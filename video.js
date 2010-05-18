@@ -4,7 +4,7 @@
 // Store a list of players on the page for reference by event listeners
 var videoJSPlayers = new Array();
 
-// Video JS Class
+// Video JS Player Class
 var VideoJS = Class.extend({
 
   // Initialize the player for the supplied video tag element
@@ -376,3 +376,14 @@ var VideoJS = Class.extend({
 
 })
 
+// Class Methods
+
+// Add video-js to any video tag with the class
+VideoJS.setup = function(){
+  var videoTags = document.getElementsByTagName("video");
+  for (var i=0;i<videoTags.length;i++) {
+    if (videoTags[i].className.indexOf("video-js") != -1) {
+      videoJSPlayers[i] = new VideoJS(document.getElementById("video"), i);
+    }
+  }
+}

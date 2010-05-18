@@ -3,17 +3,17 @@
 <head>
   <meta charset="utf-8" />
   <title>HTML5 Video Player</title>
-  <link rel="stylesheet" href="video-js.css" type="text/css" media="screen" title="Video JS" charset="utf-8">
   <script src="video.js" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript" charset="utf-8">
-    
+
     var bodyLoaded = function(){
-      videoPlayer = videoJSPlayers[0] = new VideoJS(document.getElementById("video"), 0);
+      VideoJS.setup();
     }
 
   </script>
+  <link rel="stylesheet" href="video-js.css" type="text/css" media="screen" title="Video JS" charset="utf-8">
 </head>
-<body id="body" onload="bodyLoaded();">
+<body id="body" onload="bodyLoaded()">
 
   <div class="video-box">
     <!-- Using the Video for Everybody Embed Code http://camendesign.com/code/video_for_everybody -->
