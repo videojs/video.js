@@ -16,10 +16,17 @@
 <body id="body" onload="bodyLoaded();">
 
   <div class="video-box">
+    <!-- Using the Video for Everybody Embed Code http://camendesign.com/code/video_for_everybody -->
     <video id="video" class="video-js" width="640" height="360" poster="http://zencoder-demo.s3.amazonaws.com/poster.jpg" autobuffer>
       <source src="http://zencoder-demo.s3.amazonaws.com/trailer_test.mp4" type="video/mp4"></source>
-      <source src="http://zencoder-demo.s3.amazonaws.com/trailer_test.ogg" type="video/ogg"></source>
-      <p>Sorry, this web browser does not support the video tag. For a video tag/embed code that will fall back to Quicktime and Flash see <a href="http://camendesign.com/code/video_for_everybody">Video for Everybody</a>.<br><br></p>
+      <source src="http://zencoder-demo.s3.amazonaws.com/trailer_test.ogg"></source>
+      <object width="640" height="360" type="application/x-shockwave-flash"
+        data="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf">
+        <param name="movie" value="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf" />
+        <param name="allowfullscreen" value="true" />
+        <param name="flashvars" value='config={"clip":"http://zencoder-demo.s3.amazonaws.com/trailer_test.mp4"}' />
+        <img src="http://zencoder-demo.s3.amazonaws.com/poster.jpg" width="640" height="360" alt="Poster Image" title="No video playback capabilities." />
+      </object>
     </video>
   </div>
 
