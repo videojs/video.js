@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>HTML5 Video Player</title>
+  <link rel="stylesheet" href="video-js.css" type="text/css" media="screen" title="Video JS" charset="utf-8">
+  <script src="video.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript" charset="utf-8">
+    
+    var bodyLoaded = function(){
+      videoPlayer = videoJSPlayers[0] = new VideoJS(document.getElementById("video"), 0);
+    }
+
+  </script>
+</head>
+<body id="body" onload="bodyLoaded();">
+
+  <div class="video-box">
+    <video id="video" class="video-js" width="640" height="360" poster="http://zencoder-demo.s3.amazonaws.com/poster.jpg" autobuffer>
+      <source src="http://zencoder-demo.s3.amazonaws.com/trailer_test.mp4" type="video/mp4"></source>
+      <source src="http://zencoder-demo.s3.amazonaws.com/trailer_test.ogg" type="video/ogg"></source>
+      <p>Sorry, this web browser does not support the video tag. For a video tag/embed code that will fall back to Quicktime and Flash see <a href="http://camendesign.com/code/video_for_everybody">Video for Everybody</a>.<br><br></p>
+    </video>
+  </div>
+
+</body>
+</html>
