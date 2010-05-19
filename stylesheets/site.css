@@ -1,0 +1,31 @@
+html { background: #152B38 url('../images/background.png') top left repeat-x; }
+body { font-size: 10px; line-height: 1; color: #fff; text-align: center; }
+#wrap { background: url("../images/background-highlights.png") center 20px no-repeat; }
+#main { position: relative; width: 640px; margin: 0px auto; text-align: left; padding-bottom: 20px; }
+h1 { font-size: 360%; line-height: 1; margin-bottom: 10px; text-align: center; letter-spacing: 5px; }
+h6 { font-size: 100%; text-transform: uppercase; margin-bottom: 10px; color: #999; }
+p.tagline { text-align: center; font-size: 120%; line-height: 1; }
+
+p { font-size: 1.4em; line-height: 1.5; margin-bottom: 20px; }
+a { color: #fff; }
+a img { border: 0; }
+
+ul#nav { list-style: none; margin: 0; padding: 0; height: 20px; text-align: right; margin-bottom: 20px; }
+ul#nav li { display: inline; list-style: none; margin: 0; padding: 0; padding-left: 20px; font-size: 120%; line-height: 20px; }
+ul#nav li a { color: #fff; text-decoration: none; }
+
+.video-box { margin-bottom: 0; background-color: #000; }
+p#video_note { margin-bottom: 20px; font-size: 100%; line-height: 20px; color: #999; text-align: center; }
+
+#features { width: 300px; float: left; }
+ul#feature_list { display: block; margin: 0; padding: 0; }
+ul#feature_list li { list-style: none; padding-left: 25px; font-size: 140%; line-height: 20px; margin-bottom: 25px; background: url("../images/icons/check.png") left top no-repeat; }
+
+#supported { float: right; width: 320px; }
+.supported-section { margin-bottom: 20px; }
+.supported-section a { padding-right: 10px; }
+.supported-section a:last-child { padding-right: 0; }
+
+#disqus_thread { clear: both; }
+
+#footer { clear: both; }

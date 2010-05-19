@@ -1,40 +1,129 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta charset="utf-8" />
+  <title>Video JS | HTML5 Video Player</title>
+  <script src="video-js/video.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript" charset="utf-8">
 
-	<title>zencoder/video-js @ GitHub</title>
-	
-	<style type="text/css">
-		body {
-  		margin-top: 1.0em;
-  		background-color: #920e14;
-		  font-family: "Helvetica,Arial,FreeSans";
-  		color: #ffffff;
+    var bodyLoaded = function(){
+      VideoJS.setup();
     }
-    #container {
-      margin: 0 auto;
-      width: 700px;
-    }
-		h1 { font-size: 3.8em; color: #6df1eb; margin-bottom: 3px; }
-		h1 .small { font-size: 0.4em; }
-		h1 a { text-decoration: none }
-		h2 { font-size: 1.5em; color: #6df1eb; }
-    h3 { text-align: center; color: #6df1eb; }
-    a { color: #6df1eb; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
-		pre { background: #000; color: #fff; padding: 15px;}
-    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
-	</style>
-	
+
+  </script>
+  <link rel="stylesheet" href="stylesheets/base.css" type="text/css" media="all" charset="utf-8" />
+  <link rel="stylesheet" href="video-js/video-js.css" type="text/css" media="all" charset="utf-8" />
+  <link rel="stylesheet" href="stylesheets/site.css" type="text/css" media="all" charset="utf-8" />
+
+  <!--[if !IE 7]>
+    <style type="text/css">
+      #wrap {display:table;height:100%}
+    </style>
+  <![endif]-->
+  
 </head>
+<body onload="bodyLoaded()">
 
-<body>
-  <a href="http://github.com/zencoder/video-js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+  <div id="wrap">
+    <div id="main">
+      
+      <ul id="nav">
+        <li><a href="http://github.com/zencoder/video-js">Source</a></li>
+        <li><a href="http://github.com/zencoder/video-js/issues">Issue Tracker</a></li>
+        <li><a href="http://wiki.github.com/zencoder/video-js/">Wiki</a></li>
+      </ul>
+      
+      <h1>Video JS</h1>
+      <p class="tagline">Open Source HTML5 Video Player</p>
+      
+      <div class="video-box">
+        <!-- Using the Video for Everybody Embed Code http://camendesign.com/code/video_for_everybody -->
+        <video id="video" class="video-js" width="640" height="264" poster="http://zencoder-demo.s3.amazonaws.com/poster.jpg" autobuffer>
+          <source src="http://video-js.s3.amazonaws.com/oceans-clip.mp4" type="video/mp4"></source>
+          <source src="http://video-js.s3.amazonaws.com/oceans-clip.ogg" type="video/ogg"></source>
+          <source src="http://video-js.s3.amazonaws.com/oceans-clip.webm" type="video/webm"></source>
+          <object width="640" height="264" type="application/x-shockwave-flash"
+            data="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf">
+            <param name="movie" value="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf" />
+            <param name="allowfullscreen" value="true" />
+            <param name="flashvars" value='config={"clip":"http://video-js.s3.amazonaws.com/oceans-clip.mp4"}' />
+            <img src="http://zencoder-demo.s3.amazonaws.com/poster.jpg" width="640" height="264" alt="Poster Image" title="No video playback capabilities." />
+          </object>
+        </video>
+      </div>
+      <p id="video_note">Video clip is from <a href="http://disney.go.com/disneynature/oceans/" title="Oceans">Disney&rsquo;s Oceans</a></p>
+      
+      <p>Video JS is a javascript-based video player that uses the HTML5 video functionality built into  advanced browsers. In general, the benefit of using and HTML5 player is a consisten look between browsers.</p>
+      
+      
+      <div id="features_and_support">
+        <div id="features">        
+          <h6>Features</h6>
+          <ul id="feature_list">
+            <li>Free &amp; Open Source</li>
+            <li>Lightweight. <strong>NO IMAGES USED</strong></li>
+            <li>100% skinnable using CSS</li>
+            <li>Library independant</li>
+            <li>Easy to use</li>
+            <li>Easy to understand &amp; extend</li>
+            <li>Consistent look between browsers</li>
+            <li>Full Window Mode</li>
+            <li>Volume Control</li>
+            <li></li>
+          </ul>
+        </div>
+        <div id="supported" class="clearfix">
+          <h6>Download</h6>
+          <div class="supported-section">
+            <a href="http://github.com/zencoder/video-js/zipball/master" title="Zip Download"><img src="images/icons/zip.png" alt="Zip Download"></a>
+            <a href="http://github.com/zencoder/video-js/tarball/master" title="Tar Download"><img src="images/icons/tar.png" alt="Tar Download"></a>
+          </div>
+          <h6>Supported Browsers</h6>
+          <div class="supported-section">
+            <a href="http://www.mozilla.com/en-US/firefox/firefox.html" title="Firefox"><img src="images/icons/firefox.png" alt="Firefox"></a>
+            <a href="http://www.apple.com/safari/" title="Safari"><img src="images/icons/safari.png" alt="Safari"></a>
+            <a href="http://www.google.com/chrome" title="Chrome"><img src="images/icons/chrome.png" alt="Chrome"></a>
+          </div>
+          <h6>Fallback Support For</h6>
+          <div class="supported-section">
+            <a href="http://www.microsoft.com/windows/Internet-explorer/default.aspx" title="IE"><img src="images/icons/ie.png" alt="IE"></a>
+            <a href="http://www.opera.com/" title="Opera"><img src="images/icons/opera.png" alt="Opera"></a>
+          </div>
+          <h6>Supported Formats</h6>
+          <div class="supported-section">
+            <a href="http://en.wikipedia.org/wiki/H.264/MPEG-4_AVC" title="h264"><img src="images/icons/h264.png" alt="h264"></a>
+            <a href="http://www.theora.org/" title="Ogg"><img src="images/icons/ogg.png" alt="Ogg"></a>
+            <a href="http://www.webmproject.org/" title="WebM"><img src="images/icons/webm.png" alt="WebM"></a>
+          </div>
+          <h6>Compatible With</h6>
+          <div class="supported-section">
+            <a href="http://www.apple.com/iphone/" title="iPhone"><img src="images/icons/iphone.png" alt="iPhone"></a>
+            <a href="http://www.apple.com/ipad/" title="iPad"><img src="images/icons/ipad.png" alt="iPad"></a>
+          </div>
+        </div>
+        
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+          /**
+            * var disqus_identifier; [Optional but recommended: Define a unique identifier (e.g. post id or slug) for this thread] 
+            */
+          (function() {
+           var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+           dsq.src = 'http://videojs.disqus.com/embed.js';
+           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript=videojs">comments powered by Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+        
+      </div>
+    </div>
+
+    <div id="footer">
+      Hosting &amp; Repository supplied by Zencoder - <a href="http://zencoder.com">Video encoding for your app</a>.
+    </div>
+  </div>
+<!--   <a href="http://github.com/zencoder/video-js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
 
   <div id="container">
 
@@ -52,8 +141,6 @@
       Universal video embed.
     </div>
 
-    
-
     <h2>Download</h2>
     <p>
       You can download this project in either
@@ -69,8 +156,22 @@
       get the source code on GitHub : <a href="http://github.com/zencoder/video-js">zencoder/video-js</a>
     </div>
 
-  </div>
-
+  </div> -->
+  
+  <script type="text/javascript">
+  //<![CDATA[
+  (function() {
+  	var links = document.getElementsByTagName('a');
+  	var query = '?';
+  	for(var i = 0; i < links.length; i++) {
+  	if(links[i].href.indexOf('#disqus_thread') >= 0) {
+  		query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&';
+  	}
+  	}
+  	document.write('<script charset="utf-8" type="text/javascript" src="http://disqus.com/forums/videojs/get_num_replies.js' + query + '"></' + 'script>');
+  })();
+  //]]>
+  </script>
   
 </body>
 </html>
