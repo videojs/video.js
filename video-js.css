@@ -1,4 +1,3 @@
-body { background-color: #222; color: #fff; }
 .video-box { text-align: left; position: relative; }
 .video-js { background-color: #000; }
 
@@ -20,14 +19,18 @@ body { background-color: #222; color: #fff; }
 
 /* Play/Pause */
 .vjs-play-control span { display: block; font-size: 0px; line-height: 0; text-decoration: none; }
-.vjs-play-control.vjs-play span { width: 0; height: 0; margin: 8px 0 0 8px; border-top: 5px solid #273F3E; border-left: 10px solid #fff; border-bottom: 5px solid #273F3E; }
+.vjs-play-control.vjs-play span { width: 0; height: 0; margin: 8px 0 0 8px; border-top: 5px solid #273F3E; border-left: 10px solid #fff; border-bottom: 5px solid #112129; }
 .vjs-play-control.vjs-pause span { width: 3px; height: 10px; margin: 8px auto 0; border-top: 0px; border-left: 3px solid #fff; border-bottom: 0px; border-right: 3px solid #fff; }
 
 /* Progress */
 .vjs-progress-control { width: 190px; }
 .vjs-progress-control ul { list-style: none; margin: 0; padding: 0; }
 .vjs-progress-control .vjs-progress-holder { list-style: none; position: relative; float: left; width: 100px; height: 9px; border: 1px solid #777; margin: 7px 0 0 5px; padding: 0; background-color: #112129; overflow:hidden; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
-.vjs-progress-control .vjs-play-progress { position: absolute; display: block; width: 0px; height: 9px; background-color: #fff; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
+.vjs-progress-control .vjs-play-progress { position: absolute; display: block; width: 0px; height: 9px; background: #fff; 
+    -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;
+    background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#777));
+    background: -moz-linear-gradient(top,  #fff,  #777);
+    }
 .vjs-progress-control .vjs-load-progress { position: absolute; display: block; width: 0px; height: 9px; background-color: #777; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
 .vjs-progress-control .vjs-progress-time { list-style: none; float: left; margin: 7px 0 0 5px; padding: 0; font-size: 10px; line-height: 1; font-weight: normal; font-family: Helvetica, Arial, sans-serif;  }
 
