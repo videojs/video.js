@@ -17,6 +17,7 @@ ul#nav li a { color: #fff; text-decoration: none; }
 .video-box { margin-bottom: 0; background-color: #000; }
 p#video_note { margin-bottom: 20px; font-size: 100%; line-height: 20px; color: #999; text-align: center; }
 
+#features_and_support { }
 #features { width: 300px; float: left; }
 ul#feature_list { display: block; margin: 0; padding: 0; }
 ul#feature_list li { list-style: none; padding-left: 25px; font-size: 140%; line-height: 20px; margin-bottom: 25px; background: url("../images/icons/check.png") left top no-repeat; }
@@ -26,6 +27,6 @@ ul#feature_list li { list-style: none; padding-left: 25px; font-size: 140%; line
 .supported-section a { padding-right: 10px; }
 .supported-section a:last-child { padding-right: 0; }
 
-#disqus_thread { clear: both; }
+#disqus_thread { clear: both; padding-top: 30px; }
 
-#footer { clear: both; }
+#footer { clear: both; padding: 20px 0; }
