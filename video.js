@@ -380,10 +380,20 @@ var VideoJS = Class.extend({
 
 // Add video-js to any video tag with the class
 VideoJS.setup = function(){
-  var videoTags = document.getElementsByTagName("video");
-  for (var i=0;i<videoTags.length;i++) {
-    if (videoTags[i].className.indexOf("video-js") != -1) {
-      videoJSPlayers[i] = new VideoJS(document.getElementById("video"), i);
+  if (VideoJS.supportsVideo()) {
+    var videoTags = document.getElementsByTagName("video");
+    for (var i=0;i<videoTags.length;i++) {
+      if (videoTags[i].className.indexOf("video-js") != -1) {
+        videoJSPlayers[i] = new VideoJS(document.getElementById("video"), i);
+      }
     }
   }
 }
+
+// Check if the browser supports video.
+VideoJS.supportsVideo = function() {
+  return !!document.createElement('video').canPlayType;
+}
+
+
+
