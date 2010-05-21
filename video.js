@@ -87,16 +87,13 @@ var VideoJS = Class.extend({
       </ul>
     */
 
-    this.videoBox = document.createElement("div");
-    this.video.parentNode.appendChild(this.videoBox);
-    this.videoBox.className = "video-js-box";
-    this.videoBox.appendChild(this.video);
+    
 
     // Create a list element to hold the different controls
     this.controls = document.createElement("ul");
 
     // Add the controls to the video's container
-    this.videoBox.appendChild(this.controls);
+    this.video.parentNode.appendChild(this.controls);
     this.controls.className = "vjs-controls";
 
     // Store the current video player's number
