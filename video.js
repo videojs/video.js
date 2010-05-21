@@ -17,8 +17,21 @@ var VideoJS = Class.extend({
     this.showController(); // has to come before positioning
     this.positionController();
 
+    // Listen for when the video is played
+    this.video.addEventListener("play", this.onPlay.context(this), false);
+    // Listen for when the video is paused
+    this.video.addEventListener("pause", this.onPause.context(this), false);
+    // Listen for when the video ends
+    this.video.addEventListener("ended", this.onEnded.context(this), false);
+    // Listen for a volume change
+    this.video.addEventListener('volumechange',this.onVolumeChange.context(this),false);
+    // Listen for video errors
+    this.video.addEventListener('error',this.onError.context(this),false);
+
     // Listen for clicks on the play/pause button
     this.playControl.addEventListener("click", this.onPlayControlClick.context(this), false);
+    // Make a click on the video act like a click on the play button.
+    this.video.addEventListener("click", this.onPlayControlClick.context(this), false);
 
     // Listen for drags on the progress bar
     this.progressHolder.addEventListener("mousedown", this.onProgressHolderMouseDown.context(this), false);
@@ -32,13 +45,16 @@ var VideoJS = Class.extend({
     // Set the display to the initial volume
     this.updateVolumeDisplay();
 
-    // Listen for clicks on the fullscreen button
+    // Listen for clicks on the button
     this.fullscreenControl.addEventListener("click", this.onFullscreenControlClick.context(this), false);
 
     // Listen for the mouse over the video. Used to reveal the controller.
     this.video.addEventListener("mouseover", this.onVideoMouseOver.context(this), false);
     // Listen for the mouse moving out of the video. Used to hide the controller.
     this.video.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
+    // Have to add the mouseout to the controller too or it may not hide.
+    // For some reason the same isn't needed for mouseover
+    this.controls.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
   },
 
   buildController: function(){
@@ -71,11 +87,16 @@ var VideoJS = Class.extend({
       </ul>
     */
 
+    this.videoBox = document.createElement("div");
+    this.video.parentNode.appendChild(this.videoBox);
+    this.videoBox.className = "video-js-box";
+    this.videoBox.appendChild(this.video);
+
     // Create a list element to hold the different controls
     this.controls = document.createElement("ul");
 
     // Add the controls to the video's container
-    this.video.parentNode.appendChild(this.controls);
+    this.videoBox.appendChild(this.controls);
     this.controls.className = "vjs-controls";
 
     // Store the current video player's number
@@ -166,17 +187,44 @@ var VideoJS = Class.extend({
     this.controls.style.display = "none";
   },
 
+  // When the video is played
+  onPlay: function(event){
+    this.playControl.className = "vjs-play-control vjs-pause";
+    this.trackPlayProgress();
+  },
+
+  // When the video is paused
+  onPause: function(event){
+    this.playControl.className = "vjs-play-control vjs-play";
+    this.stopTrackingPlayProgress();
+  },
+
+  // When the video ends
+  onEnded: function(event){
+    this.video.pause();
+    this.onPause();
+  },
+
+  onVolumeChange: function(event){
+    this.updateVolumeDisplay();
+  },
+
+  onError: function(event){
+    console.log(event);
+    console.log(this.video.error);
+  },
+
   // React to clicks on the play/pause button
-  onPlayControlClick: function(e){
+  onPlayControlClick: function(event){
     if (this.video.paused) {
-      this.playVideo();
+      this.video.play();
     } else {
-      this.pauseVideo();
+      this.video.pause();
     }
   },
 
   // Adjust the play position when the user drags on the progress bar
-  onProgressHolderMouseDown: function(e){
+  onProgressHolderMouseDown: function(event){
     this.stopTrackingPlayProgress();
 
     if (this.video.paused) {
@@ -187,11 +235,11 @@ var VideoJS = Class.extend({
     }
 
     this.blockTextSelection();
-    document.onmousemove = function(e) {
-      this.setPlayProgress(e.pageX);
+    document.onmousemove = function(event) {
+      this.setPlayProgress(event.pageX);
     }.context(this);
 
-    document.onmouseup = function() {
+    document.onmouseup = function(event) {
       this.unblockTextSelection();
       document.onmousemove = null;
       document.onmouseup = null;
@@ -204,15 +252,15 @@ var VideoJS = Class.extend({
 
   // When the user stops dragging on the progress bar, update play position
   // Backup for when the user only clicks and doesn't drag
-  onProgressHolderMouseUp: function(e){
-    this.setPlayProgress(e.pageX);
+  onProgressHolderMouseUp: function(event){
+    this.setPlayProgress(event.pageX);
   },
 
   // Adjust the volume when the user drags on the volume control
-  onVolumeControlMouseDown: function(e){
+  onVolumeControlMouseDown: function(event){
     this.blockTextSelection();
-    document.onmousemove = function(e) {
-      this.setVolume(e.pageX);
+    document.onmousemove = function(event) {
+      this.setVolume(event.pageX);
     }.context(this);
     document.onmouseup = function() {
       this.unblockTextSelection();
@@ -223,44 +271,35 @@ var VideoJS = Class.extend({
 
   // When the user stops dragging, set a new volume
   // Backup for when the user only clicks and doesn't drag
-  onVolumeControlMouseUp: function(e){
-    this.setVolume(e.pageX);
+  onVolumeControlMouseUp: function(event){
+    this.setVolume(event.pageX);
   },
 
   // When the user clicks on the fullscreen button, update fullscreen setting
-  onFullscreenControlClick: function(e){
+  onFullscreenControlClick: function(event){
     if (!this.videoIsFullScreen) {
       this.fullscreenOn();
     } else {
       this.fullscreenOff();
     }
   },
-  
-  onVideoMouseOver: function(e){
+
+  onVideoMouseOver: function(event){
     this.showController();
   },
-  
-  onVideoMouseOut: function(e){
-    setTimeout(function(){
+
+  onVideoMouseOut: function(event){
+    // Prevent flicker by making sure mouse hasn't left the video
+    var parent = event.relatedTarget;
+    while (parent && parent !== this.video && parent !== this.controls) {
+      parent = parent.parentNode;
+    }
+    if (parent !== this.video && parent !== this.controls) {
       this.hideController();
-    }.context(this), 1000)
+    }
   },
 
-  // Play the video
-  playVideo: function(){
-    this.video.play();
-    this.playControl.className = "vjs-play-control vjs-pause";
-    this.trackPlayProgress();
-  },
-
-  // Pause the video
-  pauseVideo: function(){
-    this.video.pause();
-    this.playControl.className = "vjs-play-control vjs-play";
-    this.stopTrackingPlayProgress();
-  },
-
-  // Adjust the width of the progress bar to fill the controls width 
+  // Adjust the width of the progress bar to fill the controls width
   sizeProgressBar: function(){
     this.progressControl.style.width = (this.controls.offsetWidth - 125) + "px";
     this.progressHolder.style.width = (this.progressControl.offsetWidth - 80) + "px";
@@ -306,7 +345,6 @@ var VideoJS = Class.extend({
       newVol = 0;
     }
     this.video.volume = newVol;
-    this.updateVolumeDisplay();
   },
 
   // Update the volume control display
