@@ -13,30 +13,32 @@ var VideoJS = Class.extend({
   init: function(element, num){
     this.video = element;
 
-    // Default the player number to 0
-    this.num = (num) ? num : 0;
-
     this.buildController();
     this.showController(); // has to come before positioning
     this.positionController();
 
     // Listen for clicks on the play/pause button
-    this.playControl.addEventListener("click", this.onPlayControlClick, true);
+    this.playControl.addEventListener("click", this.onPlayControlClick.context(this), false);
 
     // Listen for drags on the progress bar
-    this.progressHolder.addEventListener("mousedown", this.onProgressHolderMouseDown, true);
+    this.progressHolder.addEventListener("mousedown", this.onProgressHolderMouseDown.context(this), false);
     // Listen for a release on the progress bar
-    this.progressHolder.addEventListener("mouseup", this.onProgressHolderMouseUp, true);
+    this.progressHolder.addEventListener("mouseup", this.onProgressHolderMouseUp.context(this), false);
 
     // Listen for a drag on the volume control
-    this.volumeControl.addEventListener("mousedown", this.onVolumeControlMouseDown, true);
+    this.volumeControl.addEventListener("mousedown", this.onVolumeControlMouseDown.context(this), false);
     // Listen for a release on the volume control
-    this.volumeControl.addEventListener("mouseup", this.onVolumeControlMouseUp, true);
+    this.volumeControl.addEventListener("mouseup", this.onVolumeControlMouseUp.context(this), false);
     // Set the display to the initial volume
     this.updateVolumeDisplay();
 
     // Listen for clicks on the fullscreen button
-    this.fullscreenControl.addEventListener("click", this.onFullscreenControlClick, true);
+    this.fullscreenControl.addEventListener("click", this.onFullscreenControlClick.context(this), false);
+
+    // Listen for the mouse over the video. Used to reveal the controller.
+    this.video.addEventListener("mouseover", this.onVideoMouseOver.context(this), false);
+    // Listen for the mouse moving out of the video. Used to hide the controller.
+    this.video.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
   },
 
   buildController: function(){
@@ -52,7 +54,7 @@ var VideoJS = Class.extend({
               <span class="vjs-load-progress"></span><span class="vjs-play-progress"></span>
             </li>
             <li class="vjs-progress-time">
-              <span class="vjs-current-time-display">00:00</span> / <span class="vjs-duration-display">00:00</span>
+              <span class="vjs-current-time-display">00:00</span><span> / </span><span class="vjs-duration-display">00:00</span>
             </li>
           </ul>
         </li>
@@ -121,8 +123,10 @@ var VideoJS = Class.extend({
     this.currentTimeDisplay.className = "vjs-current-time-display";
     this.currentTimeDisplay.innerHTML = '00:00';
 
-    // Adding a slash for visual separation
-    this.progressTime.innerHTML += " / ";
+    // Add time separator
+    this.timeSeparator = document.createElement("span");
+    this.timeSeparator.innerHTML = " / ";
+    this.progressTime.appendChild(this.timeSeparator);
 
     // Create the total duration display
     this.durationDisplay = document.createElement("span");
@@ -164,78 +168,82 @@ var VideoJS = Class.extend({
 
   // React to clicks on the play/pause button
   onPlayControlClick: function(e){
-    var player = videoJSPlayers[this.parentNode.getAttribute("data-video-js")];
-    if (player.video.paused) {
-      player.playVideo();
+    if (this.video.paused) {
+      this.playVideo();
     } else {
-      player.pauseVideo();
+      this.pauseVideo();
     }
   },
 
   // Adjust the play position when the user drags on the progress bar
   onProgressHolderMouseDown: function(e){
-    var player = videoJSPlayers[this.parentNode.parentNode.parentNode.getAttribute("data-video-js")];
-    player.stopTrackingPlayProgress();
+    this.stopTrackingPlayProgress();
 
-    if (player.video.paused) {
-      player.videoWasPlaying = false;
+    if (this.video.paused) {
+      this.videoWasPlaying = false;
     } else {
-      player.videoWasPlaying = true;
-      player.video.pause();
+      this.videoWasPlaying = true;
+      this.video.pause();
     }
 
-    player.blockTextSelection();
+    this.blockTextSelection();
     document.onmousemove = function(e) {
-      player.setPlayProgress(e.pageX);
-    }
+      this.setPlayProgress(e.pageX);
+    }.context(this);
 
     document.onmouseup = function() {
-      player.unblockTextSelection();
+      this.unblockTextSelection();
       document.onmousemove = null;
       document.onmouseup = null;
-      if (player.videoWasPlaying) {
-        player.video.play();
-        player.trackPlayProgress();
+      if (this.videoWasPlaying) {
+        this.video.play();
+        this.trackPlayProgress();
       }
-    }
+    }.context(this);
   },
 
   // When the user stops dragging on the progress bar, update play position
   // Backup for when the user only clicks and doesn't drag
   onProgressHolderMouseUp: function(e){
-    var player = videoJSPlayers[this.parentNode.parentNode.parentNode.getAttribute("data-video-js")];
-    player.setPlayProgress(e.pageX);
+    this.setPlayProgress(e.pageX);
   },
 
   // Adjust the volume when the user drags on the volume control
   onVolumeControlMouseDown: function(e){
-    var player = videoJSPlayers[this.parentNode.getAttribute("data-video-js")];
-    player.blockTextSelection();
+    this.blockTextSelection();
     document.onmousemove = function(e) {
-      player.setVolume(e.pageX);
-    }
+      this.setVolume(e.pageX);
+    }.context(this);
     document.onmouseup = function() {
-      player.unblockTextSelection();
+      this.unblockTextSelection();
       document.onmousemove = null;
       document.onmouseup = null;
-    }
+    }.context(this);
   },
 
   // When the user stops dragging, set a new volume
   // Backup for when the user only clicks and doesn't drag
   onVolumeControlMouseUp: function(e){
-    var player = videoJSPlayers[this.parentNode.getAttribute("data-video-js")];
-    player.setVolume(e.pageX);
+    this.setVolume(e.pageX);
   },
 
   // When the user clicks on the fullscreen button, update fullscreen setting
   onFullscreenControlClick: function(e){
-    var player = videoJSPlayers[this.parentNode.getAttribute("data-video-js")];
-    if (!player.videoIsFullScreen) {
-      player.fullscreenOn();
+    if (!this.videoIsFullScreen) {
+      this.fullscreenOn();
     } else {
-      player.fullscreenOff();
+      this.fullscreenOff();
     }
+  },
+  
+  onVideoMouseOver: function(e){
+    this.showController();
+  },
+  
+  onVideoMouseOut: function(e){
+    setTimeout(function(){
+      this.hideController();
+    }.context(this), 1000)
   },
 
   // Play the video
@@ -261,8 +269,7 @@ var VideoJS = Class.extend({
 
   // Track & display the current play progress
   trackPlayProgress: function(){
-    context = this;
-    this.playProgressInterval = setInterval(function(){ context.updatePlayProgress(); }, 33);
+    this.playProgressInterval = setInterval(function(){ this.updatePlayProgress(); }.context(this), 33);
   },
 
   // Turn off play progress tracking (when paused)
@@ -384,7 +391,7 @@ VideoJS.setup = function(){
     var videoTags = document.getElementsByTagName("video");
     for (var i=0;i<videoTags.length;i++) {
       if (videoTags[i].className.indexOf("video-js") != -1) {
-        videoJSPlayers[i] = new VideoJS(document.getElementById("video"), i);
+        videoJSPlayers[i] = new VideoJS(videoTags[i], i);
       }
     }
   }
@@ -396,4 +403,12 @@ VideoJS.supportsVideo = function() {
 }
 
 
-
+// Allows for binding context to functions
+// when using in event listeners and timeouts
+Function.prototype.context = function(obj) {
+  var method = this
+  temp = function() {
+    return method.apply(obj, arguments)
+  }
+ return temp
+}
