@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>HTML5 Video Player</title>
+  <script src="video.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript" charset="utf-8">
+
+    // If using jQuery
+    // $(function(){
+    //   VideoJS.setup();
+    // })
+    
+    window.onload = function(){
+      VideoJS.setup();
+    }
+
+  </script>
+  <link rel="stylesheet" href="video-js.css" type="text/css" media="screen" title="Video JS" charset="utf-8">
+</head>
+<body id="body">
+
+  <!-- Using the Video for Everybody Embed Code (modified for VP8/WebM) http://camendesign.com/code/video_for_everybody -->
+  <video id="video" class="video-js" width="640" height="264" poster="http://video-js.s3.amazonaws.com/oceans-clip.png" autobuffer>
+    <source src="http://video-js.s3.amazonaws.com/oceans-clip.mp4" type="video/mp4">
+    <source src="http://video-js.s3.amazonaws.com/oceans-clip.webm" type="video/webm">
+    <source src="http://video-js.s3.amazonaws.com/oceans-clip.ogg" type="video/ogg">
+    <object width="640" height="264" type="application/x-shockwave-flash"
+      data="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf">
+      <param name="movie" value="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf" />
+      <param name="allowfullscreen" value="true" />
+      <param name="flashvars" value='config={"clip":"http://video-js.s3.amazonaws.com/oceans-clip.mp4"}' />
+      <img src="http://video-js.s3.amazonaws.com/oceans-clip.png" width="640" height="264" alt="Poster Image" title="No video playback capabilities." />
+    </object>
+  </video>
+
+</body>
+</html>

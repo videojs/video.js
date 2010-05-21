@@ -14,7 +14,7 @@ ul#nav { list-style: none; margin: 0; padding: 0; height: 20px; text-align: righ
 ul#nav li { display: inline; list-style: none; margin: 0; padding: 0; padding-left: 20px; font-size: 120%; line-height: 20px; }
 ul#nav li a { color: #fff; text-decoration: none; }
 
-.video-box { margin-bottom: 0; background-color: #000; }
+.video-js-box { margin-bottom: 0; background-color: #000; }
 p#video_note { margin-bottom: 20px; font-size: 100%; line-height: 20px; color: #999; text-align: center; }
 
 #features_and_support { }

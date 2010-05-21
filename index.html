@@ -4,13 +4,6 @@
   <meta charset="utf-8" />
   <title>Video JS | HTML5 Video Player</title>
   <script src="video-js/video.js" type="text/javascript" charset="utf-8"></script>
-  <script type="text/javascript" charset="utf-8">
-
-    var bodyLoaded = function(){
-      VideoJS.setup();
-    }
-
-  </script>
   <link rel="stylesheet" href="stylesheets/base.css" type="text/css" media="all" charset="utf-8" />
   <link rel="stylesheet" href="video-js/video-js.css" type="text/css" media="all" charset="utf-8" />
   <link rel="stylesheet" href="stylesheets/site.css" type="text/css" media="all" charset="utf-8" />
@@ -36,7 +29,7 @@
       <h1>Video JS</h1>
       <p class="tagline">Open Source HTML5 Video Player</p>
 
-      <div class="video-box">
+      <div class="video-js-box">
         <!-- Using the Video for Everybody Embed Code (modified for VP8/WebM) http://camendesign.com/code/video_for_everybody -->
         <video id="video" class="video-js" width="640" height="264" poster="http://video-js.s3.amazonaws.com/oceans-clip.png" autobuffer>
           <source src="http://video-js.s3.amazonaws.com/oceans-clip.mp4" type="video/mp4"></source>
@@ -51,6 +44,11 @@
           </object>
         </video>
       </div>
+      
+      <script type="text/javascript" charset="utf-8">
+        VideoJS.setup();
+      </script>
+      
       <p id="video_note">Video clip is from <a href="http://disney.go.com/disneynature/oceans/" title="Oceans">Disney&rsquo;s Oceans</a></p>
 
       <p>Video JS is a javascript-based video player that uses the HTML5 video functionality built into  advanced browsers. In general, the benefit of using an HTML5 player is a consistent look between browsers.</p>
