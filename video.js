@@ -14,8 +14,7 @@ var VideoJS = Class.extend({
     this.video = element;
 
     this.buildController();
-    this.showController(); // has to come before positioning
-    this.positionController();
+    this.showController();
 
     // Listen for when the video is played
     this.video.addEventListener("play", this.onPlay.context(this), false);
@@ -169,10 +168,14 @@ var VideoJS = Class.extend({
   // Show the controller
   showController: function(){
     this.controls.style.display = "block";
+    this.positionController();
   },
 
   // Place controller relative to the video's position
   positionController: function(){
+    // Make sure the controls are visible
+    if (this.controls.style.display == 'none') return;
+
     this.controls.style.top = (this.video.offsetHeight - this.controls.offsetHeight) + "px";
     this.controls.style.left = "0px";
     this.controls.style.width = this.video.offsetWidth + "px";
@@ -368,7 +371,17 @@ var VideoJS = Class.extend({
 
     // Hide any scroll bars
     document.documentElement.style.overflow = 'hidden';
+    this.fullscreenControl.className = "vjs-fullscreen-control vjs-fs-active";
 
+    // Watch for when the window is resized and resize the video to match.
+    this.fullWindowResize = window.addEventListener('resize', this.sizeToWindow.context(this), false);
+
+    // Resize the video to the window
+    this.sizeToWindow();
+  },
+
+  // Resize the video to the full window
+  sizeToWindow: function(){
     this.video.style.width = window.innerWidth + "px";
     this.video.style.height = window.innerHeight + "px";
     this.video.style.position = "fixed";
@@ -376,8 +389,6 @@ var VideoJS = Class.extend({
     this.video.style.top = 0;
     this.controls.style.position = "fixed";
     this.positionController();
-
-    this.fullscreenControl.className = "vjs-fullscreen-control vjs-fs-active";
   },
 
   // Turn off fullscreen (window) mode
@@ -387,6 +398,10 @@ var VideoJS = Class.extend({
     // Unhide scroll bars.
     document.documentElement.style.overflow = this.docOrigOverflow;
 
+    // Remove window resizing event listener
+    window.removeEventListener('resize', this.sizeToWindow.context(this), false);
+
+    // Resize to original settings
     this.video.style.width = this.videoOrigWidth + "px";
     this.video.style.height = this.videoOrigHeight + "px";
     this.video.style.position = "static";
