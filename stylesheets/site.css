@@ -17,6 +17,8 @@ ul#nav li a { color: #fff; text-decoration: none; }
 .video-js-box { margin-bottom: 0; background-color: #000; }
 p#video_note { margin-bottom: 20px; font-size: 100%; line-height: 20px; color: #999; text-align: center; }
 
+p#sponsor { font-size: 10px; }
+
 #features_and_support { }
 #features { width: 300px; float: left; }
 ul#feature_list { display: block; margin: 0; padding: 0; }
