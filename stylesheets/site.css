@@ -27,6 +27,8 @@ ul#feature_list li { list-style: none; padding-left: 25px; font-size: 140%; line
 .supported-section a { padding-right: 10px; }
 .supported-section a:last-child { padding-right: 0; }
 
+#issues_link { clear: both; padding-top: 20px; text-align: center; }
+
 #disqus_thread { clear: both; padding-top: 30px; }
 
 #footer { clear: both; padding: 20px 0; }
