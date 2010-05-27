@@ -364,6 +364,10 @@ var VideoJS = Class.extend({
     this.videoIsFullScreen = true;
     this.videoOrigWidth = this.video.offsetWidth;
     this.videoOrigHeight = this.video.offsetHeight;
+    this.docOrigOverflow = document.documentElement.style.overflow;
+
+    // Hide any scroll bars
+    document.documentElement.style.overflow = 'hidden';
 
     this.video.style.width = window.innerWidth + "px";
     this.video.style.height = window.innerHeight + "px";
@@ -379,6 +383,10 @@ var VideoJS = Class.extend({
   // Turn off fullscreen (window) mode
   fullscreenOff: function(){
     this.videoIsFullScreen = false;
+
+    // Unhide scroll bars.
+    document.documentElement.style.overflow = this.docOrigOverflow;
+
     this.video.style.width = this.videoOrigWidth + "px";
     this.video.style.height = this.videoOrigHeight + "px";
     this.video.style.position = "static";
