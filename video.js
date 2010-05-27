@@ -315,6 +315,7 @@ var VideoJS = Class.extend({
 
   // Ajust the play progress bar's width based on the current play time
   updatePlayProgress: function(){
+    if (this.controls.style.display == 'none') return;
     this.playProgress.style.width = ((this.video.currentTime / this.video.duration) * (this.progressHolder.offsetWidth - 2)) + "px";
     this.updateTimeDisplay();
   },
