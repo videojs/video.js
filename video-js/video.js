@@ -12,6 +12,8 @@ var VideoJS = Class.extend({
   // num: the current player's position in the videoJSPlayers array
   init: function(element, num){
     this.video = element;
+    this.num = num;
+    this.box = element.parentNode;
 
     this.buildController();
     this.showController();
@@ -365,29 +367,14 @@ var VideoJS = Class.extend({
   // Real fullscreen isn't available in browsers quite yet.
   fullscreenOn: function(){
     this.videoIsFullScreen = true;
-    this.videoOrigWidth = this.video.offsetWidth;
-    this.videoOrigHeight = this.video.offsetHeight;
     this.docOrigOverflow = document.documentElement.style.overflow;
 
     // Hide any scroll bars
     document.documentElement.style.overflow = 'hidden';
     this.fullscreenControl.className = "vjs-fullscreen-control vjs-fs-active";
-
-    // Watch for when the window is resized and resize the video to match.
-    this.fullWindowResize = window.addEventListener('resize', this.sizeToWindow.context(this), false);
-
+    this.box.className = "video-js-box vjs-fullscreen";
+    
     // Resize the video to the window
-    this.sizeToWindow();
-  },
-
-  // Resize the video to the full window
-  sizeToWindow: function(){
-    this.video.style.width = window.innerWidth + "px";
-    this.video.style.height = window.innerHeight + "px";
-    this.video.style.position = "fixed";
-    this.video.style.left = 0;
-    this.video.style.top = 0;
-    this.controls.style.position = "fixed";
     this.positionController();
   },
 
@@ -399,15 +386,14 @@ var VideoJS = Class.extend({
     document.documentElement.style.overflow = this.docOrigOverflow;
 
     // Remove window resizing event listener
-    window.removeEventListener('resize', this.sizeToWindow.context(this), false);
+    window.removeEventListener('resize', this.fullWindowResize, false);
 
     // Resize to original settings
-    this.video.style.width = this.videoOrigWidth + "px";
-    this.video.style.height = this.videoOrigHeight + "px";
     this.video.style.position = "static";
     this.controls.style.position = "absolute";
     this.positionController();
     this.fullscreenControl.className = "vjs-fullscreen-control";
+    this.box.className = "video-js-box";
   },
 
   // Attempt to block the ability to select text while dragging controls
