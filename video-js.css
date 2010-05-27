@@ -1,7 +1,7 @@
 .video-js-box { text-align: left; position: relative; z-index: 1000; }
 video.video-js { background-color: #000; }
 
-.video-js-box.vjs-fullscreen { position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: hidden; }
+.video-js-box.vjs-fullscreen { position: fixed; left: 0; top: 0; right: 0; bottom: 0; overflow: hidden; }
 .video-js-box.vjs-fullscreen video.video-js { position: absolute; width: 100%; height: 100%; }
 
 /* General controls styles */
