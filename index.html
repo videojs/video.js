@@ -6,6 +6,9 @@
   <meta name="google-site-verification" content="QHf9MEYVlEWoNHbzTeUkSQsbRT5Twzqu6N0nX1i3nes" />
   
   <script src="video-js/video.js" type="text/javascript" charset="utf-8"></script>
+  <!-- JQuery not required, but used for dom ready function -->
+  <script src="javascripts/jquery-1.4.2.min.js" type="text/javascript" charset="utf-8"></script>
+
   <link rel="stylesheet" href="stylesheets/base.css" type="text/css" media="all" charset="utf-8" />
   <link rel="stylesheet" href="video-js/video-js.css" type="text/css" media="all" charset="utf-8" />
   <link rel="stylesheet" href="stylesheets/site.css" type="text/css" media="all" charset="utf-8" />
@@ -17,9 +20,11 @@
   <![endif]-->
 
   <script type="text/javascript" charset="utf-8">
-    window.onload = function(){
+    // Using JQuery's DOM Ready function
+    // You can also use window.onload, but it loads slower
+    $(function(){
       VideoJS.setup();
-    }
+    })
   </script>
 
 </head>
