@@ -66,8 +66,8 @@ var VideoJS = Class.extend({
     // Listen for clicks on the button
     this.fullscreenControl.addEventListener("click", this.onFullscreenControlClick.context(this), false);
 
-    // Listen for the mouse over the video. Used to reveal the controller.
-    this.video.addEventListener("mouseover", this.onVideoMouseOver.context(this), false);
+    // Listen for the mouse move the video. Used to reveal the controller.
+    this.video.addEventListener("mousemove", this.onVideoMouseMove.context(this), false);
     // Listen for the mouse moving out of the video. Used to hide the controller.
     this.video.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
     // Have to add the mouseout to the controller too or it may not hide.
@@ -303,8 +303,10 @@ var VideoJS = Class.extend({
     }
   },
 
-  onVideoMouseOver: function(event){
+  onVideoMouseMove: function(event){
     this.showController();
+    clearInterval(this.mouseMoveTimeout);
+    this.mouseMoveTimeout = setTimeout(function(){this.hideController(); }.context(this), 4000);
   },
 
   onVideoMouseOut: function(event){
