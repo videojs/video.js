@@ -1,8 +1,25 @@
+/*
+This file is part of VideoJS. Copyright 2010 Zencoder, Inc.
+
+VideoJS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+VideoJS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with VideoJS.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+// Store a list of players on the page for reference
+var videoJSPlayers = new Array();
+
 // Using jresig's Class implementation http://ejohn.org/blog/simple-javascript-inheritance/
 (function(){var initializing=false, fnTest=/xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/; this.Class = function(){}; Class.extend = function(prop) { var _super = this.prototype; initializing = true; var prototype = new this(); initializing = false; for (var name in prop) { prototype[name] = typeof prop[name] == "function" && typeof _super[name] == "function" && fnTest.test(prop[name]) ? (function(name, fn){ return function() { var tmp = this._super; this._super = _super[name]; var ret = fn.apply(this, arguments); this._super = tmp; return ret; }; })(name, prop[name]) : prop[name]; } function Class() { if ( !initializing && this.init ) this.init.apply(this, arguments); } Class.prototype = prototype; Class.constructor = Class; Class.extend = arguments.callee; return Class;};})();
-
-// Store a list of players on the page for reference by event listeners
-var videoJSPlayers = new Array();
 
 // Video JS Player Class
 var VideoJS = Class.extend({
