@@ -1,8 +1,25 @@
+/*
+This file is part of VideoJS. Copyright 2010 Zencoder, Inc.
+
+VideoJS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+VideoJS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with VideoJS.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+// Store a list of players on the page for reference
+var videoJSPlayers = new Array();
+
 // Using jresig's Class implementation http://ejohn.org/blog/simple-javascript-inheritance/
 (function(){var initializing=false, fnTest=/xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/; this.Class = function(){}; Class.extend = function(prop) { var _super = this.prototype; initializing = true; var prototype = new this(); initializing = false; for (var name in prop) { prototype[name] = typeof prop[name] == "function" && typeof _super[name] == "function" && fnTest.test(prop[name]) ? (function(name, fn){ return function() { var tmp = this._super; this._super = _super[name]; var ret = fn.apply(this, arguments); this._super = tmp; return ret; }; })(name, prop[name]) : prop[name]; } function Class() { if ( !initializing && this.init ) this.init.apply(this, arguments); } Class.prototype = prototype; Class.constructor = Class; Class.extend = arguments.callee; return Class;};})();
-
-// Store a list of players on the page for reference by event listeners
-var videoJSPlayers = new Array();
 
 // Video JS Player Class
 var VideoJS = Class.extend({
@@ -15,8 +32,13 @@ var VideoJS = Class.extend({
     this.num = num;
     this.box = element.parentNode;
 
+    this.showPoster();
+
     this.buildController();
     this.showController();
+
+    // Position & show controls when data is loaded
+    this.video.addEventListener("loadeddata", this.onLoadedData.context(this), false);
 
     // Listen for when the video is played
     this.video.addEventListener("play", this.onPlay.context(this), false);
@@ -49,10 +71,16 @@ var VideoJS = Class.extend({
     // Listen for clicks on the button
     this.fullscreenControl.addEventListener("click", this.onFullscreenControlClick.context(this), false);
 
-    // Listen for the mouse over the video. Used to reveal the controller.
-    this.video.addEventListener("mouseover", this.onVideoMouseOver.context(this), false);
+    // Listen for the mouse move the video. Used to reveal the controller.
+    this.video.addEventListener("mousemove", this.onVideoMouseMove.context(this), false);
     // Listen for the mouse moving out of the video. Used to hide the controller.
     this.video.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
+
+    // Listen for the mouse move the poster image. Used to reveal the controller.
+    this.poster.addEventListener("mousemove", this.onVideoMouseMove.context(this), false);
+    // Listen for the mouse moving out of the poster image. Used to hide the controller.
+    this.poster.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
+
     // Have to add the mouseout to the controller too or it may not hide.
     // For some reason the same isn't needed for mouseover
     this.controls.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
@@ -87,8 +115,6 @@ var VideoJS = Class.extend({
         </li>
       </ul>
     */
-
-    
 
     // Create a list element to hold the different controls
     this.controls = document.createElement("ul");
@@ -184,6 +210,26 @@ var VideoJS = Class.extend({
     this.sizeProgressBar();
   },
 
+  // Add the video poster to the video's container, to fix autobuffer/preload bug
+  showPoster: function(){
+    this.poster = document.createElement("img");
+    this.video.parentNode.appendChild(this.poster);
+
+    // Add image data and style it correctly
+    this.poster.src = this.video.poster;
+    this.poster.className = "vjs-poster";
+
+    this.positionPoster();
+  },
+
+  // Size the poster image
+  positionPoster: function(){
+    // Only if the poster is visible
+    if (this.poster.style.display == 'none') return;
+    this.poster.style.height = this.video.offsetHeight + "px";
+    this.poster.style.width = this.video.offsetWidth + "px";
+  },
+
   // Hide the controller
   hideController: function(){
     this.controls.style.display = "none";
@@ -192,6 +238,7 @@ var VideoJS = Class.extend({
   // When the video is played
   onPlay: function(event){
     this.playControl.className = "vjs-play-control vjs-pause";
+    this.poster.style.display = "none";
     this.trackPlayProgress();
   },
 
@@ -214,6 +261,10 @@ var VideoJS = Class.extend({
   onError: function(event){
     console.log(event);
     console.log(this.video.error);
+  },
+
+  onLoadedData: function(event){
+    this.showController();
   },
 
   // React to clicks on the play/pause button
@@ -286,8 +337,10 @@ var VideoJS = Class.extend({
     }
   },
 
-  onVideoMouseOver: function(event){
+  onVideoMouseMove: function(event){
     this.showController();
+    clearInterval(this.mouseMoveTimeout);
+    this.mouseMoveTimeout = setTimeout(function(){this.hideController(); }.context(this), 4000);
   },
 
   onVideoMouseOut: function(event){
@@ -367,15 +420,19 @@ var VideoJS = Class.extend({
   // Real fullscreen isn't available in browsers quite yet.
   fullscreenOn: function(){
     this.videoIsFullScreen = true;
+
+    // Storing original doc overflow value to return to when fullscreen is off
     this.docOrigOverflow = document.documentElement.style.overflow;
 
     // Hide any scroll bars
     document.documentElement.style.overflow = 'hidden';
-    this.fullscreenControl.className = "vjs-fullscreen-control vjs-fs-active";
+
+    // Apply fullscreen styles
     this.box.className = "video-js-box vjs-fullscreen";
-    
-    // Resize the video to the window
+
+    // Resize the controller and poster
     this.positionController();
+    this.positionPoster();
   },
 
   // Turn off fullscreen (window) mode
@@ -385,15 +442,12 @@ var VideoJS = Class.extend({
     // Unhide scroll bars.
     document.documentElement.style.overflow = this.docOrigOverflow;
 
-    // Remove window resizing event listener
-    window.removeEventListener('resize', this.fullWindowResize, false);
+    // Remove fullscreen styles
+    this.box.className = "video-js-box";
 
     // Resize to original settings
-    this.video.style.position = "static";
-    this.controls.style.position = "absolute";
     this.positionController();
-    this.fullscreenControl.className = "vjs-fullscreen-control";
-    this.box.className = "video-js-box";
+    this.positionPoster();
   },
 
   // Attempt to block the ability to select text while dragging controls
