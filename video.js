@@ -32,6 +32,9 @@ var VideoJS = Class.extend({
     this.num = num;
     this.box = element.parentNode;
 
+    // Hide no-video download paragraph
+    this.box.getElementsByClassName("vjs-no-video")[0].style.display = "none";
+    
     this.buildPoster();
     this.showPoster();
 
@@ -508,7 +511,6 @@ var VideoJS = Class.extend({
     }
     return curleft;
   }
-
 })
 
 // Class Methods

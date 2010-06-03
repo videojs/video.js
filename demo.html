@@ -3,25 +3,38 @@
 <head>
   <meta charset="utf-8" />
   <title>HTML5 Video Player</title>
+
+  <!-- Include the VideoJS Library -->
   <script src="video.js" type="text/javascript" charset="utf-8"></script>
+
   <script type="text/javascript" charset="utf-8">
+    // Run the script on page load.
 
     // If using jQuery
     // $(function(){
     //   VideoJS.setup();
     // })
     
+    // If using Prototype
+    // document.observe("dom:loaded", function() {
+    //   VideoJS.setup();
+    // });
+    
+    // If not using a JS library
     window.onload = function(){
       VideoJS.setup();
     }
 
   </script>
+  
+  <!-- Include the VideoJS Stylesheet -->
   <link rel="stylesheet" href="video-js.css" type="text/css" media="screen" title="Video JS" charset="utf-8">
 </head>
-<body id="body">
-
+<body>
+  
+  <!-- Begin VideoJS -->
   <div class="video-js-box">
-    <!-- Using the Video for Everybody Embed Code (modified for VP8/WebM) http://camendesign.com/code/video_for_everybody -->
+    <!-- Using the Video for Everybody Embed Code http://camendesign.com/code/video_for_everybody -->
     <video id="video" class="video-js" width="640" height="264" poster="http://video-js.s3.amazonaws.com/oceans-clip.png" preload>
       <source src="http://video-js.s3.amazonaws.com/oceans-clip.mp4" type="video/mp4">
       <source src="http://video-js.s3.amazonaws.com/oceans-clip.webm" type="video/webm">
@@ -31,10 +44,18 @@
         <param name="movie" value="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf" />
         <param name="allowfullscreen" value="true" />
         <param name="flashvars" value='config={"clip":"http://video-js.s3.amazonaws.com/oceans-clip.mp4"}' />
-        <img src="http://video-js.s3.amazonaws.com/oceans-clip.png" width="640" height="264" alt="Poster Image" title="No video playback capabilities." />
+        <img src="http://video-js.s3.amazonaws.com/oceans-clip.png" width="640" height="264" alt="Poster Image" 
+          title="No video playback capabilities." />
       </object>
     </video>
+    <p class="vjs-no-video"><strong>Download Video:</strong>
+      <a href="http://video-js.s3.amazonaws.com/oceans-clip.mp4">MP4</a>,
+      <a href="http://video-js.s3.amazonaws.com/oceans-clip.webm">WebM</a>,
+      <a href="http://video-js.s3.amazonaws.com/oceans-clip.ogg">Ogg</a><br>
+      <a href="http://videojs.com">HTML5 Video Player</a> by <a href="http://videojs.com">VideoJS</a>
+    </p>
   </div>
-
+  <!-- End VideoJS -->
+  
 </body>
 </html>
