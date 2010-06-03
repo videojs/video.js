@@ -32,6 +32,7 @@ var VideoJS = Class.extend({
     this.num = num;
     this.box = element.parentNode;
 
+    this.buildPoster();
     this.showPoster();
 
     this.buildController();
@@ -55,6 +56,8 @@ var VideoJS = Class.extend({
     this.playControl.addEventListener("click", this.onPlayControlClick.context(this), false);
     // Make a click on the video act like a click on the play button.
     this.video.addEventListener("click", this.onPlayControlClick.context(this), false);
+    // Make a click on the poster act like a click on the play button.
+    if (this.poster) this.poster.addEventListener("click", this.onPlayControlClick.context(this), false);
 
     // Listen for drags on the progress bar
     this.progressHolder.addEventListener("mousedown", this.onProgressHolderMouseDown.context(this), false);
@@ -77,9 +80,9 @@ var VideoJS = Class.extend({
     this.video.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
 
     // Listen for the mouse move the poster image. Used to reveal the controller.
-    this.poster.addEventListener("mousemove", this.onVideoMouseMove.context(this), false);
+    if (this.poster) this.poster.addEventListener("mousemove", this.onVideoMouseMove.context(this), false);
     // Listen for the mouse moving out of the poster image. Used to hide the controller.
-    this.poster.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
+    if (this.poster) this.poster.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
 
     // Have to add the mouseout to the controller too or it may not hide.
     // For some reason the same isn't needed for mouseover
@@ -210,35 +213,50 @@ var VideoJS = Class.extend({
     this.sizeProgressBar();
   },
 
+  // Hide the controller
+  hideController: function(){
+    this.controls.style.display = "none";
+  },
+
+  buildPoster: function(){
+    if (this.video.poster) {
+      this.poster = document.createElement("img");
+      // Add poster to video box
+      this.video.parentNode.appendChild(this.poster);
+
+      // Add poster image data
+      this.poster.src = this.video.poster;
+      // Add poster styles
+      this.poster.className = "vjs-poster";
+    } else {
+      this.poster = false;
+    }
+  },
+
   // Add the video poster to the video's container, to fix autobuffer/preload bug
   showPoster: function(){
-    this.poster = document.createElement("img");
-    this.video.parentNode.appendChild(this.poster);
-
-    // Add image data and style it correctly
-    this.poster.src = this.video.poster;
-    this.poster.className = "vjs-poster";
-
+    if (!this.poster) return;
+    this.poster.style.display = "block";
     this.positionPoster();
   },
 
   // Size the poster image
   positionPoster: function(){
     // Only if the poster is visible
-    if (this.poster.style.display == 'none') return;
+    if (this.poster == false || this.poster.style.display == 'none') return;
     this.poster.style.height = this.video.offsetHeight + "px";
     this.poster.style.width = this.video.offsetWidth + "px";
   },
 
-  // Hide the controller
-  hideController: function(){
-    this.controls.style.display = "none";
+  hidePoster: function(){
+    if (!this.poster) return;
+    this.poster.style.display = "none";
   },
 
   // When the video is played
   onPlay: function(event){
     this.playControl.className = "vjs-play-control vjs-pause";
-    this.poster.style.display = "none";
+    this.hidePoster();
     this.trackPlayProgress();
   },
 
