@@ -8,6 +8,7 @@ video.video-js { background-color: #000; }
 
 img.vjs-poster { display: block; position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; }
 
+.video-js-box p { font-size: small; }
 
 /* DEFAULT SKIN */
 /* Using all CSS to draw the controls. Images could be used to simplify the CSS if desired.
