@@ -68,7 +68,7 @@ var VideoJS = Class.extend({
     this.progressHolder.addEventListener("mouseup", this.onProgressHolderMouseUp.context(this), false);
 
     // Set to stored volume OR 85%
-    this.setVolume(localStorage["volume"] || 0.85);
+    this.setVolume(localStorage.volume || 0.85);
     // Listen for a drag on the volume control
     this.volumeControl.addEventListener("mousedown", this.onVolumeControlMouseDown.context(this), false);
     // Listen for a release on the volume control
@@ -421,8 +421,8 @@ var VideoJS = Class.extend({
 
   // Set a new volume based on where the user clicked on the volume control
   setVolume: function(newVol){
-    this.video.volume = newVol;
-    localStorage["volume"] = this.video.volume;
+    this.video.volume = parseFloat(newVol);
+    localStorage.volume = this.video.volume;
   },
 
   setVolumeWithEvent: function(event){
