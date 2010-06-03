@@ -64,6 +64,8 @@ var VideoJS = Class.extend({
     // Listen for a release on the progress bar
     this.progressHolder.addEventListener("mouseup", this.onProgressHolderMouseUp.context(this), false);
 
+    // Set to stored volume OR 85%
+    this.setVolume(localStorage["volume"] || 0.85);
     // Listen for a drag on the volume control
     this.volumeControl.addEventListener("mousedown", this.onVolumeControlMouseDown.context(this), false);
     // Listen for a release on the volume control
@@ -307,7 +309,7 @@ var VideoJS = Class.extend({
 
     this.blockTextSelection();
     document.onmousemove = function(event) {
-      this.setPlayProgress(event.pageX);
+      this.setPlayProgressWithEvent(event);
     }.context(this);
 
     document.onmouseup = function(event) {
@@ -324,14 +326,14 @@ var VideoJS = Class.extend({
   // When the user stops dragging on the progress bar, update play position
   // Backup for when the user only clicks and doesn't drag
   onProgressHolderMouseUp: function(event){
-    this.setPlayProgress(event.pageX);
+    this.setPlayProgressWithEvent(event);
   },
 
   // Adjust the volume when the user drags on the volume control
   onVolumeControlMouseDown: function(event){
     this.blockTextSelection();
     document.onmousemove = function(event) {
-      this.setVolume(event.pageX);
+      this.setVolumeWithEvent(event);
     }.context(this);
     document.onmouseup = function() {
       this.unblockTextSelection();
@@ -343,7 +345,7 @@ var VideoJS = Class.extend({
   // When the user stops dragging, set a new volume
   // Backup for when the user only clicks and doesn't drag
   onVolumeControlMouseUp: function(event){
-    this.setVolume(event.pageX);
+    this.setVolumeWithEvent(event);
   },
 
   // When the user clicks on the fullscreen button, update fullscreen setting
@@ -358,7 +360,7 @@ var VideoJS = Class.extend({
   onVideoMouseMove: function(event){
     this.showController();
     clearInterval(this.mouseMoveTimeout);
-    this.mouseMoveTimeout = setTimeout(function(){this.hideController(); }.context(this), 4000);
+    this.mouseMoveTimeout = setTimeout(function(){ this.hideController(); }.context(this), 4000);
   },
 
   onVideoMouseOut: function(event){
@@ -397,11 +399,15 @@ var VideoJS = Class.extend({
   },
 
   // Update the play position based on where the user clicked on the progresss bar
-  setPlayProgress: function(clickX) {
-    var newPercent = Math.max(0, Math.min(1, (clickX - this.findPosX(this.progressHolder)) / this.progressHolder.offsetWidth));
-    this.video.currentTime = newPercent * this.video.duration
-    this.playProgress.style.width = newPercent * (this.progressHolder.offsetWidth - 2)  + "px";
+  setPlayProgress: function(newProgress){
+    this.video.currentTime = newProgress * this.video.duration;
+    this.playProgress.style.width = newProgress * (this.progressHolder.offsetWidth - 2)  + "px";
     this.updateTimeDisplay();
+  },
+  
+  setPlayProgressWithEvent: function(event){
+    var newProgress = this.getRelativePosition(event.pageX, this.progressHolder);
+    this.setPlayProgress(newProgress);
   },
 
   // Update the displayed time (00:00)
@@ -411,14 +417,14 @@ var VideoJS = Class.extend({
   },
 
   // Set a new volume based on where the user clicked on the volume control
-  setVolume: function(clickX) {
-    var newVol = (clickX - this.findPosX(this.volumeControl)) / this.volumeControl.offsetWidth;
-    if (newVol > 1) {
-      newVol = 1;
-    } else if (newVol < 0) {
-      newVol = 0;
-    }
+  setVolume: function(newVol){
     this.video.volume = newVol;
+    localStorage["volume"] = this.video.volume;
+  },
+
+  setVolumeWithEvent: function(event){
+    var newVol = this.getRelativePosition(event.pageX, this.volumeControl);
+    this.setVolume(newVol);
   },
 
   // Update the volume control display
@@ -487,6 +493,11 @@ var VideoJS = Class.extend({
     seconds = Math.floor(seconds % 60);
     seconds = (seconds >= 10) ? seconds : "0" + seconds;
     return minutes + ":" + seconds;
+  },
+
+  // Return the relative horizonal position of an event as a value from 0-1
+  getRelativePosition: function(x, relativeElement){
+    return Math.max(0, Math.min(1, (x - this.findPosX(relativeElement)) / relativeElement.offsetWidth));
   },
 
   // Get an objects position on the page
