@@ -34,9 +34,14 @@ var VideoJS = Class.extend({
 
     // Hide no-video download paragraph
     this.box.getElementsByClassName("vjs-no-video")[0].style.display = "none";
-    
+
     this.buildPoster();
     this.showPoster();
+
+    this.propertyInterval
+
+    this.video.preload = true;
+    this.video.autobuffer = true;
 
     // Hide default controls
     this.video.controls = false;
@@ -57,6 +62,10 @@ var VideoJS = Class.extend({
     this.video.addEventListener('volumechange',this.onVolumeChange.context(this),false);
     // Listen for video errors
     this.video.addEventListener('error',this.onError.context(this),false);
+    // Listen for Video Load Progress (currently does not if html file is local)
+    this.video.addEventListener('progress', this.onProgress.context(this), false);
+    // Sometimes the 'progress' event doesn't fire the final (finished) progress notice.
+    this.watchBuffer = setInterval(this.updateBufferedTotal.context(this), 500);
 
     // Listen for clicks on the play/pause button
     this.playControl.addEventListener("click", this.onPlayControlClick.context(this), false);
@@ -95,6 +104,9 @@ var VideoJS = Class.extend({
     // Have to add the mouseout to the controller too or it may not hide.
     // For some reason the same isn't needed for mouseover
     this.controls.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
+
+    // Support older browsers that used autobuffer
+    if (this.video.preload) this.video.autobuffer = true;
   },
 
   buildController: function(){
@@ -284,6 +296,14 @@ var VideoJS = Class.extend({
     this.updateVolumeDisplay();
   },
 
+  // When the video's load progress is updated
+  // Safari 5 seems have lost this functionality
+  onProgress: function(event){
+    if(event.total > 0) {
+      this.updateLoadProgress(event.loaded / event.total);
+    }
+  },
+
   onError: function(event){
     console.log(event);
     console.log(this.video.error);
@@ -291,6 +311,17 @@ var VideoJS = Class.extend({
 
   onLoadedData: function(event){
     this.showController();
+  },
+
+  updateBufferedTotal: function(){
+    if (this.video.buffered && this.video.buffered.length >= 1) {
+      if (this.video.buffered.end(0) == this.video.duration) {
+        this.updateLoadProgress(1);
+        clearInterval(this.watchBuffer);
+      }
+    } else {
+      clearInterval(this.watchBuffer);
+    }
   },
 
   // React to clicks on the play/pause button
@@ -404,13 +435,18 @@ var VideoJS = Class.extend({
     this.updateTimeDisplay();
   },
 
+  updateLoadProgress: function(decimal){
+    if (this.controls.style.display == 'none') return;
+    this.loadProgress.style.width = (decimal * (this.progressHolder.offsetWidth - 2)) + "px";
+  },
+
   // Update the play position based on where the user clicked on the progresss bar
   setPlayProgress: function(newProgress){
     this.video.currentTime = newProgress * this.video.duration;
     this.playProgress.style.width = newProgress * (this.progressHolder.offsetWidth - 2)  + "px";
     this.updateTimeDisplay();
   },
-  
+
   setPlayProgressWithEvent: function(event){
     var newProgress = this.getRelativePosition(event.pageX, this.progressHolder);
     this.setPlayProgress(newProgress);

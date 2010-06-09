@@ -43,7 +43,11 @@ img.vjs-poster { display: block; position: absolute; left: 0px; top: 0px; width:
   background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#777));
   background: -moz-linear-gradient(top,  #fff,  #777);
 }
-.vjs-progress-control .vjs-load-progress { position: absolute; display: block; width: 0px; height: 9px; background-color: #777; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
+.vjs-progress-control .vjs-load-progress { position: absolute; display: block; width: 0px; height: 9px; background-color: #777; opacity: 0.5;
+  -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; 
+  background: -webkit-gradient(linear, left top, left bottom, from(#999), to(#ccc));
+  background: -moz-linear-gradient(top,  #999,  #ccc);
+}
 .vjs-progress-control .vjs-progress-time { list-style: none; float: left; margin: 7px 0 0 5px; padding: 0; font-size: 10px; line-height: 1; font-weight: normal; font-family: Helvetica, Arial, sans-serif;  }
 
 /* Volume */
