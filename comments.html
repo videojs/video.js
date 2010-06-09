@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Comments | HTML5 Video Player | Video JS</title>
+  <meta name="google-site-verification" content="QHf9MEYVlEWoNHbzTeUkSQsbRT5Twzqu6N0nX1i3nes" />
+  
+  <script src="video-js/video.js" type="text/javascript" charset="utf-8"></script>
+  <!-- JQuery not required, but used for dom ready function -->
+  <script src="javascripts/jquery-1.4.2.min.js" type="text/javascript" charset="utf-8"></script>
+
+  <link rel="stylesheet" href="stylesheets/base.css" type="text/css" media="all" charset="utf-8" />
+  <link rel="stylesheet" href="video-js/video-js.css" type="text/css" media="all" charset="utf-8" />
+  <link rel="stylesheet" href="stylesheets/site.css" type="text/css" media="all" charset="utf-8" />
+
+  <!--[if !IE 7]>
+    <style type="text/css">
+      #wrap {display:table;height:100%}
+    </style>
+  <![endif]-->
+
+  <script type="text/javascript" charset="utf-8">
+    // Using JQuery's DOM Ready function
+    // You can also use window.onload, but it loads slower
+    $(function(){
+      VideoJS.setup();
+    })
+    
+    // If not using a JS library
+    // window.onload = function(){
+    //   VideoJS.setup();
+    // }
+  </script>
+
+</head>
+<body>
+
+  <div id="wrap">
+    <div id="main">
+
+      <ul id="nav">
+        <li><a href="http://github.com/zencoder/video-js">Source</a></li>
+        <li><a href="http://wiki.github.com/zencoder/video-js/browser-device-compatibility">Compatibility</a></li>        
+        <li><a href="http://github.com/zencoder/video-js/issues">Issue Tracker</a></li>
+        <li><a href="http://wiki.github.com/zencoder/video-js/">Wiki</a></li>
+      </ul>
+
+      <h1>Video JS</h1>
+      <p class="tagline">Open Source HTML5 Video Player</p>
+
+        <div id="disqus_thread"></div> 
+        <script type="text/javascript">
+          /**
+            * var disqus_identifier; [Optional but recommended: Define a unique identifier (e.g. post id or slug) for this thread]
+            */
+          (function() {
+           var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+           dsq.src = 'http://videojs.disqus.com/embed.js';
+           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript=videojs">comments powered by Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+      </div>
+    </div>
+
+    <div id="footer">
+      &copy; <a href="http://videojs.com">The Video JS Project</a>. Sponsored by <a href="http://zencoder.com">Zencoder</a>.
+    </div>
+  </div>
+
+  <script type="text/javascript">
+  //<![CDATA[
+  (function() {
+    var links = document.getElementsByTagName('a');
+    var query = '?';
+    for(var i = 0; i < links.length; i++) {
+    if(links[i].href.indexOf('#disqus_thread') >= 0) {
+      query += 'url' + i + '=' + encodeURIComponent(links[i].href) + '&';
+    }
+    }
+    document.write('<script charset="utf-8" type="text/javascript" src="http://disqus.com/forums/videojs/get_num_replies.js' + query + '"></' + 'script>');
+  })();
+  //]]>
+  </script>
+
+  <script type="text/javascript">
+
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-16505296-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+  </script>
+
+</body>
+</html>
