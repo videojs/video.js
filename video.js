@@ -38,6 +38,9 @@ var VideoJS = Class.extend({
     this.buildPoster();
     this.showPoster();
 
+    // Hide default controls
+    this.video.controls = false;
+
     this.buildController();
     this.showController();
 
