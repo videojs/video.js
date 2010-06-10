@@ -104,6 +104,14 @@ var VideoJS = Class.extend({
     // Have to add the mouseout to the controller too or it may not hide.
     // For some reason the same isn't needed for mouseover
     this.controls.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
+    
+    // Create listener for esc key while in full screen mode
+    // Creating it here to add context
+    this.escKeyListener = function(event){
+      if (event.keyCode == 27) {
+        this.fullscreenOff();
+      }
+    }.context(this);
 
     // Support older browsers that used autobuffer
     if (this.video.preload) this.video.autobuffer = true;
@@ -490,6 +498,9 @@ var VideoJS = Class.extend({
     // Storing original doc overflow value to return to when fullscreen is off
     this.docOrigOverflow = document.documentElement.style.overflow;
 
+    // Add listener for esc key to exit fullscreen
+    document.addEventListener("keydown", this.escKeyListener, false);
+
     // Hide any scroll bars
     document.documentElement.style.overflow = 'hidden';
 
@@ -504,6 +515,8 @@ var VideoJS = Class.extend({
   // Turn off fullscreen (window) mode
   fullscreenOff: function(){
     this.videoIsFullScreen = false;
+
+    document.removeEventListener("keydown", this.escKeyListener, false);
 
     // Unhide scroll bars.
     document.documentElement.style.overflow = this.docOrigOverflow;
