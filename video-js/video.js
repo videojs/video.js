@@ -31,6 +31,7 @@ var VideoJS = Class.extend({
     this.video = element;
     this.num = num;
     this.box = element.parentNode;
+    this.percentLoaded = 0;
 
     // Hide no-video download paragraph
     this.box.getElementsByClassName("vjs-no-video")[0].style.display = "none";
@@ -64,8 +65,8 @@ var VideoJS = Class.extend({
     this.video.addEventListener('error',this.onError.context(this),false);
     // Listen for Video Load Progress (currently does not if html file is local)
     this.video.addEventListener('progress', this.onProgress.context(this), false);
-    // Sometimes the 'progress' event doesn't fire the final (finished) progress notice.
-    this.watchBuffer = setInterval(this.updateBufferedTotal.context(this), 500);
+    // Set interval for load progress using buffer watching method
+    this.watchBuffer = setInterval(this.updateBufferedTotal.context(this), 33);
 
     // Listen for clicks on the play/pause button
     this.playControl.addEventListener("click", this.onPlayControlClick.context(this), false);
@@ -104,7 +105,7 @@ var VideoJS = Class.extend({
     // Have to add the mouseout to the controller too or it may not hide.
     // For some reason the same isn't needed for mouseover
     this.controls.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
-    
+
     // Create listener for esc key while in full screen mode
     // Creating it during initialization to add context
     // and because it has to be removed with removeEventListener
@@ -305,14 +306,6 @@ var VideoJS = Class.extend({
     this.updateVolumeDisplay();
   },
 
-  // When the video's load progress is updated
-  // Safari 5 seems have lost this functionality
-  onProgress: function(event){
-    if(event.total > 0) {
-      this.updateLoadProgress(event.loaded / event.total);
-    }
-  },
-
   onError: function(event){
     console.log(event);
     console.log(this.video.error);
@@ -322,15 +315,39 @@ var VideoJS = Class.extend({
     this.showController();
   },
 
+  // When the video's load progress is updated
+  // Does not work in all browsers (Safari/Chrome 5)
+  onProgress: function(event){
+    if(event.total > 0) {
+      this.setLoadProgress(event.loaded / event.total);
+    }
+  },
+
+  // Buffer watching method for load progress.
+  // Used for browsers that don't support the progress event
   updateBufferedTotal: function(){
-    if (this.video.buffered && this.video.buffered.length >= 1) {
-      if (this.video.buffered.end(0) == this.video.duration) {
-        this.updateLoadProgress(1);
-        clearInterval(this.watchBuffer);
+    if (this.video.buffered) {
+      if (this.video.buffered.length >= 1) {
+        this.setLoadProgress(this.video.buffered.end(0) / this.video.duration);
+        if (this.video.buffered.end(0) == this.video.duration) {
+          clearInterval(this.watchBuffer);
+        }
       }
     } else {
       clearInterval(this.watchBuffer);
     }
+  },
+
+  setLoadProgress: function(percentAsDecimal){
+    if (percentAsDecimal > this.percentLoaded) {
+      this.percentLoaded = percentAsDecimal;
+      this.updateLoadProgress();
+    }
+  },
+
+  updateLoadProgress: function(){
+    if (this.controls.style.display == 'none') return;
+    this.loadProgress.style.width = (this.percentLoaded * (this.progressHolder.offsetWidth - 2)) + "px";
   },
 
   // React to clicks on the play/pause button
@@ -425,6 +442,7 @@ var VideoJS = Class.extend({
     this.progressControl.style.width = (this.controls.offsetWidth - 125) + "px";
     this.progressHolder.style.width = (this.progressControl.offsetWidth - 80) + "px";
     this.updatePlayProgress();
+    this.updateLoadProgress();
   },
 
   // Track & display the current play progress
@@ -442,11 +460,6 @@ var VideoJS = Class.extend({
     if (this.controls.style.display == 'none') return;
     this.playProgress.style.width = ((this.video.currentTime / this.video.duration) * (this.progressHolder.offsetWidth - 2)) + "px";
     this.updateTimeDisplay();
-  },
-
-  updateLoadProgress: function(decimal){
-    if (this.controls.style.display == 'none') return;
-    this.loadProgress.style.width = (decimal * (this.progressHolder.offsetWidth - 2)) + "px";
   },
 
   // Update the play position based on where the user clicked on the progresss bar
