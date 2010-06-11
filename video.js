@@ -106,7 +106,8 @@ var VideoJS = Class.extend({
     this.controls.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
     
     // Create listener for esc key while in full screen mode
-    // Creating it here to add context
+    // Creating it during initialization to add context
+    // and because it has to be removed with removeEventListener
     this.escKeyListener = function(event){
       if (event.keyCode == 27) {
         this.fullscreenOff();
