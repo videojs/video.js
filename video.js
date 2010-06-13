@@ -27,22 +27,43 @@ var VideoJS = Class.extend({
   // Initialize the player for the supplied video tag element
   // element: video tag
   // num: the current player's position in the videoJSPlayers array
-  init: function(element, num){
+  init: function(element, setOptions){
+
+    if(!VideoJS.browserSupportsVideo()) return;
+
     this.video = element;
-    this.num = num;
-    this.box = element.parentNode;
+
+    // Default Options
+    this.options = {
+      num: 0, // Optional tracking of videoJSPLayers position
+      controlsBelow: false, // Display control bar below video vs. on top
+      controlsHiding: true, // Hide controls when not over the video
+      defaultVolume: 0.85 // Will be overridden by localStorage volume if available
+    };
+
+    // Override default options with set options
+    if (typeof setOptions == "object") _V_.merge(this.options, setOptions);
+
+    this.box = this.video.parentNode;
     this.percentLoaded = 0;
 
-    // Hide no-video download paragraph
-    this.box.getElementsByClassName("vjs-no-video")[0].style.display = "none";
+    // if (this.canPlaySource()) {
+    //
+    // }
+
+    this.hideDownloadLinks();
+
+    if (VideoJS.isIpad()) {
+      this.options.controlsBelow = true;
+      this.options.controlsHiding = false;
+    }
+
+    if (this.options.controlsBelow) {
+      _V_.addClass(this.box, "vjs-controls-below");
+    }
 
     this.buildPoster();
     this.showPoster();
-
-    this.propertyInterval
-
-    this.video.preload = true;
-    this.video.autobuffer = true;
 
     // Hide default controls
     this.video.controls = false;
@@ -81,7 +102,7 @@ var VideoJS = Class.extend({
     this.progressHolder.addEventListener("mouseup", this.onProgressHolderMouseUp.context(this), false);
 
     // Set to stored volume OR 85%
-    this.setVolume(localStorage.volume || 0.85);
+    this.setVolume(localStorage.volume || this.options.defaultVolume);
     // Listen for a drag on the volume control
     this.volumeControl.addEventListener("mousedown", this.onVolumeControlMouseDown.context(this), false);
     // Listen for a release on the volume control
@@ -109,10 +130,14 @@ var VideoJS = Class.extend({
     // Create listener for esc key while in full screen mode
     // Creating it during initialization to add context
     // and because it has to be removed with removeEventListener
-    this.escKeyListener = function(event){
+    this.onEscKey = function(event){
       if (event.keyCode == 27) {
         this.fullscreenOff();
       }
+    }.context(this);
+
+    this.onWindowResize = function(event){
+      this.positionController();
     }.context(this);
 
     // Support older browsers that used autobuffer
@@ -150,80 +175,72 @@ var VideoJS = Class.extend({
     */
 
     // Create a list element to hold the different controls
-    this.controls = document.createElement("ul");
-
+    this.controls = _V_.createElement("ul", { className: "vjs-controls" });
     // Add the controls to the video's container
     this.video.parentNode.appendChild(this.controls);
-    this.controls.className = "vjs-controls";
-
-    // Store the current video player's number
-    // For referencing in event listeners
-    this.controls.setAttribute("data-video-js", this.num);
 
     // Build the play control
-    this.playControl = document.createElement("li");
+    this.playControl = _V_.createElement("li", { className: "vjs-play-control vjs-play", innerHTML: "<span></span>" });
     this.controls.appendChild(this.playControl);
-    this.playControl.className = "vjs-play-control vjs-play";
-    this.playControl.innerHTML = "<span></span>";
 
     // Build the progress control
-    this.progressControl = document.createElement("li");
+    this.progressControl = _V_.createElement("li", { className: "vjs-progress-control" });
     this.controls.appendChild(this.progressControl);
-    this.progressControl.className = "vjs-progress-control";
 
     // Create a list for the different progress elements
     this.progressList = document.createElement("ul");
     this.progressControl.appendChild(this.progressList);
 
     // Create a holder for the progress bars
-    this.progressHolder = document.createElement("li");
+    this.progressHolder = _V_.createElement("li", { className: "vjs-progress-holder" });
     this.progressList.appendChild(this.progressHolder);
-    this.progressHolder.className = "vjs-progress-holder";
 
     // Create the loading progress display
-    this.loadProgress = document.createElement("span");
+    this.loadProgress = _V_.createElement("span", { className: "vjs-load-progress" });
     this.progressHolder.appendChild(this.loadProgress)
-    this.loadProgress.className = "vjs-load-progress";
 
     // Create the playing progress display
-    this.playProgress = document.createElement("span");
+    this.playProgress = _V_.createElement("span", { className: "vjs-play-progress" });
     this.progressHolder.appendChild(this.playProgress);
-    this.playProgress.className = "vjs-play-progress";
 
     // Create the progress time display (00:00 / 00:00)
-    this.progressTime = document.createElement("li");
+    this.progressTime = _V_.createElement("li", { className: "vjs-progress-time" });
     this.progressList.appendChild(this.progressTime);
-    this.progressTime.className = "vjs-progress-time";
 
     // Create the current play time display
-    this.currentTimeDisplay = document.createElement("span");
+    this.currentTimeDisplay = _V_.createElement("span", { className: "vjs-current-time-display", innerHTML: "00:00" });
     this.progressTime.appendChild(this.currentTimeDisplay);
-    this.currentTimeDisplay.className = "vjs-current-time-display";
-    this.currentTimeDisplay.innerHTML = '00:00';
 
     // Add time separator
-    this.timeSeparator = document.createElement("span");
-    this.timeSeparator.innerHTML = " / ";
+    this.timeSeparator = _V_.createElement("span", { innerHTML: " / " });
     this.progressTime.appendChild(this.timeSeparator);
 
     // Create the total duration display
-    this.durationDisplay = document.createElement("span");
+    this.durationDisplay = _V_.createElement("span", { className: "vjs-duration-display", innerHTML: "00:00" });
     this.progressTime.appendChild(this.durationDisplay);
-    this.durationDisplay.className = "vjs-duration-display";
-    this.durationDisplay.innerHTML = '00:00';
 
     // Create the volumne control
-    this.volumeControl = document.createElement("li");
+    this.volumeControl = _V_.createElement("li", {
+      className: "vjs-volume-control",
+      innerHTML: "<ul><li></li><li></li><li></li><li></li><li></li><li></li></ul>"
+    });
     this.controls.appendChild(this.volumeControl);
-    this.volumeControl.className = "vjs-volume-control";
-    this.volumeControl.innerHTML = "<ul><li></li><li></li><li></li><li></li><li></li><li></li></ul>";
     this.volumeDisplay = this.volumeControl.children[0]
 
     // Crete the fullscreen control
-    this.fullscreenControl = document.createElement("li");
+    this.fullscreenControl = _V_.createElement("li", {
+      className: "vjs-fullscreen-control",
+      innerHTML: "<ul><li></li><li></li><li></li><li></li></ul>"
+    });
     this.controls.appendChild(this.fullscreenControl);
-    this.fullscreenControl.className = "vjs-fullscreen-control";
-    this.fullscreenControl.innerHTML = "<ul><li></li><li></li><li></li><li></li></ul>";
+  },
+
+  // Hide no-video download paragraph
+  hideDownloadLinks: function(){
+    var children = this.box.children;
+    for(var i=0; i<children.length; i++){
+      if(children[i].className == "vjs-no-video") children[i].style.display = "none";
+    }
   },
 
   // Show the controller
@@ -237,18 +254,39 @@ var VideoJS = Class.extend({
     // Make sure the controls are visible
     if (this.controls.style.display == 'none') return;
 
-    this.controls.style.top = (this.video.offsetHeight - this.controls.offsetHeight) + "px";
-    this.controls.style.left = "0px";
+    if (this.options.controlsBelow) {
+      if(this.videoIsFullScreen) {
+        this.box.style.height = "";
+        this.video.style.height = (this.box.offsetHeight - this.controls.offsetHeight) + "px";
+      } else {
+        this.video.style.height = "";
+        this.box.style.height = this.video.offsetHeight + this.controls.offsetHeight + "px";
+      }
+      this.controls.style.top = this.video.offsetHeight + "px";
+    } else {
+      this.controls.style.top = (this.video.offsetHeight - this.controls.offsetHeight) + "px";
+    }
+
     this.controls.style.width = this.video.offsetWidth + "px";
     this.sizeProgressBar();
   },
 
   // Hide the controller
   hideController: function(){
-    this.controls.style.display = "none";
+    if (this.options.controlsHiding) this.controls.style.display = "none";
+  },
+
+  // Update poster source from attribute or fallback image
+  // iPad breaks if you include a poster attribute, so this fixes that
+  updatePosterSource: function(){
+    if (!this.video.poster) {
+      var images = this.video.getElementsByTagName("img");
+      if (images.length > 0) this.video.poster = images[0].src;
+    }
   },
 
   buildPoster: function(){
+    this.updatePosterSource();
     if (this.video.poster) {
       this.poster = document.createElement("img");
       // Add poster to video box
@@ -281,6 +319,18 @@ var VideoJS = Class.extend({
   hidePoster: function(){
     if (!this.poster) return;
     this.poster.style.display = "none";
+  },
+
+  canPlaySource: function(){
+    var children = this.video.children;
+    for (var i=0; i<children.length; i++) {
+      if (children[i].tagName.toUpperCase() == "SOURCE") {
+        var canPlay = this.video.canPlayType(children[i].type);
+        if(canPlay == "probably" || canPlay == "maybe") {
+          return true;
+        }
+      }
+    }
   },
 
   // When the video is played
@@ -513,13 +563,16 @@ var VideoJS = Class.extend({
     this.docOrigOverflow = document.documentElement.style.overflow;
 
     // Add listener for esc key to exit fullscreen
-    document.addEventListener("keydown", this.escKeyListener, false);
+    document.addEventListener("keydown", this.onEscKey, false);
+
+    // Add listener for a window resize
+    window.addEventListener("resize", this.onWindowResize, false);
 
     // Hide any scroll bars
     document.documentElement.style.overflow = 'hidden';
 
     // Apply fullscreen styles
-    this.box.className = "video-js-box vjs-fullscreen";
+    _V_.addClass(this.box, "vjs-fullscreen");
 
     // Resize the controller and poster
     this.positionController();
@@ -530,13 +583,14 @@ var VideoJS = Class.extend({
   fullscreenOff: function(){
     this.videoIsFullScreen = false;
 
-    document.removeEventListener("keydown", this.escKeyListener, false);
+    document.removeEventListener("keydown", this.onEscKey, false);
+    window.removeEventListener("resize", this.onWindowResize, false);
 
     // Unhide scroll bars.
     document.documentElement.style.overflow = this.docOrigOverflow;
 
     // Remove fullscreen styles
-    this.box.className = "video-js-box";
+    _V_.removeClass(this.box, "vjs-fullscreen");
 
     // Resize to original settings
     this.positionController();
@@ -576,28 +630,64 @@ var VideoJS = Class.extend({
       curleft += obj.offsetLeft;
     }
     return curleft;
-  }
+  },
+
 })
 
 // Class Methods
 
 // Add video-js to any video tag with the class
 VideoJS.setup = function(){
-  if (VideoJS.supportsVideo()) {
+  if (VideoJS.browserSupportsVideo()) {
     var videoTags = document.getElementsByTagName("video");
     for (var i=0;i<videoTags.length;i++) {
       if (videoTags[i].className.indexOf("video-js") != -1) {
-        videoJSPlayers[i] = new VideoJS(videoTags[i], i);
+        videoJSPlayers[i] = new VideoJS(videoTags[i], { num: i });
       }
     }
   }
 }
 
 // Check if the browser supports video.
-VideoJS.supportsVideo = function() {
+VideoJS.browserSupportsVideo = function() {
   return !!document.createElement('video').canPlayType;
 }
 
+VideoJS.isIpad = function(){
+  return navigator.userAgent.match(/iPad/i) != null;
+}
+
+VideoJS.browserSupportsFlash = function(){
+  if (navigator.mimeTypes && navigator.mimeTypes["application/x-shockwave-flash"]) {
+    return 1
+  } else {
+    return 0
+  }
+}
+
+// Convenience Functions (mini library)
+// Functions not specific to video or VideoJS and could be replaced with a library like jQuery
+var _V_ = {
+  addClass: function(element, classToAdd){
+    if (element.className.split(/\s+/).lastIndexOf(classToAdd) == -1) element.className = element.className == "" ? classToAdd : element.className + " " + classToAdd;
+  },
+
+  removeClass: function(element, classToRemove){
+    if (element.className.indexOf(classToRemove) == -1) return;
+    var classNames = element.className.split(/\s+/);
+    classNames.splice(classNames.lastIndexOf(classToRemove),1);
+    element.className = classNames.join(" ");
+  },
+
+  merge: function(obj1, obj2){
+    for (attrname in obj2) { obj1[attrname] = obj2[attrname]; }
+    return obj1;
+  },
+
+  createElement: function(tagName, attributes){
+    return _V_.merge(document.createElement(tagName), attributes);
+  }
+}
 
 // Allows for binding context to functions
 // when using in event listeners and timeouts
