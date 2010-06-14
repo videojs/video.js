@@ -537,14 +537,14 @@ var VideoJS = Class.extend({
   },
 
   setVolumeWithEvent: function(event){
-    var newVol = this.getRelativePosition(event.pageX, this.volumeControl);
+    var newVol = this.getRelativePosition(event.pageX, this.volumeControl.children[0]);
     this.setVolume(newVol);
   },
 
   // Update the volume control display
   // Unique to these default controls. Uses borders to create the look of bars.
   updateVolumeDisplay: function(){
-    var volNum = Math.floor(this.video.volume * 6);
+    var volNum = Math.ceil(this.video.volume * 6);
     for(var i=0; i<6; i++) {
       if (i < volNum) {
         this.volumeDisplay.children[i].style.borderColor = "#fff";
