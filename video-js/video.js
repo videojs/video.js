@@ -29,8 +29,6 @@ var VideoJS = Class.extend({
   // num: the current player's position in the videoJSPlayers array
   init: function(element, setOptions){
 
-    if(!VideoJS.browserSupportsVideo()) return;
-
     this.video = element;
 
     // Default Options
@@ -38,20 +36,31 @@ var VideoJS = Class.extend({
       num: 0, // Optional tracking of videoJSPLayers position
       controlsBelow: false, // Display control bar below video vs. on top
       controlsHiding: true, // Hide controls when not over the video
-      defaultVolume: 0.85 // Will be overridden by localStorage volume if available
+      defaultVolume: 0.85, // Will be overridden by localStorage volume if available
+      flashVersion: 9
     };
-
     // Override default options with set options
     if (typeof setOptions == "object") _V_.merge(this.options, setOptions);
 
     this.box = this.video.parentNode;
+    this.flashFallback = this.getFlashFallback();
+    this.linksFallback = this.getLinksFallback();
     this.percentLoaded = 0;
 
-    // if (this.canPlaySource()) {
-    //
-    // }
+    if (VideoJS.browserSupportsVideo()) {
+      if (this.canPlaySource() == false) {
+        this.hideLinksFallback();
+        this.replaceWithFlash();
+        return;
+      }
+    } else if (VideoJS.browserFlashVersion() >= this.options.flashVersion) {
+      this.hideLinksFallback();
+      return;
+    } else {
+      return;
+    }
 
-    this.hideDownloadLinks();
+    this.hideLinksFallback();
 
     if (VideoJS.isIpad()) {
       this.options.controlsBelow = true;
@@ -235,12 +244,30 @@ var VideoJS = Class.extend({
     this.controls.appendChild(this.fullscreenControl);
   },
 
+  // Get the download links block element
+  getLinksFallback: function(){
+    return this.box.getElementsByTagName("P")[0];
+  },
+
   // Hide no-video download paragraph
-  hideDownloadLinks: function(){
-    var children = this.box.children;
-    for(var i=0; i<children.length; i++){
-      if(children[i].className == "vjs-no-video") children[i].style.display = "none";
+  hideLinksFallback: function(){
+    if (this.linksFallback) this.linksFallback.style.display = "none";
+  },
+
+  getFlashFallback: function(){
+    if (VideoJS.isIE()) return;
+    var children = this.box.getElementsByClassName("vjs-flash-fallback");
+    for (var i=0; i<children.length; i++) {
+      if (children[i].tagName.toUpperCase() == "OBJECT") {
+        return children[i];
+      }
     }
+  },
+
+  replaceWithFlash: function(){
+    // this.flashFallback = this.video.removeChild(this.flashFallback);
+    this.box.appendChild(this.flashFallback);
+    this.video.style.display = "none"; // Removing it was breaking later players
   },
 
   // Show the controller
@@ -331,6 +358,7 @@ var VideoJS = Class.extend({
         }
       }
     }
+    return false;
   },
 
   // When the video is played
@@ -420,13 +448,13 @@ var VideoJS = Class.extend({
       this.video.pause();
     }
 
-    this.blockTextSelection();
+    _V_.blockTextSelection();
     document.onmousemove = function(event) {
       this.setPlayProgressWithEvent(event);
     }.context(this);
 
     document.onmouseup = function(event) {
-      this.unblockTextSelection();
+      _V_.unblockTextSelection();
       document.onmousemove = null;
       document.onmouseup = null;
       if (this.videoWasPlaying) {
@@ -444,12 +472,12 @@ var VideoJS = Class.extend({
 
   // Adjust the volume when the user drags on the volume control
   onVolumeControlMouseDown: function(event){
-    this.blockTextSelection();
+    _V_.blockTextSelection();
     document.onmousemove = function(event) {
       this.setVolumeWithEvent(event);
     }.context(this);
     document.onmouseup = function() {
-      this.unblockTextSelection();
+      _V_.unblockTextSelection();
       document.onmousemove = null;
       document.onmouseup = null;
     }.context(this);
@@ -520,14 +548,14 @@ var VideoJS = Class.extend({
   },
 
   setPlayProgressWithEvent: function(event){
-    var newProgress = this.getRelativePosition(event.pageX, this.progressHolder);
+    var newProgress = _V_.getRelativePosition(event.pageX, this.progressHolder);
     this.setPlayProgress(newProgress);
   },
 
   // Update the displayed time (00:00)
   updateTimeDisplay: function(){
-    this.currentTimeDisplay.innerHTML = this.formatTime(this.video.currentTime);
-    if (this.video.duration) this.durationDisplay.innerHTML = this.formatTime(this.video.duration);
+    this.currentTimeDisplay.innerHTML = _V_.formatTime(this.video.currentTime);
+    if (this.video.duration) this.durationDisplay.innerHTML = _V_.formatTime(this.video.duration);
   },
 
   // Set a new volume based on where the user clicked on the volume control
@@ -537,14 +565,14 @@ var VideoJS = Class.extend({
   },
 
   setVolumeWithEvent: function(event){
-    var newVol = this.getRelativePosition(event.pageX, this.volumeControl);
+    var newVol = _V_.getRelativePosition(event.pageX, this.volumeControl.children[0]);
     this.setVolume(newVol);
   },
 
   // Update the volume control display
   // Unique to these default controls. Uses borders to create the look of bars.
   updateVolumeDisplay: function(){
-    var volNum = Math.floor(this.video.volume * 6);
+    var volNum = Math.ceil(this.video.volume * 6);
     for(var i=0; i<6; i++) {
       if (i < volNum) {
         this.volumeDisplay.children[i].style.borderColor = "#fff";
@@ -595,6 +623,74 @@ var VideoJS = Class.extend({
     // Resize to original settings
     this.positionController();
     this.positionPoster();
+  }
+})
+
+// Class Methods
+
+// Add video-js to any video tag with the class
+VideoJS.setup = function(){
+  var videoCount = document.getElementsByTagName("video").length
+  for (var i=0;i<videoCount;i++) {
+    videoTag = document.getElementsByTagName("video")[i];
+    if (videoTag.className.indexOf("video-js") != -1) {
+      videoJSPlayers[i] = new VideoJS(videoTag, { num: i });
+    }
+  }
+}
+
+// Check if the browser supports video.
+VideoJS.browserSupportsVideo = function() {
+  return !!document.createElement('video').canPlayType;
+}
+
+VideoJS.isIpad = function(){
+  return navigator.userAgent.match(/iPad/i) != null;
+}
+
+VideoJS.browserFlashVersion = function(){
+  if (typeof navigator.plugins != "undefined" && typeof navigator.plugins["Shockwave Flash"] == "object") {
+    desc = navigator.plugins["Shockwave Flash"].description;
+    if (desc && !(typeof navigator.mimeTypes != "undefined" && navigator.mimeTypes["application/x-shockwave-flash"] && !navigator.mimeTypes["application/x-shockwave-flash"].enabledPlugin)) {
+      return parseInt(desc.match(/^.*\s+([^\s]+)\.[^\s]+\s+[^\s]+$/)[1]);
+    }
+  } else if (typeof window.ActiveXObject != "undefined") {
+    try {
+      var testObject = new ActiveXObject("ShockwaveFlash.ShockwaveFlash");
+      if (testObject) {
+        return parseInt(testObject.GetVariable("$version").match(/^[^\s]+\s(\d+)/)[1]);
+      }
+    }
+    catch(e) { return false; }
+  }
+  return 0;
+}
+
+VideoJS.isIE = function(){
+  return !+"\v1"
+}
+
+// Convenience Functions (mini library)
+// Functions not specific to video or VideoJS and could be replaced with a library like jQuery
+var _V_ = {
+  addClass: function(element, classToAdd){
+    if (element.className.split(/\s+/).lastIndexOf(classToAdd) == -1) element.className = element.className == "" ? classToAdd : element.className + " " + classToAdd;
+  },
+
+  removeClass: function(element, classToRemove){
+    if (element.className.indexOf(classToRemove) == -1) return;
+    var classNames = element.className.split(/\s+/);
+    classNames.splice(classNames.lastIndexOf(classToRemove),1);
+    element.className = classNames.join(" ");
+  },
+
+  merge: function(obj1, obj2){
+    for (attrname in obj2) { obj1[attrname] = obj2[attrname]; }
+    return obj1;
+  },
+
+  createElement: function(tagName, attributes){
+    return _V_.merge(document.createElement(tagName), attributes);
   },
 
   // Attempt to block the ability to select text while dragging controls
@@ -620,7 +716,7 @@ var VideoJS = Class.extend({
 
   // Return the relative horizonal position of an event as a value from 0-1
   getRelativePosition: function(x, relativeElement){
-    return Math.max(0, Math.min(1, (x - this.findPosX(relativeElement)) / relativeElement.offsetWidth));
+    return Math.max(0, Math.min(1, (x - _V_.findPosX(relativeElement)) / relativeElement.offsetWidth));
   },
 
   // Get an objects position on the page
@@ -630,62 +726,6 @@ var VideoJS = Class.extend({
       curleft += obj.offsetLeft;
     }
     return curleft;
-  },
-
-})
-
-// Class Methods
-
-// Add video-js to any video tag with the class
-VideoJS.setup = function(){
-  if (VideoJS.browserSupportsVideo()) {
-    var videoTags = document.getElementsByTagName("video");
-    for (var i=0;i<videoTags.length;i++) {
-      if (videoTags[i].className.indexOf("video-js") != -1) {
-        videoJSPlayers[i] = new VideoJS(videoTags[i], { num: i });
-      }
-    }
-  }
-}
-
-// Check if the browser supports video.
-VideoJS.browserSupportsVideo = function() {
-  return !!document.createElement('video').canPlayType;
-}
-
-VideoJS.isIpad = function(){
-  return navigator.userAgent.match(/iPad/i) != null;
-}
-
-VideoJS.browserSupportsFlash = function(){
-  if (navigator.mimeTypes && navigator.mimeTypes["application/x-shockwave-flash"]) {
-    return 1
-  } else {
-    return 0
-  }
-}
-
-// Convenience Functions (mini library)
-// Functions not specific to video or VideoJS and could be replaced with a library like jQuery
-var _V_ = {
-  addClass: function(element, classToAdd){
-    if (element.className.split(/\s+/).lastIndexOf(classToAdd) == -1) element.className = element.className == "" ? classToAdd : element.className + " " + classToAdd;
-  },
-
-  removeClass: function(element, classToRemove){
-    if (element.className.indexOf(classToRemove) == -1) return;
-    var classNames = element.className.split(/\s+/);
-    classNames.splice(classNames.lastIndexOf(classToRemove),1);
-    element.className = classNames.join(" ");
-  },
-
-  merge: function(obj1, obj2){
-    for (attrname in obj2) { obj1[attrname] = obj2[attrname]; }
-    return obj1;
-  },
-
-  createElement: function(tagName, attributes){
-    return _V_.merge(document.createElement(tagName), attributes);
   }
 }
 

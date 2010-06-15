@@ -54,8 +54,9 @@ img.vjs-poster { display: block; position: absolute; left: 0px; top: 0px; width:
 
 /* Volume */
 .vjs-volume-control { width: 50px !important; cursor: pointer !important; }
-.vjs-volume-control ul { display: block; margin: 0; padding: 4px 0 0 5px; list-style: none; }
-.vjs-volume-control ul li { float: left; margin: 0; padding: 0; list-style: none; width: 5px; margin-right: 2px; height: 0px; border-bottom: 18px solid #555; }
+.vjs-volume-control ul { display: block; margin: 0 5px 0 5px; padding: 4px 0 0 0; list-style: none; }
+.vjs-volume-control ul li { float: left; margin: 0 2px 0 0; padding: 0; list-style: none; width: 5px; height: 0px; border-bottom: 18px solid #555; }
+.vjs-volume-control ul li:last-child { margin-right: 0; }
 .vjs-volume-control ul li:nth-child(1) { border-bottom-width: 2px; height: 16px; }
 .vjs-volume-control ul li:nth-child(2) { border-bottom-width: 4px; height: 14px; }
 .vjs-volume-control ul li:nth-child(3) { border-bottom-width: 7px; height: 11px; }
