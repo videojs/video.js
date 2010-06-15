@@ -420,13 +420,13 @@ var VideoJS = Class.extend({
       this.video.pause();
     }
 
-    this.blockTextSelection();
+    _V_.blockTextSelection();
     document.onmousemove = function(event) {
       this.setPlayProgressWithEvent(event);
     }.context(this);
 
     document.onmouseup = function(event) {
-      this.unblockTextSelection();
+      _V_.unblockTextSelection();
       document.onmousemove = null;
       document.onmouseup = null;
       if (this.videoWasPlaying) {
@@ -444,12 +444,12 @@ var VideoJS = Class.extend({
 
   // Adjust the volume when the user drags on the volume control
   onVolumeControlMouseDown: function(event){
-    this.blockTextSelection();
+    _V_.blockTextSelection();
     document.onmousemove = function(event) {
       this.setVolumeWithEvent(event);
     }.context(this);
     document.onmouseup = function() {
-      this.unblockTextSelection();
+      _V_.unblockTextSelection();
       document.onmousemove = null;
       document.onmouseup = null;
     }.context(this);
@@ -520,14 +520,14 @@ var VideoJS = Class.extend({
   },
 
   setPlayProgressWithEvent: function(event){
-    var newProgress = this.getRelativePosition(event.pageX, this.progressHolder);
+    var newProgress = _V_.getRelativePosition(event.pageX, this.progressHolder);
     this.setPlayProgress(newProgress);
   },
 
   // Update the displayed time (00:00)
   updateTimeDisplay: function(){
-    this.currentTimeDisplay.innerHTML = this.formatTime(this.video.currentTime);
-    if (this.video.duration) this.durationDisplay.innerHTML = this.formatTime(this.video.duration);
+    this.currentTimeDisplay.innerHTML = _V_.formatTime(this.video.currentTime);
+    if (this.video.duration) this.durationDisplay.innerHTML = _V_.formatTime(this.video.duration);
   },
 
   // Set a new volume based on where the user clicked on the volume control
@@ -537,7 +537,7 @@ var VideoJS = Class.extend({
   },
 
   setVolumeWithEvent: function(event){
-    var newVol = this.getRelativePosition(event.pageX, this.volumeControl.children[0]);
+    var newVol = _V_.getRelativePosition(event.pageX, this.volumeControl.children[0]);
     this.setVolume(newVol);
   },
 
@@ -595,43 +595,7 @@ var VideoJS = Class.extend({
     // Resize to original settings
     this.positionController();
     this.positionPoster();
-  },
-
-  // Attempt to block the ability to select text while dragging controls
-  blockTextSelection: function(){
-    document.body.focus();
-    document.onselectstart = function () { return false; };
-  },
-
-  // Turn off text selection blocking
-  unblockTextSelection: function(){
-    document.onselectstart = function () { return true; };
-  },
-
-  // Return seconds as MM:SS
-  formatTime: function(seconds) {
-    seconds = Math.round(seconds);
-    minutes = Math.floor(seconds / 60);
-    minutes = (minutes >= 10) ? minutes : "0" + minutes;
-    seconds = Math.floor(seconds % 60);
-    seconds = (seconds >= 10) ? seconds : "0" + seconds;
-    return minutes + ":" + seconds;
-  },
-
-  // Return the relative horizonal position of an event as a value from 0-1
-  getRelativePosition: function(x, relativeElement){
-    return Math.max(0, Math.min(1, (x - this.findPosX(relativeElement)) / relativeElement.offsetWidth));
-  },
-
-  // Get an objects position on the page
-  findPosX: function(obj) {
-    var curleft = obj.offsetLeft;
-    while(obj = obj.offsetParent) {
-      curleft += obj.offsetLeft;
-    }
-    return curleft;
-  },
-
+  }
 })
 
 // Class Methods
@@ -686,6 +650,41 @@ var _V_ = {
 
   createElement: function(tagName, attributes){
     return _V_.merge(document.createElement(tagName), attributes);
+  },
+  
+  // Attempt to block the ability to select text while dragging controls
+  blockTextSelection: function(){
+    document.body.focus();
+    document.onselectstart = function () { return false; };
+  },
+
+  // Turn off text selection blocking
+  unblockTextSelection: function(){
+    document.onselectstart = function () { return true; };
+  },
+
+  // Return seconds as MM:SS
+  formatTime: function(seconds) {
+    seconds = Math.round(seconds);
+    minutes = Math.floor(seconds / 60);
+    minutes = (minutes >= 10) ? minutes : "0" + minutes;
+    seconds = Math.floor(seconds % 60);
+    seconds = (seconds >= 10) ? seconds : "0" + seconds;
+    return minutes + ":" + seconds;
+  },
+
+  // Return the relative horizonal position of an event as a value from 0-1
+  getRelativePosition: function(x, relativeElement){
+    return Math.max(0, Math.min(1, (x - _V_.findPosX(relativeElement)) / relativeElement.offsetWidth));
+  },
+  
+  // Get an objects position on the page
+  findPosX: function(obj) {
+    var curleft = obj.offsetLeft;
+    while(obj = obj.offsetParent) {
+      curleft += obj.offsetLeft;
+    }
+    return curleft;
   }
 }
 
