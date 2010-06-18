@@ -1,15 +1,11 @@
 .video-js-box { text-align: left; position: relative; }
 video.video-js { background-color: #000; position: relative; }
-
 .video-js-box.vjs-fullscreen { position: fixed; left: 0; top: 0; right: 0; bottom: 0; overflow: hidden; z-index: 1000; }
 .video-js-box.vjs-fullscreen video.video-js { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1001; }
 .video-js-box.vjs-fullscreen .vjs-controls { z-index: 1002; }
-
 .vjs-controls { display: none; position: absolute; margin: 0; padding: 0; border: none; left: 0; }
 .video-js-box.vjs-controls-below .vjs-controls { background-color: #000; }
-
 img.vjs-poster { display: block; position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; }
-
 .video-js-box p { font-size: small; }
 
 /* DEFAULT SKIN */
@@ -18,6 +14,9 @@ img.vjs-poster { display: block; position: absolute; left: 0px; top: 0px; width:
 /* General controls styles */
 .vjs-controls { list-style: none; height: 35px; opacity: 0.85; color: #fff; }
 .vjs-controls > li { list-style: none; float: left; height: 25px; width: 25px; margin: 5px 5px 0 0; padding: 0; text-align: center;
+  
+  /* CONTROL ITEM BORDER AND BACKGROUND COLOR */
+  
   background-color: #0B151A; border-radius: 5px; box-shadow: 0px 2px 2px #000;
   /* Webkit */
   -webkit-border-radius: 5px;

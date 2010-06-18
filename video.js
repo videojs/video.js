@@ -154,7 +154,7 @@ var VideoJS = Class.extend({
     this.fixPreloading()
   },
   
-  // Support older browsers that used autobuffer
+  // Support older browsers that used "autobuffer"
   fixPreloading: function(){
     if (typeof this.video.hasAttribute == "function" && this.video.hasAttribute("preload")) {
       this.video.autobuffer = true;
