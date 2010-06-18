@@ -37,7 +37,8 @@ var VideoJS = Class.extend({
       controlsBelow: false, // Display control bar below video vs. on top
       controlsHiding: true, // Hide controls when not over the video
       defaultVolume: 0.85, // Will be overridden by localStorage volume if available
-      flashVersion: 9
+      flashVersion: 9,
+      linksHiding: true
     };
     // Override default options with set options
     if (typeof setOptions == "object") _V_.merge(this.options, setOptions);
@@ -150,7 +151,14 @@ var VideoJS = Class.extend({
     }.context(this);
 
     // Support older browsers that used autobuffer
-    if (this.video.preload) this.video.autobuffer = true;
+    this.fixPreloading()
+  },
+  
+  // Support older browsers that used autobuffer
+  fixPreloading: function(){
+    if (typeof this.video.hasAttribute == "function" && this.video.hasAttribute("preload")) {
+      this.video.autobuffer = true;
+    }
   },
 
   buildController: function(){
@@ -251,7 +259,7 @@ var VideoJS = Class.extend({
 
   // Hide no-video download paragraph
   hideLinksFallback: function(){
-    if (this.linksFallback) this.linksFallback.style.display = "none";
+    if (this.options.linksHiding && this.linksFallback) this.linksFallback.style.display = "none";
   },
 
   getFlashFallback: function(){
@@ -517,8 +525,13 @@ var VideoJS = Class.extend({
 
   // Adjust the width of the progress bar to fill the controls width
   sizeProgressBar: function(){
-    this.progressControl.style.width = (this.controls.offsetWidth - 125) + "px";
-    this.progressHolder.style.width = (this.progressControl.offsetWidth - 80) + "px";
+    this.progressControl.style.width = (
+      this.controls.offsetWidth 
+      - this.playControl.offsetWidth
+      - this.volumeControl.offsetWidth
+      - this.fullscreenControl.offsetWidth
+    ) - (5*5) + "px";
+    this.progressHolder.style.width = (this.progressControl.offsetWidth - (this.progressTime.offsetWidth + 20)) + "px";
     this.updatePlayProgress();
     this.updateLoadProgress();
   },
@@ -626,50 +639,6 @@ var VideoJS = Class.extend({
   }
 })
 
-// Class Methods
-
-// Add video-js to any video tag with the class
-VideoJS.setup = function(){
-  var videoCount = document.getElementsByTagName("video").length
-  for (var i=0;i<videoCount;i++) {
-    videoTag = document.getElementsByTagName("video")[i];
-    if (videoTag.className.indexOf("video-js") != -1) {
-      videoJSPlayers[i] = new VideoJS(videoTag, { num: i });
-    }
-  }
-}
-
-// Check if the browser supports video.
-VideoJS.browserSupportsVideo = function() {
-  return !!document.createElement('video').canPlayType;
-}
-
-VideoJS.isIpad = function(){
-  return navigator.userAgent.match(/iPad/i) != null;
-}
-
-VideoJS.browserFlashVersion = function(){
-  if (typeof navigator.plugins != "undefined" && typeof navigator.plugins["Shockwave Flash"] == "object") {
-    desc = navigator.plugins["Shockwave Flash"].description;
-    if (desc && !(typeof navigator.mimeTypes != "undefined" && navigator.mimeTypes["application/x-shockwave-flash"] && !navigator.mimeTypes["application/x-shockwave-flash"].enabledPlugin)) {
-      return parseInt(desc.match(/^.*\s+([^\s]+)\.[^\s]+\s+[^\s]+$/)[1]);
-    }
-  } else if (typeof window.ActiveXObject != "undefined") {
-    try {
-      var testObject = new ActiveXObject("ShockwaveFlash.ShockwaveFlash");
-      if (testObject) {
-        return parseInt(testObject.GetVariable("$version").match(/^[^\s]+\s(\d+)/)[1]);
-      }
-    }
-    catch(e) { return false; }
-  }
-  return 0;
-}
-
-VideoJS.isIE = function(){
-  return !+"\v1"
-}
-
 // Convenience Functions (mini library)
 // Functions not specific to video or VideoJS and could be replaced with a library like jQuery
 var _V_ = {
@@ -727,6 +696,51 @@ var _V_ = {
     }
     return curleft;
   }
+}
+
+// Class Methods
+
+// Add video-js to any video tag with the class
+VideoJS.setup = function(options){
+  var videoCount = document.getElementsByTagName("video").length
+  for (var i=0;i<videoCount;i++) {
+    videoTag = document.getElementsByTagName("video")[i];
+    if (videoTag.className.indexOf("video-js") != -1) {
+      options = (options) ? _V_.merge(options, { num: i }) : options;
+      videoJSPlayers[i] = new VideoJS(videoTag, options);
+    }
+  }
+}
+
+// Check if the browser supports video.
+VideoJS.browserSupportsVideo = function() {
+  return !!document.createElement('video').canPlayType;
+}
+
+VideoJS.isIpad = function(){
+  return navigator.userAgent.match(/iPad/i) != null;
+}
+
+VideoJS.browserFlashVersion = function(){
+  if (typeof navigator.plugins != "undefined" && typeof navigator.plugins["Shockwave Flash"] == "object") {
+    desc = navigator.plugins["Shockwave Flash"].description;
+    if (desc && !(typeof navigator.mimeTypes != "undefined" && navigator.mimeTypes["application/x-shockwave-flash"] && !navigator.mimeTypes["application/x-shockwave-flash"].enabledPlugin)) {
+      return parseInt(desc.match(/^.*\s+([^\s]+)\.[^\s]+\s+[^\s]+$/)[1]);
+    }
+  } else if (typeof window.ActiveXObject != "undefined") {
+    try {
+      var testObject = new ActiveXObject("ShockwaveFlash.ShockwaveFlash");
+      if (testObject) {
+        return parseInt(testObject.GetVariable("$version").match(/^[^\s]+\s(\d+)/)[1]);
+      }
+    }
+    catch(e) { return false; }
+  }
+  return 0;
+}
+
+VideoJS.isIE = function(){
+  return !+"\v1";
 }
 
 // Allows for binding context to functions
