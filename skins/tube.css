@@ -1,0 +1,82 @@
+.tube-css .vjs-controls {
+  opacity: 1; color: #000;
+  height: 25px;
+  padding-left: 102px; /* Width of play button + margin */
+  padding-right: 83px; /* Width of all the controls to the right of the progress control + margins */
+
+  background-color: #ccc;
+  background: #fcfcfc -webkit-gradient(linear, left top, left bottom, from(#fcfcfc), to(#d0d0d0)) left top;
+  background: #fcfcfc -moz-linear-gradient(top,  #fcfcfc,  #d0d0d0) left top;
+}
+
+.tube-css .vjs-controls > li {
+  height: 23px; margin: 0; background: none;
+  border: 1px solid #b1b1b1; border-left-color: #eee;
+  border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0;
+  box-shadow: none; -webkit-box-shadow: none; -moz-box-shadow: none;
+}
+
+/* Placement of Control Items */
+.tube-css .vjs-controls > li.vjs-play-control       { width: 25px; left: 0; }
+.tube-css .vjs-controls > li.vjs-progress-control   { width: 100%; position: relative; }
+.tube-css .vjs-controls > li.vjs-time-control       { width: 75px; left: 27px; }
+.tube-css .vjs-controls > li.vjs-volume-control     { width: 50px; right: 30px; }
+.tube-css .vjs-controls > li.vjs-fullscreen-control { width: 30px; right: 0; }
+
+/* Removing borders on time & progress to join them */
+.tube-css .vjs-controls > li.vjs-progress-control { border-left: none; }
+.tube-css .vjs-controls > li.vjs-time-control { border-right: none; }
+
+
+/* Play/Pause
+-------------------------------------------------------------------------------- */
+.tube-css .vjs-controls > li:first-child { margin-left: 0; border-left-color: #b1b1b1; }
+.tube-css .vjs-play-control.vjs-play span { border-left-color: #333; border-top-width: 7px; border-left-width: 13px; border-bottom-width: 7px; margin: 5px 0 0 7px; }
+.tube-css .vjs-play-control.vjs-pause span { height: 14px; margin: 5px auto 0; border-left: 4px solid #333; border-right: 4px solid #333; }
+.tube-css .vjs-play-control.vjs-play:hover span { border-left-color: #CF1A1A; }
+.tube-css .vjs-play-control.vjs-pause:hover span { border-left-color: #CF1A1A; border-right-color: #CF1A1A; }
+
+/* Time Display
+-------------------------------------------------------------------------------- */
+.tube-css .vjs-controls .vjs-time-control { font-size: 11px; }
+.tube-css .vjs-controls .vjs-time-control span { line-height: 25px; /* Centering vertically */ }
+
+/* Progress
+-------------------------------------------------------------------------------- */
+.tube-css .vjs-progress-holder {
+  margin-right: 10px;
+  background-color: #b1b1b1;
+  background: #b1b1b1 -webkit-gradient(linear, left top, left bottom, from(#b1b1b1), to(#cacaca)) left top;
+  background: #b1b1b1 -moz-linear-gradient(top,  #b1b1b1,  #cacaca) left top;
+  border-color: #CACACA; border-bottom-color: #eaeaea;
+  border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0;
+}
+.tube-css .vjs-progress-control .vjs-load-progress { background: #C89191; border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0; }
+.tube-css .vjs-progress-control .vjs-play-progress { background: #f33; background: -webkit-gradient(linear, left top, left bottom, from(#f33), to(#CF1A1A)); background: -moz-linear-gradient(top,  #f33,  #CF1A1A); -webkit-border-radius: 0; -moz-border-radius: 0; border-radius: 0; }
+
+/* Volume
+-------------------------------------------------------------------------------- */
+.tube-css .vjs-volume-control ul { padding: 3px 0 0 0; }
+.tube-css .vjs-volume-control ul li { border-bottom-color: #ccc; }
+/* Volume icon color */
+.tube-css .vjs-volume-control ul li.vjs-volume-level-on { border-color: #333; }
+/* Volume icon hovering color */
+.tube-css .vjs-volume-control:hover ul li.vjs-volume-level-on { border-color: #CF1A1A; }
+
+/* Fullscreen
+-------------------------------------------------------------------------------- */
+.tube-css .vjs-fullscreen-control ul { margin: 4px 0 0 8px; }
+/* Fullscreen icon color */
+.tube-css .vjs-fullscreen-control ul li:nth-child(3), .tube-css .vjs-fullscreen-control ul li:nth-child(4), .tube-css.vjs-fullscreen .vjs-fullscreen-control ul li:nth-child(1), .tube-css.vjs-fullscreen .vjs-fullscreen-control ul li:nth-child(2) {
+  border-bottom-color: #333;
+}
+.tube-css .vjs-fullscreen-control ul li:nth-child(1), .tube-css .vjs-fullscreen-control ul li:nth-child(2), .tube-css.vjs-fullscreen .vjs-fullscreen-control ul li:nth-child(3), .tube-css.vjs-fullscreen .vjs-fullscreen-control ul li:nth-child(4) {
+  border-top-color: #333;
+}
+/* Fullscreen icon hovering color */
+.tube-css .vjs-fullscreen-control:hover ul li:nth-child(3), .tube-css .vjs-fullscreen-control:hover ul li:nth-child(4), .tube-css.vjs-fullscreen:hover .vjs-fullscreen-control ul li:nth-child(1), .tube-css.vjs-fullscreen:hover .vjs-fullscreen-control ul li:nth-child(2) {
+  border-bottom-color: #CF1A1A;
+}
+.tube-css .vjs-fullscreen-control:hover ul li:nth-child(1), .tube-css .vjs-fullscreen-control:hover ul li:nth-child(2), .tube-css.vjs-fullscreen:hover .vjs-fullscreen-control ul li:nth-child(3), .tube-css.vjs-fullscreen:hover .vjs-fullscreen-control ul li:nth-child(4) {
+  border-top-color: #CF1A1A;
+}

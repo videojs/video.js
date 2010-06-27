@@ -169,14 +169,13 @@ var VideoJS = Class.extend({
           <span></span>
         </li>
         <li class="vjs-progress-control">
-          <ul>
-            <li class="vjs-progress-holder">
-              <span class="vjs-load-progress"></span><span class="vjs-play-progress"></span>
-            </li>
-            <li class="vjs-progress-time">
-              <span class="vjs-current-time-display">00:00</span><span> / </span><span class="vjs-duration-display">00:00</span>
-            </li>
+          <ul class="vjs-progress-holder">
+            <li class="vjs-load-progress"></li>
+            <li class="vjs-play-progress"></li>
           </ul>
+        </li>
+        <li class="vjs-time-control">
+          <span class="vjs-current-time-display">00:00</span><span> / </span><span class="vjs-duration-display">00:00</span>
         </li>
         <li class="vjs-volume-control">
           <ul>
@@ -204,37 +203,33 @@ var VideoJS = Class.extend({
     this.progressControl = _V_.createElement("li", { className: "vjs-progress-control" });
     this.controls.appendChild(this.progressControl);
 
-    // Create a list for the different progress elements
-    this.progressList = document.createElement("ul");
-    this.progressControl.appendChild(this.progressList);
-
     // Create a holder for the progress bars
-    this.progressHolder = _V_.createElement("li", { className: "vjs-progress-holder" });
-    this.progressList.appendChild(this.progressHolder);
+    this.progressHolder = _V_.createElement("ul", { className: "vjs-progress-holder" });
+    this.progressControl.appendChild(this.progressHolder);
 
     // Create the loading progress display
-    this.loadProgress = _V_.createElement("span", { className: "vjs-load-progress" });
+    this.loadProgress = _V_.createElement("li", { className: "vjs-load-progress" });
     this.progressHolder.appendChild(this.loadProgress)
 
     // Create the playing progress display
-    this.playProgress = _V_.createElement("span", { className: "vjs-play-progress" });
+    this.playProgress = _V_.createElement("li", { className: "vjs-play-progress" });
     this.progressHolder.appendChild(this.playProgress);
 
     // Create the progress time display (00:00 / 00:00)
-    this.progressTime = _V_.createElement("li", { className: "vjs-progress-time" });
-    this.progressList.appendChild(this.progressTime);
+    this.timeControl = _V_.createElement("li", { className: "vjs-time-control" });
+    this.controls.appendChild(this.timeControl);
 
     // Create the current play time display
     this.currentTimeDisplay = _V_.createElement("span", { className: "vjs-current-time-display", innerHTML: "00:00" });
-    this.progressTime.appendChild(this.currentTimeDisplay);
+    this.timeControl.appendChild(this.currentTimeDisplay);
 
     // Add time separator
     this.timeSeparator = _V_.createElement("span", { innerHTML: " / " });
-    this.progressTime.appendChild(this.timeSeparator);
+    this.timeControl.appendChild(this.timeSeparator);
 
     // Create the total duration display
     this.durationDisplay = _V_.createElement("span", { className: "vjs-duration-display", innerHTML: "00:00" });
-    this.progressTime.appendChild(this.durationDisplay);
+    this.timeControl.appendChild(this.durationDisplay);
 
     // Create the volumne control
     this.volumeControl = _V_.createElement("li", {
@@ -289,8 +284,14 @@ var VideoJS = Class.extend({
     // Make sure the controls are visible
     if (this.controls.style.display == 'none') return;
 
+    if (this.videoIsFullScreen) {
+      this.box.style.width = "";
+    } else {
+      this.box.style.width = this.video.offsetWidth + "px";
+    }
+
     if (this.options.controlsBelow) {
-      if(this.videoIsFullScreen) {
+      if (this.videoIsFullScreen) {
         this.box.style.height = "";
         this.video.style.height = (this.box.offsetHeight - this.controls.offsetHeight) + "px";
       } else {
@@ -302,7 +303,6 @@ var VideoJS = Class.extend({
       this.controls.style.top = (this.video.offsetHeight - this.controls.offsetHeight) + "px";
     }
 
-    this.controls.style.width = this.video.offsetWidth + "px";
     this.sizeProgressBar();
   },
 
@@ -433,7 +433,7 @@ var VideoJS = Class.extend({
 
   updateLoadProgress: function(){
     if (this.controls.style.display == 'none') return;
-    this.loadProgress.style.width = (this.percentLoaded * (this.progressHolder.offsetWidth - 2)) + "px";
+    this.loadProgress.style.width = (this.percentLoaded * (_V_.getComputedStyleValue(this.progressHolder, "width").replace("px", ""))) + "px";
   },
 
   // React to clicks on the play/pause button
@@ -525,15 +525,30 @@ var VideoJS = Class.extend({
 
   // Adjust the width of the progress bar to fill the controls width
   sizeProgressBar: function(){
-    this.progressControl.style.width = (
-      this.controls.offsetWidth 
-      - this.playControl.offsetWidth
-      - this.volumeControl.offsetWidth
-      - this.fullscreenControl.offsetWidth
-    ) - (5*5) + "px";
-    this.progressHolder.style.width = (this.progressControl.offsetWidth - (this.progressTime.offsetWidth + 20)) + "px";
+    // this.progressControl.style.width =
+    //   this.controls.offsetWidth 
+    //   - this.playControl.offsetWidth
+    //   - this.volumeControl.offsetWidth
+    //   - this.timeControl.offsetWidth
+    //   - this.fullscreenControl.offsetWidth
+    //   - (this.getControlsPadding() * 6) 
+    //   - this.getControlBorderAdjustment() 
+    //   + "px";
+    // this.progressHolder.style.width = (this.progressControl.offsetWidth - (this.timeControl.offsetWidth + 20)) + "px";
     this.updatePlayProgress();
     this.updateLoadProgress();
+  },
+  
+  // Get the space between controls. For more flexible styling.
+  getControlsPadding: function(){
+    return _V_.findPosX(this.playControl) - _V_.findPosX(this.controls)
+  },
+  
+  // When dynamically placing controls, if there are borders on the controls, it can break to a new line.
+  getControlBorderAdjustment: function(){
+    var leftBorder = parseInt(_V_.getComputedStyleValue(this.playControl, "border-left-width").replace("px", ""));
+    var rightBorder = parseInt(_V_.getComputedStyleValue(this.playControl, "border-right-width").replace("px", ""));
+    return leftBorder + rightBorder;
   },
 
   // Track & display the current play progress
@@ -549,14 +564,14 @@ var VideoJS = Class.extend({
   // Ajust the play progress bar's width based on the current play time
   updatePlayProgress: function(){
     if (this.controls.style.display == 'none') return;
-    this.playProgress.style.width = ((this.video.currentTime / this.video.duration) * (this.progressHolder.offsetWidth - 2)) + "px";
+    this.playProgress.style.width = ((this.video.currentTime / this.video.duration) * (_V_.getComputedStyleValue(this.progressHolder, "width").replace("px", ""))) + "px";
     this.updateTimeDisplay();
   },
 
   // Update the play position based on where the user clicked on the progresss bar
   setPlayProgress: function(newProgress){
     this.video.currentTime = newProgress * this.video.duration;
-    this.playProgress.style.width = newProgress * (this.progressHolder.offsetWidth - 2)  + "px";
+    this.playProgress.style.width = newProgress * (_V_.getComputedStyleValue(this.progressHolder, "width").replace("px", "")) + "px";
     this.updateTimeDisplay();
   },
 
@@ -588,9 +603,9 @@ var VideoJS = Class.extend({
     var volNum = Math.ceil(this.video.volume * 6);
     for(var i=0; i<6; i++) {
       if (i < volNum) {
-        this.volumeDisplay.children[i].style.borderColor = "#fff";
+        _V_.addClass(this.volumeDisplay.children[i], "vjs-volume-level-on")
       } else {
-        this.volumeDisplay.children[i].style.borderColor = "#555";
+        _V_.removeClass(this.volumeDisplay.children[i], "vjs-volume-level-on");
       }
     }
   },
@@ -598,26 +613,38 @@ var VideoJS = Class.extend({
   // Turn on fullscreen (window) mode
   // Real fullscreen isn't available in browsers quite yet.
   fullscreenOn: function(){
-    this.videoIsFullScreen = true;
+    if (!this.nativeFullscreenOn()) {
+      this.videoIsFullScreen = true;
 
-    // Storing original doc overflow value to return to when fullscreen is off
-    this.docOrigOverflow = document.documentElement.style.overflow;
+      // Storing original doc overflow value to return to when fullscreen is off
+      this.docOrigOverflow = document.documentElement.style.overflow;
 
-    // Add listener for esc key to exit fullscreen
-    document.addEventListener("keydown", this.onEscKey, false);
+      // Add listener for esc key to exit fullscreen
+      document.addEventListener("keydown", this.onEscKey, false);
 
-    // Add listener for a window resize
-    window.addEventListener("resize", this.onWindowResize, false);
+      // Add listener for a window resize
+      window.addEventListener("resize", this.onWindowResize, false);
 
-    // Hide any scroll bars
-    document.documentElement.style.overflow = 'hidden';
+      // Hide any scroll bars
+      document.documentElement.style.overflow = 'hidden';
 
-    // Apply fullscreen styles
-    _V_.addClass(this.box, "vjs-fullscreen");
+      // Apply fullscreen styles
+      _V_.addClass(this.box, "vjs-fullscreen");
 
-    // Resize the controller and poster
-    this.positionController();
-    this.positionPoster();
+      // Resize the controller and poster
+      this.positionController();
+      this.positionPoster();
+    }
+  },
+  
+  nativeFullscreenOn: function(){
+    if(typeof this.video.webkitEnterFullScreen == 'function') {
+      // Seems to be broken in Chromium/Chrome
+      if (!navigator.userAgent.match("Chrome")) {
+        this.video.webkitEnterFullScreen();
+        return true;
+      }
+    }
   },
 
   // Turn off fullscreen (window) mode
@@ -695,7 +722,12 @@ var _V_ = {
       curleft += obj.offsetLeft;
     }
     return curleft;
+  },
+  
+  getComputedStyleValue: function(element, style){
+    return window.getComputedStyle(element, null).getPropertyValue(style);
   }
+  
 }
 
 // Class Methods
