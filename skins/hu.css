@@ -1,0 +1,99 @@
+.hu-css .vjs-controls { 
+  height: 47px; opacity: 0.95; color: #fff; 
+  padding-left: 84px; /* Width of play button + margin */
+  padding-right: 0px; /* Width of all the controls to the right of the progress control + margins */
+  background: #3A3835;
+}
+
+.hu-css .vjs-controls > li {
+  background: none;
+  border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0;
+  box-shadow: none; -webkit-box-shadow: none; -moz-box-shadow: none;
+}
+
+/* Top Level Items */
+.hu-css .vjs-controls > li.vjs-play-control, 
+.hu-css .vjs-controls > li.vjs-volume-control, 
+.hu-css .vjs-controls > li.vjs-fullscreen-control {
+  bottom: 20px; height: 27px;
+}
+/* Bottom Level Items */
+.hu-css .vjs-controls > li.vjs-progress-control, .hu-css .vjs-controls > li.vjs-time-control {
+  margin-top: 28px; height: 19px;
+}
+
+/* Placement of Control Items */
+.hu-css .vjs-controls > li.vjs-play-control       { width: 33px; left: 0px; }
+.hu-css .vjs-controls > li.vjs-progress-control   { width: 100%; position: relative; }
+.hu-css .vjs-controls > li.vjs-time-control       { width: 84px; left: 0px; }
+.hu-css .vjs-controls > li.vjs-volume-control     { width: 43px; right: 44px; }
+.hu-css .vjs-controls > li.vjs-fullscreen-control { width: 43px; right: 0px; }
+
+/* Play/Pause
+-------------------------------------------------------------------------------- */
+.hu-css .vjs-play-control.vjs-play span { margin: 9px 0 0 12px; }
+.hu-css .vjs-play-control.vjs-pause span { margin: 9px 0 0 12px; }
+.hu-css .vjs-play-control:hover { background-color: #000; }
+
+/* Progress
+-------------------------------------------------------------------------------- */
+.hu-css .vjs-progress-holder { /* Box containing play and load progresses */
+  height: 19px; border: none;
+  margin: 0px 0px 0 0px; /* Placement within the progress control item */
+  background: #000;
+  border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0;
+}
+.hu-css .vjs-progress-holder li { height: 13px; margin-top: 3px; border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0; }
+.hu-css .vjs-play-progress {
+  /* Default */ background: #777;
+  /* Webkit  */ background: -webkit-gradient(linear, left top, left bottom, from(#999), to(#777));
+  /* Firefox */ background: -moz-linear-gradient(top,  #999,  #777);
+}
+.hu-css .vjs-load-progress { background: #555; }
+
+/* Time Display
+-------------------------------------------------------------------------------- */
+.hu-css .vjs-controls .vjs-time-control { font-size: 11px; background: #000; }
+.hu-css .vjs-controls .vjs-time-control span { line-height: 19px; /* Centering vertically */ }
+
+/* Volume
+-------------------------------------------------------------------------------- */
+/*.hu-css .vjs-volume-control:hover { background-color: #000; }*/
+.hu-css .vjs-volume-control ul { margin: 0 5px 0 5px; padding: 9px 0 0 0; }
+.hu-css .vjs-volume-control ul li { /* Individual volume bars */
+  margin: 0 2px 0 0; /* Space between */
+  width: 3px; height: 0px; /* Total height is height + bottom border */
+  border-bottom: 12px solid #555; /* Default (off) color and height of visible portion */
+}
+.hu-css .vjs-volume-control ul li.vjs-volume-level-on { border-color: #fff; /* Volume on bar color */ }
+/* Creating differnt bar heights through height (transparent) and bottom border (visible). */
+.hu-css .vjs-volume-control ul li:nth-child(1) { border-bottom-width: 2px; height: 10px; }
+.hu-css .vjs-volume-control ul li:nth-child(2) { border-bottom-width: 4px; height: 8px; }
+.hu-css .vjs-volume-control ul li:nth-child(3) { border-bottom-width: 6px; height: 6px; }
+.hu-css .vjs-volume-control ul li:nth-child(4) { border-bottom-width: 8px; height: 4px; }
+.hu-css .vjs-volume-control ul li:nth-child(5) { border-bottom-width: 10px; height: 2px; }
+
+/* Fullscreen
+-------------------------------------------------------------------------------- */
+.hu-css .vjs-fullscreen-control:hover { background-color: #000; }
+.hu-css .vjs-fullscreen-control ul { margin: 8px 0 0 0px; padding-left: 13px; height: 13px; border-left: 1px solid #555; }
+.hu-css .vjs-fullscreen-control ul li:nth-child(1) { margin-right: 9px; margin-bottom: 5px; border-top: 4px solid #fff; border-right: 4px solid rgba(0,0,0,0); }
+.hu-css .vjs-fullscreen-control ul li:nth-child(2) { border-top: 4px solid #fff; border-left: 4px solid rgba(0,0,0,0); }
+.hu-css .vjs-fullscreen-control ul li:nth-child(3) { clear: both; margin: 0 9px 0 0; border-bottom: 4px solid #fff; border-right: 4px solid rgba(0,0,0,0); }
+.hu-css .vjs-fullscreen-control ul li:nth-child(4) { border-bottom: 4px solid #fff; border-left: 4px solid rgba(0,0,0,0); }
+/* Icon when video is in fullscreen mode */
+.hu-css.vjs-fullscreen .vjs-fullscreen-control ul li:nth-child(1) { border: none; border-bottom: 4px solid #fff; border-left: 4px solid rgba(0,0,0,0); }
+.hu-css.vjs-fullscreen .vjs-fullscreen-control ul li:nth-child(2) { border: none; border-bottom: 4px solid #fff; border-right: 4px solid rgba(0,0,0,0); }
+.hu-css.vjs-fullscreen .vjs-fullscreen-control ul li:nth-child(3) { border: none; border-top: 4px solid #fff; border-left: 4px solid rgba(0,0,0,0); }
+.hu-css.vjs-fullscreen .vjs-fullscreen-control ul li:nth-child(4) { border: none; border-top: 4px solid #fff; border-right: 4px solid rgba(0,0,0,0); }
+
+
+
+
+
+
+
+
+
+
+
