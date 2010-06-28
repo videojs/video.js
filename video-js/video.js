@@ -31,14 +31,17 @@ var VideoJS = Class.extend({
 
     this.video = element;
 
+    // Hide default controls
+    this.video.controls = false;
+
     // Default Options
     this.options = {
       num: 0, // Optional tracking of videoJSPLayers position
       controlsBelow: false, // Display control bar below video vs. on top
       controlsHiding: true, // Hide controls when not over the video
       defaultVolume: 0.85, // Will be overridden by localStorage volume if available
-      flashVersion: 9,
-      linksHiding: true
+      flashVersion: 9, // Required flash version for fallback
+      linksHiding: true // Hide download links when video is supported
     };
     // Override default options with set options
     if (typeof setOptions == "object") _V_.merge(this.options, setOptions);
@@ -46,23 +49,25 @@ var VideoJS = Class.extend({
     this.box = this.video.parentNode;
     this.flashFallback = this.getFlashFallback();
     this.linksFallback = this.getLinksFallback();
-    this.percentLoaded = 0;
 
+    // Hide download links if video can play
+    if(VideoJS.browserSupportsVideo() || ((this.flashFallback || VideoJS.isIE()) && this.flashVersionSupported())) {
+      this.hideLinksFallback();
+    }
+
+    // Check if browser can play HTML5 video
     if (VideoJS.browserSupportsVideo()) {
+      // Force flash fallback when there's no supported source
       if (this.canPlaySource() == false) {
-        this.hideLinksFallback();
         this.replaceWithFlash();
         return;
       }
-    } else if (VideoJS.browserFlashVersion() >= this.options.flashVersion) {
-      this.hideLinksFallback();
-      return;
     } else {
       return;
     }
 
-    this.hideLinksFallback();
-
+    // For iPads, controls need to always show because there's no hover
+    // The controls also have to be below for the full-window mode to work.
     if (VideoJS.isIpad()) {
       this.options.controlsBelow = true;
       this.options.controlsHiding = false;
@@ -71,12 +76,12 @@ var VideoJS = Class.extend({
     if (this.options.controlsBelow) {
       _V_.addClass(this.box, "vjs-controls-below");
     }
+    
+    // Store amount of video loaded
+    this.percentLoaded = 0;
 
     this.buildPoster();
     this.showPoster();
-
-    // Hide default controls
-    this.video.controls = false;
 
     this.buildController();
     this.showController();
@@ -260,7 +265,7 @@ var VideoJS = Class.extend({
   getFlashFallback: function(){
     if (VideoJS.isIE()) return;
     var children = this.box.getElementsByClassName("vjs-flash-fallback");
-    for (var i=0; i<children.length; i++) {
+    for (var i=0,j=children.length; i<j; i++) {
       if (children[i].tagName.toUpperCase() == "OBJECT") {
         return children[i];
       }
@@ -269,8 +274,10 @@ var VideoJS = Class.extend({
 
   replaceWithFlash: function(){
     // this.flashFallback = this.video.removeChild(this.flashFallback);
-    this.box.appendChild(this.flashFallback);
-    this.video.style.display = "none"; // Removing it was breaking later players
+    if (this.flashFallback) {
+      this.box.insertBefore(this.flashFallback, this.video);
+      this.video.style.display = "none"; // Removing it was breaking later players
+    }
   },
 
   // Show the controller
@@ -358,7 +365,7 @@ var VideoJS = Class.extend({
 
   canPlaySource: function(){
     var children = this.video.children;
-    for (var i=0; i<children.length; i++) {
+    for (var i=0,j=children.length; i<j; i++) {
       if (children[i].tagName.toUpperCase() == "SOURCE") {
         var canPlay = this.video.canPlayType(children[i].type);
         if(canPlay == "probably" || canPlay == "maybe") {
@@ -638,7 +645,7 @@ var VideoJS = Class.extend({
   },
   
   nativeFullscreenOn: function(){
-    if(typeof this.video.webkitEnterFullScreen == 'function') {
+    if(typeof this.video.webkitEnterFullScreen == 'function' && false) {
       // Seems to be broken in Chromium/Chrome
       if (!navigator.userAgent.match("Chrome")) {
         this.video.webkitEnterFullScreen();
@@ -663,6 +670,10 @@ var VideoJS = Class.extend({
     // Resize to original settings
     this.positionController();
     this.positionPoster();
+  },
+  
+  flashVersionSupported: function(){
+    return VideoJS.getFlashVersion() >= this.options.flashVersion;
   }
 })
 
@@ -681,8 +692,7 @@ var _V_ = {
   },
 
   merge: function(obj1, obj2){
-    for (attrname in obj2) { obj1[attrname] = obj2[attrname]; }
-    return obj1;
+    for(attrname in obj2){obj1[attrname]=obj2[attrname];} return obj1;
   },
 
   createElement: function(tagName, attributes){
@@ -723,20 +733,19 @@ var _V_ = {
     }
     return curleft;
   },
-  
+
   getComputedStyleValue: function(element, style){
     return window.getComputedStyle(element, null).getPropertyValue(style);
   }
-  
 }
 
 // Class Methods
 
 // Add video-js to any video tag with the class
 VideoJS.setup = function(options){
-  var videoCount = document.getElementsByTagName("video").length
-  for (var i=0;i<videoCount;i++) {
-    videoTag = document.getElementsByTagName("video")[i];
+  var elements = document.getElementsByTagName("video");
+  for (var i=0,j=elements.length; i<j; i++) {
+    videoTag = elements[i];
     if (videoTag.className.indexOf("video-js") != -1) {
       options = (options) ? _V_.merge(options, { num: i }) : options;
       videoJSPlayers[i] = new VideoJS(videoTag, options);
@@ -746,34 +755,33 @@ VideoJS.setup = function(options){
 
 // Check if the browser supports video.
 VideoJS.browserSupportsVideo = function() {
-  return !!document.createElement('video').canPlayType;
+  if (typeof VideoJS.videoSupport != "undefined") return VideoJS.videoSupport;
+  return VideoJS.videoSupport = !!document.createElement('video').canPlayType;
 }
 
-VideoJS.isIpad = function(){
-  return navigator.userAgent.match(/iPad/i) != null;
-}
-
-VideoJS.browserFlashVersion = function(){
+VideoJS.getFlashVersion = function(){
+  // Cache Version
+  if (typeof VideoJS.flashVersion != "undefined") return VideoJS.flashVersion;
+  var version = 0;
   if (typeof navigator.plugins != "undefined" && typeof navigator.plugins["Shockwave Flash"] == "object") {
     desc = navigator.plugins["Shockwave Flash"].description;
     if (desc && !(typeof navigator.mimeTypes != "undefined" && navigator.mimeTypes["application/x-shockwave-flash"] && !navigator.mimeTypes["application/x-shockwave-flash"].enabledPlugin)) {
-      return parseInt(desc.match(/^.*\s+([^\s]+)\.[^\s]+\s+[^\s]+$/)[1]);
+      version = parseInt(desc.match(/^.*\s+([^\s]+)\.[^\s]+\s+[^\s]+$/)[1]);
     }
   } else if (typeof window.ActiveXObject != "undefined") {
     try {
       var testObject = new ActiveXObject("ShockwaveFlash.ShockwaveFlash");
       if (testObject) {
-        return parseInt(testObject.GetVariable("$version").match(/^[^\s]+\s(\d+)/)[1]);
+        version = parseInt(testObject.GetVariable("$version").match(/^[^\s]+\s(\d+)/)[1]);
       }
     }
-    catch(e) { return false; }
+    catch(e) {}
   }
-  return 0;
+  return VideoJS.flashVersion = version;
 }
 
-VideoJS.isIE = function(){
-  return !+"\v1";
-}
+VideoJS.isIE = function(){ return !+"\v1"; }
+VideoJS.isIpad = function(){ return navigator.userAgent.match(/iPad/i) != null; }
 
 // Allows for binding context to functions
 // when using in event listeners and timeouts

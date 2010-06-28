@@ -3,6 +3,7 @@ body { font-size: 10px; line-height: 1; color: #fff; text-align: center; }
 #wrap { background: url("../images/background-highlights.png") center 20px no-repeat; }
 #main { position: relative; width: 640px; margin: 0px auto; text-align: left; padding-bottom: 20px; }
 h1 { font-size: 360%; line-height: 1; margin-bottom: 10px; text-align: center; letter-spacing: 5px; }
+h2 { font-size: 200%; line-height: 1; margin-bottom: 10px; }
 h6 { font-size: 100%; text-transform: uppercase; margin-bottom: 10px; color: #999; }
 p.tagline { text-align: center; font-size: 120%; line-height: 1; }
 

@@ -1,0 +1,62 @@
+.vim-css .vjs-controls { 
+  height: 50px; opacity: 0.9; color: #fff; 
+  padding-left: 85px; /* Width of play button + margin */
+  padding-right: 160px; /* Width of all the controls to the right of the progress control + margins */
+}
+.vim-css .vjs-controls > li { 
+  height: 32px; width: 25px; margin: 8px 0 0 0; padding: 0; text-align: center; background: rgba(23, 35, 34, 0.746094); 
+  border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0; 
+  box-shadow: none; -webkit-box-shadow: none; -moz-box-shadow: none;
+}
+/* Placement of Control Items */
+.vim-css .vjs-controls > li.vjs-play-control       { width: 65px; left: 10px; }
+.vim-css .vjs-controls > li.vjs-progress-control   { width: 100%; position: relative; }
+.vim-css .vjs-controls > li.vjs-time-control       { width: 75px; right: 85px; }
+.vim-css .vjs-controls > li.vjs-volume-control     { width: 50px; right: 35px; }
+.vim-css .vjs-controls > li.vjs-fullscreen-control { width: 25px; right: 10px; }
+
+/* Play/Pause
+-------------------------------------------------------------------------------- */
+.vim-css .vjs-controls .vjs-play-control { margin: 0; height: 40px;  border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px; }
+.vim-css .vjs-play-control.vjs-play span { border-left-color: #fff; border-top-width: 9px; border-left-width: 18px; border-bottom-width: 9px; margin: 11px 0 0 24px; }
+.vim-css .vjs-play-control:hover { background: #00ADEF; }
+.vim-css .vjs-play-control.vjs-pause span { width: 5px; height: 18px; margin: 5px auto 0; border-left: 5px solid #fff; border-right: 5px solid #fff; margin: 11px 0 0 24px; }
+
+/* Progress
+-------------------------------------------------------------------------------- */
+.vim-css .vjs-controls .vjs-progress-control { border-radius: 5px 0 0 5px; -webkit-border-radius: 5px 0 0 5px; -moz-border-radius: 5px 0 0 5px; }
+.vim-css .vjs-progress-control .vjs-progress-holder { height: 8px; padding: 1px; margin: 10px 5px 0 10px; border-color: #666666; border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0; }
+.vim-css .vjs-progress-control .vjs-play-progress { height: 8px; background: #00ADEF; border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0; }
+.vim-css .vjs-progress-control .vjs-load-progress { height: 8px; background: #898F8F; border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0; }
+
+/* Time Display
+-------------------------------------------------------------------------------- */
+.vim-css .vjs-controls .vjs-time-control { font-size: 11px; }
+.vim-css .vjs-controls .vjs-time-control span { line-height: 32px; /* Centering vertically */ }
+
+/* Volume
+-------------------------------------------------------------------------------- */
+.vim-css .vjs-volume-control ul { padding: 7px 0 0 5px; width: 30px; }
+.vim-css .vjs-volume-control ul li { 
+  float: left; margin: 0 2px 0 0; padding: 0; list-style: none; width: 3px; height: 3px; border-bottom: 12px solid #666666; 
+  -webkit-transition: all 100ms linear; -moz-transition: all 100ms linear;
+}
+.vim-css .vjs-volume-control ul li.vjs-volume-level-on { border-color: #00ADEF; }
+.vim-css .vjs-volume-control ul li:hover { height: 0; border-bottom-width: 15px; }
+
+/* Fullscreen
+-------------------------------------------------------------------------------- */
+.vim-css .vjs-fullscreen-control ul { margin: 10px 0 0 0; }
+.vim-css .vjs-controls .vjs-fullscreen-control { border-radius: 0 5px 5px 0; -webkit-border-radius: 0 5px 5px 0; -moz-border-radius: 0 5px 5px 0; }
+/* Making default fullscreen icon smaller */
+.vim-css .vjs-fullscreen-control ul li:nth-child(1) { margin: 0 4px 4px 0; border: none; border-top: 4px solid #fff; border-right: 4px solid rgba(0,0,0,0); }
+.vim-css .vjs-fullscreen-control ul li:nth-child(2) { border: none; border-top: 4px solid #fff; border-left: 4px solid rgba(0,0,0,0); }
+.vim-css .vjs-fullscreen-control ul li:nth-child(3) { clear: both; margin: 0 4px 0 0; border: none; border-bottom: 4px solid #fff; border-right: 4px solid rgba(0,0,0,0); }
+.vim-css .vjs-fullscreen-control ul li:nth-child(4) { border: none; border-bottom: 4px solid #fff; border-left: 4px solid rgba(0,0,0,0); }
+.vim-css.vjs-fullscreen .vjs-fullscreen-control ul li:nth-child(1) { border: none; border-bottom: 4px solid #fff; border-left: 4px solid rgba(0,0,0,0); }
+.vim-css.vjs-fullscreen .vjs-fullscreen-control ul li:nth-child(2) { border: none; border-bottom: 4px solid #fff; border-right: 4px solid rgba(0,0,0,0); }
+.vim-css.vjs-fullscreen .vjs-fullscreen-control ul li:nth-child(3) { border: none; border-top: 4px solid #fff; border-left: 4px solid rgba(0,0,0,0); }
+.vim-css.vjs-fullscreen .vjs-fullscreen-control ul li:nth-child(4) { border: none; border-top: 4px solid #fff; border-right: 4px solid rgba(0,0,0,0); }
+/* Fullscreen control hovering */
+.vim-css .vjs-fullscreen-control:hover ul li:nth-child(3), .vim-css .vjs-fullscreen-control:hover ul li:nth-child(4), .vim-css.vjs-fullscreen .vjs-fullscreen-control:hover ul li:nth-child(1), .vim-css.vjs-fullscreen .vjs-fullscreen-control:hover ul li:nth-child(2) { border-bottom-color: #00ADEF; }
+.vim-css .vjs-fullscreen-control:hover ul li:nth-child(1), .vim-css .vjs-fullscreen-control:hover ul li:nth-child(2), .vim-css.vjs-fullscreen .vjs-fullscreen-control:hover ul li:nth-child(3), .vim-css.vjs-fullscreen .vjs-fullscreen-control:hover ul li:nth-child(4) { border-top-color: #00ADEF; }

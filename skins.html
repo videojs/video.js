@@ -2,6 +2,134 @@
 <html>
 <head>
   <meta charset="utf-8" />
+  <title>Skins | HTML5 Video Player | Video JS</title>
+  <meta name="google-site-verification" content="QHf9MEYVlEWoNHbzTeUkSQsbRT5Twzqu6N0nX1i3nes" />
+
+  <script src="video-js/video.js" type="text/javascript" charset="utf-8"></script>
+  <!-- JQuery not required, but used for dom ready function -->
+  <script src="javascripts/jquery-1.4.2.min.js" type="text/javascript" charset="utf-8"></script>
+
+  <link rel="stylesheet" href="stylesheets/base.css" type="text/css" media="all" charset="utf-8" />
+  <link rel="stylesheet" href="video-js/video-js.css" type="text/css" media="all" charset="utf-8" />
+  <link rel="stylesheet" href="stylesheets/site.css" type="text/css" media="all" charset="utf-8" />
+  <link rel="stylesheet" href="video-js/skins/tube.css" type="text/css" media="screen" title="Video JS" charset="utf-8">
+  <link rel="stylesheet" href="video-js/skins/vim.css" type="text/css" media="screen" title="Video JS" charset="utf-8">
+  <link rel="stylesheet" href="video-js/skins/hu.css" type="text/css" media="screen" title="Video JS" charset="utf-8">
+
+  <!--[if !IE 7]>
+    <style type="text/css">
+      #wrap {display:table;height:100%}
+    </style>
+  <![endif]-->
+
+  <script type="text/javascript" charset="utf-8">
+    // Using JQuery's DOM Ready function
+    // You can also use window.onload, but it loads slower
+    $(function(){
+      VideoJS.setup();
+    })
+
+    // If not using a JS library
+    // window.onload = function(){
+    //   VideoJS.setup();
+    // }
+  </script>
+
+</head>
+<body>
+
+  <div id="wrap">
+    <div id="main">
+
+      <ul id="nav">
+        <li><a href="http://videojs.com/skins.html">Skins</a></li>
+        <li><a href="http://github.com/zencoder/video-js">Source</a></li>
+        <li><a href="http://wiki.github.com/zencoder/video-js/browser-device-compatibility">Compatibility</a></li>
+        <li><a href="http://github.com/zencoder/video-js/issues">Issue Tracker</a></li>
+        <li><a href="http://wiki.github.com/zencoder/video-js/">Wiki</a></li>
+      </ul>
+
+      <h1>Video JS Skins</h1>
+      <p class="tagline">Replicas of some well known skins using just CSS</p>
+
+      <p>These skins were created to show how you can re-skin VideoJS using just CSS. To use these skins, download the CSS file and include in the same document as VideoJS. Then add the skin's classname to the video-js-box.</p>
+
+      <p>&lt;div class="video-js-box vim-css"&gt;</p>
+
+      <h2>The Original</h2>
+
+      <div class="video-js-box">
+        <video class="video-js" width="640" height="264" poster="http://video-js.zencoder.com/oceans-clip.png" controls>
+          <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+          <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm; codecs="vp8, vorbis"'>
+          <source src="http://video-js.zencoder.com/oceans-clip.ogg" type='video/ogg; codecs="theora, vorbis"'>
+          <p>You need an HTML5 video compatible browser to view these skins.</p>
+        </video>
+      </div>
+      <p>No additional files needed.</p>
+
+      <h2>VimCSS</h2>
+      <div class="video-js-box vim-css">
+        <video class="video-js" width="640" height="264" poster="http://video-js.zencoder.com/oceans-clip.png" controls>
+          <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+          <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm; codecs="vp8, vorbis"'>
+          <source src="http://video-js.zencoder.com/oceans-clip.ogg" type='video/ogg; codecs="theora, vorbis"'>
+        </video>
+      </div>
+      <p>Download <a href="video-js/skins/vim.css">VimCSS</a>. Add the class "vim-css".</p>
+
+      <h2>HuCSS</h2>
+      <!-- Begin VideoJS -->
+      <div class="video-js-box hu-css">
+        <video class="video-js" width="640" height="264" poster="http://video-js.zencoder.com/oceans-clip.png" controls>
+          <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+          <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm; codecs="vp8, vorbis"'>
+          <source src="http://video-js.zencoder.com/oceans-clip.ogg" type='video/ogg; codecs="theora, vorbis"'>
+        </video>
+      </div>
+      <p>Download <a href="video-js/skins/hu.css">HuCSS</a>. Add the class "hu-css".</p>
+
+
+      <h2>TubeCSS</h2>
+      <div class="video-js-box tube-css">
+        <video class="video-js" width="640" height="264" poster="http://video-js.zencoder.com/oceans-clip.png" controls>
+          <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+          <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm; codecs="vp8, vorbis"'>
+          <source src="http://video-js.zencoder.com/oceans-clip.ogg" type='video/ogg; codecs="theora, vorbis"'>
+        </video>
+      </div>
+      <p>Download <a href="video-js/skins/tube.css">TubeCSS</a>. Add the class "tube-css".</p>
+
+    </div>
+  </div>
+
+    <div id="footer">
+      &copy; <a href="http://videojs.com">The Video JS Project</a>. Sponsored by <a href="http://zencoder.com">Zencoder</a>.
+    </div>
+  </div>
+
+  <script type="text/javascript">
+
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-16505296-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+  </script>
+
+</body>
+</html>
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
   <title>HTML5 Video Player</title>
 
   <script src="javascripts/jquery-1.4.2.min.js" type="text/javascript" charset="utf-8"></script>
@@ -14,111 +142,13 @@
   </script>
 
   <link rel="stylesheet" href="video-js/video-js.css" type="text/css" media="screen" title="Video JS" charset="utf-8">
-  <link rel="stylesheet" href="skins/tube.css" type="text/css" media="screen" title="Video JS" charset="utf-8">
-  <link rel="stylesheet" href="skins/vim.css" type="text/css" media="screen" title="Video JS" charset="utf-8">
-  <link rel="stylesheet" href="skins/hu.css" type="text/css" media="screen" title="Video JS" charset="utf-8">  
+  <link rel="stylesheet" href="video-js/skins/tube.css" type="text/css" media="screen" title="Video JS" charset="utf-8">
+  <link rel="stylesheet" href="video-js/skins/vim.css" type="text/css" media="screen" title="Video JS" charset="utf-8">
+  <link rel="stylesheet" href="video-js/skins/hu.css" type="text/css" media="screen" title="Video JS" charset="utf-8">
 </head>
 <body>
 
-  <!-- Begin VideoJS -->
-  <div class="video-js-box hu-css">
-    <!-- Using the Video for Everybody Embed Code http://camendesign.com/code/video_for_everybody -->
-    <video class="video-js" width="640" height="264" poster="http://video-js.zencoder.com/oceans-clip.png" controls>
-      <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
-      <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm; codecs="vp8, vorbis"'>
-      <source src="http://video-js.zencoder.com/oceans-clip.ogg" type='video/ogg; codecs="theora, vorbis"'>
-      <object class="vjs-flash-fallback" width="640" height="264" type="application/x-shockwave-flash"
-        data="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf">
-        <param name="movie" value="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf" />
-        <param name="allowfullscreen" value="true" />
-        <param name="flashvars" value='config={"clip":{"url":"http://video-js.zencoder.com/oceans-clip.mp4","autoPlay":false,"autoBuffering":true}}' />
-        <!-- <img src="http://video-js.zencoder.com/oceans-clip.png" width="640" height="264" alt="Poster Image"
-          title="No video playback capabilities." /> -->
-      </object>
-    </video>
-    <p class="vjs-no-video"><strong>Download Video:</strong>
-      <a href="http://video-js.zencoder.com/oceans-clip.mp4">MP4</a>,
-      <a href="http://video-js.zencoder.com/oceans-clip.webm">WebM</a>,
-      <a href="http://video-js.zencoder.com/oceans-clip.ogg">Ogg</a><br>
-      <a href="http://videojs.com">HTML5 Video Player</a> by <a href="http://videojs.com">VideoJS</a>
-    </p>
-  </div>
-  <!-- End VideoJS -->
 
-  <!-- Begin VideoJS -->
-  <div class="video-js-box">
-    <!-- Using the Video for Everybody Embed Code http://camendesign.com/code/video_for_everybody -->
-    <video class="video-js" width="640" height="264" poster="http://video-js.zencoder.com/oceans-clip.png" controls>
-      <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
-      <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm; codecs="vp8, vorbis"'>
-      <source src="http://video-js.zencoder.com/oceans-clip.ogg" type='video/ogg; codecs="theora, vorbis"'>
-      <object class="vjs-flash-fallback" width="640" height="264" type="application/x-shockwave-flash"
-        data="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf">
-        <param name="movie" value="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf" />
-        <param name="allowfullscreen" value="true" />
-        <param name="flashvars" value='config={"clip":{"url":"http://video-js.zencoder.com/oceans-clip.mp4","autoPlay":false,"autoBuffering":true}}' />
-        <!-- <img src="http://video-js.zencoder.com/oceans-clip.png" width="640" height="264" alt="Poster Image"
-          title="No video playback capabilities." /> -->
-      </object>
-    </video>
-    <p class="vjs-no-video"><strong>Download Video:</strong>
-      <a href="http://video-js.zencoder.com/oceans-clip.mp4">MP4</a>,
-      <a href="http://video-js.zencoder.com/oceans-clip.webm">WebM</a>,
-      <a href="http://video-js.zencoder.com/oceans-clip.ogg">Ogg</a><br>
-      <a href="http://videojs.com">HTML5 Video Player</a> by <a href="http://videojs.com">VideoJS</a>
-    </p>
-  </div>
-  <!-- End VideoJS -->
-
-  <!-- Begin VideoJS -->
-  <div class="video-js-box tube-css">
-    <!-- Using the Video for Everybody Embed Code http://camendesign.com/code/video_for_everybody -->
-    <video class="video-js" width="640" height="264" poster="http://video-js.zencoder.com/oceans-clip.png" controls>
-      <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
-      <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm; codecs="vp8, vorbis"'>
-      <source src="http://video-js.zencoder.com/oceans-clip.ogg" type='video/ogg; codecs="theora, vorbis"'>
-      <object class="vjs-flash-fallback" width="640" height="264" type="application/x-shockwave-flash"
-        data="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf">
-        <param name="movie" value="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf" />
-        <param name="allowfullscreen" value="true" />
-        <param name="flashvars" value='config={"clip":{"url":"http://video-js.zencoder.com/oceans-clip.mp4","autoPlay":false,"autoBuffering":true}}' />
-        <!-- <img src="http://video-js.zencoder.com/oceans-clip.png" width="640" height="264" alt="Poster Image"
-          title="No video playback capabilities." /> -->
-      </object>
-    </video>
-    <p class="vjs-no-video"><strong>Download Video:</strong>
-      <a href="http://video-js.zencoder.com/oceans-clip.mp4">MP4</a>,
-      <a href="http://video-js.zencoder.com/oceans-clip.webm">WebM</a>,
-      <a href="http://video-js.zencoder.com/oceans-clip.ogg">Ogg</a><br>
-      <a href="http://videojs.com">HTML5 Video Player</a> by <a href="http://videojs.com">VideoJS</a>
-    </p>
-  </div>
-  <!-- End VideoJS -->
-
-  <!-- Begin VideoJS -->
-  <div class="video-js-box vim-css">
-    <!-- Using the Video for Everybody Embed Code http://camendesign.com/code/video_for_everybody -->
-    <video class="video-js" width="640" height="264" poster="http://video-js.zencoder.com/oceans-clip.png" controls>
-      <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
-      <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm; codecs="vp8, vorbis"'>
-      <source src="http://video-js.zencoder.com/oceans-clip.ogg" type='video/ogg; codecs="theora, vorbis"'>
-      <object class="vjs-flash-fallback" width="640" height="264" type="application/x-shockwave-flash"
-        data="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf">
-        <param name="movie" value="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf" />
-        <param name="allowfullscreen" value="true" />
-        <param name="flashvars" value='config={"clip":{"url":"http://video-js.zencoder.com/oceans-clip.mp4","autoPlay":false,"autoBuffering":true}}' />
-        <!-- <img src="http://video-js.zencoder.com/oceans-clip.png" width="640" height="264" alt="Poster Image"
-          title="No video playback capabilities." /> -->
-      </object>
-    </video>
-    <p class="vjs-no-video"><strong>Download Video:</strong>
-      <a href="http://video-js.zencoder.com/oceans-clip.mp4">MP4</a>,
-      <a href="http://video-js.zencoder.com/oceans-clip.webm">WebM</a>,
-      <a href="http://video-js.zencoder.com/oceans-clip.ogg">Ogg</a><br>
-      <a href="http://videojs.com">HTML5 Video Player</a> by <a href="http://videojs.com">VideoJS</a>
-    </p>
-  </div>
-  <!-- End VideoJS -->
 
 <!--   <p><label>Control Background</label><input type="text" name="control_background" value="" id="control_background"></p>
   <p><label>Control Border Radius</label><input type="text" name="control_border_radius" value="" id="control_border_radius"></p> -->
