@@ -51,7 +51,7 @@ var VideoJS = Class.extend({
     this.linksFallback = this.getLinksFallback();
 
     // Hide download links if video can play
-    if(VideoJS.browserSupportsVideo() || (this.flashFallback && this.flashVersionSupported())) {
+    if(VideoJS.browserSupportsVideo() || ((this.flashFallback || VideoJS.isIE()) && this.flashVersionSupported())) {
       this.hideLinksFallback();
     }
 
@@ -673,7 +673,7 @@ var VideoJS = Class.extend({
   },
   
   flashVersionSupported: function(){
-    return VideoJS.browserFlashVersion() >= this.options.flashVersion;
+    return VideoJS.getFlashVersion() >= this.options.flashVersion;
   }
 })
 
@@ -734,11 +734,10 @@ var _V_ = {
     }
     return curleft;
   },
-  
+
   getComputedStyleValue: function(element, style){
     return window.getComputedStyle(element, null).getPropertyValue(style);
   }
-  
 }
 
 // Class Methods
@@ -757,34 +756,34 @@ VideoJS.setup = function(options){
 
 // Check if the browser supports video.
 VideoJS.browserSupportsVideo = function() {
-  return !!document.createElement('video').canPlayType;
+  if (typeof VideoJS.videoSupport != "undefined") return VideoJS.videoSupport;
+  return VideoJS.videoSupport = !!document.createElement('video').canPlayType;
 }
 
-VideoJS.isIpad = function(){
-  return navigator.userAgent.match(/iPad/i) != null;
-}
+VideoJS.isIpad = function(){ return navigator.userAgent.match(/iPad/i) != null; }
 
-VideoJS.browserFlashVersion = function(){
+VideoJS.getFlashVersion = function(){
+  // Cache Version
+  if (typeof VideoJS.flashVersion != "undefined") return VideoJS.flashVersion;
+  var version = 0;
   if (typeof navigator.plugins != "undefined" && typeof navigator.plugins["Shockwave Flash"] == "object") {
     desc = navigator.plugins["Shockwave Flash"].description;
     if (desc && !(typeof navigator.mimeTypes != "undefined" && navigator.mimeTypes["application/x-shockwave-flash"] && !navigator.mimeTypes["application/x-shockwave-flash"].enabledPlugin)) {
-      return parseInt(desc.match(/^.*\s+([^\s]+)\.[^\s]+\s+[^\s]+$/)[1]);
+      version = parseInt(desc.match(/^.*\s+([^\s]+)\.[^\s]+\s+[^\s]+$/)[1]);
     }
   } else if (typeof window.ActiveXObject != "undefined") {
     try {
       var testObject = new ActiveXObject("ShockwaveFlash.ShockwaveFlash");
       if (testObject) {
-        return parseInt(testObject.GetVariable("$version").match(/^[^\s]+\s(\d+)/)[1]);
+        version = parseInt(testObject.GetVariable("$version").match(/^[^\s]+\s(\d+)/)[1]);
       }
     }
-    catch(e) { return false; }
+    catch(e) {}
   }
-  return 0;
+  return VideoJS.flashVersion = version;
 }
 
-VideoJS.isIE = function(){
-  return !+"\v1";
-}
+VideoJS.isIE = function(){ return !+"\v1"; }
 
 // Allows for binding context to functions
 // when using in event listeners and timeouts
