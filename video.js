@@ -31,6 +31,9 @@ var VideoJS = Class.extend({
 
     this.video = element;
 
+    // Hide default controls
+    this.video.controls = false;
+
     // Default Options
     this.options = {
       num: 0, // Optional tracking of videoJSPLayers position
@@ -46,23 +49,25 @@ var VideoJS = Class.extend({
     this.box = this.video.parentNode;
     this.flashFallback = this.getFlashFallback();
     this.linksFallback = this.getLinksFallback();
-    this.percentLoaded = 0;
 
+    // Hide download links if video can play
+    if(VideoJS.browserSupportsVideo() || (this.flashFallback && this.flashVersionSupported())) {
+      this.hideLinksFallback();
+    }
+
+    // Check if browser can play HTML5 video
     if (VideoJS.browserSupportsVideo()) {
+      // Force flash fallback when there's no supported source
       if (this.canPlaySource() == false) {
-        this.hideLinksFallback();
         this.replaceWithFlash();
         return;
       }
-    } else if (VideoJS.browserFlashVersion() >= this.options.flashVersion) {
-      this.hideLinksFallback();
-      return;
     } else {
       return;
     }
 
-    this.hideLinksFallback();
-
+    // For iPads, controls need to always show because there's no hover
+    // The controls also have to be below for the full-window mode to work.
     if (VideoJS.isIpad()) {
       this.options.controlsBelow = true;
       this.options.controlsHiding = false;
@@ -71,12 +76,12 @@ var VideoJS = Class.extend({
     if (this.options.controlsBelow) {
       _V_.addClass(this.box, "vjs-controls-below");
     }
+    
+    // Store amount of video loaded
+    this.percentLoaded = 0;
 
     this.buildPoster();
     this.showPoster();
-
-    // Hide default controls
-    this.video.controls = false;
 
     this.buildController();
     this.showController();
@@ -260,7 +265,7 @@ var VideoJS = Class.extend({
   getFlashFallback: function(){
     if (VideoJS.isIE()) return;
     var children = this.box.getElementsByClassName("vjs-flash-fallback");
-    for (var i=0; i<children.length; i++) {
+    for (var i=0,j=children.length; i<j; i++) {
       if (children[i].tagName.toUpperCase() == "OBJECT") {
         return children[i];
       }
@@ -269,8 +274,10 @@ var VideoJS = Class.extend({
 
   replaceWithFlash: function(){
     // this.flashFallback = this.video.removeChild(this.flashFallback);
-    this.box.appendChild(this.flashFallback);
-    this.video.style.display = "none"; // Removing it was breaking later players
+    if (this.flashFallback) {
+      this.box.insertBefore(this.flashFallback, this.video);
+      this.video.style.display = "none"; // Removing it was breaking later players
+    }
   },
 
   // Show the controller
@@ -358,7 +365,7 @@ var VideoJS = Class.extend({
 
   canPlaySource: function(){
     var children = this.video.children;
-    for (var i=0; i<children.length; i++) {
+    for (var i=0,j=children.length; i<j; i++) {
       if (children[i].tagName.toUpperCase() == "SOURCE") {
         var canPlay = this.video.canPlayType(children[i].type);
         if(canPlay == "probably" || canPlay == "maybe") {
@@ -663,6 +670,10 @@ var VideoJS = Class.extend({
     // Resize to original settings
     this.positionController();
     this.positionPoster();
+  },
+  
+  flashVersionSupported: function(){
+    return VideoJS.browserFlashVersion() >= this.options.flashVersion;
   }
 })
 
@@ -734,9 +745,9 @@ var _V_ = {
 
 // Add video-js to any video tag with the class
 VideoJS.setup = function(options){
-  var videoCount = document.getElementsByTagName("video").length
-  for (var i=0;i<videoCount;i++) {
-    videoTag = document.getElementsByTagName("video")[i];
+  var elements = document.getElementsByTagName("video");
+  for (var i=0,j=elements.length; i<j; i++) {
+    videoTag = elements[i];
     if (videoTag.className.indexOf("video-js") != -1) {
       options = (options) ? _V_.merge(options, { num: i }) : options;
       videoJSPlayers[i] = new VideoJS(videoTag, options);
