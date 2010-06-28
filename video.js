@@ -40,8 +40,8 @@ var VideoJS = Class.extend({
       controlsBelow: false, // Display control bar below video vs. on top
       controlsHiding: true, // Hide controls when not over the video
       defaultVolume: 0.85, // Will be overridden by localStorage volume if available
-      flashVersion: 9,
-      linksHiding: true
+      flashVersion: 9, // Required flash version for fallback
+      linksHiding: true // Hide download links when video is supported
     };
     // Override default options with set options
     if (typeof setOptions == "object") _V_.merge(this.options, setOptions);
@@ -692,8 +692,7 @@ var _V_ = {
   },
 
   merge: function(obj1, obj2){
-    for (attrname in obj2) { obj1[attrname] = obj2[attrname]; }
-    return obj1;
+    for(attrname in obj2){obj1[attrname]=obj2[attrname];} return obj1;
   },
 
   createElement: function(tagName, attributes){
@@ -760,8 +759,6 @@ VideoJS.browserSupportsVideo = function() {
   return VideoJS.videoSupport = !!document.createElement('video').canPlayType;
 }
 
-VideoJS.isIpad = function(){ return navigator.userAgent.match(/iPad/i) != null; }
-
 VideoJS.getFlashVersion = function(){
   // Cache Version
   if (typeof VideoJS.flashVersion != "undefined") return VideoJS.flashVersion;
@@ -784,6 +781,7 @@ VideoJS.getFlashVersion = function(){
 }
 
 VideoJS.isIE = function(){ return !+"\v1"; }
+VideoJS.isIpad = function(){ return navigator.userAgent.match(/iPad/i) != null; }
 
 // Allows for binding context to functions
 // when using in event listeners and timeouts
