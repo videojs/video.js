@@ -289,9 +289,7 @@ var VideoJS = JRClass.extend({
     if (VideoJS.isIE()) return;
     var children = this.box.getElementsByClassName("vjs-flash-fallback");
     for (var i=0,j=children.length; i<j; i++) {
-      if (children[i].tagName.toUpperCase() == "OBJECT") {
-        return children[i];
-      }
+      return children[i];
     }
   },
 
