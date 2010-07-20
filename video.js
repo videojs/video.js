@@ -161,7 +161,8 @@ var VideoJS = Class.extend({
     this.fixPreloading();
 
     // Load subtitles. Based on http://matroska.org/technical/specs/subtitles/srt.html
-    if (this.options.subtitles != null) {
+    this.subtitlesSource = this.video.getAttribute("data-subtitles");
+    if (this.subtitlesSource != null) {
       this.loadSubtitles();
       this.buildSubtitles();
     }
@@ -703,7 +704,7 @@ var VideoJS = Class.extend({
       };
     }
     var request = new XMLHttpRequest();
-    request.open("GET",this.options.subtitles);
+    request.open("GET",this.subtitlesSource);
     request.onreadystatechange = function() {
       if (request.readyState == 4 && request.status == 200) {
         this.parseSubtitles(request.responseText);
