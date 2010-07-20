@@ -768,6 +768,22 @@ VideoJS.setup = function(options){
   }
 }
 
+// Add video-js to the video tag or array of video tags (or IDs) passed in.
+// Typically used when videos are being added to a page dynamically.
+VideoJS.addVideos = function(videos, options) {
+  videos = videos instanceof Array ? videos : [videos];
+  var videoTag;
+  for (var i=0; i<videos.length; i++) {
+    if (typeof videos[i] == 'string') {
+      videoTag = document.getElementById(videos[i]);
+    } else { // assume DOM object
+      videoTag = videos[i];
+    }
+    options = (options) ? _V_.merge(options, { num: videoJSPlayers.length }) : options;
+    videoJSPlayers.push(new VideoJS(videoTag, options));
+  }
+}
+
 // Check if the browser supports video.
 VideoJS.browserSupportsVideo = function() {
   if (typeof VideoJS.videoSupport != "undefined") return VideoJS.videoSupport;
