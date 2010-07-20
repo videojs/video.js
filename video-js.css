@@ -13,8 +13,10 @@ video.video-js { background-color: #000; position: relative; }
 .video-js-box.vjs-fullscreen video.video-js { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1001; }
 .video-js-box.vjs-fullscreen .vjs-controls { z-index: 1002; }
 
-/* Poster styles */
+/* Poster Style */
 .vjs-poster { display: block; position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+/* Subtiles Style */
+.vjs-subtitles { color:#fff; font-size: 20px; text-align: center; bottom: 20px; left: 0; right: 0; position: absolute; z-index: 1002; }
 
 
 /* DEFAULT SKIN (override in another file)

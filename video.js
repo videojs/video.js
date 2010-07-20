@@ -156,7 +156,13 @@ var VideoJS = Class.extend({
     }.context(this);
 
     // Support older browsers that used autobuffer
-    this.fixPreloading()
+    this.fixPreloading();
+
+    // Load subtitles. Based on http://matroska.org/technical/specs/subtitles/srt.html
+    if (this.options.subtitles != null) {
+      this.loadSubtitles();
+      this.buildSubtitles();
+    }
   },
   
   // Support older browsers that used "autobuffer"
@@ -675,10 +681,15 @@ var VideoJS = Class.extend({
   flashVersionSupported: function(){
     return VideoJS.getFlashVersion() >= this.options.flashVersion;
   }
+  
+  
+  
 })
 
+////////////////////////////////////////////////////////////////////////////////
 // Convenience Functions (mini library)
 // Functions not specific to video or VideoJS and could be replaced with a library like jQuery
+////////////////////////////////////////////////////////////////////////////////
 var _V_ = {
   addClass: function(element, classToAdd){
     if (element.className.split(/\s+/).lastIndexOf(classToAdd) == -1) element.className = element.className == "" ? classToAdd : element.className + " " + classToAdd;
@@ -739,9 +750,13 @@ var _V_ = {
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
 // Class Methods
+// Functions that don't apply to individual videos.
+////////////////////////////////////////////////////////////////////////////////
 
 // Add video-js to any video tag with the class
+// Typically used when page is loaded.
 VideoJS.setup = function(options){
   var elements = document.getElementsByTagName("video");
   for (var i=0,j=elements.length; i<j; i++) {
