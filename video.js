@@ -76,7 +76,7 @@ var VideoJS = Class.extend({
     if (this.options.controlsBelow) {
       _V_.addClass(this.box, "vjs-controls-below");
     }
-    
+
     // Store amount of video loaded
     this.percentLoaded = 0;
 
@@ -103,6 +103,8 @@ var VideoJS = Class.extend({
     this.video.addEventListener('progress', this.onProgress.context(this), false);
     // Set interval for load progress using buffer watching method
     this.watchBuffer = setInterval(this.updateBufferedTotal.context(this), 33);
+    // Listen for Video time update
+    this.video.addEventListener('timeupdate', this.onTimeUpdate.context(this), false);
 
     // Listen for clicks on the play/pause button
     this.playControl.addEventListener("click", this.onPlayControlClick.context(this), false);
@@ -164,7 +166,7 @@ var VideoJS = Class.extend({
       this.buildSubtitles();
     }
   },
-  
+
   // Support older browsers that used "autobuffer"
   fixPreloading: function(){
     if (typeof this.video.hasAttribute == "function" && this.video.hasAttribute("preload")) {
@@ -539,24 +541,24 @@ var VideoJS = Class.extend({
   // Adjust the width of the progress bar to fill the controls width
   sizeProgressBar: function(){
     // this.progressControl.style.width =
-    //   this.controls.offsetWidth 
+    //   this.controls.offsetWidth
     //   - this.playControl.offsetWidth
     //   - this.volumeControl.offsetWidth
     //   - this.timeControl.offsetWidth
     //   - this.fullscreenControl.offsetWidth
-    //   - (this.getControlsPadding() * 6) 
-    //   - this.getControlBorderAdjustment() 
+    //   - (this.getControlsPadding() * 6)
+    //   - this.getControlBorderAdjustment()
     //   + "px";
     // this.progressHolder.style.width = (this.progressControl.offsetWidth - (this.timeControl.offsetWidth + 20)) + "px";
     this.updatePlayProgress();
     this.updateLoadProgress();
   },
-  
+
   // Get the space between controls. For more flexible styling.
   getControlsPadding: function(){
     return _V_.findPosX(this.playControl) - _V_.findPosX(this.controls)
   },
-  
+
   // When dynamically placing controls, if there are borders on the controls, it can break to a new line.
   getControlBorderAdjustment: function(){
     var leftBorder = parseInt(_V_.getComputedStyleValue(this.playControl, "border-left-width").replace("px", ""));
@@ -586,6 +588,8 @@ var VideoJS = Class.extend({
     this.video.currentTime = newProgress * this.video.duration;
     this.playProgress.style.width = newProgress * (_V_.getComputedStyleValue(this.progressHolder, "width").replace("px", "")) + "px";
     this.updateTimeDisplay();
+    // currentTime changed, reset subtitles
+    if (this.subtitles != null) { this.currentSubtitlePosition = 0; }
   },
 
   setPlayProgressWithEvent: function(event){
@@ -649,7 +653,7 @@ var VideoJS = Class.extend({
       this.positionPoster();
     }
   },
-  
+
   nativeFullscreenOn: function(){
     if(typeof this.video.webkitEnterFullScreen == 'function' && false) {
       // Seems to be broken in Chromium/Chrome
@@ -677,13 +681,119 @@ var VideoJS = Class.extend({
     this.positionController();
     this.positionPoster();
   },
-  
+
+  // Check if browser can use this flash player
   flashVersionSupported: function(){
     return VideoJS.getFlashVersion() >= this.options.flashVersion;
+  },
+
+  /* Subtitles
+  ================================================================================ */
+  loadSubtitles: function() {
+    if (typeof XMLHttpRequest == "undefined") {
+      XMLHttpRequest = function () {
+        try { return new ActiveXObject("Msxml2.XMLHTTP.6.0"); }
+          catch (e) {}
+        try { return new ActiveXObject("Msxml2.XMLHTTP.3.0"); }
+          catch (e) {}
+        try { return new ActiveXObject("Msxml2.XMLHTTP"); }
+          catch (e) {}
+        //Microsoft.XMLHTTP points to Msxml2.XMLHTTP.3.0 and is redundant
+        throw new Error("This browser does not support XMLHttpRequest.");
+      };
+    }
+    var request = new XMLHttpRequest();
+    request.open("GET",this.options.subtitles);
+    request.onreadystatechange = function() {
+      if (request.readyState == 4 && request.status == 200) {
+        this.parseSubtitles(request.responseText);
+      }
+    }.context(this);
+    request.send();
+  },
+
+  parseSubtitles: function(text) {
+    var lines = text.replace("\r",'').split("\n");
+    this.subtitles = new Array();
+    this.currentSubtitlePosition = 0;
+
+    var i = 0;
+    while(i<lines.length) {
+      // define the current subtitle object
+      var subtitle = {};
+      // get the number
+      subtitle.id = lines[i++];
+      if (subtitle.id=="") {
+        break;
+      }
+
+      // get time
+      var time = lines[i++].split(" --> ");
+      subtitle.startTime = this.parseSubtitleTime(time[0]);
+      subtitle.endTime = this.parseSubtitleTime(time[1]);
+
+      // get subtitle text
+      var text = new Array();
+      while(lines[i].length>0 && lines[i]!="\r") {
+        text.push(lines[i++]);
+      }
+      subtitle.text = text.join('<br/>');
+
+      // add this subtitle
+      this.subtitles.push(subtitle);
+
+      // ignore the blank line
+      i++;
+    }
+  },
+
+  parseSubtitleTime: function(timeText) {
+    var parts = timeText.split(':');
+    var time = 0;
+    // hours => seconds
+    time += parseInt(parts[0])*60*60;
+    // minutes => seconds
+    time += parseInt(parts[1])*60;
+    // get seconds
+    var seconds = parts[2].split(',');
+    time += parseInt(seconds[0]);
+    // add miliseconds
+    time = time + parseInt(seconds[1])/1000;
+    return time;
+  },
+
+  buildSubtitles: function(){
+    /* Creating this HTML
+      <div class="vjs-subtitles">
+      </div>
+    */
+    this.subtitlesDiv = _V_.createElement("div", { className: 'vjs-subtitles' });
+    this.video.parentNode.appendChild(this.subtitlesDiv);
+  },
+
+  onTimeUpdate: function(){
+    // show the subtitles
+    if (this.subtitles != null) {
+      var x = this.currentSubtitlePosition;
+
+      while (x<this.subtitles.length && this.video.currentTime>this.subtitles[x].endTime) {
+        if (this.subtitles[x].showing) {
+          this.subtitles[x].showing = false;
+          this.subtitlesDiv.innerHTML = "";
+        }
+        this.currentSubtitlePosition++;
+        x = this.currentSubtitlePosition;
+      }
+
+      if (this.currentSubtitlePosition>=this.subtitles.length)
+        return;
+
+      if (this.video.currentTime>=this.subtitles[x].startTime && this.video.currentTime<=this.subtitles[x].endTime) {
+        this.subtitlesDiv.innerHTML = this.subtitles[x].text;
+        this.subtitles[x].showing = true;
+      }
+    }
   }
-  
-  
-  
 })
 
 ////////////////////////////////////////////////////////////////////////////////
