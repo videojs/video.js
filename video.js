@@ -569,6 +569,7 @@ var VideoJS = Class.extend({
 
   // Track & display the current play progress
   trackPlayProgress: function(){
+    if(this.playProgressInterval) clearInterval(this.playProgressInterval);
     this.playProgressInterval = setInterval(function(){ this.updatePlayProgress(); }.context(this), 33);
   },
 
@@ -803,7 +804,7 @@ var VideoJS = Class.extend({
 ////////////////////////////////////////////////////////////////////////////////
 var _V_ = {
   addClass: function(element, classToAdd){
-    if (element.className.split(/\s+/).lastIndexOf(classToAdd) == -1) element.className = element.className == "" ? classToAdd : element.className + " " + classToAdd;
+    if (element.className.split(/\s+/).lastIndexOf(classToAdd) == -1) { element.className = element.className == "" ? classToAdd : element.className + " " + classToAdd; }
   },
 
   removeClass: function(element, classToRemove){
