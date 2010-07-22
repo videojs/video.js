@@ -492,6 +492,13 @@ var VideoJS = Class.extend({
   // Backup for when the user only clicks and doesn't drag
   onProgressHolderMouseUp: function(event){
     this.setPlayProgressWithEvent(event);
+
+    // Fixe for an apparent play button state issue.
+    if (this.video.paused) {
+      this.onPause();
+    } else {
+      this.onPlay();
+    }
   },
 
   // Adjust the volume when the user drags on the volume control
