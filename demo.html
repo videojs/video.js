@@ -8,22 +8,39 @@
   <script src="video.js" type="text/javascript" charset="utf-8"></script>
 
   <script type="text/javascript" charset="utf-8">
-    // Run the script on page load.
+    // Must come after the video.js library
 
-    // If using jQuery
-    // $(function(){
-    //   VideoJS.setup();
-    // })
+    // Add VideoJS to all video tags on the page
+    VideoJS.setup();
 
-    // If using Prototype
-    // document.observe("dom:loaded", function() {
-    //   VideoJS.setup();
-    // });
+    /* ========== OR ========== */
 
-    // If not using a JS library
-    window.onload = function(){
-      VideoJS.setup();
-    }
+    // Setup and store a reference to a video.
+    // Must happen after the DOM is loaded
+    /*
+    VideoJS.DOMReady(function(){
+      var myPlayer = new VideoJS("example_video_1");
+
+      // Then you can...(example)
+      myPlayer.play();
+    });
+    */
+    // If you are already using a DOM Loaded function from another lib (jQuery, Prototype, etc.)
+    // you can use that instead of VideoJS.DOMReady
+
+    /* ========== OR ========== */
+
+    // Set options when setting up the videos
+    // The defaults are shown here
+    /*
+    VideoJS.setup({
+      controlsBelow: false, // Display control bar below video instead of in front of
+      controlsHiding: true, // Hide controls when mouse is not over the video
+      defaultVolume: 0.85, // Will be overridden by user's last volume if available
+      flashVersion: 9, // Required flash version for fallback
+      linksHiding: true // Hide download links when video is supported
+    });
+    */
 
   </script>
   <!-- Include the VideoJS Stylesheet -->
@@ -34,7 +51,7 @@
   <!-- Begin VideoJS -->
   <div class="video-js-box">
     <!-- Using the Video for Everybody Embed Code http://camendesign.com/code/video_for_everybody -->
-    <video class="video-js" width="640" height="264" poster="http://video-js.zencoder.com/oceans-clip.png" controls preload>
+    <video id="example_video_1" class="video-js" width="640" height="264" poster="http://video-js.zencoder.com/oceans-clip.png" controls preload>
       <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
       <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm; codecs="vp8, vorbis"'>
       <source src="http://video-js.zencoder.com/oceans-clip.ogg" type='video/ogg; codecs="theora, vorbis"'>
@@ -44,7 +61,7 @@
         <param name="movie" value="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf" />
         <param name="allowfullscreen" value="true" />
         <param name="flashvars" value='config={"clip":{"url":"http://video-js.zencoder.com/oceans-clip.mp4","autoPlay":false,"autoBuffering":true}}' />
-        <!-- Image Fallback -->
+        <!-- Image Fallback. Typically the same as the poster image. -->
         <img src="http://video-js.zencoder.com/oceans-clip.png" width="640" height="264" alt="Poster Image"
           title="No video playback capabilities." />
       </object>

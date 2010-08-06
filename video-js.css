@@ -2,8 +2,8 @@
 ================================================================================ */
 
 /* Box containing video, controls, and download links.
-   If you want to add some kind of frame, use another containing element, not this one. */
-.video-js-box { text-align: left; position: relative; } /* Will be set to the width of the video element */
+   If you want to add some kind of frame or special positioning, use another containing element, not video-js-box. */
+.video-js-box { text-align: left; position: relative; vertical-align: bottom; } /* Will be set to the width of the video element */
 
 /* Video Element */
 video.video-js { background-color: #000; position: relative; }

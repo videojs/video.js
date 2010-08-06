@@ -29,7 +29,12 @@ var VideoJS = JRClass.extend({
   // num: the current player's position in the videoJSPlayers array
   init: function(element, setOptions){
 
-    this.video = element;
+    // Allow an ID string or an element
+    if (typeof element == 'string') {
+      this.video = document.getElementById(element);
+    } else {
+      this.video = element;
+    }
 
     // Hide default controls
     this.video.controls = false;
@@ -37,13 +42,17 @@ var VideoJS = JRClass.extend({
     // Default Options
     this.options = {
       num: 0, // Optional tracking of videoJSPLayers position
-      controlsBelow: false, // Display control bar below video vs. on top
+      controlsBelow: false, // Display control bar below video vs. in front of
       controlsHiding: true, // Hide controls when not over the video
       defaultVolume: 0.85, // Will be overridden by localStorage volume if available
       flashVersion: 9, // Required flash version for fallback
       linksHiding: true // Hide download links when video is supported
     };
-    // Override default options with set options
+
+    // Override default options with global options
+    if (typeof VideoJS.options == "object") _V_.merge(this.options, VideoJS.options);
+
+    // Override global options with options specific to this video
     if (typeof setOptions == "object") _V_.merge(this.options, setOptions);
 
     this.box = this.video.parentNode;
@@ -166,6 +175,7 @@ var VideoJS = JRClass.extend({
       this.loadSubtitles();
       this.buildSubtitles();
     }
+    
   },
 
   // Support older browsers that used "autobuffer"
@@ -174,6 +184,10 @@ var VideoJS = JRClass.extend({
       this.video.autobuffer = true;
     }
   },
+
+  // Translate functionality
+  play: function(){ this.video.play(); },
+  pause: function(){ this.video.pause(); },
 
   buildController: function(){
 
@@ -300,6 +314,24 @@ var VideoJS = JRClass.extend({
     // Make sure the controls are visible
     if (this.controls.style.display == 'none') return;
 
+    // Sometimes the CSS styles haven't been applied to the controls yet
+    // when we're trying to calculate the height and position them correctly.
+    // This causes a flicker where the controls are out of place.
+    // Best way I can think of to test this is to check if the width of all the controls are the same.
+    // If so, hide the controller and delay positioning them briefly.
+    if (this.playControl.offsetWidth == this.progressControl.offsetWidth
+     && this.playControl.offsetWidth == this.timeControl.offsetWidth
+     && this.playControl.offsetWidth == this.volumeControl.offsetWidth) {
+       // Don't want to create an endless loop either.
+       if (!this.positionRetries) this.positionRetries = 1;
+       if (this.positionRetries++ < 100) {
+         this.controls.style.display = "none";
+         setTimeout(this.showController.context(this),0);
+         return;
+       }
+    }
+
+    // Set width based on fullscreen or not.
     if (this.videoIsFullScreen) {
       this.box.style.width = "";
     } else {
@@ -548,16 +580,6 @@ var VideoJS = JRClass.extend({
 
   // Adjust the width of the progress bar to fill the controls width
   sizeProgressBar: function(){
-    // this.progressControl.style.width =
-    //   this.controls.offsetWidth
-    //   - this.playControl.offsetWidth
-    //   - this.volumeControl.offsetWidth
-    //   - this.timeControl.offsetWidth
-    //   - this.fullscreenControl.offsetWidth
-    //   - (this.getControlsPadding() * 6)
-    //   - this.getControlBorderAdjustment()
-    //   + "px";
-    // this.progressHolder.style.width = (this.progressControl.offsetWidth - (this.timeControl.offsetWidth + 20)) + "px";
     this.updatePlayProgress();
     this.updateLoadProgress();
   },
@@ -636,6 +658,13 @@ var VideoJS = JRClass.extend({
     }
   },
 
+  // Check if browser can use this flash player
+  flashVersionSupported: function(){
+    return VideoJS.getFlashVersion() >= this.options.flashVersion;
+  },
+
+  /* Fullscreen / Full-window
+  ================================================================================ */
   // Turn on fullscreen (window) mode
   // Real fullscreen isn't available in browsers quite yet.
   fullscreenOn: function(){
@@ -689,11 +718,6 @@ var VideoJS = JRClass.extend({
     // Resize to original settings
     this.positionController();
     this.positionPoster();
-  },
-
-  // Check if browser can use this flash player
-  flashVersionSupported: function(){
-    return VideoJS.getFlashVersion() >= this.options.flashVersion;
   },
 
   /* Subtitles
@@ -866,25 +890,84 @@ var _V_ = {
 
   getComputedStyleValue: function(element, style){
     return window.getComputedStyle(element, null).getPropertyValue(style);
+  },
+
+  // DOM Ready functionality adapted from jQuery. http://jquery.com/
+  bindDOMReady: function(){
+    if (document.readyState === "complete") {
+      return _V_.DOMReady();
+    }
+    if (document.addEventListener) {
+      document.addEventListener("DOMContentLoaded", _V_.DOMContentLoaded, false);
+      window.addEventListener("load", _V_.DOMReady, false);
+    } else if (document.attachEvent) {
+      document.attachEvent("onreadystatechange", _V_.DOMContentLoaded);
+      window.attachEvent("onload", _V_.DOMReady);
+    }
+  },
+
+  DOMContentLoaded: function(){
+    if (document.addEventListener) {
+      document.removeEventListener( "DOMContentLoaded", _V_.DOMContentLoaded, false);
+      _V_.DOMReady();
+    } else if ( document.attachEvent ) {
+      if ( document.readyState === "complete" ) {
+        document.detachEvent("onreadystatechange", _V_.DOMContentLoaded);
+        _V_.DOMReady();
+      }
+    }
+  },
+
+  // Functions to be run once the DOM is loaded
+  DOMReadyList: [],
+  addToDOMReady: function(fn){
+    if (_V_.DOMIsReady) {
+      fn.call(document)
+    } else {
+      _V_.DOMReadyList.push(fn);
+    }
+  },
+
+  DOMIsReady: false,
+  DOMReady: function(){
+    if (_V_.DOMIsReady) return;
+    if (!document.body) { return setTimeout(_V_.DOMReady, 13); }
+    _V_.DOMIsReady = true;
+    if (_V_.DOMReadyList) {
+      for (var i=0; i<_V_.DOMReadyList.length; i++) {
+
+        _V_.DOMReadyList[i].call(document)
+      }
+      _V_.DOMReadyList = null;
+    }
   }
+
 }
+_V_.bindDOMReady();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class Methods
 // Functions that don't apply to individual videos.
 ////////////////////////////////////////////////////////////////////////////////
 
-// Add video-js to any video tag with the class
-// Typically used when page is loaded.
+// Add video-js to any video tag with the class on page load
 VideoJS.setup = function(options){
+  VideoJS.options = options;
+  _V_.addToDOMReady(VideoJS.setupAllWhenReady)
+}
+
+VideoJS.setupAllWhenReady = function(){
   var elements = document.getElementsByTagName("video");
   for (var i=0,j=elements.length; i<j; i++) {
     videoTag = elements[i];
     if (videoTag.className.indexOf("video-js") != -1) {
-      options = (options) ? _V_.merge(options, { num: i }) : options;
-      videoJSPlayers[i] = new VideoJS(videoTag, options);
+      videoJSPlayers[i] = new VideoJS(videoTag, { num: i });
     }
   }
+}
+
+VideoJS.DOMReady = function(fn){
+  _V_.addToDOMReady(fn);
 }
 
 // Add video-js to the video tag or array of video tags (or IDs) passed in.
