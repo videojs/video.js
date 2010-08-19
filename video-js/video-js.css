@@ -2,8 +2,8 @@
 ================================================================================ */
 
 /* Box containing video, controls, and download links.
-   If you want to add some kind of frame, use another containing element, not this one. */
-.video-js-box { text-align: left; position: relative; } /* Will be set to the width of the video element */
+   If you want to add some kind of frame or special positioning, use another containing element, not video-js-box. */
+.video-js-box { text-align: left; position: relative; vertical-align: bottom; } /* Will be set to the width of the video element */
 
 /* Video Element */
 video.video-js { background-color: #000; position: relative; }
@@ -13,8 +13,10 @@ video.video-js { background-color: #000; position: relative; }
 .video-js-box.vjs-fullscreen video.video-js { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1001; }
 .video-js-box.vjs-fullscreen .vjs-controls { z-index: 1002; }
 
-/* Poster styles */
+/* Poster Style */
 .vjs-poster { display: block; position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+/* Subtiles Style */
+.vjs-subtitles { color:#fff; font-size: 20px; text-align: center; bottom: 20px; left: 0; right: 0; position: absolute; z-index: 1002; }
 
 
 /* DEFAULT SKIN (override in another file)
