@@ -950,40 +950,65 @@ _V_.bindDOMReady();
 // Functions that don't apply to individual videos.
 ////////////////////////////////////////////////////////////////////////////////
 
-// Add video-js to any video tag with the class on page load
-VideoJS.setup = function(options){
+// Add VideoJS to all video tags with the video-js class when the DOM is ready
+VideoJS.setupAllWhenReady = function(options){
+  // Options is stored globally, and added ot any new player on init
   VideoJS.options = options;
-  _V_.addToDOMReady(VideoJS.setupAllWhenReady)
+  VideoJS.DOMReady(VideoJS.setup);
 }
 
-VideoJS.setupAllWhenReady = function(){
-  var elements = document.getElementsByTagName("video");
-  for (var i=0,j=elements.length; i<j; i++) {
-    videoTag = elements[i];
-    if (videoTag.className.indexOf("video-js") != -1) {
-      videoJSPlayers[i] = new VideoJS(videoTag, { num: i });
-    }
-  }
-}
-
+// Run the supplied function when the DOM is ready
 VideoJS.DOMReady = function(fn){
   _V_.addToDOMReady(fn);
 }
 
-// Add video-js to the video tag or array of video tags (or IDs) passed in.
-// Typically used when videos are being added to a page dynamically.
-VideoJS.addVideos = function(videos, options) {
-  videos = videos instanceof Array ? videos : [videos];
-  var videoTag;
+// Set up a specific video or array of video elements
+// "video" can be:
+//    false, undefined, or "All": set up all videos with the video-js class
+//    A video tag ID or video tag element: set up one video and return one player
+//    An array of video tag elements/IDs: set up each and return an array of players
+VideoJS.setup = function(videos, options){
+
+  var returnSingular = false,
+  playerList = [];
+
+  // If videos is undefined or "All", set up all videos with the video-js class
+  if (!videos || videos == "All") {
+    videos = VideoJS.getVideoJSTags();
+
+  // If videos is not an array, add to an array
+  } else if (typeof videos != 'object') {
+    videos = [videos];
+    returnSingular = true;
+  }
+
+  // Loop through videos and create players for them
   for (var i=0; i<videos.length; i++) {
     if (typeof videos[i] == 'string') {
-      videoTag = document.getElementById(videos[i]);
+      videoElement = document.getElementById(videos[i]);
     } else { // assume DOM object
-      videoTag = videos[i];
+      videoElement = videos[i];
     }
-    options = (options) ? _V_.merge(options, { num: videoJSPlayers.length }) : options;
-    videoJSPlayers.push(new VideoJS(videoTag, options));
+    playerList.push(new VideoJS(videoElement, options));
   }
+
+  // Return one or all depending on what was passed in
+  return (returnSingular) ? playerList[0] : playerList;
+}
+
+// Find video tags with the video-js class
+VideoJS.getVideoJSTags = function() {
+  var videoTags = document.getElementsByTagName("video"),
+  videoJSTags = [];
+
+  for (var i=0,j=videoTags.length; i<j; i++) {
+    videoTag = videoTags[i];
+    if (videoTag.className.indexOf("video-js") != -1) {
+      videoJSTags.push(videoTag);
+    }
+  }
+
+  return videoJSTags;
 }
 
 // Check if the browser supports video.
