@@ -14,9 +14,9 @@ video.video-js { background-color: #000; position: relative; }
 .video-js-box.vjs-fullscreen .vjs-controls { z-index: 1002; }
 
 /* Poster Style */
-.vjs-poster { display: block; position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+.video-js-box .vjs-poster { display: block; position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
 /* Subtiles Style */
-.vjs-subtitles { color:#fff; font-size: 20px; text-align: center; bottom: 20px; left: 0; right: 0; position: absolute; z-index: 1002; }
+.video-js-box .vjs-subtitles { color:#fff; font-size: 20px; text-align: center; bottom: 20px; left: 0; right: 0; position: absolute; z-index: 1002; }
 
 
 /* DEFAULT SKIN (override in another file)
