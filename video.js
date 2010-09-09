@@ -15,9 +15,6 @@ You should have received a copy of the GNU Lesser General Public License
 along with VideoJS.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// Store a list of players on the page for reference
-var videoJSPlayers = new Array();
-
 // Using jresig's Class implementation http://ejohn.org/blog/simple-javascript-inheritance/
 (function(){var initializing=false, fnTest=/xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/; this.JRClass = function(){}; JRClass.extend = function(prop) { var _super = this.prototype; initializing = true; var prototype = new this(); initializing = false; for (var name in prop) { prototype[name] = typeof prop[name] == "function" && typeof _super[name] == "function" && fnTest.test(prop[name]) ? (function(name, fn){ return function() { var tmp = this._super; this._super = _super[name]; var ret = fn.apply(this, arguments); this._super = tmp; return ret; }; })(name, prop[name]) : prop[name]; } function JRClass() { if ( !initializing && this.init ) this.init.apply(this, arguments); } JRClass.prototype = prototype; JRClass.constructor = JRClass; JRClass.extend = arguments.callee; return JRClass;};})();
 
@@ -26,8 +23,10 @@ var VideoJS = JRClass.extend({
 
   // Initialize the player for the supplied video tag element
   // element: video tag
-  // num: the current player's position in the videoJSPlayers array
   init: function(element, setOptions){
+
+    // Hide default controls
+    this.video.controls = false;
 
     // Allow an ID string or an element
     if (typeof element == 'string') {
@@ -36,12 +35,12 @@ var VideoJS = JRClass.extend({
       this.video = element;
     }
 
-    // Hide default controls
-    this.video.controls = false;
+    // Store reference to player on the video element.
+    // So you can acess the player later: document.getElementById("video_id").player.play();
+    this.video.player = this;
 
     // Default Options
     this.options = {
-      num: 0, // Optional tracking of videoJSPLayers position
       controlsBelow: false, // Display control bar below video vs. in front of
       controlsHiding: true, // Hide controls when not over the video
       defaultVolume: 0.85, // Will be overridden by localStorage volume if available
