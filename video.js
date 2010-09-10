@@ -693,7 +693,7 @@ var VideoJS = JRClass.extend({
   },
 
   nativeFullscreenOn: function(){
-    if(typeof this.video.webkitEnterFullScreen == 'function' && false) {
+    if(typeof this.video.webkitEnterFullScreen == 'function') {
       // Seems to be broken in Chromium/Chrome
       if (!navigator.userAgent.match("Chrome")) {
         this.video.webkitEnterFullScreen();
