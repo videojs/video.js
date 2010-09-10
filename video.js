@@ -25,15 +25,15 @@ var VideoJS = JRClass.extend({
   // element: video tag
   init: function(element, setOptions){
 
-    // Hide default controls
-    this.video.controls = false;
-
     // Allow an ID string or an element
     if (typeof element == 'string') {
       this.video = document.getElementById(element);
     } else {
       this.video = element;
     }
+
+    // Hide default controls
+    this.video.controls = false;
 
     // Store reference to player on the video element.
     // So you can acess the player later: document.getElementById("video_id").player.play();
@@ -45,7 +45,8 @@ var VideoJS = JRClass.extend({
       controlsHiding: true, // Hide controls when not over the video
       defaultVolume: 0.85, // Will be overridden by localStorage volume if available
       flashVersion: 9, // Required flash version for fallback
-      linksHiding: true // Hide download links when video is supported
+      linksHiding: true, // Hide download links when video is supported
+      flashIsDominant: false // Always use Flash when available
     };
 
     // Override default options with global options
@@ -65,8 +66,8 @@ var VideoJS = JRClass.extend({
 
     // Check if browser can play HTML5 video
     if (VideoJS.browserSupportsVideo()) {
-      // Force flash fallback when there's no supported source
-      if (this.canPlaySource() == false) {
+      // Force flash fallback when there's no supported source, or flash is dominant
+      if (this.canPlaySource() == false || this.options.flashIsDominant) {
         this.replaceWithFlash();
         return;
       }
@@ -830,7 +831,7 @@ var VideoJS = JRClass.extend({
 
 ////////////////////////////////////////////////////////////////////////////////
 // Convenience Functions (mini library)
-// Functions not specific to video or VideoJS and could be replaced with a library like jQuery
+// Functions not specific to video or VideoJS and could probably be replaced with a library like jQuery
 ////////////////////////////////////////////////////////////////////////////////
 var _V_ = {
   addClass: function(element, classToAdd){
@@ -976,7 +977,7 @@ VideoJS.setup = function(videos, options){
     videos = VideoJS.getVideoJSTags();
 
   // If videos is not an array, add to an array
-  } else if (typeof videos != 'object') {
+  } else if (typeof videos != 'object' || videos.nodeType == 1) {
     videos = [videos];
     returnSingular = true;
   }
@@ -1049,3 +1050,17 @@ Function.prototype.context = function(obj) {
   }
  return temp
 }
+
+// jQuery Plugin
+if (window.jQuery) {
+  (function($) {
+    $.fn.VideoJS = function(options) {
+      this.each(function() {
+        VideoJS.setup(this, options);
+      });
+      return this;
+     };
+   })(jQuery);
+}
+
+
