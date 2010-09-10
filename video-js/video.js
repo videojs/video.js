@@ -15,9 +15,6 @@ You should have received a copy of the GNU Lesser General Public License
 along with VideoJS.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// Store a list of players on the page for reference
-var videoJSPlayers = new Array();
-
 // Using jresig's Class implementation http://ejohn.org/blog/simple-javascript-inheritance/
 (function(){var initializing=false, fnTest=/xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/; this.JRClass = function(){}; JRClass.extend = function(prop) { var _super = this.prototype; initializing = true; var prototype = new this(); initializing = false; for (var name in prop) { prototype[name] = typeof prop[name] == "function" && typeof _super[name] == "function" && fnTest.test(prop[name]) ? (function(name, fn){ return function() { var tmp = this._super; this._super = _super[name]; var ret = fn.apply(this, arguments); this._super = tmp; return ret; }; })(name, prop[name]) : prop[name]; } function JRClass() { if ( !initializing && this.init ) this.init.apply(this, arguments); } JRClass.prototype = prototype; JRClass.constructor = JRClass; JRClass.extend = arguments.callee; return JRClass;};})();
 
@@ -26,7 +23,6 @@ var VideoJS = JRClass.extend({
 
   // Initialize the player for the supplied video tag element
   // element: video tag
-  // num: the current player's position in the videoJSPlayers array
   init: function(element, setOptions){
 
     // Allow an ID string or an element
@@ -39,14 +35,18 @@ var VideoJS = JRClass.extend({
     // Hide default controls
     this.video.controls = false;
 
+    // Store reference to player on the video element.
+    // So you can acess the player later: document.getElementById("video_id").player.play();
+    this.video.player = this;
+
     // Default Options
     this.options = {
-      num: 0, // Optional tracking of videoJSPLayers position
       controlsBelow: false, // Display control bar below video vs. in front of
       controlsHiding: true, // Hide controls when not over the video
       defaultVolume: 0.85, // Will be overridden by localStorage volume if available
       flashVersion: 9, // Required flash version for fallback
-      linksHiding: true // Hide download links when video is supported
+      linksHiding: true, // Hide download links when video is supported
+      flashIsDominant: false // Always use Flash when available
     };
 
     // Override default options with global options
@@ -66,8 +66,8 @@ var VideoJS = JRClass.extend({
 
     // Check if browser can play HTML5 video
     if (VideoJS.browserSupportsVideo()) {
-      // Force flash fallback when there's no supported source
-      if (this.canPlaySource() == false) {
+      // Force flash fallback when there's no supported source, or flash is dominant
+      if (this.canPlaySource() == false || this.options.flashIsDominant) {
         this.replaceWithFlash();
         return;
       }
@@ -693,7 +693,7 @@ var VideoJS = JRClass.extend({
   },
 
   nativeFullscreenOn: function(){
-    if(typeof this.video.webkitEnterFullScreen == 'function' && false) {
+    if(typeof this.video.webkitEnterFullScreen == 'function') {
       // Seems to be broken in Chromium/Chrome
       if (!navigator.userAgent.match("Chrome")) {
         this.video.webkitEnterFullScreen();
@@ -831,7 +831,7 @@ var VideoJS = JRClass.extend({
 
 ////////////////////////////////////////////////////////////////////////////////
 // Convenience Functions (mini library)
-// Functions not specific to video or VideoJS and could be replaced with a library like jQuery
+// Functions not specific to video or VideoJS and could probably be replaced with a library like jQuery
 ////////////////////////////////////////////////////////////////////////////////
 var _V_ = {
   addClass: function(element, classToAdd){
@@ -977,7 +977,7 @@ VideoJS.setup = function(videos, options){
     videos = VideoJS.getVideoJSTags();
 
   // If videos is not an array, add to an array
-  } else if (typeof videos != 'object') {
+  } else if (typeof videos != 'object' || videos.nodeType == 1) {
     videos = [videos];
     returnSingular = true;
   }
@@ -1050,3 +1050,17 @@ Function.prototype.context = function(obj) {
   }
  return temp
 }
+
+// jQuery Plugin
+if (window.jQuery) {
+  (function($) {
+    $.fn.VideoJS = function(options) {
+      this.each(function() {
+        VideoJS.setup(this, options);
+      });
+      return this;
+     };
+   })(jQuery);
+}
+
+
