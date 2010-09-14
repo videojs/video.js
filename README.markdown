@@ -1,5 +1,7 @@
 VideoJS - [HTML5 Video Player](http://videojs.com)
 ==================================================
+Version 1.1.1
+
 View [VideoJS.com](http://videojs.com) for a demo and overview.
 
 VideoJS is an HTML5 video player that uses the HTML5 video tag built into modern browsers, and uses javascript to add custom controls, new functionality, and to fix cross browser bugs.
@@ -118,4 +120,14 @@ Set options when setting up the videos. The defaults are shown here.
         // Same options
       });
     });
+
+
+Changelog
+---------
+
+1.1.1 (2010-09-14)
+  - First Formally Versioned Release
+  
+1.0.0 (2010-05-18)
+  - First released
 
