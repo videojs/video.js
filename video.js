@@ -136,9 +136,9 @@ var VideoJS = JRClass.extend({
     this.fullscreenControl.addEventListener("click", this.onFullscreenControlClick.context(this), false);
 
     // Listen for the mouse move the video. Used to reveal the controller.
-    this.video.addEventListener("mousemove", this.onVideoMouseMove.context(this), false);
+    this.box.addEventListener("mousemove", this.onVideoMouseMove.context(this), false);
     // Listen for the mouse moving out of the video. Used to hide the controller.
-    this.video.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
+    this.box.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
 
     if (this.poster) {
       // Listen for the mouse move the poster image. Used to reveal the controller.
@@ -780,14 +780,14 @@ var VideoJS = JRClass.extend({
     var parts = timeText.split(':');
     var time = 0;
     // hours => seconds
-    time += parseInt(parts[0], 10)*60*60;
+    time += parseFloat(parts[0])*60*60;
     // minutes => seconds
-    time += parseInt(parts[1], 10)*60;
+    time += parseFloat(parts[1])*60;
     // get seconds
     var seconds = parts[2].split(',');
-    time += parseInt(seconds[0], 10);
+    time += parseFloat(seconds[0]);
     // add miliseconds
-    time = time + parseInt(seconds[1], 10)/1000;
+    time = time + parseFloat(seconds[1])/1000;
     return time;
   },
 
@@ -1070,8 +1070,8 @@ Function.prototype.context = function(obj) {
   var method = this;
   temp = function() {
     return method.apply(obj, arguments);
-  }
- return temp;
+  };
+  return temp;
 };
 
 // jQuery Plugin
