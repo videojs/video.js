@@ -14,7 +14,7 @@ Originally based on [this tutorial](http://blog.steveheffernan.com/2010/04/how-t
 
 Contributors (Github Username)
 ------------------------------
-heff, dz0ny, sentientbit, Shraymonks, albertogasparin, sandaru1, nicholasbs, majornista, tvdeyen
+heff, dz0ny, sentientbit, tvdeyen, brandonarbini, gordonbrander, Shraymonks, albertogasparin, sandaru1, nicholasbs, majornista
 
 
 Getting Started
