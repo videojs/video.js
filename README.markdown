@@ -12,6 +12,11 @@ View demo.html for an example of how to use it.
 
 Originally based on [this tutorial](http://blog.steveheffernan.com/2010/04/how-to-build-an-html5-video-player/).
 
+Contributors (Github Username)
+------------------------------
+heff, dz0ny, sentientbit, Shraymonks, albertogasparin, sandaru1, nicholasbs, majornista, tvdeyen
+
+
 Getting Started
 ---------------
 
@@ -130,4 +135,3 @@ Changelog
   
 1.0.0 (2010-05-18)
   - First released
-
