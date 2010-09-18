@@ -75,12 +75,8 @@ var VideoJS = JRClass.extend({
       return;
     }
 
-    // For iPads, controls need to always show because there's no hover
-    // The controls also have to be below for the full-window mode to work.
-    if (VideoJS.isIpad()) {
-      this.options.controlsBelow = true;
-      this.options.controlsHiding = false;
-    }
+    if (VideoJS.isIpad()) { this.iPadFix(); }
+    if (VideoJS.isAndroid()) { this.androidFix(); }
 
     if (this.options.controlsBelow) {
       _V_.addClass(this.box, "vjs-controls-below");
@@ -175,7 +171,7 @@ var VideoJS = JRClass.extend({
       this.loadSubtitles();
       this.buildSubtitles();
     }
-    
+
   },
 
   // Support older browsers that used "autobuffer"
@@ -824,7 +820,29 @@ var VideoJS = JRClass.extend({
         this.subtitles[x].showing = true;
       }
     }
+  },
+
+
+  /* Device Fixes
+  ================================================================================ */
+
+  // For iPads, controls need to always show because there's no hover
+  // The controls also have to be below for the full-window mode to work.
+  iPadFix: function(){
+    this.options.controlsBelow = true;
+    this.options.controlsHiding = false;
+  },
+  
+  // For Androids, add the MP4 source directly to the video tag otherwise it will not play
+  androidFix: function() {
+    var children = this.video.children;
+    for (var i=0,j=children.length; i<j; i++) {
+      if (children[i].tagName.toUpperCase() == "SOURCE" && children[i].src.match(/\.mp4$/i)) {
+        this.video.src = children[i].src;
+      }
+    }
   }
+
 })
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1038,6 +1056,7 @@ VideoJS.getFlashVersion = function(){
 
 VideoJS.isIE = function(){ return !+"\v1"; }
 VideoJS.isIpad = function(){ return navigator.userAgent.match(/iPad/i) != null; }
+VideoJS.isAndroid = function(){ return navigator.userAgent.match(/Android/i) != null; };
 
 // Allows for binding context to functions
 // when using in event listeners and timeouts
