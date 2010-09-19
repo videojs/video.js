@@ -1062,6 +1062,7 @@ VideoJS.getFlashVersion = function(){
 
 VideoJS.isIE = function(){ return !+"\v1"; };
 VideoJS.isIpad = function(){ return navigator.userAgent.match(/iPad/i) !== null; };
+VideoJS.isIphone = function(){ return navigator.userAgent.match(/iPhone/i) !== null; };
 VideoJS.isAndroid = function(){ return navigator.userAgent.match(/Android/i) !== null; };
 
 // Allows for binding context to functions
