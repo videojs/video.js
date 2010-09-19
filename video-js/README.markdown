@@ -1,5 +1,7 @@
 VideoJS - [HTML5 Video Player](http://videojs.com)
 ==================================================
+Version 1.1.1
+
 View [VideoJS.com](http://videojs.com) for a demo and overview.
 
 VideoJS is an HTML5 video player that uses the HTML5 video tag built into modern browsers, and uses javascript to add custom controls, new functionality, and to fix cross browser bugs.
@@ -9,6 +11,11 @@ The base of VideoJS is Kroc Camen's [Video for Everybody](http://camendesign.com
 View demo.html for an example of how to use it.
 
 Originally based on [this tutorial](http://blog.steveheffernan.com/2010/04/how-to-build-an-html5-video-player/).
+
+Contributors (Github Username)
+------------------------------
+heff, dz0ny, sentientbit, tvdeyen, brandonarbini, gordonbrander, Shraymonks, albertogasparin, sandaru1, nicholasbs, majornista
+
 
 Getting Started
 ---------------
@@ -40,7 +47,7 @@ Change the video and image files to your own. You can even swap out the Flash Fa
       <video id="example_video_1" class="video-js" width="640" height="264" poster="http://video-js.zencoder.com/oceans-clip.png" controls preload>
         <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
         <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm; codecs="vp8, vorbis"'>
-        <source src="http://video-js.zencoder.com/oceans-clip.ogg" type='video/ogg; codecs="theora, vorbis"'>
+        <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg; codecs="theora, vorbis"'>
         <!-- Flash Fallback. Use any flash video player here. Make sure to keep the vjs-flash-fallback class. -->
         <object class="vjs-flash-fallback" width="640" height="264" type="application/x-shockwave-flash"
           data="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf">
@@ -56,9 +63,9 @@ Change the video and image files to your own. You can even swap out the Flash Fa
       <p class="vjs-no-video"><strong>Download Video:</strong>
         <a href="http://video-js.zencoder.com/oceans-clip.mp4">MP4</a>,
         <a href="http://video-js.zencoder.com/oceans-clip.webm">WebM</a>,
-        <a href="http://video-js.zencoder.com/oceans-clip.ogg">Ogg</a><br>
+        <a href="http://video-js.zencoder.com/oceans-clip.ogv">Ogg</a><br>
         <!-- Support VideoJS by keeping this link. -->
-        <a href="http://videojs.com">HTML5 Video Player</a> by <a href="http://videojs.com">VideoJS</a>
+        <a href="http://videojs.com">HTML5 Video Player</a> by VideoJS
       </p>
     </div>
     <!-- End VideoJS -->
@@ -119,3 +126,12 @@ Set options when setting up the videos. The defaults are shown here.
       });
     });
 
+
+Changelog
+---------
+
+1.1.1 (2010-09-14)
+  - First Formally Versioned Release
+  
+1.0.0 (2010-05-18)
+  - First released
