@@ -32,9 +32,6 @@ var VideoJS = JRClass.extend({
       this.video = element;
     }
 
-    // Hide default controls
-    this.video.controls = false;
-
     // Store reference to player on the video element.
     // So you can acess the player later: document.getElementById("video_id").player.play();
     this.video.player = this;
@@ -46,7 +43,8 @@ var VideoJS = JRClass.extend({
       defaultVolume: 0.85, // Will be overridden by localStorage volume if available
       flashVersion: 9, // Required flash version for fallback
       linksHiding: true, // Hide download links when video is supported
-      flashIsDominant: false // Always use Flash when available
+      flashIsDominant: false, // Always use Flash when available
+      useBrowserControls: false // Dont' use the video JS controls (iPhone)
     };
 
     // Override default options with global options
@@ -55,11 +53,13 @@ var VideoJS = JRClass.extend({
     // Override global options with options specific to this video
     if (typeof setOptions == "object") { _V_.merge(this.options, setOptions); }
 
+    // Store reference to embed code pieces
     this.box = this.video.parentNode;
     this.flashFallback = this.getFlashFallback();
     this.linksFallback = this.getLinksFallback();
 
     // Hide download links if video can play
+    // Flash fallback can't be found in IE. Maybe add video as an element like modernizr so it can contain elements.
     if(VideoJS.browserSupportsVideo() || ((this.flashFallback || VideoJS.isIE()) && this.flashVersionSupported())) {
       this.hideLinksFallback();
     }
@@ -67,7 +67,7 @@ var VideoJS = JRClass.extend({
     // Check if browser can play HTML5 video
     if (VideoJS.browserSupportsVideo()) {
       // Force flash fallback when there's no supported source, or flash is dominant
-      if (!this.canPlaySource() || this.options.flashIsDominant) {
+      if (!this.canPlaySource() || (this.options.flashIsDominant && this.flashVersionSupported())) {
         this.replaceWithFlash();
         return;
       }
@@ -75,8 +75,24 @@ var VideoJS = JRClass.extend({
       return;
     }
 
-    if (VideoJS.isIpad()) { this.iPadFix(); }
-    if (VideoJS.isAndroid()) { this.androidFix(); }
+    // Force the video source
+    // Helps fix loading bugs in a handful of devices, like the iPad/iPhone poster bug
+    // And iPad/iPhone javascript include location bug
+    // And Android type attribute bug
+    this.video.src = this.firstPlayableSource.src; // From canPlaySource()
+
+    if (VideoJS.isIpad() || VideoJS.isIphone() || VideoJS.isAndroid()) {
+      this.video.load(); // 2nd step of forcing the source
+      return; // Use the devices default controls
+    }
+
+    if (this.options.useBrowserControls == false) {
+      // Hide default controls
+      this.video.controls = false;
+    }
+
+    // Support older browsers that used autobuffer
+    this.fixPreloading();
 
     if (this.options.controlsBelow) {
       _V_.addClass(this.box, "vjs-controls-below");
@@ -164,9 +180,6 @@ var VideoJS = JRClass.extend({
       this.positionController();
     }.context(this);
 
-    // Support older browsers that used autobuffer
-    this.fixPreloading();
-
     // Load subtitles. Based on http://matroska.org/technical/specs/subtitles/srt.html
     this.subtitlesSource = this.video.getAttribute("data-subtitles");
     if (this.subtitlesSource !== null) {
@@ -180,6 +193,10 @@ var VideoJS = JRClass.extend({
   fixPreloading: function(){
     if (typeof this.video.hasAttribute == "function" && this.video.hasAttribute("preload")) {
       this.video.autobuffer = true;
+      this.video.load();
+    } else {
+      this.video.preload = false;
+      this.video.autobuffer = false;
     }
   },
 
@@ -406,6 +423,7 @@ var VideoJS = JRClass.extend({
       if (children[i].tagName.toUpperCase() == "SOURCE") {
         var canPlay = this.video.canPlayType(children[i].type);
         if(canPlay == "probably" || canPlay == "maybe") {
+          this.firstPlayableSource = children[i];
           return true;
         }
       }
@@ -827,22 +845,25 @@ var VideoJS = JRClass.extend({
   /* Device Fixes
   ================================================================================ */
 
+  /* Using Default Controls for iPad now. Can't do native fullscreen through the iPad API */
   // For iPads, controls need to always show because there's no hover
   // The controls also have to be below for the full-window mode to work.
-  iPadFix: function(){
-    this.options.controlsBelow = true;
-    this.options.controlsHiding = false;
-  },
-  
+  // iPadFix: function(){
+  //   this.options.controlsBelow = true;
+  //   this.options.controlsHiding = false;
+  // },
+
+  /* The "force the source" fix should hopefully fix this as well now. 
+     Not sure if canPlayType works on Android though. */
   // For Androids, add the MP4 source directly to the video tag otherwise it will not play
-  androidFix: function() {
-    var children = this.video.children;
-    for (var i=0,j=children.length; i<j; i++) {
-      if (children[i].tagName.toUpperCase() == "SOURCE" && children[i].src.match(/\.mp4$/i)) {
-        this.video.src = children[i].src;
-      }
-    }
-  }
+  // androidFix: function() {
+  //   var children = this.video.children;
+  //   for (var i=0,j=children.length; i<j; i++) {
+  //     if (children[i].tagName.toUpperCase() == "SOURCE" && children[i].src.match(/\.mp4$/i)) {
+  //       this.video.src = children[i].src;
+  //     }
+  //   }
+  // }
 
 });
 
@@ -1060,6 +1081,7 @@ VideoJS.getFlashVersion = function(){
   return VideoJS.flashVersion;
 };
 
+// Browser & Device Checks
 VideoJS.isIE = function(){ return !+"\v1"; };
 VideoJS.isIpad = function(){ return navigator.userAgent.match(/iPad/i) !== null; };
 VideoJS.isIphone = function(){ return navigator.userAgent.match(/iPhone/i) !== null; };
