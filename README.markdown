@@ -130,11 +130,14 @@ Set options when setting up the videos. The defaults are shown here.
 Changelog
 ---------
 1.1.2 (2010-09-20)
+
 - Added a fix for the poster bug in iPad/iPhone
 - Added more specificity to styles
 
 1.1.1 (2010-09-14)
+
 - First Formally Versioned Release
   
 1.0.0 (2010-05-18)
+
 - First released
