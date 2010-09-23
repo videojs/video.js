@@ -854,7 +854,7 @@ var VideoJS = JRClass.extend({
         this.subtitles[x].showing = true;
       }
     }
-  },
+  }
 
 
   /* Device Fixes
