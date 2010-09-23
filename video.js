@@ -203,6 +203,21 @@ var VideoJS = JRClass.extend({
   // Translate functionality
   play: function(){ this.video.play(); },
   pause: function(){ this.video.pause(); },
+  width: function(width){ 
+    this.video.width = width;
+    this.box.width = width;
+    // Width isn't working for the poster
+    this.poster.style.width = width+"px";
+    this.positionController();
+    return this;
+  },
+  height: function(height){ 
+    this.video.height = height;
+    this.box.height = height;
+    this.poster.style.height = height+"px";
+    this.positionController();
+    return this;
+  },
 
   buildController: function(){
 
