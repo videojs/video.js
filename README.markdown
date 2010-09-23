@@ -14,7 +14,7 @@ Originally based on [this tutorial](http://blog.steveheffernan.com/2010/04/how-t
 
 Contributors (Github Username)
 ------------------------------
-heff, dz0ny, sentientbit, tvdeyen, brandonarbini, gordonbrander, Shraymonks, albertogasparin, sandaru1, nicholasbs, majornista
+heff, dz0ny, sentientbit, tvdeyen, brandonarbini, gordonbrander, Shraymonks, albertogasparin, sandaru1, nicholasbs, majornista, Fredust85
 
 
 Getting Started
@@ -129,6 +129,12 @@ Set options when setting up the videos. The defaults are shown here.
 
 Changelog
 ---------
+1.1.3
+
+- Feature: Width/Height functions for resizing the player
+- Fix: Removed trailing comma that was breaking IE7
+- Fix: Removed some vars from global scope
+
 1.1.2 (2010-09-20)
 
 - Added a fix for the poster bug in iPad/iPhone

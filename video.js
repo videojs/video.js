@@ -854,7 +854,7 @@ var VideoJS = JRClass.extend({
         this.subtitles[x].showing = true;
       }
     }
-  },
+  }
 
 
   /* Device Fixes
@@ -1026,7 +1026,8 @@ VideoJS.DOMReady = function(fn){
 VideoJS.setup = function(videos, options){
 
   var returnSingular = false,
-  playerList = [];
+  playerList = [],
+  videoElement;
 
   // If videos is undefined or "All", set up all videos with the video-js class
   if (!videos || videos == "All") {
@@ -1055,7 +1056,7 @@ VideoJS.setup = function(videos, options){
 // Find video tags with the video-js class
 VideoJS.getVideoJSTags = function() {
   var videoTags = document.getElementsByTagName("video"),
-  videoJSTags = [];
+  videoJSTags = [], videoTag;
 
   for (var i=0,j=videoTags.length; i<j; i++) {
     videoTag = videoTags[i];
@@ -1077,7 +1078,7 @@ VideoJS.browserSupportsVideo = function() {
 VideoJS.getFlashVersion = function(){
   // Cache Version
   if (typeof VideoJS.flashVersion != "undefined") { return VideoJS.flashVersion; }
-  var version = 0;
+  var version = 0, desc;
   if (typeof navigator.plugins != "undefined" && typeof navigator.plugins["Shockwave Flash"] == "object") {
     desc = navigator.plugins["Shockwave Flash"].description;
     if (desc && !(typeof navigator.mimeTypes != "undefined" && navigator.mimeTypes["application/x-shockwave-flash"] && !navigator.mimeTypes["application/x-shockwave-flash"].enabledPlugin)) {
@@ -1105,7 +1106,7 @@ VideoJS.isAndroid = function(){ return navigator.userAgent.match(/Android/i) !==
 // Allows for binding context to functions
 // when using in event listeners and timeouts
 Function.prototype.context = function(obj) {
-  var method = this;
+  var method = this, temp;
   temp = function() {
     return method.apply(obj, arguments);
   };
