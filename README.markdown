@@ -132,8 +132,11 @@ Changelog
 1.1.3
 
 - Feature: Width/Height functions for resizing the player
+- Feature: Made initial click & hold trigger new value on progress and volume
+- Feature: Made controls not hide when hovering over them
 - Fix: Removed trailing comma that was breaking IE7
 - Fix: Removed some vars from global scope
+- Fix: Changed a document.onmousemove to an eventListener to prevent conflicts
 
 1.1.2 (2010-09-20)
 

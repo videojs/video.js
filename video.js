@@ -1,4 +1,7 @@
 /*
+VideoJS - HTML5 Video Player
+v1.1.3
+
 This file is part of VideoJS. Copyright 2010 Zencoder, Inc.
 
 VideoJS is free software: you can redistribute it and/or modify
@@ -163,13 +166,25 @@ var VideoJS = JRClass.extend({
       this.poster.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
     }
 
-    // Have to add the mouseout to the controller too or it may not hide.
-    // For some reason the same isn't needed for mouseover
-    this.controls.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
+    // Block hiding when over controls
+    this.controls.addEventListener("mousemove", this.onControlsMouseMove.context(this), false);
+    
+    // Release controls hiding block, and call VideoMouseOut
+    this.controls.addEventListener("mouseout", this.onControlsMouseOut.context(this), false);
+
+    // Load subtitles. Based on http://matroska.org/technical/specs/subtitles/srt.html
+    this.subtitlesSource = this.video.getAttribute("data-subtitles");
+    if (this.subtitlesSource !== null) {
+      this.loadSubtitles();
+      this.buildSubtitles();
+    }
+
+    /* Removeable Event Listeners with Context
+    ================================================================================ */
+    // Creating during initialization to add context
+    // and because it has to be removed with removeEventListener
 
     // Create listener for esc key while in full screen mode
-    // Creating it during initialization to add context
-    // and because it has to be removed with removeEventListener
     this.onEscKey = function(event){
       if (event.keyCode == 27) {
         this.fullscreenOff();
@@ -180,30 +195,49 @@ var VideoJS = JRClass.extend({
       this.positionController();
     }.context(this);
 
-    // Load subtitles. Based on http://matroska.org/technical/specs/subtitles/srt.html
-    this.subtitlesSource = this.video.getAttribute("data-subtitles");
-    if (this.subtitlesSource !== null) {
-      this.loadSubtitles();
-      this.buildSubtitles();
-    }
+    this.onProgressMouseMove = function(event){
+      this.setPlayProgressWithEvent(event);
+    }.context(this);
+
+    this.onProgressMouseUp = function(event){
+      _V_.unblockTextSelection();
+
+      document.removeEventListener("mousemove", this.onProgressMouseMove, false);
+      document.removeEventListener("mouseup", this.onProgressMouseUp, false);
+
+      if (this.videoWasPlaying) {
+        this.video.play();
+        this.trackPlayProgress();
+      }
+    }.context(this);
+
+    this.onVolumeMouseMove = function(event){
+      this.setVolumeWithEvent(event);
+    }.context(this);
+
+    this.onVolumeMouseUp = function(event){
+      _V_.unblockTextSelection();
+      document.removeEventListener("mousemove", this.onVolumeMouseMove, false);
+      document.removeEventListener("mouseup", this.onVolumeMouseUp, false);
+    }.context(this);
 
   },
 
   // Support older browsers that used "autobuffer"
   fixPreloading: function(){
     if (typeof this.video.hasAttribute == "function" && this.video.hasAttribute("preload")) {
-      this.video.autobuffer = true;
+      this.video.autobuffer = true; // Was a boolean
       this.video.load();
     } else {
-      this.video.preload = false;
       this.video.autobuffer = false;
+      this.video.preload = "none";
     }
   },
 
   // Translate functionality
   play: function(){ this.video.play(); },
   pause: function(){ this.video.pause(); },
-  width: function(width){ 
+  width: function(width){
     this.video.width = width;
     this.box.width = width;
     // Width isn't working for the poster
@@ -211,7 +245,7 @@ var VideoJS = JRClass.extend({
     this.positionController();
     return this;
   },
-  height: function(height){ 
+  height: function(height){
     this.video.height = height;
     this.box.height = height;
     this.poster.style.height = height+"px";
@@ -384,7 +418,7 @@ var VideoJS = JRClass.extend({
 
   // Hide the controller
   hideController: function(){
-    if (this.options.controlsHiding) { this.controls.style.display = "none"; }
+    if (this.options.controlsHiding && !this.mouseIsOverControls) { this.controls.style.display = "none"; }
   },
 
   // Update poster source from attribute or fallback image
@@ -534,19 +568,11 @@ var VideoJS = JRClass.extend({
     }
 
     _V_.blockTextSelection();
-    document.onmousemove = function(event) {
-      this.setPlayProgressWithEvent(event);
-    }.context(this);
 
-    document.onmouseup = function(event) {
-      _V_.unblockTextSelection();
-      document.onmousemove = null;
-      document.onmouseup = null;
-      if (this.videoWasPlaying) {
-        this.video.play();
-        this.trackPlayProgress();
-      }
-    }.context(this);
+    this.setPlayProgressWithEvent(event);
+    document.addEventListener("mousemove", this.onProgressMouseMove, false);
+    document.addEventListener("mouseup", this.onProgressMouseUp, false);
+
   },
 
   // When the user stops dragging on the progress bar, update play position
@@ -554,7 +580,7 @@ var VideoJS = JRClass.extend({
   onProgressHolderMouseUp: function(event){
     this.setPlayProgressWithEvent(event);
 
-    // Fixe for an apparent play button state issue.
+    // Fixe for a play button state issue.
     if (this.video.paused) {
       this.onPause();
     } else {
@@ -565,14 +591,9 @@ var VideoJS = JRClass.extend({
   // Adjust the volume when the user drags on the volume control
   onVolumeControlMouseDown: function(event){
     _V_.blockTextSelection();
-    document.onmousemove = function(event) {
-      this.setVolumeWithEvent(event);
-    }.context(this);
-    document.onmouseup = function() {
-      _V_.unblockTextSelection();
-      document.onmousemove = null;
-      document.onmouseup = null;
-    }.context(this);
+    this.setVolumeWithEvent(event);
+    document.addEventListener("mousemove", this.onVolumeMouseMove, false);
+    document.addEventListener("mouseup", this.onVolumeMouseUp, false);
   },
 
   // When the user stops dragging, set a new volume
@@ -590,7 +611,18 @@ var VideoJS = JRClass.extend({
     }
   },
 
-  onVideoMouseMove: function(event){
+  onControlsMouseMove: function(){
+    // Block controls from hiding when mouse is over them.
+    this.mouseIsOverControls = true;
+  },
+  
+  onControlsMouseOut: function(event){
+    this.mouseIsOverControls = false;
+    // Have to add the video mouseout to the controller too or it may not hide.
+    this.onVideoMouseOut(event);
+  },
+
+  onVideoMouseMove: function(){
     this.showController();
     clearInterval(this.mouseMoveTimeout);
     this.mouseMoveTimeout = setTimeout(function(){ this.hideController(); }.context(this), 4000);
@@ -868,7 +900,7 @@ var VideoJS = JRClass.extend({
   //   this.options.controlsHiding = false;
   // },
 
-  /* The "force the source" fix should hopefully fix this as well now. 
+  /* The "force the source" fix should hopefully fix this as well now.
      Not sure if canPlayType works on Android though. */
   // For Androids, add the MP4 source directly to the video tag otherwise it will not play
   // androidFix: function() {
