@@ -496,6 +496,8 @@ var VideoJS = JRClass.extend({
   // When the video ends
   onEnded: function(event){
     this.video.pause();
+    this.video.currentTime = 0;
+    this.showPoster();
     this.onPause();
   },
 
