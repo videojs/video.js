@@ -42,6 +42,7 @@ var VideoJS = JRClass.extend({
     // Default Options
     this.options = {
       controlsBelow: false, // Display control bar below video vs. in front of
+      showControlsAtStart: false, // Make controls visible when page loads
       controlsHiding: true, // Hide controls when not over the video
       defaultVolume: 0.85, // Will be overridden by localStorage volume if available
       flashVersion: 9, // Required flash version for fallback
@@ -107,8 +108,9 @@ var VideoJS = JRClass.extend({
     this.buildPoster();
     this.showPoster();
 
+    this.buildBigPlayButton();
     this.buildController();
-    this.showController();
+    this.loadInterface();
 
     // Position & show controls when data is loaded
     this.video.addEventListener("loadeddata", this.onLoadedData.context(this), false);
@@ -129,6 +131,9 @@ var VideoJS = JRClass.extend({
     this.watchBuffer = setInterval(this.updateBufferedTotal.context(this), 33);
     // Listen for Video time update
     this.video.addEventListener('timeupdate', this.onTimeUpdate.context(this), false);
+
+    // Listen for clicks on the big play button
+    this.bigPlayButton.addEventListener("click", this.onPlayControlClick.context(this), false);
 
     // Listen for clicks on the play/pause button
     this.playControl.addEventListener("click", this.onPlayControlClick.context(this), false);
@@ -168,7 +173,7 @@ var VideoJS = JRClass.extend({
 
     // Block hiding when over controls
     this.controls.addEventListener("mousemove", this.onControlsMouseMove.context(this), false);
-    
+
     // Release controls hiding block, and call VideoMouseOut
     this.controls.addEventListener("mouseout", this.onControlsMouseOut.context(this), false);
 
@@ -223,6 +228,9 @@ var VideoJS = JRClass.extend({
 
   },
 
+  // Array to track errors
+  errors: [],
+
   // Support older browsers that used "autobuffer"
   fixPreloading: function(){
     if (typeof this.video.hasAttribute == "function" && this.video.hasAttribute("preload")) {
@@ -251,6 +259,22 @@ var VideoJS = JRClass.extend({
     this.poster.style.height = height+"px";
     this.positionController();
     return this;
+  },
+
+  loadInterface: function(){
+    if(!this.stylesHaveLoaded()) {
+      // Don't want to create an endless loop either.
+      if (!this.positionRetries) { this.positionRetries = 1; }
+      if (this.positionRetries++ < 100) {
+        setTimeout(this.loadInterface.context(this),0);
+        return;
+      }
+    }
+    this.positionBox();
+    this.showBigPlayButton();
+    if(this.options.showControlsAtStart) {
+      this.showController();
+    }
   },
 
   buildController: function(){
@@ -339,6 +363,25 @@ var VideoJS = JRClass.extend({
     this.controls.appendChild(this.fullscreenControl);
   },
 
+  buildBigPlayButton: function(){
+    /* Creating this HTML
+      <div class="vjs-big-play-button"><span></span></div>
+    */
+    this.bigPlayButton = _V_.createElement("div", {
+      className: "vjs-big-play-button",
+      innerHTML: "<span></span>"
+    });
+    this.video.parentNode.appendChild(this.bigPlayButton);
+  },
+
+  showBigPlayButton: function(){
+    this.bigPlayButton.style.display = "block";
+  },
+
+  hideBigPlayButton: function(){
+    this.bigPlayButton.style.display = "none";
+  },
+
   // Get the download links block element
   getLinksFallback: function(){
     return this.box.getElementsByTagName("P")[0];
@@ -365,10 +408,46 @@ var VideoJS = JRClass.extend({
     }
   },
 
+  positionBox: function(){
+    // Set width based on fullscreen or not.
+    if (this.videoIsFullScreen) {
+      this.box.style.width = "";
+      if (this.options.controlsBelow) {
+        this.box.style.height = "";
+        this.video.style.height = (this.box.offsetHeight - this.controls.offsetHeight) + "px";
+      }
+    } else {
+      this.box.style.width = this.video.offsetWidth + "px";
+      if (this.options.controlsBelow) {
+        this.video.style.height = "";
+        this.box.style.height = this.video.offsetHeight + this.controls.offsetHeight + "px";
+      }
+    }
+
+    this.positionController();
+    this.positionPoster();
+  },
+
   // Show the controller
   showController: function(){
+    if (!this.options.showControlsAtStart && !this.hasPlayed) { return; }
     this.controls.style.display = "block";
     this.positionController();
+  },
+
+  // Sometimes the CSS styles haven't been applied to the controls yet
+  // when we're trying to calculate the height and position them correctly.
+  // This causes a flicker where the controls are out of place.
+  // Best way I can think of to test this is to check if the width of all the controls are the same.
+  // If so, hide the controller and delay positioning them briefly.
+  stylesHaveLoaded: function(){
+    if (this.playControl.offsetWidth == this.progressControl.offsetWidth
+     && this.playControl.offsetWidth == this.timeControl.offsetWidth
+     && this.playControl.offsetWidth == this.volumeControl.offsetWidth) {
+       return false;
+    } else {
+      return true;
+    }
   },
 
   // Place controller relative to the video's position
@@ -376,38 +455,7 @@ var VideoJS = JRClass.extend({
     // Make sure the controls are visible
     if (this.controls.style.display == 'none') { return; }
 
-    // Sometimes the CSS styles haven't been applied to the controls yet
-    // when we're trying to calculate the height and position them correctly.
-    // This causes a flicker where the controls are out of place.
-    // Best way I can think of to test this is to check if the width of all the controls are the same.
-    // If so, hide the controller and delay positioning them briefly.
-    if (this.playControl.offsetWidth == this.progressControl.offsetWidth
-     && this.playControl.offsetWidth == this.timeControl.offsetWidth
-     && this.playControl.offsetWidth == this.volumeControl.offsetWidth) {
-       // Don't want to create an endless loop either.
-       if (!this.positionRetries) { this.positionRetries = 1; }
-       if (this.positionRetries++ < 100) {
-         this.controls.style.display = "none";
-         setTimeout(this.showController.context(this),0);
-         return;
-       }
-    }
-
-    // Set width based on fullscreen or not.
-    if (this.videoIsFullScreen) {
-      this.box.style.width = "";
-    } else {
-      this.box.style.width = this.video.offsetWidth + "px";
-    }
-
     if (this.options.controlsBelow) {
-      if (this.videoIsFullScreen) {
-        this.box.style.height = "";
-        this.video.style.height = (this.box.offsetHeight - this.controls.offsetHeight) + "px";
-      } else {
-        this.video.style.height = "";
-        this.box.style.height = this.video.offsetHeight + this.controls.offsetHeight + "px";
-      }
       this.controls.style.top = this.video.offsetHeight + "px";
     } else {
       this.controls.style.top = (this.video.offsetHeight - this.controls.offsetHeight) + "px";
@@ -482,8 +530,10 @@ var VideoJS = JRClass.extend({
 
   // When the video is played
   onPlay: function(event){
+    this.hasPlayed = true;
     this.playControl.className = "vjs-play-control vjs-pause";
     this.hidePoster();
+    this.hideBigPlayButton();
     this.trackPlayProgress();
   },
 
@@ -498,6 +548,7 @@ var VideoJS = JRClass.extend({
     this.video.pause();
     this.video.currentTime = 0;
     this.showPoster();
+    this.showBigPlayButton();
     this.onPause();
   },
 
@@ -511,7 +562,7 @@ var VideoJS = JRClass.extend({
   },
 
   onLoadedData: function(event){
-    this.showController();
+    // this.showController();
   },
 
   // When the video's load progress is updated
@@ -617,7 +668,7 @@ var VideoJS = JRClass.extend({
     // Block controls from hiding when mouse is over them.
     this.mouseIsOverControls = true;
   },
-  
+
   onControlsMouseOut: function(event){
     this.mouseIsOverControls = false;
     // Have to add the video mouseout to the controller too or it may not hide.
@@ -647,17 +698,19 @@ var VideoJS = JRClass.extend({
     this.updateLoadProgress();
   },
 
+  // Individual control positioning now done through CSS
+
   // Get the space between controls. For more flexible styling.
-  getControlsPadding: function(){
-    return _V_.findPosX(this.playControl) - _V_.findPosX(this.controls);
-  },
+  // getControlsPadding: function(){
+  //   return _V_.findPosX(this.playControl) - _V_.findPosX(this.controls);
+  // },
 
   // When dynamically placing controls, if there are borders on the controls, it can break to a new line.
-  getControlBorderAdjustment: function(){
-    var leftBorder = parseInt(_V_.getComputedStyleValue(this.playControl, "border-left-width").replace("px", ""), 10);
-    var rightBorder = parseInt(_V_.getComputedStyleValue(this.playControl, "border-right-width").replace("px", ""), 10);
-    return leftBorder + rightBorder;
-  },
+  // getControlBorderAdjustment: function(){
+  //   var leftBorder = parseInt(_V_.getComputedStyleValue(this.playControl, "border-left-width").replace("px", ""), 10);
+  //   var rightBorder = parseInt(_V_.getComputedStyleValue(this.playControl, "border-right-width").replace("px", ""), 10);
+  //   return leftBorder + rightBorder;
+  // },
 
   // Track & display the current play progress
   trackPlayProgress: function(){
@@ -679,7 +732,10 @@ var VideoJS = JRClass.extend({
 
   // Update the play position based on where the user clicked on the progresss bar
   setPlayProgress: function(newProgress){
-    this.video.currentTime = newProgress * this.video.duration;
+    try { this.video.currentTime = newProgress * this.video.duration; } 
+      catch(e) { 
+        if (e.code = 11) { this.errors.push(VideoJS.errorCodes.videoNotReady); }
+      }
     this.playProgress.style.width = newProgress * (_V_.getComputedStyleValue(this.progressHolder, "width").replace("px", "")) + "px";
     this.updateTimeDisplay();
     // currentTime changed, reset subtitles
@@ -749,9 +805,8 @@ var VideoJS = JRClass.extend({
       // Apply fullscreen styles
       _V_.addClass(this.box, "vjs-fullscreen");
 
-      // Resize the controller and poster
-      this.positionController();
-      this.positionPoster();
+      // Resize the box, controller, and poster
+      this.positionBox();
     }
   },
 
@@ -759,7 +814,11 @@ var VideoJS = JRClass.extend({
     if(typeof this.video.webkitEnterFullScreen == 'function') {
       // Seems to be broken in Chromium/Chrome
       if (!navigator.userAgent.match("Chrome")) {
-        this.video.webkitEnterFullScreen();
+        try {
+          this.video.webkitEnterFullScreen();
+        } catch (e) {
+          if (e.code = 11) { this.errors.push(VideoJS.errorCodes.videoNotReady); }
+        }
         return true;
       }
     }
@@ -778,9 +837,8 @@ var VideoJS = JRClass.extend({
     // Remove fullscreen styles
     _V_.removeClass(this.box, "vjs-fullscreen");
 
-    // Resize to original settings
-    this.positionController();
-    this.positionPoster();
+    // Resize the box, controller, and poster to original sizes
+    this.positionBox();
   },
 
   /* Subtitles
@@ -1136,6 +1194,11 @@ VideoJS.isIE = function(){ return !+"\v1"; };
 VideoJS.isIpad = function(){ return navigator.userAgent.match(/iPad/i) !== null; };
 VideoJS.isIphone = function(){ return navigator.userAgent.match(/iPhone/i) !== null; };
 VideoJS.isAndroid = function(){ return navigator.userAgent.match(/Android/i) !== null; };
+
+VideoJS.errorCodes = {
+  // Safari errors if you call functions on a video that hasn't loaded yet
+  videoNotReady: "Video is not ready yet (try playing the video first)."
+};
 
 // Allows for binding context to functions
 // when using in event listeners and timeouts
