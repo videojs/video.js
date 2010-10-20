@@ -87,13 +87,25 @@
 .hu-css.vjs-fullscreen .vjs-fullscreen-control ul li:nth-child(3) { border: none; border-top: 4px solid #fff; border-left: 4px solid rgba(0,0,0,0); }
 .hu-css.vjs-fullscreen .vjs-fullscreen-control ul li:nth-child(4) { border: none; border-top: 4px solid #fff; border-right: 4px solid rgba(0,0,0,0); }
 
+/* Big Play Button (at start)
+---------------------------------------------------------*/
+.hu-css div.vjs-big-play-button { 
+  width: 76px; height: 70px; margin: -35px 0 0 -38px;
+  border: 1px solid #ccc; opacity: 0.8;
+  border-radius: 0px; -webkit-border-radius: 0px; -moz-border-radius: 0px;
 
+  background: rgba(50,50,50,0.8);
 
-
-
-
-
-
-
-
-
+  /* CSS Shadows */
+  box-shadow: none; -webkit-box-shadow: none; -moz-box-shadow: none;
+}
+.hu-css div.vjs-big-play-button:hover {
+  box-shadow: 0px 0px 80px #fff; -webkit-box-shadow: 0px 0px 80px #fff; -moz-box-shadow: 0px 0px 80px #fff;
+}
+.hu-css div.vjs-big-play-button span {
+  margin: 16px 0 0 21px;
+  /* Drawing the play triangle with borders - http://www.infimum.dk/HTML/slantinfo.html */
+  border-left: 40px solid #fff; /* Width & Color of play icon */
+  /* Height of play icon is total top & bottom border widths. Color is transparent. */
+  border-top: 20px solid rgba(0,0,0,0); border-bottom: 20px solid rgba(0,0,0,0);
+}

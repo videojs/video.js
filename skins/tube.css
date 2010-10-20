@@ -80,3 +80,29 @@
 .tube-css .vjs-fullscreen-control:hover ul li:nth-child(1), .tube-css .vjs-fullscreen-control:hover ul li:nth-child(2), .tube-css.vjs-fullscreen:hover .vjs-fullscreen-control ul li:nth-child(3), .tube-css.vjs-fullscreen:hover .vjs-fullscreen-control ul li:nth-child(4) {
   border-top-color: #CF1A1A;
 }
+
+/* Big Play Button (at start)
+---------------------------------------------------------*/
+.tube-css div.vjs-big-play-button { 
+  width: 84px; height: 58px; margin: -35px 0 0 -38px;
+  border: 2px solid #ccc; opacity: 0.9;
+  border-radius: 10px; -webkit-border-radius: 10px; -moz-border-radius: 10px;
+
+  /* CSS Background Gradients */
+  /* Default */ background-color: #333;
+  /* Webkit  */ background: #000 -webkit-gradient(linear, left top, left bottom, from(#000), to(#333)) left 29px;
+  /* Firefox */ background: #000 -moz-linear-gradient(top,  #000,  #333) left 29px;
+
+  /* CSS Shadows */
+  box-shadow: none; -webkit-box-shadow: none; -moz-box-shadow: none;
+}
+.tube-css div.vjs-big-play-button:hover {
+  opacity: 1;
+}
+.tube-css div.vjs-big-play-button span {
+  margin: 11px 0 0 26px;
+  /* Drawing the play triangle with borders - http://www.infimum.dk/HTML/slantinfo.html */
+  border-left: 36px solid #fff; /* Width & Color of play icon */
+  /* Height of play icon is total top & bottom border widths. Color is transparent. */
+  border-top: 18px solid rgba(0,0,0,0); border-bottom: 18px solid rgba(0,0,0,0);
+}

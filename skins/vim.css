@@ -1,11 +1,11 @@
-.vim-css ul.vjs-controls { 
-  height: 50px; opacity: 0.9; color: #fff; 
+.vim-css ul.vjs-controls {
+  height: 50px; opacity: 0.9; color: #fff;
   padding-left: 85px; /* Width of play button + margin */
   padding-right: 160px; /* Width of all the controls to the right of the progress control + margins */
 }
-.vim-css ul.vjs-controls > li { 
-  height: 32px; width: 25px; margin: 8px 0 0 0; padding: 0; text-align: center; background: rgba(23, 35, 34, 0.746094); 
-  border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0; 
+.vim-css ul.vjs-controls > li {
+  height: 32px; width: 25px; margin: 8px 0 0 0; padding: 0; text-align: center; background: rgba(23, 35, 34, 0.746094);
+  border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0;
   box-shadow: none; -webkit-box-shadow: none; -moz-box-shadow: none;
 }
 /* Placement of Control Items */
@@ -37,8 +37,8 @@
 /* Volume
 -------------------------------------------------------------------------------- */
 .vim-css li.vjs-volume-control ul { padding: 7px 0 0 5px; width: 30px; }
-.vim-css li.vjs-volume-control ul li { 
-  float: left; margin: 0 2px 0 0; padding: 0; list-style: none; width: 3px; height: 3px; border-bottom: 12px solid #666666; 
+.vim-css li.vjs-volume-control ul li {
+  float: left; margin: 0 2px 0 0; padding: 0; list-style: none; width: 3px; height: 3px; border-bottom: 12px solid #666666;
   -webkit-transition: all 100ms linear; -moz-transition: all 100ms linear;
 }
 .vim-css li.vjs-volume-control ul li.vjs-volume-level-on { border-color: #00ADEF; }
@@ -60,3 +60,27 @@
 /* Fullscreen control hovering */
 .vim-css .vjs-fullscreen-control:hover ul li:nth-child(3), .vim-css .vjs-fullscreen-control:hover ul li:nth-child(4), .vim-css.vjs-fullscreen .vjs-fullscreen-control:hover ul li:nth-child(1), .vim-css.vjs-fullscreen .vjs-fullscreen-control:hover ul li:nth-child(2) { border-bottom-color: #00ADEF; }
 .vim-css .vjs-fullscreen-control:hover ul li:nth-child(1), .vim-css .vjs-fullscreen-control:hover ul li:nth-child(2), .vim-css.vjs-fullscreen .vjs-fullscreen-control:hover ul li:nth-child(3), .vim-css.vjs-fullscreen .vjs-fullscreen-control:hover ul li:nth-child(4) { border-top-color: #00ADEF; }
+
+/* Big Play Button (at start)
+---------------------------------------------------------*/
+.vim-css div.vjs-big-play-button {
+  width: 130px; height: 80px; margin: -40px 0 0 -65px;
+  border: none; opacity: 0.9;
+  border-radius: 10px; -webkit-border-radius: 10px; -moz-border-radius: 10px;
+
+  background: rgba(23, 35, 34, 0.746094);
+
+  /* CSS Shadows */
+  box-shadow: none; -webkit-box-shadow: none; -moz-box-shadow: none;
+}
+.vim-css div.vjs-big-play-button:hover {
+  background: #00ADEF;
+  opacity: 1;
+}
+.vim-css div.vjs-big-play-button span {
+  margin: 22px 0 0 48px;
+  /* Drawing the play triangle with borders - http://www.infimum.dk/HTML/slantinfo.html */
+  border-left: 36px solid #fff; /* Width & Color of play icon */
+  /* Height of play icon is total top & bottom border widths. Color is transparent. */
+  border-top: 18px solid rgba(0,0,0,0); border-bottom: 18px solid rgba(0,0,0,0);
+}

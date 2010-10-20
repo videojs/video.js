@@ -233,9 +233,8 @@ var VideoJS = JRClass.extend({
 
   // Support older browsers that used "autobuffer"
   fixPreloading: function(){
-    if (typeof this.video.hasAttribute == "function" && this.video.hasAttribute("preload")) {
+    if (typeof this.video.hasAttribute == "function" && this.video.hasAttribute("preload") && this.video.preload != "none") {
       this.video.autobuffer = true; // Was a boolean
-      this.video.load();
     } else {
       this.video.autobuffer = false;
       this.video.preload = "none";
