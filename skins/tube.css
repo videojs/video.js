@@ -84,7 +84,7 @@
 /* Big Play Button (at start)
 ---------------------------------------------------------*/
 .tube-css div.vjs-big-play-button { 
-  width: 84px; height: 58px; margin: -35px 0 0 -38px;
+  width: 84px; height: 58px; margin: -29px 0 0 -42px;
   border: 2px solid #ccc; opacity: 0.9;
   border-radius: 10px; -webkit-border-radius: 10px; -moz-border-radius: 10px;
 
