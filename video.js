@@ -90,7 +90,7 @@ var VideoJS = JRClass.extend({
       return; // Use the devices default controls
     }
 
-    if (this.options.useBrowserControls == false) {
+    if (!this.options.useBrowserControls) {
       // Hide default controls
       this.video.controls = false;
     }
@@ -734,7 +734,7 @@ var VideoJS = JRClass.extend({
   setPlayProgress: function(newProgress){
     try { this.video.currentTime = newProgress * this.video.duration; } 
       catch(e) { 
-        if (e.code = 11) { this.errors.push(VideoJS.errorCodes.videoNotReady); }
+        if (e.code == 11) { this.errors.push(VideoJS.errorCodes.videoNotReady); }
       }
     this.playProgress.style.width = newProgress * (_V_.getComputedStyleValue(this.progressHolder, "width").replace("px", "")) + "px";
     this.updateTimeDisplay();
@@ -817,7 +817,7 @@ var VideoJS = JRClass.extend({
         try {
           this.video.webkitEnterFullScreen();
         } catch (e) {
-          if (e.code = 11) { this.errors.push(VideoJS.errorCodes.videoNotReady); }
+          if (e.code == 11) { this.errors.push(VideoJS.errorCodes.videoNotReady); }
         }
         return true;
       }

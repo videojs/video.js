@@ -1,6 +1,6 @@
 VideoJS - [HTML5 Video Player](http://videojs.com)
 ==================================================
-Version 1.1.2
+Version 1.1.3
 
 View [VideoJS.com](http://videojs.com) for a demo and overview.
 
@@ -134,10 +134,12 @@ Changelog
 - Feature: Width/Height functions for resizing the player
 - Feature: Made initial click & hold trigger new value on progress and volume
 - Feature: Made controls not hide when hovering over them
+- Feature: Added big play button as default starting control.
 - Fix: Removed trailing comma that was breaking IE7
 - Fix: Removed some vars from global scope
 - Fix: Changed a document.onmousemove to an eventListener to prevent conflicts
 - Fix: Added a unique ID to FlowPlayer demo object to fix a FlowPlayer bug. Thanks @emirpprime.
+- Fix: Safari error on unloaded video
 
 1.1.2 (2010-09-20)
 
