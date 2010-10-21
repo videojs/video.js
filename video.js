@@ -259,6 +259,10 @@ var VideoJS = JRClass.extend({
     this.positionController();
     return this;
   },
+  volume: function(newVolume){
+    if(newVolume != undefined) { this.setVolume(newVolume); }
+    return this.video.volume;
+  },
 
   loadInterface: function(){
     if(!this.stylesHaveLoaded()) {

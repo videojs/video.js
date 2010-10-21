@@ -129,6 +129,10 @@ Set options when setting up the videos. The defaults are shown here.
 
 Changelog
 ---------
+1.1.4
+
+- Feature: Added volume() function to get and set volume through the player.
+
 1.1.3
 
 - Feature: Width/Height functions for resizing the player
