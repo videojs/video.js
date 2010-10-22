@@ -553,7 +553,7 @@ var VideoJS = JRClass.extend({
 
   // When the video is played
   onPlay: function(event){
-    console.log("onPlay");
+    this.log("onPlay");
     this.hasPlayed = true;
     this.playControl.className = "vjs-play-control vjs-pause";
     this.hidePoster();
@@ -581,47 +581,46 @@ var VideoJS = JRClass.extend({
   },
 
   onError: function(event){
-    console.log(event);
-    console.log(this.video.error);
+    this.log(this.video.error);
   },
 
   onLoadedData: function(event){
-    console.log("loaded")
+    this.log("loaded")
     this.hideSpinner();
   },
 
   onSeeking: function(event){
     this.showSpinner();
-    console.log("Seeking");
+    this.log("Seeking");
   },
 
   onSeeked: function(event){
     this.hideSpinner();
-    console.log("Seeked");
+    this.log("Seeked");
   },
 
   onWaiting: function(event){
     this.showSpinner();
-    console.log("waiting");
+    this.log("waiting");
   },
   
   onStalled: function(event){
     this.showSpinner();
-    console.log("waiting");
+    this.log("waiting");
   },
   
   onLoadStart: function(event){
     this.showSpinner();
-    console.log("loadstart");
+    this.log("loadstart");
   },
 
   onCanPlay: function(event){
     this.hideSpinner();
-    console.log("CanPlay");
+    this.log("CanPlay");
   },
   
   onCanPlayThrough: function(event){
-    console.log("CanPlayThrough");
+    this.log("CanPlayThrough");
   },
 
   // When the video's load progress is updated
@@ -1005,7 +1004,7 @@ var VideoJS = JRClass.extend({
         this.subtitles[x].showing = true;
       }
     }
-  }
+  },
 
 
   /* Device Fixes
@@ -1030,6 +1029,12 @@ var VideoJS = JRClass.extend({
   //     }
   //   }
   // }
+
+  history: [],
+  log: function(text){
+    if (this.options.debug === true) { console.log(text); }
+    if (this.history.length >= 50) { this.history.shift(); }
+  }
 
 });
 
