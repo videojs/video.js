@@ -109,11 +109,13 @@ var VideoJS = JRClass.extend({
     this.showPoster();
 
     this.buildBigPlayButton();
+    this.buildSpinner();
     this.buildController();
     this.loadInterface();
 
     // Position & show controls when data is loaded
     this.video.addEventListener("loadeddata", this.onLoadedData.context(this), false);
+    this.video.addEventListener("loadstart", this.onLoadStart.context(this), false);
 
     // Listen for when the video is played
     this.video.addEventListener("play", this.onPlay.context(this), false);
@@ -131,6 +133,16 @@ var VideoJS = JRClass.extend({
     this.watchBuffer = setInterval(this.updateBufferedTotal.context(this), 33);
     // Listen for Video time update
     this.video.addEventListener('timeupdate', this.onTimeUpdate.context(this), false);
+
+    // When seeking occurs
+    this.video.addEventListener("seeking", this.onSeeking.context(this), false);
+    // When seeking has ended
+    this.video.addEventListener("seeked", this.onSeeked.context(this), false);
+    
+    this.video.addEventListener("canplay", this.onCanPlay.context(this), false);
+    this.video.addEventListener("canplaythrough", this.onCanPlayThrough.context(this), false);
+    this.video.addEventListener("waiting", this.onWaiting.context(this), false);
+    this.video.addEventListener("stalled", this.onStalled.context(this), false);
 
     // Listen for clicks on the big play button
     this.bigPlayButton.addEventListener("click", this.onPlayControlClick.context(this), false);
@@ -274,7 +286,7 @@ var VideoJS = JRClass.extend({
       }
     }
     this.positionBox();
-    this.showBigPlayButton();
+    if(this.video.paused !== false) { this.showBigPlayButton(); }
     if(this.options.showControlsAtStart) {
       this.showController();
     }
@@ -366,6 +378,8 @@ var VideoJS = JRClass.extend({
     this.controls.appendChild(this.fullscreenControl);
   },
 
+  /* Big Play Button
+  ================================================================================ */
   buildBigPlayButton: function(){
     /* Creating this HTML
       <div class="vjs-big-play-button"><span></span></div>
@@ -376,14 +390,20 @@ var VideoJS = JRClass.extend({
     });
     this.video.parentNode.appendChild(this.bigPlayButton);
   },
+  showBigPlayButton: function(){ this.bigPlayButton.style.display = "block"; },
+  hideBigPlayButton: function(){ this.bigPlayButton.style.display = "none"; },
 
-  showBigPlayButton: function(){
-    this.bigPlayButton.style.display = "block";
+  /* Spinner (Loading)
+  ================================================================================ */
+  buildSpinner: function(){
+    this.spinner = _V_.createElement("div", {
+      className: "vjs-spinner",
+      innerHTML: "<span>Loading...</span>"
+    });
+    this.video.parentNode.appendChild(this.spinner);
   },
-
-  hideBigPlayButton: function(){
-    this.bigPlayButton.style.display = "none";
-  },
+  showSpinner: function(){ this.spinner.style.display = "block"; },
+  hideSpinner: function(){ this.spinner.style.display = "none"; },
 
   // Get the download links block element
   getLinksFallback: function(){
@@ -533,6 +553,7 @@ var VideoJS = JRClass.extend({
 
   // When the video is played
   onPlay: function(event){
+    console.log("onPlay");
     this.hasPlayed = true;
     this.playControl.className = "vjs-play-control vjs-pause";
     this.hidePoster();
@@ -548,8 +569,8 @@ var VideoJS = JRClass.extend({
 
   // When the video ends
   onEnded: function(event){
-    this.video.pause();
     this.video.currentTime = 0;
+    this.video.pause();
     this.showPoster();
     this.showBigPlayButton();
     this.onPause();
@@ -565,7 +586,42 @@ var VideoJS = JRClass.extend({
   },
 
   onLoadedData: function(event){
-    // this.showController();
+    console.log("loaded")
+    this.hideSpinner();
+  },
+
+  onSeeking: function(event){
+    this.showSpinner();
+    console.log("Seeking");
+  },
+
+  onSeeked: function(event){
+    this.hideSpinner();
+    console.log("Seeked");
+  },
+
+  onWaiting: function(event){
+    this.showSpinner();
+    console.log("waiting");
+  },
+  
+  onStalled: function(event){
+    this.showSpinner();
+    console.log("waiting");
+  },
+  
+  onLoadStart: function(event){
+    this.showSpinner();
+    console.log("loadstart");
+  },
+
+  onCanPlay: function(event){
+    this.hideSpinner();
+    console.log("CanPlay");
+  },
+  
+  onCanPlayThrough: function(event){
+    console.log("CanPlayThrough");
   },
 
   // When the video's load progress is updated
@@ -636,7 +692,7 @@ var VideoJS = JRClass.extend({
   onProgressHolderMouseUp: function(event){
     this.setPlayProgressWithEvent(event);
 
-    // Fixe for a play button state issue.
+    // Fix for a play button state issue.
     if (this.video.paused) {
       this.onPause();
     } else {

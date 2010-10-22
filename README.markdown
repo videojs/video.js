@@ -132,6 +132,7 @@ Changelog
 1.1.4
 
 - Feature: Added volume() function to get and set volume through the player.
+- Fix: Fix issue where FF would loop video in background when ended.
 
 1.1.3
 
