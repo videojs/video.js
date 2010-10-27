@@ -821,6 +821,7 @@ var VideoJS = JRClass.extend({
           this.video.webkitEnterFullScreen();
         } catch (e) {
           if (e.code == 11) { this.errors.push(VideoJS.errorCodes.videoNotReady); }
+          return false;
         }
         return true;
       }
