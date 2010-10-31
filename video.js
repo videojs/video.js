@@ -742,7 +742,7 @@ var VideoJS = JRClass.extend({
     this.playProgress.style.width = newProgress * (_V_.getComputedStyleValue(this.progressHolder, "width").replace("px", "")) + "px";
     this.updateTimeDisplay();
     // currentTime changed, reset subtitles
-    if (!this.subtitles) { this.currentSubtitlePosition = 0; }
+    if (this.subtitles) { this.currentSubtitlePosition = 0; }
   },
 
   setPlayProgressWithEvent: function(event){
