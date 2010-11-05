@@ -144,6 +144,7 @@ var VideoJS = JRClass.extend({
     this.video.addEventListener("playing", this.onPlaying.context(this), false);
     this.video.addEventListener("waiting", this.onWaiting.context(this), false);
     this.video.addEventListener("stalled", this.onStalled.context(this), false);
+    this.video.addEventListener("suspend", this.onSuspend.context(this), false);
 
     // Listen for clicks on the big play button
     this.bigPlayButton.addEventListener("click", this.onPlayControlClick.context(this), false);
@@ -616,6 +617,7 @@ var VideoJS = JRClass.extend({
   },
 
   onStalled: function(event){},
+  onSuspend: function(event){},
 
   onLoadStart: function(event){
     this.showSpinner();
@@ -699,7 +701,8 @@ var VideoJS = JRClass.extend({
   // When the user stops dragging on the progress bar, update play position
   // Backup for when the user only clicks and doesn't drag
   onProgressHolderMouseUp: function(event){
-    this.setPlayProgressWithEvent(event);
+    // Removed. Chrome breaks (shows poster, plays audio) if you set currentTime rapidly.
+    // this.setPlayProgressWithEvent(event);
 
     // Fix for a play button state issue.
     if (this.video.paused) {
