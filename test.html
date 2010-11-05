@@ -8,67 +8,58 @@
   <script src="video.js" type="text/javascript" charset="utf-8"></script>
 
   <script type="text/javascript">
-    // Must come after the video.js library
-
-    // Add VideoJS to all video tags on the page when the DOM is ready
-    VideoJS.setupAllWhenReady({ debug: true });
-
-    /* ============= OR ============ */
-
-    // Setup and store a reference to the player(s).
-    // Must happen after the DOM is loaded
-    // You can use any library's DOM Ready method instead of VideoJS.DOMReady
-
-    /*
     VideoJS.DOMReady(function(){
+      var myPlayer = VideoJS.setup("example_video_1", {});
+      var vid = document.getElementById("example_video_1"),
+          attrTable = document.getElementById("attributes"),
+          attrNames = ["error", "networkState", "readyState", "preload", "buffered",
+            "seeking", "currentTime", "initialTime", "duration", "startOffsetTime",
+            "paused", "defaultPlaybackRate", "playbackRate", "played", "seekable",
+            "ended", "autoplay", "loop", "controls", "volume", "muted", "tracks"
+          ],
+          attrs = {};
+
+      for(var i=0,j=attrNames.length; i<j; i++) {
+        var row = _V_.createElement("tr");
+        var th = _V_.createElement("th"); 
+        th.innerHTML = attrNames[i];
+        attrs[attrNames[i]] = _V_.createElement("td", { id: attrNames[i] });
+        row.appendChild(th); row.appendChild(attrs[attrNames[i]]);
+        attrTable.appendChild(row);
+      }
       
-      // Using the video's ID or element
-      var myPlayer = VideoJS.setup("example_video_1");
+      setInterval(function(){
+        for(var i=0,j=attrNames.length; i<j; i++) {
+          attrs[attrNames[i]].innerHTML = vid[attrNames[i]];
+        }
+      }, 100);
       
-      // OR using an array of video elements/IDs
-      // Note: It returns an array of players
-      var myManyPlayers = VideoJS.setup(["example_video_1", "example_video_2", video3Element]);
-
-      // OR all videos on the page
-      var myManyPlayers = VideoJS.setup("All");
-
-      // After you have references to your players you can...(example)
-      myPlayer.play(); // Starts playing the video for this player.
+      var events = ["loadstart","progress","suspend","abort","error","emptied","stalled","play","pause",
+        "loadedmetadata", "loadeddata", "waiting", "playing", "canplay", "canplaythrough", "seeking", "seeked",
+        // "timeupdate",
+        "ended", "ratechange", "durationchange","volumechange"
+      ],
+      eventsList = document.getElementById("events");
+      
+      for(var i=0,j=events.length; i<j; i++) {
+        vid.addEventListener(events[i], function(){
+          eventsList.innerHTML = this + "\n" + eventsList.innerHTML
+        }.context(events[i]), false);
+      }
+      
     });
-    */
-
-    /* ========= SETTING OPTIONS ========= */
-
-    // Set options when setting up the videos. The defaults are shown here.
-
-    /*
-    VideoJS.setupAllWhenReady({
-      controlsBelow: false, // Display control bar below video instead of in front of
-      controlsHiding: true, // Hide controls when mouse is not over the video
-      defaultVolume: 0.85, // Will be overridden by user's last volume if available
-      flashVersion: 9, // Required flash version for fallback
-      linksHiding: true // Hide download links when video is supported
-    });
-    */
-
-    // Or as the second option of VideoJS.setup
-    
-    /*
-    VideoJS.DOMReady(function(){
-      var myPlayer = VideoJS.setup("example_video_1", {
-        // Same options
-      });
-    });
-    */
 
   </script>
+
+  <style type="text/css" media="screen">
+    #attributes { width: 300px; float: left; }
+    #events { width: 300px; height: 500px; float: left; }
+  </style>
 
   <!-- Include the VideoJS Stylesheet -->
   <link rel="stylesheet" href="video-js.css" type="text/css" media="screen" title="Video JS">
 </head>
 <body>
-
-  <input id="test">
 
   <!-- Begin VideoJS -->
   <div class="video-js-box">
@@ -99,14 +90,12 @@
   </div>
   <!-- End VideoJS -->
 
-  <script type="text/javascript" charset="utf-8">
-    var div = document.getElementById("test");
-    var vid = document.getElementById("example_video_1");
-    // vid.addEventListener("readystate", function(e){ console.log("hi"); }, false);
-    setInterval(function(){
-      div.value = vid.readyState;
-    }, 100)
-  </script>
+  <a href="#" onclick="document.getElementById('example_video_1').currentTime = 10; return false;">Click</a>
+
+  <table id="attributes">
+  </table>
+  
+  <textarea id="events"></textarea>
 
 </body>
 </html>

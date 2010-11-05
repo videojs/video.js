@@ -138,9 +138,10 @@ var VideoJS = JRClass.extend({
     this.video.addEventListener("seeking", this.onSeeking.context(this), false);
     // When seeking has ended
     this.video.addEventListener("seeked", this.onSeeked.context(this), false);
-    
+
     this.video.addEventListener("canplay", this.onCanPlay.context(this), false);
     this.video.addEventListener("canplaythrough", this.onCanPlayThrough.context(this), false);
+    this.video.addEventListener("playing", this.onPlaying.context(this), false);
     this.video.addEventListener("waiting", this.onWaiting.context(this), false);
     this.video.addEventListener("stalled", this.onStalled.context(this), false);
 
@@ -398,12 +399,29 @@ var VideoJS = JRClass.extend({
   buildSpinner: function(){
     this.spinner = _V_.createElement("div", {
       className: "vjs-spinner",
-      innerHTML: "<span>Loading...</span>"
+      innerHTML: "<div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>"
     });
+    this.spinner.style.left = (this.video.offsetWidth-100)/2 +"px";
+    this.spinner.style.top= (this.video.offsetHeight-100)/2 +"px";
     this.video.parentNode.appendChild(this.spinner);
   },
-  showSpinner: function(){ this.spinner.style.display = "block"; },
-  hideSpinner: function(){ this.spinner.style.display = "none"; },
+  showSpinner: function(){
+    this.spinner.style.display = "block";
+    clearInterval(this.spinnerInterval);
+    this.spinnerInterval = setInterval(function(){ this.rotateSpinner(); }.context(this), 100);
+  },
+  hideSpinner: function(){ 
+    this.spinner.style.display = "none"; 
+    clearInterval(this.spinnerInterval);
+  },
+  spinnerRotated: 0,
+  rotateSpinner: function(){
+    // this.spinner.style.transform =       'scale(0.5) rotate('+this.spinnerRotated+'deg)';
+    this.spinner.style.WebkitTransform = 'scale(0.5) rotate('+this.spinnerRotated+'deg)';
+    this.spinner.style.MozTransform =    'scale(0.5) rotate('+this.spinnerRotated+'deg)';
+    if (this.spinnerRotated == 360) { this.spinnerRotated = 0 }
+    this.spinnerRotated += 45;
+  },
 
   // Get the download links block element
   getLinksFallback: function(){
@@ -553,7 +571,6 @@ var VideoJS = JRClass.extend({
 
   // When the video is played
   onPlay: function(event){
-    this.log("onPlay");
     this.hasPlayed = true;
     this.playControl.className = "vjs-play-control vjs-pause";
     this.hidePoster();
@@ -580,47 +597,40 @@ var VideoJS = JRClass.extend({
     this.updateVolumeDisplay();
   },
 
-  onError: function(event){
-    this.log(this.video.error);
-  },
+  onError: function(event){ this.log(this.video.error); },
 
   onLoadedData: function(event){
-    this.log("loaded")
     this.hideSpinner();
   },
 
   onSeeking: function(event){
-    this.showSpinner();
-    this.log("Seeking");
+    // this.showSpinner();
   },
 
   onSeeked: function(event){
-    this.hideSpinner();
-    this.log("Seeked");
+    // this.hideSpinner();
   },
 
   onWaiting: function(event){
     this.showSpinner();
-    this.log("waiting");
   },
-  
-  onStalled: function(event){
-    this.showSpinner();
-    this.log("waiting");
-  },
-  
+
+  onStalled: function(event){},
+
   onLoadStart: function(event){
     this.showSpinner();
-    this.log("loadstart");
   },
 
   onCanPlay: function(event){
+    // this.hideSpinner();
+  },
+
+  onCanPlayThrough: function(event){
     this.hideSpinner();
-    this.log("CanPlay");
   },
   
-  onCanPlayThrough: function(event){
-    this.log("CanPlayThrough");
+  onPlaying: function(event){
+    this.hideSpinner();
   },
 
   // When the video's load progress is updated
@@ -790,8 +800,8 @@ var VideoJS = JRClass.extend({
 
   // Update the play position based on where the user clicked on the progresss bar
   setPlayProgress: function(newProgress){
-    try { this.video.currentTime = newProgress * this.video.duration; } 
-      catch(e) { 
+    try { this.video.currentTime = newProgress * this.video.duration; }
+      catch(e) {
         if (e.code == 11) { this.errors.push(VideoJS.errorCodes.videoNotReady); }
       }
     this.playProgress.style.width = newProgress * (_V_.getComputedStyleValue(this.progressHolder, "width").replace("px", "")) + "px";
@@ -1031,9 +1041,12 @@ var VideoJS = JRClass.extend({
   // }
 
   history: [],
-  log: function(text){
-    if (this.options.debug === true) { console.log(text); }
+  log: function(event){
+    if (!event) { return; }
+    if (typeof event == "string") { event = { type: event }; }
+    if (event.type) { this.history.push(event.type); }
     if (this.history.length >= 50) { this.history.shift(); }
+    if (this.options.debug === true) { console.log(event.type); }
   }
 
 });
