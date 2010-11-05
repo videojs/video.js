@@ -131,14 +131,10 @@ var VideoJS = JRClass.extend({
     this.video.addEventListener('progress', this.onProgress.context(this), false);
     // Set interval for load progress using buffer watching method
     this.watchBuffer = setInterval(this.updateBufferedTotal.context(this), 33);
-    // Listen for Video time update
+    
     this.video.addEventListener('timeupdate', this.onTimeUpdate.context(this), false);
-
-    // When seeking occurs
     this.video.addEventListener("seeking", this.onSeeking.context(this), false);
-    // When seeking has ended
     this.video.addEventListener("seeked", this.onSeeked.context(this), false);
-
     this.video.addEventListener("canplay", this.onCanPlay.context(this), false);
     this.video.addEventListener("canplaythrough", this.onCanPlayThrough.context(this), false);
     this.video.addEventListener("playing", this.onPlaying.context(this), false);
@@ -286,6 +282,7 @@ var VideoJS = JRClass.extend({
         setTimeout(this.loadInterface.context(this),0);
         return;
       }
+      console.log(100)
     }
     this.positionBox();
     if(this.video.paused !== false) { this.showBigPlayButton(); }
@@ -411,8 +408,8 @@ var VideoJS = JRClass.extend({
     clearInterval(this.spinnerInterval);
     this.spinnerInterval = setInterval(function(){ this.rotateSpinner(); }.context(this), 100);
   },
-  hideSpinner: function(){ 
-    this.spinner.style.display = "none"; 
+  hideSpinner: function(){
+    this.spinner.style.display = "none";
     clearInterval(this.spinnerInterval);
   },
   spinnerRotated: 0,
@@ -613,6 +610,8 @@ var VideoJS = JRClass.extend({
   },
 
   onWaiting: function(event){
+    // Safari sometimes triggers waiting in appropriately
+    // Like after video has played, any you play again.
     this.showSpinner();
   },
 
@@ -630,7 +629,7 @@ var VideoJS = JRClass.extend({
   onCanPlayThrough: function(event){
     this.hideSpinner();
   },
-  
+
   onPlaying: function(event){
     this.hideSpinner();
   },
@@ -997,6 +996,10 @@ var VideoJS = JRClass.extend({
   },
 
   onTimeUpdate: function(){
+
+    // Safari sometimes calls waiting and doesn't recover
+    // if(this.spinner.style.display == "block") { this.hideSpinner(); }
+
     // show the subtitles
     if (this.subtitles) {
       var x = this.currentSubtitlePosition;

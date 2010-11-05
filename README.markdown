@@ -134,6 +134,7 @@ Changelog
 - Feature: Added loading spinner.
 - Feature: Added volume() function to get and set volume through the player.
 - Fix: Fix issue where FF would loop video in background when ended.
+- Fix: Bug in Chrome that shows poster & plays audio if you set currentTime too quickly.
 
 1.1.3
 
