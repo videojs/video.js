@@ -137,6 +137,7 @@ Changelog
 - Fix: Fix issue where FF would loop video in background when ended.
 - Fix: Bug in Chrome that shows poster & plays audio if you set currentTime too quickly.
 - Fix: Bug in Safari where waiting is triggered and shows spinner when not needed
+- Fix: Updated to show links if only unplayable sources and no Flash.
 
 1.1.3
 

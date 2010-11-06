@@ -63,8 +63,11 @@ var VideoJS = JRClass.extend({
     this.linksFallback = this.getLinksFallback();
 
     // Hide download links if video can play
+    if (VideoJS.browserSupportsVideo() && this.canPlaySource()) {
+      this.hideLinksFallback();
+    // Hide if using Flash and version is supported
     // Flash fallback can't be found in IE. Maybe add video as an element like modernizr so it can contain elements.
-    if(VideoJS.browserSupportsVideo() || ((this.flashFallback || VideoJS.isIE()) && this.flashVersionSupported())) {
+    } else if ((this.flashFallback || VideoJS.isIE()) && this.flashVersionSupported()) {
       this.hideLinksFallback();
     }
 
@@ -563,16 +566,21 @@ var VideoJS = JRClass.extend({
   },
 
   canPlaySource: function(){
+    // Cache Result
+    if (this.canPlaySourceResult) { return this.canPlaySourceResult; }
+    // Loop through sources and check if any can play
     var children = this.video.children;
     for (var i=0,j=children.length; i<j; i++) {
       if (children[i].tagName.toUpperCase() == "SOURCE") {
         var canPlay = this.video.canPlayType(children[i].type);
         if(canPlay == "probably" || canPlay == "maybe") {
           this.firstPlayableSource = children[i];
+          this.canPlaySourceResult = true;
           return true;
         }
       }
     }
+    this.canPlaySourceResult = false;
     return false;
   },
 
