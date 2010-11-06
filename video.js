@@ -1,6 +1,6 @@
 /*
 VideoJS - HTML5 Video Player
-v1.1.3
+v1.1.4
 
 This file is part of VideoJS. Copyright 2010 Zencoder, Inc.
 
@@ -1007,7 +1007,7 @@ var VideoJS = JRClass.extend({
   onTimeUpdate: function(){
 
     // Safari sometimes calls waiting and doesn't recover
-    // if(this.spinner.style.display == "block") { this.hideSpinner(); }
+    if(this.spinner.style.display == "block") { this.hideSpinner(); }
 
     // show the subtitles
     if (this.subtitles) {
