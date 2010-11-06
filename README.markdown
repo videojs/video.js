@@ -49,7 +49,7 @@ Change the video and image files to your own. You can even swap out the Flash Fa
         <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm; codecs="vp8, vorbis"'>
         <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg; codecs="theora, vorbis"'>
         <!-- Flash Fallback. Use any flash video player here. Make sure to keep the vjs-flash-fallback class. -->
-        <object class="vjs-flash-fallback" width="640" height="264" type="application/x-shockwave-flash"
+        <object id="flash_fallback_1" class="vjs-flash-fallback" width="640" height="264" type="application/x-shockwave-flash"
           data="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf">
           <param name="movie" value="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf" />
           <param name="allowfullscreen" value="true" />
