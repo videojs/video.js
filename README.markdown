@@ -138,6 +138,7 @@ Changelog
 - Fix: Bug in Chrome that shows poster & plays audio if you set currentTime too quickly.
 - Fix: Bug in Safari where waiting is triggered and shows spinner when not needed
 - Fix: Updated to show links if only unplayable sources and no Flash.
+- Fix: Issue where if play button was loaded after play, it wouldn't hide.
 
 1.1.3
 
