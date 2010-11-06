@@ -22,6 +22,9 @@ video.video-js { background-color: #000; position: relative; }
 /* Subtiles Style */
 .video-js-box .vjs-subtitles { color:#fff; font-size: 20px; text-align: center; bottom: 20px; left: 0; right: 0; position: absolute; z-index: 1002; }
 
+/* Styles Loaded Check */
+.vjs-styles-check { height: 5px; z-index: -1; }
+
 /* DEFAULT SKIN (override in another file)
 ================================================================================
 Using all CSS to draw the controls. Images could be used if desired.

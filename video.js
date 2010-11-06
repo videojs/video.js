@@ -104,6 +104,8 @@ var VideoJS = JRClass.extend({
 
     // Store amount of video loaded
     this.percentLoaded = 0;
+    
+    this.buildStylesCheckDiv();
 
     this.buildPoster();
     this.showPoster();
@@ -282,8 +284,8 @@ var VideoJS = JRClass.extend({
         setTimeout(this.loadInterface.context(this),0);
         return;
       }
-      console.log(100)
     }
+    this.hideStylesCheckDiv();
     this.positionBox();
     if(this.video.paused !== false) { this.showBigPlayButton(); }
     if(this.options.showControlsAtStart) {
@@ -421,6 +423,15 @@ var VideoJS = JRClass.extend({
     this.spinnerRotated += 45;
   },
 
+  /* Styles Check - Check if styles are loaded
+  ================================================================================ */
+  buildStylesCheckDiv: function(){
+    this.stylesCheckDiv = _V_.createElement("div", { className: "vjs-styles-check" });
+    this.stylesCheckDiv.style.position = "absolute";
+    this.box.appendChild(this.stylesCheckDiv);
+  },
+  hideStylesCheckDiv: function(){ this.stylesCheckDiv.style.display = "none"; },
+
   // Get the download links block element
   getLinksFallback: function(){
     return this.box.getElementsByTagName("P")[0];
@@ -480,9 +491,7 @@ var VideoJS = JRClass.extend({
   // Best way I can think of to test this is to check if the width of all the controls are the same.
   // If so, hide the controller and delay positioning them briefly.
   stylesHaveLoaded: function(){
-    if (this.playControl.offsetWidth == this.progressControl.offsetWidth
-     && this.playControl.offsetWidth == this.timeControl.offsetWidth
-     && this.playControl.offsetWidth == this.volumeControl.offsetWidth) {
+    if (this.stylesCheckDiv.offsetHeight != 5) {
        return false;
     } else {
       return true;
