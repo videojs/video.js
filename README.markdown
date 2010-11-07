@@ -132,7 +132,7 @@ Changelog
 1.1.4
 
 - Feature: Added loading spinner.
-- Improved styles loaded checking.
+- Feature: Improved styles loaded checking.
 - Feature: Added volume() function to get and set volume through the player.
 - Fix: Fix issue where FF would loop video in background when ended.
 - Fix: Bug in Chrome that shows poster & plays audio if you set currentTime too quickly.
