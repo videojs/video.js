@@ -34,7 +34,6 @@ var VideoJS = JRClass.extend({
     } else {
       this.video = element;
     }
-
     // Store reference to player on the video element.
     // So you can acess the player later: document.getElementById("video_id").player.play();
     this.video.player = this;
@@ -48,40 +47,32 @@ var VideoJS = JRClass.extend({
       flashVersion: 9, // Required flash version for fallback
       linksHiding: true, // Hide download links when video is supported
       flashIsDominant: false, // Always use Flash when available
-      useBrowserControls: false // Dont' use the video JS controls (iPhone)
+      useBrowserControls: false, // Dont' use the video JS controls (iPhone)
+      players: ["html5", "flashObject", "links"] // Players and order to use them
     };
-
     // Override default options with global options
     if (typeof VideoJS.options == "object") { _V_.merge(this.options, VideoJS.options); }
-
-    // Override global options with options specific to this video
+    // Override default & global options with options specific to this player
     if (typeof setOptions == "object") { _V_.merge(this.options, setOptions); }
 
     // Store reference to embed code pieces
     this.box = this.video.parentNode;
-    this.flashFallback = this.getFlashFallback();
+    this.flashObject = this.getFlashObject();
     this.linksFallback = this.getLinksFallback();
+    this.hideLinksFallback(); // Will be shown again if "links" player is used
 
-    // Hide download links if video can play
-    if (VideoJS.browserSupportsVideo() && this.canPlaySource()) {
-      this.hideLinksFallback();
-    // Hide if using Flash and version is supported
-    // Flash fallback can't be found in IE. Maybe add video as an element like modernizr so it can contain elements.
-    } else if ((this.flashFallback || VideoJS.isIE()) && this.flashVersionSupported()) {
-      this.hideLinksFallback();
-    }
-
-    // Check if browser can play HTML5 video
-    if (VideoJS.browserSupportsVideo()) {
-      // Force flash fallback when there's no supported source, or flash is dominant
-      if (!this.canPlaySource() || (this.options.flashIsDominant && this.flashVersionSupported())) {
-        this.replaceWithFlash();
-        return;
+    // Loop through the player names list in options, "html5" etc.
+    // For each player name, initialize the player with that name under VideoJS.players
+    // If the player successfully initializes, we're done
+    // If not, try the next player in the list
+    for (var i=0,players=this.options.players,j=players.length; i<j; i++) {
+      if((VideoJS.players[players[i]].init.context(this))()) {
+        break;
       }
-    } else {
-      return;
     }
+  },
 
+  html5Init: function(){
     // Force the video source
     // Helps fix loading bugs in a handful of devices, like the iPad/iPhone poster bug
     // And iPad/iPhone javascript include location bug
@@ -93,35 +84,20 @@ var VideoJS = JRClass.extend({
       return; // Use the devices default controls
     }
 
-    if (!this.options.useBrowserControls) {
-      // Hide default controls
-      this.video.controls = false;
-    }
+    if (!this.options.useBrowserControls) { this.video.controls = false; }
+    if (this.options.controlsBelow) { _V_.addClass(this.box, "vjs-controls-below"); }
+    this.fixPreloading(); // Support older browsers that used autobuffer
+    this.percentLoaded = 0; // Store amount of video loaded
 
-    // Support older browsers that used autobuffer
-    this.fixPreloading();
-
-    if (this.options.controlsBelow) {
-      _V_.addClass(this.box, "vjs-controls-below");
-    }
-
-    // Store amount of video loaded
-    this.percentLoaded = 0;
-    
-    this.buildStylesCheckDiv();
-
+    this.buildStylesCheckDiv(); // Used to check if style are loaded
     this.buildPoster();
-    this.showPoster();
-
     this.buildBigPlayButton();
     this.buildSpinner();
     this.buildController();
-    this.loadInterface();
+    this.loadInterface(); // Show everything once styles are loaded
 
-    // Position & show controls when data is loaded
     this.video.addEventListener("loadeddata", this.onLoadedData.context(this), false);
     this.video.addEventListener("loadstart", this.onLoadStart.context(this), false);
-
     // Listen for when the video is played
     this.video.addEventListener("play", this.onPlay.context(this), false);
     // Listen for when the video is paused
@@ -136,7 +112,6 @@ var VideoJS = JRClass.extend({
     this.video.addEventListener('progress', this.onProgress.context(this), false);
     // Set interval for load progress using buffer watching method
     this.watchBuffer = setInterval(this.updateBufferedTotal.context(this), 33);
-    
     this.video.addEventListener('timeupdate', this.onTimeUpdate.context(this), false);
     this.video.addEventListener("seeking", this.onSeeking.context(this), false);
     this.video.addEventListener("seeked", this.onSeeked.context(this), false);
@@ -170,7 +145,6 @@ var VideoJS = JRClass.extend({
     this.volumeControl.addEventListener("mouseup", this.onVolumeControlMouseUp.context(this), false);
     // Set the display to the initial volume
     this.updateVolumeDisplay();
-
     // Listen for clicks on the button
     this.fullscreenControl.addEventListener("click", this.onFullscreenControlClick.context(this), false);
 
@@ -188,7 +162,6 @@ var VideoJS = JRClass.extend({
 
     // Block hiding when over controls
     this.controls.addEventListener("mousemove", this.onControlsMouseMove.context(this), false);
-
     // Release controls hiding block, and call VideoMouseOut
     this.controls.addEventListener("mouseout", this.onControlsMouseOut.context(this), false);
 
@@ -240,7 +213,6 @@ var VideoJS = JRClass.extend({
       document.removeEventListener("mousemove", this.onVolumeMouseMove, false);
       document.removeEventListener("mouseup", this.onVolumeMouseUp, false);
     }.context(this);
-
   },
 
   // Array to track errors
@@ -275,7 +247,7 @@ var VideoJS = JRClass.extend({
     return this;
   },
   volume: function(newVolume){
-    if(newVolume != undefined) { this.setVolume(newVolume); }
+    if (newVolume != undefined) { this.setVolume(newVolume); }
     return this.video.volume;
   },
 
@@ -290,14 +262,14 @@ var VideoJS = JRClass.extend({
     }
     this.hideStylesCheckDiv();
     this.positionBox();
-    if(this.video.paused !== false) { this.showBigPlayButton(); }
-    if(this.options.showControlsAtStart) {
-      this.showController();
-    }
+    this.showPoster();
+    this.showBigPlayButton();
+    if (this.options.showControlsAtStart) { this.showController(); }
   },
 
+  /* Custom HTML5 Controller
+  ================================================================================ */
   buildController: function(){
-
     /* Creating this HTML
       <ul class="vjs-controls">
         <li class="vjs-play-control vjs-play">
@@ -381,6 +353,26 @@ var VideoJS = JRClass.extend({
     });
     this.controls.appendChild(this.fullscreenControl);
   },
+  showController: function(){
+    if (!this.options.showControlsAtStart && !this.hasPlayed) { return; }
+    this.controls.style.display = "block";
+    this.positionController();
+  },
+  // Place controller relative to the video's position
+  positionController: function(){
+    // Make sure the controls are visible
+    if (this.controls.style.display == 'none') { return; }
+
+    if (this.options.controlsBelow) {
+      this.controls.style.top = this.video.offsetHeight + "px";
+    } else {
+      this.controls.style.top = (this.video.offsetHeight - this.controls.offsetHeight) + "px";
+    }
+    this.sizeProgressBar();
+  },
+  hideController: function(){
+    if (this.options.controlsHiding && !this.mouseIsOverControls) { this.controls.style.display = "none"; }
+  },
 
   /* Big Play Button
   ================================================================================ */
@@ -394,7 +386,9 @@ var VideoJS = JRClass.extend({
     });
     this.video.parentNode.appendChild(this.bigPlayButton);
   },
-  showBigPlayButton: function(){ this.bigPlayButton.style.display = "block"; },
+  showBigPlayButton: function(){ 
+    if (this.video.paused !== false) { this.bigPlayButton.style.display = "block"; }
+  },
   hideBigPlayButton: function(){ this.bigPlayButton.style.display = "none"; },
 
   /* Spinner (Loading)
@@ -428,35 +422,51 @@ var VideoJS = JRClass.extend({
 
   /* Styles Check - Check if styles are loaded
   ================================================================================ */
+  // Sometimes the CSS styles haven't been applied to the controls yet
+  // when we're trying to calculate the height and position them correctly.
+  // This causes a flicker where the controls are out of place.
   buildStylesCheckDiv: function(){
     this.stylesCheckDiv = _V_.createElement("div", { className: "vjs-styles-check" });
     this.stylesCheckDiv.style.position = "absolute";
     this.box.appendChild(this.stylesCheckDiv);
   },
   hideStylesCheckDiv: function(){ this.stylesCheckDiv.style.display = "none"; },
-
-  // Get the download links block element
-  getLinksFallback: function(){
-    return this.box.getElementsByTagName("P")[0];
+  stylesHaveLoaded: function(){
+    if (this.stylesCheckDiv.offsetHeight != 5) {
+       return false;
+    } else {
+      return true;
+    }
   },
 
+  /* Download Links Fallback
+  ================================================================================ */
+  // Get the download links block element
+  getLinksFallback: function(){ return this.box.getElementsByTagName("P")[0]; },
   // Hide no-video download paragraph
   hideLinksFallback: function(){
     if (this.options.linksHiding && this.linksFallback) { this.linksFallback.style.display = "none"; }
   },
-
-  getFlashFallback: function(){
-    if (VideoJS.isIE()) { return; }
-    var children = this.box.getElementsByClassName("vjs-flash-fallback");
-    for (var i=0,j=children.length; i<j; i++) {
-      return children[i];
-    }
+  // Hide no-video download paragraph
+  showLinksFallback: function(){
+    if (this.linksFallback) { this.linksFallback.style.display = "block"; }
   },
 
+  /* Flash Object Fallback
+  ================================================================================ */
+  // Get Flash Fallback object element from Embed Code
+  getFlashObject: function(){
+    var objects = this.video.getElementsByTagName("OBJECT");
+    for (var i=0,j=objects.length; i<j; i++) {
+      if (objects[i].className == "vjs-flash-fallback") {
+        return  objects[i];
+      }
+    }
+  },
   replaceWithFlash: function(){
-    // this.flashFallback = this.video.removeChild(this.flashFallback);
-    if (this.flashFallback) {
-      this.box.insertBefore(this.flashFallback, this.video);
+    // this.flashObject = this.video.removeChild(this.flashObject);
+    if (this.flashObject) {
+      this.box.insertBefore(this.flashObject, this.video);
       this.video.style.display = "none"; // Removing it was breaking later players
     }
   },
@@ -479,45 +489,6 @@ var VideoJS = JRClass.extend({
 
     this.positionController();
     this.positionPoster();
-  },
-
-  // Show the controller
-  showController: function(){
-    if (!this.options.showControlsAtStart && !this.hasPlayed) { return; }
-    this.controls.style.display = "block";
-    this.positionController();
-  },
-
-  // Sometimes the CSS styles haven't been applied to the controls yet
-  // when we're trying to calculate the height and position them correctly.
-  // This causes a flicker where the controls are out of place.
-  // Best way I can think of to test this is to check if the width of all the controls are the same.
-  // If so, hide the controller and delay positioning them briefly.
-  stylesHaveLoaded: function(){
-    if (this.stylesCheckDiv.offsetHeight != 5) {
-       return false;
-    } else {
-      return true;
-    }
-  },
-
-  // Place controller relative to the video's position
-  positionController: function(){
-    // Make sure the controls are visible
-    if (this.controls.style.display == 'none') { return; }
-
-    if (this.options.controlsBelow) {
-      this.controls.style.top = this.video.offsetHeight + "px";
-    } else {
-      this.controls.style.top = (this.video.offsetHeight - this.controls.offsetHeight) + "px";
-    }
-
-    this.sizeProgressBar();
-  },
-
-  // Hide the controller
-  hideController: function(){
-    if (this.options.controlsHiding && !this.mouseIsOverControls) { this.controls.style.display = "none"; }
   },
 
   // Update poster source from attribute or fallback image
@@ -1198,6 +1169,38 @@ _V_.bindDOMReady();
 // Functions that don't apply to individual videos.
 ////////////////////////////////////////////////////////////////////////////////
 
+VideoJS.players = {
+  html5: {
+    init: function(){
+      if (VideoJS.browserSupportsVideo() && this.canPlaySource()) {
+        this.html5Init();
+        return true;
+      } else {
+        return false;
+      }
+    }
+  },
+
+  flashObject: {
+    init: function(){
+      // Check if object exists & Flash Player version is supported
+      if (this.flashObject && this.flashVersionSupported()) {
+        this.replaceWithFlash();
+        return true;
+      } else {
+        return false;
+      }
+    }
+  },
+
+  links: {
+    init: function(){
+      this.showLinksFallback();
+      return true;
+    }
+  }
+}
+
 // Add VideoJS to all video tags with the video-js class when the DOM is ready
 VideoJS.setupAllWhenReady = function(options){
   // Options is stored globally, and added ot any new player on init
@@ -1289,6 +1292,10 @@ VideoJS.getFlashVersion = function(){
   return VideoJS.flashVersion;
 };
 
+VideoJS.flashVersionSupported = function(version){
+  return VideoJS.getFlashVersion() >= version;
+};
+
 // Browser & Device Checks
 VideoJS.isIE = function(){ return !+"\v1"; };
 VideoJS.isIpad = function(){ return navigator.userAgent.match(/iPad/i) !== null; };
@@ -1309,6 +1316,9 @@ Function.prototype.context = function(obj) {
   };
   return temp;
 };
+
+// Shim to make Video tag valid in IE
+if(VideoJS.isIE()) { document.createElement("video"); }
 
 // jQuery Plugin
 if (window.jQuery) {
