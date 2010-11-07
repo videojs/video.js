@@ -129,6 +129,10 @@ Set options when setting up the videos. The defaults are shown here.
 
 Changelog
 ---------
+1.1.5
+
+
+
 1.1.4
 
 - Feature: Added loading spinner.
