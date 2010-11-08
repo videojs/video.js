@@ -96,7 +96,7 @@ var VideoJS = JRClass.extend({
     this.buildPoster();
     this.buildBigPlayButton();
     this.buildSpinner();
-    this.buildController();
+    this.buildControlBar();
     this.loadInterface(); // Show everything once styles are loaded
 
     /* Initialize Subtitles
@@ -154,7 +154,7 @@ var VideoJS = JRClass.extend({
     this.positionBox();
     this.showPoster();
     if (this.video.paused !== false) { this.showBigPlayButton(); }
-    if (this.options.showControlsAtStart) { this.showController(); }
+    if (this.options.showControlsAtStart) { this.showControlBar(); }
   },
 
   /* VideoJS Box - Holds all elements
@@ -174,13 +174,13 @@ var VideoJS = JRClass.extend({
         this.box.style.height = this.video.offsetHeight + this.controls.offsetHeight + "px";
       }
     }
-    this.positionController();
+    this.positionControlBar();
     this.positionPoster();
   },
 
   /* Control Bar
   ================================================================================ */
-  buildController: function(){
+  buildControlBar: function(){
     /* Creating this HTML
       <ul class="vjs-controls">
         <li class="vjs-play-control vjs-play">
@@ -329,13 +329,13 @@ var VideoJS = JRClass.extend({
     // Listen for the mouse moving out of the video. Used to hide the controller.
     this.box.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
   },
-  showController: function(){
+  showControlBar: function(){
     if (!this.options.showControlsAtStart && !this.hasPlayed) { return; }
     this.controls.style.display = "block";
-    this.positionController();
+    this.positionControlBar();
   },
   // Place controller relative to the video's position
-  positionController: function(){
+  positionControlBar: function(){
     // Make sure the controls are visible
     if (this.controls.style.display == 'none') { return; }
 
@@ -347,7 +347,7 @@ var VideoJS = JRClass.extend({
     this.updatePlayProgress();
     this.updateLoadProgress();
   },
-  hideController: function(){
+  hideControlBar: function(){
     if (this.options.controlsHiding && !this.mouseIsOverControls) { this.controls.style.display = "none"; }
   },
   onControlsMouseMove: function(){
@@ -360,9 +360,9 @@ var VideoJS = JRClass.extend({
     this.onVideoMouseOut(event);
   },
   onVideoMouseMove: function(){
-    this.showController();
+    this.showControlBar();
     clearInterval(this.mouseMoveTimeout);
-    this.mouseMoveTimeout = setTimeout(function(){ this.hideController(); }.context(this), 4000);
+    this.mouseMoveTimeout = setTimeout(function(){ this.hideControlBar(); }.context(this), 4000);
   },
   onVideoMouseOut: function(event){
     // Prevent flicker by making sure mouse hasn't left the video
@@ -371,7 +371,7 @@ var VideoJS = JRClass.extend({
       parent = parent.parentNode;
     }
     if (parent !== this.video && parent !== this.controls) {
-      this.hideController();
+      this.hideControlBar();
     }
   },
   
@@ -626,7 +626,7 @@ var VideoJS = JRClass.extend({
     this.positionBox();
   },
   onWindowResize: function(event){ // Removeable
-    this.positionController();
+    this.positionControlBar();
   },
   // Create listener for esc key while in full screen mode
   onEscKey: function(event){ // Removeable
@@ -988,14 +988,14 @@ var VideoJS = JRClass.extend({
     this.box.width = width;
     // Width isn't working for the poster
     this.poster.style.width = width+"px";
-    this.positionController();
+    this.positionControlBar();
     return this;
   },
   height: function(height){
     this.video.height = height;
     this.box.height = height;
     this.poster.style.height = height+"px";
-    this.positionController();
+    this.positionControlBar();
     return this;
   },
   volume: function(newVolume){
