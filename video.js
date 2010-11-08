@@ -130,7 +130,8 @@ var VideoJS = JRClass.extend({
     for (var i=0,j=children.length; i<j; i++) {
       if (children[i].tagName.toUpperCase() == "SOURCE") {
         var canPlay = this.video.canPlayType(children[i].type);
-        if(canPlay == "probably" || canPlay == "maybe") {
+        if(canPlay == "probably" || canPlay == "maybe"
+          || (VideoJS.isAndroid() && children[i].src.match(/\.(mp4|m4v)$/i))) {
           this.firstPlayableSource = children[i];
           this.canPlaySourceResult = true;
           return true;
@@ -387,7 +388,12 @@ var VideoJS = JRClass.extend({
     if (this.video.paused) {
       this.video.play();
     } else {
-      this.video.pause();
+      // Android has a problem with "paused" not returning correctly.
+      if (!this.hasPlayed && VideoJS.isAndroid) { 
+        this.video.play(); return; 
+      } else {
+        this.video.pause();
+      }
     }
   },
   // When the video is played
@@ -1283,8 +1289,11 @@ if (window.jQuery) {
         VideoJS.setup(this, options);
       });
       return this;
-     };
-   })(jQuery);
+    };
+    $.fn.player = function() {
+      return this[0].player;
+    };
+  })(jQuery);
 }
 
 
