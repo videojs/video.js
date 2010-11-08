@@ -48,7 +48,8 @@ var VideoJS = JRClass.extend({
       flashVersion: 9, // Required flash version for fallback
       linksHiding: true, // Hide download links when video is supported
       flashIsDominant: false, // Always use Flash when available
-      useBrowserControls: false // Dont' use the video JS controls (iPhone)
+      useBrowserControls: false, // Dont' use the video JS controls (iPhone)
+      afterPositionComplete: null //Callback to get fired after poistioning is complete
     };
 
     // Override default options with global options
@@ -479,6 +480,7 @@ var VideoJS = JRClass.extend({
 
     this.positionController();
     this.positionPoster();
+    this.positionCompleteCallback();
   },
 
   // Show the controller
@@ -671,6 +673,12 @@ var VideoJS = JRClass.extend({
       }
     } else {
       clearInterval(this.watchBuffer);
+    }
+  },
+
+  positionCompleteCallback: function(){
+    if(typeof(this.options.afterPositionComplete) == 'function') {
+        this.options.afterPositionComplete();
     }
   },
 
