@@ -15,13 +15,16 @@ video.video-js { background-color: #000; position: relative; }
 /* Poster Style */
 .video-js-box img.vjs-poster { display: block; position: absolute; left: 0; top: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
 /* Subtiles Style */
-.video-js-box .vjs-subtitles { color:#fff; font-size: 20px; text-align: center; bottom: 20px; left: 0; right: 0; position: absolute; z-index: 1004; }
+.video-js-box .vjs-subtitles { color:#fff; font-size: 20px; text-align: center; bottom: 20px; left: 0; right: 0; position: absolute; }
 
 /* Fullscreen styles for main elements */
 .video-js-box.vjs-fullscreen { position: fixed; left: 0; top: 0; right: 0; bottom: 0; overflow: hidden; z-index: 1000; }
-.video-js-box.vjs-fullscreen video.video-js { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1001; }
-.video-js-box.vjs-fullscreen img.vjs-poster { z-index: 1002; }
+.video-js-box.vjs-fullscreen video.video-js { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; }
+.video-js-box.vjs-fullscreen img.vjs-poster { z-index: 1001; }
+.video-js-box.vjs-fullscreen .vjs-spinner { z-index: 1002; }
 .video-js-box.vjs-fullscreen ul.vjs-controls { z-index: 1003; }
+.video-js-box.vjs-fullscreen .vjs-big-play-button { z-index: 1003; }
+.video-js-box.vjs-fullscreen .vjs-subtitles { z-index: 1004; }
 
 /* Styles Loaded Check */
 .vjs-styles-check { height: 5px; z-index: -1; }
@@ -180,7 +183,7 @@ li.vjs-fullscreen-control ul li:nth-child(4) { border-bottom: 6px solid #fff; bo
 ---------------------------------------------------------*/
 div.vjs-big-play-button {
   display: none; /* Start hidden */
-  position: absolute; top: 50%; left: 50%; width: 80px; height: 80px; margin: -43px 0 0 -43px; z-index: 1003; text-align: center; vertical-align: center; cursor: pointer !important;
+  position: absolute; top: 50%; left: 50%; width: 80px; height: 80px; margin: -43px 0 0 -43px; text-align: center; vertical-align: center; cursor: pointer !important;
   border: 3px solid #fff; opacity: 0.9;
   border-radius: 20px; -webkit-border-radius: 20px; -moz-border-radius: 20px;
   
@@ -209,7 +212,7 @@ div.vjs-big-play-button span {
 ---------------------------------------------------------*/
 /* CSS Spinners by Kilian Valkhof - http://kilianvalkhof.com/2010/css-xhtml/css3-loading-spinners-without-images/ */
 
-.vjs-spinner { display: none; z-index: 1002; position: absolute; top: 50%; left: 50%; width: 100px; height: 100px;
+.vjs-spinner { display: none; position: absolute; top: 50%; left: 50%; width: 100px; height: 100px;
   transform: scale(0.5); -webkit-transform:scale(0.5); -moz-transform:scale(0.5);
 /*  -webkit-animation-name: rotateThis;
   -webkit-animation-duration:2s;
