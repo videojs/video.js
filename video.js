@@ -944,59 +944,96 @@ var VideoJS = JRClass.extend({
       };
     }
     var request = new XMLHttpRequest();
+    var subType = this.subtitlesSource ? this.subtitlesSource.split('.').pop().toLowerCase() : "";
+    var parser = XHRFormatter(request, subType);
     request.open("GET",this.subtitlesSource);
     request.onreadystatechange = function() {
       if (request.readyState == 4 && request.status == 200) {
-        this.parseSubtitles(request.responseText);
+        this.parseSubtitles(request.responseText, parser);
       }
     }.context(this);
     request.send();
   },
 
-  parseSubtitles: function(subText) {
-    var lines = subText.replace("\r",'').split("\n");
+  parseSubtitles: function(subText, parser) {
     this.subtitles = [];
     this.currentSubtitlePosition = 0;
-
     var i = 0;
-    while(i<lines.length) {
-      // define the current subtitle object
-      var subtitle = {};
-      // get the number
-      subtitle.id = lines[i++];
-      if (!subtitle.id) {
-        break;
-      }
+    var items;
+    
+    switch(parser.getType()) {
+      case "srt":
+        items = parser.select(subText.replace("\r",''), "\n");
+        
+        while(i<items.length) {
+          // define the current subtitle object
+          var subtitle = {};
+          // get the number
+          subtitle.id = items[i++];
+          if (!subtitle.id) {
+            break;
+          }
 
-      // get time
-      var time = lines[i++].split(" --> ");
-      subtitle.startTime = this.parseSubtitleTime(time[0]);
-      subtitle.endTime = this.parseSubtitleTime(time[1]);
+          // get time
+          var time = items[i++].split(" --> ");
+          subtitle.startTime = this.parseSubtitleTime(time[0]);
+          subtitle.endTime = this.parseSubtitleTime(time[1]);
 
-      // get subtitle text
-      var text = [];
-      while(lines[i].length>0 && lines[i]!="\r") {
-        text.push(lines[i++]);
-      }
-      subtitle.text = text.join('<br/>');
+          // get subtitle text
+          var text = [];
+          while(items[i].length>0 && items[i]!="\r") {
+            text.push(items[i++]);
+          }
+          subtitle.text = text.join('<br/>');
 
-      // add this subtitle
-      this.subtitles.push(subtitle);
+          // add this subtitle
+          this.subtitles.push(subtitle);
 
-      // ignore the blank line
-      i++;
+          // ignore the blank line
+          i++;
+        }
+      break;
+      case "ttxt":
+        // Find all TextSample nodes within root TextStream node, must parse first
+        items = parser.select(parser.format(subText), "//TextStream/TextSample");
+        var item; // For iteration through returned NodeList
+        
+        for(item in items) {
+          var subtitle = {};
+          var textSample = items[item];
+          
+          subtitle.id = ++i; // Compatibility with SRT format (id) field
+          subtitle.startTime = this.parseSubtitleTime(textSample.getAttribute('sampleTime'), '.');
+          subtitle.text = textSample.getAttribute('text');
+          
+          this.subtitles.push(subtitle);
+        }
+        
+        // Calculate end times as just before start of following subtitle start
+        var subLen = this.subtitles.length;
+        var maxTime = 0;
+        
+        for(i=0;i<subLen-1;i++) {
+          var item = this.subtitles[i+1];
+          this.subtitles[i].endTime = item.startTime-0.001;
+          maxTime = item.startTime;
+        }
+        
+        // Put end time on last subtitle artificially as maximum value
+        this.subtitles[this.subtitles.length-1].endTime = Number.MAX_VALUE;
+      break;
     }
   },
 
-  parseSubtitleTime: function(timeText) {
+  parseSubtitleTime: function(timeText,decSep) {
     var parts = timeText.split(':');
     var time = 0;
     // hours => seconds
     time += parseFloat(parts[0])*60*60;
     // minutes => seconds
     time += parseFloat(parts[1])*60;
-    // get seconds
-    var seconds = parts[2].split(',');
+    // get seconds. Use ',' if no decimal separator is supplied
+    var seconds = parts[2].split(decSep || ',');
     time += parseFloat(seconds[0]);
     // add miliseconds
     time = time + parseFloat(seconds[1])/1000;
@@ -1322,4 +1359,62 @@ if (window.jQuery) {
    })(jQuery);
 }
 
-
+// Wrapper for browser-specific work in ensuring data from XmlHttpRequest is returned in proper format
+// Params: request is XmlHttpRequest, type is file extension
+// Presently supports formatting TTXT as XML. Can handle SRT as text.
+function XHRFormatter(request, type) {
+  var canForce = request.overrideMimeType;
+  var forceToXML = canForce && type === 'ttxt';
+  var isXml = forceToXML || type === 'xml';
+  var isText = !isXml && (type === 'srt' || type === 'txt' || type === '');
+  
+  if (forceToXML) {
+    request.overrideMimeType('text/xml');
+  }
+  
+  return {
+    // Select elements from aRef based on expression aExpr
+    // aRef is whatever type is returned by format (plain text or XML Node)
+    // aExpr is a query string (delimiter to split on for text, XPath for xml)
+    // For XML, aRef is reference node, aExpr is XPath string
+    // For Text, aRef is a string, aExpr is a string to split on
+    select: function(aRef, aExpr) {
+      if (isXml) {
+        var xpe = aRef.ownerDocument || aRef;
+        
+        if (xpe.createNSResolver && xpe.evaluate) {
+          // Thanks to https://developer.mozilla.org/en/Using_XPath
+          var nsResolver = xpe.createNSResolver(xpe.documentElement);
+          var result = xpe.evaluate(aExpr, aRef, nsResolver, 0, null);  
+          var found = [];  
+          var res;  
+          while (res = result.iterateNext())  
+            found.push(res);  
+          return found;  
+        } else if (xpe.selectNodes) { // IE
+          return xpe.selectNodes(aExpr);
+        }
+      } else if (isText) {
+        return aRef.split(aExpr);
+      }
+    },
+    
+    getType: function() { return type; },
+    
+    format: function(str) {
+      if (isXml) { // Return str as xml
+        if (canForce || !forceToXML) { // Mime type has been overriden as XML or is XML by default
+          return request.responseXML;
+        } else if (typeof ActiveXObject !== 'undefined') { // IE, mime type not overriden, must parse into XML
+          var doc = new ActiveXObject("MSXML.DomDocument");
+          doc.loadXML(str);
+          return doc;
+        } else {
+          throw new Error("Can not process as XML!");
+        }
+      } else if (isText) {
+        return request.responseText;
+      }
+    }
+  }
+}

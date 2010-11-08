@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- GPAC 3GPP Text Stream -->
+
+<TextStream version="1.0">
+<TextStreamHeader width="0" height="0" layer="0" translation_x="0" translation_y="0">
+<TextSampleDescription horizontalJustification="center" verticalJustification="bottom" backColor="0 0 0 0" verticalText="no" fillTextRegion="no" continuousKaraoke="no" scroll="None">
+
+<FontTable>
+<FontTableEntry fontName="Georgia" fontID="1"/>
+</FontTable>
+
+<TextBox top="0" left="0" bottom="0" right="0"/>
+<Style styles="Normal" fontID="1" fontSize="36" color="ff ff ff ff"/>
+</TextSampleDescription>
+</TextStreamHeader>
+
+<TextSample sampleTime="00:00:00.000" text=""></TextSample>
+<TextSample sampleTime="00:00:02.400" text="[Background Music Playing]"></TextSample>
+<TextSample sampleTime="00:00:05.200" text=""></TextSample>
+<TextSample sampleTime="00:00:15.712" text="Heay!!"></TextSample>
+<TextSample sampleTime="00:00:17.399" text=""></TextSample>
+<TextSample sampleTime="00:00:25.712" text="[Bird noises]"></TextSample>
+<TextSample sampleTime="00:00:30.399" text=""></TextSample>
+
+</TextStream>
