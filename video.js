@@ -153,7 +153,7 @@ var VideoJS = JRClass.extend({
     this.hideStylesCheckDiv();
     this.positionBox();
     this.showPoster();
-    this.showBigPlayButton();
+    if (this.video.paused !== false) { this.showBigPlayButton(); }
     if (this.options.showControlsAtStart) { this.showController(); }
   },
 
@@ -178,7 +178,7 @@ var VideoJS = JRClass.extend({
     this.positionPoster();
   },
 
-  /* Custom HTML5 Controller
+  /* Control Bar
   ================================================================================ */
   buildController: function(){
     /* Creating this HTML
@@ -268,28 +268,9 @@ var VideoJS = JRClass.extend({
   },
   // Set up Event Listeners
   initializeControls: function(){
-    /* Initialize Loading/Waiting
-    ================================================================================ */
-    this.video.addEventListener("loadeddata", this.onLoadedData.context(this), false);
-    this.video.addEventListener("loadstart", this.onLoadStart.context(this), false);
-    this.video.addEventListener("seeking", this.onSeeking.context(this), false);
-    this.video.addEventListener("seeked", this.onSeeked.context(this), false);
-    this.video.addEventListener("canplay", this.onCanPlay.context(this), false);
-    this.video.addEventListener("canplaythrough", this.onCanPlayThrough.context(this), false);
-    this.video.addEventListener("waiting", this.onWaiting.context(this), false);
-    this.video.addEventListener("stalled", this.onStalled.context(this), false);
-    this.video.addEventListener("suspend", this.onSuspend.context(this), false);
-
     /* Initialize Errors
     ================================================================================ */
     this.video.addEventListener('error',this.onError.context(this),false);
-
-    /* Initialize Buffering Progress
-    ================================================================================ */
-    // Listen for Video Load Progress (currently does not if html file is local)
-    this.video.addEventListener('progress', this.onProgress.context(this), false);
-    // Set interval for load progress using buffer watching method
-    this.watchBuffer = setInterval(this.updateBufferedTotal.context(this), 33);
 
     /* Initialize Play/Pause
     ================================================================================ */
@@ -311,7 +292,13 @@ var VideoJS = JRClass.extend({
     // Listen for a release on the progress bar
     this.progressHolder.addEventListener("mouseup", this.onProgressHolderMouseUp.context(this), false);
     this.video.addEventListener('timeupdate', this.onTimeUpdate.context(this), false);
-    this.video.addEventListener("playing", this.onPlaying.context(this), false);
+
+    /* Initialize Buffering Progress
+    ================================================================================ */
+    // Listen for Video Load Progress (currently does not if html file is local)
+    this.video.addEventListener('progress', this.onProgress.context(this), false);
+    // Set interval for load progress using buffer watching method
+    this.watchBuffer = setInterval(this.updateBufferedTotal.context(this), 33);
 
     /* Initialize Volume
     ================================================================================ */
@@ -407,8 +394,6 @@ var VideoJS = JRClass.extend({
   onPlay: function(event){
     this.hasPlayed = true;
     this.playControl.className = "vjs-play-control vjs-pause";
-    this.hidePoster();
-    this.hideBigPlayButton();
     this.trackPlayProgress();
   },
   // When the video is paused
@@ -420,46 +405,6 @@ var VideoJS = JRClass.extend({
   onEnded: function(event){
     this.video.currentTime = 0;
     this.video.pause();
-    this.showPoster();
-    this.showBigPlayButton();
-    this.onPause();
-  },
-  onPlaying: function(event){
-    this.hideSpinner();
-  },
-
-  /* Load Progress
-  ================================================================================ */
-  // When the video's load progress is updated
-  // Does not work in all browsers (Safari/Chrome 5)
-  onProgress: function(event){
-    if(event.total > 0) {
-      this.setLoadProgress(event.loaded / event.total);
-    }
-  },
-  // Buffer watching method for load progress.
-  // Used for browsers that don't support the progress event
-  updateBufferedTotal: function(){
-    if (this.video.buffered) {
-      if (this.video.buffered.length >= 1) {
-        this.setLoadProgress(this.video.buffered.end(0) / this.video.duration);
-        if (this.video.buffered.end(0) == this.video.duration) {
-          clearInterval(this.watchBuffer);
-        }
-      }
-    } else {
-      clearInterval(this.watchBuffer);
-    }
-  },
-  setLoadProgress: function(percentAsDecimal){
-    if (percentAsDecimal > this.percentLoaded) {
-      this.percentLoaded = percentAsDecimal;
-      this.updateLoadProgress();
-    }
-  },
-  updateLoadProgress: function(){
-    if (this.controls.style.display == 'none') { return; }
-    this.loadProgress.style.width = (this.percentLoaded * (_V_.getComputedStyleValue(this.progressHolder, "width").replace("px", ""))) + "px";
   },
 
   /* Play Progress
@@ -537,6 +482,40 @@ var VideoJS = JRClass.extend({
   updateTimeDisplay: function(){
     this.currentTimeDisplay.innerHTML = _V_.formatTime(this.video.currentTime);
     if (this.video.duration) { this.durationDisplay.innerHTML = _V_.formatTime(this.video.duration); }
+  },
+
+  /* Load Progress
+  ================================================================================ */
+  // When the video's load progress is updated
+  // Does not work in all browsers (Safari/Chrome 5)
+  onProgress: function(event){
+    if(event.total > 0) {
+      this.setLoadProgress(event.loaded / event.total);
+    }
+  },
+  // Buffer watching method for load progress.
+  // Used for browsers that don't support the progress event
+  updateBufferedTotal: function(){
+    if (this.video.buffered) {
+      if (this.video.buffered.length >= 1) {
+        this.setLoadProgress(this.video.buffered.end(0) / this.video.duration);
+        if (this.video.buffered.end(0) == this.video.duration) {
+          clearInterval(this.watchBuffer);
+        }
+      }
+    } else {
+      clearInterval(this.watchBuffer);
+    }
+  },
+  setLoadProgress: function(percentAsDecimal){
+    if (percentAsDecimal > this.percentLoaded) {
+      this.percentLoaded = percentAsDecimal;
+      this.updateLoadProgress();
+    }
+  },
+  updateLoadProgress: function(){
+    if (this.controls.style.display == 'none') { return; }
+    this.loadProgress.style.width = (this.percentLoaded * (_V_.getComputedStyleValue(this.progressHolder, "width").replace("px", ""))) + "px";
   },
 
   /* Volume
@@ -669,11 +648,15 @@ var VideoJS = JRClass.extend({
     this.video.parentNode.appendChild(this.bigPlayButton);
     this.initializeBigPlayButton();
   },
-  initializeBigPlayButton: function(){ this.bigPlayButton.addEventListener("click", this.onPlayControlClick.context(this), false); },
-  showBigPlayButton: function(){ 
-    if (this.video.paused !== false) { this.bigPlayButton.style.display = "block"; }
+  initializeBigPlayButton: function(){
+    this.bigPlayButton.addEventListener("click", this.onPlayControlClick.context(this), false);
+    this.video.addEventListener("play", this.bigPlayButtonOnPlay.context(this), false);
+    this.video.addEventListener("ended", this.bigPlayButtonOnEnded.context(this), false);
   },
+  showBigPlayButton: function(){ this.bigPlayButton.style.display = "block"; },
   hideBigPlayButton: function(){ this.bigPlayButton.style.display = "none"; },
+  bigPlayButtonOnPlay: function(event){ this.hideBigPlayButton(); },
+  bigPlayButtonOnEnded: function(event){ this.showBigPlayButton(); },
 
   /* Spinner (Loading)
   ================================================================================ */
@@ -685,6 +668,19 @@ var VideoJS = JRClass.extend({
     this.spinner.style.left = (this.video.offsetWidth-100)/2 +"px";
     this.spinner.style.top= (this.video.offsetHeight-100)/2 +"px";
     this.video.parentNode.appendChild(this.spinner);
+    this.initializeSpinner();
+  },
+  initializeSpinner: function(){
+    this.video.addEventListener("loadeddata", this.spinnerOnLoadedData.context(this), false);
+    this.video.addEventListener("loadstart", this.spinnerOnLoadStart.context(this), false);
+    this.video.addEventListener("seeking", this.spinnerOnSeeking.context(this), false);
+    this.video.addEventListener("seeked", this.spinnerOnSeeked.context(this), false);
+    this.video.addEventListener("canplay", this.spinnerOnCanPlay.context(this), false);
+    this.video.addEventListener("canplaythrough", this.spinnerOnCanPlayThrough.context(this), false);
+    this.video.addEventListener("waiting", this.spinnerOnWaiting.context(this), false);
+    this.video.addEventListener("stalled", this.spinnerOnStalled.context(this), false);
+    this.video.addEventListener("suspend", this.spinnerOnSuspend.context(this), false);
+    this.video.addEventListener("playing", this.spinnerOnPlaying.context(this), false);
   },
   showSpinner: function(){
     this.spinner.style.display = "block";
@@ -703,32 +699,20 @@ var VideoJS = JRClass.extend({
     if (this.spinnerRotated == 360) { this.spinnerRotated = 0 }
     this.spinnerRotated += 45;
   },
-  onLoadedData: function(event){
-    this.hideSpinner();
-  },
-  onLoadStart: function(event){
-    this.showSpinner();
-  },
-  onSeeking: function(event){
-    // this.showSpinner();
-  },
-  onSeeked: function(event){
-    // this.hideSpinner();
-  },
-  onWaiting: function(event){
-    // Safari sometimes triggers waiting in appropriately
+  spinnerOnLoadedData: function(event){ this.hideSpinner(); },
+  spinnerOnLoadStart: function(event){ this.showSpinner(); },
+  spinnerOnSeeking: function(event){ /* this.showSpinner(); */ },
+  spinnerOnSeeked: function(event){ /* this.hideSpinner(); */ },
+  spinnerOnCanPlay: function(event){ /* this.hideSpinner(); */ },
+  spinnerOnCanPlayThrough: function(event){ this.hideSpinner(); },
+  spinnerOnWaiting: function(event){
+    // Safari sometimes triggers waiting inappropriately
     // Like after video has played, any you play again.
     this.showSpinner();
   },
-  onStalled: function(event){},
-  onSuspend: function(event){},
-
-  onCanPlay: function(event){
-    // this.hideSpinner();
-  },
-  onCanPlayThrough: function(event){
-    this.hideSpinner();
-  },
+  spinnerOnStalled: function(event){},
+  spinnerOnSuspend: function(event){},
+  spinnerOnPlaying: function(event){ this.hideSpinner(); },
 
   /* Styles Check - Check if styles are loaded
   ================================================================================ */
@@ -775,6 +759,9 @@ var VideoJS = JRClass.extend({
       this.poster.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
       // Make a click on the poster act like a click on the play button.
       this.poster.addEventListener("click", this.onPlayControlClick.context(this), false);
+      // Hide/Show poster on video events
+      this.video.addEventListener("play", this.posterOnPlay.context(this), false);
+      this.video.addEventListener("ended", this.posterOnEnded.context(this), false);
     }
   },
   // Add the video poster to the video's container, to fix autobuffer/preload bug
@@ -802,6 +789,8 @@ var VideoJS = JRClass.extend({
       if (images.length > 0) { this.video.poster = images[0].src; }
     }
   },
+  posterOnEnded: function(){ this.showPoster(); },
+  posterOnPlay: function(){ this.hidePoster(); },
 
   /* Subtitles
   ================================================================================ */

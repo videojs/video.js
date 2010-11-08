@@ -131,7 +131,7 @@ Changelog
 ---------
 1.1.5
 
-
+- Massive reorganization of code
 
 1.1.4
 
