@@ -700,7 +700,7 @@ var VideoJS = JRClass.extend({
     // this.spinner.style.transform =       'scale(0.5) rotate('+this.spinnerRotated+'deg)';
     this.spinner.style.WebkitTransform = 'scale(0.5) rotate('+this.spinnerRotated+'deg)';
     this.spinner.style.MozTransform =    'scale(0.5) rotate('+this.spinnerRotated+'deg)';
-    if (this.spinnerRotated == 360) { this.spinnerRotated = 0 }
+    if (this.spinnerRotated == 360) { this.spinnerRotated = 0; }
     this.spinnerRotated += 45;
   },
   spinnerOnLoadedData: function(event){ this.hideSpinner(); },
@@ -989,7 +989,7 @@ var VideoJS = JRClass.extend({
     return this;
   },
   volume: function(newVolume){
-    if (newVolume != undefined) { this.setVolume(newVolume); }
+    if (newVolume !== undefined) { this.setVolume(newVolume); }
     return this.video.volume;
   }
 });
@@ -1264,15 +1264,15 @@ VideoJS.getFlashVersion = function(){
 VideoJS.isIE = function(){ return !+"\v1"; };
 VideoJS.isIPad = function(){ return navigator.userAgent.match(/iPad/i) !== null; };
 VideoJS.isIPhone = function(){ return navigator.userAgent.match(/iPhone/i) !== null; };
-VideoJS.isIOS = function(){ return VideoJS.isIPhone || VideoJS.isIPad };
+VideoJS.isIOS = function(){ return VideoJS.isIPhone || VideoJS.isIPad; };
 VideoJS.iOSVersion = function() {
   var match = navigator.userAgent.match(/OS (\d+)_/i);
-  if (match && match[1]) { return match[1] };
+  if (match && match[1]) { return match[1]; }
 };
 VideoJS.isAndroid = function(){ return navigator.userAgent.match(/Android/i) !== null; };
 VideoJS.androidVersion = function() {
   var match = navigator.userAgent.match(/Android (\d+)\./i);
-  if (match && match[1]) { return match[1] };
+  if (match && match[1]) { return match[1]; }
 };
 
 VideoJS.errorCodes = {
