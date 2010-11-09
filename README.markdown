@@ -1,6 +1,6 @@
 VideoJS - [HTML5 Video Player](http://videojs.com)
 ==================================================
-Version 1.1.4
+Version 1.1.5
 
 View [VideoJS.com](http://videojs.com) for a demo and overview.
 
@@ -131,7 +131,10 @@ Changelog
 ---------
 1.1.5
 
-- Massive reorganization of code
+- Feature: Switch to track method for setting subtitles
+- Feature: Created "players" concept for defining fallbacks and fallback order
+- Fix: Android playback bug.
+- Fix: Massive reorganization of code to make easier to navigate
 
 1.1.4
 

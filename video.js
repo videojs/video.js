@@ -1,6 +1,6 @@
 /*
 VideoJS - HTML5 Video Player
-v1.1.4
+v1.1.5
 
 This file is part of VideoJS. Copyright 2010 Zencoder, Inc.
 
@@ -76,7 +76,7 @@ var VideoJS = JRClass.extend({
 
   html5Init: function(){
     this.fixPreloading(); // Support older browsers that used autobuffer
-    
+
     if (VideoJS.isIOS() && VideoJS.iOSVersion < 4) {
       this.forceTheSource();
       this.options.useBrowserControls = true;
@@ -89,8 +89,8 @@ var VideoJS = JRClass.extend({
     }
 
     // Add VideoJS Controls
-    if (!this.options.useBrowserControls) { 
-      this.video.controls = false; 
+    if (!this.options.useBrowserControls) {
+      this.video.controls = false;
 
       if (this.options.controlsBelow) { _V_.addClass(this.box, "vjs-controls-below"); }
       this.percentLoaded = 0; // Store amount of video loaded
@@ -378,7 +378,7 @@ var VideoJS = JRClass.extend({
       this.hideControlBar();
     }
   },
-  
+
   /* Errors
   ================================================================================ */
   errors: [], // Array to track errors
@@ -392,8 +392,8 @@ var VideoJS = JRClass.extend({
       this.video.play();
     } else {
       // Android has a problem with "paused" not returning correctly.
-      if (!this.hasPlayed && VideoJS.isAndroid) { 
-        this.video.play(); return; 
+      if (!this.hasPlayed && VideoJS.isAndroid) {
+        this.video.play(); return;
       } else {
         this.video.pause();
       }
@@ -486,7 +486,7 @@ var VideoJS = JRClass.extend({
       this.onPlay();
     }
   },
-  
+
   // Update the displayed time (00:00)
   updateTimeDisplay: function(){
     this.currentTimeDisplay.innerHTML = _V_.formatTime(this.video.currentTime);
@@ -550,7 +550,7 @@ var VideoJS = JRClass.extend({
   onVolumeControlMouseUp: function(event){
     this.setVolumeWithEvent(event);
   },
-  
+
   // Set a new volume based on where the user clicked on the volume control
   setVolume: function(newVol){
     this.video.volume = parseFloat(newVol);
@@ -621,16 +621,12 @@ var VideoJS = JRClass.extend({
   // Turn off fullscreen (window) mode
   fullscreenOff: function(){
     this.videoIsFullScreen = false;
-
     document.removeEventListener("keydown", this.onEscKey, false);
     window.removeEventListener("resize", this.onWindowResize, false);
-
     // Unhide scroll bars.
     document.documentElement.style.overflow = this.docOrigOverflow;
-
     // Remove fullscreen styles
     _V_.removeClass(this.box, "vjs-fullscreen");
-
     // Resize the box, controller, and poster to original sizes
     this.positionBox();
   },
@@ -721,7 +717,7 @@ var VideoJS = JRClass.extend({
   spinnerOnStalled: function(event){},
   spinnerOnSuspend: function(event){},
   spinnerOnPlaying: function(event){ this.hideSpinner(); },
-  spinnerOnTimeUpdate: function(event){ 
+  spinnerOnTimeUpdate: function(event){
     // Safari sometimes calls waiting and doesn't recover
     if(this.spinner.style.display == "block") { this.hideSpinner(); }
   },
@@ -881,7 +877,7 @@ var VideoJS = JRClass.extend({
     this.box.appendChild(this.subtitlesDiv);
     this.initializeSubtitles();
   },
-  
+
   initializeSubtitles: function(){
     this.video.addEventListener('timeupdate', this.subtitlesOnTimeUpdate.context(this), false);
   },
@@ -995,8 +991,7 @@ var VideoJS = JRClass.extend({
   volume: function(newVolume){
     if (newVolume != undefined) { this.setVolume(newVolume); }
     return this.video.volume;
-  },
-
+  }
 });
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1270,12 +1265,12 @@ VideoJS.isIE = function(){ return !+"\v1"; };
 VideoJS.isIPad = function(){ return navigator.userAgent.match(/iPad/i) !== null; };
 VideoJS.isIPhone = function(){ return navigator.userAgent.match(/iPhone/i) !== null; };
 VideoJS.isIOS = function(){ return VideoJS.isIPhone || VideoJS.isIPad };
-VideoJS.iOSVersion = function() { 
+VideoJS.iOSVersion = function() {
   var match = navigator.userAgent.match(/OS (\d+)_/i);
   if (match && match[1]) { return match[1] };
 };
 VideoJS.isAndroid = function(){ return navigator.userAgent.match(/Android/i) !== null; };
-VideoJS.androidVersion = function() { 
+VideoJS.androidVersion = function() {
   var match = navigator.userAgent.match(/Android (\d+)\./i);
   if (match && match[1]) { return match[1] };
 };
@@ -1294,10 +1289,6 @@ Function.prototype.context = function(obj){
   };
   return temp;
 };
-
-_V_.merge(VideoJS, {
-  asdf: function(){ alert("hi") }
-});
 
 // Shim to make Video tag valid in IE
 if(VideoJS.isIE()) { document.createElement("video"); }
