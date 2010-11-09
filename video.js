@@ -102,15 +102,7 @@ var VideoJS = JRClass.extend({
       this.buildSpinner();
       this.buildControlBar();
       this.loadInterface(); // Show everything once styles are loaded
-
-      /* Initialize Subtitles
-      ================================================================================ */
-      // Load subtitles. Based on http://matroska.org/technical/specs/subtitles/srt.html
-      this.subtitlesSource = this.video.getAttribute("data-subtitles");
-      if (this.subtitlesSource !== null) {
-        this.loadSubtitles();
-        this.buildSubtitles();
-      }
+      this.getSubtitles();
 
       /* Removeable Event Listeners with Context
       ================================================================================ */
@@ -304,7 +296,6 @@ var VideoJS = JRClass.extend({
     this.progressHolder.addEventListener("mousedown", this.onProgressHolderMouseDown.context(this), false);
     // Listen for a release on the progress bar
     this.progressHolder.addEventListener("mouseup", this.onProgressHolderMouseUp.context(this), false);
-    this.video.addEventListener('timeupdate', this.onTimeUpdate.context(this), false);
 
     /* Initialize Buffering Progress
     ================================================================================ */
@@ -697,6 +688,7 @@ var VideoJS = JRClass.extend({
     this.video.addEventListener("stalled", this.spinnerOnStalled.context(this), false);
     this.video.addEventListener("suspend", this.spinnerOnSuspend.context(this), false);
     this.video.addEventListener("playing", this.spinnerOnPlaying.context(this), false);
+    this.video.addEventListener("timeupdate", this.spinnerOnTimeUpdate.context(this), false);
   },
   showSpinner: function(){
     this.spinner.style.display = "block";
@@ -729,6 +721,10 @@ var VideoJS = JRClass.extend({
   spinnerOnStalled: function(event){},
   spinnerOnSuspend: function(event){},
   spinnerOnPlaying: function(event){ this.hideSpinner(); },
+  spinnerOnTimeUpdate: function(event){ 
+    // Safari sometimes calls waiting and doesn't recover
+    if(this.spinner.style.display == "block") { this.hideSpinner(); }
+  },
 
   /* Styles Check - Check if styles are loaded
   ================================================================================ */
@@ -810,27 +806,21 @@ var VideoJS = JRClass.extend({
 
   /* Subtitles
   ================================================================================ */
-  loadSubtitles: function() {
-    if (typeof XMLHttpRequest == "undefined") {
-      XMLHttpRequest = function () {
-        try { return new ActiveXObject("Msxml2.XMLHTTP.6.0"); }
-          catch (e) {}
-        try { return new ActiveXObject("Msxml2.XMLHTTP.3.0"); }
-          catch (f) {}
-        try { return new ActiveXObject("Msxml2.XMLHTTP"); }
-          catch (g) {}
-        //Microsoft.XMLHTTP points to Msxml2.XMLHTTP.3.0 and is redundant
-        throw new Error("This browser does not support XMLHttpRequest.");
-      };
-    }
-    var request = new XMLHttpRequest();
-    request.open("GET",this.subtitlesSource);
-    request.onreadystatechange = function() {
-      if (request.readyState == 4 && request.status == 200) {
-        this.parseSubtitles(request.responseText);
+  getSubtitles: function(){
+    var tracks = this.video.getElementsByTagName("TRACK");
+    for (var i=0,j=tracks.length; i<j; i++) {
+      if (tracks[i].getAttribute("kind") == "subtitles") {
+        this.subtitlesSource = tracks[i].getAttribute("src");
       }
-    }.context(this);
-    request.send();
+    }
+    if (this.subtitlesSource !== null) {
+      this.loadSubtitles();
+      this.buildSubtitles();
+    }
+  },
+
+  loadSubtitles: function() {
+    _V_.get(this.subtitlesSource, this.parseSubtitles.context(this));
   },
 
   parseSubtitles: function(subText) {
@@ -885,18 +875,18 @@ var VideoJS = JRClass.extend({
 
   buildSubtitles: function(){
     /* Creating this HTML
-      <div class="vjs-subtitles">
-      </div>
+      <div class="vjs-subtitles"></div>
     */
     this.subtitlesDiv = _V_.createElement("div", { className: 'vjs-subtitles' });
-    this.video.parentNode.appendChild(this.subtitlesDiv);
+    this.box.appendChild(this.subtitlesDiv);
+    this.initializeSubtitles();
+  },
+  
+  initializeSubtitles: function(){
+    this.video.addEventListener('timeupdate', this.subtitlesOnTimeUpdate.context(this), false);
   },
 
-  onTimeUpdate: function(){
-
-    // Safari sometimes calls waiting and doesn't recover
-    if(this.spinner.style.display == "block") { this.hideSpinner(); }
-
+  subtitlesOnTimeUpdate: function(){
     // show the subtitles
     if (this.subtitles) {
       var x = this.currentSubtitlePosition;
@@ -939,18 +929,6 @@ var VideoJS = JRClass.extend({
   //   this.options.controlsBelow = true;
   //   this.options.controlsHiding = false;
   // },
-
-  /* The "force the source" fix should hopefully fix this as well now.
-     Not sure if canPlayType works on Android though. */
-  // For Androids, add the MP4 source directly to the video tag otherwise it will not play
-  // androidFix: function() {
-  //   var children = this.video.children;
-  //   for (var i=0,j=children.length; i<j; i++) {
-  //     if (children[i].tagName.toUpperCase() == "SOURCE" && children[i].src.match(/\.mp4$/i)) {
-  //       this.video.src = children[i].src;
-  //     }
-  //   }
-  // }
 
   history: [],
   log: function(event){
@@ -1087,6 +1065,26 @@ var _V_ = {
 
   getComputedStyleValue: function(element, style){
     return window.getComputedStyle(element, null).getPropertyValue(style);
+  },
+
+  get: function(url, onSuccess){
+    if (typeof XMLHttpRequest == "undefined") {
+      XMLHttpRequest = function () {
+        try { return new ActiveXObject("Msxml2.XMLHTTP.6.0"); } catch (e) {}
+        try { return new ActiveXObject("Msxml2.XMLHTTP.3.0"); } catch (f) {}
+        try { return new ActiveXObject("Msxml2.XMLHTTP"); } catch (g) {}
+        //Microsoft.XMLHTTP points to Msxml2.XMLHTTP.3.0 and is redundant
+        throw new Error("This browser does not support XMLHttpRequest.");
+      };
+    }
+    var request = new XMLHttpRequest();
+    request.open("GET",url);
+    request.onreadystatechange = function() {
+      if (request.readyState == 4 && request.status == 200) {
+        onSuccess(request.responseText);
+      }
+    }.context(this);
+    request.send();
   },
 
   // DOM Ready functionality adapted from jQuery. http://jquery.com/
