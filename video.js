@@ -66,11 +66,9 @@ var VideoJS = JRClass.extend({
     // If the player successfully initializes, we're done
     // If not, try the next player in the list
     for (var i=0,players=this.options.players,j=players.length; i<j; i++) {
-      try {
-        if((VideoJS.players[players[i]].init.context(this))()) {
-          break;
-        }
-      } catch (e) {} // Catch errors so it tries the next fallback method
+      if((VideoJS.players[players[i]].init.context(this))()) {
+        break;
+      }
     }
   },
 
@@ -809,7 +807,7 @@ var VideoJS = JRClass.extend({
         this.subtitlesSource = tracks[i].getAttribute("src");
       }
     }
-    if (this.subtitlesSource !== null) {
+    if (this.subtitlesSource !== undefined) {
       this.loadSubtitles();
       this.buildSubtitles();
     }
