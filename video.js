@@ -75,14 +75,16 @@ var VideoJS = JRClass.extend({
   html5Init: function(){
     this.fixPreloading(); // Support older browsers that used autobuffer
 
-    if (VideoJS.isIOS() && VideoJS.iOSVersion < 4) {
-      this.forceTheSource();
+    if (VideoJS.isIOS()) {
       this.options.useBrowserControls = true;
+      if(VideoJS.iOSVersion() < 4) {
+        this.forceTheSource();
+      }
     }
 
     if (VideoJS.isAndroid()) {
-      this.forceTheSource();
       this.options.useBrowserControls = true;
+      this.forceTheSource();
       this.video.addEventListener("click", function(){ this.play(); }, false);
     }
 
