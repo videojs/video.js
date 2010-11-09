@@ -1262,7 +1262,7 @@ VideoJS.getFlashVersion = function(){
 VideoJS.isIE = function(){ return !+"\v1"; };
 VideoJS.isIPad = function(){ return navigator.userAgent.match(/iPad/i) !== null; };
 VideoJS.isIPhone = function(){ return navigator.userAgent.match(/iPhone/i) !== null; };
-VideoJS.isIOS = function(){ return VideoJS.isIPhone || VideoJS.isIPad; };
+VideoJS.isIOS = function(){ return VideoJS.isIPhone() || VideoJS.isIPad(); };
 VideoJS.iOSVersion = function() {
   var match = navigator.userAgent.match(/OS (\d+)_/i);
   if (match && match[1]) { return match[1]; }
