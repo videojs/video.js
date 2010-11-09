@@ -14,7 +14,7 @@ Originally based on [this tutorial](http://blog.steveheffernan.com/2010/04/how-t
 
 Contributors (Github Username)
 ------------------------------
-heff, dz0ny, sentientbit, tvdeyen, brandonarbini, gordonbrander, Shraymonks, albertogasparin, sandaru1, nicholasbs, majornista, Fredust85
+heff, dz0ny, sentientbit, tvdeyen, brandonarbini, gordonbrander, Shraymonks, albertogasparin, sandaru1, nicholasbs, majornista, Fredust85, @wonderboymusic
 
 
 Getting Started
@@ -131,7 +131,7 @@ Changelog
 ---------
 1.1.5
 
-- Feature: Switch to track method for setting subtitles
+- Feature: Switched to track method for setting subtitles. Now works like spec.
 - Feature: Created "players" concept for defining fallbacks and fallback order
 - Fix: Android playback bug.
 - Fix: Massive reorganization of code to make easier to navigate
