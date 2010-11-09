@@ -1,3 +1,8 @@
+/*
+VideoJS VimCSS Skin (http://videojs.com)
+Version 1.1.5
+*/
+
 .vim-css ul.vjs-controls {
   height: 50px; opacity: 0.9; color: #fff;
   padding-left: 85px; /* Width of play button + margin */

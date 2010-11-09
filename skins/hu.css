@@ -1,3 +1,8 @@
+/*
+VideoJS HuCSS Skin (http://videojs.com)
+Version 1.1.5
+*/
+
 .hu-css ul.vjs-controls { 
   height: 47px; opacity: 0.95; color: #fff; 
   padding-left: 84px; /* Width of play button + margin */
