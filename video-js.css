@@ -70,7 +70,7 @@ so you can upgrade to newer versions easier. */
 /* Placement of Control Items */
 ul.vjs-controls > li.vjs-play-control       { width: 25px; left: 5px; }
 ul.vjs-controls > li.vjs-progress-control   { width: 100%; position: relative; }
-ul.vjs-controls > li.vjs-time-control       { width: 75px; right: 90px; }
+ul.vjs-controls > li.vjs-time-control       { width: 75px; right: 90px; } /* Time control and progress bar are combined to look like one */
 ul.vjs-controls > li.vjs-volume-control     { width: 50px; right: 35px; }
 ul.vjs-controls > li.vjs-fullscreen-control { width: 25px; right: 5px; }
 
@@ -212,7 +212,7 @@ div.vjs-big-play-button span {
 ---------------------------------------------------------*/
 /* CSS Spinners by Kilian Valkhof - http://kilianvalkhof.com/2010/css-xhtml/css3-loading-spinners-without-images/ */
 
-.vjs-spinner { display: none; position: absolute; top: 50%; left: 50%; width: 100px; height: 100px; z-index: 1;
+.vjs-spinner { display: none; position: absolute; top: 50%; left: 50%; width: 100px; height: 100px; z-index: 1; margin: -50px 0 0 -50px;
   transform: scale(0.5); -webkit-transform:scale(0.5); -moz-transform:scale(0.5);
 /*  -webkit-animation-name: rotateThis;
   -webkit-animation-duration:2s;

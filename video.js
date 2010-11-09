@@ -75,51 +75,56 @@ var VideoJS = JRClass.extend({
   },
 
   html5Init: function(){
-    // Force the video source
-    // Helps fix loading bugs in a handful of devices, like the iPad/iPhone poster bug
-    // And iPad/iPhone javascript include location bug
-    // And Android type attribute bug
-    this.video.src = this.firstPlayableSource.src; // From canPlaySource()
-
-    if (VideoJS.isIpad() || VideoJS.isIphone() || VideoJS.isAndroid()) {
-      this.video.load(); // 2nd step of forcing the source
-      return; // Use the devices default controls
-    }
-
-    if (!this.options.useBrowserControls) { this.video.controls = false; }
-    if (this.options.controlsBelow) { _V_.addClass(this.box, "vjs-controls-below"); }
     this.fixPreloading(); // Support older browsers that used autobuffer
-    this.percentLoaded = 0; // Store amount of video loaded
-
-    // Build Interface
-    this.buildStylesCheckDiv(); // Used to check if style are loaded
-    this.buildPoster();
-    this.buildBigPlayButton();
-    this.buildSpinner();
-    this.buildControlBar();
-    this.loadInterface(); // Show everything once styles are loaded
-
-    /* Initialize Subtitles
-    ================================================================================ */
-    // Load subtitles. Based on http://matroska.org/technical/specs/subtitles/srt.html
-    this.subtitlesSource = this.video.getAttribute("data-subtitles");
-    if (this.subtitlesSource !== null) {
-      this.loadSubtitles();
-      this.buildSubtitles();
+    
+    if (VideoJS.isIOS() && VideoJS.iOSVersion < 4) {
+      this.forceTheSource();
+      this.options.useBrowserControls = true;
     }
 
-    /* Removeable Event Listeners with Context
-    ================================================================================ */
-    // These event listeners are attached to global elements like document/window.
-    // They are also temporary, which means they need to be removed.
-    // They also need context (this) so they can call functions on their specific player.
-    // Adding context on initialization allows them to referenced and removed after being attached.
-    this.onEscKey = this.onEscKey.context(this);
-    this.onWindowResize = this.onWindowResize.context(this);
-    this.onProgressMouseMove = this.onProgressMouseMove.context(this);
-    this.onProgressMouseUp = this.onProgressMouseUp.context(this);
-    this.onVolumeMouseMove = this.onVolumeMouseMove.context(this);
-    this.onVolumeMouseUp = this.onVolumeMouseUp.context(this);
+    if (VideoJS.isAndroid()) {
+      this.forceTheSource();
+      this.options.useBrowserControls = true;
+      this.video.addEventListener("click", function(){ this.play(); }, false);
+    }
+
+    // Add VideoJS Controls
+    if (!this.options.useBrowserControls) { 
+      this.video.controls = false; 
+
+      if (this.options.controlsBelow) { _V_.addClass(this.box, "vjs-controls-below"); }
+      this.percentLoaded = 0; // Store amount of video loaded
+
+      // Build Interface
+      this.buildStylesCheckDiv(); // Used to check if style are loaded
+      this.buildPoster();
+      this.buildBigPlayButton();
+      this.buildSpinner();
+      this.buildControlBar();
+      this.loadInterface(); // Show everything once styles are loaded
+
+      /* Initialize Subtitles
+      ================================================================================ */
+      // Load subtitles. Based on http://matroska.org/technical/specs/subtitles/srt.html
+      this.subtitlesSource = this.video.getAttribute("data-subtitles");
+      if (this.subtitlesSource !== null) {
+        this.loadSubtitles();
+        this.buildSubtitles();
+      }
+
+      /* Removeable Event Listeners with Context
+      ================================================================================ */
+      // These event listeners are attached to global elements like document/window.
+      // They are also temporary, which means they need to be removed.
+      // They also need context (this) so they can call functions on their specific player.
+      // Adding context on initialization allows them to referenced and removed after being attached.
+      this.onEscKey = this.onEscKey.context(this);
+      this.onWindowResize = this.onWindowResize.context(this);
+      this.onProgressMouseMove = this.onProgressMouseMove.context(this);
+      this.onProgressMouseUp = this.onProgressMouseUp.context(this);
+      this.onVolumeMouseMove = this.onVolumeMouseMove.context(this);
+      this.onVolumeMouseUp = this.onVolumeMouseUp.context(this);
+    }
   },
 
   canPlaySource: function(){
@@ -142,6 +147,13 @@ var VideoJS = JRClass.extend({
     return false;
   },
 
+  // Force the video source - Helps fix loading bugs in a handful of devices, like the iPad/iPhone poster bug
+  // And iPad/iPhone javascript include location bug. And Android type attribute bug
+  forceTheSource: function(){
+    this.video.src = this.firstPlayableSource.src; // From canPlaySource()
+    this.video.load();
+  },
+
   loadInterface: function(){
     if(!this.stylesHaveLoaded()) {
       // Don't want to create an endless loop either.
@@ -152,10 +164,10 @@ var VideoJS = JRClass.extend({
       }
     }
     this.hideStylesCheckDiv();
-    this.positionBox();
     this.showPoster();
     if (this.video.paused !== false) { this.showBigPlayButton(); }
     if (this.options.showControlsAtStart) { this.showControlBar(); }
+    this.positionBox();
   },
 
   /* VideoJS Box - Holds all elements
@@ -671,8 +683,6 @@ var VideoJS = JRClass.extend({
       className: "vjs-spinner",
       innerHTML: "<div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>"
     });
-    this.spinner.style.left = (this.video.offsetWidth-100)/2 +"px";
-    this.spinner.style.top= (this.video.offsetHeight-100)/2 +"px";
     this.video.parentNode.appendChild(this.spinner);
     this.initializeSpinner();
   },
@@ -1259,9 +1269,18 @@ VideoJS.getFlashVersion = function(){
 
 // Browser & Device Checks
 VideoJS.isIE = function(){ return !+"\v1"; };
-VideoJS.isIpad = function(){ return navigator.userAgent.match(/iPad/i) !== null; };
-VideoJS.isIphone = function(){ return navigator.userAgent.match(/iPhone/i) !== null; };
+VideoJS.isIPad = function(){ return navigator.userAgent.match(/iPad/i) !== null; };
+VideoJS.isIPhone = function(){ return navigator.userAgent.match(/iPhone/i) !== null; };
+VideoJS.isIOS = function(){ return VideoJS.isIPhone || VideoJS.isIPad };
+VideoJS.iOSVersion = function() { 
+  var match = navigator.userAgent.match(/OS (\d+)_/i);
+  if (match && match[1]) { return match[1] };
+};
 VideoJS.isAndroid = function(){ return navigator.userAgent.match(/Android/i) !== null; };
+VideoJS.androidVersion = function() { 
+  var match = navigator.userAgent.match(/Android (\d+)\./i);
+  if (match && match[1]) { return match[1] };
+};
 
 VideoJS.errorCodes = {
   // Safari errors if you call functions on a video that hasn't loaded yet
@@ -1270,13 +1289,17 @@ VideoJS.errorCodes = {
 
 // Allows for binding context to functions
 // when using in event listeners and timeouts
-Function.prototype.context = function(obj) {
+Function.prototype.context = function(obj){
   var method = this, temp;
-  temp = function() {
+  temp = function(){
     return method.apply(obj, arguments);
   };
   return temp;
 };
+
+_V_.merge(VideoJS, {
+  asdf: function(){ alert("hi") }
+});
 
 // Shim to make Video tag valid in IE
 if(VideoJS.isIE()) { document.createElement("video"); }
