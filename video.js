@@ -1,6 +1,6 @@
 /*
 VideoJS - HTML5 Video Player
-v1.1.5
+v1.2.0
 
 This file is part of VideoJS. Copyright 2010 Zencoder, Inc.
 
@@ -302,9 +302,9 @@ var VideoJS = JRClass.extend({
     // Listen for when the video ends
     this.video.addEventListener("ended", this.onEnded.context(this), false);
     // Listen for clicks on the play/pause button
-    this.playControl.addEventListener("click", this.onPlayControlClick.context(this), false);
+    this.activateAsPlayPauseButton(this.playControl);
     // Make a click on the video act like a click on the play button.
-    this.video.addEventListener("click", this.onPlayControlClick.context(this), false);
+    this.activateAsPlayPauseButton(this.video);
 
     /* Activate Play Progress
     ================================================================================ */
@@ -407,28 +407,34 @@ var VideoJS = JRClass.extend({
 
   /* Play/Pause
   ================================================================================ */
+  activateAsPlayPauseButton: function(element){
+    element.addEventListener("click", this.onPlayControlClick.context(this), false);
+  },
+  activateAsPlayButton: function(element){
+    element.addEventListener("click", this.onPlayButtonClick.context(this), false);
+  },
+
   // React to clicks on the play/pause button
   onPlayControlClick: function(event){
     if (this.video.paused) {
       this.video.play();
     } else {
-      // Android has a problem with "paused" not returning correctly.
-      if (!this.hasPlayed && VideoJS.isAndroid) {
-        this.video.play(); return;
-      } else {
-        this.video.pause();
-      }
+      this.video.pause();
     }
   },
+  onPlayButtonClick: function(event){ this.video.play(); },
+  onPauseButtonClick: function(event){ this.video.pause(); },
   // When the video is played
   onPlay: function(event){
     this.hasPlayed = true;
-    this.playControl.className = "vjs-play-control vjs-pause";
+    _V_.removeClass(this.box, "vjs-paused");
+    _V_.addClass(this.box, "vjs-playing");
     this.trackPlayProgress();
   },
   // When the video is paused
   onPause: function(event){
-    this.playControl.className = "vjs-play-control vjs-play";
+    _V_.removeClass(this.box, "vjs-playing");
+    _V_.addClass(this.box, "vjs-paused");
     this.stopTrackingPlayProgress();
   },
   // When the video ends
@@ -678,7 +684,7 @@ var VideoJS = JRClass.extend({
     this.video.parentNode.appendChild(this.bigPlayButton);
   },
   activateBigPlayButton: function(){
-    this.bigPlayButton.addEventListener("click", this.onPlayControlClick.context(this), false);
+    this.activateAsPlayPauseButton(this.bigPlayButton);
     this.video.addEventListener("play", this.bigPlayButtonOnPlay.context(this), false);
     this.video.addEventListener("ended", this.bigPlayButtonOnEnded.context(this), false);
   },
@@ -789,7 +795,7 @@ var VideoJS = JRClass.extend({
     // Listen for the mouse moving out of the poster image. Used to hide the controller.
     this.poster.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
     // Make a click on the poster act like a click on the play button.
-    this.poster.addEventListener("click", this.onPlayControlClick.context(this), false);
+    this.activateAsPlayButton(this.poster);
     // Hide/Show poster on video events
     this.video.addEventListener("play", this.posterOnPlay.context(this), false);
     this.video.addEventListener("ended", this.posterOnEnded.context(this), false);

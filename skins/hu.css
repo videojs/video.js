@@ -36,8 +36,8 @@ Version 1.2.0
 
 /* Play/Pause
 -------------------------------------------------------------------------------- */
-.hu-css .vjs-play-control.vjs-play span { margin: 9px 0 0 12px; }
-.hu-css .vjs-play-control.vjs-pause span { margin: 9px 0 0 12px; }
+.hu-css.vjs-paused .vjs-play-control span { margin: 9px 0 0 12px; }
+.hu-css.vjs-playing .vjs-play-control span { margin: 9px 0 0 12px; }
 .hu-css .vjs-play-control:hover { background-color: #000; }
 
 /* Progress

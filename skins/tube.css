@@ -36,10 +36,10 @@ Version 1.2.0
 /* Play/Pause
 -------------------------------------------------------------------------------- */
 .tube-css .vjs-play-control { margin-left: 0; border-left-color: #b1b1b1; }
-.tube-css .vjs-play-control.vjs-play span { border-left-color: #333; border-top-width: 7px; border-left-width: 13px; border-bottom-width: 7px; margin: 5px 0 0 7px; }
-.tube-css .vjs-play-control.vjs-pause span { height: 14px; margin: 5px auto 0; border-left: 4px solid #333; border-right: 4px solid #333; }
-.tube-css .vjs-play-control.vjs-play:hover span { border-left-color: #CF1A1A; }
-.tube-css .vjs-play-control.vjs-pause:hover span { border-left-color: #CF1A1A; border-right-color: #CF1A1A; }
+.tube-css.vjs-paused  .vjs-play-control span { border-left-color: #333; border-top-width: 7px; border-left-width: 13px; border-bottom-width: 7px; margin: 5px 0 0 7px; }
+.tube-css.vjs-playing .vjs-play-control span { height: 14px; margin: 5px auto 0; border-left: 4px solid #333; border-right: 4px solid #333; }
+.tube-css.vjs-paused  .vjs-play-control:hover span { border-left-color: #CF1A1A; }
+.tube-css.vjs-playing .vjs-play-control:hover span { border-left-color: #CF1A1A; border-right-color: #CF1A1A; }
 
 /* Time Display
 -------------------------------------------------------------------------------- */

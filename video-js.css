@@ -88,14 +88,14 @@ so you can upgrade to newer versions easier. */
 -------------------------------------------------------------------------------- */
 .vjs-play-control { cursor: pointer !important; }
 .vjs-play-control span { display: block; font-size: 0; line-height: 0; }
-.vjs-play-control.vjs-play span {
+.vjs-paused .vjs-play-control span {
   width: 0; height: 0; margin: 8px 0 0 8px;
   /* Drawing the play triangle with borders - http://www.infimum.dk/HTML/slantinfo.html */
   border-left: 10px solid #fff; /* Width & Color of play icon */
   /* Height of play icon is total top & bottom border widths. Color is transparent. */
   border-top: 5px solid rgba(0,0,0,0); border-bottom: 5px solid rgba(0,0,0,0);
 }
-.vjs-play-control.vjs-pause span {
+.vjs-playing .vjs-play-control span {
   width: 3px; height: 10px; margin: 8px auto 0;
   /* Drawing the pause bars with borders */
   border-top: 0px; border-left: 3px solid #fff; border-bottom: 0px; border-right: 3px solid #fff;
