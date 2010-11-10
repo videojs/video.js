@@ -47,7 +47,7 @@ var VideoJS = JRClass.extend({
       flashVersion: 9, // Required flash version for fallback
       linksHiding: true, // Hide download links when video is supported
       flashIsDominant: false, // Always use Flash when available
-      useBrowserControls: false, // Dont' use the video JS controls (iPhone)
+      useBuiltInControls: false, // Dont' use the video JS controls (iPhone)
       players: ["html5", "flashObject", "links"] // Players and order to use them
     };
     // Override default options with global options
@@ -57,9 +57,9 @@ var VideoJS = JRClass.extend({
 
     // Store reference to embed code pieces
     this.box = this.video.parentNode;
-    this.flashObject = this.getFlashObject();
     this.linksFallback = this.getLinksFallback();
     this.hideLinksFallback(); // Will be shown again if "links" player is used
+    this.flashObject = this.getFlashObject();
 
     // Loop through the player names list in options, "html5" etc.
     // For each player name, initialize the player with that name under VideoJS.players
@@ -73,23 +73,20 @@ var VideoJS = JRClass.extend({
   },
 
   html5Init: function(){
-    this.fixPreloading(); // Support older browsers that used autobuffer
+    this.fixPreloading();
 
     if (VideoJS.isIOS()) {
-      this.options.useBrowserControls = true;
-      if(VideoJS.iOSVersion() < 4) {
-        this.forceTheSource();
-      }
+      this.options.useBuiltInControls = true;
+      this.iOSInterface();
     }
 
     if (VideoJS.isAndroid()) {
-      this.options.useBrowserControls = true;
-      this.forceTheSource();
-      this.video.addEventListener("click", function(){ this.play(); }, false);
+      this.options.useBuiltInControls = true;
+      this.androidInterface();
     }
 
     // Add VideoJS Controls
-    if (!this.options.useBrowserControls) {
+    if (!this.options.useBuiltInControls) {
       this.video.controls = false;
 
       if (this.options.controlsBelow) { _V_.addClass(this.box, "vjs-controls-below"); }
@@ -97,10 +94,10 @@ var VideoJS = JRClass.extend({
 
       // Build Interface
       this.buildStylesCheckDiv(); // Used to check if style are loaded
-      this.buildPoster();
-      this.buildBigPlayButton();
-      this.buildSpinner();
-      this.buildControlBar();
+      this.buildAndActivatePoster();
+      this.buildAndActivateBigPlayButton();
+      this.buildAndActivateSpinner();
+      this.buildAndActivateControlBar();
       this.loadInterface(); // Show everything once styles are loaded
       this.getSubtitles();
 
@@ -109,7 +106,7 @@ var VideoJS = JRClass.extend({
       // These event listeners are attached to global elements like document/window.
       // They are also temporary, which means they need to be removed.
       // They also need context (this) so they can call functions on their specific player.
-      // Adding context on initialization allows them to referenced and removed after being attached.
+      // Adding context on initialization allows us to store a reference to them and remove them later.
       this.onEscKey = this.onEscKey.context(this);
       this.onWindowResize = this.onWindowResize.context(this);
       this.onProgressMouseMove = this.onProgressMouseMove.context(this);
@@ -126,9 +123,8 @@ var VideoJS = JRClass.extend({
     var children = this.video.children;
     for (var i=0,j=children.length; i<j; i++) {
       if (children[i].tagName.toUpperCase() == "SOURCE") {
-        var canPlay = this.video.canPlayType(children[i].type);
-        if(canPlay == "probably" || canPlay == "maybe"
-          || (VideoJS.isAndroid() && children[i].src.match(/\.(mp4|m4v)$/i))) {
+        var canPlay = this.video.canPlayType(children[i].type) || this.canPlayExt(children[i].src);
+        if (canPlay == "probably" || canPlay == "maybe") {
           this.firstPlayableSource = children[i];
           this.canPlaySourceResult = true;
           return true;
@@ -137,6 +133,23 @@ var VideoJS = JRClass.extend({
     }
     this.canPlaySourceResult = false;
     return false;
+  },
+
+  // Check if the extention is compatible, for when type won't work
+  canPlayExt: function(src){
+    if (!src) { return ""; }
+    var match = src.match(/\.([^\.]+)$/);
+    if (match && match[1]) {
+      var ext = match[1].toLowerCase();
+      // Android canPlayType doesn't work
+      if (VideoJS.isAndroid()) {
+        if (ext == "mp4" || ext == "m4v") { return "maybe"; }
+      // Allow Apple HTTP Streaming for iOS
+      } else if (VideoJS.isIOS()) {
+        if (ext == "m3u8") { return "maybe"; }
+      }
+    }
+    return "";
   },
 
   // Force the video source - Helps fix loading bugs in a handful of devices, like the iPad/iPhone poster bug
@@ -159,11 +172,16 @@ var VideoJS = JRClass.extend({
     this.showPoster();
     if (this.video.paused !== false) { this.showBigPlayButton(); }
     if (this.options.showControlsAtStart) { this.showControlBar(); }
-    this.positionBox();
+    this.positionAll();
   },
 
   /* VideoJS Box - Holds all elements
   ================================================================================ */
+  positionAll: function(){
+    this.positionBox();
+    this.positionControlBar();
+    this.positionPoster();
+  },
   positionBox: function(){
     // Set width based on fullscreen or not.
     if (this.videoIsFullScreen) {
@@ -179,13 +197,11 @@ var VideoJS = JRClass.extend({
         this.box.style.height = this.video.offsetHeight + this.controls.offsetHeight + "px";
       }
     }
-    this.positionControlBar();
-    this.positionPoster();
   },
 
   /* Control Bar
   ================================================================================ */
-  buildControlBar: function(){
+  buildAndActivateControlBar: function(){
     /* Creating this HTML
       <ul class="vjs-controls">
         <li class="vjs-play-control vjs-play">
@@ -269,15 +285,15 @@ var VideoJS = JRClass.extend({
     });
     this.controls.appendChild(this.fullscreenControl);
 
-    this.initializeControls();
+    this.activateControls();
   },
   // Set up Event Listeners
-  initializeControls: function(){
-    /* Initialize Errors
+  activateControls: function(){
+    /* Activate Errors
     ================================================================================ */
     this.video.addEventListener('error',this.onError.context(this),false);
 
-    /* Initialize Play/Pause
+    /* Activate Play/Pause
     ================================================================================ */
     // Listen for when the video is played
     this.video.addEventListener("play", this.onPlay.context(this), false);
@@ -290,21 +306,21 @@ var VideoJS = JRClass.extend({
     // Make a click on the video act like a click on the play button.
     this.video.addEventListener("click", this.onPlayControlClick.context(this), false);
 
-    /* Initialize Play Progress
+    /* Activate Play Progress
     ================================================================================ */
     // Listen for drags on the progress bar
     this.progressHolder.addEventListener("mousedown", this.onProgressHolderMouseDown.context(this), false);
     // Listen for a release on the progress bar
     this.progressHolder.addEventListener("mouseup", this.onProgressHolderMouseUp.context(this), false);
 
-    /* Initialize Buffering Progress
+    /* Activate Buffering Progress
     ================================================================================ */
     // Listen for Video Load Progress (currently does not if html file is local)
     this.video.addEventListener('progress', this.onProgress.context(this), false);
     // Set interval for load progress using buffer watching method
     this.watchBuffer = setInterval(this.updateBufferedTotal.context(this), 33);
 
-    /* Initialize Volume
+    /* Activate Volume
     ================================================================================ */
     // Set to stored volume OR 85%
     this.setVolume(localStorage.volume || this.options.defaultVolume);
@@ -317,12 +333,12 @@ var VideoJS = JRClass.extend({
     // Listen for a release on the volume control
     this.volumeControl.addEventListener("mouseup", this.onVolumeControlMouseUp.context(this), false);
 
-    /* Initialize Fullscreen
+    /* Activate Fullscreen
     ================================================================================ */
     // Listen for clicks on the button
     this.fullscreenControl.addEventListener("click", this.onFullscreenControlClick.context(this), false);
 
-    /* Initialize Controls Movement
+    /* Activate Controls Movement
     ================================================================================ */
     // Block hiding when over controls
     this.controls.addEventListener("mousemove", this.onControlsMouseMove.context(this), false);
@@ -379,10 +395,15 @@ var VideoJS = JRClass.extend({
     }
   },
 
-  /* Errors
+  /* Errors/Warnings
   ================================================================================ */
   errors: [], // Array to track errors
   onError: function(event){ this.log(this.video.error); },
+  warnings: [],
+  warning: function(warning){
+    this.warnings.push(warning);
+    this.log(warning);
+  },
 
   /* Play/Pause
   ================================================================================ */
@@ -435,7 +456,7 @@ var VideoJS = JRClass.extend({
   setPlayProgress: function(newProgress){
     try { this.video.currentTime = newProgress * this.video.duration; }
       catch(e) {
-        if (e.code == 11) { this.errors.push(VideoJS.errorCodes.videoNotReady); }
+        if (e.code == 11) { this.warning(VideoJS.warnings.videoNotReady); }
       }
     this.playProgress.style.width = newProgress * (_V_.getComputedStyleValue(this.progressHolder, "width").replace("px", "")) + "px";
     this.updateTimeDisplay();
@@ -554,7 +575,7 @@ var VideoJS = JRClass.extend({
   // Set a new volume based on where the user clicked on the volume control
   setVolume: function(newVol){
     this.video.volume = parseFloat(newVol);
-    localStorage.volume = this.video.volume;
+    this.setLocalStorage("volume", this.video.volume);
   },
 
   setVolumeWithEvent: function(event){
@@ -601,7 +622,7 @@ var VideoJS = JRClass.extend({
       // Apply fullscreen styles
       _V_.addClass(this.box, "vjs-fullscreen");
       // Resize the box, controller, and poster
-      this.positionBox();
+      this.positionAll();
     }
   },
   // If available use the native fullscreen
@@ -612,7 +633,7 @@ var VideoJS = JRClass.extend({
         try {
           this.video.webkitEnterFullScreen();
         } catch (e) {
-          if (e.code == 11) { this.errors.push(VideoJS.errorCodes.videoNotReady); }
+          if (e.code == 11) { this.warning(VideoJS.warnings.videoNotReady); }
         }
         return true;
       }
@@ -628,7 +649,7 @@ var VideoJS = JRClass.extend({
     // Remove fullscreen styles
     _V_.removeClass(this.box, "vjs-fullscreen");
     // Resize the box, controller, and poster to original sizes
-    this.positionBox();
+    this.positionAll();
   },
   onWindowResize: function(event){ // Removeable
     this.positionControlBar();
@@ -642,6 +663,10 @@ var VideoJS = JRClass.extend({
 
   /* Big Play Button
   ================================================================================ */
+  buildAndActivateBigPlayButton: function(){
+    this.buildBigPlayButton();
+    this.activateBigPlayButton();
+  },
   buildBigPlayButton: function(){
     /* Creating this HTML
       <div class="vjs-big-play-button"><span></span></div>
@@ -651,9 +676,8 @@ var VideoJS = JRClass.extend({
       innerHTML: "<span></span>"
     });
     this.video.parentNode.appendChild(this.bigPlayButton);
-    this.initializeBigPlayButton();
   },
-  initializeBigPlayButton: function(){
+  activateBigPlayButton: function(){
     this.bigPlayButton.addEventListener("click", this.onPlayControlClick.context(this), false);
     this.video.addEventListener("play", this.bigPlayButtonOnPlay.context(this), false);
     this.video.addEventListener("ended", this.bigPlayButtonOnEnded.context(this), false);
@@ -665,15 +689,15 @@ var VideoJS = JRClass.extend({
 
   /* Spinner (Loading)
   ================================================================================ */
-  buildSpinner: function(){
+  buildAndActivateSpinner: function(){
     this.spinner = _V_.createElement("div", {
       className: "vjs-spinner",
       innerHTML: "<div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>"
     });
     this.video.parentNode.appendChild(this.spinner);
-    this.initializeSpinner();
+    this.activateSpinner();
   },
-  initializeSpinner: function(){
+  activateSpinner: function(){
     this.video.addEventListener("loadeddata", this.spinnerOnLoadedData.context(this), false);
     this.video.addEventListener("loadstart", this.spinnerOnLoadStart.context(this), false);
     this.video.addEventListener("seeking", this.spinnerOnSeeking.context(this), false);
@@ -743,7 +767,7 @@ var VideoJS = JRClass.extend({
 
   /* Poster Image
   ================================================================================ */
-  buildPoster: function(){
+  buildAndActivatePoster: function(){
     this.updatePosterSource();
     if (this.video.poster) {
       this.poster = document.createElement("img");
@@ -754,23 +778,21 @@ var VideoJS = JRClass.extend({
       this.poster.src = this.video.poster;
       // Add poster styles
       this.poster.className = "vjs-poster";
-      this.initializePoster();
+      this.activatePoster();
     } else {
       this.poster = false;
     }
   },
-  initializePoster: function(){
-    if (this.poster) {
-      // Listen for the mouse move the poster image. Used to reveal the controller.
-      this.poster.addEventListener("mousemove", this.onVideoMouseMove.context(this), false);
-      // Listen for the mouse moving out of the poster image. Used to hide the controller.
-      this.poster.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
-      // Make a click on the poster act like a click on the play button.
-      this.poster.addEventListener("click", this.onPlayControlClick.context(this), false);
-      // Hide/Show poster on video events
-      this.video.addEventListener("play", this.posterOnPlay.context(this), false);
-      this.video.addEventListener("ended", this.posterOnEnded.context(this), false);
-    }
+  activatePoster: function(){
+    // Listen for the mouse move the poster image. Used to reveal the controller.
+    this.poster.addEventListener("mousemove", this.onVideoMouseMove.context(this), false);
+    // Listen for the mouse moving out of the poster image. Used to hide the controller.
+    this.poster.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
+    // Make a click on the poster act like a click on the play button.
+    this.poster.addEventListener("click", this.onPlayControlClick.context(this), false);
+    // Hide/Show poster on video events
+    this.video.addEventListener("play", this.posterOnPlay.context(this), false);
+    this.video.addEventListener("ended", this.posterOnEnded.context(this), false);
   },
   // Add the video poster to the video's container, to fix autobuffer/preload bug
   showPoster: function(){
@@ -782,8 +804,8 @@ var VideoJS = JRClass.extend({
   positionPoster: function(){
     // Only if the poster is visible
     if (!this.poster || this.poster.style.display == 'none') { return; }
-    this.poster.style.height = this.video.offsetHeight + "px";
-    this.poster.style.width = this.video.offsetWidth + "px";
+    this.poster.style.height = this.video.offsetHeight + "px"; // Need incase controlsBelow
+    this.poster.style.width = this.video.offsetWidth + "px"; // Could probably do 100% of box
   },
   hidePoster: function(){
     if (!this.poster) { return; }
@@ -805,20 +827,14 @@ var VideoJS = JRClass.extend({
   getSubtitles: function(){
     var tracks = this.video.getElementsByTagName("TRACK");
     for (var i=0,j=tracks.length; i<j; i++) {
-      if (tracks[i].getAttribute("kind") == "subtitles") {
-        this.subtitlesSource = tracks[i].getAttribute("src");
-      }
+      if (tracks[i].getAttribute("kind") == "subtitles") { this.subtitlesSource = tracks[i].getAttribute("src"); }
     }
     if (this.subtitlesSource !== undefined) {
       this.loadSubtitles();
       this.buildSubtitles();
     }
   },
-
-  loadSubtitles: function() {
-    _V_.get(this.subtitlesSource, this.parseSubtitles.context(this));
-  },
-
+  loadSubtitles: function() { _V_.get(this.subtitlesSource, this.parseSubtitles.context(this)); },
   parseSubtitles: function(subText) {
     var lines = subText.replace("\r",'').split("\n");
     this.subtitles = [];
@@ -833,22 +849,18 @@ var VideoJS = JRClass.extend({
       if (!subtitle.id) {
         break;
       }
-
       // get time
       var time = lines[i++].split(" --> ");
       subtitle.startTime = this.parseSubtitleTime(time[0]);
       subtitle.endTime = this.parseSubtitleTime(time[1]);
-
       // get subtitle text
       var text = [];
       while(lines[i].length>0 && lines[i]!="\r") {
         text.push(lines[i++]);
       }
       subtitle.text = text.join('<br/>');
-
       // add this subtitle
       this.subtitles.push(subtitle);
-
       // ignore the blank line
       i++;
     }
@@ -875,10 +887,10 @@ var VideoJS = JRClass.extend({
     */
     this.subtitlesDiv = _V_.createElement("div", { className: 'vjs-subtitles' });
     this.box.appendChild(this.subtitlesDiv);
-    this.initializeSubtitles();
+    this.activateSubtitles();
   },
 
-  initializeSubtitles: function(){
+  activateSubtitles: function(){
     this.video.addEventListener('timeupdate', this.subtitlesOnTimeUpdate.context(this), false);
   },
 
@@ -918,7 +930,15 @@ var VideoJS = JRClass.extend({
     }
   },
 
-  /* Using Default Controls for iPad now. Can't do native fullscreen through the iPad API */
+  iOSInterface: function(){
+    if(VideoJS.iOSVersion() < 4) { this.forceTheSource(); } // Fix loading issues
+    if(VideoJS.isIPad()) {
+      this.buildAndActivateSpinner(); // Spinner still works well on iPad, since iPad doesn't have one
+    }
+  },
+
+  /* Save incase we want to use VideoJS controls for iPad again.
+     Using built-in Controls for now. Can't do native fullscreen through the iPad API */
   // For iPads, controls need to always show because there's no hover
   // The controls also have to be below for the full-window mode to work.
   // iPadFix: function(){
@@ -926,13 +946,15 @@ var VideoJS = JRClass.extend({
   //   this.options.controlsHiding = false;
   // },
 
-  history: [],
-  log: function(event){
-    if (!event) { return; }
-    if (typeof event == "string") { event = { type: event }; }
-    if (event.type) { this.history.push(event.type); }
-    if (this.history.length >= 50) { this.history.shift(); }
-    if (this.options.debug === true) { console.log(event.type); }
+  // Fix android specific quirks
+  // Use built-in controls, but add the big play button, since android doesn't have one.
+  androidInterface: function(){
+    this.forceTheSource(); // Fix loading issues
+    this.video.addEventListener("click", function(){ this.play(); }, false); // Required to play
+    this.buildBigPlayButton(); // But don't activate the normal way. Pause doesn't work right on android.
+    this.bigPlayButton.addEventListener("click", function(){ this.video.play(); }.context(this), false);
+    this.positionBox();
+    this.showBigPlayButton();
   },
 
   /* Flash Object Fallback
@@ -946,6 +968,7 @@ var VideoJS = JRClass.extend({
       }
     }
   },
+  // Used to force a browser to fall back when it's an HTML5 browser but there's no supported sources
   replaceWithFlash: function(){
     // this.flashObject = this.video.removeChild(this.flashObject);
     if (this.flashObject) {
@@ -967,6 +990,28 @@ var VideoJS = JRClass.extend({
   // Hide no-video download paragraph
   showLinksFallback: function(){
     if (this.linksFallback) { this.linksFallback.style.display = "block"; }
+  },
+
+  /* History of errors/events (not quite there yet)
+  ================================================================================ */
+  history: [],
+  log: function(event){
+    if (!event) { return; }
+    if (typeof event == "string") { event = { type: event }; }
+    if (event.type) { this.history.push(event.type); }
+    if (this.history.length >= 50) { this.history.shift(); }
+    try { console.log(event.type); } catch(e) { try { opera.postError(event.type); } catch(e){} }
+  },
+
+  /* Local Storage
+  ================================================================================ */
+  setLocalStorage: function(key, value){
+    try { localStorage[key] = value; } 
+    catch(e) {
+      if (e.code == 22 || e.code == 1014) { // Webkit == 22 / Firefox == 1014
+        this.warning(VideoJS.warnings.localStorageFull);
+      }
+    }
   },
 
   /* Player API - Translate functionality from player to video
@@ -1275,9 +1320,11 @@ VideoJS.androidVersion = function() {
   if (match && match[1]) { return match[1]; }
 };
 
-VideoJS.errorCodes = {
+VideoJS.warnings = {
   // Safari errors if you call functions on a video that hasn't loaded yet
-  videoNotReady: "Video is not ready yet (try playing the video first)."
+  videoNotReady: "Video is not ready yet (try playing the video first).",
+  // Getting a QUOTA_EXCEEDED_ERR when setting local storage occasionally
+  localStorageFull: "Local Storage is Full"
 };
 
 // Allows for binding context to functions
