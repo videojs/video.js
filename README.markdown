@@ -129,14 +129,22 @@ Set options when setting up the videos. The defaults are shown here.
 
 Changelog
 ---------
-1.1.5
+1.2.0
+
+- Feature: Switched back to divs for controls, for more portable styles.
+- Feature: Added play button for Android.
+- Feature: Added spinner for iPad (non-fullscreen)
+- Fix: Checking for m3u8 files (Apple HTTP Streaming)
+- Fix: Catching error on localStorage full that safari seems to randomly throw
+
+1.1.5 (2010-11-09)
 
 - Feature: Switched to track method for setting subtitles. Now works like spec.
 - Feature: Created "players" concept for defining fallbacks and fallback order
 - Fix: Android playback bug.
 - Fix: Massive reorganization of code to make easier to navigate
 
-1.1.4
+1.1.4 (2010-11-06)
 
 - Feature: Added loading spinner.
 - Feature: Improved styles loaded checking.
@@ -147,7 +155,7 @@ Changelog
 - Fix: Updated to show links if only unplayable sources and no Flash.
 - Fix: Issue where if play button was loaded after play, it wouldn't hide.
 
-1.1.3
+1.1.3 (2010-10-19)
 
 - Feature: Width/Height functions for resizing the player
 - Feature: Made initial click & hold trigger new value on progress and volume

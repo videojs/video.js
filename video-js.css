@@ -1,6 +1,6 @@
 /* 
 VideoJS Default Styles (http://videojs.com)
-Version 1.1.5
+Version 1.2.0
 
 REQUIRED STYLES (be careful overriding)
 ================================================================================ */
@@ -22,7 +22,7 @@ video.video-js { background-color: #000; position: relative; }
 .video-js-box.vjs-fullscreen video.video-js { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; }
 .video-js-box.vjs-fullscreen img.vjs-poster { z-index: 1001; }
 .video-js-box.vjs-fullscreen .vjs-spinner { z-index: 1001; }
-.video-js-box.vjs-fullscreen ul.vjs-controls { z-index: 1003; }
+.video-js-box.vjs-fullscreen .vjs-controls { z-index: 1003; }
 .video-js-box.vjs-fullscreen .vjs-big-play-button { z-index: 1004; }
 .video-js-box.vjs-fullscreen .vjs-subtitles { z-index: 1004; }
 
@@ -38,8 +38,8 @@ so you can upgrade to newer versions easier. */
 /* Controls Layout
    Using a Holy Grail type method to allow the progress bar holder to expand into all available space,
    but using abosolute positioning for individual controls. http://www.alistapart.com/articles/holygrail */
-.video-js-box ul.vjs-controls {
-  list-style: none; position: absolute; margin: 0; border: none; opacity: 0.85; color: #fff;
+.video-js-box .vjs-controls {
+  position: absolute; margin: 0; border: none; opacity: 0.85; color: #fff;
   display: none; /* Start hidden */
   left: 0; right: 0; /* 100% width of video-js-box */
   height: 35px; /* Including any margin you want above or below control items */
@@ -48,10 +48,10 @@ so you can upgrade to newer versions easier. */
   padding-top: 0; padding-bottom: 0;
 }
 /* Controls styles when below the video */
-.video-js-box.vjs-controls-below ul.vjs-controls { background-color: #000; }
+.video-js-box.vjs-controls-below .vjs-controls { background-color: #000; }
 
-.video-js-box ul.vjs-controls > li { /* Direct li children of control bar */
-  position: absolute; list-style: none; float: left; padding: 0; text-align: center;
+.video-js-box .vjs-controls > div { /* Direct div children of control bar */
+  position: absolute; float: left; padding: 0; text-align: center;
   height: 25px; /* Default height of individual controls */
   margin: 5px 0 0 0; /* Top margin to put space between video and controls when controls are below */
 
@@ -68,34 +68,34 @@ so you can upgrade to newer versions easier. */
 }
 
 /* Placement of Control Items */
-ul.vjs-controls > li.vjs-play-control       { width: 25px; left: 5px; }
-ul.vjs-controls > li.vjs-progress-control   { width: 100%; position: relative; }
-ul.vjs-controls > li.vjs-time-control       { width: 75px; right: 90px; } /* Time control and progress bar are combined to look like one */
-ul.vjs-controls > li.vjs-volume-control     { width: 50px; right: 35px; }
-ul.vjs-controls > li.vjs-fullscreen-control { width: 25px; right: 5px; }
+.vjs-controls > div.vjs-play-control       { width: 25px; left: 5px; }
+.vjs-controls > div.vjs-progress-control   { width: 100%; position: relative; }
+.vjs-controls > div.vjs-time-control       { width: 75px; right: 90px; } /* Time control and progress bar are combined to look like one */
+.vjs-controls > div.vjs-volume-control     { width: 50px; right: 35px; }
+.vjs-controls > div.vjs-fullscreen-control { width: 25px; right: 5px; }
 
 /* Removing curves on progress control and time control to join them. */
-ul.vjs-controls > li.vjs-progress-control {
+.vjs-controls > div.vjs-progress-control {
   border-top-right-radius: 0; -webkit-border-top-right-radius: 0; -moz-border-radius-topright: 0;
   border-bottom-right-radius: 0; -webkit-border-bottom-right-radius: 0; -moz-border-radius-bottomright: 0;
 }
-ul.vjs-controls > li.vjs-time-control { 
+.vjs-controls > div.vjs-time-control { 
   border-top-left-radius: 0; -webkit-border-top-left-radius: 0; -moz-border-radius-topleft: 0;
   border-bottom-left-radius: 0; -webkit-border-bottom-left-radius: 0; -moz-border-radius-bottomleft: 0;
 }
 
 /* Play/Pause
 -------------------------------------------------------------------------------- */
-li.vjs-play-control { cursor: pointer !important; }
-li.vjs-play-control span { display: block; font-size: 0; line-height: 0; }
-li.vjs-play-control.vjs-play span {
+.vjs-play-control { cursor: pointer !important; }
+.vjs-play-control span { display: block; font-size: 0; line-height: 0; }
+.vjs-play-control.vjs-play span {
   width: 0; height: 0; margin: 8px 0 0 8px;
   /* Drawing the play triangle with borders - http://www.infimum.dk/HTML/slantinfo.html */
   border-left: 10px solid #fff; /* Width & Color of play icon */
   /* Height of play icon is total top & bottom border widths. Color is transparent. */
   border-top: 5px solid rgba(0,0,0,0); border-bottom: 5px solid rgba(0,0,0,0);
 }
-li.vjs-play-control.vjs-pause span {
+.vjs-play-control.vjs-pause span {
   width: 3px; height: 10px; margin: 8px auto 0;
   /* Drawing the pause bars with borders */
   border-top: 0px; border-left: 3px solid #fff; border-bottom: 0px; border-right: 3px solid #fff;
@@ -103,22 +103,22 @@ li.vjs-play-control.vjs-pause span {
 
 /* Progress
 -------------------------------------------------------------------------------- */
-ul.vjs-progress-holder { /* Box containing play and load progresses */
-  position: relative; list-style: none; padding: 0; overflow:hidden; cursor: pointer !important;
+.vjs-progress-holder { /* Box containing play and load progresses */
+  position: relative; padding: 0; overflow:hidden; cursor: pointer !important;
   height: 9px; border: 1px solid #777;
   margin: 7px 1px 0 5px; /* Placement within the progress control item */
   border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px;
 }
-ul.vjs-progress-holder li { /* Progress Bars */
-  position: absolute; display: block; width: 0; height: 9px; margin: 0; padding: 0; list-style: none;
+.vjs-progress-holder div { /* Progress Bars */
+  position: absolute; display: block; width: 0; height: 9px; margin: 0; padding: 0;
   border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px;
 }
-li.vjs-play-progress {
+.vjs-play-progress {
   /* Default */ background: #fff;
   /* Webkit  */ background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#777));
   /* Firefox */ background: -moz-linear-gradient(top,  #fff,  #777);
 }
-li.vjs-load-progress {
+.vjs-load-progress {
   opacity: 0.8;
   /* Default */ background-color: #555;
   /* Webkit  */ background: -webkit-gradient(linear, left top, left bottom, from(#555), to(#aaa));
@@ -127,53 +127,53 @@ li.vjs-load-progress {
 
 /* Time Display
 -------------------------------------------------------------------------------- */
-ul.vjs-controls li.vjs-time-control { font-size: 10px; line-height: 1; font-weight: normal; font-family: Helvetica, Arial, sans-serif; }
-ul.vjs-controls li.vjs-time-control span { line-height: 25px; /* Centering vertically */ }
+.vjs-controls .vjs-time-control { font-size: 10px; line-height: 1; font-weight: normal; font-family: Helvetica, Arial, sans-serif; }
+.vjs-controls .vjs-time-control span { line-height: 25px; /* Centering vertically */ }
 
 /* Volume
 -------------------------------------------------------------------------------- */
-li.vjs-volume-control { cursor: pointer !important; }
-li.vjs-volume-control ul { list-style: none; display: block; margin: 0 5px 0 5px; padding: 4px 0 0 0; }
-/* Drawing the volume icon using 6 li elements */
-li.vjs-volume-control ul li { /* Individual volume bars */
-  list-style: none; float: left; padding: 0;
+.vjs-volume-control { cursor: pointer !important; }
+.vjs-volume-control div { display: block; margin: 0 5px 0 5px; padding: 4px 0 0 0; }
+/* Drawing the volume icon using 6 span elements */
+.vjs-volume-control div span { /* Individual volume bars */
+  float: left; padding: 0;
   margin: 0 2px 0 0; /* Space between */
   width: 5px; height: 0px; /* Total height is height + bottom border */
   border-bottom: 18px solid #555; /* Default (off) color and height of visible portion */
 }
-li.vjs-volume-control ul li.vjs-volume-level-on { border-color: #fff; /* Volume on bar color */ }
+.vjs-volume-control div span.vjs-volume-level-on { border-color: #fff; /* Volume on bar color */ }
 /* Creating differnt bar heights through height (transparent) and bottom border (visible). */
-li.vjs-volume-control ul li:nth-child(1) { border-bottom-width: 2px; height: 16px; }
-li.vjs-volume-control ul li:nth-child(2) { border-bottom-width: 4px; height: 14px; }
-li.vjs-volume-control ul li:nth-child(3) { border-bottom-width: 7px; height: 11px; }
-li.vjs-volume-control ul li:nth-child(4) { border-bottom-width: 10px; height: 8px; }
-li.vjs-volume-control ul li:nth-child(5) { border-bottom-width: 14px; height: 4px; }
-li.vjs-volume-control ul li:nth-child(6) { margin-right: 0; }
+.vjs-volume-control div span:nth-child(1) { border-bottom-width: 2px; height: 16px; }
+.vjs-volume-control div span:nth-child(2) { border-bottom-width: 4px; height: 14px; }
+.vjs-volume-control div span:nth-child(3) { border-bottom-width: 7px; height: 11px; }
+.vjs-volume-control div span:nth-child(4) { border-bottom-width: 10px; height: 8px; }
+.vjs-volume-control div span:nth-child(5) { border-bottom-width: 14px; height: 4px; }
+.vjs-volume-control div span:nth-child(6) { margin-right: 0; }
 
 /* Fullscreen
 -------------------------------------------------------------------------------- */
-li.vjs-fullscreen-control { cursor: pointer !important; }
-li.vjs-fullscreen-control ul {
-  list-style: none; padding: 0; text-align: left; vertical-align: top; cursor: pointer !important; 
+.vjs-fullscreen-control { cursor: pointer !important; }
+.vjs-fullscreen-control div {
+  padding: 0; text-align: left; vertical-align: top; cursor: pointer !important; 
   margin: 5px 0 0 5px; /* Placement within the fullscreen control item */
   width: 20px; height: 20px;
 }
 /* Drawing the fullscreen icon using 4 li elements */
-li.vjs-fullscreen-control ul li { list-style: none; float: left; margin: 0; padding: 0; font-size: 0; line-height: 0; width: 0; text-align: left; vertical-align: top; }
-li.vjs-fullscreen-control ul li:nth-child(1) { /* Top-left triangle */
+.vjs-fullscreen-control div span { float: left; margin: 0; padding: 0; font-size: 0; line-height: 0; width: 0; text-align: left; vertical-align: top; }
+.vjs-fullscreen-control div span:nth-child(1) { /* Top-left triangle */
   margin-right: 3px; /* Space between top-left and top-right */
   margin-bottom: 3px; /* Space between top-left and bottom-left */
   border-top: 6px solid #fff; /* Height and color */
   border-right: 6px solid rgba(0,0,0,0);  /* Width */
 }
-li.vjs-fullscreen-control ul li:nth-child(2) { border-top: 6px solid #fff; border-left: 6px solid rgba(0,0,0,0); }
-li.vjs-fullscreen-control ul li:nth-child(3) { clear: both; margin: 0 3px 0 0; border-bottom: 6px solid #fff; border-right: 6px solid rgba(0,0,0,0); }
-li.vjs-fullscreen-control ul li:nth-child(4) { border-bottom: 6px solid #fff; border-left: 6px solid rgba(0,0,0,0); }
+.vjs-fullscreen-control div span:nth-child(2) { border-top: 6px solid #fff; border-left: 6px solid rgba(0,0,0,0); }
+.vjs-fullscreen-control div span:nth-child(3) { clear: both; margin: 0 3px 0 0; border-bottom: 6px solid #fff; border-right: 6px solid rgba(0,0,0,0); }
+.vjs-fullscreen-control div span:nth-child(4) { border-bottom: 6px solid #fff; border-left: 6px solid rgba(0,0,0,0); }
 /* Icon when video is in fullscreen mode */
-.vjs-fullscreen li.vjs-fullscreen-control ul li:nth-child(1) { border: none; border-bottom: 6px solid #fff; border-left: 6px solid rgba(0,0,0,0); }
-.vjs-fullscreen li.vjs-fullscreen-control ul li:nth-child(2) { border: none; border-bottom: 6px solid #fff; border-right: 6px solid rgba(0,0,0,0); }
-.vjs-fullscreen li.vjs-fullscreen-control ul li:nth-child(3) { border: none; border-top: 6px solid #fff; border-left: 6px solid rgba(0,0,0,0); }
-.vjs-fullscreen li.vjs-fullscreen-control ul li:nth-child(4) { border: none; border-top: 6px solid #fff; border-right: 6px solid rgba(0,0,0,0); }
+.vjs-fullscreen .vjs-fullscreen-control div span:nth-child(1) { border: none; border-bottom: 6px solid #fff; border-left: 6px solid rgba(0,0,0,0); }
+.vjs-fullscreen .vjs-fullscreen-control div span:nth-child(2) { border: none; border-bottom: 6px solid #fff; border-right: 6px solid rgba(0,0,0,0); }
+.vjs-fullscreen .vjs-fullscreen-control div span:nth-child(3) { border: none; border-top: 6px solid #fff; border-left: 6px solid rgba(0,0,0,0); }
+.vjs-fullscreen .vjs-fullscreen-control div span:nth-child(4) { border: none; border-top: 6px solid #fff; border-right: 6px solid rgba(0,0,0,0); }
 
 /* Download Links - Used for browsers that don't support any video.
 ---------------------------------------------------------*/

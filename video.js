@@ -203,59 +203,59 @@ var VideoJS = JRClass.extend({
   ================================================================================ */
   buildAndActivateControlBar: function(){
     /* Creating this HTML
-      <ul class="vjs-controls">
-        <li class="vjs-play-control vjs-play">
+      <div class="vjs-controls">
+        <div class="vjs-play-control vjs-play">
           <span></span>
-        </li>
-        <li class="vjs-progress-control">
-          <ul class="vjs-progress-holder">
-            <li class="vjs-load-progress"></li>
-            <li class="vjs-play-progress"></li>
-          </ul>
-        </li>
-        <li class="vjs-time-control">
+        </div>
+        <div class="vjs-progress-control">
+          <div class="vjs-progress-holder">
+            <div class="vjs-load-progress"></div>
+            <div class="vjs-play-progress"></div>
+          </div>
+        </div>
+        <div class="vjs-time-control">
           <span class="vjs-current-time-display">00:00</span><span> / </span><span class="vjs-duration-display">00:00</span>
-        </li>
-        <li class="vjs-volume-control">
-          <ul>
-            <li></li><li></li><li></li><li></li><li></li><li></li>
-          </ul>
-        </li>
-        <li class="vjs-fullscreen-control">
-          <ul>
-            <li></li><li></li><li></li><li></li>
-          </ul>
-        </li>
-      </ul>
+        </div>
+        <div class="vjs-volume-control">
+          <div>
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+        <div class="vjs-fullscreen-control">
+          <div>
+            <span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
     */
 
     // Create a list element to hold the different controls
-    this.controls = _V_.createElement("ul", { className: "vjs-controls" });
+    this.controls = _V_.createElement("div", { className: "vjs-controls" });
     // Add the controls to the video's container
     this.video.parentNode.appendChild(this.controls);
 
     // Build the play control
-    this.playControl = _V_.createElement("li", { className: "vjs-play-control vjs-play", innerHTML: "<span></span>" });
+    this.playControl = _V_.createElement("div", { className: "vjs-play-control vjs-play", innerHTML: "<span></span>" });
     this.controls.appendChild(this.playControl);
 
     // Build the progress control
-    this.progressControl = _V_.createElement("li", { className: "vjs-progress-control" });
+    this.progressControl = _V_.createElement("div", { className: "vjs-progress-control" });
     this.controls.appendChild(this.progressControl);
 
     // Create a holder for the progress bars
-    this.progressHolder = _V_.createElement("ul", { className: "vjs-progress-holder" });
+    this.progressHolder = _V_.createElement("div", { className: "vjs-progress-holder" });
     this.progressControl.appendChild(this.progressHolder);
 
     // Create the loading progress display
-    this.loadProgress = _V_.createElement("li", { className: "vjs-load-progress" });
+    this.loadProgress = _V_.createElement("div", { className: "vjs-load-progress" });
     this.progressHolder.appendChild(this.loadProgress);
 
     // Create the playing progress display
-    this.playProgress = _V_.createElement("li", { className: "vjs-play-progress" });
+    this.playProgress = _V_.createElement("div", { className: "vjs-play-progress" });
     this.progressHolder.appendChild(this.playProgress);
 
     // Create the progress time display (00:00 / 00:00)
-    this.timeControl = _V_.createElement("li", { className: "vjs-time-control" });
+    this.timeControl = _V_.createElement("div", { className: "vjs-time-control" });
     this.controls.appendChild(this.timeControl);
 
     // Create the current play time display
@@ -271,17 +271,17 @@ var VideoJS = JRClass.extend({
     this.timeControl.appendChild(this.durationDisplay);
 
     // Create the volumne control
-    this.volumeControl = _V_.createElement("li", {
+    this.volumeControl = _V_.createElement("div", {
       className: "vjs-volume-control",
-      innerHTML: "<ul><li></li><li></li><li></li><li></li><li></li><li></li></ul>"
+      innerHTML: "<div><span></span><span></span><span></span><span></span><span></span><span></span></div>"
     });
     this.controls.appendChild(this.volumeControl);
     this.volumeDisplay = this.volumeControl.children[0];
 
     // Crete the fullscreen control
-    this.fullscreenControl = _V_.createElement("li", {
+    this.fullscreenControl = _V_.createElement("div", {
       className: "vjs-fullscreen-control",
-      innerHTML: "<ul><li></li><li></li><li></li><li></li></ul>"
+      innerHTML: "<div><span></span><span></span><span></span><span></span></div>"
     });
     this.controls.appendChild(this.fullscreenControl);
 
