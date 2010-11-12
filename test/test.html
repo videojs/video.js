@@ -8,7 +8,12 @@
   <script src="../video.js" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript">
     VideoJS.DOMReady(function(){
-      var myPlayer = VideoJS.setup("example_video_1", { controlsHiding: false, controlsBelow: true, showControlsAtStart: true });
+      var myPlayer = VideoJS.setup("example_video_1", { 
+        controlsHiding: false, 
+        controlsBelow: false, 
+        showControlsAtStart: true,
+        linksHiding: false,
+      });
       myPlayer.activateControl(document.getElementById("scrub"), "loadProgressBar");
       var vid = document.getElementById("example_video_1"),
           attrTable = document.getElementById("attributes"),
@@ -66,7 +71,7 @@
 
   <!-- Begin VideoJS -->
   <div id="scrub" style="background: #000; height: 10px;"></div>
-  <div class="video-js-box vim-css">
+  <div class="video-js-box">
     <!-- Using the Video for Everybody Embed Code http://camendesign.com/code/video_for_everybody -->
     <video data-subtitles="../demo-subtitles.srt" id="example_video_1" class="video-js" width="640" height="264" controls="controls" preload="auto" poster="http://video-js.zencoder.com/oceans-clip.png">
       <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />

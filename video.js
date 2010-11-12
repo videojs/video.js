@@ -49,7 +49,6 @@ var VideoJS = _V_ = JRClass.extend({
       controlsHiding: true, // Hide controls when not over the video
       defaultVolume: 0.85, // Will be overridden by localStorage volume if available
       flashVersion: 9, // Required flash version for fallback
-      linksHiding: true, // Hide download links when video is supported
       flashIsDominant: false, // Always use Flash when available
       useBuiltInControls: false, // Dont' use the video JS controls (iPhone)
       players: ["html5", "flashObject", "links"] // Players and order to use them
@@ -991,7 +990,7 @@ var VideoJS = _V_ = JRClass.extend({
   getLinksFallback: function(){ return this.box.getElementsByTagName("P")[0]; },
   // Hide no-video download paragraph
   hideLinksFallback: function(){
-    if (this.options.linksHiding && this.linksFallback) { this.linksFallback.style.display = "none"; }
+    if (this.linksFallback) { this.linksFallback.style.display = "none"; }
   },
   // Hide no-video download paragraph
   showLinksFallback: function(){

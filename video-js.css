@@ -4,18 +4,18 @@ Version 1.2.0
 
 REQUIRED STYLES (be careful overriding)
 ================================================================================ */
-
 /* Box containing video, controls, and download links.
+   Will be set to the width of the video element through JS
    If you want to add some kind of frame or special positioning, use another containing element, not video-js-box. */
-.video-js-box { text-align: left; position: relative; line-height: 0; margin: 0; padding: 0;  } /* Will be set to the width of the video element */
+.video-js-box { text-align: left; position: relative; line-height: 0 !important; margin: 0; padding: 0 !important; border: none !important;  }
 
 /* Video Element */
 video.video-js { background-color: #000; position: relative; padding: 0; }
 
-/* Poster Style */
-.video-js-box img.vjs-poster { display: block; position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; height: 100%; margin: 0; cursor: pointer; }
+/* Poster Overlay Style */
+.video-js-box img.vjs-poster { display: block; position: absolute; left: 0; top: 0; width: 100%; height: 100%; margin: 0; padding: 0; cursor: pointer; }
 /* Subtiles Style */
-.video-js-box .vjs-subtitles { color:#fff; font-size: 20px; text-align: center; bottom: 40px; left: 0; right: 0; position: absolute; }
+.video-js-box .vjs-subtitles { color: #fff; font-size: 20px; text-align: center; position: absolute; bottom: 40px; left: 0; right: 0; }
 
 /* Fullscreen styles for main elements */
 .video-js-box.vjs-fullscreen { position: fixed; left: 0; top: 0; right: 0; bottom: 0; overflow: hidden; z-index: 1000; }
@@ -28,9 +28,9 @@ video.video-js { background-color: #000; position: relative; padding: 0; }
 
 /* Styles Loaded Check */
 .vjs-styles-check { height: 5px; position: absolute; }
-.video-js-box.vjs-controls-below .vjs-controls { position: relative; opacity: 1; }
-.video-js-box.vjs-controls-below video { margin: 0 0 0px 0; /* Firefox gap */ }
-
+/* Controls Below Video */
+.video-js-box.vjs-controls-below .vjs-controls { position: relative; opacity: 1; background-color: #000; }
+.video-js-box.vjs-controls-below .vjs-subtitles { bottom: 75px; } /* Account for height of controls below video */
 
 /* DEFAULT SKIN (override in another file)
 ================================================================================
@@ -41,23 +41,22 @@ so you can upgrade to newer versions easier. */
 /* Controls Layout 
   Using absolute positioning to position controls */
 .video-js-box .vjs-controls {
-  position: absolute; margin: 0; border: none; opacity: 0.85; color: #fff;
+  position: absolute; margin: 0; opacity: 0.85; color: #fff;
   display: none; /* Start hidden */
   left: 0; right: 0; /* 100% width of video-js-box */
-  bottom: 0px;
+  bottom: 0px; /* Distance from the bottom of the box/video. Keep 0. Use height to add more bottom margin. */
   height: 35px; /* Including any margin you want above or below control items */
-  padding: 0;
+  padding: 0; /* Controls are absolutely position, so no padding necessary */
 }
-/* Controls styles when below the video */
-.video-js-box.vjs-controls-below .vjs-controls { background-color: #000; }
 
 .video-js-box .vjs-controls > div { /* Direct div children of control bar */
-  position: absolute; padding: 0; text-align: center;
+  position: absolute; /* Use top, bottom, left, and right to specifically position the control. */
+  text-align: center; margin: 0; padding: 0;
   height: 25px; /* Default height of individual controls */
-  margin: 0; padding: 0;
   top: 5px; /* Top margin to put space between video and controls when controls are below */
-  
-  /* CSS Background Gradients */
+
+  /* CSS Background Gradients 
+     Using to give the aqua-ish look. */
   /* Default */ background-color: #0B151A;
   /* Webkit  */ background: #1F3744 -webkit-gradient(linear, left top, left bottom, from(#0B151A), to(#1F3744)) left 12px;
   /* Firefox */ background: #1F3744 -moz-linear-gradient(top,  #0B151A,  #1F3744) left 12px;
@@ -69,14 +68,17 @@ so you can upgrade to newer versions easier. */
   box-shadow: 1px 1px 2px #000; -webkit-box-shadow: 1px 1px 2px #000; -moz-box-shadow: 1px 1px 2px #000;
 }
 
-/* Placement of Control Items */
-.vjs-controls > div.vjs-play-control       { width: 25px; left: 5px; }
-.vjs-controls > div.vjs-progress-control   { left: 35px; right: 165px; } /* Using left & right so it expands with the width of the video */
-.vjs-controls > div.vjs-time-control       { width: 75px; right: 90px; } /* Time control and progress bar are combined to look like one */
-.vjs-controls > div.vjs-volume-control     { width: 50px; right: 35px; }
-.vjs-controls > div.vjs-fullscreen-control { width: 25px; right: 5px; }
+/* Placement of Control Items 
+   - Left side of pogress bar, use left & width
+   - Rigth side of progress bar, use right & width
+   - Expand with the video (like progress bar) use left & right */
+.vjs-controls > div.vjs-play-control       { left: 5px;   width: 25px;  }
+.vjs-controls > div.vjs-progress-control   { left: 35px;  right: 165px; } /* Using left & right so it expands with the width of the video */
+.vjs-controls > div.vjs-time-control       { width: 75px; right: 90px;  } /* Time control and progress bar are combined to look like one */
+.vjs-controls > div.vjs-volume-control     { width: 50px; right: 35px;  }
+.vjs-controls > div.vjs-fullscreen-control { width: 25px; right: 5px;   }
 
-/* Removing curves on progress control and time control to join them. */
+/* Removing curved corners on progress control and time control to join them. */
 .vjs-controls > div.vjs-progress-control {
   border-top-right-radius: 0; -webkit-border-top-right-radius: 0; -moz-border-radius-topright: 0;
   border-bottom-right-radius: 0; -webkit-border-bottom-right-radius: 0; -moz-border-radius-bottomright: 0;
@@ -89,6 +91,7 @@ so you can upgrade to newer versions easier. */
 /* Play/Pause
 -------------------------------------------------------------------------------- */
 .vjs-play-control { cursor: pointer !important; }
+/* Play Icon */
 .vjs-play-control span { display: block; font-size: 0; line-height: 0; }
 .vjs-paused .vjs-play-control span {
   width: 0; height: 0; margin: 8px 0 0 8px;
@@ -116,12 +119,14 @@ so you can upgrade to newer versions easier. */
   border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px;
 }
 .vjs-play-progress {
+  /* CSS Gradient */
   /* Default */ background: #fff;
   /* Webkit  */ background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#777));
   /* Firefox */ background: -moz-linear-gradient(top,  #fff,  #777);
 }
 .vjs-load-progress {
   opacity: 0.8;
+  /* CSS Gradient */
   /* Default */ background-color: #555;
   /* Webkit  */ background: -webkit-gradient(linear, left top, left bottom, from(#555), to(#aaa));
   /* Firefox */ background: -moz-linear-gradient(top,  #555,  #aaa);
@@ -160,7 +165,7 @@ so you can upgrade to newer versions easier. */
   margin: 5px 0 0 5px; /* Placement within the fullscreen control item */
   width: 20px; height: 20px;
 }
-/* Drawing the fullscreen icon using 4 li elements */
+/* Drawing the fullscreen icon using 4 span elements */
 .vjs-fullscreen-control div span { float: left; margin: 0; padding: 0; font-size: 0; line-height: 0; width: 0; text-align: left; vertical-align: top; }
 .vjs-fullscreen-control div span:nth-child(1) { /* Top-left triangle */
   margin-right: 3px; /* Space between top-left and top-right */
