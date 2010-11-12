@@ -114,7 +114,6 @@ Set options when setting up the videos. The defaults are shown here.
       controlsHiding: true, // Hide controls when mouse is not over the video
       defaultVolume: 0.85, // Will be overridden by user's last volume if available
       flashVersion: 9, // Required flash version for fallback
-      linksHiding: true, // Hide download links when video is supported
       flashIsDominant: false // Always use Flash when available
     });
 

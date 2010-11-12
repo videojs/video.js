@@ -9,11 +9,11 @@
   <script type="text/javascript">
     VideoJS.DOMReady(function(){
       var myPlayer = VideoJS.setup("example_video_1", { 
-        controlsHiding: false, 
+        controlsHiding: true, 
         controlsBelow: false, 
         showControlsAtStart: true
       });
-      myPlayer.activateControl(document.getElementById("scrub"), "loadProgressBar");
+      myPlayer.activateElement(document.getElementById("scrub"), "loadProgressBar");
       var vid = document.getElementById("example_video_1"),
           attrTable = document.getElementById("attributes"),
           attrNames = ["error", "networkState", "readyState", "preload", "buffered",
@@ -76,6 +76,7 @@
       <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
       <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm; codecs="vp8, vorbis"' />
       <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg; codecs="theora, vorbis"' />
+      <track kind="subtitles" src="../demo-subtitles.srt" srclang="en-US" label="English"></track>
       <!-- Flash Fallback. Use any flash video player here. Make sure to keep the vjs-flash-fallback class. -->
       <object id="flash_fallback_1" class="vjs-flash-fallback" width="640" height="264" type="application/x-shockwave-flash"
         data="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf">

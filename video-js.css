@@ -219,7 +219,7 @@ div.vjs-big-play-button span {
 ---------------------------------------------------------*/
 /* CSS Spinners by Kilian Valkhof - http://kilianvalkhof.com/2010/css-xhtml/css3-loading-spinners-without-images/ */
 .vjs-spinner { display: none; position: absolute; top: 50%; left: 50%; width: 100px; height: 100px; z-index: 1; margin: -50px 0 0 -50px;
-  /* Scaling makes the circles look smoother. */ 
+  /* Scaling makes the circles look smoother. */
   transform: scale(0.5); -webkit-transform:scale(0.5); -moz-transform:scale(0.5);
 }
 /* Spinner circles */
