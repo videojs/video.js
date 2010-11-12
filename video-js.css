@@ -218,24 +218,16 @@ div.vjs-big-play-button span {
 /* Spinner Styles
 ---------------------------------------------------------*/
 /* CSS Spinners by Kilian Valkhof - http://kilianvalkhof.com/2010/css-xhtml/css3-loading-spinners-without-images/ */
-
 .vjs-spinner { display: none; position: absolute; top: 50%; left: 50%; width: 100px; height: 100px; z-index: 1; margin: -50px 0 0 -50px;
+  /* Scaling makes the circles look smoother. */ 
   transform: scale(0.5); -webkit-transform:scale(0.5); -moz-transform:scale(0.5);
-/*  -webkit-animation-name: rotateThis;
-  -webkit-animation-duration:2s;
-  -webkit-animation-iteration-count:infinite;
-  -webkit-animation-timing-function:linear;*/
 }
-
-/*@-webkit-keyframes rotateThis {
-  from {-webkit-transform:scale(0.5) rotate(0deg);}
-  to {-webkit-transform:scale(0.5) rotate(360deg);}
-}*/
-
+/* Spinner circles */
 .vjs-spinner div { position:absolute; left: 40px; top: 40px; width: 20px; height: 20px; background: #fff;
   border-radius: 20px; -webkit-border-radius: 20px; -moz-border-radius: 20px;
   border: 1px solid #ccc; /* Added border so can be visible on white backgrounds */
 }
+/* Each circle */
 .vjs-spinner div:nth-child(1) { opacity: 0.12; transform: rotate(000deg) translate(0, -40px) scale(0.1); -webkit-transform: rotate(000deg) translate(0, -40px) scale(0.1); -moz-transform: rotate(000deg) translate(0, -40px) scale(0.1); }
 .vjs-spinner div:nth-child(2) { opacity: 0.25; transform: rotate(045deg) translate(0, -40px) scale(0.2); -webkit-transform: rotate(045deg) translate(0, -40px) scale(0.2); -moz-transform: rotate(045deg) translate(0, -40px) scale(0.2); }
 .vjs-spinner div:nth-child(3) { opacity: 0.37; transform: rotate(090deg) translate(0, -40px) scale(0.4); -webkit-transform: rotate(090deg) translate(0, -40px) scale(0.4); -moz-transform: rotate(090deg) translate(0, -40px) scale(0.4); }
