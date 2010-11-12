@@ -104,13 +104,6 @@ var VideoJS = _V_ = JRClass.extend({
       this.buildAndActivateControlBar();
       this.loadInterface(); // Show everything once styles are loaded
       this.getSubtitles();
-
-      /* Removeable Event Listeners with Context
-      ================================================================================ */
-      // These event listeners are attached to global elements like document/window.
-      // They are also temporary, which means they need to be removed.
-      // They also need context (this) so they can call functions on their specific player.
-      // Adding context on initialization allows us to store a reference to them and remove them later.
     }
   },
 
@@ -202,7 +195,7 @@ var VideoJS = _V_ = JRClass.extend({
   buildAndActivateControlBar: function(){
     /* Creating this HTML
       <div class="vjs-controls">
-        <div class="vjs-play-control vjs-play">
+        <div class="vjs-play-control">
           <span></span>
         </div>
         <div class="vjs-progress-control">
@@ -231,9 +224,10 @@ var VideoJS = _V_ = JRClass.extend({
     this.controls = _V_.createElement("div", { className: "vjs-controls" });
     // Add the controls to the video's container
     this.video.parentNode.appendChild(this.controls);
+    _V_.addClass(this.video.parentNode, "vjs-paused");
 
     // Build the play control
-    this.playControl = _V_.createElement("div", { className: "vjs-play-control vjs-play", innerHTML: "<span></span>" });
+    this.playControl = _V_.createElement("div", { className: "vjs-play-control", innerHTML: "<span></span>" });
     this.controls.appendChild(this.playControl);
 
     // Build the progress control

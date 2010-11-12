@@ -7,13 +7,13 @@ REQUIRED STYLES (be careful overriding)
 
 /* Box containing video, controls, and download links.
    If you want to add some kind of frame or special positioning, use another containing element, not video-js-box. */
-.video-js-box { text-align: left; position: relative; vertical-align: bottom; } /* Will be set to the width of the video element */
+.video-js-box { text-align: left; position: relative; line-height: 0; margin: 0; padding: 0;  } /* Will be set to the width of the video element */
 
 /* Video Element */
-video.video-js { background-color: #000; position: relative; margin: 0 0 -1px 0; /* Firefox gap */ padding: 0; }
+video.video-js { background-color: #000; position: relative; padding: 0; }
 
 /* Poster Style */
-.video-js-box img.vjs-poster { display: block; position: absolute; left: 0; top: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.video-js-box img.vjs-poster { display: block; position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; height: 100%; margin: 0; cursor: pointer; }
 /* Subtiles Style */
 .video-js-box .vjs-subtitles { color:#fff; font-size: 20px; text-align: center; bottom: 40px; left: 0; right: 0; position: absolute; }
 
@@ -27,7 +27,10 @@ video.video-js { background-color: #000; position: relative; margin: 0 0 -1px 0;
 .video-js-box.vjs-fullscreen .vjs-subtitles { z-index: 1004; }
 
 /* Styles Loaded Check */
-.vjs-styles-check { height: 5px; z-index: -1; }
+.vjs-styles-check { height: 5px; position: absolute; }
+.video-js-box.vjs-controls-below .vjs-controls { position: relative; opacity: 1; }
+.video-js-box.vjs-controls-below video { margin: 0 0 0px 0; /* Firefox gap */ }
+
 
 /* DEFAULT SKIN (override in another file)
 ================================================================================
@@ -41,17 +44,18 @@ so you can upgrade to newer versions easier. */
   position: absolute; margin: 0; border: none; opacity: 0.85; color: #fff;
   display: none; /* Start hidden */
   left: 0; right: 0; /* 100% width of video-js-box */
-  bottom: 5px;
+  bottom: 0px;
   height: 35px; /* Including any margin you want above or below control items */
-  padding-top: 0; padding-bottom: 0;
+  padding: 0;
 }
 /* Controls styles when below the video */
-.video-js-box.vjs-controls-below .vjs-controls { position: relative; opacity: 1; background-color: #000; }
+.video-js-box.vjs-controls-below .vjs-controls { background-color: #000; }
 
 .video-js-box .vjs-controls > div { /* Direct div children of control bar */
   position: absolute; padding: 0; text-align: center;
   height: 25px; /* Default height of individual controls */
-  margin: 0; top: 5px; /* Top margin to put space between video and controls when controls are below */
+  margin: 0; padding: 0;
+  top: 5px; /* Top margin to put space between video and controls when controls are below */
   
   /* CSS Background Gradients */
   /* Default */ background-color: #0B151A;

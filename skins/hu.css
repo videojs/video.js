@@ -5,12 +5,12 @@ Version 1.2.0
 
 .hu-css .vjs-controls {
   height: 47px; opacity: 0.95; color: #fff;
-  padding-left: 84px; /* Width of play button + margin */
-  padding-right: 0px; /* Width of all the controls to the right of the progress control + margins */
   background: #3A3835;
 }
+.hu-css.video-js-box.vjs-controls-below .vjs-controls { background: #3A3835; }
 
 .hu-css .vjs-controls > div {
+  top: 0;
   background: none;
   border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0;
   box-shadow: none; -webkit-box-shadow: none; -moz-box-shadow: none;
@@ -29,7 +29,7 @@ Version 1.2.0
 
 /* Placement of Control Items */
 .hu-css .vjs-controls > div.vjs-play-control       { width: 33px; left: 0px; }
-.hu-css .vjs-controls > div.vjs-progress-control   { width: 100%; position: relative; }
+.hu-css .vjs-controls > div.vjs-progress-control   { width: left: 84px; right: 0; }
 .hu-css .vjs-controls > div.vjs-time-control       { width: 84px; left: 0px; }
 .hu-css .vjs-controls > div.vjs-volume-control     { width: 43px; right: 44px; }
 .hu-css .vjs-controls > div.vjs-fullscreen-control { width: 43px; right: 0px; }

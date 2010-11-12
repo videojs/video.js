@@ -4,25 +4,23 @@ Version 1.2.0
 */
 
 .vim-css .vjs-controls {
-  height: 50px; opacity: 0.9; color: #fff;
-  padding-left: 85px; /* Width of play button + margin */
-  padding-right: 160px; /* Width of all the controls to the right of the progress control + margins */
+  height: 60px; opacity: 0.9; color: #fff;
 }
 .vim-css .vjs-controls > div {
-  height: 32px; width: 25px; margin: 8px 0 0 0; padding: 0; text-align: center; background: rgba(23, 35, 34, 0.746094);
+  height: 32px; top: 18px; padding: 0; text-align: center; background: rgba(23, 35, 34, 0.746094);
   border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0;
   box-shadow: none; -webkit-box-shadow: none; -moz-box-shadow: none;
 }
 /* Placement of Control Items */
 .vim-css .vjs-controls > div.vjs-play-control       { width: 65px; left: 10px; }
-.vim-css .vjs-controls > div.vjs-progress-control   { width: 100%; position: relative; }
+.vim-css .vjs-controls > div.vjs-progress-control   { left: 85px; right: 160px; }
 .vim-css .vjs-controls > div.vjs-time-control       { width: 75px; right: 85px; }
 .vim-css .vjs-controls > div.vjs-volume-control     { width: 50px; right: 35px; }
 .vim-css .vjs-controls > div.vjs-fullscreen-control { width: 25px; right: 10px; }
 
 /* Play/Pause
 -------------------------------------------------------------------------------- */
-.vim-css .vjs-controls .vjs-play-control { margin: 0; height: 40px;  border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px; }
+.vim-css .vjs-controls .vjs-play-control { top: 10px; margin: 0; height: 40px;  border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px; }
 .vim-css .vjs-play-control:hover { background: #00ADEF; }
 .vim-css.vjs-paused .vjs-play-control span { border-left-color: #fff; border-top-width: 9px; border-left-width: 18px; border-bottom-width: 9px; margin: 11px 0 0 24px; }
 .vim-css.vjs-playing .vjs-play-control span { width: 5px; height: 18px; margin: 5px auto 0; border-left: 5px solid #fff; border-right: 5px solid #fff; margin: 11px 0 0 24px; }

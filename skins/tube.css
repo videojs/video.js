@@ -5,17 +5,15 @@ Version 1.2.0
 
 .tube-css .vjs-controls {
   opacity: 1; color: #000;
-  height: 25px;
-  padding-left: 102px; /* Width of play button + margin */
-  padding-right: 83px; /* Width of all the controls to the right of the progress control + margins */
-
+  height: 24px;
+  bottom: 0;
   background-color: #ccc;
   background: #fcfcfc -webkit-gradient(linear, left top, left bottom, from(#fcfcfc), to(#d0d0d0)) left top;
   background: #fcfcfc -moz-linear-gradient(top,  #fcfcfc,  #d0d0d0) left top;
 }
 
 .tube-css .vjs-controls > div {
-  height: 23px; margin: 0; background: none;
+  height: 23px; margin: 0; background: none; top: 0;
   border: 1px solid #b1b1b1; border-left-color: #eee;
   border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0;
   box-shadow: none; -webkit-box-shadow: none; -moz-box-shadow: none;
@@ -23,7 +21,7 @@ Version 1.2.0
 
 /* Placement of Control Items */
 .tube-css .vjs-controls > div.vjs-play-control       { width: 25px; left: 0; }
-.tube-css .vjs-controls > div.vjs-progress-control   { width: 100%; position: relative; }
+.tube-css .vjs-controls > div.vjs-progress-control   { left: 102px; right: 83px; }
 .tube-css .vjs-controls > div.vjs-time-control       { width: 75px; left: 27px; }
 .tube-css .vjs-controls > div.vjs-volume-control     { width: 50px; right: 30px; }
 .tube-css .vjs-controls > div.vjs-fullscreen-control { width: 30px; right: 0; }
