@@ -64,6 +64,9 @@ var VideoJS = _V_ = JRClass.extend({
     this.hideLinksFallback(); // Will be shown again if "links" player is used
     this.flashObject = this.getFlashObject();
 
+    // Make Flash first player in line
+    if (this.options.flashIsDominant) { this.options.players.unshift("flashObject") }
+
     // Loop through the player names list in options, "html5" etc.
     // For each player name, initialize the player with that name under VideoJS.players
     // If the player successfully initializes, we're done
@@ -1149,6 +1152,7 @@ VideoJS.players = {
       // Check if object exists & Flash Player version is supported
       if (this.flashObject && this.flashVersionSupported()) {
         this.replaceWithFlash();
+        this.video.src = ""; // Stop video from downloading if HTML5 is still supported
         return true;
       } else {
         return false;
