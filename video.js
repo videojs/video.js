@@ -21,8 +21,12 @@ along with VideoJS.  If not, see <http://www.gnu.org/licenses/>.
 // Using jresig's Class implementation http://ejohn.org/blog/simple-javascript-inheritance/
 (function(){var initializing=false, fnTest=/xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/; this.JRClass = function(){}; JRClass.extend = function(prop) { var _super = this.prototype; initializing = true; var prototype = new this(); initializing = false; for (var name in prop) { prototype[name] = typeof prop[name] == "function" && typeof _super[name] == "function" && fnTest.test(prop[name]) ? (function(name, fn){ return function() { var tmp = this._super; this._super = _super[name]; var ret = fn.apply(this, arguments); this._super = tmp; return ret; }; })(name, prop[name]) : prop[name]; } function JRClass() { if ( !initializing && this.init ) this.init.apply(this, arguments); } JRClass.prototype = prototype; JRClass.constructor = JRClass; JRClass.extend = arguments.callee; return JRClass;};})();
 
+// Self-executing function to prevent global vars and help with minification
+(function(window, undefined){
+  var document = window.document;
+
 // Video JS Player Class
-var VideoJS = JRClass.extend({
+var VideoJS = _V_ = JRClass.extend({
 
   // Initialize the player for the supplied video tag element
   // element: video tag
@@ -73,7 +77,8 @@ var VideoJS = JRClass.extend({
   },
 
   html5Init: function(){
-    this.fixPreloading();
+    this.fixPreloading(); // Support old browsers that used autobuffer
+    this.percentLoaded = 0; // Store amount of video loaded
 
     if (VideoJS.isIOS()) {
       this.options.useBuiltInControls = true;
@@ -90,7 +95,6 @@ var VideoJS = JRClass.extend({
       this.video.controls = false;
 
       if (this.options.controlsBelow) { _V_.addClass(this.box, "vjs-controls-below"); }
-      this.percentLoaded = 0; // Store amount of video loaded
 
       // Build Interface
       this.buildStylesCheckDiv(); // Used to check if style are loaded
@@ -107,12 +111,6 @@ var VideoJS = JRClass.extend({
       // They are also temporary, which means they need to be removed.
       // They also need context (this) so they can call functions on their specific player.
       // Adding context on initialization allows us to store a reference to them and remove them later.
-      this.onEscKey = this.onEscKey.context(this);
-      this.onWindowResize = this.onWindowResize.context(this);
-      this.onProgressMouseMove = this.onProgressMouseMove.context(this);
-      this.onProgressMouseUp = this.onProgressMouseUp.context(this);
-      this.onVolumeMouseMove = this.onVolumeMouseMove.context(this);
-      this.onVolumeMouseUp = this.onVolumeMouseUp.context(this);
     }
   },
 
@@ -164,7 +162,7 @@ var VideoJS = JRClass.extend({
       // Don't want to create an endless loop either.
       if (!this.positionRetries) { this.positionRetries = 1; }
       if (this.positionRetries++ < 100) {
-        setTimeout(this.loadInterface.context(this),0);
+        setTimeout(this.loadInterface.context(this),10);
         return;
       }
     }
@@ -194,7 +192,7 @@ var VideoJS = JRClass.extend({
       this.box.style.width = this.video.offsetWidth + "px";
       if (this.options.controlsBelow) {
         this.video.style.height = "";
-        this.box.style.height = this.video.offsetHeight + this.controls.offsetHeight + "px";
+        // this.box.style.height = this.video.offsetHeight + this.controls.offsetHeight + "px";
       }
     }
   },
@@ -287,6 +285,7 @@ var VideoJS = JRClass.extend({
 
     this.activateControls();
   },
+  
   // Set up Event Listeners
   activateControls: function(){
     /* Activate Errors
@@ -302,16 +301,14 @@ var VideoJS = JRClass.extend({
     // Listen for when the video ends
     this.video.addEventListener("ended", this.onEnded.context(this), false);
     // Listen for clicks on the play/pause button
-    this.activateAsPlayPauseButton(this.playControl);
+    this.activateControl(this.playControl, "playToggle");
     // Make a click on the video act like a click on the play button.
-    this.activateAsPlayPauseButton(this.video);
+    this.activateControl(this.video, "playToggle");
 
     /* Activate Play Progress
     ================================================================================ */
     // Listen for drags on the progress bar
-    this.progressHolder.addEventListener("mousedown", this.onProgressHolderMouseDown.context(this), false);
-    // Listen for a release on the progress bar
-    this.progressHolder.addEventListener("mouseup", this.onProgressHolderMouseUp.context(this), false);
+    this.activateControl(this.progressHolder, "timelineScrubber");
 
     /* Activate Buffering Progress
     ================================================================================ */
@@ -319,6 +316,8 @@ var VideoJS = JRClass.extend({
     this.video.addEventListener('progress', this.onProgress.context(this), false);
     // Set interval for load progress using buffer watching method
     this.watchBuffer = setInterval(this.updateBufferedTotal.context(this), 33);
+    this.activateControl(this.loadProgress, "loadProgressBar");
+
 
     /* Activate Volume
     ================================================================================ */
@@ -328,15 +327,12 @@ var VideoJS = JRClass.extend({
     this.updateVolumeDisplay();
     // Listen for a volume change
     this.video.addEventListener('volumechange',this.onVolumeChange.context(this),false);
-    // Listen for a drag on the volume control
-    this.volumeControl.addEventListener("mousedown", this.onVolumeControlMouseDown.context(this), false);
-    // Listen for a release on the volume control
-    this.volumeControl.addEventListener("mouseup", this.onVolumeControlMouseUp.context(this), false);
+    this.activateControl(this.volumeControl, "volumeScrubber");
 
     /* Activate Fullscreen
     ================================================================================ */
     // Listen for clicks on the button
-    this.fullscreenControl.addEventListener("click", this.onFullscreenControlClick.context(this), false);
+    this.activateControl(this.fullscreenControl, "fullscreenToggle")
 
     /* Activate Controls Movement
     ================================================================================ */
@@ -359,11 +355,11 @@ var VideoJS = JRClass.extend({
     // Make sure the controls are visible
     if (this.controls.style.display == 'none') { return; }
 
-    if (this.options.controlsBelow) {
-      this.controls.style.top = this.video.offsetHeight + "px";
-    } else {
-      this.controls.style.top = (this.video.offsetHeight - this.controls.offsetHeight) + "px";
-    }
+    // if (this.options.controlsBelow) {
+    //   this.controls.style.top = this.video.offsetHeight + "px";
+    // } else {
+    //   this.controls.style.top = (this.video.offsetHeight - this.controls.offsetHeight) + "px";
+    // }
     this.updatePlayProgress();
     this.updateLoadProgress();
   },
@@ -382,7 +378,7 @@ var VideoJS = JRClass.extend({
   onVideoMouseMove: function(){
     this.showControlBar();
     clearInterval(this.mouseMoveTimeout);
-    this.mouseMoveTimeout = setTimeout(function(){ this.hideControlBar(); }.context(this), 4000);
+    this.mouseMoveTimeout = setTimeout(this.hideControlBar.context(this), 4000);
   },
   onVideoMouseOut: function(event){
     // Prevent flicker by making sure mouse hasn't left the video
@@ -407,11 +403,34 @@ var VideoJS = JRClass.extend({
 
   /* Play/Pause
   ================================================================================ */
-  activateAsPlayPauseButton: function(element){
-    element.addEventListener("click", this.onPlayControlClick.context(this), false);
+  behaviors: {
+    playToggle: function(element){
+      element.addEventListener("click", this.onPlayControlClick.context(this), false);
+    },
+    playButton: function(element){
+      element.addEventListener("click", this.onPlayButtonClick.context(this), false);
+    },
+    pauseButton: function(element){
+      element.addEventListener("click", this.onPauseButtonClick.context(this), false);
+    }, 
+    timelineScrubber: function(element){
+      var player = this;
+      element.addEventListener("mousedown", this.onTimelineScrubberMouseDown.rEvtContext(this), false);
+    },
+    volumeScrubber: function(element){
+      element.addEventListener("mousedown", this.onVolumeScrubberMouseDown.rEvtContext(this), false);
+    },
+    fullscreenToggle: function(element){
+      element.addEventListener("click", this.onFullscreenToggleClick.context(this), false);
+    },
+    loadProgressBar: function(element){
+      if (!this.loadProgressBars) { this.loadProgressBars = []; }
+      this.loadProgressBars.push(element);
+    }
   },
-  activateAsPlayButton: function(element){
-    element.addEventListener("click", this.onPlayButtonClick.context(this), false);
+
+  activateControl: function(element, behavior){
+    this.behaviors[behavior].call(this, element);
   },
 
   // React to clicks on the play/pause button
@@ -448,7 +467,7 @@ var VideoJS = JRClass.extend({
   // Track & display the current play progress
   trackPlayProgress: function(){
     if(this.playProgressInterval) { clearInterval(this.playProgressInterval); }
-    this.playProgressInterval = setInterval(function(){ this.updatePlayProgress(); }.context(this), 33);
+    this.playProgressInterval = setInterval(this.updatePlayProgress.context(this), 33);
   },
   // Turn off play progress tracking (when paused)
   stopTrackingPlayProgress: function(){ clearInterval(this.playProgressInterval); },
@@ -469,48 +488,35 @@ var VideoJS = JRClass.extend({
     // currentTime changed, reset subtitles
     if (!this.subtitles) { this.currentSubtitlePosition = 0; }
   },
-  setPlayProgressWithEvent: function(event){
-    var newProgress = _V_.getRelativePosition(event.pageX, this.progressHolder);
+  setPlayProgressWithScrubber: function(event){
+    var newProgress = _V_.getRelativePosition(event.pageX, this.currentScrubber);
     this.setPlayProgress(newProgress);
   },
   // Adjust the play position when the user drags on the progress bar
-  onProgressHolderMouseDown: function(event){
-    this.stopTrackingPlayProgress();
+  onTimelineScrubberMouseDown: function(event, scrubber){
+    event.preventDefault();
+    this.currentScrubber = scrubber;
 
-    if (this.video.paused) {
-      this.videoWasPlaying = false;
-    } else {
-      this.videoWasPlaying = true;
-      this.video.pause();
-    }
+    this.stopTrackingPlayProgress();
+  
+    this.videoWasPlaying = !this.video.paused;
+    this.video.pause();
+  
     _V_.blockTextSelection();
-    this.setPlayProgressWithEvent(event);
-    document.addEventListener("mousemove", this.onProgressMouseMove, false);
-    document.addEventListener("mouseup", this.onProgressMouseUp, false);
+    this.setPlayProgressWithScrubber(event);
+    document.addEventListener("mousemove", this.onTimelineScrubberMouseMove.rEvtContext(this), false);
+    document.addEventListener("mouseup", this.onTimelineScrubberMouseUp.rEvtContext(this), false);
   },
-  onProgressMouseMove: function(event){ // Removeable
-    this.setPlayProgressWithEvent(event);
+  onTimelineScrubberMouseMove: function(event){ // Removeable
+    this.setPlayProgressWithScrubber(event);
   },
-  onProgressMouseUp: function(event){ // Removeable
+  onTimelineScrubberMouseUp: function(event){ // Removeable
     _V_.unblockTextSelection();
-    document.removeEventListener("mousemove", this.onProgressMouseMove, false);
-    document.removeEventListener("mouseup", this.onProgressMouseUp, false);
+    document.removeEventListener("mousemove", this.onTimelineScrubberMouseMove, false);
+    document.removeEventListener("mouseup", this.onTimelineScrubberMouseUp, false);
     if (this.videoWasPlaying) {
       this.video.play();
       this.trackPlayProgress();
-    }
-  },
-  // When the user stops dragging on the progress bar, update play position
-  // Backup for when the user only clicks and doesn't drag
-  onProgressHolderMouseUp: function(event){
-    // Removed. Chrome breaks (shows poster, plays audio) if you set currentTime rapidly.
-    // this.setPlayProgressWithEvent(event);
-
-    // Fix for a play button state issue.
-    if (this.video.paused) {
-      this.onPause();
-    } else {
-      this.onPlay();
     }
   },
 
@@ -550,33 +556,34 @@ var VideoJS = JRClass.extend({
     }
   },
   updateLoadProgress: function(){
-    if (this.controls.style.display == 'none') { return; }
-    this.loadProgress.style.width = (this.percentLoaded * (_V_.getComputedStyleValue(this.progressHolder, "width").replace("px", ""))) + "px";
+    for (var i=0,bars=this.loadProgressBars,j=bars.length; i<j; i++) {
+      if (bars[i].style) { bars[i].style.width = parseInt(this.percentLoaded * 100) + "%"; }
+    }
+    // this.loadProgress.style.width = (this.percentLoaded * (_V_.getComputedStyleValue(this.progressHolder, "width").replace("px", ""))) + "px";
   },
 
   /* Volume
   ================================================================================ */
   onVolumeChange: function(event){ this.updateVolumeDisplay(); },
   // Adjust the volume when the user drags on the volume control
-  onVolumeControlMouseDown: function(event){
+  onVolumeScrubberMouseDown: function(event, scrubber){
+    event.preventDefault();
+    this.currentScrubber = scrubber;
     _V_.blockTextSelection();
-    this.setVolumeWithEvent(event);
-    document.addEventListener("mousemove", this.onVolumeMouseMove, false);
-    document.addEventListener("mouseup", this.onVolumeMouseUp, false);
+    this.setVolumeWithScrubber(event);
+    document.addEventListener("mousemove", this.onVolumeScrubberMouseMove.rEvtContext(this), false);
+    document.addEventListener("mouseup", this.onVolumeScrubberMouseUp.rEvtContext(this), false);
   },
-  onVolumeMouseMove: function(event){
-    this.setVolumeWithEvent(event);
-  },
-  onVolumeMouseUp: function(event){
+  onVolumeScrubberMouseMove: function(event){ this.setVolumeWithScrubber(event); },
+  onVolumeScrubberMouseUp: function(event){
     _V_.unblockTextSelection();
-    document.removeEventListener("mousemove", this.onVolumeMouseMove, false);
-    document.removeEventListener("mouseup", this.onVolumeMouseUp, false);
+    document.removeEventListener("mousemove", this.onVolumeScrubberMouseMove, false);
+    document.removeEventListener("mouseup", this.onVolumeScrubberMouseUp, false);
+    this.setVolumeWithScrubber(event);
   },
   // When the user stops dragging, set a new volume
   // Backup for when the user only clicks and doesn't drag
-  onVolumeControlMouseUp: function(event){
-    this.setVolumeWithEvent(event);
-  },
+  // onVolumeControlMouseUp: function(event){ this.setVolumeWithScrubber(event); },
 
   // Set a new volume based on where the user clicked on the volume control
   setVolume: function(newVol){
@@ -584,8 +591,8 @@ var VideoJS = JRClass.extend({
     this.setLocalStorage("volume", this.video.volume);
   },
 
-  setVolumeWithEvent: function(event){
-    var newVol = _V_.getRelativePosition(event.pageX, this.volumeControl.children[0]);
+  setVolumeWithScrubber: function(event){
+    var newVol = _V_.getRelativePosition(event.pageX, this.currentScrubber);
     this.setVolume(newVol);
   },
 
@@ -605,7 +612,7 @@ var VideoJS = JRClass.extend({
   /* Fullscreen / Full-window
   ================================================================================ */
   // When the user clicks on the fullscreen button, update fullscreen setting
-  onFullscreenControlClick: function(event){
+  onFullscreenToggleClick: function(event){
     if (!this.videoIsFullScreen) {
       this.fullscreenOn();
     } else {
@@ -620,9 +627,9 @@ var VideoJS = JRClass.extend({
       // Storing original doc overflow value to return to when fullscreen is off
       this.docOrigOverflow = document.documentElement.style.overflow;
       // Add listener for esc key to exit fullscreen
-      document.addEventListener("keydown", this.onEscKey, false);
+      document.addEventListener("keydown", this.onEscKey.rEvtContext(this), false);
       // Add listener for a window resize
-      window.addEventListener("resize", this.onWindowResize, false);
+      window.addEventListener("resize", this.onWindowResize.rEvtContext(this), false);
       // Hide any scroll bars
       document.documentElement.style.overflow = 'hidden';
       // Apply fullscreen styles
@@ -684,7 +691,7 @@ var VideoJS = JRClass.extend({
     this.video.parentNode.appendChild(this.bigPlayButton);
   },
   activateBigPlayButton: function(){
-    this.activateAsPlayPauseButton(this.bigPlayButton);
+    this.activateControl(this.bigPlayButton, "playToggle");
     this.video.addEventListener("play", this.bigPlayButtonOnPlay.context(this), false);
     this.video.addEventListener("ended", this.bigPlayButtonOnEnded.context(this), false);
   },
@@ -719,7 +726,7 @@ var VideoJS = JRClass.extend({
   showSpinner: function(){
     this.spinner.style.display = "block";
     clearInterval(this.spinnerInterval);
-    this.spinnerInterval = setInterval(function(){ this.rotateSpinner(); }.context(this), 100);
+    this.spinnerInterval = setInterval(this.rotateSpinner.context(this), 100);
   },
   hideSpinner: function(){
     this.spinner.style.display = "none";
@@ -795,7 +802,7 @@ var VideoJS = JRClass.extend({
     // Listen for the mouse moving out of the poster image. Used to hide the controller.
     this.poster.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
     // Make a click on the poster act like a click on the play button.
-    this.activateAsPlayButton(this.poster);
+    this.activateControl(this.poster, "playButton");
     // Hide/Show poster on video events
     this.video.addEventListener("play", this.posterOnPlay.context(this), false);
     this.video.addEventListener("ended", this.posterOnEnded.context(this), false);
@@ -923,7 +930,6 @@ var VideoJS = JRClass.extend({
     }
   },
 
-
   /* Device Fixes
   ================================================================================ */
   // Support older browsers that used "autobuffer"
@@ -1046,145 +1052,6 @@ var VideoJS = JRClass.extend({
 });
 
 ////////////////////////////////////////////////////////////////////////////////
-// Convenience Functions (mini library)
-// Functions not specific to video or VideoJS and could probably be replaced with a library like jQuery
-////////////////////////////////////////////////////////////////////////////////
-var _V_ = {
-  addClass: function(element, classToAdd){
-    if (element.className.split(/\s+/).lastIndexOf(classToAdd) == -1) { element.className = element.className === "" ? classToAdd : element.className + " " + classToAdd; }
-  },
-
-  removeClass: function(element, classToRemove){
-    if (element.className.indexOf(classToRemove) == -1) { return; }
-    var classNames = element.className.split(/\s+/);
-    classNames.splice(classNames.lastIndexOf(classToRemove),1);
-    element.className = classNames.join(" ");
-  },
-
-  merge: function(obj1, obj2){
-    for(var attrname in obj2){
-      if (obj2.hasOwnProperty(attrname)) {
-        obj1[attrname]=obj2[attrname];
-      }
-    }
-    return obj1;
-  },
-
-  createElement: function(tagName, attributes){
-    return _V_.merge(document.createElement(tagName), attributes);
-  },
-
-  // Attempt to block the ability to select text while dragging controls
-  blockTextSelection: function(){
-    document.body.focus();
-    document.onselectstart = function () { return false; };
-  },
-
-  // Turn off text selection blocking
-  unblockTextSelection: function(){
-    document.onselectstart = function () { return true; };
-  },
-
-  // Return seconds as MM:SS
-  formatTime: function(secs) {
-    var seconds = Math.round(secs);
-    var minutes = Math.floor(seconds / 60);
-    minutes = (minutes >= 10) ? minutes : "0" + minutes;
-    seconds = Math.floor(seconds % 60);
-    seconds = (seconds >= 10) ? seconds : "0" + seconds;
-    return minutes + ":" + seconds;
-  },
-
-  // Return the relative horizonal position of an event as a value from 0-1
-  getRelativePosition: function(x, relativeElement){
-    return Math.max(0, Math.min(1, (x - _V_.findPosX(relativeElement)) / relativeElement.offsetWidth));
-  },
-
-  // Get an objects position on the page
-  findPosX: function(obj) {
-    var curleft = obj.offsetLeft;
-    while(obj = obj.offsetParent) {
-      curleft += obj.offsetLeft;
-    }
-    return curleft;
-  },
-
-  getComputedStyleValue: function(element, style){
-    return window.getComputedStyle(element, null).getPropertyValue(style);
-  },
-
-  get: function(url, onSuccess){
-    if (typeof XMLHttpRequest == "undefined") {
-      XMLHttpRequest = function () {
-        try { return new ActiveXObject("Msxml2.XMLHTTP.6.0"); } catch (e) {}
-        try { return new ActiveXObject("Msxml2.XMLHTTP.3.0"); } catch (f) {}
-        try { return new ActiveXObject("Msxml2.XMLHTTP"); } catch (g) {}
-        //Microsoft.XMLHTTP points to Msxml2.XMLHTTP.3.0 and is redundant
-        throw new Error("This browser does not support XMLHttpRequest.");
-      };
-    }
-    var request = new XMLHttpRequest();
-    request.open("GET",url);
-    request.onreadystatechange = function() {
-      if (request.readyState == 4 && request.status == 200) {
-        onSuccess(request.responseText);
-      }
-    }.context(this);
-    request.send();
-  },
-
-  // DOM Ready functionality adapted from jQuery. http://jquery.com/
-  bindDOMReady: function(){
-    if (document.readyState === "complete") {
-      return _V_.DOMReady();
-    }
-    if (document.addEventListener) {
-      document.addEventListener("DOMContentLoaded", _V_.DOMContentLoaded, false);
-      window.addEventListener("load", _V_.DOMReady, false);
-    } else if (document.attachEvent) {
-      document.attachEvent("onreadystatechange", _V_.DOMContentLoaded);
-      window.attachEvent("onload", _V_.DOMReady);
-    }
-  },
-
-  DOMContentLoaded: function(){
-    if (document.addEventListener) {
-      document.removeEventListener( "DOMContentLoaded", _V_.DOMContentLoaded, false);
-      _V_.DOMReady();
-    } else if ( document.attachEvent ) {
-      if ( document.readyState === "complete" ) {
-        document.detachEvent("onreadystatechange", _V_.DOMContentLoaded);
-        _V_.DOMReady();
-      }
-    }
-  },
-
-  // Functions to be run once the DOM is loaded
-  DOMReadyList: [],
-  addToDOMReady: function(fn){
-    if (_V_.DOMIsReady) {
-      fn.call(document);
-    } else {
-      _V_.DOMReadyList.push(fn);
-    }
-  },
-
-  DOMIsReady: false,
-  DOMReady: function(){
-    if (_V_.DOMIsReady) { return; }
-    if (!document.body) { return setTimeout(_V_.DOMReady, 13); }
-    _V_.DOMIsReady = true;
-    if (_V_.DOMReadyList) {
-      for (var i=0; i<_V_.DOMReadyList.length; i++) {
-        _V_.DOMReadyList[i].call(document);
-      }
-      _V_.DOMReadyList = null;
-    }
-  }
-};
-_V_.bindDOMReady();
-
-////////////////////////////////////////////////////////////////////////////////
 // Class Methods
 // Functions that don't apply to individual videos.
 ////////////////////////////////////////////////////////////////////////////////
@@ -1230,7 +1097,7 @@ VideoJS.setupAllWhenReady = function(options){
 
 // Run the supplied function when the DOM is ready
 VideoJS.DOMReady = function(fn){
-  _V_.addToDOMReady(fn);
+  VideoJS.addToDOMReady(fn);
 };
 
 // Set up a specific video or array of video elements
@@ -1333,14 +1200,177 @@ VideoJS.warnings = {
   localStorageFull: "Local Storage is Full"
 };
 
+// Combine Objects
+// Use "safe" to protect from overwriting existing items
+VideoJS.merge = function(obj1, obj2, safe){
+  for(var attrname in obj2){
+    if (obj2.hasOwnProperty(attrname) && (!safe || !obj1.hasOwnProperty(attrname))) { obj1[attrname]=obj2[attrname]; }
+  }
+  return obj1;
+};
+VideoJS.extend = function(obj){ this.merge(this, obj, true); }
+
+////////////////////////////////////////////////////////////////////////////////
+// Convenience Functions (mini library)
+// Functions not specific to video or VideoJS and could probably be replaced with a library like jQuery
+////////////////////////////////////////////////////////////////////////////////
+VideoJS.extend({
+
+  addClass: function(element, classToAdd){
+    if (element.className.split(/\s+/).lastIndexOf(classToAdd) == -1) { element.className = element.className === "" ? classToAdd : element.className + " " + classToAdd; }
+  },
+  removeClass: function(element, classToRemove){
+    if (element.className.indexOf(classToRemove) == -1) { return; }
+    var classNames = element.className.split(/\s+/);
+    classNames.splice(classNames.lastIndexOf(classToRemove),1);
+    element.className = classNames.join(" ");
+  },
+  createElement: function(tagName, attributes){
+    return this.merge(document.createElement(tagName), attributes);
+  },
+
+  // Attempt to block the ability to select text while dragging controls
+  blockTextSelection: function(){
+    document.body.focus();
+    document.onselectstart = function () { return false; };
+  },
+  // Turn off text selection blocking
+  unblockTextSelection: function(){ document.onselectstart = function () { return true; }; },
+
+  // Return seconds as MM:SS
+  formatTime: function(secs) {
+    var seconds = Math.round(secs);
+    var minutes = Math.floor(seconds / 60);
+    minutes = (minutes >= 10) ? minutes : "0" + minutes;
+    seconds = Math.floor(seconds % 60);
+    seconds = (seconds >= 10) ? seconds : "0" + seconds;
+    return minutes + ":" + seconds;
+  },
+
+  // Return the relative horizonal position of an event as a value from 0-1
+  getRelativePosition: function(x, relativeElement){
+    return Math.max(0, Math.min(1, (x - this.findPosX(relativeElement)) / relativeElement.offsetWidth));
+  },
+  // Get an objects position on the page
+  findPosX: function(obj) {
+    var curleft = obj.offsetLeft;
+    while(obj = obj.offsetParent) {
+      curleft += obj.offsetLeft;
+    }
+    return curleft;
+  },
+  getComputedStyleValue: function(element, style){
+    return window.getComputedStyle(element, null).getPropertyValue(style);
+  },
+
+  get: function(url, onSuccess){
+    if (typeof XMLHttpRequest == "undefined") {
+      XMLHttpRequest = function () {
+        try { return new ActiveXObject("Msxml2.XMLHTTP.6.0"); } catch (e) {}
+        try { return new ActiveXObject("Msxml2.XMLHTTP.3.0"); } catch (f) {}
+        try { return new ActiveXObject("Msxml2.XMLHTTP"); } catch (g) {}
+        //Microsoft.XMLHTTP points to Msxml2.XMLHTTP.3.0 and is redundant
+        throw new Error("This browser does not support XMLHttpRequest.");
+      };
+    }
+    var request = new XMLHttpRequest();
+    request.open("GET",url);
+    request.onreadystatechange = function() {
+      if (request.readyState == 4 && request.status == 200) {
+        onSuccess(request.responseText);
+      }
+    }.context(this);
+    request.send();
+  },
+
+  // DOM Ready functionality adapted from jQuery. http://jquery.com/
+  bindDOMReady: function(){
+    if (document.readyState === "complete") {
+      return VideoJS.onDOMReady();
+    }
+    if (document.addEventListener) {
+      document.addEventListener("DOMContentLoaded", VideoJS.DOMContentLoaded, false);
+      window.addEventListener("load", VideoJS.onDOMReady, false);
+    } else if (document.attachEvent) {
+      document.attachEvent("onreadystatechange", VideoJS.DOMContentLoaded);
+      window.attachEvent("onload", VideoJS.onDOMReady);
+    }
+  },
+
+  DOMContentLoaded: function(){
+    if (document.addEventListener) {
+      document.removeEventListener( "DOMContentLoaded", VideoJS.DOMContentLoaded, false);
+      VideoJS.onDOMReady();
+    } else if ( document.attachEvent ) {
+      if ( document.readyState === "complete" ) {
+        document.detachEvent("onreadystatechange", VideoJS.DOMContentLoaded);
+        VideoJS.onDOMReady();
+      }
+    }
+  },
+
+  // Functions to be run once the DOM is loaded
+  DOMReadyList: [],
+  addToDOMReady: function(fn){
+    if (VideoJS.DOMIsReady) {
+      fn.call(document);
+    } else {
+      VideoJS.DOMReadyList.push(fn);
+    }
+  },
+
+  DOMIsReady: false,
+  onDOMReady: function(){
+    if (VideoJS.DOMIsReady) { return; }
+    if (!document.body) { return setTimeout(VideoJS.onDOMReady, 13); }
+    VideoJS.DOMIsReady = true;
+    if (VideoJS.DOMReadyList) {
+      for (var i=0; i<VideoJS.DOMReadyList.length; i++) {
+        VideoJS.DOMReadyList[i].call(document);
+      }
+      VideoJS.DOMReadyList = null;
+    }
+  }
+});
+VideoJS.bindDOMReady();
+
 // Allows for binding context to functions
 // when using in event listeners and timeouts
 Function.prototype.context = function(obj){
-  var method = this, temp;
+  var method = this,
   temp = function(){
     return method.apply(obj, arguments);
   };
   return temp;
+};
+
+// Like context, in that it creates a closure
+// But insteaad keep "this" intact, and passes the var as the second argument of the function
+// Need for event listeners where you need to know what called the event
+Function.prototype.evtContext = function(obj){
+  var method = this,
+  temp = function(){
+    var origContext = this;
+    return method.call(obj, arguments[0], origContext);
+  };
+  return temp;
+};
+
+// Removeable Event listener with Context
+// Replaces the original function with a version that has context
+// So it can be removed using the original function name.
+// I have a feeling this one is gonna bite me in the butt some day
+Function.prototype.rEvtContext = function(obj, funcParent){
+  if (this.hasContext == true) { return this; }
+  if (!funcParent) { funcParent = obj; }
+  for (var attrname in funcParent) {
+    if (funcParent[attrname] == this) {
+      funcParent[attrname] = this.evtContext(obj);
+      funcParent[attrname].hasContext = true;
+      return funcParent[attrname];
+    }
+  }
+  // Log function not found on object
 };
 
 // Shim to make Video tag valid in IE
@@ -1361,4 +1391,9 @@ if (window.jQuery) {
   })(jQuery);
 }
 
+// Expose to global
+VideoJS.player = VideoJS.prototype;
+return (window.VideoJS = window._V_ = VideoJS);
 
+// End self-executing function
+})(window);

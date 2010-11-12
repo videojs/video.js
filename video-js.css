@@ -10,7 +10,7 @@ REQUIRED STYLES (be careful overriding)
 .video-js-box { text-align: left; position: relative; vertical-align: bottom; } /* Will be set to the width of the video element */
 
 /* Video Element */
-video.video-js { background-color: #000; position: relative; }
+video.video-js { background-color: #000; position: relative; margin: 0 0 -1px 0; /* Firefox gap */ padding: 0; }
 
 /* Poster Style */
 .video-js-box img.vjs-poster { display: block; position: absolute; left: 0; top: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
@@ -19,7 +19,7 @@ video.video-js { background-color: #000; position: relative; }
 
 /* Fullscreen styles for main elements */
 .video-js-box.vjs-fullscreen { position: fixed; left: 0; top: 0; right: 0; bottom: 0; overflow: hidden; z-index: 1000; }
-.video-js-box.vjs-fullscreen video.video-js { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; }
+.video-js-box.vjs-fullscreen video.video-js { position: relative; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; }
 .video-js-box.vjs-fullscreen img.vjs-poster { z-index: 1001; }
 .video-js-box.vjs-fullscreen .vjs-spinner { z-index: 1001; }
 .video-js-box.vjs-fullscreen .vjs-controls { z-index: 1003; }
@@ -35,26 +35,24 @@ Using all CSS to draw the controls. Images could be used if desired.
 Instead of editing this file, I recommend creating your own skin CSS file to be included after this file,
 so you can upgrade to newer versions easier. */
 
-/* Controls Layout
-   Using a Holy Grail type method to allow the progress bar holder to expand into all available space,
-   but using abosolute positioning for individual controls. http://www.alistapart.com/articles/holygrail */
+/* Controls Layout 
+  Using absolute positioning to position controls */
 .video-js-box .vjs-controls {
   position: absolute; margin: 0; border: none; opacity: 0.85; color: #fff;
   display: none; /* Start hidden */
   left: 0; right: 0; /* 100% width of video-js-box */
+  bottom: 5px;
   height: 35px; /* Including any margin you want above or below control items */
-  padding-left: 35px; /* Width of play button + margin */
-  padding-right: 165px; /* Width of all the controls to the right of the progress control + margins */
   padding-top: 0; padding-bottom: 0;
 }
 /* Controls styles when below the video */
-.video-js-box.vjs-controls-below .vjs-controls { background-color: #000; }
+.video-js-box.vjs-controls-below .vjs-controls { position: relative; opacity: 1; background-color: #000; }
 
 .video-js-box .vjs-controls > div { /* Direct div children of control bar */
-  position: absolute; float: left; padding: 0; text-align: center;
+  position: absolute; padding: 0; text-align: center;
   height: 25px; /* Default height of individual controls */
-  margin: 5px 0 0 0; /* Top margin to put space between video and controls when controls are below */
-
+  margin: 0; top: 5px; /* Top margin to put space between video and controls when controls are below */
+  
   /* CSS Background Gradients */
   /* Default */ background-color: #0B151A;
   /* Webkit  */ background: #1F3744 -webkit-gradient(linear, left top, left bottom, from(#0B151A), to(#1F3744)) left 12px;
@@ -69,7 +67,7 @@ so you can upgrade to newer versions easier. */
 
 /* Placement of Control Items */
 .vjs-controls > div.vjs-play-control       { width: 25px; left: 5px; }
-.vjs-controls > div.vjs-progress-control   { width: 100%; position: relative; }
+.vjs-controls > div.vjs-progress-control   { left: 35px; right: 165px; } /* Using left & right so it expands with the width of the video */
 .vjs-controls > div.vjs-time-control       { width: 75px; right: 90px; } /* Time control and progress bar are combined to look like one */
 .vjs-controls > div.vjs-volume-control     { width: 50px; right: 35px; }
 .vjs-controls > div.vjs-fullscreen-control { width: 25px; right: 5px; }

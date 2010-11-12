@@ -4,52 +4,44 @@
   <meta charset="utf-8" />
   <title>HTML5 Video Player</title>
 
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+
   <!-- Include the VideoJS Library -->
-  <script src="../video.js" type="text/javascript" charset="utf-8"></script>
+  <script src="../../video.js" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript">
     VideoJS.DOMReady(function(){
-      var myPlayer = VideoJS.setup("example_video_1", { controlsHiding: false, controlsBelow: true, showControlsAtStart: true });
-      myPlayer.activateControl(document.getElementById("scrub"), "loadProgressBar");
-      var vid = document.getElementById("example_video_1"),
-          attrTable = document.getElementById("attributes"),
-          attrNames = ["error", "networkState", "readyState", "preload", "buffered",
-            "seeking", "currentTime", "initialTime", "duration", "startOffsetTime",
-            "paused", "defaultPlaybackRate", "playbackRate", "played", "seekable",
-            "ended", "autoplay", "loop", "controls", "volume", "muted", "tracks"
-          ],
-          attrs = {};
-
-      for(var i=0,j=attrNames.length; i<j; i++) {
-        var row = _V_.createElement("tr");
-        var th = _V_.createElement("th"); 
-        th.innerHTML = attrNames[i];
-        attrs[attrNames[i]] = _V_.createElement("td", { id: attrNames[i] });
-        row.appendChild(th); row.appendChild(attrs[attrNames[i]]);
-        attrTable.appendChild(row);
-      }
-      
-      setInterval(function(){
-        for(var i=0,j=attrNames.length; i<j; i++) {
-          attrs[attrNames[i]].innerHTML = vid[attrNames[i]];
-        }
-      }, 100);
-      
-      var events = ["loadstart","progress","suspend","abort","error","emptied","stalled","play","pause",
-        "loadedmetadata", "loadeddata", "waiting", "playing", "canplay", "canplaythrough", "seeking", "seeked",
-        // "timeupdate",
-        "ended", "ratechange", "durationchange","volumechange"
-      ],
-      eventsList = document.getElementById("events");
-      
-      for(var i=0,j=events.length; i<j; i++) {
-        vid.addEventListener(events[i], function(){
-          eventsList.innerHTML = this + "\n" + eventsList.innerHTML
-        }.context(events[i]), false);
-      }
-      
+      var myPlayer = VideoJS.setup("example_video_1", { controlsHiding: false });
     });
 
   </script>
+
+  <script type="text/javascript"
+      src="http://maps.google.com/maps/api/js?sensor=false">
+  </script>
+  <script type="text/javascript">
+    function initialize() {
+      var latlng = new google.maps.LatLng(-34.397, 150.644);
+      var myOptions = {
+        zoom: 8,
+        center: latlng,
+        disableDefaultUI: true,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      };
+      var map = new google.maps.Map(document.getElementById("map_canvas"),
+          myOptions);
+      
+      setTimeout(function() { map.panTo(new google.maps.LatLng(37.4419, -122.1419), 13) }, 2000)
+    }
+
+  </script>
+
+  <style type="text/css">
+    html { height: 100% }
+    body { height: 100%; margin: 0px; padding: 0px }
+    #map_canvas { height: 100%; position: absolute; top: 0; left: 0; }
+    
+    .video-js-box { position: absolute; top: 50%; left: 50%; z-index: 1; margin: -132px 0 0 -320px; }
+  </style>
 
   <style type="text/css" media="screen">
     #attributes { width: 300px; float: left; }
@@ -57,15 +49,14 @@
   </style>
 
   <!-- Include the VideoJS Stylesheet -->
-  <link rel="stylesheet" href="../video-js.css" type="text/css" media="screen" title="Video JS">
+  <link rel="stylesheet" href="../../video-js.css" type="text/css" media="screen" title="Video JS">
   <link rel="stylesheet" href="../skins/tube.css" type="text/css" media="screen" title="Video JS">
   <link rel="stylesheet" href="../skins/hu.css" type="text/css" media="screen" title="Video JS">
   <link rel="stylesheet" href="../skins/vim.css" type="text/css" media="screen" title="Video JS">
 </head>
-<body>
+<body onload="initialize()">
 
   <!-- Begin VideoJS -->
-  <div id="scrub" style="background: #000; height: 10px;"></div>
   <div class="video-js-box">
     <!-- Using the Video for Everybody Embed Code http://camendesign.com/code/video_for_everybody -->
     <video data-subtitles="../demo-subtitles.srt" id="example_video_1" class="video-js" width="640" height="264" controls="controls" preload="auto" poster="http://video-js.zencoder.com/oceans-clip.png">
@@ -94,12 +85,7 @@
   </div>
   <!-- End VideoJS -->
 
-  <a href="#" onclick="document.getElementById('example_video_1').currentTime = 10; return false;">Click</a>
-
-  <table id="attributes">
-  </table>
-  
-  <textarea id="events"></textarea>
+  <div id="map_canvas" style="width:100%; height:100%"></div>
 
 </body>
 </html>
