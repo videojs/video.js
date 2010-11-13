@@ -51,7 +51,7 @@ var VideoJS = _V_ = JRClass.extend({
       flashVersion: 9, // Required flash version for fallback
       flashIsDominant: false, // Always use Flash when available
       useBuiltInControls: false, // Dont' use the video JS controls (iPhone)
-      players: ["html5", "flashObject", "links"] // Players and order to use them
+      playerFallbackOrder: ["html5", "flashObject", "links"] // Players and order to use them
     };
     // Override default options with global options
     if (typeof VideoJS.options == "object") { _V_.merge(this.options, VideoJS.options); }
@@ -71,11 +71,10 @@ var VideoJS = _V_ = JRClass.extend({
     // For each player name, initialize the player with that name under VideoJS.players
     // If the player successfully initializes, we're done
     // If not, try the next player in the list
-    for (var i=0,players=this.options.players,j=players.length; i<j; i++) {
-      if((VideoJS.players[players[i]].init.context(this))()) {
-        break;
-      }
-    }
+    this.each(this.options.playerFallbackOrder, function(playerType){
+      var playerSupported = (VideoJS.playerTypes[playerType].init.context(this))();
+      return playerSupported;
+    });
   },
 
   html5Init: function(){
@@ -95,6 +94,8 @@ var VideoJS = _V_ = JRClass.extend({
       this.androidInterface();
     }
 
+    this.activateElement(this.video, "video");
+
     // Add VideoJS Controls
     if (!this.options.useBuiltInControls) {
       this.video.controls = false;
@@ -109,8 +110,6 @@ var VideoJS = _V_ = JRClass.extend({
       this.buildAndActivateControlBar();
       this.loadInterface(); // Show everything once styles are loaded
       this.getSubtitles();
-
-      this.activateElement(this.video, "video");
     }
   },
 
@@ -169,7 +168,7 @@ var VideoJS = _V_ = JRClass.extend({
     this.hideStylesCheckDiv();
     this.showPoster();
     if (this.video.paused !== false) { this.showBigPlayButton(); }
-    if (this.options.showControlsAtStart) { this.showControlBar(); }
+    if (this.options.showControlsAtStart) { this.showControlBars(); }
     this.positionAll();
   },
 
@@ -188,7 +187,7 @@ var VideoJS = _V_ = JRClass.extend({
   ================================================================================ */
   positionAll: function(){
     this.positionBox();
-    this.positionControlBar();
+    this.positionControlBars();
     this.positionPoster();
   },
   positionBox: function(){
@@ -678,7 +677,9 @@ var VideoJS = _V_ = JRClass.extend({
     if (this.values.currentTime) { return this.values.currentTime; }
     return this.video.currentTime;
   },
-  duration: function(val){ return this.video.duration; },
+  duration: function(val){ 
+    return this.video.duration; 
+  },
   playProgress: function(percentAsDecimal){
     if (percentAsDecimal !== undefined) { 
       this.values.playProgress = percentAsDecimal; 
@@ -709,19 +710,29 @@ var VideoJS = _V_ = JRClass.extend({
     this.box.width = width;
     // Width isn't working for the poster
     this.poster.style.width = width+"px";
-    this.positionControlBar();
+    this.positionControlBars();
     return this;
   },
   height: function(height){
     this.video.height = height;
     this.box.height = height;
     this.poster.style.height = height+"px";
-    this.positionControlBar();
+    this.positionControlBars();
     return this;
   },
-  
-  extend: function(obj){ 
-    for(var attrname in obj){
+
+  /* Helpers
+  ================================================================================ */
+  // Each that that mains player as context
+  // Break if true is returned
+  each: function(arr, fn){
+    for (var i=0,j=arr.length; i<j; i++) { 
+      if (fn.call(this, arr[i], i)) { break; }
+    }
+  },
+
+  extend: function(obj){
+    for (var attrname in obj) {
       if (obj.hasOwnProperty(attrname)) { this[attrname]=obj[attrname]; }
     }
   }
@@ -749,7 +760,6 @@ VideoJS.player.newBehavior("video", function(element){
     element.addEventListener('progress', this.onVideoProgress.context(this), false);
     // Set interval for load progress using buffer watching method
     this.trackBuffered();
-
     // Make a click on th video act as a play button
     this.activateElement(element, "playToggle");
   },{
@@ -766,8 +776,8 @@ VideoJS.player.newBehavior("video", function(element){
       this.stopTrackingCurrentTime();
     },
     onVideoEnded: function(event){
-      this.video.currentTime = 0;
-      this.video.pause();
+      this.currentTime(0);
+      this.pause();
     },
     onVideoVolumeChange: function(event){ this.updateVolumeDisplays(); },
 
@@ -786,9 +796,9 @@ VideoJS.player.newBehavior("video", function(element){
     },
     updateBufferedTotal: function(){
       if (this.video.buffered) {
-        if (this.video.buffered.length >= 1) {
-          this.loaded(this.video.buffered.end(0) / this.video.duration);
-          if (this.video.buffered.end(0) == this.video.duration) {
+        if (this.video.buffered.length >= 1 && this.duration() > 0) {
+          this.loaded(this.video.buffered.end(0) / this.duration());
+          if (this.video.buffered.end(0) === this.duration()) {
             this.stopTrackingBuffered();
           }
         }
@@ -834,9 +844,9 @@ VideoJS.player.newBehavior("mouseOverVideoReporter", function(element){
     element.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
   },{
     onVideoMouseMove: function(){
-      this.showControlBar();
+      this.showControlBars();
       clearInterval(this.mouseMoveTimeout);
-      this.mouseMoveTimeout = setTimeout(this.hideControlBar.context(this), 4000);
+      this.mouseMoveTimeout = setTimeout(this.hideControlBars.context(this), 4000);
     },
     onVideoMouseOut: function(event){
       // Prevent flicker by making sure mouse hasn't left the video
@@ -845,7 +855,7 @@ VideoJS.player.newBehavior("mouseOverVideoReporter", function(element){
         parent = parent.parentNode;
       }
       if (parent !== this.video && parent !== this.controls) {
-        this.hideControlBar();
+        this.hideControlBars();
       }
     }
   }
@@ -857,20 +867,21 @@ VideoJS.player.newBehavior("controlBar", function(element){
     element.addEventListener("mousemove", this.onControlBarMouseMove.context(this), false);
     element.addEventListener("mouseout", this.onControlBarMouseOut.context(this), false);
     if (!this.controlBars) { this.controlBars = []; }
+    this.controlBars.push(element);
   },{
-    showControlBar: function(){
+    showControlBars: function(){
       if (!this.options.showControlsAtStart && !this.hasPlayed) { return; }
       this.controls.style.display = "block";
-      this.positionControlBar();
+      this.positionControlBars();
     },
     // Place controller relative to the video's position
-    positionControlBar: function(){
+    positionControlBars: function(){
       // Make sure the controls are visible
-      if (this.controls.style.display == 'none') { return; }
+      // if (this.controls.style.display == 'none') { return; }
       this.updatePlayProgressBars();
       this.updateLoadProgress();
     },
-    hideControlBar: function(){
+    hideControlBars: function(){
       if (this.options.controlsHiding && !this.mouseIsOverControls) { this.controls.style.display = "none"; }
     },
     // Block controls from hiding when mouse is over them.
@@ -918,9 +929,9 @@ VideoJS.player.newBehavior("playProgressBar", function(element){
   },{
     // Ajust the play progress bar's width based on the current play time
     updatePlayProgressBars: function(){
-      for (var i=0,bars=this.playProgressBars,j=bars.length; i<j; i++) {
-        if (bars[i].style) { bars[i].style.width = _V_.round(this.playProgress() * 100) + "%"; }
-      }
+      this.each(this.playProgressBars, function(bar){
+        if (bar.style) { bar.style.width = _V_.round(this.playProgress() * 100) + "%"; }
+      });
     }
   }
 );
@@ -931,9 +942,9 @@ VideoJS.player.newBehavior("loadProgressBar", function(element){
     this.loadProgressBars.push(element);
   },{
     updateLoadProgress: function(){
-      for (var i=0,bars=this.loadProgressBars,j=bars.length; i<j; i++) {
-        if (bars[i].style) { bars[i].style.width = parseInt(this.loaded() * 100) + "%"; }
-      }
+      this.each(this.loadProgressBars, function(bar){
+        if (bar.style) { bar.style.width = parseInt(this.loaded() * 100) + "%"; }
+      });
     }
   }
 );
@@ -947,12 +958,13 @@ VideoJS.player.newBehavior("currentTimeDisplay", function(element){
     // Update the displayed time (00:00)
     updateCurrentTimeDisplays: function(){
       if (!this.currentTimeDisplays) { return; }
-      for (var i=0,displays=this.currentTimeDisplays,j=displays.length; i<j; i++) {
-        displays[i].innerHTML = _V_.formatTime(this.video.currentTime);
-      }
+      this.each(this.currentTimeDisplays, function(dis){
+        dis.innerHTML = _V_.formatTime(this.video.currentTime);
+      });
     }
   }
 );
+
 /* Duration Display Behaviors
 ================================================================================ */
 VideoJS.player.newBehavior("durationDisplay", function(element){
@@ -961,9 +973,9 @@ VideoJS.player.newBehavior("durationDisplay", function(element){
   },{
     updateDurationDisplays: function(){
       if (!this.durationDisplays) { return; }
-      for (var i=0,displays=this.durationDisplays,j=displays.length; i<j; i++) {
-        if (this.video.duration) { displays[i].innerHTML = _V_.formatTime(this.video.duration); }
-      }
+      this.each(this.durationDisplays, function(dis){
+        if (this.duration()) { dis.innerHTML = _V_.formatTime(this.duration()); }
+      });
     }
   }
 );
@@ -1017,19 +1029,19 @@ VideoJS.player.newBehavior("volumeDisplay", function(element){
     // Unique to these default controls. Uses borders to create the look of bars.
     updateVolumeDisplays: function(){
       if (!this.volumeDisplays) { return; }
-      for (var i=0,dis=this.volumeDisplays,j=dis.length; i<j; i++) {
-        this.updateVolumeDisplay(dis[i]);
-      }
+      this.each(this.volumeDisplays, function(dis){
+        this.updateVolumeDisplay(dis);
+      })
     },
     updateVolumeDisplay: function(display){
       var volNum = Math.ceil(this.video.volume * 6);
-      for(var i=0; i<display.children.length; i++) {
-        if (i < volNum) {
-          _V_.addClass(display.children[i], "vjs-volume-level-on");
+      this.each(display.children, function(child, num){
+        if (num < volNum) {
+          _V_.addClass(child, "vjs-volume-level-on");
         } else {
-          _V_.removeClass(display.children[i], "vjs-volume-level-on");
+          _V_.removeClass(child, "vjs-volume-level-on");
         }
-      }
+      })
     },
   }
 );
@@ -1119,7 +1131,7 @@ VideoJS.player.newBehavior("fullscreenToggle", function(element){
       this.positionAll();
     },
     onFullscreenWindowResize: function(event){ // Removeable
-      this.positionControlBar();
+      this.positionControlBars();
     },
     // Create listener for esc key while in full screen mode
     onFullscreenEscKey: function(event){ // Removeable
@@ -1135,7 +1147,7 @@ VideoJS.player.newBehavior("fullscreenToggle", function(element){
 // Functions that don't apply to individual videos.
 ////////////////////////////////////////////////////////////////////////////////
 
-VideoJS.players = {
+VideoJS.playerTypes = {
   html5: {
     init: function(){
       if (VideoJS.browserSupportsVideo() && this.canPlaySource()) {
@@ -1287,7 +1299,7 @@ VideoJS.warnings = {
 
 // Combine Objects - Use "safe" to protect from overwriting existing items
 VideoJS.merge = function(obj1, obj2, safe){
-  for(var attrname in obj2){
+  for (var attrname in obj2){
     if (obj2.hasOwnProperty(attrname) && (!safe || !obj1.hasOwnProperty(attrname))) { obj1[attrname]=obj2[attrname]; }
   }
   return obj1;
