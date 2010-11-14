@@ -5,7 +5,10 @@
   <title>HTML5 Video Player</title>
 
   <!-- Include the VideoJS Library -->
-  <script src="../video.js" type="text/javascript" charset="utf-8"></script>
+  <script src="src/video.js" type="text/javascript" charset="utf-8"></script>
+  <script src="src/html5.js" type="text/javascript" charset="utf-8"></script>
+  <script src="src/behaviors.js" type="text/javascript" charset="utf-8"></script>
+
   <script type="text/javascript">
     VideoJS.DOMReady(function(){
       myPlayer = VideoJS.setup("example_video_1", { 
@@ -13,7 +16,7 @@
         controlsBelow: false, 
         showControlsAtStart: true
       });
-      myPlayer.activateElement(document.getElementById("scrub"), "loadProgressBar");
+      // myPlayer.activateElement(document.getElementById("scrub"), "spinner");
       var vid = document.getElementById("example_video_1"),
           attrTable = document.getElementById("attributes"),
           attrNames = ["error", "networkState", "readyState", "preload", "buffered",
@@ -70,6 +73,7 @@
 
   <!-- Begin VideoJS -->
   <div id="scrub" style="background: #000; height: 10px;"></div>
+  
   <div class="video-js-box">
     <!-- Using the Video for Everybody Embed Code http://camendesign.com/code/video_for_everybody -->
     <video data-subtitles="../demo-subtitles.srt" id="example_video_1" class="video-js" width="640" height="264" controls="controls" preload="none" poster="http://video-js.zencoder.com/oceans-clip.png">

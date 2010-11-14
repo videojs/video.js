@@ -685,7 +685,7 @@ var VideoJS = _V_ = JRClass.extend({
       this.values.playProgress = percentAsDecimal; 
       this.onPlayProgressUpdate();
     }
-    if (!this.values.playProgress) { this.values.playProgress = 0; }
+    if (this.values.playProgress == undefined) { this.values.playProgress = 0; }
     return this.values.playProgress;
   },
   loaded: function(percentAsDecimal){
@@ -693,7 +693,7 @@ var VideoJS = _V_ = JRClass.extend({
       this.values.loaded = percentAsDecimal
       this.updateLoadProgress();
     }
-    if (!this.values.loaded) { this.values.loaded = 0; }
+    if (this.values.loaded == undefined) { this.values.loaded = 0; }
     return this.values.loaded;
   },
   volume: function(percentAsDecimal){
