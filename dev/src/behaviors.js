@@ -78,8 +78,6 @@ VideoJS.player.newBehavior("video", function(element){
       this.updatePlayProgress();
       this.updateCurrentTimeDisplays();
       this.updateDurationDisplays();
-      // currentTime changed, reset subtitles
-      // if (!this.subtitles) { this.currentSubtitlePosition = 0; }
     },
     // Play progress
     updatePlayProgress: function(){
@@ -530,7 +528,8 @@ VideoJS.player.newBehavior("subtitlesDisplay", function(element){
     subtitlesDisplaysOnVideoTimeUpdate: function(){
       // show the subtitles
       if (this.subtitles) {
-        var x = this.currentSubtitlePosition;
+        // var x = this.currentSubtitlePosition;
+        var x = 0;
 
         while (x<this.subtitles.length && this.video.currentTime>this.subtitles[x].endTime) {
           if (this.subtitles[x].showing) {
