@@ -469,7 +469,6 @@ VideoJS.player.newBehavior("fullscreenToggle", function(element){
 /* Big Play Button Behaviors
 ================================================================================ */
 VideoJS.player.newBehavior("bigPlayButton", function(element){
-    console.log(this)
     if (!this.bigPlayButtons) {
       this.bigPlayButtons = [];
       this.onPlay(this.bigPlayButtonsOnPlay);
@@ -486,7 +485,6 @@ VideoJS.player.newBehavior("bigPlayButton", function(element){
       });
     },
     hideBigPlayButtons: function(){
-      console.log(this.bigPlayButtons)
       this.each(this.bigPlayButtons, function(element){
         element.style.display = "none"; 
       });
