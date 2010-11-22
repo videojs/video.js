@@ -326,9 +326,9 @@ VideoJS.player.newBehavior("currentTimeScrubber", function(element){
       _V_.unblockTextSelection();
       document.removeEventListener("mousemove", this.onCurrentTimeScrubberMouseMove, false);
       document.removeEventListener("mouseup", this.onCurrentTimeScrubberMouseUp, false);
+      this.trackCurrentTime();
       if (this.videoWasPlaying) {
         this.play();
-        this.trackCurrentTime();
       }
     },
     setCurrentTimeWithScrubber: function(event){

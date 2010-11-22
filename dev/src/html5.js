@@ -421,6 +421,7 @@ VideoJS.player.extend({
       this.values.currentTime = seconds;
       return this;
     }
+
     return this.video.currentTime;
   },
   // Allow for smoother visual scrubbing
