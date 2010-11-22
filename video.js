@@ -217,7 +217,7 @@ VideoJS.flashPlayers.htmlObject = {
         this.triggerResizeListeners();
         return this;
       }
-      return this.element.offsetWidth;
+      return this.element.width;
     },
     height: function(height){
       if (height !== undefined) {
@@ -226,7 +226,7 @@ VideoJS.flashPlayers.htmlObject = {
         this.triggerResizeListeners();
         return this;
       }
-      return this.element.offsetHeight;
+      return this.element.height;
     }
   }
 };
@@ -822,8 +822,9 @@ VideoJS.player.extend({
       this.values.bufferStart = 0;
       this.values.bufferEnd = 0;
     }
-    if (this.video.buffered && this.video.buffered.length > 0 && this.video.buffered.end(0) > this.values.bufferEnd) {
-      this.values.bufferEnd = this.video.buffered.end(0);
+    if (this.video.buffered && this.video.buffered.length > 0) {
+      var newEnd = this.video.buffered.end(0);
+      if (newEnd > this.values.bufferEnd) { this.values.bufferEnd = newEnd; }
     }
     return [this.values.bufferStart, this.values.bufferEnd];
   },
@@ -894,17 +895,20 @@ VideoJS.player.newBehavior("player", function(player){
     this.onError(this.playerOnVideoError);
     // Listen for when the video is played
     this.onPlay(this.playerOnVideoPlay);
+    this.onPlay(this.trackCurrentTime);
     // Listen for when the video is paused
     this.onPause(this.playerOnVideoPause);
+    this.onPause(this.stopTrackingCurrentTime);
     // Listen for when the video ends
     this.onEnded(this.playerOnVideoEnded);
     // Set interval for load progress using buffer watching method
-    this.trackCurrentTime();
+    // this.trackCurrentTime();
     this.trackBuffered();
     // Buffer Full
     this.onBufferedUpdate(this.isBufferFull);
   },{
-    playerOnVideoError: function(event){ 
+    playerOnVideoError: function(event){
+      this.log(event);
       this.log(this.video.error);
     },
     playerOnVideoPlay: function(event){ this.hasPlayed = true; },
@@ -918,7 +922,7 @@ VideoJS.player.newBehavior("player", function(player){
     // Buffer watching method for load progress.
     // Used for browsers that don't support the progress event
     trackBuffered: function(){
-      this.bufferedInterval = setInterval(this.triggerBufferedListeners.context(this), 200);
+      this.bufferedInterval = setInterval(this.triggerBufferedListeners.context(this), 500);
     },
     stopTrackingBuffered: function(){ clearInterval(this.bufferedInterval); },
     bufferedListeners: [],

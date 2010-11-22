@@ -469,23 +469,25 @@ VideoJS.player.newBehavior("fullscreenToggle", function(element){
 /* Big Play Button Behaviors
 ================================================================================ */
 VideoJS.player.newBehavior("bigPlayButton", function(element){
-    if (!this.elements.bigPlayButtons) { 
-      this.elements.bigPlayButtons = [];
+    console.log(this)
+    if (!this.bigPlayButtons) {
+      this.bigPlayButtons = [];
       this.onPlay(this.bigPlayButtonsOnPlay);
       this.onEnded(this.bigPlayButtonsOnEnded);
     }
-    this.elements.bigPlayButtons.push(element);
+    this.bigPlayButtons.push(element);
     this.activateElement(element, "playButton");
   },{
     bigPlayButtonsOnPlay: function(event){ this.hideBigPlayButtons(); },
     bigPlayButtonsOnEnded: function(event){ this.showBigPlayButtons(); },
-    showBigPlayButtons: function(){ 
-      this.each(this.elements.bigPlayButtons, function(element){
+    showBigPlayButtons: function(){
+      this.each(this.bigPlayButtons, function(element){
         element.style.display = "block"; 
       });
     },
-    hideBigPlayButtons: function(){ 
-      this.each(this.elements.bigPlayButtons, function(element){
+    hideBigPlayButtons: function(){
+      console.log(this.bigPlayButtons)
+      this.each(this.bigPlayButtons, function(element){
         element.style.display = "none"; 
       });
     }
@@ -556,11 +558,11 @@ VideoJS.player.newBehavior("spinner", function(element){
 /* Subtitles
 ================================================================================ */
 VideoJS.player.newBehavior("subtitlesDisplay", function(element){
-    if (!this.elements.subtitlesDisplays) { 
-      this.elements.subtitlesDisplays = [];
+    if (!this.subtitlesDisplays) { 
+      this.subtitlesDisplays = [];
       _V_.addListener(this.video, "timeupdate", this.subtitlesDisplaysOnVideoTimeUpdate.context(this));
     }
-    this.elements.subtitlesDisplays.push(element);
+    this.subtitlesDisplays.push(element);
   },{
     subtitlesDisplaysOnVideoTimeUpdate: function(){
       // show the subtitles
@@ -586,7 +588,7 @@ VideoJS.player.newBehavior("subtitlesDisplay", function(element){
       }
     },
     updateSubtitlesDisplays: function(val){
-      this.each(this.elements.subtitlesDisplays, function(disp){
+      this.each(this.subtitlesDisplays, function(disp){
         disp.innerHTML = val;
       });
     }

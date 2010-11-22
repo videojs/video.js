@@ -133,6 +133,7 @@ Changelog
 ---------
 2.0.1 (2010-11-22)
 
+- Fix: Issue with big play button when multiple videos are on the page.
 - Fix: Optimized play progress tracking.
 - Fix: Optimized buffer progress checking.
 - Fix: Firefox not showing Flash fallback object.

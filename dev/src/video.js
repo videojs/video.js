@@ -68,6 +68,7 @@ var VideoJS = JRClass.extend({
     this.extend(functions);
   },
   activateElement: function(element, behavior){
+    // if (behavior == "bigPlayButton") { console.log(this.video.id) }
     this.behaviors[behavior].call(this, element);
   },
   /* Errors/Warnings
