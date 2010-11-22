@@ -131,6 +131,12 @@ Coming Next
 
 Changelog
 ---------
+2.0.1 (2010-11-22)
+
+- Fix: Optimized play progress tracking.
+- Fix: Optimized buffer progress checking.
+- Fix: Firefox not showing Flash fallback object.
+
 2.0.0 (2010-11-21)
 
 - Feature: Created "behaviors" concept for adding behaviors to elements
