@@ -27,7 +27,7 @@ var VideoJS = _V_ = JRClass.extend({
       controlsAtStart: false, // Make controls visible when page loads
       controlsHiding: true, // Hide controls when not over the video
       defaultVolume: 0.85, // Will be overridden by localStorage volume if available
-      playerFallbackOrder: ["flash", "flash", "links"], // Players and order to use them
+      playerFallbackOrder: ["html5", "flash", "links"], // Players and order to use them
       flashPlayer: "htmlObject",
       flashPlayerVersion: false // Required flash version for fallback
     };
@@ -212,7 +212,10 @@ VideoJS.flashPlayers.htmlObject = {
 ================================================================================ */
 VideoJS.player.extend({
   linksSupported: function(){ return true; },
-  linksInit: function(){ this.showLinksFallback(); },
+  linksInit: function(){ 
+    this.showLinksFallback(); 
+    this.element = this.video;
+  },
   // Get the download links block element
   getLinksFallback: function(){ return this.box.getElementsByTagName("P")[0]; },
   // Hide no-video download paragraph
