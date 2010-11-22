@@ -3,115 +3,128 @@
 // Tell elements how to act or react
 ////////////////////////////////////////////////////////////////////////////////
 
-/* Video Behaviors
+/* Player Behaviors - How VideoJS reacts to what the video is doing.
 ================================================================================ */
-VideoJS.player.newBehavior("video", function(element){
-    element.addEventListener('error',this.onVideoError.context(this),false);
+VideoJS.player.newBehavior("player", function(player){
+    this.onError(this.playerOnVideoError);
     // Listen for when the video is played
-    element.addEventListener("play", this.onVideoPlay.context(this), false);
+    this.onPlay(this.playerOnVideoPlay);
     // Listen for when the video is paused
-    element.addEventListener("pause", this.onVideoPause.context(this), false);
+    this.onPause(this.playerOnVideoPause);
     // Listen for when the video ends
-    element.addEventListener("ended", this.onVideoEnded.context(this), false);
-    // Listen for a volume change
-    element.addEventListener('volumechange',this.onVideoVolumeChange.context(this),false);
-    // Listen for Video Load Progress (currently does not if html file is local)
-    element.addEventListener('progress', this.onVideoProgress.context(this), false);
+    this.onEnded(this.playerOnVideoEnded);
     // Set interval for load progress using buffer watching method
+    this.trackCurrentTime();
     this.trackBuffered();
-    // Make a click on th video act as a play button
-    this.activateElement(element, "playToggle");
+    // Buffer Full
+    this.onBufferedUpdate(this.isBufferFull);
   },{
-    onVideoError: function(event){ this.log(this.video.error); },
-    onVideoPlay: function(event){
-      this.hasPlayed = true;
-      _V_.removeClass(this.box, "vjs-paused");
-      _V_.addClass(this.box, "vjs-playing");
-      this.trackCurrentTime();
+    playerOnVideoError: function(event){ 
+      this.log(this.video.error); 
+      console.log(event)
     },
-    onVideoPause: function(event){
-      _V_.removeClass(this.box, "vjs-playing");
-      _V_.addClass(this.box, "vjs-paused");
-      this.stopTrackingCurrentTime();
-    },
-    onVideoEnded: function(event){
+    playerOnVideoPlay: function(event){ this.hasPlayed = true; },
+    playerOnVideoPause: function(event){},
+    playerOnVideoEnded: function(event){
       this.currentTime(0);
       this.pause();
     },
-    onVideoVolumeChange: function(event){ this.updateVolumeDisplays(); },
 
     /* Load Tracking -------------------------------------------------------------- */
-    // When the video's load progress is updated
-    // Does not work in all browsers (Safari/Chrome 5)
-    onVideoProgress: function(event){
-      if(event.total > 0) {
-        this.loaded(event.loaded / event.total);
-      }
-    },
     // Buffer watching method for load progress.
     // Used for browsers that don't support the progress event
     trackBuffered: function(){
-      this.bufferedInterval = setInterval(this.updateBufferedTotal.context(this), 33);
-    },
-    updateBufferedTotal: function(){
-      if (this.video.buffered) {
-        if (this.video.buffered.length >= 1 && this.duration() > 0) {
-          this.loaded(this.video.buffered.end(0) / this.duration());
-          if (this.video.buffered.end(0) === this.duration()) {
-            this.stopTrackingBuffered();
-          }
-        }
-      } else {
-        this.stopTrackingBuffered();
-      }
+      this.bufferedInterval = setInterval(this.triggerBufferedListeners.context(this), 100);
     },
     stopTrackingBuffered: function(){ clearInterval(this.bufferedInterval); },
+    bufferedListeners: [],
+    onBufferedUpdate: function(fn){
+      this.bufferedListeners.push(fn);
+    },
+    triggerBufferedListeners: function(){
+      this.each(this.bufferedListeners, function(listener){
+        (listener.context(this))();
+      });
+    },
+    isBufferFull: function(){
+      if (this.bufferedPercent() == 1) { this.stopTrackingBuffered(); }
+    },
 
     /* Time Tracking -------------------------------------------------------------- */
     trackCurrentTime: function(){
       if (this.currentTimeInterval) { clearInterval(this.currentTimeInterval); }
-      this.currentTimeInterval = setInterval(this.onCurrentTimeUpdate.context(this), 33);
+      this.currentTimeInterval = setInterval(this.triggerCurrentTimeListeners.context(this), 42); // 24 fps
+      this.trackingCurrentTime = true;
     },
     // Turn off play progress tracking (when paused or dragging)
-    stopTrackingCurrentTime: function(){ clearInterval(this.currentTimeInterval); },
-    onCurrentTimeUpdate: function(){
-      this.updatePlayProgress();
-      this.updateCurrentTimeDisplays();
-      this.updateDurationDisplays();
+    stopTrackingCurrentTime: function(){
+      clearInterval(this.currentTimeInterval);
+      this.trackingCurrentTime = false;
     },
-    // Play progress
-    updatePlayProgress: function(){
-      if (this.duration()) {
-        this.playProgress(this.currentTime() / this.duration());
-      }
+    currentTimeListeners: [],
+    onCurrentTimeUpdate: function(fn){
+      this.currentTimeListeners.push(fn);
     },
-    onPlayProgressUpdate: function(){
-      this.updatePlayProgressBars();
+    triggerCurrentTimeListeners: function(late, newTime){ // FF passes milliseconds late a the first argument
+      this.each(this.currentTimeListeners, function(listener){
+        (listener.context(this))(newTime);
+      });
+    },
+
+    /* Resize Tracking -------------------------------------------------------------- */
+    resizeListeners: [],
+    onResize: function(fn){
+      this.resizeListeners.push(fn);
+    },
+    // Trigger anywhere the video/box size is changed.
+    triggerResizeListeners: function(){
+      this.each(this.resizeListeners, function(listener){
+        (listener.context(this))();
+      });
     }
   }
 );
-/* Mouse Over Video Reporter Behaviors
+/* Mouse Over Video Reporter Behaviors - i.e. Controls hiding based on mouse location
 ================================================================================ */
 VideoJS.player.newBehavior("mouseOverVideoReporter", function(element){
     // Listen for the mouse move the video. Used to reveal the controller.
-    element.addEventListener("mousemove", this.onVideoMouseMove.context(this), false);
+    element.addEventListener("mousemove", this.mouseOverVideoReporterOnMouseMove.context(this), false);
     // Listen for the mouse moving out of the video. Used to hide the controller.
-    element.addEventListener("mouseout", this.onVideoMouseOut.context(this), false);
+    element.addEventListener("mouseout", this.mouseOverVideoReporterOnMouseOut.context(this), false);
   },{
-    onVideoMouseMove: function(){
+    mouseOverVideoReporterOnMouseMove: function(){
       this.showControlBars();
       clearInterval(this.mouseMoveTimeout);
       this.mouseMoveTimeout = setTimeout(this.hideControlBars.context(this), 4000);
     },
-    onVideoMouseOut: function(event){
+    mouseOverVideoReporterOnMouseOut: function(event){
       // Prevent flicker by making sure mouse hasn't left the video
       var parent = event.relatedTarget;
-      while (parent && parent !== this.video && parent !== this.controls) {
+      while (parent && parent !== this.box) {
         parent = parent.parentNode;
       }
-      if (parent !== this.video && parent !== this.controls) {
+      if (parent !== this.box) {
         this.hideControlBars();
       }
+    }
+  }
+);
+/* Mouse Over Video Reporter Behaviors - i.e. Controls hiding based on mouse location
+================================================================================ */
+VideoJS.player.newBehavior("box", function(element){
+    this.positionBox();
+    _V_.addClass(element, "vjs-paused");
+    this.activateElement(element, "mouseOverVideoReporter");
+    this.onPlay(this.boxOnVideoPlay);
+    this.onPause(this.boxOnVideoPause);
+  },{
+    boxOnVideoPlay: function(){
+      _V_.removeClass(this.box, "vjs-paused");
+      _V_.addClass(this.box, "vjs-playing");
+    },
+    boxOnVideoPause: function(){
+      _V_.removeClass(this.box, "vjs-playing");
+      _V_.addClass(this.box, "vjs-paused");
     }
   }
 );
@@ -120,11 +133,10 @@ VideoJS.player.newBehavior("mouseOverVideoReporter", function(element){
 VideoJS.player.newBehavior("poster", function(element){
     this.activateElement(element, "mouseOverVideoReporter");
     this.activateElement(element, "playButton");
-    this.video.addEventListener("play", this.posterOnPlay.context(this), false);
-    this.video.addEventListener("ended", this.posterOnEnded.context(this), false);
+    this.onPlay(this.hidePoster);
+    this.onEnded(this.showPoster);
+    this.onResize(this.positionPoster);
   },{
-    posterOnEnded: function(){ this.showPoster(); },
-    posterOnPlay: function(){ this.hidePoster(); },
     showPoster: function(){
       if (!this.poster) { return; }
       this.poster.style.display = "block";
@@ -133,8 +145,8 @@ VideoJS.player.newBehavior("poster", function(element){
     positionPoster: function(){
       // Only if the poster is visible
       if (!this.poster || this.poster.style.display == 'none') { return; }
-      this.poster.style.height = this.video.offsetHeight + "px"; // Need incase controlsBelow
-      this.poster.style.width = this.video.offsetWidth + "px"; // Could probably do 100% of box
+      this.poster.style.height = this.height() + "px"; // Need incase controlsBelow
+      this.poster.style.width = this.width() + "px"; // Could probably do 100% of box
     },
     hidePoster: function(){
       if (!this.poster) { return; }
@@ -153,29 +165,35 @@ VideoJS.player.newBehavior("poster", function(element){
 /* Control Bar Behaviors
 ================================================================================ */
 VideoJS.player.newBehavior("controlBar", function(element){
-    element.addEventListener("mousemove", this.onControlBarMouseMove.context(this), false);
-    element.addEventListener("mouseout", this.onControlBarMouseOut.context(this), false);
-    if (!this.controlBars) { this.controlBars = []; }
+    if (!this.controlBars) { 
+      this.controlBars = []; 
+      this.onResize(this.positionControlBars);
+    }
     this.controlBars.push(element);
+    element.addEventListener("mousemove", this.onControlBarsMouseMove.context(this), false);
+    element.addEventListener("mouseout", this.onControlBarsMouseOut.context(this), false);
   },{
     showControlBars: function(){
-      if (!this.options.showControlsAtStart && !this.hasPlayed) { return; }
-      this.controls.style.display = "block";
-      this.positionControlBars();
+      if (!this.options.controlsAtStart && !this.hasPlayed) { return; }
+      this.each(this.controlBars, function(bar){
+        bar.style.display = "block";
+      });
     },
-    // Place controller relative to the video's position
+    // Place controller relative to the video's position (now just resizing bars)
     positionControlBars: function(){
-      // Make sure the controls are visible
-      // if (this.controls.style.display == 'none') { return; }
       this.updatePlayProgressBars();
-      this.updateLoadProgress();
+      this.updateLoadProgressBars();
     },
     hideControlBars: function(){
-      if (this.options.controlsHiding && !this.mouseIsOverControls) { this.controls.style.display = "none"; }
+      if (this.options.controlsHiding && !this.mouseIsOverControls) { 
+        this.each(this.controlBars, function(bar){
+          bar.style.display = "none";
+        });
+      }
     },
     // Block controls from hiding when mouse is over them.
-    onControlBarMouseMove: function(){ this.mouseIsOverControls = true; },
-    onControlBarMouseOut: function(event){ 
+    onControlBarsMouseMove: function(){ this.mouseIsOverControls = true; },
+    onControlBarsMouseOut: function(event){ 
       this.mouseIsOverControls = false; 
     }
   }
@@ -187,10 +205,10 @@ VideoJS.player.newBehavior("playToggle", function(element){
     element.addEventListener("click", this.onPlayToggleClick.context(this), false);
   },{
     onPlayToggleClick: function(event){
-      if (this.video.paused) {
-        this.video.play();
+      if (this.paused()) {
+        this.play();
       } else {
-        this.video.pause();
+        this.pause();
       }
     }
   }
@@ -199,26 +217,30 @@ VideoJS.player.newBehavior("playToggle", function(element){
 VideoJS.player.newBehavior("playButton", function(element){
     element.addEventListener("click", this.onPlayButtonClick.context(this), false);
   },{
-    onPlayButtonClick: function(event){ this.video.play(); }
+    onPlayButtonClick: function(event){ this.play(); }
   }
 );
 // Pause
 VideoJS.player.newBehavior("pauseButton", function(element){
     element.addEventListener("click", this.onPauseButtonClick.context(this), false);
   },{
-    onPauseButtonClick: function(event){ this.video.pause(); }
+    onPauseButtonClick: function(event){ this.pause(); }
   }
 );
 /* Play Progress Bar Behaviors
 ================================================================================ */
 VideoJS.player.newBehavior("playProgressBar", function(element){
-    if (!this.playProgressBars) { this.playProgressBars = []; }
+    if (!this.playProgressBars) { 
+      this.playProgressBars = [];
+      this.onCurrentTimeUpdate(this.updatePlayProgressBars);
+    }
     this.playProgressBars.push(element);
   },{
     // Ajust the play progress bar's width based on the current play time
-    updatePlayProgressBars: function(){
+    updatePlayProgressBars: function(newTime){
+      var progress = (newTime !== undefined) ? newTime / this.duration() : this.currentTime() / this.duration();
       this.each(this.playProgressBars, function(bar){
-        if (bar.style) { bar.style.width = _V_.round(this.playProgress() * 100, 2) + "%"; }
+        if (bar.style) { bar.style.width = _V_.round(progress * 100, 2) + "%"; }
       });
     }
   }
@@ -228,10 +250,11 @@ VideoJS.player.newBehavior("playProgressBar", function(element){
 VideoJS.player.newBehavior("loadProgressBar", function(element){
     if (!this.loadProgressBars) { this.loadProgressBars = []; }
     this.loadProgressBars.push(element);
+    this.onBufferedUpdate(this.updateLoadProgressBars);
   },{
-    updateLoadProgress: function(){
+    updateLoadProgressBars: function(){
       this.each(this.loadProgressBars, function(bar){
-        if (bar.style) { bar.style.width = _V_.round(this.loaded() * 100, 2) + "%"; }
+        if (bar.style) { bar.style.width = _V_.round(this.bufferedPercent() * 100, 2) + "%"; }
       });
     }
   }
@@ -240,14 +263,19 @@ VideoJS.player.newBehavior("loadProgressBar", function(element){
 /* Current Time Display Behaviors
 ================================================================================ */
 VideoJS.player.newBehavior("currentTimeDisplay", function(element){
-    if (!this.currentTimeDisplays) { this.currentTimeDisplays = []; }
+    if (!this.currentTimeDisplays) { 
+      this.currentTimeDisplays = []; 
+      this.onCurrentTimeUpdate(this.updateCurrentTimeDisplays);
+    }
     this.currentTimeDisplays.push(element);
   },{
     // Update the displayed time (00:00)
-    updateCurrentTimeDisplays: function(){
+    updateCurrentTimeDisplays: function(newTime){
       if (!this.currentTimeDisplays) { return; }
+      // Allows for smooth scrubbing, when player can't keep up.
+      var time = (newTime) ? newTime : this.currentTime();
       this.each(this.currentTimeDisplays, function(dis){
-        dis.innerHTML = _V_.formatTime(this.video.currentTime);
+        dis.innerHTML = _V_.formatTime(time);
       });
     }
   }
@@ -256,7 +284,10 @@ VideoJS.player.newBehavior("currentTimeDisplay", function(element){
 /* Duration Display Behaviors
 ================================================================================ */
 VideoJS.player.newBehavior("durationDisplay", function(element){
-    if (!this.durationDisplays) { this.durationDisplays = []; }
+    if (!this.durationDisplays) { 
+      this.durationDisplays = []; 
+      this.onCurrentTimeUpdate(this.updateDurationDisplays);
+    }
     this.durationDisplays.push(element);
   },{
     updateDurationDisplays: function(){
@@ -278,10 +309,10 @@ VideoJS.player.newBehavior("currentTimeScrubber", function(element){
       event.preventDefault();
       this.currentScrubber = scrubber;
 
-      this.stopTrackingCurrentTime();
+      this.stopTrackingCurrentTime(); // Allows for smooth scrubbing
 
-      this.videoWasPlaying = !this.video.paused;
-      this.video.pause();
+      this.videoWasPlaying = !this.paused();
+      this.pause();
 
       _V_.blockTextSelection();
       this.setCurrentTimeWithScrubber(event);
@@ -296,20 +327,27 @@ VideoJS.player.newBehavior("currentTimeScrubber", function(element){
       document.removeEventListener("mousemove", this.onCurrentTimeScrubberMouseMove, false);
       document.removeEventListener("mouseup", this.onCurrentTimeScrubberMouseUp, false);
       if (this.videoWasPlaying) {
-        this.video.play();
+        this.play();
         this.trackCurrentTime();
       }
     },
     setCurrentTimeWithScrubber: function(event){
-      var newProgress = _V_.getRelativePosition(event.pageX, this.currentScrubber)
-      this.currentTime(newProgress * this.duration());
+      var newProgress = _V_.getRelativePosition(event.pageX, this.currentScrubber);
+      var newTime = newProgress * this.duration();
+      this.triggerCurrentTimeListeners(0, newTime); // Allows for smooth scrubbing
+      // Don't let video end while scrubbing.
+      if (newTime == this.duration()) { newTime = newTime - 0.1; }
+      this.currentTime(newTime);
     }
   }
 );
 /* Volume Display Behaviors
 ================================================================================ */
 VideoJS.player.newBehavior("volumeDisplay", function(element){
-    if (!this.volumeDisplays) { this.volumeDisplays = []; }
+    if (!this.volumeDisplays) { 
+      this.volumeDisplays = [];
+      this.onVolumeChange(this.updateVolumeDisplays);
+    }
     this.volumeDisplays.push(element);
     this.updateVolumeDisplay(element); // Set the display to the initial volume
   },{
@@ -322,7 +360,7 @@ VideoJS.player.newBehavior("volumeDisplay", function(element){
       })
     },
     updateVolumeDisplay: function(display){
-      var volNum = Math.ceil(this.video.volume * 6);
+      var volNum = Math.ceil(this.volume() * 6);
       this.each(display.children, function(child, num){
         if (num < volNum) {
           _V_.addClass(child, "vjs-volume-level-on");
@@ -340,19 +378,21 @@ VideoJS.player.newBehavior("volumeScrubber", function(element){
   },{
     // Adjust the volume when the user drags on the volume control
     onVolumeScrubberMouseDown: function(event, scrubber){
-      event.preventDefault();
-      this.currentScrubber = scrubber;
+      // event.preventDefault();
       _V_.blockTextSelection();
+      this.currentScrubber = scrubber;
       this.setVolumeWithScrubber(event);
       document.addEventListener("mousemove", this.onVolumeScrubberMouseMove.rEvtContext(this), false);
       document.addEventListener("mouseup", this.onVolumeScrubberMouseUp.rEvtContext(this), false);
     },
-    onVolumeScrubberMouseMove: function(event){ this.setVolumeWithScrubber(event); },
+    onVolumeScrubberMouseMove: function(event){ 
+      this.setVolumeWithScrubber(event);
+    },
     onVolumeScrubberMouseUp: function(event){
+      this.setVolumeWithScrubber(event);
       _V_.unblockTextSelection();
       document.removeEventListener("mousemove", this.onVolumeScrubberMouseMove, false);
       document.removeEventListener("mouseup", this.onVolumeScrubberMouseUp, false);
-      this.setVolumeWithScrubber(event);
     },
     setVolumeWithScrubber: function(event){
       var newVol = _V_.getRelativePosition(event.pageX, this.currentScrubber);
@@ -394,16 +434,10 @@ VideoJS.player.newBehavior("fullscreenToggle", function(element){
     },
     // If available use the native fullscreen
     nativeFullscreenOn: function(){
-      if(typeof this.video.webkitEnterFullScreen == 'function') {
-        // Seems to be broken in Chromium/Chrome
-        if (!navigator.userAgent.match("Chrome")) {
-          try {
-            this.video.webkitEnterFullScreen();
-          } catch (e) {
-            if (e.code == 11) { this.warning(VideoJS.warnings.videoNotReady); }
-          }
-          return true;
-        }
+      if(this.supportsFullScreen()) {
+        return this.enterFullScreen();
+      } else {
+        return false;
       }
     },
     // Turn off fullscreen (window) mode
@@ -432,13 +466,13 @@ VideoJS.player.newBehavior("fullscreenToggle", function(element){
 /* Big Play Button Behaviors
 ================================================================================ */
 VideoJS.player.newBehavior("bigPlayButton", function(element){
-    this.activateElement(element, "playButton");
     if (!this.elements.bigPlayButtons) { 
       this.elements.bigPlayButtons = [];
-      this.video.addEventListener("play", this.bigPlayButtonsOnPlay.context(this), false);
-      this.video.addEventListener("ended", this.bigPlayButtonsOnEnded.context(this), false);
+      this.onPlay(this.bigPlayButtonsOnPlay);
+      this.onEnded(this.bigPlayButtonsOnEnded);
     }
     this.elements.bigPlayButtons.push(element);
+    this.activateElement(element, "playButton");
   },{
     bigPlayButtonsOnPlay: function(event){ this.hideBigPlayButtons(); },
     bigPlayButtonsOnEnded: function(event){ this.showBigPlayButtons(); },

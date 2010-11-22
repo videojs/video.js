@@ -1,29 +1,5 @@
-/*
-VideoJS - HTML5 Video Player
-v1.2.0
-
-This file is part of VideoJS. Copyright 2010 Zencoder, Inc.
-
-VideoJS is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-VideoJS is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with VideoJS.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
 // Using jresig's Class implementation http://ejohn.org/blog/simple-javascript-inheritance/
 (function(){var initializing=false, fnTest=/xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/; this.JRClass = function(){}; JRClass.extend = function(prop) { var _super = this.prototype; initializing = true; var prototype = new this(); initializing = false; for (var name in prop) { prototype[name] = typeof prop[name] == "function" && typeof _super[name] == "function" && fnTest.test(prop[name]) ? (function(name, fn){ return function() { var tmp = this._super; this._super = _super[name]; var ret = fn.apply(this, arguments); this._super = tmp; return ret; }; })(name, prop[name]) : prop[name]; } function JRClass() { if ( !initializing && this.init ) this.init.apply(this, arguments); } JRClass.prototype = prototype; JRClass.constructor = JRClass; JRClass.extend = arguments.callee; return JRClass;};})();
-
-// Self-executing function to prevent global vars and help with minification
-(function(window, undefined){
-  var document = window.document;
 
 // Video JS Player Class
 var VideoJS = _V_ = JRClass.extend({
@@ -44,39 +20,44 @@ var VideoJS = _V_ = JRClass.extend({
 
     // Default Options
     this.options = {
+      autoplay: false,
+      preload: true,
+      useBuiltInControls: false, // Use the browser's controls (iPhone)
       controlsBelow: false, // Display control bar below video vs. in front of
-      showControlsAtStart: false, // Make controls visible when page loads
+      controlsAtStart: false, // Make controls visible when page loads
       controlsHiding: true, // Hide controls when not over the video
       defaultVolume: 0.85, // Will be overridden by localStorage volume if available
-      flashVersion: 9, // Required flash version for fallback
-      flashIsDominant: false, // Always use Flash when available
-      useBuiltInControls: false, // Dont' use the video JS controls (iPhone)
-      playerFallbackOrder: ["html5", "flash", "links"] // Players and order to use them
+      playerFallbackOrder: ["flash", "flash", "links"], // Players and order to use them
+      flashPlayer: "htmlObject",
+      flashPlayerVersion: false // Required flash version for fallback
     };
     // Override default options with global options
     if (typeof VideoJS.options == "object") { _V_.merge(this.options, VideoJS.options); }
     // Override default & global options with options specific to this player
     if (typeof setOptions == "object") { _V_.merge(this.options, setOptions); }
+    // Override preload & autoplay with video attributes
+    if (this.getPreloadAttribute() !== undefined) { this.options.preload = this.getPreloadAttribute(); }
+    if (this.getAutoplayAttribute() !== undefined) { this.options.autoplay = this.getAutoplayAttribute(); }
 
     // Store reference to embed code pieces
     this.box = this.video.parentNode;
     this.linksFallback = this.getLinksFallback();
     this.hideLinksFallback(); // Will be shown again if "links" player is used
 
-    // Make Flash first player in line
-    if (this.options.flashIsDominant) { this.options.playerFallbackOrder.unshift("flash") }
-
     // Loop through the player names list in options, "html5" etc.
     // For each player name, initialize the player with that name under VideoJS.players
     // If the player successfully initializes, we're done
     // If not, try the next player in the list
     this.each(this.options.playerFallbackOrder, function(playerType){
-      if (!this[playerType+"Supported"]) { return false; }
-      if (this[playerType+"Supported"]()) {
-        this[playerType+"Init"]();
-        return true;
+      if (this[playerType+"Supported"]()) { // Check if player type is supported
+        this[playerType+"Init"](); // Initialize player type
+        return true; // Stop looping though players
       }
     });
+
+    // Start Global Listeners - API doesn't exist before now
+    this.activateElement(this, "player");
+    this.activateElement(this.box, "box");
   },
   /* Behaviors
   ================================================================================ */
@@ -117,86 +98,34 @@ var VideoJS = _V_ = JRClass.extend({
       }
     }
   },
-
-  /* Player API - Translate functionality from player to video
-  ================================================================================ */
-  values: {}, // Storage for setters and getters of the same name.
-  play: function(){ 
-    this.video.play(); 
-    return this;
-  },
-  pause: function(){ 
-    this.video.pause(); 
-    return this;
-  },
-  currentTime: function(seconds){
-    if (seconds !== undefined) { 
-      this.video.currentTime = seconds;
-      this.values.currentTime = seconds;
-      this.onCurrentTimeUpdate();
-    } else {
-      this.values.currentTime = this.video.currentTime
-    }
-    // Allow for smoother scrubbing by repoting back stored value
-    return this.values.currentTime;
-  },
-  duration: function(){
-    return this.video.duration;
-  },
-  playProgress: function(percentAsDecimal){
-    if (percentAsDecimal !== undefined) { 
-      this.values.playProgress = percentAsDecimal; 
-      this.onPlayProgressUpdate();
-    }
-    if (this.values.playProgress == undefined) { this.values.playProgress = 0; }
-    return this.values.playProgress;
-  },
-  loaded: function(percentAsDecimal){
-    if (percentAsDecimal !== undefined && percentAsDecimal > this.values.loaded) {
-      this.values.loaded = percentAsDecimal
-      this.updateLoadProgress();
-    }
-    if (this.values.loaded == undefined) { this.values.loaded = 0; }
-    return this.values.loaded;
-  },
-  volume: function(percentAsDecimal){
-    if (percentAsDecimal !== undefined) {
-      this.values.volume = parseFloat(percentAsDecimal);
-      this.video.volume = this.values.volume;
-      this.setLocalStorage("volume", this.video.volume);
-    }
-    if (this.values.volume) { return this.values.volume; }
-    return this.video.volume;
-  },
-  width: function(width){
-    if (width !== undefined) {
-      this.video.width = width;
-      this.box.width = width;
-      this.positionPoster();
-      this.positionControlBars();
-    }
-    return this.video.width;
-  },
-  height: function(height){
-    if (height !== undefined) {
-      this.video.height = height;
-      this.box.height = height;
-      this.positionPoster();
-      this.positionControlBars();
-    }
-    return this.video.height;
-  },
-
   /* Helpers
   ================================================================================ */
+  getPreloadAttribute: function(){
+    if (typeof this.video.hasAttribute == "function" && this.video.hasAttribute("preload")) {
+      var preload = this.video.getAttribute("preload");
+      // Only included the attribute, thinking it was boolean
+      if (preload === "" || preload === "true") { return "auto"; } 
+      if (preload === "false") { return "none"; }
+      return preload;
+    }
+  },
+  getAutoplayAttribute: function(){
+    if (typeof this.video.hasAttribute == "function" && this.video.hasAttribute("autoplay")) {
+      var autoplay = this.video.getAttribute("autoplay");
+      if (autoplay === "false") { return false; }
+      return true;
+    }
+  },
+  // Calculates amoutn of buffer is full
+  bufferedPercent: function(){ return (this.duration()) ? this.buffered()[1] / this.duration() : 0; },
   // Each that maintains player as context
   // Break if true is returned
   each: function(arr, fn){
-    for (var i=0,j=arr.length; i<j; i++) { 
+    if (!arr || arr.length == 0) { return; }
+    for (var i=0,j=arr.length; i<j; i++) {
       if (fn.call(this, arr[i], i)) { break; }
     }
   },
-
   extend: function(obj){
     for (var attrname in obj) {
       if (obj.hasOwnProperty(attrname)) { this[attrname]=obj[attrname]; }
@@ -209,13 +138,13 @@ VideoJS.player = VideoJS.prototype;
 // Player Types
 ////////////////////////////////////////////////////////////////////////////////
 
-/* Flash Object Fallback
+/* Flash Object Fallback (Player Type)
 ================================================================================ */
 VideoJS.player.extend({
   flashSupported: function(){
-    if (!this.flashObject) { this.flashObject = this.getFlashObject(); }
+    if (!this.flashElement) { this.flashElement = this.getFlashElement(); }
     // Check if object exists & Flash Player version is supported
-    if (this.flashObject && this.flashVersionSupported()) {
+    if (this.flashElement && this.flashPlayerVersionSupported()) {
       return true;
     } else {
       return false;
@@ -223,32 +152,63 @@ VideoJS.player.extend({
   },
   flashInit: function(){
     this.replaceWithFlash();
+    this.element = this.flashElement;
     this.video.src = ""; // Stop video from downloading if HTML5 is still supported
+    var flashPlayerType = VideoJS.flashPlayers[this.options.flashPlayer];
+    this.extend(VideoJS.flashPlayers[this.options.flashPlayer].api);
+    (flashPlayerType.init.context(this))();
   },
   // Get Flash Fallback object element from Embed Code
-  getFlashObject: function(){
-    var objects = this.video.getElementsByTagName("OBJECT");
-    for (var i=0,j=objects.length; i<j; i++) {
-      if (objects[i].className == "vjs-flash-fallback") {
-        return  objects[i];
+  getFlashElement: function(){
+    var children = this.video.children;
+    for (var i=0,j=children.length; i<j; i++) {
+      if (children[i].className == "vjs-flash-fallback") {
+        return children[i];
       }
     }
   },
   // Used to force a browser to fall back when it's an HTML5 browser but there's no supported sources
   replaceWithFlash: function(){
-    // this.flashObject = this.video.removeChild(this.flashObject);
-    if (this.flashObject) {
-      this.box.insertBefore(this.flashObject, this.video);
+    // this.flashElement = this.video.removeChild(this.flashElement);
+    if (this.flashElement) {
+      this.box.insertBefore(this.flashElement, this.video);
       this.video.style.display = "none"; // Removing it was breaking later players
     }
   },
   // Check if browser can use this flash player
-  flashVersionSupported: function(){ 
-    return VideoJS.getFlashVersion() >= this.options.flashVersion; 
+  flashPlayerVersionSupported: function(){
+    var playerVersion = (this.options.flashPlayerVersion) ? this.options.flashPlayerVersion : VideoJS.flashPlayers[this.options.flashPlayer].flashPlayerVersion;
+    return VideoJS.getFlashVersion() >= playerVersion;
   }
 });
+VideoJS.flashPlayers = {};
+VideoJS.flashPlayers.htmlObject = {
+  flashPlayerVersion: 9,
+  init: function() { return true; },
+  api: { // No video API available with HTML Object embed method
+    width: function(width){
+      if (width !== undefined) {
+        this.element.width = width;
+        this.box.style.width = width+"px";
+        this.triggerResizeListeners();
+        return this;
+      }
+      return this.element.offsetWidth;
+    },
+    height: function(height){
+      if (height !== undefined) {
+        this.element.height = height;
+        this.box.style.height = height+"px";
+        this.triggerResizeListeners();
+        return this;
+      }
+      return this.element.offsetHeight;
+    }
+  }
+};
 
-/* Download Links Fallback
+
+/* Download Links Fallback (Player Type)
 ================================================================================ */
 VideoJS.player.extend({
   linksSupported: function(){ return true; },
@@ -298,7 +258,6 @@ VideoJS.extend({
   //    A video tag ID or video tag element: set up one video and return one player
   //    An array of video tag elements/IDs: set up each and return an array of players
   setup: function(videos, options){
-
     var returnSingular = false,
     playerList = [],
     videoElement;
@@ -392,195 +351,8 @@ VideoJS.extend({
   }
 });
 
-////////////////////////////////////////////////////////////////////////////////
-// Convenience Functions (mini library)
-// Functions not specific to video or VideoJS and could probably be replaced with a library like jQuery
-////////////////////////////////////////////////////////////////////////////////
-
-VideoJS.extend({
-
-  addClass: function(element, classToAdd){
-    if (element.className.split(/\s+/).lastIndexOf(classToAdd) == -1) { element.className = element.className === "" ? classToAdd : element.className + " " + classToAdd; }
-  },
-  removeClass: function(element, classToRemove){
-    if (element.className.indexOf(classToRemove) == -1) { return; }
-    var classNames = element.className.split(/\s+/);
-    classNames.splice(classNames.lastIndexOf(classToRemove),1);
-    element.className = classNames.join(" ");
-  },
-  createElement: function(tagName, attributes){
-    return this.merge(document.createElement(tagName), attributes);
-  },
-
-  // Attempt to block the ability to select text while dragging controls
-  blockTextSelection: function(){
-    document.body.focus();
-    document.onselectstart = function () { return false; };
-  },
-  // Turn off text selection blocking
-  unblockTextSelection: function(){ document.onselectstart = function () { return true; }; },
-
-  // Return seconds as MM:SS
-  formatTime: function(secs) {
-    var seconds = Math.round(secs);
-    var minutes = Math.floor(seconds / 60);
-    minutes = (minutes >= 10) ? minutes : "0" + minutes;
-    seconds = Math.floor(seconds % 60);
-    seconds = (seconds >= 10) ? seconds : "0" + seconds;
-    return minutes + ":" + seconds;
-  },
-
-  // Return the relative horizonal position of an event as a value from 0-1
-  getRelativePosition: function(x, relativeElement){
-    return Math.max(0, Math.min(1, (x - this.findPosX(relativeElement)) / relativeElement.offsetWidth));
-  },
-  // Get an objects position on the page
-  findPosX: function(obj) {
-    var curleft = obj.offsetLeft;
-    while(obj = obj.offsetParent) {
-      curleft += obj.offsetLeft;
-    }
-    return curleft;
-  },
-  getComputedStyleValue: function(element, style){
-    return window.getComputedStyle(element, null).getPropertyValue(style);
-  },
-
-  round: function(num, dec) {
-    if (!dec) { dec = 0; }
-    return Math.round(num*Math.pow(10,dec))/Math.pow(10,dec);
-  },
-
-  get: function(url, onSuccess){
-    if (typeof XMLHttpRequest == "undefined") {
-      XMLHttpRequest = function () {
-        try { return new ActiveXObject("Msxml2.XMLHTTP.6.0"); } catch (e) {}
-        try { return new ActiveXObject("Msxml2.XMLHTTP.3.0"); } catch (f) {}
-        try { return new ActiveXObject("Msxml2.XMLHTTP"); } catch (g) {}
-        //Microsoft.XMLHTTP points to Msxml2.XMLHTTP.3.0 and is redundant
-        throw new Error("This browser does not support XMLHttpRequest.");
-      };
-    }
-    var request = new XMLHttpRequest();
-    request.open("GET",url);
-    request.onreadystatechange = function() {
-      if (request.readyState == 4 && request.status == 200) {
-        onSuccess(request.responseText);
-      }
-    }.context(this);
-    request.send();
-  },
-
-  // DOM Ready functionality adapted from jQuery. http://jquery.com/
-  bindDOMReady: function(){
-    if (document.readyState === "complete") {
-      return VideoJS.onDOMReady();
-    }
-    if (document.addEventListener) {
-      document.addEventListener("DOMContentLoaded", VideoJS.DOMContentLoaded, false);
-      window.addEventListener("load", VideoJS.onDOMReady, false);
-    } else if (document.attachEvent) {
-      document.attachEvent("onreadystatechange", VideoJS.DOMContentLoaded);
-      window.attachEvent("onload", VideoJS.onDOMReady);
-    }
-  },
-
-  DOMContentLoaded: function(){
-    if (document.addEventListener) {
-      document.removeEventListener( "DOMContentLoaded", VideoJS.DOMContentLoaded, false);
-      VideoJS.onDOMReady();
-    } else if ( document.attachEvent ) {
-      if ( document.readyState === "complete" ) {
-        document.detachEvent("onreadystatechange", VideoJS.DOMContentLoaded);
-        VideoJS.onDOMReady();
-      }
-    }
-  },
-
-  // Functions to be run once the DOM is loaded
-  DOMReadyList: [],
-  addToDOMReady: function(fn){
-    if (VideoJS.DOMIsReady) {
-      fn.call(document);
-    } else {
-      VideoJS.DOMReadyList.push(fn);
-    }
-  },
-
-  DOMIsReady: false,
-  onDOMReady: function(){
-    if (VideoJS.DOMIsReady) { return; }
-    if (!document.body) { return setTimeout(VideoJS.onDOMReady, 13); }
-    VideoJS.DOMIsReady = true;
-    if (VideoJS.DOMReadyList) {
-      for (var i=0; i<VideoJS.DOMReadyList.length; i++) {
-        VideoJS.DOMReadyList[i].call(document);
-      }
-      VideoJS.DOMReadyList = null;
-    }
-  }
-});
-VideoJS.bindDOMReady();
-
-// Allows for binding context to functions
-// when using in event listeners and timeouts
-Function.prototype.context = function(obj){
-  var method = this,
-  temp = function(){
-    return method.apply(obj, arguments);
-  };
-  return temp;
-};
-
-// Like context, in that it creates a closure
-// But insteaad keep "this" intact, and passes the var as the second argument of the function
-// Need for event listeners where you need to know what called the event
-Function.prototype.evtContext = function(obj){
-  var method = this,
-  temp = function(){
-    var origContext = this;
-    return method.call(obj, arguments[0], origContext);
-  };
-  return temp;
-};
-
-// Removeable Event listener with Context
-// Replaces the original function with a version that has context
-// So it can be removed using the original function name.
-// I have a feeling this one is gonna bite me in the butt some day
-Function.prototype.rEvtContext = function(obj, funcParent){
-  if (this.hasContext == true) { return this; }
-  if (!funcParent) { funcParent = obj; }
-  for (var attrname in funcParent) {
-    if (funcParent[attrname] == this) {
-      funcParent[attrname] = this.evtContext(obj);
-      funcParent[attrname].hasContext = true;
-      return funcParent[attrname];
-    }
-  }
-  // Log function not found on object
-};
-
 // Shim to make Video tag valid in IE
 if(VideoJS.isIE()) { document.createElement("video"); }
 
-// jQuery Plugin
-if (window.jQuery) {
-  (function($) {
-    $.fn.VideoJS = function(options) {
-      this.each(function() {
-        VideoJS.setup(this, options);
-      });
-      return this;
-    };
-    $.fn.player = function() {
-      return this[0].player;
-    };
-  })(jQuery);
-}
-
 // Expose to global
-return (window.VideoJS = window._V_ = VideoJS);
-
-// End self-executing function
-})(window);
+window.VideoJS = window._V_ = VideoJS;

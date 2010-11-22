@@ -12,6 +12,8 @@ REQUIRED STYLES (be careful overriding)
 /* Video Element */
 video.video-js { background-color: #000; position: relative; padding: 0; }
 
+.vjs-flash-fallback { display: block; }
+
 /* Poster Overlay Style */
 .video-js-box img.vjs-poster { display: block; position: absolute; left: 0; top: 0; width: 100%; height: 100%; margin: 0; padding: 0; cursor: pointer; }
 /* Subtiles Style */
@@ -19,7 +21,8 @@ video.video-js { background-color: #000; position: relative; padding: 0; }
 
 /* Fullscreen styles for main elements */
 .video-js-box.vjs-fullscreen { position: fixed; left: 0; top: 0; right: 0; bottom: 0; overflow: hidden; z-index: 1000; }
-.video-js-box.vjs-fullscreen video.video-js { position: relative; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; }
+.video-js-box.vjs-fullscreen video.video-js,
+.video-js-box.vjs-fullscreen .vjs-flash-fallback { position: relative; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; }
 .video-js-box.vjs-fullscreen img.vjs-poster { z-index: 1001; }
 .video-js-box.vjs-fullscreen .vjs-spinner { z-index: 1001; }
 .video-js-box.vjs-fullscreen .vjs-controls { z-index: 1003; }
@@ -43,7 +46,8 @@ so you can upgrade to newer versions easier. */
 .video-js-box .vjs-controls {
   position: absolute; margin: 0; opacity: 0.85; color: #fff;
   display: none; /* Start hidden */
-  left: 0; right: 0; /* 100% width of video-js-box */
+  left: 0; right: 0; /* 100% width of video-js-box */ 
+  width: 100%;
   bottom: 0px; /* Distance from the bottom of the box/video. Keep 0. Use height to add more bottom margin. */
   height: 35px; /* Including any margin you want above or below control items */
   padding: 0; /* Controls are absolutely position, so no padding necessary */
@@ -184,7 +188,7 @@ so you can upgrade to newer versions easier. */
 
 /* Download Links - Used for browsers that don't support any video.
 ---------------------------------------------------------*/
-.vjs-no-video { font-size: small; }
+.vjs-no-video { font-size: small; line-height: 1.5; }
 
 /* Big Play Button (at start)
 ---------------------------------------------------------*/

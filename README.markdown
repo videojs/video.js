@@ -113,8 +113,7 @@ Set options when setting up the videos. The defaults are shown here.
       controlsBelow: false, // Display control bar below video instead of in front of
       controlsHiding: true, // Hide controls when mouse is not over the video
       defaultVolume: 0.85, // Will be overridden by user's last volume if available
-      flashVersion: 9, // Required flash version for fallback
-      flashIsDominant: false // Always use Flash when available
+      flashPlayerVersion: 9, // Required flash version for fallback
     });
 
 ### Or as the second option of VideoJS.setup
@@ -124,6 +123,10 @@ Set options when setting up the videos. The defaults are shown here.
         // Same options
       });
     });
+
+
+Coming Next
+-----------
 
 
 Changelog

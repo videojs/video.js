@@ -1,4 +1,5 @@
-// HTML5 Player Type
+/* HTML5 Player Type
+================================================================================ */
 VideoJS.player.extend({
   html5Supported: function(){
     if (VideoJS.browserSupportsVideo() && this.canPlaySource()) {
@@ -8,29 +9,31 @@ VideoJS.player.extend({
     }
   },
   html5Init: function(){
+    this.element = this.video;
+
     this.fixPreloading(); // Support old browsers that used autobuffer
-    this.loaded(0); // Store amount of video loaded
+    this.supportProgressEvents(); // Support browsers that don't use 'buffered'
 
     // Set to stored volume OR 85%
-    this.volume(localStorage.volume || this.options.defaultVolume);
+    this.volume((localStorage && localStorage.volume) || this.options.defaultVolume);
 
+    // Update interface for device needs
     if (VideoJS.isIOS()) {
       this.options.useBuiltInControls = true;
       this.iOSInterface();
-    }
-
-    if (VideoJS.isAndroid()) {
+    } else if (VideoJS.isAndroid()) {
       this.options.useBuiltInControls = true;
       this.androidInterface();
     }
-
-    this.activateElement(this.video, "video");
 
     // Add VideoJS Controls
     if (!this.options.useBuiltInControls) {
       this.video.controls = false;
 
       if (this.options.controlsBelow) { _V_.addClass(this.box, "vjs-controls-below"); }
+
+      // Make a click on th video act as a play button
+      this.activateElement(this.video, "playToggle");
 
       // Build Interface
       this.buildStylesCheckDiv(); // Used to check if style are loaded
@@ -96,6 +99,21 @@ VideoJS.player.extend({
     }
   },
 
+  // Listen for Video Load Progress (currently does not if html file is local)
+  // Buffered does't work in all browsers, so watching progress as well
+  supportProgressEvents: function(e){
+    this.video.addEventListener('progress', this.playerOnVideoProgress.context(this), false);
+  },
+  playerOnVideoProgress: function(event){
+    this.setBufferedFromProgress(event);
+  },
+  setBufferedFromProgress: function(event){ // HTML5 Only
+    if(event.total > 0) {
+      var newBufferEnd = (event.loaded / event.total) * this.duration();
+      if (newBufferEnd > this.values.bufferEnd) { this.values.bufferEnd = newBufferEnd; }
+    }
+  },
+
   iOSInterface: function(){
     if(VideoJS.iOSVersion() < 4) { this.forceTheSource(); } // Fix loading issues
     if(VideoJS.isIPad()) { // iPad could work with controlsBelow
@@ -109,7 +127,7 @@ VideoJS.player.extend({
     this.forceTheSource(); // Fix loading issues
     this.video.addEventListener("click", function(){ this.play(); }, false); // Required to play
     this.buildBigPlayButton(); // But don't activate the normal way. Pause doesn't work right on android.
-    this.bigPlayButton.addEventListener("click", function(){ this.video.play(); }.context(this), false);
+    this.bigPlayButton.addEventListener("click", function(){ this.play(); }.context(this), false);
     this.positionBox();
     this.showBigPlayButtons();
   },
@@ -127,7 +145,7 @@ VideoJS.player.extend({
     this.hideStylesCheckDiv();
     this.showPoster();
     if (this.video.paused !== false) { this.showBigPlayButtons(); }
-    if (this.options.showControlsAtStart) { this.showControlBars(); }
+    if (this.options.controlsAtStart) { this.showControlBars(); }
     this.positionAll();
   },
   /* Control Bar
@@ -160,10 +178,6 @@ VideoJS.player.extend({
       </div>
     */
 
-    // Set up containing box with behaviors
-    _V_.addClass(this.box, "vjs-paused");
-    this.activateElement(this.box, "mouseOverVideoReporter");
-
     // Create a div to hold the different controls
     this.controls = _V_.createElement("div", { className: "vjs-controls" });
     // Add the controls to the video's container
@@ -194,7 +208,7 @@ VideoJS.player.extend({
     this.playProgressBar = _V_.createElement("div", { className: "vjs-play-progress" });
     this.progressHolder.appendChild(this.playProgressBar);
     this.activateElement(this.playProgressBar, "playProgressBar");
-    
+
     // Create the progress time display (00:00 / 00:00)
     this.timeControl = _V_.createElement("div", { className: "vjs-time-control" });
     this.controls.appendChild(this.timeControl);
@@ -212,7 +226,7 @@ VideoJS.player.extend({
     this.durationDisplay = _V_.createElement("span", { className: "vjs-duration-display", innerHTML: "00:00" });
     this.timeControl.appendChild(this.durationDisplay);
     this.activateElement(this.durationDisplay, "durationDisplay");
-    
+
     // Create the volumne control
     this.volumeControl = _V_.createElement("div", {
       className: "vjs-volume-control",
@@ -273,7 +287,7 @@ VideoJS.player.extend({
     this.box.appendChild(this.spinner);
     this.activateElement(this.spinner, "spinner");
   },
-  /* Styles Check - Check if styles are loaded
+  /* Styles Check - Check if styles are loaded (move ot _V_)
   ================================================================================ */
   // Sometimes the CSS styles haven't been applied to the controls yet
   // when we're trying to calculate the height and position them correctly.
@@ -302,14 +316,16 @@ VideoJS.player.extend({
     // Set width based on fullscreen or not.
     if (this.videoIsFullScreen) {
       this.box.style.width = "";
+      this.element.style.height=""
       if (this.options.controlsBelow) {
         this.box.style.height = "";
-        this.video.style.height = (this.box.offsetHeight - this.controls.offsetHeight) + "px";
+        this.element.style.height = (this.box.offsetHeight - this.controls.offsetHeight) + "px";
       }
     } else {
-      this.box.style.width = this.video.offsetWidth + "px";
+      this.box.style.width = this.width() + "px";
+      this.element.style.height=this.height()+"px";
       if (this.options.controlsBelow) {
-        this.video.style.height = "";
+        this.element.style.height = "";
         // this.box.style.height = this.video.offsetHeight + this.controls.offsetHeight + "px";
       }
     }
@@ -378,5 +394,104 @@ VideoJS.player.extend({
     this.subtitlesDisplay = _V_.createElement("div", { className: 'vjs-subtitles' });
     this.box.appendChild(this.subtitlesDisplay);
     this.activateElement(this.subtitlesDisplay, "subtitlesDisplay");
+  },
+
+  /* Player API - Translate functionality from player to video
+  ================================================================================ */
+  values: {}, // Storage for setters and getters of the same name.
+  addVideoListener: function(type, fn){ this.video.addEventListener(type,fn.rEvtContext(this),false); },
+
+  play: function(){
+    this.video.play();
+    return this;
+  },
+  onPlay: function(fn){ this.addVideoListener("play", fn); return this; },
+
+  pause: function(){
+    this.video.pause();
+    return this;
+  },
+  onPause: function(fn){ this.addVideoListener("pause", fn); return this; },
+  paused: function() { return this.video.paused; },
+
+  currentTime: function(seconds){
+    if (seconds !== undefined) {
+      try { this.video.currentTime = seconds; }
+      catch(e) { this.warning(VideoJS.warnings.videoNotReady); }
+      this.values.currentTime = seconds;
+      return this;
+    }
+    return this.video.currentTime;
+  },
+  // Allow for smoother visual scrubbing
+  lastSetCurrentTime: function(){ return this.values.currentTime; },
+  duration: function(){
+    return this.video.duration;
+  },
+
+  buffered: function(){
+    // Storing values allows them be overridden by setBufferedFromProgress
+    if (this.values.bufferStart == undefined) {
+      this.values.bufferStart = 0;
+      this.values.bufferEnd = 0;
+    }
+    if (this.video.buffered && this.video.buffered.length > 0 && this.video.buffered.end(0) > this.values.bufferEnd) {
+      this.values.bufferEnd = this.video.buffered.end(0);
+    }
+    return [this.values.bufferStart, this.values.bufferEnd]
+  },
+
+  volume: function(percentAsDecimal){
+    if (percentAsDecimal !== undefined) {
+      this.values.volume = parseFloat(percentAsDecimal);
+      this.video.volume = this.values.volume;
+      this.setLocalStorage("volume", this.values.volume);
+      return this;
+    }
+    if (this.values.volume) { return this.values.volume; }
+    return this.video.volume;
+  },
+  onVolumeChange: function(fn){ this.video.addEventListener('volumechange',fn.rEvtContext(this),false); },
+
+  width: function(width){
+    if (width !== undefined) {
+      this.video.width = width; // Not using style so it can be overridden on fullscreen.
+      this.box.style.width = width+"px";
+      this.triggerResizeListeners();
+      return this;
+    }
+    return this.video.offsetWidth;
+  },
+  height: function(height){
+    if (height !== undefined) {
+      this.video.height = height;
+      this.box.style.height = height+"px";
+      this.triggerResizeListeners();
+      return this;
+    }
+    return this.video.offsetHeight;
+  },
+
+  supportsFullScreen: function(){
+    if(typeof this.video.webkitEnterFullScreen == 'function') {
+      // Seems to be broken in Chromium/Chrome
+      if (!navigator.userAgent.match("Chrome")) {
+        return true;
+      }
+    }
+    return false;
+  },
+  enterFullScreen: function(){
+    try {
+      this.video.webkitEnterFullScreen();
+    } catch (e) {
+      if (e.code == 11) { this.warning(VideoJS.warnings.videoNotReady); }
+    }
+    return this;
+  },
+
+  onError: function(fn){ this.addVideoListener("error", fn); return this; },
+  onEnded: function(fn){
+    this.addVideoListener("ended", fn); return this;
   }
 });
