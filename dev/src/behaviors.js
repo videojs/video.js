@@ -33,7 +33,7 @@ VideoJS.player.newBehavior("player", function(player){
     // Buffer watching method for load progress.
     // Used for browsers that don't support the progress event
     trackBuffered: function(){
-      this.bufferedInterval = setInterval(this.triggerBufferedListeners.context(this), 100);
+      this.bufferedInterval = setInterval(this.triggerBufferedListeners.context(this), 200);
     },
     stopTrackingBuffered: function(){ clearInterval(this.bufferedInterval); },
     bufferedListeners: [],

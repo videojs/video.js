@@ -1,6 +1,6 @@
 VideoJS - [HTML5 Video Player](http://videojs.com)
 ==================================================
-Version 1.2.0
+Version 2.0.0
 
 View [VideoJS.com](http://videojs.com) for a demo and overview.
 
@@ -45,9 +45,9 @@ Change the video and image files to your own. You can even swap out the Flash Fa
     <div class="video-js-box">
       <!-- Using the Video for Everybody Embed Code http://camendesign.com/code/video_for_everybody -->
       <video id="example_video_1" class="video-js" width="640" height="264" poster="http://video-js.zencoder.com/oceans-clip.png" controls preload>
-        <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
-        <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm; codecs="vp8, vorbis"'>
-        <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg; codecs="theora, vorbis"'>
+        <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
+        <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm; codecs="vp8, vorbis"' />
+        <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg; codecs="theora, vorbis"' />
         <!-- Flash Fallback. Use any flash video player here. Make sure to keep the vjs-flash-fallback class. -->
         <object id="flash_fallback_1" class="vjs-flash-fallback" width="640" height="264" type="application/x-shockwave-flash"
           data="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf">
@@ -127,17 +127,23 @@ Set options when setting up the videos. The defaults are shown here.
 
 Coming Next
 -----------
-
+- API to Flash fallback
 
 Changelog
 ---------
-1.2.0
+2.0.0 (2010-11-21)
 
-- Feature: Switched back to divs for controls, for more portable styles.
-- Feature: Added play button for Android.
+- Feature: Created "behaviors" concept for adding behaviors to elements
+- Feature: Switched back to divs for controls, for more portable styles
+- Feature: Created playerFallbackOrder array option. ["html5", "flash", "links"]
+- Feature: Created playerType concept, for initializing different platforms
+- Feature: Added play button for Android
 - Feature: Added spinner for iPad (non-fullscreen)
+- Feature: Split into multiple files for easier development
+- Feature: Combined VideoJS & _V_ into the same variable to reduce confusion
 - Fix: Checking for m3u8 files (Apple HTTP Streaming)
 - Fix: Catching error on localStorage full that safari seems to randomly throw
+- Fix: Scrubbing to end doesn't trigger onEnded
 
 1.1.5 (2010-11-09)
 
