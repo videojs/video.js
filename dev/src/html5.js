@@ -496,3 +496,4 @@ VideoJS.player.extend({
     this.addVideoListener("ended", fn); return this;
   }
 });
+

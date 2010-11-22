@@ -589,3 +589,4 @@ VideoJS.player.newBehavior("subtitlesDisplay", function(element){
     }
   }
 );
+

@@ -359,3 +359,4 @@ if(VideoJS.isIE()) { document.createElement("video"); }
 
 // Expose to global
 window.VideoJS = window._V_ = VideoJS;
+

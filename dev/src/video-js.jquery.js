@@ -12,3 +12,4 @@ if (window.jQuery) {
     };
   })(jQuery);
 }
+
