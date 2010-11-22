@@ -6,7 +6,9 @@
 VideoJS.extend({
 
   addClass: function(element, classToAdd){
-    if (element.className.split(/\s+/).lastIndexOf(classToAdd) == -1) { element.className = element.className === "" ? classToAdd : element.className + " " + classToAdd; }
+    if ((" "+element.className+" ").indexOf(" "+classToAdd+" ") == -1) { 
+      element.className = element.className === "" ? classToAdd : element.className + " " + classToAdd; 
+    }
   },
   removeClass: function(element, classToRemove){
     if (element.className.indexOf(classToRemove) == -1) { return; }
@@ -55,6 +57,21 @@ VideoJS.extend({
   round: function(num, dec) {
     if (!dec) { dec = 0; }
     return Math.round(num*Math.pow(10,dec))/Math.pow(10,dec);
+  },
+  
+  addListener: function(element, type, handler){
+    if (element.addEventListener) {
+      element.addEventListener(type, handler, false);
+    } else if (element.attachEvent) {
+      element.attachEvent("on"+type, handler);
+    }
+  },
+  removeListener: function(element, type, handler){
+    if (element.removeEventListener) {
+      element.removeEventListener(type, handler, false);
+    } else if (element.attachEvent) {
+      element.detachEvent("on"+type, handler);
+    }
   },
 
   get: function(url, onSuccess){
@@ -156,7 +173,7 @@ Function.prototype.evtContext = function(obj){
 // So it can be removed using the original function name.
 // In order to work, a version of the function must already exist in the player/prototype
 Function.prototype.rEvtContext = function(obj, funcParent){
-  if (this.hasContext == true) { return this; }
+  if (this.hasContext === true) { return this; }
   if (!funcParent) { funcParent = obj; }
   for (var attrname in funcParent) {
     if (funcParent[attrname] == this) {

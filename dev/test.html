@@ -52,9 +52,9 @@
       eventsList = document.getElementById("events");
       
       for(var i=0,j=events.length; i<j; i++) {
-        vid.addEventListener(events[i], function(){
+        _V_.addListener(vid, events[i], function(){
           eventsList.innerHTML = this + "\n" + eventsList.innerHTML
-        }.context(events[i]), false);
+        }.context(events[i]));
       }
       
     });

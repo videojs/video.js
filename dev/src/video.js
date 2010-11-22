@@ -2,7 +2,7 @@
 (function(){var initializing=false, fnTest=/xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/; this.JRClass = function(){}; JRClass.extend = function(prop) { var _super = this.prototype; initializing = true; var prototype = new this(); initializing = false; for (var name in prop) { prototype[name] = typeof prop[name] == "function" && typeof _super[name] == "function" && fnTest.test(prop[name]) ? (function(name, fn){ return function() { var tmp = this._super; this._super = _super[name]; var ret = fn.apply(this, arguments); this._super = tmp; return ret; }; })(name, prop[name]) : prop[name]; } function JRClass() { if ( !initializing && this.init ) this.init.apply(this, arguments); } JRClass.prototype = prototype; JRClass.constructor = JRClass; JRClass.extend = arguments.callee; return JRClass;};})();
 
 // Video JS Player Class
-var VideoJS = _V_ = JRClass.extend({
+var VideoJS = JRClass.extend({
 
   // Initialize the player for the supplied video tag element
   // element: video tag
@@ -121,7 +121,7 @@ var VideoJS = _V_ = JRClass.extend({
   // Each that maintains player as context
   // Break if true is returned
   each: function(arr, fn){
-    if (!arr || arr.length == 0) { return; }
+    if (!arr || arr.length === 0) { return; }
     for (var i=0,j=arr.length; i<j; i++) {
       if (fn.call(this, arr[i], i)) { break; }
     }
@@ -240,7 +240,7 @@ VideoJS.merge = function(obj1, obj2, safe){
   }
   return obj1;
 };
-VideoJS.extend = function(obj){ this.merge(this, obj, true); }
+VideoJS.extend = function(obj){ this.merge(this, obj, true); };
 
 VideoJS.extend({
   // Add VideoJS to all video tags with the video-js class when the DOM is ready

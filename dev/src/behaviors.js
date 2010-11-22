@@ -20,8 +20,7 @@ VideoJS.player.newBehavior("player", function(player){
     this.onBufferedUpdate(this.isBufferFull);
   },{
     playerOnVideoError: function(event){ 
-      this.log(this.video.error); 
-      console.log(event)
+      this.log(this.video.error);
     },
     playerOnVideoPlay: function(event){ this.hasPlayed = true; },
     playerOnVideoPause: function(event){},
@@ -88,9 +87,9 @@ VideoJS.player.newBehavior("player", function(player){
 ================================================================================ */
 VideoJS.player.newBehavior("mouseOverVideoReporter", function(element){
     // Listen for the mouse move the video. Used to reveal the controller.
-    element.addEventListener("mousemove", this.mouseOverVideoReporterOnMouseMove.context(this), false);
+    _V_.addListener(element, "mousemove", this.mouseOverVideoReporterOnMouseMove.context(this));
     // Listen for the mouse moving out of the video. Used to hide the controller.
-    element.addEventListener("mouseout", this.mouseOverVideoReporterOnMouseOut.context(this), false);
+    _V_.addListener(element, "mouseout", this.mouseOverVideoReporterOnMouseOut.context(this));
   },{
     mouseOverVideoReporterOnMouseMove: function(){
       this.showControlBars();
@@ -170,8 +169,8 @@ VideoJS.player.newBehavior("controlBar", function(element){
       this.onResize(this.positionControlBars);
     }
     this.controlBars.push(element);
-    element.addEventListener("mousemove", this.onControlBarsMouseMove.context(this), false);
-    element.addEventListener("mouseout", this.onControlBarsMouseOut.context(this), false);
+    _V_.addListener(element, "mousemove", this.onControlBarsMouseMove.context(this));
+    _V_.addListener(element, "mouseout", this.onControlBarsMouseOut.context(this));
   },{
     showControlBars: function(){
       if (!this.options.controlsAtStart && !this.hasPlayed) { return; }
@@ -202,7 +201,7 @@ VideoJS.player.newBehavior("controlBar", function(element){
 ================================================================================ */
 // Play Toggle
 VideoJS.player.newBehavior("playToggle", function(element){
-    element.addEventListener("click", this.onPlayToggleClick.context(this), false);
+    _V_.addListener(element, "click", this.onPlayToggleClick.context(this));
   },{
     onPlayToggleClick: function(event){
       if (this.paused()) {
@@ -215,14 +214,14 @@ VideoJS.player.newBehavior("playToggle", function(element){
 );
 // Play
 VideoJS.player.newBehavior("playButton", function(element){
-    element.addEventListener("click", this.onPlayButtonClick.context(this), false);
+    _V_.addListener(element, "click", this.onPlayButtonClick.context(this));
   },{
     onPlayButtonClick: function(event){ this.play(); }
   }
 );
 // Pause
 VideoJS.player.newBehavior("pauseButton", function(element){
-    element.addEventListener("click", this.onPauseButtonClick.context(this), false);
+    _V_.addListener(element, "click", this.onPauseButtonClick.context(this));
   },{
     onPauseButtonClick: function(event){ this.pause(); }
   }
@@ -239,6 +238,7 @@ VideoJS.player.newBehavior("playProgressBar", function(element){
     // Ajust the play progress bar's width based on the current play time
     updatePlayProgressBars: function(newTime){
       var progress = (newTime !== undefined) ? newTime / this.duration() : this.currentTime() / this.duration();
+      if (isNaN(progress)) { progress = 0; }
       this.each(this.playProgressBars, function(bar){
         if (bar.style) { bar.style.width = _V_.round(progress * 100, 2) + "%"; }
       });
@@ -302,7 +302,7 @@ VideoJS.player.newBehavior("durationDisplay", function(element){
 /* Current Time Scrubber Behaviors
 ================================================================================ */
 VideoJS.player.newBehavior("currentTimeScrubber", function(element){
-    element.addEventListener("mousedown", this.onCurrentTimeScrubberMouseDown.rEvtContext(this), false);
+    _V_.addListener(element, "mousedown", this.onCurrentTimeScrubberMouseDown.rEvtContext(this));
   },{
     // Adjust the play position when the user drags on the progress bar
     onCurrentTimeScrubberMouseDown: function(event, scrubber){
@@ -316,8 +316,8 @@ VideoJS.player.newBehavior("currentTimeScrubber", function(element){
 
       _V_.blockTextSelection();
       this.setCurrentTimeWithScrubber(event);
-      document.addEventListener("mousemove", this.onCurrentTimeScrubberMouseMove.rEvtContext(this), false);
-      document.addEventListener("mouseup", this.onCurrentTimeScrubberMouseUp.rEvtContext(this), false);
+      _V_.addListener(document, "mousemove", this.onCurrentTimeScrubberMouseMove.rEvtContext(this));
+      _V_.addListener(document, "mouseup", this.onCurrentTimeScrubberMouseUp.rEvtContext(this));
     },
     onCurrentTimeScrubberMouseMove: function(event){ // Removeable
       this.setCurrentTimeWithScrubber(event);
@@ -357,7 +357,7 @@ VideoJS.player.newBehavior("volumeDisplay", function(element){
       if (!this.volumeDisplays) { return; }
       this.each(this.volumeDisplays, function(dis){
         this.updateVolumeDisplay(dis);
-      })
+      });
     },
     updateVolumeDisplay: function(display){
       var volNum = Math.ceil(this.volume() * 6);
@@ -367,14 +367,14 @@ VideoJS.player.newBehavior("volumeDisplay", function(element){
         } else {
           _V_.removeClass(child, "vjs-volume-level-on");
         }
-      })
+      });
     }
   }
 );
 /* Volume Scrubber Behaviors
 ================================================================================ */
 VideoJS.player.newBehavior("volumeScrubber", function(element){
-    element.addEventListener("mousedown", this.onVolumeScrubberMouseDown.rEvtContext(this), false);
+    _V_.addListener(element, "mousedown", this.onVolumeScrubberMouseDown.rEvtContext(this));
   },{
     // Adjust the volume when the user drags on the volume control
     onVolumeScrubberMouseDown: function(event, scrubber){
@@ -382,8 +382,8 @@ VideoJS.player.newBehavior("volumeScrubber", function(element){
       _V_.blockTextSelection();
       this.currentScrubber = scrubber;
       this.setVolumeWithScrubber(event);
-      document.addEventListener("mousemove", this.onVolumeScrubberMouseMove.rEvtContext(this), false);
-      document.addEventListener("mouseup", this.onVolumeScrubberMouseUp.rEvtContext(this), false);
+      _V_.addListener(document, "mousemove", this.onVolumeScrubberMouseMove.rEvtContext(this));
+      _V_.addListener(document, "mouseup", this.onVolumeScrubberMouseUp.rEvtContext(this));
     },
     onVolumeScrubberMouseMove: function(event){ 
       this.setVolumeWithScrubber(event);
@@ -403,7 +403,7 @@ VideoJS.player.newBehavior("volumeScrubber", function(element){
 /* Fullscreen Toggle Behaviors
 ================================================================================ */
 VideoJS.player.newBehavior("fullscreenToggle", function(element){
-    element.addEventListener("click", this.onFullscreenToggleClick.context(this), false);
+    _V_.addListener(element, "click", this.onFullscreenToggleClick.context(this));
   },{
     // When the user clicks on the fullscreen button, update fullscreen setting
     onFullscreenToggleClick: function(event){
@@ -421,9 +421,9 @@ VideoJS.player.newBehavior("fullscreenToggle", function(element){
         // Storing original doc overflow value to return to when fullscreen is off
         this.docOrigOverflow = document.documentElement.style.overflow;
         // Add listener for esc key to exit fullscreen
-        document.addEventListener("keydown", this.fullscreenOnEscKey.rEvtContext(this), false);
+        _V_.addListener(document, "keydown", this.fullscreenOnEscKey.rEvtContext(this));
         // Add listener for a window resize
-        window.addEventListener("resize", this.fullscreenOnWindowResize.rEvtContext(this), false);
+        _V_.addListener(window, "resize", this.fullscreenOnWindowResize.rEvtContext(this));
         // Hide any scroll bars
         document.documentElement.style.overflow = 'hidden';
         // Apply fullscreen styles
@@ -484,7 +484,7 @@ VideoJS.player.newBehavior("bigPlayButton", function(element){
     hideBigPlayButtons: function(){ 
       this.each(this.elements.bigPlayButtons, function(element){
         element.style.display = "none"; 
-      })
+      });
     }
   }
 );
@@ -493,17 +493,17 @@ VideoJS.player.newBehavior("bigPlayButton", function(element){
 VideoJS.player.newBehavior("spinner", function(element){
     if (!this.spinners) {
       this.spinners = [];
-      this.video.addEventListener("loadeddata", this.spinnersOnVideoLoadedData.context(this), false);
-      this.video.addEventListener("loadstart", this.spinnersOnVideoLoadStart.context(this), false);
-      this.video.addEventListener("seeking", this.spinnersOnVideoSeeking.context(this), false);
-      this.video.addEventListener("seeked", this.spinnersOnVideoSeeked.context(this), false);
-      this.video.addEventListener("canplay", this.spinnersOnVideoCanPlay.context(this), false);
-      this.video.addEventListener("canplaythrough", this.spinnersOnVideoCanPlayThrough.context(this), false);
-      this.video.addEventListener("waiting", this.spinnersOnVideoWaiting.context(this), false);
-      this.video.addEventListener("stalled", this.spinnersOnVideoStalled.context(this), false);
-      this.video.addEventListener("suspend", this.spinnersOnVideoSuspend.context(this), false);
-      this.video.addEventListener("playing", this.spinnersOnVideoPlaying.context(this), false);
-      this.video.addEventListener("timeupdate", this.spinnersOnVideoTimeUpdate.context(this), false);
+      _V_.addListener(this.video, "loadeddata", this.spinnersOnVideoLoadedData.context(this));
+      _V_.addListener(this.video, "loadstart", this.spinnersOnVideoLoadStart.context(this));
+      _V_.addListener(this.video, "seeking", this.spinnersOnVideoSeeking.context(this));
+      _V_.addListener(this.video, "seeked", this.spinnersOnVideoSeeked.context(this));
+      _V_.addListener(this.video, "canplay", this.spinnersOnVideoCanPlay.context(this));
+      _V_.addListener(this.video, "canplaythrough", this.spinnersOnVideoCanPlayThrough.context(this));
+      _V_.addListener(this.video, "waiting", this.spinnersOnVideoWaiting.context(this));
+      _V_.addListener(this.video, "stalled", this.spinnersOnVideoStalled.context(this));
+      _V_.addListener(this.video, "suspend", this.spinnersOnVideoSuspend.context(this));
+      _V_.addListener(this.video, "playing", this.spinnersOnVideoPlaying.context(this));
+      _V_.addListener(this.video, "timeupdate", this.spinnersOnVideoTimeUpdate.context(this));
     }
     this.spinners.push(element);
   },{
@@ -555,7 +555,7 @@ VideoJS.player.newBehavior("spinner", function(element){
 VideoJS.player.newBehavior("subtitlesDisplay", function(element){
     if (!this.elements.subtitlesDisplays) { 
       this.elements.subtitlesDisplays = [];
-      this.video.addEventListener('timeupdate', this.subtitlesDisplaysOnVideoTimeUpdate.context(this), false);
+      _V_.addListener(this.video, "timeupdate", this.subtitlesDisplaysOnVideoTimeUpdate.context(this));
     }
     this.elements.subtitlesDisplays.push(element);
   },{

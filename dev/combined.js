@@ -26,7 +26,7 @@ along with VideoJS.  If not, see <http://www.gnu.org/licenses/>.
 (function(){var initializing=false, fnTest=/xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/; this.JRClass = function(){}; JRClass.extend = function(prop) { var _super = this.prototype; initializing = true; var prototype = new this(); initializing = false; for (var name in prop) { prototype[name] = typeof prop[name] == "function" && typeof _super[name] == "function" && fnTest.test(prop[name]) ? (function(name, fn){ return function() { var tmp = this._super; this._super = _super[name]; var ret = fn.apply(this, arguments); this._super = tmp; return ret; }; })(name, prop[name]) : prop[name]; } function JRClass() { if ( !initializing && this.init ) this.init.apply(this, arguments); } JRClass.prototype = prototype; JRClass.constructor = JRClass; JRClass.extend = arguments.callee; return JRClass;};})();
 
 // Video JS Player Class
-var VideoJS = _V_ = JRClass.extend({
+var VideoJS = JRClass.extend({
 
   // Initialize the player for the supplied video tag element
   // element: video tag
@@ -145,7 +145,7 @@ var VideoJS = _V_ = JRClass.extend({
   // Each that maintains player as context
   // Break if true is returned
   each: function(arr, fn){
-    if (!arr || arr.length == 0) { return; }
+    if (!arr || arr.length === 0) { return; }
     for (var i=0,j=arr.length; i<j; i++) {
       if (fn.call(this, arr[i], i)) { break; }
     }
@@ -209,7 +209,26 @@ VideoJS.flashPlayers = {};
 VideoJS.flashPlayers.htmlObject = {
   flashPlayerVersion: 9,
   init: function() { return true; },
-  api: {} // No API available with HTML Object embed method
+  api: { // No video API available with HTML Object embed method
+    width: function(width){
+      if (width !== undefined) {
+        this.element.width = width;
+        this.box.style.width = width+"px";
+        this.triggerResizeListeners();
+        return this;
+      }
+      return this.element.offsetWidth;
+    },
+    height: function(height){
+      if (height !== undefined) {
+        this.element.height = height;
+        this.box.style.height = height+"px";
+        this.triggerResizeListeners();
+        return this;
+      }
+      return this.element.offsetHeight;
+    }
+  }
 };
 
 
@@ -217,7 +236,10 @@ VideoJS.flashPlayers.htmlObject = {
 ================================================================================ */
 VideoJS.player.extend({
   linksSupported: function(){ return true; },
-  linksInit: function(){ this.showLinksFallback(); },
+  linksInit: function(){ 
+    this.showLinksFallback(); 
+    this.element = this.video;
+  },
   // Get the download links block element
   getLinksFallback: function(){ return this.box.getElementsByTagName("P")[0]; },
   // Hide no-video download paragraph
@@ -242,7 +264,7 @@ VideoJS.merge = function(obj1, obj2, safe){
   }
   return obj1;
 };
-VideoJS.extend = function(obj){ this.merge(this, obj, true); }
+VideoJS.extend = function(obj){ this.merge(this, obj, true); };
 
 VideoJS.extend({
   // Add VideoJS to all video tags with the video-js class when the DOM is ready
@@ -622,7 +644,7 @@ VideoJS.player.extend({
       this.poster.src = this.video.poster;
       // Add poster styles
       this.poster.className = "vjs-poster";
-      this.activateElement(this.poster, "poster")
+      this.activateElement(this.poster, "poster");
     } else {
       this.poster = false;
     }
@@ -679,7 +701,7 @@ VideoJS.player.extend({
     // Set width based on fullscreen or not.
     if (this.videoIsFullScreen) {
       this.box.style.width = "";
-      this.element.style.height=""
+      this.element.style.height="";
       if (this.options.controlsBelow) {
         this.box.style.height = "";
         this.element.style.height = (this.box.offsetHeight - this.controls.offsetHeight) + "px";
@@ -784,6 +806,7 @@ VideoJS.player.extend({
       this.values.currentTime = seconds;
       return this;
     }
+
     return this.video.currentTime;
   },
   // Allow for smoother visual scrubbing
@@ -794,14 +817,14 @@ VideoJS.player.extend({
 
   buffered: function(){
     // Storing values allows them be overridden by setBufferedFromProgress
-    if (this.values.bufferStart == undefined) {
+    if (this.values.bufferStart === undefined) {
       this.values.bufferStart = 0;
       this.values.bufferEnd = 0;
     }
     if (this.video.buffered && this.video.buffered.length > 0 && this.video.buffered.end(0) > this.values.bufferEnd) {
       this.values.bufferEnd = this.video.buffered.end(0);
     }
-    return [this.values.bufferStart, this.values.bufferEnd]
+    return [this.values.bufferStart, this.values.bufferEnd];
   },
 
   volume: function(percentAsDecimal){
@@ -879,8 +902,7 @@ VideoJS.player.newBehavior("player", function(player){
     this.onBufferedUpdate(this.isBufferFull);
   },{
     playerOnVideoError: function(event){ 
-      this.log(this.video.error); 
-      console.log(event)
+      this.log(this.video.error);
     },
     playerOnVideoPlay: function(event){ this.hasPlayed = true; },
     playerOnVideoPause: function(event){},
@@ -1185,9 +1207,9 @@ VideoJS.player.newBehavior("currentTimeScrubber", function(element){
       _V_.unblockTextSelection();
       document.removeEventListener("mousemove", this.onCurrentTimeScrubberMouseMove, false);
       document.removeEventListener("mouseup", this.onCurrentTimeScrubberMouseUp, false);
+      this.trackCurrentTime();
       if (this.videoWasPlaying) {
         this.play();
-        this.trackCurrentTime();
       }
     },
     setCurrentTimeWithScrubber: function(event){
@@ -1216,7 +1238,7 @@ VideoJS.player.newBehavior("volumeDisplay", function(element){
       if (!this.volumeDisplays) { return; }
       this.each(this.volumeDisplays, function(dis){
         this.updateVolumeDisplay(dis);
-      })
+      });
     },
     updateVolumeDisplay: function(display){
       var volNum = Math.ceil(this.volume() * 6);
@@ -1226,7 +1248,7 @@ VideoJS.player.newBehavior("volumeDisplay", function(element){
         } else {
           _V_.removeClass(child, "vjs-volume-level-on");
         }
-      })
+      });
     }
   }
 );
@@ -1343,7 +1365,7 @@ VideoJS.player.newBehavior("bigPlayButton", function(element){
     hideBigPlayButtons: function(){ 
       this.each(this.elements.bigPlayButtons, function(element){
         element.style.display = "none"; 
-      })
+      });
     }
   }
 );
@@ -1605,7 +1627,7 @@ Function.prototype.evtContext = function(obj){
 // So it can be removed using the original function name.
 // In order to work, a version of the function must already exist in the player/prototype
 Function.prototype.rEvtContext = function(obj, funcParent){
-  if (this.hasContext == true) { return this; }
+  if (this.hasContext === true) { return this; }
   if (!funcParent) { funcParent = obj; }
   for (var attrname in funcParent) {
     if (funcParent[attrname] == this) {

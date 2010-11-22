@@ -102,7 +102,7 @@ VideoJS.player.extend({
   // Listen for Video Load Progress (currently does not if html file is local)
   // Buffered does't work in all browsers, so watching progress as well
   supportProgressEvents: function(e){
-    this.video.addEventListener('progress', this.playerOnVideoProgress.context(this), false);
+    _V_.addListener(this.video, 'progress', this.playerOnVideoProgress.context(this));
   },
   playerOnVideoProgress: function(event){
     this.setBufferedFromProgress(event);
@@ -125,9 +125,9 @@ VideoJS.player.extend({
   // Use built-in controls, but add the big play button, since android doesn't have one.
   androidInterface: function(){
     this.forceTheSource(); // Fix loading issues
-    this.video.addEventListener("click", function(){ this.play(); }, false); // Required to play
+    _V_.addListener(this.video, "click", function(){ this.play(); }); // Required to play
     this.buildBigPlayButton(); // But don't activate the normal way. Pause doesn't work right on android.
-    this.bigPlayButton.addEventListener("click", function(){ this.play(); }.context(this), false);
+    _V_.addListener(this.bigPlayButton, "click", function(){ this.play(); }.context(this));
     this.positionBox();
     this.showBigPlayButtons();
   },
@@ -259,7 +259,7 @@ VideoJS.player.extend({
       this.poster.src = this.video.poster;
       // Add poster styles
       this.poster.className = "vjs-poster";
-      this.activateElement(this.poster, "poster")
+      this.activateElement(this.poster, "poster");
     } else {
       this.poster = false;
     }
@@ -316,7 +316,7 @@ VideoJS.player.extend({
     // Set width based on fullscreen or not.
     if (this.videoIsFullScreen) {
       this.box.style.width = "";
-      this.element.style.height=""
+      this.element.style.height="";
       if (this.options.controlsBelow) {
         this.box.style.height = "";
         this.element.style.height = (this.box.offsetHeight - this.controls.offsetHeight) + "px";
@@ -399,7 +399,7 @@ VideoJS.player.extend({
   /* Player API - Translate functionality from player to video
   ================================================================================ */
   values: {}, // Storage for setters and getters of the same name.
-  addVideoListener: function(type, fn){ this.video.addEventListener(type,fn.rEvtContext(this),false); },
+  addVideoListener: function(type, fn){ _V_.addListener(this.video, type, fn.rEvtContext(this)); },
 
   play: function(){
     this.video.play();
@@ -432,14 +432,14 @@ VideoJS.player.extend({
 
   buffered: function(){
     // Storing values allows them be overridden by setBufferedFromProgress
-    if (this.values.bufferStart == undefined) {
+    if (this.values.bufferStart === undefined) {
       this.values.bufferStart = 0;
       this.values.bufferEnd = 0;
     }
     if (this.video.buffered && this.video.buffered.length > 0 && this.video.buffered.end(0) > this.values.bufferEnd) {
       this.values.bufferEnd = this.video.buffered.end(0);
     }
-    return [this.values.bufferStart, this.values.bufferEnd]
+    return [this.values.bufferStart, this.values.bufferEnd];
   },
 
   volume: function(percentAsDecimal){
@@ -452,7 +452,7 @@ VideoJS.player.extend({
     if (this.values.volume) { return this.values.volume; }
     return this.video.volume;
   },
-  onVolumeChange: function(fn){ this.video.addEventListener('volumechange',fn.rEvtContext(this),false); },
+  onVolumeChange: function(fn){ _V_.addListener(this.video, 'volumechange', fn.rEvtContext(this)); },
 
   width: function(width){
     if (width !== undefined) {
