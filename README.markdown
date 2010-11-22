@@ -1,6 +1,6 @@
 VideoJS - [HTML5 Video Player](http://videojs.com)
 ==================================================
-Version 2.0.0
+Version 2.0.1
 
 View [VideoJS.com](http://videojs.com) for a demo and overview.
 
