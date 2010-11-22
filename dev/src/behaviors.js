@@ -9,12 +9,14 @@ VideoJS.player.newBehavior("player", function(player){
     this.onError(this.playerOnVideoError);
     // Listen for when the video is played
     this.onPlay(this.playerOnVideoPlay);
+    this.onPlay(this.trackCurrentTime);
     // Listen for when the video is paused
     this.onPause(this.playerOnVideoPause);
+    this.onPause(this.stopTrackingCurrentTime);
     // Listen for when the video ends
     this.onEnded(this.playerOnVideoEnded);
     // Set interval for load progress using buffer watching method
-    this.trackCurrentTime();
+    // this.trackCurrentTime();
     this.trackBuffered();
     // Buffer Full
     this.onBufferedUpdate(this.isBufferFull);
@@ -33,7 +35,7 @@ VideoJS.player.newBehavior("player", function(player){
     // Buffer watching method for load progress.
     // Used for browsers that don't support the progress event
     trackBuffered: function(){
-      this.bufferedInterval = setInterval(this.triggerBufferedListeners.context(this), 200);
+      this.bufferedInterval = setInterval(this.triggerBufferedListeners.context(this), 500);
     },
     stopTrackingBuffered: function(){ clearInterval(this.bufferedInterval); },
     bufferedListeners: [],
