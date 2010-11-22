@@ -193,7 +193,7 @@ VideoJS.flashPlayers.htmlObject = {
         this.triggerResizeListeners();
         return this;
       }
-      return this.element.offsetWidth;
+      return this.element.width;
     },
     height: function(height){
       if (height !== undefined) {
@@ -202,7 +202,7 @@ VideoJS.flashPlayers.htmlObject = {
         this.triggerResizeListeners();
         return this;
       }
-      return this.element.offsetHeight;
+      return this.element.height;
     }
   }
 };

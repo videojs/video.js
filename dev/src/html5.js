@@ -436,8 +436,9 @@ VideoJS.player.extend({
       this.values.bufferStart = 0;
       this.values.bufferEnd = 0;
     }
-    if (this.video.buffered && this.video.buffered.length > 0 && this.video.buffered.end(0) > this.values.bufferEnd) {
-      this.values.bufferEnd = this.video.buffered.end(0);
+    if (this.video.buffered && this.video.buffered.length > 0) {
+      var newEnd = this.video.buffered.end(0);
+      if (newEnd > this.values.bufferEnd) { this.values.bufferEnd = newEnd; }
     }
     return [this.values.bufferStart, this.values.bufferEnd];
   },

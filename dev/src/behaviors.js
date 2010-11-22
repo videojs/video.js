@@ -21,7 +21,8 @@ VideoJS.player.newBehavior("player", function(player){
     // Buffer Full
     this.onBufferedUpdate(this.isBufferFull);
   },{
-    playerOnVideoError: function(event){ 
+    playerOnVideoError: function(event){
+      this.log(event);
       this.log(this.video.error);
     },
     playerOnVideoPlay: function(event){ this.hasPlayed = true; },
