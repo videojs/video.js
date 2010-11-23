@@ -17,6 +17,8 @@ var VideoJS = JRClass.extend({
     // Store reference to player on the video element.
     // So you can acess the player later: document.getElementById("video_id").player.play();
     this.video.player = this;
+    this.values = {}; // Cache video values.
+    this.elements = {}; // Store refs to controls elements.
 
     // Default Options
     this.options = {
@@ -62,7 +64,6 @@ var VideoJS = JRClass.extend({
   /* Behaviors
   ================================================================================ */
   behaviors: {},
-  elements: {},
   newBehavior: function(name, activate, functions){
     this.behaviors[name] = activate;
     this.extend(functions);

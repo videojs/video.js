@@ -469,23 +469,23 @@ VideoJS.player.newBehavior("fullscreenToggle", function(element){
 /* Big Play Button Behaviors
 ================================================================================ */
 VideoJS.player.newBehavior("bigPlayButton", function(element){
-    if (!this.bigPlayButtons) {
-      this.bigPlayButtons = [];
+    if (!this.elements.bigPlayButtons) {
+      this.elements.bigPlayButtons = [];
       this.onPlay(this.bigPlayButtonsOnPlay);
       this.onEnded(this.bigPlayButtonsOnEnded);
     }
-    this.bigPlayButtons.push(element);
+    this.elements.bigPlayButtons.push(element);
     this.activateElement(element, "playButton");
   },{
     bigPlayButtonsOnPlay: function(event){ this.hideBigPlayButtons(); },
     bigPlayButtonsOnEnded: function(event){ this.showBigPlayButtons(); },
     showBigPlayButtons: function(){
-      this.each(this.bigPlayButtons, function(element){
+      this.each(this.elements.bigPlayButtons, function(element){
         element.style.display = "block"; 
       });
     },
     hideBigPlayButtons: function(){
-      this.each(this.bigPlayButtons, function(element){
+      this.each(this.elements.bigPlayButtons, function(element){
         element.style.display = "none"; 
       });
     }

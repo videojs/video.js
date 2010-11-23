@@ -398,7 +398,6 @@ VideoJS.player.extend({
 
   /* Player API - Translate functionality from player to video
   ================================================================================ */
-  values: {}, // Storage for setters and getters of the same name.
   addVideoListener: function(type, fn){ _V_.addListener(this.video, type, fn.rEvtContext(this)); },
 
   play: function(){
