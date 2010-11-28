@@ -194,9 +194,37 @@ var VideoJS = JRClass.extend({
 
     // Load subtitles. Based on http://matroska.org/technical/specs/subtitles/srt.html
     this.subtitlesSource = this.video.getAttribute("data-subtitles");
+    
+    var subTglId = this.video.getAttribute("data-subToggle");
+    if (subTglId)
+      var subTgl = document.getElementById(subTglId);
+      
     if (this.subtitlesSource !== null) {
+      if (subTgl) {
+        subTgl.checked = true;
+        subTgl.addEventListener("click", function() { this.toggleSubitles(subTgl.checked); }.context(this), false);
+      }
+    
       this.loadSubtitles();
       this.buildSubtitles();
+    } else { hideSubToggle(subTgl); }
+    
+    this.toggleSubitles(this.subtitlesSource); // If subtitles are available, display them
+    
+    // Hide the checkbox for subtitles if no subtitle file given
+    function hideSubToggle(elem) {
+      if(!elem) return;
+      var f = elem.parentNode.firstChild;
+      
+      // Find label for checkbox, make invisible
+      for(;f;f = f.nextSibling) {
+        if (f.nodeType === 1 && f.tagName === "LABEL" && f.getAttribute("for") === subTglId) {
+          f.style.display = "none";
+          break;
+        }
+      }
+      
+      elem.style.display = "none";
     }
 
     /* Removeable Event Listeners with Context
@@ -1048,6 +1076,26 @@ var VideoJS = JRClass.extend({
     this.subtitlesDiv = _V_.createElement("div", { className: 'vjs-subtitles' });
     this.video.parentNode.appendChild(this.subtitlesDiv);
   },
+  
+  toggleSubitles: function(isOn) {
+    this.showSubs = isOn = !!isOn;
+    
+    if (!this.subtitles) return;
+    
+    if (!isOn) {
+      this.subtitlesDiv.innerHTML = "";
+      this.subtitles[this.currentSubtitlePosition].showing = false;
+    } else {
+      for(var i=0, l=this.subtitles.length;i<l;i++) {
+        var thisSub = this.subtitles[i];
+        thisSub.showing = this.video.currentTime>=thisSub.startTime && this.video.currentTime<=thisSub.endTime;
+        if(thisSub.showing) {
+          this.currentSubtitlePosition = i; // Detect current subtitle position
+          this.subtitlesDiv.innerHTML = thisSub.text; // Display subtitle
+        }
+      }
+    }
+  },
 
   onTimeUpdate: function(){
 
@@ -1055,9 +1103,27 @@ var VideoJS = JRClass.extend({
     if(this.spinner.style.display == "block") { this.hideSpinner(); }
 
     // show the subtitles
-    if (this.subtitles) {
+    if (this.showSubs && this.subtitles) {
+      var foundSub = 0;
+      // Find current subtitle (may be normal video progression or scrolling forward/back
+      for(var i=0, l=this.subtitles.length;i<l;i++) {
+        var thisSub = this.subtitles[i];
+        thisSub.showing = this.video.currentTime>=thisSub.startTime && this.video.currentTime<=thisSub.endTime;
+        
+        if(thisSub.showing) {
+          if(i !== this.currentSubtitlePosition) { // Found subtitle to display and is different than last one
+            this.currentSubtitlePosition = i;
+            this.subtitlesDiv.innerHTML = thisSub.text;
+          }
+          foundSub = 1;
+        }
+      }
+      
+      if (!foundSub) { // Clear if found no matching subtitle
+        this.subtitlesDiv.innerHTML = "";
+      }
+/*
       var x = this.currentSubtitlePosition;
-
       while (x<this.subtitles.length && this.video.currentTime>this.subtitles[x].endTime) {
         if (this.subtitles[x].showing) {
           this.subtitles[x].showing = false;
@@ -1072,10 +1138,9 @@ var VideoJS = JRClass.extend({
       if (this.video.currentTime>=this.subtitles[x].startTime && this.video.currentTime<=this.subtitles[x].endTime) {
         this.subtitlesDiv.innerHTML = this.subtitles[x].text;
         this.subtitles[x].showing = true;
-      }
+      }*/
     }
   },
-
 
   /* Device Fixes
   ================================================================================ */
