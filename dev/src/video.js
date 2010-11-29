@@ -25,6 +25,7 @@ var VideoJS = JRClass.extend({
       autoplay: false,
       preload: true,
       useBuiltInControls: false, // Use the browser's controls (iPhone)
+      controlsEnabled: true,
       controlsBelow: false, // Display control bar below video vs. in front of
       controlsAtStart: false, // Make controls visible when page loads
       controlsHiding: true, // Hide controls when not over the video

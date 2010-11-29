@@ -176,10 +176,12 @@ VideoJS.player.newBehavior("controlBar", function(element){
     _V_.addListener(element, "mouseout", this.onControlBarsMouseOut.context(this));
   },{
     showControlBars: function(){
-      if (!this.options.controlsAtStart && !this.hasPlayed) { return; }
-      this.each(this.controlBars, function(bar){
-        bar.style.display = "block";
-      });
+      if(this.options.controlsShow){
+        if (!this.options.controlsAtStart && !this.hasPlayed) { return; }
+        this.each(this.controlBars, function(bar){
+          bar.style.display = "block";
+        });
+      }
     },
     // Place controller relative to the video's position (now just resizing bars)
     positionControlBars: function(){
