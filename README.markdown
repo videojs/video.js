@@ -131,6 +131,10 @@ Coming Next
 
 Changelog
 ---------
+2.0.2 ()
+
+- Fix: Bug in Safari for Mac OS 10.5 (Leopard) that was breaking fullscreen.
+
 2.0.1 (2010-11-22)
 
 - Fix: Issue with big play button when multiple videos are on the page.
