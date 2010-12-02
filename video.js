@@ -863,7 +863,7 @@ VideoJS.player.extend({
   supportsFullScreen: function(){
     if(typeof this.video.webkitEnterFullScreen == 'function') {
       // Seems to be broken in Chromium/Chrome
-      if (!navigator.userAgent.match("Chrome")) {
+      if (!navigator.userAgent.match("Chrome") && !navigator.userAgent.match("Mac OS X 10.5")) {
         return true;
       }
     }

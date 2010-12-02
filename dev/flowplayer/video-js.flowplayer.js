@@ -1,4 +1,5 @@
 // INCLUDES A COPY OF THE FLOWPLAYER JAVASCRIPT LIBRARY
+VideoJS.options.flashPlayer = "flowplayer"; // Set default flash player to Flowplayer.
 VideoJS.flashPlayers.flowplayer = {
 
   flashPlayerVersion: 9,
