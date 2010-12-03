@@ -12,6 +12,8 @@ View demo.html for an example of how to use it.
 
 Originally based on [this tutorial](http://blog.steveheffernan.com/2010/04/how-to-build-an-html5-video-player/).
 
+W3C's working draft on the [HTML5 video element](http://www.w3.org/TR/html5/video.html).
+
 Contributors (Github Username)
 ------------------------------
 heff, dz0ny, sentientbit, tvdeyen, brandonarbini, gordonbrander, Shraymonks, albertogasparin, sandaru1, nicholasbs, majornista, Fredust85, @wonderboymusic
@@ -70,6 +72,13 @@ Change the video and image files to your own. You can even swap out the Flash Fa
     </div>
     <!-- End VideoJS -->
 
+You can add the following options as attributes on the video element:
+
+| Attribute   | Default     | Description                          |
+|:------------|:------------|:-------------------------------------|
+| preload     | true        | a suggestion to the video player     |
+| autoplay    | false       | start playing the video when loaded  |
+| loop        | false       | at end loop back to the beginning    |
 
 Storing a Reference to the Player(s)
 ------------------------------------

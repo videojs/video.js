@@ -24,6 +24,7 @@ var VideoJS = JRClass.extend({
     this.options = {
       autoplay: false,
       preload: true,
+      loop: false,
       useBuiltInControls: false, // Use the browser's controls (iPhone)
       controlsBelow: false, // Display control bar below video vs. in front of
       controlsAtStart: false, // Make controls visible when page loads
@@ -40,6 +41,7 @@ var VideoJS = JRClass.extend({
     // Override preload & autoplay with video attributes
     if (this.getPreloadAttribute() !== undefined) { this.options.preload = this.getPreloadAttribute(); }
     if (this.getAutoplayAttribute() !== undefined) { this.options.autoplay = this.getAutoplayAttribute(); }
+    if (this.getLoopAttribute() !== undefined) { this.options.loop = this.getLoopAttribute(); }
 
     // Store reference to embed code pieces
     this.box = this.video.parentNode;
@@ -114,6 +116,13 @@ var VideoJS = JRClass.extend({
     if (typeof this.video.hasAttribute == "function" && this.video.hasAttribute("autoplay")) {
       var autoplay = this.video.getAttribute("autoplay");
       if (autoplay === "false") { return false; }
+      return true;
+    }
+  },
+  getLoopAttribute: function(){
+    if (typeof this.video.hasAttribute == "function" && this.video.hasAttribute("loop")) {
+      var loop = this.video.getAttribute("loop");
+      if (loop === "false") { return false; }
       return true;
     }
   },
