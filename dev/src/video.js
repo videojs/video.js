@@ -69,6 +69,8 @@ var VideoJS = JRClass.extend({
     this.extend(functions);
   },
   activateElement: function(element, behavior){
+    // Allow passing and ID string
+    if (typeof element == "string") { element = document.getElementById(element); }
     this.behaviors[behavior].call(this, element);
   },
   /* Errors/Warnings
