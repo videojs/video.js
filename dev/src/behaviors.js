@@ -204,6 +204,12 @@ VideoJS.player.newBehavior("controlBar", function(element){
 ================================================================================ */
 // Play Toggle
 VideoJS.player.newBehavior("playToggle", function(element){
+    if (!this.elements.playToggles) {
+      this.elements.playToggles = [];
+      this.onPlay(this.playTogglesOnPlay);
+      this.onPause(this.playTogglesOnPause);
+    }
+    this.elements.playToggles.push(element);
     _V_.addListener(element, "click", this.onPlayToggleClick.context(this));
   },{
     onPlayToggleClick: function(event){
@@ -212,6 +218,18 @@ VideoJS.player.newBehavior("playToggle", function(element){
       } else {
         this.pause();
       }
+    },
+    playTogglesOnPlay: function(event){
+      this.each(this.elements.playToggles, function(toggle){
+        _V_.removeClass(toggle, "vjs-paused");
+        _V_.addClass(toggle, "vjs-playing");
+      });
+    },
+    playTogglesOnPause: function(event){
+      this.each(this.elements.playToggles, function(toggle){
+        _V_.removeClass(toggle, "vjs-playing");
+        _V_.addClass(toggle, "vjs-paused");
+      });
     }
   }
 );
@@ -437,11 +455,7 @@ VideoJS.player.newBehavior("fullscreenToggle", function(element){
     },
     // If available use the native fullscreen
     nativeFullscreenOn: function(){
-      if(this.supportsFullScreen()) {
-        return this.enterFullScreen();
-      } else {
-        return false;
-      }
+      return (this.supportsFullScreen()) ? this.enterFullScreen() : false;
     },
     // Turn off fullscreen (window) mode
     fullscreenOff: function(){

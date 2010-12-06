@@ -423,8 +423,7 @@ VideoJS.player.extend({
 
     return this.video.currentTime;
   },
-  // Allow for smoother visual scrubbing
-  lastSetCurrentTime: function(){ return this.values.currentTime; },
+
   duration: function(){
     return this.video.duration;
   },
