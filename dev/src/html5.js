@@ -443,7 +443,8 @@ VideoJS.player.extend({
 
   volume: function(percentAsDecimal){
     if (percentAsDecimal !== undefined) {
-      this.values.volume = parseFloat(percentAsDecimal);
+      // Force value to between 0 and 1
+      this.values.volume = Math.max(0, Math.min(1, parseFloat(percentAsDecimal)));
       this.video.volume = this.values.volume;
       this.setLocalStorage("volume", this.values.volume);
       return this;
@@ -481,13 +482,61 @@ VideoJS.player.extend({
     }
     return false;
   },
-  enterFullScreen: function(){
+
+  html5EnterNativeFullScreen: function(){
     try {
       this.video.webkitEnterFullScreen();
     } catch (e) {
       if (e.code == 11) { this.warning(VideoJS.warnings.videoNotReady); }
     }
     return this;
+  },
+  
+  // Turn on fullscreen (window) mode
+  // Real fullscreen isn't available in browsers quite yet.
+  enterFullScreen: function(){
+    if (this.supportsFullScreen()) {
+      this.html5EnterNativeFullScreen();
+    } else {
+      this.enterFullWindow();
+    }
+  },
+
+  exitFullScreen: function(){
+    if (this.supportsFullScreen()) {
+      // Shouldn't be called
+    } else {
+      this.exitFullWindow();
+    }
+  },
+
+  enterFullWindow: function(){
+    this.videoIsFullScreen = true;
+    // Storing original doc overflow value to return to when fullscreen is off
+    this.docOrigOverflow = document.documentElement.style.overflow;
+    // Add listener for esc key to exit fullscreen
+    _V_.addListener(document, "keydown", this.fullscreenOnEscKey.rEvtContext(this));
+    // Add listener for a window resize
+    _V_.addListener(window, "resize", this.fullscreenOnWindowResize.rEvtContext(this));
+    // Hide any scroll bars
+    document.documentElement.style.overflow = 'hidden';
+    // Apply fullscreen styles
+    _V_.addClass(this.box, "vjs-fullscreen");
+    // Resize the box, controller, and poster
+    this.positionAll();
+  },
+
+  // Turn off fullscreen (window) mode
+  exitFullWindow: function(){
+    this.videoIsFullScreen = false;
+    document.removeEventListener("keydown", this.fullscreenOnEscKey, false);
+    window.removeEventListener("resize", this.fullscreenOnWindowResize, false);
+    // Unhide scroll bars.
+    document.documentElement.style.overflow = this.docOrigOverflow;
+    // Remove fullscreen styles
+    _V_.removeClass(this.box, "vjs-fullscreen");
+    // Resize the box, controller, and poster to original sizes
+    this.positionAll();
   },
 
   onError: function(fn){ this.addVideoListener("error", fn); return this; },

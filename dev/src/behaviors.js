@@ -429,53 +429,19 @@ VideoJS.player.newBehavior("fullscreenToggle", function(element){
     // When the user clicks on the fullscreen button, update fullscreen setting
     onFullscreenToggleClick: function(event){
       if (!this.videoIsFullScreen) {
-        this.fullscreenOn();
+        this.enterFullScreen();
       } else {
-        this.fullscreenOff();
+        this.exitFullScreen();
       }
     },
-    // Turn on fullscreen (window) mode
-    // Real fullscreen isn't available in browsers quite yet.
-    fullscreenOn: function(){
-      if (!this.nativeFullscreenOn()) {
-        this.videoIsFullScreen = true;
-        // Storing original doc overflow value to return to when fullscreen is off
-        this.docOrigOverflow = document.documentElement.style.overflow;
-        // Add listener for esc key to exit fullscreen
-        _V_.addListener(document, "keydown", this.fullscreenOnEscKey.rEvtContext(this));
-        // Add listener for a window resize
-        _V_.addListener(window, "resize", this.fullscreenOnWindowResize.rEvtContext(this));
-        // Hide any scroll bars
-        document.documentElement.style.overflow = 'hidden';
-        // Apply fullscreen styles
-        _V_.addClass(this.box, "vjs-fullscreen");
-        // Resize the box, controller, and poster
-        this.positionAll();
-      }
-    },
-    // If available use the native fullscreen
-    nativeFullscreenOn: function(){
-      return (this.supportsFullScreen()) ? this.enterFullScreen() : false;
-    },
-    // Turn off fullscreen (window) mode
-    fullscreenOff: function(){
-      this.videoIsFullScreen = false;
-      document.removeEventListener("keydown", this.fullscreenOnEscKey, false);
-      window.removeEventListener("resize", this.fullscreenOnWindowResize, false);
-      // Unhide scroll bars.
-      document.documentElement.style.overflow = this.docOrigOverflow;
-      // Remove fullscreen styles
-      _V_.removeClass(this.box, "vjs-fullscreen");
-      // Resize the box, controller, and poster to original sizes
-      this.positionAll();
-    },
+
     fullscreenOnWindowResize: function(event){ // Removeable
       this.positionControlBars();
     },
     // Create listener for esc key while in full screen mode
     fullscreenOnEscKey: function(event){ // Removeable
       if (event.keyCode == 27) {
-        this.fullscreenOff();
+        this.exitFullScreen();
       }
     }
   }

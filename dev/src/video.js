@@ -94,8 +94,10 @@ var VideoJS = JRClass.extend({
   /* Local Storage
   ================================================================================ */
   setLocalStorage: function(key, value){
-    try { localStorage[key] = value; }
-    catch(e) {
+    if (!localStorage) return;
+    try {
+      localStorage[key] = value;
+    } catch(e) {
       if (e.code == 22 || e.code == 1014) { // Webkit == 22 / Firefox == 1014
         this.warning(VideoJS.warnings.localStorageFull);
       }
