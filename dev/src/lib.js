@@ -94,6 +94,8 @@ VideoJS.extend({
     request.send();
   },
 
+  trim: function(string){ return string.toString().replace(/^\s+/, "").replace(/\s+$/, ""); },
+
   // DOM Ready functionality adapted from jQuery. http://jquery.com/
   bindDOMReady: function(){
     if (document.readyState === "complete") {

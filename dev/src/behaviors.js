@@ -44,6 +44,7 @@ VideoJS.player.newBehavior("player", function(player){
       this.bufferedListeners.push(fn);
     },
     triggerBufferedListeners: function(){
+      this.isBufferFull();
       this.each(this.bufferedListeners, function(listener){
         (listener.context(this))();
       });
@@ -55,7 +56,7 @@ VideoJS.player.newBehavior("player", function(player){
     /* Time Tracking -------------------------------------------------------------- */
     trackCurrentTime: function(){
       if (this.currentTimeInterval) { clearInterval(this.currentTimeInterval); }
-      this.currentTimeInterval = setInterval(this.triggerCurrentTimeListeners.context(this), 42); // 24 fps
+      this.currentTimeInterval = setInterval(this.triggerCurrentTimeListeners.context(this), 100); // 42 = 24 fps
       this.trackingCurrentTime = true;
     },
     // Turn off play progress tracking (when paused or dragging)
@@ -64,12 +65,10 @@ VideoJS.player.newBehavior("player", function(player){
       this.trackingCurrentTime = false;
     },
     currentTimeListeners: [],
-    onCurrentTimeUpdate: function(fn){
-      this.currentTimeListeners.push(fn);
-    },
-    triggerCurrentTimeListeners: function(late, newTime){ // FF passes milliseconds late a the first argument
+    // onCurrentTimeUpdate is in API section now
+    triggerCurrentTimeListeners: function(late, newTime){ // FF passes milliseconds late as the first argument
       this.each(this.currentTimeListeners, function(listener){
-        (listener.context(this))(newTime);
+        (listener.context(this))(newTime || this.currentTime());
       });
     },
 
@@ -347,9 +346,9 @@ VideoJS.player.newBehavior("currentTimeScrubber", function(element){
       _V_.unblockTextSelection();
       document.removeEventListener("mousemove", this.onCurrentTimeScrubberMouseMove, false);
       document.removeEventListener("mouseup", this.onCurrentTimeScrubberMouseUp, false);
-      this.trackCurrentTime();
       if (this.videoWasPlaying) {
         this.play();
+        this.trackCurrentTime();
       }
     },
     setCurrentTimeWithScrubber: function(event){
@@ -536,37 +535,60 @@ VideoJS.player.newBehavior("spinner", function(element){
 /* Subtitles
 ================================================================================ */
 VideoJS.player.newBehavior("subtitlesDisplay", function(element){
-    if (!this.subtitlesDisplays) { 
-      this.subtitlesDisplays = [];
-      _V_.addListener(this.video, "timeupdate", this.subtitlesDisplaysOnVideoTimeUpdate.context(this));
+    if (!this.subtitleDisplays) { 
+      this.subtitleDisplays = [];
+      this.onCurrentTimeUpdate(this.subtitleDisplaysOnVideoTimeUpdate);
+      this.onEnded(function() { this.lastSubtitleIndex = 0; }.context(this))
     }
-    this.subtitlesDisplays.push(element);
+    this.subtitleDisplays.push(element);
   },{
-    subtitlesDisplaysOnVideoTimeUpdate: function(){
-      // show the subtitles
+    subtitleDisplaysOnVideoTimeUpdate: function(time){
+      // Assuming all subtitles are in order by time, and do not overlap
       if (this.subtitles) {
-        // var x = this.currentSubtitlePosition;
-        var x = 0;
-
-        while (x<this.subtitles.length && this.video.currentTime>this.subtitles[x].endTime) {
-          if (this.subtitles[x].showing) {
-            this.subtitles[x].showing = false;
-            this.updateSubtitlesDisplays("");
+        // If current subtitle should stay showing, don't do anything. Otherwise, find new subtitle.
+        if (!this.currentSubtitle || this.currentSubtitle.start >= time || this.currentSubtitle.end < time) {
+          var newSubIndex = false,
+              // Loop in reverse if lastSubtitle is after current time (optimization)
+              // Meaning the user is scrubbing in reverse or rewinding
+              reverse = (this.subtitles[this.lastSubtitleIndex].start > time),
+              // If reverse, step back 1 becase we know it's not the lastSubtitle
+              i = this.lastSubtitleIndex - (reverse) ? 1 : 0;
+          while (true) { // Loop until broken
+            if (reverse) { // Looping in reverse
+              // Stop if no more, or this subtitle ends before the current time (no earlier subtitles should apply)
+              if (i < 0 || this.subtitles[i].end < time) { break; }
+              // End is greater than time, so if start is less, show this subtitle
+              if (this.subtitles[i].start < time) {
+                newSubIndex = i;
+                break;
+              }
+              i--;
+            } else { // Looping forward
+              // Stop if no more, or this subtitle starts after time (no later subtitles should apply)
+              if (i >= this.subtitles.length || this.subtitles[i].start > time) { break; }
+              // Start is less than time, so if end is later, show this subtitle
+              if (this.subtitles[i].end > time) {
+                newSubIndex = i;
+                break;
+              }
+              i++;
+            }
           }
-          this.currentSubtitlePosition++;
-          x = this.currentSubtitlePosition;
-        }
 
-        if (this.currentSubtitlePosition>=this.subtitles.length) { return; }
-
-        if (this.video.currentTime>=this.subtitles[x].startTime && this.video.currentTime<=this.subtitles[x].endTime) {
-          this.updateSubtitlesDisplays(this.subtitles[x].text);
-          this.subtitles[x].showing = true;
+          // Set or clear current subtitle
+          if (newSubIndex !== false) {
+            this.currentSubtitle = this.subtitles[newSubIndex];
+            this.lastSubtitleIndex = newSubIndex;
+            this.updateSubtitleDisplays(this.currentSubtitle.text);
+          } else if (this.currentSubtitle) {
+            this.currentSubtitle = false;
+            this.updateSubtitleDisplays("");
+          }
         }
       }
     },
-    updateSubtitlesDisplays: function(val){
-      this.each(this.subtitlesDisplays, function(disp){
+    updateSubtitleDisplays: function(val){
+      this.each(this.subtitleDisplays, function(disp){
         disp.innerHTML = val;
       });
     }

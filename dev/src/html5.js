@@ -335,55 +335,66 @@ VideoJS.player.extend({
   getSubtitles: function(){
     var tracks = this.video.getElementsByTagName("TRACK");
     for (var i=0,j=tracks.length; i<j; i++) {
-      if (tracks[i].getAttribute("kind") == "subtitles") { this.subtitlesSource = tracks[i].getAttribute("src"); }
-    }
-    if (this.subtitlesSource !== undefined) {
-      this.loadSubtitles();
-      this.buildSubtitles();
+      if (tracks[i].getAttribute("kind") == "subtitles" && tracks[i].getAttribute("src")) {
+        this.subtitlesSource = tracks[i].getAttribute("src");
+        this.loadSubtitles();
+        this.buildSubtitles();
+      }
     }
   },
   loadSubtitles: function() { _V_.get(this.subtitlesSource, this.parseSubtitles.context(this)); },
   parseSubtitles: function(subText) {
-    var lines = subText.replace("\r",'').split("\n");
+    var lines = subText.split("\n"),
+        line = "",
+        subtitle, time, text;
     this.subtitles = [];
-    this.currentSubtitlePosition = 0;
+    this.currentSubtitle = false;
+    this.lastSubtitleIndex = 0;
 
-    var i = 0;
-    while(i<lines.length) {
-      // define the current subtitle object
-      var subtitle = {};
-      // get the number
-      subtitle.id = lines[i++];
-      if (!subtitle.id) { break; }
-      // get time
-      var time = lines[i++].split(" --> ");
-      subtitle.startTime = this.parseSubtitleTime(time[0]);
-      subtitle.endTime = this.parseSubtitleTime(time[1]);
-      // get subtitle text
-      var text = [];
-      while(lines[i].length>0 && lines[i]!="\r") {
-        text.push(lines[i++]);
+    for (var i=0; i<lines.length; i++) {
+      line = _V_.trim(lines[i]); // Trim whitespace and linebreaks
+      if (line != "") { // Loop until a line with content
+
+        // First line - Number
+        subtitle = {
+          id: line, // Subtitle Number
+          index: this.subtitles.length // Position in Array
+        };
+
+        // Second line - Time
+        line = _V_.trim(lines[++i]);
+        time = line.split(" --> ");
+        subtitle.start = this.parseSubtitleTime(time[0]);
+        subtitle.end = this.parseSubtitleTime(time[1]);
+
+        // Additional lines - Subtitle Text
+        text = [];
+        for (var j=i; j<lines.length; j++) { // Loop until a blank line or end of lines
+          line = _V_.trim(lines[++i]);
+          if (line == "") { break; }
+          text.push(line);
+        }
+        subtitle.text = text.join('<br/>');
+
+        // Add this subtitle
+        this.subtitles.push(subtitle);
       }
-      subtitle.text = text.join('<br/>');
-      // add this subtitle
-      this.subtitles.push(subtitle);
-      // ignore the blank line
-      i++;
     }
   },
 
   parseSubtitleTime: function(timeText) {
-    var parts = timeText.split(':');
-    var time = 0;
+    var parts = timeText.split(':'),
+        time = 0;
     // hours => seconds
     time += parseFloat(parts[0])*60*60;
     // minutes => seconds
     time += parseFloat(parts[1])*60;
     // get seconds
-    var seconds = parts[2].split(',');
+    var seconds = parts[2].split(/\.|,/); // Either . or ,
     time += parseFloat(seconds[0]);
     // add miliseconds
-    time = time + parseFloat(seconds[1])/1000;
+    ms = parseFloat(seconds[1]);
+    if (ms) { time += ms/1000; }
     return time;
   },
 
@@ -420,8 +431,10 @@ VideoJS.player.extend({
       this.values.currentTime = seconds;
       return this;
     }
-
     return this.video.currentTime;
+  },
+  onCurrentTimeUpdate: function(fn){
+    this.currentTimeListeners.push(fn);
   },
 
   duration: function(){
@@ -491,7 +504,7 @@ VideoJS.player.extend({
     }
     return this;
   },
-  
+
   // Turn on fullscreen (window) mode
   // Real fullscreen isn't available in browsers quite yet.
   enterFullScreen: function(){
