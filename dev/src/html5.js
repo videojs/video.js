@@ -1,6 +1,7 @@
 /* HTML5 Player Type
 ================================================================================ */
 VideoJS.fn.extend({
+
   html5Supported: function(){
     if (VideoJS.browserSupportsVideo() && this.canPlaySource()) {
       return true;
