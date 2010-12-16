@@ -19,6 +19,7 @@ var VideoJS = JRClass.extend({
     this.video.player = this;
     this.values = {}; // Cache video values.
     this.elements = {}; // Store refs to controls elements.
+    this.api = {}; // API to video functions
 
     // Default Options
     this.options = {
@@ -53,7 +54,7 @@ var VideoJS = JRClass.extend({
     this.each(this.options.playerFallbackOrder, function(playerType){
       if (this[playerType+"Supported"]()) { // Check if player type is supported
         this[playerType+"Init"](); // Initialize player type
-        return true; // Stop looping though players
+        return true; // Stop looping through players
       }
     });
 
@@ -94,7 +95,7 @@ var VideoJS = JRClass.extend({
   /* Local Storage
   ================================================================================ */
   setLocalStorage: function(key, value){
-    if (!localStorage) return;
+    if (!localStorage) { return; }
     try {
       localStorage[key] = value;
     } catch(e) {
@@ -109,7 +110,7 @@ var VideoJS = JRClass.extend({
     if (typeof this.video.hasAttribute == "function" && this.video.hasAttribute("preload")) {
       var preload = this.video.getAttribute("preload");
       // Only included the attribute, thinking it was boolean
-      if (preload === "" || preload === "true") { return "auto"; } 
+      if (preload === "" || preload === "true") { return "auto"; }
       if (preload === "false") { return "none"; }
       return preload;
     }
@@ -137,7 +138,8 @@ var VideoJS = JRClass.extend({
     }
   }
 });
-VideoJS.player = VideoJS.prototype;
+VideoJS.fn = VideoJS.prototype;
+VideoJS.options = {}; // Globally set options
 
 ////////////////////////////////////////////////////////////////////////////////
 // Player Types
@@ -145,7 +147,7 @@ VideoJS.player = VideoJS.prototype;
 
 /* Flash Object Fallback (Player Type)
 ================================================================================ */
-VideoJS.player.extend({
+VideoJS.fn.extend({
   flashSupported: function(){
     if (!this.flashElement) { this.flashElement = this.getFlashElement(); }
     // Check if object exists & Flash Player version is supported
@@ -160,7 +162,7 @@ VideoJS.player.extend({
     this.element = this.flashElement;
     this.video.src = ""; // Stop video from downloading if HTML5 is still supported
     var flashPlayerType = VideoJS.flashPlayers[this.options.flashPlayer];
-    this.extend(VideoJS.flashPlayers[this.options.flashPlayer].api);
+    this.extend(flashPlayerType.api);
     (flashPlayerType.init.context(this))();
   },
   // Get Flash Fallback object element from Embed Code
@@ -186,6 +188,7 @@ VideoJS.player.extend({
     return VideoJS.getFlashVersion() >= playerVersion;
   }
 });
+
 VideoJS.flashPlayers = {};
 VideoJS.flashPlayers.htmlObject = {
   flashPlayerVersion: 9,
@@ -215,10 +218,10 @@ VideoJS.flashPlayers.htmlObject = {
 
 /* Download Links Fallback (Player Type)
 ================================================================================ */
-VideoJS.player.extend({
+VideoJS.fn.extend({
   linksSupported: function(){ return true; },
-  linksInit: function(){ 
-    this.showLinksFallback(); 
+  linksInit: function(){
+    this.showLinksFallback();
     this.element = this.video;
   },
   // Get the download links block element
@@ -249,11 +252,15 @@ VideoJS.extend = function(obj){ this.merge(this, obj, true); };
 
 VideoJS.extend({
   // Add VideoJS to all video tags with the video-js class when the DOM is ready
-  setupAllWhenReady: function(options){
+  setupAll: function(options, fn){
     // Options is stored globally, and added ot any new player on init
     VideoJS.options = options;
     VideoJS.DOMReady(VideoJS.setup);
+    if (fn) { VideoJS.DOMReady(fn); }
   },
+  
+  // Backward compatability. Changed to just SetupAll
+  setupAllWhenReady: function(options){ VideoJS.setupAll(options); },
 
   // Run the supplied function when the DOM is ready
   DOMReady: function(fn){

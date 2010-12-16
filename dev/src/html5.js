@@ -1,6 +1,6 @@
 /* HTML5 Player Type
 ================================================================================ */
-VideoJS.player.extend({
+VideoJS.fn.extend({
   html5Supported: function(){
     if (VideoJS.browserSupportsVideo() && this.canPlaySource()) {
       return true;
@@ -8,6 +8,7 @@ VideoJS.player.extend({
       return false;
     }
   },
+
   html5Init: function(){
     this.element = this.video;
 
@@ -353,7 +354,7 @@ VideoJS.player.extend({
 
     for (var i=0; i<lines.length; i++) {
       line = _V_.trim(lines[i]); // Trim whitespace and linebreaks
-      if (line != "") { // Loop until a line with content
+      if (line) { // Loop until a line with content
 
         // First line - Number
         subtitle = {
@@ -371,7 +372,7 @@ VideoJS.player.extend({
         text = [];
         for (var j=i; j<lines.length; j++) { // Loop until a blank line or end of lines
           line = _V_.trim(lines[++i]);
-          if (line == "") { break; }
+          if (!line) { break; }
           text.push(line);
         }
         subtitle.text = text.join('<br/>');
@@ -409,19 +410,19 @@ VideoJS.player.extend({
 
   /* Player API - Translate functionality from player to video
   ================================================================================ */
-  addVideoListener: function(type, fn){ _V_.addListener(this.video, type, fn.rEvtContext(this)); },
+  html5AddVideoListener: function(type, fn){ _V_.addListener(this.video, type, fn.rEvtContext(this)); },
 
   play: function(){
     this.video.play();
     return this;
   },
-  onPlay: function(fn){ this.addVideoListener("play", fn); return this; },
+  onPlay: function(fn){ this.html5AddVideoListener("play", fn); return this; },
 
   pause: function(){
     this.video.pause();
     return this;
   },
-  onPause: function(fn){ this.addVideoListener("pause", fn); return this; },
+  onPause: function(fn){ this.html5AddVideoListener("pause", fn); return this; },
   paused: function() { return this.video.paused; },
 
   currentTime: function(seconds){
@@ -435,6 +436,10 @@ VideoJS.player.extend({
   },
   onCurrentTimeUpdate: function(fn){
     this.currentTimeListeners.push(fn);
+  },
+
+  onEnded: function(fn){
+    this.html5AddVideoListener("ended", fn); return this;
   },
 
   duration: function(){
@@ -552,9 +557,6 @@ VideoJS.player.extend({
     this.positionAll();
   },
 
-  onError: function(fn){ this.addVideoListener("error", fn); return this; },
-  onEnded: function(fn){
-    this.addVideoListener("ended", fn); return this;
-  }
+  onError: function(fn){ this.html5AddVideoListener("error", fn); return this; },
 });
 

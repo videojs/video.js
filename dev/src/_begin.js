@@ -1,6 +1,6 @@
 /*
 VideoJS - HTML5 Video Player
-v2.0.1
+v2.0.2
 
 This file is part of VideoJS. Copyright 2010 Zencoder, Inc.
 

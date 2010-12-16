@@ -6,8 +6,8 @@
 VideoJS.extend({
 
   addClass: function(element, classToAdd){
-    if ((" "+element.className+" ").indexOf(" "+classToAdd+" ") == -1) { 
-      element.className = element.className === "" ? classToAdd : element.className + " " + classToAdd; 
+    if ((" "+element.className+" ").indexOf(" "+classToAdd+" ") == -1) {
+      element.className = element.className === "" ? classToAdd : element.className + " " + classToAdd;
     }
   },
   removeClass: function(element, classToRemove){
@@ -58,7 +58,7 @@ VideoJS.extend({
     if (!dec) { dec = 0; }
     return Math.round(num*Math.pow(10,dec))/Math.pow(10,dec);
   },
-  
+
   addListener: function(element, type, handler){
     if (element.addEventListener) {
       element.addEventListener(type, handler, false);

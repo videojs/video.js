@@ -1,6 +1,6 @@
 /*
 VideoJS - HTML5 Video Player
-v2.0.1
+v2.0.2
 
 This file is part of VideoJS. Copyright 2010 Zencoder, Inc.
 
@@ -41,6 +41,8 @@ var VideoJS = JRClass.extend({
     // Store reference to player on the video element.
     // So you can acess the player later: document.getElementById("video_id").player.play();
     this.video.player = this;
+    this.values = {}; // Cache video values.
+    this.elements = {}; // Store refs to controls elements.
 
     // Default Options
     this.options = {
@@ -86,12 +88,13 @@ var VideoJS = JRClass.extend({
   /* Behaviors
   ================================================================================ */
   behaviors: {},
-  elements: {},
   newBehavior: function(name, activate, functions){
     this.behaviors[name] = activate;
     this.extend(functions);
   },
   activateElement: function(element, behavior){
+    // Allow passing and ID string
+    if (typeof element == "string") { element = document.getElementById(element); }
     this.behaviors[behavior].call(this, element);
   },
   /* Errors/Warnings
@@ -115,8 +118,10 @@ var VideoJS = JRClass.extend({
   /* Local Storage
   ================================================================================ */
   setLocalStorage: function(key, value){
-    try { localStorage[key] = value; }
-    catch(e) {
+    if (!localStorage) { return; }
+    try {
+      localStorage[key] = value;
+    } catch(e) {
       if (e.code == 22 || e.code == 1014) { // Webkit == 22 / Firefox == 1014
         this.warning(VideoJS.warnings.localStorageFull);
       }
@@ -128,7 +133,7 @@ var VideoJS = JRClass.extend({
     if (typeof this.video.hasAttribute == "function" && this.video.hasAttribute("preload")) {
       var preload = this.video.getAttribute("preload");
       // Only included the attribute, thinking it was boolean
-      if (preload === "" || preload === "true") { return "auto"; } 
+      if (preload === "" || preload === "true") { return "auto"; }
       if (preload === "false") { return "none"; }
       return preload;
     }
@@ -236,8 +241,8 @@ VideoJS.flashPlayers.htmlObject = {
 ================================================================================ */
 VideoJS.player.extend({
   linksSupported: function(){ return true; },
-  linksInit: function(){ 
-    this.showLinksFallback(); 
+  linksInit: function(){
+    this.showLinksFallback();
     this.element = this.video;
   },
   // Get the download links block element
@@ -721,55 +726,66 @@ VideoJS.player.extend({
   getSubtitles: function(){
     var tracks = this.video.getElementsByTagName("TRACK");
     for (var i=0,j=tracks.length; i<j; i++) {
-      if (tracks[i].getAttribute("kind") == "subtitles") { this.subtitlesSource = tracks[i].getAttribute("src"); }
-    }
-    if (this.subtitlesSource !== undefined) {
-      this.loadSubtitles();
-      this.buildSubtitles();
+      if (tracks[i].getAttribute("kind") == "subtitles" && tracks[i].getAttribute("src")) {
+        this.subtitlesSource = tracks[i].getAttribute("src");
+        this.loadSubtitles();
+        this.buildSubtitles();
+      }
     }
   },
   loadSubtitles: function() { _V_.get(this.subtitlesSource, this.parseSubtitles.context(this)); },
   parseSubtitles: function(subText) {
-    var lines = subText.replace("\r",'').split("\n");
+    var lines = subText.split("\n"),
+        line = "",
+        subtitle, time, text;
     this.subtitles = [];
-    this.currentSubtitlePosition = 0;
+    this.currentSubtitle = false;
+    this.lastSubtitleIndex = 0;
 
-    var i = 0;
-    while(i<lines.length) {
-      // define the current subtitle object
-      var subtitle = {};
-      // get the number
-      subtitle.id = lines[i++];
-      if (!subtitle.id) { break; }
-      // get time
-      var time = lines[i++].split(" --> ");
-      subtitle.startTime = this.parseSubtitleTime(time[0]);
-      subtitle.endTime = this.parseSubtitleTime(time[1]);
-      // get subtitle text
-      var text = [];
-      while(lines[i].length>0 && lines[i]!="\r") {
-        text.push(lines[i++]);
+    for (var i=0; i<lines.length; i++) {
+      line = _V_.trim(lines[i]); // Trim whitespace and linebreaks
+      if (line) { // Loop until a line with content
+
+        // First line - Number
+        subtitle = {
+          id: line, // Subtitle Number
+          index: this.subtitles.length // Position in Array
+        };
+
+        // Second line - Time
+        line = _V_.trim(lines[++i]);
+        time = line.split(" --> ");
+        subtitle.start = this.parseSubtitleTime(time[0]);
+        subtitle.end = this.parseSubtitleTime(time[1]);
+
+        // Additional lines - Subtitle Text
+        text = [];
+        for (var j=i; j<lines.length; j++) { // Loop until a blank line or end of lines
+          line = _V_.trim(lines[++i]);
+          if (!line) { break; }
+          text.push(line);
+        }
+        subtitle.text = text.join('<br/>');
+
+        // Add this subtitle
+        this.subtitles.push(subtitle);
       }
-      subtitle.text = text.join('<br/>');
-      // add this subtitle
-      this.subtitles.push(subtitle);
-      // ignore the blank line
-      i++;
     }
   },
 
   parseSubtitleTime: function(timeText) {
-    var parts = timeText.split(':');
-    var time = 0;
+    var parts = timeText.split(':'),
+        time = 0;
     // hours => seconds
     time += parseFloat(parts[0])*60*60;
     // minutes => seconds
     time += parseFloat(parts[1])*60;
     // get seconds
-    var seconds = parts[2].split(',');
+    var seconds = parts[2].split(/\.|,/); // Either . or ,
     time += parseFloat(seconds[0]);
     // add miliseconds
-    time = time + parseFloat(seconds[1])/1000;
+    ms = parseFloat(seconds[1]);
+    if (ms) { time += ms/1000; }
     return time;
   },
 
@@ -784,7 +800,6 @@ VideoJS.player.extend({
 
   /* Player API - Translate functionality from player to video
   ================================================================================ */
-  values: {}, // Storage for setters and getters of the same name.
   addVideoListener: function(type, fn){ _V_.addListener(this.video, type, fn.rEvtContext(this)); },
 
   play: function(){
@@ -807,11 +822,12 @@ VideoJS.player.extend({
       this.values.currentTime = seconds;
       return this;
     }
-
     return this.video.currentTime;
   },
-  // Allow for smoother visual scrubbing
-  lastSetCurrentTime: function(){ return this.values.currentTime; },
+  onCurrentTimeUpdate: function(fn){
+    this.currentTimeListeners.push(fn);
+  },
+
   duration: function(){
     return this.video.duration;
   },
@@ -831,7 +847,8 @@ VideoJS.player.extend({
 
   volume: function(percentAsDecimal){
     if (percentAsDecimal !== undefined) {
-      this.values.volume = parseFloat(percentAsDecimal);
+      // Force value to between 0 and 1
+      this.values.volume = Math.max(0, Math.min(1, parseFloat(percentAsDecimal)));
       this.video.volume = this.values.volume;
       this.setLocalStorage("volume", this.values.volume);
       return this;
@@ -869,13 +886,61 @@ VideoJS.player.extend({
     }
     return false;
   },
-  enterFullScreen: function(){
+
+  html5EnterNativeFullScreen: function(){
     try {
       this.video.webkitEnterFullScreen();
     } catch (e) {
       if (e.code == 11) { this.warning(VideoJS.warnings.videoNotReady); }
     }
     return this;
+  },
+
+  // Turn on fullscreen (window) mode
+  // Real fullscreen isn't available in browsers quite yet.
+  enterFullScreen: function(){
+    if (this.supportsFullScreen()) {
+      this.html5EnterNativeFullScreen();
+    } else {
+      this.enterFullWindow();
+    }
+  },
+
+  exitFullScreen: function(){
+    if (this.supportsFullScreen()) {
+      // Shouldn't be called
+    } else {
+      this.exitFullWindow();
+    }
+  },
+
+  enterFullWindow: function(){
+    this.videoIsFullScreen = true;
+    // Storing original doc overflow value to return to when fullscreen is off
+    this.docOrigOverflow = document.documentElement.style.overflow;
+    // Add listener for esc key to exit fullscreen
+    _V_.addListener(document, "keydown", this.fullscreenOnEscKey.rEvtContext(this));
+    // Add listener for a window resize
+    _V_.addListener(window, "resize", this.fullscreenOnWindowResize.rEvtContext(this));
+    // Hide any scroll bars
+    document.documentElement.style.overflow = 'hidden';
+    // Apply fullscreen styles
+    _V_.addClass(this.box, "vjs-fullscreen");
+    // Resize the box, controller, and poster
+    this.positionAll();
+  },
+
+  // Turn off fullscreen (window) mode
+  exitFullWindow: function(){
+    this.videoIsFullScreen = false;
+    document.removeEventListener("keydown", this.fullscreenOnEscKey, false);
+    window.removeEventListener("resize", this.fullscreenOnWindowResize, false);
+    // Unhide scroll bars.
+    document.documentElement.style.overflow = this.docOrigOverflow;
+    // Remove fullscreen styles
+    _V_.removeClass(this.box, "vjs-fullscreen");
+    // Resize the box, controller, and poster to original sizes
+    this.positionAll();
   },
 
   onError: function(fn){ this.addVideoListener("error", fn); return this; },
@@ -930,6 +995,7 @@ VideoJS.player.newBehavior("player", function(player){
       this.bufferedListeners.push(fn);
     },
     triggerBufferedListeners: function(){
+      this.isBufferFull();
       this.each(this.bufferedListeners, function(listener){
         (listener.context(this))();
       });
@@ -941,7 +1007,7 @@ VideoJS.player.newBehavior("player", function(player){
     /* Time Tracking -------------------------------------------------------------- */
     trackCurrentTime: function(){
       if (this.currentTimeInterval) { clearInterval(this.currentTimeInterval); }
-      this.currentTimeInterval = setInterval(this.triggerCurrentTimeListeners.context(this), 42); // 24 fps
+      this.currentTimeInterval = setInterval(this.triggerCurrentTimeListeners.context(this), 100); // 42 = 24 fps
       this.trackingCurrentTime = true;
     },
     // Turn off play progress tracking (when paused or dragging)
@@ -950,12 +1016,10 @@ VideoJS.player.newBehavior("player", function(player){
       this.trackingCurrentTime = false;
     },
     currentTimeListeners: [],
-    onCurrentTimeUpdate: function(fn){
-      this.currentTimeListeners.push(fn);
-    },
-    triggerCurrentTimeListeners: function(late, newTime){ // FF passes milliseconds late a the first argument
+    // onCurrentTimeUpdate is in API section now
+    triggerCurrentTimeListeners: function(late, newTime){ // FF passes milliseconds late as the first argument
       this.each(this.currentTimeListeners, function(listener){
-        (listener.context(this))(newTime);
+        (listener.context(this))(newTime || this.currentTime());
       });
     },
 
@@ -1053,8 +1117,8 @@ VideoJS.player.newBehavior("poster", function(element){
 /* Control Bar Behaviors
 ================================================================================ */
 VideoJS.player.newBehavior("controlBar", function(element){
-    if (!this.controlBars) { 
-      this.controlBars = []; 
+    if (!this.controlBars) {
+      this.controlBars = [];
       this.onResize(this.positionControlBars);
     }
     this.controlBars.push(element);
@@ -1073,7 +1137,7 @@ VideoJS.player.newBehavior("controlBar", function(element){
       this.updateLoadProgressBars();
     },
     hideControlBars: function(){
-      if (this.options.controlsHiding && !this.mouseIsOverControls) { 
+      if (this.options.controlsHiding && !this.mouseIsOverControls) {
         this.each(this.controlBars, function(bar){
           bar.style.display = "none";
         });
@@ -1081,8 +1145,8 @@ VideoJS.player.newBehavior("controlBar", function(element){
     },
     // Block controls from hiding when mouse is over them.
     onControlBarsMouseMove: function(){ this.mouseIsOverControls = true; },
-    onControlBarsMouseOut: function(event){ 
-      this.mouseIsOverControls = false; 
+    onControlBarsMouseOut: function(event){
+      this.mouseIsOverControls = false;
     }
   }
 );
@@ -1090,6 +1154,12 @@ VideoJS.player.newBehavior("controlBar", function(element){
 ================================================================================ */
 // Play Toggle
 VideoJS.player.newBehavior("playToggle", function(element){
+    if (!this.elements.playToggles) {
+      this.elements.playToggles = [];
+      this.onPlay(this.playTogglesOnPlay);
+      this.onPause(this.playTogglesOnPause);
+    }
+    this.elements.playToggles.push(element);
     _V_.addListener(element, "click", this.onPlayToggleClick.context(this));
   },{
     onPlayToggleClick: function(event){
@@ -1098,6 +1168,18 @@ VideoJS.player.newBehavior("playToggle", function(element){
       } else {
         this.pause();
       }
+    },
+    playTogglesOnPlay: function(event){
+      this.each(this.elements.playToggles, function(toggle){
+        _V_.removeClass(toggle, "vjs-paused");
+        _V_.addClass(toggle, "vjs-playing");
+      });
+    },
+    playTogglesOnPause: function(event){
+      this.each(this.elements.playToggles, function(toggle){
+        _V_.removeClass(toggle, "vjs-playing");
+        _V_.addClass(toggle, "vjs-paused");
+      });
     }
   }
 );
@@ -1118,7 +1200,7 @@ VideoJS.player.newBehavior("pauseButton", function(element){
 /* Play Progress Bar Behaviors
 ================================================================================ */
 VideoJS.player.newBehavior("playProgressBar", function(element){
-    if (!this.playProgressBars) { 
+    if (!this.playProgressBars) {
       this.playProgressBars = [];
       this.onCurrentTimeUpdate(this.updatePlayProgressBars);
     }
@@ -1152,8 +1234,8 @@ VideoJS.player.newBehavior("loadProgressBar", function(element){
 /* Current Time Display Behaviors
 ================================================================================ */
 VideoJS.player.newBehavior("currentTimeDisplay", function(element){
-    if (!this.currentTimeDisplays) { 
-      this.currentTimeDisplays = []; 
+    if (!this.currentTimeDisplays) {
+      this.currentTimeDisplays = [];
       this.onCurrentTimeUpdate(this.updateCurrentTimeDisplays);
     }
     this.currentTimeDisplays.push(element);
@@ -1173,8 +1255,8 @@ VideoJS.player.newBehavior("currentTimeDisplay", function(element){
 /* Duration Display Behaviors
 ================================================================================ */
 VideoJS.player.newBehavior("durationDisplay", function(element){
-    if (!this.durationDisplays) { 
-      this.durationDisplays = []; 
+    if (!this.durationDisplays) {
+      this.durationDisplays = [];
       this.onCurrentTimeUpdate(this.updateDurationDisplays);
     }
     this.durationDisplays.push(element);
@@ -1215,9 +1297,9 @@ VideoJS.player.newBehavior("currentTimeScrubber", function(element){
       _V_.unblockTextSelection();
       document.removeEventListener("mousemove", this.onCurrentTimeScrubberMouseMove, false);
       document.removeEventListener("mouseup", this.onCurrentTimeScrubberMouseUp, false);
-      this.trackCurrentTime();
       if (this.videoWasPlaying) {
         this.play();
+        this.trackCurrentTime();
       }
     },
     setCurrentTimeWithScrubber: function(event){
@@ -1233,7 +1315,7 @@ VideoJS.player.newBehavior("currentTimeScrubber", function(element){
 /* Volume Display Behaviors
 ================================================================================ */
 VideoJS.player.newBehavior("volumeDisplay", function(element){
-    if (!this.volumeDisplays) { 
+    if (!this.volumeDisplays) {
       this.volumeDisplays = [];
       this.onVolumeChange(this.updateVolumeDisplays);
     }
@@ -1274,7 +1356,7 @@ VideoJS.player.newBehavior("volumeScrubber", function(element){
       _V_.addListener(document, "mousemove", this.onVolumeScrubberMouseMove.rEvtContext(this));
       _V_.addListener(document, "mouseup", this.onVolumeScrubberMouseUp.rEvtContext(this));
     },
-    onVolumeScrubberMouseMove: function(event){ 
+    onVolumeScrubberMouseMove: function(event){
       this.setVolumeWithScrubber(event);
     },
     onVolumeScrubberMouseUp: function(event){
@@ -1297,57 +1379,19 @@ VideoJS.player.newBehavior("fullscreenToggle", function(element){
     // When the user clicks on the fullscreen button, update fullscreen setting
     onFullscreenToggleClick: function(event){
       if (!this.videoIsFullScreen) {
-        this.fullscreenOn();
+        this.enterFullScreen();
       } else {
-        this.fullscreenOff();
+        this.exitFullScreen();
       }
     },
-    // Turn on fullscreen (window) mode
-    // Real fullscreen isn't available in browsers quite yet.
-    fullscreenOn: function(){
-      if (!this.nativeFullscreenOn()) {
-        this.videoIsFullScreen = true;
-        // Storing original doc overflow value to return to when fullscreen is off
-        this.docOrigOverflow = document.documentElement.style.overflow;
-        // Add listener for esc key to exit fullscreen
-        _V_.addListener(document, "keydown", this.fullscreenOnEscKey.rEvtContext(this));
-        // Add listener for a window resize
-        _V_.addListener(window, "resize", this.fullscreenOnWindowResize.rEvtContext(this));
-        // Hide any scroll bars
-        document.documentElement.style.overflow = 'hidden';
-        // Apply fullscreen styles
-        _V_.addClass(this.box, "vjs-fullscreen");
-        // Resize the box, controller, and poster
-        this.positionAll();
-      }
-    },
-    // If available use the native fullscreen
-    nativeFullscreenOn: function(){
-      if(this.supportsFullScreen()) {
-        return this.enterFullScreen();
-      } else {
-        return false;
-      }
-    },
-    // Turn off fullscreen (window) mode
-    fullscreenOff: function(){
-      this.videoIsFullScreen = false;
-      document.removeEventListener("keydown", this.fullscreenOnEscKey, false);
-      window.removeEventListener("resize", this.fullscreenOnWindowResize, false);
-      // Unhide scroll bars.
-      document.documentElement.style.overflow = this.docOrigOverflow;
-      // Remove fullscreen styles
-      _V_.removeClass(this.box, "vjs-fullscreen");
-      // Resize the box, controller, and poster to original sizes
-      this.positionAll();
-    },
+
     fullscreenOnWindowResize: function(event){ // Removeable
       this.positionControlBars();
     },
     // Create listener for esc key while in full screen mode
     fullscreenOnEscKey: function(event){ // Removeable
       if (event.keyCode == 27) {
-        this.fullscreenOff();
+        this.exitFullScreen();
       }
     }
   }
@@ -1355,24 +1399,24 @@ VideoJS.player.newBehavior("fullscreenToggle", function(element){
 /* Big Play Button Behaviors
 ================================================================================ */
 VideoJS.player.newBehavior("bigPlayButton", function(element){
-    if (!this.bigPlayButtons) {
-      this.bigPlayButtons = [];
+    if (!this.elements.bigPlayButtons) {
+      this.elements.bigPlayButtons = [];
       this.onPlay(this.bigPlayButtonsOnPlay);
       this.onEnded(this.bigPlayButtonsOnEnded);
     }
-    this.bigPlayButtons.push(element);
+    this.elements.bigPlayButtons.push(element);
     this.activateElement(element, "playButton");
   },{
     bigPlayButtonsOnPlay: function(event){ this.hideBigPlayButtons(); },
     bigPlayButtonsOnEnded: function(event){ this.showBigPlayButtons(); },
     showBigPlayButtons: function(){
-      this.each(this.bigPlayButtons, function(element){
-        element.style.display = "block"; 
+      this.each(this.elements.bigPlayButtons, function(element){
+        element.style.display = "block";
       });
     },
     hideBigPlayButtons: function(){
-      this.each(this.bigPlayButtons, function(element){
-        element.style.display = "none"; 
+      this.each(this.elements.bigPlayButtons, function(element){
+        element.style.display = "none";
       });
     }
   }
@@ -1442,37 +1486,60 @@ VideoJS.player.newBehavior("spinner", function(element){
 /* Subtitles
 ================================================================================ */
 VideoJS.player.newBehavior("subtitlesDisplay", function(element){
-    if (!this.subtitlesDisplays) { 
-      this.subtitlesDisplays = [];
-      _V_.addListener(this.video, "timeupdate", this.subtitlesDisplaysOnVideoTimeUpdate.context(this));
+    if (!this.subtitleDisplays) {
+      this.subtitleDisplays = [];
+      this.onCurrentTimeUpdate(this.subtitleDisplaysOnVideoTimeUpdate);
+      this.onEnded(function() { this.lastSubtitleIndex = 0; }.context(this));
     }
-    this.subtitlesDisplays.push(element);
+    this.subtitleDisplays.push(element);
   },{
-    subtitlesDisplaysOnVideoTimeUpdate: function(){
-      // show the subtitles
+    subtitleDisplaysOnVideoTimeUpdate: function(time){
+      // Assuming all subtitles are in order by time, and do not overlap
       if (this.subtitles) {
-        // var x = this.currentSubtitlePosition;
-        var x = 0;
-
-        while (x<this.subtitles.length && this.video.currentTime>this.subtitles[x].endTime) {
-          if (this.subtitles[x].showing) {
-            this.subtitles[x].showing = false;
-            this.updateSubtitlesDisplays("");
+        // If current subtitle should stay showing, don't do anything. Otherwise, find new subtitle.
+        if (!this.currentSubtitle || this.currentSubtitle.start >= time || this.currentSubtitle.end < time) {
+          var newSubIndex = false,
+              // Loop in reverse if lastSubtitle is after current time (optimization)
+              // Meaning the user is scrubbing in reverse or rewinding
+              reverse = (this.subtitles[this.lastSubtitleIndex].start > time),
+              // If reverse, step back 1 becase we know it's not the lastSubtitle
+              i = this.lastSubtitleIndex - (reverse) ? 1 : 0;
+          while (true) { // Loop until broken
+            if (reverse) { // Looping in reverse
+              // Stop if no more, or this subtitle ends before the current time (no earlier subtitles should apply)
+              if (i < 0 || this.subtitles[i].end < time) { break; }
+              // End is greater than time, so if start is less, show this subtitle
+              if (this.subtitles[i].start < time) {
+                newSubIndex = i;
+                break;
+              }
+              i--;
+            } else { // Looping forward
+              // Stop if no more, or this subtitle starts after time (no later subtitles should apply)
+              if (i >= this.subtitles.length || this.subtitles[i].start > time) { break; }
+              // Start is less than time, so if end is later, show this subtitle
+              if (this.subtitles[i].end > time) {
+                newSubIndex = i;
+                break;
+              }
+              i++;
+            }
           }
-          this.currentSubtitlePosition++;
-          x = this.currentSubtitlePosition;
-        }
 
-        if (this.currentSubtitlePosition>=this.subtitles.length) { return; }
-
-        if (this.video.currentTime>=this.subtitles[x].startTime && this.video.currentTime<=this.subtitles[x].endTime) {
-          this.updateSubtitlesDisplays(this.subtitles[x].text);
-          this.subtitles[x].showing = true;
+          // Set or clear current subtitle
+          if (newSubIndex !== false) {
+            this.currentSubtitle = this.subtitles[newSubIndex];
+            this.lastSubtitleIndex = newSubIndex;
+            this.updateSubtitleDisplays(this.currentSubtitle.text);
+          } else if (this.currentSubtitle) {
+            this.currentSubtitle = false;
+            this.updateSubtitleDisplays("");
+          }
         }
       }
     },
-    updateSubtitlesDisplays: function(val){
-      this.each(this.subtitlesDisplays, function(disp){
+    updateSubtitleDisplays: function(val){
+      this.each(this.subtitleDisplays, function(disp){
         disp.innerHTML = val;
       });
     }
@@ -1487,8 +1554,8 @@ VideoJS.player.newBehavior("subtitlesDisplay", function(element){
 VideoJS.extend({
 
   addClass: function(element, classToAdd){
-    if ((" "+element.className+" ").indexOf(" "+classToAdd+" ") == -1) { 
-      element.className = element.className === "" ? classToAdd : element.className + " " + classToAdd; 
+    if ((" "+element.className+" ").indexOf(" "+classToAdd+" ") == -1) {
+      element.className = element.className === "" ? classToAdd : element.className + " " + classToAdd;
     }
   },
   removeClass: function(element, classToRemove){
@@ -1539,7 +1606,7 @@ VideoJS.extend({
     if (!dec) { dec = 0; }
     return Math.round(num*Math.pow(10,dec))/Math.pow(10,dec);
   },
-  
+
   addListener: function(element, type, handler){
     if (element.addEventListener) {
       element.addEventListener(type, handler, false);
@@ -1574,6 +1641,8 @@ VideoJS.extend({
     }.context(this);
     request.send();
   },
+
+  trim: function(string){ return string.toString().replace(/^\s+/, "").replace(/\s+$/, ""); },
 
   // DOM Ready functionality adapted from jQuery. http://jquery.com/
   bindDOMReady: function(){

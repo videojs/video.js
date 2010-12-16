@@ -1,6 +1,6 @@
 VideoJS - [HTML5 Video Player](http://videojs.com)
 ==================================================
-Version 2.0.1
+Version 2.0.2
 
 View [VideoJS.com](http://videojs.com) for a demo and overview.
 
@@ -131,8 +131,15 @@ Coming Next
 
 Changelog
 ---------
-2.0.2 ()
+2.0.3
 
+- Feature: Setup method now has a callback, so you can more easily work with the player after setup
+- Changes: setupAllWhenReady is now just setupAll (backward compatible)
+
+2.0.2 (2010-12-10)
+
+- Feature: Rewrote and optimized subtitle code.
+- Feature: Protecting against volume ranges outside of 1 and 0.
 - Fix: Bug in Safari for Mac OS 10.5 (Leopard) that was breaking fullscreen.
 
 2.0.1 (2010-11-22)
