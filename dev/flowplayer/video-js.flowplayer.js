@@ -1,18 +1,34 @@
+if (typeof VideoJS.options == 'undefined') VideoJS.options = {};
+VideoJS.options.flashPlayer = "flowplayer";
 // INCLUDES A COPY OF THE FLOWPLAYER JAVASCRIPT LIBRARY
-VideoJS.options.flashPlayer = "flowplayer"; // Set default flash player to Flowplayer.
 VideoJS.flashPlayers.flowplayer = {
 
   flashPlayerVersion: 9,
 
   init: function(){
+    // add poster before initializing flowplayer
+    this.poster = false;
+    // ignore poster if autoplay is true
+    if (this.video.poster && !this.options.autoplay) {
+      // to make poster we set the image as the background
+      // and insert the big play button as a child.
+      this.poster = true;
+      this.flashElement.style.backgroundImage = 'url('+this.video.poster+')';
+      this.bigPlayButton = _V_.createElement("div", {
+        className: "vjs-big-play-button",
+        innerHTML: "<span></span>"
+      });
+      this.bigPlayButton.style.display = "block";
+      this.flashElement.appendChild(this.bigPlayButton);
+    }
+    
     this.flowplayer = flowplayer(this.flashElement, { 
         src: 'http://releases.flowplayer.org/swf/flowplayer-3.2.5.swf', 
         wmode: 'opaque'
       },
       {
-        clip: { autoPlay: false, scaling: "fit" },
+        clip: { autoPlay: (this.poster) ? true : this.options.autoplay, scaling: "fit" },
         plugins: { controls: { autoHide: "always" } },
-        autoPlay: this.options.autoPlay,
         onLoad: function() {}.context(this)
       }
     );

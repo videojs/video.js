@@ -8,6 +8,7 @@
   <script src="../src/video.js" type="text/javascript" charset="utf-8"></script>
   <script src="../src/html5.js" type="text/javascript" charset="utf-8"></script>
   <script src="../src/behaviors.js" type="text/javascript" charset="utf-8"></script>
+  <script src="../src/lib.js" type="text/javascript" charset="utf-8"></script>
 
   <!-- <script type="text/javascript" src="flowplayer-3.2.4.min.js"></script> -->
   <script type="text/javascript" src="video-js.flowplayer.js"></script>
@@ -98,7 +99,9 @@
   </div>
   <!-- End VideoJS -->
 
-  <a href="#" onclick="document.getElementById('example_video_1').currentTime = 10; return false;">Click</a>
+  <a href="#" onclick="document.getElementById('example_video_1').currentTime = 10; return false;">Click</a> /
+  <a href="#" onclick="myPlayer.pause(); return false;">Pause</a> /
+  <a href="#" onclick="myPlayer.play(); return false;">Play</a>
 
   <table id="attributes">
   </table>

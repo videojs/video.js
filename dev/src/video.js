@@ -106,20 +106,16 @@ var VideoJS = JRClass.extend({
   /* Helpers
   ================================================================================ */
   getPreloadAttribute: function(){
-    if (typeof this.video.hasAttribute == "function" && this.video.hasAttribute("preload")) {
-      var preload = this.video.getAttribute("preload");
-      // Only included the attribute, thinking it was boolean
-      if (preload === "" || preload === "true") { return "auto"; } 
-      if (preload === "false") { return "none"; }
-      return preload;
-    }
+    var preload = this.video.getAttribute("preload");
+    // Only included the attribute, thinking it was boolean
+    if (preload === null || preload === "" || preload === "true") { return "auto"; } 
+    if (preload === "false") { return "none"; }
+    return preload;
   },
   getAutoplayAttribute: function(){
-    if (typeof this.video.hasAttribute == "function" && this.video.hasAttribute("autoplay")) {
-      var autoplay = this.video.getAttribute("autoplay");
-      if (autoplay === "false") { return false; }
-      return true;
-    }
+    var autoplay = this.video.getAttribute("autoplay");
+    if (autoplay === null || autoplay === "false") { return false; }
+    return true;
   },
   // Calculates amoutn of buffer is full
   bufferedPercent: function(){ return (this.duration()) ? this.buffered()[1] / this.duration() : 0; },
