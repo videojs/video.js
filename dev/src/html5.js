@@ -12,6 +12,8 @@ VideoJS.fn.extend({
 
   html5Init: function(){
     this.element = this.video;
+    this.api = this.html5API;
+    this.api.setupTriggers.call(this);
 
     this.fixPreloading(); // Support old browsers that used autobuffer
     this.supportProgressEvents(); // Support browsers that don't use 'buffered'
@@ -104,15 +106,18 @@ VideoJS.fn.extend({
   // Listen for Video Load Progress (currently does not if html file is local)
   // Buffered does't work in all browsers, so watching progress as well
   supportProgressEvents: function(e){
-    _V_.addListener(this.video, 'progress', this.playerOnVideoProgress.context(this));
+    _V_.addListener(this.video, 'progress', this.setBufferedFromProgress.context(this));
   },
-  playerOnVideoProgress: function(event){
-    this.setBufferedFromProgress(event);
-  },
+  // playerOnVideoProgress: function(event){
+  //   this.setBufferedFromProgress(event);
+  // },
   setBufferedFromProgress: function(event){ // HTML5 Only
-    if(event.total > 0) {
+    if(event.total > 0 && this.duration()) {
       var newBufferEnd = (event.loaded / event.total) * this.duration();
-      if (newBufferEnd > this.values.bufferEnd) { this.values.bufferEnd = newBufferEnd; }
+      if (newBufferEnd > this.values.bufferEnd) {
+        this.values.bufferEnd = newBufferEnd;
+        this.triggerListeners("bufferedupdate");
+      }
     }
   },
 
@@ -411,153 +416,55 @@ VideoJS.fn.extend({
 
   /* Player API - Translate functionality from player to video
   ================================================================================ */
-  html5AddVideoListener: function(type, fn){ _V_.addListener(this.video, type, fn.rEvtContext(this)); },
+  html5API: {
+    setupTriggers: function(){
+      // Make video events trigger player events
+      // May seem verbose here, but makes other APIs possible.
+      var types = ["play", "pause", "ended", "volumechange", "error"],
+          player = this, i, type;
+      for (i = 0; i<types.length; i++) {
+        type = types[i];
+        _V_.addListener(this.video, type, function(e){
+          player.triggerListeners(this, e);
+        }.context(type));
+      }
+    },
 
-  play: function(){
-    this.video.play();
-    return this;
-  },
-  onPlay: function(fn){ this.html5AddVideoListener("play", fn); return this; },
+    play: function(){ this.video.play(); },
+    pause: function(){ this.video.pause(); },
+    paused: function(){ return this.video.paused; },
 
-  pause: function(){
-    this.video.pause();
-    return this;
-  },
-  onPause: function(fn){ this.html5AddVideoListener("pause", fn); return this; },
-  paused: function() { return this.video.paused; },
-
-  currentTime: function(seconds){
-    if (seconds !== undefined) {
+    currentTime: function(){ return this.video.currentTime; },
+    setCurrentTime: function(seconds){
       try { this.video.currentTime = seconds; }
       catch(e) { this.warning(VideoJS.warnings.videoNotReady); }
-      this.values.currentTime = seconds;
-      return this;
-    }
-    return this.video.currentTime;
-  },
-  onCurrentTimeUpdate: function(fn){
-    this.currentTimeListeners.push(fn);
-  },
+    },
 
-  onEnded: function(fn){
-    this.html5AddVideoListener("ended", fn); return this;
-  },
+    duration: function(){ return this.video.duration; },
+    buffered: function(){ return this.video.buffered; },
 
-  duration: function(){
-    return this.video.duration;
-  },
+    volume: function(){ return this.video.volume; },
+    setVolume: function(percentAsDecimal){ this.video.volume = percentAsDecimal; },
 
-  buffered: function(){
-    // Storing values allows them be overridden by setBufferedFromProgress
-    if (this.values.bufferStart === undefined) {
-      this.values.bufferStart = 0;
-      this.values.bufferEnd = 0;
-    }
-    if (this.video.buffered && this.video.buffered.length > 0) {
-      var newEnd = this.video.buffered.end(0);
-      if (newEnd > this.values.bufferEnd) { this.values.bufferEnd = newEnd; }
-    }
-    return [this.values.bufferStart, this.values.bufferEnd];
-  },
+    width: function(){ return this.video.offsetWidth; },
+    height: function(){ return this.video.offsetHeight; },
 
-  volume: function(percentAsDecimal){
-    if (percentAsDecimal !== undefined) {
-      // Force value to between 0 and 1
-      this.values.volume = Math.max(0, Math.min(1, parseFloat(percentAsDecimal)));
-      this.video.volume = this.values.volume;
-      this.setLocalStorage("volume", this.values.volume);
-      return this;
-    }
-    if (this.values.volume) { return this.values.volume; }
-    return this.video.volume;
-  },
-  onVolumeChange: function(fn){ _V_.addListener(this.video, 'volumechange', fn.rEvtContext(this)); },
-
-  width: function(width){
-    if (width !== undefined) {
-      this.video.width = width; // Not using style so it can be overridden on fullscreen.
-      this.box.style.width = width+"px";
-      this.triggerResizeListeners();
-      return this;
-    }
-    return this.video.offsetWidth;
-  },
-  height: function(height){
-    if (height !== undefined) {
-      this.video.height = height;
-      this.box.style.height = height+"px";
-      this.triggerResizeListeners();
-      return this;
-    }
-    return this.video.offsetHeight;
-  },
-
-  supportsFullScreen: function(){
-    if(typeof this.video.webkitEnterFullScreen == 'function') {
-      // Seems to be broken in Chromium/Chrome
-      if (!navigator.userAgent.match("Chrome") && !navigator.userAgent.match("Mac OS X 10.5")) {
-        return true;
+    supportsFullScreen: function(){
+      if(typeof this.video.webkitEnterFullScreen == 'function') {
+        // Seems to be broken in Chromium/Chrome && Safari in Leopard
+        if (!navigator.userAgent.match("Chrome") && !navigator.userAgent.match("Mac OS X 10.5")) {
+          return true;
+        }
+      }
+      return false;
+    },
+    enterFullScreen: function(){
+      try {
+        this.video.webkitEnterFullScreen();
+      } catch (e) {
+        if (e.code == 11) { this.warning(VideoJS.warnings.videoNotReady); }
       }
     }
-    return false;
-  },
-
-  html5EnterNativeFullScreen: function(){
-    try {
-      this.video.webkitEnterFullScreen();
-    } catch (e) {
-      if (e.code == 11) { this.warning(VideoJS.warnings.videoNotReady); }
-    }
-    return this;
-  },
-
-  // Turn on fullscreen (window) mode
-  // Real fullscreen isn't available in browsers quite yet.
-  enterFullScreen: function(){
-    if (this.supportsFullScreen()) {
-      this.html5EnterNativeFullScreen();
-    } else {
-      this.enterFullWindow();
-    }
-  },
-
-  exitFullScreen: function(){
-    if (this.supportsFullScreen()) {
-      // Shouldn't be called
-    } else {
-      this.exitFullWindow();
-    }
-  },
-
-  enterFullWindow: function(){
-    this.videoIsFullScreen = true;
-    // Storing original doc overflow value to return to when fullscreen is off
-    this.docOrigOverflow = document.documentElement.style.overflow;
-    // Add listener for esc key to exit fullscreen
-    _V_.addListener(document, "keydown", this.fullscreenOnEscKey.rEvtContext(this));
-    // Add listener for a window resize
-    _V_.addListener(window, "resize", this.fullscreenOnWindowResize.rEvtContext(this));
-    // Hide any scroll bars
-    document.documentElement.style.overflow = 'hidden';
-    // Apply fullscreen styles
-    _V_.addClass(this.box, "vjs-fullscreen");
-    // Resize the box, controller, and poster
-    this.positionAll();
-  },
-
-  // Turn off fullscreen (window) mode
-  exitFullWindow: function(){
-    this.videoIsFullScreen = false;
-    document.removeEventListener("keydown", this.fullscreenOnEscKey, false);
-    window.removeEventListener("resize", this.fullscreenOnWindowResize, false);
-    // Unhide scroll bars.
-    document.documentElement.style.overflow = this.docOrigOverflow;
-    // Remove fullscreen styles
-    _V_.removeClass(this.box, "vjs-fullscreen");
-    // Resize the box, controller, and poster to original sizes
-    this.positionAll();
-  },
-
-  onError: function(fn){ this.html5AddVideoListener("error", fn); return this; },
+  }
 });
 

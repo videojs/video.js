@@ -133,6 +133,9 @@ Changelog
 ---------
 2.0.3
 
+- Feature: Made returning to the start at the end of the movie an option ("returnToStart").
+- Feature: Added loop option to loop movie ("loop").
+- Feature: Reorganized player API and listeners.
 - Feature: Setup method now has a callback, so you can more easily work with the player after setup
 - Changes: setupAllWhenReady is now just setupAll (backward compatible)
 

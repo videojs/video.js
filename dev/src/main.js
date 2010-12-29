@@ -14,17 +14,24 @@ var VideoJS = JRClass.extend({
     } else {
       this.video = element;
     }
-    // Store reference to player on the video element.
-    // So you can acess the player later: document.getElementById("video_id").player.play();
-    this.video.player = this;
+
+    this.video.player = this; // Store reference to player on the video element.
+    this.box = this.video.parentNode; // Container element for controls positioning
     this.values = {}; // Cache video values.
     this.elements = {}; // Store refs to controls elements.
-    this.api = {}; // API to video functions
+    this.listeners = {}; // Store video event listeners.
+    this.api = {}; // Current API to video functions (changes with player type)
+
+    // Hide Links. Will be shown again if "links" player is used
+    this.linksFallback = this.getLinksFallback();
+    this.hideLinksFallback();
 
     // Default Options
     this.options = {
       autoplay: false,
       preload: true,
+      loop: false,
+      returnToStart: true,
       useBuiltInControls: false, // Use the browser's controls (iPhone)
       controlsBelow: false, // Display control bar below video vs. in front of
       controlsAtStart: false, // Make controls visible when page loads
@@ -41,11 +48,6 @@ var VideoJS = JRClass.extend({
     // Override preload & autoplay with video attributes
     if (this.getPreloadAttribute() !== undefined) { this.options.preload = this.getPreloadAttribute(); }
     if (this.getAutoplayAttribute() !== undefined) { this.options.autoplay = this.getAutoplayAttribute(); }
-
-    // Store reference to embed code pieces
-    this.box = this.video.parentNode;
-    this.linksFallback = this.getLinksFallback();
-    this.hideLinksFallback(); // Will be shown again if "links" player is used
 
     // Loop through the player names list in options, "html5" etc.
     // For each player name, initialize the player with that name under VideoJS.players
@@ -122,8 +124,6 @@ var VideoJS = JRClass.extend({
       return true;
     }
   },
-  // Calculates amoutn of buffer is full
-  bufferedPercent: function(){ return (this.duration()) ? this.buffered()[1] / this.duration() : 0; },
   // Each that maintains player as context
   // Break if true is returned
   each: function(arr, fn){
@@ -132,6 +132,7 @@ var VideoJS = JRClass.extend({
       if (fn.call(this, arr[i], i)) { break; }
     }
   },
+  // Add functions to the player
   extend: function(obj){
     for (var attrname in obj) {
       if (obj.hasOwnProperty(attrname)) { this[attrname]=obj[attrname]; }

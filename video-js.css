@@ -51,6 +51,23 @@ so you can upgrade to newer versions easier. */
   bottom: 0px; /* Distance from the bottom of the box/video. Keep 0. Use height to add more bottom margin. */
   height: 35px; /* Including any margin you want above or below control items */
   padding: 0; /* Controls are absolutely position, so no padding necessary */
+  -webkit-transition: opacity 0.5s linear;
+  -moz-transition: opacity 0.5s linear;
+  -o-transition: opacity 0.5s linear;
+  -ms-transition: opacity 0.5s linear;
+  transition: opacity 0.5s linear;
+}
+
+.vjs-hide {
+  opacity: 0;
+  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"; /* IE8 */
+  filter: alpha(opacity=0); /* IE5-7 */
+}
+
+.vjs-show {
+  opacity: 1;
+  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=100)"; /* IE8 */
+  filter: alpha(opacity=100); /* IE5-7 */
 }
 
 .video-js-box .vjs-controls > div { /* Direct div children of control bar */

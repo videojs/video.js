@@ -12,9 +12,10 @@ VideoJS.fn.extend({
     this.replaceWithFlash();
     this.element = this.flashElement;
     this.video.src = ""; // Stop video from downloading if HTML5 is still supported
-    var flashPlayerType = VideoJS.flashPlayers[this.options.flashPlayer];
-    this.extend(flashPlayerType.api);
-    (flashPlayerType.init.context(this))();
+    var flashPlayer = VideoJS.flashPlayers[this.options.flashPlayer];
+    flashPlayer.init.call(this);
+    this.api = flashPlayer.api;
+    this.api.setupTriggers.call(this);
   },
 
   // Get Flash Fallback object element from Embed Code
@@ -43,32 +44,12 @@ VideoJS.fn.extend({
   }
 });
 
-/* Flash Object Fallback (Flash Player Type)
+/* Flash Object Fallback (Flash Player)
 ================================================================================ */
 VideoJS.flashPlayers = {};
 VideoJS.flashPlayers.htmlObject = {
   flashPlayerVersion: 9,
   init: function() { return true; },
-  api: { // No video API available with HTML Object embed method
-
-    width: function(width){
-      if (width !== undefined) {
-        this.element.width = width;
-        this.box.style.width = width+"px";
-        this.triggerResizeListeners();
-        return this;
-      }
-      return this.element.width;
-    },
-
-    height: function(height){
-      if (height !== undefined) {
-        this.element.height = height;
-        this.box.style.height = height+"px";
-        this.triggerResizeListeners();
-        return this;
-      }
-      return this.element.height;
-    }
-  }
+  api: {} // No video API available with HTML Object embed method
 };
+

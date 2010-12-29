@@ -75,6 +75,9 @@ VideoJS.extend({
   },
 
   get: function(url, onSuccess){
+    // if (netscape.security.PrivilegeManager.enablePrivilege) {
+    //   netscape.security.PrivilegeManager.enablePrivilege("UniversalBrowserRead");
+    // }
     if (typeof XMLHttpRequest == "undefined") {
       XMLHttpRequest = function () {
         try { return new ActiveXObject("Msxml2.XMLHTTP.6.0"); } catch (e) {}
@@ -91,7 +94,11 @@ VideoJS.extend({
         onSuccess(request.responseText);
       }
     }.context(this);
-    request.send();
+    try {
+      request.send();
+    } catch(e) {
+      // Can't access file.
+    }
   },
 
   trim: function(string){ return string.toString().replace(/^\s+/, "").replace(/\s+$/, ""); },

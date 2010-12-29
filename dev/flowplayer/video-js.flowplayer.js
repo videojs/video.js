@@ -20,80 +20,43 @@ VideoJS.flashPlayers.flowplayer = {
   },
 
   api: {
-    play: function(){ this.flowplayer.play(); return this; },
-    onPlay: function(fn){
-      this.flowplayer.onStart(fn.context(this));
-      this.flowplayer.onResume(fn.context(this));
-      return this; 
+
+    setupTriggers: function(){
+      this.flowplayer.onStart(function(e){ this.triggerListeners("play", e); }.context(this));
+      this.flowplayer.onResume(function(e){ this.triggerListeners("play", e); }.context(this));
+      this.flowplayer.onPause(function(e){ this.triggerListeners("pause", e); }.context(this));
+      this.flowplayer.onVolume(function(e){ this.triggerListeners("volumechange", e); }.context(this));
+      this.flowplayer.onError(function(e){ this.triggerListeners("error", e); }.context(this));
     },
 
-    pause: function(){ this.flowplayer.pause(); return this; },
-    onPause: function(fn){ 
-      this.flowplayer.onPause(fn.context(this));
-      return this;
-    },
+    play: function(){ this.flowplayer.play(); },
+    pause: function(){ this.flowplayer.pause(); },
     paused: function(){ 
       return !this.flowplayer.isPlaying(); // More accurate than isPaused
     },
 
-    currentTime: function(seconds){
-      if (seconds !== undefined) { 
-        this.flowplayer.seek(seconds); 
-        return this;
-      }
-      return this.flowplayer.getTime();
-    },
+    currentTime: function(){ return this.flowplayer.getTime(); },
+    setCurrentTime: function(seconds){ this.flowplayer.seek(seconds); },
 
     duration: function(){
       var clip = this.flowplayer.getClip();
-      if (clip) { return clip.duration; }
+      return (clip) ? clip.duration : 0;
     },
-    
+
     buffered: function(){
       var status = this.flowplayer.getStatus();
-      return [status.bufferStart, status.bufferEnd]
+      return this.createTimeRange(status.bufferStart, status.bufferEnd);
     },
 
-    volume: function(percentAsDecimal){
-      if (percentAsDecimal !== undefined) {
-        this.values.volume = parseFloat(percentAsDecimal);
-        this.flowplayer.setVolume(parseInt(percentAsDecimal * 100));
-        this.setLocalStorage("volume", this.values.volume);
-        return this;
-      }
-      return this.flowplayer.getVolume() / 100;
-    },
-    onVolumeChange: function(fn){ this.flowplayer.onVolume(fn.context(this)); return this; },
-
-    width: function(width){
-      if (width !== undefined) {
-        this.flashElement.width = width;
-        this.box.style.width = width+"px";
-        this.triggerResizeListeners();
-        return this;
-      }
-      return parseInt(this.flashElement.getAttribute("width"));
-    },
-    height: function(height){
-      if (height !== undefined) {
-        this.flashElement.height = height;
-        this.box.style.height = height+"px";
-        this.triggerResizeListeners();
-        return this;
-      }
-      return parseInt(this.flashElement.getAttribute("height"));
-    },
+    volume: function(){ return this.flowplayer.getVolume() / 100; },
+    setVolume: function(percentAsDecimal){ this.flowplayer.setVolume(parseInt(percentAsDecimal * 100)); },
 
     supportsFullScreen: function(){
       return false; // Flash does not allow fullscreen through javascript
       // Maybe at click listener, and say "click screen".
     },
-    enterFullScreen: function(){
-      this.flowplayer.toggleFullscreen();
-      return this;
-    },
+    enterFullScreen: function(){ this.flowplayer.toggleFullscreen(); },
 
-    onError: function(fn){ this.flowplayer.onError(fn); return this; },
     readError: function(eventArguments){
       var errorCode = arguments[0],
           errorMessage = arguments[1];

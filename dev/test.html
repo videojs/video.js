@@ -5,8 +5,10 @@
   <title>HTML5 Video Player</title>
 
   <!-- Include the VideoJS Library -->
-  <script src="src/video.js" type="text/javascript" charset="utf-8"></script>
+  <script src="src/main.js" type="text/javascript" charset="utf-8"></script>
+  <script src="src/api.js" type="text/javascript" charset="utf-8"></script>
   <script src="src/html5.js" type="text/javascript" charset="utf-8"></script>
+  <script src="src/flash.js" type="text/javascript" charset="utf-8"></script>
   <script src="src/behaviors.js" type="text/javascript" charset="utf-8"></script>
   <script src="src/lib.js" type="text/javascript" charset="utf-8"></script>
   <script src="src/video-js.jquery.js" type="text/javascript" charset="utf-8"></script>
@@ -80,11 +82,11 @@
   
   <div class="video-js-box">
     <!-- Using the Video for Everybody Embed Code http://camendesign.com/code/video_for_everybody -->
-    <video data-subtitles="../demo-subtitles.srt" id="example_video_1" class="video-js" width="640" height="264" controls="controls" preload="none" poster="http://video-js.zencoder.com/oceans-clip.png">
+    <video id="example_video_1" class="video-js" width="640" height="264" controls="controls" preload="auto" poster="http://video-js.zencoder.com/oceans-clip.png">
       <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
       <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm; codecs="vp8, vorbis"' />
       <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg; codecs="theora, vorbis"' />
-      <track kind="subtitles" src="demo-subtitles.srt" srclang="en-US" label="English"></track>
+      <track kind="subtitles" src="../demo-subtitles.srt" srclang="en-US" label="English"></track>
       <!-- Flash Fallback. Use any flash video player here. Make sure to keep the vjs-flash-fallback class. -->
       <object id="flash_fallback_1" class="vjs-flash-fallback" width="640" height="264" type="application/x-shockwave-flash"
         data="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf">
@@ -109,11 +111,10 @@
 
   <div class="video-js-box">
     <!-- Using the Video for Everybody Embed Code http://camendesign.com/code/video_for_everybody -->
-    <video data-subtitles="../demo-subtitles.srt" id="example_video_2" class="video-js" width="640" height="264" controls="controls" preload="none" poster="http://video-js.zencoder.com/oceans-clip.png">
+    <!-- <video id="example_video_2" class="video-jsnot" width="640" height="264" controls="controls" preload="none" poster="http://video-js.zencoder.com/oceans-clip.png"> -->
       <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
       <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm; codecs="vp8, vorbis"' />
       <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg; codecs="theora, vorbis"' />
-      <track kind="subtitles" src="demo-subtitles.srt" srclang="en-US" label="English"></track>
       <!-- Flash Fallback. Use any flash video player here. Make sure to keep the vjs-flash-fallback class. -->
       <object id="flash_fallback_1" class="vjs-flash-fallback" width="640" height="264" type="application/x-shockwave-flash"
         data="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf">
@@ -124,7 +125,7 @@
         <img src="http://video-js.zencoder.com/oceans-clip.png" width="640" height="264" alt="Poster Image"
           title="No video playback capabilities." />
       </object>
-    </video>
+    <!-- </video> -->
     <!-- Download links provided for devices that can't play video in the browser. -->
     <p class="vjs-no-video"><strong>Download Video:</strong>
       <a href="http://video-js.zencoder.com/oceans-clip.mp4">MP4</a>,

@@ -6,82 +6,61 @@
 /* Player Behaviors - How VideoJS reacts to what the video is doing.
 ================================================================================ */
 VideoJS.fn.newBehavior("player", function(player){
-    this.onError(this.playerOnVideoError);
-    // Listen for when the video is played
-    this.onPlay(this.playerOnVideoPlay);
-    this.onPlay(this.trackCurrentTime);
-    // Listen for when the video is paused
-    this.onPause(this.playerOnVideoPause);
-    this.onPause(this.stopTrackingCurrentTime);
-    // Listen for when the video ends
-    this.onEnded(this.playerOnVideoEnded);
-    // Set interval for load progress using buffer watching method
-    // this.trackCurrentTime();
+    this.addListener("error", this.playerOnVideoError);
+    this.addListener("play", this.playerOnVideoPlay);
+    this.addListener("play", this.trackCurrentTime);
+    this.addListener("pause", this.stopTrackingCurrentTime);
+    this.addListener("ended", this.playerOnVideoEnded);
     this.trackBuffered();
-    // Buffer Full
-    this.onBufferedUpdate(this.isBufferFull);
+    this.addListener("bufferedupdate", this.bufferFull);
   },{
     playerOnVideoError: function(event){
       this.log(event);
       this.log(this.video.error);
     },
     playerOnVideoPlay: function(event){ this.hasPlayed = true; },
-    playerOnVideoPause: function(event){},
     playerOnVideoEnded: function(event){
-      this.currentTime(0);
-      this.pause();
+      if (this.options.loop) {
+        this.currentTime(0);
+        this.play();
+      } else if (this.options.returnToStart) {
+        this.currentTime(0);
+        this.pause();
+      }
     },
 
     /* Load Tracking -------------------------------------------------------------- */
     // Buffer watching method for load progress.
     // Used for browsers that don't support the progress event
     trackBuffered: function(){
-      this.bufferedInterval = setInterval(this.triggerBufferedListeners.context(this), 500);
+      this.bufferedInterval = setInterval(function(){
+        // Don't trigger unless
+        if (this.values.bufferEnd < this.buffered().end(0)) {
+          this.triggerListeners("bufferedupdate");
+        }
+      }.context(this), 500);
     },
     stopTrackingBuffered: function(){ clearInterval(this.bufferedInterval); },
-    bufferedListeners: [],
-    onBufferedUpdate: function(fn){
-      this.bufferedListeners.push(fn);
-    },
-    triggerBufferedListeners: function(){
-      this.isBufferFull();
-      this.each(this.bufferedListeners, function(listener){
-        (listener.context(this))();
-      });
-    },
-    isBufferFull: function(){
-      if (this.bufferedPercent() == 1) { this.stopTrackingBuffered(); }
+    bufferFull: function(){
+      if (this.bufferedPercent() == 1) {
+        this.stopTrackingBuffered();
+      }
     },
 
     /* Time Tracking -------------------------------------------------------------- */
     trackCurrentTime: function(){
       if (this.currentTimeInterval) { clearInterval(this.currentTimeInterval); }
-      this.currentTimeInterval = setInterval(this.triggerCurrentTimeListeners.context(this), 100); // 42 = 24 fps
+
+      this.currentTimeInterval = setInterval(function(){
+        this.triggerListeners("timeupdate");
+      }.context(this), 100); // 42 = 24 fps
+
       this.trackingCurrentTime = true;
     },
     // Turn off play progress tracking (when paused or dragging)
     stopTrackingCurrentTime: function(){
       clearInterval(this.currentTimeInterval);
       this.trackingCurrentTime = false;
-    },
-    currentTimeListeners: [],
-    // onCurrentTimeUpdate is in API section now
-    triggerCurrentTimeListeners: function(late, newTime){ // FF passes milliseconds late as the first argument
-      this.each(this.currentTimeListeners, function(listener){
-        (listener.context(this))(newTime || this.currentTime());
-      });
-    },
-
-    /* Resize Tracking -------------------------------------------------------------- */
-    resizeListeners: [],
-    onResize: function(fn){
-      this.resizeListeners.push(fn);
-    },
-    // Trigger anywhere the video/box size is changed.
-    triggerResizeListeners: function(){
-      this.each(this.resizeListeners, function(listener){
-        (listener.context(this))();
-      });
     }
   }
 );
@@ -116,8 +95,8 @@ VideoJS.fn.newBehavior("box", function(element){
     this.positionBox();
     _V_.addClass(element, "vjs-paused");
     this.activateElement(element, "mouseOverVideoReporter");
-    this.onPlay(this.boxOnVideoPlay);
-    this.onPause(this.boxOnVideoPause);
+    this.addListener("play", this.boxOnVideoPlay);
+    this.addListener("pause", this.boxOnVideoPause);
   },{
     boxOnVideoPlay: function(){
       _V_.removeClass(this.box, "vjs-paused");
@@ -134,9 +113,9 @@ VideoJS.fn.newBehavior("box", function(element){
 VideoJS.fn.newBehavior("poster", function(element){
     this.activateElement(element, "mouseOverVideoReporter");
     this.activateElement(element, "playButton");
-    this.onPlay(this.hidePoster);
-    this.onEnded(this.showPoster);
-    this.onResize(this.positionPoster);
+    this.addListener("play", this.hidePoster);
+    this.addListener("ended", this.showPoster);
+    this.addListener("resize", this.positionPoster);
   },{
     showPoster: function(){
       if (!this.poster) { return; }
@@ -168,7 +147,7 @@ VideoJS.fn.newBehavior("poster", function(element){
 VideoJS.fn.newBehavior("controlBar", function(element){
     if (!this.controlBars) {
       this.controlBars = [];
-      this.onResize(this.positionControlBars);
+      this.addListener("resize", this.positionControlBars);
     }
     this.controlBars.push(element);
     _V_.addListener(element, "mousemove", this.onControlBarsMouseMove.context(this));
@@ -177,6 +156,7 @@ VideoJS.fn.newBehavior("controlBar", function(element){
     showControlBars: function(){
       if (!this.options.controlsAtStart && !this.hasPlayed) { return; }
       this.each(this.controlBars, function(bar){
+        // bar.style.opacity = 1;
         bar.style.display = "block";
       });
     },
@@ -188,6 +168,7 @@ VideoJS.fn.newBehavior("controlBar", function(element){
     hideControlBars: function(){
       if (this.options.controlsHiding && !this.mouseIsOverControls) {
         this.each(this.controlBars, function(bar){
+          // bar.style.opacity = 0;
           bar.style.display = "none";
         });
       }
@@ -205,8 +186,8 @@ VideoJS.fn.newBehavior("controlBar", function(element){
 VideoJS.fn.newBehavior("playToggle", function(element){
     if (!this.elements.playToggles) {
       this.elements.playToggles = [];
-      this.onPlay(this.playTogglesOnPlay);
-      this.onPause(this.playTogglesOnPause);
+      this.addListener("play", this.playTogglesOnPlay);
+      this.addListener("pause", this.playTogglesOnPause);
     }
     this.elements.playToggles.push(element);
     _V_.addListener(element, "click", this.onPlayToggleClick.context(this));
@@ -249,17 +230,17 @@ VideoJS.fn.newBehavior("pauseButton", function(element){
 /* Play Progress Bar Behaviors
 ================================================================================ */
 VideoJS.fn.newBehavior("playProgressBar", function(element){
-    if (!this.playProgressBars) {
-      this.playProgressBars = [];
-      this.onCurrentTimeUpdate(this.updatePlayProgressBars);
+    if (!this.elements.playProgressBars) {
+      this.elements.playProgressBars = [];
+      this.addListener("timeupdate", this.updatePlayProgressBars);
     }
-    this.playProgressBars.push(element);
+    this.elements.playProgressBars.push(element);
   },{
     // Ajust the play progress bar's width based on the current play time
     updatePlayProgressBars: function(newTime){
-      var progress = (newTime !== undefined) ? newTime / this.duration() : this.currentTime() / this.duration();
+      var progress = (this.scrubbing) ? this.values.currentTime / this.duration() : this.currentTime() / this.duration();
       if (isNaN(progress)) { progress = 0; }
-      this.each(this.playProgressBars, function(bar){
+      this.each(this.elements.playProgressBars, function(bar){
         if (bar.style) { bar.style.width = _V_.round(progress * 100, 2) + "%"; }
       });
     }
@@ -268,12 +249,12 @@ VideoJS.fn.newBehavior("playProgressBar", function(element){
 /* Load Progress Bar Behaviors
 ================================================================================ */
 VideoJS.fn.newBehavior("loadProgressBar", function(element){
-    if (!this.loadProgressBars) { this.loadProgressBars = []; }
-    this.loadProgressBars.push(element);
-    this.onBufferedUpdate(this.updateLoadProgressBars);
+    if (!this.elements.loadProgressBars) { this.elements.loadProgressBars = []; }
+    this.elements.loadProgressBars.push(element);
+    this.addListener("bufferedupdate", this.updateLoadProgressBars);
   },{
     updateLoadProgressBars: function(){
-      this.each(this.loadProgressBars, function(bar){
+      this.each(this.elements.loadProgressBars, function(bar){
         if (bar.style) { bar.style.width = _V_.round(this.bufferedPercent() * 100, 2) + "%"; }
       });
     }
@@ -283,18 +264,17 @@ VideoJS.fn.newBehavior("loadProgressBar", function(element){
 /* Current Time Display Behaviors
 ================================================================================ */
 VideoJS.fn.newBehavior("currentTimeDisplay", function(element){
-    if (!this.currentTimeDisplays) {
-      this.currentTimeDisplays = [];
-      this.onCurrentTimeUpdate(this.updateCurrentTimeDisplays);
+    if (!this.elements.currentTimeDisplays) {
+      this.elements.currentTimeDisplays = [];
+      this.addListener("timeupdate", this.updateCurrentTimeDisplays);
     }
-    this.currentTimeDisplays.push(element);
+    this.elements.currentTimeDisplays.push(element);
   },{
     // Update the displayed time (00:00)
     updateCurrentTimeDisplays: function(newTime){
-      if (!this.currentTimeDisplays) { return; }
       // Allows for smooth scrubbing, when player can't keep up.
-      var time = (newTime) ? newTime : this.currentTime();
-      this.each(this.currentTimeDisplays, function(dis){
+      var time = (this.scrubbing) ? this.values.currentTime : this.currentTime();
+      this.each(this.elements.currentTimeDisplays, function(dis){
         dis.innerHTML = _V_.formatTime(time);
       });
     }
@@ -304,15 +284,14 @@ VideoJS.fn.newBehavior("currentTimeDisplay", function(element){
 /* Duration Display Behaviors
 ================================================================================ */
 VideoJS.fn.newBehavior("durationDisplay", function(element){
-    if (!this.durationDisplays) {
-      this.durationDisplays = [];
-      this.onCurrentTimeUpdate(this.updateDurationDisplays);
+    if (!this.elements.durationDisplays) {
+      this.elements.durationDisplays = [];
+      this.addListener("timeupdate", this.updateDurationDisplays);
     }
-    this.durationDisplays.push(element);
+    this.elements.durationDisplays.push(element);
   },{
     updateDurationDisplays: function(){
-      if (!this.durationDisplays) { return; }
-      this.each(this.durationDisplays, function(dis){
+      this.each(this.elements.durationDisplays, function(dis){
         if (this.duration()) { dis.innerHTML = _V_.formatTime(this.duration()); }
       });
     }
@@ -330,6 +309,7 @@ VideoJS.fn.newBehavior("currentTimeScrubber", function(element){
       this.currentScrubber = scrubber;
 
       this.stopTrackingCurrentTime(); // Allows for smooth scrubbing
+      this.scrubbing = true;
 
       this.videoWasPlaying = !this.paused();
       this.pause();
@@ -346,6 +326,7 @@ VideoJS.fn.newBehavior("currentTimeScrubber", function(element){
       _V_.unblockTextSelection();
       document.removeEventListener("mousemove", this.onCurrentTimeScrubberMouseMove, false);
       document.removeEventListener("mouseup", this.onCurrentTimeScrubberMouseUp, false);
+      this.scrubbing = false;
       if (this.videoWasPlaying) {
         this.play();
         this.trackCurrentTime();
@@ -354,28 +335,28 @@ VideoJS.fn.newBehavior("currentTimeScrubber", function(element){
     setCurrentTimeWithScrubber: function(event){
       var newProgress = _V_.getRelativePosition(event.pageX, this.currentScrubber);
       var newTime = newProgress * this.duration();
-      this.triggerCurrentTimeListeners(0, newTime); // Allows for smooth scrubbing
       // Don't let video end while scrubbing.
       if (newTime == this.duration()) { newTime = newTime - 0.1; }
       this.currentTime(newTime);
+      this.triggerListeners("timeupdate");
     }
   }
 );
 /* Volume Display Behaviors
 ================================================================================ */
 VideoJS.fn.newBehavior("volumeDisplay", function(element){
-    if (!this.volumeDisplays) {
-      this.volumeDisplays = [];
-      this.onVolumeChange(this.updateVolumeDisplays);
+    if (!this.elements.volumeDisplays) {
+      this.elements.volumeDisplays = [];
+      this.addListener("volumechange", this.updateVolumeDisplays);
     }
-    this.volumeDisplays.push(element);
+    this.elements.volumeDisplays.push(element);
     this.updateVolumeDisplay(element); // Set the display to the initial volume
   },{
     // Update the volume control display
     // Unique to these default controls. Uses borders to create the look of bars.
     updateVolumeDisplays: function(){
-      if (!this.volumeDisplays) { return; }
-      this.each(this.volumeDisplays, function(dis){
+      if (!this.elements.volumeDisplays) { return; }
+      this.each(this.elements.volumeDisplays, function(dis){
         this.updateVolumeDisplay(dis);
       });
     },
@@ -450,14 +431,12 @@ VideoJS.fn.newBehavior("fullscreenToggle", function(element){
 VideoJS.fn.newBehavior("bigPlayButton", function(element){
     if (!this.elements.bigPlayButtons) {
       this.elements.bigPlayButtons = [];
-      this.onPlay(this.bigPlayButtonsOnPlay);
-      this.onEnded(this.bigPlayButtonsOnEnded);
+      this.addListener("play", this.hideBigPlayButtons);
+      this.addListener("ended", this.showBigPlayButtons);
     }
     this.elements.bigPlayButtons.push(element);
     this.activateElement(element, "playButton");
   },{
-    bigPlayButtonsOnPlay: function(event){ this.hideBigPlayButtons(); },
-    bigPlayButtonsOnEnded: function(event){ this.showBigPlayButtons(); },
     showBigPlayButtons: function(){
       this.each(this.elements.bigPlayButtons, function(element){
         element.style.display = "block";
@@ -475,6 +454,7 @@ VideoJS.fn.newBehavior("bigPlayButton", function(element){
 VideoJS.fn.newBehavior("spinner", function(element){
     if (!this.spinners) {
       this.spinners = [];
+      this.spinnersRotated = 0;
       _V_.addListener(this.video, "loadeddata", this.spinnersOnVideoLoadedData.context(this));
       _V_.addListener(this.video, "loadstart", this.spinnersOnVideoLoadStart.context(this));
       _V_.addListener(this.video, "seeking", this.spinnersOnVideoSeeking.context(this));
@@ -502,7 +482,6 @@ VideoJS.fn.newBehavior("spinner", function(element){
       });
       clearInterval(this.spinnerInterval);
     },
-    spinnersRotated: 0,
     rotateSpinners: function(){
       this.each(this.spinners, function(spinner){
         // spinner.style.transform =       'scale(0.5) rotate('+this.spinnersRotated+'deg)';
@@ -520,7 +499,7 @@ VideoJS.fn.newBehavior("spinner", function(element){
     spinnersOnVideoCanPlayThrough: function(event){ this.hideSpinners(); },
     spinnersOnVideoWaiting: function(event){
       // Safari sometimes triggers waiting inappropriately
-      // Like after video has played, any you play again.
+      // Like after video has played, and you play again.
       this.showSpinners();
     },
     spinnersOnVideoStalled: function(event){},
@@ -535,16 +514,17 @@ VideoJS.fn.newBehavior("spinner", function(element){
 /* Subtitles
 ================================================================================ */
 VideoJS.fn.newBehavior("subtitlesDisplay", function(element){
-    if (!this.subtitleDisplays) {
-      this.subtitleDisplays = [];
-      this.onCurrentTimeUpdate(this.subtitleDisplaysOnVideoTimeUpdate);
-      this.onEnded(function() { this.lastSubtitleIndex = 0; }.context(this));
+    if (!this.elements.subtitleDisplays) {
+      this.elements.subtitleDisplays = [];
+      this.addListener("timeupdate", this.subtitleDisplaysOnVideoTimeUpdate);
+      this.addListener("ended", function() { this.lastSubtitleIndex = 0; }.context(this));
     }
-    this.subtitleDisplays.push(element);
+    this.elements.subtitleDisplays.push(element);
   },{
-    subtitleDisplaysOnVideoTimeUpdate: function(time){
+    subtitleDisplaysOnVideoTimeUpdate: function(){
       // Assuming all subtitles are in order by time, and do not overlap
       if (this.subtitles) {
+        var time = this.currentTime();
         // If current subtitle should stay showing, don't do anything. Otherwise, find new subtitle.
         if (!this.currentSubtitle || this.currentSubtitle.start >= time || this.currentSubtitle.end < time) {
           var newSubIndex = false,
@@ -588,7 +568,7 @@ VideoJS.fn.newBehavior("subtitlesDisplay", function(element){
       }
     },
     updateSubtitleDisplays: function(val){
-      this.each(this.subtitleDisplays, function(disp){
+      this.each(this.elements.subtitleDisplays, function(disp){
         disp.innerHTML = val;
       });
     }
