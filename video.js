@@ -82,6 +82,37 @@ var VideoJS = JRClass.extend({
     // Start Global Listeners - API doesn't exist before now
     this.activateElement(this, "player");
     this.activateElement(this.box, "box");
+
+	/*	Google Analytics Integration
+	This is based on the event tracking facility and follows this documentation
+	http://code.google.com/apis/analytics/docs/tracking/eventTrackerGuide.html
+
+	PREREQUISITES: In order for this to work correctly, the standard asynchronous 
+	analytics code must be included in the <head> of the page.
+
+	EVENT ACTIONS: Play, Stop, Volume, Load, Pause, Resume, Scrub, End, Error, Flash, Preload, AutoPlay
+	EVENT VALUES:
+	Stop => time
+	Volume => time
+	Load => time to load
+	Pause => time
+	Scrub => direction, time
+	Error => error description
+	Flash => browser, version, etc.
+	Preload => none, metadata, auto
+	AutoPlay => true, false 
+
+	example call: _gaq.push(['_trackEvent', gaCategory, 'Play', this.title])
+	example call: _gaq.push(['_trackEvent', gaCategory, 'Play', this.title, 23])
+	================================================================================ */
+	// Listen for typical GA events
+	gaCategory = 'videojs';
+    this.video.addEventListener("play", function(){_gaq.push(['_trackEvent', gaCategory, 'Play', this.title]);}, false);
+    this.video.addEventListener("pause", function(){_gaq.push(['_trackEvent', gaCategory, 'Pause', this.title, parseInt(this.currentTime)]);}, false);
+    this.video.addEventListener("load", function(){_gaq.push(['_trackEvent', gaCategory, 'Load', this.title, parseInt(this.currentTime)]);}, false);
+	this.video.addEventListener("ended", function(){_gaq.push(['_trackEvent', gaCategory, 'Ended', this.title]);}, false);
+    this.video.addEventListener("volumechange", function(){_gaq.push(['_trackEvent', gaCategory, 'Volume', this.title, parseInt(this.currentTime)]);}, false);
+
   },
   /* Behaviors
   ================================================================================ */
