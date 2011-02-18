@@ -150,5 +150,10 @@ VideoJS.fn.extend({
     // Resize the box, controller, and poster to original sizes
     this.positionAll();
     this.triggerListeners("exitFullWindow");
+  },
+
+  src: function(src){
+    this.api.src.call(this, src);
+    return this;
   }
 });

@@ -464,6 +464,10 @@ VideoJS.fn.extend({
       } catch (e) {
         if (e.code == 11) { this.warning(VideoJS.warnings.videoNotReady); }
       }
+    },
+    src: function(src){
+      this.video.src = src;
+      this.video.load();
     }
   }
 });

@@ -62,6 +62,8 @@ VideoJS.flashPlayers.flowplayer = {
           errorMessage = arguments[1];
       return errorMessage;
     }
+    
+    // src: function(){}
   }
 };
 
