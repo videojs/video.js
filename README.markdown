@@ -14,7 +14,7 @@ Originally based on [this tutorial](http://blog.steveheffernan.com/2010/04/how-t
 
 Contributors (Github Username)
 ------------------------------
-heff, dz0ny, sentientbit, tvdeyen, brandonarbini, gordonbrander, Shraymonks, albertogasparin, sandaru1, nicholasbs, majornista, Fredust85, @wonderboymusic
+heff, dz0ny, sentientbit, tvdeyen, brandonarbini, gordonbrander, Shraymonks, albertogasparin, sandaru1, nicholasbs, majornista, Fredust85, @wonderboymusic, ellis-
 
 
 Getting Started
@@ -136,6 +136,7 @@ Changelog
 - Feature: Made returning to the start at the end of the movie an option ("returnToStart").
 - Feature: Added loop option to loop movie ("loop").
 - Feature: Reorganized player API and listeners.
+- Feature: Added option to disable controls. controlsEnabled: false
 - Feature: Setup method now has a callback, so you can more easily work with the player after setup
 - Changes: setupAllWhenReady is now just setupAll (backward compatible)
 
