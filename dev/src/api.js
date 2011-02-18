@@ -109,6 +109,7 @@ VideoJS.fn.extend({
     } else {
       this.enterFullWindow();
     }
+    this.triggerListeners("enterFullScreen");
     return this;
   },
 
@@ -116,6 +117,7 @@ VideoJS.fn.extend({
     if (!this.supportsFullScreen()) {
       this.exitFullWindow();
     }
+    this.triggerListeners("exitFullScreen");
     // Otherwise Shouldn't be called since native fullscreen uses own controls.
     return this;
   },
@@ -134,6 +136,7 @@ VideoJS.fn.extend({
     _V_.addClass(this.box, "vjs-fullscreen");
     // Resize the box, controller, and poster
     this.positionAll();
+    this.triggerListeners("enterFullWindow");
   },
 
   exitFullWindow: function(){
@@ -146,5 +149,6 @@ VideoJS.fn.extend({
     _V_.removeClass(this.box, "vjs-fullscreen");
     // Resize the box, controller, and poster to original sizes
     this.positionAll();
+    this.triggerListeners("exitFullWindow");
   }
 });
