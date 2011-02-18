@@ -15,8 +15,8 @@ Version 2.0.0
 .tube-css .vjs-controls > div {
   height: 23px; margin: 0; background: none; top: 0;
   border: 1px solid #b1b1b1; border-left-color: #eee;
-  border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0;
-  box-shadow: none; -webkit-box-shadow: none; -moz-box-shadow: none;
+  -webkit-border-radius: 0; -moz-border-radius: 0; border-radius: 0;
+  -webkit-box-shadow: none; -moz-box-shadow: none; box-shadow: none;
 }
 
 /* Placement of Control Items */
@@ -52,9 +52,9 @@ Version 2.0.0
   background: #b1b1b1 -webkit-gradient(linear, left top, left bottom, from(#b1b1b1), to(#cacaca)) left top;
   background: #b1b1b1 -moz-linear-gradient(top,  #b1b1b1,  #cacaca) left top;
   border-color: #CACACA; border-bottom-color: #eaeaea;
-  border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0;
+  -webkit-border-radius: 0; -moz-border-radius: 0; border-radius: 0;
 }
-.tube-css .vjs-progress-control .vjs-load-progress { background: #C89191; border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0; }
+.tube-css .vjs-progress-control .vjs-load-progress { background: #C89191; -webkit-border-radius: 0; -moz-border-radius: 0; border-radius: 0; }
 .tube-css .vjs-progress-control .vjs-play-progress { background: #f33; background: -webkit-gradient(linear, left top, left bottom, from(#f33), to(#CF1A1A)); background: -moz-linear-gradient(top,  #f33,  #CF1A1A); -webkit-border-radius: 0; -moz-border-radius: 0; border-radius: 0; }
 
 /* Volume
@@ -89,7 +89,7 @@ Version 2.0.0
 .tube-css div.vjs-big-play-button { 
   width: 84px; height: 58px; margin: -29px 0 0 -42px;
   border: 2px solid #ccc; opacity: 0.9;
-  border-radius: 10px; -webkit-border-radius: 10px; -moz-border-radius: 10px;
+  -webkit-border-radius: 10px; -moz-border-radius: 10px; border-radius: 10px;
 
   /* CSS Background Gradients */
   /* Default */ background-color: #333;
@@ -97,7 +97,7 @@ Version 2.0.0
   /* Firefox */ background: #000 -moz-linear-gradient(top,  #000,  #333) left 29px;
 
   /* CSS Shadows */
-  box-shadow: none; -webkit-box-shadow: none; -moz-box-shadow: none;
+  -webkit-box-shadow: none; -moz-box-shadow: none; box-shadow: none;
 }
 .tube-css div.vjs-big-play-button:hover {
   opacity: 1;

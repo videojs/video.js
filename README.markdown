@@ -14,7 +14,7 @@ Originally based on [this tutorial](http://blog.steveheffernan.com/2010/04/how-t
 
 Contributors (Github Username)
 ------------------------------
-heff, dz0ny, sentientbit, tvdeyen, brandonarbini, gordonbrander, Shraymonks, albertogasparin, sandaru1, nicholasbs, majornista, Fredust85, @wonderboymusic, ellis-
+heff, dz0ny, sentientbit, tvdeyen, brandonarbini, gordonbrander, Shraymonks, albertogasparin, sandaru1, nicholasbs, majornista, Fredust85, @wonderboymusic, ellis-, emirpprime
 
 
 Getting Started
@@ -138,6 +138,7 @@ Changelog
 - Feature: Reorganized player API and listeners.
 - Feature: Added option to disable controls. controlsEnabled: false
 - Feature: Setup method now has a callback, so you can more easily work with the player after setup
+- Feature: Added listeners for enter/exit full screen/window.
 - Changes: setupAllWhenReady is now just setupAll (backward compatible)
 
 2.0.2 (2010-12-10)

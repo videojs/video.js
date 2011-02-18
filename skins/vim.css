@@ -8,8 +8,8 @@ Version 2.0.0
 }
 .vim-css .vjs-controls > div {
   height: 32px; top: 18px; padding: 0; text-align: center; background: rgba(23, 35, 34, 0.746094);
-  border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0;
-  box-shadow: none; -webkit-box-shadow: none; -moz-box-shadow: none;
+  -webkit-border-radius: 0; -moz-border-radius: 0; border-radius: 0;
+  -webkit-box-shadow: none; -moz-box-shadow: none; box-shadow: none;
 }
 /* Placement of Control Items */
 .vim-css .vjs-controls > div.vjs-play-control       { width: 65px; left: 10px; }
@@ -20,17 +20,17 @@ Version 2.0.0
 
 /* Play/Pause
 -------------------------------------------------------------------------------- */
-.vim-css .vjs-controls .vjs-play-control { top: 10px; margin: 0; height: 40px;  border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px; }
+.vim-css .vjs-controls .vjs-play-control { top: 10px; margin: 0; height: 40px;  -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; }
 .vim-css .vjs-play-control:hover { background: #00ADEF; }
 .vim-css.vjs-paused .vjs-play-control span { border-left-color: #fff; border-top-width: 9px; border-left-width: 18px; border-bottom-width: 9px; margin: 11px 0 0 24px; }
 .vim-css.vjs-playing .vjs-play-control span { width: 5px; height: 18px; margin: 5px auto 0; border-left: 5px solid #fff; border-right: 5px solid #fff; margin: 11px 0 0 24px; }
 
 /* Progress
 -------------------------------------------------------------------------------- */
-.vim-css .vjs-controls .vjs-progress-control { border-radius: 5px 0 0 5px; -webkit-border-radius: 5px 0 0 5px; -moz-border-radius: 5px 0 0 5px; }
-.vim-css .vjs-progress-control .vjs-progress-holder { height: 8px; padding: 1px; margin: 10px 5px 0 10px; border-color: #666666; border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0; }
-.vim-css .vjs-progress-control .vjs-play-progress { height: 8px; background: #00ADEF; border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0; }
-.vim-css .vjs-progress-control .vjs-load-progress { height: 8px; background: #898F8F; border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0; }
+.vim-css .vjs-controls .vjs-progress-control { -webkit-border-radius: 5px 0 0 5px; -moz-border-radius: 5px 0 0 5px; border-radius: 5px 0 0 5px; }
+.vim-css .vjs-progress-control .vjs-progress-holder { height: 8px; padding: 1px; margin: 10px 5px 0 10px; border-color: #666666; -webkit-border-radius: 0; -moz-border-radius: 0; border-radius: 0; }
+.vim-css .vjs-progress-control .vjs-play-progress { height: 8px; background: #00ADEF; -webkit-border-radius: 0; -moz-border-radius: 0; border-radius: 0; }
+.vim-css .vjs-progress-control .vjs-load-progress { height: 8px; background: #898F8F; -webkit-border-radius: 0; -moz-border-radius: 0; border-radius: 0; }
 
 /* Time Display
 -------------------------------------------------------------------------------- */
@@ -50,7 +50,7 @@ Version 2.0.0
 /* Fullscreen
 -------------------------------------------------------------------------------- */
 .vim-css .vjs-fullscreen-control div { margin: 10px 0 0 0; }
-.vim-css .vjs-controls .vjs-fullscreen-control { border-radius: 0 5px 5px 0; -webkit-border-radius: 0 5px 5px 0; -moz-border-radius: 0 5px 5px 0; }
+.vim-css .vjs-controls .vjs-fullscreen-control { -webkit-border-radius: 0 5px 5px 0; -moz-border-radius: 0 5px 5px 0; border-radius: 0 5px 5px 0; }
 /* Making default fullscreen icon smaller */
 .vim-css .vjs-fullscreen-control div span:nth-child(1) { margin: 0 4px 4px 0; border: none; border-top: 4px solid #fff; border-right: 4px solid rgba(0,0,0,0); }
 .vim-css .vjs-fullscreen-control div span:nth-child(2) { border: none; border-top: 4px solid #fff; border-left: 4px solid rgba(0,0,0,0); }
@@ -69,12 +69,12 @@ Version 2.0.0
 .vim-css div.vjs-big-play-button {
   width: 130px; height: 80px; margin: -40px 0 0 -65px;
   border: none; opacity: 0.9;
-  border-radius: 10px; -webkit-border-radius: 10px; -moz-border-radius: 10px;
+  -webkit-border-radius: 10px; -moz-border-radius: 10px; border-radius: 10px;
 
   background: rgba(23, 35, 34, 0.746094);
 
   /* CSS Shadows */
-  box-shadow: none; -webkit-box-shadow: none; -moz-box-shadow: none;
+  -webkit-box-shadow: none; -moz-box-shadow: none; box-shadow: none;
 }
 .vim-css div.vjs-big-play-button:hover {
   background: #00ADEF;
