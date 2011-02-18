@@ -154,6 +154,7 @@ VideoJS.fn.newBehavior("controlBar", function(element){
     _V_.addListener(element, "mouseout", this.onControlBarsMouseOut.context(this));
   },{
     showControlBars: function(){
+      if (!this.options.controlsEnabled) { return; }
       if (!this.options.controlsAtStart && !this.hasPlayed) { return; }
       this.each(this.controlBars, function(bar){
         // bar.style.opacity = 1;
@@ -438,6 +439,7 @@ VideoJS.fn.newBehavior("bigPlayButton", function(element){
     this.activateElement(element, "playButton");
   },{
     showBigPlayButtons: function(){
+      if (!this.options.controlsEnabled) { return; }
       this.each(this.elements.bigPlayButtons, function(element){
         element.style.display = "block";
       });

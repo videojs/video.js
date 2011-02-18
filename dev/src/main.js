@@ -32,6 +32,7 @@ var VideoJS = JRClass.extend({
       preload: true,
       loop: false,
       returnToStart: true,
+      controlsEnabled: true,
       useBuiltInControls: false, // Use the browser's controls (iPhone)
       controlsBelow: false, // Display control bar below video vs. in front of
       controlsAtStart: false, // Make controls visible when page loads
@@ -283,6 +284,7 @@ VideoJS.extend({
     var match = navigator.userAgent.match(/Android (\d+)\./i);
     if (match && match[1]) { return match[1]; }
   },
+  //isAndroidBrowser
 
   warnings: {
     // Safari errors if you call functions on a video that hasn't loaded yet
