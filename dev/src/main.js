@@ -227,6 +227,9 @@ VideoJS.extend({
     return (returnSingular) ? playerList[0] : playerList;
   },
 
+  // Get the player object for the supplied video tag ID
+  player: function(id){ return document.getElementById(id).player; },
+
   // Find video tags with the video-js class
   getVideoJSTags: function() {
     var videoTags = document.getElementsByTagName("video"),
