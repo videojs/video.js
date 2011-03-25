@@ -282,7 +282,7 @@ VideoJS.extend({
     var match = navigator.userAgent.match(/OS (\d+)_/i);
     if (match && match[1]) { return match[1]; }
   },
-  isAndroid: function(){ return navigator.userAgent.match(/Android/i) !== null; },
+  isAndroid: function(){ return navigator.userAgent.match(/Android.*AppleWebKit/i) !== null; },
   androidVersion: function() {
     var match = navigator.userAgent.match(/Android (\d+)\./i);
     if (match && match[1]) { return match[1]; }
