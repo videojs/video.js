@@ -1,6 +1,11 @@
 /*
 VideoJS - HTML5 Video Player
-v2.0.2
+v2.0.2.rev-gltovar
+
+******  note from gltovar ( gltovar.com/blog code.google.com/p/gltovar)
+******  This version of VideoJS Demos some fixes for fullscreen on the latest chrome and firefox (has not been tested on anything else) *********
+******  Purpose is to demonstrate where the fixes need to be, but code wise, is not elegant nor matches the coding standards of videoJS *********
+******  when it is officially fixed, there will this code will be updated with and alert to discourage users from this file             ********* 
 
 This file is part of VideoJS. Copyright 2010 Zencoder, Inc.
 
@@ -24,6 +29,9 @@ along with VideoJS.  If not, see <http://www.gnu.org/licenses/>.
 
 // Using jresig's Class implementation http://ejohn.org/blog/simple-javascript-inheritance/
 (function(){var initializing=false, fnTest=/xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/; this.JRClass = function(){}; JRClass.extend = function(prop) { var _super = this.prototype; initializing = true; var prototype = new this(); initializing = false; for (var name in prop) { prototype[name] = typeof prop[name] == "function" && typeof _super[name] == "function" && fnTest.test(prop[name]) ? (function(name, fn){ return function() { var tmp = this._super; this._super = _super[name]; var ret = fn.apply(this, arguments); this._super = tmp; return ret; }; })(name, prop[name]) : prop[name]; } function JRClass() { if ( !initializing && this.init ) this.init.apply(this, arguments); } JRClass.prototype = prototype; JRClass.constructor = JRClass; JRClass.extend = arguments.callee; return JRClass;};})();
+
+var widthBeforeFullScreen; // TODO: make the 'back from fullscreeen' on chrome and firefox work better
+var heightBeforeFullScreen;
 
 // Video JS Player Class
 var VideoJS = JRClass.extend({
@@ -705,16 +713,20 @@ VideoJS.player.extend({
   },
   positionBox: function(){
     // Set width based on fullscreen or not.
-    if (this.videoIsFullScreen) {
+    if (this.videoIsFullScreen) { //TODO: make this 'back from fullscreen' on chrome and firefox work better
+      widthBeforeFullScreen = this.width();  // ADDED
+      heightBeforeFullScreen = this.height(); // ADDED
       this.box.style.width = "";
       this.element.style.height="";
+      this.element.style.width=""; // ADDED
       if (this.options.controlsBelow) {
         this.box.style.height = "";
         this.element.style.height = (this.box.offsetHeight - this.controls.offsetHeight) + "px";
       }
     } else {
-      this.box.style.width = this.width() + "px";
-      this.element.style.height=this.height()+"px";
+      this.box.style.width = (widthBeforeFullScreen != null) ? widthBeforeFullScreen+"px" : this.width()+"px"; // MODIFIED
+      this.element.style.height=(heightBeforeFullScreen != null) ? heightBeforeFullScreen+"px" : this.height()+"px"; //MODIFIED
+      this.element.style.width=(widthBeforeFullScreen != null) ? widthBeforeFullScreen+"px" : this.width()+"px"; // ADDED
       if (this.options.controlsBelow) {
         this.element.style.height = "";
         // this.box.style.height = this.video.offsetHeight + this.controls.offsetHeight + "px";
