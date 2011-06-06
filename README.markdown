@@ -14,7 +14,7 @@ Originally based on [this tutorial](http://blog.steveheffernan.com/2010/04/how-t
 
 Contributors (Github Username)
 ------------------------------
-heff, dz0ny, sentientbit, tvdeyen, brandonarbini, gordonbrander, Shraymonks, albertogasparin, sandaru1, nicholasbs, majornista, Fredust85, @wonderboymusic, ellis-, emirpprime, eirikb
+heff, dz0ny, sentientbit, tvdeyen, brandonarbini, gordonbrander, Shraymonks, albertogasparin, sandaru1, nicholasbs, majornista, Fredust85, @wonderboymusic, ellis-, emirpprime, eirikb, mbrubeck
 
 
 Getting Started
@@ -140,7 +140,9 @@ Changelog
 - Feature: Added option to disable controls. controlsEnabled: false
 - Feature: Setup method now has a callback, so you can more easily work with the player after setup
 - Feature: Added listeners for enter/exit full screen/window.
+- Feature: Added a VideoJS.player(id) function for getting the player for a video ID
 - Changes: setupAllWhenReady is now just setupAll (backward compatible)
+- Fix: Check for Android browser now excludes firefox and opera
 
 2.0.2 (2010-12-10)
 

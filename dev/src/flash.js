@@ -13,8 +13,8 @@ VideoJS.fn.extend({
     this.element = this.flashElement;
     this.video.src = ""; // Stop video from downloading if HTML5 is still supported
     var flashPlayer = VideoJS.flashPlayers[this.options.flashPlayer];
-    flashPlayer.init.call(this);
     this.api = flashPlayer.api;
+    flashPlayer.init.call(this);
     this.api.setupTriggers.call(this);
   },
 

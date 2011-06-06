@@ -14,9 +14,22 @@ VideoJS.flashPlayers.flowplayer = {
         clip: { autoPlay: false, scaling: "fit" },
         plugins: { controls: { autoHide: "always" } },
         autoPlay: this.options.autoPlay,
-        onLoad: function() {}.context(this)
+        onLoad: function() {}.context(this),
+        plugins:  {
+          controls: null
+        }
       }
     );
+    
+    this.flowplayer.play();
+    
+    this.buildStylesCheckDiv(); // Used to check if style are loaded
+    // this.buildAndActivatePoster();
+    // this.buildBigPlayButton();
+    this.buildAndActivateSpinner();
+    this.buildAndActivateControlBar();
+    this.loadInterface(); // Show everything once styles are loaded
+    this.getSubtitles();
   },
 
   api: {

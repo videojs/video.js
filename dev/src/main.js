@@ -17,7 +17,7 @@ var VideoJS = JRClass.extend({
 
     this.video.player = this; // Store reference to player on the video element.
     this.box = this.video.parentNode; // Container element for controls positioning
-    this.values = {}; // Cache video values.
+    this.values = {}; // Cache for video property values.
     this.elements = {}; // Store refs to controls elements.
     this.listeners = {}; // Store video event listeners.
     this.api = {}; // Current API to video functions (changes with player type)
@@ -31,7 +31,7 @@ var VideoJS = JRClass.extend({
       autoplay: false,
       preload: true,
       loop: false,
-      returnToStart: true,
+      returnToStart: true, // Go back to the beginning when the video is done
       controlsEnabled: true,
       useBuiltInControls: false, // Use the browser's controls (iPhone)
       controlsBelow: false, // Display control bar below video vs. in front of

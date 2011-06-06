@@ -103,7 +103,7 @@
   </div>
   <!-- End VideoJS -->
 
-  <a href="#" onclick="document.getElementById('example_video_1').currentTime = 10; return false;">Click</a>
+  <a onClick="(function(){document.getElementById('example_video_1').player.flowplayer.play(); return false;})()">Click</a>
 
   <table id="attributes">
   </table>
