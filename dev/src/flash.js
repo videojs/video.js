@@ -3,12 +3,11 @@
 VideoJS.fn.extend({
 
   flashSupported: function(){
-    if (!this.flashElement) { this.flashElement = this.getFlashElement(); }
-    // Check if object exists & Flash Player version is supported
-    return !!(this.flashElement && this.flashPlayerVersionSupported());
+    return !!this.flashPlayerVersionSupported();
   },
 
   flashInit: function(){
+    this.flashElement = this.getFlashElement();
     this.replaceWithFlash();
     this.element = this.flashElement;
     this.video.src = ""; // Stop video from downloading if HTML5 is still supported
@@ -25,6 +24,30 @@ VideoJS.fn.extend({
       if (children[i].className == "vjs-flash-fallback") {
         return children[i];
       }
+    }
+  },
+
+  buildFlashElement: function(){
+    this.flashElement = _V_.createElement("object", { 
+      id: "flash_fallback_2", 
+      className: "vjs-flash-fallback",
+      type: "application/x-shockwave-flash",
+      data: "http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf"
+    });
+    // <object width="640" height="264" >
+
+    var params = {
+      movie: 'http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf',
+      wmode: 'opaque',
+      allowfullscreen: 'true',
+      flashvars: 'config={"playlist":["http://video-js.zencoder.com/oceans-clip.png", {"url": "http://video-js.zencoder.com/oceans-clip.mp4","autoPlay":false,"autoBuffering":true}]}'
+    };
+    
+    for (var name in params){
+      var p = _V_.createElement("param");
+      p.name = name;
+      p.value = params[name];
+      this.flashElement.appendChild(p);
     }
   },
 
@@ -52,4 +75,3 @@ VideoJS.flashPlayers.htmlObject = {
   init: function() { return true; },
   api: {} // No video API available with HTML Object embed method
 };
-

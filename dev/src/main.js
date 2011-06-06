@@ -39,14 +39,14 @@ var VideoJS = JRClass.extend({
       controlsHiding: true, // Hide controls when not over the video
       defaultVolume: 0.85, // Will be overridden by localStorage volume if available
       playerFallbackOrder: ["html5", "flash", "links"], // Players and order to use them
-      flashPlayer: "htmlObject",
+      flashPlayer: "htmlObject", // htmlObject, or custom options available
       flashPlayerVersion: false // Required flash version for fallback
     };
     // Override default options with global options
     if (typeof VideoJS.options == "object") { _V_.merge(this.options, VideoJS.options); }
     // Override default & global options with options specific to this player
     if (typeof setOptions == "object") { _V_.merge(this.options, setOptions); }
-    // Override preload & autoplay with video attributes
+    // Override preload & autoplay with video attributes (test x = y || z on IE)
     if (this.getPreloadAttribute() !== undefined) { this.options.preload = this.getPreloadAttribute(); }
     if (this.getAutoplayAttribute() !== undefined) { this.options.autoplay = this.getAutoplayAttribute(); }
 
@@ -65,13 +65,14 @@ var VideoJS = JRClass.extend({
     this.activateElement(this, "player");
     this.activateElement(this.box, "box");
   },
-  /* Behaviors
+  /* Behaviors - Make elements act like specific controls or displays
   ================================================================================ */
   behaviors: {},
   newBehavior: function(name, activate, functions){
     this.behaviors[name] = activate;
     this.extend(functions);
   },
+  // Change to addBehavior or attachBehavior?
   activateElement: function(element, behavior){
     // Allow passing and ID string
     if (typeof element == "string") { element = document.getElementById(element); }
