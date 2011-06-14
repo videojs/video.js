@@ -1,4 +1,4 @@
-#! /bin/csh
+#! /bin/sh
 # Combines Source Files. In terminal, sh combine_sources.sh
 cat src/_begin.js > combined.js
 
