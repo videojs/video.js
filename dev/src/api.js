@@ -3,10 +3,12 @@
 VideoJS.fn.extend({
 
   /* Listener types: play, pause, timeupdate, bufferedupdate, ended, volumechange, error */
-  addListener: function(type, fn){
+  addEventListener: function(type, fn){
     if (!this.listeners[type]) { this.listeners[type] = []; }
     this.listeners[type].push(fn);
   },
+  // Alias for backwards compatibility
+  addListener: function(){ return this.addEventListener.apply(this, arguments); },
 
   triggerListeners: function(type, e){
     this.each(this.listeners[type], function(listener){
