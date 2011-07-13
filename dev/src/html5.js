@@ -329,8 +329,10 @@ VideoJS.fn.extend({
         this.element.style.height = (this.box.offsetHeight - this.controls.offsetHeight) + "px";
       }
     } else {
-      this.box.style.width = this.width() + "px";
-      this.element.style.height=this.height()+"px";
+      var width = this.width(),
+         height = this.height();
+      if (width) { this.box.style.width = width + "px"; }
+      if (height) { this.element.style.height = height + "px"; }
       if (this.options.controlsBelow) {
         this.element.style.height = "";
         // this.box.style.height = this.video.offsetHeight + this.controls.offsetHeight + "px";
