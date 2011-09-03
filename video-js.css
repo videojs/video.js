@@ -162,15 +162,15 @@ so you can upgrade to newer versions easier. */
 /* Volume Mute
 -------------------------------------------------------------------------------- */
 .vjs-mute-control  { cursor: pointer !important; }
-.vjs-mute-control span:nth-child(1){ position: absolute; left: 5px; top: 9px;   width: 5px; height: 8px; background: #fff; z-index: 2;}
-.vjs-mute-control span:nth-child(2){ position: absolute; left: 5px; top: 5px; width: 0; height: 0; border-right: 10px solid #fff; border-top: 8px solid transparent; border-bottom: 8px solid transparent; z-index: 1;}
-.vjs-mute-control span:nth-child(3){ border: 1px solid #fff; border-radius: 25px; display: block; height: 16px; position: absolute; left: 4px; top: 4px; width: 17px;}
-.vjs-mute-control span:nth-child(4){	border: 1px solid #fff; border-radius: 25px; display: block; height: 10px; position: absolute; left: 9px; top: 7px; width: 9px;}
-.vjs-mute-control span:nth-child(5){ position: absolute; display: block; height: 21px; width: 13px; left: 5px; top: 2px;
-  /* Default */ background-color: #0B151A;
-  /* Webkit  */ background: #1F3744 -webkit-gradient(linear, left top, left bottom, from(#0B151A), to(#1F3744)) left 10px;
-  /* Firefox */ background: #1F3744 -moz-linear-gradient(top,  #0B151A,  #1F3744) left 10px;}
-.vjs-mute .vjs-mute-control span:nth-child(5){ width: 18px;}
+.vjs-mute-control > div { position: absolute; left: 6px; top: 5px }
+.vjs-mute-control div div:nth-child(1) { position: absolute; top: 0; left: 1px; width: 8px; height: 16px; overflow: hidden; }
+.vjs-mute-control div div:nth-child(1) span:nth-child(1){ position: absolute; left: 0; top: 4px;   width: 5px; height: 8px; background: #fff; z-index: 2;}
+.vjs-mute-control div div:nth-child(1) span:nth-child(2){ position: absolute; right: 0; top: 0; width: 0; height: 0; border-right: 10px solid #fff; border-top: 8px solid transparent; border-bottom: 8px solid transparent; z-index: 1;}
+.vjs-mute-control div div:nth-child(2) { height: 16px; left: 11px; overflow: hidden; position: absolute; top: 0; width: 5px; }
+.vjs-mute-control div div:nth-child(2) span:nth-child(1){ border: 1px solid #fff; border-radius: 25px; display: block; height: 14px; position: absolute; right: 0; top: 0; width: 17px;}
+.vjs-mute-control div div:nth-child(2) span:nth-child(2){	border: 1px solid #fff; border-radius: 25px; display: block; height: 8px; position: absolute; right: 2px; top: 3px; width: 9px;}
+.vjs-mute-control div div:nth-child(2) span:nth-child(3){	border: 1px solid #fff; border-radius: 25px; display: block; height: 4px; position: absolute; right: 4px; top: 5px; width: 5px;}
+.vjs-mute .vjs-mute-control div div:nth-child(2){ display: none;}
 
 /* Volume
 -------------------------------------------------------------------------------- */
