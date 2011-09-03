@@ -1330,12 +1330,13 @@ VideoJS.player.newBehavior("volumeMute", function(element){
   },{
     // When the user clicks on the mute button
     onMuteClick: function(event){
-		if(this.volume() > 0) { 
-			this.SavedVolume = this.volume();		
-			this.volume(0);
-		} else {
-			this.volume(this.SavedVolume);
-		}
+      if(this.volume() > 0) { 
+	this.SavedVolume = this.volume();		
+	this.volume(0);
+      } else {
+	if (this.SavedVolume == 0) {this.SavedVolume = this.options.defaultVolume}
+        this.volume(this.SavedVolume);
+      }
     },
   }
 );
@@ -1352,11 +1353,11 @@ VideoJS.player.newBehavior("volumeDisplay", function(element){
     // Update the volume control display
     // Unique to these default controls. Uses borders to create the look of bars.
     updateVolumeDisplays: function(){
-	  if(this.volume() == 0) { 
-		  _V_.addClass(this.box,"vjs-mute");
-	  } else {
-          _V_.removeClass(this.box,"vjs-mute");
-	  }
+    if(this.volume() == 0) { 
+        _V_.addClass(this.box,"vjs-mute");
+    } else {
+        _V_.removeClass(this.box,"vjs-mute");
+      }
       if (!this.volumeDisplays) { return; }
       this.each(this.volumeDisplays, function(dis){
         this.updateVolumeDisplay(dis);
