@@ -556,6 +556,16 @@ VideoJS.player.extend({
         <div class="vjs-time-control">
           <span class="vjs-current-time-display">00:00</span><span> / </span><span class="vjs-duration-display">00:00</span>
         </div>
+  	<div class="vjs-mute-control">
+			<div>
+				<div>
+					<span></span><span></span>
+				</div>
+				<div>
+					<span></span><span></span><span></span>
+				</div>
+			</div>
+		</div>
         <div class="vjs-volume-control">
           <div>
             <span></span><span></span><span></span><span></span><span></span><span></span>
@@ -563,7 +573,7 @@ VideoJS.player.extend({
         </div>
         <div class="vjs-fullscreen-control">
           <div>
-            <span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span>
           </div>
         </div>
       </div>
@@ -618,6 +628,14 @@ VideoJS.player.extend({
     this.timeControl.appendChild(this.durationDisplay);
     this.activateElement(this.durationDisplay, "durationDisplay");
 
+	// Create mute control
+    this.muteControl = _V_.createElement("div", {
+      className: "vjs-mute-control",
+	  innerHTML: "<div><div><span></span><span></span></div><div><span></span><span></span><span></span></div></div>"
+    });
+    this.controls.appendChild(this.muteControl);
+    this.activateElement(this.muteControl, "volumeMute");
+	
     // Create the volumne control
     this.volumeControl = _V_.createElement("div", {
       className: "vjs-volume-control",
@@ -632,7 +650,7 @@ VideoJS.player.extend({
     // Crete the fullscreen control
     this.fullscreenControl = _V_.createElement("div", {
       className: "vjs-fullscreen-control",
-      innerHTML: "<div><span></span><span></span><span></span><span></span></div>"
+      innerHTML: "<div><span></span><span></span><span></span><span></span><span></span></div>"
     });
     this.controls.appendChild(this.fullscreenControl);
     this.activateElement(this.fullscreenControl, "fullscreenToggle");
@@ -1312,6 +1330,23 @@ VideoJS.player.newBehavior("currentTimeScrubber", function(element){
     }
   }
 );
+/* Volume Mute Behaviors
+================================================================================ */
+VideoJS.player.newBehavior("volumeMute", function(element){
+    _V_.addListener(element, "click", this.onMuteClick.context(this));
+  },{
+    // When the user clicks on the mute button
+    onMuteClick: function(event){
+		if(this.volume() > 0) { 
+			this.SavedVolume = this.volume();		
+			this.volume(0);
+		} else {
+			if (this.SavedVolume == 0) {this.SavedVolume = this.options.defaultVolume}
+			this.volume(this.SavedVolume);
+		}
+    },
+  }
+);
 /* Volume Display Behaviors
 ================================================================================ */
 VideoJS.player.newBehavior("volumeDisplay", function(element){
@@ -1325,6 +1360,11 @@ VideoJS.player.newBehavior("volumeDisplay", function(element){
     // Update the volume control display
     // Unique to these default controls. Uses borders to create the look of bars.
     updateVolumeDisplays: function(){
+	  if(this.volume() == 0) { 
+		  _V_.addClass(this.box,"vjs-mute");
+	  } else {
+          _V_.removeClass(this.box,"vjs-mute");
+	  }
       if (!this.volumeDisplays) { return; }
       this.each(this.volumeDisplays, function(dis){
         this.updateVolumeDisplay(dis);
@@ -1368,6 +1408,7 @@ VideoJS.player.newBehavior("volumeScrubber", function(element){
     setVolumeWithScrubber: function(event){
       var newVol = _V_.getRelativePosition(event.pageX, this.currentScrubber);
       this.volume(newVol);
+	  this.SavedVolume = this.volume();
     }
   }
 );
