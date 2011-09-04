@@ -31,6 +31,7 @@ Version 2.0.0
 .hu-css .vjs-controls > div.vjs-play-control       { width: 33px; left: 0px; }
 .hu-css .vjs-controls > div.vjs-progress-control   { width: left: 84px; right: 0; }
 .hu-css .vjs-controls > div.vjs-time-control       { width: 84px; left: 0px; }
+.hu-css .vjs-controls > div.vjs-mute-control       { right: 86px; }
 .hu-css .vjs-controls > div.vjs-volume-control     { width: 43px; right: 44px; }
 .hu-css .vjs-controls > div.vjs-fullscreen-control { width: 43px; right: 0px; }
 
@@ -60,6 +61,10 @@ Version 2.0.0
 -------------------------------------------------------------------------------- */
 .hu-css .vjs-controls .vjs-time-control { font-size: 11px; background: #000; }
 .hu-css .vjs-controls .vjs-time-control span { line-height: 19px; /* Centering vertically */ }
+
+/* Volume Mute
+-------------------------------------------------------------------------------- */
+.hu-css .vjs-mute-control > div { top: 7px; left: 6px }
 
 /* Volume
 -------------------------------------------------------------------------------- */
