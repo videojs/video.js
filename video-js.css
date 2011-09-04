@@ -94,8 +94,9 @@ so you can upgrade to newer versions easier. */
    - Rigth side of progress bar, use right & width
    - Expand with the video (like progress bar) use left & right */
 .vjs-controls > div.vjs-play-control       { left: 5px;   width: 25px;  }
-.vjs-controls > div.vjs-progress-control   { left: 35px;  right: 165px; } /* Using left & right so it expands with the width of the video */
-.vjs-controls > div.vjs-time-control       { width: 75px; right: 90px;  } /* Time control and progress bar are combined to look like one */
+.vjs-controls > div.vjs-progress-control   { left: 35px;  right: 195px; } /* Using left & right so it expands with the width of the video */
+.vjs-controls > div.vjs-time-control       { width: 75px; right: 120px;  } /* Time control and progress bar are combined to look like one */
+.vjs-controls > div.vjs-mute-control     { width: 25px; right: 90px;  }
 .vjs-controls > div.vjs-volume-control     { width: 50px; right: 35px;  }
 .vjs-controls > div.vjs-fullscreen-control { width: 25px; right: 5px;   }
 
@@ -157,6 +158,21 @@ so you can upgrade to newer versions easier. */
 -------------------------------------------------------------------------------- */
 .vjs-controls .vjs-time-control { font-size: 10px; line-height: 1; font-weight: normal; font-family: Helvetica, Arial, sans-serif; }
 .vjs-controls .vjs-time-control span { line-height: 25px; /* Centering vertically */ }
+
+/* Volume Mute
+-------------------------------------------------------------------------------- */
+.vjs-mute-control  { cursor: pointer !important; }
+.vjs-mute-control > div { position: absolute; left: 6px; top: 5px }
+.vjs-mute-control div div:nth-child(1) { position: absolute; top: 0; left: 0; width: 10px; height: 16px; overflow: hidden; }
+.vjs-mute-control div div:nth-child(1) span:nth-child(1){ position: absolute; left: 0; top: 5px;   width: 6px; height: 6px; background: #fff; z-index: 2;}
+.vjs-mute-control div div:nth-child(1) span:nth-child(2){ position: absolute; right: 0; top: 0; width: 0; height: 0; border-right: 10px solid #fff; border-top: 8px solid transparent; border-bottom: 8px solid transparent; z-index: 1;}
+.vjs-mute-control div div:nth-child(2) { height: 16px; left: 12px; overflow: hidden; position: absolute; top: 0; width: 6px; }
+.vjs-mute-control div div:nth-child(2) span:nth-child(1){ border: 1px solid #fff; border-radius: 25px; display: block; height: 10px; position: absolute; right: 2px; top: 2px; width: 9px;}
+.vjs-mute-control div div:nth-child(2) span:nth-child(2){ border: 1px solid #fff; border-radius: 25px; display: block; height: 6px; position: absolute; right: 4px; top: 4px; width: 5px;}
+.vjs-mute-control div div:nth-child(2) span:nth-child(3){ border: 0; display: none; }
+.vjs-mute .vjs-mute-control div div:nth-child(2)  span:nth-child(1), .vjs-mute .vjs-mute-control div div:nth-child(2)  span:nth-child(2) { display: none;}
+.vjs-mute .vjs-mute-control div div:nth-child(2)  span:nth-child(3)  { display: block; font-size: 12px; font-weight: bold; margin: 7px 0 0;} 
+.vjs-mute .vjs-mute-control div div:nth-child(2)  span:nth-child(3):before  { content: "x"; color: #CC2323; } 
 
 /* Volume
 -------------------------------------------------------------------------------- */
