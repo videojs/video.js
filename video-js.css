@@ -171,8 +171,8 @@ so you can upgrade to newer versions easier. */
 .vjs-mute-control div div:nth-child(2) span:nth-child(2){ border: 1px solid #fff; border-radius: 25px; display: block; height: 6px; position: absolute; right: 4px; top: 4px; width: 5px;}
 .vjs-mute-control div div:nth-child(2) span:nth-child(3){ border: 0; display: none; }
 .vjs-mute .vjs-mute-control div div:nth-child(2)  span:nth-child(1), .vjs-mute .vjs-mute-control div div:nth-child(2)  span:nth-child(2) { display: none;}
-.vjs-mute .vjs-mute-control div div:nth-child(2)  span:nth-child(3)  { display: block; font-size: 12px; font-weight: bold; margin: 7px 0 0;} 
-.vjs-mute .vjs-mute-control div div:nth-child(2)  span:nth-child(3):before  { content: "x"; color: #CC2323; } 
+.vjs-mute .vjs-mute-control div div:nth-child(2)  span:nth-child(3)  { display: block; } 
+.vjs-mute .vjs-mute-control div div:nth-child(2)  span:nth-child(3):before  { content: "x"; color: #CC2323; font-size: 12px; font-weight: bold; font-family: sans-serif; line-height: 14px; top: 7px;} 
 
 /* Volume
 -------------------------------------------------------------------------------- */
