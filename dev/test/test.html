@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>QUnit Test Suite</title>
+
+  <link rel="stylesheet" href="../design/video-js.css" type="text/css">
+  <!--[if lt IE 9]>
+    <script>
+      document.createElement("video"); // HTML5 Shiv. Must be in <head>.
+    </script>
+  <![endif]-->
+
+  <!--[if IE]>
+    <script src="https://getfirebug.com/firebug-lite.js" type="text/javascript" charset="utf-8"></script>
+  <![endif]-->
+
+  <script src="../src/core.js" type="text/javascript" charset="utf-8"></script>
+  <script src="../src/lib.js" type="text/javascript" charset="utf-8"></script>
+  <script src="../src/ecma.js" type="text/javascript" charset="utf-8"></script>
+  <script src="../src/json.js" type="text/javascript" charset="utf-8"></script>
+
+  <script src="../src/api.js" type="text/javascript" charset="utf-8"></script>
+  <script src="../src/events.js" type="text/javascript" charset="utf-8"></script>
+
+  <script src="../src/tracks.js" type="text/javascript" charset="utf-8"></script>
+
+  <script src="../src/behaviors/behaviors.js" type="text/javascript" charset="utf-8"></script>
+  <script src="../src/behaviors/seekBar.js" type="text/javascript" charset="utf-8"></script>
+  <script src="../src/behaviors/volume.js" type="text/javascript" charset="utf-8"></script>
+  <script src="../src/behaviors/texttrackdisplays.js" type="text/javascript" charset="utf-8"></script>
+
+  <script src="../src/controls/bigPlay.js" type="text/javascript" charset="utf-8"></script>
+  <script src="../src/controls/bar.js" type="text/javascript" charset="utf-8"></script>
+  <script src="../src/controls/subtitlesBox.js" type="text/javascript" charset="utf-8"></script>
+
+  <script src="../src/tech/html5.js" type="text/javascript" charset="utf-8"></script>
+  <script src="../src/tech/flowplayer.js" type="text/javascript" charset="utf-8"></script>
+
+  <script src="../src/autoload.js" type="text/javascript" charset="utf-8"></script>
+  
+  <script src="../src/log.js" type="text/javascript" charset="utf-8"></script>
+
+  <link rel="stylesheet" href="qunit/qunit/qunit.css" type="text/css" media="screen">
+  <script type="text/javascript" src="qunit/qunit/qunit.js"></script>
+  <script type="text/javascript" src="test.js"></script>
+</head>
+<body>
+  <h1 id="qunit-header">QUnit Test Suite</h1>
+  <h2 id="qunit-banner"></h2>
+  <div id="qunit-testrunner-toolbar"></div>
+  <h2 id="qunit-userAgent"></h2>
+  <ol id="qunit-tests"></ol>
+  <div id="qunit-fixture">test markup</div>
+</body>
+</html>

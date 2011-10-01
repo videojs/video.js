@@ -1,102 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <title>HTML5 Video Player</title>
+  <title>VideoJS | HTML5 Video Player</title>
 
-  <!-- Include the VideoJS Library -->
-  <script src="video.js" type="text/javascript" charset="utf-8"></script>
+  <link href="video-js.css" rel="stylesheet" type="text/css">
 
-  <script type="text/javascript">
-    // Must come after the video.js library
+  <!-- video.js must be in the <head> for older IEs to work. -->
+  <script src="video.js"></script>
 
-    // Add VideoJS to all video tags on the page when the DOM is ready
-    VideoJS.setupAllWhenReady();
-
-    /* ============= OR ============ */
-
-    // Setup and store a reference to the player(s).
-    // Must happen after the DOM is loaded
-    // You can use any library's DOM Ready method instead of VideoJS.DOMReady
-
-    /*
-    VideoJS.DOMReady(function(){
-      
-      // Using the video's ID or element
-      var myPlayer = VideoJS.setup("example_video_1");
-      
-      // OR using an array of video elements/IDs
-      // Note: It returns an array of players
-      var myManyPlayers = VideoJS.setup(["example_video_1", "example_video_2", video3Element]);
-
-      // OR all videos on the page
-      var myManyPlayers = VideoJS.setup("All");
-
-      // After you have references to your players you can...(example)
-      myPlayer.play(); // Starts playing the video for this player.
-    });
-    */
-
-    /* ========= SETTING OPTIONS ========= */
-
-    // Set options when setting up the videos. The defaults are shown here.
-
-    /*
-    VideoJS.setupAllWhenReady({
-      controlsBelow: false, // Display control bar below video instead of in front of
-      controlsHiding: true, // Hide controls when mouse is not over the video
-      defaultVolume: 0.85, // Will be overridden by user's last volume if available
-      flashVersion: 9, // Required flash version for fallback
-      linksHiding: true // Hide download links when video is supported
-    });
-    */
-
-    // Or as the second option of VideoJS.setup
-    
-    /*
-    VideoJS.DOMReady(function(){
-      var myPlayer = VideoJS.setup("example_video_1", {
-        // Same options
-      });
-    });
-    */
-
-  </script>
-
-  <!-- Include the VideoJS Stylesheet -->
-  <link rel="stylesheet" href="video-js.css" type="text/css" media="screen" title="Video JS">
 </head>
 <body>
 
-  <!-- Begin VideoJS -->
-  <div class="video-js-box">
-    <!-- Using the Video for Everybody Embed Code http://camendesign.com/code/video_for_everybody -->
-    <video id="example_video_1" class="video-js" width="640" height="264" controls="controls" preload="auto" poster="http://video-js.zencoder.com/oceans-clip.png">
-      <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
-      <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm; codecs="vp8, vorbis"' />
-      <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg; codecs="theora, vorbis"' />
-      <!-- Flash Fallback. Use any flash video player here. Make sure to keep the vjs-flash-fallback class. -->
-      <object id="flash_fallback_1" class="vjs-flash-fallback" width="640" height="264" type="application/x-shockwave-flash"
-        data="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf">
-        <param name="movie" value="http://releases.flowplayer.org/swf/flowplayer-3.2.1.swf" />
-        <param name="wmode" value="opaque" />
-        <param name="allowfullscreen" value="true" />
-        <param name="flashvars" value='config={"playlist":["http://video-js.zencoder.com/oceans-clip.png", {"url": "http://video-js.zencoder.com/oceans-clip.mp4","autoPlay":false,"autoBuffering":true}]}' />
-        <!-- Image Fallback. Typically the same as the poster image. -->
-        <img src="http://video-js.zencoder.com/oceans-clip.png" width="640" height="264" alt="Poster Image"
-          title="No video playback capabilities." />
-      </object>
-    </video>
-    <!-- Download links provided for devices that can't play video in the browser. -->
-    <p class="vjs-no-video"><strong>Download Video:</strong>
-      <a href="http://video-js.zencoder.com/oceans-clip.mp4">MP4</a>,
-      <a href="http://video-js.zencoder.com/oceans-clip.webm">WebM</a>,
-      <a href="http://video-js.zencoder.com/oceans-clip.ogv">Ogg</a><br>
-      <!-- Support VideoJS by keeping this link. -->
-      <a href="http://videojs.com">HTML5 Video Player</a> by VideoJS
-    </p>
-  </div>
-  <!-- End VideoJS -->
+  <video id="example_video_1" class="video-js vjs-default-skin" controls preload="none" width="640" height="264"
+      poster="http://video-js.zencoder.com/oceans-clip.png"
+      data-setup="">
+    <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4'>
+    <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm'>
+  </video>
 
 </body>
 </html>

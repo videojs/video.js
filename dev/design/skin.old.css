@@ -1,0 +1,190 @@
+/* DEFAULT SKIN (override in another file)
+================================================================================
+Using all CSS to draw the controls. Images could be used if desired.
+Instead of editing this file, I recommend creating your own skin CSS file to be included after this file,
+so you can upgrade to newer versions easier. */
+
+.vjs-original-skin .vjs-controls {
+  position: absolute; margin: 0; opacity: 0.85; color: #fff;
+  display: block; /* Start hidden */
+  left: 0; right: 0; /* 100% width of video-js-box */ 
+  width: 100%;
+  bottom: 0px; /* Distance from the bottom of the box/video. Keep 0. Use height to add more bottom margin. */
+  height: 35px; /* Including any margin you want above or below control items */
+  padding: 0; /* Controls are absolutely position, so no padding necessary */
+  -webkit-transition: opacity 0.5s linear;
+  -moz-transition: opacity 0.5s linear;
+  -o-transition: opacity 0.5s linear;
+  -ms-transition: opacity 0.5s linear;
+  transition: opacity 0.5s linear;
+}
+
+.vjs-original-skin .vjs-control {
+  position: absolute; /* Use top, bottom, left, and right to specifically position the control. */
+  text-align: center; margin: 0; padding: 0;
+  height: 25px; /* Default height of individual controls */
+  top: 5px; /* Top margin to put space between video and controls when controls are below */
+
+  /* CSS Background Gradients 
+     Using to give the aqua-ish look. */
+  /* Default */ background-color: #0B151A;
+  /* Webkit  */ background: #1F3744 -webkit-gradient(linear, left top, left bottom, from(#0B151A), to(#1F3744)) left 12px;
+  /* Firefox */ background: #1F3744 -moz-linear-gradient(top,  #0B151A,  #1F3744) left 12px;
+
+  /* CSS Curved Corners */
+  -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;
+
+  /* CSS Shadows */
+  -webkit-box-shadow: 1px 1px 2px #000; -moz-box-shadow: 1px 1px 2px #000; box-shadow: 1px 1px 2px #000;
+}
+
+/* Placement of Control Items 
+   - Left side of pogress bar, use left & width
+   - Rigth side of progress bar, use right & width
+   - Expand with the video (like progress bar) use left & right
+   (using div.x to make more specific than vjs-control style)
+*/
+.vjs-original-skin div.vjs-play-control       { left: 5px;   width: 25px;  }
+.vjs-original-skin div.vjs-progress-control   { left: 35px;  right: 165px; } /* Using left & right so it expands with the width of the video */
+.vjs-original-skin div.vjs-time-control       { width: 75px; right: 90px;  } /* Time control and progress bar are combined to look like one */
+.vjs-original-skin div.vjs-volume-control     { width: 50px; right: 35px;  }
+.vjs-original-skin div.vjs-fullscreen-control { width: 25px; right: 5px;   }
+
+/* Removing curved corners on progress control and time control to join them. */
+.vjs-original-skin div.vjs-progress-control {
+  -webkit-border-top-right-radius: 0; -moz-border-radius-topright: 0; border-top-right-radius: 0;
+  -webkit-border-bottom-right-radius: 0; -moz-border-radius-bottomright: 0; border-bottom-right-radius: 0;
+}
+.vjs-original-skin div.vjs-time-control {
+  -webkit-border-top-left-radius: 0; -moz-border-radius-topleft: 0; border-top-left-radius: 0;
+  -webkit-border-bottom-left-radius: 0; -moz-border-radius-bottomleft: 0; border-bottom-left-radius: 0;
+}
+
+/* Play/Pause
+-------------------------------------------------------------------------------- */
+.vjs-original-skin .vjs-play-control { cursor: pointer !important; }
+/* Play Icon */
+.vjs-original-skin .vjs-play-control span { display: block; font-size: 0; line-height: 0; }
+.vjs-original-skin.vjs-paused .vjs-play-control span {
+  width: 0; height: 0; margin: 8px 0 0 8px;
+  /* Drawing the play triangle with borders - http://www.infimum.dk/HTML/slantinfo.html */
+  border-left: 10px solid #fff; /* Width & Color of play icon */
+  /* Height of play icon is total top & bottom border widths. Color is transparent. */
+  border-top: 5px solid rgba(0,0,0,0); border-bottom: 5px solid rgba(0,0,0,0);
+}
+.vjs-original-skin.vjs-playing .vjs-play-control span {
+  width: 3px; height: 10px; margin: 8px auto 0;
+  /* Drawing the pause bars with borders */
+  border-top: 0px; border-left: 3px solid #fff; border-bottom: 0px; border-right: 3px solid #fff;
+}
+
+/* Progress
+-------------------------------------------------------------------------------- */
+.vjs-original-skin .vjs-progress-holder { /* Box containing play and load progresses */
+  position: relative; padding: 0; overflow:hidden; cursor: pointer !important;
+  height: 9px; border: 1px solid #777;
+  margin: 7px 1px 0 5px; /* Placement within the progress control item */
+  -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;
+}
+.vjs-original-skin .vjs-progress-holder div { /* Progress Bars */
+  position: absolute; display: block; width: 0; height: 9px; margin: 0; padding: 0;
+  left: 0; top: 0; /*Needed for IE6*/
+  -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;
+}
+.vjs-original-skin .vjs-play-progress {
+  /* CSS Gradient */
+  /* Default */ background: #fff;
+  /* Webkit  */ background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#777));
+  /* Firefox */ background: -moz-linear-gradient(top,  #fff,  #777);
+}
+.vjs-original-skin .vjs-load-progress {
+  opacity: 0.8;
+  /* CSS Gradient */
+  /* Default */ background-color: #555;
+  /* Webkit  */ background: -webkit-gradient(linear, left top, left bottom, from(#555), to(#aaa));
+  /* Firefox */ background: -moz-linear-gradient(top,  #555,  #aaa);
+}
+
+/* Time Display
+-------------------------------------------------------------------------------- */
+.vjs-original-skin .vjs-time-control { font-size: 10px; line-height: 1; font-weight: normal; font-family: Helvetica, Arial, sans-serif; }
+.vjs-original-skin .vjs-time-control span { line-height: 25px; /* Centering vertically */ }
+
+/* Volume
+-------------------------------------------------------------------------------- */
+.vjs-original-skin .vjs-volume-control { cursor: pointer !important; }
+.vjs-original-skin .vjs-volume-control div { display: block; margin: 0 5px 0 5px; padding: 4px 0 0 0; }
+/* Drawing the volume icon using 6 span elements */
+.vjs-original-skin .vjs-volume-control div span { /* Individual volume bars */
+  float: left; padding: 0; font-size: 0; line-height: 0;
+  margin: 0 2px 0 0; /* Space between */
+  width: 5px; height: 0px; /* Total height is height + bottom border */
+  border-bottom: 18px solid #555; /* Default (off) color and height of visible portion */
+}
+.vjs-original-skin .vjs-volume-control div span.vjs-volume-level-on { border-color: #fff; /* Volume on bar color */ }
+/* Creating differnt bar heights through height (transparent) and bottom border (visible). */
+.vjs-original-skin .vjs-volume-control div span.vjs-vc-1 { border-bottom-width: 2px; height: 16px; }
+.vjs-original-skin .vjs-volume-control div span.vjs-vc-2 { border-bottom-width: 4px; height: 14px; }
+.vjs-original-skin .vjs-volume-control div span.vjs-vc-3 { border-bottom-width: 7px; height: 11px; }
+.vjs-original-skin .vjs-volume-control div span.vjs-vc-4 { border-bottom-width: 10px; height: 8px; }
+.vjs-original-skin .vjs-volume-control div span.vjs-vc-5 { border-bottom-width: 14px; height: 4px; }
+.vjs-original-skin .vjs-volume-control div span.vjs-vc-6 { margin-right: 0; }
+
+/* Fullscreen
+-------------------------------------------------------------------------------- */
+.vjs-original-skin .vjs-fullscreen-control { cursor: pointer !important; }
+.vjs-original-skin .vjs-fullscreen-control div {
+  padding: 0; text-align: left; vertical-align: top; cursor: pointer !important; 
+  margin: 5px 0 0 5px; /* Placement within the fullscreen control item */
+  width: 20px; height: 20px;
+}
+/* Drawing the fullscreen icon using 4 span elements */
+.vjs-original-skin .vjs-fullscreen-control div span { float: left; margin: 0; padding: 0; font-size: 0; line-height: 0; width: 0; text-align: left; vertical-align: top; }
+.vjs-original-skin .vjs-fullscreen-control div span.vjs-fc-1 { /* Top-left triangle */
+  margin-right: 3px; /* Space between top-left and top-right */
+  margin-bottom: 3px; /* Space between top-left and bottom-left */
+  border-top: 6px solid #fff; /* Height and color */
+  border-right: 6px solid rgba(0,0,0,0);  /* Width */
+}
+.vjs-original-skin .vjs-fullscreen-control div span.vjs-fc-2 { border-top: 6px solid #fff; border-left: 6px solid rgba(0,0,0,0); }
+.vjs-original-skin .vjs-fullscreen-control div span.vjs-fc-3 { clear: both; margin: 0 3px 0 0; border-bottom: 6px solid #fff; border-right: 6px solid rgba(0,0,0,0); }
+.vjs-original-skin .vjs-fullscreen-control div span.vjs-fc-4 { border-bottom: 6px solid #fff; border-left: 6px solid rgba(0,0,0,0); }
+/* Icon when video is in fullscreen mode */
+.vjs-original-skin.vjs-fullscreen .vjs-fullscreen-control div span.vjs-fc-1 { border: none; border-bottom: 6px solid #fff; border-left: 6px solid rgba(0,0,0,0); }
+.vjs-original-skin.vjs-fullscreen .vjs-fullscreen-control div span.vjs-fc-2 { border: none; border-bottom: 6px solid #fff; border-right: 6px solid rgba(0,0,0,0); }
+.vjs-original-skin.vjs-fullscreen .vjs-fullscreen-control div span.vjs-fc-3 { border: none; border-top: 6px solid #fff; border-left: 6px solid rgba(0,0,0,0); }
+.vjs-original-skin.vjs-fullscreen .vjs-fullscreen-control div span.vjs-fc-4 { border: none; border-top: 6px solid #fff; border-right: 6px solid rgba(0,0,0,0); }
+
+
+
+
+
+/* Big Play Button (at start)
+---------------------------------------------------------*/
+.vjs-original-skin .vjs-big-play-button {
+  display: block; /* Start hidden */ z-index: 2;
+  position: absolute; top: 50%; left: 50%; width: 80px; height: 80px; margin: -43px 0 0 -43px; text-align: center; vertical-align: center; cursor: pointer !important;
+  border: 3px solid #fff; opacity: 0.9;
+  -webkit-border-radius: 20px; -moz-border-radius: 20px; border-radius: 20px;
+  
+  /* CSS Background Gradients */
+  /* Default */ background-color: #0B151A;
+  /* Webkit  */ background: #1F3744 -webkit-gradient(linear, left top, left bottom, from(#0B151A), to(#1F3744)) left 40px;
+  /* Firefox */ background: #1F3744 -moz-linear-gradient(top,  #0B151A,  #1F3744) left 40px;
+
+  /* CSS Shadows */
+  -webkit-box-shadow: 4px 4px 8px #000; -moz-box-shadow: 4px 4px 8px #000; box-shadow: 4px 4px 8px #000;
+}
+
+.vjs-original-skin div.vjs-big-play-button:hover {
+  -webkit-box-shadow: 0px 0px 80px #fff; -moz-box-shadow: 0px 0px 80px #fff; box-shadow: 0px 0px 80px #fff;
+}
+
+.vjs-original-skin div.vjs-big-play-button span {
+  display: block; font-size: 0; line-height: 0;
+  width: 0; height: 0; margin: 20px 0 0 23px;
+  /* Drawing the play triangle with borders - http://www.infimum.dk/HTML/slantinfo.html */
+  border-left: 40px solid #fff; /* Width & Color of play icon */
+  /* Height of play icon is total top & bottom border widths. Color is transparent. */
+  border-top: 20px solid rgba(0,0,0,0); border-bottom: 20px solid rgba(0,0,0,0);
+}
