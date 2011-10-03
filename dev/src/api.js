@@ -170,7 +170,7 @@ VideoJS.fn.extend({
     _V_.removeClass(this.box, "vjs-fullscreen");
 
     // Resize the box, controller, and poster to original sizes
-    this.positionAll();
+    // this.positionAll();
     this.triggerEvent("exitFullWindow");
   },
 

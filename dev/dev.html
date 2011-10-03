@@ -38,24 +38,32 @@
 
   <script src="src/tech/h5swf.js"></script>
 
+  <script src="src/tech/youtube.js"></script>
+
   <script src="src/autoload.js"></script>
   
   <script type="text/javascript" src="flash/swfobject.js"></script>
+  
 
 </head>
 <body>
-  <video id="vid1" class="video-js vjs-default-skin" controls preload="none" width="640" height="264" data-setup='{"example_option":true}' poster="http://video-js.zencoder.com/oceans-clip.png">
+
+  <video id="vid1" class="video-js vjs-default-skin" controls preload="none" width="640" height="264" 
+      poster="http://video-js.zencoder.com/oceans-clip.png"
+      data-setup='{"techOrder":["html5","youtube"]}'>
+    <source src="http://www.youtube.com/watch?v=YjaZNYSt7o0&feature=related" type='video/youtube'>
+    <!-- <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4'> -->
     <!-- <source src="http://pseudo01.hddn.com/vod/demo.flowplayervod/flowplayer-700.flv" type='video/flv'> -->
-    <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4'>
-    <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm'>
+    <!-- <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4'>
+    <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm'> -->
     <!-- <source src="http://stg.video.howcookingworks.com/video/posts/e110d95f6770c62e8d3ba52ff221e7f7907683ac266939/e110d95f6770c62e8d3ba52ff221e7f7907683ac266939_high.webm" type='video/webm'> -->
-    <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg; codecs="theora, vorbis"'>
+    <!-- <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg; codecs="theora, vorbis"'> -->
     <!-- <track kind="subtitles" src="http://videojs.com/subtitles/demo-subtitles.srt" srclang="en-US" label="English"></track> -->
     <!-- <track kind="subtitles" src="demo-subtitles.srt" srclang="en-US" label="English"></track> -->
   </video>
 
   <script>
-    // vid = document.getElementById("vid2");
+    vid = document.getElementById("vid1");
   </script>
 
 </body>

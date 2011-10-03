@@ -26,8 +26,15 @@ _V_.extend({
         var handlers = _V_.getData(elem).events[event.type];
         // Go through and call all the real bound handlers
         if (handlers) {
-          for (var i = 0, l = handlers.length; i < l; i++) {
-            if (handlers[i]) handlers[i].call(elem, event); // Incase one's been removed
+          
+          // Copy handlers so if handlers are added/removed during the process it doesn't throw everything off.
+          var handlersCopy = [];
+          _V_.each(handlers, function(handler, i){
+            handlersCopy[i] = handler;
+          })
+          
+          for (var i = 0, l = handlersCopy.length; i < l; i++) {
+            handlersCopy[i].call(elem, event);
           }
         }
       };

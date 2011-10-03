@@ -44,6 +44,9 @@ var VideoJS = _V_ = function(id, options){
   tag.removeAttribute("height");
   tag.removeAttribute("controls");
 
+  // Same id for player/box
+  this.id = box.id;
+
   // Default Options
   this.options = _V_.options; // Global Defaults
   _V_.merge(this.options, this.getVideoTagSettings()); // Override with Video Tag Options
@@ -171,7 +174,7 @@ VideoJS.fn = VideoJS.prototype = {
     // Finsh API Setup when tech is ready
     this.addEvent("techready", _V_.proxy(this, function(){
       // Reomve this so it's not called twice next load
-      this.removeEvent("techready", arguments.callee);
+      // this.removeEvent("techready", arguments.callee);
       
       this.currentTechElement = this.tels[this.currentTechName];
 

@@ -28,7 +28,7 @@ VideoJS.tech.h5swf = {
   init: function(sourceObj){
     var player = this,
         placeHolder = _V_.createElement("div", { id: player.box.id + "_temp_h5swf" }),
-        objId = player.box.id+"_h5swf_api"
+        objId = player.box.id+"_h5swf_api",
         h5swf = VideoJS.tech.h5swf,
 
         flashvars = {

@@ -21,6 +21,8 @@ cat ../src/tech/flowplayer.js >> ../dist/video.js
 # h5swf temporarily requires swfobject
 cat ../src/tech/h5swf.js >> ../dist/video.js
 cat ../flash/swfobject.js >> ../dist/video.js
+# So does Youtube
+cat ../src/tech/youtube.js >> ../dist/video.js
 
 cat ../src/behaviors/behaviors.js >> ../dist/video.js
 cat ../src/behaviors/seekBar.js >> ../dist/video.js

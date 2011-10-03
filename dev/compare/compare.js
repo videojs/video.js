@@ -1,6 +1,6 @@
 $(function(){  
   var tech, i,
-      techList = ["html5","h5swf","flowplayer"],
+      techList = ["html5","h5swf","youtube"],
       props = "error,currentSrc,networkState,buffered,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,seekable,ended,videoWidth,videoHeight,textTracks,preload,currentTime,playbackRate,autoplay,loop,controls,volume,muted,defaultMuted".split(","),
       methods = "play,pause,src,load,canPlayType,addTextTrack",
       notUsed = "mediaGroup,controller,videoTracks,audioTracks,defaultPlaybackRate";
