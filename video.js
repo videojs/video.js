@@ -98,7 +98,7 @@ var VideoJS = _V_ = function(id, options){
 };
 
 VideoJS.options = {
-  techOrder: ["h5swf","html5","flowplayer"],
+  techOrder: ["html5","h5swf","flowplayer"],
   controlSets: ["bigPlayButton", "bar", "subtitlesBox"/*, "replay"*/],
   controlSetOptions: {
     bigPlayButton: {},
