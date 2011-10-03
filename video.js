@@ -98,7 +98,7 @@ var VideoJS = _V_ = function(id, options){
 };
 
 VideoJS.options = {
-  techOrder: ["html5","h5swf","flowplayer"],
+  techOrder: ["html5","flowplayer","h5swf"],
   controlSets: ["bigPlayButton", "bar", "subtitlesBox"/*, "replay"*/],
   controlSetOptions: {
     bigPlayButton: {},
@@ -3276,9 +3276,3 @@ _V_.loadPlayerTimeout = function(wait){
   setTimeout(_V_.loadPlayers, wait);
 };
 _V_.loadPlayerTimeout(1); // Let vjs javascript finish executing
-
-// Expose to global
-window.VideoJS = window._V_ = VideoJS;
-
-// End self-executing function
-})(window);
