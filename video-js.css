@@ -223,11 +223,11 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
   margin-top: -0.3em;
   left: 0; top: 0; /*Needed for IE6*/
 
-  background: url('video-js.png') 0px -50px;
+  background: url('video-js.png') 0 -50px;
   /* CSS Curved Corners. Needed to make shadows curved. */
   -moz-border-radius: 0.8em; -webkit-border-radius: 0.8em; border-radius: 0.8em;
   /* CSS Shadows */
-  -webkit-box-shadow: 0px 2px 4px 0px #000; -moz-box-shadow: 0px 2px 4px 0px #000; box-shadow: 0px 2px 4px 0px #000;
+  -webkit-box-shadow: 0 2px 4px 0 #000; -moz-box-shadow: 0 2px 4px 0 #000; box-shadow: 0 2px 4px 0 #000;
 }
 /* Time Display
 -------------------------------------------------------------------------------- */
@@ -296,7 +296,7 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 }
 
 .vjs-default-skin div.vjs-big-play-button:hover {
-  -webkit-box-shadow: 0px 0px 80px #fff; -moz-box-shadow: 0px 0px 80px #fff; box-shadow: 0px 0px 80px #fff;
+  -webkit-box-shadow: 0 0 80px #fff; -moz-box-shadow: 0 0 80px #fff; box-shadow: 0 0 80px #fff;
 }
 
 .vjs-default-skin div.vjs-big-play-button span {
