@@ -142,7 +142,7 @@ VideoJS.tech.html5 = {
 // iOS
 if (_V_.isIOS()) {
   // If you move a video element in the DOM, it breaks video playback.
-  _V_.tech.supports.movingElementInDOM = false;
+  _V_.tech.html5.supports.movingElementInDOM = false;
 }
 
 // Android
