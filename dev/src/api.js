@@ -71,7 +71,7 @@ VideoJS.fn.extend({
   },
 
   volume: function(percentAsDecimal){
-    if (percentAsDecimal !== undefined) {
+    if (typeof percentAsDecimal !== 'undefined' && !isNaN(percentAsDecimal) && percentAsDecimal !== null ) {
       var vol = Math.max(0, Math.min(1, parseFloat(percentAsDecimal))); // Force value to between 0 and 1
       this.values.volume = vol;
       this.apiCall("setVolume", vol);
