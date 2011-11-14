@@ -52,7 +52,7 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
   /* Can use the Ultimate CSS Gradient Generator: http://www.colorzilla.com/gradient-editor/ */
   background: #242424; /* Old browsers */
   background: -moz-linear-gradient(top, #242424 50%, #1f1f1f 50%, #171717 100%); /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(50%,#242424), color-stop(50%,#1f1f1f), color-stop(100%,#171717)); /* Chrome,Safari4+ */
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(50%,#242424), color-stop(50%,#1f1f1f), color-stop(100%,#171717)); /* Chrome,Safari4+ */
   background: -webkit-linear-gradient(top, #242424 50%,#1f1f1f 50%,#171717 100%); /* Chrome10+,Safari5.1+ */
   background: -o-linear-gradient(top, #242424 50%,#1f1f1f 50%,#171717 100%); /* Opera11.10+ */
   background: -ms-linear-gradient(top, #242424 50%,#1f1f1f 50%,#171717 100%); /* IE10+ */
@@ -106,30 +106,30 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 
 .vjs-default-skin .vjs-volume-control { width: 5em; float: right; }
 .vjs-default-skin .vjs-volume-bar { 
-  position: relative; width: 5em; height: 0.6em; margin: 1em auto 0; background: #666; cursor: pointer !important; 
+  position: relative; width: 5em; height: 0.6em; margin: 1em auto 0; cursor: pointer !important; 
 
   -moz-border-radius: 0.3em; -webkit-border-radius: 0.3em; border-radius: 0.3em;
 
-  background: #333;
-  background: -moz-linear-gradient(top, #333 0%, #666 100%);
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#333), color-stop(100%,#666));
-  background: -webkit-linear-gradient(top, #333 0%,#666 100%);
-  background: -o-linear-gradient(top, #333 0%,#666 100%);
-  background: -ms-linear-gradient(top, #333 0%,#666 100%);
-  background: linear-gradient(top, #333 0%,#666 100%);
+  background: #666;
+  background: -moz-linear-gradient(top, #333, #666);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#333), to(#666));
+  background: -webkit-linear-gradient(top, #333, #666);
+  background: -o-linear-gradient(top, #333, #666);
+  background: -ms-linear-gradient(top, #333, #666);
+  background: linear-gradient(top, #333, #666);
 }
 .vjs-default-skin .vjs-volume-level { 
-  position: absolute; top: 0; left: 0; height: 0.6em; background: #fff; 
+  position: absolute; top: 0; left: 0; height: 0.6em; 
 
   -moz-border-radius: 0.3em; -webkit-border-radius: 0.3em; border-radius: 0.3em;
 
-  background: #ffffff;
-  background: -moz-linear-gradient(top, #ffffff 0%, #cccccc 100%);
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#cccccc));
-  background: -webkit-linear-gradient(top, #ffffff 0%,#cccccc 100%);
-  background: -o-linear-gradient(top, #ffffff 0%,#cccccc 100%);
-  background: -ms-linear-gradient(top, #ffffff 0%,#cccccc 100%);
-  background: linear-gradient(top, #ffffff 0%,#cccccc 100%);
+  background: #fff;
+  background: -moz-linear-gradient(top, #fff, #ccc);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#ccc));
+  background: -webkit-linear-gradient(top, #fff, #ccc);
+  background: -o-linear-gradient(top, #fff, #ccc);
+  background: -ms-linear-gradient(top, #fff, #ccc);
+  background: linear-gradient(top, #fff, #ccc);
 }
 .vjs-default-skin .vjs-volume-handle { 
   position: absolute; top: -0.2em; width: 0.8em; height: 0.8em; background: #ccc; left: 0;
@@ -149,12 +149,12 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 
   /* CSS Gradient */
   background: #333;
-  background: -moz-linear-gradient(top, #333 0%, #222 100%);
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#222), color-stop(100%,#333));
-  background: -webkit-linear-gradient(top, #222 0%,#333 100%);
-  background: -o-linear-gradient(top, #333 0%,#222 100%);
-  background: -ms-linear-gradient(top, #333 0%,#222 100%);
-  background: linear-gradient(top, #333 0%,#222 100%);
+  background: -moz-linear-gradient(top, #333, #222);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#333), to(#222));
+  background: -webkit-linear-gradient(top, #333, #222);
+  background: -o-linear-gradient(top, #333, #222);
+  background: -ms-linear-gradient(top, #333, #222);
+  background: linear-gradient(top, #333, #222);
 
   /* 1px top shadow */
 /*  -webkit-box-shadow: 0px -1px 0px 0px rgba(0, 0, 0, 0.15); -moz-box-shadow: 0px -1px 0px 0px rgba(0, 0, 0, 0.15); box-shadow: 0px -1px 0px 0px rgba(0, 0, 0, 0.15);*/
@@ -169,12 +169,12 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 
   /* CSS Gradient */
   background: #111;
-  background: -moz-linear-gradient(top, #111 0%, #262626 100%);
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#111), color-stop(100%,#262626));
-  background: -webkit-linear-gradient(top, #111 0%,#262626 100%);
-  background: -o-linear-gradient(top, #111 0%,#262626 100%);
-  background: -ms-linear-gradient(top, #111 0%,#262626 100%);
-  background: linear-gradient(top, #111 0%,#262626 100%);
+  background: -moz-linear-gradient(top, #111, #262626);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#111), to(#262626));
+  background: -webkit-linear-gradient(top, #111, #262626);
+  background: -o-linear-gradient(top, #111, #262626);
+  background: -ms-linear-gradient(top, #111, #262626);
+  background: linear-gradient(top, #111, #262626);
 }
 .vjs-default-skin .vjs-progress-holder .vjs-play-progress,
 .vjs-default-skin .vjs-progress-holder .vjs-load-progress { /* Progress Bars */
@@ -189,7 +189,7 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
   /* CSS Gradient. */ 
   background: #fff; /* Old browsers */
   background: -moz-linear-gradient(top, #fff 0%, #d6d6d6 50%, #fff 100%);
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fff), color-stop(50%,#d6d6d6), color-stop(100%,#fff));
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%,#fff), color-stop(50%,#d6d6d6), color-stop(100%,#fff));
   background: -webkit-linear-gradient(top, #fff 0%,#d6d6d6 50%,#fff 100%);
   background: -o-linear-gradient(top, #fff 0%,#d6d6d6 50%,#fff 100%);
   background: -ms-linear-gradient(top, #fff 0%,#d6d6d6 50%,#fff 100%);
@@ -197,7 +197,7 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
   
   background: #efefef;
   background: -moz-linear-gradient(top, #efefef 0%, #f5f5f5 50%, #dbdbdb 50%, #f1f1f1 100%);
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#efefef), color-stop(50%,#f5f5f5), color-stop(50%,#dbdbdb), color-stop(100%,#f1f1f1));
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%,#efefef), color-stop(50%,#f5f5f5), color-stop(50%,#dbdbdb), color-stop(100%,#f1f1f1));
   background: -webkit-linear-gradient(top, #efefef 0%,#f5f5f5 50%,#dbdbdb 50%,#f1f1f1 100%);
   background: -o-linear-gradient(top, #efefef 0%,#f5f5f5 50%,#dbdbdb 50%,#f1f1f1 100%);
   background: -ms-linear-gradient(top, #efefef 0%,#f5f5f5 50%,#dbdbdb 50%,#f1f1f1 100%);
@@ -209,12 +209,12 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 
   /* CSS Gradient */
   background: #666;
-  background: -moz-linear-gradient(top, #666 0%, #333 100%);
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#666), color-stop(100%,#333));
-  background: -webkit-linear-gradient(top, #666 0%,#333 100%);
-  background: -o-linear-gradient(top, #666 0%,#333 100%);
-  background: -ms-linear-gradient(top, #666 0%,#333 100%);
-  background: linear-gradient(top, #666 0%,#333 100%);
+  background: -moz-linear-gradient(top, #666, #333);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#666), to(#333));
+  background: -webkit-linear-gradient(top, #666, #333);
+  background: -o-linear-gradient(top, #666, #333);
+  background: -ms-linear-gradient(top, #666, #333);
+  background: linear-gradient(top, #666, #333);
 }
 
 .vjs-default-skin div.vjs-seek-handle {
@@ -223,11 +223,11 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
   margin-top: -0.3em;
   left: 0; top: 0; /*Needed for IE6*/
 
-  background: url('video-js.png') 0px -50px;
+  background: url('video-js.png') 0 -50px;
   /* CSS Curved Corners. Needed to make shadows curved. */
   -moz-border-radius: 0.8em; -webkit-border-radius: 0.8em; border-radius: 0.8em;
   /* CSS Shadows */
-  -webkit-box-shadow: 0px 2px 4px 0px #000; -moz-box-shadow: 0px 2px 4px 0px #000; box-shadow: 0px 2px 4px 0px #000;
+  -webkit-box-shadow: 0 2px 4px 0 #000; -moz-box-shadow: 0 2px 4px 0 #000; box-shadow: 0 2px 4px 0 #000;
 }
 /* Time Display
 -------------------------------------------------------------------------------- */
@@ -243,12 +243,12 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
   font-size: 1em; line-height: 1.0em; font-weight: normal; font-family: Helvetica, Arial, sans-serif;
   
   background: #333;
-  background: -moz-linear-gradient(top, #222 0%, #333 100%);
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#222), color-stop(100%,#333));
-  background: -webkit-linear-gradient(top, #222 0%,#333 100%);
-  background: -o-linear-gradient(top, #333 0%,#222 100%);
-  background: -ms-linear-gradient(top, #333 0%,#222 100%);
-  background: linear-gradient(top, #333 0%,#222 100%);
+  background: -moz-linear-gradient(top, #222, #333);
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#222), to(#333));
+  background: -webkit-linear-gradient(top, #222, #333);
+  background: -o-linear-gradient(top, #333, #222);
+  background: -ms-linear-gradient(top, #333, #222);
+  background: linear-gradient(top, #333, #222);
 
   /* 1px top shadow */
 /*  -webkit-box-shadow: 0px -1px 0px 0px rgba(0, 0, 0, 0.15); -moz-box-shadow: 0px -1px 0px 0px rgba(0, 0, 0, 0.15); box-shadow: 0px -1px 0px 0px rgba(0, 0, 0, 0.15);*/
@@ -284,7 +284,7 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 
   background: #454545;
   background: -moz-linear-gradient(top, #454545 0%, #232323 50%, #161616 50%, #3f3f3f 100%);
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#454545), color-stop(50%,#232323), color-stop(50%,#161616), color-stop(100%,#3f3f3f));
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(0%,#454545), color-stop(50%,#232323), color-stop(50%,#161616), color-stop(100%,#3f3f3f));
   background: -webkit-linear-gradient(top, #454545 0%,#232323 50%,#161616 50%,#3f3f3f 100%);
   background: -o-linear-gradient(top, #454545 0%,#232323 50%,#161616 50%,#3f3f3f 100%);
   background: -ms-linear-gradient(top, #454545 0%,#232323 50%,#161616 50%,#3f3f3f 100%);
@@ -296,7 +296,7 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 }
 
 .vjs-default-skin div.vjs-big-play-button:hover {
-  -webkit-box-shadow: 0px 0px 80px #fff; -moz-box-shadow: 0px 0px 80px #fff; box-shadow: 0px 0px 80px #fff;
+  -webkit-box-shadow: 0 0 80px #fff; -moz-box-shadow: 0 0 80px #fff; box-shadow: 0 0 80px #fff;
 }
 
 .vjs-default-skin div.vjs-big-play-button span {
