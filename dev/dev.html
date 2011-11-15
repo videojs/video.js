@@ -47,21 +47,9 @@
 </head>
 <body>
 
-  <video id="vid1" class="video-js vjs-default-skin" autoplay controls preload="none" width="640" height="264" 
+  <video id="vid1" class="video-js vjs-default-skin" autoplay preload="none" width="640" height="264" 
       poster="http://video-js.zencoder.com/oceans-clip.png"
-      >
-    <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4'>
-    <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm'>
-    <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg; codecs="theora, vorbis"'>
-    <source src="http://pseudo01.hddn.com/vod/demo.flowplayervod/flowplayer-700.flv" type='video/flv'>
-    <source src="http://www.youtube.com/watch?v=YjaZNYSt7o0&feature=related" type='video/youtube'>
-    <!-- <track kind="subtitles" src="http://videojs.com/subtitles/demo-subtitles.srt" srclang="en-US" label="English"></track> -->
-    <!-- <track kind="subtitles" src="demo-subtitles.srt" srclang="en-US" label="English"></track> -->
-  </video>
-
-  <video id="vid1" class="video-js vjs-default-skin" autoplay controls preload="none" width="640" height="264" 
-      poster="http://video-js.zencoder.com/oceans-clip.png"
-      data-setup='{"techOrder":["html5","youtube"]}'>
+      data-setup='{"techOrder":["html5","h5swf","youtube"]}'>
     <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4'>
     <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm'>
     <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg; codecs="theora, vorbis"'>

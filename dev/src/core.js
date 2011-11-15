@@ -1,7 +1,7 @@
 // HTML5 Shiv. Must be in <head>.
 document.createElement("video");document.createElement("audio");
 
-var VideoJS = _V_ = function(id, options){
+var VideoJS = _V_ = function(id, addOptions){
 
   // Allow for element or ID to be passed in.
   var tag = (typeof id == "string" ? _V_.el(id) : id);
@@ -17,10 +17,15 @@ var VideoJS = _V_ = function(id, options){
     return tag.player || new VideoJS(id, options);
   }
 
-  this.tag = tag;
-  var box = this.box = _V_.createElement("div"),
-      width = tag.width || 300,
-      height = tag.height || 150;
+  this.tag = tag; // The original tag used to set options
+  var box = this.box = _V_.createElement("div"), // Div to contain video and controls
+      options = this.options = {},
+      width = options.width = tag.width,
+      height = options.height = tag.height,
+
+      // Browsers default to 300x150 if there's no width/height or video size data.
+      initWidth = width || 300,
+      initHeight = height || 150;
 
   // Make player findable on elements
   tag.player = box.player = this;
@@ -30,27 +35,30 @@ var VideoJS = _V_ = function(id, options){
   box.appendChild(tag); // Breaks iPhone, fixed in HTML5 setup.
 
   // Give video tag properties to box
-  box.id = tag.id; // ID will now reference box, not the video tag
+  box.id = this.id = tag.id; // ID will now reference box, not the video tag
   box.className = tag.className;
-  box.setAttribute("width", width);
-  box.setAttribute("height", height);
-  box.style.width = width+"px";
-  box.style.height = height+"px";
-
-  // Strip tag of basic properties
+  // Update tag id/class for use as HTML5 playback tech
   tag.id += "_html5_api";
   tag.className = "vjs-tech";
+
+  // Make box use width/height of tag, or default 300x150
+  box.setAttribute("width", initWidth);
+  box.setAttribute("height", initHeight);
+  // Enforce with CSS since width/height attrs don't work on divs
+  box.style.width = initWidth+"px";
+  box.style.height = initHeight+"px";
+  // Remove width/height attrs from tag so CSS can make it 100% width/height
   tag.removeAttribute("width");
   tag.removeAttribute("height");
+
+  // Store controls setting, and then remove immediately so native controls don't flash.
+  options.controls = tag.getAttribute("controls") !== null;
   tag.removeAttribute("controls");
 
-  // Same id for player/box
-  this.id = box.id;
-
   // Default Options
-  this.options = _V_.options; // Global Defaults
+  _V_.merge(options, _V_.options); // Copy Global Defaults
   _V_.merge(this.options, this.getVideoTagSettings()); // Override with Video Tag Options
-  _V_.merge(this.options, options); // Override/extend with options from setup call
+  _V_.merge(this.options, addOptions); // Override/extend with options from setup call
 
   // Empty video tag sources and tracks so the built in player doesn't use them also.
   if (tag.hasChildNodes()) {
@@ -81,12 +89,14 @@ var VideoJS = _V_ = function(id, options){
 
   this.addEvent("ended", this.handleEnded);
 
-  // Build controls when the API is ready
-  this.addEvent("techready", _V_.proxy(this, function(){
-    this.each(this.options.controlSets, function(set){
-      _V_.controlSets[set].add.call(this);
+  // When the API is ready, loop through the controlsets and add to the player.
+  if (this.options.controls) {
+    this.addEvent("techready", function(){
+      this.each(this.options.controlSets, function(set){
+        _V_.controlSets[set].add.call(this);
+      });
     });
-  }));
+  }
 
   // Loop through playback technologies (HTML5, Flash) and check for support
   // Then load the best source.
@@ -113,13 +123,10 @@ VideoJS.fn = VideoJS.prototype = {
       tracks: []
     };
 
-    options.width = this.tag.width;
-    options.height = this.tag.height;
     options.src = this.tag.src;
     options.poster = this.tag.poster;
     options.preload = this.tag.preload;
     options.autoplay = this.tag.getAttribute("autoplay") !== null; // hasAttribute not IE <8 compatible
-    options.controls = this.tag.getAttribute("controls") !== null;
     options.loop = this.tag.getAttribute("loop") !== null;
     options.muted = this.tag.getAttribute("muted") !== null;
 

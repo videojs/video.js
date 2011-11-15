@@ -42,7 +42,8 @@ VideoJS.tech.html5 = {
       this.triggerEvent("loadstart");
     }
 
-    // Moving video inside box breaks autoplay on Safari.
+    // Moving video inside box breaks autoplay on Safari. This forces it to play.
+    // Currently triggering play in other browsers as well.
     this.addEvent("techready", function(){
       if (this.options.autoplay && this.paused()) {
         this.play();
