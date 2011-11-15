@@ -345,8 +345,9 @@ VideoJS.fn = VideoJS.prototype = {
       this.currentTime(0);
       this.play();
     } else {
-      this.currentTime(0);
       this.pause();
+      this.currentTime(0);
+      
     }
   },
 
