@@ -17,7 +17,7 @@ _V_.loadPlayers = function(){
             // If empty string, make it a parsable json object.
             options = JSON.parse(options || "{}");
             // Create new video.js instance.
-            VideoJS.players[vid.id] = new VideoJS(vid, options);
+            new VideoJS(vid, options);
           }
         }
 

@@ -1,7 +1,12 @@
 // HTML5 Shiv. Must be in <head>.
 document.createElement("video");document.createElement("audio");
 
-var VideoJS = _V_ = function(id, addOptions){
+var VideoJS = _V_ = function(id, addOptions, ready){
+
+  // If player has already been created for ID, return player.
+  if (_V_.players[id]) {
+    return _V_.players[id];
+  }
 
   // Allow for element or ID to be passed in.
   var tag = (typeof id == "string" ? _V_.el(id) : id);
@@ -14,10 +19,10 @@ var VideoJS = _V_ = function(id, addOptions){
   if (!(this instanceof arguments.callee)) {
     // Return the player attr on the element if it exists
     // Otherwise set up a new player.
-    return tag.player || new VideoJS(id, options);
+    return tag.player || new VideoJS(id, options, ready);
   }
 
-  this.tag = tag; // The original tag used to set options
+  this.tag = tag; // Store the original tag used to set options
   var box = this.box = _V_.createElement("div"), // Div to contain video and controls
       options = this.options = {},
       width = options.width = tag.width,
@@ -41,6 +46,9 @@ var VideoJS = _V_ = function(id, addOptions){
   tag.id += "_html5_api";
   tag.className = "vjs-tech";
 
+  // Make player easily findable by ID
+  _V_.players[box.id] = this
+
   // Make box use width/height of tag, or default 300x150
   box.setAttribute("width", initWidth);
   box.setAttribute("height", initHeight);
@@ -55,10 +63,10 @@ var VideoJS = _V_ = function(id, addOptions){
   options.controls = tag.getAttribute("controls") !== null;
   tag.removeAttribute("controls");
 
-  // Default Options
+  // Set Options
   _V_.merge(options, _V_.options); // Copy Global Defaults
-  _V_.merge(this.options, this.getVideoTagSettings()); // Override with Video Tag Options
-  _V_.merge(this.options, addOptions); // Override/extend with options from setup call
+  _V_.merge(options, this.getVideoTagSettings()); // Override with Video Tag Options
+  _V_.merge(options, addOptions); // Override/extend with options from setup call
 
   // Empty video tag sources and tracks so the built in player doesn't use them also.
   if (tag.hasChildNodes()) {
@@ -69,8 +77,10 @@ var VideoJS = _V_ = function(id, addOptions){
     }
   }
 
+  // Add callback to ready queue
+  if (ready) { this.ready(ready); }
+
   // Store references to elements for different purposes
-  this.els = {};
   // Tech (playback) Elements. Store playback tech objects for switching between them.
   // ex. this.tels.html5 = videoTagElement; this.tels.flowplayer = swfObject;
   this.tels = {};
@@ -80,6 +90,7 @@ var VideoJS = _V_ = function(id, addOptions){
   // Control Elements. Store refs to elements that are part of control sets
   // this.cels.mainControls.playButton = playButtonDiv;
   this.cels = {};
+
   // Cache for video property values.
   this.values = {};
 
@@ -101,6 +112,9 @@ var VideoJS = _V_ = function(id, addOptions){
   // Loop through playback technologies (HTML5, Flash) and check for support
   // Then load the best source.
   this.src(this.options.sources);
+
+  // Return Player Obj (though API will not be ready yet)
+  return this;
 };
 
 VideoJS.options = {
@@ -354,7 +368,6 @@ VideoJS.fn = VideoJS.prototype = {
     } else {
       this.pause();
       this.currentTime(0);
-      
     }
   },
 
