@@ -6,7 +6,7 @@ _V_.Track = function(attributes, player){
   this.kind = attributes.kind;
   this.srclang = attributes.srclang;
   this.label = attributes.label;
-  this["default"] = attributes["default"];
+  this["default"] = attributes["default"]; // 'default' is reserved-ish
   this.title = attributes.title;
 
   this.cues = [];

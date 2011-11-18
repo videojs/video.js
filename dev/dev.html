@@ -42,18 +42,14 @@
 
   <script src="src/autoload.js"></script>
 
-  <script type="text/javascript" src="flash/swfobject.js"></script>
+  <script src="flash/swfobject.js"></script>
 
 </head>
 <body>
 
-  <video src="http://video-js.zencoder.com/oceans-clip.mp4" id="vid1" class="video-js vjs-default-skin" autoplay preload="auto" width="640" height="264"
-      poster="http://video-js.zencoder.com/oceans-clip.png"></video>
-  
-
   <video id="vid1" class="video-js vjs-default-skin" autoplay preload="auto" width="640" height="264"
-      poster="http://video-js.zencoder.com/oceans-clip.png">
-      <!-- data-setup='{"techOrder":["html5","h5swf","youtube"]}'> -->
+      poster="http://video-js.zencoder.com/oceans-clip.png"
+      data-setup='{"techOrder":["html5","h5swf","youtube"]}'>
     <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4'>
     <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm'>
     <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg; codecs="theora, vorbis"'>

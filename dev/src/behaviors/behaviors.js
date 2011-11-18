@@ -23,6 +23,8 @@ VideoJS.fn.newBehavior("box",
 ================================================================================ */
 VideoJS.fn.newBehavior("tech", 
   function(element){
+    // Need to add click event to video element instead of box, otherwise box will
+    // catch clicks on all control buttons. (Could add stopPropagation to all, but don't want to if not needed yet.)
     _V_.addEvent(element, "click", _V_.proxy(this, this.onPlayToggleClick));
   },
   function(element){

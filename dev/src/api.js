@@ -116,7 +116,7 @@ VideoJS.fn.extend({
 
   // Turn on fullscreen (or window) mode
   enterFullScreen: function(){
-    if (false && this.supportsFullScreen()) {
+    if (this.supportsFullScreen()) {
       this.api("enterFullScreen");
     } else {
       this.enterFullWindow();
@@ -287,8 +287,8 @@ VideoJS.fn.extend({
   videoHeight: function(){ return this.apiCall("videoHeight"); },
   defaultPlaybackRate: function(){ return this.apiCall("defaultPlaybackRate"); },
   playbackRate: function(){ return this.apiCall("playbackRate"); },
-  mediaGroup: function(){ return this.apiCall("mediaGroup"); },
-  controller: function(){ return this.apiCall("controller"); },
+  // mediaGroup: function(){ return this.apiCall("mediaGroup"); },
+  // controller: function(){ return this.apiCall("controller"); },
   controls: function(){ return this.apiCall("controls"); },
   defaultMuted: function(){ return this.apiCall("defaultMuted"); }
 });

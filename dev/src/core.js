@@ -11,8 +11,7 @@ var VideoJS = _V_ = function(id, addOptions, ready){
   // Allow for element or ID to be passed in.
   var tag = (typeof id == "string" ? _V_.el(id) : id);
   if (!tag || !tag.nodeName) { // Could be a box div also
-    throw new TypeError("The element or ID supplied is not valid. (video.js)");
-    return;
+    throw new TypeError("The element or ID supplied is not valid. (video.js)"); // Returns
   }
 
   // Check if (not) using "new" operator before the function to create new instance
@@ -23,6 +22,7 @@ var VideoJS = _V_ = function(id, addOptions, ready){
   }
 
   this.tag = tag; // Store the original tag used to set options
+
   var box = this.box = _V_.createElement("div"), // Div to contain video and controls
       options = this.options = {},
       width = options.width = tag.width,
@@ -30,7 +30,10 @@ var VideoJS = _V_ = function(id, addOptions, ready){
 
       // Browsers default to 300x150 if there's no width/height or video size data.
       initWidth = width || 300,
-      initHeight = height || 150;
+      initHeight = height || 150,
+      
+      // If the HTML5 video is already playing, we'll adjust
+      paused = tag.paused;
 
   // Make player findable on elements
   tag.player = box.player = this;
@@ -38,6 +41,16 @@ var VideoJS = _V_ = function(id, addOptions, ready){
   // Wrap video tag in div (box) container
   tag.parentNode.insertBefore(box, tag);
   box.appendChild(tag); // Breaks iPhone, fixed in HTML5 setup.
+
+  // Safari (5.1.1) and Chrome (15) both have issues when you use autoplay and a poster and no controls.
+  // Chrome just hides the video. Safari hides the video if you move it in the DOM like VJS does.
+  // This fixes the Safari issue by removing the poster, which is currently never used again after
+  // the video starts playing.
+  if (!paused) {
+    options.poster = tag.poster
+    tag.poster = null; 
+    tag.play();
+  }
 
   // Give video tag properties to box
   box.id = this.id = tag.id; // ID will now reference box, not the video tag
@@ -115,7 +128,8 @@ var VideoJS = _V_ = function(id, addOptions, ready){
 
   // Return Player Obj (though API will not be ready yet)
   return this;
-};
+
+}, _V_ = VideoJS;
 
 VideoJS.options = {
   techOrder: ["html5","flowplayer","h5swf"],
@@ -204,7 +218,7 @@ VideoJS.fn = VideoJS.prototype = {
       this.triggerReady();
 
       // Make playback element clickable
-      this.addBehavior(this.currentTechElement, "tech");
+      this.addBehavior(this.currentTechElement, "playToggle");
 
       // Manually track progress in cases where the browser/flash player doesn't report it.
       if (!_V_.techSupports(tech, "event", "progress")) { this.manualProgressOn(); }

@@ -1,3 +1,4 @@
+/* OLD VERSION OF CONTROL BAR */
 _V_.controlSets.main = {
   options: {},
   add: function(){
