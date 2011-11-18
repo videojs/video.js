@@ -182,7 +182,7 @@ VideoJS.fn.extend({
   src: function(source){
     // Case: Array of source objects to choose from and pick the best to play
     if (source instanceof Array) {
-_V_.log(this.options.techOrder);
+
       techLoop: // Named loop for breaking both loops
       // Loop through each playback technology in the options order
       for (var i=0,j=this.options.techOrder;i<j.length;i++) {

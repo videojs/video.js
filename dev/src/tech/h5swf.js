@@ -3,8 +3,7 @@ VideoJS.tech.h5swf = {
   swf: "https://s3.amazonaws.com/video-js/3.0b/video-js.swf",
   // swf: "http://video-js.zencoder.com/3.0b/video-js.swf",
   supported: function(){
-    /* TODO Check for flash, etc. */
-    return true;
+    return swfobject.hasFlashPlayerVersion("9");
   },
   canPlaySource: function(sourceObj){
     if (sourceObj.type in _V_.tech.h5swf.supports.format) { return "maybe"; }
@@ -93,8 +92,8 @@ VideoJS.tech.h5swf = {
     }
   },
 
-   onSWFErrorEvent: function(swfID, eventName){
-    _V_.log("Error", eventName);
+  onSWFErrorEvent: function(swfID, eventName){
+    _V_.log("Flash (H5SWF) Error", eventName);
   },
   
   api: {

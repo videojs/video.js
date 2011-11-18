@@ -2,6 +2,7 @@
 VideoJS - HTML5 Video Player
 Version 3.0 BETA
 
+LGPL v3 LICENSE INFO
 This file is part of VideoJS. Copyright 2011 Zencoder, Inc.
 
 VideoJS is free software: you can redistribute it and/or modify

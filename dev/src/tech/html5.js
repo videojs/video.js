@@ -110,7 +110,10 @@ VideoJS.tech.html5 = {
       try {
         this.tels.html5.webkitEnterFullScreen();
       } catch (e) {
-        if (e.code == 11) { this.warning(VideoJS.warnings.videoNotReady); }
+        if (e.code == 11) { 
+          // this.warning(VideoJS.warnings.videoNotReady);
+          _V_.log("VideoJS: Video not ready.")
+        }
       }
     },
     src: function(src){ this.tels.html5.src = src; },
@@ -152,7 +155,7 @@ VideoJS.tech.html5 = {
 // iOS
 if (_V_.isIOS()) {
   // If you move a video element in the DOM, it breaks video playback.
-  _V_.tech.supports.movingElementInDOM = false;
+  _V_.tech.html5.supports.movingElementInDOM = false;
 }
 
 // Android

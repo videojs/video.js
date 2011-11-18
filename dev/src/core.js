@@ -382,6 +382,7 @@ VideoJS.fn = VideoJS.prototype = {
     } else {
       this.pause();
       this.currentTime(0);
+      this.pause();
     }
   },
 
@@ -410,7 +411,7 @@ VideoJS.fn = VideoJS.prototype = {
       localStorage[key] = value;
     } catch(e) {
       if (e.code == 22 || e.code == 1014) { // Webkit == 22 / Firefox == 1014
-        // this.warning(VideoJS.warnings.localStorageFull);
+        _V_.log("VideoJS: LocalStorage Full")
       }
     }
   }
