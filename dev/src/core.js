@@ -81,8 +81,6 @@ var VideoJS = _V_ = function(id, addOptions, ready){
   _V_.merge(options, this.getVideoTagSettings()); // Override with Video Tag Options
   _V_.merge(options, addOptions); // Override/extend with options from setup call
 
-  _V_.log(addOptions)
-
   // Empty video tag sources and tracks so the built in player doesn't use them also.
   if (tag.hasChildNodes()) {
     for (var i=0,j=tag.childNodes;i<j.length;i++) {
