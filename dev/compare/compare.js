@@ -1,6 +1,6 @@
 $(function(){  
   var tech, i,
-      techList = ["html5","h5swf","youtube"],
+      techList = ["html5","h5swf"],
       props = "error,currentSrc,networkState,buffered,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,seekable,ended,videoWidth,videoHeight,textTracks,preload,currentTime,playbackRate,autoplay,loop,controls,volume,muted,defaultMuted".split(","),
       methods = "play,pause,src,load,canPlayType,addTextTrack",
       notUsed = "mediaGroup,controller,videoTracks,audioTracks,defaultPlaybackRate";
@@ -8,6 +8,8 @@ $(function(){
 
   for (i=0; i < techList.length; i++) {
     tech = techList[i];
+
+    _V_.log(_V_.el("vid"+(i+1)))
 
     var player = _V_("vid"+(i+1), { "techOrder":[tech] });
 

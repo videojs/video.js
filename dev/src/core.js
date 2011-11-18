@@ -18,7 +18,7 @@ var VideoJS = _V_ = function(id, addOptions, ready){
   if (!(this instanceof arguments.callee)) {
     // Return the player attr on the element if it exists
     // Otherwise set up a new player.
-    return tag.player || new VideoJS(id, options, ready);
+    return tag.player || new VideoJS(id, addOptions, ready);
   }
 
   this.tag = tag; // Store the original tag used to set options
@@ -81,6 +81,8 @@ var VideoJS = _V_ = function(id, addOptions, ready){
   _V_.merge(options, this.getVideoTagSettings()); // Override with Video Tag Options
   _V_.merge(options, addOptions); // Override/extend with options from setup call
 
+  _V_.log(addOptions)
+
   // Empty video tag sources and tracks so the built in player doesn't use them also.
   if (tag.hasChildNodes()) {
     for (var i=0,j=tag.childNodes;i<j.length;i++) {
@@ -132,7 +134,7 @@ var VideoJS = _V_ = function(id, addOptions, ready){
 }, _V_ = VideoJS;
 
 VideoJS.options = {
-  techOrder: ["html5","flowplayer","h5swf"],
+  techOrder: ["html5","h5swf","flowplayer"],
   controlSets: ["bigPlayButton", "bar", "subtitlesBox"/*, "replay"*/],
   controlSetOptions: {
     bigPlayButton: {},
