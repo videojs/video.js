@@ -117,7 +117,7 @@ VideoJS.fn.extend({
   // Turn on fullscreen (or window) mode
   enterFullScreen: function(){
     if (this.supportsFullScreen()) {
-      this.api("enterFullScreen");
+      this.apiCall("enterFullScreen");
     } else {
       this.enterFullWindow();
     }
