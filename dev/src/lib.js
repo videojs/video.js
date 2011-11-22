@@ -119,6 +119,10 @@ _V_.extend({
     return h + m + s;
   },
 
+  capitalize: function(string){
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  },
+
   // Return the relative horizonal position of an event as a value from 0-1
   getRelativePosition: function(x, relativeElement){
     return Math.max(0, Math.min(1, (x - _V_.findPosX(relativeElement)) / relativeElement.offsetWidth));

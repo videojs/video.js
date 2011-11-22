@@ -117,7 +117,7 @@ VideoJS.fn.extend({
   // Turn on fullscreen (or window) mode
   enterFullScreen: function(){
     if (this.supportsFullScreen()) {
-      this.api("enterFullScreen");
+      this.apiCall("enterFullScreen");
     } else {
       this.enterFullWindow();
     }
@@ -142,10 +142,7 @@ VideoJS.fn.extend({
     this.docOrigOverflow = document.documentElement.style.overflow;
 
     // Add listener for esc key to exit fullscreen
-    _V_.addEvent(document, "keydown", _V_.proxy(this, this.fullscreenOnEscKey));
-
-    // Add listener for a window resize
-    _V_.addEvent(window, "resize", _V_.proxy(this, this.fullscreenOnWindowResize));
+    _V_.addEvent(document, "keydown", _V_.proxy(this, this.fullWindowOnEscKey));
 
     // Hide any scroll bars
     document.documentElement.style.overflow = 'hidden';
@@ -156,11 +153,16 @@ VideoJS.fn.extend({
 
     this.triggerEvent("enterFullWindow");
   },
+  
+  fullWindowOnEscKey: function(event){
+    if (event.keyCode == 27) {
+      this.exitFullScreen();
+    }
+  },
 
   exitFullWindow: function(){
     this.videoIsFullScreen = false;
-    _V_.removeEvent(document, "keydown", this.fullscreenOnEscKey);
-    _V_.removeEvent(window, "resize", this.fullscreenOnWindowResize);
+    _V_.removeEvent(document, "keydown", this.fullWindowOnEscKey);
 
     // Unhide scroll bars.
     document.documentElement.style.overflow = this.docOrigOverflow;
@@ -272,6 +274,7 @@ VideoJS.fn.extend({
 
   controls: function(){ return this.options.controls; },
   textTracks: function(){ return this.options.tracks; },
+  poster: function(){ return this.apiCall("poster"); },
 
   error: function(){ return this.apiCall("error"); },
   networkState: function(){ return this.apiCall("networkState"); },

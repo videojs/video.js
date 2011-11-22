@@ -38,7 +38,8 @@ VideoJS.tech.h5swf = {
           autoplay: this.options.autoplay,
           preload: this.options.preload,
           loop: this.options.loop,
-          muted: this.options.muted
+          muted: this.options.muted,
+          poster: this.options.poster,
         },
 
         params = {
@@ -105,6 +106,7 @@ VideoJS.tech.h5swf = {
     pause: function(){ this.tels.h5swf.vjs_pause(); },
     src: function(src){ this.tels.h5swf.vjs_src(src); },
     load: function(){ this.tels.h5swf.vjs_load(); },
+    poster: function(){ this.tels.h5swf.vjs_getProperty("poster"); },
 
     buffered: function(){
       return _V_.createTimeRange(0, this.tels.h5swf.vjs_getProperty("buffered"));

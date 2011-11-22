@@ -96,10 +96,10 @@ VideoJS.fn.newBehavior("seekBar",
     },
     updateSeekBars: function(){
       // If scrubbing, use the cached currentTime value for speed
-      var progress = /* (this.scrubbing) ? this.scrubTime / this.duration() : */ this.currentTime() / this.duration();
+      var progress =  /* (this.scrubbing) ? this.values.currentTime / this.duration() : */ this.currentTime() / this.duration();
       // Protect against no duration and other division issues
       if (isNaN(progress)) { progress = 0; }
-      
+
       this.each(this.bels.seekBars, function(bar){
         var barData = _V_.getData(bar),
             barX = _V_.findPosX(bar),
@@ -165,33 +165,36 @@ VideoJS.fn.newBehavior("seekHandle",
   {}
 );
 
-/* Play Progress Bar Behaviors
+/* 
+CHANGED TO SEEK BAR
+Play Progress Bar Behaviors 
 ================================================================================ */
-VideoJS.fn.newBehavior("playProgressBar",
-  function(element){
-    if (!this.bels.playProgressBars) {
-      this.bels.playProgressBars = [];
-      this.addEvent("timeupdate", this.updatePlayProgressBars);
-    }
-    this.bels.playProgressBars.push(element);
-  },
-  function(){
-    // Remove
-  },
-  {
-    // Ajust the play progress bar's width based on the current play time
-    updatePlayProgressBars: function(){
-      // If scrubbing, use the cached currentTime value for speed
-      var progress = (this.scrubbing) ? this.values.currentTime / this.duration() : this.currentTime() / this.duration();
-      // Protect against no duration and other division issues
-      if (isNaN(progress)) { progress = 0; }
-      // Update bar length
-      this.each(this.bels.playProgressBars, function(bar){
-        if (bar.style) { bar.style.width = _V_.round(progress * 100, 2) + "%"; }
-      });
-    }
-  }
-);
+// VideoJS.fn.newBehavior("playProgressBar",
+//   function(element){
+//     if (!this.bels.playProgressBars) {
+//       this.bels.playProgressBars = [];
+//       this.addEvent("timeupdate", this.updatePlayProgressBars);
+//     }
+//     this.bels.playProgressBars.push(element);
+//   },
+//   function(){
+//     // Remove
+//   },
+//   {
+//     // Ajust the play progress bar's width based on the current play time
+//     updatePlayProgressBars: function(){
+//       // If scrubbing, use the cached currentTime value for speed
+//       var progress = (this.scrubbing) ? this.values.currentTime / this.duration() : this.currentTime() / this.duration();
+//       _V_.log("PROG", progress)
+//       // Protect against no duration and other division issues
+//       if (isNaN(progress)) { progress = 0; }
+//       // Update bar length
+//       this.each(this.bels.playProgressBars, function(bar){
+//         if (bar.style) { bar.style.width = _V_.round(progress * 100, 2) + "%"; }
+//       });
+//     }
+//   }
+// );
 
 /* Load Progress Bar Behaviors
 ================================================================================ */

@@ -104,6 +104,9 @@ var VideoJS = _V_ = function(id, addOptions, ready){
   // this.cels.mainControls.playButton = playButtonDiv;
   this.cels = {};
 
+  // New holder for UI objects
+  this.ui = {};
+
   // Cache for video property values.
   this.values = {};
 
@@ -117,8 +120,12 @@ var VideoJS = _V_ = function(id, addOptions, ready){
   if (this.options.controls) {
     this.addEvent("techready", function(){
       this.each(this.options.controlSets, function(set){
-        _V_.controlSets[set].add.call(this);
+        this.appendUI(set);
       });
+      
+      // this.each(this.options.controlSets, function(set){
+      //   _V_.controlSets[set].add.call(this);
+      // });
     });
   }
 
@@ -133,7 +140,8 @@ var VideoJS = _V_ = function(id, addOptions, ready){
 
 VideoJS.options = {
   techOrder: ["html5","h5swf","flowplayer"],
-  controlSets: ["bigPlayButton", "bar", "subtitlesBox"/*, "replay"*/],
+  // controlSets: ["bigPlayButton", "bar", "subtitlesBox"/*, "replay"*/],
+  controlSets: ["bigPlayButton", "controlBar"/*, "bar", "subtitlesBox", "replay"*/],
   controlSetOptions: {
     bigPlayButton: {},
     bar: {},
@@ -286,6 +294,29 @@ VideoJS.fn = VideoJS.prototype = {
     if (typeof element == "string") { element = _V_.el(element); }
     this.behaviors[behavior].remove.call(this, element);
   },
+  
+  appendUI: function(nameORobj){
+    var name, uiClass, options, ui;
+
+    if (typeof set == "string") {
+      name = nameORobj;
+
+      // Assume name of set is a lowercased name of the UI Class (PlayButton, etc.)
+      uiClass = _V_.capitalize(nameORobj);
+
+    // Can also pass in object to define a different class than the name and add other options
+    } else {
+      name = nameORobj.name;
+      uiClass = nameORobj.uiClass;
+      options = nameORobj.options;
+    }
+
+    // Create a new object & element for this controls set
+    ui = this.ui[name] = new _V_[uiClass](this);
+
+    // Add the UI object's element to the container div (box)
+    this.box.appendChild(ui.el);
+  },
 
   /* Fallbacks for unsupported event types
   ================================================================================ */
@@ -380,9 +411,9 @@ VideoJS.fn = VideoJS.prototype = {
       this.currentTime(0);
       this.play();
     } else {
-      this.pause();
-      this.currentTime(0);
-      this.pause();
+      // this.pause();
+      // this.currentTime(0);
+      // this.pause();
     }
   },
 
