@@ -14,7 +14,8 @@ _V_.Track = function(attributes, player){
   this.lastCueIndex = 0;
 
   // Update current cue on timeupdate
-  player.addEvent("timeupdate", _V_.proxy(this, this.update))
+  player.addEvent("timeupdate", _V_.proxy(this, this.update));
+
   // Reset cue time on media end
   player.addEvent("ended", _V_.proxy(this, function() { this.lastCueIndex = 0; }));
 

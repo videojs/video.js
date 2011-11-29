@@ -1,4 +1,4 @@
-// Event System (J.Resig - Secrets of a JS Ninja http://jsninja.com/ [Go buy it, really])
+// Event System (J.Resig - Secrets of a JS Ninja http://jsninja.com/ [Go read it, really])
 // (Book version isn't completely usable, so fixed some things and borrowed from jQuery where it's working)
 // 
 // This should work very similarly to jQuery's events, however it's based off the book version which isn't as
