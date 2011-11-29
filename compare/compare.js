@@ -1,6 +1,6 @@
 $(function(){  
   var tech, i,
-      techList = ["html5","h5swf"],
+      techList = ["html5","h5swf","youtube"],
       props = "error,currentSrc,networkState,buffered,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,seekable,ended,videoWidth,videoHeight,textTracks,preload,currentTime,defaultPlaybackRate,playbackRate,autoplay,loop,controls,volume,muted,defaultMuted,poster".split(","),
       methods = "play,pause,src,load,canPlayType,addTextTrack",
       notUsed = "mediaGroup,controller,videoTracks,audioTracks,defaultPlaybackRate";
@@ -11,7 +11,7 @@ $(function(){
 
     var player = _V_("vid"+(i+1), { "techOrder":[tech] });
 
-    _V_.each(_V_.html5Events, function(evt){
+    _V_.each(_V_.HTML5.events, function(evt){
       player.addEvent(evt, _V_.proxy(tech, function(evt){
         var eventsId = "#"+this+"_events",
             type = evt.type,

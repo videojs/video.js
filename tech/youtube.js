@@ -1,5 +1,7 @@
 // Flowplayer API Connector
 VideoJS.tech.youtube = {
+  name: "YouTube",
+  
   supported: function(){
     // Flash Player 8 or higher
     return true;

@@ -2,6 +2,14 @@
 # Combines Source Files. In terminal, sh combine_sources.sh
 # It will put a new video.js file under dist/
 
+# FILES=../src/*
+# for f in $FILES
+# do
+#   echo "Processing $f file..."
+#   # take action on each file. $f store current file name
+#   cat $f
+# done
+
 cat ../src/_begin.js > ../dist/video.js
 
 cat ../src/core.js >> ../dist/video.js
@@ -24,14 +32,7 @@ cat ../flash/swfobject.js >> ../dist/video.js
 # So does Youtube
 cat ../src/tech/youtube.js >> ../dist/video.js
 
-cat ../src/behaviors/behaviors.js >> ../dist/video.js
-cat ../src/behaviors/seekBar.js >> ../dist/video.js
-cat ../src/behaviors/texttrackdisplays.js >> ../dist/video.js
-cat ../src/behaviors/volume.js >> ../dist/video.js
-
-cat ../src/controls/bar.js >> ../dist/video.js
-cat ../src/controls/bigPlay.js >> ../dist/video.js
-cat ../src/controls/subtitlesBox.js >> ../dist/video.js
+cat ../src/components.js >> ../dist/video.js
 
 cat ../src/autoload.js >> ../dist/video.js
 

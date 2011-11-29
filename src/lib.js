@@ -11,8 +11,8 @@ _V_.extend({
   controlSets: {}, // Holder for control set definitions
 
   techSupports: function(tech, type, name){
-    if (tech.supports[type]) {
-      return tech.supports[type][name];
+    if (_V_[tech].supports[type]) {
+      return _V_[tech].supports[type][name];
     }
     return false;
   },
@@ -20,8 +20,6 @@ _V_.extend({
     if (!tech.supports[type]) { tech.supports[type] = {}; }
     tech.supports[type][name] = value;
   },
-  
-  html5Events: "loadstart,suspend,abort,error,emptied,stalled,loadedmetadata,loadeddata,canplay,canplaythrough,playing,waiting,seeking,seeked,ended,durationchange,timeupdate,progress,play,pause,ratechange,volumechange".split(","),
 
   // Device Checks
   isIE: function(){ return !+"\v1"; },
@@ -171,6 +169,7 @@ _V_.extend({
 
   // Returns the cache object where data for the element is stored
   getData: function(elem){
+    // _V_.log(arguments.callee.caller.arguments.callee.caller)
     var id = elem[_V_.expando];
     if (!id) {
       id = elem[_V_.expando] = _V_.guid++;
@@ -257,16 +256,41 @@ _V_.extend({
       _V_.log(e);
       onError(e);
     }
+  },
+
+  /* Local Storage
+  ================================================================================ */
+  setLocalStorage: function(key, value){
+    // IE was throwing errors referencing the var anywhere without this
+    var localStorage = localStorage || false;
+    if (!localStorage) { return; }
+    try {
+      localStorage[key] = value;
+    } catch(e) {
+      if (e.code == 22 || e.code == 1014) { // Webkit == 22 / Firefox == 1014
+        _V_.log("LocalStorage Full (VideoJS)", e);
+      } else {
+        _V_.log("LocalStorage Error (VideoJS)", e);
+      }
+    }
   }
 
 });
 
-// /* Function Context Allows for binding context to functions when using in event listeners
-// ================================================================================ */
-// Function.prototype.context = function(obj){
-//   var method = this,
-//   temp = function(){
-//     return method.apply(obj, arguments);
-//   };
-//   return temp;
-// };
+// usage: log('inside coolFunc', this, arguments);
+// paulirish.com/2009/log-a-lightweight-wrapper-for-consolelog/
+_V_.log = function(){
+  _V_.log.history = _V_.log.history || [];// store logs to an array for reference
+  _V_.log.history.push(arguments);
+  if(window.console) {
+    arguments.callee = arguments.callee.caller;
+    var newarr = [].slice.call(arguments);
+    (typeof console.log === 'object' ? _V_.log.apply.call(console.log, console, newarr) : console.log.apply(console, newarr));
+  }
+};
+
+// make it safe to use console.log always
+(function(b){function c(){}for(var d="assert,count,debug,dir,dirxml,error,exception,group,groupCollapsed,groupEnd,info,log,timeStamp,profile,profileEnd,time,timeEnd,trace,warn".split(","),a;a=d.pop();){b[a]=b[a]||c}})((function(){try
+{console.log();return window.console;}catch(err){return window.console={};}})());
+
+

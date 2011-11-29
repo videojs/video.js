@@ -1,5 +1,7 @@
 // Flowplayer API Connector
 VideoJS.tech.flowplayer = {
+  name: "Flowplayer",
+  
   supported: function(){
     if (flowplayer) { 
       return true;
