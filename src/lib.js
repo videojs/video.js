@@ -17,8 +17,8 @@ _V_.extend({
     return false;
   },
   updateTechSupport: function(tech, type, name, value){
-    if (!tech.supports[type]) { tech.supports[type] = {}; }
-    tech.supports[type][name] = value;
+    if (_V_[tech].supports[type] === undefined) { _V_[tech].supports[type] = {}; }
+    _V_[tech].supports[type][name] = value;
   },
 
   // Device Checks
