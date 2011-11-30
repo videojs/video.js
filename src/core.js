@@ -2,8 +2,7 @@
 document.createElement("video");document.createElement("audio");
 
 var VideoJS = function(id, addOptions, ready){
-
-  var tag;
+  var tag; // Element of ID
 
   // Allow for element or ID to be passed in
   // String ID
@@ -30,7 +29,7 @@ var VideoJS = function(id, addOptions, ready){
 
   // Check for a useable element
   if (!tag || !tag.nodeName) { // re: nodeName, could be a box div also
-    throw new TypeError("The element or ID supplied is not valid. (video.js)"); // Returns
+    throw new TypeError("The element or ID supplied is not valid. (VideoJS)"); // Returns
   }
 
   // Element may have a player attr referring to an already created player instance.
@@ -94,8 +93,8 @@ VideoJS.options = {
 
 // Automatically set up any tags that have a data-setup attribute
 _V_.autoSetup = function(){
-  var vids = document.getElementsByTagName("video"),
-      options, vid, player;
+  var options, vid, player,
+      vids = document.getElementsByTagName("video");
 
   // Check if any media elements exist
   if (vids && vids.length > 0) {
