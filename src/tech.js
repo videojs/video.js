@@ -35,9 +35,9 @@ _V_.HTML5 = _V_.PlaybackTech.extend({
 
     var source = options.source;
 
-    if (this.el.currentSrc != source.src) {
+    if (source && this.el.currentSrc != source.src) {
       this.el.src = source.src;
-    } else {
+    } else if (source) {
       player.triggerEvent("loadstart");
     }
 
@@ -58,16 +58,18 @@ _V_.HTML5 = _V_.PlaybackTech.extend({
   },
 
   createElement: function(){
+    var html5 = _V_.HTML5,
+        player = this.player,
 
-    var el = this.player.tag, // Reuse original tag for HTML5 playback technology element
-        html5 = _V_.HTML5,
-        playerOptions = this.player.options;
+        // Reuse original tag for HTML5 playback technology element
+        el = player.tag,
+        newEl;
 
     // Check if this browser supports moving the element into the box.
     // On the iPhone video will break if you move the element,
     // So we have to create a brand new element.
     if (html5.supports.movingElementInDOM === false) {
-      var newEl = _V_.createElement("video", {
+      newEl = _V_.createElement("video", {
         id: el.id,
         className: el.className
       });
@@ -79,11 +81,10 @@ _V_.HTML5 = _V_.PlaybackTech.extend({
 
     // Update tag settings, in case they were overridden
     _V_.each(["autoplay","preload","loop","muted","poster"], function(attr){
-      el[attr] = playerOptions[attr];
+      el[attr] = player.options[attr];
     }, this);
 
     return el;
-
   },
 
   setupTriggers: function(){
@@ -234,17 +235,17 @@ _V_.H5swf = _V_.PlaybackTech.extend({
     var source = options.source,
         placeHolder = this.el = _V_.createElement("div", { id: player.el.id + "_temp_h5swf" }),
         objId = player.el.id+"_h5swf_api",
+        playerOptions = player.options;
 
         flashvars = {
           readyFunction: "_V_.H5swf.onSWFReady",
           eventProxyFunction: "_V_.H5swf.onSWFEvent",
           errorEventProxyFunction: "_V_.H5swf.onSWFErrorEvent",
-          src: source.src,
-          autoplay: player.options.autoplay,
-          preload: player.options.preload,
-          loop: player.options.loop,
-          muted: player.options.muted,
-          poster: player.options.poster
+          autoplay: playerOptions.autoplay,
+          preload: playerOptions.preload,
+          loop: playerOptions.loop,
+          muted: playerOptions.muted,
+          poster: playerOptions.poster
         },
 
         params = {
@@ -259,10 +260,14 @@ _V_.H5swf = _V_.PlaybackTech.extend({
           'class': 'vjs-tech'
         };
 
+    // If source was supplied pass as a flash var.
+    if (source) {
+      flashvars.src = source.src;
+    }
+
     player.el.appendChild(placeHolder);
 
     swfobject.embedSWF(options.swf || this.swf, placeHolder.id, "480", "270", "9.0.124", "", flashvars, params, attributes);
-    
   },
 
   setupTriggers: function(){
@@ -272,7 +277,7 @@ _V_.H5swf = _V_.PlaybackTech.extend({
   play: function(){ this.el.vjs_play(); },
   pause: function(){ this.el.vjs_pause(); },
   src: function(src){ this.el.vjs_src(src); },
-  load: function(){ this.el.vjs_load(); },
+  load: function(){ this.el.vjs_load(); _V_.log("load"); },
   poster: function(){ this.el.vjs_getProperty("poster"); },
 
   buffered: function(){
@@ -290,7 +295,7 @@ _V_.H5swf = _V_.PlaybackTech.extend({
 // Create setters and getters for attributes
 (function(){
   var api = _V_.H5swf.prototype,
-      readWrite = "src,preload,currentTime,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted".split(","),
+      readWrite = "preload,currentTime,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted".split(","),
       readOnly = "error,currentSrc,networkState,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight,textTracks".split(","),
       callOnly = "load,play,pause".split(",");
       // Overridden: buffered

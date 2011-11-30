@@ -23,9 +23,26 @@
   <script src="src/tracks.js"></script>
 
   <script src="flash/swfobject.js"></script>
+  
+  <script type="text/javascript" charset="utf-8">
+    if (window.location.href.indexOf("?flash") !== -1) {
+      _V_.options.techOrder = ["H5swf"]
+    }
+  </script>
 
 </head>
 <body>
+
+  <video id="dyn" class="video-js vjs-default-skin" autoplay controls width="640" height="264">
+    
+  </video>
+
+  <script type="text/javascript" charset="utf-8">
+    _V_("dyn");
+    setTimeout(function(){
+      _V_("dyn").src("http://video-js.zencoder.com/oceans-clip.mp4");
+    }, 2000);
+  </script>
 
   <video id="vid1" class="video-js vjs-default-skin" controls preload="none" width="640" height="264"
       poster="http://video-js.zencoder.com/oceans-clip.png"
