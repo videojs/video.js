@@ -25,6 +25,7 @@
   <script src="flash/swfobject.js"></script>
   
   <script type="text/javascript" charset="utf-8">
+    // Easy access to test Flash over HTML5. Add ?flash to URL
     if (window.location.href.indexOf("?flash") !== -1) {
       _V_.options.techOrder = ["H5swf"]
     }
@@ -33,24 +34,12 @@
 </head>
 <body>
 
-  <video id="dyn" class="video-js vjs-default-skin" autoplay controls width="640" height="264">
-    
-  </video>
-
-  <script type="text/javascript" charset="utf-8">
-    _V_("dyn");
-    setTimeout(function(){
-      _V_("dyn").src("http://video-js.zencoder.com/oceans-clip.mp4");
-    }, 2000);
-  </script>
-
   <video id="vid1" class="video-js vjs-default-skin" controls preload="none" width="640" height="264"
       poster="http://video-js.zencoder.com/oceans-clip.png"
       data-setup='{}'>
     <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4'>
     <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm'>
     <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg; codecs="theora, vorbis"'>
-    <source src="http://pseudo01.hddn.com/vod/demo.flowplayervod/flowplayer-700.flv" type='video/flv'>
     <source src="http://www.youtube.com/watch?v=YjaZNYSt7o0&feature=related" type='video/youtube'>
     <track kind="subtitles" src="http://videojs.com/subtitles/demo-subtitles.srt" srclang="en-US" label="English"></track>
     <!-- <track kind="subtitles" src="demo-subtitles.srt" srclang="en-US" label="English"></track> -->
