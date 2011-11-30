@@ -277,7 +277,7 @@ _V_.H5swf = _V_.PlaybackTech.extend({
   play: function(){ this.el.vjs_play(); },
   pause: function(){ this.el.vjs_pause(); },
   src: function(src){ this.el.vjs_src(src); },
-  load: function(){ this.el.vjs_load(); _V_.log("load"); },
+  load: function(){ this.el.vjs_load(); },
   poster: function(){ this.el.vjs_getProperty("poster"); },
 
   buffered: function(){

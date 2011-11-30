@@ -248,7 +248,9 @@ _V_.extend({
         if (request.status == 200 || local && request.status == 0) {
           onSuccess(request.responseText);
         } else {
-          onError();
+          if (onError) {
+            onError();
+          }
         }
       }
     });
@@ -257,7 +259,9 @@ _V_.extend({
       request.send();
     } catch(e) {
       _V_.log("VideoJS XMLHttpRequest (send)", e);
-      onError(e);
+      if (onError) {
+        onError(e);
+      }
     }
   },
 
