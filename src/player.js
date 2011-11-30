@@ -30,9 +30,9 @@ _V_.Player = _V_.Component.extend({
     // This fixes the Safari issue by removing the poster, which is currently never used again after
     // the video starts playing.
     if (!paused) {
-      options.poster = tag.poster
-      tag.poster = null;
-      tag.play();
+      // options.poster = tag.poster
+      // tag.poster = null;
+      // tag.play();
     }
 
     // Give video tag properties to box
@@ -193,7 +193,6 @@ _V_.Player = _V_.Component.extend({
     // Add tech element to player div
     if (this.techs[techName] === undefined) {
       this.techs[techName] = this.tech = new _V_[techName](this, { source: source });
-      _V_.insertFirst(this.tech.el, this.el);
     } else {
       this.tech = this.techs[techName];
       _V_.insertFirst(this.techs[techName].el, this.el);

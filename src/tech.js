@@ -222,15 +222,17 @@ _V_.H5swf = _V_.PlaybackTech.extend({
   name: "H5swf",
 
   // swf: "flash/video-js.swf",
-  swf: "https://s3.amazonaws.com/video-js/3.0b/video-js.swf",
+  // swf: "https://s3.amazonaws.com/video-js/3.0b/video-js.swf",
   // swf: "http://video-js.zencoder.com/3.0b/video-js.swf",
+  swf: "http://video-js.com/test/video-js.swf",
+  // swf: "video-js.swf",
 
   init: function(player, options){
     this.player = player;
     // this.el = this.createElement();
 
     var source = options.source,
-        placeHolder = _V_.createElement("div", { id: player.el.id + "_temp_h5swf" }),
+        placeHolder = this.el = _V_.createElement("div", { id: player.el.id + "_temp_h5swf" }),
         objId = player.el.id+"_h5swf_api",
 
         flashvars = {
@@ -242,7 +244,7 @@ _V_.H5swf = _V_.PlaybackTech.extend({
           preload: player.options.preload,
           loop: player.options.loop,
           muted: player.options.muted,
-          poster: player.options.poster,
+          poster: player.options.poster
         },
 
         params = {

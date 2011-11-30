@@ -693,7 +693,7 @@ _V_.TextTrackDisplay = _V_.Component.extend({
 
   createElement: function(){
     return this._super("div", {
-      className: "vjs-" + this.trackType,
+      className: "vjs-" + this.trackType
     });
   },
 

@@ -35,7 +35,7 @@ var VideoJS = function(id, addOptions, ready){
 
   // Element may have a player attr referring to an already created player instance.
   // If not, set up a new player and return the instance.
-  return tag.player || new _V_.Player(id, addOptions, ready);
+  return tag.player || new _V_.Player(tag, addOptions, ready);
 },
 
 // Shortcut

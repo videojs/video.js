@@ -59,6 +59,7 @@ _V_.extend({
     }
     return el;
   },
+
   insertFirst: function(node, parent){
     if (parent.firstChild) {
       parent.insertBefore(parent.firstChild, node);
@@ -66,11 +67,13 @@ _V_.extend({
       parent.appendChild(node);
     }
   },
+
   addClass: function(element, classToAdd){
     if ((" "+element.className+" ").indexOf(" "+classToAdd+" ") == -1) {
       element.className = element.className === "" ? classToAdd : element.className + " " + classToAdd;
     }
   },
+
   removeClass: function(element, classToRemove){
     if (element.className.indexOf(classToRemove) == -1) { return; }
     var classNames = element.className.split(" ");
@@ -235,7 +238,7 @@ _V_.extend({
     try {
       request.open("GET", url);
     } catch(e) {
-      _V_.log(e);
+      _V_.log("VideoJS XMLHttpRequest (open)", e);
       // onError(e);
       return false;
     }
@@ -253,7 +256,7 @@ _V_.extend({
     try {
       request.send();
     } catch(e) {
-      _V_.log(e);
+      _V_.log("VideoJS XMLHttpRequest (send)", e);
       onError(e);
     }
   },
