@@ -10,6 +10,11 @@ in the video-js directory using the commnand-line/terminal of a unix-based syste
 
 Contributing
 ------------
+If you'd like to help out on VideoJS, you are awesome. Updates should be made to the source files and then make a pull request.
+
+When working on VideoJS code, you can use dev.html as your test page. It doesn't exist in the repo and changes to it won't be tracked. To get your own copy simply clone the repo and copy dev.html.example.
+cp dev.html.example dev.html
+
 You can use dev.html to test new code. It's simple HTML doc that includes all the source files. Send a pull request for any updates.
 
 ---
