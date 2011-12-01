@@ -25,7 +25,7 @@ body.vjs-full-window {
   padding: 0; margin: 0;
   height: 100%; overflow-y: auto; /* Fix for IE6 full-window. http://www.cssplay.co.uk/layouts/fixed.html */
 }
-.video-js.vjs-fullscreen {
+.video-js.vjs-fullscreen, .video-js:-webkit-full-screen {
   position: fixed; overflow: hidden; z-index: 1000; left: 0; top: 0; bottom: 0; right: 0; width: 100% !important; height: 100% !important;
   _position: absolute; /* IE6 Full-window (underscore hack) */
 }
