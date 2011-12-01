@@ -11,7 +11,11 @@ _V_.PlaybackTech = _V_.Component.extend({
   },
   createElement: function(){},
   setupTriggers: function(){},
-  removeTriggers: function(){}
+  removeTriggers: function(){},
+  
+  canPlaySource: function(source){
+    return _V_[this.name].canPlaySource(source);
+  }
 });
 
 // Create placeholder methods for each that warn when a method
@@ -28,33 +32,35 @@ _V_.each(_V_.apiMethods, function(methodName){
 _V_.HTML5 = _V_.PlaybackTech.extend({
   name: "HTML5",
 
-  init: function(player, options){
-
+  init: function(player, options, ready){
     this.player = player;
     this.el = this.createElement();
+    this.ready(ready);
 
     var source = options.source;
 
-    if (source && this.el.currentSrc != source.src) {
-      this.el.src = source.src;
-    } else if (source) {
+    // If the element source is already set, we may have missed the loadstart event, and want to trigger it.
+    // We don't want to set the source again and interrupt playback.
+    if (source && this.el.currentSrc == source.src) {
       player.triggerEvent("loadstart");
+
+    // Otherwise set the source if one was provided.
+    } else if (source) {
+      this.el.src = source.src;
     }
 
-    // Moving video inside box breaks autoplay on Safari. This forces it to play.
-    // Currently triggering play in other browsers as well.
-    player.addEvent("techready", function(){
+    // Chrome and Safari both have issues with autoplay.
+    // In Safari (5.1.1), when we move the video element into the container div, autoplay doesn't work.
+    // In Chrome (15), if you have autoplay + a poster + no controls, the video gets hidden (but audio plays)
+    // This fixes both issues. Need to wait for API, so it updates displays correctly
+    player.ready(function(){
       if (this.options.autoplay && this.paused()) {
+        this.tag.poster = null; // Chrome Fix. Fixed in Chrome v16.
         this.play();
       }
-      this.removeEvent("techready", arguments.callee);
     });
 
-    // Trigger tech ready on player.
-    // TODO: Switch to component ready when available.
-    setTimeout(_V_.proxy(this, function(){
-      this.player.triggerEvent("techready");
-    }), 0);
+    this.triggerReady();
   },
 
   createElement: function(){
@@ -76,7 +82,8 @@ _V_.HTML5 = _V_.PlaybackTech.extend({
 
       player.el.removeChild(el);
       el = newEl;
-      player.el.appendChild(el);
+      _V_.log("here")
+      _V_.insertFirst(el, player.el);
     }
 
     // Update tag settings, in case they were overridden
@@ -186,7 +193,7 @@ _V_.HTML5.isSupported = function(){
 };
 
 _V_.HTML5.canPlaySource = function(srcObj){
-  return !!document.createElement("video").canPlayType(srcObj.type); // Switch to global check
+  return !!document.createElement("video").canPlayType(srcObj.type);
   // TODO: Check Type
   // If no Type, check ext
   // Check Media Type
@@ -222,18 +229,19 @@ if (_V_.isAndroid()) {
 _V_.H5swf = _V_.PlaybackTech.extend({
   name: "H5swf",
 
-  // swf: "flash/video-js.swf",
+  swf: "flash/video-js.swf",
   // swf: "https://s3.amazonaws.com/video-js/3.0b/video-js.swf",
   // swf: "http://video-js.zencoder.com/3.0b/video-js.swf",
-  swf: "http://video-js.com/test/video-js.swf",
+  // swf: "http://video-js.com/test/video-js.swf",
+  // swf: "http://video-js.com/source/flash/video-js.swf",
+  // swf: "http://video-js.com/source/flash/video-js.swf",
   // swf: "video-js.swf",
 
   init: function(player, options){
     this.player = player;
-    // this.el = this.createElement();
+    var placeHolder = this.el = _V_.createElement("div", { id: player.el.id + "_temp_h5swf" });
 
     var source = options.source,
-        placeHolder = this.el = _V_.createElement("div", { id: player.el.id + "_temp_h5swf" }),
         objId = player.el.id+"_h5swf_api",
         playerOptions = player.options;
 
@@ -244,8 +252,7 @@ _V_.H5swf = _V_.PlaybackTech.extend({
           autoplay: playerOptions.autoplay,
           preload: playerOptions.preload,
           loop: playerOptions.loop,
-          muted: playerOptions.muted,
-          poster: playerOptions.poster
+          muted: playerOptions.muted
         },
 
         params = {
@@ -260,12 +267,16 @@ _V_.H5swf = _V_.PlaybackTech.extend({
           'class': 'vjs-tech'
         };
 
+    if (playerOptions.poster) {
+      flashvars.poster = playerOptions.poster;
+    }
+
     // If source was supplied pass as a flash var.
     if (source) {
       flashvars.src = source.src;
     }
 
-    player.el.appendChild(placeHolder);
+    _V_.insertFirst(placeHolder, player.el);
 
     swfobject.embedSWF(options.swf || this.swf, placeHolder.id, "480", "270", "9.0.124", "", flashvars, params, attributes);
   },
@@ -276,7 +287,16 @@ _V_.H5swf = _V_.PlaybackTech.extend({
 
   play: function(){ this.el.vjs_play(); },
   pause: function(){ this.el.vjs_pause(); },
-  src: function(src){ this.el.vjs_src(src); },
+  src: function(src){ 
+    this.el.vjs_src(src);
+
+    // Currently the SWF doesn't autoplay if you load a source later.
+    // e.g. Load player w/ no source, wait 2s, set src.
+    if (this.player.autoplay) {
+      // var tech = this;
+      // setTimeout(function(){ tech.play(); }, 0);
+    }
+  },
   load: function(){ this.el.vjs_load(); },
   poster: function(){ this.el.vjs_getProperty("poster"); },
 
@@ -347,24 +367,26 @@ _V_.H5swf.supports = {
 };
 
 _V_.H5swf.onSWFReady = function(currSwf){
+  
+  _V_.log(currSwf, "currSwf")
+  
   // Flash seems to be catching errors, so raising them manally
   try {
     // Delay for real swf ready.
     setTimeout(function(){
-      var el = _V_.el(currSwf),
+      var el = _V_.el(currSwf);
 
           // Get player from box
-          player = el.parentNode.player;
+      var  player = el.parentNode.player,
+          tech = player.techs["H5swf"];
 
+      // Reference player on tech element
       el.player = player;
 
       // Update reference to playback technology element
-      player.techs["H5swf"].el = el;
+      tech.el = el;
 
-      player.ready(function(){
-        // this.src("http://video-js.zencoder.com/oceans-clip.mp4");
-      });
-      player.triggerEvent("techready");
+      tech.triggerReady();
 
     },0);
 

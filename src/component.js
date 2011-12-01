@@ -141,10 +141,12 @@ _V_.Component = _V_.Class.extend({
   /* Ready - Trigger functions when component is ready
   ================================================================================ */
   ready: function(fn){
+    if (!fn) return;
+
     if (this.isReady) {
       fn.call(this);
     } else {
-      if (this.readyQueue !== undefined) {
+      if (this.readyQueue === undefined) {
         this.readyQueue = [];
       }
       this.readyQueue.push(fn);
@@ -152,9 +154,8 @@ _V_.Component = _V_.Class.extend({
   },
 
   triggerReady: function(){
-    if (this.isReady) return;
     this.isReady = true;
-    if (this.readyQueue.length > 0) {
+    if (this.readyQueue && this.readyQueue.length > 0) {
       // Call all functions in ready queue
       this.each(this.readyQueue, function(fn){
         fn.call(this);

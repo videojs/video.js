@@ -62,7 +62,7 @@ _V_.extend({
 
   insertFirst: function(node, parent){
     if (parent.firstChild) {
-      parent.insertBefore(parent.firstChild, node);
+      parent.insertBefore(node, parent.firstChild);
     } else {
       parent.appendChild(node);
     }

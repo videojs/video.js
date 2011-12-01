@@ -13,27 +13,17 @@ _V_.Player = _V_.Component.extend({
 
         // Browsers default to 300x150 if there's no width/height or video size data.
         initWidth = width || 300,
-        initHeight = height || 150,
-
-        // If the HTML5 video is already playing, we'll adjust
-        paused = tag.paused;
+        initHeight = height || 150;
 
     // Make player findable on elements
     tag.player = el.player = this;
 
+    // Add callback to ready queue
+    this.ready(ready);
+
     // Wrap video tag in div (el/box) container
     tag.parentNode.insertBefore(el, tag);
     el.appendChild(tag); // Breaks iPhone, fixed in HTML5 setup.
-
-    // Safari (5.1.1) and Chrome (15) both have issues when you use autoplay and a poster and no controls.
-    // Chrome just hides the video. Safari hides the video if you move it in the DOM like VJS does.
-    // This fixes the Safari issue by removing the poster, which is currently never used again after
-    // the video starts playing.
-    if (!paused) {
-      // options.poster = tag.poster
-      // tag.poster = null;
-      // tag.play();
-    }
 
     // Give video tag properties to box
     el.id = this.id = tag.id; // ID will now reference box, not the video tag
@@ -72,11 +62,6 @@ _V_.Player = _V_.Component.extend({
       }
     }
 
-    // Add callback to ready queue
-    this.apiIsReady = false;
-    this.readyQueue = [];
-    if (ready) { this.ready(ready); }
-
     // Holder for playback tech components
     this.techs = {};
 
@@ -88,11 +73,12 @@ _V_.Player = _V_.Component.extend({
     this.addEvent("ended", this.onEnded);
     this.addEvent("play", this.onPlay);
     this.addEvent("pause", this.onPause);
+    this.addEvent("error", this.onError);
+    
 
     // When the API is ready, loop through the components and add to the player.
-    this.components = [];
     if (this.options.controls) {
-      this.addEvent("techready", function(){
+      this.ready(function(){
         this.each(this.options.components, function(set){
           this.addComponent(set);
         });
@@ -173,9 +159,20 @@ _V_.Player = _V_.Component.extend({
   // And append playback element in player div.
   loadTech: function(techName, source){
 
+    this.triggerEvent("loadingtech");
+
     // Pause and remove current playback technology
     if (this.tech) {
-      this.removeTech(tech);
+      this.removeTech(this.tech);
+      
+      // Turn off any manual progress or timeupdate tracking
+      if (this.manualProgress) {
+        this.manualProgressOff()
+      }
+
+      if (this.manualTimeUpdates) {
+        this.manualTimeUpdatesOff()
+      }
 
     // If the first time loading, HTML5 tag will exist but won't be initialized
     // So we need to remove it if we're not loading HTML5
@@ -188,28 +185,30 @@ _V_.Player = _V_.Component.extend({
     // Turn off API access because we're loading a new tech that might load asynchronously
     this.isReady = false;
 
-    // Finsh API Setup when tech is ready
-    this.addEvent("techready", _V_.proxy(this, function(){
-      // Reomve this so it's not called twice next load
-      this.removeEvent("techready", arguments.callee);
-
+    var techReady = function(){
       // Set up playback technology's event triggers
-      this.tech.setupTriggers();
-      this.triggerReady();
+      this.setupTriggers();
+      this.player.triggerReady();
 
       // Manually track progress in cases where the browser/flash player doesn't report it.
-      if (!_V_.techSupports(techName, "event", "progress")) { this.manualProgressOn(); }
+      if (!_V_.techSupports(this.name, "event", "progress")) { 
+        this.player.manualProgressOn(); 
+      }
 
       // Manually track timeudpates in cases where the browser/flash player doesn't report it.
-      if (!_V_.techSupports(techName, "event", "timeupdate")) { this.manualTimeUpdatesOn(); }
-    }));
+      if (!_V_.techSupports(this.name, "event", "timeupdate")) { 
+        this.player.manualTimeUpdatesOn(); 
+      }
+    }
 
     // Initialize new tech if it hasn't been yet and load source
     // Add tech element to player div
     if (this.techs[techName] === undefined) {
       this.techs[techName] = this.tech = new _V_[techName](this, { source: source });
+      this.tech.ready(techReady)
     } else {
       this.tech = this.techs[techName];
+          _V_.log("here3")
       _V_.insertFirst(this.techs[techName].el, this.el);
       this.src(source);
     }
@@ -330,6 +329,10 @@ _V_.Player = _V_.Component.extend({
   onPause: function(){
     _V_.removeClass(this.el, "vjs-playing");
     _V_.addClass(this.el, "vjs-paused");
+  },
+  
+  onError: function(e) {
+    _V_.log("Video Error", e);
   }
 
 });
@@ -342,7 +345,9 @@ _V_.Player.prototype.extend({
     if (this.isReady) {
       return this.tech[method](arg);
     } else {
-      throw new Error("The playback technology API is not ready yet. Use player.ready(myFunction).");
+      _V_.log("The playback technology API is not ready yet. Use player.ready(myFunction)."+" ["+method+"]")
+      return false;
+      // throw new Error("The playback technology API is not ready yet. Use player.ready(myFunction)."+" ["+method+"]");
     }
   },
 
@@ -506,6 +511,8 @@ _V_.Player.prototype.extend({
     // Case: Array of source objects to choose from and pick the best to play
     if (source instanceof Array) {
 
+      var sources = source;
+
       techLoop: // Named loop for breaking both loops
       // Loop through each playback technology in the options order
       for (var i=0,j=this.options.techOrder;i<j.length;i++) {
@@ -517,7 +524,7 @@ _V_.Player.prototype.extend({
         if (tech.isSupported()) {
 
           // Loop through each source object
-          for (var a=0,b=this.options.sources;a<b.length;a++) {
+          for (var a=0,b=sources;a<b.length;a++) {
             var source = b[a];
 
             // Check if source can be played with this technology
@@ -540,12 +547,27 @@ _V_.Player.prototype.extend({
 
     // Case: Source object { src: "", type: "" ... }
     } else if (source instanceof Object) {
-      this.src(source.src);
-
+      if (this.tech.canPlaySource(source)) {
+        this.src(source.src);
+      } else {
+        // Send through tech loop to check for a compatible technology.
+        this.src([source]);
+      }
     // Case: URL String (http://myvideo...)
     } else {
-      this.apiCall("src", source);
-      this.load();
+      if (!this.isReady) {
+        this.ready(function(){
+          this.src(source);
+        });
+      } else {
+        this.apiCall("src", source);
+        if (this.options.preload == "auto") {
+          this.load();
+        }
+        if (this.options.autoplay) {
+          // this.play();
+        }
+      }
     }
     return this;
   },
