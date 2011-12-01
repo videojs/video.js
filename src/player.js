@@ -437,24 +437,28 @@ _V_.Player.prototype.extend({
 
   // Turn on fullscreen (or window) mode
   enterFullScreen: function(){
-    if (this.supportsFullScreen()) {
-      this.apiCall("enterFullScreen");
-    } else {
-      this.enterFullWindow();
-    }
-    this.triggerEvent("enterFullScreen");
-    return this;
-  },
+     if (this.supportsFullScreen()) {
+       this.videoIsFullScreen = true;
+       this.apiCall("enterFullScreen");
+     } else {
+       this.enterFullWindow();
+     }
+     this.triggerEvent("enterFullScreen");
+     return this;
+   },
 
-  exitFullScreen: function(){
-    if (true || !this.supportsFullScreen()) {
-      this.exitFullWindow();
-    }
-    this.triggerEvent("exitFullScreen");
+   exitFullScreen: function(){
+     if (this.supportsFullScreen()) {
+       this.videoIsFullScreen = false;
+       this.apiCall("exitFullScreen");
+     } else {
+       this.exitFullWindow();
+     }
+     this.triggerEvent("exitFullScreen");
 
-    // Otherwise Shouldn't be called since native fullscreen uses own controls.
-    return this;
-  },
+     // Otherwise Shouldn't be called since native fullscreen uses own controls.
+     return this;
+   },
 
   enterFullWindow: function(){
     this.videoIsFullScreen = true;
