@@ -441,6 +441,26 @@ _V_.Player.prototype.extend({
 
   // Turn on fullscreen (or window) mode
   enterFullScreen: function(){
+<<<<<<< HEAD
+    if (this.supportsFullScreen()) {
+      this.apiCall("enterFullScreen");
+    } else {
+      this.enterFullWindow();
+    }
+    this.triggerEvent("enterFullScreen");
+    return this;
+  },
+
+  exitFullScreen: function(){
+    if (true || !this.supportsFullScreen()) {
+      this.exitFullWindow();
+    }
+    this.triggerEvent("exitFullScreen");
+
+    // Otherwise Shouldn't be called since native fullscreen uses own controls.
+    return this;
+  },
+=======
     this.videoIsFullScreen = true;
      if (typeof this.el.webkitRequestFullScreen == 'function') {
        this.el.webkitRequestFullScreen();
@@ -464,9 +484,10 @@ _V_.Player.prototype.extend({
      }
      this.triggerEvent("exitFullScreen");
 
-    // Otherwise Shouldn't be called since native fullscreen uses own controls.
-    return this;
-  },
+     // Otherwise Shouldn't be called since native fullscreen uses own controls.
+     return this;
+   },
+>>>>>>> 2f99215f8dae0cac216f8c494f9058b087b39725
 
   enterFullWindow: function(){
     this.videoIsFullScreen = true;

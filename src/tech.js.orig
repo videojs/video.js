@@ -135,12 +135,30 @@ _V_.HTML5 = _V_.PlaybackTech.extend({
   height: function(){ return this.el.offsetHeight; },
 
   supportsFullScreen: function(){
+<<<<<<< HEAD
+    if(typeof this.el.webkitEnterFullScreen == 'function') {
+=======
     if (typeof this.el.webkitEnterFullScreen == 'function') {
       
+>>>>>>> 2f99215f8dae0cac216f8c494f9058b087b39725
       // Seems to be broken in Chromium/Chrome && Safari in Leopard
       if (!navigator.userAgent.match("Chrome") && !navigator.userAgent.match("Mac OS X 10.5")) {
         return true;
       }
+<<<<<<< HEAD
+    }
+    return false;
+  },
+  enterFullScreen: function(){
+    try {
+      this.el.webkitEnterFullScreen();
+    } catch (e) {
+      if (e.code == 11) {
+        // this.warning(VideoJS.warnings.videoNotReady);
+        _V_.log("VideoJS: Video not ready.")
+      }
+    }
+=======
     } 
       return false;
   },
@@ -153,6 +171,7 @@ _V_.HTML5 = _V_.PlaybackTech.extend({
           _V_.log("VideoJS: Video not ready.")
         }
       }
+>>>>>>> 2f99215f8dae0cac216f8c494f9058b087b39725
   },
   src: function(src){ this.el.src = src; },
   load: function(){ this.el.load(); },
