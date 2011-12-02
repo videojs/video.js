@@ -20,7 +20,7 @@ _V_.PlaybackTech = _V_.Component.extend({
 
 // Create placeholder methods for each that warn when a method
 // isn't supported by the current playback technology
-_V_.apiMethods = "play,pause,paused,currentTime,setCurrentTime,duration,buffered,volume,setVolume,muted,setMuted,width,height,supportsFullScreen,enterFullScreen,exitFullScreen,src,load,currentSrc,preload,setPreload,autoplay,setAutoplay,loop,setLoop,error,networkState,readyState,seeking,initialTime,startOffsetTime,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight,textTracks,defaultPlaybackRate,playbackRate,mediaGroup,controller,controls,defaultMuted".split(",");
+_V_.apiMethods = "play,pause,paused,currentTime,setCurrentTime,duration,buffered,volume,setVolume,muted,setMuted,width,height,supportsFullScreen,enterFullScreen,src,load,currentSrc,preload,setPreload,autoplay,setAutoplay,loop,setLoop,error,networkState,readyState,seeking,initialTime,startOffsetTime,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight,textTracks,defaultPlaybackRate,playbackRate,mediaGroup,controller,controls,defaultMuted".split(",");
 _V_.each(_V_.apiMethods, function(methodName){
   _V_.PlaybackTech.prototype[methodName] = function(){
     throw new Error("The '"+method+"' method is not available on the playback technology's API");
@@ -135,45 +135,22 @@ _V_.HTML5 = _V_.PlaybackTech.extend({
   height: function(){ return this.el.offsetHeight; },
 
   supportsFullScreen: function(){
-    if (typeof this.el.webkitRequestFullScreen == 'function') {
-      return true;
-    } else if (typeof this.el.webkitEnterFullScreen == 'function') {
-      
+    if(typeof this.el.webkitEnterFullScreen == 'function') {
       // Seems to be broken in Chromium/Chrome && Safari in Leopard
       if (!navigator.userAgent.match("Chrome") && !navigator.userAgent.match("Mac OS X 10.5")) {
         return true;
       }
-    } else {
-      return false;
-      }
+    }
+    return false;
   },
   enterFullScreen: function(){
-    if (typeof this.el.webkitRequestFullScreen == 'function') {
-      try {
-        this.player.el.webkitRequestFullScreen();
-      } catch (e) {
-        if (e.code == 11) {
-          // this.warning(VideoJS.warnings.videoNotReady);
-          _V_.log("VideoJS: Video not ready.")
-        }
+    try {
+      this.el.webkitEnterFullScreen();
+    } catch (e) {
+      if (e.code == 11) {
+        // this.warning(VideoJS.warnings.videoNotReady);
+        _V_.log("VideoJS: Video not ready.")
       }
-    } else {
-      try {
-        this.el.webkitEnterFullScreen();
-      } catch (e) {
-        if (e.code == 11) {
-          // this.warning(VideoJS.warnings.videoNotReady);
-          _V_.log("VideoJS: Video not ready.")
-        }
-      }
-    }
-  },
-  
-  exitFullScreen: function(){
-    if (typeof this.el.webkitRequestFullScreen == 'function') {
-        document.webkitCancelFullScreen();
-    } else {
-        document.webkitExitFullScreen();
     }
   },
   src: function(src){ this.el.src = src; },
@@ -316,8 +293,8 @@ _V_.H5swf = _V_.PlaybackTech.extend({
     // Currently the SWF doesn't autoplay if you load a source later.
     // e.g. Load player w/ no source, wait 2s, set src.
     if (this.player.autoplay) {
-      // var tech = this;
-      // setTimeout(function(){ tech.play(); }, 0);
+      var tech = this;
+      setTimeout(function(){ tech.play(); }, 0);
     }
   },
   load: function(){ this.el.vjs_load(); },
