@@ -439,14 +439,7 @@ _V_.Player.prototype.extend({
   enterFullScreen: function(){
     this.videoIsFullScreen = true;
      if (typeof this.el.webkitRequestFullScreen == 'function') {
-       try {
-         this.el.webkitRequestFullScreen();
-       } catch (e) {
-         if (e.code == 11) {
-           // this.warning(VideoJS.warnings.videoNotReady);
-           _V_.log("VideoJS: Video not ready.")
-         }
-       }
+       this.el.webkitRequestFullScreen();
      } else if (this.supportsFullScreen()) {
        this.apiCall("enterFullScreen");
      } else {
