@@ -437,8 +437,10 @@ _V_.Player.prototype.extend({
 
   // Turn on fullscreen (or window) mode
   enterFullScreen: function(){
-     if (this.supportsFullScreen()) {
-       this.videoIsFullScreen = true;
+    this.videoIsFullScreen = true;
+     if (typeof this.el.webkitRequestFullScreen == 'function') {
+       this.el.webkitRequestFullScreen();
+     } else if (this.supportsFullScreen()) {
        this.apiCall("enterFullScreen");
      } else {
        this.enterFullWindow();
@@ -448,9 +450,11 @@ _V_.Player.prototype.extend({
    },
 
    exitFullScreen: function(){
-     if (this.supportsFullScreen()) {
-       this.videoIsFullScreen = false;
-       this.apiCall("exitFullScreen");
+     this.videoIsFullScreen = false;
+     if (typeof this.el.webkitRequestFullScreen == 'function') {
+       document.webkitCancelFullScreen();
+     } else if (this.supportsFullScreen()) {
+       document.webkitExitFullScreen();
      } else {
        this.exitFullWindow();
      }
