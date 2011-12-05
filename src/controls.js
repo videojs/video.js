@@ -1,9 +1,6 @@
 /* Control - Base class for all control elements
 ================================================================================ */
 _V_.Control = _V_.Component.extend({
-  init: function(player, options){
-    this._super(player, options);
-  },
 
   buildCSSClass: function(){
     return "vjs-control " + this._super();
@@ -18,27 +15,21 @@ _V_.Button = _V_.Control.extend({
   init: function(player, options){
     this._super(player, options);
 
-    _V_.addEvent(this.el, "click", _V_.proxy(this, this.onClick));
-    _V_.addEvent(this.el, "focus", _V_.proxy(this, this.onFocus));
-    _V_.addEvent(this.el, "blur", _V_.proxy(this, this.onBlur));
-
-    return "fdsa";
+    this.addEvent("click", this.onClick);
+    this.addEvent("focus", this.onFocus);
+    this.addEvent("blur", this.onBlur);
   },
 
   createElement: function(type, attrs){
-    // Default to Div element
-    type = type || "div";
-
     // Add standard Aria and Tabindex info
     attrs = _V_.merge({
+      className: this.buildCSSClass(),
+      innerHTML: '<div><span class="vjs-control-text">' + (this.buttonText || "Need Text") + '</span></div>',
       role: "button",
       tabIndex: 0
-    }, attrs || {});
+    }, attrs);
 
-    return this._super(type, {
-      className: attrs.className || this.buildCSSClass(),
-      innerHTML: attrs.innerHTML || '<div><span class="vjs-control-text">' + (this.buttonText || "Need Text") + '</span></div>'
-    });
+    return this._super(type, attrs);
   },
 
   // Click - Override with specific functionality for button
@@ -186,8 +177,8 @@ _V_.ControlBar = _V_.Component.extend({
   init: function(player, options){
     this._super(player, options);
 
-    // player.addEvent("mouseover", _V_.proxy(this, this.show));
-    // player.addEvent("mouseout", _V_.proxy(this, this.hide));
+    player.addEvent("mouseover", _V_.proxy(this, this.show));
+    player.addEvent("mouseout", _V_.proxy(this, this.hide));
   },
 
   createElement: function(){
@@ -312,6 +303,138 @@ _V_.RemainingTimeDisplay = _V_.Component.extend({
 
 });
 
+/* Slider - Parent for seek bar and volume slider
+================================================================================ */
+_V_.Slider = _V_.Component.extend({
+
+  init: function(player, options){
+    this._super(player, options);
+
+    _V_.each.call(this, this.components, function(comp){
+      if (comp instanceof _V_[this.barClass]) {
+        this.bar = comp;
+      } else if (comp instanceof _V_[this.handleClass]) {
+        this.handle = comp;
+      }
+    });
+
+    player.addEvent(this.playerEvent, _V_.proxy(this, this.update));
+
+    this.addEvent("mousedown", this.onMouseDown);
+    this.addEvent("focus", this.onFocus);
+    this.addEvent("blur", this.onBlur);
+  },
+
+  createElement: function(type, attrs) {
+    attrs = _V_.merge({
+      role: "slider", 
+      "aria-valuenow": 0,
+      "aria-valuemin": 0,
+      "aria-valuemax": 100,
+      tabIndex: 0
+    }, attrs);
+
+    return this._super(type, attrs);
+  },
+
+  onMouseDown: function(event){
+    event.preventDefault();
+    _V_.blockTextSelection();
+
+    _V_.addEvent(document, "mousemove", _V_.proxy(this, this.onMouseMove));
+    _V_.addEvent(document, "mouseup", _V_.proxy(this, this.onMouseUp));
+
+    this.onMouseMove(event);
+  },
+
+  onMouseUp: function(event) {
+    _V_.unblockTextSelection();
+    _V_.removeEvent(document, "mousemove", this.onMouseMove, false);
+    _V_.removeEvent(document, "mouseup", this.onMouseUp, false);
+  },
+
+  update: function(){
+    // If scrubbing, we could use a cached value to make the handle keep up with the user's mouse.
+    // On HTML5 browsers scrubbing is really smooth, but some flash players are slow, so we might want to utilize this later.
+    // var progress =  (this.player.scrubbing) ? this.player.values.currentTime / this.player.duration() : this.player.currentTime() / this.player.duration();
+
+    var progress = this.getPercent();
+        handle = this.handle,
+        bar = this.bar,
+        barProgress = progress;
+
+    // Protect against no duration and other division issues
+    if (isNaN(progress)) { progress = 0; }
+
+    // If there is a handle, we need to account for the handle in our calculation for progress bar
+    // so that it doesn't fall short of or extend past the handle.
+    if (handle) {
+      var box = this.el,
+          boxWidth = box.offsetWidth,
+
+          // The width of the handle in percent of the containing box
+          handlePercent = handle.el.offsetWidth / boxWidth,
+
+          // Get the adjusted size of the box, considering that the handle's center never touches the left or right side.
+          // There is a margin of half the handle's width on both sides.
+          boxAdjustedPercent = 1 - handlePercent;
+
+          // Adjust the progress that we'll use to set widths to the new adjusted box width
+          adjustedProgress = progress * boxAdjustedPercent,
+
+          // The bar does reach the left side, so we need to account for this in the bar's width
+          barProgress = adjustedProgress + (handlePercent / 2);
+
+      // Move the handle from the left based on the adjected progress
+      handle.el.style.left = _V_.round(adjustedProgress * 100, 2) + "%";
+    }
+
+    // Set the new bar width
+    bar.el.style.width = _V_.round(barProgress * 100, 2) + "%";
+  },
+
+  calculateDistance: function(event){
+    var box = this.el,
+        boxX = _V_.findPosX(box),
+        boxW = box.offsetWidth,
+        handle = this.handle;
+
+    // _V_.log(box.offsetLeft, box.offsetLeft)
+
+    if (handle) {
+      var handleW = handle.el.offsetWidth;
+
+      // Adjusted X and Width, so handle doesn't go outside the bar
+      boxX = boxX + (handleW / 2);
+      boxW = boxW - handleW;
+    }
+
+    // _V_.log(event.pageX, boxX, boxW);
+
+    // Percent that the click is through the adjusted area
+    return Math.max(0, Math.min(1, (event.pageX - boxX) / boxW));
+  },
+
+  onFocus: function(event){
+    _V_.addEvent(document, "keyup", _V_.proxy(this, this.onKeyPress));
+  },
+
+  onKeyPress: function(event){
+    if (event.which == 37) { // Left Arrow
+      event.preventDefault();
+      this.stepBack();
+    } else if (event.which == 39) { // Right Arrow
+      event.preventDefault();
+      this.stepForward();
+    }
+  },
+
+  onBlur: function(event){
+    _V_.removeEvent(document, "keyup", _V_.proxy(this, this.onKeyPress));
+  }
+});
+
+
 /* Progress
 ================================================================================ */
 
@@ -327,28 +450,14 @@ _V_.ProgressControl = _V_.Component.extend({
 });
 
 // Seek Bar and holder for the progress bars
-_V_.SeekBar = _V_.Component.extend({
+_V_.SeekBar = _V_.Slider.extend({
+
+  barClass: "PlayProgressBar",
+  handleClass: "SeekHandle",
+  playerEvent: "timeupdate",
 
   init: function(player, options){
     this._super(player, options);
-
-    _V_.each.call(this, this.components, function(comp){
-      if (comp instanceof _V_.PlayProgressBar) {
-        this.playProgressBar = comp;
-      } else if (comp instanceof _V_.SeekHandle) {
-        this.seekHandle = comp;
-      }
-    });
-
-    player.addEvent("timeupdate", _V_.proxy(this, this.update));
-
-    _V_.addEvent(this.el, "mousedown", _V_.proxy(this, this.onMouseDown));
-    _V_.addEvent(this.el, "focus", _V_.proxy(this, this.onFocus));
-    _V_.addEvent(this.el, "blur", _V_.proxy(this, this.onBlur));
-
-    // _V_.addEvent(element, "mousedown", _V_.proxy(element, function(event){
-    //   player.onSeekBarMouseDown(event, this);
-    // }));
   },
 
   createElement: function(){
@@ -357,66 +466,21 @@ _V_.SeekBar = _V_.Component.extend({
     });
   },
 
-  update: function(){
-    // If scrubbing, use the cached currentTime value for speed
-    var progress =  /* (this.player.scrubbing) ? this.player.values.currentTime / this.player.duration() : */ this.player.currentTime() / this.player.duration();
-    // Protect against no duration and other division issues
-    if (isNaN(progress)) { progress = 0; }
-
-    var // barData = _V_.getData(bar),
-        barX = _V_.findPosX(this.el),
-        barW = this.el.offsetWidth,
-        handle = this.seekHandle,
-        progBar = this.playProgressBar,
-        handleW = (handle) ? handle.el.offsetWidth : 0;
-
-        // Adjusted X and Width, so handle doesn't go outside the bar
-        barAX = barX + (handleW / 2),
-        barAW = barW - handleW,
-        progBarProgress = _V_.round(progress * barAW + handleW / 2) + "px";
-
-    if (progBar && progBar.el.style) {
-      progBar.el.style.width = progBarProgress;
-    }
-
-    if (handle) {
-      handle.el.style.left = _V_.round(progress * barAW)+"px";
-    }
+  getPercent: function(){
+    return this.player.currentTime() / this.player.duration();
   },
 
   onMouseDown: function(event){
-    event.preventDefault();
-    _V_.blockTextSelection();
-
-    this.player.currSeekBar = this;
-    this.player.currHandle = this.seekHandle || false;
+    this._super(event);
 
     this.player.scrubbing = true;
 
-    this.player.videoWasPlaying = !this.player.paused();
+    this.videoWasPlaying = !this.player.paused();
     this.player.pause();
-
-    this.setCurrentTimeWithScrubber(event);
-    _V_.addEvent(document, "mousemove", _V_.proxy(this, this.onMouseMove));
-    _V_.addEvent(document, "mouseup", _V_.proxy(this, this.onMouseUp));
   },
 
-  setCurrentTimeWithScrubber: function(event){
-    var bar = this.el,
-        barX = _V_.findPosX(bar),
-        barW = bar.offsetWidth,
-        handle = this.player.currHandle.el,
-        handleW = (handle) ? handle.offsetWidth : 0;
-
-        // Adjusted X and Width, so handle doesn't go outside the bar
-        barAX = barX + (handleW / 2),
-        barAW = barW - handleW,
-        // Percent that the click is through the adjusted area
-        percent = Math.max(0, Math.min(1, (event.pageX - barAX) / barAW)),
-        // Percent translated to pixels
-        percentPix = percent * barAW,
-        // Percent translated to seconds
-        newTime = percent * this.player.duration();
+  onMouseMove: function(event){
+    var newTime = this.calculateDistance(event) * this.player.duration();
 
     // Don't let video end while scrubbing.
     if (newTime == this.player.duration()) { newTime = newTime - 0.1; }
@@ -425,33 +489,21 @@ _V_.SeekBar = _V_.Component.extend({
     this.player.currentTime(newTime);
   },
 
-  onMouseMove: function(event){ // Removeable
-    this.setCurrentTimeWithScrubber(event);
-  },
-  onMouseUp: function(event){ // Removeable
-    _V_.unblockTextSelection();
-    _V_.removeEvent(document, "mousemove", this.onMouseMove, false);
-    _V_.removeEvent(document, "mouseup", this.onMouseUp, false);
+  onMouseUp: function(event){
+    this._super(event);
+
     this.player.scrubbing = false;
-    if (this.player.videoWasPlaying) {
+    if (this.videoWasPlaying) {
       this.player.play();
     }
   },
 
-  onFocus: function(event){
-    _V_.addEvent(document, "keyup", _V_.proxy(this, this.onKeyPress));
+  stepForward: function(){
+    this.player.currentTime(this.player.currentTime() + 1);
   },
-  onKeyPress: function(event){
-    if (event.which == 37) {
-      event.preventDefault();
-      this.player.currentTime(this.player.currentTime() - 1);
-    } else if (event.which == 39) {
-      event.preventDefault();
-      this.player.currentTime(this.player.currentTime() + 1);
-    }
-  },
-  onBlur: function(event){
-     _V_.removeEvent(document, "keyup", _V_.proxy(this, this.onKeyPress));
+
+  stepBack: function(){
+    this.player.currentTime(this.player.currentTime() - 1);
   }
 
 });
@@ -497,9 +549,7 @@ _V_.SeekHandle = _V_.Component.extend({
   createElement: function(){
     return this._super("div", {
       className: "vjs-seek-handle",
-      innerHTML: '<span class="vjs-control-text">00:00</span>',
-      tabIndex: 0,
-      role: "slider", "aria-valuenow": 0, "aria-valuemin": 0, "aria-valuemax": 100
+      innerHTML: '<span class="vjs-control-text">00:00</span>'
     });
   }
 
@@ -518,25 +568,11 @@ _V_.VolumeControl = _V_.Component.extend({
 
 });
 
-_V_.VolumeBar = _V_.Component.extend({
+_V_.VolumeBar = _V_.Slider.extend({
 
-  init: function(player, options){
-    this._super(player, options);
-
-    _V_.each.call(this, this.components, function(comp){
-      if (comp instanceof _V_.VolumeLevel) {
-        this.volumeLevel = comp;
-      } else if (comp instanceof _V_.VolumeHandle) {
-        this.volumeHandle = comp;
-      }
-    });
-
-    player.addEvent("volumechange", _V_.proxy(this, this.update));
-
-    _V_.addEvent(this.el, "mousedown", _V_.proxy(this, this.onMouseDown));
-    // _V_.addEvent(this.el, "focus", _V_.proxy(this, this.onFocus));
-    // _V_.addEvent(this.el, "blur", _V_.proxy(this, this.onBlur));
-  },
+  barClass: "VolumeLevel",
+  handleClass: "VolumeHandle",
+  playerEvent: "volumechange",
 
   createElement: function(){
     return this._super("div", {
@@ -544,70 +580,21 @@ _V_.VolumeBar = _V_.Component.extend({
     });
   },
 
-  onMouseDown: function(event){
-    event.preventDefault();
-    _V_.blockTextSelection();
-
-    this.player.currVolumeBar = this;
-    this.player.currHandle = this.volumeHandle || false;
-
-    this.setVolumeWithSlider(event);
-    _V_.addEvent(document, "mousemove", _V_.proxy(this, this.onMouseMove));
-    _V_.addEvent(document, "mouseup", _V_.proxy(this, this.onMouseUp));
-  },
-  onMouseMove: function(event){ // Removeable
-    this.setVolumeWithSlider(event);
-  },
-  onMouseUp: function(event){ // Removeable
-    _V_.unblockTextSelection();
-    _V_.removeEvent(document, "mousemove", this.onMouseMove, false);
-    _V_.removeEvent(document, "mouseup", this.onMouseUp, false);
+  onMouseMove: function(event) {
+    this.player.volume(this.calculateDistance(event));
   },
 
-  setVolumeWithSlider: function(event){
-    var bar = this.el,
-        barX = _V_.findPosX(bar),
-        barW = bar.offsetWidth,
-        handle = (this.player.currHandle) ? this.player.currHandle.el : false,
-        handleW = (handle) ? handle.offsetWidth : 0;
-
-        // Adjusted X and Width, so handle doesn't go outside the bar
-        barAX = barX + (handleW / 2),
-        barAW = barW - handleW,
-        // Percent that the click is through the adjusted area
-        percent = Math.max(0, Math.min(1, (event.pageX - barAX) / barAW)),
-        // Percent translated to pixels
-        percentPix = percent * barAW,
-        // Percent translated to seconds
-        newTime = percent * this.player.duration();
-
-    this.player.volume(percent);
+  getPercent: function(){
+   return this.player.volume();
   },
 
-  update: function(){
-     var vol = this.player.volume();
+  stepForward: function(){
+    this.player.volume(this.player.volume() + 0.1);
+  },
 
-     var bar = this.el;
-         barX = _V_.findPosX(bar),
-         barW = bar.offsetWidth,
-         handle = (this.volumeHandle) ? this.volumeHandle.el : false,
-         level = (this.volumeLevel) ? this.volumeLevel.el : false,
-         handleW = (handle) ? handle.offsetWidth : 0;
-
-         // Adjusted X and Width, so handle doesn't go outside the bar
-         barAX = barX + (handleW / 2),
-         barAW = barW - handleW,
-         progBarProgress = _V_.round(vol * barAW + handleW / 2) + "px";
-
-     if (level) {
-       level.style.width = progBarProgress;
-     }
-
-     if (handle) {
-       handle.style.left = _V_.round(vol * barAW)+"px";
-     }
-   }
-
+  stepBack: function(){
+    this.player.volume(this.player.volume() - 0.1);
+  }
 });
 
 _V_.VolumeLevel = _V_.Component.extend({
@@ -626,9 +613,9 @@ _V_.VolumeHandle = _V_.Component.extend({
   createElement: function(){
     return this._super("div", {
       className: "vjs-volume-handle",
-      innerHTML: '<span class="vjs-control-text"></span>',
-      tabindex: 0,
-      role: "slider", "aria-valuenow": 0, "aria-valuemin": 0, "aria-valuemax": 100
+      innerHTML: '<span class="vjs-control-text"></span>'
+      // tabindex: 0,
+      // role: "slider", "aria-valuenow": 0, "aria-valuemin": 0, "aria-valuemax": 100
     });
   }
 
@@ -708,16 +695,19 @@ _V_.SubtitlesDisplay = _V_.TextTrackDisplay.extend({
   trackType: "subtitles"
 
 });
+
 _V_.CaptionsDisplay = _V_.TextTrackDisplay.extend({
 
   trackType: "captions"
 
 });
+
 _V_.ChaptersDisplay = _V_.TextTrackDisplay.extend({
 
   trackType: "chapters"
 
 });
+
 _V_.DescriptionsDisplay = _V_.TextTrackDisplay.extend({
 
   trackType: "descriptions"

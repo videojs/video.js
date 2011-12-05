@@ -61,11 +61,8 @@ _V_.Component = _V_.Class.extend({
 
   destroy: function(){},
 
-  createElement: function(type, options){
-    options = _V_.merge({
-      /* Standar Options */
-    }, options || {});
-    return _V_.createElement(type || "div", options);
+  createElement: function(type, attrs){
+    return _V_.createElement(type || "div", attrs);
   },
 
   buildCSSClass: function(){

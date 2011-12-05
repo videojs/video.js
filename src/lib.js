@@ -1,4 +1,7 @@
 _V_.merge = function(obj1, obj2, safe){
+  // Make sure second object exists
+  if (!obj2) { obj2 = {}; };
+
   for (var attrname in obj2){
     if (obj2.hasOwnProperty(attrname) && (!safe || !obj1.hasOwnProperty(attrname))) { obj1[attrname]=obj2[attrname]; }
   }
@@ -128,14 +131,7 @@ _V_.extend({
   getRelativePosition: function(x, relativeElement){
     return Math.max(0, Math.min(1, (x - _V_.findPosX(relativeElement)) / relativeElement.offsetWidth));
   },
-  // Get an objects position on the page
-  findPosX: function(obj) {
-    var curleft = obj.offsetLeft;
-    while(obj = obj.offsetParent) {
-      curleft += obj.offsetLeft;
-    }
-    return curleft;
-  },
+  
   getComputedStyleValue: function(element, style){
     return window.getComputedStyle(element, null).getPropertyValue(style);
   },
@@ -300,4 +296,38 @@ _V_.log = function(){
 (function(b){function c(){}for(var d="assert,count,debug,dir,dirxml,error,exception,group,groupCollapsed,groupEnd,info,log,timeStamp,profile,profileEnd,time,timeEnd,trace,warn".split(","),a;a=d.pop();){b[a]=b[a]||c}})((function(){try
 {console.log();return window.console;}catch(err){return window.console={};}})());
 
+// Offset Left
+if ("getBoundingClientRect" in document.documentElement) {
+  _V_.findPosX = function(el) {
+    var box;
 
+    try {
+      box = el.getBoundingClientRect();
+    } catch(e) {}
+
+    if (!box) { return 0; }
+
+    var docEl = document.documentElement,
+        body = document.body,
+        clientLeft = docEl.clientLeft || body.clientLeft || 0,
+        scrollLeft = window.pageXOffset || body.scrollLeft,
+        left = box.left + scrollLeft - clientLeft;
+
+    return left;
+  };
+} else {
+  _V_.findPosX = function(el) {
+    var curleft = el.offsetLeft;
+    // _V_.log(obj.className, obj.offsetLeft)
+    while(el = obj.offsetParent) {
+      if (el.className.indexOf("video-js") == -1) {
+        // _V_.log(el.offsetParent, "OFFSETLEFT", el.offsetLeft)
+        // _V_.log("-webkit-full-screen", el.webkitMatchesSelector("-webkit-full-screen"));
+        // _V_.log("-webkit-full-screen", el.querySelectorAll(".video-js:-webkit-full-screen"));
+      } else {
+      }
+      curleft += el.offsetLeft;
+    }
+    return curleft;
+  };
+}

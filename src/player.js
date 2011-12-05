@@ -362,9 +362,15 @@ _V_.Player.prototype.extend({
 
   currentTime: function(seconds){
     if (seconds !== undefined) {
-      this.values.currentTime = seconds; // Cache the last set value for smoother scrubbing.
+
+      // Cache the last set value for smoother scrubbing.
+      this.values.currentTime = seconds;
+
       this.apiCall("setCurrentTime", seconds);
-      if (this.manualTimeUpdates) { this.triggerEvent("timeupdate"); }
+
+      if (this.manualTimeUpdates) { 
+        this.triggerEvent("timeupdate"); 
+      }
       return this;
     }
     return this.apiCall("currentTime");

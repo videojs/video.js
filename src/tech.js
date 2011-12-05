@@ -116,9 +116,10 @@ _V_.HTML5 = _V_.PlaybackTech.extend({
 
   currentTime: function(){ return this.el.currentTime; },
   setCurrentTime: function(seconds){
-    try { this.el.currentTime = seconds; }
-    catch(e) {
-      _V_.log(e);
+    try {
+      this.el.currentTime = seconds;
+      } catch(e) {
+        _V_.log(e, "Video isn't ready. (VideoJS)");
       // this.warning(VideoJS.warnings.videoNotReady);
     }
   },

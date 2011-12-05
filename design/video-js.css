@@ -79,7 +79,7 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 }
 
 .vjs-default-skin .vjs-control:focus {
-  outline: 0;
+/*  outline: 0;*/
 }
 
 /* Hide control text visually, but have it available for screenreaders: h5bp.com/v */
