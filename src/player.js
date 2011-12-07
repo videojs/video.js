@@ -450,6 +450,8 @@ _V_.Player.prototype.extend({
     this.videoIsFullScreen = true;
      if (typeof this.el.webkitRequestFullScreen == 'function') {
        this.el.webkitRequestFullScreen();
+     } else if (typeof this.el.mozRequestFullScreen == 'function') {
+       this.el.mozRequestFullScreen();
      } else if (this.supportsFullScreen()) {
        this.apiCall("enterFullScreen");
      } else {
@@ -463,6 +465,8 @@ _V_.Player.prototype.extend({
      this.videoIsFullScreen = false;
      if (typeof this.el.webkitRequestFullScreen == 'function') {
        document.webkitCancelFullScreen();
+     } else if (typeof this.el.mozRequestFullScreen == 'function') {
+       document.mozCancelFullScreen();
      } else if (this.supportsFullScreen()) {
        document.webkitExitFullScreen();
      } else {

@@ -32,6 +32,9 @@ body.vjs-full-window {
 .video-js:-webkit-full-screen {
   width: 100% !important; height: 100% !important;
 }
+.video-js:-moz-full-screen {
+  width: 100% !important; height: 100% !important;
+}
 
 /* Subtiles Style */
 .video-js .vjs-subtitles { color: #fff; font-size: 20px; text-align: center; position: absolute; bottom: 40px; left: 0; right: 0; }
