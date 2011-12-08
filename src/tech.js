@@ -8,18 +8,13 @@ _V_.PlaybackTech = _V_.Component.extend({
     // _V_.addEvent(this.el, "click", _V_.proxy(this, _V_.PlayToggle.prototype.onClick));
 
     // player.triggerEvent("techready");
-  },
-  createElement: function(){},
-  setupTriggers: function(){},
-  removeTriggers: function(){},
-  
-  canPlaySource: function(source){
-    return _V_[this.name].canPlaySource(source);
   }
+  // createElement: function(){},
+  // setupTriggers: function(){},
+  // removeTriggers: function(){}
 });
 
-// Create placeholder methods for each that warn when a method
-// isn't supported by the current playback technology
+// Create placeholder methods for each that warn when a method isn't supported by the current playback technology
 _V_.apiMethods = "play,pause,paused,currentTime,setCurrentTime,duration,buffered,volume,setVolume,muted,setMuted,width,height,supportsFullScreen,enterFullScreen,src,load,currentSrc,preload,setPreload,autoplay,setAutoplay,loop,setLoop,error,networkState,readyState,seeking,initialTime,startOffsetTime,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight,textTracks,defaultPlaybackRate,playbackRate,mediaGroup,controller,controls,defaultMuted".split(",");
 _V_.each(_V_.apiMethods, function(methodName){
   _V_.PlaybackTech.prototype[methodName] = function(){
@@ -30,7 +25,7 @@ _V_.each(_V_.apiMethods, function(methodName){
 /* HTML5 Playback Technology - Wrapper for HTML5 Media API
 ================================================================================ */
 _V_.html5 = _V_.PlaybackTech.extend({
-  name: "html5",
+  // name: "html5",
 
   init: function(player, options, ready){
     this.player = player;
@@ -82,7 +77,6 @@ _V_.html5 = _V_.PlaybackTech.extend({
 
       player.el.removeChild(el);
       el = newEl;
-      _V_.log("here")
       _V_.insertFirst(el, player.el);
     }
 
@@ -137,12 +131,12 @@ _V_.html5 = _V_.PlaybackTech.extend({
 
   supportsFullScreen: function(){
     if (typeof this.el.webkitEnterFullScreen == 'function') {
-      
+
       // Seems to be broken in Chromium/Chrome && Safari in Leopard
       if (!navigator.userAgent.match("Chrome") && !navigator.userAgent.match("Mac OS X 10.5")) {
         return true;
       }
-    } 
+    }
       return false;
   },
   enterFullScreen: function(){
@@ -229,13 +223,13 @@ if (_V_.isAndroid()) {
 /* VideoJS-SWF - Custom Flash Player with HTML5-ish API
 ================================================================================ */
 _V_.flash = _V_.PlaybackTech.extend({
-  name: "flash",
+  // name: "flash",
 
   init: function(player, options){
     this.player = player;
-    var placeHolder = this.el = _V_.createElement("div", { id: player.el.id + "_temp_flash" });
 
-    var source = options.source,
+    var placeHolder = this.el = _V_.createElement("div", { id: player.el.id + "_temp_flash" }),
+        source = options.source,
         objId = player.el.id+"_flash_api",
         playerOptions = player.options;
 
@@ -254,17 +248,17 @@ _V_.flash = _V_.PlaybackTech.extend({
 
         }, options.flashVars),
 
-        params = {
+        params = _V_.merge({
           allowScriptAccess: "always",
           wmode: "opaque",
           bgcolor: "#000000"
-        },
+        }, options.params),
 
-        attributes = {
+        attributes = _V_.merge({
           id: objId,
           name: objId,
           'class': 'vjs-tech'
-        };
+        }, options.attributes);
 
     if (playerOptions.poster) {
       flashVars.poster = playerOptions.poster;
@@ -275,6 +269,7 @@ _V_.flash = _V_.PlaybackTech.extend({
       flashVars.src = source.src;
     }
 
+    // Add to box.
     _V_.insertFirst(placeHolder, player.el);
 
     swfobject.embedSWF(options.swf, placeHolder.id, "480", "270", "9.0.124", "", flashVars, params, attributes);
@@ -286,7 +281,7 @@ _V_.flash = _V_.PlaybackTech.extend({
 
   play: function(){ this.el.vjs_play(); },
   pause: function(){ this.el.vjs_pause(); },
-  src: function(src){ 
+  src: function(src){
     this.el.vjs_src(src);
 
     // Currently the SWF doesn't autoplay if you load a source later.
@@ -306,8 +301,8 @@ _V_.flash = _V_.PlaybackTech.extend({
   supportsFullScreen: function(){
     return false; // Flash does not allow fullscreen through javascript
   },
-  enterFullScreen: function(){ 
-    return false; 
+  enterFullScreen: function(){
+    return false;
   }
 });
 
@@ -366,9 +361,9 @@ _V_.flash.supports = {
 };
 
 _V_.flash.onSWFReady = function(currSwf){
-  
-  _V_.log(currSwf, "currSwf")
-  
+
+  // _V_.log(currSwf, "currSwf")
+
   // Flash seems to be catching errors, so raising them manally
   try {
     // Delay for real swf ready.
@@ -393,7 +388,7 @@ _V_.flash.onSWFReady = function(currSwf){
     _V_.log(err);
   }
 };
-  
+
 _V_.flash.onSWFEvent = function(swfID, eventName, other){
   try {
     var player = _V_.el(swfID).player;

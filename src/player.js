@@ -190,12 +190,12 @@ _V_.Player = _V_.Component.extend({
       this.player.triggerReady();
 
       // Manually track progress in cases where the browser/flash player doesn't report it.
-      if (!_V_.techSupports(this.name, "event", "progress")) {
+      if (!_V_.techSupports(this.player.techName, "event", "progress")) {
         this.player.manualProgressOn();
       }
 
       // Manually track timeudpates in cases where the browser/flash player doesn't report it.
-      if (!_V_.techSupports(this.name, "event", "timeupdate")) {
+      if (!_V_.techSupports(this.player.techName, "event", "timeupdate")) {
         this.player.manualTimeUpdatesOn();
       }
     }
@@ -564,7 +564,7 @@ _V_.Player.prototype.extend({
 
     // Case: Source object { src: "", type: "" ... }
     } else if (source instanceof Object) {
-      if (this.tech.canPlaySource(source)) {
+      if (_V_[this.techName].canPlaySource(source)) {
         this.src(source.src);
       } else {
         // Send through tech loop to check for a compatible technology.
