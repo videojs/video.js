@@ -272,7 +272,7 @@ _V_.flash = _V_.PlaybackTech.extend({
 
     // If source was supplied pass as a flash var.
     if (source) {
-      flashvars.src = source.src;
+      flashVars.src = source.src;
     }
 
     _V_.insertFirst(placeHolder, player.el);

@@ -1,4 +1,4 @@
-_V_.flash.prototype.swf = "../flash/video-js.swf";
+_V_.options.flash.swf = "../flash/video-js.swf";
 
 $(function(){
   var tech, i, tname, player,
@@ -6,7 +6,6 @@ $(function(){
       props = "error,currentSrc,networkState,buffered,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,seekable,ended,videoWidth,videoHeight,textTracks,preload,currentTime,defaultPlaybackRate,playbackRate,autoplay,loop,controls,volume,muted,defaultMuted,poster".split(","),
       methods = "play,pause,src,load,canPlayType,addTextTrack",
       notUsed = "mediaGroup,controller,videoTracks,audioTracks,defaultPlaybackRate";
-      
 
   for (i=0; i < techList.length; i++) {
     tech = techList[i];
