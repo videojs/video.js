@@ -1,8 +1,8 @@
-_V_.H5swf.prototype.swf = "../flash/video-js.swf";
+_V_.flash.prototype.swf = "../flash/video-js.swf";
 
 $(function(){
   var tech, i, tname, player,
-      techList = ["HTML5","H5swf"],
+      techList = ["html5","flash"],
       props = "error,currentSrc,networkState,buffered,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,seekable,ended,videoWidth,videoHeight,textTracks,preload,currentTime,defaultPlaybackRate,playbackRate,autoplay,loop,controls,volume,muted,defaultMuted,poster".split(","),
       methods = "play,pause,src,load,canPlayType,addTextTrack",
       notUsed = "mediaGroup,controller,videoTracks,audioTracks,defaultPlaybackRate";
@@ -14,7 +14,7 @@ $(function(){
 
     player = _V_("vid"+(i+1), { "techOrder":[tech] });
 
-    _V_.each(_V_.HTML5.events, function(evt){
+    _V_.each(_V_.html5.events, function(evt){
 
       player.addEvent(evt, _V_.proxy(tname, function(evt){
         var eventsId = "#"+this+"_events",

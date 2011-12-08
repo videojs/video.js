@@ -45,8 +45,12 @@ VideoJS.players = {};
 VideoJS.options = {
 
   // Default order of fallback technology
-  techOrder: ["HTML5","H5swf"],
-  // techOrder: ["H5swf","HTML5"],
+  techOrder: ["html5","flash"],
+  // techOrder: ["flash","HTML5"],
+
+  flash: {
+    
+  },
 
   // Default of web browser is 300x150. Should rely on source width/height.
   width: "auto",

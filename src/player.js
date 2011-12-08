@@ -175,7 +175,7 @@ _V_.Player = _V_.Component.extend({
 
     // If the first time loading, HTML5 tag will exist but won't be initialized
     // So we need to remove it if we're not loading HTML5
-    } else if (!this.tech && techName != "HTML5") {
+    } else if (!this.tech && techName != "html5") {
       this.removeTechElement(this.tag);
     }
 

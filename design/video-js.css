@@ -18,7 +18,7 @@ REQUIRED STYLES (be careful overriding)
 }
 
 /* Playback technology elements expand to the width/height of the containing div. <video> or <object> */
-.video-js .vjs-tech { top: 0; left: 0; width: 100%; height: 100%; }
+.video-js .vjs-tech { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
 /* Fullscreen Styles */
 body.vjs-full-window { 

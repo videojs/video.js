@@ -29,8 +29,8 @@ _V_.each(_V_.apiMethods, function(methodName){
 
 /* HTML5 Playback Technology - Wrapper for HTML5 Media API
 ================================================================================ */
-_V_.HTML5 = _V_.PlaybackTech.extend({
-  name: "HTML5",
+_V_.html5 = _V_.PlaybackTech.extend({
+  name: "html5",
 
   init: function(player, options, ready){
     this.player = player;
@@ -64,7 +64,7 @@ _V_.HTML5 = _V_.PlaybackTech.extend({
   },
 
   createElement: function(){
-    var html5 = _V_.HTML5,
+    var html5 = _V_.html5,
         player = this.player,
 
         // Reuse original tag for HTML5 playback technology element
@@ -99,7 +99,7 @@ _V_.HTML5 = _V_.PlaybackTech.extend({
     // May seem verbose here, but makes other APIs possible.
 
     // ["play", "playing", "pause", "ended", "volumechange", "error", "progress", "seeking", "timeupdate"]
-    var types = _V_.HTML5.events,
+    var types = _V_.html5.events,
         i;
     for (i = 0;i<types.length; i++) {
       _V_.addEvent(this.el, types[i], _V_.proxy(this.player, function(e){
@@ -190,28 +190,28 @@ _V_.HTML5 = _V_.PlaybackTech.extend({
 
 /* HTML5 Support Testing -------------------------------------------------------- */
 
-_V_.HTML5.isSupported = function(){
+_V_.html5.isSupported = function(){
   return !!document.createElement("video").canPlayType;
 };
 
-_V_.HTML5.canPlaySource = function(srcObj){
+_V_.html5.canPlaySource = function(srcObj){
   return !!document.createElement("video").canPlayType(srcObj.type);
   // TODO: Check Type
   // If no Type, check ext
   // Check Media Type
 };
 
-_V_.HTML5.supports = {};
+_V_.html5.supports = {};
 
 // List of all HTML5 events (various uses).
-_V_.HTML5.events = "loadstart,suspend,abort,error,emptied,stalled,loadedmetadata,loadeddata,canplay,canplaythrough,playing,waiting,seeking,seeked,ended,durationchange,timeupdate,progress,play,pause,ratechange,volumechange".split(",");
+_V_.html5.events = "loadstart,suspend,abort,error,emptied,stalled,loadedmetadata,loadeddata,canplay,canplaythrough,playing,waiting,seeking,seeked,ended,durationchange,timeupdate,progress,play,pause,ratechange,volumechange".split(",");
 
 /* HTML5 Device Fixes ---------------------------------------------------------- */
 
 // iOS
 if (_V_.isIOS()) {
   // If you move a video element in the DOM, it breaks video playback.
-  _V_.HTML5.supports.movingElementInDOM = false;
+  _V_.html5.supports.movingElementInDOM = false;
 }
 
 // Android
@@ -226,10 +226,10 @@ if (_V_.isAndroid()) {
 }
 
 
-/* H5SWF - Custom Flash Player with HTML5-ish API
+/* VideoJS-SWF - Custom Flash Player with HTML5-ish API
 ================================================================================ */
-_V_.H5swf = _V_.PlaybackTech.extend({
-  name: "H5swf",
+_V_.flash = _V_.PlaybackTech.extend({
+  name: "flash",
 
   swf: "flash/video-js.swf",
   // swf: "https://s3.amazonaws.com/video-js/3.0b/video-js.swf",
@@ -241,16 +241,16 @@ _V_.H5swf = _V_.PlaybackTech.extend({
 
   init: function(player, options){
     this.player = player;
-    var placeHolder = this.el = _V_.createElement("div", { id: player.el.id + "_temp_h5swf" });
+    var placeHolder = this.el = _V_.createElement("div", { id: player.el.id + "_temp_flash" });
 
     var source = options.source,
-        objId = player.el.id+"_h5swf_api",
+        objId = player.el.id+"_flash_api",
         playerOptions = player.options;
 
         flashvars = {
-          readyFunction: "_V_.H5swf.onSWFReady",
-          eventProxyFunction: "_V_.H5swf.onSWFEvent",
-          errorEventProxyFunction: "_V_.H5swf.onSWFErrorEvent",
+          readyFunction: "_V_.flash.onSWFReady",
+          eventProxyFunction: "_V_.flash.onSWFEvent",
+          errorEventProxyFunction: "_V_.flash.onSWFErrorEvent",
           autoplay: playerOptions.autoplay,
           preload: playerOptions.preload,
           loop: playerOptions.loop,
@@ -316,7 +316,7 @@ _V_.H5swf = _V_.PlaybackTech.extend({
 
 // Create setters and getters for attributes
 (function(){
-  var api = _V_.H5swf.prototype,
+  var api = _V_.flash.prototype,
       readWrite = "preload,currentTime,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted".split(","),
       readOnly = "error,currentSrc,networkState,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight,textTracks".split(","),
       callOnly = "load,play,pause".split(",");
@@ -345,15 +345,15 @@ _V_.H5swf = _V_.PlaybackTech.extend({
 
 /* Flash Support Testing -------------------------------------------------------- */
 
-_V_.H5swf.isSupported = function(){
+_V_.flash.isSupported = function(){
   return swfobject.hasFlashPlayerVersion("9");
 };
 
-_V_.H5swf.canPlaySource = function(srcObj){
-  if (srcObj.type in _V_.H5swf.supports.format) { return "maybe"; }
+_V_.flash.canPlaySource = function(srcObj){
+  if (srcObj.type in _V_.flash.supports.format) { return "maybe"; }
 };
 
-_V_.H5swf.supports = {
+_V_.flash.supports = {
   format: {
     "video/flv": "FLV",
     "video/x-flv": "FLV",
@@ -368,7 +368,7 @@ _V_.H5swf.supports = {
   }
 };
 
-_V_.H5swf.onSWFReady = function(currSwf){
+_V_.flash.onSWFReady = function(currSwf){
   
   _V_.log(currSwf, "currSwf")
   
@@ -380,7 +380,7 @@ _V_.H5swf.onSWFReady = function(currSwf){
 
           // Get player from box
       var  player = el.parentNode.player,
-          tech = player.techs["H5swf"];
+          tech = player.techs["flash"];
 
       // Reference player on tech element
       el.player = player;
@@ -397,7 +397,7 @@ _V_.H5swf.onSWFReady = function(currSwf){
   }
 };
   
-_V_.H5swf.onSWFEvent = function(swfID, eventName, other){
+_V_.flash.onSWFEvent = function(swfID, eventName, other){
   try {
     var player = _V_.el(swfID).player;
     if (player) {
@@ -408,6 +408,6 @@ _V_.H5swf.onSWFEvent = function(swfID, eventName, other){
   }
 };
 
-_V_.H5swf.onSWFErrorEvent = function(swfID, eventName){
-  _V_.log("Flash (H5SWF) Error", eventName);
+_V_.flash.onSWFErrorEvent = function(swfID, eventName){
+  _V_.log("Flash Error", eventName);
 };
