@@ -25,7 +25,6 @@ _V_.each(_V_.apiMethods, function(methodName){
 /* HTML5 Playback Technology - Wrapper for HTML5 Media API
 ================================================================================ */
 _V_.html5 = _V_.PlaybackTech.extend({
-  // name: "html5",
 
   init: function(player, options, ready){
     this.player = player;
@@ -223,7 +222,6 @@ if (_V_.isAndroid()) {
 /* VideoJS-SWF - Custom Flash Player with HTML5-ish API
 ================================================================================ */
 _V_.flash = _V_.PlaybackTech.extend({
-  // name: "flash",
 
   init: function(player, options){
     this.player = player;

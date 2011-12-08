@@ -204,7 +204,7 @@ _V_.Player = _V_.Component.extend({
     // Add tech element to player div
     if (this.techs[techName] === undefined) {
 
-      var techOptions = _V_.merge({ source: source }, this.options.flash)
+      var techOptions = _V_.merge({ source: source }, this.options[techName])
 
       this.techs[techName] = this.tech = new _V_[techName](this, techOptions);
       this.tech.ready(techReady)
