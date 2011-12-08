@@ -450,6 +450,8 @@ _V_.Player.prototype.extend({
     this.videoIsFullScreen = true;
      if (typeof this.el.webkitRequestFullScreen == 'function') {
        this.el.webkitRequestFullScreen();
+     } else if (this.el.mozRequestFullScreen == 'function') {
+       this.el.mozRequestFullScreen();
      } else if (this.supportsFullScreen()) {
        this.apiCall("enterFullScreen");
      } else {

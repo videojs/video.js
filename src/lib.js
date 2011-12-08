@@ -297,6 +297,7 @@ _V_.log = function(){
 {console.log();return window.console;}catch(err){return window.console={};}})());
 
 // Offset Left
+// getBoundingClientRect technique from John Resig http://ejohn.org/blog/getboundingclientrect-is-awesome/
 if ("getBoundingClientRect" in document.documentElement) {
   _V_.findPosX = function(el) {
     var box;

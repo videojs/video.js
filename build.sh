@@ -38,4 +38,4 @@ cp flash/video-js.swf dist/video-js.swf
 
 cp build/files/README.md dist/README.md
 cp build/files/demo.html dist/demo.html
-cp LICENSE.txt dist/LICENSE.txt
+cp LGPLv3-LICENSE.txt dist/LGPLv3-LICENSE.txt
