@@ -76,7 +76,7 @@ _V_.Player = _V_.Component.extend({
     this.addEvent("error", this.onError);
 
     // When the API is ready, loop through the components and add to the player.
-    if (this.options.controls) {
+    if (options.controls) {
       this.ready(function(){
         this.each(this.options.components, function(set){
           this.addComponent(set);
@@ -86,13 +86,13 @@ _V_.Player = _V_.Component.extend({
 
     // If there are no sources when the player is initialized,
     // load the first supported playback technology.
-    if (!this.options.sources || this.options.sources.length == 0) {
-      for (var i=0,j=this.options.techOrder;i<j.length;i++) {
+    if (!options.sources || options.sources.length == 0) {
+      for (var i=0,j=options.techOrder; i<j.length; i++) {
         var techName = j[i],
             tech = _V_[techName];
 
         // Check if the browser supports this technology
-        if (tech.isSupported()) { 
+        if (tech.isSupported()) {
           this.loadTech(techName);
           break;
         }
@@ -100,7 +100,7 @@ _V_.Player = _V_.Component.extend({
     } else {
       // Loop through playback technologies (HTML5, Flash) and check for support
       // Then load the best source.
-      this.src(this.options.sources);
+      this.src(options.sources);
     }
   },
 
@@ -110,7 +110,7 @@ _V_.Player = _V_.Component.extend({
   destroy: function(){},
 
   createElement: function(type, options){
-    
+
   },
 
   getVideoTagSettings: function(){
@@ -163,7 +163,7 @@ _V_.Player = _V_.Component.extend({
     // Pause and remove current playback technology
     if (this.tech) {
       this.removeTech(this.tech);
-      
+
       // Turn off any manual progress or timeupdate tracking
       if (this.manualProgress) {
         this.manualProgressOff()
@@ -190,24 +190,26 @@ _V_.Player = _V_.Component.extend({
       this.player.triggerReady();
 
       // Manually track progress in cases where the browser/flash player doesn't report it.
-      if (!_V_.techSupports(this.name, "event", "progress")) { 
-        this.player.manualProgressOn(); 
+      if (!_V_.techSupports(this.name, "event", "progress")) {
+        this.player.manualProgressOn();
       }
 
       // Manually track timeudpates in cases where the browser/flash player doesn't report it.
-      if (!_V_.techSupports(this.name, "event", "timeupdate")) { 
-        this.player.manualTimeUpdatesOn(); 
+      if (!_V_.techSupports(this.name, "event", "timeupdate")) {
+        this.player.manualTimeUpdatesOn();
       }
     }
 
     // Initialize new tech if it hasn't been yet and load source
     // Add tech element to player div
     if (this.techs[techName] === undefined) {
-      this.techs[techName] = this.tech = new _V_[techName](this, { source: source });
+
+      var techOptions = _V_.merge({ source: source }, this.options.flash)
+
+      this.techs[techName] = this.tech = new _V_[techName](this, techOptions);
       this.tech.ready(techReady)
     } else {
       this.tech = this.techs[techName];
-          _V_.log("here3")
       _V_.insertFirst(this.techs[techName].el, this.el);
       this.src(source);
     }
@@ -329,7 +331,7 @@ _V_.Player = _V_.Component.extend({
     _V_.removeClass(this.el, "vjs-playing");
     _V_.addClass(this.el, "vjs-paused");
   },
-  
+
   onError: function(e) {
     _V_.log("Video Error", e);
   }
@@ -368,8 +370,8 @@ _V_.Player.prototype.extend({
 
       this.apiCall("setCurrentTime", seconds);
 
-      if (this.manualTimeUpdates) { 
-        this.triggerEvent("timeupdate"); 
+      if (this.manualTimeUpdates) {
+        this.triggerEvent("timeupdate");
       }
       return this;
     }
@@ -494,7 +496,7 @@ _V_.Player.prototype.extend({
 
     this.triggerEvent("enterFullWindow");
   },
-  
+
   fullWindowOnEscKey: function(event){
     if (event.keyCode == 27) {
       this.exitFullScreen();

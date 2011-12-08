@@ -46,10 +46,17 @@ VideoJS.options = {
 
   // Default order of fallback technology
   techOrder: ["html5","flash"],
-  // techOrder: ["flash","HTML5"],
+  // techOrder: ["flash","html5"],
 
+  html5: {},
   flash: {
-    
+    swf: "flash/video-js.swf"
+    // swf: "https://s3.amazonaws.com/video-js/3.0b/video-js.swf"
+    // swf: "http://video-js.zencoder.com/3.0b/video-js.swf"
+    // swf: "http://video-js.com/test/video-js.swf"
+    // swf: "http://video-js.com/source/flash/video-js.swf"
+    // swf: "http://video-js.com/source/flash/video-js.swf"
+    // swf: "video-js.swf"
   },
 
   // Default of web browser is 300x150. Should rely on source width/height.

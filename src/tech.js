@@ -231,14 +231,6 @@ if (_V_.isAndroid()) {
 _V_.flash = _V_.PlaybackTech.extend({
   name: "flash",
 
-  swf: "flash/video-js.swf",
-  // swf: "https://s3.amazonaws.com/video-js/3.0b/video-js.swf",
-  // swf: "http://video-js.zencoder.com/3.0b/video-js.swf",
-  // swf: "http://video-js.com/test/video-js.swf",
-  // swf: "http://video-js.com/source/flash/video-js.swf",
-  // swf: "http://video-js.com/source/flash/video-js.swf",
-  // swf: "video-js.swf",
-
   init: function(player, options){
     this.player = player;
     var placeHolder = this.el = _V_.createElement("div", { id: player.el.id + "_temp_flash" });
@@ -247,15 +239,20 @@ _V_.flash = _V_.PlaybackTech.extend({
         objId = player.el.id+"_flash_api",
         playerOptions = player.options;
 
-        flashvars = {
+        flashVars = _V_.merge({
+
+          // SWF Callback Functions
           readyFunction: "_V_.flash.onSWFReady",
           eventProxyFunction: "_V_.flash.onSWFEvent",
           errorEventProxyFunction: "_V_.flash.onSWFErrorEvent",
+
+          // Player Settings
           autoplay: playerOptions.autoplay,
           preload: playerOptions.preload,
           loop: playerOptions.loop,
           muted: playerOptions.muted
-        },
+
+        }, options.flashVars),
 
         params = {
           allowScriptAccess: "always",
@@ -270,7 +267,7 @@ _V_.flash = _V_.PlaybackTech.extend({
         };
 
     if (playerOptions.poster) {
-      flashvars.poster = playerOptions.poster;
+      flashVars.poster = playerOptions.poster;
     }
 
     // If source was supplied pass as a flash var.
@@ -280,7 +277,7 @@ _V_.flash = _V_.PlaybackTech.extend({
 
     _V_.insertFirst(placeHolder, player.el);
 
-    swfobject.embedSWF(options.swf || this.swf, placeHolder.id, "480", "270", "9.0.124", "", flashvars, params, attributes);
+    swfobject.embedSWF(options.swf, placeHolder.id, "480", "270", "9.0.124", "", flashVars, params, attributes);
   },
 
   setupTriggers: function(){
