@@ -243,7 +243,7 @@ _V_.Player = _V_.Component.extend({
       this.removeEvent("progress", arguments.callee);
 
       // Update known progress support for this playback technology
-      _V_.updateTechSupport(this.name, "event", "progress", true);
+      _V_.updateTechSupport(this.player.techName, "event", "progress", true);
 
       // Turn off manual progress tracking
       this.player.manualProgressOff();
@@ -285,7 +285,7 @@ _V_.Player = _V_.Component.extend({
       this.removeEvent("timeupdate", arguments.callee);
 
       // Update known progress support for this playback technology
-      _V_.updateTechSupport(this.name, "event", "timeupdate", true);
+      _V_.updateTechSupport(this.player.techName, "event", "timeupdate", true);
 
       // Turn off manual progress tracking
       this.player.manualTimeUpdatesOff();
