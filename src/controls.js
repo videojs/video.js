@@ -323,6 +323,11 @@ _V_.Slider = _V_.Component.extend({
     this.addEvent("mousedown", this.onMouseDown);
     this.addEvent("focus", this.onFocus);
     this.addEvent("blur", this.onBlur);
+
+    // Update Display
+    // Need to wait for styles to be loaded.
+    // TODO - replace setTimeout with stylesReady function.
+    setTimeout(this.proxy(this.update), 0);
   },
 
   createElement: function(type, attrs) {
@@ -399,8 +404,6 @@ _V_.Slider = _V_.Component.extend({
         boxW = box.offsetWidth,
         handle = this.handle;
 
-    // _V_.log(box.offsetLeft, box.offsetLeft)
-
     if (handle) {
       var handleW = handle.el.offsetWidth;
 
@@ -408,8 +411,6 @@ _V_.Slider = _V_.Component.extend({
       boxX = boxX + (handleW / 2);
       boxW = boxW - handleW;
     }
-
-    // _V_.log(event.pageX, boxX, boxW);
 
     // Percent that the click is through the adjusted area
     return Math.max(0, Math.min(1, (event.pageX - boxX) / boxW));

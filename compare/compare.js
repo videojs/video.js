@@ -45,7 +45,18 @@ $(function(){
           if (result === null) result = "<span class='undefined'>null</span>";
           if (result === undefined) result = "<span class='undefined'>undefined</span>";
           if (typeof result.start == "function") {
-            result = (result.length > 0) ? "s:"+result.start(0)+" e:"+result.end(0) : "-";
+            var newResult = "", i;
+            if (result.length > 0) {
+              
+              for (i=0;i<result.length;i++) {
+                newResult += "l:"+result.length+" s:"+result.start(i)+" e:"+result.end(i);
+              }
+            } else {
+               newResult = "-";
+            }
+            result = newResult;
+            // result = result.toString();
+            // result = (result.length > 0) ? "s:"+result.start(0)+" e:"+result.end(0) : "-";
           }
         } catch(e) {
           result = "<span class='na'>N/A</span>";

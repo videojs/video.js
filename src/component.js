@@ -176,6 +176,11 @@ _V_.Component = _V_.Class.extend({
     for (var attrname in obj) {
       if (obj.hasOwnProperty(attrname)) { this[attrname]=obj[attrname]; }
     }
+  },
+
+  // More easily attach 'this' to functions
+  proxy: function(fn){
+    return _V_.proxy(this, fn);
   }
 
 });
