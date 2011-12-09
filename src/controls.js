@@ -171,6 +171,45 @@ _V_.BigPlayButton = _V_.Button.extend({
   }
 });
 
+/* Loading Spinner
+================================================================================ */
+_V_.LoadingSpinner = _V_.Component.extend({
+  init: function(player, options){
+    this._super(player, options);
+
+    // player.addEvent("play", _V_.proxy(this, this.hide));
+    // player.addEvent("ended", _V_.proxy(this, this.show));
+    
+    player.addEvent("canplay", _V_.proxy(this, this.hide));
+    player.addEvent("canplaythrough", _V_.proxy(this, this.hide));
+    player.addEvent("playing", _V_.proxy(this, this.hide));    
+    player.addEvent("seeking", _V_.proxy(this, this.show));
+    player.addEvent("error", _V_.proxy(this, this.show));
+    player.addEvent("stalled", _V_.proxy(this, this.show));
+    player.addEvent("waiting", _V_.proxy(this, this.show));
+    
+  },
+
+  createElement: function(){
+    
+    var classNameSpinner, innerHtmlSpinner;
+    
+    if (typeof this.player.el.style.WebkitBorderRadius == "string" || typeof this.player.el.style.MozBorderRadius == "string" || typeof this.player.el.style.KhtmlBorderRadius == "string" || typeof this.player.el.style.borderRadius == "string") {
+      classNameSpinner = "vjs-loading-spinner";
+      innerHtmlSpinner = "<div class='ball1'></div><div class='ball2'></div><div class='ball3'></div><div class='ball4'></div><div class='ball5'></div><div class='ball6'></div><div class='ball7'></div><div class='ball8'></div>";
+      } else {
+      classNameSpinner = "vjs-loading-spinner-fallback";
+      innerHtmlSpinner = "";
+      }
+    
+    return this._super("div", {
+      
+      className: classNameSpinner,
+      innerHTML: innerHtmlSpinner
+    });
+  }
+});
+
 /* Control Bar
 ================================================================================ */
 _V_.ControlBar = _V_.Component.extend({
