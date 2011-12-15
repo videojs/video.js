@@ -8,8 +8,8 @@ _V_.Player = _V_.Component.extend({
 
     var el = this.el = _V_.createElement("div"), // Div to contain video and controls
         options = this.options = {},
-        width = options.width = tag.width,
-        height = options.height = tag.height,
+        width = options.width || tag.width,
+        height = options.height || tag.height,
 
         // Browsers default to 300x150 if there's no width/height or video size data.
         initWidth = width || 300,
