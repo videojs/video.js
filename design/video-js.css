@@ -98,6 +98,12 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 .vjs-default-skin .vjs-rewind-control { width: 5em; cursor: pointer !important; }
 .vjs-default-skin .vjs-rewind-control div { width: 19px; height: 16px; background: url('video-js.png'); margin: 0.5em auto 0; }
 
+/* Subtitles
+-------------------------------------------------------------------------------- */
+.vjs-default-skin .vjs-subtitles-control { width: 5em; cursor: pointer !important; float: right; }
+.vjs-default-skin .vjs-subtitles-control div { width: 22px; height: 16px; background: url('video-js.png') -75px -50px; margin: 0.5em auto 0; }
+.vjs-default-skin .vjs-subtitles-control.vjs-subtitleson div { background: url('video-js.png') -50px -50px; }
+
 /* Volume/Mute
 -------------------------------------------------------------------------------- */
 .vjs-default-skin .vjs-mute-control { width: 3.8em; cursor: pointer !important; float: right; }

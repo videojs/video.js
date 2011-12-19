@@ -662,6 +662,37 @@ _V_.MuteToggle = _V_.Button.extend({
 
 });
 
+_V_.SubtitlesToggle = _V_.Button.extend({
+
+  buttonText: "Toggle subtitles",
+
+  buildCSSClass: function(){
+    return "vjs-subtitles-control " + (this.player.subtitles() ? "vjs-subtitleson " : "") + this._super();
+  },
+
+  createElement: function(){
+    var el = this._super();
+    for (track in this.player.options.tracks) {
+      if (this.player.options.tracks[track].kind == "subtitles") {
+        return el;
+      }
+    }
+
+    // No subtitle tracks
+    el.style.display = "none";
+    return el;
+  },
+
+  onClick: function(event){
+    this.player.subtitles( this.player.subtitles() ? false : true );
+    if (this.player.subtitles()) {
+      _V_.addClass(this.el, "vjs-subtitleson");
+    } else {
+      _V_.removeClass(this.el, "vjs-subtitleson");
+    }
+  },
+
+});
 
 /* Text Track Displays
 ================================================================================ */

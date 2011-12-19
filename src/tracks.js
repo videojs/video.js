@@ -78,6 +78,13 @@ _V_.Track.prototype = {
   },
 
   update: function(){
+    // Clear subtitle box and return if subtitles are disabled
+    if (!this.player.subtitles()) {
+      this.currentCue = false;
+      this.updatePlayer("");
+      return;
+    }
+
     // Assuming all cues are in order by time, and do not overlap
     if (this.cues && this.cues.length > 0) {
       var time = this.player.currentTime();

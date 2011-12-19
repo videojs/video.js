@@ -98,7 +98,8 @@ VideoJS.options = {
             }
           ]}
         },
-        "muteToggle"
+        "muteToggle",
+        "subtitlesToggle",
       ]
     }},
     "subtitlesDisplay"/*, "replay"*/

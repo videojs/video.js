@@ -126,6 +126,7 @@ _V_.Player = _V_.Component.extend({
     options.autoplay = this.tag.getAttribute("autoplay") !== null; // hasAttribute not IE <8 compatible
     options.loop = this.tag.getAttribute("loop") !== null;
     options.muted = this.tag.getAttribute("muted") !== null;
+    options.subtitles = this.tag.getAttribute("subtitles") !== null;
 
     for (var c,i=0,j=this.tag.children;i<j.length;i++) {
       c = j[i];
@@ -421,6 +422,13 @@ _V_.Player.prototype.extend({
     }
     return this.apiCall("muted");
   },
+  subtitles: function(subtitles){
+    if (subtitles !== undefined) {
+      this.apiCall("setSubtitles", subtitles);
+      return this;
+    }
+    return this.apiCall("subtitles");
+  },
 
   width: function(width, skipListeners){
     if (width !== undefined) {
@@ -655,6 +663,7 @@ _V_.Player.prototype.extend({
   // mediaGroup: function(){ return this.apiCall("mediaGroup"); },
   // controller: function(){ return this.apiCall("controller"); },
   controls: function(){ return this.apiCall("controls"); },
-  defaultMuted: function(){ return this.apiCall("defaultMuted"); }
+  defaultMuted: function(){ return this.apiCall("defaultMuted"); },
+  defaultSubtitles: function(){ return this.apiCall("defaultSubtitles"); }
 });
 

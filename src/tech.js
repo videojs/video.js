@@ -15,7 +15,7 @@ _V_.PlaybackTech = _V_.Component.extend({
 });
 
 // Create placeholder methods for each that warn when a method isn't supported by the current playback technology
-_V_.apiMethods = "play,pause,paused,currentTime,setCurrentTime,duration,buffered,volume,setVolume,muted,setMuted,width,height,supportsFullScreen,enterFullScreen,src,load,currentSrc,preload,setPreload,autoplay,setAutoplay,loop,setLoop,error,networkState,readyState,seeking,initialTime,startOffsetTime,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight,textTracks,defaultPlaybackRate,playbackRate,mediaGroup,controller,controls,defaultMuted".split(",");
+_V_.apiMethods = "play,pause,paused,currentTime,setCurrentTime,duration,buffered,volume,setVolume,muted,setMuted,subtitles,setSubtitles,width,height,supportsFullScreen,enterFullScreen,src,load,currentSrc,preload,setPreload,autoplay,setAutoplay,loop,setLoop,error,networkState,readyState,seeking,initialTime,startOffsetTime,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight,textTracks,defaultPlaybackRate,playbackRate,mediaGroup,controller,controls,defaultMuted,defaultSubtitles".split(",");
 _V_.each(_V_.apiMethods, function(methodName){
   _V_.PlaybackTech.prototype[methodName] = function(){
     throw new Error("The '"+method+"' method is not available on the playback technology's API");
@@ -80,7 +80,7 @@ _V_.html5 = _V_.PlaybackTech.extend({
     }
 
     // Update tag settings, in case they were overridden
-    _V_.each(["autoplay","preload","loop","muted","poster"], function(attr){
+    _V_.each(["autoplay","preload","loop","muted","subtitles","poster"], function(attr){
       el[attr] = player.options[attr];
     }, this);
 
@@ -124,6 +124,8 @@ _V_.html5 = _V_.PlaybackTech.extend({
   setVolume: function(percentAsDecimal){ this.el.volume = percentAsDecimal; },
   muted: function(){ return this.el.muted; },
   setMuted: function(muted){ this.el.muted = muted },
+  subtitles: function(){ return this.el.subtitles; },
+  setSubtitles: function(subtitles){ this.el.subtitles = subtitles },
 
   width: function(){ return this.el.offsetWidth; },
   height: function(){ return this.el.offsetHeight; },
@@ -178,7 +180,8 @@ _V_.html5 = _V_.PlaybackTech.extend({
   mediaGroup: function(){ return this.el.mediaGroup; },
   controller: function(){ return this.el.controller; },
   controls: function(){ return this.player.options.controls; },
-  defaultMuted: function(){ return this.el.defaultMuted; }
+  defaultMuted: function(){ return this.el.defaultMuted; },
+  defaultSubtitles: function(){ return this.el.defaultSubtitles; }
 });
 
 /* HTML5 Support Testing -------------------------------------------------------- */
@@ -242,7 +245,8 @@ _V_.flash = _V_.PlaybackTech.extend({
           autoplay: playerOptions.autoplay,
           preload: playerOptions.preload,
           loop: playerOptions.loop,
-          muted: playerOptions.muted
+          muted: playerOptions.muted,
+          subtitles: playerOptions.subtitles
 
         }, options.flashVars),
 
@@ -307,7 +311,7 @@ _V_.flash = _V_.PlaybackTech.extend({
 // Create setters and getters for attributes
 (function(){
   var api = _V_.flash.prototype,
-      readWrite = "preload,currentTime,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted".split(","),
+      readWrite = "preload,currentTime,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted,subtitles,defaultSubtitles".split(","),
       readOnly = "error,currentSrc,networkState,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight,textTracks".split(","),
       callOnly = "load,play,pause".split(",");
       // Overridden: buffered
