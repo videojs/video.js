@@ -1,7 +1,7 @@
 // Flowplayer API Connector
 VideoJS.tech.youtube = {
   name: "YouTube",
-  
+
   supported: function(){
     // Flash Player 8 or higher
     return true;
@@ -64,17 +64,17 @@ VideoJS.tech.youtube = {
       player.triggerEvent("pause");
     }
   },
-  
+
   error: function(id, errorCode){
     _V_.log(id, errorCode);
   },
 
   api: {
     setupTriggers: function(){
-      this.tels.youtube.addEventListener("onStateChange", 
+      this.tels.youtube.addEventListener("onStateChange",
         "(function(state){ _V_.tech.youtube.stateChange('"+this.id+"',state); })");
 
-      this.tels.youtube.addEventListener("onError", 
+      this.tels.youtube.addEventListener("onError",
         "(function(errorCode){ _V_.tech.youtube.error('"+this.id+"',errorCode); })");
 
     },

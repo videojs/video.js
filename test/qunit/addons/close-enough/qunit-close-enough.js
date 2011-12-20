@@ -14,9 +14,9 @@ QUnit.extend( QUnit, {
 		var passes = (actual === expected) || Math.abs(actual - expected) <= maxDifference;
 		QUnit.push(passes, actual, expected, message);
 	},
-	
+
 	/**
-	 * Checks that the first two arguments are numbers with differences greater than the specified 
+	 * Checks that the first two arguments are numbers with differences greater than the specified
 	 * minimum difference.
 	 *
 	 * @example notClose(3.1, Math.PI, 0.001);

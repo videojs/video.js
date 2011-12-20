@@ -343,14 +343,14 @@ function chainwrap(depth, first, prev) {
     depth = depth || 0;
     var last = prev || new Wrap();
     first = first || last;
-    
+
     if (depth == 1) {
         first.wrap = last;
-    } 
+    }
     if (depth > 1) {
         last = chainwrap(depth-1, first, new Wrap(last));
     }
-    
+
     return last;
 }
 
@@ -368,7 +368,7 @@ test("check jsDump recursion", function() {
     var parentref = chainwrap(2);
     var parentdump = QUnit.jsDump.parse(parentref);
     equal(parentdump, '{\n  "wrap": {\n    "wrap": recursion(-2),\n    "first": true\n  }\n}');
-    
+
     var circref = chainwrap(10);
     var circdump = QUnit.jsDump.parse(circref);
     ok(new RegExp("recursion\\(-10\\)").test(circdump), "(" +circdump + ") should show -10 recursion level");
@@ -394,7 +394,7 @@ test('Circular reference with arrays', function() {
     // pure array self-ref
     var arr = [];
     arr.push(arr);
-    
+
     var arrdump = QUnit.jsDump.parse(arr);
 
     equal(arrdump, '[\n  recursion(-1)\n]');
@@ -405,16 +405,16 @@ test('Circular reference with arrays', function() {
     var obj = {};
     var childarr = [obj];
     obj.childarr = childarr;
-    
+
     var objdump = QUnit.jsDump.parse(obj);
     var childarrdump = QUnit.jsDump.parse(childarr);
-    
+
     equal(objdump, '{\n  "childarr": [\n    recursion(-2)\n  ]\n}');
     equal(childarrdump, '[\n  {\n    "childarr": recursion(-2)\n  }\n]');
-    
+
     equal(obj.childarr, childarr, 'no endless stack when trying to dump array/object mix with circular ref');
     equal(childarr[0], obj, 'no endless stack when trying to dump array/object mix with circular ref');
-    
+
 });
 
 

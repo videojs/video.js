@@ -19,7 +19,7 @@ QUnit.extend( QUnit, {
 
 /**
  * Reset the step counter for every test()
- */ 
+ */
 QUnit.testStart(function () {
 	this.config.current.step = 0;
 });

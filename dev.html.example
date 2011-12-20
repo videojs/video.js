@@ -23,7 +23,7 @@
   <script src="src/tracks.js"></script>
 
   <script src="flash/swfobject.js"></script>
-  
+
   <script type="text/javascript" charset="utf-8">
     // Easy access to test Flash over HTML5. Add ?flash to URL
     if (window.location.href.indexOf("?flash") !== -1) {

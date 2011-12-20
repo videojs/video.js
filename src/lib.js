@@ -83,11 +83,11 @@ _V_.extend({
     classNames.splice(classNames.indexOf(classToRemove),1);
     element.className = classNames.join(" ");
   },
-  
+
   remove: function(item, array){
     if (!array) return;
     var i = array.indexOf(item);
-    if (i != -1) { 
+    if (i != -1) {
       return array.splice(i, 1)
     };
   },
@@ -131,7 +131,7 @@ _V_.extend({
   getRelativePosition: function(x, relativeElement){
     return Math.max(0, Math.min(1, (x - _V_.findPosX(relativeElement)) / relativeElement.offsetWidth));
   },
-  
+
   getComputedStyleValue: function(element, style){
     return window.getComputedStyle(element, null).getPropertyValue(style);
   },
