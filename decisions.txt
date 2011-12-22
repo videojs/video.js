@@ -1,6 +1,6 @@
 Tracking/Polling CurrentTime Manually
 -------------------------------------
-- Necessary for most flash players and browsers that don't trigger timeupdate events. 
+- Necessary for most flash players and browsers that don't trigger timeupdate events.
 - In VJS 1-2, we always tracked time because timeupdate was rare.
 - Now most browsers support it well. There is a delay bug in the current Chrome.
     http://code.google.com/p/chromium/issues/detail?id=92251

@@ -47,7 +47,7 @@ $(function(){
           if (typeof result.start == "function") {
             var newResult = "", i;
             if (result.length > 0) {
-              
+
               for (i=0;i<result.length;i++) {
                 newResult += "l:"+result.length+" s:"+result.start(i)+" e:"+result.end(i);
               }

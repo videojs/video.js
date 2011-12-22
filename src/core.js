@@ -62,7 +62,7 @@ VideoJS.options = {
   // Default of web browser is 300x150. Should rely on source width/height.
   width: "auto",
   height: "auto",
-  
+
   // defaultVolume: 0.85,
   defaultVolume: 0.00, // The freakin seaguls are driving me crazy!
 
@@ -124,7 +124,7 @@ _V_.autoSetup = function(){
         if (vid.player === undefined) {
           options = vid.getAttribute("data-setup");
 
-          // Check if data-setup attr exists. 
+          // Check if data-setup attr exists.
           // We only auto-setup if they've added the data-setup attr.
           if (options !== null) {
 

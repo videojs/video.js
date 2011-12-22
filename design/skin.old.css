@@ -7,7 +7,7 @@ so you can upgrade to newer versions easier. */
 .vjs-original-skin .vjs-controls {
   position: absolute; margin: 0; opacity: 0.85; color: #fff;
   display: block; /* Start hidden */
-  left: 0; right: 0; /* 100% width of video-js-box */ 
+  left: 0; right: 0; /* 100% width of video-js-box */
   width: 100%;
   bottom: 0px; /* Distance from the bottom of the box/video. Keep 0. Use height to add more bottom margin. */
   height: 35px; /* Including any margin you want above or below control items */
@@ -25,7 +25,7 @@ so you can upgrade to newer versions easier. */
   height: 25px; /* Default height of individual controls */
   top: 5px; /* Top margin to put space between video and controls when controls are below */
 
-  /* CSS Background Gradients 
+  /* CSS Background Gradients
      Using to give the aqua-ish look. */
   /* Default */ background-color: #0B151A;
   /* Webkit  */ background: #1F3744 -webkit-gradient(linear, left top, left bottom, from(#0B151A), to(#1F3744)) left 12px;
@@ -38,7 +38,7 @@ so you can upgrade to newer versions easier. */
   -webkit-box-shadow: 1px 1px 2px #000; -moz-box-shadow: 1px 1px 2px #000; box-shadow: 1px 1px 2px #000;
 }
 
-/* Placement of Control Items 
+/* Placement of Control Items
    - Left side of pogress bar, use left & width
    - Rigth side of progress bar, use right & width
    - Expand with the video (like progress bar) use left & right
@@ -134,7 +134,7 @@ so you can upgrade to newer versions easier. */
 -------------------------------------------------------------------------------- */
 .vjs-original-skin .vjs-fullscreen-control { cursor: pointer !important; }
 .vjs-original-skin .vjs-fullscreen-control div {
-  padding: 0; text-align: left; vertical-align: top; cursor: pointer !important; 
+  padding: 0; text-align: left; vertical-align: top; cursor: pointer !important;
   margin: 5px 0 0 5px; /* Placement within the fullscreen control item */
   width: 20px; height: 20px;
 }
@@ -166,7 +166,7 @@ so you can upgrade to newer versions easier. */
   position: absolute; top: 50%; left: 50%; width: 80px; height: 80px; margin: -43px 0 0 -43px; text-align: center; vertical-align: center; cursor: pointer !important;
   border: 3px solid #fff; opacity: 0.9;
   -webkit-border-radius: 20px; -moz-border-radius: 20px; border-radius: 20px;
-  
+
   /* CSS Background Gradients */
   /* Default */ background-color: #0B151A;
   /* Webkit  */ background: #1F3744 -webkit-gradient(linear, left top, left bottom, from(#0B151A), to(#1F3744)) left 40px;

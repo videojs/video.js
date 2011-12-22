@@ -1,11 +1,11 @@
 // Event System (J.Resig - Secrets of a JS Ninja http://jsninja.com/ [Go read it, really])
 // (Book version isn't completely usable, so fixed some things and borrowed from jQuery where it's working)
-// 
+//
 // This should work very similarly to jQuery's events, however it's based off the book version which isn't as
 // robust as jquery's, so there's probably some differences.
-// 
-// When you add an event listener using _V_.addEvent, 
-//   it stores the handler function in seperate cache object, 
+//
+// When you add an event listener using _V_.addEvent,
+//   it stores the handler function in seperate cache object,
 //   and adds a generic handler to the element's event,
 //   along with a unique id (guid) to the element.
 
@@ -26,13 +26,13 @@ _V_.extend({
         var handlers = _V_.getData(elem).events[event.type];
         // Go through and call all the real bound handlers
         if (handlers) {
-          
+
           // Copy handlers so if handlers are added/removed during the process it doesn't throw everything off.
           var handlersCopy = [];
           _V_.each(handlers, function(handler, i){
             handlersCopy[i] = handler;
           })
-          
+
           for (var i = 0, l = handlersCopy.length; i < l; i++) {
             handlersCopy[i].call(elem, event);
           }
@@ -184,7 +184,7 @@ _V_.extend({
 
     // Added in attion to book. Book code was broke.
     event = typeof event === "object" ?
-      event[_V_.expando] ? 
+      event[_V_.expando] ?
         event :
         new _V_.Event(type, event) :
       new _V_.Event(type);
@@ -202,7 +202,7 @@ _V_.extend({
     // Unless it's been explicitly stopped
     // if (parent && !event.isPropagationStopped()) {
     //   _V_.triggerEvent(parent, event);
-    // 
+    //
     // // We're at the top document so trigger the default action
     // } else if (!parent && !event.isDefaultPrevented()) {
     //   // log(type);
@@ -216,10 +216,10 @@ _V_.extend({
     //     if (targetHandler) {
     //       targetData.handler = function(){};
     //     }
-    // 
+    //
     //     // Trigger the native event (click, focus, blur)
     //     event.target[event.type]();
-    // 
+    //
     //     // Restore the handler
     //     if (targetHandler) {
     //       targetData.handler = targetHandler;
@@ -263,7 +263,7 @@ _V_.Event.prototype = {
     if (!e) { return; }
 
     // if preventDefault exists run it on the original event
-    if (e.preventDefault) { 
+    if (e.preventDefault) {
       e.preventDefault();
     // otherwise set the returnValue property of the original event to false (IE)
     } else {

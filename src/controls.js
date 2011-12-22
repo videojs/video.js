@@ -332,7 +332,7 @@ _V_.Slider = _V_.Component.extend({
 
   createElement: function(type, attrs) {
     attrs = _V_.merge({
-      role: "slider", 
+      role: "slider",
       "aria-valuenow": 0,
       "aria-valuemin": 0,
       "aria-valuemax": 100,
