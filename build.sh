@@ -2,6 +2,9 @@
 # Combines Source Files. In terminal, sh build.sh
 # It will put a new video.js file under dist/
 
+# Create dist directory if it doesn't already exist
+mkdir -p dist
+
 # FILES=../src/*
 # for f in $FILES
 # do
