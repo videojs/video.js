@@ -269,6 +269,8 @@ _V_.flash = _V_.PlaybackTech.extend({
 
     // Add to box.
     _V_.insertFirst(placeHolder, player.el);
+    
+    _V_.log(attributes)
 
     swfobject.embedSWF(options.swf, placeHolder.id, "480", "270", "9.0.124", "", flashVars, params, attributes);
   },
@@ -360,30 +362,33 @@ _V_.flash.supports = {
 
 _V_.flash.onSWFReady = function(currSwf){
 
-  // _V_.log(currSwf, "currSwf")
+  _V_.log(currSwf, "currSwf")
 
-  // Flash seems to be catching errors, so raising them manally
-  try {
-    // Delay for real swf ready.
+  var el = _V_.el(currSwf);
+
+  // Get player from box
+  // On firefox reloads, el might already have a player
+  var player = el.player || el.parentNode.player,
+      tech = player.techs["flash"];
+
+  // Reference player on tech element
+  el.player = player;
+
+  // Update reference to playback technology element
+  tech.el = el;
+
+  _V_.flash.checkReady(tech);
+};
+
+// The SWF isn't alwasy ready when it says it is. Sometimes the API functions still need to be added to the object.
+// If it's not ready, we set a timeout to check again shortly.
+_V_.flash.checkReady = function(tech){
+  if (tech.el.vjs_getProperty) {
+    tech.triggerReady();
+  } else {
     setTimeout(function(){
-      var el = _V_.el(currSwf);
-
-          // Get player from box
-      var  player = el.parentNode.player,
-          tech = player.techs["flash"];
-
-      // Reference player on tech element
-      el.player = player;
-
-      // Update reference to playback technology element
-      tech.el = el;
-
-      tech.triggerReady();
-
-    },0);
-
-  } catch(err) {
-    _V_.log(err);
+      _V_.flash.checkReady(tech);
+    }, 50);
   }
 };
 
