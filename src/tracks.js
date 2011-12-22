@@ -88,7 +88,7 @@ _V_.Track.prototype = {
           // Meaning the user is scrubbing in reverse or rewinding
           reverse = (this.cues[this.lastCueIndex].startTime > time),
           // If reverse, step back 1 becase we know it's not the lastCue
-          i = this.lastCueIndex - (reverse) ? 1 : 0;
+          i = this.lastCueIndex - (reverse ? 1 : 0);
         while (true) { // Loop until broken
           if (reverse) { // Looping in reverse
             // Stop if no more, or this cue ends before the current time (no earlier cues should apply)

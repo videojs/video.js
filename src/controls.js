@@ -167,6 +167,7 @@ _V_.BigPlayButton = _V_.Button.extend({
   },
 
   onClick: function(){
+    this.player.currentTime(0);
     this.player.play();
   }
 });
