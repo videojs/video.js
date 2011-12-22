@@ -177,9 +177,6 @@ _V_.LoadingSpinner = _V_.Component.extend({
   init: function(player, options){
     this._super(player, options);
 
-    // player.addEvent("play", _V_.proxy(this, this.hide));
-    // player.addEvent("ended", _V_.proxy(this, this.show));
-
     player.addEvent("canplay", _V_.proxy(this, this.hide));
     player.addEvent("canplaythrough", _V_.proxy(this, this.hide));
     player.addEvent("playing", _V_.proxy(this, this.hide));

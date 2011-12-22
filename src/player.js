@@ -452,13 +452,11 @@ _V_.Player.prototype.extend({
     this.videoIsFullScreen = true;
      if (typeof this.el.webkitRequestFullScreen == 'function') {
        this.el.webkitRequestFullScreen();
-     // } else if (typeof this.el.mozRequestFullScreen == 'function') {
-     //   _V_.log("here")
-     //   this.el.mozRequestFullScreen();
+     } else if (typeof this.el.mozRequestFullScreen == 'function') {
+       this.el.mozRequestFullScreen();
      } else if (this.supportsFullScreen()) {
        this.apiCall("enterFullScreen");
      } else {
-              _V_.log("2")
        this.enterFullWindow();
      }
      this.triggerEvent("enterFullScreen");
