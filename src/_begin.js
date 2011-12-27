@@ -1,4 +1,4 @@
-/*
+/*!
 VideoJS - HTML5 Video Player
 Version 3.0 BETA
 
