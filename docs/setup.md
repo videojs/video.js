@@ -1,3 +1,10 @@
+---
+layout: docs
+title: Setup
+description: Setup
+body_id: docs
+---
+
 Setup
 =====
 

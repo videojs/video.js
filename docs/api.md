@@ -1,28 +1,45 @@
+---
+layout: docs
+title: API
+description: Video.JS API Docs
+body_id: docs
+---
+
 API
 ===
-The VideoJS API allows you to interact with the video through Javascript, whether the browser is playing the video through HTML5 video or any number of media playback technologies that have an API wrapper (e.g. video-js.flowplayer.js).
+The VideoJS API allows you to interact with the video through Javascript, whether the browser is playing the video through HTML5 video or any other supported playback technologies.
 
 Referencing the Player
 ----------------------
 To use the API functions, you need access to the player object. Luckily this is easy to get. You just need to make sure your video tag has an ID. The example embed code has an ID of "example_video_1". If you have multiple videos on one page, make sure every video tag has a unique ID (example_video_2, example_video_3, etc.).
 
-    _V_("example_video_1")
+{% highlight javascript %}
+
+  var myPlayer = _V_("example_video_1");
+
+{% endhighlight %}
 
 
-Wait until Ready
-----------------
+Wait Until the Player is Ready
+------------------------------
 The time it takes VideoJS to set up the video and API will vary depending on the playback technology being used (HTML5 will often be much faster to load than Flash). For that reason we want to use the player's 'ready' function to trigger any code that requires the player's API.
+
+{% highlight javascript %}
 
     _V_("example_video_1").ready(function(){
 
       var myPlayer = this;
 
+      // EXAMPLE: Start playing the video.
+      myPlayer.play();
+
     });
 
+{% endhighlight %}
 
 API Methods
 -----------
-Now that you have access to a ready player, you can control the video or react to video events using the following functions. The VideoJS API function names follow the HTML5 media API. The main difference is that attributes which you would get or set on a video element directly ( videoElement.currentTime = "120"; ), you would use a function syntax for VideoJS ( myPlayer.currentTime(120); )
+Now that you have access to a ready player, you can control the video or react to video events using the following functions. The VideoJS API function names follow the HTML5 media API. The main difference is that attributes which you would get or set on a video element directly ( videoElement.currentTime = "120"; ), you would use a function argument syntax for VideoJS ( myPlayer.currentTime(120); )
 
 ### play()
   Start video playback.
@@ -53,13 +70,13 @@ Now that you have access to a ready player, you can control the video or react t
 
 
 ### duration()
-  Returns the length in time of the video in seconds. Note: The video must have started loading before the duration can be known.
+  Returns the length in time of the video in seconds. NOTE: The video must have started loading before the duration can be known, and in the case of Flash, may not be known until the video starts playing.
   Example:
 
     var howLongIsThis = myPlayer.duration();
 
 ### buffered()
-  Returns a [TimeRange](http://videojs.com/docs/timerange.html) with sections of the video that have been downloaded. If you just want the percent of the video that's been downloaded, use bufferedPercent.
+  Returns a [TimeRange](http://videojs.com/docs/glossary.html#timerange) with sections of the video that have been downloaded. If you just want the percent of the video that's been downloaded, use bufferedPercent.
   Example:
 
     var whatHasBeenBuffered = myPlayer.buffered();

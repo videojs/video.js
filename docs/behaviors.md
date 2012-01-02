@@ -1,3 +1,12 @@
+---
+layout: docs
+title: Behvaiors
+description: Video.JS Behaviors
+body_id: docs
+---
+
+DEPRECATED
+
 Behaviors
 =========
 Behaviors allow you to make an element on your page act as a video control or a display of video information. The easiest example of this is creating a play button. The following code will make a click on your element play the video.
