@@ -163,25 +163,22 @@ _V_.Player = _V_.Component.extend({
   // And append playback element in player div.
   loadTech: function(techName, source){
 
-    this.triggerEvent("loadingtech");
-
     // Pause and remove current playback technology
     if (this.tech) {
-      this.removeTech(this.tech);
+
+      this.tech.destroy();
 
       // Turn off any manual progress or timeupdate tracking
-      if (this.manualProgress) {
-        this.manualProgressOff()
-      }
+      if (this.manualProgress) { this.manualProgressOff(); }
 
-      if (this.manualTimeUpdates) {
-        this.manualTimeUpdatesOff()
-      }
+      if (this.manualTimeUpdates) { this.manualTimeUpdatesOff(); }
+
+      this.tech = false;
 
     // If the first time loading, HTML5 tag will exist but won't be initialized
     // So we need to remove it if we're not loading HTML5
-    } else if (!this.tech && techName != "html5") {
-      this.removeTechElement(this.tag);
+    } else if (techName != "html5") {
+      this.el.removeChild(this.tag);
     }
 
     this.techName = techName;
@@ -190,8 +187,8 @@ _V_.Player = _V_.Component.extend({
     this.isReady = false;
 
     var techReady = function(){
-      // Set up playback technology's event triggers
-      this.setupTriggers();
+      _V_.log("ready")
+      
       this.player.triggerReady();
 
       // Manually track progress in cases where the browser/flash player doesn't report it.
@@ -205,28 +202,12 @@ _V_.Player = _V_.Component.extend({
       }
     }
 
-    // Initialize new tech if it hasn't been yet and load source
-    // Add tech element to player div
-    if (this.techs[techName] === undefined) {
+    // Grab tech-specific options from player options and add source and parent element to use.
+    var techOptions = _V_.merge({ source: source, parentEl: this.el }, this.options[techName])
 
-      var techOptions = _V_.merge({ source: source }, this.options[techName])
-
-      this.techs[techName] = this.tech = new _V_[techName](this, techOptions);
-      this.tech.ready(techReady)
-    } else {
-      this.tech = this.techs[techName];
-      _V_.insertFirst(this.techs[techName].el, this.el);
-      this.src(source);
-    }
-  },
-
-  removeTech: function(tech){
-    this.removeTechElement(tech.el);
-    // TODO: Remove API listeners as well
-  },
-
-  removeTechElement: function(el){
-    this.el.removeChild(el);
+    // Initialize tech instance
+    this.tech = new _V_[techName](this, techOptions);
+    this.tech.ready(techReady);
   },
 
   /* Fallbacks for unsupported event types
@@ -394,7 +375,7 @@ _V_.Player.prototype.extend({
         start = 0, end = this.values.bufferEnd = this.values.bufferEnd || 0,
         timeRange;
 
-    if (buffered && buffered.length > 0 && buffered.end(0) > end) {
+    if (buffered && buffered.length > 0 && buffered.end(0) !== end) {
       end = buffered.end(0);
       // Storing values allows them be overridden by setBufferedFromProgress
       this.values.bufferEnd = end;

@@ -167,7 +167,11 @@ _V_.BigPlayButton = _V_.Button.extend({
   },
 
   onClick: function(){
-    this.player.currentTime(0);
+    // Go back to the beginning if big play button is showing at the end.
+    // Have to check for current time otherwise it might throw a 'not ready' error.
+    if(this.player.currentTime()) { 
+      this.player.currentTime(0);
+    }
     this.player.play();
   }
 });

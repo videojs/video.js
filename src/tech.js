@@ -9,9 +9,8 @@ _V_.PlaybackTech = _V_.Component.extend({
 
     // player.triggerEvent("techready");
   }
+  // destroy: function(){},
   // createElement: function(){},
-  // setupTriggers: function(){},
-  // removeTriggers: function(){}
 });
 
 // Create placeholder methods for each that warn when a method isn't supported by the current playback technology
@@ -54,27 +53,39 @@ _V_.html5 = _V_.PlaybackTech.extend({
       }
     });
 
+    this.setupTriggers();
+
     this.triggerReady();
+  },
+  
+  destroy: function(){
+    this.player.tag = false;
+    this.el.parentNode.removeChild(this.el);
   },
 
   createElement: function(){
     var html5 = _V_.html5,
         player = this.player,
 
-        // Reuse original tag for HTML5 playback technology element
+        // If possible, reuse original tag for HTML5 playback technology element
         el = player.tag,
         newEl;
 
     // Check if this browser supports moving the element into the box.
     // On the iPhone video will break if you move the element,
     // So we have to create a brand new element.
-    if (html5.supports.movingElementInDOM === false) {
+    if (!el || html5.supports.movingElementInDOM === false) {
+
+      // If the original tag is still there, remove it.
+      if (el) { 
+        player.el.removeChild(el);
+      }
+
       newEl = _V_.createElement("video", {
-        id: el.id,
-        className: el.className
+        id: el.id || player.el.id + "_html5_api",
+        className: el.className || "vjs-tech"
       });
 
-      player.el.removeChild(el);
       el = newEl;
       _V_.insertFirst(el, player.el);
     }
@@ -226,8 +237,9 @@ _V_.flash = _V_.PlaybackTech.extend({
   init: function(player, options){
     this.player = player;
 
-    var placeHolder = this.el = _V_.createElement("div", { id: player.el.id + "_temp_flash" }),
-        source = options.source,
+    var source = options.source,
+        parentEl = options.parentEl,
+        placeHolder = this.el = _V_.createElement("div", { id: parentEl.id + "_temp_flash" }),
         objId = player.el.id+"_flash_api",
         playerOptions = player.options;
 
@@ -268,16 +280,16 @@ _V_.flash = _V_.PlaybackTech.extend({
     }
 
     // Add to box.
-    _V_.insertFirst(placeHolder, player.el);
-    
-    _V_.log(attributes)
+    _V_.insertFirst(placeHolder, parentEl);
 
     swfobject.embedSWF(options.swf, placeHolder.id, "480", "270", "9.0.124", "", flashVars, params, attributes);
   },
-
-  setupTriggers: function(){
-    // Using global onSWFEvent func to distribute events
+  
+  destroy: function(){
+    this.el.parentNode.removeChild(this.el);
   },
+
+  // setupTriggers: function(){}, // Using global onSWFEvent func to distribute events
 
   play: function(){ this.el.vjs_play(); },
   pause: function(){ this.el.vjs_pause(); },
@@ -369,7 +381,7 @@ _V_.flash.onSWFReady = function(currSwf){
   // Get player from box
   // On firefox reloads, el might already have a player
   var player = el.player || el.parentNode.player,
-      tech = player.techs["flash"];
+      tech = player.tech;
 
   // Reference player on tech element
   el.player = player;
