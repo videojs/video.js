@@ -28,6 +28,8 @@ _V_.Button = _V_.Control.extend({
       role: "button",
       tabIndex: 0
     }, attrs);
+    
+    _V_.log(attrs)
 
     return this._super(type, attrs);
   },
@@ -221,8 +223,10 @@ _V_.ControlBar = _V_.Component.extend({
   init: function(player, options){
     this._super(player, options);
 
-    player.addEvent("mouseover", _V_.proxy(this, this.show));
-    player.addEvent("mouseout", _V_.proxy(this, this.hide));
+    player.addEvent("play", this.proxy(this.show));
+
+    player.addEvent("mouseover", this.proxy(this.reveal));
+    player.addEvent("mouseout", this.proxy(this.conceal));
   },
 
   createElement: function(){
@@ -231,15 +235,13 @@ _V_.ControlBar = _V_.Component.extend({
     });
   },
 
-  show: function(){
-    // Used for transitions (fading out)
+  // Used for transitions (fading out)
+  reveal: function(){
     this.el.style.opacity = 1;
-    // bar.style.display = "block";
   },
 
-  hide: function(){
+  conceal: function(){
     this.el.style.opacity = 0;
-    // bar.style.display = "none";
   }
 });
 
@@ -706,6 +708,31 @@ _V_.MuteToggle = _V_.Button.extend({
     _V_.addClass(this.el, "vjs-vol-"+level);
   }
 
+});
+
+
+/* Poster Image
+================================================================================ */
+_V_.Poster = _V_.Button.extend({
+  init: function(player, options){
+    this._super(player, options);
+
+    player.addEvent("play", _V_.proxy(this, this.hide));
+  },
+
+  createElement: function(){
+    return this._super("img", {
+      className: "vjs-poster",
+      src: this.player.options.poster,
+
+      // Don't want poster to be tabbable.
+      tabIndex: -1
+    });
+  },
+
+  onClick: function(){
+    this.player.play();
+  }
 });
 
 

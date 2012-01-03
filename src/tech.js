@@ -29,6 +29,7 @@ _V_.html5 = _V_.PlaybackTech.extend({
     this.player = player;
     this.el = this.createElement();
     this.ready(ready);
+    _V_.addEvent(this.el, "click", _V_.proxy(this, _V_.PlayToggle.prototype.onClick));
 
     var source = options.source;
 
@@ -91,7 +92,7 @@ _V_.html5 = _V_.PlaybackTech.extend({
     }
 
     // Update tag settings, in case they were overridden
-    _V_.each(["autoplay","preload","loop","muted","poster"], function(attr){
+    _V_.each(["autoplay","preload","loop","muted"], function(attr){ // ,"poster"
       el[attr] = player.options[attr];
     }, this);
 
@@ -270,9 +271,11 @@ _V_.flash = _V_.PlaybackTech.extend({
           'class': 'vjs-tech'
         }, options.attributes);
 
-    if (playerOptions.poster) {
-      flashVars.poster = playerOptions.poster;
-    }
+
+    // EDIT: Trying to just us a manual <img> for poster. 
+    // if (playerOptions.poster) {
+    //   flashVars.poster = playerOptions.poster;
+    // }
 
     // If source was supplied pass as a flash var.
     if (source) {
@@ -388,6 +391,9 @@ _V_.flash.onSWFReady = function(currSwf){
 
   // Update reference to playback technology element
   tech.el = el;
+
+  // Make a click on the swf play the video
+  _V_.addEvent(el, "click", _V_.proxy(player, _V_.PlayToggle.prototype.onClick));
 
   _V_.flash.checkReady(tech);
 };

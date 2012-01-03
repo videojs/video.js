@@ -13,8 +13,13 @@ REQUIRED STYLES (be careful overriding)
 */
 .video-js {
   background-color: #000; position: relative; padding: 0;
+
   /* Start with 10px for base font size so other dimensions can be em based and easily calculable. */
   font-size: 10px;
+
+  /* Allow poster to be vertially aligned. */
+  vertical-align: middle;
+  display: table-cell;
 }
 
 /* Playback technology elements expand to the width/height of the containing div. <video> or <object> */
@@ -33,7 +38,16 @@ body.vjs-full-window {
   width: 100% !important; height: 100% !important;
 }
 
-/* Subtiles Style */
+/* Poster Styles */
+.vjs-poster {
+  margin: 0 auto; padding: 0; cursor: pointer;
+
+  /* Scale with the size of the player div. Works when poster is vertically shorter, but stretches when it's less wide. */
+  position: relative; width: 100%; max-height: 100%; 
+}
+
+
+/* Subtiles Styles */
 .video-js .vjs-subtitles { color: #fff; font-size: 20px; text-align: center; position: absolute; bottom: 40px; left: 0; right: 0; }
 
 /* DEFAULT SKIN (override in another file to create new skins)
@@ -46,7 +60,8 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
   position: absolute;
   bottom: 0; /* Distance from the bottom of the box/video. Keep 0. Use height to add more bottom margin. */
   left: 0; right: 0; /* 100% width of div */
-  opacity: 0.85; display: block; /* Start hidden */
+  opacity: 0.85; 
+  display: none; /* Start hidden */
   margin: 0; padding: 0; /* Controls are absolutely position, so no padding necessary */
   height: 2.6em; /* Including any margin you want above or below control items */
   color: #fff; border-top: 1px solid #404040;

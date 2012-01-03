@@ -53,6 +53,9 @@ _V_.Player = _V_.Component.extend({
     // Store controls setting, and then remove immediately so native controls don't flash.
     tag.removeAttribute("controls");
 
+    // Poster will be handled by a manual <img>
+    tag.removeAttribute("poster");
+
     // Empty video tag sources and tracks so the built in player doesn't use them also.
     if (tag.hasChildNodes()) {
       for (var i=0,j=tag.childNodes;i<j.length;i++) {
