@@ -1,17 +1,18 @@
 ---
 layout: docs
-title: API
-description: Video.JS API Docs
-body_id: docs
+title: API &mdash; Video.JS &raquo; HTML5 Video Player
+description: Video.JS API Docs - API settings based on the HTML5 video API
+body_id: api
+body_class: docs subpage
 ---
 
 API
 ===
-The VideoJS API allows you to interact with the video through Javascript, whether the browser is playing the video through HTML5 video or any other supported playback technologies.
+The Video.js API allows you to interact with the video through Javascript, whether the browser is playing the video through HTML5 video, Flash, or any other supported playback technologies.
 
 Referencing the Player
 ----------------------
-To use the API functions, you need access to the player object. Luckily this is easy to get. You just need to make sure your video tag has an ID. The example embed code has an ID of "example_video_1". If you have multiple videos on one page, make sure every video tag has a unique ID (example_video_2, example_video_3, etc.).
+To use the API functions, you need access to the player object. Luckily this is easy to get. You just need to make sure your video tag has an ID. The example embed code has an ID of "example_video_1". If you have multiple videos on one page, make sure every video tag has a unique ID.
 
 {% highlight javascript %}
 
@@ -19,10 +20,11 @@ To use the API functions, you need access to the player object. Luckily this is 
 
 {% endhighlight %}
 
+(If the player hasn't been initialized yet via the data-setup attribute or another method, this will also initialize the player.)
 
 Wait Until the Player is Ready
 ------------------------------
-The time it takes VideoJS to set up the video and API will vary depending on the playback technology being used (HTML5 will often be much faster to load than Flash). For that reason we want to use the player's 'ready' function to trigger any code that requires the player's API.
+The time it takes Video.js to set up the video and API will vary depending on the playback technology being used (HTML5 will often be much faster to load than Flash). For that reason we want to use the player's 'ready' function to trigger any code that requires the player's API.
 
 {% highlight javascript %}
 
@@ -39,122 +41,189 @@ The time it takes VideoJS to set up the video and API will vary depending on the
 
 API Methods
 -----------
-Now that you have access to a ready player, you can control the video or react to video events using the following functions. The VideoJS API function names follow the HTML5 media API. The main difference is that attributes which you would get or set on a video element directly ( videoElement.currentTime = "120"; ), you would use a function argument syntax for VideoJS ( myPlayer.currentTime(120); )
+Now that you have access to a ready player, you can control the video or respond to video events using the following functions. The Video.js API function names follow the [HTML5 media API](http://www.w3.org/TR/html5/video.html). The main difference is that attributes which you would get or set on a video element using the equals sign ( `myVideoElement.currentTime = "120";` ), you would use a function argument syntax for Video.js ( `myPlayer.currentTime(120);` )
 
 ### play()
-  Start video playback.
-  Returns the player object.
-  Example:
+  Start video playback. Returns the player object.
 
-    myPlayer.play();
+{% highlight javascript %}
+
+  myPlayer.play();
+
+{% endhighlight %}
+
+
 
 ### pause()
-  Pause the video playback.
-  Returns: the player object
-  Example:
+  Pause the video playback. Returns: the player object
 
-    myPlayer.pause();
+{% highlight javascript %}
+
+  myPlayer.pause();
+
+{% endhighlight %}
 
 ### currentTime()
   Returns the current time of the video in seconds.
-  Example:
 
-    var whereYouAt = myPlayer.currentTime();
+{% highlight javascript %}
+
+  var whereYouAt = myPlayer.currentTime();
+
+{% endhighlight %}
 
 ### currentTime(seconds) // Type: Integer or Float
   Seek to the supplied time (seconds).
   Returns the player object.
-  Example:
 
-    myPlayer.currentTime(120); // 2 minutes into the video
+{% highlight javascript %}
+
+  myPlayer.currentTime(120); // 2 minutes into the video
+
+{% endhighlight %}
 
 
 ### duration()
   Returns the length in time of the video in seconds. NOTE: The video must have started loading before the duration can be known, and in the case of Flash, may not be known until the video starts playing.
-  Example:
 
-    var howLongIsThis = myPlayer.duration();
+
+{% highlight javascript %}
+
+  var howLongIsThis = myPlayer.duration();
+
+{% endhighlight %}
 
 ### buffered()
   Returns a [TimeRange](http://videojs.com/docs/glossary.html#timerange) with sections of the video that have been downloaded. If you just want the percent of the video that's been downloaded, use bufferedPercent.
-  Example:
 
-    var whatHasBeenBuffered = myPlayer.buffered();
+{% highlight javascript %}
+
+  var whatHasBeenBuffered = myPlayer.buffered();
+
+{% endhighlight %}
 
 ### bufferedPercent()
   Returns the percent (as a decimal) of the video that's been downloaded.
-  Example:
 
-    var howMuchIsDownloaded = myPlayer.bufferedPercent();
+{% highlight javascript %}
+
+  var howMuchIsDownloaded = myPlayer.bufferedPercent();
+
+{% endhighlight %}
 
 ### volume()
   Returns the current volume of the video as a percent in decimal form. 0 is off (muted), 1.0 is all the way up, 0.5 is half way.
-  Example:
 
-    var howLoudIsIt = myPlayer.volume();
+{% highlight javascript %}
+
+  var howLoudIsIt = myPlayer.volume();
+
+{% endhighlight %}
 
 ### volume(percentAsDecimal)
   Set the volume to the supplied percent (as a decimal between 0 and 1).
-  Example:
 
-    myPlayer.volume(0.5); // Set volume to half
+{% highlight javascript %}
+
+  myPlayer.volume(0.5); // Set volume to half
+
+{% endhighlight %}
 
 ### width()
   Returns the current width of the video in pixels.
-  Example:
-  
+
+{% highlight javascript %}
+
     var howWideIsIt = myPlayer.width();
+
+{% endhighlight %}
 
 ### width(pixels)
   Change the width of the video to the supplied width in pixels.
   Returns the player object
-  Example:
 
-    myPlayer.width(640);
+{% highlight javascript %}
+
+  myPlayer.width(640);
+
+{% endhighlight %}
+
 
 ### height()
   Returns the current height of the video in pixels.
-  Example:
 
-    var howTallIsIt = myPlayer.height();
+{% highlight javascript %}
+
+  var howTallIsIt = myPlayer.height();
+
+{% endhighlight %}
+
 
 ### height(pixels)
   Change the height of the video to the supplied height in pixels.
   Returns the player object
 
-    myPlayer.height(480);
+{% highlight javascript %}
+
+  myPlayer.height(480);
+
+{% endhighlight %}
+
 
 ### size(width, height)
-  Changes the width and height of the video to the supplied width and height. This is more efficient if you're changing both width and height.
+  Changes the width and height of the video to the supplied width and height. This is more efficient if you're changing both width and height (only triggers the player's resize event once). Returns the player object.
+
+{% highlight javascript %}
+
+  myPlayer.size(640,480);
+
+{% endhighlight %}
+
+
+### requestFullScreen()
+  Increase the size of the video to full screen. In some browsers, full screen is not supported natively, so it enters full window mode, where the fills the browser window. In browsers that support native full screen, typically the browser's default controls will be shown, and not the Video.js custom skin. In full window mode, the Video.js controls and skin will always be used.
   Returns the player object.
-  
-    myPlayer.size(640,480);
 
-### enterFullScreen()
-  Increase the size of the video to full screen. In some browsers, full screen is not supported natively, so it enters full window mode, where the fills the browser window. In browsers that support native full screen, typically the browser's default controls will be shown, and not the VideoJS custom skin. In full window mode, the VideoJS controls and skin will always be used.
-  Returns the player object.
+{% highlight javascript %}
 
-    myPlayer.enterFullScreen();
+  myPlayer.enterFullScreen();
 
-### exitFullScreen()
+{% endhighlight %}
+
+
+### cancelFullScreen()
   Return the video to its normal size after having been in full screen mode.
   Returns the player object.
 
-    myPlayer.exitFullScreen();
+{% highlight javascript %}
+
+  myPlayer.exitFullScreen();
+
+{% endhighlight %}
 
 
 Events
 ------
 You can attach event listeners to the player similarly to how you would for a video element.
 
-    var myFunc = function(){
-      // Do something when the event is fired
-    };
-    myPlayer.addEvent("eventName", myFunc);
+{% highlight javascript %}
+
+  var myFunc = function(){
+    // Do something when the event is fired
+  };
+  myPlayer.addEvent("eventName", myFunc);
+
+{% endhighlight %}
+
 
 You can also remove the listeners later.
 
-    myPlayer.removeEvent("eventName", myFunc);
+{% highlight javascript %}
+
+  myPlayer.removeEvent("eventName", myFunc);
+
+{% endhighlight %}
+
 
 ### Event Types
 

@@ -13,17 +13,6 @@ _V_.extend({
   tech: {}, // Holder for playback technology settings
   controlSets: {}, // Holder for control set definitions
 
-  techSupports: function(tech, type, name){
-    if (_V_[tech].supports[type]) {
-      return _V_[tech].supports[type][name];
-    }
-    return false;
-  },
-  updateTechSupport: function(tech, type, name, value){
-    if (_V_[tech].supports[type] === undefined) { _V_[tech].supports[type] = {}; }
-    _V_[tech].supports[type][name] = value;
-  },
-
   // Device Checks
   isIE: function(){ return !+"\v1"; },
   isIPad: function(){ return navigator.userAgent.match(/iPad/i) !== null; },
@@ -38,7 +27,10 @@ _V_.extend({
     var match = navigator.userAgent.match(/Android (\d+)\./i);
     if (match && match[1]) { return match[1]; }
   },
-  //isAndroidBrowser
+
+  testVid: document.createElement("video"),
+  ua: navigator.userAgent,
+  support: {},
 
   each: function(arr, fn){
     if (!arr || arr.length === 0) { return; }

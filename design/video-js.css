@@ -19,7 +19,7 @@ REQUIRED STYLES (be careful overriding)
 
   /* Allow poster to be vertially aligned. */
   vertical-align: middle;
-  display: table-cell;
+  /*  display: table-cell; */ /*This works in Safari but not Firefox.*/
 }
 
 /* Playback technology elements expand to the width/height of the containing div. <video> or <object> */

@@ -1,4 +1,5 @@
 _V_.options.flash.swf = "../flash/video-js.swf";
+_V_.options.flash.swf = "http://andylemay.com/dev/videojs/VideoJS.swf";
 
 $(function(){
   var tech, i, tname, player,

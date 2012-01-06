@@ -28,8 +28,6 @@ _V_.Button = _V_.Control.extend({
       role: "button",
       tabIndex: 0
     }, attrs);
-    
-    _V_.log(attrs)
 
     return this._super(type, attrs);
   },
@@ -143,9 +141,9 @@ _V_.FullscreenToggle = _V_.Button.extend({
 
   onClick: function(){
     if (!this.player.videoIsFullScreen) {
-      this.player.enterFullScreen();
+      this.player.requestFullScreen();
     } else {
-      this.player.exitFullScreen();
+      this.player.cancelFullScreen();
     }
   }
 
@@ -716,6 +714,10 @@ _V_.MuteToggle = _V_.Button.extend({
 _V_.Poster = _V_.Button.extend({
   init: function(player, options){
     this._super(player, options);
+
+    if (!this.player.options.poster) {
+      this.hide();
+    }
 
     player.addEvent("play", _V_.proxy(this, this.hide));
   },

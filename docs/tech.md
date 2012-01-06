@@ -2,7 +2,8 @@
 layout: docs
 title: Playback Technology
 description: Video.JS Playback Technology
-body_id: docs
+body_id: tech
+body_class: docs subpage
 ---
 
 Playback Technology ("Tech")

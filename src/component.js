@@ -138,7 +138,7 @@ _V_.Component = _V_.Class.extend({
   /* Ready - Trigger functions when component is ready
   ================================================================================ */
   ready: function(fn){
-    if (!fn) return;
+    if (!fn) return this;
 
     if (this.isReady) {
       fn.call(this);
@@ -148,6 +148,8 @@ _V_.Component = _V_.Class.extend({
       }
       this.readyQueue.push(fn);
     }
+
+    return this;
   },
 
   triggerReady: function(){

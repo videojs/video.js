@@ -168,20 +168,13 @@ _V_.Player = _V_.Component.extend({
 
     // Pause and remove current playback technology
     if (this.tech) {
-
-      this.tech.destroy();
-
-      // Turn off any manual progress or timeupdate tracking
-      if (this.manualProgress) { this.manualProgressOff(); }
-
-      if (this.manualTimeUpdates) { this.manualTimeUpdatesOff(); }
-
-      this.tech = false;
+      this.unloadTech();
 
     // If the first time loading, HTML5 tag will exist but won't be initialized
     // So we need to remove it if we're not loading HTML5
-    } else if (techName != "html5") {
+    } else if (techName != "html5" && this.tag) {
       this.el.removeChild(this.tag);
+      this.tag = false;
     }
 
     this.techName = techName;
@@ -190,17 +183,15 @@ _V_.Player = _V_.Component.extend({
     this.isReady = false;
 
     var techReady = function(){
-      _V_.log("ready")
-      
       this.player.triggerReady();
 
       // Manually track progress in cases where the browser/flash player doesn't report it.
-      if (!_V_.techSupports(this.player.techName, "event", "progress")) {
+      if (!this.support.progressEvent) {
         this.player.manualProgressOn();
       }
 
       // Manually track timeudpates in cases where the browser/flash player doesn't report it.
-      if (!_V_.techSupports(this.player.techName, "event", "timeupdate")) {
+      if (!this.support.timeupdateEvent) {
         this.player.manualTimeUpdatesOn();
       }
     }
@@ -208,9 +199,42 @@ _V_.Player = _V_.Component.extend({
     // Grab tech-specific options from player options and add source and parent element to use.
     var techOptions = _V_.merge({ source: source, parentEl: this.el }, this.options[techName])
 
+    if (source.src == this.values.src && this.values.currentTime > 0) {
+      techOptions.startTime = this.values.currentTime;
+    }
+
+    if (source) {
+      this.values.src = source.src;
+    }
+
     // Initialize tech instance
     this.tech = new _V_[techName](this, techOptions);
     this.tech.ready(techReady);
+  },
+
+  unloadTech: function(){
+    this.tech.destroy();
+
+    // Turn off any manual progress or timeupdate tracking
+    if (this.manualProgress) { this.manualProgressOff(); }
+
+    if (this.manualTimeUpdates) { this.manualTimeUpdatesOff(); }
+
+    this.tech = false;
+  },
+
+  // There's many issues around changing the size of a Flash (or other plugin) object.
+  // First is a plugin reload issue in Firefox that has been around for 11 years: https://bugzilla.mozilla.org/show_bug.cgi?id=90268
+  // Then with the new fullscreen API, Mozilla and webkit browsers will reload the flash object after going to fullscreen.
+  // To get around this, we're unloading the tech, caching source and currentTime values, and reloading the tech once the plugin is resized.
+  reloadTech: function(betweenFn){
+    _V_.log("unloadingTech")
+    this.unloadTech();
+    _V_.log("unloadedTech")
+    if (betweenFn) { betweenFn.call(); }
+    _V_.log("LoadingTech")
+    this.loadTech(this.techName, { src: this.values.src })
+    _V_.log("loadedTech")
   },
 
   /* Fallbacks for unsupported event types
@@ -232,7 +256,7 @@ _V_.Player = _V_.Component.extend({
       this.removeEvent("progress", arguments.callee);
 
       // Update known progress support for this playback technology
-      _V_.updateTechSupport(this.player.techName, "event", "progress", true);
+      this.support.progressEvent = true;
 
       // Turn off manual progress tracking
       this.player.manualProgressOff();
@@ -274,7 +298,7 @@ _V_.Player = _V_.Component.extend({
       this.removeEvent("timeupdate", arguments.callee);
 
       // Update known progress support for this playback technology
-      _V_.updateTechSupport(this.player.techName, "event", "timeupdate", true);
+      this.support.timeupdateEvent = true;
 
       // Turn off manual progress tracking
       this.player.manualTimeUpdatesOff();
@@ -323,19 +347,16 @@ _V_.Player = _V_.Component.extend({
 
   onError: function(e) {
     _V_.log("Video Error", e);
-  }
-
-});
+  },
 
 /* Player API
 ================================================================================ */
-_V_.Player.prototype.extend({
 
   apiCall: function(method, arg){
     if (this.isReady) {
       return this.tech[method](arg);
     } else {
-      _V_.log("The playback technology API is not ready yet. Use player.ready(myFunction)."+" ["+method+"]")
+      _V_.log("The playback technology API is not ready yet. Use player.ready(myFunction)."+" ["+method+"]", arguments.callee.caller.arguments.callee.caller.arguments.callee.caller)
       return false;
       // throw new Error("The playback technology API is not ready yet. Use player.ready(myFunction)."+" ["+method+"]");
     }
@@ -355,7 +376,7 @@ _V_.Player.prototype.extend({
     if (seconds !== undefined) {
 
       // Cache the last set value for smoother scrubbing.
-      this.values.currentTime = seconds;
+      this.values.lastSetCurrentTime = seconds;
 
       this.apiCall("setCurrentTime", seconds);
 
@@ -364,7 +385,9 @@ _V_.Player.prototype.extend({
       }
       return this;
     }
-    return this.apiCall("currentTime");
+
+    // Cache last currentTime and return
+    return this.values.currentTime = this.apiCall("currentTime");
   },
   duration: function(){
     return this.apiCall("duration");
@@ -437,33 +460,81 @@ _V_.Player.prototype.extend({
   supportsFullScreen: function(){ return this.apiCall("supportsFullScreen"); },
 
   // Turn on fullscreen (or window) mode
-  enterFullScreen: function(){
-    this.videoIsFullScreen = true;
-     if (typeof this.el.webkitRequestFullScreen == 'function') {
-       this.el.webkitRequestFullScreen();
-     } else if (typeof this.el.mozRequestFullScreen == 'function') {
-       this.el.mozRequestFullScreen();
-     } else if (this.supportsFullScreen()) {
-       this.apiCall("enterFullScreen");
-     } else {
-       this.enterFullWindow();
-     }
-     this.triggerEvent("enterFullScreen");
+  requestFullScreen: function(){
+    var requestFullScreen = _V_.support.requestFullScreen;
+
+    // Check for browser element fullscreen support
+    if (requestFullScreen) {
+      // Flash and other plugins get reloaded when you take their parent to fullscreen.
+      // To fix that we'll remove the tech, and reload it after the resize has finished.
+      if (this.tech.support.fullscreenResize === false) {
+
+        this.pause();
+        this.unloadTech();
+
+        _V_.addEvent(document, "keydown", _V_.proxy(this, function(e){
+          _V_.log("asdf", e)
+        }));
+
+        _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
+          _V_.removeEvent(document, requestFullScreen.eventName, arguments.callee);
+          this.loadTech(this.techName, { src: this.values.src });
+        }));
+
+        this.el[requestFullScreen.requestFn]();
+
+      } else {
+        this.el[requestFullScreen.requestFn]();
+      }
+
+    } else if (this.tech.supportsFullScreen()) {
+      this.apiCall("enterFullScreen");
+
+    } else {
+      this.enterFullWindow();
+    }
+
+     this.videoIsFullScreen = true;
+     this.triggerEvent("fullscreenchange");
+
      return this;
    },
 
-   exitFullScreen: function(){
-     this.videoIsFullScreen = false;
-     if (typeof this.el.webkitRequestFullScreen == 'function') {
-       document.webkitCancelFullScreen();
-     } else if (this.supportsFullScreen()) {
-       document.webkitExitFullScreen();
-     } else {
-       this.exitFullWindow();
-     }
-     this.triggerEvent("exitFullScreen");
+   cancelFullScreen: function(){
+    var requestFullScreen = _V_.support.requestFullScreen;
 
-    // Otherwise Shouldn't be called since native fullscreen uses own controls.
+    // Check for browser element fullscreen support
+    if (requestFullScreen) {
+
+     // Flash and other plugins get reloaded when you take their parent to fullscreen.
+     // To fix that we'll remove the tech, and reload it after the resize has finished.
+     if (this.tech.support.fullscreenResize === false) {
+
+       this.pause();
+       this.unloadTech();
+
+       _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
+         _V_.removeEvent(document, requestFullScreen.eventName, arguments.callee);
+         _V_.log("document fullscreeneventchange")
+         this.loadTech(this.techName, { src: this.values.src })
+       }));
+
+       document[requestFullScreen.cancelFn]();
+
+     } else {
+       document[requestFullScreen.cancelFn]();
+     }
+
+    } else if (this.tech.supportsFullScreen()) {
+     this.apiCall("exitFullScreen");
+
+    } else {
+     this.exitFullWindow();
+    }
+
+    this.videoIsFullScreen = false;
+    this.triggerEvent("fullscreenchange");
+
     return this;
   },
 
@@ -488,7 +559,7 @@ _V_.Player.prototype.extend({
 
   fullWindowOnEscKey: function(event){
     if (event.keyCode == 27) {
-      this.exitFullScreen();
+      this.cancelFullScreen();
     }
   },
 
@@ -561,6 +632,9 @@ _V_.Player.prototype.extend({
       }
     // Case: URL String (http://myvideo...)
     } else {
+      // Cache for getting last set source
+      this.values.src = source;
+
       if (!this.isReady) {
         this.ready(function(){
           this.src(source);
@@ -647,3 +721,44 @@ _V_.Player.prototype.extend({
   defaultMuted: function(){ return this.apiCall("defaultMuted"); }
 });
 
+// RequestFullscreen API
+(function(){
+  var requestFn,
+      cancelFn,
+      playerProto = _V_.Player.prototype;
+
+  // Current W3C Spec
+  // http://dvcs.w3.org/hg/fullscreen/raw-file/tip/Overview.html#api
+  // Mozilla Draft: https://wiki.mozilla.org/Gecko:FullScreenAPI#fullscreenchange_event
+  if (document.cancelFullscreen !== undefined) {
+    requestFn = "requestFullscreen";
+    cancelFn = "exitFullscreen";
+    eventName = "fullscreenchange";
+
+  // Webkit (Chrome/Safari) and Mozilla (Firefox) have working implementaitons
+  // that use prefixes and vary slightly from the new W3C spec. Specifically, using 'exit' instead of 'cancel',
+  // and lowercasing the 'S' in Fullscreen.
+  // Other browsers don't have any hints of which version they might follow yet, so not going to try to predict by loopeing through all prefixes.
+  } else {
+
+    _V_.each(["moz", "webkit"], function(prefix){
+
+      if (document[prefix + "CancelFullScreen"] !== undefined) {
+        requestFn = prefix + "RequestFullScreen";
+        cancelFn = prefix + "CancelFullScreen";
+        eventName = prefix + "fullscreenchange";
+      }
+
+    });
+
+  }
+
+  if (requestFn) {
+    _V_.support.requestFullScreen = {
+      requestFn: requestFn,
+      cancelFn: cancelFn,
+      eventName: eventName
+    };
+  }
+
+})();

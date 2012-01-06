@@ -1,0 +1,13 @@
+var vjsSourceList = [];
+vjsSourceList.push('_begin.js')
+vjsSourceList.push('_end.js')
+vjsSourceList.push('component.js')
+vjsSourceList.push('controls.js')
+vjsSourceList.push('core.js')
+vjsSourceList.push('ecma.js')
+vjsSourceList.push('events.js')
+vjsSourceList.push('json.js')
+vjsSourceList.push('lib.js')
+vjsSourceList.push('player.js')
+vjsSourceList.push('tech.js')
+vjsSourceList.push('tracks.js')

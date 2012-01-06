@@ -7,10 +7,17 @@ _V_.PlaybackTech = _V_.Component.extend({
     // Make playback element clickable
     // _V_.addEvent(this.el, "click", _V_.proxy(this, _V_.PlayToggle.prototype.onClick));
 
+    // this.addEvent("click", this.proxy(this.onClick));
+
     // player.triggerEvent("techready");
-  }
+  },
   // destroy: function(){},
   // createElement: function(){},
+  onClick: function(){
+    if (this.player.options.controls) {
+      _V_.PlayToggle.prototype.onClick.call(this);
+    }
+  }
 });
 
 // Create placeholder methods for each that warn when a method isn't supported by the current playback technology
@@ -29,7 +36,8 @@ _V_.html5 = _V_.PlaybackTech.extend({
     this.player = player;
     this.el = this.createElement();
     this.ready(ready);
-    _V_.addEvent(this.el, "click", _V_.proxy(this, _V_.PlayToggle.prototype.onClick));
+
+    this.addEvent("click", this.proxy(this.onClick));
 
     var source = options.source;
 
@@ -61,6 +69,7 @@ _V_.html5 = _V_.PlaybackTech.extend({
   
   destroy: function(){
     this.player.tag = false;
+    this.removeTriggers();
     this.el.parentNode.removeChild(this.el);
   },
 
@@ -75,7 +84,7 @@ _V_.html5 = _V_.PlaybackTech.extend({
     // Check if this browser supports moving the element into the box.
     // On the iPhone video will break if you move the element,
     // So we have to create a brand new element.
-    if (!el || html5.supports.movingElementInDOM === false) {
+    if (!el || this.support.movingElementInDOM === false) {
 
       // If the original tag is still there, remove it.
       if (el) { 
@@ -99,21 +108,22 @@ _V_.html5 = _V_.PlaybackTech.extend({
     return el;
   },
 
+  // Make video events trigger player events
+  // May seem verbose here, but makes other APIs possible.
   setupTriggers: function(){
-    // Make video events trigger player events
-    // May seem verbose here, but makes other APIs possible.
-
-    // ["play", "playing", "pause", "ended", "volumechange", "error", "progress", "seeking", "timeupdate"]
-    var types = _V_.html5.events,
-        i;
-    for (i = 0;i<types.length; i++) {
-      _V_.addEvent(this.el, types[i], _V_.proxy(this.player, function(e){
-        e.stopPropagation();
-        this.triggerEvent(e);
-      }));
-    }
+    _V_.each.call(this, _V_.html5.events, function(type){
+      _V_.addEvent(this.el, type, _V_.proxy(this.player, this.eventHandler));
+    });
   },
-  removeTriggers: function(){},
+  removeTriggers: function(){
+    _V_.each.call(this, _V_.html5.events, function(type){
+      _V_.removeEvent(this.el, type, _V_.proxy(this.player, this.eventHandler));
+    });
+  },
+  eventHandler: function(e){
+    e.stopPropagation();
+    this.triggerEvent(e);
+  },
 
   play: function(){ this.el.play(); },
   pause: function(){ this.el.pause(); },
@@ -148,8 +158,9 @@ _V_.html5 = _V_.PlaybackTech.extend({
         return true;
       }
     }
-      return false;
+    return false;
   },
+
   enterFullScreen: function(){
       try {
         this.el.webkitEnterFullScreen();
@@ -206,18 +217,22 @@ _V_.html5.canPlaySource = function(srcObj){
   // Check Media Type
 };
 
-_V_.html5.supports = {};
-
 // List of all HTML5 events (various uses).
 _V_.html5.events = "loadstart,suspend,abort,error,emptied,stalled,loadedmetadata,loadeddata,canplay,canplaythrough,playing,waiting,seeking,seeked,ended,durationchange,timeupdate,progress,play,pause,ratechange,volumechange".split(",");
 
 /* HTML5 Device Fixes ---------------------------------------------------------- */
 
-// iOS
-if (_V_.isIOS()) {
-  // If you move a video element in the DOM, it breaks video playback.
-  _V_.html5.supports.movingElementInDOM = false;
-}
+_V_.html5.prototype.support = {
+  
+  // Support for tech specific full screen. (webkitEnterFullScreen, not requestFullscreen)
+  // http://developer.apple.com/library/safari/#documentation/AudioVideo/Reference/HTMLVideoElementClassReference/HTMLVideoElement/HTMLVideoElement.html
+  // Seems to be broken in Chromium/Chrome && Safari in Leopard
+  fullscreen: (typeof _V_.testVid.webkitEnterFullScreen !== undefined) ? (!_V_.ua.match("Chrome") && !_V_.ua.match("Mac OS X 10.5") ? true : false) : false,
+
+  // In iOS, if you move a video element in the DOM, it breaks video playback.
+  movingElementInDOM: !_V_.isIOS()
+
+};
 
 // Android
 if (_V_.isAndroid()) {
@@ -285,6 +300,14 @@ _V_.flash = _V_.PlaybackTech.extend({
     // Add to box.
     _V_.insertFirst(placeHolder, parentEl);
 
+    if (options.startTime) {
+      this.ready(function(){
+        this.load();
+        this.play();
+        this.currentTime(options.startTime);
+      });
+    }
+
     swfobject.embedSWF(options.swf, placeHolder.id, "480", "270", "9.0.124", "", flashVars, params, attributes);
   },
   
@@ -310,7 +333,11 @@ _V_.flash = _V_.PlaybackTech.extend({
   poster: function(){ this.el.vjs_getProperty("poster"); },
 
   buffered: function(){
-    return _V_.createTimeRange(0, this.el.vjs_getProperty("buffered"));
+    try {
+      return _V_.createTimeRange(0, this.el.vjs_getProperty("buffered"));
+    } catch(e) {
+      _V_.log(e, arguments.callee.caller.arguments.callee.caller)
+    }
   },
 
   supportsFullScreen: function(){
@@ -353,15 +380,15 @@ _V_.flash = _V_.PlaybackTech.extend({
 /* Flash Support Testing -------------------------------------------------------- */
 
 _V_.flash.isSupported = function(){
-  return swfobject.hasFlashPlayerVersion("9");
+  return swfobject.hasFlashPlayerVersion("10");
 };
 
 _V_.flash.canPlaySource = function(srcObj){
-  if (srcObj.type in _V_.flash.supports.format) { return "maybe"; }
+  if (srcObj.type in _V_.flash.prototype.support.formats) { return "maybe"; }
 };
 
-_V_.flash.supports = {
-  format: {
+_V_.flash.prototype.support = {
+  formats: {
     "video/flv": "FLV",
     "video/x-flv": "FLV",
     "video/mp4": "MP4",
@@ -369,15 +396,19 @@ _V_.flash.supports = {
   },
 
   // Optional events that we can manually mimic with timers
-  event: {
-    progress: false,
-    timeupdate: false
-  }
+  progressEvent: false,
+  timeupdateEvent: false,
+
+  // Resizing plugins using request fullscreen reloads the plugin 
+  fullscreenResize: false,
+
+  // Resizing plugins in Firefox always reloads the plugin (e.g. full window mode)
+  parentResize: !(_V_.ua.match("Firefox"))
 };
 
 _V_.flash.onSWFReady = function(currSwf){
 
-  _V_.log(currSwf, "currSwf")
+  _V_.log("swfReady", currSwf)
 
   var el = _V_.el(currSwf);
 
@@ -392,8 +423,8 @@ _V_.flash.onSWFReady = function(currSwf){
   // Update reference to playback technology element
   tech.el = el;
 
-  // Make a click on the swf play the video
-  _V_.addEvent(el, "click", _V_.proxy(player, _V_.PlayToggle.prototype.onClick));
+  // Now that the element is ready, make a click on the swf play the video
+  tech.addEvent("click", tech.onClick);
 
   _V_.flash.checkReady(tech);
 };
@@ -413,7 +444,7 @@ _V_.flash.checkReady = function(tech){
 _V_.flash.onSWFEvent = function(swfID, eventName, other){
   try {
     var player = _V_.el(swfID).player;
-    if (player) {
+    if (player && player.techName == "flash") {
       player.triggerEvent(eventName);
     }
   } catch(err) {
