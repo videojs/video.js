@@ -24,6 +24,8 @@
 
   <script src="flash/swfobject.js"></script>
   
+  <script src="src/setup.js"></script>
+  
   <script type="text/javascript" charset="utf-8">
     // Easy access to test Flash over HTML5. Add ?flash to URL
     if (window.location.href.indexOf("?flash") !== -1) {
@@ -34,15 +36,12 @@
 </head>
 <body>
 
-  <video id="vid1" class="video-js vjs-default-skin" controls preload="none" width="640" height="264"
+  <video id="vid1" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264"
       poster="http://video-js.zencoder.com/oceans-clip.png"
       data-setup='{}'>
     <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4'>
     <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm'>
-    <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg; codecs="theora, vorbis"'>
-    <source src="http://www.youtube.com/watch?v=YjaZNYSt7o0&feature=related" type='video/youtube'>
-    <track kind="subtitles" src="http://videojs.com/subtitles/demo-subtitles.srt" srclang="en-US" label="English"></track>
-    <!-- <track kind="subtitles" src="demo-subtitles.srt" srclang="en-US" label="English"></track> -->
+    <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg'>
     <p>Video Playback Not Supported</p>
   </video>
 

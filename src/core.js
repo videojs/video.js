@@ -146,8 +146,8 @@ _V_.autoSetup = function(){
       }
     }
 
-  // No videos were found, so keep looping
-  } else {
+  // No videos were found, so keep looping unless page is finisehd loading.
+  } else if (!_V_.windowLoaded) {
     _V_.autoSetupTimeout(1);
   }
 };
@@ -156,6 +156,3 @@ _V_.autoSetup = function(){
 _V_.autoSetupTimeout = function(wait){
   setTimeout(_V_.autoSetup, wait);
 };
-
-// Being called at _end now.
-_V_.autoSetupTimeout(1); // Let vjs javascript finish executing

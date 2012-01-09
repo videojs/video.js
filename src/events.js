@@ -292,3 +292,4 @@ _V_.Event.props = "altKey attrChange attrName bubbles button cancelable charCode
 
 function returnTrue(){ return true; }
 function returnFalse(){ return false; }
+

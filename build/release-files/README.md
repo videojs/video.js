@@ -1,10 +1,9 @@
-VideoJS - [HTML5 Video Player](http://videojs.com)
+Video.js - [HTML5 Video Player](http://videojs.com)
 ==================================================
 Version 3.0 BETA
 
 ---
-BETA NOTES  
-Version 3 is almost a complete rewrite of the previous versions of VideoJS. New features includes:
+Version 3 is almost a complete rewrite of the previous versions of Video.js. New features includes:
 
   - HTML/CSS Controls and API now work for both the HTML5 and Flash versions.
   - Custom Super-lightweight Flash Fallback
@@ -14,9 +13,9 @@ Version 3 is almost a complete rewrite of the previous versions of VideoJS. New 
 
 ---
 
-View [VideoJS.com](http://videojs.com) for a demo and overview.  
+View [videojs.com](http://videojs.com) for a demo and overview.  
 
-VideoJS is an HTML5 video player that uses the HTML5 video tag built into modern browsers, and uses javascript to add custom controls, new functionality, and to fix cross browser bugs. For browsers that don't support HTML5, it will fallback to a Flash player.
+Video.js is an HTML5 video player that uses the HTML5 video tag built into modern browsers, and uses javascript to add custom controls, new functionality, and to fix cross browser bugs. For browsers that don't support HTML5, it will fallback to a Flash player.
 
 View demo.html for an example of how to use it.
 
@@ -30,7 +29,7 @@ heff, dz0ny, sentientbit, tvdeyen, brandonarbini, gordonbrander, Shraymonks, alb
 Getting Started
 ---------------
 
-### Step 1: Include the VideoJS Javascript and CSS files in the head of your page.
+### Step 1: Include the Video.js Javascript and CSS files in the head of your page.
 Change the file urls to point to the files on your server.
 
     <script src="video.js"></script>
@@ -38,12 +37,12 @@ Change the file urls to point to the files on your server.
 
 
 ### Step 2: Add an HTML5 video tag to your page.
-Use the video tag as normal, with a few extra pieces for VideoJS:
+Use the video tag as normal, with a few extra pieces for Video.js:
 
-  1. The 'data-setup' Atrribute tells VideoJS to automatically set up the video when the page is ready, and read any options (in JSON format) from the attribute.
+  1. The 'data-setup' attribute tells Video.js to automatically set up the video when the page is ready, and read any options (in JSON format) from the attribute.
   2. The 'id' Attribute: Should be used and unique for every video on the same page.
   3. The 'class' attribute contains two classes:
-    - 'video-js' applies styles that are required for VideoJS functionality, like fullscreen and subtitles.
+    - 'video-js' applies styles that are required for Video.js functionality, like fullscreen and subtitles.
     - 'vjs-default-skin' applies the default skin to the HTML controls, and can be removed or overridden to create your own controls design.
 
 Otherwise include/exclude attributes, settings, sources, and tracks exactly as you would for HTML5 video.
@@ -57,18 +56,19 @@ Otherwise include/exclude attributes, settings, sources, and tracks exactly as y
 
 
 ### Step 3: Nada!
-That's all it take to get started. See the docs for more advanced uses.
+That's all it take to get started. See the [docs](http://videojs.com/docs/) for more advanced uses.
 
-
-Coming Next
------------
-- Stable Release
 
 Changelog
 ---------
-3.0b
+3.0
 
-- Complete rewrite in progress
+- Complete rewrite
+- HTML/CSS Controls and API now work for both the HTML5 and Flash versions
+- Custom Super-lightweight Flash Fallback
+- Embed Code is much simpler.
+  - No more "vjs-box" div required, just use the video tag.
+  - No more embedding of Flash fallback within the video tag HTML.
 
 2.0.3
 

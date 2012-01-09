@@ -160,7 +160,6 @@ _V_.extend({
 
   // Returns the cache object where data for the element is stored
   getData: function(elem){
-    // _V_.log(arguments.callee.caller.arguments.callee.caller)
     var id = elem[_V_.expando];
     if (!id) {
       id = elem[_V_.expando] = _V_.guid++;

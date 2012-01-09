@@ -333,11 +333,7 @@ _V_.flash = _V_.PlaybackTech.extend({
   poster: function(){ this.el.vjs_getProperty("poster"); },
 
   buffered: function(){
-    try {
-      return _V_.createTimeRange(0, this.el.vjs_getProperty("buffered"));
-    } catch(e) {
-      _V_.log(e, arguments.callee.caller.arguments.callee.caller)
-    }
+    return _V_.createTimeRange(0, this.el.vjs_getProperty("buffered"));
   },
 
   supportsFullScreen: function(){
@@ -408,7 +404,7 @@ _V_.flash.prototype.support = {
 
 _V_.flash.onSWFReady = function(currSwf){
 
-  _V_.log("swfReady", currSwf)
+  // _V_.log("swfReady", currSwf)
 
   var el = _V_.el(currSwf);
 

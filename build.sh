@@ -31,6 +31,7 @@ cat src/tracks.js >> dist/video.js
 # h5swf temporarily requires swfobject
 cat flash/swfobject.js >> dist/video.js
 
+cat src/setup.js >> dist/video.js
 cat src/_end.js >> dist/video.js
 
 
@@ -39,6 +40,9 @@ cp design/video-js.css dist/video-js.css
 cp design/video-js.png dist/video-js.png
 cp flash/video-js.swf dist/video-js.swf
 
-cp build/files/README.md dist/README.md
-cp build/files/demo.html dist/demo.html
+cp build/release-files/README.md dist/README.md
+cp build/release-files/demo.html dist/demo.html
 cp LGPLv3-LICENSE.txt dist/LGPLv3-LICENSE.txt
+
+java -jar build/lib/yuicompressor-2.4.7.jar dist/video.js -o dist/video.min.js
+java -jar build/lib/yuicompressor-2.4.7.jar dist/video-js.css -o dist/video-js.min.css
