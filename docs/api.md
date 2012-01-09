@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: API &mdash; Video.JS &raquo; HTML5 Video Player
+title: API
 description: Video.JS API Docs - API settings based on the HTML5 video API
 body_id: api
 body_class: docs subpage
