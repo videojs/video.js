@@ -1,6 +1,6 @@
 Video.js - [HTML5 Video Player](http://videojs.com)
 ==================================================
-Version 3.0 BETA
+Version 3.0
 
 ---
 Version 3 is almost a complete rewrite of the previous versions of Video.js. New features includes:
