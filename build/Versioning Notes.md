@@ -21,4 +21,4 @@ Release revisions means bug fixes. The CDN url should not reflect the revision n
 
 Tagging a Release
 -----------------
-git tag -a v[version number] [commit]
+git tag -a [version number] [commit]
