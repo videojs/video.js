@@ -409,13 +409,15 @@ _V_.Slider = _V_.Component.extend({
     // On HTML5 browsers scrubbing is really smooth, but some flash players are slow, so we might want to utilize this later.
     // var progress =  (this.player.scrubbing) ? this.player.values.currentTime / this.player.duration() : this.player.currentTime() / this.player.duration();
 
-    var progress = this.getPercent();
+    var barProgress,
+        progress = this.getPercent();
         handle = this.handle,
-        bar = this.bar,
-        barProgress = progress;
+        bar = this.bar;
 
     // Protect against no duration and other division issues
     if (isNaN(progress)) { progress = 0; }
+
+    barProgress = progress;
 
     // If there is a handle, we need to account for the handle in our calculation for progress bar
     // so that it doesn't fall short of or extend past the handle.
@@ -424,7 +426,8 @@ _V_.Slider = _V_.Component.extend({
           boxWidth = box.offsetWidth,
 
           // The width of the handle in percent of the containing box
-          handlePercent = handle.el.offsetWidth / boxWidth,
+          // In IE, widths may not be ready yet causing NaN
+          handlePercent = (handle.el.offsetWidth) ? handle.el.offsetWidth / boxWidth : 0,
 
           // Get the adjusted size of the box, considering that the handle's center never touches the left or right side.
           // There is a margin of half the handle's width on both sides.
@@ -723,6 +726,7 @@ _V_.Poster = _V_.Button.extend({
   },
 
   createElement: function(){
+    _V_.log(this.player.options.poster)
     return this._super("img", {
       className: "vjs-poster",
       src: this.player.options.poster,

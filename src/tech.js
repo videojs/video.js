@@ -404,8 +404,6 @@ _V_.flash.prototype.support = {
 
 _V_.flash.onSWFReady = function(currSwf){
 
-  // _V_.log("swfReady", currSwf)
-
   var el = _V_.el(currSwf);
 
   // Get player from box
