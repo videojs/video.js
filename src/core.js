@@ -68,7 +68,7 @@ VideoJS.options = {
 
   // Included control sets
   components: [
-    // "poster",
+    "poster",
     "loadingSpinner",
     "bigPlayButton",
     { name: "controlBar", options: {

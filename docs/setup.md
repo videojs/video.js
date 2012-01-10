@@ -22,8 +22,6 @@ You can download the Video.js source and host it on your own servers, or use the
 
 {% endhighlight %}
 
-It's often recommended now to include JavaScript before the end \</body\> tag instead of the \<head\>, but Video.js includes an 'HTML5 Shiv', which needs to be in the \<head\> for older IE versions.
-
 
 Step 2: Add an HTML5 video tag to your page.
 --------------------------------------------

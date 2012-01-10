@@ -1,3 +1,7 @@
+Deploying Version
+-----------------
+- Update SWF location for CDN
+
 Version Numbers
 ---------------
 http://en.wikipedia.org/wiki/Software_versioning#Sequence-based_identifiers
@@ -10,9 +14,9 @@ http://en.wikipedia.org/wiki/Software_versioning#Sequence-based_identifiers
 
 ### Revision Versions
 
-- Beta (3.1-b1)
-- Release Candidate (3.1-rc1)
-- Release with revisions (3.1-r1)
+- Beta (3.1b1)
+- Release Candidate (3.1rc1)
+- Release with revisions (3.1r1)
 
 Notes:
 The last level of one revision type (beta/release candidate) should match the first level of the next revision type. 4.0-b10 should match 4.0-rc1, assuming b10 is the last beta version.
