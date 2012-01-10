@@ -1,6 +1,6 @@
 /*!
 Video.js - HTML5 Video Player
-Version 3.0
+Version 3.0r2
 
 LGPL v3 LICENSE INFO
 This file is part of Video.js. Copyright 2011 Zencoder, Inc.
