@@ -50,7 +50,7 @@ VideoJS.options = {
 
   html5: {},
   flash: {
-    swf: "flash/video-js.swf"
+    swf: "http://vjs.zencdn.net/c/video-js.swf"
     // swf: "https://s3.amazonaws.com/video-js/3.0b/video-js.swf"
     // swf: "http://video-js.zencoder.com/3.0b/video-js.swf"
     // swf: "http://video-js.com/test/video-js.swf"
