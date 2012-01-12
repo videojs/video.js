@@ -5,3 +5,5 @@
 CHANGELOG
 =========
 
+---- 3.0.3 / 2012-01-12 / doc-change -------------------------------------------
+* Added line to docs to test zenflow

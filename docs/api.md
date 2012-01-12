@@ -226,6 +226,7 @@ You can also remove the listeners later.
 
 
 ### Event Types
+List of player events you can add listeners for.
 
 <table border="0" cellspacing="5" cellpadding="5">
   <tr><th>Name</th><th>Description</th></tr>
