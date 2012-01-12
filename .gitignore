@@ -2,3 +2,4 @@
 dist/*
 dev.html
 projects
+.zenflow-log

@@ -1,0 +1,10 @@
+--- 
+confirm_review: true
+backup_remote: false
+release_branch: stable
+project: videojs
+qa_branch: false
+staging_branch: false
+development_branch: master
+remote: origin
+confirm_staging: false
