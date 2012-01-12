@@ -199,11 +199,11 @@ _V_.Player = _V_.Component.extend({
     // Grab tech-specific options from player options and add source and parent element to use.
     var techOptions = _V_.merge({ source: source, parentEl: this.el }, this.options[techName])
 
-    if (source.src == this.values.src && this.values.currentTime > 0) {
-      techOptions.startTime = this.values.currentTime;
-    }
-
     if (source) {
+      if (source.src == this.values.src && this.values.currentTime > 0) {
+        techOptions.startTime = this.values.currentTime;
+      }
+
       this.values.src = source.src;
     }
 
