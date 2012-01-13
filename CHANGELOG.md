@@ -13,3 +13,6 @@ CHANGELOG
 
 ---- 3.0.5 / 2012-01-12 / event-layer-x-deprecation-fix ------------------------
 * Removed deprecated event.layerX and layerY
+
+---- 3.0.6 / 2012-01-12 / docs-url-fix -----------------------------------------
+* Fixed wrong URL for CDN in docs
