@@ -51,12 +51,6 @@ VideoJS.options = {
   html5: {},
   flash: {
     swf: "http://vjs.zencdn.net/c/video-js.swf"
-    // swf: "https://s3.amazonaws.com/video-js/3.0b/video-js.swf"
-    // swf: "http://video-js.zencoder.com/3.0b/video-js.swf"
-    // swf: "http://video-js.com/test/video-js.swf"
-    // swf: "http://video-js.com/source/flash/video-js.swf"
-    // swf: "http://video-js.com/source/flash/video-js.swf"
-    // swf: "video-js.swf"
   },
 
   // Default of web browser is 300x150. Should rely on source width/height.
@@ -106,6 +100,11 @@ VideoJS.options = {
     "subtitlesDisplay"/*, "replay"*/
   ]
 };
+
+// Set CDN Version of swf
+if (CDN_VERSION != "GENERATED_CDN_VSN") {
+  _V_.options.flash.swf = "http://vjs.zencdn.net/"+CDN_VERSION+"/video-js.swf"
+}
 
 // Automatically set up any tags that have a data-setup attribute
 _V_.autoSetup = function(){

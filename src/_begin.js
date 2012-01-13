@@ -1,6 +1,6 @@
 /*!
 Video.js - HTML5 Video Player
-Version 3.0
+Version GENERATED_AT_BUILD
 
 LGPL v3 LICENSE INFO
 This file is part of Video.js. Copyright 2011 Zencoder, Inc.
@@ -21,5 +21,5 @@ along with Video.js.  If not, see <http://www.gnu.org/licenses/>.
 
 // Self-executing function to prevent global vars and help with minification
 ;(function(window, undefined){
-  var document = window.document;
-
+  var document = window.document,
+      CDN_VERSION = "GENERATED_CDN_VSN";
