@@ -4,6 +4,11 @@ require 'httparty'
 
 namespace :build do
 
+  task :test do
+    Rake::Log['CDN_VERSION = false'.gsub('CDN_VERSION = false', 'hi')]
+    
+  end
+
   desc "Build version for current '/c/' CDN copy and locked in version"
   task :current do
     Rake::Task["build:source"].execute
@@ -14,17 +19,32 @@ namespace :build do
       Rake::Shell["mkdir dist/#{vsn}"]
 
       File.open("dist/#{vsn}/video.js", "w+") do |file|
-        file.puts File.read("dist/video.min.js").gsub('GENERATED_CDN_VSN', vsn)
+        file.puts File.read("dist/video.min.js").sub('GENERATED_CDN_VSN', vsn)
       end
 
       Rake::Shell["cp dist/video-js.min.css dist/#{vsn}/video-js.css"]
       Rake::Shell["cp dist/video-js.swf dist/#{vsn}/video-js.swf"]
-      Rake::Shell["cp dist/video-js.swf dist/#{vsn}/video-js.png"]
+      Rake::Shell["cp dist/video-js.png dist/#{vsn}/video-js.png"]
       Rake::Shell["cp dist/demo.html dist/#{vsn}/demo.html"]
     end
 
-    Rake::Shell["cp -r dist/#{cdn_version_num} dist/video-js"]
-    Rake::Shell["zip dist/video-js-#{version_number}.zip dist/video-js"]
+    Rake::Shell["mkdir dist/video-js"]
+
+    File.open("dist/video-js/video.min.js", "w+") do |file|
+      file.puts File.read("dist/video.min.js").sub('GENERATED_CDN_VSN', cdn_version_num)
+    end
+
+    File.open("dist/video-js/video.js", "w+") do |file|
+      file.puts File.read("dist/video.js").sub('GENERATED_CDN_VSN', cdn_version_num)
+    end
+
+    Rake::Shell["cp dist/video-js.min.css dist/video-js/video-js.min.css"]
+    Rake::Shell["cp dist/video-js.css dist/video-js/video-js.css"]
+    Rake::Shell["cp dist/video-js.swf dist/video-js/video-js.swf"]
+    Rake::Shell["cp dist/video-js.png dist/video-js/video-js.png"]
+    Rake::Shell["cp dist/demo.html dist/video-js/demo.html"]
+
+    Rake::Shell["cd dist && zip -r video-js-#{version_number}.zip video-js && cd .."]
 
     if `git name-rev --name-only HEAD`.strip != 'stable'
       Rake::Log["*** WARNING: NOT ON STABLE BRANCH!!! ***"]
