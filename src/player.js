@@ -743,7 +743,7 @@ _V_.Player = _V_.Component.extend({
 
     _V_.each(["moz", "webkit"], function(prefix){
 
-      if (document[prefix + "CancelFullScreen"] !== undefined) {
+      if ((prefix != "moz" || document.mozFullScreenEnabled) && document[prefix + "CancelFullScreen"] !== undefined) {
         requestFn = prefix + "RequestFullScreen";
         cancelFn = prefix + "CancelFullScreen";
         eventName = prefix + "fullscreenchange";
