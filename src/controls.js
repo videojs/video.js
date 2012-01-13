@@ -726,8 +726,7 @@ _V_.Poster = _V_.Button.extend({
   },
 
   createElement: function(){
-    _V_.log(this.player.options.poster)
-    return this._super("img", {
+    return _V_.createElement("img", {
       className: "vjs-poster",
       src: this.player.options.poster,
 
