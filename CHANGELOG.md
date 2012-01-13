@@ -16,3 +16,6 @@ CHANGELOG
 
 ---- 3.0.6 / 2012-01-12 / docs-url-fix -----------------------------------------
 * Fixed wrong URL for CDN in docs
+
+---- 3.0.7 / 2012-01-12 / fixing-ie8-poster-bug --------------------------------
+* Fixed an ie8 breaking bug with the poster
