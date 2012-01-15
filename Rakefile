@@ -73,11 +73,12 @@ namespace :build do
     end
 
     Dir.foreach('src') do |item|
-      next if (['.', '..', '.DS_Store', '_end.js'] + first_files).include? item
+      next if (['.', '..', '.DS_Store', 'setup.js', '_end.js'] + first_files).include? item
       combined << File.read("src/#{item}")
     end
 
     combined << File.read("flash/swfobject.js")
+    combined << File.read("src/setup.js")
     combined << File.read("src/_end.js")
 
     Rake::Log["Adding version number"]

@@ -38,7 +38,10 @@ var VideoJS = function(id, addOptions, ready){
 },
 
 // Shortcut
-_V_ = VideoJS;
+_V_ = VideoJS,
+
+// CDN Version. Used to target right flash swf.
+CDN_VERSION = "GENERATED_CDN_VSN";
 
 VideoJS.players = {};
 

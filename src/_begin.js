@@ -21,5 +21,4 @@ along with Video.js.  If not, see <http://www.gnu.org/licenses/>.
 
 // Self-executing function to prevent global vars and help with minification
 ;(function(window, undefined){
-  var document = window.document,
-      CDN_VERSION = "GENERATED_CDN_VSN";
+  var document = window.document;
