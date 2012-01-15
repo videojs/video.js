@@ -1,3 +1,4 @@
+* Fixed CDN Version which was breaking dev.html
 * Made full-window mode more independent
 * Added rakefile for release generation
 --------------------------------------------------------------------------------
