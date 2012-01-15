@@ -1,3 +1,4 @@
+* Made full-window mode more independent
 * Added rakefile for release generation
 --------------------------------------------------------------------------------
                           ^ ADD NEW CHANGES ABOVE ^
