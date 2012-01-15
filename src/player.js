@@ -539,7 +539,7 @@ _V_.Player = _V_.Component.extend({
   },
 
   enterFullWindow: function(){
-    this.videoIsFullScreen = true;
+    this.videoIsFullWindow = true;
 
     // Storing original doc overflow value to return to when fullscreen is off
     this.docOrigOverflow = document.documentElement.style.overflow;
@@ -559,12 +559,16 @@ _V_.Player = _V_.Component.extend({
 
   fullWindowOnEscKey: function(event){
     if (event.keyCode == 27) {
-      this.cancelFullScreen();
+      if (this.videoIsFullScreen == true) {
+        this.cancelFullScreen();
+      } else {
+        this.exitFullWindow();
+      }
     }
   },
 
   exitFullWindow: function(){
-    this.videoIsFullScreen = false;
+    this.videoIsFullWindow = false;
     _V_.removeEvent(document, "keydown", this.fullWindowOnEscKey);
 
     // Unhide scroll bars.
