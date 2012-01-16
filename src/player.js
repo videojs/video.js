@@ -747,6 +747,7 @@ _V_.Player = _V_.Component.extend({
 
     _V_.each(["moz", "webkit"], function(prefix){
 
+      // https://github.com/zencoder/video-js/pull/128
       if ((prefix != "moz" || document.mozFullScreenEnabled) && document[prefix + "CancelFullScreen"] !== undefined) {
         requestFn = prefix + "RequestFullScreen";
         cancelFn = prefix + "CancelFullScreen";
