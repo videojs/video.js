@@ -4,11 +4,6 @@ require 'httparty'
 
 namespace :build do
 
-  task :test do
-    Rake::Log['CDN_VERSION = false'.gsub('CDN_VERSION = false', 'hi')]
-    
-  end
-
   desc "Build version for current '/c/' CDN copy and locked in version"
   task :current do
     Rake::Task["build:source"].execute
@@ -58,7 +53,7 @@ namespace :build do
     if File.exist?("dist")
       Rake::Shell["rm -r dist"]
     end
-    
+
     # Make distribution folder
     Rake::Shell["mkdir dist"]
 
@@ -107,9 +102,39 @@ namespace :build do
     Rake::Log["Minimizing CSS"]
     Rake::Shell["java -jar build/lib/yuicompressor-2.4.7.jar dist/video-js.css -o dist/video-js.min.css"]
 
-    Rake::Log[version_number << " Built"]    
+    Rake::Log[version_number << " Built"]
   end
 
+  desc "Build list of source files for easy inclusion in projects"
+  task :js_source do
+
+    File.open("dev/source-list.js", "w+") do |file|
+      file.puts "var vjsSourceList = [];"
+
+      src_array = ["src/core", "src/lib"]
+      last = ["flash/swfobject", "src/setup"]
+      exclude = [".", "..", ".DS_Store", "_end.js", "_begin.js"]
+
+      Dir.foreach('src') do |item|
+        next if exclude.include? item
+
+        item_name = "src/" << item.sub(".js", "")
+
+        next if (src_array + last).include? item_name
+
+        src_array << item_name
+      end
+
+      src_array = src_array + last
+
+      src_array.each do |item|
+        file.puts "vjsSourceList.push('#{item}')"
+      end
+      # file.puts "vjsSourceList.push('src/#{item.sub(".js", "")}')"
+      # file.puts "vjsSourceList.push('flash/swfobject.js')"
+
+    end
+  end
 
 end
 
@@ -120,196 +145,6 @@ end
 def version_number
   "#{version['major']}.#{version['minor']}.#{version['patch']}"
 end
-
-desc "Set up the environment"
-task :setup do
-  Rake::Log["Installing jekyll"]
-  Rake::Shell["gem install jekyll"]
-  Rake::Log["Installing the RDiscount gem for decent Markdown support"]
-  Rake::Shell["gem install rdiscount"]
-  Rake::Log["Installing Pygments for syntax highlighting"]
-  Rake::Shell["easy_install pygments"]
-  if !File.exist?("_config.yml")
-    Rake::Log["Setting up _config.yml"]
-    Rake::Shell["cp _config.yml.example _config.yml"]
-  end
-  Rake::Log["SSH configuration should go in ~/.ssh/config:\n\nHost static1\n  Hostname static1.zencoder.com\n  Port 22777\n  User deploy\n\nHost static2\n  Hostname static2.zencoder.com\n  Port 22777\n  User deploy"]
-
-  Rake::Log["!!! SYNTAX HIGHLIGHTING WIHT PYGMENTS REQUIRED liquid version 2.2.2"]
-  Rake::Log["gem list -d liquid"]
-  Rake::Log["If not 2.2.2"]
-  Rake::Log["gem uninstall liquid"]
-  Rake::Log['gem install liquid --version "2.2.2"']
-end
-
-namespace :site do
-  desc "Delete site cache"
-  task :delete do
-    Rake::Log["Deleting site cache"]
-    if File.exist?("_site")
-      Rake::Shell["rm -r _site"]
-    end
-  end
-
-  desc "Build the site cache"
-  task :build do
-    Rake::Log["Building site cache"]
-    Rake::Shell["jekyll --no-server --no-auto"]
-  end
-
-  desc "Rebuild the site cache"
-  task :rebuild do
-    Rake::Task["site:delete"].execute
-    Rake::Task["site:build"].execute
-  end
-
-end
-
-# Using the HTML5 Boilerplate build script to optimize files
-namespace :hb do
-
-  desc "Udate H5BP Page List config property"
-  task :update do
-    Rake::Log["Updating H5BP Page List (_site/build/config/project.properties)"]
-    text = File.read("_site/build/config/project.properties")
-    pages = File.read("_site/page-list-for-h5bp.html")
-    File.open("_site/build/config/project.properties", "w") do |file|
-      file.puts text.gsub(/file\.pages\s+=.*/, "file.pages = " << pages)
-    end
-  end
-
-  desc "Optimize the site cache using the HTML5 Boilerplate build script. Creates a new folder called 'publish' inside _site folder"
-  task :build do
-    Rake::Task["hb:update"].execute
-
-    Rake::Log["Optimizing site cache"]
-    Rake::Shell["cd _site/build/ && ant build && cd ../.."]
-  end
-end
-
-
-namespace :env do
-  desc "Change to development environment"
-  task :development do
-    Rake::Log["Changing to development environment"]
-    set_env_to :development
-  end
-
-  desc "Change to staging environment"
-  task :staging do
-    Rake::Log["Changing to staging environment"]
-    set_env_to :staging
-  end
-
-  desc "Change to production environment"
-  task :production do
-    Rake::Log["Changing to production environment"]
-    set_env_to :production
-  end
-end
-
-namespace :deploy do
-  task :update_local do
-    Rake::Log["Updating local git repo and pushing changes"]
-    Rake::Shell["git pull && git push"]
-  end
-
-  desc "Deploy to staging"
-  task :staging do
-    Rake::Task["deploy:update_local"].execute
-    Rake::Log["Rebuilding for staging"]
-    Rake::Task["env:staging"].execute
-    Rake::Task["site:rebuild"].execute
-    Rake::Task["hb:build"].execute
-    config["servers"]["staging"].each do |server|
-      Rake::Log["Deploying to #{server.split(':').first}"]
-      Rake::Shell["rsync -avrzth --delete _site/publish/ #{server}"]
-    end
-    Rake::Log["Rebuilding for development"]
-    Rake::Task["env:development"].execute
-    Rake::Task["site:rebuild"].execute
-  end
-
-  desc "Deploy to production"
-  task :production do
-    Rake::Task["deploy:update_local"].execute
-    Rake::Log["Rebuilding for production"]
-    Rake::Task["env:production"].execute
-    Rake::Task["site:rebuild"].execute
-    Rake::Task["hb:build"].execute
-    config["servers"]["production"].each do |server|
-      Rake::Log["Deploying to #{server.split(':').first}"]
-      Rake::Shell["rsync -avrzth --delete _site/publish/ #{server}"]
-    end
-    Rake::Log["Rebuilding for development"]
-    Rake::Task["env:development"].execute
-    Rake::Task["site:rebuild"].execute
-  end
-end
-
-namespace :docs do
-
-  desc "Generate Doc directories and pages from VideoJS library docs"
-  task :generate do
-
-    Rake::Log["Getting docs from " << config["videojs_dir"]]
-
-    if File.exist?("docs")
-      Rake::Shell["rm -r docs"]
-    end
-    Dir.mkdir("docs");
-
-    list = "<ul><li id='docs_nav_start'><a href='/docs/'>Start</a></li>\n"
-    list << "<ul><li id='docs_nav_setup'><a href='/docs/setup/'>Setup</a></li>\n"
-    list << "<ul><li id='docs_nav_options'><a href='/docs/options/'>Options</a></li>\n"
-
-    Dir.foreach(config["videojs_dir"] << '/docs') do |item|
-      next if item == '.' or item == '..'
-
-      # do work on real items
-      Rake::Log[item]
-
-      text = File.read(config["videojs_dir"] << "/docs/" << item)
-      name = item.gsub(/\.md/, "")
-
-      if name == 'index'
-        filename = "docs/" << "index.md"
-        File.open(filename, "w+") do |file|
-          file.puts "" << text
-        end
-      else
-        filename = "docs/" << name << "/index.md"
-        Dir.mkdir("docs/" << name)
-        if name != "glossary" and name != "setup" and name != "options"
-          list << "<li id='docs_nav_#{name}'><a href='/docs/#{name}/'>#{name}</a></li>\n"
-        end
-      end
-
-      File.open(filename, "w+") do |file|
-        file.puts "" << text
-      end
-
-    end
-
-    File.open("_includes/docs_menu.html", "w+") do |file|
-      file.puts list << "<li id='docs_nav_glossary'><a href='/docs/glossary/'>glossary</a></li></ul>"
-    end
-  end
-
-end
-
-
-def set_env_to(env)
-  text = File.read("_config.yml")
-  File.open("_config.yml", "w") do |file|
-    file.puts text.gsub(/env:.*/, "env: #{env}")
-  end
-end
-
-def config
-  YAML.load(File.read("_config.yml"))
-end
-
 
 module Rake
   class Shell
