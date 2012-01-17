@@ -612,7 +612,7 @@ _V_.Player = _V_.Component.extend({
             if (tech.canPlaySource.call(this, source)) {
 
               // If this technology is already loaded, set source
-              if (techName == this.currentTechName) {
+              if (techName == this.techName) {
                 this.src(source); // Passing the source object
 
               // Otherwise load this technology with chosen source
