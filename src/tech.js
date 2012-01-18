@@ -294,7 +294,7 @@ _V_.flash = _V_.PlaybackTech.extend({
 
     // If source was supplied pass as a flash var.
     if (source) {
-      flashVars.src = source.src;
+      flashVars.src = encodeURIComponent(source.src);
     }
 
     // Add to box.
