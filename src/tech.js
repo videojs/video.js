@@ -183,23 +183,23 @@ _V_.html5 = _V_.PlaybackTech.extend({
   setLoop: function(val){ this.el.loop = val; },
 
   error: function(){ return this.el.error; },
-  networkState: function(){ return this.el.networkState; },
-  readyState: function(){ return this.el.readyState; },
+  // networkState: function(){ return this.el.networkState; },
+  // readyState: function(){ return this.el.readyState; },
   seeking: function(){ return this.el.seeking; },
-  initialTime: function(){ return this.el.initialTime; },
-  startOffsetTime: function(){ return this.el.startOffsetTime; },
-  played: function(){ return this.el.played; },
-  seekable: function(){ return this.el.seekable; },
+  // initialTime: function(){ return this.el.initialTime; },
+  // startOffsetTime: function(){ return this.el.startOffsetTime; },
+  // played: function(){ return this.el.played; },
+  // seekable: function(){ return this.el.seekable; },
   ended: function(){ return this.el.ended; },
-  videoTracks: function(){ return this.el.videoTracks; },
-  audioTracks: function(){ return this.el.audioTracks; },
-  videoWidth: function(){ return this.el.videoWidth; },
-  videoHeight: function(){ return this.el.videoHeight; },
-  textTracks: function(){ return this.el.textTracks; },
-  defaultPlaybackRate: function(){ return this.el.defaultPlaybackRate; },
-  playbackRate: function(){ return this.el.playbackRate; },
-  mediaGroup: function(){ return this.el.mediaGroup; },
-  controller: function(){ return this.el.controller; },
+  // videoTracks: function(){ return this.el.videoTracks; },
+  // audioTracks: function(){ return this.el.audioTracks; },
+  // videoWidth: function(){ return this.el.videoWidth; },
+  // videoHeight: function(){ return this.el.videoHeight; },
+  // textTracks: function(){ return this.el.textTracks; },
+  // defaultPlaybackRate: function(){ return this.el.defaultPlaybackRate; },
+  // playbackRate: function(){ return this.el.playbackRate; },
+  // mediaGroup: function(){ return this.el.mediaGroup; },
+  // controller: function(){ return this.el.controller; },
   controls: function(){ return this.player.options.controls; },
   defaultMuted: function(){ return this.el.defaultMuted; }
 });
@@ -262,9 +262,9 @@ _V_.flash = _V_.PlaybackTech.extend({
         flashVars = _V_.merge({
 
           // SWF Callback Functions
-          readyFunction: "_V_.flash.onSWFReady",
-          eventProxyFunction: "_V_.flash.onSWFEvent",
-          errorEventProxyFunction: "_V_.flash.onSWFErrorEvent",
+          readyFunction: "_V_.flash.onReady",
+          eventProxyFunction: "_V_.flash.onEvent",
+          errorEventProxyFunction: "_V_.flash.onError",
 
           // Player Settings
           autoplay: playerOptions.autoplay,
@@ -420,7 +420,7 @@ _V_.flash = _V_.PlaybackTech.extend({
     this.el.parentNode.removeChild(this.el);
   },
 
-  // setupTriggers: function(){}, // Using global onSWFEvent func to distribute events
+  // setupTriggers: function(){}, // Using global onEvent func to distribute events
 
   play: function(){ this.el.vjs_play(); },
   pause: function(){ this.el.vjs_pause(); },
@@ -507,7 +507,7 @@ _V_.flash.prototype.support = {
   parentResize: !(_V_.ua.match("Firefox"))
 };
 
-_V_.flash.onSWFReady = function(currSwf){
+_V_.flash.onReady = function(currSwf){
 
   var el = _V_.el(currSwf);
 
@@ -540,7 +540,7 @@ _V_.flash.checkReady = function(tech){
   }
 };
 
-_V_.flash.onSWFEvent = function(swfID, eventName, other){
+_V_.flash.onEvent = function(swfID, eventName, other){
   try {
     var player = _V_.el(swfID).player;
     if (player && player.techName == "flash") {
@@ -551,6 +551,6 @@ _V_.flash.onSWFEvent = function(swfID, eventName, other){
   }
 };
 
-_V_.flash.onSWFErrorEvent = function(swfID, eventName){
+_V_.flash.onError = function(swfID, eventName){
   _V_.log("Flash Error", eventName);
 };
