@@ -467,7 +467,7 @@ _V_.Player = _V_.Component.extend({
     if (requestFullScreen) {
       // Flash and other plugins get reloaded when you take their parent to fullscreen.
       // To fix that we'll remove the tech, and reload it after the resize has finished.
-      if (this.tech.support.fullscreenResize === false) {
+      if (this.tech.support.fullscreenResize === false && this.options.flash.iFrameMode != true) {
 
         this.pause();
         this.unloadTech();
@@ -508,7 +508,7 @@ _V_.Player = _V_.Component.extend({
 
      // Flash and other plugins get reloaded when you take their parent to fullscreen.
      // To fix that we'll remove the tech, and reload it after the resize has finished.
-     if (this.tech.support.fullscreenResize === false) {
+     if (this.tech.support.fullscreenResize === false && this.options.flash.iFrameMode != true) {
 
        this.pause();
        this.unloadTech();

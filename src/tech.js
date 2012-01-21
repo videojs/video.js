@@ -66,7 +66,7 @@ _V_.html5 = _V_.PlaybackTech.extend({
 
     this.triggerReady();
   },
-  
+
   destroy: function(){
     this.player.tag = false;
     this.removeTriggers();
@@ -87,7 +87,7 @@ _V_.html5 = _V_.PlaybackTech.extend({
     if (!el || this.support.movingElementInDOM === false) {
 
       // If the original tag is still there, remove it.
-      if (el) { 
+      if (el) {
         player.el.removeChild(el);
       }
 
@@ -223,7 +223,7 @@ _V_.html5.events = "loadstart,suspend,abort,error,emptied,stalled,loadedmetadata
 /* HTML5 Device Fixes ---------------------------------------------------------- */
 
 _V_.html5.prototype.support = {
-  
+
   // Support for tech specific full screen. (webkitEnterFullScreen, not requestFullscreen)
   // http://developer.apple.com/library/safari/#documentation/AudioVideo/Reference/HTMLVideoElementClassReference/HTMLVideoElement/HTMLVideoElement.html
   // Seems to be broken in Chromium/Chrome && Safari in Leopard
@@ -286,12 +286,6 @@ _V_.flash = _V_.PlaybackTech.extend({
           'class': 'vjs-tech'
         }, options.attributes);
 
-
-    // EDIT: Trying to just us a manual <img> for poster. 
-    // if (playerOptions.poster) {
-    //   flashVars.poster = playerOptions.poster;
-    // }
-
     // If source was supplied pass as a flash var.
     if (source) {
       flashVars.src = source.src;
@@ -308,9 +302,120 @@ _V_.flash = _V_.PlaybackTech.extend({
       });
     }
 
-    swfobject.embedSWF(options.swf, placeHolder.id, "480", "270", "9.0.124", "", flashVars, params, attributes);
+    // Flash iFrame Mode
+    // In web browsers there are multiple instances where changing the parent element or visibility of a plugin causes the plugin to reload.
+    // - Firefox just about always. https://bugzilla.mozilla.org/show_bug.cgi?id=90268 (might be fixed by version 13)
+    // - Webkit when hiding the plugin
+    // - Webkit and Firefox when using requestFullScreen on a parent element
+    // Loading the flash plugin into a dynamically generated iFrame gets around most of these issues.
+    // Issues that remain include hiding the element and requestFullScreen in Firefox specifically
+
+    // There's on particularly annoying issue with this method which is that Firefox throws a security error on an offsite Flash object loaded into a dynamically created iFrame.
+    // Even though the iframe was inserted into a page on the web, Firefox + Flash considers it a local app trying to access an internet file.
+    // I tried mulitple ways of setting the iframe src attribute but couldn't find a src that worked well. Tried a real/fake source, in/out of domain.
+    // Also tried a method from stackoverflow that caused a security error in all browsers. http://stackoverflow.com/questions/2486901/how-to-set-document-domain-for-a-dynamically-generated-iframe
+    // In the end the solution I found to work was setting the iframe window.location.href right before doing a document.write of the Flash object.
+    // The only downside of this it seems to trigger another http request to the original page (no matter what's put in the href). Not sure why that is.
+    if (options.iFrameMode) {
+
+      // Create iFrame with vjs-tech class so it's 100% width/height
+      var iFrm = _V_.createElement("iframe", {
+        id: objId + "_iframe",
+        className: "vjs-tech",
+        scrolling: "no",
+        marginWidth: 0,
+        marginHeight: 0,
+        frameBorder: 0
+      });
+
+      // Wait until iFrame has loaded to write into it.
+      _V_.addEvent(iFrm, "load", _V_.proxy(this, function(){
+
+        var iDoc, objTag, swfLoc,
+            iWin = iFrm.contentWindow,
+            varString = "";
+
+        // Setting the window href gets around a security error that Firefox throws when it thinks a local page is attempting to load a remote script.
+        // Firefox seems to be telling Flash (incorrectly) that iframe is local
+        // Need to find a better method than UA parsing
+        if (_V_.ua.match("Firefox")) {
+          iWin.location.href = "";
+        }
+
+        // Get the iFrame's document
+        iDoc = iFrm.contentDocument ? iFrm.contentDocument : iFrm.contentWindow.document;
+
+        // Build the Flash object tag
+        // Using bgcolor prevents a white flash when the object is loading
+        swfLoc = 'http://vjs.zencdn.net/c/video-js.swf';
+        flashVars.readyFunction = "ready";
+        flashVars.eventProxyFunction = "events";
+        flashVars.errorEventProxyFunction = "errors";
+
+        for (var name in flashVars) {
+          if (flashVars.hasOwnProperty(name)) {
+            varString += (name + "=" + flashVars[name] + "&amp;");
+          }
+        }
+
+        objTag = '<object data="'+swfLoc+'" id="flash_fallback_1" name="flash_fallback_1" class="vjs-flash-fallback" type="application/x-shockwave-flash" bgcolor="#000000" style="width: 100%; height: 100%;">';
+        objTag += '<param name="movie" value="'+swfLoc+'" />';
+        objTag += '<param name="allowScriptAccess" value="always">';
+        objTag += '<param name="wmode" value="opaque" />';
+
+        objTag += '<param name="flashvars" value="'+varString+'">';
+        objTag += '</object>';
+
+        // Using document.write because other methods like append and innerHTML were causing the same security errors in Firefox
+        iDoc.write(objTag);
+
+        // Setting variables on the window need to come after the doc write because otherwise they can get reset in some browsers
+        // So far no issues with swf ready event being called before it's set on the window.
+        iWin.player = this.player;
+
+        iWin.ready = _V_.proxy(this.player, function(currSwf){
+          var el = iDoc.getElementById(currSwf),
+              player = this,
+              tech = player.tech;
+
+          // Reference player on tech element
+          el.player = player;
+
+          // Update reference to playback technology element
+          tech.el = el;
+
+          // Now that the element is ready, make a click on the swf play the video
+          tech.addEvent("click", tech.onClick);
+
+          el.vjs_setProperty("volume", 0);
+
+          _V_.flash.checkReady(tech);
+        });
+
+        iWin.events = _V_.proxy(this.player, function(swfID, eventName, other){
+          try {
+            var player = this;
+            if (player && player.techName == "flash") {
+              player.triggerEvent(eventName);
+            }
+          } catch(err) {
+            _V_.log(err);
+          }
+        });
+
+        iWin.errors = _V_.proxy(this.player, function(swfID, eventName){
+          _V_.log("Flash Error", eventName);
+        });
+
+      }));
+
+      placeHolder.parentNode.replaceChild(iFrm, placeHolder);
+
+    } else {
+      swfobject.embedSWF(options.swf, placeHolder.id, "480", "270", "9.0.124", "", flashVars, params, attributes);
+    }
   },
-  
+
   destroy: function(){
     this.el.parentNode.removeChild(this.el);
   },
@@ -395,7 +500,7 @@ _V_.flash.prototype.support = {
   progressEvent: false,
   timeupdateEvent: false,
 
-  // Resizing plugins using request fullscreen reloads the plugin 
+  // Resizing plugins using request fullscreen reloads the plugin
   fullscreenResize: false,
 
   // Resizing plugins in Firefox always reloads the plugin (e.g. full window mode)
