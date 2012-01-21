@@ -227,15 +227,15 @@ _V_.Player = _V_.Component.extend({
   // First is a plugin reload issue in Firefox that has been around for 11 years: https://bugzilla.mozilla.org/show_bug.cgi?id=90268
   // Then with the new fullscreen API, Mozilla and webkit browsers will reload the flash object after going to fullscreen.
   // To get around this, we're unloading the tech, caching source and currentTime values, and reloading the tech once the plugin is resized.
-  reloadTech: function(betweenFn){
-    _V_.log("unloadingTech")
-    this.unloadTech();
-    _V_.log("unloadedTech")
-    if (betweenFn) { betweenFn.call(); }
-    _V_.log("LoadingTech")
-    this.loadTech(this.techName, { src: this.values.src })
-    _V_.log("loadedTech")
-  },
+  // reloadTech: function(betweenFn){
+  //   _V_.log("unloadingTech")
+  //   this.unloadTech();
+  //   _V_.log("unloadedTech")
+  //   if (betweenFn) { betweenFn.call(); }
+  //   _V_.log("LoadingTech")
+  //   this.loadTech(this.techName, { src: this.values.src })
+  //   _V_.log("loadedTech")
+  // },
 
   /* Fallbacks for unsupported event types
   ================================================================================ */

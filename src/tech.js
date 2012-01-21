@@ -554,3 +554,20 @@ _V_.flash.onEvent = function(swfID, eventName, other){
 _V_.flash.onError = function(swfID, eventName){
   _V_.log("Flash Error", eventName);
 };
+
+// Flash Version Check
+_V_.flash.version = function(){
+  var version = '0,0,0'
+  // IE
+  try {
+    version = new ActiveXObject('ShockwaveFlash.ShockwaveFlash').GetVariable('$version').replace(/\D+/g, ',').match(/^,?(.+),?$/)[1];
+  // other browsers
+  } catch(e) {
+    try {
+      if (navigator.mimeTypes["application/x-shockwave-flash"].enabledPlugin){
+        version = (navigator.plugins["Shockwave Flash 2.0"] || navigator.plugins["Shockwave Flash"]).description.replace(/\D+/g, ",").match(/^,?(.+),?$/)[1];
+      }
+    } catch(e) {}
+  }
+  return version.split(",");
+}
