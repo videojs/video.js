@@ -39,6 +39,14 @@ _V_.extend({
     }
   },
 
+  objEach: function(obj, fn){
+    for (var name in obj) {
+      if (obj.hasOwnProperty(name)) {
+        fn.call(this, name, obj[name]);
+      }
+    }
+  },
+
   el: function(id){ return document.getElementById(id); },
   createElement: function(tagName, attributes){
     var el = document.createElement(tagName),

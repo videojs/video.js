@@ -316,7 +316,7 @@ _V_.flash = _V_.PlaybackTech.extend({
     // Also tried a method from stackoverflow that caused a security error in all browsers. http://stackoverflow.com/questions/2486901/how-to-set-document-domain-for-a-dynamically-generated-iframe
     // In the end the solution I found to work was setting the iframe window.location.href right before doing a document.write of the Flash object.
     // The only downside of this it seems to trigger another http request to the original page (no matter what's put in the href). Not sure why that is.
-    if (options.iFrameMode) {
+    if (!options.iFrameMode) {
 
       // Create iFrame with vjs-tech class so it's 100% width/height
       var iFrm = _V_.createElement("iframe", {
@@ -352,22 +352,11 @@ _V_.flash = _V_.PlaybackTech.extend({
         flashVars.eventProxyFunction = "events";
         flashVars.errorEventProxyFunction = "errors";
 
-        for (var name in flashVars) {
-          if (flashVars.hasOwnProperty(name)) {
-            varString += (name + "=" + flashVars[name] + "&amp;");
-          }
-        }
-
-        objTag = '<object data="'+swfLoc+'" id="flash_fallback_1" name="flash_fallback_1" class="vjs-flash-fallback" type="application/x-shockwave-flash" bgcolor="#000000" style="width: 100%; height: 100%;">';
-        objTag += '<param name="movie" value="'+swfLoc+'" />';
-        objTag += '<param name="allowScriptAccess" value="always">';
-        objTag += '<param name="wmode" value="opaque" />';
-
-        objTag += '<param name="flashvars" value="'+varString+'">';
-        objTag += '</object>';
+        // Set styls on obj. iFrame won't have video-js.css in scope
+        attributes.style = "width: 100%; height: 100%;"
 
         // Using document.write because other methods like append and innerHTML were causing the same security errors in Firefox
-        iDoc.write(objTag);
+        iDoc.write(_V_.flash.getEmbedCode(swfLoc, flashVars, params, attributes));
 
         // Setting variables on the window need to come after the doc write because otherwise they can get reset in some browsers
         // So far no issues with swf ready event being called before it's set on the window.
@@ -412,7 +401,8 @@ _V_.flash = _V_.PlaybackTech.extend({
       placeHolder.parentNode.replaceChild(iFrm, placeHolder);
 
     } else {
-      swfobject.embedSWF(options.swf, placeHolder.id, "480", "270", "9.0.124", "", flashVars, params, attributes);
+      // swfobject.embedSWF(options.swf, placeHolder.id, "480", "270", "9", "", flashVars, params, attributes);
+      _V_.flash.embed(options.swf, placeHolder, flashVars, params, attributes);
     }
   },
 
@@ -570,4 +560,62 @@ _V_.flash.version = function(){
     } catch(e) {}
   }
   return version.split(",");
+}
+
+_V_.flash.embed = function(swf, placeHolder, flashVars, params, attributes){
+  var code = _V_.flash.getEmbedCode(swf, flashVars, params, attributes)
+
+  // Get element by embedding code and retrieving created element
+  ,   obj = _V_.createElement("div", { innerHTML: code }).childNodes[0];
+  
+  
+  // swfobject.embedSWF(swf, placeHolder.id, "480", "270", "9", "", flashVars, params, attributes);
+  // placeHolder.outerHTML = code;
+  var par = placeHolder.parentNode;
+  placeHolder.parentNode.replaceChild(obj, placeHolder);
+
+  // IE6 seems to have an issue where it won't initialize the swf object after injecting it.
+  // This is a dumb temporary fix
+  var newObj = par.childNodes[0];
+  setTimeout(function(){
+    newObj.style.display = "block";
+  }, 1000);
+};
+
+_V_.flash.getEmbedCode = function(swf, flashVars, params, attributes){
+
+  var objTag = '<object type="application/x-shockwave-flash"',
+      flashVarsString = '',
+      paramsString = ''
+      attrsString = '';
+
+  // Convert flash vars to string
+  if (flashVars) {
+    _V_.objEach(flashVars, function(key, val){
+      flashVarsString += (key + "=" + val + "&amp;");
+    });
+  }
+
+  // Add swf, flashVars, and other default params
+  params = _V_.merge({
+    movie: swf,
+    flashvars: flashVarsString,
+    allowScriptAccess: 'always'
+  }, params);
+  // Create param tags
+  _V_.objEach(params, function(key, val){
+    paramsString += '<param name="'+key+'" value="'+val+'" />';
+  });
+
+  // Add swf to attributes (need both for IE and Others to work)
+  attributes = _V_.merge({ 
+    data: swf, 
+    width: "640", 
+    height: "270"
+  }, attributes);
+  _V_.objEach(attributes, function(key, val){
+    attrsString += (key + '="' + val + '" ');
+  });
+
+  return objTag + attrsString + '>' + paramsString + '</object>';
 }
