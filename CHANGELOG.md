@@ -1,3 +1,4 @@
+* Escaping special characters in source URL for Flash
 * Added a check for if Firefox is enabled which fixes a Firefox 9 issue
 * Stopped spinner from showing on 'stalled' events since browsers sometimes don't show that they've recovered.
 * Fixed CDN Version which was breaking dev.html
