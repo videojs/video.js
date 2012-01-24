@@ -24,3 +24,6 @@ CHANGELOG
 
 ---- 3.0.7 / 2012-01-12 / fixing-ie8-poster-bug --------------------------------
 * Fixed an ie8 breaking bug with the poster
+
+---- 3.0.8 / 2012-01-23 / fix-ie-controls-hiding -------------------------------
+* CFixed issue with controls not hiding in IE due to no opacity support
