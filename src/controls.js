@@ -236,10 +236,18 @@ _V_.ControlBar = _V_.Component.extend({
   // Used for transitions (fading out)
   reveal: function(){
     this.el.style.opacity = 1;
+
+    // IE doesn't support opacity, so use display instead
+    if ( !('opacity' in document.body.style) ) {
+      this.show();
+    }
   },
 
   conceal: function(){
     this.el.style.opacity = 0;
+    if ( !('opacity' in document.body.style) ) {
+      this.hide();
+    }
   }
 });
 
