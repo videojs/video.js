@@ -135,27 +135,29 @@ _V_.Player = _V_.Component.extend({
     options.loop = this.tag.getAttribute("loop") !== null;
     options.muted = this.tag.getAttribute("muted") !== null;
 
-    for (var c,i=0,j=this.tag.children;i<j.length;i++) {
-      c = j[i];
-      if (c.nodeName == "SOURCE") {
-        options.sources.push({
-          src: c.src,
-          type: c.type,
-          media: c.media,
-          title: c.title
-        });
-      }
-      if (c.nodeName == "TRACK") {
-        options.tracks.push(new _V_.Track({
-          src: c.getAttribute("src"),
-          kind: c.getAttribute("kind"),
-          srclang: c.getAttribute("srclang"),
-          label: c.getAttribute("label"),
-          'default': c.getAttribute("default") !== null,
-          title: c.getAttribute("title")
-        }, this));
-
-      }
+    if (this.tag.hasChildNodes()) {
+	    for (var c,i=0,j=this.tag.childNodes;i<j.length;i++) {
+	      c = j[i];
+	      if (c.nodeName == "SOURCE") {
+	        options.sources.push({
+	          src: c.src,
+	          type: c.type,
+	          media: c.media,
+	          title: c.title
+	        });
+	      }
+	      if (c.nodeName == "TRACK") {
+	        options.tracks.push(new _V_.Track({
+	          src: c.getAttribute("src"),
+	          kind: c.getAttribute("kind"),
+	          srclang: c.getAttribute("srclang"),
+	          label: c.getAttribute("label"),
+	          'default': c.getAttribute("default") !== null,
+	          title: c.getAttribute("title")
+	        }, this));
+	
+	      }
+	    }
     }
     return options;
   },
