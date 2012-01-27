@@ -63,7 +63,7 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
   bottom: 0; /* Distance from the bottom of the box/video. Keep 0. Use height to add more bottom margin. */
   left: 0; right: 0; /* 100% width of div */
   opacity: 0.85; 
-  display: none; /* Start hidden */
+  /*  display: none; /* Start hidden */*/
   margin: 0; padding: 0; /* Controls are absolutely position, so no padding necessary */
   height: 2.6em; /* Including any margin you want above or below control items */
   color: #fff; border-top: 1px solid #404040;

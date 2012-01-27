@@ -222,6 +222,21 @@ _V_.LoadingSpinner = _V_.Component.extend({
 /* Control Bar
 ================================================================================ */
 _V_.ControlBar = _V_.Component.extend({
+
+  options: {
+    components: {
+      "playToggle": {},
+      "fullscreenToggle": {},
+      "currentTimeDisplay": {},
+      "timeDivider": {},
+      "durationDisplay": {},
+      "remainingTimeDisplay": {},
+      "progressControl": {},
+      "volumeControl": {},
+      "muteToggle": {}
+    }
+  },
+
   init: function(player, options){
     this._super(player, options);
 
@@ -229,6 +244,8 @@ _V_.ControlBar = _V_.Component.extend({
 
     player.addEvent("mouseover", this.proxy(this.reveal));
     player.addEvent("mouseout", this.proxy(this.conceal));
+
+    this.hide();
   },
 
   createElement: function(){
@@ -379,11 +396,6 @@ _V_.Slider = _V_.Component.extend({
     this.addEvent("mousedown", this.onMouseDown);
     this.addEvent("focus", this.onFocus);
     this.addEvent("blur", this.onBlur);
-
-    // Update Display
-    // Need to wait for styles to be loaded.
-    // TODO - replace setTimeout with stylesReady function.
-    setTimeout(this.proxy(this.update), 0);
   },
 
   createElement: function(type, attrs) {
@@ -434,12 +446,15 @@ _V_.Slider = _V_.Component.extend({
     // If there is a handle, we need to account for the handle in our calculation for progress bar
     // so that it doesn't fall short of or extend past the handle.
     if (handle) {
+
       var box = this.el,
           boxWidth = box.offsetWidth,
 
+          handleWidth = handle.el.offsetWidth,
+
           // The width of the handle in percent of the containing box
           // In IE, widths may not be ready yet causing NaN
-          handlePercent = (handle.el.offsetWidth) ? handle.el.offsetWidth / boxWidth : 0,
+          handlePercent = (handleWidth) ? handleWidth / boxWidth : 0,
 
           // Get the adjusted size of the box, considering that the handle's center never touches the left or right side.
           // There is a margin of half the handle's width on both sides.
@@ -453,6 +468,7 @@ _V_.Slider = _V_.Component.extend({
 
       // Move the handle from the left based on the adjected progress
       handle.el.style.left = _V_.round(adjustedProgress * 100, 2) + "%";
+      _V_.log(this.playerEvent, boxWidth, handle.el.style.left);
     }
 
     // Set the new bar width
@@ -503,6 +519,12 @@ _V_.Slider = _V_.Component.extend({
 // Progress Control: Seek, Load Progress, and Play Progress
 _V_.ProgressControl = _V_.Component.extend({
 
+  options: {
+    components: {
+      "seekBar": {}
+    }
+  },
+
   createElement: function(){
     return this._super("div", {
       className: "vjs-progress-control vjs-control"
@@ -513,6 +535,14 @@ _V_.ProgressControl = _V_.Component.extend({
 
 // Seek Bar and holder for the progress bars
 _V_.SeekBar = _V_.Slider.extend({
+
+  options: {
+    components: {
+      "loadProgressBar": {},
+      "playProgressBar": {},
+      "seekHandle": {}
+    }
+  },
 
   barClass: "PlayProgressBar",
   handleClass: "SeekHandle",
@@ -622,6 +652,12 @@ _V_.SeekHandle = _V_.Component.extend({
 // Progress Control: Seek, Load Progress, and Play Progress
 _V_.VolumeControl = _V_.Component.extend({
 
+  options: {
+    components: {
+      "volumeBar": {}
+    }
+  },
+
   createElement: function(){
     return this._super("div", {
       className: "vjs-volume-control vjs-control"
@@ -631,6 +667,13 @@ _V_.VolumeControl = _V_.Component.extend({
 });
 
 _V_.VolumeBar = _V_.Slider.extend({
+
+  options: {
+    components: {
+      "volumeLevel": {},
+      "volumeHandle": {}
+    }
+  },
 
   barClass: "VolumeLevel",
   handleClass: "VolumeHandle",

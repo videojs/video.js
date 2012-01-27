@@ -51,12 +51,7 @@ _V_.Component = _V_.Class.extend({
       this.el = this.createElement();
     }
 
-    // Array of sub-components
-    if (options && options.components) {
-      _V_.each.call(this, options.components, function(comp){
-        this.addComponent(comp);
-      });
-    }
+    this.initComponents();
   },
 
   destroy: function(){},
@@ -69,6 +64,14 @@ _V_.Component = _V_.Class.extend({
     // Child classes can include a function that does:
     // return "CLASS NAME" + this._super();
     return "";
+  },
+
+  initComponents: function(){
+    if (this.options && this.options.components) {
+      this.each(this.options.components, function(comp){
+        this.addComponent(comp);
+      });
+    }
   },
 
   // Add child components to this component.
