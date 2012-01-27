@@ -67,9 +67,12 @@ _V_.Component = _V_.Class.extend({
   },
 
   initComponents: function(){
-    if (this.options && this.options.components) {
-      this.each(this.options.components, function(comp){
-        this.addComponent(comp);
+    var options = this.options;
+    if (options && options.components) {
+
+      // Loop through components and add them to the player
+      this.eachProp(options.components, function(name, opts){
+        this.addComponent(name, opts);
       });
     }
   },
@@ -77,35 +80,26 @@ _V_.Component = _V_.Class.extend({
   // Add child components to this component.
   // Will generate a new child component and then append child component's element to this component's element.
   // Takes either the name of the UI component class, or an object that contains a name, UI Class, and options.
-  addComponent: function(nameORobj){
-    var name, componentClass, options, component;
+  addComponent: function(name, options){
+    var componentClass, component;
 
-    if (typeof nameORobj == "string") {
-      name = nameORobj;
+    // Make sure options is at least an empty object to protect against errors
+    options = options || {};
 
-    // Can also pass in object to define a different class than the name and add other options
-    } else {
-      name = nameORobj.name;
-      componentClass = nameORobj.componentClass;
-      options = nameORobj.options;
-    }
-
-    if (!componentClass) {
-      // Assume name of set is a lowercased name of the UI Class (PlayButton, etc.)
-      componentClass = _V_.capitalize(name);
-    }
+    // Assume name of set is a lowercased name of the UI Class (PlayButton, etc.)
+    componentClass = options.componentClass || _V_.capitalize(name);
 
     // Create a new object & element for this controls set
     // If there's no .player, this is a player
     component = new _V_[componentClass](this.player || this, options);
 
-    if (this.components === undefined) {
-      this.components = [];
-    }
-    this.components.push(component);
-
     // Add the UI object's element to the container div (box)
     this.el.appendChild(component.el);
+
+    // Set property name on player. Could cause conflicts with other prop names, but it's worth making refs easy.
+    this[name] = component;
+
+    return component;
   },
 
   /* Display
@@ -174,6 +168,15 @@ _V_.Component = _V_.Class.extend({
     if (!arr || arr.length === 0) { return; }
     for (var i=0,j=arr.length; i<j; i++) {
       if (fn.call(this, arr[i], i)) { break; }
+    }
+  },
+
+  eachProp: function(obj, fn){
+    if (!obj) { return; }
+    for (var name in obj) {
+      if (obj.hasOwnProperty(name)) {
+        fn.call(this, name, obj[name]);
+      }
     }
   },
 

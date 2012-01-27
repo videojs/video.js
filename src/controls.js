@@ -383,19 +383,13 @@ _V_.Slider = _V_.Component.extend({
   init: function(player, options){
     this._super(player, options);
 
-    _V_.each.call(this, this.components, function(comp){
-      if (comp instanceof _V_[this.barClass]) {
-        this.bar = comp;
-      } else if (comp instanceof _V_[this.handleClass]) {
-        this.handle = comp;
-      }
-    });
-
     player.addEvent(this.playerEvent, _V_.proxy(this, this.update));
 
     this.addEvent("mousedown", this.onMouseDown);
     this.addEvent("focus", this.onFocus);
     this.addEvent("blur", this.onBlur);
+
+    this.update();
   },
 
   createElement: function(type, attrs) {
@@ -468,7 +462,6 @@ _V_.Slider = _V_.Component.extend({
 
       // Move the handle from the left based on the adjected progress
       handle.el.style.left = _V_.round(adjustedProgress * 100, 2) + "%";
-      _V_.log(this.playerEvent, boxWidth, handle.el.style.left);
     }
 
     // Set the new bar width
@@ -539,13 +532,13 @@ _V_.SeekBar = _V_.Slider.extend({
   options: {
     components: {
       "loadProgressBar": {},
-      "playProgressBar": {},
-      "seekHandle": {}
+
+      // Set property names to bar and handle to match with the parent Slider class is looking for
+      "bar": { componentClass: "PlayProgressBar" },
+      "handle": { componentClass: "SeekHandle" }
     }
   },
 
-  barClass: "PlayProgressBar",
-  handleClass: "SeekHandle",
   playerEvent: "timeupdate",
 
   init: function(player, options){
@@ -670,13 +663,11 @@ _V_.VolumeBar = _V_.Slider.extend({
 
   options: {
     components: {
-      "volumeLevel": {},
-      "volumeHandle": {}
+      "bar": { componentClass: "VolumeLevel" },
+      "handle": { componentClass: "VolumeHandle" }
     }
   },
 
-  barClass: "VolumeLevel",
-  handleClass: "VolumeHandle",
   playerEvent: "volumechange",
 
   createElement: function(){

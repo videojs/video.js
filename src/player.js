@@ -81,9 +81,10 @@ _V_.Player = _V_.Component.extend({
     // When the API is ready, loop through the components and add to the player.
     if (options.controls) {
       this.ready(function(){
-        this.each(this.options.components, function(set){
-          this.addComponent(set);
-        });
+        this.initComponents();
+        // this.each(this.options.components, function(set){
+        //   this.addComponent(set);
+        // });
       });
     }
 
