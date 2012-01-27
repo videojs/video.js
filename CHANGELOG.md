@@ -1,3 +1,4 @@
+* Fixed ian issue with triggering fullscreen a second time.
 * Fixed issue with getting attributes in Firefox 3.0
 * Escaping special characters in source URL for Flash
 * Added a check for if Firefox is enabled which fixes a Firefox 9 issue
