@@ -489,6 +489,11 @@ _V_.Player = _V_.Component.extend({
         this.el[requestFullScreen.requestFn]();
       }
 
+      // In case the user presses escape to exit fullscreen, we need to update fullscreen status
+      _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
+        this.isFullScreen = document[requestFullScreen.isFullScreen];
+      }));
+
     } else if (this.tech.supportsFullScreen()) {
       this.apiCall("enterFullScreen");
 
@@ -496,7 +501,7 @@ _V_.Player = _V_.Component.extend({
       this.enterFullWindow();
     }
 
-     this.videoIsFullScreen = true;
+     this.isFullScreen = true;
      this.triggerEvent("fullscreenchange");
 
      return this;
@@ -517,7 +522,6 @@ _V_.Player = _V_.Component.extend({
 
        _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
          _V_.removeEvent(document, requestFullScreen.eventName, arguments.callee);
-         _V_.log("document fullscreeneventchange")
          this.loadTech(this.techName, { src: this.values.src })
        }));
 
@@ -534,14 +538,14 @@ _V_.Player = _V_.Component.extend({
      this.exitFullWindow();
     }
 
-    this.videoIsFullScreen = false;
+    this.isFullScreen = false;
     this.triggerEvent("fullscreenchange");
 
     return this;
   },
 
   enterFullWindow: function(){
-    this.videoIsFullWindow = true;
+    this.isFullWindow = true;
 
     // Storing original doc overflow value to return to when fullscreen is off
     this.docOrigOverflow = document.documentElement.style.overflow;
@@ -561,7 +565,7 @@ _V_.Player = _V_.Component.extend({
 
   fullWindowOnEscKey: function(event){
     if (event.keyCode == 27) {
-      if (this.videoIsFullScreen == true) {
+      if (this.isFullScreen == true) {
         this.cancelFullScreen();
       } else {
         this.exitFullWindow();
@@ -570,7 +574,7 @@ _V_.Player = _V_.Component.extend({
   },
 
   exitFullWindow: function(){
-    this.videoIsFullWindow = false;
+    this.isFullWindow = false;
     _V_.removeEvent(document, "keydown", this.fullWindowOnEscKey);
 
     // Unhide scroll bars.
@@ -731,6 +735,8 @@ _V_.Player = _V_.Component.extend({
 (function(){
   var requestFn,
       cancelFn,
+      eventName,
+      isFullScreen,
       playerProto = _V_.Player.prototype;
 
   // Current W3C Spec
@@ -740,6 +746,7 @@ _V_.Player = _V_.Component.extend({
     requestFn = "requestFullscreen";
     cancelFn = "exitFullscreen";
     eventName = "fullscreenchange";
+    isFullScreen = "fullScreen";
 
   // Webkit (Chrome/Safari) and Mozilla (Firefox) have working implementaitons
   // that use prefixes and vary slightly from the new W3C spec. Specifically, using 'exit' instead of 'cancel',
@@ -755,7 +762,12 @@ _V_.Player = _V_.Component.extend({
         cancelFn = prefix + "CancelFullScreen";
         eventName = prefix + "fullscreenchange";
       }
-
+      
+      if (prefix == "webkit") {
+        isFullScreen = prefix + "IsFullScreen";
+      } else {
+        isFullScreen = prefix + "FullScreen";
+      }
     });
 
   }

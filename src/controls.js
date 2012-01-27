@@ -140,7 +140,7 @@ _V_.FullscreenToggle = _V_.Button.extend({
   },
 
   onClick: function(){
-    if (!this.player.videoIsFullScreen) {
+    if (!this.player.isFullScreen) {
       this.player.requestFullScreen();
     } else {
       this.player.cancelFullScreen();
