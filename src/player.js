@@ -8,8 +8,8 @@ _V_.Player = _V_.Component.extend({
 
     var el = this.el = _V_.createElement("div"), // Div to contain video and controls
         options = this.options = {},
-        width = options.width = tag.width,
-        height = options.height = tag.height,
+        width = options.width = tag.getAttribute('width'),
+        height = options.height = tag.getAttribute('height'),
 
         // Browsers default to 300x150 if there's no width/height or video size data.
         initWidth = width || 300,
@@ -127,35 +127,37 @@ _V_.Player = _V_.Component.extend({
       tracks: []
     };
 
-    options.src = this.tag.src;
+    options.src = this.tag.getAttribute("src");
     options.controls = this.tag.getAttribute("controls") !== null;
-    options.poster = this.tag.poster;
-    options.preload = this.tag.preload;
+    options.poster = this.tag.getAttribute("poster");
+    options.preload = this.tag.getAttribute("preload");
     options.autoplay = this.tag.getAttribute("autoplay") !== null; // hasAttribute not IE <8 compatible
     options.loop = this.tag.getAttribute("loop") !== null;
     options.muted = this.tag.getAttribute("muted") !== null;
 
-    for (var c,i=0,j=this.tag.children;i<j.length;i++) {
-      c = j[i];
-      if (c.nodeName == "SOURCE") {
-        options.sources.push({
-          src: c.src,
-          type: c.type,
-          media: c.media,
-          title: c.title
-        });
-      }
-      if (c.nodeName == "TRACK") {
-        options.tracks.push(new _V_.Track({
-          src: c.getAttribute("src"),
-          kind: c.getAttribute("kind"),
-          srclang: c.getAttribute("srclang"),
-          label: c.getAttribute("label"),
-          'default': c.getAttribute("default") !== null,
-          title: c.getAttribute("title")
-        }, this));
-
-      }
+    if (this.tag.hasChildNodes()) {
+	    for (var c,i=0,j=this.tag.childNodes;i<j.length;i++) {
+	      c = j[i];
+	      if (c.nodeName == "SOURCE") {
+	        options.sources.push({
+	          src: c.getAttribute('src'),
+	          type: c.getAttribute('type'),
+	          media: c.getAttribute('media'),
+	          title: c.getAttribute('title')
+	        });
+	      }
+	      if (c.nodeName == "TRACK") {
+	        options.tracks.push(new _V_.Track({
+	          src: c.getAttribute("src"),
+	          kind: c.getAttribute("kind"),
+	          srclang: c.getAttribute("srclang"),
+	          label: c.getAttribute("label"),
+	          'default': c.getAttribute("default") !== null,
+	          title: c.getAttribute("title")
+	        }, this));
+	
+	      }
+	    }
     }
     return options;
   },
