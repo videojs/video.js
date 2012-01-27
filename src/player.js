@@ -136,28 +136,28 @@ _V_.Player = _V_.Component.extend({
     options.muted = this.tag.getAttribute("muted") !== null;
 
     if (this.tag.hasChildNodes()) {
-	    for (var c,i=0,j=this.tag.childNodes;i<j.length;i++) {
-	      c = j[i];
-	      if (c.nodeName == "SOURCE") {
-	        options.sources.push({
-	          src: c.getAttribute('src'),
-	          type: c.getAttribute('type'),
-	          media: c.getAttribute('media'),
-	          title: c.getAttribute('title')
-	        });
-	      }
-	      if (c.nodeName == "TRACK") {
-	        options.tracks.push(new _V_.Track({
-	          src: c.getAttribute("src"),
-	          kind: c.getAttribute("kind"),
-	          srclang: c.getAttribute("srclang"),
-	          label: c.getAttribute("label"),
-	          'default': c.getAttribute("default") !== null,
-	          title: c.getAttribute("title")
-	        }, this));
-	
-	      }
-	    }
+      for (var c,i=0,j=this.tag.childNodes;i<j.length;i++) {
+        c = j[i];
+        if (c.nodeName == "SOURCE") {
+          options.sources.push({
+            src: c.getAttribute('src'),
+            type: c.getAttribute('type'),
+            media: c.getAttribute('media'),
+            title: c.getAttribute('title')
+          });
+        }
+        if (c.nodeName == "TRACK") {
+          options.tracks.push(new _V_.Track({
+            src: c.getAttribute("src"),
+            kind: c.getAttribute("kind"),
+            srclang: c.getAttribute("srclang"),
+            label: c.getAttribute("label"),
+            'default': c.getAttribute("default") !== null,
+            title: c.getAttribute("title")
+          }, this));
+  
+        }
+      }
     }
     return options;
   },
