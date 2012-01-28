@@ -82,9 +82,6 @@ _V_.Player = _V_.Component.extend({
     if (options.controls) {
       this.ready(function(){
         this.initComponents();
-        // this.each(this.options.components, function(set){
-        //   this.addComponent(set);
-        // });
       });
     }
 

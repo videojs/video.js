@@ -45,12 +45,17 @@ _V_.Component = _V_.Class.extend({
   init: function(player, options){
     this.player = player;
 
-    if (options && options.el) {
+    // Allow for overridding default component options
+    options = this.options = _V_.merge(this.options || {}, options);
+
+    // Create element if one wasn't provided in options
+    if (options.el) {
       this.el = options.el;
     } else {
       this.el = this.createElement();
     }
 
+    // Add any components in options
     this.initComponents();
   },
 
@@ -69,7 +74,6 @@ _V_.Component = _V_.Class.extend({
   initComponents: function(){
     var options = this.options;
     if (options && options.components) {
-
       // Loop through components and add them to the player
       this.eachProp(options.components, function(name, opts){
         this.addComponent(name, opts);
@@ -93,13 +97,13 @@ _V_.Component = _V_.Class.extend({
     // If there's no .player, this is a player
     component = new _V_[componentClass](this.player || this, options);
 
+    _V_.log(component)
+
     // Add the UI object's element to the container div (box)
     this.el.appendChild(component.el);
 
     // Set property name on player. Could cause conflicts with other prop names, but it's worth making refs easy.
     this[name] = component;
-
-    return component;
   },
 
   /* Display
@@ -130,6 +134,9 @@ _V_.Component = _V_.Class.extend({
   },
   triggerEvent: function(type, e){
     return _V_.triggerEvent(this.el, type, e);
+  },
+  one: function(type, fn) {
+    _V_.one.call(this, this.el, type, fn);
   },
 
   /* Ready - Trigger functions when component is ready

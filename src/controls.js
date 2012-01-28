@@ -224,6 +224,7 @@ _V_.LoadingSpinner = _V_.Component.extend({
 _V_.ControlBar = _V_.Component.extend({
 
   options: {
+    loadEvent: "play",
     components: {
       "playToggle": {},
       "fullscreenToggle": {},
@@ -244,8 +245,6 @@ _V_.ControlBar = _V_.Component.extend({
 
     player.addEvent("mouseover", this.proxy(this.reveal));
     player.addEvent("mouseout", this.proxy(this.conceal));
-
-    this.hide();
   },
 
   createElement: function(){
@@ -462,6 +461,10 @@ _V_.Slider = _V_.Component.extend({
 
       // Move the handle from the left based on the adjected progress
       handle.el.style.left = _V_.round(adjustedProgress * 100, 2) + "%";
+
+      handle.el.style.left = _V_.round(adjustedProgress * 100, 2) + "%";
+
+      _V_.log(boxWidth, handleWidth, getComputedStyle(handle.el).width)
     }
 
     // Set the new bar width
