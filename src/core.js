@@ -52,9 +52,7 @@ VideoJS.options = {
   // techOrder: ["flash","html5"],
 
   html5: {},
-  flash: {
-    swf: "http://vjs.zencdn.net/c/video-js.swf"
-  },
+  flash: { swf: "http://vjs.zencdn.net/c/video-js.swf" },
 
   // Default of web browser is 300x150. Should rely on source width/height.
   width: "auto",
@@ -64,44 +62,52 @@ VideoJS.options = {
   defaultVolume: 0.00, // The freakin seaguls are driving me crazy!
 
   // Included control sets
-  components: [
-    "poster",
-    "loadingSpinner",
-    "bigPlayButton",
-    { name: "controlBar", options: {
-      components: [
-        "playToggle",
-        "fullscreenToggle",
-        "currentTimeDisplay",
-        "timeDivider",
-        "durationDisplay",
-        "remainingTimeDisplay",
-        { name: "progressControl", options: {
-          components: [
-            { name: "seekBar", options: {
-              components: [
-                "loadProgressBar",
-                "playProgressBar",
-                "seekHandle"
-              ]}
-            }
-          ]}
-        },
-        { name: "volumeControl", options: {
-          components: [
-            { name: "volumeBar", options: {
-              components: [
-                "volumeLevel",
-                "volumeHandle"
-              ]}
-            }
-          ]}
-        },
-        "muteToggle"
-      ]
-    }},
-    "subtitlesDisplay"/*, "replay"*/
-  ]
+  components: {
+    "poster": {},
+    "loadingSpinner": {},
+    "bigPlayButton": {},
+    "controlBar": {},
+    "subtitlesDisplay": {}
+  }
+
+  // components: [
+  //   "poster",
+  //   "loadingSpinner",
+  //   "bigPlayButton",
+  //   { name: "controlBar", options: {
+  //     components: [
+  //       "playToggle",
+  //       "fullscreenToggle",
+  //       "currentTimeDisplay",
+  //       "timeDivider",
+  //       "durationDisplay",
+  //       "remainingTimeDisplay",
+  //       { name: "progressControl", options: {
+  //         components: [
+  //           { name: "seekBar", options: {
+  //             components: [
+  //               "loadProgressBar",
+  //               "playProgressBar",
+  //               "seekHandle"
+  //             ]}
+  //           }
+  //         ]}
+  //       },
+  //       { name: "volumeControl", options: {
+  //         components: [
+  //           { name: "volumeBar", options: {
+  //             components: [
+  //               "volumeLevel",
+  //               "volumeHandle"
+  //             ]}
+  //           }
+  //         ]}
+  //       },
+  //       "muteToggle"
+  //     ]
+  //   }},
+  //   "subtitlesDisplay"/*, "replay"*/
+  // ]
 };
 
 // Set CDN Version of swf

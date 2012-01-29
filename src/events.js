@@ -226,6 +226,13 @@ _V_.extend({
     //     }
     //   }
     // }
+  },
+  
+  one: function(elem, type, fn) {
+    _V_.addEvent(elem, type, function(){
+      _V_.removeEvent(elem, type, arguments.callee)
+      fn.apply(this, arguments);
+    });
   }
 });
 
