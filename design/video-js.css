@@ -48,9 +48,30 @@ body.vjs-full-window {
   position: relative; width: 100%; max-height: 100%; 
 }
 
-
 /* Subtiles Styles */
 .video-js .vjs-subtitles { color: #fff; font-size: 20px; text-align: center; position: absolute; bottom: 40px; left: 0; right: 0; }
+
+/* Fading sytles, used to fade control bar. */
+.vjs-fade-in {
+  visibility: visible !important; /* Needed to make sure things hide in older browsers too. */
+  opacity: 1 !important;
+  
+  -webkit-transition: visibility 0s linear 0s, opacity 0.3s linear;
+  -moz-transition: visibility 0s linear 0s, opacity 0.3s linear;
+  -ms-transition: visibility 0s linear 0s, opacity 0.3s linear;
+  -o-transition: visibility 0s linear 0s, opacity 0.3s linear;
+  transition: visibility 0s linear 0s, opacity 0.3s linear;
+}
+.vjs-fade-out {
+  visibility: hidden !important;
+  opacity: 0 !important;
+
+  -webkit-transition: visibility 0s linear 1.5s,opacity 1.5s linear;
+  -moz-transition: visibility 0s linear 1.5s,opacity 1.5s linear;
+  -ms-transition: visibility 0s linear 1.5s,opacity 1.5s linear;
+  -o-transition: visibility 0s linear 1.5s,opacity 1.5s linear;
+  transition: visibility 0s linear 1.5s,opacity 1.5s linear;
+}
 
 /* DEFAULT SKIN (override in another file to create new skins)
 ================================================================================
@@ -62,8 +83,6 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
   position: absolute;
   bottom: 0; /* Distance from the bottom of the box/video. Keep 0. Use height to add more bottom margin. */
   left: 0; right: 0; /* 100% width of div */
-  opacity: 0.85; 
-/*  display: none; /* Start hidden */
   margin: 0; padding: 0; /* Controls are absolutely position, so no padding necessary */
   height: 2.6em; /* Including any margin you want above or below control items */
   color: #fff; border-top: 1px solid #404040;
@@ -80,12 +99,10 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
   /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#242424', endColorstr='#171717',GradientType=0 );*/ /* IE6-9 */
   background: linear-gradient(top, #242424 50%,#1f1f1f 50%,#171717 100%); /* W3C */
 
-  /* Fade-in using CSS Transitions */
-  -webkit-transition: opacity 0.3s linear;
-  -moz-transition: opacity 0.3s linear;
-  -o-transition: opacity 0.3s linear;
-  -ms-transition: opacity 0.3s linear;
-  transition: opacity 0.3s linear;
+  /* Start hidden and with 0 opacity. Opacity is used to fade in modern browsers. */
+  /* Can't use display block to hide initially because widths of slider handles aren't calculated and avaialbe for positioning correctly. */
+  visibility: hidden;
+  opacity: 0;
 }
 
 /* General styles for individual controls. */

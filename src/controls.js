@@ -241,10 +241,11 @@ _V_.ControlBar = _V_.Component.extend({
   init: function(player, options){
     this._super(player, options);
 
-    player.addEvent("play", this.proxy(this.show));
-
-    player.addEvent("mouseover", this.proxy(this.reveal));
-    player.addEvent("mouseout", this.proxy(this.conceal));
+    player.addEvent("play", this.proxy(function(){
+      this.fadeIn();
+      this.player.addEvent("mouseover", this.proxy(this.fadeIn));
+      this.player.addEvent("mouseout", this.proxy(this.fadeOut));
+    }));
   },
 
   createElement: function(){
@@ -253,21 +254,14 @@ _V_.ControlBar = _V_.Component.extend({
     });
   },
 
-  // Used for transitions (fading out)
-  reveal: function(){
-    this.el.style.opacity = 1;
-
-    // IE doesn't support opacity, so use display instead
-    if ( !('opacity' in document.body.style) ) {
-      this.show();
-    }
+  fadeIn: function(){
+    this._super();
+    this.player.triggerEvent("controlsvisible");
   },
 
-  conceal: function(){
-    this.el.style.opacity = 0;
-    if ( !('opacity' in document.body.style) ) {
-      this.hide();
-    }
+  fadeOut: function(){
+    this._super();
+    this.player.triggerEvent("controlshidden");
   }
 });
 
@@ -388,6 +382,11 @@ _V_.Slider = _V_.Component.extend({
     this.addEvent("focus", this.onFocus);
     this.addEvent("blur", this.onBlur);
 
+    this.player.addEvent("controlsvisible", this.proxy(this.update));
+
+    // This is actually to fix the volume handle position. http://twitter.com/#!/gerritvanaaken/status/159046254519787520
+    // this.player.one("timeupdate", this.proxy(this.update));
+
     this.update();
   },
 
@@ -461,10 +460,6 @@ _V_.Slider = _V_.Component.extend({
 
       // Move the handle from the left based on the adjected progress
       handle.el.style.left = _V_.round(adjustedProgress * 100, 2) + "%";
-
-      handle.el.style.left = _V_.round(adjustedProgress * 100, 2) + "%";
-
-      _V_.log(boxWidth, handleWidth, getComputedStyle(handle.el).width)
     }
 
     // Set the new bar width

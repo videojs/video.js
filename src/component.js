@@ -76,7 +76,17 @@ _V_.Component = _V_.Class.extend({
     if (options && options.components) {
       // Loop through components and add them to the player
       this.eachProp(options.components, function(name, opts){
-        this.addComponent(name, opts);
+
+        // Allow waiting to add components until a specific event is called
+        var tempAdd = this.proxy(function(){
+          this.addComponent(name, opts);
+        });
+
+        if (opts.loadEvent) {
+          this.one(opts.loadEvent, tempAdd)
+        } else {
+          tempAdd();
+        }
       });
     }
   },
@@ -97,8 +107,6 @@ _V_.Component = _V_.Class.extend({
     // If there's no .player, this is a player
     component = new _V_[componentClass](this.player || this, options);
 
-    _V_.log(component)
-
     // Add the UI object's element to the container div (box)
     this.el.appendChild(component.el);
 
@@ -114,6 +122,16 @@ _V_.Component = _V_.Class.extend({
 
   hide: function(){
     this.el.style.display = "none";
+  },
+  
+  fadeIn: function(){
+    this.removeClass("vjs-fade-out");
+    this.addClass("vjs-fade-in");
+  },
+
+  fadeOut: function(){
+    this.removeClass("vjs-fade-in");
+    this.addClass("vjs-fade-out");
   },
 
   addClass: function(classToAdd){
