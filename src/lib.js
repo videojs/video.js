@@ -39,7 +39,8 @@ _V_.extend({
     }
   },
 
-  objEach: function(obj, fn){
+  eachProp: function(obj, fn){
+    if (!obj) { return; }
     for (var name in obj) {
       if (obj.hasOwnProperty(name)) {
         fn.call(this, name, obj[name]);
