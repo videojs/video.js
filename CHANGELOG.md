@@ -1,3 +1,4 @@
+* Fixed issue with volume knob position. Improved controls fading.
 * Fixed ian issue with triggering fullscreen a second time.
 * Fixed issue with getting attributes in Firefox 3.0
 * Escaping special characters in source URL for Flash
