@@ -1,3 +1,7 @@
+* Fixed issue with volume knob position. Improved controls fading.
+* Fixed ian issue with triggering fullscreen a second time.
+* Fixed issue with getting attributes in Firefox 3.0
+* Escaping special characters in source URL for Flash
 * Added a check for if Firefox is enabled which fixes a Firefox 9 issue
 * Stopped spinner from showing on 'stalled' events since browsers sometimes don't show that they've recovered.
 * Fixed CDN Version which was breaking dev.html
@@ -24,3 +28,6 @@ CHANGELOG
 
 ---- 3.0.7 / 2012-01-12 / fixing-ie8-poster-bug --------------------------------
 * Fixed an ie8 breaking bug with the poster
+
+---- 3.0.8 / 2012-01-23 / fix-ie-controls-hiding -------------------------------
+* Fixed issue with controls not hiding in IE due to no opacity support

@@ -8,8 +8,8 @@ _V_.Player = _V_.Component.extend({
 
     var el = this.el = _V_.createElement("div"), // Div to contain video and controls
         options = this.options = {},
-        width = options.width = tag.width,
-        height = options.height = tag.height,
+        width = options.width = tag.getAttribute('width'),
+        height = options.height = tag.getAttribute('height'),
 
         // Browsers default to 300x150 if there's no width/height or video size data.
         initWidth = width || 300,
@@ -81,9 +81,7 @@ _V_.Player = _V_.Component.extend({
     // When the API is ready, loop through the components and add to the player.
     if (options.controls) {
       this.ready(function(){
-        this.each(this.options.components, function(set){
-          this.addComponent(set);
-        });
+        this.initComponents();
       });
     }
 
@@ -127,34 +125,36 @@ _V_.Player = _V_.Component.extend({
       tracks: []
     };
 
-    options.src = this.tag.src;
+    options.src = this.tag.getAttribute("src");
     options.controls = this.tag.getAttribute("controls") !== null;
-    options.poster = this.tag.poster;
-    options.preload = this.tag.preload;
+    options.poster = this.tag.getAttribute("poster");
+    options.preload = this.tag.getAttribute("preload");
     options.autoplay = this.tag.getAttribute("autoplay") !== null; // hasAttribute not IE <8 compatible
     options.loop = this.tag.getAttribute("loop") !== null;
     options.muted = this.tag.getAttribute("muted") !== null;
 
-    for (var c,i=0,j=this.tag.children;i<j.length;i++) {
-      c = j[i];
-      if (c.nodeName == "SOURCE") {
-        options.sources.push({
-          src: c.src,
-          type: c.type,
-          media: c.media,
-          title: c.title
-        });
-      }
-      if (c.nodeName == "TRACK") {
-        options.tracks.push(new _V_.Track({
-          src: c.getAttribute("src"),
-          kind: c.getAttribute("kind"),
-          srclang: c.getAttribute("srclang"),
-          label: c.getAttribute("label"),
-          'default': c.getAttribute("default") !== null,
-          title: c.getAttribute("title")
-        }, this));
-
+    if (this.tag.hasChildNodes()) {
+      for (var c,i=0,j=this.tag.childNodes;i<j.length;i++) {
+        c = j[i];
+        if (c.nodeName == "SOURCE") {
+          options.sources.push({
+            src: c.getAttribute('src'),
+            type: c.getAttribute('type'),
+            media: c.getAttribute('media'),
+            title: c.getAttribute('title')
+          });
+        }
+        if (c.nodeName == "TRACK") {
+          options.tracks.push(new _V_.Track({
+            src: c.getAttribute("src"),
+            kind: c.getAttribute("kind"),
+            srclang: c.getAttribute("srclang"),
+            label: c.getAttribute("label"),
+            'default': c.getAttribute("default") !== null,
+            title: c.getAttribute("title")
+          }, this));
+  
+        }
       }
     }
     return options;
@@ -487,6 +487,11 @@ _V_.Player = _V_.Component.extend({
         this.el[requestFullScreen.requestFn]();
       }
 
+      // In case the user presses escape to exit fullscreen, we need to update fullscreen status
+      _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
+        this.isFullScreen = document[requestFullScreen.isFullScreen];
+      }));
+
     } else if (this.tech.supportsFullScreen()) {
       this.apiCall("enterFullScreen");
 
@@ -494,7 +499,7 @@ _V_.Player = _V_.Component.extend({
       this.enterFullWindow();
     }
 
-     this.videoIsFullScreen = true;
+     this.isFullScreen = true;
      this.triggerEvent("fullscreenchange");
 
      return this;
@@ -515,7 +520,6 @@ _V_.Player = _V_.Component.extend({
 
        _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
          _V_.removeEvent(document, requestFullScreen.eventName, arguments.callee);
-         _V_.log("document fullscreeneventchange")
          this.loadTech(this.techName, { src: this.values.src })
        }));
 
@@ -532,14 +536,14 @@ _V_.Player = _V_.Component.extend({
      this.exitFullWindow();
     }
 
-    this.videoIsFullScreen = false;
+    this.isFullScreen = false;
     this.triggerEvent("fullscreenchange");
 
     return this;
   },
 
   enterFullWindow: function(){
-    this.videoIsFullWindow = true;
+    this.isFullWindow = true;
 
     // Storing original doc overflow value to return to when fullscreen is off
     this.docOrigOverflow = document.documentElement.style.overflow;
@@ -559,7 +563,7 @@ _V_.Player = _V_.Component.extend({
 
   fullWindowOnEscKey: function(event){
     if (event.keyCode == 27) {
-      if (this.videoIsFullScreen == true) {
+      if (this.isFullScreen == true) {
         this.cancelFullScreen();
       } else {
         this.exitFullWindow();
@@ -568,7 +572,7 @@ _V_.Player = _V_.Component.extend({
   },
 
   exitFullWindow: function(){
-    this.videoIsFullWindow = false;
+    this.isFullWindow = false;
     _V_.removeEvent(document, "keydown", this.fullWindowOnEscKey);
 
     // Unhide scroll bars.
@@ -729,6 +733,8 @@ _V_.Player = _V_.Component.extend({
 (function(){
   var requestFn,
       cancelFn,
+      eventName,
+      isFullScreen,
       playerProto = _V_.Player.prototype;
 
   // Current W3C Spec
@@ -738,6 +744,7 @@ _V_.Player = _V_.Component.extend({
     requestFn = "requestFullscreen";
     cancelFn = "exitFullscreen";
     eventName = "fullscreenchange";
+    isFullScreen = "fullScreen";
 
   // Webkit (Chrome/Safari) and Mozilla (Firefox) have working implementaitons
   // that use prefixes and vary slightly from the new W3C spec. Specifically, using 'exit' instead of 'cancel',
@@ -753,7 +760,12 @@ _V_.Player = _V_.Component.extend({
         cancelFn = prefix + "CancelFullScreen";
         eventName = prefix + "fullscreenchange";
       }
-
+      
+      if (prefix == "webkit") {
+        isFullScreen = prefix + "IsFullScreen";
+      } else {
+        isFullScreen = prefix + "FullScreen";
+      }
     });
 
   }
