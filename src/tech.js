@@ -518,7 +518,8 @@ _V_.flash = _V_.PlaybackTech.extend({
 /* Flash Support Testing -------------------------------------------------------- */
 
 _V_.flash.isSupported = function(){
-  return swfobject.hasFlashPlayerVersion("10");
+  return _V_.flash.version()[0] >= 10;
+  // return swfobject.hasFlashPlayerVersion("10");
 };
 
 _V_.flash.canPlaySource = function(srcObj){
