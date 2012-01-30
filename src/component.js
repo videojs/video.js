@@ -189,31 +189,13 @@ _V_.Component = _V_.Class.extend({
 
   /* Utility
   ================================================================================ */
-  each: function(arr, fn){
-    if (!arr || arr.length === 0) { return; }
-    for (var i=0,j=arr.length; i<j; i++) {
-      if (fn.call(this, arr[i], i)) { break; }
-    }
-  },
+  each: function(arr, fn){ _V_.each.call(this, arr, fn); },
 
-  eachProp: function(obj, fn){
-    if (!obj) { return; }
-    for (var name in obj) {
-      if (obj.hasOwnProperty(name)) {
-        fn.call(this, name, obj[name]);
-      }
-    }
-  },
+  eachProp: function(obj, fn){ _V_.eachProp.call(this, obj, fn); },
 
-  extend: function(obj){
-    for (var attrname in obj) {
-      if (obj.hasOwnProperty(attrname)) { this[attrname]=obj[attrname]; }
-    }
-  },
+  extend: function(obj){ _V_.merge(this, obj) },
 
   // More easily attach 'this' to functions
-  proxy: function(fn){
-    return _V_.proxy(this, fn);
-  }
+  proxy: function(fn){  return _V_.proxy(this, fn); }
 
 });

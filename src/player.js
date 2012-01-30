@@ -227,15 +227,15 @@ _V_.Player = _V_.Component.extend({
   // First is a plugin reload issue in Firefox that has been around for 11 years: https://bugzilla.mozilla.org/show_bug.cgi?id=90268
   // Then with the new fullscreen API, Mozilla and webkit browsers will reload the flash object after going to fullscreen.
   // To get around this, we're unloading the tech, caching source and currentTime values, and reloading the tech once the plugin is resized.
-  reloadTech: function(betweenFn){
-    _V_.log("unloadingTech")
-    this.unloadTech();
-    _V_.log("unloadedTech")
-    if (betweenFn) { betweenFn.call(); }
-    _V_.log("LoadingTech")
-    this.loadTech(this.techName, { src: this.values.src })
-    _V_.log("loadedTech")
-  },
+  // reloadTech: function(betweenFn){
+  //   _V_.log("unloadingTech")
+  //   this.unloadTech();
+  //   _V_.log("unloadedTech")
+  //   if (betweenFn) { betweenFn.call(); }
+  //   _V_.log("LoadingTech")
+  //   this.loadTech(this.techName, { src: this.values.src })
+  //   _V_.log("loadedTech")
+  // },
 
   /* Fallbacks for unsupported event types
   ================================================================================ */
@@ -463,18 +463,17 @@ _V_.Player = _V_.Component.extend({
   requestFullScreen: function(){
     var requestFullScreen = _V_.support.requestFullScreen;
 
+    this.isFullScreen = true;
+
     // Check for browser element fullscreen support
     if (requestFullScreen) {
+
       // Flash and other plugins get reloaded when you take their parent to fullscreen.
       // To fix that we'll remove the tech, and reload it after the resize has finished.
-      if (this.tech.support.fullscreenResize === false) {
+      if (this.tech.support.fullscreenResize === false && this.options.flash.iFrameMode != true) {
 
         this.pause();
         this.unloadTech();
-
-        _V_.addEvent(document, "keydown", _V_.proxy(this, function(e){
-          _V_.log("asdf", e)
-        }));
 
         _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
           _V_.removeEvent(document, requestFullScreen.eventName, arguments.callee);
@@ -499,7 +498,6 @@ _V_.Player = _V_.Component.extend({
       this.enterFullWindow();
     }
 
-     this.isFullScreen = true;
      this.triggerEvent("fullscreenchange");
 
      return this;
@@ -513,7 +511,7 @@ _V_.Player = _V_.Component.extend({
 
      // Flash and other plugins get reloaded when you take their parent to fullscreen.
      // To fix that we'll remove the tech, and reload it after the resize has finished.
-     if (this.tech.support.fullscreenResize === false) {
+     if (this.tech.support.fullscreenResize === false && this.options.flash.iFrameMode != true) {
 
        this.pause();
        this.unloadTech();
@@ -759,13 +757,15 @@ _V_.Player = _V_.Component.extend({
         requestFn = prefix + "RequestFullScreen";
         cancelFn = prefix + "CancelFullScreen";
         eventName = prefix + "fullscreenchange";
+
+        if (prefix == "webkit") {
+          isFullScreen = prefix + "IsFullScreen";
+        } else {
+          _V_.log("moz here")
+          isFullScreen = prefix + "FullScreen";
+        }
       }
-      
-      if (prefix == "webkit") {
-        isFullScreen = prefix + "IsFullScreen";
-      } else {
-        isFullScreen = prefix + "FullScreen";
-      }
+
     });
 
   }
@@ -774,7 +774,8 @@ _V_.Player = _V_.Component.extend({
     _V_.support.requestFullScreen = {
       requestFn: requestFn,
       cancelFn: cancelFn,
-      eventName: eventName
+      eventName: eventName,
+      isFullScreen: isFullScreen
     };
   }
 
