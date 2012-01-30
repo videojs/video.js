@@ -1,3 +1,4 @@
+* Replaced swfobject with custom embed to save file size.
 * Added  flash iframe-mode, an experimental method for getting around flash reloading issues.
 * Fixed issue with volume knob position. Improved controls fading.
 * Fixed ian issue with triggering fullscreen a second time.
