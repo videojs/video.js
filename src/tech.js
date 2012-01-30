@@ -335,7 +335,7 @@ _V_.flash = _V_.PlaybackTech.extend({
     //    Not sure why that even works, but it causes the browser to look like it's continuously trying to load the page.
     // Firefox 3.6 keeps calling the iframe onload function anytime I write to it, causing an endless loop.
 
-    if (options.iFrameMode !== false && !_V_.isFF) { // Default to iFrameMode.
+    if (options.iFrameMode == true && !_V_.isFF) {
 
       // Create iFrame with vjs-tech class so it's 100% width/height
       var iFrm = _V_.createElement("iframe", {
