@@ -8,8 +8,8 @@ _V_.Player = _V_.Component.extend({
 
     var el = this.el = _V_.createElement("div"), // Div to contain video and controls
         options = this.options = {},
-        width = options.width = tag.width,
-        height = options.height = tag.height,
+        width = options.width = tag.getAttribute('width'),
+        height = options.height = tag.getAttribute('height'),
 
         // Browsers default to 300x150 if there's no width/height or video size data.
         initWidth = width || 300,
@@ -81,9 +81,7 @@ _V_.Player = _V_.Component.extend({
     // When the API is ready, loop through the components and add to the player.
     if (options.controls) {
       this.ready(function(){
-        this.each(this.options.components, function(set){
-          this.addComponent(set);
-        });
+        this.initComponents();
       });
     }
 
@@ -127,34 +125,36 @@ _V_.Player = _V_.Component.extend({
       tracks: []
     };
 
-    options.src = this.tag.src;
+    options.src = this.tag.getAttribute("src");
     options.controls = this.tag.getAttribute("controls") !== null;
-    options.poster = this.tag.poster;
-    options.preload = this.tag.preload;
+    options.poster = this.tag.getAttribute("poster");
+    options.preload = this.tag.getAttribute("preload");
     options.autoplay = this.tag.getAttribute("autoplay") !== null; // hasAttribute not IE <8 compatible
     options.loop = this.tag.getAttribute("loop") !== null;
     options.muted = this.tag.getAttribute("muted") !== null;
 
-    for (var c,i=0,j=this.tag.children;i<j.length;i++) {
-      c = j[i];
-      if (c.nodeName == "SOURCE") {
-        options.sources.push({
-          src: c.src,
-          type: c.type,
-          media: c.media,
-          title: c.title
-        });
-      }
-      if (c.nodeName == "TRACK") {
-        options.tracks.push(new _V_.Track({
-          src: c.getAttribute("src"),
-          kind: c.getAttribute("kind"),
-          srclang: c.getAttribute("srclang"),
-          label: c.getAttribute("label"),
-          'default': c.getAttribute("default") !== null,
-          title: c.getAttribute("title")
-        }, this));
-
+    if (this.tag.hasChildNodes()) {
+      for (var c,i=0,j=this.tag.childNodes;i<j.length;i++) {
+        c = j[i];
+        if (c.nodeName == "SOURCE") {
+          options.sources.push({
+            src: c.getAttribute('src'),
+            type: c.getAttribute('type'),
+            media: c.getAttribute('media'),
+            title: c.getAttribute('title')
+          });
+        }
+        if (c.nodeName == "TRACK") {
+          options.tracks.push(new _V_.Track({
+            src: c.getAttribute("src"),
+            kind: c.getAttribute("kind"),
+            srclang: c.getAttribute("srclang"),
+            label: c.getAttribute("label"),
+            'default': c.getAttribute("default") !== null,
+            title: c.getAttribute("title")
+          }, this));
+  
+        }
       }
     }
     return options;
@@ -227,15 +227,15 @@ _V_.Player = _V_.Component.extend({
   // First is a plugin reload issue in Firefox that has been around for 11 years: https://bugzilla.mozilla.org/show_bug.cgi?id=90268
   // Then with the new fullscreen API, Mozilla and webkit browsers will reload the flash object after going to fullscreen.
   // To get around this, we're unloading the tech, caching source and currentTime values, and reloading the tech once the plugin is resized.
-  reloadTech: function(betweenFn){
-    _V_.log("unloadingTech")
-    this.unloadTech();
-    _V_.log("unloadedTech")
-    if (betweenFn) { betweenFn.call(); }
-    _V_.log("LoadingTech")
-    this.loadTech(this.techName, { src: this.values.src })
-    _V_.log("loadedTech")
-  },
+  // reloadTech: function(betweenFn){
+  //   _V_.log("unloadingTech")
+  //   this.unloadTech();
+  //   _V_.log("unloadedTech")
+  //   if (betweenFn) { betweenFn.call(); }
+  //   _V_.log("LoadingTech")
+  //   this.loadTech(this.techName, { src: this.values.src })
+  //   _V_.log("loadedTech")
+  // },
 
   /* Fallbacks for unsupported event types
   ================================================================================ */
@@ -463,18 +463,17 @@ _V_.Player = _V_.Component.extend({
   requestFullScreen: function(){
     var requestFullScreen = _V_.support.requestFullScreen;
 
+    this.isFullScreen = true;
+
     // Check for browser element fullscreen support
     if (requestFullScreen) {
+
       // Flash and other plugins get reloaded when you take their parent to fullscreen.
       // To fix that we'll remove the tech, and reload it after the resize has finished.
-      if (this.tech.support.fullscreenResize === false) {
+      if (this.tech.support.fullscreenResize === false && this.options.flash.iFrameMode != true) {
 
         this.pause();
         this.unloadTech();
-
-        _V_.addEvent(document, "keydown", _V_.proxy(this, function(e){
-          _V_.log("asdf", e)
-        }));
 
         _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
           _V_.removeEvent(document, requestFullScreen.eventName, arguments.callee);
@@ -487,6 +486,11 @@ _V_.Player = _V_.Component.extend({
         this.el[requestFullScreen.requestFn]();
       }
 
+      // In case the user presses escape to exit fullscreen, we need to update fullscreen status
+      _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
+        this.isFullScreen = document[requestFullScreen.isFullScreen];
+      }));
+
     } else if (this.tech.supportsFullScreen()) {
       this.apiCall("enterFullScreen");
 
@@ -494,7 +498,6 @@ _V_.Player = _V_.Component.extend({
       this.enterFullWindow();
     }
 
-     this.videoIsFullScreen = true;
      this.triggerEvent("fullscreenchange");
 
      return this;
@@ -508,14 +511,13 @@ _V_.Player = _V_.Component.extend({
 
      // Flash and other plugins get reloaded when you take their parent to fullscreen.
      // To fix that we'll remove the tech, and reload it after the resize has finished.
-     if (this.tech.support.fullscreenResize === false) {
+     if (this.tech.support.fullscreenResize === false && this.options.flash.iFrameMode != true) {
 
        this.pause();
        this.unloadTech();
 
        _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
          _V_.removeEvent(document, requestFullScreen.eventName, arguments.callee);
-         _V_.log("document fullscreeneventchange")
          this.loadTech(this.techName, { src: this.values.src })
        }));
 
@@ -532,14 +534,14 @@ _V_.Player = _V_.Component.extend({
      this.exitFullWindow();
     }
 
-    this.videoIsFullScreen = false;
+    this.isFullScreen = false;
     this.triggerEvent("fullscreenchange");
 
     return this;
   },
 
   enterFullWindow: function(){
-    this.videoIsFullScreen = true;
+    this.isFullWindow = true;
 
     // Storing original doc overflow value to return to when fullscreen is off
     this.docOrigOverflow = document.documentElement.style.overflow;
@@ -559,12 +561,16 @@ _V_.Player = _V_.Component.extend({
 
   fullWindowOnEscKey: function(event){
     if (event.keyCode == 27) {
-      this.cancelFullScreen();
+      if (this.isFullScreen == true) {
+        this.cancelFullScreen();
+      } else {
+        this.exitFullWindow();
+      }
     }
   },
 
   exitFullWindow: function(){
-    this.videoIsFullScreen = false;
+    this.isFullWindow = false;
     _V_.removeEvent(document, "keydown", this.fullWindowOnEscKey);
 
     // Unhide scroll bars.
@@ -608,7 +614,7 @@ _V_.Player = _V_.Component.extend({
             if (tech.canPlaySource.call(this, source)) {
 
               // If this technology is already loaded, set source
-              if (techName == this.currentTechName) {
+              if (techName == this.techName) {
                 this.src(source); // Passing the source object
 
               // Otherwise load this technology with chosen source
@@ -725,6 +731,8 @@ _V_.Player = _V_.Component.extend({
 (function(){
   var requestFn,
       cancelFn,
+      eventName,
+      isFullScreen,
       playerProto = _V_.Player.prototype;
 
   // Current W3C Spec
@@ -734,6 +742,7 @@ _V_.Player = _V_.Component.extend({
     requestFn = "requestFullscreen";
     cancelFn = "exitFullscreen";
     eventName = "fullscreenchange";
+    isFullScreen = "fullScreen";
 
   // Webkit (Chrome/Safari) and Mozilla (Firefox) have working implementaitons
   // that use prefixes and vary slightly from the new W3C spec. Specifically, using 'exit' instead of 'cancel',
@@ -743,10 +752,18 @@ _V_.Player = _V_.Component.extend({
 
     _V_.each(["moz", "webkit"], function(prefix){
 
-      if (document[prefix + "CancelFullScreen"] !== undefined) {
+      // https://github.com/zencoder/video-js/pull/128
+      if ((prefix != "moz" || document.mozFullScreenEnabled) && document[prefix + "CancelFullScreen"] !== undefined) {
         requestFn = prefix + "RequestFullScreen";
         cancelFn = prefix + "CancelFullScreen";
         eventName = prefix + "fullscreenchange";
+
+        if (prefix == "webkit") {
+          isFullScreen = prefix + "IsFullScreen";
+        } else {
+          _V_.log("moz here")
+          isFullScreen = prefix + "FullScreen";
+        }
       }
 
     });
@@ -757,7 +774,8 @@ _V_.Player = _V_.Component.extend({
     _V_.support.requestFullScreen = {
       requestFn: requestFn,
       cancelFn: cancelFn,
-      eventName: eventName
+      eventName: eventName,
+      isFullScreen: isFullScreen
     };
   }
 

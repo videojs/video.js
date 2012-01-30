@@ -186,7 +186,7 @@ Now that you have access to a ready player, you can control the video or respond
 
 {% highlight javascript %}
 
-  myPlayer.enterFullScreen();
+  myPlayer.requestFullScreen();
 
 {% endhighlight %}
 
@@ -197,7 +197,7 @@ Now that you have access to a ready player, you can control the video or respond
 
 {% highlight javascript %}
 
-  myPlayer.exitFullScreen();
+  myPlayer.cancelFullScreen();
 
 {% endhighlight %}
 

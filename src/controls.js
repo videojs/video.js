@@ -140,7 +140,7 @@ _V_.FullscreenToggle = _V_.Button.extend({
   },
 
   onClick: function(){
-    if (!this.player.videoIsFullScreen) {
+    if (!this.player.isFullScreen) {
       this.player.requestFullScreen();
     } else {
       this.player.cancelFullScreen();
@@ -188,7 +188,11 @@ _V_.LoadingSpinner = _V_.Component.extend({
 
     player.addEvent("seeking", _V_.proxy(this, this.show));
     player.addEvent("error", _V_.proxy(this, this.show));
-    player.addEvent("stalled", _V_.proxy(this, this.show));
+
+    // Not showing spinner on stalled any more. Browsers may stall and then not trigger any events that would remove the spinner.
+    // Checked in Chrome 16 and Safari 5.1.2. http://help.videojs.com/discussions/problems/883-why-is-the-download-progress-showing
+    // player.addEvent("stalled", _V_.proxy(this, this.show));
+
     player.addEvent("waiting", _V_.proxy(this, this.show));
   },
 
@@ -218,13 +222,30 @@ _V_.LoadingSpinner = _V_.Component.extend({
 /* Control Bar
 ================================================================================ */
 _V_.ControlBar = _V_.Component.extend({
+
+  options: {
+    loadEvent: "play",
+    components: {
+      "playToggle": {},
+      "fullscreenToggle": {},
+      "currentTimeDisplay": {},
+      "timeDivider": {},
+      "durationDisplay": {},
+      "remainingTimeDisplay": {},
+      "progressControl": {},
+      "volumeControl": {},
+      "muteToggle": {}
+    }
+  },
+
   init: function(player, options){
     this._super(player, options);
 
-    player.addEvent("play", this.proxy(this.show));
-
-    player.addEvent("mouseover", this.proxy(this.reveal));
-    player.addEvent("mouseout", this.proxy(this.conceal));
+    player.addEvent("play", this.proxy(function(){
+      this.fadeIn();
+      this.player.addEvent("mouseover", this.proxy(this.fadeIn));
+      this.player.addEvent("mouseout", this.proxy(this.fadeOut));
+    }));
   },
 
   createElement: function(){
@@ -233,21 +254,14 @@ _V_.ControlBar = _V_.Component.extend({
     });
   },
 
-  // Used for transitions (fading out)
-  reveal: function(){
-    this.el.style.opacity = 1;
-
-    // IE doesn't support opacity, so use display instead
-    if ( !('opacity' in document.body.style) ) {
-      this.show();
-    }
+  fadeIn: function(){
+    this._super();
+    this.player.triggerEvent("controlsvisible");
   },
 
-  conceal: function(){
-    this.el.style.opacity = 0;
-    if ( !('opacity' in document.body.style) ) {
-      this.hide();
-    }
+  fadeOut: function(){
+    this._super();
+    this.player.triggerEvent("controlshidden");
   }
 });
 
@@ -362,24 +376,18 @@ _V_.Slider = _V_.Component.extend({
   init: function(player, options){
     this._super(player, options);
 
-    _V_.each.call(this, this.components, function(comp){
-      if (comp instanceof _V_[this.barClass]) {
-        this.bar = comp;
-      } else if (comp instanceof _V_[this.handleClass]) {
-        this.handle = comp;
-      }
-    });
-
     player.addEvent(this.playerEvent, _V_.proxy(this, this.update));
 
     this.addEvent("mousedown", this.onMouseDown);
     this.addEvent("focus", this.onFocus);
     this.addEvent("blur", this.onBlur);
 
-    // Update Display
-    // Need to wait for styles to be loaded.
-    // TODO - replace setTimeout with stylesReady function.
-    setTimeout(this.proxy(this.update), 0);
+    this.player.addEvent("controlsvisible", this.proxy(this.update));
+
+    // This is actually to fix the volume handle position. http://twitter.com/#!/gerritvanaaken/status/159046254519787520
+    // this.player.one("timeupdate", this.proxy(this.update));
+
+    this.update();
   },
 
   createElement: function(type, attrs) {
@@ -430,12 +438,15 @@ _V_.Slider = _V_.Component.extend({
     // If there is a handle, we need to account for the handle in our calculation for progress bar
     // so that it doesn't fall short of or extend past the handle.
     if (handle) {
+
       var box = this.el,
           boxWidth = box.offsetWidth,
 
+          handleWidth = handle.el.offsetWidth,
+
           // The width of the handle in percent of the containing box
           // In IE, widths may not be ready yet causing NaN
-          handlePercent = (handle.el.offsetWidth) ? handle.el.offsetWidth / boxWidth : 0,
+          handlePercent = (handleWidth) ? handleWidth / boxWidth : 0,
 
           // Get the adjusted size of the box, considering that the handle's center never touches the left or right side.
           // There is a margin of half the handle's width on both sides.
@@ -499,6 +510,12 @@ _V_.Slider = _V_.Component.extend({
 // Progress Control: Seek, Load Progress, and Play Progress
 _V_.ProgressControl = _V_.Component.extend({
 
+  options: {
+    components: {
+      "seekBar": {}
+    }
+  },
+
   createElement: function(){
     return this._super("div", {
       className: "vjs-progress-control vjs-control"
@@ -510,8 +527,16 @@ _V_.ProgressControl = _V_.Component.extend({
 // Seek Bar and holder for the progress bars
 _V_.SeekBar = _V_.Slider.extend({
 
-  barClass: "PlayProgressBar",
-  handleClass: "SeekHandle",
+  options: {
+    components: {
+      "loadProgressBar": {},
+
+      // Set property names to bar and handle to match with the parent Slider class is looking for
+      "bar": { componentClass: "PlayProgressBar" },
+      "handle": { componentClass: "SeekHandle" }
+    }
+  },
+
   playerEvent: "timeupdate",
 
   init: function(player, options){
@@ -618,6 +643,12 @@ _V_.SeekHandle = _V_.Component.extend({
 // Progress Control: Seek, Load Progress, and Play Progress
 _V_.VolumeControl = _V_.Component.extend({
 
+  options: {
+    components: {
+      "volumeBar": {}
+    }
+  },
+
   createElement: function(){
     return this._super("div", {
       className: "vjs-volume-control vjs-control"
@@ -628,8 +659,13 @@ _V_.VolumeControl = _V_.Component.extend({
 
 _V_.VolumeBar = _V_.Slider.extend({
 
-  barClass: "VolumeLevel",
-  handleClass: "VolumeHandle",
+  options: {
+    components: {
+      "bar": { componentClass: "VolumeLevel" },
+      "handle": { componentClass: "VolumeHandle" }
+    }
+  },
+
   playerEvent: "volumechange",
 
   createElement: function(){

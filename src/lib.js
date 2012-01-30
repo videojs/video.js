@@ -15,6 +15,7 @@ _V_.extend({
 
   // Device Checks
   isIE: function(){ return !+"\v1"; },
+  isFF: function(){ return !!_V_.ua.match("Firefox") },
   isIPad: function(){ return navigator.userAgent.match(/iPad/i) !== null; },
   isIPhone: function(){ return navigator.userAgent.match(/iPhone/i) !== null; },
   isIOS: function(){ return VideoJS.isIPhone() || VideoJS.isIPad(); },
@@ -36,6 +37,15 @@ _V_.extend({
     if (!arr || arr.length === 0) { return; }
     for (var i=0,j=arr.length; i<j; i++) {
       fn.call(this, arr[i], i);
+    }
+  },
+
+  eachProp: function(obj, fn){
+    if (!obj) { return; }
+    for (var name in obj) {
+      if (obj.hasOwnProperty(name)) {
+        fn.call(this, name, obj[name]);
+      }
     }
   },
 

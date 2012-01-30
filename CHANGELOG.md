@@ -21,4 +21,18 @@ CHANGELOG
 * Fixed an ie8 breaking bug with the poster
 
 ---- 3.0.8 / 2012-01-23 / fix-ie-controls-hiding -------------------------------
-* CFixed issue with controls not hiding in IE due to no opacity support
+* Fixed issue with controls not hiding in IE due to no opacity support
+
+---- 3.1.0 / 2012-01-30 / leonardo ---------------------------------------------
+* Added CSS fix for Firefox 9 fullscreen (in the rare case that it's enabled)
+* Replaced swfobject with custom embed to save file size.
+* Added  flash iframe-mode, an experimental method for getting around flash reloading issues.
+* Fixed issue with volume knob position. Improved controls fading.
+* Fixed ian issue with triggering fullscreen a second time.
+* Fixed issue with getting attributes in Firefox 3.0
+* Escaping special characters in source URL for Flash
+* Added a check for if Firefox is enabled which fixes a Firefox 9 issue
+* Stopped spinner from showing on 'stalled' events since browsers sometimes don't show that they've recovered.
+* Fixed CDN Version which was breaking dev.html
+* Made full-window mode more independent
+* Added rakefile for release generation

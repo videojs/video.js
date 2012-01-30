@@ -38,7 +38,10 @@ var VideoJS = function(id, addOptions, ready){
 },
 
 // Shortcut
-_V_ = VideoJS;
+_V_ = VideoJS,
+
+// CDN Version. Used to target right flash swf.
+CDN_VERSION = "GENERATED_CDN_VSN";
 
 VideoJS.players = {};
 
@@ -49,15 +52,7 @@ VideoJS.options = {
   // techOrder: ["flash","html5"],
 
   html5: {},
-  flash: {
-    swf: "http://vjs.zencdn.net/c/video-js.swf"
-    // swf: "https://s3.amazonaws.com/video-js/3.0b/video-js.swf"
-    // swf: "http://video-js.zencoder.com/3.0b/video-js.swf"
-    // swf: "http://video-js.com/test/video-js.swf"
-    // swf: "http://video-js.com/source/flash/video-js.swf"
-    // swf: "http://video-js.com/source/flash/video-js.swf"
-    // swf: "video-js.swf"
-  },
+  flash: { swf: "http://vjs.zencdn.net/c/video-js.swf" },
 
   // Default of web browser is 300x150. Should rely on source width/height.
   width: "auto",
@@ -67,45 +62,58 @@ VideoJS.options = {
   defaultVolume: 0.00, // The freakin seaguls are driving me crazy!
 
   // Included control sets
-  components: [
-    "poster",
-    "loadingSpinner",
-    "bigPlayButton",
-    { name: "controlBar", options: {
-      components: [
-        "playToggle",
-        "fullscreenToggle",
-        "currentTimeDisplay",
-        "timeDivider",
-        "durationDisplay",
-        "remainingTimeDisplay",
-        { name: "progressControl", options: {
-          components: [
-            { name: "seekBar", options: {
-              components: [
-                "loadProgressBar",
-                "playProgressBar",
-                "seekHandle"
-              ]}
-            }
-          ]}
-        },
-        { name: "volumeControl", options: {
-          components: [
-            { name: "volumeBar", options: {
-              components: [
-                "volumeLevel",
-                "volumeHandle"
-              ]}
-            }
-          ]}
-        },
-        "muteToggle"
-      ]
-    }},
-    "subtitlesDisplay"/*, "replay"*/
-  ]
+  components: {
+    "poster": {},
+    "loadingSpinner": {},
+    "bigPlayButton": {},
+    "controlBar": {},
+    "subtitlesDisplay": {}
+  }
+
+  // components: [
+  //   "poster",
+  //   "loadingSpinner",
+  //   "bigPlayButton",
+  //   { name: "controlBar", options: {
+  //     components: [
+  //       "playToggle",
+  //       "fullscreenToggle",
+  //       "currentTimeDisplay",
+  //       "timeDivider",
+  //       "durationDisplay",
+  //       "remainingTimeDisplay",
+  //       { name: "progressControl", options: {
+  //         components: [
+  //           { name: "seekBar", options: {
+  //             components: [
+  //               "loadProgressBar",
+  //               "playProgressBar",
+  //               "seekHandle"
+  //             ]}
+  //           }
+  //         ]}
+  //       },
+  //       { name: "volumeControl", options: {
+  //         components: [
+  //           { name: "volumeBar", options: {
+  //             components: [
+  //               "volumeLevel",
+  //               "volumeHandle"
+  //             ]}
+  //           }
+  //         ]}
+  //       },
+  //       "muteToggle"
+  //     ]
+  //   }},
+  //   "subtitlesDisplay"/*, "replay"*/
+  // ]
 };
+
+// Set CDN Version of swf
+if (CDN_VERSION != "GENERATED_CDN_VSN") {
+  _V_.options.flash.swf = "http://vjs.zencdn.net/"+CDN_VERSION+"/video-js.swf"
+}
 
 // Automatically set up any tags that have a data-setup attribute
 _V_.autoSetup = function(){

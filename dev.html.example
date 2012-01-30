@@ -21,8 +21,6 @@
   <script src="src/controls.js"></script>
   <script src="src/events.js"></script>
   <script src="src/tracks.js"></script>
-
-  <script src="flash/swfobject.js"></script>
   
   <script src="src/setup.js"></script>
   

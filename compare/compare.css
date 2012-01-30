@@ -1,7 +1,0 @@
-body { background-color: #ccc; font-size: 11px; font-family: 'Helvetica Neue', helvetica, arial; }
-#main { width: 1000px; margin: 10px auto 0; }
-td, th { text-align: left; vertical-align: top; }
-td.info-col { width: 240px; }
-td.data { text-align: right; }
-span.na { color: red; }
-span.undefined { color: #999; }

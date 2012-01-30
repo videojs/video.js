@@ -45,18 +45,18 @@ _V_.Component = _V_.Class.extend({
   init: function(player, options){
     this.player = player;
 
-    if (options && options.el) {
+    // Allow for overridding default component options
+    options = this.options = _V_.merge(this.options || {}, options);
+
+    // Create element if one wasn't provided in options
+    if (options.el) {
       this.el = options.el;
     } else {
       this.el = this.createElement();
     }
 
-    // Array of sub-components
-    if (options && options.components) {
-      _V_.each.call(this, options.components, function(comp){
-        this.addComponent(comp);
-      });
-    }
+    // Add any components in options
+    this.initComponents();
   },
 
   destroy: function(){},
@@ -71,38 +71,47 @@ _V_.Component = _V_.Class.extend({
     return "";
   },
 
+  initComponents: function(){
+    var options = this.options;
+    if (options && options.components) {
+      // Loop through components and add them to the player
+      this.eachProp(options.components, function(name, opts){
+
+        // Allow waiting to add components until a specific event is called
+        var tempAdd = this.proxy(function(){
+          this.addComponent(name, opts);
+        });
+
+        if (opts.loadEvent) {
+          this.one(opts.loadEvent, tempAdd)
+        } else {
+          tempAdd();
+        }
+      });
+    }
+  },
+
   // Add child components to this component.
   // Will generate a new child component and then append child component's element to this component's element.
   // Takes either the name of the UI component class, or an object that contains a name, UI Class, and options.
-  addComponent: function(nameORobj){
-    var name, componentClass, options, component;
+  addComponent: function(name, options){
+    var componentClass, component;
 
-    if (typeof nameORobj == "string") {
-      name = nameORobj;
+    // Make sure options is at least an empty object to protect against errors
+    options = options || {};
 
-    // Can also pass in object to define a different class than the name and add other options
-    } else {
-      name = nameORobj.name;
-      componentClass = nameORobj.componentClass;
-      options = nameORobj.options;
-    }
-
-    if (!componentClass) {
-      // Assume name of set is a lowercased name of the UI Class (PlayButton, etc.)
-      componentClass = _V_.capitalize(name);
-    }
+    // Assume name of set is a lowercased name of the UI Class (PlayButton, etc.)
+    componentClass = options.componentClass || _V_.capitalize(name);
 
     // Create a new object & element for this controls set
     // If there's no .player, this is a player
     component = new _V_[componentClass](this.player || this, options);
 
-    if (this.components === undefined) {
-      this.components = [];
-    }
-    this.components.push(component);
-
     // Add the UI object's element to the container div (box)
     this.el.appendChild(component.el);
+
+    // Set property name on player. Could cause conflicts with other prop names, but it's worth making refs easy.
+    this[name] = component;
   },
 
   /* Display
@@ -113,6 +122,16 @@ _V_.Component = _V_.Class.extend({
 
   hide: function(){
     this.el.style.display = "none";
+  },
+  
+  fadeIn: function(){
+    this.removeClass("vjs-fade-out");
+    this.addClass("vjs-fade-in");
+  },
+
+  fadeOut: function(){
+    this.removeClass("vjs-fade-in");
+    this.addClass("vjs-fade-out");
   },
 
   addClass: function(classToAdd){
@@ -133,6 +152,9 @@ _V_.Component = _V_.Class.extend({
   },
   triggerEvent: function(type, e){
     return _V_.triggerEvent(this.el, type, e);
+  },
+  one: function(type, fn) {
+    _V_.one.call(this, this.el, type, fn);
   },
 
   /* Ready - Trigger functions when component is ready
@@ -167,22 +189,13 @@ _V_.Component = _V_.Class.extend({
 
   /* Utility
   ================================================================================ */
-  each: function(arr, fn){
-    if (!arr || arr.length === 0) { return; }
-    for (var i=0,j=arr.length; i<j; i++) {
-      if (fn.call(this, arr[i], i)) { break; }
-    }
-  },
+  each: function(arr, fn){ _V_.each.call(this, arr, fn); },
 
-  extend: function(obj){
-    for (var attrname in obj) {
-      if (obj.hasOwnProperty(attrname)) { this[attrname]=obj[attrname]; }
-    }
-  },
+  eachProp: function(obj, fn){ _V_.eachProp.call(this, obj, fn); },
+
+  extend: function(obj){ _V_.merge(this, obj) },
 
   // More easily attach 'this' to functions
-  proxy: function(fn){
-    return _V_.proxy(this, fn);
-  }
+  proxy: function(fn){  return _V_.proxy(this, fn); }
 
 });
