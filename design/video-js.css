@@ -26,7 +26,8 @@ REQUIRED STYLES (be careful overriding)
 
 /* Playback technology elements expand to the width/height of the containing div. <video> or <object> */
 .video-js .vjs-tech { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-
+/*fix for firefox9 fullscreen (only if it is enabled)*/
+.video-js:-moz-full-screen { position: absolute; }
 /* Fullscreen Styles */
 body.vjs-full-window {
   padding: 0; margin: 0;
