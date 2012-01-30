@@ -72,7 +72,7 @@ namespace :build do
       combined << File.read("src/#{item}")
     end
 
-    combined << File.read("flash/swfobject.js")
+    # combined << File.read("flash/swfobject.js")
     combined << File.read("src/setup.js")
     combined << File.read("src/_end.js")
 
@@ -112,7 +112,7 @@ namespace :build do
       file.puts "var vjsSourceList = [];"
 
       src_array = ["src/core", "src/lib"]
-      last = ["flash/swfobject", "src/setup"]
+      last = ["src/setup"] # "flash/swfobject", 
       exclude = [".", "..", ".DS_Store", "_end.js", "_begin.js"]
 
       Dir.foreach('src') do |item|
