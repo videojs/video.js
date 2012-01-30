@@ -1,3 +1,4 @@
+* Added CSS fix for Firefox 9 fullscreen (in the rare case that it's enabled)
 * Replaced swfobject with custom embed to save file size.
 * Added  flash iframe-mode, an experimental method for getting around flash reloading issues.
 * Fixed issue with volume knob position. Improved controls fading.
