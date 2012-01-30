@@ -329,17 +329,46 @@ _V_.flash = _V_.PlaybackTech.extend({
     // Also tried a method from stackoverflow that caused a security error in all browsers. http://stackoverflow.com/questions/2486901/how-to-set-document-domain-for-a-dynamically-generated-iframe
     // In the end the solution I found to work was setting the iframe window.location.href right before doing a document.write of the Flash object.
     // The only downside of this it seems to trigger another http request to the original page (no matter what's put in the href). Not sure why that is.
-    if (options.iFrameMode !== false) { // Default to iFrameMode
+
+    // NOTE (2012-01-29): Cannot get Firefox to load the remote hosted SWF into a dynamically created iFrame
+    // Firefox 9 throws a security error, unleess you call location.href right before doc.write.
+    //    Not sure why that even works, but it causes the browser to look like it's continuously trying to load the page.
+    // Firefox 3.6 keeps calling the iframe onload function anytime I write to it, causing an endless loop.
+
+    if (options.iFrameMode !== false && !_V_.isFF) { // Default to iFrameMode.
 
       // Create iFrame with vjs-tech class so it's 100% width/height
       var iFrm = _V_.createElement("iframe", {
         id: objId + "_iframe",
+        name: objId + "_iframe",
         className: "vjs-tech",
         scrolling: "no",
         marginWidth: 0,
         marginHeight: 0,
         frameBorder: 0
       });
+
+      // Update ready function names in flash vars for iframe window
+      flashVars.readyFunction = "ready";
+      flashVars.eventProxyFunction = "events";
+      flashVars.errorEventProxyFunction = "errors";
+
+      // Tried multiple methods to get this to work in all browsers
+
+      // Tried embedding the flash object in the page first, and then adding a place holder to the iframe, then replacing the placeholder with the page object.
+      // The goal here was to try to load the swf URL in the parent page first and hope that got around the firefox security error
+      // var newObj = _V_.flash.embed(options.swf, placeHolder, flashVars, params, attributes);
+      // (in onload)
+      //  var temp = _V_.createElement("a", { id:"asdf", innerHTML: "asdf" } );
+      //  iDoc.body.appendChild(temp);
+
+      // Tried embedding the flash object through javascript in the iframe source.
+      // This works in webkit but still triggers the firefox security error
+      // iFrm.src = "javascript: document.write('"+_V_.flash.getEmbedCode(options.swf, flashVars, params, attributes)+"');";
+
+      // Tried an actual local iframe just to make sure that works, but it kills the easiness of the CDN version if you require the user to host an iframe
+      // We should add an option to host the iframe locally though, because it could help a lot of issues.
+      // iFrm.src = "iframe.html";
 
       // Wait until iFrame has loaded to write into it.
       _V_.addEvent(iFrm, "load", _V_.proxy(this, function(){
@@ -348,22 +377,33 @@ _V_.flash = _V_.PlaybackTech.extend({
             iWin = iFrm.contentWindow,
             varString = "";
 
-        // Setting the window href gets around a security error that Firefox throws when it thinks a local page is attempting to load a remote script.
-        // Firefox seems to be telling Flash (incorrectly) that iframe is local
-        // Need to find a better method than UA parsing, but works for now
-        if (_V_.ua.match("Firefox")) {
-          iWin.location.href = "";
-        }
+
+        // The one working method I found was to use the iframe's document.write() to create the swf object
+        // This got around the security issue in all browsers except firefox.
+        // I did find a hack where if I call the iframe's window.location.href="", it would get around the security error
+        // However, the main page would look like it was loading indefinitely (URL bar loading spinner would never stop)
+        // Plus Firefox 3.6 didn't work no matter what I tried.
+        // if (_V_.ua.match("Firefox")) {
+        //   iWin.location.href = "";
+        // }
 
         // Get the iFrame's document depending on what the browser supports
         iDoc = iFrm.contentDocument ? iFrm.contentDocument : iFrm.contentWindow.document;
 
-        // Update ready function names in flash vars for iframe window
-        flashVars.readyFunction = "ready";
-        flashVars.eventProxyFunction = "events";
-        flashVars.errorEventProxyFunction = "errors";
+        // Tried ensuring both document domains were the same, but they already were, so that wasn't the issue.
+        // Even tried adding /. that was mentioned in a browser security writeup
+        // document.domain = document.domain+"/.";
+        // iDoc.domain = document.domain+"/.";
 
-        // Using document.write because other methods like append and innerHTML were causing the same security errors in Firefox
+        // Tried adding the object to the iframe doc's innerHTML. Security error in all browsers.
+        // iDoc.body.innerHTML = swfObjectHTML;
+
+        // Tried appending the object to the iframe doc's body. Security error in all browsers.
+        // iDoc.body.appendChild(swfObject);
+
+        // Using document.write actually got around the security error that browsers were throwing.
+        // Again, it's a dynamically generated (same domain) iframe, loading an external Flash swf.
+        // Not sure why that's a security issue, but apparently it is.
         iDoc.write(_V_.flash.getEmbedCode(options.swf, flashVars, params, attributes));
 
         // Setting variables on the window needs to come after the doc write because otherwise they can get reset in some browsers
@@ -388,13 +428,9 @@ _V_.flash = _V_.PlaybackTech.extend({
 
         // Create event listener for all swf events
         iWin.events = _V_.proxy(this.player, function(swfID, eventName, other){
-          try {
-            var player = this;
-            if (player && player.techName == "flash") {
-              player.triggerEvent(eventName);
-            }
-          } catch(err) {
-            _V_.log(err);
+          var player = this;
+          if (player && player.techName == "flash") {
+            player.triggerEvent(eventName);
           }
         });
 
@@ -405,9 +441,8 @@ _V_.flash = _V_.PlaybackTech.extend({
 
       }));
 
-      // Replace placeholder with iFrame
+      // Replace placeholder with iFrame (it will load now)
       placeHolder.parentNode.replaceChild(iFrm, placeHolder);
-
 
     // If not using iFrame mode, embed as normal object
     } else {
@@ -601,6 +636,8 @@ _V_.flash.embed = function(swf, placeHolder, flashVars, params, attributes){
     }, 1000);
   }
 
+  return obj;
+
 };
 
 _V_.flash.getEmbedCode = function(swf, flashVars, params, attributes){
@@ -621,7 +658,8 @@ _V_.flash.getEmbedCode = function(swf, flashVars, params, attributes){
   params = _V_.merge({
     movie: swf,
     flashvars: flashVarsString,
-    allowScriptAccess: "always" // Required to talk to swf
+    allowScriptAccess: "always", // Required to talk to swf
+    allowNetworking: "all" // All should be default, but having security issues.
   }, params);
 
   // Create param tags string
@@ -638,7 +676,7 @@ _V_.flash.getEmbedCode = function(swf, flashVars, params, attributes){
     height: "100%"
 
   }, attributes);
-  
+
   // Create Attributes string
   _V_.eachProp(attributes, function(key, val){
     attrsString += (key + '="' + val + '" ');
