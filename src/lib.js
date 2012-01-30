@@ -105,8 +105,8 @@ _V_.extend({
   // Return seconds as H:MM:SS or M:SS
   // Supplying a guide (in seconds) will include enough leading zeros to cover the length of the guide
   formatTime: function(seconds, guide) {
-    var guide = guide || seconds, // Default to using seconds as guide
-        s = Math.floor(seconds % 60),
+    guide = guide || seconds; // Default to using seconds as guide
+    var s = Math.floor(seconds % 60),
         m = Math.floor(seconds / 60 % 60),
         h = Math.floor(seconds / 3600),
         gm = Math.floor(guide / 60 % 60),
