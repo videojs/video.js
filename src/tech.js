@@ -102,7 +102,9 @@ _V_.html5 = _V_.PlaybackTech.extend({
 
     // Update tag settings, in case they were overridden
     _V_.each(["autoplay","preload","loop","muted"], function(attr){ // ,"poster"
-      el[attr] = player.options[attr];
+      if (player.options[attr] !== null) {
+        el[attr] = player.options[attr];
+      }
     }, this);
 
     return el;
