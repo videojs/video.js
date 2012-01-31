@@ -415,7 +415,7 @@ _V_.Player = _V_.Component.extend({
     return (this.duration()) ? this.buffered().end(0) / this.duration() : 0;
   },
 
-  volume: function(percentAsDecimal){
+ volume: function(percentAsDecimal){
     if (percentAsDecimal !== undefined) {
       var vol = Math.max(0, Math.min(1, parseFloat(percentAsDecimal))); // Force value to between 0 and 1
       this.values.volume = vol;
@@ -423,7 +423,7 @@ _V_.Player = _V_.Component.extend({
       _V_.setLocalStorage("volume", vol);
       return this;
     }
-    // if (this.values.volume) { return this.values.volume; }
+    if (window.localStorage['volume']) { return window.localStorage['volume']; }
     return this.apiCall("volume");
   },
   muted: function(muted){
