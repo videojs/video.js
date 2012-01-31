@@ -24,7 +24,7 @@ _V_.PlaybackTech = _V_.Component.extend({
 _V_.apiMethods = "play,pause,paused,currentTime,setCurrentTime,duration,buffered,volume,setVolume,muted,setMuted,width,height,supportsFullScreen,enterFullScreen,src,load,currentSrc,preload,setPreload,autoplay,setAutoplay,loop,setLoop,error,networkState,readyState,seeking,initialTime,startOffsetTime,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight,textTracks,defaultPlaybackRate,playbackRate,mediaGroup,controller,controls,defaultMuted".split(",");
 _V_.each(_V_.apiMethods, function(methodName){
   _V_.PlaybackTech.prototype[methodName] = function(){
-    throw new Error("The '"+method+"' method is not available on the playback technology's API");
+    throw new Error("The '"+methodName+"' method is not available on the playback technology's API");
   }
 });
 
