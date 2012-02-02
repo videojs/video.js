@@ -171,6 +171,16 @@ _V_.html5 = _V_.PlaybackTech.extend({
         }
       }
   },
+  exitFullScreen: function(){
+      try {
+        this.el.webkitExitFullScreen();
+      } catch (e) {
+        if (e.code == 11) {
+          // this.warning(VideoJS.warnings.videoNotReady);
+          _V_.log("VideoJS: Video not ready.")
+        }
+      }
+  },
   src: function(src){ this.el.src = src; },
   load: function(){ this.el.load(); },
   currentSrc: function(){ return this.el.currentSrc; },
