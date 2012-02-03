@@ -135,6 +135,39 @@ namespace :build do
 
     end
   end
+  
+  desc "Build list of source files for easy inclusion in projects"
+  task :source_html do
+
+    File.open("dev/source-list.html", "w+") do |file|
+      file.puts "<!-- Video.js Source Files -->"
+
+      src_array = ["src/core", "src/lib"]
+      last = ["src/setup"] # "flash/swfobject", 
+      exclude = [".", "..", ".DS_Store", "_end.js", "_begin.js"]
+
+      Dir.foreach('src') do |item|
+        next if exclude.include? item
+
+        item_name = "src/" << item.sub(".js", "")
+
+        next if (src_array + last).include? item_name
+
+        src_array << item_name
+      end
+
+      src_array = src_array + last
+
+      src_array.each do |item|
+        file.puts "<script src='#{item}.js'></script>"
+      end
+      # file.puts "vjsSourceList.push('src/#{item.sub(".js", "")}')"
+      # file.puts "vjsSourceList.push('flash/swfobject.js')"
+      
+      file.puts "<!-- END Video.js Source Files -->"
+
+    end
+  end
 
 end
 
