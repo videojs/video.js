@@ -359,18 +359,46 @@ _V_.Player = _V_.Component.extend({
 
     // Otherwise call method now
     } else {
-      this.tech[method](arg);
+      try {
+        this.tech[method](arg);
+      } catch(e) {
+        _V_.log(e);
+      }
     }
   },
 
   // Get calls can't wait for the tech, and sometimes don't need to.
   techGet: function(method){
-    try {
-      return this.tech[method]();
-    } catch(e) {
-      _V_.log(e);
-      return;
+
+    // Make sure tech is ready
+    if (this.tech.isReady) {
+
+      // Flash likes to die and reload when you hide or reposition it.
+      // In these cases the object methods go away and we get errors.
+      // When that happens we'll catch the errors and inform tech that it's not ready any more.
+      try {
+        return this.tech[method]();
+      } catch(e) {
+
+        // When building additional tech libs, an expected method may not be defined yet
+        if (this.tech[method] === undefined) {
+          _V_.log("Video.js: " + method + " method not defined for "+this.techName+" playback technology.", e);
+
+        } else {
+
+          // When a method isn't available on the object it throws a TypeError
+          if (e.name == "TypeError") {
+            _V_.log("Video.js: " + method + " unavailable on "+this.techName+" playback technology element.", e);
+            this.tech.isReady = false;
+
+          } else {
+            _V_.log(e);
+          }
+        }
+      }
     }
+
+    return;
   },
 
   // Method for calling methods on the current playback technology
@@ -642,8 +670,6 @@ _V_.Player = _V_.Component.extend({
   },
 
   selectSource: function(sources){
-
-    _V_.log(sources)
 
     // Loop through each playback technology in the options order
     for (var i=0,j=this.options.techOrder;i<j.length;i++) {
