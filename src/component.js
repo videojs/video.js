@@ -184,6 +184,9 @@ _V_.Component = _V_.Class.extend({
 
       // Reset Ready Queue
       this.readyQueue = [];
+
+      // Allow for using event listeners also, in case you want to do something everytime a source is ready.
+      this.triggerEvent("ready");
     }
   },
 
