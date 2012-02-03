@@ -65,9 +65,6 @@ _V_.Player = _V_.Component.extend({
       }
     }
 
-    // Holder for playback tech components
-    this.techs = {};
-
     // Cache for video property values.
     this.values = {};
 
@@ -99,8 +96,9 @@ _V_.Player = _V_.Component.extend({
         }
       }
     } else {
-      // Loop through playback technologies (HTML5, Flash) and check for support
-      // Then load the best source.
+      // Loop through playback technologies (HTML5, Flash) and check for support. Then load the best source.
+      // A few assumptions here:
+      //   All playback technologies respect preload false.
       this.src(options.sources);
     }
   },
@@ -115,9 +113,7 @@ _V_.Player = _V_.Component.extend({
     delete _V_.players[this.id]
   },
 
-  createElement: function(type, options){
-
-  },
+  createElement: function(type, options){},
 
   getVideoTagSettings: function(){
     var options = {
@@ -352,22 +348,42 @@ _V_.Player = _V_.Component.extend({
 /* Player API
 ================================================================================ */
 
-  // Method for calling methods on the current playback technology
+  // Pass values to the playback tech
   techCall: function(method, arg){
+
+    // If it's not ready yet, call method when it is
+    if (!this.tech.isReady) {
+      this.tech.ready(function(){
+        this[method](arg);
+      });
+
+    // Otherwise call method now
+    } else {
+      this.tech[method](arg);
+    }
+  },
+
+  // Get calls can't wait for the tech, and sometimes don't need to.
+  techGet: function(method){
     try {
-      return this.tech[method](arg);
+      return this.tech[method]();
     } catch(e) {
       _V_.log(e);
       return;
     }
-    // if (this.isReady) {
-    //   
-    // } else {
-    //   _V_.log("The playback technology API is not ready yet. Use player.ready(myFunction)."+" ["+method+"]", arguments.callee.caller.arguments.callee.caller.arguments.callee.caller)
-    //   return false;
-    //   // throw new Error("The playback technology API is not ready yet. Use player.ready(myFunction)."+" ["+method+"]");
-    // }
   },
+
+  // Method for calling methods on the current playback technology
+  // techCall: function(method, arg){
+  // 
+  //   // if (this.isReady) {
+  //   //   
+  //   // } else {
+  //   //   _V_.log("The playback technology API is not ready yet. Use player.ready(myFunction)."+" ["+method+"]", arguments.callee.caller.arguments.callee.caller.arguments.callee.caller)
+  //   //   return false;
+  //   //   // throw new Error("The playback technology API is not ready yet. Use player.ready(myFunction)."+" ["+method+"]");
+  //   // }
+  // },
 
   // http://dev.w3.org/html5/spec/video.html#dom-media-play
   play: function(){
@@ -384,7 +400,7 @@ _V_.Player = _V_.Component.extend({
   // http://dev.w3.org/html5/spec/video.html#dom-media-paused
   // The initial state of paused should be true (in Safari it's actually false)
   paused: function(){
-    return (this.techCall("paused") === false) ? false : true;
+    return (this.techGet("paused") === false) ? false : true;
   },
 
   // http://dev.w3.org/html5/spec/video.html#dom-media-currenttime
@@ -404,13 +420,13 @@ _V_.Player = _V_.Component.extend({
 
     // Cache last currentTime and return
     // Default to 0 seconds
-    return this.values.currentTime = (this.techCall("currentTime") || 0);
+    return this.values.currentTime = (this.techGet("currentTime") || 0);
   },
 
   // http://dev.w3.org/html5/spec/video.html#dom-media-duration
   // Duration should return NaN if not available. ParseFloat will turn false-ish values to NaN.
   duration: function(){
-    return parseFloat(this.techCall("duration"));
+    return parseFloat(this.techGet("duration"));
   },
 
   // Calculates how much time is left. Not in spec, but useful.
@@ -422,7 +438,7 @@ _V_.Player = _V_.Component.extend({
   // Buffered returns a timerange object. Kind of like an array of portions of the video that have been downloaded.
   // So far no browsers return more than one range (portion)
   buffered: function(){
-    var buffered = this.techCall("buffered"),
+    var buffered = this.techGet("buffered"),
         start = 0,
         end = this.values.bufferEnd = this.values.bufferEnd || 0, // Default end to 0 and store in values
         timeRange;
@@ -454,7 +470,7 @@ _V_.Player = _V_.Component.extend({
     }
 
     // Default to 1 when returning current volume.
-    vol = parseFloat(this.techCall("volume"));
+    vol = parseFloat(this.techGet("volume"));
     return (isNaN(vol)) ? 1 : vol;
   },
 
@@ -464,7 +480,7 @@ _V_.Player = _V_.Component.extend({
       this.techCall("setMuted", muted);
       return this;
     }
-    return this.techCall("muted") || false; // Default to false
+    return this.techGet("muted") || false; // Default to false
   },
 
   // http://dev.w3.org/html5/spec/dimension-attributes.html#attr-dim-height
@@ -497,7 +513,7 @@ _V_.Player = _V_.Component.extend({
   },
 
   // Check if current tech can support native fullscreen (e.g. with built in controls lik iOS, so not our flash swf)
-  supportsFullScreen: function(){ return this.techCall("supportsFullScreen") || false; },
+  supportsFullScreen: function(){ return this.techGet("supportsFullScreen") || false; },
 
   // Turn on fullscreen (or window) mode
   requestFullScreen: function(){
@@ -725,7 +741,7 @@ _V_.Player = _V_.Component.extend({
 
   // http://dev.w3.org/html5/spec/video.html#dom-media-currentsrc
   currentSrc: function(){
-    return this.techCall("currentSrc") || "";
+    return this.techGet("currentSrc") || this.values.src || "";
   },
 
   textTrackValue: function(kind, value){
@@ -744,7 +760,7 @@ _V_.Player = _V_.Component.extend({
       this.options.preload = value;
       return this;
     }
-    return this.techCall("preload", value);
+    return this.techGet("preload");
   },
   autoplay: function(value){
     if (value !== undefined) {
@@ -752,7 +768,7 @@ _V_.Player = _V_.Component.extend({
       this.options.autoplay = value;
       return this;
     }
-    return this.techCall("autoplay", value);
+    return this.techGet("autoplay", value);
   },
   loop: function(value){
     if (value !== undefined) {
@@ -760,14 +776,14 @@ _V_.Player = _V_.Component.extend({
       this.options.loop = value;
       return this;
     }
-    return this.techCall("loop", value);
+    return this.techGet("loop");
   },
 
   controls: function(){ return this.options.controls; },
   textTracks: function(){ return this.options.tracks; },
-  poster: function(){ return this.techCall("poster"); },
-  error: function(){ return this.techCall("error"); },
-  ended: function(){ return this.techCall("ended"); }
+  poster: function(){ return this.techGet("poster"); },
+  error: function(){ return this.techGet("error"); },
+  ended: function(){ return this.techGet("ended"); }
 
   // Methods to add support for
   // networkState: function(){ return this.techCall("networkState"); },
