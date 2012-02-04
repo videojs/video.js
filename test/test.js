@@ -4,26 +4,66 @@
 // http://saucelabs.com/blog/index.php/2011/06/javascript-unit-testing-with-jellyfish-and-ondemand/
 // https://github.com/admc/jellyfish/blob/master/test/fun/jfqunit.js
 
-var tagCode = '<video id="vid1" controls class="video-js vjs-default-skin" preload="none" width="640" height="264" data-setup=\'{}\' poster="http://video-js.zencoder.com/oceans-clip.png">';
-    tagCode+= '<source src="http://video-js.zencoder.com/oceans-clip.mp4" type="video/mp4">';
-    tagCode+= '<source src="http://video-js.zencoder.com/oceans-clip.webm" type="video/webm">';
-    tagCode+= '<source src="http://video-js.zencoder.com/oceans-clip.ogv" type="video/ogg; codecs=\'theora, vorbis\'">';
-    tagCode+= '</video>';
+function createVideoTag(id){
+  var tagCode, tag, attrs;
+
+  tagCode = '<video id="vid1" controls class="video-js vjs-default-skin" preload="none" width="640" height="264" data-setup=\'{}\' poster="http://video-js.zencoder.com/oceans-clip.png">';
+  tagCode+= '<source src="http://video-js.zencoder.com/oceans-clip.mp4" type="video/mp4">';
+  tagCode+= '<source src="http://video-js.zencoder.com/oceans-clip.webm" type="video/webm">';
+  tagCode+= '<source src="http://video-js.zencoder.com/oceans-clip.ogv" type="video/ogg; codecs=\'theora, vorbis\'">';
+  tagCode+= '</video>';
+
+  tag = document.createElement("video");
+  
+  tag.id = "vid1";
+  tag.controls = true;
+  tag.className = "video-js vjs-default-skin";
+  tag.preload = "auto";
+  tag.width = "640";
+  tag.height = "264";
+  tag.poster = "http://video-js.zencoder.com/oceans-clip.png";
+
+  source1 = document.createElement("source");
+  source1.src = "http://video-js.zencoder.com/oceans-clip.mp4";
+  source1.type = "video/mp4";
+  tag.appendChild(source1);
+
+  source2 = document.createElement("source");
+  source2.src = "http://video-js.zencoder.com/oceans-clip.webm";
+  source2.type = "video/webm";
+  tag.appendChild(source2);
+
+  source3 = document.createElement("source");
+  source3.src = "http://video-js.zencoder.com/oceans-clip.ogv";
+  source3.type = "video/ogg";
+  tag.appendChild(source3);
+
+  return tag;
+}
 
 function playerSetup(){
-  document.body.innerHTML += tagCode;
+  
+  _V_.log(_V_.players)
+  
+  _V_.el("player_box").appendChild(createVideoTag())
+
   var vid = document.getElementById("vid1");
   this.player = _V_(vid);
 
   stop();
+
   this.player.ready(_V_.proxy(this, function(){
     start();
   }));
 }
 
 function playerTeardown(){
+  stop();
   _V_("vid1").destroy();
-  document.body.removeChild(document.getElementById("vid1"));
+  // document.body.removeChild(document.getElementById("vid1"));
+  setTimeout(function(){
+    start();
+  }, 500);
 }
 
 module("Video.js setup", {
@@ -33,6 +73,145 @@ module("Video.js setup", {
 
 test("Player Set Up", function() {
   ok(this.player);
+});
+
+/* Methods
+================================================================================ */
+module("API Methods", {
+  setup: playerSetup,
+  teardown: playerTeardown
+});
+
+function failOnEnded() {
+  this.player.one("ended", _V_.proxy(this, function(){
+    start();
+  }));
+}
+
+// Play Method
+test("play()", 1, function() {
+  stop();
+
+  this.player.one("playing", _V_.proxy(this, function(){
+    ok(true);
+    start();
+  }));
+
+  this.player.play();
+
+  failOnEnded.call(this);
+});
+
+// Pause Method
+test("pause()", 1, function() {
+  stop();
+
+  // Flash doesn't currently like calling pause immediately after 'playing'.
+  this.player.one("timeupdate", _V_.proxy(this, function(){
+
+    this.player.pause();
+
+  }));
+
+  this.player.addEvent("pause", _V_.proxy(this, function(){
+    ok(true);
+    start();
+  }));
+
+  this.player.play();
+});
+
+// Paused Method
+test("paused()", 2, function() {
+  stop();
+
+  this.player.one("timeupdate", _V_.proxy(this, function(){
+    equal(this.player.paused(), false);
+    this.player.pause();
+  }));
+
+  this.player.addEvent("pause", _V_.proxy(this, function(){
+    equal(this.player.paused(), true);
+    start();
+  }));
+
+  this.player.play();
+});
+
+test("currentTime()", 1, function() {
+  stop();
+
+  // Try for 3 time updates, sometimes it updates at 0 seconds.
+  var tries = 0;
+
+  this.player.one("loadeddata", _V_.proxy(this, function(){
+
+    this.player.addEvent("timeupdate", _V_.proxy(this, function(){
+
+      _V_.log(tries)
+
+      if (this.player.currentTime() > 0) {
+        ok(true, "Time is greater than 0.");
+        start();
+      } else {
+        tries++;
+      }
+
+      if (tries >= 3) {
+        start();
+      }
+    }));
+
+  }));
+  
+  this.player.play();
+});
+
+
+test("currentTime(seconds)", 2, function() {
+  stop();
+
+  // var afterPlayback = _V_.proxy(this, function(){
+  //   this.player.currentTime(this.player.duration() / 2);
+  // 
+  //   this.player.addEvent("timeupdate", _V_.proxy(this, function(){
+  //     ok(this.player.currentTime() > 0, "Time is greater than 0.");
+  //     
+  //     this.player.pause();
+  //     
+  //     this.player.addEvent("timeupdate", _V_.proxy(this, function(){
+  //       ok(this.player.currentTime() == 0, "Time is 0.");
+  //       start();
+  //     }));
+  // 
+  //     this.player.currentTime(0);
+  //   }));
+  // });
+
+  this.player.play();
+
+  this.player.one("timeupdate", _V_.proxy(this, function(){
+
+    this.player.currentTime(this.player.duration() / 2);
+
+    this.player.one("timeupdate", _V_.proxy(this, function(){
+      ok(this.player.currentTime() > 0, "Time is greater than 0.");
+
+      this.player.pause();
+      this.player.currentTime(0);
+
+      this.player.one("timeupdate", _V_.proxy(this, function(){
+
+        ok(this.player.currentTime() == 0, "Time is 0.");
+        start();
+
+      }));
+
+    }));
+
+
+  }));
+
 });
 
 /* Events
@@ -97,77 +276,3 @@ test("Initial Events", 11, function() {
 
   this.player.play();
 });
-
-/* Methods
-================================================================================ */
-module("API Methods", {
-  setup: playerSetup,
-  teardown: playerTeardown
-});
-
-// Play Method
-test("play()", function() {
-  this.player.addEvent("playing", _V_.proxy(this, function(){
-    start();
-    ok(true);
-  }));
-  this.player.play();
-});
-
-// Pause Method
-test("pause()", function() {
-  this.player.addEvent("pause", _V_.proxy(this, function(){
-    start();
-    ok(true);
-  }));
-  this.player.addEvent("playing", _V_.proxy(this, function(){
-    this.player.pause();
-  }));
-  this.player.play();
-});
-
-// test("currentTime()", function() {
-// 
-//   // Need video loaded before we can call current time
-//   this.player.addEvent("loadstart", _V_.proxy(this, function(){
-//     start();
-//     ok(true, "vid loading");
-// 
-//     // Watch for timeudpate
-//     this.player.addEvent("timeupdate", _V_.proxy(this, function(){
-//       start();
-//       equal(this.player.currentTime(), 0, "time is 0");
-//       this.player.removeEvent("timeupdate", arguments.callee);
-// 
-//       // Test again for later time
-//       this.player.addEvent("timeupdate", _V_.proxy(this, function(){
-//         start();
-//         notEqual(this.player.currentTime(), 0, "time is not 0");
-//         this.player.removeEvent("timeupdate", arguments.callee);
-//       }));
-//       // Stop and trigger time
-//       stop();
-//       this.player.currentTime(10);
-// 
-//     }));
-//     // Stop and trigger time
-//     stop();
-//     this.player.currentTime(0);
-// 
-//   }));
-// 
-//   stop();
-//   this.player.load();
-// 
-// 
-// 
-//   // Watch for timeudpate
-//   this.player.addEvent("timeupdate", _V_.proxy(this, function(){
-//     start();
-//     notEqual(this.player.currentTime(), 0, "time is not 0");
-//     this.player.removeEvent("timeupdate", arguments.callee);
-//   }));
-//   // Stop and trigger time
-//   stop();
-//   this.player.load();
-// });

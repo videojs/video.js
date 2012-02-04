@@ -154,7 +154,7 @@ _V_.Component = _V_.Class.extend({
     return _V_.triggerEvent(this.el, type, e);
   },
   one: function(type, fn) {
-    _V_.one.call(this, this.el, type, fn);
+    _V_.one(this.el, type, _V_.proxy(this, fn));
   },
 
   /* Ready - Trigger functions when component is ready

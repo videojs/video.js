@@ -1,3 +1,4 @@
+* Improved player.destory(). Now removes elements and references.
 * Refactored API to be more immediately available.
 --------------------------------------------------------------------------------
                           ^ ADD NEW CHANGES ABOVE ^

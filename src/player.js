@@ -110,7 +110,10 @@ _V_.Player = _V_.Component.extend({
     // Ensure that tracking progress and time progress will stop and plater deleted
     this.stopTrackingProgress();
     this.stopTrackingCurrentTime();
-    delete _V_.players[this.id]
+    _V_.players[this.id] = null;
+    delete _V_.players[this.id];
+    this.tech.destroy();
+    this.el.parentNode.removeChild(this.el);
   },
 
   createElement: function(type, options){},
