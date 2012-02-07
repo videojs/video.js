@@ -27,7 +27,7 @@ Step 2: Add an HTML5 video tag to your page.
 --------------------------------------------
 Use the video tag as normal, with a few extra pieces for Video.js:
 
-  1. The 'data-setup' Atrribute tells Video.js to automatically set up the video when the page is ready, and read any options (in JSON format) from the attribute (see ['options'](http://videojs.com/docs/options.html)).
+  1. The 'data-setup' Atrribute tells Video.js to automatically set up the video when the page is ready, and read any options (in JSON format) from the attribute (see ['options'](http://videojs.com/docs/options/)).
   2. The 'id' Attribute: Should be used and unique for every video on the same page.
   3. The 'class' attribute contains two classes:
     - 'video-js' applies styles that are required for Video.js functionality, like fullscreen and subtitles.

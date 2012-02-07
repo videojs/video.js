@@ -42,9 +42,7 @@ function createVideoTag(id){
 }
 
 function playerSetup(){
-  
-  _V_.log(_V_.players)
-  
+
   _V_.el("player_box").appendChild(createVideoTag())
 
   var vid = document.getElementById("vid1");
@@ -61,6 +59,7 @@ function playerTeardown(){
   stop();
   _V_("vid1").destroy();
   // document.body.removeChild(document.getElementById("vid1"));
+  delete this.player;
   setTimeout(function(){
     start();
   }, 500);
@@ -89,7 +88,7 @@ function failOnEnded() {
 }
 
 // Play Method
-test("play()", 1, function() {
+test("Play", 1, function() {
   stop();
 
   this.player.one("playing", _V_.proxy(this, function(){
@@ -103,7 +102,7 @@ test("play()", 1, function() {
 });
 
 // Pause Method
-test("pause()", 1, function() {
+test("Pause", 1, function() {
   stop();
 
   // Flash doesn't currently like calling pause immediately after 'playing'.
@@ -122,7 +121,7 @@ test("pause()", 1, function() {
 });
 
 // Paused Method
-test("paused()", 2, function() {
+test("Paused", 2, function() {
   stop();
 
   this.player.one("timeupdate", _V_.proxy(this, function(){
@@ -142,24 +141,23 @@ test("currentTime()", 1, function() {
   stop();
 
   // Try for 3 time updates, sometimes it updates at 0 seconds.
-  var tries = 0;
+  // var tries = 0;
 
+  // Can't rely on just time update because it's faked for Flash.
   this.player.one("loadeddata", _V_.proxy(this, function(){
 
     this.player.addEvent("timeupdate", _V_.proxy(this, function(){
-
-      _V_.log(tries)
 
       if (this.player.currentTime() > 0) {
         ok(true, "Time is greater than 0.");
         start();
       } else {
-        tries++;
+        // tries++;
       }
 
-      if (tries >= 3) {
-        start();
-      }
+      // if (tries >= 3) {
+      //   start();
+      // }
     }));
 
   }));
@@ -188,29 +186,56 @@ test("currentTime(seconds)", 2, function() {
   //   }));
   // });
 
-  this.player.play();
+  // Wait for Source to be ready.
+  this.player.one("loadeddata", _V_.proxy(this, function(){
 
-  this.player.one("timeupdate", _V_.proxy(this, function(){
+    _V_.log("loadeddata", this.player);
+    this.player.currentTime(this.player.duration() - 1);
 
-    this.player.currentTime(this.player.duration() / 2);
+  }));
+  
+  this.player.one("seeked", _V_.proxy(this, function(){
 
-    this.player.one("timeupdate", _V_.proxy(this, function(){
-      ok(this.player.currentTime() > 0, "Time is greater than 0.");
+    _V_.log("seeked", this.player.currentTime())
+    ok(this.player.currentTime() > 1, "Time is greater than 1.");
 
-      this.player.pause();
-      this.player.currentTime(0);
+    this.player.one("seeked", _V_.proxy(this, function(){
+      
+      _V_.log("seeked2", this.player.currentTime())
 
-      this.player.one("timeupdate", _V_.proxy(this, function(){
-
-        ok(this.player.currentTime() == 0, "Time is 0.");
-        start();
-
-      }));
+      ok(this.player.currentTime() <= 1, "Time is less than 1.");
+      start();
 
     }));
 
+    this.player.currentTime(0);
 
   }));
+
+
+  this.player.play();
+
+  // this.player.one("timeupdate", _V_.proxy(this, function(){
+  // 
+  //   this.player.currentTime(this.player.duration() / 2);
+  // 
+  //   this.player.one("timeupdate", _V_.proxy(this, function(){
+  //     ok(this.player.currentTime() > 0, "Time is greater than 0.");
+  // 
+  //     this.player.pause();
+  //     this.player.currentTime(0);
+  // 
+  //     this.player.one("timeupdate", _V_.proxy(this, function(){
+  // 
+  //       ok(this.player.currentTime() == 0, "Time is 0.");
+  //       start();
+  // 
+  //     }));
+  // 
+  //   }));
+  // 
+  // 
+  // }));
 
 });
 
