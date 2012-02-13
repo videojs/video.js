@@ -346,6 +346,7 @@ _V_.Player = _V_.Component.extend({
   },
 
   onProgress: function(){
+    // Add custom event for when source is finished downloading.
     if (this.bufferedPercent() == 1) {
       this.triggerEvent("loadedalldata");
     }
