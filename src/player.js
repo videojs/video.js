@@ -73,6 +73,7 @@ _V_.Player = _V_.Component.extend({
     this.addEvent("ended", this.onEnded);
     this.addEvent("play", this.onPlay);
     this.addEvent("pause", this.onPause);
+    this.addEvent("progress", this.onProgress);
     this.addEvent("error", this.onError);
 
     // When the API is ready, loop through the components and add to the player.
@@ -342,6 +343,12 @@ _V_.Player = _V_.Component.extend({
   onPause: function(){
     _V_.removeClass(this.el, "vjs-playing");
     _V_.addClass(this.el, "vjs-paused");
+  },
+
+  onProgress: function(){
+    if (this.bufferedPercent() == 1) {
+      this.triggerEvent("loadedalldata");
+    }
   },
 
   onError: function(e) {

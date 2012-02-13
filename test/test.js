@@ -249,7 +249,7 @@ module("API Events", {
 var playEventList = []
 
 // Test all playback events
-test("Initial Events", 11, function() {
+test("Initial Events", 12, function() {
   stop(); // Give 30 seconds to run then fail.
 
   var events = [
@@ -260,6 +260,7 @@ test("Initial Events", 11, function() {
     "durationchange",
     "loadedmetadata",
     "loadeddata",
+    "loadedalldata",
 
     "progress",
     "timeupdate",
@@ -280,7 +281,7 @@ test("Initial Events", 11, function() {
       ok(true, this.evt);
 
       // Once we reach canplaythrough, pause the video and wait for 'paused'.
-      if (this.evt == "canplaythrough") {
+      if (this.evt == "loadedalldata") {
         this.player.pause();
       
       // After we've paused, go to the end of the video and wait for 'ended'.
