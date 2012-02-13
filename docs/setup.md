@@ -13,7 +13,7 @@ Video.js is pretty easy to set up. It can take a matter of seconds to get the pl
 
 Step 1: Include the Video.js Javascript and CSS files in the head of your page.
 ------------------------------------------------------------------------------
-You can download the Video.js source and host it on your own servers, or use the free CDN hosted version (thanks to Zencoder). It's often recommended now to put JavaScript before the end \</body\> tag instead of the head but Video.js includes an 'HTML5 Shiv', which needs to be in the \<head\> for older IE versions. If you 
+You can download the Video.js source and host it on your own servers, or use the free CDN hosted version (thanks to Zencoder). It's often recommended now to put JavaScript before the end \</body\> tag instead of the head but Video.js includes an 'HTML5 Shiv', which needs to be in the \<head\> for older IE versions. 
 
 {% highlight html %}
 
