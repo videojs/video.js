@@ -301,7 +301,17 @@ _V_.flash = _V_.PlaybackTech.extend({
 
     // If source was supplied pass as a flash var.
     if (source) {
-      flashVars.src = encodeURIComponent(source.src);
+
+      // Check if absolute URL
+      var tempSrc = source.src;
+      if (!tempSrc.match(/^https?:\/\//)) {
+        // Convert to absolute URL. Flash hosted off-site needs an absolute URL.
+        tempSrc = _V_.getAbsoluteURL(tempSrc);
+      }
+
+      _V_.log(tempSrc)
+
+      flashVars.src = encodeURIComponent(tempSrc);
     }
 
     // Add placeholder to player div
