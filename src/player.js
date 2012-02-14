@@ -563,6 +563,18 @@ _V_.Player = _V_.Component.extend({
     // Check for browser element fullscreen support
     if (requestFullScreen) {
 
+      // Trigger fullscreenchange event after change
+      _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
+        this.isFullScreen = document[requestFullScreen.isFullScreen];
+
+        // If cancelling fullscreen, remove event listener.
+        if (this.isFullScreen == false) {
+          _V_.removeEvent(document, requestFullScreen.eventName, arguments.callee);
+        }
+
+        this.triggerEvent("fullscreenchange");
+      }));
+
       // Flash and other plugins get reloaded when you take their parent to fullscreen.
       // To fix that we'll remove the tech, and reload it after the resize has finished.
       if (this.tech.support.fullscreenResize === false && this.options.flash.iFrameMode != true) {
@@ -581,20 +593,14 @@ _V_.Player = _V_.Component.extend({
         this.el[requestFullScreen.requestFn]();
       }
 
-      // In case the user presses escape to exit fullscreen, we need to update fullscreen status
-      _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
-        this.isFullScreen = document[requestFullScreen.isFullScreen];
-        this.triggerEvent("fullscreenchange");
-      }));
-
     } else if (this.tech.supportsFullScreen()) {
+      this.triggerEvent("fullscreenchange");
       this.techCall("enterFullScreen");
 
     } else {
+      this.triggerEvent("fullscreenchange");
       this.enterFullWindow();
     }
-
-     this.triggerEvent("fullscreenchange");
 
      return this;
    },
