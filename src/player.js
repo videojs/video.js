@@ -584,6 +584,7 @@ _V_.Player = _V_.Component.extend({
       // In case the user presses escape to exit fullscreen, we need to update fullscreen status
       _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
         this.isFullScreen = document[requestFullScreen.isFullScreen];
+        this.triggerEvent("fullscreenchange");
       }));
 
     } else if (this.tech.supportsFullScreen()) {
@@ -600,6 +601,8 @@ _V_.Player = _V_.Component.extend({
 
    cancelFullScreen: function(){
     var requestFullScreen = _V_.support.requestFullScreen;
+
+    this.isFullScreen = false;
 
     // Check for browser element fullscreen support
     if (requestFullScreen) {
@@ -624,13 +627,12 @@ _V_.Player = _V_.Component.extend({
 
     } else if (this.tech.supportsFullScreen()) {
      this.techCall("exitFullScreen");
+     this.triggerEvent("fullscreenchange");
 
     } else {
      this.exitFullWindow();
+     this.triggerEvent("fullscreenchange");
     }
-
-    this.isFullScreen = false;
-    this.triggerEvent("fullscreenchange");
 
     return this;
   },
