@@ -301,7 +301,7 @@ _V_.flash = _V_.PlaybackTech.extend({
 
     // If source was supplied pass as a flash var.
     if (source) {
-      flashVars.src = encodeURIComponent(source.src);
+      flashVars.src = encodeURIComponent(_V_.getAbsoluteURL(source.src));
     }
 
     // Add placeholder to player div
@@ -461,6 +461,9 @@ _V_.flash = _V_.PlaybackTech.extend({
   play: function(){ this.el.vjs_play(); },
   pause: function(){ this.el.vjs_pause(); },
   src: function(src){
+    // Make sure source URL is abosolute.
+    src = _V_.getAbsoluteURL(src);
+
     this.el.vjs_src(src);
 
     // Currently the SWF doesn't autoplay if you load a source later.

@@ -277,6 +277,21 @@ _V_.extend({
         _V_.log("LocalStorage Error (VideoJS)", e);
       }
     }
+  },
+
+  // Get abosolute version of relative URL. Used to tell flash correct URL.
+  // http://stackoverflow.com/questions/470832/getting-an-absolute-url-from-a-relative-one-ie6-issue
+  getAbsoluteURL: function(url){
+
+    // Check if absolute URL
+    if (!url.match(/^https?:\/\//)) {
+      // Convert to absolute URL. Flash hosted off-site needs an absolute URL.
+      url = _V_.createElement('div', {
+        innerHTML: '<a href="'+url+'">x</a>'
+      }).firstChild.href;
+    }
+
+    return url;
   }
 
 });
