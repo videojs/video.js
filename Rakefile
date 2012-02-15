@@ -4,6 +4,63 @@ require 'httparty'
 
 namespace :build do
 
+  task :special do
+    Rake::Log["Building Version: " << version_number]
+
+    if File.exist?("dist")
+      Rake::Shell["rm -r dist"]
+    end
+
+    # Make distribution folder
+    Rake::Shell["mkdir dist"]
+
+    Rake::Log["Combining source files"]
+    combined = ""
+
+    first_files = [ '_begin.js', 'core.js', 'lib.js' ]
+    exclude_files = ['.', '..', '.DS_Store', 'setup.js', 'tracks.js', 'json.js', 'controls.js', '_end.js']
+
+    first_files.each do |item|
+      Rake::Log[item]
+      combined << File.read("src/#{item}")
+    end
+
+    Dir.foreach('src') do |item|
+      next if (exclude_files + first_files).include? item
+      combined << File.read("src/#{item}")
+    end
+
+    # combined << File.read("flash/swfobject.js")
+    # combined << File.read("src/setup.js")
+    combined << File.read("src/_end.js")
+
+    Rake::Log["Adding version number"]
+    combined = combined.gsub('GENERATED_AT_BUILD', version_number)
+
+    File.open('dist/video.js', "w+") do |file|
+      file.puts "" << combined
+    end
+
+    Rake::Log["Copying CSS and updated version"]
+    File.open('dist/video-js.css', "w+") do |file|
+      file.puts File.read("design/video-js.css").gsub('GENERATED_AT_BUILD', version_number)
+    end
+
+    Rake::Log["Copying suppporting files"]
+    Rake::Shell["cp design/video-js.png dist/video-js.png"]
+    Rake::Shell["cp flash/video-js.swf dist/video-js.swf"]
+
+    Rake::Log["Minimizing JavaScript"]
+    Rake::Shell["java -jar build/lib/yuicompressor-2.4.7.jar dist/video.js -o dist/video.min.js"]
+
+    Rake::Log["Minimizing CSS"]
+    Rake::Shell["java -jar build/lib/yuicompressor-2.4.7.jar dist/video-js.css -o dist/video-js.min.css"]
+
+    # Rake::Shell["cd dist && gzip video.min.js && cd .."]
+
+    Rake::Log[version_number << " Built"]
+  end
+
   desc "Build version for current '/c/' CDN copy and locked in version"
   task :current do
     Rake::Task["build:source"].execute
