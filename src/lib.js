@@ -266,7 +266,7 @@ _V_.extend({
   ================================================================================ */
   setLocalStorage: function(key, value){
     // IE was throwing errors referencing the var anywhere without this
-    var localStorage = localStorage || false;
+    var localStorage = window.localStorage || false;
     if (!localStorage) { return; }
     try {
       localStorage[key] = value;
