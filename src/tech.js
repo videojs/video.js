@@ -468,7 +468,7 @@ _V_.flash = _V_.PlaybackTech.extend({
 
     // Currently the SWF doesn't autoplay if you load a source later.
     // e.g. Load player w/ no source, wait 2s, set src.
-    if (this.player.autoplay) {
+    if (this.player.autoplay()) {
       var tech = this;
       setTimeout(function(){ tech.play(); }, 0);
     }
