@@ -234,7 +234,8 @@ _V_.ControlBar = _V_.Component.extend({
       "remainingTimeDisplay": {},
       "progressControl": {},
       "volumeControl": {},
-      "muteToggle": {}
+      "muteToggle": {},
+      "captionsButton": {}
     }
   },
 
@@ -803,7 +804,7 @@ _V_.TextTrackDisplay = _V_.Component.extend({
 
   createElement: function(){
     return this._super("div", {
-      className: "vjs-" + this.trackType
+      className: "vjs-" + this.trackType + " vjs-text-track"
     });
   },
 
@@ -834,5 +835,27 @@ _V_.ChaptersDisplay = _V_.TextTrackDisplay.extend({
 _V_.DescriptionsDisplay = _V_.TextTrackDisplay.extend({
 
   trackType: "descriptions"
+
+});
+
+/* Captions Button
+================================================================================ */
+_V_.CaptionsButton = _V_.Button.extend({
+
+  buttonText: "Captions",
+
+  buildCSSClass: function(){
+    return "vjs-captions-control " + this._super();
+  },
+
+  onClick: function(){
+    this.player.textTrackValue("captions", "Hi<br>hi2")
+    var captionsDisplay = this.player.captionsDisplay;
+    if (captionsDisplay.el.style.display == "block") {
+      captionsDisplay.hide();
+    } else {
+      captionsDisplay.show();
+    }
+  }
 
 });

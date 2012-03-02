@@ -30,8 +30,13 @@ _V_.Track.prototype = {
         lines = srcContent.split("\n"),
         line = "";
 
-    for (var i=0; i<lines.length; i++) {
+    for (var i=1, j=lines.length; i<j; i++) {
+      // Line 0 should be 'WEBVTT', so skipping i=0
+
+      _V_.log("line", lines[i])
+
       line = _V_.trim(lines[i]); // Trim whitespace and linebreaks
+
       if (line) { // Loop until a line with content
 
         // First line - Number
@@ -48,9 +53,12 @@ _V_.Track.prototype = {
 
         // Additional lines - Cue Text
         text = [];
-        for (var j=i; j<lines.length; j++) { // Loop until a blank line or end of lines
+        for (var m=i,n=lines.length; m<n; m++) { // Loop until a blank line or end of lines
+
+          _V_.log(lines[i+1])
+
           line = _V_.trim(lines[++i]);
-          if (!line) { break; }
+          if (!line) { break; } // Text is done
           text.push(line);
         }
         cue.text = text.join('<br/>');

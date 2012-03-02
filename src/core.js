@@ -67,7 +67,8 @@ VideoJS.options = {
     "loadingSpinner": {},
     "bigPlayButton": {},
     "controlBar": {},
-    "subtitlesDisplay": {}
+    "subtitlesDisplay": {},
+    "captionsDisplay": {}
   }
 
   // components: [
