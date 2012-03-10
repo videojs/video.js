@@ -52,11 +52,12 @@ body.vjs-full-window {
 }
 
 /* Text Track Styles */
-.video-js .vjs-text-track-display {
-  text-align: center; position: absolute; bottom: 4em; left: 1em; right: 1em;
-}
+/* Overall track holder for both captions and subtitles */
+.video-js .vjs-text-track-display { text-align: center; position: absolute; bottom: 4em; left: 1em; right: 1em; }
+/* Individual tracks */
 .video-js .vjs-text-track {
   display: none; color: #fff; font-size: 1.4em; text-align: center; margin-bottom: 0.1em;
+  /* Transparent black background, or fallback to all black (IE6) */
   background: rgb(0, 0, 0); background: rgba(0, 0, 0, 0.50);
 }
 .video-js .vjs-subtitles { color: #fff; }
@@ -165,6 +166,8 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
   background: -o-linear-gradient(top, #333, #666);
   background: -ms-linear-gradient(top, #333, #666);
   background: linear-gradient(top, #333, #666);
+
+  border: 1px solid #000;
 }
 .vjs-default-skin .vjs-volume-level {
   position: absolute; top: 0; left: 0; height: 0.6em;
@@ -434,11 +437,13 @@ div.vjs-loading-spinner .ball7 { opacity: 0.87; position:absolute; left: 0px; to
 div.vjs-loading-spinner .ball8 { opacity: 1.00; position:absolute; left: 6px; top: 6px; width: 13px; height: 13px; background: #fff;
   border-radius: 13px; -webkit-border-radius: 13px; -moz-border-radius: 13px; border: 1px solid #ccc; }
 
-/* Captions Button
+/* Feature Buttons (Captions/Subtitles/etc.)
 -------------------------------------------------------------------------------- */
-.vjs-default-skin .vjs-captions-control { 
-  float: right; margin: 0.2em 1em 0 0; padding: 0; width: 3em; height: 2em; cursor: pointer !important;
+.vjs-default-skin .vjs-feature-button { 
+  float: right; margin: 0.2em 0.5em 0 0; padding: 0; width: 3em; height: 2em; cursor: pointer !important;
+
   border: 1px solid #111; -moz-border-radius: 0.3em; -webkit-border-radius: 0.3em; border-radius: 0.3em; 
+
   background: #4d4d4d;
   background: -moz-linear-gradient(top,  #4d4d4d 0%, #3f3f3f 50%, #333333 50%, #252525 100%);
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#4d4d4d), color-stop(50%,#3f3f3f), color-stop(50%,#333333), color-stop(100%,#252525));
@@ -447,17 +452,16 @@ div.vjs-loading-spinner .ball8 { opacity: 1.00; position:absolute; left: 6px; to
   background: -ms-linear-gradient(top,  #4d4d4d 0%,#3f3f3f 50%,#333333 50%,#252525 100%);
   background: linear-gradient(top,  #4d4d4d 0%,#3f3f3f 50%,#333333 50%,#252525 100%);
 }
-/* Play Icon */
-.vjs-default-skin .vjs-captions-control div { background: url('video-js.png') 0px -75px; width: 16px; height: 16px; margin: 0.2em auto 0; padding: 0; }
+/* Button Icon */
+.vjs-default-skin .vjs-feature-button div { background: url('video-js.png') 0px -75px no-repeat; width: 16px; height: 16px; margin: 0.2em auto 0; padding: 0; }
 
-.vjs-default-skin .vjs-captions-control ul { 
-  display: none; /* Start hidden. Hover will show. */
-}
-.vjs-default-skin .vjs-captions-control:hover ul {
+/* Button Pop-up Menu */
+.vjs-default-skin .vjs-feature-button ul { display: none; /* Start hidden. Hover will show. */ }
+.vjs-default-skin .vjs-feature-button:hover ul {
   display: block;
   opacity: 0.8;
   list-style: none; padding: 0; margin: 0;
-  position: absolute; width: 10em; height: 10em; bottom: 2em; 
+  position: absolute; width: 10em; bottom: 2em; 
   left: -3.5em; /* Width of menu - width of button / 2 */
   background-color: #111;
   border: 2px solid #333;
@@ -465,5 +469,8 @@ div.vjs-loading-spinner .ball8 { opacity: 1.00; position:absolute; left: 6px; to
   -webkit-box-shadow: 0 2px 4px 0 #000; -moz-box-shadow: 0 2px 4px 0 #000; box-shadow: 0 2px 4px 0 #000;
   overflow: auto;
 }
-.vjs-default-skin .vjs-captions-control ul li { list-style: none; margin: 0 0 2px 0; padding: 0; line-height: 1.5em; font-size: 1.4em; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; background-color: #333; }
-.vjs-default-skin .vjs-captions-control ul li:hover { background-color: #ccc; color: #333; }
+.vjs-default-skin .vjs-feature-button ul li { list-style: none; margin: 0 0 2px 0; padding: 0; line-height: 1.5em; font-size: 1.4em; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; background-color: #333; }
+.vjs-default-skin .vjs-feature-button ul li:hover { background-color: #ccc; color: #333; }
+
+/* Subtitles Button */
+.vjs-default-skin .vjs-captions-button div { background-position: -25px -75px; }

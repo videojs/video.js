@@ -157,7 +157,7 @@ _V_.Component = _V_.Class.extend({
   /* Events
   ================================================================================ */
   addEvent: function(type, fn, uid){
-    return _V_.addEvent(this.el, type, _V_.proxy(this, fn, uid));
+    return _V_.addEvent(this.el, type, _V_.proxy(this, fn));
   },
   removeEvent: function(type, fn){
     return _V_.removeEvent(this.el, type, fn);
@@ -211,6 +211,6 @@ _V_.Component = _V_.Class.extend({
   extend: function(obj){ _V_.merge(this, obj) },
 
   // More easily attach 'this' to functions
-  proxy: function(fn){  return _V_.proxy(this, fn); }
+  proxy: function(fn, uid){  return _V_.proxy(this, fn, uid); }
 
 });

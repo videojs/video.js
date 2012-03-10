@@ -465,8 +465,6 @@ _V_.TextTrackDisplay = _V_.Component.extend({
 ================================================================================ */
 _V_.TextTrackButton = _V_.Button.extend({
 
-  buttonText: "Captions",
-
   init: function(player, options){
     this._super(player, options);
 
@@ -480,7 +478,7 @@ _V_.TextTrackButton = _V_.Button.extend({
     _V_.addEvent(off, "click", this.proxy(this.turnOff));
 
     this.each(this.player.textTracks, function(track){
-      if (track.kind === "captions") {
+      if (track.kind === this.kind) {
         count++;
 
         li = _V_.createElement("li", { innerHTML: track.label });
@@ -517,10 +515,6 @@ _V_.TextTrackButton = _V_.Button.extend({
 
   },
 
-  buildCSSClass: function(){
-    return "vjs-captions-control " + this._super();
-  },
-
   turnOn: function(lang, label){
     var tracks = this.player.textTracks,
         i=0, j=tracks.length,
@@ -528,7 +522,7 @@ _V_.TextTrackButton = _V_.Button.extend({
 
     for (;i<j;i++) {
       track = tracks[i];
-      if (track.kind == "captions") {
+      if (track.kind == this.kind) {
         if (track.language == lang && track.label == label) {
           track.show();
         } else if (track.mode > 0) {
@@ -545,17 +539,34 @@ _V_.TextTrackButton = _V_.Button.extend({
 
     for (;i<j;i++) {
       track = tracks[i];
-      if (track.kind == "captions" && track.mode > 0) {
+      if (track.kind == this.kind && track.mode > 0) {
         track.disable();
       }
     }
+  },
+
+  buildCSSClass: function(){
+    return this.className + " vjs-feature-button " + this._super();
   }
 
 });
 
-_V_.CaptionsButton = _V_.Button.extend({
+_V_.CaptionsButton = _V_.TextTrackButton.extend({
   kind: "captions",
-  buttonText: "Captions"
+  buttonText: "Captions",
+  className: "vjs-captions-button"
+});
+
+_V_.SubtitlesButton = _V_.TextTrackButton.extend({
+  kind: "subtitles",
+  buttonText: "Subtitles",
+  className: "vjs-subtitles-button"
+});
+
+// Add Buttons to controlBar
+_V_.merge(_V_.ControlBar.prototype.options.components, {
+  "subtitlesButton": {},
+  "captionsButton": {}
 });
 
 // _V_.Cue = _V_.Component.extend({
