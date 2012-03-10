@@ -83,6 +83,11 @@ _V_.Player = _V_.Component.extend({
       });
     }
 
+    // Tracks defined in tracks.js
+    if (options.tracks && options.tracks.length > 0) {
+      this.addTextTracks(options.tracks);
+    }
+
     // If there are no sources when the player is initialized,
     // load the first supported playback technology.
     if (!options.sources || options.sources.length == 0) {
@@ -145,15 +150,14 @@ _V_.Player = _V_.Component.extend({
           });
         }
         if (c.nodeName == "TRACK") {
-          options.tracks.push(new _V_.Track({
+          options.tracks.push({
             src: c.getAttribute("src"),
             kind: c.getAttribute("kind"),
             srclang: c.getAttribute("srclang"),
             label: c.getAttribute("label"),
             'default': c.getAttribute("default") !== null,
             title: c.getAttribute("title")
-          }, this));
-  
+          });
         }
       }
     }
@@ -789,15 +793,6 @@ _V_.Player = _V_.Component.extend({
     return this.techGet("currentSrc") || this.values.src || "";
   },
 
-  textTrackValue: function(kind, value){
-    if (value !== undefined) {
-      this.values[kind] = value;
-      this.triggerEvent(kind+"update");
-      return this;
-    }
-    return this.values[kind];
-  },
-
   // Attributes/Options
   preload: function(value){
     if (value !== undefined) {
@@ -825,7 +820,6 @@ _V_.Player = _V_.Component.extend({
   },
 
   controls: function(){ return this.options.controls; },
-  textTracks: function(){ return this.options.tracks; },
   poster: function(){ return this.techGet("poster"); },
   error: function(){ return this.techGet("error"); },
   ended: function(){ return this.techGet("ended"); }

@@ -52,9 +52,12 @@ body.vjs-full-window {
 }
 
 /* Text Track Styles */
+.video-js .vjs-text-track-display {
+  text-align: center; position: absolute; bottom: 4em; left: 1em; right: 1em;
+}
 .video-js .vjs-text-track {
-  display: none; color: #fff; font-size: 2em; text-align: center; position: absolute; bottom: 2em; left: 1em; right: 1em;
-  background: rgb(0, 0, 0); background: rgba(0, 0, 0, 0.25);
+  display: none; color: #fff; font-size: 1.4em; text-align: center; margin-bottom: 0.1em;
+  background: rgb(0, 0, 0); background: rgba(0, 0, 0, 0.50);
 }
 .video-js .vjs-subtitles { color: #fff; }
 .video-js .vjs-captions { color: #fc6; }
@@ -109,8 +112,8 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 
   /* Start hidden and with 0 opacity. Opacity is used to fade in modern browsers. */
   /* Can't use display block to hide initially because widths of slider handles aren't calculated and avaialbe for positioning correctly. */
-  visibility: hidden;
-  opacity: 0;
+/*  visibility: hidden;
+  opacity: 0;*/
 }
 
 /* General styles for individual controls. */
@@ -447,3 +450,20 @@ div.vjs-loading-spinner .ball8 { opacity: 1.00; position:absolute; left: 6px; to
 /* Play Icon */
 .vjs-default-skin .vjs-captions-control div { background: url('video-js.png') 0px -75px; width: 16px; height: 16px; margin: 0.2em auto 0; padding: 0; }
 
+.vjs-default-skin .vjs-captions-control ul { 
+  display: none; /* Start hidden. Hover will show. */
+}
+.vjs-default-skin .vjs-captions-control:hover ul {
+  display: block;
+  opacity: 0.8;
+  list-style: none; padding: 0; margin: 0;
+  position: absolute; width: 10em; height: 10em; bottom: 2em; 
+  left: -3.5em; /* Width of menu - width of button / 2 */
+  background-color: #111;
+  border: 2px solid #333;
+  -moz-border-radius: 0.7em; -webkit-border-radius: 1em; border-radius: .5em;
+  -webkit-box-shadow: 0 2px 4px 0 #000; -moz-box-shadow: 0 2px 4px 0 #000; box-shadow: 0 2px 4px 0 #000;
+  overflow: auto;
+}
+.vjs-default-skin .vjs-captions-control ul li { list-style: none; margin: 0 0 2px 0; padding: 0; line-height: 1.5em; font-size: 1.4em; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; background-color: #333; }
+.vjs-default-skin .vjs-captions-control ul li:hover { background-color: #ccc; color: #333; }

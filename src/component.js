@@ -79,7 +79,8 @@ _V_.Component = _V_.Class.extend({
 
         // Allow waiting to add components until a specific event is called
         var tempAdd = this.proxy(function(){
-          this.addComponent(name, opts);
+          // Set property name on player. Could cause conflicts with other prop names, but it's worth making refs easy.
+          this[name] = this.addComponent(name, opts);
         });
 
         if (opts.loadEvent) {
@@ -95,23 +96,34 @@ _V_.Component = _V_.Class.extend({
   // Will generate a new child component and then append child component's element to this component's element.
   // Takes either the name of the UI component class, or an object that contains a name, UI Class, and options.
   addComponent: function(name, options){
-    var componentClass, component;
+    var component, componentClass;
 
-    // Make sure options is at least an empty object to protect against errors
-    options = options || {};
+    // If string, create new component with options
+    if (typeof name == "string") {
 
-    // Assume name of set is a lowercased name of the UI Class (PlayButton, etc.)
-    componentClass = options.componentClass || _V_.capitalize(name);
+      // Make sure options is at least an empty object to protect against errors
+      options = options || {};
 
-    // Create a new object & element for this controls set
-    // If there's no .player, this is a player
-    component = new _V_[componentClass](this.player || this, options);
+      // Assume name of set is a lowercased name of the UI Class (PlayButton, etc.)
+      componentClass = options.componentClass || _V_.capitalize(name);
+
+      // Create a new object & element for this controls set
+      // If there's no .player, this is a player
+      component = new _V_[componentClass](this.player || this, options);
+
+    } else {
+      component = name;
+    }
 
     // Add the UI object's element to the container div (box)
     this.el.appendChild(component.el);
 
-    // Set property name on player. Could cause conflicts with other prop names, but it's worth making refs easy.
-    this[name] = component;
+    // Return so it can stored on parent object if desired.
+    return component;
+  },
+
+  removeComponent: function(component){
+    this.el.removeChild(component.el);
   },
 
   /* Display
@@ -144,8 +156,8 @@ _V_.Component = _V_.Class.extend({
 
   /* Events
   ================================================================================ */
-  addEvent: function(type, fn){
-    return _V_.addEvent(this.el, type, _V_.proxy(this, fn));
+  addEvent: function(type, fn, uid){
+    return _V_.addEvent(this.el, type, _V_.proxy(this, fn, uid));
   },
   removeEvent: function(type, fn){
     return _V_.removeEvent(this.el, type, fn);
