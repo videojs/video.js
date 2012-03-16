@@ -113,8 +113,8 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 
   /* Start hidden and with 0 opacity. Opacity is used to fade in modern browsers. */
   /* Can't use display block to hide initially because widths of slider handles aren't calculated and avaialbe for positioning correctly. */
-/*  visibility: hidden;
-  opacity: 0;*/
+  visibility: hidden;
+  opacity: 0;
 }
 
 /* General styles for individual controls. */
