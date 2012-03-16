@@ -1,3 +1,4 @@
+* Overhauled HTML5 Track support.
 * Fixed Flash always autoplaying when setting source.
 * Fixed localStorage context
 * Updated 'fullscreenchange' even to be calledd d even if the user presses escape to exit fullscreen.

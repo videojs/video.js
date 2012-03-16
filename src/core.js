@@ -64,10 +64,10 @@ VideoJS.options = {
   // Included control sets
   components: {
     "poster": {},
+    "textTrackDisplay": {},
     "loadingSpinner": {},
     "bigPlayButton": {},
-    "controlBar": {},
-    "subtitlesDisplay": {}
+    "controlBar": {}
   }
 
   // components: [

@@ -125,7 +125,7 @@ _V_.extend({
     return h + m + s;
   },
 
-  capitalize: function(string){
+  uc: function(string){
     return string.charAt(0).toUpperCase() + string.slice(1);
   },
 
@@ -199,17 +199,21 @@ _V_.extend({
   /* Proxy (a.k.a Bind or Context). A simple method for changing the context of a function
      It also stores a unique id on the function so it can be easily removed from events
   ================================================================================ */
-  proxy: function(context, fn) {
+  proxy: function(context, fn, uid) {
     // Make sure the function has a unique ID
     if (!fn.guid) { fn.guid = _V_.guid++; }
+
     // Create the new function that changes the context
     var ret = function() {
       return fn.apply(context, arguments);
-    };
+    }
 
-    // Give the new function the same ID
-    // (so that they are equivalent and can be easily removed)
-    ret.guid = fn.guid;
+    // Allow for the ability to individualize this function
+    // Needed in the case where multiple objects might share the same prototype
+    // IF both items add an event listener with the same function, then you try to remove just one
+    // it will remove both because they both have the same guid.
+    // when using this, you need to use the proxy method when you remove the listener as well.
+    ret.guid = (uid) ? uid + "_" + fn.guid : fn.guid;
 
     return ret;
   },
