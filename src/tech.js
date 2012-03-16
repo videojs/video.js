@@ -599,7 +599,8 @@ _V_.flash.onEvent = function(swfID, eventName){
 
 // Log errors from the swf
 _V_.flash.onError = function(swfID, err){
-  _V_.log("Flash Error", err, swfID);
+  var player = _V_.el(swfID).player;
+  player.triggerEvent("error");
 };
 
 // Flash Version Check
