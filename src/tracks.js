@@ -132,11 +132,11 @@ _V_.Track = _V_.Component.extend({
 
   // Show: Mode Showing (2)
   // Indicates that the text track is active. If no attempt has yet been made to obtain the track's cues, the user agent will perform such an attempt momentarily.
-  // The user agent is maintaining a list of which cues are active, and events are being fired accordingly. 
-  // In addition, for text tracks whose kind is subtitles or captions, the cues are being displayed over the video as appropriate; 
-  // for text tracks whose kind is descriptions, the user agent is making the cues available to the user in a non-visual fashion; 
+  // The user agent is maintaining a list of which cues are active, and events are being fired accordingly.
+  // In addition, for text tracks whose kind is subtitles or captions, the cues are being displayed over the video as appropriate;
+  // for text tracks whose kind is descriptions, the user agent is making the cues available to the user in a non-visual fashion;
   // and for text tracks whose kind is chapters, the user agent is making available to the user a mechanism by which the user can navigate to any point in the media resource by selecting a cue.
-  // The showing by default state is used in conjunction with the default attribute on track elements to indicate that the text track was enabled due to that attribute. 
+  // The showing by default state is used in conjunction with the default attribute on track elements to indicate that the text track was enabled due to that attribute.
   // This allows the user agent to override the state if a later track is discovered that is more appropriate per the user's preferences.
   show: function(){
     this.activate();
@@ -146,10 +146,10 @@ _V_.Track = _V_.Component.extend({
     // Show element.
     this._super();
   },
-  
+
   // Hide: Mode Hidden (1)
-  // Indicates that the text track is active, but that the user agent is not actively displaying the cues. 
-  // If no attempt has yet been made to obtain the track's cues, the user agent will perform such an attempt momentarily. 
+  // Indicates that the text track is active, but that the user agent is not actively displaying the cues.
+  // If no attempt has yet been made to obtain the track's cues, the user agent will perform such an attempt momentarily.
   // The user agent is maintaining a list of which cues are active, and events are being fired accordingly.
   hide: function(){
     // When hidden, cues are still triggered. Disable to stop triggering.
@@ -209,16 +209,16 @@ _V_.Track = _V_.Component.extend({
 
   // A readiness state
   // One of the following:
-  // 
+  //
   // Not loaded
   // Indicates that the text track is known to exist (e.g. it has been declared with a track element), but its cues have not been obtained.
-  // 
+  //
   // Loading
   // Indicates that the text track is loading and there have been no fatal errors encountered so far. Further cues might still be added to the track.
-  // 
+  //
   // Loaded
   // Indicates that the text track has been loaded with no fatal errors. No new cues will be added to the track except if the text track corresponds to a MutableTextTrack object.
-  // 
+  //
   // Failed to load
   // Indicates that the text track was enabled, but when the user agent attempted to obtain it, this failed in some way (e.g. URL could not be resolved, network error, unknown text track format). Some or all of the cues are likely missing and will not be obtained.
   load: function(){
@@ -464,60 +464,8 @@ _V_.TextTrackDisplay = _V_.Component.extend({
 
 });
 
-/* Menu
+/* Text Track Menu Items
 ================================================================================ */
-_V_.Menu = _V_.Component.extend({
-
-  init: function(player, options){
-    this._super(player, options);
-  },
-
-  addItem: function(component){
-    this.addComponent(component);
-    component.addEvent("click", this.proxy(function(){
-      this.unlockShowing();
-    }));
-  },
-
-  createElement: function(){
-    return this._super("ul", {
-      className: "vjs-menu"
-    });
-  }
-
-});
-
-_V_.MenuItem = _V_.Button.extend({
-
-  init: function(player, options){
-    this._super(player, options);
-
-    if (options.selected) {
-      this.addClass("vjs-selected");
-    }
-  },
-
-  createElement: function(type, attrs){
-    return this._super("li", _V_.merge({
-      className: "vjs-menu-item",
-      innerHTML: this.options.label
-    }, attrs));
-  },
-
-  onClick: function(){
-    this.selected(true);
-  },
-
-  selected: function(selected){
-    if (selected) {
-      this.addClass("vjs-selected");
-    } else {
-      this.removeClass("vjs-selected")
-    }
-  }
-
-});
-
 _V_.TextTrackMenuItem = _V_.MenuItem.extend({
 
   init: function(player, options){
@@ -648,7 +596,7 @@ _V_.TextTrackButton = _V_.Button.extend({
       this.menu.unlockShowing();
     }));
   },
-  // Can't turn off list display that we turned on with focus, because list would go away. 
+  // Can't turn off list display that we turned on with focus, because list would go away.
   onBlur: function(){},
 
   onClick: function(){
@@ -779,7 +727,7 @@ _V_.ChaptersTrackMenuItem = _V_.MenuItem.extend({
   update: function(time){
     var cue = this.cue,
         currentTime = this.player.currentTime();
-    
+
     // _V_.log(currentTime, cue.startTime);
     if (cue.startTime <= currentTime && currentTime < cue.endTime) {
       this.selected(true);

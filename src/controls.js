@@ -53,7 +53,7 @@ _V_.ControlBar = _V_.Component.extend({
     this._super();
     this.player.triggerEvent("controlshidden");
   },
-  
+
   lockShowing: function(){
     this.el.style.opacity = "1";
   }
@@ -221,7 +221,7 @@ _V_.BigPlayButton = _V_.Button.extend({
   onClick: function(){
     // Go back to the beginning if big play button is showing at the end.
     // Have to check for current time otherwise it might throw a 'not ready' error.
-    if(this.player.currentTime()) { 
+    if(this.player.currentTime()) {
       this.player.currentTime(0);
     }
     this.player.play();
@@ -252,9 +252,9 @@ _V_.LoadingSpinner = _V_.Component.extend({
 
     var classNameSpinner, innerHtmlSpinner;
 
-    if ( typeof this.player.el.style.WebkitBorderRadius == "string" 
-         || typeof this.player.el.style.MozBorderRadius == "string" 
-         || typeof this.player.el.style.KhtmlBorderRadius == "string" 
+    if ( typeof this.player.el.style.WebkitBorderRadius == "string"
+         || typeof this.player.el.style.MozBorderRadius == "string"
+         || typeof this.player.el.style.KhtmlBorderRadius == "string"
          || typeof this.player.el.style.borderRadius == "string")
       {
         classNameSpinner = "vjs-loading-spinner";
@@ -788,4 +788,59 @@ _V_.Poster = _V_.Button.extend({
   onClick: function(){
     this.player.play();
   }
+});
+
+/* Menu
+================================================================================ */
+// The base for text track and settings menu buttons.
+_V_.Menu = _V_.Component.extend({
+
+  init: function(player, options){
+    this._super(player, options);
+  },
+
+  addItem: function(component){
+    this.addComponent(component);
+    component.addEvent("click", this.proxy(function(){
+      this.unlockShowing();
+    }));
+  },
+
+  createElement: function(){
+    return this._super("ul", {
+      className: "vjs-menu"
+    });
+  }
+
+});
+
+_V_.MenuItem = _V_.Button.extend({
+
+  init: function(player, options){
+    this._super(player, options);
+
+    if (options.selected) {
+      this.addClass("vjs-selected");
+    }
+  },
+
+  createElement: function(type, attrs){
+    return this._super("li", _V_.merge({
+      className: "vjs-menu-item",
+      innerHTML: this.options.label
+    }, attrs));
+  },
+
+  onClick: function(){
+    this.selected(true);
+  },
+
+  selected: function(selected){
+    if (selected) {
+      this.addClass("vjs-selected");
+    } else {
+      this.removeClass("vjs-selected")
+    }
+  }
+
 });
