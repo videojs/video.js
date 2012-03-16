@@ -1,7 +1,7 @@
 * Overhauled HTML5 Track support.
 * Fixed Flash always autoplaying when setting source.
 * Fixed localStorage context
-* Updated 'fullscreenchange' even to be calledd d even if the user presses escape to exit fullscreen.
+* Updated 'fullscreenchange' event to be called even if the user presses escape to exit fullscreen.
 * Automatically converting URsource URL to absolute for Flash fallback.
 * Created new 'loadedalldata' event for when  the source is completely downloaded
 * Improved player.destory(). Now removes elements and references.
