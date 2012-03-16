@@ -53,7 +53,7 @@ body.vjs-full-window {
 
 /* Text Track Styles */
 /* Overall track holder for both captions and subtitles */
-.video-js .vjs-text-track-display { text-align: center; position: absolute; bottom: 4em; left: 1em; right: 1em; }
+.video-js .vjs-text-track-display { text-align: center; position: absolute; bottom: 4em; left: 1em; right: 1em; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
 /* Individual tracks */
 .video-js .vjs-text-track {
   display: none; color: #fff; font-size: 1.4em; text-align: center; margin-bottom: 0.1em;
@@ -125,7 +125,8 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 }
 
 .vjs-default-skin .vjs-control:focus {
-  outline: 0;
+  outline: 1;
+/*  background-color: #555;*/
 }
 
 /* Hide control text visually, but have it available for screenreaders: h5bp.com/v */
@@ -330,8 +331,8 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 ---------------------------------------------------------*/
 .vjs-default-skin .vjs-big-play-button {
   display: block; /* Start hidden */ z-index: 2;
-  position: absolute; top: 50%; left: 50%; width: 8.0em; height: 8.0em; margin: -43px 0 0 -43px; text-align: center; vertical-align: center; cursor: pointer !important;
-  border: 0.3em solid #fff; opacity: 0.95;
+  position: absolute; top: 50%; left: 50%; width: 8.0em; height: 8.0em; margin: -42px 0 0 -42px; text-align: center; vertical-align: center; cursor: pointer !important;
+  border: 0.2em solid #fff; opacity: 0.95;
   -webkit-border-radius: 25px; -moz-border-radius: 25px; border-radius: 25px;
 
   background: #454545;
@@ -437,9 +438,9 @@ div.vjs-loading-spinner .ball7 { opacity: 0.87; position:absolute; left: 0px; to
 div.vjs-loading-spinner .ball8 { opacity: 1.00; position:absolute; left: 6px; top: 6px; width: 13px; height: 13px; background: #fff;
   border-radius: 13px; -webkit-border-radius: 13px; -moz-border-radius: 13px; border: 1px solid #ccc; }
 
-/* Feature Buttons (Captions/Subtitles/etc.)
+/* Menu Buttons (Captions/Subtitles/etc.)
 -------------------------------------------------------------------------------- */
-.vjs-default-skin .vjs-feature-button { 
+.vjs-default-skin .vjs-menu-button { 
   float: right; margin: 0.2em 0.5em 0 0; padding: 0; width: 3em; height: 2em; cursor: pointer !important;
 
   border: 1px solid #111; -moz-border-radius: 0.3em; -webkit-border-radius: 0.3em; border-radius: 0.3em; 
@@ -453,15 +454,15 @@ div.vjs-loading-spinner .ball8 { opacity: 1.00; position:absolute; left: 6px; to
   background: linear-gradient(top,  #4d4d4d 0%,#3f3f3f 50%,#333333 50%,#252525 100%);
 }
 /* Button Icon */
-.vjs-default-skin .vjs-feature-button div { background: url('video-js.png') 0px -75px no-repeat; width: 16px; height: 16px; margin: 0.2em auto 0; padding: 0; }
+.vjs-default-skin .vjs-menu-button div { background: url('video-js.png') 0px -75px no-repeat; width: 16px; height: 16px; margin: 0.2em auto 0; padding: 0; }
+.vjs-default-skin .vjs-menu-button:focus { border: 1px solid #fff; }
 
 /* Button Pop-up Menu */
-.vjs-default-skin .vjs-feature-button ul { display: none; /* Start hidden. Hover will show. */ }
-.vjs-default-skin .vjs-feature-button:hover ul {
-  display: block;
+.vjs-default-skin .vjs-menu-button ul { 
+  display: none; /* Start hidden. Hover will show. */ 
   opacity: 0.8;
-  list-style: none; padding: 0; margin: 0;
-  position: absolute; width: 10em; bottom: 2em; 
+  padding: 0; margin: 0;
+  position: absolute; width: 10em; bottom: 2em; max-height: 15em;
   left: -3.5em; /* Width of menu - width of button / 2 */
   background-color: #111;
   border: 2px solid #333;
@@ -469,8 +470,32 @@ div.vjs-loading-spinner .ball8 { opacity: 1.00; position:absolute; left: 6px; to
   -webkit-box-shadow: 0 2px 4px 0 #000; -moz-box-shadow: 0 2px 4px 0 #000; box-shadow: 0 2px 4px 0 #000;
   overflow: auto;
 }
-.vjs-default-skin .vjs-feature-button ul li { list-style: none; margin: 0 0 2px 0; padding: 0; line-height: 1.5em; font-size: 1.4em; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; background-color: #333; }
-.vjs-default-skin .vjs-feature-button ul li:hover { background-color: #ccc; color: #333; }
+.vjs-default-skin .vjs-menu-button:hover ul,
+.vjs-default-skin .vjs-menu-button:focus ul { display: block; list-style: none; }
+.vjs-default-skin .vjs-menu-button ul li { list-style: none; margin: 0; padding: 0.3em 0 0.3em 20px; line-height: 1.4em; font-size: 1.2em; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; text-align: left; }
+.vjs-default-skin .vjs-menu-button ul li:hover,
+.vjs-default-skin .vjs-menu-button ul li:focus,
+.vjs-default-skin .vjs-menu-button ul li.vjs-selected:hover,
+.vjs-default-skin .vjs-menu-button ul li.vjs-selected:focus { background-color: #ccc; color: #111; }
+.vjs-default-skin .vjs-menu-button ul li:focus { outline: 0; }
+.vjs-default-skin .vjs-menu-button ul li.vjs-selected { text-decoration: underline; background: url('video-js.png') -125px -50px no-repeat; }
+.vjs-default-skin .vjs-menu-button ul li.vjs-menu-title { 
+  text-align: center; text-transform: uppercase; font-size: 1em; line-height: 2em; padding: 0; margin: 0 0 0.3em 0;
+
+  color: #fff; font-weight: bold;
+
+  cursor: default;
+
+  background: #4d4d4d;
+  background: -moz-linear-gradient(top,  #4d4d4d 0%, #3f3f3f 50%, #333333 50%, #252525 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#4d4d4d), color-stop(50%,#3f3f3f), color-stop(50%,#333333), color-stop(100%,#252525));
+  background: -webkit-linear-gradient(top,  #4d4d4d 0%,#3f3f3f 50%,#333333 50%,#252525 100%);
+  background: -o-linear-gradient(top,  #4d4d4d 0%,#3f3f3f 50%,#333333 50%,#252525 100%);
+  background: -ms-linear-gradient(top,  #4d4d4d 0%,#3f3f3f 50%,#333333 50%,#252525 100%);
+  background: linear-gradient(top,  #4d4d4d 0%,#3f3f3f 50%,#333333 50%,#252525 100%);
+}
 
 /* Subtitles Button */
 .vjs-default-skin .vjs-captions-button div { background-position: -25px -75px; }
+.vjs-default-skin .vjs-chapters-button div { background-position: -100px -75px; }
+.vjs-default-skin .vjs-chapters-button ul { width: 20em; left: -8.5em; /* Width of menu - width of button / 2 */ }

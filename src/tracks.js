@@ -1,52 +1,85 @@
-// Player Extenstions
+// TEXT TRACKS
+// Text tracks are tracks of timed text events.
+//    Captions - text displayed over the video for the hearing impared
+//    Subtitles - text displayed over the video for those who don't understand langauge in the video
+//    Chapters - text displayed in a menu allowing the user to jump to particular points (chapters) in the video
+//    Descriptions (not supported yet) - audio descriptions that are read back to the user by a screen reading device
+
+// Player Track Functions - Functions add to the player object for easier access to tracks
 _V_.merge(_V_.Player.prototype, {
 
   // Add an array of text tracks. captions, subtitles, chapters, descriptions
+  // Track objects will be stored in the player.textTracks array
   addTextTracks: function(trackObjects){
     var tracks = this.textTracks = (this.textTracks) ? this.textTracks : [],
-        i = 0, 
-        j = trackObjects.length, 
-        track, Kind;
+        i = 0, j = trackObjects.length, track, Kind;
 
     for (;i<j;i++) {
       // HTML5 Spec says default to subtitles.
-      // Captitalize first letter to match class names
-      Kind = _V_.capitalize(trackObjects[i].kind || "subtitles");
+      // Uppercase (uc) first letter to match class names
+      Kind = _V_.uc(trackObjects[i].kind || "subtitles");
 
       // Create correct texttrack class. CaptionsTrack, etc.
       track = new _V_[Kind + "Track"](this, trackObjects[i]);
 
       tracks.push(track);
 
-      if (track.default) {
+      // If track.default is set, start showing immediately
+      // TODO: Add a process to deterime the best track to show for the specific kind
+      // Incase there are mulitple defaulted tracks of the same kind
+      // Or the user has a set preference of a specific language that should override the default
+      if (track['default']) {
         this.ready(_V_.proxy(track, track.show));
       }
     }
+
+    // Return the track so it can be appended to the display component
+    return this;
   },
 
-  getTextTrackByKind: function(kind, srclang, label){
+  // Show a text track
+  // disableSameKind: disable all other tracks of the same kind. Value should be a track kind (captions, etc.)
+  showTextTrack: function(id, disableSameKind){
     var tracks = this.textTracks,
         i = 0,
         j = tracks.length,
-        track;
+        track, showTrack, kind;
 
+    // Find Track with same ID
     for (;i<j;i++) {
       track = tracks[i];
-      if (track.kind == kind && (!srclang || track.language == srclang) && (!label || label == track.label)) {
-        break;
+      if (track.id === id) {
+        track.show();
+        showTrack = track;
+
+      // Disable tracks of the same kind
+      } else if (disableSameKind && track.kind == disableSameKind && track.mode > 0) {
+        track.disable();
       }
     }
 
-    return track;
+    // Get track kind from shown track or disableSameKind
+    kind = (showTrack) ? showTrack.kind : ((disableSameKind) ? disableSameKind : false);
+
+    // Trigger trackchange event, captionstrackchange, subtitlestrackchange, etc.
+    if (kind) {
+      this.triggerEvent(kind+"trackchange");
+    }
+
+    return this;
   }
 
 });
 
+// Track Class
+// Contains track methods for loading, showing, parsing cues of tracks
 _V_.Track = _V_.Component.extend({
 
   init: function(player, options){
     this._super(player, options);
 
+    // Apply track info to track object
+    // Options will often be a track element
     _V_.merge(this, {
       // Build ID if one doesn't exist
       id: options.id || ("vjs_" + options.kind + "_" + options.language + "_" + _V_.guid++),
@@ -57,18 +90,23 @@ _V_.Track = _V_.Component.extend({
       "default": options["default"], // 'default' is reserved-ish
       title: options.title,
 
+      // Language - two letter string to represent track language, e.g. "en" for English
       // readonly attribute DOMString language;
       language: options.srclang,
 
+      // Track label e.g. "English"
       // readonly attribute DOMString label;
       label: options.label,
 
+      // All cues of the track. Cues have a startTime, endTime, text, and other properties.
       // readonly attribute TextTrackCueList cues;
       cues: [],
 
+      // ActiveCues is all cues that are currently showing
       // readonly attribute TextTrackCueList activeCues;
       activeCues: [],
 
+      // ReadyState describes if the text file has been loaded
       // const unsigned short NONE = 0;
       // const unsigned short LOADING = 1;
       // const unsigned short LOADED = 2;
@@ -76,21 +114,16 @@ _V_.Track = _V_.Component.extend({
       // readonly attribute unsigned short readyState;
       readyState: 0,
 
+      // Mode describes if the track is showing, hidden, or disabled
       // const unsigned short OFF = 0;
-      // const unsigned short HIDDEN = 1;
+      // const unsigned short HIDDEN = 1; (still triggering cuechange events, but not visible)
       // const unsigned short SHOWING = 2;
       // attribute unsigned short mode;
-      mode: 0,
-
-      currentCue: false,
-      lastCueIndex: 0
+      mode: 0
     });
-
-    // this.update = this.proxy(this.update);
-    // this.update.guid = this.kind + this.update.guid;
-
   },
 
+  // Create basic div to hold cue text
   createElement: function(){
     return this._super("div", {
       className: "vjs-" + this.kind + " vjs-text-track"
@@ -142,10 +175,10 @@ _V_.Track = _V_.Component.extend({
     this.mode = 0;
   },
 
+  // Turn on cue tracking. Tracks that are showing OR hidden are active.
   activate: function(){
-    if (this.readyState == 0) {
-      this.load();
-    }
+    // Load text file if it hasn't been yet.
+    if (this.readyState == 0) { this.load(); }
 
     // Only activate if not already active.
     if (this.mode == 0) {
@@ -157,10 +190,13 @@ _V_.Track = _V_.Component.extend({
       this.player.addEvent("ended", this.proxy(this.reset, this.id));
 
       // Add to display
-      this.player.textTrackDisplay.addComponent(this);
+      if (this.kind == "captions" || this.kind == "subtitles") {
+        this.player.textTrackDisplay.addComponent(this);
+      }
     }
   },
 
+  // Turn off cue tracking.
   deactivate: function(){
     // Using unique ID for proxy function so other tracks don't remove listener
     this.player.removeEvent("timeupdate", this.proxy(this.update, this.id));
@@ -189,6 +225,7 @@ _V_.Track = _V_.Component.extend({
 
     // Only load if not loaded yet.
     if (this.readyState == 0) {
+      this.readyState = 1;
       _V_.get(this.src, this.proxy(this.parseCues), this.proxy(this.onError));
     }
 
@@ -196,9 +233,12 @@ _V_.Track = _V_.Component.extend({
 
   onError: function(err){
     this.error = err;
+    this.readyState = 3;
     this.triggerEvent("error");
   },
 
+  // Parse the WebVTT text format for cue times.
+  // TODO: Separate parser into own class so alternative timed text formats can be used. (TTML, DFXP)
   parseCues: function(srcContent) {
     var cue, time, text,
         lines = srcContent.split("\n"),
@@ -239,6 +279,7 @@ _V_.Track = _V_.Component.extend({
       }
     }
 
+    this.readyState = 2;
     this.triggerEvent("loaded");
   },
 
@@ -263,6 +304,7 @@ _V_.Track = _V_.Component.extend({
     return time;
   },
 
+  // Update active cues whenever timeupdate events are triggered on the player.
   update: function(){
     if (this.cues.length > 0) {
 
@@ -274,24 +316,27 @@ _V_.Track = _V_.Component.extend({
         var cues = this.cues,
 
             // Create a new time box for this state.
-            nextChange = 0,
-            prevChange = this.player.duration(),
-            reverse = false,
-            newCues = [],
-            firstActiveIndex,
-            lastActiveIndex,
-            html = "",
-            cue, i, j;
+            newNextChange = this.player.duration(), // Start at beginning of the timeline
+            newPrevChange = 0, // Start at end
+
+            reverse = false, // Set the direction of the loop through the cues. Optimized the cue check.
+            newCues = [], // Store new active cues.
+
+            // Store where in the loop the current active cues are, to provide a smart starting point for the next loop.
+            firstActiveIndex, lastActiveIndex,
+
+            html = "", // Create cue text HTML to add to the display
+            cue, i, j; // Loop vars
 
         // Check if time is going forwards or backwards (scrubbing/rewinding)
         // If we know the direction we can optimize the starting position and direction of the loop through the cues array.
-        if (nextChange <= time) {
+        if (time >= this.nextChange || this.nextChange === undefined) { // NextChange should happen
           // Forwards, so start at the index of the first active cue and loop forward
           i = (this.firstActiveIndex !== undefined) ? this.firstActiveIndex : 0;
         } else {
           // Backwards, so start at the index of the last active cue and loop backward
           reverse = true;
-          i = (this.lastActiveIndex !== undefined) ? this.lastActiveIndex : cues.length;
+          i = (this.lastActiveIndex !== undefined) ? this.lastActiveIndex : cues.length - 1;
         }
 
         while (true) { // Loop until broken
@@ -299,25 +344,30 @@ _V_.Track = _V_.Component.extend({
 
           // Cue ended at this point
           if (cue.endTime <= time) {
-            prevChange = Math.max(prevChange, cue.endTime);
+            newPrevChange = Math.max(newPrevChange, cue.endTime);
 
             if (cue.active) {
               cue.active = false;
             }
 
+            // No earlier cues should have an active start time.
+            // Nevermind. Assume first cue could have a duration the same as the video.
+            // In that case we need to loop all the way back to the beginning.
+            // if (reverse && cue.startTime) { break; }
+
           // Cue hasn't started
           } else if (time < cue.startTime) {
-            nextChange = Math.min(nextChange, cue.startTime);
+            newNextChange = Math.min(newNextChange, cue.startTime);
 
             if (cue.active) {
               cue.active = false;
             }
 
             // No later cues should have an active start time.
-            break;
+            if (!reverse) { break; }
 
           // Cue is current
-          } else if (time < cue.endTime) {
+          } else {
 
             if (reverse) {
               // Add cue to front of array to keep in time order
@@ -335,81 +385,49 @@ _V_.Track = _V_.Component.extend({
               lastActiveIndex = i;
             }
 
-            nextChange = Math.min(nextChange, cue.endTime);
-            prevChange = Math.max(prevChange, cue.startTime);
+            newNextChange = Math.min(newNextChange, cue.endTime);
+            newPrevChange = Math.max(newPrevChange, cue.startTime);
 
             cue.active = true;
           }
 
           if (reverse) {
+            // Reverse down the array of cues, break if at first
             if (i === 0) { break; } else { i--; }
           } else {
+            // Walk up the array fo cues, break if at last
             if (i === cues.length - 1) { break; } else { i++; }
           }
 
         }
 
-        this.nextChange = nextChange;
-        this.prevChange = prevChange;
+        this.activeCues = newCues;
+        this.nextChange = newNextChange;
+        this.prevChange = newPrevChange;
         this.firstActiveIndex = firstActiveIndex;
         this.lastActiveIndex = lastActiveIndex;
 
-        for (i=0,j=newCues.length;i<j;i++) {
-          html += "<span class='vjs-tt-cue'>"+cue.text+"</span>";
-        }
+        this.updateDisplay();
 
-        this.el.innerHTML = html;
-
+        this.triggerEvent("cuechange");
       }
     }
-
-
-    // // Assuming all cues are in order by time, and do not overlap
-    // if (this.cues && this.cues.length > 0) {
-    //   var time = this.player.currentTime();
-    //   // If current cue should stay showing, don't do anything. Otherwise, find new cue.
-    //   if (!this.currentCue || this.currentCue.startTime >= time || this.currentCue.endTime < time) {
-    //     var newSubIndex = false,
-    //       // // Loop in reverse if lastCue is after current time (optimization)
-    //       // // Meaning the user is scrubbing in reverse or rewinding
-    //       // reverse = (this.cues[this.lastCueIndex].startTime > time),
-    //       // // If reverse, step back 1 becase we know it's not the lastCue
-    //       // i = this.lastCueIndex - (reverse ? 1 : 0);
-    //     // while (true) { // Loop until broken
-    //     //   if (reverse) { // Looping in reverse
-    //     //     // Stop if no more, or this cue ends before the current time (no earlier cues should apply)
-    //     //     if (i < 0 || this.cues[i].endTime < time) { break; }
-    //     //     // End is greater than time, so if start is less, show this cue
-    //     //     if (this.cues[i].startTime < time) {
-    //     //       newSubIndex = i;
-    //     //       break;
-    //     //     }
-    //     //     i--;
-    //     //   } else { // Looping forward
-    //     //     // Stop if no more, or this cue starts after time (no later cues should apply)
-    //     //     if (i >= this.cues.length || this.cues[i].startTime > time) { break; }
-    //     //     // Start is less than time, so if end is later, show this cue
-    //     //     if (this.cues[i].endTime > time) {
-    //     //       newSubIndex = i;
-    //     //       break;
-    //     //     }
-    //     //     i++;
-    //     //   }
-    //     // }
-    // 
-    //     // // Set or clear current cue
-    //     // if (newSubIndex !== false) {
-    //     //   this.currentCue = this.cues[newSubIndex];
-    //     //   this.lastCueIndex = newSubIndex;
-    //     //   this.updatePlayer(this.currentCue.text);
-    //     // } else if (this.currentCue) {
-    //     //   this.currentCue = false;
-    //     //   this.updatePlayer("");
-    //     // }
-    //   }
-    // }
   },
 
+  // Add cue HTML to display
+  updateDisplay: function(){
+    var cues = this.activeCues,
+        html = "",
+        i=0,j=cues.length;
+
+    for (;i<j;i++) {
+      html += "<span class='vjs-tt-cue'>"+cues[i].text+"</span>";
+    }
+
+    this.el.innerHTML = html;
+  },
+
+  // Set all loop helper values back
   reset: function(){
     this.nextChange = 0;
     this.prevChange = this.player.duration();
@@ -419,6 +437,7 @@ _V_.Track = _V_.Component.extend({
 
 });
 
+// Create specific track types
 _V_.CaptionsTrack = _V_.Track.extend({
   kind: "captions"
 });
@@ -427,39 +446,140 @@ _V_.SubtitlesTrack = _V_.Track.extend({
   kind: "subtitles"
 });
 
+_V_.ChaptersTrack = _V_.Track.extend({
+  kind: "chapters"
+});
 
-/* Text Track Displays
+
+/* Text Track Display
 ================================================================================ */
-// Create a behavior type for each text track type (subtitlesDisplay, captionsDisplay, etc.).
-// Then you can easily do something like.
-//    player.addBehavior(myDiv, "subtitlesDisplay");
-// And the myDiv's content will be updated with the text change.
-
-// Base class for all track displays. Should not be instantiated on its own.
+// Global container for both subtitle and captions text. Simple div container.
 _V_.TextTrackDisplay = _V_.Component.extend({
-
-  // init: function(player, options){
-  //   this._super(player, options);
-  // 
-  //   player.addEvent(this.trackType + "update", _V_.proxy(this, this.update));
-  // },
 
   createElement: function(){
     return this._super("div", {
-      className: "vjs-" + this.trackType + " vjs-text-track-display"
+      className: "vjs-text-track-display"
     });
-  },
-
-  update: function(){
-    this.el.innerHTML = this.player.textTrackValue(this.trackType);
   }
 
 });
 
-// _V_.SubtitlesDisplay = _V_.TextTrackDisplay.extend({ trackType: "subtitles" });
-// _V_.CaptionsDisplay = _V_.TextTrackDisplay.extend({ trackType: "captions" });
-// _V_.ChaptersDisplay = _V_.TextTrackDisplay.extend({ trackType: "chapters" });
-// _V_.DescriptionsDisplay = _V_.TextTrackDisplay.extend({ trackType: "descriptions" });
+/* Menu
+================================================================================ */
+_V_.Menu = _V_.Component.extend({
+
+  init: function(player, options){
+    this._super(player, options);
+  },
+
+  addItem: function(component){
+    this.addComponent(component);
+    component.addEvent("click", this.proxy(function(){
+      this.unlockShowing();
+    }));
+  },
+
+  createElement: function(){
+    return this._super("ul", {
+      className: "vjs-menu"
+    });
+  }
+
+});
+
+_V_.MenuItem = _V_.Button.extend({
+
+  init: function(player, options){
+    this._super(player, options);
+
+    if (options.selected) {
+      this.addClass("vjs-selected");
+    }
+  },
+
+  createElement: function(type, attrs){
+    return this._super("li", _V_.merge({
+      className: "vjs-menu-item",
+      innerHTML: this.options.label
+    }, attrs));
+  },
+
+  onClick: function(){
+    this.selected(true);
+  },
+
+  selected: function(selected){
+    if (selected) {
+      this.addClass("vjs-selected");
+    } else {
+      this.removeClass("vjs-selected")
+    }
+  }
+
+});
+
+_V_.TextTrackMenuItem = _V_.MenuItem.extend({
+
+  init: function(player, options){
+    var track = this.track = options.track;
+
+    // Modify options for parent MenuItem class's init.
+    options.label = track.label;
+    options.selected = track["default"];
+    this._super(player, options);
+
+    this.player.addEvent(track.kind + "trackchange", _V_.proxy(this, this.update));
+  },
+
+  onClick: function(){
+    this._super();
+    this.player.showTextTrack(this.track.id, this.track.kind);
+  },
+
+  update: function(){
+    if (this.track.mode == 2) {
+      this.selected(true);
+    } else {
+      this.selected(false);
+    }
+  }
+
+});
+
+_V_.OffTextTrackMenuItem = _V_.TextTrackMenuItem.extend({
+
+  init: function(player, options){
+    // Create pseudo track info
+    // Requires options.kind
+    options.track = { kind: options.kind, player: player, label: "Off" }
+    this._super(player, options);
+  },
+
+  onClick: function(){
+    this._super();
+    this.player.showTextTrack(this.track.id, this.track.kind);
+  },
+
+  update: function(){
+    var tracks = this.player.textTracks,
+        i=0, j=tracks.length, track,
+        off = true;
+
+    for (;i<j;i++) {
+      track = tracks[i];
+      if (track.kind == this.track.kind && track.mode == 2) {
+        off = false;
+      }
+    }
+
+    if (off) {
+      this.selected(true);
+    } else {
+      this.selected(false);
+    }
+  }
+
+});
 
 /* Captions Button
 ================================================================================ */
@@ -468,85 +588,77 @@ _V_.TextTrackButton = _V_.Button.extend({
   init: function(player, options){
     this._super(player, options);
 
-    this.list = _V_.createElement("ul");
+    this.menu = this.createMenu();
 
-    var count = 0,
-        lis = [],
-        li,
-        off = _V_.createElement("li", { innerHTML: "OFF" });
-
-    _V_.addEvent(off, "click", this.proxy(this.turnOff));
-
-    this.each(this.player.textTracks, function(track){
-      if (track.kind === this.kind) {
-        count++;
-
-        li = _V_.createElement("li", { innerHTML: track.label });
-
-        var tempLang = track.language,
-            tempLabel = track.label;
-        _V_.addEvent(li, "click", this.proxy(function(){
-          this.turnOn(tempLang, tempLabel);
-        }));
-
-        lis.push(li);
-      }
-    });
-
-    if (count > 0) {
-      // Only one lang
-      if (count == 1) {
-        lis[0].innerHTML = "ON";
-        lis.push(off);
-      } else {
-        // Add Off to the top of the list
-        lis.splice(0,0,off);
-      }
-      
-      for (var i=0;i<lis.length;i++) {
-        this.list.appendChild(lis[i]);
-      }
-      
-      this.el.appendChild(this.list);
-      
-    } else {
+    if (this.items.length === 0) {
       this.hide();
     }
-
   },
 
-  turnOn: function(lang, label){
-    var tracks = this.player.textTracks,
-        i=0, j=tracks.length,
-        track;
+  createMenu: function(){
+    var menu = new _V_.Menu(this.player);
 
-    for (;i<j;i++) {
-      track = tracks[i];
-      if (track.kind == this.kind) {
-        if (track.language == lang && track.label == label) {
-          track.show();
-        } else if (track.mode > 0) {
-          track.disable();
-        }
-      }
-    }
+    // Add a title list item to the top
+    menu.el.appendChild(_V_.createElement("li", {
+      className: "vjs-menu-title",
+      innerHTML: _V_.uc(this.kind)
+    }));
+
+    // Add an OFF menu item to turn all tracks off
+    menu.addItem(new _V_.OffTextTrackMenuItem(this.player, { kind: this.kind }))
+
+    this.items = this.createItems();
+
+    // Add menu items to the menu
+    this.each(this.items, function(item){
+      menu.addItem(item);
+    });
+
+    // Add list to element
+    this.addComponent(menu);
+
+    return menu;
   },
-  
-  turnOff: function(){
-    var tracks = this.player.textTracks,
-        i=0, j=tracks.length,
-        track;
 
-    for (;i<j;i++) {
-      track = tracks[i];
-      if (track.kind == this.kind && track.mode > 0) {
-        track.disable();
+  // Create a menu item for each text track
+  createItems: function(){
+    var items = [];
+    this.each(this.player.textTracks, function(track){
+      if (track.kind === this.kind) {
+        items.push(new _V_.TextTrackMenuItem(this.player, {
+          track: track
+        }));
       }
-    }
+    });
+    return items;
   },
 
   buildCSSClass: function(){
-    return this.className + " vjs-feature-button " + this._super();
+    return this.className + " vjs-menu-button " + this._super();
+  },
+
+  // Focus - Add keyboard functionality to element
+  onFocus: function(){
+    // Show the menu, and keep showing when the menu items are in focus
+    this.menu.lockShowing();
+    // this.menu.el.style.display = "block";
+
+    // When tabbing through, the menu should hide when focus goes from the last menu item to the next tabbed element.
+    _V_.one(this.menu.el.childNodes[this.menu.el.childNodes.length - 1], "blur", this.proxy(function(){
+      this.menu.unlockShowing();
+    }));
+  },
+  // Can't turn off list display that we turned on with focus, because list would go away. 
+  onBlur: function(){},
+
+  onClick: function(){
+    // When you click the button it adds focus, which will show the menu indefinitely.
+    // So we'll remove focus when the mouse leaves the button.
+    // Focus is needed for tab navigation.
+    this.one("mouseout", this.proxy(function(){
+      this.menu.unlockShowing();
+      this.el.blur();
+    }));
   }
 
 });
@@ -563,10 +675,126 @@ _V_.SubtitlesButton = _V_.TextTrackButton.extend({
   className: "vjs-subtitles-button"
 });
 
+// Chapters act much differently than other text tracks
+// Cues are navigation vs. other tracks of alternative languages
+_V_.ChaptersButton = _V_.TextTrackButton.extend({
+  kind: "chapters",
+  buttonText: "Chapters",
+  className: "vjs-chapters-button",
+
+  // Create a menu item for each text track
+  createItems: function(chaptersTrack){
+    var items = [];
+
+    this.each(this.player.textTracks, function(track){
+      if (track.kind === this.kind) {
+        items.push(new _V_.TextTrackMenuItem(this.player, {
+          track: track
+        }));
+      }
+    });
+
+    return items;
+  },
+
+  createMenu: function(){
+    var tracks = this.player.textTracks,
+        i = 0,
+        j = tracks.length,
+        track, chaptersTrack,
+        items = this.items = [];
+
+    for (;i<j;i++) {
+      track = tracks[i];
+      if (track.kind == this.kind && track["default"]) {
+        if (track.readyState < 2) {
+          this.chaptersTrack = track;
+          track.addEvent("loaded", this.proxy(this.createMenu));
+          return;
+        } else {
+          chaptersTrack = track;
+          break;
+        }
+      }
+    }
+
+    var menu = this.menu = new _V_.Menu(this.player);
+
+    menu.el.appendChild(_V_.createElement("li", {
+      className: "vjs-menu-title",
+      innerHTML: _V_.uc(this.kind)
+    }));
+
+    if (chaptersTrack) {
+      var cues = chaptersTrack.cues,
+          i = 0, j = cues.length, cue, mi;
+
+      for (;i<j;i++) {
+        cue = cues[i];
+
+        mi = new _V_.ChaptersTrackMenuItem(this.player, {
+          track: chaptersTrack,
+          cue: cue
+        });
+
+        items.push(mi);
+
+        menu.addComponent(mi);
+      }
+    }
+
+    // Add list to element
+    this.addComponent(menu);
+
+    if (this.items.length > 0) {
+      this.show();
+    }
+
+    return menu;
+  }
+
+});
+
+_V_.ChaptersTrackMenuItem = _V_.MenuItem.extend({
+
+  init: function(player, options){
+    var track = this.track = options.track,
+        cue = this.cue = options.cue,
+        currentTime = player.currentTime();
+
+    // Modify options for parent MenuItem class's init.
+    options.label = cue.text;
+    options.selected = (cue.startTime <= currentTime && currentTime < cue.endTime);
+    this._super(player, options);
+
+    track.addEvent("cuechange", _V_.proxy(this, this.update));
+  },
+
+  onClick: function(){
+    this._super();
+    this.player.currentTime(this.cue.startTime);
+    this.update(this.cue.startTime);
+  },
+
+  update: function(time){
+    var cue = this.cue,
+        currentTime = this.player.currentTime();
+    
+    // _V_.log(currentTime, cue.startTime);
+    if (cue.startTime <= currentTime && currentTime < cue.endTime) {
+      this.selected(true);
+    } else {
+      this.selected(false);
+    }
+  }
+
+});
+
 // Add Buttons to controlBar
 _V_.merge(_V_.ControlBar.prototype.options.components, {
   "subtitlesButton": {},
-  "captionsButton": {}
+  "captionsButton": {},
+  "chaptersButton": {}
 });
 
 // _V_.Cue = _V_.Component.extend({

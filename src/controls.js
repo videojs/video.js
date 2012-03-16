@@ -8,6 +8,58 @@ _V_.Control = _V_.Component.extend({
 
 });
 
+/* Control Bar
+================================================================================ */
+_V_.ControlBar = _V_.Component.extend({
+
+  options: {
+    loadEvent: "play",
+    components: {
+      "playToggle": {},
+      "fullscreenToggle": {},
+      "currentTimeDisplay": {},
+      "timeDivider": {},
+      "durationDisplay": {},
+      "remainingTimeDisplay": {},
+      "progressControl": {},
+      "volumeControl": {},
+      "muteToggle": {}
+    }
+  },
+
+  init: function(player, options){
+    this._super(player, options);
+
+    player.addEvent("play", this.proxy(function(){
+      this.fadeIn();
+      this.player.addEvent("mouseover", this.proxy(this.fadeIn));
+      this.player.addEvent("mouseout", this.proxy(this.fadeOut));
+    }));
+
+  },
+
+  createElement: function(){
+    return _V_.createElement("div", {
+      className: "vjs-controls"
+    });
+  },
+
+  fadeIn: function(){
+    this._super();
+    this.player.triggerEvent("controlsvisible");
+  },
+
+  fadeOut: function(){
+    this._super();
+    this.player.triggerEvent("controlshidden");
+  },
+  
+  lockShowing: function(){
+    this.el.style.opacity = "1";
+  }
+
+});
+
 /* Button - Base class for all buttons
 ================================================================================ */
 _V_.Button = _V_.Control.extend({
@@ -216,52 +268,6 @@ _V_.LoadingSpinner = _V_.Component.extend({
       className: classNameSpinner,
       innerHTML: innerHtmlSpinner
     });
-  }
-});
-
-/* Control Bar
-================================================================================ */
-_V_.ControlBar = _V_.Component.extend({
-
-  options: {
-    loadEvent: "play",
-    components: {
-      "playToggle": {},
-      "fullscreenToggle": {},
-      "currentTimeDisplay": {},
-      "timeDivider": {},
-      "durationDisplay": {},
-      "remainingTimeDisplay": {},
-      "progressControl": {},
-      "volumeControl": {},
-      "muteToggle": {}
-    }
-  },
-
-  init: function(player, options){
-    this._super(player, options);
-
-    player.addEvent("play", this.proxy(function(){
-      this.fadeIn();
-      this.player.addEvent("mouseover", this.proxy(this.fadeIn));
-      this.player.addEvent("mouseout", this.proxy(this.fadeOut));
-    }));
-  },
-
-  createElement: function(){
-    return _V_.createElement("div", {
-      className: "vjs-controls"
-    });
-  },
-
-  fadeIn: function(){
-    this._super();
-    this.player.triggerEvent("controlsvisible");
-  },
-
-  fadeOut: function(){
-    this._super();
-    this.player.triggerEvent("controlshidden");
   }
 });
 

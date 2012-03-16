@@ -105,7 +105,7 @@ _V_.Component = _V_.Class.extend({
       options = options || {};
 
       // Assume name of set is a lowercased name of the UI Class (PlayButton, etc.)
-      componentClass = options.componentClass || _V_.capitalize(name);
+      componentClass = options.componentClass || _V_.uc(name);
 
       // Create a new object & element for this controls set
       // If there's no .player, this is a player
@@ -144,6 +144,20 @@ _V_.Component = _V_.Class.extend({
   fadeOut: function(){
     this.removeClass("vjs-fade-in");
     this.addClass("vjs-fade-out");
+  },
+
+  lockShowing: function(){
+    var style = this.el.style;
+    style.display = "block";
+    style.opacity = 1;
+    style.visiblity = "visible";
+  },
+
+  unlockShowing: function(){
+    var style = this.el.style;
+    style.display = "";
+    style.opacity = "";
+    style.visiblity = "";
   },
 
   addClass: function(classToAdd){
