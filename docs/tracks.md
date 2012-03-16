@@ -21,3 +21,8 @@ Creating the Text File
 ----------------------
 To provide 
 Tracks require the WebVTT timed text format.
+
+
+Captions
+--------
+http://www.theneitherworld.com/mcpoodle/SCC_TOOLS/DOCS/SCC_FORMAT.HTML#style
