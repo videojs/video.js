@@ -242,7 +242,7 @@ _V_.Track = _V_.Component.extend({
   parseCues: function(srcContent) {
     var cue, time, text,
         lines = srcContent.split("\n"),
-        line = "";
+        line = "", id;
 
     for (var i=1, j=lines.length; i<j; i++) {
       // Line 0 should be 'WEBVTT', so skipping i=0
@@ -251,14 +251,23 @@ _V_.Track = _V_.Component.extend({
 
       if (line) { // Loop until a line with content
 
+        // First line could be an optional cue ID
+        // Check if line has the time separator
+        if (line.indexOf("-->") == -1) {
+          id = line;
+          // Advance to next line for timing.
+          line = _V_.trim(lines[++i]);
+        } else {
+          id = this.cues.length;
+        }
+
         // First line - Number
         cue = {
-          id: line, // Cue Number
+          id: id, // Cue Number
           index: this.cues.length // Position in Array
         };
 
-        // Second line - Time
-        line = _V_.trim(lines[++i]);
+        // Timing line
         time = line.split(" --> ");
         cue.startTime = this.parseCueTime(time[0]);
         cue.endTime = this.parseCueTime(time[1]);
@@ -286,21 +295,40 @@ _V_.Track = _V_.Component.extend({
   parseCueTime: function(timeText) {
     var parts = timeText.split(':'),
         time = 0,
-        flags, seconds;
-    // hours => seconds
-    time += parseFloat(parts[0])*60*60;
-    // minutes => seconds
-    time += parseFloat(parts[1])*60;
-    // get seconds and flags
-    // TODO: Make additional cue layout settings work
-    flags = parts[2].split(/\s+/)
-    // Seconds is the first part before any spaces.
+        hours, minutes, other, seconds, ms, flags;
+
+    // Check if optional hours place is included
+    // 00:00:00.000 vs. 00:00.000
+    if (parts.length == 3) {
+      hours = parts[0];
+      minutes = parts[1];
+      other = parts[2];
+    } else {
+      hours = 0;
+      minutes = parts[0];
+      other = parts[1];
+    }
+
+    // Break other (seconds, milliseconds, and flags) by spaces
+    // TODO: Make additional cue layout settings work with flags
+    other = other.split(/\s+/)
+    // Remove seconds. Seconds is the first part before any spaces.
+    seconds = other.splice(0,1)[0];
     // Could use either . or , for decimal
-    seconds = flags.splice(0,1)[0].split(/\.|,/);
-    time += parseFloat(seconds);
-    // add miliseconds
+    seconds = seconds.split(/\.|,/);
+    // Get milliseconds
     ms = parseFloat(seconds[1]);
+    seconds = seconds[0];
+
+    // hours => seconds
+    time += parseFloat(hours) * 3600;
+    // minutes => seconds
+    time += parseFloat(minutes) * 60;
+    // Add seconds
+    time += parseFloat(seconds);
+    // Add milliseconds
     if (ms) { time += ms/1000; }
+
     return time;
   },
 
