@@ -58,9 +58,10 @@ _V_.Player = _V_.Component.extend({
 
     // Empty video tag sources and tracks so the built in player doesn't use them also.
     if (tag.hasChildNodes()) {
-      for (var i=0,j=tag.childNodes;i<j.length;i++) {
-        if (j[i].nodeName == "SOURCE" || j[i].nodeName == "TRACK") {
-          tag.removeChild(j[i]);
+      var nrOfChildNodes = tag.childNodes.length;
+      for (var i=0,j=tag.childNodes;i<nrOfChildNodes;i++) {
+        if (j[0].nodeName == "SOURCE" || j[0].nodeName == "TRACK") {
+          tag.removeChild(j[0]);
         }
       }
     }
