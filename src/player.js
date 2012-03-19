@@ -84,6 +84,7 @@ _V_.Player = _V_.Component.extend({
     }
 
     // Tracks defined in tracks.js
+    this.textTracks = [];
     if (options.tracks && options.tracks.length > 0) {
       this.addTextTracks(options.tracks);
     }
