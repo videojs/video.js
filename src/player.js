@@ -84,6 +84,7 @@ _V_.Player = _V_.Component.extend({
     }
 
     // Tracks defined in tracks.js
+    this.textTracks = [];
     if (options.tracks && options.tracks.length > 0) {
       this.addTextTracks(options.tracks);
     }
@@ -877,7 +878,6 @@ _V_.Player = _V_.Component.extend({
         if (prefix == "webkit") {
           isFullScreen = prefix + "IsFullScreen";
         } else {
-          _V_.log("moz here")
           isFullScreen = prefix + "FullScreen";
         }
       }

@@ -1,3 +1,4 @@
+* Updated docs with more options.
 * Overhauled HTML5 Track support.
 * Fixed Flash always autoplaying when setting source.
 * Fixed localStorage context
