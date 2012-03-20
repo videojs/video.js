@@ -3,10 +3,10 @@
 <head>
   <title>Video.js | HTML5 Video Player</title>
 
-  <link href="http://vjs.zencdn.net/c/video-js.css" rel="stylesheet" type="text/css">
-
+  <!-- Chang URLs to wherever Video.js files will be hosted -->
+  <link href="video-js.css" rel="stylesheet" type="text/css">
   <!-- video.js must be in the <head> for older IEs to work. -->
-  <script src="http://vjs.zencdn.net/c/video.js"></script>
+  <script src="video.js"></script>
 
 </head>
 <body>
@@ -17,6 +17,7 @@
     <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' />
     <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />
     <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />
+    <track kind="captions" src="captions.vtt" srclang="en" label="English" default>
   </video>
 
 </body>
