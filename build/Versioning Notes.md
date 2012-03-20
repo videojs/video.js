@@ -25,4 +25,12 @@ Release revisions means bug fixes. The CDN url should not reflect the revision n
 
 Tagging a Release
 -----------------
-git tag -a [version number] [commit]
+`git tag -a [version number] [commit]`
+
+Release Names
+-------------
+Using [TMNT characters](http://en.wikipedia.org/wiki/List_of_Teenage_Mutant_Ninja_Turtles_characters).
+
+- Alphabetical order
+- Major Release - Good Guys
+- Minor Release - Bad Guys
