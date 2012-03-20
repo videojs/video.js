@@ -65,9 +65,6 @@ _V_.Player = _V_.Component.extend({
       }
     }
 
-    // Holder for playback tech components
-    this.techs = {};
-
     // Cache for video property values.
     this.values = {};
 
@@ -76,6 +73,7 @@ _V_.Player = _V_.Component.extend({
     this.addEvent("ended", this.onEnded);
     this.addEvent("play", this.onPlay);
     this.addEvent("pause", this.onPause);
+    this.addEvent("progress", this.onProgress);
     this.addEvent("error", this.onError);
 
     // When the API is ready, loop through the components and add to the player.
@@ -83,6 +81,12 @@ _V_.Player = _V_.Component.extend({
       this.ready(function(){
         this.initComponents();
       });
+    }
+
+    // Tracks defined in tracks.js
+    this.textTracks = [];
+    if (options.tracks && options.tracks.length > 0) {
+      this.addTextTracks(options.tracks);
     }
 
     // If there are no sources when the player is initialized,
@@ -99,8 +103,9 @@ _V_.Player = _V_.Component.extend({
         }
       }
     } else {
-      // Loop through playback technologies (HTML5, Flash) and check for support
-      // Then load the best source.
+      // Loop through playback technologies (HTML5, Flash) and check for support. Then load the best source.
+      // A few assumptions here:
+      //   All playback technologies respect preload false.
       this.src(options.sources);
     }
   },
@@ -112,12 +117,13 @@ _V_.Player = _V_.Component.extend({
     // Ensure that tracking progress and time progress will stop and plater deleted
     this.stopTrackingProgress();
     this.stopTrackingCurrentTime();
-    delete _V_.players[this.id]
+    _V_.players[this.id] = null;
+    delete _V_.players[this.id];
+    this.tech.destroy();
+    this.el.parentNode.removeChild(this.el);
   },
 
-  createElement: function(type, options){
-
-  },
+  createElement: function(type, options){},
 
   getVideoTagSettings: function(){
     var options = {
@@ -145,15 +151,14 @@ _V_.Player = _V_.Component.extend({
           });
         }
         if (c.nodeName == "TRACK") {
-          options.tracks.push(new _V_.Track({
+          options.tracks.push({
             src: c.getAttribute("src"),
             kind: c.getAttribute("kind"),
             srclang: c.getAttribute("srclang"),
             label: c.getAttribute("label"),
             'default': c.getAttribute("default") !== null,
             title: c.getAttribute("title")
-          }, this));
-  
+          });
         }
       }
     }
@@ -345,6 +350,13 @@ _V_.Player = _V_.Component.extend({
     _V_.addClass(this.el, "vjs-paused");
   },
 
+  onProgress: function(){
+    // Add custom event for when source is finished downloading.
+    if (this.bufferedPercent() == 1) {
+      this.triggerEvent("loadedalldata");
+    }
+  },
+
   onError: function(e) {
     _V_.log("Video Error", e);
   },
@@ -352,53 +364,127 @@ _V_.Player = _V_.Component.extend({
 /* Player API
 ================================================================================ */
 
-  apiCall: function(method, arg){
-    if (this.isReady) {
-      return this.tech[method](arg);
+  // Pass values to the playback tech
+  techCall: function(method, arg){
+
+    // If it's not ready yet, call method when it is
+    if (!this.tech.isReady) {
+      this.tech.ready(function(){
+        this[method](arg);
+      });
+
+    // Otherwise call method now
     } else {
-      _V_.log("The playback technology API is not ready yet. Use player.ready(myFunction)."+" ["+method+"]", arguments.callee.caller.arguments.callee.caller.arguments.callee.caller)
-      return false;
-      // throw new Error("The playback technology API is not ready yet. Use player.ready(myFunction)."+" ["+method+"]");
+      try {
+        this.tech[method](arg);
+      } catch(e) {
+        _V_.log(e);
+      }
     }
   },
 
-  play: function(){
-    this.apiCall("play"); return this;
-  },
-  pause: function(){
-    this.apiCall("pause"); return this;
-  },
-  paused: function(){
-    return this.apiCall("paused");
+  // Get calls can't wait for the tech, and sometimes don't need to.
+  techGet: function(method){
+
+    // Make sure tech is ready
+    if (this.tech.isReady) {
+
+      // Flash likes to die and reload when you hide or reposition it.
+      // In these cases the object methods go away and we get errors.
+      // When that happens we'll catch the errors and inform tech that it's not ready any more.
+      try {
+        return this.tech[method]();
+      } catch(e) {
+
+        // When building additional tech libs, an expected method may not be defined yet
+        if (this.tech[method] === undefined) {
+          _V_.log("Video.js: " + method + " method not defined for "+this.techName+" playback technology.", e);
+
+        } else {
+
+          // When a method isn't available on the object it throws a TypeError
+          if (e.name == "TypeError") {
+            _V_.log("Video.js: " + method + " unavailable on "+this.techName+" playback technology element.", e);
+            this.tech.isReady = false;
+
+          } else {
+            _V_.log(e);
+          }
+        }
+      }
+    }
+
+    return;
   },
 
+  // Method for calling methods on the current playback technology
+  // techCall: function(method, arg){
+  // 
+  //   // if (this.isReady) {
+  //   //   
+  //   // } else {
+  //   //   _V_.log("The playback technology API is not ready yet. Use player.ready(myFunction)."+" ["+method+"]", arguments.callee.caller.arguments.callee.caller.arguments.callee.caller)
+  //   //   return false;
+  //   //   // throw new Error("The playback technology API is not ready yet. Use player.ready(myFunction)."+" ["+method+"]");
+  //   // }
+  // },
+
+  // http://dev.w3.org/html5/spec/video.html#dom-media-play
+  play: function(){
+    this.techCall("play");
+    return this;
+  },
+
+  // http://dev.w3.org/html5/spec/video.html#dom-media-pause
+  pause: function(){
+    this.techCall("pause");
+    return this;
+  },
+  
+  // http://dev.w3.org/html5/spec/video.html#dom-media-paused
+  // The initial state of paused should be true (in Safari it's actually false)
+  paused: function(){
+    return (this.techGet("paused") === false) ? false : true;
+  },
+
+  // http://dev.w3.org/html5/spec/video.html#dom-media-currenttime
   currentTime: function(seconds){
     if (seconds !== undefined) {
 
       // Cache the last set value for smoother scrubbing.
       this.values.lastSetCurrentTime = seconds;
 
-      this.apiCall("setCurrentTime", seconds);
+      this.techCall("setCurrentTime", seconds);
 
-      if (this.manualTimeUpdates) {
-        this.triggerEvent("timeupdate");
-      }
+      // Improve the accuracy of manual timeupdates
+      if (this.manualTimeUpdates) { this.triggerEvent("timeupdate"); }
+
       return this;
     }
 
     // Cache last currentTime and return
-    return this.values.currentTime = this.apiCall("currentTime");
+    // Default to 0 seconds
+    return this.values.currentTime = (this.techGet("currentTime") || 0);
   },
+
+  // http://dev.w3.org/html5/spec/video.html#dom-media-duration
+  // Duration should return NaN if not available. ParseFloat will turn false-ish values to NaN.
   duration: function(){
-    return this.apiCall("duration");
+    return parseFloat(this.techGet("duration"));
   },
+
+  // Calculates how much time is left. Not in spec, but useful.
   remainingTime: function(){
     return this.duration() - this.currentTime();
   },
 
+  // http://dev.w3.org/html5/spec/video.html#dom-media-buffered
+  // Buffered returns a timerange object. Kind of like an array of portions of the video that have been downloaded.
+  // So far no browsers return more than one range (portion)
   buffered: function(){
-    var buffered = this.apiCall("buffered"),
-        start = 0, end = this.values.bufferEnd = this.values.bufferEnd || 0,
+    var buffered = this.techGet("buffered"),
+        start = 0,
+        end = this.values.bufferEnd = this.values.bufferEnd || 0, // Default end to 0 and store in values
         timeRange;
 
     if (buffered && buffered.length > 0 && buffered.end(0) !== end) {
@@ -410,34 +496,46 @@ _V_.Player = _V_.Component.extend({
     return _V_.createTimeRange(start, end);
   },
 
-  // Calculates amount of buffer is full
+  // Calculates amount of buffer is full. Not in spec but useful.
   bufferedPercent: function(){
     return (this.duration()) ? this.buffered().end(0) / this.duration() : 0;
   },
 
+  // http://dev.w3.org/html5/spec/video.html#dom-media-volume
   volume: function(percentAsDecimal){
+    var vol;
+
     if (percentAsDecimal !== undefined) {
-      var vol = Math.max(0, Math.min(1, parseFloat(percentAsDecimal))); // Force value to between 0 and 1
+      vol = Math.max(0, Math.min(1, parseFloat(percentAsDecimal))); // Force value to between 0 and 1
       this.values.volume = vol;
-      this.apiCall("setVolume", vol);
+      this.techCall("setVolume", vol);
       _V_.setLocalStorage("volume", vol);
       return this;
     }
-    // if (this.values.volume) { return this.values.volume; }
-    return this.apiCall("volume");
-  },
-  muted: function(muted){
-    if (muted !== undefined) {
-      this.apiCall("setMuted", muted);
-      return this;
-    }
-    return this.apiCall("muted");
+
+    // Default to 1 when returning current volume.
+    vol = parseFloat(this.techGet("volume"));
+    return (isNaN(vol)) ? 1 : vol;
   },
 
+  // http://dev.w3.org/html5/spec/video.html#attr-media-muted
+  muted: function(muted){
+    if (muted !== undefined) {
+      this.techCall("setMuted", muted);
+      return this;
+    }
+    return this.techGet("muted") || false; // Default to false
+  },
+
+  // http://dev.w3.org/html5/spec/dimension-attributes.html#attr-dim-height
+  // Video tag width/height only work in pixels. No percents.
+  // We could potentially allow percents but won't for now until we can do testing around it.
   width: function(width, skipListeners){
     if (width !== undefined) {
       this.el.width = width;
       this.el.style.width = width+"px";
+
+      // skipListeners allows us to avoid triggering the resize event when setting both width and height
       if (!skipListeners) { this.triggerEvent("resize"); }
       return this;
     }
@@ -452,12 +550,14 @@ _V_.Player = _V_.Component.extend({
     }
     return parseInt(this.el.getAttribute("height"));
   },
+  // Set both width and height at the same time.
   size: function(width, height){
     // Skip resize listeners on width for optimization
     return this.width(width, true).height(height);
   },
 
-  supportsFullScreen: function(){ return this.apiCall("supportsFullScreen"); },
+  // Check if current tech can support native fullscreen (e.g. with built in controls lik iOS, so not our flash swf)
+  supportsFullScreen: function(){ return this.techGet("supportsFullScreen") || false; },
 
   // Turn on fullscreen (or window) mode
   requestFullScreen: function(){
@@ -467,6 +567,18 @@ _V_.Player = _V_.Component.extend({
 
     // Check for browser element fullscreen support
     if (requestFullScreen) {
+
+      // Trigger fullscreenchange event after change
+      _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
+        this.isFullScreen = document[requestFullScreen.isFullScreen];
+
+        // If cancelling fullscreen, remove event listener.
+        if (this.isFullScreen == false) {
+          _V_.removeEvent(document, requestFullScreen.eventName, arguments.callee);
+        }
+
+        this.triggerEvent("fullscreenchange");
+      }));
 
       // Flash and other plugins get reloaded when you take their parent to fullscreen.
       // To fix that we'll remove the tech, and reload it after the resize has finished.
@@ -486,25 +598,22 @@ _V_.Player = _V_.Component.extend({
         this.el[requestFullScreen.requestFn]();
       }
 
-      // In case the user presses escape to exit fullscreen, we need to update fullscreen status
-      _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
-        this.isFullScreen = document[requestFullScreen.isFullScreen];
-      }));
-
     } else if (this.tech.supportsFullScreen()) {
-      this.apiCall("enterFullScreen");
+      this.triggerEvent("fullscreenchange");
+      this.techCall("enterFullScreen");
 
     } else {
+      this.triggerEvent("fullscreenchange");
       this.enterFullWindow();
     }
-
-     this.triggerEvent("fullscreenchange");
 
      return this;
    },
 
    cancelFullScreen: function(){
     var requestFullScreen = _V_.support.requestFullScreen;
+
+    this.isFullScreen = false;
 
     // Check for browser element fullscreen support
     if (requestFullScreen) {
@@ -528,18 +637,18 @@ _V_.Player = _V_.Component.extend({
      }
 
     } else if (this.tech.supportsFullScreen()) {
-     this.apiCall("exitFullScreen");
+     this.techCall("exitFullScreen");
+     this.triggerEvent("fullscreenchange");
 
     } else {
      this.exitFullWindow();
+     this.triggerEvent("fullscreenchange");
     }
-
-    this.isFullScreen = false;
-    this.triggerEvent("fullscreenchange");
 
     return this;
   },
 
+  // When fullscreen isn't supported we can stretch the video container to as wide as the browser will let us.
   enterFullWindow: function(){
     this.isFullWindow = true;
 
@@ -558,7 +667,6 @@ _V_.Player = _V_.Component.extend({
 
     this.triggerEvent("enterFullWindow");
   },
-
   fullWindowOnEscKey: function(event){
     if (event.keyCode == 27) {
       if (this.isFullScreen == true) {
@@ -585,6 +693,34 @@ _V_.Player = _V_.Component.extend({
     this.triggerEvent("exitFullWindow");
   },
 
+  selectSource: function(sources){
+
+    // Loop through each playback technology in the options order
+    for (var i=0,j=this.options.techOrder;i<j.length;i++) {
+      var techName = j[i],
+          tech = _V_[techName];
+          // tech = _V_.tech[techName];
+
+      // Check if the browser supports this technology
+      if (tech.isSupported()) {
+
+        // Loop through each source object
+        for (var a=0,b=sources;a<b.length;a++) {
+          var source = b[a];
+
+          // Check if source can be played with this technology
+          if (tech.canPlaySource.call(this, source)) {
+
+            return { source: source, tech: techName };
+
+          }
+        }
+      }
+    }
+
+    return false;
+  },
+
   // src is a pretty powerful function
   // If you pass it an array of source objects, it will find the best source to play and use that object.src
   //   If the new source requires a new playback technology, it will switch to that.
@@ -594,48 +730,36 @@ _V_.Player = _V_.Component.extend({
     // Case: Array of source objects to choose from and pick the best to play
     if (source instanceof Array) {
 
-      var sources = source;
+      var sourceTech = this.selectSource(source),
+          source,
+          techName;
 
-      techLoop: // Named loop for breaking both loops
-      // Loop through each playback technology in the options order
-      for (var i=0,j=this.options.techOrder;i<j.length;i++) {
-        var techName = j[i],
-            tech = _V_[techName];
-            // tech = _V_.tech[techName];
+      if (sourceTech) {
+          source = sourceTech.source;
+          techName = sourceTech.tech;
 
-        // Check if the browser supports this technology
-        if (tech.isSupported()) {
+        // If this technology is already loaded, set source
+        if (techName == this.techName) {
+          this.src(source); // Passing the source object
 
-          // Loop through each source object
-          for (var a=0,b=sources;a<b.length;a++) {
-            var source = b[a];
-
-            // Check if source can be played with this technology
-            if (tech.canPlaySource.call(this, source)) {
-
-              // If this technology is already loaded, set source
-              if (techName == this.techName) {
-                this.src(source); // Passing the source object
-
-              // Otherwise load this technology with chosen source
-              } else {
-                this.loadTech(techName, source);
-              }
-
-              break techLoop; // Break both loops
-            }
-          }
+        // Otherwise load this technology with chosen source
+        } else {
+          this.loadTech(techName, source);
         }
+      } else {
+        _V_.log("No compatible source and playback technology were found.")
       }
 
     // Case: Source object { src: "", type: "" ... }
     } else if (source instanceof Object) {
+
       if (_V_[this.techName].canPlaySource(source)) {
         this.src(source.src);
       } else {
         // Send through tech loop to check for a compatible technology.
         this.src([source]);
       }
+
     // Case: URL String (http://myvideo...)
     } else {
       // Cache for getting last set source
@@ -646,7 +770,7 @@ _V_.Player = _V_.Component.extend({
           this.src(source);
         });
       } else {
-        this.apiCall("src", source);
+        this.techCall("src", source);
         if (this.options.preload == "auto") {
           this.load();
         }
@@ -659,72 +783,65 @@ _V_.Player = _V_.Component.extend({
   },
 
   // Begin loading the src data
+  // http://dev.w3.org/html5/spec/video.html#dom-media-load
   load: function(){
-    this.apiCall("load");
+    this.techCall("load");
     return this;
   },
-  currentSrc: function(){
-    return this.apiCall("currentSrc");
-  },
 
-  textTrackValue: function(kind, value){
-    if (value !== undefined) {
-      this.values[kind] = value;
-      this.triggerEvent(kind+"update");
-      return this;
-    }
-    return this.values[kind];
+  // http://dev.w3.org/html5/spec/video.html#dom-media-currentsrc
+  currentSrc: function(){
+    return this.techGet("currentSrc") || this.values.src || "";
   },
 
   // Attributes/Options
   preload: function(value){
     if (value !== undefined) {
-      this.apiCall("setPreload", value);
+      this.techCall("setPreload", value);
       this.options.preload = value;
       return this;
     }
-    return this.apiCall("preload", value);
+    return this.techGet("preload");
   },
   autoplay: function(value){
     if (value !== undefined) {
-      this.apiCall("setAutoplay", value);
+      this.techCall("setAutoplay", value);
       this.options.autoplay = value;
       return this;
     }
-    return this.apiCall("autoplay", value);
+    return this.techGet("autoplay", value);
   },
   loop: function(value){
     if (value !== undefined) {
-      this.apiCall("setLoop", value);
+      this.techCall("setLoop", value);
       this.options.loop = value;
       return this;
     }
-    return this.apiCall("loop", value);
+    return this.techGet("loop");
   },
 
   controls: function(){ return this.options.controls; },
-  textTracks: function(){ return this.options.tracks; },
-  poster: function(){ return this.apiCall("poster"); },
+  poster: function(){ return this.techGet("poster"); },
+  error: function(){ return this.techGet("error"); },
+  ended: function(){ return this.techGet("ended"); }
 
-  error: function(){ return this.apiCall("error"); },
-  networkState: function(){ return this.apiCall("networkState"); },
-  readyState: function(){ return this.apiCall("readyState"); },
-  seeking: function(){ return this.apiCall("seeking"); },
-  initialTime: function(){ return this.apiCall("initialTime"); },
-  startOffsetTime: function(){ return this.apiCall("startOffsetTime"); },
-  played: function(){ return this.apiCall("played"); },
-  seekable: function(){ return this.apiCall("seekable"); },
-  ended: function(){ return this.apiCall("ended"); },
-  videoTracks: function(){ return this.apiCall("videoTracks"); },
-  audioTracks: function(){ return this.apiCall("audioTracks"); },
-  videoWidth: function(){ return this.apiCall("videoWidth"); },
-  videoHeight: function(){ return this.apiCall("videoHeight"); },
-  defaultPlaybackRate: function(){ return this.apiCall("defaultPlaybackRate"); },
-  playbackRate: function(){ return this.apiCall("playbackRate"); },
-  // mediaGroup: function(){ return this.apiCall("mediaGroup"); },
-  // controller: function(){ return this.apiCall("controller"); },
-  controls: function(){ return this.apiCall("controls"); },
-  defaultMuted: function(){ return this.apiCall("defaultMuted"); }
+  // Methods to add support for
+  // networkState: function(){ return this.techCall("networkState"); },
+  // readyState: function(){ return this.techCall("readyState"); },
+  // seeking: function(){ return this.techCall("seeking"); },
+  // initialTime: function(){ return this.techCall("initialTime"); },
+  // startOffsetTime: function(){ return this.techCall("startOffsetTime"); },
+  // played: function(){ return this.techCall("played"); },
+  // seekable: function(){ return this.techCall("seekable"); },
+  // videoTracks: function(){ return this.techCall("videoTracks"); },
+  // audioTracks: function(){ return this.techCall("audioTracks"); },
+  // videoWidth: function(){ return this.techCall("videoWidth"); },
+  // videoHeight: function(){ return this.techCall("videoHeight"); },
+  // defaultPlaybackRate: function(){ return this.techCall("defaultPlaybackRate"); },
+  // playbackRate: function(){ return this.techCall("playbackRate"); },
+  // mediaGroup: function(){ return this.techCall("mediaGroup"); },
+  // controller: function(){ return this.techCall("controller"); },
+  // defaultMuted: function(){ return this.techCall("defaultMuted"); }
 });
 
 // RequestFullscreen API
@@ -761,7 +878,6 @@ _V_.Player = _V_.Component.extend({
         if (prefix == "webkit") {
           isFullScreen = prefix + "IsFullScreen";
         } else {
-          _V_.log("moz here")
           isFullScreen = prefix + "FullScreen";
         }
       }

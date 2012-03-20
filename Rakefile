@@ -21,6 +21,7 @@ namespace :build do
       Rake::Shell["cp dist/video-js.swf dist/#{vsn}/video-js.swf"]
       Rake::Shell["cp dist/video-js.png dist/#{vsn}/video-js.png"]
       Rake::Shell["cp dist/demo.html dist/#{vsn}/demo.html"]
+      Rake::Shell["cp dist/captions.vtt dist/#{vsn}/captions.vtt"]
     end
 
     Rake::Shell["mkdir dist/video-js"]
@@ -38,6 +39,7 @@ namespace :build do
     Rake::Shell["cp dist/video-js.swf dist/video-js/video-js.swf"]
     Rake::Shell["cp dist/video-js.png dist/video-js/video-js.png"]
     Rake::Shell["cp dist/demo.html dist/video-js/demo.html"]
+    Rake::Shell["cp dist/captions.vtt dist/video-js/captions.vtt"]
 
     Rake::Shell["cd dist && zip -r video-js-#{version_number}.zip video-js && cd .."]
 
@@ -94,6 +96,7 @@ namespace :build do
 
     Rake::Shell["cp build/release-files/README.md dist/README.md"]
     Rake::Shell["cp build/release-files/demo.html dist/demo.html"]
+    Rake::Shell["cp build/release-files/captions.vtt dist/captions.vtt"]
     Rake::Shell["cp LGPLv3-LICENSE.txt dist/LGPLv3-LICENSE.txt"]
 
     Rake::Log["Minimizing JavaScript"]
@@ -132,6 +135,39 @@ namespace :build do
       end
       # file.puts "vjsSourceList.push('src/#{item.sub(".js", "")}')"
       # file.puts "vjsSourceList.push('flash/swfobject.js')"
+
+    end
+  end
+  
+  desc "Build list of source files for easy inclusion in projects"
+  task :source_html do
+
+    File.open("dev/source-list.html", "w+") do |file|
+      file.puts "<!-- Video.js Source Files -->"
+
+      src_array = ["src/core", "src/lib"]
+      last = ["src/setup"] # "flash/swfobject", 
+      exclude = [".", "..", ".DS_Store", "_end.js", "_begin.js"]
+
+      Dir.foreach('src') do |item|
+        next if exclude.include? item
+
+        item_name = "src/" << item.sub(".js", "")
+
+        next if (src_array + last).include? item_name
+
+        src_array << item_name
+      end
+
+      src_array = src_array + last
+
+      src_array.each do |item|
+        file.puts "<script src='#{item}.js'></script>"
+      end
+      # file.puts "vjsSourceList.push('src/#{item.sub(".js", "")}')"
+      # file.puts "vjsSourceList.push('flash/swfobject.js')"
+      
+      file.puts "<!-- END Video.js Source Files -->"
 
     end
   end

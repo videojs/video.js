@@ -24,7 +24,7 @@ _V_.PlaybackTech = _V_.Component.extend({
 _V_.apiMethods = "play,pause,paused,currentTime,setCurrentTime,duration,buffered,volume,setVolume,muted,setMuted,width,height,supportsFullScreen,enterFullScreen,src,load,currentSrc,preload,setPreload,autoplay,setAutoplay,loop,setLoop,error,networkState,readyState,seeking,initialTime,startOffsetTime,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight,textTracks,defaultPlaybackRate,playbackRate,mediaGroup,controller,controls,defaultMuted".split(",");
 _V_.each(_V_.apiMethods, function(methodName){
   _V_.PlaybackTech.prototype[methodName] = function(){
-    throw new Error("The '"+method+"' method is not available on the playback technology's API");
+    throw new Error("The '"+methodName+"' method is not available on the playback technology's API");
   }
 });
 
@@ -102,7 +102,9 @@ _V_.html5 = _V_.PlaybackTech.extend({
 
     // Update tag settings, in case they were overridden
     _V_.each(["autoplay","preload","loop","muted"], function(attr){ // ,"poster"
-      el[attr] = player.options[attr];
+      if (player.options[attr] !== null) {
+        el[attr] = player.options[attr];
+      }
     }, this);
 
     return el;
@@ -299,7 +301,7 @@ _V_.flash = _V_.PlaybackTech.extend({
 
     // If source was supplied pass as a flash var.
     if (source) {
-      flashVars.src = encodeURIComponent(source.src);
+      flashVars.src = encodeURIComponent(_V_.getAbsoluteURL(source.src));
     }
 
     // Add placeholder to player div
@@ -459,11 +461,14 @@ _V_.flash = _V_.PlaybackTech.extend({
   play: function(){ this.el.vjs_play(); },
   pause: function(){ this.el.vjs_pause(); },
   src: function(src){
+    // Make sure source URL is abosolute.
+    src = _V_.getAbsoluteURL(src);
+
     this.el.vjs_src(src);
 
     // Currently the SWF doesn't autoplay if you load a source later.
     // e.g. Load player w/ no source, wait 2s, set src.
-    if (this.player.autoplay) {
+    if (this.player.autoplay()) {
       var tech = this;
       setTimeout(function(){ tech.play(); }, 0);
     }
@@ -594,6 +599,8 @@ _V_.flash.onEvent = function(swfID, eventName){
 
 // Log errors from the swf
 _V_.flash.onError = function(swfID, err){
+  var player = _V_.el(swfID).player;
+  player.triggerEvent("error");
   _V_.log("Flash Error", err, swfID);
 };
 

@@ -36,3 +36,14 @@ CHANGELOG
 * Fixed CDN Version which was breaking dev.html
 * Made full-window mode more independent
 * Added rakefile for release generation
+
+---- 3.2.0 / 2012-03-20 / baxter -----------------------------------------------
+* Updated docs with more options.
+* Overhauled HTML5 Track support.
+* Fixed Flash always autoplaying when setting source.
+* Fixed localStorage context
+* Updated 'fullscreenchange' event to be called even if the user presses escape to exit fullscreen.
+* Automatically converting URsource URL to absolute for Flash fallback.
+* Created new 'loadedalldata' event for when  the source is completely downloaded
+* Improved player.destory(). Now removes elements and references.
+* Refactored API to be more immediately available.
