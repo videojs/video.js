@@ -967,6 +967,8 @@ _V_.youtube.onStateChange = function(e){
     case YT.PlayerState.BUFFERING:
       player.triggerEvent("timeupdate");
       player.triggerEvent("waiting");
+      // Hide the waiting spinner since YouTube has its own
+      player.loadingSpinner.hide();
       break;
   }
 
