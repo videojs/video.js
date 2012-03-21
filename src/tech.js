@@ -813,7 +813,7 @@ _V_.youtube = _V_.PlaybackTech.extend({
   currentTime: function(){ return this.youtube.getCurrentTime() || 0; },
   setCurrentTime: function(seconds){
     this.youtube.seekTo(seconds, true);
-    this.youtube.playVideo();
+    this.player.triggerEvent("timeupdate");
   },
 
   duration: function(){ return this.youtube.getDuration() || 0; },
@@ -860,12 +860,13 @@ _V_.youtube = _V_.PlaybackTech.extend({
 
   preload: function(){ return false; },
   setPreload: function(val){ },
-  autoplay: function(){ return !!this.apiArgs.playerArgs.autoplay; },
+  autoplay: function(){ return !!this.apiArgs.playerVars.autoplay; },
   setAutoplay: function(val){ },
-  loop: function(){ return !!this.apiArgs.playerArgs.loop; },
+  loop: function(){ return !!this.apiArgs.playerVars.loop; },
   setLoop: function(val){
-    this.apiArgs.playerArgs.loop = (val ? 1 : 0);
-    this.youtube.setLoop(val);
+    this.player.apiArgs.playerVars.loop = (val ? 1 : 0);
+    // We handle looping manually
+    //this.youtube.setLoop(val);
   },
 
   supportsFullScreen: function(){
@@ -925,21 +926,35 @@ _V_.youtube.onReady = function(e){
   player.tech.triggerReady();
   player.triggerReady();
   player.triggerEvent("durationchange");
+  
+  _V_.youtube.hideOverlay(player);
 };
 
 _V_.youtube.onStateChange = function(e){
   var player = e.target.getIframe().parentNode.player;
 
+  // Suppress any duplicate events from YouTube
   if (player.lastState === e.data)
     return;
 
   switch (e.data) {
     case -1: // Unstarted
-    case YT.PlayerState.CUED:
       player.triggerEvent("durationchange");
+      break;
+    case YT.PlayerState.CUED:
       break;
     case YT.PlayerState.ENDED:
       player.triggerEvent("ended");
+      _V_.youtube.hideOverlay(player);
+      
+      // YouTube looping doesn't seem to play well with VideoJS, so we need to
+      // implement it manually here
+      if (player.apiArgs.playerVars.loop) {
+        player.tech.youtube.seekTo(0, true);
+        player.tech.youtube.playVideo();
+      } else {
+        player.tech.youtube.stopVideo();
+      }
       break;
     case YT.PlayerState.PLAYING:
       player.triggerEvent("timeupdate");
@@ -963,6 +978,22 @@ _V_.youtube.onPlaybackQualityChange = function(e){
   _V_.youtube.updateVideoQuality(player, e.data);
   player.triggerEvent("ratechange");
 };
+
+_V_.youtube.onError = function(e){
+  var player = e.target.getIframe().parentNode.player;
+  player.error = e.data;
+  player.triggerEvent("error");
+};
+
+// Helpers ------------------------------------------------------------
+
+_V_.youtube.hideOverlay = function(player) {
+  // Trigger play and then pause to remove the big play button and poster
+  // since YouTube provides these. Using our own prevents the video from
+  // playing on the first click in mobile devices
+  player.bigPlayButton.hide();
+  player.posterImage.hide();
+}
 
 _V_.youtube.updateVideoQuality = function(player, quality) {
   switch (quality) {
@@ -997,12 +1028,6 @@ _V_.youtube.updateVideoQuality = function(player, quality) {
   }
 };
 
-_V_.youtube.onError = function(e){
-  var player = e.target.getIframe().parentNode.player;
-  player.error = e.data;
-  player.triggerEvent("error");
-};
-
 // Support testing ------------------------------------------------------------
 
 _V_.youtube.isSupported = function(){
@@ -1024,7 +1049,7 @@ _V_.youtube.prototype.support = {
 
   //fullscreen: true,
   // In iOS, if you move a video element in the DOM, it breaks video playback.
-  //movingElementInDOM: !_V_.isIOS(),
+  movingElementInDOM: !_V_.isIOS(),
 
   fullscreenResize: true,
   parentResize: true
