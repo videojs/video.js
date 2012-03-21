@@ -738,7 +738,6 @@ _V_.youtube = _V_.PlaybackTech.extend({
       enablejsapi: 1,
       iv_load_policy: 3,
       modestbranding: 1,
-      origin: document.location.protocol + '//' + document.domain,
       playerapiid: objId,
       rel: 0,
       showinfo: 0,
@@ -747,6 +746,11 @@ _V_.youtube = _V_.PlaybackTech.extend({
       loop: playerOptions.loop ? 1 : 0,
       hd: 0,
     }, options.params);
+
+    var p = (document.location.protocol == 'https:') ? 'https:' : 'http:';
+
+    if (document.location.protocol != 'file:')
+      params.origin = p + "//" + document.domain;
 
     this.apiArgs = {
       videoId: videoId,
@@ -761,7 +765,7 @@ _V_.youtube = _V_.PlaybackTech.extend({
 
     _V_.addEvent(parentEl, "techready", _V_.proxy(this, function(){
       // YouTube JS API is ready, load the player
-      iFrm.src = "//www.youtube.com/embed/" + videoId + "?" +
+      iFrm.src = p + "//www.youtube.com/embed/" + videoId + "?" +
         this.makeQueryString(params);
       // Initialize the YouTube Player object. Only pass events as arguments,
       // since all of our other parameters went into the iFrame URL
@@ -784,7 +788,11 @@ _V_.youtube = _V_.PlaybackTech.extend({
 
   play: function(){ this.youtube.playVideo(); },
   pause: function(){ this.youtube.pauseVideo(); },
-  paused: function(){ return this.youtube.getPlayerState() === YT.PlayerState.PAUSED; },
+  paused: function(){
+    var state = this.youtube.getPlayerState();
+    return state !== YT.PlayerState.PLAYING &&
+           state !== YT.PlayerState.BUFFERING;
+  },
 
   src: function(src){
     delete this.player.error;
@@ -890,7 +898,6 @@ _V_.youtube.onReady = function(e){
   player.tech.triggerReady();
   player.triggerReady();
   player.triggerEvent("durationchange");
-  player.triggerEvent("play");
 };
 
 _V_.youtube.onStateChange = function(e){
@@ -903,7 +910,6 @@ _V_.youtube.onStateChange = function(e){
     case -1: // Unstarted
     case YT.PlayerState.CUED:
       player.triggerEvent("durationchange");
-      player.triggerEvent("play");
       break;
     case YT.PlayerState.ENDED:
       player.triggerEvent("ended");
