@@ -728,12 +728,11 @@ _V_.youtube = _V_.PlaybackTech.extend({
     _V_.youtube.loadingEls = _V_.youtube.loadingEls || [];
     _V_.youtube.loadingEls.push(parentEl);
 
-    // Store player options in local var for optimization
     var playerOptions = player.options;
+    var optionsParams = options.params || {};
 
     // Merge default player parameters with init params
-    var params = _V_.merge({
-      controls: 0,
+    var params = {
       disablekb: 1,
       enablejsapi: 1,
       iv_load_policy: 3,
@@ -743,10 +742,13 @@ _V_.youtube = _V_.PlaybackTech.extend({
       rel: 0,
       showinfo: 0,
       showsearch: 0,
-      autoplay: playerOptions.autoplay ? 1 : 0,
-      loop: playerOptions.loop ? 1 : 0,
-      hd: 0,
-    }, options.params);
+    };
+
+    // Make sure the configurable params are 1 or 0
+    params.controls = this.toBoolInt(optionsParams.ytcontrols || playerOptions.ytcontrols);
+    params.autoplay = this.toBoolInt(optionsParams.autoplay || playerOptions.autoplay);
+    params.loop = this.toBoolInt(optionsParams.loop || playerOptions.loop);
+    params.hd = this.toBoolInt(optionsParams.hd || playerOptions.hd);
 
     var p = (document.location.protocol == 'https:') ? 'https:' : 'http:';
 
@@ -874,6 +876,10 @@ _V_.youtube = _V_.PlaybackTech.extend({
   
   getVideoId: function(url) {
     return url.match(/v=([^&]+)/)[1];
+  },
+  
+  toBoolInt: function(val) {
+    return val ? 1 : 0;
   },
   
   loadApi: function() {
