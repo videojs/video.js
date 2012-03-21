@@ -828,10 +828,30 @@ _V_.youtube = _V_.PlaybackTech.extend({
     return _V_.createTimeRange(secondsOffset, secondsOffset + secondsBuffered);
   },
 
-  volume: function(){ return this.youtube.getVolume() / 100.0; },
-  setVolume: function(percentAsDecimal){ this.youtube.setVolume(percentAsDecimal * 100.0); },
+  volume: function(){
+    if (isNaN(this.youtube.volumeVal))
+      this.youtube.volumeVal = this.youtube.getVolume() / 100.0;
+    return this.youtube.volumeVal;
+  },
+  setVolume: function(percentAsDecimal){
+    if (percentAsDecimal != this.youtube.volumeVal) {
+      this.youtube.volumeVal = percentAsDecimal;
+      this.youtube.setVolume(percentAsDecimal * 100.0);
+      this.player.triggerEvent("volumechange");
+    }
+  },
   muted: function(){ return this.youtube.isMuted(); },
-  setMuted: function(muted){ if (muted) { this.youtube.mute(); } else { this.youtube.unMute(); } },
+  setMuted: function(muted){
+    if (muted)
+      this.youtube.mute();
+    else
+      this.youtube.unMute();
+    
+    // Volume changes do not show up in the API immediately, so we need
+    // to wait for a moment
+    var self = this;
+    setTimeout(function() { self.player.triggerEvent("volumechange"); }, 50);
+  },
 
   width: function(){ return this.el.offsetWidth; },
   height: function(){ return this.el.offsetHeight; },
