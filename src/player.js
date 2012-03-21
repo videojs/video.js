@@ -58,9 +58,10 @@ _V_.Player = _V_.Component.extend({
 
     // Empty video tag sources and tracks so the built in player doesn't use them also.
     if (tag.hasChildNodes()) {
-      for (var i=0,j=tag.childNodes;i<j.length;i++) {
-        if (j[i].nodeName == "SOURCE" || j[i].nodeName == "TRACK") {
-          tag.removeChild(j[i]);
+      var nrOfChildNodes = tag.childNodes.length;
+      for (var i=0,j=tag.childNodes;i<nrOfChildNodes;i++) {
+        if (j[0].nodeName.toLowerCase() == "source" || j[0].nodeName.toLowerCase() == "track") {
+          tag.removeChild(j[0]);
         }
       }
     }
@@ -142,7 +143,7 @@ _V_.Player = _V_.Component.extend({
     if (this.tag.hasChildNodes()) {
       for (var c,i=0,j=this.tag.childNodes;i<j.length;i++) {
         c = j[i];
-        if (c.nodeName == "SOURCE") {
+        if (c.nodeName.toLowerCase() == "source") {
           options.sources.push({
             src: c.getAttribute('src'),
             type: c.getAttribute('type'),
@@ -150,7 +151,7 @@ _V_.Player = _V_.Component.extend({
             title: c.getAttribute('title')
           });
         }
-        if (c.nodeName == "TRACK") {
+        if (c.nodeName.toLowerCase() == "track") {
           options.tracks.push({
             src: c.getAttribute("src"),
             kind: c.getAttribute("kind"),
