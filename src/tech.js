@@ -739,6 +739,7 @@ _V_.youtube = _V_.PlaybackTech.extend({
       iv_load_policy: 3,
       modestbranding: 1,
       playerapiid: objId,
+      wmode: "opaque", // Opaque is needed to overlay controls, but can affect playback performance (Flash only)
       rel: 0,
       showinfo: 0,
       showsearch: 0,
