@@ -42,6 +42,7 @@ cp flash/video-js.swf dist/video-js.swf
 
 cp build/release-files/README.md dist/README.md
 cp build/release-files/demo.html dist/demo.html
+cp build/release-files/youtube.html dist/youtube.html
 cp LGPLv3-LICENSE.txt dist/LGPLv3-LICENSE.txt
 
 java -jar build/lib/yuicompressor-2.4.7.jar dist/video.js -o dist/video.min.js
