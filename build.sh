@@ -23,7 +23,13 @@ cat src/events.js >> dist/video.js
 
 cat src/component.js >> dist/video.js
 cat src/player.js >> dist/video.js
+
 cat src/tech.js >> dist/video.js
+cat src/tech/html5.js >> dist/video.js
+cat src/tech/flash.js >> dist/video.js
+cat src/tech/youtube.js >> dist/video.js
+cat src/tech/vimeo.js >> dist/video.js
+
 cat src/controls.js >> dist/video.js
 
 cat src/tracks.js >> dist/video.js
