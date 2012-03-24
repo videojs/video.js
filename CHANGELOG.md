@@ -46,5 +46,5 @@ CHANGELOG
 * Updated 'fullscreenchange' event to be called even if the user presses escape to exit fullscreen.
 * Automatically converting URsource URL to absolute for Flash fallback.
 * Created new 'loadedalldata' event for when  the source is completely downloaded
-* Improved player.destory(). Now removes elements and references.
+* Improved player.destroy(). Now removes elements and references.
 * Refactored API to be more immediately available.
