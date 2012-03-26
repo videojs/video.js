@@ -15,7 +15,7 @@ _V_.extend({
   // It stores the handler function in a separate cache object
   // and adds a generic handler to the element's event,
   // along with a unique id (guid) to the element.
-  addEvent: function(elem, type, fn){
+  on: function(elem, type, fn){
     var data = _V_.getData(elem), handlers;
 
     // We only need to generate one handler per element
@@ -61,8 +61,10 @@ _V_.extend({
 
     handlers.push(fn);
   },
+  // Deprecated name for 'on' function
+  addEvent: function(){ return _V_.on.apply(this, arguments); },
 
-  removeEvent: function(elem, type, fn) {
+  off: function(elem, type, fn) {
     var data = _V_.getData(elem), handlers;
     // If no events exist, nothing to unbind
     if (!data.events) { return; }
@@ -94,6 +96,8 @@ _V_.extend({
 
     _V_.cleanUpEvents(elem, type);
   },
+  // Deprecated name for 'on' function
+  removeEvent: function(){ return _V_.off.apply(this, arguments); },
 
   cleanUpEvents: function(elem, type) {
     var data = _V_.getData(elem);
@@ -174,7 +178,7 @@ _V_.extend({
     return event;
   },
 
-  triggerEvent: function(elem, event) {
+  trigger: function(elem, event) {
     var data = _V_.getData(elem),
         parent = elem.parentNode || elem.ownerDocument,
         type = event.type || event,
@@ -227,7 +231,9 @@ _V_.extend({
     //   }
     // }
   },
-  
+  // Deprecated name for 'on' function
+  triggerEvent: function(){ return _V_.trigger.apply(this, arguments); },
+
   one: function(elem, type, fn) {
     _V_.addEvent(elem, type, function(){
       _V_.removeEvent(elem, type, arguments.callee)
