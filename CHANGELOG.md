@@ -1,3 +1,4 @@
+* Changed addEvent function name to 'on'. 
 * Removed conflicting array.indexOf function
 Added exitFullScreen to support BlackBerry devices (pull/143)
 --------------------------------------------------------------------------------
