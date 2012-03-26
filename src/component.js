@@ -170,15 +170,24 @@ _V_.Component = _V_.Class.extend({
 
   /* Events
   ================================================================================ */
-  addEvent: function(type, fn, uid){
-    return _V_.addEvent(this.el, type, _V_.proxy(this, fn));
+  on: function(type, fn, uid){
+    return _V_.on(this.el, type, _V_.proxy(this, fn));
   },
-  removeEvent: function(type, fn){
-    return _V_.removeEvent(this.el, type, fn);
+  // Deprecated name for 'on' function
+  addEvent: function(){ return this.on.apply(this, arguments); },
+
+  off: function(type, fn){
+    return _V_.off(this.el, type, fn);
   },
-  triggerEvent: function(type, e){
-    return _V_.triggerEvent(this.el, type, e);
+  // Deprecated name for 'off' function
+  removeEvent: function(){ return this.off.apply(this, arguments); },
+
+  trigger: function(type, e){
+    return _V_.trigger(this.el, type, e);
   },
+  // Deprecated name for 'off' function
+  triggerEvent: function(){ return this.trigger.apply(this, arguments); },
+
   one: function(type, fn) {
     _V_.one(this.el, type, _V_.proxy(this, fn));
   },
@@ -212,7 +221,7 @@ _V_.Component = _V_.Class.extend({
       this.readyQueue = [];
 
       // Allow for using event listeners also, in case you want to do something everytime a source is ready.
-      this.triggerEvent("ready");
+      this.trigger("ready");
     }
   },
 

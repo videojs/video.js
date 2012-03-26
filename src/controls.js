@@ -30,10 +30,10 @@ _V_.ControlBar = _V_.Component.extend({
   init: function(player, options){
     this._super(player, options);
 
-    player.addEvent("play", this.proxy(function(){
+    player.on("play", this.proxy(function(){
       this.fadeIn();
-      this.player.addEvent("mouseover", this.proxy(this.fadeIn));
-      this.player.addEvent("mouseout", this.proxy(this.fadeOut));
+      this.player.on("mouseover", this.proxy(this.fadeIn));
+      this.player.on("mouseout", this.proxy(this.fadeOut));
     }));
 
   },
@@ -46,12 +46,12 @@ _V_.ControlBar = _V_.Component.extend({
 
   fadeIn: function(){
     this._super();
-    this.player.triggerEvent("controlsvisible");
+    this.player.trigger("controlsvisible");
   },
 
   fadeOut: function(){
     this._super();
-    this.player.triggerEvent("controlshidden");
+    this.player.trigger("controlshidden");
   },
 
   lockShowing: function(){
@@ -67,9 +67,9 @@ _V_.Button = _V_.Control.extend({
   init: function(player, options){
     this._super(player, options);
 
-    this.addEvent("click", this.onClick);
-    this.addEvent("focus", this.onFocus);
-    this.addEvent("blur", this.onBlur);
+    this.on("click", this.onClick);
+    this.on("focus", this.onFocus);
+    this.on("blur", this.onBlur);
   },
 
   createElement: function(type, attrs){
@@ -89,7 +89,7 @@ _V_.Button = _V_.Control.extend({
 
   // Focus - Add keyboard functionality to element
   onFocus: function(){
-    _V_.addEvent(document, "keyup", _V_.proxy(this, this.onKeyPress));
+    _V_.on(document, "keyup", _V_.proxy(this, this.onKeyPress));
   },
 
   // KeyPress (document level) - Trigger click when keys are pressed
@@ -103,7 +103,7 @@ _V_.Button = _V_.Control.extend({
 
   // Blur - Remove keyboard triggers
   onBlur: function(){
-    _V_.removeEvent(document, "keyup", _V_.proxy(this, this.onKeyPress));
+    _V_.off(document, "keyup", _V_.proxy(this, this.onKeyPress));
   }
 
 });
@@ -149,8 +149,8 @@ _V_.PlayToggle = _V_.Button.extend({
   init: function(player, options){
     this._super(player, options);
 
-    player.addEvent("play", _V_.proxy(this, this.onPlay));
-    player.addEvent("pause", _V_.proxy(this, this.onPause));
+    player.on("play", _V_.proxy(this, this.onPlay));
+    player.on("pause", _V_.proxy(this, this.onPause));
   },
 
   buildCSSClass: function(){
@@ -207,8 +207,8 @@ _V_.BigPlayButton = _V_.Button.extend({
   init: function(player, options){
     this._super(player, options);
 
-    player.addEvent("play", _V_.proxy(this, this.hide));
-    player.addEvent("ended", _V_.proxy(this, this.show));
+    player.on("play", _V_.proxy(this, this.hide));
+    player.on("ended", _V_.proxy(this, this.show));
   },
 
   createElement: function(){
@@ -234,18 +234,18 @@ _V_.LoadingSpinner = _V_.Component.extend({
   init: function(player, options){
     this._super(player, options);
 
-    player.addEvent("canplay", _V_.proxy(this, this.hide));
-    player.addEvent("canplaythrough", _V_.proxy(this, this.hide));
-    player.addEvent("playing", _V_.proxy(this, this.hide));
+    player.on("canplay", _V_.proxy(this, this.hide));
+    player.on("canplaythrough", _V_.proxy(this, this.hide));
+    player.on("playing", _V_.proxy(this, this.hide));
 
-    player.addEvent("seeking", _V_.proxy(this, this.show));
-    player.addEvent("error", _V_.proxy(this, this.show));
+    player.on("seeking", _V_.proxy(this, this.show));
+    player.on("error", _V_.proxy(this, this.show));
 
     // Not showing spinner on stalled any more. Browsers may stall and then not trigger any events that would remove the spinner.
     // Checked in Chrome 16 and Safari 5.1.2. http://help.videojs.com/discussions/problems/883-why-is-the-download-progress-showing
-    // player.addEvent("stalled", _V_.proxy(this, this.show));
+    // player.on("stalled", _V_.proxy(this, this.show));
 
-    player.addEvent("waiting", _V_.proxy(this, this.show));
+    player.on("waiting", _V_.proxy(this, this.show));
   },
 
   createElement: function(){
@@ -278,7 +278,7 @@ _V_.CurrentTimeDisplay = _V_.Component.extend({
   init: function(player, options){
     this._super(player, options);
 
-    player.addEvent("timeupdate", _V_.proxy(this, this.updateContent));
+    player.on("timeupdate", _V_.proxy(this, this.updateContent));
   },
 
   createElement: function(){
@@ -308,7 +308,7 @@ _V_.DurationDisplay = _V_.Component.extend({
   init: function(player, options){
     this._super(player, options);
 
-    player.addEvent("timeupdate", _V_.proxy(this, this.updateContent));
+    player.on("timeupdate", _V_.proxy(this, this.updateContent));
   },
 
   createElement: function(){
@@ -348,7 +348,7 @@ _V_.RemainingTimeDisplay = _V_.Component.extend({
   init: function(player, options){
     this._super(player, options);
 
-    player.addEvent("timeupdate", _V_.proxy(this, this.updateContent));
+    player.on("timeupdate", _V_.proxy(this, this.updateContent));
   },
 
   createElement: function(){
@@ -382,13 +382,13 @@ _V_.Slider = _V_.Component.extend({
   init: function(player, options){
     this._super(player, options);
 
-    player.addEvent(this.playerEvent, _V_.proxy(this, this.update));
+    player.on(this.playerEvent, _V_.proxy(this, this.update));
 
-    this.addEvent("mousedown", this.onMouseDown);
-    this.addEvent("focus", this.onFocus);
-    this.addEvent("blur", this.onBlur);
+    this.on("mousedown", this.onMouseDown);
+    this.on("focus", this.onFocus);
+    this.on("blur", this.onBlur);
 
-    this.player.addEvent("controlsvisible", this.proxy(this.update));
+    this.player.on("controlsvisible", this.proxy(this.update));
 
     // This is actually to fix the volume handle position. http://twitter.com/#!/gerritvanaaken/status/159046254519787520
     // this.player.one("timeupdate", this.proxy(this.update));
@@ -412,16 +412,16 @@ _V_.Slider = _V_.Component.extend({
     event.preventDefault();
     _V_.blockTextSelection();
 
-    _V_.addEvent(document, "mousemove", _V_.proxy(this, this.onMouseMove));
-    _V_.addEvent(document, "mouseup", _V_.proxy(this, this.onMouseUp));
+    _V_.on(document, "mousemove", _V_.proxy(this, this.onMouseMove));
+    _V_.on(document, "mouseup", _V_.proxy(this, this.onMouseUp));
 
     this.onMouseMove(event);
   },
 
   onMouseUp: function(event) {
     _V_.unblockTextSelection();
-    _V_.removeEvent(document, "mousemove", this.onMouseMove, false);
-    _V_.removeEvent(document, "mouseup", this.onMouseUp, false);
+    _V_.off(document, "mousemove", this.onMouseMove, false);
+    _V_.off(document, "mouseup", this.onMouseUp, false);
 
     this.update();
   },
@@ -491,7 +491,7 @@ _V_.Slider = _V_.Component.extend({
   },
 
   onFocus: function(event){
-    _V_.addEvent(document, "keyup", _V_.proxy(this, this.onKeyPress));
+    _V_.on(document, "keyup", _V_.proxy(this, this.onKeyPress));
   },
 
   onKeyPress: function(event){
@@ -505,7 +505,7 @@ _V_.Slider = _V_.Component.extend({
   },
 
   onBlur: function(event){
-    _V_.removeEvent(document, "keyup", _V_.proxy(this, this.onKeyPress));
+    _V_.off(document, "keyup", _V_.proxy(this, this.onKeyPress));
   }
 });
 
@@ -602,7 +602,7 @@ _V_.LoadProgressBar = _V_.Component.extend({
 
   init: function(player, options){
     this._super(player, options);
-    player.addEvent("progress", _V_.proxy(this, this.update));
+    player.on("progress", _V_.proxy(this, this.update));
   },
 
   createElement: function(){
@@ -726,7 +726,7 @@ _V_.MuteToggle = _V_.Button.extend({
   init: function(player, options){
     this._super(player, options);
 
-    player.addEvent("volumechange", _V_.proxy(this, this.update));
+    player.on("volumechange", _V_.proxy(this, this.update));
   },
 
   createElement: function(){
@@ -772,7 +772,7 @@ _V_.PosterImage = _V_.Button.extend({
       this.hide();
     }
 
-    player.addEvent("play", _V_.proxy(this, this.hide));
+    player.on("play", _V_.proxy(this, this.hide));
   },
 
   createElement: function(){
@@ -801,7 +801,7 @@ _V_.Menu = _V_.Component.extend({
 
   addItem: function(component){
     this.addComponent(component);
-    component.addEvent("click", this.proxy(function(){
+    component.on("click", this.proxy(function(){
       this.unlockShowing();
     }));
   },

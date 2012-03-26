@@ -71,11 +71,11 @@ _V_.Player = _V_.Component.extend({
 
     this.addClass("vjs-paused");
 
-    this.addEvent("ended", this.onEnded);
-    this.addEvent("play", this.onPlay);
-    this.addEvent("pause", this.onPause);
-    this.addEvent("progress", this.onProgress);
-    this.addEvent("error", this.onError);
+    this.on("ended", this.onEnded);
+    this.on("play", this.onPlay);
+    this.on("pause", this.onPause);
+    this.on("progress", this.onProgress);
+    this.on("error", this.onError);
 
     // When the API is ready, loop through the components and add to the player.
     if (options.controls) {
@@ -256,7 +256,7 @@ _V_.Player = _V_.Component.extend({
     // Watch for a native progress event call on the tech element
     // In HTML5, some older versions don't support the progress event
     // So we're assuming they don't, and turning off manual progress if they do.
-    this.tech.addEvent("progress", function(){
+    this.tech.on("progress", function(){
 
       // Remove this listener from the element
       this.removeEvent("progress", arguments.callee);
@@ -280,10 +280,10 @@ _V_.Player = _V_.Component.extend({
       // log(this.values.bufferEnd, this.buffered().end(0), this.duration())
       /* TODO: update for multiple buffered regions */
       if (this.values.bufferEnd < this.buffered().end(0)) {
-        this.triggerEvent("progress");
+        this.trigger("progress");
       } else if (this.bufferedPercent() == 1) {
         this.stopTrackingProgress();
-        this.triggerEvent("progress"); // Last update
+        this.trigger("progress"); // Last update
       }
     }), 500);
   },
@@ -293,12 +293,12 @@ _V_.Player = _V_.Component.extend({
   manualTimeUpdatesOn: function(){
     this.manualTimeUpdates = true;
 
-    this.addEvent("play", this.trackCurrentTime);
-    this.addEvent("pause", this.stopTrackingCurrentTime);
+    this.on("play", this.trackCurrentTime);
+    this.on("pause", this.stopTrackingCurrentTime);
     // timeupdate is also called by .currentTime whenever current time is set
 
     // Watch for native timeupdate event
-    this.tech.addEvent("timeupdate", function(){
+    this.tech.on("timeupdate", function(){
 
       // Remove this listener from the element
       this.removeEvent("timeupdate", arguments.callee);
@@ -321,7 +321,7 @@ _V_.Player = _V_.Component.extend({
   trackCurrentTime: function(){
     if (this.currentTimeInterval) { this.stopTrackingCurrentTime(); }
     this.currentTimeInterval = setInterval(_V_.proxy(this, function(){
-      this.triggerEvent("timeupdate");
+      this.trigger("timeupdate");
     }), 250); // 42 = 24 fps // 250 is what Webkit uses // FF uses 15
   },
 
@@ -354,7 +354,7 @@ _V_.Player = _V_.Component.extend({
   onProgress: function(){
     // Add custom event for when source is finished downloading.
     if (this.bufferedPercent() == 1) {
-      this.triggerEvent("loadedalldata");
+      this.trigger("loadedalldata");
     }
   },
 
@@ -458,7 +458,7 @@ _V_.Player = _V_.Component.extend({
       this.techCall("setCurrentTime", seconds);
 
       // Improve the accuracy of manual timeupdates
-      if (this.manualTimeUpdates) { this.triggerEvent("timeupdate"); }
+      if (this.manualTimeUpdates) { this.trigger("timeupdate"); }
 
       return this;
     }
@@ -537,7 +537,7 @@ _V_.Player = _V_.Component.extend({
       this.el.style.width = width+"px";
 
       // skipListeners allows us to avoid triggering the resize event when setting both width and height
-      if (!skipListeners) { this.triggerEvent("resize"); }
+      if (!skipListeners) { this.trigger("resize"); }
       return this;
     }
     return parseInt(this.el.getAttribute("width"));
@@ -546,7 +546,7 @@ _V_.Player = _V_.Component.extend({
     if (height !== undefined) {
       this.el.height = height;
       this.el.style.height = height+"px";
-      this.triggerEvent("resize");
+      this.trigger("resize");
       return this;
     }
     return parseInt(this.el.getAttribute("height"));
@@ -570,7 +570,7 @@ _V_.Player = _V_.Component.extend({
     if (requestFullScreen) {
 
       // Trigger fullscreenchange event after change
-      _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
+      _V_.on(document, requestFullScreen.eventName, this.proxy(function(){
         this.isFullScreen = document[requestFullScreen.isFullScreen];
 
         // If cancelling fullscreen, remove event listener.
@@ -578,7 +578,7 @@ _V_.Player = _V_.Component.extend({
           _V_.removeEvent(document, requestFullScreen.eventName, arguments.callee);
         }
 
-        this.triggerEvent("fullscreenchange");
+        this.trigger("fullscreenchange");
       }));
 
       // Flash and other plugins get reloaded when you take their parent to fullscreen.
@@ -588,7 +588,7 @@ _V_.Player = _V_.Component.extend({
         this.pause();
         this.unloadTech();
 
-        _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
+        _V_.on(document, requestFullScreen.eventName, this.proxy(function(){
           _V_.removeEvent(document, requestFullScreen.eventName, arguments.callee);
           this.loadTech(this.techName, { src: this.values.src });
         }));
@@ -600,11 +600,11 @@ _V_.Player = _V_.Component.extend({
       }
 
     } else if (this.tech.supportsFullScreen()) {
-      this.triggerEvent("fullscreenchange");
+      this.trigger("fullscreenchange");
       this.techCall("enterFullScreen");
 
     } else {
-      this.triggerEvent("fullscreenchange");
+      this.trigger("fullscreenchange");
       this.enterFullWindow();
     }
 
@@ -626,7 +626,7 @@ _V_.Player = _V_.Component.extend({
        this.pause();
        this.unloadTech();
 
-       _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
+       _V_.on(document, requestFullScreen.eventName, this.proxy(function(){
          _V_.removeEvent(document, requestFullScreen.eventName, arguments.callee);
          this.loadTech(this.techName, { src: this.values.src })
        }));
@@ -639,11 +639,11 @@ _V_.Player = _V_.Component.extend({
 
     } else if (this.tech.supportsFullScreen()) {
      this.techCall("exitFullScreen");
-     this.triggerEvent("fullscreenchange");
+     this.trigger("fullscreenchange");
 
     } else {
      this.exitFullWindow();
-     this.triggerEvent("fullscreenchange");
+     this.trigger("fullscreenchange");
     }
 
     return this;
@@ -657,7 +657,7 @@ _V_.Player = _V_.Component.extend({
     this.docOrigOverflow = document.documentElement.style.overflow;
 
     // Add listener for esc key to exit fullscreen
-    _V_.addEvent(document, "keydown", _V_.proxy(this, this.fullWindowOnEscKey));
+    _V_.on(document, "keydown", _V_.proxy(this, this.fullWindowOnEscKey));
 
     // Hide any scroll bars
     document.documentElement.style.overflow = 'hidden';
@@ -666,7 +666,7 @@ _V_.Player = _V_.Component.extend({
     _V_.addClass(document.body, "vjs-full-window");
     _V_.addClass(this.el, "vjs-fullscreen");
 
-    this.triggerEvent("enterFullWindow");
+    this.trigger("enterFullWindow");
   },
   fullWindowOnEscKey: function(event){
     if (event.keyCode == 27) {
@@ -691,7 +691,7 @@ _V_.Player = _V_.Component.extend({
 
     // Resize the box, controller, and poster to original sizes
     // this.positionAll();
-    this.triggerEvent("exitFullWindow");
+    this.trigger("exitFullWindow");
   },
 
   selectSource: function(sources){
