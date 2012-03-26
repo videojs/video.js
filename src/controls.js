@@ -103,7 +103,7 @@ _V_.Button = _V_.Control.extend({
 
   // Blur - Remove keyboard triggers
   onBlur: function(){
-    _V_.removeEvent(document, "keyup", _V_.proxy(this, this.onKeyPress));
+    _V_.off(document, "keyup", _V_.proxy(this, this.onKeyPress));
   }
 
 });
@@ -420,8 +420,8 @@ _V_.Slider = _V_.Component.extend({
 
   onMouseUp: function(event) {
     _V_.unblockTextSelection();
-    _V_.removeEvent(document, "mousemove", this.onMouseMove, false);
-    _V_.removeEvent(document, "mouseup", this.onMouseUp, false);
+    _V_.off(document, "mousemove", this.onMouseMove, false);
+    _V_.off(document, "mouseup", this.onMouseUp, false);
 
     this.update();
   },
@@ -505,7 +505,7 @@ _V_.Slider = _V_.Component.extend({
   },
 
   onBlur: function(event){
-    _V_.removeEvent(document, "keyup", _V_.proxy(this, this.onKeyPress));
+    _V_.off(document, "keyup", _V_.proxy(this, this.onKeyPress));
   }
 });
 

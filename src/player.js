@@ -71,11 +71,11 @@ _V_.Player = _V_.Component.extend({
 
     this.addClass("vjs-paused");
 
-    this.addEvent("ended", this.onEnded);
-    this.addEvent("play", this.onPlay);
-    this.addEvent("pause", this.onPause);
-    this.addEvent("progress", this.onProgress);
-    this.addEvent("error", this.onError);
+    this.on("ended", this.onEnded);
+    this.on("play", this.onPlay);
+    this.on("pause", this.onPause);
+    this.on("progress", this.onProgress);
+    this.on("error", this.onError);
 
     // When the API is ready, loop through the components and add to the player.
     if (options.controls) {
@@ -256,7 +256,7 @@ _V_.Player = _V_.Component.extend({
     // Watch for a native progress event call on the tech element
     // In HTML5, some older versions don't support the progress event
     // So we're assuming they don't, and turning off manual progress if they do.
-    this.tech.addEvent("progress", function(){
+    this.tech.on("progress", function(){
 
       // Remove this listener from the element
       this.removeEvent("progress", arguments.callee);
@@ -293,12 +293,12 @@ _V_.Player = _V_.Component.extend({
   manualTimeUpdatesOn: function(){
     this.manualTimeUpdates = true;
 
-    this.addEvent("play", this.trackCurrentTime);
-    this.addEvent("pause", this.stopTrackingCurrentTime);
+    this.on("play", this.trackCurrentTime);
+    this.on("pause", this.stopTrackingCurrentTime);
     // timeupdate is also called by .currentTime whenever current time is set
 
     // Watch for native timeupdate event
-    this.tech.addEvent("timeupdate", function(){
+    this.tech.on("timeupdate", function(){
 
       // Remove this listener from the element
       this.removeEvent("timeupdate", arguments.callee);
@@ -570,7 +570,7 @@ _V_.Player = _V_.Component.extend({
     if (requestFullScreen) {
 
       // Trigger fullscreenchange event after change
-      _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
+      _V_.on(document, requestFullScreen.eventName, this.proxy(function(){
         this.isFullScreen = document[requestFullScreen.isFullScreen];
 
         // If cancelling fullscreen, remove event listener.
@@ -588,7 +588,7 @@ _V_.Player = _V_.Component.extend({
         this.pause();
         this.unloadTech();
 
-        _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
+        _V_.on(document, requestFullScreen.eventName, this.proxy(function(){
           _V_.removeEvent(document, requestFullScreen.eventName, arguments.callee);
           this.loadTech(this.techName, { src: this.values.src });
         }));
@@ -626,7 +626,7 @@ _V_.Player = _V_.Component.extend({
        this.pause();
        this.unloadTech();
 
-       _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
+       _V_.on(document, requestFullScreen.eventName, this.proxy(function(){
          _V_.removeEvent(document, requestFullScreen.eventName, arguments.callee);
          this.loadTech(this.techName, { src: this.values.src })
        }));
@@ -657,7 +657,7 @@ _V_.Player = _V_.Component.extend({
     this.docOrigOverflow = document.documentElement.style.overflow;
 
     // Add listener for esc key to exit fullscreen
-    _V_.addEvent(document, "keydown", _V_.proxy(this, this.fullWindowOnEscKey));
+    _V_.on(document, "keydown", _V_.proxy(this, this.fullWindowOnEscKey));
 
     // Hide any scroll bars
     document.documentElement.style.overflow = 'hidden';
