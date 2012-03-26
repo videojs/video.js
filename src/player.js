@@ -280,10 +280,10 @@ _V_.Player = _V_.Component.extend({
       // log(this.values.bufferEnd, this.buffered().end(0), this.duration())
       /* TODO: update for multiple buffered regions */
       if (this.values.bufferEnd < this.buffered().end(0)) {
-        this.triggerEvent("progress");
+        this.trigger("progress");
       } else if (this.bufferedPercent() == 1) {
         this.stopTrackingProgress();
-        this.triggerEvent("progress"); // Last update
+        this.trigger("progress"); // Last update
       }
     }), 500);
   },
@@ -321,7 +321,7 @@ _V_.Player = _V_.Component.extend({
   trackCurrentTime: function(){
     if (this.currentTimeInterval) { this.stopTrackingCurrentTime(); }
     this.currentTimeInterval = setInterval(_V_.proxy(this, function(){
-      this.triggerEvent("timeupdate");
+      this.trigger("timeupdate");
     }), 250); // 42 = 24 fps // 250 is what Webkit uses // FF uses 15
   },
 
@@ -354,7 +354,7 @@ _V_.Player = _V_.Component.extend({
   onProgress: function(){
     // Add custom event for when source is finished downloading.
     if (this.bufferedPercent() == 1) {
-      this.triggerEvent("loadedalldata");
+      this.trigger("loadedalldata");
     }
   },
 
@@ -458,7 +458,7 @@ _V_.Player = _V_.Component.extend({
       this.techCall("setCurrentTime", seconds);
 
       // Improve the accuracy of manual timeupdates
-      if (this.manualTimeUpdates) { this.triggerEvent("timeupdate"); }
+      if (this.manualTimeUpdates) { this.trigger("timeupdate"); }
 
       return this;
     }
@@ -537,7 +537,7 @@ _V_.Player = _V_.Component.extend({
       this.el.style.width = width+"px";
 
       // skipListeners allows us to avoid triggering the resize event when setting both width and height
-      if (!skipListeners) { this.triggerEvent("resize"); }
+      if (!skipListeners) { this.trigger("resize"); }
       return this;
     }
     return parseInt(this.el.getAttribute("width"));
@@ -546,7 +546,7 @@ _V_.Player = _V_.Component.extend({
     if (height !== undefined) {
       this.el.height = height;
       this.el.style.height = height+"px";
-      this.triggerEvent("resize");
+      this.trigger("resize");
       return this;
     }
     return parseInt(this.el.getAttribute("height"));
@@ -578,7 +578,7 @@ _V_.Player = _V_.Component.extend({
           _V_.removeEvent(document, requestFullScreen.eventName, arguments.callee);
         }
 
-        this.triggerEvent("fullscreenchange");
+        this.trigger("fullscreenchange");
       }));
 
       // Flash and other plugins get reloaded when you take their parent to fullscreen.
@@ -600,11 +600,11 @@ _V_.Player = _V_.Component.extend({
       }
 
     } else if (this.tech.supportsFullScreen()) {
-      this.triggerEvent("fullscreenchange");
+      this.trigger("fullscreenchange");
       this.techCall("enterFullScreen");
 
     } else {
-      this.triggerEvent("fullscreenchange");
+      this.trigger("fullscreenchange");
       this.enterFullWindow();
     }
 
@@ -639,11 +639,11 @@ _V_.Player = _V_.Component.extend({
 
     } else if (this.tech.supportsFullScreen()) {
      this.techCall("exitFullScreen");
-     this.triggerEvent("fullscreenchange");
+     this.trigger("fullscreenchange");
 
     } else {
      this.exitFullWindow();
-     this.triggerEvent("fullscreenchange");
+     this.trigger("fullscreenchange");
     }
 
     return this;
@@ -666,7 +666,7 @@ _V_.Player = _V_.Component.extend({
     _V_.addClass(document.body, "vjs-full-window");
     _V_.addClass(this.el, "vjs-fullscreen");
 
-    this.triggerEvent("enterFullWindow");
+    this.trigger("enterFullWindow");
   },
   fullWindowOnEscKey: function(event){
     if (event.keyCode == 27) {
@@ -691,7 +691,7 @@ _V_.Player = _V_.Component.extend({
 
     // Resize the box, controller, and poster to original sizes
     // this.positionAll();
-    this.triggerEvent("exitFullWindow");
+    this.trigger("exitFullWindow");
   },
 
   selectSource: function(sources){

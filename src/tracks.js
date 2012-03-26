@@ -63,7 +63,7 @@ _V_.merge(_V_.Player.prototype, {
 
     // Trigger trackchange event, captionstrackchange, subtitlestrackchange, etc.
     if (kind) {
-      this.triggerEvent(kind+"trackchange");
+      this.trigger(kind+"trackchange");
     }
 
     return this;
@@ -184,10 +184,10 @@ _V_.Track = _V_.Component.extend({
     if (this.mode == 0) {
       // Update current cue on timeupdate
       // Using unique ID for proxy function so other tracks don't remove listener
-      this.player.addEvent("timeupdate", this.proxy(this.update, this.id));
+      this.player.on("timeupdate", this.proxy(this.update, this.id));
 
       // Reset cue time on media end
-      this.player.addEvent("ended", this.proxy(this.reset, this.id));
+      this.player.on("ended", this.proxy(this.reset, this.id));
 
       // Add to display
       if (this.kind == "captions" || this.kind == "subtitles") {
@@ -199,8 +199,8 @@ _V_.Track = _V_.Component.extend({
   // Turn off cue tracking.
   deactivate: function(){
     // Using unique ID for proxy function so other tracks don't remove listener
-    this.player.removeEvent("timeupdate", this.proxy(this.update, this.id));
-    this.player.removeEvent("ended", this.proxy(this.reset, this.id));
+    this.player.off("timeupdate", this.proxy(this.update, this.id));
+    this.player.off("ended", this.proxy(this.reset, this.id));
     this.reset(); // Reset
 
     // Remove from display
@@ -234,7 +234,7 @@ _V_.Track = _V_.Component.extend({
   onError: function(err){
     this.error = err;
     this.readyState = 3;
-    this.triggerEvent("error");
+    this.trigger("error");
   },
 
   // Parse the WebVTT text format for cue times.
@@ -289,7 +289,7 @@ _V_.Track = _V_.Component.extend({
     }
 
     this.readyState = 2;
-    this.triggerEvent("loaded");
+    this.trigger("loaded");
   },
 
   parseCueTime: function(timeText) {
@@ -437,7 +437,7 @@ _V_.Track = _V_.Component.extend({
 
         this.updateDisplay();
 
-        this.triggerEvent("cuechange");
+        this.trigger("cuechange");
       }
     }
   },
@@ -504,7 +504,7 @@ _V_.TextTrackMenuItem = _V_.MenuItem.extend({
     options.selected = track["default"];
     this._super(player, options);
 
-    this.player.addEvent(track.kind + "trackchange", _V_.proxy(this, this.update));
+    this.player.on(track.kind + "trackchange", _V_.proxy(this, this.update));
   },
 
   onClick: function(){
@@ -685,7 +685,7 @@ _V_.ChaptersButton = _V_.TextTrackButton.extend({
       if (track.kind == this.kind && track["default"]) {
         if (track.readyState < 2) {
           this.chaptersTrack = track;
-          track.addEvent("loaded", this.proxy(this.createMenu));
+          track.on("loaded", this.proxy(this.createMenu));
           return;
         } else {
           chaptersTrack = track;
@@ -743,7 +743,7 @@ _V_.ChaptersTrackMenuItem = _V_.MenuItem.extend({
     options.selected = (cue.startTime <= currentTime && currentTime < cue.endTime);
     this._super(player, options);
 
-    track.addEvent("cuechange", _V_.proxy(this, this.update));
+    track.on("cuechange", _V_.proxy(this, this.update));
   },
 
   onClick: function(){

@@ -46,12 +46,12 @@ _V_.ControlBar = _V_.Component.extend({
 
   fadeIn: function(){
     this._super();
-    this.player.triggerEvent("controlsvisible");
+    this.player.trigger("controlsvisible");
   },
 
   fadeOut: function(){
     this._super();
-    this.player.triggerEvent("controlshidden");
+    this.player.trigger("controlshidden");
   },
 
   lockShowing: function(){

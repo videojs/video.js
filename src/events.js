@@ -235,8 +235,8 @@ _V_.extend({
   triggerEvent: function(){ return _V_.trigger.apply(this, arguments); },
 
   one: function(elem, type, fn) {
-    _V_.addEvent(elem, type, function(){
-      _V_.removeEvent(elem, type, arguments.callee)
+    _V_.on(elem, type, function(){
+      _V_.off(elem, type, arguments.callee)
       fn.apply(this, arguments);
     });
   }
