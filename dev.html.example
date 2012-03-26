@@ -12,7 +12,6 @@
 
   <script src="src/core.js"></script>
   <script src="src/lib.js"></script>
-  <script src="src/ecma.js"></script>
   <script src="src/json.js"></script>
 
   <script src="src/component.js"></script>
