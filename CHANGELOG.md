@@ -47,3 +47,6 @@ CHANGELOG
 * Created new 'loadedalldata' event for when  the source is completely downloaded
 * Improved player.destroy(). Now removes elements and references.
 * Refactored API to be more immediately available.
+
+---- 3.2.1 / 2012-04-06 / options-width-fix ------------------------------------
+* Fixed setting width/height with javascript options
