@@ -7,27 +7,34 @@ _V_.Player = _V_.Component.extend({
     this.tag = tag; // Store the original tag used to set options
 
     var el = this.el = _V_.createElement("div"), // Div to contain video and controls
-        options = this.options = {},
-        width = options.width = tag.getAttribute('width'),
-        height = options.height = tag.getAttribute('height'),
+        options = this.options = {};
 
-        // Browsers default to 300x150 if there's no width/height or video size data.
-        initWidth = width || 300,
-        initHeight = height || 150;
-
-    // Make player findable on elements
-    tag.player = el.player = this;
+    // Set Options
+    _V_.merge(options, _V_.options); // Copy Global Defaults
+    _V_.merge(options, this.getVideoTagSettings()); // Override with Video Tag Options
+    _V_.merge(options, addOptions); // Override/extend with options from setup call
 
     // Add callback to ready queue
     this.ready(ready);
+
+    // Store controls setting, and then remove immediately so native controls don't flash.
+    tag.removeAttribute("controls");
+
+    // Poster will be handled by a manual <img>
+    tag.removeAttribute("poster");
+
+    // Make player findable on elements
+    tag.player = el.player = this;
 
     // Wrap video tag in div (el/box) container
     tag.parentNode.insertBefore(el, tag);
     el.appendChild(tag); // Breaks iPhone, fixed in HTML5 setup.
 
     // Give video tag properties to box
-    el.id = this.id = tag.id; // ID will now reference box, not the video tag
+    // ID will now reference box, not the video tag
+    this.id = el.id = tag.id;
     el.className = tag.className;
+
     // Update tag id/class for use as HTML5 playback tech
     tag.id += "_html5_api";
     tag.className = "vjs-tech";
@@ -36,27 +43,18 @@ _V_.Player = _V_.Component.extend({
     _V_.players[el.id] = this;
 
     // Make box use width/height of tag, or default 300x150
-    el.setAttribute("width", initWidth);
-    el.setAttribute("height", initHeight);
+    el.setAttribute("width", options.width);
+    el.setAttribute("height", options.height);
+
     // Enforce with CSS since width/height attrs don't work on divs
-    el.style.width = initWidth+"px";
-    el.style.height = initHeight+"px";
+    el.style.width = options.width+"px";
+    el.style.height = options.height+"px";
+
     // Remove width/height attrs from tag so CSS can make it 100% width/height
     tag.removeAttribute("width");
     tag.removeAttribute("height");
 
-    // Set Options
-    _V_.merge(options, _V_.options); // Copy Global Defaults
-    _V_.merge(options, this.getVideoTagSettings()); // Override with Video Tag Options
-    _V_.merge(options, addOptions); // Override/extend with options from setup call
-
-    // Store controls setting, and then remove immediately so native controls don't flash.
-    tag.removeAttribute("controls");
-
-    // Poster will be handled by a manual <img>
-    tag.removeAttribute("poster");
-
-    // Empty video tag sources and tracks so the built in player doesn't use them also.
+    // Empty video tag sources and tracks so the built-in player doesn't use them also.
     if (tag.hasChildNodes()) {
       for (var i=0,j=tag.childNodes;i<j.length;i++) {
         if (j[i].nodeName == "SOURCE" || j[i].nodeName == "TRACK") {
@@ -129,35 +127,37 @@ _V_.Player = _V_.Component.extend({
     var options = {
       sources: [],
       tracks: []
-    };
+    },
+    tag = this.tag,
+    getAttribute = "getAttribute"; // For better minification
 
-    options.src = this.tag.getAttribute("src");
-    options.controls = this.tag.getAttribute("controls") !== null;
-    options.poster = this.tag.getAttribute("poster");
-    options.preload = this.tag.getAttribute("preload");
-    options.autoplay = this.tag.getAttribute("autoplay") !== null; // hasAttribute not IE <8 compatible
-    options.loop = this.tag.getAttribute("loop") !== null;
-    options.muted = this.tag.getAttribute("muted") !== null;
+    options.src = tag[getAttribute]("src");
+    options.controls = tag[getAttribute]("controls") !== null;
+    options.poster = tag[getAttribute]("poster");
+    options.preload = tag[getAttribute]("preload");
+    options.autoplay = tag[getAttribute]("autoplay") !== null; // hasAttribute not IE <8 compatible
+    options.loop = tag[getAttribute]("loop") !== null;
+    options.muted = tag[getAttribute]("muted") !== null;
 
     if (this.tag.hasChildNodes()) {
       for (var c,i=0,j=this.tag.childNodes;i<j.length;i++) {
         c = j[i];
         if (c.nodeName == "SOURCE") {
           options.sources.push({
-            src: c.getAttribute('src'),
-            type: c.getAttribute('type'),
-            media: c.getAttribute('media'),
-            title: c.getAttribute('title')
+            src: c[getAttribute]('src'),
+            type: c[getAttribute]('type'),
+            media: c[getAttribute]('media'),
+            title: c[getAttribute]('title')
           });
         }
         if (c.nodeName == "TRACK") {
           options.tracks.push({
-            src: c.getAttribute("src"),
-            kind: c.getAttribute("kind"),
-            srclang: c.getAttribute("srclang"),
-            label: c.getAttribute("label"),
-            'default': c.getAttribute("default") !== null,
-            title: c.getAttribute("title")
+            src: c[getAttribute]("src"),
+            kind: c[getAttribute]("kind"),
+            srclang: c[getAttribute]("srclang"),
+            label: c[getAttribute]("label"),
+            'default': c[getAttribute]("default") !== null,
+            title: c[getAttribute]("title")
           });
         }
       }
