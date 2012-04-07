@@ -26,18 +26,13 @@ _V_.Player = _V_.Component.extend({
     // Make player findable on elements
     tag.player = el.player = this;
 
-    // Wrap video tag in div (el/box) container
-    tag.parentNode.insertBefore(el, tag);
-    el.appendChild(tag); // Breaks iPhone, fixed in HTML5 setup.
+    // Make sure tag ID exists
+    tag.id = tag.id || "vjs_video_" + _V_.guid++;
 
     // Give video tag properties to box
     // ID will now reference box, not the video tag
     this.id = el.id = tag.id;
     el.className = tag.className;
-
-    // Update tag id/class for use as HTML5 playback tech
-    tag.id += "_html5_api";
-    tag.className = "vjs-tech";
 
     // Make player easily findable by ID
     _V_.players[el.id] = this;
@@ -50,9 +45,19 @@ _V_.Player = _V_.Component.extend({
     el.style.width = options.width+"px";
     el.style.height = options.height+"px";
 
+    // Update tag id/class for use as HTML5 playback tech
+    // Might think we should do this after embedding in container so .vjs-tech class 
+    // doesn't flash 100% width/height, but class only applies with .video-js parent
+    tag.id += "_html5_api";
+    tag.className = "vjs-tech";
+
     // Remove width/height attrs from tag so CSS can make it 100% width/height
     tag.removeAttribute("width");
     tag.removeAttribute("height");
+
+    // Wrap video tag in div (el/box) container
+    tag.parentNode.insertBefore(el, tag);
+    el.appendChild(tag); // Breaks iPhone, fixed in HTML5 setup.
 
     // Empty video tag sources and tracks so the built-in player doesn't use them also.
     if (tag.hasChildNodes()) {
