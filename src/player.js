@@ -114,9 +114,6 @@ _V_.Player = _V_.Component.extend({
     }
   },
 
-  // Cache for video property values.
-  values: {},
-
   destroy: function(){
     // Ensure that tracking progress and time progress will stop and plater deleted
     this.stopTrackingProgress();
