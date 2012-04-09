@@ -38,12 +38,9 @@ _V_.Player = _V_.Component.extend({
     _V_.players[el.id] = this;
 
     // Make box use width/height of tag, or default 300x150
-    el.setAttribute("width", options.width);
-    el.setAttribute("height", options.height);
-
     // Enforce with CSS since width/height attrs don't work on divs
-    el.style.width = options.width+"px";
-    el.style.height = options.height+"px";
+    this.width(options.width, true); // (true) Skip resize listener on load
+    this.height(options.height, true);
 
     // Update tag id/class for use as HTML5 playback tech
     // Might think we should do this after embedding in container so .vjs-tech class 
@@ -535,31 +532,39 @@ _V_.Player = _V_.Component.extend({
 
   // http://dev.w3.org/html5/spec/dimension-attributes.html#attr-dim-height
   // Video tag width/height only work in pixels. No percents.
-  // We could potentially allow percents but won't for now until we can do testing around it.
-  width: function(width, skipListeners){
-    if (width !== undefined) {
-      this.el.width = width;
-      this.el.style.width = width+"px";
-
-      // skipListeners allows us to avoid triggering the resize event when setting both width and height
-      if (!skipListeners) { this.trigger("resize"); }
-      return this;
-    }
-    return parseInt(this.el.getAttribute("width"));
+  // But allowing limited percents use. e.g. width() will return number+%, not computed width
+  width: function(num, skipListeners){
+    return this.dimension("width", num, skipListeners);
   },
-  height: function(height){
-    if (height !== undefined) {
-      this.el.height = height;
-      this.el.style.height = height+"px";
-      this.trigger("resize");
-      return this;
-    }
-    return parseInt(this.el.getAttribute("height"));
+  height: function(num, skipListeners){
+    return this.dimension("height", num, skipListeners);
   },
   // Set both width and height at the same time.
   size: function(width, height){
     // Skip resize listeners on width for optimization
     return this.width(width, true).height(height);
+  },
+  dimension: function(widthOrHeight, num, skipListeners){
+    if (num !== undefined) {
+
+      // Cache on object to be returned. Shouldn't have any effect after CSS.
+      this.el[widthOrHeight] = num;
+
+      // Check if using percent width/height and adjust
+      if ((""+num).indexOf("%") !== -1) {
+        this.el.style[widthOrHeight] = num;
+      } else {
+        this.el.style[widthOrHeight] = num+"px";
+      }
+
+      // skipListeners allows us to avoid triggering the resize event when setting both width and height
+      if (!skipListeners) { this.trigger("resize"); }
+      return this;
+    }
+
+    // Returns cached width/height in attribute.
+    // Could make this return computed width and support %s. Not a small amount of work.
+    return parseInt(this.el.getAttribute(widthOrHeight));
   },
 
   // Check if current tech can support native fullscreen (e.g. with built in controls lik iOS, so not our flash swf)
