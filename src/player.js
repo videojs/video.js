@@ -141,6 +141,9 @@ _V_.Player = _V_.Component.extend({
     options.autoplay = tag[getAttribute]("autoplay") !== null; // hasAttribute not IE <8 compatible
     options.loop = tag[getAttribute]("loop") !== null;
     options.muted = tag[getAttribute]("muted") !== null;
+    
+    options.width = tag[getAttribute]("width");
+    options.height = tag[getAttribute]("height");
 
     if (this.tag.hasChildNodes()) {
       for (var c,i=0,j=this.tag.childNodes;i<j.length;i++) {
