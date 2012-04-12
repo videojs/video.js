@@ -336,10 +336,6 @@ _V_.Player = _V_.Component.extend({
     if (this.options.loop) {
       this.currentTime(0);
       this.play();
-    } else {
-      this.pause();
-      this.currentTime(0);
-      this.pause();
     }
   },
 
