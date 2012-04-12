@@ -1,3 +1,4 @@
+* Stopped player from going back to beginningg on ended event.
 * Added support for percent width/height and fluid layouts
 * Improved load order of elements to reduce reflow.
 * Changed addEvent function name to 'on'. 
