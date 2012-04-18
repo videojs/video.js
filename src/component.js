@@ -171,25 +171,29 @@ _V_.Component = _V_.Class.extend({
   /* Events
   ================================================================================ */
   on: function(type, fn, uid){
-    return _V_.on(this.el, type, _V_.proxy(this, fn));
+    _V_.on(this.el, type, _V_.proxy(this, fn));
+    return this;
   },
   // Deprecated name for 'on' function
   addEvent: function(){ return this.on.apply(this, arguments); },
 
   off: function(type, fn){
-    return _V_.off(this.el, type, fn);
+    _V_.off(this.el, type, fn);
+    return this;
   },
   // Deprecated name for 'off' function
   removeEvent: function(){ return this.off.apply(this, arguments); },
 
   trigger: function(type, e){
-    return _V_.trigger(this.el, type, e);
+    _V_.trigger(this.el, type, e);
+    return this;
   },
   // Deprecated name for 'off' function
   triggerEvent: function(){ return this.trigger.apply(this, arguments); },
 
   one: function(type, fn) {
     _V_.one(this.el, type, _V_.proxy(this, fn));
+    return this;
   },
 
   /* Ready - Trigger functions when component is ready
