@@ -75,6 +75,7 @@ _V_.Player = _V_.Component.extend({
     this.on("play", this.onPlay);
     this.on("pause", this.onPause);
     this.on("progress", this.onProgress);
+    this.on("durationchange", this.onDurationChange);
     this.on("error", this.onError);
 
     // When the API is ready, loop through the components and add to the player.
@@ -358,6 +359,12 @@ _V_.Player = _V_.Component.extend({
     }
   },
 
+  // Update duration with durationchange event
+  // Allows for cacheing value instead of asking player each time.
+  onDurationChange: function(){
+    this.duration(this.techGet("duration"));
+  },
+
   onError: function(e) {
     _V_.log("Video Error", e);
   },
@@ -470,8 +477,16 @@ _V_.Player = _V_.Component.extend({
 
   // http://dev.w3.org/html5/spec/video.html#dom-media-duration
   // Duration should return NaN if not available. ParseFloat will turn false-ish values to NaN.
-  duration: function(){
-    return parseFloat(this.techGet("duration"));
+  duration: function(seconds){
+    if (seconds !== undefined) {
+
+      // Cache the last set value for optimiized scrubbing (esp. Flash)
+      this.values.duration = parseFloat(seconds);
+
+      return this;
+    }
+
+    return this.values.duration;
   },
 
   // Calculates how much time is left. Not in spec, but useful.
