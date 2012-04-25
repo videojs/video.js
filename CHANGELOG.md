@@ -1,3 +1,4 @@
+* Duration is now setable (need ed for HLS m3u8 files)
 * Event binders (on/off/one) now return the player instance
 * Stopped player from going back to beginningg on ended event.
 * Added support for percent width/height and fluid layouts
