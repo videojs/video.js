@@ -30,7 +30,7 @@ _V_.ControlBar = _V_.Component.extend({
   init: function(player, options){
     this._super(player, options);
 
-    player.addEvent("play", this.proxy(function(){
+    player.one("play", this.proxy(function(){
       this.fadeIn();
       this.player.addEvent("mouseover", this.proxy(this.fadeIn));
       this.player.addEvent("mouseout", this.proxy(this.fadeOut));
