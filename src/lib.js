@@ -15,6 +15,7 @@ _V_.extend({
 
   // Device Checks
   isIE: function(){ return !+"\v1"; },
+  isFF: function(){ return !!_V_.ua.match("Firefox") },
   isIPad: function(){ return navigator.userAgent.match(/iPad/i) !== null; },
   isIPhone: function(){ return navigator.userAgent.match(/iPhone/i) !== null; },
   isIOS: function(){ return VideoJS.isIPhone() || VideoJS.isIPad(); },
@@ -36,6 +37,15 @@ _V_.extend({
     if (!arr || arr.length === 0) { return; }
     for (var i=0,j=arr.length; i<j; i++) {
       fn.call(this, arr[i], i);
+    }
+  },
+
+  eachProp: function(obj, fn){
+    if (!obj) { return; }
+    for (var name in obj) {
+      if (obj.hasOwnProperty(name)) {
+        fn.call(this, name, obj[name]);
+      }
     }
   },
 
@@ -95,8 +105,8 @@ _V_.extend({
   // Return seconds as H:MM:SS or M:SS
   // Supplying a guide (in seconds) will include enough leading zeros to cover the length of the guide
   formatTime: function(seconds, guide) {
-    var guide = guide || seconds, // Default to using seconds as guide
-        s = Math.floor(seconds % 60),
+    guide = guide || seconds; // Default to using seconds as guide
+    var s = Math.floor(seconds % 60),
         m = Math.floor(seconds / 60 % 60),
         h = Math.floor(seconds / 3600),
         gm = Math.floor(guide / 60 % 60),
@@ -115,7 +125,7 @@ _V_.extend({
     return h + m + s;
   },
 
-  capitalize: function(string){
+  uc: function(string){
     return string.charAt(0).toUpperCase() + string.slice(1);
   },
 
@@ -189,17 +199,21 @@ _V_.extend({
   /* Proxy (a.k.a Bind or Context). A simple method for changing the context of a function
      It also stores a unique id on the function so it can be easily removed from events
   ================================================================================ */
-  proxy: function(context, fn) {
+  proxy: function(context, fn, uid) {
     // Make sure the function has a unique ID
     if (!fn.guid) { fn.guid = _V_.guid++; }
+
     // Create the new function that changes the context
     var ret = function() {
       return fn.apply(context, arguments);
-    };
+    }
 
-    // Give the new function the same ID
-    // (so that they are equivalent and can be easily removed)
-    ret.guid = fn.guid;
+    // Allow for the ability to individualize this function
+    // Needed in the case where multiple objects might share the same prototype
+    // IF both items add an event listener with the same function, then you try to remove just one
+    // it will remove both because they both have the same guid.
+    // when using this, you need to use the proxy method when you remove the listener as well.
+    ret.guid = (uid) ? uid + "_" + fn.guid : fn.guid;
 
     return ret;
   },
@@ -256,7 +270,7 @@ _V_.extend({
   ================================================================================ */
   setLocalStorage: function(key, value){
     // IE was throwing errors referencing the var anywhere without this
-    var localStorage = localStorage || false;
+    var localStorage = window.localStorage || false;
     if (!localStorage) { return; }
     try {
       localStorage[key] = value;
@@ -267,6 +281,21 @@ _V_.extend({
         _V_.log("LocalStorage Error (VideoJS)", e);
       }
     }
+  },
+
+  // Get abosolute version of relative URL. Used to tell flash correct URL.
+  // http://stackoverflow.com/questions/470832/getting-an-absolute-url-from-a-relative-one-ie6-issue
+  getAbsoluteURL: function(url){
+
+    // Check if absolute URL
+    if (!url.match(/^https?:\/\//)) {
+      // Convert to absolute URL. Flash hosted off-site needs an absolute URL.
+      url = _V_.createElement('div', {
+        innerHTML: '<a href="'+url+'">x</a>'
+      }).firstChild.href;
+    }
+
+    return url;
   }
 
 });

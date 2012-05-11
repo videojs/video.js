@@ -52,109 +52,65 @@ VideoJS.options = {
   // techOrder: ["flash","html5"],
 
   html5: {},
-  flash: {
-    swf: "http://vjs.zencdn.net/c/video-js.swf"
-  },
+  flash: { swf: "http://vjs.zencdn.net/c/video-js.swf" },
 
   // Default of web browser is 300x150. Should rely on source width/height.
-  width: "auto",
-  height: "auto",
-  
+  width: 300,
+  height: 150,
+
   // defaultVolume: 0.85,
   defaultVolume: 0.00, // The freakin seaguls are driving me crazy!
 
   // Included control sets
-  components: [
-    "poster",
-    "loadingSpinner",
-    "bigPlayButton",
-    { name: "controlBar", options: {
-      components: [
-        "playToggle",
-        "fullscreenToggle",
-        "currentTimeDisplay",
-        "timeDivider",
-        "durationDisplay",
-        "remainingTimeDisplay",
-        { name: "progressControl", options: {
-          components: [
-            { name: "seekBar", options: {
-              components: [
-                "loadProgressBar",
-                "playProgressBar",
-                "seekHandle"
-              ]}
-            }
-          ]}
-        },
-        { name: "volumeControl", options: {
-          components: [
-            { name: "volumeBar", options: {
-              components: [
-                "volumeLevel",
-                "volumeHandle"
-              ]}
-            }
-          ]}
-        },
-        "muteToggle"
-      ]
-    }},
-    "subtitlesDisplay"/*, "replay"*/
-  ]
+  components: {
+    "posterImage": {},
+    "textTrackDisplay": {},
+    "loadingSpinner": {},
+    "bigPlayButton": {},
+    "controlBar": {}
+  }
+
+  // components: [
+  //   "poster",
+  //   "loadingSpinner",
+  //   "bigPlayButton",
+  //   { name: "controlBar", options: {
+  //     components: [
+  //       "playToggle",
+  //       "fullscreenToggle",
+  //       "currentTimeDisplay",
+  //       "timeDivider",
+  //       "durationDisplay",
+  //       "remainingTimeDisplay",
+  //       { name: "progressControl", options: {
+  //         components: [
+  //           { name: "seekBar", options: {
+  //             components: [
+  //               "loadProgressBar",
+  //               "playProgressBar",
+  //               "seekHandle"
+  //             ]}
+  //           }
+  //         ]}
+  //       },
+  //       { name: "volumeControl", options: {
+  //         components: [
+  //           { name: "volumeBar", options: {
+  //             components: [
+  //               "volumeLevel",
+  //               "volumeHandle"
+  //             ]}
+  //           }
+  //         ]}
+  //       },
+  //       "muteToggle"
+  //     ]
+  //   }},
+  //   "subtitlesDisplay"/*, "replay"*/
+  // ]
 };
 
 // Set CDN Version of swf
 if (CDN_VERSION != "GENERATED_CDN_VSN") {
   _V_.options.flash.swf = "http://vjs.zencdn.net/"+CDN_VERSION+"/video-js.swf"
 }
-
-// Automatically set up any tags that have a data-setup attribute
-_V_.autoSetup = function(){
-  var options, vid, player,
-      vids = document.getElementsByTagName("video");
-
-  // Check if any media elements exist
-  if (vids && vids.length > 0) {
-
-    for (var i=0,j=vids.length; i<j; i++) {
-      vid = vids[i];
-
-      // Check if element exists, has getAttribute func.
-      // IE seems to consider typeof el.getAttribute == "object" instead of "function" like expected, at least when loading the player immediately.
-      if (vid && vid.getAttribute) {
-
-        // Make sure this player hasn't already been set up.
-        if (vid.player === undefined) {
-          options = vid.getAttribute("data-setup");
-
-          // Check if data-setup attr exists. 
-          // We only auto-setup if they've added the data-setup attr.
-          if (options !== null) {
-
-            // Parse options JSON
-            // If empty string, make it a parsable json object.
-            options = JSON.parse(options || "{}");
-
-            // Create new video.js instance.
-            player = _V_(vid, options);
-          }
-        }
-
-      // If getAttribute isn't defined, we need to wait for the DOM.
-      } else {
-        _V_.autoSetupTimeout(1);
-        break;
-      }
-    }
-
-  // No videos were found, so keep looping unless page is finisehd loading.
-  } else if (!_V_.windowLoaded) {
-    _V_.autoSetupTimeout(1);
-  }
-};
-
-// Pause to let the DOM keep processing
-_V_.autoSetupTimeout = function(wait){
-  setTimeout(_V_.autoSetup, wait);
-};
