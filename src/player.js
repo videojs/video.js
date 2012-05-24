@@ -771,6 +771,7 @@ _V_.Player = _V_.Component.extend({
           this.loadTech(techName, source);
         }
       } else {
+        this.triggerLoadError();
         _V_.log("No compatible source and playback technology were found.")
       }
 
