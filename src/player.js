@@ -14,9 +14,6 @@ _V_.Player = _V_.Component.extend({
     _V_.merge(options, this.getVideoTagSettings()); // Override with Video Tag Options
     _V_.merge(options, addOptions); // Override/extend with options from setup call
 
-    // Add callback to ready queue
-    this.ready(ready);
-
     // Store controls setting, and then remove immediately so native controls don't flash.
     tag.removeAttribute("controls");
 
@@ -84,6 +81,9 @@ _V_.Player = _V_.Component.extend({
         this.initComponents();
       });
     }
+
+    // Add callback to ready queue
+    this.ready(ready);
 
     // Tracks defined in tracks.js
     this.textTracks = [];
