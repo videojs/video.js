@@ -89,9 +89,9 @@ _V_.youtube = _V_.PlaybackTech.extend({
   },
 
   destroy: function(){
+    this.el.parentNode.removeChild(this.el);
     this.youtube.destroy();
     delete this.youtube;
-    this.el.parentNode.removeChild(this.el);
   },
 
   play: function(){ this.youtube.playVideo(); },
@@ -363,7 +363,7 @@ _V_.youtube.prototype.support = {
 window.onYouTubePlayerAPIReady = function() {
   // Fire a techready event for each loading player
   var loadingEl;
-  while (loadingEl = _V_.youtube.loadingEls.shift()) {
+  while ((loadingEl = _V_.youtube.loadingEls.shift())) {
     loadingEl.player.triggerEvent("techready");
   }
 };
