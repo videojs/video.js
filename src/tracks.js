@@ -529,6 +529,7 @@ _V_.OffTextTrackMenuItem = _V_.TextTrackMenuItem.extend({
     // Requires options.kind
     options.track = { kind: options.kind, player: player, label: "Off" }
     this._super(player, options);
+    this.selected(true);
   },
 
   onClick: function(){
