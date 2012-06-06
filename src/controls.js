@@ -28,13 +28,77 @@ _V_.ControlBar = _V_.Component.extend({
   },
 
   init: function(player, options){
+
+    var didMousemove = false,
+        mousedOverControls = false,
+        fadeOutTimeout,
+        placeholderFadeIn,
+        placeholderFadeOut;
+
     this._super(player, options);
 
     player.one("play", this.proxy(function(){
-      this.fadeIn();
-      this.player.on("mouseover", this.proxy(this.fadeIn));
-      this.player.on("mouseout", this.proxy(this.fadeOut));
+
+      // When the player is first initialized, trigger the mousemove switch to 
+      // show the control bar at first.
+      didMousemove = true;
+
+      // These placeholders are to store the function calls for use in the interval below.
+      placeholderFadeIn = this.proxy(this.fadeIn);
+      placeholderFadeOut = this.proxy(this.fadeOut);
+
+      // When the mouse is moved over the player, trigger this switch for the below interval.
+      this.player.on("mousemove", function(e) {
+        didMousemove = true;
+      });
+
+      // When mousing over the control bar, set a separate flag so that we can keep the 
+      // control bar visible indefinitely while hovering over it.
+      this.on("mousemove", function() {
+        mousedOverControls = true;
+      });
+
+      // If the user mouses out of the player while over the control bar, this clears the 
+      // "moused over the control bar" flag so that the control bar doesn't stay visible.
+      this.player.on("mouseout", function() {
+        mousedOverControls = false;
+      });
+
+      // When entering or exiting fullscreen, trigger the usual mousemove event.
+      // This is necessary because if you click the fullscreen button for browsers that 
+      // support native fullscreen, the browser still thinks your mouse pointer is over 
+      // the fullscreen button even after the control bar has been moved to the bottom 
+      // of the screen. Because of this, the control bar would otherwise stay visible 
+      // until the mouse is moved again.
+      this.player.on("fullscreenchange", function() {
+        didMousemove = true;
+      });
+
     }));
+
+    // Run an interval every 250 milliseconds instead of stuffing everything into 
+    // the mousemove function itself, to prevent performance degradation.
+    // http://ejohn.org/blog/learning-from-twitter/
+    setInterval(function() {
+      // Check to see if the mouse has been moved in the last 250 milliseconds
+      if (didMousemove) {
+        // If so, immediately show the controls
+        placeholderFadeIn();
+        // Clear any existing fade out instructions that are waiting to trigger
+        clearTimeout(fadeOutTimeout);
+        // If this mouse movement was not over the control bar...
+        if (!mousedOverControls) {
+          // Set the control bar to fade out in 1.5 seconds
+          fadeOutTimeout = setTimeout(function() {
+            placeholderFadeOut();
+          }, 1500);
+        }
+        // (If so, don't set the control bar to fade out, keep it visible)
+        // Reset any movement markers for next time.
+        didMousemove = false;
+        mousedOverControls = false;
+      }
+    }, 250);
 
   },
 
