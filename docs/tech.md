@@ -44,3 +44,56 @@ timeupdate
 progress
 enterFullScreen
 exitFullScreen
+
+
+<!-- Added By John A. Baena (JAB) -->
+
+Adding Playback Technology
+===================
+When adding additional Tech to a video player, make sure to add the supported tech to the video object.
+
+<b>Tag Method:</b>
+<code type="html">
+  <video data-setup='{"techOrder", "html5", "flash", [other supported tech]}'
+</code>
+
+<b>Object Method:</b>
+<code type="javascript">
+  _V_("videoID", {
+    techOrder: {"html5", "flash", [other supported tech]}
+  });
+</code>
+
+Youtube Technology
+==================
+To add a youtube source to your video tag, use the following source:
+
+<code type="html">
+  <source src="http://www.youtube.com/watch?v=[ytVideoId]" type="video/youtube"
+</code>
+
+<b>Important Note:</b>
+> You can simply copy and paste the url of the youtube page from the browser and
+> the Youtube Tech will be able to find the video id by itself. This is just the
+> minimum needed to get the video working. (Useful for data storage)
+
+
+Youtube Technology - Extra Options
+----------------------------------
+
+In Addition to the natively supported options, the Youtube API supports the following
+added options:
+
+### ytcontrols ###
+Type: Boolean (T/F)
+Default: False
+
+Determines whether to show Youtube's basic Red/Black default play bar skin or to hide
+it and use the native video-js play bar.
+
+### hd ###
+Type: Boolean (T/F)
+Default: False
+
+Determines whether or not to play back the video in HD.
+
