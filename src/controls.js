@@ -86,8 +86,10 @@ _V_.ControlBar = _V_.Component.extend({
         placeholderFadeIn();
         // Clear any existing fade out instructions that are waiting to trigger
         clearTimeout(fadeOutTimeout);
-        // If this mouse movement was not over the control bar...
-        if (!mousedOverControls) {
+        // If this mouse movement was not over the control bar, and if the current 
+        // device isn't a touch device (since the control bar needs to be shown at all 
+        // times for touch devices, since there is no mouse)...
+        if (!mousedOverControls && !_V_.isTouchDevice()) {
           // Set the control bar to fade out in 1.5 seconds
           fadeOutTimeout = setTimeout(function() {
             placeholderFadeOut();
