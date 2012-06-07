@@ -1,0 +1,12 @@
+{
+    "name": "zencoder/video-js",
+    "description": "VideoJS - HTML5 Video Player",
+    "homepage":"http://videojs.com/",
+    "license":"LGPL-3.0",
+    "authors": [
+        
+    ],
+    "require": {
+
+    }
+}
