@@ -42,21 +42,21 @@ Individual Options
 
 > ### Note on Video Tag Attributes ###
 > With HTML5 video tag attributes that can only be true or false (boolean), you simply include the attribute (no equals sign) to turn it on, or exclude it to turn it off. For example, to turn controls on:
->
-> WRONG
-> <code type="html">
->
->     <video controls="true" ...>
->
-> </code>
->  
-> RIGHT
-> <code type="html">
->  
->     <video controls ...>
->  
-> </code>
->  
+
+WRONG
+<code type="html">
+
+     <video controls="true" ...>
+
+</code>
+
+RIGHT
+<code type="html">
+
+    <video controls ...>
+
+</code>
+
 > The biggest issue people run into is trying to set these values to false using false as the value (e.g. controls="false") which actually does the opposite and sets the value to true because the attribute is still included. If you need the attribute to include an equals sign for XHTML validation, you can set the attribute's value to the same as its name (e.g. controls="controls").
 
 

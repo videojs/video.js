@@ -1,3 +1,11 @@
+* Duration is now setable (need ed for HLS m3u8 files)
+* Event binders (on/off/one) now return the player instance
+* Stopped player from going back to beginningg on ended event.
+* Added support for percent width/height and fluid layouts
+* Improved load order of elements to reduce reflow.
+* Changed addEvent function name to 'on'. 
+* Removed conflicting array.indexOf function
+* Added exitFullScreen to support BlackBerry devices (pull/143)
 --------------------------------------------------------------------------------
                           ^ ADD NEW CHANGES ABOVE ^
 --------------------------------------------------------------------------------
@@ -45,5 +53,11 @@ CHANGELOG
 * Updated 'fullscreenchange' event to be called even if the user presses escape to exit fullscreen.
 * Automatically converting URsource URL to absolute for Flash fallback.
 * Created new 'loadedalldata' event for when  the source is completely downloaded
-* Improved player.destory(). Now removes elements and references.
+* Improved player.destroy(). Now removes elements and references.
 * Refactored API to be more immediately available.
+
+---- 3.2.1 / 2012-04-06 / options-width-fix ------------------------------------
+* Fixed setting width/height with javascript options
+
+---- 3.2.2 / 2012-05-02 / multiple-control-fades-fix ---------------------------
+* Fixed error with multiple controls fading listeners

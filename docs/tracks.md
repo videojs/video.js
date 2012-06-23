@@ -29,16 +29,16 @@ Once you have your WebVTT file created, you can add it to Video.js using the tra
 
 <code type="html">
 
-    <video id="example_video_1" class="video-js vjs-default-skin"  
-      controls preload="auto" width="640" height="264"  
-      data-setup='{"example_option":true}'>  
-     <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' />  
-     <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />  
-     <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />  
+<video id="example_video_1" class="video-js vjs-default-skin"  
+  controls preload="auto" width="640" height="264"  
+  data-setup='{"example_option":true}'>  
+ <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' />  
+ <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />  
+ <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />  
 
-     <track kind="captions" src="http://example.com/path/to/captions.vtt" srclang="en" label="English" default>
+ <track kind="captions" src="http://example.com/path/to/captions.vtt" srclang="en" label="English" default>
 
-    </video>
+</video>
 
 </code>
 

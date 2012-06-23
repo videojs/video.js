@@ -62,6 +62,16 @@ Pause the video playback. Returns the player object
 
 </code>
 
+### paused() ###
+Returns false if the video is currently playing, or true otherwise. ()
+
+<code type="javascript">
+
+    var isPaused = myPlayer.paused();
+    var isPlaying = !myPlayer.paused();
+
+</code>
+
 ### src(newSource) ###
 The source function updates the video source. There are three types of variables you can pass as the argument.
 

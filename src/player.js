@@ -7,48 +7,15 @@ _V_.Player = _V_.Component.extend({
     this.tag = tag; // Store the original tag used to set options
 
     var el = this.el = _V_.createElement("div"), // Div to contain video and controls
-        options = this.options = {},
-        width = options.width = tag.getAttribute('width'),
-        height = options.height = tag.getAttribute('height'),
-
-        // Browsers default to 300x150 if there's no width/height or video size data.
-        initWidth = width || 300,
-        initHeight = height || 150;
-
-    // Make player findable on elements
-    tag.player = el.player = this;
-
-    // Add callback to ready queue
-    this.ready(ready);
-
-    // Wrap video tag in div (el/box) container
-    tag.parentNode.insertBefore(el, tag);
-    el.appendChild(tag); // Breaks iPhone, fixed in HTML5 setup.
-
-    // Give video tag properties to box
-    el.id = this.id = tag.id; // ID will now reference box, not the video tag
-    el.className = tag.className;
-    // Update tag id/class for use as HTML5 playback tech
-    tag.id += "_html5_api";
-    tag.className = "vjs-tech";
-
-    // Make player easily findable by ID
-    _V_.players[el.id] = this;
-
-    // Make box use width/height of tag, or default 300x150
-    el.setAttribute("width", initWidth);
-    el.setAttribute("height", initHeight);
-    // Enforce with CSS since width/height attrs don't work on divs
-    el.style.width = initWidth+"px";
-    el.style.height = initHeight+"px";
-    // Remove width/height attrs from tag so CSS can make it 100% width/height
-    tag.removeAttribute("width");
-    tag.removeAttribute("height");
+        options = this.options = {};
 
     // Set Options
     _V_.merge(options, _V_.options); // Copy Global Defaults
     _V_.merge(options, this.getVideoTagSettings()); // Override with Video Tag Options
     _V_.merge(options, addOptions); // Override/extend with options from setup call
+
+    // Add callback to ready queue
+    this.ready(ready);
 
     // Store controls setting, and then remove immediately so native controls don't flash.
     tag.removeAttribute("controls");
@@ -56,11 +23,45 @@ _V_.Player = _V_.Component.extend({
     // Poster will be handled by a manual <img>
     tag.removeAttribute("poster");
 
-    // Empty video tag sources and tracks so the built in player doesn't use them also.
+    // Make player findable on elements
+    tag.player = el.player = this;
+
+    // Make sure tag ID exists
+    tag.id = tag.id || "vjs_video_" + _V_.guid++;
+
+    // Give video tag properties to box
+    // ID will now reference box, not the video tag
+    this.id = el.id = tag.id;
+    el.className = tag.className;
+
+    // Make player easily findable by ID
+    _V_.players[el.id] = this;
+
+    // Make box use width/height of tag, or default 300x150
+    // Enforce with CSS since width/height attrs don't work on divs
+    this.width(options.width, true); // (true) Skip resize listener on load
+    this.height(options.height, true);
+
+    // Update tag id/class for use as HTML5 playback tech
+    // Might think we should do this after embedding in container so .vjs-tech class 
+    // doesn't flash 100% width/height, but class only applies with .video-js parent
+    tag.id += "_html5_api";
+    tag.className = "vjs-tech";
+
+    // Remove width/height attrs from tag so CSS can make it 100% width/height
+    tag.removeAttribute("width");
+    tag.removeAttribute("height");
+
+    // Wrap video tag in div (el/box) container
+    tag.parentNode.insertBefore(el, tag);
+    el.appendChild(tag); // Breaks iPhone, fixed in HTML5 setup.
+
+    // Empty video tag sources and tracks so the built-in player doesn't use them also.
     if (tag.hasChildNodes()) {
-      for (var i=0,j=tag.childNodes;i<j.length;i++) {
-        if (j[i].nodeName == "SOURCE" || j[i].nodeName == "TRACK") {
-          tag.removeChild(j[i]);
+      var nrOfChildNodes = tag.childNodes.length;
+      for (var i=0,j=tag.childNodes;i<nrOfChildNodes;i++) {
+        if (j[0].nodeName.toLowerCase() == "source" || j[0].nodeName.toLowerCase() == "track") {
+          tag.removeChild(j[0]);
         }
       }
     }
@@ -70,11 +71,12 @@ _V_.Player = _V_.Component.extend({
 
     this.addClass("vjs-paused");
 
-    this.addEvent("ended", this.onEnded);
-    this.addEvent("play", this.onPlay);
-    this.addEvent("pause", this.onPause);
-    this.addEvent("progress", this.onProgress);
-    this.addEvent("error", this.onError);
+    this.on("ended", this.onEnded);
+    this.on("play", this.onPlay);
+    this.on("pause", this.onPause);
+    this.on("progress", this.onProgress);
+    this.on("durationchange", this.onDurationChange);
+    this.on("error", this.onError);
 
     // When the API is ready, loop through the components and add to the player.
     if (options.controls) {
@@ -110,9 +112,6 @@ _V_.Player = _V_.Component.extend({
     }
   },
 
-  // Cache for video property values.
-  values: {},
-
   destroy: function(){
     // Ensure that tracking progress and time progress will stop and plater deleted
     this.stopTrackingProgress();
@@ -129,35 +128,40 @@ _V_.Player = _V_.Component.extend({
     var options = {
       sources: [],
       tracks: []
-    };
+    },
+    tag = this.tag,
+    getAttribute = "getAttribute"; // For better minification
 
-    options.src = this.tag.getAttribute("src");
-    options.controls = this.tag.getAttribute("controls") !== null;
-    options.poster = this.tag.getAttribute("poster");
-    options.preload = this.tag.getAttribute("preload");
-    options.autoplay = this.tag.getAttribute("autoplay") !== null; // hasAttribute not IE <8 compatible
-    options.loop = this.tag.getAttribute("loop") !== null;
-    options.muted = this.tag.getAttribute("muted") !== null;
+    options.src = tag[getAttribute]("src");
+    options.controls = tag[getAttribute]("controls") !== null;
+    options.poster = tag[getAttribute]("poster");
+    options.preload = tag[getAttribute]("preload");
+    options.autoplay = tag[getAttribute]("autoplay") !== null; // hasAttribute not IE <8 compatible
+    options.loop = tag[getAttribute]("loop") !== null;
+    options.muted = tag[getAttribute]("muted") !== null;
+    
+    options.width = tag[getAttribute]("width");
+    options.height = tag[getAttribute]("height");
 
     if (this.tag.hasChildNodes()) {
       for (var c,i=0,j=this.tag.childNodes;i<j.length;i++) {
         c = j[i];
-        if (c.nodeName == "SOURCE") {
+        if (c.nodeName.toLowerCase() == "source") {
           options.sources.push({
-            src: c.getAttribute('src'),
-            type: c.getAttribute('type'),
-            media: c.getAttribute('media'),
-            title: c.getAttribute('title')
+            src: c[getAttribute]('src'),
+            type: c[getAttribute]('type'),
+            media: c[getAttribute]('media'),
+            title: c[getAttribute]('title')
           });
         }
-        if (c.nodeName == "TRACK") {
+        if (c.nodeName.toLowerCase() == "track") {
           options.tracks.push({
-            src: c.getAttribute("src"),
-            kind: c.getAttribute("kind"),
-            srclang: c.getAttribute("srclang"),
-            label: c.getAttribute("label"),
-            'default': c.getAttribute("default") !== null,
-            title: c.getAttribute("title")
+            src: c[getAttribute]("src"),
+            kind: c[getAttribute]("kind"),
+            srclang: c[getAttribute]("srclang"),
+            label: c[getAttribute]("label"),
+            'default': c[getAttribute]("default") !== null,
+            title: c[getAttribute]("title")
           });
         }
       }
@@ -255,7 +259,7 @@ _V_.Player = _V_.Component.extend({
     // Watch for a native progress event call on the tech element
     // In HTML5, some older versions don't support the progress event
     // So we're assuming they don't, and turning off manual progress if they do.
-    this.tech.addEvent("progress", function(){
+    this.tech.on("progress", function(){
 
       // Remove this listener from the element
       this.removeEvent("progress", arguments.callee);
@@ -279,10 +283,10 @@ _V_.Player = _V_.Component.extend({
       // log(this.values.bufferEnd, this.buffered().end(0), this.duration())
       /* TODO: update for multiple buffered regions */
       if (this.values.bufferEnd < this.buffered().end(0)) {
-        this.triggerEvent("progress");
+        this.trigger("progress");
       } else if (this.bufferedPercent() == 1) {
         this.stopTrackingProgress();
-        this.triggerEvent("progress"); // Last update
+        this.trigger("progress"); // Last update
       }
     }), 500);
   },
@@ -292,12 +296,12 @@ _V_.Player = _V_.Component.extend({
   manualTimeUpdatesOn: function(){
     this.manualTimeUpdates = true;
 
-    this.addEvent("play", this.trackCurrentTime);
-    this.addEvent("pause", this.stopTrackingCurrentTime);
+    this.on("play", this.trackCurrentTime);
+    this.on("pause", this.stopTrackingCurrentTime);
     // timeupdate is also called by .currentTime whenever current time is set
 
     // Watch for native timeupdate event
-    this.tech.addEvent("timeupdate", function(){
+    this.tech.on("timeupdate", function(){
 
       // Remove this listener from the element
       this.removeEvent("timeupdate", arguments.callee);
@@ -320,7 +324,7 @@ _V_.Player = _V_.Component.extend({
   trackCurrentTime: function(){
     if (this.currentTimeInterval) { this.stopTrackingCurrentTime(); }
     this.currentTimeInterval = setInterval(_V_.proxy(this, function(){
-      this.triggerEvent("timeupdate");
+      this.trigger("timeupdate");
     }), 250); // 42 = 24 fps // 250 is what Webkit uses // FF uses 15
   },
 
@@ -334,8 +338,6 @@ _V_.Player = _V_.Component.extend({
       this.currentTime(0);
       this.play();
     } else {
-      this.pause();
-      this.currentTime(0);
       this.pause();
     }
   },
@@ -353,8 +355,14 @@ _V_.Player = _V_.Component.extend({
   onProgress: function(){
     // Add custom event for when source is finished downloading.
     if (this.bufferedPercent() == 1) {
-      this.triggerEvent("loadedalldata");
+      this.trigger("loadedalldata");
     }
+  },
+
+  // Update duration with durationchange event
+  // Allows for cacheing value instead of asking player each time.
+  onDurationChange: function(){
+    this.duration(this.techGet("duration"));
   },
 
   onError: function(e) {
@@ -457,7 +465,7 @@ _V_.Player = _V_.Component.extend({
       this.techCall("setCurrentTime", seconds);
 
       // Improve the accuracy of manual timeupdates
-      if (this.manualTimeUpdates) { this.triggerEvent("timeupdate"); }
+      if (this.manualTimeUpdates) { this.trigger("timeupdate"); }
 
       return this;
     }
@@ -469,8 +477,16 @@ _V_.Player = _V_.Component.extend({
 
   // http://dev.w3.org/html5/spec/video.html#dom-media-duration
   // Duration should return NaN if not available. ParseFloat will turn false-ish values to NaN.
-  duration: function(){
-    return parseFloat(this.techGet("duration"));
+  duration: function(seconds){
+    if (seconds !== undefined) {
+
+      // Cache the last set value for optimiized scrubbing (esp. Flash)
+      this.values.duration = parseFloat(seconds);
+
+      return this;
+    }
+
+    return this.values.duration;
   },
 
   // Calculates how much time is left. Not in spec, but useful.
@@ -529,31 +545,39 @@ _V_.Player = _V_.Component.extend({
 
   // http://dev.w3.org/html5/spec/dimension-attributes.html#attr-dim-height
   // Video tag width/height only work in pixels. No percents.
-  // We could potentially allow percents but won't for now until we can do testing around it.
-  width: function(width, skipListeners){
-    if (width !== undefined) {
-      this.el.width = width;
-      this.el.style.width = width+"px";
-
-      // skipListeners allows us to avoid triggering the resize event when setting both width and height
-      if (!skipListeners) { this.triggerEvent("resize"); }
-      return this;
-    }
-    return parseInt(this.el.getAttribute("width"));
+  // But allowing limited percents use. e.g. width() will return number+%, not computed width
+  width: function(num, skipListeners){
+    return this.dimension("width", num, skipListeners);
   },
-  height: function(height){
-    if (height !== undefined) {
-      this.el.height = height;
-      this.el.style.height = height+"px";
-      this.triggerEvent("resize");
-      return this;
-    }
-    return parseInt(this.el.getAttribute("height"));
+  height: function(num, skipListeners){
+    return this.dimension("height", num, skipListeners);
   },
   // Set both width and height at the same time.
   size: function(width, height){
     // Skip resize listeners on width for optimization
     return this.width(width, true).height(height);
+  },
+  dimension: function(widthOrHeight, num, skipListeners){
+    if (num !== undefined) {
+
+      // Cache on object to be returned. Shouldn't have any effect after CSS.
+      this.el[widthOrHeight] = num;
+
+      // Check if using percent width/height and adjust
+      if ((""+num).indexOf("%") !== -1) {
+        this.el.style[widthOrHeight] = num;
+      } else {
+        this.el.style[widthOrHeight] = num+"px";
+      }
+
+      // skipListeners allows us to avoid triggering the resize event when setting both width and height
+      if (!skipListeners) { this.trigger("resize"); }
+      return this;
+    }
+
+    // Returns cached width/height in attribute.
+    // Could make this return computed width and support %s. Not a small amount of work.
+    return parseInt(this.el.getAttribute(widthOrHeight));
   },
 
   // Check if current tech can support native fullscreen (e.g. with built in controls lik iOS, so not our flash swf)
@@ -569,7 +593,7 @@ _V_.Player = _V_.Component.extend({
     if (requestFullScreen) {
 
       // Trigger fullscreenchange event after change
-      _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
+      _V_.on(document, requestFullScreen.eventName, this.proxy(function(){
         this.isFullScreen = document[requestFullScreen.isFullScreen];
 
         // If cancelling fullscreen, remove event listener.
@@ -577,7 +601,7 @@ _V_.Player = _V_.Component.extend({
           _V_.removeEvent(document, requestFullScreen.eventName, arguments.callee);
         }
 
-        this.triggerEvent("fullscreenchange");
+        this.trigger("fullscreenchange");
       }));
 
       // Flash and other plugins get reloaded when you take their parent to fullscreen.
@@ -587,7 +611,7 @@ _V_.Player = _V_.Component.extend({
         this.pause();
         this.unloadTech();
 
-        _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
+        _V_.on(document, requestFullScreen.eventName, this.proxy(function(){
           _V_.removeEvent(document, requestFullScreen.eventName, arguments.callee);
           this.loadTech(this.techName, { src: this.values.src });
         }));
@@ -599,11 +623,11 @@ _V_.Player = _V_.Component.extend({
       }
 
     } else if (this.tech.supportsFullScreen()) {
-      this.triggerEvent("fullscreenchange");
+      this.trigger("fullscreenchange");
       this.techCall("enterFullScreen");
 
     } else {
-      this.triggerEvent("fullscreenchange");
+      this.trigger("fullscreenchange");
       this.enterFullWindow();
     }
 
@@ -625,7 +649,7 @@ _V_.Player = _V_.Component.extend({
        this.pause();
        this.unloadTech();
 
-       _V_.addEvent(document, requestFullScreen.eventName, this.proxy(function(){
+       _V_.on(document, requestFullScreen.eventName, this.proxy(function(){
          _V_.removeEvent(document, requestFullScreen.eventName, arguments.callee);
          this.loadTech(this.techName, { src: this.values.src })
        }));
@@ -638,11 +662,11 @@ _V_.Player = _V_.Component.extend({
 
     } else if (this.tech.supportsFullScreen()) {
      this.techCall("exitFullScreen");
-     this.triggerEvent("fullscreenchange");
+     this.trigger("fullscreenchange");
 
     } else {
      this.exitFullWindow();
-     this.triggerEvent("fullscreenchange");
+     this.trigger("fullscreenchange");
     }
 
     return this;
@@ -656,7 +680,7 @@ _V_.Player = _V_.Component.extend({
     this.docOrigOverflow = document.documentElement.style.overflow;
 
     // Add listener for esc key to exit fullscreen
-    _V_.addEvent(document, "keydown", _V_.proxy(this, this.fullWindowOnEscKey));
+    _V_.on(document, "keydown", _V_.proxy(this, this.fullWindowOnEscKey));
 
     // Hide any scroll bars
     document.documentElement.style.overflow = 'hidden';
@@ -665,7 +689,7 @@ _V_.Player = _V_.Component.extend({
     _V_.addClass(document.body, "vjs-full-window");
     _V_.addClass(this.el, "vjs-fullscreen");
 
-    this.triggerEvent("enterFullWindow");
+    this.trigger("enterFullWindow");
   },
   fullWindowOnEscKey: function(event){
     if (event.keyCode == 27) {
@@ -690,7 +714,7 @@ _V_.Player = _V_.Component.extend({
 
     // Resize the box, controller, and poster to original sizes
     // this.positionAll();
-    this.triggerEvent("exitFullWindow");
+    this.trigger("exitFullWindow");
   },
 
   selectSource: function(sources){

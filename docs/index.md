@@ -25,5 +25,8 @@ You can change the look of the player across playback technologies just by editi
 ### [Tech](/docs/tech/)
 A 'playback technology' is the term we're using to represent HTML5 video, Flash, and other video plugins, as well as other players like the YouTube player. Basically anything that has a unique API to audio or video. Additional playback technologies can be added relatively easily.
 
+### [Tracks](/docs/tracks/)
+Text Tracks are used to display subtitles and captions, and add a menu for navigating between chapters in a video.
+
 ### [Glossary](/docs/glossary/)
 Some helpful definitions.

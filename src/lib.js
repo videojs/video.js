@@ -85,14 +85,6 @@ _V_.extend({
     classNames.splice(classNames.indexOf(classToRemove),1);
     element.className = classNames.join(" ");
   },
-  
-  remove: function(item, array){
-    if (!array) return;
-    var i = array.indexOf(item);
-    if (i != -1) { 
-      return array.splice(i, 1)
-    };
-  },
 
   // Attempt to block the ability to select text while dragging controls
   blockTextSelection: function(){

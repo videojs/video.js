@@ -1,4 +1,3 @@
-
 /* HTML5 Playback Technology - Wrapper for HTML5 Media API
 ================================================================================ */
 _V_.html5 = _V_.PlaybackTech.extend({
@@ -137,6 +136,16 @@ _V_.html5 = _V_.PlaybackTech.extend({
   enterFullScreen: function(){
       try {
         this.el.webkitEnterFullScreen();
+      } catch (e) {
+        if (e.code == 11) {
+          // this.warning(VideoJS.warnings.videoNotReady);
+          _V_.log("VideoJS: Video not ready.");
+        }
+      }
+  },
+  exitFullScreen: function(){
+      try {
+        this.el.webkitExitFullScreen();
       } catch (e) {
         if (e.code == 11) {
           // this.warning(VideoJS.warnings.videoNotReady);
