@@ -57,7 +57,7 @@ _V_.youtube = _V_.PlaybackTech.extend({
 
     var p = (document.location.protocol == 'https:') ? 'https:' : 'http:';
 
-    if (document.location.protocol != 'file:')
+    if (document.domain != 'localhost' && document.location.protocol != 'file:')
       params.origin = p + "//" + document.domain;
 
     this.player.apiArgs = {
@@ -84,6 +84,12 @@ _V_.youtube = _V_.PlaybackTech.extend({
     _V_.insertFirst(iFrm, parentEl);
 
     _V_.youtube.updateVideoQuality(this.player, null);
+
+    // If native YouTube controls are enabled, turn on a CSS class that hides
+    // the video.js controls
+    if (params.controls) {
+      player.controlBar.addClass("showYTBar");
+    }
 
     this.loadApi();
   },
