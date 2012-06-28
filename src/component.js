@@ -77,6 +77,10 @@ _V_.Component = _V_.Class.extend({
       // Loop through components and add them to the player
       this.eachProp(options.components, function(name, opts){
 
+        // Allow for disabling default components
+        // e.g. _V_.options.components.posterImage = false
+        if (opts === false) return;
+
         // Allow waiting to add components until a specific event is called
         var tempAdd = this.proxy(function(){
           // Set property name on player. Could cause conflicts with other prop names, but it's worth making refs easy.
