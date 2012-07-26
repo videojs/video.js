@@ -237,6 +237,7 @@ _V_.LoadingSpinner = _V_.Component.extend({
     player.on("canplay", _V_.proxy(this, this.hide));
     player.on("canplaythrough", _V_.proxy(this, this.hide));
     player.on("playing", _V_.proxy(this, this.hide));
+    player.on("seeked", _V_.proxy(this, this.hide));
 
     player.on("seeking", _V_.proxy(this, this.show));
     player.on("error", _V_.proxy(this, this.show));
