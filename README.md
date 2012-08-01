@@ -28,4 +28,3 @@ Version 3 is almost a complete rewrite of the previous versions of VideoJS. New 
     - No more embedding of Flash fallback within the video tag HTML.
 
 ---
- 
