@@ -192,12 +192,6 @@ _V_.Player = _V_.Component.extend({
     this.isReady = false;
 
     var techReady = function(){
-      // Remove this class in the event that the user switches from the Youtube player so that
-      // the native control bar is visible again
-      if (techName != "youtube") {
-        this.player.controlBar.removeClass("showYTBar");
-      }
-
       this.player.triggerReady();
 
       // Manually track progress in cases where the browser/flash player doesn't report it.
