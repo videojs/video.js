@@ -18,7 +18,8 @@ _V_.Player = _V_.Component.extend({
     tag.removeAttribute("controls");
 
     // Poster will be handled by a manual <img>
-    tag.removeAttribute("poster");
+    if (!options.nativeposter)
+      tag.removeAttribute("poster");
 
     // Make player findable on elements
     tag.player = el.player = this;
