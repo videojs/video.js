@@ -1,3 +1,5 @@
+// **** NEEDS UPDATING ******
+
 // Flowplayer API Connector
 VideoJS.tech.flowplayer = {
   name: "Flowplayer",
