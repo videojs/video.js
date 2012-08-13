@@ -30,7 +30,11 @@ cat src/tracks.js >> dist/video.js
 # h5swf temporarily requires swfobject
 # cat flash/swfobject.js >> dist/video.js
 
+cat tech/html5/html5.js >> dist/video.js
+cat tech/flash/flash.js >> dist/video.js
+
 cat src/setup.js >> dist/video.js
+
 cat src/_end.js >> dist/video.js
 
 
