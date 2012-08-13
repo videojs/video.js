@@ -222,6 +222,7 @@ _V_.Player = _V_.Component.extend({
   },
 
   unloadTech: function(){
+    this.isReady = false;
     this.tech.destroy();
 
     // Turn off any manual progress or timeupdate tracking
