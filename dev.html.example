@@ -20,13 +20,17 @@
   <script src="src/controls.js"></script>
   <script src="src/events.js"></script>
   <script src="src/tracks.js"></script>
+
+  <script src="tech/html5/html5.js"></script>
+  <script src="tech/flash/flash.js"></script>
   
   <script src="src/setup.js"></script>
-  
+
   <script type="text/javascript" charset="utf-8">
     // Easy access to test Flash over HTML5. Add ?flash to URL
     if (window.location.href.indexOf("?flash") !== -1) {
-      _V_.options.techOrder = ["H5swf"]
+      _V_.options.techOrder = ["flash"];
+      _V_.options.flash.swf = "tech/flash/video-js.swf";
     }
   </script>
 
