@@ -778,3 +778,4 @@ _V_.merge(_V_.ControlBar.prototype.options.components, {
 //     this._super(player, options);
 //   }
 // });
+
