@@ -49,6 +49,38 @@ _V_.extend({
     }
   },
 
+  objKeys: function (obj) {
+    if (!!Object.keys) return Object.keys(obj);
+    var keys = [],
+      k;
+    for (k in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, k)) {
+        keys.push(k);
+      }
+    }
+    return keys;
+  },
+
+  objValues: function (obj) {
+    if (!!Object.values) return Object.values(obj);
+    var values = [],
+      k;
+    for (k in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, k)) {
+        values.push(obj[k]);
+      }
+    }
+    return values;
+  },
+
+  reduce: function(arr, fn, init) {
+    this.each(arr, function(val, i) {
+      init = fn.call(arr, init, val, i);
+    });
+
+    return init;
+  },
+
   el: function(id){ return document.getElementById(id); },
   createElement: function(tagName, attributes){
     var el = document.createElement(tagName),
