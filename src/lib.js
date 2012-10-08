@@ -125,7 +125,7 @@ _V_.extend({
   getRelativePosition: function(x, relativeElement){
     return Math.max(0, Math.min(1, (x - _V_.findPosX(relativeElement)) / relativeElement.offsetWidth));
   },
-  
+
   getComputedStyleValue: function(element, style){
     return window.getComputedStyle(element, null).getPropertyValue(style);
   },
