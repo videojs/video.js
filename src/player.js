@@ -40,7 +40,7 @@ _V_.Player = _V_.Component.extend({
     this.height(options.height, true);
 
     // Update tag id/class for use as HTML5 playback tech
-    // Might think we should do this after embedding in container so .vjs-tech class 
+    // Might think we should do this after embedding in container so .vjs-tech class
     // doesn't flash 100% width/height, but class only applies with .video-js parent
     tag.id += "_html5_api";
     tag.className = "vjs-tech";
@@ -139,7 +139,7 @@ _V_.Player = _V_.Component.extend({
     options.autoplay = tag[getAttribute]("autoplay") !== null; // hasAttribute not IE <8 compatible
     options.loop = tag[getAttribute]("loop") !== null;
     options.muted = tag[getAttribute]("muted") !== null;
-    
+
     options.width = tag[getAttribute]("width");
     options.height = tag[getAttribute]("height");
 
@@ -427,9 +427,9 @@ _V_.Player = _V_.Component.extend({
 
   // Method for calling methods on the current playback technology
   // techCall: function(method, arg){
-  // 
+  //
   //   // if (this.isReady) {
-  //   //   
+  //   //
   //   // } else {
   //   //   _V_.log("The playback technology API is not ready yet. Use player.ready(myFunction)."+" ["+method+"]", arguments.callee.caller.arguments.callee.caller.arguments.callee.caller)
   //   //   return false;
@@ -448,7 +448,7 @@ _V_.Player = _V_.Component.extend({
     this.techCall("pause");
     return this;
   },
-  
+
   // http://dev.w3.org/html5/spec/video.html#dom-media-paused
   // The initial state of paused should be true (in Safari it's actually false)
   paused: function(){
@@ -747,7 +747,7 @@ _V_.Player = _V_.Component.extend({
 
   // src is a pretty powerful function
   // If you pass it an array of source objects, it will find the best source to play and use that object.src
-  //   If the new source requires a new playback technology, it will switch to that.
+  // If the new source requires a new playback technology, it will switch to that.
   // If you pass it an object, it will set the source to object.src
   // If you pass it anything else (url string) it will set the video source to that
   src: function(source){
