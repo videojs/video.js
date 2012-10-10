@@ -737,8 +737,13 @@ _V_.Player = _V_.Component.extend({
 
     if (!typeAndTech) return false;
 
+    // even though we choose the best resolution for the user here, we
+    // should remember the resolutions so that we can potentially
+    // change resolution later
+    this._sourceResolutions = sourcesByType[typeAndTech.type];
+
     return {
-      source: this.selectResolution(sourcesByType[typeAndTech.type]),
+      source: this.selectResolution(this._sourceResolutions),
       tech: typeAndTech.tech
     }
   },
