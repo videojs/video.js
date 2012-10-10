@@ -114,14 +114,11 @@ _V_.ResolutionMenuItem = _V_.MenuItem.extend({
 
 /* Resolutions Button
 ================================================================================ */
-_V_.ResolutionButton = _V_.Button.extend({
+_V_.ResolutionsButton = _V_.Button.extend({
 
   init: function(player, options){
     this._super(player, options);
 
-    this.kind = "resolutions";
-    this.buttonText = "Resolutions";
-    this.className = "vjs-resolutions-button";
     this.menu = this.createMenu();
 
     if (this.items.length === 0) {
@@ -129,13 +126,16 @@ _V_.ResolutionButton = _V_.Button.extend({
     }
   },
 
+  buttonText: "Resolutions",
+  className: "vjs-resolutions-button",
+
   createMenu: function(){
     var menu = new _V_.Menu(this.player);
 
     // Add a title list item to the top
     menu.el.appendChild(_V_.createElement("li", {
       className: "vjs-menu-title",
-      innerHTML: _V_.uc(this.kind)
+      innerHTML: _V_.uc("resolutions")
     }));
 
     this.items = this.createItems();
@@ -190,4 +190,9 @@ _V_.ResolutionButton = _V_.Button.extend({
     }));
   }
 
+});
+
+// Add Button to controlBar
+_V_.merge(_V_.ControlBar.prototype.options.components, {
+  "resolutionsButton": {}
 });
