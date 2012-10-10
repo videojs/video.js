@@ -53,10 +53,6 @@ _V_.extend({
       return null;
   },
 
-  eraseCookie: function(name) {
-    setCookie(name,"",-1);
-  },
-
   each: function(arr, fn){
     if (!arr || arr.length === 0) { return; }
     for (var i=0,j=arr.length; i<j; i++) {
