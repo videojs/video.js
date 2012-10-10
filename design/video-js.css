@@ -497,3 +497,6 @@ div.vjs-loading-spinner .ball8 { opacity: 1.00; position:absolute; left: 6px; to
 .vjs-default-skin .vjs-captions-button div { background-position: -25px -75px; }
 .vjs-default-skin .vjs-chapters-button div { background-position: -100px -75px; }
 .vjs-default-skin .vjs-chapters-button ul { width: 20em; left: -8.5em; /* Width of menu - width of button / 2 */ }
+
+/* Resolutions Button - just gonna use the 'HD' glyph for now */
+.vjs-default-skin .vjs-resolutions-button div { background-position: -75px -75px; }
