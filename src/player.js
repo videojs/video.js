@@ -109,6 +109,11 @@ _V_.Player = _V_.Component.extend({
       // A few assumptions here:
       //   All playback technologies respect preload false.
       this.src(options.sources);
+
+      // Resolutions defined in resolutions.js
+      if (this.options.sourceResolutions && this.options.sourceResolutions.length > 0) {
+        this.showResolution(this.options.sourceResolutions);
+      }
     }
   },
 
@@ -740,10 +745,10 @@ _V_.Player = _V_.Component.extend({
     // even though we choose the best resolution for the user here, we
     // should remember the resolutions so that we can potentially
     // change resolution later
-    this._sourceResolutions = sourcesByType[typeAndTech.type];
+    this.options.sourceResolutions = sourcesByType[typeAndTech.type];
 
     return {
-      source: this.selectResolution(this._sourceResolutions),
+      source: this.selectResolution(this.options.sourceResolutions),
       tech: typeAndTech.tech
     }
   },
@@ -780,10 +785,17 @@ _V_.Player = _V_.Component.extend({
   // matches the user's saved preference
   selectResolution: function(typeSources){
     var maxRes = (typeSources.length - 1),
+      cookieName = "videojs_preferred_res",
       // default to lowest resolution for now (res 0)
-      preferredRes = _V_.getCookie("videojs_preferred_res") || 0;
+      preferredRes = _V_.getCookie(cookieName) || 0,
+      actualRes = preferredRes > maxRes ? maxRes : preferredRes;
 
-    return typeSources[preferredRes > maxRes ? maxRes : preferredRes];
+    // remember current resolution for the instance
+    this.options.currentResolution = actualRes;
+
+    // 99 days expiry - totally arbitrary
+    _V_.setCookie(cookieName, actualRes, 99);
+    return typeSources[actualRes];
   },
 
   // src is a pretty powerful function

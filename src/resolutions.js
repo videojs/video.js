@@ -4,7 +4,7 @@
 _V_.merge(_V_.Player.prototype, {
 
   showResolution: function(sourceResolutions){
-    var currentSource = sourceResolutions[this._currentResolution],
+    var currentSource = sourceResolutions[this.options.currentResolution],
         resolution = new _V_.Resolution(this, currentSource);
 
     this.ready(_V_.proxy(resolution, resolution.show));

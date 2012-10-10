@@ -10,6 +10,7 @@ var vjsSourceList = ["require",
   'order!../../src/player.js',
   'order!../../src/tech.js',
   'order!../../src/tracks.js',
+  'order!../../src/resolutions.js',
   'order!../../flash/swfobject.js',
   'order!../../src/setup.js'
 ];
@@ -21,11 +22,11 @@ require([vjsSourceList])
 // for (var i=0; i < vjsSourceList.length; i++) {
 //   requireEval += 'require(["order!'+vjsSourceList[i]+'"], function() { ';
 // }
-// 
+//
 // requireEval += 'var libsLoaded = true;'
-// 
+//
 // for (var i=0; i < vjsSourceList.length; i++) {
 //   requireEval += ' }); ';
 // }
-// 
+//
 // eval(requireEval);
