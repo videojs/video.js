@@ -109,11 +109,6 @@ _V_.Player = _V_.Component.extend({
       // A few assumptions here:
       //   All playback technologies respect preload false.
       this.src(options.sources);
-
-      // Resolutions defined in resolutions.js
-      if (this.options.sourceResolutions && this.options.sourceResolutions.length > 0) {
-        this.showResolution(this.options.sourceResolutions);
-      }
     }
   },
 
