@@ -718,15 +718,32 @@ _V_.Player = _V_.Component.extend({
   },
 
   // pass in a source definition
-  bucketTechs: function(sources){
+  bucketByTypes: function(sources){
     return _V_.reduce(sources, function(init, val, i){
       (init[val.type] = init[val.type] || []).push(val);
       return init;
     }, {});
   },
 
+  // takes a selection of sources, checks the video format against the
+  // available video technologies for support, finds a format that is
+  // supported (or returns false), then chooses the most appropriate
+  // resolution from the available source resolutions
   selectSource: function(sources){
+    var sourcesByType = this.bucketByTypes(sources),
+      typeAndTech = this.selectTypeAndTech(sources);
 
+    if (!typeAndTech) return false;
+
+    return {
+      source: this.selectResolution(sourcesByType[typeAndTech.type]),
+      tech: typeAndTech.tech
+    }
+  },
+
+  // takes a list of sources and returns the video format (type) and
+  // the technology that can play it (html5, flash, etc)
+  selectTypeAndTech: function(sources){
     // Loop through each playback technology in the options order
     for (var i=0,j=this.options.techOrder;i<j.length;i++) {
       var techName = j[i],
@@ -743,18 +760,22 @@ _V_.Player = _V_.Component.extend({
           // Check if source can be played with this technology
           if (tech.canPlaySource.call(this, source)) {
 
-            return { source: source, tech: techName };
+            return { type: source.type, tech: techName };
 
           }
         }
       }
     }
-
-    return false;
   },
 
-  selectResolution: function(sources){
+  // takes an array of sources of one homogeneous video format type
+  // and returns the source representing the resolution that best
+  // matches the user's saved preference
+  selectResolution: function(typeSources){
+    var maxRes = (typeSources.length - 1),
+      preferredRes = 1 || 0; // TODO: pull this value from a cookie
 
+    return typeSources[preferredRes > maxRes ? maxRes : preferredRes];
   },
 
   // src is a pretty powerful function
