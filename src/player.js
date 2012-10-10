@@ -775,7 +775,8 @@ _V_.Player = _V_.Component.extend({
   // matches the user's saved preference
   selectResolution: function(typeSources){
     var maxRes = (typeSources.length - 1),
-      preferredRes = 1 || 0; // TODO: pull this value from a cookie
+      // default to lowest resolution for now (res 0)
+      preferredRes = _V_.getCookie("videojs_preferred_res") || 0;
 
     return typeSources[preferredRes > maxRes ? maxRes : preferredRes];
   },
