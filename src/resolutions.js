@@ -19,8 +19,7 @@ _V_.merge(_V_.Player.prototype, {
 
 });
 
-// Track Class
-// Contains track methods for loading, showing, parsing cues of tracks
+// Resolution Class
 _V_.Resolution = _V_.Component.extend({
 
   init: function(player, options){
@@ -90,8 +89,8 @@ _V_.ResolutionMenuItem = _V_.MenuItem.extend({
     var source = this.source = options.source;
 
     // Modify options for parent MenuItem class's init.
-    options.label = source.label;
-    options.selected = source["default"];
+    options.label = options.source.res;
+    options.selected = options.source["default"];
     this._super(player, options);
 
     this.player.on("resolutionchange", _V_.proxy(this, this.update));
@@ -154,7 +153,7 @@ _V_.ResolutionsButton = _V_.Button.extend({
   // Create a menu item for each resolution
   createItems: function(){
     var items = [];
-    this.each(this.player._sourceResolutions, function(source){
+    this.each(this.player.options.sourceResolutions, function(source){
       items.push(new _V_.ResolutionMenuItem(this.player, {
         source: source
       }));
