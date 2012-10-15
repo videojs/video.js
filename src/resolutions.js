@@ -98,7 +98,7 @@ _V_.ResolutionsButton = _V_.Button.extend({
 
     this.menu = this.createMenu();
 
-    if (this.items.length === 0) {
+    if (player.options.sources.length <= 1) {
       this.hide();
     }
   },
