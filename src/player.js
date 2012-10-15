@@ -784,19 +784,18 @@ _V_.Player = _V_.Component.extend({
 
     // check to see if any sources are marked as default
     _V_.each(typeSources, function(s, i){
+      // add the index here so we can reference it later
+      s.index = i;
+
       if (s['default']) defaultRes = i;
     });
 
     var maxRes = (typeSources.length - 1),
-      keyName = "videojs_preferred_res",
       // if the user has previously selected a preference, check if
       // that preference is available. if not, use the source marked
       // default
-      preferredRes = !!window.localStorage ? window.localStorage.getItem(keyName) : defaultRes;
+      preferredRes = !!window.localStorage ? window.localStorage.getItem("videojs_preferred_res") : defaultRes;
       actualRes = preferredRes > maxRes ? maxRes : preferredRes;
-
-    // remember current resolution index for the instance
-    this.options.currentResolution = actualRes;
 
     return typeSources[actualRes];
   },

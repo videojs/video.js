@@ -38,6 +38,9 @@ _V_.merge(_V_.Player.prototype, {
     // when the technology is re-started, kick off the new stream
     this.ready(this.proxy(function(){
       this.play();
+
+      // remember this selection
+      _V_.setLocalStorage("videojs_preferred_res", new_source.index);
     }));
 
     return this;
@@ -54,9 +57,13 @@ _V_.ResolutionMenuItem = _V_.MenuItem.extend({
 
     // Modify options for parent MenuItem class's init.
     options.label = options.source.res;
-    options.selected = options.source["default"];
+
     this._super(player, options);
 
+    // set initial 'default' selection
+    this.player.one("loadstart", _V_.proxy(this, this.update));
+
+    // set selection on successfull change
     this.player.on("resolutionchange", _V_.proxy(this, this.update));
   },
 
