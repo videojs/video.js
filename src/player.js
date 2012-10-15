@@ -152,8 +152,9 @@ _V_.Player = _V_.Component.extend({
             type: c[getAttribute]('type'),
             media: c[getAttribute]('media'),
             title: c[getAttribute]('title'),
-            // yes, 'res' is non-HTML5 standard
-            res: c[getAttribute]('res')
+            // yes, 'res' and 'default' are non-HTML5 standard
+            res: c[getAttribute]('res'),
+            'default': c[getAttribute]('default')
           });
         }
         if (c.nodeName.toLowerCase() == "track") {
@@ -779,10 +780,17 @@ _V_.Player = _V_.Component.extend({
   // and returns the source representing the resolution that best
   // matches the user's saved preference
   selectResolution: function(typeSources){
+    var defaultRes = 0;
+    _V_.each(typeSources, function(s, i){
+        if (s['default']) defaultRes = i;
+    });
+
     var maxRes = (typeSources.length - 1),
       cookieName = "videojs_preferred_res",
-      // default to lowest resolution for now (res 0)
-      preferredRes = _V_.getCookie(cookieName) || 0,
+      // if the user has previously selected a preference, check if
+      // that preference is available. if not, use the source marked
+      // default
+      preferredRes = _V_.getCookie(cookieName) || defaultRes,
       actualRes = preferredRes > maxRes ? maxRes : preferredRes;
 
     // remember current resolution index for the instance
