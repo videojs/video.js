@@ -785,7 +785,7 @@ _V_.Player = _V_.Component.extend({
       preferredRes = _V_.getCookie(cookieName) || 0,
       actualRes = preferredRes > maxRes ? maxRes : preferredRes;
 
-    // remember current resolution for the instance
+    // remember current resolution index for the instance
     this.options.currentResolution = actualRes;
 
     // 99 days expiry - totally arbitrary

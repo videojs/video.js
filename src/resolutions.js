@@ -2,7 +2,18 @@
 // Resolutions are selectable sources for alternate bitrate material
 // Player Resolution Functions - Functions add to the player object for easier access to resolutions
 _V_.merge(_V_.Player.prototype, {
+  // fired when a stream is chosen from the resolution menu
   changeResolution: function(new_source){
+    var success = this.proxy(function(){
+      this.trigger("resolutionchange");
+    });
+
+    // has the exact same source been chosen?
+    if (this.values.src === new_source.src){
+        success();
+        return this; // basically a no-op
+    }
+
     this.pause();
 
     // remember our position in the current stream
@@ -21,6 +32,7 @@ _V_.merge(_V_.Player.prototype, {
     this.one("loadedmetadata", this.proxy(function(){
       // seek to the remembered position in the last stream
       this.currentTime(curTime);
+      success();
     }));
 
     // when the technology is re-started, kick off the new stream
