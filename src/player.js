@@ -788,18 +788,16 @@ _V_.Player = _V_.Component.extend({
     });
 
     var maxRes = (typeSources.length - 1),
-      cookieName = "videojs_preferred_res",
+      keyName = "videojs_preferred_res",
       // if the user has previously selected a preference, check if
       // that preference is available. if not, use the source marked
       // default
-      preferredRes = _V_.getCookie(cookieName) || defaultRes,
+      preferredRes = !!window.localStorage ? window.localStorage.getItem(keyName) : defaultRes;
       actualRes = preferredRes > maxRes ? maxRes : preferredRes;
 
     // remember current resolution index for the instance
     this.options.currentResolution = actualRes;
 
-    // 99 days expiry - totally arbitrary
-    _V_.setCookie(cookieName, actualRes, 99);
     return typeSources[actualRes];
   },
 
