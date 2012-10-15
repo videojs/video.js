@@ -2,9 +2,31 @@
 // Resolutions are selectable sources for alternate bitrate material
 // Player Resolution Functions - Functions add to the player object for easier access to resolutions
 _V_.merge(_V_.Player.prototype, {
-  changeResolution: function(id, disableSameKind){
-    // TODO: do things...
-//    this.trigger(kind+"trackchange");
+  changeResolution: function(new_source){
+    this.pause();
+
+    // remember our position in the current stream
+    var curTime = this.currentTime();
+
+    // unloading the tech might 'technically' (hehe) be unnecessary
+    // but ensures that we don't have residual mess from the last
+    // playback
+    this.unloadTech();
+
+    // reload the new tech and the new source (mostly used to re-fire
+    // the events we want)
+    this.loadTech(this.techName, {src: new_source.src});
+
+    // fired *after* ready - when the video is ready to seek
+    this.one("loadedmetadata", this.proxy(function(){
+      // seek to the remembered position in the last stream
+      this.currentTime(curTime);
+    }));
+
+    // when the technology is re-started, kick off the new stream
+    this.ready(this.proxy(function(){
+      this.play();
+    }));
 
     return this;
   }
