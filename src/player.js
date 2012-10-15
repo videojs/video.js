@@ -781,8 +781,10 @@ _V_.Player = _V_.Component.extend({
   // matches the user's saved preference
   selectResolution: function(typeSources){
     var defaultRes = 0;
+
+    // check to see if any sources are marked as default
     _V_.each(typeSources, function(s, i){
-        if (s['default']) defaultRes = i;
+      if (s['default']) defaultRes = i;
     });
 
     var maxRes = (typeSources.length - 1),

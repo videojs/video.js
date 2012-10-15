@@ -63,10 +63,14 @@ _V_.ResolutionMenuItem = _V_.MenuItem.extend({
   onClick: function(){
     this._super();
     this.player.changeResolution(this.source);
+
+    // need to manually blur to get rid of focus css pseudoclass on
+    // the chosen item
+    this.el.blur();
   },
 
   update: function(){
-    if (this.source.mode == 2) {
+    if (this.player.values.src === this.source.src){
       this.selected(true);
     } else {
       this.selected(false);
