@@ -40,7 +40,7 @@ _V_.merge(_V_.Player.prototype, {
       this.play();
 
       // remember this selection
-      _V_.setLocalStorage("videojs_preferred_res", new_source.index);
+      _V_.setLocalStorage("videojs_preferred_res", parseInt(new_source.index, 10));
     }));
 
     return this;
