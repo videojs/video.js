@@ -720,7 +720,29 @@ _V_.Player = _V_.Component.extend({
     this.trigger("exitFullWindow");
   },
 
-  // pass in a source definition
+  // pass in source definition, get arrays of sources indexed by type:
+  // example:
+  // [
+  //  { type: "video/mp4", src: "http://www.example.com/path/to/video_sd.mp4", res: "SD", default: true },
+  //  { type: "video/mp4", src: "http://www.example.com/path/to/video_hd.mp4", res: "HD" },
+  //  { type: "video/webm", src: "http://www.example.com/path/to/video.webm" },
+  //  { type: "video/ogg", src: "http://www.example.com/path/to/video.ogv" }
+  // ]
+  //
+  // becomes...
+  //
+  // {
+  //   "video/mp4": [
+  //     { "type": "video/mp4", "src": "http://www.example.com/path/to/video_sd.mp4", "res": "SD", default: true },
+  //     { "type": "video/mp4", "src": "http://www.example.com/path/to/video_hd.mp4", "res": "HD" }
+  //   ],
+  //   "video/webm": [
+  //     { "type": "video/webm", "src": "http://www.example.com/path/to/video.webm" }
+  //   ],
+  //   "video/ogg": [
+  //     { "type": "video/ogg", "src": "http://www.example.com/path/to/video.ogv" }
+  //   ]
+  // }
   bucketByTypes: function(sources){
     return _V_.reduce(sources, function(init, val, i){
       (init[val.type] = init[val.type] || []).push(val);

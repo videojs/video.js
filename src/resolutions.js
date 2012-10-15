@@ -76,7 +76,10 @@ _V_.ResolutionMenuItem = _V_.MenuItem.extend({
     this.el.blur();
   },
 
+  // fired initially when the video is loaded and when the resolution
+  // changes
   update: function(){
+    // are we the current video source?
     if (this.player.values.src === this.source.src){
       this.selected(true);
     } else {

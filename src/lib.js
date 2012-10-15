@@ -49,6 +49,7 @@ _V_.extend({
     }
   },
 
+  // Object.keys implementation for the benefit of lte IE8
   objKeys: function (obj) {
     if (!!Object.keys) return Object.keys(obj);
     var keys = [],
@@ -61,6 +62,7 @@ _V_.extend({
     return keys;
   },
 
+  // Object.values implementation for the benefit of lte IE8
   objValues: function (obj) {
     if (!!Object.values) return Object.values(obj);
     var values = [],
@@ -73,6 +75,7 @@ _V_.extend({
     return values;
   },
 
+  // Array.reduce implementation for lte IE8
   reduce: function(arr, fn, init) {
     this.each(arr, function(val, i) {
       init = fn.call(arr, init, val, i);
