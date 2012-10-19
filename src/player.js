@@ -154,7 +154,7 @@ _V_.Player = _V_.Component.extend({
             title: c[getAttribute]('title'),
             // yes, 'res' and 'default' are non-HTML5 standard
             res: c[getAttribute]('res'),
-            'default': c[getAttribute]('default')
+            'default': c[getAttribute]('default') !== null
           });
         }
         if (c.nodeName.toLowerCase() == "track") {
@@ -816,7 +816,7 @@ _V_.Player = _V_.Component.extend({
       // if the user has previously selected a preference, check if
       // that preference is available. if not, use the source marked
       // default
-      preferredRes = !!window.localStorage ? window.localStorage.getItem("videojs_preferred_res") : defaultRes,
+      preferredRes = parseInt(!!window.localStorage ? window.localStorage.getItem("videojs_preferred_res") : defaultRes, 10),
       actualRes = preferredRes > maxRes ? maxRes : preferredRes;
 
     return typeSources[actualRes];
