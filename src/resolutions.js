@@ -19,11 +19,6 @@ _V_.merge(_V_.Player.prototype, {
     // remember our position in the current stream
     var curTime = this.currentTime();
 
-    // unloading the tech might 'technically' (hehe) be unnecessary
-    // but ensures that we don't have residual mess from the last
-    // playback
-    this.unloadTech();
-
     // reload the new tech and the new source (mostly used to re-fire
     // the events we want)
     this.loadTech(this.techName, {src: new_source.src});
