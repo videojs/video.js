@@ -24,9 +24,23 @@ _V_.merge(_V_.Player.prototype, {
     this.loadTech(this.techName, {src: new_source.src});
 
     // fired *after* ready - when the video is ready to seek
-    this.one("loadedmetadata", this.proxy(function(){
+    // NOTE: "play" doesn't work for html5 but "loadedmetadata" does.
+    //       "loadedmetadata" doesn't work for flash but "play" does
+    this.one(this.techName === "flash" ? "play" : "loadedmetadata", _V_.proxy(this, function(){
       // seek to the remembered position in the last stream
-      this.currentTime(curTime);
+      // NOTE: flash does *not* properly seek to a time immediately
+      // after any of the VideoJS event hooks, so this timeout is
+      // necessary.  I suspect it may be somewhat unreliable,
+      // depending on how quickly Flash can become ready to seek the
+      // video, but it is necessary unless we can get flash to produce
+      // an event when it is genuinely ready to seek the video.
+      // "play" ain't it.  and, really, it has to buffer the video
+      // anyway before it can play the seek time so it doesn't
+      // actually add a delay in the interface in most cases
+      setTimeout(_V_.proxy(this, function(){
+          this.currentTime(curTime);
+      }), 500);
+
       success();
     }));
 
