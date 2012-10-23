@@ -816,7 +816,11 @@ _V_.Player = _V_.Component.extend({
       // if the user has previously selected a preference, check if
       // that preference is available. if not, use the source marked
       // default
-      preferredRes = parseInt(!!window.localStorage ? window.localStorage.getItem("videojs_preferred_res") : defaultRes, 10),
+      preferredRes = parseInt(
+          !!window.localStorage && !!window.localStorage.getItem("videojs_preferred_res") ?
+              window.localStorage.getItem("videojs_preferred_res") :
+              defaultRes
+          , 10),
       actualRes = preferredRes > maxRes ? maxRes : preferredRes;
 
     return typeSources[actualRes];
