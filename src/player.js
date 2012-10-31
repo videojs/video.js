@@ -771,7 +771,12 @@ _V_.Player = _V_.Component.extend({
           this.loadTech(techName, source);
         }
       } else {
-        _V_.log("No compatible source and playback technology were found.")
+        _V_.log("No compatible source and playback technology were found.");
+        var fallbackInfo = _V_.createElement("div", {
+          innerHTML: "Sorry, no compatible source and playback technology were found for this video. Try using another browser like <a href='http://www.google.com/chrome'>Google Chrome</a> or download the latest <a href='http://get.adobe.com/flashplayer/'>Adobe Flash Player</a>."
+        });
+        fallbackInfo.style.cssText = "color:#ffffff;font-size:13px;";
+        this.el.appendChild(fallbackInfo);
       }
 
     // Case: Source object { src: "", type: "" ... }
