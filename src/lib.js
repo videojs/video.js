@@ -14,8 +14,8 @@ _V_.extend({
   controlSets: {}, // Holder for control set definitions
 
   // Device Checks
-  isIE: function(){ return !+"\v1"; },
-  isFF: function(){ return !!_V_.ua.match("Firefox") },
+  isIE: function(){ return !!_V_.ua.match("MSIE"); },
+  isFF: function(){ return !!_V_.ua.match("Firefox"); },
   isIPad: function(){ return navigator.userAgent.match(/iPad/i) !== null; },
   isIPhone: function(){ return navigator.userAgent.match(/iPhone/i) !== null; },
   isIOS: function(){ return VideoJS.isIPhone() || VideoJS.isIPad(); },
@@ -85,11 +85,11 @@ _V_.extend({
     classNames.splice(classNames.indexOf(classToRemove),1);
     element.className = classNames.join(" ");
   },
-  
+
   remove: function(item, array){
     if (!array) return;
     var i = array.indexOf(item);
-    if (i != -1) { 
+    if (i != -1) {
       return array.splice(i, 1)
     };
   },
