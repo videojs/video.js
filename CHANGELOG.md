@@ -62,3 +62,6 @@ CHANGELOG
 
 ---- 3.2.2 / 2012-05-02 / multiple-control-fades-fix ---------------------------
 * Fixed error with multiple controls fading listeners
+
+---- 3.2.3 / 2012-11-12 / fix-chrome-seeking-spinner ---------------------------
+* Fixed chrome spinner continuing on seek
