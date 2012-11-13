@@ -49,6 +49,41 @@ _V_.extend({
     }
   },
 
+  // Object.keys implementation for the benefit of lte IE8
+  objKeys: function (obj) {
+    if (!!Object.keys) return Object.keys(obj);
+    var keys = [],
+      k;
+    for (k in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, k)) {
+        keys.push(k);
+      }
+    }
+    return keys;
+  },
+
+  // Object.values implementation for the benefit of lte IE8
+  objValues: function (obj) {
+    if (!!Object.values) return Object.values(obj);
+    var values = [],
+      k;
+    for (k in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, k)) {
+        values.push(obj[k]);
+      }
+    }
+    return values;
+  },
+
+  // Array.reduce implementation for lte IE8
+  reduce: function(arr, fn, init) {
+    this.each(arr, function(val, i) {
+      init = fn.call(arr, init, val, i);
+    });
+
+    return init;
+  },
+
   el: function(id){ return document.getElementById(id); },
   createElement: function(tagName, attributes){
     var el = document.createElement(tagName),
@@ -125,7 +160,7 @@ _V_.extend({
   getRelativePosition: function(x, relativeElement){
     return Math.max(0, Math.min(1, (x - _V_.findPosX(relativeElement)) / relativeElement.offsetWidth));
   },
-  
+
   getComputedStyleValue: function(element, style){
     return window.getComputedStyle(element, null).getPropertyValue(style);
   },

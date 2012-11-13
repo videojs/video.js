@@ -37,6 +37,14 @@ _V_.html5 = _V_.PlaybackTech.extend({
     this.triggerReady();
   },
 
+  removeSources: function(el){
+    var srcs = el.getElementsByTagName("source");
+
+    for(var i=0;i<srcs.length;i++){
+      el.removeChild(srcs[i]);
+    }
+  },
+
   destroy: function(){
     this.player.tag = false;
     this.removeTriggers();
@@ -77,6 +85,11 @@ _V_.html5 = _V_.PlaybackTech.extend({
       }
     }, this);
 
+    // IE9 prefers the source elements, if present, over programatic
+    // attempts attempts to change the video src attribute. IE9 will
+    // fail to swap sources unless we remove the source elements. we
+    // have already parsed the relevant data out of them anyway.
+    this.removeSources(el);
     return el;
   },
 

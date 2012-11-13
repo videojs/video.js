@@ -20,10 +20,11 @@
   <script src="src/controls.js"></script>
   <script src="src/events.js"></script>
   <script src="src/tracks.js"></script>
+  <script src="src/resolutions.js"></script>
 
   <script src="tech/html5/html5.js"></script>
   <script src="tech/flash/flash.js"></script>
-  
+
   <script src="src/setup.js"></script>
 
   <script type="text/javascript" charset="utf-8">
@@ -40,7 +41,8 @@
   <video id="vid1" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264"
       poster="http://video-js.zencoder.com/oceans-clip.png"
       data-setup='{}'>
-    <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4'>
+    <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' res="SD">
+    <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' res="HD">
     <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm'>
     <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg'>
     <p>Video Playback Not Supported</p>

@@ -40,7 +40,7 @@ _V_.Player = _V_.Component.extend({
     this.height(options.height, true);
 
     // Update tag id/class for use as HTML5 playback tech
-    // Might think we should do this after embedding in container so .vjs-tech class 
+    // Might think we should do this after embedding in container so .vjs-tech class
     // doesn't flash 100% width/height, but class only applies with .video-js parent
     tag.id += "_html5_api";
     tag.className = "vjs-tech";
@@ -139,7 +139,7 @@ _V_.Player = _V_.Component.extend({
     options.autoplay = tag[getAttribute]("autoplay") !== null; // hasAttribute not IE <8 compatible
     options.loop = tag[getAttribute]("loop") !== null;
     options.muted = tag[getAttribute]("muted") !== null;
-    
+
     options.width = tag[getAttribute]("width");
     options.height = tag[getAttribute]("height");
 
@@ -151,7 +151,10 @@ _V_.Player = _V_.Component.extend({
             src: c[getAttribute]('src'),
             type: c[getAttribute]('type'),
             media: c[getAttribute]('media'),
-            title: c[getAttribute]('title')
+            title: c[getAttribute]('title'),
+            // yes, 'res' and 'default' are non-HTML5 standard
+            res: c[getAttribute]('res'),
+            'default': c[getAttribute]('default') !== null
           });
         }
         if (c.nodeName.toLowerCase() == "track") {
@@ -427,9 +430,9 @@ _V_.Player = _V_.Component.extend({
 
   // Method for calling methods on the current playback technology
   // techCall: function(method, arg){
-  // 
+  //
   //   // if (this.isReady) {
-  //   //   
+  //   //
   //   // } else {
   //   //   _V_.log("The playback technology API is not ready yet. Use player.ready(myFunction)."+" ["+method+"]", arguments.callee.caller.arguments.callee.caller.arguments.callee.caller)
   //   //   return false;
@@ -448,7 +451,7 @@ _V_.Player = _V_.Component.extend({
     this.techCall("pause");
     return this;
   },
-  
+
   // http://dev.w3.org/html5/spec/video.html#dom-media-paused
   // The initial state of paused should be true (in Safari it's actually false)
   paused: function(){
@@ -717,8 +720,60 @@ _V_.Player = _V_.Component.extend({
     this.trigger("exitFullWindow");
   },
 
-  selectSource: function(sources){
+  // pass in source definition, get arrays of sources indexed by type:
+  // example:
+  // [
+  //  { type: "video/mp4", src: "http://www.example.com/path/to/video_sd.mp4", res: "SD", default: true },
+  //  { type: "video/mp4", src: "http://www.example.com/path/to/video_hd.mp4", res: "HD" },
+  //  { type: "video/webm", src: "http://www.example.com/path/to/video.webm" },
+  //  { type: "video/ogg", src: "http://www.example.com/path/to/video.ogv" }
+  // ]
+  //
+  // becomes...
+  //
+  // {
+  //   "video/mp4": [
+  //     { "type": "video/mp4", "src": "http://www.example.com/path/to/video_sd.mp4", "res": "SD", default: true },
+  //     { "type": "video/mp4", "src": "http://www.example.com/path/to/video_hd.mp4", "res": "HD" }
+  //   ],
+  //   "video/webm": [
+  //     { "type": "video/webm", "src": "http://www.example.com/path/to/video.webm" }
+  //   ],
+  //   "video/ogg": [
+  //     { "type": "video/ogg", "src": "http://www.example.com/path/to/video.ogv" }
+  //   ]
+  // }
+  bucketByTypes: function(sources){
+    return _V_.reduce(sources, function(init, val, i){
+      (init[val.type] = init[val.type] || []).push(val);
+      return init;
+    }, {});
+  },
 
+  // takes a selection of sources, checks the video format against the
+  // available video technologies for support, finds a format that is
+  // supported (or returns false), then chooses the most appropriate
+  // resolution from the available source resolutions
+  selectSource: function(sources){
+    var sourcesByType = this.bucketByTypes(sources),
+      typeAndTech = this.selectTypeAndTech(sources);
+
+    if (!typeAndTech) return false;
+
+    // even though we choose the best resolution for the user here, we
+    // should remember the resolutions so that we can potentially
+    // change resolution later
+    this.options.sourceResolutions = sourcesByType[typeAndTech.type];
+
+    return {
+      source: this.selectResolution(this.options.sourceResolutions),
+      tech: typeAndTech.tech
+    }
+  },
+
+  // takes a list of sources and returns the video format (type) and
+  // the technology that can play it (html5, flash, etc)
+  selectTypeAndTech: function(sources){
     // Loop through each playback technology in the options order
     for (var i=0,j=this.options.techOrder;i<j.length;i++) {
       var techName = j[i],
@@ -735,19 +790,45 @@ _V_.Player = _V_.Component.extend({
           // Check if source can be played with this technology
           if (tech.canPlaySource.call(this, source)) {
 
-            return { source: source, tech: techName };
+            return { type: source.type, tech: techName };
 
           }
         }
       }
     }
+  },
 
-    return false;
+  // takes an array of sources of one homogeneous video format type
+  // and returns the source representing the resolution that best
+  // matches the user's saved preference
+  selectResolution: function(typeSources){
+    var defaultRes = 0;
+
+    // check to see if any sources are marked as default
+    _V_.each(typeSources, function(s, i){
+      // add the index here so we can reference it later
+      s.index = i;
+
+      if (s['default']) defaultRes = i;
+    });
+
+    var maxRes = (typeSources.length - 1),
+      // if the user has previously selected a preference, check if
+      // that preference is available. if not, use the source marked
+      // default
+      preferredRes = parseInt(
+          !!window.localStorage && !!window.localStorage.getItem("videojs_preferred_res") ?
+              window.localStorage.getItem("videojs_preferred_res") :
+              defaultRes
+          , 10),
+      actualRes = preferredRes > maxRes ? maxRes : preferredRes;
+
+    return typeSources[actualRes];
   },
 
   // src is a pretty powerful function
   // If you pass it an array of source objects, it will find the best source to play and use that object.src
-  //   If the new source requires a new playback technology, it will switch to that.
+  // If the new source requires a new playback technology, it will switch to that.
   // If you pass it an object, it will set the source to object.src
   // If you pass it anything else (url string) it will set the video source to that
   src: function(source){
