@@ -27,7 +27,7 @@ The time it takes Video.js to set up the video and API will vary depending on th
 
     });
 
-</code>
+```
 
 API Methods
 -----------
@@ -36,51 +36,51 @@ Now that you have access to a ready player, you can control the video, get value
 ### play() ###
 Start video playback. Returns the player object.
 
-<code type="javascript">
+```js
 
     myPlayer.play();
 
-</code>
+```
 
 
 ### pause() ###
 Pause the video playback. Returns the player object
 
-<code type="javascript">
+```js
 
     myPlayer.pause();
 
-</code>
+```
 
 ### paused() ###
 Returns false if the video is currently playing, or true otherwise. ()
 
-<code type="javascript">
+```js
 
     var isPaused = myPlayer.paused();
     var isPlaying = !myPlayer.paused();
 
-</code>
+```
 
 ### src(newSource) ###
 The source function updates the video source. There are three types of variables you can pass as the argument.
 
 **URL String**: A URL to the the video file. Use this method if you're sure the current playback technology (HTML5/Flash) can support the source you provide. Currently only MP4 files can be used in both HTML5 and Flash.
-<code type="javascript">
+```js
 
     myPlayer.src("http://www.example.com/path/to/video.mp4");
 
-</code>
+```
 
 **Source Object (or element):** A javascript object containing information about the source file. Use this method if you want the player to determine if it can support the file using the type information.
-<code type="javascript">
+```js
 
     myPlayer.src({ type: "video/mp4", src: "http://www.example.com/path/to/video.mp4" });
 
-</code>
+```
 
 **Array of Source Objects:** To provide multiple versions of the source so that it can be played using HTML5 across browsers you can use an array of source objects. Video.js will detect which version is supported and load that file.
-<code type="javascript">
+```js
 
     myPlayer.src([
       { type: "video/mp4", src: "http://www.example.com/path/to/video.mp4" },
@@ -88,44 +88,44 @@ The source function updates the video source. There are three types of variables
       { type: "video/ogg", src: "http://www.example.com/path/to/video.ogv" }
     ]);
 
-</code>
+```
 
 Returns the player object.
 
 ### currentTime() ###
 Returns the current time of the video in seconds.
 
-<code type="javascript">
+```js
 
     var whereYouAt = myPlayer.currentTime();
 
-</code>
+```
 
 
 ### currentTime(seconds) // Type: Integer or Float ###
 Seek to the supplied time (seconds). Returns the player object.
 
-<code type="javascript">
+```js
 
     myPlayer.currentTime(120); // 2 minutes into the video
 
-</code>
+```
 
 
 ### duration() ###
 Returns the length in time of the video in seconds. NOTE: The video must have started loading before the duration can be known, and in the case of Flash, may not be known until the video starts playing.
 
-<code type="javascript">
+```js
 
     var howLongIsThis = myPlayer.duration();
 
-</code>
+```
 
 
 ### buffered() ###
 Returns a [TimeRange](http://videojs.com/docs/glossary.html#timerange) object with sections of the video that have been downloaded. If you just want the percent of the video that's been downloaded, use bufferedPercent.
 
-<code type="javascript">
+```js
 
     var bufferedTimeRange = myPlayer.buffered(),
 
@@ -141,113 +141,113 @@ Returns a [TimeRange](http://videojs.com/docs/glossary.html#timerange) object wi
     // Length in seconds of the first time range
     firstRangeLength = firstRangeEnd - firstRangeStart;
 
-</code>
+```
 
 
 ### bufferedPercent() ###
 Returns the percent (as a decimal) of the video that's been downloaded. 0 means none, 1 means all.
 
-<code type="javascript">
+```js
 
     var howMuchIsDownloaded = myPlayer.bufferedPercent();
 
-</code>
+```
 
 
 ### volume() ###
 Returns the current volume of the video as a percent in decimal form. 0 is off (muted), 1.0 is all the way up, 0.5 is half way.
 
-<code type="javascript">
+```js
 
     var howLoudIsIt = myPlayer.volume();
 
-</code>
+```
 
 ### volume(percentAsDecimal) ###
 Set the volume to the supplied percent (as a decimal between 0 and 1).
 
-<code type="javascript">
+```js
 
     myPlayer.volume(0.5); // Set volume to half
 
-</code>
+```
 
 
 ### width() ###
 Returns the current width of the video in pixels.
 
-<code type="javascript">
+```js
 
     var howWideIsIt = myPlayer.width();
 
-</code>
+```
 
 
 ### width(pixels) ###
 Change the width of the video to the supplied width in pixels. Returns the player object
 
-<code type="javascript">
+```js
 
     myPlayer.width(640);
 
-</code>
+```
 
 
 ### height() ###
 Returns the current height of the video in pixels.
 
-<code type="javascript">
+```js
 
     var howTallIsIt = myPlayer.height();
 
-</code>
+```
 
 
 ### height(pixels) ###
 Change the height of the video to the supplied height in pixels. Returns the player object
 
-<code type="javascript">
+```js
 
     myPlayer.height(480);
 
-</code>
+```
 
 
 ### size(width, height) ###
 Changes the width and height of the video to the supplied width and height. This is more efficient if you're changing both width and height (only triggers the player's resize event once). Returns the player object.
 
-<code type="javascript">
+```js
 
     myPlayer.size(640,480);
 
-</code>
+```
 
 
 ### requestFullScreen() ###
 Increase the size of the video to full screen. In some browsers, full screen is not supported natively, so it enters full window mode, where the video fills the browser window. In browsers and devices that support native full screen, sometimes the browser's default controls will be shown, and not the Video.js custom skin. This includes most mobile devices (iOS, Android) and older versions of Safari. Returns the player object.
 
-<code type="javascript">
+```js
 
     myPlayer.requestFullScreen();
 
-</code>
+```
 
 
 ### cancelFullScreen() ###
 Return the video to its normal size after having been in full screen mode. Returns the player object.
 
-<code type="javascript">
+```js
 
     myPlayer.cancelFullScreen();
 
-</code>
+```
 
 
 Events
 ------
 You can attach event listeners to the player similarly to how you would for a video element.
 
-<code type="javascript">
+```js
 
     var myFunc = function(){
       var myPlayer = this;
@@ -255,15 +255,15 @@ You can attach event listeners to the player similarly to how you would for a vi
     };
     myPlayer.addEvent("eventName", myFunc);
 
-</code>
+```
 
 You can also remove the listeners later.
 
-<code type="javascript">
+```js
 
     myPlayer.removeEvent("eventName", myFunc);
 
-</code>
+```
 
 
 ### Event Types
