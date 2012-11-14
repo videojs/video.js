@@ -6,11 +6,9 @@ Referencing the Player
 ----------------------
 To use the API functions, you need access to the player object. Luckily this is easy to get. You just need to make sure your video tag has an ID. The example embed code has an ID of "example\_video_1". If you have multiple videos on one page, make sure every video tag has a unique ID.
 
-<code type="javascript">
-
-    var myPlayer = _V_("example_video_1");
-
-</code>
+```js
+var myPlayer = _V_("example_video_1");
+```
 
 (If the player hasn't been initialized yet via the data-setup attribute or another method, this will also initialize the player.)
 
