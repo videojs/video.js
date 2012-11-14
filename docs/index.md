@@ -6,7 +6,7 @@ The Video.js documentation is here to help you setup and use the player. These d
 
 ## Getting Started
 
-* [Setup](setup.md) - Check out the [5 second setup](/#setup) if you're just getting started. The setup documentation gives a deeper view of the additional methods you can use to trigger the player setup.
+* [Setup](setup.md) - Check out the [5 second setup](http://videojs.com/#section5) if you're just getting started. The setup documentation gives a deeper view of the additional methods you can use to trigger the player setup.
 
 * [Options](options.md) - There are a number of options that can be used to change how the player behaves, starting with the HTML5 media options like autoplay and preload, and expanding to Video.JS specific options.
 
