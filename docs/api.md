@@ -98,7 +98,7 @@ var howLongIsThis = myPlayer.duration();
 
 
 ### buffered() ###
-Returns a [TimeRange](http://videojs.com/docs/glossary.html#timerange) object with sections of the video that have been downloaded. If you just want the percent of the video that's been downloaded, use bufferedPercent.
+Returns a [TimeRange](glossary.md#timerange) object with sections of the video that have been downloaded. If you just want the percent of the video that's been downloaded, use bufferedPercent.
 ```js
 var bufferedTimeRange = myPlayer.buffered(),
 
