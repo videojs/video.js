@@ -1,4 +1,4 @@
-(Video.js homepage)[http://videojs.com]
+[Video.js homepage](http://videojs.com)
 
 <h1>Video.js Documentation</h1>
 
@@ -18,7 +18,7 @@ The Video.js documentation is here to help you setup and use the player. These d
 
 * [Skins](skins.md) - You can change the look of the player across playback technologies just by editing a CSS file. The skins documentation gives you a intro to how the HTML and CSS of the default skin is put together.
 
-*[Tech](tech.md) - A 'playback technology' is the term we're using to represent HTML5 video, Flash, and other video plugins, as well as other players like the YouTube player. Basically anything that has a unique API to audio or video. Additional playback technologies can be added relatively easily.
+* [Tech](tech.md) - A 'playback technology' is the term we're using to represent HTML5 video, Flash, and other video plugins, as well as other players like the YouTube player. Basically anything that has a unique API to audio or video. Additional playback technologies can be added relatively easily.
 
 ## Resources
 
