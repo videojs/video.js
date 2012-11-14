@@ -1,5 +1,6 @@
 Glossary
 ========
+Terms related to web video.
 
 ### DOM (Document Object Model)
 The container of elements on the page that must be loaded before you can interact with the elements with through Javascript.
