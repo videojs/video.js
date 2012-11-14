@@ -1,11 +1,3 @@
----
-layout: docs
-title: Setup
-description: Setup
-body_id: setup
-body_class: docs subpage
----
-
 Setup
 =====
 

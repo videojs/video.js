@@ -1,11 +1,3 @@
----
-layout: docs
-title: HTML5 Video Text Tracks (Subtitles, Captions, Chapters)
-description: Video.js support for captions, subtitles, and chapters through the use of the HTML5 video track element.
-body_id: tracks
-body_class: docs subpage
----
-
 Tracks
 ======
 

@@ -1,12 +1,3 @@
----
-layout: docs
-title: VideoJS Glossary
-description: Video.JS Glossary
-body_id: glossary
-body_class: docs subpage
----
-
-
 Glossary
 ========
 

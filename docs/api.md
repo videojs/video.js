@@ -1,11 +1,3 @@
----
-layout: docs
-title: API
-description: Video.JS API Docs - API settings based on the HTML5 video API
-body_id: api
-body_class: docs subpage
----
-
 API
 ===
 The Video.js API allows you to interact with the video through Javascript, whether the browser is playing the video through HTML5 video, Flash, or any other supported playback technologies.
