@@ -19,7 +19,7 @@ Adding to Video.js
 ------------------
 Once you have your WebVTT file created, you can add it to Video.js using the track trag. Put your track track tag after all the source elements, and before any fallback content.
 
-<code type="html">
+```html
 
 <video id="example_video_1" class="video-js vjs-default-skin"  
   controls preload="auto" width="640" height="264"  
@@ -32,7 +32,7 @@ Once you have your WebVTT file created, you can add it to Video.js using the tra
 
 </video>
 
-</code>
+```
 
 Track Attributes
 ----------------
