@@ -2,8 +2,9 @@
 # Combines Source Files. In terminal, sh build.sh
 # It will put a new video.js file under dist/
 
-# Create dist directory if it doesn't already exist
-mkdir -p dist
+# Clean and create dist directory
+rm -rf dist;
+mkdir dist;
 
 # FILES=../src/*
 # for f in $FILES
@@ -41,7 +42,7 @@ cat src/_end.js >> dist/video.js
 # Copy Files
 cp design/video-js.css dist/video-js.css
 cp design/video-js.png dist/video-js.png
-cp flash/video-js.swf dist/video-js.swf
+cp tech/flash/video-js.swf dist/video-js.swf
 
 cp build/release-files/README.md dist/README.md
 cp build/release-files/demo.html dist/demo.html
