@@ -233,6 +233,42 @@ _V_.Component = _V_.Class.extend({
     }
   },
 
+
+
+  /* Load Error - Trigger functions when component cannot load
+  ================================================================================ */
+  loadError: function(fn){
+    if (!fn) return this;
+
+    if (this.isLoadError) {
+      fn.call(this);
+    } else {
+      if (this.loadErrorQueue === undefined) {
+        this.loadErrorQueue = [];
+      }
+      this.loadErrorQueue.push(fn);
+    }
+
+    return this;
+  },
+
+  triggerLoadError: function() {
+    this.isLoadError = true;
+    if (this.loadErrorQueue && this.loadErrorQueue.length > 0) {
+      // Call all functions in ready queue
+      this.each(this.loadErrorQueue, function(fn){
+        fn.call(this);
+      });
+
+      // Reset Ready Queue
+      this.loadErrorQueue = [];
+
+      // Allow for using event listeners also, in case you want to do something everytime a source is ready.
+      this.triggerEvent("loaderror");
+    }
+  },
+
+
   /* Utility
   ================================================================================ */
   each: function(arr, fn){ _V_.each.call(this, arr, fn); },
