@@ -43,6 +43,9 @@ _V_ = VideoJS,
 // CDN Version. Used to target right flash swf.
 CDN_VERSION = "GENERATED_CDN_VSN";
 
+// Assign http: or https:
+PROTOCOL = document.location.protocol;
+
 VideoJS.players = {};
 
 VideoJS.options = {
@@ -52,7 +55,7 @@ VideoJS.options = {
   // techOrder: ["flash","html5"],
 
   html5: {},
-  flash: { swf: "http://vjs.zencdn.net/c/video-js.swf" },
+  flash: { swf: PROTOCOL+"//vjs.zencdn.net/c/video-js.swf" },
 
   // Default of web browser is 300x150. Should rely on source width/height.
   width: 300,
@@ -112,5 +115,5 @@ VideoJS.options = {
 
 // Set CDN Version of swf
 if (CDN_VERSION != "GENERATED_CDN_VSN") {
-  _V_.options.flash.swf = "http://vjs.zencdn.net/"+CDN_VERSION+"/video-js.swf"
+  _V_.options.flash.swf = PROTOCOL+"//vjs.zencdn.net/"+CDN_VERSION+"/video-js.swf"
 }
