@@ -19,6 +19,7 @@ _V_.extend({
   isIPad: function(){ return navigator.userAgent.match(/iPad/i) !== null; },
   isIPhone: function(){ return navigator.userAgent.match(/iPhone/i) !== null; },
   isIOS: function(){ return VideoJS.isIPhone() || VideoJS.isIPad(); },
+  isTouchDevice: function(){ return !!('ontouchstart' in window); },
   iOSVersion: function() {
     var match = navigator.userAgent.match(/OS (\d+)_/i);
     if (match && match[1]) { return match[1]; }
