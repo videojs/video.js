@@ -44,11 +44,13 @@ RIGHT
 
 ### controls ###
 The controls option sets whether or not the player has controls that the user can interact with. Without controls the only way to start the video playing is with the autoplay attribute or through the API.
+
 ```html
 <video controls ...>
 or
 { "controls": true }
 ```
+
 
 ### autoplay ###
 If autoplay is true, the video will start playing as soon as page is loaded (without any interaction from the user).  
@@ -58,6 +60,7 @@ NOT SUPPORTED BY APPLE iOS DEVICES. Apple blocks the autoplay functionality in a
 or
 { "autoplay": true }
 ```
+
 
 ### preload ###
 The preload attribute informs the browser whether or not the video data should begin downloading as soon as the video tag is loaded. The options are auto, metadata, and none.
@@ -74,6 +77,7 @@ or
 { "preload": "auto" }
 ```
 
+
 ### poster ###
 The poster attribute sets the image that displays before the video begins playing. This is often a frame of the video or a custom title screen. As soon as the user clicks play the image will go away.
 ```html
@@ -81,6 +85,7 @@ The poster attribute sets the image that displays before the video begins playin
 or
 { "poster": "myPoster.jpg" }
 ```
+
 
 ### loop ###
 The loop attribute causes the video to start over as soon as it ends. This could be used for a visual affect like clouds in the background.
@@ -90,6 +95,7 @@ or
 { "loop": "true" }
 ```
 
+
 ### width ###
 The width attribute sets the display width of the video.
 ```html
@@ -97,6 +103,7 @@ The width attribute sets the display width of the video.
 or
 { "width": 640 }
 ```
+
 
 ### height ###
 The height attribute sets the display height of the video.

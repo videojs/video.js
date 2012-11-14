@@ -1,4 +1,4 @@
-<h1>Start</h1>
+<h1>TOC</h1>
 
 The Video.js documentation is here to help you setup and use the player. These docs can be found and contributed to in the [Video.js library repository](https://github.com/zencoder/video-js/tree/master/docs).
 
