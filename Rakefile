@@ -74,8 +74,8 @@ namespace :build do
       combined << File.read("src/#{item}")
     end
 
-    combined << File.read("tech/html5/html5.js")
-    combined << File.read("tech/flash/flash.js")
+    combined << "\n" << File.read("tech/html5/html5.js")
+    combined << "\n" << File.read("tech/flash/flash.js")
 
     # combined << File.read("flash/swfobject.js")
     combined << File.read("src/setup.js")
