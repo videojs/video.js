@@ -74,6 +74,9 @@ namespace :build do
       combined << File.read("src/#{item}")
     end
 
+    combined << File.read("tech/html5/html5.js")
+    combined << File.read("tech/flash/flash.js")
+
     # combined << File.read("flash/swfobject.js")
     combined << File.read("src/setup.js")
     combined << File.read("src/_end.js")
@@ -92,7 +95,7 @@ namespace :build do
 
     Rake::Log["Copying suppporting files"]
     Rake::Shell["cp design/video-js.png dist/video-js.png"]
-    Rake::Shell["cp flash/video-js.swf dist/video-js.swf"]
+    Rake::Shell["cp tech/flash/video-js.swf dist/video-js.swf"]
 
     Rake::Shell["cp build/release-files/README.md dist/README.md"]
     Rake::Shell["cp build/release-files/demo.html dist/demo.html"]
