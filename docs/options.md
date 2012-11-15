@@ -1,11 +1,3 @@
----
-layout: docs
-title: Options
-description: Player Options
-body_id: options
-body_class: docs subpage
----
-
 Options
 =======
 
@@ -14,27 +6,21 @@ Setting Options
 
 The Video.js emebed code is simply an HTML5 video tag, so for many of the options you can use the standard tag attributes to set the options.
 
-<code type="html">
-
-    <video controls autoplay preload="auto" ...>
-
-</code>
+```html
+<video controls autoplay preload="auto" ...>
+```
 
 Alternatively, you can use the data-setup attribute to provide options in the [JSON](http://json.org/example.html) format. This is also how you would set options that aren't standard to the video tag.
 
-<code type="html">
-
-    <video data-setup='{ "controls": true, "autoplay": false, "preload": "auto" }'...>
-
-</code>
+```html
+<video data-setup='{ "controls": true, "autoplay": false, "preload": "auto" }'...>
+```
 
 Finally, if you're not using the data-setup attribute to trigger the player setup, you can pass in an object with the player options as the second argument in the javascript setup function.
 
-<code type="javascript">
-
-    _V_("example_video_1", { "controls": true, "autoplay": false, "preload": "auto" });
-
-</code>
+```js
+_V_("example_video_1", { "controls": true, "autoplay": false, "preload": "auto" });
+```
 
 
 Individual Options
@@ -44,42 +30,37 @@ Individual Options
 > With HTML5 video tag attributes that can only be true or false (boolean), you simply include the attribute (no equals sign) to turn it on, or exclude it to turn it off. For example, to turn controls on:
 
 WRONG
-<code type="html">
-
-     <video controls="true" ...>
-
-</code>
+```html
+<video controls="true" ...>
+```
 
 RIGHT
-<code type="html">
-
-    <video controls ...>
-
-</code>
+```html
+<video controls ...>
+```
 
 > The biggest issue people run into is trying to set these values to false using false as the value (e.g. controls="false") which actually does the opposite and sets the value to true because the attribute is still included. If you need the attribute to include an equals sign for XHTML validation, you can set the attribute's value to the same as its name (e.g. controls="controls").
 
 
 ### controls ###
 The controls option sets whether or not the player has controls that the user can interact with. Without controls the only way to start the video playing is with the autoplay attribute or through the API.
-<code type="html">
 
-    <video controls ...>
-    or
-    { "controls": true }
+```html
+<video controls ...>
+or
+{ "controls": true }
+```
 
-</code>
 
 ### autoplay ###
 If autoplay is true, the video will start playing as soon as page is loaded (without any interaction from the user).  
 NOT SUPPORTED BY APPLE iOS DEVICES. Apple blocks the autoplay functionality in an effort to protect it's customers from unwillingly using a lot of their (often expensive) monthly data plans. A user touch/click is required to start the video in this case.
-<code type="html">
+```html
+<video autoplay ...>
+or
+{ "autoplay": true }
+```
 
-    <video autoplay ...>
-    or
-    { "autoplay": true }
-
-</code>
 
 ### preload ###
 The preload attribute informs the browser whether or not the video data should begin downloading as soon as the video tag is loaded. The options are auto, metadata, and none.
@@ -90,50 +71,44 @@ The preload attribute informs the browser whether or not the video data should b
 
 'none': Don't preload any of the video data. This will wait until the user clicks play to begin downloading.
 
-<code type="html">
+```html
+<video preload ...>
+or
+{ "preload": "auto" }
+```
 
-    <video preload ...>
-    or
-    { "preload": "auto" }
-
-</code>
 
 ### poster ###
 The poster attribute sets the image that displays before the video begins playing. This is often a frame of the video or a custom title screen. As soon as the user clicks play the image will go away.
-<code type="html">
+```html
+<video poster="myPoster.jpg" ...>
+or
+{ "poster": "myPoster.jpg" }
+```
 
-    <video poster="myPoster.jpg" ...>
-    or
-    { "poster": "myPoster.jpg" }
-
-</code>
 
 ### loop ###
 The loop attribute causes the video to start over as soon as it ends. This could be used for a visual affect like clouds in the background.
-<code type="html">
+```html
+<video loop ...>
+or
+{ "loop": "true" }
+```
 
-    <video loop ...>
-    or
-    { "loop": "true" }
-
-</code>
 
 ### width ###
 The width attribute sets the display width of the video.
-<code type="html">
+```html
+<video width="640" ...>
+or
+{ "width": 640 }
+```
 
-    <video width="640" ...>
-    or
-    { "width": 640 }
-
-</code>
 
 ### height ###
 The height attribute sets the display height of the video.
-<code type="html">
-
-    <video height="480" ...>
-    or
-    { "height": 480 }
-
-</code>
+```html
+<video height="480" ...>
+or
+{ "height": 480 }
+```

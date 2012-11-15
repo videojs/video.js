@@ -1,11 +1,3 @@
----
-layout: docs
-title: Playback Technology
-description: Video.js Playback Technology
-body_id: tech
-body_class: docs subpage
----
-
 Playback Technology ("Tech")
 ============================
 Playback Technology refers to the specific browser or plugin technology used to play the video or audio. When using HTML5, the playback technology is the video or audio element. When using Flash, the playback technology is the specific Flash player used, e.g. Flowplayer, YouTube Player, video-js.swf, etc. (not just "Flash"). This could also include Silverlight, Quicktime, or any other plugin that will play back video in the browser, as long as there is an API wrapper written for it. 
