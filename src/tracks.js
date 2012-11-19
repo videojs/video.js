@@ -10,9 +10,16 @@ _V_.merge(_V_.Player.prototype, {
 
   // Add an array of text tracks. captions, subtitles, chapters, descriptions
   // Track objects will be stored in the player.textTracks array
-  addTextTracks: function(trackObjects){
-    var tracks = this.textTracks = (this.textTracks) ? this.textTracks : [],
-        i = 0, j = trackObjects.length, track, Kind;
+  tracks: function(trackObjects){
+    var tracks = this.textTracks = (this.textTracks) ? this.textTracks : [];
+    if (trackObjects === undefined) {
+      return this.textTracks;
+    }
+    var i = 0, j = trackObjects.length, track, Kind;
+
+    this.each(this.textTracks, function(item){
+      this.textTrackDisplay.removeComponent(item);
+    });
 
     for (;i<j;i++) {
       // HTML5 Spec says default to subtitles.
@@ -32,8 +39,8 @@ _V_.merge(_V_.Player.prototype, {
         this.ready(_V_.proxy(track, track.show));
       }
     }
+    this['controlBar']['subtitlesButton'].update();
 
-    // Return the track so it can be appended to the display component
     return this;
   },
 
@@ -565,9 +572,24 @@ _V_.TextTrackButton = _V_.Button.extend({
     this._super(player, options);
 
     this.menu = this.createMenu();
+  },
+
+  update: function(){
+    this.each(this.items, function(item){
+      this.menu.removeItem(item);
+    });
+
+    this.items = this.createItems();
+
+    // Add menu items to the menu
+    this.each(this.items, function(item){
+      this.menu.addItem(item);
+    });
 
     if (this.items.length === 0) {
       this.hide();
+    } else {
+      this.show();
     }
   },
 
@@ -583,12 +605,7 @@ _V_.TextTrackButton = _V_.Button.extend({
     // Add an OFF menu item to turn all tracks off
     menu.addItem(new _V_.OffTextTrackMenuItem(this.player, { kind: this.kind }))
 
-    this.items = this.createItems();
-
-    // Add menu items to the menu
-    this.each(this.items, function(item){
-      menu.addItem(item);
-    });
+    this.update();
 
     // Add list to element
     this.addComponent(menu);
@@ -722,7 +739,9 @@ _V_.ChaptersButton = _V_.TextTrackButton.extend({
     // Add list to element
     this.addComponent(menu);
 
-    if (this.items.length > 0) {
+    if (this.items.length === 0) {
+      this.hide();
+    } else {
       this.show();
     }
 

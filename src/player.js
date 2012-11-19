@@ -88,7 +88,7 @@ _V_.Player = _V_.Component.extend({
     // Tracks defined in tracks.js
     this.textTracks = [];
     if (options.tracks && options.tracks.length > 0) {
-      this.addTextTracks(options.tracks);
+      this.tracks(options.tracks);
     }
 
     // If there are no sources when the player is initialized,
@@ -726,7 +726,7 @@ _V_.Player = _V_.Component.extend({
           // tech = _V_.tech[techName];
 
       // Check if the browser supports this technology
-      if (tech.isSupported()) {
+      if (tech && tech.isSupported()) {
 
         // Loop through each source object
         for (var a=0,b=sources;a<b.length;a++) {
