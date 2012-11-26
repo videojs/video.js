@@ -577,7 +577,7 @@ _V_.Player = _V_.Component.extend({
 
     // Returns cached width/height in attribute.
     // Could make this return computed width and support %s. Not a small amount of work.
-    return parseInt(this.el.getAttribute(widthOrHeight));
+    return parseInt(this.el.style[widthOrHeight]);
   },
 
   // Check if current tech can support native fullscreen (e.g. with built in controls lik iOS, so not our flash swf)
