@@ -342,7 +342,6 @@ _V_.Track = _V_.Component.extend({
       // Check if the new time is outside the time box created by the the last update.
       if (this.prevChange === undefined || time < this.prevChange || this.nextChange <= time) {
         var cues = this.cues,
-
             // Create a new time box for this state.
             newNextChange = this.player.duration(), // Start at beginning of the timeline
             newPrevChange = 0, // Start at end
@@ -355,6 +354,8 @@ _V_.Track = _V_.Component.extend({
 
             html = "", // Create cue text HTML to add to the display
             cue, i, j; // Loop vars
+
+			if (newNextChange  === undefined) return;
 
         // Check if time is going forwards or backwards (scrubbing/rewinding)
         // If we know the direction we can optimize the starting position and direction of the loop through the cues array.
