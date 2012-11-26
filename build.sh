@@ -1,4 +1,4 @@
-#! /bin/csh
+#! /bin/bash
 # Combines Source Files. In terminal, sh build.sh
 # It will put a new video.js file under dist/
 
