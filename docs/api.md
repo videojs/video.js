@@ -11,6 +11,8 @@ var myPlayer = _V_("example_video_1");
 
 (If the player hasn't been initialized yet via the data-setup attribute or another method, this will also initialize the player.)
 
+The player may also be referenced using a DOM element as an argument,  so `_V_(document.getElementById('my-video'))` and `_V_('my-video')` are equivalent.
+
 Wait Until the Player is Ready
 ------------------------------
 The time it takes Video.js to set up the video and API will vary depending on the playback technology being used (HTML5 will often be much faster to load than Flash). For that reason we want to use the player's 'ready' function to trigger any code that requires the player's API.
