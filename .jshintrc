@@ -1,0 +1,16 @@
+{
+    "validthis": true,
+    "browser"  : true,
+    "debug"    : true,
+    "boss"     : true,
+    "expr"     : true,
+    "eqnull"   : true,
+    "quotmark" : "double",
+    "sub"      : true,
+    "trailing" : true,
+    "undef"    : true,
+    "predef"   : [  // Extra globals.
+        "_V_",
+        "VideoJS"
+    ]
+}

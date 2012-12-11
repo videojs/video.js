@@ -1,3 +1,4 @@
+* Added automated test suite and support for Travis CI.
 * Updated docs to use Github markdown
 * Allow disabling of default components
 * Duration is now setable (need ed for HLS m3u8 files)
