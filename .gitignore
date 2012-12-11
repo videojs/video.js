@@ -3,3 +3,5 @@ dist/*
 dev.html
 projects
 .zenflow-log
+
+node_modules

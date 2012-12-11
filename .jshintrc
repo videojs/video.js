@@ -1,12 +1,16 @@
 {
     "validthis": true,
-    "laxcomma" : true,
-    "laxbreak" : true,
     "browser"  : true,
-    "eqnull"   : true,
     "debug"    : true,
-    "devel"    : true,
     "boss"     : true,
     "expr"     : true,
-    "asi"      : true
+    "eqnull"   : true,
+    "quotmark" : "double",
+    "sub"      : true,
+    "trailing" : true,
+    "undef"    : true,
+    "predef"   : [  // Extra globals.
+        "_V_",
+        "VideoJS"
+    ]
 }
