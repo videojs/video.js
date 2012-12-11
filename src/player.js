@@ -14,6 +14,9 @@ _V_.Player = _V_.Component.extend({
     _V_.merge(options, this.getVideoTagSettings()); // Override with Video Tag Options
     _V_.merge(options, addOptions); // Override/extend with options from setup call
 
+    // Cache for video property values.
+    this.values = {};
+
     // Store controls setting, and then remove immediately so native controls don't flash.
     tag.removeAttribute("controls");
 
@@ -62,9 +65,6 @@ _V_.Player = _V_.Component.extend({
         }
       }
     }
-
-    // Cache for video property values.
-    this.values = {};
 
     this.addClass("vjs-paused");
 
