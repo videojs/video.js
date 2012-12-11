@@ -561,7 +561,7 @@ _V_.Player = _V_.Component.extend({
     if (num !== undefined) {
 
       // Cache on object to be returned. Shouldn't have any effect after CSS.
-      this.el[widthOrHeight] = num;
+      this.values[widthOrHeight] = num;
 
       // Check if using percent width/height and adjust
       if ((""+num).indexOf("%") !== -1) {
@@ -577,7 +577,7 @@ _V_.Player = _V_.Component.extend({
 
     // Returns cached width/height in attribute.
     // Could make this return computed width and support %s. Not a small amount of work.
-    return parseInt(this.el.getAttribute(widthOrHeight));
+    return this.values[widthOrHeight];
   },
 
   // Check if current tech can support native fullscreen (e.g. with built in controls lik iOS, so not our flash swf)
