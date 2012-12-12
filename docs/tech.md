@@ -42,7 +42,7 @@ Adding Playback Technology
 When adding additional Tech to a video player, make sure to add the supported tech to the video object.
 
 ### Tag Method: ###
-    <video data-setup='{"techOrder", "html5", "flash", [other supported tech]}'
+    <video data-setup='{"techOrder": ["html5", "flash", [other supported tech]]}'
 
 ### Object Method: ###
     _V_("videoID", {
