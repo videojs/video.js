@@ -813,6 +813,11 @@ _V_.Menu = _V_.Component.extend({
     }));
   },
 
+  removeItem: function(component){
+    this.removeComponent(component);
+    // TODO: component.off
+  },
+
   createElement: function(){
     return this._super("ul", {
       className: "vjs-menu"
