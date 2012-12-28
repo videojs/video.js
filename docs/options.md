@@ -4,7 +4,7 @@ Options
 Setting Options
 ---------------
 
-The Video.js emebed code is simply an HTML5 video tag, so for many of the options you can use the standard tag attributes to set the options.
+The Video.js embed code is simply an HTML5 video tag, so for many of the options you can use the standard tag attributes to set the options.
 
 ```html
 <video controls autoplay preload="auto" ...>
