@@ -3,7 +3,7 @@ module("Component");
 test('should create an element', function(){
   var comp = new _V_.Component({}, {});
 
-  ok(comp.el.nodeName);
+  ok(comp.getEl().nodeName);
 });
 
 test('should init child coponents from options', function(){
@@ -15,6 +15,18 @@ test('should init child coponents from options', function(){
 
   ok(comp.el.childNodes.length === 1);
 });
+
+test('should add a child component', function(){
+  var comp = new _V_.Component({});
+
+  comp.addChild("Component");
+
+  ok(comp.el.childNodes.length === 1);
+});
+
+
+
+
 
 test('should show and hide an element', function(){
   var comp = new _V_.Component({}, {});

@@ -1,308 +1,308 @@
-// Event System (J.Resig - Secrets of a JS Ninja http://jsninja.com/ [Go read it, really])
-// (Book version isn't completely usable, so fixed some things and borrowed from jQuery where it's working)
-// 
+// Event System (John Resig - Secrets of a JS Ninja http://jsninja.com/)
+// (Original book version wasn't completely usable, so fixed some things and made Closure Compiler compatible)
+//
 // This should work very similarly to jQuery's events, however it's based off the book version which isn't as
 // robust as jquery's, so there's probably some differences.
-// 
-// When you add an event listener using _V_.addEvent, 
-//   it stores the handler function in seperate cache object, 
-//   and adds a generic handler to the element's event,
-//   along with a unique id (guid) to the element.
 
-_V_.extend({
+/**
+ * Add an event listener to element
+ * It stores the handler function in a separate cache object
+ * and adds a generic handler to the element's event,
+ * along with a unique id (guid) to the element.
+ * @param  {Element|Object}   elem Element or object to bind listeners to
+ * @param  {String}   type Type of event to bind to.
+ * @param  {Function} fn   Event listener.
+ */
+_V_.on = function(elem, type, fn){
+  var data = _V_.getData(elem);
 
-  // Add an event listener to element
-  // It stores the handler function in a separate cache object
-  // and adds a generic handler to the element's event,
-  // along with a unique id (guid) to the element.
-  on: function(elem, type, fn){
-    var data = _V_.getData(elem), handlers;
+  // We need a place to store all our handler data
+  if (!data.handlers) data.handlers = {};
 
-    // We only need to generate one handler per element
-    if (data && !data.handler) {
-      // Our new meta-handler that fixes the event object and the context
-      data.handler = function(event){
-        event = _V_.fixEvent(event);
-        var handlers = _V_.getData(elem).events[event.type];
-        // Go through and call all the real bound handlers
-        if (handlers) {
-          
-          // Copy handlers so if handlers are added/removed during the process it doesn't throw everything off.
-          var handlersCopy = [];
-          _V_.each(handlers, function(handler, i){
-            handlersCopy[i] = handler;
-          })
-          
-          for (var i = 0, l = handlersCopy.length; i < l; i++) {
-            handlersCopy[i].call(elem, event);
-          }
+  if (!data.handlers[type]) data.handlers[type] = [];
+
+  if (!fn.guid) fn.guid = _V_.guid++;
+
+  data.handlers[type].push(fn);
+
+  if (!data.dispatcher) {
+    data.disabled = false;
+
+    data.dispatcher = function (event){
+
+      if (data.disabled) return;
+      event = _V_.fixEvent(event);
+
+      var handlers = data.handlers[event.type];
+
+      /* Was making a copy of handlers to protect
+       * against removal of listeners mid loop.
+       * Removing for v4 to test if we still need it. */
+      // Copy handlers so if handlers are added/removed during the process it doesn't throw everything off.
+      if (handlers) {
+        var handlersCopy = [];
+        for (var i = 0, j = handlers.length; i < j; i++) {
+          handlersCopy[i] = handlers[i];
         }
-      };
-    }
 
-    // We need a place to store all our event data
-    if (!data.events) { data.events = {}; }
-
-    // And a place to store the handlers for this event type
-    handlers = data.events[type];
-
-    if (!handlers) {
-      handlers = data.events[ type ] = [];
-
-      // Attach our meta-handler to the element, since one doesn't exist
-      if (document.addEventListener) {
-        elem.addEventListener(type, data.handler, false);
-      } else if (document.attachEvent) {
-        elem.attachEvent("on" + type, data.handler);
-      }
-    }
-
-    if (!fn.guid) { fn.guid = _V_.guid++; }
-
-    handlers.push(fn);
-  },
-  // Deprecated name for 'on' function
-  addEvent: function(){ return _V_.on.apply(this, arguments); },
-
-  off: function(elem, type, fn) {
-    var data = _V_.getData(elem), handlers;
-    // If no events exist, nothing to unbind
-    if (!data.events) { return; }
-
-    // Are we removing all bound events?
-    if (!type) {
-      for (type in data.events) {
-        _V_.cleanUpEvents(elem, type);
-      }
-      return;
-    }
-
-    // And a place to store the handlers for this event type
-    handlers = data.events[type];
-
-    // If no handlers exist, nothing to unbind
-    if (!handlers) { return; }
-
-    // See if we're only removing a single handler
-    if (fn && fn.guid) {
-      for (var i = 0; i < handlers.length; i++) {
-        // We found a match (don't stop here, there could be a couple bound)
-        if (handlers[i].guid === fn.guid) {
-          // Remove the handler from the array of handlers
-          handlers.splice(i--, 1);
+        for (var m = 0, n = handlersCopy.length; m < n; m++) {
+          handlersCopy[m].call(elem, event);
         }
       }
+    };
+  }
+
+  if (data.handlers[type].length == 1) {
+    if (document.addEventListener) {
+      elem.addEventListener(type, data.dispatcher, false);
+    } else if (document.attachEvent) {
+      elem.attachEvent("on" + type, data.dispatcher);
     }
+  }
+};
 
-    _V_.cleanUpEvents(elem, type);
-  },
-  // Deprecated name for 'on' function
-  removeEvent: function(){ return _V_.off.apply(this, arguments); },
+/**
+ * Removes event listeners from an element
+ * @param  {Element|Object}   elem Object to remove listeners from
+ * @param  {String=}   type Type of listener to remove. Don't include to remove all events from element.
+ * @param  {Function} fn   Specific listener to remove. Don't incldue to remove listeners for an event type.
+ */
+_V_.off = function(elem, type, fn) {
+  var data = _V_.getData(elem);
 
-  cleanUpEvents: function(elem, type) {
-    var data = _V_.getData(elem);
-    // Remove the events of a particular type if there are none left
+  // If no events exist, nothing to unbind
+  if (!data.handlers) { return; }
 
-    if (data.events[type].length === 0) {
-      delete data.events[type];
+  // Utility function
+  var removeType = function(t){
+     data.handlers[t] = [];
+     _V_.cleanUpEvents(elem,t);
+  };
 
-      // Remove the meta-handler from the element
-      if (document.removeEventListener) {
-        elem.removeEventListener(type, data.handler, false);
-      } else if (document.detachEvent) {
-        elem.detachEvent("on" + type, data.handler);
+  // Are we removing all bound events?
+  if (!type) {
+    for (var t in data.handlers) removeType(t);
+    return;
+  }
+
+  var handlers = data.handlers[type];
+
+  // If no handlers exist, nothing to unbind
+  if (!handlers) return;
+
+  // If no listener was provided, remove all listeners for type
+  if (!fn) {
+    removeType(type);
+    return;
+  }
+
+  // We're only removing a single handler
+  if (fn.guid) {
+    for (var n = 0; n < handlers.length; n++) {
+      if (handlers[n].guid === fn.guid) {
+        handlers.splice(n--, 1);
       }
     }
-
-    // Remove the events object if there are no types left
-    if (_V_.isEmpty(data.events)) {
-      delete data.events;
-      delete data.handler;
-    }
-
-    // Finally remove the expando if there is no data left
-    if (_V_.isEmpty(data)) {
-      _V_.removeData(elem);
-    }
-  },
-
-  fixEvent: function(event) {
-    if (event[_V_.expando]) { return event; }
-    // store a copy of the original event object
-    // and "clone" to set read-only properties
-    var originalEvent = event;
-    event = new _V_.Event(originalEvent);
-
-    for ( var i = _V_.Event.props.length, prop; i; ) {
-      prop = _V_.Event.props[ --i ];
-      event[prop] = originalEvent[prop];
-    }
-
-    // Fix target property, if necessary
-    if (!event.target) { event.target = event.srcElement || document; }
-
-    // check if target is a textnode (safari)
-    if (event.target.nodeType === 3) { event.target = event.target.parentNode; }
-
-    // Add relatedTarget, if necessary
-    if (!event.relatedTarget && event.fromElement) {
-      event.relatedTarget = event.fromElement === event.target ? event.toElement : event.fromElement;
-    }
-
-    // Calculate pageX/Y if missing and clientX/Y available
-    if ( event.pageX == null && event.clientX != null ) {
-      var eventDocument = event.target.ownerDocument || document,
-        doc = eventDocument.documentElement,
-        body = eventDocument.body;
-
-      event.pageX = event.clientX + (doc && doc.scrollLeft || body && body.scrollLeft || 0) - (doc && doc.clientLeft || body && body.clientLeft || 0);
-      event.pageY = event.clientY + (doc && doc.scrollTop  || body && body.scrollTop  || 0) - (doc && doc.clientTop  || body && body.clientTop  || 0);
-    }
-
-    // Add which for key events
-    if (event.which == null && (event.charCode != null || event.keyCode != null)) {
-      event.which = event.charCode != null ? event.charCode : event.keyCode;
-    }
-
-    // Add metaKey to non-Mac browsers (use ctrl for PC's and Meta for Macs)
-    if ( !event.metaKey && event.ctrlKey ) {
-      event.metaKey = event.ctrlKey;
-    }
-
-    // Add which for click: 1 === left; 2 === middle; 3 === right
-    // Note: button is not normalized, so don't use it
-    if ( !event.which && event.button !== undefined ) {
-      event.which = (event.button & 1 ? 1 : ( event.button & 2 ? 3 : ( event.button & 4 ? 2 : 0 ) ));
-    }
-
-    return event;
-  },
-
-  trigger: function(elem, event) {
-    var data = _V_.getData(elem),
-        parent = elem.parentNode || elem.ownerDocument,
-        type = event.type || event,
-        handler;
-
-    if (data) { handler = data.handler }
-
-    // Added in attion to book. Book code was broke.
-    event = typeof event === "object" ?
-      event[_V_.expando] ? 
-        event :
-        new _V_.Event(type, event) :
-      new _V_.Event(type);
-
-    event.type = type;
-    if (handler) {
-      handler.call(elem, event);
-    }
-
-    // Clean up the event in case it is being reused
-    event.result = undefined;
-    event.target = elem;
-
-    // Bubble the event up the tree to the document,
-    // Unless it's been explicitly stopped
-    // if (parent && !event.isPropagationStopped()) {
-    //   _V_.triggerEvent(parent, event);
-    // 
-    // // We're at the top document so trigger the default action
-    // } else if (!parent && !event.isDefaultPrevented()) {
-    //   // log(type);
-    //   var targetData = _V_.getData(event.target);
-    //   // log(targetData);
-    //   var targetHandler = targetData.handler;
-    //   // log("2");
-    //   if (event.target[event.type]) {
-    //     // Temporarily disable the bound handler,
-    //     // don't want to execute it twice
-    //     if (targetHandler) {
-    //       targetData.handler = function(){};
-    //     }
-    // 
-    //     // Trigger the native event (click, focus, blur)
-    //     event.target[event.type]();
-    // 
-    //     // Restore the handler
-    //     if (targetHandler) {
-    //       targetData.handler = targetHandler;
-    //     }
-    //   }
-    // }
-  },
-  // Deprecated name for 'on' function
-  triggerEvent: function(){ return _V_.trigger.apply(this, arguments); },
-
-  one: function(elem, type, fn) {
-    _V_.on(elem, type, function(){
-      _V_.off(elem, type, arguments.callee)
-      fn.apply(this, arguments);
-    });
-  }
-});
-
-// Custom Event object for standardizing event objects between browsers.
-_V_.Event = function(src, props){
-  // Event object
-  if (src && src.type) {
-    this.originalEvent = src;
-    this.type = src.type;
-
-    // Events bubbling up the document may have been marked as prevented
-    // by a handler lower down the tree; reflect the correct value.
-    this.isDefaultPrevented = (src.defaultPrevented || src.returnValue === false ||
-      src.getPreventDefault && src.getPreventDefault()) ? returnTrue : returnFalse;
-
-  // Event type
-  } else {
-    this.type = src;
   }
 
-  // Put explicitly provided properties onto the event object
-  if (props) { _V_.merge(this, props); }
-
-  this.timeStamp = (new Date).getTime();
-
-  // Mark it as fixed
-  this[_V_.expando] = true;
+  _V_.cleanUpEvents(elem, type);
 };
 
-_V_.Event.prototype = {
-  preventDefault: function() {
-    this.isDefaultPrevented = returnTrue;
+/**
+ * Clean up the listener cache and dispatchers
+ * @param  {Element|Object} elem Element to clean up
+ * @param  {String} type Type of event to clean up
+ */
+_V_.cleanUpEvents = function(elem, type) {
+  var data = _V_.getData(elem);
 
-    var e = this.originalEvent;
-    if (!e) { return; }
+  // Remove the events of a particular type if there are none left
+  if (data.handlers[type].length === 0) {
+    delete data.handlers[type];
+    // data.handlers[type] = null;
+    // Setting to null was causing an error with data.handlers
 
-    // if preventDefault exists run it on the original event
-    if (e.preventDefault) { 
-      e.preventDefault();
-    // otherwise set the returnValue property of the original event to false (IE)
-    } else {
-      e.returnValue = false;
+    // Remove the meta-handler from the element
+    if (document.removeEventListener) {
+      elem.removeEventListener(type, data.dispatcher, false);
+    } else if (document.detachEvent) {
+      elem.detachEvent("on" + type, data.dispatcher);
     }
-  },
-  stopPropagation: function() {
-    this.isPropagationStopped = returnTrue;
+  }
 
-    var e = this.originalEvent;
-    if (!e) { return; }
-    // if stopPropagation exists run it on the original event
-    if (e.stopPropagation) { e.stopPropagation(); }
-    // otherwise set the cancelBubble property of the original event to true (IE)
-    e.cancelBubble = true;
-  },
-  stopImmediatePropagation: function() {
-    this.isImmediatePropagationStopped = returnTrue;
-    this.stopPropagation();
-  },
-  isDefaultPrevented: returnFalse,
-  isPropagationStopped: returnFalse,
-  isImmediatePropagationStopped: returnFalse
+  // Remove the events object if there are no types left
+  if (_V_.isEmpty(data.handlers)) {
+    data.handlers = null;
+    data.dispatcher = null;
+    data.disabled = null;
+  }
+
+  // Finally remove the expando if there is no data left
+  if (_V_.isEmpty(data)) {
+    _V_.removeData(elem);
+  }
 };
-_V_.Event.props = "altKey attrChange attrName bubbles button cancelable charCode clientX clientY ctrlKey currentTarget data detail eventPhase fromElement handler keyCode metaKey newValue offsetX offsetY pageX pageY prevValue relatedNode relatedTarget screenX screenY shiftKey srcElement target toElement view wheelDelta which".split(" ");
 
-function returnTrue(){ return true; }
-function returnFalse(){ return false; }
+/**
+ * Fix a native event to have standard property values
+ * @param  {Object} event Event object to fix
+ * @return {Object}
+ */
+_V_.fixEvent = function(event) {
 
+  function returnTrue() { return true; }
+  function returnFalse() { return false; }
+
+  // Test if fixing up is needed
+  // Used to check if !event.stopPropagation instead of isPropagationStopped
+  // But native events return true for stopPropagation, but don't have
+  // other expected methods like isPropagationStopped. Seems to be a problem
+  // with the Javascript Ninja code. So we're just overriding all events now.
+  if (!event || !event.isPropagationStopped) {
+    var old = event || window.event;
+
+    // Clone the old object so that we can modify the values event = {};
+    for (var prop in old) {
+      event[prop] = old[prop];
+    }
+
+    // The event occurred on this element
+    if (!event.target) {
+      event.target = event.srcElement || document;
+    }
+
+    // Handle which other element the event is related to
+    event.relatedTarget = event.fromElement === event.target ?
+      event.toElement :
+      event.fromElement;
+
+    // Stop the default browser action
+    event.preventDefault = function () {
+      event.returnValue = false;
+      event.isDefaultPrevented = returnTrue;
+    };
+
+    event.isDefaultPrevented = returnFalse;
+
+    // Stop the event from bubbling
+    event.stopPropagation = function () {
+      event.cancelBubble = true;
+      event.isPropagationStopped = returnTrue;
+    };
+
+    event.isPropagationStopped = returnFalse;
+
+    // Stop the event from bubbling and executing other handlers
+    event.stopImmediatePropagation = function () {
+      event.isImmediatePropagationStopped = returnTrue;
+      event.stopPropagation();
+    };
+
+    event.isImmediatePropagationStopped = returnFalse;
+
+    // Handle mouse position
+    if (event.clientX != null) {
+      var doc = document.documentElement, body = document.body;
+
+      event.pageX = event.clientX +
+        (doc && doc.scrollLeft || body && body.scrollLeft || 0) -
+        (doc && doc.clientLeft || body && body.clientLeft || 0);
+      event.pageY = event.clientY +
+        (doc && doc.scrollTop || body && body.scrollTop || 0) -
+        (doc && doc.clientTop || body && body.clientTop || 0);
+    }
+
+    // Handle key presses
+    event.which = event.charCode || event.keyCode;
+
+    // Fix button for mouse clicks:
+    // 0 == left; 1 == middle; 2 == right
+    if (event.button != null) {
+      event.button = (event.button & 1 ? 0 :
+        (event.button & 4 ? 1 :
+          (event.button & 2 ? 2 : 0)));
+    }
+  }
+
+  // Returns fixed-up instance
+  return event;
+};
+
+/**
+ * Trigger an event for an element
+ * @param  {Element|Object} elem  Element to trigger an event on
+ * @param  {String} event Type of event to trigger
+ */
+_V_.trigger = function(elem, event) {
+  // Fetches element data and a reference to the parent (for bubbling).
+  var elemData = _V_.getData(elem);
+  var parent = elem.parentNode || elem.ownerDocument;
+      // type = event.type || event,
+      // handler;
+
+  // If an event name was passed as a string, creates an event out of it
+  if (typeof event === "string") {
+    event = { type:event, target:elem };
+  }
+  // Normalizes the event properties.
+  event = _V_.fixEvent(event);
+
+  // If the passed element has a dispatcher, executes the established handlers.
+  if (elemData.dispatcher) {
+    elemData.dispatcher.call(elem, event);
+  }
+
+  // Unless explicitly stopped, recursively calls this function to bubble the event up the DOM.
+  if (parent && !event.isPropagationStopped()) {
+    _V_.trigger(parent, event);
+
+  // If at the top of the DOM, triggers the default action unless disabled.
+  } else if (!parent && !event.isDefaultPrevented()) {
+    var targetData = _V_.getData(event.target);
+
+    // Checks if the target has a default action for this event.
+    if (event.target[event.type]) {
+      // Temporarily disables event dispatching on the target as we have already executed the handler.
+      targetData.disabled = true;
+      // Executes the default action.
+      if (typeof event.target[event.type] === 'function') {
+        event.target[event.type]();
+      }
+      // Re-enables event dispatching.
+      targetData.disabled = false;
+    }
+  }
+  /* Original version of js ninja events wasn't complete.
+   * We've since updated to the latest version, but keeping this around
+   * for now just in case.
+   */
+  // // Added in attion to book. Book code was broke.
+  // event = typeof event === "object" ?
+  //   event[_V_.expando] ?
+  //     event :
+  //     new _V_.Event(type, event) :
+  //   new _V_.Event(type);
+
+  // event.type = type;
+  // if (handler) {
+  //   handler.call(elem, event);
+  // }
+
+  // // Clean up the event in case it is being reused
+  // event.result = undefined;
+  // event.target = elem;
+};
+
+/**
+ * Trigger a listener only once for an event
+ * @param  {Element|Object}   elem Element or object to
+ * @param  {[type]}   type [description]
+ * @param  {Function} fn   [description]
+ * @return {[type]}
+ */
+_V_.one = function(elem, type, fn) {
+  _V_.on(elem, type, function(){
+    _V_.off(elem, type, arguments.callee)
+    fn.apply(this, arguments);
+  });
+}

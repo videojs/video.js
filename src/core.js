@@ -1,7 +1,9 @@
 // HTML5 Shiv. Must be in <head> to support older browsers.
 document.createElement("video");document.createElement("audio");
 
-var VideoJS = function(id, addOptions, ready){
+goog.provide('_V_');
+
+var _V_ = function(id, options, ready){
   var tag; // Element of ID
 
   // Allow for element or ID to be passed in
@@ -34,19 +36,20 @@ var VideoJS = function(id, addOptions, ready){
 
   // Element may have a player attr referring to an already created player instance.
   // If not, set up a new player and return the instance.
-  return tag.player || new _V_.Player(tag, addOptions, ready);
-},
+  return tag.player || new _V_.Player(tag, options, ready);
+};
 
 // Shortcut
-_V_ = VideoJS,
+VideoJS = _V_;
 
 // CDN Version. Used to target right flash swf.
 CDN_VERSION = "GENERATED_CDN_VSN";
 
-VideoJS.players = {};
-
-VideoJS.options = {
-
+/**
+ * Global Player instance options
+ * @type {Object}
+ */
+_V_.options = {
   // Default order of fallback technology
   techOrder: ["html5","flash"],
   // techOrder: ["flash","html5"],
@@ -62,53 +65,23 @@ VideoJS.options = {
   defaultVolume: 0.00, // The freakin seaguls are driving me crazy!
 
   // Included control sets
-  components: {
+  // TODO: just use uppercase Class name
+  children: {
+    "mediaLoader": {},
     "posterImage": {},
-    "textTrackDisplay": {},
+    // "textTrackDisplay": {},
     "loadingSpinner": {},
     "bigPlayButton": {},
     "controlBar": {}
   }
-
-  // components: [
-  //   "poster",
-  //   "loadingSpinner",
-  //   "bigPlayButton",
-  //   { name: "controlBar", options: {
-  //     components: [
-  //       "playToggle",
-  //       "fullscreenToggle",
-  //       "currentTimeDisplay",
-  //       "timeDivider",
-  //       "durationDisplay",
-  //       "remainingTimeDisplay",
-  //       { name: "progressControl", options: {
-  //         components: [
-  //           { name: "seekBar", options: {
-  //             components: [
-  //               "loadProgressBar",
-  //               "playProgressBar",
-  //               "seekHandle"
-  //             ]}
-  //           }
-  //         ]}
-  //       },
-  //       { name: "volumeControl", options: {
-  //         components: [
-  //           { name: "volumeBar", options: {
-  //             components: [
-  //               "volumeLevel",
-  //               "volumeHandle"
-  //             ]}
-  //           }
-  //         ]}
-  //       },
-  //       "muteToggle"
-  //     ]
-  //   }},
-  //   "subtitlesDisplay"/*, "replay"*/
-  // ]
 };
+
+/**
+ * Global player list
+ * @type {Object}
+ */
+_V_.players = {};
+
 
 // Set CDN Version of swf
 if (CDN_VERSION != "GENERATED_CDN_VSN") {

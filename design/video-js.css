@@ -92,7 +92,7 @@ Instead of editing this file, I recommend creating your own skin CSS file to be 
 so you can upgrade to newer versions easier. You can remove all these styles by removing the 'vjs-default-skin' class from the tag. */
 
 /* The default control bar. Created by bar.js */
-.vjs-default-skin .vjs-controls {
+.vjs-default-skin .vjs-control-bar {
   position: absolute;
   bottom: 0; /* Distance from the bottom of the box/video. Keep 0. Use height to add more bottom margin. */
   left: 0; right: 0; /* 100% width of div */
