@@ -41,7 +41,7 @@ test('should format the time', function(){
 });
 
 test('should uppercase a word', function(){
-  ok(_V_.uc('asdf') === "Asdf");
+  ok(_V_.capitalize('asdf') === "Asdf");
 });
 
 test('should trim a string', function(){

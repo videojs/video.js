@@ -1,5 +1,9 @@
 goog.provide('_V_.Html5');
 goog.provide('_V_.media.html5');
+goog.provide('_V_.Html5.Supports');
+goog.provide('_V_.Html5.Events');
+goog.provide('_V_.Html5.isSupported');
+goog.provide('_V_.Html5.canPlaySource');
 
 goog.require('_V_.MediaTechController');
 
@@ -62,7 +66,7 @@ _V_.Html5.prototype.createEl = function(){
   // Check if this browser supports moving the element into the box.
   // On the iPhone video will break if you move the element,
   // So we have to create a brand new element.
-  if (!el || _V_.media.html5.support.movingElementInDOM === false) {
+  if (!el || _V_.Html5.Supports.movingElementInDOM === false) {
 
     // If the original tag is still there, remove it.
     if (el) {
@@ -94,13 +98,13 @@ _V_.Html5.prototype.createEl = function(){
 // Make video events trigger player events
 // May seem verbose here, but makes other APIs possible.
 _V_.Html5.prototype.setupTriggers = function(){
-  for (var i = _V_.media.html5.events.length - 1; i >= 0; i--) {
-    _V_.on(this.el_, _V_.media.html5.events[i], _V_.bind(this.player, this.eventHandler));
+  for (var i = _V_.Html5.Events.length - 1; i >= 0; i--) {
+    _V_.on(this.el_, _V_.Html5.Events[i], _V_.bind(this.player, this.eventHandler));
   };
 };
 _V_.Html5.prototype.removeTriggers = function(){
-  for (var i = _V_.media.html5.events.length - 1; i >= 0; i--) {
-    _V_.off(this.el_, _V_.media.html5.events[i], _V_.bind(this.player, this.eventHandler));
+  for (var i = _V_.Html5.Events.length - 1; i >= 0; i--) {
+    _V_.off(this.el_, _V_.Html5.Events[i], _V_.bind(this.player, this.eventHandler));
   };
   // console.log("removeTriggers", _V_.getData(this.el_));
 };
@@ -201,11 +205,11 @@ _V_.Html5.prototype.defaultMuted = function(){ return this.el_.defaultMuted; };
 
 /* HTML5 Support Testing -------------------------------------------------------- */
 
-_V_.media.html5.isSupported = function(){
+_V_.Html5.isSupported = function(){
   return !!document.createElement("video").canPlayType;
 };
 
-_V_.media.html5.canPlaySource = function(srcObj){
+_V_.Html5.canPlaySource = function(srcObj){
   return !!document.createElement("video").canPlayType(srcObj.type);
   // TODO: Check Type
   // If no Type, check ext
@@ -213,20 +217,20 @@ _V_.media.html5.canPlaySource = function(srcObj){
 };
 
 // List of all HTML5 events (various uses).
-_V_.media.html5.events = "loadstart,suspend,abort,error,emptied,stalled,loadedmetadata,loadeddata,canplay,canplaythrough,playing,waiting,seeking,seeked,ended,durationchange,timeupdate,progress,play,pause,ratechange,volumechange".split(",");
+_V_.Html5.Events = "loadstart,suspend,abort,error,emptied,stalled,loadedmetadata,loadeddata,canplay,canplaythrough,playing,waiting,seeking,seeked,ended,durationchange,timeupdate,progress,play,pause,ratechange,volumechange".split(",");
 
 
 // HTML5 Device Fixes ---------------------------------------------------------- //
 
-_V_.media.html5.support = {
+_V_.Html5.Supports = {
 
   // Support for video element specific full screen. (webkitEnterFullScreen, not requestFullscreen which we use on the player div)
   // http://developer.apple.com/library/safari/#documentation/AudioVideo/Reference/HTMLVideoElementClassReference/HTMLVideoElement/HTMLVideoElement.html
   // Seems to be broken in Chromium/Chrome && Safari in Leopard
-  fullscreen: (_V_.TEST_VID.webkitEnterFullScreen) ? (!_V_.UA.match("Chrome") && !_V_.UA.match("Mac OS X 10.5") ? true : false) : false,
+  'fullscreen': (_V_.TEST_VID.webkitEnterFullScreen) ? (!_V_.UA.match("Chrome") && !_V_.UA.match("Mac OS X 10.5") ? true : false) : false,
 
   // In iOS, if you move a video element in the DOM, it breaks video playback.
-  movingElementInDOM: !_V_.IS_IOS
+  'movingElementInDOM': !_V_.IS_IOS
 
 };
 

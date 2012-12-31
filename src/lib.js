@@ -27,7 +27,7 @@ _V_.createEl = function(tagName, properties){
  * @param  {String} string String to be uppercased
  * @return {String}
  */
-_V_.uc = function(string){
+_V_.capitalize = function(string){
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
@@ -93,6 +93,31 @@ _V_.bind = function(context, fn, uid) {
 };
 
 /**
+ * FROM CLOSURE LIB
+ * Like bind(), except that a 'this object' is not required. Useful when the
+ * target function is already bound.
+ *
+ * Usage:
+ * var g = partial(f, arg1, arg2);
+ * g(arg3, arg4);
+ *
+ * @param {Function} fn A function to partially apply.
+ * @param {...*} var_args Additional arguments that are partially
+ *     applied to fn.
+ * @return {!Function} A partially-applied form of the function bind() was
+ *     invoked as a method of.
+ */
+_V_.partial = function(fn, var_args) {
+  var args = Array.prototype.slice.call(arguments, 1);
+  return function() {
+    // Prepend the bound arguments to the current arguments.
+    var newArgs = Array.prototype.slice.call(arguments);
+    newArgs.unshift.apply(newArgs, args);
+    return fn.apply(this, newArgs);
+  };
+};
+
+/**
  * Element Data Store. Allows for binding data to an element without putting it directly on the element.
  * Ex. Event listneres are stored here.
  * (also from jsninja.com, slightly modified and updated for closure compiler)
@@ -128,6 +153,16 @@ _V_.getData = function(el){
 };
 
 /**
+ * Returns the cache object where data for an element is stored
+ * @param  {Element} el Element to store data for.
+ * @return {Object}
+ */
+_V_.hasData = function(el){
+  var id = el[_V_.expando];
+  return !(!id || _V_.isEmpty(_V_.cache[id]));
+};
+
+/**
  * Delete data for the element from the cache and the guid attr from getElementById
  * @param  {Element} el Remove data for an element
  */
@@ -137,7 +172,9 @@ _V_.removeData = function(el){
   // Remove all stored data
   // Changed to = null
   // http://coding.smashingmagazine.com/2012/11/05/writing-fast-memory-efficient-javascript/
-  _V_.cache[id] = null;
+  // _V_.cache[id] = null;
+  delete _V_.cache[id];
+
   // Remove the expando property from the DOM node
   try {
     delete el[_V_.expando];

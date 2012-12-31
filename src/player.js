@@ -38,10 +38,10 @@ _V_.Player = function(tag, options, ready){
   this.on("error", this.onError);
 
   // Tracks defined in tracks.js
-  this.textTracks = [];
-  if (opts.tracks && opts.tracks.length > 0) {
-    this.addTextTracks(opts.tracks);
-  }
+  // this.textTracks = [];
+  // if (opts.tracks && opts.tracks.length > 0) {
+  //   this.addTextTracks(opts.tracks);
+  // }
 
   // Make player easily findable by ID
   _V_.players[this.id] = this;
@@ -57,13 +57,13 @@ _V_.Player.prototype.dispose = function(){
   if (this.el_ && this.el_.player) { this.el_.player = null; }
 
   // Ensure that tracking progress and time progress will stop and plater deleted
-  // this.stopTrackingProgress();
+  this.stopTrackingProgress();
   // this.stopTrackingCurrentTime();
 
   if (this.tech) { this.tech.dispose(); }
 
   // Component dispose
-  goog.base(this, 'dispose')
+  goog.base(this, 'dispose');
 };
 
 _V_.Player.prototype.getTagSettings = function(tag){
@@ -182,15 +182,15 @@ _V_.Player.prototype.loadTech = function(techName, source){
   var techReady = function(){
     this.player.triggerReady();
 
-    // // Manually track progress in cases where the browser/flash player doesn't report it.
-    // if (!this.support.progressEvent) {
-    //   this.player.manualProgressOn();
-    // }
+    // Manually track progress in cases where the browser/flash player doesn't report it.
+    if (!window['_V_'][techName]['Supports']['progressEvent']) {
+      this.player.manualProgressOn();
+    }
 
-    // // Manually track timeudpates in cases where the browser/flash player doesn't report it.
-    // if (!this.support.timeupdateEvent) {
-    //   this.player.manualTimeUpdatesOn();
-    // }
+    // Manually track timeudpates in cases where the browser/flash player doesn't report it.
+    if (!window['_V_'][techName]['Supports']['timeupdateEvent']) {
+      this.player.manualTimeUpdatesOn();
+    }
   }
 
   // Grab tech-specific options from player options and add source and parent element to use.
@@ -238,86 +238,89 @@ _V_.Player.prototype.loadTech = function(techName, source){
 ================================================================================ */
 // Manually trigger progress events based on changes to the buffered amount
 // Many flash players and older HTML5 browsers don't send progress or progress-like events
-// _V_.Player.prototype.manualProgressOn = function(){
-//   this.manualProgress = true;
+_V_.Player.prototype.manualProgressOn = function(){
+  this.manualProgress = true;
 
-//   // Trigger progress watching when a source begins loading
-//   this.trackProgress();
+  // Trigger progress watching when a source begins loading
+  this.trackProgress();
 
-//   // Watch for a native progress event call on the tech element
-//   // In HTML5, some older versions don't support the progress event
-//   // So we're assuming they don't, and turning off manual progress if they do.
-//   this.tech.on("progress", function(){
+  var techName = this.techName;
 
-//     // Remove this listener from the element
-//     this.off("progress", arguments.callee);
+  // Watch for a native progress event call on the tech element
+  // In HTML5, some older versions don't support the progress event
+  // So we're assuming they don't, and turning off manual progress if they do.
+  // As opposed to doing user agent detection
+  this.tech.one("progress", function(){
 
-//     // Update known progress support for this playback technology
-//     this.support.progressEvent = true;
+    // Update known progress support for this playback technology
+    window['_V_'][techName]['Supports']['progressEvent'] = true;
 
-//     // Turn off manual progress tracking
-//     this.player.manualProgressOff();
-//   });
-// };
+    // Turn off manual progress tracking
+    this.player.manualProgressOff();
+  });
+};
 
-// _V_.Player.prototype.manualProgressOff = function(){
-//   this.manualProgress = false;
-//   this.stopTrackingProgress();
-// };
+_V_.Player.prototype.manualProgressOff = function(){
+  this.manualProgress = false;
+  this.stopTrackingProgress();
+};
 
-// _V_.Player.prototype.trackProgress = function(){
-//   this.progressInterval = setInterval(_V_.bind(this, function(){
-//     // Don't trigger unless buffered amount is greater than last time
-//     // log(this.cache_.bufferEnd, this.buffered().end(0), this.duration())
-//     /* TODO: update for multiple buffered regions */
-//     if (this.cache_.bufferEnd < this.buffered().end(0)) {
-//       this.trigger("progress");
-//     } else if (this.bufferedPercent() == 1) {
-//       this.stopTrackingProgress();
-//       this.trigger("progress"); // Last update
-//     }
-//   }), 500);
-// };
-// _V_.Player.prototype.stopTrackingProgress = function(){ clearInterval(this.progressInterval); };
+_V_.Player.prototype.trackProgress = function(){
 
-// /* Time Tracking -------------------------------------------------------------- */
-// _V_.Player.prototype.manualTimeUpdatesOn = function(){
-//   this.manualTimeUpdates = true;
+  this.progressInterval = setInterval(_V_.bind(this, function(){
+    // Don't trigger unless buffered amount is greater than last time
+    // log(this.cache_.bufferEnd, this.buffered().end(0), this.duration())
+    /* TODO: update for multiple buffered regions */
+    if (this.cache_.bufferEnd < this.buffered().end(0)) {
+      this.trigger("progress");
+    } else if (this.bufferedPercent() == 1) {
+      this.stopTrackingProgress();
+      this.trigger("progress"); // Last update
+    }
+  }), 500);
+};
+_V_.Player.prototype.stopTrackingProgress = function(){ clearInterval(this.progressInterval); };
 
-//   this.on("play", this.trackCurrentTime);
-//   this.on("pause", this.stopTrackingCurrentTime);
-//   // timeupdate is also called by .currentTime whenever current time is set
+/* Time Tracking -------------------------------------------------------------- */
+_V_.Player.prototype.manualTimeUpdatesOn = function(){
+  this.manualTimeUpdates = true;
 
-//   // Watch for native timeupdate event
-//   this.tech.on("timeupdate", function(){
+  this.on("play", this.trackCurrentTime);
+  this.on("pause", this.stopTrackingCurrentTime);
+  // timeupdate is also called by .currentTime whenever current time is set
 
-//     // Remove this listener from the element
-//     this.off("timeupdate", arguments.callee);
+  var techName = this.techName;
 
-//     // Update known progress support for this playback technology
-//     this.support.timeupdateEvent = true;
+  // Watch for native timeupdate event
+  this.tech.on("timeupdate", function(){
 
-//     // Turn off manual progress tracking
-//     this.player.manualTimeUpdatesOff();
-//   });
-// };
+    // Remove this listener from the element
+    this.off("timeupdate", arguments.callee);
 
-// _V_.Player.prototype.manualTimeUpdatesOff = function(){
-//   this.manualTimeUpdates = false;
-//   this.stopTrackingCurrentTime();
-//   this.off("play", this.trackCurrentTime);
-//   this.off("pause", this.stopTrackingCurrentTime);
-// };
+    // Update known progress support for this playback technology
+    window['_V_'][techName]['Supports']['timeupdateEvent'] = true;
 
-// _V_.Player.prototype.trackCurrentTime = function(){
-//   if (this.currentTimeInterval) { this.stopTrackingCurrentTime(); }
-//   this.currentTimeInterval = setInterval(_V_.bind(this, function(){
-//     this.trigger("timeupdate");
-//   }), 250); // 42 = 24 fps // 250 is what Webkit uses // FF uses 15
-// };
+    // Turn off manual progress tracking
+    this.player.manualTimeUpdatesOff();
+  });
+};
 
-// // Turn off play progress tracking (when paused or dragging)
-// _V_.Player.prototype.stopTrackingCurrentTime = function(){ clearInterval(this.currentTimeInterval); };
+_V_.Player.prototype.manualTimeUpdatesOff = function(){
+  this.manualTimeUpdates = false;
+  this.stopTrackingCurrentTime();
+  this.off("play", this.trackCurrentTime);
+  this.off("pause", this.stopTrackingCurrentTime);
+};
+
+_V_.Player.prototype.trackCurrentTime = function(){
+  if (this.currentTimeInterval) { this.stopTrackingCurrentTime(); }
+  this.currentTimeInterval = setInterval(_V_.bind(this, function(){
+    this.trigger("timeupdate");
+  }), 250); // 42 = 24 fps // 250 is what Webkit uses // FF uses 15
+};
+
+// Turn off play progress tracking (when paused or dragging)
+_V_.Player.prototype.stopTrackingCurrentTime = function(){ clearInterval(this.currentTimeInterval); };
 
 // /* Player event handlers (how the player reacts to certain events)
 // ================================================================================ */
@@ -408,9 +411,10 @@ _V_.Player.prototype.techGet = function(method){
 
         // When a method isn't available on the object it throws a TypeError
         if (e.name == "TypeError") {
+          window['e'] = e
           _V_.log("Video.js: " + method + " unavailable on "+this.techName+" playback technology element.", e);
           this.tech.isReady_ = false;
-
+          throw e;
         } else {
           _V_.log(e);
         }
@@ -553,7 +557,7 @@ _V_.Player.prototype.requestFullScreen = function(){
 
     // Flash and other plugins get reloaded when you take their parent to fullscreen.
     // To fix that we'll remove the tech, and reload it after the resize has finished.
-    if (window['_V_'][this.techName].support.fullscreenResize === false && this.options.flash.iFrameMode != true) {
+    if (window['_V_'][this.techName]['Supports']['fullscreenResize'] === false && this.options.flash.iFrameMode != true) {
 
       this.pause();
       this.unloadTech();
@@ -591,7 +595,7 @@ _V_.Player.prototype.cancelFullScreen = function(){
 
    // Flash and other plugins get reloaded when you take their parent to fullscreen.
    // To fix that we'll remove the tech, and reload it after the resize has finished.
-   if (window['_V_']['media'][this.techName.toLowerCase()].support.fullscreenResize === false && this.options.flash.iFrameMode != true) {
+   if (window['_V_'][this.techName]['Supports']['fullscreenResize'] === false && this.options.flash.iFrameMode != true) {
 
      this.pause();
      this.unloadTech();
@@ -668,19 +672,19 @@ _V_.Player.prototype.selectSource = function(sources){
 
   // Loop through each playback technology in the options order
   for (var i=0,j=this.options.techOrder;i<j.length;i++) {
-    var techName = _V_.uc(j[i]),
+    var techName = _V_.capitalize(j[i]),
         tech = window['_V_'][techName];
 
-    var techInfo = window['_V_']['media'][j[i]];
+    var techInfo = window['_V_'][j[i]];
 
     // Check if the browser supports this technology
-    if (techInfo.isSupported()) {
+    if (tech.isSupported()) {
       // Loop through each source object
       for (var a=0,b=sources;a<b.length;a++) {
         var source = b[a];
 
         // Check if source can be played with this technology
-        if (techInfo.canPlaySource(source)) {
+        if (tech['canPlaySource'](source)) {
           return { source: source, tech: techName };
         }
       }
@@ -721,7 +725,7 @@ _V_.Player.prototype.src = function(source){
   // Case: Source object { src: "", type: "" ... }
   } else if (source instanceof Object) {
 
-    if (window['_V_']['media'][this.techName.toLowerCase()].canPlaySource(source)) {
+    if (window['_V_'][this.techName]['canPlaySource'](source)) {
       this.src(source.src);
     } else {
       // Send through tech loop to check for a compatible technology.
@@ -879,13 +883,13 @@ _V_.MediaLoader = function(player, options, ready){
   // load the first supported playback technology.
   if (!player.options.sources || player.options.sources.length == 0) {
     for (var i=0,j=player.options.techOrder; i<j.length; i++) {
-      var techName = _V_.uc(j[i]),
+      var techName = _V_.capitalize(j[i]),
           tech = window['_V_'][techName];
 
-      var techInfo = window['_V_']['media'][j[i]];
+      var techInfo = window['_V_'][j[i]];
 
       // Check if the browser supports this technology
-      if (tech && techInfo.isSupported()) {
+      if (tech && tech.isSupported()) {
         player.loadTech(techName);
         break;
       }

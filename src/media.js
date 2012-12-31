@@ -46,7 +46,11 @@ _V_.apiMethods = "play,pause,paused,currentTime,setCurrentTime,duration,buffered
 
 // Create placeholder methods for each that warn when a method isn't supported by the current playback technology
 for (var i = _V_.apiMethods.length - 1; i >= 0; i--) {
-  _V_.MediaTechController.prototype[_V_.apiMethods[i]] = function(){
-    throw new Error("The '"+_V_.apiMethods[i]+"' method is not available on the playback technology's API");
-  };
+  var methodName = _V_.apiMethods[i];
+
+  _V_.MediaTechController.prototype[_V_.apiMethods[i]] = (function(methodName){
+    return function(){
+      throw new Error("The '"+methodName+"' method is not available on the playback technology's API");
+    }
+  })(methodName);
 };

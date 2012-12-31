@@ -2,8 +2,9 @@
 document.createElement("video");document.createElement("audio");
 
 goog.provide('_V_');
+goog.provide('VideoJS');
 
-var _V_ = function(id, options, ready){
+var VideoJS = function(id, options, ready){
   var tag; // Element of ID
 
   // Allow for element or ID to be passed in
@@ -40,7 +41,7 @@ var _V_ = function(id, options, ready){
 };
 
 // Shortcut
-VideoJS = _V_;
+// VideoJS = _V_;
 
 // CDN Version. Used to target right flash swf.
 CDN_VERSION = "GENERATED_CDN_VSN";
@@ -69,7 +70,7 @@ _V_.options = {
   children: {
     "mediaLoader": {},
     "posterImage": {},
-    // "textTrackDisplay": {},
+    // // "textTrackDisplay": {},
     "loadingSpinner": {},
     "bigPlayButton": {},
     "controlBar": {}

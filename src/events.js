@@ -68,6 +68,9 @@ _V_.on = function(elem, type, fn){
  * @param  {Function} fn   Specific listener to remove. Don't incldue to remove listeners for an event type.
  */
 _V_.off = function(elem, type, fn) {
+  // Don't want to add a cache object through getData if not needed
+  if (!_V_.hasData(elem)) return;
+
   var data = _V_.getData(elem);
 
   // If no events exist, nothing to unbind
@@ -132,9 +135,13 @@ _V_.cleanUpEvents = function(elem, type) {
 
   // Remove the events object if there are no types left
   if (_V_.isEmpty(data.handlers)) {
-    data.handlers = null;
-    data.dispatcher = null;
-    data.disabled = null;
+    delete data.handlers;
+    delete data.dispatcher;
+    delete data.disabled;
+
+    // data.handlers = null;
+    // data.dispatcher = null;
+    // data.disabled = null;
   }
 
   // Finally remove the expando if there is no data left
@@ -235,7 +242,9 @@ _V_.fixEvent = function(event) {
  */
 _V_.trigger = function(elem, event) {
   // Fetches element data and a reference to the parent (for bubbling).
-  var elemData = _V_.getData(elem);
+  // Don't want to add a data object to cache for every parent,
+  // so checking hasData first.
+  var elemData = (_V_.hasData(elem)) ? _V_.getData(elem) : {};
   var parent = elem.parentNode || elem.ownerDocument;
       // type = event.type || event,
       // handler;

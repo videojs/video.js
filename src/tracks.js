@@ -16,7 +16,7 @@ _V_.Player.prototype.addTextTracks = function(trackObjects){
   for (;i<j;i++) {
     // HTML5 Spec says default to subtitles.
     // Uppercase (uc) first letter to match class names
-    Kind = _V_.uc(trackObjects[i].kind || "subtitles");
+    Kind = _V_.capitalize(trackObjects[i].kind || "subtitles");
 
     // Create correct texttrack class. CaptionsTrack, etc.
     track = new _V_[Kind + "Track"](this, trackObjects[i]);
@@ -592,7 +592,7 @@ _V_.TextTrackButton.prototype.createMenu = function(){
   // Add a title list item to the top
   menu.el.appendChild(_V_.createElement("li", {
     className: "vjs-menu-title",
-    innerHTML: _V_.uc(this.kind)
+    innerHTML: _V_.capitalize(this.kind)
   }));
 
   // Add an OFF menu item to turn all tracks off
@@ -721,7 +721,7 @@ _V_.ChaptersButton.prototype.createMenu = function(){
 
   menu.el.appendChild(_V_.createElement("li", {
     className: "vjs-menu-title",
-    innerHTML: _V_.uc(this.kind)
+    innerHTML: _V_.capitalize(this.kind)
   }));
 
   if (chaptersTrack) {

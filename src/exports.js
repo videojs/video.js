@@ -2,6 +2,8 @@ goog.require('_V_');
 goog.require('_V_.Component');
 goog.require('_V_.Player');
 
+goog.exportSymbol('VideoJS', VideoJS);
+
 goog.exportSymbol('_V_.Component', _V_.Component);
 goog.exportProperty(_V_.Component.prototype, "dispose", _V_.Component.prototype.dispose);
 goog.exportProperty(_V_.Component.prototype, "createEl", _V_.Component.prototype.createEl);
@@ -57,16 +59,21 @@ goog.exportSymbol('_V_.MenuItem', _V_.MenuItem);
 
 goog.exportSymbol('_V_.MediaTechController', _V_.MediaTechController);
 
-// Can't figure out why export symbol doesn't work with media controllers
 goog.exportSymbol('_V_.Html5', _V_.Html5);
-// goog.exportProperty(_V_, "Html5", _V_.Html5);
+goog.exportProperty(_V_.Html5, "Supports", _V_.Html5.Supports);
+goog.exportProperty(_V_.Html5, "Events", _V_.Html5.Events);
+goog.exportProperty(_V_.Html5, "isSupported", _V_.Html5.isSupported);
+goog.exportProperty(_V_.Html5, "canPlaySource", _V_.Html5.canPlaySource);
 
-// goog.exportProperty(_V_.Html5, "isSupported", _V_.Html5.isSupported);
-// goog.exportProperty(_V_.Html5, "canPlaySource", _V_.Html5.canPlaySource);
+// Export non-standard HTML5 video API methods.
+// Standard method names already protected by default externs.
+goog.exportProperty(_V_.Html5.prototype, "setCurrentTime", _V_.Html5.prototype.setCurrentTime);
+goog.exportProperty(_V_.Html5.prototype, "setVolume", _V_.Html5.prototype.setVolume);
+goog.exportProperty(_V_.Html5.prototype, "setMuted", _V_.Html5.prototype.setMuted);
+goog.exportProperty(_V_.Html5.prototype, "setPreload", _V_.Html5.prototype.setPreload);
+goog.exportProperty(_V_.Html5.prototype, "setAutoplay", _V_.Html5.prototype.setAutoplay);
+goog.exportProperty(_V_.Html5.prototype, "setLoop", _V_.Html5.prototype.setLoop);
 
-goog.exportSymbol('_V_.media', _V_.media);
-goog.exportSymbol('_V_.media.html5', _V_.media.html5);
-goog.exportProperty(_V_.media.html5, "isSupported", _V_.media.html5.isSupported);
-goog.exportProperty(_V_.media.html5, "canPlaySource", _V_.media.html5.canPlaySource);
-// goog.exportSymbol('_V_.media.html5.canPlaySource', _V_.media.html5.canPlaySource);
-// goog.exportSymbol('_V_.media.html5.isSupported', _V_.media.html5.isSupported);
+
+// Allow external components to use global cache
+goog.exportSymbol('_V_.cache', _V_.cache);

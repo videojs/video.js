@@ -38,9 +38,6 @@ _V_.Component = function(player, options, ready){
  * Dispose of the component and all child components.
  */
 _V_.Component.prototype.dispose = function(){
-  // Remove all event listeners.
-  this.off();
-
   // Dispose all children.
   if (this.children_) {
     for (var i = this.children_.length - 1; i >= 0; i--) {
@@ -48,16 +45,20 @@ _V_.Component.prototype.dispose = function(){
     };
   }
 
-  // Remove element from DOM
-  if (this.el_.parentNode) {
-    this.el_.parentNode.removeChild(this.el_);
-  }
-
   // Delete child references
   this.children_ = null;
   this.childIndex_ = null;
   this.childNameIndex_ = null;
 
+  // Remove all event listeners.
+  this.off();
+
+  // Remove element from DOM
+  if (this.el_.parentNode) {
+    this.el_.parentNode.removeChild(this.el_);
+  }
+
+  _V_.removeData(this.el_);
   this.el_ = null;
 };
 
@@ -188,7 +189,7 @@ _V_.Component.prototype.addChild = function(child, options){
     options = options || {};
 
     // Assume name of set is a lowercased name of the UI Class (PlayButton, etc.)
-    componentClass = options.componentClass || _V_.uc(componentName);
+    componentClass = options.componentClass || _V_.capitalize(componentName);
 
     // Set name through options
     options.name = componentName;
@@ -577,7 +578,7 @@ _V_.Component.prototype.dimension = function(widthOrHeight, num, skipListeners){
   // TODO: handle display:none and no dimension style using px
   } else {
 
-    return parseInt(this.el_['offset'+_V_.uc(widthOrHeight)], 10);
+    return parseInt(this.el_['offset'+_V_.capitalize(widthOrHeight)], 10);
 
     // ComputedStyle version.
     // Only difference is if the element is hidden it will return
