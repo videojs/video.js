@@ -1,47 +1,47 @@
-goog.provide('_V_.Control');
-goog.provide('_V_.ControlBar');
-goog.provide('_V_.Button');
-goog.provide('_V_.PlayButton');
-goog.provide('_V_.PauseButton');
-goog.provide('_V_.PlayToggle');
-goog.provide('_V_.FullscreenToggle');
-goog.provide('_V_.BigPlayButton');
-goog.provide('_V_.LoadingSpinner');
-goog.provide('_V_.CurrentTimeDisplay');
-goog.provide('_V_.DurationDisplay');
-goog.provide('_V_.TimeDivider');
-goog.provide('_V_.RemainingTimeDisplay');
-goog.provide('_V_.Slider');
-goog.provide('_V_.ProgressControl');
-goog.provide('_V_.SeekBar');
-goog.provide('_V_.LoadProgressBar');
-goog.provide('_V_.PlayProgressBar');
-goog.provide('_V_.SeekHandle');
-goog.provide('_V_.VolumeControl');
-goog.provide('_V_.VolumeBar');
-goog.provide('_V_.VolumeLevel');
-goog.provide('_V_.VolumeHandle');
-goog.provide('_V_.MuteToggle');
-goog.provide('_V_.PosterImage');
-goog.provide('_V_.Menu');
-goog.provide('_V_.MenuItem');
+goog.provide('vjs.Control');
+goog.provide('vjs.ControlBar');
+goog.provide('vjs.Button');
+goog.provide('vjs.PlayButton');
+goog.provide('vjs.PauseButton');
+goog.provide('vjs.PlayToggle');
+goog.provide('vjs.FullscreenToggle');
+goog.provide('vjs.BigPlayButton');
+goog.provide('vjs.LoadingSpinner');
+goog.provide('vjs.CurrentTimeDisplay');
+goog.provide('vjs.DurationDisplay');
+goog.provide('vjs.TimeDivider');
+goog.provide('vjs.RemainingTimeDisplay');
+goog.provide('vjs.Slider');
+goog.provide('vjs.ProgressControl');
+goog.provide('vjs.SeekBar');
+goog.provide('vjs.LoadProgressBar');
+goog.provide('vjs.PlayProgressBar');
+goog.provide('vjs.SeekHandle');
+goog.provide('vjs.VolumeControl');
+goog.provide('vjs.VolumeBar');
+goog.provide('vjs.VolumeLevel');
+goog.provide('vjs.VolumeHandle');
+goog.provide('vjs.MuteToggle');
+goog.provide('vjs.PosterImage');
+goog.provide('vjs.Menu');
+goog.provide('vjs.MenuItem');
 
-goog.require('_V_.Component');
+goog.require('vjs.Component');
 
 /* Control - Base class for all control elements
 ================================================================================ */
 /**
  * Base class for all control elements
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.Control = function(player, options){
+vjs.Control = function(player, options){
   goog.base(this, player, options);
 };
-goog.inherits(_V_.Control, _V_.Component);
+goog.inherits(vjs.Control, vjs.Component);
 
-_V_.Control.prototype.buildCSSClass = function(){
+vjs.Control.prototype.buildCSSClass = function(){
   return "vjs-control " + goog.base(this, 'buildCSSClass');
 };
 
@@ -49,22 +49,22 @@ _V_.Control.prototype.buildCSSClass = function(){
 ================================================================================ */
 /**
  * Container of main controls
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.ControlBar = function(player, options){
+vjs.ControlBar = function(player, options){
   goog.base(this, player, options);
 
-  player.one("play", _V_.bind(this, function(){
+  player.one("play", vjs.bind(this, function(){
     this.fadeIn();
-    this.player.on("mouseover", _V_.bind(this, this.fadeIn));
-    this.player.on("mouseout", _V_.bind(this, this.fadeOut));
+    this.player.on("mouseover", vjs.bind(this, this.fadeIn));
+    this.player.on("mouseout", vjs.bind(this, this.fadeOut));
   }));
 };
-goog.inherits(_V_.ControlBar, _V_.Component);
+goog.inherits(vjs.ControlBar, vjs.Component);
 
-_V_.ControlBar.prototype.options = {
+vjs.ControlBar.prototype.options = {
   loadEvent: "play",
   children: {
     "playToggle": {},
@@ -79,23 +79,23 @@ _V_.ControlBar.prototype.options = {
   }
 };
 
-_V_.ControlBar.prototype.createEl = function(){
-  return _V_.createEl("div", {
+vjs.ControlBar.prototype.createEl = function(){
+  return vjs.createEl("div", {
     className: "vjs-control-bar"
   });
 };
 
-_V_.ControlBar.prototype.fadeIn = function(){
+vjs.ControlBar.prototype.fadeIn = function(){
   goog.base(this, 'fadeIn');
   this.player.trigger("controlsvisible");
 };
 
-_V_.ControlBar.prototype.fadeOut = function(){
+vjs.ControlBar.prototype.fadeOut = function(){
   goog.base(this, 'fadeOut');
   this.player.trigger("controlshidden");
 };
 
-_V_.ControlBar.prototype.lockShowing = function(){
+vjs.ControlBar.prototype.lockShowing = function(){
   this.el_.style.opacity = "1";
 };
 
@@ -103,22 +103,22 @@ _V_.ControlBar.prototype.lockShowing = function(){
 ================================================================================ */
 /**
  * Base class for all buttons
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.Button = function(player, options){
+vjs.Button = function(player, options){
   goog.base(this, player, options);
 
   this.on("click", this.onClick);
   this.on("focus", this.onFocus);
   this.on("blur", this.onBlur);
 };
-goog.inherits(_V_.Button, _V_.Control);
+goog.inherits(vjs.Button, vjs.Control);
 
-_V_.Button.prototype.createEl = function(type, attrs){
+vjs.Button.prototype.createEl = function(type, attrs){
   // Add standard Aria and Tabindex info
-  attrs = _V_.merge({
+  attrs = vjs.merge({
     className: this.buildCSSClass(),
     innerHTML: '<div><span class="vjs-control-text">' + (this.buttonText || "Need Text") + '</span></div>',
     role: "button",
@@ -129,15 +129,15 @@ _V_.Button.prototype.createEl = function(type, attrs){
 };
 
   // Click - Override with specific functionality for button
-_V_.Button.prototype.onClick = function(){};
+vjs.Button.prototype.onClick = function(){};
 
   // Focus - Add keyboard functionality to element
-_V_.Button.prototype.onFocus = function(){
-  _V_.on(document, "keyup", _V_.bind(this, this.onKeyPress));
+vjs.Button.prototype.onFocus = function(){
+  vjs.on(document, "keyup", vjs.bind(this, this.onKeyPress));
 };
 
   // KeyPress (document level) - Trigger click when keys are pressed
-_V_.Button.prototype.onKeyPress = function(event){
+vjs.Button.prototype.onKeyPress = function(event){
   // Check for space bar (32) or enter (13) keys
   if (event.which == 32 || event.which == 13) {
     event.preventDefault();
@@ -146,30 +146,30 @@ _V_.Button.prototype.onKeyPress = function(event){
 };
 
   // Blur - Remove keyboard triggers
-_V_.Button.prototype.onBlur = function(){
-  _V_.off(document, "keyup", _V_.bind(this, this.onKeyPress));
+vjs.Button.prototype.onBlur = function(){
+  vjs.off(document, "keyup", vjs.bind(this, this.onKeyPress));
 }
 
 /* Play Button
 ================================================================================ */
 /**
  * Basic play button
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.PlayButton = function(player, options){
+vjs.PlayButton = function(player, options){
   goog.base(this, player, options);
 };
-goog.inherits(_V_.PlayButton, _V_.Button);
+goog.inherits(vjs.PlayButton, vjs.Button);
 
-_V_.PlayButton.prototype.buttonText = "Play";
+vjs.PlayButton.prototype.buttonText = "Play";
 
-_V_.PlayButton.prototype.buildCSSClass = function(){
+vjs.PlayButton.prototype.buildCSSClass = function(){
   return "vjs-play-button " + goog.base(this, 'buildCSSClass');
 };
 
-_V_.PlayButton.prototype.onClick = function(){
+vjs.PlayButton.prototype.onClick = function(){
   this.player.play();
 }
 
@@ -177,22 +177,22 @@ _V_.PlayButton.prototype.onClick = function(){
 ================================================================================ */
 /**
  * Basic pause button
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.PauseButton = function(player, options){
+vjs.PauseButton = function(player, options){
   goog.base(this, player, options);
 };
-goog.inherits(_V_.PauseButton, _V_.Button);
+goog.inherits(vjs.PauseButton, vjs.Button);
 
-_V_.PauseButton.prototype.buttonText = "Play";
+vjs.PauseButton.prototype.buttonText = "Play";
 
-_V_.PauseButton.prototype.buildCSSClass = function(){
+vjs.PauseButton.prototype.buildCSSClass = function(){
   return "vjs-pause-button " + goog.base(this, 'buildCSSClass');
 };
 
-_V_.PauseButton.prototype.onClick = function(){
+vjs.PauseButton.prototype.onClick = function(){
   this.player.pause();
 };
 
@@ -200,26 +200,26 @@ _V_.PauseButton.prototype.onClick = function(){
 ================================================================================ */
 /**
  * Button to toggle between play and pause
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.PlayToggle = function(player, options){
+vjs.PlayToggle = function(player, options){
   goog.base(this, player, options);
 
-  player.on("play", _V_.bind(this, this.onPlay));
-  player.on("pause", _V_.bind(this, this.onPause));
+  player.on("play", vjs.bind(this, this.onPlay));
+  player.on("pause", vjs.bind(this, this.onPause));
 };
-goog.inherits(_V_.PlayToggle, _V_.Button);
+goog.inherits(vjs.PlayToggle, vjs.Button);
 
-_V_.PlayToggle.prototype.buttonText = "Play";
+vjs.PlayToggle.prototype.buttonText = "Play";
 
-_V_.PlayToggle.prototype.buildCSSClass = function(){
+vjs.PlayToggle.prototype.buildCSSClass = function(){
   return "vjs-play-control " + goog.base(this, 'buildCSSClass');
 };
 
   // OnClick - Toggle between play and pause
-_V_.PlayToggle.prototype.onClick = function(){
+vjs.PlayToggle.prototype.onClick = function(){
   if (this.player.paused()) {
     this.player.play();
   } else {
@@ -228,15 +228,15 @@ _V_.PlayToggle.prototype.onClick = function(){
 };
 
   // OnPlay - Add the vjs-playing class to the element so it can change appearance
-_V_.PlayToggle.prototype.onPlay = function(){
-  _V_.removeClass(this.el_, "vjs-paused");
-  _V_.addClass(this.el_, "vjs-playing");
+vjs.PlayToggle.prototype.onPlay = function(){
+  vjs.removeClass(this.el_, "vjs-paused");
+  vjs.addClass(this.el_, "vjs-playing");
 };
 
   // OnPause - Add the vjs-paused class to the element so it can change appearance
-_V_.PlayToggle.prototype.onPause = function(){
-  _V_.removeClass(this.el_, "vjs-playing");
-  _V_.addClass(this.el_, "vjs-paused");
+vjs.PlayToggle.prototype.onPause = function(){
+  vjs.removeClass(this.el_, "vjs-playing");
+  vjs.addClass(this.el_, "vjs-paused");
 }
 
 
@@ -244,22 +244,22 @@ _V_.PlayToggle.prototype.onPause = function(){
 ================================================================================ */
 /**
  * Toggle fullscreen video
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.FullscreenToggle = function(player, options){
+vjs.FullscreenToggle = function(player, options){
   goog.base(this, player, options);
 };
-goog.inherits(_V_.FullscreenToggle, _V_.Button);
+goog.inherits(vjs.FullscreenToggle, vjs.Button);
 
-_V_.FullscreenToggle.prototype.buttonText = "Fullscreen";
+vjs.FullscreenToggle.prototype.buttonText = "Fullscreen";
 
-_V_.FullscreenToggle.prototype.buildCSSClass = function(){
+vjs.FullscreenToggle.prototype.buildCSSClass = function(){
   return "vjs-fullscreen-control " + goog.base(this, 'buildCSSClass');
 };
 
-_V_.FullscreenToggle.prototype.onClick = function(){
+vjs.FullscreenToggle.prototype.onClick = function(){
   if (!this.player.isFullScreen) {
     this.player.requestFullScreen();
   } else {
@@ -272,26 +272,26 @@ _V_.FullscreenToggle.prototype.onClick = function(){
 ================================================================================ */
 /**
  * Initial play button. Shows before the video has played.
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.BigPlayButton = function(player, options){
+vjs.BigPlayButton = function(player, options){
   goog.base(this, player, options);
 
-  player.on("play", _V_.bind(this, this.hide));
-  player.on("ended", _V_.bind(this, this.show));
+  player.on("play", vjs.bind(this, this.hide));
+  player.on("ended", vjs.bind(this, this.show));
 };
-goog.inherits(_V_.BigPlayButton, _V_.Button);
+goog.inherits(vjs.BigPlayButton, vjs.Button);
 
-_V_.BigPlayButton.prototype.createEl = function(){
+vjs.BigPlayButton.prototype.createEl = function(){
   return goog.base(this, 'createEl', "div", {
     className: "vjs-big-play-button",
     innerHTML: "<span></span>"
   });
 };
 
-_V_.BigPlayButton.prototype.onClick = function(){
+vjs.BigPlayButton.prototype.onClick = function(){
   // Go back to the beginning if big play button is showing at the end.
   // Have to check for current time otherwise it might throw a 'not ready' error.
   if(this.player.currentTime()) {
@@ -304,36 +304,36 @@ _V_.BigPlayButton.prototype.onClick = function(){
 ================================================================================ */
 /**
  * Loading spinner for waiting events
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.LoadingSpinner = function(player, options){
+vjs.LoadingSpinner = function(player, options){
   goog.base(this, player, options);
 
-  player.on("canplay", _V_.bind(this, this.hide));
-  player.on("canplaythrough", _V_.bind(this, this.hide));
-  player.on("playing", _V_.bind(this, this.hide));
-  player.on("seeked", _V_.bind(this, this.hide));
+  player.on("canplay", vjs.bind(this, this.hide));
+  player.on("canplaythrough", vjs.bind(this, this.hide));
+  player.on("playing", vjs.bind(this, this.hide));
+  player.on("seeked", vjs.bind(this, this.hide));
 
-  player.on("seeking", _V_.bind(this, this.show));
+  player.on("seeking", vjs.bind(this, this.show));
 
   // in some browsers seeking does not trigger the 'playing' event,
   // so we also need to trap 'seeked' if we are going to set a
   // 'seeking' event
-  player.on("seeked", _V_.bind(this, this.hide));
+  player.on("seeked", vjs.bind(this, this.hide));
 
-  player.on("error", _V_.bind(this, this.show));
+  player.on("error", vjs.bind(this, this.show));
 
   // Not showing spinner on stalled any more. Browsers may stall and then not trigger any events that would remove the spinner.
   // Checked in Chrome 16 and Safari 5.1.2. http://help.videojs.com/discussions/problems/883-why-is-the-download-progress-showing
-  // player.on("stalled", _V_.bind(this, this.show));
+  // player.on("stalled", vjs.bind(this, this.show));
 
-  player.on("waiting", _V_.bind(this, this.show));
+  player.on("waiting", vjs.bind(this, this.show));
 };
-goog.inherits(_V_.LoadingSpinner, _V_.Component);
+goog.inherits(vjs.LoadingSpinner, vjs.Component);
 
-_V_.LoadingSpinner.prototype.createEl = function(){
+vjs.LoadingSpinner.prototype.createEl = function(){
   var classNameSpinner, innerHtmlSpinner;
 
   if ( typeof this.player.getEl().style.WebkitBorderRadius == "string"
@@ -359,80 +359,80 @@ _V_.LoadingSpinner.prototype.createEl = function(){
 
 /**
  * Displays the current time
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.CurrentTimeDisplay = function(player, options){
+vjs.CurrentTimeDisplay = function(player, options){
   goog.base(this, player, options);
 
-  player.on("timeupdate", _V_.bind(this, this.updateContent));
+  player.on("timeupdate", vjs.bind(this, this.updateContent));
 };
-goog.inherits(_V_.CurrentTimeDisplay, _V_.Component);
+goog.inherits(vjs.CurrentTimeDisplay, vjs.Component);
 
-_V_.CurrentTimeDisplay.prototype.createEl = function(){
+vjs.CurrentTimeDisplay.prototype.createEl = function(){
   var el = goog.base(this, 'createEl', "div", {
     className: "vjs-current-time vjs-time-controls vjs-control"
   });
 
-  this.content = _V_.createEl("div", {
+  this.content = vjs.createEl("div", {
     className: "vjs-current-time-display",
     innerHTML: '0:00'
   });
 
-  el.appendChild(_V_.createEl("div").appendChild(this.content));
+  el.appendChild(vjs.createEl("div").appendChild(this.content));
   return el;
 };
 
-_V_.CurrentTimeDisplay.prototype.updateContent = function(){
+vjs.CurrentTimeDisplay.prototype.updateContent = function(){
   // Allows for smooth scrubbing, when player can't keep up.
   var time = (this.player.scrubbing) ? this.player.getCache().currentTime : this.player.currentTime();
-  this.content.innerHTML = _V_.formatTime(time, this.player.duration());
+  this.content.innerHTML = vjs.formatTime(time, this.player.duration());
 };
 
 /**
  * Displays the duration
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.DurationDisplay = function(player, options){
+vjs.DurationDisplay = function(player, options){
   goog.base(this, player, options);
 
-  player.on("timeupdate", _V_.bind(this, this.updateContent));
+  player.on("timeupdate", vjs.bind(this, this.updateContent));
 };
-goog.inherits(_V_.DurationDisplay, _V_.Component);
+goog.inherits(vjs.DurationDisplay, vjs.Component);
 
-_V_.DurationDisplay.prototype.createEl = function(){
+vjs.DurationDisplay.prototype.createEl = function(){
   var el = goog.base(this, 'createEl', "div", {
     className: "vjs-duration vjs-time-controls vjs-control"
   });
 
-  this.content = _V_.createEl("div", {
+  this.content = vjs.createEl("div", {
     className: "vjs-duration-display",
     innerHTML: '0:00'
   });
 
-  el.appendChild(_V_.createEl("div").appendChild(this.content));
+  el.appendChild(vjs.createEl("div").appendChild(this.content));
   return el;
 };
 
-_V_.DurationDisplay.prototype.updateContent = function(){
-  if (this.player.duration()) { this.content.innerHTML = _V_.formatTime(this.player.duration()); }
+vjs.DurationDisplay.prototype.updateContent = function(){
+  if (this.player.duration()) { this.content.innerHTML = vjs.formatTime(this.player.duration()); }
 };
 
 /**
  * Time Separator (Not used in main skin, but still available, and could be used as a 'spare element')
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.TimeDivider = function(player, options){
+vjs.TimeDivider = function(player, options){
   goog.base(this, player, options);
 };
-goog.inherits(_V_.TimeDivider, _V_.Component);
+goog.inherits(vjs.TimeDivider, vjs.Component);
 
-_V_.TimeDivider.prototype.createEl = function(){
+vjs.TimeDivider.prototype.createEl = function(){
   return goog.base(this, 'createEl', "div", {
     className: "vjs-time-divider",
     innerHTML: '<div><span>/</span></div>'
@@ -441,49 +441,49 @@ _V_.TimeDivider.prototype.createEl = function(){
 
 /**
  * Displays the time left in the video
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.RemainingTimeDisplay = function(player, options){
+vjs.RemainingTimeDisplay = function(player, options){
   goog.base(this, player, options);
 
-  player.on("timeupdate", _V_.bind(this, this.updateContent));
+  player.on("timeupdate", vjs.bind(this, this.updateContent));
 };
-goog.inherits(_V_.RemainingTimeDisplay, _V_.Component);
+goog.inherits(vjs.RemainingTimeDisplay, vjs.Component);
 
 
-_V_.RemainingTimeDisplay.prototype.createEl = function(){
+vjs.RemainingTimeDisplay.prototype.createEl = function(){
   var el = goog.base(this, 'createEl', "div", {
     className: "vjs-remaining-time vjs-time-controls vjs-control"
   });
 
-  this.content = _V_.createEl("div", {
+  this.content = vjs.createEl("div", {
     className: "vjs-remaining-time-display",
     innerHTML: '-0:00'
   });
 
-  el.appendChild(_V_.createEl("div").appendChild(this.content));
+  el.appendChild(vjs.createEl("div").appendChild(this.content));
   return el;
 };
 
-_V_.RemainingTimeDisplay.prototype.updateContent = function(){
-  if (this.player.duration()) { this.content.innerHTML = "-"+_V_.formatTime(this.player.remainingTime()); }
+vjs.RemainingTimeDisplay.prototype.updateContent = function(){
+  if (this.player.duration()) { this.content.innerHTML = "-"+vjs.formatTime(this.player.remainingTime()); }
 
   // Allows for smooth scrubbing, when player can't keep up.
   // var time = (this.player.scrubbing) ? this.player.getCache().currentTime : this.player.currentTime();
-  // this.content.innerHTML = _V_.formatTime(time, this.player.duration());
+  // this.content.innerHTML = vjs.formatTime(time, this.player.duration());
 };
 
 /* Slider
 ================================================================================ */
 /**
  * Parent for seek bar and volume slider
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.Slider = function(player, options){
+vjs.Slider = function(player, options){
     goog.base(this, player, options);
 
     // Set property names to bar and handle to match with the child Slider class is looking for
@@ -492,23 +492,23 @@ _V_.Slider = function(player, options){
 
     // console.log('asdf', this.bar, this.childNameIndex_, this.options)
 
-    player.on(this.playerEvent, _V_.bind(this, this.update));
+    player.on(this.playerEvent, vjs.bind(this, this.update));
 
     this.on("mousedown", this.onMouseDown);
     this.on("focus", this.onFocus);
     this.on("blur", this.onBlur);
 
-    this.player.on("controlsvisible", _V_.bind(this, this.update));
+    this.player.on("controlsvisible", vjs.bind(this, this.update));
 
     // This is actually to fix the volume handle position. http://twitter.com/#!/gerritvanaaken/status/159046254519787520
-    // this.player.one("timeupdate", _V_.bind(this, this.update));
+    // this.player.one("timeupdate", vjs.bind(this, this.update));
 
-    player.ready(_V_.bind(this, this.update));
+    player.ready(vjs.bind(this, this.update));
 };
-goog.inherits(_V_.Slider, _V_.Component);
+goog.inherits(vjs.Slider, vjs.Component);
 
-_V_.Slider.prototype.createEl = function(type, attrs) {
-  attrs = _V_.merge({
+vjs.Slider.prototype.createEl = function(type, attrs) {
+  attrs = vjs.merge({
     role: "slider",
     "aria-valuenow": 0,
     "aria-valuemin": 0,
@@ -519,25 +519,25 @@ _V_.Slider.prototype.createEl = function(type, attrs) {
   return goog.base(this, 'createEl', type, attrs);
 };
 
-_V_.Slider.prototype.onMouseDown = function(event){
+vjs.Slider.prototype.onMouseDown = function(event){
   event.preventDefault();
-  _V_.blockTextSelection();
+  vjs.blockTextSelection();
 
-  _V_.on(document, "mousemove", _V_.bind(this, this.onMouseMove));
-  _V_.on(document, "mouseup", _V_.bind(this, this.onMouseUp));
+  vjs.on(document, "mousemove", vjs.bind(this, this.onMouseMove));
+  vjs.on(document, "mouseup", vjs.bind(this, this.onMouseUp));
 
   this.onMouseMove(event);
 };
 
-_V_.Slider.prototype.onMouseUp = function(event) {
-  _V_.unblockTextSelection();
-  _V_.off(document, "mousemove", this.onMouseMove, false);
-  _V_.off(document, "mouseup", this.onMouseUp, false);
+vjs.Slider.prototype.onMouseUp = function(event) {
+  vjs.unblockTextSelection();
+  vjs.off(document, "mousemove", this.onMouseMove, false);
+  vjs.off(document, "mouseup", this.onMouseUp, false);
 
   this.update();
 };
 
-_V_.Slider.prototype.update = function(){
+vjs.Slider.prototype.update = function(){
   // If scrubbing, we could use a cached value to make the handle keep up with the user's mouse.
   // On HTML5 browsers scrubbing is really smooth, but some flash players are slow, so we might want to utilize this later.
   // var progress =  (this.player.scrubbing) ? this.player.getCache().currentTime / this.player.duration() : this.player.currentTime() / this.player.duration();
@@ -576,16 +576,16 @@ _V_.Slider.prototype.update = function(){
         barProgress = adjustedProgress + (handlePercent / 2);
 
     // Move the handle from the left based on the adjected progress
-    handle.getEl().style.left = _V_.round(adjustedProgress * 100, 2) + "%";
+    handle.getEl().style.left = vjs.round(adjustedProgress * 100, 2) + "%";
   }
 
   // Set the new bar width
-  bar.getEl().style.width = _V_.round(barProgress * 100, 2) + "%";
+  bar.getEl().style.width = vjs.round(barProgress * 100, 2) + "%";
 };
 
-_V_.Slider.prototype.calculateDistance = function(event){
+vjs.Slider.prototype.calculateDistance = function(event){
   var box = this.el_,
-      boxX = _V_.findPosX(box),
+      boxX = vjs.findPosX(box),
       boxW = box.offsetWidth,
       handle = this.handle;
 
@@ -601,11 +601,11 @@ _V_.Slider.prototype.calculateDistance = function(event){
   return Math.max(0, Math.min(1, (event.pageX - boxX) / boxW));
 };
 
-_V_.Slider.prototype.onFocus = function(event){
-  _V_.on(document, "keyup", _V_.bind(this, this.onKeyPress));
+vjs.Slider.prototype.onFocus = function(event){
+  vjs.on(document, "keyup", vjs.bind(this, this.onKeyPress));
 };
 
-_V_.Slider.prototype.onKeyPress = function(event){
+vjs.Slider.prototype.onKeyPress = function(event){
   if (event.which == 37) { // Left Arrow
     event.preventDefault();
     this.stepBack();
@@ -615,8 +615,8 @@ _V_.Slider.prototype.onKeyPress = function(event){
   }
 };
 
-_V_.Slider.prototype.onBlur = function(event){
-  _V_.off(document, "keyup", _V_.bind(this, this.onKeyPress));
+vjs.Slider.prototype.onBlur = function(event){
+  vjs.off(document, "keyup", vjs.bind(this, this.onKeyPress));
 };
 
 
@@ -625,22 +625,22 @@ _V_.Slider.prototype.onBlur = function(event){
 
 /**
  * Seek, Load Progress, and Play Progress
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.ProgressControl = function(player, options){
+vjs.ProgressControl = function(player, options){
   goog.base(this, player, options);
 };
-goog.inherits(_V_.ProgressControl, _V_.Component);
+goog.inherits(vjs.ProgressControl, vjs.Component);
 
-_V_.ProgressControl.prototype.options = {
+vjs.ProgressControl.prototype.options = {
   children: {
     "seekBar": {}
   }
 };
 
-_V_.ProgressControl.prototype.createEl = function(){
+vjs.ProgressControl.prototype.createEl = function(){
   return goog.base(this, 'createEl', "div", {
     className: "vjs-progress-control vjs-control"
   });
@@ -648,16 +648,16 @@ _V_.ProgressControl.prototype.createEl = function(){
 
 /**
  * Seek Bar and holder for the progress bars
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.SeekBar = function(player, options){
+vjs.SeekBar = function(player, options){
   goog.base(this, player, options);
 };
-goog.inherits(_V_.SeekBar, _V_.Slider);
+goog.inherits(vjs.SeekBar, vjs.Slider);
 
-_V_.SeekBar.prototype.options = {
+vjs.SeekBar.prototype.options = {
   children: {
     "loadProgressBar": {},
     "playProgressBar": {},
@@ -667,19 +667,19 @@ _V_.SeekBar.prototype.options = {
   "handleName": "seekHandle"
 };
 
-_V_.SeekBar.prototype.playerEvent = "timeupdate";
+vjs.SeekBar.prototype.playerEvent = "timeupdate";
 
-_V_.SeekBar.prototype.createEl = function(){
+vjs.SeekBar.prototype.createEl = function(){
   return goog.base(this, 'createEl', "div", {
     className: "vjs-progress-holder"
   });
 };
 
-_V_.SeekBar.prototype.getPercent = function(){
+vjs.SeekBar.prototype.getPercent = function(){
   return this.player.currentTime() / this.player.duration();
 };
 
-_V_.SeekBar.prototype.onMouseDown = function(event){
+vjs.SeekBar.prototype.onMouseDown = function(event){
   goog.base(this, 'onMouseDown', event);
 
   this.player.scrubbing = true;
@@ -688,7 +688,7 @@ _V_.SeekBar.prototype.onMouseDown = function(event){
   this.player.pause();
 };
 
-_V_.SeekBar.prototype.onMouseMove = function(event){
+vjs.SeekBar.prototype.onMouseMove = function(event){
   var newTime = this.calculateDistance(event) * this.player.duration();
 
   // Don't let video end while scrubbing.
@@ -698,7 +698,7 @@ _V_.SeekBar.prototype.onMouseMove = function(event){
   this.player.currentTime(newTime);
 };
 
-_V_.SeekBar.prototype.onMouseUp = function(event){
+vjs.SeekBar.prototype.onMouseUp = function(event){
   goog.base(this, 'onMouseUp', event);
 
   this.player.scrubbing = false;
@@ -707,51 +707,51 @@ _V_.SeekBar.prototype.onMouseUp = function(event){
   }
 };
 
-_V_.SeekBar.prototype.stepForward = function(){
+vjs.SeekBar.prototype.stepForward = function(){
   this.player.currentTime(this.player.currentTime() + 1);
 };
 
-_V_.SeekBar.prototype.stepBack = function(){
+vjs.SeekBar.prototype.stepBack = function(){
   this.player.currentTime(this.player.currentTime() - 1);
 };
 
 
 /**
  * Shows load progres
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.LoadProgressBar = function(player, options){
+vjs.LoadProgressBar = function(player, options){
   goog.base(this, player, options);
-  player.on("progress", _V_.bind(this, this.update));
+  player.on("progress", vjs.bind(this, this.update));
 };
-goog.inherits(_V_.LoadProgressBar, _V_.Component);
+goog.inherits(vjs.LoadProgressBar, vjs.Component);
 
-_V_.LoadProgressBar.prototype.createEl = function(){
+vjs.LoadProgressBar.prototype.createEl = function(){
   return goog.base(this, 'createEl', "div", {
     className: "vjs-load-progress",
     innerHTML: '<span class="vjs-control-text">Loaded: 0%</span>'
   });
 };
 
-_V_.LoadProgressBar.prototype.update = function(){
-  if (this.el_.style) { this.el_.style.width = _V_.round(this.player.bufferedPercent() * 100, 2) + "%"; }
+vjs.LoadProgressBar.prototype.update = function(){
+  if (this.el_.style) { this.el_.style.width = vjs.round(this.player.bufferedPercent() * 100, 2) + "%"; }
 };
 
 
 /**
  * Shows play progress
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.PlayProgressBar = function(player, options){
+vjs.PlayProgressBar = function(player, options){
   goog.base(this, player, options);
 };
-goog.inherits(_V_.PlayProgressBar, _V_.Component);
+goog.inherits(vjs.PlayProgressBar, vjs.Component);
 
-_V_.PlayProgressBar.prototype.createEl = function(){
+vjs.PlayProgressBar.prototype.createEl = function(){
   return goog.base(this, 'createEl', "div", {
     className: "vjs-play-progress",
     innerHTML: '<span class="vjs-control-text">Progress: 0%</span>'
@@ -761,16 +761,16 @@ _V_.PlayProgressBar.prototype.createEl = function(){
 /**
  * SeekBar Behavior includes play progress bar, and seek handle
  * Needed so it can determine seek position based on handle position/size
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.SeekHandle = function(player, options){
+vjs.SeekHandle = function(player, options){
   goog.base(this, player, options);
 };
-goog.inherits(_V_.SeekHandle, _V_.Component);
+goog.inherits(vjs.SeekHandle, vjs.Component);
 
-_V_.SeekHandle.prototype.createEl = function(){
+vjs.SeekHandle.prototype.createEl = function(){
   return goog.base(this, 'createEl', "div", {
     className: "vjs-seek-handle",
     innerHTML: '<span class="vjs-control-text">00:00</span>'
@@ -779,22 +779,22 @@ _V_.SeekHandle.prototype.createEl = function(){
 
 /**
  * Control the volume
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.VolumeControl = function(player, options){
+vjs.VolumeControl = function(player, options){
   goog.base(this, player, options);
 };
-goog.inherits(_V_.VolumeControl, _V_.Component);
+goog.inherits(vjs.VolumeControl, vjs.Component);
 
-_V_.VolumeControl.prototype.options = {
+vjs.VolumeControl.prototype.options = {
   children: {
     "volumeBar": {}
   }
 };
 
-_V_.VolumeControl.prototype.createEl = function(){
+vjs.VolumeControl.prototype.createEl = function(){
   return goog.base(this, 'createEl', "div", {
     className: "vjs-volume-control vjs-control"
   });
@@ -802,16 +802,16 @@ _V_.VolumeControl.prototype.createEl = function(){
 
 /**
  * Contains volume level
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.VolumeBar = function(player, options){
+vjs.VolumeBar = function(player, options){
   goog.base(this, player, options);
 };
-goog.inherits(_V_.VolumeBar, _V_.Slider);
+goog.inherits(vjs.VolumeBar, vjs.Slider);
 
-_V_.VolumeBar.prototype.options = {
+vjs.VolumeBar.prototype.options = {
   children: {
     "volumeLevel": {},
     "volumeHandle": {}
@@ -820,42 +820,42 @@ _V_.VolumeBar.prototype.options = {
   "handleName": "volumeHandle"
 };
 
-_V_.VolumeBar.prototype.playerEvent = "volumechange";
+vjs.VolumeBar.prototype.playerEvent = "volumechange";
 
-_V_.VolumeBar.prototype.createEl = function(){
+vjs.VolumeBar.prototype.createEl = function(){
   return goog.base(this, 'createEl', "div", {
     className: "vjs-volume-bar"
   });
 };
 
-_V_.VolumeBar.prototype.onMouseMove = function(event) {
+vjs.VolumeBar.prototype.onMouseMove = function(event) {
   this.player.volume(this.calculateDistance(event));
 };
 
-_V_.VolumeBar.prototype.getPercent = function(){
+vjs.VolumeBar.prototype.getPercent = function(){
    return this.player.volume();
 };
 
-_V_.VolumeBar.prototype.stepForward = function(){
+vjs.VolumeBar.prototype.stepForward = function(){
   this.player.volume(this.player.volume() + 0.1);
 };
 
-_V_.VolumeBar.prototype.stepBack = function(){
+vjs.VolumeBar.prototype.stepBack = function(){
   this.player.volume(this.player.volume() - 0.1);
 };
 
 /**
  * Shows volume level
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.VolumeLevel = function(player, options){
+vjs.VolumeLevel = function(player, options){
   goog.base(this, player, options);
 };
-goog.inherits(_V_.VolumeLevel, _V_.Component);
+goog.inherits(vjs.VolumeLevel, vjs.Component);
 
-_V_.VolumeLevel.prototype.createEl = function(){
+vjs.VolumeLevel.prototype.createEl = function(){
   return goog.base(this, 'createEl', "div", {
     className: "vjs-volume-level",
     innerHTML: '<span class="vjs-control-text"></span>'
@@ -864,16 +864,16 @@ _V_.VolumeLevel.prototype.createEl = function(){
 
 /**
  * Change volume level
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.VolumeHandle = function(player, options){
+vjs.VolumeHandle = function(player, options){
   goog.base(this, player, options);
 };
-goog.inherits(_V_.VolumeHandle, _V_.Component);
+goog.inherits(vjs.VolumeHandle, vjs.Component);
 
-_V_.VolumeHandle.prototype.createEl = function(){
+vjs.VolumeHandle.prototype.createEl = function(){
   return goog.base(this, 'createEl', "div", {
     className: "vjs-volume-handle",
     innerHTML: '<span class="vjs-control-text"></span>'
@@ -884,29 +884,29 @@ _V_.VolumeHandle.prototype.createEl = function(){
 
 /**
  * Mute the audio
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.MuteToggle = function(player, options){
+vjs.MuteToggle = function(player, options){
   goog.base(this, player, options);
 
-  player.on("volumechange", _V_.bind(this, this.update));
+  player.on("volumechange", vjs.bind(this, this.update));
 };
-goog.inherits(_V_.MuteToggle, _V_.Button);
+goog.inherits(vjs.MuteToggle, vjs.Button);
 
-_V_.MuteToggle.prototype.createEl = function(){
+vjs.MuteToggle.prototype.createEl = function(){
   return goog.base(this, 'createEl', "div", {
     className: "vjs-mute-control vjs-control",
     innerHTML: '<div><span class="vjs-control-text">Mute</span></div>'
   });
 };
 
-_V_.MuteToggle.prototype.onClick = function(event){
+vjs.MuteToggle.prototype.onClick = function(event){
   this.player.muted( this.player.muted() ? false : true );
 };
 
-_V_.MuteToggle.prototype.update = function(event){
+vjs.MuteToggle.prototype.update = function(event){
   var vol = this.player.volume(),
       level = 3;
 
@@ -920,32 +920,32 @@ _V_.MuteToggle.prototype.update = function(event){
 
   /* TODO improve muted icon classes */
   for (var i = 0; i < 4; i++) {
-    _V_.removeClass(this.el_, "vjs-vol-"+i);
+    vjs.removeClass(this.el_, "vjs-vol-"+i);
   };
-  _V_.addClass(this.el_, "vjs-vol-"+level);
+  vjs.addClass(this.el_, "vjs-vol-"+level);
 }
 
 /* Poster Image
 ================================================================================ */
 /**
  * Poster image. Shows before the video plays.
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.PosterImage = function(player, options){
+vjs.PosterImage = function(player, options){
   goog.base(this, player, options);
 
   if (!this.player.options.poster) {
     this.hide();
   }
 
-  player.on("play", _V_.bind(this, this.hide));
+  player.on("play", vjs.bind(this, this.hide));
 };
-goog.inherits(_V_.PosterImage, _V_.Button);
+goog.inherits(vjs.PosterImage, vjs.Button);
 
-_V_.PosterImage.prototype.createEl = function(){
-  var el = _V_.createEl("img", {
+vjs.PosterImage.prototype.createEl = function(){
+  var el = vjs.createEl("img", {
     className: "vjs-poster",
 
     // Don't want poster to be tabbable.
@@ -959,7 +959,7 @@ _V_.PosterImage.prototype.createEl = function(){
   return el;
 };
 
-_V_.PosterImage.prototype.onClick = function(){
+vjs.PosterImage.prototype.onClick = function(){
   this.player.play();
 }
 
@@ -967,23 +967,23 @@ _V_.PosterImage.prototype.onClick = function(){
 ================================================================================ */
 /**
  * The base for text track and settings menu buttons.
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.Menu = function(player, options){
+vjs.Menu = function(player, options){
   goog.base(this, player, options);
 };
-goog.inherits(_V_.Menu, _V_.Component);
+goog.inherits(vjs.Menu, vjs.Component);
 
-_V_.Menu.prototype.addItem = function(component){
-  this.addComponent(component);
-  component.on("click", _V_.bind(this, function(){
+vjs.Menu.prototype.addItem = function(component){
+  this.addChild(component);
+  component.on("click", vjs.bind(this, function(){
     this.unlockShowing();
   }));
 };
 
-_V_.Menu.prototype.createEl = function(){
+vjs.Menu.prototype.createEl = function(){
   return goog.base(this, 'createEl', "ul", {
     className: "vjs-menu"
   });
@@ -991,31 +991,31 @@ _V_.Menu.prototype.createEl = function(){
 
 /**
  * Menu item
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-_V_.MenuItem = function(player, options){
+vjs.MenuItem = function(player, options){
   goog.base(this, player, options);
 
   if (options.selected) {
     this.addClass("vjs-selected");
   }
 };
-goog.inherits(_V_.MenuItem, _V_.Button);
+goog.inherits(vjs.MenuItem, vjs.Button);
 
-_V_.MenuItem.prototype.createEl = function(type, attrs){
-  return goog.base(this, 'createEl', "li", _V_.merge({
+vjs.MenuItem.prototype.createEl = function(type, attrs){
+  return goog.base(this, 'createEl', "li", vjs.merge({
     className: "vjs-menu-item",
     innerHTML: this.options.label
   }, attrs));
 };
 
-_V_.MenuItem.prototype.onClick = function(){
+vjs.MenuItem.prototype.onClick = function(){
   this.selected(true);
 };
 
-_V_.MenuItem.prototype.selected = function(selected){
+vjs.MenuItem.prototype.selected = function(selected){
   if (selected) {
     this.addClass("vjs-selected");
   } else {
@@ -1026,7 +1026,7 @@ _V_.MenuItem.prototype.selected = function(selected){
 
 // /* Control - Base class for all control elements
 // ================================================================================ */
-// _V_.Control = _V_.Component.extend({
+// vjs.Control = vjs.Component.extend({
 
 //   buildCSSClass: function(){
 //     return "vjs-control " + this._super();
@@ -1036,7 +1036,7 @@ _V_.MenuItem.prototype.selected = function(selected){
 
 // /* Control Bar
 // ================================================================================ */
-// _V_.ControlBar = _V_.Component.extend({
+// vjs.ControlBar = vjs.Component.extend({
 
 //   options: {
 //     loadEvent: "play",
@@ -1056,16 +1056,16 @@ _V_.MenuItem.prototype.selected = function(selected){
 //   init: function(player, options){
 //     this._super(player, options);
 
-//     player.one("play", _V_.bind(this, function(){
+//     player.one("play", vjs.bind(this, function(){
 //       this.fadeIn();
-//       this.player.on("mouseover", _V_.bind(this, this.fadeIn));
-//       this.player.on("mouseout", _V_.bind(this, this.fadeOut));
+//       this.player.on("mouseover", vjs.bind(this, this.fadeIn));
+//       this.player.on("mouseout", vjs.bind(this, this.fadeOut));
 //     }));
 
 //   },
 
 //   createEl: function(){
-//     return _V_.createEl("div", {
+//     return vjs.createEl("div", {
 //       className: "vjs-controls"
 //     });
 //   },
@@ -1088,7 +1088,7 @@ _V_.MenuItem.prototype.selected = function(selected){
 
 // /* Button - Base class for all buttons
 // ================================================================================ */
-// _V_.Button = _V_.Control.extend({
+// vjs.Button = vjs.Control.extend({
 
 //   init: function(player, options){
 //     this._super(player, options);
@@ -1100,7 +1100,7 @@ _V_.MenuItem.prototype.selected = function(selected){
 
 //   createEl: function(type, attrs){
 //     // Add standard Aria and Tabindex info
-//     attrs = _V_.merge({
+//     attrs = vjs.merge({
 //       className: this.buildCSSClass(),
 //       innerHTML: '<div><span class="vjs-control-text">' + (this.buttonText || "Need Text") + '</span></div>',
 //       role: "button",
@@ -1115,7 +1115,7 @@ _V_.MenuItem.prototype.selected = function(selected){
 
 //   // Focus - Add keyboard functionality to element
 //   onFocus: function(){
-//     _V_.on(document, "keyup", _V_.bind(this, this.onKeyPress));
+//     vjs.on(document, "keyup", vjs.bind(this, this.onKeyPress));
 //   },
 
 //   // KeyPress (document level) - Trigger click when keys are pressed
@@ -1129,14 +1129,14 @@ _V_.MenuItem.prototype.selected = function(selected){
 
 //   // Blur - Remove keyboard triggers
 //   onBlur: function(){
-//     _V_.off(document, "keyup", _V_.bind(this, this.onKeyPress));
+//     vjs.off(document, "keyup", vjs.bind(this, this.onKeyPress));
 //   }
 
 // });
 
 // /* Play Button
 // ================================================================================ */
-// _V_.PlayButton = _V_.Button.extend({
+// vjs.PlayButton = vjs.Button.extend({
 
 //   buttonText: "Play",
 
@@ -1152,7 +1152,7 @@ _V_.MenuItem.prototype.selected = function(selected){
 
 // /* Pause Button
 // ================================================================================ */
-// _V_.PauseButton = _V_.Button.extend({
+// vjs.PauseButton = vjs.Button.extend({
 
 //   buttonText: "Pause",
 
@@ -1168,15 +1168,15 @@ _V_.MenuItem.prototype.selected = function(selected){
 
 // /* Play Toggle - Play or Pause Media
 // ================================================================================ */
-// _V_.PlayToggle = _V_.Button.extend({
+// vjs.PlayToggle = vjs.Button.extend({
 
 //   buttonText: "Play",
 
 //   init: function(player, options){
 //     this._super(player, options);
 
-//     player.on("play", _V_.bind(this, this.onPlay));
-//     player.on("pause", _V_.bind(this, this.onPause));
+//     player.on("play", vjs.bind(this, this.onPlay));
+//     player.on("pause", vjs.bind(this, this.onPause));
 //   },
 
 //   buildCSSClass: function(){
@@ -1194,14 +1194,14 @@ _V_.MenuItem.prototype.selected = function(selected){
 
 //   // OnPlay - Add the vjs-playing class to the element so it can change appearance
 //   onPlay: function(){
-//     _V_.removeClass(this.el_, "vjs-paused");
-//     _V_.addClass(this.el_, "vjs-playing");
+//     vjs.removeClass(this.el_, "vjs-paused");
+//     vjs.addClass(this.el_, "vjs-playing");
 //   },
 
 //   // OnPause - Add the vjs-paused class to the element so it can change appearance
 //   onPause: function(){
-//     _V_.removeClass(this.el_, "vjs-playing");
-//     _V_.addClass(this.el_, "vjs-paused");
+//     vjs.removeClass(this.el_, "vjs-playing");
+//     vjs.addClass(this.el_, "vjs-paused");
 //   }
 
 // });
@@ -1209,7 +1209,7 @@ _V_.MenuItem.prototype.selected = function(selected){
 
 // /* Fullscreen Toggle Behaviors
 // ================================================================================ */
-// _V_.FullscreenToggle = _V_.Button.extend({
+// vjs.FullscreenToggle = vjs.Button.extend({
 
 //   buttonText: "Fullscreen",
 
@@ -1229,12 +1229,12 @@ _V_.MenuItem.prototype.selected = function(selected){
 
 // /* Big Play Button
 // ================================================================================ */
-// _V_.BigPlayButton = _V_.Button.extend({
+// vjs.BigPlayButton = vjs.Button.extend({
 //   init: function(player, options){
 //     this._super(player, options);
 
-//     player.on("play", _V_.bind(this, this.hide));
-//     player.on("ended", _V_.bind(this, this.show));
+//     player.on("play", vjs.bind(this, this.hide));
+//     player.on("ended", vjs.bind(this, this.show));
 //   },
 
 //   createEl: function(){
@@ -1256,29 +1256,29 @@ _V_.MenuItem.prototype.selected = function(selected){
 
 // /* Loading Spinner
 // ================================================================================ */
-// _V_.LoadingSpinner = _V_.Component.extend({
+// vjs.LoadingSpinner = vjs.Component.extend({
 //   init: function(player, options){
 //     this._super(player, options);
 
-//     player.on("canplay", _V_.bind(this, this.hide));
-//     player.on("canplaythrough", _V_.bind(this, this.hide));
-//     player.on("playing", _V_.bind(this, this.hide));
-//     player.on("seeked", _V_.bind(this, this.hide));
+//     player.on("canplay", vjs.bind(this, this.hide));
+//     player.on("canplaythrough", vjs.bind(this, this.hide));
+//     player.on("playing", vjs.bind(this, this.hide));
+//     player.on("seeked", vjs.bind(this, this.hide));
 
-//     player.on("seeking", _V_.bind(this, this.show));
+//     player.on("seeking", vjs.bind(this, this.show));
 
 //     // in some browsers seeking does not trigger the 'playing' event,
 //     // so we also need to trap 'seeked' if we are going to set a
 //     // 'seeking' event
-//     player.on("seeked", _V_.bind(this, this.hide));
+//     player.on("seeked", vjs.bind(this, this.hide));
 
-//     player.on("error", _V_.bind(this, this.show));
+//     player.on("error", vjs.bind(this, this.show));
 
 //     // Not showing spinner on stalled any more. Browsers may stall and then not trigger any events that would remove the spinner.
 //     // Checked in Chrome 16 and Safari 5.1.2. http://help.videojs.com/discussions/problems/883-why-is-the-download-progress-showing
-//     // player.on("stalled", _V_.bind(this, this.show));
+//     // player.on("stalled", vjs.bind(this, this.show));
 
-//     player.on("waiting", _V_.bind(this, this.show));
+//     player.on("waiting", vjs.bind(this, this.show));
 //   },
 
 //   createEl: function(){
@@ -1306,12 +1306,12 @@ _V_.MenuItem.prototype.selected = function(selected){
 
 // /* Time
 // ================================================================================ */
-// _V_.CurrentTimeDisplay = _V_.Component.extend({
+// vjs.CurrentTimeDisplay = vjs.Component.extend({
 
 //   init: function(player, options){
 //     this._super(player, options);
 
-//     player.on("timeupdate", _V_.bind(this, this.updateContent));
+//     player.on("timeupdate", vjs.bind(this, this.updateContent));
 //   },
 
 //   createEl: function(){
@@ -1319,29 +1319,29 @@ _V_.MenuItem.prototype.selected = function(selected){
 //       className: "vjs-current-time vjs-time-controls vjs-control"
 //     });
 
-//     this.content = _V_.createEl("div", {
+//     this.content = vjs.createEl("div", {
 //       className: "vjs-current-time-display",
 //       innerHTML: '0:00'
 //     });
 
-//     el.appendChild(_V_.createEl("div").appendChild(this.content));
+//     el.appendChild(vjs.createEl("div").appendChild(this.content));
 //     return el;
 //   },
 
 //   updateContent: function(){
 //     // Allows for smooth scrubbing, when player can't keep up.
 //     var time = (this.player.scrubbing) ? this.player.getCache().currentTime : this.player.currentTime();
-//     this.content.innerHTML = _V_.formatTime(time, this.player.duration());
+//     this.content.innerHTML = vjs.formatTime(time, this.player.duration());
 //   }
 
 // });
 
-// _V_.DurationDisplay = _V_.Component.extend({
+// vjs.DurationDisplay = vjs.Component.extend({
 
 //   init: function(player, options){
 //     this._super(player, options);
 
-//     player.on("timeupdate", _V_.bind(this, this.updateContent));
+//     player.on("timeupdate", vjs.bind(this, this.updateContent));
 //   },
 
 //   createEl: function(){
@@ -1349,23 +1349,23 @@ _V_.MenuItem.prototype.selected = function(selected){
 //       className: "vjs-duration vjs-time-controls vjs-control"
 //     });
 
-//     this.content = _V_.createEl("div", {
+//     this.content = vjs.createEl("div", {
 //       className: "vjs-duration-display",
 //       innerHTML: '0:00'
 //     });
 
-//     el.appendChild(_V_.createEl("div").appendChild(this.content));
+//     el.appendChild(vjs.createEl("div").appendChild(this.content));
 //     return el;
 //   },
 
 //   updateContent: function(){
-//     if (this.player.duration()) { this.content.innerHTML = _V_.formatTime(this.player.duration()); }
+//     if (this.player.duration()) { this.content.innerHTML = vjs.formatTime(this.player.duration()); }
 //   }
 
 // });
 
 // // Time Separator (Not used in main skin, but still available, and could be used as a 'spare element')
-// _V_.TimeDivider = _V_.Component.extend({
+// vjs.TimeDivider = vjs.Component.extend({
 
 //   createEl: function(){
 //     return this._super("div", {
@@ -1376,12 +1376,12 @@ _V_.MenuItem.prototype.selected = function(selected){
 
 // });
 
-// _V_.RemainingTimeDisplay = _V_.Component.extend({
+// vjs.RemainingTimeDisplay = vjs.Component.extend({
 
 //   init: function(player, options){
 //     this._super(player, options);
 
-//     player.on("timeupdate", _V_.bind(this, this.updateContent));
+//     player.on("timeupdate", vjs.bind(this, this.updateContent));
 //   },
 
 //   createEl: function(){
@@ -1389,48 +1389,48 @@ _V_.MenuItem.prototype.selected = function(selected){
 //       className: "vjs-remaining-time vjs-time-controls vjs-control"
 //     });
 
-//     this.content = _V_.createEl("div", {
+//     this.content = vjs.createEl("div", {
 //       className: "vjs-remaining-time-display",
 //       innerHTML: '-0:00'
 //     });
 
-//     el.appendChild(_V_.createEl("div").appendChild(this.content));
+//     el.appendChild(vjs.createEl("div").appendChild(this.content));
 //     return el;
 //   },
 
 //   updateContent: function(){
-//     if (this.player.duration()) { this.content.innerHTML = "-"+_V_.formatTime(this.player.remainingTime()); }
+//     if (this.player.duration()) { this.content.innerHTML = "-"+vjs.formatTime(this.player.remainingTime()); }
 
 //     // Allows for smooth scrubbing, when player can't keep up.
 //     // var time = (this.player.scrubbing) ? this.player.getCache().currentTime : this.player.currentTime();
-//     // this.content.innerHTML = _V_.formatTime(time, this.player.duration());
+//     // this.content.innerHTML = vjs.formatTime(time, this.player.duration());
 //   }
 
 // });
 
 // /* Slider - Parent for seek bar and volume slider
 // ================================================================================ */
-// _V_.Slider = _V_.Component.extend({
+// vjs.Slider = vjs.Component.extend({
 
 //   init: function(player, options){
 //     this._super(player, options);
 
-//     player.on(this.playerEvent, _V_.bind(this, this.update));
+//     player.on(this.playerEvent, vjs.bind(this, this.update));
 
 //     this.on("mousedown", this.onMouseDown);
 //     this.on("focus", this.onFocus);
 //     this.on("blur", this.onBlur);
 
-//     this.player.on("controlsvisible", _V_.bind(this, this.update));
+//     this.player.on("controlsvisible", vjs.bind(this, this.update));
 
 //     // This is actually to fix the volume handle position. http://twitter.com/#!/gerritvanaaken/status/159046254519787520
-//     // this.player.one("timeupdate", _V_.bind(this, this.update));
+//     // this.player.one("timeupdate", vjs.bind(this, this.update));
 
 //     this.update();
 //   },
 
 //   createEl: function(type, attrs) {
-//     attrs = _V_.merge({
+//     attrs = vjs.merge({
 //       role: "slider",
 //       "aria-valuenow": 0,
 //       "aria-valuemin": 0,
@@ -1443,18 +1443,18 @@ _V_.MenuItem.prototype.selected = function(selected){
 
 //   onMouseDown: function(event){
 //     event.preventDefault();
-//     _V_.blockTextSelection();
+//     vjs.blockTextSelection();
 
-//     _V_.on(document, "mousemove", _V_.bind(this, this.onMouseMove));
-//     _V_.on(document, "mouseup", _V_.bind(this, this.onMouseUp));
+//     vjs.on(document, "mousemove", vjs.bind(this, this.onMouseMove));
+//     vjs.on(document, "mouseup", vjs.bind(this, this.onMouseUp));
 
 //     this.onMouseMove(event);
 //   },
 
 //   onMouseUp: function(event) {
-//     _V_.unblockTextSelection();
-//     _V_.off(document, "mousemove", this.onMouseMove, false);
-//     _V_.off(document, "mouseup", this.onMouseUp, false);
+//     vjs.unblockTextSelection();
+//     vjs.off(document, "mousemove", this.onMouseMove, false);
+//     vjs.off(document, "mouseup", this.onMouseUp, false);
 
 //     this.update();
 //   },
@@ -1498,16 +1498,16 @@ _V_.MenuItem.prototype.selected = function(selected){
 //           barProgress = adjustedProgress + (handlePercent / 2);
 
 //       // Move the handle from the left based on the adjected progress
-//       handle.el.style.left = _V_.round(adjustedProgress * 100, 2) + "%";
+//       handle.el.style.left = vjs.round(adjustedProgress * 100, 2) + "%";
 //     }
 
 //     // Set the new bar width
-//     bar.el.style.width = _V_.round(barProgress * 100, 2) + "%";
+//     bar.el.style.width = vjs.round(barProgress * 100, 2) + "%";
 //   },
 
 //   calculateDistance: function(event){
 //     var box = this.el_,
-//         boxX = _V_.findPosX(box),
+//         boxX = vjs.findPosX(box),
 //         boxW = box.offsetWidth,
 //         handle = this.handle;
 
@@ -1524,7 +1524,7 @@ _V_.MenuItem.prototype.selected = function(selected){
 //   },
 
 //   onFocus: function(event){
-//     _V_.on(document, "keyup", _V_.bind(this, this.onKeyPress));
+//     vjs.on(document, "keyup", vjs.bind(this, this.onKeyPress));
 //   },
 
 //   onKeyPress: function(event){
@@ -1538,7 +1538,7 @@ _V_.MenuItem.prototype.selected = function(selected){
 //   },
 
 //   onBlur: function(event){
-//     _V_.off(document, "keyup", _V_.bind(this, this.onKeyPress));
+//     vjs.off(document, "keyup", vjs.bind(this, this.onKeyPress));
 //   }
 // });
 
@@ -1547,7 +1547,7 @@ _V_.MenuItem.prototype.selected = function(selected){
 // ================================================================================ */
 
 // // Progress Control: Seek, Load Progress, and Play Progress
-// _V_.ProgressControl = _V_.Component.extend({
+// vjs.ProgressControl = vjs.Component.extend({
 
 //   options: {
 //     children: {
@@ -1564,7 +1564,7 @@ _V_.MenuItem.prototype.selected = function(selected){
 // });
 
 // // Seek Bar and holder for the progress bars
-// _V_.SeekBar = _V_.Slider.extend({
+// vjs.SeekBar = vjs.Slider.extend({
 
 //   options: {
 //     children: {
@@ -1631,11 +1631,11 @@ _V_.MenuItem.prototype.selected = function(selected){
 // });
 
 // // Load Progress Bar
-// _V_.LoadProgressBar = _V_.Component.extend({
+// vjs.LoadProgressBar = vjs.Component.extend({
 
 //   init: function(player, options){
 //     this._super(player, options);
-//     player.on("progress", _V_.bind(this, this.update));
+//     player.on("progress", vjs.bind(this, this.update));
 //   },
 
 //   createEl: function(){
@@ -1646,13 +1646,13 @@ _V_.MenuItem.prototype.selected = function(selected){
 //   },
 
 //   update: function(){
-//     if (this.el_.style) { this.el_.style.width = _V_.round(this.player.bufferedPercent() * 100, 2) + "%"; }
+//     if (this.el_.style) { this.el_.style.width = vjs.round(this.player.bufferedPercent() * 100, 2) + "%"; }
 //   }
 
 // });
 
 // // Play Progress Bar
-// _V_.PlayProgressBar = _V_.Component.extend({
+// vjs.PlayProgressBar = vjs.Component.extend({
 
 //   createEl: function(){
 //     return this._super("div", {
@@ -1666,7 +1666,7 @@ _V_.MenuItem.prototype.selected = function(selected){
 // // Seek Handle
 // // SeekBar Behavior includes play progress bar, and seek handle
 // // Needed so it can determine seek position based on handle position/size
-// _V_.SeekHandle = _V_.Component.extend({
+// vjs.SeekHandle = vjs.Component.extend({
 
 //   createEl: function(){
 //     return this._super("div", {
@@ -1680,7 +1680,7 @@ _V_.MenuItem.prototype.selected = function(selected){
 // /* Volume Scrubber
 // ================================================================================ */
 // // Progress Control: Seek, Load Progress, and Play Progress
-// _V_.VolumeControl = _V_.Component.extend({
+// vjs.VolumeControl = vjs.Component.extend({
 
 //   options: {
 //     children: {
@@ -1696,7 +1696,7 @@ _V_.MenuItem.prototype.selected = function(selected){
 
 // });
 
-// _V_.VolumeBar = _V_.Slider.extend({
+// vjs.VolumeBar = vjs.Slider.extend({
 
 //   options: {
 //     children: {
@@ -1730,7 +1730,7 @@ _V_.MenuItem.prototype.selected = function(selected){
 //   }
 // });
 
-// _V_.VolumeLevel = _V_.Component.extend({
+// vjs.VolumeLevel = vjs.Component.extend({
 
 //   createEl: function(){
 //     return this._super("div", {
@@ -1741,7 +1741,7 @@ _V_.MenuItem.prototype.selected = function(selected){
 
 // });
 
-// _V_.VolumeHandle = _V_.Component.extend({
+// vjs.VolumeHandle = vjs.Component.extend({
 
 //   createEl: function(){
 //     return this._super("div", {
@@ -1754,12 +1754,12 @@ _V_.MenuItem.prototype.selected = function(selected){
 
 // });
 
-// _V_.MuteToggle = _V_.Button.extend({
+// vjs.MuteToggle = vjs.Button.extend({
 
 //   init: function(player, options){
 //     this._super(player, options);
 
-//     player.on("volumechange", _V_.bind(this, this.update));
+//     player.on("volumechange", vjs.bind(this, this.update));
 //   },
 
 //   createEl: function(){
@@ -1786,10 +1786,10 @@ _V_.MenuItem.prototype.selected = function(selected){
 //     }
 
 //     /* TODO improve muted icon classes */
-//     _V_.each.call(this, [0,1,2,3], function(i){
-//       _V_.removeClass(this.el, "vjs-vol-"+i);
+//     vjs.each.call(this, [0,1,2,3], function(i){
+//       vjs.removeClass(this.el, "vjs-vol-"+i);
 //     });
-//     _V_.addClass(this.el, "vjs-vol-"+level);
+//     vjs.addClass(this.el, "vjs-vol-"+level);
 //   }
 
 // });
@@ -1797,7 +1797,7 @@ _V_.MenuItem.prototype.selected = function(selected){
 
 // /* Poster Image
 // ================================================================================ */
-// _V_.PosterImage = _V_.Button.extend({
+// vjs.PosterImage = vjs.Button.extend({
 //   init: function(player, options){
 //     this._super(player, options);
 
@@ -1805,11 +1805,11 @@ _V_.MenuItem.prototype.selected = function(selected){
 //       this.hide();
 //     }
 
-//     player.on("play", _V_.bind(this, this.hide));
+//     player.on("play", vjs.bind(this, this.hide));
 //   },
 
 //   createEl: function(){
-//     return _V_.createEl("img", {
+//     return vjs.createEl("img", {
 //       className: "vjs-poster",
 //       src: this.player.options.poster,
 
@@ -1826,7 +1826,7 @@ _V_.MenuItem.prototype.selected = function(selected){
 // /* Menu
 // ================================================================================ */
 // // The base for text track and settings menu buttons.
-// _V_.Menu = _V_.Component.extend({
+// vjs.Menu = vjs.Component.extend({
 
 //   init: function(player, options){
 //     this._super(player, options);
@@ -1834,7 +1834,7 @@ _V_.MenuItem.prototype.selected = function(selected){
 
 //   addItem: function(component){
 //     this.addChild(component);
-//     component.on("click", _V_.bind(this, function(){
+//     component.on("click", vjs.bind(this, function(){
 //       this.unlockShowing();
 //     }));
 //   },
@@ -1847,7 +1847,7 @@ _V_.MenuItem.prototype.selected = function(selected){
 
 // });
 
-// _V_.MenuItem = _V_.Button.extend({
+// vjs.MenuItem = vjs.Button.extend({
 
 //   init: function(player, options){
 //     this._super(player, options);
@@ -1858,7 +1858,7 @@ _V_.MenuItem.prototype.selected = function(selected){
 //   },
 
 //   createEl: function(type, attrs){
-//     return this._super("li", _V_.merge({
+//     return this._super("li", vjs.merge({
 //       className: "vjs-menu-item",
 //       innerHTML: this.options.label
 //     }, attrs));

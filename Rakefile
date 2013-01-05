@@ -4,6 +4,16 @@ require 'httparty'
 
 namespace :build do
 
+  desc "Compile"
+  task :compiled do
+    Rake::Shell['java -jar build/compiler/compiler.jar --compilation_level ADVANCED_OPTIMIZATIONS --js=src/goog.base.js --js=src/core.js --js=src/lib.js --js=src/events.js --js=src/component.js --js=src/player.js --js=src/media.js --js=src/media.html5.js --js=src/media.flash.js --js=src/controls.js --js=src/tracks.js --js=src/setup.js --js=src/json.js --js=src/exports.js --formatting=pretty_print --js_output_file=closure-test/video.compiled.js --create_source_map closure-test/video.compiled.js.map --source_map_format=V3 --externs src/media.flash.externs.js --externs closure-test/qunit-externs.js --output_wrapper "(function() {%output%})();//@ sourceMappingURL=video.compiled.js.map"']
+  end
+
+  desc "Compile with test"
+  task :compiled_tests do
+    Rake::Shell['java -jar build/compiler/compiler.jar --compilation_level ADVANCED_OPTIMIZATIONS --js=src/goog.base.js --js=src/core.js --js=src/lib.js --js=src/events.js --js=src/component.js --js=src/player.js --js=src/media.js --js=src/media.html5.js --js=src/media.flash.js --js=src/controls.js --js=src/tracks.js --js=src/setup.js --js=src/json.js --js=src/exports.js --js=closure-test/unit/component.js --js=closure-test/unit/lib.js --js=closure-test/unit/events.js --js=closure-test/unit/player.js --formatting=pretty_print --js_output_file=closure-test/video.test.compiled.js --create_source_map closure-test/video.test.compiled.js.map --source_map_format=V3 --externs src/media.flash.externs.js --externs closure-test/qunit-externs.js --output_wrapper "(function() {%output%})();//@ sourceMappingURL=video.test.compiled.js.map"']
+  end
+
   desc "Build version for current '/c/' CDN copy and locked in version"
   task :current do
     Rake::Task["build:source"].execute
@@ -118,7 +128,7 @@ namespace :build do
       file.puts "var vjsSourceList = [];"
 
       src_array = ["src/core", "src/lib"]
-      last = ["src/setup"] # "flash/swfobject", 
+      last = ["src/setup"] # "flash/swfobject",
       exclude = [".", "..", ".DS_Store", "_end.js", "_begin.js"]
 
       Dir.foreach('src') do |item|
@@ -141,7 +151,7 @@ namespace :build do
 
     end
   end
-  
+
   desc "Build list of source files for easy inclusion in projects"
   task :source_html do
 
@@ -149,7 +159,7 @@ namespace :build do
       file.puts "<!-- Video.js Source Files -->"
 
       src_array = ["src/core", "src/lib"]
-      last = ["src/setup"] # "flash/swfobject", 
+      last = ["src/setup"] # "flash/swfobject",
       exclude = [".", "..", ".DS_Store", "_end.js", "_begin.js"]
 
       Dir.foreach('src') do |item|
@@ -169,7 +179,7 @@ namespace :build do
       end
       # file.puts "vjsSourceList.push('src/#{item.sub(".js", "")}')"
       # file.puts "vjsSourceList.push('flash/swfobject.js')"
-      
+
       file.puts "<!-- END Video.js Source Files -->"
 
     end

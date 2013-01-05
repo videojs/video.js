@@ -104,7 +104,7 @@ _V_.youtube = _V_.PlaybackTech.extend({
 
   src: function(src){
     delete this.player.error;
-    
+
     // FIXME: Does this work or do we have to set the iFrame src again?
     var videoId = this.getVideoId(src);
     this.youtube.loadVideoById(videoId);
@@ -227,7 +227,7 @@ _V_.youtube.onReady = function(e){
   player.tech.triggerReady();
   player.triggerReady();
   player.triggerEvent("durationchange");
-  
+
   _V_.youtube.hideOverlay(player);
 };
 
@@ -247,7 +247,7 @@ _V_.youtube.onStateChange = function(e){
     case YT.PlayerState.ENDED:
       player.triggerEvent("ended");
       _V_.youtube.hideOverlay(player);
-      
+
       // YouTube looping doesn't seem to play well with VideoJS, so we need to
       // implement it manually here
       if (player.apiArgs.playerVars.loop) {
@@ -347,8 +347,8 @@ _V_.youtube.prototype.support = {
   },
 
   // Optional events that we can manually mimic with timers
-  progressEvent: false,
-  timeupdateEvent: false,
+  progressEvents: false,
+  timeupdateEvents: false,
 
   //fullscreen: true,
   // In iOS, if you move a video element in the DOM, it breaks video playback.

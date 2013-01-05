@@ -253,7 +253,7 @@ _V_.vimeo.onFinish = function(id) {
   player.vimeoInfo.state = VimeoState.ENDED;
   player.triggerEvent("ended");
   _V_.vimeo.hideOverlay(player);
-  
+
   // Vimeo looping doesn't seem to play well with VideoJS, so we need to
   // implement it manually here
   if (player.apiArgs.loop) {
@@ -300,8 +300,8 @@ _V_.vimeo.prototype.support = {
   },
 
   // Optional events that we can manually mimic with timers
-  progressEvent: true,
-  timeupdateEvent: true,
+  progressEvents: true,
+  timeupdateEvents: true,
 
   //fullscreen: true,
   // In iOS, if you move a video element in the DOM, it breaks video playback.

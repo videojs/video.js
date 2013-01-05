@@ -1,15 +1,15 @@
-goog.provide('_V_.Player');
+goog.provide('vjs.Player');
 
-goog.require('_V_.Component');
+goog.require('vjs.Component');
 
 /**
- * Main player class. Returned by _V_(id);
+ * Main player class. Returned by vjs(id);
  * @param {Element} tag        The original video tag used for configuring options
  * @param {Object=} options    Player options
  * @param {Function=} ready    Ready callback function
  * @constructor
  */
-_V_.Player = function(tag, options, ready){
+vjs.Player = function(tag, options, ready){
   this.tag = tag; // Store the original tag used to set options
 
   // Set Options
@@ -18,17 +18,25 @@ _V_.Player = function(tag, options, ready){
   // This latter part coincides with the load order
   // (tag must exist before Player)
   var opts = {};
-  _V_.merge(opts, _V_.options); // Copy Global Defaults
-  _V_.merge(opts, this.getTagSettings(tag)); // Override with Video Tag Options
-  _V_.merge(opts, options); // Override/extend with options from setup call
+  vjs.merge(opts, vjs.options); // Copy Global Defaults
+  vjs.merge(opts, this.getTagSettings(tag)); // Override with Video Tag Options
+  vjs.merge(opts, options); // Override/extend with options from setup call
 
   // Cache for video property values.
   this.cache_ = {};
 
+  // Tracks defined in tracks.js
+  this.textTracks = [];
+  // this.ready(function() {
+  //   if (opts.tracks && opts.tracks.length > 0) {
+  //     this.addTextTracks(opts.tracks);
+  //   }
+  // });
+
   // Run base component initializing with new options.
   // Builds the element through createEl()
   // Inits and embeds any child components in opts
-  _V_.Component.call(this, this, opts, ready);
+  vjs.Component.call(this, this, opts, ready);
 
   this.on("ended", this.onEnded);
   this.on("play", this.onPlay);
@@ -37,22 +45,16 @@ _V_.Player = function(tag, options, ready){
   this.on("durationchange", this.onDurationChange);
   this.on("error", this.onError);
 
-  // Tracks defined in tracks.js
-  // this.textTracks = [];
-  // if (opts.tracks && opts.tracks.length > 0) {
-  //   this.addTextTracks(opts.tracks);
-  // }
-
   // Make player easily findable by ID
-  _V_.players[this.id] = this;
+  vjs.players[this.id] = this;
 };
-goog.inherits(_V_.Player, _V_.Component);
+goog.inherits(vjs.Player, vjs.Component);
 
-_V_.Player.prototype.dispose = function(){
+vjs.Player.prototype.dispose = function(){
   // this.isReady_ = false;
 
   // Kill reference to this player
-  _V_.players[this.id] = null;
+  vjs.players[this.id] = null;
   if (this.tag && this.tag.player) { this.tag.player = null; }
   if (this.el_ && this.el_.player) { this.el_.player = null; }
 
@@ -66,13 +68,13 @@ _V_.Player.prototype.dispose = function(){
   goog.base(this, 'dispose');
 };
 
-_V_.Player.prototype.getTagSettings = function(tag){
+vjs.Player.prototype.getTagSettings = function(tag){
   var options = {
     sources: [],
     tracks: []
   };
 
-  _V_.merge(options, _V_.getAttributeValues(tag));
+  vjs.merge(options, vjs.getAttributeValues(tag));
 
   // Get tag children settings
   if (tag.hasChildNodes()) {
@@ -87,10 +89,10 @@ _V_.Player.prototype.getTagSettings = function(tag){
       childName = child.nodeName.toLowerCase();
 
       if (childName === "source") {
-        options.sources.push(_V_.getAttributeValues(child));
+        options.sources.push(vjs.getAttributeValues(child));
 
       } else if (childName === "track") {
-        options.tracks.push(_V_.getAttributeValues(child));
+        options.tracks.push(vjs.getAttributeValues(child));
 
       }
     }
@@ -98,7 +100,7 @@ _V_.Player.prototype.getTagSettings = function(tag){
   return options;
 };
 
-_V_.Player.prototype.createEl = function(){
+vjs.Player.prototype.createEl = function(){
   var el = this.el_ = goog.base(this, 'createEl', 'div');
   var tag = this.tag;
 
@@ -124,7 +126,7 @@ _V_.Player.prototype.createEl = function(){
   }
 
   // Make sure tag ID exists
-  tag.id = tag.id || "vjs_video_" + _V_.guid++;
+  tag.id = tag.id || "vjs_video_" + vjs.guid++;
 
   // Give video tag ID and class to player div
   // ID will now reference player box, not the video tag
@@ -152,7 +154,7 @@ _V_.Player.prototype.createEl = function(){
   if (tag.parentNode) {
     tag.parentNode.insertBefore(el, tag);
   }
-  _V_.insertFirst(tag, el); // Breaks iPhone, fixed in HTML5 setup.
+  vjs.insertFirst(tag, el); // Breaks iPhone, fixed in HTML5 setup.
 
   return el;
 }
@@ -161,7 +163,7 @@ _V_.Player.prototype.createEl = function(){
 // ================================================================================ */
 // Load/Create an instance of playback technlogy including element and API methods
 // And append playback element in player div.
-_V_.Player.prototype.loadTech = function(techName, source){
+vjs.Player.prototype.loadTech = function(techName, source){
 
   // Pause and remove current playback technology
   if (this.tech) {
@@ -183,18 +185,18 @@ _V_.Player.prototype.loadTech = function(techName, source){
     this.player.triggerReady();
 
     // Manually track progress in cases where the browser/flash player doesn't report it.
-    if (!window['_V_'][techName]['Supports']['progressEvent']) {
+    if (!this.features.progressEvents) {
       this.player.manualProgressOn();
     }
 
     // Manually track timeudpates in cases where the browser/flash player doesn't report it.
-    if (!window['_V_'][techName]['Supports']['timeupdateEvent']) {
+    if (!this.features.timeupdateEvents) {
       this.player.manualTimeUpdatesOn();
     }
   }
 
   // Grab tech-specific options from player options and add source and parent element to use.
-  var techOptions = _V_.merge({ source: source, parentEl: this.el_ }, this.options[techName])
+  var techOptions = vjs.merge({ source: source, parentEl: this.el_ }, this.options[techName.toLowerCase()])
 
   if (source) {
     if (source.src == this.cache_.src && this.cache_.currentTime > 0) {
@@ -205,11 +207,12 @@ _V_.Player.prototype.loadTech = function(techName, source){
   }
 
   // Initialize tech instance
-  this.tech = new window['_V_'][techName](this, techOptions);
+  this.tech = new window['videojs'][techName](this, techOptions);
+
   this.tech.ready(techReady);
 };
 
-// _V_.Player.prototype.unloadTech = function(){
+// vjs.Player.prototype.unloadTech = function(){
 //   this.tech.destroy();
 
 //   // Turn off any manual progress or timeupdate tracking
@@ -225,20 +228,20 @@ _V_.Player.prototype.loadTech = function(techName, source){
 // Then with the new fullscreen API, Mozilla and webkit browsers will reload the flash object after going to fullscreen.
 // To get around this, we're unloading the tech, caching source and currentTime values, and reloading the tech once the plugin is resized.
 // reloadTech: function(betweenFn){
-//   _V_.log("unloadingTech")
+//   vjs.log("unloadingTech")
 //   this.unloadTech();
-//   _V_.log("unloadedTech")
+//   vjs.log("unloadedTech")
 //   if (betweenFn) { betweenFn.call(); }
-//   _V_.log("LoadingTech")
+//   vjs.log("LoadingTech")
 //   this.loadTech(this.techName, { src: this.cache_.src })
-//   _V_.log("loadedTech")
+//   vjs.log("loadedTech")
 // },
 
 /* Fallbacks for unsupported event types
 ================================================================================ */
 // Manually trigger progress events based on changes to the buffered amount
 // Many flash players and older HTML5 browsers don't send progress or progress-like events
-_V_.Player.prototype.manualProgressOn = function(){
+vjs.Player.prototype.manualProgressOn = function(){
   this.manualProgress = true;
 
   // Trigger progress watching when a source begins loading
@@ -253,21 +256,21 @@ _V_.Player.prototype.manualProgressOn = function(){
   this.tech.one("progress", function(){
 
     // Update known progress support for this playback technology
-    window['_V_'][techName]['Supports']['progressEvent'] = true;
+    this.features.progressEvents = true;
 
     // Turn off manual progress tracking
     this.player.manualProgressOff();
   });
 };
 
-_V_.Player.prototype.manualProgressOff = function(){
+vjs.Player.prototype.manualProgressOff = function(){
   this.manualProgress = false;
   this.stopTrackingProgress();
 };
 
-_V_.Player.prototype.trackProgress = function(){
+vjs.Player.prototype.trackProgress = function(){
 
-  this.progressInterval = setInterval(_V_.bind(this, function(){
+  this.progressInterval = setInterval(vjs.bind(this, function(){
     // Don't trigger unless buffered amount is greater than last time
     // log(this.cache_.bufferEnd, this.buffered().end(0), this.duration())
     /* TODO: update for multiple buffered regions */
@@ -279,69 +282,62 @@ _V_.Player.prototype.trackProgress = function(){
     }
   }), 500);
 };
-_V_.Player.prototype.stopTrackingProgress = function(){ clearInterval(this.progressInterval); };
+vjs.Player.prototype.stopTrackingProgress = function(){ clearInterval(this.progressInterval); };
 
 /* Time Tracking -------------------------------------------------------------- */
-_V_.Player.prototype.manualTimeUpdatesOn = function(){
+vjs.Player.prototype.manualTimeUpdatesOn = function(){
   this.manualTimeUpdates = true;
 
   this.on("play", this.trackCurrentTime);
   this.on("pause", this.stopTrackingCurrentTime);
   // timeupdate is also called by .currentTime whenever current time is set
 
-  var techName = this.techName;
-
   // Watch for native timeupdate event
-  this.tech.on("timeupdate", function(){
-
-    // Remove this listener from the element
-    this.off("timeupdate", arguments.callee);
-
+  this.tech.one("timeupdate", function(){
     // Update known progress support for this playback technology
-    window['_V_'][techName]['Supports']['timeupdateEvent'] = true;
-
+    this.features.timeupdateEvents = true;
     // Turn off manual progress tracking
     this.player.manualTimeUpdatesOff();
   });
 };
 
-_V_.Player.prototype.manualTimeUpdatesOff = function(){
+vjs.Player.prototype.manualTimeUpdatesOff = function(){
   this.manualTimeUpdates = false;
   this.stopTrackingCurrentTime();
   this.off("play", this.trackCurrentTime);
   this.off("pause", this.stopTrackingCurrentTime);
 };
 
-_V_.Player.prototype.trackCurrentTime = function(){
+vjs.Player.prototype.trackCurrentTime = function(){
   if (this.currentTimeInterval) { this.stopTrackingCurrentTime(); }
-  this.currentTimeInterval = setInterval(_V_.bind(this, function(){
+  this.currentTimeInterval = setInterval(vjs.bind(this, function(){
     this.trigger("timeupdate");
   }), 250); // 42 = 24 fps // 250 is what Webkit uses // FF uses 15
 };
 
 // Turn off play progress tracking (when paused or dragging)
-_V_.Player.prototype.stopTrackingCurrentTime = function(){ clearInterval(this.currentTimeInterval); };
+vjs.Player.prototype.stopTrackingCurrentTime = function(){ clearInterval(this.currentTimeInterval); };
 
 // /* Player event handlers (how the player reacts to certain events)
 // ================================================================================ */
-_V_.Player.prototype.onEnded = function(){
+vjs.Player.prototype.onEnded = function(){
   if (this.options.loop) {
     this.currentTime(0);
     this.play();
   }
 };
 
-_V_.Player.prototype.onPlay = function(){
-  _V_.removeClass(this.el_, "vjs-paused");
-  _V_.addClass(this.el_, "vjs-playing");
+vjs.Player.prototype.onPlay = function(){
+  vjs.removeClass(this.el_, "vjs-paused");
+  vjs.addClass(this.el_, "vjs-playing");
 };
 
-_V_.Player.prototype.onPause = function(){
-  _V_.removeClass(this.el_, "vjs-playing");
-  _V_.addClass(this.el_, "vjs-paused");
+vjs.Player.prototype.onPause = function(){
+  vjs.removeClass(this.el_, "vjs-playing");
+  vjs.addClass(this.el_, "vjs-paused");
 };
 
-_V_.Player.prototype.onProgress = function(){
+vjs.Player.prototype.onProgress = function(){
   // Add custom event for when source is finished downloading.
   if (this.bufferedPercent() == 1) {
     this.trigger("loadedalldata");
@@ -350,12 +346,12 @@ _V_.Player.prototype.onProgress = function(){
 
 // Update duration with durationchange event
 // Allows for cacheing value instead of asking player each time.
-_V_.Player.prototype.onDurationChange = function(){
+vjs.Player.prototype.onDurationChange = function(){
   this.duration(this.techGet("duration"));
 };
 
-_V_.Player.prototype.onError = function(e) {
-  _V_.log("Video Error", e);
+vjs.Player.prototype.onError = function(e) {
+  vjs.log("Video Error", e);
 };
 
 // /* Player API
@@ -365,15 +361,14 @@ _V_.Player.prototype.onError = function(e) {
  * Object for cached values.
  * @private
  */
-_V_.Player.prototype.cache_;
+vjs.Player.prototype.cache_;
 
-_V_.Player.prototype.getCache = function(){
+vjs.Player.prototype.getCache = function(){
   return this.cache_;
 };
 
 // Pass values to the playback tech
-_V_.Player.prototype.techCall = function(method, arg){
-
+vjs.Player.prototype.techCall = function(method, arg){
   // If it's not ready yet, call method when it is
   if (!this.tech.isReady_) {
     this.tech.ready(function(){
@@ -385,13 +380,13 @@ _V_.Player.prototype.techCall = function(method, arg){
     try {
       this.tech[method](arg);
     } catch(e) {
-      _V_.log(e);
+      vjs.log(e);
     }
   }
 };
 
 // Get calls can't wait for the tech, and sometimes don't need to.
-_V_.Player.prototype.techGet = function(method){
+vjs.Player.prototype.techGet = function(method){
 
   // Make sure tech is ready
   if (this.tech.isReady_) {
@@ -405,18 +400,18 @@ _V_.Player.prototype.techGet = function(method){
 
       // When building additional tech libs, an expected method may not be defined yet
       if (this.tech[method] === undefined) {
-        _V_.log("Video.js: " + method + " method not defined for "+this.techName+" playback technology.", e);
+        vjs.log("Video.js: " + method + " method not defined for "+this.techName+" playback technology.", e);
 
       } else {
 
         // When a method isn't available on the object it throws a TypeError
         if (e.name == "TypeError") {
           window['e'] = e
-          _V_.log("Video.js: " + method + " unavailable on "+this.techName+" playback technology element.", e);
+          vjs.log("Video.js: " + method + " unavailable on "+this.techName+" playback technology element.", e);
           this.tech.isReady_ = false;
           throw e;
         } else {
-          _V_.log(e);
+          vjs.log(e);
         }
       }
     }
@@ -426,25 +421,25 @@ _V_.Player.prototype.techGet = function(method){
 };
 
 // http://dev.w3.org/html5/spec/video.html#dom-media-play
-_V_.Player.prototype.play = function(){
+vjs.Player.prototype.play = function(){
   this.techCall("play");
   return this;
 };
 
 // http://dev.w3.org/html5/spec/video.html#dom-media-pause
-_V_.Player.prototype.pause = function(){
+vjs.Player.prototype.pause = function(){
   this.techCall("pause");
   return this;
 };
 
 // http://dev.w3.org/html5/spec/video.html#dom-media-paused
 // The initial state of paused should be true (in Safari it's actually false)
-_V_.Player.prototype.paused = function(){
+vjs.Player.prototype.paused = function(){
   return (this.techGet("paused") === false) ? false : true;
 };
 
 // http://dev.w3.org/html5/spec/video.html#dom-media-currenttime
-_V_.Player.prototype.currentTime = function(seconds){
+vjs.Player.prototype.currentTime = function(seconds){
   if (seconds !== undefined) {
 
     // Cache the last set value for smoother scrubbing.
@@ -465,7 +460,7 @@ _V_.Player.prototype.currentTime = function(seconds){
 
 // http://dev.w3.org/html5/spec/video.html#dom-media-duration
 // Duration should return NaN if not available. ParseFloat will turn false-ish values to NaN.
-_V_.Player.prototype.duration = function(seconds){
+vjs.Player.prototype.duration = function(seconds){
   if (seconds !== undefined) {
 
     // Cache the last set value for optimiized scrubbing (esp. Flash)
@@ -478,14 +473,14 @@ _V_.Player.prototype.duration = function(seconds){
 };
 
 // Calculates how much time is left. Not in spec, but useful.
-_V_.Player.prototype.remainingTime = function(){
+vjs.Player.prototype.remainingTime = function(){
   return this.duration() - this.currentTime();
 };
 
 // http://dev.w3.org/html5/spec/video.html#dom-media-buffered
 // Buffered returns a timerange object. Kind of like an array of portions of the video that have been downloaded.
 // So far no browsers return more than one range (portion)
-_V_.Player.prototype.buffered = function(){
+vjs.Player.prototype.buffered = function(){
   var buffered = this.techGet("buffered"),
       start = 0,
       end = this.cache_.bufferEnd = this.cache_.bufferEnd || 0, // Default end to 0 and store in values
@@ -497,23 +492,23 @@ _V_.Player.prototype.buffered = function(){
     this.cache_.bufferEnd = end;
   }
 
-  return _V_.createTimeRange(start, end);
+  return vjs.createTimeRange(start, end);
 };
 
 // Calculates amount of buffer is full. Not in spec but useful.
-_V_.Player.prototype.bufferedPercent = function(){
+vjs.Player.prototype.bufferedPercent = function(){
   return (this.duration()) ? this.buffered().end(0) / this.duration() : 0;
 };
 
 // http://dev.w3.org/html5/spec/video.html#dom-media-volume
-_V_.Player.prototype.volume = function(percentAsDecimal){
+vjs.Player.prototype.volume = function(percentAsDecimal){
   var vol;
 
   if (percentAsDecimal !== undefined) {
     vol = Math.max(0, Math.min(1, parseFloat(percentAsDecimal))); // Force value to between 0 and 1
     this.cache_.volume = vol;
     this.techCall("setVolume", vol);
-    _V_.setLocalStorage("volume", vol);
+    vjs.setLocalStorage("volume", vol);
     return this;
   }
 
@@ -523,7 +518,7 @@ _V_.Player.prototype.volume = function(percentAsDecimal){
 };
 
 // http://dev.w3.org/html5/spec/video.html#attr-media-muted
-_V_.Player.prototype.muted = function(muted){
+vjs.Player.prototype.muted = function(muted){
   if (muted !== undefined) {
     this.techCall("setMuted", muted);
     return this;
@@ -532,11 +527,11 @@ _V_.Player.prototype.muted = function(muted){
 };
 
 // Check if current tech can support native fullscreen (e.g. with built in controls lik iOS, so not our flash swf)
-_V_.Player.prototype.supportsFullScreen = function(){ return this.techGet("supportsFullScreen") || false; };
+vjs.Player.prototype.supportsFullScreen = function(){ return this.techGet("supportsFullScreen") || false; };
 
 // Turn on fullscreen (or window) mode
-_V_.Player.prototype.requestFullScreen = function(){
-  var requestFullScreen = _V_.support.requestFullScreen;
+vjs.Player.prototype.requestFullScreen = function(){
+  var requestFullScreen = vjs.support.requestFullScreen;
 
   this.isFullScreen = true;
 
@@ -544,12 +539,12 @@ _V_.Player.prototype.requestFullScreen = function(){
   if (requestFullScreen) {
 
     // Trigger fullscreenchange event after change
-    _V_.on(document, requestFullScreen.eventName, _V_.bind(this, function(){
+    vjs.on(document, requestFullScreen.eventName, vjs.bind(this, function(){
       this.isFullScreen = document[requestFullScreen.isFullScreen];
 
       // If cancelling fullscreen, remove event listener.
       if (this.isFullScreen == false) {
-        _V_.off(document, requestFullScreen.eventName, arguments.callee);
+        vjs.off(document, requestFullScreen.eventName, arguments.callee);
       }
 
       this.trigger("fullscreenchange");
@@ -557,13 +552,13 @@ _V_.Player.prototype.requestFullScreen = function(){
 
     // Flash and other plugins get reloaded when you take their parent to fullscreen.
     // To fix that we'll remove the tech, and reload it after the resize has finished.
-    if (window['_V_'][this.techName]['Supports']['fullscreenResize'] === false && this.options.flash.iFrameMode != true) {
+    if (this.tech.features.fullscreenResize === false && this.options.Flash.iFrameMode != true) {
 
       this.pause();
       this.unloadTech();
 
-      _V_.on(document, requestFullScreen.eventName, _V_.bind(this, function(){
-        _V_.off(document, requestFullScreen.eventName, arguments.callee);
+      vjs.on(document, requestFullScreen.eventName, vjs.bind(this, function(){
+        vjs.off(document, requestFullScreen.eventName, arguments.callee);
         this.loadTech(this.techName, { src: this.cache_.src });
       }));
 
@@ -585,8 +580,8 @@ _V_.Player.prototype.requestFullScreen = function(){
    return this;
 };
 
-_V_.Player.prototype.cancelFullScreen = function(){
-  var requestFullScreen = _V_.support.requestFullScreen;
+vjs.Player.prototype.cancelFullScreen = function(){
+  var requestFullScreen = vjs.support.requestFullScreen;
 
   this.isFullScreen = false;
 
@@ -595,13 +590,13 @@ _V_.Player.prototype.cancelFullScreen = function(){
 
    // Flash and other plugins get reloaded when you take their parent to fullscreen.
    // To fix that we'll remove the tech, and reload it after the resize has finished.
-   if (window['_V_'][this.techName]['Supports']['fullscreenResize'] === false && this.options.flash.iFrameMode != true) {
+   if (this.tech.features.fullscreenResize === false && this.options.Flash.iFrameMode != true) {
 
      this.pause();
      this.unloadTech();
 
-     _V_.on(document, requestFullScreen.eventName, _V_.bind(this, function(){
-       _V_.off(document, requestFullScreen.eventName, arguments.callee);
+     vjs.on(document, requestFullScreen.eventName, vjs.bind(this, function(){
+       vjs.off(document, requestFullScreen.eventName, arguments.callee);
        this.loadTech(this.techName, { src: this.cache_.src })
      }));
 
@@ -624,25 +619,25 @@ _V_.Player.prototype.cancelFullScreen = function(){
 };
 
 // When fullscreen isn't supported we can stretch the video container to as wide as the browser will let us.
-_V_.Player.prototype.enterFullWindow = function(){
+vjs.Player.prototype.enterFullWindow = function(){
   this.isFullWindow = true;
 
   // Storing original doc overflow value to return to when fullscreen is off
   this.docOrigOverflow = document.documentElement.style.overflow;
 
   // Add listener for esc key to exit fullscreen
-  _V_.on(document, "keydown", _V_.bind(this, this.fullWindowOnEscKey));
+  vjs.on(document, "keydown", vjs.bind(this, this.fullWindowOnEscKey));
 
   // Hide any scroll bars
   document.documentElement.style.overflow = 'hidden';
 
   // Apply fullscreen styles
-  _V_.addClass(document.body, "vjs-full-window");
-  _V_.addClass(this.el_, "vjs-fullscreen");
+  vjs.addClass(document.body, "vjs-full-window");
+  vjs.addClass(this.el_, "vjs-fullscreen");
 
   this.trigger("enterFullWindow");
 };
-_V_.Player.prototype.fullWindowOnEscKey = function(event){
+vjs.Player.prototype.fullWindowOnEscKey = function(event){
   if (event.keyCode == 27) {
     if (this.isFullScreen == true) {
       this.cancelFullScreen();
@@ -652,30 +647,28 @@ _V_.Player.prototype.fullWindowOnEscKey = function(event){
   }
 };
 
-_V_.Player.prototype.exitFullWindow = function(){
+vjs.Player.prototype.exitFullWindow = function(){
   this.isFullWindow = false;
-  _V_.off(document, "keydown", this.fullWindowOnEscKey);
+  vjs.off(document, "keydown", this.fullWindowOnEscKey);
 
   // Unhide scroll bars.
   document.documentElement.style.overflow = this.docOrigOverflow;
 
   // Remove fullscreen styles
-  _V_.removeClass(document.body, "vjs-full-window");
-  _V_.removeClass(this.el_, "vjs-fullscreen");
+  vjs.removeClass(document.body, "vjs-full-window");
+  vjs.removeClass(this.el_, "vjs-fullscreen");
 
   // Resize the box, controller, and poster to original sizes
   // this.positionAll();
   this.trigger("exitFullWindow");
 };
 
-_V_.Player.prototype.selectSource = function(sources){
+vjs.Player.prototype.selectSource = function(sources){
 
   // Loop through each playback technology in the options order
-  for (var i=0,j=this.options.techOrder;i<j.length;i++) {
-    var techName = _V_.capitalize(j[i]),
-        tech = window['_V_'][techName];
-
-    var techInfo = window['_V_'][j[i]];
+  for (var i=0,j=this.options['techOrder'];i<j.length;i++) {
+    var techName = vjs.capitalize(j[i]),
+        tech = window['videojs'][techName];
 
     // Check if the browser supports this technology
     if (tech.isSupported()) {
@@ -699,7 +692,7 @@ _V_.Player.prototype.selectSource = function(sources){
 //   If the new source requires a new playback technology, it will switch to that.
 // If you pass it an object, it will set the source to object.src
 // If you pass it anything else (url string) it will set the video source to that
-_V_.Player.prototype.src = function(source){
+vjs.Player.prototype.src = function(source){
   // Case: Array of source objects to choose from and pick the best to play
   if (source instanceof Array) {
 
@@ -719,13 +712,13 @@ _V_.Player.prototype.src = function(source){
         this.loadTech(techName, source);
       }
     } else {
-      _V_.log("No compatible source and media technology were found.")
+      vjs.log("No compatible source and media technology were found.")
     }
 
   // Case: Source object { src: "", type: "" ... }
   } else if (source instanceof Object) {
 
-    if (window['_V_'][this.techName]['canPlaySource'](source)) {
+    if (window['videojs'][this.techName]['canPlaySource'](source)) {
       this.src(source.src);
     } else {
       // Send through tech loop to check for a compatible technology.
@@ -756,18 +749,18 @@ _V_.Player.prototype.src = function(source){
 
 // Begin loading the src data
 // http://dev.w3.org/html5/spec/video.html#dom-media-load
-_V_.Player.prototype.load = function(){
+vjs.Player.prototype.load = function(){
   this.techCall("load");
   return this;
 };
 
 // http://dev.w3.org/html5/spec/video.html#dom-media-currentsrc
-_V_.Player.prototype.currentSrc = function(){
+vjs.Player.prototype.currentSrc = function(){
   return this.techGet("currentSrc") || this.cache_.src || "";
 };
 
 // Attributes/Options
-_V_.Player.prototype.preload = function(value){
+vjs.Player.prototype.preload = function(value){
   if (value !== undefined) {
     this.techCall("setPreload", value);
     this.options.preload = value;
@@ -775,7 +768,7 @@ _V_.Player.prototype.preload = function(value){
   }
   return this.techGet("preload");
 };
-_V_.Player.prototype.autoplay = function(value){
+vjs.Player.prototype.autoplay = function(value){
   if (value !== undefined) {
     this.techCall("setAutoplay", value);
     this.options.autoplay = value;
@@ -783,7 +776,7 @@ _V_.Player.prototype.autoplay = function(value){
   }
   return this.techGet("autoplay", value);
 };
-_V_.Player.prototype.loop = function(value){
+vjs.Player.prototype.loop = function(value){
   if (value !== undefined) {
     this.techCall("setLoop", value);
     this.options.loop = value;
@@ -792,10 +785,10 @@ _V_.Player.prototype.loop = function(value){
   return this.techGet("loop");
 };
 
-_V_.Player.prototype.controls = function(){ return this.options.controls; };
-_V_.Player.prototype.poster = function(){ return this.techGet("poster"); };
-_V_.Player.prototype.error = function(){ return this.techGet("error"); };
-_V_.Player.prototype.ended = function(){ return this.techGet("ended"); };
+vjs.Player.prototype.controls = function(){ return this.options.controls; };
+vjs.Player.prototype.poster = function(){ return this.techGet("poster"); };
+vjs.Player.prototype.error = function(){ return this.techGet("error"); };
+vjs.Player.prototype.ended = function(){ return this.techGet("ended"); };
 
 // Methods to add support for
 // networkState: function(){ return this.techCall("networkState"); },
@@ -825,7 +818,7 @@ _V_.Player.prototype.ended = function(){ return this.techGet("ended"); };
       cancelFn,
       eventName,
       isFullScreen,
-      playerProto = _V_.Player.prototype;
+      playerProto = vjs.Player.prototype;
 
   // Current W3C Spec
   // http://dvcs.w3.org/hg/fullscreen/raw-file/tip/Overview.html#api
@@ -863,7 +856,7 @@ _V_.Player.prototype.ended = function(){ return this.techGet("ended"); };
   }
 
   if (requestFn) {
-    _V_.support.requestFullScreen = {
+    vjs.support.requestFullScreen = {
       requestFn: requestFn,
       cancelFn: cancelFn,
       eventName: eventName,
@@ -876,17 +869,15 @@ _V_.Player.prototype.ended = function(){ return this.techGet("ended"); };
 /**
  * @constructor
  */
-_V_.MediaLoader = function(player, options, ready){
-  _V_.Component.call(this, player, options, ready);
+vjs.MediaLoader = function(player, options, ready){
+  vjs.Component.call(this, player, options, ready);
 
   // If there are no sources when the player is initialized,
   // load the first supported playback technology.
   if (!player.options.sources || player.options.sources.length == 0) {
-    for (var i=0,j=player.options.techOrder; i<j.length; i++) {
-      var techName = _V_.capitalize(j[i]),
-          tech = window['_V_'][techName];
-
-      var techInfo = window['_V_'][j[i]];
+    for (var i=0,j=player.options['techOrder']; i<j.length; i++) {
+      var techName = vjs.capitalize(j[i]),
+          tech = window['videojs'][techName];
 
       // Check if the browser supports this technology
       if (tech && tech.isSupported()) {
@@ -902,6 +893,6 @@ _V_.MediaLoader = function(player, options, ready){
     player.src(player.options.sources);
   }
 };
-goog.inherits(_V_.MediaLoader, _V_.Component);
+goog.inherits(vjs.MediaLoader, vjs.Component);
 
 

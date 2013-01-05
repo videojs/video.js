@@ -1,5 +1,5 @@
 // Automatically set up any tags that have a data-setup attribute
-_V_.autoSetup = function(){
+vjs.autoSetup = function(){
   var options, vid, player,
       vids = document.getElementsByTagName("video");
 
@@ -17,40 +17,40 @@ _V_.autoSetup = function(){
         if (vid.player === undefined) {
           options = vid.getAttribute("data-setup");
 
-          // Check if data-setup attr exists. 
+          // Check if data-setup attr exists.
           // We only auto-setup if they've added the data-setup attr.
           if (options !== null) {
 
             // Parse options JSON
             // If empty string, make it a parsable json object.
-            options = JSON.parse(options || "{}");
+            options = vjs.JSON.parse(options || "{}");
 
             // Create new video.js instance.
-            player = _V_(vid, options);
+            player = videojs(vid, options);
           }
         }
 
       // If getAttribute isn't defined, we need to wait for the DOM.
       } else {
-        _V_.autoSetupTimeout(1);
+        vjs.autoSetupTimeout(1);
         break;
       }
     }
 
   // No videos were found, so keep looping unless page is finisehd loading.
-  } else if (!_V_.windowLoaded) {
-    _V_.autoSetupTimeout(1);
+  } else if (!vjs.windowLoaded) {
+    vjs.autoSetupTimeout(1);
   }
 };
 
 // Pause to let the DOM keep processing
-_V_.autoSetupTimeout = function(wait){
-  setTimeout(_V_.autoSetup, wait);
+vjs.autoSetupTimeout = function(wait){
+  setTimeout(vjs.autoSetup, wait);
 };
 
-_V_.addEvent(window, "load", function(){
-  _V_.windowLoaded = true;
+vjs.one(window, "load", function(){
+  vjs.windowLoaded = true;
 });
 
 // Run Auto-load players
-_V_.autoSetup();
+vjs.autoSetup();

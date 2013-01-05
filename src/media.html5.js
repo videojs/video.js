@@ -1,22 +1,21 @@
-goog.provide('_V_.Html5');
-goog.provide('_V_.media.html5');
-goog.provide('_V_.Html5.Supports');
-goog.provide('_V_.Html5.Events');
-goog.provide('_V_.Html5.isSupported');
-goog.provide('_V_.Html5.canPlaySource');
+goog.provide('vjs.Html5');
+goog.provide('vjs.media.html5');
+goog.provide('vjs.Html5.Events');
+goog.provide('vjs.Html5.isSupported');
+goog.provide('vjs.Html5.canPlaySource');
 
-goog.require('_V_.MediaTechController');
+goog.require('vjs.MediaTechController');
 
 /* HTML5 Media Controller - Wrapper for HTML5 Media API
-================================================================================ */
+============================================================================= */
 /**
  * HTML5 Media Controller - Wrapper for HTML5 Media API
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @param {Function=} ready
  * @constructor
  */
-_V_.Html5 = function(player, options, ready){
+vjs.Html5 = function(player, options, ready){
   goog.base(this, player, options, ready);
 
   var source = options.source;
@@ -48,16 +47,16 @@ _V_.Html5 = function(player, options, ready){
 
   this.triggerReady();
 };
-goog.inherits(_V_.Html5, _V_.MediaTechController);
+goog.inherits(vjs.Html5, vjs.MediaTechController);
 
-_V_.Html5.prototype.dispose = function(){
+vjs.Html5.prototype.dispose = function(){
   // this.player.tag = false;
   this.removeTriggers();
 
   goog.base(this, 'dispose');
 };
 
-_V_.Html5.prototype.createEl = function(){
+vjs.Html5.prototype.createEl = function(){
   var player = this.player,
       // If possible, reuse original tag for HTML5 playback technology element
       el = player.tag,
@@ -66,20 +65,20 @@ _V_.Html5.prototype.createEl = function(){
   // Check if this browser supports moving the element into the box.
   // On the iPhone video will break if you move the element,
   // So we have to create a brand new element.
-  if (!el || _V_.Html5.Supports.movingElementInDOM === false) {
+  if (!el || this.features.movingMediaElementInDOM === false) {
 
     // If the original tag is still there, remove it.
     if (el) {
       player.getEl().removeChild(el);
     }
 
-    newEl = _V_.createElement("video", {
+    newEl = vjs.createElement("video", {
       id: el.id || player.id + "_html5_api",
       className: el.className || "vjs-tech"
     });
 
     el = newEl;
-    _V_.insertFirst(el, player.el);
+    vjs.insertFirst(el, player.el);
   }
 
   // Update specific tag settings, in case they were overridden
@@ -97,50 +96,50 @@ _V_.Html5.prototype.createEl = function(){
 
 // Make video events trigger player events
 // May seem verbose here, but makes other APIs possible.
-_V_.Html5.prototype.setupTriggers = function(){
-  for (var i = _V_.Html5.Events.length - 1; i >= 0; i--) {
-    _V_.on(this.el_, _V_.Html5.Events[i], _V_.bind(this.player, this.eventHandler));
+vjs.Html5.prototype.setupTriggers = function(){
+  for (var i = vjs.Html5.Events.length - 1; i >= 0; i--) {
+    vjs.on(this.el_, vjs.Html5.Events[i], vjs.bind(this.player, this.eventHandler));
   };
 };
-_V_.Html5.prototype.removeTriggers = function(){
-  for (var i = _V_.Html5.Events.length - 1; i >= 0; i--) {
-    _V_.off(this.el_, _V_.Html5.Events[i], _V_.bind(this.player, this.eventHandler));
+vjs.Html5.prototype.removeTriggers = function(){
+  for (var i = vjs.Html5.Events.length - 1; i >= 0; i--) {
+    vjs.off(this.el_, vjs.Html5.Events[i], vjs.bind(this.player, this.eventHandler));
   };
-  // console.log("removeTriggers", _V_.getData(this.el_));
+  // console.log("removeTriggers", vjs.getData(this.el_));
 };
-_V_.Html5.prototype.eventHandler = function(e){
+vjs.Html5.prototype.eventHandler = function(e){
   // console.log('eventHandler', e.type, e, this.el_)
   this.trigger(e);
   e.stopPropagation();
 };
 
 
-_V_.Html5.prototype.play = function(){ this.el_.play(); };
-_V_.Html5.prototype.pause = function(){ this.el_.pause(); };
-_V_.Html5.prototype.paused = function(){ return this.el_.paused; };
+vjs.Html5.prototype.play = function(){ this.el_.play(); };
+vjs.Html5.prototype.pause = function(){ this.el_.pause(); };
+vjs.Html5.prototype.paused = function(){ return this.el_.paused; };
 
-_V_.Html5.prototype.currentTime = function(){ return this.el_.currentTime; };
-_V_.Html5.prototype.setCurrentTime = function(seconds){
+vjs.Html5.prototype.currentTime = function(){ return this.el_.currentTime; };
+vjs.Html5.prototype.setCurrentTime = function(seconds){
   try {
     this.el_.currentTime = seconds;
   } catch(e) {
-    _V_.log(e, "Video isn't ready. (Video.js)");
+    vjs.log(e, "Video isn't ready. (Video.js)");
     // this.warning(VideoJS.warnings.videoNotReady);
   }
 };
 
-_V_.Html5.prototype.duration = function(){ return this.el_.duration || 0; };
-_V_.Html5.prototype.buffered = function(){ return this.el_.buffered; };
+vjs.Html5.prototype.duration = function(){ return this.el_.duration || 0; };
+vjs.Html5.prototype.buffered = function(){ return this.el_.buffered; };
 
-_V_.Html5.prototype.volume = function(){ return this.el_.volume; };
-_V_.Html5.prototype.setVolume = function(percentAsDecimal){ this.el_.volume = percentAsDecimal; };
-_V_.Html5.prototype.muted = function(){ return this.el_.muted; };
-_V_.Html5.prototype.setMuted = function(muted){ this.el_.muted = muted; };
+vjs.Html5.prototype.volume = function(){ return this.el_.volume; };
+vjs.Html5.prototype.setVolume = function(percentAsDecimal){ this.el_.volume = percentAsDecimal; };
+vjs.Html5.prototype.muted = function(){ return this.el_.muted; };
+vjs.Html5.prototype.setMuted = function(muted){ this.el_.muted = muted; };
 
-_V_.Html5.prototype.width = function(){ return this.el_.offsetWidth; };
-_V_.Html5.prototype.height = function(){ return this.el_.offsetHeight; };
+vjs.Html5.prototype.width = function(){ return this.el_.offsetWidth; };
+vjs.Html5.prototype.height = function(){ return this.el_.offsetHeight; };
 
-_V_.Html5.prototype.supportsFullScreen = function(){
+vjs.Html5.prototype.supportsFullScreen = function(){
   if (typeof this.el_.webkitEnterFullScreen == 'function') {
 
     // Seems to be broken in Chromium/Chrome && Safari in Leopard
@@ -151,46 +150,46 @@ _V_.Html5.prototype.supportsFullScreen = function(){
   return false;
 };
 
-_V_.Html5.prototype.enterFullScreen = function(){
+vjs.Html5.prototype.enterFullScreen = function(){
   try {
     this.el_.webkitEnterFullScreen();
   } catch (e) {
     if (e.code == 11) {
       // this.warning(VideoJS.warnings.videoNotReady);
-      _V_.log("Video.js: Video not ready.");
+      vjs.log("Video.js: Video not ready.");
     }
   }
 };
-_V_.Html5.prototype.exitFullScreen = function(){
+vjs.Html5.prototype.exitFullScreen = function(){
     try {
       this.el_.webkitExitFullScreen();
     } catch (e) {
       if (e.code == 11) {
         // this.warning(VideoJS.warnings.videoNotReady);
-        _V_.log("Video.js: Video not ready.");
+        vjs.log("Video.js: Video not ready.");
       }
     }
 };
-_V_.Html5.prototype.src = function(src){ this.el_.src = src; };
-_V_.Html5.prototype.load = function(){ this.el_.load(); };
-_V_.Html5.prototype.currentSrc = function(){ return this.el_.currentSrc; };
+vjs.Html5.prototype.src = function(src){ this.el_.src = src; };
+vjs.Html5.prototype.load = function(){ this.el_.load(); };
+vjs.Html5.prototype.currentSrc = function(){ return this.el_.currentSrc; };
 
-_V_.Html5.prototype.preload = function(){ return this.el_.preload; };
-_V_.Html5.prototype.setPreload = function(val){ this.el_.preload = val; };
-_V_.Html5.prototype.autoplay = function(){ return this.el_.autoplay; };
-_V_.Html5.prototype.setAutoplay = function(val){ this.el_.autoplay = val; };
-_V_.Html5.prototype.loop = function(){ return this.el_.loop; };
-_V_.Html5.prototype.setLoop = function(val){ this.el_.loop = val; };
+vjs.Html5.prototype.preload = function(){ return this.el_.preload; };
+vjs.Html5.prototype.setPreload = function(val){ this.el_.preload = val; };
+vjs.Html5.prototype.autoplay = function(){ return this.el_.autoplay; };
+vjs.Html5.prototype.setAutoplay = function(val){ this.el_.autoplay = val; };
+vjs.Html5.prototype.loop = function(){ return this.el_.loop; };
+vjs.Html5.prototype.setLoop = function(val){ this.el_.loop = val; };
 
-_V_.Html5.prototype.error = function(){ return this.el_.error; };
+vjs.Html5.prototype.error = function(){ return this.el_.error; };
   // networkState: function(){ return this.el_.networkState; },
   // readyState: function(){ return this.el_.readyState; },
-_V_.Html5.prototype.seeking = function(){ return this.el_.seeking; };
+vjs.Html5.prototype.seeking = function(){ return this.el_.seeking; };
   // initialTime: function(){ return this.el_.initialTime; },
   // startOffsetTime: function(){ return this.el_.startOffsetTime; },
   // played: function(){ return this.el_.played; },
   // seekable: function(){ return this.el_.seekable; },
-_V_.Html5.prototype.ended = function(){ return this.el_.ended; };
+vjs.Html5.prototype.ended = function(){ return this.el_.ended; };
   // videoTracks: function(){ return this.el_.videoTracks; },
   // audioTracks: function(){ return this.el_.audioTracks; },
   // videoWidth: function(){ return this.el_.videoWidth; },
@@ -200,16 +199,16 @@ _V_.Html5.prototype.ended = function(){ return this.el_.ended; };
   // playbackRate: function(){ return this.el_.playbackRate; },
   // mediaGroup: function(){ return this.el_.mediaGroup; },
   // controller: function(){ return this.el_.controller; },
-_V_.Html5.prototype.controls = function(){ return this.player.options.controls; };
-_V_.Html5.prototype.defaultMuted = function(){ return this.el_.defaultMuted; };
+vjs.Html5.prototype.controls = function(){ return this.player.options.controls; };
+vjs.Html5.prototype.defaultMuted = function(){ return this.el_.defaultMuted; };
 
-/* HTML5 Support Testing -------------------------------------------------------- */
+/* HTML5 Support Testing ---------------------------------------------------- */
 
-_V_.Html5.isSupported = function(){
+vjs.Html5.isSupported = function(){
   return !!document.createElement("video").canPlayType;
 };
 
-_V_.Html5.canPlaySource = function(srcObj){
+vjs.Html5.canPlaySource = function(srcObj){
   return !!document.createElement("video").canPlayType(srcObj.type);
   // TODO: Check Type
   // If no Type, check ext
@@ -217,28 +216,31 @@ _V_.Html5.canPlaySource = function(srcObj){
 };
 
 // List of all HTML5 events (various uses).
-_V_.Html5.Events = "loadstart,suspend,abort,error,emptied,stalled,loadedmetadata,loadeddata,canplay,canplaythrough,playing,waiting,seeking,seeked,ended,durationchange,timeupdate,progress,play,pause,ratechange,volumechange".split(",");
+vjs.Html5.Events = "loadstart,suspend,abort,error,emptied,stalled,loadedmetadata,loadeddata,canplay,canplaythrough,playing,waiting,seeking,seeked,ended,durationchange,timeupdate,progress,play,pause,ratechange,volumechange".split(",");
 
 
-// HTML5 Device Fixes ---------------------------------------------------------- //
-
-_V_.Html5.Supports = {
+// HTML5 Feature detection and Device Fixes --------------------------------- //
+vjs.Html5.prototype.features = {
 
   // Support for video element specific full screen. (webkitEnterFullScreen, not requestFullscreen which we use on the player div)
   // http://developer.apple.com/library/safari/#documentation/AudioVideo/Reference/HTMLVideoElementClassReference/HTMLVideoElement/HTMLVideoElement.html
   // Seems to be broken in Chromium/Chrome && Safari in Leopard
-  'fullscreen': (_V_.TEST_VID.webkitEnterFullScreen) ? (!_V_.UA.match("Chrome") && !_V_.UA.match("Mac OS X 10.5") ? true : false) : false,
+  fullscreen: (vjs.TEST_VID.webkitEnterFullScreen)
+    ? ((!vjs.USER_AGENT.match("Chrome") && !vjs.USER_AGENT.match("Mac OS X 10.5")
+      ? true
+      : false))
+    : false,
 
   // In iOS, if you move a video element in the DOM, it breaks video playback.
-  'movingElementInDOM': !_V_.IS_IOS
+  movingMediaElementInDOM: !vjs.IS_IOS
 
 };
 
 // Android
-if (_V_.IS_ANDROID) {
+if (vjs.IS_ANDROID) {
 
   // Override Android 2.2 and less canPlayType method which is broken
-  if (_V_.ANDROID_VERSION < 3) {
+  if (vjs.ANDROID_VERSION < 3) {
     document.createElement("video").constructor.prototype.canPlayType = function(type){
       return (type && type.toLowerCase().indexOf("video/mp4") != -1) ? "maybe" : "";
     };

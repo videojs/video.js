@@ -87,7 +87,7 @@ _V_.flash = _V_.PlaybackTech.extend({
     //    Not sure why that even works, but it causes the browser to look like it's continuously trying to load the page.
     // Firefox 3.6 keeps calling the iframe onload function anytime I write to it, causing an endless loop.
 
-    if (options.iFrameMode === true && !_V_.isFF) {
+    if (options.iFrameMode === true && !_V_.IS_FIREFOX) {
 
       // Create iFrame with vjs-tech class so it's 100% width/height
       var iFrm = _V_.createElement("iframe", {
@@ -290,8 +290,8 @@ _V_.flash.prototype.support = {
   },
 
   // Optional events that we can manually mimic with timers
-  progressEvent: false,
-  timeupdateEvent: false,
+  progressEvents: false,
+  timeupdateEvents: false,
 
   // Resizing plugins using request fullscreen reloads the plugin
   fullscreenResize: false,
@@ -387,7 +387,7 @@ _V_.flash.embed = function(swf, placeHolder, flashVars, params, attributes){
 
   // IE6 seems to have an issue where it won't initialize the swf object after injecting it.
   // This is a dumb temporary fix
-  if (_V_.isIE()) {
+  if (_V_.IS_IE6to8()) {
     var newObj = par.childNodes[0];
     setTimeout(function(){
       newObj.style.display = "block";

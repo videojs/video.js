@@ -13,15 +13,15 @@
  * @param  {String}   type Type of event to bind to.
  * @param  {Function} fn   Event listener.
  */
-_V_.on = function(elem, type, fn){
-  var data = _V_.getData(elem);
+vjs.on = function(elem, type, fn){
+  var data = vjs.getData(elem);
 
   // We need a place to store all our handler data
   if (!data.handlers) data.handlers = {};
 
   if (!data.handlers[type]) data.handlers[type] = [];
 
-  if (!fn.guid) fn.guid = _V_.guid++;
+  if (!fn.guid) fn.guid = vjs.guid++;
 
   data.handlers[type].push(fn);
 
@@ -31,7 +31,7 @@ _V_.on = function(elem, type, fn){
     data.dispatcher = function (event){
 
       if (data.disabled) return;
-      event = _V_.fixEvent(event);
+      event = vjs.fixEvent(event);
 
       var handlers = data.handlers[event.type];
 
@@ -67,11 +67,11 @@ _V_.on = function(elem, type, fn){
  * @param  {String=}   type Type of listener to remove. Don't include to remove all events from element.
  * @param  {Function} fn   Specific listener to remove. Don't incldue to remove listeners for an event type.
  */
-_V_.off = function(elem, type, fn) {
+vjs.off = function(elem, type, fn) {
   // Don't want to add a cache object through getData if not needed
-  if (!_V_.hasData(elem)) return;
+  if (!vjs.hasData(elem)) return;
 
-  var data = _V_.getData(elem);
+  var data = vjs.getData(elem);
 
   // If no events exist, nothing to unbind
   if (!data.handlers) { return; }
@@ -79,7 +79,7 @@ _V_.off = function(elem, type, fn) {
   // Utility function
   var removeType = function(t){
      data.handlers[t] = [];
-     _V_.cleanUpEvents(elem,t);
+     vjs.cleanUpEvents(elem,t);
   };
 
   // Are we removing all bound events?
@@ -108,7 +108,7 @@ _V_.off = function(elem, type, fn) {
     }
   }
 
-  _V_.cleanUpEvents(elem, type);
+  vjs.cleanUpEvents(elem, type);
 };
 
 /**
@@ -116,8 +116,8 @@ _V_.off = function(elem, type, fn) {
  * @param  {Element|Object} elem Element to clean up
  * @param  {String} type Type of event to clean up
  */
-_V_.cleanUpEvents = function(elem, type) {
-  var data = _V_.getData(elem);
+vjs.cleanUpEvents = function(elem, type) {
+  var data = vjs.getData(elem);
 
   // Remove the events of a particular type if there are none left
   if (data.handlers[type].length === 0) {
@@ -134,7 +134,7 @@ _V_.cleanUpEvents = function(elem, type) {
   }
 
   // Remove the events object if there are no types left
-  if (_V_.isEmpty(data.handlers)) {
+  if (vjs.isEmpty(data.handlers)) {
     delete data.handlers;
     delete data.dispatcher;
     delete data.disabled;
@@ -145,8 +145,8 @@ _V_.cleanUpEvents = function(elem, type) {
   }
 
   // Finally remove the expando if there is no data left
-  if (_V_.isEmpty(data)) {
-    _V_.removeData(elem);
+  if (vjs.isEmpty(data)) {
+    vjs.removeData(elem);
   }
 };
 
@@ -155,7 +155,7 @@ _V_.cleanUpEvents = function(elem, type) {
  * @param  {Object} event Event object to fix
  * @return {Object}
  */
-_V_.fixEvent = function(event) {
+vjs.fixEvent = function(event) {
 
   function returnTrue() { return true; }
   function returnFalse() { return false; }
@@ -240,11 +240,11 @@ _V_.fixEvent = function(event) {
  * @param  {Element|Object} elem  Element to trigger an event on
  * @param  {String} event Type of event to trigger
  */
-_V_.trigger = function(elem, event) {
+vjs.trigger = function(elem, event) {
   // Fetches element data and a reference to the parent (for bubbling).
   // Don't want to add a data object to cache for every parent,
   // so checking hasData first.
-  var elemData = (_V_.hasData(elem)) ? _V_.getData(elem) : {};
+  var elemData = (vjs.hasData(elem)) ? vjs.getData(elem) : {};
   var parent = elem.parentNode || elem.ownerDocument;
       // type = event.type || event,
       // handler;
@@ -254,7 +254,7 @@ _V_.trigger = function(elem, event) {
     event = { type:event, target:elem };
   }
   // Normalizes the event properties.
-  event = _V_.fixEvent(event);
+  event = vjs.fixEvent(event);
 
   // If the passed element has a dispatcher, executes the established handlers.
   if (elemData.dispatcher) {
@@ -263,11 +263,11 @@ _V_.trigger = function(elem, event) {
 
   // Unless explicitly stopped, recursively calls this function to bubble the event up the DOM.
   if (parent && !event.isPropagationStopped()) {
-    _V_.trigger(parent, event);
+    vjs.trigger(parent, event);
 
   // If at the top of the DOM, triggers the default action unless disabled.
   } else if (!parent && !event.isDefaultPrevented()) {
-    var targetData = _V_.getData(event.target);
+    var targetData = vjs.getData(event.target);
 
     // Checks if the target has a default action for this event.
     if (event.target[event.type]) {
@@ -287,10 +287,10 @@ _V_.trigger = function(elem, event) {
    */
   // // Added in attion to book. Book code was broke.
   // event = typeof event === "object" ?
-  //   event[_V_.expando] ?
+  //   event[vjs.expando] ?
   //     event :
-  //     new _V_.Event(type, event) :
-  //   new _V_.Event(type);
+  //     new vjs.Event(type, event) :
+  //   new vjs.Event(type);
 
   // event.type = type;
   // if (handler) {
@@ -309,9 +309,9 @@ _V_.trigger = function(elem, event) {
  * @param  {Function} fn   [description]
  * @return {[type]}
  */
-_V_.one = function(elem, type, fn) {
-  _V_.on(elem, type, function(){
-    _V_.off(elem, type, arguments.callee)
+vjs.one = function(elem, type, fn) {
+  vjs.on(elem, type, function(){
+    vjs.off(elem, type, arguments.callee)
     fn.apply(this, arguments);
   });
 }

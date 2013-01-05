@@ -1,18 +1,19 @@
-goog.provide('_V_.Flash');
-goog.provide('_V_.media.flash');
+goog.provide('vjs.Flash');
+goog.provide('vjs.media.flash');
 
-goog.require('_V_.MediaTechController');
+goog.require('vjs.MediaTechController');
 
 /* VideoJS-SWF - Custom Flash Player with HTML5-ish API - https://github.com/zencoder/video-js-swf
+    Not using setupTriggers. Using global onEvent func to distribute events
 ================================================================================ */
 /**
  * HTML5 Media Controller - Wrapper for HTML5 Media API
- * @param {_V_.Player|Object} player
+ * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @param {Function=} ready
  * @constructor
  */
-_V_.Flash = function(player, options, ready){
+vjs.Flash = function(player, options, ready){
   goog.base(this, player, options, ready);
 
   var source = options.source,
@@ -21,51 +22,53 @@ _V_.Flash = function(player, options, ready){
       parentEl = options.parentEl,
 
       // Create a temporary element to be replaced by swf object
-      placeHolder = this.el = _V_.createElement("div", { id: parentEl.id + "_temp_flash" }),
+      placeHolder = this.el_ = vjs.createEl("div", { id: player.getId() + "_temp_flash" }),
 
       // Generate ID for swf object
-      objId = player.el.id+"_flash_api",
+      objId = player.getId()+"_flash_api",
 
       // Store player options in local var for optimization
+      // TODO: switch to using player methods instead of options
+      // e.g. player.autoplay();
       playerOptions = player.options,
 
       // Merge default flashvars with ones passed in to init
-      flashVars = _V_.merge({
+      flashVars = vjs.merge({
 
         // SWF Callback Functions
-        readyFunction: "_V_.Flash.onReady",
-        eventProxyFunction: "_V_.Flash.onEvent",
-        errorEventProxyFunction: "_V_.Flash.onError",
+        'readyFunction': "videojs.Flash.onReady",
+        'eventProxyFunction': "videojs.Flash.onEvent",
+        'errorEventProxyFunction': "videojs.Flash.onError",
 
         // Player Settings
-        autoplay: playerOptions.autoplay,
-        preload: playerOptions.preload,
-        loop: playerOptions.loop,
-        muted: playerOptions.muted
+        'autoplay': playerOptions.autoplay,
+        'preload': playerOptions.preload,
+        'loop': playerOptions.loop,
+        'muted': playerOptions.muted
 
-      }, options.flashVars),
+      }, options['flashVars']),
 
       // Merge default parames with ones passed in
-      params = _V_.merge({
-        wmode: "opaque", // Opaque is needed to overlay controls, but can affect playback performance
-        bgcolor: "#000000" // Using bgcolor prevents a white flash when the object is loading
-      }, options.params),
+      params = vjs.merge({
+        'wmode': "opaque", // Opaque is needed to overlay controls, but can affect playback performance
+        'bgcolor': "#000000" // Using bgcolor prevents a white flash when the object is loading
+      }, options['params']),
 
       // Merge default attributes with ones passed in
-      attributes = _V_.merge({
-        id: objId,
-        name: objId, // Both ID and Name needed or swf to identifty itself
+      attributes = vjs.merge({
+        'id': objId,
+        'name': objId, // Both ID and Name needed or swf to identifty itself
         'class': 'vjs-tech'
-      }, options.attributes)
+      }, options['attributes'])
   ;
 
   // If source was supplied pass as a flash var.
   if (source) {
-    flashVars.src = encodeURIComponent(_V_.getAbsoluteURL(source.src));
+    flashVars['src'] = encodeURIComponent(vjs.getAbsoluteURL(source.src));
   }
 
   // Add placeholder to player div
-  _V_.insertFirst(placeHolder, parentEl);
+  vjs.insertFirst(placeHolder, parentEl);
 
   // Having issues with Flash reloading on certain page actions (hide/resize/fullscreen) in certain browsers
   // This allows resetting the playhead when we catch the reload
@@ -97,43 +100,43 @@ _V_.Flash = function(player, options, ready){
   //    Not sure why that even works, but it causes the browser to look like it's continuously trying to load the page.
   // Firefox 3.6 keeps calling the iframe onload function anytime I write to it, causing an endless loop.
 
-  if (options.iFrameMode === true && !_V_.isFF) {
+  if (options.iFrameMode === true && !vjs.IS_FIREFOX) {
 
     // Create iFrame with vjs-tech class so it's 100% width/height
-    var iFrm = _V_.createElement("iframe", {
-      id: objId + "_iframe",
-      name: objId + "_iframe",
-      className: "vjs-tech",
-      scrolling: "no",
-      marginWidth: 0,
-      marginHeight: 0,
-      frameBorder: 0
+    var iFrm = vjs.createEl("iframe", {
+      'id': objId + "_iframe",
+      'name': objId + "_iframe",
+      'className': "vjs-tech",
+      'scrolling': "no",
+      'marginWidth': 0,
+      'marginHeight': 0,
+      'frameBorder': 0
     });
 
     // Update ready function names in flash vars for iframe window
-    flashVars.readyFunction = "ready";
-    flashVars.eventProxyFunction = "events";
-    flashVars.errorEventProxyFunction = "errors";
+    flashVars['readyFunction'] = "ready";
+    flashVars['eventProxyFunction'] = "events";
+    flashVars['errorEventProxyFunction'] = "errors";
 
     // Tried multiple methods to get this to work in all browsers
 
     // Tried embedding the flash object in the page first, and then adding a place holder to the iframe, then replacing the placeholder with the page object.
     // The goal here was to try to load the swf URL in the parent page first and hope that got around the firefox security error
-    // var newObj = _V_.Flash.embed(options.swf, placeHolder, flashVars, params, attributes);
+    // var newObj = vjs.Flash.embed(options.swf, placeHolder, flashVars, params, attributes);
     // (in onload)
-    //  var temp = _V_.createElement("a", { id:"asdf", innerHTML: "asdf" } );
+    //  var temp = vjs.createEl("a", { id:"asdf", innerHTML: "asdf" } );
     //  iDoc.body.appendChild(temp);
 
     // Tried embedding the flash object through javascript in the iframe source.
     // This works in webkit but still triggers the firefox security error
-    // iFrm.src = "javascript: document.write('"+_V_.Flash.getEmbedCode(options.swf, flashVars, params, attributes)+"');";
+    // iFrm.src = "javascript: document.write('"+vjs.Flash.getEmbedCode(options.swf, flashVars, params, attributes)+"');";
 
     // Tried an actual local iframe just to make sure that works, but it kills the easiness of the CDN version if you require the user to host an iframe
     // We should add an option to host the iframe locally though, because it could help a lot of issues.
     // iFrm.src = "iframe.html";
 
     // Wait until iFrame has loaded to write into it.
-    _V_.addEvent(iFrm, "load", _V_.proxy(this, function(){
+    vjs.on(iFrm, "load", vjs.bind(this, function(){
 
       var iDoc, objTag, swfLoc,
           iWin = iFrm.contentWindow,
@@ -145,7 +148,7 @@ _V_.Flash = function(player, options, ready){
       // I did find a hack where if I call the iframe's window.location.href="", it would get around the security error
       // However, the main page would look like it was loading indefinitely (URL bar loading spinner would never stop)
       // Plus Firefox 3.6 didn't work no matter what I tried.
-      // if (_V_.ua.match("Firefox")) {
+      // if (vjs.USER_AGENT.match("Firefox")) {
       //   iWin.location.href = "";
       // }
 
@@ -166,14 +169,14 @@ _V_.Flash = function(player, options, ready){
       // Using document.write actually got around the security error that browsers were throwing.
       // Again, it's a dynamically generated (same domain) iframe, loading an external Flash swf.
       // Not sure why that's a security issue, but apparently it is.
-      iDoc.write(_V_.Flash.getEmbedCode(options.swf, flashVars, params, attributes));
+      iDoc.write(vjs.Flash.getEmbedCode(options['swf'], flashVars, params, attributes));
 
       // Setting variables on the window needs to come after the doc write because otherwise they can get reset in some browsers
       // So far no issues with swf ready event being called before it's set on the window.
       iWin.player = this.player;
 
       // Create swf ready function for iFrame window
-      iWin.ready = _V_.proxy(this.player, function(currSwf){
+      iWin.ready = vjs.bind(this.player, function(currSwf){
         var el = iDoc.getElementById(currSwf),
             player = this,
             tech = player.tech;
@@ -182,23 +185,23 @@ _V_.Flash = function(player, options, ready){
         tech.el = el;
 
         // Now that the element is ready, make a click on the swf play the video
-        _V_.addEvent(el, "click", tech.proxy(tech.onClick));
+        vjs.on(el, "click", tech.bind(tech.onClick));
 
         // Make sure swf is actually ready. Sometimes the API isn't actually yet.
-        _V_.Flash.checkReady(tech);
+        vjs.Flash.checkReady(tech);
       });
 
       // Create event listener for all swf events
-      iWin.events = _V_.proxy(this.player, function(swfID, eventName, other){
+      iWin.events = vjs.bind(this.player, function(swfID, eventName, other){
         var player = this;
         if (player && player.techName == "flash") {
-          player.triggerEvent(eventName);
+          player.trigger(eventName);
         }
       });
 
       // Create error listener for all swf errors
-      iWin.errors = _V_.proxy(this.player, function(swfID, eventName){
-        _V_.log("Flash Error", eventName);
+      iWin.errors = vjs.bind(this.player, function(swfID, eventName){
+        vjs.log("Flash Error", eventName);
       });
 
     }));
@@ -208,98 +211,105 @@ _V_.Flash = function(player, options, ready){
 
   // If not using iFrame mode, embed as normal object
   } else {
-    _V_.Flash.embed(options.swf, placeHolder, flashVars, params, attributes);
+    vjs.Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
   }
 
 };
-goog.inherits(_V_.Flash, _V_.MediaTechController);
+goog.inherits(vjs.Flash, vjs.MediaTechController);
 
-_V_.Flash = _V_.PlaybackTech.extend({
+vjs.Flash.prototype.dispose = function(){
+  goog.base(this, 'dispose');
+};
 
-  init: function(player, options){
-  
-  },
+vjs.Flash.prototype.play = function(){
+  this.el_.vjs_play();
+}
 
-  destroy: function(){
-    this.el.parentNode.removeChild(this.el);
-  },
+vjs.Flash.prototype.pause = function(){
+  this.el_.vjs_pause();
+}
 
-  // setupTriggers: function(){}, // Using global onEvent func to distribute events
+vjs.Flash.prototype.src = function(src){
+  // Make sure source URL is abosolute.
+  src = vjs.getAbsoluteURL(src);
 
-  play: function(){ this.el.vjs_play(); },
-  pause: function(){ this.el.vjs_pause(); },
-  src: function(src){
-    // Make sure source URL is abosolute.
-    src = _V_.getAbsoluteURL(src);
+  this.el_.vjs_src(src);
 
-    this.el.vjs_src(src);
-
-    // Currently the SWF doesn't autoplay if you load a source later.
-    // e.g. Load player w/ no source, wait 2s, set src.
-    if (this.player.autoplay()) {
-      var tech = this;
-      setTimeout(function(){ tech.play(); }, 0);
-    }
-  },
-  load: function(){ this.el.vjs_load(); },
-  poster: function(){ this.el.vjs_getProperty("poster"); },
-
-  buffered: function(){
-    return _V_.createTimeRange(0, this.el.vjs_getProperty("buffered"));
-  },
-
-  supportsFullScreen: function(){
-    return false; // Flash does not allow fullscreen through javascript
-  },
-  enterFullScreen: function(){
-    return false;
+  // Currently the SWF doesn't autoplay if you load a source later.
+  // e.g. Load player w/ no source, wait 2s, set src.
+  if (this.player.autoplay()) {
+    var tech = this;
+    setTimeout(function(){ tech.play(); }, 0);
   }
-});
+}
+
+vjs.Flash.prototype.load = function(){
+  this.el_.vjs_load();
+}
+
+vjs.Flash.prototype.poster = function(){
+  this.el_.vjs_getProperty("poster");
+}
+
+vjs.Flash.prototype.buffered = function(){
+  return vjs.createTimeRange(0, this.el_.vjs_getProperty("buffered"));
+}
+
+vjs.Flash.prototype.supportsFullScreen = function(){
+  return false; // Flash does not allow fullscreen through javascript
+}
+
+vjs.Flash.prototype.enterFullScreen = function(){
+  return false;
+}
+
 
 // Create setters and getters for attributes
-(function(){
+var api = vjs.Flash.prototype,
+    readWrite = "preload,currentTime,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted".split(","),
+    readOnly = "error,currentSrc,networkState,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight,textTracks".split(","),
+    callOnly = "load,play,pause".split(",");
+    // Overridden: buffered
 
-  var api = _V_.Flash.prototype,
-      readWrite = "preload,currentTime,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted".split(","),
-      readOnly = "error,currentSrc,networkState,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight,textTracks".split(","),
-      callOnly = "load,play,pause".split(",");
-      // Overridden: buffered
+    /**
+     * @this {*}
+     */
+    createSetter = function(attr){
+      var attrUpper = attr.charAt(0).toUpperCase() + attr.slice(1);
+      api["set"+attrUpper] = function(val){ return this.el_.vjs_setProperty(attr, val); };
+    },
 
-      createSetter = function(attr){
-        var attrUpper = attr.charAt(0).toUpperCase() + attr.slice(1);
-        api["set"+attrUpper] = function(val){ return this.el.vjs_setProperty(attr, val); };
-      },
+    /**
+     * @this {*}
+     */
+    createGetter = function(attr){
+      api[attr] = function(){ return this.el_.vjs_getProperty(attr); };
+    }
+;
 
-      createGetter = function(attr){
-        api[attr] = function(){ return this.el.vjs_getProperty(attr); };
-      }
-  ;
+// Create getter and setters for all read/write attributes
+for (var i = 0; i < readWrite.length; i++) {
+  createGetter(readWrite[i]);
+  createSetter(readWrite[i]);
+};
 
-  // Create getter and setters for all read/write attributes
-  _V_.each(readWrite, function(attr){
-    createGetter(attr);
-    createSetter(attr);
-  });
-
-  // Create getters for read-only attributes
-  _V_.each(readOnly, function(attr){
-    createGetter(attr);
-  });
-
-})();
+// Create getters for read-only attributes
+for (var i = 0; i < readOnly.length; i++) {
+  createGetter(readOnly[i]);
+};
 
 /* Flash Support Testing -------------------------------------------------------- */
 
-_V_.Flash.isSupported = function(){
-  return _V_.Flash.version()[0] >= 10;
+vjs.Flash.isSupported = function(){
+  return vjs.Flash.version()[0] >= 10;
   // return swfobject.hasFlashPlayerVersion("10");
 };
 
-_V_.Flash.canPlaySource = function(srcObj){
-  if (srcObj.type in _V_.Flash.prototype.support.formats) { return "maybe"; }
+vjs.Flash.canPlaySource = function(srcObj){
+  if (srcObj.type in vjs.Flash.prototype.features.formats) { return "maybe"; }
 };
 
-_V_.Flash.prototype.support = {
+vjs.Flash.prototype.features = {
   formats: {
     "video/flv": "FLV",
     "video/x-flv": "FLV",
@@ -308,19 +318,19 @@ _V_.Flash.prototype.support = {
   },
 
   // Optional events that we can manually mimic with timers
-  progressEvent: false,
-  timeupdateEvent: false,
+  // currently not triggered by video-js-swf
+  progressEvents: false,
+  timeupdateEvents: false,
 
   // Resizing plugins using request fullscreen reloads the plugin
   fullscreenResize: false,
 
   // Resizing plugins in Firefox always reloads the plugin (e.g. full window mode)
-  parentResize: !(_V_.ua.match("Firefox"))
+  parentResize: !(vjs.USER_AGENT.match("Firefox"))
 };
 
-_V_.Flash.onReady = function(currSwf){
-
-  var el = _V_.el(currSwf);
+vjs.Flash['onReady'] = function(currSwf){
+  var el = vjs.el(currSwf);
 
   // Get player from box
   // On firefox reloads, el might already have a player
@@ -331,20 +341,20 @@ _V_.Flash.onReady = function(currSwf){
   el.player = player;
 
   // Update reference to playback technology element
-  tech.el = el;
+  tech.el_ = el;
 
   // Now that the element is ready, make a click on the swf play the video
-  tech.addEvent("click", tech.onClick);
+  tech.on("click", tech.onClick);
 
-  _V_.Flash.checkReady(tech);
+  vjs.Flash.checkReady(tech);
 };
 
 // The SWF isn't alwasy ready when it says it is. Sometimes the API functions still need to be added to the object.
 // If it's not ready, we set a timeout to check again shortly.
-_V_.Flash.checkReady = function(tech){
+vjs.Flash.checkReady = function(tech){
 
   // Check if API property exists
-  if (tech.el.vjs_getProperty) {
+  if (tech.getEl().vjs_getProperty) {
 
     // If so, tell tech it's ready
     tech.triggerReady();
@@ -353,27 +363,27 @@ _V_.Flash.checkReady = function(tech){
   } else {
 
     setTimeout(function(){
-      _V_.Flash.checkReady(tech);
+      vjs.Flash.checkReady(tech);
     }, 50);
 
   }
 };
 
 // Trigger events from the swf on the player
-_V_.Flash.onEvent = function(swfID, eventName){
-  var player = _V_.el(swfID).player;
-  player.triggerEvent(eventName);
+vjs.Flash['onEvent'] = function(swfID, eventName){
+  var player = vjs.el(swfID).player;
+  player.trigger(eventName);
 };
 
 // Log errors from the swf
-_V_.Flash.onError = function(swfID, err){
-  var player = _V_.el(swfID).player;
-  player.triggerEvent("error");
-  _V_.log("Flash Error", err, swfID);
+vjs.Flash['onError'] = function(swfID, err){
+  var player = vjs.el(swfID).player;
+  player.trigger("error");
+  vjs.log("Flash Error", err, swfID);
 };
 
 // Flash Version Check
-_V_.Flash.version = function(){
+vjs.Flash.version = function(){
   var version = '0,0,0';
 
   // IE
@@ -392,11 +402,11 @@ _V_.Flash.version = function(){
 };
 
 // Flash embedding method. Only used in non-iframe mode
-_V_.Flash.embed = function(swf, placeHolder, flashVars, params, attributes){
-  var code = _V_.Flash.getEmbedCode(swf, flashVars, params, attributes),
+vjs.Flash.embed = function(swf, placeHolder, flashVars, params, attributes){
+  var code = vjs.Flash.getEmbedCode(swf, flashVars, params, attributes),
 
       // Get element by embedding code and retrieving created element
-      obj = _V_.createElement("div", { innerHTML: code }).childNodes[0],
+      obj = vjs.createEl("div", { innerHTML: code }).childNodes[0],
 
       par = placeHolder.parentNode
   ;
@@ -405,7 +415,7 @@ _V_.Flash.embed = function(swf, placeHolder, flashVars, params, attributes){
 
   // IE6 seems to have an issue where it won't initialize the swf object after injecting it.
   // This is a dumb temporary fix
-  if (_V_.isIE()) {
+  if (vjs.IS_IE6to8()) {
     var newObj = par.childNodes[0];
     setTimeout(function(){
       newObj.style.display = "block";
@@ -416,7 +426,7 @@ _V_.Flash.embed = function(swf, placeHolder, flashVars, params, attributes){
 
 };
 
-_V_.Flash.getEmbedCode = function(swf, flashVars, params, attributes){
+vjs.Flash.getEmbedCode = function(swf, flashVars, params, attributes){
 
   var objTag = '<object type="application/x-shockwave-flash"',
       flashVarsString = '',
@@ -425,36 +435,36 @@ _V_.Flash.getEmbedCode = function(swf, flashVars, params, attributes){
 
   // Convert flash vars to string
   if (flashVars) {
-    _V_.eachProp(flashVars, function(key, val){
+    vjs.eachProp(flashVars, function(key, val){
       flashVarsString += (key + "=" + val + "&amp;");
     });
   }
 
   // Add swf, flashVars, and other default params
-  params = _V_.merge({
-    movie: swf,
-    flashvars: flashVarsString,
-    allowScriptAccess: "always", // Required to talk to swf
-    allowNetworking: "all" // All should be default, but having security issues.
+  params = vjs.merge({
+    'movie': swf,
+    'flashvars': flashVarsString,
+    'allowScriptAccess': "always", // Required to talk to swf
+    'allowNetworking': "all" // All should be default, but having security issues.
   }, params);
 
   // Create param tags string
-  _V_.eachProp(params, function(key, val){
+  vjs.eachProp(params, function(key, val){
     paramsString += '<param name="'+key+'" value="'+val+'" />';
   });
 
-  attributes = _V_.merge({
+  attributes = vjs.merge({
     // Add swf to attributes (need both for IE and Others to work)
-    data: swf,
+    'data': swf,
 
     // Default to 100% width/height
-    width: "100%",
-    height: "100%"
+    'width': "100%",
+    'height': "100%"
 
   }, attributes);
 
   // Create Attributes string
-  _V_.eachProp(attributes, function(key, val){
+  vjs.eachProp(attributes, function(key, val){
     attrsString += (key + '="' + val + '" ');
   });
 
