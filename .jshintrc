@@ -1,16 +1,23 @@
 {
+    // Hopefully people are smart enough not to use eval
+    // But goog.base uses execScript so it throws an error.
+    // When compiled goog.base is stripped out completely.
+    "evil" : true,
     "validthis": true,
     "browser"  : true,
     "debug"    : true,
     "boss"     : true,
     "expr"     : true,
     "eqnull"   : true,
-    "quotmark" : "double",
+    "quotmark" : "single",
     "sub"      : true,
     "trailing" : true,
     "undef"    : true,
+    "laxbreak" : true,
     "predef"   : [  // Extra globals.
         "_V_",
-        "VideoJS"
+        "videojs",
+        "vjs",
+        "goog"
     ]
 }

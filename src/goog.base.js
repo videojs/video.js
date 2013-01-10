@@ -426,9 +426,10 @@ goog.nullFunction = function() {};
  *      without type.
  * @deprecated Use goog.functions.identity instead.
  */
-goog.identityFunction = function(opt_returnValue, var_args) {
-  return opt_returnValue;
-};
+// Currently not used in Video.js and throwing jshint errors
+// goog.identityFunction = function(opt_returnValue, var_args) {
+//   return opt_returnValue;
+// };
 
 
 /**
@@ -458,18 +459,19 @@ goog.abstractMethod = function() {
  * @param {!Function} ctor The constructor for the class to add the static
  *     method to.
  */
-goog.addSingletonGetter = function(ctor) {
-  ctor.getInstance = function() {
-    if (ctor.instance_) {
-      return ctor.instance_;
-    }
-    if (goog.DEBUG) {
-      // NOTE: JSCompiler can't optimize away Array#push.
-      goog.instantiatedSingletons_[goog.instantiatedSingletons_.length] = ctor;
-    }
-    return ctor.instance_ = new ctor;
-  };
-};
+// Currently not used in Video.js and throwing jshint errors
+// goog.addSingletonGetter = function(ctor) {
+//   ctor.getInstance = function() {
+//     if (ctor.instance_) {
+//       return ctor.instance_;
+//     }
+//     if (goog.DEBUG) {
+//       // NOTE: JSCompiler can't optimize away Array#push.
+//       goog.instantiatedSingletons_[goog.instantiatedSingletons_.length] = ctor;
+//     }
+//     return ctor.instance_ = new ctor;
+//   };
+// };
 
 
 /**
@@ -1043,9 +1045,10 @@ goog.cloneObject = function(obj) {
  *     is deprecated because some people have declared a pure-JS version.
  *     Only the pure-JS version is truly deprecated.
  */
-goog.bindNative_ = function(fn, selfObj, var_args) {
-  return /** @type {!Function} */ (fn.call.apply(fn.bind, arguments));
-};
+// Currently not used in Video.js and throwing errors
+// goog.bindNative_ = function(fn, selfObj, var_args) {
+//   return /** @type {!Function} */ (fn.call.apply(fn.bind, arguments));
+// };
 
 
 /**
@@ -1059,26 +1062,26 @@ goog.bindNative_ = function(fn, selfObj, var_args) {
  *     invoked as a method of.
  * @private
  */
-goog.bindJs_ = function(fn, selfObj, var_args) {
-  if (!fn) {
-    throw new Error();
-  }
+// goog.bindJs_ = function(fn, selfObj, var_args) {
+//   if (!fn) {
+//     throw new Error();
+//   }
 
-  if (arguments.length > 2) {
-    var boundArgs = Array.prototype.slice.call(arguments, 2);
-    return function() {
-      // Prepend the bound arguments to the current arguments.
-      var newArgs = Array.prototype.slice.call(arguments);
-      Array.prototype.unshift.apply(newArgs, boundArgs);
-      return fn.apply(selfObj, newArgs);
-    };
+//   if (arguments.length > 2) {
+//     var boundArgs = Array.prototype.slice.call(arguments, 2);
+//     return function() {
+//       // Prepend the bound arguments to the current arguments.
+//       var newArgs = Array.prototype.slice.call(arguments);
+//       Array.prototype.unshift.apply(newArgs, boundArgs);
+//       return fn.apply(selfObj, newArgs);
+//     };
 
-  } else {
-    return function() {
-      return fn.apply(selfObj, arguments);
-    };
-  }
-};
+//   } else {
+//     return function() {
+//       return fn.apply(selfObj, arguments);
+//     };
+//   }
+// };
 
 
 /**
@@ -1104,23 +1107,23 @@ goog.bindJs_ = function(fn, selfObj, var_args) {
  *     invoked as a method of.
  * @suppress {deprecated} See above.
  */
-goog.bind = function(fn, selfObj, var_args) {
-  // TODO(nicksantos): narrow the type signature.
-  if (Function.prototype.bind &&
-      // NOTE(nicksantos): Somebody pulled base.js into the default
-      // Chrome extension environment. This means that for Chrome extensions,
-      // they get the implementation of Function.prototype.bind that
-      // calls goog.bind instead of the native one. Even worse, we don't want
-      // to introduce a circular dependency between goog.bind and
-      // Function.prototype.bind, so we have to hack this to make sure it
-      // works correctly.
-      Function.prototype.bind.toString().indexOf('native code') != -1) {
-    goog.bind = goog.bindNative_;
-  } else {
-    goog.bind = goog.bindJs_;
-  }
-  return goog.bind.apply(null, arguments);
-};
+// goog.bind = function(fn, selfObj, var_args) {
+//   // TODO(nicksantos): narrow the type signature.
+//   if (Function.prototype.bind &&
+//       // NOTE(nicksantos): Somebody pulled base.js into the default
+//       // Chrome extension environment. This means that for Chrome extensions,
+//       // they get the implementation of Function.prototype.bind that
+//       // calls goog.bind instead of the native one. Even worse, we don't want
+//       // to introduce a circular dependency between goog.bind and
+//       // Function.prototype.bind, so we have to hack this to make sure it
+//       // works correctly.
+//       Function.prototype.bind.toString().indexOf('native code') != -1) {
+//     goog.bind = goog.bindNative_;
+//   } else {
+//     goog.bind = goog.bindJs_;
+//   }
+//   return goog.bind.apply(null, arguments);
+// };
 
 
 /**
@@ -1137,15 +1140,15 @@ goog.bind = function(fn, selfObj, var_args) {
  * @return {!Function} A partially-applied form of the function bind() was
  *     invoked as a method of.
  */
-goog.partial = function(fn, var_args) {
-  var args = Array.prototype.slice.call(arguments, 1);
-  return function() {
-    // Prepend the bound arguments to the current arguments.
-    var newArgs = Array.prototype.slice.call(arguments);
-    newArgs.unshift.apply(newArgs, args);
-    return fn.apply(this, newArgs);
-  };
-};
+// goog.partial = function(fn, var_args) {
+//   var args = Array.prototype.slice.call(arguments, 1);
+//   return function() {
+//     // Prepend the bound arguments to the current arguments.
+//     var newArgs = Array.prototype.slice.call(arguments);
+//     newArgs.unshift.apply(newArgs, args);
+//     return fn.apply(this, newArgs);
+//   };
+// };
 
 
 /**
@@ -1186,38 +1189,39 @@ goog.now = Date.now || (function() {
  * Throws an exception if neither execScript or eval is defined.
  * @param {string} script JavaScript string.
  */
-goog.globalEval = function(script) {
-  if (goog.global.execScript) {
-    goog.global.execScript(script, 'JavaScript');
-  } else if (goog.global.eval) {
-    // Test to see if eval works
-    if (goog.evalWorksForGlobals_ == null) {
-      goog.global.eval('var _et_ = 1;');
-      if (typeof goog.global['_et_'] != 'undefined') {
-        delete goog.global['_et_'];
-        goog.evalWorksForGlobals_ = true;
-      } else {
-        goog.evalWorksForGlobals_ = false;
-      }
-    }
+// Currently not used in Video.js and throwing jshint errors
+// goog.globalEval = function(script) {
+//   if (goog.global.execScript) {
+//     goog.global.execScript(script, 'JavaScript');
+//   } else if (goog.global.eval) {
+//     // Test to see if eval works
+//     if (goog.evalWorksForGlobals_ == null) {
+//       goog.global.eval('var _et_ = 1;');
+//       if (typeof goog.global['_et_'] != 'undefined') {
+//         delete goog.global['_et_'];
+//         goog.evalWorksForGlobals_ = true;
+//       } else {
+//         goog.evalWorksForGlobals_ = false;
+//       }
+//     }
 
-    if (goog.evalWorksForGlobals_) {
-      goog.global.eval(script);
-    } else {
-      var doc = goog.global.document;
-      var scriptElt = doc.createElement('script');
-      scriptElt.type = 'text/javascript';
-      scriptElt.defer = false;
-      // Note(user): can't use .innerHTML since "t('<test>')" will fail and
-      // .text doesn't work in Safari 2.  Therefore we append a text node.
-      scriptElt.appendChild(doc.createTextNode(script));
-      doc.body.appendChild(scriptElt);
-      doc.body.removeChild(scriptElt);
-    }
-  } else {
-    throw Error('goog.globalEval not available');
-  }
-};
+//     if (goog.evalWorksForGlobals_) {
+//       goog.global.eval(script);
+//     } else {
+//       var doc = goog.global.document;
+//       var scriptElt = doc.createElement('script');
+//       scriptElt.type = 'text/javascript';
+//       scriptElt.defer = false;
+//       // Note(user): can't use .innerHTML since "t('<test>')" will fail and
+//       // .text doesn't work in Safari 2.  Therefore we append a text node.
+//       scriptElt.appendChild(doc.createTextNode(script));
+//       doc.body.appendChild(scriptElt);
+//       doc.body.removeChild(scriptElt);
+//     }
+//   } else {
+//     throw Error('goog.globalEval not available');
+//   }
+// };
 
 
 /**
@@ -1407,9 +1411,9 @@ goog.getMsg = function(str, opt_values) {
  * @param {string} b The fallback message.
  * @return {string} The best translated message.
  */
-goog.getMsgWithFallback = function(a, b) {
-  return a;
-};
+// goog.getMsgWithFallback = function(a, b) {
+//   return a;
+// };
 
 
 /**
@@ -1486,7 +1490,7 @@ goog.exportProperty = function(object, publicName, symbol) {
  */
 goog.inherits = function(childCtor, parentCtor) {
   /** @constructor */
-  function tempCtor() {};
+  function tempCtor() {}
   tempCtor.prototype = parentCtor.prototype;
   childCtor.superClass_ = parentCtor.prototype;
   childCtor.prototype = new tempCtor();
@@ -1521,6 +1525,7 @@ goog.inherits = function(childCtor, parentCtor) {
  * @return {*} The return value of the superclass method.
  */
 goog.base = function(me, opt_methodName, var_args) {
+  var_args = var_args; // Hiding JSHint unused var warning without killing check
   var caller = arguments.callee.caller;
   if (caller.superClass_) {
     // This is a constructor. Call the superclass constructor.

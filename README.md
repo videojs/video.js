@@ -1,7 +1,15 @@
-[Video.js - HTML5 Video Player](http://videojs.com)  [![Build Status](https://travis-ci.org/zencoder/video-js.png?branch=master)](https://travis-ci.org/zencoder/video-js)
+[Video.js - HTML5 and Flash Video Player](http://videojs.com)  [![Build Status](https://travis-ci.org/zencoder/video-js.png?branch=master)](https://travis-ci.org/zencoder/video-js)
 ==================================================
 
 Visit the main site at [videojs.com](http://videojs.com) for download options and instructions.
+
+Video.js was built to provide a fast and easy way to embed and work with video in a web page. It was built from the ground up with the assumption that HTML5 is the future of web video, however it supports Flash equally well for older browsers and for advanced features not yet supported in HTML5.
+
+Some of the focuses of Video.js are:
+- Universal browser and device support
+- Easily skinned (themed/chromed) using just CSS
+- A JavaScript API for controlling the video that works consistently across video platforms (HTML5, Flash, and others) as well as devices
+- A common skin and API between HTML5, Flash, and potentially other players like YouTube
 
 To build video-js from the latest version of the source, clone the source repository and run:
 sh build.sh

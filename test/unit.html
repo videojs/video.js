@@ -4,8 +4,8 @@
   <title>Video.js Test Suite</title>
 
   <!-- QUnit -->
-  <link rel="stylesheet" href="vendor/qunit/qunit/qunit.css" />
-  <script src="vendor/qunit/qunit/qunit.js"></script>
+  <link rel="stylesheet" href="../test/vendor/qunit/qunit/qunit.css" />
+  <script src="../test/vendor/qunit/qunit/qunit.js"></script>
 
   <!-- phantomjs logging script-->
   <script src="unit/phantom-logging.js"></script>
@@ -14,27 +14,28 @@
   <link rel="stylesheet" href="../design/video-js.css" type="text/css">
 
   <!-- Video.js JavaScript -->
+  <script src='../src/goog.base.js'></script>
   <script src='../src/core.js'></script>
   <script src='../src/lib.js'></script>
-  <script src='../src/component.js'></script>
-  <script src='../src/controls.js'></script>
   <script src='../src/events.js'></script>
-  <script src='../src/json.js'></script>
+  <script src='../src/component.js'></script>
   <script src='../src/player.js'></script>
-  <script src='../src/tech.js'></script>
+  <script src='../src/media.js'></script>
+  <script src='../src/media.html5.js'></script>
+  <script src='../src/media.flash.js'></script>
+  <script src='../src/controls.js'></script>
   <script src='../src/tracks.js'></script>
-
-  <script src='../tech/html5/html5.js'></script>
-  <script src='../tech/flash/flash.js'></script>
-
   <script src='../src/setup.js'></script>
 
   <!-- Unit Tests -->
-  <script src="unit/component.js"></script>
-  <script src="unit/controls.js"></script>
-  <script src="unit/player.js"></script>
   <script src="unit/lib.js"></script>
+  <script src="unit/events.js"></script>
+  <script src="unit/component.js"></script>
+  <script src="unit/player.js"></script>
+  <script src="unit/core.js"></script>
+  <script src="unit/media.html5.js"></script>
 
+<!--  -->
 </head>
 <body>
   <div>

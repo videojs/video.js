@@ -22,7 +22,7 @@ With the self hosted option you'll also want to update the location of the video
 <link href="http://example.com/path/to/video-js.css" rel="stylesheet">
 <script src="http://example.com/path/to/video.js"></script>
 <script>
-  _V_.options.Flash.swf = "http://example.com/path/to/video-js.swf"
+  _V_.options.flash.swf = "http://example.com/path/to/video-js.swf"
 </script>
 ```
 

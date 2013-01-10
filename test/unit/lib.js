@@ -1,69 +1,184 @@
 module("Lib");
 
-test('should merge two objects', function(){
-  var obj1 = { a:1, b:2 };
-  var obj2 = { b:3, c:4 };
-
-  _V_.merge(obj1, obj2);
-
-  deepEqual(obj1, {a:1,b:3,c:4} );
+test('should create an element', function(){
+  var div = vjs.createEl();
+  var span = vjs.createEl('span', { "data-test": "asdf", innerHTML:'fdsa' })
+  ok(div.nodeName === 'DIV');
+  ok(span.nodeName === 'SPAN');
+  ok(span['data-test'] === 'asdf');
+  ok(span.innerHTML === "fdsa");
 });
 
-test('should create an element with attributes', function(){
-  var el = _V_.createElement('div', { className: 'test-class', 'data-test': 'asdf' })
-  ok(el.className === 'test-class');
-  ok(el.getAttribute('data-test') === 'asdf' );
+test('should make a string start with an uppercase letter', function(){
+  var foo = vjs.capitalize('bar')
+  ok(foo === 'Bar');
 });
 
-test('should insert an element first', function(){
+test('should loop through each property on an object', function(){
+  var asdf = {
+    a: 1,
+    b: 2,
+    'c': 3
+  }
+
+  // Add 3 to each value
+  vjs.eachProp(asdf, function(key, value){
+    asdf[key] = value + 3;
+  });
+
+  deepEqual(asdf,{a:4,b:5,'c':6})
+});
+
+test('should add context to a function', function(){
+  var newContext = { test: 'obj'};
+  var asdf = function(){
+    ok(this === newContext);
+  }
+  var fdsa = vjs.bind(newContext, asdf);
+
+  fdsa();
+});
+
+test('should add and remove a class name on an element', function(){
+  var el = document.createElement('div');
+  vjs.addClass(el, 'test-class')
+  ok(el.className === 'test-class', 'class added');
+  vjs.addClass(el, 'test-class')
+  ok(el.className === 'test-class', 'same class not duplicated');
+  vjs.addClass(el, 'test-class2')
+  ok(el.className === 'test-class test-class2', 'added second class');
+  vjs.removeClass(el, 'test-class')
+  ok(el.className === 'test-class2', 'removed first class');
+});
+
+test('should get and remove data from an element', function(){
+  var el = document.createElement('div');
+  var data = vjs.getData(el);
+  var id = el[vjs.expando];
+
+  ok(typeof data === 'object', 'data object created');
+
+  // Add data
+  var testData = { asdf: 'fdsa' };
+  data.test = testData;
+  ok(vjs.getData(el).test === testData, 'data added');
+
+  // Remove all data
+  vjs.removeData(el);
+
+  ok(!vjs.cache[id], 'cached item nulled')
+  ok(el[vjs.expando] === null || el[vjs.expando] === undefined, 'element data id removed')
+});
+
+test('should read tag attributes from elements, including HTML5 in all browsers', function(){
+  var container = document.createElement('div');
+
+  var tags = '<video id="vid1" controls autoplay loop muted preload="none" src="http://google.com" poster="http://www2.videojs.com/img/video-js-html5-video-player.png" data-test="asdf" data-empty-string=""></video>';
+  tags += '<video id="vid2">';
+  // Not putting source and track inside video element because
+  // oldIE needs the HTML5 shim to read tags inside HTML5 tags.
+  // Still may not work in oldIE.
+  tags += '<source id="source" src="http://google.com" type="video/mp4" media="fdsa" title="test" >';
+  tags += '<track id="track" default src="http://google.com" kind="captions" srclang="en" label="testlabel" title="test" >';
+  container.innerHTML += tags;
+  document.getElementById('qunit-fixture').appendChild(container);
+
+  var vid1Vals = vjs.getAttributeValues(document.getElementById('vid1'));
+  var vid2Vals = vjs.getAttributeValues(document.getElementById('vid2'));
+  var sourceVals = vjs.getAttributeValues(document.getElementById('source'));
+  var trackVals = vjs.getAttributeValues(document.getElementById('track'));
+
+  deepEqual(vid1Vals, { 'autoplay': true, 'controls': true, 'data-test': "asdf", 'data-empty-string': "", 'id': "vid1", 'loop': true, 'muted': true, 'poster': "http://www2.videojs.com/img/video-js-html5-video-player.png", 'preload': "none", 'src': "http://google.com" });
+  deepEqual(vid2Vals, { 'id': "vid2" });
+  deepEqual(sourceVals, {'title': "test", 'media': "fdsa", 'type': "video/mp4", 'src': "http://google.com", 'id': "source" });
+  deepEqual(trackVals, { "default": true, /* IE no likey default key */ 'id': "track", 'kind': "captions", 'label': "testlabel", 'src': "http://google.com", 'srclang': "en", 'title': "test" });
+});
+
+test('should get the right style values for an element', function(){
+  var el = document.createElement('div');
+  var container = document.createElement('div');
+  var fixture = document.getElementById('qunit-fixture')
+
+  container.appendChild(el);
+  fixture.appendChild(container);
+
+  container.style.width = "1000px";
+  container.style.height = "1000px";
+
+  el.style.height = "100%";
+  el.style.width = "123px";
+
+  ok(vjs.getComputedStyleValue(el, 'height') === '1000px');
+  ok(vjs.getComputedStyleValue(el, 'width') === '123px');
+});
+
+test('should insert an element first in another', function(){
   var el1 = document.createElement('div');
   var el2 = document.createElement('div');
-  var el3 = document.createElement('div');
+  var parent = document.createElement('div');
 
-  _V_.insertFirst(el2, el1);
-  ok(el1.childNodes[0] === el2);
-  _V_.insertFirst(el3, el1);
-  ok(el1.childNodes[0] === el3);
+  vjs.insertFirst(el1, parent)
+  ok(parent.firstChild === el1, 'inserts first into empty parent');
+
+  vjs.insertFirst(el2, parent)
+  ok(parent.firstChild === el2, 'inserts first into parent with child');
 });
 
-test('should add and remove a CSS class', function(){
-  var el = document.createElement('div');
+test('should return the element with the ID', function(){
+  var el1 = document.createElement('div');
+  var el2 = document.createElement('div');
+  var fixture = document.getElementById('qunit-fixture');
 
-  _V_.addClass(el, 'test-class')
-  ok(el.className.indexOf('test-class') !== -1);
-  _V_.removeClass(el, 'test-class')
-  ok(el.className.indexOf('test-class') === -1);
+  fixture.appendChild(el1);
+  fixture.appendChild(el2);
+
+  el1.id = 'test_id1';
+  el2.id = 'test_id2';
+
+  ok(vjs.el("test_id1") === el1, 'found element for ID');
+  ok(vjs.el("#test_id2") === el2, 'found element for CSS ID');
 });
 
-test('should format the time', function(){
-  ok(_V_.formatTime(120) === "2:00");
-  ok(_V_.formatTime(18121) === "5:02:01");
-});
-
-test('should uppercase a word', function(){
-  ok(_V_.capitalize('asdf') === "Asdf");
-});
-
-test('should trim a string', function(){
-  ok(_V_.trim(' asdf ') === "asdf");
+test('should trim whitespace from a string', function(){
+  ok(vjs.trim(' asdf asdf asdf   \t\n\r') === 'asdf asdf asdf');
 });
 
 test('should round a number', function(){
-  ok(_V_.round(1.01) === 1);
-  ok(_V_.round(1.01, 1) === 1.0);
-  ok(_V_.round(1.01, 2) === 1.01);
-  ok(_V_.round(1.05, 1) === 1.1);
+  ok(vjs.round(1.01) === 1);
+  ok(vjs.round(1.5) === 2);
+  ok(vjs.round(1.55, 2) === 1.55);
+  ok(vjs.round(10.551, 2) === 10.55);
 });
 
-test('should test that an object is empty', function(){
-  ok(_V_.isEmpty({}) === true);
-  ok(_V_.isEmpty({ asdf: 'asdf' }) === false);
+test('should format time as a string', function(){
+  ok(vjs.formatTime(1) === "0:01");
+  ok(vjs.formatTime(10) === "0:10");
+  ok(vjs.formatTime(60) === "1:00");
+  ok(vjs.formatTime(600) === "10:00");
+  ok(vjs.formatTime(3600) === "1:00:00");
+  ok(vjs.formatTime(36000) === "10:00:00");
+  ok(vjs.formatTime(360000) === "100:00:00");
+
+  // Using guide should provide extra leading zeros
+  ok(vjs.formatTime(1,1) === "0:01");
+  ok(vjs.formatTime(1,10) === "0:01");
+  ok(vjs.formatTime(1,60) === "0:01");
+  ok(vjs.formatTime(1,600) === "00:01");
+  ok(vjs.formatTime(1,3600) === "0:00:01");
+  // Don't do extra leading zeros for hours
+  ok(vjs.formatTime(1,36000) === "0:00:01");
+  ok(vjs.formatTime(1,360000) === "0:00:01");
 });
 
 test('should create a fake timerange', function(){
-  var tr = _V_.createTimeRange(0, 100);
-
+  var tr = vjs.createTimeRange(0, 10);
   ok(tr.start() === 0);
-  ok(tr.end() === 100);
-  ok(tr.length === 1);
+  ok(tr.end() === 10);
+});
+
+test('should get an absolute URL', function(){
+  // Errors on compiled tests that don't use unit.html. Need a better solution.
+  // ok(vjs.getAbsoluteURL('unit.html') === window.location.href);
+  ok(vjs.getAbsoluteURL('http://asdf.com') === "http://asdf.com");
+  ok(vjs.getAbsoluteURL('https://asdf.com/index.html') === "https://asdf.com/index.html");
 });

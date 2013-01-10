@@ -1,13 +1,7 @@
-goog.provide('vjs.Html5');
-goog.provide('vjs.media.html5');
-goog.provide('vjs.Html5.Events');
-goog.provide('vjs.Html5.isSupported');
-goog.provide('vjs.Html5.canPlaySource');
+/**
+ * @fileoverview HTML5 Media Controller - Wrapper for HTML5 Media API
+ */
 
-goog.require('vjs.MediaTechController');
-
-/* HTML5 Media Controller - Wrapper for HTML5 Media API
-============================================================================= */
 /**
  * HTML5 Media Controller - Wrapper for HTML5 Media API
  * @param {vjs.Player|Object} player
@@ -23,7 +17,7 @@ vjs.Html5 = function(player, options, ready){
   // If the element source is already set, we may have missed the loadstart event, and want to trigger it.
   // We don't want to set the source again and interrupt playback.
   if (source && this.el_.currentSrc == source.src) {
-    player.trigger("loadstart");
+    player.trigger('loadstart');
 
   // Otherwise set the source if one was provided.
   } else if (source) {
@@ -41,7 +35,7 @@ vjs.Html5 = function(player, options, ready){
     }
   });
 
-  this.on("click", this.onClick);
+  this.on('click', this.onClick);
 
   this.setupTriggers();
 
@@ -69,12 +63,12 @@ vjs.Html5.prototype.createEl = function(){
 
     // If the original tag is still there, remove it.
     if (el) {
-      player.getEl().removeChild(el);
+      player.el().removeChild(el);
     }
 
-    newEl = vjs.createElement("video", {
-      id: el.id || player.id + "_html5_api",
-      className: el.className || "vjs-tech"
+    newEl = vjs.createElement('video', {
+      id: el.id || player.id + '_html5_api',
+      className: el.className || 'vjs-tech'
     });
 
     el = newEl;
@@ -82,13 +76,13 @@ vjs.Html5.prototype.createEl = function(){
   }
 
   // Update specific tag settings, in case they were overridden
-  var attrs = ["autoplay","preload","loop","muted"];
+  var attrs = ['autoplay','preload','loop','muted'];
   for (var i = attrs.length - 1; i >= 0; i--) {
     var attr = attrs[i];
     if (player.options[attr] !== null) {
       el[attr] = player.options[attr];
     }
-  };
+  }
 
   return el;
   // jenniisawesome = true;
@@ -99,13 +93,13 @@ vjs.Html5.prototype.createEl = function(){
 vjs.Html5.prototype.setupTriggers = function(){
   for (var i = vjs.Html5.Events.length - 1; i >= 0; i--) {
     vjs.on(this.el_, vjs.Html5.Events[i], vjs.bind(this.player, this.eventHandler));
-  };
+  }
 };
 vjs.Html5.prototype.removeTriggers = function(){
   for (var i = vjs.Html5.Events.length - 1; i >= 0; i--) {
     vjs.off(this.el_, vjs.Html5.Events[i], vjs.bind(this.player, this.eventHandler));
-  };
-  // console.log("removeTriggers", vjs.getData(this.el_));
+  }
+  // console.log('removeTriggers', vjs.getData(this.el_));
 };
 vjs.Html5.prototype.eventHandler = function(e){
   // console.log('eventHandler', e.type, e, this.el_)
@@ -123,7 +117,7 @@ vjs.Html5.prototype.setCurrentTime = function(seconds){
   try {
     this.el_.currentTime = seconds;
   } catch(e) {
-    vjs.log(e, "Video isn't ready. (Video.js)");
+    vjs.log(e, 'Video is not ready. (Video.js)');
     // this.warning(VideoJS.warnings.videoNotReady);
   }
 };
@@ -143,7 +137,7 @@ vjs.Html5.prototype.supportsFullScreen = function(){
   if (typeof this.el_.webkitEnterFullScreen == 'function') {
 
     // Seems to be broken in Chromium/Chrome && Safari in Leopard
-    if (!navigator.userAgent.match("Chrome") && !navigator.userAgent.match("Mac OS X 10.5")) {
+    if (!navigator.userAgent.match('Chrome') && !navigator.userAgent.match('Mac OS X 10.5')) {
       return true;
     }
   }
@@ -156,7 +150,7 @@ vjs.Html5.prototype.enterFullScreen = function(){
   } catch (e) {
     if (e.code == 11) {
       // this.warning(VideoJS.warnings.videoNotReady);
-      vjs.log("Video.js: Video not ready.");
+      vjs.log('Video.js: Video not ready.');
     }
   }
 };
@@ -166,7 +160,7 @@ vjs.Html5.prototype.exitFullScreen = function(){
     } catch (e) {
       if (e.code == 11) {
         // this.warning(VideoJS.warnings.videoNotReady);
-        vjs.log("Video.js: Video not ready.");
+        vjs.log('Video.js: Video not ready.');
       }
     }
 };
@@ -205,18 +199,18 @@ vjs.Html5.prototype.defaultMuted = function(){ return this.el_.defaultMuted; };
 /* HTML5 Support Testing ---------------------------------------------------- */
 
 vjs.Html5.isSupported = function(){
-  return !!document.createElement("video").canPlayType;
+  return !!document.createElement('video').canPlayType;
 };
 
 vjs.Html5.canPlaySource = function(srcObj){
-  return !!document.createElement("video").canPlayType(srcObj.type);
+  return !!document.createElement('video').canPlayType(srcObj.type);
   // TODO: Check Type
   // If no Type, check ext
   // Check Media Type
 };
 
 // List of all HTML5 events (various uses).
-vjs.Html5.Events = "loadstart,suspend,abort,error,emptied,stalled,loadedmetadata,loadeddata,canplay,canplaythrough,playing,waiting,seeking,seeked,ended,durationchange,timeupdate,progress,play,pause,ratechange,volumechange".split(",");
+vjs.Html5.Events = 'loadstart,suspend,abort,error,emptied,stalled,loadedmetadata,loadeddata,canplay,canplaythrough,playing,waiting,seeking,seeked,ended,durationchange,timeupdate,progress,play,pause,ratechange,volumechange'.split(',');
 
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //
@@ -226,7 +220,7 @@ vjs.Html5.prototype.features = {
   // http://developer.apple.com/library/safari/#documentation/AudioVideo/Reference/HTMLVideoElementClassReference/HTMLVideoElement/HTMLVideoElement.html
   // Seems to be broken in Chromium/Chrome && Safari in Leopard
   fullscreen: (vjs.TEST_VID.webkitEnterFullScreen)
-    ? ((!vjs.USER_AGENT.match("Chrome") && !vjs.USER_AGENT.match("Mac OS X 10.5")
+    ? ((!vjs.USER_AGENT.match('Chrome') && !vjs.USER_AGENT.match('Mac OS X 10.5')
       ? true
       : false))
     : false,
@@ -241,8 +235,8 @@ if (vjs.IS_ANDROID) {
 
   // Override Android 2.2 and less canPlayType method which is broken
   if (vjs.ANDROID_VERSION < 3) {
-    document.createElement("video").constructor.prototype.canPlayType = function(type){
-      return (type && type.toLowerCase().indexOf("video/mp4") != -1) ? "maybe" : "";
+    document.createElement('video').constructor.prototype.canPlayType = function(type){
+      return (type && type.toLowerCase().indexOf('video/mp4') != -1) ? 'maybe' : '';
     };
   }
 }

@@ -56,7 +56,7 @@ vjs.on = function(elem, type, fn){
     if (document.addEventListener) {
       elem.addEventListener(type, data.dispatcher, false);
     } else if (document.attachEvent) {
-      elem.attachEvent("on" + type, data.dispatcher);
+      elem.attachEvent('on' + type, data.dispatcher);
     }
   }
 };
@@ -129,7 +129,7 @@ vjs.cleanUpEvents = function(elem, type) {
     if (document.removeEventListener) {
       elem.removeEventListener(type, data.dispatcher, false);
     } else if (document.detachEvent) {
-      elem.detachEvent("on" + type, data.dispatcher);
+      elem.detachEvent('on' + type, data.dispatcher);
     }
   }
 
@@ -250,7 +250,7 @@ vjs.trigger = function(elem, event) {
       // handler;
 
   // If an event name was passed as a string, creates an event out of it
-  if (typeof event === "string") {
+  if (typeof event === 'string') {
     event = { type:event, target:elem };
   }
   // Normalizes the event properties.
@@ -286,7 +286,7 @@ vjs.trigger = function(elem, event) {
    * for now just in case.
    */
   // // Added in attion to book. Book code was broke.
-  // event = typeof event === "object" ?
+  // event = typeof event === 'object' ?
   //   event[vjs.expando] ?
   //     event :
   //     new vjs.Event(type, event) :
@@ -311,7 +311,7 @@ vjs.trigger = function(elem, event) {
  */
 vjs.one = function(elem, type, fn) {
   vjs.on(elem, type, function(){
-    vjs.off(elem, type, arguments.callee)
+    vjs.off(elem, type, arguments.callee);
     fn.apply(this, arguments);
   });
-}
+};

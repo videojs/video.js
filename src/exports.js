@@ -34,20 +34,20 @@ goog.exportSymbol('videojs.options', vjs.options);
 goog.exportSymbol('videojs.cache', vjs.cache);
 
 goog.exportSymbol('videojs.Component', vjs.Component);
-goog.exportProperty(vjs.Component.prototype, "dispose", vjs.Component.prototype.dispose);
-goog.exportProperty(vjs.Component.prototype, "createEl", vjs.Component.prototype.createEl);
-goog.exportProperty(vjs.Component.prototype, "getEl", vjs.Component.prototype.getEl);
-goog.exportProperty(vjs.Component.prototype, "addChild", vjs.Component.prototype.addChild);
-goog.exportProperty(vjs.Component.prototype, "getChildren", vjs.Component.prototype.getChildren);
-goog.exportProperty(vjs.Component.prototype, "on", vjs.Component.prototype.on);
-goog.exportProperty(vjs.Component.prototype, "off", vjs.Component.prototype.off);
-goog.exportProperty(vjs.Component.prototype, "one", vjs.Component.prototype.one);
-goog.exportProperty(vjs.Component.prototype, "trigger", vjs.Component.prototype.trigger);
-goog.exportProperty(vjs.Component.prototype, "show", vjs.Component.prototype.show);
-goog.exportProperty(vjs.Component.prototype, "hide", vjs.Component.prototype.hide);
-goog.exportProperty(vjs.Component.prototype, "width", vjs.Component.prototype.width);
-goog.exportProperty(vjs.Component.prototype, "height", vjs.Component.prototype.height);
-goog.exportProperty(vjs.Component.prototype, "dimensions", vjs.Component.prototype.dimensions);
+goog.exportProperty(vjs.Component.prototype, 'dispose', vjs.Component.prototype.dispose);
+goog.exportProperty(vjs.Component.prototype, 'createEl', vjs.Component.prototype.createEl);
+goog.exportProperty(vjs.Component.prototype, 'getEl', vjs.Component.prototype.getEl);
+goog.exportProperty(vjs.Component.prototype, 'addChild', vjs.Component.prototype.addChild);
+goog.exportProperty(vjs.Component.prototype, 'getChildren', vjs.Component.prototype.getChildren);
+goog.exportProperty(vjs.Component.prototype, 'on', vjs.Component.prototype.on);
+goog.exportProperty(vjs.Component.prototype, 'off', vjs.Component.prototype.off);
+goog.exportProperty(vjs.Component.prototype, 'one', vjs.Component.prototype.one);
+goog.exportProperty(vjs.Component.prototype, 'trigger', vjs.Component.prototype.trigger);
+goog.exportProperty(vjs.Component.prototype, 'show', vjs.Component.prototype.show);
+goog.exportProperty(vjs.Component.prototype, 'hide', vjs.Component.prototype.hide);
+goog.exportProperty(vjs.Component.prototype, 'width', vjs.Component.prototype.width);
+goog.exportProperty(vjs.Component.prototype, 'height', vjs.Component.prototype.height);
+goog.exportProperty(vjs.Component.prototype, 'dimensions', vjs.Component.prototype.dimensions);
 
 goog.exportSymbol('videojs.Player', vjs.Player);
 
@@ -93,24 +93,27 @@ goog.exportSymbol('videojs.ChaptersButton', vjs.ChaptersButton);
 goog.exportSymbol('videojs.MediaTechController', vjs.MediaTechController);
 
 goog.exportSymbol('videojs.Html5', vjs.Html5);
-goog.exportProperty(vjs.Html5, "Events", vjs.Html5.Events);
-goog.exportProperty(vjs.Html5, "isSupported", vjs.Html5.isSupported);
-goog.exportProperty(vjs.Html5, "canPlaySource", vjs.Html5.canPlaySource);
+goog.exportProperty(vjs.Html5, 'Events', vjs.Html5.Events);
+goog.exportProperty(vjs.Html5, 'isSupported', vjs.Html5.isSupported);
+goog.exportProperty(vjs.Html5, 'canPlaySource', vjs.Html5.canPlaySource);
 
 // Export non-standard HTML5 video API methods.
 // Standard method names already protected by default externs.
-goog.exportProperty(vjs.Html5.prototype, "setCurrentTime", vjs.Html5.prototype.setCurrentTime);
-goog.exportProperty(vjs.Html5.prototype, "setVolume", vjs.Html5.prototype.setVolume);
-goog.exportProperty(vjs.Html5.prototype, "setMuted", vjs.Html5.prototype.setMuted);
-goog.exportProperty(vjs.Html5.prototype, "setPreload", vjs.Html5.prototype.setPreload);
-goog.exportProperty(vjs.Html5.prototype, "setAutoplay", vjs.Html5.prototype.setAutoplay);
-goog.exportProperty(vjs.Html5.prototype, "setLoop", vjs.Html5.prototype.setLoop);
+goog.exportProperty(vjs.Html5.prototype, 'setCurrentTime', vjs.Html5.prototype.setCurrentTime);
+goog.exportProperty(vjs.Html5.prototype, 'setVolume', vjs.Html5.prototype.setVolume);
+goog.exportProperty(vjs.Html5.prototype, 'setMuted', vjs.Html5.prototype.setMuted);
+goog.exportProperty(vjs.Html5.prototype, 'setPreload', vjs.Html5.prototype.setPreload);
+goog.exportProperty(vjs.Html5.prototype, 'setAutoplay', vjs.Html5.prototype.setAutoplay);
+goog.exportProperty(vjs.Html5.prototype, 'setLoop', vjs.Html5.prototype.setLoop);
 
 goog.exportSymbol('videojs.Flash', vjs.Flash);
-goog.exportProperty(vjs.Flash, "Events", vjs.Flash.Events);
-goog.exportProperty(vjs.Flash, "isSupported", vjs.Flash.isSupported);
-goog.exportProperty(vjs.Flash, "canPlaySource", vjs.Flash.canPlaySource);
-goog.exportProperty(vjs.Flash, "onReady", vjs.Flash['onReady']);
+goog.exportProperty(vjs.Flash, 'Events', vjs.Flash.Events);
+goog.exportProperty(vjs.Flash, 'isSupported', vjs.Flash.isSupported);
+goog.exportProperty(vjs.Flash, 'canPlaySource', vjs.Flash.canPlaySource);
+goog.exportProperty(vjs.Flash, 'onReady', vjs.Flash['onReady']);
+
+goog.exportSymbol('videojs.TextTrack', vjs.TextTrack);
+goog.exportProperty(vjs.TextTrack.prototype, 'label', vjs.TextTrack.prototype.label);
 
 goog.exportSymbol('videojs.CaptionsTrack', vjs.CaptionsTrack);
 goog.exportSymbol('videojs.SubtitlesTrack', vjs.SubtitlesTrack);

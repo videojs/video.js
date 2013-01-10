@@ -1,9 +1,9 @@
-// Javascript JSON implementation
-// (Parse Method Only)
-// https://github.com/douglascrockford/JSON-js/blob/master/json2.js
-
 /**
- * JSON shim. Only using for parse method when parsing data-setup attribute JSON.
+ * Javascript JSON implementation
+ * (Parse Method Only)
+ * https://github.com/douglascrockford/JSON-js/blob/master/json2.js
+ * Only using for parse method when parsing data-setup attribute JSON.
+ * @type {Object}
  */
 vjs.JSON;
 

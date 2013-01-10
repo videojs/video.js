@@ -12,7 +12,7 @@ vjs.createEl = function(tagName, properties){
       el[propName] = properties[propName];
       // Not remembering why we were checking for dash
       // but using setAttribute means you have to use getAttribute
-      // if (propName.indexOf("-") !== -1) {
+      // if (propName.indexOf('-') !== -1) {
       //   el.setAttribute(propName, properties[propName]);
       // } else {
       //   el[propName] = properties[propName];
@@ -80,41 +80,17 @@ vjs.bind = function(context, fn, uid) {
   // Create the new function that changes the context
   var ret = function() {
     return fn.apply(context, arguments);
-  }
+  };
 
   // Allow for the ability to individualize this function
   // Needed in the case where multiple objects might share the same prototype
   // IF both items add an event listener with the same function, then you try to remove just one
   // it will remove both because they both have the same guid.
   // when using this, you need to use the bind method when you remove the listener as well.
-  ret.guid = (uid) ? uid + "_" + fn.guid : fn.guid;
+  // currently used in text tracks
+  ret.guid = (uid) ? uid + '_' + fn.guid : fn.guid;
 
   return ret;
-};
-
-/**
- * FROM CLOSURE LIB
- * Like bind(), except that a 'this object' is not required. Useful when the
- * target function is already bound.
- *
- * Usage:
- * var g = partial(f, arg1, arg2);
- * g(arg3, arg4);
- *
- * @param {Function} fn A function to partially apply.
- * @param {...*} var_args Additional arguments that are partially
- *     applied to fn.
- * @return {!Function} A partially-applied form of the function bind() was
- *     invoked as a method of.
- */
-vjs.partial = function(fn, var_args) {
-  var args = Array.prototype.slice.call(arguments, 1);
-  return function() {
-    // Prepend the bound arguments to the current arguments.
-    var newArgs = Array.prototype.slice.call(arguments);
-    newArgs.unshift.apply(newArgs, args);
-    return fn.apply(this, newArgs);
-  };
 };
 
 /**
@@ -136,7 +112,7 @@ vjs.guid = 1;
  * @type {String}
  * @constant
  */
-vjs.expando = "vdata" + (new Date).getTime();
+vjs.expando = 'vdata' + (new Date()).getTime();
 
 /**
  * Returns the cache object where data for an element is stored
@@ -204,8 +180,8 @@ vjs.isEmpty = function(obj) {
  * @param {String} classToAdd Classname to add
  */
 vjs.addClass = function(element, classToAdd){
-  if ((" "+element.className+" ").indexOf(" "+classToAdd+" ") == -1) {
-    element.className = element.className === "" ? classToAdd : element.className + " " + classToAdd;
+  if ((' '+element.className+' ').indexOf(' '+classToAdd+' ') == -1) {
+    element.className = element.className === '' ? classToAdd : element.className + ' ' + classToAdd;
   }
 };
 
@@ -216,9 +192,9 @@ vjs.addClass = function(element, classToAdd){
  */
 vjs.removeClass = function(element, classToRemove){
   if (element.className.indexOf(classToRemove) == -1) { return; }
-  var classNames = element.className.split(" ");
+  var classNames = element.className.split(' ');
   classNames.splice(classNames.indexOf(classToRemove),1);
-  element.className = classNames.join(" ");
+  element.className = classNames.join(' ');
 };
 
 /**
@@ -226,7 +202,7 @@ vjs.removeClass = function(element, classToRemove){
  * @type {Element}
  * @constant
  */
-vjs.TEST_VID = document.createElement("video");
+vjs.TEST_VID = document.createElement('video');
 
 /**
  * Useragent for browser testing.
@@ -259,11 +235,7 @@ vjs.ANDROID_VERSION = (function() {
   return null;
 })();
 
-// http://webreflection.blogspot.com/2009/01/32-bytes-to-know-if-your-browser-is-ie.html
-// IE9+ returns false
-vjs.IS_IE6to8 = function(){ return !+"\v1"; };
-
-vjs.IS_FIREFOX = function(){ return !!vjs.USER_AGENT.match("Firefox") };
+vjs.IS_FIREFOX = function(){ return !!vjs.USER_AGENT.match('Firefox'); };
 
 
 /**
@@ -281,7 +253,7 @@ vjs.getAttributeValues = function(tag){
   // We can check for matching boolean properties, but older browsers
   // won't know about HTML5 boolean attributes that we still read from.
   // Bookending with commas to allow for an easy string search.
-  var knownBooleans = ","+"autoplay,controls,loop,muted,default"+",";
+  var knownBooleans = ','+'autoplay,controls,loop,muted,default'+',';
 
   if (tag && tag.attributes && tag.attributes.length > 0) {
     var attrs = tag.attributes;
@@ -293,15 +265,15 @@ vjs.getAttributeValues = function(tag){
 
       // Check for known booleans
       // The matching element property will return a value for typeof
-      if (typeof tag[attrName] === 'boolean' || knownBooleans.indexOf(","+attrName+",") !== -1) {
-        // The value of an included boolean attribute is typically an empty string ("")
+      if (typeof tag[attrName] === 'boolean' || knownBooleans.indexOf(','+attrName+',') !== -1) {
+        // The value of an included boolean attribute is typically an empty string ('')
         // which would equal false if we just check for a false value.
-        // We also don't want support bad code like autoplay="false"
+        // We also don't want support bad code like autoplay='false'
         attrVal = (attrVal !== null) ? true : false;
       }
 
       obj[attrName] = attrVal;
-    };
+    }
   }
 
   return obj;
@@ -315,9 +287,9 @@ vjs.getAttributeValues = function(tag){
  * @return {String}            Style value
  */
 vjs.getComputedStyleValue = function(el, strCssRule){
-  var strValue = "";
+  var strValue = '';
   if(document.defaultView && document.defaultView.getComputedStyle){
-    strValue = document.defaultView.getComputedStyle(el, "").getPropertyValue(strCssRule);
+    strValue = document.defaultView.getComputedStyle(el, '').getPropertyValue(strCssRule);
 
   } else if(el.currentStyle){
     strCssRule = strCssRule.replace(/\-(\w)/g, function (strMatch, p1){
@@ -354,7 +326,7 @@ vjs.support = {};
  * @return {Element}    Element with supplied ID
  */
 vjs.el = function(id){
-  if (id.indexOf("#") === 0) {
+  if (id.indexOf('#') === 0) {
     id = id.slice(1);
   }
 
@@ -378,14 +350,14 @@ vjs.formatTime = function(seconds, guide) {
       gh = Math.floor(guide / 3600);
 
   // Check if we need to show hours
-  h = (h > 0 || gh > 0) ? h + ":" : "";
+  h = (h > 0 || gh > 0) ? h + ':' : '';
 
   // If hours are showing, we may need to add a leading zero.
   // Always show at least one digit of minutes.
-  m = (((h || gm >= 10) && m < 10) ? "0" + m : m) + ":";
+  m = (((h || gm >= 10) && m < 10) ? '0' + m : m) + ':';
 
   // Check if leading zero is need for seconds
-  s = (s < 10) ? "0" + s : s;
+  s = (s < 10) ? '0' + s : s;
 
   return h + m + s;
 };
@@ -404,7 +376,7 @@ vjs.unblockTextSelection = function(){ document.onselectstart = function () { re
  * @return {String}        Trimmed string
  */
 vjs.trim = function(string){
-  return string.toString().replace(/^\s+/, "").replace(/\s+$/, "");
+  return string.toString().replace(/^\s+/, '').replace(/\s+$/, '');
 };
 
 /**
@@ -435,67 +407,52 @@ vjs.createTimeRange = function(start, end){
   };
 };
 
-// vjs.extend({
+/**
+ * Simple http request for retrieving external files (e.g. text tracks)
+ * @param  {String} url           URL of resource
+ * @param  {Function=} onSuccess  Success callback
+ * @param  {Function=} onError    Error callback
+ */
+vjs.get = function(url, onSuccess, onError){
+  var local = (url.indexOf('file:') === 0 || (window.location.href.indexOf('file:') === 0 && url.indexOf('http') === -1));
 
-//   each: function(arr, fn){
-//     if (!arr || arr.length === 0) { return; }
-//     for (var i=0,j=arr.length; i<j; i++) {
-//       fn.call(this, arr[i], i);
-//     }
-//   },
+  if (typeof XMLHttpRequest === 'undefined') {
+    window.XMLHttpRequest = function () {
+      try { return new window.ActiveXObject('Msxml2.XMLHTTP.6.0'); } catch (e) {}
+      try { return new window.ActiveXObject('Msxml2.XMLHTTP.3.0'); } catch (f) {}
+      try { return new window.ActiveXObject('Msxml2.XMLHTTP'); } catch (g) {}
+      throw new Error('This browser does not support XMLHttpRequest.');
+    };
+  }
 
-//   // Return the relative horizonal position of an event as a value from 0-1
-//   getRelativePosition: function(x, relativeElement){
-//     return Math.max(0, Math.min(1, (x - vjs.findPosX(relativeElement)) / relativeElement.offsetWidth));
-//   },
+  var request = new XMLHttpRequest();
 
-//   get: function(url, onSuccess, onError){
-//     // if (netscape.security.PrivilegeManager.enablePrivilege) {
-//     //   netscape.security.PrivilegeManager.enablePrivilege("UniversalBrowserRead");
-//     // }
+  try {
+    request.open('GET', url);
+  } catch(e) {
+    onError(e);
+  }
 
-//     var local = (url.indexOf("file:") == 0 || (window.location.href.indexOf("file:") == 0 && url.indexOf("http:") == -1));
+  request.onreadystatechange = function() {
+    if (request.readyState === 4) {
+      if (request.status === 200 || local && request.status === 0) {
+        onSuccess(request.responseText);
+      } else {
+        if (onError) {
+          onError();
+        }
+      }
+    }
+  };
 
-//     if (typeof XMLHttpRequest == "undefined") {
-//       XMLHttpRequest = function () {
-//         try { return new ActiveXObject("Msxml2.XMLHTTP.6.0"); } catch (e) {}
-//         try { return new ActiveXObject("Msxml2.XMLHTTP.3.0"); } catch (f) {}
-//         try { return new ActiveXObject("Msxml2.XMLHTTP"); } catch (g) {}
-//         throw new Error("This browser does not support XMLHttpRequest.");
-//       };
-//     }
-
-//     var request = new XMLHttpRequest();
-
-//     try {
-//       request.open("GET", url);
-//     } catch(e) {
-//       vjs.log("VideoJS XMLHttpRequest (open)", e);
-//       // onError(e);
-//       return false;
-//     }
-
-//     request.onreadystatechange = vjs.proxy(this, function() {
-//       if (request.readyState == 4) {
-//         if (request.status == 200 || local && request.status == 0) {
-//           onSuccess(request.responseText);
-//         } else {
-//           if (onError) {
-//             onError();
-//           }
-//         }
-//       }
-//     });
-
-//     try {
-//       request.send();
-//     } catch(e) {
-//       vjs.log("VideoJS XMLHttpRequest (send)", e);
-//       if (onError) {
-//         onError(e);
-//       }
-//     }
-//   },
+  try {
+    request.send();
+  } catch(e) {
+    if (onError) {
+      onError(e);
+    }
+  }
+};
 
 /* Local Storage
 ================================================================================ */
@@ -507,9 +464,9 @@ vjs.setLocalStorage = function(key, value){
     localStorage[key] = value;
   } catch(e) {
     if (e.code == 22 || e.code == 1014) { // Webkit == 22 / Firefox == 1014
-      vjs.log("LocalStorage Full (VideoJS)", e);
+      vjs.log('LocalStorage Full (VideoJS)', e);
     } else {
-      vjs.log("LocalStorage Error (VideoJS)", e);
+      vjs.log('LocalStorage Error (VideoJS)', e);
     }
   }
 };
@@ -533,25 +490,19 @@ vjs.getAbsoluteURL = function(url){
   return url;
 };
 
-// usage: log('inside coolFunc', this, arguments);
-// paulirish.com/2009/log-a-lightweight-wrapper-for-consolelog/
+// usage: log('inside coolFunc',this,arguments);
+// http://paulirish.com/2009/log-a-lightweight-wrapper-for-consolelog/
 vjs.log = function(){
-  vjs.log.history = vjs.log.history || [];// store logs to an array for reference
+  vjs.log.history = vjs.log.history || [];   // store logs to an array for reference
   vjs.log.history.push(arguments);
-  if(window.console) {
-    arguments.callee = arguments.callee.caller;
-    var newarr = [].slice.call(arguments);
-    (typeof console.log === 'object' ? vjs.log.apply.call(console.log, console, newarr) : console.log.apply(console, newarr));
+  if(window.console){
+    window.console.log(Array.prototype.slice.call(arguments));
   }
 };
 
-// make it safe to use console.log always
-(function(b){function c(){}for(var d="assert,count,debug,dir,dirxml,error,exception,group,groupCollapsed,groupEnd,info,log,timeStamp,profile,profileEnd,time,timeEnd,trace,warn".split(","),a;a=d.pop();){b[a]=b[a]||c}})((function(){try
-{console.log();return window.console;}catch(err){return window.console={};}})());
-
 // Offset Left
 // getBoundingClientRect technique from John Resig http://ejohn.org/blog/getboundingclientrect-is-awesome/
-if ("getBoundingClientRect" in document.documentElement) {
+if ('getBoundingClientRect' in document.documentElement) {
   vjs.findPosX = function(el) {
     var box;
 
@@ -573,11 +524,11 @@ if ("getBoundingClientRect" in document.documentElement) {
   vjs.findPosX = function(el) {
     var curleft = el.offsetLeft;
     // vjs.log(obj.className, obj.offsetLeft)
-    while(el = obj.offsetParent) {
-      if (el.className.indexOf("video-js") == -1) {
-        // vjs.log(el.offsetParent, "OFFSETLEFT", el.offsetLeft)
-        // vjs.log("-webkit-full-screen", el.webkitMatchesSelector("-webkit-full-screen"));
-        // vjs.log("-webkit-full-screen", el.querySelectorAll(".video-js:-webkit-full-screen"));
+    while(el = el.offsetParent) {
+      if (el.className.indexOf('video-js') == -1) {
+        // vjs.log(el.offsetParent, 'OFFSETLEFT', el.offsetLeft)
+        // vjs.log('-webkit-full-screen', el.webkitMatchesSelector('-webkit-full-screen'));
+        // vjs.log('-webkit-full-screen', el.querySelectorAll('.video-js:-webkit-full-screen'));
       } else {
       }
       curleft += el.offsetLeft;

@@ -76,13 +76,13 @@ myComponent.addChild('');
 myPlayer.addChild('BigPlayButton');
 myPlayer.removeChild('BigPlayButton');
 myPlayer.getChild('BiPlayButton');
-myPlayer.getChildren();
+myPlayer.children();
 
 
 myPlayer.getChildById('biPlayButton');
 myPlayer.removeChildById('my-player-big-play-button');
 
-getEl();
+el();
 getContentEl();
 getChildren();
 

@@ -1,10 +1,7 @@
 /**
- * Player Component - Base class for all UI objects
+ * @fileoverview Player Component - Base class for all UI objects
+ *
  */
-
-goog.provide('vjs.Component');
-
-goog.require('vjs');
 
 /**
  * Base UI Component class
@@ -19,7 +16,7 @@ vjs.Component = function(player, options, ready){
   options = this.options = vjs.merge(this.options || {}, options);
 
   // Get ID from options, element, or create using player ID and unique ID
-  this.id_ = options.id || ((options.el && options.el.id) ? options.el.id : player.id + "_component_" + vjs.guid++);
+  this.id_ = options.id || ((options.el && options.el.id) ? options.el.id : player.id + '_component_' + vjs.guid++ );
 
   this.name_ = options.name || null;
 
@@ -46,7 +43,7 @@ vjs.Component.prototype.dispose = function(){
   if (this.children_) {
     for (var i = this.children_.length - 1; i >= 0; i--) {
       this.children_[i].dispose();
-    };
+    }
   }
 
   // Delete child references
@@ -94,7 +91,7 @@ vjs.Component.prototype.createEl = function(tagName, attributes){
  * Return the component's DOM element.
  * @return {Element}
  */
-vjs.Component.prototype.getEl = function(){
+vjs.Component.prototype.el = function(){
   return this.el_;
 };
 
@@ -109,7 +106,7 @@ vjs.Component.prototype.id_;
  * Return the component's ID.
  * @return {String}
  */
-vjs.Component.prototype.getId = function(){
+vjs.Component.prototype.id = function(){
   return this.id_;
 };
 
@@ -124,7 +121,7 @@ vjs.Component.prototype.name_;
  * Return the component's ID.
  * @return {String}
  */
-vjs.Component.prototype.getName = function(){
+vjs.Component.prototype.name = function(){
   return this.name_;
 };
 
@@ -139,9 +136,9 @@ vjs.Component.prototype.children_;
  * Returns array of all child components.
  * @return {Array}
  */
-vjs.Component.prototype.getChildren = function(){
+vjs.Component.prototype.children = function(){
   return this.children_;
-}
+};
 
 /**
  * Object of child components by ID
@@ -156,7 +153,7 @@ vjs.Component.prototype.childIndex_;
  */
 vjs.Component.prototype.getChildById = function(id){
   return this.childIndex_[id];
-}
+};
 
 /**
  * Object of child components by Name
@@ -171,7 +168,7 @@ vjs.Component.prototype.childNameIndex_;
  */
 vjs.Component.prototype.getChild = function(name){
   return this.childNameIndex_[name];
-}
+};
 
 /**
  * Adds a child component inside this component.
@@ -185,7 +182,7 @@ vjs.Component.prototype.addChild = function(child, options){
   var component, componentClass, componentName, componentId;
 
   // If string, create new component with options
-  if (typeof child === "string") {
+  if (typeof child === 'string') {
 
     componentName = child;
 
@@ -209,8 +206,8 @@ vjs.Component.prototype.addChild = function(child, options){
     component = child;
   }
 
-  componentName = component.getName();
-  componentId = component.getId();
+  componentName = component.name();
+  componentId = component.id();
 
   this.children_.push(component);
 
@@ -223,7 +220,7 @@ vjs.Component.prototype.addChild = function(child, options){
   }
 
   // Add the UI object's element to the container div (box)
-  this.el_.appendChild(component.getEl());
+  this.el_.appendChild(component.el());
 
   // Return so it can stored on parent object if desired.
   return component;
@@ -243,16 +240,16 @@ vjs.Component.prototype.removeChild = function(component){
       this.children_.splice(i,1);
       break;
     }
-  };
+  }
 
   if (!childFound) return;
 
   this.childIndex_[component.id] = null;
   this.childNameIndex_[component.name] = null;
 
-  var compEl = component.getEl();
+  var compEl = component.el();
   if (compEl && compEl.parentNode === this.el_) {
-    this.el_.removeChild(component.getEl());
+    this.el_.removeChild(component.el());
   }
 };
 
@@ -289,8 +286,8 @@ vjs.Component.prototype.initChildren = function(){
 
 vjs.Component.prototype.buildCSSClass = function(){
     // Child classes can include a function that does:
-    // return "CLASS NAME" + this._super();
-    return "";
+    // return 'CLASS NAME' + this._super();
+    return '';
 };
 
 /* Events
@@ -399,14 +396,14 @@ vjs.Component.prototype.triggerReady = function(){
   if (readyQueue && readyQueue.length > 0) {
 
     for (var i = 0, j = readyQueue.length; i < j; i++) {
-      readyQueue[i].call(this)
-    };
+      readyQueue[i].call(this);
+    }
 
     // Reset Ready Queue
     this.readyQueue_ = [];
 
     // Allow for using event listeners also, in case you want to do something everytime a source is ready.
-    this.trigger("ready");
+    this.trigger('ready');
   }
 };
 
@@ -438,7 +435,7 @@ vjs.Component.prototype.removeClass = function(classToRemove){
  * @return {vjs.Component}
  */
 vjs.Component.prototype.show = function(){
-  this.el_.style.display = "block";
+  this.el_.style.display = 'block';
   return this;
 };
 
@@ -447,7 +444,7 @@ vjs.Component.prototype.show = function(){
  * @return {vjs.Component}
  */
 vjs.Component.prototype.hide = function(){
-  this.el_.style.display = "none";
+  this.el_.style.display = 'none';
   return this;
 };
 
@@ -456,8 +453,8 @@ vjs.Component.prototype.hide = function(){
  * @return {vjs.Component}
  */
 vjs.Component.prototype.fadeIn = function(){
-  this.removeClass("vjs-fade-out");
-  this.addClass("vjs-fade-in");
+  this.removeClass('vjs-fade-out');
+  this.addClass('vjs-fade-in');
   return this;
 };
 
@@ -466,8 +463,8 @@ vjs.Component.prototype.fadeIn = function(){
  * @return {vjs.Component}
  */
 vjs.Component.prototype.fadeOut = function(){
-  this.removeClass("vjs-fade-in");
-  this.addClass("vjs-fade-out");
+  this.removeClass('vjs-fade-in');
+  this.addClass('vjs-fade-out');
   return this;
 };
 
@@ -477,9 +474,9 @@ vjs.Component.prototype.fadeOut = function(){
  */
 vjs.Component.prototype.lockShowing = function(){
   var style = this.el_.style;
-  style.display = "block";
+  style.display = 'block';
   style.opacity = 1;
-  style.visiblity = "visible";
+  style.visiblity = 'visible';
   return this;
 };
 
@@ -488,10 +485,10 @@ vjs.Component.prototype.lockShowing = function(){
  * @return {vjs.Component}
  */
 vjs.Component.prototype.unlockShowing = function(){
-  var style = this.el.style;
-  style.display = "";
-  style.opacity = "";
-  style.visiblity = "";
+  var style = this.el_.style;
+  style.display = '';
+  style.opacity = '';
+  style.visiblity = '';
   return this;
 };
 
@@ -507,7 +504,7 @@ vjs.Component.prototype.unlockShowing = function(){
  *   Otherwise it returns the dimension.
  */
 vjs.Component.prototype.width = function(num, skipListeners){
-  return this.dimension("width", num, skipListeners);
+  return this.dimension('width', num, skipListeners);
 };
 
 /**
@@ -517,7 +514,7 @@ vjs.Component.prototype.width = function(num, skipListeners){
  * @return {vjs.Component|Number|String} The player, or the dimension
  */
 vjs.Component.prototype.height = function(num, skipListeners){
-  return this.dimension("height", num, skipListeners);
+  return this.dimension('height', num, skipListeners);
 };
 
 /**
@@ -549,14 +546,14 @@ vjs.Component.prototype.dimension = function(widthOrHeight, num, skipListeners){
   if (num !== undefined) {
 
     // Check if using css width/height (% or px) and adjust
-    if ((""+num).indexOf("%") !== -1 || (""+num).indexOf("px") !== -1) {
+    if ((''+num).indexOf('%') !== -1 || (''+num).indexOf('px') !== -1) {
       this.el_.style[widthOrHeight] = num;
     } else {
-      this.el_.style[widthOrHeight] = num+"px";
+      this.el_.style[widthOrHeight] = num+'px';
     }
 
     // skipListeners allows us to avoid triggering the resize event when setting both width and height
-    if (!skipListeners) { this.trigger("resize"); }
+    if (!skipListeners) { this.trigger('resize'); }
 
     // Return component
     return this;
@@ -568,7 +565,7 @@ vjs.Component.prototype.dimension = function(widthOrHeight, num, skipListeners){
 
   // Get dimension value from style
   var val = this.el_.style[widthOrHeight];
-  var pxIndex = val.indexOf("px");
+  var pxIndex = val.indexOf('px');
   if (pxIndex !== -1) {
     // Return the pixel value with no 'px'
     return parseInt(val.slice(0,pxIndex), 10);
@@ -585,7 +582,7 @@ vjs.Component.prototype.dimension = function(widthOrHeight, num, skipListeners){
     // the percent value (e.g. '100%'')
     // instead of zero like offsetWidth returns.
     // var val = vjs.getComputedStyleValue(this.el_, widthOrHeight);
-    // var pxIndex = val.indexOf("px");
+    // var pxIndex = val.indexOf('px');
 
     // if (pxIndex !== -1) {
     //   return val.slice(0, pxIndex);
@@ -594,14 +591,3 @@ vjs.Component.prototype.dimension = function(widthOrHeight, num, skipListeners){
     // }
   }
 };
-
-// /* Utility
-// ================================================================================ */
-// vjs.Component.prototype.each = function(arr, fn){ vjs.each.call(this, arr, fn); };
-
-// vjs.Component.prototype.eachProp = function(obj, fn){ vjs.eachProp.call(this, obj, fn); };
-
-// vjs.Component.prototype.extend = function(obj){ vjs.merge(this, obj) };
-
-// // More easily attach 'this' to functions
-// vjs.Component.prototype.proxy = function(fn, uid){  return vjs.proxy(this, fn, uid); };

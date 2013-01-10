@@ -1,7 +1,12 @@
+/**
+ * @fileoverview Functions for automatically setting up a player
+ * based on the data-setup attribute of the video tag
+ */
+
 // Automatically set up any tags that have a data-setup attribute
 vjs.autoSetup = function(){
   var options, vid, player,
-      vids = document.getElementsByTagName("video");
+      vids = document.getElementsByTagName('video');
 
   // Check if any media elements exist
   if (vids && vids.length > 0) {
@@ -10,12 +15,12 @@ vjs.autoSetup = function(){
       vid = vids[i];
 
       // Check if element exists, has getAttribute func.
-      // IE seems to consider typeof el.getAttribute == "object" instead of "function" like expected, at least when loading the player immediately.
+      // IE seems to consider typeof el.getAttribute == 'object' instead of 'function' like expected, at least when loading the player immediately.
       if (vid && vid.getAttribute) {
 
         // Make sure this player hasn't already been set up.
         if (vid.player === undefined) {
-          options = vid.getAttribute("data-setup");
+          options = vid.getAttribute('data-setup');
 
           // Check if data-setup attr exists.
           // We only auto-setup if they've added the data-setup attr.
@@ -23,7 +28,7 @@ vjs.autoSetup = function(){
 
             // Parse options JSON
             // If empty string, make it a parsable json object.
-            options = vjs.JSON.parse(options || "{}");
+            options = vjs.JSON.parse(options || '{}');
 
             // Create new video.js instance.
             player = videojs(vid, options);
@@ -48,7 +53,7 @@ vjs.autoSetupTimeout = function(wait){
   setTimeout(vjs.autoSetup, wait);
 };
 
-vjs.one(window, "load", function(){
+vjs.one(window, 'load', function(){
   vjs.windowLoaded = true;
 });
 
