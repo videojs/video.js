@@ -698,7 +698,9 @@ vjs.Player.prototype.src = function(source){
         this.loadTech(techName, source);
       }
     } else {
-      vjs.log('No compatible source and media technology were found.');
+      this.el_.appendChild(vjs.createEl('p', {
+        innerHTML: 'Sorry, no compatible source and playback technology were found for this video. Try using another browser like <a href="http://www.google.com/chrome">Google Chrome</a> or download the latest <a href="http://get.adobe.com/flashplayer/">Adobe Flash Player</a>.'
+      }));
     }
 
   // Case: Source object { src: '', type: '' ... }
