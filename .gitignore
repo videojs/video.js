@@ -3,6 +3,7 @@ dist/*
 dev.html
 projects
 .zenflow-log
+test/*.map
 
 node_modules
 npm-debug.log

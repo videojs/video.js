@@ -767,7 +767,7 @@ r.src = function(a) {
       }
       b = k
     }
-    b ? (a = b.source, b = b.k, b == this.V ? this.src(a) : C(this, b, a)) : vjs.log("No compatible source and media technology were found.")
+    b ? (a = b.source, b = b.k, b == this.V ? this.src(a) : C(this, b, a)) : this.b.appendChild(vjs.d("p", {innerHTML:'Sorry, no compatible source and playback technology were found for this video. Try using another browser like <a href="http://www.google.com/chrome">Google Chrome</a> or download the latest <a href="http://get.adobe.com/flashplayer/">Adobe Flash Player</a>.'}))
   }else {
     a instanceof Object ? window.videojs[this.V].canPlaySource(a) ? this.src(a.src) : this.src([a]) : (this.n.src = a, this.ia ? (H(this, "src", a), "auto" == this.options.preload && this.load(), this.options.autoplay && this.play()) : this.P(function() {
       this.src(a)
