@@ -1,6 +1,9 @@
 /**
- * @fileoverview Main function src. First file after goog.base.
+ * @fileoverview Main function src.
  */
+
+goog.provide('vjs');
+goog.provide('videojs');
 
 // HTML5 Shiv. Must be in <head> to support older browsers.
 document.createElement('video');document.createElement('audio');

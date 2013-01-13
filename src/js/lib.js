@@ -1,3 +1,7 @@
+goog.provide('vjs.dom');
+
+goog.require('vjs');
+
 /**
  * Creates an element and applies properties.
  * @param  {String=} tagName    Name of tag to be created.
@@ -202,7 +206,7 @@ vjs.removeClass = function(element, classToRemove){
  * @type {Element}
  * @constant
  */
-vjs.TEST_VID = document.createElement('video');
+vjs.TEST_VID = vjs.createEl('video');
 
 /**
  * Useragent for browser testing.
@@ -216,19 +220,19 @@ vjs.USER_AGENT = navigator.userAgent;
  * @type {Boolean}
  * @constant
  */
-vjs.IS_IPHONE = !!navigator.userAgent.match(/iPad/i);
-vjs.IS_IPAD = !!navigator.userAgent.match(/iPhone/i);
-vjs.IS_IPOD = !!navigator.userAgent.match(/iPod/i);
+vjs.IS_IPHONE = !!vjs.USER_AGENT.match(/iPad/i);
+vjs.IS_IPAD = !!vjs.USER_AGENT.match(/iPhone/i);
+vjs.IS_IPOD = !!vjs.USER_AGENT.match(/iPod/i);
 vjs.IS_IOS = vjs.IS_IPHONE || vjs.IS_IPAD || vjs.IS_IPOD;
 
 vjs.IOS_VERSION = (function(){
-  var match = navigator.userAgent.match(/OS (\d+)_/i);
+  var match = vjs.USER_AGENT.match(/OS (\d+)_/i);
   if (match && match[1]) { return match[1]; }
 })();
 
-vjs.IS_ANDROID = !!navigator.userAgent.match(/Android.*AppleWebKit/i);
+vjs.IS_ANDROID = !!vjs.USER_AGENT.match(/Android.*AppleWebKit/i);
 vjs.ANDROID_VERSION = (function() {
-  var match = navigator.userAgent.match(/Android (\d+)\./i);
+  var match = vjs.USER_AGENT.match(/Android (\d+)\./i);
   if (match && match[1]) {
     return match[1];
   }

@@ -3,52 +3,37 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    concat: {
-      dist: {
-        src: [
-          'src/js/goog.base.js',
-          'src/js/core.js',
-          'src/js/lib.js',
-          'src/js/events.js',
-          'src/js/component.js',
-          'src/js/player.js',
-          'src/js/media.js',
-          'src/js/media.html5.js',
-          'src/js/media.flash.js',
-          'src/js/controls.js',
-          'src/js/tracks.js',
-          'src/js/setup.js',
-          'src/js/json.js',
-          'src/js/exports.js'
-        ],
-        dest: 'dist/video.js'
-      },
-      test: {
-        src: [
-          'test/unit/phantom-logging.js',
-          'test/unit/component.js',
-          'test/unit/core.js',
-          'test/unit/events.js',
-          'test/unit/lib.js',
-          'test/unit/media.html5.js',
-          'test/unit/player.js',
-          'test/unit/setup.js',
-        ],
-        dest: 'test/unit.js'
-      }
+    build: {
+      dist:{}
     },
     // Current forEach issue: https://github.com/gruntjs/grunt/issues/610
     // npm install https://github.com/gruntjs/grunt-contrib-jshint/archive/7fd70e86c5a8d489095fa81589d95dccb8eb3a46.tar.gz
     jshint: {
-      dist: {
-        src: ["dist/video.js"],
+      src: {
+        src: ["src/js/*.js"],
         options: {
           jshintrc: ".jshintrc"
         }
       }
     },
+    compile: {
+      dist:{
+        sourcelist: 'dist/sourcelist.txt',
+        externs: ['src/js/media.flash.externs.js'],
+        dest: 'dist/video.js'
+      },
+      test: {
+        sourcelist: 'dist/sourcelist.txt',
+        src: ['test/unit/*.js'],
+        externs: ['src/js/media.flash.externs.js', 'test/qunit-externs.js'],
+        dest: 'test/video.test.js'
+      }
+    },
+    dist: {
+      latest:{}
+    },
     qunit: {
-      all: ['test/unit.html']
+      all: ['test/index.html'],
     },
     watch: {
       files: [ "src/**/*.js" ],
@@ -57,77 +42,80 @@ module.exports = function(grunt) {
 
   });
 
-  // Default task.
-  // grunt.registerTask('default', 'lint:beforeconcat concat lint:afterconcat');
-  // // Default task(s).
-  // grunt.registerTask('default', ['uglify']);
-
-  grunt.loadNpmTasks("grunt-contrib-concat");
   grunt.loadNpmTasks("grunt-contrib-jshint");
   grunt.loadNpmTasks("grunt-contrib-qunit");
   grunt.loadNpmTasks("grunt-contrib-watch");
 
-  grunt.registerTask( "dev", [ "compile" ] ); // "build:*:*", "jshint"
-  // compiled += grunt.file.read( filepath );
+  // Default task.
+  grunt.registerTask('default', ['build', 'jshint', 'compile', 'dist']);
+  // Development watch task
+  grunt.registerTask('dev', ['build', 'jshint']);
 
-  var exec = require('child_process').exec,
-      fs = require('fs'),
+  grunt.registerTask('test', ['build', 'jshint', 'qunit']);
+
+  var fs = require('fs'),
       gzip = require('zlib').gzip;
 
   grunt.registerMultiTask('build', 'Building Source', function(){
-    grunt.log.writeln(this.target)
-    if (this.target === 'latest') {
-      var files = this.data.files;
-      var dist = '';
-
-      // for (prop in this.file) {
-      //   grunt.log.writeln(prop + ":" + this.file[prop])
-      // }
-
-      files.forEach(function(file){
-        dist += grunt.file.read('src/js/' + file)
-      });
-
-      grunt.file.write('dist/video.js', dist);
-    } else if (this.target === 'test') {
-      grunt.task.run('build:latest');
-    }
-
-  });
-
-  grunt.registerTask('compile', 'Minify JS files using Closure Compiler.', function() {
+    var calcdeps = require('calcdeps').calcdeps;
+    // caclcdeps is async
     var done = this.async();
 
-    var command = 'java -jar build/compiler/compiler.jar';
-    command += ' --compilation_level ADVANCED_OPTIMIZATIONS';
+    // In current version of calcdeps, not supplying certain
+    // options that should have defaults causes errors
+    // so we have all options listed here with their defaults.
+    calcdeps({
+      input: ['src/js/exports.js'],
+      path:['src/js/'],
+      dep:[],
+      exclude:[],
+      output_mode:'list',
+    }, function(err,results){
+      if (err) {
+        grunt.warn({ message: err })
+        grunt.log.writeln(err);
+        done(false);
+      }
 
-    var files = [
-      'goog.base.js',
-      'core.js',
-      'lib.js',
-      'events.js',
-      'component.js',
-      'player.js',
-      'media.js',
-      'media.html5.js',
-      'media.flash.js',
-      'controls.js',
-      'tracks.js',
-      'setup.js',
-      'json.js',
-      'exports.js'
-    ];
+      if (results) {
+        grunt.file.write('dist/sourcelist.txt', results.join(','));
+        grunt.file.write('dist/sourcelist.js', 'var sourcelist = ["' + results.join('","') + '"]');
+      }
+
+      done();
+    });
+  });
+
+  grunt.registerMultiTask('compile', 'Minify JS files using Closure Compiler.', function() {
+    var done = this.async();
+    var exec = require('child_process').exec;
+
+    var externs = this.file.externs || [];
+    var dest = this.file.dest;
+    var files = [];
+    if (this.data.sourcelist) {
+      files = files.concat(grunt.file.read(this.data.sourcelist).split(','))
+    }
+    if (this.file.src) {
+      files = files.concat(this.file.src);
+    }
+
+    var command = 'java -jar build/compiler/compiler.jar'
+                + ' --compilation_level ADVANCED_OPTIMIZATIONS'
+                // + ' --formatting=pretty_print'
+                + ' --js_output_file=' + dest
+                + ' --create_source_map ' + dest + '.map --source_map_format=V3'
+                + ' --output_wrapper "(function() {%output%})();//@ sourceMappingURL=video.js.map"';
 
     files.forEach(function(file){
-      command += ' --js=src/js/'+file;
+      command += ' --js='+file;
     });
 
-    command += ' --externs src/js/media.flash.externs.js';
-    // command += ' --formatting=pretty_print';
-    command += ' --js_output_file=test/video.compiled.js';
-    command += ' --create_source_map test/video.compiled.js.map --source_map_format=V3';
-    // command += ' --externs test/qunit-externs.js';
-    command += ' --output_wrapper "(function() {%output%})();//@ sourceMappingURL=video.compiled.js.map"';
+    externs.forEach(function(extern){
+      command += ' --externs='+extern;
+    });
+
+    // grunt.log.writeln(command)
 
     exec(command, { maxBuffer: 500*1024 }, function(err, stdout, stderr){
 
@@ -140,9 +128,11 @@ module.exports = function(grunt) {
         grunt.log.writeln(stdout);
       }
 
-      grunt.log.writeln("done!")
       done();
     });
   });
 
+  grunt.registerMultiTask('dist', 'Creating distribution', function(){
+
+  });
 };

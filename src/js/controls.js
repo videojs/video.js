@@ -2,6 +2,12 @@
  * @fileoverview Controls classes for Video.js buttons, sliders, etc.
  */
 
+goog.provide('vjs.Control');
+goog.provide('vjs.Menu');
+goog.provide('vjs.MenuItem');
+
+goog.require('vjs.Player');
+
 /**
  * Base class for all control elements
  * @param {vjs.Player|Object} player

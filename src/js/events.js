@@ -1,8 +1,13 @@
-// Event System (John Resig - Secrets of a JS Ninja http://jsninja.com/)
-// (Original book version wasn't completely usable, so fixed some things and made Closure Compiler compatible)
-//
-// This should work very similarly to jQuery's events, however it's based off the book version which isn't as
-// robust as jquery's, so there's probably some differences.
+/**
+ * @fileoverview Event System (John Resig - Secrets of a JS Ninja http://jsninja.com/)
+ * (Original book version wasn't completely usable, so fixed some things and made Closure Compiler compatible)
+ * This should work very similarly to jQuery's events, however it's based off the book version which isn't as
+ * robust as jquery's, so there's probably some differences.
+ */
+
+goog.provide('vjs.events');
+
+goog.require('vjs');
 
 /**
  * Add an event listener to element

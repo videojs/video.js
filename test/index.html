@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Video.js Test Suite</title>
+
+  <!-- QUnit -->
+  <link rel="stylesheet" href="../test/qunit/qunit/qunit.css" />
+  <script src="../test/qunit/qunit/qunit.js"></script>
+
+  <!-- Video.js CSS -->
+  <link rel="stylesheet" href="../src/css/video-js.css" type="text/css">
+
+  <!-- GENERATED LIST OF SOURCE FILES -->
+  <script src="../dist/sourcelist.js"></script>
+
+  <script type="text/javascript">
+    (function(){
+      var root = '../';
+      // ADD NEW TEST FILES HERE
+      var tests = [
+        'test/unit/lib.js',
+        'test/unit/events.js',
+        'test/unit/component.js',
+        'test/unit/player.js',
+        'test/unit/core.js',
+        'test/unit/media.html5.js'
+      ];
+      var compiledTests = "test/video.test.js";
+      var scripts = [];
+
+      // Choose either the raw source and tests
+      // Or the compiled source + tests.
+      // Use ?comiled to use the compiled tests
+      if (QUnit.urlParams.min || QUnit.urlParams.compiled) {
+        scripts.push(compiledTests);
+      } else {
+        // sourcelist is loaded by sourcelist.js
+        // which is built by `grunt build` or `grunt watch`
+        scripts = scripts.concat(sourcelist,tests);
+      }
+
+      for (var i = 0; i < scripts.length; i++) {
+        document.write( "<script src='" + root + scripts[i] + "'><\/script>" );
+      }
+
+    })()
+  </script>
+
+</head>
+<body>
+  <div>
+    <h1 id="qunit-header">Video.js Test Suite</h1>
+    <h2 id="qunit-banner"></h2>
+    <h2 id="qunit-userAgent"></h2>
+    <ol id="qunit-tests"></ol>
+    <div id="qunit-fixture"></div>
+  </div>
+</body>
+</html>

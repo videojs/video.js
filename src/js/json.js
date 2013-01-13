@@ -1,3 +1,5 @@
+goog.provide('vjs.JSON');
+
 /**
  * Javascript JSON implementation
  * (Parse Method Only)

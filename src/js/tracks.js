@@ -7,6 +7,12 @@
  * Descriptions (not supported yet) - audio descriptions that are read back to the user by a screen reading device
  */
 
+goog.provide('vjs.TextTrack');
+
+goog.require('vjs.Menu');
+goog.require('vjs.MenuItem');
+goog.require('vjs.Component');
+
 
 // Player Additions - Functions add to the player object for easier access to tracks
 

@@ -5,6 +5,15 @@
  * be renamed by closure compiler.
  */
 
+goog.require('vjs');
+goog.require('vjs.Component');
+goog.require('vjs.Player');
+goog.require('vjs.Control');
+goog.require('vjs.Html5');
+goog.require('vjs.Flash');
+goog.require('vjs.TextTrack');
+goog.require('vjs.autoSetup');
+
 /**
  * vjs (internal only) = videojs = _V_ (external only)
  *
@@ -118,3 +127,5 @@ goog.exportProperty(vjs.TextTrack.prototype, 'label', vjs.TextTrack.prototype.la
 goog.exportSymbol('videojs.CaptionsTrack', vjs.CaptionsTrack);
 goog.exportSymbol('videojs.SubtitlesTrack', vjs.SubtitlesTrack);
 goog.exportSymbol('videojs.ChaptersTrack', vjs.ChaptersTrack);
+
+goog.exportSymbol('videojs.autoSetup', vjs.autoSetup);

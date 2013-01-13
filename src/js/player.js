@@ -1,3 +1,7 @@
+goog.provide('vjs.Player');
+
+goog.require('vjs.Component');
+
 /**
  * Main player class. A player instance is returned by _V_(id);
  * @param {Element} tag        The original video tag used for configuring options

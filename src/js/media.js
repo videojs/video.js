@@ -2,6 +2,10 @@
  * @fileoverview Media Technology Controller - Base class for media playback technologies
  */
 
+goog.provide('vjs.MediaTechController');
+
+goog.require('vjs.Component');
+
 /**
  * Base class for media (HTML5 Video, Flash) controllers
  * @param {vjs.Player|Object} player  Central player instance
