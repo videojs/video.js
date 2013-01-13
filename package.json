@@ -23,6 +23,7 @@
     "grunt-contrib-jshint": "https://github.com/gruntjs/grunt-contrib-jshint/archive/7fd70e86c5a8d489095fa81589d95dccb8eb3a46.tar.gz",
     "grunt-contrib-watch": "~0.1.4",
     "grunt-contrib-qunit": "~0.1.0",
-    "calcdeps": "~0.1.7"
+    "calcdeps": "~0.1.7",
+    "phantomjs": "~1.8.0-1"
   }
 }
