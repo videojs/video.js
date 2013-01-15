@@ -1,16 +1,29 @@
-{ "name": "Video.js"
-, "description": "An HTML5 and Flash video player with a common API and skin for both."
-, "version": "3.2.3"
-, "keywords": ["html5", "flash", "video", "player"]
-, "homepage": "http://videojs.com"
-, "author": "Steve Heffernan"
-, "scripts": { "test": "make test" }
-, "repository": 
-    { "type": "git"
-    , "url": "https://github.com/zencoder/video-js.git"
-    }
-, "devDependencies": 
-    { "jshint": "0.6.1"
-    , "connect": "2.1.3"
-    }
+{
+  "name": "video.js",
+  "description": "An HTML5 and Flash video player with a common API and skin for both.",
+  "version": "3.2.3",
+  "keywords": [
+    "html5",
+    "flash",
+    "video",
+    "player"
+  ],
+  "homepage": "http://videojs.com",
+  "author": "Steve Heffernan",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zencoder/video-js.git"
+  },
+  "devDependencies": {
+    "grunt-cli": "~0.1.0",
+    "grunt": "0.4.0rc4",
+    "grunt-contrib-jshint": "https://github.com/gruntjs/grunt-contrib-jshint/archive/7fd70e86c5a8d489095fa81589d95dccb8eb3a46.tar.gz",
+    "grunt-contrib-watch": "~0.1.4",
+    "grunt-contrib-qunit": "~0.1.0",
+    "calcdeps": "~0.1.7",
+    "phantomjs": "~1.8.0-1"
+  }
 }
