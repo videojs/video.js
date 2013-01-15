@@ -25,7 +25,7 @@ module.exports = function(grunt) {
       test: {
         sourcelist: 'dist/sourcelist.txt',
         src: ['test/unit/*.js'],
-        externs: ['src/js/media.flash.externs.js', 'test/qunit-externs.js'],
+        externs: ['src/js/media.flash.externs.js', 'test/qunit/qunit-externs.js'],
         dest: 'test/video.test.js'
       }
     },
@@ -49,9 +49,9 @@ module.exports = function(grunt) {
   // Default task.
   grunt.registerTask('default', ['build', 'jshint', 'compile', 'dist']);
   // Development watch task
-  grunt.registerTask('dev', ['build', 'jshint']);
+  grunt.registerTask('dev', ['jshint','build']);
 
-  grunt.registerTask('test', ['build', 'jshint', 'qunit']);
+  grunt.registerTask('test', ['jshint','build','qunit']);
 
   var fs = require('fs'),
       gzip = require('zlib').gzip;
