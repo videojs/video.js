@@ -84,6 +84,10 @@ Example:
 
 **[File a bug report](https://github.com/h5bp/html5-boilerplate/issues/)**
 
+### NOTE: Testing Flash Locall in Chrome
+Chrome 21+ (as of 2013/01/01) doens't run Flash files that are local and loaded into a locally accessed page (file:///). To get around this you need to [disable the version of Flash](http://helpx.adobe.com/flash-player/kb/flash-player-google-chrome.html#How_can_I_run_debugger_or_alternate_versions_of_Flash_Player_in_Google_Chrome) included with Chrome and enable a system-wide version of Flash.
+
+
 ## Pull requests
 
 Good pull requests - patches, improvements, new features - are a fantastic help. They should remain focused in scope and avoid containing unrelated commits. If your contribution involves a significant amount of work or substantial changes to any part of the project, please open an issue to discuss it first.
@@ -155,5 +159,5 @@ If you happen to find something in the codebase that does not follow the style g
 This doc was inspired by some great contribution guide examples including [contribute.md template](https://github.com/contribute-md/contribute-md-template),
 [grunt](https://github.com/gruntjs/grunt/wiki/Contributing),
 [html5 boilerplate](https://github.com/h5bp/html5-boilerplate/blob/master/CONTRIBUTING.md),
-[jquery](https://github.com/jquery/jquery/blob/master/CONTRIBUTING.md), 
+[jquery](https://github.com/jquery/jquery/blob/master/CONTRIBUTING.md),
 and [node.js](https://github.com/joyent/node/wiki/Contributing).
