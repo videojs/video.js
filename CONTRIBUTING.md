@@ -13,45 +13,45 @@ Don't miss the [code style guide](#code-style).
 
 2. [Fork](http://help.github.com/fork-a-repo/) and clone the video.js git repository.
 
-```bash
-# Clones your fork of the repo into the current directory in terminal
-git clone https://github.com/<your-username>/video-js.git
-# Navigate to the newly cloned directory
-cd video-js
-# Assigns the original repo to a remote called "upstream"
-git remote add upstream https://github.com/zencoder/video-js.git
-```
+  ```bash
+  # Clones your fork of the repo into the current directory in terminal
+  git clone https://github.com/<your-username>/video-js.git
+  # Navigate to the newly cloned directory
+  cd video-js
+  # Assigns the original repo to a remote called "upstream"
+  git remote add upstream https://github.com/zencoder/video-js.git
+  ```
 
-In the future, if you want to pull in updates to video.js that happened after you cloned the main repo, you can run:
+  In the future, if you want to pull in updates to video.js that happened after you cloned the main repo, you can run:
 
-```bash
-git checkout master
-git pull upstream master
-```
+  ```bash
+  git checkout master
+  git pull upstream master
+  ```
 
 3. Install the grunt-cli package so that you will have the correct version of grunt available from any project that needs it. This should be done as a global install:
 
-```bash
-npm install -g grunt-cli
-```
+  ```bash
+  npm install -g grunt-cli
+  ```
 
 4. Install required node.js modules using node package manager.
 
-```bash
-npm install
-```
+  ```bash
+  npm install
+  ```
 
 5. Build a local copy. Video.js uses [grunt](http://gruntjs.com), a node-based task automation tool for building and tesing. The following will compile a local copy in the dist/ directory and run tests. It will also create a sourcelist.js file that can be used to load the video.js source scripts in a page.
 
-```bash
-grunt
-```
+  ```bash
+  grunt
+  ```
 
 6. When you're ready to add a feature, make a change, or fix a bug, first create a new branch for it. Prefix the branch with the correspoding [issue number](https://github.com/zencoder/video-js/issues). If there isn't one, submit a new issue. Anything more complicated than simple docs changes should have an issue.
 
-```bash
-git checkout -b <####-branch-name>
-```
+  ```bash
+  git checkout -b <####-branch-name>
+  ```
 
 # Bugs
 
