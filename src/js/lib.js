@@ -44,6 +44,7 @@ vjs.capitalize = function(string){
  */
 vjs.eachProp = function(obj, fn){
   if (!obj) { return; }
+
   for (var name in obj) {
     if (obj.hasOwnProperty(name)) {
       fn.call(this, name, obj[name]);
@@ -58,16 +59,15 @@ vjs.eachProp = function(obj, fn){
  * @param  {[type]} safe [description]
  * @return {[type]}
  */
-vjs.merge = function(obj1, obj2, safe){
+vjs.merge = function(obj1, obj2){
   // Make sure second object exists
   if (!obj2) { return obj1; }
 
-  for (var attrname in obj2){
-    if (obj2.hasOwnProperty(attrname) && (!safe || !obj1.hasOwnProperty(attrname))) { obj1[attrname]=obj2[attrname]; }
+  for (var propName in obj2){
+    if (obj2.hasOwnProperty(propName)) { obj1[propName] = obj2[propName]; }
   }
   return obj1;
 };
-// vjs.extend = function(obj){ this.merge(this, obj, true); };
 
 /**
  * Bind (a.k.a proxy or Context). A simple method for changing the context of a function

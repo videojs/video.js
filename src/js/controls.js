@@ -94,16 +94,16 @@ vjs.Button = function(player, options){
 };
 goog.inherits(vjs.Button, vjs.Control);
 
-vjs.Button.prototype.createEl = function(type, attrs){
+vjs.Button.prototype.createEl = function(type, props){
   // Add standard Aria and Tabindex info
-  attrs = vjs.merge({
+  props = vjs.merge({
     className: this.buildCSSClass(),
     innerHTML: '<div><span class="vjs-control-text">' + (this.buttonText || 'Need Text') + '</span></div>',
     role: 'button',
     tabIndex: 0
-  }, attrs);
+  }, props);
 
-  return goog.base(this, 'createEl', type, attrs);
+  return goog.base(this, 'createEl', type, props);
 };
 
   // Click - Override with specific functionality for button
@@ -485,16 +485,16 @@ vjs.Slider = function(player, options){
 };
 goog.inherits(vjs.Slider, vjs.Component);
 
-vjs.Slider.prototype.createEl = function(type, attrs) {
-  attrs = vjs.merge({
+vjs.Slider.prototype.createEl = function(type, props) {
+  props = vjs.merge({
     role: 'slider',
     'aria-valuenow': 0,
     'aria-valuemin': 0,
     'aria-valuemax': 100,
     tabIndex: 0
-  }, attrs);
+  }, props);
 
-  return goog.base(this, 'createEl', type, attrs);
+  return goog.base(this, 'createEl', type, props);
 };
 
 vjs.Slider.prototype.onMouseDown = function(event){
@@ -982,11 +982,11 @@ vjs.MenuItem = function(player, options){
 };
 goog.inherits(vjs.MenuItem, vjs.Button);
 
-vjs.MenuItem.prototype.createEl = function(type, attrs){
+vjs.MenuItem.prototype.createEl = function(type, props){
   return goog.base(this, 'createEl', 'li', vjs.merge({
     className: 'vjs-menu-item',
     innerHTML: this.options.label
-  }, attrs));
+  }, props));
 };
 
 vjs.MenuItem.prototype.onClick = function(){

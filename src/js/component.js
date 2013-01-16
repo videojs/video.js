@@ -18,7 +18,7 @@ vjs.Component = function(player, options, ready){
   this.player = player;
 
   // // Allow for overridding default component options
-  options = this.options = vjs.merge(this.options || {}, options);
+  options = this.options = this.mergeOptions(this.options, options);
 
   // Get ID from options, element, or create using player ID and unique ID
   this.id_ = options.id || ((options.el && options.el.id) ? options.el.id : player.id + '_component_' + vjs.guid++ );
@@ -74,6 +74,80 @@ vjs.Component.prototype.dispose = function(){
  * @private
  */
 vjs.Component.prototype.options;
+
+/**
+ * Deep merge of options objects
+ * Whenever a property is an object on both options objects
+ * the two properties will be merged using mergeOptions
+ *
+ * This is used for merging options for child components. We
+ * want it to be easy to override individual options on a child
+ * component without having to rewrite all the other default options.
+ *
+ * parentDefaultOptions = {
+ *   children: {
+ *     'childOne': { 'foo': 'bar', 'asdf': 'fdsa' },
+ *     'childTwo': {},
+ *     'childThree': {}
+ *   }
+ * }
+ * parentOptionsFromInit = {
+ *   children: {
+ *     'childOne': { 'foo': 'baz', 'abc': '123' }
+ *     'childTwo': null,
+ *     'childFour': {}
+ *   }
+ * }
+ *
+ * this.mergeOptions(parentDefaultOptions, parentOptionsFromInit);
+ *
+ * RESULT
+ *
+ * {
+ *   children: {
+ *     'childOne': { 'foo': 'baz', 'asdf': 'fdsa', 'abc': '123' },
+ *     'childTwo': null, // Disabled. Won't be initialized.
+ *     'childThree': {},
+ *     'childFour': {}
+ *   }
+ * }
+ *
+ *
+ * @param  {Object} obj1 Object whose values will be overwritten
+ * @param  {Object} obj2 Object whose values will overwrite
+ * @return {Object}      NEW merged object. Does not return obj1.
+ */
+vjs.Component.prototype.mergeOptions = function(obj1, obj2){
+  var retObj, toString, hasOwnProp, propName, objDef, val1, val2;
+
+  hasOwnProp = Object.prototype.hasOwnProperty;
+  toString = Object.prototype.toString;
+  objDef = '[object Object]';
+  obj1 = obj1 || {};
+  retObj = {};
+
+  // Make a copy of obj1 so we don't affect the original options
+  vjs.eachProp(obj1, function(name, val){
+    retObj[name] = val;
+  });
+
+  if (!obj2) { return retObj; }
+
+  for (propName in obj2){
+    if (hasOwnProp.call(obj2, propName)) {
+      val1 = retObj[propName];
+      val2 = obj2[propName];
+
+      if (toString.call(val1) === objDef && toString.call(val2) === objDef) {
+        retObj[propName] = this.mergeOptions(val1, val2);
+      } else {
+        retObj[propName] = obj2[propName];
+      }
+    }
+  }
+
+  return retObj;
+};
 
 /**
  * The DOM element for the component.

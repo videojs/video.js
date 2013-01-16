@@ -29,6 +29,35 @@ test('should init child coponents from options', function(){
   ok(comp.el().childNodes.length === 1);
 });
 
+test('should do a deep merge of child options', function(){
+  var compDefaultOptions = {
+    'children': {
+      'childOne': { 'foo': 'bar', 'asdf': 'fdsa' },
+      'childTwo': {},
+      'childThree': {}
+    }
+  }
+
+  var compInitOptions = {
+    'children': {
+      'childOne': { 'foo': 'baz', 'abc': '123' },
+      'childThree': null,
+      'childFour': {}
+    }
+  }
+
+  var mergedOptions = vjs.Component.prototype.mergeOptions(compDefaultOptions, compInitOptions);
+  var children = mergedOptions['children'];
+
+  ok(children['childOne']['foo'] === 'baz', 'value three levels deep overridden');
+  console.log(children['childOne']['asdf'])
+  ok(children['childOne']['asdf'] === 'fdsa', 'value three levels deep maintained');
+  ok(children['childOne']['abc'] === '123', 'value three levels deep added');
+  ok(children['childTwo'], 'object two levels deep maintained');
+  ok(children['childThree'] === null, 'object two levels deep removed');
+  ok(children['childFour'], 'object two levels deep added');
+});
+
 test('should dispose of component and children', function(){
   var comp = new vjs.Component({});
 
