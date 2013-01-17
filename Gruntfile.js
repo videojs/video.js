@@ -33,7 +33,7 @@ module.exports = function(grunt) {
       latest:{}
     },
     qunit: {
-      all: ['test/index.html'],
+      all: ['test/index.html', 'test/compiled.html'],
     },
     watch: {
       files: [ "src/**/*.js" ],
