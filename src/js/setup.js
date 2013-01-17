@@ -24,7 +24,7 @@ vjs.autoSetup = function(){
       if (vid && vid.getAttribute) {
 
         // Make sure this player hasn't already been set up.
-        if (vid.player === undefined) {
+        if (vid['player'] === undefined) {
           options = vid.getAttribute('data-setup');
 
           // Check if data-setup attr exists.

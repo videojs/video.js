@@ -15,7 +15,7 @@ goog.require('vjs.dom');
  * @constructor
  */
 vjs.Component = function(player, options, ready){
-  this.player = player;
+  this.player_ = player;
 
   // // Allow for overridding default component options
   options = this.options = this.mergeOptions(this.options, options);
@@ -67,6 +67,13 @@ vjs.Component.prototype.dispose = function(){
   vjs.removeData(this.el_);
   this.el_ = null;
 };
+
+/**
+ * Reference to main player instance.
+ * @type {vjs.Player}
+ * @private
+ */
+vjs.Component.prototype.player_;
 
 /**
  * Component options object.
@@ -275,10 +282,10 @@ vjs.Component.prototype.addChild = function(child, options){
     options.name = componentName;
 
     // Create a new object & element for this controls set
-    // If there's no .player, this is a player
+    // If there's no .player_, this is a player
     // Closure Compiler throws an 'incomplete alias' warning if we use the vjs variable directly.
     // Every class should be exported, so this should never be a problem here.
-    component = new window['videojs'][componentClass](this.player || this, options);
+    component = new window['videojs'][componentClass](this.player_ || this, options);
 
   // child is a component instance
   } else {

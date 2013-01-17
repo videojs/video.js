@@ -173,16 +173,16 @@ vjs.Flash = function(player, options, ready){
 
       // Setting variables on the window needs to come after the doc write because otherwise they can get reset in some browsers
       // So far no issues with swf ready event being called before it's set on the window.
-      iWin.player = this.player;
+      iWin['player'] = this.player_;
 
       // Create swf ready function for iFrame window
-      iWin.ready = vjs.bind(this.player, function(currSwf){
+      iWin['ready'] = vjs.bind(this.player_, function(currSwf){
         var el = iDoc.getElementById(currSwf),
             player = this,
             tech = player.tech;
 
         // Update reference to playback technology element
-        tech.el = el;
+        tech.el_ = el;
 
         // Now that the element is ready, make a click on the swf play the video
         vjs.on(el, 'click', tech.bind(tech.onClick));
@@ -192,7 +192,7 @@ vjs.Flash = function(player, options, ready){
       });
 
       // Create event listener for all swf events
-      iWin.events = vjs.bind(this.player, function(swfID, eventName){
+      iWin['events'] = vjs.bind(this.player_, function(swfID, eventName){
         var player = this;
         if (player && player.techName === 'flash') {
           player.trigger(eventName);
@@ -200,7 +200,7 @@ vjs.Flash = function(player, options, ready){
       });
 
       // Create error listener for all swf errors
-      iWin.errors = vjs.bind(this.player, function(swfID, eventName){
+      iWin['errors'] = vjs.bind(this.player_, function(swfID, eventName){
         vjs.log('Flash Error', eventName);
       });
 
@@ -237,7 +237,7 @@ vjs.Flash.prototype.src = function(src){
 
   // Currently the SWF doesn't autoplay if you load a source later.
   // e.g. Load player w/ no source, wait 2s, set src.
-  if (this.player.autoplay()) {
+  if (this.player_.autoplay()) {
     var tech = this;
     setTimeout(function(){ tech.play(); }, 0);
   }
@@ -332,11 +332,11 @@ vjs.Flash['onReady'] = function(currSwf){
 
   // Get player from box
   // On firefox reloads, el might already have a player
-  var player = el.player || el.parentNode.player,
+  var player = el['player'] || el.parentNode['player'],
       tech = player.tech;
 
   // Reference player on tech element
-  el.player = player;
+  el['player'] = player;
 
   // Update reference to playback technology element
   tech.el_ = el;
@@ -369,13 +369,13 @@ vjs.Flash.checkReady = function(tech){
 
 // Trigger events from the swf on the player
 vjs.Flash['onEvent'] = function(swfID, eventName){
-  var player = vjs.el(swfID).player;
+  var player = vjs.el(swfID)['player'];
   player.trigger(eventName);
 };
 
 // Log errors from the swf
 vjs.Flash['onError'] = function(swfID, err){
-  var player = vjs.el(swfID).player;
+  var player = vjs.el(swfID)['player'];
   player.trigger('error');
   vjs.log('Flash Error', err, swfID);
 };

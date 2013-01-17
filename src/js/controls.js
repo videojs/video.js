@@ -36,8 +36,8 @@ vjs.ControlBar = function(player, options){
 
   player.one('play', vjs.bind(this, function(){
     this.fadeIn();
-    this.player.on('mouseover', vjs.bind(this, this.fadeIn));
-    this.player.on('mouseout', vjs.bind(this, this.fadeOut));
+    this.player_.on('mouseover', vjs.bind(this, this.fadeIn));
+    this.player_.on('mouseout', vjs.bind(this, this.fadeOut));
   }));
 };
 goog.inherits(vjs.ControlBar, vjs.Component);
@@ -65,12 +65,12 @@ vjs.ControlBar.prototype.createEl = function(){
 
 vjs.ControlBar.prototype.fadeIn = function(){
   goog.base(this, 'fadeIn');
-  this.player.trigger('controlsvisible');
+  this.player_.trigger('controlsvisible');
 };
 
 vjs.ControlBar.prototype.fadeOut = function(){
   goog.base(this, 'fadeOut');
-  this.player.trigger('controlshidden');
+  this.player_.trigger('controlshidden');
 };
 
 vjs.ControlBar.prototype.lockShowing = function(){
@@ -148,7 +148,7 @@ vjs.PlayButton.prototype.buildCSSClass = function(){
 };
 
 vjs.PlayButton.prototype.onClick = function(){
-  this.player.play();
+  this.player_.play();
 };
 
 /* Pause Button
@@ -171,7 +171,7 @@ vjs.PauseButton.prototype.buildCSSClass = function(){
 };
 
 vjs.PauseButton.prototype.onClick = function(){
-  this.player.pause();
+  this.player_.pause();
 };
 
 /* Play Toggle - Play or Pause Media
@@ -198,10 +198,10 @@ vjs.PlayToggle.prototype.buildCSSClass = function(){
 
   // OnClick - Toggle between play and pause
 vjs.PlayToggle.prototype.onClick = function(){
-  if (this.player.paused()) {
-    this.player.play();
+  if (this.player_.paused()) {
+    this.player_.play();
   } else {
-    this.player.pause();
+    this.player_.pause();
   }
 };
 
@@ -238,10 +238,10 @@ vjs.FullscreenToggle.prototype.buildCSSClass = function(){
 };
 
 vjs.FullscreenToggle.prototype.onClick = function(){
-  if (!this.player.isFullScreen) {
-    this.player.requestFullScreen();
+  if (!this.player_.isFullScreen) {
+    this.player_.requestFullScreen();
   } else {
-    this.player.cancelFullScreen();
+    this.player_.cancelFullScreen();
   }
 };
 
@@ -272,10 +272,10 @@ vjs.BigPlayButton.prototype.createEl = function(){
 vjs.BigPlayButton.prototype.onClick = function(){
   // Go back to the beginning if big play button is showing at the end.
   // Have to check for current time otherwise it might throw a 'not ready' error.
-  if(this.player.currentTime()) {
-    this.player.currentTime(0);
+  if(this.player_.currentTime()) {
+    this.player_.currentTime(0);
   }
-  this.player.play();
+  this.player_.play();
 };
 
 /* Loading Spinner
@@ -314,10 +314,10 @@ goog.inherits(vjs.LoadingSpinner, vjs.Component);
 vjs.LoadingSpinner.prototype.createEl = function(){
   var classNameSpinner, innerHtmlSpinner;
 
-  if ( typeof this.player.el().style.WebkitBorderRadius == 'string'
-       || typeof this.player.el().style.MozBorderRadius == 'string'
-       || typeof this.player.el().style.KhtmlBorderRadius == 'string'
-       || typeof this.player.el().style.borderRadius == 'string')
+  if ( typeof this.player_.el().style.WebkitBorderRadius == 'string'
+       || typeof this.player_.el().style.MozBorderRadius == 'string'
+       || typeof this.player_.el().style.KhtmlBorderRadius == 'string'
+       || typeof this.player_.el().style.borderRadius == 'string')
     {
       classNameSpinner = 'vjs-loading-spinner';
       innerHtmlSpinner = '<div class="ball1"></div><div class="ball2"></div><div class="ball3"></div><div class="ball4"></div><div class="ball5"></div><div class="ball6"></div><div class="ball7"></div><div class="ball8"></div>';
@@ -364,8 +364,8 @@ vjs.CurrentTimeDisplay.prototype.createEl = function(){
 
 vjs.CurrentTimeDisplay.prototype.updateContent = function(){
   // Allows for smooth scrubbing, when player can't keep up.
-  var time = (this.player.scrubbing) ? this.player.getCache().currentTime : this.player.currentTime();
-  this.content.innerHTML = vjs.formatTime(time, this.player.duration());
+  var time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
+  this.content.innerHTML = vjs.formatTime(time, this.player_.duration());
 };
 
 /**
@@ -396,7 +396,7 @@ vjs.DurationDisplay.prototype.createEl = function(){
 };
 
 vjs.DurationDisplay.prototype.updateContent = function(){
-  if (this.player.duration()) { this.content.innerHTML = vjs.formatTime(this.player.duration()); }
+  if (this.player_.duration()) { this.content.innerHTML = vjs.formatTime(this.player_.duration()); }
 };
 
 /**
@@ -446,11 +446,11 @@ vjs.RemainingTimeDisplay.prototype.createEl = function(){
 };
 
 vjs.RemainingTimeDisplay.prototype.updateContent = function(){
-  if (this.player.duration()) { this.content.innerHTML = '-'+vjs.formatTime(this.player.remainingTime()); }
+  if (this.player_.duration()) { this.content.innerHTML = '-'+vjs.formatTime(this.player_.remainingTime()); }
 
   // Allows for smooth scrubbing, when player can't keep up.
-  // var time = (this.player.scrubbing) ? this.player.getCache().currentTime : this.player.currentTime();
-  // this.content.innerHTML = vjs.formatTime(time, this.player.duration());
+  // var time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
+  // this.content.innerHTML = vjs.formatTime(time, this.player_.duration());
 };
 
 /* Slider
@@ -476,10 +476,10 @@ vjs.Slider = function(player, options){
     this.on('focus', this.onFocus);
     this.on('blur', this.onBlur);
 
-    this.player.on('controlsvisible', vjs.bind(this, this.update));
+    this.player_.on('controlsvisible', vjs.bind(this, this.update));
 
     // This is actually to fix the volume handle position. http://twitter.com/#!/gerritvanaaken/status/159046254519787520
-    // this.player.one('timeupdate', vjs.bind(this, this.update));
+    // this.player_.one('timeupdate', vjs.bind(this, this.update));
 
     player.ready(vjs.bind(this, this.update));
 };
@@ -518,7 +518,7 @@ vjs.Slider.prototype.onMouseUp = function() {
 vjs.Slider.prototype.update = function(){
   // If scrubbing, we could use a cached value to make the handle keep up with the user's mouse.
   // On HTML5 browsers scrubbing is really smooth, but some flash players are slow, so we might want to utilize this later.
-  // var progress =  (this.player.scrubbing) ? this.player.getCache().currentTime / this.player.duration() : this.player.currentTime() / this.player.duration();
+  // var progress =  (this.player_.scrubbing) ? this.player_.getCache().currentTime / this.player_.duration() : this.player_.currentTime() / this.player_.duration();
 
   var barProgress,
       progress = this.getPercent(),
@@ -654,43 +654,43 @@ vjs.SeekBar.prototype.createEl = function(){
 };
 
 vjs.SeekBar.prototype.getPercent = function(){
-  return this.player.currentTime() / this.player.duration();
+  return this.player_.currentTime() / this.player_.duration();
 };
 
 vjs.SeekBar.prototype.onMouseDown = function(event){
   goog.base(this, 'onMouseDown', event);
 
-  this.player.scrubbing = true;
+  this.player_.scrubbing = true;
 
-  this.videoWasPlaying = !this.player.paused();
-  this.player.pause();
+  this.videoWasPlaying = !this.player_.paused();
+  this.player_.pause();
 };
 
 vjs.SeekBar.prototype.onMouseMove = function(event){
-  var newTime = this.calculateDistance(event) * this.player.duration();
+  var newTime = this.calculateDistance(event) * this.player_.duration();
 
   // Don't let video end while scrubbing.
-  if (newTime == this.player.duration()) { newTime = newTime - 0.1; }
+  if (newTime == this.player_.duration()) { newTime = newTime - 0.1; }
 
   // Set new time (tell player to seek to new time)
-  this.player.currentTime(newTime);
+  this.player_.currentTime(newTime);
 };
 
 vjs.SeekBar.prototype.onMouseUp = function(event){
   goog.base(this, 'onMouseUp', event);
 
-  this.player.scrubbing = false;
+  this.player_.scrubbing = false;
   if (this.videoWasPlaying) {
-    this.player.play();
+    this.player_.play();
   }
 };
 
 vjs.SeekBar.prototype.stepForward = function(){
-  this.player.currentTime(this.player.currentTime() + 1);
+  this.player_.currentTime(this.player_.currentTime() + 1);
 };
 
 vjs.SeekBar.prototype.stepBack = function(){
-  this.player.currentTime(this.player.currentTime() - 1);
+  this.player_.currentTime(this.player_.currentTime() - 1);
 };
 
 
@@ -714,7 +714,7 @@ vjs.LoadProgressBar.prototype.createEl = function(){
 };
 
 vjs.LoadProgressBar.prototype.update = function(){
-  if (this.el_.style) { this.el_.style.width = vjs.round(this.player.bufferedPercent() * 100, 2) + '%'; }
+  if (this.el_.style) { this.el_.style.width = vjs.round(this.player_.bufferedPercent() * 100, 2) + '%'; }
 };
 
 
@@ -807,19 +807,19 @@ vjs.VolumeBar.prototype.createEl = function(){
 };
 
 vjs.VolumeBar.prototype.onMouseMove = function(event) {
-  this.player.volume(this.calculateDistance(event));
+  this.player_.volume(this.calculateDistance(event));
 };
 
 vjs.VolumeBar.prototype.getPercent = function(){
-   return this.player.volume();
+   return this.player_.volume();
 };
 
 vjs.VolumeBar.prototype.stepForward = function(){
-  this.player.volume(this.player.volume() + 0.1);
+  this.player_.volume(this.player_.volume() + 0.1);
 };
 
 vjs.VolumeBar.prototype.stepBack = function(){
-  this.player.volume(this.player.volume() - 0.1);
+  this.player_.volume(this.player_.volume() - 0.1);
 };
 
 /**
@@ -881,14 +881,14 @@ vjs.MuteToggle.prototype.createEl = function(){
 };
 
 vjs.MuteToggle.prototype.onClick = function(){
-  this.player.muted( this.player.muted() ? false : true );
+  this.player_.muted( this.player_.muted() ? false : true );
 };
 
 vjs.MuteToggle.prototype.update = function(){
-  var vol = this.player.volume(),
+  var vol = this.player_.volume(),
       level = 3;
 
-  if (vol === 0 || this.player.muted()) {
+  if (vol === 0 || this.player_.muted()) {
     level = 0;
   } else if (vol < 0.33) {
     level = 1;
@@ -914,7 +914,7 @@ vjs.MuteToggle.prototype.update = function(){
 vjs.PosterImage = function(player, options){
   goog.base(this, player, options);
 
-  if (!this.player.options.poster) {
+  if (!this.player_.options.poster) {
     this.hide();
   }
 
@@ -931,14 +931,14 @@ vjs.PosterImage.prototype.createEl = function(){
   });
 
   // src throws errors if no poster was defined.
-  if (this.player.options.poster) {
-    el.src = this.player.options.poster;
+  if (this.player_.options.poster) {
+    el.src = this.player_.options.poster;
   }
   return el;
 };
 
 vjs.PosterImage.prototype.onClick = function(){
-  this.player.play();
+  this.player_.play();
 };
 
 /* Menu

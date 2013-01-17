@@ -373,14 +373,14 @@ vjs.TextTrack.prototype.activate = function(){
   if (this.mode_ === 0) {
     // Update current cue on timeupdate
     // Using unique ID for bind function so other tracks don't remove listener
-    this.player.on('timeupdate', vjs.bind(this, this.update, this.id_));
+    this.player_.on('timeupdate', vjs.bind(this, this.update, this.id_));
 
     // Reset cue time on media end
-    this.player.on('ended', vjs.bind(this, this.reset, this.id_));
+    this.player_.on('ended', vjs.bind(this, this.reset, this.id_));
 
     // Add to display
     if (this.kind_ === 'captions' || this.kind_ === 'subtitles') {
-      this.player.getChild('textTrackDisplay').addChild(this);
+      this.player_.getChild('textTrackDisplay').addChild(this);
     }
   }
 };
@@ -390,12 +390,12 @@ vjs.TextTrack.prototype.activate = function(){
  */
 vjs.TextTrack.prototype.deactivate = function(){
   // Using unique ID for bind function so other tracks don't remove listener
-  this.player.off('timeupdate', vjs.bind(this, this.update, this.id_));
-  this.player.off('ended', vjs.bind(this, this.reset, this.id_));
+  this.player_.off('timeupdate', vjs.bind(this, this.update, this.id_));
+  this.player_.off('ended', vjs.bind(this, this.reset, this.id_));
   this.reset(); // Reset
 
   // Remove from display
-  this.player.getChild('textTrackDisplay').removeChild(this);
+  this.player_.getChild('textTrackDisplay').removeChild(this);
 };
 
 // A readiness state
@@ -529,14 +529,14 @@ vjs.TextTrack.prototype.update = function(){
   if (this.cues_.length > 0) {
 
     // Get curent player time
-    var time = this.player.currentTime();
+    var time = this.player_.currentTime();
 
     // Check if the new time is outside the time box created by the the last update.
     if (this.prevChange === undefined || time < this.prevChange || this.nextChange <= time) {
       var cues = this.cues_,
 
           // Create a new time box for this state.
-          newNextChange = this.player.duration(), // Start at beginning of the timeline
+          newNextChange = this.player_.duration(), // Start at beginning of the timeline
           newPrevChange = 0, // Start at end
 
           reverse = false, // Set the direction of the loop through the cues. Optimized the cue check.
@@ -648,7 +648,7 @@ vjs.TextTrack.prototype.updateDisplay = function(){
 // Set all loop helper values back
 vjs.TextTrack.prototype.reset = function(){
   this.nextChange = 0;
-  this.prevChange = this.player.duration();
+  this.prevChange = this.player_.duration();
   this.firstActiveIndex = 0;
   this.lastActiveIndex = 0;
 };
@@ -699,7 +699,7 @@ vjs.TextTrackDisplay = function(player, options, ready){
   // Should probably be moved to an external track loader when we support
   // tracks that don't need a display.
   if (player.options['tracks'] && player.options['tracks'].length > 0) {
-    this.player.addTextTracks(player.options['tracks']);
+    this.player_.addTextTracks(player.options['tracks']);
   }
 };
 goog.inherits(vjs.TextTrackDisplay, vjs.Component);
@@ -724,13 +724,13 @@ vjs.TextTrackMenuItem = function(player, options){
   options['selected'] = track.dflt();
   goog.base(this, player, options);
 
-  this.player.on(track.kind() + 'trackchange', vjs.bind(this, this.update));
+  this.player_.on(track.kind() + 'trackchange', vjs.bind(this, this.update));
 };
 goog.inherits(vjs.TextTrackMenuItem, vjs.MenuItem);
 
 vjs.TextTrackMenuItem.prototype.onClick = function(){
   goog.base(this, 'onClick');
-  this.player.showTextTrack(this.track.id(), this.track.kind());
+  this.player_.showTextTrack(this.track.id(), this.track.kind());
 };
 
 vjs.TextTrackMenuItem.prototype.update = function(){
@@ -760,11 +760,11 @@ goog.inherits(vjs.OffTextTrackMenuItem, vjs.TextTrackMenuItem);
 
 vjs.OffTextTrackMenuItem.prototype.onClick = function(){
   goog.base(this, 'onClick');
-  this.player.showTextTrack(this.track.id(), this.track.kind());
+  this.player_.showTextTrack(this.track.id(), this.track.kind());
 };
 
 vjs.OffTextTrackMenuItem.prototype.update = function(){
-  var tracks = this.player.textTracks(),
+  var tracks = this.player_.textTracks(),
       i=0, j=tracks.length, track,
       off = true;
 
@@ -799,7 +799,7 @@ vjs.TextTrackButton = function(player, options){
 goog.inherits(vjs.TextTrackButton, vjs.Button);
 
 vjs.TextTrackButton.prototype.createMenu = function(){
-  var menu = new vjs.Menu(this.player);
+  var menu = new vjs.Menu(this.player_);
 
   // Add a title list item to the top
   menu.el().appendChild(vjs.createEl('li', {
@@ -808,7 +808,7 @@ vjs.TextTrackButton.prototype.createMenu = function(){
   }));
 
   // Add an OFF menu item to turn all tracks off
-  menu.addItem(new vjs.OffTextTrackMenuItem(this.player, { 'kind': this.kind_ }));
+  menu.addItem(new vjs.OffTextTrackMenuItem(this.player_, { 'kind': this.kind_ }));
 
   this.items = this.createItems();
 
@@ -827,10 +827,10 @@ vjs.TextTrackButton.prototype.createMenu = function(){
 vjs.TextTrackButton.prototype.createItems = function(){
   var items = [], track;
 
-  for (var i = 0; i < this.player.textTracks().length; i++) {
-    track = this.player.textTracks()[i];
+  for (var i = 0; i < this.player_.textTracks().length; i++) {
+    track = this.player_.textTracks()[i];
     if (track.kind() === this.kind_) {
-      items.push(new vjs.TextTrackMenuItem(this.player, {
+      items.push(new vjs.TextTrackMenuItem(this.player_, {
         'track': track
       }));
     }
@@ -906,10 +906,10 @@ vjs.ChaptersButton.prototype.className = 'vjs-chapters-button';
 vjs.ChaptersButton.prototype.createItems = function(){
   var items = [], track;
 
-  for (var i = 0; i < this.player.textTracks().length; i++) {
-    track = this.player.textTracks()[i];
+  for (var i = 0; i < this.player_.textTracks().length; i++) {
+    track = this.player_.textTracks()[i];
     if (track.kind() === this.kind_) {
-      items.push(new vjs.TextTrackMenuItem(this.player, {
+      items.push(new vjs.TextTrackMenuItem(this.player_, {
         'track': track
       }));
     }
@@ -919,7 +919,7 @@ vjs.ChaptersButton.prototype.createItems = function(){
 };
 
 vjs.ChaptersButton.prototype.createMenu = function(){
-  var tracks = this.player.textTracks(),
+  var tracks = this.player_.textTracks(),
       i = 0,
       j = tracks.length,
       track, chaptersTrack,
@@ -939,7 +939,7 @@ vjs.ChaptersButton.prototype.createMenu = function(){
     }
   }
 
-  var menu = this.menu = new vjs.Menu(this.player);
+  var menu = this.menu = new vjs.Menu(this.player_);
 
   menu.el_.appendChild(vjs.createEl('li', {
     className: 'vjs-menu-title',
@@ -954,7 +954,7 @@ vjs.ChaptersButton.prototype.createMenu = function(){
     for (;i<j;i++) {
       cue = cues[i];
 
-      mi = new vjs.ChaptersTrackMenuItem(this.player, {
+      mi = new vjs.ChaptersTrackMenuItem(this.player_, {
         'track': chaptersTrack,
         'cue': cue
       });
@@ -995,13 +995,13 @@ goog.inherits(vjs.ChaptersTrackMenuItem, vjs.MenuItem);
 
 vjs.ChaptersTrackMenuItem.prototype.onClick = function(){
   goog.base(this, 'onClick');
-  this.player.currentTime(this.cue.startTime);
+  this.player_.currentTime(this.cue.startTime);
   this.update(this.cue.startTime);
 };
 
 vjs.ChaptersTrackMenuItem.prototype.update = function(){
   var cue = this.cue,
-      currentTime = this.player.currentTime();
+      currentTime = this.player_.currentTime();
 
   // vjs.log(currentTime, cue.startTime);
   if (cue.startTime <= currentTime && currentTime < cue.endTime) {

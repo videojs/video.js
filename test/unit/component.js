@@ -50,7 +50,6 @@ test('should do a deep merge of child options', function(){
   var children = mergedOptions['children'];
 
   ok(children['childOne']['foo'] === 'baz', 'value three levels deep overridden');
-  console.log(children['childOne']['asdf'])
   ok(children['childOne']['asdf'] === 'fdsa', 'value three levels deep maintained');
   ok(children['childOne']['abc'] === '123', 'value three levels deep added');
   ok(children['childTwo'], 'object two levels deep maintained');

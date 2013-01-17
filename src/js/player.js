@@ -47,8 +47,8 @@ vjs.Player.prototype.dispose = function(){
 
   // Kill reference to this player
   vjs.players[this.id_] = null;
-  if (this.tag && this.tag.player) { this.tag.player = null; }
-  if (this.el_ && this.el_.player) { this.el_.player = null; }
+  if (this.tag && this.tag['player']) { this.tag['player'] = null; }
+  if (this.el_ && this.el_['player']) { this.el_['player'] = null; }
 
   // Ensure that tracking progress and time progress will stop and plater deleted
   this.stopTrackingProgress();
@@ -133,7 +133,7 @@ vjs.Player.prototype.createEl = function(){
   tag.className = 'vjs-tech';
 
   // Make player findable on elements
-  tag.player = el.player = this;
+  tag['player'] = el['player'] = this;
 
   // Default state of video is paused
   this.addClass('vjs-paused');
@@ -175,16 +175,16 @@ vjs.Player.prototype.loadTech = function(techName, source){
   this.isReady_ = false;
 
   var techReady = function(){
-    this.player.triggerReady();
+    this.player_.triggerReady();
 
     // Manually track progress in cases where the browser/flash player doesn't report it.
     if (!this.features.progressEvents) {
-      this.player.manualProgressOn();
+      this.player_.manualProgressOn();
     }
 
     // Manually track timeudpates in cases where the browser/flash player doesn't report it.
     if (!this.features.timeupdateEvents) {
-      this.player.manualTimeUpdatesOn();
+      this.player_.manualTimeUpdatesOn();
     }
   };
 
@@ -250,7 +250,7 @@ vjs.Player.prototype.manualProgressOn = function(){
     this.features.progressEvents = true;
 
     // Turn off manual progress tracking
-    this.player.manualProgressOff();
+    this.player_.manualProgressOff();
   });
 };
 
@@ -288,7 +288,7 @@ vjs.Player.prototype.manualTimeUpdatesOn = function(){
     // Update known progress support for this playback technology
     this.features.timeupdateEvents = true;
     // Turn off manual progress tracking
-    this.player.manualTimeUpdatesOff();
+    this.player_.manualTimeUpdatesOff();
   });
 };
 

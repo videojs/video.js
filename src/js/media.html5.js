@@ -48,14 +48,14 @@ vjs.Html5 = function(player, options, ready){
 goog.inherits(vjs.Html5, vjs.MediaTechController);
 
 vjs.Html5.prototype.dispose = function(){
-  // this.player.tag = false;
+  // this.player_.tag = false;
   this.removeTriggers();
 
   goog.base(this, 'dispose');
 };
 
 vjs.Html5.prototype.createEl = function(){
-  var player = this.player,
+  var player = this.player_,
       // If possible, reuse original tag for HTML5 playback technology element
       el = player.tag,
       newEl;
@@ -96,12 +96,12 @@ vjs.Html5.prototype.createEl = function(){
 // May seem verbose here, but makes other APIs possible.
 vjs.Html5.prototype.setupTriggers = function(){
   for (var i = vjs.Html5.Events.length - 1; i >= 0; i--) {
-    vjs.on(this.el_, vjs.Html5.Events[i], vjs.bind(this.player, this.eventHandler));
+    vjs.on(this.el_, vjs.Html5.Events[i], vjs.bind(this.player_, this.eventHandler));
   }
 };
 vjs.Html5.prototype.removeTriggers = function(){
   for (var i = vjs.Html5.Events.length - 1; i >= 0; i--) {
-    vjs.off(this.el_, vjs.Html5.Events[i], vjs.bind(this.player, this.eventHandler));
+    vjs.off(this.el_, vjs.Html5.Events[i], vjs.bind(this.player_, this.eventHandler));
   }
   // console.log('removeTriggers', vjs.getData(this.el_));
 };
@@ -197,7 +197,7 @@ vjs.Html5.prototype.ended = function(){ return this.el_.ended; };
   // playbackRate: function(){ return this.el_.playbackRate; },
   // mediaGroup: function(){ return this.el_.mediaGroup; },
   // controller: function(){ return this.el_.controller; },
-vjs.Html5.prototype.controls = function(){ return this.player.options.controls; };
+vjs.Html5.prototype.controls = function(){ return this.player_.options.controls; };
 vjs.Html5.prototype.defaultMuted = function(){ return this.el_.defaultMuted; };
 
 /* HTML5 Support Testing ---------------------------------------------------- */

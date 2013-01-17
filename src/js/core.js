@@ -50,7 +50,7 @@ vjs = function(id, options, ready){
 
   // Element may have a player attr referring to an already created player instance.
   // If not, set up a new player and return the instance.
-  return tag.player || new vjs.Player(tag, options, ready);
+  return tag['player'] || new vjs.Player(tag, options, ready);
 };
 
 // Extended name, also available externally, window.videojs
