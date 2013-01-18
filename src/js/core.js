@@ -58,7 +58,7 @@ var videojs = vjs;
 
 // CDN Version. Used to target right flash swf.
 vjs.cdn_version = 'GENERATED_CDN_VSN';
-vjs.access_protocol = ("https:" == document.location.protocol ? "https://" : "http://");
+vjs.access_protocol = ('https:' == document.location.protocol ? 'https://' : 'http://');
 
 /**
  * Global Player instance options
