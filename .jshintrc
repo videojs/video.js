@@ -1,16 +1,20 @@
 {
+    "evil" : true,
     "validthis": true,
     "browser"  : true,
     "debug"    : true,
     "boss"     : true,
     "expr"     : true,
     "eqnull"   : true,
-    "quotmark" : "double",
+    "quotmark" : "single",
     "sub"      : true,
     "trailing" : true,
     "undef"    : true,
-    "predef"   : [  // Extra globals.
+    "laxbreak" : true,
+    "predef"   : [
         "_V_",
-        "VideoJS"
+        "videojs",
+        "vjs",
+        "goog"
     ]
 }

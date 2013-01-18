@@ -1,22 +1,183 @@
-module("Player", {
-  setup: function(){
+module("Player");
+
+var PlayerTest = {
+  makeTag: function(){
     var videoTag = document.createElement('video');
     videoTag.id = 'example_1';
     videoTag.className = 'video-js vjs-default-skin';
+    return videoTag;
+  },
+  makePlayer: function(playerOptions){
+    var videoTag = PlayerTest.makeTag();
 
     var fixture = document.getElementById('qunit-fixture');
     fixture.appendChild(videoTag);
 
-    this.player = new _V_.Player(videoTag, {});
-  },
-  teardown: function(){
-
+    return player = new vjs.Player(videoTag, playerOptions);
   }
+};
+
+// Compiler doesn't like using 'this' in setup/teardown.
+// module("Player", {
+//   /**
+//    * @this {*}
+//    */
+//   setup: function(){
+//     window.player1 = true; // using window works
+//   },
+
+//   /**
+//    * @this {*}
+//    */
+//   teardown: function(){
+//     // if (this.player && this.player.el() !== null) {
+//     //   this.player.dispose();
+//     //   this.player = null;
+//     // }
+//   }
+// });
+
+// Object.size = function(obj) {
+//     var size = 0, key;
+//     for (key in obj) {
+//         console.log('key', key)
+//         if (obj.hasOwnProperty(key)) size++;
+//     }
+//     return size;
+// };
+
+
+test('should create player instance that inherits from component and dispose it', function(){
+  var player = PlayerTest.makePlayer();
+
+  ok(player.el().nodeName === 'DIV');
+  ok(player.on, 'component function exists');
+
+  player.dispose();
+  ok(player.el() === null, 'element disposed');
 });
 
-test('should create and embed a new player element', function(){
-  ok(this.player.el.nodeName === 'DIV');
-  ok(this.player.el.parentNode.id === 'qunit-fixture');
-  ok(this.player.el.className.indexOf('video-js vjs-default-skin') !== -1);
-  ok(this.player.el.id === 'example_1');
+test('should accept options from multiple sources and override in correct order', function(){
+  // For closure compiler to work, all reference to the prop have to be the same type
+  // As in options['attr'] or options.attr. Compiler will minimize each separately.
+  // Since we're using setAttribute which requires a string, we have to use the string
+  // version of the key for all version.
+
+  // Set a global option
+  vjs.options['attr'] = 1;
+
+  var tag0 = PlayerTest.makeTag();
+  var player0 = new vjs.Player(tag0);
+
+  ok(player0.options['attr'] === 1, 'global option was set')
+  player0.dispose();
+
+  // Set a tag level option
+  var tag1 = PlayerTest.makeTag();
+  tag1.setAttribute('attr', 'asdf'); // Attributes must be set as strings
+
+  var player1 = new vjs.Player(tag1);
+  ok(player1.options['attr'] === 'asdf', 'Tag options overrode global options');
+  player1.dispose();
+
+  // Set a tag level option
+  var tag2 = PlayerTest.makeTag();
+  tag2.setAttribute('attr', 'asdf');
+
+  var player2 = new vjs.Player(tag2, { 'attr': 'fdsa' });
+  ok(player2.options['attr'] === 'fdsa', 'Init options overrode tag and global options');
+  player2.dispose();
+});
+
+test('should get tag, source, and track settings', function(){
+  // Partially tested in lib->getAttributeValues
+
+  var fixture = document.getElementById('qunit-fixture');
+
+  var html = '<video id="example_1" class="video-js" autoplay preload="metadata">'
+      html += '<source src="http://google.com" type="video/mp4">';
+      html += '<source src="http://google.com" type="video/webm">';
+      html += '<track src="http://google.com" kind="captions" default>';
+      html += '</video>';
+
+  fixture.innerHTML += html;
+
+  var tag = document.getElementById('example_1');
+  var player = new vjs.Player(tag);
+
+  ok(player.options['autoplay'] === true);
+  ok(player.options['preload'] === 'metadata'); // No extern. Use string.
+  ok(player.options['id'] === 'example_1');
+  ok(player.options['sources'].length === 2);
+  ok(player.options['sources'][0].src === 'http://google.com');
+  ok(player.options['sources'][0].type === 'video/mp4');
+  ok(player.options['sources'][1].type === 'video/webm');
+  ok(player.options['tracks'].length === 1);
+  ok(player.options['tracks'][0]['kind'] === 'captions'); // No extern
+  ok(player.options['tracks'][0]['default'] === true);
+
+  ok(player.el().className.indexOf('video-js') !== -1, 'transferred class from tag to player div');
+  ok(player.el().id === 'example_1', 'transferred id from tag to player div');
+
+  ok(tag['player'] === player, 'player referenceable on original tag');
+  ok(vjs.players[player.id()] === player, 'player referenceable from global list');
+  ok(tag.id !== player.id, 'tag ID no longer is the same as player ID');
+  ok(tag.className !== player.el().className, 'tag classname updated');
+
+  player.dispose();
+
+  ok(tag['player'] === null, 'tag player ref killed')
+  ok(!vjs.players['example_1'], 'global player ref killed')
+  ok(player.el() === null, 'player el killed')
+});
+
+test('should set the width and height of the player', function(){
+  var player = PlayerTest.makePlayer({ width: 123, height: '100%' });
+
+  ok(player.width() === 123)
+  ok(player.el().style.width === '123px')
+
+  var fixture = document.getElementById('qunit-fixture');
+  var container = document.createElement('div');
+  fixture.appendChild(container);
+
+  // Player container needs to have height in order to have height
+  // Don't want to mess with the fixture itself
+  container.appendChild(player.el());
+  container.style.height = "1000px";
+  ok(player.height() === 1000);
+
+  player.dispose();
+});
+
+test('should accept options from multiple sources and override in correct order', function(){
+  var tag = PlayerTest.makeTag();
+  var container = document.createElement('div');
+  var fixture = document.getElementById('qunit-fixture');
+
+  container.appendChild(tag);
+  fixture.appendChild(container);
+
+  var player = new vjs.Player(tag);
+  var el = player.el();
+
+  ok(el.parentNode === container, 'player placed at same level as tag')
+  // Tag may be placed inside the player element or it may be removed from the DOM
+  ok(tag.parentNode !== container, 'tag removed from original place')
+
+  player.dispose();
+});
+
+test('should load a media controller', function(){
+  var player = PlayerTest.makePlayer({
+    preload: 'none',
+    sources: [
+      { src: "http://google.com", type: 'video/mp4' },
+      { src: "http://google.com", type: 'video/webm' }
+    ]
+  });
+
+  ok(player.el().children[0].className.indexOf('vjs-tech') !== -1, 'media controller loaded')
+
+  player.dispose();
 });

@@ -6,7 +6,7 @@ Video.js is pretty easy to set up. It can take a matter of seconds to get the pl
 Step 1: Include the Video.js Javascript and CSS files in the head of your page.
 ------------------------------------------------------------------------------
 
-You can download the Video.js source and host it on your own servers, or use the free CDN hosted version. It's often recommended now to put JavaScript before the end body tag (&lt;/body>) instead of the head (&lt;head>), but Video.js includes an 'HTML5 Shiv', which needs to be in the head for older IE versions to respect the video tag as a valid element. 
+You can download the Video.js source and host it on your own servers, or use the free CDN hosted version. It's often recommended now to put JavaScript before the end body tag (&lt;/body>) instead of the head (&lt;head>), but Video.js includes an 'HTML5 Shiv', which needs to be in the head for older IE versions to respect the video tag as a valid element.
 
 > NOTE: If you're already using an HTML5 shiv like [Modernizr](http://modernizr.com/) you can include the Video.js JavaScript anywhere, however make sure your version of Modernizr includes the shiv for video.
 
@@ -42,13 +42,13 @@ With Video.js you just use an HTML5 video tag to embed a video. Video.js will th
 Otherwise include/exclude attributes, settings, sources, and tracks exactly as you would for HTML5 video.
 
 ```html
-<video id="example_video_1" class="video-js vjs-default-skin"  
-  controls preload="auto" width="640" height="264"  
-  poster="http://video-js.zencoder.com/oceans-clip.png"  
-  data-setup='{"example_option":true}'>  
- <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' />  
- <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />  
- <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />  
+<video id="example_video_1" class="video-js vjs-default-skin"
+  controls preload="auto" width="640" height="264"
+  poster="http://video-js.zencoder.com/oceans-clip.png"
+  data-setup='{"example_option":true}'>
+ <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' />
+ <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />
+ <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />
 </video>
 ```
 
@@ -62,9 +62,9 @@ _V_("example_video_1", {}, function(){
 });
 ```
 
-The first argument in the \_V_ function is the ID of your video tag. Replace it with your own.  
+The first argument in the \_V_ function is the ID of your video tag. Replace it with your own.
 
-The second argument is an options object. It allows you to set additional options like you can with the data-setup attribute.  
+The second argument is an options object. It allows you to set additional options like you can with the data-setup attribute.
 
 The third argument is a 'ready' callback. Once Video.js has initialized it will call this function.
 
