@@ -73,7 +73,7 @@ test('should accept options from multiple sources and override in correct order'
   var tag0 = PlayerTest.makeTag();
   var player0 = new vjs.Player(tag0);
 
-  ok(player0.options['attr'] === 1, 'global option was set')
+  ok(player0.options_['attr'] === 1, 'global option was set')
   player0.dispose();
 
   // Set a tag level option
@@ -81,7 +81,7 @@ test('should accept options from multiple sources and override in correct order'
   tag1.setAttribute('attr', 'asdf'); // Attributes must be set as strings
 
   var player1 = new vjs.Player(tag1);
-  ok(player1.options['attr'] === 'asdf', 'Tag options overrode global options');
+  ok(player1.options_['attr'] === 'asdf', 'Tag options overrode global options');
   player1.dispose();
 
   // Set a tag level option
@@ -89,7 +89,7 @@ test('should accept options from multiple sources and override in correct order'
   tag2.setAttribute('attr', 'asdf');
 
   var player2 = new vjs.Player(tag2, { 'attr': 'fdsa' });
-  ok(player2.options['attr'] === 'fdsa', 'Init options overrode tag and global options');
+  ok(player2.options_['attr'] === 'fdsa', 'Init options overrode tag and global options');
   player2.dispose();
 });
 
@@ -109,16 +109,16 @@ test('should get tag, source, and track settings', function(){
   var tag = document.getElementById('example_1');
   var player = new vjs.Player(tag);
 
-  ok(player.options['autoplay'] === true);
-  ok(player.options['preload'] === 'metadata'); // No extern. Use string.
-  ok(player.options['id'] === 'example_1');
-  ok(player.options['sources'].length === 2);
-  ok(player.options['sources'][0].src === 'http://google.com');
-  ok(player.options['sources'][0].type === 'video/mp4');
-  ok(player.options['sources'][1].type === 'video/webm');
-  ok(player.options['tracks'].length === 1);
-  ok(player.options['tracks'][0]['kind'] === 'captions'); // No extern
-  ok(player.options['tracks'][0]['default'] === true);
+  ok(player.options_['autoplay'] === true);
+  ok(player.options_['preload'] === 'metadata'); // No extern. Use string.
+  ok(player.options_['id'] === 'example_1');
+  ok(player.options_['sources'].length === 2);
+  ok(player.options_['sources'][0].src === 'http://google.com');
+  ok(player.options_['sources'][0].type === 'video/mp4');
+  ok(player.options_['sources'][1].type === 'video/webm');
+  ok(player.options_['tracks'].length === 1);
+  ok(player.options_['tracks'][0]['kind'] === 'captions'); // No extern
+  ok(player.options_['tracks'][0]['default'] === true);
 
   ok(player.el().className.indexOf('video-js') !== -1, 'transferred class from tag to player div');
   ok(player.el().id === 'example_1', 'transferred id from tag to player div');

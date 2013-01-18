@@ -698,8 +698,8 @@ vjs.TextTrackDisplay = function(player, options, ready){
   // if a track should show by default and the display hadn't loaded yet.
   // Should probably be moved to an external track loader when we support
   // tracks that don't need a display.
-  if (player.options['tracks'] && player.options['tracks'].length > 0) {
-    this.player_.addTextTracks(player.options['tracks']);
+  if (player.options_['tracks'] && player.options_['tracks'].length > 0) {
+    this.player_.addTextTracks(player.options_['tracks']);
   }
 };
 goog.inherits(vjs.TextTrackDisplay, vjs.Component);
@@ -1012,7 +1012,7 @@ vjs.ChaptersTrackMenuItem.prototype.update = function(){
 };
 
 // Add Buttons to controlBar
-vjs.merge(vjs.ControlBar.prototype.options['children'], {
+vjs.merge(vjs.ControlBar.prototype.options_['children'], {
   'subtitlesButton': {},
   'captionsButton': {},
   'chaptersButton': {}

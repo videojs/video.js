@@ -18,7 +18,7 @@ vjs.Component = function(player, options, ready){
   this.player_ = player;
 
   // // Allow for overridding default component options
-  options = this.options = this.mergeOptions(this.options, options);
+  options = this.options_ = this.mergeOptions(this.options_, options);
 
   // Get ID from options, element, or create using player ID and unique ID
   this.id_ = options['id'] || ((options['el'] && options['el']['id']) ? options['el']['id'] : player.id() + '_component_' + vjs.guid++ );
@@ -76,11 +76,19 @@ vjs.Component.prototype.dispose = function(){
 vjs.Component.prototype.player_;
 
 /**
+ * Return the component's player.
+ * @return {vjs.Player}
+ */
+vjs.Component.prototype.player = function(){
+  return this.player_;
+};
+
+/**
  * Component options object.
  * @type {Object}
  * @private
  */
-vjs.Component.prototype.options;
+vjs.Component.prototype.options_;
 
 /**
  * Deep merge of options objects
@@ -343,7 +351,7 @@ vjs.Component.prototype.removeChild = function(component){
  * Initialize default child components from options
  */
 vjs.Component.prototype.initChildren = function(){
-  var options = this.options;
+  var options = this.options_;
 
   if (options && options['children']) {
     var self = this;

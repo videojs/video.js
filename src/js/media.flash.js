@@ -32,7 +32,7 @@ vjs.Flash = function(player, options, ready){
       // Store player options in local var for optimization
       // TODO: switch to using player methods instead of options
       // e.g. player.autoplay();
-      playerOptions = player.options,
+      playerOptions = player.options_,
 
       // Merge default flashvars with ones passed in to init
       flashVars = vjs.merge({

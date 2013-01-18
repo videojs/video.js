@@ -33,7 +33,7 @@ vjs.Html5 = function(player, options, ready){
   // In Chrome (15), if you have autoplay + a poster + no controls, the video gets hidden (but audio plays)
   // This fixes both issues. Need to wait for API, so it updates displays correctly
   player.ready(function(){
-    if (this.options['autoplay'] && this.paused()) {
+    if (this.options_['autoplay'] && this.paused()) {
       this.tag.poster = null; // Chrome Fix. Fixed in Chrome v16.
       this.play();
     }
@@ -80,8 +80,8 @@ vjs.Html5.prototype.createEl = function(){
   var attrs = ['autoplay','preload','loop','muted'];
   for (var i = attrs.length - 1; i >= 0; i--) {
     var attr = attrs[i];
-    if (player.options[attr] !== null) {
-      el[attr] = player.options[attr];
+    if (player.options_[attr] !== null) {
+      el[attr] = player.options_[attr];
     }
   }
 
@@ -194,7 +194,7 @@ vjs.Html5.prototype.ended = function(){ return this.el_.ended; };
   // playbackRate: function(){ return this.el_.playbackRate; },
   // mediaGroup: function(){ return this.el_.mediaGroup; },
   // controller: function(){ return this.el_.controller; },
-vjs.Html5.prototype.controls = function(){ return this.player_.options['controls']; };
+vjs.Html5.prototype.controls = function(){ return this.player_.options_['controls']; };
 vjs.Html5.prototype.defaultMuted = function(){ return this.el_.defaultMuted; };
 
 /* HTML5 Support Testing ---------------------------------------------------- */

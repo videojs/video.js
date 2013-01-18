@@ -154,8 +154,8 @@ vjs.Player.prototype.createEl = function(){
 
   // Make box use width/height of tag, or default 300x150
   // Enforce with CSS since width/height attrs don't work on divs
-  this.width(this.options['width'], true); // (true) Skip resize listener on load
-  this.height(this.options['height'], true);
+  this.width(this.options_['width'], true); // (true) Skip resize listener on load
+  this.height(this.options_['height'], true);
 
   // Wrap video tag in div (el/box) container
   if (tag.parentNode) {
@@ -203,7 +203,7 @@ vjs.Player.prototype.loadTech = function(techName, source){
   };
 
   // Grab tech-specific options from player options and add source and parent element to use.
-  var techOptions = vjs.merge({ source: source, parentEl: this.el_ }, this.options[techName.toLowerCase()]);
+  var techOptions = vjs.merge({ source: source, parentEl: this.el_ }, this.options_[techName.toLowerCase()]);
 
   if (source) {
     if (source.src == this.cache_.src && this.cache_.currentTime > 0) {
@@ -326,7 +326,7 @@ vjs.Player.prototype.stopTrackingCurrentTime = function(){ clearInterval(this.cu
 // /* Player event handlers (how the player reacts to certain events)
 // ================================================================================ */
 vjs.Player.prototype.onEnded = function(){
-  if (this.options['loop']) {
+  if (this.options_['loop']) {
     this.currentTime(0);
     this.play();
   }
@@ -575,7 +575,7 @@ vjs.Player.prototype.requestFullScreen = function(){
 
     // Flash and other plugins get reloaded when you take their parent to fullscreen.
     // To fix that we'll remove the tech, and reload it after the resize has finished.
-    if (this.tech.features.fullscreenResize === false && this.options['flash']['iFrameMode'] !== true) {
+    if (this.tech.features.fullscreenResize === false && this.options_['flash']['iFrameMode'] !== true) {
 
       this.pause();
       this.unloadTech();
@@ -613,7 +613,7 @@ vjs.Player.prototype.cancelFullScreen = function(){
 
    // Flash and other plugins get reloaded when you take their parent to fullscreen.
    // To fix that we'll remove the tech, and reload it after the resize has finished.
-   if (this.tech.features.fullscreenResize === false && this.options['flash']['iFrameMode'] !== true) {
+   if (this.tech.features.fullscreenResize === false && this.options_['flash']['iFrameMode'] !== true) {
 
      this.pause();
      this.unloadTech();
@@ -689,7 +689,7 @@ vjs.Player.prototype.exitFullWindow = function(){
 vjs.Player.prototype.selectSource = function(sources){
 
   // Loop through each playback technology in the options order
-  for (var i=0,j=this.options['techOrder'];i<j.length;i++) {
+  for (var i=0,j=this.options_['techOrder'];i<j.length;i++) {
     var techName = vjs.capitalize(j[i]),
         tech = window['videojs'][techName];
 
@@ -760,10 +760,10 @@ vjs.Player.prototype.src = function(source){
       });
     } else {
       this.techCall('src', source);
-      if (this.options['preload'] == 'auto') {
+      if (this.options_['preload'] == 'auto') {
         this.load();
       }
-      if (this.options['autoplay']) {
+      if (this.options_['autoplay']) {
         this.play();
       }
     }
@@ -787,7 +787,7 @@ vjs.Player.prototype.currentSrc = function(){
 vjs.Player.prototype.preload = function(value){
   if (value !== undefined) {
     this.techCall('setPreload', value);
-    this.options['preload'] = value;
+    this.options_['preload'] = value;
     return this;
   }
   return this.techGet('preload');
@@ -795,7 +795,7 @@ vjs.Player.prototype.preload = function(value){
 vjs.Player.prototype.autoplay = function(value){
   if (value !== undefined) {
     this.techCall('setAutoplay', value);
-    this.options['autoplay'] = value;
+    this.options_['autoplay'] = value;
     return this;
   }
   return this.techGet('autoplay', value);
@@ -803,13 +803,13 @@ vjs.Player.prototype.autoplay = function(value){
 vjs.Player.prototype.loop = function(value){
   if (value !== undefined) {
     this.techCall('setLoop', value);
-    this.options['loop'] = value;
+    this.options_['loop'] = value;
     return this;
   }
   return this.techGet('loop');
 };
 
-vjs.Player.prototype.controls = function(){ return this.options['controls']; };
+vjs.Player.prototype.controls = function(){ return this.options_['controls']; };
 vjs.Player.prototype.poster = function(){ return this.techGet('poster'); };
 vjs.Player.prototype.error = function(){ return this.techGet('error'); };
 vjs.Player.prototype.ended = function(){ return this.techGet('ended'); };
@@ -894,8 +894,8 @@ vjs.MediaLoader = function(player, options, ready){
 
   // If there are no sources when the player is initialized,
   // load the first supported playback technology.
-  if (!player.options['sources'] || player.options['sources'].length === 0) {
-    for (var i=0,j=player.options['techOrder']; i<j.length; i++) {
+  if (!player.options_['sources'] || player.options_['sources'].length === 0) {
+    for (var i=0,j=player.options_['techOrder']; i<j.length; i++) {
       var techName = vjs.capitalize(j[i]),
           tech = window['videojs'][techName];
 
@@ -910,7 +910,7 @@ vjs.MediaLoader = function(player, options, ready){
     // // Then load the best source.
     // // A few assumptions here:
     // //   All playback technologies respect preload false.
-    player.src(player.options['sources']);
+    player.src(player.options_['sources']);
   }
 };
 goog.inherits(vjs.MediaLoader, vjs.Component);

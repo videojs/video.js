@@ -42,7 +42,7 @@ vjs.ControlBar = function(player, options){
 };
 goog.inherits(vjs.ControlBar, vjs.Component);
 
-vjs.ControlBar.prototype.options = {
+vjs.ControlBar.prototype.options_ = {
   loadEvent: 'play',
   children: {
     'playToggle': {},
@@ -465,10 +465,10 @@ vjs.Slider = function(player, options){
     goog.base(this, player, options);
 
     // Set property names to bar and handle to match with the child Slider class is looking for
-    this.bar = this.getChild(this.options['barName']);
-    this.handle = this.getChild(this.options['handleName']);
+    this.bar = this.getChild(this.options_['barName']);
+    this.handle = this.getChild(this.options_['handleName']);
 
-    // console.log('asdf', this.bar, this.childNameIndex_, this.options)
+    // console.log('asdf', this.bar, this.childNameIndex_, this.options_)
 
     player.on(this.playerEvent, vjs.bind(this, this.update));
 
@@ -612,7 +612,7 @@ vjs.ProgressControl = function(player, options){
 };
 goog.inherits(vjs.ProgressControl, vjs.Component);
 
-vjs.ProgressControl.prototype.options = {
+vjs.ProgressControl.prototype.options_ = {
   children: {
     'seekBar': {}
   }
@@ -635,7 +635,7 @@ vjs.SeekBar = function(player, options){
 };
 goog.inherits(vjs.SeekBar, vjs.Slider);
 
-vjs.SeekBar.prototype.options = {
+vjs.SeekBar.prototype.options_ = {
   children: {
     'loadProgressBar': {},
     'playProgressBar': {},
@@ -766,7 +766,7 @@ vjs.VolumeControl = function(player, options){
 };
 goog.inherits(vjs.VolumeControl, vjs.Component);
 
-vjs.VolumeControl.prototype.options = {
+vjs.VolumeControl.prototype.options_ = {
   children: {
     'volumeBar': {}
   }
@@ -789,7 +789,7 @@ vjs.VolumeBar = function(player, options){
 };
 goog.inherits(vjs.VolumeBar, vjs.Slider);
 
-vjs.VolumeBar.prototype.options = {
+vjs.VolumeBar.prototype.options_ = {
   children: {
     'volumeLevel': {},
     'volumeHandle': {}
@@ -914,7 +914,7 @@ vjs.MuteToggle.prototype.update = function(){
 vjs.PosterImage = function(player, options){
   goog.base(this, player, options);
 
-  if (!this.player_.options['poster']) {
+  if (!this.player_.options_['poster']) {
     this.hide();
   }
 
@@ -931,8 +931,8 @@ vjs.PosterImage.prototype.createEl = function(){
   });
 
   // src throws errors if no poster was defined.
-  if (this.player_.options['poster']) {
-    el.src = this.player_.options['poster'];
+  if (this.player_.options_['poster']) {
+    el.src = this.player_.options_['poster'];
   }
   return el;
 };
@@ -985,7 +985,7 @@ goog.inherits(vjs.MenuItem, vjs.Button);
 vjs.MenuItem.prototype.createEl = function(type, props){
   return goog.base(this, 'createEl', 'li', vjs.merge({
     className: 'vjs-menu-item',
-    innerHTML: this.options['label']
+    innerHTML: this.options_['label']
   }, props));
 };
 
