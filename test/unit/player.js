@@ -13,7 +13,11 @@ var PlayerTest = {
     var fixture = document.getElementById('qunit-fixture');
     fixture.appendChild(videoTag);
 
-    return player = new vjs.Player(videoTag, playerOptions);
+    var opts = vjs.merge({
+      'techOrder': ['mediaFaker']
+    }, playerOptions);
+
+    return player = new vjs.Player(videoTag, opts);
   }
 };
 
@@ -178,6 +182,32 @@ test('should load a media controller', function(){
   });
 
   ok(player.el().children[0].className.indexOf('vjs-tech') !== -1, 'media controller loaded')
+
+  player.dispose();
+});
+
+test('should not play if firstplay event prevents default', function(){
+  expect(1);
+  var player = PlayerTest.makePlayer({
+    'preload': 'none',
+    'autoplay': false,
+    'sources': [
+      { 'src': "http://google.com", 'type': 'video/mp4' },
+      { 'src': "http://google.com", 'type': 'video/webm' }
+    ]
+  });
+
+  player.on('firstplay', function(e){
+    ok(true, 'firstplay triggered');
+
+    e.preventDefault();
+  });
+
+  player.on('play', function(){
+    ok(false, 'play triggered anyway')
+  });
+
+  player.play();
 
   player.dispose();
 });

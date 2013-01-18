@@ -30,6 +30,20 @@ vjs.Player = function(tag, options, ready){
   // Inits and embeds any child components in opts
   vjs.Component.call(this, this, opts, ready);
 
+  // Firstplay event implimentation. Not sold on the event yet.
+  // Could probably just check currentTime==0?
+  this.one('play', function(e){
+    var fpEvent = { type: 'firstplay', target: this.el_ };
+    // Using vjs.trigger so we can check if default was prevented
+    var keepGoing = vjs.trigger(this.el_, fpEvent);
+
+    if (!keepGoing) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+    }
+  });
+
   this.on('ended', this.onEnded);
   this.on('play', this.onPlay);
   this.on('pause', this.onPause);
@@ -52,7 +66,7 @@ vjs.Player.prototype.dispose = function(){
 
   // Ensure that tracking progress and time progress will stop and plater deleted
   this.stopTrackingProgress();
-  // this.stopTrackingCurrentTime();
+  this.stopTrackingCurrentTime();
 
   if (this.tech) { this.tech.dispose(); }
 
@@ -361,7 +375,7 @@ vjs.Player.prototype.getCache = function(){
 // Pass values to the playback tech
 vjs.Player.prototype.techCall = function(method, arg){
   // If it's not ready yet, call method when it is
-  if (!this.tech.isReady_) {
+  if (this.tech && this.tech.isReady_) {
     this.tech.ready(function(){
       this[method](arg);
     });
@@ -379,7 +393,11 @@ vjs.Player.prototype.techCall = function(method, arg){
 // Get calls can't wait for the tech, and sometimes don't need to.
 vjs.Player.prototype.techGet = function(method){
 
-  // Make sure tech is ready
+  // Make sure there is a tech
+  // if (!this.tech) {
+  //   return;
+  // }
+
   if (this.tech.isReady_) {
 
     // Flash likes to die and reload when you hide or reposition it.
@@ -410,9 +428,23 @@ vjs.Player.prototype.techGet = function(method){
   return;
 };
 
-// http://dev.w3.org/html5/spec/video.html#dom-media-play
+/**
+ * Start media playback
+ * http://dev.w3.org/html5/spec/video.html#dom-media-play
+ * We're triggering the 'play' event here instead of relying on the
+ * media element to allow using event.preventDefault() to stop
+ * play from happening if desired. Usecase: preroll ads.
+ */
 vjs.Player.prototype.play = function(){
-  this.techCall('play');
+  // Create an event object so we can check for preventDefault after
+  var e = { type: 'play', target: this.el_ };
+
+  this.trigger(e);
+
+  if (!e.isDefaultPrevented()) {
+    this.techCall('play');
+  }
+
   return this;
 };
 

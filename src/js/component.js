@@ -21,12 +21,12 @@ vjs.Component = function(player, options, ready){
   options = this.options = this.mergeOptions(this.options, options);
 
   // Get ID from options, element, or create using player ID and unique ID
-  this.id_ = options.id || ((options.el && options.el.id) ? options.el.id : player.id + '_component_' + vjs.guid++ );
+  this.id_ = options['id'] || ((options['el'] && options['el']['id']) ? options['el']['id'] : player.id() + '_component_' + vjs.guid++ );
 
-  this.name_ = options.name || null;
+  this.name_ = options['name'] || null;
 
   // Create element if one wasn't provided in potions
-  this.el_ = (options.el) ? options.el : this.createEl();
+  this.el_ = options['el'] || this.createEl();
 
   this.children_ = [];
   this.childIndex_ = {};

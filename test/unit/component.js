@@ -1,13 +1,20 @@
 module("Component");
 
+var getFakePlayer = function(){
+  return {
+    // Fake player requries an ID
+    id: function(){ return 'player_1'; }
+  }
+};
+
 test('should create an element', function(){
-  var comp = new vjs.Component({}, {});
+  var comp = new vjs.Component(getFakePlayer(), {});
 
   ok(comp.el().nodeName);
 });
 
 test('should add a child component', function(){
-  var comp = new vjs.Component({});
+  var comp = new vjs.Component(getFakePlayer());
 
   var child = comp.addChild("component");
 
@@ -19,7 +26,7 @@ test('should add a child component', function(){
 });
 
 test('should init child coponents from options', function(){
-  var comp = new vjs.Component({}, {
+  var comp = new vjs.Component(getFakePlayer(), {
     children: {
       'component': true
     }
@@ -58,7 +65,7 @@ test('should do a deep merge of child options', function(){
 });
 
 test('should dispose of component and children', function(){
-  var comp = new vjs.Component({});
+  var comp = new vjs.Component(getFakePlayer());
 
   // Add a child
   var child = comp.addChild("Component");
@@ -80,7 +87,7 @@ test('should dispose of component and children', function(){
 });
 
 test('should add and remove event listeners to element', function(){
-  var comp = new vjs.Component({}, {});
+  var comp = new vjs.Component(getFakePlayer(), {});
 
   // No need to make this async because we're triggering events inline.
   // We're going to trigger the event after removing the listener,
@@ -99,7 +106,7 @@ test('should add and remove event listeners to element', function(){
 });
 
 test('should trigger a listener once using one()', function(){
-  var comp = new vjs.Component({}, {});
+  var comp = new vjs.Component(getFakePlayer(), {});
 
   expect(1);
 
@@ -122,7 +129,7 @@ test('should trigger a listener when ready', function(){
     ok(true, 'ready method listener fired')
   };
 
-  var comp = new vjs.Component({}, {}, optionsReadyListener);
+  var comp = new vjs.Component(getFakePlayer(), {}, optionsReadyListener);
 
   comp.triggerReady();
 
@@ -133,7 +140,7 @@ test('should trigger a listener when ready', function(){
 });
 
 test('should add and remove a CSS class', function(){
-  var comp = new vjs.Component({}, {});
+  var comp = new vjs.Component(getFakePlayer(), {});
 
   comp.addClass('test-class');
   ok(comp.el().className.indexOf('test-class') !== -1);
@@ -142,7 +149,7 @@ test('should add and remove a CSS class', function(){
 });
 
 test('should show and hide an element', function(){
-  var comp = new vjs.Component({}, {});
+  var comp = new vjs.Component(getFakePlayer(), {});
 
   comp.hide();
   ok(comp.el().style.display === 'none');
@@ -152,7 +159,7 @@ test('should show and hide an element', function(){
 
 test('should change the width and height of a component', function(){
   var container = document.createElement('div');
-  var comp = new vjs.Component({}, {});
+  var comp = new vjs.Component(getFakePlayer(), {});
   var el = comp.el();
   var fixture = document.getElementById('qunit-fixture');
 

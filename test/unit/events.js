@@ -72,3 +72,20 @@ test('should listen only once', function(){
   vjs.trigger(el, 'click'); // 1 click
   vjs.trigger(el, 'click'); // No click should happen.
 });
+
+test('should stop immediate propagtion', function(){
+  expect(1);
+
+  var el = document.createElement('div');
+
+  vjs.on(el, 'test', function(e){
+    ok(true, 'First listener fired');
+    e.stopImmediatePropagation();
+  });
+
+  vjs.on(el, 'test', function(e){
+    ok(false, 'Second listener fired');
+  });
+
+  vjs.trigger(el, 'test');
+});

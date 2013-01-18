@@ -40,18 +40,16 @@ vjs.on = function(elem, type, fn){
 
       var handlers = data.handlers[event.type];
 
-      /* Was making a copy of handlers to protect
-       * against removal of listeners mid loop.
-       * Removing for v4 to test if we still need it. */
-      // Copy handlers so if handlers are added/removed during the process it doesn't throw everything off.
       if (handlers) {
-        var handlersCopy = [];
-        for (var i = 0, j = handlers.length; i < j; i++) {
-          handlersCopy[i] = handlers[i];
-        }
+        // Copy handlers so if handlers are added/removed during the process it doesn't throw everything off.
+        var handlersCopy = handlers.slice(0);
 
         for (var m = 0, n = handlersCopy.length; m < n; m++) {
-          handlersCopy[m].call(elem, event);
+          if (event.isImmediatePropagationStopped()) {
+            break;
+          } else {
+            handlersCopy[m].call(elem, event);
+          }
         }
       }
     };
@@ -286,6 +284,9 @@ vjs.trigger = function(elem, event) {
       targetData.disabled = false;
     }
   }
+
+  // Inform the triggerer if the default was prevented by returning false
+  return !event.isDefaultPrevented();
   /* Original version of js ninja events wasn't complete.
    * We've since updated to the latest version, but keeping this around
    * for now just in case.

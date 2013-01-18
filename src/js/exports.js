@@ -116,7 +116,6 @@ goog.exportProperty(vjs.Html5.prototype, 'setAutoplay', vjs.Html5.prototype.setA
 goog.exportProperty(vjs.Html5.prototype, 'setLoop', vjs.Html5.prototype.setLoop);
 
 goog.exportSymbol('videojs.Flash', vjs.Flash);
-goog.exportProperty(vjs.Flash, 'Events', vjs.Flash.Events);
 goog.exportProperty(vjs.Flash, 'isSupported', vjs.Flash.isSupported);
 goog.exportProperty(vjs.Flash, 'canPlaySource', vjs.Flash.canPlaySource);
 goog.exportProperty(vjs.Flash, 'onReady', vjs.Flash['onReady']);

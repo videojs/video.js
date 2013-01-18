@@ -15,6 +15,7 @@
         "_V_",
         "videojs",
         "vjs",
-        "goog"
+        "goog",
+        "console"
     ]
 }

@@ -48,9 +48,6 @@ vjs.Html5 = function(player, options, ready){
 goog.inherits(vjs.Html5, vjs.MediaTechController);
 
 vjs.Html5.prototype.dispose = function(){
-  // this.player_.tag = false;
-  this.removeTriggers();
-
   goog.base(this, 'dispose');
 };
 
@@ -71,12 +68,12 @@ vjs.Html5.prototype.createEl = function(){
     }
 
     newEl = vjs.createElement('video', {
-      id: el.id || player.id + '_html5_api',
+      id: el.id || player.id() + '_html5_api',
       className: el.className || 'vjs-tech'
     });
 
     el = newEl;
-    vjs.insertFirst(el, player.el);
+    vjs.insertFirst(el, player.el());
   }
 
   // Update specific tag settings, in case they were overridden
@@ -99,15 +96,15 @@ vjs.Html5.prototype.setupTriggers = function(){
     vjs.on(this.el_, vjs.Html5.Events[i], vjs.bind(this.player_, this.eventHandler));
   }
 };
-vjs.Html5.prototype.removeTriggers = function(){
-  for (var i = vjs.Html5.Events.length - 1; i >= 0; i--) {
-    vjs.off(this.el_, vjs.Html5.Events[i], vjs.bind(this.player_, this.eventHandler));
-  }
-  // console.log('removeTriggers', vjs.getData(this.el_));
-};
+// Triggers removed using this.off when disposed
+
 vjs.Html5.prototype.eventHandler = function(e){
-  // console.log('eventHandler', e.type, e, this.el_)
+  // We'll be triggring play ourselves, thank you.
+  if (e.type === 'play') return;
+
   this.trigger(e);
+
+  // No need for media events to bubble up.
   e.stopPropagation();
 };
 
