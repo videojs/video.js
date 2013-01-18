@@ -914,7 +914,7 @@ vjs.MuteToggle.prototype.update = function(){
 vjs.PosterImage = function(player, options){
   goog.base(this, player, options);
 
-  if (!this.player_.options.poster) {
+  if (!this.player_.options['poster']) {
     this.hide();
   }
 
@@ -931,8 +931,8 @@ vjs.PosterImage.prototype.createEl = function(){
   });
 
   // src throws errors if no poster was defined.
-  if (this.player_.options.poster) {
-    el.src = this.player_.options.poster;
+  if (this.player_.options['poster']) {
+    el.src = this.player_.options['poster'];
   }
   return el;
 };
@@ -976,7 +976,7 @@ vjs.Menu.prototype.createEl = function(){
 vjs.MenuItem = function(player, options){
   goog.base(this, player, options);
 
-  if (options.selected) {
+  if (options['selected']) {
     this.addClass('vjs-selected');
   }
 };
@@ -985,7 +985,7 @@ goog.inherits(vjs.MenuItem, vjs.Button);
 vjs.MenuItem.prototype.createEl = function(type, props){
   return goog.base(this, 'createEl', 'li', vjs.merge({
     className: 'vjs-menu-item',
-    innerHTML: this.options.label
+    innerHTML: this.options['label']
   }, props));
 };
 

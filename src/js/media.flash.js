@@ -18,10 +18,10 @@ goog.require('vjs.MediaTechController');
 vjs.Flash = function(player, options, ready){
   goog.base(this, player, options, ready);
 
-  var source = options.source,
+  var source = options['source'],
 
       // Which element to embed in
-      parentEl = options.parentEl,
+      parentEl = options['parentEl'],
 
       // Create a temporary element to be replaced by swf object
       placeHolder = this.el_ = vjs.createEl('div', { id: player.id() + '_temp_flash' }),
@@ -74,11 +74,11 @@ vjs.Flash = function(player, options, ready){
 
   // Having issues with Flash reloading on certain page actions (hide/resize/fullscreen) in certain browsers
   // This allows resetting the playhead when we catch the reload
-  if (options.startTime) {
+  if (options['startTime']) {
     this.ready(function(){
       this.load();
       this.play();
-      this.currentTime(options.startTime);
+      this.currentTime(options['startTime']);
     });
   }
 
@@ -102,7 +102,7 @@ vjs.Flash = function(player, options, ready){
   //    Not sure why that even works, but it causes the browser to look like it's continuously trying to load the page.
   // Firefox 3.6 keeps calling the iframe onload function anytime I write to it, causing an endless loop.
 
-  if (options.iFrameMode === true && !vjs.IS_FIREFOX) {
+  if (options['iFrameMode'] === true && !vjs.IS_FIREFOX) {
 
     // Create iFrame with vjs-tech class so it's 100% width/height
     var iFrm = vjs.createEl('iframe', {
@@ -124,14 +124,14 @@ vjs.Flash = function(player, options, ready){
 
     // Tried embedding the flash object in the page first, and then adding a place holder to the iframe, then replacing the placeholder with the page object.
     // The goal here was to try to load the swf URL in the parent page first and hope that got around the firefox security error
-    // var newObj = vjs.Flash.embed(options.swf, placeHolder, flashVars, params, attributes);
+    // var newObj = vjs.Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
     // (in onload)
     //  var temp = vjs.createEl('a', { id:'asdf', innerHTML: 'asdf' } );
     //  iDoc.body.appendChild(temp);
 
     // Tried embedding the flash object through javascript in the iframe source.
     // This works in webkit but still triggers the firefox security error
-    // iFrm.src = 'javascript: document.write('"+vjs.Flash.getEmbedCode(options.swf, flashVars, params, attributes)+"');";
+    // iFrm.src = 'javascript: document.write('"+vjs.Flash.getEmbedCode(options['swf'], flashVars, params, attributes)+"');";
 
     // Tried an actual local iframe just to make sure that works, but it kills the easiness of the CDN version if you require the user to host an iframe
     // We should add an option to host the iframe locally though, because it could help a lot of issues.

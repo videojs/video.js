@@ -276,10 +276,10 @@ vjs.Component.prototype.addChild = function(child, options){
     options = options || {};
 
     // Assume name of set is a lowercased name of the UI Class (PlayButton, etc.)
-    componentClass = options.componentClass || vjs.capitalize(componentName);
+    componentClass = options['componentClass'] || vjs.capitalize(componentName);
 
     // Set name through options
-    options.name = componentName;
+    options['name'] = componentName;
 
     // Create a new object & element for this controls set
     // If there's no .player_, this is a player
@@ -345,14 +345,14 @@ vjs.Component.prototype.removeChild = function(component){
 vjs.Component.prototype.initChildren = function(){
   var options = this.options;
 
-  if (options && options.children) {
+  if (options && options['children']) {
     var self = this;
 
     // Loop through components and add them to the player
-    vjs.eachProp(options.children, function(name, opts){
+    vjs.eachProp(options['children'], function(name, opts){
 
       // Allow for disabling default components
-      // e.g. vjs.options.components.posterImage = false
+      // e.g. vjs.options['children']['posterImage'] = false
       if (opts === false) return;
 
       // Allow waiting to add components until a specific event is called
@@ -361,7 +361,7 @@ vjs.Component.prototype.initChildren = function(){
         self[name] = self.addChild(name, opts);
       };
 
-      if (opts.loadEvent) {
+      if (opts['loadEvent']) {
         // this.one(opts.loadEvent, tempAdd)
       } else {
         tempAdd();

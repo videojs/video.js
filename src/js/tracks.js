@@ -746,7 +746,7 @@ vjs.TextTrackMenuItem.prototype.update = function(){
  */
 vjs.OffTextTrackMenuItem = function(player, options){
   // Create pseudo track info
-  // Requires options.kind
+  // Requires options['kind']
   options['track'] = {
     kind: function() { return options['kind']; },
     player: player,

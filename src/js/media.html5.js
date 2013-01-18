@@ -16,7 +16,7 @@ goog.require('vjs.MediaTechController');
 vjs.Html5 = function(player, options, ready){
   goog.base(this, player, options, ready);
 
-  var source = options.source;
+  var source = options['source'];
 
   // If the element source is already set, we may have missed the loadstart event, and want to trigger it.
   // We don't want to set the source again and interrupt playback.
@@ -33,7 +33,7 @@ vjs.Html5 = function(player, options, ready){
   // In Chrome (15), if you have autoplay + a poster + no controls, the video gets hidden (but audio plays)
   // This fixes both issues. Need to wait for API, so it updates displays correctly
   player.ready(function(){
-    if (this.options.autoplay && this.paused()) {
+    if (this.options['autoplay'] && this.paused()) {
       this.tag.poster = null; // Chrome Fix. Fixed in Chrome v16.
       this.play();
     }
@@ -194,7 +194,7 @@ vjs.Html5.prototype.ended = function(){ return this.el_.ended; };
   // playbackRate: function(){ return this.el_.playbackRate; },
   // mediaGroup: function(){ return this.el_.mediaGroup; },
   // controller: function(){ return this.el_.controller; },
-vjs.Html5.prototype.controls = function(){ return this.player_.options.controls; };
+vjs.Html5.prototype.controls = function(){ return this.player_.options['controls']; };
 vjs.Html5.prototype.defaultMuted = function(){ return this.el_.defaultMuted; };
 
 /* HTML5 Support Testing ---------------------------------------------------- */
