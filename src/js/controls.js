@@ -914,7 +914,7 @@ vjs.MuteToggle.prototype.update = function(){
 vjs.PosterImage = function(player, options){
   goog.base(this, player, options);
 
-  if (!this.player_.options_['poster']) {
+  if (!player.poster()) {
     this.hide();
   }
 
@@ -931,8 +931,8 @@ vjs.PosterImage.prototype.createEl = function(){
   });
 
   // src throws errors if no poster was defined.
-  if (this.player_.options_['poster']) {
-    el.src = this.player_.options_['poster'];
+  if (this.player_.poster()) {
+    el.src = this.player_.poster();
   }
   return el;
 };

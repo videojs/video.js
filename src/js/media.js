@@ -29,7 +29,7 @@ goog.inherits(vjs.MediaTechController, vjs.Component);
  * Handle a click on the media element. By default will play the media.
  */
 vjs.MediaTechController.prototype.onClick = function(){
-  if (this.player_.options_['controls']) {
+  if (this.player_.controls()) {
     if (this.player_.paused()) {
       this.player_.play();
     } else {

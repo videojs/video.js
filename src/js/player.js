@@ -30,6 +30,11 @@ vjs.Player = function(tag, options, ready){
   // Inits and embeds any child components in opts
   vjs.Component.call(this, this, opts, ready);
 
+  // Set poster
+  this.poster_ = this.options_['poster'];
+  // Set controls
+  this.controls_ = this.options_['controls'];
+
   // Firstplay event implimentation. Not sold on the event yet.
   // Could probably just check currentTime==0?
   this.one('play', function(e){
@@ -809,8 +814,44 @@ vjs.Player.prototype.loop = function(value){
   return this.techGet('loop');
 };
 
-vjs.Player.prototype.controls = function(){ return this.options_['controls']; };
-vjs.Player.prototype.poster = function(){ return this.techGet('poster'); };
+/**
+ * The url of the poster image source.
+ * @type {String}
+ * @private
+ */
+vjs.Player.prototype.poster_;
+
+/**
+ * Get or set the poster image source url.
+ * @param  {String} src Poster image source URL
+ * @return {String=}    Poster image source URL or null
+ */
+vjs.Player.prototype.poster = function(src){
+  if (src !== undefined) {
+    this.poster_ = src;
+  }
+  return this.poster_;
+};
+
+/**
+ * Whether or not the controls are showing
+ * @type {Boolean}
+ * @private
+ */
+vjs.Player.prototype.controls_;
+
+/**
+ * Get or set whether or not the controls are showing.
+ * @param  {Boolean} controls Set controls to showing or not
+ * @return {Boolean}    Controls are showing
+ */
+vjs.Player.prototype.controls = function(controls){
+  if (controls !== undefined) {
+    this.controls_ = controls;
+  }
+  return this.controls_;
+};
+
 vjs.Player.prototype.error = function(){ return this.techGet('error'); };
 vjs.Player.prototype.ended = function(){ return this.techGet('ended'); };
 

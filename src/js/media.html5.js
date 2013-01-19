@@ -194,7 +194,6 @@ vjs.Html5.prototype.ended = function(){ return this.el_.ended; };
   // playbackRate: function(){ return this.el_.playbackRate; },
   // mediaGroup: function(){ return this.el_.mediaGroup; },
   // controller: function(){ return this.el_.controller; },
-vjs.Html5.prototype.controls = function(){ return this.player_.options_['controls']; };
 vjs.Html5.prototype.defaultMuted = function(){ return this.el_.defaultMuted; };
 
 /* HTML5 Support Testing ---------------------------------------------------- */
