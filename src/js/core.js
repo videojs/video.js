@@ -57,8 +57,8 @@ vjs = function(id, options, ready){
 var videojs = vjs;
 
 // CDN Version. Used to target right flash swf.
-vjs.cdn_version = 'GENERATED_CDN_VSN';
-vjs.access_protocol = ('https:' == document.location.protocol ? 'https://' : 'http://');
+vjs.CDN_VERSION = 'GENERATED_CDN_VSN';
+vjs.ACCESS_PROTOCOL = ('https:' == document.location.protocol ? 'https://' : 'http://');
 
 /**
  * Global Player instance options
@@ -72,7 +72,7 @@ vjs.options = {
   // techOrder: ['flash','html5'],
 
   'html5': {},
-  'flash': { swf: vjs.access_protocol + 'vjs.zencdn.net/c/video-js.swf' },
+  'flash': { swf: vjs.ACCESS_PROTOCOL + 'vjs.zencdn.net/c/video-js.swf' },
 
   // Default of web browser is 300x150. Should rely on source width/height.
   'width': 300,
@@ -100,6 +100,6 @@ vjs.players = {};
 
 
 // Set CDN Version of swf
-if (vjs.cdn_version != 'GENERATED_CDN_VSN') {
-  videojs.options['flash']['swf'] = vjs.access_protocol + 'vjs.zencdn.net/'+vjs.cdn_version+'/video-js.swf';
+if (vjs.CDN_VERSION != 'GENERATED_CDN_VSN') {
+  videojs.options['flash']['swf'] = vjs.ACCESS_PROTOCOL + 'vjs.zencdn.net/'+vjs.CDN_VERSION+'/video-js.swf';
 }
