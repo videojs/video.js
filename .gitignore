@@ -9,4 +9,3 @@ node_modules
 npm-debug.log
 sandbox/*
 !sandbox/*.example
-test/video.test.js
