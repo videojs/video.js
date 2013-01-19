@@ -26,7 +26,7 @@ module.exports = function(grunt) {
         sourcelist: 'dist/sourcelist.txt',
         src: ['test/unit/*.js'],
         externs: ['src/js/media.flash.externs.js', 'test/qunit/qunit-externs.js'],
-        dest: 'dist/video.test.js'
+        dest: 'dist/test.video.js'
       }
     },
     dist: {
