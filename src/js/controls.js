@@ -361,7 +361,8 @@ vjs.CurrentTimeDisplay.prototype.createEl = function(){
 
   this.content = vjs.createEl('div', {
     className: 'vjs-current-time-display',
-    innerHTML: '0:00'
+    innerHTML: '<span class="vjs-control-text">Current Time </span>' + '0:00', // label the current time for screen reader users
+    'aria-live': 'off' // tell screen readers not to automatically read the time as it changes
   });
 
   el.appendChild(vjs.createEl('div').appendChild(this.content));
@@ -371,7 +372,7 @@ vjs.CurrentTimeDisplay.prototype.createEl = function(){
 vjs.CurrentTimeDisplay.prototype.updateContent = function(){
   // Allows for smooth scrubbing, when player can't keep up.
   var time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
-  this.content.innerHTML = vjs.formatTime(time, this.player_.duration());
+  this.content.innerHTML = '<span class="vjs-control-text">Current Time </span>' + vjs.formatTime(time, this.player_.duration());
 };
 
 /**
@@ -402,7 +403,9 @@ vjs.DurationDisplay.prototype.createEl = function(){
 };
 
 vjs.DurationDisplay.prototype.updateContent = function(){
-  if (this.player_.duration()) { this.content.innerHTML = vjs.formatTime(this.player_.duration()); }
+  if (this.player_.duration()) {
+      this.content.innerHTML = '<span class="vjs-control-text">Current Time </span>' + vjs.formatTime(this.player_.duration()); // label the current time for screen reader users
+  }
 };
 
 /**
@@ -444,7 +447,8 @@ vjs.RemainingTimeDisplay.prototype.createEl = function(){
 
   this.content = vjs.createEl('div', {
     className: 'vjs-remaining-time-display',
-    innerHTML: '-0:00'
+    innerHTML: '<span class="vjs-control-text">Remaining Time </span>' + '-0:00', // label the remaining time for screen reader users
+    'aria-live': 'off' // tell screen readers not to automatically read the time as it changes
   });
 
   el.appendChild(vjs.createEl('div').appendChild(this.content));
@@ -452,7 +456,11 @@ vjs.RemainingTimeDisplay.prototype.createEl = function(){
 };
 
 vjs.RemainingTimeDisplay.prototype.updateContent = function(){
-  if (this.player_.duration()) { this.content.innerHTML = '-'+vjs.formatTime(this.player_.remainingTime()); }
+  if (this.player_.duration()) {
+      if (this.player_.duration()) {
+          this.content.innerHTML = '<span class="vjs-control-text">Remaining Time </span>' + '-'+ vjs.formatTime(this.player_.remainingTime());
+      }
+  }
 
   // Allows for smooth scrubbing, when player can't keep up.
   // var time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
@@ -638,6 +646,8 @@ vjs.ProgressControl.prototype.createEl = function(){
  */
 vjs.SeekBar = function(player, options){
   goog.base(this, player, options);
+  player.on('timeupdate', vjs.bind(this, this.updateARIAAttributes));
+  player.ready(vjs.bind(this, this.updateARIAAttributes));
 };
 goog.inherits(vjs.SeekBar, vjs.Slider);
 
@@ -655,8 +665,16 @@ vjs.SeekBar.prototype.playerEvent = 'timeupdate';
 
 vjs.SeekBar.prototype.createEl = function(){
   return goog.base(this, 'createEl', 'div', {
-    className: 'vjs-progress-holder'
+    className: 'vjs-progress-holder',
+    'aria-label': 'video progress bar'
   });
+};
+
+vjs.SeekBar.prototype.updateARIAAttributes = function(){
+    // Allows for smooth scrubbing, when player can't keep up.
+    var time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
+    this.el_.setAttribute('aria-valuenow',vjs.round(this.getPercent()*100, 2)); // machine readable value of progress bar (percentage complete)
+    this.el_.setAttribute('aria-valuetext',vjs.formatTime(time, this.player_.duration())); // human readable value of progress bar (time complete)
 };
 
 vjs.SeekBar.prototype.getPercent = function(){
@@ -692,11 +710,11 @@ vjs.SeekBar.prototype.onMouseUp = function(event){
 };
 
 vjs.SeekBar.prototype.stepForward = function(){
-  this.player_.currentTime(this.player_.currentTime() + 1);
+  this.player_.currentTime(this.player_.currentTime() + 5); // more quickly fast forward for keyboard-only users
 };
 
 vjs.SeekBar.prototype.stepBack = function(){
-  this.player_.currentTime(this.player_.currentTime() - 1);
+  this.player_.currentTime(this.player_.currentTime() - 5); // more quickly rewind for keyboard-only users
 };
 
 
