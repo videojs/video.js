@@ -748,7 +748,7 @@ goog.inherits(vjs.TextTrackMenuItem, vjs.MenuItem);
 
 vjs.TextTrackMenuItem.prototype.onClick = function(){
   goog.base(this, 'onClick');
-  this.player_.showTextTrack(this.track.id(), this.track.kind());
+  this.player_.showTextTrack(this.track.id_, this.track.kind());
 };
 
 vjs.TextTrackMenuItem.prototype.update = function(){
@@ -778,7 +778,7 @@ goog.inherits(vjs.OffTextTrackMenuItem, vjs.TextTrackMenuItem);
 
 vjs.OffTextTrackMenuItem.prototype.onClick = function(){
   goog.base(this, 'onClick');
-  this.player_.showTextTrack(this.track.id(), this.track.kind());
+  this.player_.showTextTrack(this.track.id_, this.track.kind());
 };
 
 vjs.OffTextTrackMenuItem.prototype.update = function(){
