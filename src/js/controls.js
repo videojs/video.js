@@ -265,7 +265,8 @@ goog.inherits(vjs.BigPlayButton, vjs.Button);
 vjs.BigPlayButton.prototype.createEl = function(){
   return goog.base(this, 'createEl', 'div', {
     className: 'vjs-big-play-button',
-    innerHTML: '<span></span>'
+    innerHTML: '<span></span>',
+    'aria-label': 'play video'
   });
 };
 
