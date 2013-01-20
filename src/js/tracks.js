@@ -813,8 +813,13 @@ vjs.TextTrackButton = function(player, options){
   if (this.items.length === 0) {
     this.hide();
   }
+  this.on('keyup', this.onKeyPress);
+  this.el_.setAttribute('aria-haspopup',true);
+  this.el_.setAttribute('role','button');
 };
 goog.inherits(vjs.TextTrackButton, vjs.Button);
+
+vjs.TextTrackButton.prototype.buttonPressed = false;
 
 vjs.TextTrackButton.prototype.createMenu = function(){
   var menu = new vjs.Menu(this.player_);
@@ -822,7 +827,8 @@ vjs.TextTrackButton.prototype.createMenu = function(){
   // Add a title list item to the top
   menu.el().appendChild(vjs.createEl('li', {
     className: 'vjs-menu-title',
-    innerHTML: vjs.capitalize(this.kind_)
+    innerHTML: vjs.capitalize(this.kind_),
+    tabindex: -1
   }));
 
   // Add an OFF menu item to turn all tracks off
@@ -863,6 +869,11 @@ vjs.TextTrackButton.prototype.buildCSSClass = function(){
 
 // Focus - Add keyboard functionality to element
 vjs.TextTrackButton.prototype.onFocus = function(){
+  // This function is not needed anymore. Instead, the keyboard functionality is handled by
+  // treating the button as triggering a submenu. When the button is pressed, the submenu
+  // appears. Pressing the button again makes the submenu disappear.
+  
+  /*
   // Show the menu, and keep showing when the menu items are in focus
   this.menu.lockShowing();
   // this.menu.el_.style.display = 'block';
@@ -871,6 +882,7 @@ vjs.TextTrackButton.prototype.onFocus = function(){
   vjs.one(this.menu.el_.childNodes[this.menu.el_.childNodes.length - 1], 'blur', vjs.bind(this, function(){
     this.menu.unlockShowing();
   }));
+    */
 };
 // Can't turn off list display that we turned on with focus, because list would go away.
 vjs.TextTrackButton.prototype.onBlur = function(){};
@@ -883,13 +895,51 @@ vjs.TextTrackButton.prototype.onClick = function(){
     this.menu.unlockShowing();
     this.el_.blur();
   }));
+  if (this.buttonPressed){
+      this.unpressButton();
+  } else {
+      this.pressButton();
+  }
 };
 
+vjs.TextTrackButton.prototype.onKeyPress = function(event){
+  // Check for space bar (32) or enter (13) keys
+  if (event.which == 32 || event.which == 13) {
+      event.preventDefault();
+      if (this.buttonPressed){
+          this.unpressButton();
+      } else {
+          this.pressButton();
+      }
+  }
+  
+  // Check for escape (27) key
+  if (event.which == 27){
+      event.preventDefault();
+      if (this.buttonPressed){
+          this.unpressButton();
+      }
+  }
+};
+
+vjs.TextTrackButton.prototype.pressButton = function(){
+    this.buttonPressed = true;
+    this.menu.lockShowing();
+    this.el_.setAttribute('aria-pressed',true);
+    this.el_.children[1].children[0].focus(); // set the focus to the title of the submenu
+};
+
+vjs.TextTrackButton.prototype.unpressButton = function(){
+    this.buttonPressed = false;
+    this.menu.unlockShowing();
+    this.el_.setAttribute('aria-pressed',false);
+};
 /**
  * @constructor
  */
 vjs.CaptionsButton = function(player, options, ready){
   goog.base(this, player, options, ready);
+  this.el_.setAttribute('aria-label','Captions Menu');
 };
 goog.inherits(vjs.CaptionsButton, vjs.TextTrackButton);
 vjs.CaptionsButton.prototype.kind_ = 'captions';
@@ -901,6 +951,7 @@ vjs.CaptionsButton.prototype.className = 'vjs-captions-button';
  */
 vjs.SubtitlesButton = function(player, options, ready){
   goog.base(this, player, options, ready);
+  this.el_.setAttribute('aria-label','Subtitles Menu');
 };
 goog.inherits(vjs.SubtitlesButton, vjs.TextTrackButton);
 vjs.SubtitlesButton.prototype.kind_ = 'subtitles';
@@ -914,6 +965,7 @@ vjs.SubtitlesButton.prototype.className = 'vjs-subtitles-button';
  */
 vjs.ChaptersButton = function(player, options, ready){
   goog.base(this, player, options, ready);
+  this.el_.setAttribute('aria-label','Chapters Menu');
 };
 goog.inherits(vjs.ChaptersButton, vjs.TextTrackButton);
 vjs.ChaptersButton.prototype.kind_ = 'chapters';
@@ -961,7 +1013,8 @@ vjs.ChaptersButton.prototype.createMenu = function(){
 
   menu.el_.appendChild(vjs.createEl('li', {
     className: 'vjs-menu-title',
-    innerHTML: vjs.capitalize(this.kind_)
+    innerHTML: vjs.capitalize(this.kind_),
+    tabindex: -1
   }));
 
   if (chaptersTrack) {
