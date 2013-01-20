@@ -126,7 +126,7 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 }
 
 .vjs-default-skin .vjs-control:focus {
-  outline: 0;
+  /*  outline: 0; */ /* keyboard-only users cannot see the focus on several of the UI elements when this is set to 0 */
 /*  background-color: #555;*/
 }
 
@@ -347,7 +347,7 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
   -webkit-box-shadow: 4px 4px 8px #000; -moz-box-shadow: 4px 4px 8px #000; box-shadow: 4px 4px 8px #000;
 }
 
-.vjs-default-skin div.vjs-big-play-button:hover {
+.vjs-default-skin div.vjs-big-play-button:hover, .vjs-default-skin div.vjs-big-play-button:focus {
   -webkit-box-shadow: 0 0 80px #fff; -moz-box-shadow: 0 0 80px #fff; box-shadow: 0 0 80px #fff;
 }
 
