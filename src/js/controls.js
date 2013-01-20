@@ -46,12 +46,12 @@ vjs.ControlBar.prototype.options_ = {
   loadEvent: 'play',
   children: {
     'playToggle': {},
-    'fullscreenToggle': {},
     'currentTimeDisplay': {},
     'timeDivider': {},
     'durationDisplay': {},
     'remainingTimeDisplay': {},
     'progressControl': {},
+    'fullscreenToggle': {},
     'volumeControl': {},
     'muteToggle': {}
   }
