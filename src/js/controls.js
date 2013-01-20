@@ -795,8 +795,16 @@ vjs.VolumeControl.prototype.createEl = function(){
  */
 vjs.VolumeBar = function(player, options){
   goog.base(this, player, options);
+  player.on('volumechange', vjs.bind(this, this.updateARIAAttributes));
+  this.updateARIAAttributes();
 };
 goog.inherits(vjs.VolumeBar, vjs.Slider);
+
+vjs.VolumeBar.prototype.updateARIAAttributes = function(){
+    // Current value of volume bar as a percentage
+    this.el_.setAttribute('aria-valuenow',_V_.round(this.player_.volume()*100, 2));
+    this.el_.setAttribute('aria-valuetext',_V_.round(this.player_.volume()*100, 2)+'%');
+};
 
 vjs.VolumeBar.prototype.options_ = {
   children: {
@@ -811,7 +819,8 @@ vjs.VolumeBar.prototype.playerEvent = 'volumechange';
 
 vjs.VolumeBar.prototype.createEl = function(){
   return goog.base(this, 'createEl', 'div', {
-    className: 'vjs-volume-bar'
+    className: 'vjs-volume-bar',
+    'aria-label': 'volume level'
   });
 };
 
