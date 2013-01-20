@@ -27,6 +27,10 @@ REQUIRED STYLES (be careful overriding)
 /* Playback technology elements expand to the width/height of the containing div. <video> or <object> */
 .video-js .vjs-tech { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
+/* If the controls are set to be visible all the time, move the video up 20 pixels to compensate for the larger container necessary to place the controls below the video */
+.video-js .vjs-tech-controls-always-visible { top: -20px;}
+.video-js .vjs-tech-controls-always-visible-ie { top: 0; height:auto;} /* IE hack. height: 100% makes the video always center itself from top to bottom, thus always leaving a gap at the top when making extra room for controls that are always visible. */
+
 /* Fix for Firefox 9 fullscreen (only if it is enabled). Not needed when checking fullScreenEnabled. */
 .video-js:-moz-full-screen { position: absolute; }
 
@@ -116,6 +120,12 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
   /* Can't use display block to hide initially because widths of slider handles aren't calculated and avaialbe for positioning correctly. */
   visibility: hidden;
   opacity: 0;
+}
+
+/* Make the control bar visible at all times */
+.vjs-controls-always-visible {
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 /* General styles for individual controls. */

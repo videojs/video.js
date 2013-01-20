@@ -89,7 +89,12 @@ vjs.options = {
     'loadingSpinner': {},
     'bigPlayButton': {},
     'controlBar': {}
-  }
+  },
+  
+  // Default value for allowing the control bar to show and hide on mouse hover events or always being visible.
+  // Override the default value by setting the optional paramenter in the data-setup.
+  // data-setup='{"controlsAlwaysVisible":true}'
+  controlsAlwaysVisible: false
 };
 
 /**

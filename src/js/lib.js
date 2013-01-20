@@ -208,6 +208,9 @@ vjs.removeClass = function(element, classToRemove){
   element.className = classNames.join(' ');
 };
 
+// Holder for control visibility
+vjs.controlsAlwaysVisible = false;
+
 /**
  * Element for testing browser HTML5 video capabilities
  * @type {Element}
@@ -221,6 +224,13 @@ vjs.TEST_VID = vjs.createEl('video');
  * @constant
  */
 vjs.USER_AGENT = navigator.userAgent;
+
+/**
+ * Browser is Internet Explorer
+ * @type {Boolean}
+ * @constant
+ */
+vjs.IS_INTERNET_EXPLORER = !!vjs.USER_AGENT.match(/MSIE/i);
 
 /**
  * Device is an iPhone

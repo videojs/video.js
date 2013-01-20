@@ -36,8 +36,11 @@ vjs.ControlBar = function(player, options){
 
   player.one('play', vjs.bind(this, function(){
     this.fadeIn();
-    this.player_.on('mouseover', vjs.bind(this, this.fadeIn));
-    this.player_.on('mouseout', vjs.bind(this, this.fadeOut));
+    // don't allow the controls to fade in and out if the controlsAlwaysVisible property is set to true
+    if(!vjs.controlsAlwaysVisible){
+        this.player_.on('mouseover', vjs.bind(this, this.fadeIn));
+        this.player_.on('mouseout', vjs.bind(this, this.fadeOut));
+    }
   }));
 };
 goog.inherits(vjs.ControlBar, vjs.Component);
@@ -59,7 +62,7 @@ vjs.ControlBar.prototype.options_ = {
 
 vjs.ControlBar.prototype.createEl = function(){
   return vjs.createEl('div', {
-    className: 'vjs-control-bar'
+    className: 'vjs-control-bar' + (vjs.controlsAlwaysVisible?' vjs-controls-always-visible':'')
   });
 };
 
