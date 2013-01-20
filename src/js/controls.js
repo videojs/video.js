@@ -100,6 +100,7 @@ vjs.Button.prototype.createEl = function(type, props){
     className: this.buildCSSClass(),
     innerHTML: '<div><span class="vjs-control-text">' + (this.buttonText || 'Need Text') + '</span></div>',
     role: 'button',
+    'aria-live': 'polite', // let the screen reader user know that the text of the button may change
     tabIndex: 0
   }, props);
 
@@ -209,12 +210,14 @@ vjs.PlayToggle.prototype.onClick = function(){
 vjs.PlayToggle.prototype.onPlay = function(){
   vjs.removeClass(this.el_, 'vjs-paused');
   vjs.addClass(this.el_, 'vjs-playing');
+  this.el_.children[0].children[0].innerHTML = 'Pause'; // change the button text to "Pause"
 };
 
   // OnPause - Add the vjs-paused class to the element so it can change appearance
 vjs.PlayToggle.prototype.onPause = function(){
   vjs.removeClass(this.el_, 'vjs-playing');
   vjs.addClass(this.el_, 'vjs-paused');
+  this.el_.children[0].children[0].innerHTML = 'Play'; // change the button text to "Play"
 };
 
 
@@ -240,8 +243,10 @@ vjs.FullscreenToggle.prototype.buildCSSClass = function(){
 vjs.FullscreenToggle.prototype.onClick = function(){
   if (!this.player_.isFullScreen) {
     this.player_.requestFullScreen();
+    this.el_.children[0].children[0].innerHTML = 'Non-Fullscreen'; // change the button text to "Non-Fullscreen"
   } else {
     this.player_.cancelFullScreen();
+    this.el_.children[0].children[0].innerHTML = 'Fullscreen'; // change the button to "Fullscreen"
   }
 };
 
@@ -895,6 +900,19 @@ vjs.MuteToggle.prototype.update = function(){
     level = 1;
   } else if (vol < 0.67) {
     level = 2;
+  }
+  
+  // Don't rewrite the button text if the actual text doesn't change.
+  // This causes unnecessary and confusing information for screen reader users.
+  // This check is needed because this function gets called every time the volume level is changed.
+  if(this.player_.muted()){
+      if(this.el_.children[0].children[0].innerHTML!='Unmute'){
+          this.el_.children[0].children[0].innerHTML = 'Unmute'; // change the button text to "Unmute"
+      }
+  } else {
+      if(this.el_.children[0].children[0].innerHTML!='Mute'){
+          this.el_.children[0].children[0].innerHTML = 'Mute'; // change the button text to "Mute"
+      }
   }
 
   /* TODO improve muted icon classes */
