@@ -1027,6 +1027,9 @@ vjs.MenuItem = function(player, options){
 
   if (options['selected']) {
     this.addClass('vjs-selected');
+    this.el_.setAttribute('aria-selected',true);
+  } else {
+    this.el_.setAttribute('aria-selected',false);
   }
 };
 goog.inherits(vjs.MenuItem, vjs.Button);
@@ -1045,7 +1048,9 @@ vjs.MenuItem.prototype.onClick = function(){
 vjs.MenuItem.prototype.selected = function(selected){
   if (selected) {
     this.addClass('vjs-selected');
+    this.el_.setAttribute('aria-selected',true);
   } else {
     this.removeClass('vjs-selected');
+    this.el_.setAttribute('aria-selected',false);
   }
 };
