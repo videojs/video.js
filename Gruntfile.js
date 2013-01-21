@@ -80,6 +80,14 @@ module.exports = function(grunt) {
       if (results) {
         grunt.file.write('dist/sourcelist.txt', results.join(','));
         grunt.file.write('dist/sourcelist.js', 'var sourcelist = ["' + results.join('","') + '"]');
+
+        // Create a combined sources file
+        // https://github.com/zencoder/video-js/issues/287
+        var combined = '';
+        results.forEach(function(result){
+          combined += grunt.file.read(result);
+        });
+        grunt.file.write('dist/source.video.js', combined);
       }
 
       done();
