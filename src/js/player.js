@@ -17,10 +17,7 @@ vjs.Player = function(tag, options, ready){
   // which overrides globally set options.
   // This latter part coincides with the load order
   // (tag must exist before Player)
-  var opts = {};
-  vjs.merge(opts, vjs.options); // Copy Global Defaults
-  vjs.merge(opts, this.getTagSettings(tag)); // Override with Video Tag Options
-  vjs.merge(opts, options); // Override/extend with options from setup call
+  options = this.mergeOptions(this.getTagSettings(tag), options);
 
   // Cache for video property values.
   this.cache_ = {};
@@ -28,7 +25,7 @@ vjs.Player = function(tag, options, ready){
   // Run base component initializing with new options.
   // Builds the element through createEl()
   // Inits and embeds any child components in opts
-  vjs.Component.call(this, this, opts, ready);
+  vjs.Component.call(this, this, options, ready);
 
   // Set poster
   this.poster_ = this.options_['poster'];
@@ -60,6 +57,17 @@ vjs.Player = function(tag, options, ready){
   vjs.players[this.id_] = this;
 };
 goog.inherits(vjs.Player, vjs.Component);
+
+/**
+ * Player instance options, surfaced using vjs.options
+ * vjs.options = vjs.Player.prototype.options_
+ * Make changes in vjs.options, not here.
+ * All options should use string keys so they avoid
+ * renaming by closure compiler
+ * @type {Object}
+ * @private
+ */
+vjs.Player.prototype.options_ = vjs.options;
 
 vjs.Player.prototype.dispose = function(){
   // this.isReady_ = false;

@@ -61,11 +61,12 @@ vjs.CDN_VERSION = 'GENERATED_CDN_VSN';
 vjs.ACCESS_PROTOCOL = ('https:' == document.location.protocol ? 'https://' : 'http://');
 
 /**
- * Global Player instance options
+ * Global Player instance options, surfaced from vjs.Player.prototype.options_
+ * vjs.options = vjs.Player.prototype.options_
+ * All options should use string keys so they avoid
+ * renaming by closure compiler
  * @type {Object}
  */
-// var vjs = videojs;
-
 vjs.options = {
   // Default order of fallback technology
   'techOrder': ['html5','flash'],
