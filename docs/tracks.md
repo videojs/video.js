@@ -1,11 +1,3 @@
----
-layout: docs
-title: HTML5 Video Text Tracks (Subtitles, Captions, Chapters)
-description: Video.js support for captions, subtitles, and chapters through the use of the HTML5 video track element.
-body_id: tracks
-body_class: docs subpage
----
-
 Tracks
 ======
 
@@ -27,8 +19,7 @@ Adding to Video.js
 ------------------
 Once you have your WebVTT file created, you can add it to Video.js using the track trag. Put your track track tag after all the source elements, and before any fallback content.
 
-<code type="html">
-
+```html
 <video id="example_video_1" class="video-js vjs-default-skin"  
   controls preload="auto" width="640" height="264"  
   data-setup='{"example_option":true}'>  
@@ -39,8 +30,7 @@ Once you have your WebVTT file created, you can add it to Video.js using the tra
  <track kind="captions" src="http://example.com/path/to/captions.vtt" srclang="en" label="English" default>
 
 </video>
-
-</code>
+```
 
 Track Attributes
 ----------------
