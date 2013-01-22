@@ -258,7 +258,7 @@ vjs.BigPlayButton = function(player, options){
   goog.base(this, player, options);
 
   player.on('play', vjs.bind(this, this.hide));
-  player.on('ended', vjs.bind(this, this.show));
+  // player.on('ended', vjs.bind(this, this.show));
 };
 goog.inherits(vjs.BigPlayButton, vjs.Button);
 
