@@ -47,7 +47,9 @@ vjs.Component.prototype.dispose = function(){
   // Dispose all children.
   if (this.children_) {
     for (var i = this.children_.length - 1; i >= 0; i--) {
-      this.children_[i].dispose();
+      if (this.children_[i].dispose) {
+        this.children_[i].dispose();
+      }
     }
   }
 
