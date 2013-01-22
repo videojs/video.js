@@ -47,7 +47,9 @@ vjs.Component.prototype.dispose = function(){
   // Dispose all children.
   if (this.children_) {
     for (var i = this.children_.length - 1; i >= 0; i--) {
-      this.children_[i].dispose();
+      if (this.children_[i].dispose) {
+        this.children_[i].dispose();
+      }
     }
   }
 
@@ -300,21 +302,25 @@ vjs.Component.prototype.addChild = function(child, options){
     component = child;
   }
 
-  componentName = component.name();
-  componentId = component.id();
-
   this.children_.push(component);
 
-  if (componentId) {
-    this.childIndex_[componentId] = component;
+  if (typeof component.id === 'function') {
+    this.childIndex_[component.id()] = component;
   }
+
+  // If a name wasn't used to create the component, check if we can use the
+  // name function of the component
+  componentName = componentName || (component.name && component.name());
 
   if (componentName) {
     this.childNameIndex_[componentName] = component;
   }
 
   // Add the UI object's element to the container div (box)
-  this.el_.appendChild(component.el());
+  // Having an element is not required
+  if (typeof component.el === 'function' && component.el()) {
+    this.el_.appendChild(component.el());
+  }
 
   // Return so it can stored on parent object if desired.
   return component;
