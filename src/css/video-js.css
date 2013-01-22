@@ -27,6 +27,10 @@ REQUIRED STYLES (be careful overriding)
 /* Playback technology elements expand to the width/height of the containing div. <video> or <object> */
 .video-js .vjs-tech { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
+/* If the controls are set to be visible all the time, move the video up 20 pixels to compensate for the larger container necessary to place the controls below the video */
+.video-js .vjs-tech-controls-always-visible { top: -20px;}
+.video-js .vjs-tech-controls-always-visible-ie { top: 0; height:auto;} /* IE hack. height: 100% makes the video always center itself from top to bottom, thus always leaving a gap at the top when making extra room for controls that are always visible. */
+
 /* Fix for Firefox 9 fullscreen (only if it is enabled). Not needed when checking fullScreenEnabled. */
 .video-js:-moz-full-screen { position: absolute; }
 
@@ -118,6 +122,12 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
   opacity: 0;
 }
 
+/* Make the control bar visible at all times */
+.vjs-controls-always-visible {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
 /* General styles for individual controls. */
 .vjs-default-skin .vjs-control {
   position: relative; float: left;
@@ -126,7 +136,7 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 }
 
 .vjs-default-skin .vjs-control:focus {
-  outline: 0;
+  /*  outline: 0; */ /* keyboard-only users cannot see the focus on several of the UI elements when this is set to 0 */
 /*  background-color: #555;*/
 }
 
@@ -347,7 +357,7 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
   -webkit-box-shadow: 4px 4px 8px #000; -moz-box-shadow: 4px 4px 8px #000; box-shadow: 4px 4px 8px #000;
 }
 
-.vjs-default-skin div.vjs-big-play-button:hover {
+.vjs-default-skin div.vjs-big-play-button:hover, .vjs-default-skin div.vjs-big-play-button:focus {
   -webkit-box-shadow: 0 0 80px #fff; -moz-box-shadow: 0 0 80px #fff; box-shadow: 0 0 80px #fff;
 }
 
@@ -469,7 +479,7 @@ div.vjs-loading-spinner .ball8 { opacity: 1.00; position:absolute; left: 6px; to
   overflow: auto;
 }
 
-.vjs-default-skin .vjs-menu-button:focus ul,
+/*.vjs-default-skin .vjs-menu-button:focus ul,*/ /* This is not needed because keyboard accessibility for the caption button is not handled with the focus any more. */
 .vjs-default-skin .vjs-menu-button:hover ul { display: block; list-style: none; }
 .vjs-default-skin .vjs-menu-button ul li { list-style: none; margin: 0; padding: 0.3em 0 0.3em 20px; line-height: 1.4em; font-size: 1.2em; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; text-align: left; }
 .vjs-default-skin .vjs-menu-button ul li.vjs-selected { text-decoration: underline; background: url('video-js.png') -125px -50px no-repeat; }

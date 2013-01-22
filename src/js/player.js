@@ -17,6 +17,12 @@ vjs.Player = function(tag, options, ready){
   // which overrides globally set options.
   // This latter part coincides with the load order
   // (tag must exist before Player)
+  var opts = {};
+  vjs.merge(opts, vjs.options); // Copy Global Defaults
+  vjs.merge(opts, this.getTagSettings(tag)); // Override with Video Tag Options
+  vjs.merge(opts, options); // Override/extend with options from setup call
+  
+  vjs.controlsAlwaysVisible = opts.controlsAlwaysVisible;
   options = this.mergeOptions(this.getTagSettings(tag), options);
 
   // Cache for video property values.
@@ -157,7 +163,8 @@ vjs.Player.prototype.createEl = function(){
   // Might think we should do this after embedding in container so .vjs-tech class
   // doesn't flash 100% width/height, but class only applies with .video-js parent
   tag.id += '_html5_api';
-  tag.className = 'vjs-tech';
+  // If the controls are set to be visible at all times, add the additional class. If it is IE, add a different class.
+  tag.className = 'vjs-tech' + (this.options_['controlsAlwaysVisible']?' vjs-tech-controls-always-visible':(vjs.IS_INTERNET_EXPLORER?'-ie':''));
 
   // Make player findable on elements
   tag['player'] = el['player'] = this;
@@ -168,7 +175,7 @@ vjs.Player.prototype.createEl = function(){
   // Make box use width/height of tag, or default 300x150
   // Enforce with CSS since width/height attrs don't work on divs
   this.width(this.options_['width'], true); // (true) Skip resize listener on load
-  this.height(this.options_['height'], true);
+  this.height(parseInt(this.options_['height'],10) + (this.options_['controlsAlwaysVisible']?40:0), true);
 
   // Wrap video tag in div (el/box) container
   if (tag.parentNode) {

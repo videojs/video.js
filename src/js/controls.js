@@ -36,8 +36,11 @@ vjs.ControlBar = function(player, options){
 
   player.one('play', vjs.bind(this, function(){
     this.fadeIn();
-    this.player_.on('mouseover', vjs.bind(this, this.fadeIn));
-    this.player_.on('mouseout', vjs.bind(this, this.fadeOut));
+    // don't allow the controls to fade in and out if the controlsAlwaysVisible property is set to true
+    if(!vjs.controlsAlwaysVisible){
+        this.player_.on('mouseover', vjs.bind(this, this.fadeIn));
+        this.player_.on('mouseout', vjs.bind(this, this.fadeOut));
+    }
   }));
 };
 goog.inherits(vjs.ControlBar, vjs.Component);
@@ -46,12 +49,12 @@ vjs.ControlBar.prototype.options_ = {
   loadEvent: 'play',
   children: {
     'playToggle': {},
-    'fullscreenToggle': {},
     'currentTimeDisplay': {},
     'timeDivider': {},
     'durationDisplay': {},
     'remainingTimeDisplay': {},
     'progressControl': {},
+    'fullscreenToggle': {},
     'volumeControl': {},
     'muteToggle': {}
   }
@@ -59,7 +62,7 @@ vjs.ControlBar.prototype.options_ = {
 
 vjs.ControlBar.prototype.createEl = function(){
   return vjs.createEl('div', {
-    className: 'vjs-control-bar'
+    className: 'vjs-control-bar' + (vjs.controlsAlwaysVisible?' vjs-controls-always-visible':'')
   });
 };
 
@@ -100,6 +103,7 @@ vjs.Button.prototype.createEl = function(type, props){
     className: this.buildCSSClass(),
     innerHTML: '<div><span class="vjs-control-text">' + (this.buttonText || 'Need Text') + '</span></div>',
     role: 'button',
+    'aria-live': 'polite', // let the screen reader user know that the text of the button may change
     tabIndex: 0
   }, props);
 
@@ -209,12 +213,14 @@ vjs.PlayToggle.prototype.onClick = function(){
 vjs.PlayToggle.prototype.onPlay = function(){
   vjs.removeClass(this.el_, 'vjs-paused');
   vjs.addClass(this.el_, 'vjs-playing');
+  this.el_.children[0].children[0].innerHTML = 'Pause'; // change the button text to "Pause"
 };
 
   // OnPause - Add the vjs-paused class to the element so it can change appearance
 vjs.PlayToggle.prototype.onPause = function(){
   vjs.removeClass(this.el_, 'vjs-playing');
   vjs.addClass(this.el_, 'vjs-paused');
+  this.el_.children[0].children[0].innerHTML = 'Play'; // change the button text to "Play"
 };
 
 
@@ -240,8 +246,10 @@ vjs.FullscreenToggle.prototype.buildCSSClass = function(){
 vjs.FullscreenToggle.prototype.onClick = function(){
   if (!this.player_.isFullScreen) {
     this.player_.requestFullScreen();
+    this.el_.children[0].children[0].innerHTML = 'Non-Fullscreen'; // change the button text to "Non-Fullscreen"
   } else {
     this.player_.cancelFullScreen();
+    this.el_.children[0].children[0].innerHTML = 'Fullscreen'; // change the button to "Fullscreen"
   }
 };
 
@@ -265,7 +273,8 @@ goog.inherits(vjs.BigPlayButton, vjs.Button);
 vjs.BigPlayButton.prototype.createEl = function(){
   return goog.base(this, 'createEl', 'div', {
     className: 'vjs-big-play-button',
-    innerHTML: '<span></span>'
+    innerHTML: '<span></span>',
+    'aria-label': 'play video'
   });
 };
 
@@ -355,7 +364,8 @@ vjs.CurrentTimeDisplay.prototype.createEl = function(){
 
   this.content = vjs.createEl('div', {
     className: 'vjs-current-time-display',
-    innerHTML: '0:00'
+    innerHTML: '<span class="vjs-control-text">Current Time </span>' + '0:00', // label the current time for screen reader users
+    'aria-live': 'off' // tell screen readers not to automatically read the time as it changes
   });
 
   el.appendChild(vjs.createEl('div').appendChild(this.content));
@@ -365,7 +375,7 @@ vjs.CurrentTimeDisplay.prototype.createEl = function(){
 vjs.CurrentTimeDisplay.prototype.updateContent = function(){
   // Allows for smooth scrubbing, when player can't keep up.
   var time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
-  this.content.innerHTML = vjs.formatTime(time, this.player_.duration());
+  this.content.innerHTML = '<span class="vjs-control-text">Current Time </span>' + vjs.formatTime(time, this.player_.duration());
 };
 
 /**
@@ -396,7 +406,9 @@ vjs.DurationDisplay.prototype.createEl = function(){
 };
 
 vjs.DurationDisplay.prototype.updateContent = function(){
-  if (this.player_.duration()) { this.content.innerHTML = vjs.formatTime(this.player_.duration()); }
+  if (this.player_.duration()) {
+      this.content.innerHTML = '<span class="vjs-control-text">Current Time </span>' + vjs.formatTime(this.player_.duration()); // label the current time for screen reader users
+  }
 };
 
 /**
@@ -438,7 +450,8 @@ vjs.RemainingTimeDisplay.prototype.createEl = function(){
 
   this.content = vjs.createEl('div', {
     className: 'vjs-remaining-time-display',
-    innerHTML: '-0:00'
+    innerHTML: '<span class="vjs-control-text">Remaining Time </span>' + '-0:00', // label the remaining time for screen reader users
+    'aria-live': 'off' // tell screen readers not to automatically read the time as it changes
   });
 
   el.appendChild(vjs.createEl('div').appendChild(this.content));
@@ -446,7 +459,11 @@ vjs.RemainingTimeDisplay.prototype.createEl = function(){
 };
 
 vjs.RemainingTimeDisplay.prototype.updateContent = function(){
-  if (this.player_.duration()) { this.content.innerHTML = '-'+vjs.formatTime(this.player_.remainingTime()); }
+  if (this.player_.duration()) {
+      if (this.player_.duration()) {
+          this.content.innerHTML = '<span class="vjs-control-text">Remaining Time </span>' + '-'+ vjs.formatTime(this.player_.remainingTime());
+      }
+  }
 
   // Allows for smooth scrubbing, when player can't keep up.
   // var time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
@@ -632,6 +649,8 @@ vjs.ProgressControl.prototype.createEl = function(){
  */
 vjs.SeekBar = function(player, options){
   goog.base(this, player, options);
+  player.on('timeupdate', vjs.bind(this, this.updateARIAAttributes));
+  this.updateARIAAttributes();
 };
 goog.inherits(vjs.SeekBar, vjs.Slider);
 
@@ -649,8 +668,16 @@ vjs.SeekBar.prototype.playerEvent = 'timeupdate';
 
 vjs.SeekBar.prototype.createEl = function(){
   return goog.base(this, 'createEl', 'div', {
-    className: 'vjs-progress-holder'
+    className: 'vjs-progress-holder',
+    'aria-label': 'video progress bar'
   });
+};
+
+vjs.SeekBar.prototype.updateARIAAttributes = function(){
+    // Allows for smooth scrubbing, when player can't keep up.
+    var time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
+    this.el_.setAttribute('aria-valuenow',vjs.round(this.getPercent()*100, 2)); // machine readable value of progress bar (percentage complete)
+    this.el_.setAttribute('aria-valuetext',vjs.formatTime(time, this.player_.duration())); // human readable value of progress bar (time complete)
 };
 
 vjs.SeekBar.prototype.getPercent = function(){
@@ -686,11 +713,11 @@ vjs.SeekBar.prototype.onMouseUp = function(event){
 };
 
 vjs.SeekBar.prototype.stepForward = function(){
-  this.player_.currentTime(this.player_.currentTime() + 1);
+  this.player_.currentTime(this.player_.currentTime() + 5); // more quickly fast forward for keyboard-only users
 };
 
 vjs.SeekBar.prototype.stepBack = function(){
-  this.player_.currentTime(this.player_.currentTime() - 1);
+  this.player_.currentTime(this.player_.currentTime() - 5); // more quickly rewind for keyboard-only users
 };
 
 
@@ -786,8 +813,16 @@ vjs.VolumeControl.prototype.createEl = function(){
  */
 vjs.VolumeBar = function(player, options){
   goog.base(this, player, options);
+  player.on('volumechange', vjs.bind(this, this.updateARIAAttributes));
+  this.updateARIAAttributes();
 };
 goog.inherits(vjs.VolumeBar, vjs.Slider);
+
+vjs.VolumeBar.prototype.updateARIAAttributes = function(){
+    // Current value of volume bar as a percentage
+    this.el_.setAttribute('aria-valuenow',_V_.round(this.player_.volume()*100, 2));
+    this.el_.setAttribute('aria-valuetext',_V_.round(this.player_.volume()*100, 2)+'%');
+};
 
 vjs.VolumeBar.prototype.options_ = {
   children: {
@@ -802,7 +837,8 @@ vjs.VolumeBar.prototype.playerEvent = 'volumechange';
 
 vjs.VolumeBar.prototype.createEl = function(){
   return goog.base(this, 'createEl', 'div', {
-    className: 'vjs-volume-bar'
+    className: 'vjs-volume-bar',
+    'aria-label': 'volume level'
   });
 };
 
@@ -895,6 +931,19 @@ vjs.MuteToggle.prototype.update = function(){
   } else if (vol < 0.67) {
     level = 2;
   }
+  
+  // Don't rewrite the button text if the actual text doesn't change.
+  // This causes unnecessary and confusing information for screen reader users.
+  // This check is needed because this function gets called every time the volume level is changed.
+  if(this.player_.muted()){
+      if(this.el_.children[0].children[0].innerHTML!='Unmute'){
+          this.el_.children[0].children[0].innerHTML = 'Unmute'; // change the button text to "Unmute"
+      }
+  } else {
+      if(this.el_.children[0].children[0].innerHTML!='Mute'){
+          this.el_.children[0].children[0].innerHTML = 'Mute'; // change the button text to "Mute"
+      }
+  }
 
   /* TODO improve muted icon classes */
   for (var i = 0; i < 4; i++) {
@@ -978,6 +1027,9 @@ vjs.MenuItem = function(player, options){
 
   if (options['selected']) {
     this.addClass('vjs-selected');
+    this.el_.setAttribute('aria-selected',true);
+  } else {
+    this.el_.setAttribute('aria-selected',false);
   }
 };
 goog.inherits(vjs.MenuItem, vjs.Button);
@@ -996,7 +1048,9 @@ vjs.MenuItem.prototype.onClick = function(){
 vjs.MenuItem.prototype.selected = function(selected){
   if (selected) {
     this.addClass('vjs-selected');
+    this.el_.setAttribute('aria-selected',true);
   } else {
     this.removeClass('vjs-selected');
+    this.el_.setAttribute('aria-selected',false);
   }
 };
