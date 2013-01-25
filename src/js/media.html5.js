@@ -67,7 +67,7 @@ vjs.Html5.prototype.createEl = function(){
       player.el().removeChild(el);
     }
 
-    newEl = vjs.createElement('video', {
+    newEl = vjs.createEl('video', {
       id: el.id || player.id() + '_html5_api',
       className: el.className || 'vjs-tech'
     });
