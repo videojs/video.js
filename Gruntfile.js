@@ -3,8 +3,12 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+
     build: {
-      dist:{}
+    },
+    clean: {
+      build: ['build/files/*'],
+      dist: ['dist/*']
     },
     // Current forEach issue: https://github.com/gruntjs/grunt/issues/610
     // npm install https://github.com/gruntjs/grunt-contrib-jshint/archive/7fd70e86c5a8d489095fa81589d95dccb8eb3a46.tar.gz
@@ -16,51 +20,64 @@ module.exports = function(grunt) {
         }
       }
     },
-    compile: {
-      dist:{
-        sourcelist: 'dist/sourcelist.txt',
+    minify: {
+      source:{
+        sourcelist: 'build/files/sourcelist.txt',
         externs: ['src/js/media.flash.externs.js'],
-        dest: 'dist/video.js'
+        dest: 'build/files/minified.video.js'
       },
-      test: {
-        sourcelist: 'dist/sourcelist.txt',
+      tests: {
+        sourcelist: 'build/files/sourcelist.txt',
         src: ['test/unit/*.js'],
         externs: ['src/js/media.flash.externs.js', 'test/qunit/qunit-externs.js'],
-        dest: 'dist/test.video.js'
+        dest: 'build/files/test.minified.video.js'
       }
     },
-    dist: {
-      latest:{}
-    },
+    dist: {},
     qunit: {
-      all: ['test/index.html', 'test/compiled.html'],
+      source: ['test/index.html'],
+      minified: ['test/minified.html']
     },
     watch: {
       files: [ "src/**/*.js" ],
       tasks: "dev"
     }
-
+    // Copy is broken. Waiting for an update to use.
+    // copy: {
+    //   latest: {
+    //     files: [
+    //       { src: ['dist/video-js'], dest: 'dist/latest' } // includes files in path
+    //       // {src: ['path/**'], dest: 'dest/'}, // includes files in path and its subdirs
+    //       // {expand: true, cwd: 'path/', src: ['**'], dest: 'dest/'}, // makes all src relative to cwd
+    //       // {expand: true, flatten: true, src: ['path/**'], dest: 'dest/', filter: 'isFile'} // flattens results to a single level
+    //     ]
+    //   }
+    // },
   });
 
   grunt.loadNpmTasks("grunt-contrib-jshint");
   grunt.loadNpmTasks("grunt-contrib-qunit");
   grunt.loadNpmTasks("grunt-contrib-watch");
+  grunt.loadNpmTasks("grunt-contrib-clean");
+  grunt.loadNpmTasks("grunt-contrib-copy");
 
   // Default task.
-  grunt.registerTask('default', ['build', 'jshint', 'compile', 'dist']);
+  grunt.registerTask('default', ['jshint', 'build', 'minify', 'dist']);
   // Development watch task
-  grunt.registerTask('dev', ['jshint','build']);
-  grunt.registerTask('test', ['jshint', 'build', 'compile','qunit']);
-
+  grunt.registerTask('dev', ['jshint', 'build', 'qunit:source']);
+  grunt.registerTask('test', ['jshint', 'build', 'minify:tests', 'qunit']);
 
   var fs = require('fs'),
       gzip = require('zlib').gzip;
 
-  grunt.registerMultiTask('build', 'Building Source', function(){
+  grunt.registerTask('build', 'Building Source', function(){
+    grunt.file.copy('src/css/video-js.css', 'build/files/video-js.css');
+    grunt.file.copy('src/css/video-js.png', 'build/files/video-js.png');
+    grunt.file.copy('src/swf/video-js.swf', 'build/files/video-js.swf');
+
     var calcdeps = require('calcdeps').calcdeps;
     // caclcdeps is async
     var done = this.async();
-
     // In current version of calcdeps, not supplying certain
     // options that should have defaults causes errors
     // so we have all options listed here with their defaults.
@@ -78,29 +95,32 @@ module.exports = function(grunt) {
       }
 
       if (results) {
-        grunt.file.write('dist/sourcelist.txt', results.join(','));
-        grunt.file.write('dist/sourcelist.js', 'var sourcelist = ["' + results.join('","') + '"]');
+        grunt.file.write('build/files/sourcelist.txt', results.join(','));
+        grunt.file.write('build/files/sourcelist.js', 'var sourcelist = ["' + results.join('","') + '"]');
 
-        // Create a combined sources file
-        // https://github.com/zencoder/video-js/issues/287
+        // Create a combined sources file. https://github.com/zencoder/video-js/issues/287
         var combined = '';
         results.forEach(function(result){
           combined += grunt.file.read(result);
         });
-        grunt.file.write('dist/source.video.js', combined);
+        grunt.file.write('build/files/combined.video.js', combined);
       }
 
       done();
     });
   });
 
-  grunt.registerMultiTask('compile', 'Minify JS files using Closure Compiler.', function() {
+  grunt.registerMultiTask('minify', 'Minify JS files using Closure Compiler.', function() {
     var done = this.async();
     var exec = require('child_process').exec;
 
     var externs = this.file.externs || [];
     var dest = this.file.dest;
     var files = [];
+
+    // Make sure deeper directories exist for compiler
+    grunt.file.write(dest, '');
+
     if (this.data.sourcelist) {
       files = files.concat(grunt.file.read(this.data.sourcelist).split(','))
     }
@@ -140,7 +160,14 @@ module.exports = function(grunt) {
     });
   });
 
-  grunt.registerMultiTask('dist', 'Creating distribution', function(){
-
+  grunt.registerTask('dist', 'Creating distribution', function(){
+    // TODO: create semver folders (4.1.1, 4.1, 4, and latest)
+    // grunt copy could be used but is currently broken and needs an update
+    grunt.file.copy('build/files/minified.video.js', 'dist/video-js/video.js');
+    grunt.file.copy('build/files/video-js.css', 'dist/video-js/video-js.css');
+    grunt.file.copy('build/files/video-js.png', 'dist/video-js/video-js.png');
+    grunt.file.copy('build/files/video-js.swf', 'dist/video-js/video-js.swf');
+    grunt.file.copy('build/demo-files/demo.html', 'dist/video-js/demo.html');
+    grunt.file.copy('build/demo-files/demo.captions.vtt', 'dist/video-js/demo.captions.vtt');
   });
 };

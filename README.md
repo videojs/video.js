@@ -22,8 +22,12 @@ Some of the focuses of Video.js are:
 - Easily skinned (themed/chromed) using just CSS
 - A JavaScript API for controlling the video that works consistently across video platforms (HTML5, Flash, and soon other players like youtube) as well as devices
 
+Getting Started
+---------------
+Check out our [gettign started guide](http://videojs.com/#section5).
+
 Contributing
 ------------
-Please check out our [contributing guide](https://github.com/zencoder/video-js/blob/master/CONTRIBUTING.md).
+Check out our [contributing guide](https://github.com/zencoder/video-js/blob/master/CONTRIBUTING.md).
 
 

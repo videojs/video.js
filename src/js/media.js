@@ -1,5 +1,5 @@
 /**
- * @fileoverview Media Technology Controller - Base class for media playback technologies
+ * @fileoverview Media Technology Controller - Base class for media playback technology controllers like Flash and HTML5
  */
 
 goog.provide('vjs.MediaTechController');
