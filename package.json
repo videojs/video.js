@@ -27,5 +27,16 @@
     "phantomjs": "~1.8.0-1",
     "grunt-contrib-clean": "~0.4.0a",
     "grunt-contrib-copy": "~0.3.2"
+  },
+  "testling": {
+    "browsers": [
+        "ie6", "ie7", "ie8", "ie9",
+        "firefox/15", "chrome/22", "opera/12", "safari/5.1"
+    ],
+    "harness" : "mocha-qunit",
+    "scripts": [
+      "src/js/*.js",
+      "test/unit/*.js"
+    ]
   }
 }
