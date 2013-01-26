@@ -1012,7 +1012,7 @@ vjs.ChaptersTrackMenuItem.prototype.update = function(){
 };
 
 // Add Buttons to controlBar
-vjs.merge(vjs.ControlBar.prototype.options_['children'], {
+vjs.obj.merge(vjs.ControlBar.prototype.options_['children'], {
   'subtitlesButton': {},
   'captionsButton': {},
   'chaptersButton': {}

@@ -17,7 +17,7 @@ vjs.Player = function(tag, options, ready){
   // which overrides globally set options.
   // This latter part coincides with the load order
   // (tag must exist before Player)
-  options = this.mergeOptions(this.getTagSettings(tag), options);
+  options = vjs.obj.merge(this.getTagSettings(tag), options);
 
   // Cache for video property values.
   this.cache_ = {};
@@ -93,7 +93,7 @@ vjs.Player.prototype.getTagSettings = function(tag){
     'tracks': []
   };
 
-  vjs.merge(options, vjs.getAttributeValues(tag));
+  vjs.obj.merge(options, vjs.getAttributeValues(tag));
 
   // Get tag children settings
   if (tag.hasChildNodes()) {
@@ -216,7 +216,7 @@ vjs.Player.prototype.loadTech = function(techName, source){
   };
 
   // Grab tech-specific options from player options and add source and parent element to use.
-  var techOptions = vjs.merge({ source: source, parentEl: this.el_ }, this.options_[techName.toLowerCase()]);
+  var techOptions = vjs.obj.merge({ source: source, parentEl: this.el_ }, this.options_[techName.toLowerCase()]);
 
   if (source) {
     if (source.src == this.cache_.src && this.cache_.currentTime > 0) {
@@ -832,7 +832,7 @@ vjs.Player.prototype.poster_;
 /**
  * Get or set the poster image source url.
  * @param  {String} src Poster image source URL
- * @return {String=}    Poster image source URL or null
+ * @return {String}    Poster image source URL or null
  */
 vjs.Player.prototype.poster = function(src){
   if (src !== undefined) {

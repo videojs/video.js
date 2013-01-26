@@ -1,4 +1,5 @@
 goog.provide('vjs.dom');
+goog.provide('vjs.obj');
 
 goog.require('vjs');
 
@@ -36,37 +37,83 @@ vjs.capitalize = function(string){
 };
 
 /**
+ * Object functions container
+ * @type {Object}
+ */
+vjs.obj = {};
+vjs.obj.toString = Object.prototype.toString;
+vjs.obj.hasOwnProperty = Object.prototype.hasOwnProperty;
+
+/**
  * Loop through each property in an object and call a function
  * whose arguments are (key,value)
  * @param  {Object}   obj Object of properties
  * @param  {Function} fn  Function to be called on each property.
  * @this {*}
  */
-vjs.eachProp = function(obj, fn){
-  if (!obj) { return; }
-
-  for (var name in obj) {
-    if (obj.hasOwnProperty(name)) {
-      fn.call(this, name, obj[name]);
+vjs.obj.each = function(obj, fn){
+  for (var key in obj) {
+    if (vjs.obj.hasOwnProperty.call(obj, key)) {
+      fn.call(this, key, obj[key]);
     }
   }
 };
 
 /**
  * Merge two objects together and return the original.
- * @param  {[type]} obj1 [description]
- * @param  {[type]} obj2 [description]
- * @param  {[type]} safe [description]
- * @return {[type]}
+ * @param  {Object} obj1
+ * @param  {Object} obj2
+ * @return {Object}
  */
-vjs.merge = function(obj1, obj2){
-  // Make sure second object exists
+vjs.obj.merge = function(obj1, obj2){
   if (!obj2) { return obj1; }
-
-  for (var propName in obj2){
-    if (obj2.hasOwnProperty(propName)) { obj1[propName] = obj2[propName]; }
+  for (var key in obj2){
+    if (vjs.obj.hasOwnProperty.call(obj2, key)) {
+      obj1[key] = obj2[key];
+    }
   }
   return obj1;
+};
+
+/**
+ * Merge two objects, and merge any properties that are objects
+ * instead of just overwriting one. Uses to merge options hashes
+ * where deeper default settings are important.
+ * @param  {Object} obj1 Object to override
+ * @param  {Object} obj2 Overriding object
+ * @return {Object}      New object. Obj1 and Obj2 will be untouched.
+ */
+vjs.obj.deepMerge = function(obj1, obj2){
+  var key, val1, val2, objDef;
+  objDef = '[object Object]';
+
+  // Make a copy of obj1 so we're not ovewriting original values.
+  // like prototype.options_ and all sub options objects
+  obj1 = vjs.obj.copy(obj1);
+
+  for (key in obj2){
+    if (vjs.obj.hasOwnProperty.call(obj2, key)) {
+      val1 = obj1[key];
+      val2 = obj2[key];
+
+      // Check if both properties are pure objects and do a deep merge if so
+      if (vjs.obj.toString.call(val1) === objDef && vjs.obj.toString.call(val2) === objDef) {
+        obj1[key] = vjs.obj.deepMerge(val1, val2);
+      } else {
+        obj1[key] = obj2[key];
+      }
+    }
+  }
+  return obj1;
+};
+
+/**
+ * Make a copy of the supplied object
+ * @param  {Object} obj Object to copy
+ * @return {Object}     Copy of object
+ */
+vjs.obj.copy = function(obj){
+  return vjs.obj.merge({}, obj);
 };
 
 /**

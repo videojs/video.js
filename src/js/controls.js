@@ -96,7 +96,7 @@ goog.inherits(vjs.Button, vjs.Control);
 
 vjs.Button.prototype.createEl = function(type, props){
   // Add standard Aria and Tabindex info
-  props = vjs.merge({
+  props = vjs.obj.merge({
     className: this.buildCSSClass(),
     innerHTML: '<div><span class="vjs-control-text">' + (this.buttonText || 'Need Text') + '</span></div>',
     role: 'button',
@@ -486,7 +486,7 @@ vjs.Slider = function(player, options){
 goog.inherits(vjs.Slider, vjs.Component);
 
 vjs.Slider.prototype.createEl = function(type, props) {
-  props = vjs.merge({
+  props = vjs.obj.merge({
     role: 'slider',
     'aria-valuenow': 0,
     'aria-valuemin': 0,
@@ -983,7 +983,7 @@ vjs.MenuItem = function(player, options){
 goog.inherits(vjs.MenuItem, vjs.Button);
 
 vjs.MenuItem.prototype.createEl = function(type, props){
-  return goog.base(this, 'createEl', 'li', vjs.merge({
+  return goog.base(this, 'createEl', 'li', vjs.obj.merge({
     className: 'vjs-menu-item',
     innerHTML: this.options_['label']
   }, props));

@@ -1,6 +1,9 @@
-// Fake a media playback tech controller so that player tests 
+// Fake a media playback tech controller so that player tests
 // can run without HTML5 or Flash, of which PhantomJS supports neither.
 
+/**
+ * @constructor
+ */
 vjs.MediaFaker = function(player, options, onReady){
   goog.base(this, player, options, onReady);
 

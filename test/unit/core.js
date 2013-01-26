@@ -5,7 +5,7 @@ test('should create a video tag and have access children in old IE', function(){
 
   fixture.innerHTML += "<video id='test_vid_id'><source type='video/mp4'></video>";
 
-  vid = document.getElementById('test_vid_id');
+  var vid = document.getElementById('test_vid_id');
 
   ok(vid.childNodes.length === 1);
   ok(vid.childNodes[0].getAttribute('type') === 'video/mp4');

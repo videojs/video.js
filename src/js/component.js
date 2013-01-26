@@ -17,8 +17,11 @@ goog.require('vjs.dom');
 vjs.Component = function(player, options, ready){
   this.player_ = player;
 
-  // // Allow for overridding default component options
-  options = this.options_ = this.mergeOptions(this.options_, options);
+  // Make a copy of prototype.options_ to protect against overriding global defaults
+  this.options_ = vjs.obj.copy(this.options_);
+
+  // Updated options with supplied options
+  options = this.options(options);
 
   // Get ID from options, element, or create using player ID and unique ID
   this.id_ = options['id'] || ((options['el'] && options['el']['id']) ? options['el']['id'] : player.id() + '_component_' + vjs.guid++ );
@@ -95,20 +98,20 @@ vjs.Component.prototype.options_;
 /**
  * Deep merge of options objects
  * Whenever a property is an object on both options objects
- * the two properties will be merged using mergeOptions
+ * the two properties will be merged using vjs.obj.deepMerge.
  *
  * This is used for merging options for child components. We
  * want it to be easy to override individual options on a child
  * component without having to rewrite all the other default options.
  *
- * parentDefaultOptions = {
+ * Parent.prototype.options_ = {
  *   children: {
  *     'childOne': { 'foo': 'bar', 'asdf': 'fdsa' },
  *     'childTwo': {},
  *     'childThree': {}
  *   }
  * }
- * parentOptionsFromInit = {
+ * newOptions = {
  *   children: {
  *     'childOne': { 'foo': 'baz', 'abc': '123' }
  *     'childTwo': null,
@@ -116,7 +119,7 @@ vjs.Component.prototype.options_;
  *   }
  * }
  *
- * this.mergeOptions(parentDefaultOptions, parentOptionsFromInit);
+ * this.options(newOptions);
  *
  * RESULT
  *
@@ -129,41 +132,13 @@ vjs.Component.prototype.options_;
  *   }
  * }
  *
- *
- * @param  {Object} obj1 Object whose values will be overwritten
- * @param  {Object} obj2 Object whose values will overwrite
+ * @param  {Object} obj Object whose values will be overwritten
  * @return {Object}      NEW merged object. Does not return obj1.
  */
-vjs.Component.prototype.mergeOptions = function(obj1, obj2){
-  var retObj, toString, hasOwnProp, propName, objDef, val1, val2;
+vjs.Component.prototype.options = function(obj){
+  if (obj === undefined) return this.options_;
 
-  hasOwnProp = Object.prototype.hasOwnProperty;
-  toString = Object.prototype.toString;
-  objDef = '[object Object]';
-  obj1 = obj1 || {};
-  retObj = {};
-
-  // Make a copy of obj1 so we don't affect the original options
-  vjs.eachProp(obj1, function(name, val){
-    retObj[name] = val;
-  });
-
-  if (!obj2) { return retObj; }
-
-  for (propName in obj2){
-    if (hasOwnProp.call(obj2, propName)) {
-      val1 = retObj[propName];
-      val2 = obj2[propName];
-
-      if (toString.call(val1) === objDef && toString.call(val2) === objDef) {
-        retObj[propName] = this.mergeOptions(val1, val2);
-      } else {
-        retObj[propName] = obj2[propName];
-      }
-    }
-  }
-
-  return retObj;
+  return this.options_ = vjs.obj.deepMerge(this.options_, obj);
 };
 
 /**
@@ -363,7 +338,7 @@ vjs.Component.prototype.initChildren = function(){
     var self = this;
 
     // Loop through components and add them to the player
-    vjs.eachProp(options['children'], function(name, opts){
+    vjs.obj.each(options['children'], function(name, opts){
 
       // Allow for disabling default components
       // e.g. vjs.options['children']['posterImage'] = false
