@@ -37,24 +37,25 @@ test('should init child coponents from options', function(){
 });
 
 test('should do a deep merge of child options', function(){
-  var compDefaultOptions = {
-    'children': {
+  // Create a default option for component
+  vjs.Component.prototype.options_ = {
+    'example': {
       'childOne': { 'foo': 'bar', 'asdf': 'fdsa' },
       'childTwo': {},
       'childThree': {}
     }
   }
 
-  var compInitOptions = {
-    'children': {
+  var comp = new vjs.Component(getFakePlayer(), {
+    'example': {
       'childOne': { 'foo': 'baz', 'abc': '123' },
       'childThree': null,
       'childFour': {}
     }
-  }
+  });
 
-  var mergedOptions = vjs.Component.prototype.mergeOptions(compDefaultOptions, compInitOptions);
-  var children = mergedOptions['children'];
+  var mergedOptions = comp.options();
+  var children = mergedOptions['example'];
 
   ok(children['childOne']['foo'] === 'baz', 'value three levels deep overridden');
   ok(children['childOne']['asdf'] === 'fdsa', 'value three levels deep maintained');
@@ -62,6 +63,11 @@ test('should do a deep merge of child options', function(){
   ok(children['childTwo'], 'object two levels deep maintained');
   ok(children['childThree'] === null, 'object two levels deep removed');
   ok(children['childFour'], 'object two levels deep added');
+
+  ok(vjs.Component.prototype.options_['example']['childOne']['foo'] === 'bar', 'prototype options were not overridden');
+
+  // Reset default component options to none
+  vjs.Component.prototype.options_ = null;
 });
 
 test('should dispose of component and children', function(){

@@ -8,12 +8,13 @@ var PlayerTest = {
     return videoTag;
   },
   makePlayer: function(playerOptions){
+    var player;
     var videoTag = PlayerTest.makeTag();
 
     var fixture = document.getElementById('qunit-fixture');
     fixture.appendChild(videoTag);
 
-    var opts = vjs.merge({
+    var opts = vjs.obj.merge({
       'techOrder': ['mediaFaker']
     }, playerOptions);
 

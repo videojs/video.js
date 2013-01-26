@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Add JSON support
+ * @suppress {undefinedVars}
+ * (Compiler doesn't like JSON not being declared)
+ */
+
 goog.provide('vjs.JSON');
 
 /**

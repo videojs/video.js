@@ -35,7 +35,7 @@ vjs.Flash = function(player, options, ready){
       playerOptions = player.options_,
 
       // Merge default flashvars with ones passed in to init
-      flashVars = vjs.merge({
+      flashVars = vjs.obj.merge({
 
         // SWF Callback Functions
         'readyFunction': 'videojs.Flash.onReady',
@@ -51,13 +51,13 @@ vjs.Flash = function(player, options, ready){
       }, options['flashVars']),
 
       // Merge default parames with ones passed in
-      params = vjs.merge({
+      params = vjs.obj.merge({
         'wmode': 'opaque', // Opaque is needed to overlay controls, but can affect playback performance
         'bgcolor': '#000000' // Using bgcolor prevents a white flash when the object is loading
       }, options['params']),
 
       // Merge default attributes with ones passed in
-      attributes = vjs.merge({
+      attributes = vjs.obj.merge({
         'id': objId,
         'name': objId, // Both ID and Name needed or swf to identifty itself
         'class': 'vjs-tech'
@@ -285,16 +285,19 @@ var createGetter = function(attr){
   api[attr] = function(){ return this.el_.vjs_getProperty(attr); };
 };
 
-// Create getter and setters for all read/write attributes
-for (var i = 0; i < readWrite.length; i++) {
-  createGetter(readWrite[i]);
-  createSetter(readWrite[i]);
-}
+(function(){
+  var i;
+  // Create getter and setters for all read/write attributes
+  for (i = 0; i < readWrite.length; i++) {
+    createGetter(readWrite[i]);
+    createSetter(readWrite[i]);
+  }
 
-// Create getters for read-only attributes
-for (var i = 0; i < readOnly.length; i++) {
-  createGetter(readOnly[i]);
-}
+  // Create getters for read-only attributes
+  for (i = 0; i < readOnly.length; i++) {
+    createGetter(readOnly[i]);
+  }
+})();
 
 /* Flash Support Testing -------------------------------------------------------- */
 
@@ -434,13 +437,13 @@ vjs.Flash.getEmbedCode = function(swf, flashVars, params, attributes){
 
   // Convert flash vars to string
   if (flashVars) {
-    vjs.eachProp(flashVars, function(key, val){
+    vjs.obj.each(flashVars, function(key, val){
       flashVarsString += (key + '=' + val + '&amp;');
     });
   }
 
   // Add swf, flashVars, and other default params
-  params = vjs.merge({
+  params = vjs.obj.merge({
     'movie': swf,
     'flashvars': flashVarsString,
     'allowScriptAccess': 'always', // Required to talk to swf
@@ -448,11 +451,11 @@ vjs.Flash.getEmbedCode = function(swf, flashVars, params, attributes){
   }, params);
 
   // Create param tags string
-  vjs.eachProp(params, function(key, val){
+  vjs.obj.each(params, function(key, val){
     paramsString += '<param name="'+key+'" value="'+val+'" />';
   });
 
-  attributes = vjs.merge({
+  attributes = vjs.obj.merge({
     // Add swf to attributes (need both for IE and Others to work)
     'data': swf,
 
@@ -463,7 +466,7 @@ vjs.Flash.getEmbedCode = function(swf, flashVars, params, attributes){
   }, attributes);
 
   // Create Attributes string
-  vjs.eachProp(attributes, function(key, val){
+  vjs.obj.each(attributes, function(key, val){
     attrsString += (key + '="' + val + '" ');
   });
 

@@ -22,11 +22,23 @@ test('should loop through each property on an object', function(){
   }
 
   // Add 3 to each value
-  vjs.eachProp(asdf, function(key, value){
+  vjs.obj.each(asdf, function(key, value){
     asdf[key] = value + 3;
   });
 
   deepEqual(asdf,{a:4,b:5,'c':6})
+});
+
+test('should copy an object', function(){
+  var asdf = {
+    a: 1,
+    b: 2,
+    'c': 3
+  }
+
+  var fdsa = vjs.obj.copy(asdf);
+
+  deepEqual(asdf,fdsa)
 });
 
 test('should add context to a function', function(){
