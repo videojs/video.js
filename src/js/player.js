@@ -11,7 +11,13 @@ goog.require('vjs.Component');
  */
 vjs.Player = function(tag, options, ready){
   this.tag = tag; // Store the original tag used to set options
-
+  
+  // new flag used to determine if loop vieo is set to true,
+  // once the video starts options_['loop'] will always be false
+  // this allows the onEnded event to always be fired and alows us
+  // to set custom start-time on loop
+  var flag_loop = false;
+  
   // Set Options
   // The options argument overrides options set in the video tag
   // which overrides globally set options.
@@ -339,15 +345,40 @@ vjs.Player.prototype.stopTrackingCurrentTime = function(){ clearInterval(this.cu
 // /* Player event handlers (how the player reacts to certain events)
 // ================================================================================ */
 vjs.Player.prototype.onEnded = function(){
-  if (this.options_['loop']) {
+  if(this.options_['start-time']!== undefined){
+    this.currentTime(this.options_['start-time']);
+  }
+  else{
     this.currentTime(0);
-    this.play();
+  }
+  if (this.flag_loop) {
+      this.play();
   }
 };
 
 vjs.Player.prototype.onPlay = function(){
   vjs.removeClass(this.el_, 'vjs-paused');
   vjs.addClass(this.el_, 'vjs-playing');
+
+  // onEnded only gets fired when _options['loop'] = false || undefined && Video ends
+  // in order to always fire onEnded when video ends we set flag_loop = options_['loop'];
+  // then options_['loop'] is set to false;
+  // we can now use flag_loop determine if loop was ever set via data-setup array
+
+  if (this.currentTime() === 0){
+    if(this.options_['loop']!== undefined){
+      if(this.options_['loop']){
+        this.loop(false);
+        this.flag_loop = true;
+      }
+    }
+    if(this.options_['start-time']!== undefined){
+      this.currentTime(this.options_['start-time']);
+    }
+    else{
+      this.currentTime(0);
+    }
+  }
 };
 
 vjs.Player.prototype.onPause = function(){
@@ -473,7 +504,6 @@ vjs.Player.prototype.paused = function(){
   return (this.techGet('paused') === false) ? false : true;
 };
 
-// http://dev.w3.org/html5/spec/video.html#dom-media-currenttime
 vjs.Player.prototype.currentTime = function(seconds){
   if (seconds !== undefined) {
 
