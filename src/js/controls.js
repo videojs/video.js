@@ -199,8 +199,14 @@ vjs.PlayToggle.prototype.buildCSSClass = function(){
   // OnClick - Toggle between play and pause
 vjs.PlayToggle.prototype.onClick = function(){
   if (this.player_.paused()) {
+    if (this.player_.currentTime() === this.player_.duration() || this.player_.currentTime() === 0 ){
+      if(this.options_['start-time']!== undefined){
+        this.player_.currentTime(this.options_['start-time']);
+      }
+    }
     this.player_.play();
-  } else {
+  }
+  else {
     this.player_.pause();
   }
 };
@@ -272,9 +278,7 @@ vjs.BigPlayButton.prototype.createEl = function(){
 vjs.BigPlayButton.prototype.onClick = function(){
   // Go back to the beginning if big play button is showing at the end.
   // Have to check for current time otherwise it might throw a 'not ready' error.
-  if(this.player_.currentTime()) {
-    this.player_.currentTime(0);
-  }
+  
   this.player_.play();
 };
 
