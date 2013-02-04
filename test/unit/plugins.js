@@ -24,7 +24,7 @@ test('Plugin should get initialized and receive options', function(){
 });
 
 test('Plugin should have the option of being initilized outside of player init', function(){
-  expect(3)
+  expect(3);
 
   vjs.plugin('myPlugin3', function(options){
     ok(true, 'Plugin initialized after player init');
@@ -43,10 +43,10 @@ test('Plugin should have the option of being initilized outside of player init',
 });
 
 test('Plugin should be able to add a UI component', function(){
-  expect(2)
+  expect(2);
 
   vjs.plugin('myPlugin4', function(options){
-    ok(instanceof this === 'vjs.Player', 'Plugin executed in player scope by default');
+    ok((this instanceof vjs.Player), 'Plugin executed in player scope by default');
     this.addChild('component');
   });
 
@@ -56,7 +56,7 @@ test('Plugin should be able to add a UI component', function(){
   });
 
   var comp = player.getChild('component');
-  ok(comp, 'Plugin added a component to the player'
+  ok(comp, 'Plugin added a component to the player');
 
   player.dispose();
 });
