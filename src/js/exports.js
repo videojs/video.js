@@ -129,3 +129,5 @@ goog.exportSymbol('videojs.SubtitlesTrack', vjs.SubtitlesTrack);
 goog.exportSymbol('videojs.ChaptersTrack', vjs.ChaptersTrack);
 
 goog.exportSymbol('videojs.autoSetup', vjs.autoSetup);
+
+goog.exportSymbol('videojs.plugin', vjs.plugin);
