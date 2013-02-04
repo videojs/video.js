@@ -33,9 +33,9 @@ test('Plugin should have the option of being initilized outside of player init',
 
   var player = PlayerTest.makePlayer({});
 
-  ok(player.myPlugin3, 'Plugin has direct access on player instance');
+  ok(player['myPlugin3'], 'Plugin has direct access on player instance');
 
-  player.myPlugin3({
+  player['myPlugin3']({
     'test': true
   });
 
@@ -51,7 +51,7 @@ test('Plugin should be able to add a UI component', function(){
   });
 
   var player = PlayerTest.makePlayer({});
-  player.myPlugin4({
+  player['myPlugin4']({
     'test': true
   });
 
