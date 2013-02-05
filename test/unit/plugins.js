@@ -61,3 +61,37 @@ test('Plugin should be able to add a UI component', function(){
   player.dispose();
 });
 
+test('Plugin should overwrite plugin of same name', function(){
+  var v1Called = 0, 
+      v2Called = 0, 
+      v3Called = 0;
+
+  // Create initial plugin
+  vjs.plugin('myPlugin5', function(options){
+    v1Called++;
+  });
+  var player = PlayerTest.makePlayer({});
+  player['myPlugin5']({});
+
+  // Overwrite and create new player
+  vjs.plugin('myPlugin5', function(options){
+    v2Called++;
+  });
+  var player2 = PlayerTest.makePlayer({});
+  player2['myPlugin5']({});
+
+  // Overwrite and init new version on existing player
+  vjs.plugin('myPlugin5', function(options){
+    v3Called++;
+  });
+  player2['myPlugin5']({});
+
+  var comp = player.getChild('component');
+  ok(v1Called === 1, 'First version of plugin called once');
+  ok(v2Called === 1, 'Plugin overwritten for new player');
+  ok(v3Called === 1, 'Plugin overwritten for existing player');
+
+  player.dispose();
+  player2.dispose();
+});
+
