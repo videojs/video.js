@@ -11,7 +11,7 @@
   <!--<![endif]-->
 
   <!-- GENERATED LIST OF SOURCE FILES -->
-  <script src="../dist/sourcelist.js"></script>
+  <script src="../build/files/sourcelist.js"></script>
 
   <script>
     (function(){
