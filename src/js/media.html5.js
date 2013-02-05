@@ -65,14 +65,13 @@ vjs.Html5.prototype.createEl = function(){
     // If the original tag is still there, remove it.
     if (el) {
       player.el().removeChild(el);
+      el = el.cloneNode(false);
+    } else {
+      el = _V_.createElement('video', {
+        id:player.id() + '_html5_api',
+        className:'vjs-tech'
+      });
     }
-
-    newEl = vjs.createElement('video', {
-      id: el.id || player.id() + '_html5_api',
-      className: el.className || 'vjs-tech'
-    });
-
-    el = newEl;
     vjs.insertFirst(el, player.el());
   }
 
