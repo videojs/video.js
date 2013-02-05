@@ -55,6 +55,12 @@ vjs.Player = function(tag, options, ready){
 
   // Make player easily findable by ID
   vjs.players[this.id_] = this;
+
+  if (options['plugins']) {
+    vjs.obj.each(options['plugins'], function(key, val){
+      this[key](val);
+    }, this);
+  }
 };
 goog.inherits(vjs.Player, vjs.Component);
 
