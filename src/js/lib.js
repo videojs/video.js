@@ -51,10 +51,10 @@ vjs.obj.hasOwnProperty = Object.prototype.hasOwnProperty;
  * @param  {Function} fn  Function to be called on each property.
  * @this {*}
  */
-vjs.obj.each = function(obj, fn){
+vjs.obj.each = function(obj, fn, context){
   for (var key in obj) {
     if (vjs.obj.hasOwnProperty.call(obj, key)) {
-      fn.call(this, key, obj[key]);
+      fn.call(context || this, key, obj[key]);
     }
   }
 };

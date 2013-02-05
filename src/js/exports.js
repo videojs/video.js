@@ -13,6 +13,7 @@ goog.require('vjs.Html5');
 goog.require('vjs.Flash');
 goog.require('vjs.TextTrack');
 goog.require('vjs.autoSetup');
+goog.require('vjs.plugin');
 
 /**
  * vjs (internal only) = videojs = _V_ (external only)
@@ -128,3 +129,5 @@ goog.exportSymbol('videojs.SubtitlesTrack', vjs.SubtitlesTrack);
 goog.exportSymbol('videojs.ChaptersTrack', vjs.ChaptersTrack);
 
 goog.exportSymbol('videojs.autoSetup', vjs.autoSetup);
+
+goog.exportSymbol('videojs.plugin', vjs.plugin);
