@@ -95,3 +95,34 @@ test('Plugin should overwrite plugin of same name', function(){
   player2.dispose();
 });
 
+
+test('Plugins should get events in registration order', function() { 
+  var order = [];
+  var expectedOrder = [];
+  var pluginName = 'orderPlugin';
+  var i = 0;
+  var name;
+  var player = PlayerTest.makePlayer({});
+
+  for (; i < 3; i++ ) {
+    name = pluginName + i;
+    expectedOrder.push(name);
+    (function (name) {
+      vjs.plugin(name, function (opts) {
+        this.on('test', function (event) {
+          order.push(name)
+        });
+      });
+      player[name]({});
+    })(name);
+  }
+  
+  vjs.plugin("testerPlugin", function (opts) {
+    this.trigger('test');
+  });
+
+  player['testerPlugin']({});
+
+  deepEqual(order, expectedOrder, "plugins should receive events in order of initialization")
+  player.dispose();
+});
