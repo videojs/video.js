@@ -95,7 +95,6 @@ test('Plugin should overwrite plugin of same name', function(){
   player2.dispose();
 });
 
-
 test('Plugins should get events in registration order', function() { 
   var order = [];
   var expectedOrder = [];
