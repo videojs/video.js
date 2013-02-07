@@ -67,7 +67,7 @@ vjs.Html5.prototype.createEl = function(){
       player.el().removeChild(el);
       el = el.cloneNode(false);
     } else {
-      el = vjs.createElement('video', {
+      el = vjs.createEl('video', {
         id:player.id() + '_html5_api',
         className:'vjs-tech'
       });
