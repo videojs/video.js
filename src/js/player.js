@@ -52,6 +52,7 @@ vjs.Player = function(tag, options, ready){
   this.on('progress', this.onProgress);
   this.on('durationchange', this.onDurationChange);
   this.on('error', this.onError);
+  this.on('fullscreenchange', this.onFullscreenChange);
 
   // Make player easily findable by ID
   vjs.players[this.id_] = this;
@@ -376,6 +377,14 @@ vjs.Player.prototype.onDurationChange = function(){
 
 vjs.Player.prototype.onError = function(e) {
   vjs.log('Video Error', e);
+};
+
+vjs.Player.prototype.onFullscreenChange = function(e) {
+  if (this.isFullScreen) {
+    this.addClass('vjs-fullscreen');
+  } else {
+    this.removeClass('vjs-fullscreen');
+  }
 };
 
 // /* Player API
