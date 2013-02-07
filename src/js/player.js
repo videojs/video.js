@@ -53,6 +53,15 @@ vjs.Player = function(tag, options, ready){
   this.on('durationchange', this.onDurationChange);
   this.on('error', this.onError);
 
+  //If the first starttime attribute is specified
+  //then we will start at the given offset in seconds
+
+  this.on('firstplay',function(){
+    if(this.options_['starttime']){
+      this.currentTime(this.options_['starttime']);
+    }
+  });
+
   // Make player easily findable by ID
   vjs.players[this.id_] = this;
 };
