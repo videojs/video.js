@@ -786,6 +786,8 @@ vjs.VolumeControl.prototype.createEl = function(){
  */
 vjs.VolumeBar = function(player, options){
   goog.base(this, player, options);
+
+  setTimeout(vjs.bind(this, this.update), 0); // update when elements is in DOM
 };
 goog.inherits(vjs.VolumeBar, vjs.Slider);
 
