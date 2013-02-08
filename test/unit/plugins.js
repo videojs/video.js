@@ -1,4 +1,4 @@
-module("Plugins");
+module('Plugins');
 
 test('Plugin should get initialized and receive options', function(){
   expect(2);
@@ -9,7 +9,7 @@ test('Plugin should get initialized and receive options', function(){
   });
 
   vjs.plugin('myPlugin2', function(options){
-    ok(false, 'Plugin initialized and should not have been')
+    ok(false, 'Plugin initialized and should not have been');
   });
 
   var player = PlayerTest.makePlayer({
@@ -62,8 +62,8 @@ test('Plugin should be able to add a UI component', function(){
 });
 
 test('Plugin should overwrite plugin of same name', function(){
-  var v1Called = 0, 
-      v2Called = 0, 
+  var v1Called = 0,
+      v2Called = 0,
       v3Called = 0;
 
   // Create initial plugin
