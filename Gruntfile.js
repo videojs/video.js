@@ -14,7 +14,7 @@ module.exports = function(grunt) {
     // npm install https://github.com/gruntjs/grunt-contrib-jshint/archive/7fd70e86c5a8d489095fa81589d95dccb8eb3a46.tar.gz
     jshint: {
       src: {
-        src: ["src/js/*.js"],
+        src: ["src/js/*.js", "Gruntfile.js", "test/unit/*.js"],
         options: {
           jshintrc: ".jshintrc"
         }
