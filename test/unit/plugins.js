@@ -156,6 +156,7 @@ test('Plugins should not get events after stopImmediatePropagation is called', f
   player['testerPlugin']({});
 
   deepEqual(order, expectedOrder.slice(0, order.length), "plugins should receive events in order of initialization, until stopImmediatePropagation");
-  player.dispose();
 
-})
+  equal(order.length, 1, "only one event listener should have triggered");
+  player.dispose();
+});
