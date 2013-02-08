@@ -110,7 +110,7 @@ test('Plugins should get events in registration order', function() {
     (function (name) {
       vjs.plugin(name, function (opts) {
         this.on('test', function (event) {
-          order.push(name)
+          order.push(name);
         });
       });
       player[name]({});
@@ -123,6 +123,39 @@ test('Plugins should get events in registration order', function() {
 
   player['testerPlugin']({});
 
-  deepEqual(order, expectedOrder, "plugins should receive events in order of initialization")
+  deepEqual(order, expectedOrder, "plugins should receive events in order of initialization");
   player.dispose();
 });
+
+test('Plugins should not get events after stopImmediatePropagation is called', function () {
+  var order = [];
+  var expectedOrder = [];
+  var pluginName = 'orderPlugin';
+  var i = 0;
+  var name;
+  var player = PlayerTest.makePlayer({});
+
+  for (; i < 3; i++ ) {
+    name = pluginName + i;
+    expectedOrder.push(name);
+    (function (name) {
+      vjs.plugin(name, function (opts) {
+        this.on('test', function (event) {
+          order.push(name);
+          event.stopImmediatePropagation();
+        });
+      });
+      player[name]({});
+    })(name);
+  }
+  
+  vjs.plugin("testerPlugin", function (opts) {
+    this.trigger('test');
+  });
+
+  player['testerPlugin']({});
+
+  deepEqual(order, expectedOrder.slice(0, order.length), "plugins should receive events in order of initialization, until stopImmediatePropagation");
+  player.dispose();
+
+})
