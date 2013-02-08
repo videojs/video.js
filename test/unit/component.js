@@ -1,10 +1,10 @@
-module("Component");
+module('Component');
 
 var getFakePlayer = function(){
   return {
     // Fake player requries an ID
     id: function(){ return 'player_1'; }
-  }
+  };
 };
 
 test('should create an element', function(){
@@ -16,7 +16,7 @@ test('should create an element', function(){
 test('should add a child component', function(){
   var comp = new vjs.Component(getFakePlayer());
 
-  var child = comp.addChild("component");
+  var child = comp.addChild('component');
 
   ok(comp.children().length === 1);
   ok(comp.children()[0] === child);
@@ -44,7 +44,7 @@ test('should do a deep merge of child options', function(){
       'childTwo': {},
       'childThree': {}
     }
-  }
+  };
 
   var comp = new vjs.Component(getFakePlayer(), {
     'example': {
@@ -74,7 +74,7 @@ test('should dispose of component and children', function(){
   var comp = new vjs.Component(getFakePlayer());
 
   // Add a child
-  var child = comp.addChild("Component");
+  var child = comp.addChild('Component');
   ok(comp.children().length === 1);
 
   // Add a listener
@@ -88,8 +88,8 @@ test('should dispose of component and children', function(){
   ok(!comp.el(), 'component element was deleted');
   ok(!child.children(), 'child children were deleted');
   ok(!child.el(), 'child element was deleted');
-  ok(!vjs.cache[id], 'listener cache nulled')
-  ok(vjs.isEmpty(data), 'original listener cache object was emptied')
+  ok(!vjs.cache[id], 'listener cache nulled');
+  ok(vjs.isEmpty(data), 'original listener cache object was emptied');
 });
 
 test('should add and remove event listeners to element', function(){
@@ -129,10 +129,10 @@ test('should trigger a listener when ready', function(){
   expect(2);
 
   var optionsReadyListener = function(){
-    ok(true, 'options listener fired')
+    ok(true, 'options listener fired');
   };
   var methodReadyListener = function(){
-    ok(true, 'ready method listener fired')
+    ok(true, 'ready method listener fired');
   };
 
   var comp = new vjs.Component(getFakePlayer(), {}, optionsReadyListener);
@@ -172,8 +172,8 @@ test('should change the width and height of a component', function(){
   fixture.appendChild(container);
   container.appendChild(el);
   // Container of el needs dimensions or the component won't have dimensions
-  container.style.width = '1000px'
-  container.style.height = '1000px'
+  container.style.width = '1000px';
+  container.style.height = '1000px';
 
   comp.width('50%');
   comp.height('123px');
