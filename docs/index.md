@@ -20,6 +20,8 @@ The Video.js documentation is here to help you setup and use the player. These d
 
 * [Tech](tech.md) - A 'playback technology' is the term we're using to represent HTML5 video, Flash, and other video plugins, as well as other players like the YouTube player. Basically anything that has a unique API to audio or video. Additional playback technologies can be added relatively easily.
 
+* [Plugins](plugins.md) - You can package up interesting Video.js customizations and reuse them elsewhere. Find out how to build your own plugin or use one created by someone else.
+
 ## Resources
 
 * [Glossary](glossary.md) - Some helpful definitions.
