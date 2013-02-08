@@ -14,9 +14,9 @@ module.exports = function(grunt) {
     // npm install https://github.com/gruntjs/grunt-contrib-jshint/archive/7fd70e86c5a8d489095fa81589d95dccb8eb3a46.tar.gz
     jshint: {
       src: {
-        src: ["src/js/*.js", "Gruntfile.js", "test/unit/*.js"],
+        src: ['src/js/*.js', 'Gruntfile.js', 'test/unit/*.js'],
         options: {
-          jshintrc: ".jshintrc"
+          jshintrc: '.jshintrc'
         }
       }
     },
@@ -39,8 +39,8 @@ module.exports = function(grunt) {
       minified: ['test/minified.html']
     },
     watch: {
-      files: [ "src/**/*.js", "test/unit/*.js" ],
-      tasks: "dev"
+      files: [ 'src/**/*.js', 'test/unit/*.js' ],
+      tasks: 'dev'
     }
     // Copy is broken. Waiting for an update to use.
     // copy: {
@@ -55,11 +55,11 @@ module.exports = function(grunt) {
     // },
   });
 
-  grunt.loadNpmTasks("grunt-contrib-jshint");
-  grunt.loadNpmTasks("grunt-contrib-qunit");
-  grunt.loadNpmTasks("grunt-contrib-watch");
-  grunt.loadNpmTasks("grunt-contrib-clean");
-  grunt.loadNpmTasks("grunt-contrib-copy");
+  grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-qunit');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-copy');
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'build', 'minify', 'dist']);
@@ -86,10 +86,10 @@ module.exports = function(grunt) {
       path:['src/js/'],
       dep:[],
       exclude:[],
-      output_mode:'list',
+      output_mode:'list'
     }, function(err,results){
       if (err) {
-        grunt.warn({ message: err })
+        grunt.warn({ message: err });
         grunt.log.writeln(err);
         done(false);
       }
@@ -122,7 +122,7 @@ module.exports = function(grunt) {
     grunt.file.write(dest, '');
 
     if (this.data.sourcelist) {
-      files = files.concat(grunt.file.read(this.data.sourcelist).split(','))
+      files = files.concat(grunt.file.read(this.data.sourcelist).split(','));
     }
     if (this.file.src) {
       files = files.concat(this.file.src);
