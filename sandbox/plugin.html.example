@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Video.js Sandbox</title>
+  <title>Video.js Plugin Example</title>
 
   <link href="../src/css/video-js.css" rel="stylesheet" type="text/css">
 
@@ -26,24 +26,15 @@
           document.write( "<script src='" + root + sourcelist[i] + "'><\/script>" );
         }
       }
-
-      // Easy access to test Flash over HTML5. Add ?flash to URL
-      if (window.location.href.indexOf("?flash") !== -1) {
-        videojs.options.techOrder = ["Flash"];
-        videojs.options.flash.swf = "../src/swf/video-js.swf";
-      }
-
     })()
   </script>
-
-  <script type="text/javascript" charset="utf-8">
-    // Easy access to test Flash over HTML5. Add ?flash to URL
-    if (window.location.href.indexOf("?flash") !== -1) {
-      videojs.options.techOrder = ["flash"];
-      videojs.options.flash.swf = "../src/swf/video-js.swf";
-    }
+  <script>
+      // Easy access to test Flash over HTML5. Add ?flash to URL
+      if (window.location.href.indexOf("?flash") !== -1) {
+        videojs.options.techOrder = ["flash"];
+        videojs.options.flash.swf = "../src/swf/video-js.swf";
+      }
   </script>
-
 </head>
 <body>
   <p style="background-color:#eee; border: 1px solid #777; padding: 10px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">This page shows you how to create, register and initialize a Video.js plugin.</p>
