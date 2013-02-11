@@ -1,4 +1,4 @@
-module("Player");
+module('Player');
 
 var PlayerTest = {
   makeTag: function(){
@@ -74,7 +74,7 @@ test('should accept options from multiple sources and override in correct order'
   var tag0 = PlayerTest.makeTag();
   var player0 = new vjs.Player(tag0);
 
-  ok(player0.options_['attr'] === 1, 'global option was set')
+  ok(player0.options_['attr'] === 1, 'global option was set');
   player0.dispose();
 
   // Set a tag level option
@@ -99,7 +99,7 @@ test('should get tag, source, and track settings', function(){
 
   var fixture = document.getElementById('qunit-fixture');
 
-  var html = '<video id="example_1" class="video-js" autoplay preload="metadata">'
+  var html = '<video id="example_1" class="video-js" autoplay preload="metadata">';
       html += '<source src="http://google.com" type="video/mp4">';
       html += '<source src="http://google.com" type="video/webm">';
       html += '<track src="http://google.com" kind="captions" default>';
@@ -131,16 +131,16 @@ test('should get tag, source, and track settings', function(){
 
   player.dispose();
 
-  ok(tag['player'] === null, 'tag player ref killed')
-  ok(!vjs.players['example_1'], 'global player ref killed')
-  ok(player.el() === null, 'player el killed')
+  ok(tag['player'] === null, 'tag player ref killed');
+  ok(!vjs.players['example_1'], 'global player ref killed');
+  ok(player.el() === null, 'player el killed');
 });
 
 test('should set the width and height of the player', function(){
   var player = PlayerTest.makePlayer({ width: 123, height: '100%' });
 
-  ok(player.width() === 123)
-  ok(player.el().style.width === '123px')
+  ok(player.width() === 123);
+  ok(player.el().style.width === '123px');
 
   var fixture = document.getElementById('qunit-fixture');
   var container = document.createElement('div');
@@ -149,7 +149,7 @@ test('should set the width and height of the player', function(){
   // Player container needs to have height in order to have height
   // Don't want to mess with the fixture itself
   container.appendChild(player.el());
-  container.style.height = "1000px";
+  container.style.height = '1000px';
   ok(player.height() === 1000);
 
   player.dispose();
@@ -166,9 +166,9 @@ test('should accept options from multiple sources and override in correct order'
   var player = new vjs.Player(tag);
   var el = player.el();
 
-  ok(el.parentNode === container, 'player placed at same level as tag')
+  ok(el.parentNode === container, 'player placed at same level as tag');
   // Tag may be placed inside the player element or it may be removed from the DOM
-  ok(tag.parentNode !== container, 'tag removed from original place')
+  ok(tag.parentNode !== container, 'tag removed from original place');
 
   player.dispose();
 });
@@ -177,12 +177,12 @@ test('should load a media controller', function(){
   var player = PlayerTest.makePlayer({
     preload: 'none',
     sources: [
-      { src: "http://google.com", type: 'video/mp4' },
-      { src: "http://google.com", type: 'video/webm' }
+      { src: 'http://google.com', type: 'video/mp4' },
+      { src: 'http://google.com', type: 'video/webm' }
     ]
   });
 
-  ok(player.el().children[0].className.indexOf('vjs-tech') !== -1, 'media controller loaded')
+  ok(player.el().children[0].className.indexOf('vjs-tech') !== -1, 'media controller loaded');
 
   player.dispose();
 });
@@ -193,8 +193,8 @@ test('should not play if firstplay event prevents default', function(){
     'preload': 'none',
     'autoplay': false,
     'sources': [
-      { 'src': "http://google.com", 'type': 'video/mp4' },
-      { 'src': "http://google.com", 'type': 'video/webm' }
+      { 'src': 'http://google.com', 'type': 'video/mp4' },
+      { 'src': 'http://google.com', 'type': 'video/webm' }
     ]
   });
 
@@ -205,7 +205,7 @@ test('should not play if firstplay event prevents default', function(){
   });
 
   player.on('play', function(){
-    ok(false, 'play triggered anyway')
+    ok(false, 'play triggered anyway');
   });
 
   player.play();

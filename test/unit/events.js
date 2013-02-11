@@ -1,4 +1,4 @@
-module("Events");
+module('Events');
 
 test('should add and remove an event listener to an element', function(){
   expect(1);
@@ -10,7 +10,7 @@ test('should add and remove an event listener to an element', function(){
 
   vjs.on(el, 'click', listener);
   vjs.trigger(el, 'click'); // 1 click
-  vjs.off(el, 'click', listener)
+  vjs.off(el, 'click', listener);
   vjs.trigger(el, 'click'); // No click should happen.
 });
 
@@ -28,12 +28,12 @@ test('should remove all listeners of a type', function(){
   vjs.on(el, 'click', listener2);
   vjs.trigger(el, 'click'); // 2 clicks
 
-  ok(clicks === 2, 'both click listeners fired')
+  ok(clicks === 2, 'both click listeners fired');
 
-  vjs.off(el, 'click')
+  vjs.off(el, 'click');
   vjs.trigger(el, 'click'); // No click should happen.
 
-  ok(clicks === 2, 'no click listeners fired')
+  ok(clicks === 2, 'no click listeners fired');
 });
 
 test('should remove all listeners from an element', function(){

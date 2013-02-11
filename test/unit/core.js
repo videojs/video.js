@@ -1,9 +1,9 @@
-module("Core");
+module('Core');
 
 test('should create a video tag and have access children in old IE', function(){
   var fixture = document.getElementById('qunit-fixture');
 
-  fixture.innerHTML += "<video id='test_vid_id'><source type='video/mp4'></video>";
+  fixture.innerHTML += '<video id="test_vid_id"><source type="video/mp4"></video>';
 
   var vid = document.getElementById('test_vid_id');
 
@@ -13,12 +13,12 @@ test('should create a video tag and have access children in old IE', function(){
 
 test('should return a video player instance', function(){
   var fixture = document.getElementById('qunit-fixture');
-  fixture.innerHTML += "<video id='test_vid_id'></video><video id='test_vid_id2'></video>";
+  fixture.innerHTML += '<video id="test_vid_id"></video><video id="test_vid_id2"></video>';
 
   var player = videojs('test_vid_id');
   ok(player, 'created player from tag');
   ok(player.id() === 'test_vid_id');
-  ok(videojs.players['test_vid_id'] === player, 'added player to global reference')
+  ok(videojs.players['test_vid_id'] === player, 'added player to global reference');
 
   var playerAgain = videojs('test_vid_id');
   ok(player === playerAgain, 'did not create a second player from same tag');
