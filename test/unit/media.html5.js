@@ -1,1 +1,1 @@
-module("HTML5");
+module('HTML5');

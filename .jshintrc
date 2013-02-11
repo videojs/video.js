@@ -16,6 +16,25 @@
         "videojs",
         "vjs",
         "goog",
-        "console"
+        "console",
+
+        "require",        
+
+        "PlayerTest",
+        "asyncTest",
+        "deepEqual",
+        "equal",
+        "expect",
+        "module",
+        "notDeepEqual",
+        "notEqual",
+        "notStrictEqual",
+        "ok",
+        "QUnit",
+        "raises",
+        "start",
+        "stop",
+        "strictEqual",
+        "test"
     ]
 }
