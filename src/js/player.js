@@ -48,19 +48,11 @@ vjs.Player = function(tag, options, ready){
 
   this.on('ended', this.onEnded);
   this.on('play', this.onPlay);
+  this.on('firstplay', this.onFirstPlay);
   this.on('pause', this.onPause);
   this.on('progress', this.onProgress);
   this.on('durationchange', this.onDurationChange);
   this.on('error', this.onError);
-
-  //If the first starttime attribute is specified
-  //then we will start at the given offset in seconds
-
-  this.on('firstplay',function(){
-    if(this.options_['starttime']){
-      this.currentTime(this.options_['starttime']);
-    }
-  });
 
   // Make player easily findable by ID
   vjs.players[this.id_] = this;
@@ -357,6 +349,14 @@ vjs.Player.prototype.onEnded = function(){
 vjs.Player.prototype.onPlay = function(){
   vjs.removeClass(this.el_, 'vjs-paused');
   vjs.addClass(this.el_, 'vjs-playing');
+};
+
+vjs.Player.prototype.onFirstPlay = function(){
+    //If the first starttime attribute is specified
+    //then we will start at the given offset in seconds
+    if(this.options_['starttime']){
+      this.currentTime(this.options_['starttime']);
+    }
 };
 
 vjs.Player.prototype.onPause = function(){
