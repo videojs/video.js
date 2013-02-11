@@ -148,6 +148,7 @@ test('Plugins should not get events after stopImmediatePropagation is called', f
   for (; i < 3; i++ ) {
     name = pluginName + i;
     expectedOrder.push(name);
+    plugin(name);
   }
   
   vjs.plugin('testerPlugin', function (opts) {
