@@ -50,7 +50,7 @@
 
   <script>
     (function() {
-      var video, progressed;
+      var vid1, vidtag, vid2, progressed;
 
       // create a really simple plugin
       // this one just logs the buffered percentage to the console whenever
@@ -65,8 +65,21 @@
       vjs.plugin('progressed', progressed);
 
       // initialize it
-      video = vjs('vid1');
-      video.progressed();
+      vid1 = vjs('vid1');
+      vid1.progressed();
+
+      // create a new video and simultaneously initialize a plugin
+      vidtag = document.createElement('video');
+      vidtag.src = 'http://video-js.zencoder.com/oceans-clip.mp4';
+      vidtag.setAttribute('controls');
+      vidtag.setAttribute('class','video-js vjs-default-skin');
+      vidtag.id = 'vid2';
+      document.body.appendChild(vidtag);
+      vid2 = vjs('vid2', {
+        plugins: {
+          progressed: {}
+        }
+      });
     })();
   </script>
 
