@@ -26,6 +26,13 @@ Step 3: Using A Plugin
 ----------------------
 There are two ways to initialize a plugin. If you're creating your video tag dynamically, you can specify the plugins you'd like to initialize with it and any options you want to pass to them:
 
+    vjs('vidId', {
+      plugins: {
+        examplePlugin: {
+          exampleOption: true
+        }
+      }
+    });
 
 If you've already initialized your video tag, you can activate a plugin at any time by calling its setup function directly:
 
