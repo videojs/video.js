@@ -53,6 +53,12 @@ Don't miss the [code style guide](#code-style).
   git checkout -b <####-branch-name>
   ```
 
+Be sure to reference your issue in any commit message. Github allows you to do this though the [fixes or closes](https://github.com/blog/831-issues-2-0-the-next-generation) keywords.
+
+  ```bash
+  My commit message. fixes #123
+  ```
+
 # Bugs
 
 A bug is a _demonstrable problem_ that is caused by the code in the

@@ -1,1 +1,1 @@
-module("Setup");
+module('Setup');

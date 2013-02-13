@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Video.js Sandbox</title>
+  <title>Video.js Plugin Example</title>
 
   <link href="../src/css/video-js.css" rel="stylesheet" type="text/css">
 
@@ -26,27 +26,18 @@
           document.write( "<script src='" + root + sourcelist[i] + "'><\/script>" );
         }
       }
-
-      // Easy access to test Flash over HTML5. Add ?flash to URL
-      if (window.location.href.indexOf("?flash") !== -1) {
-        videojs.options.techOrder = ["Flash"];
-        videojs.options.flash.swf = "../src/swf/video-js.swf";
-      }
-
     })()
   </script>
-
-  <script type="text/javascript" charset="utf-8">
-    // Easy access to test Flash over HTML5. Add ?flash to URL
-    if (window.location.href.indexOf("?flash") !== -1) {
-      videojs.options.techOrder = ["flash"];
-      videojs.options.flash.swf = "../src/swf/video-js.swf";
-    }
+  <script>
+      // Easy access to test Flash over HTML5. Add ?flash to URL
+      if (window.location.href.indexOf("?flash") !== -1) {
+        videojs.options.techOrder = ["flash"];
+        videojs.options.flash.swf = "../src/swf/video-js.swf";
+      }
   </script>
-
 </head>
 <body>
-  <p style="background-color:#eee; border: 1px solid #777; padding: 10px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">You can use /sandbox/ for writing and testing your own code. Nothing in /sandbox/ will get checked into the repo, except files that end in .example, so please don't edit or add those files. To get started make a copy of index.html.example and rename it to index.html.</p>
+  <p style="background-color:#eee; border: 1px solid #777; padding: 10px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">This page shows you how to create, register and initialize a Video.js plugin.</p>
 
   <video id="vid1" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264"
       poster="http://video-js.zencoder.com/oceans-clip.png"
@@ -58,7 +49,25 @@
   </video>
 
   <script>
-    vid = document.getElementById("vid1");
+    (function() {
+      var vid1, progressed;
+
+      // create a really simple plugin
+      // this one just logs the buffered percentage to the console whenever
+      // more data is downloaded
+      progressed = function(options) {
+        this.on('progress', function(e) {
+          console.log(this.bufferedPercent());
+        });
+      };
+
+      // register the plugin
+      vjs.plugin('progressed', progressed);
+
+      // initialize it
+      vid1 = vjs('vid1');
+      vid1.progressed();
+    })();
   </script>
 
 </body>
