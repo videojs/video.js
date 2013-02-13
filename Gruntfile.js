@@ -95,6 +95,10 @@ module.exports = function(grunt) {
       }
 
       if (results) {
+	var i = results.length;
+	while (i--) {
+          results[i] = results[i].replace(/\\/g, '/');
+	}
         grunt.file.write('build/files/sourcelist.txt', results.join(','));
         grunt.file.write('build/files/sourcelist.js', 'var sourcelist = ["' + results.join('","') + '"]');
 
