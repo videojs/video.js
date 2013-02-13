@@ -312,7 +312,7 @@ vjs.TextTrack.prototype.adjustFontSize = function(){
         // Scale the font by the same factor as increasing the video width to the full screen window width.
         // Additionally, multiply that factor by 1.4, which is the default font size for
         // the caption track (from the CSS)
-        this.el_.style.fontSize = screen.width / this.player_.options_.width * 1.4 * 100 + '%';
+        this.el_.style.fontSize = screen.width / this.player_.width() * 1.4 * 100 + '%';
     } else {
         // Change the font size of the text track back to its original non-fullscreen size
         this.el_.style.fontSize = '';
