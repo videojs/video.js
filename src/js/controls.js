@@ -404,7 +404,7 @@ vjs.DurationDisplay.prototype.createEl = function(){
 
 vjs.DurationDisplay.prototype.updateContent = function(){
   if (this.player_.duration()) {
-      this.content.innerHTML = '<span class="vjs-control-text">Current Time </span>' + vjs.formatTime(this.player_.duration()); // label the current time for screen reader users
+      this.content.innerHTML = '<span class="vjs-control-text">Time Remaining </span>' + vjs.formatTime(this.player_.duration()); // label the time remaining for screen reader users
   }
 };
 
