@@ -95,7 +95,7 @@ module.exports = function(grunt) {
       }
 
       if (results) {
-	var i = results.length; 
+	var i = results.length;
 	while (i--) {
           results[i] = results[i].replace(/\\/g, '/');
 	}
