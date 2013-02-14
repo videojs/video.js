@@ -22,15 +22,15 @@ vjs.Player = function(tag, options, ready){
   // Cache for video property values.
   this.cache_ = {};
 
+  // Set poster
+  this.poster_ = options['poster'];
+  // Set controls
+  this.controls_ = options['controls'];
+
   // Run base component initializing with new options.
   // Builds the element through createEl()
   // Inits and embeds any child components in opts
   vjs.Component.call(this, this, options, ready);
-
-  // Set poster
-  this.poster_ = this.options_['poster'];
-  // Set controls
-  this.controls_ = this.options_['controls'];
 
   // Firstplay event implimentation. Not sold on the event yet.
   // Could probably just check currentTime==0?
