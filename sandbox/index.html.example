@@ -26,24 +26,15 @@
           document.write( "<script src='" + root + sourcelist[i] + "'><\/script>" );
         }
       }
-
-      // Easy access to test Flash over HTML5. Add ?flash to URL
-      if (window.location.href.indexOf("?flash") !== -1) {
-        videojs.options.techOrder = ["Flash"];
-        videojs.options.flash.swf = "../src/swf/video-js.swf";
-      }
-
     })()
   </script>
-
-  <script type="text/javascript" charset="utf-8">
+  <script>
     // Easy access to test Flash over HTML5. Add ?flash to URL
     if (window.location.href.indexOf("?flash") !== -1) {
-      videojs.options.techOrder = ["flash"];
-      videojs.options.flash.swf = "../src/swf/video-js.swf";
+      vjs.options.techOrder = ["flash"];
+      vjs.options.flash.swf = "../src/swf/video-js.swf";
     }
   </script>
-
 </head>
 <body>
   <p style="background-color:#eee; border: 1px solid #777; padding: 10px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">You can use /sandbox/ for writing and testing your own code. Nothing in /sandbox/ will get checked into the repo, except files that end in .example, so please don't edit or add those files. To get started make a copy of index.html.example and rename it to index.html.</p>
