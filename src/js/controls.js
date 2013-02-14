@@ -812,6 +812,7 @@ vjs.VolumeBar = function(player, options){
   goog.base(this, player, options);
   player.on('volumechange', vjs.bind(this, this.updateARIAAttributes));
   player.ready(vjs.bind(this, this.updateARIAAttributes));
+  setTimeout(vjs.bind(this, this.update), 0); // update when elements is in DOM
 };
 goog.inherits(vjs.VolumeBar, vjs.Slider);
 
