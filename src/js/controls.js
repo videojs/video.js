@@ -384,7 +384,7 @@ vjs.CurrentTimeDisplay.prototype.updateContent = function(){
 vjs.DurationDisplay = function(player, options){
   goog.base(this, player, options);
 
-  player.on('timeupdate', vjs.bind(this, this.updateContent));
+  player.on('timeupdate', vjs.bind(this, this.updateContent)); // this might need to be changes to 'durationchange' instead of 'timeupdate' eventually, however the durationchange event fires before this.player_.duration() is set, so the value cannot be written out using this method. Once the order of durationchange and this.player_.duration() being set is figured out, this can be updated.
 };
 goog.inherits(vjs.DurationDisplay, vjs.Component);
 
@@ -395,7 +395,8 @@ vjs.DurationDisplay.prototype.createEl = function(){
 
   this.content = vjs.createEl('div', {
     className: 'vjs-duration-display',
-    innerHTML: '0:00'
+    innerHTML: '<span class="vjs-control-text">Duration Time </span>' + '-0:00', // label the duration time for screen reader users
+    'aria-live': 'off' // tell screen readers not to automatically read the time as it changes
   });
 
   el.appendChild(vjs.createEl('div').appendChild(this.content));
@@ -404,7 +405,7 @@ vjs.DurationDisplay.prototype.createEl = function(){
 
 vjs.DurationDisplay.prototype.updateContent = function(){
   if (this.player_.duration()) {
-      this.content.innerHTML = '<span class="vjs-control-text">Time Remaining </span>' + vjs.formatTime(this.player_.duration()); // label the time remaining for screen reader users
+      this.content.innerHTML = '<span class="vjs-control-text">Duration Time </span>' + '-' + vjs.formatTime(this.player_.duration()); // label the duration time for screen reader users
   }
 };
 
