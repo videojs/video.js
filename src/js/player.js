@@ -224,7 +224,7 @@ vjs.Player.prototype.loadTech = function(techName, source){
   };
 
   // Grab tech-specific options from player options and add source and parent element to use.
-  var techOptions = vjs.obj.merge({ source: source, parentEl: this.el_ }, this.options_[techName.toLowerCase()]);
+  var techOptions = vjs.obj.merge({ 'source': source, 'parentEl': this.el_ }, this.options_[techName.toLowerCase()]);
 
   if (source) {
     if (source.src == this.cache_.src && this.cache_.currentTime > 0) {
