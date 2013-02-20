@@ -14,7 +14,7 @@ document.createElement('video');document.createElement('audio');
  * @param  {Function=} ready        Optional ready callback
  * @return {vjs.Player}             A player instance
  */
-vjs = function(id, options, ready){
+var vjs = function(id, options, ready){
   var tag; // Element of ID
 
   // Allow for element or ID to be passed in
