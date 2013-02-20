@@ -14,14 +14,21 @@ vjs.createEl = function(tagName, properties){
 
   for (var propName in properties){
     if (properties.hasOwnProperty(propName)) {
-      el[propName] = properties[propName];
+      //el[propName] = properties[propName];
       // Not remembering why we were checking for dash
       // but using setAttribute means you have to use getAttribute
-      // if (propName.indexOf('-') !== -1) {
-      //   el.setAttribute(propName, properties[propName]);
-      // } else {
-      //   el[propName] = properties[propName];
-      // }
+      
+      // The check for dash checks for the aria-* attributes, like aria-label, aria-valuemin.
+      // The additional check for "role" is because the default method for adding attributes does not
+      // add the attribute "role". My guess is because it's not a valid attribute in some namespaces, although
+      // browsers handle the attribute just fine. The W3C allows for aria-* attributes to be used in pre-HTML5 docs.
+      // http://www.w3.org/TR/wai-aria-primer/#ariahtml. Using setAttribute gets around this problem.
+      
+       if (propName.indexOf('aria-') !== -1 || propName=='role') {
+         el.setAttribute(propName, properties[propName]);
+       } else {
+         el[propName] = properties[propName];
+       }
     }
   }
   return el;
