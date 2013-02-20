@@ -4,10 +4,6 @@
  * Not using setupTriggers. Using global onEvent func to distribute events
  */
 
-goog.provide('vjs.Flash');
-
-goog.require('vjs.MediaTechController');
-
 /**
  * HTML5 Media Controller - Wrapper for HTML5 Media API
  * @param {vjs.Player|Object} player

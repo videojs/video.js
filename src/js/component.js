@@ -3,11 +3,6 @@
  *
  */
 
-goog.provide('vjs.Component');
-
-goog.require('vjs.events');
-goog.require('vjs.dom');
-
 /**
  * Base UI Component class
  * @param {Object} player  Main Player

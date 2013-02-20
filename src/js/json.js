@@ -4,8 +4,6 @@
  * (Compiler doesn't like JSON not being declared)
  */
 
-goog.provide('vjs.JSON');
-
 /**
  * Javascript JSON implementation
  * (Parse Method Only)

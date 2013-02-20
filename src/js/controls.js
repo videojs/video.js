@@ -2,12 +2,6 @@
  * @fileoverview Controls classes for Video.js buttons, sliders, etc.
  */
 
-goog.provide('vjs.Control');
-goog.provide('vjs.Menu');
-goog.provide('vjs.MenuItem');
-
-goog.require('vjs.Player');
-
 /**
  * Base class for all control elements
  * @param {vjs.Player|Object} player
@@ -930,7 +924,7 @@ vjs.MuteToggle.prototype.update = function(){
   } else if (vol < 0.67) {
     level = 2;
   }
-  
+
   // Don't rewrite the button text if the actual text doesn't change.
   // This causes unnecessary and confusing information for screen reader users.
   // This check is needed because this function gets called every time the volume level is changed.
