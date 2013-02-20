@@ -5,6 +5,16 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
 
     build: {
+      src: 'src/js/dependencies.js',
+      options: {
+        baseDir: 'src/js/'
+      }
+    },
+    deps: {
+      src: 'src/js/dependencies.js',
+      options: {
+        baseDir: 'src/js/'
+      }
     },
     clean: {
       build: ['build/files/*'],
@@ -22,13 +32,12 @@ module.exports = function(grunt) {
     },
     minify: {
       source:{
-        sourcelist: 'build/files/sourcelist.txt',
+        src: ['build/files/combined.video.js'],
         externs: ['src/js/media.flash.externs.js'],
         dest: 'build/files/minified.video.js'
       },
       tests: {
-        sourcelist: 'build/files/sourcelist.txt',
-        src: ['test/unit/*.js'],
+        src: ['build/files/combined.video.js', 'test/unit/*.js'],
         externs: ['src/js/media.flash.externs.js', 'test/qunit/qunit-externs.js'],
         dest: 'build/files/test.minified.video.js'
       }
@@ -42,17 +51,6 @@ module.exports = function(grunt) {
       files: [ 'src/**/*.js', 'test/unit/*.js' ],
       tasks: 'dev'
     }
-    // Copy is broken. Waiting for an update to use.
-    // copy: {
-    //   latest: {
-    //     files: [
-    //       { src: ['dist/video-js'], dest: 'dist/latest' } // includes files in path
-    //       // {src: ['path/**'], dest: 'dest/'}, // includes files in path and its subdirs
-    //       // {expand: true, cwd: 'path/', src: ['**'], dest: 'dest/'}, // makes all src relative to cwd
-    //       // {expand: true, flatten: true, src: ['path/**'], dest: 'dest/', filter: 'isFile'} // flattens results to a single level
-    //     ]
-    //   }
-    // },
   });
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -70,44 +68,24 @@ module.exports = function(grunt) {
   var fs = require('fs'),
       gzip = require('zlib').gzip;
 
-  grunt.registerTask('build', 'Building Source', function(){
+  grunt.registerMultiTask('build', 'Building Source', function(){
+    var sd = require('./build/simple-deps.js');
+    var sourceList = sd.generateSourceList(this.file.src[0], this.options());
+
+    // grunt.file.write('build/files/sourcelist.txt', sourceList.join(','));
+    // Allow time for people to update their index.html before they remove these
+    grunt.file.write('build/files/sourcelist.js', 'var sourcelist = ["' + sourceList.join('","') + '"]');
+
+    // Create a combined sources file. https://github.com/zencoder/video-js/issues/287
+    var combined = '';
+    sourceList.forEach(function(result){
+      combined += grunt.file.read(result);
+    });
+    grunt.file.write('build/files/combined.video.js', combined);
+
     grunt.file.copy('src/css/video-js.css', 'build/files/video-js.css');
     grunt.file.copy('src/css/video-js.png', 'build/files/video-js.png');
     grunt.file.copy('src/swf/video-js.swf', 'build/files/video-js.swf');
-
-    var calcdeps = require('calcdeps').calcdeps;
-    // caclcdeps is async
-    var done = this.async();
-    // In current version of calcdeps, not supplying certain
-    // options that should have defaults causes errors
-    // so we have all options listed here with their defaults.
-    calcdeps({
-      input: ['src/js/exports.js'],
-      path:['src/js/'],
-      dep:[],
-      exclude:[],
-      output_mode:'list'
-    }, function(err,results){
-      if (err) {
-        grunt.warn({ message: err });
-        grunt.log.writeln(err);
-        done(false);
-      }
-
-      if (results) {
-        grunt.file.write('build/files/sourcelist.txt', results.join(','));
-        grunt.file.write('build/files/sourcelist.js', 'var sourcelist = ["' + results.join('","') + '"]');
-
-        // Create a combined sources file. https://github.com/zencoder/video-js/issues/287
-        var combined = '';
-        results.forEach(function(result){
-          combined += grunt.file.read(result);
-        });
-        grunt.file.write('build/files/combined.video.js', combined);
-      }
-
-      done();
-    });
   });
 
   grunt.registerMultiTask('minify', 'Minify JS files using Closure Compiler.', function() {
@@ -170,5 +148,17 @@ module.exports = function(grunt) {
     grunt.file.copy('build/files/video-js.swf', 'dist/video-js/video-js.swf');
     grunt.file.copy('build/demo-files/demo.html', 'dist/video-js/demo.html');
     grunt.file.copy('build/demo-files/demo.captions.vtt', 'dist/video-js/demo.captions.vtt');
+
+    // Copy is broken. Waiting for an update to use.
+    // copy: {
+    //   latest: {
+    //     files: [
+    //       { src: ['dist/video-js'], dest: 'dist/latest' } // includes files in path
+    //       // {src: ['path/**'], dest: 'dest/'}, // includes files in path and its subdirs
+    //       // {expand: true, cwd: 'path/', src: ['**'], dest: 'dest/'}, // makes all src relative to cwd
+    //       // {expand: true, flatten: true, src: ['path/**'], dest: 'dest/', filter: 'isFile'} // flattens results to a single level
+    //     ]
+    //   }
+    // },
   });
 };

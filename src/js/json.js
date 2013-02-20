@@ -12,11 +12,15 @@ goog.provide('vjs.JSON');
  * https://github.com/douglascrockford/JSON-js/blob/master/json2.js
  * Only using for parse method when parsing data-setup attribute JSON.
  * @type {Object}
+ * @suppress {undefinedVars}
  */
 vjs.JSON;
 
-if (JSON && JSON.parse === 'function') {
-  vjs.JSON = JSON;
+/**
+ * @suppress {undefinedVars}
+ */
+if (typeof window.JSON !== 'undefined' && window.JSON.parse === 'function') {
+  vjs.JSON = window.JSON;
 
 } else {
   vjs.JSON = {};
