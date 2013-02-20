@@ -72,6 +72,12 @@ module.exports = function(grunt) {
     var sd = require('./build/simple-deps.js');
     var sourceList = sd.generateSourceList(this.file.src[0], this.options());
 
+    // Fix windows file path delimiter issue
+    var i = sourceList.length;
+    while (i--) {
+      sourceList[i] = sourceList[i].replace(/\\/g, '/');
+    }
+
     // grunt.file.write('build/files/sourcelist.txt', sourceList.join(','));
     // Allow time for people to update their index.html before they remove these
     grunt.file.write('build/files/sourcelist.js', 'var sourcelist = ["' + sourceList.join('","') + '"]');
