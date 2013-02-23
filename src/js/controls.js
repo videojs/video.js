@@ -38,6 +38,7 @@ goog.inherits(vjs.ControlBar, vjs.Component);
 
 var isiOS = navigator.userAgent.match(/(iPhone|iPod|iPad)/);
 //Check to see if the useragent matches an iOS Device
+//isiOS returns a boolean value
 if(isiOS){
   //Exclude the audio controls and the mute button
   vjs.ControlBar.prototype.options_ = {
