@@ -3,6 +3,10 @@
 <head>
   <title>Video.js Test Suite</title>
 
+  <!--[if IE]>
+    <script src="https://getfirebug.com/releases/lite/1.4/firebug-lite.js"></script>
+  <!--<![endif]-->
+
   <!-- QUnit -->
   <link rel="stylesheet" href="../test/qunit/qunit/qunit.css" />
   <script src="../test/qunit/qunit/qunit.js"></script>
@@ -10,12 +14,9 @@
   <!-- Video.js CSS -->
   <link rel="stylesheet" href="../src/css/video-js.css" type="text/css">
 
-  <!-- GENERATED LIST OF SOURCE FILES -->
-  <script src="../build/files/sourcelist.js"></script>
-
   <script type="text/javascript">
     (function(){
-      var root = '../';
+
       // ADD NEW TEST FILES HERE
       var tests = [
         'test/unit/lib.js',
@@ -28,6 +29,8 @@
         'test/unit/plugins.js'
       ];
       var compiledTests = "build/files/test.minified.video.js";
+
+      var projectRoot = '../';
       var scripts = [];
 
       // Choose either the raw source and tests
@@ -36,13 +39,11 @@
       if (QUnit.urlParams.min || QUnit.urlParams.compiled) {
         scripts.push(compiledTests);
       } else {
-        // sourcelist is loaded by sourcelist.js
-        // which is built by `grunt build` or `grunt watch`
-        scripts = scripts.concat(sourcelist,tests);
+        scripts = scripts.concat(['build/source-loader.js'], tests);
       }
 
       for (var i = 0; i < scripts.length; i++) {
-        document.write( "<script src='" + root + scripts[i] + "'><\/script>" );
+        document.write( "<script src='" + projectRoot + scripts[i] + "'><\/script>" );
       }
 
     })()

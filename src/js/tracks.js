@@ -7,13 +7,6 @@
  * Descriptions (not supported yet) - audio descriptions that are read back to the user by a screen reading device
  */
 
-goog.provide('vjs.TextTrack');
-
-goog.require('vjs.Menu');
-goog.require('vjs.MenuItem');
-goog.require('vjs.Component');
-
-
 // Player Additions - Functions add to the player object for easier access to tracks
 
 /**
@@ -143,7 +136,7 @@ vjs.TextTrack = function(player, options){
   this.activeCues_ = [];
   this.readyState_ = 0;
   this.mode_ = 0;
-  
+
   this.player_.on('fullscreenchange', vjs.bind(this, this.adjustFontSize));
 };
 goog.inherits(vjs.TextTrack, vjs.Component);
@@ -872,7 +865,7 @@ vjs.TextTrackButton.prototype.onFocus = function(){
   // This function is not needed anymore. Instead, the keyboard functionality is handled by
   // treating the button as triggering a submenu. When the button is pressed, the submenu
   // appears. Pressing the button again makes the submenu disappear.
-  
+
   /*
   // Show the menu, and keep showing when the menu items are in focus
   this.menu.lockShowing();
@@ -912,7 +905,7 @@ vjs.TextTrackButton.prototype.onKeyPress = function(event){
           this.pressButton();
       }
   }
-  
+
   // Check for escape (27) key
   if (event.which == 27){
       event.preventDefault();

@@ -5,16 +5,6 @@
  * be renamed by closure compiler.
  */
 
-goog.require('vjs');
-goog.require('vjs.Component');
-goog.require('vjs.Player');
-goog.require('vjs.Control');
-goog.require('vjs.Html5');
-goog.require('vjs.Flash');
-goog.require('vjs.TextTrack');
-goog.require('vjs.autoSetup');
-goog.require('vjs.plugin');
-
 /**
  * vjs (internal only) = videojs = _V_ (external only)
  *

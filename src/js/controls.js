@@ -2,12 +2,6 @@
  * @fileoverview Controls classes for Video.js buttons, sliders, etc.
  */
 
-goog.provide('vjs.Control');
-goog.provide('vjs.Menu');
-goog.provide('vjs.MenuItem');
-
-goog.require('vjs.Player');
-
 /**
  * Base class for all control elements
  * @param {vjs.Player|Object} player
@@ -531,6 +525,10 @@ vjs.Slider.prototype.onMouseUp = function() {
 };
 
 vjs.Slider.prototype.update = function(){
+  // In VolumeBar init we have a setTimeout for update that pops and update to the end of the
+  // execution stack. The player is destroyed before then update will cause an error
+  if (!this.el_) return;
+
   // If scrubbing, we could use a cached value to make the handle keep up with the user's mouse.
   // On HTML5 browsers scrubbing is really smooth, but some flash players are slow, so we might want to utilize this later.
   // var progress =  (this.player_.scrubbing) ? this.player_.getCache().currentTime / this.player_.duration() : this.player_.currentTime() / this.player_.duration();
@@ -930,7 +928,7 @@ vjs.MuteToggle.prototype.update = function(){
   } else if (vol < 0.67) {
     level = 2;
   }
-  
+
   // Don't rewrite the button text if the actual text doesn't change.
   // This causes unnecessary and confusing information for screen reader users.
   // This check is needed because this function gets called every time the volume level is changed.
