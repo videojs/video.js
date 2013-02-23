@@ -36,20 +36,40 @@ vjs.ControlBar = function(player, options){
 };
 goog.inherits(vjs.ControlBar, vjs.Component);
 
-vjs.ControlBar.prototype.options_ = {
-  loadEvent: 'play',
-  children: {
-    'playToggle': {},
-    'currentTimeDisplay': {},
-    'timeDivider': {},
-    'durationDisplay': {},
-    'remainingTimeDisplay': {},
-    'progressControl': {},
-    'fullscreenToggle': {},
-    'volumeControl': {},
-    'muteToggle': {}
-  }
-};
+var isiOS = navigator.userAgent.match(/(iPhone|iPod|iPad)/);
+//Check to see if the useragent matches an iOS Device
+if(isiOS){
+  //Exclude the audio controls and the mute button
+  vjs.ControlBar.prototype.options_ = {
+    loadEvent: 'play',
+    children: {
+      'playToggle': {},
+      'currentTimeDisplay': {},
+      'timeDivider': {},
+      'durationDisplay': {},
+      'remainingTimeDisplay': {},
+      'progressControl': {},
+      'fullscreenToggle': {}
+    }
+  };
+}
+else{
+  //For all other devices show all buttons
+  vjs.ControlBar.prototype.options_ = {
+    loadEvent: 'play',
+    children: {
+      'playToggle': {},
+      'currentTimeDisplay': {},
+      'timeDivider': {},
+      'durationDisplay': {},
+      'remainingTimeDisplay': {},
+      'progressControl': {},
+      'fullscreenToggle': {},
+      'volumeControl': {},
+      'muteToggle': {}
+    }
+  };
+}
 
 vjs.ControlBar.prototype.createEl = function(){
   return vjs.createEl('div', {
