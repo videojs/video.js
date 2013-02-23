@@ -5,10 +5,6 @@
  * robust as jquery's, so there's probably some differences.
  */
 
-goog.provide('vjs.events');
-
-goog.require('vjs');
-
 /**
  * Add an event listener to element
  * It stores the handler function in a separate cache object
