@@ -22,15 +22,15 @@ vjs.Player = function(tag, options, ready){
   // Cache for video property values.
   this.cache_ = {};
 
+  // Set poster
+  this.poster_ = options['poster'];
+  // Set controls
+  this.controls_ = options['controls'];
+
   // Run base component initializing with new options.
   // Builds the element through createEl()
   // Inits and embeds any child components in opts
   vjs.Component.call(this, this, options, ready);
-
-  // Set poster
-  this.poster_ = this.options_['poster'];
-  // Set controls
-  this.controls_ = this.options_['controls'];
 
   // Firstplay event implimentation. Not sold on the event yet.
   // Could probably just check currentTime==0?
@@ -53,6 +53,7 @@ vjs.Player = function(tag, options, ready){
   this.on('progress', this.onProgress);
   this.on('durationchange', this.onDurationChange);
   this.on('error', this.onError);
+  this.on('fullscreenchange', this.onFullscreenChange);
 
   // Make player easily findable by ID
   vjs.players[this.id_] = this;
@@ -385,6 +386,14 @@ vjs.Player.prototype.onDurationChange = function(){
 
 vjs.Player.prototype.onError = function(e) {
   vjs.log('Video Error', e);
+};
+
+vjs.Player.prototype.onFullscreenChange = function(e) {
+  if (this.isFullScreen) {
+    this.addClass('vjs-fullscreen');
+  } else {
+    this.removeClass('vjs-fullscreen');
+  }
 };
 
 // /* Player API
