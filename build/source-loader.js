@@ -1,31 +1,59 @@
-(function(window){
+// This file is used to load the video.js source files into a page
+// in the correct order based on dependencies.
+// When you create a new source file you will need to add
+// it to the list below to use it in sandbox/index.html and
+// test/index.html
 
-  var projectRoot = window.projectRoot || '';
+// You can use the projectRoot variable to adjust relative urls
+// that this script loads. By default it's "../", which is what /sandbox
+// and /test need. If you had sandbox/newDir/index.html, in index.html you
+// would set projectRoot = "../../"
 
-  window.loadScript = function(url, callback) {
-    // adding the script tag to the head as suggested before
-    var head = document.getElementsByTagName('head')[0];
-    var script = document.createElement('script');
-    script.src = url;
+// We could use somehting like requireJS to load files, and at one point
+// we used goog.require/provide to load dependencies, but that seems like
+// overkill with the small number of files we actually have.
 
-    // then bind the event to the callback function
-    // there are several events for cross browser compatibility
-    script.onreadystatechange = callback;
-    script.onload = callback;
+// ADD NEW SOURCE FILES HERE
+var sourceFiles = [
+  "src/js/goog.base.js",
+  "src/js/core.js",
+  "src/js/events.js",
+  "src/js/lib.js",
+  "src/js/component.js",
+  "src/js/player.js",
+  "src/js/controls.js",
+  "src/js/media.js",
+  "src/js/media.html5.js",
+  "src/js/media.flash.js",
+  "src/js/tracks.js",
+  "src/js/json.js",
+  "src/js/setup.js",
+  "src/js/plugins.js",
+  "src/js/exports.js"
+];
 
-    // fire the loading
-    head.appendChild(script);
+// Allow overriding the default project root
+var projectRoot = projectRoot || '../';
+
+function loadScripts(scriptsArr){
+  for (var i = 0; i < scriptsArr.length; i++) {
+    // Using document.write because that's the easiest way to avoid triggering
+    // asynchrnous script loading
+    document.write( "<script src='" + projectRoot + scriptsArr[i] + "'><\/script>" );
   }
+}
 
-  window.loadScript(projectRoot + 'src/js/dependency-map.js', function(){
-    loadScript(projectRoot + 'build/simple-deps.js', function(){});
-  });
+// We use this file in the grunt build script to load the same source file list
+// and don't want to load the scripts there.
+if (typeof blockSourceLoading === 'undefined') {
+  loadScripts(sourceFiles);
 
-})(window);
+  // Allow for making Flash first
+  if (window.location.href.indexOf("?flash") !== -1) {
+    // Using doc.write to load this script to, otherwise when it runs videojs
+    // is undefined
+    document.write('<script>videojs.options.techOrder = ["flash"];videojs.options.flash.swf = "../src/swf/video-js.swf";</script>')
+  }
+}
 
-// Ditching this file for now because we loading scripts in order
-// gets complicated when you load them dynamically, becuase
-// they become asynchrounus.
-// Loading simple-deps.js diretly allows us to just use document.write
-// If we go this far in the future we might consider requirejs more
-// but for now still trying to avoid the overhead of it
+

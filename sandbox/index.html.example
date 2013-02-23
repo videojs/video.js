@@ -6,21 +6,8 @@
 
   <link href="../src/css/video-js.css" rel="stylesheet" type="text/css">
 
-  <!--[if IE]>
-    <script src="https://getfirebug.com/releases/lite/1.4/firebug-lite.js"></script>
-  <!--<![endif]-->
-
-  <!-- GENERATED LIST OF SOURCE FILES -->
-  <script src="../src/js/dependencies.js"></script>
-  <script src="../build/simple-deps.js"></script>
-
-  <script type="text/javascript" charset="utf-8">
-    // Easy access to test Flash over HTML5. Add ?flash to URL
-    if (window.location.href.indexOf("?flash") !== -1) {
-      videojs.options.techOrder = ["flash"];
-      videojs.options.flash.swf = "../src/swf/video-js.swf";
-    }
-  </script>
+  <!-- LOAD VIDEO.JS SOURCE FILES IN ORDER -->
+  <script src="../build/source-loader.js"></script>
 
 </head>
 <body>

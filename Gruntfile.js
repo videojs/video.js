@@ -69,22 +69,26 @@ module.exports = function(grunt) {
       gzip = require('zlib').gzip;
 
   grunt.registerMultiTask('build', 'Building Source', function(){
-    var sd = require('./build/simple-deps.js');
-    var sourceList = sd.generateSourceList(this.file.src[0], this.options());
+    /*jshint undef:false, evil:true */
+
+    // Loading predefined source order from source-loader.js
+    // Trust me, this is the easist way to do it so far.
+    var blockSourceLoading = true;
+    eval(grunt.file.read('./build/source-loader.js'));
 
     // Fix windows file path delimiter issue
-    var i = sourceList.length;
+    var i = sourceFiles.length;
     while (i--) {
-      sourceList[i] = sourceList[i].replace(/\\/g, '/');
+      sourceFiles[i] = sourceFiles[i].replace(/\\/g, '/');
     }
 
     // grunt.file.write('build/files/sourcelist.txt', sourceList.join(','));
     // Allow time for people to update their index.html before they remove these
-    grunt.file.write('build/files/sourcelist.js', 'var sourcelist = ["' + sourceList.join('","') + '"]');
+    grunt.file.write('build/files/sourcelist.js', 'var sourcelist = ["' + sourceFiles.join('","') + '"]');
 
     // Create a combined sources file. https://github.com/zencoder/video-js/issues/287
     var combined = '';
-    sourceList.forEach(function(result){
+    sourceFiles.forEach(function(result){
       combined += grunt.file.read(result);
     });
     grunt.file.write('build/files/combined.video.js', combined);
