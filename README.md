@@ -24,7 +24,7 @@ Some of the focuses of Video.js are:
 
 Getting Started
 ---------------
-Check out our [gettign started guide](http://videojs.com/#section5).
+Check out our [getting started guide](http://videojs.com/#section5).
 
 Contributing
 ------------
