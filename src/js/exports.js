@@ -5,16 +5,6 @@
  * be renamed by closure compiler.
  */
 
-goog.require('vjs');
-goog.require('vjs.Component');
-goog.require('vjs.Player');
-goog.require('vjs.Control');
-goog.require('vjs.Html5');
-goog.require('vjs.Flash');
-goog.require('vjs.TextTrack');
-goog.require('vjs.autoSetup');
-goog.require('vjs.plugin');
-
 /**
  * vjs (internal only) = videojs = _V_ (external only)
  *
@@ -46,9 +36,9 @@ goog.exportSymbol('videojs.cache', vjs.cache);
 goog.exportSymbol('videojs.Component', vjs.Component);
 goog.exportProperty(vjs.Component.prototype, 'dispose', vjs.Component.prototype.dispose);
 goog.exportProperty(vjs.Component.prototype, 'createEl', vjs.Component.prototype.createEl);
-goog.exportProperty(vjs.Component.prototype, 'getEl', vjs.Component.prototype.getEl);
+goog.exportProperty(vjs.Component.prototype, 'el', vjs.Component.prototype.el);
 goog.exportProperty(vjs.Component.prototype, 'addChild', vjs.Component.prototype.addChild);
-goog.exportProperty(vjs.Component.prototype, 'getChildren', vjs.Component.prototype.getChildren);
+goog.exportProperty(vjs.Component.prototype, 'children', vjs.Component.prototype.children);
 goog.exportProperty(vjs.Component.prototype, 'on', vjs.Component.prototype.on);
 goog.exportProperty(vjs.Component.prototype, 'off', vjs.Component.prototype.off);
 goog.exportProperty(vjs.Component.prototype, 'one', vjs.Component.prototype.one);
