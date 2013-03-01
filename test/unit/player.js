@@ -22,6 +22,15 @@ var PlayerTest = {
   }
 };
 
+// Fake the tech so that players can be constructed during tests without HTML
+// or Flash (e.g. when running with PhantomJS)
+if (/phantom/i.test(window.navigator.userAgent)) {
+  vjs.Player.prototype['tech'] = {
+    dispose: function(){},
+    features: {}
+  };
+}
+
 // Compiler doesn't like using 'this' in setup/teardown.
 // module("Player", {
 //   /**
