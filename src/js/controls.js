@@ -969,17 +969,22 @@ vjs.PosterImage = function(player, options){
 goog.inherits(vjs.PosterImage, vjs.Button);
 
 vjs.PosterImage.prototype.createEl = function(){
-  var el = vjs.createEl('img', {
-    className: 'vjs-poster',
-
-    // Don't want poster to be tabbable.
-    tabIndex: -1
-  });
-
-  // src throws errors if no poster was defined.
-  if (this.player_.poster()) {
-    el.src = this.player_.poster();
+  var el = vjs.createEl('div', {
+        className: 'vjs-poster',
+        
+        // Don't want poster to be tabbable.
+        tabIndex: -1
+      }),
+      poster = this.player_.poster();
+  
+  if (poster) {
+    if ('backgroundSize' in el.style) {
+      el.style.backgroundImage = 'url("' + poster + '")';
+    } else {
+      el.appendChild(vjs.createEl('img', { src: poster }));
+    }
   }
+  
   return el;
 };
 

@@ -45,10 +45,22 @@ body.vjs-full-window {
 
 /* Poster Styles */
 .vjs-poster {
-  margin: 0 auto; padding: 0; cursor: pointer;
-
-  /* Scale with the size of the player div. Works when poster is vertically shorter, but stretches when it's less wide. */
-  position: relative; width: 100%; max-height: 100%;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  background-size: contain;
+  cursor: pointer;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  width: 100%;
+}
+.vjs-poster img {
+  display: block;
+  margin: 0 auto;
+  max-height: 100%;
+  padding: 0;
+  width: 100%;
 }
 
 /* Text Track Styles */
