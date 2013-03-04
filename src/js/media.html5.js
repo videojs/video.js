@@ -205,9 +205,7 @@ vjs.Html5.canPlaySource = function(srcObj){
 };
 
 vjs.Html5.canControlVolume = function(){
-  var
-    volume =  vjs.TEST_VID.volume,
-    volumeOptions = {};
+  var volume =  vjs.TEST_VID.volume;
   vjs.TEST_VID.volume = (volume / 2) + 0.1;
   return volume !== vjs.TEST_VID.volume;
 };
