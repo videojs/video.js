@@ -34,7 +34,7 @@ goog.exportSymbol('videojs.options', vjs.options);
 goog.exportSymbol('videojs.cache', vjs.cache);
 
 goog.exportSymbol('videojs.Component', vjs.Component);
-goog.exportProperty(vjs.Component.prototype, 'dispose', vjs.Component.prototype.dispose);
+//goog.exportProperty(vjs.Component.prototype, 'dispose', vjs.Component.prototype.dispose);
 goog.exportProperty(vjs.Component.prototype, 'createEl', vjs.Component.prototype.createEl);
 goog.exportProperty(vjs.Component.prototype, 'el', vjs.Component.prototype.el);
 goog.exportProperty(vjs.Component.prototype, 'addChild', vjs.Component.prototype.addChild);
@@ -51,6 +51,7 @@ goog.exportProperty(vjs.Component.prototype, 'dimensions', vjs.Component.prototy
 goog.exportProperty(vjs.Component.prototype, 'ready', vjs.Component.prototype.ready);
 
 goog.exportSymbol('videojs.Player', vjs.Player);
+goog.exportProperty(vjs.Player.prototype, 'dispose', vjs.Player.prototype.dispose);
 
 goog.exportSymbol('videojs.MediaLoader', vjs.MediaLoader);
 goog.exportSymbol('videojs.PosterImage', vjs.PosterImage);
