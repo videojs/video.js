@@ -48,6 +48,7 @@ goog.exportProperty(vjs.Component.prototype, 'hide', vjs.Component.prototype.hid
 goog.exportProperty(vjs.Component.prototype, 'width', vjs.Component.prototype.width);
 goog.exportProperty(vjs.Component.prototype, 'height', vjs.Component.prototype.height);
 goog.exportProperty(vjs.Component.prototype, 'dimensions', vjs.Component.prototype.dimensions);
+goog.exportProperty(vjs.Component.prototype, 'ready', vjs.Component.prototype.ready);
 
 goog.exportSymbol('videojs.Player', vjs.Player);
 

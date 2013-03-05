@@ -37,7 +37,7 @@ module.exports = function(grunt) {
         dest: 'build/files/minified.video.js'
       },
       tests: {
-        src: ['build/files/combined.video.js', 'test/unit/*.js'],
+        src: ['build/files/combined.video.js', 'test/unit/*.js', '!test/unit/minified.js'],
         externs: ['src/js/media.flash.externs.js', 'test/qunit/qunit-externs.js'],
         dest: 'build/files/test.minified.video.js'
       }
@@ -45,7 +45,8 @@ module.exports = function(grunt) {
     dist: {},
     qunit: {
       source: ['test/index.html'],
-      minified: ['test/minified.html']
+      minified: ['test/minified.html'],
+      minified_lib: ['test/minified-lib.html']
     },
     watch: {
       files: [ 'src/**/*.js', 'test/unit/*.js' ],
