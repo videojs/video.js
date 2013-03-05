@@ -1,51 +1,49 @@
 module('Controls');
 
-
-
 test('should hide volume control if it\'s not supported', function() {
-  var
-    noop = function(){},
-    player = {
-      id: noop,
-      on: noop,
-      ready: noop,
-      tech: {
-        features: {
-          volumeControl: false
-        }
+  var noop, player, volumeControl, muteToggle;
+  noop = function(){};
+  player = {
+    id: noop,
+    on: noop,
+    ready: noop,
+    tech: {
+      features: {
+        volumeControl: false
       }
-    },
-    volumeControl = new vjs.VolumeControl(player),
-    muteToggle = new vjs.MuteToggle(player);
+    }
+  };
+  volumeControl = new vjs.VolumeControl(player);
+  muteToggle = new vjs.MuteToggle(player);
 
   equal(volumeControl.el().style.display, 'none', 'volumeControl is not hidden');
   equal(muteToggle.el().style.display, 'none', 'muteToggle is not hidden');
 });
 
 test('should test and toggle volume control on `loadstart`', function(){
-  var
-    noop = function(){},
-    listeners = [],
-    player = {
-      id: noop,
-      on: function(event, callback){
-        listeners.push(callback);
-      },
-      ready: noop,
-      volume: function(){
-        return 1;
-      },
-      muted: function(){
-        return false;
-      },
-      tech: {
-        features: {
-          volumeControl: true
-        }
-      }
+  var noop, listeners, player, volumeControl, muteToggle;
+  noop = function(){};
+  listeners = [];
+  player = {
+    id: noop,
+    on: function(event, callback){
+      listeners.push(callback);
     },
-    volumeControl = new vjs.VolumeControl(player),
-    muteToggle = new vjs.MuteToggle(player);
+    ready: noop,
+    volume: function(){
+      return 1;
+    },
+    muted: function(){
+      return false;
+    },
+    tech: {
+      features: {
+        volumeControl: true
+      }
+    }
+  };
+  volumeControl = new vjs.VolumeControl(player);
+  muteToggle = new vjs.MuteToggle(player);
 
   equal(volumeControl.el().style.display,
         '',
