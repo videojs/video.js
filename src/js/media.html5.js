@@ -204,6 +204,12 @@ vjs.Html5.canPlaySource = function(srcObj){
   // Check Media Type
 };
 
+vjs.Html5.canControlVolume = function(){
+  var volume =  vjs.TEST_VID.volume;
+  vjs.TEST_VID.volume = (volume / 2) + 0.1;
+  return volume !== vjs.TEST_VID.volume;
+};
+
 // List of all HTML5 events (various uses).
 vjs.Html5.Events = 'loadstart,suspend,abort,error,emptied,stalled,loadedmetadata,loadeddata,canplay,canplaythrough,playing,waiting,seeking,seeked,ended,durationchange,timeupdate,progress,play,pause,ratechange,volumechange'.split(',');
 
@@ -221,8 +227,10 @@ vjs.Html5.prototype.features = {
     : false,
 
   // In iOS, if you move a video element in the DOM, it breaks video playback.
-  movingMediaElementInDOM: !vjs.IS_IOS
+  movingMediaElementInDOM: !vjs.IS_IOS,
 
+  // volume cannot be changed from 1 on iOS
+  volumeControl: vjs.Html5.canControlVolume()
 };
 
 // Android
