@@ -308,6 +308,35 @@ vjs.removeClass = function(element, classToRemove){
 };
 
 /**
+ * Returns the first index at which a given element can be found in the array, or -1 if it is not present
+ * @param {Array} arr    Array to search through
+ * @param {Element} elem Element to locate in the array
+ * @param {Number=} i Optional index at which to begin the search. Defaults to 0.
+ */
+vjs.inArray = function (arr, elem, i) {
+    var len;
+
+    if (arr) {
+        if ([].indexOf) {
+            return [].indexOf.call(arr, elem, i);
+        }
+
+        len = arr.length;
+        i = i ? i < 0 ? Math.max(0, len + i) : i : 0;
+
+        for (; i < len; i++) {
+            // Skip accessing in sparse arrays
+            if (i in arr && arr[i] === elem) {
+                return i;
+            }
+        }
+    }
+
+    return -1;
+};
+
+
+/**
  * Element for testing browser HTML5 video capabilities
  * @type {Element}
  * @constant
