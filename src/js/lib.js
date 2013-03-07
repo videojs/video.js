@@ -128,6 +128,20 @@ vjs.obj.copy = function(obj){
 };
 
 /**
+ * Gets the type of an object
+ * @param  {Object} obj Object to get the type for
+ * @return {String}     The type of the object
+ */
+vjs.obj.type = function (obj) {
+    if ( obj == null ) {
+        return String( obj );
+    }
+    return typeof obj === "object" || typeof obj === "function" ?
+        vjs.obj[vjs.obj.toString.call(obj)] || "object" :
+        typeof obj;
+};
+
+/**
  * Bind (a.k.a proxy or Context). A simple method for changing the context of a function
    It also stores a unique id on the function so it can be easily removed from events
  * @param  {*}   context The object to bind as scope
