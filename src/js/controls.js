@@ -482,6 +482,7 @@ vjs.Slider = function(player, options){
     player.on(this.playerEvent, vjs.bind(this, this.update));
 
     this.on('mousedown', this.onMouseDown);
+    this.on('touchstart', this.onMouseDown);
     this.on('focus', this.onFocus);
     this.on('blur', this.onBlur);
 
@@ -512,6 +513,8 @@ vjs.Slider.prototype.onMouseDown = function(event){
 
   vjs.on(document, 'mousemove', vjs.bind(this, this.onMouseMove));
   vjs.on(document, 'mouseup', vjs.bind(this, this.onMouseUp));
+  vjs.on(document, 'touchmove', vjs.bind(this, this.onMouseMove));
+  vjs.on(document, 'touchend', vjs.bind(this, this.onMouseUp));
 
   this.onMouseMove(event);
 };
@@ -520,6 +523,8 @@ vjs.Slider.prototype.onMouseUp = function() {
   vjs.unblockTextSelection();
   vjs.off(document, 'mousemove', this.onMouseMove, false);
   vjs.off(document, 'mouseup', this.onMouseUp, false);
+  vjs.off(document, 'touchmove', this.onMouseMove, false);
+  vjs.off(document, 'touchend', this.onMouseUp, false);
 
   this.update();
 };
