@@ -171,10 +171,10 @@ vjs.Player.prototype.createEl = function(){
 
   // Make box use width/height of tag, or rely on default implementation
   // Enforce with CSS since width/height attrs don't work on divs
-  if (this.options_['width']) {
+  if (this.options_['width'] !== 'auto') {
     this.width(this.options_['width'], true); // (true) Skip resize listener on load
   }
-  if (this.options_['height']) {
+  if (this.options_['height'] !== 'auto') {
     this.height(this.options_['height'], true);
   }
 
