@@ -229,8 +229,6 @@ vjs.fixEvent = function(event) {
         (newEvent.button & 4 ? 1 :
           (newEvent.button & 2 ? 2 : 0)));
     }
-  }
-
   // Returns fixed-up instance
     return newEvent;
   } else {
