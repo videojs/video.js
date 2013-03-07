@@ -288,8 +288,8 @@ vjs.Component.prototype.addChild = function(child, options){
 
   // Add the UI object's element to the container div (box)
   // Having an element is not required
-  if (typeof component.el === 'function' && component.el()) {
-    this.el_.appendChild(component.el());
+  if (typeof component['el'] === 'function' && component['el']()) {
+    this.el_.appendChild(component['el']());
   }
 
   // Return so it can stored on parent object if desired.
