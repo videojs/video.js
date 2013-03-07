@@ -269,8 +269,8 @@ vjs.USER_AGENT = navigator.userAgent;
  * @type {Boolean}
  * @constant
  */
-vjs.IS_IPHONE = !!vjs.USER_AGENT.match(/iPad/i);
-vjs.IS_IPAD = !!vjs.USER_AGENT.match(/iPhone/i);
+vjs.IS_IPHONE = !!vjs.USER_AGENT.match(/iPhone/i);
+vjs.IS_IPAD = !!vjs.USER_AGENT.match(/iPad/i);
 vjs.IS_IPOD = !!vjs.USER_AGENT.match(/iPod/i);
 vjs.IS_IOS = vjs.IS_IPHONE || vjs.IS_IPAD || vjs.IS_IPOD;
 
