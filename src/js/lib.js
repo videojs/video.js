@@ -86,8 +86,7 @@ vjs.obj.merge = function(obj1, obj2){
  * @return {Object}      New object. Obj1 and Obj2 will be untouched.
  */
 vjs.obj.deepMerge = function(obj1, obj2){
-  var key, val1, val2, objDef;
-  objDef = '[object Object]';
+  var key, val1, val2;
 
   // Make a copy of obj1 so we're not ovewriting original values.
   // like prototype.options_ and all sub options objects
@@ -99,7 +98,7 @@ vjs.obj.deepMerge = function(obj1, obj2){
       val2 = obj2[key];
 
       // Check if both properties are pure objects and do a deep merge if so
-      if (vjs.obj.toString.call(val1) === objDef && vjs.obj.toString.call(val2) === objDef) {
+      if (vjs.obj.isPlainObject(val1) && vjs.obj.isPlainObject(val2)) {
         obj1[key] = vjs.obj.deepMerge(val1, val2);
       } else {
         obj1[key] = obj2[key];
