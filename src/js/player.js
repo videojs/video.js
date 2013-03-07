@@ -471,7 +471,7 @@ vjs.Player.prototype.techGet = function(method){
 vjs.Player.prototype.play = function(){
   // Create an event object so we can check for preventDefault after
   var e = { type: 'play', target: this.el_ };
-  var e = vjs.fixEvent(e);
+  e = vjs.fixEvent(e);
   
   this.trigger(e);
 

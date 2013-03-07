@@ -135,8 +135,8 @@ vjs.obj.type = function (obj) {
     if ( obj == null ) {
         return String( obj );
     }
-    return typeof obj === "object" || typeof obj === "function" ?
-        vjs.obj[vjs.obj.toString.call(obj)] || "object" :
+    return typeof obj === 'object' || typeof obj === 'function' ?
+        vjs.obj[vjs.obj.toString.call(obj)] || 'object' :
         typeof obj;
 };
 
@@ -149,15 +149,15 @@ vjs.obj.isPlainObject = function (obj) {
     // Must be an Object.
     // Because of IE, we also have to check the presence of the constructor property.
     // Make sure that DOM nodes and window objects don't pass through, as well
-    if (!obj || vjs.obj.type(obj) !== "object" || obj.nodeType || vjs.obj.isWindow(obj)) {
+    if (!obj || vjs.obj.type(obj) !== 'object' || obj.nodeType || vjs.obj.isWindow(obj)) {
         return false;
     }
 
     try {
         // Not own constructor property must be Object
         if ( obj.constructor &&
-            !vjs.obj.hasOwnProperty.call(obj, "constructor") &&
-            !vjs.obj.hasOwnProperty.call(obj.constructor.prototype, "isPrototypeOf")) {
+            !vjs.obj.hasOwnProperty.call(obj, 'constructor') &&
+            !vjs.obj.hasOwnProperty.call(obj.constructor.prototype, 'isPrototypeOf')) {
             return false;
         }
     } catch ( e ) {
