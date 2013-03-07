@@ -119,6 +119,15 @@ vjs.obj.copy = function(obj){
 };
 
 /**
+ * Checks whether an object is a Window
+ * @param  {Object} obj Object to check if window
+ * @return {Boolean}    Whether the object is a window
+ */
+ vjs.obj.isWindow = function (obj) {
+    return obj != null && obj == obj.window;
+};
+
+/**
  * Bind (a.k.a proxy or Context). A simple method for changing the context of a function
    It also stores a unique id on the function so it can be easily removed from events
  * @param  {*}   context The object to bind as scope
