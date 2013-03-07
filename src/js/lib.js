@@ -302,7 +302,7 @@ vjs.addClass = function(element, classToAdd){
 vjs.removeClass = function(element, classToRemove){
   if (element.className.indexOf(classToRemove) == -1) { return; }
   var classNames = element.className.split(' ');
-  classNames.splice(classNames.indexOf(classToRemove),1);
+  classNames.splice(vjs.inArray(classNames,classToRemove),1);
   element.className = classNames.join(' ');
 };
 
