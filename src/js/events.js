@@ -166,72 +166,77 @@ vjs.fixEvent = function(event) {
   // with the Javascript Ninja code. So we're just overriding all events now.
   if (!event || !event.isPropagationStopped) {
     var old = event || window.event;
-
+	var newEvent = {};
+	
     // Clone the old object so that we can modify the values event = {};
     for (var prop in old) {
-      event[prop] = old[prop];
+      newEvent[prop] = old[prop];
     }
 
     // The event occurred on this element
-    if (!event.target) {
-      event.target = event.srcElement || document;
+    if (!newEvent.target) {
+      newEvent.target = newEvent.srcElement || document;
     }
 
     // Handle which other element the event is related to
-    event.relatedTarget = event.fromElement === event.target ?
-      event.toElement :
-      event.fromElement;
+    newEvent.relatedTarget = newEvent.fromElement === newEvent.target ?
+      newEvent.toElement :
+      newEvent.fromElement;
 
     // Stop the default browser action
-    event.preventDefault = function () {
-      event.returnValue = false;
-      event.isDefaultPrevented = returnTrue;
+    newEvent.preventDefault = function () {
+      newEvent.returnValue = false;
+      newEvent.isDefaultPrevented = returnTrue;
     };
 
-    event.isDefaultPrevented = returnFalse;
+    newEvent.isDefaultPrevented = returnFalse;
 
     // Stop the event from bubbling
-    event.stopPropagation = function () {
-      event.cancelBubble = true;
-      event.isPropagationStopped = returnTrue;
+    newEvent.stopPropagation = function () {
+      newEvent.cancelBubble = true;
+      newEvent.isPropagationStopped = returnTrue;
     };
 
-    event.isPropagationStopped = returnFalse;
+    newEvent.isPropagationStopped = returnFalse;
 
     // Stop the event from bubbling and executing other handlers
-    event.stopImmediatePropagation = function () {
-      event.isImmediatePropagationStopped = returnTrue;
-      event.stopPropagation();
+    newEvent.stopImmediatePropagation = function () {
+      newEvent.isImmediatePropagationStopped = returnTrue;
+      newEvent.stopPropagation();
     };
 
-    event.isImmediatePropagationStopped = returnFalse;
+    newEvent.isImmediatePropagationStopped = returnFalse;
 
     // Handle mouse position
-    if (event.clientX != null) {
+    if (newEvent.clientX != null) {
       var doc = document.documentElement, body = document.body;
 
-      event.pageX = event.clientX +
+      newEvent.pageX = newEvent.clientX +
         (doc && doc.scrollLeft || body && body.scrollLeft || 0) -
         (doc && doc.clientLeft || body && body.clientLeft || 0);
-      event.pageY = event.clientY +
+      newEvent.pageY = newEvent.clientY +
         (doc && doc.scrollTop || body && body.scrollTop || 0) -
         (doc && doc.clientTop || body && body.clientTop || 0);
     }
 
     // Handle key presses
-    event.which = event.charCode || event.keyCode;
+    newEvent.which = newEvent.charCode || newEvent.keyCode;
 
     // Fix button for mouse clicks:
     // 0 == left; 1 == middle; 2 == right
-    if (event.button != null) {
-      event.button = (event.button & 1 ? 0 :
-        (event.button & 4 ? 1 :
-          (event.button & 2 ? 2 : 0)));
+    if (newEvent.button != null) {
+      newEvent.button = (newEvent.button & 1 ? 0 :
+        (newEvent.button & 4 ? 1 :
+          (newEvent.button & 2 ? 2 : 0)));
     }
   }
 
   // Returns fixed-up instance
+    return newEvent;
+  } else {
+
   return event;
+  }
 };
 
 /**
