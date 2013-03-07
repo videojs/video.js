@@ -29,9 +29,31 @@ vjs.ControlBar = function(player, options){
   goog.base(this, player, options);
 
   player.one('play', vjs.bind(this, function(){
+    var touchstart;
+
     this.fadeIn();
     this.player_.on('mouseover', vjs.bind(this, this.fadeIn));
     this.player_.on('mouseout', vjs.bind(this, this.fadeOut));
+
+    touchstart = false;
+    this.player_.on('touchstart', function() {
+      touchstart = true;
+    });
+    this.player_.on('touchmove', function() {
+      touchstart = false;
+    });
+    this.player_.on('touchend', vjs.bind(this, function() {
+      var idx;
+      if (touchstart) {
+        idx = this.el().className.search('fade-in');
+          if (idx !== -1) {
+            this.fadeOut();
+          } else {
+            this.fadeIn();
+          }
+      }
+      touchstart = false;
+    }));
   }));
 };
 goog.inherits(vjs.ControlBar, vjs.Component);
