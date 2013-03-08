@@ -68,6 +68,9 @@ vjs.Html5.prototype.createEl = function(){
         className:'vjs-tech'
       });
     }
+    // associate the player with the new tag
+    el['player'] = player;
+
     vjs.insertFirst(el, player.el());
   }
 

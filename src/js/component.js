@@ -23,7 +23,7 @@ vjs.Component = function(player, options, ready){
 
   this.name_ = options['name'] || null;
 
-  // Create element if one wasn't provided in potions
+  // Create element if one wasn't provided in options
   this.el_ = options['el'] || this.createEl();
 
   this.children_ = [];
