@@ -33,5 +33,5 @@ test('should re-link the player if the tech is moved', function(){
   };
   tech.createEl();
 
-  strictEqual(player, tech.el().player);
+  strictEqual(player, tech.el()['player']);
 });
