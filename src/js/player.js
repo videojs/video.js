@@ -169,11 +169,11 @@ vjs.Player.prototype.createEl = function(){
   // Default state of video is paused
   this.addClass('vjs-paused');
 
-  // Make box use width/height of tag, or default 300x150
+  // Make box use width/height of tag, or rely on default implementation
   // Enforce with CSS since width/height attrs don't work on divs
   this.width(this.options_['width'], true); // (true) Skip resize listener on load
   this.height(this.options_['height'], true);
-
+  
   // Wrap video tag in div (el/box) container
   if (tag.parentNode) {
     tag.parentNode.insertBefore(el, tag);
@@ -220,7 +220,7 @@ vjs.Player.prototype.loadTech = function(techName, source){
   };
 
   // Grab tech-specific options from player options and add source and parent element to use.
-  var techOptions = vjs.obj.merge({ source: source, parentEl: this.el_ }, this.options_[techName.toLowerCase()]);
+  var techOptions = vjs.obj.merge({ 'source': source, 'parentEl': this.el_ }, this.options_[techName.toLowerCase()]);
 
   if (source) {
     if (source.src == this.cache_.src && this.cache_.currentTime > 0) {

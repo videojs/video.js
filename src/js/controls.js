@@ -786,6 +786,18 @@ vjs.SeekHandle.prototype.createEl = function(){
  */
 vjs.VolumeControl = function(player, options){
   goog.base(this, player, options);
+
+  // hide volume controls when they're not supported by the current tech
+  if (player.tech && player.tech.features.volumeControl === false) {
+    this.hide();
+  }
+  player.on('loadstart', vjs.bind(this, function(){
+    if (player.tech.features.volumeControl === false) {
+      this.hide();
+    } else {
+      this.show();
+    }
+  }));
 };
 goog.inherits(vjs.VolumeControl, vjs.Component);
 
@@ -903,6 +915,18 @@ vjs.MuteToggle = function(player, options){
   goog.base(this, player, options);
 
   player.on('volumechange', vjs.bind(this, this.update));
+
+  // hide mute toggle if the current tech doesn't support volume control
+  if (player.tech && player.tech.features.volumeControl === false) {
+    this.hide();
+  }
+  player.on('loadstart', vjs.bind(this, function(){
+    if (player.tech.features.volumeControl === false) {
+      this.hide();
+    } else {
+      this.show();
+    }
+  }));
 };
 goog.inherits(vjs.MuteToggle, vjs.Button);
 
@@ -969,17 +993,22 @@ vjs.PosterImage = function(player, options){
 goog.inherits(vjs.PosterImage, vjs.Button);
 
 vjs.PosterImage.prototype.createEl = function(){
-  var el = vjs.createEl('img', {
-    className: 'vjs-poster',
-
-    // Don't want poster to be tabbable.
-    tabIndex: -1
-  });
-
-  // src throws errors if no poster was defined.
-  if (this.player_.poster()) {
-    el.src = this.player_.poster();
+  var el = vjs.createEl('div', {
+        className: 'vjs-poster',
+        
+        // Don't want poster to be tabbable.
+        tabIndex: -1
+      }),
+      poster = this.player_.poster();
+  
+  if (poster) {
+    if ('backgroundSize' in el.style) {
+      el.style.backgroundImage = 'url("' + poster + '")';
+    } else {
+      el.appendChild(vjs.createEl('img', { src: poster }));
+    }
   }
+  
   return el;
 };
 

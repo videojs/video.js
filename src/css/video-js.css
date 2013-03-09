@@ -45,10 +45,22 @@ body.vjs-full-window {
 
 /* Poster Styles */
 .vjs-poster {
-  margin: 0 auto; padding: 0; cursor: pointer;
-
-  /* Scale with the size of the player div. Works when poster is vertically shorter, but stretches when it's less wide. */
-  position: relative; width: 100%; max-height: 100%;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  background-size: contain;
+  cursor: pointer;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  width: 100%;
+}
+.vjs-poster img {
+  display: block;
+  margin: 0 auto;
+  max-height: 100%;
+  padding: 0;
+  width: 100%;
 }
 
 /* Text Track Styles */
@@ -330,7 +342,7 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 ---------------------------------------------------------*/
 .vjs-default-skin .vjs-big-play-button {
   display: block; /* Start hidden */ z-index: 2;
-  position: absolute; top: 50%; left: 50%; width: 8.0em; height: 8.0em; margin: -42px 0 0 -42px; text-align: center; vertical-align: center; cursor: pointer !important;
+  position: absolute; top: 50%; left: 50%; width: 8.0em; height: 8.0em; margin: -42px 0 0 -42px; text-align: center; vertical-align: middle; cursor: pointer !important;
   border: 0.2em solid #fff; opacity: 0.95;
   -webkit-border-radius: 25px; -moz-border-radius: 25px; border-radius: 25px;
 
