@@ -184,4 +184,9 @@ test('should change the width and height of a component', function(){
 
   comp.width(321);
   ok(comp.width() === 321, 'integer values working');
+
+  comp.width('auto');
+  comp.height('auto');
+  ok(comp.width() === 1000, 'forced width was removed');
+  ok(comp.height() === 0, 'forced height was removed');
 });

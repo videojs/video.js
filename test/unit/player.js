@@ -155,6 +155,14 @@ test('should set the width and height of the player', function(){
   player.dispose();
 });
 
+test('should not force width and height', function() {
+  var player = PlayerTest.makePlayer({ width: 'auto', height: 'auto' });
+  ok(player.el().style.width === '', 'Width is not forced');
+  ok(player.el().style.height === '', 'Height is not forced');
+  
+  player.dispose();
+});
+
 test('should accept options from multiple sources and override in correct order', function(){
   var tag = PlayerTest.makeTag();
   var container = document.createElement('div');
