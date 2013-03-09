@@ -618,6 +618,8 @@ vjs.Component.prototype.dimension = function(widthOrHeight, num, skipListeners){
     // Check if using css width/height (% or px) and adjust
     if ((''+num).indexOf('%') !== -1 || (''+num).indexOf('px') !== -1) {
       this.el_.style[widthOrHeight] = num;
+    } else if (num === 'auto') {
+      this.el_.style[widthOrHeight] = '';
     } else {
       this.el_.style[widthOrHeight] = num+'px';
     }
