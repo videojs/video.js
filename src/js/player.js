@@ -483,6 +483,7 @@ vjs.Player.prototype.play = function(){
 
 // http://dev.w3.org/html5/spec/video.html#dom-media-pause
 vjs.Player.prototype.pause = function(){
+  this.trigger(type:'showBigPlayButton', target: this.el_});
   this.techCall('pause');
   return this;
 };
