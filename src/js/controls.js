@@ -612,7 +612,8 @@ vjs.Slider.prototype.calculateDistance = function(event){
   var box = this.el_,
       boxX = vjs.findPosX(box),
       boxW = box.offsetWidth,
-      handle = this.handle;
+      handle = this.handle,
+      pageX = event.pageX;
 
   if (handle) {
     var handleW = handle.el().offsetWidth;
@@ -622,8 +623,12 @@ vjs.Slider.prototype.calculateDistance = function(event){
     boxW = boxW - handleW;
   }
 
+  if (pageX === 0 && event.changedTouches) {
+    pageX = event.changedTouches[0].pageX;
+  }
+
   // Percent that the click is through the adjusted area
-  return Math.max(0, Math.min(1, (event.pageX - boxX) / boxW));
+  return Math.max(0, Math.min(1, (pageX - boxX) / boxW));
 };
 
 vjs.Slider.prototype.onFocus = function(){
