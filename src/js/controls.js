@@ -521,6 +521,8 @@ vjs.Slider = function(player, options){
     // this.player_.one('timeupdate', vjs.bind(this, this.update));
 
     player.ready(vjs.bind(this, this.update));
+
+    this.boundEvents = {};
 };
 goog.inherits(vjs.Slider, vjs.Component);
 
@@ -540,20 +542,23 @@ vjs.Slider.prototype.onMouseDown = function(event){
   event.preventDefault();
   vjs.blockTextSelection();
 
-  vjs.on(document, 'mousemove', vjs.bind(this, this.onMouseMove));
-  vjs.on(document, 'mouseup', vjs.bind(this, this.onMouseUp));
-  vjs.on(document, 'touchmove', vjs.bind(this, this.onMouseMove));
-  vjs.on(document, 'touchend', vjs.bind(this, this.onMouseUp));
+  this.boundEvents.move = vjs.bind(this, this.onMouseMove);
+  this.boundEvents.end = vjs.bind(this, this.onMouseUp);
+
+  vjs.on(document, 'mousemove', this.boundEvents.move);
+  vjs.on(document, 'mouseup', this.boundEvents.end);
+  vjs.on(document, 'touchmove', this.boundEvents.move);
+  vjs.on(document, 'touchend', this.boundEvents.end);
 
   this.onMouseMove(event);
 };
 
 vjs.Slider.prototype.onMouseUp = function() {
   vjs.unblockTextSelection();
-  vjs.off(document, 'mousemove', this.onMouseMove, false);
-  vjs.off(document, 'mouseup', this.onMouseUp, false);
-  vjs.off(document, 'touchmove', this.onMouseMove, false);
-  vjs.off(document, 'touchend', this.onMouseUp, false);
+  vjs.off(document, 'mousemove', this.boundEvents.move, false);
+  vjs.off(document, 'mouseup', this.boundEvents.end, false);
+  vjs.off(document, 'touchmove', this.boundEvents.move, false);
+  vjs.off(document, 'touchend', this.boundEvents.end, false);
 
   this.update();
 };
