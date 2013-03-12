@@ -29,15 +29,28 @@ vjs.ControlBar = function(player, options){
   goog.base(this, player, options);
 
   player.one('play', vjs.bind(this, function(){
-    var touchstart;
+    var touchstart,
+      fadeIn = vjs.bind(this, this.fadeIn),
+      fadeOut = vjs.bind(this, this.fadeOut),
+      mouseOff = vjs.bind(this, function() {
+        this.player_.off('mouseover', fadeIn);
+        this.player_.off('mouseout', fadeIn);
+        mouseOff = null;
+      });
 
     this.fadeIn();
-    this.player_.on('mouseover', vjs.bind(this, this.fadeIn));
-    this.player_.on('mouseout', vjs.bind(this, this.fadeOut));
+
+    if ( !('ontouchstart' in window) ) {
+      this.player_.on('mouseover', fadeIn);
+      this.player_.on('mouseout', fadeOut);
+    }
 
     touchstart = false;
     this.player_.on('touchstart', function() {
       touchstart = true;
+      if (mouseOff) {
+        mouseOff();
+      }
     });
     this.player_.on('touchmove', function() {
       touchstart = false;
@@ -300,7 +313,6 @@ vjs.BigPlayButton = function(player, options){
     this.hide();
 
     player.on('showBigPlayButton', vjs.bind(this, function(event) {
-      console.log(event);
       this.show();
     }));
   }));
