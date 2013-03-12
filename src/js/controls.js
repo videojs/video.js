@@ -42,7 +42,7 @@ vjs.ControlBar = function(player, options){
     this.player_.on('touchmove', function() {
       touchstart = false;
     });
-    this.player_.on('touchend', vjs.bind(this, function() {
+    this.player_.on('touchend', vjs.bind(this, function(event) {
       var idx;
       if (touchstart) {
         idx = this.el().className.search('fade-in');
@@ -53,6 +53,8 @@ vjs.ControlBar = function(player, options){
           }
       }
       touchstart = false;
+
+      event.preventDefault();
     }));
   }));
 };
@@ -103,6 +105,22 @@ vjs.ControlBar.prototype.lockShowing = function(){
  */
 vjs.Button = function(player, options){
   goog.base(this, player, options);
+
+    var touchstart = false;
+    this.on('touchstart', function() {
+      touchstart = true;
+    });
+    this.on('touchmove', function() {
+      touchstart = false;
+    });
+    var self = this;
+    this.on('touchend', function(event) {
+      if (touchstart) {
+        self.onClick(event);
+      }
+      event.preventDefault();
+      event.stopPropagation();
+    });
 
   this.on('click', this.onClick);
   this.on('focus', this.onFocus);
