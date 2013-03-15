@@ -5,16 +5,7 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
 
     build: {
-      src: 'src/js/dependencies.js',
-      options: {
-        baseDir: 'src/js/'
-      }
-    },
-    deps: {
-      src: 'src/js/dependencies.js',
-      options: {
-        baseDir: 'src/js/'
-      }
+      source:{}
     },
     clean: {
       build: ['build/files/*'],
@@ -58,6 +49,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
+
+  grunt.loadTasks('./build/contributor-flow/tasks');
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'build', 'minify', 'dist']);
