@@ -102,7 +102,7 @@ module.exports = function(grunt) {
     var upstreamOwner, baseBranchName;
 
     options = options || {};
-    upstreamOwner = options.upstreamOwner || 'heff2';
+    upstreamOwner = options.upstreamOwner || 'zencoder';
     baseBranchName = options.baseBranchName || 'master';
 
     Feature.getBranchName(featureName, {}, function(err, branchName){
