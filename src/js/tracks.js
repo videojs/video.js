@@ -766,6 +766,7 @@ vjs.OffTextTrackMenuItem = function(player, options){
     mode: function(){ return false; }
   };
   goog.base(this, player, options);
+  this.selected(true);
 };
 goog.inherits(vjs.OffTextTrackMenuItem, vjs.TextTrackMenuItem);
 
