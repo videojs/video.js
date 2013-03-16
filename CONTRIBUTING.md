@@ -1,17 +1,19 @@
-So you're telling me you want to spend some of your precious time giving back to this humble project? You're crazy. But since you're here...there are some ways you can help make Video.js a faster, easier, more compatible, and more fully-featured video player.
+If you're on this page, you must be interested in spending some time giving back to this humble project. If that's the case, fantastic! Here are some ways you can help make Video.js a faster, easier, more compatible, and more fully-featured video player.
 
   * Bug reports and fixes
-  * Features and changes (pull requests)
+  * Features and changes
   * [Answer questions](http://stackoverflow.com/questions/tagged/video.js) on Stack Overflow
   * Other Video.js projects
 
-Don't miss the [code style guide](#code-style).
+Thanks again for helping out! One thing we ask is that you refer to the [code style guide](#code-style) when writing your code.
 
 # Getting started
 
-1. [Download and install Node.js](http://nodejs.org/download/). Video.js uses Node for build and test automation.
+1. [Download and install Node.js](http://nodejs.org/download/). Video.js uses Node for build and test automation. Node is available for Windows, Mac OS X, Linux, and SunOS, as well as source code, in case you want to build it yourself.
 
-2. [Fork](http://help.github.com/fork-a-repo/) and clone the video.js git repository.
+2. Fork the video.js git repository. At the top of every github page, there is a Fork button. Click it, and the forking process will copy Video.js into your organization. You can find more information on [Forking a Github repository](http://help.github.com/fork-a-repo/) here.
+
+3. Clone your copy of video.js to your local workstation.
 
   ```bash
   # Clones your fork of the repo into the current directory in terminal
@@ -29,124 +31,132 @@ Don't miss the [code style guide](#code-style).
   git pull upstream master
   ```
 
-3. Install the grunt-cli package so that you will have the correct version of grunt available from any project that needs it. This should be done as a global install:
+4. Install the grunt-cli package so that you will have the correct version of grunt available from any project that needs it. This should be done as a global install:
 
+  On Unix-based systems, you'll have to do this as a superuser:
+  ```bash
+  sudo npm install -g grunt-cli
+  ```
+  On Windows, you can just run:
   ```bash
   npm install -g grunt-cli
   ```
 
-4. Install required node.js modules using node package manager.
+5. Install required node.js modules using node package manager.
 
+  You do not need to install these modules as a superuser, so for all platforms run:
   ```bash
   npm install
   ```
 
-5. Build a local copy. Video.js uses [grunt](http://gruntjs.com), a node-based task automation tool for building and tesing. The following will compile a local copy in the dist/ directory and run tests. It will also create a sourcelist.js file that can be used to load the video.js source scripts in a page.
+6. Build a local copy and run the current suite of tests. Video.js uses [grunt](http://gruntjs.com), a node-based task automation tool for building and tesing. 
+
+The following will compile a local copy in the dist/ directory and run tests. It will also create a sourcelist.js file that can be used to load the video.js source scripts in a page.
 
   ```bash
   grunt
   ```
-
-6. When you're ready to add a feature, make a change, or fix a bug, first create a new branch for it. Prefix the branch with the correspoding [issue number](https://github.com/zencoder/video-js/issues). If there isn't one, submit a new issue. Anything more complicated than simple docs changes should have an issue.
-
+To run the QUnit test suite, run:
   ```bash
-  git checkout -b <####-branch-name>
+  grunt test
   ```
 
-Be sure to reference your issue in any commit message. Github allows you to do this though the [fixes or closes](https://github.com/blog/831-issues-2-0-the-next-generation) keywords.
+7. Depending on whether you're adding something new, making a change or fix a bug, you'll want to do some up-front preparation.
+   * If you're fixing a bug, submit an issue for it. If you're fixing an existing bug, claim it by adding a comment to it. This will give a heads-up to anyone watching the issue that you're working on a fix. Please refer to the [Bugs](#bugs) section below for guidelines on filing new issues.
+   * Create a new branch for your work.
+
+   * If you're adding new functionality instead, you only need to create a new branch for your work. When you submit a Pull Request, Github automatically opens a new issue to track it.
+
+Since the issue filing process is described elsewhere, let's assume that you've filed or claimed the issue already.
+
+Next, create the branch:
+  ```bash
+  git checkout -b <issue####-aditional-branch-info>
+  ```
+Prefix the branch with the corresponding [issue number](https://github.com/zencoder/video-js/issues). Add as much additional information after that as you think is appropriate to remain concise yet informative.
+
+8. Thoroughly test your feature or fix. If you're fixing a bug, we recommend in addition to testing the fix itself, to do some testing around the areas that your fix has touched. For example, a brief smoketest of the player never hurts.
+
+9. Commit your feature or fix locally.
+
+Be sure to reference your issue in any commit message. Github allows you to do this though the [fixes](https://github.com/blog/831-issues-2-0-the-next-generation) keyword.
 
   ```bash
-  My commit message. fixes #123
+  My commit message. fixes issue#123
+  Testing:
+  (briefly describe any testing here, for example, 'unit tests and cross-browser manual tests around playback and network interruption')
   ```
+10. Submit a [Pull Request](#pull-requests).
 
 # Bugs
 
-A bug is a _demonstrable problem_ that is caused by the code in the
-repository. Good bug reports are extremely helpful - thank you!
+**A bug is a demonstrable problem** that is caused by the code in the repository. Good bug reports are extremely helpful. Thank You!
 
 Guidelines for bug reports:
 
-1. **Use the [GitHub issue search](https://github.com/zencoder/video-js/issues)** &mdash; check if the issue has already been reported.
+1. Use the [GitHub issue search](https://github.com/zencoder/video-js/issues) &mdash; check if the issue has already been reported.
 
-2. **Check if the issue has been fixed** &mdash; try to reproduce it using the latest `master` branch in the repository.
+2. Check if the issue has been fixed &mdash; try to reproduce it using the latest `master` branch in the repository.
 
-3. **Isolate the problem** &mdash; ideally create a [reduced test
-   case](http://css-tricks.com/6263-reduced-test-cases/) and a live example.
+3. Isolate the problem &mdash; ideally create a [reduced test case](http://css-tricks.com/6263-reduced-test-cases/) and a live example.
 
-A good bug report shouldn't leave others needing to chase you up for more information. Please try to be as detailed as possible in your report. What is your environment? What steps will reproduce the issue? What browser(s), OS, and devices experience the problem? What would you expect to be the outcome? All these
-details will help people to fix any potential bugs.
+A good bug report should be as detailed as possible, so that others won't have to follow up for the essential details.
 
-Example:
+Here's an example:
 
-> Short and descriptive example bug report title
+> Short yet concise Bug Summary
 >
-> A summary of the issue and the browser/OS environment in which it occurs. If
-> suitable, include the steps required to reproduce the bug.
+> Description
+> Happens on Windows 7 and OSX. Seen with IE9, Firefox 19 OSX, Chrome 21, Flash 11.6 and 11.2
 >
 > 1. This is the first step
 > 2. This is the second step
 > 3. Further steps, etc.
 >
-> `<url>` (a link to the reduced test case)
+> Expected:
+> (describe the expected outcome of the steps above)
+>
+> Actual:
+> (describe what actually happens)
+>
+> `<url>` (a link to the reduced test case, if it exists)
 >
 > Any other information you want to share that is relevant to the issue being
 > reported. This might include the lines of code that you have identified as
 > causing the bug, and potential solutions (and your opinions on their
 > merits).
 
-**[File a bug report](https://github.com/h5bp/html5-boilerplate/issues/)**
+**[File a bug report](https://github.com/zencoder/video-js/issues/new)**
 
-### NOTE: Testing Flash Locall in Chrome
-Chrome 21+ (as of 2013/01/01) doens't run Flash files that are local and loaded into a locally accessed page (file:///). To get around this you need to [disable the version of Flash](http://helpx.adobe.com/flash-player/kb/flash-player-google-chrome.html#How_can_I_run_debugger_or_alternate_versions_of_Flash_Player_in_Google_Chrome) included with Chrome and enable a system-wide version of Flash.
-
+### NOTE: Testing Flash Locally in Chrome
+Chrome 21+ (as of 2013/01/01) doens't run Flash files that are local and loaded into a locally accessed page (file:///).
+To get around this you can do either of the following:
+1. Do your development and testing using a local HTTP server.
+2. [Disable the version of Flash included with Chrome](http://helpx.adobe.com/flash-player/kb/flash-player-google-chrome.html#How_can_I_run_debugger_or_alternate_versions_of_Flash_Player_in_Google_Chrome) and enable a system-wide version of Flash instead.
 
 ## Pull requests
 
-Good pull requests - patches, improvements, new features - are a fantastic help. They should remain focused in scope and avoid containing unrelated commits. If your contribution involves a significant amount of work or substantial changes to any part of the project, please open an issue to discuss it first.
+Good pull requests - bug fixes, improvements, new features - are a fantastic help. They should remain focused in scope and avoid containing unrelated commits. If your contribution involves a significant amount of work or substantial changes to any part of the project, please open an issue to discuss it first.
 
 Make sure to adhere to the coding conventions used throughout a project (indentation, accurate comments, etc.). Please update any documentation that is relevant to the change you're making.
 
 Please follow this process; it's the best way to get your work included in the project:
 
-1. [Fork](http://help.github.com/fork-a-repo/) the project, clone your fork, and configure the remotes:
+1. Commit your changes in logical chunks. Please adhere to these [git commit message guidelines](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) or your pull request is unlikely be merged into the main project. Use git's [interactive rebase](https://help.github.com/articles/interactive-rebase) feature to tidy up your commits before making them public.
 
-   ```bash
-   # Clones your fork of the repo into the current directory in terminal
-   git clone https://github.com/<your-username>/html5-boilerplate.git
-   # Navigate to the newly cloned directory
-   cd html5-boilerplate
-   # Assigns the original repo to a remote called "upstream"
-   git remote add upstream https://github.com/h5bp/html5-boilerplate.git
-   ```
-
-2. If you cloned a while ago, get the latest changes from upstream:
-
-   ```bash
-   git checkout master
-   git pull upstream master
-   ```
-
-3. Create a new topic branch to contain your feature, change, or fix:
-
-   ```bash
-   git checkout -b <topic-branch-name>
-   ```
-
-4. Commit your changes in logical chunks. Please adhere to these [git commit message guidelines](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) or your pull request is unlikely be merged into the main project. Use git's [interactive rebase](https://help.github.com/articles/interactive-rebase) feature to tidy up your commits before making them public.
-
-5. Locally merge (or rebase) the upstream development branch into your topic branch:
+2. Locally merge (or rebase) the upstream development branch into your topic branch:
 
    ```bash
    git pull [--rebase] upstream master
    ```
 
-6. Push your topic branch up to your fork:
+3. Push your topic branch up to your fork:
 
    ```bash
    git push origin <topic-branch-name>
    ```
 
-10. [Open a Pull Request](http://help.github.com/send-pull-requests/) with a clear title and description.
+4. [Open a Pull Request](http://help.github.com/send-pull-requests/) with a clear title and description.
 
 # Code Style
 Please follow [Google's JavaScript Style Guide](http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml) to the letter. If your editor supports [.editorconfig](http://editorconfig.org/#download) it will make it easier to manage differences from your own coding style.
