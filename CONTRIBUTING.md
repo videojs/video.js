@@ -51,35 +51,35 @@ Thanks again for helping out! One thing we ask is that you refer to the [code st
 
 6. Build a local copy and run the current suite of tests. Video.js uses [grunt](http://gruntjs.com), a node-based task automation tool for building and tesing. 
 
-The following will compile a local copy in the dist/ directory and run tests. It will also create a sourcelist.js file that can be used to load the video.js source scripts in a page.
+  The following will compile a local copy in the dist/ directory and run tests. It will also create a sourcelist.js file that can be used to load the video.js source scripts in a page.
 
   ```bash
   grunt
   ```
-To run the QUnit test suite, run:
+  To run the QUnit test suite, run:
   ```bash
   grunt test
   ```
 
 7. Depending on whether you're adding something new, making a change or fix a bug, you'll want to do some up-front preparation.
-   * If you're fixing a bug, submit an issue for it. If you're fixing an existing bug, claim it by adding a comment to it. This will give a heads-up to anyone watching the issue that you're working on a fix. Please refer to the [Bugs](#bugs) section below for guidelines on filing new issues.
-   * Create a new branch for your work.
+   1. If you're fixing a bug, submit an issue for it. If you're fixing an existing bug, claim it by adding a comment to it. This will give a heads-up to anyone watching the issue that you're working on a fix. Please refer to the [Bugs](#bugs) section below for guidelines on filing new issues.
+   2. Create a new branch for your work.
 
-   * If you're adding new functionality instead, you only need to create a new branch for your work. When you submit a Pull Request, Github automatically opens a new issue to track it.
+   If you're adding new functionality instead, you only need to create a new branch for your work. When you submit a Pull Request, Github automatically opens a new issue to track it.
 
-Since the issue filing process is described elsewhere, let's assume that you've filed or claimed the issue already.
+  Since the issue filing process is described elsewhere, let's assume that you've filed or claimed the issue already.
 
-Next, create the branch:
+  Next, create the branch:
   ```bash
   git checkout -b <issue####-aditional-branch-info>
   ```
-Prefix the branch with the corresponding [issue number](https://github.com/zencoder/video-js/issues). Add as much additional information after that as you think is appropriate to remain concise yet informative.
+  Prefix the branch with the corresponding [issue number](https://github.com/zencoder/video-js/issues). Add as much additional information after that as you think is appropriate to remain concise yet informative.
 
 8. Thoroughly test your feature or fix. If you're fixing a bug, we recommend in addition to testing the fix itself, to do some testing around the areas that your fix has touched. For example, a brief smoketest of the player never hurts.
 
 9. Commit your feature or fix locally.
 
-Be sure to reference your issue in any commit message. Github allows you to do this though the [fixes](https://github.com/blog/831-issues-2-0-the-next-generation) keyword.
+  Be sure to reference your issue in any commit message. Github allows you to do this though the [fixes](https://github.com/blog/831-issues-2-0-the-next-generation) keyword.
 
   ```bash
   My commit message. fixes issue#123
