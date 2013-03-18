@@ -2,10 +2,10 @@ var branch = {};
 var shell = require('./shell.js');
 var log = require('./log.js').log;
 // Set up the Github connection for pull requests
-var GithubAPI = require("github");
+var GithubAPI = require('github');
 var github = new GithubAPI({
     // required
-    version: "3.0.0",
+    version: '3.0.0',
     // optional
     timeout: 5000
 });
@@ -13,7 +13,6 @@ var github = new GithubAPI({
 branch.parseName = function(name){
   var match, changeType, changeName, owner, ownerBranchName, tempName;
 
-  options = options || {};
   tempName = name;
 
   match = tempName.match(/([^_]+)_(.*)/);
@@ -52,7 +51,7 @@ branch.current = function(options, callback){
       return callback('You are not in a ' + options.changeType + ' branch');
     }
 
-    callback(null, branchInfo);
+    callback(null, info);
   });
 };
 
@@ -75,7 +74,7 @@ branch.update = function(name, options, callback){
   var cmd = 'git checkout '+name+' && git pull';
 
   if (options.upstream === true) {
-    message += ' with upstream changes'
+    message += ' with upstream changes';
     cmd += ' upstream '+name;
   }
 

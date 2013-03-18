@@ -1,11 +1,12 @@
 // Set up the Github connection for pull requests
-var GithubAPI = require("github");
+var GithubAPI = require('github');
 var github = new GithubAPI({
     // required
-    version: "3.0.0",
+    version: '3.0.0',
     // optional
     timeout: 5000
 });
+var prompt = require('prompt');
 
 var PR = {};
 

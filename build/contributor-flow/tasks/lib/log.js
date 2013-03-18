@@ -9,6 +9,6 @@ log.log = function(str, options) {
   }
 
   grunt.log.writeln(str);
-}
+};
 
 module.exports = log;
