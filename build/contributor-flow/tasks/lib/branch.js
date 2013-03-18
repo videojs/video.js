@@ -1,6 +1,6 @@
 var branch = {};
 var shell = require('./shell.js');
-var log = require('./log.js').log;
+var log = require('./log.js');
 // Set up the Github connection for pull requests
 var GithubAPI = require('github');
 var github = new GithubAPI({

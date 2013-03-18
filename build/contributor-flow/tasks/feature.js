@@ -4,7 +4,7 @@
   module.exports = function(grunt) {
     var prompt = require('prompt');
     var branch = require('./lib/branch');
-    var log = require('./lib/log').log;
+    var log = require('./lib/log');
     var shell = require('./lib/shell');
     var pullRequest = require('./lib/pullrequest');
 

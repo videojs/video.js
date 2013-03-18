@@ -1,14 +1,9 @@
-var log = {};
-var grunt = require('grunt');
-
-log.log = function(str, options) {
+module.exports = function log(str, options) {
   options = options || {};
 
   if (options.arrow !== false) {
-    str = '-----> '+str;
+    str = '-----> ' + str;
   }
 
-  grunt.log.writeln(str);
+  console.log(str + '\n');
 };
-
-module.exports = log;

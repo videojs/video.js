@@ -1,5 +1,5 @@
 var shell = {};
-var log = require('./log.js').log;
+var log = require('./log.js');
 
 var exec = require('child_process').exec;
 var grunt = require('grunt');
