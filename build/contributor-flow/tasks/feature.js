@@ -199,7 +199,7 @@ module.exports = function(grunt) {
               url: gitUrl + ' ' + branchName
             }, function(err){
               grunt.task.run('test');
-              if (!err) { log('Feature copied into your local repo'); }
+              if (!err) { log(branchName + ' copied into your local repo'); }
               callback(err);
             });
           });

@@ -10,40 +10,49 @@ var github = new GithubAPI({
     timeout: 5000
 });
 
+branch.parseName = function(name){
+  var match, changeType, changeName, owner, ownerBranchName, tempName;
+
+  options = options || {};
+  tempName = name;
+
+  match = tempName.match(/([^_]+)_(.*)/);
+  if (match) {
+    owner = match[1];
+    ownerBranchName = match[2];
+    tempName = ownerBranchName;
+  }
+
+  match = tempName.match(/([^\/]+)\/(.*)/);
+  if (match) {
+    changeType = match[1];
+    changeName = match[2];
+  }
+
+  return {
+    name: name,
+    changeType: changeType,
+    changeName: changeName,
+    owner: owner,
+    ownerBranchName: ownerBranchName
+  };
+};
+
 branch.current = function(options, callback){
-  var name, match, type, change, owner, ownerBranchName, tempName;
+  var name, info;
   options = options || {};
 
   shell.run('git rev-parse --abbrev-ref HEAD', { logging: false }, function(err, stdout){
     if (err) { return callback(err); }
 
     name = stdout.replace('\n', '');
-    tempName = name;
+    info = branch.parseName(name);
 
-    match = tempName.match(/([^_]+)_(.*)/);
-    if (match) {
-      owner = match[1];
-      ownerBranchName = match[2];
-      tempName = ownerBranchName;
+    if (options.changeType && options.changeType !== info.changeType) {
+      return callback('You are not in a ' + options.changeType + ' branch');
     }
 
-    match = tempName.match(/([^\/]+)\/(.*)/);
-    if (match) {
-      type = match[1];
-      change = match[2];
-    }
-
-    if (options.changeType && options.changeType !== type) {
-      return callback('You are not in a '+options.type+' branch');
-    }
-
-    callback(null, {
-      name: stdout.replace('\n', ''),
-      changeType: type,
-      changeName: change,
-      owner: owner,
-      ownerBranchName: ownerBranchName
-    });
+    callback(null, branchInfo);
   });
 };
 
