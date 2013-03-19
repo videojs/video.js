@@ -51,11 +51,11 @@ vjs.ControlBar = function(player, options){
       var idx;
       if (touchstart) {
         idx = this.el().className.search('fade-in');
-          if (idx !== -1) {
-            this.fadeOut();
-          } else {
-            this.fadeIn();
-          }
+        if (idx !== -1) {
+          this.fadeOut();
+        } else {
+          this.fadeIn();
+        }
       }
       touchstart = false;
 
