@@ -49,6 +49,11 @@ Thanks again for helping out! One thing we ask is that you refer to the [code st
   npm install
   ```
 
+  A note to Windows developers: If you run npm commands, and you find that your command prompt colors have suddenly reversed, you can configure npm to set color to false to prevent this from happening.
+  ```bash
+  npm config set color false
+  ```
+  Note that this change takes effect when a new command prompt window is opened; the current window will not be affected.
 6. Build a local copy and run the current suite of tests. Video.js uses [grunt](http://gruntjs.com), a node-based task automation tool for building and tesing. 
 
 The following will compile a local copy in the dist/ directory and run tests. It will also create a sourcelist.js file that can be used to load the video.js source scripts in a page.
