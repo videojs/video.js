@@ -31,12 +31,7 @@ vjs.ControlBar = function(player, options){
   player.one('play', vjs.bind(this, function(){
     var touchstart,
       fadeIn = vjs.bind(this, this.fadeIn),
-      fadeOut = vjs.bind(this, this.fadeOut),
-      mouseOff = vjs.bind(this, function() {
-        this.player_.off('mouseover', fadeIn);
-        this.player_.off('mouseout', fadeIn);
-        mouseOff = null;
-      });
+      fadeOut = vjs.bind(this, this.fadeOut);
 
     this.fadeIn();
 
@@ -48,9 +43,6 @@ vjs.ControlBar = function(player, options){
     touchstart = false;
     this.player_.on('touchstart', function() {
       touchstart = true;
-      if (mouseOff) {
-        mouseOff();
-      }
     });
     this.player_.on('touchmove', function() {
       touchstart = false;
