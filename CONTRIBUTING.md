@@ -136,7 +136,9 @@ Here's an example:
 ### NOTE: Testing Flash Locally in Chrome
 Chrome 21+ (as of 2013/01/01) doens't run Flash files that are local and loaded into a locally accessed page (file:///).
 To get around this you can do either of the following:
+
 1. Do your development and testing using a local HTTP server.
+
 2. [Disable the version of Flash included with Chrome](http://helpx.adobe.com/flash-player/kb/flash-player-google-chrome.html#How_can_I_run_debugger_or_alternate_versions_of_Flash_Player_in_Google_Chrome) and enable a system-wide version of Flash instead.
 
 ## Pull requests
