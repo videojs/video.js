@@ -16,15 +16,15 @@
 // It is still possible to use the official version of Google Closure instead of
 // the one bundled with video-js for those who want to do that. For /sandbox or
 // /test, use the 'goog-base' query parameter. For builds, pass the
-// --skipBundledClosure argument to grunt. See the getGoogBaseJs() method below.
-// See optPushGoogBase() below for more details.
+// --skipBundledClosure argument to grunt.  See optPushGoogBase() below for more
+// details.
 
-// Pushes the version of goog base.js to load to the given array of source
-// files, pusing nothing if no version should be loaded. In cases when a version
-// is needed, the default will be src/js/goog.base.js bundled with video-js.
+// Pushes onto the given array the correct version of goog base.js to load,
+// pushing nothing if no version should be loaded. 
 //
-// The return value from this method is consistent with a call to Array.push()
+// The return value from this method is consistent with a call to Array.push().
 //
+// --------------------------------------------------
 // When this script is loaded from a browser
 // --------------------------------------------------
 //
@@ -44,8 +44,9 @@
 // considered an error and are simply ignored.
 //
 //
+// --------------------------------------------------
 // When this script is loaded by Gruntfile.js
-// -------------------------------------------------------
+// --------------------------------------------------
 //
 // If the --skipBundledClosure option is passed to grunt then nothing will be
 // pushed into the argument array; otherwise the default will be used. See the

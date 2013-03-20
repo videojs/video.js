@@ -11,12 +11,11 @@ version](https://github.com/zencoder/video-js/blob/master/src/js/goog.base.js)
 of `goog.base.js`, Video.js does not actually use Google Closure, but does need
 to supply a minimal version of the library, if only for the Closure Compiler.
 In theory this can lead to problems for projects using both Video.js and the
-official version of the Google Closure library and tools if the official version
-of `goog/base.js` diverges from the one bundled with Video.js.  In practice it's
-not likely, given the maturity of Google Closure and the centrality of
-`goog/base.js`, but paranoid developers may still want to be sure that they are
-not potentially loading separate and conflicting versions of the Closure Library
-in their pages.
+official version of Google Closure if the official version of `goog/base.js`
+diverges from the one bundled with Video.js.  In practice this isn't likely,
+given the maturity of Google Closure and the centrality there of `goog/base.js`,
+but paranoid developers may still want to be sure that they are not potentially
+loading separate and conflicting versions of the Closure Library in their pages.
 
 Developers that want to work directly with their own distribution of Google
 Closure can do so in 2 ways:
