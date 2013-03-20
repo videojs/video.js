@@ -59,7 +59,9 @@ vjs.ControlBar = function(player, options){
       }
       touchstart = false;
 
-      event.preventDefault();
+      if (!this.player_.paused()) {
+        event.preventDefault();
+      }
     }));
   }));
 };
