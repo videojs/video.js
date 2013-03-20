@@ -87,9 +87,11 @@ module.exports = function(grunt) {
 
     // Allow time for people to update their index.html before they remove these
     grunt.file.write('build/files/sourcelist.js', 'var sourcelist = ["' + sourceFiles.join('","') + '"]');
-    // This plaintext version can be useful for other scripts which need
-    // low-level access to the file list
+    // These versions can be useful for other scripts which need low-level
+    // access to the file list. sourcelist.txt is source paths, one per line;
+    // sourcelist.json is the source paths array as a JSON array
     grunt.file.write('build/files/sourcelist.txt', sourceFiles.join('\n') + '\n');
+    grunt.file.write('build/files/sourcelist.json', JSON.stringify(sourceFiles));
 
     // Create a combined sources file. https://github.com/zencoder/video-js/issues/287
     var combined = '';
