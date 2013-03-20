@@ -646,6 +646,8 @@ vjs.Slider.prototype.calculateDistance = function(event){
     boxW = boxW - handleW;
   }
 
+  // This is done because on Android, event.pageX is always 0 and the actual
+  // values live under the changedTouches array.
   if (pageX === 0 && event.changedTouches) {
     pageX = event.changedTouches[0].pageX;
   }

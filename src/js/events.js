@@ -172,11 +172,6 @@ vjs.fixEvent = function(event) {
       event[prop] = old[prop];
     }
 
-    if (event.changedTouches && event.pageX === 0 && event.pageY === 0) {
-      event.pageX = event.changedTouches[0].pageX;
-      event.pageY = event.changedTouches[0].pageY;
-    }
-
     // The event occurred on this element
     if (!event.target) {
       event.target = event.srcElement || document;
