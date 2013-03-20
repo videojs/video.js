@@ -64,6 +64,6 @@ if (typeof window.JSON !== 'undefined' && window.JSON.parse === 'function') {
               walk({'': j}, '') : j;
       }
 
-      throw new SyntaxError('JSON.parse');
+      throw new SyntaxError('JSON.parse(): invalid or malformed JSON data');
   };
 }
