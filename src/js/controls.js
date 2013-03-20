@@ -301,13 +301,7 @@ vjs.FullscreenToggle.prototype.onClick = function(){
 vjs.BigPlayButton = function(player, options){
   goog.base(this, player, options);
 
-  player.on('play', vjs.bind(this, function() {
-    this.hide();
-
-    player.on('showBigPlayButton', vjs.bind(this, function(event) {
-      this.show();
-    }));
-  }));
+  player.on('play', vjs.bind(this, this.hide));
   // player.on('ended', vjs.bind(this, this.show));
 };
 goog.inherits(vjs.BigPlayButton, vjs.Button);
