@@ -117,7 +117,7 @@ Thanks again for helping out! One thing we ask is that you refer to the [code st
 
   You'll be prompted for title and description for the Pull Request.  After that, your Pull Request will be submitted to video-js.
 
-11. You're Done! (except for cleanup).  And grunt can help with that too!
+11. You're Done! (except for cleanup.)  And grunt can help with that too!
 
   First, checkout your feature or issue branch:
   ```bash
