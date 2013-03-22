@@ -100,7 +100,12 @@ Thanks again for helping out! One thing we ask is that you refer to the [code st
   ```
 10. You can use grunt to submit your [Pull Request](#pull-requests).
 
-  For your new feature:
+  First, checkout your feature or issue branch:
+  ```bash
+  git checkout (branchname)
+  ```
+
+  Next, submit your Pull Request, for your new feature:
   ```bash
   grunt feature:submit
   ```
@@ -112,6 +117,11 @@ Thanks again for helping out! One thing we ask is that you refer to the [code st
   You'll be prompted for title and description for the Pull Request.  After that, your Pull Request will be submitted to video-js.
 
 11. You're Done! (except for cleanup).  And grunt can help with that too!
+
+  First, checkout your feature or issue branch:
+  ```bash
+  git checkout (branchname)
+  ```
 
   To clean up your feature:
   ```bash
