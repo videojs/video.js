@@ -68,12 +68,15 @@ module.exports = function(grunt) {
   var fs = require('fs'),
       gzip = require('zlib').gzip;
 
+  // Call with --skipBundledClosure to generate a source file list without the
+  // bundled file src/js/goog.base.js
   grunt.registerMultiTask('build', 'Building Source', function(){
     /*jshint undef:false, evil:true */
 
     // Loading predefined source order from source-loader.js
     // Trust me, this is the easist way to do it so far.
     var blockSourceLoading = true;
+    var skipBundledClosure = grunt.option( 'skipBundledClosure' );
     eval(grunt.file.read('./build/source-loader.js'));
 
     // Fix windows file path delimiter issue
@@ -82,9 +85,13 @@ module.exports = function(grunt) {
       sourceFiles[i] = sourceFiles[i].replace(/\\/g, '/');
     }
 
-    // grunt.file.write('build/files/sourcelist.txt', sourceList.join(','));
     // Allow time for people to update their index.html before they remove these
     grunt.file.write('build/files/sourcelist.js', 'var sourcelist = ["' + sourceFiles.join('","') + '"]');
+    // These versions can be useful for other scripts which need low-level
+    // access to the file list. sourcelist.txt is source paths, one per line;
+    // sourcelist.json is the source paths array as a JSON array
+    grunt.file.write('build/files/sourcelist.txt', sourceFiles.join('\n') + '\n');
+    grunt.file.write('build/files/sourcelist.json', JSON.stringify(sourceFiles));
 
     // Create a combined sources file. https://github.com/zencoder/video-js/issues/287
     var combined = '';
