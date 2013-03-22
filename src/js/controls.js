@@ -29,9 +29,40 @@ vjs.ControlBar = function(player, options){
   goog.base(this, player, options);
 
   player.one('play', vjs.bind(this, function(){
+    var touchstart,
+      fadeIn = vjs.bind(this, this.fadeIn),
+      fadeOut = vjs.bind(this, this.fadeOut);
+
     this.fadeIn();
-    this.player_.on('mouseover', vjs.bind(this, this.fadeIn));
-    this.player_.on('mouseout', vjs.bind(this, this.fadeOut));
+
+    if ( !('ontouchstart' in window) ) {
+      this.player_.on('mouseover', fadeIn);
+      this.player_.on('mouseout', fadeOut);
+    }
+
+    touchstart = false;
+    this.player_.on('touchstart', function() {
+      touchstart = true;
+    });
+    this.player_.on('touchmove', function() {
+      touchstart = false;
+    });
+    this.player_.on('touchend', vjs.bind(this, function(event) {
+      var idx;
+      if (touchstart) {
+        idx = this.el().className.search('fade-in');
+        if (idx !== -1) {
+          this.fadeOut();
+        } else {
+          this.fadeIn();
+        }
+      }
+      touchstart = false;
+
+      if (!this.player_.paused()) {
+        event.preventDefault();
+      }
+    }));
   }));
 };
 goog.inherits(vjs.ControlBar, vjs.Component);
@@ -81,6 +112,22 @@ vjs.ControlBar.prototype.lockShowing = function(){
  */
 vjs.Button = function(player, options){
   goog.base(this, player, options);
+
+    var touchstart = false;
+    this.on('touchstart', function() {
+      touchstart = true;
+    });
+    this.on('touchmove', function() {
+      touchstart = false;
+    });
+    var self = this;
+    this.on('touchend', function(event) {
+      if (touchstart) {
+        self.onClick(event);
+      }
+      event.preventDefault();
+      event.stopPropagation();
+    });
 
   this.on('click', this.onClick);
   this.on('focus', this.onFocus);
@@ -272,9 +319,9 @@ vjs.BigPlayButton.prototype.createEl = function(){
 vjs.BigPlayButton.prototype.onClick = function(){
   // Go back to the beginning if big play button is showing at the end.
   // Have to check for current time otherwise it might throw a 'not ready' error.
-  if(this.player_.currentTime()) {
-    this.player_.currentTime(0);
-  }
+  //if(this.player_.currentTime()) {
+    //this.player_.currentTime(0);
+  //}
   this.player_.play();
 };
 
@@ -482,6 +529,7 @@ vjs.Slider = function(player, options){
     player.on(this.playerEvent, vjs.bind(this, this.update));
 
     this.on('mousedown', this.onMouseDown);
+    this.on('touchstart', this.onMouseDown);
     this.on('focus', this.onFocus);
     this.on('blur', this.onBlur);
 
@@ -491,6 +539,8 @@ vjs.Slider = function(player, options){
     // this.player_.one('timeupdate', vjs.bind(this, this.update));
 
     player.ready(vjs.bind(this, this.update));
+
+    this.boundEvents = {};
 };
 goog.inherits(vjs.Slider, vjs.Component);
 
@@ -510,16 +560,23 @@ vjs.Slider.prototype.onMouseDown = function(event){
   event.preventDefault();
   vjs.blockTextSelection();
 
-  vjs.on(document, 'mousemove', vjs.bind(this, this.onMouseMove));
-  vjs.on(document, 'mouseup', vjs.bind(this, this.onMouseUp));
+  this.boundEvents.move = vjs.bind(this, this.onMouseMove);
+  this.boundEvents.end = vjs.bind(this, this.onMouseUp);
+
+  vjs.on(document, 'mousemove', this.boundEvents.move);
+  vjs.on(document, 'mouseup', this.boundEvents.end);
+  vjs.on(document, 'touchmove', this.boundEvents.move);
+  vjs.on(document, 'touchend', this.boundEvents.end);
 
   this.onMouseMove(event);
 };
 
 vjs.Slider.prototype.onMouseUp = function() {
   vjs.unblockTextSelection();
-  vjs.off(document, 'mousemove', this.onMouseMove, false);
-  vjs.off(document, 'mouseup', this.onMouseUp, false);
+  vjs.off(document, 'mousemove', this.boundEvents.move, false);
+  vjs.off(document, 'mouseup', this.boundEvents.end, false);
+  vjs.off(document, 'touchmove', this.boundEvents.move, false);
+  vjs.off(document, 'touchend', this.boundEvents.end, false);
 
   this.update();
 };
@@ -578,7 +635,8 @@ vjs.Slider.prototype.calculateDistance = function(event){
   var box = this.el_,
       boxX = vjs.findPosX(box),
       boxW = box.offsetWidth,
-      handle = this.handle;
+      handle = this.handle,
+      pageX = event.pageX;
 
   if (handle) {
     var handleW = handle.el().offsetWidth;
@@ -588,8 +646,14 @@ vjs.Slider.prototype.calculateDistance = function(event){
     boxW = boxW - handleW;
   }
 
+  // This is done because on Android, event.pageX is always 0 and the actual
+  // values live under the changedTouches array.
+  if (pageX === 0 && event.changedTouches) {
+    pageX = event.changedTouches[0].pageX;
+  }
+
   // Percent that the click is through the adjusted area
-  return Math.max(0, Math.min(1, (event.pageX - boxX) / boxW));
+  return Math.max(0, Math.min(1, (pageX - boxX) / boxW));
 };
 
 vjs.Slider.prototype.onFocus = function(){
