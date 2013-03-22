@@ -75,12 +75,13 @@ Thanks again for helping out! One thing we ask is that you refer to the [code st
   Since the issue filing process is described elsewhere, let's assume that you've filed or claimed the issue already.
 
   Next, create the branch.  We've created a grunt plugin that helps you do this.
-  For new features:
+
+  Run this command for new features:
   ```bash
   grunt feature:start
   ```
 
-  If you're fixing an issue:
+  Run this command if you're fixing an issue:
   ```bash
   grunt issue:start
   ```
@@ -123,12 +124,12 @@ Thanks again for helping out! One thing we ask is that you refer to the [code st
   git checkout (branchname)
   ```
 
-  To clean up your feature:
+  Run this command to clean up your feature:
   ```bash
   grunt feature:delete
   ```
 
-  Or your bug fix:
+  Run this command to clean up your bug fix:
   ```bash
   grunt issue:delete
   ```
