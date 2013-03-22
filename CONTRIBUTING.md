@@ -74,11 +74,18 @@ Thanks again for helping out! One thing we ask is that you refer to the [code st
 
   Since the issue filing process is described elsewhere, let's assume that you've filed or claimed the issue already.
 
-  Next, create the branch:
+  Next, create the branch.  We've created a grunt plugin that helps you do this.
+  For new features:
   ```bash
-  git checkout -b <issue####-aditional-branch-info>
+  grunt feature:start
   ```
-  Prefix the branch with the corresponding [issue number](https://github.com/zencoder/video-js/issues). Add as much additional information after that as you think is appropriate to remain concise yet informative.
+
+  If you're fixing an issue:
+  ```bash
+  grunt issue:start
+  ```
+
+  You will be prompted to name the branch.  After that, grunt will create the branch locally, push it up to your origin, and track it.  You're now ready to start building your feature or fixing that bug!
 
 8. Thoroughly test your feature or fix. If you're fixing a bug, we recommend in addition to testing the fix itself, to do some testing around the areas that your fix has touched. For example, a brief smoketest of the player never hurts.
 
@@ -91,8 +98,33 @@ Thanks again for helping out! One thing we ask is that you refer to the [code st
   Testing:
   (briefly describe any testing here, for example, 'unit tests and cross-browser manual tests around playback and network interruption')
   ```
-10. Submit a [Pull Request](#pull-requests).
+10. You can use grunt to submit your [Pull Request](#pull-requests).
 
+  For your new feature:
+  ```bash
+  grunt feature:submit
+  ```
+  Or for your bug fix:
+  ```bash
+  grunt issue:submit
+  ```
+
+  You'll be prompted for title and description for the Pull Request.  After that, your Pull Request will be submitted to video-js.
+
+11. You're Done! (except for cleanup).  And grunt can help with that too!
+
+  To clean up your feature:
+  ```bash
+  grunt feature:delete
+  ```
+
+  Or your bug fix:
+  ```bash
+  grunt issue:delete
+  ```
+  PLEASE NOTE: THIS WILL DELETE YOUR LOCAL AND REMOTE COPIES OF THE FEATURE.
+  This is meant to clean up your local and remote branches, so make sure any changes you don't want to lose have been pulled into the parent project or another branch first.
+  
 # Bugs
 
 **A bug is a demonstrable problem** that is caused by the code in the repository. Good bug reports are extremely helpful. Thank You!
