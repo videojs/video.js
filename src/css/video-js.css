@@ -145,6 +145,8 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 /* Hide control text visually, but have it available for screenreaders: h5bp.com/v */
 .vjs-default-skin .vjs-control-text { border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; }
 
+/* Hide disabled or unsupported controls */
+.vjs-default-skin .vjs-disabled { display: none; }
 
 /* Play/Pause
 -------------------------------------------------------------------------------- */
