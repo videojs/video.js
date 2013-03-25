@@ -26,7 +26,8 @@
     "calcdeps": "~0.1.7",
     "grunt-contrib-clean": "~0.4.0a",
     "grunt-contrib-copy": "~0.3.2",
-    "mocha": "~1.8.1"
+    "mocha": "~1.8.1",
+    "contribflow": "~0.1.0"
   },
   "testling": {
     "browsers": [
