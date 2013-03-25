@@ -58,6 +58,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('contribflow');
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'build', 'minify', 'dist']);
