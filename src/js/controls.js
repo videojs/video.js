@@ -29,15 +29,43 @@ vjs.ControlBar = function(player, options){
   goog.base(this, player, options);
 
   player.one('play', vjs.bind(this, function(){
-    var touchstart,
-      fadeIn = vjs.bind(this, this.fadeIn),
-      fadeOut = vjs.bind(this, this.fadeOut);
+    var touchstart, hide_timer, just_hidden;
 
     this.fadeIn();
 
     if ( !('ontouchstart' in window) ) {
-      this.player_.on('mouseover', fadeIn);
-      this.player_.on('mouseout', fadeOut);
+      this.player_.on('mouseover', vjs.bind(this, function(){
+        clearTimeout(hide_timer);
+        this.fadeIn();
+      }));
+      this.player_.on('mouseout', vjs.bind(this, function(){
+        clearTimeout(hide_timer);
+        this.fadeOut();
+      }));
+      this.player_.on('mousemove', vjs.bind(this, function(e){
+        clearTimeout(hide_timer);
+
+        // Hide only when the event is on media element
+        if (e.target != this.player_.tech.el_) {
+          return;
+        }
+
+        if (!just_hidden){
+          this.player_.el_.style.cursor = 'auto';
+          this.fadeIn();
+        }
+
+        var self = this;
+        hide_timer = setTimeout(function(){
+          just_hidden = true;
+          setTimeout(function(){
+            just_hidden = false;
+          }, 500);
+
+          self.player_.el_.style.cursor = 'none';
+          self.fadeOut();
+        }, 3000);
+      }));
     }
 
     touchstart = false;
@@ -1059,12 +1087,12 @@ goog.inherits(vjs.PosterImage, vjs.Button);
 vjs.PosterImage.prototype.createEl = function(){
   var el = vjs.createEl('div', {
         className: 'vjs-poster',
-        
+
         // Don't want poster to be tabbable.
         tabIndex: -1
       }),
       poster = this.player_.poster();
-  
+
   if (poster) {
     if ('backgroundSize' in el.style) {
       el.style.backgroundImage = 'url("' + poster + '")';
@@ -1072,7 +1100,7 @@ vjs.PosterImage.prototype.createEl = function(){
       el.appendChild(vjs.createEl('img', { src: poster }));
     }
   }
-  
+
   return el;
 };
 
