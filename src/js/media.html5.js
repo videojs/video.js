@@ -36,6 +36,7 @@ vjs.Html5 = function(player, options, ready){
   });
 
   this.on('click', this.onClick);
+  this.on('dblclick', this.onDblClick);
 
   this.setupTriggers();
 
