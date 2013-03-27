@@ -436,7 +436,7 @@ vjs.DurationDisplay.prototype.createEl = function(){
 
   this.content = vjs.createEl('div', {
     className: 'vjs-duration-display',
-    innerHTML: '<span class="vjs-control-text">Duration Time </span>' + '-0:00', // label the duration time for screen reader users
+    innerHTML: '<span class="vjs-control-text">Duration Time </span>' + '0:00', // label the duration time for screen reader users
     'aria-live': 'off' // tell screen readers not to automatically read the time as it changes
   });
 
@@ -446,7 +446,7 @@ vjs.DurationDisplay.prototype.createEl = function(){
 
 vjs.DurationDisplay.prototype.updateContent = function(){
   if (this.player_.duration()) {
-      this.content.innerHTML = '<span class="vjs-control-text">Duration Time </span>' + '-' + vjs.formatTime(this.player_.duration()); // label the duration time for screen reader users
+      this.content.innerHTML = '<span class="vjs-control-text">Duration Time </span>' + vjs.formatTime(this.player_.duration()); // label the duration time for screen reader users
   }
 };
 
