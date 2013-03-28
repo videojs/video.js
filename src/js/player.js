@@ -719,28 +719,73 @@ vjs.Player.prototype.exitFullWindow = function(){
   this.trigger('exitFullWindow');
 };
 
+vjs.Player.prototype.bucketByTypes = function(sources){
+  return vjs.reduce(sources, function(init, val, i){
+    (init[val.type] = init[val.type] || []).push(val);
+    return init;
+  }, {}, this);
+};
+
 vjs.Player.prototype.selectSource = function(sources){
 
-  // Loop through each playback technology in the options order
+  var sourcesByType = this.bucketByTypes(sources),
+      typeAndTech = this.selectTypeAndTech(sources);
+
+    if (!typeAndTech) return false;
+
+    // even though we choose the best resolution for the user here, we
+    // should remember the resolutions so that we can potentially
+    // change resolution later
+    this.options_['sourceResolutions'] = sourcesByType[typeAndTech.type];
+
+    return {
+      source: this.selectResolution(this.options_['sourceResolutions']),
+      tech: typeAndTech.tech
+    }
+};
+
+vjs.Player.prototype.selectTypeAndTech = function(sources) {
   for (var i=0,j=this.options_['techOrder'];i<j.length;i++) {
-    var techName = vjs.capitalize(j[i]),
+      var techName = vjs.capitalize(j[i]),
         tech = window['videojs'][techName];
 
-    // Check if the browser supports this technology
-    if (tech.isSupported()) {
-      // Loop through each source object
-      for (var a=0,b=sources;a<b.length;a++) {
-        var source = b[a];
-
-        // Check if source can be played with this technology
-        if (tech['canPlaySource'](source)) {
-          return { source: source, tech: techName };
+      // Check if the browser supports this technology
+      if (tech.isSupported()) {
+        // Loop through each source object
+        for (var a=0,b=sources;a<b.length;a++) {
+          var source = b[a];
+          // Check if source can be played with this technology
+          if (tech['canPlaySource'](source)) {
+            return { type: source.type, tech: techName };
+          }
         }
       }
     }
-  }
+};
 
-  return false;
+vjs.Player.prototype.selectResolution = function(typeSources) {
+  var defaultRes = 0;
+
+  // check to see if any sources are marked as default
+  vjs.obj.each(typeSources, function(s, i){
+    // add the index here so we can reference it later
+    s.index = i;
+
+    if (s['default']) defaultRes = i;
+  }, this);
+
+  var maxRes = (typeSources.length - 1),
+    // if the user has previously selected a preference, check if
+    // that preference is available. if not, use the source marked
+    // default
+    preferredRes = parseInt(
+        !!window.localStorage && !!window.localStorage.getItem("videojs_preferred_res") ?
+            window.localStorage.getItem("videojs_preferred_res") :
+            defaultRes
+        , 10) || 0,
+    actualRes = preferredRes > maxRes ? maxRes : preferredRes;
+
+  return typeSources[actualRes];
 };
 
 // src is a pretty powerful function
@@ -771,7 +816,7 @@ vjs.Player.prototype.src = function(source){
         innerHTML: 'Sorry, no compatible source and playback technology were found for this video. Try using another browser like <a href="http://www.google.com/chrome">Google Chrome</a> or download the latest <a href="http://get.adobe.com/flashplayer/">Adobe Flash Player</a>.'
       }));
     }
-
+    this.options_['source'] = sourceTech.source.src;
   // Case: Source object { src: '', type: '' ... }
   } else if (source instanceof Object) {
 
@@ -781,7 +826,7 @@ vjs.Player.prototype.src = function(source){
       // Send through tech loop to check for a compatible technology.
       this.src([source]);
     }
-
+    this.options_['source'] = source.src;
   // Case: URL String (http://myvideo...)
   } else {
     // Cache for getting last set source
@@ -800,7 +845,9 @@ vjs.Player.prototype.src = function(source){
         this.play();
       }
     }
+    this.options_['source'] = source.src;
   }
+
   return this;
 };
 

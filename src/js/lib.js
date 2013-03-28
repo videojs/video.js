@@ -227,6 +227,38 @@ vjs.isEmpty = function(obj) {
   return true;
 };
 
+vjs.objKeys = function(obj) {
+  if (!!Object.keys) return Object.keys(obj);
+    var keys = [],
+      k;
+    for (k in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, k)) {
+        keys.push(k);
+      }
+    }
+    return keys;
+  };
+
+  vjs.objValues = function(obj) {
+    if (!!Object.values) return Object.values(obj);
+    var values = [],
+      k;
+    for (k in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, k)) {
+        values.push(obj[k]);
+      }
+    }
+    return values;
+  };
+
+  vjs.reduce = function(arr, fn, init, n) {
+    if (!arr || arr.length === 0) { return; }
+    for (var i=0,j=arr.length; i<j; i++) {
+      init = fn.call(arr, init, arr[i], i);
+    }
+    return init;
+  };
+
 /**
  * Add a CSS class name to an element
  * @param {Element} element    Element to add class name to
