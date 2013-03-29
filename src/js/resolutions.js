@@ -40,6 +40,8 @@ vjs.ResolutionMenuItem = function(player, options){
   options['label'] = source['res'];
   goog.base(this, player, options);
 
+  this.orgSource = option['source'];
+
   this.player_.one('loadstart', vjs.bind(this, this.update));
   this.player_.on('resolutionchange', vjs.bind(this, this.update));
 };
@@ -51,7 +53,7 @@ vjs.ResolutionMenuItem.prototype.onClick = function(){
 };
 
 vjs.ResolutionMenuItem.prototype.update = function(){
-  if (this.player_.options_.source === this.source.src) {
+  if (orgSource === this.source.src) {
     this.selected(true);
   } else {
     this.selected(false);
@@ -64,8 +66,9 @@ vjs.ResolutionsButton = function(player, options) {
   goog.base(this, player, options);
 
   this.menu = this.createMenu();
+  this.sourceResolutions = options['sourceResolutions'];
 
-  if (player.options_['sourceResolutions'].length <= 1) {
+  if (sourceResolutions.length <= 1) {
     this.hide();
   }
   this.on('keyup', this.onKeyPress);
@@ -102,11 +105,10 @@ vjs.ResolutionsButton.prototype.createMenu = function() {
 };
 
 vjs.ResolutionsButton.prototype.createItems = function(){
-  var player = this.player_;
   var items = [];
-  for (var i = 0; i < player.options_['sourceResolutions'].length; i++) {
+  for (var i = 0; i < sourceResolutions.length; i++) {
     items.push(new vjs.ResolutionMenuItem(this.player_, {
-      'source': player.options_['sourceResolutions'][i]
+      'source': sourceResolutions[i]
     }));
   }
   return items;
