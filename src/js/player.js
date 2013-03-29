@@ -23,9 +23,9 @@ vjs.Player = function(tag, options, ready){
   // Set controls
   this.controls_ = options['controls'];
   // Set source
-  this.source_ = options['source'];
+  this.source_ = options['source'] || '';
   // Set resolution
-  this.resolution_ = options['resolution'];
+  this.resolution_ = options['resolution'] || '';
 
   // Run base component initializing with new options.
   // Builds the element through createEl()
@@ -819,7 +819,7 @@ vjs.Player.prototype.src = function(source){
         innerHTML: 'Sorry, no compatible source and playback technology were found for this video. Try using another browser like <a href="http://www.google.com/chrome">Google Chrome</a> or download the latest <a href="http://get.adobe.com/flashplayer/">Adobe Flash Player</a>.'
       }));
     }
-    source_ = sourceTech.source['src']
+    source_ = sourceTech.source['src'];
     resolution_ = sourceTech.source['res'];
   // Case: Source object { src: '', type: '' ... }
   } else if (source instanceof Object) {
