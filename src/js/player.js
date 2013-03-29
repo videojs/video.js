@@ -22,6 +22,10 @@ vjs.Player = function(tag, options, ready){
   this.poster_ = options['poster'];
   // Set controls
   this.controls_ = options['controls'];
+  // Set source
+  this.source_ = options['source'];
+  // Set resolution
+  this.resolution_ = options['resolution'];
 
   // Run base component initializing with new options.
   // Builds the element through createEl()
@@ -815,9 +819,8 @@ vjs.Player.prototype.src = function(source){
         innerHTML: 'Sorry, no compatible source and playback technology were found for this video. Try using another browser like <a href="http://www.google.com/chrome">Google Chrome</a> or download the latest <a href="http://get.adobe.com/flashplayer/">Adobe Flash Player</a>.'
       }));
     }
-    var tech = sourceTech.source;
-    this.options_['source'] = tech.src;
-    this.options_['resolution'] = tech.res;
+    source_ = sourceTech.source['src']
+    resolution_ = sourceTech.source['res'];
   // Case: Source object { src: '', type: '' ... }
   } else if (source instanceof Object) {
 
@@ -827,8 +830,8 @@ vjs.Player.prototype.src = function(source){
       // Send through tech loop to check for a compatible technology.
       this.src([source]);
     }
-    this.options_['source'] = source['src'];
-    this.options_['resolution'] = source['res'];
+    source_ = source['src'];
+    resolution_ = source['res'];
   // Case: URL String (http://myvideo...)
   } else {
     // Cache for getting last set source
@@ -847,8 +850,8 @@ vjs.Player.prototype.src = function(source){
         this.play();
       }
     }
-    this.options_['source'] = source['src'];
-    this.options_['resolution'] = source['res'];
+    source_ = source['src'];
+    resolution_ = source['res'];
   }
 
   return this;
@@ -928,6 +931,36 @@ vjs.Player.prototype.controls = function(controls){
     this.controls_ = controls;
   }
   return this.controls_;
+};
+
+/**
+ * The url of the current source.
+ * @type {String}
+ * @private
+ */
+vjs.Player.prototype.source_;
+
+/**
+ * Get the current source url.
+ * @return {String}    Current source URL or null
+ */
+vjs.Player.prototype.source = function(){
+  return this.source_;
+};
+
+/**
+ * The url of the current resolution.
+ * @type {String}
+ * @private
+ */
+vjs.Player.prototype.resolution_;
+
+/**
+ * Get the current resolution.
+ * @return {String}    Current resolution or null
+ */
+vjs.Player.prototype.resolution = function(){
+  return this.resolution_;
 };
 
 vjs.Player.prototype.error = function(){ return this.techGet('error'); };
