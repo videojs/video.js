@@ -816,8 +816,8 @@ vjs.Player.prototype.src = function(source){
       }));
     }
     var tech = sourceTech.source;
-    this.options_['source'] = tech['src'];
-    this.options_['resolution'] = tech['res'];
+    this.options_['source'] = tech.src;
+    this.options_['resolution'] = tech.res;
   // Case: Source object { src: '', type: '' ... }
   } else if (source instanceof Object) {
 

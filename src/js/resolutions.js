@@ -67,9 +67,10 @@ vjs.ResolutionsButton = function(player, options) {
   goog.base(this, player, options);
 
   this.sourceResolutions_ = player.options_['sourceResolutions'];
+  var resolutions = this.sourceResolutions_ || [];
   this.menu = this.createMenu();
 
-  if (this.sourceResolutions_.length <= 1) {
+  if (resolutions.length <= 1) {
     this.hide();
   }
   this.on('keyup', this.onKeyPress);
