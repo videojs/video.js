@@ -16,8 +16,7 @@
   <video id="vid1" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264"
       poster="http://video-js.zencoder.com/oceans-clip.png"
       data-setup='{}'>
-    <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' res="SD" default="default">
-    <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' res="HD">
+    <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4'>
     <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm'>
     <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg'>
     <p>Video Playback Not Supported</p>

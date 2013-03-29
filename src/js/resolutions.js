@@ -2,9 +2,9 @@
 // Resolutions are selectable sources for alternate bitrate material
 // Player Resolution Functions - Functions add to the player object for easier access to resolutions
 
-vjs.Player.prototype.changeResolution = function(new_source){
+vjs.Player.prototype.changeResolution = function(new_source, new_resolution){
     // has the exact same source been chosen?
-    if (this.src === new_source.src){
+    if (this.options_['resoution'] === new_resolution){
         this.trigger('resolutionchange');
         return this; // basically a no-op
     }
@@ -16,7 +16,7 @@ vjs.Player.prototype.changeResolution = function(new_source){
 
     // reload the new tech and the new source (mostly used to re-fire
     // the events we want)
-    this.src(new_source.src);
+    this.src(new_source);
     
 
     // when the technology is re-started, kick off the new stream
@@ -34,13 +34,13 @@ vjs.Player.prototype.changeResolution = function(new_source){
 /* Resolution Menu Items
 ================================================================================ */
 vjs.ResolutionMenuItem = function(player, options){
-  var source = this.source = options['source'];
-
   // Modify options for parent MenuItem class's init.
-  options['label'] = source['res'];
-  goog.base(this, player, options);
+  options['label'] = options.source['res'];
 
-  this.orgSource = option['source'];
+  this.source = options.source['src'];
+  this.resolution = options.source['res'];
+
+  goog.base(this, player, options);
 
   this.player_.one('loadstart', vjs.bind(this, this.update));
   this.player_.on('resolutionchange', vjs.bind(this, this.update));
@@ -49,11 +49,12 @@ goog.inherits(vjs.ResolutionMenuItem, vjs.MenuItem);
 
 vjs.ResolutionMenuItem.prototype.onClick = function(){
   goog.base(this, 'onClick');
-  this.player_.changeResolution(this.source);
+  this.player_.changeResolution(this.source, this.resolution);
 };
 
 vjs.ResolutionMenuItem.prototype.update = function(){
-  if (orgSource === this.source.src) {
+  var player = this.player_;
+  if ((player.cache_['src'] === this.source)) {
     this.selected(true);
   } else {
     this.selected(false);
@@ -65,10 +66,10 @@ vjs.ResolutionMenuItem.prototype.update = function(){
 vjs.ResolutionsButton = function(player, options) {
   goog.base(this, player, options);
 
+  this.sourceResolutions_ = player.options_['sourceResolutions'];
   this.menu = this.createMenu();
-  this.sourceResolutions = options['sourceResolutions'];
 
-  if (sourceResolutions.length <= 1) {
+  if (this.sourceResolutions_.length <= 1) {
     this.hide();
   }
   this.on('keyup', this.onKeyPress);
@@ -106,9 +107,9 @@ vjs.ResolutionsButton.prototype.createMenu = function() {
 
 vjs.ResolutionsButton.prototype.createItems = function(){
   var items = [];
-  for (var i = 0; i < sourceResolutions.length; i++) {
+  for (var i = 0; i < this.sourceResolutions_.length; i++) {
     items.push(new vjs.ResolutionMenuItem(this.player_, {
-      'source': sourceResolutions[i]
+      'source': this.sourceResolutions_[i]
     }));
   }
   return items;

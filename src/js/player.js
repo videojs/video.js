@@ -816,6 +816,7 @@ vjs.Player.prototype.src = function(source){
       }));
     }
     this.options_['source'] = sourceTech.source['src'];
+    this.options_['resolution'] = sourceTech.source['res'];
   // Case: Source object { src: '', type: '' ... }
   } else if (source instanceof Object) {
 
@@ -825,7 +826,8 @@ vjs.Player.prototype.src = function(source){
       // Send through tech loop to check for a compatible technology.
       this.src([source]);
     }
-    this.options_['source'] = source.src;
+    this.options_['source'] = source['src'];
+    this.options_['resolution'] = source['res'];
   // Case: URL String (http://myvideo...)
   } else {
     // Cache for getting last set source
@@ -844,7 +846,8 @@ vjs.Player.prototype.src = function(source){
         this.play();
       }
     }
-    this.options_['source'] = source.src;
+    this.options_['source'] = source['src'];
+    this.options_['resolution'] = source['res'];
   }
 
   return this;
