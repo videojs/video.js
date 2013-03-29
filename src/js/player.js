@@ -741,7 +741,7 @@ vjs.Player.prototype.selectSource = function(sources){
     return {
       source: this.selectResolution(this.options_['sourceResolutions']),
       tech: typeAndTech.tech
-    }
+    };
 };
 
 vjs.Player.prototype.selectTypeAndTech = function(sources) {
@@ -779,10 +779,9 @@ vjs.Player.prototype.selectResolution = function(typeSources) {
     // that preference is available. if not, use the source marked
     // default
     preferredRes = parseInt(
-        !!window.localStorage && !!window.localStorage.getItem("videojs_preferred_res") ?
-            window.localStorage.getItem("videojs_preferred_res") :
-            defaultRes
-        , 10) || 0,
+        !!window.localStorage && !!window.localStorage.getItem('videojs_preferred_res') ?
+            window.localStorage.getItem('videojs_preferred_res') :
+            defaultRes, 10) || 0,
     actualRes = preferredRes > maxRes ? maxRes : preferredRes;
 
   return typeSources[actualRes];

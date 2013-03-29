@@ -5,7 +5,7 @@
 vjs.Player.prototype.changeResolution = function(new_source){
     // has the exact same source been chosen?
     if (this.src === new_source.src){
-        this.trigger("resolutionchange");
+        this.trigger('resolutionchange');
         return this; // basically a no-op
     }
 
@@ -24,10 +24,10 @@ vjs.Player.prototype.changeResolution = function(new_source){
       this.one('loadeddata', vjs.bind(this, function() {
         this.currentTime(curTime);
       }));
-      this.trigger("resolutionchange");
+      this.trigger('resolutionchange');
       this.play();
       // remember this selection
-      vjs.setLocalStorage("videojs_preferred_res", parseInt(new_source.index, 10));
+      vjs.setLocalStorage('videojs_preferred_res', parseInt(new_source.index, 10));
     });
 };
 
@@ -82,9 +82,9 @@ vjs.ResolutionsButton.prototype.createMenu = function() {
   var menu = new vjs.Menu(this.player_);
 
     // Add a title list item to the top
-    menu.el_.appendChild(vjs.createEl("li", {
-      className: "vjs-menu-title",
-      innerHTML: vjs.capitalize("resolutions"),
+    menu.el_.appendChild(vjs.createEl('li', {
+      className: 'vjs-menu-title',
+      innerHTML: vjs.capitalize('resolutions'),
       tabindex: -1
     }));
 
@@ -99,7 +99,7 @@ vjs.ResolutionsButton.prototype.createMenu = function() {
     this.addChild(menu);
 
     return menu;
-}
+};
 
 vjs.ResolutionsButton.prototype.createItems = function(){
   var player = this.player_;
@@ -188,4 +188,4 @@ vjs.ResolutionsButton.prototype.unpressButton = function(){
 // Add Button to controlBar
 vjs.obj.merge(vjs.ControlBar.prototype.options_['children'], {
   'resolutionsButton': {}
-})
+});
