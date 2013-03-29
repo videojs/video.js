@@ -815,8 +815,9 @@ vjs.Player.prototype.src = function(source){
         innerHTML: 'Sorry, no compatible source and playback technology were found for this video. Try using another browser like <a href="http://www.google.com/chrome">Google Chrome</a> or download the latest <a href="http://get.adobe.com/flashplayer/">Adobe Flash Player</a>.'
       }));
     }
-    this.options_['source'] = sourceTech.source['src'];
-    this.options_['resolution'] = sourceTech.source['res'];
+    var tech = sourceTech.source;
+    this.options_['source'] = tech['src'];
+    this.options_['resolution'] = tech['res'];
   // Case: Source object { src: '', type: '' ... }
   } else if (source instanceof Object) {
 

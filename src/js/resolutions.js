@@ -106,8 +106,9 @@ vjs.ResolutionsButton.prototype.createMenu = function() {
 };
 
 vjs.ResolutionsButton.prototype.createItems = function(){
+  var resolutions = this.sourceResolutions_ || [];
   var items = [];
-  for (var i = 0; i < this.sourceResolutions_.length; i++) {
+  for (var i = 0; i < resolutions.length; i++) {
     items.push(new vjs.ResolutionMenuItem(this.player_, {
       'source': this.sourceResolutions_[i]
     }));
