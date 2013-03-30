@@ -120,8 +120,6 @@ test('should get tag, source, and track settings', function(){
   ok(player.options_['tracks'].length === 1);
   ok(player.options_['tracks'][0]['kind'] === 'captions'); // No extern
   ok(player.options_['tracks'][0]['default'] === true);
-  ok(player.options_['source'][0].src === 'http://google.com');
-  ok(player.options_['resolution'][0].res === 'SD');
 
   ok(player.el().className.indexOf('video-js') !== -1, 'transferred class from tag to player div');
   ok(player.el().id === 'example_1', 'transferred id from tag to player div');
