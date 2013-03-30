@@ -1,3 +1,4 @@
+* Added Skins and Import to main Stylesheet
 * Added a plugins interface
 * Added automated test suite and support for Travis CI.
 * Updated docs to use Github markdown
