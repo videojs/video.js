@@ -23,9 +23,9 @@ vjs.Player = function(tag, options, ready){
   // Set controls
   this.controls_ = options['controls'];
   // Set source
-  this.source_ = options['source'];
+  this.source_ = options['source'] || null;
   // Set resolution
-  this.resolution_ = options['resolution'];
+  this.resolution_ = options['resolution'] || null;
 
   // Run base component initializing with new options.
   // Builds the element through createEl()
@@ -819,8 +819,6 @@ vjs.Player.prototype.src = function(source){
         innerHTML: 'Sorry, no compatible source and playback technology were found for this video. Try using another browser like <a href="http://www.google.com/chrome">Google Chrome</a> or download the latest <a href="http://get.adobe.com/flashplayer/">Adobe Flash Player</a>.'
       }));
     }
-    this.source_ = sourceTech.source['src'];
-    this.resolution_ = sourceTech.source['res'];
   // Case: Source object { src: '', type: '' ... }
   } else if (source instanceof Object) {
 
@@ -830,8 +828,6 @@ vjs.Player.prototype.src = function(source){
       // Send through tech loop to check for a compatible technology.
       this.src([source]);
     }
-    this.source_ = source['src'];
-    this.resolution_ = source['res'];
   // Case: URL String (http://myvideo...)
   } else {
     // Cache for getting last set source
@@ -850,9 +846,11 @@ vjs.Player.prototype.src = function(source){
         this.play();
       }
     }
-    this.source_ = source['src'];
-    this.resolution_ = source['res'];
+    
   }
+  // Pass source and resolution to player variables.
+  this.source_ = source.src || null;
+  this.resolution_ = source.res || null;
 
   return this;
 };
