@@ -775,7 +775,7 @@ vjs.Player.prototype.selectResolution = function(typeSources) {
     // add the index here so we can reference it later
     s.index = i;
 
-    if (s['default']) defaultRes = i;
+    if (s['data-default']) defaultRes = i;
   }, this);
 
   var maxRes = (typeSources.length - 1),

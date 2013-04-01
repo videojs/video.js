@@ -116,10 +116,10 @@ vjs.TextTrack.prototype.title = function(){
 ================================================================================ */
 vjs.ResolutionMenuItem = function(player, options){
   // Modify options for parent MenuItem class's init.
-  options['label'] = options.source['res'];
+  options['label'] = options.source['data-res'];
 
   this.source = options.source['src'];
-  this.resolution = options.source['res'];
+  this.resolution = options.source['data-res'];
 
   goog.base(this, player, options);
 
