@@ -31,6 +31,87 @@ vjs.Player.prototype.changeResolution = function(new_source, new_resolution){
     });
 };
 
+/**
+ * Resolution Class
+ * Contains resolution methods for loading and parsing of resoltuions
+ * @param {vjs.Player|Object} player
+ * @param {Object=} options
+ * @constructor
+ */
+vjs.Resolution = function(player, options){
+  goog.base(this, player, options);
+
+  // Apply resolution info to resolution object
+  // Options will often be a resolution element
+
+  // Build ID if one doesn't exist
+  this.id_ = options['id'] || ('vjs_' + options['kind'] + '_' + options['language'] + '_' + vjs.guid++);
+  this.src_ = options['src'];
+  // 'default' is a reserved keyword in js so we use an abbreviated version
+  this.dflt_ = options['default'] || options['dflt'];
+  this.title_ = options['title'];
+  this.label_ = options['label'];
+};
+goog.inherits(vjs.Resolution, vjs.Component);
+
+/**
+ * Resoltuion kind value.
+ * @private
+ */
+vjs.Resolution.prototype.kind_;
+
+/**
+ * Get the track kind value
+ * @return {String}
+ */
+vjs.Resolution.prototype.kind = function(){
+  return this.kind_;
+};
+
+/**
+ * Resolution src value
+ * @private
+ */
+vjs.Resolution.prototype.src_;
+
+/**
+ * Get the resolution src value
+ * @return {String}
+ */
+vjs.Resolution.prototype.src = function(){
+  return this.src_;
+};
+
+/**
+ * Resolution default value
+ * If default is used, resoltuion to show
+ * @private
+ */
+vjs.Resolution.prototype.dflt_;
+
+/**
+ * Get the resoltuion default value
+ * 'default' is a reserved keyword
+ * @return {Boolean}
+ */
+vjs.Resolution.prototype.dflt = function(){
+  return this.dflt_;
+};
+
+/**
+ * Resoltuion title value
+ * @private
+ */
+vjs.TextTrack.prototype.title_;
+
+/**
+ * Get the resolution title value
+ * @return {String}
+ */
+vjs.TextTrack.prototype.title = function(){
+  return this.title_;
+};
+
 /* Resolution Menu Items
 ================================================================================ */
 vjs.ResolutionMenuItem = function(player, options){
@@ -74,12 +155,13 @@ vjs.ResolutionsButton = function(player, options) {
     this.hide();
   }
   this.on('keyup', this.onKeyPress);
+  this.el_.setAttribute('aria-label','Resolutions Menu');
   this.el_.setAttribute('aria-haspopup',true);
   this.el_.setAttribute('role','button');
 };
 goog.inherits(vjs.ResolutionsButton, vjs.Button);
 
-vjs.ResolutionsButton.prototype.kind_ = 'captions';
+vjs.ResolutionsButton.prototype.kind_ = 'resolutions';
 vjs.ResolutionsButton.prototype.buttonText = 'Resolutions';
 vjs.ResolutionsButton.prototype.className = 'vjs-resolutions-button';
 
@@ -89,7 +171,7 @@ vjs.ResolutionsButton.prototype.createMenu = function() {
     // Add a title list item to the top
     menu.el_.appendChild(vjs.createEl('li', {
       className: 'vjs-menu-title',
-      innerHTML: vjs.capitalize('resolutions'),
+      innerHTML: vjs.capitalize(this.kind_),
       tabindex: -1
     }));
 
