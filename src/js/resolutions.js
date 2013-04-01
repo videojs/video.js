@@ -38,8 +38,8 @@ vjs.Player.prototype.changeResolution = function(new_source, new_resolution){
  * @param {Object=} options
  * @constructor
  */
-vjs.Resolution = function(player, options){
-  goog.base(this, player, options);
+vjs.Resolution = function(player, options, ready){
+  goog.base(this, player, options, ready);
 
   // Apply resolution info to resolution object
   // Options will often be a resolution element
@@ -144,7 +144,7 @@ vjs.ResolutionMenuItem.prototype.update = function(){
 
 /* Resolutions Button
 ================================================================================ */
-vjs.ResolutionsButton = function(player, options) {
+vjs.ResolutionButton = function(player, options) {
   goog.base(this, player, options);
 
   this.sourceResolutions_ = player.options_['sourceResolutions'];
@@ -155,17 +155,14 @@ vjs.ResolutionsButton = function(player, options) {
     this.hide();
   }
   this.on('keyup', this.onKeyPress);
-  this.el_.setAttribute('aria-label','Resolutions Menu');
   this.el_.setAttribute('aria-haspopup',true);
   this.el_.setAttribute('role','button');
 };
-goog.inherits(vjs.ResolutionsButton, vjs.Button);
+goog.inherits(vjs.ResolutionButton, vjs.Button);
 
-vjs.ResolutionsButton.prototype.kind_ = 'resolutions';
-vjs.ResolutionsButton.prototype.buttonText = 'Resolutions';
-vjs.ResolutionsButton.prototype.className = 'vjs-resolutions-button';
+vjs.ResolutionButton.prototype.buttonPressed = false;
 
-vjs.ResolutionsButton.prototype.createMenu = function() {
+vjs.ResolutionButton.prototype.createMenu = function() {
   var menu = new vjs.Menu(this.player_);
 
     // Add a title list item to the top
@@ -188,7 +185,7 @@ vjs.ResolutionsButton.prototype.createMenu = function() {
     return menu;
 };
 
-vjs.ResolutionsButton.prototype.createItems = function(){
+vjs.ResolutionButton.prototype.createItems = function(){
   var resolutions = this.sourceResolutions_ || [];
   var items = [];
   for (var i = 0; i < resolutions.length; i++) {
@@ -199,12 +196,12 @@ vjs.ResolutionsButton.prototype.createItems = function(){
   return items;
 };
 
-vjs.ResolutionsButton.prototype.buildCSSClass = function(){
+vjs.ResolutionButton.prototype.buildCSSClass = function(){
   return this.className + ' vjs-menu-button ' + goog.base(this, 'buildCSSClass');
 };
 
 // Focus - Add keyboard functionality to element
-vjs.ResolutionsButton.prototype.onFocus = function() {
+vjs.ResolutionButton.prototype.onFocus = function() {
   // This function is not needed anymore. Instead, the keyboard functionality is handled by
   // treating the button as triggering a submenu. When the button is pressed, the submenu
   // appears. Pressing the button again makes the submenu disappear.
@@ -222,9 +219,9 @@ vjs.ResolutionsButton.prototype.onFocus = function() {
 };
 
 // Can't turn off list display that we turned on with focus, because list would go away.
-vjs.ResolutionsButton.prototype.onBlur = function() {};
+vjs.ResolutionButton.prototype.onBlur = function() {};
 
-vjs.ResolutionsButton.prototype.onClick = function(){
+vjs.ResolutionButton.prototype.onClick = function(){
   // When you click the button it adds focus, which will show the menu indefinitely.
   // So we'll remove focus when the mouse leaves the button.
   // Focus is needed for tab navigation.
@@ -239,7 +236,7 @@ vjs.ResolutionsButton.prototype.onClick = function(){
   }
 };
 
-vjs.ResolutionsButton.prototype.onKeyPress = function(event){
+vjs.ResolutionButton.prototype.onKeyPress = function(event){
   // Check for space bar (32) or enter (13) keys
   if (event.which == 32 || event.which == 13) {
       event.preventDefault();
@@ -259,18 +256,30 @@ vjs.ResolutionsButton.prototype.onKeyPress = function(event){
   }
 };
 
-vjs.ResolutionsButton.prototype.pressButton = function(){
+vjs.ResolutionButton.prototype.pressButton = function(){
     this.buttonPressed = true;
     this.menu.lockShowing();
     this.el_.setAttribute('aria-pressed',true);
     this.el_.children[1].children[0].focus(); // set the focus to the title of the submenu
 };
 
-vjs.ResolutionsButton.prototype.unpressButton = function(){
+vjs.ResolutionButton.prototype.unpressButton = function(){
     this.buttonPressed = false;
     this.menu.unlockShowing();
     this.el_.setAttribute('aria-pressed',false);
 };
+
+/**
+ * @constructor
+ */
+vjs.ResolutionsButton = function(player, options, ready){
+  goog.base(this, player, options, ready);
+  this.el_.setAttribute('aria-label','Resolutions Menu');
+};
+goog.inherits(vjs.ResolutionsButton, vjs.ResolutionButton);
+vjs.ResolutionsButton.prototype.kind_ = 'resolutions';
+vjs.ResolutionsButton.prototype.buttonText = 'Resolutions';
+vjs.ResolutionsButton.prototype.className = 'vjs-resolutions-button';
 
 // Add Button to controlBar
 vjs.obj.merge(vjs.ControlBar.prototype.options_['children'], {
