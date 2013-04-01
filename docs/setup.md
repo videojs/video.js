@@ -52,6 +52,20 @@ Otherwise include/exclude attributes, settings, sources, and tracks exactly as y
 </video>
 ```
 
+Video.js will support multiple resolutions and default to a type of resolution of your choosing. Just add the additional source elements along with HTML5 compatiable 'data-res' and 'data-default' attributes to indicate your resolution and default choice for resolution, respecively.
+
+```html
+<video id="example_video_1" class="video-js vjs-default-skin"
+  controls preload="auto" width="640" height="264"
+  poster="http://video-js.zencoder.com/oceans-clip.png"
+  data-setup='{"example_option":true}'>
+ <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' data-res='SD' data-default='default' />
+  <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' data-res='HD' />
+ <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />
+ <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />
+</video>
+```
+
 
 Alternative Setup for Dynamically Loaded HTML
 ---------------------------------------------
