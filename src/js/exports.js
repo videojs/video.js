@@ -52,10 +52,6 @@ goog.exportProperty(vjs.Component.prototype, 'dimensions', vjs.Component.prototy
 goog.exportSymbol('videojs.Player', vjs.Player);
 
 goog.exportSymbol('videojs.MediaLoader', vjs.MediaLoader);
-goog.exportSymbol('videojs.PosterImage', vjs.PosterImage);
-goog.exportSymbol('videojs.LoadingSpinner', vjs.LoadingSpinner);
-goog.exportSymbol('videojs.BigPlayButton', vjs.BigPlayButton);
-goog.exportSymbol('videojs.ControlBar', vjs.ControlBar);
 goog.exportSymbol('videojs.TextTrackDisplay', vjs.TextTrackDisplay);
 
 goog.exportSymbol('videojs.Control', vjs.Control);
