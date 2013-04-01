@@ -114,6 +114,9 @@ goog.exportProperty(vjs.Flash, 'onReady', vjs.Flash['onReady']);
 goog.exportSymbol('videojs.TextTrack', vjs.TextTrack);
 goog.exportProperty(vjs.TextTrack.prototype, 'label', vjs.TextTrack.prototype.label);
 
+goog.exportSymbol('videojs.Resolution', vjs.Resolution);
+goog.exportSymbol('videojs.ResolutionsButton', vjs.ResolutionsButton);
+
 goog.exportSymbol('videojs.CaptionsTrack', vjs.CaptionsTrack);
 goog.exportSymbol('videojs.SubtitlesTrack', vjs.SubtitlesTrack);
 goog.exportSymbol('videojs.ChaptersTrack', vjs.ChaptersTrack);

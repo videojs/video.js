@@ -43,6 +43,13 @@ vjs.Html5 = function(player, options, ready){
 };
 goog.inherits(vjs.Html5, vjs.MediaTechController);
 
+vjs.Html5.prototype.removeSources = function(el) {
+  var srcs = el.getElementsByTagName('source');
+  for(var i=0;i<srcs.length;i++){
+    el.removeChild(srcs[i]);
+  }
+};
+
 vjs.Html5.prototype.dispose = function(){
   goog.base(this, 'dispose');
 };

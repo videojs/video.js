@@ -72,6 +72,15 @@ myPlayer.src([
   { type: "video/ogg", src: "http://www.example.com/path/to/video.ogv" }
 ]);
 ```
+You may also provide resolutions and defaults to the array. Video.js will detect the supported file type, resolution, and default if provided.
+```js
+myPlayer.src([
+  { type: "video/mp4", src: "http://www.example.com/path/to/video.mp4", res: "SD", default: "default" },
+  { type: "video/mp4", src: "http://www.example.com/path/to/video-HD.mp4", res: "HD" },
+  { type: "video/webm", src: "http://www.example.com/path/to/video.webm" },
+  { type: "video/ogg", src: "http://www.example.com/path/to/video.ogv" }
+]);
+```
 
 Returns the player object.
 

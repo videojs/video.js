@@ -227,6 +227,14 @@ vjs.isEmpty = function(obj) {
   return true;
 };
 
+vjs.reduce = function(arr, fn, init, n) {
+  if (!arr || arr.length === 0) { return; }
+  for (var i=0,j=arr.length; i<j; i++) {
+    init = fn.call(arr, init, arr[i], i);
+  }
+  return init;
+};
+
 /**
  * Add a CSS class name to an element
  * @param {Element} element    Element to add class name to

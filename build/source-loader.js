@@ -26,6 +26,7 @@ var sourceFiles = [
   "src/js/media.html5.js",
   "src/js/media.flash.js",
   "src/js/tracks.js",
+  "src/js/resolutions.js",
   "src/js/json.js",
   "src/js/setup.js",
   "src/js/plugins.js",
