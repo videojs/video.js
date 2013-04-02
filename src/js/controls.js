@@ -29,46 +29,45 @@ vjs.ControlBar = function(player, options){
   goog.base(this, player, options);
 
   player.one('play', vjs.bind(this, function(){
-    var touchstart, hide_timer, just_hidden;
-
     this.fadeIn();
 
     if ( !('ontouchstart' in window) ) {
-      this.player_.on('mouseover', vjs.bind(this, function(){
-        clearTimeout(hide_timer);
+      var hideTimer, justHidden;
+
+      this.player_.on('mouseover', vjs.bind(this, this.fadeIn));
+      this.player_.on('mouseout', vjs.bind(this, this.fadeOut));
+      this.player_.on('fullscreenchange', vjs.bind(this, function(){
+        clearTimeout(hideTimer);
+        this.player_.el().style.cursor = 'auto';
         this.fadeIn();
       }));
-      this.player_.on('mouseout', vjs.bind(this, function(){
-        clearTimeout(hide_timer);
-        this.fadeOut();
-      }));
       this.player_.on('mousemove', vjs.bind(this, function(e){
-        clearTimeout(hide_timer);
-
-        // Hide only when the event is on media element
-        if (e.target != this.player_.tech.el_) {
+        // Hide only in fullscreen and when the cursor is on media element
+        if (e.target != this.player_.tech.el() || !this.player_.isFullScreen) {
           return;
         }
 
-        if (!just_hidden){
-          this.player_.el_.style.cursor = 'auto';
+        clearTimeout(hideTimer);
+        if (!justHidden) {
+          this.player_.el().style.cursor = 'auto';
           this.fadeIn();
         }
 
         var self = this;
-        hide_timer = setTimeout(function(){
-          just_hidden = true;
-          setTimeout(function(){
-            just_hidden = false;
-          }, 500);
-
-          self.player_.el_.style.cursor = 'none';
+        hideTimer = setTimeout(function(){
+          self.player_.el().style.cursor = 'none';
           self.fadeOut();
+
+          // Fix chrome bug when changing style of cursor triggers mousemove
+          justHidden = true;
+          setTimeout(function(){
+            justHidden = false;
+          }, 500);
         }, 3000);
       }));
     }
 
-    touchstart = false;
+    var touchstart = false;
     this.player_.on('touchstart', function() {
       touchstart = true;
     });
