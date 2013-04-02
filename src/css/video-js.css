@@ -97,6 +97,8 @@ body.vjs-full-window {
   -o-transition: visibility 0s linear 1.5s,opacity 1.5s linear;
   transition: visibility 0s linear 1.5s,opacity 1.5s linear;
 }
+/* Hide disabled or unsupported controls */
+.vjs-default-skin .vjs-hidden { display: none; }
 
 /* DEFAULT SKIN (override in another file to create new skins)
 ================================================================================
@@ -144,10 +146,6 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 
 /* Hide control text visually, but have it available for screenreaders: h5bp.com/v */
 .vjs-default-skin .vjs-control-text { border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; }
-
-/* Hide disabled or unsupported controls */
-.vjs-default-skin .vjs-disabled { display: none; }
-
 /* Play/Pause
 -------------------------------------------------------------------------------- */
 .vjs-default-skin .vjs-play-control { width: 5em; cursor: pointer !important; }

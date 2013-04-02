@@ -16,8 +16,8 @@ test('should hide volume control if it\'s not supported', function(){
   volumeControl = new vjs.VolumeControl(player);
   muteToggle = new vjs.MuteToggle(player);
 
-  ok(volumeControl.el().className.indexOf('vjs-disabled') >= 0, 'volumeControl is not hidden');
-  ok(muteToggle.el().className.indexOf('vjs-disabled') >= 0, 'muteToggle is not hidden');
+  ok(volumeControl.el().className.indexOf('vjs-hidden') >= 0, 'volumeControl is not hidden');
+  ok(muteToggle.el().className.indexOf('vjs-hidden') >= 0, 'muteToggle is not hidden');
 });
 
 test('should test and toggle volume control on `loadstart`', function(){
@@ -45,9 +45,9 @@ test('should test and toggle volume control on `loadstart`', function(){
   volumeControl = new vjs.VolumeControl(player);
   muteToggle = new vjs.MuteToggle(player);
 
-  ok(volumeControl.el().className.indexOf('vjs-disabled') < 0,
+  ok(volumeControl.el().className.indexOf('vjs-hidden') < 0,
      'volumeControl is hidden initially');
-  ok(muteToggle.el().className.indexOf('vjs-disabled') < 0,
+  ok(muteToggle.el().className.indexOf('vjs-hidden') < 0,
      'muteToggle is hidden initially');
 
   player.tech.features.volumeControl = false;
@@ -55,9 +55,9 @@ test('should test and toggle volume control on `loadstart`', function(){
     listener();
   });
 
-  ok(volumeControl.el().className.indexOf('vjs-disabled') >= 0,
+  ok(volumeControl.el().className.indexOf('vjs-hidden') >= 0,
      'volumeControl does not hide itself');
-  ok(muteToggle.el().className.indexOf('vjs-disabled') >= 0,
+  ok(muteToggle.el().className.indexOf('vjs-hidden') >= 0,
      'muteToggle does not hide itself');
 
   player.tech.features.volumeControl = true;
@@ -65,8 +65,8 @@ test('should test and toggle volume control on `loadstart`', function(){
     listener();
   });
 
-  ok(volumeControl.el().className.indexOf('vjs-disabled') < 0,
+  ok(volumeControl.el().className.indexOf('vjs-hidden') < 0,
      'volumeControl does not show itself');
-  ok(muteToggle.el().className.indexOf('vjs-disabled') < 0,
+  ok(muteToggle.el().className.indexOf('vjs-hidden') < 0,
      'muteToggle does not show itself');
 });
