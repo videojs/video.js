@@ -34,6 +34,17 @@ vjs.MediaTechController.prototype.onClick = function(){
   }
 };
 
+/**
+ * Handle a double click on the media element. Toggles fullscreen.
+ */
+vjs.MediaTechController.prototype.onDblClick = function(){
+  if (this.player_.isFullScreen) {
+    this.player_.cancelFullScreen();
+  } else {
+    this.player_.requestFullScreen();
+  }
+};
+
 vjs.media = {};
 
 /**

@@ -342,6 +342,7 @@ vjs.Flash['onReady'] = function(currSwf){
 
   // Now that the element is ready, make a click on the swf play the video
   tech.on('click', tech.onClick);
+  tech.on('dblclick', tech.onDblClick);
 
   vjs.Flash.checkReady(tech);
 };
