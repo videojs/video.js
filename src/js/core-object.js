@@ -20,7 +20,7 @@ vjs.CoreObject.extend = function(props){
 
   // Set up the constructor using the supplied init method
   // or using the init of the parent object
-  props.init = props.init || this.prototype.init || function(){};
+  var init = props.init || this.prototype.init || function(){};
   // In Resig's simple class inheritance (previously used) the constructor
   //  is a function that calls `this.init.apply(arguments)`
   // However that would prevent us from using `ParentObject.call(this);`
@@ -29,9 +29,9 @@ vjs.CoreObject.extend = function(props){
   //    `ParentObject.prototype.init.apply(this, argumnents);`
   //  Bleh. We're not creating a _super() function, so it's good to keep
   //  the parent constructor reference simple.
-  //  This does mean the init function and the Child object are one in the same.
-  //  I don't forsee any issues with that but something to look out for.
-  var C = props.init;
+  var C = function(){
+    init.apply(this, arguments);
+  };
 
   // Inherit from F
   C.prototype = new F();
