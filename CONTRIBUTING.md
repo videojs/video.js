@@ -10,6 +10,7 @@ Don't miss the [code style guide](#code-style).
 # Getting started
 
 1. [Download and install Node.js](http://nodejs.org/download/). Video.js uses Node for build and test automation.
+   There is a known issue between Node.js version 0.10.x and phantomjs.  This will manifest itself during the node module installation (see step 4 below).  For the time being, please install Node.js version 0.8.22 or earlier.  You can find earlier versions of Node.js [here](http://nodejs.org/dist/).
 
 2. [Fork](http://help.github.com/fork-a-repo/) and clone the video.js git repository.
 
