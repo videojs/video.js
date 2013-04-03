@@ -17,6 +17,7 @@
 var sourceFiles = [
   "src/js/goog.base.js",
   "src/js/core.js",
+  "src/js/core-object.js",
   "src/js/events.js",
   "src/js/lib.js",
   "src/js/component.js",
