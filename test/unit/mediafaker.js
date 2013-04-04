@@ -22,6 +22,10 @@ vjs.MediaFaker.prototype.createEl = function(){
   var el = goog.base(this, 'createEl', 'div', {
     className: 'vjs-tech'
   });
+  if (this.player_.poster_) {
+    // transfer the poster image to mimic HTML
+    el.poster = this.player_.poster_;
+  }
 
   vjs.insertFirst(el, this.player_.el());
 
