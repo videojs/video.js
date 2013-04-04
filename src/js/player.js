@@ -173,7 +173,7 @@ vjs.Player.prototype.createEl = function(){
   // Enforce with CSS since width/height attrs don't work on divs
   this.width(this.options_['width'], true); // (true) Skip resize listener on load
   this.height(this.options_['height'], true);
-  
+
   // Wrap video tag in div (el/box) container
   if (tag.parentNode) {
     tag.parentNode.insertBefore(el, tag);
@@ -237,6 +237,7 @@ vjs.Player.prototype.loadTech = function(techName, source){
 };
 
 vjs.Player.prototype.unloadTech = function(){
+  this.isReady_ = false;
   this.tech.dispose();
 
   // Turn off any manual progress or timeupdate tracking
