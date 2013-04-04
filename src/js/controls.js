@@ -853,13 +853,13 @@ vjs.VolumeControl = function(player, options){
 
   // hide volume controls when they're not supported by the current tech
   if (player.tech && player.tech.features.volumeControl === false) {
-    this.hide();
+    this.addClass('vjs-hidden');
   }
   player.on('loadstart', vjs.bind(this, function(){
     if (player.tech.features.volumeControl === false) {
-      this.hide();
+      this.addClass('vjs-hidden');
     } else {
-      this.show();
+      this.removeClass('vjs-hidden');
     }
   }));
 };
@@ -982,13 +982,13 @@ vjs.MuteToggle = function(player, options){
 
   // hide mute toggle if the current tech doesn't support volume control
   if (player.tech && player.tech.features.volumeControl === false) {
-    this.hide();
+    this.addClass('vjs-hidden');
   }
   player.on('loadstart', vjs.bind(this, function(){
     if (player.tech.features.volumeControl === false) {
-      this.hide();
+      this.addClass('vjs-hidden');
     } else {
-      this.show();
+      this.removeClass('vjs-hidden');
     }
   }));
 };
