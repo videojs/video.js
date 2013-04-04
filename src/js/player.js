@@ -131,8 +131,6 @@ vjs.Player.prototype.createEl = function(){
   // Original tag settings stored in options
   // now remove immediately so native controls don't flash.
   tag.removeAttribute('controls');
-  // Poster will be handled by a manual <img>
-  tag.removeAttribute('poster');
   // Remove width/height attrs from tag so CSS can make it 100% width/height
   tag.removeAttribute('width');
   tag.removeAttribute('height');

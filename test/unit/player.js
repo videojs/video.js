@@ -181,6 +181,21 @@ test('should accept options from multiple sources and override in correct order'
   player.dispose();
 });
 
+test('should transfer the poster attribute unmodified', function(){
+  var tag, fixture, poster, player;
+  poster = 'http://example.com/poster.jpg';
+  tag = PlayerTest.makeTag();
+  tag.setAttribute('poster', poster);
+  fixture = document.getElementById('qunit-fixture');
+
+  fixture.appendChild(tag);
+  player = new vjs.Player(tag, {
+    'techOrder': ['mediaFaker']
+  });
+
+  equal(player.tech.el().poster, poster, 'the poster attribute should not be removed');
+});
+
 test('should load a media controller', function(){
   var player = PlayerTest.makePlayer({
     preload: 'none',
