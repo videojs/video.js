@@ -49,11 +49,9 @@ vjs.obj.hasOwnProperty = Object.prototype.hasOwnProperty;
 /**
  * Object.create shim for prototypal inheritance.
  * https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object/create
- * Not seeing a benfit of checking if a native Object.create already exists
- * so using this code always for consistency with older browsers.
  * @param  {Object}   obj Object to use as prototype
  */
-vjs.obj.create = function(obj){
+ vjs.obj.create = Object.create || function(obj){
   //Create a new function called 'F' which is just an empty object.
   function F() {}
 
