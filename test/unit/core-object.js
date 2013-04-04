@@ -12,6 +12,9 @@ test('should verify CoreObject extension', function(){
   var instance = new TestObject({ 'a': true });
 
   ok(instance instanceof TestObject, 'New instance is instance of TestObject');
+  window.console.log('instance', instance);
+  window.console.log('TestObject', instance);
+  window.console.log('vjs.CoreObject', vjs.CoreObject);
   ok(instance instanceof vjs.CoreObject, 'New instance is instance of CoreObject');
   ok(instance['a'], 'Init options are passed to init');
   ok(instance.testFn(), 'Additional methods are applied to TestObject prototype');
@@ -36,10 +39,10 @@ test('should verify CoreObject extension', function(){
   ok(childInstance['b'], 'Init options are passed to init');
   ok(childInstance['a'], 'Init options are passed to super init');
   ok(childInstance.testFn() === false, 'Methods can be overridden by extend');
+  ok(TestObject.prototype.testFn() === true, 'Prototype of parent not overridden');
 });
 
 test('should verify CoreObject create function', function(){
-  var oInstance = vjs.CoreObject.create();
   var TestObject = vjs.CoreObject.extend({
     init: function(initOptions){
       this['a'] = initOptions['a'];
@@ -50,6 +53,7 @@ test('should verify CoreObject create function', function(){
   });
 
   var instance = TestObject.create({ 'a': true });
+  ok(instance instanceof vjs.CoreObject, 'New instance is instance of CoreObject');
   ok(instance['a'], 'Init options are passed to init');
   ok(instance.testFn(), 'Additional methods are applied to TestObject prototype');
 });

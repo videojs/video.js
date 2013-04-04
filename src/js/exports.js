@@ -33,6 +33,9 @@ goog.exportSymbol('videojs.options', vjs.options);
 // Allow external components to use global cache
 goog.exportSymbol('videojs.cache', vjs.cache);
 
+// goog.exportSymbol('videojs.CoreObject', vjs.CoreObject);
+// goog.exportProperty(vjs.CoreObject, 'create', vjs.CoreObject.create);
+
 goog.exportSymbol('videojs.Component', vjs.Component);
 goog.exportProperty(vjs.Component.prototype, 'dispose', vjs.Component.prototype.dispose);
 goog.exportProperty(vjs.Component.prototype, 'createEl', vjs.Component.prototype.createEl);

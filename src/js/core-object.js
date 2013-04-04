@@ -2,7 +2,12 @@
  * Core Object/Class for objects that use inheritance + contstructors
  * @constructor
  */
-vjs.CoreObject = function(){};
+vjs.CoreObject = vjs['CoreObject'] = function(){};
+// Manually exporting vjs['CoreObject'] here for Closure Compiler
+// because of the use of the extend/create class methods
+// If we didn't do this, those functions would get flattend to something like
+// `a = ...` and `this.prototype` would refer to the global object instead of
+// CoreObject
 
 /**
  * Create a new object that inherits from this Object
@@ -25,7 +30,8 @@ vjs.CoreObject.extend = function(props){
   //  is a function that calls `this.init.apply(arguments)`
   // However that would prevent us from using `ParentObject.call(this);`
   //  in a Child constuctor because the `this` in `this.init`
-  //  would still refer to the Child. We would instead have to do
+  //  would still refer to the Child and cause an inifinite loop.
+  // We would instead have to do
   //    `ParentObject.prototype.init.apply(this, argumnents);`
   //  Bleh. We're not creating a _super() function, so it's good to keep
   //  the parent constructor reference simple.
@@ -46,7 +52,9 @@ vjs.CoreObject.extend = function(props){
 
   // Extend C's prototype with functions and other properties from props
   for (var name in props) {
-    C.prototype[name] = props[name];
+    if (props.hasOwnProperty(name)) {
+      C.prototype[name] = props[name];
+    }
   }
 
   return C;
