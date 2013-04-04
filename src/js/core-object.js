@@ -16,16 +16,12 @@ vjs.CoreObject = vjs['CoreObject'] = function(){};
  * @return {vjs.CoreObject} Returns an object that inherits from CoreObject
  */
 vjs.CoreObject.extend = function(props){
+  var init, subObj;
+
   props = props || {};
-
-  // Create a new function called 'F' which is just an empty object
-  function F() {}
-  // Inherit from this object's prototype
-  F.prototype = this.prototype;
-
   // Set up the constructor using the supplied init method
   // or using the init of the parent object
-  var init = props.init || this.prototype.init || function(){};
+  init = props.init || this.prototype.init || function(){};
   // In Resig's simple class inheritance (previously used) the constructor
   //  is a function that calls `this.init.apply(arguments)`
   // However that would prevent us from using `ParentObject.call(this);`
@@ -35,29 +31,29 @@ vjs.CoreObject.extend = function(props){
   //    `ParentObject.prototype.init.apply(this, argumnents);`
   //  Bleh. We're not creating a _super() function, so it's good to keep
   //  the parent constructor reference simple.
-  var C = function(){
+  subObj = function(){
     init.apply(this, arguments);
   };
 
-  // Inherit from F
-  C.prototype = new F();
-  // Reset the constructor property for C otherwise
-  // instances of C would have the constructor of the parent Object
-  C.prototype.constructor = C;
+  // Inherit from this object's prototype
+  subObj.prototype = vjs.obj.create(this.prototype);
+  // Reset the constructor property for subObj otherwise
+  // instances of subObj would have the constructor of the parent Object
+  subObj.prototype.constructor = subObj;
 
   // Make the class extendable
-  C.extend = vjs.CoreObject.extend;
+  subObj.extend = vjs.CoreObject.extend;
   // Make a function for creating instances
-  C.create = vjs.CoreObject.create;
+  subObj.create = vjs.CoreObject.create;
 
-  // Extend C's prototype with functions and other properties from props
+  // Extend subObj's prototype with functions and other properties from props
   for (var name in props) {
     if (props.hasOwnProperty(name)) {
-      C.prototype[name] = props[name];
+      subObj.prototype[name] = props[name];
     }
   }
 
-  return C;
+  return subObj;
 };
 
 /**

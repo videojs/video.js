@@ -12,9 +12,6 @@ test('should verify CoreObject extension', function(){
   var instance = new TestObject({ 'a': true });
 
   ok(instance instanceof TestObject, 'New instance is instance of TestObject');
-  window.console.log('instance', instance);
-  window.console.log('TestObject', instance);
-  window.console.log('vjs.CoreObject', vjs.CoreObject);
   ok(instance instanceof vjs.CoreObject, 'New instance is instance of CoreObject');
   ok(instance['a'], 'Init options are passed to init');
   ok(instance.testFn(), 'Additional methods are applied to TestObject prototype');
@@ -53,6 +50,8 @@ test('should verify CoreObject create function', function(){
   });
 
   var instance = TestObject.create({ 'a': true });
+
+  ok(instance instanceof TestObject, 'New instance is instance of TestObject');
   ok(instance instanceof vjs.CoreObject, 'New instance is instance of CoreObject');
   ok(instance['a'], 'Init options are passed to init');
   ok(instance.testFn(), 'Additional methods are applied to TestObject prototype');
