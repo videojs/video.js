@@ -37,7 +37,7 @@ module.exports = function(grunt) {
         dest: 'build/files/minified.video.js'
       },
       tests: {
-        src: ['build/files/combined.video.js', 'test/unit/*.js'],
+        src: ['build/files/combined.video.js', 'test/unit/*.js', '!test/unit/api.js'],
         externs: ['src/js/media.flash.externs.js', 'test/qunit/qunit-externs.js'],
         dest: 'build/files/test.minified.video.js'
       }
@@ -45,7 +45,8 @@ module.exports = function(grunt) {
     dist: {},
     qunit: {
       source: ['test/index.html'],
-      minified: ['test/minified.html']
+      minified: ['test/minified.html'],
+      minified_api: ['test/minified-api.html']
     },
     watch: {
       files: [ 'src/**/*.js', 'test/unit/*.js' ],
@@ -64,7 +65,7 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['jshint', 'build', 'minify', 'dist']);
   // Development watch task
   grunt.registerTask('dev', ['jshint', 'build', 'qunit:source']);
-  grunt.registerTask('test', ['jshint', 'build', 'minify:tests', 'qunit']);
+  grunt.registerTask('test', ['jshint', 'build', 'minify', 'qunit']);
 
   var fs = require('fs'),
       gzip = require('zlib').gzip;
