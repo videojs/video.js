@@ -7,12 +7,12 @@ test('should hide volume control if it\'s not supported', function(){
     id: noop,
     on: noop,
     ready: noop,
-    tech: {
-      features: {
-        volumeControl: false
-      }
-    }
+    tech: {}
   };
+
+  player.tech['features'] = {};
+  player.tech['features']['volumeControl'] = false;
+
   volumeControl = new vjs.VolumeControl(player);
   muteToggle = new vjs.MuteToggle(player);
 
@@ -36,12 +36,12 @@ test('should test and toggle volume control on `loadstart`', function(){
     muted: function(){
       return false;
     },
-    tech: {
-      features: {
-        volumeControl: true
-      }
-    }
+    tech: {}
   };
+
+  player.tech['features'] = {};
+  player.tech['features']['volumeControl'] = true;
+
   volumeControl = new vjs.VolumeControl(player);
   muteToggle = new vjs.MuteToggle(player);
 
