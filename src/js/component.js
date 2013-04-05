@@ -546,7 +546,7 @@ vjs.Component.prototype.lockShowing = function(){
   var style = this.el_.style;
   style.display = 'block';
   style.opacity = 1;
-  style.visiblity = 'visible';
+  style.visibility = 'visible';
   return this;
 };
 
@@ -558,7 +558,7 @@ vjs.Component.prototype.unlockShowing = function(){
   var style = this.el_.style;
   style.display = '';
   style.opacity = '';
-  style.visiblity = '';
+  style.visibility = '';
   return this;
 };
 

@@ -38,6 +38,8 @@ vjs.ControlBar = function(player, options){
     if ( !('ontouchstart' in window) ) {
       this.player_.on('mouseover', fadeIn);
       this.player_.on('mouseout', fadeOut);
+      this.player_.on('pause', vjs.bind(this, this.lockShowing));
+      this.player_.on('play', vjs.bind(this, this.unlockShowing));
     }
 
     touchstart = false;
@@ -96,10 +98,6 @@ vjs.ControlBar.prototype.fadeIn = function(){
 vjs.ControlBar.prototype.fadeOut = function(){
   goog.base(this, 'fadeOut');
   this.player_.trigger('controlshidden');
-};
-
-vjs.ControlBar.prototype.lockShowing = function(){
-  this.el_.style.opacity = '1';
 };
 
 /* Button - Base class for all buttons
@@ -1059,12 +1057,12 @@ goog.inherits(vjs.PosterImage, vjs.Button);
 vjs.PosterImage.prototype.createEl = function(){
   var el = vjs.createEl('div', {
         className: 'vjs-poster',
-        
+
         // Don't want poster to be tabbable.
         tabIndex: -1
       }),
       poster = this.player_.poster();
-  
+
   if (poster) {
     if ('backgroundSize' in el.style) {
       el.style.backgroundImage = 'url("' + poster + '")';
@@ -1072,7 +1070,7 @@ vjs.PosterImage.prototype.createEl = function(){
       el.appendChild(vjs.createEl('img', { src: poster }));
     }
   }
-  
+
   return el;
 };
 
