@@ -50,7 +50,7 @@ test('should test and toggle volume control on `loadstart`', function(){
   ok(muteToggle.el().className.indexOf('vjs-hidden') < 0,
      'muteToggle is hidden initially');
 
-  player.tech.features.volumeControl = false;
+  player.tech['features']['volumeControl'] = false;
   listeners.forEach(function(listener) {
     listener();
   });
@@ -60,7 +60,7 @@ test('should test and toggle volume control on `loadstart`', function(){
   ok(muteToggle.el().className.indexOf('vjs-hidden') >= 0,
      'muteToggle does not hide itself');
 
-  player.tech.features.volumeControl = true;
+  player.tech['features']['volumeControl'] = true;
   listeners.forEach(function(listener) {
     listener();
   });
