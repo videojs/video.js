@@ -103,6 +103,12 @@ goog.exportProperty(vjs.Html5.prototype, 'setPreload', vjs.Html5.prototype.setPr
 goog.exportProperty(vjs.Html5.prototype, 'setAutoplay', vjs.Html5.prototype.setAutoplay);
 goog.exportProperty(vjs.Html5.prototype, 'setLoop', vjs.Html5.prototype.setLoop);
 
+goog.exportProperty(vjs.Html5.prototype, 'features', vjs.Html5.prototype.features);
+goog.exportProperty(vjs.Html5.prototype.features, 'volumeControl', vjs.Html5.prototype.features.volumeControl);
+goog.exportProperty(vjs.Html5.prototype.features, 'fullscreenResize', vjs.Html5.prototype.features.fullscreenResize);
+goog.exportProperty(vjs.Html5.prototype.features, 'progressEvents', vjs.Html5.prototype.features.progressEvents);
+goog.exportProperty(vjs.Html5.prototype.features, 'timeupdateEvents', vjs.Html5.prototype.features.timeupdateEvents);
+
 goog.exportSymbol('videojs.Flash', vjs.Flash);
 goog.exportProperty(vjs.Flash, 'isSupported', vjs.Flash.isSupported);
 goog.exportProperty(vjs.Flash, 'canPlaySource', vjs.Flash.canPlaySource);
