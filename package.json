@@ -11,7 +11,7 @@
   "homepage": "http://videojs.com",
   "author": "Steve Heffernan",
   "scripts": {
-    "test": "grunt default test --verbose"
+    "test": "grunt test --verbose"
   },
   "repository": {
     "type": "git",
