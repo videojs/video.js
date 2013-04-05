@@ -78,8 +78,9 @@ body.vjs-full-window {
 
 /* Fading sytles, used to fade control bar. */
 .vjs-fade-in {
-  visibility: visible !important; /* Needed to make sure things hide in older browsers too. */
-  opacity: 1 !important;
+  display: block !important;
+  visibility: visible; /* Needed to make sure things hide in older browsers too. */
+  opacity: 1;
 
   -webkit-transition: visibility 0s linear 0s, opacity 0.3s linear;
   -moz-transition: visibility 0s linear 0s, opacity 0.3s linear;
@@ -88,8 +89,9 @@ body.vjs-full-window {
   transition: visibility 0s linear 0s, opacity 0.3s linear;
 }
 .vjs-fade-out {
-  visibility: hidden !important;
-  opacity: 0 !important;
+  display: block !important;
+  visibility: hidden;
+  opacity: 0;
 
   -webkit-transition: visibility 0s linear 1.5s,opacity 1.5s linear;
   -moz-transition: visibility 0s linear 1.5s,opacity 1.5s linear;
@@ -126,10 +128,11 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
   /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#242424', endColorstr='#171717',GradientType=0 );*/ /* IE6-9 */
   background: linear-gradient(top, #242424 50%,#1f1f1f 50%,#171717 100%); /* W3C */
 
+  display: none;
   /* Start hidden and with 0 opacity. Opacity is used to fade in modern browsers. */
   /* Can't use display block to hide initially because widths of slider handles aren't calculated and avaialbe for positioning correctly. */
-  visibility: hidden;
-  opacity: 0;
+  /*visibility: hidden;
+  opacity: 0;*/
 }
 
 /* General styles for individual controls. */
