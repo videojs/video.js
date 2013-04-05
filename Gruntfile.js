@@ -64,7 +64,7 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['jshint', 'build', 'minify', 'dist']);
   // Development watch task
   grunt.registerTask('dev', ['jshint', 'build', 'qunit:source']);
-  grunt.registerTask('test', ['jshint', 'build', 'minify:tests', 'qunit']);
+  grunt.registerTask('test', ['jshint', 'build', 'minify', 'qunit']);
 
   var fs = require('fs'),
       gzip = require('zlib').gzip;
