@@ -43,6 +43,7 @@ goog.exportProperty(vjs.Component.prototype, 'on', vjs.Component.prototype.on);
 goog.exportProperty(vjs.Component.prototype, 'off', vjs.Component.prototype.off);
 goog.exportProperty(vjs.Component.prototype, 'one', vjs.Component.prototype.one);
 goog.exportProperty(vjs.Component.prototype, 'trigger', vjs.Component.prototype.trigger);
+goog.exportProperty(vjs.Component.prototype, 'triggerReady', vjs.Component.prototype.triggerReady);
 goog.exportProperty(vjs.Component.prototype, 'show', vjs.Component.prototype.show);
 goog.exportProperty(vjs.Component.prototype, 'hide', vjs.Component.prototype.hide);
 goog.exportProperty(vjs.Component.prototype, 'width', vjs.Component.prototype.width);
@@ -117,3 +118,5 @@ goog.exportSymbol('videojs.ChaptersTrack', vjs.ChaptersTrack);
 goog.exportSymbol('videojs.autoSetup', vjs.autoSetup);
 
 goog.exportSymbol('videojs.plugin', vjs.plugin);
+
+goog.exportSymbol('videojs.createTimeRange', vjs.createTimeRange);
