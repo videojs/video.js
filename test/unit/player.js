@@ -235,3 +235,24 @@ test('should not play if firstplay event prevents default', function(){
 
   player.dispose();
 });
+
+test('should be able to initialize player twice on the same tag using string reference', function() {
+  var videoTag = PlayerTest.makeTag();
+  var id = videoTag.id;
+
+  var fixture = document.getElementById('qunit-fixture');
+  fixture.appendChild(videoTag);
+
+  var player = vjs(videoTag.id);
+  ok(player, 'player is created');
+  player.dispose();
+
+  ok(!document.getElementById(id), 'element is removed');
+  videoTag = PlayerTest.makeTag();
+  fixture.appendChild(videoTag);
+
+  //here we receive cached version instead of real
+  player = vjs(videoTag.id);
+  //here it triggers error, because player was destroyed already after first dispose
+  player.dispose();
+});
