@@ -159,7 +159,7 @@ test('should not force width and height', function() {
   var player = PlayerTest.makePlayer({ width: 'auto', height: 'auto' });
   ok(player.el().style.width === '', 'Width is not forced');
   ok(player.el().style.height === '', 'Height is not forced');
-  
+
   player.dispose();
 });
 
@@ -206,32 +206,6 @@ test('should load a media controller', function(){
   });
 
   ok(player.el().children[0].className.indexOf('vjs-tech') !== -1, 'media controller loaded');
-
-  player.dispose();
-});
-
-test('should not play if firstplay event prevents default', function(){
-  expect(1);
-  var player = PlayerTest.makePlayer({
-    'preload': 'none',
-    'autoplay': false,
-    'sources': [
-      { 'src': 'http://google.com', 'type': 'video/mp4' },
-      { 'src': 'http://google.com', 'type': 'video/webm' }
-    ]
-  });
-
-  player.on('firstplay', function(e){
-    ok(true, 'firstplay triggered');
-
-    e.preventDefault();
-  });
-
-  player.on('play', function(){
-    ok(false, 'play triggered anyway');
-  });
-
-  player.play();
 
   player.dispose();
 });

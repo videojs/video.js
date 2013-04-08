@@ -468,15 +468,7 @@ vjs.Player.prototype.techGet = function(method){
  * play from happening if desired. Usecase: preroll ads.
  */
 vjs.Player.prototype.play = function(){
-  // Create an event object so we can check for preventDefault after
-  var e = { type: 'play', target: this.el_ };
-
-  this.trigger(e);
-
-  if (!e.isDefaultPrevented()) {
-    this.techCall('play');
-  }
-
+  this.techCall('play');
   return this;
 };
 

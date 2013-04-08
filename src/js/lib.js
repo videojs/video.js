@@ -99,7 +99,7 @@ vjs.obj.deepMerge = function(obj1, obj2){
       val2 = obj2[key];
 
       // Check if both properties are pure objects and do a deep merge if so
-      if (vjs.obj.toString.call(val1) === objDef && vjs.obj.toString.call(val2) === objDef) {
+      if (vjs.obj.isPlain(val1) && vjs.obj.isPlain(val2)) {
         obj1[key] = vjs.obj.deepMerge(val1, val2);
       } else {
         obj1[key] = obj2[key];
@@ -116,6 +116,18 @@ vjs.obj.deepMerge = function(obj1, obj2){
  */
 vjs.obj.copy = function(obj){
   return vjs.obj.merge({}, obj);
+};
+
+/**
+ * Check if an object is plain, and not a dom node or any object sub-instance
+ * @param  {Object} obj Object to check
+ * @return {Boolean}     True if plain, false otherwise
+ */
+vjs.obj.isPlain = function(obj){
+  return !!obj
+    && typeof obj === 'object'
+    && vjs.obj.toString.call(obj) === '[object Object]'
+    && obj.constructor === Object;
 };
 
 /**
