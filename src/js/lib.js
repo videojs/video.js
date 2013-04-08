@@ -86,8 +86,7 @@ vjs.obj.merge = function(obj1, obj2){
  * @return {Object}      New object. Obj1 and Obj2 will be untouched.
  */
 vjs.obj.deepMerge = function(obj1, obj2){
-  var key, val1, val2, objDef;
-  objDef = '[object Object]';
+  var key, val1, val2;
 
   // Make a copy of obj1 so we're not ovewriting original values.
   // like prototype.options_ and all sub options objects
@@ -99,7 +98,7 @@ vjs.obj.deepMerge = function(obj1, obj2){
       val2 = obj2[key];
 
       // Check if both properties are pure objects and do a deep merge if so
-      if (vjs.obj.toString.call(val1) === objDef && vjs.obj.toString.call(val2) === objDef) {
+      if (vjs.obj.isPlainObject(val1) && vjs.obj.isPlainObject(val2)) {
         obj1[key] = vjs.obj.deepMerge(val1, val2);
       } else {
         obj1[key] = obj2[key];
@@ -116,6 +115,63 @@ vjs.obj.deepMerge = function(obj1, obj2){
  */
 vjs.obj.copy = function(obj){
   return vjs.obj.merge({}, obj);
+};
+
+/**
+ * Checks whether an object is a Window
+ * @param  {Object} obj Object to check if window
+ * @return {Boolean}    Whether the object is a window
+ */
+ vjs.obj.isWindow = function (obj) {
+    return obj != null && obj == obj.window;
+};
+
+/**
+ * Gets the type of an object
+ * @param  {Object} obj Object to get the type for
+ * @return {String}     The type of the object
+ */
+vjs.obj.type = function (obj) {
+    if ( obj == null ) {
+        return String( obj );
+    }
+    return typeof obj === 'object' || typeof obj === 'function' ?
+        vjs.obj[vjs.obj.toString.call(obj)] || 'object' :
+        typeof obj;
+};
+
+/**
+ * Checks whether an object is an plain object and not a DOM object or window
+ * @param  {Object} obj Object to check type of
+ * @return {Boolean}    Whether the object is plain
+ */
+vjs.obj.isPlainObject = function (obj) {
+    // Must be an Object.
+    // Because of IE, we also have to check the presence of the constructor property.
+    // Make sure that DOM nodes and window objects don't pass through, as well
+    if (!obj || vjs.obj.type(obj) !== 'object' || obj.nodeType || vjs.obj.isWindow(obj)) {
+        return false;
+    }
+
+    try {
+        // Not own constructor property must be Object
+        if ( obj.constructor &&
+            !vjs.obj.hasOwnProperty.call(obj, 'constructor') &&
+            !vjs.obj.hasOwnProperty.call(obj.constructor.prototype, 'isPrototypeOf')) {
+            return false;
+        }
+    } catch ( e ) {
+        // IE8,9 Will throw exceptions on certain host objects
+        return false;
+    }
+
+    // Own properties are enumerated firstly, so to speed up,
+    // if last one is own, then all properties are own.
+
+    var key;
+    for ( key in obj ) {}
+
+    return key === undefined || vjs.obj.hasOwnProperty.call(obj, key);
 };
 
 /**
@@ -246,9 +302,38 @@ vjs.addClass = function(element, classToAdd){
 vjs.removeClass = function(element, classToRemove){
   if (element.className.indexOf(classToRemove) == -1) { return; }
   var classNames = element.className.split(' ');
-  classNames.splice(classNames.indexOf(classToRemove),1);
+  classNames.splice(vjs.inArray(classNames,classToRemove),1);
   element.className = classNames.join(' ');
 };
+
+/**
+ * Returns the first index at which a given element can be found in the array, or -1 if it is not present
+ * @param {Array} arr    Array to search through
+ * @param {Element} elem Element to locate in the array
+ * @param {Number=} i Optional index at which to begin the search. Defaults to 0.
+ */
+vjs.inArray = function (arr, elem, i) {
+    var len;
+
+    if (arr) {
+        if ([].indexOf) {
+            return [].indexOf.call(arr, elem, i);
+        }
+
+        len = arr.length;
+        i = i ? i < 0 ? Math.max(0, len + i) : i : 0;
+
+        for (; i < len; i++) {
+            // Skip accessing in sparse arrays
+            if (i in arr && arr[i] === elem) {
+                return i;
+            }
+        }
+    }
+
+    return -1;
+};
+
 
 /**
  * Element for testing browser HTML5 video capabilities
