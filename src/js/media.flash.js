@@ -14,6 +14,9 @@
 vjs.Flash = function(player, options, ready){
   goog.base(this, player, options, ready);
 
+  // Resizing plugins in Firefox always reloads the plugin (e.g. full window mode)
+  this.features.parentResize = !(vjs.USER_AGENT.match('Firefox'));
+
   var source = options['source'],
 
       // Which element to embed in
@@ -209,7 +212,6 @@ vjs.Flash = function(player, options, ready){
   } else {
     vjs.Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
   }
-
 };
 goog.inherits(vjs.Flash, vjs.MediaTechController);
 
@@ -303,27 +305,15 @@ vjs.Flash.isSupported = function(){
 };
 
 vjs.Flash.canPlaySource = function(srcObj){
-  if (srcObj.type in vjs.Flash.prototype['features']['formats']) { return 'maybe'; }
+  if (srcObj.type in vjs.Flash.formats) { return 'maybe'; }
 };
 
-vjs.Flash.prototype['features'] = {};
-vjs.Flash.prototype['features']['formats'] = {
+vjs.Flash.formats = {
   'video/flv': 'FLV',
   'video/x-flv': 'FLV',
   'video/mp4': 'MP4',
   'video/m4v': 'MP4'
 };
-
-// Optional events that we can manually mimic with timers
-// currently not triggered by video-js-swf
-vjs.Flash.prototype['features']['progressEvents'] = false;
-vjs.Flash.prototype['features']['timeupdateEvents'] = false;
-
-// Resizing plugins using request fullscreen reloads the plugin
-vjs.Flash.prototype['features']['fullscreenResize'] = false;
-
-// Resizing plugins in Firefox always reloads the plugin (e.g. full window mode)
-vjs.Flash.prototype['features']['parentResize'] = !(vjs.USER_AGENT.match('Firefox'));
 
 vjs.Flash['onReady'] = function(currSwf){
   var el = vjs.el(currSwf);
