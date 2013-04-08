@@ -119,6 +119,18 @@ vjs.obj.copy = function(obj){
 };
 
 /**
+ * Check if an object is plain, and not a dom node or any object sub-instance
+ * @param  {Object} obj Object to check
+ * @return {Boolean}     True if plain, false otherwise
+ */
+vjs.obj.isPlain = function(obj){
+  return !!obj
+    && typeof obj === 'object'
+    && vjs.obj.toString.call(obj) === '[object Object]'
+    && obj.constructor === Object;
+};
+
+/**
  * Bind (a.k.a proxy or Context). A simple method for changing the context of a function
    It also stores a unique id on the function so it can be easily removed from events
  * @param  {*}   context The object to bind as scope
