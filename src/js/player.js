@@ -131,8 +131,6 @@ vjs.Player.prototype.createEl = function(){
   // Original tag settings stored in options
   // now remove immediately so native controls don't flash.
   tag.removeAttribute('controls');
-  // Poster will be handled by a manual <img>
-  tag.removeAttribute('poster');
   // Remove width/height attrs from tag so CSS can make it 100% width/height
   tag.removeAttribute('width');
   tag.removeAttribute('height');
@@ -173,7 +171,7 @@ vjs.Player.prototype.createEl = function(){
   // Enforce with CSS since width/height attrs don't work on divs
   this.width(this.options_['width'], true); // (true) Skip resize listener on load
   this.height(this.options_['height'], true);
-  
+
   // Wrap video tag in div (el/box) container
   if (tag.parentNode) {
     tag.parentNode.insertBefore(el, tag);
@@ -237,6 +235,7 @@ vjs.Player.prototype.loadTech = function(techName, source){
 };
 
 vjs.Player.prototype.unloadTech = function(){
+  this.isReady_ = false;
   this.tech.dispose();
 
   // Turn off any manual progress or timeupdate tracking
@@ -469,15 +468,7 @@ vjs.Player.prototype.techGet = function(method){
  * play from happening if desired. Usecase: preroll ads.
  */
 vjs.Player.prototype.play = function(){
-  // Create an event object so we can check for preventDefault after
-  var e = { type: 'play', target: this.el_ };
-
-  this.trigger(e);
-
-  if (!e.isDefaultPrevented()) {
-    this.techCall('play');
-  }
-
+  this.techCall('play');
   return this;
 };
 

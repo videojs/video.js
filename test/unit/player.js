@@ -159,7 +159,7 @@ test('should not force width and height', function() {
   var player = PlayerTest.makePlayer({ width: 'auto', height: 'auto' });
   ok(player.el().style.width === '', 'Width is not forced');
   ok(player.el().style.height === '', 'Height is not forced');
-  
+
   player.dispose();
 });
 
@@ -181,6 +181,21 @@ test('should accept options from multiple sources and override in correct order'
   player.dispose();
 });
 
+test('should transfer the poster attribute unmodified', function(){
+  var tag, fixture, poster, player;
+  poster = 'http://example.com/poster.jpg';
+  tag = PlayerTest.makeTag();
+  tag.setAttribute('poster', poster);
+  fixture = document.getElementById('qunit-fixture');
+
+  fixture.appendChild(tag);
+  player = new vjs.Player(tag, {
+    'techOrder': ['mediaFaker']
+  });
+
+  equal(player.tech.el().poster, poster, 'the poster attribute should not be removed');
+});
+
 test('should load a media controller', function(){
   var player = PlayerTest.makePlayer({
     preload: 'none',
@@ -195,28 +210,23 @@ test('should load a media controller', function(){
   player.dispose();
 });
 
-test('should not play if firstplay event prevents default', function(){
-  expect(1);
-  var player = PlayerTest.makePlayer({
-    'preload': 'none',
-    'autoplay': false,
-    'sources': [
-      { 'src': 'http://google.com', 'type': 'video/mp4' },
-      { 'src': 'http://google.com', 'type': 'video/webm' }
-    ]
-  });
+test('should be able to initialize player twice on the same tag using string reference', function() {
+  var videoTag = PlayerTest.makeTag();
+  var id = videoTag.id;
 
-  player.on('firstplay', function(e){
-    ok(true, 'firstplay triggered');
+  var fixture = document.getElementById('qunit-fixture');
+  fixture.appendChild(videoTag);
 
-    e.preventDefault();
-  });
+  var player = vjs(videoTag.id);
+  ok(player, 'player is created');
+  player.dispose();
 
-  player.on('play', function(){
-    ok(false, 'play triggered anyway');
-  });
+  ok(!document.getElementById(id), 'element is removed');
+  videoTag = PlayerTest.makeTag();
+  fixture.appendChild(videoTag);
 
-  player.play();
-
+  //here we receive cached version instead of real
+  player = vjs(videoTag.id);
+  //here it triggers error, because player was destroyed already after first dispose
   player.dispose();
 });

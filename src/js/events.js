@@ -168,9 +168,7 @@ vjs.fixEvent = function(event) {
     var old = event || window.event;
 
     // Clone the old object so that we can modify the values event = {};
-    for (var prop in old) {
-      event[prop] = old[prop];
-    }
+    event = vjs.obj.copy(old);
 
     // The event occurred on this element
     if (!event.target) {
