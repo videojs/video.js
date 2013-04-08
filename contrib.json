@@ -1,0 +1,6 @@
+{
+  "developmentBranch": "master",
+  "releaseBranch": "stable",
+  "remote": "origin",
+  "upstream": "zencoder"
+}
