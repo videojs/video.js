@@ -41,6 +41,17 @@ test('should copy an object', function(){
   deepEqual(asdf,fdsa);
 });
 
+test('should check if an object is plain', function(){
+  var empty = {};
+  ok(vjs.obj.isPlain(empty) === true, 'Empty object is plain');
+
+  var node = document.createElement('div');
+  ok(vjs.obj.isPlain(node) === false, 'DOM node is not plain');
+
+  var fn = function(){};
+  ok(vjs.obj.isPlain(fn) === false, 'Function is not plain');
+});
+
 test('should add context to a function', function(){
   var newContext = { test: 'obj'};
   var asdf = function(){
