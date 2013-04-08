@@ -71,7 +71,6 @@ vjs.obj.merge = function(obj1, obj2){
   if (!obj2) { return obj1; }
   for (var key in obj2){
     if (vjs.obj.hasOwnProperty.call(obj2, key)) {
-      // console.log(key)
       obj1[key] = obj2[key];
     }
   }
