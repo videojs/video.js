@@ -368,9 +368,6 @@ vjs.Flash.checkReady = function(tech){
 
 // Trigger events from the swf on the player
 vjs.Flash['onEvent'] = function(swfID, eventName){
-  // Triggering play in the play method to allow for preventDefault
-  if (eventName === 'play') return;
-
   var player = vjs.el(swfID)['player'];
   player.trigger(eventName);
 };
