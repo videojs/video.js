@@ -97,9 +97,6 @@ vjs.Html5.prototype.setupTriggers = function(){
 // Triggers removed using this.off when disposed
 
 vjs.Html5.prototype.eventHandler = function(e){
-  // We'll be triggring play ourselves, thank you.
-  if (e.type === 'play') return;
-
   this.trigger(e);
 
   // No need for media events to bubble up.
