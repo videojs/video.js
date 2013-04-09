@@ -28,9 +28,7 @@ test('should re-link the player if the tech is moved', function(){
     ready: function(){}
   };
   tech = new vjs.Html5(player, {});
-  tech.features = {
-    movingMediaElementInDOM: false
-  };
+  vjs.Html5.movingMediaElementInDOM = false;
   tech.createEl();
 
   strictEqual(player, tech.el()['player']);

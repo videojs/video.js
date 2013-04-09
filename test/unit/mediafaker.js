@@ -15,10 +15,7 @@ vjs.MediaFaker = vjs.MediaTechController.extend({
 // Support everything
 vjs.MediaFaker.isSupported = function(){ return true; };
 vjs.MediaFaker.canPlaySource = function(srcObj){ return true; };
-vjs.MediaFaker.prototype.features = {
-  progressEvents: true,
-  timeupdateEvents: true
-};
+
 vjs.MediaFaker.prototype.createEl = function(){
   var el = vjs.MediaTechController.prototype.createEl.call(this, 'div', {
     className: 'vjs-tech'
