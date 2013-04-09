@@ -19,10 +19,10 @@
   },
   "devDependencies": {
     "grunt-cli": "~0.1.0",
-    "grunt": "0.4.0rc4",
-    "grunt-contrib-jshint": "https://github.com/gruntjs/grunt-contrib-jshint/archive/7fd70e86c5a8d489095fa81589d95dccb8eb3a46.tar.gz",
+    "grunt": "~0.4.0",
+    "grunt-contrib-jshint": "~0.4.3",
     "grunt-contrib-watch": "~0.1.4",
-    "grunt-contrib-qunit": "0.1.0",
+    "grunt-contrib-qunit": "~0.2.1",
     "calcdeps": "~0.1.7",
     "grunt-contrib-clean": "~0.4.0a",
     "grunt-contrib-copy": "~0.3.2",

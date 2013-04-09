@@ -117,7 +117,7 @@ test('Plugins should get events in registration order', function() {
     expectedOrder.push(name);
     plugin(name);
   }
-  
+
   vjs.plugin('testerPlugin', function (opts) {
     this.trigger('test');
   });
@@ -150,7 +150,7 @@ test('Plugins should not get events after stopImmediatePropagation is called', f
     expectedOrder.push(name);
     plugin(name);
   }
-  
+
   vjs.plugin('testerPlugin', function (opts) {
     this.trigger('test');
   });
