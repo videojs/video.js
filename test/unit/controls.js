@@ -13,6 +13,7 @@ test('should hide volume control if it\'s not supported', function(){
       }
     }
   };
+
   volumeControl = new vjs.VolumeControl(player);
   muteToggle = new vjs.MuteToggle(player);
 
@@ -42,6 +43,7 @@ test('should test and toggle volume control on `loadstart`', function(){
       }
     }
   };
+
   volumeControl = new vjs.VolumeControl(player);
   muteToggle = new vjs.MuteToggle(player);
 

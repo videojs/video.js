@@ -209,7 +209,6 @@ vjs.Flash = function(player, options, ready){
   } else {
     vjs.Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
   }
-
 };
 goog.inherits(vjs.Flash, vjs.MediaTechController);
 
@@ -303,27 +302,14 @@ vjs.Flash.isSupported = function(){
 };
 
 vjs.Flash.canPlaySource = function(srcObj){
-  if (srcObj.type in vjs.Flash.prototype.features.formats) { return 'maybe'; }
+  if (srcObj.type in vjs.Flash.formats) { return 'maybe'; }
 };
 
-vjs.Flash.prototype.features = {
-  formats: {
-    'video/flv': 'FLV',
-    'video/x-flv': 'FLV',
-    'video/mp4': 'MP4',
-    'video/m4v': 'MP4'
-  },
-
-  // Optional events that we can manually mimic with timers
-  // currently not triggered by video-js-swf
-  progressEvents: false,
-  timeupdateEvents: false,
-
-  // Resizing plugins using request fullscreen reloads the plugin
-  fullscreenResize: false,
-
-  // Resizing plugins in Firefox always reloads the plugin (e.g. full window mode)
-  parentResize: !(vjs.USER_AGENT.match('Firefox'))
+vjs.Flash.formats = {
+  'video/flv': 'FLV',
+  'video/x-flv': 'FLV',
+  'video/mp4': 'MP4',
+  'video/m4v': 'MP4'
 };
 
 vjs.Flash['onReady'] = function(currSwf){
