@@ -33,6 +33,9 @@ goog.exportSymbol('videojs.options', vjs.options);
 // Allow external components to use global cache
 goog.exportSymbol('videojs.cache', vjs.cache);
 
+// goog.exportSymbol('videojs.CoreObject', vjs.CoreObject);
+// goog.exportProperty(vjs.CoreObject, 'create', vjs.CoreObject.create);
+
 goog.exportSymbol('videojs.Component', vjs.Component);
 goog.exportProperty(vjs.Component.prototype, 'dispose', vjs.Component.prototype.dispose);
 goog.exportProperty(vjs.Component.prototype, 'createEl', vjs.Component.prototype.createEl);
@@ -57,11 +60,8 @@ goog.exportProperty(vjs.Player.prototype, 'dispose', vjs.Player.prototype.dispos
 goog.exportSymbol('videojs.MediaLoader', vjs.MediaLoader);
 goog.exportSymbol('videojs.TextTrackDisplay', vjs.TextTrackDisplay);
 
-goog.exportSymbol('videojs.Control', vjs.Control);
 goog.exportSymbol('videojs.ControlBar', vjs.ControlBar);
 goog.exportSymbol('videojs.Button', vjs.Button);
-goog.exportSymbol('videojs.PlayButton', vjs.PlayButton);
-goog.exportSymbol('videojs.PauseButton', vjs.PauseButton);
 goog.exportSymbol('videojs.PlayToggle', vjs.PlayToggle);
 goog.exportSymbol('videojs.FullscreenToggle', vjs.FullscreenToggle);
 goog.exportSymbol('videojs.BigPlayButton', vjs.BigPlayButton);

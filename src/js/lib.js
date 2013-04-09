@@ -47,6 +47,23 @@ vjs.capitalize = function(string){
 vjs.obj = {};
 
 /**
+ * Object.create shim for prototypal inheritance.
+ * https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object/create
+ * @param  {Object}   obj Object to use as prototype
+ */
+ vjs.obj.create = Object.create || function(obj){
+  //Create a new function called 'F' which is just an empty object.
+  function F() {}
+
+  //the prototype of the 'F' function should point to the
+  //parameter of the anonymous function.
+  F.prototype = obj;
+
+  //create a new constructor function based off of the 'F' function.
+  return new F();
+};
+
+/**
  * Loop through each property in an object and call a function
  * whose arguments are (key,value)
  * @param  {Object}   obj Object of properties

@@ -32,12 +32,12 @@ module.exports = function(grunt) {
     },
     minify: {
       source:{
-        src: ['build/files/combined.video.js'],
+        src: ['build/files/combined.video.js', 'build/compiler/goog.base.js', 'src/js/exports.js'],
         externs: ['src/js/media.flash.externs.js'],
         dest: 'build/files/minified.video.js'
       },
       tests: {
-        src: ['build/files/combined.video.js', 'test/unit/*.js', '!test/unit/api.js'],
+        src: ['build/files/combined.video.js', 'build/compiler/goog.base.js', 'src/js/exports.js', 'test/unit/*.js', '!test/unit/api.js'],
         externs: ['src/js/media.flash.externs.js', 'test/qunit/qunit-externs.js'],
         dest: 'build/files/test.minified.video.js'
       }
