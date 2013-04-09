@@ -14,9 +14,6 @@
 vjs.Flash = function(player, options, ready){
   goog.base(this, player, options, ready);
 
-  // Resizing plugins in Firefox always reloads the plugin (e.g. full window mode)
-  this.features.parentResize = !(vjs.USER_AGENT.match('Firefox'));
-
   var source = options['source'],
 
       // Which element to embed in
