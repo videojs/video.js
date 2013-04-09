@@ -850,11 +850,11 @@ vjs.VolumeControl = function(player, options){
   goog.base(this, player, options);
 
   // hide volume controls when they're not supported by the current tech
-  if (player.tech && player.tech.features.volumeControl === false) {
+  if (player.tech && player.tech.features && player.tech.features.volumeControl === false) {
     this.addClass('vjs-hidden');
   }
   player.on('loadstart', vjs.bind(this, function(){
-    if (player.tech.features.volumeControl === false) {
+    if (player.tech.features && player.tech.features.volumeControl === false) {
       this.addClass('vjs-hidden');
     } else {
       this.removeClass('vjs-hidden');
@@ -979,11 +979,11 @@ vjs.MuteToggle = function(player, options){
   player.on('volumechange', vjs.bind(this, this.update));
 
   // hide mute toggle if the current tech doesn't support volume control
-  if (player.tech && player.tech.features.volumeControl === false) {
+  if (player.tech && player.tech.features && player.tech.features.volumeControl === false) {
     this.addClass('vjs-hidden');
   }
   player.on('loadstart', vjs.bind(this, function(){
-    if (player.tech.features.volumeControl === false) {
+    if (player.tech.features && player.tech.features.volumeControl === false) {
       this.addClass('vjs-hidden');
     } else {
       this.removeClass('vjs-hidden');

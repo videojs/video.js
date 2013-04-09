@@ -14,10 +14,7 @@ goog.inherits(vjs.MediaFaker, vjs.MediaTechController);
 // Support everything
 vjs.MediaFaker.isSupported = function(){ return true; };
 vjs.MediaFaker.canPlaySource = function(srcObj){ return true; };
-vjs.MediaFaker.prototype.features = {
-  progressEvents: true,
-  timeupdateEvents: true
-};
+
 vjs.MediaFaker.prototype.createEl = function(){
   var el = goog.base(this, 'createEl', 'div', {
     className: 'vjs-tech'

@@ -43,6 +43,7 @@ goog.exportProperty(vjs.Component.prototype, 'on', vjs.Component.prototype.on);
 goog.exportProperty(vjs.Component.prototype, 'off', vjs.Component.prototype.off);
 goog.exportProperty(vjs.Component.prototype, 'one', vjs.Component.prototype.one);
 goog.exportProperty(vjs.Component.prototype, 'trigger', vjs.Component.prototype.trigger);
+goog.exportProperty(vjs.Component.prototype, 'triggerReady', vjs.Component.prototype.triggerReady);
 goog.exportProperty(vjs.Component.prototype, 'show', vjs.Component.prototype.show);
 goog.exportProperty(vjs.Component.prototype, 'hide', vjs.Component.prototype.hide);
 goog.exportProperty(vjs.Component.prototype, 'width', vjs.Component.prototype.width);
@@ -89,6 +90,11 @@ goog.exportSymbol('videojs.CaptionsButton', vjs.CaptionsButton);
 goog.exportSymbol('videojs.ChaptersButton', vjs.ChaptersButton);
 
 goog.exportSymbol('videojs.MediaTechController', vjs.MediaTechController);
+goog.exportProperty(vjs.MediaTechController.prototype, 'features', vjs.MediaTechController.prototype.features);
+goog.exportProperty(vjs.MediaTechController.prototype.features, 'volumeControl', vjs.MediaTechController.prototype.features.volumeControl);
+goog.exportProperty(vjs.MediaTechController.prototype.features, 'fullscreenResize', vjs.MediaTechController.prototype.features.fullscreenResize);
+goog.exportProperty(vjs.MediaTechController.prototype.features, 'progressEvents', vjs.MediaTechController.prototype.features.progressEvents);
+goog.exportProperty(vjs.MediaTechController.prototype.features, 'timeupdateEvents', vjs.MediaTechController.prototype.features.timeupdateEvents);
 
 goog.exportSymbol('videojs.Html5', vjs.Html5);
 goog.exportProperty(vjs.Html5, 'Events', vjs.Html5.Events);
@@ -119,3 +125,5 @@ goog.exportSymbol('videojs.ChaptersTrack', vjs.ChaptersTrack);
 goog.exportSymbol('videojs.autoSetup', vjs.autoSetup);
 
 goog.exportSymbol('videojs.plugin', vjs.plugin);
+
+goog.exportSymbol('videojs.createTimeRange', vjs.createTimeRange);

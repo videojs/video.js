@@ -34,6 +34,18 @@ vjs.MediaTechController.prototype.onClick = function(){
   }
 };
 
+vjs.MediaTechController.prototype.features = {
+  volumeControl: true,
+
+  // Resizing plugins using request fullscreen reloads the plugin
+  fullscreenResize: false,
+
+  // Optional events that we can manually mimic with timers
+  // currently not triggered by video-js-swf
+  progressEvents: false,
+  timeupdateEvents: false
+};
+
 vjs.media = {};
 
 /**

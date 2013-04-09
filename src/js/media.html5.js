@@ -12,6 +12,12 @@
 vjs.Html5 = function(player, options, ready){
   goog.base(this, player, options, ready);
 
+  // volume cannot be changed from 1 on iOS
+  this.features.volumeControl = vjs.Html5.canControlVolume();
+
+  // In iOS, if you move a video element in the DOM, it breaks video playback.
+  this.features.movingMediaElementInDOM = !vjs.IS_IOS;
+
   var source = options['source'];
 
   // If the element source is already set, we may have missed the loadstart event, and want to trigger it.
@@ -215,23 +221,6 @@ vjs.Html5.Events = 'loadstart,suspend,abort,error,emptied,stalled,loadedmetadata
 
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //
-vjs.Html5.prototype.features = {
-
-  // Support for video element specific full screen. (webkitEnterFullScreen, not requestFullscreen which we use on the player div)
-  // http://developer.apple.com/library/safari/#documentation/AudioVideo/Reference/HTMLVideoElementClassReference/HTMLVideoElement/HTMLVideoElement.html
-  // Seems to be broken in Chromium/Chrome && Safari in Leopard
-  fullscreen: (vjs.TEST_VID.webkitEnterFullScreen)
-    ? ((!vjs.USER_AGENT.match('Chrome') && !vjs.USER_AGENT.match('Mac OS X 10.5')
-      ? true
-      : false))
-    : false,
-
-  // In iOS, if you move a video element in the DOM, it breaks video playback.
-  movingMediaElementInDOM: !vjs.IS_IOS,
-
-  // volume cannot be changed from 1 on iOS
-  volumeControl: vjs.Html5.canControlVolume()
-};
 
 // Android
 if (vjs.IS_ANDROID) {
