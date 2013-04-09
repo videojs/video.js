@@ -9,6 +9,7 @@
  * @constructor
  */
 vjs.Control = vjs.Component.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Component.call(this, player, options);
   }
@@ -27,10 +28,7 @@ vjs.Control.prototype.buildCSSClass = function(){
  * @constructor
  */
 vjs.ControlBar = vjs.Component.extend({
-
-  /**
-   * @constructor
-   */
+  /** @constructor */
   init: function(player, options){
     vjs.Component.call(this, player, options);
 
@@ -115,10 +113,7 @@ vjs.ControlBar.prototype.fadeOut = function(){
  * @constructor
  */
 vjs.Button = vjs.Control.extend({
-
-  /**
-   * @constructor
-   */
+  /** @constructor */
   init: function(player, options){
     vjs.Control.call(this, player, options);
 
@@ -228,6 +223,7 @@ vjs.PauseButton.prototype.onClick = function(){
  * @constructor
  */
 vjs.PlayToggle = vjs.Button.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Button.call(this, player, options);
 
@@ -275,6 +271,7 @@ vjs.PlayToggle.prototype.onPause = function(){
  * @constructor
  */
 vjs.FullscreenToggle = vjs.Button.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Button.call(this, player, options);
   }
@@ -306,6 +303,7 @@ vjs.FullscreenToggle.prototype.onClick = function(){
  * @constructor
  */
 vjs.BigPlayButton = vjs.Button.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Button.call(this, player, options);
 
@@ -340,6 +338,7 @@ vjs.BigPlayButton.prototype.onClick = function(){
  * @constructor
  */
 vjs.LoadingSpinner = vjs.Component.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Component.call(this, player, options);
 
@@ -396,6 +395,7 @@ vjs.LoadingSpinner.prototype.createEl = function(){
  * @constructor
  */
 vjs.CurrentTimeDisplay = vjs.Component.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Component.call(this, player, options);
 
@@ -431,6 +431,7 @@ vjs.CurrentTimeDisplay.prototype.updateContent = function(){
  * @constructor
  */
 vjs.DurationDisplay = vjs.Component.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Component.call(this, player, options);
 
@@ -466,6 +467,7 @@ vjs.DurationDisplay.prototype.updateContent = function(){
  * @constructor
  */
 vjs.TimeDivider = vjs.Component.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Component.call(this, player, options);
   }
@@ -485,6 +487,7 @@ vjs.TimeDivider.prototype.createEl = function(){
  * @constructor
  */
 vjs.RemainingTimeDisplay = vjs.Component.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Component.call(this, player, options);
 
@@ -528,18 +531,13 @@ vjs.RemainingTimeDisplay.prototype.updateContent = function(){
  * @constructor
  */
 vjs.Slider = vjs.Component.extend({
-
-  /**
-   * @constructor
-   */
+  /** @constructor */
   init: function(player, options){
     vjs.Component.call(this, player, options);
 
     // Set property names to bar and handle to match with the child Slider class is looking for
     this.bar = this.getChild(this.options_['barName']);
     this.handle = this.getChild(this.options_['handleName']);
-
-    // console.log('asdf', this.bar, this.childNameIndex_, this.options_)
 
     player.on(this.playerEvent, vjs.bind(this, this.update));
 
@@ -700,6 +698,7 @@ vjs.Slider.prototype.onBlur = function(){
  * @constructor
  */
 vjs.ProgressControl = vjs.Component.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Component.call(this, player, options);
   }
@@ -724,6 +723,7 @@ vjs.ProgressControl.prototype.createEl = function(){
  * @constructor
  */
 vjs.SeekBar = vjs.Slider.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Slider.call(this, player, options);
     player.on('timeupdate', vjs.bind(this, this.updateARIAAttributes));
@@ -805,6 +805,7 @@ vjs.SeekBar.prototype.stepBack = function(){
  * @constructor
  */
 vjs.LoadProgressBar = vjs.Component.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Component.call(this, player, options);
     player.on('progress', vjs.bind(this, this.update));
@@ -830,6 +831,7 @@ vjs.LoadProgressBar.prototype.update = function(){
  * @constructor
  */
 vjs.PlayProgressBar = vjs.Component.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Component.call(this, player, options);
   }
@@ -850,6 +852,7 @@ vjs.PlayProgressBar.prototype.createEl = function(){
  * @constructor
  */
 vjs.SeekHandle = vjs.Component.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Component.call(this, player, options);
   }
@@ -869,6 +872,7 @@ vjs.SeekHandle.prototype.createEl = function(){
  * @constructor
  */
 vjs.VolumeControl = vjs.Component.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Component.call(this, player, options);
 
@@ -905,6 +909,7 @@ vjs.VolumeControl.prototype.createEl = function(){
  * @constructor
  */
 vjs.VolumeBar = vjs.Slider.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Slider.call(this, player, options);
     player.on('volumechange', vjs.bind(this, this.updateARIAAttributes));
@@ -960,6 +965,7 @@ vjs.VolumeBar.prototype.stepBack = function(){
  * @constructor
  */
 vjs.VolumeLevel = vjs.Component.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Component.call(this, player, options);
   }
@@ -979,6 +985,7 @@ vjs.VolumeLevel.prototype.createEl = function(){
  * @constructor
  */
 vjs.VolumeHandle = vjs.Component.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Component.call(this, player, options);
   }
@@ -1000,6 +1007,7 @@ vjs.VolumeHandle.prototype.createEl = function(){
  * @constructor
  */
 vjs.MuteToggle = vjs.Button.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Button.call(this, player, options);
 
@@ -1071,6 +1079,7 @@ vjs.MuteToggle.prototype.update = function(){
  * @constructor
  */
 vjs.PosterImage = vjs.Button.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Button.call(this, player, options);
 
@@ -1115,6 +1124,7 @@ vjs.PosterImage.prototype.onClick = function(){
  * @constructor
  */
 vjs.Menu = vjs.Component.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Component.call(this, player, options);
   }
@@ -1140,6 +1150,7 @@ vjs.Menu.prototype.createEl = function(){
  * @constructor
  */
 vjs.MenuItem = vjs.Button.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Button.call(this, player, options);
 

@@ -9,6 +9,7 @@
  * @constructor
  */
 vjs.MediaTechController = vjs.Component.extend({
+  /** @constructor */
   init: function(player, options, ready){
     vjs.Component.call(this, player, options, ready);
 

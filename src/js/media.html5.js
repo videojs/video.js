@@ -10,6 +10,7 @@
  * @constructor
  */
 vjs.Html5 = vjs.MediaTechController.extend({
+  /** @constructor */
   init: function(player, options, ready){
     vjs.MediaTechController.call(this, player, options, ready);
 

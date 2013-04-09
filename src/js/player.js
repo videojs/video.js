@@ -6,10 +6,7 @@
  * @constructor
  */
 vjs.Player = vjs.Component.extend({
-
-  /**
-   * @constructor
-   */
+  /** @constructor */
   init: function(tag, options, ready){
     this.tag = tag; // Store the original tag used to set options
 
@@ -955,6 +952,7 @@ vjs.Player.prototype.ended = function(){ return this.techGet('ended'); };
  * @constructor
  */
 vjs.MediaLoader = vjs.Component.extend({
+  /** @constructor */
   init: function(player, options, ready){
     vjs.Component.call(this, player, options, ready);
 

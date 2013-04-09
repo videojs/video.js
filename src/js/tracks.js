@@ -119,6 +119,7 @@ vjs.Player.prototype.showTextTrack = function(id, disableSameKind){
  * @constructor
  */
 vjs.TextTrack = vjs.Component.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Component.call(this, player, options);
 
@@ -695,6 +696,7 @@ vjs.ChaptersTrack.prototype.kind_ = 'chapters';
  * @constructor
  */
 vjs.TextTrackDisplay = vjs.Component.extend({
+  /** @constructor */
   init: function(player, options, ready){
     vjs.Component.call(this, player, options, ready);
 
@@ -721,6 +723,7 @@ vjs.TextTrackDisplay.prototype.createEl = function(){
  * @constructor
  */
 vjs.TextTrackMenuItem = vjs.MenuItem.extend({
+  /** @constructor */
   init: function(player, options){
     var track = this.track = options['track'];
 
@@ -750,6 +753,7 @@ vjs.TextTrackMenuItem.prototype.update = function(){
  * @constructor
  */
 vjs.OffTextTrackMenuItem = vjs.TextTrackMenuItem.extend({
+  /** @constructor */
   init: function(player, options){
     // Create pseudo track info
     // Requires options['kind']
@@ -795,6 +799,7 @@ vjs.OffTextTrackMenuItem.prototype.update = function(){
  * @constructor
  */
 vjs.TextTrackButton = vjs.Button.extend({
+  /** @constructor */
   init: function(player, options){
     vjs.Button.call(this, player, options);
 
@@ -928,6 +933,7 @@ vjs.TextTrackButton.prototype.unpressButton = function(){
  * @constructor
  */
 vjs.CaptionsButton = vjs.TextTrackButton.extend({
+  /** @constructor */
   init: function(player, options, ready){
     vjs.TextTrackButton.call(this, player, options, ready);
     this.el_.setAttribute('aria-label','Captions Menu');
@@ -941,6 +947,7 @@ vjs.CaptionsButton.prototype.className = 'vjs-captions-button';
  * @constructor
  */
 vjs.SubtitlesButton = vjs.TextTrackButton.extend({
+  /** @constructor */
   init: function(player, options, ready){
     vjs.TextTrackButton.call(this, player, options, ready);
     this.el_.setAttribute('aria-label','Subtitles Menu');
@@ -956,6 +963,7 @@ vjs.SubtitlesButton.prototype.className = 'vjs-subtitles-button';
  * @constructor
  */
 vjs.ChaptersButton = vjs.TextTrackButton.extend({
+  /** @constructor */
   init: function(player, options, ready){
     vjs.TextTrackButton.call(this, player, options, ready);
     this.el_.setAttribute('aria-label','Chapters Menu');
@@ -1044,6 +1052,7 @@ vjs.ChaptersButton.prototype.createMenu = function(){
  * @constructor
  */
 vjs.ChaptersTrackMenuItem = vjs.MenuItem.extend({
+  /** @constructor */
   init: function(player, options){
     var track = this.track = options['track'],
         cue = this.cue = options['cue'],
@@ -1084,6 +1093,7 @@ vjs.obj.merge(vjs.ControlBar.prototype.options_['children'], {
 });
 
 // vjs.Cue = vjs.Component.extend({
+//   /** @constructor */
 //   init: function(player, options){
 //     vjs.Component.call(this, player, options);
 //   }
