@@ -15,22 +15,27 @@
 
 // ADD NEW SOURCE FILES HERE
 var sourceFiles = [
-  // "src/js/goog.base.js",
   "src/js/core.js",
   "src/js/core-object.js",
   "src/js/events.js",
   "src/js/lib.js",
-  "src/js/component.js",
+  "src/js/ui.component.js",
+  "src/js/ui.button.js",
+  "src/js/ui.slider.js",
+  "src/js/ui.menu.js",
   "src/js/player.js",
   "src/js/controls.js",
+  "src/js/poster.js",
+  "src/js/loading-spinner.js",
+  "src/js/big-play-button.js",
   "src/js/media.js",
   "src/js/media.html5.js",
   "src/js/media.flash.js",
+  "src/js/media.loader.js",
   "src/js/tracks.js",
   "src/js/json.js",
   "src/js/setup.js",
   "src/js/plugins.js"
-  // "src/js/exports.js"
 ];
 
 // Allow overriding the default project root
