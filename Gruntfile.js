@@ -76,6 +76,7 @@ module.exports = function(grunt) {
     // Loading predefined source order from source-loader.js
     // Trust me, this is the easist way to do it so far.
     var blockSourceLoading = true;
+    var sourceFiles; // Needed to satisfy jshint
     eval(grunt.file.read('./build/source-loader.js'));
 
     // Fix windows file path delimiter issue
@@ -104,18 +105,18 @@ module.exports = function(grunt) {
     var done = this.async();
     var exec = require('child_process').exec;
 
-    var externs = this.file.externs || [];
-    var dest = this.file.dest;
+    var externs = this.files[0].externs || [];
+    var dest = this.files[0].dest;
     var files = [];
 
     // Make sure deeper directories exist for compiler
     grunt.file.write(dest, '');
 
-    if (this.data.sourcelist) {
-      files = files.concat(grunt.file.read(this.data.sourcelist).split(','));
+    if (this.files[0].sourcelist) {
+      files = files.concat(grunt.file.read(this.files[0].sourcelist).split(','));
     }
-    if (this.file.src) {
-      files = files.concat(this.file.src);
+    if (this.files[0].src) {
+      files = files.concat(this.files[0].src);
     }
 
     var command = 'java -jar build/compiler/compiler.jar'

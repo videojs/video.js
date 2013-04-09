@@ -1,3 +1,5 @@
+var hasOwnProp = Object.prototype.hasOwnProperty;
+
 /**
  * Creates an element and applies properties.
  * @param  {String=} tagName    Name of tag to be created.
@@ -8,7 +10,7 @@ vjs.createEl = function(tagName, properties){
   var el = document.createElement(tagName || 'div');
 
   for (var propName in properties){
-    if (properties.hasOwnProperty(propName)) {
+    if (hasOwnProp.call(properties, propName)) {
       //el[propName] = properties[propName];
       // Not remembering why we were checking for dash
       // but using setAttribute means you have to use getAttribute
@@ -43,8 +45,6 @@ vjs.capitalize = function(string){
  * @type {Object}
  */
 vjs.obj = {};
-vjs.obj.toString = Object.prototype.toString;
-vjs.obj.hasOwnProperty = Object.prototype.hasOwnProperty;
 
 /**
  * Loop through each property in an object and call a function
@@ -55,7 +55,7 @@ vjs.obj.hasOwnProperty = Object.prototype.hasOwnProperty;
  */
 vjs.obj.each = function(obj, fn, context){
   for (var key in obj) {
-    if (vjs.obj.hasOwnProperty.call(obj, key)) {
+    if (hasOwnProp.call(obj, key)) {
       fn.call(context || this, key, obj[key]);
     }
   }
@@ -70,7 +70,7 @@ vjs.obj.each = function(obj, fn, context){
 vjs.obj.merge = function(obj1, obj2){
   if (!obj2) { return obj1; }
   for (var key in obj2){
-    if (vjs.obj.hasOwnProperty.call(obj2, key)) {
+    if (hasOwnProp.call(obj2, key)) {
       obj1[key] = obj2[key];
     }
   }
@@ -94,7 +94,7 @@ vjs.obj.deepMerge = function(obj1, obj2){
   obj1 = vjs.obj.copy(obj1);
 
   for (key in obj2){
-    if (vjs.obj.hasOwnProperty.call(obj2, key)) {
+    if (hasOwnProp.call(obj2, key)) {
       val1 = obj1[key];
       val2 = obj2[key];
 
@@ -126,7 +126,7 @@ vjs.obj.copy = function(obj){
 vjs.obj.isPlain = function(obj){
   return !!obj
     && typeof obj === 'object'
-    && vjs.obj.toString.call(obj) === '[object Object]'
+    && obj.toString() === '[object Object]'
     && obj.constructor === Object;
 };
 
