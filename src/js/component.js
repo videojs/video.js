@@ -10,6 +10,10 @@
  * @constructor
  */
 vjs.Component = vjs.CoreObject.extend({
+
+  /**
+   * @constructor
+   */
   init: function(player, options, ready){
     this.player_ = player;
 
@@ -515,6 +519,7 @@ vjs.Component.prototype.show = function(){
  * @return {vjs.Component}
  */
 vjs.Component.prototype.hide = function(){
+  console.log('here', this)
   this.el_.style.display = 'none';
   return this;
 };

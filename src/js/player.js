@@ -6,6 +6,10 @@
  * @constructor
  */
 vjs.Player = vjs.Component.extend({
+
+  /**
+   * @constructor
+   */
   init: function(tag, options, ready){
     this.tag = tag; // Store the original tag used to set options
 

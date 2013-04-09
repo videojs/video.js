@@ -27,6 +27,10 @@ vjs.Control.prototype.buildCSSClass = function(){
  * @constructor
  */
 vjs.ControlBar = vjs.Component.extend({
+
+  /**
+   * @constructor
+   */
   init: function(player, options){
     vjs.Component.call(this, player, options);
 
@@ -111,6 +115,10 @@ vjs.ControlBar.prototype.fadeOut = function(){
  * @constructor
  */
 vjs.Button = vjs.Control.extend({
+
+  /**
+   * @constructor
+   */
   init: function(player, options){
     vjs.Control.call(this, player, options);
 
@@ -179,11 +187,7 @@ vjs.Button.prototype.onBlur = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.PlayButton = vjs.Button.extend({
-  init: function(player, options){
-    vjs.Button.call(this, player, options);
-  }
-});
+vjs.PlayButton = vjs.Button.extend();
 
 vjs.PlayButton.prototype.buttonText = 'Play';
 
@@ -203,11 +207,7 @@ vjs.PlayButton.prototype.onClick = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.PauseButton = vjs.Button.extend({
-  init: function(player, options){
-    vjs.Button.call(this, player, options);
-  }
-});
+vjs.PauseButton = vjs.Button.extend();
 
 vjs.PauseButton.prototype.buttonText = 'Play';
 
@@ -528,6 +528,10 @@ vjs.RemainingTimeDisplay.prototype.updateContent = function(){
  * @constructor
  */
 vjs.Slider = vjs.Component.extend({
+
+  /**
+   * @constructor
+   */
   init: function(player, options){
     vjs.Component.call(this, player, options);
 

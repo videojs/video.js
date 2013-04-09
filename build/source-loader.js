@@ -15,7 +15,7 @@
 
 // ADD NEW SOURCE FILES HERE
 var sourceFiles = [
-  "src/js/goog.base.js",
+  // "src/js/goog.base.js",
   "src/js/core.js",
   "src/js/core-object.js",
   "src/js/events.js",
@@ -29,8 +29,8 @@ var sourceFiles = [
   "src/js/tracks.js",
   "src/js/json.js",
   "src/js/setup.js",
-  "src/js/plugins.js",
-  "src/js/exports.js"
+  "src/js/plugins.js"
+  // "src/js/exports.js"
 ];
 
 // Allow overriding the default project root
