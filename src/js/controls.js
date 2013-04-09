@@ -8,13 +8,14 @@
  * @param {Object=} options
  * @constructor
  */
-vjs.Control = function(player, options){
-  goog.base(this, player, options);
-};
-goog.inherits(vjs.Control, vjs.Component);
+vjs.Control = vjs.Component.extend({
+  init: function(player, options){
+    vjs.Component.call(this, player, options);
+  }
+});
 
 vjs.Control.prototype.buildCSSClass = function(){
-  return 'vjs-control ' + goog.base(this, 'buildCSSClass');
+  return 'vjs-control ' + vjs.Component.prototype.buildCSSClass.call(this);
 };
 
 /* Control Bar
@@ -25,49 +26,50 @@ vjs.Control.prototype.buildCSSClass = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.ControlBar = function(player, options){
-  goog.base(this, player, options);
+vjs.ControlBar = vjs.Component.extend({
+  init: function(player, options){
+    vjs.Component.call(this, player, options);
 
-  player.one('play', vjs.bind(this, function(){
-    var touchstart,
-      fadeIn = vjs.bind(this, this.fadeIn),
-      fadeOut = vjs.bind(this, this.fadeOut);
+    player.one('play', vjs.bind(this, function(){
+      var touchstart,
+        fadeIn = vjs.bind(this, this.fadeIn),
+        fadeOut = vjs.bind(this, this.fadeOut);
 
-    this.fadeIn();
+      this.fadeIn();
 
-    if ( !('ontouchstart' in window) ) {
-      this.player_.on('mouseover', fadeIn);
-      this.player_.on('mouseout', fadeOut);
-      this.player_.on('pause', vjs.bind(this, this.lockShowing));
-      this.player_.on('play', vjs.bind(this, this.unlockShowing));
-    }
+      if ( !('ontouchstart' in window) ) {
+        this.player_.on('mouseover', fadeIn);
+        this.player_.on('mouseout', fadeOut);
+        this.player_.on('pause', vjs.bind(this, this.lockShowing));
+        this.player_.on('play', vjs.bind(this, this.unlockShowing));
+      }
 
-    touchstart = false;
-    this.player_.on('touchstart', function() {
-      touchstart = true;
-    });
-    this.player_.on('touchmove', function() {
       touchstart = false;
-    });
-    this.player_.on('touchend', vjs.bind(this, function(event) {
-      var idx;
-      if (touchstart) {
-        idx = this.el().className.search('fade-in');
-        if (idx !== -1) {
-          this.fadeOut();
-        } else {
-          this.fadeIn();
+      this.player_.on('touchstart', function() {
+        touchstart = true;
+      });
+      this.player_.on('touchmove', function() {
+        touchstart = false;
+      });
+      this.player_.on('touchend', vjs.bind(this, function(event) {
+        var idx;
+        if (touchstart) {
+          idx = this.el().className.search('fade-in');
+          if (idx !== -1) {
+            this.fadeOut();
+          } else {
+            this.fadeIn();
+          }
         }
-      }
-      touchstart = false;
+        touchstart = false;
 
-      if (!this.player_.paused()) {
-        event.preventDefault();
-      }
+        if (!this.player_.paused()) {
+          event.preventDefault();
+        }
+      }));
     }));
-  }));
-};
-goog.inherits(vjs.ControlBar, vjs.Component);
+  }
+});
 
 vjs.ControlBar.prototype.options_ = {
   loadEvent: 'play',
@@ -91,12 +93,12 @@ vjs.ControlBar.prototype.createEl = function(){
 };
 
 vjs.ControlBar.prototype.fadeIn = function(){
-  goog.base(this, 'fadeIn');
+  vjs.Component.prototype.fadeIn.call(this);
   this.player_.trigger('controlsvisible');
 };
 
 vjs.ControlBar.prototype.fadeOut = function(){
-  goog.base(this, 'fadeOut');
+  vjs.Component.prototype.fadeOut.call(this);
   this.player_.trigger('controlshidden');
 };
 
@@ -108,8 +110,9 @@ vjs.ControlBar.prototype.fadeOut = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.Button = function(player, options){
-  goog.base(this, player, options);
+vjs.Button = vjs.Control.extend({
+  init: function(player, options){
+    vjs.Control.call(this, player, options);
 
     var touchstart = false;
     this.on('touchstart', function() {
@@ -127,11 +130,11 @@ vjs.Button = function(player, options){
       event.stopPropagation();
     });
 
-  this.on('click', this.onClick);
-  this.on('focus', this.onFocus);
-  this.on('blur', this.onBlur);
-};
-goog.inherits(vjs.Button, vjs.Control);
+    this.on('click', this.onClick);
+    this.on('focus', this.onFocus);
+    this.on('blur', this.onBlur);
+  }
+});
 
 vjs.Button.prototype.createEl = function(type, props){
   // Add standard Aria and Tabindex info
@@ -143,7 +146,7 @@ vjs.Button.prototype.createEl = function(type, props){
     tabIndex: 0
   }, props);
 
-  return goog.base(this, 'createEl', type, props);
+  return vjs.Component.prototype.createEl.call(this, type, props);
 };
 
   // Click - Override with specific functionality for button
@@ -176,15 +179,16 @@ vjs.Button.prototype.onBlur = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.PlayButton = function(player, options){
-  goog.base(this, player, options);
-};
-goog.inherits(vjs.PlayButton, vjs.Button);
+vjs.PlayButton = vjs.Button.extend({
+  init: function(player, options){
+    vjs.Button.call(this, player, options);
+  }
+});
 
 vjs.PlayButton.prototype.buttonText = 'Play';
 
 vjs.PlayButton.prototype.buildCSSClass = function(){
-  return 'vjs-play-button ' + goog.base(this, 'buildCSSClass');
+  return 'vjs-play-button ' + vjs.Button.prototype.buildCSSClass.call(this);
 };
 
 vjs.PlayButton.prototype.onClick = function(){
@@ -199,15 +203,16 @@ vjs.PlayButton.prototype.onClick = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.PauseButton = function(player, options){
-  goog.base(this, player, options);
-};
-goog.inherits(vjs.PauseButton, vjs.Button);
+vjs.PauseButton = vjs.Button.extend({
+  init: function(player, options){
+    vjs.Button.call(this, player, options);
+  }
+});
 
 vjs.PauseButton.prototype.buttonText = 'Play';
 
 vjs.PauseButton.prototype.buildCSSClass = function(){
-  return 'vjs-pause-button ' + goog.base(this, 'buildCSSClass');
+  return 'vjs-pause-button ' + vjs.Button.prototype.buildCSSClass.call(this);
 };
 
 vjs.PauseButton.prototype.onClick = function(){
@@ -222,18 +227,19 @@ vjs.PauseButton.prototype.onClick = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.PlayToggle = function(player, options){
-  goog.base(this, player, options);
+vjs.PlayToggle = vjs.Button.extend({
+  init: function(player, options){
+    vjs.Button.call(this, player, options);
 
-  player.on('play', vjs.bind(this, this.onPlay));
-  player.on('pause', vjs.bind(this, this.onPause));
-};
-goog.inherits(vjs.PlayToggle, vjs.Button);
+    player.on('play', vjs.bind(this, this.onPlay));
+    player.on('pause', vjs.bind(this, this.onPause));
+  }
+});
 
 vjs.PlayToggle.prototype.buttonText = 'Play';
 
 vjs.PlayToggle.prototype.buildCSSClass = function(){
-  return 'vjs-play-control ' + goog.base(this, 'buildCSSClass');
+  return 'vjs-play-control ' + vjs.Button.prototype.buildCSSClass.call(this);
 };
 
   // OnClick - Toggle between play and pause
@@ -268,15 +274,16 @@ vjs.PlayToggle.prototype.onPause = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.FullscreenToggle = function(player, options){
-  goog.base(this, player, options);
-};
-goog.inherits(vjs.FullscreenToggle, vjs.Button);
+vjs.FullscreenToggle = vjs.Button.extend({
+  init: function(player, options){
+    vjs.Button.call(this, player, options);
+  }
+});
 
 vjs.FullscreenToggle.prototype.buttonText = 'Fullscreen';
 
 vjs.FullscreenToggle.prototype.buildCSSClass = function(){
-  return 'vjs-fullscreen-control ' + goog.base(this, 'buildCSSClass');
+  return 'vjs-fullscreen-control ' + vjs.Button.prototype.buildCSSClass.call(this);
 };
 
 vjs.FullscreenToggle.prototype.onClick = function(){
@@ -298,16 +305,17 @@ vjs.FullscreenToggle.prototype.onClick = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.BigPlayButton = function(player, options){
-  goog.base(this, player, options);
+vjs.BigPlayButton = vjs.Button.extend({
+  init: function(player, options){
+    vjs.Button.call(this, player, options);
 
-  player.on('play', vjs.bind(this, this.hide));
-  // player.on('ended', vjs.bind(this, this.show));
-};
-goog.inherits(vjs.BigPlayButton, vjs.Button);
+    player.on('play', vjs.bind(this, this.hide));
+    // player.on('ended', vjs.bind(this, this.show));
+  }
+});
 
 vjs.BigPlayButton.prototype.createEl = function(){
-  return goog.base(this, 'createEl', 'div', {
+  return vjs.Button.prototype.createEl.call(this, 'div', {
     className: 'vjs-big-play-button',
     innerHTML: '<span></span>',
     'aria-label': 'play video'
@@ -331,30 +339,31 @@ vjs.BigPlayButton.prototype.onClick = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.LoadingSpinner = function(player, options){
-  goog.base(this, player, options);
+vjs.LoadingSpinner = vjs.Component.extend({
+  init: function(player, options){
+    vjs.Component.call(this, player, options);
 
-  player.on('canplay', vjs.bind(this, this.hide));
-  player.on('canplaythrough', vjs.bind(this, this.hide));
-  player.on('playing', vjs.bind(this, this.hide));
-  player.on('seeked', vjs.bind(this, this.hide));
+    player.on('canplay', vjs.bind(this, this.hide));
+    player.on('canplaythrough', vjs.bind(this, this.hide));
+    player.on('playing', vjs.bind(this, this.hide));
+    player.on('seeked', vjs.bind(this, this.hide));
 
-  player.on('seeking', vjs.bind(this, this.show));
+    player.on('seeking', vjs.bind(this, this.show));
 
-  // in some browsers seeking does not trigger the 'playing' event,
-  // so we also need to trap 'seeked' if we are going to set a
-  // 'seeking' event
-  player.on('seeked', vjs.bind(this, this.hide));
+    // in some browsers seeking does not trigger the 'playing' event,
+    // so we also need to trap 'seeked' if we are going to set a
+    // 'seeking' event
+    player.on('seeked', vjs.bind(this, this.hide));
 
-  player.on('error', vjs.bind(this, this.show));
+    player.on('error', vjs.bind(this, this.show));
 
-  // Not showing spinner on stalled any more. Browsers may stall and then not trigger any events that would remove the spinner.
-  // Checked in Chrome 16 and Safari 5.1.2. http://help.videojs.com/discussions/problems/883-why-is-the-download-progress-showing
-  // player.on('stalled', vjs.bind(this, this.show));
+    // Not showing spinner on stalled any more. Browsers may stall and then not trigger any events that would remove the spinner.
+    // Checked in Chrome 16 and Safari 5.1.2. http://help.videojs.com/discussions/problems/883-why-is-the-download-progress-showing
+    // player.on('stalled', vjs.bind(this, this.show));
 
-  player.on('waiting', vjs.bind(this, this.show));
-};
-goog.inherits(vjs.LoadingSpinner, vjs.Component);
+    player.on('waiting', vjs.bind(this, this.show));
+  }
+});
 
 vjs.LoadingSpinner.prototype.createEl = function(){
   var classNameSpinner, innerHtmlSpinner;
@@ -371,7 +380,7 @@ vjs.LoadingSpinner.prototype.createEl = function(){
       innerHtmlSpinner = '';
     }
 
-  return goog.base(this, 'createEl', 'div', {
+  return vjs.Component.prototype.createEl.call(this, 'div', {
     className: classNameSpinner,
     innerHTML: innerHtmlSpinner
   });
@@ -386,15 +395,16 @@ vjs.LoadingSpinner.prototype.createEl = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.CurrentTimeDisplay = function(player, options){
-  goog.base(this, player, options);
+vjs.CurrentTimeDisplay = vjs.Component.extend({
+  init: function(player, options){
+    vjs.Component.call(this, player, options);
 
-  player.on('timeupdate', vjs.bind(this, this.updateContent));
-};
-goog.inherits(vjs.CurrentTimeDisplay, vjs.Component);
+    player.on('timeupdate', vjs.bind(this, this.updateContent));
+  }
+});
 
 vjs.CurrentTimeDisplay.prototype.createEl = function(){
-  var el = goog.base(this, 'createEl', 'div', {
+  var el = vjs.Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-current-time vjs-time-controls vjs-control'
   });
 
@@ -420,15 +430,16 @@ vjs.CurrentTimeDisplay.prototype.updateContent = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.DurationDisplay = function(player, options){
-  goog.base(this, player, options);
+vjs.DurationDisplay = vjs.Component.extend({
+  init: function(player, options){
+    vjs.Component.call(this, player, options);
 
-  player.on('timeupdate', vjs.bind(this, this.updateContent)); // this might need to be changes to 'durationchange' instead of 'timeupdate' eventually, however the durationchange event fires before this.player_.duration() is set, so the value cannot be written out using this method. Once the order of durationchange and this.player_.duration() being set is figured out, this can be updated.
-};
-goog.inherits(vjs.DurationDisplay, vjs.Component);
+    player.on('timeupdate', vjs.bind(this, this.updateContent)); // this might need to be changes to 'durationchange' instead of 'timeupdate' eventually, however the durationchange event fires before this.player_.duration() is set, so the value cannot be written out using this method. Once the order of durationchange and this.player_.duration() being set is figured out, this can be updated.
+  }
+});
 
 vjs.DurationDisplay.prototype.createEl = function(){
-  var el = goog.base(this, 'createEl', 'div', {
+  var el = vjs.Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-duration vjs-time-controls vjs-control'
   });
 
@@ -454,13 +465,14 @@ vjs.DurationDisplay.prototype.updateContent = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.TimeDivider = function(player, options){
-  goog.base(this, player, options);
-};
-goog.inherits(vjs.TimeDivider, vjs.Component);
+vjs.TimeDivider = vjs.Component.extend({
+  init: function(player, options){
+    vjs.Component.call(this, player, options);
+  }
+});
 
 vjs.TimeDivider.prototype.createEl = function(){
-  return goog.base(this, 'createEl', 'div', {
+  return vjs.Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-time-divider',
     innerHTML: '<div><span>/</span></div>'
   });
@@ -472,16 +484,16 @@ vjs.TimeDivider.prototype.createEl = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.RemainingTimeDisplay = function(player, options){
-  goog.base(this, player, options);
+vjs.RemainingTimeDisplay = vjs.Component.extend({
+  init: function(player, options){
+    vjs.Component.call(this, player, options);
 
-  player.on('timeupdate', vjs.bind(this, this.updateContent));
-};
-goog.inherits(vjs.RemainingTimeDisplay, vjs.Component);
-
+    player.on('timeupdate', vjs.bind(this, this.updateContent));
+  }
+});
 
 vjs.RemainingTimeDisplay.prototype.createEl = function(){
-  var el = goog.base(this, 'createEl', 'div', {
+  var el = vjs.Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-remaining-time vjs-time-controls vjs-control'
   });
 
@@ -515,8 +527,9 @@ vjs.RemainingTimeDisplay.prototype.updateContent = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.Slider = function(player, options){
-    goog.base(this, player, options);
+vjs.Slider = vjs.Component.extend({
+  init: function(player, options){
+    vjs.Component.call(this, player, options);
 
     // Set property names to bar and handle to match with the child Slider class is looking for
     this.bar = this.getChild(this.options_['barName']);
@@ -539,8 +552,8 @@ vjs.Slider = function(player, options){
     player.ready(vjs.bind(this, this.update));
 
     this.boundEvents = {};
-};
-goog.inherits(vjs.Slider, vjs.Component);
+  }
+});
 
 vjs.Slider.prototype.createEl = function(type, props) {
   props = vjs.obj.merge({
@@ -551,7 +564,7 @@ vjs.Slider.prototype.createEl = function(type, props) {
     tabIndex: 0
   }, props);
 
-  return goog.base(this, 'createEl', type, props);
+  return vjs.Component.prototype.createEl.call(this, type, props);
 };
 
 vjs.Slider.prototype.onMouseDown = function(event){
@@ -682,10 +695,11 @@ vjs.Slider.prototype.onBlur = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.ProgressControl = function(player, options){
-  goog.base(this, player, options);
-};
-goog.inherits(vjs.ProgressControl, vjs.Component);
+vjs.ProgressControl = vjs.Component.extend({
+  init: function(player, options){
+    vjs.Component.call(this, player, options);
+  }
+});
 
 vjs.ProgressControl.prototype.options_ = {
   children: {
@@ -694,7 +708,7 @@ vjs.ProgressControl.prototype.options_ = {
 };
 
 vjs.ProgressControl.prototype.createEl = function(){
-  return goog.base(this, 'createEl', 'div', {
+  return vjs.Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-progress-control vjs-control'
   });
 };
@@ -705,12 +719,13 @@ vjs.ProgressControl.prototype.createEl = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.SeekBar = function(player, options){
-  goog.base(this, player, options);
-  player.on('timeupdate', vjs.bind(this, this.updateARIAAttributes));
-  player.ready(vjs.bind(this, this.updateARIAAttributes));
-};
-goog.inherits(vjs.SeekBar, vjs.Slider);
+vjs.SeekBar = vjs.Slider.extend({
+  init: function(player, options){
+    vjs.Slider.call(this, player, options);
+    player.on('timeupdate', vjs.bind(this, this.updateARIAAttributes));
+    player.ready(vjs.bind(this, this.updateARIAAttributes));
+  }
+});
 
 vjs.SeekBar.prototype.options_ = {
   children: {
@@ -725,7 +740,7 @@ vjs.SeekBar.prototype.options_ = {
 vjs.SeekBar.prototype.playerEvent = 'timeupdate';
 
 vjs.SeekBar.prototype.createEl = function(){
-  return goog.base(this, 'createEl', 'div', {
+  return vjs.Slider.prototype.createEl.call(this, 'div', {
     className: 'vjs-progress-holder',
     'aria-label': 'video progress bar'
   });
@@ -743,7 +758,7 @@ vjs.SeekBar.prototype.getPercent = function(){
 };
 
 vjs.SeekBar.prototype.onMouseDown = function(event){
-  goog.base(this, 'onMouseDown', event);
+  vjs.Slider.prototype.onMouseDown.call(this, event);
 
   this.player_.scrubbing = true;
 
@@ -762,7 +777,7 @@ vjs.SeekBar.prototype.onMouseMove = function(event){
 };
 
 vjs.SeekBar.prototype.onMouseUp = function(event){
-  goog.base(this, 'onMouseUp', event);
+  vjs.Slider.prototype.onMouseUp.call(this, event);
 
   this.player_.scrubbing = false;
   if (this.videoWasPlaying) {
@@ -785,14 +800,15 @@ vjs.SeekBar.prototype.stepBack = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.LoadProgressBar = function(player, options){
-  goog.base(this, player, options);
-  player.on('progress', vjs.bind(this, this.update));
-};
-goog.inherits(vjs.LoadProgressBar, vjs.Component);
+vjs.LoadProgressBar = vjs.Component.extend({
+  init: function(player, options){
+    vjs.Component.call(this, player, options);
+    player.on('progress', vjs.bind(this, this.update));
+  }
+});
 
 vjs.LoadProgressBar.prototype.createEl = function(){
-  return goog.base(this, 'createEl', 'div', {
+  return vjs.Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-load-progress',
     innerHTML: '<span class="vjs-control-text">Loaded: 0%</span>'
   });
@@ -809,13 +825,14 @@ vjs.LoadProgressBar.prototype.update = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.PlayProgressBar = function(player, options){
-  goog.base(this, player, options);
-};
-goog.inherits(vjs.PlayProgressBar, vjs.Component);
+vjs.PlayProgressBar = vjs.Component.extend({
+  init: function(player, options){
+    vjs.Component.call(this, player, options);
+  }
+});
 
 vjs.PlayProgressBar.prototype.createEl = function(){
-  return goog.base(this, 'createEl', 'div', {
+  return vjs.Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-play-progress',
     innerHTML: '<span class="vjs-control-text">Progress: 0%</span>'
   });
@@ -828,13 +845,14 @@ vjs.PlayProgressBar.prototype.createEl = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.SeekHandle = function(player, options){
-  goog.base(this, player, options);
-};
-goog.inherits(vjs.SeekHandle, vjs.Component);
+vjs.SeekHandle = vjs.Component.extend({
+  init: function(player, options){
+    vjs.Component.call(this, player, options);
+  }
+});
 
 vjs.SeekHandle.prototype.createEl = function(){
-  return goog.base(this, 'createEl', 'div', {
+  return vjs.Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-seek-handle',
     innerHTML: '<span class="vjs-control-text">00:00</span>'
   });
@@ -846,22 +864,23 @@ vjs.SeekHandle.prototype.createEl = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.VolumeControl = function(player, options){
-  goog.base(this, player, options);
+vjs.VolumeControl = vjs.Component.extend({
+  init: function(player, options){
+    vjs.Component.call(this, player, options);
 
-  // hide volume controls when they're not supported by the current tech
-  if (player.tech && player.tech.features.volumeControl === false) {
-    this.addClass('vjs-hidden');
-  }
-  player.on('loadstart', vjs.bind(this, function(){
-    if (player.tech.features.volumeControl === false) {
+    // hide volume controls when they're not supported by the current tech
+    if (player.tech && player.tech.features.volumeControl === false) {
       this.addClass('vjs-hidden');
-    } else {
-      this.removeClass('vjs-hidden');
     }
-  }));
-};
-goog.inherits(vjs.VolumeControl, vjs.Component);
+    player.on('loadstart', vjs.bind(this, function(){
+      if (player.tech.features.volumeControl === false) {
+        this.addClass('vjs-hidden');
+      } else {
+        this.removeClass('vjs-hidden');
+      }
+    }));
+  }
+});
 
 vjs.VolumeControl.prototype.options_ = {
   children: {
@@ -870,7 +889,7 @@ vjs.VolumeControl.prototype.options_ = {
 };
 
 vjs.VolumeControl.prototype.createEl = function(){
-  return goog.base(this, 'createEl', 'div', {
+  return vjs.Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-volume-control vjs-control'
   });
 };
@@ -881,18 +900,19 @@ vjs.VolumeControl.prototype.createEl = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.VolumeBar = function(player, options){
-  goog.base(this, player, options);
-  player.on('volumechange', vjs.bind(this, this.updateARIAAttributes));
-  player.ready(vjs.bind(this, this.updateARIAAttributes));
-  setTimeout(vjs.bind(this, this.update), 0); // update when elements is in DOM
-};
-goog.inherits(vjs.VolumeBar, vjs.Slider);
+vjs.VolumeBar = vjs.Slider.extend({
+  init: function(player, options){
+    vjs.Slider.call(this, player, options);
+    player.on('volumechange', vjs.bind(this, this.updateARIAAttributes));
+    player.ready(vjs.bind(this, this.updateARIAAttributes));
+    setTimeout(vjs.bind(this, this.update), 0); // update when elements is in DOM
+  }
+});
 
 vjs.VolumeBar.prototype.updateARIAAttributes = function(){
-    // Current value of volume bar as a percentage
-    this.el_.setAttribute('aria-valuenow',vjs.round(this.player_.volume()*100, 2));
-    this.el_.setAttribute('aria-valuetext',vjs.round(this.player_.volume()*100, 2)+'%');
+  // Current value of volume bar as a percentage
+  this.el_.setAttribute('aria-valuenow',vjs.round(this.player_.volume()*100, 2));
+  this.el_.setAttribute('aria-valuetext',vjs.round(this.player_.volume()*100, 2)+'%');
 };
 
 vjs.VolumeBar.prototype.options_ = {
@@ -907,7 +927,7 @@ vjs.VolumeBar.prototype.options_ = {
 vjs.VolumeBar.prototype.playerEvent = 'volumechange';
 
 vjs.VolumeBar.prototype.createEl = function(){
-  return goog.base(this, 'createEl', 'div', {
+  return vjs.Slider.prototype.createEl.call(this, 'div', {
     className: 'vjs-volume-bar',
     'aria-label': 'volume level'
   });
@@ -935,13 +955,14 @@ vjs.VolumeBar.prototype.stepBack = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.VolumeLevel = function(player, options){
-  goog.base(this, player, options);
-};
-goog.inherits(vjs.VolumeLevel, vjs.Component);
+vjs.VolumeLevel = vjs.Component.extend({
+  init: function(player, options){
+    vjs.Component.call(this, player, options);
+  }
+});
 
 vjs.VolumeLevel.prototype.createEl = function(){
-  return goog.base(this, 'createEl', 'div', {
+  return vjs.Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-volume-level',
     innerHTML: '<span class="vjs-control-text"></span>'
   });
@@ -953,13 +974,14 @@ vjs.VolumeLevel.prototype.createEl = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.VolumeHandle = function(player, options){
-  goog.base(this, player, options);
-};
-goog.inherits(vjs.VolumeHandle, vjs.Component);
+vjs.VolumeHandle = vjs.Component.extend({
+  init: function(player, options){
+    vjs.Component.call(this, player, options);
+  }
+});
 
 vjs.VolumeHandle.prototype.createEl = function(){
-  return goog.base(this, 'createEl', 'div', {
+  return vjs.Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-volume-handle',
     innerHTML: '<span class="vjs-control-text"></span>'
     // tabindex: 0,
@@ -973,27 +995,28 @@ vjs.VolumeHandle.prototype.createEl = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.MuteToggle = function(player, options){
-  goog.base(this, player, options);
+vjs.MuteToggle = vjs.Button.extend({
+  init: function(player, options){
+    vjs.Button.call(this, player, options);
 
-  player.on('volumechange', vjs.bind(this, this.update));
+    player.on('volumechange', vjs.bind(this, this.update));
 
-  // hide mute toggle if the current tech doesn't support volume control
-  if (player.tech && player.tech.features.volumeControl === false) {
-    this.addClass('vjs-hidden');
-  }
-  player.on('loadstart', vjs.bind(this, function(){
-    if (player.tech.features.volumeControl === false) {
+    // hide mute toggle if the current tech doesn't support volume control
+    if (player.tech && player.tech.features.volumeControl === false) {
       this.addClass('vjs-hidden');
-    } else {
-      this.removeClass('vjs-hidden');
     }
-  }));
-};
-goog.inherits(vjs.MuteToggle, vjs.Button);
+    player.on('loadstart', vjs.bind(this, function(){
+      if (player.tech.features.volumeControl === false) {
+        this.addClass('vjs-hidden');
+      } else {
+        this.removeClass('vjs-hidden');
+      }
+    }));
+  }
+});
 
 vjs.MuteToggle.prototype.createEl = function(){
-  return goog.base(this, 'createEl', 'div', {
+  return vjs.Button.prototype.createEl.call(this, 'div', {
     className: 'vjs-mute-control vjs-control',
     innerHTML: '<div><span class="vjs-control-text">Mute</span></div>'
   });
@@ -1043,16 +1066,17 @@ vjs.MuteToggle.prototype.update = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.PosterImage = function(player, options){
-  goog.base(this, player, options);
+vjs.PosterImage = vjs.Button.extend({
+  init: function(player, options){
+    vjs.Button.call(this, player, options);
 
-  if (!player.poster()) {
-    this.hide();
+    if (!player.poster()) {
+      this.hide();
+    }
+
+    player.on('play', vjs.bind(this, this.hide));
   }
-
-  player.on('play', vjs.bind(this, this.hide));
-};
-goog.inherits(vjs.PosterImage, vjs.Button);
+});
 
 vjs.PosterImage.prototype.createEl = function(){
   var el = vjs.createEl('div', {
@@ -1086,10 +1110,11 @@ vjs.PosterImage.prototype.onClick = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.Menu = function(player, options){
-  goog.base(this, player, options);
-};
-goog.inherits(vjs.Menu, vjs.Component);
+vjs.Menu = vjs.Component.extend({
+  init: function(player, options){
+    vjs.Component.call(this, player, options);
+  }
+});
 
 vjs.Menu.prototype.addItem = function(component){
   this.addChild(component);
@@ -1099,7 +1124,7 @@ vjs.Menu.prototype.addItem = function(component){
 };
 
 vjs.Menu.prototype.createEl = function(){
-  return goog.base(this, 'createEl', 'ul', {
+  return vjs.Component.prototype.createEl.call(this, 'ul', {
     className: 'vjs-menu'
   });
 };
@@ -1110,20 +1135,21 @@ vjs.Menu.prototype.createEl = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.MenuItem = function(player, options){
-  goog.base(this, player, options);
+vjs.MenuItem = vjs.Button.extend({
+  init: function(player, options){
+    vjs.Button.call(this, player, options);
 
-  if (options['selected']) {
-    this.addClass('vjs-selected');
-    this.el_.setAttribute('aria-selected',true);
-  } else {
-    this.el_.setAttribute('aria-selected',false);
+    if (options['selected']) {
+      this.addClass('vjs-selected');
+      this.el_.setAttribute('aria-selected',true);
+    } else {
+      this.el_.setAttribute('aria-selected',false);
+    }
   }
-};
-goog.inherits(vjs.MenuItem, vjs.Button);
+});
 
 vjs.MenuItem.prototype.createEl = function(type, props){
-  return goog.base(this, 'createEl', 'li', vjs.obj.merge({
+  return vjs.Button.prototype.createEl.call(this, 'li', vjs.obj.merge({
     className: 'vjs-menu-item',
     innerHTML: this.options_['label']
   }, props));
