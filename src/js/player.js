@@ -5,62 +5,64 @@
  * @param {Function=} ready    Ready callback function
  * @constructor
  */
-vjs.Player = function(tag, options, ready){
-  this.tag = tag; // Store the original tag used to set options
+vjs.Player = vjs.Component.extend({
+  /** @constructor */
+  init: function(tag, options, ready){
+    this.tag = tag; // Store the original tag used to set options
 
-  // Set Options
-  // The options argument overrides options set in the video tag
-  // which overrides globally set options.
-  // This latter part coincides with the load order
-  // (tag must exist before Player)
-  options = vjs.obj.merge(this.getTagSettings(tag), options);
+    // Set Options
+    // The options argument overrides options set in the video tag
+    // which overrides globally set options.
+    // This latter part coincides with the load order
+    // (tag must exist before Player)
+    options = vjs.obj.merge(this.getTagSettings(tag), options);
 
-  // Cache for video property values.
-  this.cache_ = {};
+    // Cache for video property values.
+    this.cache_ = {};
 
-  // Set poster
-  this.poster_ = options['poster'];
-  // Set controls
-  this.controls_ = options['controls'];
+    // Set poster
+    this.poster_ = options['poster'];
+    // Set controls
+    this.controls_ = options['controls'];
 
-  // Run base component initializing with new options.
-  // Builds the element through createEl()
-  // Inits and embeds any child components in opts
-  vjs.Component.call(this, this, options, ready);
+    // Run base component initializing with new options.
+    // Builds the element through createEl()
+    // Inits and embeds any child components in opts
+    vjs.Component.call(this, this, options, ready);
 
-  // Firstplay event implimentation. Not sold on the event yet.
-  // Could probably just check currentTime==0?
-  this.one('play', function(e){
-    var fpEvent = { type: 'firstplay', target: this.el_ };
-    // Using vjs.trigger so we can check if default was prevented
-    var keepGoing = vjs.trigger(this.el_, fpEvent);
+    // Firstplay event implimentation. Not sold on the event yet.
+    // Could probably just check currentTime==0?
+    this.one('play', function(e){
+      var fpEvent = { type: 'firstplay', target: this.el_ };
+      // Using vjs.trigger so we can check if default was prevented
+      var keepGoing = vjs.trigger(this.el_, fpEvent);
 
-    if (!keepGoing) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
+      if (!keepGoing) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+      }
+    });
+
+    this.on('ended', this.onEnded);
+    this.on('play', this.onPlay);
+    this.on('firstplay', this.onFirstPlay);
+    this.on('pause', this.onPause);
+    this.on('progress', this.onProgress);
+    this.on('durationchange', this.onDurationChange);
+    this.on('error', this.onError);
+    this.on('fullscreenchange', this.onFullscreenChange);
+
+    // Make player easily findable by ID
+    vjs.players[this.id_] = this;
+
+    if (options['plugins']) {
+      vjs.obj.each(options['plugins'], function(key, val){
+        this[key](val);
+      }, this);
     }
-  });
-
-  this.on('ended', this.onEnded);
-  this.on('play', this.onPlay);
-  this.on('firstplay', this.onFirstPlay);
-  this.on('pause', this.onPause);
-  this.on('progress', this.onProgress);
-  this.on('durationchange', this.onDurationChange);
-  this.on('error', this.onError);
-  this.on('fullscreenchange', this.onFullscreenChange);
-
-  // Make player easily findable by ID
-  vjs.players[this.id_] = this;
-
-  if (options['plugins']) {
-    vjs.obj.each(options['plugins'], function(key, val){
-      this[key](val);
-    }, this);
   }
-};
-goog.inherits(vjs.Player, vjs.Component);
+});
 
 /**
  * Player instance options, surfaced using vjs.options
@@ -88,7 +90,7 @@ vjs.Player.prototype.dispose = function(){
   if (this.tech) { this.tech.dispose(); }
 
   // Component dispose
-  goog.base(this, 'dispose');
+  vjs.Component.prototype.dispose.call(this);
 };
 
 vjs.Player.prototype.getTagSettings = function(tag){
@@ -125,7 +127,7 @@ vjs.Player.prototype.getTagSettings = function(tag){
 };
 
 vjs.Player.prototype.createEl = function(){
-  var el = this.el_ = goog.base(this, 'createEl', 'div');
+  var el = this.el_ = vjs.Component.prototype.createEl.call(this, 'div');
   var tag = this.tag;
 
   // Original tag settings stored in options
@@ -759,7 +761,7 @@ vjs.Player.prototype.src = function(source){
       }
     } else {
       this.el_.appendChild(vjs.createEl('p', {
-        innerHTML: 'Sorry, no compatible source and playback technology were found for this video. Try using another browser like <a href="http://www.google.com/chrome">Google Chrome</a> or download the latest <a href="http://get.adobe.com/flashplayer/">Adobe Flash Player</a>.'
+        innerHTML: 'Sorry, no compatible source and playback technology were found for this video. Try using another browser like <a href="http://bit.ly/ccMUEC">Chrome</a> or download the latest <a href="http://adobe.ly/mwfN1">Adobe Flash Player</a>.'
       }));
     }
 
@@ -945,34 +947,5 @@ vjs.Player.prototype.ended = function(){ return this.techGet('ended'); };
   }
 
 })();
-
-/**
- * @constructor
- */
-vjs.MediaLoader = function(player, options, ready){
-  vjs.Component.call(this, player, options, ready);
-
-  // If there are no sources when the player is initialized,
-  // load the first supported playback technology.
-  if (!player.options_['sources'] || player.options_['sources'].length === 0) {
-    for (var i=0,j=player.options_['techOrder']; i<j.length; i++) {
-      var techName = vjs.capitalize(j[i]),
-          tech = window['videojs'][techName];
-
-      // Check if the browser supports this technology
-      if (tech && tech.isSupported()) {
-        player.loadTech(techName);
-        break;
-      }
-    }
-  } else {
-    // // Loop through playback technologies (HTML5, Flash) and check for support.
-    // // Then load the best source.
-    // // A few assumptions here:
-    // //   All playback technologies respect preload false.
-    player.src(player.options_['sources']);
-  }
-};
-goog.inherits(vjs.MediaLoader, vjs.Component);
 
 

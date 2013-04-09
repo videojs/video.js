@@ -9,8 +9,10 @@
  * @param {Function=} ready
  * @constructor
  */
-vjs.Html5 = function(player, options, ready){
-  goog.base(this, player, options, ready);
+vjs.Html5 = vjs.MediaTechController.extend({
+  /** @constructor */
+  init: function(player, options, ready){
+    vjs.MediaTechController.call(this, player, options, ready);
 
   // volume cannot be changed from 1 on iOS
   this.features.volumeControl = vjs.Html5.canControlVolume();
@@ -20,37 +22,37 @@ vjs.Html5 = function(player, options, ready){
 
   var source = options['source'];
 
-  // If the element source is already set, we may have missed the loadstart event, and want to trigger it.
-  // We don't want to set the source again and interrupt playback.
-  if (source && this.el_.currentSrc == source.src) {
-    player.trigger('loadstart');
+    // If the element source is already set, we may have missed the loadstart event, and want to trigger it.
+    // We don't want to set the source again and interrupt playback.
+    if (source && this.el_.currentSrc == source.src) {
+      player.trigger('loadstart');
 
-  // Otherwise set the source if one was provided.
-  } else if (source) {
-    this.el_.src = source.src;
-  }
-
-  // Chrome and Safari both have issues with autoplay.
-  // In Safari (5.1.1), when we move the video element into the container div, autoplay doesn't work.
-  // In Chrome (15), if you have autoplay + a poster + no controls, the video gets hidden (but audio plays)
-  // This fixes both issues. Need to wait for API, so it updates displays correctly
-  player.ready(function(){
-    if (this.options_['autoplay'] && this.paused()) {
-      this.tag.poster = null; // Chrome Fix. Fixed in Chrome v16.
-      this.play();
+    // Otherwise set the source if one was provided.
+    } else if (source) {
+      this.el_.src = source.src;
     }
-  });
 
-  this.on('click', this.onClick);
+    // Chrome and Safari both have issues with autoplay.
+    // In Safari (5.1.1), when we move the video element into the container div, autoplay doesn't work.
+    // In Chrome (15), if you have autoplay + a poster + no controls, the video gets hidden (but audio plays)
+    // This fixes both issues. Need to wait for API, so it updates displays correctly
+    player.ready(function(){
+      if (this.options_['autoplay'] && this.paused()) {
+        this.tag.poster = null; // Chrome Fix. Fixed in Chrome v16.
+        this.play();
+      }
+    });
 
-  this.setupTriggers();
+    this.on('click', this.onClick);
 
-  this.triggerReady();
-};
-goog.inherits(vjs.Html5, vjs.MediaTechController);
+    this.setupTriggers();
+
+    this.triggerReady();
+  }
+});
 
 vjs.Html5.prototype.dispose = function(){
-  goog.base(this, 'dispose');
+  vjs.MediaTechController.prototype.dispose.call(this);
 };
 
 vjs.Html5.prototype.createEl = function(){

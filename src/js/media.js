@@ -8,15 +8,17 @@
  * @param {Object=} options Options object
  * @constructor
  */
-vjs.MediaTechController = function(player, options, ready){
-  goog.base(this, player, options, ready);
+vjs.MediaTechController = vjs.Component.extend({
+  /** @constructor */
+  init: function(player, options, ready){
+    vjs.Component.call(this, player, options, ready);
 
-  // Make playback element clickable
-  // this.addEvent('click', this.proxy(this.onClick));
+    // Make playback element clickable
+    // this.addEvent('click', this.proxy(this.onClick));
 
-  // player.triggerEvent('techready');
-};
-goog.inherits(vjs.MediaTechController, vjs.Component);
+    // player.triggerEvent('techready');
+  }
+});
 
 // destroy: function(){},
 // createElement: function(){},

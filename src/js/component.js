@@ -9,34 +9,37 @@
  * @param {Object=} options
  * @constructor
  */
-vjs.Component = function(player, options, ready){
-  this.player_ = player;
+vjs.Component = vjs.CoreObject.extend({
+  /** @constructor */
+  init: function(player, options, ready){
+    this.player_ = player;
 
-  // Make a copy of prototype.options_ to protect against overriding global defaults
-  this.options_ = vjs.obj.copy(this.options_);
+    // Make a copy of prototype.options_ to protect against overriding global defaults
+    this.options_ = vjs.obj.copy(this.options_);
 
-  // Updated options with supplied options
-  options = this.options(options);
+    // Updated options with supplied options
+    options = this.options(options);
 
-  // Get ID from options, element, or create using player ID and unique ID
-  this.id_ = options['id'] || ((options['el'] && options['el']['id']) ? options['el']['id'] : player.id() + '_component_' + vjs.guid++ );
+    // Get ID from options, element, or create using player ID and unique ID
+    this.id_ = options['id'] || ((options['el'] && options['el']['id']) ? options['el']['id'] : player.id() + '_component_' + vjs.guid++ );
 
-  this.name_ = options['name'] || null;
+    this.name_ = options['name'] || null;
 
-  // Create element if one wasn't provided in options
-  this.el_ = options['el'] || this.createEl();
+    // Create element if one wasn't provided in options
+    this.el_ = options['el'] || this.createEl();
 
-  this.children_ = [];
-  this.childIndex_ = {};
-  this.childNameIndex_ = {};
+    this.children_ = [];
+    this.childIndex_ = {};
+    this.childNameIndex_ = {};
 
-  // Add any child components in options
-  this.initChildren();
+    // Add any child components in options
+    this.initChildren();
 
-  this.ready(ready);
-  // Don't want to trigger ready here or it will before init is actually
-  // finished for all children that run this constructor
-};
+    this.ready(ready);
+    // Don't want to trigger ready here or it will before init is actually
+    // finished for all children that run this constructor
+  }
+});
 
 /**
  * Dispose of the component and all child components.
@@ -334,7 +337,6 @@ vjs.Component.prototype.initChildren = function(){
 
     // Loop through components and add them to the player
     vjs.obj.each(options['children'], function(name, opts){
-
       // Allow for disabling default components
       // e.g. vjs.options['children']['posterImage'] = false
       if (opts === false) return;
