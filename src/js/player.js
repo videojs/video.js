@@ -165,7 +165,6 @@ vjs.Player.prototype.createEl = function(){
 
   // Make player findable on elements
   tag['player'] = el['player'] = this;
-
   // Default state of video is paused
   this.addClass('vjs-paused');
 
@@ -197,6 +196,7 @@ vjs.Player.prototype.loadTech = function(techName, source){
   // So we need to remove it if we're not loading HTML5
   } else if (techName !== 'Html5' && this.tag) {
     this.el_.removeChild(this.tag);
+    this.tag.player = null;
     this.tag = null;
   }
 

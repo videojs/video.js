@@ -275,7 +275,13 @@ vjs.addClass = function(element, classToAdd){
 vjs.removeClass = function(element, classToRemove){
   if (element.className.indexOf(classToRemove) == -1) { return; }
   var classNames = element.className.split(' ');
-  classNames.splice(classNames.indexOf(classToRemove),1);
+  // IE8 Does not support array.indexOf so using a for loop
+  for (var i = classNames.length - 1; i >= 0; i--) {
+    if (classNames[i] === classToRemove) {
+      classNames.splice(i,1);
+    }
+  }
+  // classNames.splice(classNames.indexOf(classToRemove),1);
   element.className = classNames.join(' ');
 };
 
@@ -368,16 +374,14 @@ vjs.getAttributeValues = function(tag){
  * @param  {String} strCssRule Style name
  * @return {String}            Style value
  */
-vjs.getComputedStyleValue = function(el, strCssRule){
+vjs.getComputedDimension = function(el, strCssRule){
   var strValue = '';
   if(document.defaultView && document.defaultView.getComputedStyle){
     strValue = document.defaultView.getComputedStyle(el, '').getPropertyValue(strCssRule);
 
   } else if(el.currentStyle){
-    strCssRule = strCssRule.replace(/\-(\w)/g, function (strMatch, p1){
-      return p1.toUpperCase();
-    });
-    strValue = el.currentStyle[strCssRule];
+    // IE8 Width/Height support
+    strValue = el['client'+strCssRule.substr(0,1).toUpperCase() + strCssRule.substr(1)] + 'px';
   }
   return strValue;
 };

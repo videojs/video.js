@@ -179,7 +179,8 @@ test('should change the width and height of a component', function(){
   comp.height('123px');
 
   ok(comp.width() === 500, 'percent values working');
-  ok(vjs.getComputedStyleValue(el, 'width') === comp.width() + 'px', 'matches computed style');
+  var compStyle = vjs.getComputedDimension(el, 'width');
+  ok(compStyle === comp.width() + 'px', 'matches computed style');
   ok(comp.height() === 123, 'px values working');
 
   comp.width(321);
