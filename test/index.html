@@ -18,7 +18,7 @@
     (function(){
 
       // ADD NEW TEST FILES HERE
-      var tests = [
+      window.tests = [
         'test/unit/core-object.js',
         'test/unit/lib.js',
         'test/unit/events.js',
@@ -30,22 +30,30 @@
         'test/unit/controls.js',
         'test/unit/plugins.js'
       ];
-      var compiledTests = "build/files/test.minified.video.js";
 
       var projectRoot = '../';
       var scripts = [];
+
+      window.loadScripts = function(scripts) {
+        for (var i = 0; i < scripts.length; i++) {
+          document.write("<script src='" + projectRoot + scripts[i] + "'><\/script>" );
+        }
+      }
 
       // Choose either the raw source and tests
       // Or the compiled source + tests.
       // Use ?comiled to use the compiled tests
       if (QUnit.urlParams.min || QUnit.urlParams.compiled) {
-        scripts.push(compiledTests);
+        window.compiled = true;
       } else {
-        scripts = scripts.concat(['build/source-loader.js'], tests);
-      }
+        // Bunyip/Yeti starts tests after it's done loading which can
+        // lead to a double Qunit.start error which reads as
+        // "Uncaught Error: pushFailure() assertion outside test"
+        if (window.$yetify) {
+          QUnit.config.autostart = false;
+        }
 
-      for (var i = 0; i < scripts.length; i++) {
-        document.write( "<script src='" + projectRoot + scripts[i] + "'><\/script>" );
+        loadScripts(['build/source-loader.js']);
       }
 
     })()
@@ -60,5 +68,15 @@
     <ol id="qunit-tests"></ol>
     <div id="qunit-fixture"></div>
   </div>
+
+  <script>
+    // Loading tests before the end to give IE time to load vjs before tests
+    if (!window.compiled) {
+      loadScripts(window.tests);
+    } else {
+      var compiledTests = "build/files/test.minified.video.js";
+      loadScripts([compiledTests]);
+    }
+  </script>
 </body>
 </html>

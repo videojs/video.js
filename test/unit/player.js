@@ -124,7 +124,6 @@ test('should get tag, source, and track settings', function(){
   ok(player.el().className.indexOf('video-js') !== -1, 'transferred class from tag to player div');
   ok(player.el().id === 'example_1', 'transferred id from tag to player div');
 
-  ok(tag['player'] === player, 'player referenceable on original tag');
   ok(vjs.players[player.id()] === player, 'player referenceable from global list');
   ok(tag.id !== player.id, 'tag ID no longer is the same as player ID');
   ok(tag.className !== player.el().className, 'tag classname updated');
@@ -194,6 +193,8 @@ test('should transfer the poster attribute unmodified', function(){
   });
 
   equal(player.tech.el().poster, poster, 'the poster attribute should not be removed');
+
+  player.dispose();
 });
 
 test('should load a media controller', function(){
