@@ -169,6 +169,9 @@ vjs.fixEvent = function(event) {
 
     // Clone the old object so that we can modify the values event = {};
     event = vjs.obj.copy(old);
+    // Firefox returns false for event.hasOwnProperty('type'),
+    // so it was getting lost in the object copy
+    event.type = old.type;
 
     // The event occurred on this element
     if (!event.target) {
