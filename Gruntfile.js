@@ -124,7 +124,7 @@ module.exports = function(grunt) {
                 // + ' --formatting=pretty_print'
                 + ' --js_output_file=' + dest
                 + ' --create_source_map ' + dest + '.map --source_map_format=V3'
-                + ' --jscomp_warning=checkTypes --warning_level=VERBOSE';
+                + ' --jscomp_warning=checkTypes --warning_level=VERBOSE'
                 + ' --output_wrapper "(function() {%output%})();//@ sourceMappingURL=video.js.map"';
 
     files.forEach(function(file){
