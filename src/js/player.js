@@ -581,11 +581,11 @@ vjs.Player.prototype.supportsFullScreen = function(){ return this.techGet('suppo
 // Turn on fullscreen (or window) mode
 vjs.Player.prototype.requestFullScreen = function(){
   var requestFullScreen = vjs.support.requestFullScreen;
-
   this.isFullScreen = true;
 
-  // Check for browser element fullscreen support
   if (requestFullScreen) {
+    // the browser supports going fullscreen at the element level so we can
+    // take the controls fullscreen as well as the video
 
     // Trigger fullscreenchange event after change
     vjs.on(document, requestFullScreen.eventName, vjs.bind(this, function(){
@@ -596,7 +596,6 @@ vjs.Player.prototype.requestFullScreen = function(){
         vjs.off(document, requestFullScreen.eventName, arguments.callee);
       }
 
-      this.trigger('fullscreenchange');
     }));
 
     // Flash and other plugins get reloaded when you take their parent to fullscreen.
@@ -618,15 +617,19 @@ vjs.Player.prototype.requestFullScreen = function(){
     }
 
   } else if (this.tech.supportsFullScreen()) {
-    this.trigger('fullscreenchange');
-    this.techCall('enterFullScreen');
+    // we can't take the video.js controls fullscreen but we can go fullscreen
+    // with native controls
 
+    this.techCall('enterFullScreen');
   } else {
+    // fullscreen isn't supported so we'll just stretch the video element to
+    // fill the viewport
+
     this.trigger('fullscreenchange');
     this.enterFullWindow();
   }
 
-   return this;
+  return this;
 };
 
 vjs.Player.prototype.cancelFullScreen = function(){
@@ -656,9 +659,8 @@ vjs.Player.prototype.cancelFullScreen = function(){
    }
 
   } else if (this.tech.supportsFullScreen()) {
-   this.techCall('exitFullScreen');
-   this.trigger('fullscreenchange');
 
+   this.techCall('exitFullScreen');
   } else {
    this.exitFullWindow();
    this.trigger('fullscreenchange');
@@ -900,52 +902,48 @@ vjs.Player.prototype.ended = function(){ return this.techGet('ended'); };
 
 // RequestFullscreen API
 (function(){
-  var requestFn, cancelFn, eventName, isFullScreen;
+  var prefix, requestFS, div;
+
+  div = document.createElement('div');
+
+  requestFS = {};
 
   // Current W3C Spec
   // http://dvcs.w3.org/hg/fullscreen/raw-file/tip/Overview.html#api
   // Mozilla Draft: https://wiki.mozilla.org/Gecko:FullScreenAPI#fullscreenchange_event
-  if (document.cancelFullscreen !== undefined) {
-    requestFn = 'requestFullscreen';
-    cancelFn = 'exitFullscreen';
-    eventName = 'fullscreenchange';
-    isFullScreen = 'fullScreen';
+  if (div.cancelFullscreen !== undefined) {
+    requestFS.requestFn = 'requestFullscreen';
+    requestFS.cancelFn = 'exitFullscreen';
+    requestFS.eventName = 'fullscreenchange';
+    requestFS.isFullScreen = 'fullScreen';
 
   // Webkit (Chrome/Safari) and Mozilla (Firefox) have working implementaitons
-  // that use prefixes and vary slightly from the new W3C spec. Specifically, using 'exit' instead of 'cancel',
-  // and lowercasing the 'S' in Fullscreen.
-  // Other browsers don't have any hints of which version they might follow yet, so not going to try to predict by loopeing through all prefixes.
+  // that use prefixes and vary slightly from the new W3C spec. Specifically,
+  // using 'exit' instead of 'cancel', and lowercasing the 'S' in Fullscreen.
+  // Other browsers don't have any hints of which version they might follow yet,
+  // so not going to try to predict by looping through all prefixes.
   } else {
 
-    var prefixes = ['moz', 'webkit'];
-
-    for (var i = prefixes.length - 1; i >= 0; i--) {
-      var prefix = prefixes[i];
-
-      // https://github.com/zencoder/video-js/pull/128
-      if ((prefix != 'moz' || document.mozFullScreenEnabled) && document[prefix + 'CancelFullScreen'] !== undefined) {
-        requestFn = prefix + 'RequestFullScreen';
-        cancelFn = prefix + 'CancelFullScreen';
-        eventName = prefix + 'fullscreenchange';
-
-        if (prefix == 'webkit') {
-          isFullScreen = prefix + 'IsFullScreen';
-        } else {
-          isFullScreen = prefix + 'FullScreen';
-        }
-      }
+    if (document.mozCancelFullScreen) {
+      prefix = 'moz';
+      requestFS.isFullScreen = prefix + 'FullScreen';
+    } else {
+      prefix = 'webkit';
+      requestFS.isFullScreen = prefix + 'IsFullScreen';
     }
+
+    if (div[prefix + 'RequestFullScreen']) {
+      requestFS.requestFn = prefix + 'RequestFullScreen';
+      requestFS.cancelFn = prefix + 'CancelFullScreen';
+    } else {
+      requestFS.requestFn = prefix + 'EnterFullScreen';
+      requestFS.cancelFn = prefix + 'ExitFullScreen';
+    }
+    requestFS.eventName = prefix + 'fullscreenchange';
   }
 
-  if (requestFn) {
-    vjs.support.requestFullScreen = {
-      requestFn: requestFn,
-      cancelFn: cancelFn,
-      eventName: eventName,
-      isFullScreen: isFullScreen
-    };
+  if (document[requestFS.cancelFn]) {
+    vjs.support.requestFullScreen = requestFS;
   }
 
 })();
-
-
