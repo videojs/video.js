@@ -1,8 +1,10 @@
 module.exports = function(grunt) {
 
+  var pkg = grunt.file.readJSON('package.json');
+
   // Project configuration.
   grunt.initConfig({
-    pkg: grunt.file.readJSON('package.json'),
+    pkg: pkg,
 
     build: {
       src: 'src/js/dependencies.js',
@@ -155,7 +157,13 @@ module.exports = function(grunt) {
   grunt.registerTask('dist', 'Creating distribution', function(){
     // TODO: create semver folders (4.1.1, 4.1, 4, and latest)
     // grunt copy could be used but is currently broken and needs an update
-    grunt.file.copy('build/files/minified.video.js', 'dist/video-js/video.js');
+
+    // Add the copyright to minified before copying over
+    var original = grunt.file.read('build/files/minified.video.js');
+    var copyright = '/** ' + pkg.copyright + ' **/\n';
+    grunt.file.write('dist/video-js/video.js', copyright + original);
+
+    // grunt.file.copy('build/files/minified.video.js', 'dist/video-js/video.js');
     grunt.file.copy('build/files/video-js.css', 'dist/video-js/video-js.css');
     grunt.file.copy('build/files/video-js.png', 'dist/video-js/video-js.png');
     grunt.file.copy('build/files/video-js.swf', 'dist/video-js/video-js.swf');
