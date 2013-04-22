@@ -22,7 +22,8 @@ vjs.CoreObject.extend = function(props){
   props = props || {};
   // Set up the constructor using the supplied init method
   // or using the init of the parent object
-  init = props.init || this.prototype.init || function(){};
+  // Make sure to check the unobfuscated version for external libs
+  init = props['init'] || props.init || this.prototype['init'] || this.prototype.init || function(){};
   // In Resig's simple class inheritance (previously used) the constructor
   //  is a function that calls `this.init.apply(arguments)`
   // However that would prevent us from using `ParentObject.call(this);`
