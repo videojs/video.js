@@ -135,6 +135,12 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
   opacity: 0;*/
 }
 
+.vjs-default-skin .vjs-lock-showing {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+}
+
 /* General styles for individual controls. */
 .vjs-default-skin .vjs-control {
   position: relative; float: left;

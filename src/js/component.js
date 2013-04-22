@@ -545,10 +545,7 @@ vjs.Component.prototype.fadeOut = function(){
  * @return {vjs.Component}
  */
 vjs.Component.prototype.lockShowing = function(){
-  var style = this.el_.style;
-  style.display = 'block';
-  style.opacity = 1;
-  style.visibility = 'visible';
+  this.addClass('vjs-lock-showing');
   return this;
 };
 
@@ -557,10 +554,7 @@ vjs.Component.prototype.lockShowing = function(){
  * @return {vjs.Component}
  */
 vjs.Component.prototype.unlockShowing = function(){
-  var style = this.el_.style;
-  style.display = '';
-  style.opacity = '';
-  style.visibility = '';
+  this.removeClass('vjs-lock-showing');
   return this;
 };
 
