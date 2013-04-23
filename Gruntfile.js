@@ -105,18 +105,18 @@ module.exports = function(grunt) {
     var done = this.async();
     var exec = require('child_process').exec;
 
-    var externs = this.files[0].externs || [];
-    var dest = this.files[0].dest;
-    var files = [];
+    var externs = this.data.externs || [];
+    var dest = this.data.dest;
+    var filePatterns = [];
 
     // Make sure deeper directories exist for compiler
     grunt.file.write(dest, '');
 
-    if (this.files[0].sourcelist) {
-      files = files.concat(grunt.file.read(this.files[0].sourcelist).split(','));
+    if (this.data.sourcelist) {
+      filePatterns = filePatterns.concat(grunt.file.read(this.data.sourcelist).split(','));
     }
-    if (this.files[0].src) {
-      files = files.concat(this.files[0].src);
+    if (this.data.src) {
+      filePatterns = filePatterns.concat(this.data.src);
     }
 
     var command = 'java -jar build/compiler/compiler.jar'
@@ -127,7 +127,7 @@ module.exports = function(grunt) {
                 + ' --jscomp_warning=checkTypes --warning_level=VERBOSE'
                 + ' --output_wrapper "(function() {%output%})();//@ sourceMappingURL=video.js.map"';
 
-    files.forEach(function(file){
+    grunt.file.expand(filePatterns).forEach(function(file){
       command += ' --js='+file;
     });
 
