@@ -127,7 +127,7 @@ module.exports = function(grunt) {
                 + ' --js_output_file=' + dest
                 + ' --create_source_map ' + dest + '.map --source_map_format=V3'
                 + ' --jscomp_warning=checkTypes --warning_level=VERBOSE'
-                + ' --output_wrapper "(function() {%output%})();//@ sourceMappingURL=video.js.map"';
+                + ' --output_wrapper "/*! ' + pkg.copyright + ' */\n (function() {%output%})();//@ sourceMappingURL=video.js.map"';
 
     files.forEach(function(file){
       command += ' --js='+file;
@@ -158,12 +158,7 @@ module.exports = function(grunt) {
     // TODO: create semver folders (4.1.1, 4.1, 4, and latest)
     // grunt copy could be used but is currently broken and needs an update
 
-    // Add the copyright to minified before copying over
-    var original = grunt.file.read('build/files/minified.video.js');
-    var copyright = '/** ' + pkg.copyright + ' **/\n';
-    grunt.file.write('dist/video-js/video.js', copyright + original);
-
-    // grunt.file.copy('build/files/minified.video.js', 'dist/video-js/video.js');
+    grunt.file.copy('build/files/minified.video.js', 'dist/video-js/video.js');
     grunt.file.copy('build/files/video-js.css', 'dist/video-js/video-js.css');
     grunt.file.copy('build/files/video-js.png', 'dist/video-js/video-js.png');
     grunt.file.copy('build/files/video-js.swf', 'dist/video-js/video-js.swf');
