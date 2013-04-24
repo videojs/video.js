@@ -23,9 +23,19 @@ vjs.Button = vjs.Component.extend({
       if (touchstart) {
         self.onClick(event);
       }
-      event.preventDefault();
-      event.stopPropagation();
     });
+
+    if (/android/i.test(navigator.userAgent) && !/chrome/i.test(navigator.userAgent)) {
+      this.on('click', function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+      });
+    } else {
+      this.on('touchend', function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+      });
+    }
 
     this.on('click', this.onClick);
     this.on('focus', this.onFocus);
