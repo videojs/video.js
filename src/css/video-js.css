@@ -102,6 +102,12 @@ body.vjs-full-window {
 /* Hide disabled or unsupported controls */
 .vjs-default-skin .vjs-hidden { display: none; }
 
+.vjs-lock-showing {
+  display: block !important;
+  opacity: 1;
+  visibility: visible;
+}
+
 /* DEFAULT SKIN (override in another file to create new skins)
 ================================================================================
 Instead of editing this file, I recommend creating your own skin CSS file to be included after this file,
@@ -133,12 +139,6 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
   /* Can't use display block to hide initially because widths of slider handles aren't calculated and avaialbe for positioning correctly. */
   /*visibility: hidden;
   opacity: 0;*/
-}
-
-.vjs-default-skin .vjs-lock-showing {
-  display: block;
-  opacity: 1;
-  visibility: visible;
 }
 
 /* General styles for individual controls. */
