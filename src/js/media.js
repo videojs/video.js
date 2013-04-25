@@ -27,7 +27,7 @@ vjs.MediaTechController = vjs.Component.extend({
  * Handle a click on the media element. By default will play the media.
  */
 vjs.MediaTechController.prototype.onClick = (function() {
-  if (/android/i.test(navigator.userAgent) && !/chrome/i.test(navigator.userAgent)) {
+  if (vjs.IS_ANDROID && !/chrome/i.test(navigator.userAgent)) {
     return function() {};
   } else {
     return function(event){

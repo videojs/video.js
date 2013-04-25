@@ -25,7 +25,7 @@ vjs.Button = vjs.Component.extend({
       }
     });
 
-    if (/android/i.test(navigator.userAgent) && !/chrome/i.test(navigator.userAgent)) {
+    if (vjs.IS_ANDROID && !/chrome/i.test(navigator.userAgent)) {
       this.on('click', function(event) {
         event.preventDefault();
         event.stopPropagation();
