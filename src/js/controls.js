@@ -78,12 +78,18 @@ vjs.ControlBar.prototype.createEl = function(){
 };
 
 vjs.ControlBar.prototype.fadeIn = function(){
-  vjs.Component.prototype.fadeIn.call(this);
+  if (this.player_.options().controls){
+    vjs.Component.prototype.fadeIn.call(this);
+  }
+
   this.player_.trigger('controlsvisible');
 };
 
 vjs.ControlBar.prototype.fadeOut = function(){
-  vjs.Component.prototype.fadeOut.call(this);
+  if (this.player_.options().controls){
+    vjs.Component.prototype.fadeOut.call(this);
+  }
+
   this.player_.trigger('controlshidden');
 };
 
