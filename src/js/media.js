@@ -28,7 +28,14 @@ vjs.MediaTechController = vjs.Component.extend({
  */
 vjs.MediaTechController.prototype.onClick = (function() {
   if (vjs.IS_ANDROID && !/chrome/i.test(navigator.userAgent)) {
-    return function() {};
+    return function() {
+      if (this.player_.controls()) {
+        if (this.player_.paused()) {
+          this.player.play();
+          vjs.MediaTechController.prototype.onClick = function() {};
+        }
+      }
+    };
   } else {
     return function(event){
       if (this.player_.controls()) {
