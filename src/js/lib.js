@@ -304,9 +304,9 @@ vjs.USER_AGENT = navigator.userAgent;
  * @type {Boolean}
  * @constant
  */
-vjs.IS_IPHONE = !!vjs.USER_AGENT.match(/iPhone/i);
-vjs.IS_IPAD = !!vjs.USER_AGENT.match(/iPad/i);
-vjs.IS_IPOD = !!vjs.USER_AGENT.match(/iPod/i);
+vjs.IS_IPHONE = (/iPhone/i).test(vjs.USER_AGENT);
+vjs.IS_IPAD = (/iPad/i).test(vjs.USER_AGENT);
+vjs.IS_IPOD = (/iPod/i).test(vjs.USER_AGENT);
 vjs.IS_IOS = vjs.IS_IPHONE || vjs.IS_IPAD || vjs.IS_IPOD;
 
 vjs.IOS_VERSION = (function(){
@@ -314,7 +314,7 @@ vjs.IOS_VERSION = (function(){
   if (match && match[1]) { return match[1]; }
 })();
 
-vjs.IS_ANDROID = !!vjs.USER_AGENT.match(/Android.*AppleWebKit/i);
+vjs.IS_ANDROID = (/Android/i).test(vjs.USER_AGENT);
 vjs.ANDROID_VERSION = (function() {
   var match = vjs.USER_AGENT.match(/Android (\d+)\./i);
   if (match && match[1]) {
@@ -323,7 +323,8 @@ vjs.ANDROID_VERSION = (function() {
   return null;
 })();
 
-vjs.IS_FIREFOX = function(){ return !!vjs.USER_AGENT.match('Firefox'); };
+vjs.IS_FIREFOX = (/Firefox/i).test(vjs.USER_AGENT);
+vjs.IS_CHROME = (/Chrome/i).test(vjs.USER_AGENT);
 
 
 /**
