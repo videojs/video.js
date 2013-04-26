@@ -27,12 +27,10 @@ vjs.MediaTechController = vjs.Component.extend({
  * Handle a click on the media element. By default will play the media.
  */
 vjs.MediaTechController.prototype.onClick = function(){
-  if (this.player_.controls()) {
-    if (this.player_.paused()) {
-      this.player_.play();
-    } else {
-      this.player_.pause();
-    }
+  if (this.player_.paused()) {
+    this.player_.play();
+  } else {
+    this.player_.pause();
   }
 };
 
