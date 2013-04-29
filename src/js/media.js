@@ -41,7 +41,7 @@ vjs.MediaTechController.prototype.onClick = (function(){
           this.player_.pause();
         }
       }
-    }
+    };
   }
 })();
 
