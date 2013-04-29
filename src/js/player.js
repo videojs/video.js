@@ -917,7 +917,7 @@ vjs.Player.prototype.ended = function(){ return this.techGet('ended'); };
     requestFS.eventName = 'fullscreenchange';
     requestFS.isFullScreen = 'fullScreen';
 
-  // Webkit (Chrome/Safari) and Mozilla (Firefox) have working implementaitons
+  // Webkit (Chrome/Safari) and Mozilla (Firefox) have working implementations
   // that use prefixes and vary slightly from the new W3C spec. Specifically,
   // using 'exit' instead of 'cancel', and lowercasing the 'S' in Fullscreen.
   // Other browsers don't have any hints of which version they might follow yet,
@@ -935,9 +935,6 @@ vjs.Player.prototype.ended = function(){ return this.techGet('ended'); };
     if (div[prefix + 'RequestFullScreen']) {
       requestFS.requestFn = prefix + 'RequestFullScreen';
       requestFS.cancelFn = prefix + 'CancelFullScreen';
-    } else {
-      requestFS.requestFn = prefix + 'EnterFullScreen';
-      requestFS.cancelFn = prefix + 'ExitFullScreen';
     }
     requestFS.eventName = prefix + 'fullscreenchange';
   }
