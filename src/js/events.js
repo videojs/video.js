@@ -189,6 +189,9 @@ vjs.fixEvent = function(event) {
 
     // Stop the default browser action
     event.preventDefault = function () {
+      if (old.preventDefault) {
+        old.preventDefault();
+      }
       event.returnValue = false;
       event.isDefaultPrevented = returnTrue;
     };
@@ -197,6 +200,9 @@ vjs.fixEvent = function(event) {
 
     // Stop the event from bubbling
     event.stopPropagation = function () {
+      if (old.stopPropagation) {
+        old.stopPropagation();
+      }
       event.cancelBubble = true;
       event.isPropagationStopped = returnTrue;
     };
@@ -205,6 +211,9 @@ vjs.fixEvent = function(event) {
 
     // Stop the event from bubbling and executing other handlers
     event.stopImmediatePropagation = function () {
+      if (old.stopImmediatePropagation) {
+        old.stopImmediatePropagation();
+      }
       event.isImmediatePropagationStopped = returnTrue;
       event.stopPropagation();
     };

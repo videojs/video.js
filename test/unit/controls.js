@@ -75,3 +75,27 @@ test('should test and toggle volume control on `loadstart`', function(){
   ok(muteToggle.el().className.indexOf('vjs-hidden') < 0,
      'muteToggle does not show itself');
 });
+
+test('calculateDistance should use changedTouches, if available', function() {
+  var noop, player, slider, event;
+  noop = function(){};
+  player = {
+    id: noop,
+    on: noop,
+    ready: noop
+  };
+  slider = new vjs.Slider(player);
+  document.body.appendChild(slider.el_);
+  slider.el_.style.position = 'absolute';
+  slider.el_.style.width = '200px';
+  slider.el_.style.left = '0px';
+
+  event = {
+    pageX: 10,
+    changedTouches: [{
+      pageX: 100
+    }]
+  };
+
+  equal(slider.calculateDistance(event), 0.5, 'we should have touched exactly in the center, so, the ratio should be half');
+});
