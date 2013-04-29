@@ -26,15 +26,28 @@ vjs.MediaTechController = vjs.Component.extend({
 /**
  * Handle a click on the media element. By default will play the media.
  */
-vjs.MediaTechController.prototype.onClick = function(){
-  if (this.player_.controls()) {
-    if (this.player_.paused()) {
-      this.player_.play();
-    } else {
-      this.player_.pause();
-    }
+vjs.MediaTechController.prototype.onClick = (function() {
+  if (vjs.IS_ANDROID && !/chrome/i.test(navigator.userAgent)) {
+    return function() {
+      if (this.player_.controls()) {
+        if (this.player_.paused()) {
+          this.player.play();
+          vjs.MediaTechController.prototype.onClick = function() {};
+        }
+      }
+    };
+  } else {
+    return function(event){
+      if (this.player_.controls()) {
+        if (this.player_.paused()) {
+          this.player_.play();
+        } else {
+          this.player_.pause();
+        }
+      }
+    };
   }
-};
+})();
 
 vjs.MediaTechController.prototype.features = {
   volumeControl: true,
