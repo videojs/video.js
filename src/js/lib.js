@@ -543,16 +543,20 @@ vjs.get = function(url, onSuccess, onError){
 /* Local Storage
 ================================================================================ */
 vjs.setLocalStorage = function(key, value){
-  // IE was throwing errors referencing the var anywhere without this
-  var localStorage = window.localStorage || false;
-  if (!localStorage) { return; }
   try {
+    // IE was throwing errors referencing the var anywhere without this
+    var localStorage = window.localStorage || false;
+    if (!localStorage) { return; }
     localStorage[key] = value;
   } catch(e) {
     if (e.code == 22 || e.code == 1014) { // Webkit == 22 / Firefox == 1014
       vjs.log('LocalStorage Full (VideoJS)', e);
     } else {
-      vjs.log('LocalStorage Error (VideoJS)', e);
+      if (e.code == 18) {
+        vjs.log('LocalStorage not allowed (VideoJS)', e);
+      } else {
+        vjs.log('LocalStorage Error (VideoJS)', e);
+      }
     }
   }
 };
