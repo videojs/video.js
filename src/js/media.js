@@ -25,16 +25,25 @@ vjs.MediaTechController = vjs.Component.extend({
 
 /**
  * Handle a click on the media element. By default will play the media.
+ *
+ * On android browsers, having this toggle play state interferes with being
+ * able to toggle the controls and toggling play state with the play button
  */
-vjs.MediaTechController.prototype.onClick = function(){
-  if (this.player_.controls()) {
-    if (this.player_.paused()) {
-      this.player_.play();
-    } else {
-      this.player_.pause();
-    }
+vjs.MediaTechController.prototype.onClick = (function(){
+  if (vjs.IS_ANDROID) {
+    return function () {};
+  } else {
+    return function () {
+      if (this.player_.controls()) {
+        if (this.player_.paused()) {
+          this.player_.play();
+        } else {
+          this.player_.pause();
+        }
+      }
+    };
   }
-};
+})();
 
 vjs.MediaTechController.prototype.features = {
   volumeControl: true,
