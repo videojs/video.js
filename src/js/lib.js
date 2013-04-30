@@ -593,7 +593,12 @@ vjs.findPosition = function(el) {
 
     box = el.getBoundingClientRect();
 
-    if (!box) { return 0; }
+    if (!box) {
+      return {
+        left: 0,
+        top: 0
+      };
+    }
 
     docEl = document.documentElement;
     body = document.body;
