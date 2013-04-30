@@ -121,26 +121,52 @@ vjs.Slider.prototype.update = function(){
 };
 
 vjs.Slider.prototype.calculateDistance = function(event){
-  var box = this.el_,
-      boxX = vjs.findPosX(box),
-      boxW = box.offsetWidth,
-      handle = this.handle,
+  var el, box, boxX, boxY, boxW, boxH, handle, pageX, pageY;
+
+  el = this.el_;
+  box = vjs.findPosition(el);
+  boxW = boxH = el.offsetWidth;
+  handle = this.handle;
+
+  if (this.options_.vertical) {
+    boxY = box.top;
+
+    if (event.changedTouches) {
+      pageY = event.changedTouches[0].pageY;
+    } else {
+      pageY = event.pageY;
+    }
+
+    if (handle) {
+      var handleH = handle.el().offsetHeight;
+      // Adjusted X and Width, so handle doesn't go outside the bar
+      boxY = boxY + (handleH / 2);
+      boxH = boxH - handleH;
+    }
+
+    // Percent that the click is through the adjusted area
+    return Math.max(0, Math.min(1, ((boxY - pageY) + boxH) / boxH));
+
+  } else {
+    boxX = box.left;
+
+    if (event.changedTouches) {
+      pageX = event.changedTouches[0].pageX;
+    } else {
       pageX = event.pageX;
+    }
 
-  if (handle) {
-    var handleW = handle.el().offsetWidth;
+    if (handle) {
+      var handleW = handle.el().offsetWidth;
 
-    // Adjusted X and Width, so handle doesn't go outside the bar
-    boxX = boxX + (handleW / 2);
-    boxW = boxW - handleW;
+      // Adjusted X and Width, so handle doesn't go outside the bar
+      boxX = boxX + (handleW / 2);
+      boxW = boxW - handleW;
+    }
+
+    // Percent that the click is through the adjusted area
+    return Math.max(0, Math.min(1, (pageX - boxX) / boxW));
   }
-
-  if (event.changedTouches) {
-    pageX = event.changedTouches[0].pageX;
-  }
-
-  // Percent that the click is through the adjusted area
-  return Math.max(0, Math.min(1, (pageX - boxX) / boxW));
 };
 
 vjs.Slider.prototype.onFocus = function(){
