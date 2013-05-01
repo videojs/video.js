@@ -588,37 +588,33 @@ vjs.log = function(){
 
 // Offset Left
 // getBoundingClientRect technique from John Resig http://ejohn.org/blog/getboundingclientrect-is-awesome/
-if ('getBoundingClientRect' in document.documentElement) {
-  vjs.findPosX = function(el) {
-    var box;
+vjs.findPosition = function(el) {
+    var box, docEl, body, clientLeft, scrollLeft, left, clientTop, scrollTop, top;
 
-    try {
+    if (el.getBoundingClientRect) {
       box = el.getBoundingClientRect();
-    } catch(e) {}
-
-    if (!box) { return 0; }
-
-    var docEl = document.documentElement,
-        body = document.body,
-        clientLeft = docEl.clientLeft || body.clientLeft || 0,
-        scrollLeft = window.pageXOffset || body.scrollLeft,
-        left = box.left + scrollLeft - clientLeft;
-
-    return left;
-  };
-} else {
-  vjs.findPosX = function(el) {
-    var curleft = el.offsetLeft;
-    // vjs.log(obj.className, obj.offsetLeft)
-    while(el = el.offsetParent) {
-      if (el.className.indexOf('video-js') == -1) {
-        // vjs.log(el.offsetParent, 'OFFSETLEFT', el.offsetLeft)
-        // vjs.log('-webkit-full-screen', el.webkitMatchesSelector('-webkit-full-screen'));
-        // vjs.log('-webkit-full-screen', el.querySelectorAll('.video-js:-webkit-full-screen'));
-      } else {
-      }
-      curleft += el.offsetLeft;
     }
-    return curleft;
-  };
-}
+
+    if (!box) {
+      return {
+        left: 0,
+        top: 0
+      };
+    }
+
+    docEl = document.documentElement;
+    body = document.body;
+
+    clientLeft = docEl.clientLeft || body.clientLeft || 0;
+    scrollLeft = window.pageXOffset || body.scrollLeft;
+    left = box.left + scrollLeft - clientLeft;
+
+    clientTop = docEl.clientTop || body.clientTop || 0;
+    scrollTop = window.pageYOffset || body.scrollTop;
+    top = box.top + scrollTop - clientTop;
+
+    return {
+      left: left,
+      top: top
+    };
+};
