@@ -217,7 +217,7 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 -------------------------------------------------------------------------------- */
 /* The default control bar. Created by controls.js */
 .vjs-default-skin .vjs-control-bar {
-  display: block; /* Start hidden */
+  display: none; /* Start hidden */
   position: absolute;
   /* Distance from the bottom of the box/video. Keep 0. Use height to add more bottom margin. */
   bottom: 0;
