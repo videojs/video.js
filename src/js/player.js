@@ -24,6 +24,16 @@ vjs.Player = vjs.Component.extend({
     this.poster_ = options['poster'];
     // Set controls
     this.controls_ = options['controls'];
+    // Use native controls for iOS and Android by default
+    //  until controls are more stable on those devices.
+    if (options['customControlsOnMobile'] !== true && (vjs.IS_IOS || vjs.IS_ANDROID)) {
+      tag.controls = options['controls'];
+      this.controls_ = false;
+    } else {
+      // Original tag settings stored in options
+      // now remove immediately so native controls don't flash.
+      tag.controls = false;
+    }
 
     // Run base component initializing with new options.
     // Builds the element through createEl()
@@ -130,9 +140,6 @@ vjs.Player.prototype.createEl = function(){
   var el = this.el_ = vjs.Component.prototype.createEl.call(this, 'div');
   var tag = this.tag;
 
-  // Original tag settings stored in options
-  // now remove immediately so native controls don't flash.
-  tag.removeAttribute('controls');
   // Remove width/height attrs from tag so CSS can make it 100% width/height
   tag.removeAttribute('width');
   tag.removeAttribute('height');
