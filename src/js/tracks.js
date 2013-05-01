@@ -760,7 +760,7 @@ vjs.OffTextTrackMenuItem = vjs.TextTrackMenuItem.extend({
     options['track'] = {
       kind: function() { return options['kind']; },
       player: player,
-      label: function(){ return 'Off'; },
+      label: function(){ return options['kind'] + ' off'; },
       dflt: function(){ return false; },
       mode: function(){ return false; }
     };
@@ -770,7 +770,7 @@ vjs.OffTextTrackMenuItem = vjs.TextTrackMenuItem.extend({
 });
 
 vjs.OffTextTrackMenuItem.prototype.onClick = function(){
-  vjs.TextTrackMenuItem.prototype.onClick(this);
+  vjs.TextTrackMenuItem.prototype.onClick.call(this);
   this.player_.showTextTrack(this.track.id_, this.track.kind());
 };
 
@@ -798,53 +798,48 @@ vjs.OffTextTrackMenuItem.prototype.update = function(){
 /**
  * @constructor
  */
-vjs.TextTrackButton = vjs.Button.extend({
+vjs.TextTrackButton = vjs.MenuButton.extend({
   /** @constructor */
   init: function(player, options){
-    vjs.Button.call(this, player, options);
+    vjs.MenuButton.call(this, player, options);
 
-    this.menu = this.createMenu();
-
-    if (this.items.length === 0) {
+    if (this.items.length <= 1) {
       this.hide();
     }
-    this.on('keyup', this.onKeyPress);
-    this.el_.setAttribute('aria-haspopup',true);
-    this.el_.setAttribute('role','button');
   }
 });
 
-vjs.TextTrackButton.prototype.buttonPressed = false;
+// vjs.TextTrackButton.prototype.buttonPressed = false;
 
-vjs.TextTrackButton.prototype.createMenu = function(){
-  var menu = new vjs.Menu(this.player_);
+// vjs.TextTrackButton.prototype.createMenu = function(){
+//   var menu = new vjs.Menu(this.player_);
 
-  // Add a title list item to the top
-  menu.el().appendChild(vjs.createEl('li', {
-    className: 'vjs-menu-title',
-    innerHTML: vjs.capitalize(this.kind_),
-    tabindex: -1
-  }));
+//   // Add a title list item to the top
+//   // menu.el().appendChild(vjs.createEl('li', {
+//   //   className: 'vjs-menu-title',
+//   //   innerHTML: vjs.capitalize(this.kind_),
+//   //   tabindex: -1
+//   // }));
 
-  // Add an OFF menu item to turn all tracks off
-  menu.addItem(new vjs.OffTextTrackMenuItem(this.player_, { 'kind': this.kind_ }));
+//   this.items = this.createItems();
 
-  this.items = this.createItems();
+//   // Add menu items to the menu
+//   for (var i = 0; i < this.items.length; i++) {
+//     menu.addItem(this.items[i]);
+//   }
 
-  // Add menu items to the menu
-  for (var i = 0; i < this.items.length; i++) {
-    menu.addItem(this.items[i]);
-  }
+//   // Add list to element
+//   this.addChild(menu);
 
-  // Add list to element
-  this.addChild(menu);
-
-  return menu;
-};
+//   return menu;
+// };
 
 // Create a menu item for each text track
 vjs.TextTrackButton.prototype.createItems = function(){
   var items = [], track;
+
+  // Add an OFF menu item to turn all tracks off
+  items.push(new vjs.OffTextTrackMenuItem(this.player_, { 'kind': this.kind_ }));
 
   for (var i = 0; i < this.player_.textTracks().length; i++) {
     track = this.player_.textTracks()[i];
@@ -858,77 +853,6 @@ vjs.TextTrackButton.prototype.createItems = function(){
   return items;
 };
 
-vjs.TextTrackButton.prototype.buildCSSClass = function(){
-  return this.className + ' vjs-menu-button ' + vjs.Button.prototype.buildCSSClass.call(this);
-};
-
-// Focus - Add keyboard functionality to element
-vjs.TextTrackButton.prototype.onFocus = function(){
-  // This function is not needed anymore. Instead, the keyboard functionality is handled by
-  // treating the button as triggering a submenu. When the button is pressed, the submenu
-  // appears. Pressing the button again makes the submenu disappear.
-
-  /*
-  // Show the menu, and keep showing when the menu items are in focus
-  this.menu.lockShowing();
-  // this.menu.el_.style.display = 'block';
-
-  // When tabbing through, the menu should hide when focus goes from the last menu item to the next tabbed element.
-  vjs.one(this.menu.el_.childNodes[this.menu.el_.childNodes.length - 1], 'blur', vjs.bind(this, function(){
-    this.menu.unlockShowing();
-  }));
-    */
-};
-// Can't turn off list display that we turned on with focus, because list would go away.
-vjs.TextTrackButton.prototype.onBlur = function(){};
-
-vjs.TextTrackButton.prototype.onClick = function(){
-  // When you click the button it adds focus, which will show the menu indefinitely.
-  // So we'll remove focus when the mouse leaves the button.
-  // Focus is needed for tab navigation.
-  this.one('mouseout', vjs.bind(this, function(){
-    this.menu.unlockShowing();
-    this.el_.blur();
-  }));
-  if (this.buttonPressed){
-      this.unpressButton();
-  } else {
-      this.pressButton();
-  }
-};
-
-vjs.TextTrackButton.prototype.onKeyPress = function(event){
-  // Check for space bar (32) or enter (13) keys
-  if (event.which == 32 || event.which == 13) {
-      event.preventDefault();
-      if (this.buttonPressed){
-          this.unpressButton();
-      } else {
-          this.pressButton();
-      }
-  }
-
-  // Check for escape (27) key
-  if (event.which == 27){
-      event.preventDefault();
-      if (this.buttonPressed){
-          this.unpressButton();
-      }
-  }
-};
-
-vjs.TextTrackButton.prototype.pressButton = function(){
-    this.buttonPressed = true;
-    this.menu.lockShowing();
-    this.el_.setAttribute('aria-pressed',true);
-    this.el_.children[1].children[0].focus(); // set the focus to the title of the submenu
-};
-
-vjs.TextTrackButton.prototype.unpressButton = function(){
-    this.buttonPressed = false;
-    this.menu.unlockShowing();
-    this.el_.setAttribute('aria-pressed',false);
-};
 /**
  * @constructor
  */
@@ -1036,9 +960,6 @@ vjs.ChaptersButton.prototype.createMenu = function(){
       menu.addChild(mi);
     }
   }
-
-  // Add list to element
-  this.addChild(menu);
 
   if (this.items.length > 0) {
     this.show();

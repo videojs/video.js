@@ -21,9 +21,24 @@ vjs.Menu.prototype.addItem = function(component){
 
 /** @inheritDoc */
 vjs.Menu.prototype.createEl = function(){
-  return vjs.Component.prototype.createEl.call(this, 'ul', {
+  var contentElType = this.options().contentElType || 'ul';
+  this.contentEl_ = vjs.createEl(contentElType, {
+    className: 'vjs-menu-content'
+  });
+  var el = vjs.Component.prototype.createEl.call(this, 'div', {
+    append: this.contentEl_,
     className: 'vjs-menu'
   });
+  el.appendChild(this.contentEl_);
+
+  // Prevent clicks from bubbling up. Needed for Menu Buttons,
+  // where a click on the parent is significant
+  vjs.on(el, 'click', function(event){
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  });
+
+  return el;
 };
 
 /**
@@ -115,9 +130,11 @@ vjs.MenuButton.prototype.createMenu = function(){
 
   this.items = this.createItems();
 
-  // Add menu items to the menu
-  for (var i = 0; i < this.items.length; i++) {
-    menu.addItem(this.items[i]);
+  if (this.items) {
+    // Add menu items to the menu
+    for (var i = 0; i < this.items.length; i++) {
+      menu.addItem(this.items[i]);
+    }
   }
 
   return menu;

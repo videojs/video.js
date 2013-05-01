@@ -37,7 +37,7 @@ vjs.Button.prototype.createEl = function(type, props){
   // Add standard Aria and Tabindex info
   props = vjs.obj.merge({
     className: this.buildCSSClass(),
-    innerHTML: '<div><span class="vjs-control-text">' + (this.buttonText || 'Need Text') + '</span></div>',
+    innerHTML: '<div class="vjs-control-content"><span class="vjs-control-text">' + (this.buttonText || 'Need Text') + '</span></div>',
     role: 'button',
     'aria-live': 'polite', // let the screen reader user know that the text of the button may change
     tabIndex: 0

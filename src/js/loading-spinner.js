@@ -34,22 +34,7 @@ vjs.LoadingSpinner = vjs.Component.extend({
 });
 
 vjs.LoadingSpinner.prototype.createEl = function(){
-  var classNameSpinner, innerHtmlSpinner;
-
-  if ( typeof this.player_.el().style.WebkitBorderRadius == 'string'
-       || typeof this.player_.el().style.MozBorderRadius == 'string'
-       || typeof this.player_.el().style.KhtmlBorderRadius == 'string'
-       || typeof this.player_.el().style.borderRadius == 'string')
-    {
-      classNameSpinner = 'vjs-loading-spinner';
-      innerHtmlSpinner = '<div class="ball1"></div><div class="ball2"></div><div class="ball3"></div><div class="ball4"></div><div class="ball5"></div><div class="ball6"></div><div class="ball7"></div><div class="ball8"></div>';
-    } else {
-      classNameSpinner = 'vjs-loading-spinner-fallback';
-      innerHtmlSpinner = '';
-    }
-
   return vjs.Component.prototype.createEl.call(this, 'div', {
-    className: classNameSpinner,
-    innerHTML: innerHtmlSpinner
+    className: 'vjs-loading-spinner'
   });
 };
