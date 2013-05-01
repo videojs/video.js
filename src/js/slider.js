@@ -36,9 +36,9 @@ vjs.Slider = vjs.Component.extend({
 
 vjs.Slider.prototype.createEl = function(type, props) {
   props = props || {};
+  // Add the slider element class to all sub classes
+  props.className = props.className + ' vjs-slider';
   props = vjs.obj.merge({
-    // Add the slider element class to all sub classes
-    className: props.className + ' vjs-slider',
     role: 'slider',
     'aria-valuenow': 0,
     'aria-valuemin': 0,
@@ -193,9 +193,9 @@ vjs.SliderHandle.prototype.defaultValue = 0;
 /** @inheritDoc */
 vjs.SliderHandle.prototype.createEl = function(type, props) {
   props = props || {};
+  // Add the slider element class to all sub classes
+  props.className = props.className + ' vjs-slider-handle';
   props = vjs.obj.merge({
-    // Add the slider element class to all sub classes
-    className: props.className + ' vjs-slider-handle',
     innerHTML: '<span class="vjs-control-text">'+this.defaultValue+'</span>'
   }, props);
 
