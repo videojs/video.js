@@ -144,7 +144,7 @@ vjs.Html5.prototype.supportsFullScreen = function(){
   if (typeof this.el_.webkitEnterFullScreen == 'function') {
 
     // Seems to be broken in Chromium/Chrome && Safari in Leopard
-    if (/Android/.test(navigator.userAgent) || !/Chrome|Mac OS X 10.5/.test(navigator.userAgent)) {
+    if (/Android/.test(vjs.USER_AGENT) || !/Chrome|Mac OS X 10.5/.test(vjs.USER_AGENT)) {
       return true;
     }
   }
