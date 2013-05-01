@@ -165,6 +165,23 @@ vjs.Component.prototype.el = function(){
 };
 
 /**
+ * An optional element where, if defined, children will be inserted
+ *   instead of directly in el_
+ * @type {Element}
+ * @private
+ */
+vjs.Component.prototype.contentEl_;
+
+/**
+ * Return the component's DOM element for embedding content.
+ *   will either be el_ or a new element defined in createEl
+ * @return {Element}
+ */
+vjs.Component.prototype.contentEl = function(){
+  return this.contentEl_ || this.el_;
+};
+
+/**
  * The ID for the component.
  * @type {String}
  * @private
@@ -292,7 +309,7 @@ vjs.Component.prototype.addChild = function(child, options){
   // Add the UI object's element to the container div (box)
   // Having an element is not required
   if (typeof component['el'] === 'function' && component['el']()) {
-    this.el_.appendChild(component['el']());
+    this.contentEl().appendChild(component['el']());
   }
 
   // Return so it can stored on parent object if desired.
@@ -321,8 +338,8 @@ vjs.Component.prototype.removeChild = function(component){
   this.childNameIndex_[component.name] = null;
 
   var compEl = component.el();
-  if (compEl && compEl.parentNode === this.el_) {
-    this.el_.removeChild(component.el());
+  if (compEl && compEl.parentNode === this.contentEl()) {
+    this.contentEl().removeChild(component.el());
   }
 };
 
