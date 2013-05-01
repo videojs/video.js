@@ -1,8 +1,10 @@
 module.exports = function(grunt) {
 
+  var pkg = grunt.file.readJSON('package.json');
+
   // Project configuration.
   grunt.initConfig({
-    pkg: grunt.file.readJSON('package.json'),
+    pkg: pkg,
 
     build: {
       src: 'src/js/dependencies.js',
@@ -125,7 +127,7 @@ module.exports = function(grunt) {
                 + ' --js_output_file=' + dest
                 + ' --create_source_map ' + dest + '.map --source_map_format=V3'
                 + ' --jscomp_warning=checkTypes --warning_level=VERBOSE'
-                + ' --output_wrapper "(function() {%output%})();//@ sourceMappingURL=video.js.map"';
+                + ' --output_wrapper "/*! ' + pkg.copyright + ' */\n (function() {%output%})();//@ sourceMappingURL=video.js.map"';
 
     grunt.file.expand(filePatterns).forEach(function(file){
       command += ' --js='+file;
@@ -155,6 +157,7 @@ module.exports = function(grunt) {
   grunt.registerTask('dist', 'Creating distribution', function(){
     // TODO: create semver folders (4.1.1, 4.1, 4, and latest)
     // grunt copy could be used but is currently broken and needs an update
+
     grunt.file.copy('build/files/minified.video.js', 'dist/video-js/video.js');
     grunt.file.copy('build/files/video-js.css', 'dist/video-js/video-js.css');
     grunt.file.copy('build/files/video-js.png', 'dist/video-js/video-js.png');
