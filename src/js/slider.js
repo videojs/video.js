@@ -21,6 +21,7 @@ vjs.Slider = vjs.Component.extend({
     this.on('touchstart', this.onMouseDown);
     this.on('focus', this.onFocus);
     this.on('blur', this.onBlur);
+    this.on('click', this.onClick);
 
     this.player_.on('controlsvisible', vjs.bind(this, this.update));
 
@@ -34,7 +35,10 @@ vjs.Slider = vjs.Component.extend({
 });
 
 vjs.Slider.prototype.createEl = function(type, props) {
+  props = props || {};
   props = vjs.obj.merge({
+    // Add the slider element class to all sub classes
+    className: props.className + ' vjs-slider',
     role: 'slider',
     'aria-valuenow': 0,
     'aria-valuemin': 0,
@@ -159,4 +163,41 @@ vjs.Slider.prototype.onKeyPress = function(event){
 
 vjs.Slider.prototype.onBlur = function(){
   vjs.off(document, 'keyup', vjs.bind(this, this.onKeyPress));
+};
+
+/**
+ * Listener for click events on slider, used to prevent clicks
+ *   from bubbling up to parent elements like button menus.
+ * @param  {Object} event Event object
+ */
+vjs.Slider.prototype.onClick = function(event){
+  event.stopImmediatePropagation();
+  event.preventDefault();
+};
+
+/**
+ * SeekBar Behavior includes play progress bar, and seek handle
+ * Needed so it can determine seek position based on handle position/size
+ * @param {vjs.Player|Object} player
+ * @param {Object=} options
+ * @constructor
+ */
+vjs.SliderHandle = vjs.Component.extend();
+
+/**
+ * Default value of the slider
+ * @type {Number}
+ */
+vjs.SliderHandle.prototype.defaultValue = 0;
+
+/** @inheritDoc */
+vjs.SliderHandle.prototype.createEl = function(type, props) {
+  props = props || {};
+  props = vjs.obj.merge({
+    // Add the slider element class to all sub classes
+    className: props.className + ' vjs-slider-handle',
+    innerHTML: '<span class="vjs-control-text">'+this.defaultValue+'</span>'
+  }, props);
+
+  return vjs.Component.prototype.createEl.call(this, 'div', props);
 };
