@@ -115,9 +115,11 @@ vjs.MenuButton.prototype.createMenu = function(){
 
   this.items = this.createItems();
 
-  // Add menu items to the menu
-  for (var i = 0; i < this.items.length; i++) {
-    menu.addItem(this.items[i]);
+  if (this.items) {
+    // Add menu items to the menu
+    for (var i = 0; i < this.items.length; i++) {
+      menu.addItem(this.items[i]);
+    }
   }
 
   return menu;
