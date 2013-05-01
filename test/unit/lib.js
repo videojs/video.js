@@ -204,3 +204,21 @@ test('should get an absolute URL', function(){
   ok(vjs.getAbsoluteURL('http://asdf.com') === 'http://asdf.com');
   ok(vjs.getAbsoluteURL('https://asdf.com/index.html') === 'https://asdf.com/index.html');
 });
+
+test('vjs.findPosition should find top and left position', function() {
+  var d = document.createElement('div'),
+    position = vjs.findPosition(d);
+  d.style.top = "10px";
+  d.style.left = "20px";
+  d.style.position = "absolute";
+
+  deepEqual(position, {left: 0, top: 0}, "If element isn't in the DOM, we should get zeros");
+
+  document.body.appendChild(d);
+  position = vjs.findPosition(d);
+  deepEqual(position, {left: 20, top: 10}, "The position was not correct");
+
+  d.getBoundingClientRect = null;
+  position = vjs.findPosition(d);
+  deepEqual(position, {left: 0, top: 0}, "If there is no gBCR, we should get zeros");
+})
