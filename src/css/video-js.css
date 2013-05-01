@@ -328,11 +328,11 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 .vjs-default-skin .vjs-volume-bar {
   width: 5em;
   height: 0.6em;
-  margin: 1em auto 0;
+  margin: 1.1em auto 0;
 }
 
 .vjs-default-skin .vjs-volume-menu-button .vjs-menu-content {
-  height: 2.5em;
+  height: 2.9em;
 }
 
 .vjs-default-skin .vjs-volume-level {
@@ -352,7 +352,7 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 
 .vjs-default-skin .vjs-volume-handle:before {
   font-size: 0.9em;
-  top: -0.3em;
+  top: -0.2em;
   left: -0.2em;
 
   width: 1em;
