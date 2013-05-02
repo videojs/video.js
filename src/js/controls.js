@@ -561,7 +561,11 @@ vjs.VolumeBar.prototype.onMouseMove = function(event) {
 };
 
 vjs.VolumeBar.prototype.getPercent = function(){
-  return this.player_.volume();
+  if (this.player_.muted()) {
+    return 0;
+  } else {
+    return this.player_.volume();
+  }
 };
 
 vjs.VolumeBar.prototype.stepForward = function(){
@@ -711,7 +715,7 @@ vjs.VolumeMenuButton.prototype.createMenu = function(){
   var menu = new vjs.Menu(this.player_, {
     contentElType: 'div'
   });
-  var vc = new vjs.VolumeBar(this.player_);
+  var vc = new vjs.VolumeBar(this.player_, vjs.obj.merge({vertical: true}, this.options_.volumeBar));
   menu.addChild(vc);
   return menu;
 };
