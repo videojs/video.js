@@ -561,7 +561,11 @@ vjs.VolumeBar.prototype.onMouseMove = function(event) {
 };
 
 vjs.VolumeBar.prototype.getPercent = function(){
-  return this.player_.volume();
+  if (this.player_.muted()) {
+    return 0;
+  } else {
+    return this.player_.volume();
+  }
 };
 
 vjs.VolumeBar.prototype.stepForward = function(){
