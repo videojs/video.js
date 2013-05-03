@@ -576,6 +576,21 @@ vjs.Component.prototype.unlockShowing = function(){
 };
 
 /**
+ * Disable component by making it unshowable
+ */
+vjs.Component.prototype.disable = function(){
+  this.hide();
+  this.show = function(){};
+  this.fadeIn = function(){};
+};
+
+// TODO: Get enable working
+// vjs.Component.prototype.enable = function(){
+//   this.fadeIn = vjs.Component.prototype.fadeIn;
+//   this.show = vjs.Component.prototype.show;
+// };
+
+/**
  * If a value is provided it will change the width of the player to that value
  * otherwise the width is returned
  * http://dev.w3.org/html5/spec/dimension-attributes.html#attr-dim-height

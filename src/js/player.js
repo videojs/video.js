@@ -427,6 +427,7 @@ vjs.Player.prototype.techCall = function(method, arg){
       this.tech[method](arg);
     } catch(e) {
       vjs.log(e);
+      throw e;
     }
   }
 };
@@ -447,22 +448,19 @@ vjs.Player.prototype.techGet = function(method){
     try {
       return this.tech[method]();
     } catch(e) {
-
       // When building additional tech libs, an expected method may not be defined yet
       if (this.tech[method] === undefined) {
         vjs.log('Video.js: ' + method + ' method not defined for '+this.techName+' playback technology.', e);
-
       } else {
-
         // When a method isn't available on the object it throws a TypeError
         if (e.name == 'TypeError') {
           vjs.log('Video.js: ' + method + ' unavailable on '+this.techName+' playback technology element.', e);
           this.tech.isReady_ = false;
-          throw e;
         } else {
           vjs.log(e);
         }
       }
+      throw e;
     }
   }
 
@@ -877,7 +875,11 @@ vjs.Player.prototype.controls_;
  */
 vjs.Player.prototype.controls = function(controls){
   if (controls !== undefined) {
-    this.controls_ = controls;
+    // Don't trigger a change event unless it actually changed
+    if (this.controls_ !== controls) {
+      this.controls_ = !!controls; // force boolean
+      this.trigger('controlschange');
+    }
   }
   return this.controls_;
 };
