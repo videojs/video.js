@@ -231,3 +231,22 @@ test('should be able to initialize player twice on the same tag using string ref
   //here it triggers error, because player was destroyed already after first dispose
   player.dispose();
 });
+
+test('should set controls and trigger event', function() {
+  expect(3);
+
+  var player = PlayerTest.makePlayer({ 'controls': false });
+  ok(player.controls() === false, 'controls set through options');
+  player.controls(true);
+  ok(player.controls() === true, 'controls updated');
+
+  player.on('controlschange', function(){
+    ok(true, 'controlschange fired once');
+  });
+  player.controls(false);
+  // Check for unnecessary controlschange events
+  player.controls(false);
+
+  player.dispose();
+});
+
