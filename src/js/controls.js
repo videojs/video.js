@@ -15,6 +15,10 @@ vjs.ControlBar = vjs.Component.extend({
   init: function(player, options){
     vjs.Component.call(this, player, options);
 
+    if (!player.controls()) {
+      this.disable();
+    }
+
     player.one('play', vjs.bind(this, function(){
       var touchstart,
         fadeIn = vjs.bind(this, this.fadeIn),

@@ -11,6 +11,10 @@ vjs.BigPlayButton = vjs.Button.extend({
   init: function(player, options){
     vjs.Button.call(this, player, options);
 
+    if (!player.controls()) {
+      this.hide();
+    }
+
     player.on('play', vjs.bind(this, this.hide));
     // player.on('ended', vjs.bind(this, this.show));
   }
