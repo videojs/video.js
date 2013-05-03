@@ -595,7 +595,7 @@ vjs.log = function(){
 vjs.findPosition = function(el) {
     var box, docEl, body, clientLeft, scrollLeft, left, clientTop, scrollTop, top;
 
-    if (el.getBoundingClientRect) {
+    if (el.getBoundingClientRect && el.parentNode) {
       box = el.getBoundingClientRect();
     }
 
