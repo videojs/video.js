@@ -1,6 +1,23 @@
 module.exports = function(grunt) {
+  var pkg, s3, semver, version, verParts;
 
-  var pkg = grunt.file.readJSON('package.json');
+  semver = require('semver');
+  pkg = grunt.file.readJSON('package.json');
+
+  try {
+    s3 = grunt.file.readJSON('.s3configw.json');
+  } catch(e) {
+    s3 = {};
+  }
+
+  verParts = pkg.version.split('.');
+  version = {
+    full: pkg.version,
+    major: verParts[0],
+    minor: verParts[1],
+    patch: verParts[2]
+  };
+  version.majorMinor = version.major + '.' + version.minor;
 
   // Project configuration.
   grunt.initConfig({
@@ -12,18 +29,10 @@ module.exports = function(grunt) {
         baseDir: 'src/js/'
       }
     },
-    deps: {
-      src: 'src/js/dependencies.js',
-      options: {
-        baseDir: 'src/js/'
-      }
-    },
     clean: {
       build: ['build/files/*'],
       dist: ['dist/*']
     },
-    // Current forEach issue: https://github.com/gruntjs/grunt/issues/610
-    // npm install https://github.com/gruntjs/grunt-contrib-jshint/archive/7fd70e86c5a8d489095fa81589d95dccb8eb3a46.tar.gz
     jshint: {
       src: {
         src: ['src/js/*.js', 'Gruntfile.js', 'test/unit/*.js'],
@@ -53,6 +62,30 @@ module.exports = function(grunt) {
     watch: {
       files: [ 'src/**/*.js', 'test/unit/*.js' ],
       tasks: 'dev'
+    },
+    copy: {
+      minor: {
+        files: [
+          {expand: true, cwd: 'build/files/', src: ['*'], dest: 'dist/'+version.majorMinor+'/', filter: 'isFile'} // includes files in path
+        ]
+      },
+      patch: {
+        files: [
+          {expand: true, cwd: 'build/files/', src: ['*'], dest: 'dist/'+version.full+'/', filter: 'isFile'} // includes files in path
+        ]
+      }
+    },
+    s3: {
+      options: s3,
+      prod: {
+        // Files to be uploaded.
+        upload: [
+          {
+            src: 'dist/video-js/*',
+            dest: 'vjs/testdir2/'
+          }
+        ]
+      }
     }
   });
 
@@ -61,6 +94,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-s3');
   grunt.loadNpmTasks('contribflow');
 
   // Default task.
@@ -89,7 +123,7 @@ module.exports = function(grunt) {
 
     // grunt.file.write('build/files/sourcelist.txt', sourceList.join(','));
     // Allow time for people to update their index.html before they remove these
-    grunt.file.write('build/files/sourcelist.js', 'var sourcelist = ["' + sourceFiles.join('","') + '"]');
+    // grunt.file.write('build/files/sourcelist.js', 'var sourcelist = ["' + sourceFiles.join('","') + '"]');
 
     // Create a combined sources file. https://github.com/zencoder/video-js/issues/287
     var combined = '';

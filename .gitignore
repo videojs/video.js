@@ -6,6 +6,7 @@ projects
 .zenflow-log
 test/*.map
 .bunyipconfig.js
+.s3config.json
 
 node_modules
 npm-debug.log
