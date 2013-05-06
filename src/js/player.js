@@ -621,6 +621,8 @@ vjs.Player.prototype.requestFullScreen = function(){
       this.el_[requestFullScreen.requestFn]();
     }
 
+    this.trigger('fullscreenchange');
+
   } else if (this.tech.supportsFullScreen()) {
     // we can't take the video.js controls fullscreen but we can go fullscreen
     // with native controls
@@ -630,8 +632,8 @@ vjs.Player.prototype.requestFullScreen = function(){
     // fullscreen isn't supported so we'll just stretch the video element to
     // fill the viewport
 
-    this.trigger('fullscreenchange');
     this.enterFullWindow();
+    this.trigger('fullscreenchange');
   }
 
   return this;
@@ -658,13 +660,13 @@ vjs.Player.prototype.cancelFullScreen = function(){
      }));
 
      document[requestFullScreen.cancelFn]();
-
    } else {
      document[requestFullScreen.cancelFn]();
    }
 
-  } else if (this.tech.supportsFullScreen()) {
+   this.trigger('fullscreenchange');
 
+  } else if (this.tech.supportsFullScreen()) {
    this.techCall('exitFullScreen');
   } else {
    this.exitFullWindow();
@@ -689,7 +691,6 @@ vjs.Player.prototype.enterFullWindow = function(){
 
   // Apply fullscreen styles
   vjs.addClass(document.body, 'vjs-full-window');
-  vjs.addClass(this.el_, 'vjs-fullscreen');
 
   this.trigger('enterFullWindow');
 };
@@ -712,7 +713,6 @@ vjs.Player.prototype.exitFullWindow = function(){
 
   // Remove fullscreen styles
   vjs.removeClass(document.body, 'vjs-full-window');
-  vjs.removeClass(this.el_, 'vjs-fullscreen');
 
   // Resize the box, controller, and poster to original sizes
   // this.positionAll();
