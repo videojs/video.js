@@ -82,7 +82,7 @@ module.exports = function(grunt) {
         upload: [
           {
             src: 'dist/video-js/*',
-            dest: 'vjs/testdir2/'
+            dest: 'vjs/'+version.full+'/'
           }
         ]
       }
