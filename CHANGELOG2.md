@@ -7,8 +7,7 @@ CHANGELOG
 =========
 
 #### 3.2.3 (2013-05-03)
-asdfasdfasdf
-asdf
+* test line
 * Added a plugins interface
 * Added automated test suite and support for Travis CI.
 * Updated docs to use Github markdown
