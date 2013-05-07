@@ -5,10 +5,10 @@ Version GENERATED_AT_BUILD
 
 @font-face{
   font-family:'FontAwesome';
-  src:url('http://netdna.bootstrapcdn.com/font-awesome/3.0.2/font/fontawesome-webfont.eot?v=3.0.2');
-  src:url('http://netdna.bootstrapcdn.com/font-awesome/3.0.2/font/fontawesome-webfont.eot?#iefix&v=3.0.2') format('embedded-opentype'),
-  url('http://netdna.bootstrapcdn.com/font-awesome/3.0.2/font/fontawesome-webfont.woff?v=3.0.2') format('woff'),
-  url('http://netdna.bootstrapcdn.com/font-awesome/3.0.2/font/fontawesome-webfont.ttf?v=3.0.2') format('truetype');
+  src:url('fontawesome-webfont.eot');
+  src:url('fontawesome-webfont.eot?#iefix') format('embedded-opentype'),
+  url('fontawesome-webfont.woff') format('woff'),
+  url('fontawesome-webfont.ttf') format('truetype');
   font-weight:normal;
   font-style:normal }
 

@@ -99,6 +99,9 @@ module.exports = function(grunt) {
     grunt.file.write('build/files/combined.video.js', combined);
 
     grunt.file.copy('src/css/video-js.css', 'build/files/video-js.css');
+    grunt.file.copy('src/css/fontawesome-webfont.eot', 'build/files/fontawesome-webfont.eot');
+    grunt.file.copy('src/css/fontawesome-webfont.ttf', 'build/files/fontawesome-webfont.ttf');
+    grunt.file.copy('src/css/fontawesome-webfont.woff', 'build/files/fontawesome-webfont.woff');
     grunt.file.copy('src/css/video-js.png', 'build/files/video-js.png');
     grunt.file.copy('src/swf/video-js.swf', 'build/files/video-js.swf');
   });
@@ -160,6 +163,9 @@ module.exports = function(grunt) {
 
     grunt.file.copy('build/files/minified.video.js', 'dist/video-js/video.js');
     grunt.file.copy('build/files/video-js.css', 'dist/video-js/video-js.css');
+    grunt.file.copy('build/files/fontawesome-webfont.eot', 'dist/video-js/fontawesome-webfont.eot');
+    grunt.file.copy('build/files/fontawesome-webfont.ttf', 'dist/video-js/fontawesome-webfont.ttf');
+    grunt.file.copy('build/files/fontawesome-webfont.woff', 'dist/video-js/fontawesome-webfont.woff');
     grunt.file.copy('build/files/video-js.png', 'dist/video-js/video-js.png');
     grunt.file.copy('build/files/video-js.swf', 'dist/video-js/video-js.swf');
     grunt.file.copy('build/demo-files/demo.html', 'dist/video-js/demo.html');
