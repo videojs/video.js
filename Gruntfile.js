@@ -205,7 +205,7 @@ module.exports = function(grunt) {
     grunt.file.copy('build/demo-files/demo.captions.vtt', 'dist/cdn/demo.captions.vtt');
 
     var css = grunt.file.read('dist/cdn/video-js.css');
-    css = css.replace(/font\//g, '../f/');
+    css = css.replace(/font\//g, '../f/1/');
     grunt.file.write('dist/cdn/video-js.css', css);
 
     // Copy is broken. Waiting for an update to use.
