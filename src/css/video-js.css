@@ -3,15 +3,6 @@ VideoJS Default Styles (http://videojs.com)
 Version GENERATED_AT_BUILD
 */
 
-@font-face{
-  font-family:'FontAwesome';
-  src:url('http://netdna.bootstrapcdn.com/font-awesome/3.0.2/font/fontawesome-webfont.eot?v=3.0.2');
-  src:url('http://netdna.bootstrapcdn.com/font-awesome/3.0.2/font/fontawesome-webfont.eot?#iefix&v=3.0.2') format('embedded-opentype'),
-  url('http://netdna.bootstrapcdn.com/font-awesome/3.0.2/font/fontawesome-webfont.woff?v=3.0.2') format('woff'),
-  url('http://netdna.bootstrapcdn.com/font-awesome/3.0.2/font/fontawesome-webfont.ttf?v=3.0.2') format('truetype');
-  font-weight:normal;
-  font-style:normal }
-
 /*
 REQUIRED STYLES (be careful overriding)
 ================================================================================ */
@@ -157,6 +148,16 @@ body.vjs-full-window {
 Instead of editing this file, I recommend creating your own skin CSS file to be included after this file,
 so you can upgrade to newer versions easier. You can remove all these styles by removing the 'vjs-default-skin' class from the tag. */
 
+@font-face{
+  font-family:'FontAwesome';
+  src:url('font/fa-custom-1.0.0/fa.eot');
+  src:url('font/fa-custom-1.0.0/fa.eot?#iefix') format('embedded-opentype'),
+  url('font/fa-custom-1.0.0/fa.woff') format('woff'),
+  url('font/fa-custom-1.0.0/fa.ttf') format('truetype');
+  font-weight:normal;
+  font-style:normal
+}
+
 /* Base UI Component Classes
 -------------------------------------------------------------------------------- */
 
@@ -189,7 +190,7 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 
 .vjs-default-skin .vjs-slider-handle:before {
   /*content: "\f111";*/ /* Circle icon = f111 */
-  content: "\f04d"; /* Square icon */
+  content: "\f038"; /* Square icon */
   color: #ccc;
   font-family: FontAwesome;
   font-size: 0.8em;
@@ -285,10 +286,10 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
   cursor: pointer;
 }
 .vjs-default-skin .vjs-play-control:before {
-  content: "\f04b"; /* Play Icon */
+  content: "\f02c"; /* Play Icon */
 }
 .vjs-default-skin.vjs-playing .vjs-play-control:before {
-  content: "\f04c"; /* Pause Icon */
+  content: "\f02d"; /* Pause Icon */
 }
 
 /* Rewind
@@ -306,19 +307,19 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 }
 .vjs-default-skin .vjs-mute-control:before,
 .vjs-default-skin .vjs-volume-menu-button:before {
-  content: "\f028"; /* Full volume */
+  content: "\f027"; /* Full volume */
 }
 .vjs-default-skin .vjs-mute-control.vjs-vol-0:before,
 .vjs-default-skin .vjs-volume-menu-button.vjs-vol-0:before {
-  content: "\f026"; /* No volume */
+  content: "\f025"; /* No volume */
 }
 .vjs-default-skin .vjs-mute-control.vjs-vol-1:before,
 .vjs-default-skin .vjs-volume-menu-button.vjs-vol-1:before {
-  content: "\f027"; /* Half volume */
+  content: "\f026"; /* Half volume */
 }
 .vjs-default-skin .vjs-mute-control.vjs-vol-2:before,
 .vjs-default-skin .vjs-volume-menu-button.vjs-vol-2:before {
-  content: "\f028"; /* Full volume */
+  content: "\f027"; /* Full volume */
 }
 
 .vjs-default-skin .vjs-volume-control {
@@ -469,10 +470,10 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
   float: right;
 }
 .vjs-default-skin .vjs-fullscreen-control:before {
-  content: "\f065";
+  content: "\f033";
 }
 .vjs-default-skin.vjs-fullscreen .vjs-fullscreen-control:before {
-  content: "\f066";
+  content: "\f034";
 }
 
 /* Big Play Button (at start)
@@ -532,7 +533,7 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 }
 
 .vjs-default-skin .vjs-big-play-button:before {
-  content: "\f04b"; /* Play icon */
+  content: "\f02c"; /* Play icon */
   font-family: FontAwesome;
   color: #ccc;
   font-size: 3em;
@@ -575,7 +576,7 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 }
 
 .vjs-default-skin .vjs-loading-spinner:before {
-  content: "\f110"; /* Play icon */
+  content: "\f03c"; /* Play icon */
   font-family: FontAwesome;
   color: #ccc;
 
@@ -590,7 +591,7 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
    Text gradient plus a text shadow doesn't work
    and `background-clip: text` only works in Webkit. */
 .vjs-default-skin .vjs-loading-spinner:after {
-  content: "\f110"; /* Play icon */
+  content: "\f03c"; /* Play icon */
   font-family: FontAwesome;
   color: #ccc;
 
@@ -711,7 +712,7 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 }
 
 /* Subtitles Button */
-.vjs-default-skin .vjs-subtitles-button:before { content: "\f075"; }
+.vjs-default-skin .vjs-subtitles-button:before { content: "\f036"; }
 
 /* There's unfortunately no CC button in FontAwesome, so we need
     to manually create one. Please +1 the fontawesome request.

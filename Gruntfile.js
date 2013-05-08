@@ -5,7 +5,7 @@ module.exports = function(grunt) {
   pkg = grunt.file.readJSON('package.json');
 
   try {
-    s3 = grunt.file.readJSON('.s3configw.json');
+    s3 = grunt.file.readJSON('.s3config.json');
   } catch(e) {
     s3 = {};
   }
@@ -194,10 +194,19 @@ module.exports = function(grunt) {
 
     grunt.file.copy('build/files/minified.video.js', 'dist/video-js/video.js');
     grunt.file.copy('build/files/video-js.css', 'dist/video-js/video-js.css');
-    grunt.file.copy('build/files/video-js.png', 'dist/video-js/video-js.png');
     grunt.file.copy('build/files/video-js.swf', 'dist/video-js/video-js.swf');
     grunt.file.copy('build/demo-files/demo.html', 'dist/video-js/demo.html');
     grunt.file.copy('build/demo-files/demo.captions.vtt', 'dist/video-js/demo.captions.vtt');
+
+    grunt.file.copy('build/files/minified.video.js', 'dist/cdn/video.js');
+    grunt.file.copy('build/files/video-js.css', 'dist/cdn/video-js.css');
+    grunt.file.copy('build/files/video-js.swf', 'dist/cdn/video-js.swf');
+    grunt.file.copy('build/demo-files/demo.html', 'dist/cdn/demo.html');
+    grunt.file.copy('build/demo-files/demo.captions.vtt', 'dist/cdn/demo.captions.vtt');
+
+    var css = grunt.file.read('dist/cdn/video-js.css');
+    css = css.replace(/font\//g, '../f/');
+    grunt.file.write('dist/cdn/video-js.css', css);
 
     // Copy is broken. Waiting for an update to use.
     // copy: {
