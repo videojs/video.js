@@ -5,10 +5,10 @@ Version GENERATED_AT_BUILD
 
 @font-face{
   font-family:'VideoJS';
-  src:url('/font/VideoJS.eot');
-  src:url('/font/VideoJS.eot') format('embedded-opentype'),
-  url('/font/VideoJS.woff') format('woff'),
-  url('/font/VideoJS.ttf') format('truetype');
+  src:url('./font/VideoJS.eot');
+  src:url('./font/VideoJS.eot') format('embedded-opentype'),
+  url('./font/VideoJS.woff') format('woff'),
+  url('./font/VideoJS.ttf') format('truetype');
   font-weight:normal;
   font-style:normal }
 
