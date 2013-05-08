@@ -316,12 +316,32 @@ vjs.IOS_VERSION = (function(){
 
 vjs.IS_ANDROID = (/Android/i).test(vjs.USER_AGENT);
 vjs.ANDROID_VERSION = (function() {
-  var match = vjs.USER_AGENT.match(/Android (\d+)\./i);
-  if (match && match[1]) {
-    return match[1];
+  // This matches Android Major.Minor.Patch versions
+  // Major and Minor are added to variables, if available
+  // and ANDROID_VERSION is Major.Minor as a Number
+  // if Minor isn't available, then only Major is returned
+  var match = vjs.USER_AGENT.match(/Android (\d+)(?:\.(\d+))?(?:\.(\d+))*/i);
+  if (!match) {
+    return null;
   }
-  return null;
+
+  if (match[1]) {
+    vjs.ANDROID_MAJOR_VERSION = parseFloat(match[1]);
+  }
+  if (match[2]) {
+    vjs.ANDROID_MINOR_VERSION = parseFloat(match[2]);
+  }
+
+  if (vjs.ANDROID_MAJOR_VERSION && vjs.ANDROID_MINOR_VERSION) {
+    return parseFloat(match[1] + '.' + match[2]);
+  } else if (vjs.ANDROID_MAJOR_VERSION) {
+    return vjs.ANDROID_MAJOR_VERSION;
+  } else {
+    return null;
+  }
 })();
+// Old Android is defined as Version older than 2.3, and requiring a webkit version of the android browser
+vjs.IS_OLD_ANDROID = vjs.IS_ANDROID && (/webkit/i).test(vjs.USER_AGENT) && vjs.ANDROID_VERSION < 2.3;
 
 vjs.IS_FIREFOX = (/Firefox/i).test(vjs.USER_AGENT);
 vjs.IS_CHROME = (/Chrome/i).test(vjs.USER_AGENT);
