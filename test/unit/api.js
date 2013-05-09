@@ -15,7 +15,7 @@ test('should export ready api call to public', function() {
   var fixture = document.getElementById('qunit-fixture');
   fixture.appendChild(videoTag);
 
-  var player = _V_('example_1');
+  var player = videojs('example_1');
   ok(player.ready !== undefined, 'ready callback is defined');
   player.dispose();
 });
@@ -27,13 +27,13 @@ test('should be able to initialize player twice on the same tag using string ref
   var fixture = document.getElementById('qunit-fixture');
   fixture.appendChild(videoTag);
 
-  var player = _V_('example_1');
+  var player = videojs('example_1');
   player.dispose();
   ok(!document.getElementById(id), 'element is removed');
 
   videoTag = PlayerTest.makeTag();
   fixture.appendChild(videoTag);
 
-  player = _V_('example_1');
+  player = videojs('example_1');
   player.dispose();
 });
