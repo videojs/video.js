@@ -3,15 +3,6 @@ VideoJS Default Styles (http://videojs.com)
 Version GENERATED_AT_BUILD
 */
 
-@font-face{
-  font-family:'VideoJS';
-  src:url('./font/VideoJS.eot');
-  src:url('./font/VideoJS.eot') format('embedded-opentype'),
-  url('./font/VideoJS.woff') format('woff'),
-  url('./font/VideoJS.ttf') format('truetype');
-  font-weight:normal;
-  font-style:normal }
-
 /*
 REQUIRED STYLES (be careful overriding)
 ================================================================================ */
@@ -158,6 +149,16 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 
 /* Base UI Component Classes
 -------------------------------------------------------------------------------- */
+@font-face{
+  font-family: 'VideoJS';
+  src: url('font/vjs.eot');
+  src: url('font/vjs.eot') format('embedded-opentype'),
+  url('font/vjs.woff') format('woff'),
+  url('font/vjs.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .vjs-default-skin {
   color: #ccc;
 }
