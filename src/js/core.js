@@ -71,7 +71,7 @@ vjs.options = {
   // techOrder: ['flash','html5'],
 
   'html5': {},
-  'flash': { 'swf': vjs.ACCESS_PROTOCOL + 'vjs.zencdn.net/c/video-js.swf' },
+  'flash': { 'swf': vjs.ACCESS_PROTOCOL + 'vjs.zencdn.net/4.0/video-js.swf' },
 
   // Default of web browser is 300x150. Should rely on source width/height.
   'width': 300,
