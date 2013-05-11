@@ -195,12 +195,12 @@ var myFunc = function(){
   var myPlayer = this;
   // Do something when the event is fired
 };
-myPlayer.addEvent("eventName", myFunc);
+myPlayer.on("eventName", myFunc);
 ```
 
 You can also remove the listeners later.
 ```js
-myPlayer.removeEvent("eventName", myFunc);
+myPlayer.off("eventName", myFunc);
 ```
 
 
