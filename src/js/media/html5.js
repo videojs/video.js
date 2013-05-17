@@ -71,6 +71,8 @@ vjs.Html5.prototype.createEl = function(){
 
     // If the original tag is still there, remove it.
     if (el) {
+      el['player'] = null;
+      player.tag = null;
       player.el().removeChild(el);
       el = el.cloneNode(false);
     } else {
