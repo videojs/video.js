@@ -54,7 +54,7 @@ _(none)_
 * Made full-window mode more independent
 * Added rakefile for release generation
 
-## 3.0.0
+## 3.0.0 (2012-01-10)
 * Same HTML/CSS Skin for both HTML5 and Flash video
 * Super lightweight Flash fallback player for browsers that don’t support HTML5 video
 * Free CDN hosting
