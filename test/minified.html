@@ -1,0 +1,30 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Video.js Test Suite</title>
+
+  <!-- QUnit -->
+  <link rel="stylesheet" href="../test/qunit/qunit/qunit.css" />
+  <script src="../test/qunit/qunit/qunit.js"></script>
+
+  <!-- Video.js CSS -->
+  <link rel="stylesheet" href="../src/css/video-js.css" type="text/css">
+
+  <!-- SOURCE COMPILED WITH TESTS
+  grunt-contrib-qunit doesn't support query vars, so making this script
+  so we can automatically run compiled tests too.
+  (in test/index.html you can add ?compiled to also run compiled tests)
+  -->
+  <script src="../build/files/test.minified.video.js"></script>
+
+</head>
+<body>
+  <div>
+    <h1 id="qunit-header">Video.js Test Suite</h1>
+    <h2 id="qunit-banner"></h2>
+    <h2 id="qunit-userAgent"></h2>
+    <ol id="qunit-tests"></ol>
+    <div id="qunit-fixture"></div>
+  </div>
+</body>
+</html>

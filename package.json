@@ -1,0 +1,52 @@
+{
+  "name": "video.js",
+  "description": "An HTML5 and Flash video player with a common API and skin for both.",
+  "version": "4.0.0",
+  "copyright": "Copyright 2013 Brightcove, Inc. https://github.com/videojs/video.js/blob/master/LICENSE",
+  "keywords": [
+    "html5",
+    "flash",
+    "video",
+    "player"
+  ],
+  "homepage": "http://videojs.com",
+  "author": "Steve Heffernan",
+  "scripts": {
+    "test": "grunt test --verbose"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zencoder/video-js.git"
+  },
+  "devDependencies": {
+    "grunt-cli": "~0.1.0",
+    "grunt": "~0.4.0",
+    "grunt-contrib-jshint": "~0.4.3",
+    "grunt-contrib-watch": "~0.1.4",
+    "grunt-contrib-qunit": "~0.2.1",
+    "calcdeps": "~0.1.7",
+    "grunt-contrib-clean": "~0.4.0a",
+    "grunt-contrib-copy": "~0.3.2",
+    "mocha": "~1.8.1",
+    "contribflow": "~0.2.0",
+    "grunt-s3": "~0.2.0-alpha",
+    "semver": "~1.1.4"
+  },
+  "testling": {
+    "browsers": [
+      "ie6",
+      "ie7",
+      "ie8",
+      "ie9",
+      "firefox/15",
+      "chrome/22",
+      "opera/12",
+      "safari/5.1"
+    ],
+    "harness": "mocha-qunit",
+    "scripts": [
+      "src/js/*.js",
+      "test/unit/*.js"
+    ]
+  }
+}

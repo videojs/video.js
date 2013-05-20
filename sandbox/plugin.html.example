@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Video.js Plugin Example</title>
+
+  <link href="../src/css/video-js.css" rel="stylesheet" type="text/css">
+
+  <!-- LOAD VIDEO.JS SOURCE FILES IN ORDER -->
+  <script src="../build/source-loader.js"></script>
+
+</head>
+<body>
+  <p style="background-color:#eee; border: 1px solid #777; padding: 10px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">This page shows you how to create, register and initialize a Video.js plugin.</p>
+
+  <video id="vid1" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264" poster="http://video-js.zencoder.com/oceans-clip.png">
+    <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4'>
+    <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm'>
+    <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg'>
+    <p>Video Playback Not Supported</p>
+  </video>
+
+  <script>
+    (function() {
+      var vid1, progressed;
+
+      // create a really simple plugin
+      // this one just logs the buffered percentage to the console whenever
+      // more data is downloaded
+      progressed = function(options) {
+        this.on('progress', function(e) {
+          console.log(this.bufferedPercent());
+        });
+      };
+
+      // register the plugin
+      vjs.plugin('progressed', progressed);
+
+      // initialize it
+      vid1 = vjs('vid1');
+      vid1.progressed();
+    })();
+  </script>
+
+</body>
+</html>

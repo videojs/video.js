@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Video.js Sandbox</title>
+
+  <link href="../src/css/video-js.css" rel="stylesheet" type="text/css">
+
+  <!-- LOAD VIDEO.JS SOURCE FILES IN ORDER -->
+  <script src="../build/source-loader.js"></script>
+
+</head>
+<body>
+  <p style="background-color:#eee; border: 1px solid #777; padding: 10px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">You can use /sandbox/ for writing and testing your own code. Nothing in /sandbox/ will get checked into the repo, except files that end in .example, so please don't edit or add those files. To get started make a copy of index.html.example and rename it to index.html.</p>
+
+  <video id="vid1" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264"
+      poster="http://video-js.zencoder.com/oceans-clip.png"
+      data-setup='{}'>
+    <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4'>
+    <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm'>
+    <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg'>
+    <p>Video Playback Not Supported</p>
+  </video>
+
+  <script>
+    vid = document.getElementById("vid1");
+  </script>
+
+</body>
+</html>

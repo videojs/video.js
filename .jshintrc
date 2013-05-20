@@ -1,0 +1,40 @@
+{
+    "evil" : true,
+    "validthis": true,
+    "browser"  : true,
+    "debug"    : true,
+    "boss"     : true,
+    "expr"     : true,
+    "eqnull"   : true,
+    "quotmark" : "single",
+    "sub"      : true,
+    "trailing" : true,
+    "undef"    : true,
+    "laxbreak" : true,
+    "predef"   : [
+        "_V_",
+        "videojs",
+        "vjs",
+        "goog",
+        "console",
+
+        "require",        
+
+        "PlayerTest",
+        "asyncTest",
+        "deepEqual",
+        "equal",
+        "expect",
+        "module",
+        "notDeepEqual",
+        "notEqual",
+        "notStrictEqual",
+        "ok",
+        "QUnit",
+        "raises",
+        "start",
+        "stop",
+        "strictEqual",
+        "test"
+    ]
+}

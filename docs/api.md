@@ -1,11 +1,3 @@
----
-layout: docs
-title: API
-description: Video.JS API Docs - API settings based on the HTML5 video API
-body_id: api
-body_class: docs subpage
----
-
 API
 ===
 The Video.js API allows you to interact with the video through Javascript, whether the browser is playing the video through HTML5 video, Flash, or any other supported playback technologies.
@@ -13,31 +5,25 @@ The Video.js API allows you to interact with the video through Javascript, wheth
 Referencing the Player
 ----------------------
 To use the API functions, you need access to the player object. Luckily this is easy to get. You just need to make sure your video tag has an ID. The example embed code has an ID of "example\_video_1". If you have multiple videos on one page, make sure every video tag has a unique ID.
-
-<code type="javascript">
-
-    var myPlayer = _V_("example_video_1");
-
-</code>
+```js
+var myPlayer = videojs("example_video_1");
+```
 
 (If the player hasn't been initialized yet via the data-setup attribute or another method, this will also initialize the player.)
 
 Wait Until the Player is Ready
 ------------------------------
 The time it takes Video.js to set up the video and API will vary depending on the playback technology being used (HTML5 will often be much faster to load than Flash). For that reason we want to use the player's 'ready' function to trigger any code that requires the player's API.
+```javascript
+videojs("example_video_1").ready(function(){
 
-<code type="javascript">
+  var myPlayer = this;
 
-    _V_("example_video_1").ready(function(){
+  // EXAMPLE: Start playing the video.
+  myPlayer.play();
 
-      var myPlayer = this;
-
-      // EXAMPLE: Start playing the video.
-      myPlayer.play();
-
-    });
-
-</code>
+});
+```
 
 API Methods
 -----------
@@ -45,225 +31,177 @@ Now that you have access to a ready player, you can control the video, get value
 
 ### play() ###
 Start video playback. Returns the player object.
-
-<code type="javascript">
-
-    myPlayer.play();
-
-</code>
+```js
+myPlayer.play();
+```
 
 
 ### pause() ###
 Pause the video playback. Returns the player object
+```js
+myPlayer.pause();
+```
 
-<code type="javascript">
 
-    myPlayer.pause();
+### paused() ###
+Returns false if the video is currently playing, or true otherwise. ()
+```js
+var isPaused = myPlayer.paused();
+var isPlaying = !myPlayer.paused();
+```
 
-</code>
 
 ### src(newSource) ###
 The source function updates the video source. There are three types of variables you can pass as the argument.
 
 **URL String**: A URL to the the video file. Use this method if you're sure the current playback technology (HTML5/Flash) can support the source you provide. Currently only MP4 files can be used in both HTML5 and Flash.
-<code type="javascript">
-
-    myPlayer.src("http://www.example.com/path/to/video.mp4");
-
-</code>
+```js
+myPlayer.src("http://www.example.com/path/to/video.mp4");
+```
 
 **Source Object (or element):** A javascript object containing information about the source file. Use this method if you want the player to determine if it can support the file using the type information.
-<code type="javascript">
-
-    myPlayer.src({ type: "video/mp4", src: "http://www.example.com/path/to/video.mp4" });
-
-</code>
+```js
+myPlayer.src({ type: "video/mp4", src: "http://www.example.com/path/to/video.mp4" });
+```
 
 **Array of Source Objects:** To provide multiple versions of the source so that it can be played using HTML5 across browsers you can use an array of source objects. Video.js will detect which version is supported and load that file.
-<code type="javascript">
-
-    myPlayer.src([
-      { type: "video/mp4", src: "http://www.example.com/path/to/video.mp4" },
-      { type: "video/webm", src: "http://www.example.com/path/to/video.webm" },
-      { type: "video/ogg", src: "http://www.example.com/path/to/video.ogv" }
-    ]);
-
-</code>
+```js
+myPlayer.src([
+  { type: "video/mp4", src: "http://www.example.com/path/to/video.mp4" },
+  { type: "video/webm", src: "http://www.example.com/path/to/video.webm" },
+  { type: "video/ogg", src: "http://www.example.com/path/to/video.ogv" }
+]);
+```
 
 Returns the player object.
 
+
 ### currentTime() ###
 Returns the current time of the video in seconds.
-
-<code type="javascript">
-
-    var whereYouAt = myPlayer.currentTime();
-
-</code>
+```js
+var whereYouAt = myPlayer.currentTime();
+```
 
 
 ### currentTime(seconds) // Type: Integer or Float ###
 Seek to the supplied time (seconds). Returns the player object.
-
-<code type="javascript">
-
-    myPlayer.currentTime(120); // 2 minutes into the video
-
-</code>
+```js
+myPlayer.currentTime(120); // 2 minutes into the video
+```
 
 
 ### duration() ###
 Returns the length in time of the video in seconds. NOTE: The video must have started loading before the duration can be known, and in the case of Flash, may not be known until the video starts playing.
-
-<code type="javascript">
-
-    var howLongIsThis = myPlayer.duration();
-
-</code>
+```js
+var howLongIsThis = myPlayer.duration();
+```
 
 
 ### buffered() ###
-Returns a [TimeRange](http://videojs.com/docs/glossary.html#timerange) object with sections of the video that have been downloaded. If you just want the percent of the video that's been downloaded, use bufferedPercent.
+Returns a [TimeRange](glossary.md#timerange) object with sections of the video that have been downloaded. If you just want the percent of the video that's been downloaded, use bufferedPercent.
+```js
+var bufferedTimeRange = myPlayer.buffered(),
 
-<code type="javascript">
+// Number of different ranges of time have been buffered. Usually 1.
+numberOfRanges = bufferedTimeRange.length,
 
-    var bufferedTimeRange = myPlayer.buffered(),
+// Time in seconds when the first range starts. Usually 0.
+firstRangeStart = bufferedTimeRange.start(0),
 
-    // Number of different ranges of time have been buffered. Usually 1.
-    numberOfRanges = bufferedTimeRange.length,
+// Time in seconds when the first range ends
+firstRangeEnd = bufferedTimeRange.end(0),
 
-    // Time in seconds when the first range starts. Usually 0.
-    firstRangeStart = bufferedTimeRange.start(0),
-    
-    // Time in seconds when the first range ends
-    firstRangeEnd = bufferedTimeRange.end(0),
-
-    // Length in seconds of the first time range
-    firstRangeLength = firstRangeEnd - firstRangeStart;
-
-</code>
+// Length in seconds of the first time range
+firstRangeLength = firstRangeEnd - firstRangeStart;
+```
 
 
 ### bufferedPercent() ###
 Returns the percent (as a decimal) of the video that's been downloaded. 0 means none, 1 means all.
-
-<code type="javascript">
-
-    var howMuchIsDownloaded = myPlayer.bufferedPercent();
-
-</code>
+```js
+var howMuchIsDownloaded = myPlayer.bufferedPercent();
+```
 
 
 ### volume() ###
 Returns the current volume of the video as a percent in decimal form. 0 is off (muted), 1.0 is all the way up, 0.5 is half way.
+```js
+var howLoudIsIt = myPlayer.volume();
+```
 
-<code type="javascript">
-
-    var howLoudIsIt = myPlayer.volume();
-
-</code>
 
 ### volume(percentAsDecimal) ###
 Set the volume to the supplied percent (as a decimal between 0 and 1).
-
-<code type="javascript">
-
-    myPlayer.volume(0.5); // Set volume to half
-
-</code>
+```js
+myPlayer.volume(0.5); // Set volume to half
+```
 
 
 ### width() ###
 Returns the current width of the video in pixels.
-
-<code type="javascript">
-
-    var howWideIsIt = myPlayer.width();
-
-</code>
+```js
+var howWideIsIt = myPlayer.width();
+```
 
 
 ### width(pixels) ###
 Change the width of the video to the supplied width in pixels. Returns the player object
-
-<code type="javascript">
-
-    myPlayer.width(640);
-
-</code>
+```js
+myPlayer.width(640);
+```
 
 
 ### height() ###
 Returns the current height of the video in pixels.
-
-<code type="javascript">
-
-    var howTallIsIt = myPlayer.height();
-
-</code>
+```js
+var howTallIsIt = myPlayer.height();
+```
 
 
 ### height(pixels) ###
 Change the height of the video to the supplied height in pixels. Returns the player object
-
-<code type="javascript">
-
-    myPlayer.height(480);
-
-</code>
+```js
+myPlayer.height(480);
+```
 
 
 ### size(width, height) ###
 Changes the width and height of the video to the supplied width and height. This is more efficient if you're changing both width and height (only triggers the player's resize event once). Returns the player object.
-
-<code type="javascript">
-
-    myPlayer.size(640,480);
-
-</code>
+```js
+myPlayer.size(640,480);
+```
 
 
 ### requestFullScreen() ###
 Increase the size of the video to full screen. In some browsers, full screen is not supported natively, so it enters full window mode, where the video fills the browser window. In browsers and devices that support native full screen, sometimes the browser's default controls will be shown, and not the Video.js custom skin. This includes most mobile devices (iOS, Android) and older versions of Safari. Returns the player object.
-
-<code type="javascript">
-
-    myPlayer.requestFullScreen();
-
-</code>
+```js
+myPlayer.requestFullScreen();
+```
 
 
 ### cancelFullScreen() ###
 Return the video to its normal size after having been in full screen mode. Returns the player object.
-
-<code type="javascript">
-
-    myPlayer.cancelFullScreen();
-
-</code>
+```js
+myPlayer.cancelFullScreen();
+```
 
 
 Events
 ------
 You can attach event listeners to the player similarly to how you would for a video element.
 
-<code type="javascript">
-
-    var myFunc = function(){
-      var myPlayer = this;
-      // Do something when the event is fired
-    };
-    myPlayer.addEvent("eventName", myFunc);
-
-</code>
+```js
+var myFunc = function(){
+  var myPlayer = this;
+  // Do something when the event is fired
+};
+myPlayer.on("eventName", myFunc);
+```
 
 You can also remove the listeners later.
-
-<code type="javascript">
-
-    myPlayer.removeEvent("eventName", myFunc);
-
-</code>
+```js
+myPlayer.off("eventName", myFunc);
+```
 
 
 ### Event Types

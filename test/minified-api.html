@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Video.js Test Suite</title>
+
+  <!-- QUnit -->
+  <link rel="stylesheet" href="../test/qunit/qunit/qunit.css" />
+  <script src="../test/qunit/qunit/qunit.js"></script>
+
+  <!-- Video.js CSS -->
+  <link rel="stylesheet" href="../src/css/video-js.css" type="text/css">
+
+  <!-- LIB COMPILED WITH NOT COMPILED TESTS
+    Check publicly available APIs against compiled lib
+  -->
+  <script type="text/javascript">
+    (function(){
+
+      // ADD NEW TEST FILES HERE
+      var tests = [
+        'test/unit/api.js'
+      ];
+      var projectRoot = '../';
+      var scripts = [];
+
+      scripts = scripts.concat(['build/files/minified.video.js'], tests);
+
+      for (var i = 0; i < scripts.length; i++) {
+        document.write( "<script src='" + projectRoot + scripts[i] + "'><\/script>" );
+      }
+
+    })()
+  </script>
+
+</head>
+<body>
+  <div>
+    <h1 id="qunit-header">Video.js Test Suite</h1>
+    <h2 id="qunit-banner"></h2>
+    <h2 id="qunit-userAgent"></h2>
+    <ol id="qunit-tests"></ol>
+    <div id="qunit-fixture"></div>
+  </div>
+</body>
+</html>

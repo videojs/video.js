@@ -1,11 +1,3 @@
----
-layout: docs
-title: HTML5 Video Text Tracks (Subtitles, Captions, Chapters)
-description: Video.js support for captions, subtitles, and chapters through the use of the HTML5 video track element.
-body_id: tracks
-body_class: docs subpage
----
-
 Tracks
 ======
 
@@ -21,26 +13,24 @@ Creating the Text File
 ----------------------
 Timed text requires a text file in [WebVTT](http://dev.w3.org/html5/webvtt/) format. This format defines a list of "cues" that have a start time, and end time, and text to display. [Microsoft has a builder](http://ie.microsoft.com/testdrive/Graphics/CaptionMaker/) that can help you get started on the file.
 
-When creating captions, there's also additional (caption formatting techniques)[http://www.theneitherworld.com/mcpoodle/SCC_TOOLS/DOCS/SCC_FORMAT.HTML#style] that would be good to use, like brackets around sound effects. [ sound effect ]
+When creating captions, there's also additional [caption formatting techniques](http://www.theneitherworld.com/mcpoodle/SCC_TOOLS/DOCS/SCC_FORMAT.HTML#style) that would be good to use, like brackets around sound effects. [ sound effect ]
 
 Adding to Video.js
 ------------------
 Once you have your WebVTT file created, you can add it to Video.js using the track trag. Put your track track tag after all the source elements, and before any fallback content.
 
-<code type="html">
+```html
+<video id="example_video_1" class="video-js vjs-default-skin"  
+  controls preload="auto" width="640" height="264"  
+  data-setup='{"example_option":true}'>  
+ <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' />  
+ <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />  
+ <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />  
 
-    <video id="example_video_1" class="video-js vjs-default-skin"  
-      controls preload="auto" width="640" height="264"  
-      data-setup='{"example_option":true}'>  
-     <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' />  
-     <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />  
-     <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />  
+ <track kind="captions" src="http://example.com/path/to/captions.vtt" srclang="en" label="English" default>
 
-     <track kind="captions" src="http://example.com/path/to/captions.vtt" srclang="en" label="English" default>
-
-    </video>
-
-</code>
+</video>
+```
 
 Track Attributes
 ----------------

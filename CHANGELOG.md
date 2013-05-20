@@ -1,3 +1,15 @@
+* Added a plugins interface
+* Added automated test suite and support for Travis CI.
+* Updated docs to use Github markdown
+* Allow disabling of default components
+* Duration is now setable (need ed for HLS m3u8 files)
+* Event binders (on/off/one) now return the player instance
+* Stopped player from going back to beginningg on ended event.
+* Added support for percent width/height and fluid layouts
+* Improved load order of elements to reduce reflow.
+* Changed addEvent function name to 'on'. 
+* Removed conflicting array.indexOf function
+* Added exitFullScreen to support BlackBerry devices (pull/143)
 --------------------------------------------------------------------------------
                           ^ ADD NEW CHANGES ABOVE ^
 --------------------------------------------------------------------------------

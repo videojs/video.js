@@ -1,0 +1,82 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Video.js Test Suite</title>
+
+  <!--[if IE]>
+    <script src="https://getfirebug.com/releases/lite/1.4/firebug-lite.js"></script>
+  <!--<![endif]-->
+
+  <!-- QUnit -->
+  <link rel="stylesheet" href="../test/qunit/qunit/qunit.css" />
+  <script src="../test/qunit/qunit/qunit.js"></script>
+
+  <!-- Video.js CSS -->
+  <link rel="stylesheet" href="../src/css/video-js.css" type="text/css">
+
+  <script type="text/javascript">
+    (function(){
+
+      // ADD NEW TEST FILES HERE
+      window.tests = [
+        'test/unit/core-object.js',
+        'test/unit/lib.js',
+        'test/unit/events.js',
+        'test/unit/component.js',
+        'test/unit/mediafaker.js',
+        'test/unit/player.js',
+        'test/unit/core.js',
+        'test/unit/media.html5.js',
+        'test/unit/controls.js',
+        'test/unit/plugins.js'
+      ];
+
+      var projectRoot = '../';
+      var scripts = [];
+
+      window.loadScripts = function(scripts) {
+        for (var i = 0; i < scripts.length; i++) {
+          document.write("<script src='" + projectRoot + scripts[i] + "'><\/script>" );
+        }
+      }
+
+      // Choose either the raw source and tests
+      // Or the compiled source + tests.
+      // Use ?comiled to use the compiled tests
+      if (QUnit.urlParams.min || QUnit.urlParams.compiled) {
+        window.compiled = true;
+      } else {
+        // Bunyip/Yeti starts tests after it's done loading which can
+        // lead to a double Qunit.start error which reads as
+        // "Uncaught Error: pushFailure() assertion outside test"
+        if (window.$yetify) {
+          QUnit.config.autostart = false;
+        }
+
+        loadScripts(['build/source-loader.js']);
+      }
+
+    })()
+  </script>
+
+</head>
+<body>
+  <div>
+    <h1 id="qunit-header">Video.js Test Suite</h1>
+    <h2 id="qunit-banner"></h2>
+    <h2 id="qunit-userAgent"></h2>
+    <ol id="qunit-tests"></ol>
+    <div id="qunit-fixture"></div>
+  </div>
+
+  <script>
+    // Loading tests before the end to give IE time to load vjs before tests
+    if (!window.compiled) {
+      loadScripts(window.tests);
+    } else {
+      var compiledTests = "build/files/test.minified.video.js";
+      loadScripts([compiledTests]);
+    }
+  </script>
+</body>
+</html>
