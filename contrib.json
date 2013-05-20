@@ -1,6 +1,7 @@
 {
+  "org": "videojs",
+  "project": "video.js",
   "developmentBranch": "master",
   "releaseBranch": "stable",
-  "remote": "origin",
-  "upstream": "videojs"
+  "remote": "origin"
 }
