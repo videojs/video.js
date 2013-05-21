@@ -22,6 +22,15 @@ REQUIRED STYLES (be careful overriding)
   /* Allow poster to be vertially aligned. */
   vertical-align: middle;
   /*  display: table-cell; */ /*This works in Safari but not Firefox.*/
+
+  /* Turn off user selection (text highlighting) by default.
+     The majority of player components will not be text blocks.
+     Text areas will need to turn user selection back on. */
+  -webkit-user-select: none;  /* Chrome all / Safari all */
+  -moz-user-select: none;     /* Firefox all */
+  -ms-user-select: none;      /* IE 10+ */
+  -o-user-select: none;
+  user-select: none;
 }
 
 /* Playback technology elements expand to the width/height of the containing div.
