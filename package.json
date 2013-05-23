@@ -1,7 +1,7 @@
 {
   "name": "video.js",
   "description": "An HTML5 and Flash video player with a common API and skin for both.",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "copyright": "Copyright 2013 Brightcove, Inc. https://github.com/videojs/video.js/blob/master/LICENSE",
   "keywords": [
     "html5",
@@ -30,7 +30,8 @@
     "mocha": "~1.8.1",
     "contribflow": "~0.2.0",
     "grunt-s3": "~0.2.0-alpha",
-    "semver": "~1.1.4"
+    "semver": "~1.1.4",
+    "grunt-contrib-cssmin": "~0.6.0"
   },
   "testling": {
     "browsers": [
