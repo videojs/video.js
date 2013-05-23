@@ -71,7 +71,7 @@ vjs.options = {
   // techOrder: ['flash','html5'],
 
   'html5': {},
-  'flash': { 'swf': vjs.ACCESS_PROTOCOL + 'vjs.zencdn.net/4.0/video-js.swf' },
+  'flash': {},
 
   // Default of web browser is 300x150. Should rely on source width/height.
   'width': 300,
@@ -90,14 +90,14 @@ vjs.options = {
   }
 };
 
+// Set CDN Version of swf
+// The added (+) blocks the replace from changing this GENERATED_CDN_VSN string
+if (vjs.CDN_VERSION !== 'GENERATED'+'_CDN_VSN') {
+  videojs.options['flash']['swf'] = vjs.ACCESS_PROTOCOL + 'vjs.zencdn.net/'+vjs.CDN_VERSION+'/video-js.swf';
+}
+
 /**
  * Global player list
  * @type {Object}
  */
 vjs.players = {};
-
-
-// Set CDN Version of swf
-if (vjs.CDN_VERSION != 'GENERATED_CDN_VSN') {
-  videojs.options['flash']['swf'] = vjs.ACCESS_PROTOCOL + 'vjs.zencdn.net/'+vjs.CDN_VERSION+'/video-js.swf';
-}
