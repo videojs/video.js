@@ -24,6 +24,9 @@ _(none)_
 * Removed conflicting array.indexOf function
 * Added exitFullScreen to support BlackBerry devices (pull/143)
 
+### Patches
+* 4.0.1 (2013-05-22) Fixed old IE font loading [view](https://github.com/videojs/video.js/pull/532)
+
 ## 3.2.0 (2012-03-20)
 * Updated docs with more options.
 * Overhauled HTML5 Track support.
