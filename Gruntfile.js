@@ -77,17 +77,8 @@ module.exports = function(grunt) {
     },
     s3: {
       options: s3,
-      prod: {
-        // Files to be uploaded.
+      minor: {
         upload: [
-          {
-            src: 'dist/cdn/*',
-            dest: 'vjs/'+version.full+'/',
-            rel: 'dist/cdn/',
-            headers: {
-              'Cache-Control': 'public, max-age=31536000'
-            }
-          },
           {
             src: 'dist/cdn/*',
             dest: 'vjs/'+version.majorMinor+'/',
@@ -97,6 +88,27 @@ module.exports = function(grunt) {
             }
           }
         ]
+      },
+      patch: {
+        upload: [
+          {
+            src: 'dist/cdn/*',
+            dest: 'vjs/'+version.full+'/',
+            rel: 'dist/cdn/',
+            headers: {
+              'Cache-Control': 'public, max-age=31536000'
+            }
+          }
+        ]
+      }
+    },
+    cssmin: {
+      minify: {
+        expand: true,
+        cwd: 'build/files/',
+        src: ['video-js.css'],
+        dest: 'build/files/',
+        ext: '.min.css'
       }
     }
   });
@@ -106,6 +118,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-s3');
   grunt.loadNpmTasks('contribflow');
 
@@ -133,28 +146,35 @@ module.exports = function(grunt) {
       sourceFiles[i] = sourceFiles[i].replace(/\\/g, '/');
     }
 
-    // grunt.file.write('build/files/sourcelist.txt', sourceList.join(','));
-    // Allow time for people to update their index.html before they remove these
-    // grunt.file.write('build/files/sourcelist.js', 'var sourcelist = ["' + sourceFiles.join('","') + '"]');
-
     // Create a combined sources file. https://github.com/zencoder/video-js/issues/287
     var combined = '';
     sourceFiles.forEach(function(result){
       combined += grunt.file.read(result);
     });
+    // Replace CDN version ref in js. Use major/minor version.
+    combined = combined.replace(/GENERATED_CDN_VSN/g, version.majorMinor);
     grunt.file.write('build/files/combined.video.js', combined);
 
+    // Copy over other files
     grunt.file.copy('src/css/video-js.css', 'build/files/video-js.css');
     grunt.file.copy('src/css/video-js.png', 'build/files/video-js.png');
     grunt.file.copy('src/swf/video-js.swf', 'build/files/video-js.swf');
-    // grunt.file.copy('src/css/font/', 'build/files/font/');
 
+    // Inject version number into css file
+    var css = grunt.file.read('build/files/video-js.css');
+    css = css.replace(/GENERATED_AT_BUILD/g, version.full);
+    grunt.file.write('build/files/video-js.css', css);
+
+    // Copy over font files
     grunt.file.recurse('src/css/font', function(absdir, rootdir, subdir, filename) {
       // Block .DS_Store files
       if ('filename'.substring(0,1) !== '.') {
         grunt.file.copy(absdir, 'build/files/font/' + filename);
       }
     });
+
+    // Minify CSS
+    grunt.task.run(['cssmin']);
   });
 
   grunt.registerMultiTask('minify', 'Minify JS files using Closure Compiler.', function() {
@@ -175,24 +195,26 @@ module.exports = function(grunt) {
       filePatterns = filePatterns.concat(this.data.src);
     }
 
+    // Build closure compiler shell command
     var command = 'java -jar build/compiler/compiler.jar'
                 + ' --compilation_level ADVANCED_OPTIMIZATIONS'
                 // + ' --formatting=pretty_print'
                 + ' --js_output_file=' + dest
                 + ' --create_source_map ' + dest + '.map --source_map_format=V3'
                 + ' --jscomp_warning=checkTypes --warning_level=VERBOSE'
-                + ' --output_wrapper "/*! ' + pkg.copyright + ' */\n (function() {%output%})();//@ sourceMappingURL=video.js.map"';
+                + ' --output_wrapper "/*! Video.js v' + version.full + ' ' + pkg.copyright + ' */\n (function() {%output%})();//@ sourceMappingURL=video.js.map"';
 
+    // Add each js file
     grunt.file.expand(filePatterns).forEach(function(file){
       command += ' --js='+file;
     });
 
+    // Add externs
     externs.forEach(function(extern){
       command += ' --externs='+extern;
     });
 
-    // grunt.log.writeln(command)
-
+    // Run command
     exec(command, { maxBuffer: 500*1024 }, function(err, stdout, stderr){
 
       if (err) {
@@ -211,14 +233,18 @@ module.exports = function(grunt) {
   grunt.registerTask('dist', 'Creating distribution', function(){
     var exec = require('child_process').exec;
     var done = this.async();
+    var css, jsmin, jsdev;
 
+    // Manually copy each source file
     grunt.file.copy('build/files/minified.video.js', 'dist/video-js/video.js');
     grunt.file.copy('build/files/combined.video.js', 'dist/video-js/video.dev.js');
     grunt.file.copy('build/files/video-js.css', 'dist/video-js/video-js.css');
+    grunt.file.copy('build/files/video-js.min.css', 'dist/video-js/video-js.min.css');
     grunt.file.copy('build/files/video-js.swf', 'dist/video-js/video-js.swf');
     grunt.file.copy('build/demo-files/demo.html', 'dist/video-js/demo.html');
     grunt.file.copy('build/demo-files/demo.captions.vtt', 'dist/video-js/demo.captions.vtt');
 
+    // Copy over font files
     grunt.file.recurse('build/files/font', function(absdir, rootdir, subdir, filename) {
       // Block .DS_Store files
       if ('filename'.substring(0,1) !== '.') {
@@ -227,18 +253,17 @@ module.exports = function(grunt) {
     });
 
     // CDN version uses already hosted font files
-    // Minified version only
-    // doesn't need demo files
+    // Minified version only, doesn't need demo files
     grunt.file.copy('build/files/minified.video.js', 'dist/cdn/video.js');
-    grunt.file.copy('build/files/video-js.css', 'dist/cdn/video-js.css');
+    grunt.file.copy('build/files/video-js.min.css', 'dist/cdn/video-js.css');
     grunt.file.copy('build/files/video-js.swf', 'dist/cdn/video-js.swf');
 
-
-
-    var css = grunt.file.read('dist/cdn/video-js.css');
+    // Replace font urls with CDN versions
+    css = grunt.file.read('dist/cdn/video-js.css');
     css = css.replace(/font\//g, '../f/1/');
     grunt.file.write('dist/cdn/video-js.css', css);
 
+    // Zip up into video-js-VERSION.zip
     exec('cd dist && zip -r video-js-'+version.full+'.zip video-js && cd ..', { maxBuffer: 500*1024 }, function(err, stdout, stderr){
 
       if (err) {
