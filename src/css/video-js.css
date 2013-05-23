@@ -152,7 +152,7 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 @font-face{
   font-family: 'VideoJS';
   src: url('font/vjs.eot');
-  src: url('font/vjs.eot') format('embedded-opentype'),
+  src: url('font/vjs.eot?#iefix') format('embedded-opentype'),
   url('font/vjs.woff') format('woff'),
   url('font/vjs.ttf') format('truetype');
   font-weight: normal;
