@@ -26,6 +26,7 @@ _(none)_
 
 ### Patches
 * 4.0.1 (2013-05-22) Fixed old IE font loading [view](https://github.com/videojs/video.js/pull/532)
+* 4.0.2 (2013-05-23) Correct version number for CDN swf url. Minify CSS. [view](https://github.com/videojs/video.js/pull/535)
 
 ## 3.2.0 (2012-03-20)
 * Updated docs with more options.
