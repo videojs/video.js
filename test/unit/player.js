@@ -250,3 +250,21 @@ test('should set controls and trigger event', function() {
   player.dispose();
 });
 
+// Can't figure out how to test fullscreen events with tests
+// Browsers aren't triggering the events at least
+// asyncTest('should trigger the fullscreenchange event', function() {
+//   expect(3);
+
+//   var player = PlayerTest.makePlayer();
+//   player.on('fullscreenchange', function(){
+//     ok(true, 'fullscreenchange event fired');
+//     ok(this.isFullScreen === true, 'isFullScreen is true');
+//     ok(this.el().className.indexOf('vjs-fullscreen') !== -1, 'vjs-fullscreen class added');
+
+//     player.dispose();
+//     start();
+//   });
+
+//   player.requestFullScreen();
+// });
+

@@ -392,7 +392,7 @@ vjs.Player.prototype.onError = function(e) {
   vjs.log('Video Error', e);
 };
 
-vjs.Player.prototype.onFullscreenChange = function(e) {
+vjs.Player.prototype.onFullscreenChange = function() {
   if (this.isFullScreen) {
     this.addClass('vjs-fullscreen');
   } else {
@@ -593,7 +593,11 @@ vjs.Player.prototype.requestFullScreen = function(){
     // take the controls fullscreen as well as the video
 
     // Trigger fullscreenchange event after change
-    vjs.on(document, requestFullScreen.eventName, vjs.bind(this, function(){
+    // We have to specifically add this each time, and remove
+    // when cancelling fullscreen. Otherwise if there's multiple
+    // players on a page, they would all be reacting to the same fullscreen
+    // events
+    vjs.on(document, requestFullScreen.eventName, vjs.bind(this, function(e){
       this.isFullScreen = document[requestFullScreen.isFullScreen];
 
       // If cancelling fullscreen, remove event listener.
@@ -601,37 +605,18 @@ vjs.Player.prototype.requestFullScreen = function(){
         vjs.off(document, requestFullScreen.eventName, arguments.callee);
       }
 
+      this.trigger('fullscreenchange');
     }));
 
-    // Flash and other plugins get reloaded when you take their parent to fullscreen.
-    // To fix that we'll remove the tech, and reload it after the resize has finished.
-    if (this.tech.features.fullscreenResize === false && this.options_['flash']['iFrameMode'] !== true) {
-
-      this.pause();
-      this.unloadTech();
-
-      vjs.on(document, requestFullScreen.eventName, vjs.bind(this, function(){
-        vjs.off(document, requestFullScreen.eventName, arguments.callee);
-        this.loadTech(this.techName, { src: this.cache_.src });
-      }));
-
-      this.el_[requestFullScreen.requestFn]();
-
-    } else {
-      this.el_[requestFullScreen.requestFn]();
-    }
-
-    this.trigger('fullscreenchange');
+    this.el_[requestFullScreen.requestFn]();
 
   } else if (this.tech.supportsFullScreen()) {
     // we can't take the video.js controls fullscreen but we can go fullscreen
     // with native controls
-
     this.techCall('enterFullScreen');
   } else {
     // fullscreen isn't supported so we'll just stretch the video element to
     // fill the viewport
-
     this.enterFullWindow();
     this.trigger('fullscreenchange');
   }
@@ -641,31 +626,11 @@ vjs.Player.prototype.requestFullScreen = function(){
 
 vjs.Player.prototype.cancelFullScreen = function(){
   var requestFullScreen = vjs.support.requestFullScreen;
-
   this.isFullScreen = false;
 
   // Check for browser element fullscreen support
   if (requestFullScreen) {
-
-   // Flash and other plugins get reloaded when you take their parent to fullscreen.
-   // To fix that we'll remove the tech, and reload it after the resize has finished.
-   if (this.tech.features.fullscreenResize === false && this.options_['flash']['iFrameMode'] !== true) {
-
-     this.pause();
-     this.unloadTech();
-
-     vjs.on(document, requestFullScreen.eventName, vjs.bind(this, function(){
-       vjs.off(document, requestFullScreen.eventName, arguments.callee);
-       this.loadTech(this.techName, { src: this.cache_.src });
-     }));
-
-     document[requestFullScreen.cancelFn]();
-   } else {
-     document[requestFullScreen.cancelFn]();
-   }
-
-   this.trigger('fullscreenchange');
-
+    document[requestFullScreen.cancelFn]();
   } else if (this.tech.supportsFullScreen()) {
    this.techCall('exitFullScreen');
   } else {
@@ -920,6 +885,7 @@ vjs.Player.prototype.ended = function(){ return this.techGet('ended'); };
   // Current W3C Spec
   // http://dvcs.w3.org/hg/fullscreen/raw-file/tip/Overview.html#api
   // Mozilla Draft: https://wiki.mozilla.org/Gecko:FullScreenAPI#fullscreenchange_event
+  // New: https://dvcs.w3.org/hg/fullscreen/raw-file/529a67b8d9f3/Overview.html
   if (div.cancelFullscreen !== undefined) {
     requestFS.requestFn = 'requestFullscreen';
     requestFS.cancelFn = 'exitFullscreen';
