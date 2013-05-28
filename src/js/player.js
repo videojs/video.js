@@ -902,11 +902,9 @@ vjs.Player.prototype.ended = function(){ return this.techGet('ended'); };
     if (document.mozCancelFullScreen) {
       prefix = 'moz';
       requestFS.isFullScreen = prefix + 'FullScreen';
-    } else if (document.webkitCancelFullScreen) {
+    } else {
       prefix = 'webkit';
       requestFS.isFullScreen = prefix + 'IsFullScreen';
-    } else {
-
     }
 
     if (div[prefix + 'RequestFullScreen']) {
