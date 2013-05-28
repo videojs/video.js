@@ -33,6 +33,10 @@ vjs.MediaFaker.prototype.createEl = function(){
 vjs.MediaFaker.prototype.currentTime = function(){ return 0; };
 vjs.MediaFaker.prototype.volume = function(){ return 0; };
 vjs.MediaFaker.prototype.muted = function(){ return false; };
+vjs.MediaFaker.prototype.pause = function(){ return false; };
+vjs.MediaFaker.prototype.supportsFullScreen = function(){ return false; };
+vjs.MediaFaker.prototype.features = {};
+vjs.MediaFaker.prototype.buffered = function(){ return {}; };
 
 // Export vars for Closure Compiler
 vjs['MediaFaker'] = vjs.MediaFaker;
