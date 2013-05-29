@@ -165,10 +165,10 @@ myPlayer.height(480);
 ```
 
 
-### size(width, height) ###
+### dimensions(width, height) ###
 Changes the width and height of the video to the supplied width and height. This is more efficient if you're changing both width and height (only triggers the player's resize event once). Returns the player object.
 ```js
-myPlayer.size(640,480);
+myPlayer.dimensions(640,480);
 ```
 
 
