@@ -14,14 +14,11 @@ REQUIRED STYLES (be careful overriding)
    Otherwise you risk messing up control positioning and full window mode. **
 */
 
-/*
-* Import Skins	
-*/
-	@import(skins/darkfunk-skin.css);
-/*
-* End Import
-*/
+/*Import Skins*/
 
+@import url(skin-import.css);
+
+/*End Import*/
 .video-js {
   background-color: #000; position: relative; padding: 0;
 
