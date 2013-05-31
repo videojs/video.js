@@ -416,7 +416,7 @@ vjs.Player.prototype.getCache = function(){
 // Pass values to the playback tech
 vjs.Player.prototype.techCall = function(method, arg){
   // If it's not ready yet, call method when it is
-  if (this.tech && this.tech.isReady_) {
+  if (this.tech && !this.tech.isReady_) {
     this.tech.ready(function(){
       this[method](arg);
     });
