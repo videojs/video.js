@@ -3,6 +3,7 @@ CHANGELOG
 
 ## Unreleased (HEAD)
 * Turned on method queuing for unready playback technologies (flash) [view](https://github.com/videojs/video.js/pull/553)
+* Blocking user text selection on player components [view](https://github.com/videojs/video.js/pull/524)
 
 --------------------
 
