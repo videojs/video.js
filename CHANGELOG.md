@@ -1,8 +1,19 @@
 CHANGELOG
 =========
 
-## Unreleased Changes (HEAD)
+## Unreleased (HEAD)
 _(none)_
+
+--------------------
+
+## 4.0.3 (2013-05-28)
+* Fixed an bug with exiting fullscreen. [view](https://github.com/videojs/video.js/pull/546)
+
+## 4.0.2 (2013-05-23)
+* Correct version number for CDN swf url. Minify CSS. [view](https://github.com/videojs/video.js/pull/535)
+
+## 4.0.1 (2013-05-22)
+* Fixed old IE font loading [view](https://github.com/videojs/video.js/pull/532)
 
 ## 4.0.0 (2013-05-09)
 * Improved performance through an 18% size reduction using Google Closure Compiler in advanced mode
@@ -23,11 +34,6 @@ _(none)_
 * Changed addEvent function name to 'on'
 * Removed conflicting array.indexOf function
 * Added exitFullScreen to support BlackBerry devices (pull/143)
-
-### Patches
-* 4.0.1 (2013-05-22) Fixed old IE font loading [view](https://github.com/videojs/video.js/pull/532)
-* 4.0.2 (2013-05-23) Correct version number for CDN swf url. Minify CSS. [view](https://github.com/videojs/video.js/pull/535)
-* 4.0.3 (2013-05-28) Fixed an bug with exiting fullscreen. [view](https://github.com/videojs/video.js/pull/546)
 
 ## 3.2.0 (2012-03-20)
 * Updated docs with more options.
