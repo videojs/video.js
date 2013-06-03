@@ -37,3 +37,17 @@ test('should be able to initialize player twice on the same tag using string ref
   player = videojs('example_1');
   player.dispose();
 });
+
+test('requestFullScreen and cancelFullScreen methods should exist', function() {
+  var videoTag = PlayerTest.makeTag();
+  var id = videoTag.id;
+
+  var fixture = document.getElementById('qunit-fixture');
+  fixture.appendChild(videoTag);
+
+  var player = videojs('example_1');
+  ok(player.requestFullScreen, 'requestFullScreen exists');
+  ok(player.requestFullScreen, 'cancelFullScreen exists');
+
+  player.dispose();
+});
