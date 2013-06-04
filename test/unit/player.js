@@ -250,6 +250,21 @@ test('should set controls and trigger event', function() {
   player.dispose();
 });
 
+test('should set localStorage value', function(){
+  var player = PlayerTest.makePlayer();
+  window.localStorage.clear();
+  player.setLocalStorage('test', 'test');
+  ok(window.localStorage['test'] === 'test', 'localStorage updated');
+});
+
+test('should set localStorage value with namespace from options', function(){
+  var player = PlayerTest.makePlayer({'localStorageNamespace': 'test'});
+  window.localStorage.clear();
+  player.setLocalStorage('test', 'test');
+  ok(window.localStorage['test'] === undefined, 'un-namespaced key not set');
+  ok(window.localStorage['test-test'] === 'test', 'namespaced key set');
+});
+
 // Can't figure out how to test fullscreen events with tests
 // Browsers aren't triggering the events at least
 // asyncTest('should trigger the fullscreenchange event', function() {

@@ -562,7 +562,7 @@ vjs.Player.prototype.volume = function(percentAsDecimal){
     vol = Math.max(0, Math.min(1, parseFloat(percentAsDecimal))); // Force value to between 0 and 1
     this.cache_.volume = vol;
     this.techCall('setVolume', vol);
-    vjs.setLocalStorage('volume', vol);
+    this.setLocalStorage('volume', vol);
     return this;
   }
 
@@ -851,6 +851,30 @@ vjs.Player.prototype.controls = function(controls){
 
 vjs.Player.prototype.error = function(){ return this.techGet('error'); };
 vjs.Player.prototype.ended = function(){ return this.techGet('ended'); };
+
+/* Local Storage
+================================================================================ */
+vjs.Player.prototype.setLocalStorage = function(key, value){
+  try {
+    // IE was throwing errors referencing the var anywhere without this
+    var localStorage = window.localStorage || false;
+    if (!localStorage) { return; }
+    if('localStorageNamespace' in this.options()){
+      key = this.options()['localStorageNamespace'] + '-' + key;
+    }
+    localStorage[key] = value;
+  } catch(e) {
+    if (e.code == 22 || e.code == 1014) { // Webkit == 22 / Firefox == 1014
+      vjs.log('LocalStorage Full (VideoJS)', e);
+    } else {
+      if (e.code == 18) {
+        vjs.log('LocalStorage not allowed (VideoJS)', e);
+      } else {
+        vjs.log('LocalStorage Error (VideoJS)', e);
+      }
+    }
+  }
+};
 
 // Methods to add support for
 // networkState: function(){ return this.techCall('networkState'); },
