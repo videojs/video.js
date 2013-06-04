@@ -51,3 +51,16 @@ test('requestFullScreen and cancelFullScreen methods should exist', function() {
 
   player.dispose();
 });
+
+test('videojs.players should be availble after minification', function() {
+  var videoTag = PlayerTest.makeTag();
+  var id = videoTag.id;
+
+  var fixture = document.getElementById('qunit-fixture');
+  fixture.appendChild(videoTag);
+
+  var player = videojs(id);
+  equal(videojs.players[id], player, 'videojs.players is available');
+
+  player.dispose();
+});

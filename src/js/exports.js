@@ -29,6 +29,7 @@ goog.exportSymbol('videojs', vjs);
 goog.exportSymbol('_V_', vjs);
 
 goog.exportSymbol('videojs.options', vjs.options);
+goog.exportSymbol('videojs.players', vjs.players);
 
 // Allow external components to use global cache
 goog.exportSymbol('videojs.cache', vjs.cache);
