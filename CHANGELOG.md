@@ -5,6 +5,7 @@ CHANGELOG
 * Turned on method queuing for unready playback technologies (flash) [view](https://github.com/videojs/video.js/pull/553)
 * Blocking user text selection on player components [view](https://github.com/videojs/video.js/pull/524)
 * Exported requestFullScreen() and cancelFullScreen() in the minified version [view](https://github.com/videojs/video.js/pull/555)
+* Exported the global players reference, videojs.players [view](https://github.com/videojs/video.js/pull/560)
 
 --------------------
 
