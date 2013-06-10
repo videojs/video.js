@@ -263,6 +263,12 @@ module.exports = function(grunt) {
     css = css.replace(/font\//g, '../f/1/');
     grunt.file.write('dist/cdn/video-js.css', css);
 
+    // Add CDN-specfic JS
+    jsmin = grunt.file.read('dist/cdn/video.js');
+    // GA Tracking Pixel (manually building the pixel URL)
+    jsmin += ';(function(i,w,n,e,l){l=w.location;i.src="//www.google-analytics.com/__utm.gif?utmwv=5.4.2&utmac=UA-16505296-2&utmn="+Math.floor(Math.random()*10e9)+"&utmhn="+e(l.hostname)+"&utmsr="+w.screen.availWidth+"x"+w.screen.availHeight+"&utmul="+(n.language||n.userLanguage)+"&utmp="+e(l.pathname);})(new Image(),window,navigator,encodeURIComponent);';
+    grunt.file.write('dist/cdn/video.js', jsmin);
+
     // Zip up into video-js-VERSION.zip
     exec('cd dist && zip -r video-js-'+version.full+'.zip video-js && cd ..', { maxBuffer: 500*1024 }, function(err, stdout, stderr){
 
