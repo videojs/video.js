@@ -9,6 +9,8 @@ CHANGELOG
 * Added google analytics to the CDN version ([view](https://github.com/videojs/video.js/pull/568))
 
 --------------------
+## 4.0.4 (2013-06-11)
+* Added google analytics to current CDN version. ([view](https://github.com/videojs/video.js/pull/571))
 
 ## 4.0.3 (2013-05-28)
 * Fixed an bug with exiting fullscreen. [view](https://github.com/videojs/video.js/pull/546)
