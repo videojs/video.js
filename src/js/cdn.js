@@ -5,7 +5,7 @@
  *
  * This code generates the GA tracking URL without requiring the GA javascript
  * library.
- * 
+ *
  * @type {Image}
  */
 ;(function(i,w,n,e,l){
@@ -19,7 +19,7 @@
     // ID
     +'&utmac=UA-16505296-2'
     // Sessions
-    // &utms=2 
+    // &utms=2
     // Cache breaker (using utmcc to do this)
     +'&utmn='+1
     +'&utmhn='+e(l.hostname)
@@ -36,7 +36,7 @@
     // Flash version
     // &utmfl=11.7%20r700
     // Page title
-    // &utmdt=HTML5%20Video%20Player%20%7C%20Video.js 
+    // &utmdt=HTML5%20Video%20Player%20%7C%20Video.js
     // Adsense
     // &utmhid=1112291628
     // Referrer, '-' is none
@@ -53,4 +53,4 @@
     // Custom Var: vjsv is the variable name and 1.0.0 is the VJS version
     +'&utme=8(vjsv)9(v0.0.0)'
   ;
-})(new Image,window,navigator,encodeURIComponent);
+})(new Image(),window,navigator,encodeURIComponent);
