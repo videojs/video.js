@@ -1,8 +1,9 @@
 module.exports = function(grunt) {
-  var pkg, s3, semver, version, verParts;
+  var pkg, s3, semver, version, verParts, uglify;
 
   semver = require('semver');
   pkg = grunt.file.readJSON('package.json');
+  uglify = require('uglify-js');
 
   try {
     s3 = grunt.file.readJSON('.s3config.json');
@@ -233,7 +234,7 @@ module.exports = function(grunt) {
   grunt.registerTask('dist', 'Creating distribution', function(){
     var exec = require('child_process').exec;
     var done = this.async();
-    var css, jsmin, jsdev;
+    var css, jsmin, jsdev, cdnjs;
 
     // Manually copy each source file
     grunt.file.copy('build/files/minified.video.js', 'dist/video-js/video.js');
@@ -262,6 +263,12 @@ module.exports = function(grunt) {
     css = grunt.file.read('dist/cdn/video-js.css');
     css = css.replace(/font\//g, '../f/1/');
     grunt.file.write('dist/cdn/video-js.css', css);
+
+    // Add CDN-specfic JS
+    jsmin = grunt.file.read('dist/cdn/video.js');
+    // GA Tracking Pixel (manually building the pixel URL)
+    cdnjs = uglify.minify('src/js/cdn.js').code.replace('v0.0.0', 'v'+version.full);
+    grunt.file.write('dist/cdn/video.js', jsmin + cdnjs);
 
     // Zip up into video-js-VERSION.zip
     exec('cd dist && zip -r video-js-'+version.full+'.zip video-js && cd ..', { maxBuffer: 500*1024 }, function(err, stdout, stderr){
