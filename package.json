@@ -31,7 +31,8 @@
     "contribflow": "~0.2.0",
     "grunt-s3": "~0.2.0-alpha",
     "semver": "~1.1.4",
-    "grunt-contrib-cssmin": "~0.6.0"
+    "grunt-contrib-cssmin": "~0.6.0",
+    "uglify-js": "~2.3.6"
   },
   "testling": {
     "browsers": [
