@@ -68,3 +68,8 @@ CHANGELOG
 
 ---- 3.2.3 / 2012-11-12 / fix-chrome-seeking-spinner ---------------------------
 * Fixed chrome spinner continuing on seek
+* Added google analytics to current version of CDN ([view](https://github.com/videojs/video.js/pull/571))
+
+--------------------
+
+undefined
