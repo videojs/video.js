@@ -6,6 +6,7 @@ CHANGELOG
 * Blocking user text selection on player components [view](https://github.com/videojs/video.js/pull/524)
 * Exported requestFullScreen() and cancelFullScreen() in the minified version [view](https://github.com/videojs/video.js/pull/555)
 * Exported the global players reference, videojs.players [view](https://github.com/videojs/video.js/pull/560)
+* Added google analytics to the CDN version ([view](https://github.com/videojs/video.js/pull/568))
 
 --------------------
 
