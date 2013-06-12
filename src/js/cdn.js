@@ -30,7 +30,7 @@
     // &utmvp=1057x1105
     // Color depth
     // &utmsc=24-bit
-    +'&utmul='+(n.language||n.userLanguage)
+    +'&utmul='+(n.language||n.userLanguage||'').toLowerCase()
     // Java
     // &utmje=1
     // Flash version
