@@ -742,11 +742,7 @@ vjs.TextTrackMenuItem.prototype.onClick = function(){
 };
 
 vjs.TextTrackMenuItem.prototype.update = function(){
-  if (this.track.mode() == 2) {
-    this.selected(true);
-  } else {
-    this.selected(false);
-  }
+  this.selected(this.track.mode() == 2);
 };
 
 /**
@@ -786,11 +782,7 @@ vjs.OffTextTrackMenuItem.prototype.update = function(){
     }
   }
 
-  if (off) {
-    this.selected(true);
-  } else {
-    this.selected(false);
-  }
+  this.selected(off);
 };
 
 /* Captions Button
@@ -999,11 +991,7 @@ vjs.ChaptersTrackMenuItem.prototype.update = function(){
       currentTime = this.player_.currentTime();
 
   // vjs.log(currentTime, cue.startTime);
-  if (cue.startTime <= currentTime && currentTime < cue.endTime) {
-    this.selected(true);
-  } else {
-    this.selected(false);
-  }
+  this.selected(cue.startTime <= currentTime && currentTime < cue.endTime);
 };
 
 // Add Buttons to controlBar
