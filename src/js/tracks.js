@@ -991,9 +991,7 @@ vjs.ChaptersTrackMenuItem.prototype.update = function(){
       currentTime = this.player_.currentTime();
 
   // vjs.log(currentTime, cue.startTime);
-  this.selected(
-  	cue.startTime <= currentTime && currentTime < cue.endTime
-  );
+  this.selected(cue.startTime <= currentTime && currentTime < cue.endTime);
 };
 
 // Add Buttons to controlBar
