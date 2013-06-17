@@ -39,7 +39,7 @@ Don't miss the [code style guide](#code-style).
 4. Install required node.js modules using node package manager.
 
   ```bash
-  npm install
+  npm install semver grunt-contrib-jshint grunt-contrib-qunit grunt-contrib-watch grunt-contrib-clean grunt-contrib-copy grunt-contrib-cssmin grunt-s3 contribflow
   ```
 
 5. Build a local copy. Video.js uses [grunt](http://gruntjs.com), a node-based task automation tool for building and tesing. The following will compile a local copy in the dist/ directory and run tests. It will also create a sourcelist.js file that can be used to load the video.js source scripts in a page.
