@@ -313,10 +313,12 @@ vjs.isEmpty = function(obj) {
  * @param {String} classToAdd Classname to add
  */
 vjs.addClass = function(element, classToAdd){
+  classToAdd = vjs.trim( classToAdd);
+
   if (classToAdd) {
     var classNames = vjs.trim(element.className).split(/\s+/);
-    (classNames.indexOf(classToAdd) == -1) && classNames.push(classToAdd);
-    element.className = classNames.join(' ');
+    (classNames.indexOf(classToAdd) == -1) && classNames.push( classToAdd);
+    element.className = element.className ? classNames.join(' ') : classToAdd;
   }
 };
 
