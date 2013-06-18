@@ -7,16 +7,16 @@ var hasOwnProp = Object.prototype.hasOwnProperty;
  */
 if (!Array.prototype.indexOf) {
   Array.prototype.indexOf = function(searchElement /*, fromIndex */ ) {
-    "use strict";
+    'use strict';
 
     if (this == null) {
       throw new TypeError();
     }
 
     var
-		t = Object(this),
-    	len = t.length >>> 0,
-    	n = 0, k
+      t = Object(this),
+      len = t.length >>> 0,
+      n = 0, k
     ;
 
     if (len === 0) {
@@ -27,7 +27,7 @@ if (!Array.prototype.indexOf) {
       n = Number(arguments[1]);
       if (n != n) { // shortcut for verifying if it's NaN
         n = 0;
-      } else if (n != 0 && n != Infinity && n != -Infinity) {
+      } else if (n !== 0 && n != Infinity && n != -Infinity) {
         n = (n > 0 || -1) * Math.floor(Math.abs(n));
       }
     }
@@ -328,7 +328,7 @@ vjs.addClass = function(element, classToAdd){
 vjs.removeClass = function(element, classToRemove){
   var classNames = element.className.split(/\s+/), i;
   while ((i = classNames.indexOf(classToRemove)) != -1) {
-  	classNames.splice(i,1);
+    classNames.splice(i,1);
   }
   element.className = classNames.join(' ');
 };
