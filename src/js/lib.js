@@ -540,27 +540,6 @@ vjs.get = function(url, onSuccess, onError){
   }
 };
 
-/* Local Storage
-================================================================================ */
-vjs.setLocalStorage = function(key, value){
-  try {
-    // IE was throwing errors referencing the var anywhere without this
-    var localStorage = window.localStorage || false;
-    if (!localStorage) { return; }
-    localStorage[key] = value;
-  } catch(e) {
-    if (e.code == 22 || e.code == 1014) { // Webkit == 22 / Firefox == 1014
-      vjs.log('LocalStorage Full (VideoJS)', e);
-    } else {
-      if (e.code == 18) {
-        vjs.log('LocalStorage not allowed (VideoJS)', e);
-      } else {
-        vjs.log('LocalStorage Error (VideoJS)', e);
-      }
-    }
-  }
-};
-
 /**
  * Get abosolute version of relative URL. Used to tell flash correct URL.
  * http://stackoverflow.com/questions/470832/getting-an-absolute-url-from-a-relative-one-ie6-issue
