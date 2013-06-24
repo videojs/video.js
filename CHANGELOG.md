@@ -7,8 +7,12 @@ CHANGELOG
 * Exported requestFullScreen() and cancelFullScreen() in the minified version [view](https://github.com/videojs/video.js/pull/555)
 * Exported the global players reference, videojs.players [view](https://github.com/videojs/video.js/pull/560)
 * Added google analytics to the CDN version ([view](https://github.com/videojs/video.js/pull/568))
+* Exported fadeIn/fadeOut for the Component API ([view](https://github.com/videojs/video.js/pull/581))
+* Fixed an IE poster error when autoplaying ([view](https://github.com/videojs/video.js/pull/593))
+* Exported bufferedPercent for the API ([view](https://github.com/videojs/video.js/pull/588))
 
 --------------------
+
 ## 4.0.4 (2013-06-11)
 * Added google analytics to current CDN version. ([view](https://github.com/videojs/video.js/pull/571))
 
@@ -84,12 +88,3 @@ CHANGELOG
 * 3.0.6 (2012-01-12) Fixed wrong URL for CDN in docs
 * 3.0.7 (2012-01-12) Fixed an ie8 breaking bug with the poster
 * 3.0.8 (2012-01-23) Fixed issue with controls not hiding in IE due to no opacity support
-
-
-* Exported fadeIn/fadeOut for the Component API ([view](https://github.com/videojs/video.js/pull/581))
-* Fixed an IE poster error when autoplaying ([view](https://github.com/videojs/video.js/pull/593))
-* Exported bufferedPercent for the API ([view](https://github.com/videojs/video.js/pull/588))
-
---------------------
-
-undefined
