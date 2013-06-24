@@ -1,27 +1,5 @@
 module('Player');
 
-var PlayerTest = {
-  makeTag: function(){
-    var videoTag = document.createElement('video');
-    videoTag.id = 'example_1';
-    videoTag.className = 'video-js vjs-default-skin';
-    return videoTag;
-  },
-  makePlayer: function(playerOptions){
-    var player;
-    var videoTag = PlayerTest.makeTag();
-
-    var fixture = document.getElementById('qunit-fixture');
-    fixture.appendChild(videoTag);
-
-    var opts = vjs.obj.merge({
-      'techOrder': ['mediaFaker']
-    }, playerOptions);
-
-    return player = new vjs.Player(videoTag, opts);
-  }
-};
-
 // Compiler doesn't like using 'this' in setup/teardown.
 // module("Player", {
 //   /**
