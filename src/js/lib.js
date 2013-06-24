@@ -317,25 +317,22 @@ vjs.IOS_VERSION = (function(){
 vjs.IS_ANDROID = (/Android/i).test(vjs.USER_AGENT);
 vjs.ANDROID_VERSION = (function() {
   // This matches Android Major.Minor.Patch versions
-  // Major and Minor are added to variables, if available
-  // and ANDROID_VERSION is Major.Minor as a Number
-  // if Minor isn't available, then only Major is returned
-  var match = vjs.USER_AGENT.match(/Android (\d+)(?:\.(\d+))?(?:\.(\d+))*/i);
+  // ANDROID_VERSION is Major.Minor as a Number, if Minor isn't available, then only Major is returned
+  var match = vjs.USER_AGENT.match(/Android (\d+)(?:\.(\d+))?(?:\.(\d+))*/i),
+    major,
+    minor;
+
   if (!match) {
     return null;
   }
 
-  if (match[1]) {
-    vjs.ANDROID_MAJOR_VERSION = parseFloat(match[1]);
-  }
-  if (match[2]) {
-    vjs.ANDROID_MINOR_VERSION = parseFloat(match[2]);
-  }
+  major = match[1] && parseFloat(match[1]);
+  minor = match[2] && parseFloat(match[2]);
 
-  if (vjs.ANDROID_MAJOR_VERSION && vjs.ANDROID_MINOR_VERSION) {
+  if (major && minor) {
     return parseFloat(match[1] + '.' + match[2]);
-  } else if (vjs.ANDROID_MAJOR_VERSION) {
-    return vjs.ANDROID_MAJOR_VERSION;
+  } else if (major) {
+    return major;
   } else {
     return null;
   }
