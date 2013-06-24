@@ -1,16 +1,30 @@
 module.exports = function(grunt) {
+  var pkg, s3, semver, version, verParts, uglify;
+
+  semver = require('semver');
+  pkg = grunt.file.readJSON('package.json');
+  uglify = require('uglify-js');
+
+  try {
+    s3 = grunt.file.readJSON('.s3config.json');
+  } catch(e) {
+    s3 = {};
+  }
+
+  verParts = pkg.version.split('.');
+  version = {
+    full: pkg.version,
+    major: verParts[0],
+    minor: verParts[1],
+    patch: verParts[2]
+  };
+  version.majorMinor = version.major + '.' + version.minor;
 
   // Project configuration.
   grunt.initConfig({
-    pkg: grunt.file.readJSON('package.json'),
+    pkg: pkg,
 
     build: {
-      src: 'src/js/dependencies.js',
-      options: {
-        baseDir: 'src/js/'
-      }
-    },
-    deps: {
       src: 'src/js/dependencies.js',
       options: {
         baseDir: 'src/js/'
@@ -20,8 +34,6 @@ module.exports = function(grunt) {
       build: ['build/files/*'],
       dist: ['dist/*']
     },
-    // Current forEach issue: https://github.com/gruntjs/grunt/issues/610
-    // npm install https://github.com/gruntjs/grunt-contrib-jshint/archive/7fd70e86c5a8d489095fa81589d95dccb8eb3a46.tar.gz
     jshint: {
       src: {
         src: ['src/js/*.js', 'Gruntfile.js', 'test/unit/*.js'],
@@ -33,12 +45,12 @@ module.exports = function(grunt) {
     minify: {
       source:{
         src: ['build/files/combined.video.js', 'build/compiler/goog.base.js', 'src/js/exports.js'],
-        externs: ['src/js/media.flash.externs.js'],
+        externs: ['src/js/media/flash.externs.js'],
         dest: 'build/files/minified.video.js'
       },
       tests: {
         src: ['build/files/combined.video.js', 'build/compiler/goog.base.js', 'src/js/exports.js', 'test/unit/*.js', '!test/unit/api.js'],
-        externs: ['src/js/media.flash.externs.js', 'test/qunit/qunit-externs.js'],
+        externs: ['src/js/media/flash.externs.js', 'test/qunit/qunit-externs.js'],
         dest: 'build/files/test.minified.video.js'
       }
     },
@@ -51,6 +63,54 @@ module.exports = function(grunt) {
     watch: {
       files: [ 'src/**/*.js', 'test/unit/*.js' ],
       tasks: 'dev'
+    },
+    copy: {
+      minor: {
+        files: [
+          {expand: true, cwd: 'build/files/', src: ['*'], dest: 'dist/'+version.majorMinor+'/', filter: 'isFile'} // includes files in path
+        ]
+      },
+      patch: {
+        files: [
+          {expand: true, cwd: 'build/files/', src: ['*'], dest: 'dist/'+version.full+'/', filter: 'isFile'} // includes files in path
+        ]
+      }
+    },
+    s3: {
+      options: s3,
+      minor: {
+        upload: [
+          {
+            src: 'dist/cdn/*',
+            dest: 'vjs/'+version.majorMinor+'/',
+            rel: 'dist/cdn/',
+            headers: {
+              'Cache-Control': 'public, max-age=2628000'
+            }
+          }
+        ]
+      },
+      patch: {
+        upload: [
+          {
+            src: 'dist/cdn/*',
+            dest: 'vjs/'+version.full+'/',
+            rel: 'dist/cdn/',
+            headers: {
+              'Cache-Control': 'public, max-age=31536000'
+            }
+          }
+        ]
+      }
+    },
+    cssmin: {
+      minify: {
+        expand: true,
+        cwd: 'build/files/',
+        src: ['video-js.css'],
+        dest: 'build/files/',
+        ext: '.min.css'
+      }
     }
   });
 
@@ -59,6 +119,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-s3');
   grunt.loadNpmTasks('contribflow');
 
   // Default task.
@@ -85,58 +147,75 @@ module.exports = function(grunt) {
       sourceFiles[i] = sourceFiles[i].replace(/\\/g, '/');
     }
 
-    // grunt.file.write('build/files/sourcelist.txt', sourceList.join(','));
-    // Allow time for people to update their index.html before they remove these
-    grunt.file.write('build/files/sourcelist.js', 'var sourcelist = ["' + sourceFiles.join('","') + '"]');
-
     // Create a combined sources file. https://github.com/zencoder/video-js/issues/287
     var combined = '';
     sourceFiles.forEach(function(result){
       combined += grunt.file.read(result);
     });
+    // Replace CDN version ref in js. Use major/minor version.
+    combined = combined.replace(/GENERATED_CDN_VSN/g, version.majorMinor);
     grunt.file.write('build/files/combined.video.js', combined);
 
+    // Copy over other files
     grunt.file.copy('src/css/video-js.css', 'build/files/video-js.css');
     grunt.file.copy('src/css/video-js.png', 'build/files/video-js.png');
     grunt.file.copy('src/swf/video-js.swf', 'build/files/video-js.swf');
+
+    // Inject version number into css file
+    var css = grunt.file.read('build/files/video-js.css');
+    css = css.replace(/GENERATED_AT_BUILD/g, version.full);
+    grunt.file.write('build/files/video-js.css', css);
+
+    // Copy over font files
+    grunt.file.recurse('src/css/font', function(absdir, rootdir, subdir, filename) {
+      // Block .DS_Store files
+      if ('filename'.substring(0,1) !== '.') {
+        grunt.file.copy(absdir, 'build/files/font/' + filename);
+      }
+    });
+
+    // Minify CSS
+    grunt.task.run(['cssmin']);
   });
 
   grunt.registerMultiTask('minify', 'Minify JS files using Closure Compiler.', function() {
     var done = this.async();
     var exec = require('child_process').exec;
 
-    var externs = this.files[0].externs || [];
-    var dest = this.files[0].dest;
-    var files = [];
+    var externs = this.data.externs || [];
+    var dest = this.data.dest;
+    var filePatterns = [];
 
     // Make sure deeper directories exist for compiler
     grunt.file.write(dest, '');
 
-    if (this.files[0].sourcelist) {
-      files = files.concat(grunt.file.read(this.files[0].sourcelist).split(','));
+    if (this.data.sourcelist) {
+      filePatterns = filePatterns.concat(grunt.file.read(this.data.sourcelist).split(','));
     }
-    if (this.files[0].src) {
-      files = files.concat(this.files[0].src);
+    if (this.data.src) {
+      filePatterns = filePatterns.concat(this.data.src);
     }
 
+    // Build closure compiler shell command
     var command = 'java -jar build/compiler/compiler.jar'
                 + ' --compilation_level ADVANCED_OPTIMIZATIONS'
                 // + ' --formatting=pretty_print'
                 + ' --js_output_file=' + dest
                 + ' --create_source_map ' + dest + '.map --source_map_format=V3'
                 + ' --jscomp_warning=checkTypes --warning_level=VERBOSE'
-                + ' --output_wrapper "(function() {%output%})();//@ sourceMappingURL=video.js.map"';
+                + ' --output_wrapper "/*! Video.js v' + version.full + ' ' + pkg.copyright + ' */\n (function() {%output%})();//@ sourceMappingURL=video.js.map"';
 
-    files.forEach(function(file){
+    // Add each js file
+    grunt.file.expand(filePatterns).forEach(function(file){
       command += ' --js='+file;
     });
 
+    // Add externs
     externs.forEach(function(extern){
       command += ' --externs='+extern;
     });
 
-    // grunt.log.writeln(command)
-
+    // Run command
     exec(command, { maxBuffer: 500*1024 }, function(err, stdout, stderr){
 
       if (err) {
@@ -153,25 +232,57 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('dist', 'Creating distribution', function(){
-    // TODO: create semver folders (4.1.1, 4.1, 4, and latest)
-    // grunt copy could be used but is currently broken and needs an update
+    var exec = require('child_process').exec;
+    var done = this.async();
+    var css, jsmin, jsdev, cdnjs;
+
+    // Manually copy each source file
     grunt.file.copy('build/files/minified.video.js', 'dist/video-js/video.js');
+    grunt.file.copy('build/files/combined.video.js', 'dist/video-js/video.dev.js');
     grunt.file.copy('build/files/video-js.css', 'dist/video-js/video-js.css');
-    grunt.file.copy('build/files/video-js.png', 'dist/video-js/video-js.png');
+    grunt.file.copy('build/files/video-js.min.css', 'dist/video-js/video-js.min.css');
     grunt.file.copy('build/files/video-js.swf', 'dist/video-js/video-js.swf');
     grunt.file.copy('build/demo-files/demo.html', 'dist/video-js/demo.html');
     grunt.file.copy('build/demo-files/demo.captions.vtt', 'dist/video-js/demo.captions.vtt');
 
-    // Copy is broken. Waiting for an update to use.
-    // copy: {
-    //   latest: {
-    //     files: [
-    //       { src: ['dist/video-js'], dest: 'dist/latest' } // includes files in path
-    //       // {src: ['path/**'], dest: 'dest/'}, // includes files in path and its subdirs
-    //       // {expand: true, cwd: 'path/', src: ['**'], dest: 'dest/'}, // makes all src relative to cwd
-    //       // {expand: true, flatten: true, src: ['path/**'], dest: 'dest/', filter: 'isFile'} // flattens results to a single level
-    //     ]
-    //   }
-    // },
+    // Copy over font files
+    grunt.file.recurse('build/files/font', function(absdir, rootdir, subdir, filename) {
+      // Block .DS_Store files
+      if ('filename'.substring(0,1) !== '.') {
+        grunt.file.copy(absdir, 'dist/video-js/font/' + filename);
+      }
+    });
+
+    // CDN version uses already hosted font files
+    // Minified version only, doesn't need demo files
+    grunt.file.copy('build/files/minified.video.js', 'dist/cdn/video.js');
+    grunt.file.copy('build/files/video-js.min.css', 'dist/cdn/video-js.css');
+    grunt.file.copy('build/files/video-js.swf', 'dist/cdn/video-js.swf');
+
+    // Replace font urls with CDN versions
+    css = grunt.file.read('dist/cdn/video-js.css');
+    css = css.replace(/font\//g, '../f/1/');
+    grunt.file.write('dist/cdn/video-js.css', css);
+
+    // Add CDN-specfic JS
+    jsmin = grunt.file.read('dist/cdn/video.js');
+    // GA Tracking Pixel (manually building the pixel URL)
+    cdnjs = uglify.minify('src/js/cdn.js').code.replace('v0.0.0', 'v'+version.full);
+    grunt.file.write('dist/cdn/video.js', jsmin + cdnjs);
+
+    // Zip up into video-js-VERSION.zip
+    exec('cd dist && zip -r video-js-'+version.full+'.zip video-js && cd ..', { maxBuffer: 500*1024 }, function(err, stdout, stderr){
+
+      if (err) {
+        grunt.warn(err);
+        done(false);
+      }
+
+      if (stdout) {
+        grunt.log.writeln(stdout);
+      }
+
+      done();
+    });
   });
 };

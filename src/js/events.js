@@ -174,7 +174,10 @@ vjs.fixEvent = function(event) {
     //  which makes copying more difficult.
     // TODO: Probably best to create a whitelist of event props
     for (var key in old) {
-      event[key] = old[key];
+      // Safari 6.0.3 warns you if you try to copy deprecated layerX/Y
+      if (key !== 'layerX' && key !== 'layerY') {
+        event[key] = old[key];
+      }
     }
 
     // The event occurred on this element

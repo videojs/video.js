@@ -14,7 +14,8 @@ test('should hide volume control if it\'s not supported', function(){
         volumeControl: false
       }
     },
-    volume: function(){}
+    volume: function(){},
+    muted: function(){}
   };
 
   volumeControl = new vjs.VolumeControl(player);

@@ -21,6 +21,7 @@ vjs.Slider = vjs.Component.extend({
     this.on('touchstart', this.onMouseDown);
     this.on('focus', this.onFocus);
     this.on('blur', this.onBlur);
+    this.on('click', this.onClick);
 
     this.player_.on('controlsvisible', vjs.bind(this, this.update));
 
@@ -34,6 +35,9 @@ vjs.Slider = vjs.Component.extend({
 });
 
 vjs.Slider.prototype.createEl = function(type, props) {
+  props = props || {};
+  // Add the slider element class to all sub classes
+  props.className = props.className + ' vjs-slider';
   props = vjs.obj.merge({
     role: 'slider',
     'aria-valuenow': 0,
@@ -121,26 +125,52 @@ vjs.Slider.prototype.update = function(){
 };
 
 vjs.Slider.prototype.calculateDistance = function(event){
-  var box = this.el_,
-      boxX = vjs.findPosX(box),
-      boxW = box.offsetWidth,
-      handle = this.handle,
+  var el, box, boxX, boxY, boxW, boxH, handle, pageX, pageY;
+
+  el = this.el_;
+  box = vjs.findPosition(el);
+  boxW = boxH = el.offsetWidth;
+  handle = this.handle;
+
+  if (this.options_.vertical) {
+    boxY = box.top;
+
+    if (event.changedTouches) {
+      pageY = event.changedTouches[0].pageY;
+    } else {
+      pageY = event.pageY;
+    }
+
+    if (handle) {
+      var handleH = handle.el().offsetHeight;
+      // Adjusted X and Width, so handle doesn't go outside the bar
+      boxY = boxY + (handleH / 2);
+      boxH = boxH - handleH;
+    }
+
+    // Percent that the click is through the adjusted area
+    return Math.max(0, Math.min(1, ((boxY - pageY) + boxH) / boxH));
+
+  } else {
+    boxX = box.left;
+
+    if (event.changedTouches) {
+      pageX = event.changedTouches[0].pageX;
+    } else {
       pageX = event.pageX;
+    }
 
-  if (handle) {
-    var handleW = handle.el().offsetWidth;
+    if (handle) {
+      var handleW = handle.el().offsetWidth;
 
-    // Adjusted X and Width, so handle doesn't go outside the bar
-    boxX = boxX + (handleW / 2);
-    boxW = boxW - handleW;
+      // Adjusted X and Width, so handle doesn't go outside the bar
+      boxX = boxX + (handleW / 2);
+      boxW = boxW - handleW;
+    }
+
+    // Percent that the click is through the adjusted area
+    return Math.max(0, Math.min(1, (pageX - boxX) / boxW));
   }
-
-  if (event.changedTouches) {
-    pageX = event.changedTouches[0].pageX;
-  }
-
-  // Percent that the click is through the adjusted area
-  return Math.max(0, Math.min(1, (pageX - boxX) / boxW));
 };
 
 vjs.Slider.prototype.onFocus = function(){
@@ -159,4 +189,41 @@ vjs.Slider.prototype.onKeyPress = function(event){
 
 vjs.Slider.prototype.onBlur = function(){
   vjs.off(document, 'keyup', vjs.bind(this, this.onKeyPress));
+};
+
+/**
+ * Listener for click events on slider, used to prevent clicks
+ *   from bubbling up to parent elements like button menus.
+ * @param  {Object} event Event object
+ */
+vjs.Slider.prototype.onClick = function(event){
+  event.stopImmediatePropagation();
+  event.preventDefault();
+};
+
+/**
+ * SeekBar Behavior includes play progress bar, and seek handle
+ * Needed so it can determine seek position based on handle position/size
+ * @param {vjs.Player|Object} player
+ * @param {Object=} options
+ * @constructor
+ */
+vjs.SliderHandle = vjs.Component.extend();
+
+/**
+ * Default value of the slider
+ * @type {Number}
+ */
+vjs.SliderHandle.prototype.defaultValue = 0;
+
+/** @inheritDoc */
+vjs.SliderHandle.prototype.createEl = function(type, props) {
+  props = props || {};
+  // Add the slider element class to all sub classes
+  props.className = props.className + ' vjs-slider-handle';
+  props = vjs.obj.merge({
+    innerHTML: '<span class="vjs-control-text">'+this.defaultValue+'</span>'
+  }, props);
+
+  return vjs.Component.prototype.createEl.call(this, 'div', props);
 };

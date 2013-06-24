@@ -29,6 +29,7 @@ goog.exportSymbol('videojs', vjs);
 goog.exportSymbol('_V_', vjs);
 
 goog.exportSymbol('videojs.options', vjs.options);
+goog.exportSymbol('videojs.players', vjs.players);
 
 // Allow external components to use global cache
 goog.exportSymbol('videojs.cache', vjs.cache);
@@ -53,9 +54,14 @@ goog.exportProperty(vjs.Component.prototype, 'width', vjs.Component.prototype.wi
 goog.exportProperty(vjs.Component.prototype, 'height', vjs.Component.prototype.height);
 goog.exportProperty(vjs.Component.prototype, 'dimensions', vjs.Component.prototype.dimensions);
 goog.exportProperty(vjs.Component.prototype, 'ready', vjs.Component.prototype.ready);
+goog.exportProperty(vjs.Component.prototype, 'fadeIn', vjs.Component.prototype.fadeIn);
+goog.exportProperty(vjs.Component.prototype, 'fadeOut', vjs.Component.prototype.fadeOut);
 
 goog.exportSymbol('videojs.Player', vjs.Player);
 goog.exportProperty(vjs.Player.prototype, 'dispose', vjs.Player.prototype.dispose);
+goog.exportProperty(vjs.Player.prototype, 'requestFullScreen', vjs.Player.prototype.requestFullScreen);
+goog.exportProperty(vjs.Player.prototype, 'cancelFullScreen', vjs.Player.prototype.cancelFullScreen);
+goog.exportProperty(vjs.Player.prototype, 'bufferedPercent', vjs.Player.prototype.bufferedPercent);
 
 goog.exportSymbol('videojs.MediaLoader', vjs.MediaLoader);
 goog.exportSymbol('videojs.TextTrackDisplay', vjs.TextTrackDisplay);

@@ -191,3 +191,29 @@ test('should change the width and height of a component', function(){
   ok(comp.width() === 1000, 'forced width was removed');
   ok(comp.height() === 0, 'forced height was removed');
 });
+
+
+test('should use a defined content el for appending children', function(){
+  var CompWithContent = vjs.Component.extend();
+  CompWithContent.prototype.createEl = function(){
+    // Create the main componenent element
+    var el = vjs.createEl('div');
+    // Create the element where children will be appended
+    this.contentEl_ = vjs.createEl('div', { 'id': 'contentEl' });
+    el.appendChild(this.contentEl_);
+    return el;
+  };
+
+  var comp = new CompWithContent(getFakePlayer());
+  var child = comp.addChild('component');
+
+  ok(comp.children().length === 1);
+  ok(comp.el().childNodes[0]['id'] === 'contentEl');
+  ok(comp.el().childNodes[0].childNodes[0] === child.el());
+
+  comp.removeChild(child);
+
+  ok(comp.children().length === 0, 'Length should now be zero');
+  ok(comp.el().childNodes[0]['id'] === 'contentEl', 'Content El should still exist');
+  ok(comp.el().childNodes[0].childNodes[0] !== child.el(), 'Child el should be removed.');
+});

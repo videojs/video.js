@@ -6,7 +6,7 @@ Referencing the Player
 ----------------------
 To use the API functions, you need access to the player object. Luckily this is easy to get. You just need to make sure your video tag has an ID. The example embed code has an ID of "example\_video_1". If you have multiple videos on one page, make sure every video tag has a unique ID.
 ```js
-var myPlayer = _V_("example_video_1");
+var myPlayer = videojs("example_video_1");
 ```
 
 (If the player hasn't been initialized yet via the data-setup attribute or another method, this will also initialize the player.)
@@ -15,7 +15,7 @@ Wait Until the Player is Ready
 ------------------------------
 The time it takes Video.js to set up the video and API will vary depending on the playback technology being used (HTML5 will often be much faster to load than Flash). For that reason we want to use the player's 'ready' function to trigger any code that requires the player's API.
 ```javascript
-_V_("example_video_1").ready(function(){
+videojs("example_video_1").ready(function(){
 
   var myPlayer = this;
 
@@ -165,10 +165,10 @@ myPlayer.height(480);
 ```
 
 
-### size(width, height) ###
+### dimensions(width, height) ###
 Changes the width and height of the video to the supplied width and height. This is more efficient if you're changing both width and height (only triggers the player's resize event once). Returns the player object.
 ```js
-myPlayer.size(640,480);
+myPlayer.dimensions(640,480);
 ```
 
 
@@ -195,12 +195,12 @@ var myFunc = function(){
   var myPlayer = this;
   // Do something when the event is fired
 };
-myPlayer.addEvent("eventName", myFunc);
+myPlayer.on("eventName", myFunc);
 ```
 
 You can also remove the listeners later.
 ```js
-myPlayer.removeEvent("eventName", myFunc);
+myPlayer.off("eventName", myFunc);
 ```
 
 

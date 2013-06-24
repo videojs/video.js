@@ -1,27 +1,5 @@
 module('Player');
 
-var PlayerTest = {
-  makeTag: function(){
-    var videoTag = document.createElement('video');
-    videoTag.id = 'example_1';
-    videoTag.className = 'video-js vjs-default-skin';
-    return videoTag;
-  },
-  makePlayer: function(playerOptions){
-    var player;
-    var videoTag = PlayerTest.makeTag();
-
-    var fixture = document.getElementById('qunit-fixture');
-    fixture.appendChild(videoTag);
-
-    var opts = vjs.obj.merge({
-      'techOrder': ['mediaFaker']
-    }, playerOptions);
-
-    return player = new vjs.Player(videoTag, opts);
-  }
-};
-
 // Compiler doesn't like using 'this' in setup/teardown.
 // module("Player", {
 //   /**
@@ -231,3 +209,40 @@ test('should be able to initialize player twice on the same tag using string ref
   //here it triggers error, because player was destroyed already after first dispose
   player.dispose();
 });
+
+test('should set controls and trigger event', function() {
+  expect(3);
+
+  var player = PlayerTest.makePlayer({ 'controls': false });
+  ok(player.controls() === false, 'controls set through options');
+  player.controls(true);
+  ok(player.controls() === true, 'controls updated');
+
+  player.on('controlschange', function(){
+    ok(true, 'controlschange fired once');
+  });
+  player.controls(false);
+  // Check for unnecessary controlschange events
+  player.controls(false);
+
+  player.dispose();
+});
+
+// Can't figure out how to test fullscreen events with tests
+// Browsers aren't triggering the events at least
+// asyncTest('should trigger the fullscreenchange event', function() {
+//   expect(3);
+
+//   var player = PlayerTest.makePlayer();
+//   player.on('fullscreenchange', function(){
+//     ok(true, 'fullscreenchange event fired');
+//     ok(this.isFullScreen === true, 'isFullScreen is true');
+//     ok(this.el().className.indexOf('vjs-fullscreen') !== -1, 'vjs-fullscreen class added');
+
+//     player.dispose();
+//     start();
+//   });
+
+//   player.requestFullScreen();
+// });
+

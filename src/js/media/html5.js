@@ -18,6 +18,9 @@ vjs.Html5 = vjs.MediaTechController.extend({
     // In iOS, if you move a video element in the DOM, it breaks video playback.
     this.features.movingMediaElementInDOM = !vjs.IS_IOS;
 
+    // HTML video is able to automatically resize when going to fullscreen
+    this.features.fullscreenResize = true;
+
     vjs.MediaTechController.call(this, player, options, ready);
 
     var source = options['source'];
@@ -38,7 +41,7 @@ vjs.Html5 = vjs.MediaTechController.extend({
     // This fixes both issues. Need to wait for API, so it updates displays correctly
     player.ready(function(){
       if (this.options_['autoplay'] && this.paused()) {
-        this.tag.poster = null; // Chrome Fix. Fixed in Chrome v16.
+        delete this.tag['poster']; // Chrome Fix. Fixed in Chrome v16.
         this.play();
       }
     });
@@ -68,6 +71,8 @@ vjs.Html5.prototype.createEl = function(){
 
     // If the original tag is still there, remove it.
     if (el) {
+      el['player'] = null;
+      player.tag = null;
       player.el().removeChild(el);
       el = el.cloneNode(false);
     } else {
@@ -141,7 +146,7 @@ vjs.Html5.prototype.supportsFullScreen = function(){
   if (typeof this.el_.webkitEnterFullScreen == 'function') {
 
     // Seems to be broken in Chromium/Chrome && Safari in Leopard
-    if (!navigator.userAgent.match('Chrome') && !navigator.userAgent.match('Mac OS X 10.5')) {
+    if (/Android/.test(vjs.USER_AGENT) || !/Chrome|Mac OS X 10.5/.test(vjs.USER_AGENT)) {
       return true;
     }
   }
@@ -149,24 +154,24 @@ vjs.Html5.prototype.supportsFullScreen = function(){
 };
 
 vjs.Html5.prototype.enterFullScreen = function(){
-  try {
-    this.el_.webkitEnterFullScreen();
-  } catch (e) {
-    if (e.code == 11) {
-      // this.warning(VideoJS.warnings.videoNotReady);
-      vjs.log('Video.js: Video not ready.');
-    }
+  var video = this.el_;
+  if (video.paused && video.networkState <= video.HAVE_METADATA) {
+    // attempt to prime the video element for programmatic access
+    // this isn't necessary on the desktop but shouldn't hurt
+    this.el_.play();
+
+    // playing and pausing synchronously during the transition to fullscreen
+    // can get iOS ~6.1 devices into a play/pause loop
+    setTimeout(function(){
+      video.pause();
+      video.webkitEnterFullScreen();
+    }, 0);
+  } else {
+    video.webkitEnterFullScreen();
   }
 };
 vjs.Html5.prototype.exitFullScreen = function(){
-    try {
-      this.el_.webkitExitFullScreen();
-    } catch (e) {
-      if (e.code == 11) {
-        // this.warning(VideoJS.warnings.videoNotReady);
-        vjs.log('Video.js: Video not ready.');
-      }
-    }
+  this.el_.webkitExitFullScreen();
 };
 vjs.Html5.prototype.src = function(src){ this.el_.src = src; };
 vjs.Html5.prototype.load = function(){ this.el_.load(); };
@@ -230,4 +235,3 @@ if (vjs.IS_OLD_ANDROID) {
     return (type && type.toLowerCase().indexOf('video/mp4') != -1) ? 'maybe' : '';
   };
 }
-
