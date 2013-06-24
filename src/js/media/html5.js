@@ -41,7 +41,7 @@ vjs.Html5 = vjs.MediaTechController.extend({
     // This fixes both issues. Need to wait for API, so it updates displays correctly
     player.ready(function(){
       if (this.options_['autoplay'] && this.paused()) {
-        this.tag.poster = null; // Chrome Fix. Fixed in Chrome v16.
+        delete this.tag['poster']; // Chrome Fix. Fixed in Chrome v16.
         this.play();
       }
     });
