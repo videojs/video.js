@@ -87,6 +87,7 @@ CHANGELOG
 
 
 * Exported fadeIn/fadeOut for the Component API ([view](https://github.com/videojs/video.js/pull/581))
+* Fixed an IE poster error when autoplaying ([view](https://github.com/videojs/video.js/pull/593))
 
 --------------------
 
