@@ -86,3 +86,8 @@ CHANGELOG
 * 3.0.8 (2012-01-23) Fixed issue with controls not hiding in IE due to no opacity support
 
 
+* Exported fadeIn/fadeOut for the Component API ([view](https://github.com/videojs/video.js/pull/581))
+
+--------------------
+
+undefined
