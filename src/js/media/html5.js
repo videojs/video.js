@@ -229,13 +229,9 @@ vjs.Html5.Events = 'loadstart,suspend,abort,error,emptied,stalled,loadedmetadata
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //
 
-// Android
-if (vjs.IS_ANDROID) {
-
   // Override Android 2.2 and less canPlayType method which is broken
-  if (vjs.ANDROID_VERSION < 3) {
-    document.createElement('video').constructor.prototype.canPlayType = function(type){
-      return (type && type.toLowerCase().indexOf('video/mp4') != -1) ? 'maybe' : '';
-    };
-  }
+if (vjs.IS_OLD_ANDROID) {
+  document.createElement('video').constructor.prototype.canPlayType = function(type){
+    return (type && type.toLowerCase().indexOf('video/mp4') != -1) ? 'maybe' : '';
+  };
 }
