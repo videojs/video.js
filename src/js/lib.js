@@ -304,9 +304,9 @@ vjs.USER_AGENT = navigator.userAgent;
  * @type {Boolean}
  * @constant
  */
-vjs.IS_IPHONE = !!vjs.USER_AGENT.match(/iPhone/i);
-vjs.IS_IPAD = !!vjs.USER_AGENT.match(/iPad/i);
-vjs.IS_IPOD = !!vjs.USER_AGENT.match(/iPod/i);
+vjs.IS_IPHONE = (/iPhone/i).test(vjs.USER_AGENT);
+vjs.IS_IPAD = (/iPad/i).test(vjs.USER_AGENT);
+vjs.IS_IPOD = (/iPod/i).test(vjs.USER_AGENT);
 vjs.IS_IOS = vjs.IS_IPHONE || vjs.IS_IPAD || vjs.IS_IPOD;
 
 vjs.IOS_VERSION = (function(){
@@ -314,16 +314,34 @@ vjs.IOS_VERSION = (function(){
   if (match && match[1]) { return match[1]; }
 })();
 
-vjs.IS_ANDROID = !!vjs.USER_AGENT.match(/Android.*AppleWebKit/i);
+vjs.IS_ANDROID = (/Android/i).test(vjs.USER_AGENT);
 vjs.ANDROID_VERSION = (function() {
-  var match = vjs.USER_AGENT.match(/Android (\d+)\./i);
-  if (match && match[1]) {
-    return match[1];
-  }
-  return null;
-})();
+  // This matches Android Major.Minor.Patch versions
+  // ANDROID_VERSION is Major.Minor as a Number, if Minor isn't available, then only Major is returned
+  var match = vjs.USER_AGENT.match(/Android (\d+)(?:\.(\d+))?(?:\.(\d+))*/i),
+    major,
+    minor;
 
-vjs.IS_FIREFOX = function(){ return !!vjs.USER_AGENT.match('Firefox'); };
+  if (!match) {
+    return null;
+  }
+
+  major = match[1] && parseFloat(match[1]);
+  minor = match[2] && parseFloat(match[2]);
+
+  if (major && minor) {
+    return parseFloat(match[1] + '.' + match[2]);
+  } else if (major) {
+    return major;
+  } else {
+    return null;
+  }
+})();
+// Old Android is defined as Version older than 2.3, and requiring a webkit version of the android browser
+vjs.IS_OLD_ANDROID = vjs.IS_ANDROID && (/webkit/i).test(vjs.USER_AGENT) && vjs.ANDROID_VERSION < 2.3;
+
+vjs.IS_FIREFOX = (/Firefox/i).test(vjs.USER_AGENT);
+vjs.IS_CHROME = (/Chrome/i).test(vjs.USER_AGENT);
 
 
 /**
