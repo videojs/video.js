@@ -42,7 +42,18 @@ Thanks again for helping out! One thing we ask is that you refer to the [code st
   npm install -g grunt-cli
   ```
 
-5. Install required node.js modules using node package manager.
+5. Install the contribflow package. This is a package from Zencoder that video.js developed to streamline the workflow for new features and hotfixes.
+
+  On Unix-based systems, you'll have to do this as a superuser:
+  ```bash
+  sudo npm install -g contribflow
+  ```
+  On Windows, you can just run:
+  ```bash
+  npm install -g contribflow
+  ```
+
+6. Install required node.js modules using node package manager.
 
   You do not need to install these modules as a superuser, so for all platforms run:
   ```bash
@@ -54,7 +65,7 @@ Thanks again for helping out! One thing we ask is that you refer to the [code st
   npm config set color false
   ```
   Note that this change takes effect when a new command prompt window is opened; the current window will not be affected.
-6. Build a local copy and run the current suite of tests. Video.js uses [grunt](http://gruntjs.com), a node-based task automation tool for building and tesing. 
+7. Build a local copy and run the current suite of tests. Video.js uses [grunt](http://gruntjs.com), a node-based task automation tool for building and tesing. 
 
   The following will compile a local copy in the dist/ directory and run tests. It will also create a sourcelist.js file that can be used to load the video.js source scripts in a page.
 
@@ -66,7 +77,7 @@ Thanks again for helping out! One thing we ask is that you refer to the [code st
   grunt test
   ```
 
-7. Depending on whether you're adding something new, making a change or fix a bug, you'll want to do some up-front preparation.
+8. Depending on whether you're adding something new, making a change or fix a bug, you'll want to do some up-front preparation.
    1. If you're fixing a bug, submit an issue for it. If you're fixing an existing bug, claim it by adding a comment to it. This will give a heads-up to anyone watching the issue that you're working on a fix. Please refer to the [Bugs](#bugs) section below for guidelines on filing new issues.
    2. Create a new branch for your work.
 
@@ -78,28 +89,28 @@ Thanks again for helping out! One thing we ask is that you refer to the [code st
 
   Run this command for new features:
   ```bash
-  grunt feature:start
+  contrib feature start
   ```
 
   Run this command if you're fixing an issue:
   ```bash
-  grunt issue:start
+  contrib hotfix start
   ```
 
   You will be prompted to name the branch.  After that, grunt will create the branch locally, push it up to your origin, and track it.  You're now ready to start building your feature or fixing that bug!
 
-8. Thoroughly test your feature or fix. If you're fixing a bug, we recommend in addition to testing the fix itself, to do some testing around the areas that your fix has touched. For example, a brief smoketest of the player never hurts.
+9. Thoroughly test your feature or fix. If you're fixing a bug, we recommend in addition to testing the fix itself, to do some testing around the areas that your fix has touched. For example, a brief smoketest of the player never hurts.
 
-9. Commit your feature or fix locally.
+10. Commit your feature or fix locally.
 
-  Be sure to reference your issue in any commit message. Github allows you to do this though the [fixes](https://github.com/blog/831-issues-2-0-the-next-generation) keyword.
+  Be sure to reference your issue in any commit message. Github allows you to do this through the [fixes](https://github.com/blog/831-issues-2-0-the-next-generation) keyword.
 
   ```bash
   My commit message. fixes issue#123
   Testing:
   (briefly describe any testing here, for example, 'unit tests and cross-browser manual tests around playback and network interruption')
   ```
-10. You can use grunt to submit your [Pull Request](#pull-requests).
+11. You can use grunt to submit your [Pull Request](#pull-requests).
 
   First, checkout your feature or issue branch:
   ```bash
@@ -108,16 +119,16 @@ Thanks again for helping out! One thing we ask is that you refer to the [code st
 
   Next, submit your Pull Request, for your new feature:
   ```bash
-  grunt feature:submit
+  contrib feature submit
   ```
   Or for your bug fix:
   ```bash
-  grunt issue:submit
+  contrib hotfix submit
   ```
 
   You'll be prompted for title and description for the Pull Request.  After that, your Pull Request will be submitted to video-js.
 
-11. You're Done! (except for cleanup.)  And grunt can help with that too!
+12. You're Done! (except for cleanup.)  And grunt can help with that too!
 
   First, checkout your feature or issue branch:
   ```bash
@@ -126,12 +137,12 @@ Thanks again for helping out! One thing we ask is that you refer to the [code st
 
   Run this command to clean up your feature:
   ```bash
-  grunt feature:delete
+  contrib feature delete
   ```
 
   Run this command to clean up your bug fix:
   ```bash
-  grunt issue:delete
+  contrib hotfix delete
   ```
   PLEASE NOTE: THIS WILL DELETE YOUR LOCAL AND REMOTE COPIES OF THE FEATURE.
   This is meant to clean up your local and remote branches, so make sure any changes you don't want to lose have been pulled into the parent project or another branch first.
