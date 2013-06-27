@@ -83,7 +83,7 @@ Thanks again for helping out! One thing we ask is that you refer to the [code st
 
   Since the issue filing process is described elsewhere, let's assume that you've filed or claimed the issue already.
 
-  Next, create the branch.  We've created a grunt plugin that helps you do this.
+  Next, create the branch. You'll use contrib to do this task.
 
   Run this command for new features:
   ```bash
