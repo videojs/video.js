@@ -215,7 +215,7 @@ vjs.Html5.canPlaySource = function(srcObj){
   // https://github.com/videojs/video.js/issues/519
   try {
     return !!vjs.TEST_VID.canPlayType(srcObj.type);
-  } catch() {
+  } catch(e) {
     return '';
   }
   // TODO: Check Type
