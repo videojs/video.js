@@ -16,6 +16,10 @@ vjs.Flash = vjs.MediaTechController.extend({
   init: function(player, options, ready){
     vjs.MediaTechController.call(this, player, options, ready);
 
+    this.player_.on("stageclick", vjs.bind(this, this.onStageClick));
+    this.player_.on("play", vjs.bind(this, this.onPlay));
+    this.player_.on("ended", vjs.bind(this, this.onEnded));
+
     var source = options['source'],
 
         // Which element to embed in
@@ -260,6 +264,24 @@ vjs.Flash.prototype.enterFullScreen = function(){
   return false;
 };
 
+vjs.Flash.prototype.onStageClick = function(){
+  if (this.hasEnded_) {
+    this.currentTime(0);
+  }
+  else if (this.paused()) {
+    this.play();
+  } else {
+    this.pause();
+  }
+};
+
+vjs.Flash.prototype.onPlay = function(){
+  this.hasEnded_ = false;
+};
+
+vjs.Flash.prototype.onEnded = function(){
+  this.hasEnded_ = true;
+};
 
 // Create setters and getters for attributes
 var api = vjs.Flash.prototype,
