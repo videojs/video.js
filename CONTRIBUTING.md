@@ -1,4 +1,4 @@
-If you're on this page, you must be interested in spending some time giving back to this humble project. If that's the case, fantastic! Here are some ways you can help make Video.js a faster, easier, more compatible, and more fully-featured video player.
+If you're on this page, you must be interested in spending some time giving back to this humble project. If that's the case, fantastic! Here are some ways you can help make Video.js a faster, easier, and more fully-featured video player.
 
   * Bug reports and fixes
   * Features and changes
@@ -31,7 +31,7 @@ Thanks again for helping out! One thing we ask is that you refer to the [code st
   git pull upstream master
   ```
 
-4. Install the grunt-cli package so that you will have the correct version of grunt available from any project that needs it. This should be done as a global install:
+4. Install the grunt-cli package so that you will have the correct version of grunt available for any project that needs it. This should be done as a global install:
 
   On Unix-based systems, you'll have to do this as a superuser:
   ```bash
@@ -65,9 +65,7 @@ Thanks again for helping out! One thing we ask is that you refer to the [code st
   npm config set color false
   ```
   Note that this change takes effect when a new command prompt window is opened; the current window will not be affected.
-7. Build a local copy and run the current suite of tests. Video.js uses [grunt](http://gruntjs.com), a node-based task automation tool for building and tesing. 
-
-  The following will compile a local copy in the dist/ directory and run tests. It will also create a sourcelist.js file that can be used to load the video.js source scripts in a page.
+7. Build a local copy and run the current suite of tests.
 
   ```bash
   grunt
@@ -77,7 +75,7 @@ Thanks again for helping out! One thing we ask is that you refer to the [code st
   grunt test
   ```
 
-8. Depending on whether you're adding something new, making a change or fix a bug, you'll want to do some up-front preparation.
+8. Depending on whether you're adding something new, making a change or fixing a bug, you'll want to do some up-front preparation.
    1. If you're fixing a bug, submit an issue for it. If you're fixing an existing bug, claim it by adding a comment to it. This will give a heads-up to anyone watching the issue that you're working on a fix. Please refer to the [Bugs](#bugs) section below for guidelines on filing new issues.
    2. Create a new branch for your work.
 
@@ -97,11 +95,11 @@ Thanks again for helping out! One thing we ask is that you refer to the [code st
   contrib hotfix start
   ```
 
-  You will be prompted to name the branch.  After that, grunt will create the branch locally, push it up to your origin, and track it.  You're now ready to start building your feature or fixing that bug!
+  You will be prompted to name the branch.  After that, contrib will create the branch locally, and use git to push it up to your origin, and track it.  You're now ready to start building your feature or fixing that bug!
 
 9. Thoroughly test your feature or fix. If you're fixing a bug, we recommend in addition to testing the fix itself, to do some testing around the areas that your fix has touched. For example, a brief smoketest of the player never hurts.
 
-10. Commit your feature or fix locally.
+10. Commit and push your feature or hotfix locally. You'll use Git directly for these tasks.
 
   Be sure to reference your issue in any commit message. Github allows you to do this through the [fixes](https://github.com/blog/831-issues-2-0-the-next-generation) keyword.
 
@@ -110,7 +108,7 @@ Thanks again for helping out! One thing we ask is that you refer to the [code st
   Testing:
   (briefly describe any testing here, for example, 'unit tests and cross-browser manual tests around playback and network interruption')
   ```
-11. You can use grunt to submit your [Pull Request](#pull-requests).
+11. Use contrib to submit your [Pull Request](#pull-requests).
 
   First, checkout your feature or issue branch:
   ```bash
@@ -126,9 +124,9 @@ Thanks again for helping out! One thing we ask is that you refer to the [code st
   contrib hotfix submit
   ```
 
-  You'll be prompted for title and description for the Pull Request.  After that, your Pull Request will be submitted to video-js.
+  You'll be prompted for title and description for the Pull Request.  After that, contrib will use Git to submit your Pull Request to video.js.
 
-12. You're Done! (except for cleanup.)  And grunt can help with that too!
+12. You're Done! (except for cleanup.) To clean up your feature or hotfix branch:
 
   First, checkout your feature or issue branch:
   ```bash
