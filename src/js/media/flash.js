@@ -64,7 +64,14 @@ vjs.Flash = vjs.MediaTechController.extend({
 
     // If source was supplied pass as a flash var.
     if (source) {
-      flashVars['src'] = encodeURIComponent(vjs.getAbsoluteURL(source.src));
+      if (source.type && vjs.Flash.isStreamingType(source.type)) {
+        var parts = vjs.Flash.streamToParts(source.src);
+        flashVars['rtmpConnection'] = encodeURIComponent(parts.connection);
+        flashVars['rtmpStream'] = encodeURIComponent(parts.stream);
+      }
+      else {
+        flashVars['src'] = encodeURIComponent(vjs.getAbsoluteURL(source.src));
+      }
     }
 
     // Add placeholder to player div
@@ -227,10 +234,16 @@ vjs.Flash.prototype.pause = function(){
 };
 
 vjs.Flash.prototype.src = function(src){
-  // Make sure source URL is abosolute.
-  src = vjs.getAbsoluteURL(src);
-
-  this.el_.vjs_src(src);
+  if (vjs.Flash.isStreamingSrc(src)) {
+    src = vjs.Flash.streamToParts(src);
+    this.setRtmpConnection(src.connection);
+    this.setRtmpStream(src.stream);
+  }
+  else {
+    // Make sure source URL is abosolute.
+    src = vjs.getAbsoluteURL(src);
+    this.el_.vjs_src(src);
+  }
 
   // Currently the SWF doesn't autoplay if you load a source later.
   // e.g. Load player w/ no source, wait 2s, set src.
@@ -238,6 +251,20 @@ vjs.Flash.prototype.src = function(src){
     var tech = this;
     setTimeout(function(){ tech.play(); }, 0);
   }
+};
+
+vjs.Flash.prototype.currentSrc = function(){
+  var src = this.el_.vjs_getProperty("currentSrc");
+  // no src, check and see if RTMP
+  if (src == null) {
+    var connection = this.rtmpConnection(),
+        stream = this.rtmpStream();
+
+    if (connection && stream) {
+      src = vjs.Flash.streamFromParts(connection, stream);
+    }
+  }
+  return src;
 };
 
 vjs.Flash.prototype.load = function(){
@@ -304,7 +331,7 @@ vjs.Flash.isSupported = function(){
 };
 
 vjs.Flash.canPlaySource = function(srcObj){
-  if (srcObj.type in vjs.Flash.formats) { return 'maybe'; }
+  if (srcObj.type in vjs.Flash.formats || srcObj.type in vjs.Flash.streamingFormats) { return 'maybe'; }
 };
 
 vjs.Flash.formats = {
@@ -312,6 +339,11 @@ vjs.Flash.formats = {
   'video/x-flv': 'FLV',
   'video/mp4': 'MP4',
   'video/m4v': 'MP4'
+};
+
+vjs.Flash.streamingFormats = {
+  'rtmp/mp4': 'MP4',
+  'rtmp/flv': 'FLV'
 };
 
 vjs.Flash['onReady'] = function(currSwf){
@@ -357,6 +389,11 @@ vjs.Flash.checkReady = function(tech){
 // Trigger events from the swf on the player
 vjs.Flash['onEvent'] = function(swfID, eventName){
   var player = vjs.el(swfID)['player'];
+  // ugly, but it smooths over progress and 
+  // time control manual timer issues
+  if (eventName === "ended") {
+    player.trigger("timeupdate");
+  }
   player.trigger(eventName);
 };
 
@@ -452,4 +489,29 @@ vjs.Flash.getEmbedCode = function(swf, flashVars, params, attributes){
   });
 
   return objTag + attrsString + '>' + paramsString + '</object>';
+};
+
+vjs.Flash.streamFromParts = function(connection, stream) {
+  return connection + "," + stream;
+};
+
+vjs.Flash.streamToParts = function(src) {
+  var parts = {
+    connection: '',
+    stream: ''
+  };
+  if (src && src.indexOf(",") !== -1) {
+    src = src.split(",");
+    parts.connection = src[0];
+    parts.stream = src[1];
+  }
+  return parts;
+};
+
+vjs.Flash.isStreamingType = function(srcType) {
+  return srcType in vjs.Flash.streamingFormats;
+};
+
+vjs.Flash.isStreamingSrc = function(src) {
+  return src && src.indexOf(",") !== -1;
 };
