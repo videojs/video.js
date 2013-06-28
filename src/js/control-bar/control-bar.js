@@ -9,50 +9,60 @@ vjs.ControlBar = vjs.Component.extend({
   init: function(player, options){
     vjs.Component.call(this, player, options);
 
-    if (!player.controls()) {
+    // Controls are always off
+    if (player.controls() === false) {
       this.disable();
+    // Controls are always on
+    } else if (player.controls() === true) {
+      this.setup();
+    // Controls fade when not in use
+    } else {
+      this.disable();
+      this.setup();
     }
-
-    player.one('play', vjs.bind(this, function(){
-      var touchstart,
-        fadeIn = vjs.bind(this, this.fadeIn),
-        fadeOut = vjs.bind(this, this.fadeOut);
-
-      this.fadeIn();
-
-      if ( !('ontouchstart' in window) ) {
-        this.player_.on('mouseover', fadeIn);
-        this.player_.on('mouseout', fadeOut);
-        this.player_.on('pause', vjs.bind(this, this.lockShowing));
-        this.player_.on('play', vjs.bind(this, this.unlockShowing));
-      }
-
-      touchstart = false;
-      this.player_.on('touchstart', function() {
-        touchstart = true;
-      });
-      this.player_.on('touchmove', function() {
-        touchstart = false;
-      });
-      this.player_.on('touchend', vjs.bind(this, function(event) {
-        var idx;
-        if (touchstart) {
-          idx = this.el().className.search('fade-in');
-          if (idx !== -1) {
-            this.fadeOut();
-          } else {
-            this.fadeIn();
-          }
-        }
-        touchstart = false;
-
-        if (!this.player_.paused()) {
-          event.preventDefault();
-        }
-      }));
-    }));
   }
 });
+
+vjs.ControlBar.prototype.setup = function(){
+  this.player_.one('play', vjs.bind(this, function(){
+    var touchstart,
+      fadeIn = vjs.bind(this, this.fadeIn),
+      fadeOut = vjs.bind(this, this.fadeOut);
+
+    this.fadeIn();
+
+    if ( !('ontouchstart' in window) ) {
+      this.player_.on('mouseover', fadeIn);
+      this.player_.on('mouseout', fadeOut);
+      this.player_.on('pause', vjs.bind(this, this.lockShowing));
+      this.player_.on('play', vjs.bind(this, this.unlockShowing));
+    }
+
+    touchstart = false;
+    this.player_.on('touchstart', function() {
+      touchstart = true;
+    });
+    this.player_.on('touchmove', function() {
+      touchstart = false;
+    });
+    this.player_.on('touchend', vjs.bind(this, function(event) {
+      var idx;
+      if (touchstart) {
+        idx = this.el().className.search('fade-in');
+        if (idx !== -1) {
+          this.fadeOut();
+        } else {
+          this.fadeIn();
+        }
+      }
+      touchstart = false;
+
+      if (!this.player_.paused()) {
+        event.preventDefault();
+      }
+    }));
+  }));
+}
 
 vjs.ControlBar.prototype.options_ = {
   loadEvent: 'play',
