@@ -113,22 +113,18 @@ vjs.Player.prototype.getTagSettings = function(tag){
 
   // Get tag children settings
   if (tag.hasChildNodes()) {
-    var child, childName,
-        children = tag.childNodes,
-        i = 0,
-        j = children.length;
+    var children, child, childName, i, j;
 
-    for (; i < j; i++) {
+    children = tag.childNodes;
+
+    for (i=0,j=children.length; i<j; i++) {
       child = children[i];
       // Change case needed: http://ejohn.org/blog/nodename-case-sensitivity/
       childName = child.nodeName.toLowerCase();
-
       if (childName === 'source') {
         options['sources'].push(vjs.getAttributeValues(child));
-
       } else if (childName === 'track') {
         options['tracks'].push(vjs.getAttributeValues(child));
-
       }
     }
   }
