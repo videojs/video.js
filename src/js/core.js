@@ -3,7 +3,9 @@
  */
 
 // HTML5 Shiv. Must be in <head> to support older browsers.
-document.createElement('video');document.createElement('audio');
+document.createElement('video');
+document.createElement('audio');
+document.createElement('track');
 
 /**
  * Doubles as the main function for users to create a player instance and also

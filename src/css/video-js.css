@@ -710,23 +710,10 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 .vjs-default-skin .vjs-subtitles-button:before { content: "\e00c"; }
 
 /* There's unfortunately no CC button in FontAwesome, so we need
-    to manually create one. Please +1 the fontawesome request.
+    to use another font. Please +1 the fontawesome request.
     https://github.com/FortAwesome/Font-Awesome/issues/968 */
-.vjs-default-skin .vjs-captions-button {
-  font-size: 1em; /* Font icons are 1.5em */
-}
 .vjs-default-skin .vjs-captions-button:before {
   content: "\e008";
-  font-family: VideoJS;
-  font-size: 1.5em;
-  line-height: 2;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  text-shadow: none;
 }
 
 
