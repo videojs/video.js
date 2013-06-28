@@ -148,11 +148,22 @@ vjs.Player.prototype.createEl = function(){
   // so we'll need to turn off any default tracks if we're manually doing
   // captions and subtitles. videoElement.textTracks
   if (tag.hasChildNodes()) {
-    var nrOfChildNodes = tag.childNodes.length;
-    for (var i=0,j=tag.childNodes;i<nrOfChildNodes;i++) {
-      if (j[0].nodeName.toLowerCase() == 'source' || j[0].nodeName.toLowerCase() == 'track') {
-        tag.removeChild(j[0]);
+    var nodes, nodesLength, i, node, nodeName, removeNodes;
+
+    nodes = tag.childNodes;
+    nodesLength = nodes.length;
+    removeNodes = [];
+
+    while (nodesLength--) {
+      node = nodes[nodesLength];
+      nodeName = node.nodeName.toLowerCase();
+      if (nodeName === 'source' || nodeName === 'track') {
+        removeNodes.push(node);
       }
+    }
+
+    for (var i = 0; i < removeNodes.length; i++) {
+      tag.removeChild(removeNodes[i]);
     }
   }
 

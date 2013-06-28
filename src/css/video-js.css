@@ -712,9 +712,9 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 /* There's unfortunately no CC button in FontAwesome, so we need
     to manually create one. Please +1 the fontawesome request.
     https://github.com/FortAwesome/Font-Awesome/issues/968 */
-.vjs-default-skin .vjs-captions-button {
+/*.vjs-default-skin .vjs-captions-button {
   font-size: 1em; /* Font icons are 1.5em */
-}
+/*}*/
 .vjs-default-skin .vjs-captions-button:before {
   content: "\e008";
   font-family: VideoJS;
