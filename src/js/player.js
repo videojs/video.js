@@ -113,22 +113,18 @@ vjs.Player.prototype.getTagSettings = function(tag){
 
   // Get tag children settings
   if (tag.hasChildNodes()) {
-    var child, childName,
-        children = tag.childNodes,
-        i = 0,
-        j = children.length;
+    var children, child, childName, i, j;
 
-    for (; i < j; i++) {
+    children = tag.childNodes;
+
+    for (i=0,j=children.length; i<j; i++) {
       child = children[i];
       // Change case needed: http://ejohn.org/blog/nodename-case-sensitivity/
       childName = child.nodeName.toLowerCase();
-
       if (childName === 'source') {
         options['sources'].push(vjs.getAttributeValues(child));
-
       } else if (childName === 'track') {
         options['tracks'].push(vjs.getAttributeValues(child));
-
       }
     }
   }
@@ -148,11 +144,22 @@ vjs.Player.prototype.createEl = function(){
   // so we'll need to turn off any default tracks if we're manually doing
   // captions and subtitles. videoElement.textTracks
   if (tag.hasChildNodes()) {
-    var nrOfChildNodes = tag.childNodes.length;
-    for (var i=0,j=tag.childNodes;i<nrOfChildNodes;i++) {
-      if (j[0].nodeName.toLowerCase() == 'source' || j[0].nodeName.toLowerCase() == 'track') {
-        tag.removeChild(j[0]);
+    var nodes, nodesLength, i, node, nodeName, removeNodes;
+
+    nodes = tag.childNodes;
+    nodesLength = nodes.length;
+    removeNodes = [];
+
+    while (nodesLength--) {
+      node = nodes[nodesLength];
+      nodeName = node.nodeName.toLowerCase();
+      if (nodeName === 'source' || nodeName === 'track') {
+        removeNodes.push(node);
       }
+    }
+
+    for (i=0; i<removeNodes.length; i++) {
+      tag.removeChild(removeNodes[i]);
     }
   }
 
