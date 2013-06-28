@@ -82,8 +82,12 @@ test('should dispose of component and children', function(){
   var data = vjs.getData(comp.el());
   var id = comp.el()[vjs.expando];
 
+  var hasDisposed = false;
+  comp.on('dispose', function(){ hasDisposed = true; });
+
   comp.dispose();
 
+  ok(hasDisposed, 'component fired dispose event');
   ok(!comp.children(), 'component children were deleted');
   ok(!comp.el(), 'component element was deleted');
   ok(!child.children(), 'child children were deleted');
