@@ -207,11 +207,17 @@ vjs.Html5.prototype.defaultMuted = function(){ return this.el_.defaultMuted; };
 /* HTML5 Support Testing ---------------------------------------------------- */
 
 vjs.Html5.isSupported = function(){
-  return !!document.createElement('video').canPlayType;
+  return !!vjs.TEST_VID.canPlayType;
 };
 
 vjs.Html5.canPlaySource = function(srcObj){
-  return !!document.createElement('video').canPlayType(srcObj.type);
+  // IE9 on Windows 7 without MediaPlayer throws an error here
+  // https://github.com/videojs/video.js/issues/519
+  try {
+    return !!vjs.TEST_VID.canPlayType(srcObj.type);
+  } catch(e) {
+    return '';
+  }
   // TODO: Check Type
   // If no Type, check ext
   // Check Media Type
