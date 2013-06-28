@@ -2,6 +2,11 @@ CHANGELOG
 =========
 
 ## Unreleased (HEAD)
+_(none)_
+
+--------------------
+
+## 4.1.0 (2013-06-28)
 * Turned on method queuing for unready playback technologies (flash) [view](https://github.com/videojs/video.js/pull/553)
 * Blocking user text selection on player components [view](https://github.com/videojs/video.js/pull/524)
 * Exported requestFullScreen() and cancelFullScreen() in the minified version [view](https://github.com/videojs/video.js/pull/555)
@@ -13,8 +18,6 @@ CHANGELOG
 * Augmented user agent detection, specifically for Android versions ([view](https://github.com/videojs/video.js/pull/470))
 * Fixed IE9 canPlayType error ([view](https://github.com/videojs/video.js/pull/606))
 * Fixed various issues with captions ([view](https://github.com/videojs/video.js/pull/609))
-
---------------------
 
 ## 4.0.4 (2013-06-11)
 * Added google analytics to current CDN version. ([view](https://github.com/videojs/video.js/pull/571))
