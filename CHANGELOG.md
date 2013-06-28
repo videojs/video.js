@@ -11,6 +11,7 @@ CHANGELOG
 * Fixed an IE poster error when autoplaying ([view](https://github.com/videojs/video.js/pull/593))
 * Exported bufferedPercent for the API ([view](https://github.com/videojs/video.js/pull/588))
 * Augmented user agent detection, specifically for Android versions ([view](https://github.com/videojs/video.js/pull/470))
+* Fixed IE9 canPlayType error ([view](https://github.com/videojs/video.js/pull/606))
 
 --------------------
 
