@@ -162,7 +162,7 @@ vjs.Player.prototype.createEl = function(){
       }
     }
 
-    for (var i = 0; i < removeNodes.length; i++) {
+    for (i=0; i<removeNodes.length; i++) {
       tag.removeChild(removeNodes[i]);
     }
   }
