@@ -108,7 +108,8 @@ test('should get tag, source, and track settings', function(){
 
   player.dispose();
 
-  ok(tag['player'] === null, 'tag player ref killed');
+
+  ok(tag['player'] !== player, 'tag player ref killed');
   ok(!vjs.players['example_1'], 'global player ref killed');
   ok(player.el() === null, 'player el killed');
 });

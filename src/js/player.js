@@ -210,7 +210,7 @@ vjs.Player.prototype.loadTech = function(techName, source){
   // So we need to remove it if we're not loading HTML5
   } else if (techName !== 'Html5' && this.tag) {
     this.el_.removeChild(this.tag);
-    this.tag.player = null;
+    this.tag['player'] = null;
     this.tag = null;
   }
 
