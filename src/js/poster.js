@@ -15,7 +15,10 @@ vjs.PosterImage = vjs.Button.extend({
       this.hide();
     }
 
-    player.on('play', vjs.bind(this, this.hide));
+    if(player.tag.tagName=="AUDIO");// console.log("dont hide poster");
+    else{
+      player.on('play', vjs.bind(this, this.hide));
+    } 
   }
 });
 
