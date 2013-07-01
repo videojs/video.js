@@ -552,7 +552,7 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 /* Loading Spinner
 ---------------------------------------------------------*/
 .vjs-loading-spinner {
-  display: none;
+  display:inline-block;
   position: absolute;
   top: 50%;
   left: 50%;
