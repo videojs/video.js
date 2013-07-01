@@ -81,6 +81,11 @@ body.vjs-full-window {
   position: relative;
   width: 100%;
 }
+
+audio + div + .vjs-poster{
+  display:block !important;
+}
+
 .vjs-poster img {
   display: block;
   margin: 0 auto;
