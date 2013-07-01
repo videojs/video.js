@@ -536,6 +536,27 @@ vjs.Component.prototype.hide = function(){
   this.el_.style.display = 'none';
   return this;
 };
+/**
+ * insert spinner 
+ * @return {vjs.Component}
+ */
+vjs.Component.prototype.insertSpinner = function(){ 
+  var parent=vjs.el(vjs.players[Object.keys(vjs.players)[0]].id_);
+  //console.log("parent.id insert:"+parent);
+  parent.insertBefore(this.el_, parent.childNodes[4]);
+  return this;
+};
+/**
+ * remove spinner if it is a child of vjs wrapper div
+ * @return {vjs.Component}
+ */
+vjs.Component.prototype.removeSpinner = function(){
+  var parent=vjs.el(vjs.players[Object.keys(vjs.players)[0]].id_);
+  //console.log("parent.id remove:"+parent.id);
+  if(parent.children.length==7) parent.removeChild(this.el_);      
+  return this;
+};
+
 
 /**
  * Fade a component in using CSS
