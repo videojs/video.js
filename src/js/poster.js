@@ -40,5 +40,9 @@ vjs.PosterImage.prototype.createEl = function(){
 };
 
 vjs.PosterImage.prototype.onClick = function(){
-  this.player_.play();
+  if (this.player_.paused()) {
+    this.player_.play();
+  } else {
+    this.player_.pause();
+  } 
 };
