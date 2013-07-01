@@ -29,6 +29,7 @@ vjs.Player = vjs.Component.extend({
     if (options['customControlsOnMobile'] !== true && (vjs.IS_IOS || vjs.IS_ANDROID)) {
       tag.controls = options['controls'];
       this.controls_ = false;
+      if(this.tag.tagName=="AUDIO") this.controls_ = true; 
     } else {
       // Original tag settings stored in options
       // now remove immediately so native controls don't flash.
