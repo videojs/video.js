@@ -15,11 +15,12 @@ vjs.PosterImage = vjs.Button.extend({
       this.hide();
     }
 
-    if(player.tag.tagName && player.tag.tagName=='AUDIO');// "dont hide poster";
+    player.on('play', vjs.bind(this, this.hide));
+    /*if(player.tag.tagName && player.tag.tagName=='AUDIO');// "dont hide poster";
     else{
 
       player.on('play', vjs.bind(this, this.hide));
-    }
+    }*/
   }
 });
 
