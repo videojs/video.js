@@ -15,10 +15,10 @@ vjs.PosterImage = vjs.Button.extend({
       this.hide();
     }
 
-    if(player.tag.tagName=="AUDIO");// console.log("dont hide poster");
+    if(player.tag.tagName=='AUDIO');// "dont hide poster";
     else{
       player.on('play', vjs.bind(this, this.hide));
-    } 
+    }
   }
 });
 
@@ -47,5 +47,5 @@ vjs.PosterImage.prototype.onClick = function(){
     this.player_.play();
   } else {
     this.player_.pause();
-  } 
+  }
 };

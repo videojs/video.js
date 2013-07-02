@@ -540,9 +540,8 @@ vjs.Component.prototype.hide = function(){
  * insert spinner 
  * @return {vjs.Component}
  */
-vjs.Component.prototype.insertSpinner = function(){ 
-  var parent=vjs.el(vjs.players[Object.keys(vjs.players)[0]].id_);
-  //console.log("parent.id insert:"+parent);
+vjs.Component.prototype.insertSpinner = function(){
+  var parent = vjs.el(vjs.players[Object.keys(vjs.players)[0]].id_);
   parent.insertBefore(this.el_, parent.childNodes[4]);
   return this;
 };
@@ -551,9 +550,8 @@ vjs.Component.prototype.insertSpinner = function(){
  * @return {vjs.Component}
  */
 vjs.Component.prototype.removeSpinner = function(){
-  var parent=vjs.el(vjs.players[Object.keys(vjs.players)[0]].id_);
-  //console.log("parent.id remove:"+parent.id);
-  if(parent.children.length==7) parent.removeChild(this.el_);      
+  var parent = vjs.el(vjs.players[Object.keys(vjs.players)[0]].id_);
+  if(parent.children.length==7) parent.removeChild(this.el_);
   return this;
 };
 
