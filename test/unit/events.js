@@ -89,3 +89,44 @@ test('should stop immediate propagtion', function(){
 
   vjs.trigger(el, 'test');
 });
+
+test('bubbling events should go up the dom', function() {
+  expect(2);
+
+  var parent = document.createElement('div');
+  var child = document.createElement('div');
+  parent.appendChild(child);
+
+  var eventBubbles = function(e) {
+    return (e.bubbles === undefined || e.bubbles === true);
+  };
+
+  vjs.on(child, 'bubbles', function(e) {
+    ok(eventBubbles(e), 'Child listener fired');
+  });
+
+  vjs.on(parent, 'bubbles', function(e) {
+    ok(eventBubbles(e), 'Parent listener fired');
+  });
+
+  vjs.trigger(child, 'bubbles');
+});
+
+test('non-bubbling events should NOT go up the dom', function() {
+  expect(1);
+
+  var parent = document.createElement('div');
+  var child = document.createElement('div');
+  parent.appendChild(child);
+
+  vjs.on(child, 'bubbles', function(e) {
+    ok(e.bubbles === false, 'Child listener fired with no bubbling');
+  });
+
+  vjs.on(parent, 'bubbles', function(e) {
+    ok(false, 'Parent listener fired with no bubbling - fail.');
+  });
+
+  vjs.trigger(child, {type:'bubbles', bubbles:false});
+});
+

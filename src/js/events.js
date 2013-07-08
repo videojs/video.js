@@ -277,24 +277,27 @@ vjs.trigger = function(elem, event) {
     elemData.dispatcher.call(elem, event);
   }
 
-  // Unless explicitly stopped, recursively calls this function to bubble the event up the DOM.
-  if (parent && !event.isPropagationStopped()) {
-    vjs.trigger(parent, event);
+  // If this event bubbles up the DOM, recursively call this function on parent.
+  if (event.bubbles === undefined || event.bubbles !== false) {
+    // Unless explicitly stopped
+    if (parent && !event.isPropagationStopped()) {
+      vjs.trigger(parent, event);
 
-  // If at the top of the DOM, triggers the default action unless disabled.
-  } else if (!parent && !event.isDefaultPrevented()) {
-    var targetData = vjs.getData(event.target);
+    // If at the top of the DOM, triggers the default action unless disabled.
+    } else if (!parent && !event.isDefaultPrevented()) {
+      var targetData = vjs.getData(event.target);
 
-    // Checks if the target has a default action for this event.
-    if (event.target[event.type]) {
-      // Temporarily disables event dispatching on the target as we have already executed the handler.
-      targetData.disabled = true;
-      // Executes the default action.
-      if (typeof event.target[event.type] === 'function') {
-        event.target[event.type]();
+      // Checks if the target has a default action for this event.
+      if (event.target[event.type]) {
+        // Temporarily disables event dispatching on the target as we have already executed the handler.
+        targetData.disabled = true;
+        // Executes the default action.
+        if (typeof event.target[event.type] === 'function') {
+          event.target[event.type]();
+        }
+        // Re-enables event dispatching.
+        targetData.disabled = false;
       }
-      // Re-enables event dispatching.
-      targetData.disabled = false;
     }
   }
 
