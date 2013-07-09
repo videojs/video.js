@@ -455,7 +455,7 @@ vjs.formatTime = function(seconds, guide) {
       gh = Math.floor(guide / 3600);
 
   // handle invalid times
-  if (window.isNaN(seconds) || seconds === Infinity) {
+  if (window['isNaN'](seconds) || seconds === Infinity) {
     // '-' is false for all relational operators (e.g. <, >=) so this setting
     // will add the minimum number of fields specified by the guide
     h = m = s = '-';
