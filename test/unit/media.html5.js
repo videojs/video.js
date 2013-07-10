@@ -33,3 +33,22 @@ test('should re-link the player if the tech is moved', function(){
 
   strictEqual(player, tech.el()['player']);
 });
+
+test('should not call default action on media event', function() {
+  expect(2);
+  var player = {
+    id: function() { return 'id'; },
+    el: function() { return document.createElement('div'); },
+    options_: {},
+    trigger: function(event) {
+      ok(event.type === 'play', 'non-play media event fired');
+      ok(event.isDefaultPrevented(), 'default action not prevented');
+    },
+    ready: function() {}
+  };
+  var tech = new vjs.Html5(player, { el: vjs.TEST_VID });
+  // Mediafaker doesn't support play/pause, so dispatch an event manually.
+  var event = document.createEvent('CustomEvent');
+  event.initCustomEvent('play', false /*bubbles*/, true /*cancelable*/, null);
+  tech.el_.dispatchEvent(event);
+});

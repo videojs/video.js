@@ -110,6 +110,10 @@ vjs.Html5.prototype.setupTriggers = function(){
 // Triggers removed using this.off when disposed
 
 vjs.Html5.prototype.eventHandler = function(e){
+  // Prevent default action from being called on the target (the video element),
+  // as all events handled here originated from it. Fixes #620.
+  e.preventDefault();
+
   this.trigger(e);
 
   // No need for media events to bubble up.
