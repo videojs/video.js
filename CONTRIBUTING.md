@@ -193,30 +193,6 @@ To get around this you can do either of the following:
 
 2. [Disable the version of Flash included with Chrome](http://helpx.adobe.com/flash-player/kb/flash-player-google-chrome.html#How_can_I_run_debugger_or_alternate_versions_of_Flash_Player_in_Google_Chrome) and enable a system-wide version of Flash instead.
 
-## Pull requests
-
-Good pull requests - bug fixes, improvements, new features - are a fantastic help. They should remain focused in scope and avoid containing unrelated commits. If your contribution involves a significant amount of work or substantial changes to any part of the project, please open an issue to discuss it first.
-
-Make sure to adhere to the coding conventions used throughout a project (indentation, accurate comments, etc.). Please update any documentation that is relevant to the change you're making.
-
-Please follow this process; it's the best way to get your work included in the project:
-
-1. Commit your changes in logical chunks. Please adhere to these [git commit message guidelines](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) or your pull request is unlikely be merged into the main project. Use git's [interactive rebase](https://help.github.com/articles/interactive-rebase) feature to tidy up your commits before making them public.
-
-2. Locally merge (or rebase) the upstream development branch into your topic branch:
-
-   ```bash
-   git pull [--rebase] upstream master
-   ```
-
-3. Push your topic branch up to your fork:
-
-   ```bash
-   git push origin <topic-branch-name>
-   ```
-
-4. [Open a Pull Request](http://help.github.com/send-pull-requests/) with a clear title and description.
-
 # Code Style
 Please follow [Google's JavaScript Style Guide](http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml) to the letter. If your editor supports [.editorconfig](http://editorconfig.org/#download) it will make it easier to manage differences from your own coding style.
 
