@@ -1,0 +1,21 @@
+/*
+Bunyip is a tool for multi-browser/device testing
+  https://github.com/ryanseddon/bunyip
+It uses a few service under the hood including:
+  Browsertack - http://browserstack.com
+  Pagekite https://pagekite.net
+You'll need accounts at both to use bunyip
+You'll also need to download and install pagekite.py
+*/
+var config = {
+    "browserstack": {
+        "username": "your-browserstack-email@example.com",
+        "password": "your browserstack password",
+        "timeout": 300
+    },
+    "port": 9000,
+    "tunnellink": "your-subdomain.pagekite.me",
+    "tunnel": "pagekite.py <port> your-subdomain.pagekite.me"
+};
+
+module.exports = config;

@@ -58,4 +58,5 @@ vjs.one(window, 'load', function(){
 });
 
 // Run Auto-load players
-vjs.autoSetup();
+// You have to wait at least once in case this script is loaded after your video in the DOM (weird behavior only with minified version)
+vjs.autoSetupTimeout(1);

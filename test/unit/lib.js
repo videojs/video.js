@@ -41,6 +41,17 @@ test('should copy an object', function(){
   deepEqual(asdf,fdsa);
 });
 
+test('should check if an object is plain', function(){
+  var empty = {};
+  ok(vjs.obj.isPlain(empty) === true, 'Empty object is plain');
+
+  var node = document.createElement('div');
+  ok(vjs.obj.isPlain(node) === false, 'DOM node is not plain');
+
+  var fn = function(){};
+  ok(vjs.obj.isPlain(fn) === false, 'Function is not plain');
+});
+
 test('should add context to a function', function(){
   var newContext = { test: 'obj'};
   var asdf = function(){
@@ -83,8 +94,6 @@ test('should get and remove data from an element', function(){
 });
 
 test('should read tag attributes from elements, including HTML5 in all browsers', function(){
-  var container = document.createElement('div');
-
   var tags = '<video id="vid1" controls autoplay loop muted preload="none" src="http://google.com" poster="http://www2.videojs.com/img/video-js-html5-video-player.png" data-test="asdf" data-empty-string=""></video>';
   tags += '<video id="vid2">';
   // Not putting source and track inside video element because
@@ -92,8 +101,9 @@ test('should read tag attributes from elements, including HTML5 in all browsers'
   // Still may not work in oldIE.
   tags += '<source id="source" src="http://google.com" type="video/mp4" media="fdsa" title="test" >';
   tags += '<track id="track" default src="http://google.com" kind="captions" srclang="en" label="testlabel" title="test" >';
-  container.innerHTML += tags;
-  document.getElementById('qunit-fixture').appendChild(container);
+  tags += '</video>';
+
+  document.getElementById('qunit-fixture').innerHTML += tags;
 
   var vid1Vals = vjs.getAttributeValues(document.getElementById('vid1'));
   var vid2Vals = vjs.getAttributeValues(document.getElementById('vid2'));
@@ -120,8 +130,8 @@ test('should get the right style values for an element', function(){
   el.style.height = '100%';
   el.style.width = '123px';
 
-  ok(vjs.getComputedStyleValue(el, 'height') === '1000px');
-  ok(vjs.getComputedStyleValue(el, 'width') === '123px');
+  ok(vjs.getComputedDimension(el, 'height') === '1000px');
+  ok(vjs.getComputedDimension(el, 'width') === '123px');
 });
 
 test('should insert an element first in another', function(){
@@ -193,4 +203,22 @@ test('should get an absolute URL', function(){
   // ok(vjs.getAbsoluteURL('unit.html') === window.location.href);
   ok(vjs.getAbsoluteURL('http://asdf.com') === 'http://asdf.com');
   ok(vjs.getAbsoluteURL('https://asdf.com/index.html') === 'https://asdf.com/index.html');
+});
+
+test('vjs.findPosition should find top and left position', function() {
+  var d = document.createElement('div'),
+    position = vjs.findPosition(d);
+  d.style.top = '10px';
+  d.style.left = '20px';
+  d.style.position = 'absolute';
+
+  deepEqual(position, {left: 0, top: 0}, 'If element isn\'t in the DOM, we should get zeros');
+
+  document.body.appendChild(d);
+  position = vjs.findPosition(d);
+  deepEqual(position, {left: 20, top: 10}, 'The position was not correct');
+
+  d.getBoundingClientRect = null;
+  position = vjs.findPosition(d);
+  deepEqual(position, {left: 0, top: 0}, 'If there is no gBCR, we should get zeros');
 });

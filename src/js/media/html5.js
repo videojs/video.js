@@ -9,42 +9,53 @@
  * @param {Function=} ready
  * @constructor
  */
-vjs.Html5 = function(player, options, ready){
-  goog.base(this, player, options, ready);
+vjs.Html5 = vjs.MediaTechController.extend({
+  /** @constructor */
+  init: function(player, options, ready){
+    // volume cannot be changed from 1 on iOS
+    this.features.volumeControl = vjs.Html5.canControlVolume();
 
-  var source = options['source'];
+    // In iOS, if you move a video element in the DOM, it breaks video playback.
+    this.features.movingMediaElementInDOM = !vjs.IS_IOS;
 
-  // If the element source is already set, we may have missed the loadstart event, and want to trigger it.
-  // We don't want to set the source again and interrupt playback.
-  if (source && this.el_.currentSrc == source.src) {
-    player.trigger('loadstart');
+    // HTML video is able to automatically resize when going to fullscreen
+    this.features.fullscreenResize = true;
 
-  // Otherwise set the source if one was provided.
-  } else if (source) {
-    this.el_.src = source.src;
-  }
+    vjs.MediaTechController.call(this, player, options, ready);
 
-  // Chrome and Safari both have issues with autoplay.
-  // In Safari (5.1.1), when we move the video element into the container div, autoplay doesn't work.
-  // In Chrome (15), if you have autoplay + a poster + no controls, the video gets hidden (but audio plays)
-  // This fixes both issues. Need to wait for API, so it updates displays correctly
-  player.ready(function(){
-    if (this.options_['autoplay'] && this.paused()) {
-      this.tag.poster = null; // Chrome Fix. Fixed in Chrome v16.
-      this.play();
+    var source = options['source'];
+
+    // If the element source is already set, we may have missed the loadstart event, and want to trigger it.
+    // We don't want to set the source again and interrupt playback.
+    if (source && this.el_.currentSrc == source.src) {
+      player.trigger('loadstart');
+
+    // Otherwise set the source if one was provided.
+    } else if (source) {
+      this.el_.src = source.src;
     }
-  });
 
-  this.on('click', this.onClick);
+    // Chrome and Safari both have issues with autoplay.
+    // In Safari (5.1.1), when we move the video element into the container div, autoplay doesn't work.
+    // In Chrome (15), if you have autoplay + a poster + no controls, the video gets hidden (but audio plays)
+    // This fixes both issues. Need to wait for API, so it updates displays correctly
+    player.ready(function(){
+      if (this.tag && this.options_['autoplay'] && this.paused()) {
+        delete this.tag['poster']; // Chrome Fix. Fixed in Chrome v16.
+        this.play();
+      }
+    });
 
-  this.setupTriggers();
+    this.on('click', this.onClick);
 
-  this.triggerReady();
-};
-goog.inherits(vjs.Html5, vjs.MediaTechController);
+    this.setupTriggers();
+
+    this.triggerReady();
+  }
+});
 
 vjs.Html5.prototype.dispose = function(){
-  goog.base(this, 'dispose');
+  vjs.MediaTechController.prototype.dispose.call(this);
 };
 
 vjs.Html5.prototype.createEl = function(){
@@ -60,6 +71,8 @@ vjs.Html5.prototype.createEl = function(){
 
     // If the original tag is still there, remove it.
     if (el) {
+      el['player'] = null;
+      player.tag = null;
       player.el().removeChild(el);
       el = el.cloneNode(false);
     } else {
@@ -68,6 +81,9 @@ vjs.Html5.prototype.createEl = function(){
         className:'vjs-tech'
       });
     }
+    // associate the player with the new tag
+    el['player'] = player;
+
     vjs.insertFirst(el, player.el());
   }
 
@@ -94,9 +110,6 @@ vjs.Html5.prototype.setupTriggers = function(){
 // Triggers removed using this.off when disposed
 
 vjs.Html5.prototype.eventHandler = function(e){
-  // We'll be triggring play ourselves, thank you.
-  if (e.type === 'play') return;
-
   this.trigger(e);
 
   // No need for media events to bubble up.
@@ -133,7 +146,7 @@ vjs.Html5.prototype.supportsFullScreen = function(){
   if (typeof this.el_.webkitEnterFullScreen == 'function') {
 
     // Seems to be broken in Chromium/Chrome && Safari in Leopard
-    if (!navigator.userAgent.match('Chrome') && !navigator.userAgent.match('Mac OS X 10.5')) {
+    if (/Android/.test(vjs.USER_AGENT) || !/Chrome|Mac OS X 10.5/.test(vjs.USER_AGENT)) {
       return true;
     }
   }
@@ -141,24 +154,24 @@ vjs.Html5.prototype.supportsFullScreen = function(){
 };
 
 vjs.Html5.prototype.enterFullScreen = function(){
-  try {
-    this.el_.webkitEnterFullScreen();
-  } catch (e) {
-    if (e.code == 11) {
-      // this.warning(VideoJS.warnings.videoNotReady);
-      vjs.log('Video.js: Video not ready.');
-    }
+  var video = this.el_;
+  if (video.paused && video.networkState <= video.HAVE_METADATA) {
+    // attempt to prime the video element for programmatic access
+    // this isn't necessary on the desktop but shouldn't hurt
+    this.el_.play();
+
+    // playing and pausing synchronously during the transition to fullscreen
+    // can get iOS ~6.1 devices into a play/pause loop
+    setTimeout(function(){
+      video.pause();
+      video.webkitEnterFullScreen();
+    }, 0);
+  } else {
+    video.webkitEnterFullScreen();
   }
 };
 vjs.Html5.prototype.exitFullScreen = function(){
-    try {
-      this.el_.webkitExitFullScreen();
-    } catch (e) {
-      if (e.code == 11) {
-        // this.warning(VideoJS.warnings.videoNotReady);
-        vjs.log('Video.js: Video not ready.');
-      }
-    }
+  this.el_.webkitExitFullScreen();
 };
 vjs.Html5.prototype.src = function(src){ this.el_.src = src; };
 vjs.Html5.prototype.load = function(){ this.el_.load(); };
@@ -194,11 +207,17 @@ vjs.Html5.prototype.defaultMuted = function(){ return this.el_.defaultMuted; };
 /* HTML5 Support Testing ---------------------------------------------------- */
 
 vjs.Html5.isSupported = function(){
-  return !!document.createElement('video').canPlayType;
+  return !!vjs.TEST_VID.canPlayType;
 };
 
 vjs.Html5.canPlaySource = function(srcObj){
-  return !!document.createElement('video').canPlayType(srcObj.type);
+  // IE9 on Windows 7 without MediaPlayer throws an error here
+  // https://github.com/videojs/video.js/issues/519
+  try {
+    return !!vjs.TEST_VID.canPlayType(srcObj.type);
+  } catch(e) {
+    return '';
+  }
   // TODO: Check Type
   // If no Type, check ext
   // Check Media Type
@@ -215,32 +234,10 @@ vjs.Html5.Events = 'loadstart,suspend,abort,error,emptied,stalled,loadedmetadata
 
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //
-vjs.Html5.prototype.features = {
-
-  // Support for video element specific full screen. (webkitEnterFullScreen, not requestFullscreen which we use on the player div)
-  // http://developer.apple.com/library/safari/#documentation/AudioVideo/Reference/HTMLVideoElementClassReference/HTMLVideoElement/HTMLVideoElement.html
-  // Seems to be broken in Chromium/Chrome && Safari in Leopard
-  fullscreen: (vjs.TEST_VID.webkitEnterFullScreen)
-    ? ((!vjs.USER_AGENT.match('Chrome') && !vjs.USER_AGENT.match('Mac OS X 10.5')
-      ? true
-      : false))
-    : false,
-
-  // In iOS, if you move a video element in the DOM, it breaks video playback.
-  movingMediaElementInDOM: !vjs.IS_IOS,
-
-  // volume cannot be changed from 1 on iOS
-  volumeControl: vjs.Html5.canControlVolume()
-};
-
-// Android
-if (vjs.IS_ANDROID) {
 
   // Override Android 2.2 and less canPlayType method which is broken
-  if (vjs.ANDROID_VERSION < 3) {
-    document.createElement('video').constructor.prototype.canPlayType = function(type){
-      return (type && type.toLowerCase().indexOf('video/mp4') != -1) ? 'maybe' : '';
-    };
-  }
+if (vjs.IS_OLD_ANDROID) {
+  document.createElement('video').constructor.prototype.canPlayType = function(type){
+    return (type && type.toLowerCase().indexOf('video/mp4') != -1) ? 'maybe' : '';
+  };
 }
-

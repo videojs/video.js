@@ -8,30 +8,53 @@
  * @param {Object=} options Options object
  * @constructor
  */
-vjs.MediaTechController = function(player, options, ready){
-  goog.base(this, player, options, ready);
+vjs.MediaTechController = vjs.Component.extend({
+  /** @constructor */
+  init: function(player, options, ready){
+    vjs.Component.call(this, player, options, ready);
 
-  // Make playback element clickable
-  // this.addEvent('click', this.proxy(this.onClick));
+    // Make playback element clickable
+    // this.addEvent('click', this.proxy(this.onClick));
 
-  // player.triggerEvent('techready');
-};
-goog.inherits(vjs.MediaTechController, vjs.Component);
+    // player.triggerEvent('techready');
+  }
+});
 
 // destroy: function(){},
 // createElement: function(){},
 
 /**
  * Handle a click on the media element. By default will play the media.
+ *
+ * On android browsers, having this toggle play state interferes with being
+ * able to toggle the controls and toggling play state with the play button
  */
-vjs.MediaTechController.prototype.onClick = function(){
-  if (this.player_.controls()) {
-    if (this.player_.paused()) {
-      this.player_.play();
-    } else {
-      this.player_.pause();
-    }
+vjs.MediaTechController.prototype.onClick = (function(){
+  if (vjs.IS_ANDROID) {
+    return function () {};
+  } else {
+    return function () {
+      if (this.player_.controls()) {
+        if (this.player_.paused()) {
+          this.player_.play();
+        } else {
+          this.player_.pause();
+        }
+      }
+    };
   }
+})();
+
+vjs.MediaTechController.prototype.features = {
+  volumeControl: true,
+
+  // Resizing plugins using request fullscreen reloads the plugin
+  fullscreenResize: false,
+
+  // Optional events that we can manually mimic with timers
+  // currently not triggered by video-js-swf
+  progressEvents: false,
+  timeupdateEvents: false
 };
 
 vjs.media = {};

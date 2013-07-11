@@ -19,7 +19,7 @@ Alternatively, you can use the data-setup attribute to provide options in the [J
 Finally, if you're not using the data-setup attribute to trigger the player setup, you can pass in an object with the player options as the second argument in the javascript setup function.
 
 ```js
-_V_("example_video_1", { "controls": true, "autoplay": false, "preload": "auto" });
+videojs("example_video_1", { "controls": true, "autoplay": false, "preload": "auto" });
 ```
 
 
@@ -53,7 +53,7 @@ or
 
 
 ### autoplay ###
-If autoplay is true, the video will start playing as soon as page is loaded (without any interaction from the user).  
+If autoplay is true, the video will start playing as soon as page is loaded (without any interaction from the user).
 NOT SUPPORTED BY APPLE iOS DEVICES. Apple blocks the autoplay functionality in an effort to protect it's customers from unwillingly using a lot of their (often expensive) monthly data plans. A user touch/click is required to start the video in this case.
 ```html
 <video autoplay ...>

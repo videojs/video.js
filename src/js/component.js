@@ -9,34 +9,37 @@
  * @param {Object=} options
  * @constructor
  */
-vjs.Component = function(player, options, ready){
-  this.player_ = player;
+vjs.Component = vjs.CoreObject.extend({
+  /** @constructor */
+  init: function(player, options, ready){
+    this.player_ = player;
 
-  // Make a copy of prototype.options_ to protect against overriding global defaults
-  this.options_ = vjs.obj.copy(this.options_);
+    // Make a copy of prototype.options_ to protect against overriding global defaults
+    this.options_ = vjs.obj.copy(this.options_);
 
-  // Updated options with supplied options
-  options = this.options(options);
+    // Updated options with supplied options
+    options = this.options(options);
 
-  // Get ID from options, element, or create using player ID and unique ID
-  this.id_ = options['id'] || ((options['el'] && options['el']['id']) ? options['el']['id'] : player.id() + '_component_' + vjs.guid++ );
+    // Get ID from options, element, or create using player ID and unique ID
+    this.id_ = options['id'] || ((options['el'] && options['el']['id']) ? options['el']['id'] : player.id() + '_component_' + vjs.guid++ );
 
-  this.name_ = options['name'] || null;
+    this.name_ = options['name'] || null;
 
-  // Create element if one wasn't provided in potions
-  this.el_ = options['el'] || this.createEl();
+    // Create element if one wasn't provided in options
+    this.el_ = options['el'] || this.createEl();
 
-  this.children_ = [];
-  this.childIndex_ = {};
-  this.childNameIndex_ = {};
+    this.children_ = [];
+    this.childIndex_ = {};
+    this.childNameIndex_ = {};
 
-  // Add any child components in options
-  this.initChildren();
+    // Add any child components in options
+    this.initChildren();
 
-  this.ready(ready);
-  // Don't want to trigger ready here or it will before init is actually
-  // finished for all children that run this constructor
-};
+    this.ready(ready);
+    // Don't want to trigger ready here or it will before init is actually
+    // finished for all children that run this constructor
+  }
+});
 
 /**
  * Dispose of the component and all child components.
@@ -159,6 +162,23 @@ vjs.Component.prototype.createEl = function(tagName, attributes){
  */
 vjs.Component.prototype.el = function(){
   return this.el_;
+};
+
+/**
+ * An optional element where, if defined, children will be inserted
+ *   instead of directly in el_
+ * @type {Element}
+ * @private
+ */
+vjs.Component.prototype.contentEl_;
+
+/**
+ * Return the component's DOM element for embedding content.
+ *   will either be el_ or a new element defined in createEl
+ * @return {Element}
+ */
+vjs.Component.prototype.contentEl = function(){
+  return this.contentEl_ || this.el_;
 };
 
 /**
@@ -289,7 +309,7 @@ vjs.Component.prototype.addChild = function(child, options){
   // Add the UI object's element to the container div (box)
   // Having an element is not required
   if (typeof component['el'] === 'function' && component['el']()) {
-    this.el_.appendChild(component['el']());
+    this.contentEl().appendChild(component['el']());
   }
 
   // Return so it can stored on parent object if desired.
@@ -318,8 +338,8 @@ vjs.Component.prototype.removeChild = function(component){
   this.childNameIndex_[component.name] = null;
 
   var compEl = component.el();
-  if (compEl && compEl.parentNode === this.el_) {
-    this.el_.removeChild(component.el());
+  if (compEl && compEl.parentNode === this.contentEl()) {
+    this.contentEl().removeChild(component.el());
   }
 };
 
@@ -334,7 +354,6 @@ vjs.Component.prototype.initChildren = function(){
 
     // Loop through components and add them to the player
     vjs.obj.each(options['children'], function(name, opts){
-
       // Allow for disabling default components
       // e.g. vjs.options['children']['posterImage'] = false
       if (opts === false) return;
@@ -543,10 +562,7 @@ vjs.Component.prototype.fadeOut = function(){
  * @return {vjs.Component}
  */
 vjs.Component.prototype.lockShowing = function(){
-  var style = this.el_.style;
-  style.display = 'block';
-  style.opacity = 1;
-  style.visiblity = 'visible';
+  this.addClass('vjs-lock-showing');
   return this;
 };
 
@@ -555,12 +571,24 @@ vjs.Component.prototype.lockShowing = function(){
  * @return {vjs.Component}
  */
 vjs.Component.prototype.unlockShowing = function(){
-  var style = this.el_.style;
-  style.display = '';
-  style.opacity = '';
-  style.visiblity = '';
+  this.removeClass('vjs-lock-showing');
   return this;
 };
+
+/**
+ * Disable component by making it unshowable
+ */
+vjs.Component.prototype.disable = function(){
+  this.hide();
+  this.show = function(){};
+  this.fadeIn = function(){};
+};
+
+// TODO: Get enable working
+// vjs.Component.prototype.enable = function(){
+//   this.fadeIn = vjs.Component.prototype.fadeIn;
+//   this.show = vjs.Component.prototype.show;
+// };
 
 /**
  * If a value is provided it will change the width of the player to that value
@@ -618,6 +646,8 @@ vjs.Component.prototype.dimension = function(widthOrHeight, num, skipListeners){
     // Check if using css width/height (% or px) and adjust
     if ((''+num).indexOf('%') !== -1 || (''+num).indexOf('px') !== -1) {
       this.el_.style[widthOrHeight] = num;
+    } else if (num === 'auto') {
+      this.el_.style[widthOrHeight] = '';
     } else {
       this.el_.style[widthOrHeight] = num+'px';
     }

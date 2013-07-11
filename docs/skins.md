@@ -3,7 +3,7 @@ Skins
 
 The default Video.js skin is made using HTML and CSS, so there's no need to learn a complicated skinning language to update colors or even create an entirely new skin. New in version 3.0 is the use of a sprites image file (video-js.png). The image allows for a little bit more classy design, as well as compatibility with older versions of IE now that the HTML skin also shows when Flash is used for those browsers.
 
-You can view the uncompressed CSS for the default skin by downloading the latest version of Video.js or viewing [the source version](https://github.com/zencoder/video-js/blob/master/design/video-js.css) on Github.
+You can view the uncompressed CSS for the default skin by downloading the latest version of Video.js or viewing [the source version](https://github.com/videojs/video.js/blob/master/src/css/video-js.css) on Github.
 
 You can either override styles in the default skin:
 

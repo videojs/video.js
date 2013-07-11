@@ -4,24 +4,26 @@
 /**
  * @constructor
  */
-vjs.MediaFaker = function(player, options, onReady){
-  goog.base(this, player, options, onReady);
+vjs.MediaFaker = vjs.MediaTechController.extend({
+  init: function(player, options, onReady){
+    vjs.MediaTechController.call(this, player, options, onReady);
 
-  this.triggerReady();
-};
-goog.inherits(vjs.MediaFaker, vjs.MediaTechController);
+    this.triggerReady();
+  }
+});
 
 // Support everything
 vjs.MediaFaker.isSupported = function(){ return true; };
 vjs.MediaFaker.canPlaySource = function(srcObj){ return true; };
-vjs.MediaFaker.prototype.features = {
-  progressEvents: true,
-  timeupdateEvents: true
-};
+
 vjs.MediaFaker.prototype.createEl = function(){
-  var el = goog.base(this, 'createEl', 'div', {
+  var el = vjs.MediaTechController.prototype.createEl.call(this, 'div', {
     className: 'vjs-tech'
   });
+  if (this.player().poster()) {
+    // transfer the poster image to mimic HTML
+    el.poster = this.player().poster();
+  }
 
   vjs.insertFirst(el, this.player_.el());
 
@@ -30,7 +32,13 @@ vjs.MediaFaker.prototype.createEl = function(){
 
 vjs.MediaFaker.prototype.currentTime = function(){ return 0; };
 vjs.MediaFaker.prototype.volume = function(){ return 0; };
+vjs.MediaFaker.prototype.muted = function(){ return false; };
+vjs.MediaFaker.prototype.pause = function(){ return false; };
+vjs.MediaFaker.prototype.supportsFullScreen = function(){ return false; };
+vjs.MediaFaker.prototype.features = {};
+vjs.MediaFaker.prototype.buffered = function(){ return {}; };
 
-goog.exportSymbol('videojs.MediaFaker', vjs.MediaFaker);
-goog.exportProperty(vjs.MediaFaker, 'isSupported', vjs.MediaFaker.isSupported);
-goog.exportProperty(vjs.MediaFaker, 'canPlaySource', vjs.MediaFaker.canPlaySource);
+// Export vars for Closure Compiler
+vjs['MediaFaker'] = vjs.MediaFaker;
+vjs['MediaFaker']['isSupported'] = vjs.MediaFaker.isSupported;
+vjs['MediaFaker']['canPlaySource'] = vjs.MediaFaker.canPlaySource;

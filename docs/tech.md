@@ -1,6 +1,6 @@
 Playback Technology ("Tech")
 ============================
-Playback Technology refers to the specific browser or plugin technology used to play the video or audio. When using HTML5, the playback technology is the video or audio element. When using Flash, the playback technology is the specific Flash player used, e.g. Flowplayer, YouTube Player, video-js.swf, etc. (not just "Flash"). This could also include Silverlight, Quicktime, or any other plugin that will play back video in the browser, as long as there is an API wrapper written for it. 
+Playback Technology refers to the specific browser or plugin technology used to play the video or audio. When using HTML5, the playback technology is the video or audio element. When using Flash, the playback technology is the specific Flash player used, e.g. Flowplayer, YouTube Player, video-js.swf, etc. (not just "Flash"). This could also include Silverlight, Quicktime, or any other plugin that will play back video in the browser, as long as there is an API wrapper written for it.
 
 Essentially we're using HTML5 and plugins only as video decoders, and using HTML and JavaScript to create a consistent API and skinning experience across all of them.
 
@@ -42,11 +42,11 @@ Adding Playback Technology
 When adding additional Tech to a video player, make sure to add the supported tech to the video object.
 
 ### Tag Method: ###
-    <video data-setup='{"techOrder": ["html5", "flash", [other supported tech]]}'
+    <video data-setup='{"techOrder": ["html5", "flash", "other supported tech"]}'
 
 ### Object Method: ###
-    _V_("videoID", {
-      techOrder: {"html5", "flash", [other supported tech]}
+    videojs("videoID", {
+      techOrder: ["html5", "flash", "other supported tech"]
     });
 
 Youtube Technology

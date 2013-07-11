@@ -1,3 +1,5 @@
+var hasOwnProp = Object.prototype.hasOwnProperty;
+
 /**
  * Creates an element and applies properties.
  * @param  {String=} tagName    Name of tag to be created.
@@ -8,7 +10,7 @@ vjs.createEl = function(tagName, properties){
   var el = document.createElement(tagName || 'div');
 
   for (var propName in properties){
-    if (properties.hasOwnProperty(propName)) {
+    if (hasOwnProp.call(properties, propName)) {
       //el[propName] = properties[propName];
       // Not remembering why we were checking for dash
       // but using setAttribute means you have to use getAttribute
@@ -43,8 +45,23 @@ vjs.capitalize = function(string){
  * @type {Object}
  */
 vjs.obj = {};
-vjs.obj.toString = Object.prototype.toString;
-vjs.obj.hasOwnProperty = Object.prototype.hasOwnProperty;
+
+/**
+ * Object.create shim for prototypal inheritance.
+ * https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object/create
+ * @param  {Object}   obj Object to use as prototype
+ */
+ vjs.obj.create = Object.create || function(obj){
+  //Create a new function called 'F' which is just an empty object.
+  function F() {}
+
+  //the prototype of the 'F' function should point to the
+  //parameter of the anonymous function.
+  F.prototype = obj;
+
+  //create a new constructor function based off of the 'F' function.
+  return new F();
+};
 
 /**
  * Loop through each property in an object and call a function
@@ -55,7 +72,7 @@ vjs.obj.hasOwnProperty = Object.prototype.hasOwnProperty;
  */
 vjs.obj.each = function(obj, fn, context){
   for (var key in obj) {
-    if (vjs.obj.hasOwnProperty.call(obj, key)) {
+    if (hasOwnProp.call(obj, key)) {
       fn.call(context || this, key, obj[key]);
     }
   }
@@ -70,7 +87,7 @@ vjs.obj.each = function(obj, fn, context){
 vjs.obj.merge = function(obj1, obj2){
   if (!obj2) { return obj1; }
   for (var key in obj2){
-    if (vjs.obj.hasOwnProperty.call(obj2, key)) {
+    if (hasOwnProp.call(obj2, key)) {
       obj1[key] = obj2[key];
     }
   }
@@ -94,12 +111,12 @@ vjs.obj.deepMerge = function(obj1, obj2){
   obj1 = vjs.obj.copy(obj1);
 
   for (key in obj2){
-    if (vjs.obj.hasOwnProperty.call(obj2, key)) {
+    if (hasOwnProp.call(obj2, key)) {
       val1 = obj1[key];
       val2 = obj2[key];
 
       // Check if both properties are pure objects and do a deep merge if so
-      if (vjs.obj.toString.call(val1) === objDef && vjs.obj.toString.call(val2) === objDef) {
+      if (vjs.obj.isPlain(val1) && vjs.obj.isPlain(val2)) {
         obj1[key] = vjs.obj.deepMerge(val1, val2);
       } else {
         obj1[key] = obj2[key];
@@ -116,6 +133,18 @@ vjs.obj.deepMerge = function(obj1, obj2){
  */
 vjs.obj.copy = function(obj){
   return vjs.obj.merge({}, obj);
+};
+
+/**
+ * Check if an object is plain, and not a dom node or any object sub-instance
+ * @param  {Object} obj Object to check
+ * @return {Boolean}     True if plain, false otherwise
+ */
+vjs.obj.isPlain = function(obj){
+  return !!obj
+    && typeof obj === 'object'
+    && obj.toString() === '[object Object]'
+    && obj.constructor === Object;
 };
 
 /**
@@ -246,7 +275,13 @@ vjs.addClass = function(element, classToAdd){
 vjs.removeClass = function(element, classToRemove){
   if (element.className.indexOf(classToRemove) == -1) { return; }
   var classNames = element.className.split(' ');
-  classNames.splice(classNames.indexOf(classToRemove),1);
+  // IE8 Does not support array.indexOf so using a for loop
+  for (var i = classNames.length - 1; i >= 0; i--) {
+    if (classNames[i] === classToRemove) {
+      classNames.splice(i,1);
+    }
+  }
+  // classNames.splice(classNames.indexOf(classToRemove),1);
   element.className = classNames.join(' ');
 };
 
@@ -269,9 +304,9 @@ vjs.USER_AGENT = navigator.userAgent;
  * @type {Boolean}
  * @constant
  */
-vjs.IS_IPHONE = !!vjs.USER_AGENT.match(/iPhone/i);
-vjs.IS_IPAD = !!vjs.USER_AGENT.match(/iPad/i);
-vjs.IS_IPOD = !!vjs.USER_AGENT.match(/iPod/i);
+vjs.IS_IPHONE = (/iPhone/i).test(vjs.USER_AGENT);
+vjs.IS_IPAD = (/iPad/i).test(vjs.USER_AGENT);
+vjs.IS_IPOD = (/iPod/i).test(vjs.USER_AGENT);
 vjs.IS_IOS = vjs.IS_IPHONE || vjs.IS_IPAD || vjs.IS_IPOD;
 
 vjs.IOS_VERSION = (function(){
@@ -279,16 +314,34 @@ vjs.IOS_VERSION = (function(){
   if (match && match[1]) { return match[1]; }
 })();
 
-vjs.IS_ANDROID = !!vjs.USER_AGENT.match(/Android.*AppleWebKit/i);
+vjs.IS_ANDROID = (/Android/i).test(vjs.USER_AGENT);
 vjs.ANDROID_VERSION = (function() {
-  var match = vjs.USER_AGENT.match(/Android (\d+)\./i);
-  if (match && match[1]) {
-    return match[1];
-  }
-  return null;
-})();
+  // This matches Android Major.Minor.Patch versions
+  // ANDROID_VERSION is Major.Minor as a Number, if Minor isn't available, then only Major is returned
+  var match = vjs.USER_AGENT.match(/Android (\d+)(?:\.(\d+))?(?:\.(\d+))*/i),
+    major,
+    minor;
 
-vjs.IS_FIREFOX = function(){ return !!vjs.USER_AGENT.match('Firefox'); };
+  if (!match) {
+    return null;
+  }
+
+  major = match[1] && parseFloat(match[1]);
+  minor = match[2] && parseFloat(match[2]);
+
+  if (major && minor) {
+    return parseFloat(match[1] + '.' + match[2]);
+  } else if (major) {
+    return major;
+  } else {
+    return null;
+  }
+})();
+// Old Android is defined as Version older than 2.3, and requiring a webkit version of the android browser
+vjs.IS_OLD_ANDROID = vjs.IS_ANDROID && (/webkit/i).test(vjs.USER_AGENT) && vjs.ANDROID_VERSION < 2.3;
+
+vjs.IS_FIREFOX = (/Firefox/i).test(vjs.USER_AGENT);
+vjs.IS_CHROME = (/Chrome/i).test(vjs.USER_AGENT);
 
 
 /**
@@ -339,16 +392,14 @@ vjs.getAttributeValues = function(tag){
  * @param  {String} strCssRule Style name
  * @return {String}            Style value
  */
-vjs.getComputedStyleValue = function(el, strCssRule){
+vjs.getComputedDimension = function(el, strCssRule){
   var strValue = '';
   if(document.defaultView && document.defaultView.getComputedStyle){
     strValue = document.defaultView.getComputedStyle(el, '').getPropertyValue(strCssRule);
 
   } else if(el.currentStyle){
-    strCssRule = strCssRule.replace(/\-(\w)/g, function (strMatch, p1){
-      return p1.toUpperCase();
-    });
-    strValue = el.currentStyle[strCssRule];
+    // IE8 Width/Height support
+    strValue = el['client'+strCssRule.substr(0,1).toUpperCase() + strCssRule.substr(1)] + 'px';
   }
   return strValue;
 };
@@ -510,16 +561,20 @@ vjs.get = function(url, onSuccess, onError){
 /* Local Storage
 ================================================================================ */
 vjs.setLocalStorage = function(key, value){
-  // IE was throwing errors referencing the var anywhere without this
-  var localStorage = window.localStorage || false;
-  if (!localStorage) { return; }
   try {
+    // IE was throwing errors referencing the var anywhere without this
+    var localStorage = window.localStorage || false;
+    if (!localStorage) { return; }
     localStorage[key] = value;
   } catch(e) {
     if (e.code == 22 || e.code == 1014) { // Webkit == 22 / Firefox == 1014
       vjs.log('LocalStorage Full (VideoJS)', e);
     } else {
-      vjs.log('LocalStorage Error (VideoJS)', e);
+      if (e.code == 18) {
+        vjs.log('LocalStorage not allowed (VideoJS)', e);
+      } else {
+        vjs.log('LocalStorage Error (VideoJS)', e);
+      }
     }
   }
 };
@@ -555,37 +610,33 @@ vjs.log = function(){
 
 // Offset Left
 // getBoundingClientRect technique from John Resig http://ejohn.org/blog/getboundingclientrect-is-awesome/
-if ('getBoundingClientRect' in document.documentElement) {
-  vjs.findPosX = function(el) {
-    var box;
+vjs.findPosition = function(el) {
+    var box, docEl, body, clientLeft, scrollLeft, left, clientTop, scrollTop, top;
 
-    try {
+    if (el.getBoundingClientRect && el.parentNode) {
       box = el.getBoundingClientRect();
-    } catch(e) {}
-
-    if (!box) { return 0; }
-
-    var docEl = document.documentElement,
-        body = document.body,
-        clientLeft = docEl.clientLeft || body.clientLeft || 0,
-        scrollLeft = window.pageXOffset || body.scrollLeft,
-        left = box.left + scrollLeft - clientLeft;
-
-    return left;
-  };
-} else {
-  vjs.findPosX = function(el) {
-    var curleft = el.offsetLeft;
-    // vjs.log(obj.className, obj.offsetLeft)
-    while(el = el.offsetParent) {
-      if (el.className.indexOf('video-js') == -1) {
-        // vjs.log(el.offsetParent, 'OFFSETLEFT', el.offsetLeft)
-        // vjs.log('-webkit-full-screen', el.webkitMatchesSelector('-webkit-full-screen'));
-        // vjs.log('-webkit-full-screen', el.querySelectorAll('.video-js:-webkit-full-screen'));
-      } else {
-      }
-      curleft += el.offsetLeft;
     }
-    return curleft;
-  };
-}
+
+    if (!box) {
+      return {
+        left: 0,
+        top: 0
+      };
+    }
+
+    docEl = document.documentElement;
+    body = document.body;
+
+    clientLeft = docEl.clientLeft || body.clientLeft || 0;
+    scrollLeft = window.pageXOffset || body.scrollLeft;
+    left = box.left + scrollLeft - clientLeft;
+
+    clientTop = docEl.clientTop || body.clientTop || 0;
+    scrollTop = window.pageYOffset || body.scrollTop;
+    top = box.top + scrollTop - clientTop;
+
+    return {
+      left: left,
+      top: top
+    };
+};
