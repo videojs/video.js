@@ -492,7 +492,7 @@ vjs.Flash.getEmbedCode = function(swf, flashVars, params, attributes){
 };
 
 vjs.Flash.streamFromParts = function(connection, stream) {
-  return connection + "," + stream;
+  return connection + "&" + stream;
 };
 
 vjs.Flash.streamToParts = function(src) {
@@ -500,11 +500,30 @@ vjs.Flash.streamToParts = function(src) {
     connection: '',
     stream: ''
   };
-  if (src && src.indexOf(",") !== -1) {
-    src = src.split(",");
-    parts.connection = src[0];
-    parts.stream = src[1];
+
+  if (! src) {
+    return parts;
   }
+
+  // Look for the normal URL separator we expect, '&'.
+  // If found, we split the URL into two pieces around the 
+  // first '&'.
+  var connEnd = src.indexOf('&');
+  var streamBegin;
+  if (connEnd !== -1) {
+    streamBegin = connEnd + 1;
+  }
+  else {
+    // If there's not a '&', we use the last '/' as the delimiter.
+    connEnd = streamBegin = src.lastIndexOf('/') + 1;
+    if (connEnd === 0) {
+      // really, there's not a '/'?
+      connEnd = streamBegin = src.length;
+    }
+  }
+  parts.connection = src.substring(0, connEnd);
+  parts.stream = src.substring(streamBegin, src.length);  
+
   return parts;
 };
 
