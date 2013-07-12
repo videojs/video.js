@@ -739,8 +739,18 @@ vjs.Player.prototype.src = function(source){
         this.loadTech(techName, source);
       }
     } else {
+      var incompatibleMessage;
+      if (videojs.options['incompatibleVideoMessage']) {
+        incompatibleMessage = vjs.options['incompatibleVideoMessage'];
+      } else {
+        incompatibleMessage = 'Sorry, no compatible source and playback ' +
+            'technology were found for this video. Try using another browser ' +
+            'like <a href="http://bit.ly/ccMUEC">Chrome</a> or download the ' +
+            'latest <a href="http://adobe.ly/mwfN1">Adobe Flash Player</a>.';
+      }
+
       this.el_.appendChild(vjs.createEl('p', {
-        innerHTML: 'Sorry, no compatible source and playback technology were found for this video. Try using another browser like <a href="http://bit.ly/ccMUEC">Chrome</a> or download the latest <a href="http://adobe.ly/mwfN1">Adobe Flash Player</a>.'
+        innerHTML: incompatibleMessage
       }));
     }
 
