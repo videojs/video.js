@@ -114,15 +114,15 @@ module.exports = function(grunt) {
     },
     karma: {
       options: {
-        configFile: 'karma.conf.js'
+        configFile: 'test-template.conf.js'
       },
       dev: {
-        configFile: 'karma.conf.js',
-        autoWatch: true			// set this to false for TeamCity
+        configFile: 'test-template.conf.js',
+        autoWatch: true	
       },
       ci: {
-        configFile: 'vjs.conf.js',
-        autoWatch: false                // set this to false for TeamCity
+        configFile: 'test-template.conf.js',
+        autoWatch: false 
       }
     }
   });
