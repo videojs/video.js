@@ -544,11 +544,12 @@ vjs.Player.prototype.remainingTime = function(){
 vjs.Player.prototype.buffered = function(){
   var buffered = this.techGet('buffered'),
       start = 0,
+      buflen = buffered.length,
       // Default end to 0 and store in values
       end = this.cache_.bufferEnd = this.cache_.bufferEnd || 0;
 
-  if (buffered && buffered.length > 0 && buffered.end(0) !== end) {
-    end = buffered.end(0);
+  if (buffered && buflen > 0 && buffered.end( buflen - 1) !== end) {
+    end = buffered.end( buflen - 1);
     // Storing values allows them be overridden by setBufferedFromProgress
     this.cache_.bufferEnd = end;
   }
