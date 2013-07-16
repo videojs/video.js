@@ -115,7 +115,7 @@ module.exports = function(grunt) {
     less: {
       dev: {
         files: {
-          'src/css/video-js.css': 'src/css/video-js.less'
+          'build/files/video-js.css': 'src/css/video-js.less'
         }
       }
     }
@@ -165,8 +165,7 @@ module.exports = function(grunt) {
     grunt.file.write('build/files/combined.video.js', combined);
 
     // Copy over other files
-    grunt.file.copy('src/css/video-js.css', 'build/files/video-js.css');
-    grunt.file.copy('src/css/video-js.png', 'build/files/video-js.png');
+    // grunt.file.copy('src/css/video-js.png', 'build/files/video-js.png');
     grunt.file.copy('src/swf/video-js.swf', 'build/files/video-js.swf');
 
     // Inject version number into css file
