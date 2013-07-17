@@ -26,7 +26,8 @@ Some of the focuses of Video.js are:
 
 ## Getting Started
 
-Check out our [getting started guide](http://videojs.com/#section5).
+For the quickest setup, simply click "Embed This Player" on the [Video.js website](http://videojs.com) after customizing the player.
+You can also refer to the [setup](docs/setup.md) page in the documentation for more examples.
 
 ## Contributing
 
