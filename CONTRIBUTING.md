@@ -95,7 +95,7 @@ Example:
 > causing the bug, and potential solutions (and your opinions on their
 > merits).
 
-**[File a bug report](https://github.com/h5bp/html5-boilerplate/issues/)**
+**[File a bug report](https://github.com/videojs/video.js/issues)**
 
 ### NOTE: Testing Flash Locally in Chrome
 Chrome 21+ (as of 2013/01/01) doens't run Flash files that are local and loaded into a locally accessed page (file:///). To get around this you need to [disable the version of Flash](http://helpx.adobe.com/flash-player/kb/flash-player-google-chrome.html#How_can_I_run_debugger_or_alternate_versions_of_Flash_Player_in_Google_Chrome) included with Chrome and enable a system-wide version of Flash.
@@ -113,11 +113,11 @@ Please follow this process; it's the best way to get your work included in the p
 
    ```bash
    # Clones your fork of the repo into the current directory in terminal
-   git clone https://github.com/<your-username>/html5-boilerplate.git
+   git clone https://github.com/<your-username>/video.js.git
    # Navigate to the newly cloned directory
-   cd html5-boilerplate
+   cd video-js
    # Assigns the original repo to a remote called "upstream"
-   git remote add upstream https://github.com/h5bp/html5-boilerplate.git
+   git remote add upstream https://github.com/videojs/video.js.git
    ```
 
 2. If you cloned a while ago, get the latest changes from upstream:
@@ -163,7 +163,7 @@ Please follow [Google's JavaScript Style Guide](http://google-styleguide.googlec
 If you happen to find something in the codebase that does not follow the style guide, that's a good opportunity to make your first contribution!
 
 # Other Video.js Pojects
-* [Video.js SWF](https://github.com/zencoder/video-js-swf) - The light-weight flash video player that makes flash work like HTML5 video. This allows player skins, plugins, and other features to work with both HTML5 and Flash.
+* [Video.js SWF](https://github.com/videojs/video-js-swf) - The light-weight flash video player that makes flash work like HTML5 video. This allows player skins, plugins, and other features to work with both HTML5 and Flash.
 
 * [Videojs.com](http://videojs.com) - The public site with helpful tools and information about Video.js.
 

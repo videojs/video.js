@@ -10,7 +10,7 @@ We're finishing up a big overhaul of the libary which includes
 * Closure compiler advanced mode support for drastically better minification over previous versions
 * Flashy new automated builds and test using node.js and grunt
 
-Check out our [contributing guide](https://github.com/zencoder/video-js/blob/master/CONTRIBUTING.md) for info on building a local version.
+Check out our [contributing guide](CONTRIBUTING.md) for info on building a local version.
 
 ## About
 
@@ -26,11 +26,11 @@ Some of the focuses of Video.js are:
 
 ## Getting Started
 
-Check out our [getting started guide](http://videojs.com/#section5).
+You will find examples to get you up and running in the [setup](docs/setup.md) documentation. You can also simply click "Embed This Player" on the [Video.js website](http://videojs.com).
 
 ## Contributing
 
-Check out our [contributing guide](https://github.com/zencoder/video-js/blob/master/CONTRIBUTING.md).
+Check out our [contributing guide](CONTRIBUTING.md).
 
 ## License
 
