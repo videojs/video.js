@@ -86,7 +86,9 @@ vjs.Player = vjs.Component.extend({
 vjs.Player.prototype.options_ = vjs.options;
 
 vjs.Player.prototype.dispose = function(){
-  // this.isReady_ = false;
+  this.trigger('dispose');
+  // prevent dispose from being called twice
+  this.off('dispose');
 
   // Kill reference to this player
   vjs.players[this.id_] = null;
