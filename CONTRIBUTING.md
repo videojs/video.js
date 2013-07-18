@@ -3,7 +3,7 @@ CONTRIBUTING
 So you want to help out? Great! There's a number of ways you can get involved.
 
   * [File and discuss issues](#filing-issues)
-  * [Contribute code](#contribute-code)
+  * [Contribute code](#contributing-code)
   * [Build and share plugins](docs/plugins.md)
   * [Answer questions on Stack Overflow](http://stackoverflow.com/questions/tagged/video.js)
 
