@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## Unreleased (HEAD)
-_(none)_
+* Added LESS as a CSS preprocessor for the default skin ([view](https://github.com/videojs/video.js/pull/644))
 
 --------------------
 
