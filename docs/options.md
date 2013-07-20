@@ -4,10 +4,14 @@ Options
 Setting Options
 ---------------
 
-The Video.js embed code is simply an HTML5 video tag, so for many of the options you can use the standard tag attributes to set the options.
+The Video.js embed code is simply an HTML5 video or audio tag, so for many of the options you can use the standard tag attributes to set the options.
 
 ```html
 <video controls autoplay preload="auto" ...>
+```
+
+```html
+<audio controls autoplay preload="auto" ...>
 ```
 
 Alternatively, you can use the data-setup attribute to provide options in the [JSON](http://json.org/example.html) format. This is also how you would set options that aren't standard to the video tag.

@@ -81,6 +81,11 @@ body.vjs-full-window {
   position: relative;
   width: 100%;
 }
+
+audio + div + .vjs-poster{
+  display:block !important;
+}
+
 .vjs-poster img {
   display: block;
   margin: 0 auto;
@@ -552,7 +557,7 @@ so you can upgrade to newer versions easier. You can remove all these styles by 
 /* Loading Spinner
 ---------------------------------------------------------*/
 .vjs-loading-spinner {
-  display: none;
+  display:inline-block;
   position: absolute;
   top: 50%;
   left: 50%;

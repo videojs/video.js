@@ -27,7 +27,7 @@ With the self hosted option you'll also want to update the location of the video
 ```
 
 
-Step 2: Add an HTML5 video tag to your page.
+Step 2: Add an HTML5 video or audio tag to your page.
 --------------------------------------------
 With Video.js you just use an HTML5 video tag to embed a video. Video.js will then read the tag and make it work in all browsers, not just ones that support HTML5 video. Beyond the basic markup, Video.js needs a few extra pieces.
 
@@ -39,7 +39,9 @@ With Video.js you just use an HTML5 video tag to embed a video. Video.js will th
     - `video-js` applies styles that are required for Video.js functionality, like fullscreen and subtitles.
     - `vjs-default-skin` applies the default skin to the HTML controls, and can be removed or overridden to create your own controls design.
 
-Otherwise include/exclude attributes, settings, sources, and tracks exactly as you would for HTML5 video.
+*Note* ```<audio>``` tag only is finalized for HTML5 and not flash, issue #533 is addressing playing audio via flash. Please see issues #533, #534, and #537 for further information.
+
+Otherwise include/exclude attributes, settings, sources, and tracks exactly as you would for HTML5 video or audio.
 
 ```html
 <video id="example_video_1" class="video-js vjs-default-skin"
@@ -50,6 +52,18 @@ Otherwise include/exclude attributes, settings, sources, and tracks exactly as y
  <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />
  <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />
 </video>
+```
+
+
+```html
+<audio id="example_audio_1" class="video-js vjs-default-skin"
+  controls preload="auto" width="640" height="264"
+  poster="http://video-js.zencoder.com/oceans-clip.png"
+  data-setup='{"example_option":true}'>
+ <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' />
+ <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />
+ <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />
+</audio>
 ```
 
 
