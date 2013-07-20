@@ -2,7 +2,7 @@
 
 <h1>Video.js Documentation</h1>
 
-The Video.js documentation is here to help you setup and use the player. These docs can be found and contributed to in the [Video.js library repository](https://github.com/zencoder/video-js/tree/master/docs).
+The Video.js documentation is here to help you setup and use the player. These docs can be found and contributed to in the [Video.js library repository](https://github.com/videojs/video.js/tree/master/docs).
 
 ## Getting Started
 
