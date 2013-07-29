@@ -186,6 +186,14 @@ myPlayer.cancelFullScreen();
 ```
 
 
+### dispose() ###
+Destroys the video player and does any necessary cleanup. This is especially helpful if you are dynamically adding and removing videos to/from the DOM. Use after removing videos from the DOM.
+```js
+myPlayer.dispose();
+```
+
+
+
 Events
 ------
 You can attach event listeners to the player similarly to how you would for a video element.
