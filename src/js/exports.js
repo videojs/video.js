@@ -38,6 +38,7 @@ goog.exportSymbol('videojs.cache', vjs.cache);
 // goog.exportProperty(vjs.CoreObject, 'create', vjs.CoreObject.create);
 
 goog.exportSymbol('videojs.Component', vjs.Component);
+goog.exportProperty(vjs.Component.prototype, 'player', vjs.Component.prototype.player);
 goog.exportProperty(vjs.Component.prototype, 'dispose', vjs.Component.prototype.dispose);
 goog.exportProperty(vjs.Component.prototype, 'createEl', vjs.Component.prototype.createEl);
 goog.exportProperty(vjs.Component.prototype, 'el', vjs.Component.prototype.el);
