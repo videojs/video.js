@@ -184,55 +184,7 @@ Here's an example:
 > causing the bug, and potential solutions (and your opinions on their
 > merits).
 
-<<<<<<< HEAD
 **[File a bug report](https://github.com/zencoder/video-js/issues/new)**
-=======
-**[File a bug report](https://github.com/h5bp/html5-boilerplate/issues/)**
-
-### NOTE: Testing Flash Locally in Chrome
-Chrome 21+ (as of 2013/01/01) doens't run Flash files that are local and loaded into a locally accessed page (file:///). To get around this you need to [disable the version of Flash](http://helpx.adobe.com/flash-player/kb/flash-player-google-chrome.html#How_can_I_run_debugger_or_alternate_versions_of_Flash_Player_in_Google_Chrome) included with Chrome and enable a system-wide version of Flash.
-
-
-## Pull requests
-
-Good pull requests - patches, improvements, new features - are a fantastic help. They should remain focused in scope and avoid containing unrelated commits. If your contribution involves a significant amount of work or substantial changes to any part of the project, please open an issue to discuss it first.
-
-Make sure to adhere to the coding conventions used throughout a project (indentation, accurate comments, etc.). Please update any documentation that is relevant to the change you're making.
-
-Please follow this process; it's the best way to get your work included in the project:
-
-1. [Fork](http://help.github.com/fork-a-repo/) the project, clone your fork, and configure the remotes:
-
-   ```bash
-   # Clones your fork of the repo into the current directory in terminal
-   git clone https://github.com/<your-username>/html5-boilerplate.git
-   # Navigate to the newly cloned directory
-   cd html5-boilerplate
-   # Assigns the original repo to a remote called "upstream"
-   git remote add upstream https://github.com/h5bp/html5-boilerplate.git
-   ```
-
-2. If you cloned a while ago, get the latest changes from upstream:
-
-   ```bash
-   git checkout master
-   git pull upstream master
-   ```
-
-3. Create a new topic branch to contain your feature, change, or fix:
-
-   ```bash
-   git checkout -b <topic-branch-name>
-   ```
-
-4. Commit your changes in logical chunks. Please adhere to these [git commit message guidelines](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) or your pull request is unlikely be merged into the main project. Use git's [interactive rebase](https://help.github.com/articles/interactive-rebase) feature to tidy up your commits before making them public.
-
-5. Locally merge (or rebase) the upstream development branch into your topic branch:
-
-   ```bash
-   git pull [--rebase] upstream master
-   ```
->>>>>>> fdf7f4f228043fa1b1fc32d00b42db0f10077339
 
 ### NOTE: Testing Flash Locally in Chrome
 Chrome 21+ (as of 2013/01/01) doens't run Flash files that are local and loaded into a locally accessed page (file:///).
