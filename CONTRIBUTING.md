@@ -184,7 +184,7 @@ Here's an example:
 > causing the bug, and potential solutions (and your opinions on their
 > merits).
 
-**[File a bug report](https://github.com/zencoder/video-js/issues/new)**
+**[File a bug report](https://github.com/videojs/video.js/issues/new)**
 
 ### NOTE: Testing Flash Locally in Chrome
 Chrome 21+ (as of 2013/01/01) doens't run Flash files that are local and loaded into a locally accessed page (file:///).
