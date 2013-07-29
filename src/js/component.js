@@ -693,3 +693,51 @@ vjs.Component.prototype.dimension = function(widthOrHeight, num, skipListeners){
     // }
   }
 };
+
+/**
+ * Emit 'tap' events when touch events are supported. We're requireing them to
+ * be enabled because otherwise every component would have this extra overhead
+ * unnecessarily, on mobile devices where extra overhead is especially bad.
+ *
+ * This is being implemented so we can support taps on the video element
+ * toggling the controls.
+ */
+vjs.Component.prototype.emitTapEvents = function(){
+  var touchStart, touchTime, couldBeTap, noTap;
+
+  if ('ontouchstart' in window) {
+    // Track the start time so we can determine how long the touch lasted
+    touchStart = 0;
+
+    this.on('touchstart', function() {
+      // Record start time so we can detect a tap vs. "touch and hold"
+      touchStart = new Date().getTime();
+      // Reset couldBeTap tracking
+      couldBeTap = true;
+    });
+
+    noTap = function(){
+      couldBeTap = false;
+    };
+    this.on('touchmove', noTap);
+    this.on('touchleave', noTap);
+    this.on('touchcancel', noTap);
+
+    // When the touch ends, measure how long it took and trigger the appropriate
+    // event
+    this.on('touchend', function() {
+      // Proceed only if the touchmove/leave/cancel event didn't happen
+      if (couldBeTap === true) {
+        // Measure how long the touch lasted
+        touchTime = new Date().getTime() - touchStart;
+        // The touch needs to be quick in order to consider it a tap
+        if (touchTime < 250) {
+          this.trigger('tap');
+          // It may be good to copy the touchend event object and change the
+          // type to tap, if the other event properties aren't exact after
+          // vjs.fixEvent runs (e.g. event.target)
+        }
+      }
+    });
+  }
+};

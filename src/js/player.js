@@ -24,21 +24,27 @@ vjs.Player = vjs.Component.extend({
     this.poster_ = options['poster'];
     // Set controls
     this.controls_ = options['controls'];
-    // Use native controls for iOS and Android by default
-    //  until controls are more stable on those devices.
-    if (options['customControlsOnMobile'] !== true && (vjs.IS_IOS || vjs.IS_ANDROID)) {
-      tag.controls = options['controls'];
-      this.controls_ = false;
-    } else {
-      // Original tag settings stored in options
-      // now remove immediately so native controls don't flash.
-      tag.controls = false;
-    }
+    // Original tag settings stored in options
+    // now remove immediately so native controls don't flash.
+    // May be turned back on by HTML5 tech if nativeControlsForTouch is true
+    tag.controls = false;
 
     // Run base component initializing with new options.
     // Builds the element through createEl()
     // Inits and embeds any child components in opts
     vjs.Component.call(this, this, options, ready);
+
+    // Update controls className. Can't do this when the controls are initially
+    // set because the element doesn't exist yet.
+    if (this.controls()) {
+      this.addClass('vjs-controls-enabled');
+    } else {
+      this.addClass('vjs-controls-disabled');
+    }
+
+    if (vjs.TOUCH_ENABLED) {
+      this.addClass('vjs-touch-enabled');
+    }
 
     // Firstplay event implimentation. Not sold on the event yet.
     // Could probably just check currentTime==0?
@@ -379,6 +385,8 @@ vjs.Player.prototype.onFirstPlay = function(){
     if(this.options_['starttime']){
       this.currentTime(this.options_['starttime']);
     }
+
+    this.addClass('vjs-has-started');
 };
 
 vjs.Player.prototype.onPause = function(){
@@ -849,32 +857,84 @@ vjs.Player.prototype.controls_;
  * @param  {Boolean} controls Set controls to showing or not
  * @return {Boolean}    Controls are showing
  */
-vjs.Player.prototype.controls = function(controls){
-  if (controls !== undefined) {
+vjs.Player.prototype.controls = function(bool){
+  if (bool !== undefined) {
+    bool = !!bool; // force boolean
     // Don't trigger a change event unless it actually changed
-    if (this.controls_ !== controls) {
-      this.controls_ = !!controls; // force boolean
-      this.trigger('controlschange');
+    if (this.controls_ !== bool) {
+      this.controls_ = bool;
+      if (bool) {
+        this.removeClass('vjs-controls-disabled');
+        this.addClass('vjs-controls-enabled');
+        this.trigger('controlsenabled');
+      } else {
+        this.removeClass('vjs-controls-enabled');
+        this.addClass('vjs-controls-disabled');
+        this.trigger('controlsdisabled');
+      }
     }
   }
   return this.controls_;
 };
 
+vjs.Player.prototype.nativeControls_;
+vjs.Player.prototype.nativeControls = function(bool){
+  if (bool !== undefined) {
+    bool = !!bool; // force boolean
+    // Don't trigger a change event unless it actually changed
+    if (this.nativeControls_ !== bool) {
+      this.nativeControls_ = bool;
+      if (bool) {
+        this.addClass('vjs-native-controls');
+      } else {
+        this.removeClass('vjs-native-controls');
+      }
+    }
+  }
+  return this.nativeControls_;
+};
+
 vjs.Player.prototype.error = function(){ return this.techGet('error'); };
 vjs.Player.prototype.ended = function(){ return this.techGet('ended'); };
 
-vjs.Player.prototype.userActive_ = false;
+// When the player is first initialized, trigger activity so components
+// like the control bar show themselves if needed
+vjs.Player.prototype.userActivity_ = true;
+vjs.Player.prototype.reportUserActivity = function(event){
+  this.userActivity_ = true;
+};
+
+vjs.Player.prototype.userActive_ = true;
 vjs.Player.prototype.userActive = function(bool){
   if (bool !== undefined) {
     bool = !!bool;
     if (bool !== this.userActive_) {
       this.userActive_ = bool;
       if (bool) {
+        // If the user was inactive and is now active we want to reset the
+        // inactivity timer
+        this.userActivity_ = true;
         this.removeClass('vjs-user-passive');
         this.addClass('vjs-user-active');
         this.trigger('useractive');
         console.log('useractive');
       } else {
+        // We're switching the state to passive manually, so erase any other
+        // activity
+        this.userActivity_ = false;
+
+        // Chrome/Safari/IE have bugs where when you change the cursor it can
+        // trigger a mousemove event. This causes an issue when you're hiding
+        // the cursor when the user is inactive, and a mousemove signals user
+        // activity. Making it impossible to go into passive mode. Specifically
+        // this happens in fullscreen when we really need to hide the cursor.
+        //
+        // When this gets resolved in ALL browsers it can be removed
+        // https://code.google.com/p/chromium/issues/detail?id=103041
+        this.tech.one('mousemove', function(e){
+          e.stopPropagation();
+          e.preventDefault();
+        });
         this.removeClass('vjs-user-active');
         this.addClass('vjs-user-passive');
         this.trigger('userpassive');
@@ -887,106 +947,53 @@ vjs.Player.prototype.userActive = function(bool){
 };
 
 vjs.Player.prototype.listenForUserActivity = function(){
-  var activity, onActivity, activityCheck, inactivityTimeout,
-      touchstart, touchmove, touchtime, touchActiveInterval;
+  var activityCheck, inactivityTimeout, touchInProgress;
 
-  // When the player is first initialized, trigger activity so components
-  // like the control bar show themselves
-  activity = true;
-
-  // Anything considered deliberate user activity should set activity to true
-  onActivity = function(){
-    activity = true;
-  };
-
-  // When not on touch devices, any mouse movement will be considered
-  // user activity
-  if (!('ontouchstart' in window)) {
-    this.on('mousedown', onActivity);
-    this.on('mousemove', onActivity);
-  }
-
-  // On touch devices user activity gets a little more complicated.
-  // A tap can signal that a user has become active, or has become passive
-  // e.g. a quick tap on an iPhone movie should reveal the controls. Another
-  // quick tap should hide them again (signaling the user is in a passive
-  // viewing state)
-  //
-  // In addition to this, we still want the user to be considered passive after
-  // a few seconds of inactivity
-  touchstart = 0;
-  this.on('touchstart', function() {
-    // Record start time so we can detect a "touch and hold" vs. an immediate
-    // release. Touch and holds do not count as an active/passive toggle.
-    touchstart = new Date().getTime();
-
-    // If a user is already active, we want to continue to consider them active.
-    // If they're passive, we want to wait and see if this is a fast tap
-    // before considering them active again. (same as iOS behavior)
-    if (this.userActive_) {
-      activity = true;
-      // For as long as the they are touching the device, we consider them acitve
-      // even if they're not moving their finger. So we want to continue ot update
-      // that they are active
-      clearInterval(touchActiveInterval);
-      touchActiveInterval = setInterval(function(){
-        // Check for touchstart to make sure this insn't called after touchend
-        if (touchstart > 0) {
-          activity = true;
-        }
-      // Setting activity=true now and setting the interval to the same time
-      // as the activityCheck interval should ensure we never miss the
+  // Consider touch events that bubble up to be activity
+  if ('ontouchstart' in window) {
+    this.on('touchstart', function() {
+      this.reportUserActivity();
+      // For as long as the they are touching the device, we consider them
+      // active even if they're not moving their finger. So we want to
+      // continue to update that they are active
+      clearInterval(touchInProgress);
+      // Setting userActivity=true now and setting the interval to the same time
+      // as the activityCheck interval (250) should ensure we never miss the
       // next activityCheck
-      }, 250);
-    }
-  });
+      touchInProgress = setInterval(vjs.bind(this, function(){
+        this.reportUserActivity();
+      }), 250);
+      // touchInProgress = setInterval(vjs.bind(this, this.reportUserActivity), 250);
+    });
 
-  // When the touch ends, determine how we should update the user state
-  this.on('touchend', vjs.bind(this, function(event) {
-    // Measure how long the touch lasted
-    touchtime = new Date().getTime() - touchstart;
-    // Stop the interval that maintains activity if it's running
-    clearInterval(touchActiveInterval);
-    // Reset touchstart so we know a touch is no longer in process
-    touchstart = 0;
-    // If the user is already active we want this event to count towards their
-    // activity, no matter if this is a tap, touch and hold, or touch + move
-    if (this.userActive_) {
-      activity = true;
-    }
+    this.on('touchmove', this.reportUserActivity);
 
-    // The touch needs to be quick in order to consider it a tap (?). Otherwise
-    // it's a touch and hold which should not toggle the user active state
-    if (touchtime < 250) {
-      if (this.userActive_) {
-        // We're switching the state to passive manually, so erase any other
-        // activity
-        activity = false;
-        this.userActive(false);
-      } else {
-        // If the user was inactive and is now active we want to reset the
-        // inactivity timer
-        activity = true;
-        this.userActive(true);
-      }
-    }
-
-    // if (!this.paused()) {
-    //   event.preventDefault();
-    // }
-  }));
+    this.on('touchend', function(event) {
+      // Stop the interval that maintains activity if it's running
+      clearInterval(touchInProgress);
+      this.reportUserActivity();
+    });
+  } else {
+    // When not on touch devices, any mouse movement will be considered
+    // user activity
+    this.on('mousedown', this.reportUserActivity);
+    this.on('mousemove', this.reportUserActivity);
+    // Listen for keyboard navigation
+    this.on('keydown', this.reportUserActivity);
+    this.on('keyup', this.reportUserActivity);
+  }
 
   // Run an interval every 250 milliseconds instead of stuffing everything into
   // the mousemove function itself, to prevent performance degradation.
   // http://ejohn.org/blog/learning-from-twitter/
   activityCheck = setInterval(vjs.bind(this, function() {
     // Check to see if the mouse has been moved
-    if (activity) {
+    if (this.userActivity_) {
       // Reset the activity tracker
-      activity = false;
+      this.userActivity_ = false;
 
       // If the user state was passive, set the state to active
-      if (!this.userActive_) {
+      if (!this.userActive()) {
         this.userActive(true);
       }
 
@@ -998,7 +1005,6 @@ vjs.Player.prototype.listenForUserActivity = function(){
       inactivityTimeout = setTimeout(vjs.bind(this, function() {
         this.userActive(false);
       }), 2000);
-      console.log('inactivityTimeout')
     }
   }), 250);
 };

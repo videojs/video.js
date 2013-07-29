@@ -21,10 +21,14 @@ test('should re-link the player if the tech is moved', function(){
   var player, tech, el;
   el = document.createElement('div');
   el.innerHTML = '<div />';
+
   player = {
     id: function(){ return 'id'; },
     el: function(){ return el; },
     options_: {},
+    options: function(){ return {}; },
+    controls: function(){ return false; },
+    nativeControls: function(){ return false; },
     ready: function(){}
   };
   tech = new vjs.Html5(player, {});

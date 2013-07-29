@@ -211,20 +211,29 @@ test('should be able to initialize player twice on the same tag using string ref
   player.dispose();
 });
 
-test('should set controls and trigger event', function() {
-  expect(3);
+test('should set controls and trigger events', function() {
+  expect(6);
 
   var player = PlayerTest.makePlayer({ 'controls': false });
   ok(player.controls() === false, 'controls set through options');
+  var hasDisabledClass = player.el().className.indexOf('vjs-controls-disabled');
+  ok(hasDisabledClass !== -1, 'Disabled class added to player');
+
   player.controls(true);
   ok(player.controls() === true, 'controls updated');
+  var hasEnabledClass = player.el().className.indexOf('vjs-controls-enabled');
+  ok(hasEnabledClass !== -1, 'Disabled class added to player');
 
-  player.on('controlschange', function(){
-    ok(true, 'controlschange fired once');
+  player.on('controlsenabled', function(){
+    ok(true, 'enabled fired once');
+  });
+  player.on('controlsdisabled', function(){
+    ok(true, 'disabled fired once');
   });
   player.controls(false);
-  // Check for unnecessary controlschange events
-  player.controls(false);
+  player.controls(true);
+  // Check for unnecessary events
+  player.controls(true);
 
   player.dispose();
 });

@@ -46,8 +46,6 @@ vjs.Html5 = vjs.MediaTechController.extend({
       }
     });
 
-    this.on('click', this.onClick);
-
     this.setupTriggers();
 
     this.triggerReady();
@@ -94,6 +92,15 @@ vjs.Html5.prototype.createEl = function(){
     if (player.options_[attr] !== null) {
       el[attr] = player.options_[attr];
     }
+  }
+
+  if (vjs.TOUCH_ENABLED
+      && this.player().options()['nativeControlsForTouch'] !== false
+      && this.features.nativeControls) {
+
+    var controls = this.player().controls();
+    el.controls = controls;
+    this.player().nativeControls(controls);
   }
 
   return el;
@@ -203,6 +210,9 @@ vjs.Html5.prototype.ended = function(){ return this.el_.ended; };
   // mediaGroup: function(){ return this.el_.mediaGroup; },
   // controller: function(){ return this.el_.controller; },
 vjs.Html5.prototype.defaultMuted = function(){ return this.el_.defaultMuted; };
+
+vjs.Html5.prototype.controls = function(){ return this.el_.controls; }
+vjs.Html5.prototype.setControls = function(val){ this.el_.controls = !!val; }
 
 /* HTML5 Support Testing ---------------------------------------------------- */
 

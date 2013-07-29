@@ -21,10 +21,11 @@ vjs.Button = vjs.Component.extend({
     var self = this;
     this.on('touchend', function(event) {
       if (touchstart) {
+        // TODO: make sure this clicks arent triggered anyway, makeing this called
+        // twice
         self.onClick(event);
       }
       event.preventDefault();
-      event.stopPropagation();
     });
 
     this.on('click', this.onClick);

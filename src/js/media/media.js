@@ -1,5 +1,6 @@
 /**
- * @fileoverview Media Technology Controller - Base class for media playback technology controllers like Flash and HTML5
+ * @fileoverview Media Technology Controller - Base class for media playback
+ * technology controllers like Flash and HTML5
  */
 
 /**
@@ -13,37 +14,133 @@ vjs.MediaTechController = vjs.Component.extend({
   init: function(player, options, ready){
     vjs.Component.call(this, player, options, ready);
 
-    // Make playback element clickable
-    // this.addEvent('click', this.proxy(this.onClick));
+    var controlsListener = function(){
+      if (this.player().controls() && !this.player().nativeControls()) {
+        this.initListeners();
+      }
+    };
 
-    // player.triggerEvent('techready');
+    // Set up event listeners once the tech is ready and has an element to apply
+    // listeners to
+    this.ready(controlsListener);
+    this.on('controlsenabled', controlsListener);
+    this.on('controlsdisabled', this.removeListeners);
   }
 });
 
-// destroy: function(){},
-// createElement: function(){},
+/**
+ * Determine whether or not controls should be enabled on the video element
+ * Use native controls for iOS and Android by default until controls are more
+ * stable on those devices
+ *
+ * @return {Boolean} Controls enabled
+ * @private
+ */
+vjs.MediaTechController.prototype.usingNativeControls = function(){
+  var controls = false;
+  if (vjs.TOUCH_ENABLED
+      && this.nativeControlsAvailable !== false
+      && this.player().options()['nativeControlsForTouch'] !== false) {
+    controls = this.player().controls();
+  }
+  return controls;
+};
+
+/**
+ * Set up click and touch listeners for the playback element
+ * On desktops, a click on the video itself will toggle playback,
+ * on a mobile device a click on the video toggles controls.
+ * (toggling controls is done by toggling the user state between active and
+ * passive)
+ *
+ * A tap can signal that a user has become active, or has become passive
+ * e.g. a quick tap on an iPhone movie should reveal the controls. Another
+ * quick tap should hide them again (signaling the user is in a passive
+ * viewing state)
+ *
+ * In addition to this, we still want the user to be considered passive after
+ * a few seconds of inactivity.
+ *
+ * Note: the only part of iOS interaction we can't mimic with this setup
+ * is a touch and hold on the video element counting as activity in order to
+ * keep the controls showing, but that shouldn't be an issue. A tap and hold on
+ * any controls will still keep the user active
+ */
+vjs.MediaTechController.prototype.initListeners = function(){
+  var preventBubble, userWasActive;
+
+  if ('ontouchstart' in window) {
+    // Turn on component tap events
+    this.emitTapEvents();
+
+    this.on('tap', function(){
+      if (this.player_.userActive()) {
+        this.player_.userActive(false);
+      } else {
+        this.player_.userActive(true);
+      }
+    });
+
+    // We need to block touch events on the video element from bubbling up,
+    // otherwise they'll signal activity prematurely. The specific use case is
+    // when the video is playing and the controls have faded out. In this case
+    // only a tap (fast touch) should toggle the user active state and turn the
+    // controls back on. A touch and move or touch and hold should not trigger
+    // the controls (per iOS as an example at least)
+    //
+    // We always want to stop propagation on touchstart because touchstart
+    // at the player level starts the touchInProgress interval. We can still
+    // report activity on the other events, but won't let them bubble for
+    // consistency. We don't want to bubble a touchend without a touchstart.
+    this.on('touchstart', function(event) {
+      // Stop the mouse events from also happening
+      event.preventDefault();
+      event.stopPropagation();
+      // Record if the user was active now so we don't have to keep polling it
+      userWasActive = this.player_.userActive();
+    });
+
+    preventBubble = function(event){
+      event.stopPropagation();
+      if (userWasActive) {
+        this.player_.reportUserActivity();
+      }
+    };
+
+    // Treat all touch events the same for consistency
+    this.on('touchmove', preventBubble);
+    this.on('touchleave', preventBubble);
+    this.on('touchcancel', preventBubble);
+    this.on('touchend', preventBubble);
+  } else {
+    this.on('click', this.onClick);
+  }
+};
+
+vjs.MediaTechController.prototype.removeListeners = function(){
+  this.off('tap');
+  this.off('touchstart');
+  this.off('touchmove');
+  this.off('touchleave');
+  this.off('touchcancel');
+  this.off('touchend');
+  this.off('click');
+};
 
 /**
  * Handle a click on the media element. By default will play the media.
- *
- * On android browsers, having this toggle play state interferes with being
- * able to toggle the controls and toggling play state with the play button
  */
-vjs.MediaTechController.prototype.onClick = (function(){
-  if (vjs.IS_ANDROID) {
-    return function () {};
-  } else {
-    return function () {
-      if (this.player_.controls()) {
-        if (this.player_.paused()) {
-          this.player_.play();
-        } else {
-          this.player_.pause();
-        }
-      }
-    };
+vjs.MediaTechController.prototype.onClick = function(){
+  // When controls are disabled a click should not toggle playback because
+  // the click is considered a control
+  if (this.player_.controls()) {
+    if (this.player_.paused()) {
+      this.player_.play();
+    } else {
+      this.player_.pause();
+    }
   }
-})();
+};
 
 vjs.MediaTechController.prototype.features = {
   volumeControl: true,
@@ -54,7 +151,11 @@ vjs.MediaTechController.prototype.features = {
   // Optional events that we can manually mimic with timers
   // currently not triggered by video-js-swf
   progressEvents: false,
-  timeupdateEvents: false
+  timeupdateEvents: false,
+
+  // Assume techs have native controls that can be used if
+  // needed. This won't be true for the video.js swf.
+  nativeControls: true
 };
 
 vjs.media = {};
@@ -63,7 +164,7 @@ vjs.media = {};
  * List of default API methods for any MediaTechController
  * @type {String}
  */
-vjs.media.ApiMethods = 'play,pause,paused,currentTime,setCurrentTime,duration,buffered,volume,setVolume,muted,setMuted,width,height,supportsFullScreen,enterFullScreen,src,load,currentSrc,preload,setPreload,autoplay,setAutoplay,loop,setLoop,error,networkState,readyState,seeking,initialTime,startOffsetTime,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight,textTracks,defaultPlaybackRate,playbackRate,mediaGroup,controller,controls,defaultMuted'.split(',');
+vjs.media.ApiMethods = 'play,pause,paused,currentTime,setCurrentTime,duration,buffered,volume,setVolume,muted,setMuted,width,height,supportsFullScreen,enterFullScreen,src,load,currentSrc,preload,setPreload,autoplay,setAutoplay,loop,setLoop,error,networkState,readyState,seeking,initialTime,startOffsetTime,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight,textTracks,defaultPlaybackRate,playbackRate,mediaGroup,controller,controls,defaultMuted,nativeControls'.split(',');
 // Create placeholder methods for each that warn when a method isn't supported by the current playback technology
 
 function createMethod(methodName){

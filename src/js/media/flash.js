@@ -183,7 +183,7 @@ vjs.Flash = vjs.MediaTechController.extend({
           tech.el_ = el;
 
           // Now that the element is ready, make a click on the swf play the video
-          vjs.on(el, 'click', tech.bind(tech.onClick));
+          // vjs.on(el, 'click', tech.bind(tech.onClick));
 
           // Make sure swf is actually ready. Sometimes the API isn't actually yet.
           vjs.Flash.checkReady(tech);
