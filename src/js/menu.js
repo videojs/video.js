@@ -128,7 +128,7 @@ vjs.MenuButton.prototype.createMenu = function(){
     }));
   }
 
-  this.items = this.createItems();
+  this.items = this['createItems']();
 
   if (this.items) {
     // Add menu items to the menu
@@ -143,7 +143,7 @@ vjs.MenuButton.prototype.createMenu = function(){
 /**
  * Create the list of menu items. Specific to each subclass.
  */
-vjs.MenuButton.prototype.createItems = function(){};
+vjs.MenuButton.prototype['createItems'] = function(){};
 
 /** @inheritDoc */
 vjs.MenuButton.prototype.buildCSSClass = function(){
