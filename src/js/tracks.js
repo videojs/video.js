@@ -827,7 +827,7 @@ vjs.TextTrackButton = vjs.MenuButton.extend({
 // };
 
 // Create a menu item for each text track
-vjs.TextTrackButton.prototype['createItems'] = function(){
+vjs.TextTrackButton.prototype.createItems = function(){
   var items = [], track;
 
   // Add an OFF menu item to turn all tracks off
@@ -890,7 +890,7 @@ vjs.ChaptersButton.prototype.buttonText = 'Chapters';
 vjs.ChaptersButton.prototype.className = 'vjs-chapters-button';
 
 // Create a menu item for each text track
-vjs.ChaptersButton.prototype['createItems'] = function(){
+vjs.ChaptersButton.prototype.createItems = function(){
   var items = [], track;
 
   for (var i = 0; i < this.player_.textTracks().length; i++) {
