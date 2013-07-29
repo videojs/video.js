@@ -4,6 +4,7 @@ CHANGELOG
 ## Unreleased (HEAD)
 * Added LESS as a CSS preprocessor for the default skin ([view](https://github.com/videojs/video.js/pull/644))
 * Exported MenuButtons for use in the API ([view](https://github.com/videojs/video.js/pull/648))
+* Fixed ability to remove listeners added with one() ([view](https://github.com/videojs/video.js/pull/659))
 
 --------------------
 
