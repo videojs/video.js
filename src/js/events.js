@@ -329,8 +329,10 @@ vjs.trigger = function(elem, event) {
  * @return {[type]}
  */
 vjs.one = function(elem, type, fn) {
-  vjs.on(elem, type, function(){
-    vjs.off(elem, type, arguments.callee);
+  var func = function(){
+    vjs.off(elem, type, func);
     fn.apply(this, arguments);
-  });
+  };
+  func.guid = fn.guid = fn.guid || vjs.guid++;
+  vjs.on(elem, type, func);
 };
