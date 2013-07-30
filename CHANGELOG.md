@@ -6,6 +6,7 @@ CHANGELOG
 * Exported MenuButtons for use in the API ([view](https://github.com/videojs/video.js/pull/648))
 * Fixed ability to remove listeners added with one() ([view](https://github.com/videojs/video.js/pull/659))
 * Updated buffered() to account for multiple loaded ranges ([view](https://github.com/videojs/video.js/pull/643))
+* Exported createItems() for custom menus ([view](https://github.com/videojs/video.js/pull/654))
 
 --------------------
 
