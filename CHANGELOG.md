@@ -7,6 +7,7 @@ CHANGELOG
 * Fixed ability to remove listeners added with one() ([view](https://github.com/videojs/video.js/pull/659))
 * Updated buffered() to account for multiple loaded ranges ([view](https://github.com/videojs/video.js/pull/643))
 * Exported createItems() for custom menus ([view](https://github.com/videojs/video.js/pull/654))
+* Preventing media events from bubbling up the DOM ([view](https://github.com/videojs/video.js/pull/630))
 
 --------------------
 
