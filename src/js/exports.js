@@ -92,6 +92,9 @@ goog.exportSymbol('videojs.PosterImage', vjs.PosterImage);
 goog.exportSymbol('videojs.Menu', vjs.Menu);
 goog.exportSymbol('videojs.MenuItem', vjs.MenuItem);
 goog.exportSymbol('videojs.MenuButton', vjs.MenuButton);
+goog.exportProperty(vjs.MenuButton.prototype, 'createItems', vjs.MenuButton.prototype.createItems);
+goog.exportProperty(vjs.TextTrackButton.prototype, 'createItems', vjs.TextTrackButton.prototype.createItems);
+goog.exportProperty(vjs.ChaptersButton.prototype, 'createItems', vjs.ChaptersButton.prototype.createItems);
 
 goog.exportSymbol('videojs.SubtitlesButton', vjs.SubtitlesButton);
 goog.exportSymbol('videojs.CaptionsButton', vjs.CaptionsButton);
