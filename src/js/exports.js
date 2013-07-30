@@ -57,6 +57,8 @@ goog.exportProperty(vjs.Component.prototype, 'dimensions', vjs.Component.prototy
 goog.exportProperty(vjs.Component.prototype, 'ready', vjs.Component.prototype.ready);
 goog.exportProperty(vjs.Component.prototype, 'fadeIn', vjs.Component.prototype.fadeIn);
 goog.exportProperty(vjs.Component.prototype, 'fadeOut', vjs.Component.prototype.fadeOut);
+goog.exportProperty(vjs.Component.prototype, 'addClass', vjs.Component.prototype.addClass);
+goog.exportProperty(vjs.Component.prototype, 'removeClass', vjs.Component.prototype.removeClass);
 
 goog.exportSymbol('videojs.Player', vjs.Player);
 goog.exportProperty(vjs.Player.prototype, 'dispose', vjs.Player.prototype.dispose);
