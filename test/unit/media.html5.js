@@ -35,17 +35,20 @@ test('should re-link the player if the tech is moved', function(){
 });
 
 test('should not call default action on media event', function() {
-  expect(1);
-  var player = PlayerTest.makePlayer();
-  player.on('play', function(event) {
-      ok(event.isDefaultPrevented(), 'default action not prevented.');
-  });
-  var tech = new vjs.Html5(player, {});
-  // PhantomJS does not currently support event constructors (the creation
-  // method advised by MDN) https://github.com/ariya/phantomjs/issues/11289
-  // so we use the 'old' way of doing so here.
+  expect(2);
+  var player = {
+    id: function() { return 'id'; },
+    el: function() { return document.createElement('div'); },
+    options_: {},
+    trigger: function(event) {
+      ok(event.type === 'play', 'non-play media event fired');
+      ok(event.isDefaultPrevented(), 'default action not prevented');
+    },
+    ready: function() {}
+  };
+  var tech = new vjs.Html5(player, { el: vjs.TEST_VID });
+  // Mediafaker doesn't support play/pause, so dispatch an event manually.
   var event = document.createEvent('CustomEvent');
   event.initCustomEvent('play', false /*bubbles*/, true /*cancelable*/, null);
-  // Mediafaker doesn't support play/pause, so dispatch an event manually.
   tech.el_.dispatchEvent(event);
 });
