@@ -277,8 +277,9 @@ vjs.trigger = function(elem, event) {
     elemData.dispatcher.call(elem, event);
   }
 
-  // Unless explicitly stopped, recursively calls this function to bubble the event up the DOM.
-  if (parent && !event.isPropagationStopped()) {
+  // Unless explicitly stopped or the event does not bubble (e.g. media events)
+  // recursively calls this function to bubble the event up the DOM.
+  if (parent && !event.isPropagationStopped() && event.bubbles !== false) {
     vjs.trigger(parent, event);
 
   // If at the top of the DOM, triggers the default action unless disabled.
@@ -329,8 +330,10 @@ vjs.trigger = function(elem, event) {
  * @return {[type]}
  */
 vjs.one = function(elem, type, fn) {
-  vjs.on(elem, type, function(){
-    vjs.off(elem, type, arguments.callee);
+  var func = function(){
+    vjs.off(elem, type, func);
     fn.apply(this, arguments);
-  });
+  };
+  func.guid = fn.guid = fn.guid || vjs.guid++;
+  vjs.on(elem, type, func);
 };

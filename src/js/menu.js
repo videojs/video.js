@@ -128,7 +128,7 @@ vjs.MenuButton.prototype.createMenu = function(){
     }));
   }
 
-  this.items = this.createItems();
+  this.items = this['createItems']();
 
   if (this.items) {
     // Add menu items to the menu
