@@ -12,6 +12,7 @@ Create your own skin at http://designer.videojs.com
 // diminensions use em-based sizes so that the scale along with the font size.
 // Try increasing it to 20px and see what happens.
 @base-font-size: 10px;
+@touch-device-font-size: 15px;
 
 // The main font color controls the color of the text and the icons (font icons)
 @main-font-color: #CCCCCC; // e.g. rgb(255, 255, 255) or #ffffff
@@ -176,13 +177,15 @@ The default control bar that is a container for most of the controls.
   visibility: hidden;
   opacity: 0;
 
-  @trans: visibility 1.5s, opacity 1.5s;
+  @trans: visibility 1.0s, opacity 1.0s;
   .transition(@trans);
-  /* Wait a moment before fading out the control bar */
-  // .transition-delay(2s);
 }
 
-.vjs-default-skin.vjs-native-controls .vjs-control-bar {
+.vjs-default-skin.vjs-controls-disabled .vjs-control-bar {
+  display: none;
+}
+
+.vjs-default-skin.vjs-using-native-controls .vjs-control-bar {
   display: none;
 }
 
@@ -458,7 +461,7 @@ easily in the skin designer. http://designer.videojs.com/
 }
 /* Hide on mobile devices. Remove when we stop using native controls
     by default on mobile  */
-.vjs-default-skin.vjs-native-controls .vjs-big-play-button {
+.vjs-default-skin.vjs-using-native-controls .vjs-big-play-button {
   display: none;
 }
 
@@ -681,6 +684,10 @@ control positioning and full window mode. **
   .user-select(none);
 }
 
+.video-js.vjs-touch-enabled {
+  font-size: 15px;
+}
+
 /* Playback technology elements expand to the width/height of the containing div
     <video> or <object> */
 .video-js .vjs-tech {
@@ -745,7 +752,7 @@ body.vjs-full-window {
 }
 
 /* Hide the poster when native controls are used otherwise it covers them */
-.video-js.vjs-native-controls .vjs-poster {
+.video-js.vjs-using-native-controls .vjs-poster {
   display: none;
 }
 

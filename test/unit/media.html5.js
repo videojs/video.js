@@ -28,7 +28,8 @@ test('should re-link the player if the tech is moved', function(){
     options_: {},
     options: function(){ return {}; },
     controls: function(){ return false; },
-    nativeControls: function(){ return false; },
+    useNativeControls: function(){ return false; },
+    on: function(){ return this; },
     ready: function(){}
   };
   tech = new vjs.Html5(player, {});

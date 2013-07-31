@@ -15,7 +15,7 @@ vjs.MediaTechController = vjs.Component.extend({
     vjs.Component.call(this, player, options, ready);
 
     var controlsListener = function(){
-      if (this.player().controls() && !this.player().nativeControls()) {
+      if (this.player().controls() && !this.player().useNativeControls()) {
         this.initListeners();
       }
     };
@@ -23,8 +23,8 @@ vjs.MediaTechController = vjs.Component.extend({
     // Set up event listeners once the tech is ready and has an element to apply
     // listeners to
     this.ready(controlsListener);
-    this.on('controlsenabled', controlsListener);
-    this.on('controlsdisabled', this.removeListeners);
+    this.player().on('controlsenabled', vjs.bind(this, controlsListener));
+    this.player().on('controlsdisabled', vjs.bind(this, this.removeListeners));
   }
 });
 
@@ -63,24 +63,13 @@ vjs.MediaTechController.prototype.usingNativeControls = function(){
  *
  * Note: the only part of iOS interaction we can't mimic with this setup
  * is a touch and hold on the video element counting as activity in order to
- * keep the controls showing, but that shouldn't be an issue. A tap and hold on
+ * keep the controls showing, but that shouldn't be an issue. A touch and hold on
  * any controls will still keep the user active
  */
 vjs.MediaTechController.prototype.initListeners = function(){
   var preventBubble, userWasActive;
 
   if ('ontouchstart' in window) {
-    // Turn on component tap events
-    this.emitTapEvents();
-
-    this.on('tap', function(){
-      if (this.player_.userActive()) {
-        this.player_.userActive(false);
-      } else {
-        this.player_.userActive(true);
-      }
-    });
-
     // We need to block touch events on the video element from bubbling up,
     // otherwise they'll signal activity prematurely. The specific use case is
     // when the video is playing and the controls have faded out. In this case
@@ -112,12 +101,26 @@ vjs.MediaTechController.prototype.initListeners = function(){
     this.on('touchleave', preventBubble);
     this.on('touchcancel', preventBubble);
     this.on('touchend', preventBubble);
+
+    // Turn on component tap events
+    this.emitTapEvents();
+
+    // The tap listener needs to come after the touchend listener because the tap
+    // listener cancels out any reportedUserActivity when setting userActive(false)
+    this.on('tap', function(){
+      if (this.player_.userActive()) {
+        this.player_.userActive(false);
+      } else {
+        this.player_.userActive(true);
+      }
+    });
   } else {
     this.on('click', this.onClick);
   }
 };
 
 vjs.MediaTechController.prototype.removeListeners = function(){
+  console.log('removeListeners');
   this.off('tap');
   this.off('touchstart');
   this.off('touchmove');
@@ -131,6 +134,7 @@ vjs.MediaTechController.prototype.removeListeners = function(){
  * Handle a click on the media element. By default will play the media.
  */
 vjs.MediaTechController.prototype.onClick = function(){
+  console.log('onClick');
   // When controls are disabled a click should not toggle playback because
   // the click is considered a control
   if (this.player_.controls()) {
@@ -151,11 +155,7 @@ vjs.MediaTechController.prototype.features = {
   // Optional events that we can manually mimic with timers
   // currently not triggered by video-js-swf
   progressEvents: false,
-  timeupdateEvents: false,
-
-  // Assume techs have native controls that can be used if
-  // needed. This won't be true for the video.js swf.
-  nativeControls: true
+  timeupdateEvents: false
 };
 
 vjs.media = {};
@@ -164,7 +164,7 @@ vjs.media = {};
  * List of default API methods for any MediaTechController
  * @type {String}
  */
-vjs.media.ApiMethods = 'play,pause,paused,currentTime,setCurrentTime,duration,buffered,volume,setVolume,muted,setMuted,width,height,supportsFullScreen,enterFullScreen,src,load,currentSrc,preload,setPreload,autoplay,setAutoplay,loop,setLoop,error,networkState,readyState,seeking,initialTime,startOffsetTime,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight,textTracks,defaultPlaybackRate,playbackRate,mediaGroup,controller,controls,defaultMuted,nativeControls'.split(',');
+vjs.media.ApiMethods = 'play,pause,paused,currentTime,setCurrentTime,duration,buffered,volume,setVolume,muted,setMuted,width,height,supportsFullScreen,enterFullScreen,src,load,currentSrc,preload,setPreload,autoplay,setAutoplay,loop,setLoop,error,networkState,readyState,seeking,initialTime,startOffsetTime,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight,textTracks,defaultPlaybackRate,playbackRate,mediaGroup,controller,controls,defaultMuted'.split(',');
 // Create placeholder methods for each that warn when a method isn't supported by the current playback technology
 
 function createMethod(methodName){

@@ -40,5 +40,8 @@ vjs.PosterImage.prototype.createEl = function(){
 };
 
 vjs.PosterImage.prototype.onClick = function(){
-  this.player_.play();
+  // Only accept clicks when controls are enabled
+  if (this.player().controls()) {
+    this.player_.play();
+  }
 };

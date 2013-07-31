@@ -35,6 +35,23 @@ vjs.Html5 = vjs.MediaTechController.extend({
       this.el_.src = source.src;
     }
 
+    // Determine if native controls should be used
+    if (vjs.TOUCH_ENABLED && player.options()['nativeControlsForTouch'] !== false) {
+      // If the player controls are enabled turn on the native controls
+      this.setControls(this.player().controls());
+
+      // Update the native controls when player controls state is updated
+      player.on('controlsenabled', vjs.bind(this, function(){
+        this.setControls(true);
+      }));
+      player.on('controlsdisabled', vjs.bind(this, function(){
+        this.setControls(false);
+      }));
+
+      // Update the state of the player to using native controls
+      this.player().useNativeControls(true);
+    }
+
     // Chrome and Safari both have issues with autoplay.
     // In Safari (5.1.1), when we move the video element into the container div, autoplay doesn't work.
     // In Chrome (15), if you have autoplay + a poster + no controls, the video gets hidden (but audio plays)
@@ -92,15 +109,6 @@ vjs.Html5.prototype.createEl = function(){
     if (player.options_[attr] !== null) {
       el[attr] = player.options_[attr];
     }
-  }
-
-  if (vjs.TOUCH_ENABLED
-      && this.player().options()['nativeControlsForTouch'] !== false
-      && this.features.nativeControls) {
-
-    var controls = this.player().controls();
-    el.controls = controls;
-    this.player().nativeControls(controls);
   }
 
   return el;

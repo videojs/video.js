@@ -109,6 +109,8 @@ vjs.Player.prototype.dispose = function(){
 
   if (this.tech) { this.tech.dispose(); }
 
+  clearInterval(this.activityCheck);
+
   // Component dispose
   vjs.Component.prototype.dispose.call(this);
 };
@@ -873,25 +875,41 @@ vjs.Player.prototype.controls = function(bool){
         this.trigger('controlsdisabled');
       }
     }
+    return this;
   }
   return this.controls_;
 };
 
-vjs.Player.prototype.nativeControls_;
-vjs.Player.prototype.nativeControls = function(bool){
+vjs.Player.prototype.useNativeControls_;
+
+/**
+ * Toggle native controls on/off. Native controls are the controls built into
+ * devices (e.g. default iPhone controls), Flash, or other techs
+ * (e.g. Vimeo Controls)
+ *
+ * **This should only be set by the current tech, because only the tech knows
+ * if it can support native controls**
+ *
+ * @param  {Boolean} bool    True signals that native controls are on
+ * @return {vjs.Player}      Returns the player
+ */
+vjs.Player.prototype.useNativeControls = function(bool){
   if (bool !== undefined) {
     bool = !!bool; // force boolean
     // Don't trigger a change event unless it actually changed
-    if (this.nativeControls_ !== bool) {
-      this.nativeControls_ = bool;
+    if (this.useNativeControls_ !== bool) {
+      this.useNativeControls_ = bool;
       if (bool) {
-        this.addClass('vjs-native-controls');
+        this.addClass('vjs-using-native-controls');
+        this.trigger('usingnativecontrols');
       } else {
-        this.removeClass('vjs-native-controls');
+        this.removeClass('vjs-using-native-controls');
+        this.trigger('usingcustomcontrols');
       }
     }
+    return this;
   }
-  return this.nativeControls_;
+  return this.useNativeControls_;
 };
 
 vjs.Player.prototype.error = function(){ return this.techGet('error'); };
@@ -917,7 +935,6 @@ vjs.Player.prototype.userActive = function(bool){
         this.removeClass('vjs-user-passive');
         this.addClass('vjs-user-active');
         this.trigger('useractive');
-        console.log('useractive');
       } else {
         // We're switching the state to passive manually, so erase any other
         // activity
@@ -938,7 +955,6 @@ vjs.Player.prototype.userActive = function(bool){
         this.removeClass('vjs-user-active');
         this.addClass('vjs-user-passive');
         this.trigger('userpassive');
-        console.log('userpassive');
       }
     }
     return this;
@@ -947,7 +963,7 @@ vjs.Player.prototype.userActive = function(bool){
 };
 
 vjs.Player.prototype.listenForUserActivity = function(){
-  var activityCheck, inactivityTimeout, touchInProgress;
+  var inactivityTimeout, touchInProgress;
 
   // Consider touch events that bubble up to be activity
   if ('ontouchstart' in window) {
@@ -986,7 +1002,7 @@ vjs.Player.prototype.listenForUserActivity = function(){
   // Run an interval every 250 milliseconds instead of stuffing everything into
   // the mousemove function itself, to prevent performance degradation.
   // http://ejohn.org/blog/learning-from-twitter/
-  activityCheck = setInterval(vjs.bind(this, function() {
+  this.activityCheck = setInterval(vjs.bind(this, function() {
     // Check to see if the mouse has been moved
     if (this.userActivity_) {
       // Reset the activity tracker
@@ -1003,7 +1019,11 @@ vjs.Player.prototype.listenForUserActivity = function(){
       // In X seconds, if no more activity has occurred (resetting this timer)
       // the user will be considered passive
       inactivityTimeout = setTimeout(vjs.bind(this, function() {
-        this.userActive(false);
+        // Protect against the case where the inactivity timeout can trigger
+        // before the next user activity is picked up by the activityCheck loop.
+        if (!this.userActivity_) {
+          this.userActive(false);
+        }
       }), 2000);
     }
   }), 250);
