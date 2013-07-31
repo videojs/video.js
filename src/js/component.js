@@ -705,7 +705,7 @@ vjs.Component.prototype.dimension = function(widthOrHeight, num, skipListeners){
 vjs.Component.prototype.emitTapEvents = function(){
   var touchStart, touchTime, couldBeTap, noTap;
 
-  if ('ontouchstart' in window) {
+  if (vjs.TOUCH_ENABLED) {
     // Track the start time so we can determine how long the touch lasted
     touchStart = 0;
 

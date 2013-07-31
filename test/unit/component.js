@@ -224,6 +224,11 @@ test('should use a defined content el for appending children', function(){
 
 test('should emit a tap event', function(){
   expect(1);
+
+  // Fake touch support. Real touch support isn't needed for this test.
+  var origTouch = vjs.TOUCH_ENABLED;
+  vjs.TOUCH_ENABLED = true;
+
   var comp = new vjs.Component(getFakePlayer(), {});
 
   comp.emitTapEvents();
@@ -238,4 +243,7 @@ test('should emit a tap event', function(){
   comp.trigger('touchstart');
   comp.trigger('touchmove');
   comp.trigger('touchend');
+
+  // Reset to orignial value
+  vjs.TOUCH_ENABLED = origTouch;
 });

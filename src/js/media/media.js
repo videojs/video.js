@@ -69,7 +69,7 @@ vjs.MediaTechController.prototype.usingNativeControls = function(){
 vjs.MediaTechController.prototype.initListeners = function(){
   var preventBubble, userWasActive;
 
-  if ('ontouchstart' in window) {
+  if (vjs.TOUCH_ENABLED) {
     // We need to block touch events on the video element from bubbling up,
     // otherwise they'll signal activity prematurely. The specific use case is
     // when the video is playing and the controls have faded out. In this case
@@ -120,7 +120,6 @@ vjs.MediaTechController.prototype.initListeners = function(){
 };
 
 vjs.MediaTechController.prototype.removeListeners = function(){
-  console.log('removeListeners');
   this.off('tap');
   this.off('touchstart');
   this.off('touchmove');
@@ -134,7 +133,6 @@ vjs.MediaTechController.prototype.removeListeners = function(){
  * Handle a click on the media element. By default will play the media.
  */
 vjs.MediaTechController.prototype.onClick = function(){
-  console.log('onClick');
   // When controls are disabled a click should not toggle playback because
   // the click is considered a control
   if (this.player_.controls()) {

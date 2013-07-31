@@ -966,7 +966,7 @@ vjs.Player.prototype.listenForUserActivity = function(){
   var inactivityTimeout, touchInProgress;
 
   // Consider touch events that bubble up to be activity
-  if ('ontouchstart' in window) {
+  if (vjs.TOUCH_ENABLED) {
     this.on('touchstart', function() {
       this.reportUserActivity();
       // For as long as the they are touching the device, we consider them
