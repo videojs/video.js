@@ -28,7 +28,7 @@ test('should re-link the player if the tech is moved', function(){
     options_: {},
     options: function(){ return {}; },
     controls: function(){ return false; },
-    useNativeControls: function(){ return false; },
+    usingNativeControls: function(){ return false; },
     on: function(){ return this; },
     ready: function(){}
   };

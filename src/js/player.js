@@ -881,7 +881,7 @@ vjs.Player.prototype.controls = function(bool){
   return this.controls_;
 };
 
-vjs.Player.prototype.useNativeControls_;
+vjs.Player.prototype.usingNativeControls_;
 
 /**
  * Toggle native controls on/off. Native controls are the controls built into
@@ -894,12 +894,12 @@ vjs.Player.prototype.useNativeControls_;
  * @param  {Boolean} bool    True signals that native controls are on
  * @return {vjs.Player}      Returns the player
  */
-vjs.Player.prototype.useNativeControls = function(bool){
+vjs.Player.prototype.usingNativeControls = function(bool){
   if (bool !== undefined) {
     bool = !!bool; // force boolean
     // Don't trigger a change event unless it actually changed
-    if (this.useNativeControls_ !== bool) {
-      this.useNativeControls_ = bool;
+    if (this.usingNativeControls_ !== bool) {
+      this.usingNativeControls_ = bool;
       if (bool) {
         this.addClass('vjs-using-native-controls');
         this.trigger('usingnativecontrols');
@@ -910,7 +910,7 @@ vjs.Player.prototype.useNativeControls = function(bool){
     }
     return this;
   }
-  return this.useNativeControls_;
+  return this.usingNativeControls_;
 };
 
 vjs.Player.prototype.error = function(){ return this.techGet('error'); };

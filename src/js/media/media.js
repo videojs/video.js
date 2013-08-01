@@ -14,17 +14,7 @@ vjs.MediaTechController = vjs.Component.extend({
   init: function(player, options, ready){
     vjs.Component.call(this, player, options, ready);
 
-    var controlsListener = function(){
-      if (this.player().controls() && !this.player().useNativeControls()) {
-        this.initListeners();
-      }
-    };
-
-    // Set up event listeners once the tech is ready and has an element to apply
-    // listeners to
-    this.ready(controlsListener);
-    this.player().on('controlsenabled', vjs.bind(this, controlsListener));
-    this.player().on('controlsdisabled', vjs.bind(this, this.removeListeners));
+    this.initListeners();
   }
 });
 
@@ -67,6 +57,27 @@ vjs.MediaTechController.prototype.usingNativeControls = function(){
  * any controls will still keep the user active
  */
 vjs.MediaTechController.prototype.initListeners = function(){
+  var player, tech, activateControls, deactivateControls;
+
+  tech = this;
+  player = this.player();
+
+  var activateControls = function(){
+    if (player.controls() && !player.usingNativeControls()) {
+      tech.addListeners();
+    }
+  };
+
+  deactivateControls = vjs.bind(tech, tech.removeListeners);
+
+  // Set up event listeners once the tech is ready and has an element to apply
+  // listeners to
+  this.ready(activateControls);
+  player.on('controlsenabled', activateControls);
+  player.on('controlsdisabled', deactivateControls);
+};
+
+vjs.MediaTechController.prototype.addListeners = function(){
   var preventBubble, userWasActive;
 
   if (vjs.TOUCH_ENABLED) {
@@ -115,7 +126,10 @@ vjs.MediaTechController.prototype.initListeners = function(){
       }
     });
   } else {
-    this.on('click', this.onClick);
+    // Some browsers (Chrome & IE) don't trigger a click on a flash swf, but do
+    // trigger mousedown/up.
+    // http://stackoverflow.com/questions/1444562/javascript-onclick-event-over-flash-object
+    this.on('mousedown', this.onClick);
   }
 };
 
@@ -127,12 +141,17 @@ vjs.MediaTechController.prototype.removeListeners = function(){
   this.off('touchcancel');
   this.off('touchend');
   this.off('click');
+  this.off('mousedown');
 };
 
 /**
  * Handle a click on the media element. By default will play the media.
  */
-vjs.MediaTechController.prototype.onClick = function(){
+vjs.MediaTechController.prototype.onClick = function(event){
+  // We're using mousedown to detect clicks thanks to Flash, but mousedown
+  // will also be triggered with right-clicks, so we need to prevent that
+  if (event.button !== 0) return;
+
   // When controls are disabled a click should not toggle playback because
   // the click is considered a control
   if (this.player_.controls()) {

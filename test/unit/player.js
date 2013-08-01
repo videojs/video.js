@@ -256,3 +256,76 @@ test('should set controls and trigger events', function() {
 //   player.requestFullScreen();
 // });
 
+test('should toggle user the user state between active and passive', function(){
+  var player = PlayerTest.makePlayer({});
+
+  expect(9);
+
+  ok(player.userActive(), 'User should be active at player init');
+
+  player.on('userpassive', function(){
+    ok(true, 'userpassive event triggered');
+  });
+
+  player.on('useractive', function(){
+    ok(true, 'useractive event triggered');
+  });
+
+  player.userActive(false);
+  ok(player.userActive() === false, 'Player state changed to passive');
+  ok(player.el().className.indexOf('vjs-user-active') === -1, 'Active class removed');
+  ok(player.el().className.indexOf('vjs-user-passive') !== -1, 'Passive class added');
+
+  player.userActive(true);
+  ok(player.userActive() === true, 'Player state changed to active');
+  ok(player.el().className.indexOf('vjs-user-passive') === -1, 'Passive class removed');
+  ok(player.el().className.indexOf('vjs-user-active') !== -1, 'Active class added');
+
+  player.dispose();
+});
+
+test('should add a touch-enabled classname when touch is supported', function(){
+  var player;
+
+  expect(1);
+
+  // Fake touch support. Real touch support isn't needed for this test.
+  var origTouch = vjs.TOUCH_ENABLED;
+  vjs.TOUCH_ENABLED = true;
+
+  player = PlayerTest.makePlayer({});
+
+  ok(player.el().className.indexOf('vjs-touch-enabled'), 'touch-enabled classname added');
+
+
+  vjs.TOUCH_ENABLED = origTouch;
+  player.dispose();
+});
+
+test('should allow for tracking when native controls are used', function(){
+  var player = PlayerTest.makePlayer({});
+
+  expect(6);
+
+  // Make sure native controls is false before starting test
+  player.usingNativeControls(false);
+
+  player.on('usingnativecontrols', function(){
+    ok(true, 'usingnativecontrols event triggered');
+  });
+
+  player.on('usingcustomcontrols', function(){
+    ok(true, 'usingcustomcontrols event triggered');
+  });
+
+  player.usingNativeControls(true);
+  ok(player.usingNativeControls() === true, 'Using native controls is true');
+  ok(player.el().className.indexOf('vjs-using-native-controls') !== -1, 'Native controls class added');
+
+  player.usingNativeControls(false);
+  ok(player.usingNativeControls() === false, 'Using native controls is false');
+  ok(player.el().className.indexOf('vjs-using-native-controls') === -1, 'Native controls class removed');
+
+  player.dispose();
+});
+

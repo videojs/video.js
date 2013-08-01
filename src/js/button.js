@@ -12,7 +12,9 @@ vjs.Button = vjs.Component.extend({
     vjs.Component.call(this, player, options);
 
     var touchstart = false;
-    this.on('touchstart', function() {
+    this.on('touchstart', function(event) {
+      // Stop click and other mouse events from triggering also
+      event.preventDefault();
       touchstart = true;
     });
     this.on('touchmove', function() {
@@ -21,8 +23,6 @@ vjs.Button = vjs.Component.extend({
     var self = this;
     this.on('touchend', function(event) {
       if (touchstart) {
-        // TODO: make sure this clicks arent triggered anyway, makeing this called
-        // twice
         self.onClick(event);
       }
       event.preventDefault();

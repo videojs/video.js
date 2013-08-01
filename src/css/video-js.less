@@ -779,26 +779,6 @@ body.vjs-full-window {
 .video-js .vjs-captions { color: #fc6 /* Captions are yellow */; }
 .vjs-tt-cue { display: block; }
 
-/* Fading sytles, used to fade control bar. */
-.vjs-fade-in {
-  display: block !important;
-  /* Visibility needed to make sure things hide in older browsers too. */
-  visibility: visible;
-  opacity: 1;
-
-  @trans: visibility 0.1s, opacity 0.1s; // Var needed because of comma
-  .transition(@trans);
-}
-.vjs-fade-out {
-  display: block !important;
-  visibility: hidden;
-  opacity: 0;
-
-  @trans: visibility 1.5s, opacity 1.5s;
-  .transition(@trans);
-  /* Wait a moment before fading out the control bar */
-  .transition-delay(2s);
-}
 /* Hide disabled or unsupported controls */
 .vjs-default-skin .vjs-hidden { display: none; }
 

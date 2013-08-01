@@ -540,26 +540,6 @@ vjs.Component.prototype.hide = function(){
 };
 
 /**
- * Fade a component in using CSS
- * @return {vjs.Component}
- */
-vjs.Component.prototype.fadeIn = function(){
-  this.removeClass('vjs-fade-out');
-  this.addClass('vjs-fade-in');
-  return this;
-};
-
-/**
- * Fade a component out using CSS
- * @return {vjs.Component}
- */
-vjs.Component.prototype.fadeOut = function(){
-  this.removeClass('vjs-fade-in');
-  this.addClass('vjs-fade-out');
-  return this;
-};
-
-/**
  * Lock an item in its visible state. To be used with fadeIn/fadeOut.
  * @return {vjs.Component}
  */
@@ -583,14 +563,7 @@ vjs.Component.prototype.unlockShowing = function(){
 vjs.Component.prototype.disable = function(){
   this.hide();
   this.show = function(){};
-  this.fadeIn = function(){};
 };
-
-// TODO: Get enable working
-// vjs.Component.prototype.enable = function(){
-//   this.fadeIn = vjs.Component.prototype.fadeIn;
-//   this.show = vjs.Component.prototype.show;
-// };
 
 /**
  * If a value is provided it will change the width of the player to that value
