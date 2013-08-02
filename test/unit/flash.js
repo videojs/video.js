@@ -32,3 +32,17 @@ test('test streamToParts', function() {
   ok(parts.connection === '');
   ok(parts.stream === '');
 });
+
+test('test isStreamingSrc', function() {
+  var isStreamingSrc = vjs.Flash.isStreamingSrc;
+  ok(isStreamingSrc('rtmp://streaming.is/fun'));
+  ok(isStreamingSrc('rtmps://streaming.is/fun'));
+  ok(isStreamingSrc('rtmpe://streaming.is/fun'));
+  ok(isStreamingSrc('rtmpt://streaming.is/fun'));
+  // test invalid protocols
+  ok(!isStreamingSrc('rtmp:streaming.is/fun'));
+  ok(!isStreamingSrc('rtmpz://streaming.is/fun'));
+  ok(!isStreamingSrc('http://streaming.is/fun'));
+  ok(!isStreamingSrc('https://streaming.is/fun'));
+  ok(!isStreamingSrc('file://streaming.is/fun'));
+});

@@ -531,6 +531,10 @@ vjs.Flash.isStreamingType = function(srcType) {
   return srcType in vjs.Flash.streamingFormats;
 };
 
+// RTMP has four variations, any string starting
+// with one of these protocols should be valid
+vjs.Flash.RTMP_RE = /^rtmp[set]?:\/\//i;
+
 vjs.Flash.isStreamingSrc = function(src) {
-  return src && src.indexOf(",") !== -1;
+  return vjs.Flash.RTMP_RE.test(src);
 };
