@@ -86,7 +86,9 @@ vjs.Player = vjs.Component.extend({
 vjs.Player.prototype.options_ = vjs.options;
 
 vjs.Player.prototype.dispose = function(){
-  // this.isReady_ = false;
+  this.trigger('dispose');
+  // prevent dispose from being called twice
+  this.off('dispose');
 
   // Kill reference to this player
   vjs.players[this.id_] = null;
@@ -544,11 +546,12 @@ vjs.Player.prototype.remainingTime = function(){
 vjs.Player.prototype.buffered = function(){
   var buffered = this.techGet('buffered'),
       start = 0,
+      buflast = buffered.length - 1,
       // Default end to 0 and store in values
       end = this.cache_.bufferEnd = this.cache_.bufferEnd || 0;
 
-  if (buffered && buffered.length > 0 && buffered.end(0) !== end) {
-    end = buffered.end(0);
+  if (buffered && buflast >= 0 && buffered.end(buflast) !== end) {
+    end = buffered.end(buflast);
     // Storing values allows them be overridden by setBufferedFromProgress
     this.cache_.bufferEnd = end;
   }

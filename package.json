@@ -32,7 +32,8 @@
     "grunt-s3": "~0.2.0-alpha",
     "semver": "~1.1.4",
     "grunt-contrib-cssmin": "~0.6.0",
-    "uglify-js": "~2.3.6"
+    "uglify-js": "~2.3.6",
+    "grunt-contrib-less": "~0.6.4"
   },
   "testling": {
     "browsers": [

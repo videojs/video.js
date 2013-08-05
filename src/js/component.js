@@ -45,6 +45,8 @@ vjs.Component = vjs.CoreObject.extend({
  * Dispose of the component and all child components.
  */
 vjs.Component.prototype.dispose = function(){
+  this.trigger('dispose');
+
   // Dispose all children.
   if (this.children_) {
     for (var i = this.children_.length - 1; i >= 0; i--) {

@@ -1,155 +1,244 @@
-So you're telling me you want to spend some of your precious time giving back to this humble project? You're crazy. But since you're here...there are some ways you can help make Video.js a faster, easier, more compatible, and more fully-featured video player.
+CONTRIBUTING
+============
+So you want to help out? Great! There's a number of ways you can get involved.
 
-  * Bug reports and fixes
-  * Features and changes (pull requests)
-  * [Answer questions](http://stackoverflow.com/questions/tagged/video.js) on Stack Overflow
-  * Other Video.js projects
+  * [File and discuss issues](#filing-issues)
+  * [Contribute code](#contributing-code)
+  * [Build and share plugins](docs/plugins.md)
+  * [Answer questions on Stack Overflow](http://stackoverflow.com/questions/tagged/video.js)
 
-Don't miss the [code style guide](#code-style).
+There's also other Video.js projects where you can help. (check the [video.js org](https://github.com/videojs) for an up-to-date list of projects)
 
-# Getting started
+  * [Videojs.com](https://github.com/videojs/videojs.com)
+  * [Video.js flash player](https://github.com/videojs/video-js-swf)
+  * [Player skin designer](https://github.com/videojs/designer)
+  * [Contribflow](https://github.com/zencoder/contribflow)
 
-1. [Download and install Node.js](http://nodejs.org/download/). Video.js uses Node for build and test automation.
-   There is a known issue between Node.js version 0.10.x and phantomjs.  This will manifest itself during the node module installation (see step 4 below).  For the time being, please install Node.js version 0.8.22 or earlier.  You can find earlier versions of Node.js [here](http://nodejs.org/dist/).
+Filing issues
+-------------
+[GitHub Issues](https://github.com/videojs/video.js/issues) are used for all discussions around the codebase, including **bugs**, **features**, and other **enhancements**.
 
-2. [Fork](http://help.github.com/fork-a-repo/) and clone the video.js git repository.
+### Reporting a Bug
 
-  ```bash
-  # Clones your fork of the repo into the current directory in terminal
-  git clone https://github.com/<your-username>/video-js.git
-  # Navigate to the newly cloned directory
-  cd video-js
-  # Assigns the original repo to a remote called "upstream"
-  git remote add upstream https://github.com/zencoder/video-js.git
-  ```
-
-  In the future, if you want to pull in updates to video.js that happened after you cloned the main repo, you can run:
-
-  ```bash
-  git checkout master
-  git pull upstream master
-  ```
-
-3. Install the grunt-cli package so that you will have the correct version of grunt available from any project that needs it. This should be done as a global install:
-
-  ```bash
-  npm install -g grunt-cli
-  ```
-
-4. Install required node.js modules using node package manager.
-
-  ```bash
-  npm install
-  ```
-
-5. Build a local copy. Video.js uses [grunt](http://gruntjs.com), a node-based task automation tool for building and tesing. The following will compile a local copy in the dist/ directory and run tests. It will also create a sourcelist.js file that can be used to load the video.js source scripts in a page.
-
-  ```bash
-  grunt
-  ```
-
-6. When you're ready to add a feature, make a change, or fix a bug, first create a new branch for it. Prefix the branch with the correspoding [issue number](https://github.com/zencoder/video-js/issues). If there isn't one, submit a new issue. Anything more complicated than simple docs changes should have an issue.
-
-  ```bash
-  git checkout -b <####-branch-name>
-  ```
-
-Be sure to reference your issue in any commit message. Github allows you to do this though the [fixes or closes](https://github.com/blog/831-issues-2-0-the-next-generation) keywords.
-
-  ```bash
-  My commit message. fixes #123
-  ```
-
-# Bugs
-
-A bug is a _demonstrable problem_ that is caused by the code in the
-repository. Good bug reports are extremely helpful - thank you!
+**A bug is a demonstrable problem** that is caused by the code in the repository. Good bug reports are extremely helpful. Thank You!
 
 Guidelines for bug reports:
 
-1. **Use the [GitHub issue search](https://github.com/zencoder/video-js/issues)** &mdash; check if the issue has already been reported.
+1. Use the [GitHub issue search](https://github.com/videojs/video.js/issues) &mdash; check if the issue has already been reported.
 
-2. **Check if the issue has been fixed** &mdash; try to reproduce it using the latest `master` branch in the repository.
+2. Check if the issue has already been fixed &mdash; try to reproduce it using the latest `master` branch in the repository.
 
-3. **Isolate the problem** &mdash; ideally create a [reduced test
-   case](http://css-tricks.com/6263-reduced-test-cases/) and a live example.
+3. Isolate the problem &mdash; **create a [reduced test case](http://css-tricks.com/6263-reduced-test-cases/)** with a live example. You can possibly use [this JSBin example](http://jsbin.com/axedog/7/edit) as a starting point.
 
-A good bug report shouldn't leave others needing to chase you up for more information. Please try to be as detailed as possible in your report. What is your environment? What steps will reproduce the issue? What browser(s), OS, and devices experience the problem? What would you expect to be the outcome? All these
-details will help people to fix any potential bugs.
+A good bug report should be as detailed as possible, so that others won't have to follow up for the essential details.
 
-Example:
+Here's an example:
 
-> Short and descriptive example bug report title
+> Short yet concise Bug Summary
 >
-> A summary of the issue and the browser/OS environment in which it occurs. If
-> suitable, include the steps required to reproduce the bug.
+> Description:
+> Happens on Windows 7 and OSX. Seen with IE9, Firefox 19 OSX, Chrome 21, Flash 11.6 and 11.2
 >
 > 1. This is the first step
 > 2. This is the second step
 > 3. Further steps, etc.
 >
-> `<url>` (a link to the reduced test case)
+> Expected:
+> (describe the expected outcome of the steps above)
+>
+> Actual:
+> (describe what actually happens)
+>
+> `<url>` (a link to the reduced test case, if it exists)
 >
 > Any other information you want to share that is relevant to the issue being
 > reported. This might include the lines of code that you have identified as
 > causing the bug, and potential solutions (and your opinions on their
 > merits).
 
-**[File a bug report](https://github.com/h5bp/html5-boilerplate/issues/)**
+**[File a bug report](https://github.com/videojs/video.js/issues/new)**
 
-### NOTE: Testing Flash Locally in Chrome
-Chrome 21+ (as of 2013/01/01) doens't run Flash files that are local and loaded into a locally accessed page (file:///). To get around this you need to [disable the version of Flash](http://helpx.adobe.com/flash-player/kb/flash-player-google-chrome.html#How_can_I_run_debugger_or_alternate_versions_of_Flash_Player_in_Google_Chrome) included with Chrome and enable a system-wide version of Flash.
+### Requesting a Feature
+
+1. [Check the plugin list](https://github.com/videojs/video.js/wiki/Plugins) for any plugins that may already support the feature.
+
+2. [Search the issues](https://github.com/videojs/video.js/issues) for any previous requests for the same feature, and give a thumbs up or +1 on existing requests.
+
+2. If no previous requests exist, create a new issue. Please be as clear as possible about why the feautre is needed and the intended use case.
+
+**[Request a feature](https://github.com/videojs/video.js/issues/new)**
+
+Contributing code
+-----------------
+
+To contibute code you'll need to be able to build a copy of Video.js and run tests locally. There are a few requirements before getting started.
+
+- Node.js -- Video.js uses Node for build and test automation. Node is available for Windows, Mac OS X, Linux, and SunOS, as well as source code if that doesn't scare you. [Download and install Node.js](http://nodejs.org/download/)
+
+- grunt-cli -- Install grunt-cli globally so that you will have the correct version of grunt available for any project that needs it.
+
+  On Unix-based systems, you'll have to do this as a superuser:
+
+```bash
+sudo npm install -g grunt-cli
+```
+  On Windows, you can just run:
+
+```bash
+npm install -g grunt-cli
+```
+
+- Contribflow -- A homegrown git workflow tool for managing feature/hotfix branches and submitting pull requests. If you have your own preferred git workflow, contribflow isn't required, but the following instructions will assume you're using it.
+
+  On Unix-based systems, you'll have to do this as a superuser:
+
+```bash
+sudo npm install -g contribflow
+```
+
+  On Windows, you can just run:
+
+```bash
+npm install -g contribflow
+```
+
+### Building your own copy of Video.js
+
+First, [fork](http://help.github.com/fork-a-repo/) the video.js git repository. At the top of every github page, there is a Fork button. Click it, and the forking process will copy Video.js into your own GitHub account.
+
+Clone your fork of the repo into your code directory
+
+```bash
+git clone https://github.com/<your-username>/video.js.git
+```
+
+Navigate to the newly cloned directory
+
+```bash
+cd video.js
+```
+
+Assign the original repo to a remote called "upstream"
+
+```
+git remote add upstream https://github.com/videojs/video.js.git
+```
+
+>In the future, if you want to pull in updates to video.js that happened after you cloned the main repo, you can run:
+>
+> ```bash
+> git checkout master
+> git pull upstream master
+> ```
+
+Install the required node.js modules using node package manager
+
+```bash
+npm install
+```
+
+> A note to Windows developers: If you run npm commands, and you find that your command prompt colors have suddenly reversed, you can configure npm to set color to false to prevent this from happening.
+> `npm config set color false`
+> Note that this change takes effect when a new command prompt window is opened; the current window will not be affected.
+
+Build a local copy of video.js and run tests
+
+```bash
+grunt
+grunt test
+```
+
+At this point you should have a built copy of video.js in a directory named `dist`, and all tests should be passing.
+
+### Making Changes
+
+Whether you're adding something new, making something better, or fixing a bug, you'll first want to search the [GitHub issues](https://github.com/videojs/video.js/issues) and [plugins list](https://github.com/videojs/video.js/wiki/Plugins) to make sure you're aware of any previous discussion or work. If an unclaimed issue exists, claim it via a comment. If no issue exists for your change, submit one, follwing the [issue filing guidelines](#filing-issues).
+
+There are two categories of changes in video.js land, features and hotfixes (Video.js follows a branching model similar to [gitflow](http://nvie.com/posts/a-successful-git-branching-model/)). Hotfixes are for urgent fixes that need to be released immediately as a patch. Features are for everything else (including non-urgent fixes). If you think you have a hotfix scenario, verify that (via comment) before starting the work. We'll focus on features here, but you can swap `hotfix` for `feature` in any command.
+
+Start a new development branch
+
+```bash
+contrib feature start
+```
+
+You'll be prompted to name the branch.  After that, contrib will create the branch locally, and use git to push it up to your origin, and track it.  You're now ready to start building your feature or fixing that bug! Be sure to read the [Code Style Guide](#code-style-guide).
+
+While you're developing, you can ensure your changes are working by writing tests (in the `test` directory) and running `grunt test`.
+
+There's also a sandbox directory where you can add any file and it won't get tracked as a change. To start you can copy the example index file and see a working version of a player (using the local source code) by loading it in a browser.
+
+```bash
+cp sandbox/index.html.example sandbox/index.html
+open sandbox/index.html
+```
+
+> #### NOTE: Testing Flash Locally in Chrome
+> Chrome 21+ (as of 2013/01/01) doens't run Flash files that are local and loaded into a locally accessed page (file:///).
+> To get around this you can do either of the following:
+>
+> 1. Do your development and testing using a local HTTP server.
+>
+> 2. [Disable the version of Flash included with Chrome](http://helpx.adobe.com/flash-player/kb/flash-player-google-chrome.html#How_can_I_run_debugger_or_alternate_versions_of_Flash_Player_in_Google_Chrome) and enable a system-wide version of Flash instead.
 
 
-## Pull requests
+Commit and push changes as you go (using git directly). Write thorough descriptions of your changes in your commit messages.
 
-Good pull requests - patches, improvements, new features - are a fantastic help. They should remain focused in scope and avoid containing unrelated commits. If your contribution involves a significant amount of work or substantial changes to any part of the project, please open an issue to discuss it first.
+```bash
+git add .
+git commit -av
+git push
+```
 
-Make sure to adhere to the coding conventions used throughout a project (indentation, accurate comments, etc.). Please update any documentation that is relevant to the change you're making.
+> GitHub allows you to close an issue through your commit message using the [fixes](https://github.com/blog/831-issues-2-0-the-next-generation) keyword.
+>
+> ```bash
+> My commit message. fixes #123
+> Testing: (briefly describe any testing here, for example, 'unit tests and cross-browser manual tests around playback and network interruption')
+> ```
 
-Please follow this process; it's the best way to get your work included in the project:
+### Submitting your changes
 
-1. [Fork](http://help.github.com/fork-a-repo/) the project, clone your fork, and configure the remotes:
+First, thoroughly test your feature or fix, including writing tests to make sure your change doesn't get regressed in a future update. If you're fixing a bug, we recommend in addition to testing the fix itself, to do some testing around the areas that your fix has touched. For example, a brief smoketest of the player never hurts.
 
-   ```bash
-   # Clones your fork of the repo into the current directory in terminal
-   git clone https://github.com/<your-username>/html5-boilerplate.git
-   # Navigate to the newly cloned directory
-   cd html5-boilerplate
-   # Assigns the original repo to a remote called "upstream"
-   git remote add upstream https://github.com/h5bp/html5-boilerplate.git
-   ```
+Make sure your changes are pushed to origin
 
-2. If you cloned a while ago, get the latest changes from upstream:
+```bash
+git push
+```
 
-   ```bash
-   git checkout master
-   git pull upstream master
-   ```
+Use contrib to submit a a pull request (make sure you're in your feature branch)
 
-3. Create a new topic branch to contain your feature, change, or fix:
+```bash
+contrib feature submit
+```
 
-   ```bash
-   git checkout -b <topic-branch-name>
-   ```
+You'll be prompted for title and description for the Pull Request.  After that, contrib will use Git to submit your pull request to video.js.
 
-4. Commit your changes in logical chunks. Please adhere to these [git commit message guidelines](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) or your pull request is unlikely be merged into the main project. Use git's [interactive rebase](https://help.github.com/articles/interactive-rebase) feature to tidy up your commits before making them public.
+You're Done! (except for cleanup.) To clean up your feature or hotfix branch:
 
-5. Locally merge (or rebase) the upstream development branch into your topic branch:
+First, checkout your feature or issue branch:
 
-   ```bash
-   git pull [--rebase] upstream master
-   ```
+```bash
+git checkout (branchname)
+```
 
-6. Push your topic branch up to your fork:
+Run this command to clean up your feature:
 
-   ```bash
-   git push origin <topic-branch-name>
-   ```
+```bash
+contrib feature delete
+```
 
-10. [Open a Pull Request](http://help.github.com/send-pull-requests/) with a clear title and description.
+Run this command to clean up your bug fix:
 
-# Code Style
+```bash
+contrib hotfix delete
+```
+> PLEASE NOTE: THIS WILL DELETE YOUR LOCAL AND REMOTE COPIES OF THE FEATURE.
+> This is meant to clean up your local and remote branches, so make sure any changes you don't want to lose have been pulled into the parent project or another branch first.
+
+Code Style Guide
+----------------
 Please follow [Google's JavaScript Style Guide](http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml) to the letter. If your editor supports [.editorconfig](http://editorconfig.org/#download) it will make it easier to manage differences from your own coding style.
 
 ### Style examples include:
@@ -161,11 +250,6 @@ Please follow [Google's JavaScript Style Guide](http://google-styleguide.googlec
 * **When in doubt, follow the conventions you see used in the source already.**
 
 If you happen to find something in the codebase that does not follow the style guide, that's a good opportunity to make your first contribution!
-
-# Other Video.js Pojects
-* [Video.js SWF](https://github.com/zencoder/video-js-swf) - The light-weight flash video player that makes flash work like HTML5 video. This allows player skins, plugins, and other features to work with both HTML5 and Flash.
-
-* [Videojs.com](http://videojs.com) - The public site with helpful tools and information about Video.js.
 
 ---
 ### Doc Credit
