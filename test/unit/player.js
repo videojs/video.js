@@ -247,3 +247,23 @@ test('should set controls and trigger event', function() {
 //   player.requestFullScreen();
 // });
 
+test('should use custom message when encountering an unsupported video type',
+    function() {
+  videojs.options['incompatibleVideoMessage'] = 'Video no go';
+  var fixture = document.getElementById('qunit-fixture');
+
+  var html =
+      '<video id="example_1">' +
+          '<source src="fake.foo" type="video/foo">' +
+          '</video>';
+
+  fixture.innerHTML += html;
+
+  var tag = document.getElementById('example_1');
+  var player = new vjs.Player(tag);
+
+  var incompatibilityMessage = player.el().getElementsByTagName('p')[0];
+  equal(incompatibilityMessage.textContent, 'Video no go');
+
+  player.dispose();
+});
