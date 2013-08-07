@@ -933,18 +933,18 @@ vjs.Player.prototype.userActive = function(bool){
         // If the user was inactive and is now active we want to reset the
         // inactivity timer
         this.userActivity_ = true;
-        this.removeClass('vjs-user-passive');
+        this.removeClass('vjs-user-inactive');
         this.addClass('vjs-user-active');
         this.trigger('useractive');
       } else {
-        // We're switching the state to passive manually, so erase any other
+        // We're switching the state to inactive manually, so erase any other
         // activity
         this.userActivity_ = false;
 
         // Chrome/Safari/IE have bugs where when you change the cursor it can
         // trigger a mousemove event. This causes an issue when you're hiding
         // the cursor when the user is inactive, and a mousemove signals user
-        // activity. Making it impossible to go into passive mode. Specifically
+        // activity. Making it impossible to go into inactive mode. Specifically
         // this happens in fullscreen when we really need to hide the cursor.
         //
         // When this gets resolved in ALL browsers it can be removed
@@ -954,8 +954,8 @@ vjs.Player.prototype.userActive = function(bool){
           e.preventDefault();
         });
         this.removeClass('vjs-user-active');
-        this.addClass('vjs-user-passive');
-        this.trigger('userpassive');
+        this.addClass('vjs-user-inactive');
+        this.trigger('userinactive');
       }
     }
     return this;
@@ -1009,7 +1009,7 @@ vjs.Player.prototype.listenForUserActivity = function(){
       // Reset the activity tracker
       this.userActivity_ = false;
 
-      // If the user state was passive, set the state to active
+      // If the user state was inactive, set the state to active
       if (!this.userActive()) {
         this.userActive(true);
       }
@@ -1018,7 +1018,7 @@ vjs.Player.prototype.listenForUserActivity = function(){
       clearTimeout(inactivityTimeout);
 
       // In X seconds, if no more activity has occurred (resetting this timer)
-      // the user will be considered passive
+      // the user will be considered inactive
       inactivityTimeout = setTimeout(vjs.bind(this, function() {
         // Protect against the case where the inactivity timeout can trigger
         // before the next user activity is picked up by the activityCheck loop.

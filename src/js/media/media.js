@@ -41,14 +41,14 @@ vjs.MediaTechController.prototype.usingNativeControls = function(){
  * On desktops, a click on the video itself will toggle playback,
  * on a mobile device a click on the video toggles controls.
  * (toggling controls is done by toggling the user state between active and
- * passive)
+ * inactive)
  *
- * A tap can signal that a user has become active, or has become passive
+ * A tap can signal that a user has become active, or has become inactive
  * e.g. a quick tap on an iPhone movie should reveal the controls. Another
- * quick tap should hide them again (signaling the user is in a passive
+ * quick tap should hide them again (signaling the user is in an inactive
  * viewing state)
  *
- * In addition to this, we still want the user to be considered passive after
+ * In addition to this, we still want the user to be considered inactive after
  * a few seconds of inactivity.
  *
  * Note: the only part of iOS interaction we can't mimic with this setup
@@ -119,11 +119,7 @@ vjs.MediaTechController.prototype.addListeners = function(){
     // The tap listener needs to come after the touchend listener because the tap
     // listener cancels out any reportedUserActivity when setting userActive(false)
     this.on('tap', function(){
-      if (this.player_.userActive()) {
-        this.player_.userActive(false);
-      } else {
-        this.player_.userActive(true);
-      }
+      this.player_.userActive(!this.player_.userActive());
     });
   } else {
     // Some browsers (Chrome & IE) don't trigger a click on a flash swf, but do

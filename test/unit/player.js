@@ -256,15 +256,15 @@ test('should set controls and trigger events', function() {
 //   player.requestFullScreen();
 // });
 
-test('should toggle user the user state between active and passive', function(){
+test('should toggle user the user state between active and inactive', function(){
   var player = PlayerTest.makePlayer({});
 
   expect(9);
 
   ok(player.userActive(), 'User should be active at player init');
 
-  player.on('userpassive', function(){
-    ok(true, 'userpassive event triggered');
+  player.on('userinactive', function(){
+    ok(true, 'userinactive event triggered');
   });
 
   player.on('useractive', function(){
@@ -272,13 +272,13 @@ test('should toggle user the user state between active and passive', function(){
   });
 
   player.userActive(false);
-  ok(player.userActive() === false, 'Player state changed to passive');
+  ok(player.userActive() === false, 'Player state changed to inactive');
   ok(player.el().className.indexOf('vjs-user-active') === -1, 'Active class removed');
-  ok(player.el().className.indexOf('vjs-user-passive') !== -1, 'Passive class added');
+  ok(player.el().className.indexOf('vjs-user-inactive') !== -1, 'Inactive class added');
 
   player.userActive(true);
   ok(player.userActive() === true, 'Player state changed to active');
-  ok(player.el().className.indexOf('vjs-user-passive') === -1, 'Passive class removed');
+  ok(player.el().className.indexOf('vjs-user-inactive') === -1, 'Inactive class removed');
   ok(player.el().className.indexOf('vjs-user-active') !== -1, 'Active class added');
 
   player.dispose();

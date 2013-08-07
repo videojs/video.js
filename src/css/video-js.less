@@ -171,8 +171,8 @@ The default control bar that is a container for most of the controls.
   .transition(@trans);
 }
 
-/* Hide the control bar when the video is playing and the user is passive  */
-.vjs-default-skin.vjs-has-started.vjs-user-passive.vjs-playing .vjs-control-bar {
+/* Hide the control bar when the video is playing and the user is inactive  */
+.vjs-default-skin.vjs-has-started.vjs-user-inactive.vjs-playing .vjs-control-bar {
   display: block;
   visibility: hidden;
   opacity: 0;
@@ -727,7 +727,7 @@ body.vjs-full-window {
   width: 100% !important;
   height: 100% !important;
 }
-.video-js.vjs-fullscreen.vjs-user-passive {
+.video-js.vjs-fullscreen.vjs-user-inactive {
   cursor: none;
 }
 
