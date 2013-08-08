@@ -42,9 +42,11 @@ vjs.Player = vjs.Component.extend({
       this.addClass('vjs-controls-disabled');
     }
 
-    if (vjs.TOUCH_ENABLED) {
-      this.addClass('vjs-touch-enabled');
-    }
+    // TODO: Make this smarter. Toggle user state between touching/mousing
+    // using events, since devices can have both touch and mouse events.
+    // if (vjs.TOUCH_ENABLED) {
+    //   this.addClass('vjs-touch-enabled');
+    // }
 
     // Firstplay event implimentation. Not sold on the event yet.
     // Could probably just check currentTime==0?
@@ -108,8 +110,6 @@ vjs.Player.prototype.dispose = function(){
   this.stopTrackingCurrentTime();
 
   if (this.tech) { this.tech.dispose(); }
-
-  clearInterval(this.activityCheck);
 
   // Component dispose
   vjs.Component.prototype.dispose.call(this);
@@ -964,70 +964,82 @@ vjs.Player.prototype.userActive = function(bool){
 };
 
 vjs.Player.prototype.listenForUserActivity = function(){
-  var inactivityTimeout, touchInProgress;
+  var onMouseActivity, onMouseDown, mouseInProgress, onMouseUp,
+      activityCheck, inactivityTimeout;
 
-  // Consider touch events that bubble up to be activity
-  if (vjs.TOUCH_ENABLED) {
-    this.on('touchstart', function() {
-      this.reportUserActivity();
-      // For as long as the they are touching the device, we consider them
-      // active even if they're not moving their finger. So we want to
-      // continue to update that they are active
-      clearInterval(touchInProgress);
-      // Setting userActivity=true now and setting the interval to the same time
-      // as the activityCheck interval (250) should ensure we never miss the
-      // next activityCheck
-      touchInProgress = setInterval(vjs.bind(this, function(){
-        this.reportUserActivity();
-      }), 250);
-      // touchInProgress = setInterval(vjs.bind(this, this.reportUserActivity), 250);
-    });
+  onMouseActivity = this.reportUserActivity;
 
-    this.on('touchmove', this.reportUserActivity);
+  onMouseDown = function() {
+    onMouseActivity();
+    // For as long as the they are touching the device or have their mouse down,
+    // we consider them active even if they're not moving their finger or mouse.
+    // So we want to continue to update that they are active
+    clearInterval(mouseInProgress);
+    // Setting userActivity=true now and setting the interval to the same time
+    // as the activityCheck interval (250) should ensure we never miss the
+    // next activityCheck
+    mouseInProgress = setInterval(vjs.bind(this, onMouseActivity), 250);
+  };
 
-    this.on('touchend', function(event) {
-      // Stop the interval that maintains activity if it's running
-      clearInterval(touchInProgress);
-      this.reportUserActivity();
-    });
-  } else {
-    // When not on touch devices, any mouse movement will be considered
-    // user activity
-    this.on('mousedown', this.reportUserActivity);
-    this.on('mousemove', this.reportUserActivity);
-    // Listen for keyboard navigation
-    this.on('keydown', this.reportUserActivity);
-    this.on('keyup', this.reportUserActivity);
-  }
+  onMouseUp = function(event) {
+    onMouseActivity();
+    // Stop the interval that maintains activity if the mouse/touch is down
+    clearInterval(mouseInProgress);
+  };
+
+  // Any mouse movement will be considered user activity
+  this.on('mousedown', onMouseDown);
+  this.on('mousemove', onMouseActivity);
+  this.on('mouseup', onMouseUp);
+
+  // Listen for keyboard navigation
+  // Shouldn't need to use inProgress interval because of key repeat
+  this.on('keydown', onMouseActivity);
+  this.on('keyup', onMouseActivity);
+
+  // Consider any touch events that bubble up to be activity
+  // Certain touches on the tech will be blocked from bubbling because they
+  // toggle controls
+  this.on('touchstart', onMouseDown);
+  this.on('touchmove', onMouseActivity);
+  this.on('touchend', onMouseUp);
+  this.on('touchcancel', onMouseUp);
 
   // Run an interval every 250 milliseconds instead of stuffing everything into
-  // the mousemove function itself, to prevent performance degradation.
+  // the mousemove/touchmove function itself, to prevent performance degradation.
+  // `this.reportUserActivity` simply sets this.userActivity_ to true, which
+  // then gets picked up by this loop
   // http://ejohn.org/blog/learning-from-twitter/
-  this.activityCheck = setInterval(vjs.bind(this, function() {
-    // Check to see if the mouse has been moved
+  activityCheck = setInterval(vjs.bind(this, function() {
+    // Check to see if mouse/touch activity has happened
     if (this.userActivity_) {
       // Reset the activity tracker
       this.userActivity_ = false;
 
       // If the user state was inactive, set the state to active
-      if (!this.userActive()) {
-        this.userActive(true);
-      }
+      this.userActive(true);
 
       // Clear any existing inactivity timeout to start the timer over
       clearTimeout(inactivityTimeout);
 
-      // In X seconds, if no more activity has occurred (resetting this timer)
-      // the user will be considered inactive
+      // In X seconds, if no more activity has occurred the user will be
+      // considered inactive
       inactivityTimeout = setTimeout(vjs.bind(this, function() {
-        // Protect against the case where the inactivity timeout can trigger
-        // before the next user activity is picked up by the activityCheck loop.
+        // Protect against the case where the inactivityTimeout can trigger just
+        // before the next user activity is picked up by the activityCheck loop
+        // causing a flicker
         if (!this.userActivity_) {
           this.userActive(false);
         }
       }), 2000);
     }
   }), 250);
+
+  // Clean up the intervals when we kill the player
+  this.on('dispose', function(){
+    clearInterval(activityCheck);
+    clearTimeout(inactivityTimeout);
+  });
 };
 
 // Methods to add support for

@@ -14,27 +14,9 @@ vjs.MediaTechController = vjs.Component.extend({
   init: function(player, options, ready){
     vjs.Component.call(this, player, options, ready);
 
-    this.initListeners();
+    this.initControlsListeners();
   }
 });
-
-/**
- * Determine whether or not controls should be enabled on the video element
- * Use native controls for iOS and Android by default until controls are more
- * stable on those devices
- *
- * @return {Boolean} Controls enabled
- * @private
- */
-vjs.MediaTechController.prototype.usingNativeControls = function(){
-  var controls = false;
-  if (vjs.TOUCH_ENABLED
-      && this.nativeControlsAvailable !== false
-      && this.player().options()['nativeControlsForTouch'] !== false) {
-    controls = this.player().controls();
-  }
-  return controls;
-};
 
 /**
  * Set up click and touch listeners for the playback element
@@ -56,7 +38,7 @@ vjs.MediaTechController.prototype.usingNativeControls = function(){
  * keep the controls showing, but that shouldn't be an issue. A touch and hold on
  * any controls will still keep the user active
  */
-vjs.MediaTechController.prototype.initListeners = function(){
+vjs.MediaTechController.prototype.initControlsListeners = function(){
   var player, tech, activateControls, deactivateControls;
 
   tech = this;
@@ -64,11 +46,11 @@ vjs.MediaTechController.prototype.initListeners = function(){
 
   var activateControls = function(){
     if (player.controls() && !player.usingNativeControls()) {
-      tech.addListeners();
+      tech.addControlsListeners();
     }
   };
 
-  deactivateControls = vjs.bind(tech, tech.removeListeners);
+  deactivateControls = vjs.bind(tech, tech.removeControlsListeners);
 
   // Set up event listeners once the tech is ready and has an element to apply
   // listeners to
@@ -77,59 +59,62 @@ vjs.MediaTechController.prototype.initListeners = function(){
   player.on('controlsdisabled', deactivateControls);
 };
 
-vjs.MediaTechController.prototype.addListeners = function(){
+vjs.MediaTechController.prototype.addControlsListeners = function(){
   var preventBubble, userWasActive;
 
-  if (vjs.TOUCH_ENABLED) {
-    // We need to block touch events on the video element from bubbling up,
-    // otherwise they'll signal activity prematurely. The specific use case is
-    // when the video is playing and the controls have faded out. In this case
-    // only a tap (fast touch) should toggle the user active state and turn the
-    // controls back on. A touch and move or touch and hold should not trigger
-    // the controls (per iOS as an example at least)
-    //
-    // We always want to stop propagation on touchstart because touchstart
-    // at the player level starts the touchInProgress interval. We can still
-    // report activity on the other events, but won't let them bubble for
-    // consistency. We don't want to bubble a touchend without a touchstart.
-    this.on('touchstart', function(event) {
-      // Stop the mouse events from also happening
-      event.preventDefault();
-      event.stopPropagation();
-      // Record if the user was active now so we don't have to keep polling it
-      userWasActive = this.player_.userActive();
-    });
+  // Some browsers (Chrome & IE) don't trigger a click on a flash swf, but do
+  // trigger mousedown/up.
+  // http://stackoverflow.com/questions/1444562/javascript-onclick-event-over-flash-object
+  // Any touch events are set to block the mousedown event from happening
+  this.on('mousedown', this.onClick);
 
-    preventBubble = function(event){
-      event.stopPropagation();
-      if (userWasActive) {
-        this.player_.reportUserActivity();
-      }
-    };
+  // We need to block touch events on the video element from bubbling up,
+  // otherwise they'll signal activity prematurely. The specific use case is
+  // when the video is playing and the controls have faded out. In this case
+  // only a tap (fast touch) should toggle the user active state and turn the
+  // controls back on. A touch and move or touch and hold should not trigger
+  // the controls (per iOS as an example at least)
+  //
+  // We always want to stop propagation on touchstart because touchstart
+  // at the player level starts the touchInProgress interval. We can still
+  // report activity on the other events, but won't let them bubble for
+  // consistency. We don't want to bubble a touchend without a touchstart.
+  this.on('touchstart', function(event) {
+    // Stop the mouse events from also happening
+    event.preventDefault();
+    event.stopPropagation();
+    // Record if the user was active now so we don't have to keep polling it
+    userWasActive = this.player_.userActive();
+  });
 
-    // Treat all touch events the same for consistency
-    this.on('touchmove', preventBubble);
-    this.on('touchleave', preventBubble);
-    this.on('touchcancel', preventBubble);
-    this.on('touchend', preventBubble);
+  preventBubble = function(event){
+    event.stopPropagation();
+    if (userWasActive) {
+      this.player_.reportUserActivity();
+    }
+  };
 
-    // Turn on component tap events
-    this.emitTapEvents();
+  // Treat all touch events the same for consistency
+  this.on('touchmove', preventBubble);
+  this.on('touchleave', preventBubble);
+  this.on('touchcancel', preventBubble);
+  this.on('touchend', preventBubble);
 
-    // The tap listener needs to come after the touchend listener because the tap
-    // listener cancels out any reportedUserActivity when setting userActive(false)
-    this.on('tap', function(){
-      this.player_.userActive(!this.player_.userActive());
-    });
-  } else {
-    // Some browsers (Chrome & IE) don't trigger a click on a flash swf, but do
-    // trigger mousedown/up.
-    // http://stackoverflow.com/questions/1444562/javascript-onclick-event-over-flash-object
-    this.on('mousedown', this.onClick);
-  }
+  // Turn on component tap events
+  this.emitTapEvents();
+
+  // The tap listener needs to come after the touchend listener because the tap
+  // listener cancels out any reportedUserActivity when setting userActive(false)
+  this.on('tap', this.onTap);
 };
 
-vjs.MediaTechController.prototype.removeListeners = function(){
+/**
+ * Remove the listeners used for click and tap controls. This is needed for
+ * toggling to controls disabled, where a tap/touch should do nothing.
+ */
+vjs.MediaTechController.prototype.removeControlsListeners = function(){
+  // We don't want to just use `this.off()` because there might be other needed
+  // listeners added by techs that extend this.
   this.off('tap');
   this.off('touchstart');
   this.off('touchmove');
@@ -141,7 +126,7 @@ vjs.MediaTechController.prototype.removeListeners = function(){
 };
 
 /**
- * Handle a click on the media element. By default will play the media.
+ * Handle a click on the media element. By default will play/pause the media.
  */
 vjs.MediaTechController.prototype.onClick = function(event){
   // We're using mousedown to detect clicks thanks to Flash, but mousedown
@@ -150,13 +135,22 @@ vjs.MediaTechController.prototype.onClick = function(event){
 
   // When controls are disabled a click should not toggle playback because
   // the click is considered a control
-  if (this.player_.controls()) {
-    if (this.player_.paused()) {
-      this.player_.play();
+  if (this.player().controls()) {
+    if (this.player().paused()) {
+      this.player().play();
     } else {
-      this.player_.pause();
+      this.player().pause();
     }
   }
+};
+
+/**
+ * Handle a tap on the media element. By default it will toggle the user
+ * activity state, which hides and shows the controls.
+ */
+
+vjs.MediaTechController.prototype.onTap = function(){
+  this.player().userActive(!this.player().userActive());
 };
 
 vjs.MediaTechController.prototype.features = {
