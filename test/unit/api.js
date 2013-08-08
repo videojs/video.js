@@ -25,6 +25,7 @@ test('should be able to access expected player API methods', function() {
   ok(player.one, 'one exists');
   ok(player.bufferedPercent, 'bufferedPercent exists');
   ok(player.dimensions, 'dimensions exists');
+  ok(player.usingNativeControls, 'usingNativeControls exists');
 
   player.dispose();
 });
@@ -66,7 +67,7 @@ test('videojs.players should be availble after minification', function() {
   fixture.appendChild(videoTag);
 
   var player = videojs(id);
-  equal(videojs.players[id], player, 'videojs.players is available');
+  ok(videojs.players[id] === player, 'videojs.players is available');
 
   player.dispose();
 });
