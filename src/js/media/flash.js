@@ -182,9 +182,6 @@ vjs.Flash = vjs.MediaTechController.extend({
           // Update reference to playback technology element
           tech.el_ = el;
 
-          // Now that the element is ready, make a click on the swf play the video
-          vjs.on(el, 'click', tech.bind(tech.onClick));
-
           // Make sure swf is actually ready. Sometimes the API isn't actually yet.
           vjs.Flash.checkReady(tech);
         });
@@ -327,9 +324,6 @@ vjs.Flash['onReady'] = function(currSwf){
 
   // Update reference to playback technology element
   tech.el_ = el;
-
-  // Now that the element is ready, make a click on the swf play the video
-  tech.on('click', tech.onClick);
 
   vjs.Flash.checkReady(tech);
 };

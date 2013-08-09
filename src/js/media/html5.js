@@ -35,6 +35,14 @@ vjs.Html5 = vjs.MediaTechController.extend({
       this.el_.src = source.src;
     }
 
+    // Determine if native controls should be used
+    // Our goal should be to get the custom controls on mobile solid everywhere
+    // so we can remove this all together. Right now this will block custom
+    // controls on touch enabled laptops like the Chrome Pixel
+    if (vjs.TOUCH_ENABLED && player.options()['nativeControlsForTouch'] !== false) {
+      this.useNativeControls();
+    }
+
     // Chrome and Safari both have issues with autoplay.
     // In Safari (5.1.1), when we move the video element into the container div, autoplay doesn't work.
     // In Chrome (15), if you have autoplay + a poster + no controls, the video gets hidden (but audio plays)
@@ -46,10 +54,7 @@ vjs.Html5 = vjs.MediaTechController.extend({
       }
     });
 
-    this.on('click', this.onClick);
-
     this.setupTriggers();
-
     this.triggerReady();
   }
 });
@@ -116,6 +121,37 @@ vjs.Html5.prototype.eventHandler = function(e){
   e.stopPropagation();
 };
 
+vjs.Html5.prototype.useNativeControls = function(){
+  var tech, player, controlsOn, controlsOff, cleanUp;
+
+  tech = this;
+  player = this.player();
+
+  // If the player controls are enabled turn on the native controls
+  tech.setControls(player.controls());
+
+  // Update the native controls when player controls state is updated
+  controlsOn = function(){
+    tech.setControls(true);
+  };
+  controlsOff = function(){
+    tech.setControls(false);
+  };
+  player.on('controlsenabled', controlsOn);
+  player.on('controlsdisabled', controlsOff);
+
+  // Clean up when not using native controls anymore
+  cleanUp = function(){
+    player.off('controlsenabled', controlsOn);
+    player.off('controlsdisabled', controlsOff);
+  };
+  tech.on('dispose', cleanUp);
+  player.on('usingcustomcontrols', cleanUp);
+
+  // Update the state of the player to using native controls
+  player.usingNativeControls(true);
+};
+
 
 vjs.Html5.prototype.play = function(){ this.el_.play(); };
 vjs.Html5.prototype.pause = function(){ this.el_.pause(); };
@@ -179,29 +215,19 @@ vjs.Html5.prototype.currentSrc = function(){ return this.el_.currentSrc; };
 
 vjs.Html5.prototype.preload = function(){ return this.el_.preload; };
 vjs.Html5.prototype.setPreload = function(val){ this.el_.preload = val; };
+
 vjs.Html5.prototype.autoplay = function(){ return this.el_.autoplay; };
 vjs.Html5.prototype.setAutoplay = function(val){ this.el_.autoplay = val; };
+
+vjs.Html5.prototype.controls = function(){ return this.el_.controls; }
+vjs.Html5.prototype.setControls = function(val){ this.el_.controls = !!val; }
+
 vjs.Html5.prototype.loop = function(){ return this.el_.loop; };
 vjs.Html5.prototype.setLoop = function(val){ this.el_.loop = val; };
 
 vjs.Html5.prototype.error = function(){ return this.el_.error; };
-  // networkState: function(){ return this.el_.networkState; },
-  // readyState: function(){ return this.el_.readyState; },
 vjs.Html5.prototype.seeking = function(){ return this.el_.seeking; };
-  // initialTime: function(){ return this.el_.initialTime; },
-  // startOffsetTime: function(){ return this.el_.startOffsetTime; },
-  // played: function(){ return this.el_.played; },
-  // seekable: function(){ return this.el_.seekable; },
 vjs.Html5.prototype.ended = function(){ return this.el_.ended; };
-  // videoTracks: function(){ return this.el_.videoTracks; },
-  // audioTracks: function(){ return this.el_.audioTracks; },
-  // videoWidth: function(){ return this.el_.videoWidth; },
-  // videoHeight: function(){ return this.el_.videoHeight; },
-  // textTracks: function(){ return this.el_.textTracks; },
-  // defaultPlaybackRate: function(){ return this.el_.defaultPlaybackRate; },
-  // playbackRate: function(){ return this.el_.playbackRate; },
-  // mediaGroup: function(){ return this.el_.mediaGroup; },
-  // controller: function(){ return this.el_.controller; },
 vjs.Html5.prototype.defaultMuted = function(){ return this.el_.defaultMuted; };
 
 /* HTML5 Support Testing ---------------------------------------------------- */
