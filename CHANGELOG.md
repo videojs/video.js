@@ -8,7 +8,7 @@ CHANGELOG
 * Updated buffered() to account for multiple loaded ranges ([view](https://github.com/videojs/video.js/pull/643))
 * Exported createItems() for custom menus ([view](https://github.com/videojs/video.js/pull/654))
 * Preventing media events from bubbling up the DOM ([view](https://github.com/videojs/video.js/pull/630))
-* Improved control bar hiding and showing ([view](https://github.com/videojs/video.js/pull/672))
+* Major reworking of the control bar and many issues fixed ([view](https://github.com/videojs/video.js/pull/672))
 
 --------------------
 
