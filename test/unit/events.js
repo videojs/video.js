@@ -89,3 +89,28 @@ test('should stop immediate propagtion', function(){
 
   vjs.trigger(el, 'test');
 });
+
+test('should bubble up DOM unless bubbles == false', function(){
+  expect(3);
+
+  var outer = document.createElement('div');
+  var inner = outer.appendChild(document.createElement('div'));
+
+  // Verify that if bubbles === true, event bubbles up dom.
+  vjs.on(inner, 'bubbles', function(e){
+    ok(true, 'Inner listener fired');
+  });
+  vjs.on(outer, 'bubbles', function(e){
+    ok(true, 'Outer listener fired');
+  });
+  vjs.trigger(inner, { type:'bubbles', target:inner, bubbles:true });
+
+  // Only change 'bubbles' to false, and verify only inner handler is called.
+  vjs.on(inner, 'nobub', function(e){
+    ok(true, 'Inner listener fired');
+  });
+  vjs.on(outer, 'nobub', function(e){
+    ok(false, 'Outer listener fired');
+  });
+  vjs.trigger(inner, { type:'nobub', target:inner, bubbles:false });
+});

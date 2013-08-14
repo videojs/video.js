@@ -38,6 +38,7 @@ goog.exportSymbol('videojs.cache', vjs.cache);
 // goog.exportProperty(vjs.CoreObject, 'create', vjs.CoreObject.create);
 
 goog.exportSymbol('videojs.Component', vjs.Component);
+goog.exportProperty(vjs.Component.prototype, 'player', vjs.Component.prototype.player);
 goog.exportProperty(vjs.Component.prototype, 'dispose', vjs.Component.prototype.dispose);
 goog.exportProperty(vjs.Component.prototype, 'createEl', vjs.Component.prototype.createEl);
 goog.exportProperty(vjs.Component.prototype, 'el', vjs.Component.prototype.el);
@@ -54,14 +55,13 @@ goog.exportProperty(vjs.Component.prototype, 'width', vjs.Component.prototype.wi
 goog.exportProperty(vjs.Component.prototype, 'height', vjs.Component.prototype.height);
 goog.exportProperty(vjs.Component.prototype, 'dimensions', vjs.Component.prototype.dimensions);
 goog.exportProperty(vjs.Component.prototype, 'ready', vjs.Component.prototype.ready);
-goog.exportProperty(vjs.Component.prototype, 'fadeIn', vjs.Component.prototype.fadeIn);
-goog.exportProperty(vjs.Component.prototype, 'fadeOut', vjs.Component.prototype.fadeOut);
 
 goog.exportSymbol('videojs.Player', vjs.Player);
 goog.exportProperty(vjs.Player.prototype, 'dispose', vjs.Player.prototype.dispose);
 goog.exportProperty(vjs.Player.prototype, 'requestFullScreen', vjs.Player.prototype.requestFullScreen);
 goog.exportProperty(vjs.Player.prototype, 'cancelFullScreen', vjs.Player.prototype.cancelFullScreen);
 goog.exportProperty(vjs.Player.prototype, 'bufferedPercent', vjs.Player.prototype.bufferedPercent);
+goog.exportProperty(vjs.Player.prototype, 'usingNativeControls', vjs.Player.prototype.usingNativeControls);
 
 goog.exportSymbol('videojs.MediaLoader', vjs.MediaLoader);
 goog.exportSymbol('videojs.TextTrackDisplay', vjs.TextTrackDisplay);
@@ -90,6 +90,10 @@ goog.exportSymbol('videojs.MuteToggle', vjs.MuteToggle);
 goog.exportSymbol('videojs.PosterImage', vjs.PosterImage);
 goog.exportSymbol('videojs.Menu', vjs.Menu);
 goog.exportSymbol('videojs.MenuItem', vjs.MenuItem);
+goog.exportSymbol('videojs.MenuButton', vjs.MenuButton);
+goog.exportProperty(vjs.MenuButton.prototype, 'createItems', vjs.MenuButton.prototype.createItems);
+goog.exportProperty(vjs.TextTrackButton.prototype, 'createItems', vjs.TextTrackButton.prototype.createItems);
+goog.exportProperty(vjs.ChaptersButton.prototype, 'createItems', vjs.ChaptersButton.prototype.createItems);
 
 goog.exportSymbol('videojs.SubtitlesButton', vjs.SubtitlesButton);
 goog.exportSymbol('videojs.CaptionsButton', vjs.CaptionsButton);

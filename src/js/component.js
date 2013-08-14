@@ -45,6 +45,8 @@ vjs.Component = vjs.CoreObject.extend({
  * Dispose of the component and all child components.
  */
 vjs.Component.prototype.dispose = function(){
+  this.trigger('dispose');
+
   // Dispose all children.
   if (this.children_) {
     for (var i = this.children_.length - 1; i >= 0; i--) {
@@ -538,26 +540,6 @@ vjs.Component.prototype.hide = function(){
 };
 
 /**
- * Fade a component in using CSS
- * @return {vjs.Component}
- */
-vjs.Component.prototype.fadeIn = function(){
-  this.removeClass('vjs-fade-out');
-  this.addClass('vjs-fade-in');
-  return this;
-};
-
-/**
- * Fade a component out using CSS
- * @return {vjs.Component}
- */
-vjs.Component.prototype.fadeOut = function(){
-  this.removeClass('vjs-fade-in');
-  this.addClass('vjs-fade-out');
-  return this;
-};
-
-/**
  * Lock an item in its visible state. To be used with fadeIn/fadeOut.
  * @return {vjs.Component}
  */
@@ -581,14 +563,7 @@ vjs.Component.prototype.unlockShowing = function(){
 vjs.Component.prototype.disable = function(){
   this.hide();
   this.show = function(){};
-  this.fadeIn = function(){};
 };
-
-// TODO: Get enable working
-// vjs.Component.prototype.enable = function(){
-//   this.fadeIn = vjs.Component.prototype.fadeIn;
-//   this.show = vjs.Component.prototype.show;
-// };
 
 /**
  * If a value is provided it will change the width of the player to that value
@@ -690,4 +665,51 @@ vjs.Component.prototype.dimension = function(widthOrHeight, num, skipListeners){
     //   return val;
     // }
   }
+};
+
+/**
+ * Emit 'tap' events when touch events are supported. We're requireing them to
+ * be enabled because otherwise every component would have this extra overhead
+ * unnecessarily, on mobile devices where extra overhead is especially bad.
+ *
+ * This is being implemented so we can support taps on the video element
+ * toggling the controls.
+ */
+vjs.Component.prototype.emitTapEvents = function(){
+  var touchStart, touchTime, couldBeTap, noTap;
+
+  // Track the start time so we can determine how long the touch lasted
+  touchStart = 0;
+
+  this.on('touchstart', function(event) {
+    // Record start time so we can detect a tap vs. "touch and hold"
+    touchStart = new Date().getTime();
+    // Reset couldBeTap tracking
+    couldBeTap = true;
+  });
+
+  noTap = function(){
+    couldBeTap = false;
+  };
+  // TODO: Listen to the original target. http://youtu.be/DujfpXOKUp8?t=13m8s
+  this.on('touchmove', noTap);
+  this.on('touchleave', noTap);
+  this.on('touchcancel', noTap);
+
+  // When the touch ends, measure how long it took and trigger the appropriate
+  // event
+  this.on('touchend', function() {
+    // Proceed only if the touchmove/leave/cancel event didn't happen
+    if (couldBeTap === true) {
+      // Measure how long the touch lasted
+      touchTime = new Date().getTime() - touchStart;
+      // The touch needs to be quick in order to consider it a tap
+      if (touchTime < 250) {
+        this.trigger('tap');
+        // It may be good to copy the touchend event object and change the
+        // type to tap, if the other event properties aren't exact after
+        // vjs.fixEvent runs (e.g. event.target)
+      }
+    }
+  });
 };
