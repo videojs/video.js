@@ -383,11 +383,6 @@ vjs.Flash.checkReady = function(tech){
 // Trigger events from the swf on the player
 vjs.Flash['onEvent'] = function(swfID, eventName){
   var player = vjs.el(swfID)['player'];
-  // ugly, but it smooths over progress and 
-  // time control manual timer issues
-  if (eventName === "ended") {
-    player.trigger("timeupdate");
-  }
   player.trigger(eventName);
 };
 
