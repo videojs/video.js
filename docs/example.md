@@ -50,9 +50,6 @@ After an instance has been created it can be accessed globally using `Video('exa
   - error
   - ended
 
-- [Properties](#)
-  - [Inherited properties >>](#)
-
 - [Events](#)
   - [Inherited events >>](#)
   - ready
@@ -124,13 +121,6 @@ the current time setter
 ```
 
 _defined in_: [src/js/player.js#123](https://github.com/videojs/video.js/blob/master/src/js/player.js#123)
-
----
-
-
-## PROPERTIES
-
-[View inheritited properties]()
 
 ---
 
