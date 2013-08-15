@@ -307,4 +307,21 @@ module.exports = function(grunt) {
       done();
     });
   });
+
+  grunt.registerTask('docs', 'Generate docs', function(){
+    var markdox = require('markdox');
+    var done = this.async();
+
+    var options = {
+      output: 'docs/api/player.md',
+      formatter: require('./docs/formatter.js').format,
+      template: 'docs/template.ejs'
+    };
+
+    markdox.process('src/js/player.js', options, function(){
+      console.log('File `all.md` generated with success');
+      done();
+    });
+  });
+
 };

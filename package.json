@@ -36,6 +36,8 @@
     "grunt-contrib-less": "~0.6.4",
     "grunt-karma": "~0.4.4",
     "karma-qunit": "~0.0.2"
+    "grunt-contrib-less": "~0.6.4",
+    "markdox": "git://github.com/heff/markdox.git"
   },
   "testling": {
     "browsers": [
