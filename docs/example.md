@@ -1,3 +1,5 @@
+<!-- Start src/js/player.js -->
+
 # Video.Player
 
 __EXTENDS__: [Video.Component](...)  
@@ -19,9 +21,7 @@ In the follwing example, the `data-setup` attribute tells the Video.js library t
 
 After an instance has been created it can be accessed globally using `Video('example_video_1')`.
 
-...(more description to come)...
-
-## Index
+## INDEX
 
 - [Methods](#)
   - [Inherited methods >>](#)

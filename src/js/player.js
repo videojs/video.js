@@ -1,88 +1,110 @@
 /**
- * Main player class. A player instance is returned by _V_(id);
+ * An instance of the `Video.Player` class is created when any of the Video.js setup methods are used to initialize a video.
+ *
+ * ```js
+ * var myPlayer = Video('example_video_1');
+ * ```
+ *
+ * In the follwing example, the `data-setup` attribute tells the Video.js library to create a player instance when the library is ready.
+ *
+ * ```html
+ * <video id="example_video_1" data-setup='{}' controls>
+ *   <source src="my-source.mp4" type="video/mp4">
+ * </video>
+ * ```
+ *
+ * After an instance has been created it can be accessed globally using `Video('example_video_1')`.
+ *
+ * @class
+ * @extends vjs.Component
+ */
+vjs.Player = vjs.Component.extend();
+
+/**
+ *
+ * player's constructor function
+ *
+ * @constructs
  * @param {Element} tag        The original video tag used for configuring options
  * @param {Object=} options    Player options
  * @param {Function=} ready    Ready callback function
- * @constructor
  */
-vjs.Player = vjs.Component.extend({
-  /** @constructor */
-  init: function(tag, options, ready){
-    this.tag = tag; // Store the original tag used to set options
+ vjs.Player.prototype.init = function(tag, options, ready){
+  this.tag = tag; // Store the original tag used to set options
 
-    // Set Options
-    // The options argument overrides options set in the video tag
-    // which overrides globally set options.
-    // This latter part coincides with the load order
-    // (tag must exist before Player)
-    options = vjs.obj.merge(this.getTagSettings(tag), options);
+  // Set Options
+  // The options argument overrides options set in the video tag
+  // which overrides globally set options.
+  // This latter part coincides with the load order
+  // (tag must exist before Player)
+  options = vjs.obj.merge(this.getTagSettings(tag), options);
 
-    // Cache for video property values.
-    this.cache_ = {};
+  // Cache for video property values.
+  this.cache_ = {};
 
-    // Set poster
-    this.poster_ = options['poster'];
-    // Set controls
-    this.controls_ = options['controls'];
-    // Original tag settings stored in options
-    // now remove immediately so native controls don't flash.
-    // May be turned back on by HTML5 tech if nativeControlsForTouch is true
-    tag.controls = false;
+  // Set poster
+  this.poster_ = options['poster'];
+  // Set controls
+  this.controls_ = options['controls'];
+  // Original tag settings stored in options
+  // now remove immediately so native controls don't flash.
+  // May be turned back on by HTML5 tech if nativeControlsForTouch is true
+  tag.controls = false;
 
-    // Run base component initializing with new options.
-    // Builds the element through createEl()
-    // Inits and embeds any child components in opts
-    vjs.Component.call(this, this, options, ready);
+  // Run base component initializing with new options.
+  // Builds the element through createEl()
+  // Inits and embeds any child components in opts
+  vjs.Component.call(this, this, options, ready);
 
-    // Update controls className. Can't do this when the controls are initially
-    // set because the element doesn't exist yet.
-    if (this.controls()) {
-      this.addClass('vjs-controls-enabled');
-    } else {
-      this.addClass('vjs-controls-disabled');
-    }
-
-    // TODO: Make this smarter. Toggle user state between touching/mousing
-    // using events, since devices can have both touch and mouse events.
-    // if (vjs.TOUCH_ENABLED) {
-    //   this.addClass('vjs-touch-enabled');
-    // }
-
-    // Firstplay event implimentation. Not sold on the event yet.
-    // Could probably just check currentTime==0?
-    this.one('play', function(e){
-      var fpEvent = { type: 'firstplay', target: this.el_ };
-      // Using vjs.trigger so we can check if default was prevented
-      var keepGoing = vjs.trigger(this.el_, fpEvent);
-
-      if (!keepGoing) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-      }
-    });
-
-    this.on('ended', this.onEnded);
-    this.on('play', this.onPlay);
-    this.on('firstplay', this.onFirstPlay);
-    this.on('pause', this.onPause);
-    this.on('progress', this.onProgress);
-    this.on('durationchange', this.onDurationChange);
-    this.on('error', this.onError);
-    this.on('fullscreenchange', this.onFullscreenChange);
-
-    // Make player easily findable by ID
-    vjs.players[this.id_] = this;
-
-    if (options['plugins']) {
-      vjs.obj.each(options['plugins'], function(key, val){
-        this[key](val);
-      }, this);
-    }
-
-    this.listenForUserActivity();
+  // Update controls className. Can't do this when the controls are initially
+  // set because the element doesn't exist yet.
+  if (this.controls()) {
+    this.addClass('vjs-controls-enabled');
+  } else {
+    this.addClass('vjs-controls-disabled');
   }
-});
+
+  // TODO: Make this smarter. Toggle user state between touching/mousing
+  // using events, since devices can have both touch and mouse events.
+  // if (vjs.TOUCH_ENABLED) {
+  //   this.addClass('vjs-touch-enabled');
+  // }
+
+  // Firstplay event implimentation. Not sold on the event yet.
+  // Could probably just check currentTime==0?
+  this.one('play', function(e){
+    var fpEvent = { type: 'firstplay', target: this.el_ };
+    // Using vjs.trigger so we can check if default was prevented
+    var keepGoing = vjs.trigger(this.el_, fpEvent);
+
+    if (!keepGoing) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+    }
+  });
+
+  this.on('ended', this.onEnded);
+  this.on('play', this.onPlay);
+  this.on('firstplay', this.onFirstPlay);
+  this.on('pause', this.onPause);
+  this.on('progress', this.onProgress);
+  this.on('durationchange', this.onDurationChange);
+  this.on('error', this.onError);
+  this.on('fullscreenchange', this.onFullscreenChange);
+
+  // Make player easily findable by ID
+  vjs.players[this.id_] = this;
+
+  if (options['plugins']) {
+    vjs.obj.each(options['plugins'], function(key, val){
+      this[key](val);
+    }, this);
+  }
+
+  this.listenForUserActivity();
+};
+
 
 /**
  * Player instance options, surfaced using vjs.options

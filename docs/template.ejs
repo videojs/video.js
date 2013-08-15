@@ -1,0 +1,101 @@
+<? docfiles.forEach(function(doc) { -?>
+  <!-- Start <?= doc.filename ?> -->
+
+  <? 
+    var classes = [];
+    var methods = [];
+    var others = [];
+
+    doc.javadoc.forEach(function(comment){
+      if (comment.type === 'class') {
+        classes.push(comment);
+      } else if (comment.type === 'method') {
+        methods.push(comment);
+      } else {
+        others.push(comment);
+      }
+    });
+
+    classes.forEach(function(comment){
+      parseComment(comment);
+    });
+
+    others.forEach(function(comment){
+      parseComment(comment);
+    });
+
+  ?>
+
+  ## Index
+
+  <? if (methods.length > 0) { ?> 
+    * [Methods](#)
+  <? } ?>
+
+  <?
+    // Build the index of methods, properties and events
+    methods.forEach(function(comment){
+      indexItem(comment.name, '#'+comment.name);
+    });
+  ?>
+
+  <? if (methods.length > 0) { ?>
+
+    ## Methods
+    <?
+      methods.forEach(function(comment){
+        parseComment(comment);
+      });
+    ?>
+  <? } ?>
+
+  <? function indexItem(name, link) { ?>
+        * * [<?= name ?>](<?= link ?>)
+  <? } ?>
+
+  <? function parseComment(comment) { ?>
+    <? if (!comment.ignore) { ?>
+      <? if (comment.name) { ?>
+        <? if (comment.isMethod || comment.isFunction) { ?>
+          ## <?= comment.name ?>(<?= comment.paramStr ?>)
+        <? } else if (comment.isClass) { ?>
+          # <?= comment.raw.ctx.string ?>
+
+          <? if (comment.extends) { -?>
+            __EXTENDS__: [<?= comment.extends ?>](<?= comment.ancestorName.toLowerCase() ?>.md)  
+          <? } -?>
+          __DEFINED IN__: [<?= doc.filename ?>](https://github.com/videojs/video.js/blob/master/<?= doc.filename ?>)
+
+        <? } else { ?>
+          ## <?= comment.name ?>
+        <? } ?>
+      <? } ?>
+        
+        <?= comment.description ?>
+
+        <? if (comment.deprecated) { ?>
+          **Deprecated**
+        <? } ?>
+
+        <? if (comment.see) { ?>
+          See: <?= comment.see ?>
+        <? } ?>
+
+      <? if (comment.paramTags.length > 0) { ?>
+        ### Params: 
+        <? comment.paramTags.forEach(function(paramTag) { ?>
+          * **<?= paramTag.joinedTypes ?>** *<?= paramTag.name ?>* <?= paramTag.description ?>
+        <? }) ?>
+      <? } ?>
+
+      <? if (comment.returnTags.length > 0) { ?>
+        ### Return:
+        <? comment.returnTags.forEach(function(returnTag) { ?>
+          * **<?= returnTag.joinedTypes ?>** <?= returnTag.description ?>
+        <? }) ?>
+      <? } ?>
+    <? } ?>
+  <? } ?>
+
+  <!-- End <?= doc.filename ?> -->
+<? }) ?>
