@@ -11,6 +11,8 @@ formatter.format = function (docfile) {
 
     var type = (javadoc.ctx && javadoc.ctx.type);
     var name = (javadoc.ctx && typeof javadoc.ctx.name === 'string') ? javadoc.ctx.name : '';
+    var nameTarget = '';
+    var nameWithParams = '';
 
     var description = ''
     var paramStr = [];
@@ -32,9 +34,24 @@ formatter.format = function (docfile) {
 
       if (tag.type == 'param') {
         tag.joinedTypes = tag.types.join('|');
+
+        // determin if parameter is optional
+        var lastTypeChar = tag.joinedTypes.slice(-1);
+        // tag.optional = tag.name.slice(0,1) === '[' || lastTypeChar === '=' || lastTypeChar === '?';
+
+        if (lastTypeChar === '=' || lastTypeChar === '?') {
+          tag.optional = true;
+          tag.joinedTypes = tag.joinedTypes.slice(0,-1);
+        }
+
+        if (tag.name.slice(0,1) === '[') {
+          tag.optional = true;
+        }
+
         paramTags.push(tag);
         paramStr.push(tag.name);
-      } else if (tag.type == 'return') {
+
+      } else if (tag.type == 'return' || tag.type == 'returns') {
         tag.joinedTypes = tag.types.join('|');
         returnTags.push(tag);
       } else if (tag.type == 'throws') {
@@ -82,6 +99,14 @@ formatter.format = function (docfile) {
                       .replace(/^h6/, '######');
 
 
+    if (type == 'method' || type == 'function') {
+      nameWithParams = name + '('+paramStr.join(', ')+')';
+    } else {
+      nameWithParams = name;
+    }
+
+    nameTarget = nameWithParams.toLowerCase().replace(/[,.\[\]\(\)]/g, '').replace(/\s+/g, '-');
+
     docfile.javadoc[index] = {
       name: name
       , paramStr: paramStr.join(', ')
@@ -101,6 +126,8 @@ formatter.format = function (docfile) {
       , description: description
       , ignore: javadoc.ignore
       , raw: javadoc
+      , nameTarget: nameTarget
+      , nameWithParams: nameWithParams
     };
 
     if (type === 'method') {

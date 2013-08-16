@@ -1,4 +1,9 @@
-<!-- Start src/js/player.js -->
+<!--
+Start src/js/player.js
+
+GENERATED FROM SOURCE
+if you edit this doc directly your changes will be lost
+-->
 
 # vjs.Player
 
@@ -21,92 +26,75 @@ In the follwing example, the `data-setup` attribute tells the Video.js library t
 
 After an instance has been created it can be accessed globally using `Video('example_video_1')`.
 
-Player instance options, surfaced using vjs.options
-vjs.options = vjs.Player.prototype.options_
-Make changes in vjs.options, not here.
-All options should use string keys so they avoid
-renaming by closure compiler
+---
 
-Fallbacks for unsupported event types
-================================================================================
+## INDEX
 
-TODO: update for multiple buffered regions
+- [METHODS](#methods)
+  - [init](#inittag-options-ready)
+  - [play](#play)
+  - [poster](#postersrc)
+  - [controls](#controlscontrols)
+  - [usingNativeControls](#usingnativecontrolsbool)
 
-Object for cached values.
+## METHODS
 
-The url of the poster image source.
-
-Whether or not the controls are showing
-
-## Index
-
- 
-* [Methods](#)
-
-* * [init](#init)
-
-* * [manualTimeUpdatesOn](#manualTimeUpdatesOn)
-
-* * [play](#play)
-
-* * [poster](#poster)
-
-* * [controls](#controls)
-
-* * [usingNativeControls](#usingNativeControls)
-
-## Methods
-
-## init(tag, options, ready)
-
+### init(tag, options, ready)
 player's constructor function
 
-### Params: 
+##### PARAMETERS:
+* __tag__ `Element` The original video tag used for configuring options
+* __options__ `Object` _(Optional)_ Player options
+* __ready__ `Function` _(Optional)_ Ready callback function
 
-* **Element** *tag* The original video tag used for configuring options
+---
 
-* **Object=** *options* Player options
+### play()
+start media playback
 
-* **Function=** *ready* Ready callback function
+##### EXAMPLE:
 
-## manualTimeUpdatesOn()
+```js
+  myPlayer.play();
+```
 
-Time Tracking --------------------------------------------------------------
+##### RETURNS:
+* `vjs.Player` self
 
-## play()
+---
 
-Start media playback
-http://dev.w3.org/html5/spec/video.html#dom-media-play
-We're triggering the 'play' event here instead of relying on the
-media element to allow using event.preventDefault() to stop
-play from happening if desired. Usecase: preroll ads.
+### poster([src])
+get or set the poster image source url
 
-## poster(src)
+##### EXAMPLE:
 
-Get or set the poster image source url.
+    // getting
+    var currentPoster = myPlayer.poster();
 
-### Params: 
+    // setting
+    myPlayer.poster('http://example.com/myImage.jpg');
 
-* **String** *src* Poster image source URL
+##### PARAMETERS:
+* __src__ `String` _(Optional)_ Poster image source URL
 
-### Return:
+##### RETURNS:
+* `String` poster URL when getting
+* `vjs.Player` self when setting
 
-* **String** Poster image source URL or null
+---
 
-## controls(controls)
-
+### controls(controls)
 Get or set whether or not the controls are showing.
 
-### Params: 
+##### PARAMETERS:
+* __controls__ `Boolean` Set controls to showing or not
 
-* **Boolean** *controls* Set controls to showing or not
+##### RETURNS:
+* `Boolean` Controls are showing
 
-### Return:
+---
 
-* **Boolean** Controls are showing
-
-## usingNativeControls(bool)
-
+### usingNativeControls(bool)
 Toggle native controls on/off. Native controls are the controls built into
 devices (e.g. default iPhone controls), Flash, or other techs
 (e.g. Vimeo Controls)
@@ -114,12 +102,13 @@ devices (e.g. default iPhone controls), Flash, or other techs
 **This should only be set by the current tech, because only the tech knows
 if it can support native controls**
 
-### Params: 
+##### PARAMETERS:
+* __bool__ `Boolean` True signals that native controls are on
 
-* **Boolean** *bool* True signals that native controls are on
+##### RETURNS:
+* `vjs.Player` Returns the player
 
-### Return:
-
-* **vjs.Player** Returns the player
+---
 
 <!-- End src/js/player.js -->
+

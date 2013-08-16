@@ -18,93 +18,93 @@
  * @class
  * @extends vjs.Component
  */
-vjs.Player = vjs.Component.extend();
+vjs.Player = vjs.Component.extend({
 
-/**
- *
- * player's constructor function
- *
- * @constructs
- * @param {Element} tag        The original video tag used for configuring options
- * @param {Object=} options    Player options
- * @param {Function=} ready    Ready callback function
- */
- vjs.Player.prototype.init = function(tag, options, ready){
-  this.tag = tag; // Store the original tag used to set options
+  /**
+   * player's constructor function
+   *
+   * @constructs
+   * @method init
+   * @param {Element} tag        The original video tag used for configuring options
+   * @param {Object=} options    Player options
+   * @param {Function=} ready    Ready callback function
+   */
+  init: function(tag, options, ready){
+    this.tag = tag; // Store the original tag used to set options
 
-  // Set Options
-  // The options argument overrides options set in the video tag
-  // which overrides globally set options.
-  // This latter part coincides with the load order
-  // (tag must exist before Player)
-  options = vjs.obj.merge(this.getTagSettings(tag), options);
+    // Set Options
+    // The options argument overrides options set in the video tag
+    // which overrides globally set options.
+    // This latter part coincides with the load order
+    // (tag must exist before Player)
+    options = vjs.obj.merge(this.getTagSettings(tag), options);
 
-  // Cache for video property values.
-  this.cache_ = {};
+    // Cache for video property values.
+    this.cache_ = {};
 
-  // Set poster
-  this.poster_ = options['poster'];
-  // Set controls
-  this.controls_ = options['controls'];
-  // Original tag settings stored in options
-  // now remove immediately so native controls don't flash.
-  // May be turned back on by HTML5 tech if nativeControlsForTouch is true
-  tag.controls = false;
+    // Set poster
+    this.poster_ = options['poster'];
+    // Set controls
+    this.controls_ = options['controls'];
+    // Original tag settings stored in options
+    // now remove immediately so native controls don't flash.
+    // May be turned back on by HTML5 tech if nativeControlsForTouch is true
+    tag.controls = false;
 
-  // Run base component initializing with new options.
-  // Builds the element through createEl()
-  // Inits and embeds any child components in opts
-  vjs.Component.call(this, this, options, ready);
+    // Run base component initializing with new options.
+    // Builds the element through createEl()
+    // Inits and embeds any child components in opts
+    vjs.Component.call(this, this, options, ready);
 
-  // Update controls className. Can't do this when the controls are initially
-  // set because the element doesn't exist yet.
-  if (this.controls()) {
-    this.addClass('vjs-controls-enabled');
-  } else {
-    this.addClass('vjs-controls-disabled');
-  }
-
-  // TODO: Make this smarter. Toggle user state between touching/mousing
-  // using events, since devices can have both touch and mouse events.
-  // if (vjs.TOUCH_ENABLED) {
-  //   this.addClass('vjs-touch-enabled');
-  // }
-
-  // Firstplay event implimentation. Not sold on the event yet.
-  // Could probably just check currentTime==0?
-  this.one('play', function(e){
-    var fpEvent = { type: 'firstplay', target: this.el_ };
-    // Using vjs.trigger so we can check if default was prevented
-    var keepGoing = vjs.trigger(this.el_, fpEvent);
-
-    if (!keepGoing) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
+    // Update controls className. Can't do this when the controls are initially
+    // set because the element doesn't exist yet.
+    if (this.controls()) {
+      this.addClass('vjs-controls-enabled');
+    } else {
+      this.addClass('vjs-controls-disabled');
     }
-  });
 
-  this.on('ended', this.onEnded);
-  this.on('play', this.onPlay);
-  this.on('firstplay', this.onFirstPlay);
-  this.on('pause', this.onPause);
-  this.on('progress', this.onProgress);
-  this.on('durationchange', this.onDurationChange);
-  this.on('error', this.onError);
-  this.on('fullscreenchange', this.onFullscreenChange);
+    // TODO: Make this smarter. Toggle user state between touching/mousing
+    // using events, since devices can have both touch and mouse events.
+    // if (vjs.TOUCH_ENABLED) {
+    //   this.addClass('vjs-touch-enabled');
+    // }
 
-  // Make player easily findable by ID
-  vjs.players[this.id_] = this;
+    // Firstplay event implimentation. Not sold on the event yet.
+    // Could probably just check currentTime==0?
+    this.one('play', function(e){
+      var fpEvent = { type: 'firstplay', target: this.el_ };
+      // Using vjs.trigger so we can check if default was prevented
+      var keepGoing = vjs.trigger(this.el_, fpEvent);
 
-  if (options['plugins']) {
-    vjs.obj.each(options['plugins'], function(key, val){
-      this[key](val);
-    }, this);
+      if (!keepGoing) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+      }
+    });
+
+    this.on('ended', this.onEnded);
+    this.on('play', this.onPlay);
+    this.on('firstplay', this.onFirstPlay);
+    this.on('pause', this.onPause);
+    this.on('progress', this.onProgress);
+    this.on('durationchange', this.onDurationChange);
+    this.on('error', this.onError);
+    this.on('fullscreenchange', this.onFullscreenChange);
+
+    // Make player easily findable by ID
+    vjs.players[this.id_] = this;
+
+    if (options['plugins']) {
+      vjs.obj.each(options['plugins'], function(key, val){
+        this[key](val);
+      }, this);
+    }
+
+    this.listenForUserActivity();
   }
-
-  this.listenForUserActivity();
-};
-
+});
 
 /**
  * Player instance options, surfaced using vjs.options
@@ -354,7 +354,7 @@ vjs.Player.prototype.trackProgress = function(){
 };
 vjs.Player.prototype.stopTrackingProgress = function(){ clearInterval(this.progressInterval); };
 
-/* Time Tracking -------------------------------------------------------------- */
+/*! Time Tracking -------------------------------------------------------------- */
 vjs.Player.prototype.manualTimeUpdatesOn = function(){
   this.manualTimeUpdates = true;
 
@@ -505,11 +505,15 @@ vjs.Player.prototype.techGet = function(method){
 };
 
 /**
- * Start media playback
- * http://dev.w3.org/html5/spec/video.html#dom-media-play
- * We're triggering the 'play' event here instead of relying on the
- * media element to allow using event.preventDefault() to stop
- * play from happening if desired. Usecase: preroll ads.
+ * start media playback
+ *
+ * ##### EXAMPLE:
+ *
+ * ```js
+ *   myPlayer.play();
+ * ```
+ *
+ * @return {vjs.Player} self
  */
 vjs.Player.prototype.play = function(){
   this.techCall('play');
@@ -850,20 +854,31 @@ vjs.Player.prototype.loop = function(value){
 };
 
 /**
- * The url of the poster image source.
+ * the url of the poster image source
  * @type {String}
  * @private
  */
 vjs.Player.prototype.poster_;
 
 /**
- * Get or set the poster image source url.
- * @param  {String} src Poster image source URL
- * @return {String}    Poster image source URL or null
+ * get or set the poster image source url
+ *
+ * ##### EXAMPLE:
+ *
+ *     // getting
+ *     var currentPoster = myPlayer.poster();
+ *
+ *     // setting
+ *     myPlayer.poster('http://example.com/myImage.jpg');
+ *
+ * @param  {String=} [src] Poster image source URL
+ * @return {String} poster URL when getting
+ * @return {vjs.Player} self when setting
  */
 vjs.Player.prototype.poster = function(src){
   if (src !== undefined) {
     this.poster_ = src;
+    return this;
   }
   return this.poster_;
 };
