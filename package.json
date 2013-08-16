@@ -24,6 +24,7 @@
     "grunt-contrib-jshint": "~0.4.3",
     "grunt-contrib-watch": "~0.1.4",
     "grunt-contrib-qunit": "~0.2.1",
+    "grunt-apidox": "0.1.1",
     "calcdeps": "~0.1.7",
     "grunt-contrib-clean": "~0.4.0a",
     "grunt-contrib-copy": "~0.3.2",

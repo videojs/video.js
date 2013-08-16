@@ -76,6 +76,10 @@ module.exports = function(grunt) {
         ]
       }
     },
+    apidox: {
+      input: 'dist/video-js/video.dev.js',
+      output: 'docs/playerapi.md'
+    },
     s3: {
       options: s3,
       minor: {
@@ -130,13 +134,14 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-s3');
   grunt.loadNpmTasks('contribflow');
+  grunt.loadNpmTasks('grunt-apidox');
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'less', 'build', 'minify', 'dist']);
   // Development watch task
   grunt.registerTask('dev', ['jshint', 'less', 'build', 'qunit:source']);
   grunt.registerTask('test', ['jshint', 'less', 'build', 'minify', 'qunit']);
-
+  grunt.registerTask('api-docs', ['apidox']);
   var fs = require('fs'),
       gzip = require('zlib').gzip;
 
