@@ -1,8 +1,8 @@
 <!-- Start src/js/player.js -->
 
-# Video.Player
+# vjs.Player
 
-__EXTENDS__: [Video.Component](...)  
+__EXTENDS__: [vjs.Component](component.md)
 __DEFINED IN__: [src/js/player.js](https://github.com/videojs/video.js/blob/master/src/js/player.js)
 
 An instance of the `Video.Player` class is created when any of the Video.js setup methods are used to initialize a video.
@@ -73,16 +73,16 @@ After an instance has been created it can be accessed globally using `Video('exa
 ## METHODS
 
 ### play() `Video.Player`
-start video playback
-
-##### RETURNS:
-`Video.Player` self
+start media playback
 
 ##### EXAMPLE:
 
 ```js
   myPlayer.play();
 ```
+
+##### RETURNS:
+`vjs.Player` self
 
 _defined in_: [src/js/player.js#123](https://github.com/videojs/video.js/blob/master/src/js/player.js#123)
 
@@ -108,7 +108,7 @@ _defined in_: [src/js/player.js#123](https://github.com/videojs/video.js/blob/ma
 
 the current time setter
 
-##### PARAMETERS:
+##### PARAMS:
 - __seconds__ `Integer` desired time to seek to in seconds
 
 ##### RETURNS:
@@ -129,10 +129,10 @@ _defined in_: [src/js/player.js#123](https://github.com/videojs/video.js/blob/ma
 ### play
 fired when the the media begins playback
 
-### pause 
+### pause
 fired when the media pauses playpack
 
-### timeupdate 
+### timeupdate
 fired continuously as the video plays, at an interval of between 15 and 250 milliseconds
 
 ---
