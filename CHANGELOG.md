@@ -9,6 +9,7 @@ CHANGELOG
 * Exported createItems() for custom menus ([view](https://github.com/videojs/video.js/pull/654))
 * Preventing media events from bubbling up the DOM ([view](https://github.com/videojs/video.js/pull/630))
 * Major reworking of the control bar and many issues fixed ([view](https://github.com/videojs/video.js/pull/672))
+* Fixed an issue with minifiying the code on Windows systems ([view](https://github.com/videojs/video.js/pull/683))
 
 --------------------
 
