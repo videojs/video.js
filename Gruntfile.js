@@ -210,7 +210,7 @@ module.exports = function(grunt) {
                 + ' --js_output_file=' + dest
                 + ' --create_source_map ' + dest + '.map --source_map_format=V3'
                 + ' --jscomp_warning=checkTypes --warning_level=VERBOSE'
-                + ' --output_wrapper "/*! Video.js v' + version.full + ' ' + pkg.copyright + ' */\n (function() {%output%})();//@ sourceMappingURL=video.js.map"';
+                + ' --output_wrapper "/*! Video.js v' + version.full + ' ' + pkg.copyright + ' */ (function() {%output%})();//@ sourceMappingURL=video.js.map"';
 
     // Add each js file
     grunt.file.expand(filePatterns).forEach(function(file){
