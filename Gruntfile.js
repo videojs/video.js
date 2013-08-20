@@ -132,6 +132,8 @@ module.exports = function(grunt) {
         autoWatch: false
       }
     }
+    },
+    docs: {}
   });
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -144,6 +146,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-s3');
   grunt.loadNpmTasks('contribflow');
   grunt.loadNpmTasks('grunt-karma');
+
+  grunt.loadTasks('./docs/tasks/');
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'less', 'build', 'minify', 'dist']);
@@ -304,22 +308,6 @@ module.exports = function(grunt) {
         grunt.log.writeln(stdout);
       }
 
-      done();
-    });
-  });
-
-  grunt.registerTask('docs', 'Generate docs', function(){
-    var markdox = require('markdox');
-    var done = this.async();
-
-    var options = {
-      output: 'docs/api/player.md',
-      formatter: require('./docs/formatter.js').format,
-      template: 'docs/template.ejs'
-    };
-
-    markdox.process('src/js/player.js', options, function(){
-      console.log('File `all.md` generated with success');
       done();
     });
   });
