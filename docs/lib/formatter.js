@@ -24,6 +24,7 @@ formatter.format = function (docfile) {
     var tagClass = ''
     var tagFunction = ''
     var tagMethod = ''
+    var tagEvent = ''
     var tagSee = ''
     var tagVersion = ''
     var tagAuthor = ''
@@ -61,12 +62,14 @@ formatter.format = function (docfile) {
         type = 'method';
         tagMethod = tag.string;
       } else if (tag.type == 'class') {
-        console.log('here', tag.type, name);
         type = 'class';
         tagClass = tag.string;
       } else if (tag.type == 'function') {
         type = 'function';
         tagFunction = tag.string;
+      } else if (tag.type == 'event') {
+        type = 'event';
+        tagEvent = tag.string;
       } else if (tag.type == 'name') {
         tagName = tag.string;
       } else if (tag.type == 'see') {
@@ -83,7 +86,7 @@ formatter.format = function (docfile) {
       }
     });
 
-    name = tagName !== '' ? tagName : tagMethod !== '' ? tagMethod : tagClass !== '' ? tagClass : tagFunction !== '' ? tagFunction : name;
+    name = tagName !== '' ? tagName : tagMethod !== '' ? tagMethod : tagClass !== '' ? tagClass : tagFunction !== '' ? tagFunction : tagEvent !== '' ? tagEvent : name;
     description = javadoc.description.full
                       .replace(/\nh1/, '#')
                       .replace(/\nh2/, '##')
@@ -131,7 +134,11 @@ formatter.format = function (docfile) {
     };
 
     if (type === 'method') {
-      docfile.methods.push(tagMethod)
+      docfile.methods.push(tagMethod);
+    }
+
+    if (type === 'event') {
+      docfile.events.push(tagEvent);
     }
 
   });

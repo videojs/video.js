@@ -37,6 +37,10 @@ After an instance has been created it can be accessed globally using `Video('exa
   - [controls](#controlscontrols)
   - [usingNativeControls](#usingnativecontrolsbool)
 
+- [EVENTS](#events)
+  - [usingnativecontrols](#usingnativecontrols)
+  - [usingcustomcontrols](#usingcustomcontrols)
+
 ## METHODS
 
 ### init(tag, options, ready)
@@ -107,6 +111,18 @@ if it can support native controls**
 
 ##### RETURNS:
 * `vjs.Player` Returns the player
+
+---
+
+## EVENTS
+
+### usingnativecontrols
+player is using the native device controls
+
+---
+
+### usingcustomcontrols
+player is using the custom HTML controls
 
 ---
 

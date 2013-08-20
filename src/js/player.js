@@ -939,9 +939,23 @@ vjs.Player.prototype.usingNativeControls = function(bool){
       this.usingNativeControls_ = bool;
       if (bool) {
         this.addClass('vjs-using-native-controls');
+
+        /**
+         * player is using the native device controls
+         *
+         * @event usingnativecontrols
+         * @type {object}
+         */
         this.trigger('usingnativecontrols');
       } else {
         this.removeClass('vjs-using-native-controls');
+
+        /**
+         * player is using the custom HTML controls
+         *
+         * @event usingcustomcontrols
+         * @type {object}
+         */
         this.trigger('usingcustomcontrols');
       }
     }
