@@ -915,6 +915,7 @@ vjs.Player.prototype.usingNativeControls = function(bool){
 
 vjs.Player.prototype.error = function(){ return this.techGet('error'); };
 vjs.Player.prototype.ended = function(){ return this.techGet('ended'); };
+vjs.Player.prototype.seeking = function(){ return this.techGet('seeking'); };
 
 // When the player is first initialized, trigger activity so components
 // like the control bar show themselves if needed

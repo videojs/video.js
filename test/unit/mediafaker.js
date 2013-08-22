@@ -31,6 +31,7 @@ vjs.MediaFaker.prototype.createEl = function(){
 };
 
 vjs.MediaFaker.prototype.currentTime = function(){ return 0; };
+vjs.MediaFaker.prototype.seeking = function(){ return false; };
 vjs.MediaFaker.prototype.volume = function(){ return 0; };
 vjs.MediaFaker.prototype.muted = function(){ return false; };
 vjs.MediaFaker.prototype.pause = function(){ return false; };
