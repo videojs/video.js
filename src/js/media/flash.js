@@ -251,7 +251,7 @@ vjs.Flash.prototype.src = function(src){
 };
 
 vjs.Flash.prototype.currentSrc = function(){
-  var src = this.el_.vjs_getProperty("currentSrc");
+  var src = this.el_.vjs_getProperty('currentSrc');
   // no src, check and see if RTMP
   if (src == null) {
     var connection = this.rtmpConnection(),
@@ -287,7 +287,7 @@ vjs.Flash.prototype.enterFullScreen = function(){
 
 // Create setters and getters for attributes
 var api = vjs.Flash.prototype,
-    readWrite = 'preload,currentTime,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted'.split(','),
+    readWrite = 'rtmpConnection,rtmpStream,preload,currentTime,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted'.split(','),
     readOnly = 'error,currentSrc,networkState,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight,textTracks'.split(',');
     // Overridden: buffered
 
@@ -481,7 +481,7 @@ vjs.Flash.getEmbedCode = function(swf, flashVars, params, attributes){
 };
 
 vjs.Flash.streamFromParts = function(connection, stream) {
-  return connection + "&" + stream;
+  return connection + '&' + stream;
 };
 
 vjs.Flash.streamToParts = function(src) {
@@ -495,7 +495,7 @@ vjs.Flash.streamToParts = function(src) {
   }
 
   // Look for the normal URL separator we expect, '&'.
-  // If found, we split the URL into two pieces around the 
+  // If found, we split the URL into two pieces around the
   // first '&'.
   var connEnd = src.indexOf('&');
   var streamBegin;
@@ -511,7 +511,7 @@ vjs.Flash.streamToParts = function(src) {
     }
   }
   parts.connection = src.substring(0, connEnd);
-  parts.stream = src.substring(streamBegin, src.length);  
+  parts.stream = src.substring(streamBegin, src.length);
 
   return parts;
 };
