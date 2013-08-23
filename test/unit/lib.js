@@ -130,8 +130,10 @@ test('should get the right style values for an element', function(){
   el.style.height = '100%';
   el.style.width = '123px';
 
-  ok(vjs.getComputedDimension(el, 'height') === '1000px');
-  ok(vjs.getComputedDimension(el, 'width') === '123px');
+  // integer px values may get translated int very-close floats in Chrome/OS X
+  // so round the dimensions to ignore this
+  equal(Math.round(parseFloat(vjs.getComputedDimension(el, 'height'))), 1000, 'the computed height is equal');
+  equal(Math.round(parseFloat(vjs.getComputedDimension(el, 'width'))), 123, 'the computed width is equal');
 });
 
 test('should insert an element first in another', function(){
