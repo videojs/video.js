@@ -842,10 +842,25 @@ vjs.Player.prototype.poster_;
  * @return {String}    Poster image source URL or null
  */
 vjs.Player.prototype.poster = function(src){
-  if (src !== undefined) {
-    this.poster_ = src;
+  var posterImage;
+  if (src === undefined) {
+    return this.poster_;
   }
-  return this.poster_;
+
+  // update the internal poster variable
+  this.poster_ = src;
+
+  // access the posterImage through the name index instead of directly off
+  // `this` because closure compiler erases the property even if it's being used...
+  posterImage = this.childNameIndex_['posterImage'];
+
+  // update the posterImage component
+  if (posterImage) {
+    posterImage.src(src);
+  }
+
+  // update the tech's poster
+  this.techCall('setPoster', src);
 };
 
 /**
