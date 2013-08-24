@@ -176,6 +176,81 @@ test('should transfer the poster attribute unmodified', function(){
   player.dispose();
 });
 
+test('should allow the poster to be changed after init', function() {
+  var tag, fixture, updatedPoster, player, posterElement, posterElementUrl, imageElement;
+  tag = PlayerTest.makeTag();
+  tag.setAttribute('poster', 'http://example.com/poster.jpg');
+  fixture = document.getElementById('qunit-fixture');
+
+  fixture.appendChild(tag);
+  player = new vjs.Player(tag, {
+    'techOrder': ['mediaFaker']
+  });
+
+  updatedPoster = 'http://example.com/updated-poster.jpg';
+  player.poster(updatedPoster);
+
+  strictEqual(player.poster(), updatedPoster, 'the updated poster is returned');
+  strictEqual(player.tech.el().poster, updatedPoster, 'the poster attribute is updated');
+
+  posterElement = document.querySelector('.vjs-poster');
+  ok(posterElement, 'vjs-poster element should exist');
+
+  if (!('backgroundSize' in posterElement.style)) {
+    imageElement = document.getElementsByTagName('img')[0];
+    ok(imageElement, 'image element should exist if the poster div has no background-size CSS property');
+    var imageElementSrc = imageElement.getAttribute('src');
+    strictEqual(imageElementSrc,
+          updatedPoster,
+          'the poster img src is updated');
+  } else {
+    posterElementUrl = posterElement.style.backgroundImage.replace(/"/g, '');
+    strictEqual(posterElementUrl,
+            'url(' + updatedPoster + ')',
+            'the poster div background is updated');
+  }
+
+  player.dispose();
+});
+
+test('should ignore setting an undefined poster after init', function() {
+  var tag, fixture, updatedPoster, originalPoster, player, posterElement, posterElementUrl, imageElement;
+  tag = PlayerTest.makeTag();
+  tag.setAttribute('poster', 'http://example.com/poster.jpg');
+  fixture = document.getElementById('qunit-fixture');
+
+  fixture.appendChild(tag);
+  player = new vjs.Player(tag, {
+    'techOrder': ['mediaFaker']
+  });
+
+  originalPoster = player.poster();
+
+  updatedPoster = undefined;
+  player.poster(updatedPoster);
+  strictEqual(player.poster(), originalPoster, 'the original poster is returned');
+  strictEqual(player.tech.el().poster, originalPoster, 'the poster attribute is unchanged');
+
+  posterElement = document.querySelector('.vjs-poster');
+  ok(posterElement, 'vjs-poster element should exist');
+
+  if (!('backgroundSize' in posterElement.style)) {
+    imageElement = document.getElementsByTagName('img')[0];
+    ok(imageElement, 'image element should exist if the poster div has no background-size CSS property');
+    var imageElementSrc = imageElement.getAttribute('src');
+    strictEqual(imageElementSrc,
+          originalPoster,
+          'the poster img src is not updated');
+  } else {
+    posterElementUrl = posterElement.style.backgroundImage.replace(/"/g, '');
+    strictEqual(posterElementUrl,
+              'url(' + originalPoster + ')',
+              'the poster div background is unchanged');
+  }
+
+  player.dispose();
+});
+
 test('should load a media controller', function(){
   var player = PlayerTest.makePlayer({
     preload: 'none',
