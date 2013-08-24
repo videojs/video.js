@@ -1093,11 +1093,18 @@ vjs.Player.prototype.poster_;
  * @return {vjs.Player} self when setting
  */
 vjs.Player.prototype.poster = function(src){
-  if (src !== undefined) {
-    this.poster_ = src;
-    return this;
+  if (src === undefined) {
+    return this.poster_;
   }
-  return this.poster_;
+
+  // update the internal poster variable
+  this.poster_ = src;
+
+  // alert components that the poster has been set
+  this.trigger('posterchange');
+
+  // update the tech's poster
+  this.techCall('setPoster', src);
 };
 
 /**
@@ -1381,5 +1388,3 @@ vjs.Player.prototype.listenForUserActivity = function(){
   }
 
 })();
-
-

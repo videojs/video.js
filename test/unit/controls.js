@@ -100,3 +100,32 @@ test('calculateDistance should use changedTouches, if available', function() {
 
   equal(slider.calculateDistance(event), 0.5, 'we should have touched exactly in the center, so, the ratio should be half');
 });
+
+test('the poster getter should work correctly even when background-size is not available', function() {
+  var noop = function(){},
+      url = 'http://example.com/poster.jpg',
+      player = {
+        controls: noop,
+        id: noop,
+        on: noop,
+        ready: noop,
+        poster: function(){
+          return url;
+        }
+      },
+      poster = new vjs.PosterImage(player);
+
+  // mock out el() to return an element that behaves like IE8
+  poster.el = function(){
+    return {
+      style: {},
+      querySelector: function() {
+        return {
+          src: url
+        };
+      }
+    };
+  };
+
+  equal(url, poster.src(), 'the poster url is returned');
+});
