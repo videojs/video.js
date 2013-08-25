@@ -162,9 +162,9 @@ test('should show and hide an element', function(){
   var comp = new vjs.Component(getFakePlayer(), {});
 
   comp.hide();
-  ok(comp.el().style.display === 'none');
+  ok(/vjs-hidden/.test(comp.el().className), 'the class is present when hidden');
   comp.show();
-  ok(comp.el().style.display === 'block');
+  ok(!/vjs-hidden/.test(comp.el().className), 'the class is absent when shown');
 });
 
 test('should change the width and height of a component', function(){

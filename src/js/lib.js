@@ -256,34 +256,55 @@ vjs.isEmpty = function(obj) {
   return true;
 };
 
-/**
- * Add a CSS class name to an element
- * @param {Element} element    Element to add class name to
- * @param {String} classToAdd Classname to add
- */
-vjs.addClass = function(element, classToAdd){
-  if ((' '+element.className+' ').indexOf(' '+classToAdd+' ') == -1) {
-    element.className = element.className === '' ? classToAdd : element.className + ' ' + classToAdd;
-  }
-};
+(function(){
+  var addClass, removeClass;
 
-/**
- * Remove a CSS class name from an element
- * @param {Element} element    Element to remove from class name
- * @param {String} classToAdd Classname to remove
- */
-vjs.removeClass = function(element, classToRemove){
-  if (element.className.indexOf(classToRemove) == -1) { return; }
-  var classNames = element.className.split(' ');
-  // IE8 Does not support array.indexOf so using a for loop
-  for (var i = classNames.length - 1; i >= 0; i--) {
-    if (classNames[i] === classToRemove) {
-      classNames.splice(i,1);
-    }
+  if (document.createElement('div').classList) {
+
+    // use browser-native class manipulation
+    addClass = function(element, classToAdd){
+      element.classList.add(classToAdd);
+    };
+    removeClass = function(element, classToRemove){
+      element.classList.remove(classToRemove);
+    };
+
+  } else {
+
+    // parse the class property by hand
+    addClass = function(element, classToAdd){
+      if ((' '+element.className+' ').indexOf(' '+classToAdd+' ') == -1) {
+        element.className = element.className === '' ? classToAdd : element.className + ' ' + classToAdd;
+      }
+    };
+    removeClass = function(element, classToRemove){
+      if (element.className.indexOf(classToRemove) == -1) { return; }
+      var classNames = element.className.split(' ');
+      // IE8 Does not support array.indexOf so using a for loop
+      for (var i = classNames.length - 1; i >= 0; i--) {
+        if (classNames[i] === classToRemove) {
+          classNames.splice(i,1);
+        }
+      }
+      // classNames.splice(classNames.indexOf(classToRemove),1);
+      element.className = classNames.join(' ');
+    };
   }
-  // classNames.splice(classNames.indexOf(classToRemove),1);
-  element.className = classNames.join(' ');
-};
+
+  /**
+   * Add a CSS class name to an element
+   * @param {Element} element    Element to add class name to
+   * @param {String} classToAdd Classname to add
+   */
+  vjs.addClass = addClass;
+
+  /**
+   * Remove a CSS class name from an element
+   * @param {Element} element    Element to remove from class name
+   * @param {String} classToAdd Classname to remove
+   */
+  vjs.removeClass = removeClass;
+})();
 
 /**
  * Element for testing browser HTML5 video capabilities
