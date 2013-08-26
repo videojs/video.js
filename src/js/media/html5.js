@@ -13,13 +13,13 @@ vjs.Html5 = vjs.MediaTechController.extend({
   /** @constructor */
   init: function(player, options, ready){
     // volume cannot be changed from 1 on iOS
-    this.features.volumeControl = vjs.Html5.canControlVolume();
+    this.features['volumeControl'] = vjs.Html5.canControlVolume();
 
     // In iOS, if you move a video element in the DOM, it breaks video playback.
-    this.features.movingMediaElementInDOM = !vjs.IS_IOS;
+    this.features['movingMediaElementInDOM'] = !vjs.IS_IOS;
 
     // HTML video is able to automatically resize when going to fullscreen
-    this.features.fullscreenResize = true;
+    this.features['fullscreenResize'] = true;
 
     vjs.MediaTechController.call(this, player, options, ready);
 
@@ -72,7 +72,7 @@ vjs.Html5.prototype.createEl = function(){
   // Check if this browser supports moving the element into the box.
   // On the iPhone video will break if you move the element,
   // So we have to create a brand new element.
-  if (!el || this.features.movingMediaElementInDOM === false) {
+  if (!el || this.features['movingMediaElementInDOM'] === false) {
 
     // If the original tag is still there, remove it.
     if (el) {

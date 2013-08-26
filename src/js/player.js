@@ -235,12 +235,12 @@ vjs.Player.prototype.loadTech = function(techName, source){
     this.player_.triggerReady();
 
     // Manually track progress in cases where the browser/flash player doesn't report it.
-    if (!this.features.progressEvents) {
+    if (!this.features['progressEvents']) {
       this.player_.manualProgressOn();
     }
 
     // Manually track timeudpates in cases where the browser/flash player doesn't report it.
-    if (!this.features.timeupdateEvents) {
+    if (!this.features['timeupdateEvents']) {
       this.player_.manualTimeUpdatesOn();
     }
   };
@@ -305,7 +305,7 @@ vjs.Player.prototype.manualProgressOn = function(){
   this.tech.one('progress', function(){
 
     // Update known progress support for this playback technology
-    this.features.progressEvents = true;
+    this.features['progressEvents'] = true;
 
     // Turn off manual progress tracking
     this.player_.manualProgressOff();
@@ -344,7 +344,7 @@ vjs.Player.prototype.manualTimeUpdatesOn = function(){
   // Watch for native timeupdate event
   this.tech.one('timeupdate', function(){
     // Update known progress support for this playback technology
-    this.features.timeupdateEvents = true;
+    this.features['timeupdateEvents'] = true;
     // Turn off manual progress tracking
     this.player_.manualTimeUpdatesOff();
   });
