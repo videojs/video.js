@@ -148,6 +148,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-karma');
 
   grunt.loadTasks('./docs/tasks/');
+  grunt.loadTasks('../esdoc/tasks/');
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'less', 'build', 'minify', 'dist']);
