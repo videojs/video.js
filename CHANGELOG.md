@@ -15,6 +15,7 @@ CHANGELOG
 * Minor code improvements ([view](https://github.com/videojs/video.js/pull/706))
 * Updated time formatting to support NaN and Infinity ([view](https://github.com/videojs/video.js/pull/627))
 * Fixed an `undefined` error in cases where no tech is loaded ([view](https://github.com/videojs/video.js/pull/632))
+* Exported addClass and removeClass for player components ([view](https://github.com/videojs/video.js/pull/661))
 
 --------------------
 

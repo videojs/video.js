@@ -25,6 +25,8 @@ test('should be able to access expected player API methods', function() {
   ok(player.one, 'one exists');
   ok(player.bufferedPercent, 'bufferedPercent exists');
   ok(player.dimensions, 'dimensions exists');
+  ok(player.addClass, 'addClass exists');
+  ok(player.removeClass, 'removeClass exists');
   ok(player.usingNativeControls, 'usingNativeControls exists');
 
   player.dispose();
