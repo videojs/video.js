@@ -13,6 +13,7 @@ CHANGELOG
 * Added support for RTMP streaming through Flash ([view](https://github.com/videojs/video.js/pull/605))
 * Made tech.features available to external techs ([view](https://github.com/videojs/video.js/pull/705))
 * Minor code improvements ([view](https://github.com/videojs/video.js/pull/706))
+* Updated time formatting to support NaN and Infinity ([view](https://github.com/videojs/video.js/pull/627))
 
 --------------------
 
