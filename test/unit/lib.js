@@ -197,6 +197,7 @@ test('should format time as a string', function(){
 test('should format invalid times as dashes', function(){
   equal(vjs.formatTime(Infinity, 90), '-:-');
   equal(vjs.formatTime(NaN), '-:-');
+  // equal(vjs.formatTime(NaN, 216000), '-:--:--');
   equal(vjs.formatTime(10, Infinity), '0:00:10');
   equal(vjs.formatTime(90, NaN), '1:30');
 });
