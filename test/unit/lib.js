@@ -194,6 +194,13 @@ test('should format time as a string', function(){
   ok(vjs.formatTime(1,360000) === '0:00:01');
 });
 
+test('should format invalid times as dashes', function(){
+  equal(vjs.formatTime(Infinity, 90), '-:-');
+  equal(vjs.formatTime(NaN), '-:-');
+  equal(vjs.formatTime(10, Infinity), '0:00:10');
+  equal(vjs.formatTime(90, NaN), '1:30');
+});
+
 test('should create a fake timerange', function(){
   var tr = vjs.createTimeRange(0, 10);
   ok(tr.start() === 0);
