@@ -85,6 +85,7 @@ goog.exportSymbol('videojs.SeekHandle', vjs.SeekHandle);
 goog.exportSymbol('videojs.VolumeControl', vjs.VolumeControl);
 goog.exportSymbol('videojs.VolumeBar', vjs.VolumeBar);
 goog.exportSymbol('videojs.VolumeLevel', vjs.VolumeLevel);
+goog.exportSymbol('videojs.VolumeMenuButton', vjs.VolumeMenuButton);
 goog.exportSymbol('videojs.VolumeHandle', vjs.VolumeHandle);
 goog.exportSymbol('videojs.MuteToggle', vjs.MuteToggle);
 goog.exportSymbol('videojs.PosterImage', vjs.PosterImage);
