@@ -1,15 +1,66 @@
 var hasOwnProp = Object.prototype.hasOwnProperty;
 
 /**
+ * Cross-browser support for Array.indexOf
+ * Implementation took from a recommendations on MDC
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
+ */
+if (!Array.prototype.indexOf) {
+  Array.prototype.indexOf = function(searchElement /*, fromIndex */ ) {
+    'use strict';
+
+    if (this == null) {
+      throw new TypeError();
+    }
+
+    var
+      t = Object(this),
+      len = t.length >>> 0,
+      n = 0, k
+    ;
+
+    if (len === 0) {
+      return -1;
+    }
+
+    if (arguments.length > 1) {
+      n = Number(arguments[1]);
+      if (n != n) { // shortcut for verifying if it's NaN
+        n = 0;
+      } else if (n !== 0 && n != Infinity && n != -Infinity) {
+        n = (n > 0 || -1) * Math.floor(Math.abs(n));
+      }
+    }
+
+    if (n >= len) {
+      return -1;
+    }
+
+    k = n >= 0 ? n : Math.max(len - Math.abs(n), 0);
+
+    for (; k < len; k++) {
+      if (k in t && t[k] === searchElement) {
+        return k;
+      }
+    }
+
+    return -1;
+  };
+}
+
+/**
  * Creates an element and applies properties.
  * @param  {String=} tagName    Name of tag to be created.
  * @param  {Object=} properties Element properties to be applied.
  * @return {Element}
  */
 vjs.createEl = function(tagName, properties){
-  var el = document.createElement(tagName || 'div');
+  var
+    el = document.createElement(tagName || 'div'),
+    propName
+  ;
 
-  for (var propName in properties){
+  for (propName in properties){
     if (hasOwnProp.call(properties, propName)) {
       //el[propName] = properties[propName];
       // Not remembering why we were checking for dash
@@ -262,8 +313,12 @@ vjs.isEmpty = function(obj) {
  * @param {String} classToAdd Classname to add
  */
 vjs.addClass = function(element, classToAdd){
-  if ((' '+element.className+' ').indexOf(' '+classToAdd+' ') == -1) {
-    element.className = element.className === '' ? classToAdd : element.className + ' ' + classToAdd;
+  classToAdd = vjs.trim( classToAdd);
+
+  if (classToAdd) {
+    var classNames = vjs.trim(element.className).split(/\s+/);
+    (classNames.indexOf(classToAdd) == -1) && classNames.push( classToAdd);
+    element.className = element.className ? classNames.join(' ') : classToAdd;
   }
 };
 
@@ -273,15 +328,10 @@ vjs.addClass = function(element, classToAdd){
  * @param {String} classToAdd Classname to remove
  */
 vjs.removeClass = function(element, classToRemove){
-  if (element.className.indexOf(classToRemove) == -1) { return; }
-  var classNames = element.className.split(' ');
-  // IE8 Does not support array.indexOf so using a for loop
-  for (var i = classNames.length - 1; i >= 0; i--) {
-    if (classNames[i] === classToRemove) {
-      classNames.splice(i,1);
-    }
+  var classNames = element.className.split(/\s+/), i;
+  while ((i = classNames.indexOf(classToRemove)) != -1) {
+    classNames.splice(i,1);
   }
-  // classNames.splice(classNames.indexOf(classToRemove),1);
   element.className = classNames.join(' ');
 };
 
@@ -354,19 +404,20 @@ vjs.TOUCH_ENABLED = ('ontouchstart' in window);
  * @return {Object}
  */
 vjs.getAttributeValues = function(tag){
-  var obj = {};
-
-  // Known boolean attributes
-  // We can check for matching boolean properties, but older browsers
-  // won't know about HTML5 boolean attributes that we still read from.
-  // Bookending with commas to allow for an easy string search.
-  var knownBooleans = ','+'autoplay,controls,loop,muted,default'+',';
+  var
+    obj = {},
+    // Known boolean attributes
+    // We can check for matching boolean properties, but older browsers
+    // won't know about HTML5 boolean attributes that we still read from.
+    // Bookending with commas to allow for an easy string search.
+    knownBooleans = ','+'autoplay,controls,loop,muted,default'+',',
+    attrs, attrName, attrVal, i
+  ;
 
   if (tag && tag.attributes && tag.attributes.length > 0) {
-    var attrs = tag.attributes;
-    var attrName, attrVal;
+    attrs = tag.attributes;
 
-    for (var i = attrs.length - 1; i >= 0; i--) {
+    for (i = attrs.length - 1; i >= 0; i--) {
       attrName = attrs[i].name;
       attrVal = attrs[i].value;
 
@@ -481,7 +532,7 @@ vjs.unblockTextSelection = function(){ document.onselectstart = function () { re
  * @return {String}        Trimmed string
  */
 vjs.trim = function(string){
-  return string.toString().replace(/^\s+/, '').replace(/\s+$/, '');
+  return (string+'').replace(/^\s+|\s+$/g, '');
 };
 
 /**
@@ -519,8 +570,6 @@ vjs.createTimeRange = function(start, end){
  * @param  {Function=} onError    Error callback
  */
 vjs.get = function(url, onSuccess, onError){
-  var local = (url.indexOf('file:') === 0 || (window.location.href.indexOf('file:') === 0 && url.indexOf('http') === -1));
-
   if (typeof XMLHttpRequest === 'undefined') {
     window.XMLHttpRequest = function () {
       try { return new window.ActiveXObject('Msxml2.XMLHTTP.6.0'); } catch (e) {}
@@ -530,7 +579,10 @@ vjs.get = function(url, onSuccess, onError){
     };
   }
 
-  var request = new XMLHttpRequest();
+  var
+    local = (url.indexOf('file:') === 0 || (window.location.href.indexOf('file:') === 0 && url.indexOf('http') === -1)),
+    request = new XMLHttpRequest()
+  ;
 
   try {
     request.open('GET', url);
