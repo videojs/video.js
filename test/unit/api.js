@@ -41,6 +41,35 @@ test('should export ready api call to public', function() {
   player.dispose();
 });
 
+test('should export useful components to the public', function () {
+  ok(videojs.ControlBar, 'ControlBar should be public');
+  ok(videojs.Button, 'Button should be public');
+  ok(videojs.PlayToggle, 'PlayToggle should be public');
+  ok(videojs.FullscreenToggle, 'FullscreenToggle should be public');
+  ok(videojs.BigPlayButton, 'BigPlayButton should be public');
+  ok(videojs.LoadingSpinner, 'LoadingSpinner should be public');
+  ok(videojs.CurrentTimeDisplay, 'CurrentTimeDisplay should be public');
+  ok(videojs.DurationDisplay, 'DurationDisplay should be public');
+  ok(videojs.TimeDivider, 'TimeDivider should be public');
+  ok(videojs.RemainingTimeDisplay, 'RemainingTimeDisplay should be public');
+  ok(videojs.Slider, 'Slider should be public');
+  ok(videojs.ProgressControl, 'ProgressControl should be public');
+  ok(videojs.SeekBar, 'SeekBar should be public');
+  ok(videojs.LoadProgressBar, 'LoadProgressBar should be public');
+  ok(videojs.PlayProgressBar, 'PlayProgressBar should be public');
+  ok(videojs.SeekHandle, 'SeekHandle should be public');
+  ok(videojs.VolumeControl, 'VolumeControl should be public');
+  ok(videojs.VolumeBar, 'VolumeBar should be public');
+  ok(videojs.VolumeLevel, 'VolumeLevel should be public');
+  ok(videojs.VolumeMenuButton, 'VolumeMenuButton should be public');
+  ok(videojs.VolumeHandle, 'VolumeHandle should be public');
+  ok(videojs.MuteToggle, 'MuteToggle should be public');
+  ok(videojs.PosterImage, 'PosterImage should be public');
+  ok(videojs.Menu, 'Menu should be public');
+  ok(videojs.MenuItem, 'MenuItem should be public');
+  ok(videojs.MenuButton, 'MenuButton should be public');
+});
+
 test('should be able to initialize player twice on the same tag using string reference', function() {
   var videoTag = PlayerTest.makeTag();
   var id = videoTag.id;
