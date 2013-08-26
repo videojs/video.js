@@ -7,9 +7,11 @@ var hasOwnProp = Object.prototype.hasOwnProperty;
  * @return {Element}
  */
 vjs.createEl = function(tagName, properties){
-  var el = document.createElement(tagName || 'div');
+  var el, propName;
 
-  for (var propName in properties){
+  el = document.createElement(tagName || 'div');
+
+  for (propName in properties){
     if (hasOwnProp.call(properties, propName)) {
       //el[propName] = properties[propName];
       // Not remembering why we were checking for dash
@@ -103,10 +105,9 @@ vjs.obj.merge = function(obj1, obj2){
  * @return {Object}      New object. Obj1 and Obj2 will be untouched.
  */
 vjs.obj.deepMerge = function(obj1, obj2){
-  var key, val1, val2, objDef;
-  objDef = '[object Object]';
+  var key, val1, val2;
 
-  // Make a copy of obj1 so we're not ovewriting original values.
+  // make a copy of obj1 so we're not ovewriting original values.
   // like prototype.options_ and all sub options objects
   obj1 = vjs.obj.copy(obj1);
 
@@ -273,15 +274,19 @@ vjs.addClass = function(element, classToAdd){
  * @param {String} classToAdd Classname to remove
  */
 vjs.removeClass = function(element, classToRemove){
+  var classNames, i;
+
   if (element.className.indexOf(classToRemove) == -1) { return; }
-  var classNames = element.className.split(' ');
-  // IE8 Does not support array.indexOf so using a for loop
-  for (var i = classNames.length - 1; i >= 0; i--) {
+
+  classNames = element.className.split(' ');
+
+  // no arr.indexOf in ie8, and we don't want to add a big shim
+  for (i = classNames.length - 1; i >= 0; i--) {
     if (classNames[i] === classToRemove) {
       classNames.splice(i,1);
     }
   }
-  // classNames.splice(classNames.indexOf(classToRemove),1);
+
   element.className = classNames.join(' ');
 };
 
@@ -354,28 +359,28 @@ vjs.TOUCH_ENABLED = ('ontouchstart' in window);
  * @return {Object}
  */
 vjs.getAttributeValues = function(tag){
-  var obj = {};
+  var obj, knownBooleans, attrs, attrName, attrVal;
 
-  // Known boolean attributes
-  // We can check for matching boolean properties, but older browsers
-  // won't know about HTML5 boolean attributes that we still read from.
-  // Bookending with commas to allow for an easy string search.
-  var knownBooleans = ','+'autoplay,controls,loop,muted,default'+',';
+  obj = {};
+
+  // known boolean attributes
+  // we can check for matching boolean properties, but older browsers
+  // won't know about HTML5 boolean attributes that we still read from
+  knownBooleans = ','+'autoplay,controls,loop,muted,default'+',';
 
   if (tag && tag.attributes && tag.attributes.length > 0) {
-    var attrs = tag.attributes;
-    var attrName, attrVal;
+    attrs = tag.attributes;
 
     for (var i = attrs.length - 1; i >= 0; i--) {
       attrName = attrs[i].name;
       attrVal = attrs[i].value;
 
-      // Check for known booleans
-      // The matching element property will return a value for typeof
+      // check for known booleans
+      // the matching element property will return a value for typeof
       if (typeof tag[attrName] === 'boolean' || knownBooleans.indexOf(','+attrName+',') !== -1) {
-        // The value of an included boolean attribute is typically an empty string ('')
-        // which would equal false if we just check for a false value.
-        // We also don't want support bad code like autoplay='false'
+        // the value of an included boolean attribute is typically an empty
+        // string ('') which would equal false if we just check for a false value.
+        // we also don't want support bad code like autoplay='false'
         attrVal = (attrVal !== null) ? true : false;
       }
 
@@ -480,8 +485,8 @@ vjs.unblockTextSelection = function(){ document.onselectstart = function () { re
  * @param  {String} string String to trim
  * @return {String}        Trimmed string
  */
-vjs.trim = function(string){
-  return string.toString().replace(/^\s+/, '').replace(/\s+$/, '');
+vjs.trim = function(str){
+  return (str+'').replace(/^\s+|\s+$/g, '');
 };
 
 /**
@@ -519,7 +524,7 @@ vjs.createTimeRange = function(start, end){
  * @param  {Function=} onError    Error callback
  */
 vjs.get = function(url, onSuccess, onError){
-  var local = (url.indexOf('file:') === 0 || (window.location.href.indexOf('file:') === 0 && url.indexOf('http') === -1));
+  var local, request;
 
   if (typeof XMLHttpRequest === 'undefined') {
     window.XMLHttpRequest = function () {
@@ -530,13 +535,14 @@ vjs.get = function(url, onSuccess, onError){
     };
   }
 
-  var request = new XMLHttpRequest();
-
+  request = new XMLHttpRequest();
   try {
     request.open('GET', url);
   } catch(e) {
     onError(e);
   }
+
+  local = (url.indexOf('file:') === 0 || (window.location.href.indexOf('file:') === 0 && url.indexOf('http') === -1));
 
   request.onreadystatechange = function() {
     if (request.readyState === 4) {
