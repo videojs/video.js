@@ -12,6 +12,7 @@ CHANGELOG
 * Fixed an issue with minifiying the code on Windows systems ([view](https://github.com/videojs/video.js/pull/683))
 * Added support for RTMP streaming through Flash ([view](https://github.com/videojs/video.js/pull/605))
 * Made tech.features available to external techs ([view](https://github.com/videojs/video.js/pull/705))
+* Minor code improvements ([view](https://github.com/videojs/video.js/pull/706))
 
 --------------------
 
