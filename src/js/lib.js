@@ -452,12 +452,20 @@ vjs.el = function(id){
  * @return {String}         Time formatted as H:MM:SS or M:SS
  */
 vjs.formatTime = function(seconds, guide) {
-  guide = guide || seconds; // Default to using seconds as guide
+  // Default to using seconds as guide
+  guide = guide || seconds;
   var s = Math.floor(seconds % 60),
       m = Math.floor(seconds / 60 % 60),
       h = Math.floor(seconds / 3600),
       gm = Math.floor(guide / 60 % 60),
       gh = Math.floor(guide / 3600);
+
+  // handle invalid times
+  if (window['isNaN'](seconds) || seconds === Infinity) {
+    // '-' is false for all relational operators (e.g. <, >=) so this setting
+    // will add the minimum number of fields specified by the guide
+    h = m = s = '-';
+  }
 
   // Check if we need to show hours
   h = (h > 0 || gh > 0) ? h + ':' : '';

@@ -65,8 +65,9 @@ vjs.DurationDisplay.prototype.createEl = function(){
 };
 
 vjs.DurationDisplay.prototype.updateContent = function(){
-  if (this.player_.duration()) {
-      this.content.innerHTML = '<span class="vjs-control-text">Duration Time </span>' + vjs.formatTime(this.player_.duration()); // label the duration time for screen reader users
+  var duration = this.player_.duration();
+  if (duration) {
+      this.content.innerHTML = '<span class="vjs-control-text">Duration Time </span>' + vjs.formatTime(duration); // label the duration time for screen reader users
   }
 };
 
@@ -122,9 +123,7 @@ vjs.RemainingTimeDisplay.prototype.createEl = function(){
 
 vjs.RemainingTimeDisplay.prototype.updateContent = function(){
   if (this.player_.duration()) {
-      if (this.player_.duration()) {
-          this.content.innerHTML = '<span class="vjs-control-text">Remaining Time </span>' + '-'+ vjs.formatTime(this.player_.remainingTime());
-      }
+    this.content.innerHTML = '<span class="vjs-control-text">Remaining Time </span>' + '-'+ vjs.formatTime(this.player_.remainingTime());
   }
 
   // Allows for smooth scrubbing, when player can't keep up.
