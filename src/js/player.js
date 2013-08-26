@@ -456,12 +456,7 @@ vjs.Player.prototype.techCall = function(method, arg){
 // Get calls can't wait for the tech, and sometimes don't need to.
 vjs.Player.prototype.techGet = function(method){
 
-  // Make sure there is a tech
-  // if (!this.tech) {
-  //   return;
-  // }
-
-  if (this.tech.isReady_) {
+  if (this.tech && this.tech.isReady_) {
 
     // Flash likes to die and reload when you hide or reposition it.
     // In these cases the object methods go away and we get errors.
