@@ -119,7 +119,14 @@ module.exports = function(grunt) {
         }
       }
     },
-    docs: {}
+    esdoc: {
+      options: {
+        output: 'docs',
+        template: 'dj-to-github-md'
+      },
+      all: ['src/js/**/*.js'],
+      player: 'src/js/player.js'
+    }
   });
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -133,6 +140,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('contribflow');
 
   grunt.loadTasks('./docs/tasks/');
+  grunt.loadTasks('../esdoc/tasks/');
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'less', 'build', 'minify', 'dist']);

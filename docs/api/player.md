@@ -10,21 +10,19 @@ if you edit this doc directly your changes will be lost
 __EXTENDS__: [vjs.Component](component.md)  
 __DEFINED IN__: [src/js/player.js](https://github.com/videojs/video.js/blob/master/src/js/player.js)
 
-An instance of the `Video.Player` class is created when any of the Video.js setup methods are used to initialize a video.
+<p>An instance of the <code>Video.Player</code> class is created when any of the Video.js setup methods are used to initialize a video.</p>
 
-```js
-var myPlayer = Video('example_video_1');
-```
+<div class="highlight"><pre lang="js">var myPlayer = Video('example_video_1');
+</pre></div>
 
-In the follwing example, the `data-setup` attribute tells the Video.js library to create a player instance when the library is ready.
+<p>In the follwing example, the <code>data-setup</code> attribute tells the Video.js library to create a player instance when the library is ready.</p>
 
-```html
-<video id="example_video_1" data-setup='{}' controls>
+<div class="highlight"><pre lang="html"><video id="example_video_1" data-setup='{}' controls>
   <source src="my-source.mp4" type="video/mp4">
 </video>
-```
+</pre></div>
 
-After an instance has been created it can be accessed globally using `Video('example_video_1')`.
+<p>After an instance has been created it can be accessed globally using <code>Video('example_video_1')</code>.</p>
 
 ---
 
@@ -44,7 +42,7 @@ After an instance has been created it can be accessed globally using `Video('exa
 ## METHODS
 
 ### init(tag, options, ready)
-player's constructor function
+<p>player's constructor function</p>
 
 ##### PARAMETERS:
 * __tag__ `Element` The original video tag used for configuring options
@@ -54,13 +52,12 @@ player's constructor function
 ---
 
 ### play()
-start media playback
+<p>start media playback</p>
 
-##### EXAMPLE:
+<h5>EXAMPLE:</h5>
 
-```js
-  myPlayer.play();
-```
+<div class="highlight"><pre lang="js">  myPlayer.play();
+</pre></div>
 
 ##### RETURNS:
 * `vjs.Player` self
@@ -68,15 +65,16 @@ start media playback
 ---
 
 ### poster([src])
-get or set the poster image source url
+<p>get or set the poster image source url</p>
 
-##### EXAMPLE:
+<h5>EXAMPLE:</h5>
 
-    // getting
-    var currentPoster = myPlayer.poster();
+<pre><code>// getting
+var currentPoster = myPlayer.poster();
 
-    // setting
-    myPlayer.poster('http://example.com/myImage.jpg');
+// setting
+myPlayer.poster('<a href='http://example.com/myImage.jpg'>http://example.com/myImage.jpg</a>');
+</code></pre>
 
 ##### PARAMETERS:
 * __src__ `String` _(Optional)_ Poster image source URL
@@ -88,7 +86,7 @@ get or set the poster image source url
 ---
 
 ### controls(controls)
-Get or set whether or not the controls are showing.
+<p>Get or set whether or not the controls are showing.</p>
 
 ##### PARAMETERS:
 * __controls__ `Boolean` Set controls to showing or not
@@ -99,12 +97,9 @@ Get or set whether or not the controls are showing.
 ---
 
 ### usingNativeControls(bool)
-Toggle native controls on/off. Native controls are the controls built into
-devices (e.g. default iPhone controls), Flash, or other techs
-(e.g. Vimeo Controls)
+<p>Toggle native controls on/off. Native controls are the controls built into<br />devices (e.g. default iPhone controls), Flash, or other techs<br />(e.g. Vimeo Controls)</p>
 
-**This should only be set by the current tech, because only the tech knows
-if it can support native controls**
+<p><strong>This should only be set by the current tech, because only the tech knows<br />if it can support native controls</strong></p>
 
 ##### PARAMETERS:
 * __bool__ `Boolean` True signals that native controls are on
@@ -117,12 +112,12 @@ if it can support native controls**
 ## EVENTS
 
 ### usingnativecontrols
-player is using the native device controls
+<p>player is using the native device controls</p>
 
 ---
 
 ### usingcustomcontrols
-player is using the custom HTML controls
+<p>player is using the custom HTML controls</p>
 
 ---
 

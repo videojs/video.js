@@ -1,149 +1,92 @@
-var formatter = {};
+/**
+ * dox output to jsondoc
+ * @param  {Object} comments dox parsed comments
+ * @return {Object}          jsondoc object
+ */
+module.exports = function (comments) {
+  var doc = {
+    entries: [],
+    types: {}
+  };
+  var entryTypeTags = ['method', 'class', 'function', 'event', 'property', 'declaration'];
 
-formatter.format = function (docfile) {
-  var result = [];
+  comments.forEach(function(comment, index){
+    var entry = {
+      name: comment.ctx && comment.ctx.name || '',
+      type: comment.ctx && comment.ctx.type,
+      description: comment.description
+    };
 
-  docfile.methods = [];
-  docfile.properties = [];
-  docfile.events = [];
-
-  docfile.javadoc.forEach(function(javadoc, index){
-
-    var type = (javadoc.ctx && javadoc.ctx.type);
-    var name = (javadoc.ctx && typeof javadoc.ctx.name === 'string') ? javadoc.ctx.name : '';
-    var nameTarget = '';
-    var nameWithParams = '';
-
-    var description = ''
-    var paramStr = [];
-    var paramTags = [];
-    var returnTags = [];
-    var throwsTags = [];
-    var tagDeprecated = false
-    var tagName = ''
-    var tagClass = ''
-    var tagFunction = ''
-    var tagMethod = ''
-    var tagEvent = ''
-    var tagSee = ''
-    var tagVersion = ''
-    var tagAuthor = ''
-    var tagExtends = '';
-    var tagAncestorName = '';
-
-    javadoc.tags.forEach(function(tag){
-
-      if (tag.type == 'param') {
-        tag.joinedTypes = tag.types.join('|');
-
-        // determin if parameter is optional
-        var lastTypeChar = tag.joinedTypes.slice(-1);
-        // tag.optional = tag.name.slice(0,1) === '[' || lastTypeChar === '=' || lastTypeChar === '?';
-
-        if (lastTypeChar === '=' || lastTypeChar === '?') {
-          tag.optional = true;
-          tag.joinedTypes = tag.joinedTypes.slice(0,-1);
+    comment.tags.forEach(function(tag){
+      // type tags
+      if (entryTypeTags.indexOf(tag.type) !== -1) {
+        entry.type = tag.type;
+        if (tag.string) {
+          entry.name = tag.string;
         }
-
-        if (tag.name.slice(0,1) === '[') {
-          tag.optional = true;
-        }
-
-        paramTags.push(tag);
-        paramStr.push(tag.name);
-
+        doc.types
+      // params
+      } else if (tag.type == 'param') {
+        tag.optional =  parseOptionalParam(tag);
+        entry.params = entry.params || [];
+        entry.params.push(tag);
+      // returns
       } else if (tag.type == 'return' || tag.type == 'returns') {
-        tag.joinedTypes = tag.types.join('|');
-        returnTags.push(tag);
+        entry.returns = entry.returns || [];
+        entry.returns.push(tag);
+      // throws
       } else if (tag.type == 'throws') {
-        tag.joinedTypes = tag.types.join('|');
-        throwsTags.push(tag);
-      } else if (tag.type == 'method') {
-        type = 'method';
-        tagMethod = tag.string;
-      } else if (tag.type == 'class') {
-        type = 'class';
-        tagClass = tag.string;
-      } else if (tag.type == 'function') {
-        type = 'function';
-        tagFunction = tag.string;
-      } else if (tag.type == 'event') {
-        type = 'event';
-        tagEvent = tag.string;
+        entry.throws = entry.throws || [];
+        entry.throws.push(tag);
+      // name
       } else if (tag.type == 'name') {
-        tagName = tag.string;
+        entry.name = tag.string;
+      // see
       } else if (tag.type == 'see') {
-        tagSee = tag.local;
+        entry.see = tag.local || tag.url;
+      // version
       } else if (tag.type == 'version') {
-        tagVersion = tag.string;
+        entry.version = tag.string;
+      // deprecated
       } else if (tag.type == 'deprecated') {
-        tagDeprecated = true;
+        entry.deprecated = true;
+      // author
       } else if (tag.type == 'author') {
-        tagAuthor = tag.string;
+        entry.author = tag.string;
+      // extends
       } else if (tag.type == 'extends' || tag.type == 'augments') {
-        tagExtends = tag.string;
-        tagAncestorName = tag.string.replace(javadoc.ctx.receiver+'.', '');
+        entry.extends = tag.string;
+      // allow unhandled tags
+      } else {
+        entry[tag.type] = tag.string || true;
       }
     });
 
-    name = tagName !== '' ? tagName : tagMethod !== '' ? tagMethod : tagClass !== '' ? tagClass : tagFunction !== '' ? tagFunction : tagEvent !== '' ? tagEvent : name;
-    description = javadoc.description.full
-                      .replace(/\nh1/, '#')
-                      .replace(/\nh2/, '##')
-                      .replace(/\nh3/, '###')
-                      .replace(/\nh4/, '####')
-                      .replace(/\nh5/, '#####')
-                      .replace(/\nh6/, '######')
-                      .replace(/^h1/, '#')
-                      .replace(/^h2/, '##')
-                      .replace(/^h3/, '###')
-                      .replace(/^h4/, '####')
-                      .replace(/^h5/, '#####')
-                      .replace(/^h6/, '######');
+    // if (type == 'method' || type == 'function') {
+    //   nameWithParams = name + '('+paramStr.join(', ')+')';
+    // } else {
+    //   nameWithParams = name;
+    // }
 
+    // nameTarget = nameWithParams.toLowerCase().replace(/[,.\[\]\(\)]/g, '').replace(/\s+/g, '-');
 
-    if (type == 'method' || type == 'function') {
-      nameWithParams = name + '('+paramStr.join(', ')+')';
-    } else {
-      nameWithParams = name;
-    }
+    doc.types[entry.type] = doc.types[entry.type] || [];
+    doc.types[entry.type].push(entry);
 
-    nameTarget = nameWithParams.toLowerCase().replace(/[,.\[\]\(\)]/g, '').replace(/\s+/g, '-');
-
-    docfile.javadoc[index] = {
-      name: name
-      , paramStr: paramStr.join(', ')
-      , paramTags: paramTags
-      , returnTags: returnTags
-      , throwsTags: throwsTags
-      , author: tagAuthor
-      , version: tagVersion
-      , see: tagSee
-      , deprecated: tagDeprecated
-      , type: type
-      , isMethod: type === 'method'
-      , isFunction: type === 'function'
-      , isClass: type === 'class'
-      , extends: tagExtends
-      , ancestorName: tagAncestorName
-      , description: description
-      , ignore: javadoc.ignore
-      , raw: javadoc
-      , nameTarget: nameTarget
-      , nameWithParams: nameWithParams
-    };
-
-    if (type === 'method') {
-      docfile.methods.push(tagMethod);
-    }
-
-    if (type === 'event') {
-      docfile.events.push(tagEvent);
-    }
-
+    doc.entries.push(entry);
   });
 
-  return docfile;
-}
+  /**
+   * determine if parameter is optional
+   * look for `[name]`, `type=`, or `type?`
+   *
+   * @private
+   * @see https://github.com/visionmedia/dox/pull/105
+   */
+  function parseOptionalParam(tag) {
+    var typesJoined = (tag.types) ? tag.types.join('|') : [];
+    return !!(tag.name.slice(0,1) == '[' || ['=','?'].indexOf(typesJoined.slice(-1)) != -1);
+  }
 
-module.exports = formatter;
+  return doc;
+}
