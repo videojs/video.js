@@ -329,3 +329,23 @@ test('should allow for tracking when native controls are used', function(){
   player.dispose();
 });
 
+test('should use custom message when encountering an unsupported video type',
+    function() {
+  videojs.options['notSupportedMessage'] = 'Video no go <a href="">link</a>';
+  var fixture = document.getElementById('qunit-fixture');
+
+  var html =
+      '<video id="example_1">' +
+          '<source src="fake.foo" type="video/foo">' +
+          '</video>';
+
+  fixture.innerHTML += html;
+
+  var tag = document.getElementById('example_1');
+  var player = new vjs.Player(tag);
+
+  var incompatibilityMessage = player.el().getElementsByTagName('p')[0];
+  equal(incompatibilityMessage.innerHTML, 'Video no go <a href="">link</a>');
+
+  player.dispose();
+});

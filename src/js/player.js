@@ -750,7 +750,7 @@ vjs.Player.prototype.src = function(source){
       }
     } else {
       this.el_.appendChild(vjs.createEl('p', {
-        innerHTML: 'Sorry, no compatible source and playback technology were found for this video. Try using another browser like <a href="http://bit.ly/ccMUEC">Chrome</a> or download the latest <a href="http://adobe.ly/mwfN1">Adobe Flash Player</a>.'
+        innerHTML: this.options()['notSupportedMessage']
       }));
     }
 
