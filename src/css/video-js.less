@@ -528,24 +528,6 @@ easily in the skin designer. http://designer.videojs.com/
   text-shadow: 0em 0em 0.1em #000;
 }
 
-/* Add a gradient to the spinner by overlaying another copy.
-   Text gradient plus a text shadow doesn't work
-   and `background-clip: text` only works in Webkit. */
-.vjs-default-skin .vjs-loading-spinner:after {
-  content: @spinner-icon; /* Loading spinner icon */
-  font-family: VideoJS;
-
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 1em;
-  height: 1em;
-  text-align: center;
-
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
 @-moz-keyframes spin {
   0% { -moz-transform: rotate(0deg); }
   100% { -moz-transform: rotate(359deg); }
