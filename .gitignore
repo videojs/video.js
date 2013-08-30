@@ -18,3 +18,7 @@ sandbox/*
 *.swo
 
 *.orig
+
+*.conf.js*
+*results.xml
+*.log
