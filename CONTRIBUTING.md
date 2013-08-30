@@ -75,6 +75,13 @@ Thanks again for helping out! One thing we ask is that you refer to the [code st
   ```bash
   grunt test
   ```
+  Video.js is also configured to run tests with Karma.  [Karma](https://npmjs.org/package/grunt-karma) is installed as a grunt plugin to run QUnit tests in real browsers, as opposed to simply running the tests in phantomjs, a headless browser.
+  To run the QUnit test suite in Karma, do the following:
+  Open test-template.conf.js in an editor, and add the browsers to it that you want to run your tests in.  The test-template.conf.js has detailed information on usage in the file itself.
+  After you've added your browsers to test-template.conf.js, run:
+  ```bash
+  grunt karma
+  ```
 
 8. Depending on whether you're adding something new, making a change or fixing a bug, you'll want to do some up-front preparation.
    1. If you're fixing a bug, submit an issue for it. If you're fixing an existing bug, claim it by adding a comment to it. This will give a heads-up to anyone watching the issue that you're working on a fix. Please refer to the [Bugs](#bugs) section below for guidelines on filing new issues.
