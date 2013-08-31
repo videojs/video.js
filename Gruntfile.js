@@ -61,7 +61,7 @@ module.exports = function(grunt) {
       minified_api: ['test/minified-api.html']
     },
     watch: {
-      files: [ 'src/**/*.js', 'test/unit/*.js' ],
+      files: [ 'src/**/*', 'test/unit/*.js', 'Gruntfile.js' ],
       tasks: 'dev'
     },
     copy: {
@@ -112,17 +112,24 @@ module.exports = function(grunt) {
         ext: '.min.css'
       }
     },
+    less: {
+      dev: {
+        files: {
+          'build/files/video-js.css': 'src/css/video-js.less'
+        }
+      }
+    },
     karma: {
       options: {
         configFile: 'test-template.conf.js'
       },
       dev: {
         configFile: 'test-template.conf.js',
-        autoWatch: true	
+        autoWatch: true
       },
       ci: {
         configFile: 'test-template.conf.js',
-        autoWatch: false 
+        autoWatch: false
       }
     }
   });
@@ -133,15 +140,16 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-s3');
   grunt.loadNpmTasks('contribflow');
   grunt.loadNpmTasks('grunt-karma');
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'build', 'minify', 'dist']);
+  grunt.registerTask('default', ['jshint', 'less', 'build', 'minify', 'dist']);
   // Development watch task
-  grunt.registerTask('dev', ['jshint', 'build', 'qunit:source']);
-  grunt.registerTask('test', ['jshint', 'build', 'minify', 'qunit']);
+  grunt.registerTask('dev', ['jshint', 'less', 'build', 'qunit:source']);
+  grunt.registerTask('test', ['jshint', 'less', 'build', 'minify', 'qunit']);
 
   var fs = require('fs'),
       gzip = require('zlib').gzip;
@@ -171,8 +179,7 @@ module.exports = function(grunt) {
     grunt.file.write('build/files/combined.video.js', combined);
 
     // Copy over other files
-    grunt.file.copy('src/css/video-js.css', 'build/files/video-js.css');
-    grunt.file.copy('src/css/video-js.png', 'build/files/video-js.png');
+    // grunt.file.copy('src/css/video-js.png', 'build/files/video-js.png');
     grunt.file.copy('src/swf/video-js.swf', 'build/files/video-js.swf');
 
     // Inject version number into css file
@@ -217,7 +224,7 @@ module.exports = function(grunt) {
                 + ' --js_output_file=' + dest
                 + ' --create_source_map ' + dest + '.map --source_map_format=V3'
                 + ' --jscomp_warning=checkTypes --warning_level=VERBOSE'
-                + ' --output_wrapper "/*! Video.js v' + version.full + ' ' + pkg.copyright + ' */\n (function() {%output%})();//@ sourceMappingURL=video.js.map"';
+                + ' --output_wrapper "/*! Video.js v' + version.full + ' ' + pkg.copyright + ' */ (function() {%output%})();//@ sourceMappingURL=video.js.map"';
 
     // Add each js file
     grunt.file.expand(filePatterns).forEach(function(file){
