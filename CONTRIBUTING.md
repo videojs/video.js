@@ -154,7 +154,7 @@ To run the QUnit test suite in Karma, do the following:
 Open test-template.conf.js in an editor, and add the browsers to it that you want to run your tests in. The test-template.conf.js has detailed information on usage in the file itself. 
 After you've added your browsers to test-template.conf.js, run:
 ```bash
-grunt karma
+grunt karma:dev
 ```
 
 At this point you should have a built copy of video.js in a directory named `dist`, and all tests should be passing.
