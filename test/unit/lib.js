@@ -110,10 +110,43 @@ test('should read tag attributes from elements, including HTML5 in all browsers'
   var sourceVals = vjs.getAttributeValues(document.getElementById('source'));
   var trackVals = vjs.getAttributeValues(document.getElementById('track'));
 
-  deepEqual(vid1Vals, { 'autoplay': true, 'controls': true, 'data-test': 'asdf', 'data-empty-string': '', 'id': 'vid1', 'loop': true, 'muted': true, 'poster': 'http://www2.videojs.com/img/video-js-html5-video-player.png', 'preload': 'none', 'src': 'http://google.com' });
-  deepEqual(vid2Vals, { 'id': 'vid2' });
-  deepEqual(sourceVals, {'title': 'test', 'media': 'fdsa', 'type': 'video/mp4', 'src': 'http://google.com', 'id': 'source' });
-  deepEqual(trackVals, { 'default': true, /* IE no likey default key */ 'id': 'track', 'kind': 'captions', 'label': 'testlabel', 'src': 'http://google.com', 'srclang': 'en', 'title': 'test' });
+  // was using deepEqual, but ie8 would send all properties as attributes
+
+  // vid1
+  equal(vid1Vals['autoplay'], true);
+  equal(vid1Vals['controls'], true);
+  equal(vid1Vals['data-test'], 'asdf');
+  equal(vid1Vals['data-empty-string'], '');
+  equal(vid1Vals['id'], 'vid1');
+  equal(vid1Vals['loop'], true);
+  equal(vid1Vals['muted'], true);
+  equal(vid1Vals['poster'], 'http://www2.videojs.com/img/video-js-html5-video-player.png');
+  equal(vid1Vals['preload'], 'none');
+  equal(vid1Vals['src'], 'http://google.com');
+
+  // vid2
+  equal(vid2Vals['id'], 'vid2');
+
+  // sourceVals
+  equal(sourceVals['title'], 'test');
+  equal(sourceVals['media'], 'fdsa');
+  equal(sourceVals['type'], 'video/mp4');
+  equal(sourceVals['src'], 'http://google.com');
+  equal(sourceVals['id'], 'source');
+
+  // trackVals
+  equal(trackVals['default'], true);
+  equal(trackVals['id'], 'track');
+  equal(trackVals['kind'], 'captions');
+  equal(trackVals['label'], 'testlabel');
+  equal(trackVals['src'], 'http://google.com');
+  equal(trackVals['srclang'], 'en');
+  equal(trackVals['title'], 'test');
+
+  // deepEqual(vid1Vals, { 'autoplay': true, 'controls': true, 'data-test': 'asdf', 'data-empty-string': '', 'id': 'vid1', 'loop': true, 'muted': true, 'poster': 'http://www2.videojs.com/img/video-js-html5-video-player.png', 'preload': 'none', 'src': 'http://google.com' });
+  // deepEqual(vid2Vals, { 'id': 'vid2' });
+  // deepEqual(sourceVals, {'title': 'test', 'media': 'fdsa', 'type': 'video/mp4', 'src': 'http://google.com', 'id': 'source' });
+  // deepEqual(trackVals, { 'default': true, /* IE no likey default key */ 'id': 'track', 'kind': 'captions', 'label': 'testlabel', 'src': 'http://google.com', 'srclang': 'en', 'title': 'test' });
 });
 
 test('should get the right style values for an element', function(){
