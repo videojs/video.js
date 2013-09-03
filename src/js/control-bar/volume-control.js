@@ -76,6 +76,10 @@ vjs.VolumeBar.prototype.createEl = function(){
 };
 
 vjs.VolumeBar.prototype.onMouseMove = function(event) {
+  if (this.player_.muted()) {
+    this.player_.muted(false);
+  }
+
   this.player_.volume(this.calculateDistance(event));
 };
 
