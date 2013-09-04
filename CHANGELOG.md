@@ -2,6 +2,11 @@ CHANGELOG
 =========
 
 ## Unreleased (HEAD)
+_(none)_
+
+--------------------
+
+## 4.3.0 (2013-09-04)
 * Added LESS as a CSS preprocessor for the default skin ([view](https://github.com/videojs/video.js/pull/644))
 * Exported MenuButtons for use in the API ([view](https://github.com/videojs/video.js/pull/648))
 * Fixed ability to remove listeners added with one() ([view](https://github.com/videojs/video.js/pull/659))
@@ -19,8 +24,6 @@ CHANGELOG
 * Made the fallback message customizable ([view](https://github.com/videojs/video.js/pull/638))
 * Fixed an issue with the loading spinner placement and rotation ([view](https://github.com/videojs/video.js/pull/694))
 * Fixed an issue with fonts being flaky in IE8
-
---------------------
 
 ## 4.1.0 (2013-06-28)
 * Turned on method queuing for unready playback technologies (flash) [view](https://github.com/videojs/video.js/pull/553)
