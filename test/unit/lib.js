@@ -142,11 +142,6 @@ test('should read tag attributes from elements, including HTML5 in all browsers'
   equal(trackVals['src'], 'http://google.com');
   equal(trackVals['srclang'], 'en');
   equal(trackVals['title'], 'test');
-
-  // deepEqual(vid1Vals, { 'autoplay': true, 'controls': true, 'data-test': 'asdf', 'data-empty-string': '', 'id': 'vid1', 'loop': true, 'muted': true, 'poster': 'http://www2.videojs.com/img/video-js-html5-video-player.png', 'preload': 'none', 'src': 'http://google.com' });
-  // deepEqual(vid2Vals, { 'id': 'vid2' });
-  // deepEqual(sourceVals, {'title': 'test', 'media': 'fdsa', 'type': 'video/mp4', 'src': 'http://google.com', 'id': 'source' });
-  // deepEqual(trackVals, { 'default': true, /* IE no likey default key */ 'id': 'track', 'kind': 'captions', 'label': 'testlabel', 'src': 'http://google.com', 'srclang': 'en', 'title': 'test' });
 });
 
 test('should get the right style values for an element', function(){

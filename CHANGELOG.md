@@ -18,6 +18,7 @@ CHANGELOG
 * Exported addClass and removeClass for player components ([view](https://github.com/videojs/video.js/pull/661))
 * Made the fallback message customizable ([view](https://github.com/videojs/video.js/pull/638))
 * Fixed an issue with the loading spinner placement and rotation ([view](https://github.com/videojs/video.js/pull/694))
+* Fixed an issue with fonts being flaky in IE8
 
 --------------------
 

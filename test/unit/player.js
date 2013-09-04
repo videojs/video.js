@@ -331,7 +331,7 @@ test('should allow for tracking when native controls are used', function(){
 
 test('should use custom message when encountering an unsupported video type',
     function() {
-  videojs.options['notSupportedMessage'] = 'video no go <a href="">link</a>';
+  videojs.options['notSupportedMessage'] = 'Video no go <a href="">link</a>';
   var fixture = document.getElementById('qunit-fixture');
 
   var html =
