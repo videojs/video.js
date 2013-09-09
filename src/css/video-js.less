@@ -189,8 +189,17 @@ The default control bar that is a container for most of the controls.
   display: none;
 }
 
+/* IE8 is flakey with fonts, and you have to change the actual content to force
+fonts to show/hide properly.
+  - "\9" IE8 hack didn't work for this
+  - Found in XP IE8 from http://modern.ie. Does not show up in "IE8 mode" in IE9
+*/
+@ie8screen: ~"\0screen";
+.vjs-default-skin.vjs-user-inactive.vjs-playing .vjs-control-bar :before {
+  @media @ie8screen { content: ""; }
+}
 
-/* General styles for individual controls. *///
+/* General styles for individual controls. */
 .vjs-default-skin .vjs-control {
   outline: none;
   position: relative;

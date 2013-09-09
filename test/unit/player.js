@@ -345,7 +345,8 @@ test('should use custom message when encountering an unsupported video type',
   var player = new vjs.Player(tag);
 
   var incompatibilityMessage = player.el().getElementsByTagName('p')[0];
-  equal(incompatibilityMessage.innerHTML, 'Video no go <a href="">link</a>');
+  // ie8 capitalizes tag names
+  equal(incompatibilityMessage.innerHTML.toLowerCase(), 'video no go <a href="">link</a>');
 
   player.dispose();
 });
