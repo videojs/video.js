@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## Unreleased (HEAD)
-* Fixed an infinite loop caused by loading the library asynchronously ([view](https://github.com/videojs/video.js/pull/727))
+_(none)_
 
 --------------------
+
+## 4.2.1 (2013-09-09)
+* Fixed an infinite loop caused by loading the library asynchronously ([view](https://github.com/videojs/video.js/pull/727))
 
 ## 4.2.0 (2013-09-04)
 * Added LESS as a CSS preprocessor for the default skin ([view](https://github.com/videojs/video.js/pull/644))
