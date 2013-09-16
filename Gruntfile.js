@@ -20,6 +20,13 @@ module.exports = function(grunt) {
   };
   version.majorMinor = version.major + '.' + version.minor;
 
+  // loading predefined source order from source-loader.js
+  // trust me, this is the easist way to do it so far
+  /*jshint undef:false, evil:true */
+  var blockSourceLoading = true;
+  var sourceFiles; // Needed to satisfy jshint
+  eval(grunt.file.read('./build/source-loader.js'));
+
   // Project configuration.
   grunt.initConfig({
     pkg: pkg,
@@ -147,8 +154,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('contribflow');
   grunt.loadNpmTasks('grunt-karma');
 
-  grunt.loadTasks('./docs/tasks/');
-  grunt.loadTasks('../esdoc/tasks/');
+  // grunt.loadTasks('./docs/tasks/');
+  grunt.loadTasks('../videojs-doc-generator/tasks/');
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'less', 'build', 'minify', 'dist']);
@@ -160,14 +167,6 @@ module.exports = function(grunt) {
       gzip = require('zlib').gzip;
 
   grunt.registerMultiTask('build', 'Building Source', function(){
-    /*jshint undef:false, evil:true */
-
-    // Loading predefined source order from source-loader.js
-    // Trust me, this is the easist way to do it so far.
-    var blockSourceLoading = true;
-    var sourceFiles; // Needed to satisfy jshint
-    eval(grunt.file.read('./build/source-loader.js'));
-
     // Fix windows file path delimiter issue
     var i = sourceFiles.length;
     while (i--) {
