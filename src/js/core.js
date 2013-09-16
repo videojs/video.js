@@ -15,6 +15,7 @@ document.createElement('track');
  * @param  {Object=} options        Optional options object for config/settings
  * @param  {Function=} ready        Optional ready callback
  * @return {vjs.Player}             A player instance
+ * @namespace
  */
 var vjs = function(id, options, ready){
   var tag; // Element of ID

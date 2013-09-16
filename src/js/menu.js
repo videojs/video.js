@@ -4,6 +4,7 @@
  * The base for text track and settings menu buttons.
  * @param {vjs.Player|Object} player
  * @param {Object=} options
+ * @class
  * @constructor
  */
 vjs.Menu = vjs.Component.extend();
@@ -45,6 +46,7 @@ vjs.Menu.prototype.createEl = function(){
  * Menu item
  * @param {vjs.Player|Object} player
  * @param {Object=} options
+ * @class
  * @constructor
  */
 vjs.MenuItem = vjs.Button.extend({

@@ -7,10 +7,16 @@
  * Base UI Component class
  * @param {Object} player  Main Player
  * @param {Object=} options
+ * @class
  * @constructor
+ * @extends vjs.CoreObject
  */
 vjs.Component = vjs.CoreObject.extend({
-  /** @constructor */
+  /**
+   * The constructor funciton for the class
+   *
+   * @constructor
+   */
   init: function(player, options, ready){
     this.player_ = player;
 
@@ -78,7 +84,7 @@ vjs.Component.prototype.dispose = function(){
  * @type {vjs.Player}
  * @private
  */
-vjs.Component.prototype.player_;
+vjs.Component.prototype.player_ = true;
 
 /**
  * Return the component's player.
@@ -97,6 +103,7 @@ vjs.Component.prototype.options_;
 
 /**
  * Deep merge of options objects
+ *
  * Whenever a property is an object on both options objects
  * the two properties will be merged using vjs.obj.deepMerge.
  *
@@ -104,33 +111,33 @@ vjs.Component.prototype.options_;
  * want it to be easy to override individual options on a child
  * component without having to rewrite all the other default options.
  *
- * Parent.prototype.options_ = {
- *   children: {
- *     'childOne': { 'foo': 'bar', 'asdf': 'fdsa' },
- *     'childTwo': {},
- *     'childThree': {}
- *   }
- * }
- * newOptions = {
- *   children: {
- *     'childOne': { 'foo': 'baz', 'abc': '123' }
- *     'childTwo': null,
- *     'childFour': {}
- *   }
- * }
+ *     Parent.prototype.options_ = {
+ *       children: {
+ *         'childOne': { 'foo': 'bar', 'asdf': 'fdsa' },
+ *         'childTwo': {},
+ *         'childThree': {}
+ *       }
+ *     }
+ *     newOptions = {
+ *       children: {
+ *         'childOne': { 'foo': 'baz', 'abc': '123' }
+ *         'childTwo': null,
+ *         'childFour': {}
+ *       }
+ *     }
  *
- * this.options(newOptions);
+ *     this.options(newOptions);
  *
  * RESULT
  *
- * {
- *   children: {
- *     'childOne': { 'foo': 'baz', 'asdf': 'fdsa', 'abc': '123' },
- *     'childTwo': null, // Disabled. Won't be initialized.
- *     'childThree': {},
- *     'childFour': {}
- *   }
- * }
+ *     {
+ *       children: {
+ *         'childOne': { 'foo': 'baz', 'asdf': 'fdsa', 'abc': '123' },
+ *         'childTwo': null, // Disabled. Won't be initialized.
+ *         'childThree': {},
+ *         'childFour': {}
+ *       }
+ *     }
  *
  * @param  {Object} obj Object whose values will be overwritten
  * @return {Object}      NEW merged object. Does not return obj1.
@@ -261,8 +268,7 @@ vjs.Component.prototype.getChild = function(name){
 /**
  * Adds a child component inside this component.
  * @param {String|vjs.Component} child The class name or instance of a child to add.
- * @param {Object=} options Optional options, including options to be passed to
- *  children of the child.
+ * @param {Object=} options Options, including options to be passed to children of the child.
  * @return {vjs.Component} The child component, because it might be created in this process.
  * @suppress {accessControls|checkRegExp|checkTypes|checkVars|const|constantProperty|deprecated|duplicate|es5Strict|fileoverviewTags|globalThis|invalidCasts|missingProperties|nonStandardJsDocs|strictModuleDepCheck|undefinedNames|undefinedVars|unknownDefines|uselessCode|visibility}
  */
@@ -439,11 +445,11 @@ vjs.Component.prototype.isReady_;
 
 /**
  * Trigger ready as soon as initialization is finished.
- *   Allows for delaying ready. Override on a sub class prototype.
- *   If you set this.isReadyOnInitFinish_ it will affect all components.
- *   Specially used when waiting for the Flash player to asynchrnously load.
- *   @type {Boolean}
- *   @private
+ * Allows for delaying ready. Override on a sub class prototype.
+ * If you set this.isReadyOnInitFinish_ it will affect all components.
+ * Specially used when waiting for the Flash player to asynchrnously load.
+ * @type {Boolean}
+ * @private
  */
 vjs.Component.prototype.isReadyOnInitFinish_ = true;
 

@@ -20,6 +20,13 @@ module.exports = function(grunt) {
   };
   version.majorMinor = version.major + '.' + version.minor;
 
+  // loading predefined source order from source-loader.js
+  // trust me, this is the easist way to do it so far
+  /*jshint undef:false, evil:true */
+  var blockSourceLoading = true;
+  var sourceFiles; // Needed to satisfy jshint
+  eval(grunt.file.read('./build/source-loader.js'));
+
   // Project configuration.
   grunt.initConfig({
     pkg: pkg,
@@ -119,13 +126,14 @@ module.exports = function(grunt) {
         }
       }
     },
-    esdoc: {
+    docs: {
       options: {
-        output: 'docs',
-        template: 'dj-to-github-md'
+        output: 'docs/api',
+        baseURL: 'https://github.com/videojs/video.js/blob/master/'
       },
-      all: ['src/js/**/*.js'],
-      player: 'src/js/player.js'
+      all: sourceFiles,
+      player: 'src/js/player.js',
+      component: ['src/js/core.js', 'src/js/plugins.js', 'src/js/component.js', 'src/js/control-bar/control-bar.js', 'src/js/control-bar/*.js']
     }
   });
 
@@ -139,8 +147,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-s3');
   grunt.loadNpmTasks('contribflow');
 
-  grunt.loadTasks('./docs/tasks/');
-  grunt.loadTasks('../esdoc/tasks/');
+  // grunt.loadTasks('./docs/tasks/');
+  grunt.loadTasks('../videojs-doc-generator/tasks/');
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'less', 'build', 'minify', 'dist']);
@@ -152,14 +160,6 @@ module.exports = function(grunt) {
       gzip = require('zlib').gzip;
 
   grunt.registerMultiTask('build', 'Building Source', function(){
-    /*jshint undef:false, evil:true */
-
-    // Loading predefined source order from source-loader.js
-    // Trust me, this is the easist way to do it so far.
-    var blockSourceLoading = true;
-    var sourceFiles; // Needed to satisfy jshint
-    eval(grunt.file.read('./build/source-loader.js'));
-
     // Fix windows file path delimiter issue
     var i = sourceFiles.length;
     while (i--) {

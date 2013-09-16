@@ -5,6 +5,7 @@
  * big play button is done via CSS and player states.
  * @param {vjs.Player|Object} player
  * @param {Object=} options
+ * @class
  * @constructor
  */
 vjs.BigPlayButton = vjs.Button.extend();
