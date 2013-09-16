@@ -1,7 +1,7 @@
 .DS_Store
 dist/*
 build/files/*
-docs/api/*
+# docs/api/*
 dev.html
 projects
 .zenflow-log
