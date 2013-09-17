@@ -267,6 +267,7 @@ var api = vjs.Flash.prototype,
 
 /**
  * @this {*}
+ * @private
  */
 var createSetter = function(attr){
   var attrUpper = attr.charAt(0).toUpperCase() + attr.slice(1);
@@ -275,6 +276,7 @@ var createSetter = function(attr){
 
 /**
  * @this {*}
+ * @private
  */
 var createGetter = function(attr){
   api[attr] = function(){ return this.el_.vjs_getProperty(attr); };
