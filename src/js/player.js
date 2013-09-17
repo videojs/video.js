@@ -942,7 +942,8 @@ vjs.Player.prototype.usingNativeControls = function(bool){
          * player is using the native device controls
          *
          * @event usingnativecontrols
-         * @type {object}
+         * @memberof vjs.Player
+         * @instance
          */
         this.trigger('usingnativecontrols');
       } else {
@@ -952,7 +953,8 @@ vjs.Player.prototype.usingNativeControls = function(bool){
          * player is using the custom HTML controls
          *
          * @event usingcustomcontrols
-         * @type {object}
+         * @memberof vjs.Player
+         * @instance
          */
         this.trigger('usingcustomcontrols');
       }

@@ -68,6 +68,10 @@ After an instance has been created it can be accessed globally using `Video('exa
   - [unlockShowing](#unlockshowing) _`inherited`_
   - [width](#width-num-skiplisteners-) _`inherited`_
 
+- [EVENTS](#events)
+  - [usingcustomcontrols](#usingcustomcontrols)
+  - [usingnativecontrols](#usingnativecontrols)
+
 ---
 
 ## METHODS
@@ -655,6 +659,22 @@ _defined in_: [src/js/player.js#L934](https://github.com/videojs/video.js/blob/m
 * `Number|String` Returns the width if nothing was set
 
 _inherited from_: [src/js/component.js#L664](https://github.com/videojs/video.js/blob/master/src/js/component.js#L664)
+
+---
+
+## EVENTS
+
+### usingcustomcontrols
+> player is using the custom HTML controls
+
+_defined in_: [src/js/player.js#L961](https://github.com/videojs/video.js/blob/master/src/js/player.js#L961)
+
+---
+
+### usingnativecontrols
+> player is using the native device controls
+
+_defined in_: [src/js/player.js#L950](https://github.com/videojs/video.js/blob/master/src/js/player.js#L950)
 
 ---
 
