@@ -65,24 +65,29 @@ Methods and properties can be overridden in subclasses.
 
 ### create()
 > Create a new instace of this Object class
+> 
+>     var myAnimal = Animal.create();
 
 ##### RETURNS: 
-* `vjs.CoreObject` Returns an instance of a CoreObject subclass
+* `vjs.CoreObject` An instance of a CoreObject subclass
 
-_defined in_: [src/js/core-object.js#L112](https://github.com/videojs/video.js/blob/master/src/js/core-object.js#L112)
+_defined in_: [src/js/core-object.js#L119](https://github.com/videojs/video.js/blob/master/src/js/core-object.js#L119)
 
 ---
 
 ### extend( props )
 > Create a new object that inherits from this Object
+> 
+>     var Animal = CoreObject.extend();
+>     var Horse = Animal.extend();
 
 ##### PARAMETERS: 
 * __props__ `Object` Functions and properties to be applied to the
 
 ##### RETURNS: 
-* `vjs.CoreObject` Returns an object that inherits from CoreObject
+* `vjs.CoreObject` An object that inherits from CoreObject
 
-_defined in_: [src/js/core-object.js#L65](https://github.com/videojs/video.js/blob/master/src/js/core-object.js#L65)
+_defined in_: [src/js/core-object.js#L69](https://github.com/videojs/video.js/blob/master/src/js/core-object.js#L69)
 
 ---
 

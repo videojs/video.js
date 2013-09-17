@@ -5,8 +5,6 @@
 __EXTENDS__: [vjs.Component](vjs.Component.md)  
 __DEFINED IN__: [src/js/media/loader.js#L4](https://github.com/videojs/video.js/blob/master/src/js/media/loader.js#L4)  
 
-undefined
-
 ---
 
 ## INDEX
@@ -15,6 +13,7 @@ undefined
   - [init](#init-player-options-ready-)
   - [addChild](#addchild-child-options-) _`inherited`_
   - [addClass](#addclass-classtoadd-) _`inherited`_
+  - [buildCSSClass](#buildcssclass) _`inherited`_
   - [children](#children) _`inherited`_
   - [contentEl](#contentel) _`inherited`_
   - [createEl](#createel-tagname-attributes-) _`inherited`_
@@ -38,6 +37,7 @@ undefined
   - [options](#options-obj-) _`inherited`_
   - [player](#player) _`inherited`_
   - [ready](#ready-fn-) _`inherited`_
+  - [removeChild](#removechild-component-) _`inherited`_
   - [removeClass](#removeclass-classtoremove-) _`inherited`_
   - [show](#show) _`inherited`_
   - [trigger](#trigger-type-event-) _`inherited`_
@@ -50,16 +50,36 @@ undefined
 ## METHODS
 
 ### addChild( child, [options] )
-> Adds a child component inside this component.
+> Adds a child component inside this component
+> 
+>     myComponent.el();
+>     // -> <div class='my-component'></div>
+>     myComonent.children();
+>     // [empty array]
+> 
+>     var myButton = myComponent.addChild('MyButton');
+>     // -> <div class='my-component'><div class="my-button">myButton<div></div>
+>     // -> myButton === myComonent.children()[0];
+> 
+> Pass in options for child constructors and options for children of the child
+> 
+>    var myButton = myComponent.addChild('MyButton', {
+>      text: 'Press Me',
+>      children: {
+>        buttonChildExample: {
+>          buttonChildOption: true
+>        }
+>      }
+>    });
 
 ##### PARAMETERS: 
-* __child__ `String|vjs.Component` The class name or instance of a child to add.
+* __child__ `String|vjs.Component` The class name or instance of a child to add
 * __options__ `Object` _(OPTIONAL)_ Options, including options to be passed to children of the child.
 
 ##### RETURNS: 
-* `vjs.Component` The child component, because it might be created in this process.
+* `vjs.Component` The child component (created by this process if a string was used)
 
-_inherited from_: [src/js/component.js#L275](https://github.com/videojs/video.js/blob/master/src/js/component.js#L275)
+_inherited from_: [src/js/component.js#L314](https://github.com/videojs/video.js/blob/master/src/js/component.js#L314)
 
 ---
 
@@ -72,153 +92,168 @@ _inherited from_: [src/js/component.js#L275](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L515](https://github.com/videojs/video.js/blob/master/src/js/component.js#L515)
+_inherited from_: [src/js/component.js#L587](https://github.com/videojs/video.js/blob/master/src/js/component.js#L587)
+
+---
+
+### buildCSSClass()
+> Allows sub components to stack CSS class names
+
+##### RETURNS: 
+* `String` The constructed class name
+
+_inherited from_: [src/js/component.js#L442](https://github.com/videojs/video.js/blob/master/src/js/component.js#L442)
 
 ---
 
 ### children()
-> Returns array of all child components.
+> Returns an array of all child components
 
 ##### RETURNS: 
 * `Array` 
 
-_inherited from_: [src/js/component.js#L234](https://github.com/videojs/video.js/blob/master/src/js/component.js#L234)
+_inherited from_: [src/js/component.js#L248](https://github.com/videojs/video.js/blob/master/src/js/component.js#L248)
 
 ---
 
 ### contentEl()
 > Return the component's DOM element for embedding content.
->   will either be el_ or a new element defined in createEl
+> Will either be el_ or a new element defined in createEl.
 
 ##### RETURNS: 
 * `Element` 
 
-_inherited from_: [src/js/component.js#L189](https://github.com/videojs/video.js/blob/master/src/js/component.js#L189)
+_inherited from_: [src/js/component.js#L197](https://github.com/videojs/video.js/blob/master/src/js/component.js#L197)
 
 ---
 
 ### createEl( [tagName], [attributes] )
-> Create the component's DOM element.
+> Create the component's DOM element
 
 ##### PARAMETERS: 
 * __tagName__ `String` _(OPTIONAL)_ Element's node type. e.g. 'div'
-* __attributes__ `Object` _(OPTIONAL)_ An object of element attributes that should be set on the element.
+* __attributes__ `Object` _(OPTIONAL)_ An object of element attributes that should be set on the element
 
 ##### RETURNS: 
 * `Element` 
 
-_inherited from_: [src/js/component.js#L164](https://github.com/videojs/video.js/blob/master/src/js/component.js#L164)
+_inherited from_: [src/js/component.js#L169](https://github.com/videojs/video.js/blob/master/src/js/component.js#L169)
 
 ---
 
-### dimension( [widthOrHeight], [num], [skipListeners] )
-> Get or set width or height.
+### dimension( widthOrHeight, [num], [skipListeners] )
+> Get or set width or height
+> 
+> This is the shared code for the width() and height() methods.
 > All for an integer, integer + 'px' or integer + '%';
-> Known issue: hidden elements. Hidden elements officially have a width of 0.
-> So we're defaulting to the style.width value and falling back to computedStyle
-> which has the hidden element issue.
-> Info, but probably not an efficient fix:
+> 
+> Known issue: Hidden elements officially have a width of 0. We're defaulting
+> to the style.width value and falling back to computedStyle which has the
+> hidden element issue. Info, but probably not an efficient fix:
 > http://www.foliotek.com/devblog/getting-the-width-of-a-hidden-element-with-jquery-using-width/
 
 ##### PARAMETERS: 
-* __widthOrHeight__ `String` _(OPTIONAL)_ 'width' or 'height'
+* __widthOrHeight__ `String` 'width' or 'height'
 * __num__ `Number|String` _(OPTIONAL)_ New dimension
 * __skipListeners__ `Boolean` _(OPTIONAL)_ Skip resize event trigger
 
 ##### RETURNS: 
-* `vjs.Component|Number|String` Return the player if setting a dimension.
+* `vjs.Component` The component if a dimension was set
+* `Number|String` The dimension if nothing was set
 
-_inherited from_: [src/js/component.js#L624](https://github.com/videojs/video.js/blob/master/src/js/component.js#L624)
+_inherited from_: [src/js/component.js#L709](https://github.com/videojs/video.js/blob/master/src/js/component.js#L709)
 
 ---
 
 ### dimensions( width, height )
-> Set both width and height at the same time.
+> Set both width and height at the same time
 
 ##### PARAMETERS: 
 * __width__ `Number|String` 
 * __height__ `Number|String` 
 
 ##### RETURNS: 
-* `vjs.Component` The player.
+* `vjs.Component` The component
 
-_inherited from_: [src/js/component.js#L605](https://github.com/videojs/video.js/blob/master/src/js/component.js#L605)
+_inherited from_: [src/js/component.js#L687](https://github.com/videojs/video.js/blob/master/src/js/component.js#L687)
 
 ---
 
 ### disable()
 > Disable component by making it unshowable
 
-_inherited from_: [src/js/component.js#L569](https://github.com/videojs/video.js/blob/master/src/js/component.js#L569)
+_inherited from_: [src/js/component.js#L648](https://github.com/videojs/video.js/blob/master/src/js/component.js#L648)
 
 ---
 
 ### dispose()
-> Dispose of the component and all child components.
+> Dispose of the component and all child components
 
 _inherited from_: [src/js/component.js#L53](https://github.com/videojs/video.js/blob/master/src/js/component.js#L53)
 
 ---
 
 ### el()
-> Return the component's DOM element.
+> return the component's DOM element
 
 ##### RETURNS: 
 * `Element` 
 
-_inherited from_: [src/js/component.js#L172](https://github.com/videojs/video.js/blob/master/src/js/component.js#L172)
+_inherited from_: [src/js/component.js#L178](https://github.com/videojs/video.js/blob/master/src/js/component.js#L178)
 
 ---
 
 ### emitTapEvents()
-> Emit 'tap' events when touch events are supported. We're requireing them to
-> be enabled because otherwise every component would have this extra overhead
-> unnecessarily, on mobile devices where extra overhead is especially bad.
+> Emit 'tap' events when touch events are supported
 > 
-> This is being implemented so we can support taps on the video element
-> toggling the controls.
+> This is used to support toggling the controls through a tap on the video.
+> 
+> We're requireing them to be enabled because otherwise every component would
+> have this extra overhead unnecessarily, on mobile devices where extra
+> overhead is especially bad.
 
-_inherited from_: [src/js/component.js#L684](https://github.com/videojs/video.js/blob/master/src/js/component.js#L684)
+_inherited from_: [src/js/component.js#L770](https://github.com/videojs/video.js/blob/master/src/js/component.js#L770)
 
 ---
 
 ### getChild( name )
-> Returns a child component with the provided ID.
+> Returns a child component with the provided ID
 
 ##### PARAMETERS: 
 * __name__ 
 
 ##### RETURNS: 
-* `Array` 
+* `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L264](https://github.com/videojs/video.js/blob/master/src/js/component.js#L264)
+_inherited from_: [src/js/component.js#L282](https://github.com/videojs/video.js/blob/master/src/js/component.js#L282)
 
 ---
 
 ### getChildById( id )
-> Returns a child component with the provided ID.
+> Returns a child component with the provided ID
 
 ##### PARAMETERS: 
 * __id__ 
 
 ##### RETURNS: 
-* `Array` 
+* `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L249](https://github.com/videojs/video.js/blob/master/src/js/component.js#L249)
+_inherited from_: [src/js/component.js#L265](https://github.com/videojs/video.js/blob/master/src/js/component.js#L265)
 
 ---
 
 ### height( [num], [skipListeners] )
-> Get or set the height of the player
+> Get or set the height of the component (CSS values)
 
 ##### PARAMETERS: 
-* __num__ `Number|String` _(OPTIONAL)_ Optional new player height
-* __skipListeners__ `Boolean` _(OPTIONAL)_ Optional skip resize event trigger
+* __num__ `Number|String` _(OPTIONAL)_ New component height
+* __skipListeners__ `Boolean` _(OPTIONAL)_ Skip the resize event trigger
 
 ##### RETURNS: 
-* `vjs.Component|Number|String` The player, or the dimension
+* `vjs.Component` The component if the height was set
+* `Number|String` The height if it wasn't set
 
-_inherited from_: [src/js/component.js#L595](https://github.com/videojs/video.js/blob/master/src/js/component.js#L595)
+_inherited from_: [src/js/component.js#L676](https://github.com/videojs/video.js/blob/master/src/js/component.js#L676)
 
 ---
 
@@ -228,17 +263,17 @@ _inherited from_: [src/js/component.js#L595](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L543](https://github.com/videojs/video.js/blob/master/src/js/component.js#L543)
+_inherited from_: [src/js/component.js#L618](https://github.com/videojs/video.js/blob/master/src/js/component.js#L618)
 
 ---
 
 ### id()
-> Return the component's ID.
+> Returns the component's ID
 
 ##### RETURNS: 
 * `String` 
 
-_inherited from_: [src/js/component.js#L204](https://github.com/videojs/video.js/blob/master/src/js/component.js#L204)
+_inherited from_: [src/js/component.js#L214](https://github.com/videojs/video.js/blob/master/src/js/component.js#L214)
 
 ---
 
@@ -254,29 +289,38 @@ _defined in_: [src/js/media/loader.js#L6](https://github.com/videojs/video.js/bl
 ---
 
 ### initChildren()
-> Initialize default child components from options
+> Add and initialize default child components from options
+> 
+>     // when an instance of MyComponent is created, all children in options
+>     // will be added to the instance by their name strings and options
+>     MyComponent.prototype.options_.children = {
+>       myChildComponent: {
+>         myChildOption: true
+>       }
+>     }
 
-_inherited from_: [src/js/component.js#L357](https://github.com/videojs/video.js/blob/master/src/js/component.js#L357)
+_inherited from_: [src/js/component.js#L410](https://github.com/videojs/video.js/blob/master/src/js/component.js#L410)
 
 ---
 
 ### lockShowing()
-> Lock an item in its visible state. To be used with fadeIn/fadeOut.
+> Lock an item in its visible state
+> To be used with fadeIn/fadeOut.
 
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L552](https://github.com/videojs/video.js/blob/master/src/js/component.js#L552)
+_inherited from_: [src/js/component.js#L629](https://github.com/videojs/video.js/blob/master/src/js/component.js#L629)
 
 ---
 
 ### name()
-> Return the component's ID.
+> Returns the component's name
 
 ##### RETURNS: 
 * `String` 
 
-_inherited from_: [src/js/component.js#L219](https://github.com/videojs/video.js/blob/master/src/js/component.js#L219)
+_inherited from_: [src/js/component.js#L231](https://github.com/videojs/video.js/blob/master/src/js/component.js#L231)
 
 ---
 
@@ -284,18 +328,19 @@ _inherited from_: [src/js/component.js#L219](https://github.com/videojs/video.js
 > Remove an event listener from the component's element
 
 ##### PARAMETERS: 
-* __type__ `String` _(OPTIONAL)_ Optional event type. Without type it will remove all listeners.
-* __fn__ `Function` _(OPTIONAL)_ Optional event listener. Without fn it will remove all listeners for a type.
+* __type__ `String` _(OPTIONAL)_ Event type. Without type it will remove all listeners.
+* __fn__ `Function` _(OPTIONAL)_ Event listener. Without fn it will remove all listeners for a type.
 
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L410](https://github.com/videojs/video.js/blob/master/src/js/component.js#L410)
+_inherited from_: [src/js/component.js#L471](https://github.com/videojs/video.js/blob/master/src/js/component.js#L471)
 
 ---
 
 ### on( type, fn )
-> Add an event listener to this component's element. Context will be the component.
+> Add an event listener to this component's element
+> The context will be the component.
 
 ##### PARAMETERS: 
 * __type__ `String` Event type e.g. 'click'
@@ -304,7 +349,7 @@ _inherited from_: [src/js/component.js#L410](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L399](https://github.com/videojs/video.js/blob/master/src/js/component.js#L399)
+_inherited from_: [src/js/component.js#L459](https://github.com/videojs/video.js/blob/master/src/js/component.js#L459)
 
 ---
 
@@ -318,7 +363,7 @@ _inherited from_: [src/js/component.js#L399](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L421](https://github.com/videojs/video.js/blob/master/src/js/component.js#L421)
+_inherited from_: [src/js/component.js#L483](https://github.com/videojs/video.js/blob/master/src/js/component.js#L483)
 
 ---
 
@@ -366,24 +411,25 @@ _inherited from_: [src/js/component.js#L421](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Object` NEW merged object. Does not return obj1.
 
-_inherited from_: [src/js/component.js#L145](https://github.com/videojs/video.js/blob/master/src/js/component.js#L145)
+_inherited from_: [src/js/component.js#L148](https://github.com/videojs/video.js/blob/master/src/js/component.js#L148)
 
 ---
 
 ### player()
-> Return the component's player.
+> Return the component's player
 
 ##### RETURNS: 
 * `vjs.Player` 
 
-_inherited from_: [src/js/component.js#L93](https://github.com/videojs/video.js/blob/master/src/js/component.js#L93)
+_inherited from_: [src/js/component.js#L95](https://github.com/videojs/video.js/blob/master/src/js/component.js#L95)
 
 ---
 
 ### ready( fn )
-> Bind a listener to the component's ready state.
->   Different from event listeners in that if the ready event has already happend
->   it will trigger the function immediately.
+> Bind a listener to the component's ready state
+> 
+> Different from event listeners in that if the ready event has already happend
+> it will trigger the function immediately.
 
 ##### PARAMETERS: 
 * __fn__ `Function` Ready listener
@@ -391,7 +437,18 @@ _inherited from_: [src/js/component.js#L93](https://github.com/videojs/video.js/
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L470](https://github.com/videojs/video.js/blob/master/src/js/component.js#L470)
+_inherited from_: [src/js/component.js#L540](https://github.com/videojs/video.js/blob/master/src/js/component.js#L540)
+
+---
+
+### removeChild( component )
+> Remove a child component from this component's list of children, and the
+> child component's element from this component's element
+
+##### PARAMETERS: 
+* __component__ `vjs.Component` Component to remove
+
+_inherited from_: [src/js/component.js#L372](https://github.com/videojs/video.js/blob/master/src/js/component.js#L372)
 
 ---
 
@@ -404,7 +461,7 @@ _inherited from_: [src/js/component.js#L470](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L525](https://github.com/videojs/video.js/blob/master/src/js/component.js#L525)
+_inherited from_: [src/js/component.js#L598](https://github.com/videojs/video.js/blob/master/src/js/component.js#L598)
 
 ---
 
@@ -414,7 +471,7 @@ _inherited from_: [src/js/component.js#L525](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L534](https://github.com/videojs/video.js/blob/master/src/js/component.js#L534)
+_inherited from_: [src/js/component.js#L608](https://github.com/videojs/video.js/blob/master/src/js/component.js#L608)
 
 ---
 
@@ -428,7 +485,7 @@ _inherited from_: [src/js/component.js#L534](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L432](https://github.com/videojs/video.js/blob/master/src/js/component.js#L432)
+_inherited from_: [src/js/component.js#L495](https://github.com/videojs/video.js/blob/master/src/js/component.js#L495)
 
 ---
 
@@ -438,35 +495,36 @@ _inherited from_: [src/js/component.js#L432](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L488](https://github.com/videojs/video.js/blob/master/src/js/component.js#L488)
+_inherited from_: [src/js/component.js#L559](https://github.com/videojs/video.js/blob/master/src/js/component.js#L559)
 
 ---
 
 ### unlockShowing()
-> Unlock an item to be hidden. To be used with fadeIn/fadeOut.
+> Unlock an item to be hidden
+> To be used with fadeIn/fadeOut.
 
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L561](https://github.com/videojs/video.js/blob/master/src/js/component.js#L561)
+_inherited from_: [src/js/component.js#L640](https://github.com/videojs/video.js/blob/master/src/js/component.js#L640)
 
 ---
 
 ### width( [num], skipListeners )
-> If a value is provided it will change the width of the player to that value
-> otherwise the width is returned
-> http://dev.w3.org/html5/spec/dimension-attributes.html#attr-dim-height
+> Set or get the width of the component (CSS values)
+> 
 > Video tag width/height only work in pixels. No percents.
 > But allowing limited percents use. e.g. width() will return number+%, not computed width
 
 ##### PARAMETERS: 
 * __num__ `Number|String` _(OPTIONAL)_ Optional width number
-* __skipListeners__ `[type]` Skip the 'resize' event trigger
+* __skipListeners__ `Boolean` Skip the 'resize' event trigger
 
 ##### RETURNS: 
-* `vjs.Component|Number|String` Returns 'this' if dimension was set.
+* `vjs.Component` Returns 'this' if width was set
+* `Number|String` Returns the width if nothing was set
 
-_inherited from_: [src/js/component.js#L585](https://github.com/videojs/video.js/blob/master/src/js/component.js#L585)
+_inherited from_: [src/js/component.js#L664](https://github.com/videojs/video.js/blob/master/src/js/component.js#L664)
 
 ---
 

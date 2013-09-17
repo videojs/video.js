@@ -13,7 +13,7 @@
  */
 vjs.Component = vjs.CoreObject.extend({
   /**
-   * The constructor funciton for the class
+   * the constructor funciton for the class
    *
    * @constructor
    */
@@ -48,7 +48,7 @@ vjs.Component = vjs.CoreObject.extend({
 });
 
 /**
- * Dispose of the component and all child components.
+ * Dispose of the component and all child components
  */
 vjs.Component.prototype.dispose = function(){
   this.trigger('dispose');
@@ -80,14 +80,16 @@ vjs.Component.prototype.dispose = function(){
 };
 
 /**
- * Reference to main player instance.
+ * Reference to main player instance
+ *
  * @type {vjs.Player}
  * @private
  */
 vjs.Component.prototype.player_ = true;
 
 /**
- * Return the component's player.
+ * Return the component's player
+ *
  * @return {vjs.Player}
  */
 vjs.Component.prototype.player = function(){
@@ -95,7 +97,8 @@ vjs.Component.prototype.player = function(){
 };
 
 /**
- * Component options object.
+ * The component's options object
+ *
  * @type {Object}
  * @private
  */
@@ -140,7 +143,7 @@ vjs.Component.prototype.options_;
  *     }
  *
  * @param  {Object} obj Object whose values will be overwritten
- * @return {Object}      NEW merged object. Does not return obj1.
+ * @return {Object}     NEW merged object. Does not return obj1.
  */
 vjs.Component.prototype.options = function(obj){
   if (obj === undefined) return this.options_;
@@ -149,16 +152,18 @@ vjs.Component.prototype.options = function(obj){
 };
 
 /**
- * The DOM element for the component.
+ * The DOM element for the component
+ *
  * @type {Element}
  * @private
  */
 vjs.Component.prototype.el_;
 
 /**
- * Create the component's DOM element.
+ * Create the component's DOM element
+ *
  * @param  {String=} tagName  Element's node type. e.g. 'div'
- * @param  {Object=} attributes An object of element attributes that should be set on the element.
+ * @param  {Object=} attributes An object of element attributes that should be set on the element
  * @return {Element}
  */
 vjs.Component.prototype.createEl = function(tagName, attributes){
@@ -166,7 +171,8 @@ vjs.Component.prototype.createEl = function(tagName, attributes){
 };
 
 /**
- * Return the component's DOM element.
+ * return the component's DOM element
+ *
  * @return {Element}
  */
 vjs.Component.prototype.el = function(){
@@ -174,8 +180,9 @@ vjs.Component.prototype.el = function(){
 };
 
 /**
- * An optional element where, if defined, children will be inserted
- *   instead of directly in el_
+ * An optional element where, if defined, children will be inserted instead of
+ * directly in `el_`
+ *
  * @type {Element}
  * @private
  */
@@ -183,7 +190,8 @@ vjs.Component.prototype.contentEl_;
 
 /**
  * Return the component's DOM element for embedding content.
- *   will either be el_ or a new element defined in createEl
+ * Will either be el_ or a new element defined in createEl.
+ *
  * @return {Element}
  */
 vjs.Component.prototype.contentEl = function(){
@@ -191,14 +199,16 @@ vjs.Component.prototype.contentEl = function(){
 };
 
 /**
- * The ID for the component.
+ * The ID for the component
+ *
  * @type {String}
  * @private
  */
 vjs.Component.prototype.id_;
 
 /**
- * Return the component's ID.
+ * Returns the component's ID
+ *
  * @return {String}
  */
 vjs.Component.prototype.id = function(){
@@ -207,13 +217,15 @@ vjs.Component.prototype.id = function(){
 
 /**
  * The name for the component. Often used to reference the component.
+ *
  * @type {String}
  * @private
  */
 vjs.Component.prototype.name_;
 
 /**
- * Return the component's ID.
+ * Returns the component's name
+ *
  * @return {String}
  */
 vjs.Component.prototype.name = function(){
@@ -222,13 +234,15 @@ vjs.Component.prototype.name = function(){
 
 /**
  * Array of child components
+ *
  * @type {Array}
  * @private
  */
 vjs.Component.prototype.children_;
 
 /**
- * Returns array of all child components.
+ * Returns an array of all child components
+ *
  * @return {Array}
  */
 vjs.Component.prototype.children = function(){
@@ -237,39 +251,64 @@ vjs.Component.prototype.children = function(){
 
 /**
  * Object of child components by ID
+ *
  * @type {Object}
  * @private
  */
 vjs.Component.prototype.childIndex_;
 
 /**
- * Returns a child component with the provided ID.
- * @return {Array}
+ * Returns a child component with the provided ID
+ *
+ * @return {vjs.Component}
  */
 vjs.Component.prototype.getChildById = function(id){
   return this.childIndex_[id];
 };
 
 /**
- * Object of child components by Name
+ * Object of child components by name
+ *
  * @type {Object}
  * @private
  */
 vjs.Component.prototype.childNameIndex_;
 
 /**
- * Returns a child component with the provided ID.
- * @return {Array}
+ * Returns a child component with the provided ID
+ *
+ * @return {vjs.Component}
  */
 vjs.Component.prototype.getChild = function(name){
   return this.childNameIndex_[name];
 };
 
 /**
- * Adds a child component inside this component.
- * @param {String|vjs.Component} child The class name or instance of a child to add.
+ * Adds a child component inside this component
+ *
+ *     myComponent.el();
+ *     // -> <div class='my-component'></div>
+ *     myComonent.children();
+ *     // [empty array]
+ *
+ *     var myButton = myComponent.addChild('MyButton');
+ *     // -> <div class='my-component'><div class="my-button">myButton<div></div>
+ *     // -> myButton === myComonent.children()[0];
+ *
+ * Pass in options for child constructors and options for children of the child
+ *
+ *    var myButton = myComponent.addChild('MyButton', {
+ *      text: 'Press Me',
+ *      children: {
+ *        buttonChildExample: {
+ *          buttonChildOption: true
+ *        }
+ *      }
+ *    });
+ *
+ * @param {String|vjs.Component} child The class name or instance of a child to add
  * @param {Object=} options Options, including options to be passed to children of the child.
- * @return {vjs.Component} The child component, because it might be created in this process.
+ * @return {vjs.Component} The child component (created by this process if a string was used)
  * @suppress {accessControls|checkRegExp|checkTypes|checkVars|const|constantProperty|deprecated|duplicate|es5Strict|fileoverviewTags|globalThis|invalidCasts|missingProperties|nonStandardJsDocs|strictModuleDepCheck|undefinedNames|undefinedVars|unknownDefines|uselessCode|visibility}
  */
 vjs.Component.prototype.addChild = function(child, options){
@@ -324,6 +363,12 @@ vjs.Component.prototype.addChild = function(child, options){
   return component;
 };
 
+/**
+ * Remove a child component from this component's list of children, and the
+ * child component's element from this component's element
+ *
+ * @param  {vjs.Component} component Component to remove
+ */
 vjs.Component.prototype.removeChild = function(component){
   if (typeof component === 'string') {
     component = this.getChild(component);
@@ -352,7 +397,15 @@ vjs.Component.prototype.removeChild = function(component){
 };
 
 /**
- * Initialize default child components from options
+ * Add and initialize default child components from options
+ *
+ *     // when an instance of MyComponent is created, all children in options
+ *     // will be added to the instance by their name strings and options
+ *     MyComponent.prototype.options_.children = {
+ *       myChildComponent: {
+ *         myChildOption: true
+ *       }
+ *     }
  */
 vjs.Component.prototype.initChildren = function(){
   var options = this.options_;
@@ -381,6 +434,11 @@ vjs.Component.prototype.initChildren = function(){
   }
 };
 
+/**
+ * Allows sub components to stack CSS class names
+ *
+ * @return {String} The constructed class name
+ */
 vjs.Component.prototype.buildCSSClass = function(){
     // Child classes can include a function that does:
     // return 'CLASS NAME' + this._super();
@@ -391,7 +449,9 @@ vjs.Component.prototype.buildCSSClass = function(){
 ============================================================================= */
 
 /**
- * Add an event listener to this component's element. Context will be the component.
+ * Add an event listener to this component's element
+ * The context will be the component.
+ *
  * @param  {String}   type Event type e.g. 'click'
  * @param  {Function} fn   Event listener
  * @return {vjs.Component}
@@ -403,8 +463,9 @@ vjs.Component.prototype.on = function(type, fn){
 
 /**
  * Remove an event listener from the component's element
- * @param  {String=}   type Optional event type. Without type it will remove all listeners.
- * @param  {Function=} fn   Optional event listener. Without fn it will remove all listeners for a type.
+ *
+ * @param  {String=}   type Event type. Without type it will remove all listeners.
+ * @param  {Function=} fn   Event listener. Without fn it will remove all listeners for a type.
  * @return {vjs.Component}
  */
 vjs.Component.prototype.off = function(type, fn){
@@ -414,6 +475,7 @@ vjs.Component.prototype.off = function(type, fn){
 
 /**
  * Add an event listener to be triggered only once and then removed
+ *
  * @param  {String}   type Event type
  * @param  {Function} fn   Event listener
  * @return {vjs.Component}
@@ -425,6 +487,7 @@ vjs.Component.prototype.one = function(type, fn) {
 
 /**
  * Trigger an event on an element
+ *
  * @param  {String} type  Event type to trigger
  * @param  {Event|Object} event Event object to be passed to the listener
  * @return {vjs.Component}
@@ -437,17 +500,21 @@ vjs.Component.prototype.trigger = function(type, event){
 /* Ready
 ================================================================================ */
 /**
- * Is the component loaded.
- * @type {Boolean}
+ * Is the component loaded
+ * This can mean different things depending on the component.
+ *
  * @private
+ * @type {Boolean}
  */
 vjs.Component.prototype.isReady_;
 
 /**
- * Trigger ready as soon as initialization is finished.
+ * Trigger ready as soon as initialization is finished
+ *
  * Allows for delaying ready. Override on a sub class prototype.
  * If you set this.isReadyOnInitFinish_ it will affect all components.
  * Specially used when waiting for the Flash player to asynchrnously load.
+ *
  * @type {Boolean}
  * @private
  */
@@ -455,15 +522,18 @@ vjs.Component.prototype.isReadyOnInitFinish_ = true;
 
 /**
  * List of ready listeners
+ *
  * @type {Array}
  * @private
  */
 vjs.Component.prototype.readyQueue_;
 
 /**
- * Bind a listener to the component's ready state.
- *   Different from event listeners in that if the ready event has already happend
- *   it will trigger the function immediately.
+ * Bind a listener to the component's ready state
+ *
+ * Different from event listeners in that if the ready event has already happend
+ * it will trigger the function immediately.
+ *
  * @param  {Function} fn Ready listener
  * @return {vjs.Component}
  */
@@ -483,6 +553,7 @@ vjs.Component.prototype.ready = function(fn){
 
 /**
  * Trigger the ready listeners
+ *
  * @return {vjs.Component}
  */
 vjs.Component.prototype.triggerReady = function(){
@@ -509,6 +580,7 @@ vjs.Component.prototype.triggerReady = function(){
 
 /**
  * Add a CSS class name to the component's element
+ *
  * @param {String} classToAdd Classname to add
  * @return {vjs.Component}
  */
@@ -519,6 +591,7 @@ vjs.Component.prototype.addClass = function(classToAdd){
 
 /**
  * Remove a CSS class name from the component's element
+ *
  * @param {String} classToRemove Classname to remove
  * @return {vjs.Component}
  */
@@ -529,6 +602,7 @@ vjs.Component.prototype.removeClass = function(classToRemove){
 
 /**
  * Show the component element if hidden
+ *
  * @return {vjs.Component}
  */
 vjs.Component.prototype.show = function(){
@@ -538,6 +612,7 @@ vjs.Component.prototype.show = function(){
 
 /**
  * Hide the component element if hidden
+ *
  * @return {vjs.Component}
  */
 vjs.Component.prototype.hide = function(){
@@ -546,7 +621,9 @@ vjs.Component.prototype.hide = function(){
 };
 
 /**
- * Lock an item in its visible state. To be used with fadeIn/fadeOut.
+ * Lock an item in its visible state
+ * To be used with fadeIn/fadeOut.
+ *
  * @return {vjs.Component}
  */
 vjs.Component.prototype.lockShowing = function(){
@@ -555,7 +632,9 @@ vjs.Component.prototype.lockShowing = function(){
 };
 
 /**
- * Unlock an item to be hidden. To be used with fadeIn/fadeOut.
+ * Unlock an item to be hidden
+ * To be used with fadeIn/fadeOut.
+ *
  * @return {vjs.Component}
  */
 vjs.Component.prototype.unlockShowing = function(){
@@ -572,35 +651,38 @@ vjs.Component.prototype.disable = function(){
 };
 
 /**
- * If a value is provided it will change the width of the player to that value
- * otherwise the width is returned
- * http://dev.w3.org/html5/spec/dimension-attributes.html#attr-dim-height
+ * Set or get the width of the component (CSS values)
+ *
  * Video tag width/height only work in pixels. No percents.
  * But allowing limited percents use. e.g. width() will return number+%, not computed width
+ *
  * @param  {Number|String=} num   Optional width number
- * @param  {[type]} skipListeners Skip the 'resize' event trigger
- * @return {vjs.Component|Number|String} Returns 'this' if dimension was set.
- *   Otherwise it returns the dimension.
+ * @param  {Boolean} skipListeners Skip the 'resize' event trigger
+ * @return {vjs.Component} Returns 'this' if width was set
+ * @return {Number|String} Returns the width if nothing was set
  */
 vjs.Component.prototype.width = function(num, skipListeners){
   return this.dimension('width', num, skipListeners);
 };
 
 /**
- * Get or set the height of the player
- * @param  {Number|String=} num     Optional new player height
- * @param  {Boolean=} skipListeners Optional skip resize event trigger
- * @return {vjs.Component|Number|String} The player, or the dimension
+ * Get or set the height of the component (CSS values)
+ *
+ * @param  {Number|String=} num     New component height
+ * @param  {Boolean=} skipListeners Skip the resize event trigger
+ * @return {vjs.Component} The component if the height was set
+ * @return {Number|String} The height if it wasn't set
  */
 vjs.Component.prototype.height = function(num, skipListeners){
   return this.dimension('height', num, skipListeners);
 };
 
 /**
- * Set both width and height at the same time.
+ * Set both width and height at the same time
+ *
  * @param  {Number|String} width
  * @param  {Number|String} height
- * @return {vjs.Component}   The player.
+ * @return {vjs.Component} The component
  */
 vjs.Component.prototype.dimensions = function(width, height){
   // Skip resize listeners on width for optimization
@@ -608,18 +690,21 @@ vjs.Component.prototype.dimensions = function(width, height){
 };
 
 /**
- * Get or set width or height.
+ * Get or set width or height
+ *
+ * This is the shared code for the width() and height() methods.
  * All for an integer, integer + 'px' or integer + '%';
- * Known issue: hidden elements. Hidden elements officially have a width of 0.
- * So we're defaulting to the style.width value and falling back to computedStyle
- * which has the hidden element issue.
- * Info, but probably not an efficient fix:
+ *
+ * Known issue: Hidden elements officially have a width of 0. We're defaulting
+ * to the style.width value and falling back to computedStyle which has the
+ * hidden element issue. Info, but probably not an efficient fix:
  * http://www.foliotek.com/devblog/getting-the-width-of-a-hidden-element-with-jquery-using-width/
- * @param  {String=} widthOrHeight 'width' or 'height'
- * @param  {Number|String=} num           New dimension
+ *
+ * @param  {String} widthOrHeight  'width' or 'height'
+ * @param  {Number|String=} num     New dimension
  * @param  {Boolean=} skipListeners Skip resize event trigger
- * @return {vjs.Component|Number|String} Return the player if setting a dimension.
- *                                         Otherwise it returns the dimension.
+ * @return {vjs.Component} The component if a dimension was set
+ * @return {Number|String} The dimension if nothing was set
  */
 vjs.Component.prototype.dimension = function(widthOrHeight, num, skipListeners){
   if (num !== undefined) {
@@ -674,12 +759,13 @@ vjs.Component.prototype.dimension = function(widthOrHeight, num, skipListeners){
 };
 
 /**
- * Emit 'tap' events when touch events are supported. We're requireing them to
- * be enabled because otherwise every component would have this extra overhead
- * unnecessarily, on mobile devices where extra overhead is especially bad.
+ * Emit 'tap' events when touch events are supported
  *
- * This is being implemented so we can support taps on the video element
- * toggling the controls.
+ * This is used to support toggling the controls through a tap on the video.
+ *
+ * We're requireing them to be enabled because otherwise every component would
+ * have this extra overhead unnecessarily, on mobile devices where extra
+ * overhead is especially bad.
  */
 vjs.Component.prototype.emitTapEvents = function(){
   var touchStart, touchTime, couldBeTap, noTap;
