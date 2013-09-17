@@ -57,9 +57,13 @@ vjs.CoreObject = vjs['CoreObject'] = function(){};
 
 /**
  * Create a new object that inherits from this Object
+ *
+ *     var Animal = CoreObject.extend();
+ *     var Horse = Animal.extend();
+ *
  * @param {Object} props Functions and properties to be applied to the
  *                       new object's prototype
- * @return {vjs.CoreObject} Returns an object that inherits from CoreObject
+ * @return {vjs.CoreObject} An object that inherits from CoreObject
  * @this {*}
  */
 vjs.CoreObject.extend = function(props){
@@ -106,7 +110,10 @@ vjs.CoreObject.extend = function(props){
 
 /**
  * Create a new instace of this Object class
- * @return {vjs.CoreObject} Returns an instance of a CoreObject subclass
+ *
+ *     var myAnimal = Animal.create();
+ *
+ * @return {vjs.CoreObject} An instance of a CoreObject subclass
  * @this {*}
  */
 vjs.CoreObject.create = function(){

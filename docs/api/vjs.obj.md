@@ -10,28 +10,13 @@ Object functions container
 
 ## INDEX
 
-- [PROPERTIES](#properties)
-  - [create](#create)
-
 - [METHODS](#methods)
   - [copy](#copy-obj-)
+  - [create](#create-obj-)
   - [deepMerge](#deepmerge-obj1-obj2-)
   - [each](#each-obj-fn-)
   - [isPlain](#isplain-obj-)
   - [merge](#merge-obj1-obj2-)
-
----
-
-## PROPERTIES
-
-### create
-> Object.create shim for prototypal inheritance.
-> https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object/create
-
-##### PARAMETERS: 
-* __obj__ `Object` Object to use as prototype
-
-_defined in_: [src/js/lib.js#L54](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L54)
 
 ---
 
@@ -46,7 +31,19 @@ _defined in_: [src/js/lib.js#L54](https://github.com/videojs/video.js/blob/maste
 ##### RETURNS: 
 * `Object` Copy of object
 
-_defined in_: [src/js/lib.js#L134](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L134)
+_defined in_: [src/js/lib.js#L137](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L137)
+
+---
+
+### create( obj )
+> Object.create shim for prototypal inheritance
+> 
+> https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object/create
+
+##### PARAMETERS: 
+* __obj__ `Object` Object to use as prototype
+
+_defined in_: [src/js/lib.js#L57](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L57)
 
 ---
 
@@ -62,7 +59,7 @@ _defined in_: [src/js/lib.js#L134](https://github.com/videojs/video.js/blob/mast
 ##### RETURNS: 
 * `Object` New object. Obj1 and Obj2 will be untouched.
 
-_defined in_: [src/js/lib.js#L105](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L105)
+_defined in_: [src/js/lib.js#L108](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L108)
 
 ---
 
@@ -74,7 +71,7 @@ _defined in_: [src/js/lib.js#L105](https://github.com/videojs/video.js/blob/mast
 * __obj__ `Object` Object of properties
 * __fn__ `Function` Function to be called on each property.
 
-_defined in_: [src/js/lib.js#L73](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L73)
+_defined in_: [src/js/lib.js#L76](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L76)
 
 ---
 
@@ -87,7 +84,7 @@ _defined in_: [src/js/lib.js#L73](https://github.com/videojs/video.js/blob/maste
 ##### RETURNS: 
 * `Boolean` True if plain, false otherwise
 
-_defined in_: [src/js/lib.js#L143](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L143)
+_defined in_: [src/js/lib.js#L146](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L146)
 
 ---
 
@@ -101,7 +98,7 @@ _defined in_: [src/js/lib.js#L143](https://github.com/videojs/video.js/blob/mast
 ##### RETURNS: 
 * `Object` 
 
-_defined in_: [src/js/lib.js#L87](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L87)
+_defined in_: [src/js/lib.js#L90](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L90)
 
 ---
 

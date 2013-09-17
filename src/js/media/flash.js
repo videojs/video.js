@@ -5,8 +5,9 @@
  */
 
 /**
- * HTML5 Media Controller - Wrapper for HTML5 Media API
- * @param {vjs.Player|Object} player
+ * Flash Media Controller - Wrapper for fallback SWF API
+ *
+ * @param {vjs.Player} player
  * @param {Object=} options
  * @param {Function=} ready
  * @constructor

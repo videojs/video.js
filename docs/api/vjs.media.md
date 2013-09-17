@@ -3,8 +3,6 @@
 # vjs.media
 
 
-undefined
-
 ---
 
 ## INDEX

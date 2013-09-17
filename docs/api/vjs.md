@@ -63,14 +63,14 @@ the main library object.
 > Ex. Event listneres are stored here.
 > (also from jsninja.com, slightly modified and updated for closure compiler)
 
-_defined in_: [src/js/lib.js#L184](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L184)
+_defined in_: [src/js/lib.js#L187](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L187)
 
 ---
 
 ### guid
 > Unique ID for an element or function
 
-_defined in_: [src/js/lib.js#L190](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L190)
+_defined in_: [src/js/lib.js#L193](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L193)
 
 ---
 
@@ -94,7 +94,7 @@ _defined in_: [src/js/core.js#L106](https://github.com/videojs/video.js/blob/mas
 ### support
 > Object to hold browser support information
 
-_defined in_: [src/js/lib.js#L425](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L425)
+_defined in_: [src/js/lib.js#L428](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L428)
 
 ---
 
@@ -107,7 +107,7 @@ _defined in_: [src/js/lib.js#L425](https://github.com/videojs/video.js/blob/mast
 * __element__ `Element` Element to add class name to
 * __classToAdd__ `String` Classname to add
 
-_defined in_: [src/js/lib.js#L264](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L264)
+_defined in_: [src/js/lib.js#L267](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L267)
 
 ---
 
@@ -123,7 +123,7 @@ _defined in_: [src/js/lib.js#L264](https://github.com/videojs/video.js/blob/mast
 ##### RETURNS: 
 * `Function` 
 
-_defined in_: [src/js/lib.js#L158](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L158)
+_defined in_: [src/js/lib.js#L161](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L161)
 
 ---
 
@@ -178,7 +178,7 @@ _defined in_: [src/js/lib.js#L9](https://github.com/videojs/video.js/blob/master
 ##### RETURNS: 
 * `Object` Fake TimeRange object
 
-_defined in_: [src/js/lib.js#L507](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L507)
+_defined in_: [src/js/lib.js#L510](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L510)
 
 ---
 
@@ -192,7 +192,7 @@ _defined in_: [src/js/lib.js#L507](https://github.com/videojs/video.js/blob/mast
 ##### RETURNS: 
 * `Element` Element with supplied ID
 
-_defined in_: [src/js/lib.js#L433](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L433)
+_defined in_: [src/js/lib.js#L436](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L436)
 
 ---
 
@@ -221,7 +221,7 @@ _defined in_: [src/js/events.js#L157](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `String` Time formatted as H:MM:SS or M:SS
 
-_defined in_: [src/js/lib.js#L449](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L449)
+_defined in_: [src/js/lib.js#L452](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L452)
 
 ---
 
@@ -233,7 +233,7 @@ _defined in_: [src/js/lib.js#L449](https://github.com/videojs/video.js/blob/mast
 * __onSuccess__ `Function` _(OPTIONAL)_ Success callback
 * __onError__ `Function` _(OPTIONAL)_ Error callback
 
-_defined in_: [src/js/lib.js#L521](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L521)
+_defined in_: [src/js/lib.js#L524](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L524)
 
 ---
 
@@ -247,7 +247,7 @@ _defined in_: [src/js/lib.js#L521](https://github.com/videojs/video.js/blob/mast
 ##### RETURNS: 
 * `String` Absolute URL
 
-_defined in_: [src/js/lib.js#L589](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L589)
+_defined in_: [src/js/lib.js#L592](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L592)
 
 ---
 
@@ -263,7 +263,7 @@ _defined in_: [src/js/lib.js#L589](https://github.com/videojs/video.js/blob/mast
 ##### RETURNS: 
 * `Object` 
 
-_defined in_: [src/js/lib.js#L356](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L356)
+_defined in_: [src/js/lib.js#L359](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L359)
 
 ---
 
@@ -278,7 +278,7 @@ _defined in_: [src/js/lib.js#L356](https://github.com/videojs/video.js/blob/mast
 ##### RETURNS: 
 * `String` Style value
 
-_defined in_: [src/js/lib.js#L396](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L396)
+_defined in_: [src/js/lib.js#L399](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L399)
 
 ---
 
@@ -291,7 +291,7 @@ _defined in_: [src/js/lib.js#L396](https://github.com/videojs/video.js/blob/mast
 ##### RETURNS: 
 * `Object` 
 
-_defined in_: [src/js/lib.js#L204](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L204)
+_defined in_: [src/js/lib.js#L207](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L207)
 
 ---
 
@@ -304,7 +304,7 @@ _defined in_: [src/js/lib.js#L204](https://github.com/videojs/video.js/blob/mast
 ##### RETURNS: 
 * `Object` 
 
-_defined in_: [src/js/lib.js#L218](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L218)
+_defined in_: [src/js/lib.js#L221](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L221)
 
 ---
 
@@ -315,7 +315,7 @@ _defined in_: [src/js/lib.js#L218](https://github.com/videojs/video.js/blob/mast
 * __child__ `Element` Element to insert
 * __parent__ `[type]` Element to insert child into
 
-_defined in_: [src/js/lib.js#L413](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L413)
+_defined in_: [src/js/lib.js#L416](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L416)
 
 ---
 
@@ -379,7 +379,7 @@ _defined in_: [src/js/plugins.js#L7](https://github.com/videojs/video.js/blob/ma
 * __element__ `Element` Element to remove from class name
 * __classToAdd__ `String` Classname to remove
 
-_defined in_: [src/js/lib.js#L275](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L275)
+_defined in_: [src/js/lib.js#L278](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L278)
 
 ---
 
@@ -389,7 +389,7 @@ _defined in_: [src/js/lib.js#L275](https://github.com/videojs/video.js/blob/mast
 ##### PARAMETERS: 
 * __el__ `Element` Remove data for an element
 
-_defined in_: [src/js/lib.js#L227](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L227)
+_defined in_: [src/js/lib.js#L230](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L230)
 
 ---
 
@@ -403,7 +403,7 @@ _defined in_: [src/js/lib.js#L227](https://github.com/videojs/video.js/blob/mast
 ##### RETURNS: 
 * `Number` Rounded number
 
-_defined in_: [src/js/lib.js#L493](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L493)
+_defined in_: [src/js/lib.js#L496](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L496)
 
 ---
 
@@ -427,7 +427,7 @@ _defined in_: [src/js/events.js#L259](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `String` Trimmed string
 
-_defined in_: [src/js/lib.js#L483](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L483)
+_defined in_: [src/js/lib.js#L486](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L486)
 
 ---
 
@@ -436,28 +436,28 @@ _defined in_: [src/js/lib.js#L483](https://github.com/videojs/video.js/blob/mast
 ### IS_IPHONE
 > Device is an iPhone
 
-_defined in_: [src/js/lib.js#L307](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L307)
+_defined in_: [src/js/lib.js#L310](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L310)
 
 ---
 
 ### TEST_VID
 > Element for testing browser HTML5 video capabilities
 
-_defined in_: [src/js/lib.js#L293](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L293)
+_defined in_: [src/js/lib.js#L296](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L296)
 
 ---
 
 ### USER_AGENT
 > Useragent for browser testing.
 
-_defined in_: [src/js/lib.js#L300](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L300)
+_defined in_: [src/js/lib.js#L303](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L303)
 
 ---
 
 ### expando
 > Unique attribute name to store an element's guid in
 
-_defined in_: [src/js/lib.js#L197](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L197)
+_defined in_: [src/js/lib.js#L200](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L200)
 
 ---
 

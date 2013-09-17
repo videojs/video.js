@@ -47,8 +47,11 @@ vjs.capitalize = function(string){
 vjs.obj = {};
 
 /**
- * Object.create shim for prototypal inheritance.
+ * Object.create shim for prototypal inheritance
+ *
  * https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object/create
+ *
+ * @function
  * @param  {Object}   obj Object to use as prototype
  */
  vjs.obj.create = Object.create || function(obj){
