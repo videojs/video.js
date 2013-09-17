@@ -51,9 +51,6 @@ the main library object.
   - [USER_AGENT](#user_agent)
   - [expando](#expando)
 
-- [UNDEFINED](#undefined)
-  - [JSON](#json)
-
 ---
 
 ## PROPERTIES
@@ -458,18 +455,6 @@ _defined in_: [src/js/lib.js#L303](https://github.com/videojs/video.js/blob/mast
 > Unique attribute name to store an element's guid in
 
 _defined in_: [src/js/lib.js#L200](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L200)
-
----
-
-## UNDEFINED
-
-### JSON
-> Javascript JSON implementation
-> (Parse Method Only)
-> https://github.com/douglascrockford/JSON-js/blob/master/json2.js
-> Only using for parse method when parsing data-setup attribute JSON.
-
-_defined in_: [src/js/json.js#L15](https://github.com/videojs/video.js/blob/master/src/js/json.js#L15)
 
 ---
 
