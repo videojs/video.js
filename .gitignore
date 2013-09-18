@@ -19,6 +19,5 @@ sandbox/*
 
 *.orig
 
-*.conf.js*
 *results.xml
 *.log

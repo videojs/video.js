@@ -121,14 +121,14 @@ module.exports = function(grunt) {
     },
     karma: {
       options: {
-        configFile: 'test-template.conf.js'
+        configFile: 'sandbox/karma.conf.js'
       },
       dev: {
-        configFile: 'test-template.conf.js',
+        configFile: 'sandbox/karma.conf.js',
         autoWatch: true
       },
       ci: {
-        configFile: 'test-template.conf.js',
+        configFile: 'sandbox/karma.conf.js',
         autoWatch: false
       }
     }
