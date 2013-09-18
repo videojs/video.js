@@ -2,13 +2,39 @@ HLS
 ============
 Thank you for using the beta version of HLS implementation in VideoJS. We have tried to make the usage of .m3u8 files similar to those of any other accepted technologies. As such, using HLS can be done via both the HTML <source> tag as well as setting the programmatic player.src setting.
 
-KNOWN ISSUES
-============
+Currently Supported M3U8 Tags
+-----------
+#EXTM3U
+#EXTINF
+#EXT-X-TARGETDURATION
+#EXT-X-MEDIA-SEQUENCE
+#EXT-X-PLAYLIST-TYPE
+#EXT-X-ENDLIST
+#EXT-X-STREAM-INF
+
+Tags Currently Ignored
+-----------
+#EXT-T-VERSION
+#EXT-T-I-FRAME-STREAM-INF
+#EXT-T-I-FRAMES-ONLY
+#EXT-T-DISCONTINUITY
+#EXT-T-MEDIA
+#EXT-T-ALLOW-CACHE
+#EXT-T-PROGRAM-DATE-TIME
+#EXT-T-KEY
+#EXT-T-BYTERANGE
+
+Draft Specification
+-----------
+For reference, see draft-pantos-http-live-streaming-11
+
+Known Issues
+-----------
 1. There is a known seeking issue where the player will seek to the beginning of the segment responsible for the seek time requested. We are aware of this issue and are working to resolve.
 2. Currently adaptive behavior is based entirely on bandwidth being detected and averaged over 3 non-cached segments. Future iteration will include logic for including viewport dimensions to help refine 'appropriate' indexes.
 
-USAGE NOTES
-============
+Usage Notes
+-----------
 1. The accepted mimetype is "application/mpegURL".
 2. The only accepted file extension is ".m3u8".
 3. Bandwidth for adaptive behavior must be greater than 1.1 x rendition bandwidth value to account for switching overhead.
@@ -26,7 +52,7 @@ To implement via HTML Tag:
 <video id="vid1" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264"
       poster="http://video-js.zencoder.com/oceans-clip.png"
       data-setup='{}'>
-    <source src="http://route/to/my_m3u8_url.m3u8" type='video/mp4'>
+    <source src="http://route/to/my_m3u8_url.m3u8" type='application/mpegURL'>
     <track kind="captions" src="../build/demo-files/demo.captions.vtt" srclang="en" label="English"></track><!-- Tracks need an ending tag thanks to IE9 -->
     <p>Video Playback Not Supported</p>
   </video>
