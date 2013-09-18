@@ -151,8 +151,9 @@ grunt test
 Video.js is also configured to run tests with Karma. Karma is installed as a grunt plugin to run QUnit tests in real browsers, as opposed to simply running the tests in phantomjs, a headless browser. 
 
 To run the QUnit test suite in Karma, do the following: 
-Open sandbox/karma.conf.js in an editor, and add the browsers to it that you want to run your tests in. The karma.conf.js has detailed information on usage in the file itself. 
-After you've added your browsers to karma.conf.js, run:
+1. Copy sandbox/karma.conf.example and rename the copy karma.conf.js.  Please note that if you decide to name the file something other than karma.conf.js, you will need to change references to karma.conf.js in Gruntfile to your new file name. (In order to provide a demo of Karma's capabilities, we decided to use karma.conf.js.)
+2. Open sandbox/karma.conf.js in an editor, and configure the properties in it as desired.  At a minimum, you'll want to add the browsers that you want to run your tests in.  The karma.conf.js file has detailed information on usage in the file itself. 
+After you've configured the desired properties in karma.conf.js, run:
 ```bash
 grunt karma:dev
 ```

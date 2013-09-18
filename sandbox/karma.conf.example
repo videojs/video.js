@@ -1,4 +1,8 @@
-// Karma configuration
+// Karma example configuration file
+// NOTE: To configure Karma tests, do the following:
+//       1.  Copy this file and rename the copy with a .conf.js extension, for example:  karma.conf.js
+//       2.  Configure the properties below in your conf.js copy
+//       3.  Run your tests
 
 // base path, that will be used to resolve files and exclude
 basePath = '';
