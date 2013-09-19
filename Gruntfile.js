@@ -118,6 +118,19 @@ module.exports = function(grunt) {
           'build/files/video-js.css': 'src/css/video-js.less'
         }
       }
+    },
+    karma: {
+      options: {
+        configFile: 'test/karma.conf.js'
+      },
+      dev: {
+        configFile: 'test/karma.conf.js',
+        autoWatch: true
+      },
+      ci: {
+        configFile: 'test/karma.conf.js',
+        autoWatch: false
+      }
     }
   });
 
@@ -130,6 +143,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-s3');
   grunt.loadNpmTasks('contribflow');
+  grunt.loadNpmTasks('grunt-karma');
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'less', 'build', 'minify', 'dist']);
