@@ -33,7 +33,9 @@
     "semver": "~1.1.4",
     "grunt-contrib-cssmin": "~0.6.0",
     "uglify-js": "~2.3.6",
-    "grunt-contrib-less": "~0.6.4"
+    "grunt-contrib-less": "~0.6.4",
+    "grunt-karma": "~0.4.4",
+    "karma-qunit": "~0.0.2"
   },
   "testling": {
     "browsers": [
