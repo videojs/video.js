@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## Unreleased (HEAD)
-_(none)_
+* Added Karma for cross-browser unit testing ([view](https://github.com/videojs/video.js/pull/714))
 
 --------------------
 
