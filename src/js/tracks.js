@@ -34,6 +34,7 @@ vjs.Player.prototype.textTracks = function(){
  * @param {String=} label       Optional label
  * @param {String=} language    Optional language
  * @param {Object=} options     Additional track options, like src
+ * @private
  */
 vjs.Player.prototype.addTextTrack = function(kind, label, language, options){
   var tracks = this.textTracks_ = this.textTracks_ || [];
@@ -67,6 +68,7 @@ vjs.Player.prototype.addTextTrack = function(kind, label, language, options){
  * Add an array of text tracks. captions, subtitles, chapters, descriptions
  * Track objects will be stored in the player.textTracks() array
  * @param {Array} trackList Array of track elements or objects (fake track elements)
+ * @private
  */
 vjs.Player.prototype.addTextTracks = function(trackList){
   var trackObj;

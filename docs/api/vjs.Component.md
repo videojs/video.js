@@ -38,12 +38,10 @@ Components are also event emitters.
   - [children](#children)
   - [contentEl](#contentel)
   - [createEl](#createel-tagname-attributes-)
-  - [dimension](#dimension-widthorheight-num-skiplisteners-)
   - [dimensions](#dimensions-width-height-)
   - [disable](#disable)
   - [dispose](#dispose)
   - [el](#el)
-  - [emitTapEvents](#emittapevents)
   - [getChild](#getchild-name-)
   - [getChildById](#getchildbyid-id-)
   - [height](#height-num-skiplisteners-)
@@ -51,7 +49,6 @@ Components are also event emitters.
   - [id](#id)
   - [init](#init-player-options-ready-)
   - [initChildren](#initchildren)
-  - [lockShowing](#lockshowing)
   - [name](#name)
   - [off](#off-type-fn-)
   - [on](#on-type-fn-)
@@ -64,8 +61,10 @@ Components are also event emitters.
   - [show](#show)
   - [trigger](#trigger-type-event-)
   - [triggerReady](#triggerready)
-  - [unlockShowing](#unlockshowing)
   - [width](#width-num-skiplisteners-)
+
+- [EVENTS](#events)
+  - [resize](#resize)
 
 ---
 
@@ -101,7 +100,7 @@ Components are also event emitters.
 ##### RETURNS: 
 * `vjs.Component` The child component (created by this process if a string was used)
 
-_defined in_: [src/js/component.js#L335](https://github.com/videojs/video.js/blob/master/src/js/component.js#L335)
+_defined in_: [src/js/component.js#L343](https://github.com/videojs/video.js/blob/master/src/js/component.js#L343)
 
 ---
 
@@ -114,7 +113,7 @@ _defined in_: [src/js/component.js#L335](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L608](https://github.com/videojs/video.js/blob/master/src/js/component.js#L608)
+_defined in_: [src/js/component.js#L628](https://github.com/videojs/video.js/blob/master/src/js/component.js#L628)
 
 ---
 
@@ -124,17 +123,19 @@ _defined in_: [src/js/component.js#L608](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `String` The constructed class name
 
-_defined in_: [src/js/component.js#L463](https://github.com/videojs/video.js/blob/master/src/js/component.js#L463)
+_defined in_: [src/js/component.js#L471](https://github.com/videojs/video.js/blob/master/src/js/component.js#L471)
 
 ---
 
 ### children()
-> Returns an array of all child components
+> Get an array of all child components
+> 
+>     var kids = myComponent.children();
 
 ##### RETURNS: 
-* `Array` 
+* `Array` The children
 
-_defined in_: [src/js/component.js#L269](https://github.com/videojs/video.js/blob/master/src/js/component.js#L269)
+_defined in_: [src/js/component.js#L277](https://github.com/videojs/video.js/blob/master/src/js/component.js#L277)
 
 ---
 
@@ -145,7 +146,7 @@ _defined in_: [src/js/component.js#L269](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `Element` 
 
-_defined in_: [src/js/component.js#L218](https://github.com/videojs/video.js/blob/master/src/js/component.js#L218)
+_defined in_: [src/js/component.js#L220](https://github.com/videojs/video.js/blob/master/src/js/component.js#L220)
 
 ---
 
@@ -163,30 +164,6 @@ _defined in_: [src/js/component.js#L190](https://github.com/videojs/video.js/blo
 
 ---
 
-### dimension( widthOrHeight, [num], [skipListeners] )
-> Get or set width or height
-> 
-> This is the shared code for the width() and height() methods.
-> All for an integer, integer + 'px' or integer + '%';
-> 
-> Known issue: Hidden elements officially have a width of 0. We're defaulting
-> to the style.width value and falling back to computedStyle which has the
-> hidden element issue. Info, but probably not an efficient fix:
-> http://www.foliotek.com/devblog/getting-the-width-of-a-hidden-element-with-jquery-using-width/
-
-##### PARAMETERS: 
-* __widthOrHeight__ `String` 'width' or 'height'
-* __num__ `Number|String` _(OPTIONAL)_ New dimension
-* __skipListeners__ `Boolean` _(OPTIONAL)_ Skip resize event trigger
-
-##### RETURNS: 
-* `vjs.Component` The component if a dimension was set
-* `Number|String` The dimension if nothing was set
-
-_defined in_: [src/js/component.js#L730](https://github.com/videojs/video.js/blob/master/src/js/component.js#L730)
-
----
-
 ### dimensions( width, height )
 > Set both width and height at the same time
 
@@ -197,14 +174,14 @@ _defined in_: [src/js/component.js#L730](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` The component
 
-_defined in_: [src/js/component.js#L708](https://github.com/videojs/video.js/blob/master/src/js/component.js#L708)
+_defined in_: [src/js/component.js#L730](https://github.com/videojs/video.js/blob/master/src/js/component.js#L730)
 
 ---
 
 ### disable()
 > Disable component by making it unshowable
 
-_defined in_: [src/js/component.js#L669](https://github.com/videojs/video.js/blob/master/src/js/component.js#L669)
+_defined in_: [src/js/component.js#L691](https://github.com/videojs/video.js/blob/master/src/js/component.js#L691)
 
 ---
 
@@ -216,25 +193,14 @@ _defined in_: [src/js/component.js#L74](https://github.com/videojs/video.js/blob
 ---
 
 ### el()
-> return the component's DOM element
+> Get the component's DOM element
+> 
+>     var domEl = myComponent.el();
 
 ##### RETURNS: 
 * `Element` 
 
-_defined in_: [src/js/component.js#L199](https://github.com/videojs/video.js/blob/master/src/js/component.js#L199)
-
----
-
-### emitTapEvents()
-> Emit 'tap' events when touch events are supported
-> 
-> This is used to support toggling the controls through a tap on the video.
-> 
-> We're requireing them to be enabled because otherwise every component would
-> have this extra overhead unnecessarily, on mobile devices where extra
-> overhead is especially bad.
-
-_defined in_: [src/js/component.js#L791](https://github.com/videojs/video.js/blob/master/src/js/component.js#L791)
+_defined in_: [src/js/component.js#L201](https://github.com/videojs/video.js/blob/master/src/js/component.js#L201)
 
 ---
 
@@ -247,7 +213,7 @@ _defined in_: [src/js/component.js#L791](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L303](https://github.com/videojs/video.js/blob/master/src/js/component.js#L303)
+_defined in_: [src/js/component.js#L311](https://github.com/videojs/video.js/blob/master/src/js/component.js#L311)
 
 ---
 
@@ -260,7 +226,7 @@ _defined in_: [src/js/component.js#L303](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L286](https://github.com/videojs/video.js/blob/master/src/js/component.js#L286)
+_defined in_: [src/js/component.js#L294](https://github.com/videojs/video.js/blob/master/src/js/component.js#L294)
 
 ---
 
@@ -275,7 +241,7 @@ _defined in_: [src/js/component.js#L286](https://github.com/videojs/video.js/blo
 * `vjs.Component` The component if the height was set
 * `Number|String` The height if it wasn't set
 
-_defined in_: [src/js/component.js#L697](https://github.com/videojs/video.js/blob/master/src/js/component.js#L697)
+_defined in_: [src/js/component.js#L719](https://github.com/videojs/video.js/blob/master/src/js/component.js#L719)
 
 ---
 
@@ -285,17 +251,19 @@ _defined in_: [src/js/component.js#L697](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L639](https://github.com/videojs/video.js/blob/master/src/js/component.js#L639)
+_defined in_: [src/js/component.js#L659](https://github.com/videojs/video.js/blob/master/src/js/component.js#L659)
 
 ---
 
 ### id()
-> Returns the component's ID
+> Get the component's ID
+> 
+>     var id = myComponent.id();
 
 ##### RETURNS: 
 * `String` 
 
-_defined in_: [src/js/component.js#L235](https://github.com/videojs/video.js/blob/master/src/js/component.js#L235)
+_defined in_: [src/js/component.js#L239](https://github.com/videojs/video.js/blob/master/src/js/component.js#L239)
 
 ---
 
@@ -322,33 +290,26 @@ _defined in_: [src/js/component.js#L41](https://github.com/videojs/video.js/blob
 >       }
 >     }
 
-_defined in_: [src/js/component.js#L431](https://github.com/videojs/video.js/blob/master/src/js/component.js#L431)
-
----
-
-### lockShowing()
-> Lock an item in its visible state
-> To be used with fadeIn/fadeOut.
-
-##### RETURNS: 
-* `vjs.Component` 
-
-_defined in_: [src/js/component.js#L650](https://github.com/videojs/video.js/blob/master/src/js/component.js#L650)
+_defined in_: [src/js/component.js#L439](https://github.com/videojs/video.js/blob/master/src/js/component.js#L439)
 
 ---
 
 ### name()
-> Returns the component's name
+> Get the component's name. The name is often used to reference the component.
+> 
+>     var name = myComponent.name();
 
 ##### RETURNS: 
 * `String` 
 
-_defined in_: [src/js/component.js#L252](https://github.com/videojs/video.js/blob/master/src/js/component.js#L252)
+_defined in_: [src/js/component.js#L258](https://github.com/videojs/video.js/blob/master/src/js/component.js#L258)
 
 ---
 
 ### off( [type], [fn] )
 > Remove an event listener from the component's element
+> 
+>     myComponent.off("eventName", myFunc);
 
 ##### PARAMETERS: 
 * __type__ `String` _(OPTIONAL)_ Event type. Without type it will remove all listeners.
@@ -357,22 +318,30 @@ _defined in_: [src/js/component.js#L252](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L492](https://github.com/videojs/video.js/blob/master/src/js/component.js#L492)
+_defined in_: [src/js/component.js#L510](https://github.com/videojs/video.js/blob/master/src/js/component.js#L510)
 
 ---
 
 ### on( type, fn )
 > Add an event listener to this component's element
+> 
+>     var myFunc = function(){
+>       var myPlayer = this;
+>       // Do something when the event is fired
+>     };
+> 
+>     myPlayer.on("eventName", myFunc);
+> 
 > The context will be the component.
 
 ##### PARAMETERS: 
-* __type__ `String` Event type e.g. 'click'
-* __fn__ `Function` Event listener
+* __type__ `String` The event type e.g. 'click'
+* __fn__ `Function` The event listener
 
 ##### RETURNS: 
-* `vjs.Component` 
+* `vjs.Component` self
 
-_defined in_: [src/js/component.js#L480](https://github.com/videojs/video.js/blob/master/src/js/component.js#L480)
+_defined in_: [src/js/component.js#L496](https://github.com/videojs/video.js/blob/master/src/js/component.js#L496)
 
 ---
 
@@ -386,7 +355,7 @@ _defined in_: [src/js/component.js#L480](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L504](https://github.com/videojs/video.js/blob/master/src/js/component.js#L504)
+_defined in_: [src/js/component.js#L522](https://github.com/videojs/video.js/blob/master/src/js/component.js#L522)
 
 ---
 
@@ -460,7 +429,7 @@ _defined in_: [src/js/component.js#L116](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L561](https://github.com/videojs/video.js/blob/master/src/js/component.js#L561)
+_defined in_: [src/js/component.js#L581](https://github.com/videojs/video.js/blob/master/src/js/component.js#L581)
 
 ---
 
@@ -471,7 +440,7 @@ _defined in_: [src/js/component.js#L561](https://github.com/videojs/video.js/blo
 ##### PARAMETERS: 
 * __component__ `vjs.Component` Component to remove
 
-_defined in_: [src/js/component.js#L393](https://github.com/videojs/video.js/blob/master/src/js/component.js#L393)
+_defined in_: [src/js/component.js#L401](https://github.com/videojs/video.js/blob/master/src/js/component.js#L401)
 
 ---
 
@@ -484,7 +453,7 @@ _defined in_: [src/js/component.js#L393](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L619](https://github.com/videojs/video.js/blob/master/src/js/component.js#L619)
+_defined in_: [src/js/component.js#L639](https://github.com/videojs/video.js/blob/master/src/js/component.js#L639)
 
 ---
 
@@ -494,21 +463,23 @@ _defined in_: [src/js/component.js#L619](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L629](https://github.com/videojs/video.js/blob/master/src/js/component.js#L629)
+_defined in_: [src/js/component.js#L649](https://github.com/videojs/video.js/blob/master/src/js/component.js#L649)
 
 ---
 
 ### trigger( type, event )
 > Trigger an event on an element
+> 
+>     myComponent.trigger('eventName');
 
 ##### PARAMETERS: 
-* __type__ `String` Event type to trigger
-* __event__ `Event|Object` Event object to be passed to the listener
+* __type__ `String` The event type to trigger, e.g. 'click'
+* __event__ `Event|Object` The event object to be passed to the listener
 
 ##### RETURNS: 
-* `vjs.Component` 
+* `vjs.Component` self
 
-_defined in_: [src/js/component.js#L516](https://github.com/videojs/video.js/blob/master/src/js/component.js#L516)
+_defined in_: [src/js/component.js#L536](https://github.com/videojs/video.js/blob/master/src/js/component.js#L536)
 
 ---
 
@@ -518,18 +489,7 @@ _defined in_: [src/js/component.js#L516](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L580](https://github.com/videojs/video.js/blob/master/src/js/component.js#L580)
-
----
-
-### unlockShowing()
-> Unlock an item to be hidden
-> To be used with fadeIn/fadeOut.
-
-##### RETURNS: 
-* `vjs.Component` 
-
-_defined in_: [src/js/component.js#L661](https://github.com/videojs/video.js/blob/master/src/js/component.js#L661)
+_defined in_: [src/js/component.js#L600](https://github.com/videojs/video.js/blob/master/src/js/component.js#L600)
 
 ---
 
@@ -547,7 +507,16 @@ _defined in_: [src/js/component.js#L661](https://github.com/videojs/video.js/blo
 * `vjs.Component` Returns 'this' if width was set
 * `Number|String` Returns the width if nothing was set
 
-_defined in_: [src/js/component.js#L685](https://github.com/videojs/video.js/blob/master/src/js/component.js#L685)
+_defined in_: [src/js/component.js#L707](https://github.com/videojs/video.js/blob/master/src/js/component.js#L707)
+
+---
+
+## EVENTS
+
+### resize
+> Fired when the width and/or height of the component changes
+
+_defined in_: [src/js/component.js#L809](https://github.com/videojs/video.js/blob/master/src/js/component.js#L809)
 
 ---
 

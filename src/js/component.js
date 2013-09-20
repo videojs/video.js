@@ -192,7 +192,9 @@ vjs.Component.prototype.createEl = function(tagName, attributes){
 };
 
 /**
- * return the component's DOM element
+ * Get the component's DOM element
+ *
+ *     var domEl = myComponent.el();
  *
  * @return {Element}
  */
@@ -228,7 +230,9 @@ vjs.Component.prototype.contentEl = function(){
 vjs.Component.prototype.id_;
 
 /**
- * Returns the component's ID
+ * Get the component's ID
+ *
+ *     var id = myComponent.id();
  *
  * @return {String}
  */
@@ -245,7 +249,9 @@ vjs.Component.prototype.id = function(){
 vjs.Component.prototype.name_;
 
 /**
- * Returns the component's name
+ * Get the component's name. The name is often used to reference the component.
+ *
+ *     var name = myComponent.name();
  *
  * @return {String}
  */
@@ -262,9 +268,11 @@ vjs.Component.prototype.name = function(){
 vjs.Component.prototype.children_;
 
 /**
- * Returns an array of all child components
+ * Get an array of all child components
  *
- * @return {Array}
+ *     var kids = myComponent.children();
+ *
+ * @return {Array} The children
  */
 vjs.Component.prototype.children = function(){
   return this.children_;
@@ -471,11 +479,19 @@ vjs.Component.prototype.buildCSSClass = function(){
 
 /**
  * Add an event listener to this component's element
+ *
+ *     var myFunc = function(){
+ *       var myPlayer = this;
+ *       // Do something when the event is fired
+ *     };
+ *
+ *     myPlayer.on("eventName", myFunc);
+ *
  * The context will be the component.
  *
- * @param  {String}   type Event type e.g. 'click'
- * @param  {Function} fn   Event listener
- * @return {vjs.Component}
+ * @param  {String}   type The event type e.g. 'click'
+ * @param  {Function} fn   The event listener
+ * @return {vjs.Component} self
  */
 vjs.Component.prototype.on = function(type, fn){
   vjs.on(this.el_, type, vjs.bind(this, fn));
@@ -484,6 +500,8 @@ vjs.Component.prototype.on = function(type, fn){
 
 /**
  * Remove an event listener from the component's element
+ *
+ *     myComponent.off("eventName", myFunc);
  *
  * @param  {String=}   type Event type. Without type it will remove all listeners.
  * @param  {Function=} fn   Event listener. Without fn it will remove all listeners for a type.
@@ -509,9 +527,11 @@ vjs.Component.prototype.one = function(type, fn) {
 /**
  * Trigger an event on an element
  *
- * @param  {String} type  Event type to trigger
- * @param  {Event|Object} event Event object to be passed to the listener
- * @return {vjs.Component}
+ *     myComponent.trigger('eventName');
+ *
+ * @param  {String}       type  The event type to trigger, e.g. 'click'
+ * @param  {Event|Object} event The event object to be passed to the listener
+ * @return {vjs.Component}      self
  */
 vjs.Component.prototype.trigger = function(type, event){
   vjs.trigger(this.el_, type, event);
@@ -646,6 +666,7 @@ vjs.Component.prototype.hide = function(){
  * To be used with fadeIn/fadeOut.
  *
  * @return {vjs.Component}
+ * @private
  */
 vjs.Component.prototype.lockShowing = function(){
   this.addClass('vjs-lock-showing');
@@ -657,6 +678,7 @@ vjs.Component.prototype.lockShowing = function(){
  * To be used with fadeIn/fadeOut.
  *
  * @return {vjs.Component}
+ * @private
  */
 vjs.Component.prototype.unlockShowing = function(){
   this.removeClass('vjs-lock-showing');
@@ -726,6 +748,7 @@ vjs.Component.prototype.dimensions = function(width, height){
  * @param  {Boolean=} skipListeners Skip resize event trigger
  * @return {vjs.Component} The component if a dimension was set
  * @return {Number|String} The dimension if nothing was set
+ * @private
  */
 vjs.Component.prototype.dimension = function(widthOrHeight, num, skipListeners){
   if (num !== undefined) {
@@ -780,6 +803,12 @@ vjs.Component.prototype.dimension = function(widthOrHeight, num, skipListeners){
 };
 
 /**
+ * Fired when the width and/or height of the component changes
+ * @event resize
+ */
+vjs.Component.prototype.onResize;
+
+/**
  * Emit 'tap' events when touch events are supported
  *
  * This is used to support toggling the controls through a tap on the video.
@@ -787,6 +816,7 @@ vjs.Component.prototype.dimension = function(widthOrHeight, num, skipListeners){
  * We're requireing them to be enabled because otherwise every component would
  * have this extra overhead unnecessarily, on mobile devices where extra
  * overhead is especially bad.
+ * @private
  */
 vjs.Component.prototype.emitTapEvents = function(){
   var touchStart, touchTime, couldBeTap, noTap;
