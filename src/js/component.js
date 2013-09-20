@@ -5,6 +5,27 @@
 
 /**
  * Base UI Component class
+ *
+ * Components are embeddable UI objects that are represented by both a
+ * javascript object and an element in the DOM. They can be children of other
+ * components, and can have many children themselves.
+ *
+ *     // adding a button to the player
+ *     var button = player.addChild('button');
+ *     button.el(); // -> button element
+ *
+ *     <div class="video-js">
+ *       <div class="vjs-button">Button</div>
+ *     </div>
+ *
+ * Components are also event emitters.
+ *
+ *     button.on('click', function(){
+ *       console.log('Button Clicked!');
+ *     });
+ *
+ *     button.trigger('customevent');
+ *
  * @param {Object} player  Main Player
  * @param {Object=} options
  * @class

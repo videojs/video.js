@@ -1,5 +1,6 @@
 /**
- * Mute the audio
+ * A button component for muting the audio
+ *
  * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor

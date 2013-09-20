@@ -1,4 +1,7 @@
 /**
+ * The Media Loader is the component that decides which playback technology to load
+ * when the player is initialized.
+ *
  * @constructor
  */
 vjs.MediaLoader = vjs.Component.extend({

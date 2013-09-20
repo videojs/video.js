@@ -81,7 +81,7 @@ Toggle fullscreen video
 ##### RETURNS: 
 * `vjs.Component` The child component (created by this process if a string was used)
 
-_inherited from_: [src/js/component.js#L314](https://github.com/videojs/video.js/blob/master/src/js/component.js#L314)
+_inherited from_: [src/js/component.js#L335](https://github.com/videojs/video.js/blob/master/src/js/component.js#L335)
 
 ---
 
@@ -94,7 +94,7 @@ _inherited from_: [src/js/component.js#L314](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L587](https://github.com/videojs/video.js/blob/master/src/js/component.js#L587)
+_inherited from_: [src/js/component.js#L608](https://github.com/videojs/video.js/blob/master/src/js/component.js#L608)
 
 ---
 
@@ -104,7 +104,7 @@ _inherited from_: [src/js/component.js#L587](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `String` The constructed class name
 
-_inherited from_: [src/js/component.js#L442](https://github.com/videojs/video.js/blob/master/src/js/component.js#L442)
+_inherited from_: [src/js/component.js#L463](https://github.com/videojs/video.js/blob/master/src/js/component.js#L463)
 
 ---
 
@@ -114,7 +114,7 @@ _inherited from_: [src/js/component.js#L442](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Array` 
 
-_inherited from_: [src/js/component.js#L248](https://github.com/videojs/video.js/blob/master/src/js/component.js#L248)
+_inherited from_: [src/js/component.js#L269](https://github.com/videojs/video.js/blob/master/src/js/component.js#L269)
 
 ---
 
@@ -125,7 +125,7 @@ _inherited from_: [src/js/component.js#L248](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Element` 
 
-_inherited from_: [src/js/component.js#L197](https://github.com/videojs/video.js/blob/master/src/js/component.js#L197)
+_inherited from_: [src/js/component.js#L218](https://github.com/videojs/video.js/blob/master/src/js/component.js#L218)
 
 ---
 
@@ -139,7 +139,7 @@ _inherited from_: [src/js/component.js#L197](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Element` 
 
-_inherited from_: [src/js/component.js#L169](https://github.com/videojs/video.js/blob/master/src/js/component.js#L169)
+_inherited from_: [src/js/component.js#L190](https://github.com/videojs/video.js/blob/master/src/js/component.js#L190)
 
 ---
 
@@ -163,7 +163,7 @@ _inherited from_: [src/js/component.js#L169](https://github.com/videojs/video.js
 * `vjs.Component` The component if a dimension was set
 * `Number|String` The dimension if nothing was set
 
-_inherited from_: [src/js/component.js#L709](https://github.com/videojs/video.js/blob/master/src/js/component.js#L709)
+_inherited from_: [src/js/component.js#L730](https://github.com/videojs/video.js/blob/master/src/js/component.js#L730)
 
 ---
 
@@ -177,21 +177,21 @@ _inherited from_: [src/js/component.js#L709](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` The component
 
-_inherited from_: [src/js/component.js#L687](https://github.com/videojs/video.js/blob/master/src/js/component.js#L687)
+_inherited from_: [src/js/component.js#L708](https://github.com/videojs/video.js/blob/master/src/js/component.js#L708)
 
 ---
 
 ### disable()
 > Disable component by making it unshowable
 
-_inherited from_: [src/js/component.js#L648](https://github.com/videojs/video.js/blob/master/src/js/component.js#L648)
+_inherited from_: [src/js/component.js#L669](https://github.com/videojs/video.js/blob/master/src/js/component.js#L669)
 
 ---
 
 ### dispose()
 > Dispose of the component and all child components
 
-_inherited from_: [src/js/component.js#L53](https://github.com/videojs/video.js/blob/master/src/js/component.js#L53)
+_inherited from_: [src/js/component.js#L74](https://github.com/videojs/video.js/blob/master/src/js/component.js#L74)
 
 ---
 
@@ -201,7 +201,7 @@ _inherited from_: [src/js/component.js#L53](https://github.com/videojs/video.js/
 ##### RETURNS: 
 * `Element` 
 
-_inherited from_: [src/js/component.js#L178](https://github.com/videojs/video.js/blob/master/src/js/component.js#L178)
+_inherited from_: [src/js/component.js#L199](https://github.com/videojs/video.js/blob/master/src/js/component.js#L199)
 
 ---
 
@@ -214,7 +214,7 @@ _inherited from_: [src/js/component.js#L178](https://github.com/videojs/video.js
 > have this extra overhead unnecessarily, on mobile devices where extra
 > overhead is especially bad.
 
-_inherited from_: [src/js/component.js#L770](https://github.com/videojs/video.js/blob/master/src/js/component.js#L770)
+_inherited from_: [src/js/component.js#L791](https://github.com/videojs/video.js/blob/master/src/js/component.js#L791)
 
 ---
 
@@ -227,7 +227,7 @@ _inherited from_: [src/js/component.js#L770](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L282](https://github.com/videojs/video.js/blob/master/src/js/component.js#L282)
+_inherited from_: [src/js/component.js#L303](https://github.com/videojs/video.js/blob/master/src/js/component.js#L303)
 
 ---
 
@@ -240,7 +240,7 @@ _inherited from_: [src/js/component.js#L282](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L265](https://github.com/videojs/video.js/blob/master/src/js/component.js#L265)
+_inherited from_: [src/js/component.js#L286](https://github.com/videojs/video.js/blob/master/src/js/component.js#L286)
 
 ---
 
@@ -255,7 +255,7 @@ _inherited from_: [src/js/component.js#L265](https://github.com/videojs/video.js
 * `vjs.Component` The component if the height was set
 * `Number|String` The height if it wasn't set
 
-_inherited from_: [src/js/component.js#L676](https://github.com/videojs/video.js/blob/master/src/js/component.js#L676)
+_inherited from_: [src/js/component.js#L697](https://github.com/videojs/video.js/blob/master/src/js/component.js#L697)
 
 ---
 
@@ -265,7 +265,7 @@ _inherited from_: [src/js/component.js#L676](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L618](https://github.com/videojs/video.js/blob/master/src/js/component.js#L618)
+_inherited from_: [src/js/component.js#L639](https://github.com/videojs/video.js/blob/master/src/js/component.js#L639)
 
 ---
 
@@ -275,7 +275,7 @@ _inherited from_: [src/js/component.js#L618](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `String` 
 
-_inherited from_: [src/js/component.js#L214](https://github.com/videojs/video.js/blob/master/src/js/component.js#L214)
+_inherited from_: [src/js/component.js#L235](https://github.com/videojs/video.js/blob/master/src/js/component.js#L235)
 
 ---
 
@@ -300,7 +300,7 @@ _defined in_: [src/js/control-bar/fullscreen-toggle.js#L14](https://github.com/v
 >       }
 >     }
 
-_inherited from_: [src/js/component.js#L410](https://github.com/videojs/video.js/blob/master/src/js/component.js#L410)
+_inherited from_: [src/js/component.js#L431](https://github.com/videojs/video.js/blob/master/src/js/component.js#L431)
 
 ---
 
@@ -311,7 +311,7 @@ _inherited from_: [src/js/component.js#L410](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L629](https://github.com/videojs/video.js/blob/master/src/js/component.js#L629)
+_inherited from_: [src/js/component.js#L650](https://github.com/videojs/video.js/blob/master/src/js/component.js#L650)
 
 ---
 
@@ -321,7 +321,7 @@ _inherited from_: [src/js/component.js#L629](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `String` 
 
-_inherited from_: [src/js/component.js#L231](https://github.com/videojs/video.js/blob/master/src/js/component.js#L231)
+_inherited from_: [src/js/component.js#L252](https://github.com/videojs/video.js/blob/master/src/js/component.js#L252)
 
 ---
 
@@ -335,7 +335,7 @@ _inherited from_: [src/js/component.js#L231](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L471](https://github.com/videojs/video.js/blob/master/src/js/component.js#L471)
+_inherited from_: [src/js/component.js#L492](https://github.com/videojs/video.js/blob/master/src/js/component.js#L492)
 
 ---
 
@@ -350,7 +350,7 @@ _inherited from_: [src/js/component.js#L471](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L459](https://github.com/videojs/video.js/blob/master/src/js/component.js#L459)
+_inherited from_: [src/js/component.js#L480](https://github.com/videojs/video.js/blob/master/src/js/component.js#L480)
 
 ---
 
@@ -364,7 +364,7 @@ _inherited from_: [src/js/component.js#L459](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L483](https://github.com/videojs/video.js/blob/master/src/js/component.js#L483)
+_inherited from_: [src/js/component.js#L504](https://github.com/videojs/video.js/blob/master/src/js/component.js#L504)
 
 ---
 
@@ -412,7 +412,7 @@ _inherited from_: [src/js/component.js#L483](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Object` NEW merged object. Does not return obj1.
 
-_inherited from_: [src/js/component.js#L148](https://github.com/videojs/video.js/blob/master/src/js/component.js#L148)
+_inherited from_: [src/js/component.js#L169](https://github.com/videojs/video.js/blob/master/src/js/component.js#L169)
 
 ---
 
@@ -422,7 +422,7 @@ _inherited from_: [src/js/component.js#L148](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Player` 
 
-_inherited from_: [src/js/component.js#L95](https://github.com/videojs/video.js/blob/master/src/js/component.js#L95)
+_inherited from_: [src/js/component.js#L116](https://github.com/videojs/video.js/blob/master/src/js/component.js#L116)
 
 ---
 
@@ -438,7 +438,7 @@ _inherited from_: [src/js/component.js#L95](https://github.com/videojs/video.js/
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L540](https://github.com/videojs/video.js/blob/master/src/js/component.js#L540)
+_inherited from_: [src/js/component.js#L561](https://github.com/videojs/video.js/blob/master/src/js/component.js#L561)
 
 ---
 
@@ -449,7 +449,7 @@ _inherited from_: [src/js/component.js#L540](https://github.com/videojs/video.js
 ##### PARAMETERS: 
 * __component__ `vjs.Component` Component to remove
 
-_inherited from_: [src/js/component.js#L372](https://github.com/videojs/video.js/blob/master/src/js/component.js#L372)
+_inherited from_: [src/js/component.js#L393](https://github.com/videojs/video.js/blob/master/src/js/component.js#L393)
 
 ---
 
@@ -462,7 +462,7 @@ _inherited from_: [src/js/component.js#L372](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L598](https://github.com/videojs/video.js/blob/master/src/js/component.js#L598)
+_inherited from_: [src/js/component.js#L619](https://github.com/videojs/video.js/blob/master/src/js/component.js#L619)
 
 ---
 
@@ -472,7 +472,7 @@ _inherited from_: [src/js/component.js#L598](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L608](https://github.com/videojs/video.js/blob/master/src/js/component.js#L608)
+_inherited from_: [src/js/component.js#L629](https://github.com/videojs/video.js/blob/master/src/js/component.js#L629)
 
 ---
 
@@ -486,7 +486,7 @@ _inherited from_: [src/js/component.js#L608](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L495](https://github.com/videojs/video.js/blob/master/src/js/component.js#L495)
+_inherited from_: [src/js/component.js#L516](https://github.com/videojs/video.js/blob/master/src/js/component.js#L516)
 
 ---
 
@@ -496,7 +496,7 @@ _inherited from_: [src/js/component.js#L495](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L559](https://github.com/videojs/video.js/blob/master/src/js/component.js#L559)
+_inherited from_: [src/js/component.js#L580](https://github.com/videojs/video.js/blob/master/src/js/component.js#L580)
 
 ---
 
@@ -507,7 +507,7 @@ _inherited from_: [src/js/component.js#L559](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L640](https://github.com/videojs/video.js/blob/master/src/js/component.js#L640)
+_inherited from_: [src/js/component.js#L661](https://github.com/videojs/video.js/blob/master/src/js/component.js#L661)
 
 ---
 
@@ -525,7 +525,7 @@ _inherited from_: [src/js/component.js#L640](https://github.com/videojs/video.js
 * `vjs.Component` Returns 'this' if width was set
 * `Number|String` Returns the width if nothing was set
 
-_inherited from_: [src/js/component.js#L664](https://github.com/videojs/video.js/blob/master/src/js/component.js#L664)
+_inherited from_: [src/js/component.js#L685](https://github.com/videojs/video.js/blob/master/src/js/component.js#L685)
 
 ---
 

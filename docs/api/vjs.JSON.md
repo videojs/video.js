@@ -2,12 +2,6 @@
 
 # vjs.JSON
 
-__DEFINED IN__: [src/js/json.js#L15](https://github.com/videojs/video.js/blob/master/src/js/json.js#L15)  
-
-Javascript JSON implementation
-(Parse Method Only)
-https://github.com/douglascrockford/JSON-js/blob/master/json2.js
-Only using for parse method when parsing data-setup attribute JSON.
 
 ---
 
@@ -30,7 +24,7 @@ Only using for parse method when parsing data-setup attribute JSON.
 ##### RETURNS: 
 * `Object|Array` The parsed JSON
 
-_defined in_: [src/js/json.js#L31](https://github.com/videojs/video.js/blob/master/src/js/json.js#L31)
+_defined in_: [src/js/json.js#L32](https://github.com/videojs/video.js/blob/master/src/js/json.js#L32)
 
 ---
 

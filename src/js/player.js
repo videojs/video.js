@@ -1,5 +1,5 @@
 /**
- * An instance of the `Video.Player` class is created when any of the Video.js setup methods are used to initialize a video.
+ * An instance of the `vjs.Player` class is created when any of the Video.js setup methods are used to initialize a video.
  *
  * ```js
  * var myPlayer = Video('example_video_1');

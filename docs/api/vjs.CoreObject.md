@@ -2,7 +2,7 @@
 
 # vjs.CoreObject
 
-__DEFINED IN__: [src/js/core-object.js#L51](https://github.com/videojs/video.js/blob/master/src/js/core-object.js#L51)  
+__DEFINED IN__: [src/js/core-object.js#L52](https://github.com/videojs/video.js/blob/master/src/js/core-object.js#L52)  
 
 Core Object/Class for objects that use inheritance + contstructors
 
@@ -56,14 +56,14 @@ Methods and properties can be overridden in subclasses.
 ## INDEX
 
 - [METHODS](#methods)
-  - [create](#create)
-  - [extend](#extend-props-)
+  - [create](#create-static)
+  - [extend](#extend-props--static)
 
 ---
 
 ## METHODS
 
-### create()
+### create() `STATIC`
 > Create a new instace of this Object class
 > 
 >     var myAnimal = Animal.create();
@@ -71,11 +71,11 @@ Methods and properties can be overridden in subclasses.
 ##### RETURNS: 
 * `vjs.CoreObject` An instance of a CoreObject subclass
 
-_defined in_: [src/js/core-object.js#L119](https://github.com/videojs/video.js/blob/master/src/js/core-object.js#L119)
+_defined in_: [src/js/core-object.js#L120](https://github.com/videojs/video.js/blob/master/src/js/core-object.js#L120)
 
 ---
 
-### extend( props )
+### extend( props ) `STATIC`
 > Create a new object that inherits from this Object
 > 
 >     var Animal = CoreObject.extend();
@@ -87,7 +87,7 @@ _defined in_: [src/js/core-object.js#L119](https://github.com/videojs/video.js/b
 ##### RETURNS: 
 * `vjs.CoreObject` An object that inherits from CoreObject
 
-_defined in_: [src/js/core-object.js#L69](https://github.com/videojs/video.js/blob/master/src/js/core-object.js#L69)
+_defined in_: [src/js/core-object.js#L70](https://github.com/videojs/video.js/blob/master/src/js/core-object.js#L70)
 
 ---
 

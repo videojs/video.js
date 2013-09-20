@@ -3,9 +3,29 @@
 # vjs.Component
 
 __EXTENDS__: [vjs.CoreObject](vjs.CoreObject.md)  
-__DEFINED IN__: [src/js/component.js#L14](https://github.com/videojs/video.js/blob/master/src/js/component.js#L14)  
+__DEFINED IN__: [src/js/component.js#L35](https://github.com/videojs/video.js/blob/master/src/js/component.js#L35)  
 
 Base UI Component class
+
+Components are embeddable UI objects that are represented by both a
+javascript object and an element in the DOM. They can be children of other
+components, and can have many children themselves.
+
+    // adding a button to the player
+    var button = player.addChild('button');
+    button.el(); // -> button element
+
+    <div class="video-js">
+      <div class="vjs-button">Button</div>
+    </div>
+
+Components are also event emitters.
+
+    button.on('click', function(){
+      console.log('Button Clicked!');
+    });
+
+    button.trigger('customevent');
 
 ---
 
@@ -81,7 +101,7 @@ Base UI Component class
 ##### RETURNS: 
 * `vjs.Component` The child component (created by this process if a string was used)
 
-_defined in_: [src/js/component.js#L314](https://github.com/videojs/video.js/blob/master/src/js/component.js#L314)
+_defined in_: [src/js/component.js#L335](https://github.com/videojs/video.js/blob/master/src/js/component.js#L335)
 
 ---
 
@@ -94,7 +114,7 @@ _defined in_: [src/js/component.js#L314](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L587](https://github.com/videojs/video.js/blob/master/src/js/component.js#L587)
+_defined in_: [src/js/component.js#L608](https://github.com/videojs/video.js/blob/master/src/js/component.js#L608)
 
 ---
 
@@ -104,7 +124,7 @@ _defined in_: [src/js/component.js#L587](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `String` The constructed class name
 
-_defined in_: [src/js/component.js#L442](https://github.com/videojs/video.js/blob/master/src/js/component.js#L442)
+_defined in_: [src/js/component.js#L463](https://github.com/videojs/video.js/blob/master/src/js/component.js#L463)
 
 ---
 
@@ -114,7 +134,7 @@ _defined in_: [src/js/component.js#L442](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `Array` 
 
-_defined in_: [src/js/component.js#L248](https://github.com/videojs/video.js/blob/master/src/js/component.js#L248)
+_defined in_: [src/js/component.js#L269](https://github.com/videojs/video.js/blob/master/src/js/component.js#L269)
 
 ---
 
@@ -125,7 +145,7 @@ _defined in_: [src/js/component.js#L248](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `Element` 
 
-_defined in_: [src/js/component.js#L197](https://github.com/videojs/video.js/blob/master/src/js/component.js#L197)
+_defined in_: [src/js/component.js#L218](https://github.com/videojs/video.js/blob/master/src/js/component.js#L218)
 
 ---
 
@@ -139,7 +159,7 @@ _defined in_: [src/js/component.js#L197](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `Element` 
 
-_defined in_: [src/js/component.js#L169](https://github.com/videojs/video.js/blob/master/src/js/component.js#L169)
+_defined in_: [src/js/component.js#L190](https://github.com/videojs/video.js/blob/master/src/js/component.js#L190)
 
 ---
 
@@ -163,7 +183,7 @@ _defined in_: [src/js/component.js#L169](https://github.com/videojs/video.js/blo
 * `vjs.Component` The component if a dimension was set
 * `Number|String` The dimension if nothing was set
 
-_defined in_: [src/js/component.js#L709](https://github.com/videojs/video.js/blob/master/src/js/component.js#L709)
+_defined in_: [src/js/component.js#L730](https://github.com/videojs/video.js/blob/master/src/js/component.js#L730)
 
 ---
 
@@ -177,21 +197,21 @@ _defined in_: [src/js/component.js#L709](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` The component
 
-_defined in_: [src/js/component.js#L687](https://github.com/videojs/video.js/blob/master/src/js/component.js#L687)
+_defined in_: [src/js/component.js#L708](https://github.com/videojs/video.js/blob/master/src/js/component.js#L708)
 
 ---
 
 ### disable()
 > Disable component by making it unshowable
 
-_defined in_: [src/js/component.js#L648](https://github.com/videojs/video.js/blob/master/src/js/component.js#L648)
+_defined in_: [src/js/component.js#L669](https://github.com/videojs/video.js/blob/master/src/js/component.js#L669)
 
 ---
 
 ### dispose()
 > Dispose of the component and all child components
 
-_defined in_: [src/js/component.js#L53](https://github.com/videojs/video.js/blob/master/src/js/component.js#L53)
+_defined in_: [src/js/component.js#L74](https://github.com/videojs/video.js/blob/master/src/js/component.js#L74)
 
 ---
 
@@ -201,7 +221,7 @@ _defined in_: [src/js/component.js#L53](https://github.com/videojs/video.js/blob
 ##### RETURNS: 
 * `Element` 
 
-_defined in_: [src/js/component.js#L178](https://github.com/videojs/video.js/blob/master/src/js/component.js#L178)
+_defined in_: [src/js/component.js#L199](https://github.com/videojs/video.js/blob/master/src/js/component.js#L199)
 
 ---
 
@@ -214,7 +234,7 @@ _defined in_: [src/js/component.js#L178](https://github.com/videojs/video.js/blo
 > have this extra overhead unnecessarily, on mobile devices where extra
 > overhead is especially bad.
 
-_defined in_: [src/js/component.js#L770](https://github.com/videojs/video.js/blob/master/src/js/component.js#L770)
+_defined in_: [src/js/component.js#L791](https://github.com/videojs/video.js/blob/master/src/js/component.js#L791)
 
 ---
 
@@ -227,7 +247,7 @@ _defined in_: [src/js/component.js#L770](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L282](https://github.com/videojs/video.js/blob/master/src/js/component.js#L282)
+_defined in_: [src/js/component.js#L303](https://github.com/videojs/video.js/blob/master/src/js/component.js#L303)
 
 ---
 
@@ -240,7 +260,7 @@ _defined in_: [src/js/component.js#L282](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L265](https://github.com/videojs/video.js/blob/master/src/js/component.js#L265)
+_defined in_: [src/js/component.js#L286](https://github.com/videojs/video.js/blob/master/src/js/component.js#L286)
 
 ---
 
@@ -255,7 +275,7 @@ _defined in_: [src/js/component.js#L265](https://github.com/videojs/video.js/blo
 * `vjs.Component` The component if the height was set
 * `Number|String` The height if it wasn't set
 
-_defined in_: [src/js/component.js#L676](https://github.com/videojs/video.js/blob/master/src/js/component.js#L676)
+_defined in_: [src/js/component.js#L697](https://github.com/videojs/video.js/blob/master/src/js/component.js#L697)
 
 ---
 
@@ -265,7 +285,7 @@ _defined in_: [src/js/component.js#L676](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L618](https://github.com/videojs/video.js/blob/master/src/js/component.js#L618)
+_defined in_: [src/js/component.js#L639](https://github.com/videojs/video.js/blob/master/src/js/component.js#L639)
 
 ---
 
@@ -275,7 +295,7 @@ _defined in_: [src/js/component.js#L618](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `String` 
 
-_defined in_: [src/js/component.js#L214](https://github.com/videojs/video.js/blob/master/src/js/component.js#L214)
+_defined in_: [src/js/component.js#L235](https://github.com/videojs/video.js/blob/master/src/js/component.js#L235)
 
 ---
 
@@ -287,7 +307,7 @@ _defined in_: [src/js/component.js#L214](https://github.com/videojs/video.js/blo
 * __options__ 
 * __ready__ 
 
-_defined in_: [src/js/component.js#L20](https://github.com/videojs/video.js/blob/master/src/js/component.js#L20)
+_defined in_: [src/js/component.js#L41](https://github.com/videojs/video.js/blob/master/src/js/component.js#L41)
 
 ---
 
@@ -302,7 +322,7 @@ _defined in_: [src/js/component.js#L20](https://github.com/videojs/video.js/blob
 >       }
 >     }
 
-_defined in_: [src/js/component.js#L410](https://github.com/videojs/video.js/blob/master/src/js/component.js#L410)
+_defined in_: [src/js/component.js#L431](https://github.com/videojs/video.js/blob/master/src/js/component.js#L431)
 
 ---
 
@@ -313,7 +333,7 @@ _defined in_: [src/js/component.js#L410](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L629](https://github.com/videojs/video.js/blob/master/src/js/component.js#L629)
+_defined in_: [src/js/component.js#L650](https://github.com/videojs/video.js/blob/master/src/js/component.js#L650)
 
 ---
 
@@ -323,7 +343,7 @@ _defined in_: [src/js/component.js#L629](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `String` 
 
-_defined in_: [src/js/component.js#L231](https://github.com/videojs/video.js/blob/master/src/js/component.js#L231)
+_defined in_: [src/js/component.js#L252](https://github.com/videojs/video.js/blob/master/src/js/component.js#L252)
 
 ---
 
@@ -337,7 +357,7 @@ _defined in_: [src/js/component.js#L231](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L471](https://github.com/videojs/video.js/blob/master/src/js/component.js#L471)
+_defined in_: [src/js/component.js#L492](https://github.com/videojs/video.js/blob/master/src/js/component.js#L492)
 
 ---
 
@@ -352,7 +372,7 @@ _defined in_: [src/js/component.js#L471](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L459](https://github.com/videojs/video.js/blob/master/src/js/component.js#L459)
+_defined in_: [src/js/component.js#L480](https://github.com/videojs/video.js/blob/master/src/js/component.js#L480)
 
 ---
 
@@ -366,7 +386,7 @@ _defined in_: [src/js/component.js#L459](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L483](https://github.com/videojs/video.js/blob/master/src/js/component.js#L483)
+_defined in_: [src/js/component.js#L504](https://github.com/videojs/video.js/blob/master/src/js/component.js#L504)
 
 ---
 
@@ -414,7 +434,7 @@ _defined in_: [src/js/component.js#L483](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `Object` NEW merged object. Does not return obj1.
 
-_defined in_: [src/js/component.js#L148](https://github.com/videojs/video.js/blob/master/src/js/component.js#L148)
+_defined in_: [src/js/component.js#L169](https://github.com/videojs/video.js/blob/master/src/js/component.js#L169)
 
 ---
 
@@ -424,7 +444,7 @@ _defined in_: [src/js/component.js#L148](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Player` 
 
-_defined in_: [src/js/component.js#L95](https://github.com/videojs/video.js/blob/master/src/js/component.js#L95)
+_defined in_: [src/js/component.js#L116](https://github.com/videojs/video.js/blob/master/src/js/component.js#L116)
 
 ---
 
@@ -440,7 +460,7 @@ _defined in_: [src/js/component.js#L95](https://github.com/videojs/video.js/blob
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L540](https://github.com/videojs/video.js/blob/master/src/js/component.js#L540)
+_defined in_: [src/js/component.js#L561](https://github.com/videojs/video.js/blob/master/src/js/component.js#L561)
 
 ---
 
@@ -451,7 +471,7 @@ _defined in_: [src/js/component.js#L540](https://github.com/videojs/video.js/blo
 ##### PARAMETERS: 
 * __component__ `vjs.Component` Component to remove
 
-_defined in_: [src/js/component.js#L372](https://github.com/videojs/video.js/blob/master/src/js/component.js#L372)
+_defined in_: [src/js/component.js#L393](https://github.com/videojs/video.js/blob/master/src/js/component.js#L393)
 
 ---
 
@@ -464,7 +484,7 @@ _defined in_: [src/js/component.js#L372](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L598](https://github.com/videojs/video.js/blob/master/src/js/component.js#L598)
+_defined in_: [src/js/component.js#L619](https://github.com/videojs/video.js/blob/master/src/js/component.js#L619)
 
 ---
 
@@ -474,7 +494,7 @@ _defined in_: [src/js/component.js#L598](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L608](https://github.com/videojs/video.js/blob/master/src/js/component.js#L608)
+_defined in_: [src/js/component.js#L629](https://github.com/videojs/video.js/blob/master/src/js/component.js#L629)
 
 ---
 
@@ -488,7 +508,7 @@ _defined in_: [src/js/component.js#L608](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L495](https://github.com/videojs/video.js/blob/master/src/js/component.js#L495)
+_defined in_: [src/js/component.js#L516](https://github.com/videojs/video.js/blob/master/src/js/component.js#L516)
 
 ---
 
@@ -498,7 +518,7 @@ _defined in_: [src/js/component.js#L495](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L559](https://github.com/videojs/video.js/blob/master/src/js/component.js#L559)
+_defined in_: [src/js/component.js#L580](https://github.com/videojs/video.js/blob/master/src/js/component.js#L580)
 
 ---
 
@@ -509,7 +529,7 @@ _defined in_: [src/js/component.js#L559](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `vjs.Component` 
 
-_defined in_: [src/js/component.js#L640](https://github.com/videojs/video.js/blob/master/src/js/component.js#L640)
+_defined in_: [src/js/component.js#L661](https://github.com/videojs/video.js/blob/master/src/js/component.js#L661)
 
 ---
 
@@ -527,7 +547,7 @@ _defined in_: [src/js/component.js#L640](https://github.com/videojs/video.js/blo
 * `vjs.Component` Returns 'this' if width was set
 * `Number|String` Returns the width if nothing was set
 
-_defined in_: [src/js/component.js#L664](https://github.com/videojs/video.js/blob/master/src/js/component.js#L664)
+_defined in_: [src/js/component.js#L685](https://github.com/videojs/video.js/blob/master/src/js/component.js#L685)
 
 ---
 

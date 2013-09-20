@@ -11,6 +11,7 @@
  * Only using for parse method when parsing data-setup attribute JSON.
  * @suppress {undefinedVars}
  * @namespace
+ * @private
  */
 vjs.JSON;
 
