@@ -47,6 +47,7 @@ vjs.capitalize = function(string){
 /**
  * Object functions container
  * @type {Object}
+ * @private
  */
 vjs.obj = {};
 
@@ -458,6 +459,7 @@ vjs.insertFirst = function(child, parent){
 /**
  * Object to hold browser support information
  * @type {Object}
+ * @private
  */
 vjs.support = {};
 
