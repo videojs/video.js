@@ -3,7 +3,7 @@
 # vjs.TextTrackDisplay
 
 __EXTENDS__: [vjs.Component](vjs.Component.md)  
-__DEFINED IN__: [src/js/tracks.js#L709](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L709)  
+__DEFINED IN__: [src/js/tracks.js#L710](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L710)  
 
 The component for displaying text track cues
 
@@ -44,7 +44,7 @@ The component for displaying text track cues
   - [width](#width-num-skiplisteners-) _`inherited`_
 
 - [EVENTS](#events)
-  - [resize](#resize) _`inherited`_
+  - [resize](#resize-event) _`inherited`_
 
 ---
 
@@ -254,7 +254,7 @@ _inherited from_: [src/js/component.js#L239](https://github.com/videojs/video.js
 * __options__ 
 * __ready__ 
 
-_defined in_: [src/js/tracks.js#L711](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L711)
+_defined in_: [src/js/tracks.js#L712](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L712)
 
 ---
 
@@ -492,7 +492,7 @@ _inherited from_: [src/js/component.js#L707](https://github.com/videojs/video.js
 
 ## EVENTS
 
-### resize
+### resize `EVENT`
 > Fired when the width and/or height of the component changes
 
 _inherited from_: [src/js/component.js#L809](https://github.com/videojs/video.js/blob/master/src/js/component.js#L809)

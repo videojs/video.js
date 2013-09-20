@@ -3,7 +3,7 @@
 # vjs.ChaptersButton
 
 __EXTENDS__: [vjs.TextTrackButton](vjs.TextTrackButton.md)  
-__DEFINED IN__: [src/js/tracks.js#L900](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L900)  
+__DEFINED IN__: [src/js/tracks.js#L901](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L901)  
 
 The button component for toggling and selecting chapters
 
@@ -45,7 +45,7 @@ The button component for toggling and selecting chapters
   - [width](#width-num-skiplisteners-) _`inherited`_
 
 - [EVENTS](#events)
-  - [resize](#resize) _`inherited`_
+  - [resize](#resize-event) _`inherited`_
 
 ---
 
@@ -259,7 +259,7 @@ _inherited from_: [src/js/component.js#L239](https://github.com/videojs/video.js
 * __options__ 
 * __ready__ 
 
-_defined in_: [src/js/tracks.js#L902](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L902)
+_defined in_: [src/js/tracks.js#L903](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L903)
 
 ---
 
@@ -497,7 +497,7 @@ _inherited from_: [src/js/component.js#L707](https://github.com/videojs/video.js
 
 ## EVENTS
 
-### resize
+### resize `EVENT`
 > Fired when the width and/or height of the component changes
 
 _inherited from_: [src/js/component.js#L809](https://github.com/videojs/video.js/blob/master/src/js/component.js#L809)
