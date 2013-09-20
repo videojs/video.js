@@ -8,7 +8,7 @@ __DEFINED IN__: [src/js/player.js#L21](https://github.com/videojs/video.js/blob/
 An instance of the `vjs.Player` class is created when any of the Video.js setup methods are used to initialize a video.
 
 ```js
-var myPlayer = Video('example_video_1');
+var myPlayer = videojs('example_video_1');
 ```
 
 In the follwing example, the `data-setup` attribute tells the Video.js library to create a player instance when the library is ready.
@@ -28,10 +28,17 @@ After an instance has been created it can be accessed globally using `Video('exa
 - [METHODS](#methods)
   - [addTextTrack](#addtexttrack-kind-label-language-options-)
   - [addTextTracks](#addtexttracks-tracklist-)
+  - [buffered](#buffered)
+  - [bufferedPercent](#bufferedpercent)
   - [controls](#controls-controls-)
+  - [currentTime](#currenttime-seconds-)
+  - [duration](#duration-seconds-)
   - [init](#init-tag-options-ready-)
+  - [pause](#pause)
+  - [paused](#paused)
   - [play](#play)
   - [poster](#poster-src-)
+  - [src](#src-source-)
   - [textTracks](#texttracks)
   - [usingNativeControls](#usingnativecontrols-bool-)
   - [addChild](#addchild-child-options-) _`inherited`_
@@ -149,6 +156,50 @@ _defined in_: [src/js/tracks.js#L71](https://github.com/videojs/video.js/blob/ma
 
 ---
 
+### buffered()
+> Get a TimeRange object with the times of the video that have been downloaded
+> 
+> If you just want the percent of the video that's been downloaded,
+> use bufferedPercent.
+> 
+> ##### EXAMPLE:
+> 
+>     // Number of different ranges of time have been buffered. Usually 1.
+>     numberOfRanges = bufferedTimeRange.length,
+> 
+>     // Time in seconds when the first range starts. Usually 0.
+>     firstRangeStart = bufferedTimeRange.start(0),
+> 
+>     // Time in seconds when the first range ends
+>     firstRangeEnd = bufferedTimeRange.end(0),
+> 
+>     // Length in seconds of the first time range
+>     firstRangeLength = firstRangeEnd - firstRangeStart;
+
+##### RETURNS: 
+* `Object` A mock TimeRange object (following HTML spec)
+
+_defined in_: [src/js/player.js#L645](https://github.com/videojs/video.js/blob/master/src/js/player.js#L645)
+
+---
+
+### bufferedPercent()
+> Get the percent (as a decimal) of the video that's been downloaded
+> 
+> ##### EXAMPLE:
+> 
+>     var howMuchIsDownloaded = myPlayer.bufferedPercent();
+> 
+> 0 means none, 1 means all.
+> (This method isn't in the HTML5 spec, but it's very convenient)
+
+##### RETURNS: 
+* `Number` A decimal between 0 and 1 representing the percent
+
+_defined in_: [src/js/player.js#L673](https://github.com/videojs/video.js/blob/master/src/js/player.js#L673)
+
+---
+
 ### buildCSSClass()
 > Allows sub components to stack CSS class names
 
@@ -189,7 +240,7 @@ _inherited from_: [src/js/component.js#L218](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Boolean` Controls are showing
 
-_defined in_: [src/js/player.js#L900](https://github.com/videojs/video.js/blob/master/src/js/player.js#L900)
+_defined in_: [src/js/player.js#L998](https://github.com/videojs/video.js/blob/master/src/js/player.js#L998)
 
 ---
 
@@ -204,6 +255,28 @@ _defined in_: [src/js/player.js#L900](https://github.com/videojs/video.js/blob/m
 * `Element` 
 
 _inherited from_: [src/js/component.js#L190](https://github.com/videojs/video.js/blob/master/src/js/component.js#L190)
+
+---
+
+### currentTime( [seconds] )
+> Get or set the current time (in seconds)
+> 
+> ##### EXAMPLE:
+> 
+>     // get
+>     var whereYouAt = myPlayer.currentTime();
+> 
+>     // set
+>     myPlayer.currentTime(120); // 2 minutes into the video
+
+##### PARAMETERS: 
+* __seconds__ `Number|String` _(OPTIONAL)_ The time to seek to
+
+##### RETURNS: 
+* `Number` The time in seconds, when not setting
+* `vjs.Player` self, when the current time is set
+
+_defined in_: [src/js/player.js#L571](https://github.com/videojs/video.js/blob/master/src/js/player.js#L571)
 
 ---
 
@@ -256,6 +329,23 @@ _inherited from_: [src/js/component.js#L669](https://github.com/videojs/video.js
 > Dispose of the component and all child components
 
 _inherited from_: [src/js/component.js#L74](https://github.com/videojs/video.js/blob/master/src/js/component.js#L74)
+
+---
+
+### duration( seconds )
+> Get the length in time of the video in seconds
+> 
+> **NOTE**: The video must have started loading before the duration can be
+> known, and in the case of Flash, may not be known until the video starts
+> playing.
+
+##### PARAMETERS: 
+* __seconds__ 
+
+##### RETURNS: 
+* `Number` The duration of the video in seconds
+
+_defined in_: [src/js/player.js#L599](https://github.com/videojs/video.js/blob/master/src/js/player.js#L599)
 
 ---
 
@@ -482,19 +572,46 @@ _inherited from_: [src/js/component.js#L169](https://github.com/videojs/video.js
 
 ---
 
+### pause()
+> Pause the video playback
+> 
+> ##### EXAMPLE:
+> 
+>     myPlayer.pause();
+
+##### RETURNS: 
+* `vjs.Player` self
+
+_defined in_: [src/js/player.js#L536](https://github.com/videojs/video.js/blob/master/src/js/player.js#L536)
+
+---
+
+### paused()
+> Check if the player is paused
+> 
+> ##### EXAMPLE:
+> 
+>     var isPaused = myPlayer.paused();
+>     var isPlaying = !myPlayer.paused();
+
+##### RETURNS: 
+* `Boolean` false if the media is currently playing, or true otherwise
+
+_defined in_: [src/js/player.js#L551](https://github.com/videojs/video.js/blob/master/src/js/player.js#L551)
+
+---
+
 ### play()
 > start media playback
 > 
 > ##### EXAMPLE:
 > 
-> ```js
->   myPlayer.play();
-> ```
+>     myPlayer.play();
 
 ##### RETURNS: 
 * `vjs.Player` self
 
-_defined in_: [src/js/player.js#L524](https://github.com/videojs/video.js/blob/master/src/js/player.js#L524)
+_defined in_: [src/js/player.js#L522](https://github.com/videojs/video.js/blob/master/src/js/player.js#L522)
 
 ---
 
@@ -526,7 +643,7 @@ _inherited from_: [src/js/component.js#L116](https://github.com/videojs/video.js
 * `String` poster URL when getting
 * `vjs.Player` self when setting
 
-_defined in_: [src/js/player.js#L880](https://github.com/videojs/video.js/blob/master/src/js/player.js#L880)
+_defined in_: [src/js/player.js#L978](https://github.com/videojs/video.js/blob/master/src/js/player.js#L978)
 
 ---
 
@@ -577,6 +694,44 @@ _inherited from_: [src/js/component.js#L619](https://github.com/videojs/video.js
 * `vjs.Component` 
 
 _inherited from_: [src/js/component.js#L629](https://github.com/videojs/video.js/blob/master/src/js/component.js#L629)
+
+---
+
+### src( source )
+> The source function updates the video source
+> 
+> There are three types of variables you can pass as the argument.
+> 
+> **URL String**: A URL to the the video file. Use this method if you are sure
+> the current playback technology (HTML5/Flash) can support the source you
+> provide. Currently only MP4 files can be used in both HTML5 and Flash.
+> 
+>     myPlayer.src("http://www.example.com/path/to/video.mp4");
+> 
+> **Source Object (or element):** A javascript object containing information
+> about the source file. Use this method if you want the player to determine if
+> it can support the file using the type information.
+> 
+>     myPlayer.src({ type: "video/mp4", src: "http://www.example.com/path/to/video.mp4" });
+> 
+> **Array of Source Objects:** To provide multiple versions of the source so
+> that it can be played using HTML5 across browsers you can use an array of
+> source objects. Video.js will detect which version is supported and load that
+> file.
+> 
+>     myPlayer.src([
+>       { type: "video/mp4", src: "http://www.example.com/path/to/video.mp4" },
+>       { type: "video/webm", src: "http://www.example.com/path/to/video.webm" },
+>       { type: "video/ogg", src: "http://www.example.com/path/to/video.ogv" }
+>     ]);
+
+##### PARAMETERS: 
+* __source__ `String|Object|Array` The source URL, object, or array of sources
+
+##### RETURNS: 
+* `vjs.Player` self
+
+_defined in_: [src/js/player.js#L862](https://github.com/videojs/video.js/blob/master/src/js/player.js#L862)
 
 ---
 
@@ -640,7 +795,7 @@ _inherited from_: [src/js/component.js#L661](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Player` Returns the player
 
-_defined in_: [src/js/player.js#L934](https://github.com/videojs/video.js/blob/master/src/js/player.js#L934)
+_defined in_: [src/js/player.js#L1032](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1032)
 
 ---
 
@@ -667,14 +822,14 @@ _inherited from_: [src/js/component.js#L685](https://github.com/videojs/video.js
 ### usingcustomcontrols
 > player is using the custom HTML controls
 
-_defined in_: [src/js/player.js#L961](https://github.com/videojs/video.js/blob/master/src/js/player.js#L961)
+_defined in_: [src/js/player.js#L1059](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1059)
 
 ---
 
 ### usingnativecontrols
 > player is using the native device controls
 
-_defined in_: [src/js/player.js#L950](https://github.com/videojs/video.js/blob/master/src/js/player.js#L950)
+_defined in_: [src/js/player.js#L1048](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1048)
 
 ---
 
