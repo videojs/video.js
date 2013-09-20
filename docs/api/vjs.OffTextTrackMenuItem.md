@@ -3,7 +3,7 @@
 # vjs.OffTextTrackMenuItem
 
 __EXTENDS__: [vjs.TextTrackMenuItem](vjs.TextTrackMenuItem.md)  
-__DEFINED IN__: [src/js/tracks.js#L764](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L764)  
+__DEFINED IN__: [src/js/tracks.js#L765](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L765)  
 
 A special menu item for turning of a specific type of text track
 
@@ -46,7 +46,7 @@ A special menu item for turning of a specific type of text track
   - [width](#width-num-skiplisteners-) _`inherited`_
 
 - [EVENTS](#events)
-  - [resize](#resize) _`inherited`_
+  - [resize](#resize-event) _`inherited`_
 
 ---
 
@@ -252,7 +252,7 @@ _inherited from_: [src/js/component.js#L239](https://github.com/videojs/video.js
 * __player__ 
 * __options__ 
 
-_defined in_: [src/js/tracks.js#L766](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L766)
+_defined in_: [src/js/tracks.js#L767](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L767)
 
 ---
 
@@ -507,7 +507,7 @@ _inherited from_: [src/js/component.js#L707](https://github.com/videojs/video.js
 
 ## EVENTS
 
-### resize
+### resize `EVENT`
 > Fired when the width and/or height of the component changes
 
 _inherited from_: [src/js/component.js#L809](https://github.com/videojs/video.js/blob/master/src/js/component.js#L809)

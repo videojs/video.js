@@ -44,7 +44,7 @@ Base class for all buttons
   - [width](#width-num-skiplisteners-) _`inherited`_
 
 - [EVENTS](#events)
-  - [resize](#resize) _`inherited`_
+  - [resize](#resize-event) _`inherited`_
 
 ---
 
@@ -493,7 +493,7 @@ _inherited from_: [src/js/component.js#L707](https://github.com/videojs/video.js
 
 ## EVENTS
 
-### resize
+### resize `EVENT`
 > Fired when the width and/or height of the component changes
 
 _inherited from_: [src/js/component.js#L809](https://github.com/videojs/video.js/blob/master/src/js/component.js#L809)

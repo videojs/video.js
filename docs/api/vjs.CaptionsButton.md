@@ -3,7 +3,7 @@
 # vjs.CaptionsButton
 
 __EXTENDS__: [vjs.TextTrackButton](vjs.TextTrackButton.md)  
-__DEFINED IN__: [src/js/tracks.js#L866](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L866)  
+__DEFINED IN__: [src/js/tracks.js#L867](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L867)  
 
 The button component for toggling and selecting captions
 
@@ -45,7 +45,7 @@ The button component for toggling and selecting captions
   - [width](#width-num-skiplisteners-) _`inherited`_
 
 - [EVENTS](#events)
-  - [resize](#resize) _`inherited`_
+  - [resize](#resize-event) _`inherited`_
 
 ---
 
@@ -259,7 +259,7 @@ _inherited from_: [src/js/component.js#L239](https://github.com/videojs/video.js
 * __options__ 
 * __ready__ 
 
-_defined in_: [src/js/tracks.js#L868](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L868)
+_defined in_: [src/js/tracks.js#L869](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L869)
 
 ---
 
@@ -497,7 +497,7 @@ _inherited from_: [src/js/component.js#L707](https://github.com/videojs/video.js
 
 ## EVENTS
 
-### resize
+### resize `EVENT`
 > Fired when the width and/or height of the component changes
 
 _inherited from_: [src/js/component.js#L809](https://github.com/videojs/video.js/blob/master/src/js/component.js#L809)

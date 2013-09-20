@@ -41,7 +41,6 @@ After an instance has been created it can be accessed globally using `Video('exa
   - [poster](#poster-src-)
   - [requestFullScreen](#requestfullscreen)
   - [src](#src-source-)
-  - [textTracks](#texttracks)
   - [volume](#volume-percentasdecimal-)
   - [addChild](#addchild-child-options-) _`inherited`_
   - [addClass](#addclass-classtoadd-) _`inherited`_
@@ -73,20 +72,20 @@ After an instance has been created it can be accessed globally using `Video('exa
   - [width](#width-num-skiplisteners-) _`inherited`_
 
 - [EVENTS](#events)
-  - [durationchange](#durationchange)
-  - [ended](#ended)
-  - [error](#error)
-  - [fullscreenchange](#fullscreenchange)
-  - [loadedalldata](#loadedalldata)
-  - [loadeddata](#loadeddata)
-  - [loadedmetadata](#loadedmetadata)
-  - [loadstart](#loadstart)
-  - [pause](#pause)
-  - [play](#play)
-  - [progress](#progress)
-  - [timeupdate](#timeupdate)
-  - [volumechange](#volumechange)
-  - [resize](#resize) _`inherited`_
+  - [durationchange](#durationchange-event)
+  - [ended](#ended-event)
+  - [error](#error-event)
+  - [fullscreenchange](#fullscreenchange-event)
+  - [loadedalldata](#loadedalldata-event)
+  - [loadeddata](#loadeddata-event)
+  - [loadedmetadata](#loadedmetadata-event)
+  - [loadstart](#loadstart-event)
+  - [pause](#pause-event)
+  - [play](#play-event)
+  - [progress](#progress-event)
+  - [timeupdate](#timeupdate-event)
+  - [volumechange](#volumechange-event)
+  - [resize](#resize-event) _`inherited`_
 
 ---
 
@@ -734,17 +733,6 @@ _defined in_: [src/js/player.js#L983](https://github.com/videojs/video.js/blob/m
 
 ---
 
-### textTracks()
-> Get an array of associated text tracks. captions, subtitles, chapters, descriptions
-> http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-texttracks
-
-##### RETURNS: 
-* `Array` Array of track objects
-
-_defined in_: [src/js/tracks.js#L24](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L24)
-
----
-
 ### trigger( type, event )
 > Trigger an event on an element
 > 
@@ -813,21 +801,21 @@ _inherited from_: [src/js/component.js#L707](https://github.com/videojs/video.js
 
 ## EVENTS
 
-### durationchange
+### durationchange `EVENT`
 > Fired when the duration of the media resource is first known or changed
 
 _defined in_: [src/js/player.js#L499](https://github.com/videojs/video.js/blob/master/src/js/player.js#L499)
 
 ---
 
-### ended
+### ended `EVENT`
 > Fired when the end of the media resource is reached (currentTime == duration)
 
 _defined in_: [src/js/player.js#L488](https://github.com/videojs/video.js/blob/master/src/js/player.js#L488)
 
 ---
 
-### error
+### error `EVENT`
 > Fired when there is an error in playback
 
 ##### PARAMETERS: 
@@ -837,70 +825,70 @@ _defined in_: [src/js/player.js#L526](https://github.com/videojs/video.js/blob/m
 
 ---
 
-### fullscreenchange
+### fullscreenchange `EVENT`
 > Fired when the player switches in or out of fullscreen mode
 
 _defined in_: [src/js/player.js#L514](https://github.com/videojs/video.js/blob/master/src/js/player.js#L514)
 
 ---
 
-### loadedalldata
+### loadedalldata `EVENT`
 > Fired when the player has finished downloading the source data
 
 _defined in_: [src/js/player.js#L425](https://github.com/videojs/video.js/blob/master/src/js/player.js#L425)
 
 ---
 
-### loadeddata
+### loadeddata `EVENT`
 > Fired when the player has downloaded data at the current playback position
 
 _defined in_: [src/js/player.js#L419](https://github.com/videojs/video.js/blob/master/src/js/player.js#L419)
 
 ---
 
-### loadedmetadata
+### loadedmetadata `EVENT`
 > Fired when the player has initial duration and dimension information
 
 _defined in_: [src/js/player.js#L413](https://github.com/videojs/video.js/blob/master/src/js/player.js#L413)
 
 ---
 
-### loadstart
+### loadstart `EVENT`
 > Fired when the user agent begins looking for media data
 
 _defined in_: [src/js/player.js#L407](https://github.com/videojs/video.js/blob/master/src/js/player.js#L407)
 
 ---
 
-### pause
+### pause `EVENT`
 > Fired whenever the media has been paused
 
 _defined in_: [src/js/player.js#L459](https://github.com/videojs/video.js/blob/master/src/js/player.js#L459)
 
 ---
 
-### play
+### play `EVENT`
 > Fired whenever the media begins or resumes playback
 
 _defined in_: [src/js/player.js#L431](https://github.com/videojs/video.js/blob/master/src/js/player.js#L431)
 
 ---
 
-### progress
+### progress `EVENT`
 > Fired while the user agent is downloading media data
 
 _defined in_: [src/js/player.js#L477](https://github.com/videojs/video.js/blob/master/src/js/player.js#L477)
 
 ---
 
-### resize
+### resize `EVENT`
 > Fired when the width and/or height of the component changes
 
 _inherited from_: [src/js/component.js#L809](https://github.com/videojs/video.js/blob/master/src/js/component.js#L809)
 
 ---
 
-### timeupdate
+### timeupdate `EVENT`
 > Fired when the current playback position has changed
 > 
 > During playback this is fired every 15-250 milliseconds, depnding on the
@@ -910,7 +898,7 @@ _defined in_: [src/js/player.js#L471](https://github.com/videojs/video.js/blob/m
 
 ---
 
-### volumechange
+### volumechange `EVENT`
 > Fired when the volume changes
 
 _defined in_: [src/js/player.js#L508](https://github.com/videojs/video.js/blob/master/src/js/player.js#L508)

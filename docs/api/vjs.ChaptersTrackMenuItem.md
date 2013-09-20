@@ -3,7 +3,7 @@
 # vjs.ChaptersTrackMenuItem
 
 __EXTENDS__: [vjs.MenuItem](vjs.MenuItem.md)  
-__DEFINED IN__: [src/js/tracks.js#L986](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L986)  
+__DEFINED IN__: [src/js/tracks.js#L987](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L987)  
 
 ---
 
@@ -44,7 +44,7 @@ __DEFINED IN__: [src/js/tracks.js#L986](https://github.com/videojs/video.js/blob
   - [width](#width-num-skiplisteners-) _`inherited`_
 
 - [EVENTS](#events)
-  - [resize](#resize) _`inherited`_
+  - [resize](#resize-event) _`inherited`_
 
 ---
 
@@ -250,7 +250,7 @@ _inherited from_: [src/js/component.js#L239](https://github.com/videojs/video.js
 * __player__ 
 * __options__ 
 
-_defined in_: [src/js/tracks.js#L988](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L988)
+_defined in_: [src/js/tracks.js#L989](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L989)
 
 ---
 
@@ -505,7 +505,7 @@ _inherited from_: [src/js/component.js#L707](https://github.com/videojs/video.js
 
 ## EVENTS
 
-### resize
+### resize `EVENT`
 > Fired when the width and/or height of the component changes
 
 _inherited from_: [src/js/component.js#L809](https://github.com/videojs/video.js/blob/master/src/js/component.js#L809)

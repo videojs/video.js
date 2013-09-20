@@ -64,7 +64,7 @@ Components are also event emitters.
   - [width](#width-num-skiplisteners-)
 
 - [EVENTS](#events)
-  - [resize](#resize)
+  - [resize](#resize-event)
 
 ---
 
@@ -513,7 +513,7 @@ _defined in_: [src/js/component.js#L707](https://github.com/videojs/video.js/blo
 
 ## EVENTS
 
-### resize
+### resize `EVENT`
 > Fired when the width and/or height of the component changes
 
 _defined in_: [src/js/component.js#L809](https://github.com/videojs/video.js/blob/master/src/js/component.js#L809)

@@ -3,7 +3,7 @@
 # vjs.TextTrack
 
 __EXTENDS__: [vjs.Component](vjs.Component.md)  
-__DEFINED IN__: [src/js/tracks.js#L125](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L125)  
+__DEFINED IN__: [src/js/tracks.js#L126](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L126)  
 
 The base class for all text tracks
 
@@ -59,7 +59,7 @@ Handles the parsing, hiding, and showing of text track cues
   - [width](#width-num-skiplisteners-) _`inherited`_
 
 - [EVENTS](#events)
-  - [resize](#resize) _`inherited`_
+  - [resize](#resize-event) _`inherited`_
 
 ---
 
@@ -68,7 +68,7 @@ Handles the parsing, hiding, and showing of text track cues
 ### activate()
 > Turn on cue tracking. Tracks that are showing OR hidden are active.
 
-_defined in_: [src/js/tracks.js#L384](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L384)
+_defined in_: [src/js/tracks.js#L385](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L385)
 
 ---
 
@@ -78,7 +78,7 @@ _defined in_: [src/js/tracks.js#L384](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `Array` 
 
-_defined in_: [src/js/tracks.js#L263](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L263)
+_defined in_: [src/js/tracks.js#L264](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L264)
 
 ---
 
@@ -133,7 +133,7 @@ _inherited from_: [src/js/component.js#L628](https://github.com/videojs/video.js
 > Change the font size of the text track to make it larger when playing in fullscreen mode
 > and restore it to its normal size when not in fullscreen mode.
 
-_defined in_: [src/js/tracks.js#L308](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L308)
+_defined in_: [src/js/tracks.js#L309](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L309)
 
 ---
 
@@ -176,7 +176,7 @@ _inherited from_: [src/js/component.js#L220](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Element` 
 
-_defined in_: [src/js/tracks.js#L324](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L324)
+_defined in_: [src/js/tracks.js#L325](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L325)
 
 ---
 
@@ -186,14 +186,14 @@ _defined in_: [src/js/tracks.js#L324](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `Array` 
 
-_defined in_: [src/js/tracks.js#L248](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L248)
+_defined in_: [src/js/tracks.js#L249](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L249)
 
 ---
 
 ### deactivate()
 > Turn off cue tracking.
 
-_defined in_: [src/js/tracks.js#L407](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L407)
+_defined in_: [src/js/tracks.js#L408](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L408)
 
 ---
 
@@ -203,7 +203,7 @@ _defined in_: [src/js/tracks.js#L407](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `Boolean` 
 
-_defined in_: [src/js/tracks.js#L189](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L189)
+_defined in_: [src/js/tracks.js#L190](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L190)
 
 ---
 
@@ -226,7 +226,7 @@ _inherited from_: [src/js/component.js#L730](https://github.com/videojs/video.js
 > Indicates that the text track is not active. Other than for the purposes of exposing the track in the DOM, the user agent is ignoring the text track.
 > No cues are active, no events are fired, and the user agent will not attempt to obtain the track's cues.
 
-_defined in_: [src/js/tracks.js#L370](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L370)
+_defined in_: [src/js/tracks.js#L371](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L371)
 
 ---
 
@@ -296,7 +296,7 @@ _inherited from_: [src/js/component.js#L719](https://github.com/videojs/video.js
 > If no attempt has yet been made to obtain the track's cues, the user agent will perform such an attempt momentarily.
 > The user agent is maintaining a list of which cues are active, and events are being fired accordingly.
 
-_defined in_: [src/js/tracks.js#L355](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L355)
+_defined in_: [src/js/tracks.js#L356](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L356)
 
 ---
 
@@ -318,7 +318,7 @@ _inherited from_: [src/js/component.js#L239](https://github.com/videojs/video.js
 * __player__ 
 * __options__ 
 
-_defined in_: [src/js/tracks.js#L127](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L127)
+_defined in_: [src/js/tracks.js#L128](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L128)
 
 ---
 
@@ -343,7 +343,7 @@ _inherited from_: [src/js/component.js#L439](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `String` 
 
-_defined in_: [src/js/tracks.js#L160](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L160)
+_defined in_: [src/js/tracks.js#L161](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L161)
 
 ---
 
@@ -353,7 +353,7 @@ _defined in_: [src/js/tracks.js#L160](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `String` 
 
-_defined in_: [src/js/tracks.js#L233](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L233)
+_defined in_: [src/js/tracks.js#L234](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L234)
 
 ---
 
@@ -363,7 +363,7 @@ _defined in_: [src/js/tracks.js#L233](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `String` 
 
-_defined in_: [src/js/tracks.js#L218](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L218)
+_defined in_: [src/js/tracks.js#L219](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L219)
 
 ---
 
@@ -373,7 +373,7 @@ _defined in_: [src/js/tracks.js#L218](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `Number` 
 
-_defined in_: [src/js/tracks.js#L300](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L300)
+_defined in_: [src/js/tracks.js#L301](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L301)
 
 ---
 
@@ -522,7 +522,7 @@ _inherited from_: [src/js/component.js#L581](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Number` 
 
-_defined in_: [src/js/tracks.js#L282](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L282)
+_defined in_: [src/js/tracks.js#L283](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L283)
 
 ---
 
@@ -560,7 +560,7 @@ _inherited from_: [src/js/component.js#L639](https://github.com/videojs/video.js
 > The showing by default state is used in conjunction with the default attribute on track elements to indicate that the text track was enabled due to that attribute.
 > This allows the user agent to override the state if a later track is discovered that is more appropriate per the user's preferences.
 
-_defined in_: [src/js/tracks.js#L340](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L340)
+_defined in_: [src/js/tracks.js#L341](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L341)
 
 ---
 
@@ -570,7 +570,7 @@ _defined in_: [src/js/tracks.js#L340](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `String` 
 
-_defined in_: [src/js/tracks.js#L174](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L174)
+_defined in_: [src/js/tracks.js#L175](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L175)
 
 ---
 
@@ -580,7 +580,7 @@ _defined in_: [src/js/tracks.js#L174](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `String` 
 
-_defined in_: [src/js/tracks.js#L203](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L203)
+_defined in_: [src/js/tracks.js#L204](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L204)
 
 ---
 
@@ -630,7 +630,7 @@ _inherited from_: [src/js/component.js#L707](https://github.com/videojs/video.js
 
 ## EVENTS
 
-### resize
+### resize `EVENT`
 > Fired when the width and/or height of the component changes
 
 _inherited from_: [src/js/component.js#L809](https://github.com/videojs/video.js/blob/master/src/js/component.js#L809)
