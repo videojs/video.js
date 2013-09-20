@@ -3,7 +3,7 @@
 # vjs.TextTrack
 
 __EXTENDS__: [vjs.Component](vjs.Component.md)  
-__DEFINED IN__: [src/js/tracks.js#L123](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L123)  
+__DEFINED IN__: [src/js/tracks.js#L125](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L125)  
 
 The base class for all text tracks
 
@@ -37,17 +37,14 @@ Handles the parsing, hiding, and showing of text track cues
   - [buildCSSClass](#buildcssclass) _`inherited`_
   - [children](#children) _`inherited`_
   - [contentEl](#contentel) _`inherited`_
-  - [dimension](#dimension-widthorheight-num-skiplisteners-) _`inherited`_
   - [dimensions](#dimensions-width-height-) _`inherited`_
   - [dispose](#dispose) _`inherited`_
   - [el](#el) _`inherited`_
-  - [emitTapEvents](#emittapevents) _`inherited`_
   - [getChild](#getchild-name-) _`inherited`_
   - [getChildById](#getchildbyid-id-) _`inherited`_
   - [height](#height-num-skiplisteners-) _`inherited`_
   - [id](#id) _`inherited`_
   - [initChildren](#initchildren) _`inherited`_
-  - [lockShowing](#lockshowing) _`inherited`_
   - [name](#name) _`inherited`_
   - [off](#off-type-fn-) _`inherited`_
   - [on](#on-type-fn-) _`inherited`_
@@ -59,8 +56,10 @@ Handles the parsing, hiding, and showing of text track cues
   - [removeClass](#removeclass-classtoremove-) _`inherited`_
   - [trigger](#trigger-type-event-) _`inherited`_
   - [triggerReady](#triggerready) _`inherited`_
-  - [unlockShowing](#unlockshowing) _`inherited`_
   - [width](#width-num-skiplisteners-) _`inherited`_
+
+- [EVENTS](#events)
+  - [resize](#resize) _`inherited`_
 
 ---
 
@@ -69,7 +68,7 @@ Handles the parsing, hiding, and showing of text track cues
 ### activate()
 > Turn on cue tracking. Tracks that are showing OR hidden are active.
 
-_defined in_: [src/js/tracks.js#L382](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L382)
+_defined in_: [src/js/tracks.js#L384](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L384)
 
 ---
 
@@ -79,7 +78,7 @@ _defined in_: [src/js/tracks.js#L382](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `Array` 
 
-_defined in_: [src/js/tracks.js#L261](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L261)
+_defined in_: [src/js/tracks.js#L263](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L263)
 
 ---
 
@@ -113,7 +112,7 @@ _defined in_: [src/js/tracks.js#L261](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `vjs.Component` The child component (created by this process if a string was used)
 
-_inherited from_: [src/js/component.js#L335](https://github.com/videojs/video.js/blob/master/src/js/component.js#L335)
+_inherited from_: [src/js/component.js#L343](https://github.com/videojs/video.js/blob/master/src/js/component.js#L343)
 
 ---
 
@@ -126,7 +125,7 @@ _inherited from_: [src/js/component.js#L335](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L608](https://github.com/videojs/video.js/blob/master/src/js/component.js#L608)
+_inherited from_: [src/js/component.js#L628](https://github.com/videojs/video.js/blob/master/src/js/component.js#L628)
 
 ---
 
@@ -134,7 +133,7 @@ _inherited from_: [src/js/component.js#L608](https://github.com/videojs/video.js
 > Change the font size of the text track to make it larger when playing in fullscreen mode
 > and restore it to its normal size when not in fullscreen mode.
 
-_defined in_: [src/js/tracks.js#L306](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L306)
+_defined in_: [src/js/tracks.js#L308](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L308)
 
 ---
 
@@ -144,17 +143,19 @@ _defined in_: [src/js/tracks.js#L306](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `String` The constructed class name
 
-_inherited from_: [src/js/component.js#L463](https://github.com/videojs/video.js/blob/master/src/js/component.js#L463)
+_inherited from_: [src/js/component.js#L471](https://github.com/videojs/video.js/blob/master/src/js/component.js#L471)
 
 ---
 
 ### children()
-> Returns an array of all child components
+> Get an array of all child components
+> 
+>     var kids = myComponent.children();
 
 ##### RETURNS: 
-* `Array` 
+* `Array` The children
 
-_inherited from_: [src/js/component.js#L269](https://github.com/videojs/video.js/blob/master/src/js/component.js#L269)
+_inherited from_: [src/js/component.js#L277](https://github.com/videojs/video.js/blob/master/src/js/component.js#L277)
 
 ---
 
@@ -165,7 +166,7 @@ _inherited from_: [src/js/component.js#L269](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Element` 
 
-_inherited from_: [src/js/component.js#L218](https://github.com/videojs/video.js/blob/master/src/js/component.js#L218)
+_inherited from_: [src/js/component.js#L220](https://github.com/videojs/video.js/blob/master/src/js/component.js#L220)
 
 ---
 
@@ -175,7 +176,7 @@ _inherited from_: [src/js/component.js#L218](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Element` 
 
-_defined in_: [src/js/tracks.js#L322](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L322)
+_defined in_: [src/js/tracks.js#L324](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L324)
 
 ---
 
@@ -185,14 +186,14 @@ _defined in_: [src/js/tracks.js#L322](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `Array` 
 
-_defined in_: [src/js/tracks.js#L246](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L246)
+_defined in_: [src/js/tracks.js#L248](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L248)
 
 ---
 
 ### deactivate()
 > Turn off cue tracking.
 
-_defined in_: [src/js/tracks.js#L405](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L405)
+_defined in_: [src/js/tracks.js#L407](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L407)
 
 ---
 
@@ -202,31 +203,7 @@ _defined in_: [src/js/tracks.js#L405](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `Boolean` 
 
-_defined in_: [src/js/tracks.js#L187](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L187)
-
----
-
-### dimension( widthOrHeight, [num], [skipListeners] )
-> Get or set width or height
-> 
-> This is the shared code for the width() and height() methods.
-> All for an integer, integer + 'px' or integer + '%';
-> 
-> Known issue: Hidden elements officially have a width of 0. We're defaulting
-> to the style.width value and falling back to computedStyle which has the
-> hidden element issue. Info, but probably not an efficient fix:
-> http://www.foliotek.com/devblog/getting-the-width-of-a-hidden-element-with-jquery-using-width/
-
-##### PARAMETERS: 
-* __widthOrHeight__ `String` 'width' or 'height'
-* __num__ `Number|String` _(OPTIONAL)_ New dimension
-* __skipListeners__ `Boolean` _(OPTIONAL)_ Skip resize event trigger
-
-##### RETURNS: 
-* `vjs.Component` The component if a dimension was set
-* `Number|String` The dimension if nothing was set
-
-_inherited from_: [src/js/component.js#L730](https://github.com/videojs/video.js/blob/master/src/js/component.js#L730)
+_defined in_: [src/js/tracks.js#L189](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L189)
 
 ---
 
@@ -240,7 +217,7 @@ _inherited from_: [src/js/component.js#L730](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` The component
 
-_inherited from_: [src/js/component.js#L708](https://github.com/videojs/video.js/blob/master/src/js/component.js#L708)
+_inherited from_: [src/js/component.js#L730](https://github.com/videojs/video.js/blob/master/src/js/component.js#L730)
 
 ---
 
@@ -249,7 +226,7 @@ _inherited from_: [src/js/component.js#L708](https://github.com/videojs/video.js
 > Indicates that the text track is not active. Other than for the purposes of exposing the track in the DOM, the user agent is ignoring the text track.
 > No cues are active, no events are fired, and the user agent will not attempt to obtain the track's cues.
 
-_defined in_: [src/js/tracks.js#L368](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L368)
+_defined in_: [src/js/tracks.js#L370](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L370)
 
 ---
 
@@ -261,25 +238,14 @@ _inherited from_: [src/js/component.js#L74](https://github.com/videojs/video.js/
 ---
 
 ### el()
-> return the component's DOM element
+> Get the component's DOM element
+> 
+>     var domEl = myComponent.el();
 
 ##### RETURNS: 
 * `Element` 
 
-_inherited from_: [src/js/component.js#L199](https://github.com/videojs/video.js/blob/master/src/js/component.js#L199)
-
----
-
-### emitTapEvents()
-> Emit 'tap' events when touch events are supported
-> 
-> This is used to support toggling the controls through a tap on the video.
-> 
-> We're requireing them to be enabled because otherwise every component would
-> have this extra overhead unnecessarily, on mobile devices where extra
-> overhead is especially bad.
-
-_inherited from_: [src/js/component.js#L791](https://github.com/videojs/video.js/blob/master/src/js/component.js#L791)
+_inherited from_: [src/js/component.js#L201](https://github.com/videojs/video.js/blob/master/src/js/component.js#L201)
 
 ---
 
@@ -292,7 +258,7 @@ _inherited from_: [src/js/component.js#L791](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L303](https://github.com/videojs/video.js/blob/master/src/js/component.js#L303)
+_inherited from_: [src/js/component.js#L311](https://github.com/videojs/video.js/blob/master/src/js/component.js#L311)
 
 ---
 
@@ -305,7 +271,7 @@ _inherited from_: [src/js/component.js#L303](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L286](https://github.com/videojs/video.js/blob/master/src/js/component.js#L286)
+_inherited from_: [src/js/component.js#L294](https://github.com/videojs/video.js/blob/master/src/js/component.js#L294)
 
 ---
 
@@ -320,7 +286,7 @@ _inherited from_: [src/js/component.js#L286](https://github.com/videojs/video.js
 * `vjs.Component` The component if the height was set
 * `Number|String` The height if it wasn't set
 
-_inherited from_: [src/js/component.js#L697](https://github.com/videojs/video.js/blob/master/src/js/component.js#L697)
+_inherited from_: [src/js/component.js#L719](https://github.com/videojs/video.js/blob/master/src/js/component.js#L719)
 
 ---
 
@@ -330,17 +296,19 @@ _inherited from_: [src/js/component.js#L697](https://github.com/videojs/video.js
 > If no attempt has yet been made to obtain the track's cues, the user agent will perform such an attempt momentarily.
 > The user agent is maintaining a list of which cues are active, and events are being fired accordingly.
 
-_defined in_: [src/js/tracks.js#L353](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L353)
+_defined in_: [src/js/tracks.js#L355](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L355)
 
 ---
 
 ### id()
-> Returns the component's ID
+> Get the component's ID
+> 
+>     var id = myComponent.id();
 
 ##### RETURNS: 
 * `String` 
 
-_inherited from_: [src/js/component.js#L235](https://github.com/videojs/video.js/blob/master/src/js/component.js#L235)
+_inherited from_: [src/js/component.js#L239](https://github.com/videojs/video.js/blob/master/src/js/component.js#L239)
 
 ---
 
@@ -350,7 +318,7 @@ _inherited from_: [src/js/component.js#L235](https://github.com/videojs/video.js
 * __player__ 
 * __options__ 
 
-_defined in_: [src/js/tracks.js#L125](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L125)
+_defined in_: [src/js/tracks.js#L127](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L127)
 
 ---
 
@@ -365,7 +333,7 @@ _defined in_: [src/js/tracks.js#L125](https://github.com/videojs/video.js/blob/m
 >       }
 >     }
 
-_inherited from_: [src/js/component.js#L431](https://github.com/videojs/video.js/blob/master/src/js/component.js#L431)
+_inherited from_: [src/js/component.js#L439](https://github.com/videojs/video.js/blob/master/src/js/component.js#L439)
 
 ---
 
@@ -375,7 +343,7 @@ _inherited from_: [src/js/component.js#L431](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `String` 
 
-_defined in_: [src/js/tracks.js#L158](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L158)
+_defined in_: [src/js/tracks.js#L160](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L160)
 
 ---
 
@@ -385,7 +353,7 @@ _defined in_: [src/js/tracks.js#L158](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `String` 
 
-_defined in_: [src/js/tracks.js#L231](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L231)
+_defined in_: [src/js/tracks.js#L233](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L233)
 
 ---
 
@@ -395,18 +363,7 @@ _defined in_: [src/js/tracks.js#L231](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `String` 
 
-_defined in_: [src/js/tracks.js#L216](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L216)
-
----
-
-### lockShowing()
-> Lock an item in its visible state
-> To be used with fadeIn/fadeOut.
-
-##### RETURNS: 
-* `vjs.Component` 
-
-_inherited from_: [src/js/component.js#L650](https://github.com/videojs/video.js/blob/master/src/js/component.js#L650)
+_defined in_: [src/js/tracks.js#L218](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L218)
 
 ---
 
@@ -416,22 +373,26 @@ _inherited from_: [src/js/component.js#L650](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Number` 
 
-_defined in_: [src/js/tracks.js#L298](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L298)
+_defined in_: [src/js/tracks.js#L300](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L300)
 
 ---
 
 ### name()
-> Returns the component's name
+> Get the component's name. The name is often used to reference the component.
+> 
+>     var name = myComponent.name();
 
 ##### RETURNS: 
 * `String` 
 
-_inherited from_: [src/js/component.js#L252](https://github.com/videojs/video.js/blob/master/src/js/component.js#L252)
+_inherited from_: [src/js/component.js#L258](https://github.com/videojs/video.js/blob/master/src/js/component.js#L258)
 
 ---
 
 ### off( [type], [fn] )
 > Remove an event listener from the component's element
+> 
+>     myComponent.off("eventName", myFunc);
 
 ##### PARAMETERS: 
 * __type__ `String` _(OPTIONAL)_ Event type. Without type it will remove all listeners.
@@ -440,22 +401,30 @@ _inherited from_: [src/js/component.js#L252](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L492](https://github.com/videojs/video.js/blob/master/src/js/component.js#L492)
+_inherited from_: [src/js/component.js#L510](https://github.com/videojs/video.js/blob/master/src/js/component.js#L510)
 
 ---
 
 ### on( type, fn )
 > Add an event listener to this component's element
+> 
+>     var myFunc = function(){
+>       var myPlayer = this;
+>       // Do something when the event is fired
+>     };
+> 
+>     myPlayer.on("eventName", myFunc);
+> 
 > The context will be the component.
 
 ##### PARAMETERS: 
-* __type__ `String` Event type e.g. 'click'
-* __fn__ `Function` Event listener
+* __type__ `String` The event type e.g. 'click'
+* __fn__ `Function` The event listener
 
 ##### RETURNS: 
-* `vjs.Component` 
+* `vjs.Component` self
 
-_inherited from_: [src/js/component.js#L480](https://github.com/videojs/video.js/blob/master/src/js/component.js#L480)
+_inherited from_: [src/js/component.js#L496](https://github.com/videojs/video.js/blob/master/src/js/component.js#L496)
 
 ---
 
@@ -469,7 +438,7 @@ _inherited from_: [src/js/component.js#L480](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L504](https://github.com/videojs/video.js/blob/master/src/js/component.js#L504)
+_inherited from_: [src/js/component.js#L522](https://github.com/videojs/video.js/blob/master/src/js/component.js#L522)
 
 ---
 
@@ -543,7 +512,7 @@ _inherited from_: [src/js/component.js#L116](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L561](https://github.com/videojs/video.js/blob/master/src/js/component.js#L561)
+_inherited from_: [src/js/component.js#L581](https://github.com/videojs/video.js/blob/master/src/js/component.js#L581)
 
 ---
 
@@ -553,7 +522,7 @@ _inherited from_: [src/js/component.js#L561](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Number` 
 
-_defined in_: [src/js/tracks.js#L280](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L280)
+_defined in_: [src/js/tracks.js#L282](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L282)
 
 ---
 
@@ -564,7 +533,7 @@ _defined in_: [src/js/tracks.js#L280](https://github.com/videojs/video.js/blob/m
 ##### PARAMETERS: 
 * __component__ `vjs.Component` Component to remove
 
-_inherited from_: [src/js/component.js#L393](https://github.com/videojs/video.js/blob/master/src/js/component.js#L393)
+_inherited from_: [src/js/component.js#L401](https://github.com/videojs/video.js/blob/master/src/js/component.js#L401)
 
 ---
 
@@ -577,7 +546,7 @@ _inherited from_: [src/js/component.js#L393](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L619](https://github.com/videojs/video.js/blob/master/src/js/component.js#L619)
+_inherited from_: [src/js/component.js#L639](https://github.com/videojs/video.js/blob/master/src/js/component.js#L639)
 
 ---
 
@@ -591,7 +560,7 @@ _inherited from_: [src/js/component.js#L619](https://github.com/videojs/video.js
 > The showing by default state is used in conjunction with the default attribute on track elements to indicate that the text track was enabled due to that attribute.
 > This allows the user agent to override the state if a later track is discovered that is more appropriate per the user's preferences.
 
-_defined in_: [src/js/tracks.js#L338](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L338)
+_defined in_: [src/js/tracks.js#L340](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L340)
 
 ---
 
@@ -601,7 +570,7 @@ _defined in_: [src/js/tracks.js#L338](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `String` 
 
-_defined in_: [src/js/tracks.js#L172](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L172)
+_defined in_: [src/js/tracks.js#L174](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L174)
 
 ---
 
@@ -611,21 +580,23 @@ _defined in_: [src/js/tracks.js#L172](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `String` 
 
-_defined in_: [src/js/tracks.js#L201](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L201)
+_defined in_: [src/js/tracks.js#L203](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L203)
 
 ---
 
 ### trigger( type, event )
 > Trigger an event on an element
+> 
+>     myComponent.trigger('eventName');
 
 ##### PARAMETERS: 
-* __type__ `String` Event type to trigger
-* __event__ `Event|Object` Event object to be passed to the listener
+* __type__ `String` The event type to trigger, e.g. 'click'
+* __event__ `Event|Object` The event object to be passed to the listener
 
 ##### RETURNS: 
-* `vjs.Component` 
+* `vjs.Component` self
 
-_inherited from_: [src/js/component.js#L516](https://github.com/videojs/video.js/blob/master/src/js/component.js#L516)
+_inherited from_: [src/js/component.js#L536](https://github.com/videojs/video.js/blob/master/src/js/component.js#L536)
 
 ---
 
@@ -635,18 +606,7 @@ _inherited from_: [src/js/component.js#L516](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Component` 
 
-_inherited from_: [src/js/component.js#L580](https://github.com/videojs/video.js/blob/master/src/js/component.js#L580)
-
----
-
-### unlockShowing()
-> Unlock an item to be hidden
-> To be used with fadeIn/fadeOut.
-
-##### RETURNS: 
-* `vjs.Component` 
-
-_inherited from_: [src/js/component.js#L661](https://github.com/videojs/video.js/blob/master/src/js/component.js#L661)
+_inherited from_: [src/js/component.js#L600](https://github.com/videojs/video.js/blob/master/src/js/component.js#L600)
 
 ---
 
@@ -664,7 +624,16 @@ _inherited from_: [src/js/component.js#L661](https://github.com/videojs/video.js
 * `vjs.Component` Returns 'this' if width was set
 * `Number|String` Returns the width if nothing was set
 
-_inherited from_: [src/js/component.js#L685](https://github.com/videojs/video.js/blob/master/src/js/component.js#L685)
+_inherited from_: [src/js/component.js#L707](https://github.com/videojs/video.js/blob/master/src/js/component.js#L707)
+
+---
+
+## EVENTS
+
+### resize
+> Fired when the width and/or height of the component changes
+
+_inherited from_: [src/js/component.js#L809](https://github.com/videojs/video.js/blob/master/src/js/component.js#L809)
 
 ---
 
