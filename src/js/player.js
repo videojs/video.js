@@ -2,7 +2,7 @@
  * An instance of the `vjs.Player` class is created when any of the Video.js setup methods are used to initialize a video.
  *
  * ```js
- * var myPlayer = Video('example_video_1');
+ * var myPlayer = videojs('example_video_1');
  * ```
  *
  * In the follwing example, the `data-setup` attribute tells the Video.js library to create a player instance when the library is ready.
@@ -515,9 +515,7 @@ vjs.Player.prototype.techGet = function(method){
  *
  * ##### EXAMPLE:
  *
- * ```js
- *   myPlayer.play();
- * ```
+ *     myPlayer.play();
  *
  * @return {vjs.Player} self
  */
@@ -526,49 +524,89 @@ vjs.Player.prototype.play = function(){
   return this;
 };
 
-// http://dev.w3.org/html5/spec/video.html#dom-media-pause
+/**
+ * Pause the video playback
+ *
+ * ##### EXAMPLE:
+ *
+ *     myPlayer.pause();
+ *
+ * @return {vjs.Player} self
+ */
 vjs.Player.prototype.pause = function(){
   this.techCall('pause');
   return this;
 };
 
-// http://dev.w3.org/html5/spec/video.html#dom-media-paused
-// The initial state of paused should be true (in Safari it's actually false)
+/**
+ * Check if the player is paused
+ *
+ * ##### EXAMPLE:
+ *
+ *     var isPaused = myPlayer.paused();
+ *     var isPlaying = !myPlayer.paused();
+ *
+ * @return {Boolean} false if the media is currently playing, or true otherwise
+ */
 vjs.Player.prototype.paused = function(){
+  // The initial state of paused should be true (in Safari it's actually false)
   return (this.techGet('paused') === false) ? false : true;
 };
 
-// http://dev.w3.org/html5/spec/video.html#dom-media-currenttime
+/**
+ * Get or set the current time (in seconds)
+ *
+ * ##### EXAMPLE:
+ *
+ *     // get
+ *     var whereYouAt = myPlayer.currentTime();
+ *
+ *     // set
+ *     myPlayer.currentTime(120); // 2 minutes into the video
+ *
+ * @param  {Number|String=} seconds The time to seek to
+ * @return {Number}        The time in seconds, when not setting
+ * @return {vjs.Player}    self, when the current time is set
+ */
 vjs.Player.prototype.currentTime = function(seconds){
   if (seconds !== undefined) {
 
-    // Cache the last set value for smoother scrubbing.
+    // cache the last set value for smoother scrubbing
     this.cache_.lastSetCurrentTime = seconds;
 
     this.techCall('setCurrentTime', seconds);
 
-    // Improve the accuracy of manual timeupdates
+    // improve the accuracy of manual timeupdates
     if (this.manualTimeUpdates) { this.trigger('timeupdate'); }
 
     return this;
   }
 
-  // Cache last currentTime and return
-  // Default to 0 seconds
+  // cache last currentTime and return
+  // default to 0 seconds
   return this.cache_.currentTime = (this.techGet('currentTime') || 0);
 };
 
-// http://dev.w3.org/html5/spec/video.html#dom-media-duration
-// Duration should return NaN if not available. ParseFloat will turn false-ish values to NaN.
+/**
+ * Get the length in time of the video in seconds
+ *
+ * **NOTE**: The video must have started loading before the duration can be
+ * known, and in the case of Flash, may not be known until the video starts
+ * playing.
+ *
+ * @return {Number} The duration of the video in seconds
+ */
 vjs.Player.prototype.duration = function(seconds){
   if (seconds !== undefined) {
 
-    // Cache the last set value for optimiized scrubbing (esp. Flash)
+    // cache the last set value for optimiized scrubbing (esp. Flash)
     this.cache_.duration = parseFloat(seconds);
 
     return this;
   }
 
+  // duration should return NaN if not available.
+  // parseFloat will turn false-ish values to NaN.
   return this.cache_.duration;
 };
 
@@ -581,6 +619,29 @@ vjs.Player.prototype.remainingTime = function(){
 // Buffered returns a timerange object.
 // Kind of like an array of portions of the video that have been downloaded.
 // So far no browsers return more than one range (portion)
+
+/**
+ * Get a TimeRange object with the times of the video that have been downloaded
+ *
+ * If you just want the percent of the video that's been downloaded,
+ * use bufferedPercent.
+ *
+ * ##### EXAMPLE:
+ *
+ *     // Number of different ranges of time have been buffered. Usually 1.
+ *     numberOfRanges = bufferedTimeRange.length,
+ *
+ *     // Time in seconds when the first range starts. Usually 0.
+ *     firstRangeStart = bufferedTimeRange.start(0),
+ *
+ *     // Time in seconds when the first range ends
+ *     firstRangeEnd = bufferedTimeRange.end(0),
+ *
+ *     // Length in seconds of the first time range
+ *     firstRangeLength = firstRangeEnd - firstRangeStart;
+ *
+ * @return {Object} A mock TimeRange object (following HTML spec)
+ */
 vjs.Player.prototype.buffered = function(){
   var buffered = this.techGet('buffered'),
       start = 0,
@@ -597,7 +658,18 @@ vjs.Player.prototype.buffered = function(){
   return vjs.createTimeRange(start, end);
 };
 
-// Calculates amount of buffer is full. Not in spec but useful.
+/**
+ * Get the percent (as a decimal) of the video that's been downloaded
+ *
+ * ##### EXAMPLE:
+ *
+ *     var howMuchIsDownloaded = myPlayer.bufferedPercent();
+ *
+ * 0 means none, 1 means all.
+ * (This method isn't in the HTML5 spec, but it's very convenient)
+ *
+ * @return {Number} A decimal between 0 and 1 representing the percent
+ */
 vjs.Player.prototype.bufferedPercent = function(){
   return (this.duration()) ? this.buffered().end(0) / this.duration() : 0;
 };
@@ -756,11 +828,37 @@ vjs.Player.prototype.selectSource = function(sources){
   return false;
 };
 
-// src is a pretty powerful function
-// If you pass it an array of source objects, it will find the best source to play and use that object.src
-//   If the new source requires a new playback technology, it will switch to that.
-// If you pass it an object, it will set the source to object.src
-// If you pass it anything else (url string) it will set the video source to that
+/**
+ * The source function updates the video source
+ *
+ * There are three types of variables you can pass as the argument.
+ *
+ * **URL String**: A URL to the the video file. Use this method if you are sure
+ * the current playback technology (HTML5/Flash) can support the source you
+ * provide. Currently only MP4 files can be used in both HTML5 and Flash.
+ *
+ *     myPlayer.src("http://www.example.com/path/to/video.mp4");
+ *
+ * **Source Object (or element):** A javascript object containing information
+ * about the source file. Use this method if you want the player to determine if
+ * it can support the file using the type information.
+ *
+ *     myPlayer.src({ type: "video/mp4", src: "http://www.example.com/path/to/video.mp4" });
+ *
+ * **Array of Source Objects:** To provide multiple versions of the source so
+ * that it can be played using HTML5 across browsers you can use an array of
+ * source objects. Video.js will detect which version is supported and load that
+ * file.
+ *
+ *     myPlayer.src([
+ *       { type: "video/mp4", src: "http://www.example.com/path/to/video.mp4" },
+ *       { type: "video/webm", src: "http://www.example.com/path/to/video.webm" },
+ *       { type: "video/ogg", src: "http://www.example.com/path/to/video.ogv" }
+ *     ]);
+ *
+ * @param  {String|Object|Array} source The source URL, object, or array of sources
+ * @return {vjs.Player} self
+ */
 vjs.Player.prototype.src = function(source){
   // Case: Array of source objects to choose from and pick the best to play
   if (source instanceof Array) {
