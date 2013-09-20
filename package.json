@@ -35,7 +35,8 @@
     "uglify-js": "~2.3.6",
     "grunt-contrib-less": "~0.6.4",
     "grunt-karma": "~0.4.4",
-    "karma-qunit": "~0.0.2"
+    "karma-qunit": "~0.0.2",
+    "videojs-doc-generator": "0.0.1"
   },
   "testling": {
     "browsers": [

@@ -46,7 +46,7 @@ The volume handle can be dragged to adjust the volume level
 - [EVENTS](#events)
   - [resize](#resize-event) _`inherited`_
 
-- [PROPERTIES](#properties)
+- [UNDEFINED](#undefined)
   - [defaultValue](#defaultvalue)
 
 ---
@@ -500,7 +500,7 @@ _inherited from_: [src/js/component.js#L809](https://github.com/videojs/video.js
 
 ---
 
-## PROPERTIES
+## UNDEFINED
 
 ### defaultValue
 

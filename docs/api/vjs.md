@@ -89,7 +89,7 @@ _defined in_: [src/js/core.js#L77](https://github.com/videojs/video.js/blob/mast
 ### players
 > Global player list
 
-_defined in_: [src/js/core.js#L112](https://github.com/videojs/video.js/blob/master/src/js/core.js#L112)
+_defined in_: [src/js/core.js#L118](https://github.com/videojs/video.js/blob/master/src/js/core.js#L118)
 
 ---
 

@@ -3,7 +3,7 @@
 # vjs.LoadProgressBar
 
 __EXTENDS__: [vjs.Component](vjs.Component.md)  
-__DEFINED IN__: [src/js/control-bar/progress-control.js#L118](https://github.com/videojs/video.js/blob/master/src/js/control-bar/progress-control.js#L118)  
+__DEFINED IN__: [src/js/control-bar/progress-control.js#L136](https://github.com/videojs/video.js/blob/master/src/js/control-bar/progress-control.js#L136)  
 
 Shows load progress
 
@@ -253,7 +253,7 @@ _inherited from_: [src/js/component.js#L239](https://github.com/videojs/video.js
 * __player__ 
 * __options__ 
 
-_defined in_: [src/js/control-bar/progress-control.js#L120](https://github.com/videojs/video.js/blob/master/src/js/control-bar/progress-control.js#L120)
+_defined in_: [src/js/control-bar/progress-control.js#L138](https://github.com/videojs/video.js/blob/master/src/js/control-bar/progress-control.js#L138)
 
 ---
 

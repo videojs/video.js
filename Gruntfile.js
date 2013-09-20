@@ -139,14 +139,14 @@ module.exports = function(grunt) {
         autoWatch: false
       }
     },
-    docs: {
-      options: {
-        output: 'docs/api',
-        baseURL: 'https://github.com/videojs/video.js/blob/master/'
-      },
-      all: sourceFiles,
-      player: 'src/js/player.js',
-      component: ['src/js/core.js', 'src/js/plugins.js', 'src/js/component.js', 'src/js/control-bar/control-bar.js', 'src/js/control-bar/*.js']
+    vjsdocs: {
+      all: {
+        src: sourceFiles,
+        dest: 'docs/api',
+        options: {
+          baseURL: 'https://github.com/videojs/video.js/blob/master/'
+        }
+      }
     }
   });
 
@@ -160,9 +160,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-s3');
   grunt.loadNpmTasks('contribflow');
   grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks('videojs-doc-generator');
 
   // grunt.loadTasks('./docs/tasks/');
-  grunt.loadTasks('../videojs-doc-generator/tasks/');
+  // grunt.loadTasks('../videojs-doc-generator/tasks/');
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'less', 'build', 'minify', 'dist']);

@@ -3,7 +3,7 @@
 # vjs.RemainingTimeDisplay
 
 __EXTENDS__: [vjs.Component](vjs.Component.md)  
-__DEFINED IN__: [src/js/control-bar/time-display.js#L102](https://github.com/videojs/video.js/blob/master/src/js/control-bar/time-display.js#L102)  
+__DEFINED IN__: [src/js/control-bar/time-display.js#L103](https://github.com/videojs/video.js/blob/master/src/js/control-bar/time-display.js#L103)  
 
 Displays the time left in the video
 
@@ -253,7 +253,7 @@ _inherited from_: [src/js/component.js#L239](https://github.com/videojs/video.js
 * __player__ 
 * __options__ 
 
-_defined in_: [src/js/control-bar/time-display.js#L104](https://github.com/videojs/video.js/blob/master/src/js/control-bar/time-display.js#L104)
+_defined in_: [src/js/control-bar/time-display.js#L105](https://github.com/videojs/video.js/blob/master/src/js/control-bar/time-display.js#L105)
 
 ---
 
