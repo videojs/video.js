@@ -46,6 +46,7 @@
  *     horsey.getName(); // -> Horsey
  *     horsey.makeSound(); // -> Alert: Neighhhhh!
  *
+ * @class
  * @constructor
  */
 vjs.CoreObject = vjs['CoreObject'] = function(){};

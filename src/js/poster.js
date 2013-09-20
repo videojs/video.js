@@ -1,7 +1,8 @@
 /* Poster Image
 ================================================================================ */
 /**
- * Poster image. Shows before the video plays.
+ * The component that handles showing the poster image.
+ *
  * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor

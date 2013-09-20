@@ -2,59 +2,25 @@
 
 # vjs
 
-__DEFINED IN__: [src/js/core.js#L20](https://github.com/videojs/video.js/blob/master/src/js/core.js#L20)  
+__DEFINED IN__: [src/js/core.js#L26](https://github.com/videojs/video.js/blob/master/src/js/core.js#L26)  
 
 Doubles as the main function for users to create a player instance and also
 the main library object.
+
+**ALIASES** videojs, _V_ (deprecated)
+
+The `vjs` function can be used to initialize or retrieve a player.
+
+    var myPlayer = vjs('my_video_id');
 
 ---
 
 ## INDEX
 
 - [PROPERTIES](#properties)
-  - [cache](#cache)
-  - [guid](#guid)
   - [options](#options)
   - [players](#players)
   - [support](#support)
-
-- NAMESPACES
-  - [CoreObject](vjs.CoreObject.md)
-  - [JSON](vjs.JSON.md)
-  - [obj](vjs.obj.md)
-
-- [METHODS](#methods)
-  - [addClass](#addclass-element-classtoadd-)
-  - [bind](#bind-context-fn-uid-)
-  - [capitalize](#capitalize-string-)
-  - [cleanUpEvents](#cleanupevents-elem-type-)
-  - [createEl](#createel-tagname-properties-)
-  - [createTimeRange](#createtimerange-start-end-)
-  - [el](#el-id-)
-  - [fixEvent](#fixevent-event-)
-  - [formatTime](#formattime-seconds-guide-)
-  - [get](#get-url-onsuccess-onerror-)
-  - [getAbsoluteURL](#getabsoluteurl-url-)
-  - [getAttributeValues](#getattributevalues-tag-)
-  - [getComputedDimension](#getcomputeddimension-el-strcssrule-)
-  - [getData](#getdata-el-)
-  - [hasData](#hasdata-el-)
-  - [insertFirst](#insertfirst-child-parent-)
-  - [off](#off-elem-type-fn-)
-  - [on](#on-elem-type-fn-)
-  - [one](#one-elem-type-fn-)
-  - [plugin](#plugin-name-init-)
-  - [removeClass](#removeclass-element-classtoadd-)
-  - [removeData](#removedata-el-)
-  - [round](#round-num-dec-)
-  - [trigger](#trigger-elem-event-)
-  - [trim](#trim-string-)
-
-- [CONSTANTS](#constants)
-  - [IS_IPHONE](#is_iphone)
-  - [TEST_VID](#test_vid)
-  - [USER_AGENT](#user_agent)
-  - [expando](#expando)
 
 - CLASSES
   - [BigPlayButton](vjs.BigPlayButton.md)
@@ -66,6 +32,7 @@ the main library object.
   - [ChaptersTrackMenuItem](vjs.ChaptersTrackMenuItem.md)
   - [Component](vjs.Component.md)
   - [ControlBar](vjs.ControlBar.md)
+  - [CoreObject](vjs.CoreObject.md)
   - [CurrentTimeDisplay](vjs.CurrentTimeDisplay.md)
   - [DurationDisplay](vjs.DurationDisplay.md)
   - [Flash](vjs.Flash.md)
@@ -103,25 +70,21 @@ the main library object.
   - [VolumeLevel](vjs.VolumeLevel.md)
   - [VolumeMenuButton](vjs.VolumeMenuButton.md)
 
+- [METHODS](#methods)
+  - [cleanUpEvents](#cleanupevents-elem-type-)
+  - [fixEvent](#fixevent-event-)
+  - [off](#off-elem-type-fn-)
+  - [on](#on-elem-type-fn-)
+  - [one](#one-elem-type-fn-)
+  - [plugin](#plugin-name-init-)
+  - [trigger](#trigger-elem-event-)
+
+- NAMESPACES
+  - [obj](vjs.obj.md)
+
 ---
 
 ## PROPERTIES
-
-### cache
-> Element Data Store. Allows for binding data to an element without putting it directly on the element.
-> Ex. Event listneres are stored here.
-> (also from jsninja.com, slightly modified and updated for closure compiler)
-
-_defined in_: [src/js/lib.js#L187](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L187)
-
----
-
-### guid
-> Unique ID for an element or function
-
-_defined in_: [src/js/lib.js#L193](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L193)
-
----
 
 ### options
 > Global Player instance options, surfaced from vjs.Player.prototype.options_
@@ -129,65 +92,25 @@ _defined in_: [src/js/lib.js#L193](https://github.com/videojs/video.js/blob/mast
 > All options should use string keys so they avoid
 > renaming by closure compiler
 
-_defined in_: [src/js/core.js#L71](https://github.com/videojs/video.js/blob/master/src/js/core.js#L71)
+_defined in_: [src/js/core.js#L77](https://github.com/videojs/video.js/blob/master/src/js/core.js#L77)
 
 ---
 
 ### players
 > Global player list
 
-_defined in_: [src/js/core.js#L106](https://github.com/videojs/video.js/blob/master/src/js/core.js#L106)
+_defined in_: [src/js/core.js#L112](https://github.com/videojs/video.js/blob/master/src/js/core.js#L112)
 
 ---
 
 ### support
 > Object to hold browser support information
 
-_defined in_: [src/js/lib.js#L428](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L428)
+_defined in_: [src/js/lib.js#L457](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L457)
 
 ---
 
 ## METHODS
-
-### addClass( element, classToAdd )
-> Add a CSS class name to an element
-
-##### PARAMETERS: 
-* __element__ `Element` Element to add class name to
-* __classToAdd__ `String` Classname to add
-
-_defined in_: [src/js/lib.js#L267](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L267)
-
----
-
-### bind( context, fn, [uid] )
-> Bind (a.k.a proxy or Context). A simple method for changing the context of a function
->    It also stores a unique id on the function so it can be easily removed from events
-
-##### PARAMETERS: 
-* __context__ `*` The object to bind as scope
-* __fn__ `Function` The function to be bound to a scope
-* __uid__ `Number` _(OPTIONAL)_ An optional unique ID for the function to be set
-
-##### RETURNS: 
-* `Function` 
-
-_defined in_: [src/js/lib.js#L161](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L161)
-
----
-
-### capitalize( string )
-> Uppercase the first letter of a string
-
-##### PARAMETERS: 
-* __string__ `String` String to be uppercased
-
-##### RETURNS: 
-* `String` 
-
-_defined in_: [src/js/lib.js#L39](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L39)
-
----
 
 ### cleanUpEvents( elem, type )
 > Clean up the listener cache and dispatchers
@@ -197,51 +120,6 @@ _defined in_: [src/js/lib.js#L39](https://github.com/videojs/video.js/blob/maste
 * __type__ `String` Type of event to clean up
 
 _defined in_: [src/js/events.js#L118](https://github.com/videojs/video.js/blob/master/src/js/events.js#L118)
-
----
-
-### createEl( [tagName], [properties] )
-> Creates an element and applies properties.
-
-##### PARAMETERS: 
-* __tagName__ `String` _(OPTIONAL)_ Name of tag to be created.
-* __properties__ `Object` _(OPTIONAL)_ Element properties to be applied.
-
-##### RETURNS: 
-* `Element` 
-
-_defined in_: [src/js/lib.js#L9](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L9)
-
----
-
-### createTimeRange( start, end )
-> Should create a fake TimeRange object
-> Mimics an HTML5 time range instance, which has functions that
-> return the start and end times for a range
-> TimeRanges are returned by the buffered() method
-
-##### PARAMETERS: 
-* __start__ `Number` Start time in seconds
-* __end__ `Number` End time in seconds
-
-##### RETURNS: 
-* `Object` Fake TimeRange object
-
-_defined in_: [src/js/lib.js#L510](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L510)
-
----
-
-### el( id )
-> Shorthand for document.getElementById()
-> Also allows for CSS (jQuery) ID syntax. But nothing other than IDs.
-
-##### PARAMETERS: 
-* __id__ `String` Element ID
-
-##### RETURNS: 
-* `Element` Element with supplied ID
-
-_defined in_: [src/js/lib.js#L436](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L436)
 
 ---
 
@@ -255,116 +133,6 @@ _defined in_: [src/js/lib.js#L436](https://github.com/videojs/video.js/blob/mast
 * `Object` 
 
 _defined in_: [src/js/events.js#L157](https://github.com/videojs/video.js/blob/master/src/js/events.js#L157)
-
----
-
-### formatTime( seconds, guide )
-> Format seconds as a time string, H:MM:SS or M:SS
-> Supplying a guide (in seconds) will force a number of leading zeros
-> to cover the length of the guide
-
-##### PARAMETERS: 
-* __seconds__ `Number` Number of seconds to be turned into a string
-* __guide__ `Number` Number (in seconds) to model the string after
-
-##### RETURNS: 
-* `String` Time formatted as H:MM:SS or M:SS
-
-_defined in_: [src/js/lib.js#L452](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L452)
-
----
-
-### get( url, [onSuccess], [onError] )
-> Simple http request for retrieving external files (e.g. text tracks)
-
-##### PARAMETERS: 
-* __url__ `String` URL of resource
-* __onSuccess__ `Function` _(OPTIONAL)_ Success callback
-* __onError__ `Function` _(OPTIONAL)_ Error callback
-
-_defined in_: [src/js/lib.js#L524](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L524)
-
----
-
-### getAbsoluteURL( url )
-> Get abosolute version of relative URL. Used to tell flash correct URL.
-> http://stackoverflow.com/questions/470832/getting-an-absolute-url-from-a-relative-one-ie6-issue
-
-##### PARAMETERS: 
-* __url__ `String` URL to make absolute
-
-##### RETURNS: 
-* `String` Absolute URL
-
-_defined in_: [src/js/lib.js#L592](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L592)
-
----
-
-### getAttributeValues( tag )
-> Get an element's attribute values, as defined on the HTML tag
-> Attributs are not the same as properties. They're defined on the tag
-> or with setAttribute (which shouldn't be used with HTML)
-> This will return true or false for boolean attributes.
-
-##### PARAMETERS: 
-* __tag__ `Element` Element from which to get tag attributes
-
-##### RETURNS: 
-* `Object` 
-
-_defined in_: [src/js/lib.js#L359](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L359)
-
----
-
-### getComputedDimension( el, strCssRule )
-> Get the computed style value for an element
-> From http://robertnyman.com/2006/04/24/get-the-rendered-style-of-an-element/
-
-##### PARAMETERS: 
-* __el__ `Element` Element to get style value for
-* __strCssRule__ `String` Style name
-
-##### RETURNS: 
-* `String` Style value
-
-_defined in_: [src/js/lib.js#L399](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L399)
-
----
-
-### getData( el )
-> Returns the cache object where data for an element is stored
-
-##### PARAMETERS: 
-* __el__ `Element` Element to store data for.
-
-##### RETURNS: 
-* `Object` 
-
-_defined in_: [src/js/lib.js#L207](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L207)
-
----
-
-### hasData( el )
-> Returns the cache object where data for an element is stored
-
-##### PARAMETERS: 
-* __el__ `Element` Element to store data for.
-
-##### RETURNS: 
-* `Object` 
-
-_defined in_: [src/js/lib.js#L221](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L221)
-
----
-
-### insertFirst( child, parent )
-> Insert an element as the first child node of another
-
-##### PARAMETERS: 
-* __child__ `Element` Element to insert
-* __parent__ `[type]` Element to insert child into
-
-_defined in_: [src/js/lib.js#L416](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L416)
 
 ---
 
@@ -421,41 +189,6 @@ _defined in_: [src/js/plugins.js#L7](https://github.com/videojs/video.js/blob/ma
 
 ---
 
-### removeClass( element, classToAdd )
-> Remove a CSS class name from an element
-
-##### PARAMETERS: 
-* __element__ `Element` Element to remove from class name
-* __classToAdd__ `String` Classname to remove
-
-_defined in_: [src/js/lib.js#L278](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L278)
-
----
-
-### removeData( el )
-> Delete data for the element from the cache and the guid attr from getElementById
-
-##### PARAMETERS: 
-* __el__ `Element` Remove data for an element
-
-_defined in_: [src/js/lib.js#L230](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L230)
-
----
-
-### round( num, dec )
-> Should round off a number to a decimal place
-
-##### PARAMETERS: 
-* __num__ `Number` Number to round
-* __dec__ `Number` Number of decimal places to round to
-
-##### RETURNS: 
-* `Number` Rounded number
-
-_defined in_: [src/js/lib.js#L496](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L496)
-
----
-
 ### trigger( elem, event )
 > Trigger an event for an element
 
@@ -464,49 +197,6 @@ _defined in_: [src/js/lib.js#L496](https://github.com/videojs/video.js/blob/mast
 * __event__ `String` Type of event to trigger
 
 _defined in_: [src/js/events.js#L259](https://github.com/videojs/video.js/blob/master/src/js/events.js#L259)
-
----
-
-### trim( string )
-> Trim whitespace from the ends of a string.
-
-##### PARAMETERS: 
-* __string__ `String` String to trim
-
-##### RETURNS: 
-* `String` Trimmed string
-
-_defined in_: [src/js/lib.js#L486](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L486)
-
----
-
-## CONSTANTS
-
-### IS_IPHONE
-> Device is an iPhone
-
-_defined in_: [src/js/lib.js#L310](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L310)
-
----
-
-### TEST_VID
-> Element for testing browser HTML5 video capabilities
-
-_defined in_: [src/js/lib.js#L296](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L296)
-
----
-
-### USER_AGENT
-> Useragent for browser testing.
-
-_defined in_: [src/js/lib.js#L303](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L303)
-
----
-
-### expando
-> Unique attribute name to store an element's guid in
-
-_defined in_: [src/js/lib.js#L200](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L200)
 
 ---
 
