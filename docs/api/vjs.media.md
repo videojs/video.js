@@ -7,12 +7,12 @@
 
 ## INDEX
 
-- [PROPERTIES](#properties)
+- [UNDEFINED](#undefined)
   - [ApiMethods](#apimethods)
 
 ---
 
-## PROPERTIES
+## UNDEFINED
 
 ### ApiMethods
 > List of default API methods for any MediaTechController

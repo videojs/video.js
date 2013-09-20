@@ -138,9 +138,16 @@ module.exports = function(grunt) {
         configFile: 'test/karma.conf.js',
         autoWatch: false
       }
-    }
     },
-    docs: {}
+    vjsdocs: {
+      all: {
+        src: sourceFiles,
+        dest: 'docs/api',
+        options: {
+          baseURL: 'https://github.com/videojs/video.js/blob/master/'
+        }
+      }
+    }
   });
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -153,9 +160,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-s3');
   grunt.loadNpmTasks('contribflow');
   grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks('videojs-doc-generator');
 
   // grunt.loadTasks('./docs/tasks/');
-  grunt.loadTasks('../videojs-doc-generator/tasks/');
+  // grunt.loadTasks('../videojs-doc-generator/tasks/');
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'less', 'build', 'minify', 'dist']);

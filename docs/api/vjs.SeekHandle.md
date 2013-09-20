@@ -3,7 +3,7 @@
 # vjs.SeekHandle
 
 __EXTENDS__: [vjs.SliderHandle](vjs.SliderHandle.md)  
-__DEFINED IN__: [src/js/control-bar/progress-control.js#L167](https://github.com/videojs/video.js/blob/master/src/js/control-bar/progress-control.js#L167)  
+__DEFINED IN__: [src/js/control-bar/progress-control.js#L185](https://github.com/videojs/video.js/blob/master/src/js/control-bar/progress-control.js#L185)  
 
 The Seek Handle shows the current position of the playhead during playback,
 and can be dragged to adjust the playhead.
@@ -138,7 +138,7 @@ _inherited from_: [src/js/component.js#L220](https://github.com/videojs/video.js
 * __tagName__ `String` _(OPTIONAL)_ Element's node type. e.g. 'div'
 * __attributes__ `Object` _(OPTIONAL)_ An object of element attributes that should be set on the element
 
-_defined in_: [src/js/control-bar/progress-control.js#L178](https://github.com/videojs/video.js/blob/master/src/js/control-bar/progress-control.js#L178)
+_defined in_: [src/js/control-bar/progress-control.js#L196](https://github.com/videojs/video.js/blob/master/src/js/control-bar/progress-control.js#L196)
 
 ---
 

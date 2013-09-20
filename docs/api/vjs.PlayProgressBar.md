@@ -3,7 +3,7 @@
 # vjs.PlayProgressBar
 
 __EXTENDS__: [vjs.Component](vjs.Component.md)  
-__DEFINED IN__: [src/js/control-bar/progress-control.js#L145](https://github.com/videojs/video.js/blob/master/src/js/control-bar/progress-control.js#L145)  
+__DEFINED IN__: [src/js/control-bar/progress-control.js#L163](https://github.com/videojs/video.js/blob/master/src/js/control-bar/progress-control.js#L163)  
 
 Shows play progress
 
@@ -253,7 +253,7 @@ _inherited from_: [src/js/component.js#L239](https://github.com/videojs/video.js
 * __player__ 
 * __options__ 
 
-_defined in_: [src/js/control-bar/progress-control.js#L147](https://github.com/videojs/video.js/blob/master/src/js/control-bar/progress-control.js#L147)
+_defined in_: [src/js/control-bar/progress-control.js#L165](https://github.com/videojs/video.js/blob/master/src/js/control-bar/progress-control.js#L165)
 
 ---
 
