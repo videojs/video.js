@@ -55,6 +55,8 @@ goog.exportProperty(vjs.Component.prototype, 'width', vjs.Component.prototype.wi
 goog.exportProperty(vjs.Component.prototype, 'height', vjs.Component.prototype.height);
 goog.exportProperty(vjs.Component.prototype, 'dimensions', vjs.Component.prototype.dimensions);
 goog.exportProperty(vjs.Component.prototype, 'ready', vjs.Component.prototype.ready);
+goog.exportProperty(vjs.Component.prototype, 'addClass', vjs.Component.prototype.addClass);
+goog.exportProperty(vjs.Component.prototype, 'removeClass', vjs.Component.prototype.removeClass);
 
 goog.exportSymbol('videojs.Player', vjs.Player);
 goog.exportProperty(vjs.Player.prototype, 'dispose', vjs.Player.prototype.dispose);
@@ -85,6 +87,7 @@ goog.exportSymbol('videojs.SeekHandle', vjs.SeekHandle);
 goog.exportSymbol('videojs.VolumeControl', vjs.VolumeControl);
 goog.exportSymbol('videojs.VolumeBar', vjs.VolumeBar);
 goog.exportSymbol('videojs.VolumeLevel', vjs.VolumeLevel);
+goog.exportSymbol('videojs.VolumeMenuButton', vjs.VolumeMenuButton);
 goog.exportSymbol('videojs.VolumeHandle', vjs.VolumeHandle);
 goog.exportSymbol('videojs.MuteToggle', vjs.MuteToggle);
 goog.exportSymbol('videojs.PosterImage', vjs.PosterImage);

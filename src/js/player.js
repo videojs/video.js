@@ -265,12 +265,12 @@ vjs.Player.prototype.loadTech = function(techName, source){
     this.player_.triggerReady();
 
     // Manually track progress in cases where the browser/flash player doesn't report it.
-    if (!this.features.progressEvents) {
+    if (!this.features['progressEvents']) {
       this.player_.manualProgressOn();
     }
 
     // Manually track timeudpates in cases where the browser/flash player doesn't report it.
-    if (!this.features.timeupdateEvents) {
+    if (!this.features['timeupdateEvents']) {
       this.player_.manualTimeUpdatesOn();
     }
   };
@@ -335,7 +335,7 @@ vjs.Player.prototype.manualProgressOn = function(){
   this.tech.one('progress', function(){
 
     // Update known progress support for this playback technology
-    this.features.progressEvents = true;
+    this.features['progressEvents'] = true;
 
     // Turn off manual progress tracking
     this.player_.manualProgressOff();
@@ -374,7 +374,7 @@ vjs.Player.prototype.manualTimeUpdatesOn = function(){
   // Watch for native timeupdate event
   this.tech.one('timeupdate', function(){
     // Update known progress support for this playback technology
-    this.features.timeupdateEvents = true;
+    this.features['timeupdateEvents'] = true;
     // Turn off manual progress tracking
     this.player_.manualTimeUpdatesOff();
   });
@@ -562,12 +562,7 @@ vjs.Player.prototype.techCall = function(method, arg){
 // Get calls can't wait for the tech, and sometimes don't need to.
 vjs.Player.prototype.techGet = function(method){
 
-  // Make sure there is a tech
-  // if (!this.tech) {
-  //   return;
-  // }
-
-  if (this.tech.isReady_) {
+  if (this.tech && this.tech.isReady_) {
 
     // Flash likes to die and reload when you hide or reposition it.
     // In these cases the object methods go away and we get errors.
@@ -1000,7 +995,7 @@ vjs.Player.prototype.src = function(source){
       }
     } else {
       this.el_.appendChild(vjs.createEl('p', {
-        innerHTML: 'Sorry, no compatible source and playback technology were found for this video. Try using another browser like <a href="http://bit.ly/ccMUEC">Chrome</a> or download the latest <a href="http://adobe.ly/mwfN1">Adobe Flash Player</a>.'
+        innerHTML: this.options()['notSupportedMessage']
       }));
     }
 
@@ -1190,6 +1185,7 @@ vjs.Player.prototype.usingNativeControls = function(bool){
 
 vjs.Player.prototype.error = function(){ return this.techGet('error'); };
 vjs.Player.prototype.ended = function(){ return this.techGet('ended'); };
+vjs.Player.prototype.seeking = function(){ return this.techGet('seeking'); };
 
 // When the player is first initialized, trigger activity so components
 // like the control bar show themselves if needed
