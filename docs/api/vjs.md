@@ -18,6 +18,11 @@ the main library object.
   - [players](#players)
   - [support](#support)
 
+- NAMESPACES
+  - [CoreObject](vjs.CoreObject.md)
+  - [JSON](vjs.JSON.md)
+  - [obj](vjs.obj.md)
+
 - [METHODS](#methods)
   - [addClass](#addclass-element-classtoadd-)
   - [bind](#bind-context-fn-uid-)
@@ -45,11 +50,58 @@ the main library object.
   - [trigger](#trigger-elem-event-)
   - [trim](#trim-string-)
 
-- [CONSTANT](#constant)
+- [CONSTANTS](#constants)
   - [IS_IPHONE](#is_iphone)
   - [TEST_VID](#test_vid)
   - [USER_AGENT](#user_agent)
   - [expando](#expando)
+
+- CLASSES
+  - [BigPlayButton](vjs.BigPlayButton.md)
+  - [Button](vjs.Button.md)
+  - [CaptionsButton](vjs.CaptionsButton.md)
+  - [CaptionsTrack](vjs.CaptionsTrack.md)
+  - [ChaptersButton](vjs.ChaptersButton.md)
+  - [ChaptersTrack](vjs.ChaptersTrack.md)
+  - [ChaptersTrackMenuItem](vjs.ChaptersTrackMenuItem.md)
+  - [Component](vjs.Component.md)
+  - [ControlBar](vjs.ControlBar.md)
+  - [CurrentTimeDisplay](vjs.CurrentTimeDisplay.md)
+  - [DurationDisplay](vjs.DurationDisplay.md)
+  - [Flash](vjs.Flash.md)
+  - [FullscreenToggle](vjs.FullscreenToggle.md)
+  - [Html5](vjs.Html5.md)
+  - [LoadProgressBar](vjs.LoadProgressBar.md)
+  - [LoadingSpinner](vjs.LoadingSpinner.md)
+  - [MediaLoader](vjs.MediaLoader.md)
+  - [MediaTechController](vjs.MediaTechController.md)
+  - [Menu](vjs.Menu.md)
+  - [MenuButton](vjs.MenuButton.md)
+  - [MenuItem](vjs.MenuItem.md)
+  - [MuteToggle](vjs.MuteToggle.md)
+  - [OffTextTrackMenuItem](vjs.OffTextTrackMenuItem.md)
+  - [PlayProgressBar](vjs.PlayProgressBar.md)
+  - [PlayToggle](vjs.PlayToggle.md)
+  - [Player](vjs.Player.md)
+  - [PosterImage](vjs.PosterImage.md)
+  - [ProgressControl](vjs.ProgressControl.md)
+  - [RemainingTimeDisplay](vjs.RemainingTimeDisplay.md)
+  - [SeekBar](vjs.SeekBar.md)
+  - [SeekHandle](vjs.SeekHandle.md)
+  - [Slider](vjs.Slider.md)
+  - [SliderHandle](vjs.SliderHandle.md)
+  - [SubtitlesButton](vjs.SubtitlesButton.md)
+  - [SubtitlesTrack](vjs.SubtitlesTrack.md)
+  - [TextTrack](vjs.TextTrack.md)
+  - [TextTrackButton](vjs.TextTrackButton.md)
+  - [TextTrackDisplay](vjs.TextTrackDisplay.md)
+  - [TextTrackMenuItem](vjs.TextTrackMenuItem.md)
+  - [TimeDivider](vjs.TimeDivider.md)
+  - [VolumeBar](vjs.VolumeBar.md)
+  - [VolumeControl](vjs.VolumeControl.md)
+  - [VolumeHandle](vjs.VolumeHandle.md)
+  - [VolumeLevel](vjs.VolumeLevel.md)
+  - [VolumeMenuButton](vjs.VolumeMenuButton.md)
 
 ---
 
@@ -428,7 +480,7 @@ _defined in_: [src/js/lib.js#L486](https://github.com/videojs/video.js/blob/mast
 
 ---
 
-## CONSTANT
+## CONSTANTS
 
 ### IS_IPHONE
 > Device is an iPhone
