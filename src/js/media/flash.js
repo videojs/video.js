@@ -335,7 +335,8 @@ vjs.Flash.formats = {
   'video/flv': 'FLV',
   'video/x-flv': 'FLV',
   'video/mp4': 'MP4',
-  'video/m4v': 'MP4'
+  'video/m4v': 'MP4',
+  'application/x-mpegURL': 'MP4'
 };
 
 vjs.Flash.streamingFormats = {
