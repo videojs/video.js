@@ -725,6 +725,16 @@ vjs.Player.prototype.selectSource = function(sources){
   return false;
 };
 
+/**
+ * Appends a not supported message. Can be called externally by the 
+ * hosting website.
+ */
+vjs.Player.prototype.appendNotSupportedMessage = function(){
+  this.el_.appendChild(vjs.createEl('p', {
+    innerHTML: this.options()['notSupportedMessage']
+  }));
+};
+
 // src is a pretty powerful function
 // If you pass it an array of source objects, it will find the best source to play and use that object.src
 //   If the new source requires a new playback technology, it will switch to that.
@@ -749,9 +759,7 @@ vjs.Player.prototype.src = function(source){
         this.loadTech(techName, source);
       }
     } else {
-      this.el_.appendChild(vjs.createEl('p', {
-        innerHTML: this.options()['notSupportedMessage']
-      }));
+      this.appendNotSupportedMessage();
     }
 
   // Case: Source object { src: '', type: '' ... }
