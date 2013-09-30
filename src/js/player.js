@@ -730,9 +730,18 @@ vjs.Player.prototype.selectSource = function(sources){
  * hosting website.
  */
 vjs.Player.prototype.appendNotSupportedMessage = function(){
-  this.el_.appendChild(vjs.createEl('p', {
-    innerHTML: this.options()['notSupportedMessage']
-  }));
+  var vjsError = document.getElementById("vjs-error");
+  //rewrite an existing error with a new message.
+  if(vjsError){
+    vjsError.innerHTML = this.options()['notSupportedMessage'];
+  }else{
+    //create a new error.
+    this.el_.appendChild(vjs.createEl('p', {
+      id: "vjs-error",
+      class: "vjs-error",
+      innerHTML: this.options()['notSupportedMessage']
+    }));
+  }
 };
 
 // src is a pretty powerful function
