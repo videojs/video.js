@@ -10,17 +10,25 @@ You can download the Video.js source and host it on your own servers, or use the
 
 > NOTE: If you're already using an HTML5 shiv like [Modernizr](http://modernizr.com/) you can include the Video.js JavaScript anywhere, however make sure your version of Modernizr includes the shiv for video.
 
+> If you're not using something like Modernizr but still want to include Video.JS before the closing body tag, you can add your own shiv. Include this in the head of your document:
+
+> ```html
+<script type="text/javascript">
+  document.createElement('video');document.createElement('audio');
+</script>
+```
+
 ### CDN Version ###
 ```html
-<link href="http://vjs.zencdn.net/4.1/video-js.css" rel="stylesheet">
-<script src="http://vjs.zencdn.net/4.1/video.js"></script>
+<link href="//vjs.zencdn.net/4.1/video-js.css" rel="stylesheet">
+<script src="//vjs.zencdn.net/4.1/video.js"></script>
 ```
 
 ### Self Hosted. ###
 With the self hosted option you'll also want to update the location of the video-js.swf file.
 ```html
-<link href="http://example.com/path/to/video-js.css" rel="stylesheet">
-<script src="http://example.com/path/to/video.js"></script>
+<link href="//example.com/path/to/video-js.css" rel="stylesheet">
+<script src="//example.com/path/to/video.js"></script>
 <script>
   videojs.options.flash.swf = "http://example.com/path/to/video-js.swf"
 </script>
