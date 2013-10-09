@@ -348,7 +348,7 @@ vjs.IS_OLD_ANDROID = vjs.IS_ANDROID && (/webkit/i).test(vjs.USER_AGENT) && vjs.A
 vjs.IS_FIREFOX = (/Firefox/i).test(vjs.USER_AGENT);
 vjs.IS_CHROME = (/Chrome/i).test(vjs.USER_AGENT);
 
-vjs.TOUCH_ENABLED = ('ontouchstart' in window);
+vjs.TOUCH_ENABLED = (('ontouchstart' in window) || window.DocumentTouch && document instanceof window.DocumentTouch);
 
 /**
  * Get an element's attribute values, as defined on the HTML tag

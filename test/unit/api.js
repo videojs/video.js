@@ -44,6 +44,7 @@ test('should export ready api call to public', function() {
 });
 
 test('should export useful components to the public', function () {
+  ok(videojs.TOUCH_ENABLED, 'Touch detection should be public');
   ok(videojs.ControlBar, 'ControlBar should be public');
   ok(videojs.Button, 'Button should be public');
   ok(videojs.PlayToggle, 'PlayToggle should be public');
