@@ -151,7 +151,7 @@ vjs.Player.prototype.createEl = function(){
   // Remove width/height attrs from tag so CSS can make it 100% width/height
   tag.removeAttribute('width');
   tag.removeAttribute('height');
-  // Empty video tag sources and tracks so the built-in player doesn't use them also.
+  // Empty video tag tracks so the built-in player doesn't use them also.
   // This may not be fast enough to stop HTML5 browsers from reading the tags
   // so we'll need to turn off any default tracks if we're manually doing
   // captions and subtitles. videoElement.textTracks
@@ -165,7 +165,7 @@ vjs.Player.prototype.createEl = function(){
     while (nodesLength--) {
       node = nodes[nodesLength];
       nodeName = node.nodeName.toLowerCase();
-      if (nodeName === 'source' || nodeName === 'track') {
+      if (nodeName === 'track') {
         removeNodes.push(node);
       }
     }
@@ -218,11 +218,10 @@ vjs.Player.prototype.loadTech = function(techName, source){
   if (this.tech) {
     this.unloadTech();
 
-  // If the first time loading, HTML5 tag will exist but won't be initialized
-  // So we need to remove it if we're not loading HTML5
+  // if this is the first time loading, HTML5 tag will exist but won't be initialized
+  // so we need to remove it if we're not loading HTML5
   } else if (techName !== 'Html5' && this.tag) {
-    this.el_.removeChild(this.tag);
-    this.tag['player'] = null;
+    vjs.Html5.disposeMediaElement(this.tag);
     this.tag = null;
   }
 
@@ -536,6 +535,10 @@ vjs.Player.prototype.duration = function(seconds){
     this.cache_.duration = parseFloat(seconds);
 
     return this;
+  }
+
+  if (this.cache_.duration === undefined) {
+    this.onDurationChange();
   }
 
   return this.cache_.duration;
