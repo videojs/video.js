@@ -222,6 +222,7 @@ List of player events you can add listeners for.
   <tr><td>loadeddata</td><td>Fired when the player has downloaded data at the current playback position.</td></tr>
   <tr><td>loadedalldata</td><td>Fired when the player has finished downloading the source data.</td></tr>
   <tr><td>play</td><td>Fired whenever the media begins or resumes playback.</td></tr>
+  <tr><td>firstplay</td><td>Fired when the player starts for the first time</td></tr>
   <tr><td>pause</td><td>Fired whenever the media has been paused.</td></tr>
   <tr><td>timeupdate</td><td>Fired when the current playback position has changed. During playback this is fired every 15-250 milliseconds, depnding on the playback technology in use.</td></tr>
   <tr><td>ended</td><td>Fired when the end of the media resource is reached. currentTime == duration</td></tr>
