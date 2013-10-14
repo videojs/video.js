@@ -1,5 +1,20 @@
 /* Poster Image
 ================================================================================ */
+
+/**
+ * Helper function to set the poster source. To ensure the poster image resizes
+ * while maintaining its original aspect ratio, use a div with `background-size`
+ * when available. For browsers that do not support `background-size` (e.g.
+ * IE8), fall back on using a regular img element.
+ */
+var setSrc = function(el, src){
+  if ('backgroundSize' in el.style) {
+    el.style.backgroundImage = 'url("' + src + '")';
+  } else {
+    el.appendChild(vjs.createEl('img', { src: src }));
+  }
+};
+
 /**
  * Poster image. Shows before the video plays.
  * @param {vjs.Player|Object} player
@@ -29,14 +44,26 @@ vjs.PosterImage.prototype.createEl = function(){
       poster = this.player_.poster();
 
   if (poster) {
-    if ('backgroundSize' in el.style) {
-      el.style.backgroundImage = 'url("' + poster + '")';
-    } else {
-      el.appendChild(vjs.createEl('img', { src: poster }));
-    }
+    setSrc(el, poster);
   }
 
   return el;
+};
+
+vjs.PosterImage.prototype.src = function(url){
+  var el = this.el();
+
+  // getter
+  if (url === undefined) {
+    if ('backgroundSize' in el.style) {
+      return (/url\(['"]?(.*)['"]?\)/).exec(el.style.backgroundImage)[1];
+    } else {
+      return el.src;
+    }
+  }
+
+  // setter
+  setSrc(el, url);
 };
 
 vjs.PosterImage.prototype.onClick = function(){
