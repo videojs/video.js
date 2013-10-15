@@ -27,7 +27,7 @@ vjs.Html5 = vjs.MediaTechController.extend({
 
     // If the element source is already set, we may have missed the loadstart event, and want to trigger it.
     // We don't want to set the source again and interrupt playback.
-    if (source && this.el_.currentSrc == source.src) {
+    if (source && this.el_.currentSrc === source.src && this.el_.networkState > 0) {
       player.trigger('loadstart');
 
     // Otherwise set the source if one was provided.
@@ -67,19 +67,20 @@ vjs.Html5.prototype.createEl = function(){
   var player = this.player_,
       // If possible, reuse original tag for HTML5 playback technology element
       el = player.tag,
-      newEl;
+      newEl,
+      clone;
 
   // Check if this browser supports moving the element into the box.
   // On the iPhone video will break if you move the element,
   // So we have to create a brand new element.
   if (!el || this.features['movingMediaElementInDOM'] === false) {
 
-    // If the original tag is still there, remove it.
+    // If the original tag is still there, clone and remove it.
     if (el) {
-      el['player'] = null;
+      clone = el.cloneNode(false);
+      vjs.Html5.disposeMediaElement(el);
+      el = clone;
       player.tag = null;
-      player.el().removeChild(el);
-      el = el.cloneNode(false);
     } else {
       el = vjs.createEl('video', {
         id:player.id() + '_html5_api',
@@ -258,6 +259,29 @@ vjs.Html5.canControlVolume = function(){
 // List of all HTML5 events (various uses).
 vjs.Html5.Events = 'loadstart,suspend,abort,error,emptied,stalled,loadedmetadata,loadeddata,canplay,canplaythrough,playing,waiting,seeking,seeked,ended,durationchange,timeupdate,progress,play,pause,ratechange,volumechange'.split(',');
 
+vjs.Html5.disposeMediaElement = function(el){
+  if (!el) { return; }
+
+  el['player'] = null;
+
+  if (el.parentNode) {
+    el.parentNode.removeChild(el);
+  }
+
+  // remove any child track or source nodes to prevent their loading
+  while(el.hasChildNodes()) {
+    el.removeChild(el.firstChild);
+  }
+
+  // remove any src reference. not setting `src=''` because that causes a warning
+  // in firefox
+  el.removeAttribute('src');
+
+  // force the media element to update its loading state by calling load()
+  if (typeof el.load === 'function') {
+    el.load();
+  }
+};
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //
 
