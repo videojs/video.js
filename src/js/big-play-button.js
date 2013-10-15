@@ -12,7 +12,7 @@ vjs.BigPlayButton = vjs.Button.extend();
 vjs.BigPlayButton.prototype.createEl = function(){
   return vjs.Button.prototype.createEl.call(this, 'div', {
     className: 'vjs-big-play-button',
-    innerHTML: '<span></span>',
+    innerHTML: '<span aria-hidden="true"></span>',
     'aria-label': 'play video'
   });
 };
