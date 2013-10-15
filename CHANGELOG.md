@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## Unreleased (HEAD)
-* Fixed a race condition that would cause videos to fail in Firefox ([view](https://github.com/videojs/video.js/pull/776))
+_(none)_
 
 --------------------
+
+## 4.2.2 (2013-10-15)
+* Fixed a race condition that would cause videos to fail in Firefox ([view](https://github.com/videojs/video.js/pull/776))
 
 ## 4.2.1 (2013-09-09)
 * Fixed an infinite loop caused by loading the library asynchronously ([view](https://github.com/videojs/video.js/pull/727))
