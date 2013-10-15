@@ -436,10 +436,10 @@ vjs.Player.prototype.onPlay = function(){
  * Fired the first time a video is played
  *
  * Not part of the HLS spec, and we're not sure if this is the best
- * implementation yet
+ * implementation yet, so use sparingly. If you don't have a reason to
+ * prevent playback, use `myPlayer.one('play');` instead.
  *
  * @event firstplay
- * @private
  */
 vjs.Player.prototype.onFirstPlay = function(){
     //If the first starttime attribute is specified

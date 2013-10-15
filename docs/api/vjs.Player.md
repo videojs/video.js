@@ -75,6 +75,7 @@ After an instance has been created it can be accessed globally using `Video('exa
   - [durationchange](#durationchange-event)
   - [ended](#ended-event)
   - [error](#error-event)
+  - [firstplay](#firstplay-event)
   - [fullscreenchange](#fullscreenchange-event)
   - [loadedalldata](#loadedalldata-event)
   - [loadeddata](#loadeddata-event)
@@ -822,6 +823,17 @@ _defined in_: [src/js/player.js#L488](https://github.com/videojs/video.js/blob/m
 * __e__ 
 
 _defined in_: [src/js/player.js#L526](https://github.com/videojs/video.js/blob/master/src/js/player.js#L526)
+
+---
+
+### firstplay `EVENT`
+> Fired the first time a video is played
+> 
+> Not part of the HLS spec, and we're not sure if this is the best
+> implementation yet, so use sparingly. If you don't have a reason to
+> prevent playback, use `myPlayer.one('play');` instead.
+
+_defined in_: [src/js/player.js#L445](https://github.com/videojs/video.js/blob/master/src/js/player.js#L445)
 
 ---
 

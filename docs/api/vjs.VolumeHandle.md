@@ -3,7 +3,7 @@
 # vjs.VolumeHandle
 
 __EXTENDS__: [vjs.SliderHandle](vjs.SliderHandle.md)  
-__DEFINED IN__: [src/js/control-bar/volume-control.js#L128](https://github.com/videojs/video.js/blob/master/src/js/control-bar/volume-control.js#L128)  
+__DEFINED IN__: [src/js/control-bar/volume-control.js#L132](https://github.com/videojs/video.js/blob/master/src/js/control-bar/volume-control.js#L132)  
 
 The volume handle can be dragged to adjust the volume level
 
@@ -45,9 +45,6 @@ The volume handle can be dragged to adjust the volume level
 
 - [EVENTS](#events)
   - [resize](#resize-event) _`inherited`_
-
-- [UNDEFINED](#undefined)
-  - [defaultValue](#defaultvalue)
 
 ---
 
@@ -140,7 +137,7 @@ _inherited from_: [src/js/component.js#L220](https://github.com/videojs/video.js
 * __tagName__ `String` _(OPTIONAL)_ Element's node type. e.g. 'div'
 * __attributes__ `Object` _(OPTIONAL)_ An object of element attributes that should be set on the element
 
-_defined in_: [src/js/control-bar/volume-control.js#L134](https://github.com/videojs/video.js/blob/master/src/js/control-bar/volume-control.js#L134)
+_defined in_: [src/js/control-bar/volume-control.js#L137](https://github.com/videojs/video.js/blob/master/src/js/control-bar/volume-control.js#L137)
 
 ---
 
@@ -497,14 +494,6 @@ _inherited from_: [src/js/component.js#L707](https://github.com/videojs/video.js
 > Fired when the width and/or height of the component changes
 
 _inherited from_: [src/js/component.js#L809](https://github.com/videojs/video.js/blob/master/src/js/component.js#L809)
-
----
-
-## UNDEFINED
-
-### defaultValue
-
-_defined in_: [src/js/control-bar/volume-control.js#L131](https://github.com/videojs/video.js/blob/master/src/js/control-bar/volume-control.js#L131)
 
 ---
 

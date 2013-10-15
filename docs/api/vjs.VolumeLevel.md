@@ -3,7 +3,7 @@
 # vjs.VolumeLevel
 
 __EXTENDS__: [vjs.Component](vjs.Component.md)  
-__DEFINED IN__: [src/js/control-bar/volume-control.js#L107](https://github.com/videojs/video.js/blob/master/src/js/control-bar/volume-control.js#L107)  
+__DEFINED IN__: [src/js/control-bar/volume-control.js#L111](https://github.com/videojs/video.js/blob/master/src/js/control-bar/volume-control.js#L111)  
 
 Shows volume level
 
@@ -253,7 +253,7 @@ _inherited from_: [src/js/component.js#L239](https://github.com/videojs/video.js
 * __player__ 
 * __options__ 
 
-_defined in_: [src/js/control-bar/volume-control.js#L109](https://github.com/videojs/video.js/blob/master/src/js/control-bar/volume-control.js#L109)
+_defined in_: [src/js/control-bar/volume-control.js#L113](https://github.com/videojs/video.js/blob/master/src/js/control-bar/volume-control.js#L113)
 
 ---
 
