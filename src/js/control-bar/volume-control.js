@@ -131,7 +131,6 @@ vjs.VolumeLevel.prototype.createEl = function(){
  */
  vjs.VolumeHandle = vjs.SliderHandle.extend();
 
- /** @inheritDoc */
  vjs.VolumeHandle.prototype.defaultValue = '00:00';
 
  /** @inheritDoc */
