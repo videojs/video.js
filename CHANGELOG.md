@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## Unreleased (HEAD)
-_(none)_
+* Fixed a race condition that would cause videos to fail in Firefox ([view](https://github.com/videojs/video.js/pull/776))
 
 --------------------
 
