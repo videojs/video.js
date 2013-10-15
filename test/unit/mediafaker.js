@@ -38,6 +38,7 @@ vjs.MediaFaker.prototype.pause = function(){ return false; };
 vjs.MediaFaker.prototype.supportsFullScreen = function(){ return false; };
 vjs.MediaFaker.prototype.features = {};
 vjs.MediaFaker.prototype.buffered = function(){ return {}; };
+vjs.MediaFaker.prototype.duration = function(){ return {}; };
 
 // Export vars for Closure Compiler
 vjs['MediaFaker'] = vjs.MediaFaker;
