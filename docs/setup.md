@@ -60,6 +60,16 @@ Otherwise include/exclude attributes, settings, sources, and tracks exactly as y
 </video>
 ```
 
+By default, the big play button is located in the upper left hand corner so it doesn't cover up the interesting parts of the poster. If you'd prefer to center the big play button, you can add an additional `vjs-big-play-centered` class to your video element. For example:
+
+```html
+<video id="example_video_1" class="video-js vjs-default-skin vjs-big-play-centered"
+  controls preload="auto" width="640" height="264"
+  poster="http://video-js.zencoder.com/oceans-clip.png"
+  data-setup='{"example_option":true}'>
+  ...
+</video>
+```
 
 Alternative Setup for Dynamically Loaded HTML
 ---------------------------------------------
