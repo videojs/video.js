@@ -65,6 +65,8 @@ goog.exportProperty(vjs.Player.prototype, 'requestFullScreen', vjs.Player.protot
 goog.exportProperty(vjs.Player.prototype, 'cancelFullScreen', vjs.Player.prototype.cancelFullScreen);
 goog.exportProperty(vjs.Player.prototype, 'bufferedPercent', vjs.Player.prototype.bufferedPercent);
 goog.exportProperty(vjs.Player.prototype, 'usingNativeControls', vjs.Player.prototype.usingNativeControls);
+goog.exportProperty(vjs.Player.prototype, 'reportUserActivity', vjs.Player.prototype.reportUserActivity);
+goog.exportProperty(vjs.Player.prototype, 'userActive', vjs.Player.prototype.userActive);
 
 goog.exportSymbol('videojs.MediaLoader', vjs.MediaLoader);
 goog.exportSymbol('videojs.TextTrackDisplay', vjs.TextTrackDisplay);
