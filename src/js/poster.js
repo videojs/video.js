@@ -29,15 +29,12 @@ vjs.PosterImage = vjs.Button.extend({
 });
 
 vjs.PosterImage.prototype.createEl = function(){
-  var el = vjs.createEl('div', {
+  return vjs.createEl('div', {
     className: 'vjs-poster',
 
     // Don't want poster to be tabbable.
     tabIndex: -1
-  }),
-  poster = this.player_.poster();
-
-  return el;
+  });
 };
 
 vjs.PosterImage.prototype.src = function(url){

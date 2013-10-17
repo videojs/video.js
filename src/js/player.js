@@ -1100,11 +1100,11 @@ vjs.Player.prototype.poster = function(src){
   // update the internal poster variable
   this.poster_ = src;
 
-  // alert components that the poster has been set
-  this.trigger('posterchange');
-
   // update the tech's poster
   this.techCall('setPoster', src);
+
+  // alert components that the poster has been set
+  this.trigger('posterchange');
 };
 
 /**
