@@ -30,6 +30,10 @@ vjs.MediaFaker.prototype.createEl = function(){
   return el;
 };
 
+// fake a poster attribute to mimic the video element
+vjs.MediaFaker.prototype.poster = function(){ return this.el().poster; };
+vjs.MediaFaker.prototype['setPoster'] = function(val){ this.el().poster = val; };
+
 vjs.MediaFaker.prototype.currentTime = function(){ return 0; };
 vjs.MediaFaker.prototype.seeking = function(){ return false; };
 vjs.MediaFaker.prototype.volume = function(){ return 0; };
