@@ -371,3 +371,21 @@ test('should not throw an exception if unsupported video type',
 
   player.dispose();
 });
+
+test('should not display controls if no sources are playable', function() {
+  var fixture = document.getElementById('qunit-fixture');
+
+  var html =
+      '<video id="example_3">' +
+          '<source src="fake.foo" type="video/foo">' +
+          '</video>';
+
+  fixture.innerHTML += html;
+
+  var tag = document.getElementById('example_3');
+  var player = new vjs.Player(tag);
+
+  equal(player.controls(), false, 'Controls are disabled');
+
+  player.dispose();
+});

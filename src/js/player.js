@@ -755,6 +755,8 @@ vjs.Player.prototype.src = function(source){
       this.el_.appendChild(vjs.createEl('p', {
         innerHTML: this.options()['notSupportedMessage']
       }));
+      // There's no point displaying controls if there's nothing to play.
+      this.controls(false);
     }
 
   // Case: Source object { src: '', type: '' ... }
