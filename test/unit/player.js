@@ -350,3 +350,24 @@ test('should use custom message when encountering an unsupported video type',
 
   player.dispose();
 });
+
+test('should not throw an exception if unsupported video type',
+    function() {
+  expect(0);
+  var fixture = document.getElementById('qunit-fixture');
+
+  var html =
+      '<video id="example_2">' +
+          '<source src="fake.foo" type="video/foo">' +
+          '</video>';
+
+  fixture.innerHTML += html;
+
+  var tag = document.getElementById('example_2');
+  var player = new vjs.Player(tag);
+
+  // This was the source of the exception.
+  player.userActive(false);
+
+  player.dispose();
+});
