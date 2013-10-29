@@ -46,3 +46,19 @@ test('test isStreamingSrc', function() {
   ok(!isStreamingSrc('https://streaming.is/fun'));
   ok(!isStreamingSrc('file://streaming.is/fun'));
 });
+
+test('test canPlaySource', function() {
+  var canPlaySource = vjs.Flash.canPlaySource;
+
+  // supported
+  ok(canPlaySource({ type: 'video/mp4; codecs=avc1.42E01E,mp4a.40.2' }), 'codecs supported');
+  ok(canPlaySource({ type: 'video/mp4' }), 'video/mp4 supported');
+  ok(canPlaySource({ type: 'video/x-flv' }), 'video/x-flv supported');
+  ok(canPlaySource({ type: 'video/flv' }), 'video/flv supported');
+  ok(canPlaySource({ type: 'video/m4v' }), 'video/m4v supported');
+  ok(canPlaySource({ type: 'VIDEO/FLV' }), 'capitalized mime type');
+
+  // not supported
+  ok(!canPlaySource({ type: 'video/webm; codecs="vp8, vorbis"' }));
+  ok(!canPlaySource({ type: 'video/webm' }));
+});
