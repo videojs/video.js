@@ -4,10 +4,14 @@
  * Base class for all buttons
  * @param {vjs.Player|Object} player
  * @param {Object=} options
+ * @class
  * @constructor
  */
 vjs.Button = vjs.Component.extend({
-  /** @constructor */
+  /**
+   * @constructor
+   * @inheritDoc
+   */
   init: function(player, options){
     vjs.Component.call(this, player, options);
 

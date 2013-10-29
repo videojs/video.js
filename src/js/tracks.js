@@ -20,6 +20,7 @@ vjs.Player.prototype.textTracks_;
  * Get an array of associated text tracks. captions, subtitles, chapters, descriptions
  * http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-texttracks
  * @return {Array}           Array of track objects
+ * @private
  */
 vjs.Player.prototype.textTracks = function(){
   this.textTracks_ = this.textTracks_ || [];
@@ -34,6 +35,7 @@ vjs.Player.prototype.textTracks = function(){
  * @param {String=} label       Optional label
  * @param {String=} language    Optional language
  * @param {Object=} options     Additional track options, like src
+ * @private
  */
 vjs.Player.prototype.addTextTrack = function(kind, label, language, options){
   var tracks = this.textTracks_ = this.textTracks_ || [];
@@ -67,6 +69,7 @@ vjs.Player.prototype.addTextTrack = function(kind, label, language, options){
  * Add an array of text tracks. captions, subtitles, chapters, descriptions
  * Track objects will be stored in the player.textTracks() array
  * @param {Array} trackList Array of track elements or objects (fake track elements)
+ * @private
  */
 vjs.Player.prototype.addTextTracks = function(trackList){
   var trackObj;
@@ -112,8 +115,10 @@ vjs.Player.prototype.showTextTrack = function(id, disableSameKind){
 };
 
 /**
- * Track Class
- * Contains track methods for loading, showing, parsing cues of tracks
+ * The base class for all text tracks
+ *
+ * Handles the parsing, hiding, and showing of text track cues
+ *
  * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
@@ -179,8 +184,7 @@ vjs.TextTrack.prototype.src = function(){
 vjs.TextTrack.prototype.dflt_;
 
 /**
- * Get the track default value
- * 'default' is a reserved keyword
+ * Get the track default value. ('default' is a reserved keyword)
  * @return {Boolean}
  */
 vjs.TextTrack.prototype.dflt = function(){
@@ -668,6 +672,8 @@ vjs.TextTrack.prototype.reset = function(){
 
 // Create specific track types
 /**
+ * The track component for managing the hiding and showing of captions
+ *
  * @constructor
  */
 vjs.CaptionsTrack = vjs.TextTrack.extend();
@@ -676,12 +682,16 @@ vjs.CaptionsTrack.prototype.kind_ = 'captions';
 // to be available on global object. e.g. new window['videojs'][Kind + 'Track']
 
 /**
+ * The track component for managing the hiding and showing of subtitles
+ *
  * @constructor
  */
 vjs.SubtitlesTrack = vjs.TextTrack.extend();
 vjs.SubtitlesTrack.prototype.kind_ = 'subtitles';
 
 /**
+ * The track component for managing the hiding and showing of chapters
+ *
  * @constructor
  */
 vjs.ChaptersTrack = vjs.TextTrack.extend();
@@ -693,6 +703,8 @@ vjs.ChaptersTrack.prototype.kind_ = 'chapters';
 // Global container for both subtitle and captions text. Simple div container.
 
 /**
+ * The component for displaying text track cues
+ *
  * @constructor
  */
 vjs.TextTrackDisplay = vjs.Component.extend({
@@ -717,9 +729,9 @@ vjs.TextTrackDisplay.prototype.createEl = function(){
 };
 
 
-/* Text Track Menu Items
-============================================================================= */
 /**
+ * The specific menu item type for selecting a language within a text track kind
+ *
  * @constructor
  */
 vjs.TextTrackMenuItem = vjs.MenuItem.extend({
@@ -746,6 +758,8 @@ vjs.TextTrackMenuItem.prototype.update = function(){
 };
 
 /**
+ * A special menu item for turning of a specific type of text track
+ *
  * @constructor
  */
 vjs.OffTextTrackMenuItem = vjs.TextTrackMenuItem.extend({
@@ -785,9 +799,9 @@ vjs.OffTextTrackMenuItem.prototype.update = function(){
   this.selected(off);
 };
 
-/* Captions Button
-================================================================================ */
 /**
+ * The base class for buttons that toggle specific text track types (e.g. subtitles)
+ *
  * @constructor
  */
 vjs.TextTrackButton = vjs.MenuButton.extend({
@@ -846,6 +860,8 @@ vjs.TextTrackButton.prototype.createItems = function(){
 };
 
 /**
+ * The button component for toggling and selecting captions
+ *
  * @constructor
  */
 vjs.CaptionsButton = vjs.TextTrackButton.extend({
@@ -860,6 +876,8 @@ vjs.CaptionsButton.prototype.buttonText = 'Captions';
 vjs.CaptionsButton.prototype.className = 'vjs-captions-button';
 
 /**
+ * The button component for toggling and selecting subtitles
+ *
  * @constructor
  */
 vjs.SubtitlesButton = vjs.TextTrackButton.extend({
@@ -876,6 +894,8 @@ vjs.SubtitlesButton.prototype.className = 'vjs-subtitles-button';
 // Chapters act much differently than other text tracks
 // Cues are navigation vs. other tracks of alternative languages
 /**
+ * The button component for toggling and selecting chapters
+ *
  * @constructor
  */
 vjs.ChaptersButton = vjs.TextTrackButton.extend({
