@@ -4,6 +4,7 @@
  * Loading spinner for waiting events
  * @param {vjs.Player|Object} player
  * @param {Object=} options
+ * @class
  * @constructor
  */
 vjs.LoadingSpinner = vjs.Component.extend({
