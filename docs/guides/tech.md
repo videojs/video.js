@@ -66,35 +66,3 @@ You may optionally use the last `/` as the separator between connection and stre
     <source src="rtmp://your.streaming.provider.net/cfx/st/mp4:video.mp4" type="rtmp/mp4">
 
 All four RTMP protocols are valid in the `src` (RTMP, RTMPT, RTMPE, and RTMPS).
-
-Youtube Technology
-==================
-To add a youtube source to your video tag, use the following source:
-
-    <source src="http://www.youtube.com/watch?v=[ytVideoId]" type="video/youtube"
-
-Important Note:
-------------------
-> You can simply copy and paste the url of the youtube page from the browser and
-> the Youtube Tech will be able to find the video id by itself. This is just the
-> minimum needed to get the video working. (Useful for data storage)
-
-
-Youtube Technology - Extra Options
-----------------------------------
-
-In Addition to the natively supported options, the Youtube API supports the following
-added options:
-
-### ytcontrols ###
-Type: Boolean (T/F)
-Default: False
-
-Determines whether to show Youtube's basic Red/Black default play bar skin or to hide
-it and use the native video-js play bar.
-
-### hd ###
-Type: Boolean (T/F)
-Default: False
-
-Determines whether or not to play back the video in HD.
