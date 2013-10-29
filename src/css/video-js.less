@@ -95,8 +95,12 @@ The control icons are from a custom font. Each icon corresponds to a character
 @fullscreen-exit-icon: "\e00b";
 @square-icon: "\e009";
 @spinner-icon: "\e00a";
+@spinner2-icon: "\e00d";
+@spinner3-icon: "\e01e";
+@spinner4-icon: "\e01f";
 @subtitles-icon: "\e00c";
 @captions-icon: "\e008";
+@share-icon: "\e00e";
 
 /* Base UI Component Classes
 --------------------------------------------------------------------------------
@@ -460,6 +464,15 @@ easily in the skin designer. http://designer.videojs.com/
   .transition(all 0.4s);
 }
 
+/* Optionally center */
+.vjs-default-skin.vjs-big-play-centered .vjs-big-play-button {
+  @total-width: @big-play-width + (@big-play-border-width * 2);
+  @total-height: @big-play-height + (@big-play-border-width * 2);
+
+  .absolute-align(center, @big-play-margin, @total-width);
+  .absolute-align(middle, @big-play-margin, @total-height);
+}
+
 /* Hide if controls are disabled */
 .vjs-default-skin.vjs-controls-disabled .vjs-big-play-button {
   display: none;
@@ -510,7 +523,7 @@ easily in the skin designer. http://designer.videojs.com/
   top: 50%;
   left: 50%;
 
-  font-size: 5em;
+  font-size: 4em;
   line-height: 1;
 
   width: 1em;
@@ -525,7 +538,7 @@ easily in the skin designer. http://designer.videojs.com/
 }
 
 .vjs-default-skin .vjs-loading-spinner:before {
-  content: @spinner-icon;
+  content: @spinner2-icon;
   font-family: VideoJS;
 
   position: absolute;

@@ -9,14 +9,12 @@
  * (Parse Method Only)
  * https://github.com/douglascrockford/JSON-js/blob/master/json2.js
  * Only using for parse method when parsing data-setup attribute JSON.
- * @type {Object}
  * @suppress {undefinedVars}
+ * @namespace
+ * @private
  */
 vjs.JSON;
 
-/**
- * @suppress {undefinedVars}
- */
 if (typeof window.JSON !== 'undefined' && window.JSON.parse === 'function') {
   vjs.JSON = window.JSON;
 
@@ -25,6 +23,12 @@ if (typeof window.JSON !== 'undefined' && window.JSON.parse === 'function') {
 
   var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
 
+  /**
+   * parse the json
+   *
+   * @memberof vjs.JSON
+   * @return {Object|Array} The parsed JSON
+   */
   vjs.JSON.parse = function (text, reviver) {
       var j;
 

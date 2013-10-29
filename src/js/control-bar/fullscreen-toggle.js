@@ -2,10 +2,15 @@
  * Toggle fullscreen video
  * @param {vjs.Player|Object} player
  * @param {Object=} options
- * @constructor
+ * @class
+ * @extends vjs.Button
  */
 vjs.FullscreenToggle = vjs.Button.extend({
-  /** @constructor */
+  /**
+   * @constructor
+   * @memberof vjs.FullscreenToggle
+   * @instance
+   */
   init: function(player, options){
     vjs.Button.call(this, player, options);
   }
