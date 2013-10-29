@@ -8,6 +8,7 @@ CHANGELOG
 * Exported user activity methods ([view](https://github.com/videojs/video.js/pull/783))
 * Added a classname to center the play button and new spinner options ([view](https://github.com/videojs/video.js/pull/784))
 * Added API doc generation ([view](https://github.com/videojs/video.js/pull/801))
+* Added support for codecs in Flash mime types ([view](https://github.com/videojs/video.js/pull/805))
 
 --------------------
 
