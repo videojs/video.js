@@ -331,7 +331,16 @@ vjs.Flash.isSupported = function(){
 };
 
 vjs.Flash.canPlaySource = function(srcObj){
-  if (srcObj.type in vjs.Flash.formats || srcObj.type in vjs.Flash.streamingFormats) { return 'maybe'; }
+  var type;
+
+  if (!srcObj.type) {
+    return '';
+  }
+
+  type = srcObj.type.replace(/;.*/,'').toLowerCase();
+  if (type in vjs.Flash.formats || type in vjs.Flash.streamingFormats) {
+    return 'maybe';
+  }
 };
 
 vjs.Flash.formats = {
