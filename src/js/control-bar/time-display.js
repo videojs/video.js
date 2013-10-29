@@ -72,7 +72,10 @@ vjs.DurationDisplay.prototype.updateContent = function(){
 };
 
 /**
- * Time Separator (Not used in main skin, but still available, and could be used as a 'spare element')
+ * The separator between the current time and duration
+ *
+ * Can be hidden if it's not needed in the design.
+ *
  * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor

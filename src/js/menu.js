@@ -1,9 +1,12 @@
 /* Menu
 ================================================================================ */
 /**
- * The base for text track and settings menu buttons.
+ * The Menu component is used to build pop up menus, including subtitle and
+ * captions selection menus.
+ *
  * @param {vjs.Player|Object} player
  * @param {Object=} options
+ * @class
  * @constructor
  */
 vjs.Menu = vjs.Component.extend();
@@ -42,9 +45,11 @@ vjs.Menu.prototype.createEl = function(){
 };
 
 /**
- * Menu item
+ * The component for a menu item. `<li>`
+ *
  * @param {vjs.Player|Object} player
  * @param {Object=} options
+ * @class
  * @constructor
  */
 vjs.MenuItem = vjs.Button.extend({
@@ -63,7 +68,9 @@ vjs.MenuItem.prototype.createEl = function(type, props){
   }, props));
 };
 
-/** @inheritDoc */
+/**
+ * Handle a click on the menu item, and set it to selected
+ */
 vjs.MenuItem.prototype.onClick = function(){
   this.selected(true);
 };
@@ -113,6 +120,7 @@ vjs.MenuButton = vjs.Button.extend({
 /**
  * Track the state of the menu button
  * @type {Boolean}
+ * @private
  */
 vjs.MenuButton.prototype.buttonPressed_ = false;
 

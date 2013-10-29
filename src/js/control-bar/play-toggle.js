@@ -2,6 +2,7 @@
  * Button to toggle between play and pause
  * @param {vjs.Player|Object} player
  * @param {Object=} options
+ * @class
  * @constructor
  */
 vjs.PlayToggle = vjs.Button.extend({
@@ -20,7 +21,7 @@ vjs.PlayToggle.prototype.buildCSSClass = function(){
   return 'vjs-play-control ' + vjs.Button.prototype.buildCSSClass.call(this);
 };
 
-  // OnClick - Toggle between play and pause
+// OnClick - Toggle between play and pause
 vjs.PlayToggle.prototype.onClick = function(){
   if (this.player_.paused()) {
     this.player_.play();

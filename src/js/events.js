@@ -13,6 +13,7 @@
  * @param  {Element|Object}   elem Element or object to bind listeners to
  * @param  {String}   type Type of event to bind to.
  * @param  {Function} fn   Event listener.
+ * @private
  */
 vjs.on = function(elem, type, fn){
   var data = vjs.getData(elem);
@@ -65,6 +66,7 @@ vjs.on = function(elem, type, fn){
  * @param  {Element|Object}   elem Object to remove listeners from
  * @param  {String=}   type Type of listener to remove. Don't include to remove all events from element.
  * @param  {Function} fn   Specific listener to remove. Don't incldue to remove listeners for an event type.
+ * @private
  */
 vjs.off = function(elem, type, fn) {
   // Don't want to add a cache object through getData if not needed
@@ -114,6 +116,7 @@ vjs.off = function(elem, type, fn) {
  * Clean up the listener cache and dispatchers
  * @param  {Element|Object} elem Element to clean up
  * @param  {String} type Type of event to clean up
+ * @private
  */
 vjs.cleanUpEvents = function(elem, type) {
   var data = vjs.getData(elem);
@@ -153,6 +156,7 @@ vjs.cleanUpEvents = function(elem, type) {
  * Fix a native event to have standard property values
  * @param  {Object} event Event object to fix
  * @return {Object}
+ * @private
  */
 vjs.fixEvent = function(event) {
 
@@ -255,6 +259,7 @@ vjs.fixEvent = function(event) {
  * Trigger an event for an element
  * @param  {Element|Object} elem  Element to trigger an event on
  * @param  {String} event Type of event to trigger
+ * @private
  */
 vjs.trigger = function(elem, event) {
   // Fetches element data and a reference to the parent (for bubbling).
@@ -325,9 +330,9 @@ vjs.trigger = function(elem, event) {
 /**
  * Trigger a listener only once for an event
  * @param  {Element|Object}   elem Element or object to
- * @param  {[type]}   type [description]
- * @param  {Function} fn   [description]
- * @return {[type]}
+ * @param  {String}   type
+ * @param  {Function} fn
+ * @private
  */
 vjs.one = function(elem, type, fn) {
   var func = function(){
