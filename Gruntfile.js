@@ -292,6 +292,8 @@ module.exports = function(grunt) {
     grunt.file.copy('build/files/minified.video.js', 'dist/cdn/video.js');
     grunt.file.copy('build/files/video-js.min.css', 'dist/cdn/video-js.css');
     grunt.file.copy('build/files/video-js.swf', 'dist/cdn/video-js.swf');
+    grunt.file.copy('build/demo-files/demo.captions.vtt', 'dist/cdn/demo.captions.vtt');
+    grunt.file.copy('build/demo-files/demo.html', 'dist/cdn/demo.html');
 
     // Replace font urls with CDN versions
     css = grunt.file.read('dist/cdn/video-js.css');
