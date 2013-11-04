@@ -415,7 +415,7 @@ vjs.Player.prototype.onLoadedMetaData;
  * Fired when the player has downloaded data at the current playback position
  * @event loadeddata
  */
-vjs.Player.prototype.onLoadedMetaData;
+vjs.Player.prototype.onLoadedData;
 
 /**
  * Fired when the player has finished downloading the source data
