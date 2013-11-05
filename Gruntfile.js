@@ -20,6 +20,13 @@ module.exports = function(grunt) {
   };
   version.majorMinor = version.major + '.' + version.minor;
 
+  // loading predefined source order from source-loader.js
+  // trust me, this is the easist way to do it so far
+  /*jshint undef:false, evil:true */
+  var blockSourceLoading = true;
+  var sourceFiles; // Needed to satisfy jshint
+  eval(grunt.file.read('./build/source-loader.js'));
+
   // Project configuration.
   grunt.initConfig({
     pkg: pkg,
@@ -118,6 +125,28 @@ module.exports = function(grunt) {
           'build/files/video-js.css': 'src/css/video-js.less'
         }
       }
+    },
+    karma: {
+      options: {
+        configFile: 'test/karma.conf.js'
+      },
+      dev: {
+        configFile: 'test/karma.conf.js',
+        autoWatch: true
+      },
+      ci: {
+        configFile: 'test/karma.conf.js',
+        autoWatch: false
+      }
+    },
+    vjsdocs: {
+      all: {
+        src: sourceFiles,
+        dest: 'docs/api',
+        options: {
+          baseURL: 'https://github.com/videojs/video.js/blob/master/'
+        }
+      }
     }
   });
 
@@ -130,6 +159,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-s3');
   grunt.loadNpmTasks('contribflow');
+  grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks('videojs-doc-generator');
+
+  // grunt.loadTasks('./docs/tasks/');
+  // grunt.loadTasks('../videojs-doc-generator/tasks/');
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'less', 'build', 'minify', 'dist']);
@@ -141,14 +175,6 @@ module.exports = function(grunt) {
       gzip = require('zlib').gzip;
 
   grunt.registerMultiTask('build', 'Building Source', function(){
-    /*jshint undef:false, evil:true */
-
-    // Loading predefined source order from source-loader.js
-    // Trust me, this is the easist way to do it so far.
-    var blockSourceLoading = true;
-    var sourceFiles; // Needed to satisfy jshint
-    eval(grunt.file.read('./build/source-loader.js'));
-
     // Fix windows file path delimiter issue
     var i = sourceFiles.length;
     while (i--) {
@@ -210,7 +236,8 @@ module.exports = function(grunt) {
                 + ' --js_output_file=' + dest
                 + ' --create_source_map ' + dest + '.map --source_map_format=V3'
                 + ' --jscomp_warning=checkTypes --warning_level=VERBOSE'
-                + ' --output_wrapper "/*! Video.js v' + version.full + ' ' + pkg.copyright + ' */\n (function() {%output%})();//@ sourceMappingURL=video.js.map"';
+                + ' --output_wrapper "/*! Video.js v' + version.full + ' ' + pkg.copyright + ' */ (function() {%output%})();"';
+                //@ sourceMappingURL=video.js.map
 
     // Add each js file
     grunt.file.expand(filePatterns).forEach(function(file){
@@ -265,10 +292,12 @@ module.exports = function(grunt) {
     grunt.file.copy('build/files/minified.video.js', 'dist/cdn/video.js');
     grunt.file.copy('build/files/video-js.min.css', 'dist/cdn/video-js.css');
     grunt.file.copy('build/files/video-js.swf', 'dist/cdn/video-js.swf');
+    grunt.file.copy('build/demo-files/demo.captions.vtt', 'dist/cdn/demo.captions.vtt');
+    grunt.file.copy('build/demo-files/demo.html', 'dist/cdn/demo.html');
 
     // Replace font urls with CDN versions
     css = grunt.file.read('dist/cdn/video-js.css');
-    css = css.replace(/font\//g, '../f/1/');
+    css = css.replace(/font\//g, '../f/2/');
     grunt.file.write('dist/cdn/video-js.css', css);
 
     // Add CDN-specfic JS
@@ -292,4 +321,5 @@ module.exports = function(grunt) {
       done();
     });
   });
+
 };

@@ -53,9 +53,13 @@ vjs.autoSetupTimeout = function(wait){
   setTimeout(vjs.autoSetup, wait);
 };
 
-vjs.one(window, 'load', function(){
+if (document.readyState === 'complete') {
   vjs.windowLoaded = true;
-});
+} else {
+  vjs.one(window, 'load', function(){
+    vjs.windowLoaded = true;
+  });
+}
 
 // Run Auto-load players
 // You have to wait at least once in case this script is loaded after your video in the DOM (weird behavior only with minified version)

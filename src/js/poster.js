@@ -1,7 +1,8 @@
 /* Poster Image
 ================================================================================ */
 /**
- * Poster image. Shows before the video plays.
+ * The component that handles showing the poster image.
+ *
  * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
@@ -40,5 +41,8 @@ vjs.PosterImage.prototype.createEl = function(){
 };
 
 vjs.PosterImage.prototype.onClick = function(){
-  this.player_.play();
+  // Only accept clicks when controls are enabled
+  if (this.player().controls()) {
+    this.player_.play();
+  }
 };

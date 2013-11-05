@@ -2,10 +2,43 @@ CHANGELOG
 =========
 
 ## Unreleased (HEAD)
-* Added LESS as a CSS preprocessor for the default skin ([view](https://github.com/videojs/video.js/pull/644))
-* Exported MenuButtons for use in the API ([view](https://github.com/videojs/video.js/pull/648))
+_(none)_
 
 --------------------
+
+## 4.3.0 (2013-11-04)
+* Added Karma for cross-browser unit testing ([view](https://github.com/videojs/video.js/pull/714))
+* Unmuting when the volume is changed ([view](https://github.com/videojs/video.js/pull/720))
+* Fixed an accessibility issue with the big play button ([view](https://github.com/videojs/video.js/pull/777))
+* Exported user activity methods ([view](https://github.com/videojs/video.js/pull/783))
+* Added a classname to center the play button and new spinner options ([view](https://github.com/videojs/video.js/pull/784))
+* Added API doc generation ([view](https://github.com/videojs/video.js/pull/801))
+* Added support for codecs in Flash mime types ([view](https://github.com/videojs/video.js/pull/805))
+
+## 4.2.2 (2013-10-15)
+* Fixed a race condition that would cause videos to fail in Firefox ([view](https://github.com/videojs/video.js/pull/776))
+
+## 4.2.1 (2013-09-09)
+* Fixed an infinite loop caused by loading the library asynchronously ([view](https://github.com/videojs/video.js/pull/727))
+
+## 4.2.0 (2013-09-04)
+* Added LESS as a CSS preprocessor for the default skin ([view](https://github.com/videojs/video.js/pull/644))
+* Exported MenuButtons for use in the API ([view](https://github.com/videojs/video.js/pull/648))
+* Fixed ability to remove listeners added with one() ([view](https://github.com/videojs/video.js/pull/659))
+* Updated buffered() to account for multiple loaded ranges ([view](https://github.com/videojs/video.js/pull/643))
+* Exported createItems() for custom menus ([view](https://github.com/videojs/video.js/pull/654))
+* Preventing media events from bubbling up the DOM ([view](https://github.com/videojs/video.js/pull/630))
+* Major reworking of the control bar and many issues fixed ([view](https://github.com/videojs/video.js/pull/672))
+* Fixed an issue with minifiying the code on Windows systems ([view](https://github.com/videojs/video.js/pull/683))
+* Added support for RTMP streaming through Flash ([view](https://github.com/videojs/video.js/pull/605))
+* Made tech.features available to external techs ([view](https://github.com/videojs/video.js/pull/705))
+* Minor code improvements ([view](https://github.com/videojs/video.js/pull/706))
+* Updated time formatting to support NaN and Infinity ([view](https://github.com/videojs/video.js/pull/627))
+* Fixed an `undefined` error in cases where no tech is loaded ([view](https://github.com/videojs/video.js/pull/632))
+* Exported addClass and removeClass for player components ([view](https://github.com/videojs/video.js/pull/661))
+* Made the fallback message customizable ([view](https://github.com/videojs/video.js/pull/638))
+* Fixed an issue with the loading spinner placement and rotation ([view](https://github.com/videojs/video.js/pull/694))
+* Fixed an issue with fonts being flaky in IE8
 
 ## 4.1.0 (2013-06-28)
 * Turned on method queuing for unready playback technologies (flash) [view](https://github.com/videojs/video.js/pull/553)

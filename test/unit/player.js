@@ -211,20 +211,29 @@ test('should be able to initialize player twice on the same tag using string ref
   player.dispose();
 });
 
-test('should set controls and trigger event', function() {
-  expect(3);
+test('should set controls and trigger events', function() {
+  expect(6);
 
   var player = PlayerTest.makePlayer({ 'controls': false });
   ok(player.controls() === false, 'controls set through options');
+  var hasDisabledClass = player.el().className.indexOf('vjs-controls-disabled');
+  ok(hasDisabledClass !== -1, 'Disabled class added to player');
+
   player.controls(true);
   ok(player.controls() === true, 'controls updated');
+  var hasEnabledClass = player.el().className.indexOf('vjs-controls-enabled');
+  ok(hasEnabledClass !== -1, 'Disabled class added to player');
 
-  player.on('controlschange', function(){
-    ok(true, 'controlschange fired once');
+  player.on('controlsenabled', function(){
+    ok(true, 'enabled fired once');
+  });
+  player.on('controlsdisabled', function(){
+    ok(true, 'disabled fired once');
   });
   player.controls(false);
-  // Check for unnecessary controlschange events
-  player.controls(false);
+  player.controls(true);
+  // Check for unnecessary events
+  player.controls(true);
 
   player.dispose();
 });
@@ -247,3 +256,97 @@ test('should set controls and trigger event', function() {
 //   player.requestFullScreen();
 // });
 
+test('should toggle user the user state between active and inactive', function(){
+  var player = PlayerTest.makePlayer({});
+
+  expect(9);
+
+  ok(player.userActive(), 'User should be active at player init');
+
+  player.on('userinactive', function(){
+    ok(true, 'userinactive event triggered');
+  });
+
+  player.on('useractive', function(){
+    ok(true, 'useractive event triggered');
+  });
+
+  player.userActive(false);
+  ok(player.userActive() === false, 'Player state changed to inactive');
+  ok(player.el().className.indexOf('vjs-user-active') === -1, 'Active class removed');
+  ok(player.el().className.indexOf('vjs-user-inactive') !== -1, 'Inactive class added');
+
+  player.userActive(true);
+  ok(player.userActive() === true, 'Player state changed to active');
+  ok(player.el().className.indexOf('vjs-user-inactive') === -1, 'Inactive class removed');
+  ok(player.el().className.indexOf('vjs-user-active') !== -1, 'Active class added');
+
+  player.dispose();
+});
+
+test('should add a touch-enabled classname when touch is supported', function(){
+  var player;
+
+  expect(1);
+
+  // Fake touch support. Real touch support isn't needed for this test.
+  var origTouch = vjs.TOUCH_ENABLED;
+  vjs.TOUCH_ENABLED = true;
+
+  player = PlayerTest.makePlayer({});
+
+  ok(player.el().className.indexOf('vjs-touch-enabled'), 'touch-enabled classname added');
+
+
+  vjs.TOUCH_ENABLED = origTouch;
+  player.dispose();
+});
+
+test('should allow for tracking when native controls are used', function(){
+  var player = PlayerTest.makePlayer({});
+
+  expect(6);
+
+  // Make sure native controls is false before starting test
+  player.usingNativeControls(false);
+
+  player.on('usingnativecontrols', function(){
+    ok(true, 'usingnativecontrols event triggered');
+  });
+
+  player.on('usingcustomcontrols', function(){
+    ok(true, 'usingcustomcontrols event triggered');
+  });
+
+  player.usingNativeControls(true);
+  ok(player.usingNativeControls() === true, 'Using native controls is true');
+  ok(player.el().className.indexOf('vjs-using-native-controls') !== -1, 'Native controls class added');
+
+  player.usingNativeControls(false);
+  ok(player.usingNativeControls() === false, 'Using native controls is false');
+  ok(player.el().className.indexOf('vjs-using-native-controls') === -1, 'Native controls class removed');
+
+  player.dispose();
+});
+
+test('should use custom message when encountering an unsupported video type',
+    function() {
+  videojs.options['notSupportedMessage'] = 'Video no go <a href="">link</a>';
+  var fixture = document.getElementById('qunit-fixture');
+
+  var html =
+      '<video id="example_1">' +
+          '<source src="fake.foo" type="video/foo">' +
+          '</video>';
+
+  fixture.innerHTML += html;
+
+  var tag = document.getElementById('example_1');
+  var player = new vjs.Player(tag);
+
+  var incompatibilityMessage = player.el().getElementsByTagName('p')[0];
+  // ie8 capitalizes tag names
+  equal(incompatibilityMessage.innerHTML.toLowerCase(), 'video no go <a href="">link</a>');
+
+  player.dispose();
+});

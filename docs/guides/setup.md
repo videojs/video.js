@@ -10,17 +10,25 @@ You can download the Video.js source and host it on your own servers, or use the
 
 > NOTE: If you're already using an HTML5 shiv like [Modernizr](http://modernizr.com/) you can include the Video.js JavaScript anywhere, however make sure your version of Modernizr includes the shiv for video.
 
+> If you're not using something like Modernizr but still want to include Video.JS before the closing body tag, you can add your own shiv. Include this in the head of your document:
+
+> ```html
+<script type="text/javascript">
+  document.createElement('video');document.createElement('audio');
+</script>
+```
+
 ### CDN Version ###
 ```html
-<link href="http://vjs.zencdn.net/4.1/video-js.css" rel="stylesheet">
-<script src="http://vjs.zencdn.net/4.1/video.js"></script>
+<link href="//vjs.zencdn.net/4.2/video-js.css" rel="stylesheet">
+<script src="//vjs.zencdn.net/4.2/video.js"></script>
 ```
 
 ### Self Hosted. ###
 With the self hosted option you'll also want to update the location of the video-js.swf file.
 ```html
-<link href="http://example.com/path/to/video-js.css" rel="stylesheet">
-<script src="http://example.com/path/to/video.js"></script>
+<link href="//example.com/path/to/video-js.css" rel="stylesheet">
+<script src="//example.com/path/to/video.js"></script>
 <script>
   videojs.options.flash.swf = "http://example.com/path/to/video-js.swf"
 </script>
@@ -52,6 +60,16 @@ Otherwise include/exclude attributes, settings, sources, and tracks exactly as y
 </video>
 ```
 
+By default, the big play button is located in the upper left hand corner so it doesn't cover up the interesting parts of the poster. If you'd prefer to center the big play button, you can add an additional `vjs-big-play-centered` class to your video element. For example:
+
+```html
+<video id="example_video_1" class="video-js vjs-default-skin vjs-big-play-centered"
+  controls preload="auto" width="640" height="264"
+  poster="http://video-js.zencoder.com/oceans-clip.png"
+  data-setup='{"example_option":true}'>
+  ...
+</video>
+```
 
 Alternative Setup for Dynamically Loaded HTML
 ---------------------------------------------

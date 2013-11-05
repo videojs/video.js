@@ -11,10 +11,17 @@ document.createElement('track');
  * Doubles as the main function for users to create a player instance and also
  * the main library object.
  *
+ * **ALIASES** videojs, _V_ (deprecated)
+ *
+ * The `vjs` function can be used to initialize or retrieve a player.
+ *
+ *     var myPlayer = vjs('my_video_id');
+ *
  * @param  {String|Element} id      Video element or video element ID
  * @param  {Object=} options        Optional options object for config/settings
  * @param  {Function=} ready        Optional ready callback
  * @return {vjs.Player}             A player instance
+ * @namespace
  */
 var vjs = function(id, options, ready){
   var tag; // Element of ID
@@ -89,7 +96,13 @@ vjs.options = {
     'loadingSpinner': {},
     'bigPlayButton': {},
     'controlBar': {}
-  }
+  },
+
+  // Default message to show when a video cannot be played.
+  'notSupportedMessage': 'Sorry, no compatible source and playback ' +
+      'technology were found for this video. Try using another browser ' +
+      'like <a href="http://bit.ly/ccMUEC">Chrome</a> or download the ' +
+      'latest <a href="http://adobe.ly/mwfN1">Adobe Flash Player</a>.'
 };
 
 // Set CDN Version of swf

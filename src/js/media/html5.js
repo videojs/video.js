@@ -13,13 +13,13 @@ vjs.Html5 = vjs.MediaTechController.extend({
   /** @constructor */
   init: function(player, options, ready){
     // volume cannot be changed from 1 on iOS
-    this.features.volumeControl = vjs.Html5.canControlVolume();
+    this.features['volumeControl'] = vjs.Html5.canControlVolume();
 
     // In iOS, if you move a video element in the DOM, it breaks video playback.
-    this.features.movingMediaElementInDOM = !vjs.IS_IOS;
+    this.features['movingMediaElementInDOM'] = !vjs.IS_IOS;
 
     // HTML video is able to automatically resize when going to fullscreen
-    this.features.fullscreenResize = true;
+    this.features['fullscreenResize'] = true;
 
     vjs.MediaTechController.call(this, player, options, ready);
 
@@ -27,12 +27,20 @@ vjs.Html5 = vjs.MediaTechController.extend({
 
     // If the element source is already set, we may have missed the loadstart event, and want to trigger it.
     // We don't want to set the source again and interrupt playback.
-    if (source && this.el_.currentSrc == source.src) {
+    if (source && this.el_.currentSrc === source.src && this.el_.networkState > 0) {
       player.trigger('loadstart');
 
     // Otherwise set the source if one was provided.
     } else if (source) {
       this.el_.src = source.src;
+    }
+
+    // Determine if native controls should be used
+    // Our goal should be to get the custom controls on mobile solid everywhere
+    // so we can remove this all together. Right now this will block custom
+    // controls on touch enabled laptops like the Chrome Pixel
+    if (vjs.TOUCH_ENABLED && player.options()['nativeControlsForTouch'] !== false) {
+      this.useNativeControls();
     }
 
     // Chrome and Safari both have issues with autoplay.
@@ -46,10 +54,7 @@ vjs.Html5 = vjs.MediaTechController.extend({
       }
     });
 
-    this.on('click', this.onClick);
-
     this.setupTriggers();
-
     this.triggerReady();
   }
 });
@@ -62,19 +67,20 @@ vjs.Html5.prototype.createEl = function(){
   var player = this.player_,
       // If possible, reuse original tag for HTML5 playback technology element
       el = player.tag,
-      newEl;
+      newEl,
+      clone;
 
   // Check if this browser supports moving the element into the box.
   // On the iPhone video will break if you move the element,
   // So we have to create a brand new element.
-  if (!el || this.features.movingMediaElementInDOM === false) {
+  if (!el || this.features['movingMediaElementInDOM'] === false) {
 
-    // If the original tag is still there, remove it.
+    // If the original tag is still there, clone and remove it.
     if (el) {
-      el['player'] = null;
+      clone = el.cloneNode(false);
+      vjs.Html5.disposeMediaElement(el);
+      el = clone;
       player.tag = null;
-      player.el().removeChild(el);
-      el = el.cloneNode(false);
     } else {
       el = vjs.createEl('video', {
         id:player.id() + '_html5_api',
@@ -114,6 +120,37 @@ vjs.Html5.prototype.eventHandler = function(e){
 
   // No need for media events to bubble up.
   e.stopPropagation();
+};
+
+vjs.Html5.prototype.useNativeControls = function(){
+  var tech, player, controlsOn, controlsOff, cleanUp;
+
+  tech = this;
+  player = this.player();
+
+  // If the player controls are enabled turn on the native controls
+  tech.setControls(player.controls());
+
+  // Update the native controls when player controls state is updated
+  controlsOn = function(){
+    tech.setControls(true);
+  };
+  controlsOff = function(){
+    tech.setControls(false);
+  };
+  player.on('controlsenabled', controlsOn);
+  player.on('controlsdisabled', controlsOff);
+
+  // Clean up when not using native controls anymore
+  cleanUp = function(){
+    player.off('controlsenabled', controlsOn);
+    player.off('controlsdisabled', controlsOff);
+  };
+  tech.on('dispose', cleanUp);
+  player.on('usingcustomcontrols', cleanUp);
+
+  // Update the state of the player to using native controls
+  player.usingNativeControls(true);
 };
 
 
@@ -179,29 +216,19 @@ vjs.Html5.prototype.currentSrc = function(){ return this.el_.currentSrc; };
 
 vjs.Html5.prototype.preload = function(){ return this.el_.preload; };
 vjs.Html5.prototype.setPreload = function(val){ this.el_.preload = val; };
+
 vjs.Html5.prototype.autoplay = function(){ return this.el_.autoplay; };
 vjs.Html5.prototype.setAutoplay = function(val){ this.el_.autoplay = val; };
+
+vjs.Html5.prototype.controls = function(){ return this.el_.controls; }
+vjs.Html5.prototype.setControls = function(val){ this.el_.controls = !!val; }
+
 vjs.Html5.prototype.loop = function(){ return this.el_.loop; };
 vjs.Html5.prototype.setLoop = function(val){ this.el_.loop = val; };
 
 vjs.Html5.prototype.error = function(){ return this.el_.error; };
-  // networkState: function(){ return this.el_.networkState; },
-  // readyState: function(){ return this.el_.readyState; },
 vjs.Html5.prototype.seeking = function(){ return this.el_.seeking; };
-  // initialTime: function(){ return this.el_.initialTime; },
-  // startOffsetTime: function(){ return this.el_.startOffsetTime; },
-  // played: function(){ return this.el_.played; },
-  // seekable: function(){ return this.el_.seekable; },
 vjs.Html5.prototype.ended = function(){ return this.el_.ended; };
-  // videoTracks: function(){ return this.el_.videoTracks; },
-  // audioTracks: function(){ return this.el_.audioTracks; },
-  // videoWidth: function(){ return this.el_.videoWidth; },
-  // videoHeight: function(){ return this.el_.videoHeight; },
-  // textTracks: function(){ return this.el_.textTracks; },
-  // defaultPlaybackRate: function(){ return this.el_.defaultPlaybackRate; },
-  // playbackRate: function(){ return this.el_.playbackRate; },
-  // mediaGroup: function(){ return this.el_.mediaGroup; },
-  // controller: function(){ return this.el_.controller; },
 vjs.Html5.prototype.defaultMuted = function(){ return this.el_.defaultMuted; };
 
 /* HTML5 Support Testing ---------------------------------------------------- */
@@ -232,6 +259,29 @@ vjs.Html5.canControlVolume = function(){
 // List of all HTML5 events (various uses).
 vjs.Html5.Events = 'loadstart,suspend,abort,error,emptied,stalled,loadedmetadata,loadeddata,canplay,canplaythrough,playing,waiting,seeking,seeked,ended,durationchange,timeupdate,progress,play,pause,ratechange,volumechange'.split(',');
 
+vjs.Html5.disposeMediaElement = function(el){
+  if (!el) { return; }
+
+  el['player'] = null;
+
+  if (el.parentNode) {
+    el.parentNode.removeChild(el);
+  }
+
+  // remove any child track or source nodes to prevent their loading
+  while(el.hasChildNodes()) {
+    el.removeChild(el.firstChild);
+  }
+
+  // remove any src reference. not setting `src=''` because that causes a warning
+  // in firefox
+  el.removeAttribute('src');
+
+  // force the media element to update its loading state by calling load()
+  if (typeof el.load === 'function') {
+    el.load();
+  }
+};
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //
 

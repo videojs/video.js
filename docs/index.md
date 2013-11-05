@@ -2,26 +2,34 @@
 
 <h1>Video.js Documentation</h1>
 
-The Video.js documentation is here to help you setup and use the player. These docs can be found and contributed to in the [Video.js library repository](https://github.com/videojs/video.js/tree/master/docs).
+There are two categories of docs: [Guides](./guides/) and [API docs](./api/). Guides explain general topics and use cases (e.g. setup). API docs are automatically generated from the codebase and give specific details about functions, properties, and events.
 
-## Getting Started
+(Corrections and additions welcome)
 
-* [Setup](setup.md) - Check out the [5 second setup](http://videojs.com/#section5) if you're just getting started. The setup documentation gives a deeper view of the additional methods you can use to trigger the player setup.
+## Guides
 
-* [Options](options.md) - There are a number of options that can be used to change how the player behaves, starting with the HTML5 media options like autoplay and preload, and expanding to Video.JS specific options.
+### Getting Started
 
-* [Tracks](tracks.md) - Text Tracks are used to display subtitles and captions, and add a menu for navigating between chapters in a video.
+* [Setup](./guides/setup.md) - Check out the [5 second setup](http://videojs.com/#section5) if you're just getting started. The setup documentation gives a deeper view of the additional methods you can use to trigger the player setup.
 
-## Customizing
+* [Options](./guides/options.md) - There are a number of options that can be used to change how the player behaves, starting with the HTML5 media options like autoplay and preload, and expanding to Video.JS specific options.
 
-* [API](api.md) - The Video.js API allows you to control the video through javascript or trigger event listeners, whether the video is playing through HTML5, flash, or another playback technology.
+* [Tracks](./guides/tracks.md) - Text Tracks are used to display subtitles and captions, and add a menu for navigating between chapters in a video.
 
-* [Skins](skins.md) - You can change the look of the player across playback technologies just by editing a CSS file. The skins documentation gives you a intro to how the HTML and CSS of the default skin is put together.
+### Customizing
 
-* [Tech](tech.md) - A 'playback technology' is the term we're using to represent HTML5 video, Flash, and other video plugins, as well as other players like the YouTube player. Basically anything that has a unique API to audio or video. Additional playback technologies can be added relatively easily.
+* [API](./guides/api.md) - The Video.js API allows you to control the video through javascript or trigger event listeners, whether the video is playing through HTML5, flash, or another playback technology.
 
-* [Plugins](plugins.md) - You can package up interesting Video.js customizations and reuse them elsewhere. Find out how to build your own plugin or use one created by someone else.
+* [Skins](./guides/skins.md) - You can change the look of the player across playback technologies just by editing a CSS file. The skins documentation gives you a intro to how the HTML and CSS of the default skin is put together.
 
-## Resources
+* [Tech](./guides/tech.md) - A 'playback technology' is the term we're using to represent HTML5 video, Flash, and other video plugins, as well as other players like the YouTube player. Basically anything that has a unique API to audio or video. Additional playback technologies can be added relatively easily.
 
-* [Glossary](glossary.md) - Some helpful definitions.
+* [Plugins](./guides/plugins.md) - You can package up interesting Video.js customizations and reuse them elsewhere. Find out how to build your own plugin or use one created by someone else.
+
+### Resources
+
+* [Glossary](./guides/glossary.md) - Some helpful definitions.
+
+## API Docs
+- The most relevant API doc is the [player API doc](./api/player.md).
+- [Full list of API Docs](./api/)
