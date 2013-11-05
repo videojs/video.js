@@ -6,7 +6,7 @@ _(none)_
 
 --------------------
 
-## 4.2.3 (2013-11-04)
+## 4.3.0 (2013-11-04)
 * Added Karma for cross-browser unit testing ([view](https://github.com/videojs/video.js/pull/714))
 * Unmuting when the volume is changed ([view](https://github.com/videojs/video.js/pull/720))
 * Fixed an accessibility issue with the big play button ([view](https://github.com/videojs/video.js/pull/777))
