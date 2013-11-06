@@ -34,7 +34,7 @@
  */
 vjs.Component = vjs.CoreObject.extend({
   /**
-   * the constructor funciton for the class
+   * the constructor function for the class
    *
    * @constructor
    */
@@ -163,8 +163,8 @@ vjs.Component.prototype.options_;
  *       }
  *     }
  *
- * @param  {Object} obj Object whose values will be overwritten
- * @return {Object}     NEW merged object. Does not return obj1.
+ * @param  {Object} obj Object of new option values
+ * @return {Object}     A NEW object of this.options_ and obj merged
  */
 vjs.Component.prototype.options = function(obj){
   if (obj === undefined) return this.options_;
@@ -304,7 +304,7 @@ vjs.Component.prototype.getChildById = function(id){
 vjs.Component.prototype.childNameIndex_;
 
 /**
- * Returns a child component with the provided ID
+ * Returns a child component with the provided name
  *
  * @return {vjs.Component}
  */
@@ -326,14 +326,14 @@ vjs.Component.prototype.getChild = function(name){
  *
  * Pass in options for child constructors and options for children of the child
  *
- *    var myButton = myComponent.addChild('MyButton', {
- *      text: 'Press Me',
- *      children: {
- *        buttonChildExample: {
- *          buttonChildOption: true
- *        }
- *      }
- *    });
+ *     var myButton = myComponent.addChild('MyButton', {
+ *       text: 'Press Me',
+ *       children: {
+ *         buttonChildExample: {
+ *           buttonChildOption: true
+ *         }
+ *       }
+ *     });
  *
  * @param {String|vjs.Component} child The class name or instance of a child to add
  * @param {Object=} options Options, including options to be passed to children of the child.
@@ -652,7 +652,7 @@ vjs.Component.prototype.show = function(){
 };
 
 /**
- * Hide the component element if hidden
+ * Hide the component element if currently showing
  *
  * @return {vjs.Component}
  */
@@ -696,13 +696,15 @@ vjs.Component.prototype.disable = function(){
 /**
  * Set or get the width of the component (CSS values)
  *
- * Video tag width/height only work in pixels. No percents.
- * But allowing limited percents use. e.g. width() will return number+%, not computed width
+ * Setting the video tag dimension values only works with values in pixels.
+ * Percent values will not work.
+ * Some percents can be used, but width()/height() will return the number + %,
+ * not the actual computed width/height.
  *
  * @param  {Number|String=} num   Optional width number
  * @param  {Boolean} skipListeners Skip the 'resize' event trigger
- * @return {vjs.Component} Returns 'this' if width was set
- * @return {Number|String} Returns the width if nothing was set
+ * @return {vjs.Component} This component, when setting the width
+ * @return {Number|String} The width, when getting
  */
 vjs.Component.prototype.width = function(num, skipListeners){
   return this.dimension('width', num, skipListeners);
@@ -711,10 +713,15 @@ vjs.Component.prototype.width = function(num, skipListeners){
 /**
  * Get or set the height of the component (CSS values)
  *
+ * Setting the video tag dimension values only works with values in pixels.
+ * Percent values will not work.
+ * Some percents can be used, but width()/height() will return the number + %,
+ * not the actual computed width/height.
+ *
  * @param  {Number|String=} num     New component height
  * @param  {Boolean=} skipListeners Skip the resize event trigger
- * @return {vjs.Component} The component if the height was set
- * @return {Number|String} The height if it wasn't set
+ * @return {vjs.Component} This component, when setting the height
+ * @return {Number|String} The height, when getting
  */
 vjs.Component.prototype.height = function(num, skipListeners){
   return this.dimension('height', num, skipListeners);
