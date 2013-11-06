@@ -106,14 +106,14 @@ After an instance has been created it can be accessed globally using `Video('exa
 > 
 > Pass in options for child constructors and options for children of the child
 > 
->    var myButton = myComponent.addChild('MyButton', {
->      text: 'Press Me',
->      children: {
->        buttonChildExample: {
->          buttonChildOption: true
->        }
->      }
->    });
+>     var myButton = myComponent.addChild('MyButton', {
+>       text: 'Press Me',
+>       children: {
+>         buttonChildExample: {
+>           buttonChildOption: true
+>         }
+>       }
+>     });
 
 ##### PARAMETERS: 
 * __child__ `String|vjs.Component` The class name or instance of a child to add
@@ -281,7 +281,7 @@ _defined in_: [src/js/player.js#L641](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `vjs.Component` The component
 
-_inherited from_: [src/js/component.js#L730](https://github.com/videojs/video.js/blob/master/src/js/component.js#L730)
+_inherited from_: [src/js/component.js#L737](https://github.com/videojs/video.js/blob/master/src/js/component.js#L737)
 
 ---
 
@@ -336,7 +336,7 @@ _inherited from_: [src/js/component.js#L201](https://github.com/videojs/video.js
 ---
 
 ### getChild( name )
-> Returns a child component with the provided ID
+> Returns a child component with the provided name
 
 ##### PARAMETERS: 
 * __name__ 
@@ -363,21 +363,26 @@ _inherited from_: [src/js/component.js#L294](https://github.com/videojs/video.js
 
 ### height( [num], [skipListeners] )
 > Get or set the height of the component (CSS values)
+> 
+> Setting the video tag dimension values only works with values in pixels.
+> Percent values will not work.
+> Some percents can be used, but width()/height() will return the number + %,
+> not the actual computed width/height.
 
 ##### PARAMETERS: 
 * __num__ `Number|String` _(OPTIONAL)_ New component height
 * __skipListeners__ `Boolean` _(OPTIONAL)_ Skip the resize event trigger
 
 ##### RETURNS: 
-* `vjs.Component` The component if the height was set
-* `Number|String` The height if it wasn't set
+* `vjs.Component` This component, when setting the height
+* `Number|String` The height, when getting
 
-_inherited from_: [src/js/component.js#L719](https://github.com/videojs/video.js/blob/master/src/js/component.js#L719)
+_inherited from_: [src/js/component.js#L726](https://github.com/videojs/video.js/blob/master/src/js/component.js#L726)
 
 ---
 
 ### hide()
-> Hide the component element if hidden
+> Hide the component element if currently showing
 
 ##### RETURNS: 
 * `vjs.Component` 
@@ -549,10 +554,10 @@ _inherited from_: [src/js/component.js#L522](https://github.com/videojs/video.js
 >     }
 
 ##### PARAMETERS: 
-* __obj__ `Object` Object whose values will be overwritten
+* __obj__ `Object` Object of new option values
 
 ##### RETURNS: 
-* `Object` NEW merged object. Does not return obj1.
+* `Object` A NEW object of this.options_ and obj merged
 
 _inherited from_: [src/js/component.js#L169](https://github.com/videojs/video.js/blob/master/src/js/component.js#L169)
 
@@ -785,18 +790,20 @@ _defined in_: [src/js/player.js#L762](https://github.com/videojs/video.js/blob/m
 ### width( [num], skipListeners )
 > Set or get the width of the component (CSS values)
 > 
-> Video tag width/height only work in pixels. No percents.
-> But allowing limited percents use. e.g. width() will return number+%, not computed width
+> Setting the video tag dimension values only works with values in pixels.
+> Percent values will not work.
+> Some percents can be used, but width()/height() will return the number + %,
+> not the actual computed width/height.
 
 ##### PARAMETERS: 
 * __num__ `Number|String` _(OPTIONAL)_ Optional width number
 * __skipListeners__ `Boolean` Skip the 'resize' event trigger
 
 ##### RETURNS: 
-* `vjs.Component` Returns 'this' if width was set
-* `Number|String` Returns the width if nothing was set
+* `vjs.Component` This component, when setting the width
+* `Number|String` The width, when getting
 
-_inherited from_: [src/js/component.js#L707](https://github.com/videojs/video.js/blob/master/src/js/component.js#L707)
+_inherited from_: [src/js/component.js#L709](https://github.com/videojs/video.js/blob/master/src/js/component.js#L709)
 
 ---
 
@@ -896,7 +903,7 @@ _defined in_: [src/js/player.js#L476](https://github.com/videojs/video.js/blob/m
 ### resize `EVENT`
 > Fired when the width and/or height of the component changes
 
-_inherited from_: [src/js/component.js#L809](https://github.com/videojs/video.js/blob/master/src/js/component.js#L809)
+_inherited from_: [src/js/component.js#L816](https://github.com/videojs/video.js/blob/master/src/js/component.js#L816)
 
 ---
 
