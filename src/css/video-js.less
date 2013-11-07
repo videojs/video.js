@@ -118,7 +118,7 @@ The control icons are from a custom font. Each icon corresponds to a character
 }
 
 .vjs-default-skin .vjs-slider:focus {
-  .box-shadow(0 0 2em #fff);
+  box-shadow: 0 0 2em #fff;
 }
 
 .vjs-default-skin .vjs-slider-handle {
@@ -141,7 +141,7 @@ The control icons are from a custom font. Each icon corresponds to a character
   left: 0;
 
   /* Rotate the square icon to make a diamond *///
-  .transform(rotate(-45deg));
+  transform: rotate(-45deg);
 }
 
 /* Control Bar
@@ -170,9 +170,7 @@ The default control bar that is a container for most of the controls.
   /* Visibility needed to make sure things hide in older browsers too. */
   visibility: visible;
   opacity: 1;
-
-  @trans: visibility 0.1s, opacity 0.1s; // Var needed because of comma
-  .transition(@trans);
+  transition: visibility 0.1s, opacity 0.1s;
 }
 
 /* Hide the control bar when the video is playing and the user is inactive  */
@@ -180,9 +178,7 @@ The default control bar that is a container for most of the controls.
   display: block;
   visibility: hidden;
   opacity: 0;
-
-  @trans: visibility 1.0s, opacity 1.0s;
-  .transition(@trans);
+  transition: visibility 1.0s, opacity 1.0s;
 }
 
 .vjs-default-skin.vjs-controls-disabled .vjs-control-bar {
@@ -341,7 +337,7 @@ fonts to show/hide properly.
   top: -1em;
 
   /* Shrink the bar slower than it grows. *///
-  .transition(all 0.4s);
+  transition: all 0.4s;
 }
 
 /* On hover, make the progress bar grow to something that's more clickable.
@@ -352,7 +348,7 @@ fonts to show/hide properly.
 
   /* Even though we're not changing the top/height, we need to include them in
       the transition so they're handled correctly. */
-  .transition(all 0.2s);
+  transition: all 0.2s;
 }
 
 /* Box containing play and load progresses. Also acts as seek scrubber. */
@@ -459,9 +455,9 @@ easily in the skin designer. http://designer.videojs.com/
 
   border: @big-play-border-width solid @big-play-border-color;
 
-  .border-radius(@big-play-border-radius);
-  .box-shadow(0px 0px 1em rgba(255, 255, 255, 0.25));
-  .transition(all 0.4s);
+  border-radius: @big-play-border-radius;
+  box-shadow: 0px 0px 1em rgba(255, 255, 255, 0.25);
+  transition: all 0.4s;
 }
 
 /* Optionally center */
@@ -495,8 +491,8 @@ easily in the skin designer. http://designer.videojs.com/
   background-color: rgb(80, 80, 80);
   background-color: rgba(50, 50, 50, 0.75);
 
-  .box-shadow(0 0 3em #fff);
-  .transition(all 0s);
+  box-shadow: 0 0 3em #fff;
+  transition: all 0s;
 }
 
 .vjs-default-skin .vjs-big-play-button:before {
@@ -534,7 +530,7 @@ easily in the skin designer. http://designer.videojs.com/
 
   opacity: 0.75;
 
-  .animation(spin 1.5s infinite linear);
+  animation: spin 1.5s infinite linear;
 }
 
 .vjs-default-skin .vjs-loading-spinner:before {
@@ -550,18 +546,6 @@ easily in the skin designer. http://designer.videojs.com/
   text-shadow: 0em 0em 0.1em #000;
 }
 
-@-moz-keyframes spin {
-  0% { -moz-transform: rotate(0deg); }
-  100% { -moz-transform: rotate(359deg); }
-}
-@-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(359deg); }
-}
-@-o-keyframes spin {
-  0% { -o-transform: rotate(0deg); }
-  100% { -o-transform: rotate(359deg); }
-}
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(359deg); }
@@ -604,7 +588,7 @@ easily in the skin designer. http://designer.videojs.com/
   left: -5em; /* Width of menu - width of button / 2 */
 
   .background-color-with-alpha(@control-bg-color, @control-bg-alpha);
-  .box-shadow(-0.2em -0.2em 0.3em rgba(255, 255, 255, 0.2));
+  box-shadow: -0.2em -0.2em 0.3em rgba(255, 255, 255, 0.2);
 }
 
 .vjs-default-skin .vjs-menu-button:hover .vjs-menu {
@@ -630,7 +614,7 @@ easily in the skin designer. http://designer.videojs.com/
   color: #111;
 
   .background-color-with-alpha(rgb(255, 255, 255), 0.75);
-  .box-shadow(0 0 1em rgba(255, 255, 255, 1));
+  box-shadow: 0 0 1em rgba(255, 255, 255, 1);
 }
 .vjs-default-skin .vjs-menu-button ul li.vjs-menu-title {
   text-align: center;
@@ -654,7 +638,7 @@ easily in the skin designer. http://designer.videojs.com/
 /* Replacement for focus outline */
 .vjs-default-skin .vjs-captions-button:focus .vjs-control-content:before,
 .vjs-default-skin .vjs-captions-button:hover .vjs-control-content:before {
-  .box-shadow(0 0 1em rgba(255, 255, 255, 1));
+  box-shadow: 0 0 1em rgba(255, 255, 255, 1);
 }
 
 /*
@@ -689,7 +673,7 @@ control positioning and full window mode. **
   /* Turn off user selection (text highlighting) by default.
      The majority of player components will not be text blocks.
      Text areas will need to turn user selection back on. */
-  .user-select(none);
+  user-select: none;
 }
 
 /* Playback technology elements expand to the width/height of the containing div
@@ -794,70 +778,6 @@ body.vjs-full-window {
 
 // MIXINS
 // =============================================================================
-// Mixins are a LESS feature and are used to add vendor prefixes to CSS rules
-// when needed.
-
-// https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow
-.box-shadow (@string: 0 0 1em rgba(0, 0, 0, 0.25)) {
-  /* box-shadow *///
-  -webkit-box-shadow: @string;
-     -moz-box-shadow: @string;
-          box-shadow: @string;
-}
-
-// https://developer.mozilla.org/en-US/docs/Web/CSS/border-radius
-.border-radius (@string: 5px) {
-  /* border-radius *///
-  -webkit-border-radius: @string;
-     -moz-border-radius: @string;
-          border-radius: @string;
-}
-
-// https://developer.mozilla.org/en-US/docs/Web/CSS/transition
-.transition (@string: all 1s linear) {
-  /* transition *///
-  -webkit-transition: @string;
-     -moz-transition: @string;
-       -o-transition: @string;
-          transition: @string;
-}
-
-// https://developer.mozilla.org/en-US/docs/Web/CSS/transition
-.transition-delay (@string: 1s) {
-  /* transition-delay *///
-  -webkit-transition-delay: @string;
-     -moz-transition-delay: @string;
-       -o-transition-delay: @string;
-          transition-delay: @string;
-}
-
-// https://developer.mozilla.org/en-US/docs/Web/CSS/animation
-.animation (@string: spin 1s infinite linear) {
-  /* animation *///
-  -webkit-animation: @string;
-     -moz-animation: @string;
-       -o-animation: @string;
-          animation: @string;
-}
-
-// https://developer.mozilla.org/en-US/docs/Web/CSS/transform
-.transform (@string: rotate(-45deg)) {
-  /* transform *///
-  -webkit-transform: @string;
-     -moz-transform: @string;
-      -ms-transform: @string;
-       -o-transform: @string;
-          transform: @string;
-}
-
-// https://developer.mozilla.org/en-US/docs/Web/CSS/user-select
-.user-select (@string: none) {
-  /* user-select *///
-  -webkit-user-select: @string;
-     -moz-user-select: @string;
-      -ms-user-select: @string;
-          user-select: @string;
-}
 
 // Hide something visually but keep available for screen readers.
 // http://h5bp.com/v
