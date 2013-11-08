@@ -31,5 +31,5 @@ There are two categories of docs: [Guides](./guides/) and [API docs](./api/). Gu
 * [Glossary](./guides/glossary.md) - Some helpful definitions.
 
 ## API Docs
-- The most relevant API doc is the [player API doc](./api/player.md).
+- The most relevant API doc is the [player API doc](./api/vjs.Player.md).
 - [Full list of API Docs](./api/)
