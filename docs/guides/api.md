@@ -41,4 +41,4 @@ myPlayer.currentTime(120);
 
 ```
 
-The full list of player API methods and events can be found in the [player API docs](../api/player.md).
+The full list of player API methods and events can be found in the [player API docs](../api/vjs.Player.md).
