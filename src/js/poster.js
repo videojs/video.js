@@ -29,16 +29,23 @@ vjs.PosterImage = vjs.Button.extend({
 });
 
 vjs.PosterImage.prototype.createEl = function(){
-  return vjs.createEl('div', {
+  var el = vjs.createEl('div', {
     className: 'vjs-poster',
 
     // Don't want poster to be tabbable.
     tabIndex: -1
   });
+
+  if (!('backgroundSize' in el.style)) {
+    // setup an img element as a fallback for IE8
+    el.appendChild(vjs.createEl('img'));
+  }
+
+  return el;
 };
 
 vjs.PosterImage.prototype.src = function(url){
-  var el = this.el();
+  var el = this.el(), imgFallback;
 
   // getter
   if (url === undefined) {
@@ -62,7 +69,7 @@ vjs.PosterImage.prototype.src = function(url){
   if ('backgroundSize' in el.style) {
     el.style.backgroundImage = 'url("' + url + '")';
   } else {
-    el.appendChild(vjs.createEl('img', { src: url }));
+    el.querySelector('img').src = url;
   }
 };
 

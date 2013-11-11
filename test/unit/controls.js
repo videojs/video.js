@@ -129,3 +129,35 @@ test('the poster getter should work correctly even when background-size is not a
 
   equal(url, poster.src(), 'the poster url is returned');
 });
+
+test('the poster setter should reuse an img when background-size is not available', function() {
+  var noop = function(){},
+      url = 'http://example.com/poster.jpg',
+      img = {},
+      player = {
+        controls: noop,
+        id: noop,
+        on: noop,
+        ready: noop,
+        poster: function(){
+          return url;
+        }
+      },
+      poster = new vjs.PosterImage(player);
+
+  // mock out el() to return an element that behaves like IE8
+  poster.el = function(){
+    return {
+      appendChild: function() {
+        ok(false, 'a new img should not be added to the poster');
+      },
+      style: {},
+      querySelector: function() {
+        return img;
+      }
+    };
+  };
+
+  poster.src(url);
+  equal(img.src, url, 'the img is reused for the new src');
+});
