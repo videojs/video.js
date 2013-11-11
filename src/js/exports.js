@@ -32,6 +32,11 @@ goog.exportSymbol('videojs.options', vjs.options);
 goog.exportSymbol('videojs.players', vjs.players);
 goog.exportSymbol('videojs.TOUCH_ENABLED', vjs.TOUCH_ENABLED);
 
+// Allow plugins to use the same options-merging as components
+goog.exportSymbol('videojs.obj', vjs.obj);
+goog.exportProperty(vjs.obj, 'deepMerge', vjs.obj.deepMerge);
+goog.exportProperty(vjs.obj, 'copy', vjs.obj.copy);
+
 // Allow external components to use global cache
 goog.exportSymbol('videojs.cache', vjs.cache);
 

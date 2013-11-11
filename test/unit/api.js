@@ -73,6 +73,12 @@ test('should export useful components to the public', function () {
   ok(videojs.MenuButton, 'MenuButton should be public');
 });
 
+test('should export object helpers for plugin authors', function(){
+  ok(videojs.obj, 'the obj namespace is public');
+  ok(videojs.obj.deepMerge, 'deepMerge is public');
+  ok(videojs.obj.copy, 'object copy is public');
+});
+
 test('should be able to initialize player twice on the same tag using string reference', function() {
   var videoTag = PlayerTest.makeTag();
   var id = videoTag.id;
