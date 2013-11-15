@@ -126,6 +126,12 @@ module.exports = function(grunt) {
         }
       }
     },
+    autoprefixer: {
+      dev: {
+        src: 'build/files/video-js.css',
+        dest: 'build/files/video-js.css'
+      }
+    },
     karma: {
       options: {
         configFile: 'test/karma.conf.js'
@@ -161,15 +167,16 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('contribflow');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('videojs-doc-generator');
+  grunt.loadNpmTasks('grunt-autoprefixer');
 
   // grunt.loadTasks('./docs/tasks/');
   // grunt.loadTasks('../videojs-doc-generator/tasks/');
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'less', 'build', 'minify', 'dist']);
+  grunt.registerTask('default', ['jshint', 'less', 'autoprefixer', 'build', 'minify', 'dist']);
   // Development watch task
-  grunt.registerTask('dev', ['jshint', 'less', 'build', 'qunit:source']);
-  grunt.registerTask('test', ['jshint', 'less', 'build', 'minify', 'qunit']);
+  grunt.registerTask('dev', ['jshint', 'less', 'autoprefixer', 'build', 'qunit:source']);
+  grunt.registerTask('test', ['jshint', 'less', 'autoprefixer', 'build', 'minify', 'qunit']);
 
   var fs = require('fs'),
       gzip = require('zlib').gzip;
