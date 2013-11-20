@@ -272,6 +272,9 @@ vjs.Flash.prototype.load = function(){
 vjs.Flash.prototype.poster = function(){
   this.el_.vjs_getProperty('poster');
 };
+vjs.Flash.prototype.setPoster = function(){
+  // poster images are not handled by the Flash tech so make this a no-op
+};
 
 vjs.Flash.prototype.buffered = function(){
   return vjs.createTimeRange(0, this.el_.vjs_getProperty('buffered'));
