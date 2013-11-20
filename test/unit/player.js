@@ -239,7 +239,7 @@ test('should ignore setting an undefined poster after init', function() {
     var eImgSrc = eImg.getAttribute('src');
     strictEqual(eImgSrc,
           originalPoster,
-          'the poster img src is updated');
+          'the poster img src is not updated');
   } else {
     strictEqual(fixture.querySelector('.vjs-poster').style.backgroundImage,
               'url(' + originalPoster + ')',
