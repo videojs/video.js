@@ -32,6 +32,9 @@ vjs.Player = vjs.Component.extend({
   init: function(tag, options, ready){
     this.tag = tag; // Store the original tag used to set options
 
+    // Make sure tag ID exists
+    tag.id = tag.id || 'vjs_video_' + vjs.guid++;
+
     // Set Options
     // The options argument overrides options set in the video tag
     // which overrides globally set options.
@@ -204,9 +207,6 @@ vjs.Player.prototype.createEl = function(){
       tag.removeChild(removeNodes[i]);
     }
   }
-
-  // Make sure tag ID exists
-  tag.id = tag.id || 'vjs_video_' + vjs.guid++;
 
   // Give video tag ID and class to player div
   // ID will now reference player box, not the video tag
