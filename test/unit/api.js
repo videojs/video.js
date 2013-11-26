@@ -103,3 +103,33 @@ test('videojs.players should be available after minification', function() {
 
   player.dispose();
 });
+
+test('fullscreenToggle does not depend on minified player methods', function(){
+  var noop, player, fullscreen, requestFullScreen, cancelFullScreen;
+  noop = function(){};
+  requestFullScreen = false;
+  cancelFullScreen = false;
+  player = {
+    id: noop,
+    on: noop,
+    ready: noop
+  };
+
+  player['requestFullScreen'] = function(){
+    requestFullScreen = true;
+  };
+  player['cancelFullScreen'] = function(){
+      cancelFullScreen = true;
+  };
+  player['isFullScreen'] = false;
+
+  fullscreen = new videojs.FullscreenToggle(player);
+  fullscreen.trigger('click');
+
+  ok(requestFullScreen, 'requestFullScreen called');
+
+  player.isFullScreen = true;
+  fullscreen.trigger('click');
+
+  ok(cancelFullScreen, 'cancelFullScreen called');
+});
