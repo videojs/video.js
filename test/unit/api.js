@@ -91,7 +91,7 @@ test('should be able to initialize player twice on the same tag using string ref
   player.dispose();
 });
 
-test('videojs.players should be availble after minification', function() {
+test('videojs.players should be available after minification', function() {
   var videoTag = PlayerTest.makeTag();
   var id = videoTag.id;
 
