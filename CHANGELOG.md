@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## Unreleased (HEAD)
-_(none)_
+* Made the poster updateable after initialization ([view](https://github.com/videojs/video.js/pull/838))
 
 --------------------
 

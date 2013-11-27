@@ -28,6 +28,9 @@ vjs.PosterImage = vjs.Button.extend({
   }
 });
 
+// use the test el to check for backgroundSize style support
+var _backgroundSizeSupported = 'backgroundSize' in vjs.TEST_VID;
+
 vjs.PosterImage.prototype.createEl = function(){
   var el = vjs.createEl('div', {
     className: 'vjs-poster',
@@ -36,7 +39,7 @@ vjs.PosterImage.prototype.createEl = function(){
     tabIndex: -1
   });
 
-  if (!('backgroundSize' in el.style)) {
+  if (!_backgroundSizeSupported) {
     // setup an img element as a fallback for IE8
     el.appendChild(vjs.createEl('img'));
   }
@@ -45,20 +48,14 @@ vjs.PosterImage.prototype.createEl = function(){
 };
 
 vjs.PosterImage.prototype.src = function(url){
-  var el = this.el(), imgFallback;
+  var el = this.el();
 
   // getter
+  // can't think of a need for a getter here
+  // see #838 if on is needed in the future
+  // still don't want a getter to set src as undefined
   if (url === undefined) {
-    if ('backgroundSize' in el.style) {
-      if (el.style.backgroundImage) {
-        // parse the poster url from the background-image value
-        return (/url\(['"]?(.*)['"]?\)/).exec(el.style.backgroundImage)[1];
-      }
-
-      // the poster is not specified
-      return '';
-    }
-    return el.querySelector('img').src;
+    return;
   }
 
   // setter
@@ -66,10 +63,10 @@ vjs.PosterImage.prototype.src = function(url){
   // ratio, use a div with `background-size` when available. For browsers that
   // do not support `background-size` (e.g. IE8), fall back on using a regular
   // img element.
-  if ('backgroundSize' in el.style) {
+  if (_backgroundSizeSupported) {
     el.style.backgroundImage = 'url("' + url + '")';
   } else {
-    el.querySelector('img').src = url;
+    el.firstChild.src = url;
   }
 };
 

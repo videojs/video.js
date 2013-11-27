@@ -108,7 +108,6 @@ test('should get tag, source, and track settings', function(){
 
   player.dispose();
 
-
   ok(tag['player'] !== player, 'tag player ref killed');
   ok(!vjs.players['example_1'], 'global player ref killed');
   ok(player.el() === null, 'player el killed');
@@ -141,7 +140,7 @@ test('should not force width and height', function() {
   player.dispose();
 });
 
-test('should accept options from multiple sources and override in correct order', function(){
+test('should wrap the original tag in the player div', function(){
   var tag = PlayerTest.makeTag();
   var container = document.createElement('div');
   var fixture = document.getElementById('qunit-fixture');
@@ -159,94 +158,26 @@ test('should accept options from multiple sources and override in correct order'
   player.dispose();
 });
 
-test('should transfer the poster attribute unmodified', function(){
-  var tag, fixture, poster, player;
+test('should set and update the poster value', function(){
+  var tag, poster, updatedPoster, player;
+
   poster = 'http://example.com/poster.jpg';
+  updatedPoster = 'http://example.com/updated-poster.jpg';
+
   tag = PlayerTest.makeTag();
   tag.setAttribute('poster', poster);
-  fixture = document.getElementById('qunit-fixture');
 
-  fixture.appendChild(tag);
-  player = new vjs.Player(tag, {
-    'techOrder': ['mediaFaker']
+  player = PlayerTest.makePlayer({}, tag);
+  equal(player.poster(), poster, 'the poster property should equal the tag attribute');
+
+  var pcEmitted = false;
+  player.on('posterchange', function(){
+    pcEmitted = true;
   });
 
-  equal(player.tech.el().poster, poster, 'the poster attribute should not be removed');
-
-  player.dispose();
-});
-
-test('should allow the poster to be changed after init', function() {
-  var tag, fixture, updatedPoster, player, posterElement, posterElementUrl, imageElement;
-  tag = PlayerTest.makeTag();
-  tag.setAttribute('poster', 'http://example.com/poster.jpg');
-  fixture = document.getElementById('qunit-fixture');
-
-  fixture.appendChild(tag);
-  player = new vjs.Player(tag, {
-    'techOrder': ['mediaFaker']
-  });
-
-  updatedPoster = 'http://example.com/updated-poster.jpg';
   player.poster(updatedPoster);
-
-  strictEqual(player.poster(), updatedPoster, 'the updated poster is returned');
-  strictEqual(player.tech.el().poster, updatedPoster, 'the poster attribute is updated');
-
-  posterElement = document.querySelector('.vjs-poster');
-  ok(posterElement, 'vjs-poster element should exist');
-
-  if (!('backgroundSize' in posterElement.style)) {
-    imageElement = document.getElementsByTagName('img')[0];
-    ok(imageElement, 'image element should exist if the poster div has no background-size CSS property');
-    var imageElementSrc = imageElement.getAttribute('src');
-    strictEqual(imageElementSrc,
-          updatedPoster,
-          'the poster img src is updated');
-  } else {
-    posterElementUrl = posterElement.style.backgroundImage.replace(/"/g, '');
-    strictEqual(posterElementUrl,
-            'url(' + updatedPoster + ')',
-            'the poster div background is updated');
-  }
-
-  player.dispose();
-});
-
-test('should ignore setting an undefined poster after init', function() {
-  var tag, fixture, updatedPoster, originalPoster, player, posterElement, posterElementUrl, imageElement;
-  tag = PlayerTest.makeTag();
-  tag.setAttribute('poster', 'http://example.com/poster.jpg');
-  fixture = document.getElementById('qunit-fixture');
-
-  fixture.appendChild(tag);
-  player = new vjs.Player(tag, {
-    'techOrder': ['mediaFaker']
-  });
-
-  originalPoster = player.poster();
-
-  updatedPoster = undefined;
-  player.poster(updatedPoster);
-  strictEqual(player.poster(), originalPoster, 'the original poster is returned');
-  strictEqual(player.tech.el().poster, originalPoster, 'the poster attribute is unchanged');
-
-  posterElement = document.querySelector('.vjs-poster');
-  ok(posterElement, 'vjs-poster element should exist');
-
-  if (!('backgroundSize' in posterElement.style)) {
-    imageElement = document.getElementsByTagName('img')[0];
-    ok(imageElement, 'image element should exist if the poster div has no background-size CSS property');
-    var imageElementSrc = imageElement.getAttribute('src');
-    strictEqual(imageElementSrc,
-          originalPoster,
-          'the poster img src is not updated');
-  } else {
-    posterElementUrl = posterElement.style.backgroundImage.replace(/"/g, '');
-    strictEqual(posterElementUrl,
-              'url(' + originalPoster + ')',
-              'the poster div background is unchanged');
-  }
+  ok(pcEmitted, 'posterchange event was emitted');
+  equal(player.poster(), updatedPoster, 'the updated poster is returned');
 
   player.dispose();
 });
