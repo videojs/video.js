@@ -3,6 +3,7 @@ CHANGELOG
 
 ## Unreleased (HEAD)
 * Made the poster updateable after initialization ([view](https://github.com/videojs/video.js/pull/838))
+* Exported more textTrack functions ([view](https://github.com/videojs/video.js/pull/815))
 
 --------------------
 
