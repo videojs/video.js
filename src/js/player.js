@@ -686,7 +686,7 @@ vjs.Player.prototype.duration = function(seconds){
     this.onDurationChange();
   }
 
-  return this.cache_.duration;
+  return this.cache_.duration || 0;
 };
 
 // Calculates how much time is left. Not in spec, but useful.
