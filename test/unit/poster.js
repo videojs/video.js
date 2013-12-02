@@ -30,4 +30,9 @@ test('should update the poster source', function(){
 
   posterImage.src(poster2);
   ok(checkPosterSource(poster2), 'displays the correct poster after updating');
+
+  posterImage.src();
+  ok(checkPosterSource(poster2), 'doesnt change poster when attempting a get');
+
+  player.dispose();
 });
