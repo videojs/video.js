@@ -5,6 +5,7 @@ CHANGELOG
 * Made the poster updateable after initialization ([view](https://github.com/videojs/video.js/pull/838))
 * Exported more textTrack functions ([view](https://github.com/videojs/video.js/pull/815))
 * Moved player ID generation to support video tags with no IDs ([view](https://github.com/videojs/video.js/pull/845))
+* Moved to using QUnit as a dependency ([view](https://github.com/videojs/video.js/pull/850))
 
 --------------------
 
