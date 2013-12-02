@@ -356,3 +356,18 @@ test('should use custom message when encountering an unsupported video type',
 
   player.dispose();
 });
+
+test('should register players with generated ids', function(){
+  var fixture, video, player, id;
+  fixture = document.getElementById('qunit-fixture');
+
+  video = document.createElement('video');
+  video.className = 'vjs-default-skin video-js';
+  fixture.appendChild(video);
+
+  player = new vjs.Player(video);
+  id = player.el().id;
+
+  equal(player.el().id, player.id(), 'the player and element ids are equal');
+  ok(vjs.players[id], 'the generated id is registered');
+});
