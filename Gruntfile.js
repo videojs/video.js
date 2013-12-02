@@ -57,7 +57,7 @@ module.exports = function(grunt) {
       },
       tests: {
         src: ['build/files/combined.video.js', 'build/compiler/goog.base.js', 'src/js/exports.js', 'test/unit/*.js', '!test/unit/api.js'],
-        externs: ['src/js/media/flash.externs.js', 'test/qunit/qunit-externs.js'],
+        externs: ['src/js/media/flash.externs.js', 'test/qunit-externs.js'],
         dest: 'build/files/test.minified.video.js'
       }
     },
