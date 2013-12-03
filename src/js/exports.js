@@ -148,3 +148,6 @@ goog.exportSymbol('videojs.autoSetup', vjs.autoSetup);
 goog.exportSymbol('videojs.plugin', vjs.plugin);
 
 goog.exportSymbol('videojs.createTimeRange', vjs.createTimeRange);
+
+goog.exportSymbol('videojs.util', vjs.util);
+goog.exportProperty(vjs.util, 'mergeOptions', vjs.util.mergeOptions);

@@ -71,6 +71,9 @@ test('should export useful components to the public', function () {
   ok(videojs.Menu, 'Menu should be public');
   ok(videojs.MenuItem, 'MenuItem should be public');
   ok(videojs.MenuButton, 'MenuButton should be public');
+
+  ok(videojs.util, 'util namespace should be public');
+  ok(videojs.util.mergeOptions, 'mergeOptions should be public');
 });
 
 test('should be able to initialize player twice on the same tag using string reference', function() {
