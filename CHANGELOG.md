@@ -7,6 +7,7 @@ CHANGELOG
 * Moved player ID generation to support video tags with no IDs ([view](https://github.com/videojs/video.js/pull/845))
 * Moved to using QUnit as a dependency ([view](https://github.com/videojs/video.js/pull/850))
 * Added the util namespace for public utility functions ([view](https://github.com/videojs/video.js/pull/862))
+* Fixed an issue with calling duration before Flash is loaded ([view](https://github.com/videojs/video.js/pull/861))
 
 --------------------
 
