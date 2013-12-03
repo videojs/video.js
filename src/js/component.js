@@ -169,7 +169,7 @@ vjs.Component.prototype.options_;
 vjs.Component.prototype.options = function(obj){
   if (obj === undefined) return this.options_;
 
-  return this.options_ = vjs.obj.deepMerge(this.options_, obj);
+  return this.options_ = vjs.util.mergeOptions(this.options_, obj);
 };
 
 /**

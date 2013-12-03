@@ -19,6 +19,7 @@ var sourceFiles = [
   "src/js/core-object.js",
   "src/js/events.js",
   "src/js/lib.js",
+  "src/js/util.js",
   "src/js/component.js",
   "src/js/button.js",
   "src/js/slider.js",
