@@ -497,7 +497,12 @@ vjs.Player.prototype.onEnded = function(){
  */
 vjs.Player.prototype.onDurationChange = function(){
   // Allows for cacheing value instead of asking player each time.
-  this.duration(this.techGet('duration'));
+  // We need to get the techGet response and check for a value so we don't
+  // accidentally cause the stack to blow up.
+  var duration = this.techGet('duration');
+  if (duration) {
+    this.duration(duration);
+  }
 };
 
 /**
@@ -681,7 +686,7 @@ vjs.Player.prototype.duration = function(seconds){
     this.onDurationChange();
   }
 
-  return this.cache_.duration;
+  return this.cache_.duration || 0;
 };
 
 // Calculates how much time is left. Not in spec, but useful.
