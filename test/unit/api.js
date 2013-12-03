@@ -107,6 +107,8 @@ test('videojs.players should be available after minification', function() {
   player.dispose();
 });
 
+// NOTE: This test could be removed after we've landed on a permanent
+// externs/exports strategy. See comment on videojs/video.js#853
 test('fullscreenToggle does not depend on minified player methods', function(){
   var noop, player, fullscreen, requestFullScreen, cancelFullScreen;
   noop = function(){};
