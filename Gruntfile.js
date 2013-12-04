@@ -322,4 +322,80 @@ module.exports = function(grunt) {
     });
   });
 
+  /**
+   * Create a new release version of video.js. This task requires a single
+   * argument which is passed directly to `npm version` to determine the new
+   * version number. See the help pages npm for more info on how to format that
+   * argument.
+   */
+  grunt.registerTask('version', 'Bump the video.js version and commit a release', function(){
+    var done = this.async(),
+        semver = this.args[0],
+        spawn = grunt.util.spawn;
+
+    // the release must already be built
+    grunt.task.requires('dist');
+
+    if (!semver) {
+      grunt.fail.warn('The version task requires a valid semver string or argument to semver.inc');
+    }
+
+    // create the new version commit
+    grunt.log.ok('creating the new version');
+    spawn({
+      cmd: 'npm',
+      args: ['version', semver]
+    }, function(error, result, code){
+      if (error) {
+        grunt.fail.warn(error);
+      }
+
+      // update the bower metadata
+      var bower = grunt.file.readJSON('bower.json'),
+          version = grunt.file.readJSON('package.json').version;
+      bower.version = version;
+      grunt.file.write('bower.json', JSON.stringify(bower, null, 2));
+
+      // force add the dist/ directory
+      spawn({
+        cmd: 'git',
+        args: 'add --force dist bower.json'.split(' ')
+      }, function(error, result, code){
+        if (error) {
+          grunt.fail.warn(error);
+        }
+
+        spawn({
+          cmd: 'git',
+          args: 'commit --amend --reuse-message=HEAD'.split(' ')
+        }, function(error, result, code){
+          if (error) {
+            grunt.fail.warn(error);
+          }
+
+          // done with the release, clean up dist/
+          grunt.log.ok('cleaning up after the release');
+          spawn({
+            cmd: 'git',
+            args: 'rm -r dist'.split(' ')
+          }, function(error, result, code){
+            if (error) {
+              grunt.fail.warn(error);
+            }
+
+            spawn({
+              cmd: 'git',
+              args: ['commit', '-m', 'Removing dist/ after the release']
+            }, function(error, result, code){
+              if (error) {
+                grunt.fail.warn(error);
+              }
+
+              done(error, result, code);
+            });
+          });
+        });
+      });
+    });
+  });
 };
