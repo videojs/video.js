@@ -1,5 +1,8 @@
 {
   "name": "video.js",
-  "version": "4.3.0",
-  "main": ["dist/video-js/video.js", "dist/video-js/video-js.min.css"]
+  "version": "4.3.0-1",
+  "main": [
+    "dist/video-js/video.js",
+    "dist/video-js/video-js.min.css"
+  ]
 }
