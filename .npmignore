@@ -1,0 +1,26 @@
+.DS_Store
+build/files/*
+docs/api/*
+dev.html
+projects
+.zenflow-log
+test/*.map
+.bunyipconfig.js
+.s3config.json
+
+node_modules
+npm-debug.log
+
+sandbox/*
+!sandbox/*.example
+
+# ignore any Karma conf.js files in the test/ directory
+test/*.conf.js
+
+*.swp
+*.swo
+
+*.orig
+
+*results.xml
+*.log
