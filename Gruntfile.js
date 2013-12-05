@@ -170,6 +170,8 @@ module.exports = function(grunt) {
   // Development watch task
   grunt.registerTask('dev', ['jshint', 'less', 'build', 'qunit:source']);
   grunt.registerTask('test', ['jshint', 'less', 'build', 'minify', 'qunit']);
+  // Release task
+  grunt.registerTask('release', ['dist', 'check-for-changes', 'version', 'commit-version']);
 
   var fs = require('fs'),
       gzip = require('zlib').gzip;
@@ -322,59 +324,101 @@ module.exports = function(grunt) {
     });
   });
 
+  grunt.registerTask('check-for-changes', 'Fail if there are any uncommitted git changes', function(){
+    var done = this.async();
+
+    grunt.util.spawn({
+      cmd: 'git',
+      args: 'diff --exit-code'.split(' ')
+    }, function(error, result, code){
+      if (error) {
+        grunt.fail.warn('There are unstaged changes.');
+      }
+
+      grunt.util.spawn({
+        cmd: 'git',
+        args: 'diff --cached --exit-code'.split(' ')
+      }, function(error, result, code){
+        if (error) {
+          grunt.fail.warn('There are staged but uncommitted changes.');
+        }
+
+        done(error, result, code);
+      });
+    });
+  });
+
   /**
-   * Create a new release version of video.js. This task requires a single
-   * argument which is passed directly to `npm version` to determine the new
-   * version number. See the help pages npm for more info on how to format that
-   * argument.
+   * Bump the version number in package.json and bower.json. The release type
+   * must be specified as an option to this task. It can be specified through
+   * the command-line: `grunt version --type=minor`.
    */
-  grunt.registerTask('version', 'Bump the video.js version and commit a release', function(){
-    var done = this.async(),
-        semver = this.args[0],
-        spawn = grunt.util.spawn;
+  grunt.registerTask('version', 'Bump the video.js version', function(){
+    var type = grunt.option('type'),
+        bower = grunt.file.readJSON('bower.json'),
+        nextVersion;
 
     // the release must already be built
     grunt.task.requires('dist');
+    grunt.task.requires('check-for-changes');
 
-    if (!semver) {
-      grunt.fail.warn('The version task requires a valid semver string or argument to semver.inc');
+    // figure out the next semantic version number
+    if (type === undefined) {
+      grunt.fail.warn('The desired release type must be specified as a task argument');
+    }
+    if (!semver.valid(pkg.version)) {
+      grunt.fail.warn('The current package.json version does not appear valid');
     }
 
-    // create the new version commit
-    grunt.log.ok('creating the new version');
+    nextVersion = semver.inc(pkg.version, type);
+
+    if (!nextVersion) {
+      grunt.fail.warn('Unable to determine the next semver');
+    }
+
+    // update package.json and bower.json
+    pkg.version = nextVersion;
+    bower.version = nextVersion;
+    grunt.file.write('package.json', JSON.stringify(pkg, null, 2) + '\n');
+    grunt.file.write('bower.json', JSON.stringify(bower, null, 2) + '\n');
+  });
+
+  /**
+   * Commit and tag a new version of video.js.
+   */
+  grunt.registerTask('commit-version', 'Commit a new release version', function(){
+    var done = this.async(),
+        spawn = grunt.util.spawn;
+
+    grunt.task.requires('version');
+
+    // add and commit the release files
     spawn({
-      cmd: 'npm',
-      args: ['version', semver]
+      cmd: 'git',
+      args: 'add --force dist package.json bower.json'.split(' ')
     }, function(error, result, code){
       if (error) {
         grunt.fail.warn(error);
       }
 
-      // update the bower metadata
-      var bower = grunt.file.readJSON('bower.json'),
-          version = grunt.file.readJSON('package.json').version;
-      bower.version = version;
-      grunt.file.write('bower.json', JSON.stringify(bower, null, 2));
-
-      // force add the dist/ directory
       spawn({
         cmd: 'git',
-        args: 'add --force dist bower.json'.split(' ')
+        args: ['commit', '-m', 'v' + pkg.version]
       }, function(error, result, code){
         if (error) {
           grunt.fail.warn(error);
         }
 
+        // tag the new version
         spawn({
           cmd: 'git',
-          args: 'commit --amend --reuse-message=HEAD'.split(' ')
+          args: ['tag', 'v' + pkg.version]
         }, function(error, result, code){
           if (error) {
             grunt.fail.warn(error);
           }
 
-          // done with the release, clean up dist/
-          grunt.log.ok('cleaning up after the release');
+          // clean up the release files
           spawn({
             cmd: 'git',
             args: 'rm -r dist'.split(' ')
@@ -398,4 +442,5 @@ module.exports = function(grunt) {
       });
     });
   });
+
 };
