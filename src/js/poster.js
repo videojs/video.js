@@ -29,7 +29,7 @@ vjs.PosterImage = vjs.Button.extend({
 });
 
 // use the test el to check for backgroundSize style support
-var _backgroundSizeSupported = 'backgroundSize' in vjs.TEST_VID;
+var _backgroundSizeSupported = 'backgroundSize' in vjs.TEST_VID.style;
 
 vjs.PosterImage.prototype.createEl = function(){
   var el = vjs.createEl('div', {
