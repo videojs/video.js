@@ -252,7 +252,7 @@ test('should set controls and trigger events', function() {
 //   var player = PlayerTest.makePlayer();
 //   player.on('fullscreenchange', function(){
 //     ok(true, 'fullscreenchange event fired');
-//     ok(this.isFullScreen === true, 'isFullScreen is true');
+//     ok(this.isFullScreen() === true, 'isFullScreen is true');
 //     ok(this.el().className.indexOf('vjs-fullscreen') !== -1, 'vjs-fullscreen class added');
 
 //     player.dispose();
