@@ -89,7 +89,10 @@ vjs.Html5.prototype.createEl = function(){
     }
     // associate the player with the new tag
     el['player'] = player;
+  }
 
+  // Add the video back if it is out of the DOM
+  if (!el.parentNode) {
     vjs.insertFirst(el, player.el());
   }
 
