@@ -516,7 +516,7 @@ vjs.Player.prototype.onVolumeChange;
  * @event fullscreenchange
  */
 vjs.Player.prototype.onFullscreenChange = function() {
-  if (this.isFullScreen) {
+  if (this.isFullScreen()) {
     this.addClass('vjs-fullscreen');
   } else {
     this.removeClass('vjs-fullscreen');
@@ -802,8 +802,43 @@ vjs.Player.prototype.muted = function(muted){
   return this.techGet('muted') || false; // Default to false
 };
 
-// Check if current tech can support native fullscreen (e.g. with built in controls lik iOS, so not our flash swf)
-vjs.Player.prototype.supportsFullScreen = function(){ return this.techGet('supportsFullScreen') || false; };
+// Check if current tech can support native fullscreen
+// (e.g. with built in controls lik iOS, so not our flash swf)
+vjs.Player.prototype.supportsFullScreen = function(){
+  return this.techGet('supportsFullScreen') || false;
+};
+
+/**
+ * is the player in fullscreen
+ * @type {Boolean}
+ * @private
+ */
+vjs.Player.prototype.isFullScreen_ = false;
+
+/**
+ * Check if the player is in fullscreen mode
+ *
+ *     // get
+ *     var fullscreenOrNot = myPlayer.isFullScreen();
+ *
+ *     // set
+ *     myPlayer.isFullScreen(true); // tell the player it's in fullscreen
+ *
+ * NOTE: As of the latest HTML5 spec, isFullScreen is no longer an official
+ * property and instead document.fullscreenElement is used. But isFullScreen is
+ * still a valuable property for internal player workings.
+ *
+ * @param  {Boolean=} isFS Update the player's fullscreen state
+ * @return {Boolean} true if fullscreen, false if not
+ * @return {vjs.Player} self, when setting
+ */
+vjs.Player.prototype.isFullScreen = function(isFS){
+  if (isFS !== undefined) {
+    this.isFullScreen_ = isFS;
+    return this;
+  }
+  return this.isFullScreen_;
+};
 
 /**
  * Increase the size of the video to full screen
@@ -821,7 +856,7 @@ vjs.Player.prototype.supportsFullScreen = function(){ return this.techGet('suppo
  */
 vjs.Player.prototype.requestFullScreen = function(){
   var requestFullScreen = vjs.support.requestFullScreen;
-  this.isFullScreen = true;
+  this.isFullScreen(true);
 
   if (requestFullScreen) {
     // the browser supports going fullscreen at the element level so we can
@@ -833,10 +868,10 @@ vjs.Player.prototype.requestFullScreen = function(){
     // players on a page, they would all be reacting to the same fullscreen
     // events
     vjs.on(document, requestFullScreen.eventName, vjs.bind(this, function(e){
-      this.isFullScreen = document[requestFullScreen.isFullScreen];
+      this.isFullScreen(document[requestFullScreen.isFullScreen]);
 
       // If cancelling fullscreen, remove event listener.
-      if (this.isFullScreen === false) {
+      if (this.isFullScreen() === false) {
         vjs.off(document, requestFullScreen.eventName, arguments.callee);
       }
 
@@ -868,7 +903,7 @@ vjs.Player.prototype.requestFullScreen = function(){
  */
 vjs.Player.prototype.cancelFullScreen = function(){
   var requestFullScreen = vjs.support.requestFullScreen;
-  this.isFullScreen = false;
+  this.isFullScreen(false);
 
   // Check for browser element fullscreen support
   if (requestFullScreen) {
@@ -903,7 +938,7 @@ vjs.Player.prototype.enterFullWindow = function(){
 };
 vjs.Player.prototype.fullWindowOnEscKey = function(event){
   if (event.keyCode === 27) {
-    if (this.isFullScreen === true) {
+    if (this.isFullScreen() === true) {
       this.cancelFullScreen();
     } else {
       this.exitFullWindow();

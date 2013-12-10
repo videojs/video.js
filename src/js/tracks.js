@@ -307,7 +307,7 @@ vjs.TextTrack.prototype.mode = function(){
  * and restore it to its normal size when not in fullscreen mode.
  */
 vjs.TextTrack.prototype.adjustFontSize = function(){
-    if (this.player_.isFullScreen) {
+    if (this.player_.isFullScreen()) {
         // Scale the font by the same factor as increasing the video width to the full screen window width.
         // Additionally, multiply that factor by 1.4, which is the default font size for
         // the caption track (from the CSS)

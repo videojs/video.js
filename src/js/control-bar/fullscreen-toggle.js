@@ -23,7 +23,7 @@ vjs.FullscreenToggle.prototype.buildCSSClass = function(){
 };
 
 vjs.FullscreenToggle.prototype.onClick = function(){
-  if (!this.player_.isFullScreen) {
+  if (!this.player_.isFullScreen()) {
     this.player_.requestFullScreen();
     this.el_.children[0].children[0].innerHTML = 'Non-Fullscreen'; // change the button text to "Non-Fullscreen"
   } else {
