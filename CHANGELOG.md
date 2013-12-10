@@ -8,6 +8,7 @@ CHANGELOG
 * Moved to using QUnit as a dependency ([view](https://github.com/videojs/video.js/pull/850))
 * Added the util namespace for public utility functions ([view](https://github.com/videojs/video.js/pull/862))
 * Fixed an issue with calling duration before Flash is loaded ([view](https://github.com/videojs/video.js/pull/861))
+* Added player methods to externs so they can be overridden ([view](https://github.com/videojs/video.js/pull/878))
 
 --------------------
 
