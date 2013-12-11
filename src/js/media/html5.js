@@ -22,6 +22,7 @@ vjs.Html5 = vjs.MediaTechController.extend({
     this.features['fullscreenResize'] = true;
 
     vjs.MediaTechController.call(this, player, options, ready);
+    this.setupTriggers();
 
     var source = options['source'];
 
@@ -54,7 +55,6 @@ vjs.Html5 = vjs.MediaTechController.extend({
       }
     });
 
-    this.setupTriggers();
     this.triggerReady();
   }
 });
