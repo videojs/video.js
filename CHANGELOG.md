@@ -9,6 +9,7 @@ CHANGELOG
 * Added the util namespace for public utility functions ([view](https://github.com/videojs/video.js/pull/862))
 * Fixed an issue with calling duration before Flash is loaded ([view](https://github.com/videojs/video.js/pull/861))
 * Added player methods to externs so they can be overridden ([view](https://github.com/videojs/video.js/pull/878))
+* Fixed html5 playback when switching between media techs ([view](https://github.com/videojs/video.js/pull/887))
 
 --------------------
 
