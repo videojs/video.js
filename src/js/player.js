@@ -247,10 +247,10 @@ vjs.Player.prototype.loadTech = function(techName, source){
   // Pause and remove current playback technology
   if (this.tech) {
     this.unloadTech();
+  }
 
-  // if this is the first time loading, HTML5 tag will exist but won't be initialized
-  // so we need to remove it if we're not loading HTML5
-  } else if (techName !== 'Html5' && this.tag) {
+  // get rid of the HTML5 video tag as soon as we are using another tech
+  if (techName !== 'Html5' && this.tag) {
     vjs.Html5.disposeMediaElement(this.tag);
     this.tag = null;
   }
