@@ -1286,7 +1286,7 @@ vjs.Player.prototype.listenForUserActivity = function(){
   var onMouseActivity, onMouseDown, mouseInProgress, onMouseUp,
       activityCheck, inactivityTimeout;
 
-  onMouseActivity = this.reportUserActivity;
+  onMouseActivity = vjs.bind(this, this.reportUserActivity);
 
   onMouseDown = function() {
     onMouseActivity();
@@ -1297,7 +1297,7 @@ vjs.Player.prototype.listenForUserActivity = function(){
     // Setting userActivity=true now and setting the interval to the same time
     // as the activityCheck interval (250) should ensure we never miss the
     // next activityCheck
-    mouseInProgress = setInterval(vjs.bind(this, onMouseActivity), 250);
+    mouseInProgress = setInterval(this, onMouseActivity, 250);
   };
 
   onMouseUp = function(event) {
