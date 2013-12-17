@@ -200,7 +200,7 @@ vjs.SeekHandle.prototype.defaultValue = '00:00';
 /** @inheritDoc */
 vjs.SeekHandle.prototype.createEl = function() {
     return this.content = vjs.SliderHandle.prototype.createEl.call(this, 'div', {
-        className: 'vjs-seek-handle',
+        className: 'vjs-seek-handle'
     });
 };
 
