@@ -88,6 +88,7 @@ vjs.Flash = vjs.MediaTechController.extend({
       });
     }
 
+    // firefox doesn't bubble mousemove events to parent. videojs/video-js-swf#37
     this.ready(function(){
       vjs.on(this.el(), 'mousemove', vjs.bind(this, function(){
         this.player().trigger('mousemove');
