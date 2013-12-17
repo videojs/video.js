@@ -88,6 +88,12 @@ vjs.Flash = vjs.MediaTechController.extend({
       });
     }
 
+    this.ready(function(){
+      vjs.on(this.el(), 'mousemove', vjs.bind(this, function(){
+        this.player().trigger('mousemove');
+      }));
+    });
+
     // Flash iFrame Mode
     // In web browsers there are multiple instances where changing the parent element or visibility of a plugin causes the plugin to reload.
     // - Firefox just about always. https://bugzilla.mozilla.org/show_bug.cgi?id=90268 (might be fixed by version 13)
