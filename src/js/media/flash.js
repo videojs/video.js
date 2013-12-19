@@ -89,11 +89,15 @@ vjs.Flash = vjs.MediaTechController.extend({
     }
 
     // firefox doesn't bubble mousemove events to parent. videojs/video-js-swf#37
-    this.ready(function(){
-      vjs.on(this.el(), 'mousemove', vjs.bind(this, function(){
-        this.player().trigger('mousemove');
-      }));
-    });
+    // bugzilla bug: https://bugzilla.mozilla.org/show_bug.cgi?id=836786
+    if (vjs.IS_FIREFOX) {
+      this.ready(function(){
+        vjs.on(this.el(), 'mousemove', vjs.bind(this, function(){
+          // since it's a custom event, don't bubble higher than the player
+          this.player().trigger({ 'type':'mousemove', 'bubbles': false });
+        }));
+      });
+    }
 
     // Flash iFrame Mode
     // In web browsers there are multiple instances where changing the parent element or visibility of a plugin causes the plugin to reload.
