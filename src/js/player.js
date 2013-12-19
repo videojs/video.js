@@ -1297,7 +1297,7 @@ vjs.Player.prototype.listenForUserActivity = function(){
     // Setting userActivity=true now and setting the interval to the same time
     // as the activityCheck interval (250) should ensure we never miss the
     // next activityCheck
-    mouseInProgress = setInterval(this, onMouseActivity, 250);
+    mouseInProgress = setInterval(onMouseActivity, 250);
   };
 
   onMouseUp = function(event) {
