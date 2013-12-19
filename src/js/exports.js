@@ -39,12 +39,20 @@ goog.exportSymbol('videojs.cache', vjs.cache);
 // goog.exportProperty(vjs.CoreObject, 'create', vjs.CoreObject.create);
 
 goog.exportSymbol('videojs.Component', vjs.Component);
+// already in default externs: id, name
 goog.exportProperty(vjs.Component.prototype, 'player', vjs.Component.prototype.player);
+goog.exportProperty(vjs.Component.prototype, 'options', vjs.Component.prototype.options);
+goog.exportProperty(vjs.Component.prototype, 'init', vjs.Component.prototype.init);
 goog.exportProperty(vjs.Component.prototype, 'dispose', vjs.Component.prototype.dispose);
 goog.exportProperty(vjs.Component.prototype, 'createEl', vjs.Component.prototype.createEl);
+goog.exportProperty(vjs.Component.prototype, 'contentEl', vjs.Component.prototype.contentEl);
 goog.exportProperty(vjs.Component.prototype, 'el', vjs.Component.prototype.el);
 goog.exportProperty(vjs.Component.prototype, 'addChild', vjs.Component.prototype.addChild);
+goog.exportProperty(vjs.Component.prototype, 'getChild', vjs.Component.prototype.getChild);
+goog.exportProperty(vjs.Component.prototype, 'getChildById', vjs.Component.prototype.getChildById);
 goog.exportProperty(vjs.Component.prototype, 'children', vjs.Component.prototype.children);
+goog.exportProperty(vjs.Component.prototype, 'initChildren', vjs.Component.prototype.initChildren);
+goog.exportProperty(vjs.Component.prototype, 'removeChild', vjs.Component.prototype.removeChild);
 goog.exportProperty(vjs.Component.prototype, 'on', vjs.Component.prototype.on);
 goog.exportProperty(vjs.Component.prototype, 'off', vjs.Component.prototype.off);
 goog.exportProperty(vjs.Component.prototype, 'one', vjs.Component.prototype.one);
@@ -58,6 +66,7 @@ goog.exportProperty(vjs.Component.prototype, 'dimensions', vjs.Component.prototy
 goog.exportProperty(vjs.Component.prototype, 'ready', vjs.Component.prototype.ready);
 goog.exportProperty(vjs.Component.prototype, 'addClass', vjs.Component.prototype.addClass);
 goog.exportProperty(vjs.Component.prototype, 'removeClass', vjs.Component.prototype.removeClass);
+goog.exportProperty(vjs.Component.prototype, 'buildCSSClass', vjs.Component.prototype.buildCSSClass);
 
 // Need to export ended to ensure it's not removed by CC, since it's not used internally
 goog.exportProperty(vjs.Player.prototype, 'ended', vjs.Player.prototype.ended);

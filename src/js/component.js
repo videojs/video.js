@@ -687,6 +687,9 @@ vjs.Component.prototype.unlockShowing = function(){
 
 /**
  * Disable component by making it unshowable
+ *
+ * Currently private because we're movign towards more css-based states.
+ * @private
  */
 vjs.Component.prototype.disable = function(){
   this.hide();

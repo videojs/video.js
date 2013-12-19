@@ -47,17 +47,40 @@ test('should be able to access expected player API methods', function() {
   ok(player.usingNativeControls, 'usingNativeControls exists');
   ok(player.isFullScreen, 'isFullScreen exists');
 
-  // Component methods
-  ok(player.ready, 'ready exists');
-  ok(player.on, 'on exists');
-  ok(player.off, 'off exists');
-  ok(player.one, 'one exists');
-  ok(player.dimensions, 'dimensions exists');
-  ok(player.addClass, 'addClass exists');
-  ok(player.removeClass, 'removeClass exists');
-  ok(player.dispose, 'dispose exists');
-
   player.dispose();
+});
+
+test('should be able to access expected component API methods', function() {
+  var comp = videojs.Component.create({ id: function(){ return 1; } });
+
+  // Component methods
+  ok(comp.player, 'player exists');
+  ok(comp.options, 'options exists');
+  ok(comp.init, 'init exists');
+  ok(comp.dispose, 'dispose exists');
+  ok(comp.createEl, 'createEl exists');
+  ok(comp.contentEl, 'contentEl exists');
+  ok(comp.el, 'el exists');
+  ok(comp.addChild, 'addChild exists');
+  ok(comp.getChild, 'getChild exists');
+  ok(comp.getChildById, 'getChildById exists');
+  ok(comp.children, 'children exists');
+  ok(comp.initChildren, 'initChildren exists');
+  ok(comp.removeChild, 'removeChild exists');
+  ok(comp.on, 'on exists');
+  ok(comp.off, 'off exists');
+  ok(comp.one, 'one exists');
+  ok(comp.trigger, 'trigger exists');
+  ok(comp.triggerReady, 'triggerReady exists');
+  ok(comp.show, 'show exists');
+  ok(comp.hide, 'hide exists');
+  ok(comp.width, 'width exists');
+  ok(comp.height, 'height exists');
+  ok(comp.dimensions, 'dimensions exists');
+  ok(comp.ready, 'ready exists');
+  ok(comp.addClass, 'addClass exists');
+  ok(comp.removeClass, 'removeClass exists');
+  ok(comp.buildCSSClass, 'buildCSSClass exists');
 });
 
 test('should export ready api call to public', function() {
