@@ -192,7 +192,7 @@ module.exports = function(grunt) {
 
     // Copy over other files
     // grunt.file.copy('src/css/video-js.png', 'build/files/video-js.png');
-    grunt.file.copy('src/swf/video-js.swf', 'build/files/video-js.swf');
+    grunt.file.copy('node_modules/videojs-swf/dist/VideoJS.swf', 'build/files/video-js.swf');
 
     // Inject version number into css file
     var css = grunt.file.read('build/files/video-js.css');
