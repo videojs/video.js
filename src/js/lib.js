@@ -331,7 +331,7 @@ vjs.TEST_VID = vjs.createEl('video');
  * @constant
  * @private
  */
-vjs.USER_AGENT = navigator.userAgent;
+vjs.USER_AGENT = window.navigator.userAgent;
 
 /**
  * Device is an iPhone
