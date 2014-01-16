@@ -147,6 +147,16 @@ module.exports = function(grunt) {
           baseURL: 'https://github.com/videojs/video.js/blob/master/'
         }
       }
+    },
+    zip: {
+      dist: {
+        router: function (filepath) {
+          var path = require('path');
+          return path.relative('dist', filepath);
+        },
+        src: ['dist/video-js/**/*'],
+        dest: 'dist/video-js-' + version.full + '.zip'
+      }
     }
   });
 
@@ -161,6 +171,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('contribflow');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('videojs-doc-generator');
+  grunt.loadNpmTasks('grunt-zip');
 
   // grunt.loadTasks('./docs/tasks/');
   // grunt.loadTasks('../videojs-doc-generator/tasks/');
@@ -265,9 +276,7 @@ module.exports = function(grunt) {
     });
   });
 
-  grunt.registerTask('dist', 'Creating distribution', function(){
-    var exec = require('child_process').exec;
-    var done = this.async();
+  grunt.registerTask('dist-copy', 'Assembling distribution', function(){
     var css, jsmin, jsdev, cdnjs;
 
     // Manually copy each source file
@@ -305,21 +314,8 @@ module.exports = function(grunt) {
     // GA Tracking Pixel (manually building the pixel URL)
     cdnjs = uglify.minify('src/js/cdn.js').code.replace('v0.0.0', 'v'+version.full);
     grunt.file.write('dist/cdn/video.js', jsmin + cdnjs);
-
-    // Zip up into video-js-VERSION.zip
-    exec('cd dist && zip -r video-js-'+version.full+'.zip video-js && cd ..', { maxBuffer: 500*1024 }, function(err, stdout, stderr){
-
-      if (err) {
-        grunt.warn(err);
-        done(false);
-      }
-
-      if (stdout) {
-        grunt.log.writeln(stdout);
-      }
-
-      done();
-    });
   });
+
+  grunt.registerTask('dist', 'Creating distribution', ['dist-copy', 'zip:dist']);
 
 };
