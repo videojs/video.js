@@ -26,7 +26,7 @@ module.exports = function(config) {
     // - PhantomJS
     // - IE (only Windows)
     // Example usage:
-    // browsers = ['Chrome','Firefox','Safari'];
+    // browsers: ['Chrome','Firefox','Safari'],
     browsers: [],
 
     // List of files / patterns to load in the browser
@@ -68,7 +68,15 @@ module.exports = function(config) {
       '../test/unit/*.js'
     ],
 
-    plugins: ['karma-qunit', 'karma-chrome-launcher'],
+    plugins: [
+      'karma-qunit',
+      'karma-chrome-launcher',
+      'karma-firefox-launcher',
+      'karma-ie-launcher',
+      'karma-opera-launcher',
+      'karma-phantomjs-launcher',
+      'karma-safari-launcher'
+    ],
 
     // list of files to exclude
     exclude: [
