@@ -11,6 +11,7 @@ CHANGELOG
 * Added player methods to externs so they can be overridden ([view](https://github.com/videojs/video.js/pull/878))
 * Fixed html5 playback when switching between media techs ([view](https://github.com/videojs/video.js/pull/887))
 * Fixed Firefox+Flash mousemove events so controls don't hide permanently ([view](https://github.com/videojs/video.js/pull/899))
+* Fixed a test for touch detection ([view](https://github.com/videojs/video.js/pull/962))
 
 --------------------
 
