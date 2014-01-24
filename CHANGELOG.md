@@ -15,6 +15,7 @@ CHANGELOG
 * Updated the src file list for karma tests ([view](https://github.com/videojs/video.js/pull/948))
 * Added more tests for API properties after minification ([view](https://github.com/videojs/video.js/pull/906))
 * Updated projet to use npm version of videojs-swf ([view](https://github.com/videojs/video.js/pull/930))
+* Added support for dist zipping on windows ([view](https://github.com/videojs/video.js/pull/944))
 
 --------------------
 
