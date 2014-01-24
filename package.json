@@ -14,7 +14,7 @@
     "url": "https://github.com/zencoder/video-js.git"
   },
   "dependencies": {
-    "videojs-swf": "4.3.1"
+    "videojs-swf": "4.3.4"
   },
   "devDependencies": {
     "grunt-cli": "~0.1.0",
