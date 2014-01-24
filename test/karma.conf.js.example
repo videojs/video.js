@@ -64,6 +64,7 @@ files = [
   '../src/js/json.js',
   '../src/js/setup.js',
   '../src/js/plugins.js',
+  '../src/js/util.js',
   '../test/unit/*.js'
 ];
 
