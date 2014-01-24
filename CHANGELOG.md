@@ -12,6 +12,7 @@ CHANGELOG
 * Fixed html5 playback when switching between media techs ([view](https://github.com/videojs/video.js/pull/887))
 * Fixed Firefox+Flash mousemove events so controls don't hide permanently ([view](https://github.com/videojs/video.js/pull/899))
 * Fixed a test for touch detection ([view](https://github.com/videojs/video.js/pull/962))
+* Updated the src file list for karma tests ([view](https://github.com/videojs/video.js/pull/948))
 
 --------------------
 
