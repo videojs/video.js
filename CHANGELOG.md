@@ -13,6 +13,7 @@ CHANGELOG
 * Fixed Firefox+Flash mousemove events so controls don't hide permanently ([view](https://github.com/videojs/video.js/pull/899))
 * Fixed a test for touch detection ([view](https://github.com/videojs/video.js/pull/962))
 * Updated the src file list for karma tests ([view](https://github.com/videojs/video.js/pull/948))
+* Added more tests for API properties after minification ([view](https://github.com/videojs/video.js/pull/906))
 
 --------------------
 
