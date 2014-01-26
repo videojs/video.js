@@ -36,6 +36,7 @@ vjs.MediaFaker.prototype['setPoster'] = function(val){ this.el().poster = val; }
 
 vjs.MediaFaker.prototype.currentTime = function(){ return 0; };
 vjs.MediaFaker.prototype.seeking = function(){ return false; };
+vjs.MediaFaker.prototype.src = function(){ return 'movie.mp4'; };
 vjs.MediaFaker.prototype.volume = function(){ return 0; };
 vjs.MediaFaker.prototype.muted = function(){ return false; };
 vjs.MediaFaker.prototype.pause = function(){ return false; };
