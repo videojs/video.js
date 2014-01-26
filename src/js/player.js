@@ -976,9 +976,13 @@ vjs.Player.prototype.selectSource = function(sources){
  *     ]);
  *
  * @param  {String|Object|Array=} source The source URL, object, or array of sources
- * @return {vjs.Player} self
+ * @return {String} The current video source
  */
 vjs.Player.prototype.src = function(source){
+  if (source === undefined) {
+    return this.techGet('src');
+  }
+
   // Case: Array of source objects to choose from and pick the best to play
   if (source instanceof Array) {
 
@@ -1031,7 +1035,7 @@ vjs.Player.prototype.src = function(source){
       }
     }
   }
-  return this;
+  return source;
 };
 
 // Begin loading the src data
