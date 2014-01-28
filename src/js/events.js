@@ -180,7 +180,11 @@ vjs.fixEvent = function(event) {
     for (var key in old) {
       // Safari 6.0.3 warns you if you try to copy deprecated layerX/Y
       if (key !== 'layerX' && key !== 'layerY') {
-        event[key] = old[key];
+        // Chrome 32+ warns if you try to copy deprecated returnValue, but
+        // we still want to if preventDefault isn't supported (IE8).
+        if (!(key == 'returnValue' && old.preventDefault)) {
+          event[key] = old[key];
+        }
       }
     }
 
