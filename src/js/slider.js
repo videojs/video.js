@@ -40,7 +40,7 @@ vjs.Slider.prototype.createEl = function(type, props) {
   // Add the slider element class to all sub classes
   props.className = props.className + ' vjs-slider';
   props = vjs.obj.merge({
-    role: 'slider',
+    'role': 'slider',
     'aria-valuenow': 0,
     'aria-valuemin': 0,
     'aria-valuemax': 100,
