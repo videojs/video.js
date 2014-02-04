@@ -14,7 +14,7 @@ vjs.MediaLoader = vjs.Component.extend({
     if (!player.options_['sources'] || player.options_['sources'].length === 0) {
       for (var i=0,j=player.options_['techOrder']; i<j.length; i++) {
         var techName = vjs.capitalize(j[i]),
-            tech = window['videojs'][techName];
+            tech = videojs[techName];
 
         // Check if the browser supports this technology
         if (tech && tech.isSupported()) {

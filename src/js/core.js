@@ -61,7 +61,6 @@ var vjs = function(id, options, ready){
 
 // Extended name, also available externally, window.videojs
 var videojs = vjs;
-window.videojs = window.vjs = vjs;
 
 // CDN Version. Used to target right flash swf.
 vjs.CDN_VERSION = 'GENERATED_CDN_VSN';

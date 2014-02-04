@@ -50,7 +50,7 @@ vjs.Player.prototype.addTextTrack = function(kind, label, language, options){
   var Kind = vjs.capitalize(kind || 'subtitles');
 
   // Create correct texttrack class. CaptionsTrack, etc.
-  var track = new window['videojs'][Kind + 'Track'](this, options);
+  var track = new videojs[Kind + 'Track'](this, options);
 
   tracks.push(track);
 
@@ -679,7 +679,7 @@ vjs.TextTrack.prototype.reset = function(){
 vjs.CaptionsTrack = vjs.TextTrack.extend();
 vjs.CaptionsTrack.prototype.kind_ = 'captions';
 // Exporting here because Track creation requires the track kind
-// to be available on global object. e.g. new window['videojs'][Kind + 'Track']
+// to be available on global object. e.g. new videojs[Kind + 'Track']
 
 /**
  * The track component for managing the hiding and showing of subtitles
