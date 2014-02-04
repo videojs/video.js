@@ -286,7 +286,7 @@ vjs.Player.prototype.loadTech = function(techName, source){
   }
 
   // Initialize tech instance
-  this.tech = new window['videojs'][techName](this, techOptions);
+  this.tech = new videojs[techName](this, techOptions);
 
   this.tech.ready(techReady);
 };
@@ -966,7 +966,7 @@ vjs.Player.prototype.selectSource = function(sources){
   // Loop through each playback technology in the options order
   for (var i=0,j=this.options_['techOrder'];i<j.length;i++) {
     var techName = vjs.capitalize(j[i]),
-        tech = window['videojs'][techName];
+        tech = videojs[techName];
 
     // Check if the browser supports this technology
     if (tech.isSupported()) {
@@ -1043,7 +1043,7 @@ vjs.Player.prototype.src = function(source){
   // Case: Source object { src: '', type: '' ... }
   } else if (source instanceof Object) {
 
-    if (window['videojs'][this.techName]['canPlaySource'](source)) {
+    if (videojs[this.techName]['canPlaySource'](source)) {
       this.src(source.src);
     } else {
       // Send through tech loop to check for a compatible technology.
