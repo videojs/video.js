@@ -43,7 +43,7 @@ vjs.Button.prototype.createEl = function(type, props){
   props = vjs.obj.merge({
     className: this.buildCSSClass(),
     innerHTML: '<div class="vjs-control-content"><span class="vjs-control-text">' + (this.buttonText || 'Need Text') + '</span></div>',
-    role: 'button',
+    'role': 'button',
     'aria-live': 'polite', // let the screen reader user know that the text of the button may change
     tabIndex: 0
   }, props);
