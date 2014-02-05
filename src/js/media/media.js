@@ -82,23 +82,7 @@ vjs.MediaTechController.prototype.addControlsListeners = function(){
   this.on('touchstart', function(event) {
     // Stop the mouse events from also happening
     event.preventDefault();
-    event.stopPropagation();
-    // Record if the user was active now so we don't have to keep polling it
-    userWasActive = this.player_.userActive();
   });
-
-  preventBubble = function(event){
-    event.stopPropagation();
-    if (userWasActive) {
-      this.player_.reportUserActivity();
-    }
-  };
-
-  // Treat all touch events the same for consistency
-  this.on('touchmove', preventBubble);
-  this.on('touchleave', preventBubble);
-  this.on('touchcancel', preventBubble);
-  this.on('touchend', preventBubble);
 
   // Turn on component tap events
   this.emitTapEvents();

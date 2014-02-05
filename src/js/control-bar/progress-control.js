@@ -19,6 +19,8 @@ vjs.ProgressControl.prototype.options_ = {
   }
 };
 
+vjs.ProgressControl.prototype.listenToTouchMove = true;
+
 vjs.ProgressControl.prototype.createEl = function(){
   return vjs.Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-progress-control vjs-control'

@@ -50,6 +50,8 @@ vjs.Slider.prototype.createEl = function(type, props) {
   return vjs.Component.prototype.createEl.call(this, type, props);
 };
 
+vjs.Slider.prototype.listenToTouchMove = true;
+
 vjs.Slider.prototype.onMouseDown = function(event){
   event.preventDefault();
   vjs.blockTextSelection();
@@ -230,3 +232,5 @@ vjs.SliderHandle.prototype.createEl = function(type, props) {
 
   return vjs.Component.prototype.createEl.call(this, 'div', props);
 };
+
+vjs.SliderHandle.prototype.listenToTouchMove = true;

@@ -65,6 +65,23 @@ vjs.Component = vjs.CoreObject.extend({
     this.ready(ready);
     // Don't want to trigger ready here or it will before init is actually
     // finished for all children that run this constructor
+
+
+    var touchmove = false;
+    this.on('touchstart', function() {
+      touchmove = false;
+    });
+    this.on('touchmove', vjs.bind(this, function() {
+      if (this.listenToTouchMove) {
+        this.player_.reportUserActivity();
+      }
+      touchmove = true;
+    }));
+    this.on('touchend', vjs.bind(this, function(event) {
+      if (!touchmove && !didSomething) {
+        this.player_.reportUserActivity();
+      }
+    }));
   }
 });
 
