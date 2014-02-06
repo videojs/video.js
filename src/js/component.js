@@ -868,7 +868,9 @@ vjs.Component.prototype.emitTapEvents = function(){
 
   // When the touch ends, measure how long it took and trigger the appropriate
   // event
-  this.on('touchend', function() {
+  this.on('touchend', function(event) {
+    event.stopImmediatePropagation();
+
     // Proceed only if the touchmove/leave/cancel event didn't happen
     if (couldBeTap === true) {
       // Measure how long the touch lasted

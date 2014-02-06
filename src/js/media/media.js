@@ -134,7 +134,10 @@ vjs.MediaTechController.prototype.onClick = function(event){
  */
 
 vjs.MediaTechController.prototype.onTap = function(){
-  this.player().userActive(!this.player().userActive());
+  var userActivity = this.player().userActive();
+  if (userActivity) {
+    this.player().userActive(!userActivity);
+  }
 };
 
 vjs.MediaTechController.prototype.features = {
