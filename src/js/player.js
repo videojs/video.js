@@ -106,6 +106,7 @@ vjs.Player = vjs.Component.extend({
     }
 
     this.listenForUserActivity();
+    this.disableUserActivity();
   }
 });
 

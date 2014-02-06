@@ -15,6 +15,7 @@ vjs.MediaTechController = vjs.Component.extend({
     vjs.Component.call(this, player, options, ready);
 
     this.initControlsListeners();
+    this.disableUserActivity();
   }
 });
 
@@ -60,7 +61,8 @@ vjs.MediaTechController.prototype.initControlsListeners = function(){
 };
 
 vjs.MediaTechController.prototype.addControlsListeners = function(){
-  var preventBubble, userWasActive;
+  var userWasActive,
+      touchmove = false;
 
   // Some browsers (Chrome & IE) don't trigger a click on a flash swf, but do
   // trigger mousedown/up.
@@ -82,14 +84,29 @@ vjs.MediaTechController.prototype.addControlsListeners = function(){
   this.on('touchstart', function(event) {
     // Stop the mouse events from also happening
     event.preventDefault();
+    userWasActive = this.player().userActive();
+    touchmove = false;
+  });
+
+  this.on('touchmove', function(event) {
+    touchmove = true;
+  })
+
+  this.on('touchend', function(event) {
+    if (userWasActive) {
+      this.player().reportUserActivity();
+    }
+    if (!touchmove) {
+      this.player().userActive(!this.player().userActive());
+    }
   });
 
   // Turn on component tap events
-  this.emitTapEvents();
+  //this.emitTapEvents();
 
   // The tap listener needs to come after the touchend listener because the tap
   // listener cancels out any reportedUserActivity when setting userActive(false)
-  this.on('tap', this.onTap);
+  //this.on('tap', this.onTap);
 };
 
 /**
@@ -134,10 +151,7 @@ vjs.MediaTechController.prototype.onClick = function(event){
  */
 
 vjs.MediaTechController.prototype.onTap = function(){
-  var userActivity = this.player().userActive();
-  if (userActivity) {
-    this.player().userActive(!userActivity);
-  }
+  this.player().userActive(!this.player().userActive());
 };
 
 vjs.MediaTechController.prototype.features = {
