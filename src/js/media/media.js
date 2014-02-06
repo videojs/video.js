@@ -61,6 +61,8 @@ vjs.MediaTechController.prototype.initControlsListeners = function(){
 };
 
 vjs.MediaTechController.prototype.addControlsListeners = function(){
+  var userWasActive;
+
   // Some browsers (Chrome & IE) don't trigger a click on a flash swf, but do
   // trigger mousedown/up.
   // http://stackoverflow.com/questions/1444562/javascript-onclick-event-over-flash-object
@@ -81,10 +83,13 @@ vjs.MediaTechController.prototype.addControlsListeners = function(){
   this.on('touchstart', function(event) {
     // Stop the mouse events from also happening
     event.preventDefault();
+    userWasActive = this.player_.userActive();
   });
 
   this.on('touchmove', function(event) {
-    this.player().reportUserActivity();
+    if (userWasActive){
+      this.player().reportUserActivity();
+    }
   });
 
   // Turn on component tap events
