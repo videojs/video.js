@@ -66,7 +66,7 @@ vjs.Component = vjs.CoreObject.extend({
     // Don't want to trigger ready here or it will before init is actually
     // finished for all children that run this constructor
 
-    if (options.reportUserActivity) {
+    if (options.reportUserActivity !== false) {
       this.enableUserActivity();
     }
   }
