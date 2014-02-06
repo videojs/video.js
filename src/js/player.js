@@ -54,6 +54,9 @@ vjs.Player = vjs.Component.extend({
     // May be turned back on by HTML5 tech if nativeControlsForTouch is true
     tag.controls = false;
 
+    // we don't want the player to report user activity
+    options.reportUserActivity = false;
+
     // Run base component initializing with new options.
     // Builds the element through createEl()
     // Inits and embeds any child components in opts
@@ -1315,14 +1318,6 @@ vjs.Player.prototype.listenForUserActivity = function(){
   // Shouldn't need to use inProgress interval because of key repeat
   this.on('keydown', onMouseActivity);
   this.on('keyup', onMouseActivity);
-
-  // Consider any touch events that bubble up to be activity
-  // Certain touches on the tech will be blocked from bubbling because they
-  // toggle controls
-  this.on('touchstart', onMouseDown);
-  this.on('touchmove', onMouseActivity);
-  this.on('touchend', onMouseUp);
-  this.on('touchcancel', onMouseUp);
 
   // Run an interval every 250 milliseconds instead of stuffing everything into
   // the mousemove/touchmove function itself, to prevent performance degradation.

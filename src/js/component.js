@@ -65,6 +65,10 @@ vjs.Component = vjs.CoreObject.extend({
     this.ready(ready);
     // Don't want to trigger ready here or it will before init is actually
     // finished for all children that run this constructor
+
+    if (options.reportUserActivity !== false) {
+      this.enableUserActivity();
+    }
   }
 });
 
@@ -851,7 +855,7 @@ vjs.Component.prototype.emitTapEvents = function(){
 
   // When the touch ends, measure how long it took and trigger the appropriate
   // event
-  this.on('touchend', function() {
+  this.on('touchend', function(event) {
     // Proceed only if the touchmove/leave/cancel event didn't happen
     if (couldBeTap === true) {
       // Measure how long the touch lasted
@@ -866,3 +870,31 @@ vjs.Component.prototype.emitTapEvents = function(){
     }
   });
 };
+
+vjs.Component.prototype.enableUserActivity = function() {
+  var touchmove = false;
+
+  this.enableUserActivity.touchstart = function() {
+    touchmove = false;
+  };
+  this.enableUserActivity.touchmove = vjs.bind(this, function() {
+    this.player_.reportUserActivity();
+    touchmove = true;
+  });
+  this.enableUserActivity.touchend = vjs.bind(this, function() {
+    if (!touchmove) {
+      this.player_.reportUserActivity();
+    }
+  });
+
+  this.on('touchstart', this.enableUserActivity.touchstart);
+  this.on('touchmove', this.enableUserActivity.touchmove);
+  this.on('touchend', this.enableUserActivity.touchend);
+};
+
+vjs.Component.prototype.disableUserActivity = function() {
+  this.off('touchstart', this.enableUserActivity.touchstart);
+  this.off('touchmove', this.enableUserActivity.touchmove);
+  this.off('touchend', this.enableUserActivity.touchend);
+};
+
