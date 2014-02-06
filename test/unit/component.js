@@ -231,6 +231,8 @@ test('should emit a tap event', function(){
 
   var comp = new vjs.Component(getFakePlayer(), {});
 
+  comp.disableUserActivity();
+
   comp.emitTapEvents();
   comp.on('tap', function(){
     ok(true, 'Tap event emitted');
