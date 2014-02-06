@@ -24,8 +24,6 @@ vjs.ControlBar.prototype.options_ = {
   }
 };
 
-vjs.ControlBar.prototype.listenToTouchMove = true;
-
 vjs.ControlBar.prototype.createEl = function(){
   return vjs.createEl('div', {
     className: 'vjs-control-bar'
