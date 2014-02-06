@@ -229,9 +229,7 @@ test('should emit a tap event', function(){
   var origTouch = vjs.TOUCH_ENABLED;
   vjs.TOUCH_ENABLED = true;
 
-  var comp = new vjs.Component(getFakePlayer(), {});
-
-  comp.disableUserActivity();
+  var comp = new vjs.Component(getFakePlayer(), {reportUserActivity: false});
 
   comp.emitTapEvents();
   comp.on('tap', function(){

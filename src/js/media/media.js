@@ -12,10 +12,12 @@
 vjs.MediaTechController = vjs.Component.extend({
   /** @constructor */
   init: function(player, options, ready){
+    // we don't want the tech to report user activity automatically.
+    // This is done manually in addControlsListeners
+    options.reportUserActivity = false;
     vjs.Component.call(this, player, options, ready);
 
     this.initControlsListeners();
-    this.disableUserActivity();
   }
 });
 

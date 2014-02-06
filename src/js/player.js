@@ -54,6 +54,9 @@ vjs.Player = vjs.Component.extend({
     // May be turned back on by HTML5 tech if nativeControlsForTouch is true
     tag.controls = false;
 
+    // we don't want the player to report user activity
+    options.reportUserActivity = false;
+
     // Run base component initializing with new options.
     // Builds the element through createEl()
     // Inits and embeds any child components in opts
@@ -106,7 +109,6 @@ vjs.Player = vjs.Component.extend({
     }
 
     this.listenForUserActivity();
-    this.disableUserActivity();
   }
 });
 
