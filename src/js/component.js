@@ -78,7 +78,7 @@ vjs.Component = vjs.CoreObject.extend({
       touchmove = true;
     }));
     this.on('touchend', vjs.bind(this, function(event) {
-      if (!touchmove && !didSomething) {
+      if (!touchmove) {
         this.player_.reportUserActivity();
       }
     }));
