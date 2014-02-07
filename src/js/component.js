@@ -66,8 +66,8 @@ vjs.Component = vjs.CoreObject.extend({
     // Don't want to trigger ready here or it will before init is actually
     // finished for all children that run this constructor
 
-    if (options.reportUserActivity !== false) {
-      this.enableUserActivity();
+    if (options.reportTouchActivity !== false) {
+      this.enableTouchActivity();
     }
   }
 });
@@ -871,30 +871,53 @@ vjs.Component.prototype.emitTapEvents = function(){
   });
 };
 
-vjs.Component.prototype.enableUserActivity = function() {
-  var touchmove = false;
+/**
+ * Report user touch activity when touch events occur
+ *
+ * User activity is used to determine when controls should show/hide. It's
+ * relatively simple when it comes to mouse events, because any mouse event
+ * should show the controls. So we capture mouse events that bubble up to the
+ * player and report activity when that happens.
+ *
+ * With touch events it isn't as easy. We can't rely on touch events at the
+ * player level, because a tap (touchstart + touchend) on the video itself on
+ * mobile devices is meant to turn controls off (and on). User activity is
+ * checked asynchronously, so what could happen is a tap event on the video
+ * turns the controls off, then the touchend event bubbles up to the player,
+ * which if it reported user activity, would turn the controls right back on.
+ * (We also don't want to completely block touch events from bubbling up)
+ *
+ * Also a touchmove, touch+hold, and anything other than a tap is not supposed
+ * to turn the controls back on on a mobile device.
+ *
+ * Here we're setting the default component behavior to report user activity
+ * whenever touch events happen, and this can be turned off by components that
+ * want touch events to act differently.
+ */
+vjs.Component.prototype.enableTouchActivity = function() {
+  var report, touchHolding, touchEnd;
 
-  this.enableUserActivity.touchstart = function() {
-    touchmove = false;
+  // listener for reporting that the user is active
+  report = vjs.bind(this.player(), this.player().reportUserActivity);
+
+  this.on('touchstart', function() {
+    report();
+    // For as long as the they are touching the device or have their mouse down,
+    // we consider them active even if they're not moving their finger or mouse.
+    // So we want to continue to update that they are active
+    clearInterval(touchHolding);
+    // report at the same interval as activityCheck
+    touchHolding = setInterval(report, 250);
+  });
+
+  touchEnd = function(event) {
+    report();
+    // stop the interval that maintains activity if the touch is holding
+    clearInterval(touchHolding);
   };
-  this.enableUserActivity.touchmove = vjs.bind(this, function() {
-    this.player_.reportUserActivity();
-    touchmove = true;
-  });
-  this.enableUserActivity.touchend = vjs.bind(this, function() {
-    if (!touchmove) {
-      this.player_.reportUserActivity();
-    }
-  });
 
-  this.on('touchstart', this.enableUserActivity.touchstart);
-  this.on('touchmove', this.enableUserActivity.touchmove);
-  this.on('touchend', this.enableUserActivity.touchend);
-};
-
-vjs.Component.prototype.disableUserActivity = function() {
-  this.off('touchstart', this.enableUserActivity.touchstart);
-  this.off('touchmove', this.enableUserActivity.touchmove);
-  this.off('touchend', this.enableUserActivity.touchend);
+  this.on('touchmove', report);
+  this.on('touchend', touchEnd);
+  this.on('touchcancel', touchEnd);
 };
 

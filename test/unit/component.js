@@ -3,7 +3,8 @@ module('Component');
 var getFakePlayer = function(){
   return {
     // Fake player requries an ID
-    id: function(){ return 'player_1'; }
+    id: function(){ return 'player_1'; },
+    reportUserActivity: function(){}
   };
 };
 
@@ -229,7 +230,7 @@ test('should emit a tap event', function(){
   var origTouch = vjs.TOUCH_ENABLED;
   vjs.TOUCH_ENABLED = true;
 
-  var comp = new vjs.Component(getFakePlayer(), {reportUserActivity: false});
+  var comp = new vjs.Component(getFakePlayer(), {reportTouchActivity: false});
 
   comp.emitTapEvents();
   comp.on('tap', function(){

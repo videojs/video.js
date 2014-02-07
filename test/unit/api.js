@@ -51,7 +51,7 @@ test('should be able to access expected player API methods', function() {
 });
 
 test('should be able to access expected component API methods', function() {
-  var comp = videojs.Component.create({ id: function(){ return 1; } });
+  var comp = videojs.Component.create({ id: function(){ return 1; }, reportUserActivity: function(){} });
 
   // Component methods
   ok(comp.player, 'player exists');
@@ -168,7 +168,8 @@ test('fullscreenToggle does not depend on minified player methods', function(){
   player = {
     id: noop,
     on: noop,
-    ready: noop
+    ready: noop,
+    reportUserActivity: noop
   };
 
   player['requestFullScreen'] = function(){

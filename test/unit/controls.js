@@ -15,7 +15,8 @@ test('should hide volume control if it\'s not supported', function(){
       }
     },
     volume: function(){},
-    muted: function(){}
+    muted: function(){},
+    reportUserActivity: function(){}
   };
 
   volumeControl = new vjs.VolumeControl(player);
@@ -45,7 +46,8 @@ test('should test and toggle volume control on `loadstart`', function(){
       features: {
         'volumeControl': true
       }
-    }
+    },
+    reportUserActivity: function(){}
   };
 
   volumeControl = new vjs.VolumeControl(player);
@@ -83,7 +85,8 @@ test('calculateDistance should use changedTouches, if available', function() {
   player = {
     id: noop,
     on: noop,
-    ready: noop
+    ready: noop,
+    reportUserActivity: noop
   };
   slider = new vjs.Slider(player);
   document.body.appendChild(slider.el_);
