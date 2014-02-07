@@ -84,11 +84,16 @@ test('should dispose of component and children', function(){
   var id = comp.el()[vjs.expando];
 
   var hasDisposed = false;
-  comp.on('dispose', function(){ hasDisposed = true; });
+  var bubbles = null;
+  comp.on('dispose', function(event){
+    hasDisposed = true;
+    bubbles = event.bubbles;
+  });
 
   comp.dispose();
 
   ok(hasDisposed, 'component fired dispose event');
+  ok(bubbles === false, 'dispose event does not bubble');
   ok(!comp.children(), 'component children were deleted');
   ok(!comp.el(), 'component element was deleted');
   ok(!child.children(), 'child children were deleted');
