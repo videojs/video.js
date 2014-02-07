@@ -19,6 +19,7 @@ CHANGELOG
 * Fixed iOS fullscreen issue ([view](https://github.com/videojs/video.js/pull/977))
 * Fixed touch event bubbling ([view](https://github.com/videojs/video.js/pull/992))
 * Fixed ARIA role attribute for button and slider ([view](https://github.com/videojs/video.js/pull/988))
+* Fixed and issue where a component's dispose event would bubble up ([view](https://github.com/videojs/video.js/pull/981))
 
 --------------------
 
