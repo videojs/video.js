@@ -76,7 +76,7 @@ vjs.Component = vjs.CoreObject.extend({
  * Dispose of the component and all child components
  */
 vjs.Component.prototype.dispose = function(){
-  this.trigger('dispose');
+  this.trigger({ type: 'dispose', 'bubbles': false });
 
   // Dispose all children.
   if (this.children_) {
