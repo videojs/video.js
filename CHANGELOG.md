@@ -18,7 +18,7 @@ CHANGELOG
 * Added support for dist zipping on windows ([view](https://github.com/videojs/video.js/pull/944))
 * Fixed iOS fullscreen issue ([view](https://github.com/videojs/video.js/pull/977))
 * Fixed touch event bubbling ([view](https://github.com/videojs/video.js/pull/992))
-
+* Fixed ARIA role attribute for button and slider ([view](https://github.com/videojs/video.js/pull/988))
 --------------------
 
 ## 4.3.0 (2013-11-04)
