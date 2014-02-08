@@ -86,3 +86,11 @@ The second argument is an options object. It allows you to set additional option
 
 The third argument is a 'ready' callback. Once Video.js has initialized it will call this function.
 
+videojs(document.getElementsById('example_video_1')), {}, function()) {
+  // This is functionally the same as the previous example.
+});
+
+videojs(document.getElementsByClassName('awesome_video_class')[0], {}, function()) {
+  // You can grab an element by class if you'd like, just make sure
+  // if it's an array that you pick one (here we chose the first).
+});
