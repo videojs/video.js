@@ -14,7 +14,7 @@ You can download the Video.js source and host it on your own servers, or use the
 
 > ```html
 <script type="text/javascript">
-  document.createElement('video');document.createElement('audio');
+  document.createElement('video');document.createElement('audio');document.createElement('track');
 </script>
 ```
 
