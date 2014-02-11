@@ -650,9 +650,6 @@ vjs.Player.prototype.paused = function(){
 vjs.Player.prototype.currentTime = function(seconds){
   if (seconds !== undefined) {
 
-    // cache the last set value for smoother scrubbing
-    this.cache_.lastSetCurrentTime = seconds;
-
     this.techCall('setCurrentTime', seconds);
 
     // improve the accuracy of manual timeupdates

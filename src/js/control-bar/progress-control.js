@@ -68,25 +68,7 @@ vjs.SeekBar.prototype.updateARIAAttributes = function(){
 };
 
 vjs.SeekBar.prototype.getPercent = function(){
-  var currentTime;
-  // Flash RTMP provider will not report the correct time
-  // immediately after a seek. This isn't noticeable if you're
-  // seeking while the video is playing, but it is if you seek
-  // while the video is paused.
-  if (this.player_.techName === 'Flash' && this.player_.seeking()) {
-    var cache = this.player_.getCache();
-    if (cache.lastSetCurrentTime) {
-      currentTime = cache.lastSetCurrentTime;
-    }
-    else {
-      currentTime = this.player_.currentTime();
-    }
-  }
-  else {
-    currentTime = this.player_.currentTime();
-  }
-
-  return currentTime / this.player_.duration();
+  return this.player_.currentTime() / this.player_.duration();
 };
 
 vjs.SeekBar.prototype.onMouseDown = function(event){

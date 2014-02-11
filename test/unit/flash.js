@@ -62,3 +62,37 @@ test('test canPlaySource', function() {
   ok(!canPlaySource({ type: 'video/webm; codecs="vp8, vorbis"' }));
   ok(!canPlaySource({ type: 'video/webm' }));
 });
+
+test('currentTime is the seek target during seeking', function() {
+  var noop = function() {},
+      seeking = false,
+      parentEl = document.createElement('div'),
+      tech = new vjs.Flash({
+        id: noop,
+        on: noop,
+        options_: {}
+      }, {
+        'parentEl': parentEl
+      }),
+      currentTime;
+
+  tech.el().vjs_setProperty = function(property, value) {
+    if (property === 'currentTime') {
+      currentTime = value;
+    }
+  };
+  tech.el().vjs_getProperty = function(name) {
+    if (name === 'currentTime') {
+      return currentTime;
+    } else if (name === 'seeking') {
+      return seeking;
+    }
+  };
+
+  currentTime = 3;
+  strictEqual(3, tech.currentTime(), 'currentTime is retreived from the SWF');
+
+  tech['setCurrentTime'](7);
+  seeking = true;
+  strictEqual(7, tech.currentTime(), 'during seeks the target time is returned');
+});
