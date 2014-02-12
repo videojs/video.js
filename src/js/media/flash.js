@@ -82,6 +82,8 @@ vjs.Flash = vjs.MediaTechController.extend({
       this.el_.vjs_setProperty('currentTime', time);
     };
     this['currentTime'] = function(time){
+      // when seeking make the reported time keep up with the requested time
+      // by reading the time we're seeking to
       if (this.seeking()) {
         return lastSeekTarget;
       }

@@ -165,10 +165,10 @@ vjs.PlayProgressBar.prototype.createEl = function(){
  * @constructor
  */
 vjs.SeekHandle = vjs.SliderHandle.extend({
-    init: function(player, options) {
-        vjs.SliderHandle.call(this, player, options);
-        player.on('timeupdate', vjs.bind(this, this.updateContent));
-    }
+  init: function(player, options) {
+    vjs.SliderHandle.call(this, player, options);
+    player.on('timeupdate', vjs.bind(this, this.updateContent));
+  }
 });
 
 /**
@@ -181,14 +181,13 @@ vjs.SeekHandle.prototype.defaultValue = '00:00';
 
 /** @inheritDoc */
 vjs.SeekHandle.prototype.createEl = function() {
-    return this.content = vjs.SliderHandle.prototype.createEl.call(this, 'div', {
-        className: 'vjs-seek-handle'
-    });
+  return vjs.SliderHandle.prototype.createEl.call(this, 'div', {
+    className: 'vjs-seek-handle',
+    'aria-live': 'off'
+  });
 };
 
 vjs.SeekHandle.prototype.updateContent = function() {
-
-    // Allows for smooth scrubbing, when player can't keep up.
-    var time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
-    this.content.innerHTML = '<span class="vjs-control-text">' + vjs.formatTime(time, this.player_.duration()) + '</span>';
+  var time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
+  this.el_.innerHTML = '<span class="vjs-control-text">' + vjs.formatTime(time, this.player_.duration()) + '</span>';
 };
