@@ -158,6 +158,13 @@ module.exports = function(grunt) {
         src: ['dist/video-js/**/*'],
         dest: 'dist/video-js-' + version.full + '.zip'
       }
+    },
+    umd: {
+      combined: {
+        src: 'build/files/minified.video.js',
+        dest: 'build/files/minified.video.js',
+        objectToExport: 'videojs'
+      }
     }
   });
 
@@ -173,6 +180,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('videojs-doc-generator');
   grunt.loadNpmTasks('grunt-zip');
+  grunt.loadNpmTasks('grunt-umd');
 
   // grunt.loadTasks('./docs/tasks/');
   // grunt.loadTasks('../videojs-doc-generator/tasks/');
