@@ -158,7 +158,7 @@ module.exports = function(grunt) {
         src: ['dist/video-js/**/*'],
         dest: 'dist/video-js-' + version.full + '.zip'
       }
-    }
+    },
     usebanner: {
       dist: {
         options: {
