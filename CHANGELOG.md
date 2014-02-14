@@ -22,6 +22,7 @@ CHANGELOG
 * Fixed and issue where a component's dispose event would bubble up ([view](https://github.com/videojs/video.js/pull/981))
 * Quieted down deprecation warnings ([view](https://github.com/videojs/video.js/pull/971))
 * Update seek handle to display the current time ([view](https://github.com/videojs/video.js/pull/902))
+* Added requirejs and browserify support (UMD) ([view](https://github.com/videojs/video.js/pull/998))
 
 --------------------
 
