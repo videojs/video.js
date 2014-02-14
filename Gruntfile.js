@@ -159,6 +159,18 @@ module.exports = function(grunt) {
         dest: 'dist/video-js-' + version.full + '.zip'
       }
     }
+    usebanner: {
+      dist: {
+        options: {
+          position: 'top',
+          banner: '/*! Video.js v' + version.full + ' <%= pkg.copyright %> */ ',
+          linebreak: true
+        },
+        files: {
+          src: [ 'build/files/minified.video.js']
+        }
+      }
+    }
   });
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -173,15 +185,16 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('videojs-doc-generator');
   grunt.loadNpmTasks('grunt-zip');
+  grunt.loadNpmTasks('grunt-banner');
 
   // grunt.loadTasks('./docs/tasks/');
   // grunt.loadTasks('../videojs-doc-generator/tasks/');
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'less', 'build', 'minify', 'dist']);
+  grunt.registerTask('default', ['jshint', 'less', 'build', 'minify', 'usebanner', 'dist']);
   // Development watch task
   grunt.registerTask('dev', ['jshint', 'less', 'build', 'qunit:source']);
-  grunt.registerTask('test', ['jshint', 'less', 'build', 'minify', 'qunit']);
+  grunt.registerTask('test', ['default', 'less', 'build', 'minify', 'usebanner', 'qunit']);
 
   var fs = require('fs'),
       gzip = require('zlib').gzip;
@@ -248,7 +261,7 @@ module.exports = function(grunt) {
                 + ' --js_output_file=' + dest
                 + ' --create_source_map ' + dest + '.map --source_map_format=V3'
                 + ' --jscomp_warning=checkTypes --warning_level=VERBOSE'
-                + ' --output_wrapper "/*! Video.js v' + version.full + ' ' + pkg.copyright + ' */ (function() {%output%})();"';
+                + ' --output_wrapper "(function() {%output%})();"';
                 //@ sourceMappingURL=video.js.map
 
     // Add each js file

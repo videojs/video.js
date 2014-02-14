@@ -14,6 +14,18 @@
     Check publicly available APIs against compiled lib
   -->
   <script type="text/javascript">
+
+    // Test AMD Support
+    // window.define = function(a, b){
+    //   console.log(a, b);
+    // };
+    // define.amd = true;
+
+    // Test CJS Support
+    // Have to remove qunit and tests to because module becomes a function
+    // window.module = window.exports = {};
+    // window.module.exports = {};
+
     (function(){
 
       // ADD NEW TEST FILES HERE
