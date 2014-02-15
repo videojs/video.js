@@ -170,6 +170,16 @@ module.exports = function(grunt) {
           src: [ 'build/files/minified.video.js']
         }
       }
+    },
+    bump: {
+      files: ['package.json'],
+      updateConfigs: ['pkg']
+    },
+    tagrelease: {
+      file: 'package.json',
+      commit:  true,
+      message: 'Release %version%',
+      prefix:  'v'
     }
   });
 
@@ -186,6 +196,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('videojs-doc-generator');
   grunt.loadNpmTasks('grunt-zip');
   grunt.loadNpmTasks('grunt-banner');
+  grunt.loadNpmTasks('grunt-bump');
+  grunt.loadNpmTasks('grunt-tagrelease');
+  grunt.loadNpmTasks('chg');
 
   // grunt.loadTasks('./docs/tasks/');
   // grunt.loadTasks('../videojs-doc-generator/tasks/');

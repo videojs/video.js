@@ -3,7 +3,12 @@
   "description": "An HTML5 and Flash video player with a common API and skin for both.",
   "version": "4.3.0",
   "copyright": "Copyright 2014 Brightcove, Inc. https://github.com/videojs/video.js/blob/master/LICENSE",
-  "keywords": ["html5", "flash", "video", "player"],
+  "keywords": [
+    "html5",
+    "flash",
+    "video",
+    "player"
+  ],
   "homepage": "http://videojs.com",
   "author": "Steve Heffernan",
   "scripts": {
@@ -19,7 +24,7 @@
   },
   "devDependencies": {
     "grunt-cli": "~0.1.0",
-    "grunt": "~0.4.0",
+    "grunt": "~0.4",
     "grunt-contrib-jshint": "~0.4.3",
     "grunt-contrib-watch": "~0.1.4",
     "grunt-contrib-qunit": "~0.2.1",
@@ -45,6 +50,9 @@
     "videojs-doc-generator": "0.0.1",
     "qunitjs": "~1.12.0",
     "grunt-zip": "0.10.2",
-    "grunt-banner": "~0.2.0"
+    "grunt-banner": "~0.2.0",
+    "chg": "~0.1.8",
+    "grunt-bump": "0.0.13",
+    "grunt-tagrelease": "~0.3.3"
   }
 }

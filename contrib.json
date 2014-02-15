@@ -1,7 +1,105 @@
 {
-  "owner": "videojs",
-  "project": "video.js",
-  "developmentBranch": "master",
-  "releaseBranch": "stable",
-  "remote": "origin"
+  "project": {
+    "owner": "videojs",
+    "name": "video.js",
+    "requirements": [
+      {
+        "name": "git",
+        "info": "http://git-scm.com",
+        "test": "which git"
+      },
+      {
+        "name": "node.js",
+        "info": "http://nodejs.org",
+        "test": "which node"
+      }
+    ]
+  },
+
+  "test": {
+    "desc": "Run automated tests",
+    "steps": ["grunt test"]
+  },
+
+  "contributions": {
+
+    "release": {
+      "desc": "Create and publish a release",
+      "steps": [
+        {
+          "desc": "Ensure there's no unadded changes",
+          "exec": "git diff --exit-code"
+        },
+        {
+          "desc": "Ensure there's no added changes",
+          "exec": "git diff --cached --exit-code"
+        },
+        {
+          "desc": "Have the changes been merged into the release branch (stable)?",
+          "prompt": "confirm"
+        },
+        {
+          "desc": "Provide the release type",
+          "prompt": {
+            "id": "type",
+            "message": "release type",
+            "default": "patch",
+            "type": "text"
+          }
+        },
+        {
+          "desc": "Checkout and update the release branch",
+          "exec": "git checkout stable & git pull"
+        },
+        {
+          "desc": "Run tests",
+          "exec": "grunt test"
+        },
+        {
+          "desc": "Bump the package version",
+          "exec": "grunt bump:<%= type %>"
+        },
+        {
+          "desc": "Build the release",
+          "exec": "grunt dist"
+        },
+        {
+          "desc": "Add the release files",
+          "exec": "git add dist/video-js --force"
+        },
+        {
+          "desc": "Rebuild the docs",
+          "exec": "grunt vjsdocs"
+        },
+        {
+          "desc": "Update the changelog with the new release",
+          "exec": "grunt chg-release:<%= type %>"
+        },
+        {
+          "desc": "Tag the release",
+          "exec": "grunt tagrelease"
+        },
+        {
+          "desc": "Push changes to the remote",
+          "exec": "git push stable"
+        },
+        {
+          "desc": "Push tags to the remote",
+          "exec": "git push --tags"
+        },
+        {
+          "desc": "Publish to npm",
+          "exec": "npm publish"
+        },
+        {
+          "desc": "Checkout the development branch (master) and merge changes",
+          "exec": "git checkout master && git merge stable"
+        },
+        {
+          "desc": "Push development branch changes",
+          "exec": "git push master"
+        }
+      ]
+    }
+  }
 }

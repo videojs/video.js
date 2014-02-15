@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
-## Unreleased (HEAD)
+## HEAD (Unreleased)
 * Made the poster updateable after initialization ([view](https://github.com/videojs/video.js/pull/838))
 * Exported more textTrack functions ([view](https://github.com/videojs/video.js/pull/815))
 * Moved player ID generation to support video tags with no IDs ([view](https://github.com/videojs/video.js/pull/845))
@@ -19,9 +19,9 @@ CHANGELOG
 * Fixed iOS fullscreen issue ([view](https://github.com/videojs/video.js/pull/977))
 * Fixed touch event bubbling ([view](https://github.com/videojs/video.js/pull/992))
 * Fixed ARIA role attribute for button and slider ([view](https://github.com/videojs/video.js/pull/988))
-* Fixed and issue where a component's dispose event would bubble up ([view](https://github.com/videojs/video.js/pull/981))
+* Fixed an issue where a component's dispose event would bubble up ([view](https://github.com/videojs/video.js/pull/981))
 * Quieted down deprecation warnings ([view](https://github.com/videojs/video.js/pull/971))
-* Update seek handle to display the current time ([view](https://github.com/videojs/video.js/pull/902))
+* Updated the seek handle to contain the current time ([view](https://github.com/videojs/video.js/pull/902))
 * Added requirejs and browserify support (UMD) ([view](https://github.com/videojs/video.js/pull/998))
 
 --------------------
