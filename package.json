@@ -4,6 +4,7 @@
   "version": "4.3.0",
   "copyright": "Copyright 2014 Brightcove, Inc. https://github.com/videojs/video.js/blob/master/LICENSE",
   "keywords": [
+    "videojs",
     "html5",
     "flash",
     "video",
