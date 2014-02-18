@@ -51,6 +51,7 @@ vjs.Flash = vjs.MediaTechController.extend({
 
         // Merge default parames with ones passed in
         params = vjs.obj.merge({
+          'scale': 'noscale', // Default movie scaling
           'wmode': 'opaque', // Opaque is needed to overlay controls, but can affect playback performance
           'bgcolor': '#000000' // Using bgcolor prevents a white flash when the object is loading
         }, options['params']),
