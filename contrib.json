@@ -64,7 +64,7 @@
           "exec": "grunt dist"
         },
         {
-          "desc": "Add the release files",
+          "desc": "Add the (otherwise ignored) release files",
           "exec": "git add dist/video-js --force"
         },
         {
@@ -94,6 +94,14 @@
         {
           "desc": "Checkout the development branch (master) and merge changes",
           "exec": "git checkout master && git merge stable"
+        },
+        {
+          "desc": "Remove built dist files to re-ignore them",
+          "exec": "grunt clean:dist"
+        },
+        {
+          "desc": "Commit the removed dist files",
+          "exec": "git add -u && git commit -m 'Removed dist files'"
         },
         {
           "desc": "Push development branch changes",

@@ -323,6 +323,11 @@ module.exports = function(grunt) {
       }
     });
 
+    // ds_store files sometime find their way in
+    if (grunt.file.exists('dist/video-js/.DS_Store')) {
+      grunt.file['delete']('dist/video-js/.DS_Store');
+    }
+
     // CDN version uses already hosted font files
     // Minified version only, doesn't need demo files
     grunt.file.copy('build/files/minified.video.js', 'dist/cdn/video.js');
