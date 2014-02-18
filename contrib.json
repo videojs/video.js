@@ -81,7 +81,7 @@
         },
         {
           "desc": "Push changes to the remote",
-          "exec": "git push stable"
+          "exec": "git push origin stable"
         },
         {
           "desc": "Push tags to the remote",
@@ -97,7 +97,7 @@
         },
         {
           "desc": "Push development branch changes",
-          "exec": "git push master"
+          "exec": "git push origin master"
         }
       ]
     }
