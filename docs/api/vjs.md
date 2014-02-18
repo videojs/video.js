@@ -69,6 +69,9 @@ The `vjs` function can be used to initialize or retrieve a player.
   - [VolumeLevel](vjs.VolumeLevel.md)
   - [VolumeMenuButton](vjs.VolumeMenuButton.md)
 
+- NAMESPACES
+  - [util](vjs.util.md)
+
 - [METHODS](#methods)
   - [plugin](#plugin-name-init-)
 

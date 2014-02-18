@@ -2,6 +2,11 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 4.5.0 (2014-02-18)
 * Made the poster updateable after initialization ([view](https://github.com/videojs/video.js/pull/838))
 * Exported more textTrack functions ([view](https://github.com/videojs/video.js/pull/815))
 * Moved player ID generation to support video tags with no IDs ([view](https://github.com/videojs/video.js/pull/845))
@@ -23,8 +28,6 @@ CHANGELOG
 * Quieted down deprecation warnings ([view](https://github.com/videojs/video.js/pull/971))
 * Updated the seek handle to contain the current time ([view](https://github.com/videojs/video.js/pull/902))
 * Added requirejs and browserify support (UMD) ([view](https://github.com/videojs/video.js/pull/998))
-
---------------------
 
 ## 4.3.0 (2013-11-04)
 * Added Karma for cross-browser unit testing ([view](https://github.com/videojs/video.js/pull/714))
