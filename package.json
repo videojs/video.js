@@ -20,7 +20,7 @@
   },
   "main": "./dist/video-js/video.js",
   "dependencies": {
-    "videojs-swf": "4.3.4"
+    "videojs-swf": "4.4.0"
   },
   "devDependencies": {
     "grunt-cli": "~0.1.0",

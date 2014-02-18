@@ -11,7 +11,7 @@
 
   <!-- Set the location of the flash SWF -->
   <script>
-    vjs.options.flash.swf = '../node_modules/videojs-swf/dist/VideoJS.swf'
+    vjs.options.flash.swf = '../node_modules/videojs-swf/dist/video-js.swf'
   </script>
 
 </head>
