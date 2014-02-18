@@ -57,7 +57,7 @@
         },
         {
           "desc": "Bump the package version",
-          "exec": "grunt bump:<%= type %>"
+          "exec": "grunt bump-only:<%= type %>"
         },
         {
           "desc": "Build the release",
