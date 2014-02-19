@@ -56,6 +56,10 @@
           "exec": "grunt test"
         },
         {
+          "desc": "Update the changelog with the new release",
+          "exec": "grunt chg-release:<%= type %>"
+        },
+        {
           "desc": "Bump the package version",
           "exec": "grunt bump-only:<%= type %>"
         },
@@ -70,10 +74,6 @@
         {
           "desc": "Rebuild the docs",
           "exec": "grunt vjsdocs"
-        },
-        {
-          "desc": "Update the changelog with the new release",
-          "exec": "grunt chg-release:<%= type %>"
         },
         {
           "desc": "Tag the release",
