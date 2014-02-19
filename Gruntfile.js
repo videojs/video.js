@@ -348,6 +348,18 @@ module.exports = function(grunt) {
     grunt.file.write('dist/cdn/video.js', jsmin + cdnjs);
   });
 
+  grunt.registerTask('cdn-links', 'Update the version of CDN links in docs', function(){
+    var doc = grunt.file.read('docs/guides/setup.md');
+    var version = pkg.version;
+
+    // remove the patch version to point to the latest patch
+    version = version.replace(/(\d\.\d)\.\d/, '$1');
+
+    // update the version in http://vjs.zencdn.net/4.3/video.js
+    doc = doc.replace(/(\/\/vjs\.zencdn\.net\/)\d\.\d(\.\d)?/g, '$1'+version);
+    grunt.file.write('docs/guides/setup.md', doc);
+  });
+
   grunt.registerTask('dist', 'Creating distribution', ['dist-copy', 'zip:dist']);
 
 };

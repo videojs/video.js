@@ -76,6 +76,10 @@
           "exec": "grunt vjsdocs"
         },
         {
+          "desc": "Update the cdn urls in the docs",
+          "exec": "grunt cdn-links"
+        },
+        {
           "desc": "Tag the release",
           "exec": "grunt tagrelease"
         },
