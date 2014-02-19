@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Added .npmignore so dist files wouldn't be ignored in packages
 
 --------------------
 
