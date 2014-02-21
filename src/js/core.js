@@ -101,8 +101,9 @@ vjs.options = {
   // Default message to show when a video cannot be played.
   'notSupportedMessage': 'Sorry, no compatible source and playback ' +
       'technology were found for this video. Try using another browser ' +
-      'like <a href="http://bit.ly/ccMUEC">Chrome</a> or download the ' +
-      'latest <a href="http://adobe.ly/mwfN1">Adobe Flash Player</a>.'
+      'like <a href="' + vjs.ACCESS_PROTOCOL + 'bit.ly/ccMUEC">Chrome</a> ' +
+      'or download the latest ' +
+      '<a href="' + vjs.ACCESS_PROTOCOL + 'get.adobe.com/flashplayer/">Adobe Flash Player</a>.'
 };
 
 // Set CDN Version of swf
