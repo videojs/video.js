@@ -2,6 +2,9 @@
   "project": {
     "owner": "videojs",
     "name": "video.js",
+    "urls": {
+      "git": "https://github.com/videojs/video.js.git"
+    },
     "requirements": [
       {
         "name": "git",
@@ -16,12 +19,118 @@
     ]
   },
 
+  "install": {
+    "steps": [
+      {
+        "desc": "Get all git branches",
+        "exec": "git fetch origin"
+      },
+      {
+        "desc": "Create the stable branch for patches",
+        "exec": "git checkout -b stable origin/stable"
+      },
+      {
+        "desc": "Add the upstream project as a remote so new changes can be pulled",
+        "exec": "git remote add upstream <%= project.urls.git %>"
+      },
+      {
+        "desc": "Get all upstream branches and changes",
+        "exec": "git fetch upstream"
+      },
+      {
+        "contrib": "update"
+      }
+    ]
+  },
+
+  "update": {
+    "steps": [
+      {
+        "desc": "Switch to the development branch",
+        "exec": "git checkout master"
+      },
+      {
+        "desc": "Get any changes to master in the main project",
+        "exec": "git pull upstream master"
+      },
+      {
+        "desc": "Switch to the release branch",
+        "exec": "git checkout stable"
+      },
+      {
+        "desc": "Get any changes to stable in the main project",
+        "exec": "git pull upstream stable"
+      },
+      {
+        "desc": "Install dependencies",
+        "exec": "npm install"
+      },
+      {
+        "desc": "Build the distribution",
+        "exec": "grunt"
+      }
+    ]
+  },
+
   "test": {
     "desc": "Run automated tests",
     "steps": ["grunt test"]
   },
 
   "contributions": {
+
+    "patch": {
+      "desc": "Urgent fixes for the latest stable version",
+      "new": {
+        "desc": "Start a new patch",
+        "steps": [
+          {
+            "id": "name",
+            "desc": "Name the patch branch",
+            "prompt": {
+              "type": "text",
+              "message": "name"
+            }
+          },
+          {
+            "desc": "Check out the release branch and get any updates",
+            "exec": "git checkout stable && git pull upstream stable"
+          },
+          {
+            "desc": "Create the patch branch",
+            "exec": "git checkout -b patch/<%= name %>"
+          },
+          {
+            "desc": "Push the branch to the origin repo",
+            "exec": "git push -u origin patch/<%= name %>"
+          }
+        ]
+      },
+      "submit": {
+        "desc": "Submit a patch when it's finished",
+        "steps": [
+          {
+            "desc": "Run tests",
+            "contrib": "test"
+          }
+        ]
+      },
+      "delete": {
+        "desc": "Delete the patch branch",
+        "steps": [
+          {
+            "id": "name",
+            "guide": false,
+            "desc": "Get the current branch name",
+            "exec": "git rev-parse --abbrev-ref HEAD"
+          },
+          {
+            "desc": "Confirm you are deleting the correct branch",
+            "prompt": "Delete branch '<%= name %>'?"
+          }
+        ]
+      }
+    },
 
     "release": {
       "desc": "Create and publish a release",
