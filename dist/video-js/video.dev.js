@@ -129,7 +129,7 @@ if (typeof define === 'function' && define['amd']) {
 
 // checking that module is an object too because of umdjs/umd#35
 } else if (typeof exports === 'object' && typeof module === 'object') {
-  module.exports = videojs;
+  module['exports'] = videojs;
 }
 /**
  * Core Object/Class for objects that use inheritance + contstructors
