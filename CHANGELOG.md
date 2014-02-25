@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Fixed module.exports in minified version ([view](https://github.com/videojs/video.js/pull/1038))
 
 --------------------
 
