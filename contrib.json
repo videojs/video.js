@@ -107,16 +107,46 @@
         ]
       },
       "submit": {
-        "desc": "Submit a patch when it's finished",
+        "desc": "Submit a pull request for a patch when it's finished",
         "steps": [
           {
             "desc": "Run tests",
             "contrib": "test"
+          },
+          {
+            "desc": "Check for any unadded changes",
+            "exec": "git diff --exit-code",
+            "fail": "Add and commit all changes before submitting a pull request"
+          },
+          {
+            "desc": "Check for any uncomitted changes",
+            "exec": "git diff --cached --exit-code",
+            "fail": "Add and commit all changes before submitting a pull request"
+          },
+          {
+            "id": "branch",
+            "desc": "Which branch should be submitted? (e.g. 'patch/my-patch')",
+            "prompt": {
+              "type": "text",
+              "message": "branch"
+            }
+          },
+          {
+            "id": "user",
+            "desc": "Which github user or org are you submitting from?",
+            "prompt": {
+              "type": "text",
+              "message": "user"
+            }
+          },
+          {
+            "desc": "Open the github pull request page",
+            "open": "https://github.com/videojs/video.js/compare/videojs:stable...<%= user %>:<%= branch %>"
           }
         ]
       },
       "delete": {
-        "desc": "Delete the patch branch",
+        "desc": "Delete the current patch branch",
         "steps": [
           {
             "id": "name",
@@ -127,6 +157,14 @@
           {
             "desc": "Confirm you are deleting the correct branch",
             "prompt": "Delete branch '<%= name %>'?"
+          },
+          {
+            "desc": "Delete the local copy of the branch",
+            "exec": "git branch -D <%= name %>"
+          },
+          {
+            "desc": "Delete the remote copy of the branch",
+            "exec": "git push origin :<%= name %>"
           }
         ]
       }
