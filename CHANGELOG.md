@@ -6,6 +6,9 @@ _(none)_
 
 --------------------
 
+## 4.4.2 (2014-02-24)
+* Fixed module.exports in minified version ([view](https://github.com/videojs/video.js/pull/1038))
+
 ## 4.4.1 (2014-02-18)
 * Added .npmignore so dist files wouldn't be ignored in packages
 
