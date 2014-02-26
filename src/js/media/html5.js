@@ -223,8 +223,8 @@ vjs.Html5.prototype.setPreload = function(val){ this.el_.preload = val; };
 vjs.Html5.prototype.autoplay = function(){ return this.el_.autoplay; };
 vjs.Html5.prototype.setAutoplay = function(val){ this.el_.autoplay = val; };
 
-vjs.Html5.prototype.controls = function(){ return this.el_.controls; }
-vjs.Html5.prototype.setControls = function(val){ this.el_.controls = !!val; }
+vjs.Html5.prototype.controls = function(){ return this.el_.controls; };
+vjs.Html5.prototype.setControls = function(val){ this.el_.controls = !!val; };
 
 vjs.Html5.prototype.loop = function(){ return this.el_.loop; };
 vjs.Html5.prototype.setLoop = function(val){ this.el_.loop = val; };
