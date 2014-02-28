@@ -54,6 +54,8 @@
     "grunt-banner": "~0.2.0",
     "chg": "~0.1.8",
     "grunt-bump": "0.0.13",
-    "grunt-tagrelease": "~0.3.3"
+    "grunt-tagrelease": "~0.3.3",
+    "github": "~0.1.14",
+    "open": "0.0.4"
   }
 }

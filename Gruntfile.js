@@ -362,4 +362,53 @@ module.exports = function(grunt) {
 
   grunt.registerTask('dist', 'Creating distribution', ['dist-copy', 'zip:dist']);
 
+  grunt.registerTask('next-issue', 'Get the next issue that needs a response', function(){
+    var done = this.async();
+    var GitHubApi = require("github");
+    var open = require('open');
+
+    var github = new GitHubApi({
+        // required
+        version: "3.0.0",
+        // optional
+        debug: true,
+        protocol: "https",
+        // host: "github.my-GHE-enabled-company.com",
+        // pathPrefix: "/api/v3", // for some GHEs
+        timeout: 5000
+    });
+    github.issues.repoIssues({
+        // optional:
+        // headers: {
+        //     "cookie": "blahblah"
+        // },
+        user: 'videojs',
+        repo: 'video.js',
+        sort: 'updated',
+        direction: 'asc'
+    }, function(err, res) {
+      var issueToOpen;
+
+      console.log('Issue num: '+res.length);
+
+      // look for issues with zero comments
+      res.some(function(issue){
+        if (issue.comments == 0) {
+          issueToOpen = issue;
+          console.log(issue.html_url);
+        }
+        return false; // break loop
+      });
+
+      if (issueToOpen) {
+        open(issueToOpen.html_url);
+      } else {
+        grunt.log.writeln('No next issue found');
+      }
+
+      // console.log(JSON.stringify(res[0], null, 2));
+      done();
+    });
+  });
+
 };
