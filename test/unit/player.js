@@ -357,14 +357,13 @@ test('should use custom message when encountering an unsupported video type',
   player.dispose();
 });
 
-test('should delegate to the tech for src accesses', function() {
-  var
-    player = PlayerTest.makePlayer({}),
-    src;
-  src = player.src();
+test('should return the player when setting src', function() {
+  var player, ret;
 
-  notEqual(src, player, 'the player is not returned');
-  equal('string', typeof src, 'a URL is returned');
+  player = PlayerTest.makePlayer({}),
+  ret = player.src('foo');
+
+  equal(player, ret, 'the player is returned');
 });
 
 test('should register players with generated ids', function(){
