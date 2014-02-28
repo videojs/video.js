@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Added component(1) support ([view](https://github.com/videojs/video.js/pull/1032))
 
 --------------------
 
