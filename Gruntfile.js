@@ -377,6 +377,7 @@ module.exports = function(grunt) {
         // pathPrefix: "/api/v3", // for some GHEs
         timeout: 5000
     });
+
     github.issues.repoIssues({
         // optional:
         // headers: {
@@ -385,11 +386,24 @@ module.exports = function(grunt) {
         user: 'videojs',
         repo: 'video.js',
         sort: 'updated',
-        direction: 'asc'
+        direction: 'asc',
+        state: 'open',
+        per_page: 100
     }, function(err, res) {
       var issueToOpen;
 
       console.log('Issue num: '+res.length);
+
+      // look for issues with no labels
+      res.some(function(issue){
+        if (issue.labels.length === 0) {
+          issueToOpen = issue;
+          return true; // break loop
+        }
+      });
+      if (issueToOpen) {
+        return open(issueToOpen.html_url);
+      }
 
       // look for issues with zero comments
       res.some(function(issue){
@@ -401,7 +415,8 @@ module.exports = function(grunt) {
       });
 
       if (issueToOpen) {
-        open(issueToOpen.html_url);
+        console.log('open', issueToOpen.html_url);
+        // open(issueToOpen.html_url);
       } else {
         grunt.log.writeln('No next issue found');
       }
