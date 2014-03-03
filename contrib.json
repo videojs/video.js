@@ -73,11 +73,82 @@
   },
 
   "test": {
-    "desc": "Run automated tests",
-    "steps": ["grunt test"]
+    "steps": [
+      {
+        "desc": "Run automated tests",
+        "exec": "grunt test"
+      }
+    ]
   },
 
   "contributions": {
+
+    "feature": {
+      "start": {
+        "desc": "Start a new feature",
+        "steps": [
+          {
+            "id": "name",
+            "desc": "Name the feature branch",
+            "prompt": {
+              "type": "text",
+              "message": "name"
+            }
+          },
+          {
+            "desc": "Check out the development branch and get any updates",
+            "exec": "git checkout master && git pull upstream master"
+          },
+          {
+            "desc": "Create the patch branch",
+            "exec": "git checkout -b feature/<%= name %>"
+          },
+          {
+            "desc": "Push the branch to the origin repo",
+            "exec": "git push -u origin feature/<%= name %>"
+          }
+        ]
+      },
+      "submit": {
+        "desc": "Submit a pull request for a feature when it's finished",
+        "steps": [
+          {
+            "desc": "Test for unadded changes <%= args[0] %>",
+            "exec": "git diff --exit-code",
+            "fail": "Make sure all changes have been added and committed, or stashed, before switching branches"
+          },
+          {
+            "desc": "Test for uncommitted changes",
+            "exec": "git diff --cached --exit-code",
+            "fail": "Make sure all changes have been added and committed, or stashed, before switching branches"
+          },
+          {
+            "contrib": "test"
+          },
+          {
+            "id": "branch",
+            "desc": "Get the current branch",
+            "exec": "git rev-parse --abbrev-ref HEAD"
+          },
+          {
+            "desc": "Are you sure <%= branch %> is the branch you want to submit",
+            "prompt": "confirm"
+          },
+          {
+            "id": "user",
+            "desc": "Which github user or org are you submitting from?",
+            "prompt": {
+              "type": "text",
+              "message": "user"
+            }
+          },
+          {
+            "desc": "Open the github pull request page",
+            "open": "https://github.com/videojs/video.js/compare/videojs:master...<%= user %>:<%= branch %>"
+          }
+        ]
+      }
+    },
 
     "patch": {
       "desc": "Urgent fixes for the latest stable version",
@@ -110,26 +181,26 @@
         "desc": "Submit a pull request for a patch when it's finished",
         "steps": [
           {
-            "desc": "Run tests",
             "contrib": "test"
           },
           {
-            "desc": "Check for any unadded changes",
+            "desc": "Test for unadded changes",
             "exec": "git diff --exit-code",
-            "fail": "Add and commit all changes before submitting a pull request"
+            "fail": "Make sure all changes have been added and committed, or stashed, before switching branches"
           },
           {
-            "desc": "Check for any uncomitted changes",
+            "desc": "Test for uncommitted changes",
             "exec": "git diff --cached --exit-code",
-            "fail": "Add and commit all changes before submitting a pull request"
+            "fail": "Make sure all changes have been added and committed, or stashed, before switching branches"
           },
           {
             "id": "branch",
-            "desc": "Which branch should be submitted? (e.g. 'patch/my-patch')",
-            "prompt": {
-              "type": "text",
-              "message": "branch"
-            }
+            "desc": "Get the current branch",
+            "exec": "git rev-parse --abbrev-ref HEAD"
+          },
+          {
+            "desc": "Are you sure <%= branch %> is the branch you want to submit",
+            "prompt": "confirm"
           },
           {
             "id": "user",
