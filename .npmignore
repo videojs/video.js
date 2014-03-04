@@ -1,2 +1,3 @@
-# .npmignore needed so dist dir won't be ignored
-# https://npmjs.org/doc/developers.html#Keeping-files-out-of-your-package
+# Exclude everything but the contents of the dist directory.
+**/*
+!dist/**

@@ -314,6 +314,8 @@ module.exports = function(grunt) {
     grunt.file.copy('node_modules/videojs-swf/dist/video-js.swf', 'dist/video-js/video-js.swf');
     grunt.file.copy('build/demo-files/demo.html', 'dist/video-js/demo.html');
     grunt.file.copy('build/demo-files/demo.captions.vtt', 'dist/video-js/demo.captions.vtt');
+    grunt.file.copy('src/css/video-js.less', 'dist/video-js/video-js.less');
+
 
     // Copy over font files
     grunt.file.recurse('build/files/font', function(absdir, rootdir, subdir, filename) {
