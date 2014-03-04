@@ -402,27 +402,63 @@ module.exports = function(grunt) {
         }
       });
       if (issueToOpen) {
-        return open(issueToOpen.html_url);
+        open(issueToOpen.html_url);
+        return done();
+      }
+
+      // look for issues with no category labels
+      res.some(function(issue){
+        if (issue.labels.length > 0) {
+          var categorized = false;
+          issue.labels.some(function(label){
+            if (['enhancement', 'bug', 'question'].indexOf(label.name) !== -1) {
+              return categorized = true;
+            }
+          });
+          if (!categorized) {
+            issueToOpen = issue;
+            return true;
+          }
+        }
+      });
+      if (issueToOpen) {
+        open(issueToOpen.html_url);
+        return done();
       }
 
       // look for issues with zero comments
       res.some(function(issue){
         if (issue.comments == 0) {
-          issueToOpen = issue;
-          console.log(issue.html_url);
+          if (issue.labels.length > 0) {
+            var confirmed = false;
+            issue.labels.some(function(label){
+              if (label.name === 'confirmed') {
+                return confirmed = true;
+              }
+            });
+            if (!confirmed) {
+              issueToOpen = issue;
+              return true;
+            }
+          }
         }
-        return false; // break loop
       });
+      if (issueToOpen) {
+        open(issueToOpen.html_url);
+        return done();
+      }
 
       if (issueToOpen) {
-        console.log('open', issueToOpen.html_url);
-        // open(issueToOpen.html_url);
+        console.log('open', issueToOpen.html_url, issueToOpen);
+        open(issueToOpen.html_url);
+        return done();
       } else {
         grunt.log.writeln('No next issue found');
       }
 
-      // console.log(JSON.stringify(res[0], null, 2));
       done();
+      // console.log(JSON.stringify(res[0], null, 2));
+
     });
   });
 
