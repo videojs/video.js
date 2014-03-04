@@ -4,6 +4,7 @@ CHANGELOG
 ## HEAD (Unreleased)
 * Added component(1) support ([view](https://github.com/videojs/video.js/pull/1032))
 * Captions now move down when controls are hidden ([view](https://github.com/videojs/video.js/pull/1053))
+* Added the .less source file to the distribution files ([view](https://github.com/videojs/video.js/pull/1056))
 
 --------------------
 
