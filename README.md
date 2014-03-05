@@ -1,4 +1,3 @@
-
 # [Video.js - HTML5 Video Player](http://videojs.com)  [![Build Status](https://travis-ci.org/zencoder/video-js.png?branch=master)](https://travis-ci.org/zencoder/video-js)
 
 > Video.js is a web video player built from the ground up for an HTML5 world. It supports HTML5 and Flash video, as well as YouTube and Vimeo (through [plugins](https://github.com/videojs/video.js/wiki/Plugins)). It supports video playback on desktops and mobile devices. This project was started mid 2010, and the player is now used on over 50,000 websites.
@@ -15,4 +14,4 @@ To build your own custom version read the section on [contributing code](CONTRIB
 
 Video.js is licensed under the Apache License, Version 2.0. [View the license file](LICENSE)
 
-Copyright 2013 Brightcove, Inc.
+Copyright 2014 Brightcove, Inc.
