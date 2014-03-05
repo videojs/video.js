@@ -391,14 +391,27 @@ module.exports = function(grunt) {
         per_page: 100
     }, function(err, res) {
       var issueToOpen;
+      var usersWithWrite = ['heff', 'mmcc'];
+      var categoryLabels = ['enhancement', 'bug', 'question', 'feature'];
 
-      console.log('Issue num: '+res.length);
+      console.log('Number of issues: '+res.length);
 
-      // look for issues with no labels
+      // TODO: Find the best way to exclude an issue where a question has been asked of the
+      // issue owner/submitter that hasn't been answerd yet.
+      // A stupid simple first step would be to check for the needs: more info label
+      // and exactly one comment (the question)
+
+      // find issues that need categorizing, no category labels
       res.some(function(issue){
         if (issue.labels.length === 0) {
-          issueToOpen = issue;
-          return true; // break loop
+          return issueToOpen = issue; // break
+        }
+        // look for category labels
+        var categorized = issue.labels.some(function(label){
+          return categoryLabels.indexOf(label.name) >= 0;
+        });
+        if (!categorized) {
+          return issueToOpen = issue; // break
         }
       });
       if (issueToOpen) {
@@ -406,19 +419,18 @@ module.exports = function(grunt) {
         return done();
       }
 
-      // look for issues with no category labels
+      // find issues that need confirming or answering
       res.some(function(issue){
-        if (issue.labels.length > 0) {
-          var categorized = false;
-          issue.labels.some(function(label){
-            if (['enhancement', 'bug', 'question'].indexOf(label.name) !== -1) {
-              return categorized = true;
-            }
-          });
-          if (!categorized) {
-            issueToOpen = issue;
-            return true;
-          }
+        // look for confirmed label
+        var confirmed = issue.labels.some(function(label){
+          return label.name === 'confirmed';
+        });
+        // Was exluding questions, but that might leave a lot of people hanging
+        // var question = issue.labels.some(function(label){
+        //   return label.name === 'question';
+        // });
+        if (!confirmed) { //  && !question
+          return issueToOpen = issue; // break
         }
       });
       if (issueToOpen) {
@@ -426,39 +438,8 @@ module.exports = function(grunt) {
         return done();
       }
 
-      // look for issues with zero comments
-      res.some(function(issue){
-        if (issue.comments == 0) {
-          if (issue.labels.length > 0) {
-            var confirmed = false;
-            issue.labels.some(function(label){
-              if (label.name === 'confirmed') {
-                return confirmed = true;
-              }
-            });
-            if (!confirmed) {
-              issueToOpen = issue;
-              return true;
-            }
-          }
-        }
-      });
-      if (issueToOpen) {
-        open(issueToOpen.html_url);
-        return done();
-      }
-
-      if (issueToOpen) {
-        console.log('open', issueToOpen.html_url, issueToOpen);
-        open(issueToOpen.html_url);
-        return done();
-      } else {
-        grunt.log.writeln('No next issue found');
-      }
-
+      grunt.log.writeln('No next issue found');
       done();
-      // console.log(JSON.stringify(res[0], null, 2));
-
     });
   });
 
