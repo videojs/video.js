@@ -364,24 +364,24 @@ module.exports = function(grunt) {
 
   grunt.registerTask('next-issue', 'Get the next issue that needs a response', function(){
     var done = this.async();
-    var GitHubApi = require("github");
+    var GitHubApi = require('github');
     var open = require('open');
 
     var github = new GitHubApi({
         // required
-        version: "3.0.0",
+        version: '3.0.0',
         // optional
         debug: true,
-        protocol: "https",
-        // host: "github.my-GHE-enabled-company.com",
-        // pathPrefix: "/api/v3", // for some GHEs
+        protocol: 'https',
+        // host: 'github.my-GHE-enabled-company.com',
+        // pathPrefix: '/api/v3', // for some GHEs
         timeout: 5000
     });
 
     github.issues.repoIssues({
         // optional:
         // headers: {
-        //     "cookie": "blahblah"
+        //     'cookie': 'blahblah'
         // },
         user: 'videojs',
         repo: 'video.js',
