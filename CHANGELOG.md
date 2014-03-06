@@ -3,6 +3,7 @@ CHANGELOG
 
 ## HEAD (Unreleased)
 * Fixed bugs in IE9 Windows 7N with no Media Player ([view](https://github.com/videojs/video.js/pull/1060))
+* Fixed a bug with setPoster() in the minified version ([view](https://github.com/videojs/video.js/pull/1062))
 
 --------------------
 
