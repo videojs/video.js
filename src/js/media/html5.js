@@ -237,6 +237,13 @@ vjs.Html5.prototype.defaultMuted = function(){ return this.el_.defaultMuted; };
 /* HTML5 Support Testing ---------------------------------------------------- */
 
 vjs.Html5.isSupported = function(){
+  // ie9 with no Media Player is a LIAR! (#984)
+  try {
+    vjs.TEST_VID['volume'] = 0.5;
+  } catch (e) {
+    return false;
+  }
+
   return !!vjs.TEST_VID.canPlayType;
 };
 
@@ -281,8 +288,16 @@ vjs.Html5.disposeMediaElement = function(el){
   el.removeAttribute('src');
 
   // force the media element to update its loading state by calling load()
+  // however IE on Windows 7N has a bug that throws an error so need a try/catch (#793)
   if (typeof el.load === 'function') {
-    el.load();
+    // wrapping in an iife so it's not deoptimized (#1060#discussion_r10324473)
+    (function() {
+      try {
+        el.load();
+      } catch (e) {
+        // not supported
+      }
+    })();
   }
 };
 

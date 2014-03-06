@@ -17,6 +17,7 @@ Base class for media (HTML5 Video, Flash) controllers
   - [onClick](#onclick-event-)
   - [onTap](#ontap)
   - [removeControlsListeners](#removecontrolslisteners)
+  - [setPoster](#setposter)
   - [addChild](#addchild-child-options-) _`inherited`_
   - [addClass](#addclass-classtoadd-) _`inherited`_
   - [buildCSSClass](#buildcssclass) _`inherited`_
@@ -512,6 +513,16 @@ _inherited from_: [src/js/component.js#L643](https://github.com/videojs/video.js
 > toggling to controls disabled, where a tap/touch should do nothing.
 
 _defined in_: [src/js/media/media.js#L102](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L102)
+
+---
+
+### setPoster()
+> Provide a default setPoster method for techs
+> 
+> Poster support for techs should be optional, so we don't want techs to
+> break if they don't have a way to set a poster.
+
+_defined in_: [src/js/media/media.js#L148](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L148)
 
 ---
 

@@ -154,7 +154,7 @@ module.exports = function(grunt) {
           var path = require('path');
           return path.relative('dist', filepath);
         },
-        compression: 'DEFLATE',
+        // compression: 'DEFLATE',
         src: ['dist/video-js/**/*'],
         dest: 'dist/video-js-' + version.full + '.zip'
       }

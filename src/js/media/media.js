@@ -139,6 +139,14 @@ vjs.MediaTechController.prototype.onTap = function(){
   this.player().userActive(!this.player().userActive());
 };
 
+/**
+ * Provide a default setPoster method for techs
+ *
+ * Poster support for techs should be optional, so we don't want techs to
+ * break if they don't have a way to set a poster.
+ */
+vjs.MediaTechController.prototype.setPoster = function(){};
+
 vjs.MediaTechController.prototype.features = {
   'volumeControl': true,
 

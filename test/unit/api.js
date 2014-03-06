@@ -83,6 +83,16 @@ test('should be able to access expected component API methods', function() {
   ok(comp.buildCSSClass, 'buildCSSClass exists');
 });
 
+test('should be able to access expected MediaTech API methods', function() {
+  var techProto = videojs.MediaTechController.prototype;
+  var html5Proto = videojs.Html5.prototype;
+  var flashProto = videojs.Flash.prototype;
+
+  ok(techProto.setPoster, 'setPoster should exist on the Media tech');
+  ok(html5Proto.setPoster, 'setPoster should exist on the HTML5 tech');
+  ok(flashProto.setPoster, 'setPoster should exist on the Flash tech');
+});
+
 test('should export ready api call to public', function() {
   var videoTag = PlayerTest.makeTag();
 

@@ -10,6 +10,10 @@ CHANGELOG
 
 --------------------
 
+## 4.4.3 (2014-03-06)
+* Fixed bugs in IE9 Windows 7N with no Media Player ([view](https://github.com/videojs/video.js/pull/1060))
+* Fixed a bug with setPoster() in the minified version ([view](https://github.com/videojs/video.js/pull/1062))
+
 ## 4.4.2 (2014-02-24)
 * Fixed module.exports in minified version ([view](https://github.com/videojs/video.js/pull/1038))
 
