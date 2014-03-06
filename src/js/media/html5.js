@@ -290,11 +290,14 @@ vjs.Html5.disposeMediaElement = function(el){
   // force the media element to update its loading state by calling load()
   // however IE on Windows 7N has a bug that throws an error so need a try/catch (#793)
   if (typeof el.load === 'function') {
-    try {
-      el.load();
-    }
-    catch(e) {
-    }
+    // wrapping in an iife so it's not deoptimized (#1060#discussion_r10324473)
+    (function() {
+      try {
+        el.load();
+      } catch (e) {
+        // not supported
+      }
+    })();
   }
 };
 
