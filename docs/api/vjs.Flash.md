@@ -42,6 +42,7 @@ Flash Media Controller - Wrapper for fallback SWF API
   - [removeChild](#removechild-component-) _`inherited`_
   - [removeClass](#removeclass-classtoremove-) _`inherited`_
   - [removeControlsListeners](#removecontrolslisteners) _`inherited`_
+  - [setPoster](#setposter) _`inherited`_
   - [show](#show) _`inherited`_
   - [trigger](#trigger-type-event-) _`inherited`_
   - [triggerReady](#triggerready) _`inherited`_
@@ -512,6 +513,16 @@ _inherited from_: [src/js/component.js#L643](https://github.com/videojs/video.js
 > toggling to controls disabled, where a tap/touch should do nothing.
 
 _inherited from_: [src/js/media/media.js#L102](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L102)
+
+---
+
+### setPoster()
+> Provide a default setPoster method for techs
+> 
+> Poster support for techs should be optional, so we don't want techs to
+> break if they don't have a way to set a poster.
+
+_inherited from_: [src/js/media/media.js#L148](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L148)
 
 ---
 

@@ -283,7 +283,7 @@
         },
         {
           "desc": "Build the release",
-          "exec": "grunt dist"
+          "exec": "grunt"
         },
         {
           "desc": "Add the (otherwise ignored) release files",
