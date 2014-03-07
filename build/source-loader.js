@@ -33,6 +33,7 @@ var sourceFiles = [
   "src/js/control-bar/volume-control.js",
   "src/js/control-bar/mute-toggle.js",
   "src/js/control-bar/volume-menu-button.js",
+  "src/js/control-bar/playback-rate-menu-button.js",
   "src/js/poster.js",
   "src/js/loading-spinner.js",
   "src/js/big-play-button.js",

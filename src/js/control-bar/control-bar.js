@@ -19,7 +19,8 @@ vjs.ControlBar.prototype.options_ = {
     'progressControl': {},
     'fullscreenToggle': {},
     'volumeControl': {},
-    'muteToggle': {}
+    'muteToggle': {},
+    'playbackRateMenuButton': {}
     // 'volumeMenuButton': {}
   }
 };

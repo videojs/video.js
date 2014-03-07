@@ -1389,7 +1389,6 @@ vjs.Player.prototype.listenForUserActivity = function(){
 // videoWidth: function(){ return this.techCall('videoWidth'); },
 // videoHeight: function(){ return this.techCall('videoHeight'); },
 // defaultPlaybackRate: function(){ return this.techCall('defaultPlaybackRate'); },
-// playbackRate: function(){ return this.techCall('playbackRate'); },
 // mediaGroup: function(){ return this.techCall('mediaGroup'); },
 // controller: function(){ return this.techCall('controller'); },
 // defaultMuted: function(){ return this.techCall('defaultMuted'); }

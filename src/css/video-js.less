@@ -260,6 +260,21 @@ fonts to show/hide properly.
   content: @pause-icon;
 }
 
+/* Playback toggle
+--------------------------------------------------------------------------------
+*/
+.vjs-default-skin .vjs-playback-rate .vjs-playaback-rate-value {
+  font-size: 1.5em;
+  line-height: 2;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+}
+
 /* Volume/Mute
 -------------------------------------------------------------------------------- */
 .vjs-default-skin .vjs-mute-control,
@@ -605,6 +620,12 @@ easily in the skin designer. http://designer.videojs.com/
 
   .background-color-with-alpha(@control-bg-color, @control-bg-alpha);
   .box-shadow(-0.2em -0.2em 0.3em rgba(255, 255, 255, 0.2));
+}
+
+.vjs-default-skin .vjs-playback-rate .vjs-menu .vjs-menu-content {
+  width: 4em;
+  left: -2em;
+  list-style: none;
 }
 
 .vjs-default-skin .vjs-menu-button:hover .vjs-menu {
