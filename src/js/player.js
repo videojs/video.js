@@ -1043,6 +1043,7 @@ vjs.Player.prototype.src = function(source){
       this.el_.appendChild(vjs.createEl('p', {
         innerHTML: this.options()['notSupportedMessage']
       }));
+      this.triggerReady();
     }
 
   // Case: Source object { src: '', type: '' ... }
