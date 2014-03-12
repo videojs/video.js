@@ -574,6 +574,7 @@ vjs.createTimeRange = function(start, end){
 vjs.get = function(url, onSuccess, onError){
   var local, request;
 
+  onError = onError || function(){};
   if (typeof XMLHttpRequest === 'undefined') {
     window.XMLHttpRequest = function () {
       try { return new window.ActiveXObject('Msxml2.XMLHTTP.6.0'); } catch (e) {}
@@ -584,8 +585,26 @@ vjs.get = function(url, onSuccess, onError){
   }
 
   request = new XMLHttpRequest();
+  if(!('withCredentials' in request) && window.XDomainRequest) {
+    request = new window.XDomainRequest();
+    request.onload = function() {
+      onSuccess(request.responseText);
+    };
+    request.onprogress = function() {};
+    request.onerror = onError;
+    request.ontimeout = onError;
+    try {
+      request.open('GET', url);
+      request.send();
+    } catch (e) {
+      onError(e);
+    }
+    return;
+  }
+
   try {
-    request.open('GET', url);
+    request.withCredentials = true;
+    request.open('GET', url, true);
   } catch(e) {
     onError(e);
   }
@@ -597,9 +616,7 @@ vjs.get = function(url, onSuccess, onError){
       if (request.status === 200 || local && request.status === 0) {
         onSuccess(request.responseText);
       } else {
-        if (onError) {
-          onError();
-        }
+        onError();
       }
     }
   };
@@ -607,9 +624,7 @@ vjs.get = function(url, onSuccess, onError){
   try {
     request.send();
   } catch(e) {
-    if (onError) {
-      onError(e);
-    }
+    onError(e);
   }
 };
 
