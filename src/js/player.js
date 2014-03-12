@@ -1043,7 +1043,7 @@ vjs.Player.prototype.src = function(source){
       this.el_.appendChild(vjs.createEl('p', {
         innerHTML: this.options()['notSupportedMessage']
       }));
-      this.triggerReady();
+      this.triggerReady(); // we could not find an appropriate tech, but let's still notify the delegate that this is it
     }
 
   // Case: Source object { src: '', type: '' ... }
