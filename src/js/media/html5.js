@@ -306,10 +306,11 @@ vjs.Html5.disposeMediaElement = function(el){
 // Android 4.0 and above can play HLS to some extent but it reports being unable to do so
 if (vjs.ANDROID_VERSION >= 4.0) {
   (function() {
-      var canPlayType = HTMLVideoElement.prototype.canPlayType;
+      var canPlayType = HTMLVideoElement.prototype.canPlayType,
+          mpegurlRE = /^application\/(?:x-|vnd\.apple\.)mpegurl$/i;
 
       HTMLVideoElement.prototype.canPlayType = function(type) {
-        if (type && type === 'application/x-mpegURL' || type === 'application/vnd.apple.mpegURL') {
+        if (type && mpegurlRE.test(type)) {
           return "maybe";
         }
         return canPlayType.call(video.constructor.prototype, type);
