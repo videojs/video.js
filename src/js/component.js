@@ -447,7 +447,13 @@ vjs.Component.prototype.initChildren = function(){
     var self = this;
 
     // Loop through components and add them to the player
-    vjs.obj.each(options['children'], function(name, opts){
+    vjs.each(options['children'], function(name, opts){
+      //Support for a simpler setup, children with no options
+      if (typeof name == 'number') {
+        name = opts;
+        opts = {};
+      }
+
       // Allow for disabling default components
       // e.g. vjs.options['children']['posterImage'] = false
       if (opts === false) return;

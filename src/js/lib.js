@@ -24,11 +24,11 @@ vjs.createEl = function(tagName, properties){
       // browsers handle the attribute just fine. The W3C allows for aria-* attributes to be used in pre-HTML5 docs.
       // http://www.w3.org/TR/wai-aria-primer/#ariahtml. Using setAttribute gets around this problem.
 
-       if (propName.indexOf('aria-') !== -1 || propName=='role') {
-         el.setAttribute(propName, properties[propName]);
-       } else {
-         el[propName] = properties[propName];
-       }
+      if (propName.indexOf('aria-') !== -1 || propName=='role') {
+        el.setAttribute(propName, properties[propName]);
+      } else {
+        el[propName] = properties[propName];
+      }
     }
   }
   return el;
@@ -42,6 +42,18 @@ vjs.createEl = function(tagName, properties){
  */
 vjs.capitalize = function(string){
   return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
+vjs.each = function (arrLike, fn, context) {
+  if (vjs.obj.isPlain(arrLike)) vjs.obj.each(arrLike, fn, context);
+  else {
+    for (var i = 0, len = arrLike.length; i < len; ++i) {
+      var val = arrLike[i];
+
+      if (vjs.obj.isPlain(val)) vjs.obj.each(val, fn, context);
+      else fn.call(context || this, i, val);
+    }
+  }
 };
 
 /**
@@ -60,7 +72,7 @@ vjs.obj = {};
  * @param  {Object}   obj Object to use as prototype
  * @private
  */
- vjs.obj.create = Object.create || function(obj){
+vjs.obj.create = Object.create || function(obj){
   //Create a new function called 'F' which is just an empty object.
   function F() {}
 
@@ -155,9 +167,9 @@ vjs.obj.copy = function(obj){
  */
 vjs.obj.isPlain = function(obj){
   return !!obj
-    && typeof obj === 'object'
-    && obj.toString() === '[object Object]'
-    && obj.constructor === Object;
+  && typeof obj === 'object'
+  && obj.toString() === '[object Object]'
+  && obj.constructor === Object;
 };
 
 /**
@@ -354,8 +366,8 @@ vjs.ANDROID_VERSION = (function() {
   // This matches Android Major.Minor.Patch versions
   // ANDROID_VERSION is Major.Minor as a Number, if Minor isn't available, then only Major is returned
   var match = vjs.USER_AGENT.match(/Android (\d+)(?:\.(\d+))?(?:\.(\d+))*/i),
-    major,
-    minor;
+      major,
+      minor;
 
   if (!match) {
     return null;
@@ -669,32 +681,32 @@ vjs.log = function(){
 // Offset Left
 // getBoundingClientRect technique from John Resig http://ejohn.org/blog/getboundingclientrect-is-awesome/
 vjs.findPosition = function(el) {
-    var box, docEl, body, clientLeft, scrollLeft, left, clientTop, scrollTop, top;
+  var box, docEl, body, clientLeft, scrollLeft, left, clientTop, scrollTop, top;
 
-    if (el.getBoundingClientRect && el.parentNode) {
-      box = el.getBoundingClientRect();
-    }
+  if (el.getBoundingClientRect && el.parentNode) {
+    box = el.getBoundingClientRect();
+  }
 
-    if (!box) {
-      return {
-        left: 0,
-        top: 0
-      };
-    }
-
-    docEl = document.documentElement;
-    body = document.body;
-
-    clientLeft = docEl.clientLeft || body.clientLeft || 0;
-    scrollLeft = window.pageXOffset || body.scrollLeft;
-    left = box.left + scrollLeft - clientLeft;
-
-    clientTop = docEl.clientTop || body.clientTop || 0;
-    scrollTop = window.pageYOffset || body.scrollTop;
-    top = box.top + scrollTop - clientTop;
-
+  if (!box) {
     return {
-      left: left,
-      top: top
+      left: 0,
+      top: 0
     };
+  }
+
+  docEl = document.documentElement;
+  body = document.body;
+
+  clientLeft = docEl.clientLeft || body.clientLeft || 0;
+  scrollLeft = window.pageXOffset || body.scrollLeft;
+  left = box.left + scrollLeft - clientLeft;
+
+  clientTop = docEl.clientTop || body.clientTop || 0;
+  scrollTop = window.pageYOffset || body.scrollTop;
+  top = box.top + scrollTop - clientTop;
+
+  return {
+    left: left,
+    top: top
+  };
 };
