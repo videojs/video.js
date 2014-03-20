@@ -24,11 +24,11 @@ vjs.createEl = function(tagName, properties){
       // browsers handle the attribute just fine. The W3C allows for aria-* attributes to be used in pre-HTML5 docs.
       // http://www.w3.org/TR/wai-aria-primer/#ariahtml. Using setAttribute gets around this problem.
 
-      if (propName.indexOf('aria-') !== -1 || propName=='role') {
-        el.setAttribute(propName, properties[propName]);
-      } else {
-        el[propName] = properties[propName];
-      }
+       if (propName.indexOf('aria-') !== -1 || propName=='role') {
+         el.setAttribute(propName, properties[propName]);
+       } else {
+         el[propName] = properties[propName];
+       }
     }
   }
   return el;
@@ -44,6 +44,14 @@ vjs.capitalize = function(string){
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
+/**
+ * Loop through an array, an array of objects, or each property
+ * in an object and call a function whose arguments are (key,value)
+ * @param  {Object} arrLike Object of properties
+ * @param  {Function} fn  Function to be called on each property.
+ * @this {*}
+ * @private
+ */
 vjs.each = function (arrLike, fn, context) {
   if (vjs.obj.isPlain(arrLike)) vjs.obj.each(arrLike, fn, context);
   else {
@@ -167,9 +175,9 @@ vjs.obj.copy = function(obj){
  */
 vjs.obj.isPlain = function(obj){
   return !!obj
-  && typeof obj === 'object'
-  && obj.toString() === '[object Object]'
-  && obj.constructor === Object;
+    && typeof obj === 'object'
+    && obj.toString() === '[object Object]'
+    && obj.constructor === Object;
 };
 
 /**
@@ -366,8 +374,8 @@ vjs.ANDROID_VERSION = (function() {
   // This matches Android Major.Minor.Patch versions
   // ANDROID_VERSION is Major.Minor as a Number, if Minor isn't available, then only Major is returned
   var match = vjs.USER_AGENT.match(/Android (\d+)(?:\.(\d+))?(?:\.(\d+))*/i),
-      major,
-      minor;
+    major,
+    minor;
 
   if (!match) {
     return null;
