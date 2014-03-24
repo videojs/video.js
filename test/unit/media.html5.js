@@ -48,7 +48,7 @@ test('patchCanPlayType patches canplaytype with our function, conditionally', fu
       patchCanPlayType,
       unpatchedCanPlayType;
 
-  vjs.ANDROID_VERSION = 4.0
+  vjs.ANDROID_VERSION = 4.0;
   vjs.Html5.patchCanPlayType();
 
   notStrictEqual(video.canPlayType, canPlayType, 'original canPlayType and patched canPlayType should not be equal');
@@ -65,13 +65,13 @@ test('should return maybe for HLS urls on Android 4.0 or above', function() {
   var oldAV = vjs.ANDROID_VERSION,
       video = document.createElement('video');
 
-  vjs.ANDROID_VERSION = 4.0
+  vjs.ANDROID_VERSION = 4.0;
   vjs.Html5.patchCanPlayType();
 
-  strictEqual(video.canPlayType('application/x-mpegurl'), "maybe", "android version 4.0 or above should be a maybe for x-mpegurl");
-  strictEqual(video.canPlayType('application/x-mpegURL'), "maybe", "android version 4.0 or above should be a maybe for x-mpegURL");
-  strictEqual(video.canPlayType('application/vnd.apple.mpegurl'), "maybe", "android version 4.0 or above should be a maybe for vnd.apple.mpegurl");
-  strictEqual(video.canPlayType('application/vnd.apple.mpegURL'), "maybe", "android version 4.0 or above should be a maybe for vnd.apple.mpegurl");
+  strictEqual(video.canPlayType('application/x-mpegurl'), 'maybe', 'android version 4.0 or above should be a maybe for x-mpegurl');
+  strictEqual(video.canPlayType('application/x-mpegURL'), 'maybe', 'android version 4.0 or above should be a maybe for x-mpegURL');
+  strictEqual(video.canPlayType('application/vnd.apple.mpegurl'), 'maybe', 'android version 4.0 or above should be a maybe for vnd.apple.mpegurl');
+  strictEqual(video.canPlayType('application/vnd.apple.mpegURL'), 'maybe', 'android version 4.0 or above should be a maybe for vnd.apple.mpegurl');
 
   vjs.ANDROID_VERSION = oldAV;
 });
