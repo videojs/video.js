@@ -44,7 +44,7 @@ test('should re-link the player if the tech is moved', function(){
 test('patchCanPlayType patches canplaytype with our function, conditionally', function() {
   var oldAV = vjs.ANDROID_VERSION,
       video = document.createElement('video'),
-      canPlayType = HTMLVideoElement.prototype.canPlayType,
+      canPlayType = vjs.TEST_VID.constructor.prototype.canPlayType,
       patchCanPlayType,
       unpatchedCanPlayType;
 
@@ -56,7 +56,7 @@ test('patchCanPlayType patches canplaytype with our function, conditionally', fu
   patchCanPlayType = video.canPlayType;
   unpatchedCanPlayType = vjs.Html5.unpatchCanPlayType();
 
-  strictEqual(video.canPlayType, HTMLVideoElement.prototype.canPlayType, 'original canPlayType and unpatched canPlayType should be equal');
+  strictEqual(video.canPlayType, vjs.TEST_VID.constructor.prototype.canPlayType, 'original canPlayType and unpatched canPlayType should be equal');
 
   vjs.ANDROID_VERSION = oldAV;
 });
