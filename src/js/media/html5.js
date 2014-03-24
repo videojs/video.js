@@ -276,10 +276,10 @@ vjs.Html5.canControlVolume = function(){
     // Android 4.0 and above can play HLS to some extent but it reports being unable to do so
     if (vjs.ANDROID_VERSION >= 4.0) {
       if (!canPlayType) {
-        canPlayType = HTMLVideoElement.prototype.canPlayType;
+        canPlayType = vjs.TEST_VID.constructor.prototype.canPlayType;
       }
 
-      HTMLVideoElement.prototype.canPlayType = function(type) {
+      vjs.TEST_VID.constructor.prototype.canPlayType = function(type) {
         if (type && mpegurlRE.test(type)) {
           return "maybe";
         }
@@ -290,10 +290,10 @@ vjs.Html5.canControlVolume = function(){
     // Override Android 2.2 and less canPlayType method which is broken
     if (vjs.IS_OLD_ANDROID) {
       if (!canPlayType) {
-        canPlayType = HTMLVideoElement.prototype.canPlayType;
+        canPlayType = vjs.TEST_VID.constructor.prototype.canPlayType;
       }
 
-      HTMLVideoElement.prototype.canPlayType = function(type){
+      vjs.TEST_VID.constructor.prototype.canPlayType = function(type){
         if (type && mp4RE.test(type)) {
           return "maybe";
         }
@@ -305,7 +305,7 @@ vjs.Html5.canControlVolume = function(){
   vjs.Html5.unpatchCanPlayType = function() {
     var r = canPlayType;
     if (canPlayType) {
-      HTMLVideoElement.prototype.canPlayType = canPlayType;
+      vjs.TEST_VID.constructor.prototype.canPlayType = canPlayType;
       canPlayType = null;
       return r;
     }
