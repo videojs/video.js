@@ -74,6 +74,7 @@ test('should return maybe for HLS urls on Android 4.0 or above', function() {
   strictEqual(video.canPlayType('application/vnd.apple.mpegURL'), 'maybe', 'android version 4.0 or above should be a maybe for vnd.apple.mpegurl');
 
   vjs.ANDROID_VERSION = oldAV;
+  vjs.Html5.unpatchCanPlayType();
 });
 
 test('should return a maybe for mp4 on OLD ANDROID', function() {
@@ -86,4 +87,5 @@ test('should return a maybe for mp4 on OLD ANDROID', function() {
   strictEqual(video.canPlayType('video/mp4'), 'maybe', 'old android should return a maybe for video/mp4');
 
   vjs.IS_OLD_ANDROID = isOldAndroid;
+  vjs.Html5.unpatchCanPlayType();
 });
