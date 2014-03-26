@@ -43,7 +43,7 @@ test('patchCanPlayType patches canplaytype with our function, conditionally', fu
   var oldAV = vjs.ANDROID_VERSION,
       video = document.createElement('video'),
       canPlayType = vjs.TEST_VID.constructor.prototype.canPlayType,
-      patchCanPlayType,
+      patchedCanPlayType,
       unpatchedCanPlayType;
 
   vjs.ANDROID_VERSION = 4.0;
@@ -51,12 +51,16 @@ test('patchCanPlayType patches canplaytype with our function, conditionally', fu
 
   notStrictEqual(video.canPlayType, canPlayType, 'original canPlayType and patched canPlayType should not be equal');
 
-  patchCanPlayType = video.canPlayType;
+  patchedCanPlayType = video.canPlayType;
   unpatchedCanPlayType = vjs.Html5.unpatchCanPlayType();
 
-  strictEqual(video.canPlayType, vjs.TEST_VID.constructor.prototype.canPlayType, 'original canPlayType and unpatched canPlayType should be equal');
+  if (canPlayType) {
+    strictEqual(canPlayType, vjs.TEST_VID.constructor.prototype.canPlayType, 'original canPlayType and unpatched canPlayType should be equal');
+    strictEqual(patchedCanPlayType, unpatchedCanPlayType, 'patched canPlayType and function returned from unpatch are equal');
+  }
 
   vjs.ANDROID_VERSION = oldAV;
+  vjs.Html5.unpatchCanPlayType();
 });
 
 test('should return maybe for HLS urls on Android 4.0 or above', function() {
