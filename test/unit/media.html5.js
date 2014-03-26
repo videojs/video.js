@@ -41,7 +41,7 @@ test('should re-link the player if the tech is moved', function(){
 
 test('patchCanPlayType and unpatchCanPlayType are available on Html5 object', function() {
   ok(vjs.Html5.patchCanPlayType, 'patchCanPlayType is available');
-  ok(vjs.Html5.unatchCanPlayType, 'unpatchCanPlayType is available');
+  ok(vjs.Html5.unpatchCanPlayType, 'unpatchCanPlayType is available');
 });
 
 test('patchCanPlayType patches canplaytype with our function, conditionally', function() {
