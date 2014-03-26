@@ -59,10 +59,8 @@ test('patchCanPlayType patches canplaytype with our function, conditionally', fu
   patchedCanPlayType = video.canPlayType;
   unpatchedCanPlayType = vjs.Html5.unpatchCanPlayType();
 
-  if (canPlayType) {
-    strictEqual(canPlayType, vjs.TEST_VID.constructor.prototype.canPlayType, 'original canPlayType and unpatched canPlayType should be equal');
-    strictEqual(patchedCanPlayType, unpatchedCanPlayType, 'patched canPlayType and function returned from unpatch are equal');
-  }
+  strictEqual(canPlayType, vjs.TEST_VID.constructor.prototype.canPlayType, 'original canPlayType and unpatched canPlayType should be equal');
+  strictEqual(patchedCanPlayType, unpatchedCanPlayType, 'patched canPlayType and function returned from unpatch are equal');
 
   vjs.ANDROID_VERSION = oldAV;
   vjs.Html5.unpatchCanPlayType();
