@@ -303,7 +303,7 @@ vjs.Html5.canControlVolume = function(){
   };
 
   vjs.Html5.unpatchCanPlayType = function() {
-    var r = canPlayType;
+    var r = vjs.TEST_VID.constructor.prototype.canPlayType;
     if (canPlayType) {
       vjs.TEST_VID.constructor.prototype.canPlayType = canPlayType;
       canPlayType = null;
