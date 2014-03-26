@@ -269,8 +269,8 @@ vjs.Html5.canControlVolume = function(){
 // HTML5 Feature detection and Device Fixes --------------------------------- //
 (function() {
   var canPlayType,
-      mpegurlRE = /^application\/(?:x-|vnd\.apple\.)mpegurl$/i,
-      mp4RE = /^video\/mp4$/i;
+      mpegurlRE = /^application\/(?:x-|vnd\.apple\.)mpegurl/i,
+      mp4RE = /^video\/mp4/i;
 
   vjs.Html5.patchCanPlayType = function() {
     // Android 4.0 and above can play HLS to some extent but it reports being unable to do so
