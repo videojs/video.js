@@ -39,6 +39,11 @@ test('should re-link the player if the tech is moved', function(){
   strictEqual(player, tech.el()['player']);
 });
 
+test('patchCanPlayType and unpatchCanPlayType are available on Html5 object', function() {
+  ok(vjs.Html5.patchCanPlayType, 'patchCanPlayType is available');
+  ok(vjs.Html5.unatchCanPlayType, 'unpatchCanPlayType is available');
+});
+
 test('patchCanPlayType patches canplaytype with our function, conditionally', function() {
   var oldAV = vjs.ANDROID_VERSION,
       video = document.createElement('video'),
