@@ -281,7 +281,7 @@ vjs.Html5.canControlVolume = function(){
 
       vjs.TEST_VID.constructor.prototype.canPlayType = function(type) {
         if (type && mpegurlRE.test(type)) {
-          return "maybe";
+          return 'maybe';
         }
         return canPlayType.call(this, type);
       };
@@ -295,7 +295,7 @@ vjs.Html5.canControlVolume = function(){
 
       vjs.TEST_VID.constructor.prototype.canPlayType = function(type){
         if (type && mp4RE.test(type)) {
-          return "maybe";
+          return 'maybe';
         }
         return canPlayType.call(this, type);
       };
