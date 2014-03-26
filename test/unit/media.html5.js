@@ -1,7 +1,5 @@
 module('HTML5');
 
-var oldAndroidVersion;
-
 test('should detect whether the volume can be changed', function(){
   var testVid, ConstVolumeVideo;
   if (!{}['__defineSetter__']) {
