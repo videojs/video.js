@@ -7,6 +7,7 @@ CHANGELOG
 * Added the .less source file to the distribution files ([view](https://github.com/videojs/video.js/pull/1056))
 * Changed src() to return the current selected source ([view](https://github.com/videojs/video.js/pull/968))
 * Added a grunt task for opening the next issue that needs addressing ([view](https://github.com/videojs/video.js/pull/1059))
+* Fixed Android 4.0+ devices' check for HLS support ([view](https://github.com/videojs/video.js/pull/1084))
 
 --------------------
 

@@ -1048,6 +1048,7 @@ vjs.Player.prototype.src = function(source){
       this.el_.appendChild(vjs.createEl('p', {
         innerHTML: this.options()['notSupportedMessage']
       }));
+      this.triggerReady(); // we could not find an appropriate tech, but let's still notify the delegate that this is it
     }
 
   // Case: Source object { src: '', type: '' ... }
@@ -1279,10 +1280,13 @@ vjs.Player.prototype.userActive = function(bool){
         //
         // When this gets resolved in ALL browsers it can be removed
         // https://code.google.com/p/chromium/issues/detail?id=103041
-        this.tech.one('mousemove', function(e){
-          e.stopPropagation();
-          e.preventDefault();
-        });
+        if(this.tech) {
+          this.tech.one('mousemove', function(e){
+            e.stopPropagation();
+            e.preventDefault();
+          });
+        }
+
         this.removeClass('vjs-user-active');
         this.addClass('vjs-user-inactive');
         this.trigger('userinactive');
