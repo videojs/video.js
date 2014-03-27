@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* Fixed a bug from the last release where canPlaySource was no longer exported
+_(none)_
 
 --------------------
+
+## 4.5.1 (2014-03-27)
+* Fixed a bug from the last release where canPlaySource was no longer exported
 
 ## 4.5.0 (2014-03-27)
 * Added component(1) support ([view](https://github.com/videojs/video.js/pull/1032))
