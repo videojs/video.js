@@ -357,15 +357,6 @@ test('should use custom message when encountering an unsupported video type',
   player.dispose();
 });
 
-test('should return the player when setting src', function() {
-  var player, ret;
-
-  player = PlayerTest.makePlayer({}),
-  ret = player.src('foo');
-
-  equal(player, ret, 'the player is returned');
-});
-
 test('should register players with generated ids', function(){
   var fixture, video, player, id;
   fixture = document.getElementById('qunit-fixture');
