@@ -45,6 +45,9 @@ test('patchCanPlayType and unpatchCanPlayType are available on Html5 object', fu
 });
 
 test('patchCanPlayType patches canplaytype with our function, conditionally', function() {
+  // the patch runs automatically so we need to first unpatch
+  vjs.Html5.unpatchCanPlayType();
+
   var oldAV = vjs.ANDROID_VERSION,
       video = document.createElement('video'),
       canPlayType = vjs.TEST_VID.constructor.prototype.canPlayType,
