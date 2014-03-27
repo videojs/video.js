@@ -20,8 +20,8 @@ You can download the Video.js source and host it on your own servers, or use the
 
 ### CDN Version ###
 ```html
-<link href="//vjs.zencdn.net/4.4/video-js.css" rel="stylesheet">
-<script src="//vjs.zencdn.net/4.4/video.js"></script>
+<link href="//vjs.zencdn.net/4.5/video-js.css" rel="stylesheet">
+<script src="//vjs.zencdn.net/4.5/video.js"></script>
 ```
 
 ### Self Hosted. ###
