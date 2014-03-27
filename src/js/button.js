@@ -15,43 +15,9 @@ vjs.Button = vjs.Component.extend({
   init: function(player, options){
     vjs.Component.call(this, player, options);
 
-    var treatTouchAsClick = false;
-    var firstTouch = null;
+    this.emitTapEvents();
 
-    this.on('touchstart', function(event) {
-      // If more than one finger, we don't want to consider treating this as a click
-      if (event.touches.length == 1) {
-        // Stop click and other mouse events from triggering also
-        event.preventDefault();
-        treatTouchAsClick = true;
-        firstTouch = event.touches[0];
-      }
-    });
-
-    this.on('touchmove', function(event) {
-      if (event.touches.length > 1) {
-        treatTouchAsClick = false;
-      } else if (firstTouch) {
-        var xdiff = event.touches[0].pageX - firstTouch.pageX;
-        var ydiff = event.touches[0].pageY - firstTouch.pageY;
-        var touchDistance = Math.sqrt(xdiff * xdiff + ydiff * ydiff);
-        // Some devices are really sensitive and will throw touchmoves for all but the slightest
-        // of taps. So, if we moved only a small distance, let's still consider this a click.
-        if (touchDistance > 44) {
-          treatTouchAsClick = false;
-        }
-      }
-    });
-
-    var self = this;
-    this.on('touchend', function(event) {
-      firstTouch = null;
-      if (treatTouchAsClick) {
-        self.onClick(event);
-      }
-      event.preventDefault();
-    });
-
+    this.on('tap', this.onClick);
     this.on('click', this.onClick);
     this.on('focus', this.onFocus);
     this.on('blur', this.onBlur);
