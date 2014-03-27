@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Fixed a bug from the last release where canPlaySource was no longer exported
 
 --------------------
 
