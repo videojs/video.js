@@ -91,6 +91,9 @@ test('should be able to access expected MediaTech API methods', function() {
   ok(techProto.setPoster, 'setPoster should exist on the Media tech');
   ok(html5Proto.setPoster, 'setPoster should exist on the HTML5 tech');
   ok(flashProto.setPoster, 'setPoster should exist on the Flash tech');
+
+  ok(videojs.Html5.patchCanPlayType, 'patchCanPlayType is available');
+  ok(videojs.Html5.unpatchCanPlayType, 'unpatchCanPlayType is available');
 });
 
 test('should export ready api call to public', function() {
