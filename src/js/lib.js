@@ -603,10 +603,11 @@ vjs.get = function(url, onSuccess, onError){
   }
 
   try {
-    request.withCredentials = true;
     request.open('GET', url, true);
+    request.withCredentials = true;
   } catch(e) {
     onError(e);
+    return;
   }
 
   local = (url.indexOf('file:') === 0 || (window.location.href.indexOf('file:') === 0 && url.indexOf('http') === -1));
