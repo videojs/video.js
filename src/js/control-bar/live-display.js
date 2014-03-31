@@ -8,8 +8,6 @@
 vjs.LiveDisplay = vjs.Component.extend({
   init: function(player, options){
     vjs.Component.call(this, player, options);
-
-    player.on('loadstart', vjs.bind(this, this.updateContent));
   }
 });
 
@@ -27,18 +25,4 @@ vjs.LiveDisplay.prototype.createEl = function(){
   el.appendChild(this.contentEl_);
 
   return el;
-};
-
-vjs.LiveDisplay.prototype.updateContent = function(){
-
-  // Most Live streams, like RTMP, will report a duration value of -1
-  // HLS Live report window.INFINITY
-
-  /*
-  if (player.duration() < 0 || player.duration() === window.INFINITY) {
-    this.show();
-  } else {
-    this.hide();
-  }
-  */
 };
