@@ -1,0 +1,22 @@
+{
+  "name": "video.js",
+  "description": "An HTML5 and Flash video player with a common API and skin for both.",
+  "version": "4.4.2",
+  "keywords": [
+    "videojs",
+    "html5",
+    "flash",
+    "video",
+    "player"
+  ],
+  "scripts": ["dist/video-js/video.dev.js"],
+  "styles": ["dist/video-js/video-js.css"],
+  "files": ["dist/video-js/video-js.swf"],
+  "fonts": [
+    "dist/video-js/font/vjs.eot",
+    "dist/video-js/font/vjs.svg",
+    "dist/video-js/font/vjs.ttf",
+    "dist/video-js/font/vjs.woff"
+  ],
+  "main": "dist/video-js/video.dev.js"
+}
