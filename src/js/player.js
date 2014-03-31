@@ -395,20 +395,28 @@ vjs.Player.prototype.stopTrackingCurrentTime = function(){ clearInterval(this.cu
  * @event loadstart
  */
 vjs.Player.prototype.onLoadStart = function() {
-  this.one('play', function(e){
-    var fpEvent = { type: 'firstplay', target: this.el_ };
-    // Using vjs.trigger so we can check if default was prevented
-    var keepGoing = vjs.trigger(this.el_, fpEvent);
-
-    if (!keepGoing) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-    }
-  });
+  // remove any first play listeners that weren't triggered from a previous video.
+  this.off('play', initFirstPlay);
+  this.one('play', initFirstPlay);
 
   vjs.removeClass(this.el_, 'vjs-has-started');
 };
+
+/**
+ * Need to create this outside the scope of onLoadStart so it
+ * can be added and removed (to avoid piling first play listeners).
+ */
+function initFirstPlay(e) {
+  var fpEvent = { type: 'firstplay', target: this.el_ };
+  // Using vjs.trigger so we can check if default was prevented
+  var keepGoing = vjs.trigger(this.el_, fpEvent);
+
+  if (!keepGoing) {
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+  }
+}
 
 /**
  * Fired when the player has initial duration and dimension information
