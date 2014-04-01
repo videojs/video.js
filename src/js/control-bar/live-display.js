@@ -18,7 +18,7 @@ vjs.LiveDisplay.prototype.createEl = function(){
 
   this.contentEl_ = vjs.createEl('div', {
     className: 'vjs-live-display',
-    innerHTML: '<span class="vjs-control-text">LIVE</span>LIVE',
+    innerHTML: '<span class="vjs-control-text">Stream Type </span>LIVE',
     'aria-live': 'off'
   });
 
