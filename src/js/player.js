@@ -504,16 +504,23 @@ vjs.Player.prototype.onDurationChange = function(){
   // We need to get the techGet response and check for a value so we don't
   // accidentally cause the stack to blow up.
   var duration = this.techGet('duration');
+
   if (duration) {
+
+    if (duration < 0) {
+      duration = window.Infinity;
+    }
+
     this.duration(duration);
+
+    // Determine if the stream is live and propagate styles down to UI.
+    if (duration === window.Infinity) {
+      this.addClass('vjs-live');
+    } else {
+      this.removeClass('vjs-live');
+    }
   }
 
-  // Determine if the stream is live and propagate styles down to UI.
-  if (duration < 0 || duration === window.INFINITY) {
-    this.addClass('vjs-live');
-  } else {
-    this.removeClass('vjs-live');
-  }
 };
 
 /**
