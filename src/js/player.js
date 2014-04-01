@@ -508,13 +508,14 @@ vjs.Player.prototype.onDurationChange = function(){
   if (duration) {
 
     if (duration < 0) {
-      duration = window.Infinity;
+
+      duration = Infinity;
     }
 
     this.duration(duration);
 
     // Determine if the stream is live and propagate styles down to UI.
-    if (duration === window.Infinity) {
+    if (duration === Infinity) {
       this.addClass('vjs-live');
     } else {
       this.removeClass('vjs-live');
