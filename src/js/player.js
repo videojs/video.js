@@ -402,10 +402,8 @@ vjs.Player.prototype.onLoadStart = function() {
   vjs.removeClass(this.el_, 'vjs-has-started');
 };
 
-/**
- * Need to create this outside the scope of onLoadStart so it
- * can be added and removed (to avoid piling first play listeners).
- */
+ // Need to create this outside the scope of onLoadStart so it
+ // can be added and removed (to avoid piling first play listeners).
 function initFirstPlay(e) {
   var fpEvent = { type: 'firstplay', target: this.el_ };
   // Using vjs.trigger so we can check if default was prevented
