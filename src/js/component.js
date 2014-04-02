@@ -834,11 +834,14 @@ vjs.Component.prototype.onResize;
  */
 vjs.Component.prototype.emitTapEvents = function(){
   var touchStart, firstTouch, touchTime, couldBeTap, noTap,
-      xdiff, ydiff, touchDistance;
+      xdiff, ydiff, touchDistance, tapMovementThreshold;
 
   // Track the start time so we can determine how long the touch lasted
   touchStart = 0;
   firstTouch = null;
+
+  // Maximum movement allowed during a touch event to still be considered a tap
+  tapMovementThreshold = 22;
 
   this.on('touchstart', function(event) {
     // If more than one finger, don't consider treating this as a click
@@ -858,11 +861,10 @@ vjs.Component.prototype.emitTapEvents = function(){
     } else if (firstTouch) {
       // Some devices will throw touchmoves for all but the slightest of taps.
       // So, if we moved only a small distance, this could still be a tap
-      // 44 pixels is somewhat abitrary, based on Apple HIG 44px min button size
       xdiff = event.touches[0].pageX - firstTouch.pageX;
       ydiff = event.touches[0].pageY - firstTouch.pageY;
       touchDistance = Math.sqrt(xdiff * xdiff + ydiff * ydiff);
-      if (touchDistance > 44) {
+      if (touchDistance > tapMovementThreshold) {
         couldBeTap = false;
       }
     }
