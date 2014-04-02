@@ -887,6 +887,7 @@ vjs.Component.prototype.emitTapEvents = function(){
       touchTime = new Date().getTime() - touchStart;
       // The touch needs to be quick in order to consider it a tap
       if (touchTime < 250) {
+        event.preventDefault(); // Don't let browser turn this into a click
         this.trigger('tap');
         // It may be good to copy the touchend event object and change the
         // type to tap, if the other event properties aren't exact after
