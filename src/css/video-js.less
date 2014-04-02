@@ -412,6 +412,25 @@ fonts to show/hide properly.
   display: block;
 }
 
+/* Live w/DVR Mode
+--------------------------------------------------------------------------------
+*/
+.vjs-default-skin.vjs-live-dvr .vjs-current-time,
+.vjs-default-skin.vjs-live-dvr .vjs-time-divider,
+.vjs-default-skin.vjs-live-dvr .vjs-progress-control {
+	display: block;
+}
+
+.vjs-default-skin.vjs-live-dvr .vjs-live-display {
+	display: block;
+	cursor: pointer;
+}
+
+.vjs-default-skin.vjs-live-dvr .vjs-duration,
+.vjs-default-skin.vjs-live-dvr .vjs-remaining-time {
+	display: none;
+}
+
 /* Live Display
 --------------------------------------------------------------------------------
 */
@@ -419,6 +438,7 @@ fonts to show/hide properly.
   display: none;
   font-size: 1em;
   line-height: 3em;
+  cursor: default;
 }
 
 /* Time Display
