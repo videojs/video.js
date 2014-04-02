@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Updated the UI to support live video ([view](https://github.com/videojs/video.js/pull/1121))
 
 --------------------
 
