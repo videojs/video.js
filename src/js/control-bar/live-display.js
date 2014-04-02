@@ -8,6 +8,8 @@
 vjs.LiveDisplay = vjs.Component.extend({
   init: function(player, options){
     vjs.Component.call(this, player, options);
+
+    this.on('click', vjs.bind(this, this.onClick));
   }
 });
 
@@ -25,4 +27,11 @@ vjs.LiveDisplay.prototype.createEl = function(){
   el.appendChild(this.contentEl_);
 
   return el;
+};
+
+vjs.LiveDisplay.prototype.onClick = function() {
+  if (player && player.el() && player.el().classList &&
+      player.el().classList.contains('vjs-live-dvr')) {
+    player.trigger('seeklive');
+  }
 };
