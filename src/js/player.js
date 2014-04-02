@@ -505,7 +505,16 @@ vjs.Player.prototype.onDurationChange = function(){
   // accidentally cause the stack to blow up.
   var duration = this.techGet('duration');
   if (duration) {
+    if (duration < 0) {
+      duration = Infinity;
+    }
     this.duration(duration);
+    // Determine if the stream is live and propagate styles down to UI.
+    if (duration === Infinity) {
+      this.addClass('vjs-live');
+    } else {
+      this.removeClass('vjs-live');
+    }
   }
 };
 
