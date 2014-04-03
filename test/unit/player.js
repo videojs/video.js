@@ -371,3 +371,34 @@ test('should register players with generated ids', function(){
   equal(player.el().id, player.id(), 'the player and element ids are equal');
   ok(vjs.players[id], 'the generated id is registered');
 });
+
+test('should not add multiple first play events despite subsequent loads', function() {
+  expect(1);
+
+  var player = PlayerTest.makePlayer({});
+
+  player.on('firstplay', function(){
+    ok('First play should fire once.');
+  });
+
+  // Checking to make sure onLoadStart removes first play listener before adding a new one.
+  player.trigger('loadstart');
+  player.trigger('loadstart');
+  player.trigger('play');
+});
+
+test('should remove vjs-has-started class', function(){
+  expect(3);
+
+  var player = PlayerTest.makePlayer({});
+
+  player.trigger('loadstart');
+  player.trigger('play');
+  ok(player.el().className.indexOf('vjs-has-started') !== -1, 'vjs-has-started class added');
+
+  player.trigger('loadstart');
+  ok(player.el().className.indexOf('vjs-has-started') === -1, 'vjs-has-started class removed');
+
+  player.trigger('play');
+  ok(player.el().className.indexOf('vjs-has-started') !== -1, 'vjs-has-started class added again');
+});
