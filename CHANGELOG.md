@@ -3,7 +3,8 @@ CHANGELOG
 
 ## HEAD (Unreleased)
 * Updated the UI to support live video ([view](https://github.com/videojs/video.js/pull/1121))
-* The UI now resets after a source change [[view](https://github.com/videojs/video.js/pull/1124)]
+* The UI now resets after a source change ([view](https://github.com/videojs/video.js/pull/1124))
+* Now assuming smart CSS defaults for sliders to prevent reflow on player init ([view](https://github.com/videojs/video.js/pull/1122))
 
 --------------------
 
