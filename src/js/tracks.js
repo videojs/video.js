@@ -948,7 +948,7 @@ vjs.ChaptersButton.prototype.createMenu = function(){
 
   var menu = this.menu = new vjs.Menu(this.player_);
 
-  menu.el_.appendChild(vjs.createEl('li', {
+  menu.contentEl().appendChild(vjs.createEl('li', {
     className: 'vjs-menu-title',
     innerHTML: vjs.capitalize(this.kind_),
     tabindex: -1

@@ -206,9 +206,11 @@ vjs.fixEvent = function(event) {
       }
       event.returnValue = false;
       event.isDefaultPrevented = returnTrue;
+      event.defaultPrevented = true;
     };
 
     event.isDefaultPrevented = returnFalse;
+    event.defaultPrevented = false;
 
     // Stop the event from bubbling
     event.stopPropagation = function () {
@@ -293,7 +295,7 @@ vjs.trigger = function(elem, event) {
     vjs.trigger(parent, event);
 
   // If at the top of the DOM, triggers the default action unless disabled.
-  } else if (!parent && !event.isDefaultPrevented()) {
+  } else if (!parent && !event.defaultPrevented) {
     var targetData = vjs.getData(event.target);
 
     // Checks if the target has a default action for this event.
@@ -310,7 +312,7 @@ vjs.trigger = function(elem, event) {
   }
 
   // Inform the triggerer if the default was prevented by returning false
-  return !event.isDefaultPrevented();
+  return !event.defaultPrevented;
   /* Original version of js ninja events wasn't complete.
    * We've since updated to the latest version, but keeping this around
    * for now just in case.

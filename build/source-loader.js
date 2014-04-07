@@ -26,6 +26,7 @@ var sourceFiles = [
   "src/js/menu.js",
   "src/js/player.js",
   "src/js/control-bar/control-bar.js",
+  "src/js/control-bar/live-display.js",
   "src/js/control-bar/play-toggle.js",
   "src/js/control-bar/time-display.js",
   "src/js/control-bar/fullscreen-toggle.js",

@@ -257,9 +257,9 @@
           "prompt": "confirm"
         },
         {
+          "id": "type",
           "desc": "Provide the release type",
           "prompt": {
-            "id": "type",
             "message": "release type",
             "default": "patch",
             "type": "text"

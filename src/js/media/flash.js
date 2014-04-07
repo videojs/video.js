@@ -284,8 +284,8 @@ vjs.Flash.prototype.currentSrc = function(){
   var src = this.el_.vjs_getProperty('currentSrc');
   // no src, check and see if RTMP
   if (src == null) {
-    var connection = this.rtmpConnection(),
-        stream = this.rtmpStream();
+    var connection = this['rtmpConnection'](),
+        stream = this['rtmpStream']();
 
     if (connection && stream) {
       src = vjs.Flash.streamFromParts(connection, stream);

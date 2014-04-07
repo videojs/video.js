@@ -16,8 +16,6 @@ vjs.Slider = vjs.Component.extend({
     this.bar = this.getChild(this.options_['barName']);
     this.handle = this.getChild(this.options_['handleName']);
 
-    player.on(this.playerEvent, vjs.bind(this, this.update));
-
     this.on('mousedown', this.onMouseDown);
     this.on('touchstart', this.onMouseDown);
     this.on('focus', this.onFocus);
@@ -26,10 +24,7 @@ vjs.Slider = vjs.Component.extend({
 
     this.player_.on('controlsvisible', vjs.bind(this, this.update));
 
-    // This is actually to fix the volume handle position. http://twitter.com/#!/gerritvanaaken/status/159046254519787520
-    // this.player_.one('timeupdate', vjs.bind(this, this.update));
-
-    player.ready(vjs.bind(this, this.update));
+    player.on(this.playerEvent, vjs.bind(this, this.update));
 
     this.boundEvents = {};
   }

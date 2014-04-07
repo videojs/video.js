@@ -38,3 +38,57 @@ test('should re-link the player if the tech is moved', function(){
 
   strictEqual(player, tech.el()['player']);
 });
+
+test('patchCanPlayType patches canplaytype with our function, conditionally', function() {
+  // the patch runs automatically so we need to first unpatch
+  vjs.Html5.unpatchCanPlayType();
+
+  var oldAV = vjs.ANDROID_VERSION,
+      video = document.createElement('video'),
+      canPlayType = vjs.TEST_VID.constructor.prototype.canPlayType,
+      patchedCanPlayType,
+      unpatchedCanPlayType;
+
+  vjs.ANDROID_VERSION = 4.0;
+  vjs.Html5.patchCanPlayType();
+
+  notStrictEqual(video.canPlayType, canPlayType, 'original canPlayType and patched canPlayType should not be equal');
+
+  patchedCanPlayType = video.canPlayType;
+  unpatchedCanPlayType = vjs.Html5.unpatchCanPlayType();
+
+  strictEqual(canPlayType, vjs.TEST_VID.constructor.prototype.canPlayType, 'original canPlayType and unpatched canPlayType should be equal');
+  strictEqual(patchedCanPlayType, unpatchedCanPlayType, 'patched canPlayType and function returned from unpatch are equal');
+
+  vjs.ANDROID_VERSION = oldAV;
+  vjs.Html5.unpatchCanPlayType();
+});
+
+test('should return maybe for HLS urls on Android 4.0 or above', function() {
+  var oldAV = vjs.ANDROID_VERSION,
+      video = document.createElement('video');
+
+  vjs.ANDROID_VERSION = 4.0;
+  vjs.Html5.patchCanPlayType();
+
+  strictEqual(video.canPlayType('application/x-mpegurl'), 'maybe', 'android version 4.0 or above should be a maybe for x-mpegurl');
+  strictEqual(video.canPlayType('application/x-mpegURL'), 'maybe', 'android version 4.0 or above should be a maybe for x-mpegURL');
+  strictEqual(video.canPlayType('application/vnd.apple.mpegurl'), 'maybe', 'android version 4.0 or above should be a maybe for vnd.apple.mpegurl');
+  strictEqual(video.canPlayType('application/vnd.apple.mpegURL'), 'maybe', 'android version 4.0 or above should be a maybe for vnd.apple.mpegurl');
+
+  vjs.ANDROID_VERSION = oldAV;
+  vjs.Html5.unpatchCanPlayType();
+});
+
+test('should return a maybe for mp4 on OLD ANDROID', function() {
+  var isOldAndroid = vjs.IS_OLD_ANDROID,
+      video = document.createElement('video');
+
+  vjs.IS_OLD_ANDROID = true;
+  vjs.Html5.patchCanPlayType();
+
+  strictEqual(video.canPlayType('video/mp4'), 'maybe', 'old android should return a maybe for video/mp4');
+
+  vjs.IS_OLD_ANDROID = isOldAndroid;
+  vjs.Html5.unpatchCanPlayType();
+});

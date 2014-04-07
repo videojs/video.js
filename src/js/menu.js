@@ -129,7 +129,7 @@ vjs.MenuButton.prototype.createMenu = function(){
 
   // Add a title list item to the top
   if (this.options().title) {
-    menu.el().appendChild(vjs.createEl('li', {
+    menu.contentEl().appendChild(vjs.createEl('li', {
       className: 'vjs-menu-title',
       innerHTML: vjs.capitalize(this.kind_),
       tabindex: -1
