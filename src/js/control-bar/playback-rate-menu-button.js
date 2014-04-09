@@ -29,7 +29,7 @@ vjs.PlaybackRateMenuButton.prototype.createEl = function(){
   var rate = this.player_.tech.playbackRate() + 'x';
   return vjs.Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-playback-rate vjs-menu-button vjs-control',
-    innerHTML:'<div class="vjs-playaback-rate-value">' + rate + '</div>'
+    innerHTML:'<div class="vjs-playback-rate-value">' + rate + '</div>'
   });
 };
 
