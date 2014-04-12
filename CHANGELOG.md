@@ -6,6 +6,9 @@ _(none)_
 
 --------------------
 
+## 4.5.2 (2014-04-12)
+* Updated release versioning to include bower.json and component.json
+
 ## 4.5.1 (2014-03-27)
 * Fixed a bug from the last release where canPlaySource was no longer exported
 
