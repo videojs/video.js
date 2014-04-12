@@ -89,7 +89,7 @@ The third argument is a 'ready' callback. Once Video.js has initialized it will 
 Instead of using an element ID, you can also pass a reference to the element itself.
 
 ```js
-videojs(document.getElementsById('example_video_1'), {}, function() {
+videojs(document.getElementById('example_video_1'), {}, function() {
   // This is functionally the same as the previous example.
 });
 ```
