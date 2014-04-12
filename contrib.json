@@ -278,8 +278,8 @@
           "exec": "grunt chg-release:<%= type %>"
         },
         {
-          "desc": "Bump the package version",
-          "exec": "grunt bump-only:<%= type %>"
+          "desc": "Bump package versions",
+          "exec": "grunt version:<%= type %>"
         },
         {
           "desc": "Build the release",
