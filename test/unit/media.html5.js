@@ -38,3 +38,30 @@ test('should re-link the player if the tech is moved', function(){
 
   strictEqual(player, tech.el()['player']);
 });
+
+test('test playbackRate', function() {
+  var el, player, playbackRate, tech;
+
+  el = document.createElement('div');
+  el.innerHTML = '<div />';
+
+  player = {
+    id: function(){ return 'id'; },
+    el: function(){ return el; },
+    options_: {},
+    options: function(){ return {}; },
+    controls: function(){ return false; },
+    usingNativeControls: function(){ return false; },
+    on: function(){ return this; },
+    ready: function(){}
+  };
+
+  tech = new vjs.Html5(player, {});
+  tech.createEl();
+
+  tech.el_.playbackRate = 1.25;
+  strictEqual(tech.playbackRate(), 1.25);
+
+  tech['setPlaybackRate'](0.75);
+  strictEqual(tech.playbackRate(), 0.75);
+});
