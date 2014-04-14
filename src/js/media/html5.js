@@ -15,6 +15,9 @@ vjs.Html5 = vjs.MediaTechController.extend({
     // volume cannot be changed from 1 on iOS
     this.features['volumeControl'] = vjs.Html5.canControlVolume();
 
+    // just in case; or is it excessively...
+    this.features['playbackRate'] = vjs.Html5.canControlPlaybackRate();
+
     // In iOS, if you move a video element in the DOM, it breaks video playback.
     this.features['movingMediaElementInDOM'] = !vjs.IS_IOS;
 
@@ -269,6 +272,59 @@ vjs.Html5.canControlVolume = function(){
   return volume !== vjs.TEST_VID.volume;
 };
 
+vjs.Html5.canControlPlaybackRate = function(){
+  var playbackRate =  vjs.TEST_VID.playbackRate;
+  vjs.TEST_VID.playbackRate = (playbackRate / 2) + 0.1;
+  return playbackRate !== vjs.TEST_VID.playbackRate;
+};
+
+// HTML5 Feature detection and Device Fixes --------------------------------- //
+(function() {
+  var canPlayType,
+      mpegurlRE = /^application\/(?:x-|vnd\.apple\.)mpegurl/i,
+      mp4RE = /^video\/mp4/i;
+
+  vjs.Html5.patchCanPlayType = function() {
+    // Android 4.0 and above can play HLS to some extent but it reports being unable to do so
+    if (vjs.ANDROID_VERSION >= 4.0) {
+      if (!canPlayType) {
+        canPlayType = vjs.TEST_VID.constructor.prototype.canPlayType;
+      }
+
+      vjs.TEST_VID.constructor.prototype.canPlayType = function(type) {
+        if (type && mpegurlRE.test(type)) {
+          return 'maybe';
+        }
+        return canPlayType.call(this, type);
+      };
+    }
+
+    // Override Android 2.2 and less canPlayType method which is broken
+    if (vjs.IS_OLD_ANDROID) {
+      if (!canPlayType) {
+        canPlayType = vjs.TEST_VID.constructor.prototype.canPlayType;
+      }
+
+      vjs.TEST_VID.constructor.prototype.canPlayType = function(type){
+        if (type && mp4RE.test(type)) {
+          return 'maybe';
+        }
+        return canPlayType.call(this, type);
+      };
+    }
+  };
+
+  vjs.Html5.unpatchCanPlayType = function() {
+    var r = vjs.TEST_VID.constructor.prototype.canPlayType;
+    vjs.TEST_VID.constructor.prototype.canPlayType = canPlayType;
+    canPlayType = null;
+    return r;
+  };
+
+  // by default, patch the video element
+  vjs.Html5.patchCanPlayType();
+})();
+
 // List of all HTML5 events (various uses).
 vjs.Html5.Events = 'loadstart,suspend,abort,error,emptied,stalled,loadedmetadata,loadeddata,canplay,canplaythrough,playing,waiting,seeking,seeked,ended,durationchange,timeupdate,progress,play,pause,ratechange,volumechange'.split(',');
 
@@ -303,12 +359,3 @@ vjs.Html5.disposeMediaElement = function(el){
     })();
   }
 };
-
-// HTML5 Feature detection and Device Fixes --------------------------------- //
-
-  // Override Android 2.2 and less canPlayType method which is broken
-if (vjs.IS_OLD_ANDROID) {
-  document.createElement('video').constructor.prototype.canPlayType = function(type){
-    return (type && type.toLowerCase().indexOf('video/mp4') != -1) ? 'maybe' : '';
-  };
-}

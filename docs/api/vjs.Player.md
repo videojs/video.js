@@ -234,7 +234,7 @@ _inherited from_: [src/js/component.js#L224](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Boolean` Controls are showing
 
-_defined in_: [src/js/player.js#L1167](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1167)
+_defined in_: [src/js/player.js#L1174](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1174)
 
 ---
 
@@ -673,7 +673,7 @@ _inherited from_: [src/js/component.js#L120](https://github.com/videojs/video.js
 * `String` poster URL when getting
 * `vjs.Player` self when setting
 
-_defined in_: [src/js/player.js#L1140](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1140)
+_defined in_: [src/js/player.js#L1147](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1147)
 
 ---
 
@@ -778,9 +778,10 @@ _inherited from_: [src/js/component.js#L653](https://github.com/videojs/video.js
 * __source__ `String|Object|Array` _(OPTIONAL)_ The source URL, object, or array of sources
 
 ##### RETURNS: 
-* `vjs.Player` self
+* `String` The current video source when getting
+* `String` The player when setting
 
-_defined in_: [src/js/player.js#L1024](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1024)
+_defined in_: [src/js/player.js#L1025](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1025)
 
 ---
 

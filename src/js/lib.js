@@ -693,8 +693,9 @@ vjs.findPosition = function(el) {
     scrollTop = window.pageYOffset || body.scrollTop;
     top = box.top + scrollTop - clientTop;
 
+    // Android sometimes returns slightly off decimal values, so need to round
     return {
-      left: left,
-      top: top
+      left: vjs.round(left),
+      top: vjs.round(top)
     };
 };

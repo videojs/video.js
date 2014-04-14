@@ -114,3 +114,20 @@ test('should bubble up DOM unless bubbles == false', function(){
   });
   vjs.trigger(inner, { type:'nobub', target:inner, bubbles:false });
 });
+
+test('should have a defaultPrevented property on an event that was prevent from doing default action', function() {
+  expect(2);
+
+  var el = document.createElement('div');
+
+  vjs.on(el, 'test', function(e){
+    ok(true, 'First listener fired');
+    e.preventDefault();
+  });
+
+  vjs.on(el, 'test', function(e){
+    ok(e.defaultPrevented, 'Should have `defaultPrevented` to signify preventDefault being called');
+  });
+
+  vjs.trigger(el, 'test');
+});
