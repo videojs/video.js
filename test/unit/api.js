@@ -27,6 +27,7 @@ test('should be able to access expected player API methods', function() {
   ok(player.textTracks, 'textTracks exists');
   ok(player.requestFullScreen, 'requestFullScreen exists');
   ok(player.cancelFullScreen, 'cancelFullScreen exists');
+  ok(player.playbackRate, 'playbackRate exists');
 
   // Unsupported Native HTML5 Methods
   // ok(player.canPlayType, 'canPlayType exists');
