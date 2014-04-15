@@ -566,12 +566,13 @@ vjs.createTimeRange = function(start, end){
 
 /**
  * Simple http request for retrieving external files (e.g. text tracks)
- * @param  {String} url           URL of resource
- * @param  {Function=} onSuccess  Success callback
- * @param  {Function=} onError    Error callback
+ * @param  {String} url              URL of resource
+ * @param  {Function=} onSuccess     Success callback
+ * @param  {Function=} onError       Error callback
+ * @param  {Boolean} withCredentials Flag which allow credentials
  * @private
  */
-vjs.get = function(url, onSuccess, onError){
+vjs.get = function(url, onSuccess, onError, withCredentials){
   var local, request;
 
   onError = onError || function(){};
@@ -604,7 +605,9 @@ vjs.get = function(url, onSuccess, onError){
 
   try {
     request.open('GET', url, true);
-    request.withCredentials = true;
+    if(withCredentials) {
+      request.withCredentials = true;
+    }
   } catch(e) {
     onError(e);
     return;
