@@ -25,7 +25,7 @@ You can download the Video.js source and host it on your own servers, or use the
 ```
 
 ### Self Hosted. ###
-With the self hosted option you'll also want to update the location of the video-js.swf file.
+With the self hosted option you'll also want to update the location of the video-js.swf file and add the video MIME types to your server configuration as documented [here](http://www.ewbooks.info/hotpot/hotpotatoes-xhtml5-audio-video).
 ```html
 <link href="//example.com/path/to/video-js.css" rel="stylesheet">
 <script src="//example.com/path/to/video.js"></script>
