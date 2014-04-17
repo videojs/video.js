@@ -745,12 +745,6 @@ vjs.TextTrackMenuItem = vjs.MenuItem.extend({
     vjs.MenuItem.call(this, player, options);
 
     this.player_.on(track.kind() + 'trackchange', vjs.bind(this, this.update));
-
-    // Add check for auto preload option to not load captions, subtitles, etc. on default
-    var preload = player.options_['preload'];
-    if(track.dflt() && preload === 'auto') {
-      this.player_.showTextTrack(this.track.id_, this.track.kind());
-    }
   }
 });
 
