@@ -58,9 +58,15 @@ vjs.Player.prototype.addTextTrack = function(kind, label, language, options){
   // TODO: Add a process to deterime the best track to show for the specific kind
   // Incase there are mulitple defaulted tracks of the same kind
   // Or the user has a set preference of a specific language that should override the default
-  // if (track.dflt()) {
-  //   this.ready(vjs.bind(track, track.show));
-  // }
+  // Note: The setTimeout is a workaround because with the html5 tech, the player is 'ready'
+ //  before it's child components (including the textTrackDisplay) have finished loading.
+  if (track.dflt()) {
+    this.ready(function(){
+      setTimeout(function(){
+        track.show();
+      }, 0);
+    });
+  }
 
   return track;
 };

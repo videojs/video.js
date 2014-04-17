@@ -80,7 +80,7 @@ test('should get tag, source, and track settings', function(){
   var html = '<video id="example_1" class="video-js" autoplay preload="metadata">';
       html += '<source src="http://google.com" type="video/mp4">';
       html += '<source src="http://google.com" type="video/webm">';
-      html += '<track src="http://google.com" kind="captions" default>';
+      html += '<track src="http://google.com" kind="captions" attrtest>';
       html += '</video>';
 
   fixture.innerHTML += html;
@@ -97,7 +97,7 @@ test('should get tag, source, and track settings', function(){
   ok(player.options_['sources'][1].type === 'video/webm');
   ok(player.options_['tracks'].length === 1);
   ok(player.options_['tracks'][0]['kind'] === 'captions'); // No extern
-  ok(player.options_['tracks'][0]['default'] === true);
+  ok(player.options_['tracks'][0]['attrtest'] === '');
 
   ok(player.el().className.indexOf('video-js') !== -1, 'transferred class from tag to player div');
   ok(player.el().id === 'example_1', 'transferred id from tag to player div');
