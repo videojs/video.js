@@ -25,7 +25,7 @@ You can download the Video.js source and host it on your own servers, or use the
 ```
 
 ### Self Hosted. ###
-With the self hosted option you'll also want to update the location of the video-js.swf file and add the video MIME types to your server configuration as documented [here](http://www.ewbooks.info/hotpot/hotpotatoes-xhtml5-audio-video).
+With the self hosted option you'll also want to update the location of the video-js.swf file.
 ```html
 <link href="//example.com/path/to/video-js.css" rel="stylesheet">
 <script src="//example.com/path/to/video.js"></script>
@@ -48,6 +48,8 @@ With Video.js you just use an HTML5 video tag to embed a video. Video.js will th
     - `vjs-default-skin` applies the default skin to the HTML controls, and can be removed or overridden to create your own controls design.
 
 Otherwise include/exclude attributes, settings, sources, and tracks exactly as you would for HTML5 video.
+
+You may also need to add the video MIME types to your server configuration as documented [here](http://www.ewbooks.info/hotpot/hotpotatoes-xhtml5-audio-video)
 
 ```html
 <video id="example_video_1" class="video-js vjs-default-skin"
