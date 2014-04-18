@@ -131,7 +131,7 @@ vjs.MenuButton.prototype.createMenu = function(){
   if (this.options().title) {
     menu.contentEl().appendChild(vjs.createEl('li', {
       className: 'vjs-menu-title',
-      innerHTML: vjs.capitalize(this.kind_),
+      innerHTML: vjs.capitalize(this.options().title),
       tabindex: -1
     }));
   }

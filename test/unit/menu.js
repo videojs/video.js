@@ -5,10 +5,8 @@ test('should place title list item into ul', function() {
 
   player = PlayerTest.makePlayer();
 
-  vjs.MenuButton.prototype.kind_ = 'testTitle';
-
   menuButton = new vjs.MenuButton(player, {
-    'title': true
+    'title': 'testTitle'
   });
 
   var menuContentElement = menuButton.el().getElementsByTagName('UL')[0];
