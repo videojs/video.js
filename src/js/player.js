@@ -1061,6 +1061,7 @@ vjs.Player.prototype.src = function(source){
         this.loadTech(techName, source);
       }
     } else {
+      this.addClass('vjs-not-supported');
       this.el_.appendChild(vjs.createEl('p', {
         innerHTML: this.options()['notSupportedMessage']
       }));
