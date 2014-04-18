@@ -496,6 +496,8 @@ vjs.Player.prototype.onProgress = function(){
  * @event ended
  */
 vjs.Player.prototype.onEnded = function(){
+  this.trigger('timeupdate');
+
   if (this.options_['loop']) {
     this.currentTime(0);
     this.play();
