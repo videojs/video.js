@@ -1382,19 +1382,24 @@ vjs.Player.prototype.listenForUserActivity = function(){
     clearInterval(activityCheck);
     clearTimeout(inactivityTimeout);
   });
+};
 
-  vjs.Player.prototype.playbackRate = function(rate) {
-    if (rate !== undefined) {
+vjs.Player.prototype.playbackRate = function(rate) {
+  if (rate !== undefined) {
 
-      this.techCall('setPlaybackRate', rate);
+    this.techCall('setPlaybackRate', rate);
 
-      this.trigger('ratechange');
+    this.trigger('ratechange');
 
-      return this;
-    }
+    return this;
+  }
 
-    return this.techGet('playbackRate') || 1.0;
-  };
+  if (this.tech && this.tech.features && this.tech.features['playbackRate']) {
+    return this.techGet('playbackRate');
+  } else {
+    return 1.0;
+  }
+
 };
 
 // Methods to add support for
