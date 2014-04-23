@@ -294,10 +294,6 @@ fonts to show/hide properly.
   margin: 1.1em auto 0;
 }
 
-.vjs-default-skin .vjs-volume-menu-button .vjs-menu-content {
-  height: 2.9em;
-}
-
 .vjs-default-skin .vjs-volume-level {
   position: absolute;
   top: 0;
@@ -328,9 +324,38 @@ fonts to show/hide properly.
   height: 1em;
 }
 
-.vjs-default-skin .vjs-volume-menu-button .vjs-menu .vjs-menu-content {
-  width: 6em;
-  left: -4em;
+.vjs-default-skin .vjs-volume-menu-button .vjs-menu {
+  left: 0.5em;
+  border-left: 1.5em solid transparent;
+  border-right: 1.5em solid transparent;
+}
+
+.vjs-default-skin .vjs-volume-menu-button.vjs-menu-button .vjs-menu .vjs-menu-content {
+  width: 2.9em;
+  left: -1.5em;
+  height: 10em;
+}
+
+.vjs-default-skin .vjs-volume-menu-button .vjs-volume-bar {
+  width: 0.6em;
+  height: 8em;
+}
+
+.vjs-default-skin .vjs-volume-menu-button .vjs-volume-bar .vjs-volume-level {
+  width: 100%;
+  top: auto;
+  bottom: 0;
+  /* assuming volume starts at 1.0 */
+  height: 100%;
+}
+
+.vjs-default-skin .vjs-volume-menu-button .vjs-volume-bar .vjs-volume-handle:before {
+  top: -0.3em;
+  left: -0.1em;
+}
+
+.vjs-default-skin .vjs-volume-menu-button .vjs-volume-bar .vjs-volume-handle {
+  left: auto;
 }
 
 /* Progress
