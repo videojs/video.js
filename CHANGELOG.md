@@ -9,6 +9,7 @@ CHANGELOG
 * Fixed title support for menu buttons ([view](https://github.com/videojs/video.js/pull/1128))
 * Fixed extra mousemove events on Windows caused by certain apps, not users [[view](https://github.com/videojs/video.js/pull/1068)]
 * Fixed error due to undefined tech when no source is supported [[view](https://github.com/videojs/video.js/pull/1172)]
+* Fixed the progress bar not finishing when manual timeupdate events are used [[view](https://github.com/videojs/video.js/pull/1173)]
 
 --------------------
 
