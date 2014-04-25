@@ -385,8 +385,13 @@ vjs.Player.prototype.trackCurrentTime = function(){
 };
 
 // Turn off play progress tracking (when paused or dragging)
-vjs.Player.prototype.stopTrackingCurrentTime = function(){ clearInterval(this.currentTimeInterval); };
+vjs.Player.prototype.stopTrackingCurrentTime = function(){
+  clearInterval(this.currentTimeInterval);
 
+  // #1002 - if the video ends right before the next timeupdate would happen,
+  // the progress bar won't make it all the way to the end
+  this.trigger('timeupdate');
+};
 // /* Player event handlers (how the player reacts to certain events)
 // ================================================================================ */
 
