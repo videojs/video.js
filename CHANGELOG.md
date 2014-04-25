@@ -6,7 +6,8 @@ CHANGELOG
 * The UI now resets after a source change ([view](https://github.com/videojs/video.js/pull/1124))
 * Now assuming smart CSS defaults for sliders to prevent reflow on player init ([view](https://github.com/videojs/video.js/pull/1122))
 * Fixed the title element placement in menus [[view](https://github.com/videojs/video.js/pull/1114)]
-* Fixed title support for menu buttons ([view](https
+* Fixed title support for menu buttons ([view](https://github.com/videojs/video.js/pull/1128))
+* Fixed extra mousemove events on Windows caused by certain apps, not users [[view](https://github.com/videojs/video.js/pull/1068)]
 
 --------------------
 
