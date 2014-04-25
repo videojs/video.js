@@ -322,14 +322,16 @@ vjs.Player.prototype.manualProgressOn = function(){
   // In HTML5, some older versions don't support the progress event
   // So we're assuming they don't, and turning off manual progress if they do.
   // As opposed to doing user agent detection
-  this.tech.one('progress', function(){
+  if (this.tech) {
+    this.tech.one('progress', function(){
 
-    // Update known progress support for this playback technology
-    this.features['progressEvents'] = true;
+      // Update known progress support for this playback technology
+      this.features['progressEvents'] = true;
 
-    // Turn off manual progress tracking
-    this.player_.manualProgressOff();
-  });
+      // Turn off manual progress tracking
+      this.player_.manualProgressOff();
+    });
+  }
 };
 
 vjs.Player.prototype.manualProgressOff = function(){
@@ -362,12 +364,14 @@ vjs.Player.prototype.manualTimeUpdatesOn = function(){
   // timeupdate is also called by .currentTime whenever current time is set
 
   // Watch for native timeupdate event
-  this.tech.one('timeupdate', function(){
-    // Update known progress support for this playback technology
-    this.features['timeupdateEvents'] = true;
-    // Turn off manual progress tracking
-    this.player_.manualTimeUpdatesOff();
-  });
+  if (this.tech) {
+    this.tech.one('timeupdate', function(){
+      // Update known progress support for this playback technology
+      this.features['timeupdateEvents'] = true;
+      // Turn off manual progress tracking
+      this.player_.manualTimeUpdatesOff();
+    });
+  }
 };
 
 vjs.Player.prototype.manualTimeUpdatesOff = function(){
