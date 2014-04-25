@@ -94,13 +94,13 @@ vjs.Slider.prototype.update = function(){
   if (handle) {
 
     var box = this.el_,
-        boxWidth = box.offsetWidth,
+        boxSize = this.options_.vertical ? box.offsetHeight : box.offsetWidth,
 
         handleWidth = handle.el().offsetWidth,
 
         // The width of the handle in percent of the containing box
         // In IE, widths may not be ready yet causing NaN
-        handlePercent = (handleWidth) ? handleWidth / boxWidth : 0,
+        handlePercent = (handleWidth) ? handleWidth / boxSize : 0,
 
         // Get the adjusted size of the box, considering that the handle's center never touches the left or right side.
         // There is a margin of half the handle's width on both sides.
@@ -112,12 +112,21 @@ vjs.Slider.prototype.update = function(){
     // The bar does reach the left side, so we need to account for this in the bar's width
     barProgress = adjustedProgress + (handlePercent / 2);
 
-    // Move the handle from the left based on the adjected progress
-    handle.el().style.left = vjs.round(adjustedProgress * 100, 2) + '%';
+    if (this.options_.vertical) {
+
+      // Move the handle from the top based on the adjusted progress
+      handle.el().style.top = vjs.round((1 - barProgress) * 100, 2) + '%';
+
+    } else {
+
+      // Move the handle from the left based on the adjusted progress
+      handle.el().style.left = vjs.round(adjustedProgress * 100, 2) + '%';
+
+    }
   }
 
   // Set the new bar width
-  bar.el().style.width = vjs.round(barProgress * 100, 2) + '%';
+  bar.el().style[this.options_.vertical ? 'height' : 'width'] = vjs.round(barProgress * 100, 2) + '%';
 };
 
 vjs.Slider.prototype.calculateDistance = function(event){
@@ -125,7 +134,8 @@ vjs.Slider.prototype.calculateDistance = function(event){
 
   el = this.el_;
   box = vjs.findPosition(el);
-  boxW = boxH = el.offsetWidth;
+  boxW = el.offsetWidth;
+  boxH = el.offsetHeight;
   handle = this.handle;
 
   if (this.options_.vertical) {
@@ -139,13 +149,15 @@ vjs.Slider.prototype.calculateDistance = function(event){
 
     if (handle) {
       var handleH = handle.el().offsetHeight;
-      // Adjusted X and Width, so handle doesn't go outside the bar
+      // Adjusted Y and Height, so handle doesn't go outside the bar
       boxY = boxY + (handleH / 2);
       boxH = boxH - handleH;
     }
 
     // Percent that the click is through the adjusted area
-    return Math.max(0, Math.min(1, ((boxY - pageY) + boxH) / boxH));
+    // Since we're measuring from the top, we reverse the percentages to have
+    // the bottom be 0%.
+    return Math.max(0, Math.min(1, 1 - ((pageY - boxY) / boxH)));
 
   } else {
     boxX = box.left;
