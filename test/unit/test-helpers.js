@@ -5,9 +5,10 @@ var PlayerTest = {
     videoTag.className = 'video-js vjs-default-skin';
     return videoTag;
   },
-  makePlayer: function(playerOptions){
+  makePlayer: function(playerOptions, videoTag){
     var player;
-    var videoTag = PlayerTest.makeTag();
+
+    videoTag = videoTag || PlayerTest.makeTag();
 
     var fixture = document.getElementById('qunit-fixture');
     fixture.appendChild(videoTag);

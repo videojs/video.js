@@ -11,10 +11,17 @@ document.createElement('track');
  * Doubles as the main function for users to create a player instance and also
  * the main library object.
  *
+ * **ALIASES** videojs, _V_ (deprecated)
+ *
+ * The `vjs` function can be used to initialize or retrieve a player.
+ *
+ *     var myPlayer = vjs('my_video_id');
+ *
  * @param  {String|Element} id      Video element or video element ID
  * @param  {Object=} options        Optional options object for config/settings
  * @param  {Function=} ready        Optional ready callback
  * @return {vjs.Player}             A player instance
+ * @namespace
  */
 var vjs = function(id, options, ready){
   var tag; // Element of ID
@@ -109,3 +116,18 @@ if (vjs.CDN_VERSION !== 'GENERATED'+'_CDN_VSN') {
  * @type {Object}
  */
 vjs.players = {};
+
+/*!
+ * Custom Universal Module Definition (UMD)
+ *
+ * Video.js will never be a non-browser lib so we can simplify UMD a bunch and
+ * still support requirejs and browserify. This also needs to be closure
+ * compiler compatible, so string keys are used.
+ */
+if (typeof define === 'function' && define['amd']) {
+  define([], function(){ return videojs; });
+
+// checking that module is an object too because of umdjs/umd#35
+} else if (typeof exports === 'object' && typeof module === 'object') {
+  module['exports'] = videojs;
+}

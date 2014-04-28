@@ -1,7 +1,81 @@
 CHANGELOG
 =========
 
-## Unreleased (HEAD)
+## HEAD (Unreleased)
+* Updated the UI to support live video ([view](https://github.com/videojs/video.js/pull/1121))
+* The UI now resets after a source change ([view](https://github.com/videojs/video.js/pull/1124))
+* Now assuming smart CSS defaults for sliders to prevent reflow on player init ([view](https://github.com/videojs/video.js/pull/1122))
+* Fixed the title element placement in menus [[view](https://github.com/videojs/video.js/pull/1114)]
+* Fixed title support for menu buttons ([view](https://github.com/videojs/video.js/pull/1128))
+* Fixed extra mousemove events on Windows caused by certain apps, not users [[view](https://github.com/videojs/video.js/pull/1068)]
+* Fixed error due to undefined tech when no source is supported [[view](https://github.com/videojs/video.js/pull/1172)]
+* Fixed the progress bar not finishing when manual timeupdate events are used [[view](https://github.com/videojs/video.js/pull/1173)]
+
+--------------------
+
+## 4.5.2 (2014-04-12)
+* Updated release versioning to include bower.json and component.json
+
+## 4.5.1 (2014-03-27)
+* Fixed a bug from the last release where canPlaySource was no longer exported
+
+## 4.5.0 (2014-03-27)
+* Added component(1) support ([view](https://github.com/videojs/video.js/pull/1032))
+* Captions now move down when controls are hidden ([view](https://github.com/videojs/video.js/pull/1053))
+* Added the .less source file to the distribution files ([view](https://github.com/videojs/video.js/pull/1056))
+* Changed src() to return the current selected source ([view](https://github.com/videojs/video.js/pull/968))
+* Added a grunt task for opening the next issue that needs addressing ([view](https://github.com/videojs/video.js/pull/1059))
+* Fixed Android 4.0+ devices' check for HLS support ([view](https://github.com/videojs/video.js/pull/1084))
+
+## 4.4.3 (2014-03-06)
+* Fixed bugs in IE9 Windows 7N with no Media Player ([view](https://github.com/videojs/video.js/pull/1060))
+* Fixed a bug with setPoster() in the minified version ([view](https://github.com/videojs/video.js/pull/1062))
+
+## 4.4.2 (2014-02-24)
+* Fixed module.exports in minified version ([view](https://github.com/videojs/video.js/pull/1038))
+
+## 4.4.1 (2014-02-18)
+* Added .npmignore so dist files wouldn't be ignored in packages
+
+## 4.4.0 (2014-02-18)
+* Made the poster updateable after initialization ([view](https://github.com/videojs/video.js/pull/838))
+* Exported more textTrack functions ([view](https://github.com/videojs/video.js/pull/815))
+* Moved player ID generation to support video tags with no IDs ([view](https://github.com/videojs/video.js/pull/845))
+* Moved to using QUnit as a dependency ([view](https://github.com/videojs/video.js/pull/850))
+* Added the util namespace for public utility functions ([view](https://github.com/videojs/video.js/pull/862))
+* Fixed an issue with calling duration before Flash is loaded ([view](https://github.com/videojs/video.js/pull/861))
+* Added player methods to externs so they can be overridden ([view](https://github.com/videojs/video.js/pull/878))
+* Fixed html5 playback when switching between media techs ([view](https://github.com/videojs/video.js/pull/887))
+* Fixed Firefox+Flash mousemove events so controls don't hide permanently ([view](https://github.com/videojs/video.js/pull/899))
+* Fixed a test for touch detection ([view](https://github.com/videojs/video.js/pull/962))
+* Updated the src file list for karma tests ([view](https://github.com/videojs/video.js/pull/948))
+* Added more tests for API properties after minification ([view](https://github.com/videojs/video.js/pull/906))
+* Updated projet to use npm version of videojs-swf ([view](https://github.com/videojs/video.js/pull/930))
+* Added support for dist zipping on windows ([view](https://github.com/videojs/video.js/pull/944))
+* Fixed iOS fullscreen issue ([view](https://github.com/videojs/video.js/pull/977))
+* Fixed touch event bubbling ([view](https://github.com/videojs/video.js/pull/992))
+* Fixed ARIA role attribute for button and slider ([view](https://github.com/videojs/video.js/pull/988))
+* Fixed an issue where a component's dispose event would bubble up ([view](https://github.com/videojs/video.js/pull/981))
+* Quieted down deprecation warnings ([view](https://github.com/videojs/video.js/pull/971))
+* Updated the seek handle to contain the current time ([view](https://github.com/videojs/video.js/pull/902))
+* Added requirejs and browserify support (UMD) ([view](https://github.com/videojs/video.js/pull/998))
+
+## 4.3.0 (2013-11-04)
+* Added Karma for cross-browser unit testing ([view](https://github.com/videojs/video.js/pull/714))
+* Unmuting when the volume is changed ([view](https://github.com/videojs/video.js/pull/720))
+* Fixed an accessibility issue with the big play button ([view](https://github.com/videojs/video.js/pull/777))
+* Exported user activity methods ([view](https://github.com/videojs/video.js/pull/783))
+* Added a classname to center the play button and new spinner options ([view](https://github.com/videojs/video.js/pull/784))
+* Added API doc generation ([view](https://github.com/videojs/video.js/pull/801))
+* Added support for codecs in Flash mime types ([view](https://github.com/videojs/video.js/pull/805))
+
+## 4.2.2 (2013-10-15)
+* Fixed a race condition that would cause videos to fail in Firefox ([view](https://github.com/videojs/video.js/pull/776))
+
+## 4.2.1 (2013-09-09)
+* Fixed an infinite loop caused by loading the library asynchronously ([view](https://github.com/videojs/video.js/pull/727))
+
+## 4.2.0 (2013-09-04)
 * Added LESS as a CSS preprocessor for the default skin ([view](https://github.com/videojs/video.js/pull/644))
 * Exported MenuButtons for use in the API ([view](https://github.com/videojs/video.js/pull/648))
 * Fixed ability to remove listeners added with one() ([view](https://github.com/videojs/video.js/pull/659))
@@ -19,8 +93,6 @@ CHANGELOG
 * Made the fallback message customizable ([view](https://github.com/videojs/video.js/pull/638))
 * Fixed an issue with the loading spinner placement and rotation ([view](https://github.com/videojs/video.js/pull/694))
 * Fixed an issue with fonts being flaky in IE8
-
---------------------
 
 ## 4.1.0 (2013-06-28)
 * Turned on method queuing for unready playback technologies (flash) [view](https://github.com/videojs/video.js/pull/553)

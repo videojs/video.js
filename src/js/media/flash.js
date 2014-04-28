@@ -5,8 +5,9 @@
  */
 
 /**
- * HTML5 Media Controller - Wrapper for HTML5 Media API
- * @param {vjs.Player|Object} player
+ * Flash Media Controller - Wrapper for fallback SWF API
+ *
+ * @param {vjs.Player} player
  * @param {Object=} options
  * @param {Function=} ready
  * @constructor
@@ -59,7 +60,9 @@ vjs.Flash = vjs.MediaTechController.extend({
           'id': objId,
           'name': objId, // Both ID and Name needed or swf to identifty itself
           'class': 'vjs-tech'
-        }, options['attributes'])
+        }, options['attributes']),
+
+        lastSeekTarget
     ;
 
     // If source was supplied pass as a flash var.
@@ -74,6 +77,19 @@ vjs.Flash = vjs.MediaTechController.extend({
       }
     }
 
+    this['setCurrentTime'] = function(time){
+      lastSeekTarget = time;
+      this.el_.vjs_setProperty('currentTime', time);
+    };
+    this['currentTime'] = function(time){
+      // when seeking make the reported time keep up with the requested time
+      // by reading the time we're seeking to
+      if (this.seeking()) {
+        return lastSeekTarget;
+      }
+      return this.el_.vjs_getProperty('currentTime');
+    };
+
     // Add placeholder to player div
     vjs.insertFirst(placeHolder, parentEl);
 
@@ -84,6 +100,17 @@ vjs.Flash = vjs.MediaTechController.extend({
         this.load();
         this.play();
         this.currentTime(options['startTime']);
+      });
+    }
+
+    // firefox doesn't bubble mousemove events to parent. videojs/video-js-swf#37
+    // bugzilla bug: https://bugzilla.mozilla.org/show_bug.cgi?id=836786
+    if (vjs.IS_FIREFOX) {
+      this.ready(function(){
+        vjs.on(this.el(), 'mousemove', vjs.bind(this, function(){
+          // since it's a custom event, don't bubble higher than the player
+          this.player().trigger({ 'type':'mousemove', 'bubbles': false });
+        }));
       });
     }
 
@@ -231,12 +258,15 @@ vjs.Flash.prototype.pause = function(){
 };
 
 vjs.Flash.prototype.src = function(src){
+  if (src === undefined) {
+    return this.currentSrc();
+  }
+
   if (vjs.Flash.isStreamingSrc(src)) {
     src = vjs.Flash.streamToParts(src);
     this.setRtmpConnection(src.connection);
     this.setRtmpStream(src.stream);
-  }
-  else {
+  } else {
     // Make sure source URL is abosolute.
     src = vjs.getAbsoluteURL(src);
     this.el_.vjs_src(src);
@@ -254,8 +284,8 @@ vjs.Flash.prototype.currentSrc = function(){
   var src = this.el_.vjs_getProperty('currentSrc');
   // no src, check and see if RTMP
   if (src == null) {
-    var connection = this.rtmpConnection(),
-        stream = this.rtmpStream();
+    var connection = this['rtmpConnection'](),
+        stream = this['rtmpStream']();
 
     if (connection && stream) {
       src = vjs.Flash.streamFromParts(connection, stream);
@@ -270,6 +300,9 @@ vjs.Flash.prototype.load = function(){
 
 vjs.Flash.prototype.poster = function(){
   this.el_.vjs_getProperty('poster');
+};
+vjs.Flash.prototype.setPoster = function(){
+  // poster images are not handled by the Flash tech so make this a no-op
 };
 
 vjs.Flash.prototype.buffered = function(){
@@ -287,12 +320,13 @@ vjs.Flash.prototype.enterFullScreen = function(){
 
 // Create setters and getters for attributes
 var api = vjs.Flash.prototype,
-    readWrite = 'rtmpConnection,rtmpStream,preload,currentTime,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted'.split(','),
-    readOnly = 'error,currentSrc,networkState,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight,textTracks'.split(',');
-    // Overridden: buffered
+    readWrite = 'rtmpConnection,rtmpStream,preload,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted'.split(','),
+    readOnly = 'error,networkState,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight,textTracks'.split(',');
+    // Overridden: buffered, currentTime, currentSrc
 
 /**
  * @this {*}
+ * @private
  */
 var createSetter = function(attr){
   var attrUpper = attr.charAt(0).toUpperCase() + attr.slice(1);
@@ -301,6 +335,7 @@ var createSetter = function(attr){
 
 /**
  * @this {*}
+ * @private
  */
 var createGetter = function(attr){
   api[attr] = function(){ return this.el_.vjs_getProperty(attr); };
@@ -328,7 +363,16 @@ vjs.Flash.isSupported = function(){
 };
 
 vjs.Flash.canPlaySource = function(srcObj){
-  if (srcObj.type in vjs.Flash.formats || srcObj.type in vjs.Flash.streamingFormats) { return 'maybe'; }
+  var type;
+
+  if (!srcObj.type) {
+    return '';
+  }
+
+  type = srcObj.type.replace(/;.*/,'').toLowerCase();
+  if (type in vjs.Flash.formats || type in vjs.Flash.streamingFormats) {
+    return 'maybe';
+  }
 };
 
 vjs.Flash.formats = {

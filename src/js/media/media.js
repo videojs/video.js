@@ -12,6 +12,10 @@
 vjs.MediaTechController = vjs.Component.extend({
   /** @constructor */
   init: function(player, options, ready){
+    options = options || {};
+    // we don't want the tech to report user activity automatically.
+    // This is done manually in addControlsListeners
+    options.reportTouchActivity = false;
     vjs.Component.call(this, player, options, ready);
 
     this.initControlsListeners();
@@ -60,7 +64,7 @@ vjs.MediaTechController.prototype.initControlsListeners = function(){
 };
 
 vjs.MediaTechController.prototype.addControlsListeners = function(){
-  var preventBubble, userWasActive;
+  var userWasActive;
 
   // Some browsers (Chrome & IE) don't trigger a click on a flash swf, but do
   // trigger mousedown/up.
@@ -68,37 +72,20 @@ vjs.MediaTechController.prototype.addControlsListeners = function(){
   // Any touch events are set to block the mousedown event from happening
   this.on('mousedown', this.onClick);
 
-  // We need to block touch events on the video element from bubbling up,
-  // otherwise they'll signal activity prematurely. The specific use case is
-  // when the video is playing and the controls have faded out. In this case
-  // only a tap (fast touch) should toggle the user active state and turn the
-  // controls back on. A touch and move or touch and hold should not trigger
-  // the controls (per iOS as an example at least)
-  //
-  // We always want to stop propagation on touchstart because touchstart
-  // at the player level starts the touchInProgress interval. We can still
-  // report activity on the other events, but won't let them bubble for
-  // consistency. We don't want to bubble a touchend without a touchstart.
+  // If the controls were hidden we don't want that to change without a tap event
+  // so we'll check if the controls were already showing before reporting user
+  // activity
   this.on('touchstart', function(event) {
     // Stop the mouse events from also happening
     event.preventDefault();
-    event.stopPropagation();
-    // Record if the user was active now so we don't have to keep polling it
     userWasActive = this.player_.userActive();
   });
 
-  preventBubble = function(event){
-    event.stopPropagation();
-    if (userWasActive) {
-      this.player_.reportUserActivity();
+  this.on('touchmove', function(event) {
+    if (userWasActive){
+      this.player().reportUserActivity();
     }
-  };
-
-  // Treat all touch events the same for consistency
-  this.on('touchmove', preventBubble);
-  this.on('touchleave', preventBubble);
-  this.on('touchcancel', preventBubble);
-  this.on('touchend', preventBubble);
+  });
 
   // Turn on component tap events
   this.emitTapEvents();
@@ -148,10 +135,17 @@ vjs.MediaTechController.prototype.onClick = function(event){
  * Handle a tap on the media element. By default it will toggle the user
  * activity state, which hides and shows the controls.
  */
-
 vjs.MediaTechController.prototype.onTap = function(){
   this.player().userActive(!this.player().userActive());
 };
+
+/**
+ * Provide a default setPoster method for techs
+ *
+ * Poster support for techs should be optional, so we don't want techs to
+ * break if they don't have a way to set a poster.
+ */
+vjs.MediaTechController.prototype.setPoster = function(){};
 
 vjs.MediaTechController.prototype.features = {
   'volumeControl': true,

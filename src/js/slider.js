@@ -1,7 +1,8 @@
 /* Slider
 ================================================================================ */
 /**
- * Parent for seek bar and volume slider
+ * The base functionality for sliders like the volume bar and seek bar
+ *
  * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
@@ -15,8 +16,6 @@ vjs.Slider = vjs.Component.extend({
     this.bar = this.getChild(this.options_['barName']);
     this.handle = this.getChild(this.options_['handleName']);
 
-    player.on(this.playerEvent, vjs.bind(this, this.update));
-
     this.on('mousedown', this.onMouseDown);
     this.on('touchstart', this.onMouseDown);
     this.on('focus', this.onFocus);
@@ -25,10 +24,7 @@ vjs.Slider = vjs.Component.extend({
 
     this.player_.on('controlsvisible', vjs.bind(this, this.update));
 
-    // This is actually to fix the volume handle position. http://twitter.com/#!/gerritvanaaken/status/159046254519787520
-    // this.player_.one('timeupdate', vjs.bind(this, this.update));
-
-    player.ready(vjs.bind(this, this.update));
+    player.on(this.playerEvent, vjs.bind(this, this.update));
 
     this.boundEvents = {};
   }
@@ -39,7 +35,7 @@ vjs.Slider.prototype.createEl = function(type, props) {
   // Add the slider element class to all sub classes
   props.className = props.className + ' vjs-slider';
   props = vjs.obj.merge({
-    role: 'slider',
+    'role': 'slider',
     'aria-valuenow': 0,
     'aria-valuemin': 0,
     'aria-valuemax': 100,
@@ -212,7 +208,9 @@ vjs.SliderHandle = vjs.Component.extend();
 
 /**
  * Default value of the slider
+ *
  * @type {Number}
+ * @private
  */
 vjs.SliderHandle.prototype.defaultValue = 0;
 

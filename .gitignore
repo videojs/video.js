@@ -1,6 +1,7 @@
 .DS_Store
 dist/*
 build/files/*
+docs/api/*
 dev.html
 projects
 .zenflow-log
@@ -14,7 +15,13 @@ npm-debug.log
 sandbox/*
 !sandbox/*.example
 
+# ignore any Karma conf.js files in the test/ directory
+test/*.conf.js
+
 *.swp
 *.swo
 
 *.orig
+
+*results.xml
+*.log

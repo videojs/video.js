@@ -108,7 +108,6 @@ test('should get tag, source, and track settings', function(){
 
   player.dispose();
 
-
   ok(tag['player'] !== player, 'tag player ref killed');
   ok(!vjs.players['example_1'], 'global player ref killed');
   ok(player.el() === null, 'player el killed');
@@ -141,7 +140,7 @@ test('should not force width and height', function() {
   player.dispose();
 });
 
-test('should accept options from multiple sources and override in correct order', function(){
+test('should wrap the original tag in the player div', function(){
   var tag = PlayerTest.makeTag();
   var container = document.createElement('div');
   var fixture = document.getElementById('qunit-fixture');
@@ -159,19 +158,26 @@ test('should accept options from multiple sources and override in correct order'
   player.dispose();
 });
 
-test('should transfer the poster attribute unmodified', function(){
-  var tag, fixture, poster, player;
+test('should set and update the poster value', function(){
+  var tag, poster, updatedPoster, player;
+
   poster = 'http://example.com/poster.jpg';
+  updatedPoster = 'http://example.com/updated-poster.jpg';
+
   tag = PlayerTest.makeTag();
   tag.setAttribute('poster', poster);
-  fixture = document.getElementById('qunit-fixture');
 
-  fixture.appendChild(tag);
-  player = new vjs.Player(tag, {
-    'techOrder': ['mediaFaker']
+  player = PlayerTest.makePlayer({}, tag);
+  equal(player.poster(), poster, 'the poster property should equal the tag attribute');
+
+  var pcEmitted = false;
+  player.on('posterchange', function(){
+    pcEmitted = true;
   });
 
-  equal(player.tech.el().poster, poster, 'the poster attribute should not be removed');
+  player.poster(updatedPoster);
+  ok(pcEmitted, 'posterchange event was emitted');
+  equal(player.poster(), updatedPoster, 'the updated poster is returned');
 
   player.dispose();
 });
@@ -246,7 +252,7 @@ test('should set controls and trigger events', function() {
 //   var player = PlayerTest.makePlayer();
 //   player.on('fullscreenchange', function(){
 //     ok(true, 'fullscreenchange event fired');
-//     ok(this.isFullScreen === true, 'isFullScreen is true');
+//     ok(this.isFullScreen() === true, 'isFullScreen is true');
 //     ok(this.el().className.indexOf('vjs-fullscreen') !== -1, 'vjs-fullscreen class added');
 
 //     player.dispose();
@@ -349,4 +355,50 @@ test('should use custom message when encountering an unsupported video type',
   equal(incompatibilityMessage.innerHTML.toLowerCase(), 'video no go <a href="">link</a>');
 
   player.dispose();
+});
+
+test('should register players with generated ids', function(){
+  var fixture, video, player, id;
+  fixture = document.getElementById('qunit-fixture');
+
+  video = document.createElement('video');
+  video.className = 'vjs-default-skin video-js';
+  fixture.appendChild(video);
+
+  player = new vjs.Player(video);
+  id = player.el().id;
+
+  equal(player.el().id, player.id(), 'the player and element ids are equal');
+  ok(vjs.players[id], 'the generated id is registered');
+});
+
+test('should not add multiple first play events despite subsequent loads', function() {
+  expect(1);
+
+  var player = PlayerTest.makePlayer({});
+
+  player.on('firstplay', function(){
+    ok('First play should fire once.');
+  });
+
+  // Checking to make sure onLoadStart removes first play listener before adding a new one.
+  player.trigger('loadstart');
+  player.trigger('loadstart');
+  player.trigger('play');
+});
+
+test('should remove vjs-has-started class', function(){
+  expect(3);
+
+  var player = PlayerTest.makePlayer({});
+
+  player.trigger('loadstart');
+  player.trigger('play');
+  ok(player.el().className.indexOf('vjs-has-started') !== -1, 'vjs-has-started class added');
+
+  player.trigger('loadstart');
+  ok(player.el().className.indexOf('vjs-has-started') === -1, 'vjs-has-started class removed');
+
+  player.trigger('play');
+  ok(player.el().className.indexOf('vjs-has-started') !== -1, 'vjs-has-started class added again');
 });

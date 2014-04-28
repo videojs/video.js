@@ -148,6 +148,16 @@ grunt
 grunt test
 ```
 
+Video.js is also configured to run tests with Karma. Karma is installed as a grunt plugin to run QUnit tests in real browsers, as opposed to simply running the tests in phantomjs, a headless browser. 
+
+To run the QUnit test suite in Karma, do the following: 
+1. Copy test/karma.conf.js.example and rename the copy test/karma.conf.js.  Please note that if you decide to name the file something other than karma.conf.js, or if you decide to change the location of your conf.js file from the test/ folder, you will need to change references to karma.conf.js in Gruntfile and .gitignore to your new file name and location, so that you don't inadvertently add your conf.js file to any of your video.js pull requests.
+2. Open test/karma.conf.js in an editor, and configure the properties in it as desired.  At a minimum, you'll want to add the browsers that you want to run your tests in.  The karma.conf.js.example file has detailed information on usage in the file itself. 
+After you've configured the desired properties in your karma.conf.js, run:
+```bash
+grunt karma:dev
+```
+
 At this point you should have a built copy of video.js in a directory named `dist`, and all tests should be passing.
 
 ### Making Changes
@@ -173,14 +183,23 @@ cp sandbox/index.html.example sandbox/index.html
 open sandbox/index.html
 ```
 
-> #### NOTE: Testing Flash Locally in Chrome
-> Chrome 21+ (as of 2013/01/01) doens't run Flash files that are local and loaded into a locally accessed page (file:///).
+
+### Testing Locally
+A simple Connect server is available via the Grunt plugin. The commands below will allow you to setup a test sandbox and begin development.
+
+```bash
+cp sandbox/index.html.example sandbox/index.html
+grunt connect
+open http://localhost:9999/sandbox/index.html
+```
+
+> NOTES regarding local testing in Chrome 21+ (as of 2013/01/01)
+> Flash files that are local and loaded into a locally accessed page (file:///) will NOT run.
 > To get around this you can do either of the following:
 >
-> 1. Do your development and testing using a local HTTP server.
+> 1. Do your development and testing using a local HTTP server. See Grunt commands above.
 >
 > 2. [Disable the version of Flash included with Chrome](http://helpx.adobe.com/flash-player/kb/flash-player-google-chrome.html#How_can_I_run_debugger_or_alternate_versions_of_Flash_Player_in_Google_Chrome) and enable a system-wide version of Flash instead.
-
 
 Commit and push changes as you go (using git directly). Write thorough descriptions of your changes in your commit messages.
 

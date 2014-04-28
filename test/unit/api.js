@@ -4,32 +4,99 @@ test('should be able to access expected player API methods', function() {
   var player = PlayerTest.makePlayer();
 
   // Native HTML5 Methods
-  ok(player.play, 'play exists');
-  ok(player.pause, 'pause exists');
-  ok(player.paused, 'paused exists');
+  ok(player.error, 'error exists');
   ok(player.src, 'src exists');
+  ok(player.currentSrc, 'currentSrc exists');
+  ok(player.buffered, 'buffered exists');
+  ok(player.load, 'load exists');
+  ok(player.seeking, 'seeking exists');
   ok(player.currentTime, 'currentTime exists');
   ok(player.duration, 'duration exists');
-  ok(player.buffered, 'buffered exists');
+  ok(player.paused, 'paused exists');
+  ok(player.ended, 'ended exists');
+  ok(player.autoplay, 'autoplay exists');
+  ok(player.loop, 'loop exists');
+  ok(player.play , 'play exists');
+  ok(player.pause , 'pause exists');
+  ok(player.controls, 'controls exists');
   ok(player.volume, 'volume exists');
   ok(player.muted, 'muted exists');
   ok(player.width, 'width exists');
   ok(player.height, 'height exists');
+  ok(player.poster, 'poster exists');
+  ok(player.textTracks, 'textTracks exists');
   ok(player.requestFullScreen, 'requestFullScreen exists');
   ok(player.cancelFullScreen, 'cancelFullScreen exists');
 
-  // Added player methods
-  ok(player.ready, 'ready exists');
-  ok(player.on, 'on exists');
-  ok(player.off, 'off exists');
-  ok(player.one, 'one exists');
+  // Unsupported Native HTML5 Methods
+  // ok(player.canPlayType, 'canPlayType exists');
+  // ok(player.readyState, 'readyState exists');
+  // ok(player.networkState, 'networkState exists');
+  // ok(player.startTime, 'startTime exists');
+  // ok(player.defaultPlaybackRate, 'defaultPlaybackRate exists');
+  // ok(player.playbackRate, 'playbackRate exists');
+  // ok(player.played, 'played exists');
+  // ok(player.seekable, 'seekable exists');
+  // ok(player.videoWidth, 'videoWidth exists');
+  // ok(player.videoHeight, 'videoHeight exists');
+
+  // Additional player methods
   ok(player.bufferedPercent, 'bufferedPercent exists');
-  ok(player.dimensions, 'dimensions exists');
-  ok(player.addClass, 'addClass exists');
-  ok(player.removeClass, 'removeClass exists');
+  ok(player.reportUserActivity, 'reportUserActivity exists');
+  ok(player.userActive, 'userActive exists');
   ok(player.usingNativeControls, 'usingNativeControls exists');
+  ok(player.isFullScreen, 'isFullScreen exists');
 
   player.dispose();
+});
+
+test('should be able to access expected component API methods', function() {
+  var comp = videojs.Component.create({ id: function(){ return 1; }, reportUserActivity: function(){} });
+
+  // Component methods
+  ok(comp.player, 'player exists');
+  ok(comp.options, 'options exists');
+  ok(comp.init, 'init exists');
+  ok(comp.dispose, 'dispose exists');
+  ok(comp.createEl, 'createEl exists');
+  ok(comp.contentEl, 'contentEl exists');
+  ok(comp.el, 'el exists');
+  ok(comp.addChild, 'addChild exists');
+  ok(comp.getChild, 'getChild exists');
+  ok(comp.getChildById, 'getChildById exists');
+  ok(comp.children, 'children exists');
+  ok(comp.initChildren, 'initChildren exists');
+  ok(comp.removeChild, 'removeChild exists');
+  ok(comp.on, 'on exists');
+  ok(comp.off, 'off exists');
+  ok(comp.one, 'one exists');
+  ok(comp.trigger, 'trigger exists');
+  ok(comp.triggerReady, 'triggerReady exists');
+  ok(comp.show, 'show exists');
+  ok(comp.hide, 'hide exists');
+  ok(comp.width, 'width exists');
+  ok(comp.height, 'height exists');
+  ok(comp.dimensions, 'dimensions exists');
+  ok(comp.ready, 'ready exists');
+  ok(comp.addClass, 'addClass exists');
+  ok(comp.removeClass, 'removeClass exists');
+  ok(comp.buildCSSClass, 'buildCSSClass exists');
+});
+
+test('should be able to access expected MediaTech API methods', function() {
+  var techProto = videojs.MediaTechController.prototype;
+  var html5Proto = videojs.Html5.prototype;
+  var flashProto = videojs.Flash.prototype;
+
+  ok(techProto.setPoster, 'setPoster should exist on the Media tech');
+  ok(html5Proto.setPoster, 'setPoster should exist on the HTML5 tech');
+  ok(flashProto.setPoster, 'setPoster should exist on the Flash tech');
+
+  ok(videojs.Html5.patchCanPlayType, 'patchCanPlayType should exist for HTML5');
+  ok(videojs.Html5.unpatchCanPlayType, 'unpatchCanPlayType should exist for HTML5');
+
+  ok(videojs.Html5.canPlaySource, 'canPlaySource should exist for HTML5');
+  ok(videojs.Flash.canPlaySource, 'canPlaySource should exist for Flash');
 });
 
 test('should export ready api call to public', function() {
@@ -44,6 +111,7 @@ test('should export ready api call to public', function() {
 });
 
 test('should export useful components to the public', function () {
+  ok(videojs.TOUCH_ENABLED !== undefined, 'Touch detection should be public');
   ok(videojs.ControlBar, 'ControlBar should be public');
   ok(videojs.Button, 'Button should be public');
   ok(videojs.PlayToggle, 'PlayToggle should be public');
@@ -70,6 +138,9 @@ test('should export useful components to the public', function () {
   ok(videojs.Menu, 'Menu should be public');
   ok(videojs.MenuItem, 'MenuItem should be public');
   ok(videojs.MenuButton, 'MenuButton should be public');
+
+  ok(videojs.util, 'util namespace should be public');
+  ok(videojs.util.mergeOptions, 'mergeOptions should be public');
 });
 
 test('should be able to initialize player twice on the same tag using string reference', function() {
@@ -90,7 +161,7 @@ test('should be able to initialize player twice on the same tag using string ref
   player.dispose();
 });
 
-test('videojs.players should be availble after minification', function() {
+test('videojs.players should be available after minification', function() {
   var videoTag = PlayerTest.makeTag();
   var id = videoTag.id;
 
@@ -101,4 +172,41 @@ test('videojs.players should be availble after minification', function() {
   ok(videojs.players[id] === player, 'videojs.players is available');
 
   player.dispose();
+});
+
+// NOTE: This test could be removed after we've landed on a permanent
+// externs/exports strategy. See comment on videojs/video.js#853
+test('fullscreenToggle does not depend on minified player methods', function(){
+  var noop, player, fullscreen, requestFullScreen, cancelFullScreen, isFullScreen_;
+  noop = function(){};
+  requestFullScreen = false;
+  cancelFullScreen = false;
+  player = {
+    id: noop,
+    on: noop,
+    ready: noop,
+    reportUserActivity: noop
+  };
+
+  player['requestFullScreen'] = function(){
+    requestFullScreen = true;
+  };
+  player['cancelFullScreen'] = function(){
+    cancelFullScreen = true;
+  };
+
+  isFullScreen_ = false;
+  player['isFullScreen'] = function(){
+    return isFullScreen_;
+  };
+
+  fullscreen = new videojs.FullscreenToggle(player);
+  fullscreen.trigger('click');
+
+  ok(requestFullScreen, 'requestFullScreen called');
+
+  isFullScreen_ = true;
+  fullscreen.trigger('click');
+
+  ok(cancelFullScreen, 'cancelFullScreen called');
 });

@@ -95,8 +95,12 @@ The control icons are from a custom font. Each icon corresponds to a character
 @fullscreen-exit-icon: "\e00b";
 @square-icon: "\e009";
 @spinner-icon: "\e00a";
+@spinner2-icon: "\e00d";
+@spinner3-icon: "\e01e";
+@spinner4-icon: "\e01f";
 @subtitles-icon: "\e00c";
 @captions-icon: "\e008";
+@share-icon: "\e00e";
 
 /* Base UI Component Classes
 --------------------------------------------------------------------------------
@@ -299,6 +303,8 @@ fonts to show/hide properly.
   top: 0;
   left: 0;
   height: 0.5em;
+  /* assuming volume starts at 1.0 */
+  width: 100%;
 
   background: @slider-bar-color
     url(@slider-bar-pattern)
@@ -307,6 +313,10 @@ fonts to show/hide properly.
 .vjs-default-skin .vjs-volume-bar .vjs-volume-handle {
   width: 0.5em;
   height: 0.5em;
+  /* Assumes volume starts at 1.0. If you change the size of the
+     handle relative to the volume bar, you'll need to update this value
+     too. */
+  left: 4.5em;
 }
 
 .vjs-default-skin .vjs-volume-handle:before {
@@ -364,6 +374,8 @@ fonts to show/hide properly.
   height: 100%;
   margin: 0;
   padding: 0;
+  /* updated by javascript during playback */
+  width: 0;
   /* Needed for IE6 *///
   left: 0;
   top: 0;
@@ -394,6 +406,27 @@ fonts to show/hide properly.
 
 .vjs-default-skin .vjs-seek-handle:before {
   padding-top: 0.1em /* Minor adjustment */;
+}
+
+/* Live Mode
+--------------------------------------------------------------------------------
+*/
+.vjs-default-skin.vjs-live .vjs-time-controls,
+.vjs-default-skin.vjs-live .vjs-time-divider,
+.vjs-default-skin.vjs-live .vjs-progress-control {
+  display: none;
+}
+.vjs-default-skin.vjs-live .vjs-live-display {
+  display: block;
+}
+
+/* Live Display
+--------------------------------------------------------------------------------
+*/
+.vjs-default-skin .vjs-live-display {
+  display: none;
+  font-size: 1em;
+  line-height: 3em;
 }
 
 /* Time Display
@@ -460,6 +493,15 @@ easily in the skin designer. http://designer.videojs.com/
   .transition(all 0.4s);
 }
 
+/* Optionally center */
+.vjs-default-skin.vjs-big-play-centered .vjs-big-play-button {
+  @total-width: @big-play-width + (@big-play-border-width * 2);
+  @total-height: @big-play-height + (@big-play-border-width * 2);
+
+  .absolute-align(center, @big-play-margin, @total-width);
+  .absolute-align(middle, @big-play-margin, @total-height);
+}
+
 /* Hide if controls are disabled */
 .vjs-default-skin.vjs-controls-disabled .vjs-big-play-button {
   display: none;
@@ -510,7 +552,7 @@ easily in the skin designer. http://designer.videojs.com/
   top: 50%;
   left: 50%;
 
-  font-size: 5em;
+  font-size: 4em;
   line-height: 1;
 
   width: 1em;
@@ -525,7 +567,7 @@ easily in the skin designer. http://designer.videojs.com/
 }
 
 .vjs-default-skin .vjs-loading-spinner:before {
-  content: @spinner-icon;
+  content: @spinner3-icon;
   font-family: VideoJS;
 
   position: absolute;
@@ -757,6 +799,12 @@ body.vjs-full-window {
   left: 1em;
   right: 1em;
 }
+
+/* Move captions down when controls aren't being shown */
+.video-js.vjs-user-inactive.vjs-playing .vjs-text-track-display {
+  bottom: 1em;
+}
+
 /* Individual tracks */
 .video-js .vjs-text-track {
   display: none;

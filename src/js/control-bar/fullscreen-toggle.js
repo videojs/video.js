@@ -2,10 +2,15 @@
  * Toggle fullscreen video
  * @param {vjs.Player|Object} player
  * @param {Object=} options
- * @constructor
+ * @class
+ * @extends vjs.Button
  */
 vjs.FullscreenToggle = vjs.Button.extend({
-  /** @constructor */
+  /**
+   * @constructor
+   * @memberof vjs.FullscreenToggle
+   * @instance
+   */
   init: function(player, options){
     vjs.Button.call(this, player, options);
   }
@@ -18,7 +23,7 @@ vjs.FullscreenToggle.prototype.buildCSSClass = function(){
 };
 
 vjs.FullscreenToggle.prototype.onClick = function(){
-  if (!this.player_.isFullScreen) {
+  if (!this.player_.isFullScreen()) {
     this.player_.requestFullScreen();
     this.el_.children[0].children[0].innerHTML = 'Non-Fullscreen'; // change the button text to "Non-Fullscreen"
   } else {

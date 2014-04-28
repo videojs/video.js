@@ -1,5 +1,52 @@
 /**
  * Core Object/Class for objects that use inheritance + contstructors
+ *
+ * To create a class that can be subclassed itself, extend the CoreObject class.
+ *
+ *     var Animal = CoreObject.extend();
+ *     var Horse = Animal.extend();
+ *
+ * The constructor can be defined through the init property of an object argument.
+ *
+ *     var Animal = CoreObject.extend({
+ *       init: function(name, sound){
+ *         this.name = name;
+ *       }
+ *     });
+ *
+ * Other methods and properties can be added the same way, or directly to the
+ * prototype.
+ *
+ *    var Animal = CoreObject.extend({
+ *       init: function(name){
+ *         this.name = name;
+ *       },
+ *       getName: function(){
+ *         return this.name;
+ *       },
+ *       sound: '...'
+ *    });
+ *
+ *    Animal.prototype.makeSound = function(){
+ *      alert(this.sound);
+ *    };
+ *
+ * To create an instance of a class, use the create method.
+ *
+ *    var fluffy = Animal.create('Fluffy');
+ *    fluffy.getName(); // -> Fluffy
+ *
+ * Methods and properties can be overridden in subclasses.
+ *
+ *     var Horse = Animal.extend({
+ *       sound: 'Neighhhhh!'
+ *     });
+ *
+ *     var horsey = Horse.create('Horsey');
+ *     horsey.getName(); // -> Horsey
+ *     horsey.makeSound(); // -> Alert: Neighhhhh!
+ *
+ * @class
  * @constructor
  */
 vjs.CoreObject = vjs['CoreObject'] = function(){};
@@ -11,9 +58,13 @@ vjs.CoreObject = vjs['CoreObject'] = function(){};
 
 /**
  * Create a new object that inherits from this Object
+ *
+ *     var Animal = CoreObject.extend();
+ *     var Horse = Animal.extend();
+ *
  * @param {Object} props Functions and properties to be applied to the
  *                       new object's prototype
- * @return {vjs.CoreObject} Returns an object that inherits from CoreObject
+ * @return {vjs.CoreObject} An object that inherits from CoreObject
  * @this {*}
  */
 vjs.CoreObject.extend = function(props){
@@ -60,7 +111,10 @@ vjs.CoreObject.extend = function(props){
 
 /**
  * Create a new instace of this Object class
- * @return {vjs.CoreObject} Returns an instance of a CoreObject subclass
+ *
+ *     var myAnimal = Animal.create();
+ *
+ * @return {vjs.CoreObject} An instance of a CoreObject subclass
  * @this {*}
  */
 vjs.CoreObject.create = function(){

@@ -46,3 +46,53 @@ test('test isStreamingSrc', function() {
   ok(!isStreamingSrc('https://streaming.is/fun'));
   ok(!isStreamingSrc('file://streaming.is/fun'));
 });
+
+test('test canPlaySource', function() {
+  var canPlaySource = vjs.Flash.canPlaySource;
+
+  // supported
+  ok(canPlaySource({ type: 'video/mp4; codecs=avc1.42E01E,mp4a.40.2' }), 'codecs supported');
+  ok(canPlaySource({ type: 'video/mp4' }), 'video/mp4 supported');
+  ok(canPlaySource({ type: 'video/x-flv' }), 'video/x-flv supported');
+  ok(canPlaySource({ type: 'video/flv' }), 'video/flv supported');
+  ok(canPlaySource({ type: 'video/m4v' }), 'video/m4v supported');
+  ok(canPlaySource({ type: 'VIDEO/FLV' }), 'capitalized mime type');
+
+  // not supported
+  ok(!canPlaySource({ type: 'video/webm; codecs="vp8, vorbis"' }));
+  ok(!canPlaySource({ type: 'video/webm' }));
+});
+
+test('currentTime is the seek target during seeking', function() {
+  var noop = function() {},
+      seeking = false,
+      parentEl = document.createElement('div'),
+      tech = new vjs.Flash({
+        id: noop,
+        on: noop,
+        options_: {}
+      }, {
+        'parentEl': parentEl
+      }),
+      currentTime;
+
+  tech.el().vjs_setProperty = function(property, value) {
+    if (property === 'currentTime') {
+      currentTime = value;
+    }
+  };
+  tech.el().vjs_getProperty = function(name) {
+    if (name === 'currentTime') {
+      return currentTime;
+    } else if (name === 'seeking') {
+      return seeking;
+    }
+  };
+
+  currentTime = 3;
+  strictEqual(3, tech.currentTime(), 'currentTime is retreived from the SWF');
+
+  tech['setCurrentTime'](7);
+  seeking = true;
+  strictEqual(7, tech.currentTime(), 'during seeks the target time is returned');
+});

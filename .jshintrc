@@ -18,7 +18,10 @@
         "goog",
         "console",
 
-        "require",        
+        "require",
+        "define",
+        "module",
+        "exports",
 
         "PlayerTest",
         "asyncTest",

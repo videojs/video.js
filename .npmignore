@@ -1,0 +1,3 @@
+# Exclude everything but the contents of the dist directory.
+**/*
+!dist/**

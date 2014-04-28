@@ -13,6 +13,7 @@
  * @param  {Element|Object}   elem Element or object to bind listeners to
  * @param  {String}   type Type of event to bind to.
  * @param  {Function} fn   Event listener.
+ * @private
  */
 vjs.on = function(elem, type, fn){
   var data = vjs.getData(elem);
@@ -65,6 +66,7 @@ vjs.on = function(elem, type, fn){
  * @param  {Element|Object}   elem Object to remove listeners from
  * @param  {String=}   type Type of listener to remove. Don't include to remove all events from element.
  * @param  {Function} fn   Specific listener to remove. Don't incldue to remove listeners for an event type.
+ * @private
  */
 vjs.off = function(elem, type, fn) {
   // Don't want to add a cache object through getData if not needed
@@ -114,6 +116,7 @@ vjs.off = function(elem, type, fn) {
  * Clean up the listener cache and dispatchers
  * @param  {Element|Object} elem Element to clean up
  * @param  {String} type Type of event to clean up
+ * @private
  */
 vjs.cleanUpEvents = function(elem, type) {
   var data = vjs.getData(elem);
@@ -153,6 +156,7 @@ vjs.cleanUpEvents = function(elem, type) {
  * Fix a native event to have standard property values
  * @param  {Object} event Event object to fix
  * @return {Object}
+ * @private
  */
 vjs.fixEvent = function(event) {
 
@@ -175,8 +179,13 @@ vjs.fixEvent = function(event) {
     // TODO: Probably best to create a whitelist of event props
     for (var key in old) {
       // Safari 6.0.3 warns you if you try to copy deprecated layerX/Y
-      if (key !== 'layerX' && key !== 'layerY') {
-        event[key] = old[key];
+      // Chrome warns you if you try to copy deprecated keyboardEvent.keyLocation
+      if (key !== 'layerX' && key !== 'layerY' && key !== 'keyboardEvent.keyLocation') {
+        // Chrome 32+ warns if you try to copy deprecated returnValue, but
+        // we still want to if preventDefault isn't supported (IE8).
+        if (!(key == 'returnValue' && old.preventDefault)) {
+          event[key] = old[key];
+        }
       }
     }
 
@@ -197,9 +206,11 @@ vjs.fixEvent = function(event) {
       }
       event.returnValue = false;
       event.isDefaultPrevented = returnTrue;
+      event.defaultPrevented = true;
     };
 
     event.isDefaultPrevented = returnFalse;
+    event.defaultPrevented = false;
 
     // Stop the event from bubbling
     event.stopPropagation = function () {
@@ -255,6 +266,7 @@ vjs.fixEvent = function(event) {
  * Trigger an event for an element
  * @param  {Element|Object} elem  Element to trigger an event on
  * @param  {String} event Type of event to trigger
+ * @private
  */
 vjs.trigger = function(elem, event) {
   // Fetches element data and a reference to the parent (for bubbling).
@@ -278,12 +290,12 @@ vjs.trigger = function(elem, event) {
   }
 
   // Unless explicitly stopped or the event does not bubble (e.g. media events)
-  // recursively calls this function to bubble the event up the DOM.
-  if (parent && !event.isPropagationStopped() && event.bubbles !== false) {
+    // recursively calls this function to bubble the event up the DOM.
+    if (parent && !event.isPropagationStopped() && event.bubbles !== false) {
     vjs.trigger(parent, event);
 
   // If at the top of the DOM, triggers the default action unless disabled.
-  } else if (!parent && !event.isDefaultPrevented()) {
+  } else if (!parent && !event.defaultPrevented) {
     var targetData = vjs.getData(event.target);
 
     // Checks if the target has a default action for this event.
@@ -300,7 +312,7 @@ vjs.trigger = function(elem, event) {
   }
 
   // Inform the triggerer if the default was prevented by returning false
-  return !event.isDefaultPrevented();
+  return !event.defaultPrevented;
   /* Original version of js ninja events wasn't complete.
    * We've since updated to the latest version, but keeping this around
    * for now just in case.
@@ -325,9 +337,9 @@ vjs.trigger = function(elem, event) {
 /**
  * Trigger a listener only once for an event
  * @param  {Element|Object}   elem Element or object to
- * @param  {[type]}   type [description]
- * @param  {Function} fn   [description]
- * @return {[type]}
+ * @param  {String}   type
+ * @param  {Function} fn
+ * @private
  */
 vjs.one = function(elem, type, fn) {
   var func = function(){
