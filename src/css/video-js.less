@@ -827,6 +827,26 @@ body.vjs-full-window {
   visibility: visible;
 }
 
+/*  In IE8 w/ no JavaScript (no HTML5 shim), the video tag doesn't register.
+    The .video-js classname on the video tag also isn't considered.
+    This optional paragraph inside the video tag can provide a message to users
+    about what's required to play video. */
+.vjs-no-js {
+  padding: 20px;
+  color: #ccc;
+  background-color: #333;
+  font-size: 18px;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  width: 300px;
+  height: 150px;
+  margin: 0px auto;
+}
+
+.vjs-no-js a, .vjs-no-js a:visited {
+  color: #F4A460;
+}
+
 // MIXINS
 // =============================================================================
 // Mixins are a LESS feature and are used to add vendor prefixes to CSS rules
