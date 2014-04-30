@@ -135,9 +135,6 @@ module.exports = function(grunt) {
       }
     },
     karma: {
-      options: {
-        configFile: 'test/localkarma.conf.js'
-      },
       saucelabs: {
         configFile: 'test/karma.conf.js'
       },
