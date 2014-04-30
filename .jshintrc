@@ -22,6 +22,7 @@
         "define",
         "module",
         "exports",
+        "process",
 
         "PlayerTest",
         "asyncTest",
