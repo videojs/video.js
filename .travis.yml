@@ -1,8 +1,8 @@
 language: node_js
 node_js:
 - 0.10
-before_script:
-- '[ "$TRAVIS_PULL_REQUEST" = "false" ] && curl https://gist.githubusercontent.com/santiycr/5139565/raw/sauce_connect_setup.sh | bash'
+script:
+- test $TRAVIS_PULL_REQUEST == "false" && curl https://gist.githubusercontent.com/santiycr/5139565/raw/sauce_connect_setup.sh | bash
 notifications:
   irc:
     channels:
