@@ -95,8 +95,6 @@ module.exports = function(config) {
       'karma-sauce-launcher'
     ],
 
-    // test results reporter to use
-    // possible values: 'dots', 'progress', 'junit'
     reporters: ['dots'],
 
     // web server port
@@ -105,14 +103,18 @@ module.exports = function(config) {
     // cli runner port
     runnerPort: 9100,
 
-    // enable / disable colors in the output (reporters and logs)
     colors: true,
 
-    // level of logging
-    // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
     logLevel: config.LOG_INFO,
 
-    // If browser does not capture in given timeout [ms], kill it
-    captureTimeout: 60000
+    captureTimeout: 60000,
+
+    sauceLabs: {
+      startConnect: true,
+      tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
+      build: process.env.TRAVIS_BUILD_NUMBER,
+      testName: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH,
+      recordScreenshots: false
+    }
   });
 };
