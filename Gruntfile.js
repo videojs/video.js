@@ -254,11 +254,8 @@ module.exports = function(grunt) {
   grunt.registerTask('test-qunit', ['jshint', 'less', 'build', 'minify', 'usebanner', 'qunit']);
 
   // The test task will run `karma:saucelabs` when running in travis,
-  // otherwise, it'll default to running karma in chrome.
-  // You can specify which browsers to build with by using grunt-style arguments
-  // or separating them with a comma:
-  //   grunt test:chrome:firefox  # grunt-style
-  //   grunt test:chrome,firefox  # comma-separated
+  // when running via a PR from a fork, it'll run qunit tests in phantom using karma
+  // otherwise, it'll run the tests in chrome via karma
   grunt.registerTask('test', function() {
     var tasks = this.args;
 
