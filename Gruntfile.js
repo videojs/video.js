@@ -139,12 +139,27 @@ module.exports = function(grunt) {
         configFile: 'test/karma.conf.js'
       },
       local: {
+        browsers: ['Chrome'],
         configFile: 'test/localkarma.conf.js'
       },
       minified: {
+        browsers: ['Chrome'],
         configFile: 'test/localkarma.minified.conf.js'
       },
       minifiedapi: {
+        browsers: ['Chrome'],
+        configFile: 'test/localkarma.minified.api.conf.js'
+      },
+      local_pjs: {
+        browsers: ['PhantomJS'],
+        configFile: 'test/localkarma.conf.js'
+      },
+      minified_pjs: {
+        browsers: ['PhantomJS'],
+        configFile: 'test/localkarma.minified.conf.js'
+      },
+      minifiedapi_pjs: {
+        browsers: ['PhantomJS'],
         configFile: 'test/localkarma.minified.api.conf.js'
       }
     },
@@ -249,7 +264,9 @@ module.exports = function(grunt) {
 
     grunt.task.run(['jshint', 'less', 'build', 'minify', 'usebanner']);
 
-    if (process.env.TRAVIS) {
+    if (process.env.TRAVIS_PULL_REQUEST) {
+      grunt.task.run(['karma:local_pjs', 'karma:minified_pjs', 'karma:minifiedapi_pjs']);
+    } else if (process.env.TRAVIS) {
       grunt.task.run(['karma:saucelabs']);
     } else {
       if (tasks.length === 0) {
