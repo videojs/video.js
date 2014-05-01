@@ -6,8 +6,6 @@ module.exports = function(config) {
 
     singleRun: true,
 
-    browsers: ['Chrome'],
-
     files: [
       '../test/karma-qunit-shim.js',
       "../src/js/core.js",
