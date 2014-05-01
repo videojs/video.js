@@ -15,9 +15,6 @@ npm-debug.log
 sandbox/*
 !sandbox/*.example
 
-# ignore any Karma conf.js files in the test/ directory
-test/*.conf.js
-
 *.swp
 *.swo
 

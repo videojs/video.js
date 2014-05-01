@@ -135,16 +135,32 @@ module.exports = function(grunt) {
       }
     },
     karma: {
-      options: {
+      saucelabs: {
         configFile: 'test/karma.conf.js'
       },
-      dev: {
-        configFile: 'test/karma.conf.js',
-        autoWatch: true
+      local: {
+        browsers: ['Chrome'],
+        configFile: 'test/localkarma.conf.js'
       },
-      ci: {
-        configFile: 'test/karma.conf.js',
-        autoWatch: false
+      minified: {
+        browsers: ['Chrome'],
+        configFile: 'test/localkarma.minified.conf.js'
+      },
+      minifiedapi: {
+        browsers: ['Chrome'],
+        configFile: 'test/localkarma.minified.api.conf.js'
+      },
+      local_pjs: {
+        browsers: ['PhantomJs'],
+        configFile: 'test/localkarma.conf.js'
+      },
+      minified_pjs: {
+        browsers: ['PhantomJs'],
+        configFile: 'test/localkarma.minified.conf.js'
+      },
+      minifiedapi_pjs: {
+        browsers: ['PhantomJs'],
+        configFile: 'test/localkarma.minified.api.conf.js'
       }
     },
     vjsdocs: {
@@ -235,7 +251,37 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['jshint', 'less', 'build', 'minify', 'usebanner', 'dist']);
   // Development watch task
   grunt.registerTask('dev', ['jshint', 'less', 'build', 'qunit:source']);
-  grunt.registerTask('test', ['jshint', 'less', 'build', 'minify', 'usebanner', 'qunit']);
+  grunt.registerTask('test-qunit', ['jshint', 'less', 'build', 'minify', 'usebanner', 'qunit']);
+
+  // The test task will run `karma:saucelabs` when running in travis,
+  // otherwise, it'll default to running karma in chrome.
+  // You can specify which browsers to build with by using grunt-style arguments
+  // or separating them with a comma:
+  //   grunt test:chrome:firefox  # grunt-style
+  //   grunt test:chrome,firefox  # comma-separated
+  grunt.registerTask('test', function() {
+    var tasks = this.args;
+
+    grunt.task.run(['jshint', 'less', 'build', 'minify', 'usebanner']);
+
+    if (process.env.TRAVIS_PULL_REQUEST) {
+      grunt.task.run(['karma:local_pjs', 'karma:minified_pjs', 'karma:minifiedapi_pjs']);
+    } else if (process.env.TRAVIS) {
+      grunt.task.run(['karma:saucelabs']);
+    } else {
+      if (tasks.length === 0) {
+        tasks.push('chrome');
+      }
+      if (tasks.length === 1) {
+        tasks = tasks[0].split(',');
+      }
+      tasks = tasks.map(function(el) {
+        return 'karma:' + el;
+      });
+
+      grunt.task.run(['karma:local', 'karma:minified', 'karma:minifiedapi']);
+    }
+  });
 
   var fs = require('fs'),
       gzip = require('zlib').gzip;
