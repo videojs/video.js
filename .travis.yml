@@ -2,7 +2,7 @@ language: node_js
 node_js:
 - 0.10
 before_script:
-- curl https://gist.githubusercontent.com/santiycr/5139565/raw/sauce_connect_setup.sh
+- curl https://gist.githubusercontent.com/santiycr/5139565/raw/sauce_connect_setup.sh | bash
 env:
   global:
   - secure: T+xpJN6kMMM/xV6K+sd9vKxPA2KhoUS05d8Em090fhpMdXmuXN4MwfhgLca5IFkMyXA/psf9E7IcXCWwtO2+exPpvhMIWN/z6ls+jtjP+6eRHU69GZK+Gc4rrJMtBbpuam5ItMPuhRoF1GSA/mvPmivGbbi4B78NvsPj+QEJ0us=
