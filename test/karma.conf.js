@@ -39,6 +39,8 @@ module.exports = function(config) {
   };
 
   config.set({
+    basePath: '',
+
     frameworks: ['qunit'],
 
     autoWatch: false,
