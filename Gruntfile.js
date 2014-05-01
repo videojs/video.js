@@ -151,15 +151,15 @@ module.exports = function(grunt) {
         configFile: 'test/localkarma.minified.api.conf.js'
       },
       local_pjs: {
-        browsers: ['PhantomJs'],
+        browsers: ['PhantomJS'],
         configFile: 'test/localkarma.conf.js'
       },
       minified_pjs: {
-        browsers: ['PhantomJs'],
+        browsers: ['PhantomJS'],
         configFile: 'test/localkarma.minified.conf.js'
       },
       minifiedapi_pjs: {
-        browsers: ['PhantomJs'],
+        browsers: ['PhantomJS'],
         configFile: 'test/localkarma.minified.api.conf.js'
       }
     },
