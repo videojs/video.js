@@ -251,7 +251,7 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['jshint', 'less', 'build', 'minify', 'usebanner', 'dist']);
   // Development watch task
   grunt.registerTask('dev', ['jshint', 'less', 'build', 'qunit:source']);
-  grunt.registerTask('test', ['jshint', 'less', 'build', 'minify', 'usebanner', 'qunit']);
+  grunt.registerTask('test-qunit', ['jshint', 'less', 'build', 'minify', 'usebanner', 'qunit']);
 
   // The test task will run `karma:saucelabs` when running in travis,
   // otherwise, it'll default to running karma in chrome.
