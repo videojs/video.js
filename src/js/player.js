@@ -1345,31 +1345,32 @@ vjs.Player.prototype.error = function(err){
   this.addClass('vjs-error');
 
   // log the name of the error type and any message
-  vjs.log.error(this.error_);
+  // ie8 just logs "[object object]" if you just log the error object
+  vjs.log.error('(CODE:'+this.error_.code+' '+vjs.MediaError.errorTypes[this.error_.code]+')', this.error_.message, this.error_);
 
   return this;
 };
 
-vjs.Player.prototype.waiting_ = false;
+// vjs.Player.prototype.waiting_ = false;
 
-vjs.Player.prototype.waiting = function(bool){
-  if (bool === undefined) {
-    return this.waiting_;
-  }
+// vjs.Player.prototype.waiting = function(bool){
+//   if (bool === undefined) {
+//     return this.waiting_;
+//   }
 
-  var wasWaiting = this.waiting_;
-  this.waiting_ = bool;
+//   var wasWaiting = this.waiting_;
+//   this.waiting_ = bool;
 
-  // trigger an event if it's newly waiting
-  if (!wasWaiting && bool) {
-    this.addClass('vjs-waiting');
-    this.trigger('waiting');
-  } else {
-    this.removeClass('vjs-waiting');
-  }
+//   // trigger an event if it's newly waiting
+//   if (!wasWaiting && bool) {
+//     this.addClass('vjs-waiting');
+//     this.trigger('waiting');
+//   } else {
+//     this.removeClass('vjs-waiting');
+//   }
 
-  return this;
-};
+//   return this;
+// };
 
 vjs.Player.prototype.ended = function(){ return this.techGet('ended'); };
 vjs.Player.prototype.seeking = function(){ return this.techGet('seeking'); };
