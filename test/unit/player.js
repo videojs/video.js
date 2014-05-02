@@ -402,3 +402,54 @@ test('should remove vjs-has-started class', function(){
   player.trigger('play');
   ok(player.el().className.indexOf('vjs-has-started') !== -1, 'vjs-has-started class added again');
 });
+
+test('player should handle different error types', function(){
+  expect(8);
+  var player = PlayerTest.makePlayer({});
+  var testMsg = 'test message';
+
+  // prevent error log messages in the console
+  sinon.stub(vjs.log, 'error');
+
+  // error code supplied
+  function errCode(){
+    equal(player.error().code, 1, 'error code is correct');
+  }
+  player.on('error', errCode);
+  player.error(1);
+  player.off('error', errCode);
+
+  // error instance supplied
+  function errInst(){
+    equal(player.error().code, 2, 'MediaError code is correct');
+    equal(player.error().message, testMsg, 'MediaError message is correct');
+  }
+  player.on('error', errInst);
+  player.error(new vjs.MediaError({ code: 2, message: testMsg }));
+  player.off('error', errInst);
+
+  // error message supplied
+  function errMsg(){
+    equal(player.error().code, 0, 'error message code is correct');
+    equal(player.error().message, testMsg, 'error message is correct');
+  }
+  player.on('error', errMsg);
+  player.error(testMsg);
+  player.off('error', errMsg);
+
+  // error config supplied
+  function errConfig(){
+    equal(player.error().code, 3, 'error config code is correct');
+    equal(player.error().message, testMsg, 'error config message is correct');
+  }
+  player.on('error', errConfig);
+  player.error({ code: 3, message: testMsg });
+  player.off('error', errConfig);
+
+  // check for vjs-error classname
+  ok(player.el().className.indexOf('vjs-error') >= 0, 'player does not have vjs-error classname');
+
+  // restore error logging
+  vjs.log.error.restore();
+});
+

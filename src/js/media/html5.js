@@ -108,18 +108,26 @@ vjs.Html5.prototype.createEl = function(){
 
 // Make video events trigger player events
 // May seem verbose here, but makes other APIs possible.
+// Triggers removed using this.off when disposed
 vjs.Html5.prototype.setupTriggers = function(){
   for (var i = vjs.Html5.Events.length - 1; i >= 0; i--) {
-    vjs.on(this.el_, vjs.Html5.Events[i], vjs.bind(this.player_, this.eventHandler));
+    vjs.on(this.el_, vjs.Html5.Events[i], vjs.bind(this, this.eventHandler));
   }
 };
-// Triggers removed using this.off when disposed
 
-vjs.Html5.prototype.eventHandler = function(e){
-  this.trigger(e);
+vjs.Html5.prototype.eventHandler = function(evt){
+  // In the case of an error, set the error prop on the player
+  // and let the player handle triggering the event.
+  if (evt.type == 'error') {
+    this.player().error(this.error().code);
 
-  // No need for media events to bubble up.
-  e.stopPropagation();
+  // in some cases we pass the event directly to the player
+  } else {
+    // No need for media events to bubble up.
+    evt.bubbles = false;
+
+    this.player().trigger(evt);
+  }
 };
 
 vjs.Html5.prototype.useNativeControls = function(){
