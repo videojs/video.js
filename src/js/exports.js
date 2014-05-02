@@ -85,6 +85,7 @@ goog.exportSymbol('videojs.DurationDisplay', vjs.DurationDisplay);
 goog.exportSymbol('videojs.TimeDivider', vjs.TimeDivider);
 goog.exportSymbol('videojs.RemainingTimeDisplay', vjs.RemainingTimeDisplay);
 goog.exportSymbol('videojs.LiveDisplay', vjs.LiveDisplay);
+goog.exportSymbol('videojs.ErrorDisplay', vjs.ErrorDisplay);
 goog.exportSymbol('videojs.Slider', vjs.Slider);
 goog.exportSymbol('videojs.ProgressControl', vjs.ProgressControl);
 goog.exportSymbol('videojs.SeekBar', vjs.SeekBar);
