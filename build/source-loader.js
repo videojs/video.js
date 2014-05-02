@@ -37,6 +37,7 @@ var sourceFiles = [
   "src/js/poster.js",
   "src/js/loading-spinner.js",
   "src/js/big-play-button.js",
+  "src/js/error-display.js",
   "src/js/media/media.js",
   "src/js/media/html5.js",
   "src/js/media/flash.js",

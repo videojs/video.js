@@ -95,7 +95,8 @@ vjs.options = {
     'textTrackDisplay': {},
     'loadingSpinner': {},
     'bigPlayButton': {},
-    'controlBar': {}
+    'controlBar': {},
+    'errorDisplay': {}
   },
 
   // Default message to show when a video cannot be played.
