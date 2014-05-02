@@ -433,8 +433,15 @@ vjs.Flash['onEvent'] = function(swfID, eventName){
 // Log errors from the swf
 vjs.Flash['onError'] = function(swfID, err){
   var player = vjs.el(swfID)['player'];
-  player.trigger('error');
-  vjs.log('Flash Error', err, swfID);
+  var msg = 'FLASH: '+err;
+
+  if (err == 'srcnotfound') {
+    player.error({ code: 4, message: msg });
+
+  // errors we haven't categorized into the media errors
+  } else {
+    player.error(msg);
+  }
 };
 
 // Flash Version Check
