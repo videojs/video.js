@@ -609,7 +609,13 @@ easily in the skin designer. http://designer.videojs.com/
 /* Errors are unrecoverable without user interaction,
    so hide the spinner in the case of an error */
 .video-js.vjs-error .vjs-loading-spinner {
-  display: none;
+  /* using !important flag because currently the loading spinner
+     uses hide()/show() instead of classes. The !important can be
+     removed when that's updated */
+  display: none !important;
+
+  /* ensure animation doesn't continue while hidden */
+  .animation(none);
 }
 
 .vjs-default-skin .vjs-loading-spinner:before {
