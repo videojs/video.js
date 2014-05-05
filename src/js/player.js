@@ -1068,9 +1068,10 @@ vjs.Player.prototype.src = function(source){
         this.loadTech(techName, source);
       }
     } else {
-      this.el_.appendChild(vjs.createEl('p', {
-        innerHTML: this.options()['notSupportedMessage']
-      }));
+      // this.el_.appendChild(vjs.createEl('p', {
+      //   innerHTML: this.options()['notSupportedMessage']
+      // }));
+      this.error({ code: 4, message: this.options()['notSupportedMessage'] });
       this.triggerReady(); // we could not find an appropriate tech, but let's still notify the delegate that this is it
     }
 

@@ -7,6 +7,9 @@
 vjs.ErrorDisplay = vjs.Component.extend({
   init: function(player, options){
     vjs.Component.call(this, player, options);
+
+    this.update();
+    player.on('error', vjs.bind(this, this.update));
   }
 });
 
@@ -15,5 +18,14 @@ vjs.ErrorDisplay.prototype.createEl = function(){
     className: 'vjs-error-display'
   });
 
+  this.contentEl_ = vjs.createEl('div');
+  el.appendChild(this.contentEl_);
+
   return el;
+};
+
+vjs.ErrorDisplay.prototype.update = function(){
+  if (this.player().error()) {
+    this.contentEl_.innerHTML = this.player().error().message;
+  }
 };
