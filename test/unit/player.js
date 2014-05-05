@@ -77,7 +77,7 @@ test('should get tag, source, and track settings', function(){
 
   var fixture = document.getElementById('qunit-fixture');
 
-  var html = '<video id="example_1" class="video-js" autoplay preload="metadata">';
+  var html = '<video id="example_1" class="video-js" autoplay preload="none">';
       html += '<source src="http://google.com" type="video/mp4">';
       html += '<source src="http://google.com" type="video/webm">';
       html += '<track src="http://google.com" kind="captions" attrtest>';
@@ -89,7 +89,7 @@ test('should get tag, source, and track settings', function(){
   var player = new vjs.Player(tag);
 
   ok(player.options_['autoplay'] === true);
-  ok(player.options_['preload'] === 'metadata'); // No extern. Use string.
+  ok(player.options_['preload'] === 'none'); // No extern. Use string.
   ok(player.options_['id'] === 'example_1');
   ok(player.options_['sources'].length === 2);
   ok(player.options_['sources'][0].src === 'http://google.com');
@@ -335,27 +335,27 @@ test('should allow for tracking when native controls are used', function(){
   player.dispose();
 });
 
-test('should use custom message when encountering an unsupported video type',
-    function() {
-  videojs.options['notSupportedMessage'] = 'Video no go <a href="">link</a>';
-  var fixture = document.getElementById('qunit-fixture');
+// test('should use custom message when encountering an unsupported video type',
+//     function() {
+//   videojs.options['notSupportedMessage'] = 'Video no go <a href="">link</a>';
+//   var fixture = document.getElementById('qunit-fixture');
 
-  var html =
-      '<video id="example_1">' +
-          '<source src="fake.foo" type="video/foo">' +
-          '</video>';
+//   var html =
+//       '<video id="example_1">' +
+//           '<source src="fake.foo" type="video/foo">' +
+//           '</video>';
 
-  fixture.innerHTML += html;
+//   fixture.innerHTML += html;
 
-  var tag = document.getElementById('example_1');
-  var player = new vjs.Player(tag);
+//   var tag = document.getElementById('example_1');
+//   var player = new vjs.Player(tag);
 
-  var incompatibilityMessage = player.el().getElementsByTagName('p')[0];
-  // ie8 capitalizes tag names
-  equal(incompatibilityMessage.innerHTML.toLowerCase(), 'video no go <a href="">link</a>');
+//   var incompatibilityMessage = player.el().getElementsByTagName('p')[0];
+//   // ie8 capitalizes tag names
+//   equal(incompatibilityMessage.innerHTML.toLowerCase(), 'video no go <a href="">link</a>');
 
-  player.dispose();
-});
+//   player.dispose();
+// });
 
 test('should register players with generated ids', function(){
   var fixture, video, player, id;
