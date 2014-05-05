@@ -45,6 +45,26 @@ vjs.capitalize = function(string){
 };
 
 /**
+ * Loop through an array, an array of objects, or each property
+ * in an object and call a function whose arguments are (key,value)
+ * @param  {Object} arrLike Object of properties
+ * @param  {Function} fn  Function to be called on each property.
+ * @this {*}
+ * @private
+ */
+vjs.each = function (arrLike, fn, context) {
+  if (vjs.obj.isPlain(arrLike)) vjs.obj.each(arrLike, fn, context);
+  else {
+    for (var i = 0, len = arrLike.length; i < len; ++i) {
+      var val = arrLike[i];
+
+      if (vjs.obj.isPlain(val)) vjs.obj.each(val, fn, context);
+      else fn.call(context || this, i, val);
+    }
+  }
+};
+
+/**
  * Object functions container
  * @type {Object}
  * @private
@@ -60,7 +80,7 @@ vjs.obj = {};
  * @param  {Object}   obj Object to use as prototype
  * @private
  */
- vjs.obj.create = Object.create || function(obj){
+vjs.obj.create = Object.create || function(obj){
   //Create a new function called 'F' which is just an empty object.
   function F() {}
 
@@ -669,29 +689,29 @@ vjs.log = function(){
 // Offset Left
 // getBoundingClientRect technique from John Resig http://ejohn.org/blog/getboundingclientrect-is-awesome/
 vjs.findPosition = function(el) {
-    var box, docEl, body, clientLeft, scrollLeft, left, clientTop, scrollTop, top;
+  var box, docEl, body, clientLeft, scrollLeft, left, clientTop, scrollTop, top;
 
-    if (el.getBoundingClientRect && el.parentNode) {
-      box = el.getBoundingClientRect();
-    }
+  if (el.getBoundingClientRect && el.parentNode) {
+    box = el.getBoundingClientRect();
+  }
 
-    if (!box) {
-      return {
-        left: 0,
-        top: 0
-      };
-    }
+  if (!box) {
+    return {
+      left: 0,
+      top: 0
+    };
+  }
 
-    docEl = document.documentElement;
-    body = document.body;
+  docEl = document.documentElement;
+  body = document.body;
 
-    clientLeft = docEl.clientLeft || body.clientLeft || 0;
-    scrollLeft = window.pageXOffset || body.scrollLeft;
-    left = box.left + scrollLeft - clientLeft;
+  clientLeft = docEl.clientLeft || body.clientLeft || 0;
+  scrollLeft = window.pageXOffset || body.scrollLeft;
+  left = box.left + scrollLeft - clientLeft;
 
-    clientTop = docEl.clientTop || body.clientTop || 0;
-    scrollTop = window.pageYOffset || body.scrollTop;
-    top = box.top + scrollTop - clientTop;
+  clientTop = docEl.clientTop || body.clientTop || 0;
+  scrollTop = window.pageYOffset || body.scrollTop;
+  top = box.top + scrollTop - clientTop;
 
     // Android sometimes returns slightly off decimal values, so need to round
     return {

@@ -22,11 +22,45 @@ test('should loop through each property on an object', function(){
   };
 
   // Add 3 to each value
-  vjs.obj.each(asdf, function(key, value){
+  vjs.each(asdf, function(key, value){
     asdf[key] = value + 3;
   });
 
   deepEqual(asdf,{a:4,b:5,'c':6});
+});
+
+test('should loop through simple array', function(){
+  var asdf = [
+    'a',
+    'b',
+    'c'
+  ];
+
+  var newArr = [];
+  vjs.each(asdf, function(key, value){
+    newArr[key] = value;
+    ok(typeof key == 'number', 'Key is not a number, the array index');
+    ok(typeof value == 'string', 'Value is not a string');
+  });
+
+  deepEqual(asdf,newArr);
+});
+
+test('should loop through an array of objects', function(){
+  var asdf = [
+    { a: {} },
+    { b: {} },
+    { 'c': {} }
+  ];
+
+  var newObj = {};
+  vjs.each(asdf, function(key, value){
+    newObj[key] = value;
+    ok(typeof key == 'string', 'Key is not a string');
+    ok(vjs.obj.isPlain(value), 'Value is not an object');
+  });
+
+  deepEqual(newObj, { a: {}, b: {}, 'c': {}});
 });
 
 test('should copy an object', function(){
