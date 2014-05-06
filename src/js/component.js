@@ -439,31 +439,62 @@ vjs.Component.prototype.removeChild = function(component){
  *         myChildOption: true
  *       }
  *     }
+ *
+ *     // Or when creating the component
+ *     var myComp = new MyComponent(player, {
+ *       children: {
+ *         myChildComponent: {
+ *           myChildOption: true
+ *         }
+ *       }
+ *     });
+ *
+ * The children option can also be an Array of child names or
+ * child options objects (that also include a 'name' key).
+ *
+ *     var myComp = new MyComponent(player, {
+ *       children: [
+ *         'button',
+ *         {
+ *           name: 'button',
+ *           someOtherOption: true
+ *         }
+ *       ]
+ *     });
+ *
  */
 vjs.Component.prototype.initChildren = function(){
-  var options = this.options_;
+  var parent, children, child, name, opts;
 
-  if (options && options['children']) {
-    var self = this;
+  parent = this;
+  children = this.options()['children'];
 
-    // Loop through components and add them to the player
-    vjs.obj.each(options['children'], function(name, opts){
-      // Allow for disabling default components
-      // e.g. vjs.options['children']['posterImage'] = false
-      if (opts === false) return;
+  if (children) {
+    // Allow for an array of children details to passed in the options
+    if (children instanceof Array) {
+      for (var i = 0; i < children.length; i++) {
+        child = children[i];
 
-      // Allow waiting to add components until a specific event is called
-      var tempAdd = function(){
-        // Set property name on player. Could cause conflicts with other prop names, but it's worth making refs easy.
-        self[name] = self.addChild(name, opts);
-      };
+        if (typeof child == 'string') {
+          name = child;
+          opts = {};
+        } else {
+          name = child.name;
+          opts = child;
+        }
 
-      if (opts['loadEvent']) {
-        // this.one(opts.loadEvent, tempAdd)
-      } else {
-        tempAdd();
+        parent[name] = parent.addChild(name, opts);
       }
-    });
+    } else {
+      vjs.obj.each(children, function(name, opts){
+        // Allow for disabling default components
+        // e.g. vjs.options['children']['posterImage'] = false
+        if (opts === false) return;
+
+        // Set property name on player. Could cause conflicts with other prop names, but it's worth making refs easy.
+        parent[name] = parent.addChild(name, opts);
+      });
+    }
   }
 };
 

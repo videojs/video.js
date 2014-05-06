@@ -26,7 +26,7 @@ test('should add a child component', function(){
   ok(comp.getChildById(child.id()) === child);
 });
 
-test('should init child coponents from options', function(){
+test('should init child components from options', function(){
   var comp = new vjs.Component(getFakePlayer(), {
     children: {
       'component': true
@@ -35,6 +35,32 @@ test('should init child coponents from options', function(){
 
   ok(comp.children().length === 1);
   ok(comp.el().childNodes.length === 1);
+});
+
+test('should init child components from simple children array', function(){
+  var comp = new vjs.Component(getFakePlayer(), {
+    children: [
+      'component',
+      'component',
+      'component'
+    ]
+  });
+
+  ok(comp.children().length === 3);
+  ok(comp.el().childNodes.length === 3);
+});
+
+test('should init child components from children array of objects', function(){
+  var comp = new vjs.Component(getFakePlayer(), {
+    children: [
+      { 'name': 'component' },
+      { 'name': 'component' },
+      { 'name': 'component' }
+    ]
+  });
+
+  ok(comp.children().length === 3);
+  ok(comp.el().childNodes.length === 3);
 });
 
 test('should do a deep merge of child options', function(){
