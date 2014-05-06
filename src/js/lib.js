@@ -60,7 +60,7 @@ vjs.obj = {};
  * @param  {Object}   obj Object to use as prototype
  * @private
  */
- vjs.obj.create = Object.create || function(obj){
+vjs.obj.create = Object.create || function(obj){
   //Create a new function called 'F' which is just an empty object.
   function F() {}
 
@@ -669,33 +669,33 @@ vjs.log = function(){
 // Offset Left
 // getBoundingClientRect technique from John Resig http://ejohn.org/blog/getboundingclientrect-is-awesome/
 vjs.findPosition = function(el) {
-    var box, docEl, body, clientLeft, scrollLeft, left, clientTop, scrollTop, top;
+  var box, docEl, body, clientLeft, scrollLeft, left, clientTop, scrollTop, top;
 
-    if (el.getBoundingClientRect && el.parentNode) {
-      box = el.getBoundingClientRect();
-    }
+  if (el.getBoundingClientRect && el.parentNode) {
+    box = el.getBoundingClientRect();
+  }
 
-    if (!box) {
-      return {
-        left: 0,
-        top: 0
-      };
-    }
-
-    docEl = document.documentElement;
-    body = document.body;
-
-    clientLeft = docEl.clientLeft || body.clientLeft || 0;
-    scrollLeft = window.pageXOffset || body.scrollLeft;
-    left = box.left + scrollLeft - clientLeft;
-
-    clientTop = docEl.clientTop || body.clientTop || 0;
-    scrollTop = window.pageYOffset || body.scrollTop;
-    top = box.top + scrollTop - clientTop;
-
-    // Android sometimes returns slightly off decimal values, so need to round
+  if (!box) {
     return {
-      left: vjs.round(left),
-      top: vjs.round(top)
+      left: 0,
+      top: 0
     };
+  }
+
+  docEl = document.documentElement;
+  body = document.body;
+
+  clientLeft = docEl.clientLeft || body.clientLeft || 0;
+  scrollLeft = window.pageXOffset || body.scrollLeft;
+  left = box.left + scrollLeft - clientLeft;
+
+  clientTop = docEl.clientTop || body.clientTop || 0;
+  scrollTop = window.pageYOffset || body.scrollTop;
+  top = box.top + scrollTop - clientTop;
+
+  // Android sometimes returns slightly off decimal values, so need to round
+  return {
+    left: vjs.round(left),
+    top: vjs.round(top)
+  };
 };
