@@ -183,14 +183,23 @@ cp sandbox/index.html.example sandbox/index.html
 open sandbox/index.html
 ```
 
-> #### NOTE: Testing Flash Locally in Chrome
-> Chrome 21+ (as of 2013/01/01) doens't run Flash files that are local and loaded into a locally accessed page (file:///).
+
+### Testing Locally
+A simple Connect server is available via the Grunt plugin. The commands below will allow you to setup a test sandbox and begin development.
+
+```bash
+cp sandbox/index.html.example sandbox/index.html
+grunt connect
+open http://localhost:9999/sandbox/index.html
+```
+
+> NOTES regarding local testing in Chrome 21+ (as of 2013/01/01)
+> Flash files that are local and loaded into a locally accessed page (file:///) will NOT run.
 > To get around this you can do either of the following:
 >
-> 1. Do your development and testing using a local HTTP server.
+> 1. Do your development and testing using a local HTTP server. See Grunt commands above.
 >
 > 2. [Disable the version of Flash included with Chrome](http://helpx.adobe.com/flash-player/kb/flash-player-google-chrome.html#How_can_I_run_debugger_or_alternate_versions_of_Flash_Player_in_Google_Chrome) and enable a system-wide version of Flash instead.
-
 
 Commit and push changes as you go (using git directly). Write thorough descriptions of your changes in your commit messages.
 

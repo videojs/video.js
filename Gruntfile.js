@@ -71,6 +71,14 @@ module.exports = function(grunt) {
       files: [ 'src/**/*', 'test/unit/*.js', 'Gruntfile.js' ],
       tasks: 'dev'
     },
+    connect: {
+      dev: {
+        options: {
+          port: 9999,
+          keepalive: true
+        }
+      }
+    },
     copy: {
       minor: {
         files: [
@@ -171,9 +179,28 @@ module.exports = function(grunt) {
         }
       }
     },
-    bump: {
-      files: ['package.json'],
-      updateConfigs: ['pkg']
+    version: {
+      options: {
+        pkg: 'package.json'
+      },
+      major: {
+        options: {
+          release: 'major'
+        },
+        src: ['package.json', 'bower.json', 'component.json']
+      },
+      minor: {
+        options: {
+          release: 'minor'
+        },
+        src: ['package.json', 'bower.json', 'component.json']
+      },
+      patch: {
+        options: {
+          release: 'patch'
+        },
+        src: ['package.json', 'bower.json', 'component.json']
+      }
     },
     tagrelease: {
       file: 'package.json',
@@ -183,6 +210,7 @@ module.exports = function(grunt) {
     }
   });
 
+  grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-qunit');
   grunt.loadNpmTasks('grunt-contrib-watch');
@@ -196,7 +224,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('videojs-doc-generator');
   grunt.loadNpmTasks('grunt-zip');
   grunt.loadNpmTasks('grunt-banner');
-  grunt.loadNpmTasks('grunt-bump');
+  grunt.loadNpmTasks('grunt-version');
   grunt.loadNpmTasks('grunt-tagrelease');
   grunt.loadNpmTasks('chg');
 
