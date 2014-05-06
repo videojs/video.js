@@ -53,9 +53,9 @@ test('should init child components from simple children array', function(){
 test('should init child components from children array of objects', function(){
   var comp = new vjs.Component(getFakePlayer(), {
     children: [
-      {'component':{}},
-      {'component':{}},
-      {'component':{}}
+      { 'name': 'component' },
+      { 'name': 'component' },
+      { 'name': 'component' }
     ]
   });
 
