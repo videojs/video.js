@@ -12,6 +12,7 @@ CHANGELOG
 * Fixed the progress bar not finishing when manual timeupdate events are used [[view](https://github.com/videojs/video.js/pull/1173)]
 * Added a more informative and styled fallback message for non-html5 browsers [[view](https://github.com/videojs/video.js/pull/1181)]
 * Added the option to provide an array of child components instead of an object [[view](https://github.com/videojs/video.js/pull/1093)]
+* Fixed casing on webkitRequestFullscreen [[view](https://github.com/videojs/video.js/pull/1101)]
 
 --------------------
 
