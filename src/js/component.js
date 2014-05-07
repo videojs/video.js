@@ -864,35 +864,61 @@ vjs.Component.prototype.onResize;
  * @private
  */
 vjs.Component.prototype.emitTapEvents = function(){
-  var touchStart, touchTime, couldBeTap, noTap;
+  var touchStart, firstTouch, touchTime, couldBeTap, noTap,
+      xdiff, ydiff, touchDistance, tapMovementThreshold;
 
   // Track the start time so we can determine how long the touch lasted
   touchStart = 0;
+  firstTouch = null;
+
+  // Maximum movement allowed during a touch event to still be considered a tap
+  tapMovementThreshold = 22;
 
   this.on('touchstart', function(event) {
-    // Record start time so we can detect a tap vs. "touch and hold"
-    touchStart = new Date().getTime();
-    // Reset couldBeTap tracking
-    couldBeTap = true;
+    // If more than one finger, don't consider treating this as a click
+    if (event.touches.length === 1) {
+      firstTouch = event.touches[0];
+      // Record start time so we can detect a tap vs. "touch and hold"
+      touchStart = new Date().getTime();
+      // Reset couldBeTap tracking
+      couldBeTap = true;
+    }
+  });
+
+  this.on('touchmove', function(event) {
+    // If more than one finger, don't consider treating this as a click
+    if (event.touches.length > 1) {
+      couldBeTap = false;
+    } else if (firstTouch) {
+      // Some devices will throw touchmoves for all but the slightest of taps.
+      // So, if we moved only a small distance, this could still be a tap
+      xdiff = event.touches[0].pageX - firstTouch.pageX;
+      ydiff = event.touches[0].pageY - firstTouch.pageY;
+      touchDistance = Math.sqrt(xdiff * xdiff + ydiff * ydiff);
+      if (touchDistance > tapMovementThreshold) {
+        couldBeTap = false;
+      }
+    }
   });
 
   noTap = function(){
     couldBeTap = false;
   };
   // TODO: Listen to the original target. http://youtu.be/DujfpXOKUp8?t=13m8s
-  this.on('touchmove', noTap);
   this.on('touchleave', noTap);
   this.on('touchcancel', noTap);
 
   // When the touch ends, measure how long it took and trigger the appropriate
   // event
   this.on('touchend', function(event) {
+    firstTouch = null;
     // Proceed only if the touchmove/leave/cancel event didn't happen
     if (couldBeTap === true) {
       // Measure how long the touch lasted
       touchTime = new Date().getTime() - touchStart;
       // The touch needs to be quick in order to consider it a tap
       if (touchTime < 250) {
+        event.preventDefault(); // Don't let browser turn this into a click
         this.trigger('tap');
         // It may be good to copy the touchend event object and change the
         // type to tap, if the other event properties aren't exact after
