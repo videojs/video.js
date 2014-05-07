@@ -1452,13 +1452,14 @@ vjs.Player.prototype.listenForUserActivity = function(){
     if (document.mozCancelFullScreen) {
       prefix = 'moz';
       requestFS.isFullScreen = prefix + 'FullScreen';
+      requestFS.requestFn = prefix + 'RequestFullScreen';
     } else {
       prefix = 'webkit';
       requestFS.isFullScreen = prefix + 'IsFullScreen';
+      requestFS.requestFn = prefix + 'RequestFullscreen';
     }
 
     if (div[prefix + 'RequestFullScreen']) {
-      requestFS.requestFn = prefix + 'RequestFullScreen';
       requestFS.cancelFn = prefix + 'CancelFullScreen';
     }
     requestFS.eventName = prefix + 'fullscreenchange';
