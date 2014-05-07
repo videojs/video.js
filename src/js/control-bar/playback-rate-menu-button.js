@@ -10,38 +10,40 @@ vjs.PlaybackRateMenuButton = vjs.MenuButton.extend({
   init: function(player, options){
     vjs.MenuButton.call(this, player, options);
 
-    player.on('loadstart', vjs.bind(this, function(){
-      // hide playback rate controls when they're no playback rate options to select
-      if (!player.tech.features || !player.tech.features['playbackRate'] ||
-          this.player().options().playbackRates.length === 0) {
-            this.addClass('vjs-hidden');
-      } else {
-        this.removeClass('vjs-hidden');
-      }
-    }));
+    this.updateVisibility();
+    this.updateLabel();
 
-    player.on('ratechange', vjs.bind(this, this.rateChange));
+    player.on('loadstart', vjs.bind(this, this.updateVisibility));
+    player.on('ratechange', vjs.bind(this, this.updateLabel));
   }
 });
 
-
 vjs.PlaybackRateMenuButton.prototype.createEl = function(){
-  var rate = this.player().tech.playbackRate() + 'x';
-  return vjs.Component.prototype.createEl.call(this, 'div', {
-    className: 'vjs-playback-rate vjs-menu-button vjs-control',
-    innerHTML:'<div class="vjs-playback-rate-value">' + rate + '</div>'
+  var el = vjs.Component.prototype.createEl.call(this, 'div', {
+    className: 'vjs-playback-rate vjs-menu-button vjs-control'
   });
+
+  this.contentEl_ = vjs.createEl('div', {
+    className: 'vjs-playback-rate-value',
+    innerHTML: 1.0
+  });
+  el.appendChild(this.contentEl_);
+
+  return el;
 };
 
 // Menu creation
 vjs.PlaybackRateMenuButton.prototype.createMenu = function(){
   var menu = new vjs.Menu(this.player());
   var rates = this.player().options().playbackRates;
-  for (var i = rates.length - 1; i >= 0; i--) {
-    menu.addChild(
-      new vjs.PlaybackRateMenuItem(this.player(), {rate: rates[i] + 'x'})
-      );
-  };
+
+  if (rates) {
+    for (var i = rates.length - 1; i >= 0; i--) {
+      menu.addChild(
+        new vjs.PlaybackRateMenuItem(this.player(), {rate: rates[i] + 'x'})
+        );
+    };
+  }
 
   return menu;
 };
@@ -63,12 +65,36 @@ vjs.PlaybackRateMenuButton.prototype.onClick = function(){
       break;
     }
   };
-  this.player().playbackRate( newRate );
+  this.player().playbackRate(newRate);
 };
 
-// Update button label when rate changed
-vjs.PlaybackRateMenuButton.prototype.rateChange = function(){
-  this.el().children[0].innerHTML = this.player().playbackRate() + 'x';
+vjs.PlaybackRateMenuButton.prototype.playbackRateSupported = function(){
+  return
+    this.player().tech
+    && this.player().tech.features['playbackRate']
+    && this.player().options().playbackRates
+    && this.player().options().playbackRates.length > 0
+  ;
+};
+
+/**
+ * Hide playback rate controls when they're no playback rate options to select
+ */
+vjs.PlaybackRateMenuButton.prototype.updateVisibility = function(){
+  if (this.playbackRateSupported()) {
+    this.removeClass('vjs-hidden');
+  } else {
+    this.addClass('vjs-hidden');
+  }
+};
+
+/**
+ * Update button label when rate changed
+ */
+vjs.PlaybackRateMenuButton.prototype.updateLabel = function(){
+  if (this.playbackRateSupported()) {
+    this.contentEl().innerHTML = this.player().playbackRate() + 'x';
+  }
 };
 
 /**

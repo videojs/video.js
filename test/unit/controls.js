@@ -107,23 +107,8 @@ test('calculateDistance should use changedTouches, if available', function() {
 test('should hide playback rate control if it\'s not supported', function(){
   expect(1);
 
-  var noop, player, playbackRate, muteToggle;
-  noop = function(){};
-  player = {
-    id: noop,
-    on: noop,
-    ready: noop,
-    tech: {
-      features: {
-        'playbackRate': false
-      }
-    },
-    volume: function(){},
-    muted: function(){},
-    reportUserActivity: function(){}
-  };
-
-  playbackRate = new vjs.PlaybackRateMenuButton(player);
+  var player = PlayerTest.makePlayer();
+  var playbackRate = new vjs.PlaybackRateMenuButton(player);
 
   ok(playbackRate.el().className.indexOf('vjs-hidden') >= 0, 'playbackRate is not hidden');
 });
