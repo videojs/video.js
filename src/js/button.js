@@ -15,23 +15,9 @@ vjs.Button = vjs.Component.extend({
   init: function(player, options){
     vjs.Component.call(this, player, options);
 
-    var touchstart = false;
-    this.on('touchstart', function(event) {
-      // Stop click and other mouse events from triggering also
-      event.preventDefault();
-      touchstart = true;
-    });
-    this.on('touchmove', function() {
-      touchstart = false;
-    });
-    var self = this;
-    this.on('touchend', function(event) {
-      if (touchstart) {
-        self.onClick(event);
-      }
-      event.preventDefault();
-    });
+    this.emitTapEvents();
 
+    this.on('tap', this.onClick);
     this.on('click', this.onClick);
     this.on('focus', this.onFocus);
     this.on('blur', this.onBlur);

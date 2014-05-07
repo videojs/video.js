@@ -322,14 +322,16 @@ vjs.Player.prototype.manualProgressOn = function(){
   // In HTML5, some older versions don't support the progress event
   // So we're assuming they don't, and turning off manual progress if they do.
   // As opposed to doing user agent detection
-  this.tech.one('progress', function(){
+  if (this.tech) {
+    this.tech.one('progress', function(){
 
-    // Update known progress support for this playback technology
-    this.features['progressEvents'] = true;
+      // Update known progress support for this playback technology
+      this.features['progressEvents'] = true;
 
-    // Turn off manual progress tracking
-    this.player_.manualProgressOff();
-  });
+      // Turn off manual progress tracking
+      this.player_.manualProgressOff();
+    });
+  }
 };
 
 vjs.Player.prototype.manualProgressOff = function(){
@@ -362,12 +364,14 @@ vjs.Player.prototype.manualTimeUpdatesOn = function(){
   // timeupdate is also called by .currentTime whenever current time is set
 
   // Watch for native timeupdate event
-  this.tech.one('timeupdate', function(){
-    // Update known progress support for this playback technology
-    this.features['timeupdateEvents'] = true;
-    // Turn off manual progress tracking
-    this.player_.manualTimeUpdatesOff();
-  });
+  if (this.tech) {
+    this.tech.one('timeupdate', function(){
+      // Update known progress support for this playback technology
+      this.features['timeupdateEvents'] = true;
+      // Turn off manual progress tracking
+      this.player_.manualTimeUpdatesOff();
+    });
+  }
 };
 
 vjs.Player.prototype.manualTimeUpdatesOff = function(){
@@ -385,8 +389,13 @@ vjs.Player.prototype.trackCurrentTime = function(){
 };
 
 // Turn off play progress tracking (when paused or dragging)
-vjs.Player.prototype.stopTrackingCurrentTime = function(){ clearInterval(this.currentTimeInterval); };
+vjs.Player.prototype.stopTrackingCurrentTime = function(){
+  clearInterval(this.currentTimeInterval);
 
+  // #1002 - if the video ends right before the next timeupdate would happen,
+  // the progress bar won't make it all the way to the end
+  this.trigger('timeupdate');
+};
 // /* Player event handlers (how the player reacts to certain events)
 // ================================================================================ */
 
@@ -1314,13 +1323,23 @@ vjs.Player.prototype.userActive = function(bool){
 };
 
 vjs.Player.prototype.listenForUserActivity = function(){
-  var onMouseActivity, onMouseDown, mouseInProgress, onMouseUp,
-      activityCheck, inactivityTimeout;
+  var onActivity, onMouseMove, onMouseDown, mouseInProgress, onMouseUp,
+      activityCheck, inactivityTimeout, lastMoveX, lastMoveY;
 
-  onMouseActivity = vjs.bind(this, this.reportUserActivity);
+  onActivity = vjs.bind(this, this.reportUserActivity);
+
+  onMouseMove = function(e) {
+    // #1068 - Prevent mousemove spamming
+    // Chrome Bug: https://code.google.com/p/chromium/issues/detail?id=366970
+    if(e.screenX != lastMoveX || e.screenY != lastMoveY) {
+      lastMoveX = e.screenX;
+      lastMoveY = e.screenY;
+      onActivity();
+    }
+  };
 
   onMouseDown = function() {
-    onMouseActivity();
+    onActivity();
     // For as long as the they are touching the device or have their mouse down,
     // we consider them active even if they're not moving their finger or mouse.
     // So we want to continue to update that they are active
@@ -1328,24 +1347,24 @@ vjs.Player.prototype.listenForUserActivity = function(){
     // Setting userActivity=true now and setting the interval to the same time
     // as the activityCheck interval (250) should ensure we never miss the
     // next activityCheck
-    mouseInProgress = setInterval(onMouseActivity, 250);
+    mouseInProgress = setInterval(onActivity, 250);
   };
 
   onMouseUp = function(event) {
-    onMouseActivity();
+    onActivity();
     // Stop the interval that maintains activity if the mouse/touch is down
     clearInterval(mouseInProgress);
   };
 
   // Any mouse movement will be considered user activity
   this.on('mousedown', onMouseDown);
-  this.on('mousemove', onMouseActivity);
+  this.on('mousemove', onMouseMove);
   this.on('mouseup', onMouseUp);
 
   // Listen for keyboard navigation
   // Shouldn't need to use inProgress interval because of key repeat
-  this.on('keydown', onMouseActivity);
-  this.on('keyup', onMouseActivity);
+  this.on('keydown', onActivity);
+  this.on('keyup', onActivity);
 
   // Run an interval every 250 milliseconds instead of stuffing everything into
   // the mousemove/touchmove function itself, to prevent performance degradation.
@@ -1386,11 +1405,7 @@ vjs.Player.prototype.listenForUserActivity = function(){
 
 vjs.Player.prototype.playbackRate = function(rate) {
   if (rate !== undefined) {
-
     this.techCall('setPlaybackRate', rate);
-
-    this.trigger('ratechange');
-
     return this;
   }
 
@@ -1450,13 +1465,14 @@ vjs.Player.prototype.playbackRate = function(rate) {
     if (document.mozCancelFullScreen) {
       prefix = 'moz';
       requestFS.isFullScreen = prefix + 'FullScreen';
+      requestFS.requestFn = prefix + 'RequestFullScreen';
     } else {
       prefix = 'webkit';
       requestFS.isFullScreen = prefix + 'IsFullScreen';
+      requestFS.requestFn = prefix + 'RequestFullscreen';
     }
 
     if (div[prefix + 'RequestFullScreen']) {
-      requestFS.requestFn = prefix + 'RequestFullScreen';
       requestFS.cancelFn = prefix + 'CancelFullScreen';
     }
     requestFS.eventName = prefix + 'fullscreenchange';
