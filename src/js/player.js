@@ -1403,6 +1403,24 @@ vjs.Player.prototype.listenForUserActivity = function(){
   });
 };
 
+vjs.Player.prototype.playbackRate = function(rate) {
+  if (rate !== undefined) {
+
+    this.techCall('setPlaybackRate', rate);
+
+    this.trigger('ratechange');
+
+    return this;
+  }
+
+  if (this.tech && this.tech.features && this.tech.features['playbackRate']) {
+    return this.techGet('playbackRate');
+  } else {
+    return 1.0;
+  }
+
+};
+
 // Methods to add support for
 // networkState: function(){ return this.techCall('networkState'); },
 // readyState: function(){ return this.techCall('readyState'); },
@@ -1415,7 +1433,6 @@ vjs.Player.prototype.listenForUserActivity = function(){
 // videoWidth: function(){ return this.techCall('videoWidth'); },
 // videoHeight: function(){ return this.techCall('videoHeight'); },
 // defaultPlaybackRate: function(){ return this.techCall('defaultPlaybackRate'); },
-// playbackRate: function(){ return this.techCall('playbackRate'); },
 // mediaGroup: function(){ return this.techCall('mediaGroup'); },
 // controller: function(){ return this.techCall('controller'); },
 // defaultMuted: function(){ return this.techCall('defaultMuted'); }

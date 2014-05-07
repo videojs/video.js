@@ -27,6 +27,7 @@ test('should be able to access expected player API methods', function() {
   ok(player.textTracks, 'textTracks exists');
   ok(player.requestFullScreen, 'requestFullScreen exists');
   ok(player.cancelFullScreen, 'cancelFullScreen exists');
+  ok(player.playbackRate, 'playbackRate exists');
 
   // Unsupported Native HTML5 Methods
   // ok(player.canPlayType, 'canPlayType exists');
@@ -138,6 +139,7 @@ test('should export useful components to the public', function () {
   ok(videojs.Menu, 'Menu should be public');
   ok(videojs.MenuItem, 'MenuItem should be public');
   ok(videojs.MenuButton, 'MenuButton should be public');
+  ok(videojs.PlaybackRateMenuButton, 'PlaybackRateMenuButton should be public');
 
   ok(videojs.util, 'util namespace should be public');
   ok(videojs.util.mergeOptions, 'mergeOptions should be public');
