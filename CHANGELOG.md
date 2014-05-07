@@ -14,6 +14,7 @@ CHANGELOG
 * Added the option to provide an array of child components instead of an object [[view](https://github.com/videojs/video.js/pull/1093)]
 * Fixed casing on webkitRequestFullscreen [[view](https://github.com/videojs/video.js/pull/1101)]
 * Made tap events on mobile less sensitive to touch moves [[view](https://github.com/videojs/video.js/pull/1111)]
+* Fixed the default flag for captions/subtitles tracks [[view](https://github.com/videojs/video.js/pull/1153)]
 
 --------------------
 
