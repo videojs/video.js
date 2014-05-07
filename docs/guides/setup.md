@@ -47,7 +47,7 @@ With Video.js you just use an HTML5 video tag to embed a video. Video.js will th
     - `video-js` applies styles that are required for Video.js functionality, like fullscreen and subtitles.
     - `vjs-default-skin` applies the default skin to the HTML controls, and can be removed or overridden to create your own controls design.
 
-Otherwise include/exclude attributes, settings, sources, and tracks exactly as you would for HTML5 video.
+Otherwise include/exclude attributes, settings, sources, and tracks exactly as you would for HTML5 video. You may also need to add the video MIME types to your server configuration as documented [here](http://www.ewbooks.info/hotpot/hotpotatoes-xhtml5-audio-video)
 
 ```html
 <video id="example_video_1" class="video-js vjs-default-skin"
