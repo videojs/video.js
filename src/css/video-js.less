@@ -466,8 +466,8 @@ easily in the skin designer. http://designer.videojs.com/
 */
 .vjs-default-skin .vjs-big-play-button {
   // Calculate total width/height so we're able to center the button
-  @total-width: @big-play-width + (@big-play-border-width * 2);
-  @total-height: @big-play-height + (@big-play-border-width * 2);
+  @total-width: (@big-play-width + (@big-play-border-width * 2));
+  @total-height: (@big-play-height + (@big-play-border-width * 2));
   // Position the button using the absolute-align mixin (bottom of page)
   .absolute-align(@big-play-align, @big-play-margin, @total-width);
   .absolute-align(@big-play-vertical-align, @big-play-margin, @total-height);
@@ -495,8 +495,8 @@ easily in the skin designer. http://designer.videojs.com/
 
 /* Optionally center */
 .vjs-default-skin.vjs-big-play-centered .vjs-big-play-button {
-  @total-width: @big-play-width + (@big-play-border-width * 2);
-  @total-height: @big-play-height + (@big-play-border-width * 2);
+  @total-width: (@big-play-width + (@big-play-border-width * 2));
+  @total-height: (@big-play-height + (@big-play-border-width * 2));
 
   .absolute-align(center, @big-play-margin, @total-width);
   .absolute-align(middle, @big-play-margin, @total-height);
@@ -946,12 +946,12 @@ body.vjs-full-window {
 .absolute-align (@align, @margin, @length) when (@align = center) {
   /* Center it horizontally *///
   left: 50%;
-  margin-left: -(@length / 2);
+  margin-left: ((@length*-1)/2);
 }
 .absolute-align (@align, @margin, @length) when (@align = middle) {
   /* Center it vertically *///
   top: 50%;
-  margin-top: -(@length / 2);
+  margin-top: ((@length*-1)/2);
 }
 
 // http://stackoverflow.com/questions/637921/opacity-of-background-but-not-the-text
