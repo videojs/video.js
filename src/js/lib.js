@@ -566,14 +566,16 @@ vjs.createTimeRange = function(start, end){
 
 /**
  * Simple http request for retrieving external files (e.g. text tracks)
- * @param  {String} url           URL of resource
- * @param  {Function=} onSuccess  Success callback
- * @param  {Function=} onError    Error callback
+ * @param  {String} url              URL of resource
+ * @param  {Function=} onSuccess     Success callback
+ * @param  {Function=} onError       Error callback
+ * @param  {Boolean} withCredentials Flag which allow credentials
  * @private
  */
-vjs.get = function(url, onSuccess, onError){
+vjs.get = function(url, onSuccess, onError, withCredentials){
   var local, request;
 
+  onError = onError || function(){};
   if (typeof XMLHttpRequest === 'undefined') {
     window.XMLHttpRequest = function () {
       try { return new window.ActiveXObject('Msxml2.XMLHTTP.6.0'); } catch (e) {}
@@ -584,10 +586,31 @@ vjs.get = function(url, onSuccess, onError){
   }
 
   request = new XMLHttpRequest();
+  if(!('withCredentials' in request) && window.XDomainRequest) {
+    request = new window.XDomainRequest();
+    request.onload = function() {
+      onSuccess(request.responseText);
+    };
+    request.onprogress = function() {};
+    request.onerror = onError;
+    request.ontimeout = onError;
+    try {
+      request.open('GET', url);
+      request.send();
+    } catch (e) {
+      onError(e);
+    }
+    return;
+  }
+
   try {
-    request.open('GET', url);
+    request.open('GET', url, true);
+    if(withCredentials) {
+      request.withCredentials = true;
+    }
   } catch(e) {
     onError(e);
+    return;
   }
 
   local = (url.indexOf('file:') === 0 || (window.location.href.indexOf('file:') === 0 && url.indexOf('http') === -1));
@@ -597,9 +620,7 @@ vjs.get = function(url, onSuccess, onError){
       if (request.status === 200 || local && request.status === 0) {
         onSuccess(request.responseText);
       } else {
-        if (onError) {
-          onError();
-        }
+        onError();
       }
     }
   };
@@ -607,9 +628,7 @@ vjs.get = function(url, onSuccess, onError){
   try {
     request.send();
   } catch(e) {
-    if (onError) {
-      onError(e);
-    }
+    onError(e);
   }
 };
 
