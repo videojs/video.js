@@ -84,6 +84,7 @@
   "contributions": {
 
     "feature": {
+      "desc": "Create a new feature or general enhancement",
       "start": {
         "desc": "Start a new feature",
         "steps": [
@@ -132,7 +133,7 @@
           },
           {
             "desc": "Are you sure <%= branch %> is the branch you want to submit",
-            "prompt": "confirm"
+            "confirm": "confirm"
           },
           {
             "id": "user",
@@ -151,7 +152,7 @@
     },
 
     "patch": {
-      "desc": "Urgent fixes for the latest stable version",
+      "desc": "Create an urgent fix for the latest stable version",
       "new": {
         "desc": "Start a new patch",
         "steps": [
@@ -200,7 +201,7 @@
           },
           {
             "desc": "Are you sure <%= branch %> is the branch you want to submit",
-            "prompt": "confirm"
+            "confirm": "confirm"
           },
           {
             "id": "user",
@@ -227,7 +228,7 @@
           },
           {
             "desc": "Confirm you are deleting the correct branch",
-            "prompt": "Delete branch '<%= name %>'?"
+            "confirm": "Delete branch '<%= name %>'?"
           },
           {
             "desc": "Delete the local copy of the branch",
@@ -239,6 +240,79 @@
           }
         ]
       }
+    },
+
+    "bug": {
+      "desc": "Submit a bug report",
+      "steps": [
+        {
+          "id": "title",
+          "prompt": "Title your bug report"
+        },
+        {
+          "id": "reproduce",
+          "prompt": "What did you do? (steps to reproduce)"
+        },
+        {
+          "id": "expected",
+          "prompt": "What did you expect to happen?"
+        },
+        {
+          "id": "actual",
+          "prompt": "What actually happened?"
+        },
+        {
+          "id": "version",
+          "prompt": "What version of video.js are you using?"
+        },
+        {
+          "id": "plugins",
+          "prompt": "Are you using any video.js plugins?"
+        },
+        {
+          "id": "browsers",
+          "prompt": "What browsers/platforms did you experience this in (e.g. Win 7, IE10; Android 4, Chrome;)?"
+        },
+        {
+          "id": "example",
+          "prompt": "Is there a URL to a live example, or a jsbin (e.g. http://jsbin.com/axedog/9999/edit)?"
+        },
+        {
+          "id": "details",
+          "prompt": "Are there any other details you'd like to provide?"
+        },
+        {
+          "open": "https://github.com/videojs/video.js/issues/new?title=<%= title %>&body=**Steps to reproduce:**\n> <%= reproduce %>\n\n**What was expected:**\n> <%= expected %>\n\n**What Happened:**\n> <%= actual %>\n\n**Video.js Version:**\n> <%= version %>\n\n**Plugins:**\n> <%= plugins %>\n\n**Browsers experienced on:**\n> <%= browsers %>\n\n**Example:**\n> <%= example %>\n\n**Other details:**\n> <%= details %>"
+        }
+      ]
+    },
+
+    "request": {
+      "desc": "Submit a feature/enhancement request",
+      "steps": [
+        {
+          "id": "title",
+          "prompt": "Title your request"
+        },
+        {
+          "id": "describe",
+          "prompt": "Describe the feature/enhancement (be as detailed as possible so it's clear who, why, and how it would be used)"
+        },
+        {
+          "id": "docs",
+          "prompt": "Is there any existing documentation or related specifications?"
+        },
+        {
+          "id": "examples",
+          "prompt": "Are there any existing examples?"
+        },
+        {
+          "confirm": "You will be redirected to Github where you can submit this issue, OK?"
+        },
+        {
+          "open": "https://github.com/videojs/video.js/issues/new?title=<%= title %>&body=**Describe the feature/enhancement:**\n> <%= describe %>\n\n**Existing docs/specs:**\n> <%= docs %>\n\n**Existing examples:**\n> <%= examples %>"
+        }
+      ]
     },
 
     "release": {
@@ -254,7 +328,7 @@
         },
         {
           "desc": "Have the changes been merged into the release branch (stable)?",
-          "prompt": "confirm"
+          "confirm": "confirm"
         },
         {
           "id": "type",
