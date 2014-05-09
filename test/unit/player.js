@@ -86,7 +86,7 @@ test('should get tag, source, and track settings', function(){
   fixture.innerHTML += html;
 
   var tag = document.getElementById('example_1');
-  var player = new vjs.Player(tag);
+  var player = PlayerTest.makePlayer({}, tag);
 
   ok(player.options_['autoplay'] === true);
   ok(player.options_['preload'] === 'none'); // No extern. Use string.

@@ -100,9 +100,7 @@ vjs.options = {
   },
 
   // Default message to show when a video cannot be played.
-  'notSupportedMessage': 'No compatible source ' +
-      'was found for this video. Learn more about' +
-      ' <a href="http://www.videojs.com/html5-video-support/">supporting video</a>.'
+  'notSupportedMessage': 'No compatible source was found for this video.'
 };
 
 // Set CDN Version of swf

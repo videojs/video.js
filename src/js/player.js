@@ -407,6 +407,10 @@ vjs.Player.prototype.onLoadStart = function() {
   this.off('play', initFirstPlay);
   this.one('play', initFirstPlay);
 
+  if (this.error()) {
+    this.error(null);
+  }
+
   vjs.removeClass(this.el_, 'vjs-has-started');
 };
 
@@ -620,12 +624,11 @@ vjs.Player.prototype.techGet = function(method){
  * @return {vjs.Player} self
  */
 vjs.Player.prototype.play = function(){
-  if (this.error()) {
-    // In the case of an error, trying to play again wont fix the issue
-    // so we're blocking calling play in this case.
-    // We might log an error when this happpens, but this is probably too chatty.
-    // vjs.log.error('The error must be resolved before attempting to play the video');
-  } else {
+  // In the case of an error, trying to play again wont fix the issue
+  // so we're blocking calling play in this case.
+  // We might log an error when this happpens, but this is probably too chatty.
+  // vjs.log.error('The error must be resolved before attempting to play the video');
+  if (!this.error()) {
     this.techCall('play');
   }
 
@@ -1268,46 +1271,6 @@ vjs.Player.prototype.usingNativeControls = function(bool){
 };
 
 /**
- * Custom MediaError to mimic the HTML5 MediaError
- * @param {Number} code The media error code
- */
-vjs.MediaError = function(code){
-  if (typeof code == 'number') {
-    this.code = code;
-  } else if (typeof code == 'string') {
-    // default code is zero, so this is a custom error
-    this.message = code;
-  } else if (typeof code == 'object') { // object
-    vjs.obj.merge(this, code);
-  }
-};
-
-vjs.MediaError.prototype.code = 0;
-
-// message is not part of the HTML5 video spec
-// but allows for more informative custom errors
-vjs.MediaError.prototype.message = '';
-
-vjs.MediaError.prototype.status = null;
-
-vjs.MediaError.errorTypes = [
-  'MEDIA_ERR_CUSTOM',            // = 0
-  'MEDIA_ERR_ABORTED',           // = 1
-  'MEDIA_ERR_NETWORK',           // = 2
-  'MEDIA_ERR_DECODE',            // = 3
-  'MEDIA_ERR_SRC_NOT_SUPPORTED', // = 4
-  'MEDIA_ERR_ENCRYPTED'          // = 5
-];
-
-// Add types as properties on MediaError
-// e.g. MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED = 4;
-for (var errNum = 0; errNum < vjs.MediaError.errorTypes.length; errNum++) {
-  vjs.MediaError[vjs.MediaError.errorTypes[errNum]] = errNum;
-  // values should be accessible on both the class and instance
-  vjs.MediaError.prototype[vjs.MediaError.errorTypes[errNum]] = errNum;
-}
-
-/**
  * Store the current media error
  * @type {Object}
  * @private
@@ -1351,27 +1314,6 @@ vjs.Player.prototype.error = function(err){
 
   return this;
 };
-
-// vjs.Player.prototype.waiting_ = false;
-
-// vjs.Player.prototype.waiting = function(bool){
-//   if (bool === undefined) {
-//     return this.waiting_;
-//   }
-
-//   var wasWaiting = this.waiting_;
-//   this.waiting_ = bool;
-
-//   // trigger an event if it's newly waiting
-//   if (!wasWaiting && bool) {
-//     this.addClass('vjs-waiting');
-//     this.trigger('waiting');
-//   } else {
-//     this.removeClass('vjs-waiting');
-//   }
-
-//   return this;
-// };
 
 vjs.Player.prototype.ended = function(){ return this.techGet('ended'); };
 vjs.Player.prototype.seeking = function(){ return this.techGet('seeking'); };
