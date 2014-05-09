@@ -22,7 +22,6 @@ vjs.LoadingSpinner = vjs.Component.extend({
     // 'seeking' event
     player.on('seeked', vjs.bind(this, this.hide));
 
-    player.on('error', vjs.bind(this, this.show));
     player.on('ended', vjs.bind(this, this.hide));
 
     // Not showing spinner on stalled any more. Browsers may stall and then not trigger any events that would remove the spinner.

@@ -38,6 +38,7 @@
         "start",
         "stop",
         "strictEqual",
-        "test"
+        "test",
+        "sinon"
     ]
 }
