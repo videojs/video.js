@@ -946,12 +946,14 @@ body.vjs-full-window {
 .absolute-align (@align, @margin, @length) when (@align = center) {
   /* Center it horizontally *///
   left: 50%;
-  margin-left: ((@length*-1)/2);
+  margin-left: (-(@length/2));
+  // margin-left: ((@length*-1)/2);
 }
 .absolute-align (@align, @margin, @length) when (@align = middle) {
   /* Center it vertically *///
   top: 50%;
-  margin-top: ((@length*-1)/2);
+  margin-top: (-(@length/2));
+  // margin-top: ((@length*-1)/2);
 }
 
 // http://stackoverflow.com/questions/637921/opacity-of-background-but-not-the-text
