@@ -26,7 +26,7 @@ test('should add a child component', function(){
   ok(comp.getChildById(child.id()) === child);
 });
 
-test('should init child coponents from options', function(){
+test('should init child components from options', function(){
   var comp = new vjs.Component(getFakePlayer(), {
     children: {
       'component': true
@@ -35,6 +35,32 @@ test('should init child coponents from options', function(){
 
   ok(comp.children().length === 1);
   ok(comp.el().childNodes.length === 1);
+});
+
+test('should init child components from simple children array', function(){
+  var comp = new vjs.Component(getFakePlayer(), {
+    children: [
+      'component',
+      'component',
+      'component'
+    ]
+  });
+
+  ok(comp.children().length === 3);
+  ok(comp.el().childNodes.length === 3);
+});
+
+test('should init child components from children array of objects', function(){
+  var comp = new vjs.Component(getFakePlayer(), {
+    children: [
+      { 'name': 'component' },
+      { 'name': 'component' },
+      { 'name': 'component' }
+    ]
+  });
+
+  ok(comp.children().length === 3);
+  ok(comp.el().childNodes.length === 3);
 });
 
 test('should do a deep merge of child options', function(){
@@ -229,7 +255,7 @@ test('should use a defined content el for appending children', function(){
 });
 
 test('should emit a tap event', function(){
-  expect(1);
+  expect(2);
 
   // Fake touch support. Real touch support isn't needed for this test.
   var origTouch = vjs.TOUCH_ENABLED;
@@ -241,13 +267,27 @@ test('should emit a tap event', function(){
   comp.on('tap', function(){
     ok(true, 'Tap event emitted');
   });
-  comp.trigger('touchstart');
+
+  // A touchstart followed by touchend should trigger a tap
+  vjs.trigger(comp.el(), {type: 'touchstart', touches: [{}]});
   comp.trigger('touchend');
 
-  // This second test should not trigger another tap event because
-  // a touchmove is happening
-  comp.trigger('touchstart');
-  comp.trigger('touchmove');
+  // A touchmove with a lot of movement should not trigger a tap
+  vjs.trigger(comp.el(), {type: 'touchstart', touches: [
+    { pageX: 0, pageY: 0 }
+  ]});
+  vjs.trigger(comp.el(), {type: 'touchmove', touches: [
+    { pageX: 100, pageY: 100 }
+  ]});
+  comp.trigger('touchend');
+
+  // A touchmove with not much movement should still allow a tap
+  vjs.trigger(comp.el(), {type: 'touchstart', touches: [
+    { pageX: 0, pageY: 0 }
+  ]});
+  vjs.trigger(comp.el(), {type: 'touchmove', touches: [
+    { pageX: 10, pageY: 10 }
+  ]});
   comp.trigger('touchend');
 
   // Reset to orignial value

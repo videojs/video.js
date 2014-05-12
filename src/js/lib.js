@@ -60,7 +60,7 @@ vjs.obj = {};
  * @param  {Object}   obj Object to use as prototype
  * @private
  */
- vjs.obj.create = Object.create || function(obj){
+vjs.obj.create = Object.create || function(obj){
   //Create a new function called 'F' which is just an empty object.
   function F() {}
 
@@ -566,17 +566,19 @@ vjs.createTimeRange = function(start, end){
 
 /**
  * Simple http request for retrieving external files (e.g. text tracks)
- * @param  {String} url              URL of resource
- * @param  {Function=} onSuccess     Success callback
- * @param  {Function=} onError       Error callback
- * @param  {Boolean} withCredentials Flag which allow credentials
+ * @param  {String}    url             URL of resource
+ * @param  {Function} onSuccess       Success callback
+ * @param  {Function=} onError         Error callback
+ * @param  {Boolean=}   withCredentials Flag which allow credentials
  * @private
  */
 vjs.get = function(url, onSuccess, onError, withCredentials){
-  var local, request;
+  var fileUrl, request, a, crossOrigin;
 
   onError = onError || function(){};
+
   if (typeof XMLHttpRequest === 'undefined') {
+    // Shim XMLHttpRequest for older IEs
     window.XMLHttpRequest = function () {
       try { return new window.ActiveXObject('Msxml2.XMLHTTP.6.0'); } catch (e) {}
       try { return new window.ActiveXObject('Msxml2.XMLHTTP.3.0'); } catch (f) {}
@@ -586,25 +588,44 @@ vjs.get = function(url, onSuccess, onError, withCredentials){
   }
 
   request = new XMLHttpRequest();
-  if(!('withCredentials' in request) && window.XDomainRequest) {
+
+  // check the host of the url
+  a = vjs.createEl('a', { href: url });
+  crossOrigin = (a.origin !== window.location.origin);
+
+  // Use XDomainRequest for IE if XMLHTTPRequest2 isn't available
+  // 'withCredentials' is only available in XMLHTTPRequest2
+  // Also XDomainRequest has a lot of gotchas, so only use if cross domain
+  if(crossOrigin && window.XDomainRequest && !('withCredentials' in request)) {
     request = new window.XDomainRequest();
     request.onload = function() {
       onSuccess(request.responseText);
     };
-    request.onprogress = function() {};
     request.onerror = onError;
+    // these blank handlers need to be set to fix ie9 http://cypressnorth.com/programming/internet-explorer-aborting-ajax-requests-fixed/
+    request.onprogress = function() {};
     request.ontimeout = onError;
-    try {
-      request.open('GET', url);
-      request.send();
-    } catch (e) {
-      onError(e);
-    }
-    return;
+
+  // XMLHTTPRequest
+  } else {
+    fileUrl = (a.protocol == 'file:' || window.location.protocol == 'file:');
+
+    request.onreadystatechange = function() {
+      if (request.readyState === 4) {
+        if (request.status === 200 || fileUrl && request.status === 0) {
+          onSuccess(request.responseText);
+        } else {
+          onError(request.responseText);
+        }
+      }
+    };
   }
 
+  // open the connection
   try {
+    // Third arg is async, or ignored by XDomainRequest
     request.open('GET', url, true);
+    // withCredentials only supported by XMLHttpRequest2
     if(withCredentials) {
       request.withCredentials = true;
     }
@@ -613,18 +634,7 @@ vjs.get = function(url, onSuccess, onError, withCredentials){
     return;
   }
 
-  local = (url.indexOf('file:') === 0 || (window.location.href.indexOf('file:') === 0 && url.indexOf('http') === -1));
-
-  request.onreadystatechange = function() {
-    if (request.readyState === 4) {
-      if (request.status === 200 || local && request.status === 0) {
-        onSuccess(request.responseText);
-      } else {
-        onError();
-      }
-    }
-  };
-
+  // send the request
   try {
     request.send();
   } catch(e) {
@@ -688,32 +698,33 @@ vjs.log = function(){
 // Offset Left
 // getBoundingClientRect technique from John Resig http://ejohn.org/blog/getboundingclientrect-is-awesome/
 vjs.findPosition = function(el) {
-    var box, docEl, body, clientLeft, scrollLeft, left, clientTop, scrollTop, top;
+  var box, docEl, body, clientLeft, scrollLeft, left, clientTop, scrollTop, top;
 
-    if (el.getBoundingClientRect && el.parentNode) {
-      box = el.getBoundingClientRect();
-    }
+  if (el.getBoundingClientRect && el.parentNode) {
+    box = el.getBoundingClientRect();
+  }
 
-    if (!box) {
-      return {
-        left: 0,
-        top: 0
-      };
-    }
-
-    docEl = document.documentElement;
-    body = document.body;
-
-    clientLeft = docEl.clientLeft || body.clientLeft || 0;
-    scrollLeft = window.pageXOffset || body.scrollLeft;
-    left = box.left + scrollLeft - clientLeft;
-
-    clientTop = docEl.clientTop || body.clientTop || 0;
-    scrollTop = window.pageYOffset || body.scrollTop;
-    top = box.top + scrollTop - clientTop;
-
+  if (!box) {
     return {
-      left: left,
-      top: top
+      left: 0,
+      top: 0
     };
+  }
+
+  docEl = document.documentElement;
+  body = document.body;
+
+  clientLeft = docEl.clientLeft || body.clientLeft || 0;
+  scrollLeft = window.pageXOffset || body.scrollLeft;
+  left = box.left + scrollLeft - clientLeft;
+
+  clientTop = docEl.clientTop || body.clientTop || 0;
+  scrollTop = window.pageYOffset || body.scrollTop;
+  top = box.top + scrollTop - clientTop;
+
+  // Android sometimes returns slightly off decimal values, so need to round
+  return {
+    left: vjs.round(left),
+    top: vjs.round(top)
+  };
 };

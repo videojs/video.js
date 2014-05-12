@@ -80,7 +80,7 @@ test('should get tag, source, and track settings', function(){
   var html = '<video id="example_1" class="video-js" autoplay preload="metadata">';
       html += '<source src="http://google.com" type="video/mp4">';
       html += '<source src="http://google.com" type="video/webm">';
-      html += '<track src="http://google.com" kind="captions" default>';
+      html += '<track src="http://google.com" kind="captions" attrtest>';
       html += '</video>';
 
   fixture.innerHTML += html;
@@ -97,7 +97,7 @@ test('should get tag, source, and track settings', function(){
   ok(player.options_['sources'][1].type === 'video/webm');
   ok(player.options_['tracks'].length === 1);
   ok(player.options_['tracks'][0]['kind'] === 'captions'); // No extern
-  ok(player.options_['tracks'][0]['default'] === true);
+  ok(player.options_['tracks'][0]['attrtest'] === '');
 
   ok(player.el().className.indexOf('video-js') !== -1, 'transferred class from tag to player div');
   ok(player.el().id === 'example_1', 'transferred id from tag to player div');
@@ -357,15 +357,6 @@ test('should use custom message when encountering an unsupported video type',
   player.dispose();
 });
 
-test('should return the player when setting src', function() {
-  var player, ret;
-
-  player = PlayerTest.makePlayer({}),
-  ret = player.src('foo');
-
-  equal(player, ret, 'the player is returned');
-});
-
 test('should register players with generated ids', function(){
   var fixture, video, player, id;
   fixture = document.getElementById('qunit-fixture');
@@ -379,4 +370,35 @@ test('should register players with generated ids', function(){
 
   equal(player.el().id, player.id(), 'the player and element ids are equal');
   ok(vjs.players[id], 'the generated id is registered');
+});
+
+test('should not add multiple first play events despite subsequent loads', function() {
+  expect(1);
+
+  var player = PlayerTest.makePlayer({});
+
+  player.on('firstplay', function(){
+    ok('First play should fire once.');
+  });
+
+  // Checking to make sure onLoadStart removes first play listener before adding a new one.
+  player.trigger('loadstart');
+  player.trigger('loadstart');
+  player.trigger('play');
+});
+
+test('should remove vjs-has-started class', function(){
+  expect(3);
+
+  var player = PlayerTest.makePlayer({});
+
+  player.trigger('loadstart');
+  player.trigger('play');
+  ok(player.el().className.indexOf('vjs-has-started') !== -1, 'vjs-has-started class added');
+
+  player.trigger('loadstart');
+  ok(player.el().className.indexOf('vjs-has-started') === -1, 'vjs-has-started class removed');
+
+  player.trigger('play');
+  ok(player.el().className.indexOf('vjs-has-started') !== -1, 'vjs-has-started class added again');
 });

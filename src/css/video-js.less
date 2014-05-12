@@ -303,6 +303,8 @@ fonts to show/hide properly.
   top: 0;
   left: 0;
   height: 0.5em;
+  /* assuming volume starts at 1.0 */
+  width: 100%;
 
   background: @slider-bar-color
     url(@slider-bar-pattern)
@@ -311,6 +313,10 @@ fonts to show/hide properly.
 .vjs-default-skin .vjs-volume-bar .vjs-volume-handle {
   width: 0.5em;
   height: 0.5em;
+  /* Assumes volume starts at 1.0. If you change the size of the
+     handle relative to the volume bar, you'll need to update this value
+     too. */
+  left: 4.5em;
 }
 
 .vjs-default-skin .vjs-volume-handle:before {
@@ -368,6 +374,8 @@ fonts to show/hide properly.
   height: 100%;
   margin: 0;
   padding: 0;
+  /* updated by javascript during playback */
+  width: 0;
   /* Needed for IE6 *///
   left: 0;
   top: 0;
@@ -398,6 +406,27 @@ fonts to show/hide properly.
 
 .vjs-default-skin .vjs-seek-handle:before {
   padding-top: 0.1em /* Minor adjustment */;
+}
+
+/* Live Mode
+--------------------------------------------------------------------------------
+*/
+.vjs-default-skin.vjs-live .vjs-time-controls,
+.vjs-default-skin.vjs-live .vjs-time-divider,
+.vjs-default-skin.vjs-live .vjs-progress-control {
+  display: none;
+}
+.vjs-default-skin.vjs-live .vjs-live-display {
+  display: block;
+}
+
+/* Live Display
+--------------------------------------------------------------------------------
+*/
+.vjs-default-skin .vjs-live-display {
+  display: none;
+  font-size: 1em;
+  line-height: 3em;
 }
 
 /* Time Display
@@ -796,6 +825,26 @@ body.vjs-full-window {
   display: block !important;
   opacity: 1;
   visibility: visible;
+}
+
+/*  In IE8 w/ no JavaScript (no HTML5 shim), the video tag doesn't register.
+    The .video-js classname on the video tag also isn't considered.
+    This optional paragraph inside the video tag can provide a message to users
+    about what's required to play video. */
+.vjs-no-js {
+  padding: 20px;
+  color: #ccc;
+  background-color: #333;
+  font-size: 18px;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  width: 300px;
+  height: 150px;
+  margin: 0px auto;
+}
+
+.vjs-no-js a, .vjs-no-js a:visited {
+  color: #F4A460;
 }
 
 // MIXINS

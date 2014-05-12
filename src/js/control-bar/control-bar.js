@@ -16,6 +16,7 @@ vjs.ControlBar.prototype.options_ = {
     'timeDivider': {},
     'durationDisplay': {},
     'remainingTimeDisplay': {},
+    'liveDisplay': {},
     'progressControl': {},
     'fullscreenToggle': {},
     'volumeControl': {},
