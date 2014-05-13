@@ -152,6 +152,7 @@ vjs.MediaTechController.prototype.features = {
 
   // Resizing plugins using request fullscreen reloads the plugin
   'fullscreenResize': false,
+  'playbackRate': false,
 
   // Optional events that we can manually mimic with timers
   // currently not triggered by video-js-swf

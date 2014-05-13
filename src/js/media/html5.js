@@ -15,6 +15,9 @@ vjs.Html5 = vjs.MediaTechController.extend({
     // volume cannot be changed from 1 on iOS
     this.features['volumeControl'] = vjs.Html5.canControlVolume();
 
+    // just in case; or is it excessively...
+    this.features['playbackRate'] = vjs.Html5.canControlPlaybackRate();
+
     // In iOS, if you move a video element in the DOM, it breaks video playback.
     this.features['movingMediaElementInDOM'] = !vjs.IS_IOS;
 
@@ -242,6 +245,9 @@ vjs.Html5.prototype.seeking = function(){ return this.el_.seeking; };
 vjs.Html5.prototype.ended = function(){ return this.el_.ended; };
 vjs.Html5.prototype.defaultMuted = function(){ return this.el_.defaultMuted; };
 
+vjs.Html5.prototype.playbackRate = function(){ return this.el_.playbackRate; };
+vjs.Html5.prototype.setPlaybackRate = function(val){ this.el_.playbackRate = val; };
+
 /* HTML5 Support Testing ---------------------------------------------------- */
 
 vjs.Html5.isSupported = function(){
@@ -272,6 +278,12 @@ vjs.Html5.canControlVolume = function(){
   var volume =  vjs.TEST_VID.volume;
   vjs.TEST_VID.volume = (volume / 2) + 0.1;
   return volume !== vjs.TEST_VID.volume;
+};
+
+vjs.Html5.canControlPlaybackRate = function(){
+  var playbackRate =  vjs.TEST_VID.playbackRate;
+  vjs.TEST_VID.playbackRate = (playbackRate / 2) + 0.1;
+  return playbackRate !== vjs.TEST_VID.playbackRate;
 };
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //

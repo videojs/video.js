@@ -88,6 +88,11 @@ vjs.options = {
   // defaultVolume: 0.85,
   'defaultVolume': 0.00, // The freakin seaguls are driving me crazy!
 
+  // default playback rates
+  'playbackRates': [],
+  // Add playback rate selection by adding rates
+  // 'playbackRates': [0.5, 1, 1.5, 2],
+
   // Included control sets
   'children': {
     'mediaLoader': {},
