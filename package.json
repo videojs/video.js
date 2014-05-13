@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "grunt-cli": "~0.1.0",
-    "grunt": "~0.4",
+    "grunt": "0.4.2",
     "grunt-contrib-connect": "~0.7.1",
     "grunt-contrib-jshint": "~0.4.3",
     "grunt-contrib-watch": "~0.1.4",
@@ -57,6 +57,7 @@
     "grunt-tagrelease": "~0.3.3",
     "github": "~0.1.14",
     "open": "0.0.4",
-    "grunt-version": "~0.3.0"
+    "grunt-version": "~0.3.0",
+    "sinon": "~1.9.1"
   }
 }

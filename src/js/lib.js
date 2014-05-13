@@ -656,14 +656,74 @@ vjs.getAbsoluteURL = function(url){
   return url;
 };
 
-// usage: log('inside coolFunc',this,arguments);
-// http://paulirish.com/2009/log-a-lightweight-wrapper-for-consolelog/
-vjs.log = function(){
-  vjs.log.history = vjs.log.history || [];   // store logs to an array for reference
-  vjs.log.history.push(arguments);
-  if(window.console){
-    window.console.log(Array.prototype.slice.call(arguments));
+// if there's no console then don't try to output messages
+// they will still be stored in vjs.log.history
+var _noop = function(){};
+var _console = window['console'] || {
+  'log': _noop,
+  'warn': _noop,
+  'error': _noop
+};
+
+/**
+ * Log messags to the console and history based on the type of message
+ *
+ * @param  {String} type The type of message, or `null` for `log`
+ * @param  {[type]} args The args to be passed to the log
+ * @private
+ */
+function _logType(type, args){
+  // convert args to an array to get array functions
+  var argsArray = Array.prototype.slice.call(args);
+
+  if (type) {
+    // add the type to the front of the message
+    argsArray.unshift(type.toUpperCase()+':');
+  } else {
+    // default to log with no prefix
+    type = 'log';
   }
+
+  // add to history
+  vjs.log.history.push(argsArray);
+
+  // add console prefix after adding to history
+  argsArray.unshift('VIDEOJS:');
+
+  // call appropriate log function
+  if (_console[type].apply) {
+    _console[type].apply(_console, argsArray);
+  } else {
+    // ie8 doesn't allow error.apply, but it will just join() the array anyway
+    _console[type](argsArray.join(' '));
+  }
+}
+
+/**
+ * Log plain debug messages
+ */
+vjs.log = function(){
+  _logType(null, arguments);
+};
+
+/**
+ * Keep a history of log messages
+ * @type {Array}
+ */
+vjs.log.history = [];
+
+/**
+ * Log error messages
+ */
+vjs.log.error = function(){
+  _logType('error', arguments);
+};
+
+/**
+ * Log warning messages
+ */
+vjs.log.warn = function(){
+  _logType('warn', arguments);
 };
 
 // Offset Left

@@ -84,7 +84,6 @@ vjs.Player = vjs.Component.extend({
     this.on('pause', this.onPause);
     this.on('progress', this.onProgress);
     this.on('durationchange', this.onDurationChange);
-    this.on('error', this.onError);
     this.on('fullscreenchange', this.onFullscreenChange);
 
     // Make player easily findable by ID
@@ -408,6 +407,10 @@ vjs.Player.prototype.onLoadStart = function() {
   this.off('play', initFirstPlay);
   this.one('play', initFirstPlay);
 
+  if (this.error()) {
+    this.error(null);
+  }
+
   vjs.removeClass(this.el_, 'vjs-has-started');
 };
 
@@ -552,14 +555,6 @@ vjs.Player.prototype.onFullscreenChange = function() {
   }
 };
 
-/**
- * Fired when there is an error in playback
- * @event error
- */
-vjs.Player.prototype.onError = function(e) {
-  vjs.log('Video Error', e);
-};
-
 // /* Player API
 // ================================================================================ */
 
@@ -594,7 +589,6 @@ vjs.Player.prototype.techCall = function(method, arg){
 
 // Get calls can't wait for the tech, and sometimes don't need to.
 vjs.Player.prototype.techGet = function(method){
-
   if (this.tech && this.tech.isReady_) {
 
     // Flash likes to die and reload when you hide or reposition it.
@@ -630,7 +624,14 @@ vjs.Player.prototype.techGet = function(method){
  * @return {vjs.Player} self
  */
 vjs.Player.prototype.play = function(){
-  this.techCall('play');
+  // In the case of an error, trying to play again wont fix the issue
+  // so we're blocking calling play in this case.
+  // We might log an error when this happpens, but this is probably too chatty.
+  // vjs.log.error('The error must be resolved before attempting to play the video');
+  if (!this.error()) {
+    this.techCall('play');
+  }
+
   return this;
 };
 
@@ -1070,9 +1071,10 @@ vjs.Player.prototype.src = function(source){
         this.loadTech(techName, source);
       }
     } else {
-      this.el_.appendChild(vjs.createEl('p', {
-        innerHTML: this.options()['notSupportedMessage']
-      }));
+      // this.el_.appendChild(vjs.createEl('p', {
+      //   innerHTML: this.options()['notSupportedMessage']
+      // }));
+      this.error({ code: 4, message: this.options()['notSupportedMessage'] });
       this.triggerReady(); // we could not find an appropriate tech, but let's still notify the delegate that this is it
     }
 
@@ -1268,7 +1270,51 @@ vjs.Player.prototype.usingNativeControls = function(bool){
   return this.usingNativeControls_;
 };
 
-vjs.Player.prototype.error = function(){ return this.techGet('error'); };
+/**
+ * Store the current media error
+ * @type {Object}
+ * @private
+ */
+vjs.Player.prototype.error_ = null;
+
+/**
+ * Set or get the current MediaError
+ * @param  {*} err A MediaError or a String/Number to be turned into a MediaError
+ * @return {vjs.MediaError|null}     when getting
+ * @return {vjs.Player}              when setting
+ */
+vjs.Player.prototype.error = function(err){
+  if (err === undefined) {
+    return this.error_;
+  }
+
+  // restoring to default
+  if (err === null) {
+    this.error_ = err;
+    this.removeClass('vjs-error');
+    return this;
+  }
+
+  // error instance
+  if (err instanceof vjs.MediaError) {
+    this.error_ = err;
+  } else {
+    this.error_ = new vjs.MediaError(err);
+  }
+
+  // fire an error event on the player
+  this.trigger('error');
+
+  // add the vjs-error classname to the player
+  this.addClass('vjs-error');
+
+  // log the name of the error type and any message
+  // ie8 just logs "[object object]" if you just log the error object
+  vjs.log.error('(CODE:'+this.error_.code+' '+vjs.MediaError.errorTypes[this.error_.code]+')', this.error_.message, this.error_);
+
+  return this;
+};
+
 vjs.Player.prototype.ended = function(){ return this.techGet('ended'); };
 vjs.Player.prototype.seeking = function(){ return this.techGet('seeking'); };
 

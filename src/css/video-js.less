@@ -193,6 +193,11 @@ The default control bar that is a container for most of the controls.
   display: none;
 }
 
+/* The control bar shouldn't show after an error */
+.vjs-default-skin.vjs-error .vjs-control-bar {
+  display: none;
+}
+
 /* IE8 is flakey with fonts, and you have to change the actual content to force
 fonts to show/hide properly.
   - "\9" IE8 hack didn't work for this
@@ -543,6 +548,59 @@ easily in the skin designer. http://designer.videojs.com/
   height: 100%;
 }
 
+.vjs-error .vjs-big-play-button {
+  display: none;
+}
+
+/* Error Display
+--------------------------------------------------------------------------------
+*/
+
+.vjs-error-display {
+  display: none;
+}
+
+.vjs-error .vjs-error-display {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.vjs-error .vjs-error-display:before {
+  content: 'X';
+  font-family: Arial;
+  font-size: 4em;
+  color: #666666;
+  /* In order to center the play icon vertically we need to set the line height
+     to the same as the button height */
+  line-height: 1;
+  text-shadow: 0.05em 0.05em 0.1em #000;
+  text-align: center /* Needed for IE8 */;
+  vertical-align: middle;
+
+  position: absolute;
+  top: 50%;
+  margin-top: -0.5em;
+  width: 100%;
+}
+
+.vjs-error-display div {
+  position: absolute;
+
+  font-size: 1.4em;
+  text-align: center;
+  bottom: 1em;
+  right: 1em;
+  left: 1em;
+}
+
+.vjs-error-display a, .vjs-error-display a:visited {
+  color: #F4A460;
+}
+
 /* Loading Spinner
 --------------------------------------------------------------------------------
 */
@@ -564,6 +622,18 @@ easily in the skin designer. http://designer.videojs.com/
   opacity: 0.75;
 
   .animation(spin 1.5s infinite linear);
+}
+
+/* Errors are unrecoverable without user interaction,
+   so hide the spinner in the case of an error */
+.video-js.vjs-error .vjs-loading-spinner {
+  /* using !important flag because currently the loading spinner
+     uses hide()/show() instead of classes. The !important can be
+     removed when that's updated */
+  display: none !important;
+
+  /* ensure animation doesn't continue while hidden */
+  .animation(none);
 }
 
 .vjs-default-skin .vjs-loading-spinner:before {
