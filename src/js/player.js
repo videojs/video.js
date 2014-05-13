@@ -1000,7 +1000,7 @@ vjs.Player.prototype.selectSource = function(sources){
         tech = window['videojs'][techName];
 
     // Check if the browser supports this technology
-    if (tech.isSupported()) {
+    if (tech && tech.isSupported()) {
       // Loop through each source object
       for (var a=0,b=sources;a<b.length;a++) {
         var source = b[a];
