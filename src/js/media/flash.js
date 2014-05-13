@@ -317,7 +317,6 @@ vjs.Flash.prototype.enterFullScreen = function(){
   return false;
 };
 
-
 // Create setters and getters for attributes
 var api = vjs.Flash.prototype,
     readWrite = 'rtmpConnection,rtmpStream,preload,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted'.split(','),

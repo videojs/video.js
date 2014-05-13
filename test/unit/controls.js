@@ -103,3 +103,12 @@ test('calculateDistance should use changedTouches, if available', function() {
 
   equal(slider.calculateDistance(event), 0.5, 'we should have touched exactly in the center, so, the ratio should be half');
 });
+
+test('should hide playback rate control if it\'s not supported', function(){
+  expect(1);
+
+  var player = PlayerTest.makePlayer();
+  var playbackRate = new vjs.PlaybackRateMenuButton(player);
+
+  ok(playbackRate.el().className.indexOf('vjs-hidden') >= 0, 'playbackRate is not hidden');
+});
