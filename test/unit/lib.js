@@ -243,6 +243,16 @@ test('should get an absolute URL', function(){
   ok(vjs.getAbsoluteURL('https://asdf.com/index.html') === 'https://asdf.com/index.html');
 });
 
+test('should parse the details of a url correctly', function(){
+  equal(vjs.parseUrl('#').protocol, window.location.protocol, 'parsed relative url protocol');
+  equal(vjs.parseUrl('#').host, window.location.host, 'parsed relative url host');
+
+  equal(vjs.parseUrl('http://example.com').protocol, 'http:', 'parsed example url protocol');
+  equal(vjs.parseUrl('http://example.com').hostname, 'example.com', 'parsed example url hostname');
+
+  equal(vjs.parseUrl('http://example.com:1234').port, '1234', 'parsed example url port');
+});
+
 test('vjs.findPosition should find top and left position', function() {
   var d = document.createElement('div'),
     position = vjs.findPosition(d);

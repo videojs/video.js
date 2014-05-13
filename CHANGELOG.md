@@ -17,6 +17,7 @@ CHANGELOG
 * Fixed the default flag for captions/subtitles tracks [[view](https://github.com/videojs/video.js/pull/1153)]
 * Fixed compilation failures with LESS v1.7.0 and GRUNT v0.4.4 [[view](https://github.com/videojs/video.js/pull/1180)]
 * Added better error handling across the library [[view](https://github.com/videojs/video.js/pull/1197)]
+* Updated captions/subtiles file fetching to support cross-origin requests in older IE browsers [[view](https://github.com/videojs/video.js/pull/1095)]
 
 --------------------
 
