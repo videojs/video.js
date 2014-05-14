@@ -49,8 +49,6 @@ module.exports = function(config) {
 
     customLaunchers: customLaunchers,
 
-    browsers: ['chrome_sl', 'ipad_sl'],
-
     files: [
       '../test/karma-qunit-shim.js',
       "../src/js/core.js",

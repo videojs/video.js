@@ -136,11 +136,12 @@ module.exports = function(grunt) {
     },
     karma: {
       saucelabs: {
+        browsers: ['chrome_sl', 'ipad_sl'],
         configFile: 'test/karma.conf.js'
       },
       local: {
         browsers: ['Chrome'],
-        configFile: 'test/localkarma.conf.js'
+        configFile: 'test/karma.conf.js'
       },
       minified: {
         browsers: ['Chrome'],
