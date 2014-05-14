@@ -32,8 +32,10 @@ vjs.Html5 = vjs.MediaTechController.extend({
     // If the element source is already set, we may have missed the loadstart event, and want to trigger it.
     // We don't want to set the source again and interrupt playback.
     if (source && this.el_.currentSrc === source.src && this.el_.networkState > 0) {
-      player.trigger('loadstart');
-
+      // wait for the player to be ready so the player listeners are attached
+      player.ready(function(){
+        player.trigger('loadstart');
+      });
     // Otherwise set the source if one was provided.
     } else if (source) {
       this.el_.src = source.src;
