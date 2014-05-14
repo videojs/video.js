@@ -58,6 +58,20 @@ vjs.Player = vjs.Component.extend({
     // see enableTouchActivity in Component
     options.reportTouchActivity = false;
 
+    // Make sure the event listeners are the first things to happen when
+    // the player is ready. See #1208
+    // If not, the tech might fire events before the listeners are attached.
+    this.ready(function(){
+      this.on('loadstart', this.onLoadStart);
+      this.on('ended', this.onEnded);
+      this.on('play', this.onPlay);
+      this.on('firstplay', this.onFirstPlay);
+      this.on('pause', this.onPause);
+      this.on('progress', this.onProgress);
+      this.on('durationchange', this.onDurationChange);
+      this.on('fullscreenchange', this.onFullscreenChange);
+    });
+
     // Run base component initializing with new options.
     // Builds the element through createEl()
     // Inits and embeds any child components in opts
@@ -76,15 +90,6 @@ vjs.Player = vjs.Component.extend({
     // if (vjs.TOUCH_ENABLED) {
     //   this.addClass('vjs-touch-enabled');
     // }
-
-    this.on('loadstart', this.onLoadStart);
-    this.on('ended', this.onEnded);
-    this.on('play', this.onPlay);
-    this.on('firstplay', this.onFirstPlay);
-    this.on('pause', this.onPause);
-    this.on('progress', this.onProgress);
-    this.on('durationchange', this.onDurationChange);
-    this.on('fullscreenchange', this.onFullscreenChange);
 
     // Make player easily findable by ID
     vjs.players[this.id_] = this;
