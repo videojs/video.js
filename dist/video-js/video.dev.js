@@ -64,7 +64,7 @@ var videojs = vjs;
 window.videojs = window.vjs = vjs;
 
 // CDN Version. Used to target right flash swf.
-vjs.CDN_VERSION = '4.5';
+vjs.CDN_VERSION = '4.6';
 vjs.ACCESS_PROTOCOL = ('https:' == document.location.protocol ? 'https://' : 'http://');
 
 /**
@@ -88,6 +88,11 @@ vjs.options = {
   // defaultVolume: 0.85,
   'defaultVolume': 0.00, // The freakin seaguls are driving me crazy!
 
+  // default playback rates
+  'playbackRates': [],
+  // Add playback rate selection by adding rates
+  // 'playbackRates': [0.5, 1, 1.5, 2],
+
   // Included control sets
   'children': {
     'mediaLoader': {},
@@ -104,7 +109,7 @@ vjs.options = {
 };
 
 // Set CDN Version of swf
-// The added (+) blocks the replace from changing this 4.5 string
+// The added (+) blocks the replace from changing this 4.6 string
 if (vjs.CDN_VERSION !== 'GENERATED'+'_CDN_VSN') {
   videojs.options['flash']['swf'] = vjs.ACCESS_PROTOCOL + 'vjs.zencdn.net/'+vjs.CDN_VERSION+'/video-js.swf';
 }
@@ -1177,15 +1182,19 @@ vjs.createTimeRange = function(start, end){
 
 /**
  * Simple http request for retrieving external files (e.g. text tracks)
- * @param  {String} url           URL of resource
- * @param  {Function=} onSuccess  Success callback
- * @param  {Function=} onError    Error callback
+ * @param  {String}    url             URL of resource
+ * @param  {Function} onSuccess       Success callback
+ * @param  {Function=} onError         Error callback
+ * @param  {Boolean=}   withCredentials Flag which allow credentials
  * @private
  */
-vjs.get = function(url, onSuccess, onError){
-  var local, request;
+vjs.get = function(url, onSuccess, onError, withCredentials){
+  var fileUrl, request, urlInfo, winLoc, crossOrigin;
+
+  onError = onError || function(){};
 
   if (typeof XMLHttpRequest === 'undefined') {
+    // Shim XMLHttpRequest for older IEs
     window.XMLHttpRequest = function () {
       try { return new window.ActiveXObject('Msxml2.XMLHTTP.6.0'); } catch (e) {}
       try { return new window.ActiveXObject('Msxml2.XMLHTTP.3.0'); } catch (f) {}
@@ -1195,32 +1204,59 @@ vjs.get = function(url, onSuccess, onError){
   }
 
   request = new XMLHttpRequest();
-  try {
-    request.open('GET', url);
-  } catch(e) {
-    onError(e);
-  }
 
-  local = (url.indexOf('file:') === 0 || (window.location.href.indexOf('file:') === 0 && url.indexOf('http') === -1));
+  urlInfo = vjs.parseUrl(url);
+  winLoc = window.location;
+  // check if url is for another domain/origin
+  // ie8 doesn't know location.origin, so we won't rely on it here
+  crossOrigin = (urlInfo.protocol + urlInfo.host) !== (winLoc.protocol + winLoc.host);
 
-  request.onreadystatechange = function() {
-    if (request.readyState === 4) {
-      if (request.status === 200 || local && request.status === 0) {
-        onSuccess(request.responseText);
-      } else {
-        if (onError) {
-          onError();
+  // Use XDomainRequest for IE if XMLHTTPRequest2 isn't available
+  // 'withCredentials' is only available in XMLHTTPRequest2
+  // Also XDomainRequest has a lot of gotchas, so only use if cross domain
+  if(crossOrigin && window.XDomainRequest && !('withCredentials' in request)) {
+    request = new window.XDomainRequest();
+    request.onload = function() {
+      onSuccess(request.responseText);
+    };
+    request.onerror = onError;
+    // these blank handlers need to be set to fix ie9 http://cypressnorth.com/programming/internet-explorer-aborting-ajax-requests-fixed/
+    request.onprogress = function() {};
+    request.ontimeout = onError;
+
+  // XMLHTTPRequest
+  } else {
+    fileUrl = (urlInfo.protocol == 'file:' || winLoc.protocol == 'file:');
+
+    request.onreadystatechange = function() {
+      if (request.readyState === 4) {
+        if (request.status === 200 || fileUrl && request.status === 0) {
+          onSuccess(request.responseText);
+        } else {
+          onError(request.responseText);
         }
       }
-    }
-  };
+    };
+  }
 
+  // open the connection
+  try {
+    // Third arg is async, or ignored by XDomainRequest
+    request.open('GET', url, true);
+    // withCredentials only supported by XMLHttpRequest2
+    if(withCredentials) {
+      request.withCredentials = true;
+    }
+  } catch(e) {
+    onError(e);
+    return;
+  }
+
+  // send the request
   try {
     request.send();
   } catch(e) {
-    if (onError) {
-      onError(e);
-    }
+    onError(e);
   }
 };
 
@@ -1265,6 +1301,48 @@ vjs.getAbsoluteURL = function(url){
   }
 
   return url;
+};
+
+
+/**
+ * Resolve and parse the elements of a URL
+ * @param  {String} url The url to parse
+ * @return {Object}     An object of url details
+ */
+vjs.parseUrl = function(url) {
+  var div, a, addToBody, props, details;
+
+  props = ['protocol', 'hostname', 'port', 'pathname', 'search', 'hash', 'host'];
+
+  // add the url to an anchor and let the browser parse the URL
+  a = vjs.createEl('a', { href: url });
+
+  // IE8 (and 9?) Fix
+  // ie8 doesn't parse the URL correctly until the anchor is actually
+  // added to the body, and an innerHTML is needed to trigger the parsing
+  addToBody = (a.host === '' && a.protocol !== 'file:');
+  if (addToBody) {
+    div = vjs.createEl('div');
+    div.innerHTML = '<a href="'+url+'"></a>';
+    a = div.firstChild;
+    // prevent the div from affecting layout
+    div.setAttribute('style', 'display:none; position:absolute;');
+    document.body.appendChild(div);
+  }
+
+  // Copy the specific URL properties to a new object
+  // This is also needed for IE8 because the anchor loses its
+  // properties when it's removed from the dom
+  details = {};
+  for (var i = 0; i < props.length; i++) {
+    details[props[i]] = a[props[i]];
+  }
+
+  if (addToBody) {
+    document.body.removeChild(div);
+  }
+
+  return details;
 };
 
 // if there's no console then don't try to output messages
@@ -3027,6 +3105,20 @@ vjs.Player = vjs.Component.extend({
     // see enableTouchActivity in Component
     options.reportTouchActivity = false;
 
+    // Make sure the event listeners are the first things to happen when
+    // the player is ready. See #1208
+    // If not, the tech might fire events before the listeners are attached.
+    this.ready(function(){
+      this.on('loadstart', this.onLoadStart);
+      this.on('ended', this.onEnded);
+      this.on('play', this.onPlay);
+      this.on('firstplay', this.onFirstPlay);
+      this.on('pause', this.onPause);
+      this.on('progress', this.onProgress);
+      this.on('durationchange', this.onDurationChange);
+      this.on('fullscreenchange', this.onFullscreenChange);
+    });
+
     // Run base component initializing with new options.
     // Builds the element through createEl()
     // Inits and embeds any child components in opts
@@ -3045,15 +3137,6 @@ vjs.Player = vjs.Component.extend({
     // if (vjs.TOUCH_ENABLED) {
     //   this.addClass('vjs-touch-enabled');
     // }
-
-    this.on('loadstart', this.onLoadStart);
-    this.on('ended', this.onEnded);
-    this.on('play', this.onPlay);
-    this.on('firstplay', this.onFirstPlay);
-    this.on('pause', this.onPause);
-    this.on('progress', this.onProgress);
-    this.on('durationchange', this.onDurationChange);
-    this.on('fullscreenchange', this.onFullscreenChange);
 
     // Make player easily findable by ID
     vjs.players[this.id_] = this;
@@ -4418,6 +4501,20 @@ vjs.Player.prototype.listenForUserActivity = function(){
   });
 };
 
+vjs.Player.prototype.playbackRate = function(rate) {
+  if (rate !== undefined) {
+    this.techCall('setPlaybackRate', rate);
+    return this;
+  }
+
+  if (this.tech && this.tech.features && this.tech.features['playbackRate']) {
+    return this.techGet('playbackRate');
+  } else {
+    return 1.0;
+  }
+
+};
+
 // Methods to add support for
 // networkState: function(){ return this.techCall('networkState'); },
 // readyState: function(){ return this.techCall('readyState'); },
@@ -4430,7 +4527,6 @@ vjs.Player.prototype.listenForUserActivity = function(){
 // videoWidth: function(){ return this.techCall('videoWidth'); },
 // videoHeight: function(){ return this.techCall('videoHeight'); },
 // defaultPlaybackRate: function(){ return this.techCall('defaultPlaybackRate'); },
-// playbackRate: function(){ return this.techCall('playbackRate'); },
 // mediaGroup: function(){ return this.techCall('mediaGroup'); },
 // controller: function(){ return this.techCall('controller'); },
 // defaultMuted: function(){ return this.techCall('defaultMuted'); }
@@ -4507,8 +4603,9 @@ vjs.ControlBar.prototype.options_ = {
     'progressControl': {},
     'fullscreenToggle': {},
     'volumeControl': {},
-    'muteToggle': {}
-    // 'volumeMenuButton': {}
+    'muteToggle': {},
+    // 'volumeMenuButton': {},
+    'playbackRateMenuButton': {}
   }
 };
 
@@ -5214,6 +5311,135 @@ vjs.VolumeMenuButton.prototype.createEl = function(){
   });
 };
 vjs.VolumeMenuButton.prototype.update = vjs.MuteToggle.prototype.update;
+/**
+ * The component for controlling the playback rate
+ *
+ * @param {vjs.Player|Object} player
+ * @param {Object=} options
+ * @constructor
+ */
+vjs.PlaybackRateMenuButton = vjs.MenuButton.extend({
+  /** @constructor */
+  init: function(player, options){
+    vjs.MenuButton.call(this, player, options);
+
+    this.updateVisibility();
+    this.updateLabel();
+
+    player.on('loadstart', vjs.bind(this, this.updateVisibility));
+    player.on('ratechange', vjs.bind(this, this.updateLabel));
+  }
+});
+
+vjs.PlaybackRateMenuButton.prototype.createEl = function(){
+  var el = vjs.Component.prototype.createEl.call(this, 'div', {
+    className: 'vjs-playback-rate vjs-menu-button vjs-control',
+    innerHTML: '<div class="vjs-control-content"><span class="vjs-control-text">Playback Rate</span></div>'
+  });
+
+  this.labelEl_ = vjs.createEl('div', {
+    className: 'vjs-playback-rate-value',
+    innerHTML: 1.0
+  });
+
+  el.appendChild(this.labelEl_);
+
+  return el;
+};
+
+// Menu creation
+vjs.PlaybackRateMenuButton.prototype.createMenu = function(){
+  var menu = new vjs.Menu(this.player());
+  var rates = this.player().options().playbackRates;
+
+  if (rates) {
+    for (var i = rates.length - 1; i >= 0; i--) {
+      menu.addChild(
+        new vjs.PlaybackRateMenuItem(this.player(), {rate: rates[i] + 'x'})
+        );
+    };
+  }
+
+  return menu;
+};
+
+vjs.PlaybackRateMenuButton.prototype.updateARIAAttributes = function(){
+  // Current playback rate
+  this.el().setAttribute('aria-valuenow', this.player().playbackRate());
+};
+
+vjs.PlaybackRateMenuButton.prototype.onClick = function(){
+  // select next rate option
+  var currentRate = this.player().playbackRate();
+  var rates = this.player().options().playbackRates;
+  // this will select first one if the last one currently selected
+  var newRate = rates[0];
+  for (var i = 0; i <rates.length ; i++) {
+    if (rates[i] > currentRate) {
+      newRate = rates[i];
+      break;
+    }
+  };
+  this.player().playbackRate(newRate);
+};
+
+vjs.PlaybackRateMenuButton.prototype.playbackRateSupported = function(){
+  return this.player().tech
+    && this.player().tech.features['playbackRate']
+    && this.player().options().playbackRates
+    && this.player().options().playbackRates.length > 0
+  ;
+};
+
+/**
+ * Hide playback rate controls when they're no playback rate options to select
+ */
+vjs.PlaybackRateMenuButton.prototype.updateVisibility = function(){
+  if (this.playbackRateSupported()) {
+    this.removeClass('vjs-hidden');
+  } else {
+    this.addClass('vjs-hidden');
+  }
+};
+
+/**
+ * Update button label when rate changed
+ */
+vjs.PlaybackRateMenuButton.prototype.updateLabel = function(){
+  if (this.playbackRateSupported()) {
+    this.labelEl_.innerHTML = this.player().playbackRate() + 'x';
+  }
+};
+
+/**
+ * The specific menu item type for selecting a playback rate
+ *
+ * @constructor
+ */
+vjs.PlaybackRateMenuItem = vjs.MenuItem.extend({
+  contentElType: 'button',
+  /** @constructor */
+  init: function(player, options){
+    var label = this.label = options['rate'];
+    var rate = this.rate = parseFloat(label, 10);
+
+    // Modify options for parent MenuItem class's init.
+    options['label'] = label;
+    options['selected'] = rate === 1;
+    vjs.MenuItem.call(this, player, options);
+
+    this.player().on('ratechange', vjs.bind(this, this.update));
+  }
+});
+
+vjs.PlaybackRateMenuItem.prototype.onClick = function(){
+  vjs.MenuItem.prototype.onClick.call(this);
+  this.player().playbackRate(this.rate);
+};
+
+vjs.PlaybackRateMenuItem.prototype.update = function(){
+  this.selected(this.player().playbackRate() == this.rate);
+};
 /* Poster Image
 ================================================================================ */
 /**
@@ -5539,6 +5765,7 @@ vjs.MediaTechController.prototype.features = {
 
   // Resizing plugins using request fullscreen reloads the plugin
   'fullscreenResize': false,
+  'playbackRate': false,
 
   // Optional events that we can manually mimic with timers
   // currently not triggered by video-js-swf
@@ -5582,6 +5809,9 @@ vjs.Html5 = vjs.MediaTechController.extend({
     // volume cannot be changed from 1 on iOS
     this.features['volumeControl'] = vjs.Html5.canControlVolume();
 
+    // just in case; or is it excessively...
+    this.features['playbackRate'] = vjs.Html5.canControlPlaybackRate();
+
     // In iOS, if you move a video element in the DOM, it breaks video playback.
     this.features['movingMediaElementInDOM'] = !vjs.IS_IOS;
 
@@ -5596,8 +5826,10 @@ vjs.Html5 = vjs.MediaTechController.extend({
     // If the element source is already set, we may have missed the loadstart event, and want to trigger it.
     // We don't want to set the source again and interrupt playback.
     if (source && this.el_.currentSrc === source.src && this.el_.networkState > 0) {
-      player.trigger('loadstart');
-
+      // wait for the player to be ready so the player listeners are attached
+      player.ready(function(){
+        player.trigger('loadstart');
+      });
     // Otherwise set the source if one was provided.
     } else if (source) {
       this.el_.src = source.src;
@@ -5809,6 +6041,9 @@ vjs.Html5.prototype.seeking = function(){ return this.el_.seeking; };
 vjs.Html5.prototype.ended = function(){ return this.el_.ended; };
 vjs.Html5.prototype.defaultMuted = function(){ return this.el_.defaultMuted; };
 
+vjs.Html5.prototype.playbackRate = function(){ return this.el_.playbackRate; };
+vjs.Html5.prototype.setPlaybackRate = function(val){ this.el_.playbackRate = val; };
+
 /* HTML5 Support Testing ---------------------------------------------------- */
 
 vjs.Html5.isSupported = function(){
@@ -5839,6 +6074,12 @@ vjs.Html5.canControlVolume = function(){
   var volume =  vjs.TEST_VID.volume;
   vjs.TEST_VID.volume = (volume / 2) + 0.1;
   return volume !== vjs.TEST_VID.volume;
+};
+
+vjs.Html5.canControlPlaybackRate = function(){
+  var playbackRate =  vjs.TEST_VID.playbackRate;
+  vjs.TEST_VID.playbackRate = (playbackRate / 2) + 0.1;
+  return playbackRate !== vjs.TEST_VID.playbackRate;
 };
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //
@@ -6240,7 +6481,6 @@ vjs.Flash.prototype.supportsFullScreen = function(){
 vjs.Flash.prototype.enterFullScreen = function(){
   return false;
 };
-
 
 // Create setters and getters for attributes
 var api = vjs.Flash.prototype,
