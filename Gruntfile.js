@@ -373,8 +373,10 @@ module.exports = function(grunt) {
             return done();
           }
 
-          stdout.pipe(process.stdout);
-          stderr.pipe(process.stderr);
+          grunt.verbose.error(stderr.toString());
+          grunt.verbose.writeln(stdout.toString());
+          grunt.task.run(['karma:saucelabs']);
+          done();
       });
     } else {
       grunt.task.run(['karma:saucelabs']);
