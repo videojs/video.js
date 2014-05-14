@@ -135,31 +135,95 @@ module.exports = function(grunt) {
       }
     },
     karma: {
+      // this config file applies to all following configs except if overwritten
+      options: {
+        configFile: 'test/karma.conf.js'
+      },
+
+      // this only runs on PRs from the mainrepo on saucelabs
       saucelabs: {
-        browsers: ['chrome_sl', 'ipad_sl'],
-        configFile: 'test/karma.conf.js'
+        browsers: ['chrome_sl', 'ipad_sl']
       },
-      local: {
-        browsers: ['Chrome'],
-        configFile: 'test/karma.conf.js'
+
+      // these are run locally on local browsers
+      dev: {
+        browsers: ['Chrome', 'Firefox', 'Safari']
       },
-      minified: {
+      chromecanary: {
+        browsers: ['ChromeCanary']
+      },
+      chrome: {
+        browsers: ['Chrome']
+      },
+      firefox: {
+        browsers: ['Firefox']
+      },
+      safari: {
+        browsers: ['Safari']
+      },
+      ie: {
+        browsers: ['IE']
+      },
+      phantomjs: {
+        browsers: ['PhantomJS']
+      },
+
+      // This is all the minified tests run locally on local browsers
+      minified_dev: {
+        browsers: ['Chrome', 'Firefox', 'Safari'],
+        configFile: 'test/karma.minified.conf.js'
+      },
+      minified_chromecanary: {
+        browsers: ['ChromeCanary'],
+        configFile: 'test/karma.minified.conf.js'
+      },
+      minified_chrome: {
         browsers: ['Chrome'],
         configFile: 'test/karma.minified.conf.js'
       },
-      minifiedapi: {
+      minified_firefox: {
+        browsers: ['Firefox'],
+        configFile: 'test/karma.minified.conf.js'
+      },
+      minified_safari: {
+        browsers: ['Safari'],
+        configFile: 'test/karma.minified.conf.js'
+      },
+      minified_ie: {
+        browsers: ['IE'],
+        configFile: 'test/karma.minified.conf.js'
+      },
+      minified_phantomjs: {
+        browsers: ['PhantomJS'],
+        configFile: 'test/karma.minified.conf.js'
+      },
+
+      // This is all the minified api tests run locally on local browsers
+      minified_api_dev: {
+        browsers: ['Chrome', 'Firefox', 'Safari'],
+        configFile: 'test/karma.minified.api.conf.js'
+      },
+      minified_api_chromecanary: {
+        browsers: ['ChromeCanary'],
+        configFile: 'test/karma.minified.api.conf.js'
+      },
+      minified_api_chrome: {
         browsers: ['Chrome'],
         configFile: 'test/karma.minified.api.conf.js'
       },
-      local_pjs: {
-        browsers: ['PhantomJS'],
-        configFile: 'test/karma.conf.js'
+      minified_api_firefox: {
+        browsers: ['Firefox'],
+        configFile: 'test/karma.minified.api.conf.js'
       },
-      minified_pjs: {
-        browsers: ['PhantomJS'],
-        configFile: 'test/karma.minified.conf.js'
+      minified_api_safari: {
+        browsers: ['Safari'],
+        configFile: 'test/karma.minified.api.conf.js'
       },
-      minifiedapi_pjs: {
+      minified_api_ie: {
+        browsers: ['IE'],
+        configFile: 'test/karma.minified.api.conf.js'
+      },
+      minified_api_phantomjs: {
         browsers: ['PhantomJS'],
         configFile: 'test/karma.minified.api.conf.js'
       }
@@ -258,12 +322,14 @@ module.exports = function(grunt) {
   // when running via a PR from a fork, it'll run qunit tests in phantom using karma
   // otherwise, it'll run the tests in chrome via karma
   grunt.registerTask('test', function() {
-    var tasks = this.args;
+    var tasks = this.args,
+        tasksMinified,
+        tasksMinifiedApi;
 
     grunt.task.run(['jshint', 'less', 'build', 'minify', 'usebanner']);
 
     if (process.env.TRAVIS_PULL_REQUEST) {
-      grunt.task.run(['karma:local_pjs', 'karma:minified_pjs', 'karma:minifiedapi_pjs']);
+      grunt.task.run(['karma:phantomjs', 'karma:minified_phantomjs', 'karma:minified_api_phantomjs']);
     } else if (process.env.TRAVIS) {
       grunt.task.run(['karma:saucelabs']);
     } else {
@@ -273,11 +339,25 @@ module.exports = function(grunt) {
       if (tasks.length === 1) {
         tasks = tasks[0].split(',');
       }
+
+      tasksMinified = tasks.slice();
+      tasksMinifiedApi = tasks.slice();
+
+      tasksMinified = tasksMinified.map(function(task) {
+        return 'minified_' + task;
+      });
+
+      tasksMinifiedApi = tasksMinifiedApi.map(function(task) {
+        return 'minified_api_' + task;
+      });
+
+      tasks = tasks.concat(tasksMinified).concat(tasksMinifiedApi);
       tasks = tasks.map(function(el) {
         return 'karma:' + el;
       });
 
-      grunt.task.run(['karma:local', 'karma:minified', 'karma:minifiedapi']);
+
+      grunt.task.run(tasks);
     }
   });
 
