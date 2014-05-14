@@ -25,16 +25,34 @@ vjs.Button = vjs.Component.extend({
 });
 
 vjs.Button.prototype.createEl = function(type, props){
+  var el;
+
   // Add standard Aria and Tabindex info
   props = vjs.obj.merge({
     className: this.buildCSSClass(),
-    innerHTML: '<div class="vjs-control-content"><span class="vjs-control-text">' + (this.buttonText || 'Need Text') + '</span></div>',
     'role': 'button',
     'aria-live': 'polite', // let the screen reader user know that the text of the button may change
     tabIndex: 0
   }, props);
 
-  return vjs.Component.prototype.createEl.call(this, type, props);
+  el = vjs.Component.prototype.createEl.call(this, type, props);
+
+  // if innerHTML hasn't been overridden (bigPlayButton), add content elements
+  if (!props.innerHTML) {
+    this.contentEl_ = vjs.createEl('div', {
+      className: 'vjs-control-content'
+    });
+
+    this.controlText_ = vjs.createEl('span', {
+      className: 'vjs-control-text',
+      innerHTML: this.buttonText || 'Need Text'
+    });
+
+    this.contentEl_.appendChild(this.controlText_);
+    el.appendChild(this.contentEl_);
+  }
+
+  return el;
 };
 
 vjs.Button.prototype.buildCSSClass = function(){
