@@ -77,6 +77,11 @@ vjs.Player = vjs.Component.extend({
     //   this.addClass('vjs-touch-enabled');
     // }
 
+    // if loadstart has already fired, invoke the handler now
+    if (this.currentSrc()) {
+      this.onLoadStart();
+    }
+
     this.on('loadstart', this.onLoadStart);
     this.on('ended', this.onEnded);
     this.on('play', this.onPlay);
