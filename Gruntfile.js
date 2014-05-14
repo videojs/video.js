@@ -145,23 +145,23 @@ module.exports = function(grunt) {
       },
       minified: {
         browsers: ['Chrome'],
-        configFile: 'test/localkarma.minified.conf.js'
+        configFile: 'test/karma.minified.conf.js'
       },
       minifiedapi: {
         browsers: ['Chrome'],
-        configFile: 'test/localkarma.minified.api.conf.js'
+        configFile: 'test/karma.minified.api.conf.js'
       },
       local_pjs: {
         browsers: ['PhantomJS'],
-        configFile: 'test/localkarma.conf.js'
+        configFile: 'test/karma.conf.js'
       },
       minified_pjs: {
         browsers: ['PhantomJS'],
-        configFile: 'test/localkarma.minified.conf.js'
+        configFile: 'test/karma.minified.conf.js'
       },
       minifiedapi_pjs: {
         browsers: ['PhantomJS'],
-        configFile: 'test/localkarma.minified.api.conf.js'
+        configFile: 'test/karma.minified.api.conf.js'
       }
     },
     vjsdocs: {
