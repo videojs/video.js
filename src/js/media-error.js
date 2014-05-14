@@ -3,12 +3,12 @@
  * @param {Number} code The media error code
  */
 vjs.MediaError = function(code){
-  if (typeof code == 'number') {
+  if (typeof code === 'number') {
     this.code = code;
-  } else if (typeof code == 'string') {
+  } else if (typeof code === 'string') {
     // default code is zero, so this is a custom error
     this.message = code;
-  } else if (typeof code == 'object') { // object
+  } else if (typeof code === 'object') { // object
     vjs.obj.merge(this, code);
   }
 

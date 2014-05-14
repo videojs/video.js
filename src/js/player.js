@@ -629,14 +629,7 @@ vjs.Player.prototype.techGet = function(method){
  * @return {vjs.Player} self
  */
 vjs.Player.prototype.play = function(){
-  // In the case of an error, trying to play again wont fix the issue
-  // so we're blocking calling play in this case.
-  // We might log an error when this happpens, but this is probably too chatty.
-  // vjs.log.error('The error must be resolved before attempting to play the video');
-  if (!this.error()) {
-    this.techCall('play');
-  }
-
+  this.techCall('play');
   return this;
 };
 
