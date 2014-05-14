@@ -1,9 +1,10 @@
 module.exports = function(grunt) {
-  var pkg, s3, semver, version, verParts, uglify;
+  var pkg, s3, semver, version, verParts, uglify, exec;
 
   semver = require('semver');
   pkg = grunt.file.readJSON('package.json');
   uglify = require('uglify-js');
+  exec = require('child_process').exec;
 
   try {
     s3 = grunt.file.readJSON('.s3config.json');
@@ -358,6 +359,26 @@ module.exports = function(grunt) {
 
 
       grunt.task.run(tasks);
+    }
+  });
+
+  grunt.registerTask('saucelabs', function() {
+    var done = this.async();
+
+    if (this.args[0] == 'connect') {
+      exec('curl https://gist.githubusercontent.com/santiycr/5139565/raw/sauce_connect_setup.sh | bash',
+        function(error, stdout, stderr) {
+          if (error) {
+            grunt.log.error(error);
+            return done();
+          }
+
+          stdout.pipe(process.stdout);
+          stderr.pipe(process.stderr);
+      });
+    } else {
+      grunt.task.run(['karma:saucelabs']);
+      done();
     }
   });
 
