@@ -10,6 +10,16 @@ CHANGELOG
 * Fixed extra mousemove events on Windows caused by certain apps, not users [[view](https://github.com/videojs/video.js/pull/1068)]
 * Fixed error due to undefined tech when no source is supported [[view](https://github.com/videojs/video.js/pull/1172)]
 * Fixed the progress bar not finishing when manual timeupdate events are used [[view](https://github.com/videojs/video.js/pull/1173)]
+* Added a more informative and styled fallback message for non-html5 browsers [[view](https://github.com/videojs/video.js/pull/1181)]
+* Added the option to provide an array of child components instead of an object [[view](https://github.com/videojs/video.js/pull/1093)]
+* Fixed casing on webkitRequestFullscreen [[view](https://github.com/videojs/video.js/pull/1101)]
+* Made tap events on mobile less sensitive to touch moves [[view](https://github.com/videojs/video.js/pull/1111)]
+* Fixed the default flag for captions/subtitles tracks [[view](https://github.com/videojs/video.js/pull/1153)]
+* Fixed compilation failures with LESS v1.7.0 and GRUNT v0.4.4 [[view](https://github.com/videojs/video.js/pull/1180)]
+* Added better error handling across the library [[view](https://github.com/videojs/video.js/pull/1197)]
+* Updated captions/subtiles file fetching to support cross-origin requests in older IE browsers [[view](https://github.com/videojs/video.js/pull/1095)]
+* Added support for playback rate switching [[view](https://github.com/videojs/video.js/pull/1132)]
+* Fixed an issue with the loadstart event order that caused the big play button to not hide [[view](https://github.com/videojs/video.js/pull/1209)]
 
 --------------------
 

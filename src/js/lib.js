@@ -60,7 +60,7 @@ vjs.obj = {};
  * @param  {Object}   obj Object to use as prototype
  * @private
  */
- vjs.obj.create = Object.create || function(obj){
+vjs.obj.create = Object.create || function(obj){
   //Create a new function called 'F' which is just an empty object.
   function F() {}
 
@@ -566,15 +566,19 @@ vjs.createTimeRange = function(start, end){
 
 /**
  * Simple http request for retrieving external files (e.g. text tracks)
- * @param  {String} url           URL of resource
- * @param  {Function=} onSuccess  Success callback
- * @param  {Function=} onError    Error callback
+ * @param  {String}    url             URL of resource
+ * @param  {Function} onSuccess       Success callback
+ * @param  {Function=} onError         Error callback
+ * @param  {Boolean=}   withCredentials Flag which allow credentials
  * @private
  */
-vjs.get = function(url, onSuccess, onError){
-  var local, request;
+vjs.get = function(url, onSuccess, onError, withCredentials){
+  var fileUrl, request, urlInfo, winLoc, crossOrigin;
+
+  onError = onError || function(){};
 
   if (typeof XMLHttpRequest === 'undefined') {
+    // Shim XMLHttpRequest for older IEs
     window.XMLHttpRequest = function () {
       try { return new window.ActiveXObject('Msxml2.XMLHTTP.6.0'); } catch (e) {}
       try { return new window.ActiveXObject('Msxml2.XMLHTTP.3.0'); } catch (f) {}
@@ -584,32 +588,59 @@ vjs.get = function(url, onSuccess, onError){
   }
 
   request = new XMLHttpRequest();
-  try {
-    request.open('GET', url);
-  } catch(e) {
-    onError(e);
-  }
 
-  local = (url.indexOf('file:') === 0 || (window.location.href.indexOf('file:') === 0 && url.indexOf('http') === -1));
+  urlInfo = vjs.parseUrl(url);
+  winLoc = window.location;
+  // check if url is for another domain/origin
+  // ie8 doesn't know location.origin, so we won't rely on it here
+  crossOrigin = (urlInfo.protocol + urlInfo.host) !== (winLoc.protocol + winLoc.host);
 
-  request.onreadystatechange = function() {
-    if (request.readyState === 4) {
-      if (request.status === 200 || local && request.status === 0) {
-        onSuccess(request.responseText);
-      } else {
-        if (onError) {
-          onError();
+  // Use XDomainRequest for IE if XMLHTTPRequest2 isn't available
+  // 'withCredentials' is only available in XMLHTTPRequest2
+  // Also XDomainRequest has a lot of gotchas, so only use if cross domain
+  if(crossOrigin && window.XDomainRequest && !('withCredentials' in request)) {
+    request = new window.XDomainRequest();
+    request.onload = function() {
+      onSuccess(request.responseText);
+    };
+    request.onerror = onError;
+    // these blank handlers need to be set to fix ie9 http://cypressnorth.com/programming/internet-explorer-aborting-ajax-requests-fixed/
+    request.onprogress = function() {};
+    request.ontimeout = onError;
+
+  // XMLHTTPRequest
+  } else {
+    fileUrl = (urlInfo.protocol == 'file:' || winLoc.protocol == 'file:');
+
+    request.onreadystatechange = function() {
+      if (request.readyState === 4) {
+        if (request.status === 200 || fileUrl && request.status === 0) {
+          onSuccess(request.responseText);
+        } else {
+          onError(request.responseText);
         }
       }
-    }
-  };
+    };
+  }
 
+  // open the connection
+  try {
+    // Third arg is async, or ignored by XDomainRequest
+    request.open('GET', url, true);
+    // withCredentials only supported by XMLHttpRequest2
+    if(withCredentials) {
+      request.withCredentials = true;
+    }
+  } catch(e) {
+    onError(e);
+    return;
+  }
+
+  // send the request
   try {
     request.send();
   } catch(e) {
-    if (onError) {
-      onError(e);
-    }
+    onError(e);
   }
 };
 
@@ -656,46 +687,148 @@ vjs.getAbsoluteURL = function(url){
   return url;
 };
 
-// usage: log('inside coolFunc',this,arguments);
-// http://paulirish.com/2009/log-a-lightweight-wrapper-for-consolelog/
-vjs.log = function(){
-  vjs.log.history = vjs.log.history || [];   // store logs to an array for reference
-  vjs.log.history.push(arguments);
-  if(window.console){
-    window.console.log(Array.prototype.slice.call(arguments));
+
+/**
+ * Resolve and parse the elements of a URL
+ * @param  {String} url The url to parse
+ * @return {Object}     An object of url details
+ */
+vjs.parseUrl = function(url) {
+  var div, a, addToBody, props, details;
+
+  props = ['protocol', 'hostname', 'port', 'pathname', 'search', 'hash', 'host'];
+
+  // add the url to an anchor and let the browser parse the URL
+  a = vjs.createEl('a', { href: url });
+
+  // IE8 (and 9?) Fix
+  // ie8 doesn't parse the URL correctly until the anchor is actually
+  // added to the body, and an innerHTML is needed to trigger the parsing
+  addToBody = (a.host === '' && a.protocol !== 'file:');
+  if (addToBody) {
+    div = vjs.createEl('div');
+    div.innerHTML = '<a href="'+url+'"></a>';
+    a = div.firstChild;
+    // prevent the div from affecting layout
+    div.setAttribute('style', 'display:none; position:absolute;');
+    document.body.appendChild(div);
   }
+
+  // Copy the specific URL properties to a new object
+  // This is also needed for IE8 because the anchor loses its
+  // properties when it's removed from the dom
+  details = {};
+  for (var i = 0; i < props.length; i++) {
+    details[props[i]] = a[props[i]];
+  }
+
+  if (addToBody) {
+    document.body.removeChild(div);
+  }
+
+  return details;
+};
+
+// if there's no console then don't try to output messages
+// they will still be stored in vjs.log.history
+var _noop = function(){};
+var _console = window['console'] || {
+  'log': _noop,
+  'warn': _noop,
+  'error': _noop
+};
+
+/**
+ * Log messags to the console and history based on the type of message
+ *
+ * @param  {String} type The type of message, or `null` for `log`
+ * @param  {[type]} args The args to be passed to the log
+ * @private
+ */
+function _logType(type, args){
+  // convert args to an array to get array functions
+  var argsArray = Array.prototype.slice.call(args);
+
+  if (type) {
+    // add the type to the front of the message
+    argsArray.unshift(type.toUpperCase()+':');
+  } else {
+    // default to log with no prefix
+    type = 'log';
+  }
+
+  // add to history
+  vjs.log.history.push(argsArray);
+
+  // add console prefix after adding to history
+  argsArray.unshift('VIDEOJS:');
+
+  // call appropriate log function
+  if (_console[type].apply) {
+    _console[type].apply(_console, argsArray);
+  } else {
+    // ie8 doesn't allow error.apply, but it will just join() the array anyway
+    _console[type](argsArray.join(' '));
+  }
+}
+
+/**
+ * Log plain debug messages
+ */
+vjs.log = function(){
+  _logType(null, arguments);
+};
+
+/**
+ * Keep a history of log messages
+ * @type {Array}
+ */
+vjs.log.history = [];
+
+/**
+ * Log error messages
+ */
+vjs.log.error = function(){
+  _logType('error', arguments);
+};
+
+/**
+ * Log warning messages
+ */
+vjs.log.warn = function(){
+  _logType('warn', arguments);
 };
 
 // Offset Left
 // getBoundingClientRect technique from John Resig http://ejohn.org/blog/getboundingclientrect-is-awesome/
 vjs.findPosition = function(el) {
-    var box, docEl, body, clientLeft, scrollLeft, left, clientTop, scrollTop, top;
+  var box, docEl, body, clientLeft, scrollLeft, left, clientTop, scrollTop, top;
 
-    if (el.getBoundingClientRect && el.parentNode) {
-      box = el.getBoundingClientRect();
-    }
+  if (el.getBoundingClientRect && el.parentNode) {
+    box = el.getBoundingClientRect();
+  }
 
-    if (!box) {
-      return {
-        left: 0,
-        top: 0
-      };
-    }
-
-    docEl = document.documentElement;
-    body = document.body;
-
-    clientLeft = docEl.clientLeft || body.clientLeft || 0;
-    scrollLeft = window.pageXOffset || body.scrollLeft;
-    left = box.left + scrollLeft - clientLeft;
-
-    clientTop = docEl.clientTop || body.clientTop || 0;
-    scrollTop = window.pageYOffset || body.scrollTop;
-    top = box.top + scrollTop - clientTop;
-
-    // Android sometimes returns slightly off decimal values, so need to round
+  if (!box) {
     return {
-      left: vjs.round(left),
-      top: vjs.round(top)
+      left: 0,
+      top: 0
     };
+  }
+
+  docEl = document.documentElement;
+  body = document.body;
+
+  clientLeft = docEl.clientLeft || body.clientLeft || 0;
+  scrollLeft = window.pageXOffset || body.scrollLeft;
+  left = box.left + scrollLeft - clientLeft;
+
+  clientTop = docEl.clientTop || body.clientTop || 0;
+  scrollTop = window.pageYOffset || body.scrollTop;
+  top = box.top + scrollTop - clientTop;
+
+  // Android sometimes returns slightly off decimal values, so need to round
+  return {
+    left: vjs.round(left),
+    top: vjs.round(top)
+  };
 };

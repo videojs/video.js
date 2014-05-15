@@ -58,6 +58,20 @@ vjs.Player = vjs.Component.extend({
     // see enableTouchActivity in Component
     options.reportTouchActivity = false;
 
+    // Make sure the event listeners are the first things to happen when
+    // the player is ready. See #1208
+    // If not, the tech might fire events before the listeners are attached.
+    this.ready(function(){
+      this.on('loadstart', this.onLoadStart);
+      this.on('ended', this.onEnded);
+      this.on('play', this.onPlay);
+      this.on('firstplay', this.onFirstPlay);
+      this.on('pause', this.onPause);
+      this.on('progress', this.onProgress);
+      this.on('durationchange', this.onDurationChange);
+      this.on('fullscreenchange', this.onFullscreenChange);
+    });
+
     // Run base component initializing with new options.
     // Builds the element through createEl()
     // Inits and embeds any child components in opts
@@ -76,16 +90,6 @@ vjs.Player = vjs.Component.extend({
     // if (vjs.TOUCH_ENABLED) {
     //   this.addClass('vjs-touch-enabled');
     // }
-
-    this.on('loadstart', this.onLoadStart);
-    this.on('ended', this.onEnded);
-    this.on('play', this.onPlay);
-    this.on('firstplay', this.onFirstPlay);
-    this.on('pause', this.onPause);
-    this.on('progress', this.onProgress);
-    this.on('durationchange', this.onDurationChange);
-    this.on('error', this.onError);
-    this.on('fullscreenchange', this.onFullscreenChange);
 
     // Make player easily findable by ID
     vjs.players[this.id_] = this;
@@ -408,6 +412,10 @@ vjs.Player.prototype.onLoadStart = function() {
   this.off('play', initFirstPlay);
   this.one('play', initFirstPlay);
 
+  if (this.error()) {
+    this.error(null);
+  }
+
   vjs.removeClass(this.el_, 'vjs-has-started');
 };
 
@@ -552,14 +560,6 @@ vjs.Player.prototype.onFullscreenChange = function() {
   }
 };
 
-/**
- * Fired when there is an error in playback
- * @event error
- */
-vjs.Player.prototype.onError = function(e) {
-  vjs.log('Video Error', e);
-};
-
 // /* Player API
 // ================================================================================ */
 
@@ -594,7 +594,6 @@ vjs.Player.prototype.techCall = function(method, arg){
 
 // Get calls can't wait for the tech, and sometimes don't need to.
 vjs.Player.prototype.techGet = function(method){
-
   if (this.tech && this.tech.isReady_) {
 
     // Flash likes to die and reload when you hide or reposition it.
@@ -1070,9 +1069,10 @@ vjs.Player.prototype.src = function(source){
         this.loadTech(techName, source);
       }
     } else {
-      this.el_.appendChild(vjs.createEl('p', {
-        innerHTML: this.options()['notSupportedMessage']
-      }));
+      // this.el_.appendChild(vjs.createEl('p', {
+      //   innerHTML: this.options()['notSupportedMessage']
+      // }));
+      this.error({ code: 4, message: this.options()['notSupportedMessage'] });
       this.triggerReady(); // we could not find an appropriate tech, but let's still notify the delegate that this is it
     }
 
@@ -1268,7 +1268,51 @@ vjs.Player.prototype.usingNativeControls = function(bool){
   return this.usingNativeControls_;
 };
 
-vjs.Player.prototype.error = function(){ return this.techGet('error'); };
+/**
+ * Store the current media error
+ * @type {Object}
+ * @private
+ */
+vjs.Player.prototype.error_ = null;
+
+/**
+ * Set or get the current MediaError
+ * @param  {*} err A MediaError or a String/Number to be turned into a MediaError
+ * @return {vjs.MediaError|null}     when getting
+ * @return {vjs.Player}              when setting
+ */
+vjs.Player.prototype.error = function(err){
+  if (err === undefined) {
+    return this.error_;
+  }
+
+  // restoring to default
+  if (err === null) {
+    this.error_ = err;
+    this.removeClass('vjs-error');
+    return this;
+  }
+
+  // error instance
+  if (err instanceof vjs.MediaError) {
+    this.error_ = err;
+  } else {
+    this.error_ = new vjs.MediaError(err);
+  }
+
+  // fire an error event on the player
+  this.trigger('error');
+
+  // add the vjs-error classname to the player
+  this.addClass('vjs-error');
+
+  // log the name of the error type and any message
+  // ie8 just logs "[object object]" if you just log the error object
+  vjs.log.error('(CODE:'+this.error_.code+' '+vjs.MediaError.errorTypes[this.error_.code]+')', this.error_.message, this.error_);
+
+  return this;
+};
+
 vjs.Player.prototype.ended = function(){ return this.techGet('ended'); };
 vjs.Player.prototype.seeking = function(){ return this.techGet('seeking'); };
 
@@ -1403,6 +1447,20 @@ vjs.Player.prototype.listenForUserActivity = function(){
   });
 };
 
+vjs.Player.prototype.playbackRate = function(rate) {
+  if (rate !== undefined) {
+    this.techCall('setPlaybackRate', rate);
+    return this;
+  }
+
+  if (this.tech && this.tech.features && this.tech.features['playbackRate']) {
+    return this.techGet('playbackRate');
+  } else {
+    return 1.0;
+  }
+
+};
+
 // Methods to add support for
 // networkState: function(){ return this.techCall('networkState'); },
 // readyState: function(){ return this.techCall('readyState'); },
@@ -1415,7 +1473,6 @@ vjs.Player.prototype.listenForUserActivity = function(){
 // videoWidth: function(){ return this.techCall('videoWidth'); },
 // videoHeight: function(){ return this.techCall('videoHeight'); },
 // defaultPlaybackRate: function(){ return this.techCall('defaultPlaybackRate'); },
-// playbackRate: function(){ return this.techCall('playbackRate'); },
 // mediaGroup: function(){ return this.techCall('mediaGroup'); },
 // controller: function(){ return this.techCall('controller'); },
 // defaultMuted: function(){ return this.techCall('defaultMuted'); }
@@ -1452,13 +1509,14 @@ vjs.Player.prototype.listenForUserActivity = function(){
     if (document.mozCancelFullScreen) {
       prefix = 'moz';
       requestFS.isFullScreen = prefix + 'FullScreen';
+      requestFS.requestFn = prefix + 'RequestFullScreen';
     } else {
       prefix = 'webkit';
       requestFS.isFullScreen = prefix + 'IsFullScreen';
+      requestFS.requestFn = prefix + 'RequestFullscreen';
     }
 
     if (div[prefix + 'RequestFullScreen']) {
-      requestFS.requestFn = prefix + 'RequestFullScreen';
       requestFS.cancelFn = prefix + 'CancelFullScreen';
     }
     requestFS.eventName = prefix + 'fullscreenchange';

@@ -8,6 +8,7 @@ module.exports = function(config) {
 
     files: [
       '../test/karma-qunit-shim.js',
+      '../node_modules/sinon/pkg/sinon.js',
       '../build/files/minified.video.js',
       '../test/unit/test-helpers.js',
       '../test/unit/api.js'

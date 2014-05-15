@@ -77,19 +77,19 @@ test('should get tag, source, and track settings', function(){
 
   var fixture = document.getElementById('qunit-fixture');
 
-  var html = '<video id="example_1" class="video-js" autoplay preload="metadata">';
+  var html = '<video id="example_1" class="video-js" autoplay preload="none">';
       html += '<source src="http://google.com" type="video/mp4">';
       html += '<source src="http://google.com" type="video/webm">';
-      html += '<track src="http://google.com" kind="captions" default>';
+      html += '<track src="http://google.com" kind="captions" attrtest>';
       html += '</video>';
 
   fixture.innerHTML += html;
 
   var tag = document.getElementById('example_1');
-  var player = new vjs.Player(tag);
+  var player = PlayerTest.makePlayer({}, tag);
 
   ok(player.options_['autoplay'] === true);
-  ok(player.options_['preload'] === 'metadata'); // No extern. Use string.
+  ok(player.options_['preload'] === 'none'); // No extern. Use string.
   ok(player.options_['id'] === 'example_1');
   ok(player.options_['sources'].length === 2);
   ok(player.options_['sources'][0].src === 'http://google.com');
@@ -97,7 +97,7 @@ test('should get tag, source, and track settings', function(){
   ok(player.options_['sources'][1].type === 'video/webm');
   ok(player.options_['tracks'].length === 1);
   ok(player.options_['tracks'][0]['kind'] === 'captions'); // No extern
-  ok(player.options_['tracks'][0]['default'] === true);
+  ok(player.options_['tracks'][0]['attrtest'] === '');
 
   ok(player.el().className.indexOf('video-js') !== -1, 'transferred class from tag to player div');
   ok(player.el().id === 'example_1', 'transferred id from tag to player div');
@@ -335,27 +335,27 @@ test('should allow for tracking when native controls are used', function(){
   player.dispose();
 });
 
-test('should use custom message when encountering an unsupported video type',
-    function() {
-  videojs.options['notSupportedMessage'] = 'Video no go <a href="">link</a>';
-  var fixture = document.getElementById('qunit-fixture');
+// test('should use custom message when encountering an unsupported video type',
+//     function() {
+//   videojs.options['notSupportedMessage'] = 'Video no go <a href="">link</a>';
+//   var fixture = document.getElementById('qunit-fixture');
 
-  var html =
-      '<video id="example_1">' +
-          '<source src="fake.foo" type="video/foo">' +
-          '</video>';
+//   var html =
+//       '<video id="example_1">' +
+//           '<source src="fake.foo" type="video/foo">' +
+//           '</video>';
 
-  fixture.innerHTML += html;
+//   fixture.innerHTML += html;
 
-  var tag = document.getElementById('example_1');
-  var player = new vjs.Player(tag);
+//   var tag = document.getElementById('example_1');
+//   var player = new vjs.Player(tag);
 
-  var incompatibilityMessage = player.el().getElementsByTagName('p')[0];
-  // ie8 capitalizes tag names
-  equal(incompatibilityMessage.innerHTML.toLowerCase(), 'video no go <a href="">link</a>');
+//   var incompatibilityMessage = player.el().getElementsByTagName('p')[0];
+//   // ie8 capitalizes tag names
+//   equal(incompatibilityMessage.innerHTML.toLowerCase(), 'video no go <a href="">link</a>');
 
-  player.dispose();
-});
+//   player.dispose();
+// });
 
 test('should register players with generated ids', function(){
   var fixture, video, player, id;
@@ -402,3 +402,54 @@ test('should remove vjs-has-started class', function(){
   player.trigger('play');
   ok(player.el().className.indexOf('vjs-has-started') !== -1, 'vjs-has-started class added again');
 });
+
+test('player should handle different error types', function(){
+  expect(8);
+  var player = PlayerTest.makePlayer({});
+  var testMsg = 'test message';
+
+  // prevent error log messages in the console
+  sinon.stub(vjs.log, 'error');
+
+  // error code supplied
+  function errCode(){
+    equal(player.error().code, 1, 'error code is correct');
+  }
+  player.on('error', errCode);
+  player.error(1);
+  player.off('error', errCode);
+
+  // error instance supplied
+  function errInst(){
+    equal(player.error().code, 2, 'MediaError code is correct');
+    equal(player.error().message, testMsg, 'MediaError message is correct');
+  }
+  player.on('error', errInst);
+  player.error(new vjs.MediaError({ code: 2, message: testMsg }));
+  player.off('error', errInst);
+
+  // error message supplied
+  function errMsg(){
+    equal(player.error().code, 0, 'error message code is correct');
+    equal(player.error().message, testMsg, 'error message is correct');
+  }
+  player.on('error', errMsg);
+  player.error(testMsg);
+  player.off('error', errMsg);
+
+  // error config supplied
+  function errConfig(){
+    equal(player.error().code, 3, 'error config code is correct');
+    equal(player.error().message, testMsg, 'error config message is correct');
+  }
+  player.on('error', errConfig);
+  player.error({ code: 3, message: testMsg });
+  player.off('error', errConfig);
+
+  // check for vjs-error classname
+  ok(player.el().className.indexOf('vjs-error') >= 0, 'player does not have vjs-error classname');
+
+  // restore error logging
+  vjs.log.error.restore();
+});
+

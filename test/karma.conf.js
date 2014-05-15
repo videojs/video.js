@@ -51,6 +51,7 @@ module.exports = function(config) {
 
     files: [
       '../test/karma-qunit-shim.js',
+      '../node_modules/sinon/pkg/sinon.js',
       "../src/js/core.js",
       "../src/js/core-object.js",
       "../src/js/events.js",
@@ -60,6 +61,7 @@ module.exports = function(config) {
       "../src/js/button.js",
       "../src/js/slider.js",
       "../src/js/menu.js",
+      "../src/js/media-error.js",
       "../src/js/player.js",
       "../src/js/control-bar/control-bar.js",
       "../src/js/control-bar/live-display.js",
@@ -70,9 +72,11 @@ module.exports = function(config) {
       "../src/js/control-bar/volume-control.js",
       "../src/js/control-bar/mute-toggle.js",
       "../src/js/control-bar/volume-menu-button.js",
+      "../src/js/control-bar/playback-rate-menu-button.js",
       "../src/js/poster.js",
       "../src/js/loading-spinner.js",
       "../src/js/big-play-button.js",
+      "../src/js/error-display.js",
       "../src/js/media/media.js",
       "../src/js/media/html5.js",
       "../src/js/media/flash.js",
