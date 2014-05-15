@@ -553,7 +553,7 @@ vjs.Player.prototype.onVolumeChange;
  * @event fullscreenchange
  */
 vjs.Player.prototype.onFullscreenChange = function() {
-  if (this.isFullScreen()) {
+  if (this.isFullscreen()) {
     this.addClass('vjs-fullscreen');
   } else {
     this.removeClass('vjs-fullscreen');
@@ -842,37 +842,46 @@ vjs.Player.prototype.supportsFullScreen = function(){
  * @type {Boolean}
  * @private
  */
-vjs.Player.prototype.isFullScreen_ = false;
+vjs.Player.prototype.isFullscreen_ = false;
 
 /**
  * Check if the player is in fullscreen mode
  *
  *     // get
- *     var fullscreenOrNot = myPlayer.isFullScreen();
+ *     var fullscreenOrNot = myPlayer.isFullscreen();
  *
  *     // set
- *     myPlayer.isFullScreen(true); // tell the player it's in fullscreen
+ *     myPlayer.isFullscreen(true); // tell the player it's in fullscreen
  *
- * NOTE: As of the latest HTML5 spec, isFullScreen is no longer an official
- * property and instead document.fullscreenElement is used. But isFullScreen is
+ * NOTE: As of the latest HTML5 spec, isFullscreen is no longer an official
+ * property and instead document.fullscreenElement is used. But isFullscreen is
  * still a valuable property for internal player workings.
  *
  * @param  {Boolean=} isFS Update the player's fullscreen state
  * @return {Boolean} true if fullscreen, false if not
  * @return {vjs.Player} self, when setting
  */
-vjs.Player.prototype.isFullScreen = function(isFS){
+vjs.Player.prototype.isFullscreen = function(isFS){
   if (isFS !== undefined) {
-    this.isFullScreen_ = isFS;
+    this.isFullscreen_ = !!isFS;
     return this;
   }
-  return this.isFullScreen_;
+  return this.isFullscreen_;
+};
+
+/**
+ * Old naming for isFullscreen()
+ * @deprecated for lowercase 's' version
+ */
+vjs.Player.prototype.isFullScreen = function(isFS){
+  vjs.log.warn('player.isFullScreen() has been deprecated, use player.isFullscreen() with a lowercase "s")');
+  return this.isFullscreen(isFS);
 };
 
 /**
  * Increase the size of the video to full screen
  *
- *     myPlayer.requestFullScreen();
+ *     myPlayer.requestFullscreen();
  *
  * In some browsers, full screen is not supported natively, so it enters
  * "full window mode", where the video fills the browser window.
@@ -883,11 +892,12 @@ vjs.Player.prototype.isFullScreen = function(isFS){
  *
  * @return {vjs.Player} self
  */
-vjs.Player.prototype.requestFullScreen = function(){
-  var requestFullScreen = vjs.support.requestFullScreen;
-  this.isFullScreen(true);
+vjs.Player.prototype.requestFullscreen = function(){
+  var fsApi = vjs.browser.fullscreenAPI;
 
-  if (requestFullScreen) {
+  this.isFullscreen(true);
+
+  if (fsApi) {
     // the browser supports going fullscreen at the element level so we can
     // take the controls fullscreen as well as the video
 
@@ -896,18 +906,18 @@ vjs.Player.prototype.requestFullScreen = function(){
     // when cancelling fullscreen. Otherwise if there's multiple
     // players on a page, they would all be reacting to the same fullscreen
     // events
-    vjs.on(document, requestFullScreen.eventName, vjs.bind(this, function(e){
-      this.isFullScreen(document[requestFullScreen.isFullScreen]);
+    vjs.on(document, fsApi.fullscreenchange, vjs.bind(this, function(e){
+      this.isFullscreen(document[fsApi.fullscreenElement]);
 
       // If cancelling fullscreen, remove event listener.
-      if (this.isFullScreen() === false) {
-        vjs.off(document, requestFullScreen.eventName, arguments.callee);
+      if (this.isFullscreen() === false) {
+        vjs.off(document, fsApi.fullscreenchange, arguments.callee);
       }
 
       this.trigger('fullscreenchange');
     }));
 
-    this.el_[requestFullScreen.requestFn]();
+    this.el_[fsApi.requestFullscreen]();
 
   } else if (this.tech.supportsFullScreen()) {
     // we can't take the video.js controls fullscreen but we can go fullscreen
@@ -924,19 +934,29 @@ vjs.Player.prototype.requestFullScreen = function(){
 };
 
 /**
+ * Old naming for requestFullscreen
+ * @deprecated for lower case 's' version
+ */
+vjs.Player.prototype.requestFullScreen = function(){
+  vjs.log.warn('player.requestFullScreen() has been deprecated, use player.requestFullscreen() with a lowercase "s")');
+  return this.requestFullscreen();
+};
+
+
+/**
  * Return the video to its normal size after having been in full screen mode
  *
- *     myPlayer.cancelFullScreen();
+ *     myPlayer.exitFullscreen();
  *
  * @return {vjs.Player} self
  */
-vjs.Player.prototype.cancelFullScreen = function(){
-  var requestFullScreen = vjs.support.requestFullScreen;
-  this.isFullScreen(false);
+vjs.Player.prototype.exitFullscreen = function(){
+  var fsApi = vjs.browser.fullscreenAPI;
+  this.isFullscreen(false);
 
   // Check for browser element fullscreen support
-  if (requestFullScreen) {
-    document[requestFullScreen.cancelFn]();
+  if (fsApi) {
+    document[fsApi.exitFullscreen]();
   } else if (this.tech.supportsFullScreen()) {
    this.techCall('exitFullScreen');
   } else {
@@ -945,6 +965,15 @@ vjs.Player.prototype.cancelFullScreen = function(){
   }
 
   return this;
+};
+
+/**
+ * Old naming for exitFullscreen
+ * @deprecated for exitFullscreen
+ */
+vjs.Player.prototype.cancelFullScreen = function(){
+  vjs.log.warn('player.cancelFullScreen() has been deprecated, use player.exitFullscreen()');
+  return this.exitFullscreen();
 };
 
 // When fullscreen isn't supported we can stretch the video container to as wide as the browser will let us.
@@ -967,8 +996,8 @@ vjs.Player.prototype.enterFullWindow = function(){
 };
 vjs.Player.prototype.fullWindowOnEscKey = function(event){
   if (event.keyCode === 27) {
-    if (this.isFullScreen() === true) {
-      this.cancelFullScreen();
+    if (this.isFullscreen() === true) {
+      this.exitFullscreen();
     } else {
       this.exitFullWindow();
     }
@@ -1480,50 +1509,3 @@ vjs.Player.prototype.playbackRate = function(rate) {
 // TODO
 // currentSrcList: the array of sources including other formats and bitrates
 // playList: array of source lists in order of playback
-
-// RequestFullscreen API
-(function(){
-  var prefix, requestFS, div;
-
-  div = document.createElement('div');
-
-  requestFS = {};
-
-  // Current W3C Spec
-  // http://dvcs.w3.org/hg/fullscreen/raw-file/tip/Overview.html#api
-  // Mozilla Draft: https://wiki.mozilla.org/Gecko:FullScreenAPI#fullscreenchange_event
-  // New: https://dvcs.w3.org/hg/fullscreen/raw-file/529a67b8d9f3/Overview.html
-  if (div.cancelFullscreen !== undefined) {
-    requestFS.requestFn = 'requestFullscreen';
-    requestFS.cancelFn = 'exitFullscreen';
-    requestFS.eventName = 'fullscreenchange';
-    requestFS.isFullScreen = 'fullScreen';
-
-  // Webkit (Chrome/Safari) and Mozilla (Firefox) have working implementations
-  // that use prefixes and vary slightly from the new W3C spec. Specifically,
-  // using 'exit' instead of 'cancel', and lowercasing the 'S' in Fullscreen.
-  // Other browsers don't have any hints of which version they might follow yet,
-  // so not going to try to predict by looping through all prefixes.
-  } else {
-
-    if (document.mozCancelFullScreen) {
-      prefix = 'moz';
-      requestFS.isFullScreen = prefix + 'FullScreen';
-      requestFS.requestFn = prefix + 'RequestFullScreen';
-    } else {
-      prefix = 'webkit';
-      requestFS.isFullScreen = prefix + 'IsFullScreen';
-      requestFS.requestFn = prefix + 'RequestFullscreen';
-    }
-
-    if (div[prefix + 'RequestFullScreen']) {
-      requestFS.cancelFn = prefix + 'CancelFullScreen';
-    }
-    requestFS.eventName = prefix + 'fullscreenchange';
-  }
-
-  if (document[requestFS.cancelFn]) {
-    vjs.support.requestFullScreen = requestFS;
-  }
-
-})();

@@ -461,7 +461,7 @@ vjs.insertFirst = function(child, parent){
  * @type {Object}
  * @private
  */
-vjs.support = {};
+vjs.browser = {};
 
 /**
  * Shorthand for document.getElementById()
