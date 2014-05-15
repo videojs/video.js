@@ -875,7 +875,10 @@ vjs.Player.prototype.isFullscreen = function(isFS){
  * Old naming for isFullscreen()
  * @deprecated for lowercase 's' version
  */
-vjs.Player.prototype.isFullScreen = vjs.Player.prototype.isFullscreen;
+vjs.Player.prototype.isFullScreen = function(isFS){
+  vjs.log.warn('player.isFullScreen() has been deprecated, use player.isFullscreen() with a lowercase "s")');
+  return this.isFullscreen(isFS);
+};
 
 /**
  * Increase the size of the video to full screen
@@ -936,7 +939,10 @@ vjs.Player.prototype.requestFullscreen = function(){
  * Old naming for requestFullscreen
  * @deprecated for lower case 's' version
  */
-vjs.Player.prototype.requestFullScreen = vjs.Player.prototype.requestFullscreen;
+vjs.Player.prototype.requestFullScreen = function(){
+  vjs.log.warn('player.requestFullScreen() has been deprecated, use player.requestFullscreen() with a lowercase "s")');
+  return this.requestFullscreen();
+};
 
 
 /**
@@ -967,7 +973,10 @@ vjs.Player.prototype.exitFullscreen = function(){
  * Old naming for exitFullscreen
  * @deprecated for exitFullscreen
  */
-vjs.Player.prototype.cancelFullScreen = vjs.Player.prototype.exitFullscreen;
+vjs.Player.prototype.cancelFullScreen = function(){
+  vjs.log.warn('player.cancelFullScreen() has been deprecated, use player.exitFullscreen()');
+  return this.exitFullscreen();
+};
 
 // When fullscreen isn't supported we can stretch the video container to as wide as the browser will let us.
 vjs.Player.prototype.enterFullWindow = function(){
