@@ -552,7 +552,8 @@ vjs.TextTrack.prototype.update = function(){
   if (this.cues_.length > 0) {
 
     // Get current player time, adjust for track offset
-    var time = this.player_.currentTime() + (this.player_.trackTimeOffset || 0);
+    var offset = this.player_.options()['trackTimeOffset'] || 0
+    var time = this.player_.currentTime() + offset;
 
     // Check if the new time is outside the time box created by the the last update.
     if (this.prevChange === undefined || time < this.prevChange || this.nextChange <= time) {
