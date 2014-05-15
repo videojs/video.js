@@ -41,7 +41,7 @@ module.exports = function(config) {
   config.set({
     basePath: '',
 
-    frameworks: ['qunit'],
+    frameworks: ['qunit', 'sinon'],
 
     autoWatch: false,
 
@@ -51,7 +51,6 @@ module.exports = function(config) {
 
     files: [
       '../test/karma-qunit-shim.js',
-      '../node_modules/sinon/pkg/sinon.js',
       "../src/js/core.js",
       "../src/js/core-object.js",
       "../src/js/events.js",
@@ -96,7 +95,8 @@ module.exports = function(config) {
       'karma-opera-launcher',
       'karma-phantomjs-launcher',
       'karma-safari-launcher',
-      'karma-sauce-launcher'
+      'karma-sauce-launcher',
+      'karma-sinon'
     ],
 
     reporters: ['dots'],
