@@ -998,13 +998,13 @@ vjs.Player.prototype.selectSource = function(sources){
   for (var i=0,j=this.options_['techOrder'];i<j.length;i++) {
     var techName = vjs.capitalize(j[i]),
         tech = window['videojs'][techName];
-    
+
     // Check if the current tech is defined before continuing
     if (!tech) {
       vjs.log.error('The "' + techName + '" tech is undefined. Skipped browser support check for that tech.');
       continue;
     }
-    
+
     // Check if the browser supports this technology
     if (tech.isSupported()) {
       // Loop through each source object
