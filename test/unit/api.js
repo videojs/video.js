@@ -25,8 +25,8 @@ test('should be able to access expected player API methods', function() {
   ok(player.height, 'height exists');
   ok(player.poster, 'poster exists');
   ok(player.textTracks, 'textTracks exists');
-  ok(player.requestFullScreen, 'requestFullScreen exists');
-  ok(player.cancelFullScreen, 'cancelFullScreen exists');
+  ok(player.requestFullscreen, 'requestFullscreen exists');
+  ok(player.exitFullscreen, 'exitFullscreen exists');
   ok(player.playbackRate, 'playbackRate exists');
 
   // Unsupported Native HTML5 Methods
@@ -46,7 +46,7 @@ test('should be able to access expected player API methods', function() {
   ok(player.reportUserActivity, 'reportUserActivity exists');
   ok(player.userActive, 'userActive exists');
   ok(player.usingNativeControls, 'usingNativeControls exists');
-  ok(player.isFullScreen, 'isFullScreen exists');
+  ok(player.isFullscreen, 'isFullscreen exists');
 
   player.dispose();
 });
@@ -179,10 +179,10 @@ test('videojs.players should be available after minification', function() {
 // NOTE: This test could be removed after we've landed on a permanent
 // externs/exports strategy. See comment on videojs/video.js#853
 test('fullscreenToggle does not depend on minified player methods', function(){
-  var noop, player, fullscreen, requestFullScreen, cancelFullScreen, isFullScreen_;
+  var noop, player, fullscreen, requestFullscreen, exitFullscreen, isFullscreen_;
   noop = function(){};
-  requestFullScreen = false;
-  cancelFullScreen = false;
+  requestFullscreen = false;
+  exitFullscreen = false;
   player = {
     id: noop,
     on: noop,
@@ -190,25 +190,25 @@ test('fullscreenToggle does not depend on minified player methods', function(){
     reportUserActivity: noop
   };
 
-  player['requestFullScreen'] = function(){
-    requestFullScreen = true;
+  player['requestFullscreen'] = function(){
+    requestFullscreen = true;
   };
-  player['cancelFullScreen'] = function(){
-    cancelFullScreen = true;
+  player['exitFullscreen'] = function(){
+    exitFullscreen = true;
   };
 
-  isFullScreen_ = false;
-  player['isFullScreen'] = function(){
-    return isFullScreen_;
+  isFullscreen_ = false;
+  player['isFullscreen'] = function(){
+    return isFullscreen_;
   };
 
   fullscreen = new videojs.FullscreenToggle(player);
   fullscreen.trigger('click');
 
-  ok(requestFullScreen, 'requestFullScreen called');
+  ok(requestFullscreen, 'requestFullscreen called');
 
-  isFullScreen_ = true;
+  isFullscreen_ = true;
   fullscreen.trigger('click');
 
-  ok(cancelFullScreen, 'cancelFullScreen called');
+  ok(exitFullscreen, 'exitFullscreen called');
 });

@@ -25,6 +25,7 @@ var sourceFiles = [
   "src/js/slider.js",
   "src/js/menu.js",
   "src/js/media-error.js",
+  "src/js/fullscreen-api.js",
   "src/js/player.js",
   "src/js/control-bar/control-bar.js",
   "src/js/control-bar/live-display.js",
