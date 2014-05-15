@@ -1,3 +1,14 @@
 language: node_js
 node_js:
-  - 0.8
+- 0.10
+before_script:
+- if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then curl https://gist.githubusercontent.com/santiycr/5139565/raw/sauce_connect_setup.sh | bash; fi
+notifications:
+  irc:
+    channels:
+      - "chat.freenode.net#videojs"
+    use_notice: true
+env:
+  global:
+  - secure: K6JpKwMkfNaJix3Bb0tLjVMzHMJgtBXdd/dvfw1BMb9DCBpd81PqXbDs7yXCddUxnUPTBPxZCrQgWsw71Wn+qEoIG5MU3uOT5A2rBbx/yZonVAGv5ed/9w0xk0OzO383CmPMFqwqtp9YmdmqGjQBkYXVXJjTvNTOAExFSdhO+3U=
+  - secure: GIbhjUJapvC70nIZVlhVyK+3KAD2TVKpiY/q412OO7V2izbvcM1tvU3LBoMZbROzrt5TT84tCoJDvHnrpL0OvxPwrzL5CUU7h4UTxhTOyQkEinbYAnWlW9wdrvtdczsEvANkFPqBZ53B3hVHZHMLOG8QRWaTBicF68vSHEJFqb4=
