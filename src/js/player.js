@@ -779,6 +779,15 @@ vjs.Player.prototype.bufferedPercent = function(){
 };
 
 /**
+ * Get time from which the beginning is reproduced video
+ *
+ * @return {Number}
+ */
+vjs.Player.prototype.startOffsetTime = function(){
+  return this.techGet('startOffsetTime') || 0;
+};
+
+/**
  * Get or set the current volume of the media
  *
  *     // get
