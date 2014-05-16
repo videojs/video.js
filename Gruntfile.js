@@ -312,11 +312,12 @@ module.exports = function(grunt) {
   // grunt.loadTasks('./docs/tasks/');
   // grunt.loadTasks('../videojs-doc-generator/tasks/');
 
+  grunt.registerTask('pretask', ['jshint', 'less', 'build', 'minify', 'usebanner']);
   // Default task.
-  grunt.registerTask('default', ['jshint', 'less', 'build', 'minify', 'usebanner', 'dist']);
+  grunt.registerTask('default', ['pretask', 'dist']);
   // Development watch task
   grunt.registerTask('dev', ['jshint', 'less', 'build', 'qunit:source']);
-  grunt.registerTask('test-qunit', ['jshint', 'less', 'build', 'minify', 'usebanner', 'qunit']);
+  grunt.registerTask('test-qunit', ['pretask', 'qunit']);
 
   // The test task will run `karma:saucelabs` when running in travis,
   // when running via a PR from a fork, it'll run qunit tests in phantom using karma
@@ -326,7 +327,7 @@ module.exports = function(grunt) {
         tasksMinified,
         tasksMinifiedApi;
 
-    grunt.task.run(['jshint', 'less', 'build', 'minify', 'usebanner']);
+    grunt.task.run(['pretask']);
 
     if (process.env.TRAVIS_PULL_REQUEST) {
       grunt.task.run(['karma:phantomjs', 'karma:minified_phantomjs', 'karma:minified_api_phantomjs']);
