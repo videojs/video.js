@@ -215,7 +215,7 @@
         },
         {
           "desc": "Add a line to the changelog",
-          "exec": "grunt chg-add:'{{line}} ([view](https://github.com/videojs/video.js/pull/{{prNum}}))'"
+          "exec": "grunt chg-add:'\"{{line}} ([view](https://github.com/videojs/video.js/pull/{{prNum}}))\"'"
         },
         {
           "desc": "Add the changlelog change to be committed",
