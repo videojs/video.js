@@ -64,6 +64,12 @@ vjs.Flash = vjs.MediaTechController.extend({
 
         lastSeekTarget
     ;
+    
+    // PseudoStreaming start param
+    if( options.pseudoStreamStartParam )
+    {
+      flashVars['pseudoStreamStartParam'] = options.pseudoStreamStartParam;
+    }
 
     // If source was supplied pass as a flash var.
     if (source) {
