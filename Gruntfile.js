@@ -333,7 +333,7 @@ module.exports = function(grunt) {
 
     grunt.task.run(['pretask']);
 
-    if (process.env.TRAVIS_PULL_REQUEST) {
+    if (process.env.TRAVIS_PULL_REQUEST !== 'false') {
       grunt.task.run(['karma:phantomjs', 'karma:minified_phantomjs', 'karma:minified_api_phantomjs']);
     } else if (process.env.TRAVIS) {
       grunt.task.run(['karma:saucelabs']);
