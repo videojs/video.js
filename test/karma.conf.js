@@ -4,7 +4,7 @@ module.exports = function(config) {
       singleRun: true,
       base: 'SauceLabs',
       browserName: 'chrome',
-      platform: 'Windows 7',
+      platform: 'Windows 8.1',
       version: '34'
     },
 
@@ -12,7 +12,8 @@ module.exports = function(config) {
       singleRun: true,
       base: 'SauceLabs',
       browserName: 'firefox',
-      platform: 'Windows 8'
+      platform: 'Linux',
+      version: '29'
     },
 
     safari_sl: {
@@ -35,6 +36,14 @@ module.exports = function(config) {
       base: 'SauceLabs',
       browserName: 'android',
       platform:'Linux'
+    },
+
+    ie_sl: {
+      singleRun: true,
+      base: 'SauceLabs',
+      browserName: 'internet explorer',
+      platform: 'Windows 8.1',
+      version: '11'
     }
   };
 
