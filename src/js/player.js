@@ -1081,7 +1081,7 @@ vjs.Player.prototype.src = function(source){
   }
 
   // Case: Array of source objects to choose from and pick the best to play
-  if (source instanceof Array) {
+  if (vjs.obj.isArray(source)) {
 
     var sourceTech = this.selectSource(source),
         techName;
