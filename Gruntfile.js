@@ -504,7 +504,7 @@ module.exports = function(grunt) {
 
     // Replace font urls with CDN versions
     css = grunt.file.read('dist/cdn/video-js.css');
-    css = css.replace(/font\//g, '../f/2/');
+    css = css.replace(/font\//g, '../f/3/');
     grunt.file.write('dist/cdn/video-js.css', css);
 
     // Add CDN-specfic JS
