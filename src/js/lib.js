@@ -168,8 +168,9 @@ vjs.obj.isPlain = function(obj){
  * @private
  */
 vjs.obj.isArray = Array.isArray || function(arr) {
-  return Object.prototype.toString.call(arr) === "[object Array]";
+  return Object.prototype.toString.call(arr) === '[object Array]';
 };
+
 /**
  * Bind (a.k.a proxy or Context). A simple method for changing the context of a function
    It also stores a unique id on the function so it can be easily removed from events
