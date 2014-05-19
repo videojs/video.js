@@ -142,7 +142,7 @@ module.exports = function(grunt) {
 
       // this only runs on PRs from the mainrepo on saucelabs
       saucelabs: {
-        browsers: ['chrome_sl', 'ipad_sl']
+        browsers: ['chrome_sl']
       },
 
       // these are run locally on local browsers
