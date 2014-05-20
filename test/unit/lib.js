@@ -42,7 +42,7 @@ test('should copy an object', function(){
 });
 
 test('should check if an object is an Array', function(){
-  var arr = ["a", "b", "c"];
+  var arr = ['a', 'b', 'c'];
   ok(vjs.obj.isArray(arr) === true, 'Arr object is an Array');
 
   var obj = {};
