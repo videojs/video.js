@@ -31,7 +31,7 @@
       },
       {
         "desc": "Add the upstream project as a remote so new changes can be pulled",
-        "exec": "git remote add upstream <%= project.urls.git %>"
+        "exec": "git remote add upstream {{ project.urls.git }}"
       },
       {
         "desc": "Get all upstream branches and changes",
@@ -101,11 +101,11 @@
         },
         {
           "desc": "Create the patch branch",
-          "exec": "git checkout -b feature/<%= name %>"
+          "exec": "git checkout -b feature/{{ name }}"
         },
         {
           "desc": "Push the branch to the origin repo",
-          "exec": "git push -u origin feature/<%= name %>"
+          "exec": "git push -u origin feature/{{ name }}"
         }
       ]
     },
@@ -114,7 +114,7 @@
       "desc": "Submit a pull request for a feature when it's finished",
       "steps": [
         {
-          "desc": "Test for unadded changes <%= args[0] %>",
+          "desc": "Test for unadded changes {{ args.[0] }}",
           "exec": "git diff --exit-code",
           "fail": "Make sure all changes have been added and committed, or stashed, before switching branches"
         },
@@ -132,7 +132,7 @@
           "exec": "git rev-parse --abbrev-ref HEAD"
         },
         {
-          "desc": "Are you sure <%= branch %> is the branch you want to submit",
+          "desc": "Are you sure {{ branch }} is the branch you want to submit",
           "confirm": "confirm"
         },
         {
@@ -145,7 +145,7 @@
         },
         {
           "desc": "Open the github pull request page",
-          "open": "https://github.com/videojs/video.js/compare/videojs:master...<%= user %>:<%= branch %>"
+          "open": "https://github.com/videojs/video.js/compare/videojs:master...{{ user }}:{{ branch }}"
         }
       ]
     },
@@ -263,11 +263,11 @@
         },
         {
           "desc": "Create the patch branch",
-          "exec": "git checkout -b patch/<%= name %>"
+          "exec": "git checkout -b patch/{{ name }}"
         },
         {
           "desc": "Push the branch to the origin repo",
-          "exec": "git push -u origin patch/<%= name %>"
+          "exec": "git push -u origin patch/{{ name }}"
         }
       ]
     },
@@ -293,7 +293,7 @@
           "exec": "git rev-parse --abbrev-ref HEAD"
         },
         {
-          "desc": "Are you sure <%= branch %> is the branch you want to submit",
+          "desc": "Are you sure {{ branch }} is the branch you want to submit",
           "confirm": "confirm"
         },
         {
@@ -306,7 +306,7 @@
         },
         {
           "desc": "Open the github pull request page",
-          "open": "https://github.com/videojs/video.js/compare/videojs:stable...<%= user %>:<%= branch %>"
+          "open": "https://github.com/videojs/video.js/compare/videojs:stable...{{ user }}:{{ branch }}"
         }
       ]
     },
@@ -321,15 +321,15 @@
         },
         {
           "desc": "Confirm you are deleting the correct branch",
-          "confirm": "Delete branch '<%= name %>'?"
+          "confirm": "Delete branch '{{ name }}'?"
         },
         {
           "desc": "Delete the local copy of the branch",
-          "exec": "git branch -D <%= name %>"
+          "exec": "git branch -D {{ name }}"
         },
         {
           "desc": "Delete the remote copy of the branch",
-          "exec": "git push origin :<%= name %>"
+          "exec": "git push origin :{{ name }}"
         }
       ]
     }
@@ -375,7 +375,7 @@
         "prompt": "Are there any other details you'd like to provide?"
       },
       {
-        "open": "https://github.com/videojs/video.js/issues/new?title=<%= title %>&body=**Steps to reproduce:**\n> <%= reproduce %>\n\n**What was expected:**\n> <%= expected %>\n\n**What Happened:**\n> <%= actual %>\n\n**Video.js Version:**\n> <%= version %>\n\n**Plugins:**\n> <%= plugins %>\n\n**Browsers experienced on:**\n> <%= browsers %>\n\n**Example:**\n> <%= example %>\n\n**Other details:**\n> <%= details %>"
+        "open": "https://github.com/videojs/video.js/issues/new?title={{ title }}&body=**Steps to reproduce:**\n> {{ reproduce }}\n\n**What was expected:**\n> {{ expected }}\n\n**What Happened:**\n> {{ actual }}\n\n**Video.js Version:**\n> {{ version }}\n\n**Plugins:**\n> {{ plugins }}\n\n**Browsers experienced on:**\n> {{ browsers }}\n\n**Example:**\n> {{ example }}\n\n**Other details:**\n> {{ details }}"
       }
     ]
   },
@@ -403,7 +403,7 @@
         "confirm": "You will be redirected to Github where you can submit this issue, OK?"
       },
       {
-        "open": "https://github.com/videojs/video.js/issues/new?title=<%= title %>&body=**Describe the feature/enhancement:**\n> <%= describe %>\n\n**Existing docs/specs:**\n> <%= docs %>\n\n**Existing examples:**\n> <%= examples %>"
+        "open": "https://github.com/videojs/video.js/issues/new?title={{ title }}&body=**Describe the feature/enhancement:**\n> {{ describe }}\n\n**Existing docs/specs:**\n> {{ docs }}\n\n**Existing examples:**\n> {{ examples }}"
       }
     ]
   },
@@ -442,11 +442,11 @@
       },
       {
         "desc": "Update the changelog with the new release",
-        "exec": "grunt chg-release:<%= type %>"
+        "exec": "grunt chg-release:{{ type }}"
       },
       {
         "desc": "Bump package versions",
-        "exec": "grunt version:<%= type %>"
+        "exec": "grunt version:{{ type }}"
       },
       {
         "desc": "Build the release",
