@@ -5431,12 +5431,12 @@ vjs.PlaybackRateMenuButton.prototype.createEl = function(){
 // Menu creation
 vjs.PlaybackRateMenuButton.prototype.createMenu = function(){
   var menu = new vjs.Menu(this.player());
-  var rates = this.player().options().playbackRates;
+  var rates = this.player().options()['playbackRates'];
 
   if (rates) {
     for (var i = rates.length - 1; i >= 0; i--) {
       menu.addChild(
-        new vjs.PlaybackRateMenuItem(this.player(), {rate: rates[i] + 'x'})
+        new vjs.PlaybackRateMenuItem(this.player(), { 'rate': rates[i] + 'x'})
         );
     };
   }
@@ -5452,7 +5452,7 @@ vjs.PlaybackRateMenuButton.prototype.updateARIAAttributes = function(){
 vjs.PlaybackRateMenuButton.prototype.onClick = function(){
   // select next rate option
   var currentRate = this.player().playbackRate();
-  var rates = this.player().options().playbackRates;
+  var rates = this.player().options()['playbackRates'];
   // this will select first one if the last one currently selected
   var newRate = rates[0];
   for (var i = 0; i <rates.length ; i++) {
@@ -5467,8 +5467,8 @@ vjs.PlaybackRateMenuButton.prototype.onClick = function(){
 vjs.PlaybackRateMenuButton.prototype.playbackRateSupported = function(){
   return this.player().tech
     && this.player().tech.features['playbackRate']
-    && this.player().options().playbackRates
-    && this.player().options().playbackRates.length > 0
+    && this.player().options()['playbackRates']
+    && this.player().options()['playbackRates'].length > 0
   ;
 };
 
