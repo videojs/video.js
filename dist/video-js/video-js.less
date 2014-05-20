@@ -1,0 +1,1098 @@
+/*!
+Video.js Default Styles (http://videojs.com)
+Version GENERATED_AT_BUILD
+Create your own skin at http://designer.videojs.com
+*/
+
+// To customize the player skin, change the values of the variables or edit the
+// CSS below.
+// (This file uses LESS. Learn more at http://lesscss.org/)
+
+// The base font size controls the size of everything, not just text. All
+// diminensions use em-based sizes so that the scale along with the font size.
+// Try increasing it to 20px and see what happens.
+@base-font-size: 10px;
+@touch-device-font-size: 15px;
+
+// The main font color controls the color of the text and the icons (font icons)
+@main-font-color: #CCCCCC; // e.g. rgb(255, 255, 255) or #ffffff
+
+// The default color of control backgrounds is mostly black but with a little
+// bit of blue so it can still be seen on all black video frames, which are
+// common.
+@control-bg-color: #07141E; // e.g. rgb(255, 255, 255) or #ffffff
+@control-bg-alpha: 0.7; // 1.0 = 100% opacity, 0.0 = 0% opacity
+
+// The slider bar color is used for the progress bar and the volume bar
+@slider-bar-color: #66A8CC; // e.g. rgb(255, 255, 255) or #ffffff
+// The background of the progress bar and volume bar have a lined pattern that
+// is created from a base64 encoded image. You can generate your own pattern at
+// http://www.patternify.com/ then replace the value in the quotes with your own
+@slider-bar-pattern: ~'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAYAAADgzO9IAAAAP0lEQVQIHWWMAQoAIAgDR/QJ/Ub//04+w7ZICBwcOg5FZi5iBB82AGzixEglJrd4TVK5XUJpskSTEvpdFzX9AB2pGziSQcvAAAAAAElFTkSuQmCC';
+// The color of the slider background
+@slider-background-color: #333333;
+@slider-background-alpha: 0.9; // 1.0 = 100% opacity, 0.0 = 0% opacity
+
+// The "Big Play Button" is the play button that shows before the video plays.
+// To center it set the align values to center and middle. The typical location
+// of the button is the center, but there is trend towards moving it to a corner
+// where it gets out of the way of valuable content in the poster image.
+@big-play-align: left; // left, center, or right
+@big-play-vertical-align: top; // top, middle, or bottom
+// The button colors match the control colors by default but you can customize
+// them by replace the variables (@control-bg-color) with your own color values.
+@big-play-bg-color: @control-bg-color;
+@big-play-bg-alpha: @control-bg-alpha;
+// The font size is what makes the big play button, big. All width/height values
+// use ems, which are a multiple of the font size.
+// If the @base-font-size is 10px, then 3em equals 30px.
+@big-play-font-size: 3em;
+// Now that font size is set, the following em values will be a multiple of the
+// new font size. If @big-play-font-size is 3em (30px), then setting the any of
+// the following values to 2em would equal 60px. 2 * font-size
+@big-play-margin: 0.5em;
+@big-play-width: 4em;
+@big-play-height: 2.6em;
+@big-play-border-radius: 0.8em;
+@big-play-border-width: 0.1em;
+@big-play-border-color: #3b4249;
+
+/* SKIN
+================================================================================
+The main class name for all skin-specific styles. To make your own skin,
+replace all occurances of 'vjs-default-skin' with a new name. Then add your new
+skin name to your video tag instead of the default skin.
+e.g. <video class="video-js my-skin-name">
+*/
+.vjs-default-skin {
+  color: @main-font-color;
+}
+
+/* Custom Icon Font
+--------------------------------------------------------------------------------
+The control icons are from a custom font. Each icon corresponds to a character
+(e.g. "\e001"). Font icons allow for easy scaling and coloring of icons.
+*/
+@font-face{
+  font-family: 'VideoJS';
+  src: url('font/vjs.eot');
+  src: url('font/vjs.eot?#iefix') format('embedded-opentype'),
+  url('font/vjs.woff') format('woff'),
+  url('font/vjs.ttf') format('truetype');
+
+  font-weight: normal;
+  font-style: normal;
+}
+
+// Icon font character values
+@play-icon: "\e001";
+@pause-icon: "\e002";
+@volume-muted-icon: "\e003";
+@volume-low-icon: "\e004";
+@volume-mid-icon: "\e005";
+@volume-high-icon: "\e006";
+@fullscreen-enter-icon: "\e000";
+@fullscreen-exit-icon: "\e00b";
+@square-icon: "\e009";
+@spinner-icon: "\e00a";
+@spinner2-icon: "\e00d";
+@spinner3-icon: "\e01e";
+@spinner4-icon: "\e01f";
+@subtitles-icon: "\e00c";
+@captions-icon: "\e008";
+@share-icon: "\e00e";
+@cog-icon: "\e600";
+
+/* Base UI Component Classes
+--------------------------------------------------------------------------------
+*/
+
+/* Slider - used for Volume bar and Seek bar */
+.vjs-default-skin .vjs-slider {
+  /* Replace browser focus hightlight with handle highlight *///
+  outline: 0;
+  position: relative;
+  cursor: pointer;
+  padding: 0;
+
+  .background-color-with-alpha(@slider-background-color, @slider-background-alpha);
+}
+
+.vjs-default-skin .vjs-slider:focus {
+  .box-shadow(0 0 2em #fff);
+}
+
+.vjs-default-skin .vjs-slider-handle {
+  position: absolute;
+  /* Needed for IE6 *///
+  left: 0;
+  top: 0;
+}
+
+.vjs-default-skin .vjs-slider-handle:before {
+  content: @square-icon;
+  font-family: VideoJS;
+  font-size: 1em;
+  line-height: 1;
+  text-align: center;
+  text-shadow: 0em 0em 1em #fff;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  /* Rotate the square icon to make a diamond *///
+  .transform(rotate(-45deg));
+}
+
+/* Control Bar
+--------------------------------------------------------------------------------
+The default control bar that is a container for most of the controls.
+*/
+.vjs-default-skin .vjs-control-bar {
+  /* Start hidden *///
+  display: none;
+  position: absolute;
+  /* Place control bar at the bottom of the player box/video.
+     If you want more margin below the control bar, add more height. *///
+  bottom: 0;
+  /* Use left/right to stretch to 100% width of player div *///
+  left: 0;
+  right: 0;
+  /* Height includes any margin you want above or below control items *///
+  height: 3.0em;
+
+  .background-color-with-alpha(@control-bg-color, @control-bg-alpha);
+}
+
+/* Show the control bar only once the video has started playing */
+.vjs-default-skin.vjs-has-started .vjs-control-bar {
+  display: block;
+  /* Visibility needed to make sure things hide in older browsers too. */
+  visibility: visible;
+  opacity: 1;
+
+  @trans: visibility 0.1s, opacity 0.1s; // Var needed because of comma
+  .transition(@trans);
+}
+
+/* Hide the control bar when the video is playing and the user is inactive  */
+.vjs-default-skin.vjs-has-started.vjs-user-inactive.vjs-playing .vjs-control-bar {
+  display: block;
+  visibility: hidden;
+  opacity: 0;
+
+  @trans: visibility 1.0s, opacity 1.0s;
+  .transition(@trans);
+}
+
+.vjs-default-skin.vjs-controls-disabled .vjs-control-bar {
+  display: none;
+}
+
+.vjs-default-skin.vjs-using-native-controls .vjs-control-bar {
+  display: none;
+}
+
+/* The control bar shouldn't show after an error */
+.vjs-default-skin.vjs-error .vjs-control-bar {
+  display: none;
+}
+
+/* IE8 is flakey with fonts, and you have to change the actual content to force
+fonts to show/hide properly.
+  - "\9" IE8 hack didn't work for this
+  - Found in XP IE8 from http://modern.ie. Does not show up in "IE8 mode" in IE9
+*/
+@ie8screen: ~"\0screen";
+.vjs-default-skin.vjs-user-inactive.vjs-playing .vjs-control-bar :before {
+  @media @ie8screen { content: ""; }
+}
+
+/* General styles for individual controls. */
+.vjs-default-skin .vjs-control {
+  outline: none;
+  position: relative;
+  float: left;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  height: 3.0em;
+  width: 4em;
+}
+
+/* FontAwsome button icons */
+.vjs-default-skin .vjs-control:before {
+  font-family: VideoJS;
+  font-size: 1.5em;
+  line-height: 2;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+
+/* Replacement for focus outline */
+.vjs-default-skin .vjs-control:focus:before,
+.vjs-default-skin .vjs-control:hover:before {
+  text-shadow: 0em 0em 1em rgba(255, 255, 255, 1);
+}
+
+.vjs-default-skin .vjs-control:focus {
+  /*  outline: 0; *///
+  /* keyboard-only users cannot see the focus on several of the UI elements when
+  this is set to 0 */
+}
+
+/* Hide control text visually, but have it available for screenreaders */
+.vjs-default-skin .vjs-control-text {
+  .hide-visually;
+}
+
+/* Play/Pause
+--------------------------------------------------------------------------------
+*/
+.vjs-default-skin .vjs-play-control {
+  width: 5em;
+  cursor: pointer;
+}
+.vjs-default-skin .vjs-play-control:before {
+  content: @play-icon;
+}
+.vjs-default-skin.vjs-playing .vjs-play-control:before {
+  content: @pause-icon;
+}
+
+/* Playback toggle
+--------------------------------------------------------------------------------
+*/
+.vjs-default-skin .vjs-playback-rate .vjs-playback-rate-value {
+  font-size: 1.5em;
+  line-height: 2;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+}
+
+.vjs-default-skin .vjs-playback-rate.vjs-menu-button .vjs-menu .vjs-menu-content {
+  width: 4em;
+  left: -2em;
+  list-style: none;
+}
+
+/* Volume/Mute
+-------------------------------------------------------------------------------- */
+.vjs-default-skin .vjs-mute-control,
+.vjs-default-skin .vjs-volume-menu-button {
+  cursor: pointer;
+  float: right;
+}
+.vjs-default-skin .vjs-mute-control:before,
+.vjs-default-skin .vjs-volume-menu-button:before {
+  content: @volume-high-icon;
+}
+.vjs-default-skin .vjs-mute-control.vjs-vol-0:before,
+.vjs-default-skin .vjs-volume-menu-button.vjs-vol-0:before {
+  content: @volume-muted-icon;
+}
+.vjs-default-skin .vjs-mute-control.vjs-vol-1:before,
+.vjs-default-skin .vjs-volume-menu-button.vjs-vol-1:before {
+  content: @volume-low-icon;
+}
+.vjs-default-skin .vjs-mute-control.vjs-vol-2:before,
+.vjs-default-skin .vjs-volume-menu-button.vjs-vol-2:before {
+  content: @volume-mid-icon;
+}
+
+.vjs-default-skin .vjs-volume-control {
+  width: 5em;
+  float: right;
+}
+.vjs-default-skin .vjs-volume-bar {
+  width: 5em;
+  height: 0.6em;
+  margin: 1.1em auto 0;
+}
+
+.vjs-default-skin .vjs-volume-menu-button .vjs-menu-content {
+  height: 2.9em;
+}
+
+.vjs-default-skin .vjs-volume-level {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 0.5em;
+  /* assuming volume starts at 1.0 */
+  width: 100%;
+
+  background: @slider-bar-color
+    url(@slider-bar-pattern)
+    -50% 0 repeat;
+}
+.vjs-default-skin .vjs-volume-bar .vjs-volume-handle {
+  width: 0.5em;
+  height: 0.5em;
+  /* Assumes volume starts at 1.0. If you change the size of the
+     handle relative to the volume bar, you'll need to update this value
+     too. */
+  left: 4.5em;
+}
+
+.vjs-default-skin .vjs-volume-handle:before {
+  font-size: 0.9em;
+  top: -0.2em;
+  left: -0.2em;
+
+  width: 1em;
+  height: 1em;
+}
+
+.vjs-default-skin .vjs-volume-menu-button .vjs-menu .vjs-menu-content {
+  width: 6em;
+  left: -4em;
+}
+
+/* Progress
+--------------------------------------------------------------------------------
+*/
+.vjs-default-skin .vjs-progress-control {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: auto;
+  font-size: 0.3em;
+  height: 1em;
+  /* Set above the rest of the controls. *///
+  top: -1em;
+
+  /* Shrink the bar slower than it grows. *///
+  .transition(all 0.4s);
+}
+
+/* On hover, make the progress bar grow to something that's more clickable.
+    This simply changes the overall font for the progress bar, and this
+    updates both the em-based widths and heights, as wells as the icon font */
+.vjs-default-skin:hover .vjs-progress-control {
+  font-size: .9em;
+
+  /* Even though we're not changing the top/height, we need to include them in
+      the transition so they're handled correctly. */
+  .transition(all 0.2s);
+}
+
+/* Box containing play and load progresses. Also acts as seek scrubber. */
+.vjs-default-skin .vjs-progress-holder {
+  height: 100%;
+}
+
+/* Progress Bars */
+.vjs-default-skin .vjs-progress-holder .vjs-play-progress,
+.vjs-default-skin .vjs-progress-holder .vjs-load-progress {
+  position: absolute;
+  display: block;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  /* updated by javascript during playback */
+  width: 0;
+  /* Needed for IE6 *///
+  left: 0;
+  top: 0;
+}
+
+.vjs-default-skin .vjs-play-progress {
+  /*
+    Using a data URI to create the white diagonal lines with a transparent
+      background. Surprisingly works in IE8.
+      Created using http://www.patternify.com
+    Changing the first color value will change the bar color.
+    Also using a paralax effect to make the lines move backwards.
+      The -50% left position makes that happen.
+  */
+  background: @slider-bar-color
+    url(@slider-bar-pattern)
+    -50% 0 repeat;
+}
+.vjs-default-skin .vjs-load-progress {
+  background: rgb(100, 100, 100) /* IE8- Fallback */;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.vjs-default-skin .vjs-seek-handle {
+  width: 1.5em;
+  height: 100%;
+}
+
+.vjs-default-skin .vjs-seek-handle:before {
+  padding-top: 0.1em /* Minor adjustment */;
+}
+
+/* Live Mode
+--------------------------------------------------------------------------------
+*/
+.vjs-default-skin.vjs-live .vjs-time-controls,
+.vjs-default-skin.vjs-live .vjs-time-divider,
+.vjs-default-skin.vjs-live .vjs-progress-control {
+  display: none;
+}
+.vjs-default-skin.vjs-live .vjs-live-display {
+  display: block;
+}
+
+/* Live Display
+--------------------------------------------------------------------------------
+*/
+.vjs-default-skin .vjs-live-display {
+  display: none;
+  font-size: 1em;
+  line-height: 3em;
+}
+
+/* Time Display
+--------------------------------------------------------------------------------
+*/
+.vjs-default-skin .vjs-time-controls {
+  font-size: 1em;
+  /* Align vertically by making the line height the same as the control bar *///
+  line-height: 3em;
+}
+.vjs-default-skin .vjs-current-time { float: left; }
+.vjs-default-skin .vjs-duration { float: left; }
+/* Remaining time is in the HTML, but not included in default design */
+.vjs-default-skin .vjs-remaining-time { display: none; float: left; }
+.vjs-time-divider { float: left; line-height: 3em; }
+
+/* Fullscreen
+--------------------------------------------------------------------------------
+*/
+.vjs-default-skin .vjs-fullscreen-control {
+  width: 3.8em;
+  cursor: pointer;
+  float: right;
+}
+.vjs-default-skin .vjs-fullscreen-control:before {
+  content: @fullscreen-enter-icon;
+}
+/* Switch to the exit icon when the player is in fullscreen */
+.vjs-default-skin.vjs-fullscreen .vjs-fullscreen-control:before {
+  content: @fullscreen-exit-icon;
+}
+
+/* Big Play Button (play button at start)
+--------------------------------------------------------------------------------
+Positioning of the play button in the center or other corners can be done more
+easily in the skin designer. http://designer.videojs.com/
+*/
+.vjs-default-skin .vjs-big-play-button {
+  // Calculate total width/height so we're able to center the button
+  @total-width: (@big-play-width + (@big-play-border-width * 2));
+  @total-height: (@big-play-height + (@big-play-border-width * 2));
+  // Position the button using the absolute-align mixin (bottom of page)
+  .absolute-align(@big-play-align, @big-play-margin, @total-width);
+  .absolute-align(@big-play-vertical-align, @big-play-margin, @total-height);
+
+  font-size: @big-play-font-size;
+  display: block;
+  z-index: 2;
+  position: absolute;
+  width: @big-play-width;
+  height: @big-play-height;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  opacity: 1;
+
+  /* Need a slightly gray bg so it can be seen on black backgrounds *///
+  .background-color-with-alpha(@big-play-bg-color, @big-play-bg-alpha);
+
+  border: @big-play-border-width solid @big-play-border-color;
+
+  .border-radius(@big-play-border-radius);
+  .box-shadow(0px 0px 1em rgba(255, 255, 255, 0.25));
+  .transition(all 0.4s);
+}
+
+/* Optionally center */
+.vjs-default-skin.vjs-big-play-centered .vjs-big-play-button {
+  @total-width: (@big-play-width + (@big-play-border-width * 2));
+  @total-height: (@big-play-height + (@big-play-border-width * 2));
+
+  .absolute-align(center, @big-play-margin, @total-width);
+  .absolute-align(middle, @big-play-margin, @total-height);
+}
+
+/* Hide if controls are disabled */
+.vjs-default-skin.vjs-controls-disabled .vjs-big-play-button {
+  display: none;
+}
+/* Hide when video starts playing */
+.vjs-default-skin.vjs-has-started .vjs-big-play-button {
+  display: none;
+}
+/* Hide on mobile devices. Remove when we stop using native controls
+    by default on mobile  */
+.vjs-default-skin.vjs-using-native-controls .vjs-big-play-button {
+  display: none;
+}
+
+.vjs-default-skin:hover .vjs-big-play-button,
+.vjs-default-skin .vjs-big-play-button:focus {
+  outline: 0;
+  border-color: #fff;
+  /* IE8 needs a non-glow hover state *///
+  background-color: rgb(80, 80, 80);
+  background-color: rgba(50, 50, 50, 0.75);
+
+  .box-shadow(0 0 3em #fff);
+  .transition(all 0s);
+}
+
+.vjs-default-skin .vjs-big-play-button:before {
+  content: @play-icon;
+  font-family: VideoJS;
+  /* In order to center the play icon vertically we need to set the line height
+     to the same as the button height */
+  line-height: @big-play-height;
+  text-shadow: 0.05em 0.05em 0.1em #000;
+  text-align: center /* Needed for IE8 */;
+
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.vjs-error .vjs-big-play-button {
+  display: none;
+}
+
+/* Error Display
+--------------------------------------------------------------------------------
+*/
+
+.vjs-error-display {
+  display: none;
+}
+
+.vjs-error .vjs-error-display {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.vjs-error .vjs-error-display:before {
+  content: 'X';
+  font-family: Arial;
+  font-size: 4em;
+  color: #666666;
+  /* In order to center the play icon vertically we need to set the line height
+     to the same as the button height */
+  line-height: 1;
+  text-shadow: 0.05em 0.05em 0.1em #000;
+  text-align: center /* Needed for IE8 */;
+  vertical-align: middle;
+
+  position: absolute;
+  top: 50%;
+  margin-top: -0.5em;
+  width: 100%;
+}
+
+.vjs-error-display div {
+  position: absolute;
+
+  font-size: 1.4em;
+  text-align: center;
+  bottom: 1em;
+  right: 1em;
+  left: 1em;
+}
+
+.vjs-error-display a, .vjs-error-display a:visited {
+  color: #F4A460;
+}
+
+/* Loading Spinner
+--------------------------------------------------------------------------------
+*/
+.vjs-loading-spinner {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  font-size: 4em;
+  line-height: 1;
+
+  width: 1em;
+  height: 1em;
+
+  margin-left: -0.5em;
+  margin-top: -0.5em;
+
+  opacity: 0.75;
+
+  .animation(spin 1.5s infinite linear);
+}
+
+/* Errors are unrecoverable without user interaction,
+   so hide the spinner in the case of an error */
+.video-js.vjs-error .vjs-loading-spinner {
+  /* using !important flag because currently the loading spinner
+     uses hide()/show() instead of classes. The !important can be
+     removed when that's updated */
+  display: none !important;
+
+  /* ensure animation doesn't continue while hidden */
+  .animation(none);
+}
+
+.vjs-default-skin .vjs-loading-spinner:before {
+  content: @spinner3-icon;
+  font-family: VideoJS;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1em;
+  height: 1em;
+  text-align: center;
+  text-shadow: 0em 0em 0.1em #000;
+}
+
+@-moz-keyframes spin {
+  0% { -moz-transform: rotate(0deg); }
+  100% { -moz-transform: rotate(359deg); }
+}
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(359deg); }
+}
+@-o-keyframes spin {
+  0% { -o-transform: rotate(0deg); }
+  100% { -o-transform: rotate(359deg); }
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(359deg); }
+}
+
+/* Menu Buttons (Captions/Subtitles/etc.)
+--------------------------------------------------------------------------------
+*/
+.vjs-default-skin .vjs-menu-button {
+  float: right;
+  cursor: pointer;
+}
+
+.vjs-default-skin .vjs-menu {
+  display: none;
+  position: absolute;
+  bottom: 0;
+  left: 0em; /* (Width of vjs-menu - width of button) / 2 */
+  width: 0em;
+  height: 0em;
+  margin-bottom: 3em;
+
+  border-left: 2em solid transparent;
+  border-right: 2em solid transparent;
+
+  border-top: 1.55em solid rgb(0, 0, 0); /* Same width top as ul bottom */
+  border-top-color: rgba(7, 40, 50, 0.5); /* Same as ul background */
+}
+
+/* Button Pop-up Menu */
+.vjs-default-skin .vjs-menu-button .vjs-menu .vjs-menu-content {
+  display: block;
+  padding: 0; margin: 0;
+  position: absolute;
+  width: 10em;
+  bottom: 1.5em; /* Same bottom as vjs-menu border-top */
+  max-height: 15em;
+  overflow: auto;
+
+  left: -5em; /* Width of menu - width of button / 2 */
+
+  .background-color-with-alpha(@control-bg-color, @control-bg-alpha);
+  .box-shadow(-0.2em -0.2em 0.3em rgba(255, 255, 255, 0.2));
+}
+
+.vjs-default-skin .vjs-menu-button:hover .vjs-menu {
+  display: block;
+}
+.vjs-default-skin .vjs-menu-button ul li {
+  list-style: none;
+  margin: 0;
+  padding: 0.3em 0 0.3em 0;
+  line-height: 1.4em;
+  font-size: 1.2em;
+  text-align: center;
+  text-transform: lowercase;
+}
+.vjs-default-skin .vjs-menu-button ul li.vjs-selected {
+  background-color: #000;
+}
+.vjs-default-skin .vjs-menu-button ul li:focus,
+.vjs-default-skin .vjs-menu-button ul li:hover,
+.vjs-default-skin .vjs-menu-button ul li.vjs-selected:focus,
+.vjs-default-skin .vjs-menu-button ul li.vjs-selected:hover {
+  outline: 0;
+  color: #111;
+
+  .background-color-with-alpha(rgb(255, 255, 255), 0.75);
+  .box-shadow(0 0 1em rgba(255, 255, 255, 1));
+}
+.vjs-default-skin .vjs-menu-button ul li.vjs-menu-title {
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 1em;
+  line-height: 2em;
+  padding: 0;
+  margin: 0 0 0.3em 0;
+  font-weight: bold;
+  cursor: default;
+}
+
+/* Subtitles Button */
+.vjs-default-skin .vjs-subtitles-button:before { content: @subtitles-icon; }
+
+/* Captions Button */
+.vjs-default-skin .vjs-captions-button:before {
+  content: @captions-icon;
+}
+
+/* Replacement for focus outline */
+.vjs-default-skin .vjs-captions-button:focus .vjs-control-content:before,
+.vjs-default-skin .vjs-captions-button:hover .vjs-control-content:before {
+  .box-shadow(0 0 1em rgba(255, 255, 255, 1));
+}
+
+/*
+REQUIRED STYLES (be careful overriding)
+================================================================================
+When loading the player, the video tag is replaced with a DIV,
+that will hold the video tag or object tag for other playback methods.
+The div contains the video playback element (Flash or HTML5) and controls,
+and sets the width and height of the video.
+
+** If you want to add some kind of border/padding (e.g. a frame), or special
+positioning, use another containing element. Otherwise you risk messing up
+control positioning and full window mode. **
+*/
+.video-js {
+  background-color: #000;
+  position: relative;
+  padding: 0;
+  /* Start with 10px for base font size so other dimensions can be em based and
+     easily calculable. */
+  font-size: @base-font-size;
+  /* Allow poster to be vertially aligned. */
+  vertical-align: middle;
+  /*  display: table-cell; */ /*This works in Safari but not Firefox.*/
+
+  /* Provide some basic defaults for fonts */
+  font-weight: normal;
+  font-style: normal;
+  /* Avoiding helvetica: issue #376 */
+  font-family: Arial, sans-serif;
+
+  /* Turn off user selection (text highlighting) by default.
+     The majority of player components will not be text blocks.
+     Text areas will need to turn user selection back on. */
+  .user-select(none);
+}
+
+/* Playback technology elements expand to the width/height of the containing div
+    <video> or <object> */
+.video-js .vjs-tech {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Fix for Firefox 9 fullscreen (only if it is enabled). Not needed when
+   checking fullScreenEnabled. */
+.video-js:-moz-full-screen { position: absolute; }
+
+/* Fullscreen Styles */
+body.vjs-full-window {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  /* Fix for IE6 full-window. http://www.cssplay.co.uk/layouts/fixed.html *///
+  overflow-y: auto;
+}
+.video-js.vjs-fullscreen {
+  position: fixed;
+  overflow: hidden;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 100% !important;
+  height: 100% !important;
+  /* IE6 full-window (underscore hack) *///
+  _position: absolute;
+}
+.video-js:-webkit-full-screen {
+  width: 100% !important;
+  height: 100% !important;
+}
+.video-js.vjs-fullscreen.vjs-user-inactive {
+  cursor: none;
+}
+
+/* Poster Styles */
+.vjs-poster {
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  background-size: contain;
+  cursor: pointer;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  width: 100%;
+}
+.vjs-poster img {
+  display: block;
+  margin: 0 auto;
+  max-height: 100%;
+  padding: 0;
+  width: 100%;
+}
+
+/* Hide the poster when native controls are used otherwise it covers them */
+.video-js.vjs-using-native-controls .vjs-poster {
+  display: none;
+}
+
+/* Text Track Styles */
+/* Overall track holder for both captions and subtitles */
+.video-js .vjs-text-track-display {
+  text-align: center;
+  position: absolute;
+  bottom: 4em;
+  /* Leave padding on left and right *///
+  left: 1em;
+  right: 1em;
+}
+
+/* Move captions down when controls aren't being shown */
+.video-js.vjs-user-inactive.vjs-playing .vjs-text-track-display {
+  bottom: 1em;
+}
+
+/* Individual tracks */
+.video-js .vjs-text-track {
+  display: none;
+  font-size: 1.4em;
+  text-align: center;
+  margin-bottom: 0.1em;
+  /* Transparent black background, or fallback to all black (oldIE) *///
+  .background-color-with-alpha(rgb(0, 0, 0), 0.5);
+}
+.video-js .vjs-subtitles { color: #fff /* Subtitles are white */; }
+.video-js .vjs-captions { color: #fc6 /* Captions are yellow */; }
+.vjs-tt-cue { display: block; }
+
+/* Hide disabled or unsupported controls */
+.vjs-default-skin .vjs-hidden { display: none; }
+
+.vjs-lock-showing {
+  display: block !important;
+  opacity: 1;
+  visibility: visible;
+}
+
+/*  In IE8 w/ no JavaScript (no HTML5 shim), the video tag doesn't register.
+    The .video-js classname on the video tag also isn't considered.
+    This optional paragraph inside the video tag can provide a message to users
+    about what's required to play video. */
+.vjs-no-js {
+  padding: 20px;
+  color: #ccc;
+  background-color: #333;
+  font-size: 18px;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  width: 300px;
+  height: 150px;
+  margin: 0px auto;
+}
+
+.vjs-no-js a, .vjs-no-js a:visited {
+  color: #F4A460;
+}
+
+// MIXINS
+// =============================================================================
+// Mixins are a LESS feature and are used to add vendor prefixes to CSS rules
+// when needed.
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow
+.box-shadow (@string: 0 0 1em rgba(0, 0, 0, 0.25)) {
+  /* box-shadow *///
+  -webkit-box-shadow: @string;
+     -moz-box-shadow: @string;
+          box-shadow: @string;
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/border-radius
+.border-radius (@string: 5px) {
+  /* border-radius *///
+  -webkit-border-radius: @string;
+     -moz-border-radius: @string;
+          border-radius: @string;
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/transition
+.transition (@string: all 1s linear) {
+  /* transition *///
+  -webkit-transition: @string;
+     -moz-transition: @string;
+       -o-transition: @string;
+          transition: @string;
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/transition
+.transition-delay (@string: 1s) {
+  /* transition-delay *///
+  -webkit-transition-delay: @string;
+     -moz-transition-delay: @string;
+       -o-transition-delay: @string;
+          transition-delay: @string;
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/animation
+.animation (@string: spin 1s infinite linear) {
+  /* animation *///
+  -webkit-animation: @string;
+     -moz-animation: @string;
+       -o-animation: @string;
+          animation: @string;
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/transform
+.transform (@string: rotate(-45deg)) {
+  /* transform *///
+  -webkit-transform: @string;
+     -moz-transform: @string;
+      -ms-transform: @string;
+       -o-transform: @string;
+          transform: @string;
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/user-select
+.user-select (@string: none) {
+  /* user-select *///
+  -webkit-user-select: @string;
+     -moz-user-select: @string;
+      -ms-user-select: @string;
+          user-select: @string;
+}
+
+// Hide something visually but keep available for screen readers.
+// http://h5bp.com/v
+.hide-visually () {
+  /* hide-visually *///
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position:
+  absolute;
+  width: 1px;
+}
+
+// Align an object with absolute positioning
+// Used to align the Big Play Button in the corners or center
+.absolute-align (@align, @margin, @length) when (@align = top) {
+  top: @margin;
+}
+.absolute-align (@align, @margin, @length) when (@align = bottom) {
+  bottom: @margin;
+}
+.absolute-align (@align, @margin, @length) when (@align = left) {
+  left: @margin;
+}
+.absolute-align (@align, @margin, @length) when (@align = right) {
+  right: @margin;
+}
+.absolute-align (@align, @margin, @length) when (@align = center) {
+  /* Center it horizontally *///
+  left: 50%;
+  margin-left: (-(@length/2));
+  // margin-left: ((@length*-1)/2);
+}
+.absolute-align (@align, @margin, @length) when (@align = middle) {
+  /* Center it vertically *///
+  top: 50%;
+  margin-top: (-(@length/2));
+  // margin-top: ((@length*-1)/2);
+}
+
+// http://stackoverflow.com/questions/637921/opacity-of-background-but-not-the-text
+.background-color-with-alpha (@color, @alpha) {
+  @rgba: rgba(red(@color), green(@color), blue(@color), @alpha);
+  /* background-color-with-alpha *///
+  background-color: @color;
+  background-color: @rgba;
+  // No longer using MS filters because they break border radius in IE9
+  // @argb: argb(@rgba);
+  // filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorstr=@{argb}, endColorstr=@{argb})";
+  // -ms-filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorstr=@{argb}, endColorstr=@{argb})";
+}
+
+.border-color-with-alpha (@color, @alpha) {
+  @rgba: rgba(red(@color), green(@color), blue(@color), @alpha);
+  /* border-color-with-alpha *///
+  border-color: @color;
+  border-color: @rgba;
+}
+
+// NOTES ON LESS (tracking learnings so we don't forget)
+// =============================================================================
+// * We want this file to continue to be accessible by people who don't know
+//   LESS but know CSS. This means finding the balance between using the most
+//   valuable LESS features (e.g. variables) and keeping it looking like CSS.
+//   So it's best to avoid advanced LESS features like conditional statements.
+//   (we're using one for the big play button position because that's a hot
+//   topic)
+//
+// * We care about the readability of the CSS output of LESS, which means we
+//   have to be careful about what features of LESS we use. (if you're building
+//   your own skin this may not apply)
+//     1. Comments inside of rules (strangely) have an extra line added after
+//        them in the CSS output. To avoid this we can add a LESS comment after
+//        the CSS comment.
+//          /* comment *///
+//
+//     2. In a rule with nested rules, any comments outside of a rule are moved
+//        to the top of the parent rule. i.e. it might look like:
+//          /* title of rule 1 */
+//          /* title of rule 2 */
+//          .rule1 {}
+//          .rule2 {}
+//        This is why we aren't using nested rules inside of the
+//        vjs-default-skin class.
+
+/* -----------------------------------------------------------------------------
+The original source of this file lives at
+https://github.com/videojs/video.js/blob/master/src/css/video-js.less */

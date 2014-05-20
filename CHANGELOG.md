@@ -2,6 +2,11 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 4.6.0 (2014-05-20)
 * Updated the UI to support live video ([view](https://github.com/videojs/video.js/pull/1121))
 * The UI now resets after a source change ([view](https://github.com/videojs/video.js/pull/1124))
 * Now assuming smart CSS defaults for sliders to prevent reflow on player init ([view](https://github.com/videojs/video.js/pull/1122))
@@ -26,8 +31,6 @@ CHANGELOG
 * Added a clearer error message when a tech is undefined ([view](https://github.com/videojs/video.js/pull/1210))
 * Added a cog icon to the font icons ([view](https://github.com/videojs/video.js/pull/1211))
 * Added a player option to offset the subtitles/captions timing ([view](https://github.com/videojs/video.js/pull/1212))
-
---------------------
 
 ## 4.5.2 (2014-04-12)
 * Updated release versioning to include bower.json and component.json
