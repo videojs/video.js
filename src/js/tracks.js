@@ -169,6 +169,20 @@ vjs.TextTrack.prototype.kind = function(){
 };
 
 /**
+ * Track id value
+ * @private
+ */
+vjs.TextTrack.prototype.id_;
+
+/**
+ * Get the track id value
+ * @return {String}
+ */
+vjs.TextTrack.prototype.id = function(){
+  return this.id_;
+};
+
+/**
  * Track src value
  * @private
  */
@@ -775,6 +789,7 @@ vjs.OffTextTrackMenuItem = vjs.TextTrackMenuItem.extend({
     // Create pseudo track info
     // Requires options['kind']
     options['track'] = {
+      id: function(){ return ('vjs_' + options['kind'] + '_off'); },
       kind: function() { return options['kind']; },
       player: player,
       label: function(){ return options['kind'] + ' off'; },
@@ -942,10 +957,9 @@ vjs.ChaptersButton.prototype.createMenu = function(){
   for (;i<j;i++) {
     track = tracks[i];
     if (track.kind() == this.kind_ && track.dflt()) {
-      if (track.readyState() < 2) {
-        this.chaptersTrack = track;
+      if (track.readyState() === 0) {
+        track.load();
         track.on('loaded', vjs.bind(this, this.createMenu));
-        return;
       } else {
         chaptersTrack = track;
         break;
@@ -978,6 +992,7 @@ vjs.ChaptersButton.prototype.createMenu = function(){
 
       menu.addChild(mi);
     }
+    this.addChild(menu);
   }
 
   if (this.items.length > 0) {
@@ -999,7 +1014,7 @@ vjs.ChaptersTrackMenuItem = vjs.MenuItem.extend({
         currentTime = player.currentTime();
 
     // Modify options for parent MenuItem class's init.
-    options['label'] = cue.text;
+    options['label'] = cue.id;
     options['selected'] = (cue.startTime <= currentTime && currentTime < cue.endTime);
     vjs.MenuItem.call(this, player, options);
 
