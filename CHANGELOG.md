@@ -6,6 +6,9 @@ _(none)_
 
 --------------------
 
+## 4.6.1 (2014-05-20)
+* Udpated playbackRate menu to work in minified version ([view](https://github.com/videojs/video.js/pull/1223))
+
 ## 4.6.0 (2014-05-20)
 * Updated the UI to support live video ([view](https://github.com/videojs/video.js/pull/1121))
 * The UI now resets after a source change ([view](https://github.com/videojs/video.js/pull/1124))
