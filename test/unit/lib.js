@@ -46,7 +46,7 @@ test('should check if an object is an Array', function(){
   ok(vjs.obj.isArray(arr) === true, 'Arr object is an Array');
 
   var obj = {};
-  ok(vjs.obj.isArray(arr) === false, 'Obj is not an Array');
+  ok(vjs.obj.isArray(obj) === false, 'Obj is not an Array');
 });
 
 test('should check if an object is plain', function(){
