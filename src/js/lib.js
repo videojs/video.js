@@ -833,6 +833,11 @@ vjs.findPosition = function(el) {
   };
 };
 
+/*
+ * Loops through an array and runs a function for each item inside it.
+ * @param  {Array}    array The array.
+ * @param  {Function} fn    The function to be run for each item. 
+ */
 vjs.arrayForEach = function(array, fn) {
   if (!(array instanceof Array) || !(fn instanceof Function)) {
     return false;

@@ -5,18 +5,26 @@
  * robust as jquery's, so there's probably some differences.
  */
 
+/**
+ * Loops through an array of event types and calls the requested method for each type.
+ * @param  {Element|Object} elem Element or object to bind listeners to
+ * @param  {String}   type Type of event to bind to.
+ * @param  {Function} fn   Event listener.
+ * @param  {String}   method Event method (on, off, one).
+ */
 vjs.forwardMultipleEvents = function( elem, type, fn, method ) {
     vjs.arrayForEach( type, function( type ) {
-      vjs[ method ](elem, type, fn);
+      vjs[ method ](elem, type, fn); //Call the event method for each one of the types
     });
 };
+
 /**
  * Add an event listener to element
  * It stores the handler function in a separate cache object
  * and adds a generic handler to the element's event,
  * along with a unique id (guid) to the element.
  * @param  {Element|Object}   elem Element or object to bind listeners to
- * @param  {String}   type Type of event to bind to.
+ * @param  {String|Array}   type Type of event to bind to.
  * @param  {Function} fn   Event listener.
  * @private
  */
@@ -74,7 +82,7 @@ vjs.on = function(elem, type, fn){
 /**
  * Removes event listeners from an element
  * @param  {Element|Object}   elem Object to remove listeners from
- * @param  {String=}   type Type of listener to remove. Don't include to remove all events from element.
+ * @param  {String|Array=}   type Type of listener to remove. Don't include to remove all events from element.
  * @param  {Function} fn   Specific listener to remove. Don't incldue to remove listeners for an event type.
  * @private
  */
@@ -352,7 +360,7 @@ vjs.trigger = function(elem, event) {
 /**
  * Trigger a listener only once for an event
  * @param  {Element|Object}   elem Element or object to
- * @param  {String}   type
+ * @param  {String|Array}   type
  * @param  {Function} fn
  * @private
  */
