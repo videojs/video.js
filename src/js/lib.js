@@ -843,7 +843,7 @@ vjs.arrayForEach = function(array, fn) {
     return false;
   }
 
-  for (var i = 0; i < array.length; ++i) {
+  for (var i = 0, len = array.length; i < len; ++i) {
     fn.apply( vjs, [array[i], i, array]);
   }
 };
