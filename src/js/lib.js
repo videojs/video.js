@@ -698,3 +698,17 @@ vjs.findPosition = function(el) {
       top: top
     };
 };
+
+vjs.filter = function(array, fn) {
+  if (!(array instanceof Array) || !(fn instanceof Function)) {
+    return false;
+  }
+
+  if (!Array.prototype.filter) {
+    for (var i = 0; i < array.length; ++i) {
+      fn(array[i]);
+    }
+  } else {
+    return array.filter(fn);
+  }
+};

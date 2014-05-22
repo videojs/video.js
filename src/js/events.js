@@ -16,6 +16,13 @@
  * @private
  */
 vjs.on = function(elem, type, fn){
+  if (type instanceof Array){
+    vjs.filter( type, function( type ) {
+      vjs.on(elem, type, fn);
+    });
+    return false;
+  }
+
   var data = vjs.getData(elem);
 
   // We need a place to store all our handler data
@@ -76,6 +83,13 @@ vjs.off = function(elem, type, fn) {
 
   // If no events exist, nothing to unbind
   if (!data.handlers) { return; }
+
+  if (type instanceof Array){
+    vjs.filter(type, function(type){
+      vjs.off(elem, type, fn);
+    });
+    return false;
+  }
 
   // Utility function
   var removeType = function(t){
@@ -342,6 +356,12 @@ vjs.trigger = function(elem, event) {
  * @private
  */
 vjs.one = function(elem, type, fn) {
+  if (type instanceof Array){
+    vjs.filter(type, function( type ){
+      vjs.one(elem, type, fn);
+    });
+    return false;
+  }
   var func = function(){
     vjs.off(elem, type, func);
     fn.apply(this, arguments);
