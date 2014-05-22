@@ -838,11 +838,7 @@ vjs.arrayForEach = function(array, fn) {
     return false;
   }
 
-  if (!Array.prototype.forEach) {
-    for (var i = 0; i < array.length; ++i) {
-      fn(array[i], i, array);
-    }
-  } else {
-    return array.forEach(fn);
+  for (var i = 0; i < array.length; ++i) {
+    fn.apply( vjs, [array[i], i, array]);
   }
 };

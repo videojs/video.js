@@ -111,6 +111,10 @@ goog.exportSymbol('videojs.SubtitlesButton', vjs.SubtitlesButton);
 goog.exportSymbol('videojs.CaptionsButton', vjs.CaptionsButton);
 goog.exportSymbol('videojs.ChaptersButton', vjs.ChaptersButton);
 
+goog.exportSymbol('videojs.on', vjs.on);
+goog.exportSymbol('videojs.off', vjs.off);
+goog.exportSymbol('videojs.one', vjs.one);
+
 goog.exportSymbol('videojs.MediaTechController', vjs.MediaTechController);
 goog.exportProperty(vjs.MediaTechController.prototype, 'features', vjs.MediaTechController.prototype.features);
 goog.exportProperty(vjs.MediaTechController.prototype.features, 'volumeControl', vjs.MediaTechController.prototype.features.volumeControl);
