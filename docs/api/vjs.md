@@ -34,11 +34,14 @@ The `vjs` function can be used to initialize or retrieve a player.
   - [CoreObject](vjs.CoreObject.md)
   - [CurrentTimeDisplay](vjs.CurrentTimeDisplay.md)
   - [DurationDisplay](vjs.DurationDisplay.md)
+  - [ErrorDisplay](vjs.ErrorDisplay.md)
   - [Flash](vjs.Flash.md)
   - [FullscreenToggle](vjs.FullscreenToggle.md)
   - [Html5](vjs.Html5.md)
+  - [LiveDisplay](vjs.LiveDisplay.md)
   - [LoadProgressBar](vjs.LoadProgressBar.md)
   - [LoadingSpinner](vjs.LoadingSpinner.md)
+  - [MediaError](vjs.MediaError.md)
   - [MediaLoader](vjs.MediaLoader.md)
   - [MediaTechController](vjs.MediaTechController.md)
   - [Menu](vjs.Menu.md)
@@ -48,6 +51,8 @@ The `vjs` function can be used to initialize or retrieve a player.
   - [OffTextTrackMenuItem](vjs.OffTextTrackMenuItem.md)
   - [PlayProgressBar](vjs.PlayProgressBar.md)
   - [PlayToggle](vjs.PlayToggle.md)
+  - [PlaybackRateMenuButton](vjs.PlaybackRateMenuButton.md)
+  - [PlaybackRateMenuItem](vjs.PlaybackRateMenuItem.md)
   - [Player](vjs.Player.md)
   - [PosterImage](vjs.PosterImage.md)
   - [ProgressControl](vjs.ProgressControl.md)
@@ -69,11 +74,13 @@ The `vjs` function can be used to initialize or retrieve a player.
   - [VolumeLevel](vjs.VolumeLevel.md)
   - [VolumeMenuButton](vjs.VolumeMenuButton.md)
 
-- NAMESPACES
-  - [util](vjs.util.md)
-
 - [METHODS](#methods)
+  - [parseUrl](#parseurl-url-)
   - [plugin](#plugin-name-init-)
+
+- NAMESPACES
+  - [log](vjs.log.md)
+  - [util](vjs.util.md)
 
 ---
 
@@ -92,11 +99,24 @@ _defined in_: [src/js/core.js#L77](https://github.com/videojs/video.js/blob/mast
 ### players
 > Global player list
 
-_defined in_: [src/js/core.js#L118](https://github.com/videojs/video.js/blob/master/src/js/core.js#L118)
+_defined in_: [src/js/core.js#L121](https://github.com/videojs/video.js/blob/master/src/js/core.js#L121)
 
 ---
 
 ## METHODS
+
+### parseUrl( url )
+> Resolve and parse the elements of a URL
+
+##### PARAMETERS: 
+* __url__ `String` The url to parse
+
+##### RETURNS: 
+* `Object` An object of url details
+
+_defined in_: [src/js/lib.js#L696](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L696)
+
+---
 
 ### plugin( name, init )
 > the method for registering a video.js plugin

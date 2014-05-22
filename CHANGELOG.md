@@ -2,14 +2,52 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 4.6.1 (2014-05-20)
+* Udpated playbackRate menu to work in minified version ([view](https://github.com/videojs/video.js/pull/1223))
+
+## 4.6.0 (2014-05-20)
+* Updated the UI to support live video ([view](https://github.com/videojs/video.js/pull/1121))
+* The UI now resets after a source change ([view](https://github.com/videojs/video.js/pull/1124))
+* Now assuming smart CSS defaults for sliders to prevent reflow on player init ([view](https://github.com/videojs/video.js/pull/1122))
+* Fixed the title element placement in menus [[view](https://github.com/videojs/video.js/pull/1114)]
+* Fixed title support for menu buttons ([view](https://github.com/videojs/video.js/pull/1128))
+* Fixed extra mousemove events on Windows caused by certain apps, not users [[view](https://github.com/videojs/video.js/pull/1068)]
+* Fixed error due to undefined tech when no source is supported [[view](https://github.com/videojs/video.js/pull/1172)]
+* Fixed the progress bar not finishing when manual timeupdate events are used [[view](https://github.com/videojs/video.js/pull/1173)]
+* Added a more informative and styled fallback message for non-html5 browsers [[view](https://github.com/videojs/video.js/pull/1181)]
+* Added the option to provide an array of child components instead of an object [[view](https://github.com/videojs/video.js/pull/1093)]
+* Fixed casing on webkitRequestFullscreen [[view](https://github.com/videojs/video.js/pull/1101)]
+* Made tap events on mobile less sensitive to touch moves [[view](https://github.com/videojs/video.js/pull/1111)]
+* Fixed the default flag for captions/subtitles tracks [[view](https://github.com/videojs/video.js/pull/1153)]
+* Fixed compilation failures with LESS v1.7.0 and GRUNT v0.4.4 [[view](https://github.com/videojs/video.js/pull/1180)]
+* Added better error handling across the library [[view](https://github.com/videojs/video.js/pull/1197)]
+* Updated captions/subtiles file fetching to support cross-origin requests in older IE browsers [[view](https://github.com/videojs/video.js/pull/1095)]
+* Added support for playback rate switching [[view](https://github.com/videojs/video.js/pull/1132)]
+* Fixed an issue with the loadstart event order that caused the big play button to not hide [[view](https://github.com/videojs/video.js/pull/1209)]
+* Modernized the fullscreen API and added support for IE11 [[view](https://github.com/videojs/video.js/pull/1205)]
+* Added cross-browser testing with SauceLabs, and added Karma as the default test runner ([view](https://github.com/videojs/video.js/pull/1187))
+* Fixed saucelabs integration to run on commits in TravisCI ([view](https://github.com/videojs/video.js/pull/1214))
+* Added a clearer error message when a tech is undefined ([view](https://github.com/videojs/video.js/pull/1210))
+* Added a cog icon to the font icons ([view](https://github.com/videojs/video.js/pull/1211))
+* Added a player option to offset the subtitles/captions timing ([view](https://github.com/videojs/video.js/pull/1212))
+
+## 4.5.2 (2014-04-12)
+* Updated release versioning to include bower.json and component.json
+
+## 4.5.1 (2014-03-27)
+* Fixed a bug from the last release where canPlaySource was no longer exported
+
+## 4.5.0 (2014-03-27)
 * Added component(1) support ([view](https://github.com/videojs/video.js/pull/1032))
 * Captions now move down when controls are hidden ([view](https://github.com/videojs/video.js/pull/1053))
 * Added the .less source file to the distribution files ([view](https://github.com/videojs/video.js/pull/1056))
 * Changed src() to return the current selected source ([view](https://github.com/videojs/video.js/pull/968))
 * Added a grunt task for opening the next issue that needs addressing ([view](https://github.com/videojs/video.js/pull/1059))
 * Fixed Android 4.0+ devices' check for HLS support ([view](https://github.com/videojs/video.js/pull/1084))
-
---------------------
 
 ## 4.4.3 (2014-03-06)
 * Fixed bugs in IE9 Windows 7N with no Media Player ([view](https://github.com/videojs/video.js/pull/1060))

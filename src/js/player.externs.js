@@ -49,9 +49,12 @@ videojs.Player.prototype.poster = function(){};
 /**
  * Fullscreen functionality
  */
-videojs.Player.prototype.isFullScreen = function(){};
-videojs.Player.prototype.requestFullScreen = function(){};
-videojs.Player.prototype.cancelFullScreen = function(){};
+videojs.Player.prototype.isFullscreen = function(){};
+videojs.Player.prototype.isFullScreen = function(){}; /* deprecated */
+videojs.Player.prototype.requestFullscreen = function(){};
+videojs.Player.prototype.requestFullScreen = function(){}; /* deprecated */
+videojs.Player.prototype.exitFullscreen = function(){};
+videojs.Player.prototype.cancelFullScreen = function(){}; /* deprecated */
 
 /**
  * Text tracks
