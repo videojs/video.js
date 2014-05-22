@@ -15,7 +15,7 @@ test('should add and remove an event listener to an element', function(){
 });
 
 test('should add and remove multiple event listeners to an element with a single call', function(){
-  expect(3);
+  expect(6);
 
   var el = document.createElement('div');
   var listener = function(){
@@ -25,13 +25,16 @@ test('should add and remove multiple event listeners to an element with a single
   vjs.on(el, [ 'click', 'event1', 'event2' ], listener);
 
   vjs.trigger(el, 'click');
+  vjs.trigger(el, 'click');
   vjs.off(el, 'click', listener);
   vjs.trigger(el, 'click'); // No click should happen.
 
   vjs.trigger(el, 'event1');
+  vjs.trigger(el, 'event1');
   vjs.off(el, 'event1', listener);
   vjs.trigger(el, 'event1'); // No event1 should happen.
 
+  vjs.trigger(el, 'event2');
   vjs.trigger(el, 'event2');
   vjs.off(el, 'event2', listener);
   vjs.trigger(el, 'event2'); // No event2 should happen.

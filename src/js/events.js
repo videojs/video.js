@@ -5,6 +5,11 @@
  * robust as jquery's, so there's probably some differences.
  */
 
+vjs.forwardMultipleEvents = function( elem, type, fn, method ) { 
+    vjs.filter( type, function( type ) {
+      vjs[ method ](elem, type, fn);
+    });
+};
 /**
  * Add an event listener to element
  * It stores the handler function in a separate cache object
@@ -17,9 +22,7 @@
  */
 vjs.on = function(elem, type, fn){
   if (type instanceof Array){
-    vjs.filter( type, function( type ) {
-      vjs.on(elem, type, fn);
-    });
+    vjs.forwardMultipleEvents(elem, type, fn, 'on');
     return false;
   }
 
@@ -85,9 +88,7 @@ vjs.off = function(elem, type, fn) {
   if (!data.handlers) { return; }
 
   if (type instanceof Array){
-    vjs.filter(type, function(type){
-      vjs.off(elem, type, fn);
-    });
+    vjs.forwardMultipleEvents(elem, type, fn, 'off');
     return false;
   }
 
@@ -357,9 +358,7 @@ vjs.trigger = function(elem, event) {
  */
 vjs.one = function(elem, type, fn) {
   if (type instanceof Array){
-    vjs.filter(type, function( type ){
-      vjs.one(elem, type, fn);
-    });
+    vjs.forwardMultipleEvents(elem, type, fn, 'one');
     return false;
   }
   var func = function(){
