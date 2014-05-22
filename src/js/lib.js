@@ -833,16 +833,16 @@ vjs.findPosition = function(el) {
   };
 };
 
-vjs.filter = function(array, fn) {
+vjs.arrayForEach = function(array, fn) {
   if (!(array instanceof Array) || !(fn instanceof Function)) {
     return false;
   }
 
-  if (!Array.prototype.filter) {
+  if (!Array.prototype.forEach) {
     for (var i = 0; i < array.length; ++i) {
-      fn(array[i]);
+      fn(array[i], i, array);
     }
   } else {
-    return array.filter(fn);
+    return array.forEach(fn);
   }
 };

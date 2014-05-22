@@ -324,3 +324,16 @@ test('should confirm logging functions work', function() {
     console.error = origError;
   }
 });
+
+test('should loop through each element of an array', function() {
+    expect(11);
+    var a = [1, 2, 3, 4, 5];
+    var sum = 0;
+    var i = 0;
+    vjs.arrayForEach(a, function(item, iterator, array) {
+        sum += item;
+        deepEqual(array, a);
+        equal(i++,iterator);
+    } );
+    ok(sum, 15);
+} );

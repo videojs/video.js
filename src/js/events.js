@@ -5,8 +5,8 @@
  * robust as jquery's, so there's probably some differences.
  */
 
-vjs.forwardMultipleEvents = function( elem, type, fn, method ) { 
-    vjs.filter( type, function( type ) {
+vjs.forwardMultipleEvents = function( elem, type, fn, method ) {
+    vjs.arrayForEach( type, function( type ) {
       vjs[ method ](elem, type, fn);
     });
 };
