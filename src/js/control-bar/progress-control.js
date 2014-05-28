@@ -107,7 +107,6 @@ vjs.SeekBar.prototype.stepBack = function(){
   this.player_.currentTime(this.player_.currentTime() - 5); // more quickly rewind for keyboard-only users
 };
 
-
 /**
  * Shows load progress
  *
@@ -125,15 +124,45 @@ vjs.LoadProgressBar = vjs.Component.extend({
 
 vjs.LoadProgressBar.prototype.createEl = function(){
   return vjs.Component.prototype.createEl.call(this, 'div', {
-    className: 'vjs-load-progress',
-    innerHTML: '<span class="vjs-control-text">Loaded: 0%</span>'
+    className: 'vjs-load-progress'
   });
 };
 
 vjs.LoadProgressBar.prototype.update = function(){
-  if (this.el_.style) { this.el_.style.width = vjs.round(this.player_.bufferedPercent() * 100, 2) + '%'; }
-};
+  var i, start, end, part,
+      buffered = this.player_.buffered(),
+      duration = this.player_.duration(),
+      bufferedEnd = this.player_.bufferedEnd(),
+      children = this.el_.children,
+      // get the percent width of a time compared to the total end
+      percentify = function (time, end){
+        var percent = (time / end) || 0; // no NaN
+        return (percent * 100) + '%';
+      };
 
+  // update the width of the progress bar
+  this.el_.style.width = percentify(bufferedEnd, duration);
+
+  // add child elements to represent the individual buffered time ranges
+  for (i = 0; i < buffered.length; i++) {
+    start = buffered.start(i),
+    end = buffered.end(i),
+    part = children[i];
+
+    if (!part) {
+      part = this.el_.appendChild(vjs.createEl())
+    };
+
+    // set the percent based on the width of the progress bar (bufferedEnd)
+    part.style.left = percentify(start, bufferedEnd);
+    part.style.width = percentify(end - start, bufferedEnd);
+  };
+
+  // remove unused buffered range elements
+  for (i = children.length; i > buffered.length; i--) {
+    this.el_.removeChild(children[i-1]);
+  }
+};
 
 /**
  * Shows play progress

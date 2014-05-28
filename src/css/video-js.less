@@ -396,7 +396,8 @@ fonts to show/hide properly.
 
 /* Progress Bars */
 .vjs-default-skin .vjs-progress-holder .vjs-play-progress,
-.vjs-default-skin .vjs-progress-holder .vjs-load-progress {
+.vjs-default-skin .vjs-progress-holder .vjs-load-progress,
+.vjs-default-skin .vjs-progress-holder .vjs-load-progress div {
   position: absolute;
   display: block;
   height: 100%;
@@ -424,7 +425,14 @@ fonts to show/hide properly.
 }
 .vjs-default-skin .vjs-load-progress {
   background: rgb(100, 100, 100) /* IE8- Fallback */;
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* there are child elements of the load progress bar that represent the
+   specific time ranges that have been buffered */
+.vjs-default-skin .vjs-load-progress div {
+  background: rgb(120, 120, 120) /* IE8- Fallback */;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .vjs-default-skin .vjs-seek-handle {

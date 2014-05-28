@@ -355,13 +355,17 @@ vjs.Player.prototype.trackProgress = function(){
 
   this.progressInterval = setInterval(vjs.bind(this, function(){
     // Don't trigger unless buffered amount is greater than last time
-    // log(this.cache_.bufferEnd, this.buffered().end(0), this.duration())
-    /* TODO: update for multiple buffered regions */
-    if (this.cache_.bufferEnd < this.buffered().end(0)) {
+
+    var bufferedPercent = this.bufferedPercent();
+
+    if (this.cache_.bufferedPercent != bufferedPercent) {
       this.trigger('progress');
-    } else if (this.bufferedPercent() == 1) {
+    }
+
+    this.cache_.bufferedPercent = bufferedPercent;
+
+    if (bufferedPercent == 1) {
       this.stopTrackingProgress();
-      this.trigger('progress'); // Last update
     }
   }), 500);
 };
@@ -748,7 +752,6 @@ vjs.Player.prototype.remainingTime = function(){
 // http://dev.w3.org/html5/spec/video.html#dom-media-buffered
 // Buffered returns a timerange object.
 // Kind of like an array of portions of the video that have been downloaded.
-// So far no browsers return more than one range (portion)
 
 /**
  * Get a TimeRange object with the times of the video that have been downloaded
@@ -771,19 +774,13 @@ vjs.Player.prototype.remainingTime = function(){
  * @return {Object} A mock TimeRange object (following HTML spec)
  */
 vjs.Player.prototype.buffered = function(){
-  var buffered = this.techGet('buffered'),
-      start = 0,
-      buflast = buffered.length - 1,
-      // Default end to 0 and store in values
-      end = this.cache_.bufferEnd = this.cache_.bufferEnd || 0;
+  var buffered = this.techGet('buffered');
 
-  if (buffered && buflast >= 0 && buffered.end(buflast) !== end) {
-    end = buffered.end(buflast);
-    // Storing values allows them be overridden by setBufferedFromProgress
-    this.cache_.bufferEnd = end;
+  if (!buffered || !buffered.length) {
+    buffered = vjs.createTimeRange(0,0);
   }
 
-  return vjs.createTimeRange(start, end);
+  return buffered;
 };
 
 /**
@@ -797,7 +794,46 @@ vjs.Player.prototype.buffered = function(){
  * @return {Number} A decimal between 0 and 1 representing the percent
  */
 vjs.Player.prototype.bufferedPercent = function(){
-  return (this.duration()) ? this.buffered().end(0) / this.duration() : 0;
+  var duration = this.duration(),
+      buffered = this.buffered(),
+      bufferedDuration = 0,
+      start, end;
+
+  if (!duration) {
+    return 0;
+  }
+
+  for (var i=0; i<buffered.length; i++){
+    start = buffered.start(i);
+    end   = buffered.end(i);
+
+    // buffered end can be bigger than duration by a very small fraction
+    if (end > duration) {
+      end = duration;
+    }
+
+    bufferedDuration += end - start;
+  }
+
+  return bufferedDuration / duration;
+};
+
+/**
+ * Get the ending time of the last buffered time range
+ *
+ * This is used in the progress bar to encapsulate all time ranges.
+ * @return {Number} The end of the last buffered time range
+ */
+vjs.Player.prototype.bufferedEnd = function(){
+  var buffered = this.buffered(),
+      duration = this.duration(),
+      end = buffered.end(buffered.length-1);
+
+  if (end > duration) {
+    end = duration;
+  }
+
+  return end;
 };
 
 /**
