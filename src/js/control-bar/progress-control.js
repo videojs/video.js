@@ -125,15 +125,38 @@ vjs.LoadProgressBar = vjs.Component.extend({
 
 vjs.LoadProgressBar.prototype.createEl = function(){
   return vjs.Component.prototype.createEl.call(this, 'div', {
-    className: 'vjs-load-progress',
-    innerHTML: '<span class="vjs-control-text">Loaded: 0%</span>'
+    className: 'vjs-load-progress'
   });
 };
 
 vjs.LoadProgressBar.prototype.update = function(){
-  if (this.el_.style) { this.el_.style.width = vjs.round(this.player_.bufferedPercent() * 100, 2) + '%'; }
+  if (this.el_.style) {
+    var buffered = this.player_.buffered(),
+        children = this.el_.children;
+
+    for (var i=0; i<buffered.length; i++) {
+      var start = buffered.start(i),
+          end = buffered.end(i),
+          part = children[i];
+
+      if (!part) {
+        part = this.el_.appendChild(vjs.createEl())
+      };
+
+      part.style.left = this.percentify(start);
+      part.style.width = this.percentify(end - start);
+    };
+
+    // remove unloaded buffered ranges
+    for (var i=0; i < (children.length - buffered.length); i++) {
+      this.el_.removeChild(children[buffered.length + i]);
+    }
+  }
 };
 
+vjs.LoadProgressBar.prototype.percentify = function(time) {
+  return vjs.round(time / this.player_.duration() * 100, 2) + '%'
+}
 
 /**
  * Shows play progress
