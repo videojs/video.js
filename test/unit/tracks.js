@@ -39,10 +39,15 @@ test('cue parsing', function() {
   equal(mockTrack.cues_[0].endTime, 4.11, 'Cue end time w/ spaces');
   equal(mockTrack.cues_[0].text, 'Text line 1', 'Cue text');
 
-  // Uncomment to test a fix for #183
-  // mockTrack.reset(); // reset mock track
-  // var timeWithTabs = vttHead + '00:00.700\t-->\t00:04.110\nText line 1';
-  // mockTrack.parseCues(timeWithTabs);
-  // equal(mockTrack.cues_[0].startTime, 0.7, 'Cue start time w/ spaces');
-  // equal(mockTrack.cues_[0].endTime, 4.11, 'Cue end time w/ spaces');
+  mockTrack.reset(); // reset mock track
+  var timeWithTabs = vttHead + '00:00.700\t-->\t00:04.110\nText line 1';
+  mockTrack.parseCues(timeWithTabs);
+  equal(mockTrack.cues_[0].startTime, 0.7, 'Cue start time w/ spaces');
+  equal(mockTrack.cues_[0].endTime, 4.11, 'Cue end time w/ spaces');
+
+  mockTrack.reset(); // reset mock track
+  var timeWithMixedWhiteSpace = vttHead + '00:00.700  -->\t 00:04.110\nText line 1';
+  mockTrack.parseCues(timeWithMixedWhiteSpace);
+  equal(mockTrack.cues_[0].startTime, 0.7, 'Cue start time w/ spaces');
+  equal(mockTrack.cues_[0].endTime, 4.11, 'Cue end time w/ spaces');
 });
