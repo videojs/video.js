@@ -313,6 +313,10 @@ vjs.Flash.prototype.buffered = function(){
   return vjs.createTimeRange(0, this.el_.vjs_getProperty('buffered'));
 };
 
+vjs.Flash.prototype.played = function(){
+  return vjs.createTimeRange(0, this.el_.vjs_getProperty('currentTime'));
+};
+
 vjs.Flash.prototype.supportsFullScreen = function(){
   return false; // Flash does not allow fullscreen through javascript
 };

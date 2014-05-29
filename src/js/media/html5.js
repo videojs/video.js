@@ -180,6 +180,7 @@ vjs.Html5.prototype.setCurrentTime = function(seconds){
 
 vjs.Html5.prototype.duration = function(){ return this.el_.duration || 0; };
 vjs.Html5.prototype.buffered = function(){ return this.el_.buffered; };
+vjs.Html5.prototype.played = function(){ return this.el_.played; };
 
 vjs.Html5.prototype.volume = function(){ return this.el_.volume; };
 vjs.Html5.prototype.setVolume = function(percentAsDecimal){ this.el_.volume = percentAsDecimal; };
