@@ -47,7 +47,6 @@ vjs.SeekBar.prototype.options_ = {
     'playProgressBar': {},
     'seekHandle': {}
   },
-  'barName': 'playProgressBar',
   'handleName': 'seekHandle'
 };
 
@@ -106,7 +105,6 @@ vjs.SeekBar.prototype.stepForward = function(){
 vjs.SeekBar.prototype.stepBack = function(){
   this.player_.currentTime(this.player_.currentTime() - 5); // more quickly rewind for keyboard-only users
 };
-
 
 /**
  * Shows load progress
@@ -169,15 +167,37 @@ vjs.PlayProgressBar = vjs.Component.extend({
   /** @constructor */
   init: function(player, options){
     vjs.Component.call(this, player, options);
+    player.on('timeupdate', vjs.bind(this, this.update));
   }
 });
 
 vjs.PlayProgressBar.prototype.createEl = function(){
   return vjs.Component.prototype.createEl.call(this, 'div', {
-    className: 'vjs-play-progress',
-    innerHTML: '<span class="vjs-control-text">Progress: 0%</span>'
+    className: 'vjs-play-progress'
   });
 };
+
+vjs.PlayProgressBar.prototype.update = function(){
+  if (this.el_.style) {
+    var played = this.player_.played(),
+        children = this.el_.children;
+
+    for (var i=0; i<played.length; i++) {
+      var start = played.start(i),
+          end = played.end(i),
+          part = children[i];
+
+      if (!part) {
+        part = this.el_.appendChild(vjs.createEl())
+      };
+
+      part.style.left = this.percentify(start);
+      part.style.width = this.percentify(end - start);
+    };
+  }
+};
+
+vjs.PlayProgressBar.prototype.percentify = vjs.LoadProgressBar.prototype.percentify;
 
 /**
  * The Seek Handle shows the current position of the playhead during playback,
