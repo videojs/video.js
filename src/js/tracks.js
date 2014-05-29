@@ -169,20 +169,6 @@ vjs.TextTrack.prototype.kind = function(){
 };
 
 /**
- * Track id value
- * @private
- */
-vjs.TextTrack.prototype.id_;
-
-/**
- * Get the track id value
- * @return {String}
- */
-vjs.TextTrack.prototype.id = function(){
-  return this.id_;
-};
-
-/**
  * Track src value
  * @private
  */
@@ -789,7 +775,6 @@ vjs.OffTextTrackMenuItem = vjs.TextTrackMenuItem.extend({
     // Create pseudo track info
     // Requires options['kind']
     options['track'] = {
-      id: function(){ return ('vjs_' + options['kind'] + '_off'); },
       kind: function() { return options['kind']; },
       player: player,
       label: function(){ return options['kind'] + ' off'; },
@@ -1016,7 +1001,7 @@ vjs.ChaptersTrackMenuItem = vjs.MenuItem.extend({
         currentTime = player.currentTime();
 
     // Modify options for parent MenuItem class's init.
-    options['label'] = cue.id;
+    options['label'] = cue.text;
     options['selected'] = (cue.startTime <= currentTime && currentTime < cue.endTime);
     vjs.MenuItem.call(this, player, options);
 
