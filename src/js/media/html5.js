@@ -56,7 +56,7 @@ vjs.Html5 = vjs.MediaTechController.extend({
     player.ready(function(){
       if (this.tag && this.options_['autoplay'] && this.paused()) {
         delete this.tag['poster']; // Chrome Fix. Fixed in Chrome v16.
-        this.play();
+        this.one('loadstart', vjs.bind(this, this.play));
       }
     });
 
