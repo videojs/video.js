@@ -58,20 +58,6 @@ vjs.Player = vjs.Component.extend({
     // see enableTouchActivity in Component
     options.reportTouchActivity = false;
 
-    // Make sure the event listeners are the first things to happen when
-    // the player is ready. See #1208
-    // If not, the tech might fire events before the listeners are attached.
-    this.ready(function(){
-      this.on('loadstart', this.onLoadStart);
-      this.on('ended', this.onEnded);
-      this.on('play', this.onPlay);
-      this.on('firstplay', this.onFirstPlay);
-      this.on('pause', this.onPause);
-      this.on('progress', this.onProgress);
-      this.on('durationchange', this.onDurationChange);
-      this.on('fullscreenchange', this.onFullscreenChange);
-    });
-
     // Run base component initializing with new options.
     // Builds the element through createEl()
     // Inits and embeds any child components in opts
@@ -229,6 +215,22 @@ vjs.Player.prototype.createEl = function(){
     tag.parentNode.insertBefore(el, tag);
   }
   vjs.insertFirst(tag, el); // Breaks iPhone, fixed in HTML5 setup.
+
+  // The event listeners need to be added before the children are added
+  // in the component init because the tech (loaded with mediaLoader) may
+  // fire events, like loadstart, that these events need to capture.
+  // Long term it might be better to expose a way to do this in component.init
+  // like component.initEventListeners() that runs between el creation and
+  // adding children
+  this.el_ = el;
+  this.on('loadstart', this.onLoadStart);
+  this.on('ended', this.onEnded);
+  this.on('play', this.onPlay);
+  this.on('firstplay', this.onFirstPlay);
+  this.on('pause', this.onPause);
+  this.on('progress', this.onProgress);
+  this.on('durationchange', this.onDurationChange);
+  this.on('fullscreenchange', this.onFullscreenChange);
 
   return el;
 };
@@ -408,9 +410,19 @@ vjs.Player.prototype.stopTrackingCurrentTime = function(){
  * @event loadstart
  */
 vjs.Player.prototype.onLoadStart = function() {
+  // If it's currently playing we want to trigger a firstplay event.
+  // The case comes from when a `play` event is fired before the `loadstart`
+  // event. This is easy to do by calling vidEl.play() immediately after it's
+  // created. In this case the `play` event will not be fired after this point
+  // without first pausing the video, meaning the neither will the firstplay.
+  if (!this.paused()) {
+    this.triggerFirstPlay();
+    return;
+  }
+
   // remove any first play listeners that weren't triggered from a previous video.
-  this.off('play', initFirstPlay);
-  this.one('play', initFirstPlay);
+  this.off('play', this.triggerFirstPlay);
+  this.one('play', this.triggerFirstPlay);
 
   if (this.error()) {
     this.error(null);
@@ -419,19 +431,20 @@ vjs.Player.prototype.onLoadStart = function() {
   vjs.removeClass(this.el_, 'vjs-has-started');
 };
 
- // Need to create this outside the scope of onLoadStart so it
- // can be added and removed (to avoid piling first play listeners).
-function initFirstPlay(e) {
+// Need to create this outside the scope of onLoadStart so it
+// can be added and removed (to avoid piling first play listeners).
+vjs.Player.prototype.triggerFirstPlay = function(playEvent){
   var fpEvent = { type: 'firstplay', target: this.el_ };
   // Using vjs.trigger so we can check if default was prevented
   var keepGoing = vjs.trigger(this.el_, fpEvent);
 
-  if (!keepGoing) {
-    e.preventDefault();
-    e.stopPropagation();
-    e.stopImmediatePropagation();
+  // allow for stopping propagation of the original 'play' event
+  if (playEvent && !keepGoing) {
+    playEvent.preventDefault();
+    playEvent.stopPropagation();
+    playEvent.stopImmediatePropagation();
   }
-}
+};
 
 /**
  * Fired when the player has initial duration and dimension information

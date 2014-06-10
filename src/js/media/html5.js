@@ -33,9 +33,9 @@ vjs.Html5 = vjs.MediaTechController.extend({
     // We don't want to set the source again and interrupt playback.
     if (source && this.el_.currentSrc === source.src && this.el_.networkState > 0) {
       // wait for the player to be ready so the player listeners are attached
-      player.ready(function(){
+      // player.ready(function(){
         player.trigger('loadstart');
-      });
+      // });
     // Otherwise set the source if one was provided.
     } else if (source) {
       this.el_.src = source.src;
