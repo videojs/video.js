@@ -410,26 +410,23 @@ vjs.Player.prototype.stopTrackingCurrentTime = function(){
  * @event loadstart
  */
 vjs.Player.prototype.onLoadStart = function() {
-  // If it's currently playing we want to trigger a firstplay event.
-  // The case comes from when a `play` event is fired before the `loadstart`
-  // event. This is easy to do by calling vidEl.play() immediately after it's
-  // created. In this case the `play` event will not be fired after this point
-  // without first pausing the video, meaning the neither will the firstplay.
-  if (!this.paused()) {
-    // usually hasStarted() triggers firstplay, but we dont' need to
-    // change that state here.
-    this.trigger('firstplay');
-    return;
-  }
-
-  // reset the hasStarted state
-  this.hasStarted(false);
-  this.one('play', function(){
-    this.hasStarted(true);
-  });
+  // TODO: Update to use `emptied` event instead. See #1277.
 
   // reset the error state
   this.error(null);
+
+  // If it's already playing we want to trigger a firstplay event now.
+  // The firstplay event relies on both the play and loadstart events
+  // which can happen in any order for a new source
+  if (!this.paused()) {
+    this.trigger('firstplay');
+  } else {
+    // reset the hasStarted state
+    this.hasStarted(false);
+    this.one('play', function(){
+      this.hasStarted(true);
+    });
+  }
 };
 
 vjs.Player.prototype.hasStarted_ = false;
