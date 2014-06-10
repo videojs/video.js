@@ -3205,20 +3205,6 @@ vjs.Player = vjs.Component.extend({
     // see enableTouchActivity in Component
     options.reportTouchActivity = false;
 
-    // Make sure the event listeners are the first things to happen when
-    // the player is ready. See #1208
-    // If not, the tech might fire events before the listeners are attached.
-    this.ready(function(){
-      this.on('loadstart', this.onLoadStart);
-      this.on('ended', this.onEnded);
-      this.on('play', this.onPlay);
-      this.on('firstplay', this.onFirstPlay);
-      this.on('pause', this.onPause);
-      this.on('progress', this.onProgress);
-      this.on('durationchange', this.onDurationChange);
-      this.on('fullscreenchange', this.onFullscreenChange);
-    });
-
     // Run base component initializing with new options.
     // Builds the element through createEl()
     // Inits and embeds any child components in opts
@@ -3376,6 +3362,22 @@ vjs.Player.prototype.createEl = function(){
     tag.parentNode.insertBefore(el, tag);
   }
   vjs.insertFirst(tag, el); // Breaks iPhone, fixed in HTML5 setup.
+
+  // The event listeners need to be added before the children are added
+  // in the component init because the tech (loaded with mediaLoader) may
+  // fire events, like loadstart, that these events need to capture.
+  // Long term it might be better to expose a way to do this in component.init
+  // like component.initEventListeners() that runs between el creation and
+  // adding children
+  this.el_ = el;
+  this.on('loadstart', this.onLoadStart);
+  this.on('ended', this.onEnded);
+  this.on('play', this.onPlay);
+  this.on('firstplay', this.onFirstPlay);
+  this.on('pause', this.onPause);
+  this.on('progress', this.onProgress);
+  this.on('durationchange', this.onDurationChange);
+  this.on('fullscreenchange', this.onFullscreenChange);
 
   return el;
 };
@@ -3555,30 +3557,44 @@ vjs.Player.prototype.stopTrackingCurrentTime = function(){
  * @event loadstart
  */
 vjs.Player.prototype.onLoadStart = function() {
-  // remove any first play listeners that weren't triggered from a previous video.
-  this.off('play', initFirstPlay);
-  this.one('play', initFirstPlay);
+  // TODO: Update to use `emptied` event instead. See #1277.
 
-  if (this.error()) {
-    this.error(null);
+  // reset the error state
+  this.error(null);
+
+  // If it's already playing we want to trigger a firstplay event now.
+  // The firstplay event relies on both the play and loadstart events
+  // which can happen in any order for a new source
+  if (!this.paused()) {
+    this.trigger('firstplay');
+  } else {
+    // reset the hasStarted state
+    this.hasStarted(false);
+    this.one('play', function(){
+      this.hasStarted(true);
+    });
   }
-
-  vjs.removeClass(this.el_, 'vjs-has-started');
 };
 
- // Need to create this outside the scope of onLoadStart so it
- // can be added and removed (to avoid piling first play listeners).
-function initFirstPlay(e) {
-  var fpEvent = { type: 'firstplay', target: this.el_ };
-  // Using vjs.trigger so we can check if default was prevented
-  var keepGoing = vjs.trigger(this.el_, fpEvent);
+vjs.Player.prototype.hasStarted_ = false;
 
-  if (!keepGoing) {
-    e.preventDefault();
-    e.stopPropagation();
-    e.stopImmediatePropagation();
+vjs.Player.prototype.hasStarted = function(hasStarted){
+  if (hasStarted !== undefined) {
+    // only update if this is a new value
+    if (this.hasStarted_ !== hasStarted) {
+      this.hasStarted_ = hasStarted;
+      if (hasStarted) {
+        this.addClass('vjs-has-started');
+        // trigger the firstplay event if this newly has played
+        this.trigger('firstplay');
+      } else {
+        this.removeClass('vjs-has-started');
+      }
+    }
+    return this;
   }
-}
+  return this.hasStarted_;
+};
 
 /**
  * Fired when the player has initial duration and dimension information
@@ -5907,10 +5923,7 @@ vjs.Html5 = vjs.MediaTechController.extend({
     // If the element source is already set, we may have missed the loadstart event, and want to trigger it.
     // We don't want to set the source again and interrupt playback.
     if (source && this.el_.currentSrc === source.src && this.el_.networkState > 0) {
-      // wait for the player to be ready so the player listeners are attached
-      player.ready(function(){
-        player.trigger('loadstart');
-      });
+      player.trigger('loadstart');
     // Otherwise set the source if one was provided.
     } else if (source) {
       this.el_.src = source.src;
