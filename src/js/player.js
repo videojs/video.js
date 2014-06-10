@@ -416,34 +416,40 @@ vjs.Player.prototype.onLoadStart = function() {
   // created. In this case the `play` event will not be fired after this point
   // without first pausing the video, meaning the neither will the firstplay.
   if (!this.paused()) {
-    this.triggerFirstPlay();
+    // usually hasStarted() triggers firstplay, but we dont' need to
+    // change that state here.
+    this.trigger('firstplay');
     return;
   }
 
-  // remove any first play listeners that weren't triggered from a previous video.
-  this.off('play', this.triggerFirstPlay);
-  this.one('play', this.triggerFirstPlay);
+  // reset the hasStarted state
+  this.hasStarted(false);
+  this.one('play', function(){
+    this.hasStarted(true);
+  });
 
-  if (this.error()) {
-    this.error(null);
-  }
-
-  vjs.removeClass(this.el_, 'vjs-has-started');
+  // reset the error state
+  this.error(null);
 };
 
-// Need to create this outside the scope of onLoadStart so it
-// can be added and removed (to avoid piling first play listeners).
-vjs.Player.prototype.triggerFirstPlay = function(playEvent){
-  var fpEvent = { type: 'firstplay', target: this.el_ };
-  // Using vjs.trigger so we can check if default was prevented
-  var keepGoing = vjs.trigger(this.el_, fpEvent);
+vjs.Player.prototype.hasStarted_ = false;
 
-  // allow for stopping propagation of the original 'play' event
-  if (playEvent && !keepGoing) {
-    playEvent.preventDefault();
-    playEvent.stopPropagation();
-    playEvent.stopImmediatePropagation();
+vjs.Player.prototype.hasStarted = function(hasStarted){
+  if (hasStarted !== undefined) {
+    // only update if this is a new value
+    if (this.hasStarted_ !== hasStarted) {
+      this.hasStarted_ = hasStarted;
+      if (hasStarted) {
+        this.addClass('vjs-has-started');
+        // trigger the firstplay event if this newly has played
+        this.trigger('firstplay');
+      } else {
+        this.removeClass('vjs-has-started');
+      }
+    }
+    return this;
   }
+  return this.hasStarted_;
 };
 
 /**
