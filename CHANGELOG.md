@@ -6,6 +6,10 @@ _(none)_
 
 --------------------
 
+## 4.6.3 (2014-06-12)
+* Updated to version 4.4.1 of the SWF ([view](https://github.com/videojs/video.js/pull/1285))
+* Fixed a minification issue with the fullscreen event. fixes #1282 ([view](https://github.com/videojs/video.js/pull/1286))
+
 ## 4.6.2 (2014-06-10)
 * Fixed an issue with the firstplay event not firing when autoplaying ([view](https://github.com/videojs/video.js/pull/1271))
 
