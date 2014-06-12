@@ -3,6 +3,7 @@ CHANGELOG
 
 ## HEAD (Unreleased)
 * Updated to version 4.4.1 of the SWF ([view](https://github.com/videojs/video.js/pull/1285))
+* Fixed a minification issue with the fullscreen event. fixes #1282 ([view](https://github.com/videojs/video.js/pull/1286))
 
 --------------------
 

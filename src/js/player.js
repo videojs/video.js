@@ -922,12 +922,12 @@ vjs.Player.prototype.requestFullscreen = function(){
     // when cancelling fullscreen. Otherwise if there's multiple
     // players on a page, they would all be reacting to the same fullscreen
     // events
-    vjs.on(document, fsApi.fullscreenchange, vjs.bind(this, function(e){
+    vjs.on(document, fsApi['fullscreenchange'], vjs.bind(this, function(e){
       this.isFullscreen(document[fsApi.fullscreenElement]);
 
       // If cancelling fullscreen, remove event listener.
       if (this.isFullscreen() === false) {
-        vjs.off(document, fsApi.fullscreenchange, arguments.callee);
+        vjs.off(document, fsApi['fullscreenchange'], arguments.callee);
       }
 
       this.trigger('fullscreenchange');
