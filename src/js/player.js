@@ -1461,6 +1461,10 @@ vjs.Player.prototype.listenForUserActivity = function(){
   this.on('keydown', onActivity);
   this.on('keyup', onActivity);
 
+  // native click events on the SWF aren't triggered on IE11, Win8.1RT
+  // use stageclick events triggered from inside the SWF instead
+  this.on('stageclick', onActivity);
+
   // Run an interval every 250 milliseconds instead of stuffing everything into
   // the mousemove/touchmove function itself, to prevent performance degradation.
   // `this.reportUserActivity` simply sets this.userActivity_ to true, which
