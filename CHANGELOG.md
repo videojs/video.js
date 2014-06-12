@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Updated to version 4.4.1 of the SWF ([view](https://github.com/videojs/video.js/pull/1285))
 
 --------------------
 
