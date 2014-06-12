@@ -858,7 +858,7 @@ vjs.Component.prototype.onResize;
  *
  * This is used to support toggling the controls through a tap on the video.
  *
- * We're requireing them to be enabled because otherwise every component would
+ * We're requiring them to be enabled because otherwise every component would
  * have this extra overhead unnecessarily, on mobile devices where extra
  * overhead is especially bad.
  * @private
