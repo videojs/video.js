@@ -482,9 +482,9 @@ vjs.TextTrack.prototype.parseCues = function(srcContent) {
       };
 
       // Timing line
-      time = line.split(' --> ');
+      time = line.split(/[\t ]+/);
       cue.startTime = this.parseCueTime(time[0]);
-      cue.endTime = this.parseCueTime(time[1]);
+      cue.endTime = this.parseCueTime(time[2]);
 
       // Additional lines - Cue Text
       text = [];
@@ -941,11 +941,10 @@ vjs.ChaptersButton.prototype.createMenu = function(){
 
   for (;i<j;i++) {
     track = tracks[i];
-    if (track.kind() == this.kind_ && track.dflt()) {
-      if (track.readyState() < 2) {
-        this.chaptersTrack = track;
+    if (track.kind() == this.kind_) {
+      if (track.readyState() === 0) {
+        track.load();
         track.on('loaded', vjs.bind(this, this.createMenu));
-        return;
       } else {
         chaptersTrack = track;
         break;
@@ -953,13 +952,15 @@ vjs.ChaptersButton.prototype.createMenu = function(){
     }
   }
 
-  var menu = this.menu = new vjs.Menu(this.player_);
-
-  menu.contentEl().appendChild(vjs.createEl('li', {
-    className: 'vjs-menu-title',
-    innerHTML: vjs.capitalize(this.kind_),
-    tabindex: -1
-  }));
+  var menu = this.menu;
+  if (menu === undefined) {
+    menu = new vjs.Menu(this.player_);
+    menu.contentEl().appendChild(vjs.createEl('li', {
+      className: 'vjs-menu-title',
+      innerHTML: vjs.capitalize(this.kind_),
+      tabindex: -1
+    }));
+  }
 
   if (chaptersTrack) {
     var cues = chaptersTrack.cues_, cue, mi;
@@ -978,6 +979,7 @@ vjs.ChaptersButton.prototype.createMenu = function(){
 
       menu.addChild(mi);
     }
+    this.addChild(menu);
   }
 
   if (this.items.length > 0) {

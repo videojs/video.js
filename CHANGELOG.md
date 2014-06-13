@@ -2,9 +2,18 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Added cross-browser isArray for cross-frame support. fixes #1195 ([view](https://github.com/videojs/video.js/pull/1218))
+* Fixed support for webvtt chapters. Fixes #676. ([view](https://github.com/videojs/video.js/pull/1221))
+* Fixed issues around webvtt cue time parsing. Fixed #877, fixed #183. ([view](https://github.com/videojs/video.js/pull/1236))
 
 --------------------
+
+## 4.6.3 (2014-06-12)
+* Updated to version 4.4.1 of the SWF ([view](https://github.com/videojs/video.js/pull/1285))
+* Fixed a minification issue with the fullscreen event. fixes #1282 ([view](https://github.com/videojs/video.js/pull/1286))
+
+## 4.6.2 (2014-06-10)
+* Fixed an issue with the firstplay event not firing when autoplaying ([view](https://github.com/videojs/video.js/pull/1271))
 
 ## 4.6.1 (2014-05-20)
 * Udpated playbackRate menu to work in minified version ([view](https://github.com/videojs/video.js/pull/1223))
