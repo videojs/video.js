@@ -50,4 +50,10 @@ test('cue parsing', function() {
   mockTrack.parseCues(timeWithMixedWhiteSpace);
   equal(mockTrack.cues_[0].startTime, 0.7, 'Cue start time w/ spaces');
   equal(mockTrack.cues_[0].endTime, 4.11, 'Cue end time w/ spaces');
+
+  mockTrack.reset(); // reset mock track
+  var timeWithFlags = vttHead + '00:00.700  -->\t 00:04.110 line:90% position:26% size:9%\nText line 1';
+  mockTrack.parseCues(timeWithMixedWhiteSpace);
+  equal(mockTrack.cues_[0].startTime, 0.7, 'Cue start time w/ flags');
+  equal(mockTrack.cues_[0].endTime, 4.11, 'Cue end time w/ flags');
 });
