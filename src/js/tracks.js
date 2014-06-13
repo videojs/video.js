@@ -482,9 +482,9 @@ vjs.TextTrack.prototype.parseCues = function(srcContent) {
       };
 
       // Timing line
-      time = line.split(' --> ');
+      time = line.split(/[\t ]+/);
       cue.startTime = this.parseCueTime(time[0]);
-      cue.endTime = this.parseCueTime(time[1]);
+      cue.endTime = this.parseCueTime(time[2]);
 
       // Additional lines - Cue Text
       text = [];
