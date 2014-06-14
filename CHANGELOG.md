@@ -6,6 +6,7 @@ CHANGELOG
 * Fixed support for webvtt chapters. Fixes #676. ([view](https://github.com/videojs/video.js/pull/1221))
 * Fixed issues around webvtt cue time parsing. Fixed #877, fixed #183. ([view](https://github.com/videojs/video.js/pull/1236))
 * Fixed an IE11 issue where clicking on the video wouldn&#x27;t show the controls ([view](https://github.com/videojs/video.js/pull/1291))
+* Added a composer.json for PHP packages ([view](https://github.com/videojs/video.js/pull/1241))
 
 --------------------
 
