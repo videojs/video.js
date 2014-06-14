@@ -17,7 +17,7 @@
 ### ApiMethods
 > List of default API methods for any MediaTechController
 
-_defined in_: [src/js/media/media.js#L168](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L168)
+_defined in_: [src/js/media/media.js#L169](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L169)
 
 ---
 

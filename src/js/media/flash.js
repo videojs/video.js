@@ -114,6 +114,10 @@ vjs.Flash = vjs.MediaTechController.extend({
       });
     }
 
+    // native click events on the SWF aren't triggered on IE11, Win8.1RT
+    // use stageclick events triggered from inside the SWF instead
+    player.on('stageclick', player.reportUserActivity);
+
     // Flash iFrame Mode
     // In web browsers there are multiple instances where changing the parent element or visibility of a plugin causes the plugin to reload.
     // - Firefox just about always. https://bugzilla.mozilla.org/show_bug.cgi?id=90268 (might be fixed by version 13)
@@ -317,7 +321,6 @@ vjs.Flash.prototype.enterFullScreen = function(){
   return false;
 };
 
-
 // Create setters and getters for attributes
 var api = vjs.Flash.prototype,
     readWrite = 'rtmpConnection,rtmpStream,preload,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted'.split(','),
@@ -433,8 +436,15 @@ vjs.Flash['onEvent'] = function(swfID, eventName){
 // Log errors from the swf
 vjs.Flash['onError'] = function(swfID, err){
   var player = vjs.el(swfID)['player'];
-  player.trigger('error');
-  vjs.log('Flash Error', err, swfID);
+  var msg = 'FLASH: '+err;
+
+  if (err == 'srcnotfound') {
+    player.error({ code: 4, message: msg });
+
+  // errors we haven't categorized into the media errors
+  } else {
+    player.error(msg);
+  }
 };
 
 // Flash Version Check

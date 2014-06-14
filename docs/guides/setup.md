@@ -20,8 +20,8 @@ You can download the Video.js source and host it on your own servers, or use the
 
 ### CDN Version ###
 ```html
-<link href="//vjs.zencdn.net/4.5/video-js.css" rel="stylesheet">
-<script src="//vjs.zencdn.net/4.5/video.js"></script>
+<link href="//vjs.zencdn.net/4.6/video-js.css" rel="stylesheet">
+<script src="//vjs.zencdn.net/4.6/video.js"></script>
 ```
 
 ### Self Hosted. ###
@@ -47,8 +47,7 @@ With Video.js you just use an HTML5 video tag to embed a video. Video.js will th
     - `video-js` applies styles that are required for Video.js functionality, like fullscreen and subtitles.
     - `vjs-default-skin` applies the default skin to the HTML controls, and can be removed or overridden to create your own controls design.
 
-Otherwise include/exclude attributes, settings, sources, and tracks exactly as you would for HTML5 video.
-
+Otherwise include/exclude attributes, settings, sources, and tracks exactly as you would for HTML5 video.*
 ```html
 <video id="example_video_1" class="video-js vjs-default-skin"
   controls preload="auto" width="640" height="264"
@@ -57,6 +56,7 @@ Otherwise include/exclude attributes, settings, sources, and tracks exactly as y
  <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' />
  <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />
  <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />
+ <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
 </video>
 ```
 
@@ -100,3 +100,5 @@ videojs(document.getElementsByClassName('awesome_video_class')[0], {}, function(
   // if it's an array that you pick one (here we chose the first).
 });
 ```
+
+\* If you have trouble playing back content you know is in the [correct format](http://blog.zencoder.com/2013/09/13/what-formats-do-i-need-for-html5-video/), your HTTP server might not be delivering the content with the correct [MIME type](http://en.wikipedia.org/wiki/Internet_media_type#Type_video). Please double check your content's headers before opening an [issue](https://github.com/videojs/video.js/blob/master/CONTRIBUTING.md).

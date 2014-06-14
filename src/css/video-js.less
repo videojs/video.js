@@ -100,7 +100,9 @@ The control icons are from a custom font. Each icon corresponds to a character
 @spinner4-icon: "\e01f";
 @subtitles-icon: "\e00c";
 @captions-icon: "\e008";
+@chapters-icon: "\e00c";
 @share-icon: "\e00e";
+@cog-icon: "\e600";
 
 /* Base UI Component Classes
 --------------------------------------------------------------------------------
@@ -193,6 +195,11 @@ The default control bar that is a container for most of the controls.
   display: none;
 }
 
+/* The control bar shouldn't show after an error */
+.vjs-default-skin.vjs-error .vjs-control-bar {
+  display: none;
+}
+
 /* IE8 is flakey with fonts, and you have to change the actual content to force
 fonts to show/hide properly.
   - "\9" IE8 hack didn't work for this
@@ -258,6 +265,27 @@ fonts to show/hide properly.
 }
 .vjs-default-skin.vjs-playing .vjs-play-control:before {
   content: @pause-icon;
+}
+
+/* Playback toggle
+--------------------------------------------------------------------------------
+*/
+.vjs-default-skin .vjs-playback-rate .vjs-playback-rate-value {
+  font-size: 1.5em;
+  line-height: 2;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+}
+
+.vjs-default-skin .vjs-playback-rate.vjs-menu-button .vjs-menu .vjs-menu-content {
+  width: 4em;
+  left: -2em;
+  list-style: none;
 }
 
 /* Volume/Mute
@@ -466,8 +494,8 @@ easily in the skin designer. http://designer.videojs.com/
 */
 .vjs-default-skin .vjs-big-play-button {
   // Calculate total width/height so we're able to center the button
-  @total-width: @big-play-width + (@big-play-border-width * 2);
-  @total-height: @big-play-height + (@big-play-border-width * 2);
+  @total-width: (@big-play-width + (@big-play-border-width * 2));
+  @total-height: (@big-play-height + (@big-play-border-width * 2));
   // Position the button using the absolute-align mixin (bottom of page)
   .absolute-align(@big-play-align, @big-play-margin, @total-width);
   .absolute-align(@big-play-vertical-align, @big-play-margin, @total-height);
@@ -495,8 +523,8 @@ easily in the skin designer. http://designer.videojs.com/
 
 /* Optionally center */
 .vjs-default-skin.vjs-big-play-centered .vjs-big-play-button {
-  @total-width: @big-play-width + (@big-play-border-width * 2);
-  @total-height: @big-play-height + (@big-play-border-width * 2);
+  @total-width: (@big-play-width + (@big-play-border-width * 2));
+  @total-height: (@big-play-height + (@big-play-border-width * 2));
 
   .absolute-align(center, @big-play-margin, @total-width);
   .absolute-align(middle, @big-play-margin, @total-height);
@@ -543,6 +571,59 @@ easily in the skin designer. http://designer.videojs.com/
   height: 100%;
 }
 
+.vjs-error .vjs-big-play-button {
+  display: none;
+}
+
+/* Error Display
+--------------------------------------------------------------------------------
+*/
+
+.vjs-error-display {
+  display: none;
+}
+
+.vjs-error .vjs-error-display {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.vjs-error .vjs-error-display:before {
+  content: 'X';
+  font-family: Arial;
+  font-size: 4em;
+  color: #666666;
+  /* In order to center the play icon vertically we need to set the line height
+     to the same as the button height */
+  line-height: 1;
+  text-shadow: 0.05em 0.05em 0.1em #000;
+  text-align: center /* Needed for IE8 */;
+  vertical-align: middle;
+
+  position: absolute;
+  top: 50%;
+  margin-top: -0.5em;
+  width: 100%;
+}
+
+.vjs-error-display div {
+  position: absolute;
+
+  font-size: 1.4em;
+  text-align: center;
+  bottom: 1em;
+  right: 1em;
+  left: 1em;
+}
+
+.vjs-error-display a, .vjs-error-display a:visited {
+  color: #F4A460;
+}
+
 /* Loading Spinner
 --------------------------------------------------------------------------------
 */
@@ -564,6 +645,18 @@ easily in the skin designer. http://designer.videojs.com/
   opacity: 0.75;
 
   .animation(spin 1.5s infinite linear);
+}
+
+/* Errors are unrecoverable without user interaction,
+   so hide the spinner in the case of an error */
+.video-js.vjs-error .vjs-loading-spinner {
+  /* using !important flag because currently the loading spinner
+     uses hide()/show() instead of classes. The !important can be
+     removed when that's updated */
+  display: none !important;
+
+  /* ensure animation doesn't continue while hidden */
+  .animation(none);
 }
 
 .vjs-default-skin .vjs-loading-spinner:before {
@@ -673,11 +766,23 @@ easily in the skin designer. http://designer.videojs.com/
 }
 
 /* Subtitles Button */
-.vjs-default-skin .vjs-subtitles-button:before { content: @subtitles-icon; }
+.vjs-default-skin .vjs-subtitles-button:before {
+  content: @subtitles-icon;
+}
 
 /* Captions Button */
 .vjs-default-skin .vjs-captions-button:before {
   content: @captions-icon;
+}
+
+/* Chapters Button */
+.vjs-default-skin .vjs-chapters-button:before {
+  content: @chapters-icon;
+}
+
+.vjs-default-skin .vjs-chapters-button.vjs-menu-button .vjs-menu .vjs-menu-content {
+  width: 24em;
+  left: -12em;
 }
 
 /* Replacement for focus outline */
@@ -827,6 +932,26 @@ body.vjs-full-window {
   visibility: visible;
 }
 
+/*  In IE8 w/ no JavaScript (no HTML5 shim), the video tag doesn't register.
+    The .video-js classname on the video tag also isn't considered.
+    This optional paragraph inside the video tag can provide a message to users
+    about what's required to play video. */
+.vjs-no-js {
+  padding: 20px;
+  color: #ccc;
+  background-color: #333;
+  font-size: 18px;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  width: 300px;
+  height: 150px;
+  margin: 0px auto;
+}
+
+.vjs-no-js a, .vjs-no-js a:visited {
+  color: #F4A460;
+}
+
 // MIXINS
 // =============================================================================
 // Mixins are a LESS feature and are used to add vendor prefixes to CSS rules
@@ -926,12 +1051,14 @@ body.vjs-full-window {
 .absolute-align (@align, @margin, @length) when (@align = center) {
   /* Center it horizontally *///
   left: 50%;
-  margin-left: -(@length / 2);
+  margin-left: (-(@length/2));
+  // margin-left: ((@length*-1)/2);
 }
 .absolute-align (@align, @margin, @length) when (@align = middle) {
   /* Center it vertically *///
   top: 50%;
-  margin-top: -(@length / 2);
+  margin-top: (-(@length/2));
+  // margin-top: ((@length*-1)/2);
 }
 
 // http://stackoverflow.com/questions/637921/opacity-of-background-but-not-the-text

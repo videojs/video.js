@@ -40,6 +40,7 @@ vjs.MediaFaker.prototype.src = function(){ return 'movie.mp4'; };
 vjs.MediaFaker.prototype.volume = function(){ return 0; };
 vjs.MediaFaker.prototype.muted = function(){ return false; };
 vjs.MediaFaker.prototype.pause = function(){ return false; };
+vjs.MediaFaker.prototype.paused = function(){ return true; };
 vjs.MediaFaker.prototype.supportsFullScreen = function(){ return false; };
 vjs.MediaFaker.prototype.features = {};
 vjs.MediaFaker.prototype.buffered = function(){ return {}; };

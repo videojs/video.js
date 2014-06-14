@@ -1,0 +1,14 @@
+{
+    "name": "videojs/video.js",
+    "description": "An HTML5 and Flash video player with a common API and skin for both.",
+    "type": "library",
+    "keywords": [
+        "videojs",
+        "html5",
+        "flash",
+        "video",
+        "player"
+    ],
+    "homepage": "http://www.videojs.com/",
+    "license": "Apache-2.0"
+}

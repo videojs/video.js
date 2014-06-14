@@ -23,11 +23,11 @@ vjs.FullscreenToggle.prototype.buildCSSClass = function(){
 };
 
 vjs.FullscreenToggle.prototype.onClick = function(){
-  if (!this.player_.isFullScreen()) {
-    this.player_.requestFullScreen();
-    this.el_.children[0].children[0].innerHTML = 'Non-Fullscreen'; // change the button text to "Non-Fullscreen"
+  if (!this.player_.isFullscreen()) {
+    this.player_.requestFullscreen();
+    this.controlText_.innerHTML = 'Non-Fullscreen';
   } else {
-    this.player_.cancelFullScreen();
-    this.el_.children[0].children[0].innerHTML = 'Fullscreen'; // change the button to "Fullscreen"
+    this.player_.exitFullscreen();
+    this.controlText_.innerHTML = 'Fullscreen';
   }
 };

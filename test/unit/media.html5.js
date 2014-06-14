@@ -1,4 +1,31 @@
-module('HTML5');
+var player, tech, el;
+
+module('HTML5', {
+  'setup': function() {
+
+    el = document.createElement('div');
+    el.innerHTML = '<div />';
+
+    player = {
+      id: function(){ return 'id'; },
+      el: function(){ return el; },
+      options_: {},
+      options: function(){ return {}; },
+      controls: function(){ return false; },
+      usingNativeControls: function(){ return false; },
+      on: function(){ return this; },
+      off: function() { return this; },
+      ready: function(){}
+    };
+    tech = new vjs.Html5(player, {});
+  },
+  'teardown': function() {
+    tech.dispose();
+    el = null;
+    player = null;
+    tech = null;
+  }
+});
 
 test('should detect whether the volume can be changed', function(){
   var testVid, ConstVolumeVideo;
@@ -18,25 +45,22 @@ test('should detect whether the volume can be changed', function(){
 });
 
 test('should re-link the player if the tech is moved', function(){
-  var player, tech, el;
-  el = document.createElement('div');
-  el.innerHTML = '<div />';
-
-  player = {
-    id: function(){ return 'id'; },
-    el: function(){ return el; },
-    options_: {},
-    options: function(){ return {}; },
-    controls: function(){ return false; },
-    usingNativeControls: function(){ return false; },
-    on: function(){ return this; },
-    ready: function(){}
-  };
-  tech = new vjs.Html5(player, {});
   vjs.Html5.movingMediaElementInDOM = false;
   tech.createEl();
 
   strictEqual(player, tech.el()['player']);
+});
+
+test('test playbackRate', function() {
+  var playbackRate;
+
+  tech.createEl();
+
+  tech.el().playbackRate = 1.25;
+  strictEqual(tech.playbackRate(), 1.25);
+
+  tech['setPlaybackRate'](0.75);
+  strictEqual(tech.playbackRate(), 0.75);
 });
 
 test('patchCanPlayType patches canplaytype with our function, conditionally', function() {
