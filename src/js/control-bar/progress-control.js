@@ -47,6 +47,7 @@ vjs.SeekBar.prototype.options_ = {
     'playProgressBar': {},
     'seekHandle': {}
   },
+  'barName': 'playProgressBar',
   'handleName': 'seekHandle'
 };
 
@@ -146,8 +147,8 @@ vjs.LoadProgressBar.prototype.update = function(){
     };
 
     // remove unloaded buffered ranges
-    for (var i=0; i < (children.length - buffered.length); i++) {
-      this.el_.removeChild(children[buffered.length + i]);
+    for (var i=children.length; i > buffered.length; i--) {
+      this.el_.removeChild(children[i-1]);
     }
   }
 };
@@ -167,7 +168,6 @@ vjs.PlayProgressBar = vjs.Component.extend({
   /** @constructor */
   init: function(player, options){
     vjs.Component.call(this, player, options);
-    player.on('timeupdate', vjs.bind(this, this.update));
   }
 });
 
@@ -176,28 +176,6 @@ vjs.PlayProgressBar.prototype.createEl = function(){
     className: 'vjs-play-progress'
   });
 };
-
-vjs.PlayProgressBar.prototype.update = function(){
-  if (this.el_.style) {
-    var played = this.player_.played(),
-        children = this.el_.children;
-
-    for (var i=0; i<played.length; i++) {
-      var start = played.start(i),
-          end = played.end(i),
-          part = children[i];
-
-      if (!part) {
-        part = this.el_.appendChild(vjs.createEl())
-      };
-
-      part.style.left = this.percentify(start);
-      part.style.width = this.percentify(end - start);
-    };
-  }
-};
-
-vjs.PlayProgressBar.prototype.percentify = vjs.LoadProgressBar.prototype.percentify;
 
 /**
  * The Seek Handle shows the current position of the playhead during playback,

@@ -395,7 +395,7 @@ fonts to show/hide properly.
 }
 
 /* Progress Bars */
-.vjs-default-skin .vjs-progress-holder .vjs-play-progress div,
+.vjs-default-skin .vjs-progress-holder .vjs-play-progress,
 .vjs-default-skin .vjs-progress-holder .vjs-load-progress div {
   position: absolute;
   display: block;
@@ -409,7 +409,7 @@ fonts to show/hide properly.
   top: 0;
 }
 
-.vjs-default-skin .vjs-play-progress div {
+.vjs-default-skin .vjs-play-progress {
   /*
     Using a data URI to create the white diagonal lines with a transparent
       background. Surprisingly works in IE8.
@@ -421,6 +421,7 @@ fonts to show/hide properly.
   background: @slider-bar-color
     url(@slider-bar-pattern)
     -50% 0 repeat;
+  opacity: 0.8;
 }
 .vjs-default-skin .vjs-load-progress div {
   background: rgb(100, 100, 100) /* IE8- Fallback */;
