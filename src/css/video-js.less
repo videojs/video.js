@@ -100,6 +100,7 @@ The control icons are from a custom font. Each icon corresponds to a character
 @spinner4-icon: "\e01f";
 @subtitles-icon: "\e00c";
 @captions-icon: "\e008";
+@chapters-icon: "\e00c";
 @share-icon: "\e00e";
 @cog-icon: "\e600";
 
@@ -765,11 +766,23 @@ easily in the skin designer. http://designer.videojs.com/
 }
 
 /* Subtitles Button */
-.vjs-default-skin .vjs-subtitles-button:before { content: @subtitles-icon; }
+.vjs-default-skin .vjs-subtitles-button:before {
+  content: @subtitles-icon;
+}
 
 /* Captions Button */
 .vjs-default-skin .vjs-captions-button:before {
   content: @captions-icon;
+}
+
+/* Chapters Button */
+.vjs-default-skin .vjs-chapters-button:before {
+  content: @chapters-icon;
+}
+
+.vjs-default-skin .vjs-chapters-button.vjs-menu-button .vjs-menu .vjs-menu-content {
+  width: 24em;
+  left: -12em;
 }
 
 /* Replacement for focus outline */

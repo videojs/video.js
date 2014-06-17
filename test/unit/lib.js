@@ -41,6 +41,14 @@ test('should copy an object', function(){
   deepEqual(asdf,fdsa);
 });
 
+test('should check if an object is an Array', function(){
+  var arr = ['a', 'b', 'c'];
+  ok(vjs.obj.isArray(arr) === true, 'Arr object is an Array');
+
+  var obj = {};
+  ok(vjs.obj.isArray(obj) === false, 'Obj is not an Array');
+});
+
 test('should check if an object is plain', function(){
   var empty = {};
   ok(vjs.obj.isPlain(empty) === true, 'Empty object is plain');

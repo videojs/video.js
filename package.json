@@ -1,7 +1,7 @@
 {
   "name": "video.js",
   "description": "An HTML5 and Flash video player with a common API and skin for both.",
-  "version": "4.6.1",
+  "version": "4.6.3",
   "copyright": "Copyright 2014 Brightcove, Inc. https://github.com/videojs/video.js/blob/master/LICENSE",
   "keywords": [
     "videojs",
@@ -21,7 +21,7 @@
   },
   "main": "./dist/video-js/video.js",
   "dependencies": {
-    "videojs-swf": "4.4.0"
+    "videojs-swf": "4.4.1"
   },
   "devDependencies": {
     "calcdeps": "~0.1.7",
@@ -50,13 +50,13 @@
     "karma-ie-launcher": "^0.1.5",
     "karma-opera-launcher": "~0.1.0",
     "karma-phantomjs-launcher": "^0.1.4",
-    "karma-qunit": "^0.1.1",
+    "karma-qunit": "^0.1.2",
     "karma-safari-launcher": "^0.1.1",
     "karma-sauce-launcher": "^0.2.8",
     "karma-sinon": "^1.0.3",
     "mocha": "~1.8.1",
     "open": "0.0.4",
-    "qunitjs": "~1.12.0",
+    "qunitjs": "~1.14.0",
     "semver": "~1.1.4",
     "sinon": "~1.9.1",
     "uglify-js": "~2.3.6",

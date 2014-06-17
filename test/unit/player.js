@@ -378,13 +378,42 @@ test('should not add multiple first play events despite subsequent loads', funct
   var player = PlayerTest.makePlayer({});
 
   player.on('firstplay', function(){
-    ok('First play should fire once.');
+    ok(true, 'First play should fire once.');
   });
 
   // Checking to make sure onLoadStart removes first play listener before adding a new one.
   player.trigger('loadstart');
   player.trigger('loadstart');
   player.trigger('play');
+});
+
+test('should fire firstplay after resetting the player', function() {
+  var player = PlayerTest.makePlayer({});
+
+  var fpFired = false;
+  player.on('firstplay', function(){
+    fpFired = true;
+  });
+
+  // init firstplay listeners
+  player.trigger('loadstart');
+  player.trigger('play');
+  ok(fpFired, 'First firstplay fired');
+
+  // reset the player
+  player.trigger('loadstart');
+  fpFired = false;
+  player.trigger('play');
+  ok(fpFired, 'Second firstplay fired');
+
+  // the play event can fire before the loadstart event.
+  // in that case we still want the firstplay even to fire.
+  player.tech.paused = function(){ return false; };
+  fpFired = false;
+  // reset the player
+  player.trigger('loadstart');
+  // player.trigger('play');
+  ok(fpFired, 'Third firstplay fired');
 });
 
 test('should remove vjs-has-started class', function(){

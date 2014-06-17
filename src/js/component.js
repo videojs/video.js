@@ -471,7 +471,7 @@ vjs.Component.prototype.initChildren = function(){
 
   if (children) {
     // Allow for an array of children details to passed in the options
-    if (children instanceof Array) {
+    if (vjs.obj.isArray(children)) {
       for (var i = 0; i < children.length; i++) {
         child = children[i];
 

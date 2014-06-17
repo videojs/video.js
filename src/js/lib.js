@@ -161,6 +161,17 @@ vjs.obj.isPlain = function(obj){
 };
 
 /**
+ * Check if an object is Array
+*  Since instanceof Array will not work on arrays created in another frame we need to use Array.isArray, but since IE8 does not support Array.isArray we need this shim
+ * @param  {Object} obj Object to check
+ * @return {Boolean}     True if plain, false otherwise
+ * @private
+ */
+vjs.obj.isArray = Array.isArray || function(arr) {
+  return Object.prototype.toString.call(arr) === '[object Array]';
+};
+
+/**
  * Bind (a.k.a proxy or Context). A simple method for changing the context of a function
    It also stores a unique id on the function so it can be easily removed from events
  * @param  {*}   context The object to bind as scope
