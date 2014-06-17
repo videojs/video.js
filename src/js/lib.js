@@ -52,6 +52,13 @@ vjs.capitalize = function(string){
 vjs.obj = {};
 
 /**
+ * Array functions container
+ * @type {Object}
+ * @private
+ */
+vjs.arr = {};
+
+/**
  * Object.create shim for prototypal inheritance
  *
  * https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object/create
@@ -849,12 +856,12 @@ vjs.findPosition = function(el) {
  * @param  {Array}    array The array.
  * @param  {Function} fn    The function to be run for each item. 
  */
-vjs.arrayForEach = function(array, fn) {
+vjs.arr.forEach = function(array, fn) {
   if (!(array instanceof Array) || !(fn instanceof Function)) {
     return false;
   }
 
   for (var i = 0, len = array.length; i < len; ++i) {
-    fn.apply( vjs, [array[i], i, array]);
+    fn.call(vjs, array[i], i, array);
   }
 };

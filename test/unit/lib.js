@@ -338,7 +338,7 @@ test('should loop through each element of an array', function() {
     var a = [1, 2, 3, 4, 5];
     var sum = 0;
     var i = 0;
-    vjs.arrayForEach(a, function(item, iterator, array) {
+    vjs.arr.forEach(a, function(item, iterator, array) {
         sum += item;
         deepEqual(array, a);
         equal(i++,iterator);
