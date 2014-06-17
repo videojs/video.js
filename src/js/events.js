@@ -7,14 +7,15 @@
 
 /**
  * Loops through an array of event types and calls the requested method for each type.
+ * @param  {Function} fn   The event method we want to use.
  * @param  {Element|Object} elem Element or object to bind listeners to
  * @param  {String}   type Type of event to bind to.
- * @param  {Function} fn   Event listener.
- * @param  {String}   method Event method (on, off, one).
+ * @param  {Function} callback   Event listener.
+ * @private
  */
-vjs.forwardMultipleEvents = function( elem, type, fn, method ) {
-    vjs.arrayForEach( type, function( type ) {
-      vjs[ method ](elem, type, fn); //Call the event method for each one of the types
+vjs._forwardMultipleEvents = function(fn, elem, type, callback) {
+    vjs.arr.forEach(type, function(type) {
+      fn(elem, type, callback); //Call the event method for each one of the types
     });
 };
 
@@ -29,9 +30,8 @@ vjs.forwardMultipleEvents = function( elem, type, fn, method ) {
  * @private
  */
 vjs.on = function(elem, type, fn){
-  if (type instanceof Array){
-    vjs.forwardMultipleEvents(elem, type, fn, 'on');
-    return false;
+  if (vjs.obj.isArray(type)) {
+    return vjs._forwardMultipleEvents(vjs.on, elem, type, fn);
   }
 
   var data = vjs.getData(elem);
@@ -95,8 +95,8 @@ vjs.off = function(elem, type, fn) {
   // If no events exist, nothing to unbind
   if (!data.handlers) { return; }
 
-  if (type instanceof Array){
-    vjs.forwardMultipleEvents(elem, type, fn, 'off');
+  if (vjs.obj.isArray(type)) {
+    vjs._forwardMultipleEvents(vjs.off, elem, type, fn);
     return false;
   }
 
@@ -365,9 +365,8 @@ vjs.trigger = function(elem, event) {
  * @private
  */
 vjs.one = function(elem, type, fn) {
-  if (type instanceof Array){
-    vjs.forwardMultipleEvents(elem, type, fn, 'one');
-    return false;
+  if (vjs.obj.isArray(type)) {
+    return vjs._forwardMultipleEvents(vjs.one, elem, type, fn);
   }
   var func = function(){
     vjs.off(elem, type, func);
