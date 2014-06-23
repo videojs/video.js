@@ -14,9 +14,9 @@
  * @private
  */
 vjs._forwardMultipleEvents = function(fn, elem, type, callback) {
-    vjs.arr.forEach(type, function(type) {
-      fn(elem, type, callback); //Call the event method for each one of the types
-    });
+  vjs.arr.forEach(type, function(type) {
+    fn(elem, type, callback); //Call the event method for each one of the types
+  });
 };
 
 /**

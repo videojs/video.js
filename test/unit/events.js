@@ -22,7 +22,7 @@ test('should add and remove multiple event listeners to an element with a single
     ok(true, 'Callback triggered');
   };
 
-  vjs.on(el, [ 'click', 'event1', 'event2' ], listener);
+  vjs.on(el, ['click', 'event1', 'event2'], listener);
 
   vjs.trigger(el, 'click');
   vjs.trigger(el, 'click');
@@ -131,7 +131,7 @@ test( 'should listen only once in multiple events from a single call', function(
     ok(true, 'Callback Triggered');
   };
 
-  vjs.one(el, [ 'click', 'event1', 'event2' ], listener);
+  vjs.one(el, ['click', 'event1', 'event2'], listener);
   vjs.trigger(el, 'click'); // 1 click
   vjs.trigger(el, 'click'); // No click should happen.
   vjs.trigger(el, 'event1'); // event1 must be handled.
