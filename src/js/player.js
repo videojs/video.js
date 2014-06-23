@@ -290,12 +290,13 @@ vjs.Player.prototype.loadTech = function(techName, source){
 
 vjs.Player.prototype.unloadTech = function(){
   this.isReady_ = false;
-  this.tech.dispose();
 
   // Turn off any manual progress or timeupdate tracking
   if (this.manualProgress) { this.manualProgressOff(); }
 
   if (this.manualTimeUpdates) { this.manualTimeUpdatesOff(); }
+
+  this.tech.dispose();
 
   this.tech = false;
 };
