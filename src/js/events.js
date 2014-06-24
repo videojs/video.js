@@ -265,7 +265,9 @@ vjs.fixEvent = function(event) {
 /**
  * Trigger an event for an element
  * @param  {Element|Object} elem  Element to trigger an event on
- * @param  {String} event Type of event to trigger
+ * @param  {Object}         event either a string (the event type) 
+ *                          to trigger or an event object with a 
+ *                          type attribute.
  * @private
  */
 vjs.trigger = function(elem, event) {
