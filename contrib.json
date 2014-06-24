@@ -54,12 +54,20 @@
         "exec": "git pull upstream master"
       },
       {
+        "desc": "Push any changes to the fork of the main project",
+        "exec": "git push origin master"
+      },
+      {
         "desc": "Switch to the release branch",
         "exec": "git checkout stable"
       },
       {
         "desc": "Get any changes to stable in the main project",
         "exec": "git pull upstream stable"
+      },
+      {
+        "desc": "Push any changes to the fork of the main project",
+        "exec": "git push origin stable"
       },
       {
         "desc": "Install dependencies",
