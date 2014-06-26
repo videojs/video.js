@@ -52,9 +52,9 @@
     "start": {
       "steps": [
         { "include": "update" },
-        { "prompt": "Name the branch",        "id": "name" },
+        { "prompt": "Name the branch",                "id": "name" },
         [ "git checkout -b {{name}} {{baseBranch}}",  "Create the branch" ],
-        [ "git push -u origin {{name}}",      "Push the branch to the origin and track it" ]
+        [ "git push -u origin {{name}}",              "Push the branch to the origin and track it" ]
       ]
     }
   },
@@ -95,9 +95,9 @@
     },
 
     "accept": {
-      "contrib": "update",
       "steps": [
         { "prompt": "What is the the pull request number?", "id": "prNum" },
+        { "include": "update" },
         { "get": "https://api.github.com/repos/videojs/video.js/pulls/{{prNum}}", "desc": "Get the PR information", "id": "pr" },
         { "get": "https://api.github.com/repos/videojs/video.js/pulls/{{prNum}}/commits", "desc": "Get the PR commits to access author info", "id": "prCommits" },
         [ "git checkout -b {{pr.user.login}}-{{pr.head.ref}} {{pr.base.ref}}", "Create a new branch for merging the changes" ],
@@ -109,9 +109,11 @@
         [ "git add CHANGELOG.md", "Add the changlelog change to be committed" ],
         [ "git commit -a --author='{{prCommits.[0].commit.author.name}} <{{prCommits.[0].commit.author.email}}>' -m '{{line}}. closes #{{prNum}}'", "Commit the changes" ],
         { "confirm": "Does everything look ok?" },
-        [ "git checkout {{pr.base.ref}}",                "Check out the base branch" ],
-        [ "git merge {{pr.user.login}}-{{pr.head.ref}}", "Merge the changes" ],
-        [ "git push origin {{pr.base.ref}}",             "Push the changes" ]
+        [ "git checkout {{pr.base.ref}}",                     "Check out the base branch" ],
+        [ "git merge {{pr.user.login}}-{{pr.head.ref}}",      "Merge the changes" ],
+        [ "git push origin {{pr.base.ref}}",                  "Push the changes to your remote fork" ],
+        [ "git push upstream {{pr.base.ref}}",                "Push the changes to the main project" ],
+        [ "git branch -D {{pr.user.login}}-{{pr.head.ref}}",  "Delete the local branch used for merging" ]
       ]
     }
   },
@@ -150,6 +152,33 @@
         { "confirm": "Are you sure '{{name}}' is the branch you want to delete?" },
         { "exec": "git branch -D {{name}}",          "desc": "Delete the local copy of the branch" },
         { "exec": "git push origin :{{ ame}}",       "desc": "Delete the remote copy of the branch" }
+      ]
+    }
+  },
+
+  "review": {
+    "desc": "Review a feature or patch that has been submitted",
+    "start": {
+      "steps": [
+        { "prompt": "What is the the pull request number?", "id": "prNum" },
+        { "get": "https://api.github.com/repos/videojs/video.js/pulls/{{prNum}}", "desc": "Get the PR information", "id": "pr" },
+        [ "git checkout -b review-{{pr.user.login}}-{{pr.head.ref}} {{pr.base.ref}}", "Checkout a new branch for reviewing changes" ],
+        [ "git pull {{pr.head.repo.ssh_url}} {{pr.head.ref}}",  "Pull in the changes" ],
+        [ "grunt test",                                         "Build and run tests" ]
+      ]
+    },
+    "modify": {
+      "steps": [
+        { "include": "test" },
+        { "exec": "git diff --exit-code",            "desc": "Test for unadded changes", "fail": "Make sure all changes have been added and committed, or stashed, before switching branches" },
+        { "exec": "git diff --cached --exit-code",   "desc": "Test for uncommitted changes", "fail": "Make sure all changes have been added and committed, or stashed, before switching branches" },
+        { "exec": "git rev-parse --abbrev-ref HEAD", "desc": "Get the current branch", "id": "branch" },
+        { "confirm": "Are you sure {{branch}} is the branch you want to submit?" },
+        { "prompt": "Which github user or org are you submitting from?", "id": "user" },
+        { "prompt": "What is the the pull request number?",              "id": "prNum" },
+        { "get": "https://api.github.com/repos/videojs/video.js/pulls/{{prNum}}", "desc": "Get the PR information", "id": "pr" },
+        { "exec": "git push -u origin {{branch}}",                                "desc": "Push the changes to the remote repo" },
+        { "open": "https://github.com/{{user}}/video.js/compare/{{pr.head.label}}...{{user}}:{{branch}}", "desc": "Open the github pull request page" }
       ]
     }
   },
