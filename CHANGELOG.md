@@ -8,6 +8,7 @@ CHANGELOG
 * Fixed an IE11 issue where clicking on the video wouldn&#x27;t show the controls ([view](https://github.com/videojs/video.js/pull/1291))
 * Added a composer.json for PHP packages ([view](https://github.com/videojs/video.js/pull/1241))
 * Exposed the vertical option for slider controls ([view](https://github.com/videojs/video.js/pull/1303))
+* Fixed an error when disposing a tech using manual timeupdates ([view](https://github.com/videojs/video.js/pull/1312))
 
 --------------------
 
