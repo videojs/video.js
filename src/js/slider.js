@@ -128,7 +128,7 @@ vjs.Slider.prototype.calculateDistance = function(event){
   boxW = boxH = el.offsetWidth;
   handle = this.handle;
 
-  if (this.options_.vertical) {
+  if (this.options()['vertical']) {
     boxY = box.top;
 
     if (event.changedTouches) {
