@@ -347,4 +347,10 @@ test('should loop through each element of an array', function() {
     equal(this, thisArg, 'The context should equal the thisArg');
   }, thisArg);
   ok(sum, 6);
+
+  vjs.arr.forEach(a, function(){
+    if (this !== vjs) {
+      ok(false, 'default context should be vjs');
+    }
+  });
 });
