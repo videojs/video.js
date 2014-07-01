@@ -81,9 +81,3 @@ videojs.Player.prototype.userActive = function(){};
  * Native controls
  */
 videojs.Player.prototype.usingNativeControls = function(){};
-
-/**
- * Tech
- */
-videojs.Player.prototype.techName = function(){};
-videojs.Player.prototype.loadTech = function(){};
