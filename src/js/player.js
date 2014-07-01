@@ -162,8 +162,7 @@ vjs.Player.prototype.createEl = function(){
   var
     el = this.el_ = vjs.Component.prototype.createEl.call(this, 'div'),
     tag = this.tag,
-    attrs,
-    attr;
+    attrs;
 
   // Remove width/height attrs from tag so CSS can make it 100% width/height
   tag.removeAttribute('width');
@@ -195,11 +194,11 @@ vjs.Player.prototype.createEl = function(){
   // Copy over all the attributes from the tag, including ID and class
   // ID will now reference player box, not the video tag
   attrs = vjs.getAttributeValues(tag);
-  for (attr in attrs) {
+  vjs.obj.each(attrs, function(attr) {
     if (Object.prototype.hasOwnProperty.call(attrs, attr)) {
       el.setAttribute(attr, attrs[attr]);
     }
-  }
+  });
 
   // Update tag id/class for use as HTML5 playback tech
   // Might think we should do this after embedding in container so .vjs-tech class
