@@ -70,6 +70,7 @@ goog.exportProperty(vjs.Component.prototype, 'buildCSSClass', vjs.Component.prot
 
 // Need to export ended to ensure it's not removed by CC, since it's not used internally
 goog.exportProperty(vjs.Player.prototype, 'ended', vjs.Player.prototype.ended);
+goog.exportProperty(vjs.Player.prototype, 'currentType', vjs.Player.prototype.currentType);
 
 goog.exportSymbol('videojs.MediaLoader', vjs.MediaLoader);
 goog.exportSymbol('videojs.TextTrackDisplay', vjs.TextTrackDisplay);
