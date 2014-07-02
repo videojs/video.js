@@ -275,7 +275,7 @@ vjs.Player.prototype.loadTech = function(techName, source){
   var techOptions = vjs.obj.merge({ 'source': source, 'parentEl': this.el_ }, this.options_[techName.toLowerCase()]);
 
   if (source) {
-    this.srcType_ = source.type;
+    this.currentType_ = source.type;
     if (source.src == this.cache_.src && this.cache_.currentTime > 0) {
       techOptions['startTime'] = this.cache_.currentTime;
     }
@@ -1066,15 +1066,23 @@ vjs.Player.prototype.selectSource = function(sources){
   return false;
 };
 
+
 vjs.Player.prototype.setSource = function(source, type) {
-    this.srcType_ = type;
-    this.techCall('src', source);
-    if (this.options_['preload'] == 'auto') {
-        this.load();
-    }
-    if (this.options_['autoplay']) {
-        this.play();
-    }
+
+    this.cache_.src = source;
+
+    var _set = (function () {
+        this.currentType_ = type || '';
+        this.techCall('src', source);
+        if (this.options_['preload'] == 'auto') {
+            this.load();
+        }
+        if (this.options_['autoplay']) {
+            this.play();
+        }
+    }).bind(this);
+
+    this.isReady_ ? _set() : this.ready(_set);
 };
 
 /**
@@ -1150,17 +1158,8 @@ vjs.Player.prototype.src = function(source){
     }
 
   // Case: URL String (http://myvideo...)
-  } else {
-    // Cache for getting last set source
-    this.cache_.src = source;
-
-    if (!this.isReady_) {
-      this.ready(function(){
-        this.setSource(source);
-      });
-    } else {
+  } else if (typeof source === 'string') {
       this.setSource(source);
-    }
   }
 
   return this;
@@ -1179,7 +1178,7 @@ vjs.Player.prototype.currentSrc = function(){
 };
 
 vjs.Player.prototype.currentType = function(){
-    return this.srcType_ || '';
+    return this.currentType_ || '';
 };
 
 // Attributes/Options
