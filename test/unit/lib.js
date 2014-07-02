@@ -334,14 +334,23 @@ test('should confirm logging functions work', function() {
 });
 
 test('should loop through each element of an array', function() {
-  expect(11);
-  var a = [1, 2, 3, 4, 5];
+  expect(10);
+  var a = [1, 2, 3];
   var sum = 0;
   var i = 0;
+  var thisArg = {};
+
   vjs.arr.forEach(a, function(item, iterator, array) {
     sum += item;
-    deepEqual(array, a);
-    equal(i++,iterator);
+    deepEqual(array, a, 'The array arg should match the original array');
+    equal(i++, iterator, 'The indexes should match');
+    equal(this, thisArg, 'The context should equal the thisArg');
+  }, thisArg);
+  ok(sum, 6);
+
+  vjs.arr.forEach(a, function(){
+    if (this !== vjs) {
+      ok(false, 'default context should be vjs');
+    }
   });
-  ok(sum, 15);
 });

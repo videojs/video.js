@@ -6,20 +6,6 @@
  */
 
 /**
- * Loops through an array of event types and calls the requested method for each type.
- * @param  {Function} fn   The event method we want to use.
- * @param  {Element|Object} elem Element or object to bind listeners to
- * @param  {String}   type Type of event to bind to.
- * @param  {Function} callback   Event listener.
- * @private
- */
-vjs._forwardMultipleEvents = function(fn, elem, type, callback) {
-  vjs.arr.forEach(type, function(type) {
-    fn(elem, type, callback); //Call the event method for each one of the types
-  });
-};
-
-/**
  * Add an event listener to element
  * It stores the handler function in a separate cache object
  * and adds a generic handler to the element's event,
@@ -31,7 +17,7 @@ vjs._forwardMultipleEvents = function(fn, elem, type, callback) {
  */
 vjs.on = function(elem, type, fn){
   if (vjs.obj.isArray(type)) {
-    return vjs._forwardMultipleEvents(vjs.on, elem, type, fn);
+    return _handleMultipleEvents(vjs.on, elem, type, fn);
   }
 
   var data = vjs.getData(elem);
@@ -96,8 +82,7 @@ vjs.off = function(elem, type, fn) {
   if (!data.handlers) { return; }
 
   if (vjs.obj.isArray(type)) {
-    vjs._forwardMultipleEvents(vjs.off, elem, type, fn);
-    return false;
+    return _handleMultipleEvents(vjs.off, elem, type, fn);
   }
 
   // Utility function
@@ -366,12 +351,27 @@ vjs.trigger = function(elem, event) {
  */
 vjs.one = function(elem, type, fn) {
   if (vjs.obj.isArray(type)) {
-    return vjs._forwardMultipleEvents(vjs.one, elem, type, fn);
+    return _handleMultipleEvents(vjs.one, elem, type, fn);
   }
   var func = function(){
     vjs.off(elem, type, func);
     fn.apply(this, arguments);
   };
+  // copy the guid to the new function so it can removed using the original function's ID
   func.guid = fn.guid = fn.guid || vjs.guid++;
   vjs.on(elem, type, func);
 };
+
+/**
+ * Loops through an array of event types and calls the requested method for each type.
+ * @param  {Function} fn   The event method we want to use.
+ * @param  {Element|Object} elem Element or object to bind listeners to
+ * @param  {String}   type Type of event to bind to.
+ * @param  {Function} callback   Event listener.
+ * @private
+ */
+function _handleMultipleEvents(fn, elem, type, callback) {
+  vjs.arr.forEach(type, function(type) {
+    fn(elem, type, callback); //Call the event method for each one of the types
+  });
+}
