@@ -19,7 +19,7 @@ In the follwing example, the `data-setup` attribute tells the Video.js library t
 </video>
 ```
 
-After an instance has been created it can be accessed globally using `Video('example_video_1')`.
+After an instance has been created it can be accessed globally using `videojs('example_video_1')`.
 
 ---
 
@@ -920,6 +920,7 @@ _inherited from_: [src/js/component.js#L747](https://github.com/videojs/video.js
 ---
 
 ## EVENTS
+Callback functions can be added to events by using the [`on`](#on-type-fn-) or [`one`](#one-type-fn-) methods. They can be removed from events by using the [`off`](#off-type-fn-) method. Events can be triggered manually with the [`trigger`](#trigger-type-event-) method.
 
 ### durationchange `EVENT`
 > Fired when the duration of the media resource is first known or changed
