@@ -74,7 +74,6 @@ goog.exportProperty(vjs.Player.prototype, 'enterFullWindow', vjs.Player.prototyp
 goog.exportProperty(vjs.Player.prototype, 'exitFullWindow', vjs.Player.prototype.exitFullWindow);
 goog.exportProperty(vjs.Player.prototype, 'preload', vjs.Player.prototype.preload);
 goog.exportProperty(vjs.Player.prototype, 'remainingTime', vjs.Player.prototype.remainingTime);
-goog.exportProperty(vjs.Player.prototype, 'selectSource', vjs.Player.prototype.selectSource);
 goog.exportProperty(vjs.Player.prototype, 'supportsFullScreen', vjs.Player.prototype.supportsFullScreen);
 
 goog.exportSymbol('videojs.MediaLoader', vjs.MediaLoader);
