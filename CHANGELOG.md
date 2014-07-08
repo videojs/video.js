@@ -10,6 +10,7 @@ CHANGELOG
 * Exposed the vertical option for slider controls ([view](https://github.com/videojs/video.js/pull/1303))
 * Fixed an error when disposing a tech using manual timeupdates ([view](https://github.com/videojs/video.js/pull/1312))
 * Exported missing Player API methods (remainingTime, supportsFullScreen, enterFullWindow, exitFullWindow, preload) ([view](https://github.com/videojs/video.js/pull/1328))
+* Added a base for running saucelabs tests from grunt ([view](https://github.com/videojs/video.js/pull/1215))
 
 --------------------
 
