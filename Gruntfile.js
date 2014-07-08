@@ -163,6 +163,24 @@ module.exports = function(grunt) {
       ie_sl: {
         browsers: ['ie_sl']
       },
+      chrome_sl: {
+        browsers: ['chrome_sl']
+      },
+      firefox_sl: {
+        browsers: ['firefox_sl']
+      },
+      safari_sl: {
+        browsers: ['safari_sl']
+      },
+      ipad_sl: {
+        browsers: ['ipad_sl']
+      },
+      android_sl: {
+        browsers: ['android_sl']
+      },
+      ie_sl: {
+        browsers: ['ie_sl']
+      },
 
       // these are run locally on local browsers
       dev: {
