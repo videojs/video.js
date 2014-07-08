@@ -145,6 +145,24 @@ module.exports = function(grunt) {
       saucelabs: {
         browsers: ['chrome_sl']
       },
+      chrome_sl: {
+        browsers: ['chrome_sl']
+      },
+      firefox_sl: {
+        browsers: ['firefox_sl']
+      },
+      safari_sl: {
+        browsers: ['safari_sl']
+      },
+      ipad_sl: {
+        browsers: ['ipad_sl']
+      },
+      android_sl: {
+        browsers: ['android_sl']
+      },
+      ie_sl: {
+        browsers: ['ie_sl']
+      },
 
       // these are run locally on local browsers
       dev: {
@@ -337,7 +355,14 @@ module.exports = function(grunt) {
     if (process.env.TRAVIS_PULL_REQUEST !== 'false') {
       grunt.task.run(['karma:phantomjs', 'karma:minified_phantomjs', 'karma:minified_api_phantomjs']);
     } else if (process.env.TRAVIS) {
-      grunt.task.run(['karma:saucelabs']);
+      grunt.task.run([
+        'karma:chrome_sl',
+        'karma:firefox_sl',
+        'karma:safari_sl',
+        'karma:ipad_sl',
+        'karma:android_sl',
+        'karma:ie_sl'
+      ]);
     } else {
       // if we aren't running this in a CI, but running it manually, we can
       // supply arguments to this task. These arguments are either colon (`:`)
@@ -368,7 +393,6 @@ module.exports = function(grunt) {
       tasks = tasks.map(function(task) {
         return 'karma:' + task;
       });
-
 
       grunt.task.run(tasks);
     }
