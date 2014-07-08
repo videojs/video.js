@@ -95,6 +95,11 @@ vjs.Component.prototype.dispose = function(){
   // Remove all event listeners.
   this.off();
 
+  // Remove HTML tag
+  if (this.techName === 'Html5' && this.tag) {
+    vjs.Html5.disposeMediaElement(this.tag);
+  }
+
   // Remove element from DOM
   if (this.el_.parentNode) {
     this.el_.parentNode.removeChild(this.el_);
