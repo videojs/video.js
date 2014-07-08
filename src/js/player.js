@@ -743,7 +743,7 @@ vjs.Player.prototype.remainingTime = function(){
   return this.duration() - this.currentTime();
 };
 
-// http://www.w3.org/html/wg/drafts/html/master/embedded-content.html#dom-media-buffered
+// http://dev.w3.org/html5/spec/video.html#dom-media-buffered
 // Buffered returns a timerange object.
 // Kind of like an array of portions of the video that have been downloaded.
 
@@ -775,22 +775,6 @@ vjs.Player.prototype.buffered = function(){
   }
 
   return buffered;
-};
-
-/**
- * Get a TimeRange object with the times of the video that have been played.
- * http://www.w3.org/html/wg/drafts/html/master/embedded-content.html#dom-media-played
- *
- * @return {Object} A mock TimeRange object (following HTML spec)
- */
-vjs.Player.prototype.played = function(){
-  var played = this.techGet('played');
-
-  if (!played || !played.length) {
-    played = vjs.createTimeRange(0,this.cache_.currentTime);
-  }
-
-  return played;
 };
 
 /**
@@ -1547,6 +1531,7 @@ vjs.Player.prototype.playbackRate = function(rate) {
 // readyState: function(){ return this.techCall('readyState'); },
 // initialTime: function(){ return this.techCall('initialTime'); },
 // startOffsetTime: function(){ return this.techCall('startOffsetTime'); },
+// played: function(){ return this.techCall('played'); },
 // seekable: function(){ return this.techCall('seekable'); },
 // videoTracks: function(){ return this.techCall('videoTracks'); },
 // audioTracks: function(){ return this.techCall('audioTracks'); },
