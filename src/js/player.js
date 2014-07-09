@@ -1071,7 +1071,7 @@ vjs.Player.prototype.setSource = function(source, type) {
 
     this.cache_.src = source;
 
-    var _set = (function () {
+    var _set = vjs.bind(this, function () {
         this.currentType_ = type || '';
         this.techCall('src', source);
         if (this.options_['preload'] == 'auto') {
@@ -1080,7 +1080,7 @@ vjs.Player.prototype.setSource = function(source, type) {
         if (this.options_['autoplay']) {
             this.play();
         }
-    }).bind(this);
+    });
 
     this.ready(_set);
 };
