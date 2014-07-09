@@ -244,12 +244,19 @@ vjs.Flash = vjs.MediaTechController.extend({
 
     // If not using iFrame mode, embed as normal object
     } else {
-      vjs.Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
+      this.obj = vjs.Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
     }
   }
 });
 
 vjs.Flash.prototype.dispose = function(){
+  // the tech is being disposed before onReady has been triggered
+  // removing the object from the DOM prevents that from firing
+  // and overwriting the state of the replacement tech
+  if (this.obj) {
+    this.obj.parentNode.removeChild(this.obj);
+    this.obj = null;
+  }
   vjs.MediaTechController.prototype.dispose.call(this);
 };
 
@@ -404,12 +411,22 @@ vjs.Flash['onReady'] = function(currSwf){
   // Update reference to playback technology element
   tech.el_ = el;
 
+  // Remove the initialization reference to the tech element
+  if (tech.obj) {
+    tech.obj = null;
+  }
+
   vjs.Flash.checkReady(tech);
 };
 
 // The SWF isn't alwasy ready when it says it is. Sometimes the API functions still need to be added to the object.
 // If it's not ready, we set a timeout to check again shortly.
 vjs.Flash.checkReady = function(tech){
+
+  // Stop worrying if the tech has been disposed
+  if (!tech.el()) {
+    return;
+  }
 
   // Check if API property exists
   if (tech.el().vjs_getProperty) {
