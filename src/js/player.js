@@ -1082,7 +1082,7 @@ vjs.Player.prototype.setSource = function(source, type) {
         }
     }).bind(this);
 
-    this.isReady_ ? _set() : this.ready(_set);
+    this.ready(_set);
 };
 
 /**
