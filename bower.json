@@ -12,5 +12,13 @@
     "flash",
     "video",
     "player"
-  ]
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "build"
+  ],
 }
