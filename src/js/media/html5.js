@@ -63,6 +63,7 @@ vjs.Html5 = vjs.MediaTechController.extend({
 
 vjs.Html5.prototype.dispose = function(){
   vjs.MediaTechController.prototype.dispose.call(this);
+  vjs.Html5.disposeMediaElement(this.player_.tag);
 };
 
 vjs.Html5.prototype.createEl = function(){
