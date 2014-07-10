@@ -112,27 +112,3 @@ test('dispose removes the object element even before ready fires', function() {
   strictEqual(tech.el(), null, 'tech el is null');
   strictEqual(parentEl.children.length, 0, 'parent el is empty');
 });
-
-test('dispose removes the object element after ready fires', function() {
-  var noop = function() {},
-      parentEl = document.createElement('div'),
-      player = {
-        id: noop,
-        on: noop,
-        options_: {}
-      },
-      tech = new vjs.Flash(player, {
-        'parentEl': parentEl
-      });
-
-  player.tech = tech;
-
-  document.getElementById('qunit-fixture').appendChild(parentEl);
-  tech.obj['player'] = player;
-
-  vjs.Flash['onReady'](parentEl.children[0].id);
-  strictEqual(tech.obj, null, 'nulled initialization reference');
-  tech.dispose();
-  strictEqual(tech.el(), null, 'tech el is null');
-  strictEqual(parentEl.children.length, 0, 'parent el is empty');
-});

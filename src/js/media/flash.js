@@ -244,19 +244,12 @@ vjs.Flash = vjs.MediaTechController.extend({
 
     // If not using iFrame mode, embed as normal object
     } else {
-      this.obj = vjs.Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
+      this.el_ = vjs.Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
     }
   }
 });
 
 vjs.Flash.prototype.dispose = function(){
-  // the tech is being disposed before onReady has been triggered
-  // removing the object from the DOM prevents that from firing
-  // and overwriting the state of the replacement tech
-  if (this.obj) {
-    this.obj.parentNode.removeChild(this.obj);
-    this.obj = null;
-  }
   vjs.MediaTechController.prototype.dispose.call(this);
 };
 
@@ -407,14 +400,6 @@ vjs.Flash['onReady'] = function(currSwf){
 
   // Reference player on tech element
   el['player'] = player;
-
-  // Update reference to playback technology element
-  tech.el_ = el;
-
-  // Remove the initialization reference to the tech element
-  if (tech.obj) {
-    tech.obj = null;
-  }
 
   vjs.Flash.checkReady(tech);
 };
