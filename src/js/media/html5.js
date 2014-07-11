@@ -29,12 +29,8 @@ vjs.Html5 = vjs.MediaTechController.extend({
 
     var source = options['source'];
 
-    // If the element source is already set, we may have missed the loadstart event, and want to trigger it.
-    // We don't want to set the source again and interrupt playback.
-    if (source && this.el_.currentSrc === source.src && this.el_.networkState > 0) {
-      player.trigger('loadstart');
-    // Otherwise set the source if one was provided.
-    } else if (source) {
+    // set the source if one was provided
+    if (source && this.el_.currentSrc !== source.src) {
       this.el_.src = source.src;
     }
 
@@ -246,6 +242,8 @@ vjs.Html5.prototype.defaultMuted = function(){ return this.el_.defaultMuted; };
 
 vjs.Html5.prototype.playbackRate = function(){ return this.el_.playbackRate; };
 vjs.Html5.prototype.setPlaybackRate = function(val){ this.el_.playbackRate = val; };
+
+vjs.Html5.prototype.networkState = function(){ return this.el_.networkState; };
 
 /* HTML5 Support Testing ---------------------------------------------------- */
 

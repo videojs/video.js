@@ -61,6 +61,17 @@ vjs.MediaTechController.prototype.initControlsListeners = function(){
   this.ready(activateControls);
   player.on('controlsenabled', activateControls);
   player.on('controlsdisabled', deactivateControls);
+
+  // if we're loading the playback object after it has started loading or playing the
+  // video (often with autoplay on) then the loadstart event has already fired and we
+  // need to fire it manually because many things rely on it.
+  // Long term we might consider how we would do this for other events like 'canplay'
+  // that may also have fired.
+  this.ready(function(){
+    if (this.networkState && this.networkState() > 0) {
+      this.player().trigger('loadstart');
+    }
+  });
 };
 
 vjs.MediaTechController.prototype.addControlsListeners = function(){
@@ -161,21 +172,3 @@ vjs.MediaTechController.prototype.features = {
 };
 
 vjs.media = {};
-
-/**
- * List of default API methods for any MediaTechController
- * @type {String}
- */
-vjs.media.ApiMethods = 'play,pause,paused,currentTime,setCurrentTime,duration,buffered,volume,setVolume,muted,setMuted,width,height,supportsFullScreen,enterFullScreen,src,load,currentSrc,preload,setPreload,autoplay,setAutoplay,loop,setLoop,error,networkState,readyState,seeking,initialTime,startOffsetTime,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight,textTracks,defaultPlaybackRate,playbackRate,mediaGroup,controller,controls,defaultMuted'.split(',');
-// Create placeholder methods for each that warn when a method isn't supported by the current playback technology
-
-function createMethod(methodName){
-  return function(){
-    throw new Error('The "'+methodName+'" method is not available on the playback technology\'s API');
-  };
-}
-
-for (var i = vjs.media.ApiMethods.length - 1; i >= 0; i--) {
-  var methodName = vjs.media.ApiMethods[i];
-  vjs.MediaTechController.prototype[vjs.media.ApiMethods[i]] = createMethod(methodName);
-}
