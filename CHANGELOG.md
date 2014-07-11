@@ -6,6 +6,9 @@ _(none)_
 
 --------------------
 
+## 4.6.4 (2014-07-11)
+* Fixed an issue where Flash autoplay would not show the controls ([view](https://github.com/videojs/video.js/pull/1343))
+
 ## 4.6.3 (2014-06-12)
 * Updated to version 4.4.1 of the SWF ([view](https://github.com/videojs/video.js/pull/1285))
 * Fixed a minification issue with the fullscreen event. fixes #1282 ([view](https://github.com/videojs/video.js/pull/1286))
