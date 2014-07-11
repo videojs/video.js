@@ -157,7 +157,8 @@
           "type": "text"
         }
       },
-      [ "git checkout stable & git pull",          "Checkout and update the release branch" ],
+      [ "git checkout stable",                     "Checkout the release branch" ],
+      [ "git pull upstream stable",                "Update the release branch" ],
       [ "grunt test",                              "Run tests" ],
       [ "grunt chg-release:{{ type }}",            "Update the changelog with the new release" ],
       [ "grunt version:{{ type }}",                "Bump package versions" ],
@@ -166,14 +167,16 @@
       [ "grunt vjsdocs",                           "Rebuild the docs" ],
       [ "grunt cdn-links",                         "Update the cdn urls in the docs" ],
       [ "grunt tagrelease",                        "Tag the release" ],
-      [ "git push origin stable",                  "Push changes to the remote" ],
-      [ "git push --tags",                         "Push tags to the remote" ],
+      [ "git push upstream stable",                "Push changes to the remote" ],
+      [ "git push upstream --tags",                "Push tags to the remote" ],
       [ "npm publish",                             "Publish to npm" ],
-      [ "git checkout master && git merge stable", "Checkout the development branch (master) and merge changes" ],
+      [ "git checkout master",                     "Checkout the development branch" ],
+      [ "git pull upstream master",                "Update the development branch" ],
+      [ "git merge stable",                        "Merge changes" ],
       [ "grunt clean:dist",                        "Remove built dist files to re-ignore them" ],
       [ "git add -u",                              "Add the changes for the removed dist files" ],
       [ "git commit -m 'Removed dist files'",      "Commit the removed dist files" ],
-      [ "git push origin master",                  "Push development branch changes" ]
+      [ "git push upstream master",                "Push development branch changes" ]
     ]
   },
 
