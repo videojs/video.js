@@ -108,6 +108,15 @@ vjs.options = {
   'notSupportedMessage': 'No compatible source was found for this video.'
 };
 
+vjs.localizations = {
+  'en-US': {
+
+  },
+  'es': {
+
+  }
+};
+
 // Set CDN Version of swf
 // The added (+) blocks the replace from changing this GENERATED_CDN_VSN string
 if (vjs.CDN_VERSION !== 'GENERATED'+'_CDN_VSN') {
