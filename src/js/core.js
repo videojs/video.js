@@ -104,9 +104,11 @@ vjs.options = {
     'errorDisplay': {}
   },
 
+  // Locale
+  locale: document.getElementsByTagName('html')[0].getAttribute('lang') || navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language || 'en-US',
+
   // Localization namespace
   'l20n': {
-    locale: 'es',
     'es': {
       'play': 'juego',
       'pause': 'no juego',

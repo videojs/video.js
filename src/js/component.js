@@ -60,9 +60,7 @@ vjs.Component = vjs.CoreObject.extend({
     this.childNameIndex_ = {};
 
     // Update Localization
-    this.locale_ = options.locale || document.getElementsByTagName('html')[0].getAttribute('lang') || navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language || 'en-US';
-
-    console.log('hello', this.id_, this.locale_);
+    this.locale_ = options.locale || this.player_.locale();
 
     // Add any child components in options
     this.initChildren();
@@ -141,6 +139,12 @@ vjs.Component.prototype.options_;
  * @private
  */
 vjs.Component.prototype.locale_;
+
+vjs.Component.prototype.locale = function (obj) {
+  if (obj===undefined) return this.locale_;
+
+  return this.locale_ = vjs.util.mergeOptions(this.locale_, obj);
+};
 
 /**
  * Deep merge of options objects
