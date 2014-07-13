@@ -104,17 +104,42 @@ vjs.options = {
     'errorDisplay': {}
   },
 
+  // Localization namespace
+  'l20n': {
+    locale: 'es',
+    'es': {
+      'play': 'juego',
+      'pause': 'no juego',
+      'current time': 'tiempo ahora',
+      'remaining time': 'tiempo',
+      'stop': '',
+      'errors' : {
+        1: {
+          headline: '',
+          message: ''
+        },
+        2: {
+          headline: '',
+          message: ''
+        },
+        3: {
+          headline: '',
+          message: ''
+        },
+        4: {
+          headline: '',
+          message: ''
+        },
+        5: {
+          headline: '',
+          message: ''
+        }
+      }
+    }
+  },
+
   // Default message to show when a video cannot be played.
   'notSupportedMessage': 'No compatible source was found for this video.'
-};
-
-vjs.localizations = {
-  'en-US': {
-
-  },
-  'es': {
-
-  }
 };
 
 // Set CDN Version of swf
