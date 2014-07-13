@@ -108,13 +108,67 @@ vjs.options = {
   locale: document.getElementsByTagName('html')[0].getAttribute('lang') || navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language || 'en-US',
 
   // Localization namespace
+  /*
+   ["Play"] 
+   ["Current", "Time"] 
+   ["Duration", "Time"] 
+   ["Remaining", "Time"] 
+   ["Stream", "Type", "LIVE"] 
+   ["Loaded:"] 
+   ["Progress:"] 
+   ["Fullscreen"] 
+   ["Mute"] 
+   ["Playback", "Rate"] 
+   ["Subtitles"] 
+   ["subtitles", "off"] 
+   ["Captions"] 
+   ["captions", "off"] 
+   ["English"]  
+   ["Chapters"]
+
+   Play 
+   Current
+   Time
+   Duration
+   Remaining
+   Stream
+   Type
+   LIVE
+   Loaded: 
+   Progress: 
+   Fullscreen 
+   Mute 
+   Playback
+   Rate
+   Subtitles 
+   subtitles
+   off
+   Captions 
+   captions
+   English  
+   Chapters 
+  */
   'l20n': {
     'es': {
-      'play': 'juego',
-      'pause': 'no juego',
-      'current time': 'tiempo ahora',
-      'remaining time': 'tiempo',
-      'stop': '',
+      'play': '',
+      'current': '',
+      'time': '',
+      'duration': '',
+      'remaining': '',
+      'stream': '',
+      'type': '',
+      'live': '',
+      'loaded:': '',
+      'progress:': '',
+      'fullscreen': '',
+      'mute': '',
+      'playback': '',
+      'rate': '',
+      'subtitles': '',
+      'off': '',
+      'captions': '',
+      'english': '',
+      'chapters': '',
       'errors' : {
         1: {
           headline: '',
