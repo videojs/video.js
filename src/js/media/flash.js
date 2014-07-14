@@ -60,9 +60,7 @@ vjs.Flash = vjs.MediaTechController.extend({
           'id': objId,
           'name': objId, // Both ID and Name needed or swf to identifty itself
           'class': 'vjs-tech'
-        }, options['attributes']),
-
-        lastSeekTarget
+        }, options['attributes'])
     ;
 
     // If source was supplied pass as a flash var.
@@ -76,19 +74,6 @@ vjs.Flash = vjs.MediaTechController.extend({
         flashVars['src'] = encodeURIComponent(vjs.getAbsoluteURL(source.src));
       }
     }
-
-    this['setCurrentTime'] = function(time){
-      lastSeekTarget = time;
-      this.el_.vjs_setProperty('currentTime', time);
-    };
-    this['currentTime'] = function(time){
-      // when seeking make the reported time keep up with the requested time
-      // by reading the time we're seeking to
-      if (this.seeking()) {
-        return lastSeekTarget;
-      }
-      return this.el_.vjs_getProperty('currentTime');
-    };
 
     // Add placeholder to player div
     vjs.insertFirst(placeHolder, parentEl);
@@ -282,6 +267,20 @@ vjs.Flash.prototype.src = function(src){
     var tech = this;
     setTimeout(function(){ tech.play(); }, 0);
   }
+};
+
+vjs.Flash.prototype.setCurrentTime = function(time){
+  this.lastSeekTarget_ = time;
+  this.el_.vjs_setProperty('currentTime', time);
+};
+
+vjs.Flash.prototype.currentTime = function(time){
+  // when seeking make the reported time keep up with the requested time
+  // by reading the time we're seeking to
+  if (this.seeking()) {
+    return this.lastSeekTarget_ || 0;
+  }
+  return this.el_.vjs_getProperty('currentTime');
 };
 
 vjs.Flash.prototype.currentSrc = function(){
