@@ -109,52 +109,59 @@ vjs.options = {
 
   // Localization namespace
   /*
-   ["Play"] 
-   ["Current", "Time"] 
-   ["Duration", "Time"] 
-   ["Remaining", "Time"] 
-   ["Stream", "Type", "LIVE"] 
-   ["Loaded:"] 
-   ["Progress:"] 
-   ["Fullscreen"] 
-   ["Mute"] 
-   ["Playback", "Rate"] 
-   ["Subtitles"] 
-   ["subtitles", "off"] 
-   ["Captions"] 
-   ["captions", "off"] 
-   ["English"]  
-   ["Chapters"]
-
-   Play 
-   Current
-   Time
-   Duration
-   Remaining
-   Stream
-   Type
-   LIVE
-   Loaded: 
-   Progress: 
-   Fullscreen 
-   Mute 
-   Playback
-   Rate
-   Subtitles 
+   play
+   pause
+   stop
+   current
+   time
+   duration
+   remaining
+   stream
+   type
+   live
+   loaded
+   progress
+   fullscreen
+   mute
+   playback
+   rate
    subtitles
    off
-   Captions 
    captions
-   English  
-   Chapters 
+   english
+   chapters
+
+   jugar
+    pausa
+    Deténgase
+    corriente
+    tiempo
+    duración
+    restante
+    corriente
+    tipo
+    vivir
+    cargado
+    progreso
+    fullscreen
+    mudo
+    reproducción
+    velocidad
+    subtítulos
+    apagado
+    subtítulos
+    Inglés
+    capítulos
   */
   'l20n': {
     'es': {
-      'play': '',
-      'current': '',
-      'time': '',
-      'duration': '',
-      'remaining': '',
+      'play': 'jugar',
+      'pause': 'pausa',
+      'stop': 'deténgase',
+      'current': 'corriente',
+      'time': 'tiempo',
+      'duration': 'duración',
+      'remaining': 'restante',
       'stream': '',
       'type': '',
       'live': '',

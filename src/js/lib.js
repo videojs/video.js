@@ -31,6 +31,12 @@ vjs.createEl = function(tagName, properties){
        }
     }
   }
+
+  if(el.textContent.length > 0) {
+    var words = el.textContent.split(' ');
+    console.log(words);
+  }
+
   return el;
 };
 
