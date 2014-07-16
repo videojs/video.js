@@ -221,7 +221,7 @@ vjs.Flash = vjs.MediaTechController.extend({
           tech.el_ = el;
 
           // Make sure swf is actually ready. Sometimes the API isn't actually yet.
-          vjs.Flash.checkReady(tech);
+          vjs.Flash['checkReady'](tech);
         });
 
         // Create event listener for all swf events
@@ -391,25 +391,31 @@ vjs.Flash.streamingFormats = {
 };
 
 vjs.Flash['onReady'] = function(currSwf){
-  var el = vjs.el(currSwf);
+  var el, player, tech;
 
-  // Get player from box
-  // On firefox reloads, el might already have a player
-  var player = el['player'] || el.parentNode['player'],
-      tech = player.tech;
+  el = vjs.el(currSwf);
 
-  // Reference player on tech element
-  el['player'] = player;
+  // Get player from the player div property
+  player = el && el.parentNode && el.parentNode['player'];
 
-  // Update reference to playback technology element
-  tech.el_ = el;
+  // if there is no el or player then then the tech has been disposed
+  // and the tech element was removed from the player div
+  if (player) {
+    // Reference player on tech element
+    el['player'] = player;
 
-  vjs.Flash.checkReady(tech);
+    tech = player.tech;
+
+    // Update reference to playback technology element
+    tech.el_ = el;
+
+    vjs.Flash['checkReady'](tech);
+  }
 };
 
 // The SWF isn't alwasy ready when it says it is. Sometimes the API functions still need to be added to the object.
 // If it's not ready, we set a timeout to check again shortly.
-vjs.Flash.checkReady = function(tech){
+vjs.Flash['checkReady'] = function(tech){
 
   // Check if API property exists
   if (tech.el().vjs_getProperty) {
@@ -421,7 +427,7 @@ vjs.Flash.checkReady = function(tech){
   } else {
 
     setTimeout(function(){
-      vjs.Flash.checkReady(tech);
+      vjs.Flash['checkReady'](tech);
     }, 50);
 
   }

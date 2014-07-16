@@ -96,3 +96,31 @@ test('currentTime is the seek target during seeking', function() {
   seeking = true;
   strictEqual(7, tech.currentTime(), 'during seeks the target time is returned');
 });
+
+test('ready triggering before and after disposing the tech', function() {
+  var checkReady, fixtureDiv, playerDiv, techEl;
+
+  checkReady = sinon.stub(vjs.Flash, 'checkReady');
+
+  fixtureDiv = document.getElementById('qunit-fixture');
+  playerDiv = document.createElement('div');
+  techEl = document.createElement('div');
+
+  playerDiv.appendChild(techEl);
+  fixtureDiv.appendChild(playerDiv);
+
+  techEl.id = 'foo1234';
+  playerDiv['player'] = {
+    tech: {}
+  };
+
+  vjs.Flash['onReady'](techEl.id);
+  ok(checkReady.called, 'checkReady should be called before the tech is disposed');
+
+  // remove the tech el from the player div to simulate being disposed
+  playerDiv.removeChild(techEl);
+  vjs.Flash['onReady'](techEl.id);
+  ok(!checkReady.calledTwice, 'checkReady should not be called after the tech is disposed');
+
+  vjs.Flash['checkReady'].restore();
+});
