@@ -224,6 +224,11 @@ vjs.Player.prototype.createEl = function(){
   // adding children
   this.el_ = el;
   this.on('loadstart', this.onLoadStart);
+  this.on('waiting', this.onWaiting);
+  this.on('seeked', this.onWaitEnd);
+  this.on('canplay', this.onWaitEnd);
+  this.on('canplaythrough', this.onWaitEnd);
+  this.on('playing', this.onWaitEnd);
   this.on('ended', this.onEnded);
   this.on('play', this.onPlay);
   this.on('firstplay', this.onFirstPlay);
@@ -475,6 +480,22 @@ vjs.Player.prototype.onLoadedAllData;
 vjs.Player.prototype.onPlay = function(){
   vjs.removeClass(this.el_, 'vjs-paused');
   vjs.addClass(this.el_, 'vjs-playing');
+};
+
+/**
+ * Fired whenever the media begins wating
+ * @event waiting
+ */
+vjs.Player.prototype.onWaiting = function(){
+  vjs.addClass(this.el_, 'vjs-waiting');
+};
+
+/**
+ * Fired whenever the waitng state has ended
+ * @event seeked, canplay, canplaythrough, playing
+ */
+vjs.Player.prototype.onWaitEnd = function(){
+  vjs.removeClass(this.el_, 'vjs-waiting');
 };
 
 /**
