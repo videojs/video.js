@@ -1,3 +1,5 @@
+var vjs = {};
+
 /**
  * Custom MediaError to mimic the HTML5 MediaError
  * @param {Number} code The media error code
@@ -67,3 +69,5 @@ for (var errNum = 0; errNum < vjs.MediaError.errorTypes.length; errNum++) {
   // values should be accessible on both the class and instance
   vjs.MediaError.prototype[vjs.MediaError.errorTypes[errNum]] = errNum;
 }
+
+module.exports = vjs.MediaError;

@@ -1,3 +1,7 @@
+var vjs = {};
+var vjsJSON = require('./json.js');
+var vjsevents = require('./events.js');
+
 /**
  * @fileoverview Functions for automatically setting up a player
  * based on the data-setup attribute of the video tag
@@ -28,7 +32,7 @@ vjs.autoSetup = function(){
 
             // Parse options JSON
             // If empty string, make it a parsable json object.
-            options = vjs.JSON.parse(options || '{}');
+            options = vjsJSON.parse(options || '{}');
 
             // Create new video.js instance.
             player = videojs(vid, options);
@@ -56,11 +60,9 @@ vjs.autoSetupTimeout = function(wait){
 if (document.readyState === 'complete') {
   vjs.windowLoaded = true;
 } else {
-  vjs.one(window, 'load', function(){
+  vjsevents.one(window, 'load', function(){
     vjs.windowLoaded = true;
   });
 }
 
-// Run Auto-load players
-// You have to wait at least once in case this script is loaded after your video in the DOM (weird behavior only with minified version)
-vjs.autoSetupTimeout(1);
+module.exports = vjs;

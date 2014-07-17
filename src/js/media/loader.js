@@ -1,20 +1,26 @@
+var vjs = {};
+var Component = require('../component.js');
+var vjslib = require('../lib.js');
+
 /**
  * The Media Loader is the component that decides which playback technology to load
  * when the player is initialized.
  *
  * @constructor
  */
-vjs.MediaLoader = vjs.Component.extend({
+vjs.MediaLoader = Component.extend({
   /** @constructor */
   init: function(player, options, ready){
-    vjs.Component.call(this, player, options, ready);
+    var components = require('../components.js');
+
+    Component.call(this, player, options, ready);
 
     // If there are no sources when the player is initialized,
     // load the first supported playback technology.
     if (!player.options_['sources'] || player.options_['sources'].length === 0) {
       for (var i=0,j=player.options_['techOrder']; i<j.length; i++) {
-        var techName = vjs.capitalize(j[i]),
-            tech = window['videojs'][techName];
+        var techName = vjslib.capitalize(j[i]),
+            tech = components[techName];
 
         // Check if the browser supports this technology
         if (tech && tech.isSupported()) {
@@ -31,3 +37,5 @@ vjs.MediaLoader = vjs.Component.extend({
     }
   }
 });
+
+module.exports = vjs.MediaLoader;

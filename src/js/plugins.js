@@ -1,3 +1,5 @@
+var vjs = {};
+vjs.Player = require('./player.js');
 /**
  * the method for registering a video.js plugin
  *
@@ -7,3 +9,5 @@
 vjs.plugin = function(name, init){
   vjs.Player.prototype[name] = init;
 };
+
+module.exports = vjs.plugin;

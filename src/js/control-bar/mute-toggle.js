@@ -1,3 +1,7 @@
+var vjs = {};
+var Button = require('../button.js');
+var vjslib = require('../lib.js');
+
 /**
  * A button component for muting the audio
  *
@@ -5,18 +9,18 @@
  * @param {Object=} options
  * @constructor
  */
-vjs.MuteToggle = vjs.Button.extend({
+vjs.MuteToggle = Button.extend({
   /** @constructor */
   init: function(player, options){
-    vjs.Button.call(this, player, options);
+    Button.call(this, player, options);
 
-    player.on('volumechange', vjs.bind(this, this.update));
+    player.on('volumechange', vjslib.bind(this, this.update));
 
     // hide mute toggle if the current tech doesn't support volume control
     if (player.tech && player.tech.features && player.tech.features['volumeControl'] === false) {
       this.addClass('vjs-hidden');
     }
-    player.on('loadstart', vjs.bind(this, function(){
+    player.on('loadstart', vjslib.bind(this, function(){
       if (player.tech.features && player.tech.features['volumeControl'] === false) {
         this.addClass('vjs-hidden');
       } else {
@@ -27,7 +31,7 @@ vjs.MuteToggle = vjs.Button.extend({
 });
 
 vjs.MuteToggle.prototype.createEl = function(){
-  return vjs.Button.prototype.createEl.call(this, 'div', {
+  return Button.prototype.createEl.call(this, 'div', {
     className: 'vjs-mute-control vjs-control',
     innerHTML: '<div><span class="vjs-control-text">Mute</span></div>'
   });
@@ -64,7 +68,9 @@ vjs.MuteToggle.prototype.update = function(){
 
   /* TODO improve muted icon classes */
   for (var i = 0; i < 4; i++) {
-    vjs.removeClass(this.el_, 'vjs-vol-'+i);
+    vjslib.removeClass(this.el_, 'vjs-vol-'+i);
   }
-  vjs.addClass(this.el_, 'vjs-vol-'+level);
+  vjslib.addClass(this.el_, 'vjs-vol-'+level);
 };
+
+module.exports = vjs.MuteToggle;

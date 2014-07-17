@@ -1,3 +1,6 @@
+var vjs = {};
+var vjslib = require('./lib.js');
+
 /**
  * @fileoverview Event System (John Resig - Secrets of a JS Ninja http://jsninja.com/)
  * (Original book version wasn't completely usable, so fixed some things and made Closure Compiler compatible)
@@ -16,18 +19,18 @@
  * @private
  */
 vjs.on = function(elem, type, fn){
-  if (vjs.obj.isArray(type)) {
+  if (vjslib.obj.isArray(type)) {
     return _handleMultipleEvents(vjs.on, elem, type, fn);
   }
 
-  var data = vjs.getData(elem);
+  var data = vjslib.getData(elem);
 
   // We need a place to store all our handler data
   if (!data.handlers) data.handlers = {};
 
   if (!data.handlers[type]) data.handlers[type] = [];
 
-  if (!fn.guid) fn.guid = vjs.guid++;
+  if (!fn.guid) fn.guid = vjslib.guid++;
 
   data.handlers[type].push(fn);
 
@@ -74,14 +77,14 @@ vjs.on = function(elem, type, fn){
  */
 vjs.off = function(elem, type, fn) {
   // Don't want to add a cache object through getData if not needed
-  if (!vjs.hasData(elem)) return;
+  if (!vjslib.hasData(elem)) return;
 
-  var data = vjs.getData(elem);
+  var data = vjslib.getData(elem);
 
   // If no events exist, nothing to unbind
   if (!data.handlers) { return; }
 
-  if (vjs.obj.isArray(type)) {
+  if (vjslib.obj.isArray(type)) {
     return _handleMultipleEvents(vjs.off, elem, type, fn);
   }
 
@@ -127,7 +130,7 @@ vjs.off = function(elem, type, fn) {
  * @private
  */
 vjs.cleanUpEvents = function(elem, type) {
-  var data = vjs.getData(elem);
+  var data = vjslib.getData(elem);
 
   // Remove the events of a particular type if there are none left
   if (data.handlers[type].length === 0) {
@@ -144,7 +147,7 @@ vjs.cleanUpEvents = function(elem, type) {
   }
 
   // Remove the events object if there are no types left
-  if (vjs.isEmpty(data.handlers)) {
+  if (vjslib.isEmpty(data.handlers)) {
     delete data.handlers;
     delete data.dispatcher;
     delete data.disabled;
@@ -155,8 +158,8 @@ vjs.cleanUpEvents = function(elem, type) {
   }
 
   // Finally remove the expando if there is no data left
-  if (vjs.isEmpty(data)) {
-    vjs.removeData(elem);
+  if (vjslib.isEmpty(data)) {
+    vjslib.removeData(elem);
   }
 };
 
@@ -280,7 +283,7 @@ vjs.trigger = function(elem, event) {
   // Fetches element data and a reference to the parent (for bubbling).
   // Don't want to add a data object to cache for every parent,
   // so checking hasData first.
-  var elemData = (vjs.hasData(elem)) ? vjs.getData(elem) : {};
+  var elemData = (vjslib.hasData(elem)) ? vjslib.getData(elem) : {};
   var parent = elem.parentNode || elem.ownerDocument;
       // type = event.type || event,
       // handler;
@@ -304,7 +307,7 @@ vjs.trigger = function(elem, event) {
 
   // If at the top of the DOM, triggers the default action unless disabled.
   } else if (!parent && !event.defaultPrevented) {
-    var targetData = vjs.getData(event.target);
+    var targetData = vjslib.getData(event.target);
 
     // Checks if the target has a default action for this event.
     if (event.target[event.type]) {
@@ -350,7 +353,7 @@ vjs.trigger = function(elem, event) {
  * @private
  */
 vjs.one = function(elem, type, fn) {
-  if (vjs.obj.isArray(type)) {
+  if (vjslib.obj.isArray(type)) {
     return _handleMultipleEvents(vjs.one, elem, type, fn);
   }
   var func = function(){
@@ -358,7 +361,7 @@ vjs.one = function(elem, type, fn) {
     fn.apply(this, arguments);
   };
   // copy the guid to the new function so it can removed using the original function's ID
-  func.guid = fn.guid = fn.guid || vjs.guid++;
+  func.guid = fn.guid = fn.guid || vjslib.guid++;
   vjs.on(elem, type, func);
 };
 
@@ -371,7 +374,9 @@ vjs.one = function(elem, type, fn) {
  * @private
  */
 function _handleMultipleEvents(fn, elem, type, callback) {
-  vjs.arr.forEach(type, function(type) {
+  vjslib.arr.forEach(type, function(type) {
     fn(elem, type, callback); //Call the event method for each one of the types
   });
 }
+
+module.exports = vjs;

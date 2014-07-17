@@ -1,3 +1,4 @@
+var vjs = {};
 var hasOwnProp = Object.prototype.hasOwnProperty;
 
 /**
@@ -342,7 +343,7 @@ vjs.TEST_VID = vjs.createEl('video');
  * @constant
  * @private
  */
-vjs.USER_AGENT = navigator.userAgent;
+vjs.USER_AGENT = navigator.userAgent || '';
 
 /**
  * Device is an iPhone
@@ -868,3 +869,5 @@ vjs.arr.forEach = function(array, callback, thisArg) {
 
   return array;
 };
+
+module.exports = vjs;

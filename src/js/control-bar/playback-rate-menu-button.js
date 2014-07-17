@@ -1,3 +1,8 @@
+var vjs = {};
+var vjsmenu = require('../menu.js');
+var vjslib = require('../lib.js');
+var Component = require('../component.js');
+
 /**
  * The component for controlling the playback rate
  *
@@ -5,26 +10,26 @@
  * @param {Object=} options
  * @constructor
  */
-vjs.PlaybackRateMenuButton = vjs.MenuButton.extend({
+vjs.PlaybackRateMenuButton = vjsmenu.MenuButton.extend({
   /** @constructor */
   init: function(player, options){
-    vjs.MenuButton.call(this, player, options);
+    vjsmenu.MenuButton.call(this, player, options);
 
     this.updateVisibility();
     this.updateLabel();
 
-    player.on('loadstart', vjs.bind(this, this.updateVisibility));
-    player.on('ratechange', vjs.bind(this, this.updateLabel));
+    player.on('loadstart', vjslib.bind(this, this.updateVisibility));
+    player.on('ratechange', vjslib.bind(this, this.updateLabel));
   }
 });
 
 vjs.PlaybackRateMenuButton.prototype.createEl = function(){
-  var el = vjs.Component.prototype.createEl.call(this, 'div', {
+  var el = Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-playback-rate vjs-menu-button vjs-control',
     innerHTML: '<div class="vjs-control-content"><span class="vjs-control-text">Playback Rate</span></div>'
   });
 
-  this.labelEl_ = vjs.createEl('div', {
+  this.labelEl_ = vjslib.createEl('div', {
     className: 'vjs-playback-rate-value',
     innerHTML: 1.0
   });
@@ -36,7 +41,7 @@ vjs.PlaybackRateMenuButton.prototype.createEl = function(){
 
 // Menu creation
 vjs.PlaybackRateMenuButton.prototype.createMenu = function(){
-  var menu = new vjs.Menu(this.player());
+  var menu = new vjsmenu.Menu(this.player());
   var rates = this.player().options()['playbackRates'];
 
   if (rates) {
@@ -103,7 +108,7 @@ vjs.PlaybackRateMenuButton.prototype.updateLabel = function(){
  *
  * @constructor
  */
-vjs.PlaybackRateMenuItem = vjs.MenuItem.extend({
+vjs.PlaybackRateMenuItem = vjsmenu.MenuItem.extend({
   contentElType: 'button',
   /** @constructor */
   init: function(player, options){
@@ -113,17 +118,19 @@ vjs.PlaybackRateMenuItem = vjs.MenuItem.extend({
     // Modify options for parent MenuItem class's init.
     options['label'] = label;
     options['selected'] = rate === 1;
-    vjs.MenuItem.call(this, player, options);
+    vjsmenu.MenuItem.call(this, player, options);
 
-    this.player().on('ratechange', vjs.bind(this, this.update));
+    this.player().on('ratechange', vjslib.bind(this, this.update));
   }
 });
 
 vjs.PlaybackRateMenuItem.prototype.onClick = function(){
-  vjs.MenuItem.prototype.onClick.call(this);
+  vjsmenu.MenuItem.prototype.onClick.call(this);
   this.player().playbackRate(this.rate);
 };
 
 vjs.PlaybackRateMenuItem.prototype.update = function(){
   this.selected(this.player().playbackRate() == this.rate);
 };
+
+module.exports = vjs.PlaybackRateMenuButton;

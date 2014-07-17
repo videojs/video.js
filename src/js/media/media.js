@@ -1,3 +1,7 @@
+var vjs = {};
+var Component = require('../component.js');
+var vjslib = require('../lib.js');
+
 /**
  * @fileoverview Media Technology Controller - Base class for media playback
  * technology controllers like Flash and HTML5
@@ -9,14 +13,14 @@
  * @param {Object=} options Options object
  * @constructor
  */
-vjs.MediaTechController = vjs.Component.extend({
+vjs.MediaTechController = Component.extend({
   /** @constructor */
   init: function(player, options, ready){
     options = options || {};
     // we don't want the tech to report user activity automatically.
     // This is done manually in addControlsListeners
     options.reportTouchActivity = false;
-    vjs.Component.call(this, player, options, ready);
+    Component.call(this, player, options, ready);
 
     this.initControlsListeners();
   }
@@ -54,7 +58,7 @@ vjs.MediaTechController.prototype.initControlsListeners = function(){
     }
   };
 
-  deactivateControls = vjs.bind(tech, tech.removeControlsListeners);
+  deactivateControls = vjslib.bind(tech, tech.removeControlsListeners);
 
   // Set up event listeners once the tech is ready and has an element to apply
   // listeners to
@@ -172,3 +176,5 @@ vjs.MediaTechController.prototype.features = {
 };
 
 vjs.media = {};
+
+module.exports = vjs.MediaTechController;

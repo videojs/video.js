@@ -1,3 +1,6 @@
+var vjs = {};
+var vjslib = require('./lib.js');
+
 /**
  * Core Object/Class for objects that use inheritance + contstructors
  *
@@ -89,7 +92,7 @@ vjs.CoreObject.extend = function(props){
   };
 
   // Inherit from this object's prototype
-  subObj.prototype = vjs.obj.create(this.prototype);
+  subObj.prototype = vjslib.obj.create(this.prototype);
   // Reset the constructor property for subObj otherwise
   // instances of subObj would have the constructor of the parent Object
   subObj.prototype.constructor = subObj;
@@ -119,7 +122,7 @@ vjs.CoreObject.extend = function(props){
  */
 vjs.CoreObject.create = function(){
   // Create a new object that inherits from this object's prototype
-  var inst = vjs.obj.create(this.prototype);
+  var inst = vjslib.obj.create(this.prototype);
 
   // Apply this constructor function to the new object
   this.apply(inst, arguments);
@@ -127,3 +130,5 @@ vjs.CoreObject.create = function(){
   // Return the new object
   return inst;
 };
+
+module.exports = vjs.CoreObject;

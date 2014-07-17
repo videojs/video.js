@@ -1,3 +1,9 @@
+var vjs = {};
+var CoreObject = require('./core-object.js');
+var vjslib = require('./lib.js');
+var vjsutil = require('./util.js')
+var vjsevents = require('./events.js');
+
 /**
  * @fileoverview Player Component - Base class for all UI objects
  *
@@ -32,7 +38,7 @@
  * @constructor
  * @extends vjs.CoreObject
  */
-vjs.Component = vjs.CoreObject.extend({
+vjs.Component = CoreObject.extend({
   /**
    * the constructor function for the class
    *
@@ -42,13 +48,13 @@ vjs.Component = vjs.CoreObject.extend({
     this.player_ = player;
 
     // Make a copy of prototype.options_ to protect against overriding global defaults
-    this.options_ = vjs.obj.copy(this.options_);
+    this.options_ = vjslib.obj.copy(this.options_);
 
     // Updated options with supplied options
     options = this.options(options);
 
     // Get ID from options, element, or create using player ID and unique ID
-    this.id_ = options['id'] || ((options['el'] && options['el']['id']) ? options['el']['id'] : player.id() + '_component_' + vjs.guid++ );
+    this.id_ = options['id'] || ((options['el'] && options['el']['id']) ? options['el']['id'] : player.id() + '_component_' + vjslib.guid++ );
 
     this.name_ = options['name'] || null;
 
@@ -100,7 +106,7 @@ vjs.Component.prototype.dispose = function(){
     this.el_.parentNode.removeChild(this.el_);
   }
 
-  vjs.removeData(this.el_);
+  vjslib.removeData(this.el_);
   this.el_ = null;
 };
 
@@ -173,7 +179,7 @@ vjs.Component.prototype.options_;
 vjs.Component.prototype.options = function(obj){
   if (obj === undefined) return this.options_;
 
-  return this.options_ = vjs.util.mergeOptions(this.options_, obj);
+  return this.options_ = vjsutil.mergeOptions(this.options_, obj);
 };
 
 /**
@@ -192,7 +198,7 @@ vjs.Component.prototype.el_;
  * @return {Element}
  */
 vjs.Component.prototype.createEl = function(tagName, attributes){
-  return vjs.createEl(tagName, attributes);
+  return vjslib.createEl(tagName, attributes);
 };
 
 /**
@@ -347,6 +353,8 @@ vjs.Component.prototype.getChild = function(name){
 vjs.Component.prototype.addChild = function(child, options){
   var component, componentClass, componentName, componentId;
 
+  components = require('./components.js');
+
   // If string, create new component with options
   if (typeof child === 'string') {
 
@@ -356,7 +364,7 @@ vjs.Component.prototype.addChild = function(child, options){
     options = options || {};
 
     // Assume name of set is a lowercased name of the UI Class (PlayButton, etc.)
-    componentClass = options['componentClass'] || vjs.capitalize(componentName);
+    componentClass = options['componentClass'] || vjslib.capitalize(componentName);
 
     // Set name through options
     options['name'] = componentName;
@@ -365,7 +373,7 @@ vjs.Component.prototype.addChild = function(child, options){
     // If there's no .player_, this is a player
     // Closure Compiler throws an 'incomplete alias' warning if we use the vjs variable directly.
     // Every class should be exported, so this should never be a problem here.
-    component = new window['videojs'][componentClass](this.player_ || this, options);
+    component = new components[componentClass](this.player_ || this, options);
 
   // child is a component instance
   } else {
@@ -471,7 +479,7 @@ vjs.Component.prototype.initChildren = function(){
 
   if (children) {
     // Allow for an array of children details to passed in the options
-    if (vjs.obj.isArray(children)) {
+    if (vjslib.obj.isArray(children)) {
       for (var i = 0; i < children.length; i++) {
         child = children[i];
 
@@ -486,7 +494,7 @@ vjs.Component.prototype.initChildren = function(){
         parent[name] = parent.addChild(name, opts);
       }
     } else {
-      vjs.obj.each(children, function(name, opts){
+      vjslib.obj.each(children, function(name, opts){
         // Allow for disabling default components
         // e.g. vjs.options['children']['posterImage'] = false
         if (opts === false) return;
@@ -529,7 +537,7 @@ vjs.Component.prototype.buildCSSClass = function(){
  * @return {vjs.Component} self
  */
 vjs.Component.prototype.on = function(type, fn){
-  vjs.on(this.el_, type, vjs.bind(this, fn));
+  vjsevents.on(this.el_, type, vjslib.bind(this, fn));
   return this;
 };
 
@@ -543,7 +551,7 @@ vjs.Component.prototype.on = function(type, fn){
  * @return {vjs.Component}
  */
 vjs.Component.prototype.off = function(type, fn){
-  vjs.off(this.el_, type, fn);
+  vjsevents.off(this.el_, type, fn);
   return this;
 };
 
@@ -555,7 +563,7 @@ vjs.Component.prototype.off = function(type, fn){
  * @return {vjs.Component}
  */
 vjs.Component.prototype.one = function(type, fn) {
-  vjs.one(this.el_, type, vjs.bind(this, fn));
+  vjsevents.one(this.el_, type, vjslib.bind(this, fn));
   return this;
 };
 
@@ -569,7 +577,7 @@ vjs.Component.prototype.one = function(type, fn) {
  * @return {vjs.Component}      self
  */
 vjs.Component.prototype.trigger = function(type, event){
-  vjs.trigger(this.el_, type, event);
+  vjsevents.trigger(this.el_, type, event);
   return this;
 };
 
@@ -661,7 +669,7 @@ vjs.Component.prototype.triggerReady = function(){
  * @return {vjs.Component}
  */
 vjs.Component.prototype.addClass = function(classToAdd){
-  vjs.addClass(this.el_, classToAdd);
+  vjslib.addClass(this.el_, classToAdd);
   return this;
 };
 
@@ -672,7 +680,7 @@ vjs.Component.prototype.addClass = function(classToAdd){
  * @return {vjs.Component}
  */
 vjs.Component.prototype.removeClass = function(classToRemove){
-  vjs.removeClass(this.el_, classToRemove);
+  vjslib.removeClass(this.el_, classToRemove);
   return this;
 };
 
@@ -830,7 +838,7 @@ vjs.Component.prototype.dimension = function(widthOrHeight, num, skipListeners){
   // TODO: handle display:none and no dimension style using px
   } else {
 
-    return parseInt(this.el_['offset'+vjs.capitalize(widthOrHeight)], 10);
+    return parseInt(this.el_['offset'+vjslib.capitalize(widthOrHeight)], 10);
 
     // ComputedStyle version.
     // Only difference is if the element is hidden it will return
@@ -955,7 +963,7 @@ vjs.Component.prototype.enableTouchActivity = function() {
   var report, touchHolding, touchEnd;
 
   // listener for reporting that the user is active
-  report = vjs.bind(this.player(), this.player().reportUserActivity);
+  report = vjslib.bind(this.player(), this.player().reportUserActivity);
 
   this.on('touchstart', function() {
     report();
@@ -978,3 +986,4 @@ vjs.Component.prototype.enableTouchActivity = function() {
   this.on('touchcancel', touchEnd);
 };
 
+module.exports = vjs.Component;

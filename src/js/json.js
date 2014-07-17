@@ -1,3 +1,5 @@
+var vjs = {};
+
 /**
  * @fileoverview Add JSON support
  * @suppress {undefinedVars}
@@ -73,3 +75,5 @@ if (typeof window.JSON !== 'undefined' && window.JSON.parse === 'function') {
       throw new SyntaxError('JSON.parse(): invalid or malformed JSON data');
   };
 }
+
+module.exports = vjs.JSON;

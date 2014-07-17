@@ -1,3 +1,8 @@
+var vjs = {};
+var Component = require('./component.js');
+var vjslib = require('./lib.js');
+var vjsevents = require('./events.js');
+
 /* Slider
 ================================================================================ */
 /**
@@ -7,10 +12,10 @@
  * @param {Object=} options
  * @constructor
  */
-vjs.Slider = vjs.Component.extend({
+vjs.Slider = Component.extend({
   /** @constructor */
   init: function(player, options){
-    vjs.Component.call(this, player, options);
+    Component.call(this, player, options);
 
     // Set property names to bar and handle to match with the child Slider class is looking for
     this.bar = this.getChild(this.options_['barName']);
@@ -22,9 +27,9 @@ vjs.Slider = vjs.Component.extend({
     this.on('blur', this.onBlur);
     this.on('click', this.onClick);
 
-    this.player_.on('controlsvisible', vjs.bind(this, this.update));
+    this.player_.on('controlsvisible', vjslib.bind(this, this.update));
 
-    player.on(this.playerEvent, vjs.bind(this, this.update));
+    player.on(this.playerEvent, vjslib.bind(this, this.update));
 
     this.boundEvents = {};
   }
@@ -34,7 +39,7 @@ vjs.Slider.prototype.createEl = function(type, props) {
   props = props || {};
   // Add the slider element class to all sub classes
   props.className = props.className + ' vjs-slider';
-  props = vjs.obj.merge({
+  props = vjslib.obj.merge({
     'role': 'slider',
     'aria-valuenow': 0,
     'aria-valuemin': 0,
@@ -42,30 +47,30 @@ vjs.Slider.prototype.createEl = function(type, props) {
     tabIndex: 0
   }, props);
 
-  return vjs.Component.prototype.createEl.call(this, type, props);
+  return Component.prototype.createEl.call(this, type, props);
 };
 
 vjs.Slider.prototype.onMouseDown = function(event){
   event.preventDefault();
-  vjs.blockTextSelection();
+  vjslib.blockTextSelection();
 
-  this.boundEvents.move = vjs.bind(this, this.onMouseMove);
-  this.boundEvents.end = vjs.bind(this, this.onMouseUp);
+  this.boundEvents.move = vjslib.bind(this, this.onMouseMove);
+  this.boundEvents.end = vjslib.bind(this, this.onMouseUp);
 
-  vjs.on(document, 'mousemove', this.boundEvents.move);
-  vjs.on(document, 'mouseup', this.boundEvents.end);
-  vjs.on(document, 'touchmove', this.boundEvents.move);
-  vjs.on(document, 'touchend', this.boundEvents.end);
+  vjsevents.on(document, 'mousemove', this.boundEvents.move);
+  vjsevents.on(document, 'mouseup', this.boundEvents.end);
+  vjsevents.on(document, 'touchmove', this.boundEvents.move);
+  vjsevents.on(document, 'touchend', this.boundEvents.end);
 
   this.onMouseMove(event);
 };
 
 vjs.Slider.prototype.onMouseUp = function() {
-  vjs.unblockTextSelection();
-  vjs.off(document, 'mousemove', this.boundEvents.move, false);
-  vjs.off(document, 'mouseup', this.boundEvents.end, false);
-  vjs.off(document, 'touchmove', this.boundEvents.move, false);
-  vjs.off(document, 'touchend', this.boundEvents.end, false);
+  vjslib.unblockTextSelection();
+  vjsevents.off(document, 'mousemove', this.boundEvents.move, false);
+  vjsevents.off(document, 'mouseup', this.boundEvents.end, false);
+  vjsevents.off(document, 'touchmove', this.boundEvents.move, false);
+  vjsevents.off(document, 'touchend', this.boundEvents.end, false);
 
   this.update();
 };
@@ -113,18 +118,18 @@ vjs.Slider.prototype.update = function(){
     barProgress = adjustedProgress + (handlePercent / 2);
 
     // Move the handle from the left based on the adjected progress
-    handle.el().style.left = vjs.round(adjustedProgress * 100, 2) + '%';
+    handle.el().style.left = vjslib.round(adjustedProgress * 100, 2) + '%';
   }
 
   // Set the new bar width
-  bar.el().style.width = vjs.round(barProgress * 100, 2) + '%';
+  bar.el().style.width = vjslib.round(barProgress * 100, 2) + '%';
 };
 
 vjs.Slider.prototype.calculateDistance = function(event){
   var el, box, boxX, boxY, boxW, boxH, handle, pageX, pageY;
 
   el = this.el_;
-  box = vjs.findPosition(el);
+  box = vjslib.findPosition(el);
   boxW = boxH = el.offsetWidth;
   handle = this.handle;
 
@@ -170,7 +175,7 @@ vjs.Slider.prototype.calculateDistance = function(event){
 };
 
 vjs.Slider.prototype.onFocus = function(){
-  vjs.on(document, 'keyup', vjs.bind(this, this.onKeyPress));
+  vjsevents.on(document, 'keyup', vjslib.bind(this, this.onKeyPress));
 };
 
 vjs.Slider.prototype.onKeyPress = function(event){
@@ -184,7 +189,7 @@ vjs.Slider.prototype.onKeyPress = function(event){
 };
 
 vjs.Slider.prototype.onBlur = function(){
-  vjs.off(document, 'keyup', vjs.bind(this, this.onKeyPress));
+  vjsevents.off(document, 'keyup', vjslib.bind(this, this.onKeyPress));
 };
 
 /**
@@ -204,7 +209,7 @@ vjs.Slider.prototype.onClick = function(event){
  * @param {Object=} options
  * @constructor
  */
-vjs.SliderHandle = vjs.Component.extend();
+vjs.SliderHandle = Component.extend();
 
 /**
  * Default value of the slider
@@ -219,9 +224,11 @@ vjs.SliderHandle.prototype.createEl = function(type, props) {
   props = props || {};
   // Add the slider element class to all sub classes
   props.className = props.className + ' vjs-slider-handle';
-  props = vjs.obj.merge({
+  props = vjslib.obj.merge({
     innerHTML: '<span class="vjs-control-text">'+this.defaultValue+'</span>'
   }, props);
 
-  return vjs.Component.prototype.createEl.call(this, 'div', props);
+  return Component.prototype.createEl.call(this, 'div', props);
 };
+
+module.exports = vjs;
