@@ -1,6 +1,7 @@
-var vjs = {};
-var Component = require('../component.js');
-var vjslib = require('../lib.js');
+var CurrentTimeDisplay, DurationDisplay, TimeDivider, RemainingTimeDisplay, Component, vjslib;
+
+Component = require('../component.js');
+vjslib = require('../lib.js');
 
 /**
  * Displays the current time
@@ -8,7 +9,7 @@ var vjslib = require('../lib.js');
  * @param {Object=} options
  * @constructor
  */
-vjs.CurrentTimeDisplay = Component.extend({
+CurrentTimeDisplay = Component.extend({
   /** @constructor */
   init: function(player, options){
     Component.call(this, player, options);
@@ -17,7 +18,7 @@ vjs.CurrentTimeDisplay = Component.extend({
   }
 });
 
-vjs.CurrentTimeDisplay.prototype.createEl = function(){
+CurrentTimeDisplay.prototype.createEl = function(){
   var el = Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-current-time vjs-time-controls vjs-control'
   });
@@ -32,7 +33,7 @@ vjs.CurrentTimeDisplay.prototype.createEl = function(){
   return el;
 };
 
-vjs.CurrentTimeDisplay.prototype.updateContent = function(){
+CurrentTimeDisplay.prototype.updateContent = function(){
   // Allows for smooth scrubbing, when player can't keep up.
   var time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
   this.contentEl_.innerHTML = '<span class="vjs-control-text">Current Time </span>' + vjslib.formatTime(time, this.player_.duration());
@@ -44,7 +45,7 @@ vjs.CurrentTimeDisplay.prototype.updateContent = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.DurationDisplay = Component.extend({
+DurationDisplay = Component.extend({
   /** @constructor */
   init: function(player, options){
     Component.call(this, player, options);
@@ -58,7 +59,7 @@ vjs.DurationDisplay = Component.extend({
   }
 });
 
-vjs.DurationDisplay.prototype.createEl = function(){
+DurationDisplay.prototype.createEl = function(){
   var el = Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-duration vjs-time-controls vjs-control'
   });
@@ -73,7 +74,7 @@ vjs.DurationDisplay.prototype.createEl = function(){
   return el;
 };
 
-vjs.DurationDisplay.prototype.updateContent = function(){
+DurationDisplay.prototype.updateContent = function(){
   var duration = this.player_.duration();
   if (duration) {
       this.contentEl_.innerHTML = '<span class="vjs-control-text">Duration Time </span>' + vjslib.formatTime(duration); // label the duration time for screen reader users
@@ -89,14 +90,14 @@ vjs.DurationDisplay.prototype.updateContent = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.TimeDivider = Component.extend({
+TimeDivider = Component.extend({
   /** @constructor */
   init: function(player, options){
     Component.call(this, player, options);
   }
 });
 
-vjs.TimeDivider.prototype.createEl = function(){
+TimeDivider.prototype.createEl = function(){
   return Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-time-divider',
     innerHTML: '<div><span>/</span></div>'
@@ -109,7 +110,7 @@ vjs.TimeDivider.prototype.createEl = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.RemainingTimeDisplay = Component.extend({
+RemainingTimeDisplay = Component.extend({
   /** @constructor */
   init: function(player, options){
     Component.call(this, player, options);
@@ -118,7 +119,7 @@ vjs.RemainingTimeDisplay = Component.extend({
   }
 });
 
-vjs.RemainingTimeDisplay.prototype.createEl = function(){
+RemainingTimeDisplay.prototype.createEl = function(){
   var el = Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-remaining-time vjs-time-controls vjs-control'
   });
@@ -133,7 +134,7 @@ vjs.RemainingTimeDisplay.prototype.createEl = function(){
   return el;
 };
 
-vjs.RemainingTimeDisplay.prototype.updateContent = function(){
+RemainingTimeDisplay.prototype.updateContent = function(){
   if (this.player_.duration()) {
     this.contentEl_.innerHTML = '<span class="vjs-control-text">Remaining Time </span>' + '-'+ vjslib.formatTime(this.player_.remainingTime());
   }
@@ -143,4 +144,9 @@ vjs.RemainingTimeDisplay.prototype.updateContent = function(){
   // this.contentEl_.innerHTML = vjs.formatTime(time, this.player_.duration());
 };
 
-module.exports = vjs;
+module.exports = {
+  CurrentTimeDisplay: CurrentTimeDisplay,
+  DurationDisplay: DurationDisplay,
+  TimeDivider: TimeDivider,
+  RemainingTimeDisplay: RemainingTimeDisplay
+};

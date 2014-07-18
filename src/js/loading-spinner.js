@@ -1,6 +1,7 @@
-var vjs = {};
-var Component = require('./component.js');
-var vjslib = require('./lib.js');
+var LoadingSpinner, Component, vjslib;
+
+Component = require('./component.js');
+vjslib = require('./lib.js');
 
 /* Loading Spinner
 ================================================================================ */
@@ -11,7 +12,7 @@ var vjslib = require('./lib.js');
  * @class
  * @constructor
  */
-vjs.LoadingSpinner = Component.extend({
+LoadingSpinner = Component.extend({
   /** @constructor */
   init: function(player, options){
     Component.call(this, player, options);
@@ -36,10 +37,10 @@ vjs.LoadingSpinner = Component.extend({
   }
 });
 
-vjs.LoadingSpinner.prototype.createEl = function(){
+LoadingSpinner.prototype.createEl = function(){
   return Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-loading-spinner'
   });
 };
 
-module.exports = vjs.LoadingSpinner;
+module.exports = LoadingSpinner;

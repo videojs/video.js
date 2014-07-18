@@ -1,6 +1,7 @@
-var vjs = {};
-var Button = require('../button.js');
-var vjslib = require('../lib.js');
+var MuteToggle, Button, vjslib;
+
+Button = require('../button.js');
+vjslib = require('../lib.js');
 
 /**
  * A button component for muting the audio
@@ -9,7 +10,7 @@ var vjslib = require('../lib.js');
  * @param {Object=} options
  * @constructor
  */
-vjs.MuteToggle = Button.extend({
+MuteToggle = Button.extend({
   /** @constructor */
   init: function(player, options){
     Button.call(this, player, options);
@@ -30,18 +31,18 @@ vjs.MuteToggle = Button.extend({
   }
 });
 
-vjs.MuteToggle.prototype.createEl = function(){
+MuteToggle.prototype.createEl = function(){
   return Button.prototype.createEl.call(this, 'div', {
     className: 'vjs-mute-control vjs-control',
     innerHTML: '<div><span class="vjs-control-text">Mute</span></div>'
   });
 };
 
-vjs.MuteToggle.prototype.onClick = function(){
+MuteToggle.prototype.onClick = function(){
   this.player_.muted( this.player_.muted() ? false : true );
 };
 
-vjs.MuteToggle.prototype.update = function(){
+MuteToggle.prototype.update = function(){
   var vol = this.player_.volume(),
       level = 3;
 
@@ -73,4 +74,4 @@ vjs.MuteToggle.prototype.update = function(){
   vjslib.addClass(this.el_, 'vjs-vol-'+level);
 };
 
-module.exports = vjs.MuteToggle;
+module.exports = MuteToggle;

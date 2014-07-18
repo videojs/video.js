@@ -1,7 +1,8 @@
-var vjs = {};
-var Component = require('../component.js');
-var vjslib = require('../lib.js');
-var slider = require('../slider.js');
+var VolumeControl, VolumeBar, VolumeLevel, VolumeLevel, VolumeHandle, Component, vjslib, slider;
+
+Component = require('../component.js');
+vjslib = require('../lib.js');
+slider = require('../slider.js');
 
 /**
  * The component for controlling the volume level
@@ -10,7 +11,7 @@ var slider = require('../slider.js');
  * @param {Object=} options
  * @constructor
  */
-vjs.VolumeControl = Component.extend({
+VolumeControl = Component.extend({
   /** @constructor */
   init: function(player, options){
     Component.call(this, player, options);
@@ -29,13 +30,13 @@ vjs.VolumeControl = Component.extend({
   }
 });
 
-vjs.VolumeControl.prototype.options_ = {
+VolumeControl.prototype.options_ = {
   children: {
     'volumeBar': {}
   }
 };
 
-vjs.VolumeControl.prototype.createEl = function(){
+VolumeControl.prototype.createEl = function(){
   return Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-volume-control vjs-control'
   });
@@ -48,7 +49,7 @@ vjs.VolumeControl.prototype.createEl = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.VolumeBar = slider.Slider.extend({
+VolumeBar = slider.Slider.extend({
   /** @constructor */
   init: function(player, options){
     slider.Slider.call(this, player, options);
@@ -57,13 +58,13 @@ vjs.VolumeBar = slider.Slider.extend({
   }
 });
 
-vjs.VolumeBar.prototype.updateARIAAttributes = function(){
+VolumeBar.prototype.updateARIAAttributes = function(){
   // Current value of volume bar as a percentage
   this.el_.setAttribute('aria-valuenow',vjslib.round(this.player_.volume()*100, 2));
   this.el_.setAttribute('aria-valuetext',vjslib.round(this.player_.volume()*100, 2)+'%');
 };
 
-vjs.VolumeBar.prototype.options_ = {
+VolumeBar.prototype.options_ = {
   children: {
     'volumeLevel': {},
     'volumeHandle': {}
@@ -72,16 +73,16 @@ vjs.VolumeBar.prototype.options_ = {
   'handleName': 'volumeHandle'
 };
 
-vjs.VolumeBar.prototype.playerEvent = 'volumechange';
+VolumeBar.prototype.playerEvent = 'volumechange';
 
-vjs.VolumeBar.prototype.createEl = function(){
+VolumeBar.prototype.createEl = function(){
   return slider.Slider.prototype.createEl.call(this, 'div', {
     className: 'vjs-volume-bar',
     'aria-label': 'volume level'
   });
 };
 
-vjs.VolumeBar.prototype.onMouseMove = function(event) {
+VolumeBar.prototype.onMouseMove = function(event) {
   if (this.player_.muted()) {
     this.player_.muted(false);
   }
@@ -89,7 +90,7 @@ vjs.VolumeBar.prototype.onMouseMove = function(event) {
   this.player_.volume(this.calculateDistance(event));
 };
 
-vjs.VolumeBar.prototype.getPercent = function(){
+VolumeBar.prototype.getPercent = function(){
   if (this.player_.muted()) {
     return 0;
   } else {
@@ -97,11 +98,11 @@ vjs.VolumeBar.prototype.getPercent = function(){
   }
 };
 
-vjs.VolumeBar.prototype.stepForward = function(){
+VolumeBar.prototype.stepForward = function(){
   this.player_.volume(this.player_.volume() + 0.1);
 };
 
-vjs.VolumeBar.prototype.stepBack = function(){
+VolumeBar.prototype.stepBack = function(){
   this.player_.volume(this.player_.volume() - 0.1);
 };
 
@@ -112,14 +113,14 @@ vjs.VolumeBar.prototype.stepBack = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.VolumeLevel = Component.extend({
+VolumeLevel = Component.extend({
   /** @constructor */
   init: function(player, options){
     Component.call(this, player, options);
   }
 });
 
-vjs.VolumeLevel.prototype.createEl = function(){
+VolumeLevel.prototype.createEl = function(){
   return Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-volume-level',
     innerHTML: '<span class="vjs-control-text"></span>'
@@ -133,15 +134,20 @@ vjs.VolumeLevel.prototype.createEl = function(){
  * @param {Object=} options
  * @constructor
  */
- vjs.VolumeHandle = slider.SliderHandle.extend();
+ VolumeHandle = slider.SliderHandle.extend();
 
- vjs.VolumeHandle.prototype.defaultValue = '00:00';
+ VolumeHandle.prototype.defaultValue = '00:00';
 
  /** @inheritDoc */
- vjs.VolumeHandle.prototype.createEl = function(){
+ VolumeHandle.prototype.createEl = function(){
    return slider.SliderHandle.prototype.createEl.call(this, 'div', {
      className: 'vjs-volume-handle'
    });
  };
 
-module.exports = vjs;
+module.exports = {
+  VolumeControl: VolumeControl,
+  VolumeBar: VolumeBar,
+  VolumeLevel: VolumeLevel,
+  VolumeHandle: VolumeHandle
+};

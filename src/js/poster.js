@@ -1,6 +1,7 @@
-var vjs = {};
-var vjslib = require('./lib.js');
-var Button = require('./button.js');
+var PosterImage, Button, vjslib;
+
+Button = require('./button.js');
+vjslib = require('./lib.js');
 
 /* Poster Image
 ================================================================================ */
@@ -11,7 +12,7 @@ var Button = require('./button.js');
  * @param {Object=} options
  * @constructor
  */
-vjs.PosterImage = Button.extend({
+PosterImage = Button.extend({
   /** @constructor */
   init: function(player, options){
     Button.call(this, player, options);
@@ -35,7 +36,7 @@ vjs.PosterImage = Button.extend({
 // use the test el to check for backgroundSize style support
 var _backgroundSizeSupported = 'backgroundSize' in vjslib.TEST_VID.style;
 
-vjs.PosterImage.prototype.createEl = function(){
+PosterImage.prototype.createEl = function(){
   var el = vjslib.createEl('div', {
     className: 'vjs-poster',
 
@@ -51,7 +52,7 @@ vjs.PosterImage.prototype.createEl = function(){
   return el;
 };
 
-vjs.PosterImage.prototype.src = function(url){
+PosterImage.prototype.src = function(url){
   var el = this.el();
 
   // getter
@@ -74,11 +75,11 @@ vjs.PosterImage.prototype.src = function(url){
   }
 };
 
-vjs.PosterImage.prototype.onClick = function(){
+PosterImage.prototype.onClick = function(){
   // Only accept clicks when controls are enabled
   if (this.player().controls()) {
     this.player_.play();
   }
 };
 
-module.exports = vjs.PosterImage;
+module.exports = PosterImage;

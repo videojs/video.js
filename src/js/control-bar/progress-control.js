@@ -1,7 +1,8 @@
-var vjs = {};
-var Component = require('../component.js');
-var vjslib = require('../lib.js');
-var slider = require('../slider.js');
+var ProgressControl, SeekBar, LoadProgressBar, PlayProgressBar, SeekHandle, Component, vjslib, slider;
+
+Component = require('../component.js');
+vjslib = require('../lib.js');
+slider = require('../slider.js');
 
 /**
  * The Progress Control component contains the seek bar, load progress,
@@ -11,20 +12,20 @@ var slider = require('../slider.js');
  * @param {Object=} options
  * @constructor
  */
-vjs.ProgressControl = Component.extend({
+ProgressControl = Component.extend({
   /** @constructor */
   init: function(player, options){
     Component.call(this, player, options);
   }
 });
 
-vjs.ProgressControl.prototype.options_ = {
+ProgressControl.prototype.options_ = {
   children: {
     'seekBar': {}
   }
 };
 
-vjs.ProgressControl.prototype.createEl = function(){
+ProgressControl.prototype.createEl = function(){
   return Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-progress-control vjs-control'
   });
@@ -37,7 +38,7 @@ vjs.ProgressControl.prototype.createEl = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.SeekBar = slider.Slider.extend({
+SeekBar = slider.Slider.extend({
   /** @constructor */
   init: function(player, options){
     slider.Slider.call(this, player, options);
@@ -46,7 +47,7 @@ vjs.SeekBar = slider.Slider.extend({
   }
 });
 
-vjs.SeekBar.prototype.options_ = {
+SeekBar.prototype.options_ = {
   children: {
     'loadProgressBar': {},
     'playProgressBar': {},
@@ -56,27 +57,27 @@ vjs.SeekBar.prototype.options_ = {
   'handleName': 'seekHandle'
 };
 
-vjs.SeekBar.prototype.playerEvent = 'timeupdate';
+SeekBar.prototype.playerEvent = 'timeupdate';
 
-vjs.SeekBar.prototype.createEl = function(){
+SeekBar.prototype.createEl = function(){
   return slider.Slider.prototype.createEl.call(this, 'div', {
     className: 'vjs-progress-holder',
     'aria-label': 'video progress bar'
   });
 };
 
-vjs.SeekBar.prototype.updateARIAAttributes = function(){
+SeekBar.prototype.updateARIAAttributes = function(){
     // Allows for smooth scrubbing, when player can't keep up.
     var time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
     this.el_.setAttribute('aria-valuenow',vjslib.round(this.getPercent()*100, 2)); // machine readable value of progress bar (percentage complete)
     this.el_.setAttribute('aria-valuetext',vjslib.formatTime(time, this.player_.duration())); // human readable value of progress bar (time complete)
 };
 
-vjs.SeekBar.prototype.getPercent = function(){
+SeekBar.prototype.getPercent = function(){
   return this.player_.currentTime() / this.player_.duration();
 };
 
-vjs.SeekBar.prototype.onMouseDown = function(event){
+SeekBar.prototype.onMouseDown = function(event){
   slider.Slider.prototype.onMouseDown.call(this, event);
 
   this.player_.scrubbing = true;
@@ -85,7 +86,7 @@ vjs.SeekBar.prototype.onMouseDown = function(event){
   this.player_.pause();
 };
 
-vjs.SeekBar.prototype.onMouseMove = function(event){
+SeekBar.prototype.onMouseMove = function(event){
   var newTime = this.calculateDistance(event) * this.player_.duration();
 
   // Don't let video end while scrubbing.
@@ -95,7 +96,7 @@ vjs.SeekBar.prototype.onMouseMove = function(event){
   this.player_.currentTime(newTime);
 };
 
-vjs.SeekBar.prototype.onMouseUp = function(event){
+SeekBar.prototype.onMouseUp = function(event){
   slider.Slider.prototype.onMouseUp.call(this, event);
 
   this.player_.scrubbing = false;
@@ -104,11 +105,11 @@ vjs.SeekBar.prototype.onMouseUp = function(event){
   }
 };
 
-vjs.SeekBar.prototype.stepForward = function(){
+SeekBar.prototype.stepForward = function(){
   this.player_.currentTime(this.player_.currentTime() + 5); // more quickly fast forward for keyboard-only users
 };
 
-vjs.SeekBar.prototype.stepBack = function(){
+SeekBar.prototype.stepBack = function(){
   this.player_.currentTime(this.player_.currentTime() - 5); // more quickly rewind for keyboard-only users
 };
 
@@ -120,7 +121,7 @@ vjs.SeekBar.prototype.stepBack = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.LoadProgressBar = Component.extend({
+LoadProgressBar = Component.extend({
   /** @constructor */
   init: function(player, options){
     Component.call(this, player, options);
@@ -128,14 +129,14 @@ vjs.LoadProgressBar = Component.extend({
   }
 });
 
-vjs.LoadProgressBar.prototype.createEl = function(){
+LoadProgressBar.prototype.createEl = function(){
   return Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-load-progress',
     innerHTML: '<span class="vjs-control-text">Loaded: 0%</span>'
   });
 };
 
-vjs.LoadProgressBar.prototype.update = function(){
+LoadProgressBar.prototype.update = function(){
   if (this.el_.style) { this.el_.style.width = vjslib.round(this.player_.bufferedPercent() * 100, 2) + '%'; }
 };
 
@@ -147,14 +148,14 @@ vjs.LoadProgressBar.prototype.update = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.PlayProgressBar = Component.extend({
+PlayProgressBar = Component.extend({
   /** @constructor */
   init: function(player, options){
     Component.call(this, player, options);
   }
 });
 
-vjs.PlayProgressBar.prototype.createEl = function(){
+PlayProgressBar.prototype.createEl = function(){
   return Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-play-progress',
     innerHTML: '<span class="vjs-control-text">Progress: 0%</span>'
@@ -169,7 +170,7 @@ vjs.PlayProgressBar.prototype.createEl = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.SeekHandle = slider.SliderHandle.extend({
+SeekHandle = slider.SliderHandle.extend({
   init: function(player, options) {
     slider.SliderHandle.call(this, player, options);
     player.on('timeupdate', vjslib.bind(this, this.updateContent));
@@ -182,19 +183,26 @@ vjs.SeekHandle = slider.SliderHandle.extend({
  * @type {String}
  * @private
  */
-vjs.SeekHandle.prototype.defaultValue = '00:00';
+SeekHandle.prototype.defaultValue = '00:00';
 
 /** @inheritDoc */
-vjs.SeekHandle.prototype.createEl = function() {
+SeekHandle.prototype.createEl = function() {
   return slider.SliderHandle.prototype.createEl.call(this, 'div', {
     className: 'vjs-seek-handle',
     'aria-live': 'off'
   });
 };
 
-vjs.SeekHandle.prototype.updateContent = function() {
+SeekHandle.prototype.updateContent = function() {
   var time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
   this.el_.innerHTML = '<span class="vjs-control-text">' + vjslib.formatTime(time, this.player_.duration()) + '</span>';
 };
 
-module.exports = vjs;
+module.exports = {
+  ProgressControl: ProgressControl,
+  LoadProgressBar: LoadProgressBar,
+  PlayProgressBar: PlayProgressBar,
+  SeekBar: SeekBar,
+  SeekHandle: SeekHandle
+};
+

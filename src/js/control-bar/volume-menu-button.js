@@ -1,15 +1,16 @@
-var vjs = {};
-var menu = require('../menu.js');
-var volume = require('./volume-control.js');
-var vjslib = require('../lib.js');
-var MuteToggle = require('./mute-toggle.js');
-var Button = require('../button.js');
+var VolumeMenuButton, Button, MuteToggle, menu, volume, vjslib;
+
+Button = require('../button.js');
+MuteToggle = require('./mute-toggle.js');
+menu = require('../menu.js');
+volume = require('./volume-control.js');
+vjslib = require('../lib.js');
 
 /**
  * Menu button with a popup for showing the volume slider.
  * @constructor
  */
-vjs.VolumeMenuButton = menu.MenuButton.extend({
+VolumeMenuButton = menu.MenuButton.extend({
   /** @constructor */
   init: function(player, options){
     menu.MenuButton.call(this, player, options);
@@ -32,7 +33,7 @@ vjs.VolumeMenuButton = menu.MenuButton.extend({
   }
 });
 
-vjs.VolumeMenuButton.prototype.createMenu = function(){
+VolumeMenuButton.prototype.createMenu = function(){
   var menu = new menu.Menu(this.player_, {
     contentElType: 'div'
   });
@@ -41,17 +42,18 @@ vjs.VolumeMenuButton.prototype.createMenu = function(){
   return menu;
 };
 
-vjs.VolumeMenuButton.prototype.onClick = function(){
+VolumeMenuButton.prototype.onClick = function(){
   MuteToggle.prototype.onClick.call(this);
   menu.MenuButton.prototype.onClick.call(this);
 };
 
-vjs.VolumeMenuButton.prototype.createEl = function(){
+VolumeMenuButton.prototype.createEl = function(){
   return Button.prototype.createEl.call(this, 'div', {
     className: 'vjs-volume-menu-button vjs-menu-button vjs-control',
     innerHTML: '<div><span class="vjs-control-text">Mute</span></div>'
   });
 };
-vjs.VolumeMenuButton.prototype.update = MuteToggle.prototype.update;
 
-module.exports = vjs.VolumeMenuButton;
+VolumeMenuButton.prototype.update = MuteToggle.prototype.update;
+
+module.exports = VolumeMenuButton;

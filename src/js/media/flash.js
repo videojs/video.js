@@ -1,7 +1,8 @@
-var vjs = {};
-var MediaTechController = require('./media.js');
-var vjslib = require('../lib.js');
-var vjsevents = require('../events.js');
+var Flash, MediaTechController, vjslib, vjsevents;
+
+MediaTechController = require('./media.js');
+vjslib = require('../lib.js');
+vjsevents = require('../events.js');
 
 /**
  * @fileoverview VideoJS-SWF - Custom Flash Player with HTML5-ish API
@@ -17,7 +18,7 @@ var vjsevents = require('../events.js');
  * @param {Function=} ready
  * @constructor
  */
-vjs.Flash = MediaTechController.extend({
+Flash = MediaTechController.extend({
   /** @constructor */
   init: function(player, options, ready){
     MediaTechController.call(this, player, options, ready);
@@ -72,8 +73,8 @@ vjs.Flash = MediaTechController.extend({
 
     // If source was supplied pass as a flash var.
     if (source) {
-      if (source.type && vjs.Flash.isStreamingType(source.type)) {
-        var parts = vjs.Flash.streamToParts(source.src);
+      if (source.type && Flash.isStreamingType(source.type)) {
+        var parts = Flash.streamToParts(source.src);
         flashVars['rtmpConnection'] = encodeURIComponent(parts.connection);
         flashVars['rtmpStream'] = encodeURIComponent(parts.stream);
       }
@@ -165,14 +166,14 @@ vjs.Flash = MediaTechController.extend({
 
       // Tried embedding the flash object in the page first, and then adding a place holder to the iframe, then replacing the placeholder with the page object.
       // The goal here was to try to load the swf URL in the parent page first and hope that got around the firefox security error
-      // var newObj = vjs.Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
+      // var newObj = Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
       // (in onload)
       //  var temp = vjs.createEl('a', { id:'asdf', innerHTML: 'asdf' } );
       //  iDoc.body.appendChild(temp);
 
       // Tried embedding the flash object through javascript in the iframe source.
       // This works in webkit but still triggers the firefox security error
-      // iFrm.src = 'javascript: document.write('"+vjs.Flash.getEmbedCode(options['swf'], flashVars, params, attributes)+"');";
+      // iFrm.src = 'javascript: document.write('"+Flash.getEmbedCode(options['swf'], flashVars, params, attributes)+"');";
 
       // Tried an actual local iframe just to make sure that works, but it kills the easiness of the CDN version if you require the user to host an iframe
       // We should add an option to host the iframe locally though, because it could help a lot of issues.
@@ -210,7 +211,7 @@ vjs.Flash = MediaTechController.extend({
         // Using document.write actually got around the security error that browsers were throwing.
         // Again, it's a dynamically generated (same domain) iframe, loading an external Flash swf.
         // Not sure why that's a security issue, but apparently it is.
-        iDoc.write(vjs.Flash.getEmbedCode(options['swf'], flashVars, params, attributes));
+        iDoc.write(Flash.getEmbedCode(options['swf'], flashVars, params, attributes));
 
         // Setting variables on the window needs to come after the doc write because otherwise they can get reset in some browsers
         // So far no issues with swf ready event being called before it's set on the window.
@@ -226,7 +227,7 @@ vjs.Flash = MediaTechController.extend({
           tech.el_ = el;
 
           // Make sure swf is actually ready. Sometimes the API isn't actually yet.
-          vjs.Flash.checkReady(tech);
+          Flash.checkReady(tech);
         });
 
         // Create event listener for all swf events
@@ -249,30 +250,30 @@ vjs.Flash = MediaTechController.extend({
 
     // If not using iFrame mode, embed as normal object
     } else {
-      vjs.Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
+      Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
     }
   }
 });
 
-vjs.Flash.prototype.dispose = function(){
+Flash.prototype.dispose = function(){
   MediaTechController.prototype.dispose.call(this);
 };
 
-vjs.Flash.prototype.play = function(){
+Flash.prototype.play = function(){
   this.el_.vjs_play();
 };
 
-vjs.Flash.prototype.pause = function(){
+Flash.prototype.pause = function(){
   this.el_.vjs_pause();
 };
 
-vjs.Flash.prototype.src = function(src){
+Flash.prototype.src = function(src){
   if (src === undefined) {
     return this.currentSrc();
   }
 
-  if (vjs.Flash.isStreamingSrc(src)) {
-    src = vjs.Flash.streamToParts(src);
+  if (Flash.isStreamingSrc(src)) {
+    src = Flash.streamToParts(src);
     this.setRtmpConnection(src.connection);
     this.setRtmpStream(src.stream);
   } else {
@@ -289,7 +290,7 @@ vjs.Flash.prototype.src = function(src){
   }
 };
 
-vjs.Flash.prototype.currentSrc = function(){
+Flash.prototype.currentSrc = function(){
   var src = this.el_.vjs_getProperty('currentSrc');
   // no src, check and see if RTMP
   if (src == null) {
@@ -297,37 +298,37 @@ vjs.Flash.prototype.currentSrc = function(){
         stream = this['rtmpStream']();
 
     if (connection && stream) {
-      src = vjs.Flash.streamFromParts(connection, stream);
+      src = Flash.streamFromParts(connection, stream);
     }
   }
   return src;
 };
 
-vjs.Flash.prototype.load = function(){
+Flash.prototype.load = function(){
   this.el_.vjs_load();
 };
 
-vjs.Flash.prototype.poster = function(){
+Flash.prototype.poster = function(){
   this.el_.vjs_getProperty('poster');
 };
-vjs.Flash.prototype.setPoster = function(){
+Flash.prototype.setPoster = function(){
   // poster images are not handled by the Flash tech so make this a no-op
 };
 
-vjs.Flash.prototype.buffered = function(){
+Flash.prototype.buffered = function(){
   return vjslib.createTimeRange(0, this.el_.vjs_getProperty('buffered'));
 };
 
-vjs.Flash.prototype.supportsFullScreen = function(){
+Flash.prototype.supportsFullScreen = function(){
   return false; // Flash does not allow fullscreen through javascript
 };
 
-vjs.Flash.prototype.enterFullScreen = function(){
+Flash.prototype.enterFullScreen = function(){
   return false;
 };
 
 // Create setters and getters for attributes
-var api = vjs.Flash.prototype,
+var api = Flash.prototype,
     readWrite = 'rtmpConnection,rtmpStream,preload,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted'.split(','),
     readOnly = 'error,networkState,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight,textTracks'.split(',');
     // Overridden: buffered, currentTime, currentSrc
@@ -365,12 +366,12 @@ var createGetter = function(attr){
 
 /* Flash Support Testing -------------------------------------------------------- */
 
-vjs.Flash.isSupported = function(){
-  return vjs.Flash.version()[0] >= 10;
+Flash.isSupported = function(){
+  return Flash.version()[0] >= 10;
   // return swfobject.hasFlashPlayerVersion('10');
 };
 
-vjs.Flash.canPlaySource = function(srcObj){
+Flash.canPlaySource = function(srcObj){
   var type;
 
   if (!srcObj.type) {
@@ -378,24 +379,24 @@ vjs.Flash.canPlaySource = function(srcObj){
   }
 
   type = srcObj.type.replace(/;.*/,'').toLowerCase();
-  if (type in vjs.Flash.formats || type in vjs.Flash.streamingFormats) {
+  if (type in Flash.formats || type in Flash.streamingFormats) {
     return 'maybe';
   }
 };
 
-vjs.Flash.formats = {
+Flash.formats = {
   'video/flv': 'FLV',
   'video/x-flv': 'FLV',
   'video/mp4': 'MP4',
   'video/m4v': 'MP4'
 };
 
-vjs.Flash.streamingFormats = {
+Flash.streamingFormats = {
   'rtmp/mp4': 'MP4',
   'rtmp/flv': 'FLV'
 };
 
-vjs.Flash['onReady'] = function(currSwf){
+Flash['onReady'] = function(currSwf){
   var el = vjslib.el(currSwf);
 
   // Get player from box
@@ -409,12 +410,12 @@ vjs.Flash['onReady'] = function(currSwf){
   // Update reference to playback technology element
   tech.el_ = el;
 
-  vjs.Flash.checkReady(tech);
+  Flash.checkReady(tech);
 };
 
 // The SWF isn't alwasy ready when it says it is. Sometimes the API functions still need to be added to the object.
 // If it's not ready, we set a timeout to check again shortly.
-vjs.Flash.checkReady = function(tech){
+Flash.checkReady = function(tech){
 
   // Check if API property exists
   if (tech.el().vjs_getProperty) {
@@ -426,20 +427,20 @@ vjs.Flash.checkReady = function(tech){
   } else {
 
     setTimeout(function(){
-      vjs.Flash.checkReady(tech);
+      Flash.checkReady(tech);
     }, 50);
 
   }
 };
 
 // Trigger events from the swf on the player
-vjs.Flash['onEvent'] = function(swfID, eventName){
+Flash['onEvent'] = function(swfID, eventName){
   var player = vjslib.el(swfID)['player'];
   player.trigger(eventName);
 };
 
 // Log errors from the swf
-vjs.Flash['onError'] = function(swfID, err){
+Flash['onError'] = function(swfID, err){
   var player = vjslib.el(swfID)['player'];
   var msg = 'FLASH: '+err;
 
@@ -453,7 +454,7 @@ vjs.Flash['onError'] = function(swfID, err){
 };
 
 // Flash Version Check
-vjs.Flash.version = function(){
+Flash.version = function(){
   var version = '0,0,0';
 
   // IE
@@ -472,8 +473,8 @@ vjs.Flash.version = function(){
 };
 
 // Flash embedding method. Only used in non-iframe mode
-vjs.Flash.embed = function(swf, placeHolder, flashVars, params, attributes){
-  var code = vjs.Flash.getEmbedCode(swf, flashVars, params, attributes),
+Flash.embed = function(swf, placeHolder, flashVars, params, attributes){
+  var code = Flash.getEmbedCode(swf, flashVars, params, attributes),
 
       // Get element by embedding code and retrieving created element
       obj = vjslib.createEl('div', { innerHTML: code }).childNodes[0],
@@ -494,7 +495,7 @@ vjs.Flash.embed = function(swf, placeHolder, flashVars, params, attributes){
 
 };
 
-vjs.Flash.getEmbedCode = function(swf, flashVars, params, attributes){
+Flash.getEmbedCode = function(swf, flashVars, params, attributes){
 
   var objTag = '<object type="application/x-shockwave-flash"',
       flashVarsString = '',
@@ -539,11 +540,11 @@ vjs.Flash.getEmbedCode = function(swf, flashVars, params, attributes){
   return objTag + attrsString + '>' + paramsString + '</object>';
 };
 
-vjs.Flash.streamFromParts = function(connection, stream) {
+Flash.streamFromParts = function(connection, stream) {
   return connection + '&' + stream;
 };
 
-vjs.Flash.streamToParts = function(src) {
+Flash.streamToParts = function(src) {
   var parts = {
     connection: '',
     stream: ''
@@ -575,16 +576,16 @@ vjs.Flash.streamToParts = function(src) {
   return parts;
 };
 
-vjs.Flash.isStreamingType = function(srcType) {
-  return srcType in vjs.Flash.streamingFormats;
+Flash.isStreamingType = function(srcType) {
+  return srcType in Flash.streamingFormats;
 };
 
 // RTMP has four variations, any string starting
 // with one of these protocols should be valid
-vjs.Flash.RTMP_RE = /^rtmp[set]?:\/\//i;
+Flash.RTMP_RE = /^rtmp[set]?:\/\//i;
 
-vjs.Flash.isStreamingSrc = function(src) {
-  return vjs.Flash.RTMP_RE.test(src);
+Flash.isStreamingSrc = function(src) {
+  return Flash.RTMP_RE.test(src);
 };
 
-module.exports = vjs.Flash;
+module.exports = Flash;

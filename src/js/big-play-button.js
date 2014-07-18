@@ -1,5 +1,6 @@
-var vjs = {};
-var Button = require('./button.js');
+var BigPlayButton, Button;
+
+Button = require('./button.js');
 
 /* Big Play Button
 ================================================================================ */
@@ -11,9 +12,9 @@ var Button = require('./button.js');
  * @class
  * @constructor
  */
-vjs.BigPlayButton = Button.extend();
+BigPlayButton = Button.extend();
 
-vjs.BigPlayButton.prototype.createEl = function(){
+BigPlayButton.prototype.createEl = function(){
   return Button.prototype.createEl.call(this, 'div', {
     className: 'vjs-big-play-button',
     innerHTML: '<span aria-hidden="true"></span>',
@@ -21,8 +22,8 @@ vjs.BigPlayButton.prototype.createEl = function(){
   });
 };
 
-vjs.BigPlayButton.prototype.onClick = function(){
+BigPlayButton.prototype.onClick = function(){
   this.player_.play();
 };
 
-module.exports = vjs.BigPlayButton;
+module.exports = BigPlayButton;

@@ -1,7 +1,8 @@
-var vjs = {};
-var Component = require('./component.js');
-var vjslib = require('./lib.js');
-var vjsevents = require('./events.js');
+var Slider, SliderHandle, Component, vjslib, vjsevents;
+
+Component = require('./component.js');
+vjslib = require('./lib.js');
+vjsevents = require('./events.js');
 
 /* Slider
 ================================================================================ */
@@ -12,7 +13,7 @@ var vjsevents = require('./events.js');
  * @param {Object=} options
  * @constructor
  */
-vjs.Slider = Component.extend({
+Slider = Component.extend({
   /** @constructor */
   init: function(player, options){
     Component.call(this, player, options);
@@ -35,7 +36,7 @@ vjs.Slider = Component.extend({
   }
 });
 
-vjs.Slider.prototype.createEl = function(type, props) {
+Slider.prototype.createEl = function(type, props) {
   props = props || {};
   // Add the slider element class to all sub classes
   props.className = props.className + ' vjs-slider';
@@ -50,7 +51,7 @@ vjs.Slider.prototype.createEl = function(type, props) {
   return Component.prototype.createEl.call(this, type, props);
 };
 
-vjs.Slider.prototype.onMouseDown = function(event){
+Slider.prototype.onMouseDown = function(event){
   event.preventDefault();
   vjslib.blockTextSelection();
 
@@ -65,7 +66,7 @@ vjs.Slider.prototype.onMouseDown = function(event){
   this.onMouseMove(event);
 };
 
-vjs.Slider.prototype.onMouseUp = function() {
+Slider.prototype.onMouseUp = function() {
   vjslib.unblockTextSelection();
   vjsevents.off(document, 'mousemove', this.boundEvents.move, false);
   vjsevents.off(document, 'mouseup', this.boundEvents.end, false);
@@ -75,7 +76,7 @@ vjs.Slider.prototype.onMouseUp = function() {
   this.update();
 };
 
-vjs.Slider.prototype.update = function(){
+Slider.prototype.update = function(){
   // In VolumeBar init we have a setTimeout for update that pops and update to the end of the
   // execution stack. The player is destroyed before then update will cause an error
   if (!this.el_) return;
@@ -125,7 +126,7 @@ vjs.Slider.prototype.update = function(){
   bar.el().style.width = vjslib.round(barProgress * 100, 2) + '%';
 };
 
-vjs.Slider.prototype.calculateDistance = function(event){
+Slider.prototype.calculateDistance = function(event){
   var el, box, boxX, boxY, boxW, boxH, handle, pageX, pageY;
 
   el = this.el_;
@@ -174,11 +175,11 @@ vjs.Slider.prototype.calculateDistance = function(event){
   }
 };
 
-vjs.Slider.prototype.onFocus = function(){
+Slider.prototype.onFocus = function(){
   vjsevents.on(document, 'keyup', vjslib.bind(this, this.onKeyPress));
 };
 
-vjs.Slider.prototype.onKeyPress = function(event){
+Slider.prototype.onKeyPress = function(event){
   if (event.which == 37) { // Left Arrow
     event.preventDefault();
     this.stepBack();
@@ -188,7 +189,7 @@ vjs.Slider.prototype.onKeyPress = function(event){
   }
 };
 
-vjs.Slider.prototype.onBlur = function(){
+Slider.prototype.onBlur = function(){
   vjsevents.off(document, 'keyup', vjslib.bind(this, this.onKeyPress));
 };
 
@@ -197,7 +198,7 @@ vjs.Slider.prototype.onBlur = function(){
  *   from bubbling up to parent elements like button menus.
  * @param  {Object} event Event object
  */
-vjs.Slider.prototype.onClick = function(event){
+Slider.prototype.onClick = function(event){
   event.stopImmediatePropagation();
   event.preventDefault();
 };
@@ -209,7 +210,7 @@ vjs.Slider.prototype.onClick = function(event){
  * @param {Object=} options
  * @constructor
  */
-vjs.SliderHandle = Component.extend();
+SliderHandle = Component.extend();
 
 /**
  * Default value of the slider
@@ -217,10 +218,10 @@ vjs.SliderHandle = Component.extend();
  * @type {Number}
  * @private
  */
-vjs.SliderHandle.prototype.defaultValue = 0;
+SliderHandle.prototype.defaultValue = 0;
 
 /** @inheritDoc */
-vjs.SliderHandle.prototype.createEl = function(type, props) {
+SliderHandle.prototype.createEl = function(type, props) {
   props = props || {};
   // Add the slider element class to all sub classes
   props.className = props.className + ' vjs-slider-handle';
@@ -231,4 +232,7 @@ vjs.SliderHandle.prototype.createEl = function(type, props) {
   return Component.prototype.createEl.call(this, 'div', props);
 };
 
-module.exports = vjs;
+module.exports = {
+  Slider: Slider,
+  SliderHandle: SliderHandle
+};

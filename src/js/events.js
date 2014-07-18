@@ -1,5 +1,6 @@
-var vjs = {};
-var vjslib = require('./lib.js');
+var on, off, cleanUpEvents, fixEvent, trigger, one, handleMultipleEvents, vjslib;
+
+vjslib = require('./lib.js');
 
 /**
  * @fileoverview Event System (John Resig - Secrets of a JS Ninja http://jsninja.com/)
@@ -18,9 +19,9 @@ var vjslib = require('./lib.js');
  * @param  {Function} fn   Event listener.
  * @private
  */
-vjs.on = function(elem, type, fn){
+on = function(elem, type, fn){
   if (vjslib.obj.isArray(type)) {
-    return _handleMultipleEvents(vjs.on, elem, type, fn);
+    return handleMultipleEvents(on, elem, type, fn);
   }
 
   var data = vjslib.getData(elem);
@@ -40,7 +41,7 @@ vjs.on = function(elem, type, fn){
     data.dispatcher = function (event){
 
       if (data.disabled) return;
-      event = vjs.fixEvent(event);
+      event = fixEvent(event);
 
       var handlers = data.handlers[event.type];
 
@@ -75,7 +76,7 @@ vjs.on = function(elem, type, fn){
  * @param  {Function} fn   Specific listener to remove. Don't incldue to remove listeners for an event type.
  * @private
  */
-vjs.off = function(elem, type, fn) {
+off = function(elem, type, fn) {
   // Don't want to add a cache object through getData if not needed
   if (!vjslib.hasData(elem)) return;
 
@@ -85,13 +86,13 @@ vjs.off = function(elem, type, fn) {
   if (!data.handlers) { return; }
 
   if (vjslib.obj.isArray(type)) {
-    return _handleMultipleEvents(vjs.off, elem, type, fn);
+    return handleMultipleEvents(off, elem, type, fn);
   }
 
   // Utility function
   var removeType = function(t){
      data.handlers[t] = [];
-     vjs.cleanUpEvents(elem,t);
+     cleanUpEvents(elem,t);
   };
 
   // Are we removing all bound events?
@@ -120,7 +121,7 @@ vjs.off = function(elem, type, fn) {
     }
   }
 
-  vjs.cleanUpEvents(elem, type);
+  cleanUpEvents(elem, type);
 };
 
 /**
@@ -129,7 +130,7 @@ vjs.off = function(elem, type, fn) {
  * @param  {String} type Type of event to clean up
  * @private
  */
-vjs.cleanUpEvents = function(elem, type) {
+cleanUpEvents = function(elem, type) {
   var data = vjslib.getData(elem);
 
   // Remove the events of a particular type if there are none left
@@ -169,7 +170,7 @@ vjs.cleanUpEvents = function(elem, type) {
  * @return {Object}
  * @private
  */
-vjs.fixEvent = function(event) {
+fixEvent = function(event) {
 
   function returnTrue() { return true; }
   function returnFalse() { return false; }
@@ -279,7 +280,7 @@ vjs.fixEvent = function(event) {
  * @param  {String} event Type of event to trigger
  * @private
  */
-vjs.trigger = function(elem, event) {
+trigger = function(elem, event) {
   // Fetches element data and a reference to the parent (for bubbling).
   // Don't want to add a data object to cache for every parent,
   // so checking hasData first.
@@ -293,7 +294,7 @@ vjs.trigger = function(elem, event) {
     event = { type:event, target:elem };
   }
   // Normalizes the event properties.
-  event = vjs.fixEvent(event);
+  event = fixEvent(event);
 
   // If the passed element has a dispatcher, executes the established handlers.
   if (elemData.dispatcher) {
@@ -303,7 +304,7 @@ vjs.trigger = function(elem, event) {
   // Unless explicitly stopped or the event does not bubble (e.g. media events)
     // recursively calls this function to bubble the event up the DOM.
     if (parent && !event.isPropagationStopped() && event.bubbles !== false) {
-    vjs.trigger(parent, event);
+    trigger(parent, event);
 
   // If at the top of the DOM, triggers the default action unless disabled.
   } else if (!parent && !event.defaultPrevented) {
@@ -352,17 +353,17 @@ vjs.trigger = function(elem, event) {
  * @param  {Function} fn
  * @private
  */
-vjs.one = function(elem, type, fn) {
+one = function(elem, type, fn) {
   if (vjslib.obj.isArray(type)) {
-    return _handleMultipleEvents(vjs.one, elem, type, fn);
+    return handleMultipleEvents(one, elem, type, fn);
   }
   var func = function(){
-    vjs.off(elem, type, func);
+    off(elem, type, func);
     fn.apply(this, arguments);
   };
   // copy the guid to the new function so it can removed using the original function's ID
   func.guid = fn.guid = fn.guid || vjslib.guid++;
-  vjs.on(elem, type, func);
+  on(elem, type, func);
 };
 
 /**
@@ -373,10 +374,15 @@ vjs.one = function(elem, type, fn) {
  * @param  {Function} callback   Event listener.
  * @private
  */
-function _handleMultipleEvents(fn, elem, type, callback) {
+handleMultipleEvents = function(fn, elem, type, callback) {
   vjslib.arr.forEach(type, function(type) {
     fn(elem, type, callback); //Call the event method for each one of the types
   });
-}
+};
 
-module.exports = vjs;
+module.exports = {
+  on: on,
+  off: off,
+  trigger: trigger,
+  one: one
+};

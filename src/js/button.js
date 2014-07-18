@@ -1,7 +1,8 @@
-var vjs = {};
-var Component = require('./component.js');
-var vjslib = require('./lib.js');
-var vjsevents = require('./events.js');
+var Button, Component, vjslib, vjsevents;
+
+Component = require('./component.js');
+vjslib = require('./lib.js');
+vjsevents = require('./events.js');
 
 /* Button - Base class for all buttons
 ================================================================================ */
@@ -12,7 +13,7 @@ var vjsevents = require('./events.js');
  * @class
  * @constructor
  */
-vjs.Button = Component.extend({
+Button = Component.extend({
   /**
    * @constructor
    * @inheritDoc
@@ -29,7 +30,7 @@ vjs.Button = Component.extend({
   }
 });
 
-vjs.Button.prototype.createEl = function(type, props){
+Button.prototype.createEl = function(type, props){
   var el;
 
   // Add standard Aria and Tabindex info
@@ -60,21 +61,21 @@ vjs.Button.prototype.createEl = function(type, props){
   return el;
 };
 
-vjs.Button.prototype.buildCSSClass = function(){
+Button.prototype.buildCSSClass = function(){
   // TODO: Change vjs-control to vjs-button?
   return 'vjs-control ' + Component.prototype.buildCSSClass.call(this);
 };
 
   // Click - Override with specific functionality for button
-vjs.Button.prototype.onClick = function(){};
+Button.prototype.onClick = function(){};
 
   // Focus - Add keyboard functionality to element
-vjs.Button.prototype.onFocus = function(){
+Button.prototype.onFocus = function(){
   vjsevents.on(document, 'keyup', vjslib.bind(this, this.onKeyPress));
 };
 
   // KeyPress (document level) - Trigger click when keys are pressed
-vjs.Button.prototype.onKeyPress = function(event){
+Button.prototype.onKeyPress = function(event){
   // Check for space bar (32) or enter (13) keys
   if (event.which == 32 || event.which == 13) {
     event.preventDefault();
@@ -83,8 +84,8 @@ vjs.Button.prototype.onKeyPress = function(event){
 };
 
 // Blur - Remove keyboard triggers
-vjs.Button.prototype.onBlur = function(){
+Button.prototype.onBlur = function(){
   vjsevents.off(document, 'keyup', vjslib.bind(this, this.onKeyPress));
 };
 
-module.exports = vjs.Button;
+module.exports = Button;

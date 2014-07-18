@@ -1,5 +1,7 @@
-var videojs = require('./core.js');
-var setup = require('./setup.js');
+var videojs, setup;
+
+videojs = require('./core.js');
+setup = require('./setup.js');
 
 if (typeof HTMLVideoElement === 'undefined') {
   videojs.elementShiv();

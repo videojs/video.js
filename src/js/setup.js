@@ -1,6 +1,7 @@
-var vjs = {};
-var vjsJSON = require('./json.js');
-var vjsevents = require('./events.js');
+var autoSetup, autoSetupTimeout, hasLoaded, windowLoaded, vjsJSON, vjsevents;
+
+vjsJSON = require('./json.js');
+vjsevents = require('./events.js');
 
 /**
  * @fileoverview Functions for automatically setting up a player
@@ -8,7 +9,7 @@ var vjsevents = require('./events.js');
  */
 
 // Automatically set up any tags that have a data-setup attribute
-vjs.autoSetup = function(){
+autoSetup = function(){
   var options, vid, player,
       vids = document.getElementsByTagName('video');
 
@@ -41,28 +42,37 @@ vjs.autoSetup = function(){
 
       // If getAttribute isn't defined, we need to wait for the DOM.
       } else {
-        vjs.autoSetupTimeout(1);
+        autoSetupTimeout(1);
         break;
       }
     }
 
   // No videos were found, so keep looping unless page is finisehd loading.
-  } else if (!vjs.windowLoaded) {
-    vjs.autoSetupTimeout(1);
+  } else if (!windowLoaded) {
+    autoSetupTimeout(1);
   }
 };
 
 // Pause to let the DOM keep processing
-vjs.autoSetupTimeout = function(wait){
-  setTimeout(vjs.autoSetup, wait);
+autoSetupTimeout = function(wait){
+  setTimeout(autoSetup, wait);
 };
 
+// return whether window has loaded
+hasLoaded = function() {
+  return windowLoaded;
+}
+
 if (document.readyState === 'complete') {
-  vjs.windowLoaded = true;
+  windowLoaded = true;
 } else {
   vjsevents.one(window, 'load', function(){
-    vjs.windowLoaded = true;
+    windowLoaded = true;
   });
 }
 
-module.exports = vjs;
+module.exports = {
+  autoSetup: autoSetup,
+  autoSetupTimeout: autoSetupTimeout,
+  hasLoaded: hasLoaded
+};

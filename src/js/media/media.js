@@ -1,6 +1,7 @@
-var vjs = {};
-var Component = require('../component.js');
-var vjslib = require('../lib.js');
+var MediaTechController, Component, vjslib;
+
+Component = require('../component.js');
+vjslib = require('../lib.js');
 
 /**
  * @fileoverview Media Technology Controller - Base class for media playback
@@ -13,7 +14,7 @@ var vjslib = require('../lib.js');
  * @param {Object=} options Options object
  * @constructor
  */
-vjs.MediaTechController = Component.extend({
+MediaTechController = Component.extend({
   /** @constructor */
   init: function(player, options, ready){
     options = options || {};
@@ -46,7 +47,7 @@ vjs.MediaTechController = Component.extend({
  * keep the controls showing, but that shouldn't be an issue. A touch and hold on
  * any controls will still keep the user active
  */
-vjs.MediaTechController.prototype.initControlsListeners = function(){
+MediaTechController.prototype.initControlsListeners = function(){
   var player, tech, activateControls, deactivateControls;
 
   tech = this;
@@ -78,7 +79,7 @@ vjs.MediaTechController.prototype.initControlsListeners = function(){
   });
 };
 
-vjs.MediaTechController.prototype.addControlsListeners = function(){
+MediaTechController.prototype.addControlsListeners = function(){
   var userWasActive;
 
   // Some browsers (Chrome & IE) don't trigger a click on a flash swf, but do
@@ -114,7 +115,7 @@ vjs.MediaTechController.prototype.addControlsListeners = function(){
  * Remove the listeners used for click and tap controls. This is needed for
  * toggling to controls disabled, where a tap/touch should do nothing.
  */
-vjs.MediaTechController.prototype.removeControlsListeners = function(){
+MediaTechController.prototype.removeControlsListeners = function(){
   // We don't want to just use `this.off()` because there might be other needed
   // listeners added by techs that extend this.
   this.off('tap');
@@ -130,7 +131,7 @@ vjs.MediaTechController.prototype.removeControlsListeners = function(){
 /**
  * Handle a click on the media element. By default will play/pause the media.
  */
-vjs.MediaTechController.prototype.onClick = function(event){
+MediaTechController.prototype.onClick = function(event){
   // We're using mousedown to detect clicks thanks to Flash, but mousedown
   // will also be triggered with right-clicks, so we need to prevent that
   if (event.button !== 0) return;
@@ -150,7 +151,7 @@ vjs.MediaTechController.prototype.onClick = function(event){
  * Handle a tap on the media element. By default it will toggle the user
  * activity state, which hides and shows the controls.
  */
-vjs.MediaTechController.prototype.onTap = function(){
+MediaTechController.prototype.onTap = function(){
   this.player().userActive(!this.player().userActive());
 };
 
@@ -160,9 +161,9 @@ vjs.MediaTechController.prototype.onTap = function(){
  * Poster support for techs should be optional, so we don't want techs to
  * break if they don't have a way to set a poster.
  */
-vjs.MediaTechController.prototype.setPoster = function(){};
+MediaTechController.prototype.setPoster = function(){};
 
-vjs.MediaTechController.prototype.features = {
+MediaTechController.prototype.features = {
   'volumeControl': true,
 
   // Resizing plugins using request fullscreen reloads the plugin
@@ -175,6 +176,4 @@ vjs.MediaTechController.prototype.features = {
   'timeupdateEvents': false
 };
 
-vjs.media = {};
-
-module.exports = vjs.MediaTechController;
+module.exports = MediaTechController;

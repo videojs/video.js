@@ -1,7 +1,9 @@
-var Player = require('./player.js');
-var options = require('./options.js');
-var vjslib = require('./lib.js');
-var CoreObject = require('./core-object.js');
+var vjs, Player, CoreObject, options, vjslib;
+
+Player = require('./player.js');
+options = require('./options.js');
+vjslib = require('./lib.js');
+CoreObject = require('./core-object.js');
 
 /**
  * @fileoverview Main function src.
@@ -30,7 +32,7 @@ var elementShiv = function() {
  * @return {vjs.Player}             A player instance
  * @namespace
  */
-var vjs = function(id, options, ready){
+vjs = function(id, options, ready){
   var tag; // Element of ID
 
   // Allow for element or ID to be passed in
@@ -43,8 +45,8 @@ var vjs = function(id, options, ready){
     }
 
     // If a player instance has already been created for this ID return it.
-    if (vjs.players[id]) {
-      return vjs.players[id];
+    if (Player.players[id]) {
+      return Player.players[id];
 
     // Otherwise get element for ID
     } else {
@@ -63,12 +65,10 @@ var vjs = function(id, options, ready){
 
   // Element may have a player attr referring to an already created player instance.
   // If not, set up a new player and return the instance.
-  return tag['player'] || new vjs.Player(tag, options, ready);
+  return tag['player'] || new Player(tag, options, ready);
 };
 
 vjs.options = options;
-vjs.Player = Player;
-vjs.players = Player.players;
 
 // Extended name, also available externally, window.videojs
 //var videojs = vjs;

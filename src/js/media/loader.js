@@ -1,6 +1,7 @@
-var vjs = {};
-var Component = require('../component.js');
-var vjslib = require('../lib.js');
+var MediaLoader, Component, vjslib;
+
+Component = require('../component.js');
+vjslib = require('../lib.js');
 
 /**
  * The Media Loader is the component that decides which playback technology to load
@@ -8,7 +9,7 @@ var vjslib = require('../lib.js');
  *
  * @constructor
  */
-vjs.MediaLoader = Component.extend({
+MediaLoader = Component.extend({
   /** @constructor */
   init: function(player, options, ready){
     var components = require('../components.js');
@@ -38,4 +39,4 @@ vjs.MediaLoader = Component.extend({
   }
 });
 
-module.exports = vjs.MediaLoader;
+module.exports = MediaLoader;

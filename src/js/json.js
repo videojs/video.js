@@ -1,4 +1,4 @@
-var vjs = {};
+var vjsJSON;
 
 /**
  * @fileoverview Add JSON support
@@ -15,13 +15,13 @@ var vjs = {};
  * @namespace
  * @private
  */
-vjs.JSON;
+vjsJSON;
 
 if (typeof window.JSON !== 'undefined' && window.JSON.parse === 'function') {
-  vjs.JSON = window.JSON;
+  vjsJSON = window.JSON;
 
 } else {
-  vjs.JSON = {};
+  vjsJSON = {};
 
   var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
 
@@ -33,7 +33,7 @@ if (typeof window.JSON !== 'undefined' && window.JSON.parse === 'function') {
    * @param {Function=} [reviver] Optional function that can transform the results
    * @return {Object|Array} The parsed JSON
    */
-  vjs.JSON.parse = function (text, reviver) {
+  vjsJSON.parse = function (text, reviver) {
       var j;
 
       function walk(holder, key) {
@@ -76,4 +76,4 @@ if (typeof window.JSON !== 'undefined' && window.JSON.parse === 'function') {
   };
 }
 
-module.exports = vjs.JSON;
+module.exports = vjsJSON;

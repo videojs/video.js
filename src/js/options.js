@@ -1,5 +1,3 @@
-var vjs = {};
-
 /**
  * Global Player instance options, surfaced from vjs.Player.prototype.options_
  * vjs.options = vjs.Player.prototype.options_
@@ -7,7 +5,7 @@ var vjs = {};
  * renaming by closure compiler
  * @type {Object}
  */
-vjs.options = {
+module.exports = {
   // Default order of fallback technology
   'techOrder': ['html5','flash'],
   // techOrder: ['flash','html5'],
@@ -41,4 +39,3 @@ vjs.options = {
   'notSupportedMessage': 'No compatible source was found for this video.'
 };
 
-module.exports = vjs.options;

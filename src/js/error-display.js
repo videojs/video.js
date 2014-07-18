@@ -1,6 +1,7 @@
-var vjs = {};
-var Component = require('./component.js');
-var vjslib = require('./lib.js');
+var ErrorDisplay, Component, vjslib;
+
+Component = require('./component.js');
+vjslib = require('./lib.js');
 
 /**
  * Display that an error has occurred making the video unplayable
@@ -8,7 +9,7 @@ var vjslib = require('./lib.js');
  * @param {Object=} options
  * @constructor
  */
-vjs.ErrorDisplay = Component.extend({
+ErrorDisplay = Component.extend({
   init: function(player, options){
     Component.call(this, player, options);
 
@@ -17,7 +18,7 @@ vjs.ErrorDisplay = Component.extend({
   }
 });
 
-vjs.ErrorDisplay.prototype.createEl = function(){
+ErrorDisplay.prototype.createEl = function(){
   var el = Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-error-display'
   });
@@ -28,10 +29,10 @@ vjs.ErrorDisplay.prototype.createEl = function(){
   return el;
 };
 
-vjs.ErrorDisplay.prototype.update = function(){
+ErrorDisplay.prototype.update = function(){
   if (this.player().error()) {
     this.contentEl_.innerHTML = this.player().error().message;
   }
 };
 
-module.exports = vjs.ErrorDisplay;
+module.exports = ErrorDisplay;

@@ -1,72 +1,72 @@
-var vjs = {};
+var menu, slider, tracks, progress, timedisplay, volume;
 
-vjs.Html5 = require('./media/html5.js');
-vjs.Flash = require('./media/flash.js');
-vjs.MediaLoader = require('./media/loader.js');
-vjs.MediaTechController = require('./media/media.js');
+menu = require('./menu.js');
+slider = require('./slider.js');
+tracks = require('./tracks.js');
+progress = require('./control-bar/progress-control.js');
+timedisplay = require('./control-bar/time-display.js');
+volume = require('./control-bar/volume-control.js');
 
-vjs.BigPlayButton = require('./big-play-button.js');
-vjs.Button = require('./button.js');
+module.exports = {
+  Html5: require('./media/html5.js'),
+  Flash: require('./media/flash.js'),
+  MediaLoader: require('./media/loader.js'),
+  MediaTechController: require('./media/media.js'),
 
-vjs.ErrorDisplay = require('./error-display.js');
+  Button: require('./button.js'),
+  BigPlayButton: require('./big-play-button.js'),
 
-vjs.LoadingSpinner = require('./loading-spinner.js');
+  ErrorDisplay: require('./error-display.js'),
+  MediaError: require('./media-error.js'),
 
-var menu = require('./menu.js');
-vjs.Menu = menu.Menu;
-vjs.MenuItem = menu.MenuItem;
-vjs.MenuButton = menu.MenuButton;
+  LoadingSpinner: require('./loading-spinner.js'),
 
-vjs.PosterImage = require('./poster.js')
+  Menu: menu.Menu,
+  MenuItem: menu.MenuItem,
+  MenuButton: menu.MenuButton,
 
-var slider = require('./slider.js');
-vjs.Slider = slider.Slider;
-vjs.SliderHandle = slider.SliderHandle;
+  PosterImage: require('./poster.js'),
 
-var tracks = require('./tracks.js');
-vjs.TextTrack = tracks.TextTrack;
-vjs.CaptionsTrack = tracks.CaptionsTrack;
-vjs.SubtitlesTrack = tracks.SubtitlesTrack;
-vjs.ChaptersTrack = tracks.ChaptersTrack;
+  Slider: slider.Slider,
+  SliderHandle: slider.SliderHandle,
 
-vjs.TextTrackDisplay = tracks.TextTrackDisplay;
-vjs.TextTrackMenuItem = tracks.TextTrackMenuItem;
-vjs.OffTextTrackMenuItem = tracks.OffTextTrackMenuItem;
-vjs.TextTrackButton = tracks.TextTrackButton;
+  TextTrack: tracks.TextTrack,
+  CaptionsTrack: tracks.CaptionsTrack,
+  SubtitlesTrack: tracks.SubtitlesTrack,
+  ChaptersTrack: tracks.ChaptersTrack,
 
-vjs.CaptionsButton = tracks.CaptionsButton;
-vjs.SubtitlesButton = tracks.SubtitlesButton;
-vjs.ChaptersButton = tracks.ChaptersButton;
+  TextTrackDisplay: tracks.TextTrackDisplay,
+  TextTrackMenuItem: tracks.TextTrackMenuItem,
+  OffTextTrackMenuItem: tracks.OffTextTrackMenuItem,
+  ChaptersTrackMenuItem: tracks.ChaptersTrackMenuItem,
 
-vjs.ChaptersTrackMenuItem = tracks.ChaptersTrackMenuItem;
+  TextTrackButton: tracks.TextTrackButton,
+  CaptionsButton: tracks.CaptionsButton,
+  SubtitlesButton: tracks.SubtitlesButton,
+  ChaptersButton: tracks.ChaptersButton,
 
-// CONTROL BAR ITEMS
-vjs.ControlBar = require('./control-bar/control-bar.js');
-vjs.FullscreenToggle = require('./control-bar/fullscreen-toggle.js');
-vjs.LiveDisplay = require('./control-bar/live-display.js');
-vjs.MuteToggle = require('./control-bar/mute-toggle.js');
-vjs.PlayToggle = require('./control-bar/play-toggle.js');
-vjs.PlaybackRateMenuButton = require('./control-bar/playback-rate-menu-button.js');
+  // CONTROL BAR ITEMS
+  ControlBar: require('./control-bar/control-bar.js'),
+  FullscreenToggle: require('./control-bar/fullscreen-toggle.js'),
+  LiveDisplay: require('./control-bar/live-display.js'),
+  MuteToggle: require('./control-bar/mute-toggle.js'),
+  PlayToggle: require('./control-bar/play-toggle.js'),
+  PlaybackRateMenuButton: require('./control-bar/playback-rate-menu-button.js'),
 
-var progress = require('./control-bar/progress-control.js');
-vjs.ProgressControl = progress.ProgressControl;
-vjs.SeekBar = progress.SeekBar;
-vjs.LoadProgressBar = progress.LoadProgressBar;
-vjs.PlayProgressBar = progress.PlayProgressBar;
-vjs.SeekHandle = progress.SeekHandle;
+  ProgressControl: progress.ProgressControl,
+  SeekBar: progress.SeekBar,
+  LoadProgressBar: progress.LoadProgressBar,
+  PlayProgressBar: progress.PlayProgressBar,
+  SeekHandle: progress.SeekHandle,
 
-var timedisplay = require('./control-bar/time-display.js');
-vjs.CurrentTimeDisplay = timedisplay.CurrentTimeDisplay;
-vjs.DurationDisplay = timedisplay.DurationDisplay;
-vjs.TimeDivider = timedisplay.TimeDivider;
-vjs.RemainingTimeDisplay = timedisplay.RemainingTimeDisplay;
+  CurrentTimeDisplay: timedisplay.CurrentTimeDisplay,
+  DurationDisplay: timedisplay.DurationDisplay,
+  TimeDivider: timedisplay.TimeDivider,
+  RemainingTimeDisplay: timedisplay.RemainingTimeDisplay,
 
-var volume = require('./control-bar/volume-control.js');
-vjs.VolumeControl = volume.VolumeControl;
-vjs.VolumeBar = volume.VolumeBar;
-vjs.VolumeLevel = volume.VolumeLevel;
-vjs.VolumeHandle = volume.VolumeHandle;
-vjs.VolumeMenuButton = require('./control-bar/volume-menu-button.js');
-
-
-module.exports = vjs;
+  VolumeControl: volume.VolumeControl,
+  VolumeBar: volume.VolumeBar,
+  VolumeLevel: volume.VolumeLevel,
+  VolumeHandle: volume.VolumeHandle,
+  VolumeMenuButton: require('./control-bar/volume-menu-button.js')
+}

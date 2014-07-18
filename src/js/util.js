@@ -1,4 +1,3 @@
-var vjs = {};
 var vjslib = require('./lib.js');
 
 /**
@@ -6,7 +5,6 @@ var vjslib = require('./lib.js');
  * @namespace
  * @type {Object}
  */
-vjs.util = {};
 
 /**
  * Merge two options objects, 
@@ -17,7 +15,7 @@ vjs.util = {};
  * @param  {Object} obj2 Overriding object
  * @return {Object}      New object -- obj1 and obj2 will be untouched
  */
-vjs.util.mergeOptions = function(obj1, obj2){
+module.exports.mergeOptions = function(obj1, obj2){
   var key, val1, val2;
 
   // make a copy of obj1 so we're not ovewriting original values.
@@ -39,5 +37,3 @@ vjs.util.mergeOptions = function(obj1, obj2){
   }
   return obj1;
 };
-
-module.exports = vjs.util;

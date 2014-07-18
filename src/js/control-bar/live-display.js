@@ -1,6 +1,7 @@
-var vjs = {};
-var Component = require('../component.js');
-var vjslib = require('../lib.js');
+var LiveDisplay, Component, vjslib;
+
+Component = require('../component.js');
+vjslib = require('../lib.js');
 
 /**
  * Displays the live indicator
@@ -9,13 +10,13 @@ var vjslib = require('../lib.js');
  * @param {Object=} options
  * @constructor
  */
-vjs.LiveDisplay = Component.extend({
+LiveDisplay = Component.extend({
   init: function(player, options){
     Component.call(this, player, options);
   }
 });
 
-vjs.LiveDisplay.prototype.createEl = function(){
+LiveDisplay.prototype.createEl = function(){
   var el = Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-live-controls vjs-control'
   });
@@ -31,4 +32,4 @@ vjs.LiveDisplay.prototype.createEl = function(){
   return el;
 };
 
-module.exports = vjs.LiveDisplay;
+module.exports = LiveDisplay;
