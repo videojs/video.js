@@ -12,3 +12,6 @@ if (typeof HTMLVideoElement === 'undefined') {
 setup.autoSetupTimeout(1);
 
 module.exports = videojs;
+module.exports.components = function() {
+  return require('./components.js');
+}
