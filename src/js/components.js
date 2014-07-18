@@ -8,12 +8,14 @@ timedisplay = require('./control-bar/time-display.js');
 volume = require('./control-bar/volume-control.js');
 
 module.exports = {
+  Component: require('./component.js'),
+  Button: require('./button.js'),
+
   Html5: require('./media/html5.js'),
   Flash: require('./media/flash.js'),
   MediaLoader: require('./media/loader.js'),
   MediaTechController: require('./media/media.js'),
 
-  Button: require('./button.js'),
   BigPlayButton: require('./big-play-button.js'),
 
   ErrorDisplay: require('./error-display.js'),

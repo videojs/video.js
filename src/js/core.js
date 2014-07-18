@@ -71,6 +71,7 @@ vjs = function(id, options, ready){
 
 vjs.options = options;
 vjs.plugins = plugins;
+vjs.Player = Player;
 
 // Extended name, also available externally, window.videojs
 //var videojs = vjs;
