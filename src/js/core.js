@@ -1,6 +1,7 @@
-var vjs, Player, CoreObject, options, vjslib;
+var vjs, Player, CoreObject, options, vjslib, plugins;
 
 Player = require('./player.js');
+plugins = require('./plugins.js');
 options = require('./options.js');
 vjslib = require('./lib.js');
 CoreObject = require('./core-object.js');
@@ -69,6 +70,7 @@ vjs = function(id, options, ready){
 };
 
 vjs.options = options;
+vjs.plugins = plugins;
 
 // Extended name, also available externally, window.videojs
 //var videojs = vjs;
