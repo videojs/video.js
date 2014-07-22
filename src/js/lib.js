@@ -32,12 +32,25 @@ vjs.createEl = function(tagName, properties){
     }
   }
 
-  if(el.textContent.length > 0) {
-    var words = el.textContent.split(' ');
-    console.log(words);
-  }
-
   return el;
+};
+
+/**
+ * Recursive update to the DOM element
+ * @param node    element being updated
+ * @param locale  locale being implemented
+ * @param dict    dictionary reference
+ */
+vjs.localizeNode = function(node, locale, dict) {
+  if(node.nodeType === 3) {
+    console.log(node.data.trim(), dict[node.data.trim()]);
+    node.data = dict[node.data.trim()] || node.data;
+  }
+  node = node.firstChild;
+  while(node) {
+    vjs.localizeNode(node, locale, dict);
+    node = node.nextSibling;
+  }
 };
 
 /**
