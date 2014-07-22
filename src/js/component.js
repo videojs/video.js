@@ -209,23 +209,20 @@ vjs.Component.prototype.el_;
  * @return {Element}
  */
 vjs.Component.prototype.createEl = function(tagName, attributes){
+  var el = vjs.createEl(tagName, attributes);
   // Determine Localization
   // Rules:
   // 1. If locale NOT english
   // 2. If localization dictionary exists for locale reported
-  // 3. If attributes were passed
-  // 4. If attributes have an innerHTML
   if (this.player_.options().locale !== 'en-US' &&
     this.player_.options().locale !== 'en' &&
     this.player_.options().l20n &&
-    this.player_.options().l20n[this.player_.options().locale] !== undefined &&
-    attributes !== undefined && attributes.innerHTML !== undefined)
+    this.player_.options().l20n[this.player_.options().locale] !== undefined)
   {
-    //console.log('localization necessary');
-    //console.log(attributes.innerHTML);
+    vjs.localizeNode(el, this.player_.options().locale, this.player_.options().l20n[this.player_.options().locale]);
   }
 
-  return vjs.createEl(tagName, attributes);
+  return el;
 };
 
 /**
