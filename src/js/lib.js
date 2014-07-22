@@ -43,7 +43,6 @@ vjs.createEl = function(tagName, properties){
  */
 vjs.localizeNode = function(node, locale, dict) {
   if(node.nodeType === 3) {
-    console.log(node.data.trim(), dict[node.data.trim()]);
     node.data = dict[node.data.trim()] || node.data;
   }
   node = node.firstChild;
