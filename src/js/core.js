@@ -142,28 +142,10 @@ vjs.options = {
       'Captions': 'Subtítulos',
       'captions off': 'subtítulos fuera',
       'Chapters': 'capítulos',
-      'errors' : {
-        1: {
-          headline: '',
-          message: ''
-        },
-        2: {
-          headline: '',
-          message: ''
-        },
-        3: {
-          headline: '',
-          message: ''
-        },
-        4: {
-          headline: '',
-          message: ''
-        },
-        5: {
-          headline: '',
-          message: ''
-        }
-      }
+      'You aborted the video playback': 'Ha anulado la reproducción de vídeo',
+      'A network error caused the video download to fail part-way.': 'Un error en la red hizo que la descarga de vídeo falle parte del camino.',
+      'The video could not be loaded, either because the server or network failed or because the format is not supported.' : 'El video no se puede cargar, ya sea porque el servidor o la red fracasaron o porque el formato no es compatible.',
+      'The video playback was aborted due to a corruption problem or because the video used features your browser did not support.': 'La reproducción de vídeo se ha cancelado debido a un problema de corrupción o porque el video utilizado cuenta con su navegador no soporta.'
     }
   },
 
