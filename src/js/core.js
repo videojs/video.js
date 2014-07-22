@@ -109,73 +109,39 @@ vjs.options = {
 
   // Localization namespace
   /*
-   play
-   pause
-   stop
-   current
-   time
-   duration
-   remaining
-   stream
-   type
-   live
-   loaded
-   progress
-   fullscreen
-   mute
-   playback
-   rate
-   subtitles
-   off
-   captions
-   english
-   chapters
-
-   jugar
-    pausa
-    Deténgase
-    corriente
-    tiempo
-    duración
-    restante
-    corriente
-    tipo
-    vivir
-    cargado
-    progreso
-    fullscreen
-    mudo
-    reproducción
-    velocidad
-    subtítulos
-    apagado
-    subtítulos
-    Inglés
-    capítulos
+    'Play': 'Juego',
+    'Current Time': 'Tiempo actual',
+    'Duration Time': 'Tiempo de duración',
+    'Remaining Time': 'Tiempo restante',
+    'Stream Type LIVE': 'Tipo de transmisión en vivo',
+    'Loaded': 'cargado',
+    'Progress': 'progreso',
+    'Fullscreen': 'Pantalla completa',
+    'Mute': 'mudo',
+    'Playback Rate': 'reproducción Cambio',
+    'Subtitles': 'Subtítulos',
+    'subtitles off': 'subtítulos fuera',
+    'Captions': 'Subtítulos',
+    'captions off': 'subtítulos fuera',
+    'Chapters': 'capítulos',
   */
   'l20n': {
     'es': {
-      'play': 'jugar',
-      'pause': 'pausa',
-      'stop': 'deténgase',
-      'current': 'corriente',
-      'time': 'tiempo',
-      'duration': 'duración',
-      'remaining': 'restante',
-      'stream': '',
-      'type': '',
-      'live': '',
-      'loaded:': '',
-      'progress:': '',
-      'fullscreen': '',
-      'mute': '',
-      'playback': '',
-      'rate': '',
-      'subtitles': '',
-      'off': '',
-      'captions': '',
-      'english': '',
-      'chapters': '',
+      'Play': 'Juego',
+      'Current Time': 'Tiempo actual',
+      'Duration Time': 'Tiempo de duración',
+      'Remaining Time': 'Tiempo restante',
+      'Stream Type LIVE': 'Tipo de transmisión en vivo',
+      'Loaded': 'cargado',
+      'Progress': 'progreso',
+      'Fullscreen': 'Pantalla completa',
+      'Mute': 'mudo',
+      'Playback Rate': 'reproducción Cambio',
+      'Subtitles': 'Subtítulos',
+      'subtitles off': 'subtítulos fuera',
+      'Captions': 'Subtítulos',
+      'captions off': 'subtítulos fuera',
+      'Chapters': 'capítulos',
       'errors' : {
         1: {
           headline: '',
