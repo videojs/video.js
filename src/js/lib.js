@@ -37,13 +37,13 @@ vjs.createEl = function(tagName, properties){
 
 /**
  * Recursive update to the DOM element
- * @param node    element being updated
- * @param locale  locale being implemented
- * @param dict    dictionary reference
+ * @param node {object} element being updated
+ * @param locale {string} locale being implemented
+ * @param dict {object} dictionary reference
  */
 vjs.localizeNode = function(node, locale, dict) {
-  if(node.nodeType === 3) {
-    node.data = dict[node.data.trim()] || node.data;
+  if(node.innerHTML && node.innerHTML.length > 1 && dict[node.innerHTML]) {
+    node.innerHTML = dict[node.innerHTML].toString().trim();
   }
   node = node.firstChild;
   while(node) {
