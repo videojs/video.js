@@ -34,7 +34,9 @@
   "update": {
     "all": [
       { "include": "update stable" },
-      { "include": "update master" }
+      { "include": "update master" },
+      [ "npm install", "Download dependencies"],
+      [ "grunt", "Build the library" ]
     ],
     "master": [
       [ "git checkout master",      "Switch to the development branch" ],
