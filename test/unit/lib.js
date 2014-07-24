@@ -102,7 +102,7 @@ test('should get and remove data from an element', function(){
 });
 
 test('should read tag attributes from elements, including HTML5 in all browsers', function(){
-  var tags = '<video id="vid1" controls autoplay loop muted preload="none" src="http://google.com" poster="http://www2.videojs.com/img/video-js-html5-video-player.png" data-test="asdf" data-empty-string=""></video>';
+  var tags = '<video id="vid1" controls autoplay webkit-playsinline loop muted preload="none" src="http://google.com" poster="http://www2.videojs.com/img/video-js-html5-video-player.png" data-test="asdf" data-empty-string=""></video>';
   tags += '<video id="vid2">';
   // Not putting source and track inside video element because
   // oldIE needs the HTML5 shim to read tags inside HTML5 tags.
@@ -122,6 +122,7 @@ test('should read tag attributes from elements, including HTML5 in all browsers'
 
   // vid1
   equal(vid1Vals['autoplay'], true);
+  equal(vid1Vals['playsinline'], true);
   equal(vid1Vals['controls'], true);
   equal(vid1Vals['data-test'], 'asdf');
   equal(vid1Vals['data-empty-string'], '');

@@ -77,7 +77,7 @@ test('should get tag, source, and track settings', function(){
 
   var fixture = document.getElementById('qunit-fixture');
 
-  var html = '<video id="example_1" class="video-js" autoplay preload="none">';
+  var html = '<video id="example_1" class="video-js" autoplay webkit-playsinline preload="none">';
       html += '<source src="http://google.com" type="video/mp4">';
       html += '<source src="http://google.com" type="video/webm">';
       html += '<track src="http://google.com" kind="captions" attrtest>';
@@ -89,6 +89,7 @@ test('should get tag, source, and track settings', function(){
   var player = PlayerTest.makePlayer({}, tag);
 
   ok(player.options_['autoplay'] === true);
+  ok(player.options_['playsinline'] === true);
   ok(player.options_['preload'] === 'none'); // No extern. Use string.
   ok(player.options_['id'] === 'example_1');
   ok(player.options_['sources'].length === 2);

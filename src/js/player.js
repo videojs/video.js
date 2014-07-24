@@ -1198,6 +1198,14 @@ vjs.Player.prototype.loop = function(value){
   }
   return this.techGet('loop');
 };
+vjs.Player.prototype.playsinline = function(value){
+  if (value !== undefined) {
+    this.techCall('setPlaysinline', value);
+    this.options_['playsinline'] = value;
+    return this;
+  }
+  return this.techGet('playsinline');
+};
 
 /**
  * the url of the poster image source
