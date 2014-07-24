@@ -92,14 +92,20 @@ vjs.Html5.prototype.createEl = function(){
   }
 
   // Update specific tag settings, in case they were overridden
-  var attrs = ['autoplay','preload','loop','muted'];
+  var attrs = ['autoplay','preload','loop','playsinline','muted'];
   for (var i = attrs.length - 1; i >= 0; i--) {
     var attr = attrs[i];
     if (player.options_[attr] !== null) {
       el[attr] = player.options_[attr];
+      if(attr === 'playsinline') {
+        if(player.options_[attr]) {
+          el.setAttribute('webkit-playsinline','');
+        } else {
+          el.removeAttribute('webkit-playsinline');
+        }
+      }
     }
   }
-
   return el;
   // jenniisawesome = true;
 };
@@ -234,6 +240,9 @@ vjs.Html5.prototype.setControls = function(val){ this.el_.controls = !!val; };
 
 vjs.Html5.prototype.loop = function(){ return this.el_.loop; };
 vjs.Html5.prototype.setLoop = function(val){ this.el_.loop = val; };
+
+vjs.Html5.prototype.playsinline = function(){ return this.el_.playsinline; };
+vjs.Html5.prototype.setPlaysinline = function(val){ this.el_.playsinline = val; };
 
 vjs.Html5.prototype.error = function(){ return this.el_.error; };
 vjs.Html5.prototype.seeking = function(){ return this.el_.seeking; };

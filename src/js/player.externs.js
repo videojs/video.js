@@ -35,6 +35,7 @@ videojs.Player.prototype.seekable = function(){};
 videojs.Player.prototype.ended = function(){};
 videojs.Player.prototype.autoplay = function(){};
 videojs.Player.prototype.loop = function(){};
+videojs.Player.prototype.inline = function(){};
 videojs.Player.prototype.play = function() {};
 videojs.Player.prototype.pause = function() {};
 videojs.Player.prototype.controls = function(){};

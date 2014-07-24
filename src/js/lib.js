@@ -408,7 +408,7 @@ vjs.getAttributeValues = function(tag){
   // known boolean attributes
   // we can check for matching boolean properties, but older browsers
   // won't know about HTML5 boolean attributes that we still read from
-  knownBooleans = ','+'autoplay,controls,loop,muted,default'+',';
+  knownBooleans = ','+'autoplay,controls,loop,playsinline,muted,default'+',';
 
   if (tag && tag.attributes && tag.attributes.length > 0) {
     attrs = tag.attributes;
@@ -425,8 +425,12 @@ vjs.getAttributeValues = function(tag){
         // we also don't want support bad code like autoplay='false'
         attrVal = (attrVal !== null) ? true : false;
       }
+      if(attrName === 'webkit-playsinline') {
+        obj['playsinline'] = (attrVal !== null) ? true : false;
+      } else {
+        obj[attrName] = attrVal;
+      }
 
-      obj[attrName] = attrVal;
     }
   }
 

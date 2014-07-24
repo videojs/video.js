@@ -140,6 +140,7 @@ goog.exportProperty(vjs.Html5.prototype, 'setMuted', vjs.Html5.prototype.setMute
 goog.exportProperty(vjs.Html5.prototype, 'setPreload', vjs.Html5.prototype.setPreload);
 goog.exportProperty(vjs.Html5.prototype, 'setAutoplay', vjs.Html5.prototype.setAutoplay);
 goog.exportProperty(vjs.Html5.prototype, 'setLoop', vjs.Html5.prototype.setLoop);
+goog.exportProperty(vjs.Html5.prototype, 'setPlaysinline', vjs.Html5.prototype.setPlaysinline);
 goog.exportProperty(vjs.Html5.prototype, 'enterFullScreen', vjs.Html5.prototype.enterFullScreen);
 goog.exportProperty(vjs.Html5.prototype, 'exitFullScreen', vjs.Html5.prototype.exitFullScreen);
 goog.exportProperty(vjs.Html5.prototype, 'playbackRate', vjs.Html5.prototype.playbackRate);

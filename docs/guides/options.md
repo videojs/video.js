@@ -61,6 +61,13 @@ or
 { "autoplay": true }
 ```
 
+### playsinline ###
+If playsinline is true, the video will play inline instead of full-screen on iOS UIWebView if allowsInlineMediaPlayback is set to YES.
+```html
+<video webkit-playsinline ...>
+or
+{ "playsinline": true }
+
 
 ### preload ###
 The preload attribute informs the browser whether or not the video data should begin downloading as soon as the video tag is loaded. The options are auto, metadata, and none.
