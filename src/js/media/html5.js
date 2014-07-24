@@ -96,6 +96,17 @@ vjs.Html5.prototype.createEl = function(){
   for (var i = attrs.length - 1; i >= 0; i--) {
     var attr = attrs[i];
     if (player.options_[attr] !== null) {
+      if(typeof player.options_[attr] === 'boolean') {
+        if(player.options_[attr]) {
+          el.setAttribute(attr,'');
+        } else {
+          el.removeAttribute(attr);
+        }
+      } else if(typeof player.options_[attr] === 'undefined') {
+        el.removeAttribute(attr);
+      } else {
+        el.setAttribute(attr,player.options_[attr]);
+      }
       el[attr] = player.options_[attr];
     }
   }
