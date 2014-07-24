@@ -482,3 +482,32 @@ test('player should handle different error types', function(){
   vjs.log.error.restore();
 });
 
+test('should restore all video tags attribute after a tech switch', function(){
+  var fixture = document.getElementById('qunit-fixture');
+  var html = '<video id="example_1" class="vjs-tech" preload="" autoplay=""></video>';
+  fixture.innerHTML += html;
+
+  var tag = document.getElementById('example_1');
+  var player = new videojs.Player(tag, {techOrder:['html5']});
+  var techOptions = vjs.obj.merge({ 'source': '', 'parentEl': player.el_ }, player.options_['html5']);
+  vjs.Html5.disposeMediaElement(player.tag);
+  player.tag = null;
+  player.tech = new vjs.Html5(player, techOptions);
+
+  equal(player.tech.el_.outerHTML,html.replace('example_1','example_1_html5_api'));
+});
+
+test('should restore all video tags attribute after a tech switch and keep options', function(){
+  var fixture = document.getElementById('qunit-fixture');
+  var html = '<video id="example_1" class="vjs-tech" preload="none" autoplay=""></video>';
+  fixture.innerHTML += html;
+
+  var tag = document.getElementById('example_1');
+  var player = new videojs.Player(tag, {techOrder:['html5'], autoplay:false});
+  var techOptions = vjs.obj.merge({ 'source': '', 'parentEl': player.el_ }, player.options_['html5']);
+  vjs.Html5.disposeMediaElement(player.tag);
+  player.tag = null;
+  player.tech = new vjs.Html5(player, techOptions);
+
+  equal(player.tech.el_.outerHTML,html.replace('example_1','example_1_html5_api').replace(' autoplay=""',''));
+});
