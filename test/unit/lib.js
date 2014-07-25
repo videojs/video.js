@@ -152,6 +152,22 @@ test('should read tag attributes from elements, including HTML5 in all browsers'
   equal(trackVals['title'], 'test');
 });
 
+
+test('should set tag attributes from object', function(){
+
+  var tags = '<video id="vid1" controls data-test="ok"></video>';
+
+  document.getElementById('qunit-fixture').innerHTML += tags;
+  var el = document.getElementById('vid1');
+  vjs.setElementAttributes(el, {controls: false,'data-test': 'asdf'});
+
+  var vid1Vals = vjs.getAttributeValues(document.getElementById('vid1'));
+
+  equal(vid1Vals['controls'], undefined);
+  equal(vid1Vals['id'], 'vid1');
+  equal(vid1Vals['data-test'], 'asdf');
+});
+
 test('should get the right style values for an element', function(){
   var el = document.createElement('div');
   var container = document.createElement('div');

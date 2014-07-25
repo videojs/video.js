@@ -35,6 +35,25 @@ vjs.createEl = function(tagName, properties){
 };
 
 /**
+ * Apply attributes to an html element.
+ * @param  {Element} el         Target element.
+ * @param  {Object=} attributes Element attributes to be applied.
+ * @private
+ */
+vjs.setElementAttributes = function(el, attributes){
+  var keys = Object.keys(attributes);
+  for(var i = 0,l = keys.length;i<l;i++) {
+    var attrName = keys[i];
+    var attrValue = attributes[attrName];
+    if (attrValue === null || typeof attrValue === 'undefined' || attrValue === false) {
+      el.removeAttribute(attrName);
+    } else {
+      el.setAttribute(attrName,attrValue === true ? '' : attrValue);
+    }
+  }
+};
+
+/**
  * Uppercase the first letter of a string
  * @param  {String} string String to be uppercased
  * @return {String}
