@@ -95,14 +95,14 @@ vjs.Html5.prototype.createEl = function(){
   }
 
   // Update specific tag settings, in case they were overridden
-  var attrs = ['autoplay','preload','loop','muted'];
-  for (var i = attrs.length - 1; i >= 0; i--) {
-    var attr = attrs[i];
-    var attributes = {};
+  var settingsAttrs = ['autoplay','preload','loop','muted'];
+  for (var i = settingsAttrs.length - 1; i >= 0; i--) {
+    var attr = settingsAttrs[i];
+    var overwriteAttrs = {};
     if (typeof player.options_[attr] !== 'undefined') {
-      attributes[attr] = player.options_[attr];
+      overwriteAttrs[attr] = player.options_[attr];
     }
-    vjs.setElementAttributes(el, attributes);
+    vjs.setElementAttributes(el, overwriteAttrs);
   }
 
   return el;
