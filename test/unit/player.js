@@ -494,7 +494,7 @@ test('should restore all video tags attribute after a tech switch', function(){
   player.tag = null;
   player.tech = new vjs.Html5(player, techOptions);
 
-  equal(player.tech.el_.outerHTML,html.replace('example_1','example_1_html5_api'));
+  PlayerTest.htmlEqualWithSort(player.tech.el_.outerHTML, html.replace('example_1','example_1_html5_api'));
 });
 
 test('should restore all video tags attribute after a tech switch and keep options', function(){
@@ -509,5 +509,5 @@ test('should restore all video tags attribute after a tech switch and keep optio
   player.tag = null;
   player.tech = new vjs.Html5(player, techOptions);
 
-  equal(player.tech.el_.outerHTML,html.replace('example_1','example_1_html5_api').replace(' autoplay=""',''));
+  PlayerTest.htmlEqualWithSort(player.tech.el_.outerHTML, html.replace('example_1','example_1_html5_api').replace(' autoplay=""',''));
 });
