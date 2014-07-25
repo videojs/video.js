@@ -41,16 +41,13 @@ vjs.createEl = function(tagName, properties){
  * @private
  */
 vjs.setElementAttributes = function(el, attributes){
-  var keys = Object.keys(attributes);
-  for(var i = 0,l = keys.length;i<l;i++) {
-    var attrName = keys[i];
-    var attrValue = attributes[attrName];
+  vjs.obj.each(attributes, function(attrName, attrValue) {
     if (attrValue === null || typeof attrValue === 'undefined' || attrValue === false) {
       el.removeAttribute(attrName);
     } else {
       el.setAttribute(attrName,attrValue === true ? '' : attrValue);
     }
-  }
+  });
 };
 
 /**
