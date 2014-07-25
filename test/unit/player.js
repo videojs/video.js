@@ -73,7 +73,7 @@ test('should accept options from multiple sources and override in correct order'
 });
 
 test('should get tag, source, and track settings', function(){
-  // Partially tested in lib->getAttributeValues
+  // Partially tested in lib->getElementAttributes
 
   var fixture = document.getElementById('qunit-fixture');
 

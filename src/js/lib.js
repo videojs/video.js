@@ -416,7 +416,7 @@ vjs.TOUCH_ENABLED = !!(('ontouchstart' in window) || window.DocumentTouch && doc
  * @return {Object}
  * @private
  */
-vjs.getAttributeValues = function(tag){
+vjs.getElementAttributes = function(tag){
   var obj, knownBooleans, attrs, attrName, attrVal;
 
   obj = {};
