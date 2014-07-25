@@ -32,6 +32,8 @@ vjs.Player = vjs.Component.extend({
   init: function(tag, options, ready){
     this.tag = tag; // Store the original tag used to set options
 
+    this.tagAttributes = (tag) ? vjs.getAttributeValues(tag) : {}; // Store the tag attributes used to restore html5 tech
+
     // Make sure tag ID exists
     tag.id = tag.id || 'vjs_video_' + vjs.guid++;
 
