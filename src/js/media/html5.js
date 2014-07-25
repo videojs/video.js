@@ -100,7 +100,7 @@ vjs.Html5.prototype.createEl = function(){
     var attr = attrs[i];
     var attributes = {};
     if (typeof player.options_[attr] !== 'undefined') {
-      attributes[attr]=player.options_[attr];
+      attributes[attr] = player.options_[attr];
     }
     vjs.setElementAttributes(el, attributes);
   }
