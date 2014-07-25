@@ -13,17 +13,19 @@
   "homepage": "http://videojs.com",
   "author": "Steve Heffernan",
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "build": "browserify -d --standalone 'videojs' . -o bundle.js"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/videojs/video.js.git"
   },
-  "main": "./dist/video-js/video.js",
+  "main": "./src/js/video.js",
   "dependencies": {
     "videojs-swf": "4.4.2"
   },
   "devDependencies": {
+    "browserify": "^4.2.1",
     "calcdeps": "~0.1.7",
     "chg": "~0.1.8",
     "contribflow": "~0.2.0",

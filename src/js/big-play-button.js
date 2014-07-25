@@ -1,3 +1,7 @@
+var BigPlayButton, Button;
+
+Button = require('./button.js');
+
 /* Big Play Button
 ================================================================================ */
 /**
@@ -8,16 +12,18 @@
  * @class
  * @constructor
  */
-vjs.BigPlayButton = vjs.Button.extend();
+BigPlayButton = Button.extend();
 
-vjs.BigPlayButton.prototype.createEl = function(){
-  return vjs.Button.prototype.createEl.call(this, 'div', {
+BigPlayButton.prototype.createEl = function(){
+  return Button.prototype.createEl.call(this, 'div', {
     className: 'vjs-big-play-button',
     innerHTML: '<span aria-hidden="true"></span>',
     'aria-label': 'play video'
   });
 };
 
-vjs.BigPlayButton.prototype.onClick = function(){
+BigPlayButton.prototype.onClick = function(){
   this.player_.play();
 };
+
+module.exports = BigPlayButton;

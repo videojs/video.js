@@ -1,3 +1,8 @@
+var ControlBar, Component, vjslib;
+
+Component = require('../component.js');
+vjslib = require('../lib.js');
+
 /**
  * Container of main controls
  * @param {vjs.Player|Object} player
@@ -6,9 +11,9 @@
  * @constructor
  * @extends vjs.Component
  */
-vjs.ControlBar = vjs.Component.extend();
+ControlBar = Component.extend();
 
-vjs.ControlBar.prototype.options_ = {
+ControlBar.prototype.options_ = {
   loadEvent: 'play',
   children: {
     'playToggle': {},
@@ -26,8 +31,10 @@ vjs.ControlBar.prototype.options_ = {
   }
 };
 
-vjs.ControlBar.prototype.createEl = function(){
-  return vjs.createEl('div', {
+ControlBar.prototype.createEl = function(){
+  return vjslib.createEl('div', {
     className: 'vjs-control-bar'
   });
 };
+
+module.exports = ControlBar;

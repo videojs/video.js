@@ -1,3 +1,8 @@
+var PosterImage, Button, vjslib;
+
+Button = require('./button.js');
+vjslib = require('./lib.js');
+
 /* Poster Image
 ================================================================================ */
 /**
@@ -7,10 +12,10 @@
  * @param {Object=} options
  * @constructor
  */
-vjs.PosterImage = vjs.Button.extend({
+PosterImage = Button.extend({
   /** @constructor */
   init: function(player, options){
-    vjs.Button.call(this, player, options);
+    Button.call(this, player, options);
 
     if (player.poster()) {
       this.src(player.poster());
@@ -20,19 +25,19 @@ vjs.PosterImage = vjs.Button.extend({
       this.hide();
     }
 
-    player.on('posterchange', vjs.bind(this, function(){
+    player.on('posterchange', vjslib.bind(this, function(){
       this.src(player.poster());
     }));
 
-    player.on('play', vjs.bind(this, this.hide));
+    player.on('play', vjslib.bind(this, this.hide));
   }
 });
 
 // use the test el to check for backgroundSize style support
-var _backgroundSizeSupported = 'backgroundSize' in vjs.TEST_VID.style;
+var _backgroundSizeSupported = 'backgroundSize' in vjslib.TEST_VID.style;
 
-vjs.PosterImage.prototype.createEl = function(){
-  var el = vjs.createEl('div', {
+PosterImage.prototype.createEl = function(){
+  var el = vjslib.createEl('div', {
     className: 'vjs-poster',
 
     // Don't want poster to be tabbable.
@@ -41,13 +46,13 @@ vjs.PosterImage.prototype.createEl = function(){
 
   if (!_backgroundSizeSupported) {
     // setup an img element as a fallback for IE8
-    el.appendChild(vjs.createEl('img'));
+    el.appendChild(vjslib.createEl('img'));
   }
 
   return el;
 };
 
-vjs.PosterImage.prototype.src = function(url){
+PosterImage.prototype.src = function(url){
   var el = this.el();
 
   // getter
@@ -70,9 +75,11 @@ vjs.PosterImage.prototype.src = function(url){
   }
 };
 
-vjs.PosterImage.prototype.onClick = function(){
+PosterImage.prototype.onClick = function(){
   // Only accept clicks when controls are enabled
   if (this.player().controls()) {
     this.player_.play();
   }
 };
+
+module.exports = PosterImage;

@@ -1,3 +1,5 @@
+module.exports = function sendGAEvent() {
+
 /**
  * Google Analytics tracking pixel for the freely hosted version of Video.js
  * at vjs.zencdn.net. We'll use this data to develop a support matrix of
@@ -54,3 +56,5 @@
     +'&utme=8(vjsv)9(v0.0.0)'
   ;
 })(new Image(),window,navigator,encodeURIComponent);
+
+}

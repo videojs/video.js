@@ -1,11 +1,21 @@
+var vjs, Player, CoreObject, options, vjslib, plugins;
+
+Player = require('./player.js');
+plugins = require('./plugins.js');
+options = require('./options.js');
+vjslib = require('./lib.js');
+CoreObject = require('./core-object.js');
+
 /**
  * @fileoverview Main function src.
  */
 
-// HTML5 Shiv. Must be in <head> to support older browsers.
-document.createElement('video');
-document.createElement('audio');
-document.createElement('track');
+var elementShiv = function() {
+  // HTML5 Shiv. Must be in <head> to support older browsers.
+  document.createElement('video');
+  document.createElement('audio');
+  document.createElement('track');
+}
 
 /**
  * Doubles as the main function for users to create a player instance and also
@@ -23,7 +33,7 @@ document.createElement('track');
  * @return {vjs.Player}             A player instance
  * @namespace
  */
-var vjs = function(id, options, ready){
+vjs = function(id, options, ready){
   var tag; // Element of ID
 
   // Allow for element or ID to be passed in
@@ -36,12 +46,12 @@ var vjs = function(id, options, ready){
     }
 
     // If a player instance has already been created for this ID return it.
-    if (vjs.players[id]) {
-      return vjs.players[id];
+    if (Player.players[id]) {
+      return Player.players[id];
 
     // Otherwise get element for ID
     } else {
-      tag = vjs.el(id);
+      tag = vjslib.el(id);
     }
 
   // ID is a media element
@@ -56,81 +66,26 @@ var vjs = function(id, options, ready){
 
   // Element may have a player attr referring to an already created player instance.
   // If not, set up a new player and return the instance.
-  return tag['player'] || new vjs.Player(tag, options, ready);
+  return tag['player'] || new Player(tag, options, ready);
 };
 
+vjs.options = options;
+vjs.plugins = plugins;
+vjs.Player = Player;
+
 // Extended name, also available externally, window.videojs
-var videojs = vjs;
-window.videojs = window.vjs = vjs;
+//var videojs = vjs;
+//window.videojs = window.vjs = vjs;
 
 // CDN Version. Used to target right flash swf.
 vjs.CDN_VERSION = 'GENERATED_CDN_VSN';
 vjs.ACCESS_PROTOCOL = ('https:' == document.location.protocol ? 'https://' : 'http://');
 
-/**
- * Global Player instance options, surfaced from vjs.Player.prototype.options_
- * vjs.options = vjs.Player.prototype.options_
- * All options should use string keys so they avoid
- * renaming by closure compiler
- * @type {Object}
- */
-vjs.options = {
-  // Default order of fallback technology
-  'techOrder': ['html5','flash'],
-  // techOrder: ['flash','html5'],
-
-  'html5': {},
-  'flash': {},
-
-  // Default of web browser is 300x150. Should rely on source width/height.
-  'width': 300,
-  'height': 150,
-  // defaultVolume: 0.85,
-  'defaultVolume': 0.00, // The freakin seaguls are driving me crazy!
-
-  // default playback rates
-  'playbackRates': [],
-  // Add playback rate selection by adding rates
-  // 'playbackRates': [0.5, 1, 1.5, 2],
-
-  // Included control sets
-  'children': {
-    'mediaLoader': {},
-    'posterImage': {},
-    'textTrackDisplay': {},
-    'loadingSpinner': {},
-    'bigPlayButton': {},
-    'controlBar': {},
-    'errorDisplay': {}
-  },
-
-  // Default message to show when a video cannot be played.
-  'notSupportedMessage': 'No compatible source was found for this video.'
-};
-
 // Set CDN Version of swf
 // The added (+) blocks the replace from changing this GENERATED_CDN_VSN string
 if (vjs.CDN_VERSION !== 'GENERATED'+'_CDN_VSN') {
-  videojs.options['flash']['swf'] = vjs.ACCESS_PROTOCOL + 'vjs.zencdn.net/'+vjs.CDN_VERSION+'/video-js.swf';
+  options['flash']['swf'] = vjs.ACCESS_PROTOCOL + 'vjs.zencdn.net/'+vjs.CDN_VERSION+'/video-js.swf';
 }
 
-/**
- * Global player list
- * @type {Object}
- */
-vjs.players = {};
-
-/*!
- * Custom Universal Module Definition (UMD)
- *
- * Video.js will never be a non-browser lib so we can simplify UMD a bunch and
- * still support requirejs and browserify. This also needs to be closure
- * compiler compatible, so string keys are used.
- */
-if (typeof define === 'function' && define['amd']) {
-  define([], function(){ return videojs; });
-
-// checking that module is an object too because of umdjs/umd#35
-} else if (typeof exports === 'object' && typeof module === 'object') {
-  module['exports'] = videojs;
-}
+module.exports = vjs;
+module.exports.elementShiv = elementShiv;

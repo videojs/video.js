@@ -1,10 +1,15 @@
+var autoSetup, autoSetupTimeout, hasLoaded, windowLoaded, vjsJSON, vjsevents;
+
+vjsJSON = require('./json.js');
+vjsevents = require('./events.js');
+
 /**
  * @fileoverview Functions for automatically setting up a player
  * based on the data-setup attribute of the video tag
  */
 
 // Automatically set up any tags that have a data-setup attribute
-vjs.autoSetup = function(){
+autoSetup = function(){
   var options, vid, player,
       vids = document.getElementsByTagName('video');
 
@@ -28,7 +33,7 @@ vjs.autoSetup = function(){
 
             // Parse options JSON
             // If empty string, make it a parsable json object.
-            options = vjs.JSON.parse(options || '{}');
+            options = vjsJSON.parse(options || '{}');
 
             // Create new video.js instance.
             player = videojs(vid, options);
@@ -37,30 +42,37 @@ vjs.autoSetup = function(){
 
       // If getAttribute isn't defined, we need to wait for the DOM.
       } else {
-        vjs.autoSetupTimeout(1);
+        autoSetupTimeout(1);
         break;
       }
     }
 
   // No videos were found, so keep looping unless page is finisehd loading.
-  } else if (!vjs.windowLoaded) {
-    vjs.autoSetupTimeout(1);
+  } else if (!windowLoaded) {
+    autoSetupTimeout(1);
   }
 };
 
 // Pause to let the DOM keep processing
-vjs.autoSetupTimeout = function(wait){
-  setTimeout(vjs.autoSetup, wait);
+autoSetupTimeout = function(wait){
+  setTimeout(autoSetup, wait);
 };
 
+// return whether window has loaded
+hasLoaded = function() {
+  return windowLoaded;
+}
+
 if (document.readyState === 'complete') {
-  vjs.windowLoaded = true;
+  windowLoaded = true;
 } else {
-  vjs.one(window, 'load', function(){
-    vjs.windowLoaded = true;
+  vjsevents.one(window, 'load', function(){
+    windowLoaded = true;
   });
 }
 
-// Run Auto-load players
-// You have to wait at least once in case this script is loaded after your video in the DOM (weird behavior only with minified version)
-vjs.autoSetupTimeout(1);
+module.exports = {
+  autoSetup: autoSetup,
+  autoSetupTimeout: autoSetupTimeout,
+  hasLoaded: hasLoaded
+};

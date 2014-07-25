@@ -1,3 +1,9 @@
+var Html5, MediaTechController, vjslib, vjsevents;
+
+MediaTechController = require('./media.js');
+vjslib = require('../lib.js');
+vjsevents = require('../events.js');
+
 /**
  * @fileoverview HTML5 Media Controller - Wrapper for HTML5 Media API
  */
@@ -9,22 +15,22 @@
  * @param {Function=} ready
  * @constructor
  */
-vjs.Html5 = vjs.MediaTechController.extend({
+Html5 = MediaTechController.extend({
   /** @constructor */
   init: function(player, options, ready){
     // volume cannot be changed from 1 on iOS
-    this.features['volumeControl'] = vjs.Html5.canControlVolume();
+    this.features['volumeControl'] = Html5.canControlVolume();
 
     // just in case; or is it excessively...
-    this.features['playbackRate'] = vjs.Html5.canControlPlaybackRate();
+    this.features['playbackRate'] = Html5.canControlPlaybackRate();
 
     // In iOS, if you move a video element in the DOM, it breaks video playback.
-    this.features['movingMediaElementInDOM'] = !vjs.IS_IOS;
+    this.features['movingMediaElementInDOM'] = !vjslib.IS_IOS;
 
     // HTML video is able to automatically resize when going to fullscreen
     this.features['fullscreenResize'] = true;
 
-    vjs.MediaTechController.call(this, player, options, ready);
+    MediaTechController.call(this, player, options, ready);
     this.setupTriggers();
 
     var source = options['source'];
@@ -38,7 +44,7 @@ vjs.Html5 = vjs.MediaTechController.extend({
     // Our goal should be to get the custom controls on mobile solid everywhere
     // so we can remove this all together. Right now this will block custom
     // controls on touch enabled laptops like the Chrome Pixel
-    if (vjs.TOUCH_ENABLED && player.options()['nativeControlsForTouch'] !== false) {
+    if (vjslib.TOUCH_ENABLED && player.options()['nativeControlsForTouch'] !== false) {
       this.useNativeControls();
     }
 
@@ -57,11 +63,11 @@ vjs.Html5 = vjs.MediaTechController.extend({
   }
 });
 
-vjs.Html5.prototype.dispose = function(){
-  vjs.MediaTechController.prototype.dispose.call(this);
+Html5.prototype.dispose = function(){
+  MediaTechController.prototype.dispose.call(this);
 };
 
-vjs.Html5.prototype.createEl = function(){
+Html5.prototype.createEl = function(){
   var player = this.player_,
       // If possible, reuse original tag for HTML5 playback technology element
       el = player.tag,
@@ -76,11 +82,11 @@ vjs.Html5.prototype.createEl = function(){
     // If the original tag is still there, clone and remove it.
     if (el) {
       clone = el.cloneNode(false);
-      vjs.Html5.disposeMediaElement(el);
+      Html5.disposeMediaElement(el);
       el = clone;
       player.tag = null;
     } else {
-      el = vjs.createEl('video', {
+      el = vjslib.createEl('video', {
         id:player.id() + '_html5_api',
         className:'vjs-tech'
       });
@@ -88,7 +94,7 @@ vjs.Html5.prototype.createEl = function(){
     // associate the player with the new tag
     el['player'] = player;
 
-    vjs.insertFirst(el, player.el());
+    vjslib.insertFirst(el, player.el());
   }
 
   // Update specific tag settings, in case they were overridden
@@ -107,13 +113,13 @@ vjs.Html5.prototype.createEl = function(){
 // Make video events trigger player events
 // May seem verbose here, but makes other APIs possible.
 // Triggers removed using this.off when disposed
-vjs.Html5.prototype.setupTriggers = function(){
-  for (var i = vjs.Html5.Events.length - 1; i >= 0; i--) {
-    vjs.on(this.el_, vjs.Html5.Events[i], vjs.bind(this, this.eventHandler));
+Html5.prototype.setupTriggers = function(){
+  for (var i = Html5.Events.length - 1; i >= 0; i--) {
+    vjsevents.on(this.el_, Html5.Events[i], vjslib.bind(this, this.eventHandler));
   }
 };
 
-vjs.Html5.prototype.eventHandler = function(evt){
+Html5.prototype.eventHandler = function(evt){
   // In the case of an error, set the error prop on the player
   // and let the player handle triggering the event.
   if (evt.type == 'error') {
@@ -128,7 +134,7 @@ vjs.Html5.prototype.eventHandler = function(evt){
   }
 };
 
-vjs.Html5.prototype.useNativeControls = function(){
+Html5.prototype.useNativeControls = function(){
   var tech, player, controlsOn, controlsOff, cleanUp;
 
   tech = this;
@@ -160,43 +166,43 @@ vjs.Html5.prototype.useNativeControls = function(){
 };
 
 
-vjs.Html5.prototype.play = function(){ this.el_.play(); };
-vjs.Html5.prototype.pause = function(){ this.el_.pause(); };
-vjs.Html5.prototype.paused = function(){ return this.el_.paused; };
+Html5.prototype.play = function(){ this.el_.play(); };
+Html5.prototype.pause = function(){ this.el_.pause(); };
+Html5.prototype.paused = function(){ return this.el_.paused; };
 
-vjs.Html5.prototype.currentTime = function(){ return this.el_.currentTime; };
-vjs.Html5.prototype.setCurrentTime = function(seconds){
+Html5.prototype.currentTime = function(){ return this.el_.currentTime; };
+Html5.prototype.setCurrentTime = function(seconds){
   try {
     this.el_.currentTime = seconds;
   } catch(e) {
-    vjs.log(e, 'Video is not ready. (Video.js)');
+    vjslib.log(e, 'Video is not ready. (Video.js)');
     // this.warning(VideoJS.warnings.videoNotReady);
   }
 };
 
-vjs.Html5.prototype.duration = function(){ return this.el_.duration || 0; };
-vjs.Html5.prototype.buffered = function(){ return this.el_.buffered; };
+Html5.prototype.duration = function(){ return this.el_.duration || 0; };
+Html5.prototype.buffered = function(){ return this.el_.buffered; };
 
-vjs.Html5.prototype.volume = function(){ return this.el_.volume; };
-vjs.Html5.prototype.setVolume = function(percentAsDecimal){ this.el_.volume = percentAsDecimal; };
-vjs.Html5.prototype.muted = function(){ return this.el_.muted; };
-vjs.Html5.prototype.setMuted = function(muted){ this.el_.muted = muted; };
+Html5.prototype.volume = function(){ return this.el_.volume; };
+Html5.prototype.setVolume = function(percentAsDecimal){ this.el_.volume = percentAsDecimal; };
+Html5.prototype.muted = function(){ return this.el_.muted; };
+Html5.prototype.setMuted = function(muted){ this.el_.muted = muted; };
 
-vjs.Html5.prototype.width = function(){ return this.el_.offsetWidth; };
-vjs.Html5.prototype.height = function(){ return this.el_.offsetHeight; };
+Html5.prototype.width = function(){ return this.el_.offsetWidth; };
+Html5.prototype.height = function(){ return this.el_.offsetHeight; };
 
-vjs.Html5.prototype.supportsFullScreen = function(){
+Html5.prototype.supportsFullScreen = function(){
   if (typeof this.el_.webkitEnterFullScreen == 'function') {
 
     // Seems to be broken in Chromium/Chrome && Safari in Leopard
-    if (/Android/.test(vjs.USER_AGENT) || !/Chrome|Mac OS X 10.5/.test(vjs.USER_AGENT)) {
+    if (/Android/.test(vjslib.USER_AGENT) || !/Chrome|Mac OS X 10.5/.test(vjslib.USER_AGENT)) {
       return true;
     }
   }
   return false;
 };
 
-vjs.Html5.prototype.enterFullScreen = function(){
+Html5.prototype.enterFullScreen = function(){
   var video = this.el_;
   if (video.paused && video.networkState <= video.HAVE_METADATA) {
     // attempt to prime the video element for programmatic access
@@ -213,56 +219,56 @@ vjs.Html5.prototype.enterFullScreen = function(){
     video.webkitEnterFullScreen();
   }
 };
-vjs.Html5.prototype.exitFullScreen = function(){
+Html5.prototype.exitFullScreen = function(){
   this.el_.webkitExitFullScreen();
 };
-vjs.Html5.prototype.src = function(src){ this.el_.src = src; };
-vjs.Html5.prototype.load = function(){ this.el_.load(); };
-vjs.Html5.prototype.currentSrc = function(){ return this.el_.currentSrc; };
+Html5.prototype.src = function(src){ this.el_.src = src; };
+Html5.prototype.load = function(){ this.el_.load(); };
+Html5.prototype.currentSrc = function(){ return this.el_.currentSrc; };
 
-vjs.Html5.prototype.poster = function(){ return this.el_.poster; };
-vjs.Html5.prototype.setPoster = function(val){ this.el_.poster = val; };
+Html5.prototype.poster = function(){ return this.el_.poster; };
+Html5.prototype.setPoster = function(val){ this.el_.poster = val; };
 
-vjs.Html5.prototype.preload = function(){ return this.el_.preload; };
-vjs.Html5.prototype.setPreload = function(val){ this.el_.preload = val; };
+Html5.prototype.preload = function(){ return this.el_.preload; };
+Html5.prototype.setPreload = function(val){ this.el_.preload = val; };
 
-vjs.Html5.prototype.autoplay = function(){ return this.el_.autoplay; };
-vjs.Html5.prototype.setAutoplay = function(val){ this.el_.autoplay = val; };
+Html5.prototype.autoplay = function(){ return this.el_.autoplay; };
+Html5.prototype.setAutoplay = function(val){ this.el_.autoplay = val; };
 
-vjs.Html5.prototype.controls = function(){ return this.el_.controls; };
-vjs.Html5.prototype.setControls = function(val){ this.el_.controls = !!val; };
+Html5.prototype.controls = function(){ return this.el_.controls; };
+Html5.prototype.setControls = function(val){ this.el_.controls = !!val; };
 
-vjs.Html5.prototype.loop = function(){ return this.el_.loop; };
-vjs.Html5.prototype.setLoop = function(val){ this.el_.loop = val; };
+Html5.prototype.loop = function(){ return this.el_.loop; };
+Html5.prototype.setLoop = function(val){ this.el_.loop = val; };
 
-vjs.Html5.prototype.error = function(){ return this.el_.error; };
-vjs.Html5.prototype.seeking = function(){ return this.el_.seeking; };
-vjs.Html5.prototype.ended = function(){ return this.el_.ended; };
-vjs.Html5.prototype.defaultMuted = function(){ return this.el_.defaultMuted; };
+Html5.prototype.error = function(){ return this.el_.error; };
+Html5.prototype.seeking = function(){ return this.el_.seeking; };
+Html5.prototype.ended = function(){ return this.el_.ended; };
+Html5.prototype.defaultMuted = function(){ return this.el_.defaultMuted; };
 
-vjs.Html5.prototype.playbackRate = function(){ return this.el_.playbackRate; };
-vjs.Html5.prototype.setPlaybackRate = function(val){ this.el_.playbackRate = val; };
+Html5.prototype.playbackRate = function(){ return this.el_.playbackRate; };
+Html5.prototype.setPlaybackRate = function(val){ this.el_.playbackRate = val; };
 
-vjs.Html5.prototype.networkState = function(){ return this.el_.networkState; };
+Html5.prototype.networkState = function(){ return this.el_.networkState; };
 
 /* HTML5 Support Testing ---------------------------------------------------- */
 
-vjs.Html5.isSupported = function(){
+Html5.isSupported = function(){
   // ie9 with no Media Player is a LIAR! (#984)
   try {
-    vjs.TEST_VID['volume'] = 0.5;
+    vjslib.TEST_VID['volume'] = 0.5;
   } catch (e) {
     return false;
   }
 
-  return !!vjs.TEST_VID.canPlayType;
+  return !!vjslib.TEST_VID.canPlayType;
 };
 
-vjs.Html5.canPlaySource = function(srcObj){
+Html5.canPlaySource = function(srcObj){
   // IE9 on Windows 7 without MediaPlayer throws an error here
   // https://github.com/videojs/video.js/issues/519
   try {
-    return !!vjs.TEST_VID.canPlayType(srcObj.type);
+    return !!vjslib.TEST_VID.canPlayType(srcObj.type);
   } catch(e) {
     return '';
   }
@@ -271,16 +277,16 @@ vjs.Html5.canPlaySource = function(srcObj){
   // Check Media Type
 };
 
-vjs.Html5.canControlVolume = function(){
-  var volume =  vjs.TEST_VID.volume;
-  vjs.TEST_VID.volume = (volume / 2) + 0.1;
-  return volume !== vjs.TEST_VID.volume;
+Html5.canControlVolume = function(){
+  var volume =  vjslib.TEST_VID.volume;
+  vjslib.TEST_VID.volume = (volume / 2) + 0.1;
+  return volume !== vjslib.TEST_VID.volume;
 };
 
-vjs.Html5.canControlPlaybackRate = function(){
-  var playbackRate =  vjs.TEST_VID.playbackRate;
-  vjs.TEST_VID.playbackRate = (playbackRate / 2) + 0.1;
-  return playbackRate !== vjs.TEST_VID.playbackRate;
+Html5.canControlPlaybackRate = function(){
+  var playbackRate =  vjslib.TEST_VID.playbackRate;
+  vjslib.TEST_VID.playbackRate = (playbackRate / 2) + 0.1;
+  return playbackRate !== vjslib.TEST_VID.playbackRate;
 };
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //
@@ -289,14 +295,14 @@ vjs.Html5.canControlPlaybackRate = function(){
       mpegurlRE = /^application\/(?:x-|vnd\.apple\.)mpegurl/i,
       mp4RE = /^video\/mp4/i;
 
-  vjs.Html5.patchCanPlayType = function() {
+  Html5.patchCanPlayType = function() {
     // Android 4.0 and above can play HLS to some extent but it reports being unable to do so
-    if (vjs.ANDROID_VERSION >= 4.0) {
+    if (vjslib.ANDROID_VERSION >= 4.0) {
       if (!canPlayType) {
-        canPlayType = vjs.TEST_VID.constructor.prototype.canPlayType;
+        canPlayType = vjslib.TEST_VID.constructor.prototype.canPlayType;
       }
 
-      vjs.TEST_VID.constructor.prototype.canPlayType = function(type) {
+      vjslib.TEST_VID.constructor.prototype.canPlayType = function(type) {
         if (type && mpegurlRE.test(type)) {
           return 'maybe';
         }
@@ -305,12 +311,12 @@ vjs.Html5.canControlPlaybackRate = function(){
     }
 
     // Override Android 2.2 and less canPlayType method which is broken
-    if (vjs.IS_OLD_ANDROID) {
+    if (vjslib.IS_OLD_ANDROID) {
       if (!canPlayType) {
-        canPlayType = vjs.TEST_VID.constructor.prototype.canPlayType;
+        canPlayType = vjslib.TEST_VID.constructor.prototype.canPlayType;
       }
 
-      vjs.TEST_VID.constructor.prototype.canPlayType = function(type){
+      vjslib.TEST_VID.constructor.prototype.canPlayType = function(type){
         if (type && mp4RE.test(type)) {
           return 'maybe';
         }
@@ -319,21 +325,21 @@ vjs.Html5.canControlPlaybackRate = function(){
     }
   };
 
-  vjs.Html5.unpatchCanPlayType = function() {
-    var r = vjs.TEST_VID.constructor.prototype.canPlayType;
-    vjs.TEST_VID.constructor.prototype.canPlayType = canPlayType;
+  Html5.unpatchCanPlayType = function() {
+    var r = vjslib.TEST_VID.constructor.prototype.canPlayType;
+    vjslib.TEST_VID.constructor.prototype.canPlayType = canPlayType;
     canPlayType = null;
     return r;
   };
 
   // by default, patch the video element
-  vjs.Html5.patchCanPlayType();
+  Html5.patchCanPlayType();
 })();
 
 // List of all HTML5 events (various uses).
-vjs.Html5.Events = 'loadstart,suspend,abort,error,emptied,stalled,loadedmetadata,loadeddata,canplay,canplaythrough,playing,waiting,seeking,seeked,ended,durationchange,timeupdate,progress,play,pause,ratechange,volumechange'.split(',');
+Html5.Events = 'loadstart,suspend,abort,error,emptied,stalled,loadedmetadata,loadeddata,canplay,canplaythrough,playing,waiting,seeking,seeked,ended,durationchange,timeupdate,progress,play,pause,ratechange,volumechange'.split(',');
 
-vjs.Html5.disposeMediaElement = function(el){
+Html5.disposeMediaElement = function(el){
   if (!el) { return; }
 
   el['player'] = null;
@@ -364,3 +370,5 @@ vjs.Html5.disposeMediaElement = function(el){
     })();
   }
 };
+
+module.exports = Html5;

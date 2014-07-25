@@ -1,3 +1,7 @@
+var FullscreenToggle, Button;
+
+Button = require('../button.js');
+
 /**
  * Toggle fullscreen video
  * @param {vjs.Player|Object} player
@@ -5,24 +9,24 @@
  * @class
  * @extends vjs.Button
  */
-vjs.FullscreenToggle = vjs.Button.extend({
+FullscreenToggle = Button.extend({
   /**
    * @constructor
    * @memberof vjs.FullscreenToggle
    * @instance
    */
   init: function(player, options){
-    vjs.Button.call(this, player, options);
+    Button.call(this, player, options);
   }
 });
 
-vjs.FullscreenToggle.prototype.buttonText = 'Fullscreen';
+FullscreenToggle.prototype.buttonText = 'Fullscreen';
 
-vjs.FullscreenToggle.prototype.buildCSSClass = function(){
-  return 'vjs-fullscreen-control ' + vjs.Button.prototype.buildCSSClass.call(this);
+FullscreenToggle.prototype.buildCSSClass = function(){
+  return 'vjs-fullscreen-control ' + Button.prototype.buildCSSClass.call(this);
 };
 
-vjs.FullscreenToggle.prototype.onClick = function(){
+FullscreenToggle.prototype.onClick = function(){
   if (!this.player_.isFullscreen()) {
     this.player_.requestFullscreen();
     this.controlText_.innerHTML = 'Non-Fullscreen';
@@ -31,3 +35,5 @@ vjs.FullscreenToggle.prototype.onClick = function(){
     this.controlText_.innerHTML = 'Fullscreen';
   }
 };
+
+module.exports = FullscreenToggle;

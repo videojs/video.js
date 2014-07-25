@@ -1,3 +1,10 @@
+var Component, CoreObject, vjslib, vjsutil, vjsevents;
+
+CoreObject = require('./core-object.js');
+vjslib = require('./lib.js');
+vjsutil = require('./util.js')
+vjsevents = require('./events.js');
+
 /**
  * @fileoverview Player Component - Base class for all UI objects
  *
@@ -32,7 +39,7 @@
  * @constructor
  * @extends vjs.CoreObject
  */
-vjs.Component = vjs.CoreObject.extend({
+Component = CoreObject.extend({
   /**
    * the constructor function for the class
    *
@@ -42,13 +49,13 @@ vjs.Component = vjs.CoreObject.extend({
     this.player_ = player;
 
     // Make a copy of prototype.options_ to protect against overriding global defaults
-    this.options_ = vjs.obj.copy(this.options_);
+    this.options_ = vjslib.obj.copy(this.options_);
 
     // Updated options with supplied options
     options = this.options(options);
 
     // Get ID from options, element, or create using player ID and unique ID
-    this.id_ = options['id'] || ((options['el'] && options['el']['id']) ? options['el']['id'] : player.id() + '_component_' + vjs.guid++ );
+    this.id_ = options['id'] || ((options['el'] && options['el']['id']) ? options['el']['id'] : player.id() + '_component_' + vjslib.guid++ );
 
     this.name_ = options['name'] || null;
 
@@ -75,7 +82,7 @@ vjs.Component = vjs.CoreObject.extend({
 /**
  * Dispose of the component and all child components
  */
-vjs.Component.prototype.dispose = function(){
+Component.prototype.dispose = function(){
   this.trigger({ type: 'dispose', 'bubbles': false });
 
   // Dispose all children.
@@ -100,7 +107,7 @@ vjs.Component.prototype.dispose = function(){
     this.el_.parentNode.removeChild(this.el_);
   }
 
-  vjs.removeData(this.el_);
+  vjslib.removeData(this.el_);
   this.el_ = null;
 };
 
@@ -110,14 +117,14 @@ vjs.Component.prototype.dispose = function(){
  * @type {vjs.Player}
  * @private
  */
-vjs.Component.prototype.player_ = true;
+Component.prototype.player_ = true;
 
 /**
  * Return the component's player
  *
  * @return {vjs.Player}
  */
-vjs.Component.prototype.player = function(){
+Component.prototype.player = function(){
   return this.player_;
 };
 
@@ -127,7 +134,7 @@ vjs.Component.prototype.player = function(){
  * @type {Object}
  * @private
  */
-vjs.Component.prototype.options_;
+Component.prototype.options_;
 
 /**
  * Deep merge of options objects
@@ -170,10 +177,10 @@ vjs.Component.prototype.options_;
  * @param  {Object} obj Object of new option values
  * @return {Object}     A NEW object of this.options_ and obj merged
  */
-vjs.Component.prototype.options = function(obj){
+Component.prototype.options = function(obj){
   if (obj === undefined) return this.options_;
 
-  return this.options_ = vjs.util.mergeOptions(this.options_, obj);
+  return this.options_ = vjsutil.mergeOptions(this.options_, obj);
 };
 
 /**
@@ -182,7 +189,7 @@ vjs.Component.prototype.options = function(obj){
  * @type {Element}
  * @private
  */
-vjs.Component.prototype.el_;
+Component.prototype.el_;
 
 /**
  * Create the component's DOM element
@@ -191,8 +198,8 @@ vjs.Component.prototype.el_;
  * @param  {Object=} attributes An object of element attributes that should be set on the element
  * @return {Element}
  */
-vjs.Component.prototype.createEl = function(tagName, attributes){
-  return vjs.createEl(tagName, attributes);
+Component.prototype.createEl = function(tagName, attributes){
+  return vjslib.createEl(tagName, attributes);
 };
 
 /**
@@ -202,7 +209,7 @@ vjs.Component.prototype.createEl = function(tagName, attributes){
  *
  * @return {Element}
  */
-vjs.Component.prototype.el = function(){
+Component.prototype.el = function(){
   return this.el_;
 };
 
@@ -213,7 +220,7 @@ vjs.Component.prototype.el = function(){
  * @type {Element}
  * @private
  */
-vjs.Component.prototype.contentEl_;
+Component.prototype.contentEl_;
 
 /**
  * Return the component's DOM element for embedding content.
@@ -221,7 +228,7 @@ vjs.Component.prototype.contentEl_;
  *
  * @return {Element}
  */
-vjs.Component.prototype.contentEl = function(){
+Component.prototype.contentEl = function(){
   return this.contentEl_ || this.el_;
 };
 
@@ -231,7 +238,7 @@ vjs.Component.prototype.contentEl = function(){
  * @type {String}
  * @private
  */
-vjs.Component.prototype.id_;
+Component.prototype.id_;
 
 /**
  * Get the component's ID
@@ -240,7 +247,7 @@ vjs.Component.prototype.id_;
  *
  * @return {String}
  */
-vjs.Component.prototype.id = function(){
+Component.prototype.id = function(){
   return this.id_;
 };
 
@@ -250,7 +257,7 @@ vjs.Component.prototype.id = function(){
  * @type {String}
  * @private
  */
-vjs.Component.prototype.name_;
+Component.prototype.name_;
 
 /**
  * Get the component's name. The name is often used to reference the component.
@@ -259,7 +266,7 @@ vjs.Component.prototype.name_;
  *
  * @return {String}
  */
-vjs.Component.prototype.name = function(){
+Component.prototype.name = function(){
   return this.name_;
 };
 
@@ -269,7 +276,7 @@ vjs.Component.prototype.name = function(){
  * @type {Array}
  * @private
  */
-vjs.Component.prototype.children_;
+Component.prototype.children_;
 
 /**
  * Get an array of all child components
@@ -278,7 +285,7 @@ vjs.Component.prototype.children_;
  *
  * @return {Array} The children
  */
-vjs.Component.prototype.children = function(){
+Component.prototype.children = function(){
   return this.children_;
 };
 
@@ -288,14 +295,14 @@ vjs.Component.prototype.children = function(){
  * @type {Object}
  * @private
  */
-vjs.Component.prototype.childIndex_;
+Component.prototype.childIndex_;
 
 /**
  * Returns a child component with the provided ID
  *
  * @return {vjs.Component}
  */
-vjs.Component.prototype.getChildById = function(id){
+Component.prototype.getChildById = function(id){
   return this.childIndex_[id];
 };
 
@@ -305,14 +312,14 @@ vjs.Component.prototype.getChildById = function(id){
  * @type {Object}
  * @private
  */
-vjs.Component.prototype.childNameIndex_;
+Component.prototype.childNameIndex_;
 
 /**
  * Returns a child component with the provided name
  *
  * @return {vjs.Component}
  */
-vjs.Component.prototype.getChild = function(name){
+Component.prototype.getChild = function(name){
   return this.childNameIndex_[name];
 };
 
@@ -344,8 +351,10 @@ vjs.Component.prototype.getChild = function(name){
  * @return {vjs.Component} The child component (created by this process if a string was used)
  * @suppress {accessControls|checkRegExp|checkTypes|checkVars|const|constantProperty|deprecated|duplicate|es5Strict|fileoverviewTags|globalThis|invalidCasts|missingProperties|nonStandardJsDocs|strictModuleDepCheck|undefinedNames|undefinedVars|unknownDefines|uselessCode|visibility}
  */
-vjs.Component.prototype.addChild = function(child, options){
-  var component, componentClass, componentName, componentId;
+Component.prototype.addChild = function(child, options){
+  var component, componentClass, componentName, componentId, components;
+
+  components = require('./components.js');
 
   // If string, create new component with options
   if (typeof child === 'string') {
@@ -356,7 +365,7 @@ vjs.Component.prototype.addChild = function(child, options){
     options = options || {};
 
     // Assume name of set is a lowercased name of the UI Class (PlayButton, etc.)
-    componentClass = options['componentClass'] || vjs.capitalize(componentName);
+    componentClass = options['componentClass'] || vjslib.capitalize(componentName);
 
     // Set name through options
     options['name'] = componentName;
@@ -365,7 +374,7 @@ vjs.Component.prototype.addChild = function(child, options){
     // If there's no .player_, this is a player
     // Closure Compiler throws an 'incomplete alias' warning if we use the vjs variable directly.
     // Every class should be exported, so this should never be a problem here.
-    component = new window['videojs'][componentClass](this.player_ || this, options);
+    component = new components[componentClass](this.player_ || this, options);
 
   // child is a component instance
   } else {
@@ -402,7 +411,7 @@ vjs.Component.prototype.addChild = function(child, options){
  *
  * @param  {vjs.Component} component Component to remove
  */
-vjs.Component.prototype.removeChild = function(component){
+Component.prototype.removeChild = function(component){
   if (typeof component === 'string') {
     component = this.getChild(component);
   }
@@ -463,7 +472,7 @@ vjs.Component.prototype.removeChild = function(component){
  *     });
  *
  */
-vjs.Component.prototype.initChildren = function(){
+Component.prototype.initChildren = function(){
   var parent, children, child, name, opts;
 
   parent = this;
@@ -471,7 +480,7 @@ vjs.Component.prototype.initChildren = function(){
 
   if (children) {
     // Allow for an array of children details to passed in the options
-    if (vjs.obj.isArray(children)) {
+    if (vjslib.obj.isArray(children)) {
       for (var i = 0; i < children.length; i++) {
         child = children[i];
 
@@ -486,7 +495,7 @@ vjs.Component.prototype.initChildren = function(){
         parent[name] = parent.addChild(name, opts);
       }
     } else {
-      vjs.obj.each(children, function(name, opts){
+      vjslib.obj.each(children, function(name, opts){
         // Allow for disabling default components
         // e.g. vjs.options['children']['posterImage'] = false
         if (opts === false) return;
@@ -503,7 +512,7 @@ vjs.Component.prototype.initChildren = function(){
  *
  * @return {String} The constructed class name
  */
-vjs.Component.prototype.buildCSSClass = function(){
+Component.prototype.buildCSSClass = function(){
     // Child classes can include a function that does:
     // return 'CLASS NAME' + this._super();
     return '';
@@ -528,8 +537,8 @@ vjs.Component.prototype.buildCSSClass = function(){
  * @param  {Function} fn   The event listener
  * @return {vjs.Component} self
  */
-vjs.Component.prototype.on = function(type, fn){
-  vjs.on(this.el_, type, vjs.bind(this, fn));
+Component.prototype.on = function(type, fn){
+  vjsevents.on(this.el_, type, vjslib.bind(this, fn));
   return this;
 };
 
@@ -542,8 +551,8 @@ vjs.Component.prototype.on = function(type, fn){
  * @param  {Function=} fn   Event listener. Without fn it will remove all listeners for a type.
  * @return {vjs.Component}
  */
-vjs.Component.prototype.off = function(type, fn){
-  vjs.off(this.el_, type, fn);
+Component.prototype.off = function(type, fn){
+  vjsevents.off(this.el_, type, fn);
   return this;
 };
 
@@ -554,8 +563,8 @@ vjs.Component.prototype.off = function(type, fn){
  * @param  {Function} fn   Event listener
  * @return {vjs.Component}
  */
-vjs.Component.prototype.one = function(type, fn) {
-  vjs.one(this.el_, type, vjs.bind(this, fn));
+Component.prototype.one = function(type, fn) {
+  vjsevents.one(this.el_, type, vjslib.bind(this, fn));
   return this;
 };
 
@@ -568,8 +577,8 @@ vjs.Component.prototype.one = function(type, fn) {
  * @param  {Event|Object} event The event object to be passed to the listener
  * @return {vjs.Component}      self
  */
-vjs.Component.prototype.trigger = function(type, event){
-  vjs.trigger(this.el_, type, event);
+Component.prototype.trigger = function(type, event){
+  vjsevents.trigger(this.el_, type, event);
   return this;
 };
 
@@ -582,7 +591,7 @@ vjs.Component.prototype.trigger = function(type, event){
  * @private
  * @type {Boolean}
  */
-vjs.Component.prototype.isReady_;
+Component.prototype.isReady_;
 
 /**
  * Trigger ready as soon as initialization is finished
@@ -594,7 +603,7 @@ vjs.Component.prototype.isReady_;
  * @type {Boolean}
  * @private
  */
-vjs.Component.prototype.isReadyOnInitFinish_ = true;
+Component.prototype.isReadyOnInitFinish_ = true;
 
 /**
  * List of ready listeners
@@ -602,7 +611,7 @@ vjs.Component.prototype.isReadyOnInitFinish_ = true;
  * @type {Array}
  * @private
  */
-vjs.Component.prototype.readyQueue_;
+Component.prototype.readyQueue_;
 
 /**
  * Bind a listener to the component's ready state
@@ -613,7 +622,7 @@ vjs.Component.prototype.readyQueue_;
  * @param  {Function} fn Ready listener
  * @return {vjs.Component}
  */
-vjs.Component.prototype.ready = function(fn){
+Component.prototype.ready = function(fn){
   if (fn) {
     if (this.isReady_) {
       fn.call(this);
@@ -632,7 +641,7 @@ vjs.Component.prototype.ready = function(fn){
  *
  * @return {vjs.Component}
  */
-vjs.Component.prototype.triggerReady = function(){
+Component.prototype.triggerReady = function(){
   this.isReady_ = true;
 
   var readyQueue = this.readyQueue_;
@@ -660,8 +669,8 @@ vjs.Component.prototype.triggerReady = function(){
  * @param {String} classToAdd Classname to add
  * @return {vjs.Component}
  */
-vjs.Component.prototype.addClass = function(classToAdd){
-  vjs.addClass(this.el_, classToAdd);
+Component.prototype.addClass = function(classToAdd){
+  vjslib.addClass(this.el_, classToAdd);
   return this;
 };
 
@@ -671,8 +680,8 @@ vjs.Component.prototype.addClass = function(classToAdd){
  * @param {String} classToRemove Classname to remove
  * @return {vjs.Component}
  */
-vjs.Component.prototype.removeClass = function(classToRemove){
-  vjs.removeClass(this.el_, classToRemove);
+Component.prototype.removeClass = function(classToRemove){
+  vjslib.removeClass(this.el_, classToRemove);
   return this;
 };
 
@@ -681,7 +690,7 @@ vjs.Component.prototype.removeClass = function(classToRemove){
  *
  * @return {vjs.Component}
  */
-vjs.Component.prototype.show = function(){
+Component.prototype.show = function(){
   this.el_.style.display = 'block';
   return this;
 };
@@ -691,7 +700,7 @@ vjs.Component.prototype.show = function(){
  *
  * @return {vjs.Component}
  */
-vjs.Component.prototype.hide = function(){
+Component.prototype.hide = function(){
   this.el_.style.display = 'none';
   return this;
 };
@@ -703,7 +712,7 @@ vjs.Component.prototype.hide = function(){
  * @return {vjs.Component}
  * @private
  */
-vjs.Component.prototype.lockShowing = function(){
+Component.prototype.lockShowing = function(){
   this.addClass('vjs-lock-showing');
   return this;
 };
@@ -715,7 +724,7 @@ vjs.Component.prototype.lockShowing = function(){
  * @return {vjs.Component}
  * @private
  */
-vjs.Component.prototype.unlockShowing = function(){
+Component.prototype.unlockShowing = function(){
   this.removeClass('vjs-lock-showing');
   return this;
 };
@@ -726,7 +735,7 @@ vjs.Component.prototype.unlockShowing = function(){
  * Currently private because we're movign towards more css-based states.
  * @private
  */
-vjs.Component.prototype.disable = function(){
+Component.prototype.disable = function(){
   this.hide();
   this.show = function(){};
 };
@@ -744,7 +753,7 @@ vjs.Component.prototype.disable = function(){
  * @return {vjs.Component} This component, when setting the width
  * @return {Number|String} The width, when getting
  */
-vjs.Component.prototype.width = function(num, skipListeners){
+Component.prototype.width = function(num, skipListeners){
   return this.dimension('width', num, skipListeners);
 };
 
@@ -761,7 +770,7 @@ vjs.Component.prototype.width = function(num, skipListeners){
  * @return {vjs.Component} This component, when setting the height
  * @return {Number|String} The height, when getting
  */
-vjs.Component.prototype.height = function(num, skipListeners){
+Component.prototype.height = function(num, skipListeners){
   return this.dimension('height', num, skipListeners);
 };
 
@@ -772,7 +781,7 @@ vjs.Component.prototype.height = function(num, skipListeners){
  * @param  {Number|String} height
  * @return {vjs.Component} The component
  */
-vjs.Component.prototype.dimensions = function(width, height){
+Component.prototype.dimensions = function(width, height){
   // Skip resize listeners on width for optimization
   return this.width(width, true).height(height);
 };
@@ -795,7 +804,7 @@ vjs.Component.prototype.dimensions = function(width, height){
  * @return {Number|String} The dimension if nothing was set
  * @private
  */
-vjs.Component.prototype.dimension = function(widthOrHeight, num, skipListeners){
+Component.prototype.dimension = function(widthOrHeight, num, skipListeners){
   if (num !== undefined) {
 
     // Check if using css width/height (% or px) and adjust
@@ -830,7 +839,7 @@ vjs.Component.prototype.dimension = function(widthOrHeight, num, skipListeners){
   // TODO: handle display:none and no dimension style using px
   } else {
 
-    return parseInt(this.el_['offset'+vjs.capitalize(widthOrHeight)], 10);
+    return parseInt(this.el_['offset'+vjslib.capitalize(widthOrHeight)], 10);
 
     // ComputedStyle version.
     // Only difference is if the element is hidden it will return
@@ -851,7 +860,7 @@ vjs.Component.prototype.dimension = function(widthOrHeight, num, skipListeners){
  * Fired when the width and/or height of the component changes
  * @event resize
  */
-vjs.Component.prototype.onResize;
+Component.prototype.onResize;
 
 /**
  * Emit 'tap' events when touch events are supported
@@ -863,7 +872,7 @@ vjs.Component.prototype.onResize;
  * overhead is especially bad.
  * @private
  */
-vjs.Component.prototype.emitTapEvents = function(){
+Component.prototype.emitTapEvents = function(){
   var touchStart, firstTouch, touchTime, couldBeTap, noTap,
       xdiff, ydiff, touchDistance, tapMovementThreshold;
 
@@ -951,11 +960,11 @@ vjs.Component.prototype.emitTapEvents = function(){
  * whenever touch events happen, and this can be turned off by components that
  * want touch events to act differently.
  */
-vjs.Component.prototype.enableTouchActivity = function() {
+Component.prototype.enableTouchActivity = function() {
   var report, touchHolding, touchEnd;
 
   // listener for reporting that the user is active
-  report = vjs.bind(this.player(), this.player().reportUserActivity);
+  report = vjslib.bind(this.player(), this.player().reportUserActivity);
 
   this.on('touchstart', function() {
     report();
@@ -978,3 +987,4 @@ vjs.Component.prototype.enableTouchActivity = function() {
   this.on('touchcancel', touchEnd);
 };
 
+module.exports = Component;
