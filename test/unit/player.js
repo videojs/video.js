@@ -484,7 +484,7 @@ test('player should handle different error types', function(){
 
 test('should restore all video tags attribute after a tech switch', function(){
   var fixture = document.getElementById('qunit-fixture');
-  var html = '<video id="example_1" class="vjs-tech" preload="" autoplay=""></video>';
+  var html = '<video id="example_1" class="vjs-tech" preload="" webkit-playsinline="" autoplay=""></video>';
   fixture.innerHTML += html;
 
   var tag = document.getElementById('example_1');
