@@ -35,22 +35,6 @@ vjs.createEl = function(tagName, properties){
 };
 
 /**
- * Apply attributes to an html element.
- * @param  {Element} el         Target element.
- * @param  {Object=} attributes Element attributes to be applied.
- * @private
- */
-vjs.setElementAttributes = function(el, attributes){
-  vjs.obj.each(attributes, function(attrName, attrValue) {
-    if (attrValue === null || typeof attrValue === 'undefined' || attrValue === false) {
-      el.removeAttribute(attrName);
-    } else {
-      el.setAttribute(attrName,attrValue === true ? '' : attrValue);
-    }
-  });
-};
-
-/**
  * Uppercase the first letter of a string
  * @param  {String} string String to be uppercased
  * @return {String}
@@ -406,6 +390,22 @@ vjs.IS_FIREFOX = (/Firefox/i).test(vjs.USER_AGENT);
 vjs.IS_CHROME = (/Chrome/i).test(vjs.USER_AGENT);
 
 vjs.TOUCH_ENABLED = !!(('ontouchstart' in window) || window.DocumentTouch && document instanceof window.DocumentTouch);
+
+/**
+ * Apply attributes to an HTML element.
+ * @param  {Element} el         Target element.
+ * @param  {Object=} attributes Element attributes to be applied.
+ * @private
+ */
+vjs.setElementAttributes = function(el, attributes){
+  vjs.obj.each(attributes, function(attrName, attrValue) {
+    if (attrValue === null || typeof attrValue === 'undefined' || attrValue === false) {
+      el.removeAttribute(attrName);
+    } else {
+      el.setAttribute(attrName,attrValue === true ? '' : attrValue);
+    }
+  });
+};
 
 /**
  * Get an element's attribute values, as defined on the HTML tag
