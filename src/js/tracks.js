@@ -63,8 +63,7 @@ vjs.Player.prototype.addTextTrack = function(kind, label, language, options){
   if (track.dflt()) {
     this.ready(function(){
       setTimeout(function(){
-        track.show();
-        track.trigger(kind+'trackchange');
+        track.player_.showTextTrack(track.id_);
       }, 0);
     });
   }
