@@ -141,8 +141,9 @@ vjs.Component.prototype.options_;
 vjs.Component.prototype.locale_;
 
 vjs.Component.prototype.locale = function (obj) {
-  if (obj===undefined) return this.locale_;
-
+  if (obj === undefined) {
+    return this.locale_;
+  }
   return this.locale_ = vjs.util.mergeOptions(this.locale_, obj);
 };
 
