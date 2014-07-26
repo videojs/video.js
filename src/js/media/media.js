@@ -99,7 +99,7 @@ vjs.MediaTechController.prototype.addControlsListeners = function(){
   this.on('touchend', function(event) {
     // Stop the mouse events from also happening
     event.preventDefault();
-  })
+  });
 
   // Turn on component tap events
   this.emitTapEvents();
