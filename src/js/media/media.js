@@ -87,8 +87,6 @@ vjs.MediaTechController.prototype.addControlsListeners = function(){
   // so we'll check if the controls were already showing before reporting user
   // activity
   this.on('touchstart', function(event) {
-    // Stop the mouse events from also happening
-    event.preventDefault();
     userWasActive = this.player_.userActive();
   });
 
@@ -96,6 +94,11 @@ vjs.MediaTechController.prototype.addControlsListeners = function(){
     if (userWasActive){
       this.player().reportUserActivity();
     }
+  });
+
+  this.on('touchend', function(event) {
+    // Stop the mouse events from also happening
+    event.preventDefault();
   });
 
   // Turn on component tap events
