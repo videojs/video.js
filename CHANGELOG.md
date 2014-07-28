@@ -13,6 +13,7 @@ CHANGELOG
 * Added a base for running saucelabs tests from grunt ([view](https://github.com/videojs/video.js/pull/1215))
 * Added additional browsers for saucelabs testing ([view](https://github.com/videojs/video.js/pull/1216))
 * Added support for listening to multiple events through a types array ([view](https://github.com/videojs/video.js/pull/1231))
+* Exported the vertical option for the volume slider ([view](https://github.com/videojs/video.js/pull/1378))
 
 --------------------
 
