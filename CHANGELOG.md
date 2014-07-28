@@ -18,6 +18,7 @@ CHANGELOG
 * Now copying all attributes from the original video tag to the generated video element ([view](https://github.com/videojs/video.js/pull/1321))
 * Added files to be ignored in the bower.json ([view](https://github.com/videojs/video.js/pull/1337))
 * Fixed an error that could happen if Flash was diposed before the ready callback was fired ([view](https://github.com/videojs/video.js/pull/1340))
+* The up and down arrows can now be used to control sliders in addition to left and right ([view](https://github.com/videojs/video.js/pull/1345))
 
 --------------------
 
