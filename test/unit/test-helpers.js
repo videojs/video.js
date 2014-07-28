@@ -17,5 +17,16 @@ var PlayerTest = {
     playerOptions['techOrder'] = ['mediaFaker'];
 
     return player = new videojs.Player(videoTag, playerOptions);
+  },
+  htmlEqualWithSort : function(htmlResult,htmlExpected) {
+    function htmlTransform(str) {
+      str = str.replace(/[<|>]/g,' ');
+      str = str.trim();
+      str = str.replace(/\s{2,}/g, ' ');
+      return str.split(' ').sort().join(' ');
+    }
+    htmlResult= htmlResult.split(' ').sort().join(' ');
+    equal(htmlTransform(htmlResult),htmlTransform(htmlExpected));
+
   }
 };

@@ -392,6 +392,22 @@ vjs.IS_CHROME = (/Chrome/i).test(vjs.USER_AGENT);
 vjs.TOUCH_ENABLED = !!(('ontouchstart' in window) || window.DocumentTouch && document instanceof window.DocumentTouch);
 
 /**
+ * Apply attributes to an HTML element.
+ * @param  {Element} el         Target element.
+ * @param  {Object=} attributes Element attributes to be applied.
+ * @private
+ */
+vjs.setElementAttributes = function(el, attributes){
+  vjs.obj.each(attributes, function(attrName, attrValue) {
+    if (attrValue === null || typeof attrValue === 'undefined' || attrValue === false) {
+      el.removeAttribute(attrName);
+    } else {
+      el.setAttribute(attrName,attrValue === true ? '' : attrValue);
+    }
+  });
+};
+
+/**
  * Get an element's attribute values, as defined on the HTML tag
  * Attributs are not the same as properties. They're defined on the tag
  * or with setAttribute (which shouldn't be used with HTML)
@@ -400,7 +416,7 @@ vjs.TOUCH_ENABLED = !!(('ontouchstart' in window) || window.DocumentTouch && doc
  * @return {Object}
  * @private
  */
-vjs.getAttributeValues = function(tag){
+vjs.getElementAttributes = function(tag){
   var obj, knownBooleans, attrs, attrName, attrVal;
 
   obj = {};
