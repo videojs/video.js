@@ -563,13 +563,15 @@ vjs.Component.prototype.one = function(type, fn) {
  * Trigger an event on an element
  *
  *     myComponent.trigger('eventName');
+ *     myComponent.trigger({'type':'eventName'});
  *
- * @param  {String}       type  The event type to trigger, e.g. 'click'
- * @param  {Event|Object} event The event object to be passed to the listener
+ * @param  {Event|Object|String} event  either a string (the event type) 
+ *                               to trigger or an event object 
+ *                               with a type attribute.
  * @return {vjs.Component}      self
  */
-vjs.Component.prototype.trigger = function(type, event){
-  vjs.trigger(this.el_, type, event);
+vjs.Component.prototype.trigger = function(event){
+  vjs.trigger(this.el_, event);
   return this;
 };
 
