@@ -195,9 +195,7 @@ vjs.Player.prototype.createEl = function(){
   // ID will now reference player box, not the video tag
   attrs = vjs.getAttributeValues(tag);
   vjs.obj.each(attrs, function(attr) {
-    if (Object.prototype.hasOwnProperty.call(attrs, attr)) {
-      el.setAttribute(attr, attrs[attr]);
-    }
+    el.setAttribute(attr, attrs[attr]);
   });
 
   // Update tag id/class for use as HTML5 playback tech
