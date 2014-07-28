@@ -14,6 +14,7 @@ CHANGELOG
 * Added additional browsers for saucelabs testing ([view](https://github.com/videojs/video.js/pull/1216))
 * Added support for listening to multiple events through a types array ([view](https://github.com/videojs/video.js/pull/1231))
 * Exported the vertical option for the volume slider ([view](https://github.com/videojs/video.js/pull/1378))
+* Fixed Component trigger function arguments and docs ([view](https://github.com/videojs/video.js/pull/1310))
 
 --------------------
 
