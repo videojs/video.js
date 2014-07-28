@@ -16,6 +16,7 @@ CHANGELOG
 * Exported the vertical option for the volume slider ([view](https://github.com/videojs/video.js/pull/1378))
 * Fixed Component trigger function arguments and docs ([view](https://github.com/videojs/video.js/pull/1310))
 * Now copying all attributes from the original video tag to the generated video element ([view](https://github.com/videojs/video.js/pull/1321))
+* Added files to be ignored in the bower.json ([view](https://github.com/videojs/video.js/pull/1337))
 
 --------------------
 
