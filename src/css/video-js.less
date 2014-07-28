@@ -867,6 +867,11 @@ body.vjs-full-window {
 }
 .video-js.vjs-fullscreen.vjs-user-inactive {
   cursor: none;
+  
+  .vjs-tech {
+    /* make sure the cursor disappear in fullscreen */
+    pointer-events: none;
+  }
 }
 
 /* Poster Styles */
