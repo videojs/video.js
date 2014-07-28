@@ -482,3 +482,15 @@ test('player should handle different error types', function(){
   vjs.log.error.restore();
 });
 
+test('Data attributes on the video element should persist in the new wrapper element', function() {
+  var dataId, tag, player;
+
+  dataId = 123;
+
+  tag = PlayerTest.makeTag();
+  tag.setAttribute('data-id', dataId);
+
+  player = PlayerTest.makePlayer({}, tag);
+
+  equal(player.el().getAttribute('data-id'), dataId, 'data-id should be available on the new player element after creation');
+});
