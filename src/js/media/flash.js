@@ -244,7 +244,7 @@ vjs.Flash = vjs.MediaTechController.extend({
 
     // If not using iFrame mode, embed as normal object
     } else {
-      vjs.Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
+      this.el_ = vjs.Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
     }
   }
 });
@@ -401,15 +401,17 @@ vjs.Flash['onReady'] = function(currSwf){
   // Reference player on tech element
   el['player'] = player;
 
-  // Update reference to playback technology element
-  tech.el_ = el;
-
   vjs.Flash.checkReady(tech);
 };
 
 // The SWF isn't alwasy ready when it says it is. Sometimes the API functions still need to be added to the object.
 // If it's not ready, we set a timeout to check again shortly.
 vjs.Flash.checkReady = function(tech){
+
+  // Stop worrying if the tech has been disposed
+  if (!tech.el()) {
+    return;
+  }
 
   // Check if API property exists
   if (tech.el().vjs_getProperty) {
