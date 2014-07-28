@@ -275,6 +275,7 @@ vjs.Player.prototype.loadTech = function(techName, source){
   var techOptions = vjs.obj.merge({ 'source': source, 'parentEl': this.el_ }, this.options_[techName.toLowerCase()]);
 
   if (source) {
+    this.currentType_ = source.type;
     if (source.src == this.cache_.src && this.cache_.currentTime > 0) {
       techOptions['startTime'] = this.cache_.currentTime;
     }
@@ -1066,6 +1067,25 @@ vjs.Player.prototype.selectSource = function(sources){
   return false;
 };
 
+
+vjs.Player.prototype.setSource = function(source, type) {
+
+    this.cache_.src = source;
+
+    var _set = vjs.bind(this, function () {
+        this.currentType_ = type || '';
+        this.techCall('src', source);
+        if (this.options_['preload'] == 'auto') {
+            this.load();
+        }
+        if (this.options_['autoplay']) {
+            this.play();
+        }
+    });
+
+    this.ready(_set);
+};
+
 /**
  * The source function updates the video source
  *
@@ -1132,30 +1152,15 @@ vjs.Player.prototype.src = function(source){
   } else if (source instanceof Object) {
 
     if (window['videojs'][this.techName]['canPlaySource'](source)) {
-      this.src(source.src);
+      this.setSource(source.src, source.type);
     } else {
       // Send through tech loop to check for a compatible technology.
       this.src([source]);
     }
 
   // Case: URL String (http://myvideo...)
-  } else {
-    // Cache for getting last set source
-    this.cache_.src = source;
-
-    if (!this.isReady_) {
-      this.ready(function(){
-        this.src(source);
-      });
-    } else {
-      this.techCall('src', source);
-      if (this.options_['preload'] == 'auto') {
-        this.load();
-      }
-      if (this.options_['autoplay']) {
-        this.play();
-      }
-    }
+  } else if (typeof source === 'string') {
+      this.setSource(source);
   }
 
   return this;
@@ -1171,6 +1176,10 @@ vjs.Player.prototype.load = function(){
 // http://dev.w3.org/html5/spec/video.html#dom-media-currentsrc
 vjs.Player.prototype.currentSrc = function(){
   return this.techGet('currentSrc') || this.cache_.src || '';
+};
+
+vjs.Player.prototype.currentType = function(){
+    return this.currentType_ || '';
 };
 
 // Attributes/Options
