@@ -84,7 +84,7 @@ vjs.Flash = vjs.MediaTechController.extend({
       this.ready(function(){
         this.load();
         this.play();
-        this.currentTime(options['startTime']);
+        this['currentTime'](options['startTime']);
       });
     }
 
@@ -248,7 +248,7 @@ vjs.Flash.prototype.pause = function(){
 
 vjs.Flash.prototype.src = function(src){
   if (src === undefined) {
-    return this.currentSrc();
+    return this['currentSrc']();
   }
 
   if (vjs.Flash.isStreamingSrc(src)) {
@@ -269,12 +269,12 @@ vjs.Flash.prototype.src = function(src){
   }
 };
 
-vjs.Flash.prototype.setCurrentTime = function(time){
+vjs.Flash.prototype['setCurrentTime'] = function(time){
   this.lastSeekTarget_ = time;
   this.el_.vjs_setProperty('currentTime', time);
 };
 
-vjs.Flash.prototype.currentTime = function(time){
+vjs.Flash.prototype['currentTime'] = function(time){
   // when seeking make the reported time keep up with the requested time
   // by reading the time we're seeking to
   if (this.seeking()) {
@@ -283,7 +283,7 @@ vjs.Flash.prototype.currentTime = function(time){
   return this.el_.vjs_getProperty('currentTime');
 };
 
-vjs.Flash.prototype.currentSrc = function(){
+vjs.Flash.prototype['currentSrc'] = function(){
   var src = this.el_.vjs_getProperty('currentSrc');
   // no src, check and see if RTMP
   if (src == null) {
@@ -304,7 +304,7 @@ vjs.Flash.prototype.load = function(){
 vjs.Flash.prototype.poster = function(){
   this.el_.vjs_getProperty('poster');
 };
-vjs.Flash.prototype.setPoster = function(){
+vjs.Flash.prototype['setPoster'] = function(){
   // poster images are not handled by the Flash tech so make this a no-op
 };
 
