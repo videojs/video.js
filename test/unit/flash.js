@@ -92,7 +92,7 @@ test('currentTime is the seek target during seeking', function() {
   currentTime = 3;
   strictEqual(3, tech.currentTime(), 'currentTime is retreived from the SWF');
 
-  tech.setCurrentTime(7);
+  tech['setCurrentTime'](7);
   seeking = true;
   strictEqual(7, tech.currentTime(), 'during seeks the target time is returned');
 });
