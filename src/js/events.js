@@ -57,9 +57,9 @@ vjs.on = function(elem, type, fn){
   }
 
   if (data.handlers[type].length == 1) {
-    if (document.addEventListener) {
+    if (elem.addEventListener) {
       elem.addEventListener(type, data.dispatcher, false);
-    } else if (document.attachEvent) {
+    } else if (elem.attachEvent) {
       elem.attachEvent('on' + type, data.dispatcher);
     }
   }
@@ -136,9 +136,9 @@ vjs.cleanUpEvents = function(elem, type) {
     // Setting to null was causing an error with data.handlers
 
     // Remove the meta-handler from the element
-    if (document.removeEventListener) {
+    if (elem.removeEventListener) {
       elem.removeEventListener(type, data.dispatcher, false);
-    } else if (document.detachEvent) {
+    } else if (elem.detachEvent) {
       elem.detachEvent('on' + type, data.dispatcher);
     }
   }
