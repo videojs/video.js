@@ -19,6 +19,7 @@ CHANGELOG
 * Added files to be ignored in the bower.json ([view](https://github.com/videojs/video.js/pull/1337))
 * Fixed an error that could happen if Flash was diposed before the ready callback was fired ([view](https://github.com/videojs/video.js/pull/1340))
 * The up and down arrows can now be used to control sliders in addition to left and right ([view](https://github.com/videojs/video.js/pull/1345))
+* Added a player.currentType() function to get the MIME type of the current source ([view](https://github.com/videojs/video.js/pull/1320))
 
 --------------------
 

@@ -1183,6 +1183,12 @@ vjs.Player.prototype.currentSrc = function(){
   return this.techGet('currentSrc') || this.cache_.src || '';
 };
 
+/**
+ * Get the current source type e.g. video/mp4
+ * This can allow you rebuild the current source object so that you could load the same
+ * source and tech later
+ * @return {String} The source MIME type
+ */
 vjs.Player.prototype.currentType = function(){
     return this.currentType_ || '';
 };
