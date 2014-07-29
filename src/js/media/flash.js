@@ -60,9 +60,7 @@ vjs.Flash = vjs.MediaTechController.extend({
           'id': objId,
           'name': objId, // Both ID and Name needed or swf to identifty itself
           'class': 'vjs-tech'
-        }, options['attributes']),
-
-        lastSeekTarget
+        }, options['attributes'])
     ;
 
     // If source was supplied pass as a flash var.
@@ -77,19 +75,6 @@ vjs.Flash = vjs.MediaTechController.extend({
       }
     }
 
-    this['setCurrentTime'] = function(time){
-      lastSeekTarget = time;
-      this.el_.vjs_setProperty('currentTime', time);
-    };
-    this['currentTime'] = function(time){
-      // when seeking make the reported time keep up with the requested time
-      // by reading the time we're seeking to
-      if (this.seeking()) {
-        return lastSeekTarget;
-      }
-      return this.el_.vjs_getProperty('currentTime');
-    };
-
     // Add placeholder to player div
     vjs.insertFirst(placeHolder, parentEl);
 
@@ -99,7 +84,7 @@ vjs.Flash = vjs.MediaTechController.extend({
       this.ready(function(){
         this.load();
         this.play();
-        this.currentTime(options['startTime']);
+        this['currentTime'](options['startTime']);
       });
     }
 
@@ -118,134 +103,7 @@ vjs.Flash = vjs.MediaTechController.extend({
     // use stageclick events triggered from inside the SWF instead
     player.on('stageclick', player.reportUserActivity);
 
-    // Flash iFrame Mode
-    // In web browsers there are multiple instances where changing the parent element or visibility of a plugin causes the plugin to reload.
-    // - Firefox just about always. https://bugzilla.mozilla.org/show_bug.cgi?id=90268 (might be fixed by version 13)
-    // - Webkit when hiding the plugin
-    // - Webkit and Firefox when using requestFullScreen on a parent element
-    // Loading the flash plugin into a dynamically generated iFrame gets around most of these issues.
-    // Issues that remain include hiding the element and requestFullScreen in Firefox specifically
-
-    // There's on particularly annoying issue with this method which is that Firefox throws a security error on an offsite Flash object loaded into a dynamically created iFrame.
-    // Even though the iframe was inserted into a page on the web, Firefox + Flash considers it a local app trying to access an internet file.
-    // I tried mulitple ways of setting the iframe src attribute but couldn't find a src that worked well. Tried a real/fake source, in/out of domain.
-    // Also tried a method from stackoverflow that caused a security error in all browsers. http://stackoverflow.com/questions/2486901/how-to-set-document-domain-for-a-dynamically-generated-iframe
-    // In the end the solution I found to work was setting the iframe window.location.href right before doing a document.write of the Flash object.
-    // The only downside of this it seems to trigger another http request to the original page (no matter what's put in the href). Not sure why that is.
-
-    // NOTE (2012-01-29): Cannot get Firefox to load the remote hosted SWF into a dynamically created iFrame
-    // Firefox 9 throws a security error, unleess you call location.href right before doc.write.
-    //    Not sure why that even works, but it causes the browser to look like it's continuously trying to load the page.
-    // Firefox 3.6 keeps calling the iframe onload function anytime I write to it, causing an endless loop.
-
-    if (options['iFrameMode'] === true && !vjs.IS_FIREFOX) {
-
-      // Create iFrame with vjs-tech class so it's 100% width/height
-      var iFrm = vjs.createEl('iframe', {
-        'id': objId + '_iframe',
-        'name': objId + '_iframe',
-        'className': 'vjs-tech',
-        'scrolling': 'no',
-        'marginWidth': 0,
-        'marginHeight': 0,
-        'frameBorder': 0
-      });
-
-      // Update ready function names in flash vars for iframe window
-      flashVars['readyFunction'] = 'ready';
-      flashVars['eventProxyFunction'] = 'events';
-      flashVars['errorEventProxyFunction'] = 'errors';
-
-      // Tried multiple methods to get this to work in all browsers
-
-      // Tried embedding the flash object in the page first, and then adding a place holder to the iframe, then replacing the placeholder with the page object.
-      // The goal here was to try to load the swf URL in the parent page first and hope that got around the firefox security error
-      // var newObj = vjs.Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
-      // (in onload)
-      //  var temp = vjs.createEl('a', { id:'asdf', innerHTML: 'asdf' } );
-      //  iDoc.body.appendChild(temp);
-
-      // Tried embedding the flash object through javascript in the iframe source.
-      // This works in webkit but still triggers the firefox security error
-      // iFrm.src = 'javascript: document.write('"+vjs.Flash.getEmbedCode(options['swf'], flashVars, params, attributes)+"');";
-
-      // Tried an actual local iframe just to make sure that works, but it kills the easiness of the CDN version if you require the user to host an iframe
-      // We should add an option to host the iframe locally though, because it could help a lot of issues.
-      // iFrm.src = "iframe.html";
-
-      // Wait until iFrame has loaded to write into it.
-      vjs.on(iFrm, 'load', vjs.bind(this, function(){
-
-        var iDoc,
-            iWin = iFrm.contentWindow;
-
-        // The one working method I found was to use the iframe's document.write() to create the swf object
-        // This got around the security issue in all browsers except firefox.
-        // I did find a hack where if I call the iframe's window.location.href='', it would get around the security error
-        // However, the main page would look like it was loading indefinitely (URL bar loading spinner would never stop)
-        // Plus Firefox 3.6 didn't work no matter what I tried.
-        // if (vjs.USER_AGENT.match('Firefox')) {
-        //   iWin.location.href = '';
-        // }
-
-        // Get the iFrame's document depending on what the browser supports
-        iDoc = iFrm.contentDocument ? iFrm.contentDocument : iFrm.contentWindow.document;
-
-        // Tried ensuring both document domains were the same, but they already were, so that wasn't the issue.
-        // Even tried adding /. that was mentioned in a browser security writeup
-        // document.domain = document.domain+'/.';
-        // iDoc.domain = document.domain+'/.';
-
-        // Tried adding the object to the iframe doc's innerHTML. Security error in all browsers.
-        // iDoc.body.innerHTML = swfObjectHTML;
-
-        // Tried appending the object to the iframe doc's body. Security error in all browsers.
-        // iDoc.body.appendChild(swfObject);
-
-        // Using document.write actually got around the security error that browsers were throwing.
-        // Again, it's a dynamically generated (same domain) iframe, loading an external Flash swf.
-        // Not sure why that's a security issue, but apparently it is.
-        iDoc.write(vjs.Flash.getEmbedCode(options['swf'], flashVars, params, attributes));
-
-        // Setting variables on the window needs to come after the doc write because otherwise they can get reset in some browsers
-        // So far no issues with swf ready event being called before it's set on the window.
-        iWin['player'] = this.player_;
-
-        // Create swf ready function for iFrame window
-        iWin['ready'] = vjs.bind(this.player_, function(currSwf){
-          var el = iDoc.getElementById(currSwf),
-              player = this,
-              tech = player.tech;
-
-          // Update reference to playback technology element
-          tech.el_ = el;
-
-          // Make sure swf is actually ready. Sometimes the API isn't actually yet.
-          vjs.Flash.checkReady(tech);
-        });
-
-        // Create event listener for all swf events
-        iWin['events'] = vjs.bind(this.player_, function(swfID, eventName){
-          var player = this;
-          if (player && player.techName === 'flash') {
-            player.trigger(eventName);
-          }
-        });
-
-        // Create error listener for all swf errors
-        iWin['errors'] = vjs.bind(this.player_, function(swfID, eventName){
-          vjs.log('Flash Error', eventName);
-        });
-
-      }));
-
-      // Replace placeholder with iFrame (it will load now)
-      placeHolder.parentNode.replaceChild(iFrm, placeHolder);
-
-    // If not using iFrame mode, embed as normal object
-    } else {
-      this.el_ = vjs.Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
-    }
+    vjs.Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
   }
 });
 
@@ -263,7 +121,7 @@ vjs.Flash.prototype.pause = function(){
 
 vjs.Flash.prototype.src = function(src){
   if (src === undefined) {
-    return this.currentSrc();
+    return this['currentSrc']();
   }
 
   if (vjs.Flash.isStreamingSrc(src)) {
@@ -284,7 +142,21 @@ vjs.Flash.prototype.src = function(src){
   }
 };
 
-vjs.Flash.prototype.currentSrc = function(){
+vjs.Flash.prototype['setCurrentTime'] = function(time){
+  this.lastSeekTarget_ = time;
+  this.el_.vjs_setProperty('currentTime', time);
+};
+
+vjs.Flash.prototype['currentTime'] = function(time){
+  // when seeking make the reported time keep up with the requested time
+  // by reading the time we're seeking to
+  if (this.seeking()) {
+    return this.lastSeekTarget_ || 0;
+  }
+  return this.el_.vjs_getProperty('currentTime');
+};
+
+vjs.Flash.prototype['currentSrc'] = function(){
   var src = this.el_.vjs_getProperty('currentSrc');
   // no src, check and see if RTMP
   if (src == null) {
@@ -305,7 +177,7 @@ vjs.Flash.prototype.load = function(){
 vjs.Flash.prototype.poster = function(){
   this.el_.vjs_getProperty('poster');
 };
-vjs.Flash.prototype.setPoster = function(){
+vjs.Flash.prototype['setPoster'] = function(){
   // poster images are not handled by the Flash tech so make this a no-op
 };
 
