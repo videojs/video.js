@@ -627,8 +627,11 @@ easily in the skin designer. http://designer.videojs.com/
 /* Loading Spinner
 --------------------------------------------------------------------------------
 */
+
 .vjs-loading-spinner {
+  /* Should be hidden by default *///
   display: none;
+
   position: absolute;
   top: 50%;
   left: 50%;
@@ -643,19 +646,22 @@ easily in the skin designer. http://designer.videojs.com/
   margin-top: -0.5em;
 
   opacity: 0.75;
+}
 
+/* Show the spinner when waiting for data and seeking to a new time */
+.vjs-waiting .vjs-loading-spinner,
+.vjs-seeking .vjs-loading-spinner {
+  display: block;
+
+  /* only animate when showing because it can be processor heavy *///
   .animation(spin 1.5s infinite linear);
 }
 
-/* Errors are unrecoverable without user interaction,
-   so hide the spinner in the case of an error */
-.video-js.vjs-error .vjs-loading-spinner {
-  /* using !important flag because currently the loading spinner
-     uses hide()/show() instead of classes. The !important can be
-     removed when that's updated */
-  display: none !important;
+/* Errors are unrecoverable without user interaction so hide the spinner */
+.vjs-error .vjs-loading-spinner {
+  display: none;
 
-  /* ensure animation doesn't continue while hidden */
+  /* ensure animation doesn't continue while hidden *///
   .animation(none);
 }
 
