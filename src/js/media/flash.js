@@ -103,7 +103,7 @@ vjs.Flash = vjs.MediaTechController.extend({
     // use stageclick events triggered from inside the SWF instead
     player.on('stageclick', player.reportUserActivity);
 
-    vjs.Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
+    this.el_ = vjs.Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
   }
 });
 
