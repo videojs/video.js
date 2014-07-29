@@ -7,8 +7,19 @@ CHANGELOG
 * Fixed issues around webvtt cue time parsing. Fixed #877, fixed #183. ([view](https://github.com/videojs/video.js/pull/1236))
 * Fixed an IE11 issue where clicking on the video wouldn&#x27;t show the controls ([view](https://github.com/videojs/video.js/pull/1291))
 * Added a composer.json for PHP packages ([view](https://github.com/videojs/video.js/pull/1241))
+* Exposed the vertical option for slider controls ([view](https://github.com/videojs/video.js/pull/1303))
+* Fixed an error when disposing a tech using manual timeupdates ([view](https://github.com/videojs/video.js/pull/1312))
+* Exported missing Player API methods (remainingTime, supportsFullScreen, enterFullWindow, exitFullWindow, preload) ([view](https://github.com/videojs/video.js/pull/1328))
+* Added a base for running saucelabs tests from grunt ([view](https://github.com/videojs/video.js/pull/1215))
+* Added additional browsers for saucelabs testing ([view](https://github.com/videojs/video.js/pull/1216))
+* Added support for listening to multiple events through a types array ([view](https://github.com/videojs/video.js/pull/1231))
+* Exported the vertical option for the volume slider ([view](https://github.com/videojs/video.js/pull/1378))
+* Fixed Component trigger function arguments and docs ([view](https://github.com/videojs/video.js/pull/1310))
 
 --------------------
+
+## 4.6.4 (2014-07-11)
+* Fixed an issue where Flash autoplay would not show the controls ([view](https://github.com/videojs/video.js/pull/1343))
 
 ## 4.6.3 (2014-06-12)
 * Updated to version 4.4.1 of the SWF ([view](https://github.com/videojs/video.js/pull/1285))

@@ -406,7 +406,7 @@ _inherited from_: [src/js/component.js#L531](https://github.com/videojs/video.js
 ##### PARAMETERS: 
 * __event__ 
 
-_defined in_: [src/js/media/media.js#L118](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L118)
+_defined in_: [src/js/media/media.js#L129](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L129)
 
 ---
 
@@ -414,7 +414,7 @@ _defined in_: [src/js/media/media.js#L118](https://github.com/videojs/video.js/b
 > Handle a tap on the media element. By default it will toggle the user
 > activity state, which hides and shows the controls.
 
-_defined in_: [src/js/media/media.js#L138](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L138)
+_defined in_: [src/js/media/media.js#L149](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L149)
 
 ---
 
@@ -534,7 +534,7 @@ _inherited from_: [src/js/component.js#L674](https://github.com/videojs/video.js
 > Remove the listeners used for click and tap controls. This is needed for
 > toggling to controls disabled, where a tap/touch should do nothing.
 
-_defined in_: [src/js/media/media.js#L102](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L102)
+_defined in_: [src/js/media/media.js#L113](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L113)
 
 ---
 
@@ -544,7 +544,7 @@ _defined in_: [src/js/media/media.js#L102](https://github.com/videojs/video.js/b
 > Poster support for techs should be optional, so we don't want techs to
 > break if they don't have a way to set a poster.
 
-_defined in_: [src/js/media/media.js#L148](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L148)
+_defined in_: [src/js/media/media.js#L159](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L159)
 
 ---
 

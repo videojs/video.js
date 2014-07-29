@@ -843,3 +843,28 @@ vjs.findPosition = function(el) {
     top: vjs.round(top)
   };
 };
+
+/**
+ * Array functions container
+ * @type {Object}
+ * @private
+ */
+vjs.arr = {};
+
+/*
+ * Loops through an array and runs a function for each item inside it.
+ * @param  {Array}    array       The array
+ * @param  {Function} callback    The function to be run for each item
+ * @param  {*}        thisArg     The `this` binding of callback
+ * @returns {Array}               The array
+ * @private
+ */
+vjs.arr.forEach = function(array, callback, thisArg) {
+  if (vjs.obj.isArray(array) && callback instanceof Function) {
+    for (var i = 0, len = array.length; i < len; ++i) {
+      callback.call(thisArg || vjs, array[i], i, array);
+    }
+  }
+
+  return array;
+};
