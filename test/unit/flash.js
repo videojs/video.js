@@ -97,6 +97,22 @@ test('currentTime is the seek target during seeking', function() {
   strictEqual(7, tech.currentTime(), 'during seeks the target time is returned');
 });
 
+test('dispose removes the object element even before ready fires', function() {
+  var noop = function() {},
+      parentEl = document.createElement('div'),
+      tech = new vjs.Flash({
+        id: noop,
+        on: noop,
+        options_: {}
+      }, {
+        'parentEl': parentEl
+      });
+
+  tech.dispose();
+  strictEqual(tech.el(), null, 'tech el is null');
+  strictEqual(parentEl.children.length, 0, 'parent el is empty');
+});
+
 test('ready triggering before and after disposing the tech', function() {
   var checkReady, fixtureDiv, playerDiv, techEl;
 

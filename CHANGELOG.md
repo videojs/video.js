@@ -13,6 +13,12 @@ CHANGELOG
 * Added a base for running saucelabs tests from grunt ([view](https://github.com/videojs/video.js/pull/1215))
 * Added additional browsers for saucelabs testing ([view](https://github.com/videojs/video.js/pull/1216))
 * Added support for listening to multiple events through a types array ([view](https://github.com/videojs/video.js/pull/1231))
+* Exported the vertical option for the volume slider ([view](https://github.com/videojs/video.js/pull/1378))
+* Fixed Component trigger function arguments and docs ([view](https://github.com/videojs/video.js/pull/1310))
+* Now copying all attributes from the original video tag to the generated video element ([view](https://github.com/videojs/video.js/pull/1321))
+* Added files to be ignored in the bower.json ([view](https://github.com/videojs/video.js/pull/1337))
+* Fixed an error that could happen if Flash was diposed before the ready callback was fired ([view](https://github.com/videojs/video.js/pull/1340))
+* The up and down arrows can now be used to control sliders in addition to left and right ([view](https://github.com/videojs/video.js/pull/1345))
 
 --------------------
 
