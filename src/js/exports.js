@@ -75,6 +75,7 @@ goog.exportProperty(vjs.Player.prototype, 'exitFullWindow', vjs.Player.prototype
 goog.exportProperty(vjs.Player.prototype, 'preload', vjs.Player.prototype.preload);
 goog.exportProperty(vjs.Player.prototype, 'remainingTime', vjs.Player.prototype.remainingTime);
 goog.exportProperty(vjs.Player.prototype, 'supportsFullScreen', vjs.Player.prototype.supportsFullScreen);
+goog.exportProperty(vjs.Player.prototype, 'currentType', vjs.Player.prototype.currentType);
 
 goog.exportSymbol('videojs.MediaLoader', vjs.MediaLoader);
 goog.exportSymbol('videojs.TextTrackDisplay', vjs.TextTrackDisplay);

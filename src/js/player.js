@@ -279,6 +279,7 @@ vjs.Player.prototype.loadTech = function(techName, source){
   var techOptions = vjs.obj.merge({ 'source': source, 'parentEl': this.el_ }, this.options_[techName.toLowerCase()]);
 
   if (source) {
+    this.currentType_ = source.type;
     if (source.src == this.cache_.src && this.cache_.currentTime > 0) {
       techOptions['startTime'] = this.cache_.currentTime;
     }
@@ -1107,62 +1108,67 @@ vjs.Player.prototype.src = function(source){
     return this.techGet('src');
   }
 
-  // Case: Array of source objects to choose from and pick the best to play
+  // case: Array of source objects to choose from and pick the best to play
   if (vjs.obj.isArray(source)) {
+    this.sourceList_(source);
 
-    var sourceTech = this.selectSource(source),
-        techName;
+  // case: URL String (http://myvideo...)
+  } else if (typeof source === 'string') {
+    // create a source object from the string
+    this.src({ src: source });
 
-    if (sourceTech) {
-        source = sourceTech.source;
-        techName = sourceTech.tech;
-
-      // If this technology is already loaded, set source
-      if (techName == this.techName) {
-        this.src(source); // Passing the source object
-      // Otherwise load this technology with chosen source
-      } else {
-        this.loadTech(techName, source);
-      }
-    } else {
-      // this.el_.appendChild(vjs.createEl('p', {
-      //   innerHTML: this.options()['notSupportedMessage']
-      // }));
-      this.error({ code: 4, message: this.options()['notSupportedMessage'] });
-      this.triggerReady(); // we could not find an appropriate tech, but let's still notify the delegate that this is it
-    }
-
-  // Case: Source object { src: '', type: '' ... }
+  // case: Source object { src: '', type: '' ... }
   } else if (source instanceof Object) {
-
-    if (window['videojs'][this.techName]['canPlaySource'](source)) {
-      this.src(source.src);
+    // check if the source has a type and the loaded tech cannot play the source
+    // if there's no type we'll just try the current tech
+    if (source.type && !window['videojs'][this.techName]['canPlaySource'](source)) {
+      // create a source list with the current source and send through
+      // the tech loop to check for a compatible technology
+      this.sourceList_([source]);
     } else {
-      // Send through tech loop to check for a compatible technology.
-      this.src([source]);
-    }
+      this.cache_.src = source.src;
+      this.currentType_ = source.type || '';
 
-  // Case: URL String (http://myvideo...)
-  } else {
-    // Cache for getting last set source
-    this.cache_.src = source;
-
-    if (!this.isReady_) {
+      // wait until the tech is ready to set the source
       this.ready(function(){
-        this.src(source);
+        this.techCall('src', source.src);
+
+        if (this.options_['preload'] == 'auto') {
+          this.load();
+        }
+
+        if (this.options_['autoplay']) {
+          this.play();
+        }
       });
-    } else {
-      this.techCall('src', source);
-      if (this.options_['preload'] == 'auto') {
-        this.load();
-      }
-      if (this.options_['autoplay']) {
-        this.play();
-      }
     }
   }
 
   return this;
+};
+
+/**
+ * Handle an array of source objects
+ * @param  {[type]} sources Array of source objects
+ * @private
+ */
+vjs.Player.prototype.sourceList_ = function(sources){
+  var sourceTech = this.selectSource(sources);
+
+  if (sourceTech) {
+    if (sourceTech.tech === this.techName) {
+      // if this technology is already loaded, set the source
+      this.src(sourceTech.source);
+    } else {
+      // load this technology with the chosen source
+      this.loadTech(sourceTech.tech, sourceTech.source);
+    }
+  } else {
+    this.error({ code: 4, message: this.options()['notSupportedMessage'] });
+    // we could not find an appropriate tech, but let's still notify the delegate that this is it
+    // this needs a better comment about why this is needed
+    this.triggerReady();
+  }
 };
 
 // Begin loading the src data
@@ -1175,6 +1181,10 @@ vjs.Player.prototype.load = function(){
 // http://dev.w3.org/html5/spec/video.html#dom-media-currentsrc
 vjs.Player.prototype.currentSrc = function(){
   return this.techGet('currentSrc') || this.cache_.src || '';
+};
+
+vjs.Player.prototype.currentType = function(){
+    return this.currentType_ || '';
 };
 
 // Attributes/Options
