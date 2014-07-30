@@ -221,18 +221,10 @@ vjs.Component.prototype.el_;
  * @return {Element}
  */
 vjs.Component.prototype.createEl = function(tagName, attributes){
-  var el, locale, dictionary;
+  var el = vjs.createEl(tagName, attributes);
 
-  el = vjs.createEl(tagName, attributes);
-  locale = this.locale();
-  dictionary = this.player_.l20n();
-
-  // Determine Localization
-  // Rules:
-  // 1. If locale NOT english
-  // 2. If localization dictionary exists for locale reported
-  if (locale !== 'en-US' && locale !== 'en' && dictionary){
-    vjs.localizeNode(el, locale, dictionary);
+  if (this.requiresLocalization()){
+    vjs.localizeNode(el, this.locale(), this.player_.l20n());
   }
 
   return el;
