@@ -104,10 +104,10 @@ vjs.options = {
     'errorDisplay': {}
   },
 
-  // Localization dictionary
-  'l20n': {
-    'en': {},
-    'en-US': {},
+  'language': document.getElementsByTagName('html')[0].getAttribute('lang') || navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language || 'en',
+
+  // locales and their language translations
+  'languages': {
     'es': {
       'Play': 'Juego',
       'Current Time': 'Tiempo actual',

@@ -183,12 +183,8 @@ test('fullscreenToggle does not depend on minified player methods', function(){
   noop = function(){};
   requestFullscreen = false;
   exitFullscreen = false;
-  player = {
-    id: noop,
-    on: noop,
-    ready: noop,
-    reportUserActivity: noop
-  };
+
+  player = PlayerTest.makePlayer();
 
   player['requestFullscreen'] = function(){
     requestFullscreen = true;
