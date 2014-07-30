@@ -27,5 +27,9 @@ vjs.ErrorDisplay.prototype.createEl = function(){
 vjs.ErrorDisplay.prototype.update = function(){
   if (this.player().error()) {
     this.contentEl_.innerHTML = this.player().error().message;
+
+    if(this.requiresLocalization()) {
+      vjs.localizeNode(this.contentEl_, this.player().locale(), this.player().l20n());
+    }
   }
 };

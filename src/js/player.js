@@ -58,6 +58,66 @@ vjs.Player = vjs.Component.extend({
     // see enableTouchActivity in Component
     options.reportTouchActivity = false;
 
+    // Determine Player Locale and Localization Dictionaries
+    // Option 1
+    // “l20n”: “es”
+    // 2
+    // “l20n”: [“es”]
+    // 3
+    // “l20n”: { lang: “es”, src: “es.json” }
+    // 4
+    // “l20n”: [{ lang: “es”, src: “es.json” }]
+
+    var l20nOverride = options['l20n'];
+
+    if(l20nOverride !== undefined){
+      // String
+      if(typeof l20nOverride === 'string') {
+        // You've been overridden by a string value
+        // according to the doc this means support for the language
+        // already exists, and should localize to that value;
+        options['locale'] = l20nOverride;
+      }
+
+      // Array
+      else if(vjs.obj.isArray(l20nOverride)) {
+        // iterate array for l20n objects to add
+        var item, index;
+        for(index = 0; index < l20nOverride.length; index++) {
+          item = l20nOverride[index];
+          // Custom objects
+          if(item.lang && item.src) {
+            this.addLocale(item.lang, item.src);
+          }
+          // String values
+          // This really should not happen until runtime switching
+          // is available/supported. Only thing we care about is
+          // a single item array which is string (covered below).
+          else {
+            // TODO - At some point check if l20n[locale] exists
+            // and if not add this.addLocale(locale, null);
+          }
+        }
+        // Single item array should enforce locale
+        // even if src detected it was added above
+        if(l20nOverride.length === 1) {
+          if(typeof l20nOverride[0] === 'string') {
+            options['locale'] = l20nOverride[0].toString();
+          } else if (l20nOverride[0].lang && typeof l20nOverride[0].lang ==='string') {
+            options['locale'] = l20nOverride.lang;
+          }
+        }
+      }
+
+      // Single Object
+      else {
+        if(l20nOverride.lang && l20nOverride.src) {
+          this.addLocale(l20nOverride.lang, l20nOverride.src);
+          options['locale'] = l20nOverride.lang;
+        }
+      }
+    }
+
     // Run base component initializing with new options.
     // Builds the element through createEl()
     // Inits and embeds any child components in opts
@@ -89,6 +149,16 @@ vjs.Player = vjs.Component.extend({
     this.listenForUserActivity();
   }
 });
+
+vjs.Player.prototype.l20n_ = vjs.options.l20n;
+
+vjs.Player.prototype.l20n = function(){
+  return this.l20n_;
+};
+
+vjs.Player.prototype.addLocale = function(locale, dictionary) {
+  this.l20n_[locale] = dictionary;
+};
 
 /**
  * Player instance options, surfaced using vjs.options

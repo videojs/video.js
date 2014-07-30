@@ -104,6 +104,34 @@ vjs.options = {
     'errorDisplay': {}
   },
 
+  // Localization dictionary
+  'l20n': {
+    'en': {},
+    'en-US': {},
+    'es': {
+      'Play': 'Juego',
+      'Current Time': 'Tiempo actual',
+      'Duration Time': 'Tiempo de duración',
+      'Remaining Time': 'Tiempo restante',
+      'Stream Type LIVE': 'Tipo de transmisión en vivo',
+      'Loaded': 'cargado',
+      'Progress': 'progreso',
+      'Fullscreen': 'Pantalla completa',
+      'Mute': 'mudo',
+      'Playback Rate': 'reproducción Cambio',
+      'Subtitles': 'Subtítulos',
+      'subtitles off': 'subtítulos fuera',
+      'Captions': 'Subtítulos',
+      'captions off': 'subtítulos fuera',
+      'Chapters': 'capítulos',
+      'You aborted the video playback': 'Ha anulado la reproducción de vídeo',
+      'A network error caused the video download to fail part-way.': 'Un error en la red hizo que la descarga de vídeo falle parte del camino.',
+      'The video could not be loaded, either because the server or network failed or because the format is not supported.' : 'El video no se puede cargar, ya sea porque el servidor o la red fracasaron o porque el formato no es compatible.',
+      'The video playback was aborted due to a corruption problem or because the video used features your browser did not support.': 'La reproducción de vídeo se ha cancelado debido a un problema de corrupción o porque el video utilizado cuenta con su navegador no soporta.',
+      'No compatible source was found for this video.': 'Ninguna fuente compatible se encontró para este video.'
+    }
+  },
+
   // Default message to show when a video cannot be played.
   'notSupportedMessage': 'No compatible source was found for this video.'
 };
