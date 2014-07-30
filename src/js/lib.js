@@ -42,13 +42,15 @@ vjs.createEl = function(tagName, properties){
  * @param dict {object} dictionary reference
  */
 vjs.localizeNode = function(node, locale, dict) {
-  if(node.innerHTML && node.innerHTML.length > 1 && dict[node.innerHTML]) {
-    node.innerHTML = dict[node.innerHTML].toString().trim();
-  }
-  node = node.firstChild;
-  while(node) {
-    vjs.localizeNode(node, locale, dict);
-    node = node.nextSibling;
+  if(dict[locale] !== undefined) {
+    if(node.innerHTML && node.innerHTML.length > 1) {
+      node.innerHTML = dict[locale][node.innerHTML.toString().trim()] || node.innerHTML;
+    }
+    node = node.firstChild;
+    while(node) {
+      vjs.localizeNode(node, locale, dict);
+      node = node.nextSibling;
+    }
   }
 };
 

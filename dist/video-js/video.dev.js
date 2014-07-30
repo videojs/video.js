@@ -104,10 +104,10 @@ vjs.options = {
     'errorDisplay': {}
   },
 
-  // Locale
-  locale: document.getElementsByTagName('html')[0].getAttribute('lang') || navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language || 'en-US',
-
+  // Localization dictionary
   'l20n': {
+    'en': {},
+    'en-US': {},
     'es': {
       'Play': 'Juego',
       'Current Time': 'Tiempo actual',
@@ -707,18 +707,20 @@ vjs.createEl = function(tagName, properties){
 
 /**
  * Recursive update to the DOM element
- * @param node    element being updated
- * @param locale  locale being implemented
- * @param dict    dictionary reference
+ * @param node {object} element being updated
+ * @param locale {string} locale being implemented
+ * @param dict {object} dictionary reference
  */
 vjs.localizeNode = function(node, locale, dict) {
-  if(node.nodeType === 3) {
-    node.data = dict[node.data.trim()] || node.data;
-  }
-  node = node.firstChild;
-  while(node) {
-    vjs.localizeNode(node, locale, dict);
-    node = node.nextSibling;
+  if(dict[locale] !== undefined) {
+    if(node.innerHTML && node.innerHTML.length > 1) {
+      node.innerHTML = dict[locale][node.innerHTML.toString().trim()] || node.innerHTML;
+    }
+    node = node.firstChild;
+    while(node) {
+      vjs.localizeNode(node, locale, dict);
+      node = node.nextSibling;
+    }
   }
 };
 
@@ -1650,15 +1652,15 @@ vjs.Component = vjs.CoreObject.extend({
 
     this.name_ = options['name'] || null;
 
+    // Update Locale
+    this.locale_ = options['locale'] || this.player_.locale() || document.getElementsByTagName('html')[0].getAttribute('lang') || navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language || 'en-US';
+
     // Create element if one wasn't provided in options
     this.el_ = options['el'] || this.createEl();
 
     this.children_ = [];
     this.childIndex_ = {};
     this.childNameIndex_ = {};
-
-    // Update Localization
-    this.locale_ = options['locale'] || this.player_.locale() || 'unknown';
 
     // Add any child components in options
     this.initChildren();
@@ -1739,9 +1741,21 @@ vjs.Component.prototype.options_;
 vjs.Component.prototype.locale_;
 
 vjs.Component.prototype.locale = function (obj) {
-  if (obj===undefined) return this.locale_;
-
+  if (obj === undefined) {
+    return this.locale_;
+  }
   return this.locale_ = vjs.util.mergeOptions(this.locale_, obj);
+};
+
+vjs.Component.prototype.requiresLocalization = function() {
+  var locale, dict;
+  locale = this.player().locale();
+  dict = this.player().l20n()[locale];
+  // Determine Localization
+  // Rules:
+  // 1. If locale NOT english
+  // 2. If localization dictionary exists for locale reported
+  return (locale !== 'en' && locale !== 'en-US' && dict);
 };
 
 /**
@@ -1807,17 +1821,18 @@ vjs.Component.prototype.el_;
  * @return {Element}
  */
 vjs.Component.prototype.createEl = function(tagName, attributes){
-  var el = vjs.createEl(tagName, attributes);
+  var el, locale, dictionary;
+
+  el = vjs.createEl(tagName, attributes);
+  locale = this.locale();
+  dictionary = this.player_.l20n();
+
   // Determine Localization
   // Rules:
   // 1. If locale NOT english
   // 2. If localization dictionary exists for locale reported
-  if (this.player_.options().locale !== 'en-US' &&
-    this.player_.options().locale !== 'en' &&
-    this.player_.options().l20n &&
-    this.player_.options().l20n[this.player_.options().locale] !== undefined)
-  {
-    vjs.localizeNode(el, this.player_.options().locale, this.player_.options().l20n[this.player_.options().locale]);
+  if (locale !== 'en-US' && locale !== 'en' && dictionary){
+    vjs.localizeNode(el, locale, dictionary);
   }
 
   return el;
@@ -3343,6 +3358,66 @@ vjs.Player = vjs.Component.extend({
     // see enableTouchActivity in Component
     options.reportTouchActivity = false;
 
+    // Determine Player Locale and Localization Dictionaries
+    // Option 1
+    // “l20n”: “es”
+    // 2
+    // “l20n”: [“es”]
+    // 3
+    // “l20n”: { lang: “es”, src: “es.json” }
+    // 4
+    // “l20n”: [{ lang: “es”, src: “es.json” }]
+
+    var l20nOverride = options['l20n'];
+
+    if(l20nOverride !== undefined){
+      // String
+      if(typeof l20nOverride === 'string') {
+        // You've been overridden by a string value
+        // according to the doc this means support for the language
+        // already exists, and should localize to that value;
+        options['locale'] = l20nOverride;
+      }
+
+      // Array
+      else if(vjs.obj.isArray(l20nOverride)) {
+        // iterate array for l20n objects to add
+        var item, index;
+        for(index = 0; index < l20nOverride.length; index++) {
+          item = l20nOverride[index];
+          // Custom objects
+          if(item.lang && item.src) {
+            this.addLocale(item.lang, item.src);
+          }
+          // String values
+          // This really should not happen until runtime switching
+          // is available/supported. Only thing we care about is
+          // a single item array which is string (covered below).
+          else {
+            // TODO - At some point check if l20n[locale] exists
+            // and if not add this.addLocale(locale, null);
+          }
+        }
+        // Single item array should enforce locale
+        // even if src detected it was added above
+        if(l20nOverride.length === 1) {
+          if(typeof l20nOverride[0] === 'string') {
+            options['locale'] = l20nOverride[0].toString();
+          } else if (l20nOverride[0].lang && typeof l20nOverride[0].lang ==='string') {
+            options['locale'] = l20nOverride.lang;
+          }
+        }
+      }
+
+      // Single Object
+      else {
+        if(l20nOverride.lang && l20nOverride.src) {
+          this.addLocale(l20nOverride.lang, l20nOverride.src);
+          options['locale'] = l20nOverride.lang;
+        }
+      }
+    }
+
     // Run base component initializing with new options.
     // Builds the element through createEl()
     // Inits and embeds any child components in opts
@@ -3374,6 +3449,16 @@ vjs.Player = vjs.Component.extend({
     this.listenForUserActivity();
   }
 });
+
+vjs.Player.prototype.l20n_ = vjs.options.l20n;
+
+vjs.Player.prototype.l20n = function(){
+  return this.l20n_;
+};
+
+vjs.Player.prototype.addLocale = function(locale, dictionary) {
+  this.l20n_[locale] = dictionary;
+};
 
 /**
  * Player instance options, surfaced using vjs.options
@@ -5845,16 +5930,9 @@ vjs.ErrorDisplay.prototype.createEl = function(){
 vjs.ErrorDisplay.prototype.update = function(){
   if (this.player().error()) {
     this.contentEl_.innerHTML = this.player().error().message;
-    // Determine Localization
-    // Rules:
-    // 1. If locale NOT english
-    // 2. If localization dictionary exists for locale reported
-    if (this.player().options().locale !== 'en-US' &&
-      this.player().options().locale !== 'en' &&
-      this.player().options().l20n &&
-      this.player().options().l20n[this.player().options().locale] !== undefined)
-    {
-      vjs.localizeNode(this.contentEl_, this.player().options().locale, this.player().options().l20n[this.player().options().locale]);
+
+    if(this.requiresLocalization()) {
+      vjs.localizeNode(this.contentEl_, this.player().locale(), this.player().l20n());
     }
   }
 };

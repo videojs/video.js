@@ -52,15 +52,15 @@ vjs.Component = vjs.CoreObject.extend({
 
     this.name_ = options['name'] || null;
 
+    // Update Locale
+    this.locale_ = options['locale'] || this.player_.locale() || document.getElementsByTagName('html')[0].getAttribute('lang') || navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language || 'en-US';
+
     // Create element if one wasn't provided in options
     this.el_ = options['el'] || this.createEl();
 
     this.children_ = [];
     this.childIndex_ = {};
     this.childNameIndex_ = {};
-
-    // Update Localization
-    this.locale_ = options['locale'] || this.player_.locale() || 'unknown';
 
     // Add any child components in options
     this.initChildren();
@@ -147,6 +147,17 @@ vjs.Component.prototype.locale = function (obj) {
   return this.locale_ = vjs.util.mergeOptions(this.locale_, obj);
 };
 
+vjs.Component.prototype.requiresLocalization = function() {
+  var locale, dict;
+  locale = this.player().locale();
+  dict = this.player().l20n()[locale];
+  // Determine Localization
+  // Rules:
+  // 1. If locale NOT english
+  // 2. If localization dictionary exists for locale reported
+  return (locale !== 'en' && locale !== 'en-US' && dict);
+};
+
 /**
  * Deep merge of options objects
  *
@@ -210,17 +221,18 @@ vjs.Component.prototype.el_;
  * @return {Element}
  */
 vjs.Component.prototype.createEl = function(tagName, attributes){
-  var el = vjs.createEl(tagName, attributes);
+  var el, locale, dictionary;
+
+  el = vjs.createEl(tagName, attributes);
+  locale = this.locale();
+  dictionary = this.player_.l20n();
+
   // Determine Localization
   // Rules:
   // 1. If locale NOT english
   // 2. If localization dictionary exists for locale reported
-  if (this.player_.options().locale !== 'en-US' &&
-    this.player_.options().locale !== 'en' &&
-    this.player_.options().l20n &&
-    this.player_.options().l20n[this.player_.options().locale] !== undefined)
-  {
-    vjs.localizeNode(el, this.player_.options().locale, this.player_.options().l20n[this.player_.options().locale]);
+  if (locale !== 'en-US' && locale !== 'en' && dictionary){
+    vjs.localizeNode(el, locale, dictionary);
   }
 
   return el;

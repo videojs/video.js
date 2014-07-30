@@ -27,16 +27,9 @@ vjs.ErrorDisplay.prototype.createEl = function(){
 vjs.ErrorDisplay.prototype.update = function(){
   if (this.player().error()) {
     this.contentEl_.innerHTML = this.player().error().message;
-    // Determine Localization
-    // Rules:
-    // 1. If locale NOT english
-    // 2. If localization dictionary exists for locale reported
-    if (this.player().options().locale !== 'en-US' &&
-      this.player().options().locale !== 'en' &&
-      this.player().options().l20n &&
-      this.player().options().l20n[this.player().options().locale] !== undefined)
-    {
-      vjs.localizeNode(this.contentEl_, this.player().options().locale, this.player().options().l20n[this.player().options().locale]);
+
+    if(this.requiresLocalization()) {
+      vjs.localizeNode(this.contentEl_, this.player().locale(), this.player().l20n());
     }
   }
 };
