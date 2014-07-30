@@ -42,6 +42,11 @@ vjs.Player = vjs.Component.extend({
     // (tag must exist before Player)
     options = vjs.obj.merge(this.getTagSettings(tag), options);
 
+    // Update Locale
+    this.language_ = options['language'];
+
+    this.languages_ = options['languages'];
+
     // Cache for video property values.
     this.cache_ = {};
 
@@ -57,66 +62,6 @@ vjs.Player = vjs.Component.extend({
     // we don't want the player to report touch activity on itself
     // see enableTouchActivity in Component
     options.reportTouchActivity = false;
-
-    // Determine Player Locale and Localization Dictionaries
-    // Option 1
-    // “l20n”: “es”
-    // 2
-    // “l20n”: [“es”]
-    // 3
-    // “l20n”: { lang: “es”, src: “es.json” }
-    // 4
-    // “l20n”: [{ lang: “es”, src: “es.json” }]
-
-    var l20nOverride = options['l20n'];
-
-    if(l20nOverride !== undefined){
-      // String
-      if(typeof l20nOverride === 'string') {
-        // You've been overridden by a string value
-        // according to the doc this means support for the language
-        // already exists, and should localize to that value;
-        options['locale'] = l20nOverride;
-      }
-
-      // Array
-      else if(vjs.obj.isArray(l20nOverride)) {
-        // iterate array for l20n objects to add
-        var item, index;
-        for(index = 0; index < l20nOverride.length; index++) {
-          item = l20nOverride[index];
-          // Custom objects
-          if(item.lang && item.src) {
-            this.addLocale(item.lang, item.src);
-          }
-          // String values
-          // This really should not happen until runtime switching
-          // is available/supported. Only thing we care about is
-          // a single item array which is string (covered below).
-          else {
-            // TODO - At some point check if l20n[locale] exists
-            // and if not add this.addLocale(locale, null);
-          }
-        }
-        // Single item array should enforce locale
-        // even if src detected it was added above
-        if(l20nOverride.length === 1) {
-          if(typeof l20nOverride[0] === 'string') {
-            options['locale'] = l20nOverride[0].toString();
-          } else if (l20nOverride[0].lang && typeof l20nOverride[0].lang ==='string') {
-            options['locale'] = l20nOverride.lang;
-          }
-        }
-      }
-
-      // Single Object
-      else {
-        if(l20nOverride.lang && l20nOverride.src) {
-          this.addLocale(l20nOverride.lang, l20nOverride.src);
-          options['locale'] = l20nOverride.lang;
-        }
-      }
-    }
 
     // Run base component initializing with new options.
     // Builds the element through createEl()
@@ -150,14 +95,33 @@ vjs.Player = vjs.Component.extend({
   }
 });
 
-vjs.Player.prototype.l20n_ = vjs.options.l20n;
+/**
+ * The players's stored locale
+ *
+ * @type {String}
+ * @private
+ */
+vjs.Player.prototype.language_;
 
-vjs.Player.prototype.l20n = function(){
-  return this.l20n_;
+/**
+ * The player's language code
+ * @param  {String} languageCode  The locale string
+ * @return {String}             The locale string when getting
+ * @return {vjs.Player}         self, when setting
+ */
+vjs.Player.prototype.language = function (languageCode) {
+  if (languageCode === undefined) {
+    return this.language_;
+  }
+
+  this.language_ = languageCode;
+  return this;
 };
 
-vjs.Player.prototype.addLocale = function(locale, dictionary) {
-  this.l20n_[locale] = dictionary;
+vjs.Player.prototype.languages_;
+
+vjs.Player.prototype.languages = function(){
+  return this.languages_;
 };
 
 /**
@@ -229,8 +193,10 @@ vjs.Player.prototype.getTagSettings = function(tag){
 };
 
 vjs.Player.prototype.createEl = function(){
-  var el = this.el_ = vjs.Component.prototype.createEl.call(this, 'div');
-  var tag = this.tag;
+  var
+    el = this.el_ = vjs.Component.prototype.createEl.call(this, 'div'),
+    tag = this.tag,
+    attrs;
 
   // Remove width/height attrs from tag so CSS can make it 100% width/height
   tag.removeAttribute('width');
@@ -259,10 +225,12 @@ vjs.Player.prototype.createEl = function(){
     }
   }
 
-  // Give video tag ID and class to player div
+  // Copy over all the attributes from the tag, including ID and class
   // ID will now reference player box, not the video tag
-  el.id = tag.id;
-  el.className = tag.className;
+  attrs = vjs.getAttributeValues(tag);
+  vjs.obj.each(attrs, function(attr) {
+    el.setAttribute(attr, attrs[attr]);
+  });
 
   // Update tag id/class for use as HTML5 playback tech
   // Might think we should do this after embedding in container so .vjs-tech class
@@ -345,6 +313,7 @@ vjs.Player.prototype.loadTech = function(techName, source){
   var techOptions = vjs.obj.merge({ 'source': source, 'parentEl': this.el_ }, this.options_[techName.toLowerCase()]);
 
   if (source) {
+    this.currentType_ = source.type;
     if (source.src == this.cache_.src && this.cache_.currentTime > 0) {
       techOptions['startTime'] = this.cache_.currentTime;
     }
@@ -1173,62 +1142,67 @@ vjs.Player.prototype.src = function(source){
     return this.techGet('src');
   }
 
-  // Case: Array of source objects to choose from and pick the best to play
+  // case: Array of source objects to choose from and pick the best to play
   if (vjs.obj.isArray(source)) {
+    this.sourceList_(source);
 
-    var sourceTech = this.selectSource(source),
-        techName;
+  // case: URL String (http://myvideo...)
+  } else if (typeof source === 'string') {
+    // create a source object from the string
+    this.src({ src: source });
 
-    if (sourceTech) {
-        source = sourceTech.source;
-        techName = sourceTech.tech;
-
-      // If this technology is already loaded, set source
-      if (techName == this.techName) {
-        this.src(source); // Passing the source object
-      // Otherwise load this technology with chosen source
-      } else {
-        this.loadTech(techName, source);
-      }
-    } else {
-      // this.el_.appendChild(vjs.createEl('p', {
-      //   innerHTML: this.options()['notSupportedMessage']
-      // }));
-      this.error({ code: 4, message: this.options()['notSupportedMessage'] });
-      this.triggerReady(); // we could not find an appropriate tech, but let's still notify the delegate that this is it
-    }
-
-  // Case: Source object { src: '', type: '' ... }
+  // case: Source object { src: '', type: '' ... }
   } else if (source instanceof Object) {
-
-    if (window['videojs'][this.techName]['canPlaySource'](source)) {
-      this.src(source.src);
+    // check if the source has a type and the loaded tech cannot play the source
+    // if there's no type we'll just try the current tech
+    if (source.type && !window['videojs'][this.techName]['canPlaySource'](source)) {
+      // create a source list with the current source and send through
+      // the tech loop to check for a compatible technology
+      this.sourceList_([source]);
     } else {
-      // Send through tech loop to check for a compatible technology.
-      this.src([source]);
-    }
+      this.cache_.src = source.src;
+      this.currentType_ = source.type || '';
 
-  // Case: URL String (http://myvideo...)
-  } else {
-    // Cache for getting last set source
-    this.cache_.src = source;
-
-    if (!this.isReady_) {
+      // wait until the tech is ready to set the source
       this.ready(function(){
-        this.src(source);
+        this.techCall('src', source.src);
+
+        if (this.options_['preload'] == 'auto') {
+          this.load();
+        }
+
+        if (this.options_['autoplay']) {
+          this.play();
+        }
       });
-    } else {
-      this.techCall('src', source);
-      if (this.options_['preload'] == 'auto') {
-        this.load();
-      }
-      if (this.options_['autoplay']) {
-        this.play();
-      }
     }
   }
 
   return this;
+};
+
+/**
+ * Handle an array of source objects
+ * @param  {[type]} sources Array of source objects
+ * @private
+ */
+vjs.Player.prototype.sourceList_ = function(sources){
+  var sourceTech = this.selectSource(sources);
+
+  if (sourceTech) {
+    if (sourceTech.tech === this.techName) {
+      // if this technology is already loaded, set the source
+      this.src(sourceTech.source);
+    } else {
+      // load this technology with the chosen source
+      this.loadTech(sourceTech.tech, sourceTech.source);
+    }
+  } else {
+    this.error({ code: 4, message: this.options()['notSupportedMessage'] });
+    // we could not find an appropriate tech, but let's still notify the delegate that this is it
+    // this needs a better comment about why this is needed
+    this.triggerReady();
+  }
 };
 
 // Begin loading the src data
@@ -1241,6 +1215,16 @@ vjs.Player.prototype.load = function(){
 // http://dev.w3.org/html5/spec/video.html#dom-media-currentsrc
 vjs.Player.prototype.currentSrc = function(){
   return this.techGet('currentSrc') || this.cache_.src || '';
+};
+
+/**
+ * Get the current source type e.g. video/mp4
+ * This can allow you rebuild the current source object so that you could load the same
+ * source and tech later
+ * @return {String} The source MIME type
+ */
+vjs.Player.prototype.currentType = function(){
+    return this.currentType_ || '';
 };
 
 // Attributes/Options

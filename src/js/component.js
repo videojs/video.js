@@ -52,9 +52,6 @@ vjs.Component = vjs.CoreObject.extend({
 
     this.name_ = options['name'] || null;
 
-    // Update Locale
-    this.locale_ = options['locale'] || this.player_.locale() || document.getElementsByTagName('html')[0].getAttribute('lang') || navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language || 'en-US';
-
     // Create element if one wasn't provided in options
     this.el_ = options['el'] || this.createEl();
 
@@ -133,32 +130,6 @@ vjs.Component.prototype.player = function(){
 vjs.Component.prototype.options_;
 
 /**
- * The component's locale
- *
- * @type {String}
- * @private
- */
-vjs.Component.prototype.locale_;
-
-vjs.Component.prototype.locale = function (obj) {
-  if (obj === undefined) {
-    return this.locale_;
-  }
-  return this.locale_ = vjs.util.mergeOptions(this.locale_, obj);
-};
-
-vjs.Component.prototype.requiresLocalization = function() {
-  var locale, dict;
-  locale = this.player().locale();
-  dict = this.player().l20n()[locale];
-  // Determine Localization
-  // Rules:
-  // 1. If locale NOT english
-  // 2. If localization dictionary exists for locale reported
-  return (locale !== 'en' && locale !== 'en-US' && dict);
-};
-
-/**
  * Deep merge of options objects
  *
  * Whenever a property is an object on both options objects
@@ -223,11 +194,18 @@ vjs.Component.prototype.el_;
 vjs.Component.prototype.createEl = function(tagName, attributes){
   var el = vjs.createEl(tagName, attributes);
 
-  if (this.requiresLocalization()){
-    vjs.localizeNode(el, this.locale(), this.player_.l20n());
+  return el;
+};
+
+vjs.Component.prototype.localize = function(string){
+  var lang = this.player_.language(),
+      languages = this.player_.languages();
+
+  if (languages && languages[lang] && languages[lang][string]) {
+    return languages[lang][string];
   }
 
-  return el;
+  return string;
 };
 
 /**
@@ -598,13 +576,13 @@ vjs.Component.prototype.one = function(type, fn) {
  * Trigger an event on an element
  *
  *     myComponent.trigger('eventName');
+ *     myComponent.trigger({'type':'eventName'});
  *
- * @param  {String}       type  The event type to trigger, e.g. 'click'
- * @param  {Event|Object} event The event object to be passed to the listener
- * @return {vjs.Component}      self
+ * @param  {Event|Object|String} event  A string (the type) or an event object with a type attribute
+ * @return {vjs.Component}       self
  */
-vjs.Component.prototype.trigger = function(type, event){
-  vjs.trigger(this.el_, type, event);
+vjs.Component.prototype.trigger = function(event){
+  vjs.trigger(this.el_, event);
   return this;
 };
 
