@@ -117,7 +117,9 @@ vjs.Slider.prototype.update = function(){
   }
 
   // Set the new bar width
-  bar.el().style.width = vjs.round(barProgress * 100, 2) + '%';
+  if (bar) {
+    bar.el().style.width = vjs.round(barProgress * 100, 2) + '%';
+  }
 };
 
 vjs.Slider.prototype.calculateDistance = function(event){
