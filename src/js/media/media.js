@@ -83,6 +83,9 @@ vjs.MediaTechController.prototype.addControlsListeners = function(){
   // Any touch events are set to block the mousedown event from happening
   this.on('mousedown', this.onClick);
 
+  // Handle hot keys on the media element.
+  this.on('keydown', vjs.bind(this, this.player().keyPressListener));
+
   // If the controls were hidden we don't want that to change without a tap event
   // so we'll check if the controls were already showing before reporting user
   // activity
@@ -121,6 +124,7 @@ vjs.MediaTechController.prototype.removeControlsListeners = function(){
   this.off('touchend');
   this.off('click');
   this.off('mousedown');
+  this.off('keydown');
 };
 
 /**

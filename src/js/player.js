@@ -87,6 +87,7 @@ vjs.Player = vjs.Component.extend({
     }
 
     this.listenForUserActivity();
+    this.listenForKeyPress();
   }
 });
 
@@ -197,6 +198,11 @@ vjs.Player.prototype.createEl = function(){
   vjs.obj.each(attrs, function(attr) {
     el.setAttribute(attr, attrs[attr]);
   });
+
+  // Set default player tabindex to handle keydown events
+  if (!el.hasAttribute('tabIndex')) {
+    el.setAttribute('tabIndex', '-1');
+  }
 
   // Update tag id/class for use as HTML5 playback tech
   // Might think we should do this after embedding in container so .vjs-tech class
@@ -1531,6 +1537,48 @@ vjs.Player.prototype.playbackRate = function(rate) {
     return 1.0;
   }
 
+};
+
+vjs.Player.prototype.keyPressListener = function(event) {
+  // Handle hotkey support across html5 and flash
+
+  // When controls are disabled, hotkeys will be disabled as well
+  if (this.player_.controls()) {
+
+    // Don't catch keys if any control buttons are focused
+    if (document.activeElement == this.el_) {
+
+      // Spacebar toggles play/pause
+      if (event.which === 32) {
+        event.preventDefault();
+        if (this.player_.paused()) {
+          this.player_.play();
+        } else {
+          this.player_.pause();
+        }
+      }
+
+      // Seeking with the left/right arrow keys
+      else if (event.which == 37) { // Left Arrow
+        event.preventDefault();
+        this.player_.currentTime(this.player_.currentTime() - 5);
+      } else if (event.which == 39) { // Right Arrow
+        event.preventDefault();
+        this.player_.currentTime(this.player_.currentTime() + 5);
+      }
+
+      // Volume control with the up/down arrow keys
+      else if (event.which == 40) {
+        this.player_.volume(this.player_.volume() - 0.1);
+      } else if (event.which == 38) {
+        this.player_.volume(this.player_.volume() + 0.1);
+      }
+    }
+  }
+};
+
+vjs.Player.prototype.listenForKeyPress = function() {
+  this.on('keydown', vjs.bind(this, this.keyPressListener));
 };
 
 // Methods to add support for
