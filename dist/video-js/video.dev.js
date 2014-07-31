@@ -104,10 +104,10 @@ vjs.options = {
     'errorDisplay': {}
   },
 
-  // Localization dictionary
-  'l20n': {
-    'en': {},
-    'en-US': {},
+  'language': document.getElementsByTagName('html')[0].getAttribute('lang') || navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language || 'en',
+
+  // locales and their language translations
+  'languages': {
     'es': {
       'Play': 'Juego',
       'Current Time': 'Tiempo actual',
@@ -565,8 +565,8 @@ vjs.fixEvent = function(event) {
 
 /**
  * Trigger an event for an element
- * @param  {Element|Object} elem  Element to trigger an event on
- * @param  {String} event Type of event to trigger
+ * @param  {Element|Object}      elem  Element to trigger an event on
+ * @param  {Event|Object|String} event A string (the type) or an event object with a type attribute
  * @private
  */
 vjs.trigger = function(elem, event) {
@@ -1566,10 +1566,9 @@ vjs.arr.forEach = function(array, callback, thisArg) {
 vjs.util = {};
 
 /**
- * Merge two options objects, 
- * recursively merging any plain object properties as well.
- * Previously `deepMerge`
- * 
+ * Merge two options objects, recursively merging any plain object properties as
+ * well.  Previously `deepMerge`
+ *
  * @param  {Object} obj1 Object to override values in
  * @param  {Object} obj2 Overriding object
  * @return {Object}      New object -- obj1 and obj2 will be untouched
@@ -1652,9 +1651,6 @@ vjs.Component = vjs.CoreObject.extend({
 
     this.name_ = options['name'] || null;
 
-    // Update Locale
-    this.locale_ = options['locale'] || this.player_.locale() || document.getElementsByTagName('html')[0].getAttribute('lang') || navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language || 'en-US';
-
     // Create element if one wasn't provided in options
     this.el_ = options['el'] || this.createEl();
 
@@ -1733,32 +1729,6 @@ vjs.Component.prototype.player = function(){
 vjs.Component.prototype.options_;
 
 /**
- * The component's locale
- *
- * @type {String}
- * @private
- */
-vjs.Component.prototype.locale_;
-
-vjs.Component.prototype.locale = function (obj) {
-  if (obj === undefined) {
-    return this.locale_;
-  }
-  return this.locale_ = vjs.util.mergeOptions(this.locale_, obj);
-};
-
-vjs.Component.prototype.requiresLocalization = function() {
-  var locale, dict;
-  locale = this.player().locale();
-  dict = this.player().l20n()[locale];
-  // Determine Localization
-  // Rules:
-  // 1. If locale NOT english
-  // 2. If localization dictionary exists for locale reported
-  return (locale !== 'en' && locale !== 'en-US' && dict);
-};
-
-/**
  * Deep merge of options objects
  *
  * Whenever a property is an object on both options objects
@@ -1821,21 +1791,22 @@ vjs.Component.prototype.el_;
  * @return {Element}
  */
 vjs.Component.prototype.createEl = function(tagName, attributes){
-  var el, locale, dictionary;
-
-  el = vjs.createEl(tagName, attributes);
-  locale = this.locale();
-  dictionary = this.player_.l20n();
-
-  // Determine Localization
-  // Rules:
-  // 1. If locale NOT english
-  // 2. If localization dictionary exists for locale reported
-  if (locale !== 'en-US' && locale !== 'en' && dictionary){
-    vjs.localizeNode(el, locale, dictionary);
-  }
+  var el = vjs.createEl(tagName, attributes);
 
   return el;
+};
+
+vjs.Component.prototype.localize = function(string){
+  if(this.player_ && this.player_.language() && this.player_.languages()) {
+    var lang = this.player_.language(),
+        languages = this.player_.languages();
+
+    if (languages && languages[lang] && languages[lang][string]) {
+      return languages[lang][string];
+    }
+  }
+
+  return string;
 };
 
 /**
@@ -2206,13 +2177,13 @@ vjs.Component.prototype.one = function(type, fn) {
  * Trigger an event on an element
  *
  *     myComponent.trigger('eventName');
+ *     myComponent.trigger({'type':'eventName'});
  *
- * @param  {String}       type  The event type to trigger, e.g. 'click'
- * @param  {Event|Object} event The event object to be passed to the listener
- * @return {vjs.Component}      self
+ * @param  {Event|Object|String} event  A string (the type) or an event object with a type attribute
+ * @return {vjs.Component}       self
  */
-vjs.Component.prototype.trigger = function(type, event){
-  vjs.trigger(this.el_, type, event);
+vjs.Component.prototype.trigger = function(event){
+  vjs.trigger(this.el_, event);
   return this;
 };
 
@@ -2668,7 +2639,7 @@ vjs.Button.prototype.createEl = function(type, props){
 
     this.controlText_ = vjs.createEl('span', {
       className: 'vjs-control-text',
-      innerHTML: this.buttonText || 'Need Text'
+      innerHTML: this.localize(this.buttonText) || 'Need Text'
     });
 
     this.contentEl_.appendChild(this.controlText_);
@@ -2880,10 +2851,10 @@ vjs.Slider.prototype.onFocus = function(){
 };
 
 vjs.Slider.prototype.onKeyPress = function(event){
-  if (event.which == 37) { // Left Arrow
+  if (event.which == 37 || event.which == 40) { // Left and Down Arrows
     event.preventDefault();
     this.stepBack();
-  } else if (event.which == 39) { // Right Arrow
+  } else if (event.which == 38 || event.which == 39) { // Up and Right Arrows
     event.preventDefault();
     this.stepForward();
   }
@@ -3342,6 +3313,11 @@ vjs.Player = vjs.Component.extend({
     // (tag must exist before Player)
     options = vjs.obj.merge(this.getTagSettings(tag), options);
 
+    // Update Locale
+    this.language_ = options['language'];
+
+    this.languages_ = options['languages'];
+
     // Cache for video property values.
     this.cache_ = {};
 
@@ -3357,66 +3333,6 @@ vjs.Player = vjs.Component.extend({
     // we don't want the player to report touch activity on itself
     // see enableTouchActivity in Component
     options.reportTouchActivity = false;
-
-    // Determine Player Locale and Localization Dictionaries
-    // Option 1
-    // “l20n”: “es”
-    // 2
-    // “l20n”: [“es”]
-    // 3
-    // “l20n”: { lang: “es”, src: “es.json” }
-    // 4
-    // “l20n”: [{ lang: “es”, src: “es.json” }]
-
-    var l20nOverride = options['l20n'];
-
-    if(l20nOverride !== undefined){
-      // String
-      if(typeof l20nOverride === 'string') {
-        // You've been overridden by a string value
-        // according to the doc this means support for the language
-        // already exists, and should localize to that value;
-        options['locale'] = l20nOverride;
-      }
-
-      // Array
-      else if(vjs.obj.isArray(l20nOverride)) {
-        // iterate array for l20n objects to add
-        var item, index;
-        for(index = 0; index < l20nOverride.length; index++) {
-          item = l20nOverride[index];
-          // Custom objects
-          if(item.lang && item.src) {
-            this.addLocale(item.lang, item.src);
-          }
-          // String values
-          // This really should not happen until runtime switching
-          // is available/supported. Only thing we care about is
-          // a single item array which is string (covered below).
-          else {
-            // TODO - At some point check if l20n[locale] exists
-            // and if not add this.addLocale(locale, null);
-          }
-        }
-        // Single item array should enforce locale
-        // even if src detected it was added above
-        if(l20nOverride.length === 1) {
-          if(typeof l20nOverride[0] === 'string') {
-            options['locale'] = l20nOverride[0].toString();
-          } else if (l20nOverride[0].lang && typeof l20nOverride[0].lang ==='string') {
-            options['locale'] = l20nOverride.lang;
-          }
-        }
-      }
-
-      // Single Object
-      else {
-        if(l20nOverride.lang && l20nOverride.src) {
-          this.addLocale(l20nOverride.lang, l20nOverride.src);
-          options['locale'] = l20nOverride.lang;
-        }
-      }
-    }
 
     // Run base component initializing with new options.
     // Builds the element through createEl()
@@ -3450,14 +3366,33 @@ vjs.Player = vjs.Component.extend({
   }
 });
 
-vjs.Player.prototype.l20n_ = vjs.options.l20n;
+/**
+ * The players's stored locale
+ *
+ * @type {String}
+ * @private
+ */
+vjs.Player.prototype.language_;
 
-vjs.Player.prototype.l20n = function(){
-  return this.l20n_;
+/**
+ * The player's language code
+ * @param  {String} languageCode  The locale string
+ * @return {String}             The locale string when getting
+ * @return {vjs.Player}         self, when setting
+ */
+vjs.Player.prototype.language = function (languageCode) {
+  if (languageCode === undefined) {
+    return this.language_;
+  }
+
+  this.language_ = languageCode;
+  return this;
 };
 
-vjs.Player.prototype.addLocale = function(locale, dictionary) {
-  this.l20n_[locale] = dictionary;
+vjs.Player.prototype.languages_;
+
+vjs.Player.prototype.languages = function(){
+  return this.languages_;
 };
 
 /**
@@ -3529,8 +3464,10 @@ vjs.Player.prototype.getTagSettings = function(tag){
 };
 
 vjs.Player.prototype.createEl = function(){
-  var el = this.el_ = vjs.Component.prototype.createEl.call(this, 'div');
-  var tag = this.tag;
+  var
+    el = this.el_ = vjs.Component.prototype.createEl.call(this, 'div'),
+    tag = this.tag,
+    attrs;
 
   // Remove width/height attrs from tag so CSS can make it 100% width/height
   tag.removeAttribute('width');
@@ -3559,10 +3496,12 @@ vjs.Player.prototype.createEl = function(){
     }
   }
 
-  // Give video tag ID and class to player div
+  // Copy over all the attributes from the tag, including ID and class
   // ID will now reference player box, not the video tag
-  el.id = tag.id;
-  el.className = tag.className;
+  attrs = vjs.getAttributeValues(tag);
+  vjs.obj.each(attrs, function(attr) {
+    el.setAttribute(attr, attrs[attr]);
+  });
 
   // Update tag id/class for use as HTML5 playback tech
   // Might think we should do this after embedding in container so .vjs-tech class
@@ -3645,6 +3584,7 @@ vjs.Player.prototype.loadTech = function(techName, source){
   var techOptions = vjs.obj.merge({ 'source': source, 'parentEl': this.el_ }, this.options_[techName.toLowerCase()]);
 
   if (source) {
+    this.currentType_ = source.type;
     if (source.src == this.cache_.src && this.cache_.currentTime > 0) {
       techOptions['startTime'] = this.cache_.currentTime;
     }
@@ -4473,62 +4413,67 @@ vjs.Player.prototype.src = function(source){
     return this.techGet('src');
   }
 
-  // Case: Array of source objects to choose from and pick the best to play
+  // case: Array of source objects to choose from and pick the best to play
   if (vjs.obj.isArray(source)) {
+    this.sourceList_(source);
 
-    var sourceTech = this.selectSource(source),
-        techName;
+  // case: URL String (http://myvideo...)
+  } else if (typeof source === 'string') {
+    // create a source object from the string
+    this.src({ src: source });
 
-    if (sourceTech) {
-        source = sourceTech.source;
-        techName = sourceTech.tech;
-
-      // If this technology is already loaded, set source
-      if (techName == this.techName) {
-        this.src(source); // Passing the source object
-      // Otherwise load this technology with chosen source
-      } else {
-        this.loadTech(techName, source);
-      }
-    } else {
-      // this.el_.appendChild(vjs.createEl('p', {
-      //   innerHTML: this.options()['notSupportedMessage']
-      // }));
-      this.error({ code: 4, message: this.options()['notSupportedMessage'] });
-      this.triggerReady(); // we could not find an appropriate tech, but let's still notify the delegate that this is it
-    }
-
-  // Case: Source object { src: '', type: '' ... }
+  // case: Source object { src: '', type: '' ... }
   } else if (source instanceof Object) {
-
-    if (window['videojs'][this.techName]['canPlaySource'](source)) {
-      this.src(source.src);
+    // check if the source has a type and the loaded tech cannot play the source
+    // if there's no type we'll just try the current tech
+    if (source.type && !window['videojs'][this.techName]['canPlaySource'](source)) {
+      // create a source list with the current source and send through
+      // the tech loop to check for a compatible technology
+      this.sourceList_([source]);
     } else {
-      // Send through tech loop to check for a compatible technology.
-      this.src([source]);
-    }
+      this.cache_.src = source.src;
+      this.currentType_ = source.type || '';
 
-  // Case: URL String (http://myvideo...)
-  } else {
-    // Cache for getting last set source
-    this.cache_.src = source;
-
-    if (!this.isReady_) {
+      // wait until the tech is ready to set the source
       this.ready(function(){
-        this.src(source);
+        this.techCall('src', source.src);
+
+        if (this.options_['preload'] == 'auto') {
+          this.load();
+        }
+
+        if (this.options_['autoplay']) {
+          this.play();
+        }
       });
-    } else {
-      this.techCall('src', source);
-      if (this.options_['preload'] == 'auto') {
-        this.load();
-      }
-      if (this.options_['autoplay']) {
-        this.play();
-      }
     }
   }
 
   return this;
+};
+
+/**
+ * Handle an array of source objects
+ * @param  {[type]} sources Array of source objects
+ * @private
+ */
+vjs.Player.prototype.sourceList_ = function(sources){
+  var sourceTech = this.selectSource(sources);
+
+  if (sourceTech) {
+    if (sourceTech.tech === this.techName) {
+      // if this technology is already loaded, set the source
+      this.src(sourceTech.source);
+    } else {
+      // load this technology with the chosen source
+      this.loadTech(sourceTech.tech, sourceTech.source);
+    }
+  } else {
+    this.error({ code: 4, message: this.options()['notSupportedMessage'] });
+    // we could not find an appropriate tech, but let's still notify the delegate that this is it
+    // this needs a better comment about why this is needed
+    this.triggerReady();
+  }
 };
 
 // Begin loading the src data
@@ -4541,6 +4486,16 @@ vjs.Player.prototype.load = function(){
 // http://dev.w3.org/html5/spec/video.html#dom-media-currentsrc
 vjs.Player.prototype.currentSrc = function(){
   return this.techGet('currentSrc') || this.cache_.src || '';
+};
+
+/**
+ * Get the current source type e.g. video/mp4
+ * This can allow you rebuild the current source object so that you could load the same
+ * source and tech later
+ * @return {String} The source MIME type
+ */
+vjs.Player.prototype.currentType = function(){
+    return this.currentType_ || '';
 };
 
 // Attributes/Options
@@ -4955,7 +4910,7 @@ vjs.LiveDisplay.prototype.createEl = function(){
 
   this.contentEl_ = vjs.createEl('div', {
     className: 'vjs-live-display',
-    innerHTML: '<span class="vjs-control-text">Stream Type </span>LIVE',
+    innerHTML: '<span class="vjs-control-text">' + this.localize('Stream Type') + '</span>' + this.localize('LIVE'),
     'aria-live': 'off'
   });
 
@@ -4999,14 +4954,14 @@ vjs.PlayToggle.prototype.onClick = function(){
 vjs.PlayToggle.prototype.onPlay = function(){
   vjs.removeClass(this.el_, 'vjs-paused');
   vjs.addClass(this.el_, 'vjs-playing');
-  this.el_.children[0].children[0].innerHTML = 'Pause'; // change the button text to "Pause"
+  this.el_.children[0].children[0].innerHTML = this.localize('Pause'); // change the button text to "Pause"
 };
 
   // OnPause - Add the vjs-paused class to the element so it can change appearance
 vjs.PlayToggle.prototype.onPause = function(){
   vjs.removeClass(this.el_, 'vjs-playing');
   vjs.addClass(this.el_, 'vjs-paused');
-  this.el_.children[0].children[0].innerHTML = 'Play'; // change the button text to "Play"
+  this.el_.children[0].children[0].innerHTML = this.localize('Play'); // change the button text to "Play"
 };
 /**
  * Displays the current time
@@ -5041,7 +4996,7 @@ vjs.CurrentTimeDisplay.prototype.createEl = function(){
 vjs.CurrentTimeDisplay.prototype.updateContent = function(){
   // Allows for smooth scrubbing, when player can't keep up.
   var time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
-  this.contentEl_.innerHTML = '<span class="vjs-control-text">Current Time </span>' + vjs.formatTime(time, this.player_.duration());
+  this.contentEl_.innerHTML = '<span class="vjs-control-text">' + this.localize('Current Time') + '</span> ' + vjs.formatTime(time, this.player_.duration());
 };
 
 /**
@@ -5071,7 +5026,7 @@ vjs.DurationDisplay.prototype.createEl = function(){
 
   this.contentEl_ = vjs.createEl('div', {
     className: 'vjs-duration-display',
-    innerHTML: '<span class="vjs-control-text">Duration Time </span>' + '0:00', // label the duration time for screen reader users
+    innerHTML: '<span class="vjs-control-text">' + this.localize('Duration Time') + '</span> ' + '0:00', // label the duration time for screen reader users
     'aria-live': 'off' // tell screen readers not to automatically read the time as it changes
   });
 
@@ -5082,7 +5037,7 @@ vjs.DurationDisplay.prototype.createEl = function(){
 vjs.DurationDisplay.prototype.updateContent = function(){
   var duration = this.player_.duration();
   if (duration) {
-      this.contentEl_.innerHTML = '<span class="vjs-control-text">Duration Time </span>' + vjs.formatTime(duration); // label the duration time for screen reader users
+      this.contentEl_.innerHTML = '<span class="vjs-control-text">' + this.localize('Duration Time') + '</span> ' + vjs.formatTime(duration); // label the duration time for screen reader users
   }
 };
 
@@ -5131,7 +5086,7 @@ vjs.RemainingTimeDisplay.prototype.createEl = function(){
 
   this.contentEl_ = vjs.createEl('div', {
     className: 'vjs-remaining-time-display',
-    innerHTML: '<span class="vjs-control-text">Remaining Time </span>' + '-0:00', // label the remaining time for screen reader users
+    innerHTML: '<span class="vjs-control-text">' + this.localize('Remaining Time') + '</span> ' + '-0:00', // label the remaining time for screen reader users
     'aria-live': 'off' // tell screen readers not to automatically read the time as it changes
   });
 
@@ -5141,7 +5096,7 @@ vjs.RemainingTimeDisplay.prototype.createEl = function(){
 
 vjs.RemainingTimeDisplay.prototype.updateContent = function(){
   if (this.player_.duration()) {
-    this.contentEl_.innerHTML = '<span class="vjs-control-text">Remaining Time </span>' + '-'+ vjs.formatTime(this.player_.remainingTime());
+    this.contentEl_.innerHTML = '<span class="vjs-control-text">' + this.localize('Remaining Time') + '</span> ' + '-'+ vjs.formatTime(this.player_.remainingTime());
   }
 
   // Allows for smooth scrubbing, when player can't keep up.
@@ -5175,10 +5130,10 @@ vjs.FullscreenToggle.prototype.buildCSSClass = function(){
 vjs.FullscreenToggle.prototype.onClick = function(){
   if (!this.player_.isFullscreen()) {
     this.player_.requestFullscreen();
-    this.controlText_.innerHTML = 'Non-Fullscreen';
+    this.controlText_.innerHTML = this.localize('Non-Fullscreen');
   } else {
     this.player_.exitFullscreen();
-    this.controlText_.innerHTML = 'Fullscreen';
+    this.controlText_.innerHTML = this.localize('Fullscreen');
   }
 };
 /**
@@ -5309,7 +5264,7 @@ vjs.LoadProgressBar = vjs.Component.extend({
 vjs.LoadProgressBar.prototype.createEl = function(){
   return vjs.Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-load-progress',
-    innerHTML: '<span class="vjs-control-text"><span>Loaded</span>: 0%</span>'
+    innerHTML: '<span class="vjs-control-text"><span>' + this.localize('Loaded') + '</span>: 0%</span>'
   });
 };
 
@@ -5335,7 +5290,7 @@ vjs.PlayProgressBar = vjs.Component.extend({
 vjs.PlayProgressBar.prototype.createEl = function(){
   return vjs.Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-play-progress',
-    innerHTML: '<span class="vjs-control-text"><span>Progress</span>: 0%</span>'
+    innerHTML: '<span class="vjs-control-text"><span>' + this.localize('Progress') + '</span>: 0%</span>'
   });
 };
 
@@ -5545,7 +5500,7 @@ vjs.MuteToggle = vjs.Button.extend({
 vjs.MuteToggle.prototype.createEl = function(){
   return vjs.Button.prototype.createEl.call(this, 'div', {
     className: 'vjs-mute-control vjs-control',
-    innerHTML: '<div><span class="vjs-control-text">Mute</span></div>'
+    innerHTML: '<div><span class="vjs-control-text">' + this.localize('Mute') + '</span></div>'
   });
 };
 
@@ -5569,12 +5524,12 @@ vjs.MuteToggle.prototype.update = function(){
   // This causes unnecessary and confusing information for screen reader users.
   // This check is needed because this function gets called every time the volume level is changed.
   if(this.player_.muted()){
-      if(this.el_.children[0].children[0].innerHTML!='Unmute'){
-          this.el_.children[0].children[0].innerHTML = 'Unmute'; // change the button text to "Unmute"
+      if(this.el_.children[0].children[0].innerHTML!=this.localize('Unmute')){
+          this.el_.children[0].children[0].innerHTML = this.localize('Unmute'); // change the button text to "Unmute"
       }
   } else {
-      if(this.el_.children[0].children[0].innerHTML!='Mute'){
-          this.el_.children[0].children[0].innerHTML = 'Mute'; // change the button text to "Mute"
+      if(this.el_.children[0].children[0].innerHTML!=this.localize('Mute')){
+          this.el_.children[0].children[0].innerHTML = this.localize('Mute'); // change the button text to "Mute"
       }
   }
 
@@ -5615,7 +5570,7 @@ vjs.VolumeMenuButton.prototype.createMenu = function(){
   var menu = new vjs.Menu(this.player_, {
     contentElType: 'div'
   });
-  var vc = new vjs.VolumeBar(this.player_, vjs.obj.merge({vertical: true}, this.options_.volumeBar));
+  var vc = new vjs.VolumeBar(this.player_, vjs.obj.merge({'vertical': true}, this.options_.volumeBar));
   menu.addChild(vc);
   return menu;
 };
@@ -5628,7 +5583,7 @@ vjs.VolumeMenuButton.prototype.onClick = function(){
 vjs.VolumeMenuButton.prototype.createEl = function(){
   return vjs.Button.prototype.createEl.call(this, 'div', {
     className: 'vjs-volume-menu-button vjs-menu-button vjs-control',
-    innerHTML: '<div><span class="vjs-control-text">Mute</span></div>'
+    innerHTML: '<div><span class="vjs-control-text">' + this.localize('Mute') + '</span></div>'
   });
 };
 vjs.VolumeMenuButton.prototype.update = vjs.MuteToggle.prototype.update;
@@ -5655,7 +5610,7 @@ vjs.PlaybackRateMenuButton = vjs.MenuButton.extend({
 vjs.PlaybackRateMenuButton.prototype.createEl = function(){
   var el = vjs.Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-playback-rate vjs-menu-button vjs-control',
-    innerHTML: '<div class="vjs-control-content"><span class="vjs-control-text">Playback Rate</span></div>'
+    innerHTML: '<div class="vjs-control-content"><span class="vjs-control-text">' + this.localize('Playback Rate') + '</span></div>'
   });
 
   this.labelEl_ = vjs.createEl('div', {
@@ -5929,11 +5884,7 @@ vjs.ErrorDisplay.prototype.createEl = function(){
 
 vjs.ErrorDisplay.prototype.update = function(){
   if (this.player().error()) {
-    this.contentEl_.innerHTML = this.player().error().message;
-
-    if(this.requiresLocalization()) {
-      vjs.localizeNode(this.contentEl_, this.player().locale(), this.player().l20n());
-    }
+    this.contentEl_.innerHTML = this.localize(this.player().error().message);
   }
 };
 /**
@@ -6538,9 +6489,7 @@ vjs.Flash = vjs.MediaTechController.extend({
           'id': objId,
           'name': objId, // Both ID and Name needed or swf to identifty itself
           'class': 'vjs-tech'
-        }, options['attributes']),
-
-        lastSeekTarget
+        }, options['attributes'])
     ;
 
     // If source was supplied pass as a flash var.
@@ -6555,19 +6504,6 @@ vjs.Flash = vjs.MediaTechController.extend({
       }
     }
 
-    this['setCurrentTime'] = function(time){
-      lastSeekTarget = time;
-      this.el_.vjs_setProperty('currentTime', time);
-    };
-    this['currentTime'] = function(time){
-      // when seeking make the reported time keep up with the requested time
-      // by reading the time we're seeking to
-      if (this.seeking()) {
-        return lastSeekTarget;
-      }
-      return this.el_.vjs_getProperty('currentTime');
-    };
-
     // Add placeholder to player div
     vjs.insertFirst(placeHolder, parentEl);
 
@@ -6577,7 +6513,7 @@ vjs.Flash = vjs.MediaTechController.extend({
       this.ready(function(){
         this.load();
         this.play();
-        this.currentTime(options['startTime']);
+        this['currentTime'](options['startTime']);
       });
     }
 
@@ -6596,134 +6532,7 @@ vjs.Flash = vjs.MediaTechController.extend({
     // use stageclick events triggered from inside the SWF instead
     player.on('stageclick', player.reportUserActivity);
 
-    // Flash iFrame Mode
-    // In web browsers there are multiple instances where changing the parent element or visibility of a plugin causes the plugin to reload.
-    // - Firefox just about always. https://bugzilla.mozilla.org/show_bug.cgi?id=90268 (might be fixed by version 13)
-    // - Webkit when hiding the plugin
-    // - Webkit and Firefox when using requestFullScreen on a parent element
-    // Loading the flash plugin into a dynamically generated iFrame gets around most of these issues.
-    // Issues that remain include hiding the element and requestFullScreen in Firefox specifically
-
-    // There's on particularly annoying issue with this method which is that Firefox throws a security error on an offsite Flash object loaded into a dynamically created iFrame.
-    // Even though the iframe was inserted into a page on the web, Firefox + Flash considers it a local app trying to access an internet file.
-    // I tried mulitple ways of setting the iframe src attribute but couldn't find a src that worked well. Tried a real/fake source, in/out of domain.
-    // Also tried a method from stackoverflow that caused a security error in all browsers. http://stackoverflow.com/questions/2486901/how-to-set-document-domain-for-a-dynamically-generated-iframe
-    // In the end the solution I found to work was setting the iframe window.location.href right before doing a document.write of the Flash object.
-    // The only downside of this it seems to trigger another http request to the original page (no matter what's put in the href). Not sure why that is.
-
-    // NOTE (2012-01-29): Cannot get Firefox to load the remote hosted SWF into a dynamically created iFrame
-    // Firefox 9 throws a security error, unleess you call location.href right before doc.write.
-    //    Not sure why that even works, but it causes the browser to look like it's continuously trying to load the page.
-    // Firefox 3.6 keeps calling the iframe onload function anytime I write to it, causing an endless loop.
-
-    if (options['iFrameMode'] === true && !vjs.IS_FIREFOX) {
-
-      // Create iFrame with vjs-tech class so it's 100% width/height
-      var iFrm = vjs.createEl('iframe', {
-        'id': objId + '_iframe',
-        'name': objId + '_iframe',
-        'className': 'vjs-tech',
-        'scrolling': 'no',
-        'marginWidth': 0,
-        'marginHeight': 0,
-        'frameBorder': 0
-      });
-
-      // Update ready function names in flash vars for iframe window
-      flashVars['readyFunction'] = 'ready';
-      flashVars['eventProxyFunction'] = 'events';
-      flashVars['errorEventProxyFunction'] = 'errors';
-
-      // Tried multiple methods to get this to work in all browsers
-
-      // Tried embedding the flash object in the page first, and then adding a place holder to the iframe, then replacing the placeholder with the page object.
-      // The goal here was to try to load the swf URL in the parent page first and hope that got around the firefox security error
-      // var newObj = vjs.Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
-      // (in onload)
-      //  var temp = vjs.createEl('a', { id:'asdf', innerHTML: 'asdf' } );
-      //  iDoc.body.appendChild(temp);
-
-      // Tried embedding the flash object through javascript in the iframe source.
-      // This works in webkit but still triggers the firefox security error
-      // iFrm.src = 'javascript: document.write('"+vjs.Flash.getEmbedCode(options['swf'], flashVars, params, attributes)+"');";
-
-      // Tried an actual local iframe just to make sure that works, but it kills the easiness of the CDN version if you require the user to host an iframe
-      // We should add an option to host the iframe locally though, because it could help a lot of issues.
-      // iFrm.src = "iframe.html";
-
-      // Wait until iFrame has loaded to write into it.
-      vjs.on(iFrm, 'load', vjs.bind(this, function(){
-
-        var iDoc,
-            iWin = iFrm.contentWindow;
-
-        // The one working method I found was to use the iframe's document.write() to create the swf object
-        // This got around the security issue in all browsers except firefox.
-        // I did find a hack where if I call the iframe's window.location.href='', it would get around the security error
-        // However, the main page would look like it was loading indefinitely (URL bar loading spinner would never stop)
-        // Plus Firefox 3.6 didn't work no matter what I tried.
-        // if (vjs.USER_AGENT.match('Firefox')) {
-        //   iWin.location.href = '';
-        // }
-
-        // Get the iFrame's document depending on what the browser supports
-        iDoc = iFrm.contentDocument ? iFrm.contentDocument : iFrm.contentWindow.document;
-
-        // Tried ensuring both document domains were the same, but they already were, so that wasn't the issue.
-        // Even tried adding /. that was mentioned in a browser security writeup
-        // document.domain = document.domain+'/.';
-        // iDoc.domain = document.domain+'/.';
-
-        // Tried adding the object to the iframe doc's innerHTML. Security error in all browsers.
-        // iDoc.body.innerHTML = swfObjectHTML;
-
-        // Tried appending the object to the iframe doc's body. Security error in all browsers.
-        // iDoc.body.appendChild(swfObject);
-
-        // Using document.write actually got around the security error that browsers were throwing.
-        // Again, it's a dynamically generated (same domain) iframe, loading an external Flash swf.
-        // Not sure why that's a security issue, but apparently it is.
-        iDoc.write(vjs.Flash.getEmbedCode(options['swf'], flashVars, params, attributes));
-
-        // Setting variables on the window needs to come after the doc write because otherwise they can get reset in some browsers
-        // So far no issues with swf ready event being called before it's set on the window.
-        iWin['player'] = this.player_;
-
-        // Create swf ready function for iFrame window
-        iWin['ready'] = vjs.bind(this.player_, function(currSwf){
-          var el = iDoc.getElementById(currSwf),
-              player = this,
-              tech = player.tech;
-
-          // Update reference to playback technology element
-          tech.el_ = el;
-
-          // Make sure swf is actually ready. Sometimes the API isn't actually yet.
-          vjs.Flash.checkReady(tech);
-        });
-
-        // Create event listener for all swf events
-        iWin['events'] = vjs.bind(this.player_, function(swfID, eventName){
-          var player = this;
-          if (player && player.techName === 'flash') {
-            player.trigger(eventName);
-          }
-        });
-
-        // Create error listener for all swf errors
-        iWin['errors'] = vjs.bind(this.player_, function(swfID, eventName){
-          vjs.log('Flash Error', eventName);
-        });
-
-      }));
-
-      // Replace placeholder with iFrame (it will load now)
-      placeHolder.parentNode.replaceChild(iFrm, placeHolder);
-
-    // If not using iFrame mode, embed as normal object
-    } else {
-      vjs.Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
-    }
+    this.el_ = vjs.Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
   }
 });
 
@@ -6741,7 +6550,7 @@ vjs.Flash.prototype.pause = function(){
 
 vjs.Flash.prototype.src = function(src){
   if (src === undefined) {
-    return this.currentSrc();
+    return this['currentSrc']();
   }
 
   if (vjs.Flash.isStreamingSrc(src)) {
@@ -6762,7 +6571,21 @@ vjs.Flash.prototype.src = function(src){
   }
 };
 
-vjs.Flash.prototype.currentSrc = function(){
+vjs.Flash.prototype['setCurrentTime'] = function(time){
+  this.lastSeekTarget_ = time;
+  this.el_.vjs_setProperty('currentTime', time);
+};
+
+vjs.Flash.prototype['currentTime'] = function(time){
+  // when seeking make the reported time keep up with the requested time
+  // by reading the time we're seeking to
+  if (this.seeking()) {
+    return this.lastSeekTarget_ || 0;
+  }
+  return this.el_.vjs_getProperty('currentTime');
+};
+
+vjs.Flash.prototype['currentSrc'] = function(){
   var src = this.el_.vjs_getProperty('currentSrc');
   // no src, check and see if RTMP
   if (src == null) {
@@ -6783,7 +6606,7 @@ vjs.Flash.prototype.load = function(){
 vjs.Flash.prototype.poster = function(){
   this.el_.vjs_getProperty('poster');
 };
-vjs.Flash.prototype.setPoster = function(){
+vjs.Flash.prototype['setPoster'] = function(){
   // poster images are not handled by the Flash tech so make this a no-op
 };
 
@@ -6869,39 +6692,40 @@ vjs.Flash.streamingFormats = {
 };
 
 vjs.Flash['onReady'] = function(currSwf){
-  var el = vjs.el(currSwf);
+  var el, player;
 
-  // Get player from box
-  // On firefox reloads, el might already have a player
-  var player = el['player'] || el.parentNode['player'],
-      tech = player.tech;
+  el = vjs.el(currSwf);
 
-  // Reference player on tech element
-  el['player'] = player;
+  // get player from the player div property
+  player = el && el.parentNode && el.parentNode['player'];
 
-  // Update reference to playback technology element
-  tech.el_ = el;
-
-  vjs.Flash.checkReady(tech);
+  // if there is no el or player then the tech has been disposed
+  // and the tech element was removed from the player div
+  if (player) {
+    // reference player on tech element
+    el['player'] = player;
+    // check that the flash object is really ready
+    vjs.Flash['checkReady'](player.tech);
+  }
 };
 
-// The SWF isn't alwasy ready when it says it is. Sometimes the API functions still need to be added to the object.
+// The SWF isn't always ready when it says it is. Sometimes the API functions still need to be added to the object.
 // If it's not ready, we set a timeout to check again shortly.
-vjs.Flash.checkReady = function(tech){
+vjs.Flash['checkReady'] = function(tech){
+  // stop worrying if the tech has been disposed
+  if (!tech.el()) {
+    return;
+  }
 
-  // Check if API property exists
+  // check if API property exists
   if (tech.el().vjs_getProperty) {
-
-    // If so, tell tech it's ready
+    // tell tech it's ready
     tech.triggerReady();
-
-  // Otherwise wait longer.
   } else {
-
+    // wait longer
     setTimeout(function(){
-      vjs.Flash.checkReady(tech);
+      vjs.Flash['checkReady'](tech);
     }, 50);
-
   }
 };
 
