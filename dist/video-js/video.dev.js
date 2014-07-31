@@ -110,20 +110,24 @@ vjs.options = {
   'languages': {
     'es': {
       'Play': 'Juego',
-      'Current Time': 'Tiempo actual',
-      'Duration Time': 'Tiempo de duración',
-      'Remaining Time': 'Tiempo restante',
-      'Stream Type LIVE': 'Tipo de transmisión en vivo',
-      'Loaded': 'cargado',
-      'Progress': 'progreso',
-      'Fullscreen': 'Pantalla completa',
-      'Mute': 'mudo',
-      'Playback Rate': 'reproducción Cambio',
+      'Pause': 'Pausa',
+      'Current Time': 'Tiempo Actual',
+      'Duration Time': 'Tiempo de Duración',
+      'Remaining Time': 'Tiempo Restante',
+      'Stream Type': 'Tipo de Transmisión',
+      'LIVE': 'En Vivo',
+      'Loaded': 'Cargado',
+      'Progress': 'Progreso',
+      'Fullscreen': 'Pantalla Completa',
+      'Non-Fullscreen': 'No Pantalla Completa',
+      'Mute': 'Mudo',
+      'Unmuted': 'Activar sonido',
+      'Playback Rate': 'Reproducción Cambio',
       'Subtitles': 'Subtítulos',
       'subtitles off': 'subtítulos fuera',
       'Captions': 'Subtítulos',
       'captions off': 'subtítulos fuera',
-      'Chapters': 'capítulos',
+      'Chapters': 'Capítulos',
       'You aborted the video playback': 'Ha anulado la reproducción de vídeo',
       'A network error caused the video download to fail part-way.': 'Un error en la red hizo que la descarga de vídeo falle parte del camino.',
       'The video could not be loaded, either because the server or network failed or because the format is not supported.' : 'El video no se puede cargar, ya sea porque el servidor o la red fracasaron o porque el formato no es compatible.',
@@ -1797,15 +1801,11 @@ vjs.Component.prototype.createEl = function(tagName, attributes){
 };
 
 vjs.Component.prototype.localize = function(string){
-  if(this.player_ && this.player_.language() && this.player_.languages()) {
-    var lang = this.player_.language(),
-        languages = this.player_.languages();
-
-    if (languages && languages[lang] && languages[lang][string]) {
-      return languages[lang][string];
-    }
+  var lang = this.player_.language(),
+      languages = this.player_.languages();
+  if (languages && languages[lang] && languages[lang][string]) {
+    return languages[lang][string];
   }
-
   return string;
 };
 
