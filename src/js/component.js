@@ -192,7 +192,18 @@ vjs.Component.prototype.el_;
  * @return {Element}
  */
 vjs.Component.prototype.createEl = function(tagName, attributes){
-  return vjs.createEl(tagName, attributes);
+  var el = vjs.createEl(tagName, attributes);
+
+  return el;
+};
+
+vjs.Component.prototype.localize = function(string){
+  var lang = this.player_.language(),
+      languages = this.player_.languages();
+  if (languages && languages[lang] && languages[lang][string]) {
+    return languages[lang][string];
+  }
+  return string;
 };
 
 /**

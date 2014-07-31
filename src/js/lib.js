@@ -31,7 +31,27 @@ vjs.createEl = function(tagName, properties){
        }
     }
   }
+
   return el;
+};
+
+/**
+ * Recursive update to the DOM element
+ * @param node {object} element being updated
+ * @param locale {string} locale being implemented
+ * @param dict {object} dictionary reference
+ */
+vjs.localizeNode = function(node, locale, dict) {
+  if(dict[locale] !== undefined) {
+    if(node.innerHTML && node.innerHTML.length > 1) {
+      node.innerHTML = dict[locale][node.innerHTML.toString().trim()] || node.innerHTML;
+    }
+    node = node.firstChild;
+    while(node) {
+      vjs.localizeNode(node, locale, dict);
+      node = node.nextSibling;
+    }
+  }
 };
 
 /**
