@@ -46,7 +46,7 @@ vjs.Player = vjs.Component.extend({
     this.language_ = options['language'] || vjs.options.language;
 
     // Update Supported Languages
-    this.languages_ = options['languages'] || vjs.options.languages;
+    this.languages_ = options['languages'] || vjs.options['languages'];
 
     // Cache for video property values.
     this.cache_ = {};
@@ -119,6 +119,12 @@ vjs.Player.prototype.language = function (languageCode) {
   return this;
 };
 
+/**
+ * The players's stored language dictionary
+ *
+ * @type {Object}
+ * @private
+ */
 vjs.Player.prototype.languages_;
 
 vjs.Player.prototype.languages = function(){
