@@ -198,11 +198,13 @@ vjs.Component.prototype.createEl = function(tagName, attributes){
 };
 
 vjs.Component.prototype.localize = function(string){
-  var lang = this.player_.language(),
-      languages = this.player_.languages();
+  if(this.player_ && this.player_.language() && this.player_.languages()) {
+    var lang = this.player_.language(),
+        languages = this.player_.languages();
 
-  if (languages && languages[lang] && languages[lang][string]) {
-    return languages[lang][string];
+    if (languages && languages[lang] && languages[lang][string]) {
+      return languages[lang][string];
+    }
   }
 
   return string;
