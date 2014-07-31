@@ -3313,10 +3313,11 @@ vjs.Player = vjs.Component.extend({
     // (tag must exist before Player)
     options = vjs.obj.merge(this.getTagSettings(tag), options);
 
-    // Update Locale
-    this.language_ = options['language'];
+    // Update Current Language
+    this.language_ = options['language'] || vjs.options.language;
 
-    this.languages_ = options['languages'];
+    // Update Supported Languages
+    this.languages_ = options['languages'] || vjs.options.languages;
 
     // Cache for video property values.
     this.cache_ = {};
@@ -3367,7 +3368,7 @@ vjs.Player = vjs.Component.extend({
 });
 
 /**
- * The players's stored locale
+ * The players's stored language code
  *
  * @type {String}
  * @private
