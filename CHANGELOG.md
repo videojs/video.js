@@ -22,6 +22,7 @@ CHANGELOG
 * Added a player.currentType() function to get the MIME type of the current source ([view](https://github.com/videojs/video.js/pull/1320))
 * Fixed a potential conflict with other event listener shims ([view](https://github.com/videojs/video.js/pull/1363))
 * Added support for multiple time ranges in the load progress bar ([view](https://github.com/videojs/video.js/pull/1253))
+* Added vjs-waiting and vjs-seeking css classnames and updated the spinner to use them ([view](https://github.com/videojs/video.js/pull/1351))
 
 --------------------
 
