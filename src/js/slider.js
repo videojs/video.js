@@ -26,10 +26,11 @@ vjs.Slider = vjs.Component.extend({
 
     player.on(this.playerEvent, vjs.bind(this, this.update));
 
-    this.boundEvents = {
-      move: vjs.bind(this, this.onMouseMove),
-      end: vjs.bind(this, this.onMouseUp)
-    };
+    this.boundEvents = {};
+
+
+    this.boundEvents.move = vjs.bind(this, this.onMouseMove);
+    this.boundEvents.end = vjs.bind(this, this.onMouseUp);
   }
 });
 
@@ -59,6 +60,9 @@ vjs.Slider.prototype.onMouseDown = function(event){
 
   this.onMouseMove(event);
 };
+
+// To be overridden by a subclass
+vjs.Slider.prototype.onMouseMove = function(){};
 
 vjs.Slider.prototype.onMouseUp = function() {
   vjs.unblockTextSelection();
