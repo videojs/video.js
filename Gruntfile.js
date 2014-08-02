@@ -355,14 +355,16 @@ module.exports = function(grunt) {
     if (process.env.TRAVIS_PULL_REQUEST !== 'false') {
       grunt.task.run(['karma:phantomjs', 'karma:minified_phantomjs', 'karma:minified_api_phantomjs']);
     } else if (process.env.TRAVIS) {
-      grunt.task.run([
-        'karma:chrome_sl',
-        'karma:firefox_sl',
-        'karma:safari_sl',
-        'karma:ipad_sl',
-        'karma:android_sl',
-        'karma:ie_sl'
-      ]);
+      grunt.task.run(['karma:phantomjs', 'karma:minified_phantomjs', 'karma:minified_api_phantomjs']);
+      //Disabling saucelabs until we figure out how to make it run reliably.
+      //grunt.task.run([
+        //'karma:chrome_sl',
+        //'karma:firefox_sl',
+        //'karma:safari_sl',
+        //'karma:ipad_sl',
+        //'karma:android_sl',
+        //'karma:ie_sl'
+      //]);
     } else {
       // if we aren't running this in a CI, but running it manually, we can
       // supply arguments to this task. These arguments are either colon (`:`)
