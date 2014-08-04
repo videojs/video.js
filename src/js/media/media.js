@@ -95,6 +95,11 @@ vjs.MediaTechController.prototype.addControlsListeners = function(){
       this.player().reportUserActivity();
     }
   });
+  
+  this.on('touchend', function(event) {
+    // Stop the mouse events from also happening
+    event.preventDefault();
+  });
 
   this.on('touchend', function(event) {
     // Stop the mouse events from also happening
