@@ -23,6 +23,7 @@ CHANGELOG
 * Fixed a potential conflict with other event listener shims ([view](https://github.com/videojs/video.js/pull/1363))
 * Added support for multiple time ranges in the load progress bar ([view](https://github.com/videojs/video.js/pull/1253))
 * Added vjs-waiting and vjs-seeking css classnames and updated the spinner to use them ([view](https://github.com/videojs/video.js/pull/1351))
+* Now restoring the original video tag attributes on a tech change to support webkit-playsinline ([view](https://github.com/videojs/video.js/pull/1369))
 
 --------------------
 
