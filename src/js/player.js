@@ -32,6 +32,8 @@ vjs.Player = vjs.Component.extend({
   init: function(tag, options, ready){
     this.tag = tag; // Store the original tag used to set options
 
+    this.tagAttributes = (tag) ? vjs.getElementAttributes(tag) : {}; // Store the tag attributes used to restore html5 tech
+
     // Make sure tag ID exists
     tag.id = tag.id || 'vjs_video_' + vjs.guid++;
 
@@ -135,7 +137,7 @@ vjs.Player.prototype.getTagSettings = function(tag){
     'tracks': []
   };
 
-  vjs.obj.merge(options, vjs.getAttributeValues(tag));
+  vjs.obj.merge(options, vjs.getElementAttributes(tag));
 
   // Get tag children settings
   if (tag.hasChildNodes()) {
@@ -148,9 +150,9 @@ vjs.Player.prototype.getTagSettings = function(tag){
       // Change case needed: http://ejohn.org/blog/nodename-case-sensitivity/
       childName = child.nodeName.toLowerCase();
       if (childName === 'source') {
-        options['sources'].push(vjs.getAttributeValues(child));
+        options['sources'].push(vjs.getElementAttributes(child));
       } else if (childName === 'track') {
-        options['tracks'].push(vjs.getAttributeValues(child));
+        options['tracks'].push(vjs.getElementAttributes(child));
       }
     }
   }
