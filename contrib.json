@@ -219,12 +219,14 @@
   "pull_request": {
     "private": true,
 
-    "start": {
+    "review": {
       "steps": [
-        { "prompt": "What is the the pull request number?", "id": "prNum" },
-        { "get": "{{project.urls.repo_api}}/pulls/{{prNum}}", "desc": "Get the PR information", "id": "pr" },
-        [ "git checkout -b review-{{pr.user.login}}-{{pr.head.ref}} {{pr.base.ref}}", "Checkout a new branch for reviewing changes" ],
-        [ "git pull {{pr.head.repo.ssh_url}} {{pr.head.ref}}",  "Pull in the changes" ],
+        { "prompt": "What is the the pull request number?",     "id": "prNum" },
+        { "get": "{{project.urls.repo_api}}/pulls/{{prNum}}",   "desc": "Get the PR information", "id": "pr" },
+        [ "git fetch {{pr.head.repo.ssh_url}} {{pr.head.ref}}", "Get the pull request changes but don't merge them" ],
+        [ "git merge-base master FETCH_HEAD",                   "Get the common ancestor commit", "base" ],
+        [ "git checkout -b review-{{pr.user.login}}-{{pr.head.ref}} {{base}}", "Create a new local branch for the pull request that has a base of the common commit" ],
+        [ "git merge FETCH_HEAD",                               "Merge in the pull request changes" ],
         [ "grunt test",                                         "Build and run tests" ]
       ]
     },
@@ -232,8 +234,8 @@
     "modify": {
       "desc": "Submit a modification to an existing pull request",
       "steps": [
-        { "exec": "git diff --exit-code",            "desc": "Test for unadded changes", "fail": "Make sure all changes have been added and committed, or stashed, before switching branches" },
-        { "exec": "git diff --cached --exit-code",   "desc": "Test for uncommitted changes", "fail": "Make sure all changes have been added and committed, or stashed, before switching branches" },
+        { "exec": "git diff --exit-code",            "desc": "Test for unadded changes",     "fail": "Make sure all changes have been added and committed before submitting changes" },
+        { "exec": "git diff --cached --exit-code",   "desc": "Test for uncommitted changes", "fail": "Make sure all changes have been committed before submitting changes" },
         { "include": "test" },
         { "exec": "git rev-parse --abbrev-ref HEAD", "desc": "Get the current branch", "id": "branch" },
         { "confirm": "Are you sure {{branch}} is the branch you want to submit?" },
