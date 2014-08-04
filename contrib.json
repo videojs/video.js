@@ -129,7 +129,8 @@
       { "prompt": "text", "desc": "Is there a URL to a live example, or a jsbin (e.g. http://jsbin.com/axedog/9999/edit)?",     "id": "example" },
       { "prompt": "text", "desc": "Are there any other details you'd like to provide?",                                         "id": "details" },
       { "open": "{{project.urls.repo_ui}}/issues/new?title={{title}}&body=**Steps to reproduce:**\n> {{reproduce}}\n\n**What was expected:**\n> {{expected}}\n\n**What Happened:**\n> {{actual}}\n\n**Video.js Version:**\n> {{version}}\n\n**Plugins:**\n> {{plugins}}\n\n**Browsers experienced on:**\n> {{browsers}}\n\n**Example:**\n> {{example}}\n\n**Other details:**\n> {{details}}" }
-    ]
+    ],
+    "finished": "Thanks for submitting a bug report! One of our contributors will address it as soon as possible."
   },
 
   "request": {
@@ -141,7 +142,8 @@
       { "prompt": "text", "desc": "Are there any existing examples?", "id": "examples" },
       { "confirm": "You will be redirected to Github where you can submit this issue, OK?" },
       { "open": "{{project.urls.repo_ui}}/issues/new?title={{ title }}&body=**Describe the feature/enhancement:**\n> {{ describe }}\n\n**Existing docs/specs:**\n> {{ docs }}\n\n**Existing examples:**\n> {{ examples }}" }
-    ]
+    ],
+    "finished": "Thanks for submitting a feature request! One of our contributors will address it as soon as possible."
   },
 
   "release": {
