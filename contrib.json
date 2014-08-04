@@ -119,15 +119,15 @@
   "report": {
     "desc": "Submit a bug report",
     "steps": [
-      { "prompt": "Title your bug report",                   "id": "title" },
-      { "prompt": "What did you do? (steps to reproduce)",   "id": "reproduce" },
-      { "prompt": "What did you expect to happen?",          "id": "expected" },
-      { "prompt": "What actually happened?",                 "id": "actual" },
-      { "prompt": "What version of video.js are you using?", "id": "version" },
-      { "prompt": "Are you using any video.js plugins?",     "id": "plugins" },
-      { "prompt": "What browsers/platforms did you experience this in (e.g. Win 7, IE10; Android 4, Chrome;)?", "id": "browsers" },
-      { "prompt": "Is there a URL to a live example, or a jsbin (e.g. http://jsbin.com/axedog/9999/edit)?",     "id": "example" },
-      { "prompt": "Are there any other details you'd like to provide?",                                         "id": "details" },
+      { "prompt": "text", "desc": "Create a title that is descriptive of the problem", "id": "title" },
+      { "prompt": "text", "desc": "What did you do? (steps to reproduce)",             "id": "reproduce" },
+      { "prompt": "text", "desc": "What did you expect to happen?",                    "id": "expected" },
+      { "prompt": "text", "desc": "What actually happened?",                           "id": "actual" },
+      { "prompt": "text", "desc": "What version of video.js are you using?",           "id": "version" },
+      { "prompt": "text", "desc": "Are you using any video.js plugins?",               "id": "plugins" },
+      { "prompt": "text", "desc": "What browsers/platforms did you experience this in (e.g. Win 7, IE10; Android 4, Chrome;)?", "id": "browsers" },
+      { "prompt": "text", "desc": "Is there a URL to a live example, or a jsbin (e.g. http://jsbin.com/axedog/9999/edit)?",     "id": "example" },
+      { "prompt": "text", "desc": "Are there any other details you'd like to provide?",                                         "id": "details" },
       { "open": "{{project.urls.repo_ui}}/issues/new?title={{title}}&body=**Steps to reproduce:**\n> {{reproduce}}\n\n**What was expected:**\n> {{expected}}\n\n**What Happened:**\n> {{actual}}\n\n**Video.js Version:**\n> {{version}}\n\n**Plugins:**\n> {{plugins}}\n\n**Browsers experienced on:**\n> {{browsers}}\n\n**Example:**\n> {{example}}\n\n**Other details:**\n> {{details}}" }
     ]
   },
@@ -135,10 +135,10 @@
   "request": {
     "desc": "Submit a feature/enhancement request",
     "steps": [
-      { "prompt":  "Title your request", "id": "title" },
-      { "prompt":  "Describe the feature/enhancement (be as detailed as possible so it's clear who, why, and how it would be used)", "id": "describe" },
-      { "prompt":  "Is there any existing documentation or related specifications?", "id": "docs" },
-      { "prompt":  "Are there any existing examples?", "id": "examples" },
+      { "prompt": "text", "desc": "Create a title that is descriptive of the enhancement", "id": "title" },
+      { "prompt": "text", "desc": "Describe the feature/enhancement (be as detailed as possible so it's clear who, why, and how it would be used)", "id": "describe" },
+      { "prompt": "text", "desc": "Is there any existing documentation or related specifications?", "id": "docs" },
+      { "prompt": "text", "desc": "Are there any existing examples?", "id": "examples" },
       { "confirm": "You will be redirected to Github where you can submit this issue, OK?" },
       { "open": "{{project.urls.repo_ui}}/issues/new?title={{ title }}&body=**Describe the feature/enhancement:**\n> {{ describe }}\n\n**Existing docs/specs:**\n> {{ docs }}\n\n**Existing examples:**\n> {{ examples }}" }
     ]
