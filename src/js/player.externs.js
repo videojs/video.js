@@ -25,6 +25,7 @@ videojs.Player.prototype.canPlayType = function(){};
 videojs.Player.prototype.readyState = function(){};
 videojs.Player.prototype.seeking = function(){};
 videojs.Player.prototype.currentTime = function(){};
+videojs.Player.prototype.remainingTime = function(){};
 videojs.Player.prototype.startTime = function(){};
 videojs.Player.prototype.duration = function(){};
 videojs.Player.prototype.paused = function(){};
