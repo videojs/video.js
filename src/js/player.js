@@ -32,10 +32,11 @@ vjs.Player = vjs.Component.extend({
   init: function(tag, options, ready){
     this.tag = tag; // Store the original tag used to set options
 
-    this.tagAttributes = (tag) ? vjs.getElementAttributes(tag) : {}; // Store the tag attributes used to restore html5 tech
-
     // Make sure tag ID exists
     tag.id = tag.id || 'vjs_video_' + vjs.guid++;
+
+    // Store the tag attributes used to restore html5 element
+    this.tagAttributes = tag && vjs.getElementAttributes(tag);
 
     // Set Options
     // The options argument overrides options set in the video tag
@@ -195,7 +196,7 @@ vjs.Player.prototype.createEl = function(){
 
   // Copy over all the attributes from the tag, including ID and class
   // ID will now reference player box, not the video tag
-  attrs = vjs.getAttributeValues(tag);
+  attrs = vjs.getElementAttributes(tag);
   vjs.obj.each(attrs, function(attr) {
     el.setAttribute(attr, attrs[attr]);
   });

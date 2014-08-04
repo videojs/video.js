@@ -495,32 +495,26 @@ test('Data attributes on the video element should persist in the new wrapper ele
   equal(player.el().getAttribute('data-id'), dataId, 'data-id should be available on the new player element after creation');
 });
 
-test('should restore all video tags attribute after a tech switch', function(){
-  var fixture = document.getElementById('qunit-fixture');
-  var html = '<video id="example_1" class="vjs-tech" preload="" webkit-playsinline="" autoplay=""></video>';
-  fixture.innerHTML += html;
+test('should restore attributes from the original video tag when creating a new element', function(){
+  var player, html5Mock, el;
 
-  var tag = document.getElementById('example_1');
-  var player = new videojs.Player(tag, {techOrder:['html5']});
-  var techOptions = vjs.obj.merge({ 'source': '', 'parentEl': player.el_ }, player.options_['html5']);
-  vjs.Html5.disposeMediaElement(player.tag);
-  player.tag = null;
-  player.tech = new vjs.Html5(player, techOptions);
+  player = PlayerTest.makePlayer();
+  html5Mock = { player_: player };
 
-  PlayerTest.htmlEqualWithSort(player.tech.el_.outerHTML, html.replace('example_1','example_1_html5_api'));
-});
+  // simulate attributes stored from the original tag
+  player.tagAttributes = {
+    'preload': 'auto',
+    'controls': true,
+    'webkit-playsinline': true
+  };
 
-test('should restore all video tags attribute after a tech switch and keep options', function(){
-  var fixture = document.getElementById('qunit-fixture');
-  var html = '<video id="example_1" class="vjs-tech" preload="none" autoplay=""></video>';
-  fixture.innerHTML += html;
+  // set options that should override tag attributes
+  player.options_['preload'] = 'none';
 
-  var tag = document.getElementById('example_1');
-  var player = new videojs.Player(tag, {techOrder:['html5'], autoplay:false});
-  var techOptions = vjs.obj.merge({ 'source': '', 'parentEl': player.el_ }, player.options_['html5']);
-  vjs.Html5.disposeMediaElement(player.tag);
-  player.tag = null;
-  player.tech = new vjs.Html5(player, techOptions);
+  // create the element
+  el = vjs.Html5.prototype.createEl.call(html5Mock);
 
-  PlayerTest.htmlEqualWithSort(player.tech.el_.outerHTML, html.replace('example_1','example_1_html5_api').replace(' autoplay=""',''));
+  equal(el.getAttribute('preload'), 'none', 'attribute was successful overridden by an option');
+  equal(el.getAttribute('controls'), '', 'controls attribute was set properly');
+  equal(el.getAttribute('webkit-playsinline'), '', 'webkit-playsinline attribute was set properly');
 });

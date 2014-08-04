@@ -81,9 +81,9 @@ vjs.Html5.prototype.createEl = function(){
       el = clone;
       player.tag = null;
     } else {
-      el = vjs.createEl('video', {});
+      el = vjs.createEl('video');
       vjs.setElementAttributes(el,
-        vjs.obj.merge(player.tagAttributes||{}, {
+        vjs.obj.merge(player.tagAttributes || {}, {
           id:player.id() + '_html5_api',
           'class':'vjs-tech'
         })
