@@ -52,6 +52,7 @@ vjs.Slider.prototype.createEl = function(type, props) {
 vjs.Slider.prototype.onMouseDown = function(event){
   event.preventDefault();
   vjs.blockTextSelection();
+  this.addClass('vjs-sliding');
 
   vjs.on(document, 'mousemove', this.boundEvents.move);
   vjs.on(document, 'mouseup', this.boundEvents.end);
@@ -66,6 +67,8 @@ vjs.Slider.prototype.onMouseMove = function(){};
 
 vjs.Slider.prototype.onMouseUp = function() {
   vjs.unblockTextSelection();
+  this.removeClass('vjs-sliding');
+
   vjs.off(document, 'mousemove', this.boundEvents.move, false);
   vjs.off(document, 'mouseup', this.boundEvents.end, false);
   vjs.off(document, 'touchmove', this.boundEvents.move, false);
