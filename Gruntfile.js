@@ -333,11 +333,11 @@ module.exports = function(grunt) {
   // grunt.loadTasks('./docs/tasks/');
   // grunt.loadTasks('../videojs-doc-generator/tasks/');
 
-  grunt.registerTask('pretask', ['jshint', 'less', 'build', 'minify', 'usebanner']);
+  grunt.registerTask('pretask', ['jshint', 'less', 'lang', 'build', 'minify', 'usebanner']);
   // Default task.
   grunt.registerTask('default', ['pretask', 'dist']);
   // Development watch task
-  grunt.registerTask('dev', ['jshint', 'less', 'build', 'qunit:source']);
+  grunt.registerTask('dev', ['jshint', 'less', 'lang', 'build', 'qunit:source']);
   grunt.registerTask('test-qunit', ['pretask', 'qunit']);
 
   // The test task will run `karma:saucelabs` when running in travis,
@@ -444,8 +444,6 @@ module.exports = function(grunt) {
   });
 
   grunt.registerMultiTask('build', 'Building Source', function(){
-    // Build Combined Languages
-    grunt.task.run(['lang']);
 
     // Fix windows file path delimiter issue
     var i = sourceFiles.length;
