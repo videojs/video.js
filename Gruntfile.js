@@ -437,7 +437,7 @@ module.exports = function(grunt) {
       combined += grunt.file.read(result.src);
     });
 
-    combined = combined.replace('undefined', 'vjs.options.languages = ');
+    combined = combined.replace('undefined', 'vjs.options["languages"] = ');
 
     grunt.file.write('build/files/combined.languages.js', combined);
 
