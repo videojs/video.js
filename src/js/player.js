@@ -5,7 +5,7 @@
  * var myPlayer = videojs('example_video_1');
  * ```
  *
- * In the follwing example, the `data-setup` attribute tells the Video.js library to create a player instance when the library is ready.
+ * In the following example, the `data-setup` attribute tells the Video.js library to create a player instance when the library is ready.
  *
  * ```html
  * <video id="example_video_1" data-setup='{}' controls>
