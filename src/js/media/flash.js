@@ -193,31 +193,22 @@ vjs.Flash.prototype.enterFullScreen = function(){
   return false;
 };
 
-// Create setters and getters for attributes
-var api = vjs.Flash.prototype,
-    readWrite = 'rtmpConnection,rtmpStream,preload,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted'.split(','),
-    readOnly = 'error,networkState,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight,textTracks'.split(',');
-    // Overridden: buffered, currentTime, currentSrc
-
-/**
- * @this {*}
- * @private
- */
-var createSetter = function(attr){
-  var attrUpper = attr.charAt(0).toUpperCase() + attr.slice(1);
-  api['set'+attrUpper] = function(val){ return this.el_.vjs_setProperty(attr, val); };
-};
-
-/**
- * @this {*}
- * @private
- */
-var createGetter = function(attr){
-  api[attr] = function(){ return this.el_.vjs_getProperty(attr); };
-};
-
 (function(){
-  var i;
+  // Create setters and getters for attributes
+  var api = vjs.Flash.prototype,
+    readWrite = 'rtmpConnection,rtmpStream,preload,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted'.split(','),
+    readOnly = 'error,networkState,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight,textTracks'.split(','),
+    // Overridden: buffered, currentTime, currentSrc
+    i;
+
+  function createSetter(attr){
+    var attrUpper = attr.charAt(0).toUpperCase() + attr.slice(1);
+    api['set'+attrUpper] = function(val){ return this.el_.vjs_setProperty(attr, val); };
+  };
+  function createGetter(attr) {
+    api[attr] = function(){ return this.el_.vjs_getProperty(attr); };
+  };
+
   // Create getter and setters for all read/write attributes
   for (i = 0; i < readWrite.length; i++) {
     createGetter(readWrite[i]);
