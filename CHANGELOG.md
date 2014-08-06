@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* Fixed the broken bower.json config ([view](https://github.com/videojs/video.js/pull/1401))
+_(none)_
 
 --------------------
+
+## 4.7.1 (2014-08-06)
+* Fixed the broken bower.json config ([view](https://github.com/videojs/video.js/pull/1401))
 
 ## 4.7.0 (2014-08-05)
 * Added cross-browser isArray for cross-frame support. fixes #1195 ([view](https://github.com/videojs/video.js/pull/1218))
