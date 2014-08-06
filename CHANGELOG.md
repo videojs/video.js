@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Fixed the broken bower.json config ([view](https://github.com/videojs/video.js/pull/1401))
 
 --------------------
 
