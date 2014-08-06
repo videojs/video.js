@@ -25,9 +25,9 @@ vjs.FullscreenToggle.prototype.buildCSSClass = function(){
 vjs.FullscreenToggle.prototype.onClick = function(){
   if (!this.player_.isFullscreen()) {
     this.player_.requestFullscreen();
-    this.controlText_.innerHTML = 'Non-Fullscreen';
+    this.controlText_.innerHTML = this.localize('Non-Fullscreen');
   } else {
     this.player_.exitFullscreen();
-    this.controlText_.innerHTML = 'Fullscreen';
+    this.controlText_.innerHTML = this.localize('Fullscreen');
   }
 };

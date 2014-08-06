@@ -67,6 +67,7 @@ goog.exportProperty(vjs.Component.prototype, 'ready', vjs.Component.prototype.re
 goog.exportProperty(vjs.Component.prototype, 'addClass', vjs.Component.prototype.addClass);
 goog.exportProperty(vjs.Component.prototype, 'removeClass', vjs.Component.prototype.removeClass);
 goog.exportProperty(vjs.Component.prototype, 'buildCSSClass', vjs.Component.prototype.buildCSSClass);
+goog.exportProperty(vjs.Component.prototype, 'localize', vjs.Component.prototype.localize);
 
 // Need to export ended to ensure it's not removed by CC, since it's not used internally
 goog.exportProperty(vjs.Player.prototype, 'ended', vjs.Player.prototype.ended);
@@ -76,6 +77,8 @@ goog.exportProperty(vjs.Player.prototype, 'preload', vjs.Player.prototype.preloa
 goog.exportProperty(vjs.Player.prototype, 'remainingTime', vjs.Player.prototype.remainingTime);
 goog.exportProperty(vjs.Player.prototype, 'supportsFullScreen', vjs.Player.prototype.supportsFullScreen);
 goog.exportProperty(vjs.Player.prototype, 'currentType', vjs.Player.prototype.currentType);
+goog.exportProperty(vjs.Player.prototype, 'language', vjs.Player.prototype.language);
+goog.exportProperty(vjs.Player.prototype, 'languages', vjs.Player.prototype.languages);
 
 goog.exportSymbol('videojs.MediaLoader', vjs.MediaLoader);
 goog.exportSymbol('videojs.TextTrackDisplay', vjs.TextTrackDisplay);

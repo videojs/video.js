@@ -124,7 +124,8 @@ vjs.LoadProgressBar = vjs.Component.extend({
 
 vjs.LoadProgressBar.prototype.createEl = function(){
   return vjs.Component.prototype.createEl.call(this, 'div', {
-    className: 'vjs-load-progress'
+    className: 'vjs-load-progress',
+    innerHTML: '<span class="vjs-control-text"><span>' + this.localize('Loaded') + '</span>: 0%</span>'
   });
 };
 
@@ -181,7 +182,7 @@ vjs.PlayProgressBar = vjs.Component.extend({
 vjs.PlayProgressBar.prototype.createEl = function(){
   return vjs.Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-play-progress',
-    innerHTML: '<span class="vjs-control-text">Progress: 0%</span>'
+    innerHTML: '<span class="vjs-control-text"><span>' + this.localize('Progress') + '</span>: 0%</span>'
   });
 };
 

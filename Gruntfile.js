@@ -31,7 +31,9 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     pkg: pkg,
-
+    lang: {
+      src: 'lang/*.json'
+    },
     build: {
       src: 'src/js/dependencies.js',
       options: {
@@ -331,11 +333,11 @@ module.exports = function(grunt) {
   // grunt.loadTasks('./docs/tasks/');
   // grunt.loadTasks('../videojs-doc-generator/tasks/');
 
-  grunt.registerTask('pretask', ['jshint', 'less', 'build', 'minify', 'usebanner']);
+  grunt.registerTask('pretask', ['jshint', 'less', 'lang', 'build', 'minify', 'usebanner']);
   // Default task.
   grunt.registerTask('default', ['pretask', 'dist']);
   // Development watch task
-  grunt.registerTask('dev', ['jshint', 'less', 'build', 'qunit:source']);
+  grunt.registerTask('dev', ['jshint', 'less', 'lang', 'build', 'qunit:source']);
   grunt.registerTask('test-qunit', ['pretask', 'qunit']);
 
   // The test task will run `karma:saucelabs` when running in travis,
@@ -425,7 +427,26 @@ module.exports = function(grunt) {
   var fs = require('fs'),
       gzip = require('zlib').gzip;
 
+  grunt.registerMultiTask('lang', 'Building Language Support', function() {
+
+    grunt.log.writeln('Building Language Support');
+
+    var langFiles = this.files;
+    var combined;
+
+    // Create a combined languages file
+    langFiles.forEach(function(result) {
+      combined += grunt.file.read(result.src);
+    });
+
+    combined = combined.replace('undefined', 'vjs.options["languages"] = ');
+
+    grunt.file.write('build/files/combined.languages.js', combined);
+
+  });
+
   grunt.registerMultiTask('build', 'Building Source', function(){
+
     // Fix windows file path delimiter issue
     var i = sourceFiles.length;
     while (i--) {
@@ -439,6 +460,10 @@ module.exports = function(grunt) {
     });
     // Replace CDN version ref in js. Use major/minor version.
     combined = combined.replace(/GENERATED_CDN_VSN/g, version.majorMinor);
+
+    // Add Combined Langauges
+    combined += grunt.file.read('build/files/combined.languages.js');
+
     grunt.file.write('build/files/combined.video.js', combined);
 
     // Copy over other files
