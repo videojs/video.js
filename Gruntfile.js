@@ -428,21 +428,19 @@ module.exports = function(grunt) {
       gzip = require('zlib').gzip;
 
   grunt.registerMultiTask('lang', 'Building Language Support', function() {
+    var combined = '';
 
     grunt.log.writeln('Building Language Support');
 
-    var langFiles = this.files;
-    var combined;
-
     // Create a combined languages file
-    langFiles.forEach(function(result) {
-      combined += grunt.file.read(result.src);
+    this.files.forEach(function(file) {
+      file.src.forEach(function(src){
+        var code = src.replace('lang/', '').replace('.json', '');
+        combined += 'videojs.options[\'languages\'][\''+code+'\'] = '+ grunt.file.read(src).trim() + ';\n';
+      });
     });
 
-    combined = combined.replace('undefined', 'vjs.options["languages"] = ');
-
     grunt.file.write('build/files/combined.languages.js', combined);
-
   });
 
   grunt.registerMultiTask('build', 'Building Source', function(){
@@ -462,7 +460,7 @@ module.exports = function(grunt) {
     combined = combined.replace(/GENERATED_CDN_VSN/g, version.majorMinor);
 
     // Add Combined Langauges
-    combined += grunt.file.read('build/files/combined.languages.js');
+    // combined += grunt.file.read('build/files/combined.languages.js');
 
     grunt.file.write('build/files/combined.video.js', combined);
 

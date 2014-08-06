@@ -18,5 +18,5 @@ test('should localize its text', function(){
   testButton.buttonText = 'Play';
   el = testButton.createEl();
 
-  ok(el.textContent, 'Juego', 'translation was successful');
+  ok(el.innerHTML, 'Juego', 'translation was successful');
 });
