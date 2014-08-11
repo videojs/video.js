@@ -1489,7 +1489,7 @@ vjs.Player.prototype.error = function(err){
   }
 
   // fire an error event on the player
-  this.trigger('error');
+  this.trigger('error', this.error_);
 
   // add the vjs-error classname to the player
   this.addClass('vjs-error');
