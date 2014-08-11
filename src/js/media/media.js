@@ -13,6 +13,11 @@ vjs.MediaTechController = vjs.Component.extend({
   /** @constructor */
   init: function(player, options, ready){
     options = options || {};
+
+    // Make sure that `this.features` isn't directly tied to `vjs.MediaTechController.prototype.features`
+    // Using `vjs.obj.create` allows us to receive default updates from the prototype if we haven't changed the value.
+    this.features = vjs.obj.create(vjs.MediaTechController.prototype.features);
+
     // we don't want the tech to report user activity automatically.
     // This is done manually in addControlsListeners
     options.reportTouchActivity = false;
