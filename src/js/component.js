@@ -195,6 +195,15 @@ vjs.Component.prototype.createEl = function(tagName, attributes){
   return vjs.createEl(tagName, attributes);
 };
 
+vjs.Component.prototype.localize = function(string){
+  var lang = this.player_.language(),
+      languages = this.player_.languages();
+  if (languages && languages[lang] && languages[lang][string]) {
+    return languages[lang][string];
+  }
+  return string;
+};
+
 /**
  * Get the component's DOM element
  *
@@ -563,13 +572,13 @@ vjs.Component.prototype.one = function(type, fn) {
  * Trigger an event on an element
  *
  *     myComponent.trigger('eventName');
+ *     myComponent.trigger({'type':'eventName'});
  *
- * @param  {String}       type  The event type to trigger, e.g. 'click'
- * @param  {Event|Object} event The event object to be passed to the listener
- * @return {vjs.Component}      self
+ * @param  {Event|Object|String} event  A string (the type) or an event object with a type attribute
+ * @return {vjs.Component}       self
  */
-vjs.Component.prototype.trigger = function(type, event){
-  vjs.trigger(this.el_, type, event);
+vjs.Component.prototype.trigger = function(event){
+  vjs.trigger(this.el_, event);
   return this;
 };
 

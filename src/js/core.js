@@ -60,8 +60,7 @@ var vjs = function(id, options, ready){
 };
 
 // Extended name, also available externally, window.videojs
-var videojs = vjs;
-window.videojs = window.vjs = vjs;
+var videojs = window['videojs'] = vjs;
 
 // CDN Version. Used to target right flash swf.
 vjs.CDN_VERSION = 'GENERATED_CDN_VSN';
@@ -103,6 +102,11 @@ vjs.options = {
     'controlBar': {},
     'errorDisplay': {}
   },
+
+  'language': document.getElementsByTagName('html')[0].getAttribute('lang') || navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language || 'en',
+
+  // locales and their language translations
+  'languages': {},
 
   // Default message to show when a video cannot be played.
   'notSupportedMessage': 'No compatible source was found for this video.'

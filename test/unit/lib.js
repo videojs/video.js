@@ -113,10 +113,10 @@ test('should read tag attributes from elements, including HTML5 in all browsers'
 
   document.getElementById('qunit-fixture').innerHTML += tags;
 
-  var vid1Vals = vjs.getAttributeValues(document.getElementById('vid1'));
-  var vid2Vals = vjs.getAttributeValues(document.getElementById('vid2'));
-  var sourceVals = vjs.getAttributeValues(document.getElementById('source'));
-  var trackVals = vjs.getAttributeValues(document.getElementById('track'));
+  var vid1Vals = vjs.getElementAttributes(document.getElementById('vid1'));
+  var vid2Vals = vjs.getElementAttributes(document.getElementById('vid2'));
+  var sourceVals = vjs.getElementAttributes(document.getElementById('source'));
+  var trackVals = vjs.getElementAttributes(document.getElementById('track'));
 
   // was using deepEqual, but ie8 would send all properties as attributes
 
@@ -150,6 +150,19 @@ test('should read tag attributes from elements, including HTML5 in all browsers'
   equal(trackVals['src'], 'http://google.com');
   equal(trackVals['srclang'], 'en');
   equal(trackVals['title'], 'test');
+});
+
+test('should set element attributes from object', function(){
+  var el, vid1Vals;
+
+  el = document.createElement('div');
+  el.id = 'el1';
+
+  vjs.setElementAttributes(el, { controls: true, 'data-test': 'asdf' });
+
+  equal(el.getAttribute('id'), 'el1');
+  equal(el.getAttribute('controls'), '');
+  equal(el.getAttribute('data-test'), 'asdf');
 });
 
 test('should get the right style values for an element', function(){
@@ -331,4 +344,26 @@ test('should confirm logging functions work', function() {
     console.warn = origWarn;
     console.error = origError;
   }
+});
+
+test('should loop through each element of an array', function() {
+  expect(10);
+  var a = [1, 2, 3];
+  var sum = 0;
+  var i = 0;
+  var thisArg = {};
+
+  vjs.arr.forEach(a, function(item, iterator, array) {
+    sum += item;
+    deepEqual(array, a, 'The array arg should match the original array');
+    equal(i++, iterator, 'The indexes should match');
+    equal(this, thisArg, 'The context should equal the thisArg');
+  }, thisArg);
+  ok(sum, 6);
+
+  vjs.arr.forEach(a, function(){
+    if (this !== vjs) {
+      ok(false, 'default context should be vjs');
+    }
+  });
 });

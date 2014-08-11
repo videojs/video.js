@@ -45,7 +45,7 @@ vjs.Button.prototype.createEl = function(type, props){
 
     this.controlText_ = vjs.createEl('span', {
       className: 'vjs-control-text',
-      innerHTML: this.buttonText || 'Need Text'
+      innerHTML: this.localize(this.buttonText) || 'Need Text'
     });
 
     this.contentEl_.appendChild(this.controlText_);

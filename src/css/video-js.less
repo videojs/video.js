@@ -78,7 +78,8 @@ The control icons are from a custom font. Each icon corresponds to a character
   src: url('font/vjs.eot');
   src: url('font/vjs.eot?#iefix') format('embedded-opentype'),
   url('font/vjs.woff') format('woff'),
-  url('font/vjs.ttf') format('truetype');
+  url('font/vjs.ttf') format('truetype'),
+  url('font/vjs.svg#icomoon') format('svg');
 
   font-weight: normal;
   font-style: normal;
@@ -396,7 +397,8 @@ fonts to show/hide properly.
 
 /* Progress Bars */
 .vjs-default-skin .vjs-progress-holder .vjs-play-progress,
-.vjs-default-skin .vjs-progress-holder .vjs-load-progress {
+.vjs-default-skin .vjs-progress-holder .vjs-load-progress,
+.vjs-default-skin .vjs-progress-holder .vjs-load-progress div {
   position: absolute;
   display: block;
   height: 100%;
@@ -424,7 +426,14 @@ fonts to show/hide properly.
 }
 .vjs-default-skin .vjs-load-progress {
   background: rgb(100, 100, 100) /* IE8- Fallback */;
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* there are child elements of the load progress bar that represent the
+   specific time ranges that have been buffered */
+.vjs-default-skin .vjs-load-progress div {
+  background: rgb(120, 120, 120) /* IE8- Fallback */;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .vjs-default-skin .vjs-seek-handle {
@@ -627,8 +636,11 @@ easily in the skin designer. http://designer.videojs.com/
 /* Loading Spinner
 --------------------------------------------------------------------------------
 */
+
 .vjs-loading-spinner {
+  /* Should be hidden by default *///
   display: none;
+
   position: absolute;
   top: 50%;
   left: 50%;
@@ -643,19 +655,22 @@ easily in the skin designer. http://designer.videojs.com/
   margin-top: -0.5em;
 
   opacity: 0.75;
+}
 
+/* Show the spinner when waiting for data and seeking to a new time */
+.vjs-waiting .vjs-loading-spinner,
+.vjs-seeking .vjs-loading-spinner {
+  display: block;
+
+  /* only animate when showing because it can be processor heavy *///
   .animation(spin 1.5s infinite linear);
 }
 
-/* Errors are unrecoverable without user interaction,
-   so hide the spinner in the case of an error */
-.video-js.vjs-error .vjs-loading-spinner {
-  /* using !important flag because currently the loading spinner
-     uses hide()/show() instead of classes. The !important can be
-     removed when that's updated */
-  display: none !important;
+/* Errors are unrecoverable without user interaction so hide the spinner */
+.vjs-error .vjs-loading-spinner {
+  display: none;
 
-  /* ensure animation doesn't continue while hidden */
+  /* ensure animation doesn't continue while hidden *///
   .animation(none);
 }
 

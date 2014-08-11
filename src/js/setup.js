@@ -42,7 +42,7 @@ vjs.autoSetup = function(){
       }
     }
 
-  // No videos were found, so keep looping unless page is finisehd loading.
+  // No videos were found, so keep looping unless page is finished loading.
   } else if (!vjs.windowLoaded) {
     vjs.autoSetupTimeout(1);
   }

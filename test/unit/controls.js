@@ -9,6 +9,8 @@ test('should hide volume control if it\'s not supported', function(){
     id: noop,
     on: noop,
     ready: noop,
+    language: noop,
+    languages: noop,
     tech: {
       features: {
         'volumeControl': false
@@ -32,6 +34,8 @@ test('should test and toggle volume control on `loadstart`', function(){
   listeners = [];
   player = {
     id: noop,
+    language: noop,
+    languages: noop,
     on: function(event, callback){
       listeners.push(callback);
     },

@@ -394,7 +394,7 @@ goog.global.CLOSURE_BASE_PATH;
  * the deps are written.
  * @type {boolean|undefined}
  */
-goog.global.CLOSURE_NO_DEPS = true;
+// goog.global.CLOSURE_NO_DEPS = true;
 // goog.global.CLOSURE_NO_DEPS;
 
 

@@ -8,29 +8,29 @@ var hasOwnProp = Object.prototype.hasOwnProperty;
  * @private
  */
 vjs.createEl = function(tagName, properties){
-  var el, propName;
+  var el;
 
-  el = document.createElement(tagName || 'div');
+  tagName = tagName || 'div';
+  properties = properties || {};
 
-  for (propName in properties){
-    if (hasOwnProp.call(properties, propName)) {
-      //el[propName] = properties[propName];
-      // Not remembering why we were checking for dash
-      // but using setAttribute means you have to use getAttribute
+  el = document.createElement(tagName);
 
-      // The check for dash checks for the aria-* attributes, like aria-label, aria-valuemin.
-      // The additional check for "role" is because the default method for adding attributes does not
-      // add the attribute "role". My guess is because it's not a valid attribute in some namespaces, although
-      // browsers handle the attribute just fine. The W3C allows for aria-* attributes to be used in pre-HTML5 docs.
-      // http://www.w3.org/TR/wai-aria-primer/#ariahtml. Using setAttribute gets around this problem.
+  vjs.obj.each(properties, function(propName, val){
+    // Not remembering why we were checking for dash
+    // but using setAttribute means you have to use getAttribute
 
-       if (propName.indexOf('aria-') !== -1 || propName=='role') {
-         el.setAttribute(propName, properties[propName]);
-       } else {
-         el[propName] = properties[propName];
-       }
+    // The check for dash checks for the aria-* attributes, like aria-label, aria-valuemin.
+    // The additional check for "role" is because the default method for adding attributes does not
+    // add the attribute "role". My guess is because it's not a valid attribute in some namespaces, although
+    // browsers handle the attribute just fine. The W3C allows for aria-* attributes to be used in pre-HTML5 docs.
+    // http://www.w3.org/TR/wai-aria-primer/#ariahtml. Using setAttribute gets around this problem.
+    if (propName.indexOf('aria-') !== -1 || propName == 'role') {
+     el.setAttribute(propName, val);
+    } else {
+     el[propName] = val;
     }
-  }
+  });
+
   return el;
 };
 
@@ -392,6 +392,22 @@ vjs.IS_CHROME = (/Chrome/i).test(vjs.USER_AGENT);
 vjs.TOUCH_ENABLED = !!(('ontouchstart' in window) || window.DocumentTouch && document instanceof window.DocumentTouch);
 
 /**
+ * Apply attributes to an HTML element.
+ * @param  {Element} el         Target element.
+ * @param  {Object=} attributes Element attributes to be applied.
+ * @private
+ */
+vjs.setElementAttributes = function(el, attributes){
+  vjs.obj.each(attributes, function(attrName, attrValue) {
+    if (attrValue === null || typeof attrValue === 'undefined' || attrValue === false) {
+      el.removeAttribute(attrName);
+    } else {
+      el.setAttribute(attrName, (attrValue === true ? '' : attrValue));
+    }
+  });
+};
+
+/**
  * Get an element's attribute values, as defined on the HTML tag
  * Attributs are not the same as properties. They're defined on the tag
  * or with setAttribute (which shouldn't be used with HTML)
@@ -400,7 +416,7 @@ vjs.TOUCH_ENABLED = !!(('ontouchstart' in window) || window.DocumentTouch && doc
  * @return {Object}
  * @private
  */
-vjs.getAttributeValues = function(tag){
+vjs.getElementAttributes = function(tag){
   var obj, knownBooleans, attrs, attrName, attrVal;
 
   obj = {};
@@ -842,4 +858,29 @@ vjs.findPosition = function(el) {
     left: vjs.round(left),
     top: vjs.round(top)
   };
+};
+
+/**
+ * Array functions container
+ * @type {Object}
+ * @private
+ */
+vjs.arr = {};
+
+/*
+ * Loops through an array and runs a function for each item inside it.
+ * @param  {Array}    array       The array
+ * @param  {Function} callback    The function to be run for each item
+ * @param  {*}        thisArg     The `this` binding of callback
+ * @returns {Array}               The array
+ * @private
+ */
+vjs.arr.forEach = function(array, callback, thisArg) {
+  if (vjs.obj.isArray(array) && callback instanceof Function) {
+    for (var i = 0, len = array.length; i < len; ++i) {
+      callback.call(thisArg || vjs, array[i], i, array);
+    }
+  }
+
+  return array;
 };

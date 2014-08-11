@@ -29,12 +29,8 @@ vjs.Html5 = vjs.MediaTechController.extend({
 
     var source = options['source'];
 
-    // If the element source is already set, we may have missed the loadstart event, and want to trigger it.
-    // We don't want to set the source again and interrupt playback.
-    if (source && this.el_.currentSrc === source.src && this.el_.networkState > 0) {
-      player.trigger('loadstart');
-    // Otherwise set the source if one was provided.
-    } else if (source) {
+    // set the source if one was provided
+    if (source && this.el_.currentSrc !== source.src) {
       this.el_.src = source.src;
     }
 
@@ -62,6 +58,7 @@ vjs.Html5 = vjs.MediaTechController.extend({
 });
 
 vjs.Html5.prototype.dispose = function(){
+  vjs.Html5.disposeMediaElement(this.el_);
   vjs.MediaTechController.prototype.dispose.call(this);
 };
 
@@ -84,10 +81,13 @@ vjs.Html5.prototype.createEl = function(){
       el = clone;
       player.tag = null;
     } else {
-      el = vjs.createEl('video', {
-        id:player.id() + '_html5_api',
-        className:'vjs-tech'
-      });
+      el = vjs.createEl('video');
+      vjs.setElementAttributes(el,
+        vjs.obj.merge(player.tagAttributes || {}, {
+          id:player.id() + '_html5_api',
+          'class':'vjs-tech'
+        })
+      );
     }
     // associate the player with the new tag
     el['player'] = player;
@@ -96,12 +96,14 @@ vjs.Html5.prototype.createEl = function(){
   }
 
   // Update specific tag settings, in case they were overridden
-  var attrs = ['autoplay','preload','loop','muted'];
-  for (var i = attrs.length - 1; i >= 0; i--) {
-    var attr = attrs[i];
-    if (player.options_[attr] !== null) {
-      el[attr] = player.options_[attr];
+  var settingsAttrs = ['autoplay','preload','loop','muted'];
+  for (var i = settingsAttrs.length - 1; i >= 0; i--) {
+    var attr = settingsAttrs[i];
+    var overwriteAttrs = {};
+    if (typeof player.options_[attr] !== 'undefined') {
+      overwriteAttrs[attr] = player.options_[attr];
     }
+    vjs.setElementAttributes(el, overwriteAttrs);
   }
 
   return el;
@@ -246,6 +248,8 @@ vjs.Html5.prototype.defaultMuted = function(){ return this.el_.defaultMuted; };
 
 vjs.Html5.prototype.playbackRate = function(){ return this.el_.playbackRate; };
 vjs.Html5.prototype.setPlaybackRate = function(val){ this.el_.playbackRate = val; };
+
+vjs.Html5.prototype.networkState = function(){ return this.el_.networkState; };
 
 /* HTML5 Support Testing ---------------------------------------------------- */
 

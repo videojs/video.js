@@ -2,13 +2,41 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 4.7.1 (2014-08-06)
+* Fixed the broken bower.json config ([view](https://github.com/videojs/video.js/pull/1401))
+
+## 4.7.0 (2014-08-05)
 * Added cross-browser isArray for cross-frame support. fixes #1195 ([view](https://github.com/videojs/video.js/pull/1218))
 * Fixed support for webvtt chapters. Fixes #676. ([view](https://github.com/videojs/video.js/pull/1221))
 * Fixed issues around webvtt cue time parsing. Fixed #877, fixed #183. ([view](https://github.com/videojs/video.js/pull/1236))
 * Fixed an IE11 issue where clicking on the video wouldn&#x27;t show the controls ([view](https://github.com/videojs/video.js/pull/1291))
 * Added a composer.json for PHP packages ([view](https://github.com/videojs/video.js/pull/1241))
+* Exposed the vertical option for slider controls ([view](https://github.com/videojs/video.js/pull/1303))
+* Fixed an error when disposing a tech using manual timeupdates ([view](https://github.com/videojs/video.js/pull/1312))
+* Exported missing Player API methods (remainingTime, supportsFullScreen, enterFullWindow, exitFullWindow, preload) ([view](https://github.com/videojs/video.js/pull/1328))
+* Added a base for running saucelabs tests from grunt ([view](https://github.com/videojs/video.js/pull/1215))
+* Added additional browsers for saucelabs testing ([view](https://github.com/videojs/video.js/pull/1216))
+* Added support for listening to multiple events through a types array ([view](https://github.com/videojs/video.js/pull/1231))
+* Exported the vertical option for the volume slider ([view](https://github.com/videojs/video.js/pull/1378))
+* Fixed Component trigger function arguments and docs ([view](https://github.com/videojs/video.js/pull/1310))
+* Now copying all attributes from the original video tag to the generated video element ([view](https://github.com/videojs/video.js/pull/1321))
+* Added files to be ignored in the bower.json ([view](https://github.com/videojs/video.js/pull/1337))
+* Fixed an error that could happen if Flash was diposed before the ready callback was fired ([view](https://github.com/videojs/video.js/pull/1340))
+* The up and down arrows can now be used to control sliders in addition to left and right ([view](https://github.com/videojs/video.js/pull/1345))
+* Added a player.currentType() function to get the MIME type of the current source ([view](https://github.com/videojs/video.js/pull/1320))
+* Fixed a potential conflict with other event listener shims ([view](https://github.com/videojs/video.js/pull/1363))
+* Added support for multiple time ranges in the load progress bar ([view](https://github.com/videojs/video.js/pull/1253))
+* Added vjs-waiting and vjs-seeking css classnames and updated the spinner to use them ([view](https://github.com/videojs/video.js/pull/1351))
+* Now restoring the original video tag attributes on a tech change to support webkit-playsinline ([view](https://github.com/videojs/video.js/pull/1369))
+* Fixed an issue where the user was unable to scroll/zoom page if touching the video ([view](https://github.com/videojs/video.js/pull/1373))
+* Added "sliding" class for when slider is sliding to help with handle styling ([view](https://github.com/videojs/video.js/pull/1385))
 
---------------------
+## 4.6.4 (2014-07-11)
+* Fixed an issue where Flash autoplay would not show the controls ([view](https://github.com/videojs/video.js/pull/1343))
 
 ## 4.6.3 (2014-06-12)
 * Updated to version 4.4.1 of the SWF ([view](https://github.com/videojs/video.js/pull/1285))

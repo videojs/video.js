@@ -92,14 +92,14 @@ The `vjs` function can be used to initialize or retrieve a player.
 > All options should use string keys so they avoid
 > renaming by closure compiler
 
-_defined in_: [src/js/core.js#L77](https://github.com/videojs/video.js/blob/master/src/js/core.js#L77)
+_defined in_: [src/js/core.js#L76](https://github.com/videojs/video.js/blob/master/src/js/core.js#L76)
 
 ---
 
 ### players
 > Global player list
 
-_defined in_: [src/js/core.js#L121](https://github.com/videojs/video.js/blob/master/src/js/core.js#L121)
+_defined in_: [src/js/core.js#L125](https://github.com/videojs/video.js/blob/master/src/js/core.js#L125)
 
 ---
 
@@ -114,7 +114,7 @@ _defined in_: [src/js/core.js#L121](https://github.com/videojs/video.js/blob/mas
 ##### RETURNS: 
 * `Object` An object of url details
 
-_defined in_: [src/js/lib.js#L696](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L696)
+_defined in_: [src/js/lib.js#L723](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L723)
 
 ---
 

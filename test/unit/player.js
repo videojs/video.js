@@ -73,7 +73,7 @@ test('should accept options from multiple sources and override in correct order'
 });
 
 test('should get tag, source, and track settings', function(){
-  // Partially tested in lib->getAttributeValues
+  // Partially tested in lib->getElementAttributes
 
   var fixture = document.getElementById('qunit-fixture');
 
@@ -482,3 +482,39 @@ test('player should handle different error types', function(){
   vjs.log.error.restore();
 });
 
+test('Data attributes on the video element should persist in the new wrapper element', function() {
+  var dataId, tag, player;
+
+  dataId = 123;
+
+  tag = PlayerTest.makeTag();
+  tag.setAttribute('data-id', dataId);
+
+  player = PlayerTest.makePlayer({}, tag);
+
+  equal(player.el().getAttribute('data-id'), dataId, 'data-id should be available on the new player element after creation');
+});
+
+test('should restore attributes from the original video tag when creating a new element', function(){
+  var player, html5Mock, el;
+
+  player = PlayerTest.makePlayer();
+  html5Mock = { player_: player };
+
+  // simulate attributes stored from the original tag
+  player.tagAttributes = {
+    'preload': 'auto',
+    'controls': true,
+    'webkit-playsinline': true
+  };
+
+  // set options that should override tag attributes
+  player.options_['preload'] = 'none';
+
+  // create the element
+  el = vjs.Html5.prototype.createEl.call(html5Mock);
+
+  equal(el.getAttribute('preload'), 'none', 'attribute was successful overridden by an option');
+  equal(el.getAttribute('controls'), '', 'controls attribute was set properly');
+  equal(el.getAttribute('webkit-playsinline'), '', 'webkit-playsinline attribute was set properly');
+});

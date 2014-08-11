@@ -21,7 +21,7 @@ vjs.PlaybackRateMenuButton = vjs.MenuButton.extend({
 vjs.PlaybackRateMenuButton.prototype.createEl = function(){
   var el = vjs.Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-playback-rate vjs-menu-button vjs-control',
-    innerHTML: '<div class="vjs-control-content"><span class="vjs-control-text">Playback Rate</span></div>'
+    innerHTML: '<div class="vjs-control-content"><span class="vjs-control-text">' + this.localize('Playback Rate') + '</span></div>'
   });
 
   this.labelEl_ = vjs.createEl('div', {
