@@ -92,6 +92,9 @@ vjs.options = {
   // Add playback rate selection by adding rates
   // 'playbackRates': [0.5, 1, 1.5, 2],
 
+  // default inactivity timeout
+  'inactivityTimeout': 2000,
+
   // Included control sets
   'children': {
     'mediaLoader': {},
