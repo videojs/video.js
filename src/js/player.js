@@ -1530,7 +1530,7 @@ vjs.Player.prototype.playbackRate = function(rate) {
     return this;
   }
 
-  if (this.tech && this.tech['playbackRate']) {
+  if (this.tech && this.tech['playbackRateFeature']) {
     return this.techGet('playbackRate');
   } else {
     return 1.0;

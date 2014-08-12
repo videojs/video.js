@@ -13,16 +13,16 @@ vjs.Html5 = vjs.MediaTechController.extend({
   /** @constructor */
   init: function(player, options, ready){
     // volume cannot be changed from 1 on iOS
-    this['volumeControl'] = vjs.Html5.canControlVolume();
+    this['volumeControlFeature'] = vjs.Html5.canControlVolume();
 
     // just in case; or is it excessively...
-    this['playbackRate'] = vjs.Html5.canControlPlaybackRate();
+    this['playbackRateFeature'] = vjs.Html5.canControlPlaybackRate();
 
     // In iOS, if you move a video element in the DOM, it breaks video playback.
     this['movingMediaElementInDOM'] = !vjs.IS_IOS;
 
     // HTML video is able to automatically resize when going to fullscreen
-    this['fullscreenResize'] = true;
+    this['fullscreenResizeFeature'] = true;
 
     // HTML video supports progress events
     this.features['progressEvents'] = true;

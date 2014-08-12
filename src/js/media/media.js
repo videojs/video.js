@@ -13,7 +13,6 @@ vjs.MediaTechController = vjs.Component.extend({
   /** @constructor */
   init: function(player, options, ready){
     options = options || {};
-
     // we don't want the tech to report user activity automatically.
     // This is done manually in addControlsListeners
     options.reportTouchActivity = false;
@@ -262,15 +261,15 @@ vjs.MediaTechController.prototype.setCurrentTime = function() {
  */
 vjs.MediaTechController.prototype.setPoster = function(){};
 
-vjs.MediaTechController.prototype[ 'volumeControl' ] = true;
+vjs.MediaTechController.prototype['volumeControlFeature'] = true;
 
 // Resizing plugins using request fullscreen reloads the plugin
-vjs.MediaTechController.prototype[ 'fullscreenResize' ] = false;
-vjs.MediaTechController.prototype[ 'playbackRate' ] = false;
+vjs.MediaTechController.prototype['fullscreenResizeFeature'] = false;
+vjs.MediaTechController.prototype['playbackRateFeature'] = false;
 
 // Optional events that we can manually mimic with timers
 // currently not triggered by video-js-swf
-vjs.MediaTechController.prototype[ 'progressEvents' ] = false;
-vjs.MediaTechController.prototype[ 'timeupdateEvents' ] = false;
+vjs.MediaTechController.prototype['progressEventsFeature'] = false;
+vjs.MediaTechController.prototype['timeupdateEventsFeature'] = false;
 
 vjs.media = {};
