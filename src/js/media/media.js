@@ -271,4 +271,96 @@ vjs.MediaTechController.prototype['featuresPlaybackRate'] = false;
 vjs.MediaTechController.prototype['featuresProgressEvents'] = false;
 vjs.MediaTechController.prototype['featuresTimeupdateEvents'] = false;
 
-vjs.media = {};
+/**
+ * A functional mixin for techs that want to use the Source Handler pattern.
+ *
+ * ##### EXAMPLE:
+ *
+ *   videojs.MediaTechController.withSourceHandlers.call(MyTech);
+ *
+ */
+vjs.MediaTechController.withSourceHandlers = function(tech){
+  /**
+   * All registered source handlers.
+   * Source handlers are scripts for handling specific formats.
+   * The source handler pattern is used for adaptive formats (HLS, DASH) that
+   * manually load video data and feed it into a Source Buffer (Media Source Extensions)
+   * @type {Array}
+   */
+  tech.sourceHandlers = [];
+
+  /**
+   * Register a source handler
+   * @param  {Function} handler  The source handler
+   * @param  {Boolean}  first    Register it before any existing handlers
+   */
+  tech.registerSourceHandler = function(handler, index){
+    if (index === undefined) {
+      // add to the end of the list
+      index = tech.sourceHandlers.length;
+    }
+
+    tech.sourceHandlers.splice(index, 0, handler);
+  };
+
+  /**
+   * Return the first source handler that supports the source
+   * TODO: Answer question: should 'probably' be prioritized over 'maybe'
+   * @param  {Object} source The source object
+   * @returns {Object}       The first source handler that supports the source
+   * @returns {null}         Null if no source handler is found
+   */
+  tech.selectSourceHandler = function(source){
+    var handlers = tech.sourceHandlers;
+
+    // console.log('here', handlers[0].canHandleSource);
+
+    for (var i = 0; i < handlers.length; i++) {
+      can = handlers[i].canHandleSource(source);
+
+      if (can) {
+        return handlers[i];
+      }
+    }
+
+    return null;
+  };
+
+  tech.prototype.setSource = function(source){
+    var sh = tech.selectSourceHandler(source);
+
+    this.currentSource_ = source;
+
+    if (sh) {
+      // Clean up any existing source handler
+      if (this.sourceHandler && this.sourceHandler.dispose) {
+        this.sourceHandler.dispose();
+      }
+
+      this.sourceHandler = sh;
+      sh.handleSource(source, this);
+    } else {
+      // If no source handler was found, attempt the existing one. It could be
+      // that it's a source object with no type.
+      // There should be no way to get here without loading an initial handler.
+      // The tech wouldn't be loaded if a handler wasn't found in canPlaySource.
+      this.sourceHandler.handleSource(source, this);
+    }
+  };
+
+  /**
+   * Check if the HTML5 tech can support the given source
+   * @param  {Object} srcObj  The source object
+   * @return {String}         'probably', 'maybe', or '' (empty string)
+   */
+  tech.canPlaySource = function(srcObj){
+    var sh = tech.selectSourceHandler(srcObj);
+
+    if (sh) {
+      return sh.canHandleSource(srcObj);
+    }
+
+    return '';
+  };
+};
+

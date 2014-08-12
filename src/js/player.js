@@ -1173,7 +1173,14 @@ vjs.Player.prototype.src = function(source){
 
       // wait until the tech is ready to set the source
       this.ready(function(){
-        this.techCall('src', source.src);
+
+        // The setSource tech method was added with source handlers
+        // so older techs won't support it
+        if (this.tech['setSource']) {
+          this.techCall('setSource', source);
+        } else {
+          this.techCall('src', source.src);
+        }
 
         if (this.options_['preload'] == 'auto') {
           this.load();
