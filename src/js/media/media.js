@@ -161,17 +161,15 @@ vjs.MediaTechController.prototype.onTap = function(){
  */
 vjs.MediaTechController.prototype.setPoster = function(){};
 
-vjs.MediaTechController.prototype.features = {
-  'volumeControl': true,
+vjs.MediaTechController.prototype['volumeControlFeature'] = true;
 
-  // Resizing plugins using request fullscreen reloads the plugin
-  'fullscreenResize': false,
-  'playbackRate': false,
+// Resizing plugins using request fullscreen reloads the plugin
+vjs.MediaTechController.prototype['fullscreenResizeFeature'] = false;
+vjs.MediaTechController.prototype['playbackRateFeature'] = false;
 
-  // Optional events that we can manually mimic with timers
-  // currently not triggered by video-js-swf
-  'progressEvents': false,
-  'timeupdateEvents': false
-};
+// Optional events that we can manually mimic with timers
+// currently not triggered by video-js-swf
+vjs.MediaTechController.prototype['progressEventsFeature'] = false;
+vjs.MediaTechController.prototype['timeupdateEventsFeature'] = false;
 
 vjs.media = {};

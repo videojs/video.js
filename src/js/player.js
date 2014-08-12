@@ -313,12 +313,12 @@ vjs.Player.prototype.loadTech = function(techName, source){
     this.player_.triggerReady();
 
     // Manually track progress in cases where the browser/flash player doesn't report it.
-    if (!this.features['progressEvents']) {
+    if (!this['progressEventsFeature']) {
       this.player_.manualProgressOn();
     }
 
     // Manually track timeudpates in cases where the browser/flash player doesn't report it.
-    if (!this.features['timeupdateEvents']) {
+    if (!this['timeupdateEventsFeature']) {
       this.player_.manualTimeUpdatesOn();
     }
   };
@@ -386,7 +386,7 @@ vjs.Player.prototype.manualProgressOn = function(){
     this.tech.one('progress', function(){
 
       // Update known progress support for this playback technology
-      this.features['progressEvents'] = true;
+      this['progressEventsFeature'] = true;
 
       // Turn off manual progress tracking
       this.player_.manualProgressOff();
@@ -431,7 +431,7 @@ vjs.Player.prototype.manualTimeUpdatesOn = function(){
   if (this.tech) {
     this.tech.one('timeupdate', function(){
       // Update known progress support for this playback technology
-      this.features['timeupdateEvents'] = true;
+      this['timeupdateEventsFeature'] = true;
       // Turn off manual progress tracking
       this.player_.manualTimeUpdatesOff();
     });
@@ -1641,7 +1641,7 @@ vjs.Player.prototype.playbackRate = function(rate) {
     return this;
   }
 
-  if (this.tech && this.tech.features && this.tech.features['playbackRate']) {
+  if (this.tech && this.tech['playbackRateFeature']) {
     return this.techGet('playbackRate');
   } else {
     return 1.0;
