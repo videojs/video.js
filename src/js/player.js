@@ -1624,7 +1624,7 @@ vjs.Player.prototype.listenForUserActivity = function(){
         if (!this.userActivity_) {
           this.userActive(false);
         }
-      }), vjs.options['inactivityTimeout']);
+      }), this.options()['inactivityTimeout']);
     }
   }), 250);
 
