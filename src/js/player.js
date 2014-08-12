@@ -349,7 +349,6 @@ vjs.Player.prototype.unloadTech = function(){
 //   vjs.log('loadedTech')
 // },
 
-
 // /* Player event handlers (how the player reacts to certain events)
 // ================================================================================ */
 
@@ -1531,7 +1530,7 @@ vjs.Player.prototype.playbackRate = function(rate) {
     return this;
   }
 
-  if (this.tech && this.tech.features && this.tech.features['playbackRate']) {
+  if (this.tech && this.tech['playbackRate']) {
     return this.techGet('playbackRate');
   } else {
     return 1.0;
