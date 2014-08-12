@@ -11,11 +11,11 @@ vjs.VolumeControl = vjs.Component.extend({
     vjs.Component.call(this, player, options);
 
     // hide volume controls when they're not supported by the current tech
-    if (player.tech && player.tech['volumeControl'] === false) {
+    if (player.tech && player.tech['volumeControlFeature'] === false) {
       this.addClass('vjs-hidden');
     }
     player.on('loadstart', vjs.bind(this, function(){
-      if (player.tech['volumeControl'] === false) {
+      if (player.tech['volumeControlFeature'] === false) {
         this.addClass('vjs-hidden');
       } else {
         this.removeClass('vjs-hidden');

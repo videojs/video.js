@@ -121,10 +121,11 @@ goog.exportSymbol('videojs.CaptionsButton', vjs.CaptionsButton);
 goog.exportSymbol('videojs.ChaptersButton', vjs.ChaptersButton);
 
 goog.exportSymbol('videojs.MediaTechController', vjs.MediaTechController);
-goog.exportProperty(vjs.MediaTechController.prototype, 'volumeControl', vjs.MediaTechController.prototype.volumeControl);
-goog.exportProperty(vjs.MediaTechController.prototype, 'fullscreenResize', vjs.MediaTechController.prototype.fullscreenResize);
-goog.exportProperty(vjs.MediaTechController.prototype, 'progressEvents', vjs.MediaTechController.prototype.progressEvents);
-goog.exportProperty(vjs.MediaTechController.prototype, 'timeupdateEvents', vjs.MediaTechController.prototype.timeupdateEvents);
+goog.exportProperty(vjs.MediaTechController.prototype, 'volumeControlFeature', vjs.MediaTechController.prototype.volumeControlFeature);
+goog.exportProperty(vjs.MediaTechController.prototype, 'fullscreenResizeFeature', vjs.MediaTechController.prototype.fullscreenResizeFeature);
+goog.exportProperty(vjs.MediaTechController.prototype, 'playbackRateFeature', vjs.MediaTechController.prototype.playbackRateFeature);
+goog.exportProperty(vjs.MediaTechController.prototype, 'progressEventsFeature', vjs.MediaTechController.prototype.progressEventsFeature);
+goog.exportProperty(vjs.MediaTechController.prototype, 'timeupdateEventsFeature', vjs.MediaTechController.prototype.timeupdateEventsFeature);
 goog.exportProperty(vjs.MediaTechController.prototype, 'setPoster', vjs.MediaTechController.prototype.setPoster);
 
 
