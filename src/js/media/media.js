@@ -18,6 +18,16 @@ vjs.MediaTechController = vjs.Component.extend({
     options.reportTouchActivity = false;
     vjs.Component.call(this, player, options, ready);
 
+    // Manually track progress in cases where the browser/flash player doesn't report it.
+    if (!this.features['progressEvents']) {
+      this.manualProgressOn();
+    }
+
+    // Manually track timeudpates in cases where the browser/flash player doesn't report it.
+    if (!this.features['timeupdateEvents']) {
+      this.manualTimeUpdatesOn();
+    }
+
     this.initControlsListeners();
   }
 });
@@ -151,6 +161,109 @@ vjs.MediaTechController.prototype.onClick = function(event){
  */
 vjs.MediaTechController.prototype.onTap = function(){
   this.player().userActive(!this.player().userActive());
+};
+
+/* Fallbacks for unsupported event types
+================================================================================ */
+// Manually trigger progress events based on changes to the buffered amount
+// Many flash players and older HTML5 browsers don't send progress or progress-like events
+vjs.MediaTechController.prototype.manualProgressOn = function(){
+  this.manualProgress = true;
+
+  // Trigger progress watching when a source begins loading
+  this.trackProgress();
+
+  // Watch for a native progress event call on the tech element
+  // In HTML5, some older versions don't support the progress event
+  // So we're assuming they don't, and turning off manual progress if they do.
+  // As opposed to doing user agent detection
+  this.one('progress', function(){
+
+    // Update known progress support for this playback technology
+    this.features['progressEvents'] = true;
+
+    // Turn off manual progress tracking
+    this.manualProgressOff();
+  });
+};
+
+vjs.MediaTechController.prototype.manualProgressOff = function(){
+  this.manualProgress = false;
+  this.stopTrackingProgress();
+};
+
+vjs.MediaTechController.prototype.trackProgress = function(){
+
+  this.progressInterval = setInterval(vjs.bind(this, function(){
+    // Don't trigger unless buffered amount is greater than last time
+
+    var bufferedPercent = this.player().bufferedPercent();
+
+    if (this.bufferedPercent_ != bufferedPercent) {
+      this.player().trigger('progress');
+    }
+
+    this.bufferedPercent_ = bufferedPercent;
+
+    if (bufferedPercent === 1) {
+      this.stopTrackingProgress();
+    }
+  }), 500);
+};
+vjs.MediaTechController.prototype.stopTrackingProgress = function(){ clearInterval(this.progressInterval); };
+
+/*! Time Tracking -------------------------------------------------------------- */
+vjs.MediaTechController.prototype.manualTimeUpdatesOn = function(){
+  this.manualTimeUpdates = true;
+
+  this.player().on('play', vjs.bind(this, this.trackCurrentTime));
+  this.player().on('pause', vjs.bind(this, this.stopTrackingCurrentTime));
+  // timeupdate is also called by .currentTime whenever current time is set
+
+  // Watch for native timeupdate event
+  this.one('timeupdate', function(){
+    // Update known progress support for this playback technology
+    this.features['timeupdateEvents'] = true;
+    // Turn off manual progress tracking
+    this.manualTimeUpdatesOff();
+  });
+};
+
+vjs.MediaTechController.prototype.manualTimeUpdatesOff = function(){
+  this.manualTimeUpdates = false;
+  this.stopTrackingCurrentTime();
+  this.off('play', this.trackCurrentTime);
+  this.off('pause', this.stopTrackingCurrentTime);
+};
+
+vjs.MediaTechController.prototype.trackCurrentTime = function(){
+  if (this.currentTimeInterval) { this.stopTrackingCurrentTime(); }
+  this.currentTimeInterval = setInterval(vjs.bind(this, function(){
+    this.player().trigger('timeupdate');
+  }), 250); // 42 = 24 fps // 250 is what Webkit uses // FF uses 15
+};
+
+// Turn off play progress tracking (when paused or dragging)
+vjs.MediaTechController.prototype.stopTrackingCurrentTime = function(){
+  clearInterval(this.currentTimeInterval);
+
+  // #1002 - if the video ends right before the next timeupdate would happen,
+  // the progress bar won't make it all the way to the end
+  this.player().trigger('timeupdate');
+};
+
+vjs.MediaTechController.prototype.dispose = function() {
+  // Turn off any manual progress or timeupdate tracking
+  if (this.manualProgress) { this.manualProgressOff(); }
+
+  if (this.manualTimeUpdates) { this.manualTimeUpdatesOff(); }
+
+  vjs.Component.prototype.dispose.call(this);
+};
+
+vjs.MediaTechController.prototype.setCurrentTime = function() {
+  // improve the accuracy of manual timeupdates
+  if (this.manualTimeUpdates) { this.player().trigger('timeupdate'); }
 };
 
 /**
