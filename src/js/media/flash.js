@@ -145,6 +145,7 @@ vjs.Flash.prototype.src = function(src){
 vjs.Flash.prototype['setCurrentTime'] = function(time){
   this.lastSeekTarget_ = time;
   this.el_.vjs_setProperty('currentTime', time);
+  vjs.MediaTechController.prototype.setCurrentTime.call(this);
 };
 
 vjs.Flash.prototype['currentTime'] = function(time){

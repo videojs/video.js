@@ -163,10 +163,6 @@ vjs.Player.prototype.dispose = function(){
   if (this.tag && this.tag['player']) { this.tag['player'] = null; }
   if (this.el_ && this.el_['player']) { this.el_['player'] = null; }
 
-  // Ensure that tracking progress and time progress will stop and plater deleted
-  this.stopTrackingProgress();
-  this.stopTrackingCurrentTime();
-
   if (this.tech) { this.tech.dispose(); }
 
   // Component dispose
@@ -311,16 +307,6 @@ vjs.Player.prototype.loadTech = function(techName, source){
 
   var techReady = function(){
     this.player_.triggerReady();
-
-    // Manually track progress in cases where the browser/flash player doesn't report it.
-    if (!this.features['progressEvents']) {
-      this.player_.manualProgressOn();
-    }
-
-    // Manually track timeudpates in cases where the browser/flash player doesn't report it.
-    if (!this.features['timeupdateEvents']) {
-      this.player_.manualTimeUpdatesOn();
-    }
   };
 
   // Grab tech-specific options from player options and add source and parent element to use.
@@ -344,11 +330,6 @@ vjs.Player.prototype.loadTech = function(techName, source){
 vjs.Player.prototype.unloadTech = function(){
   this.isReady_ = false;
 
-  // Turn off any manual progress or timeupdate tracking
-  if (this.manualProgress) { this.manualProgressOff(); }
-
-  if (this.manualTimeUpdates) { this.manualTimeUpdatesOff(); }
-
   this.tech.dispose();
 
   this.tech = false;
@@ -368,98 +349,7 @@ vjs.Player.prototype.unloadTech = function(){
 //   vjs.log('loadedTech')
 // },
 
-/* Fallbacks for unsupported event types
-================================================================================ */
-// Manually trigger progress events based on changes to the buffered amount
-// Many flash players and older HTML5 browsers don't send progress or progress-like events
-vjs.Player.prototype.manualProgressOn = function(){
-  this.manualProgress = true;
 
-  // Trigger progress watching when a source begins loading
-  this.trackProgress();
-
-  // Watch for a native progress event call on the tech element
-  // In HTML5, some older versions don't support the progress event
-  // So we're assuming they don't, and turning off manual progress if they do.
-  // As opposed to doing user agent detection
-  if (this.tech) {
-    this.tech.one('progress', function(){
-
-      // Update known progress support for this playback technology
-      this.features['progressEvents'] = true;
-
-      // Turn off manual progress tracking
-      this.player_.manualProgressOff();
-    });
-  }
-};
-
-vjs.Player.prototype.manualProgressOff = function(){
-  this.manualProgress = false;
-  this.stopTrackingProgress();
-};
-
-vjs.Player.prototype.trackProgress = function(){
-
-  this.progressInterval = setInterval(vjs.bind(this, function(){
-    // Don't trigger unless buffered amount is greater than last time
-
-    var bufferedPercent = this.bufferedPercent();
-
-    if (this.cache_.bufferedPercent != bufferedPercent) {
-      this.trigger('progress');
-    }
-
-    this.cache_.bufferedPercent = bufferedPercent;
-
-    if (bufferedPercent == 1) {
-      this.stopTrackingProgress();
-    }
-  }), 500);
-};
-vjs.Player.prototype.stopTrackingProgress = function(){ clearInterval(this.progressInterval); };
-
-/*! Time Tracking -------------------------------------------------------------- */
-vjs.Player.prototype.manualTimeUpdatesOn = function(){
-  this.manualTimeUpdates = true;
-
-  this.on('play', this.trackCurrentTime);
-  this.on('pause', this.stopTrackingCurrentTime);
-  // timeupdate is also called by .currentTime whenever current time is set
-
-  // Watch for native timeupdate event
-  if (this.tech) {
-    this.tech.one('timeupdate', function(){
-      // Update known progress support for this playback technology
-      this.features['timeupdateEvents'] = true;
-      // Turn off manual progress tracking
-      this.player_.manualTimeUpdatesOff();
-    });
-  }
-};
-
-vjs.Player.prototype.manualTimeUpdatesOff = function(){
-  this.manualTimeUpdates = false;
-  this.stopTrackingCurrentTime();
-  this.off('play', this.trackCurrentTime);
-  this.off('pause', this.stopTrackingCurrentTime);
-};
-
-vjs.Player.prototype.trackCurrentTime = function(){
-  if (this.currentTimeInterval) { this.stopTrackingCurrentTime(); }
-  this.currentTimeInterval = setInterval(vjs.bind(this, function(){
-    this.trigger('timeupdate');
-  }), 250); // 42 = 24 fps // 250 is what Webkit uses // FF uses 15
-};
-
-// Turn off play progress tracking (when paused or dragging)
-vjs.Player.prototype.stopTrackingCurrentTime = function(){
-  clearInterval(this.currentTimeInterval);
-
-  // #1002 - if the video ends right before the next timeupdate would happen,
-  // the progress bar won't make it all the way to the end
-  this.trigger('timeupdate');
-};
 // /* Player event handlers (how the player reacts to certain events)
 // ================================================================================ */
 
@@ -781,9 +671,6 @@ vjs.Player.prototype.currentTime = function(seconds){
   if (seconds !== undefined) {
 
     this.techCall('setCurrentTime', seconds);
-
-    // improve the accuracy of manual timeupdates
-    if (this.manualTimeUpdates) { this.trigger('timeupdate'); }
 
     return this;
   }
