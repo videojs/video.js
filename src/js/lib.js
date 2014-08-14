@@ -756,15 +756,6 @@ vjs.parseUrl = function(url) {
   return details;
 };
 
-// if there's no console then don't try to output messages
-// they will still be stored in vjs.log.history
-var _noop = function(){};
-var _console = window['console'] || {
-  'log': _noop,
-  'warn': _noop,
-  'error': _noop
-};
-
 /**
  * Log messags to the console and history based on the type of message
  *
@@ -773,8 +764,20 @@ var _console = window['console'] || {
  * @private
  */
 function _logType(type, args){
+  var argsArray, noop, console;
+
   // convert args to an array to get array functions
-  var argsArray = Array.prototype.slice.call(args);
+  argsArray = Array.prototype.slice.call(args);
+  // if there's no console then don't try to output messages
+  // they will still be stored in vjs.log.history
+  // Was setting these once outside of this function, but containing them
+  // in the function makes it easier to test cases where console doesn't exist
+  noop = function(){};
+  console = window['console'] || {
+    'log': noop,
+    'warn': noop,
+    'error': noop
+  };
 
   if (type) {
     // add the type to the front of the message
@@ -791,11 +794,11 @@ function _logType(type, args){
   argsArray.unshift('VIDEOJS:');
 
   // call appropriate log function
-  if (_console[type].apply) {
-    _console[type].apply(_console, argsArray);
+  if (console[type].apply) {
+    console[type].apply(console, argsArray);
   } else {
     // ie8 doesn't allow error.apply, but it will just join() the array anyway
-    _console[type](argsArray.join(' '));
+    console[type](argsArray.join(' '));
   }
 }
 
