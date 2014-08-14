@@ -11,11 +11,13 @@ module('HTML5', {
       el: function(){ return el; },
       options_: {},
       options: function(){ return {}; },
+      bufferedPercent: function() { return 0; },
       controls: function(){ return false; },
       usingNativeControls: function(){ return false; },
       on: function(){ return this; },
       off: function() { return this; },
-      ready: function(){}
+      ready: function(){},
+      trigger: function(){}
     };
     tech = new vjs.Html5(player, {});
   },
