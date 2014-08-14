@@ -345,7 +345,7 @@ _inherited from_: [src/js/component.js#L475](https://github.com/videojs/video.js
 > keep the controls showing, but that shouldn't be an issue. A touch and hold on
 > any controls will still keep the user active
 
-_defined in_: [src/js/media/media.js#L45](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L45)
+_defined in_: [src/js/media/media.js#L55](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L55)
 
 ---
 
@@ -406,7 +406,7 @@ _inherited from_: [src/js/component.js#L540](https://github.com/videojs/video.js
 ##### PARAMETERS: 
 * __event__ 
 
-_defined in_: [src/js/media/media.js#L132](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L132)
+_defined in_: [src/js/media/media.js#L142](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L142)
 
 ---
 
@@ -414,7 +414,7 @@ _defined in_: [src/js/media/media.js#L132](https://github.com/videojs/video.js/b
 > Handle a tap on the media element. By default it will toggle the user
 > activity state, which hides and shows the controls.
 
-_defined in_: [src/js/media/media.js#L152](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L152)
+_defined in_: [src/js/media/media.js#L162](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L162)
 
 ---
 
@@ -534,7 +534,7 @@ _inherited from_: [src/js/component.js#L683](https://github.com/videojs/video.js
 > Remove the listeners used for click and tap controls. This is needed for
 > toggling to controls disabled, where a tap/touch should do nothing.
 
-_defined in_: [src/js/media/media.js#L116](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L116)
+_defined in_: [src/js/media/media.js#L126](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L126)
 
 ---
 
@@ -544,7 +544,7 @@ _defined in_: [src/js/media/media.js#L116](https://github.com/videojs/video.js/b
 > Poster support for techs should be optional, so we don't want techs to
 > break if they don't have a way to set a poster.
 
-_defined in_: [src/js/media/media.js#L162](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L162)
+_defined in_: [src/js/media/media.js#L262](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L262)
 
 ---
 

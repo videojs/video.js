@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* Fixed a case where timeupdate events were not firing, and fixed and issue with the Flash player version ([view](https://github.com/videojs/video.js/pull/1417))
+_(none)_
 
 --------------------
+
+## 4.7.2 (2014-08-14)
+* Fixed a case where timeupdate events were not firing, and fixed and issue with the Flash player version ([view](https://github.com/videojs/video.js/pull/1417))
 
 ## 4.7.1 (2014-08-06)
 * Fixed the broken bower.json config ([view](https://github.com/videojs/video.js/pull/1401))
