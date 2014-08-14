@@ -4,6 +4,7 @@ module('Media Tech', {
   'setup': function() {
     clock = sinon.useFakeTimers();
     features = videojs.util.mergeOptions({}, videojs.MediaTechController.prototype.features);
+    videojs.MediaTechController.prototype.features['progressEvents'] = false;
   },
   'teardown': function() {
     clock.restore();
@@ -113,30 +114,4 @@ test('should synthesize progress events by default', function() {
 
   clock.tick(500);
   equal(progresses, 1, 'triggered one event');
-});
-
-test('stops progress events if the tech produces them natively', function() {
-  var end = 0, buffered = 0, progresses = 0, tech;
-  tech = new videojs.MediaTechController({
-    id: noop,
-    on: noop,
-    // progress will be detected any time it is queried
-    bufferedPercent: function() {
-      return buffered++;
-    },
-    trigger: function(event) {
-      if (event === 'progress') {
-        progresses++;
-      }
-    }
-  });
-
-  // simulate a native progress event
-  tech.trigger('progress');
-  tech.on('progress', function() {
-    progresses++;
-  });
-
-  clock.tick(10 * 1000);
-  equal(progresses, 0, 'did not simulate progress');
 });

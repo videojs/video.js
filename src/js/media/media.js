@@ -172,19 +172,6 @@ vjs.MediaTechController.prototype.manualProgressOn = function(){
 
   // Trigger progress watching when a source begins loading
   this.trackProgress();
-
-  // Watch for a native progress event call on the tech element
-  // In HTML5, some older versions don't support the progress event
-  // So we're assuming they don't, and turning off manual progress if they do.
-  // As opposed to doing user agent detection
-  this.one('progress', function(){
-
-    // Update known progress support for this playback technology
-    this.features['progressEvents'] = true;
-
-    // Turn off manual progress tracking
-    this.manualProgressOff();
-  });
 };
 
 vjs.MediaTechController.prototype.manualProgressOff = function(){
