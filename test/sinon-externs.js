@@ -6,6 +6,8 @@ function sinon(){}
 sinon.stub = function(){};
 sinon.spy = function(){};
 sinon.mock = function(){};
+sinon.useFakeTimers = function(){};
+sinon.clock.tick = function(){};
 
 Function.prototype.alwaysCalledOn = function(){};
 Function.prototype.alwaysCalledWith = function(){};

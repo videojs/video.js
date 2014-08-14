@@ -294,56 +294,54 @@ test('vjs.findPosition should find top and left position', function() {
 
 // LOG TESTS
 test('should confirm logging functions work', function() {
-  var console = window['console'];
-  var origLog = console.log;
-  var origWarn = console.warn;
-  var origError = console.error;
+  var console, log, error, warn, origConsole, origLog, origWarn, origError;
 
+  origConsole = window['console'];
+  // replace the native console for testing
   // in ie8 console.log is apparently not a 'function' so sinon chokes on it
   // https://github.com/cjohansen/Sinon.JS/issues/386
-  // instead we'll temporarily replace them with functions
-  if (typeof origLog === 'object') {
-    console.log = function(){};
-    console.warn = function(){};
-    console.error = function(){};
-  }
+  // instead we'll temporarily replace them with no-op functions
+  console = window['console'] = {
+    log: function(){},
+    warn: function(){},
+    error: function(){}
+  };
 
   // stub the global log functions
-  var log = sinon.stub(console, 'log');
-  var error = sinon.stub(console, 'error');
-  var warn = sinon.stub(console, 'warn');
+  log = sinon.stub(console, 'log');
+  error = sinon.stub(console, 'error');
+  warn = sinon.stub(console, 'warn');
 
-  vjs.log('asdf', 'fdsa');
+  vjs.log('log1', 'log2');
+  vjs.log.warn('warn1', 'warn2');
+  vjs.log.error('error1', 'error2');
+
   ok(log.called, 'log was called');
   equal(log.firstCall.args[0], 'VIDEOJS:');
-  equal(log.firstCall.args[1], 'asdf');
-  equal(log.firstCall.args[2], 'fdsa');
+  equal(log.firstCall.args[1], 'log1');
+  equal(log.firstCall.args[2], 'log2');
 
-  vjs.log.warn('asdf', 'fdsa');
   ok(warn.called, 'warn was called');
   equal(warn.firstCall.args[0], 'VIDEOJS:');
   equal(warn.firstCall.args[1], 'WARN:');
-  equal(warn.firstCall.args[2], 'asdf');
-  equal(warn.firstCall.args[3], 'fdsa');
+  equal(warn.firstCall.args[2], 'warn1');
+  equal(warn.firstCall.args[3], 'warn2');
 
-  vjs.log.error('asdf', 'fdsa');
   ok(error.called, 'error was called');
   equal(error.firstCall.args[0], 'VIDEOJS:');
   equal(error.firstCall.args[1], 'ERROR:');
-  equal(error.firstCall.args[2], 'asdf');
-  equal(error.firstCall.args[3], 'fdsa');
+  equal(error.firstCall.args[2], 'error1');
+  equal(error.firstCall.args[3], 'error2');
+
+  ok(vjs.log.history.length === 3, 'there should be three messages in the log history');
 
   // tear down sinon
   log.restore();
   error.restore();
   warn.restore();
 
-  // restore ie8
-  if (typeof origLog === 'object') {
-    console.log = origLog;
-    console.warn = origWarn;
-    console.error = origError;
-  }
+  // restore the native console
+  window['console'] = origConsole;
 });
 
 test('should loop through each element of an array', function() {

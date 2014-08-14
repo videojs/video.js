@@ -24,6 +24,9 @@ vjs.Html5 = vjs.MediaTechController.extend({
     // HTML video is able to automatically resize when going to fullscreen
     this.features['fullscreenResize'] = true;
 
+    // HTML video supports progress events
+    this.features['progressEvents'] = true;
+
     vjs.MediaTechController.call(this, player, options, ready);
     this.setupTriggers();
 
