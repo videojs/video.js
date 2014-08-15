@@ -1615,16 +1615,19 @@ vjs.Player.prototype.listenForUserActivity = function(){
       // Clear any existing inactivity timeout to start the timer over
       clearTimeout(inactivityTimeout);
 
-      // In X seconds, if no more activity has occurred the user will be
-      // considered inactive
-      inactivityTimeout = setTimeout(vjs.bind(this, function() {
-        // Protect against the case where the inactivityTimeout can trigger just
-        // before the next user activity is picked up by the activityCheck loop
-        // causing a flicker
-        if (!this.userActivity_) {
-          this.userActive(false);
-        }
-      }), this.options()['inactivityTimeout']);
+      var timeout = this.options()['inactivityTimeout'];
+      if (timeout > 0) {
+          // In <timeout> milliseconds, if no more activity has occurred the
+          // user will be considered inactive
+          inactivityTimeout = setTimeout(vjs.bind(this, function () {
+              // Protect against the case where the inactivityTimeout can trigger just
+              // before the next user activity is picked up by the activityCheck loop
+              // causing a flicker
+              if (!this.userActivity_) {
+                  this.userActive(false);
+              }
+          }), timeout);
+      }
     }
   }), 250);
 
