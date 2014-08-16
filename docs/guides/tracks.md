@@ -17,7 +17,7 @@ When creating captions, there's also additional [caption formatting techniques] 
 
 Adding to Video.js
 ------------------
-Once you have your WebVTT file created, you can add it to Video.js using the track trag. Put your track track tag after all the source elements, and before any fallback content.
+Once you have your WebVTT file created, you can add it to Video.js using the track tag. Put your track tag after all the source elements, and before any fallback content.
 
 ```html
 <video id="example_video_1" class="video-js vjs-default-skin"  
