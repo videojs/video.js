@@ -27,3 +27,15 @@ test('should return a video player instance', function(){
   var player2 = videojs(tag2);
   ok(player2.id() === 'test_vid_id2', 'created player from element');
 });
+
+test('should add the value to the languages object', function() {
+  var code, data, result;
+
+  code = 'es';
+  data = {'Hello': 'Hola'};
+  result = vjs.addLanguage(code, data);
+
+  ok(vjs.options['languages'][code], 'should exist');
+  equal(vjs.options['languages'][code], data, 'should match');
+  deepEqual(result[code], vjs.options['languages'][code], 'should also match');
+});

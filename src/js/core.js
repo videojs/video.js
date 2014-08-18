@@ -119,6 +119,25 @@ if (vjs.CDN_VERSION !== 'GENERATED'+'_CDN_VSN') {
 }
 
 /**
+ * Utility function for adding languages to the default options. Useful for
+ * amending multiple language support at runtime.
+ *
+ * Example: vjs.addLanguage('es', {'Hello':'Hola'});
+ *
+ * @param  {String} code The language code or dictionary property
+ * @param  {Object} data The data values to be translated
+ * @return {Object} The resulting global languages dictionary object
+ */
+vjs.addLanguage = function(code, data){
+  if(vjs.options['languages'][code] !== undefined) {
+    vjs.options['languages'][code] = vjs.util.mergeOptions(vjs.options['languages'][code], data);
+  } else {
+    vjs.options['languages'][code] = data;
+  }
+  return vjs.options['languages'];
+};
+
+/**
  * Global player list
  * @type {Object}
  */

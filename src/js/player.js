@@ -1167,7 +1167,7 @@ vjs.Player.prototype.sourceList_ = function(sources){
       this.loadTech(sourceTech.tech, sourceTech.source);
     }
   } else {
-    this.error({ code: 4, message: this.options()['notSupportedMessage'] });
+    this.error({ code: 4, message: this.localize(this.options()['notSupportedMessage']) });
     // we could not find an appropriate tech, but let's still notify the delegate that this is it
     // this needs a better comment about why this is needed
     this.triggerReady();
