@@ -1,7 +1,7 @@
 Languages
 =========
 
-Multiple language support allows for users of non-English locales to property interact with the displayed player. Video.js will compile multiple langauge files (see below) and instantiate with a global dictionary of language key/value support. Video.js player instances can be created with per-player language support that amends/overrides this default values. Player instances can also hard-set default languges to values other than English as of version 4.7.
+Multiple language support allows for users of non-English locales to natively interact with the displayed player. Video.js will compile multiple langauge files (see below) and instantiate with a global dictionary of language key/value support. Video.js player instances can be created with per-player language support that amends/overrides this default values. Player instances can also hard-set default languges to values other than English as of version 4.7.
 
 Creating the Language File
 --------------------------
