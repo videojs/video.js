@@ -16,7 +16,7 @@ vjs.util = {};
 vjs.util.mergeOptions = function(obj1, obj2){
   var key, val1, val2;
 
-  // make a copy of obj1 so we're not ovewriting original values.
+  // make a copy of obj1 so we're not overwriting original values.
   // like prototype.options_ and all sub options objects
   obj1 = vjs.obj.copy(obj1);
 
@@ -36,4 +36,21 @@ vjs.util.mergeOptions = function(obj1, obj2){
   return obj1;
 };
 
-
+/**
+ * Utility function for adding languages to the default options. Useful for
+ * amending multiple language support at runtime.
+ *
+ * Example: vjs.util.addLanguage('es', {'Hello':'Hola'});
+ *
+ * @param  {String} code The language code or dictionary property
+ * @param  {Object} data The data values to be translated
+ * @return {Object} The resulting global languages dictionary object
+ */
+vjs.util.addLanguage = function(code, data){
+  if(vjs.options.languages[code] !== undefined) {
+    vjs.options.languages[code] = vjs.util.mergeOptions(vjs.options.languages[code], data);
+  } else {
+    vjs.options.languages[code] = data;
+  }
+  return vjs.options.languages;
+};

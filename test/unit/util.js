@@ -27,3 +27,15 @@ test('should merge options objects', function(){
     d: true
   }, 'options objects merged correctly');
 });
+
+test('should add the value to the languages object', function() {
+  var code, data, result;
+
+  code = 'es';
+  data = {'Hello': 'Hola'};
+  result = vjs.util.addLanguage(code, data);
+
+  ok(vjs.options.languages[code], 'should exist');
+  equal(vjs.options.languages[code], data, 'should match');
+  deepEqual(result, vjs.options.languages[code], 'should also match');
+});
