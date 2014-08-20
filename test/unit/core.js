@@ -37,5 +37,6 @@ test('should add the value to the languages object', function() {
 
   ok(vjs.options.languages[code], 'should exist');
   equal(vjs.options.languages[code], data, 'should match');
-  deepEqual(result, vjs.options.languages[code], 'should also match');
+  deepEqual(result[code], vjs.options.languages[code], 'should also match');
+
 });
