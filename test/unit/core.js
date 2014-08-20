@@ -35,8 +35,7 @@ test('should add the value to the languages object', function() {
   data = {'Hello': 'Hola'};
   result = vjs.addLanguage(code, data);
 
-  ok(vjs.options.languages[code], 'should exist');
-  equal(vjs.options.languages[code], data, 'should match');
-  deepEqual(result[code], vjs.options.languages[code], 'should also match');
-
+  ok(vjs.options['languages'][code], 'should exist');
+  equal(vjs.options['languages'][code], data, 'should match');
+  deepEqual(result[code], vjs.options['languages'][code], 'should also match');
 });
