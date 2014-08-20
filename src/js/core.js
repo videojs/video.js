@@ -122,7 +122,7 @@ if (vjs.CDN_VERSION !== 'GENERATED'+'_CDN_VSN') {
  * Utility function for adding languages to the default options. Useful for
  * amending multiple language support at runtime.
  *
- * Example: vjs.util.addLanguage('es', {'Hello':'Hola'});
+ * Example: vjs.addLanguage('es', {'Hello':'Hola'});
  *
  * @param  {String} code The language code or dictionary property
  * @param  {Object} data The data values to be translated
