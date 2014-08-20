@@ -6,6 +6,10 @@ _(none)_
 
 --------------------
 
+## 4.7.3 (2014-08-20)
+* Added function for adding new language translations, updated docs, and fixed the notSupportedMessage translation ([view](https://github.com/videojs/video.js/pull/1427))
+* Exposed the player.selectSource method to allow overriding the source selection order ([view](https://github.com/videojs/video.js/pull/1424))
+
 ## 4.7.2 (2014-08-14)
 * Fixed a case where timeupdate events were not firing, and fixed and issue with the Flash player version ([view](https://github.com/videojs/video.js/pull/1417))
 

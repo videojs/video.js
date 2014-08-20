@@ -82,3 +82,8 @@ videojs.Player.prototype.userActive = function(){};
  * Native controls
  */
 videojs.Player.prototype.usingNativeControls = function(){};
+
+/**
+ * Source selection
+ */
+videojs.Player.prototype.selectSource = function(){};
