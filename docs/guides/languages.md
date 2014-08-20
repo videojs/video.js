@@ -7,7 +7,7 @@ Creating the Language File
 --------------------------
 Video.js uses key/value object dictionaries in JSON form. A sample dictionary for Spanish ['es'] would look as follows;
 
-```json
+```JSON
 {
   "Play": "Juego",
   "Pause": "Pausa",
@@ -92,7 +92,9 @@ During a Video.js player instantiation you can force it to localize to a specifi
 
 Language Codes
 --------------
-Here's a list of available language codes.
+The following is a list of official language codes. 
+
+**NOTE:** For supported language translations, please see the [Languages Folder (/lang)](../../lang) folder located in the project root.
 
 <table border="0" cellspacing="5" cellpadding="5">
   <tr>
