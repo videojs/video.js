@@ -45,7 +45,43 @@ Adding Languages to Video.js
 ----------------------------
 Additional language support can be added to Video.js in multiple ways.
 
-During a Video.js player instantiation. Adding the languages to the configuration object provided in the data-setup attribute.
+1. Add your JSON objects via the videojs.addLanguage API. Preferably in the HEAD element of your DOM or otherwise prior to player instantiation.
+
+```html
+<head>
+<script>
+  videojs.options.flash.swf = '../node_modules/videojs-swf/dist/video-js.swf';
+  videojs.addLanguage('es', {
+    "Play": "Juego",
+    "Pause": "Pausa",
+    "Current Time": "Tiempo Actual",
+    "Duration Time": "Tiempo de Duracion",
+    "Remaining Time": "Tiempo Restante",
+    "Stream Type": "Tipo de Transmision",
+    "LIVE": "En Vivo",
+    "Loaded": "Cargado",
+    "Progress": "Progreso",
+    "Fullscreen": "Pantalla Completa",
+    "Non-Fullscreen": "No Pantalla Completa",
+    "Mute": "Mudo",
+    "Unmuted": "Activar sonido",
+    "Playback Rate": "Reproduccion Cambio",
+    "Subtitles": "Subtitulos",
+    "subtitles off": "subtitulos fuera",
+    "Captions": "Subtitulos",
+    "captions off": "subtitulos fuera",
+    "Chapters": "Capitulos",
+    "You aborted the video playback": "Ha anulado la reproduccion de video",
+    "A network error caused the video download to fail part-way.": "Un error en la red hizo que la descarga de video falle parte del camino.",
+    "The video could not be loaded, either because the server or network failed or because the format is not supported.": "El video no se puede cargar, ya sea porque el servidor o la red fracasaron o porque el formato no es compatible.",
+    "The video playback was aborted due to a corruption problem or because the video used features your browser did not support.": "La reproduccion de video se ha cancelado debido a un problema de corrupcion o porque el video utilizado cuenta con su navegador no soporta.",
+    "No compatible source was found for this video.": "Ninguna fuente compatible se encontro para este video."
+  });
+</script>
+</head>
+```
+
+2. During a Video.js player instantiation. Adding the languages to the configuration object provided in the data-setup attribute.
 
 ```html
 <video id="example_video_1" class="video-js vjs-default-skin"  
