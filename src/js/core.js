@@ -129,12 +129,12 @@ if (vjs.CDN_VERSION !== 'GENERATED'+'_CDN_VSN') {
  * @return {Object} The resulting global languages dictionary object
  */
 vjs.addLanguage = function(code, data){
-  if(vjs.options.languages[code] !== undefined) {
-    vjs.options.languages[code] = vjs.util.mergeOptions(vjs.options.languages[code], data);
+  if(vjs.options['languages'][code] !== undefined) {
+    vjs.options['languages'][code] = vjs.util.mergeOptions(vjs.options['languages'][code], data);
   } else {
-    vjs.options.languages[code] = data;
+    vjs.options['languages'][code] = data;
   }
-  return vjs.options.languages;
+  return vjs.options['languages'];
 };
 
 /**
