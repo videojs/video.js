@@ -21,6 +21,11 @@ The `vjs` function can be used to initialize or retrieve a player.
   - [options](#options)
   - [players](#players)
 
+- [METHODS](#methods)
+  - [addLanguage](#addlanguage-code-data-)
+  - [parseUrl](#parseurl-url-)
+  - [plugin](#plugin-name-init-)
+
 - CLASSES
   - [BigPlayButton](vjs.BigPlayButton.md)
   - [Button](vjs.Button.md)
@@ -74,10 +79,6 @@ The `vjs` function can be used to initialize or retrieve a player.
   - [VolumeLevel](vjs.VolumeLevel.md)
   - [VolumeMenuButton](vjs.VolumeMenuButton.md)
 
-- [METHODS](#methods)
-  - [parseUrl](#parseurl-url-)
-  - [plugin](#plugin-name-init-)
-
 - NAMESPACES
   - [log](vjs.log.md)
   - [util](vjs.util.md)
@@ -99,11 +100,28 @@ _defined in_: [src/js/core.js#L76](https://github.com/videojs/video.js/blob/mast
 ### players
 > Global player list
 
-_defined in_: [src/js/core.js#L125](https://github.com/videojs/video.js/blob/master/src/js/core.js#L125)
+_defined in_: [src/js/core.js#L144](https://github.com/videojs/video.js/blob/master/src/js/core.js#L144)
 
 ---
 
 ## METHODS
+
+### addLanguage( code, data )
+> Utility function for adding languages to the default options. Useful for
+> amending multiple language support at runtime.
+> 
+> Example: vjs.addLanguage('es', {'Hello':'Hola'});
+
+##### PARAMETERS: 
+* __code__ `String` The language code or dictionary property
+* __data__ `Object` The data values to be translated
+
+##### RETURNS: 
+* `Object` The resulting global languages dictionary object
+
+_defined in_: [src/js/core.js#L131](https://github.com/videojs/video.js/blob/master/src/js/core.js#L131)
+
+---
 
 ### parseUrl( url )
 > Resolve and parse the elements of a URL

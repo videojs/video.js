@@ -119,6 +119,25 @@ if (vjs.CDN_VERSION !== 'GENERATED'+'_CDN_VSN') {
 }
 
 /**
+ * Utility function for adding languages to the default options. Useful for
+ * amending multiple language support at runtime.
+ *
+ * Example: vjs.addLanguage('es', {'Hello':'Hola'});
+ *
+ * @param  {String} code The language code or dictionary property
+ * @param  {Object} data The data values to be translated
+ * @return {Object} The resulting global languages dictionary object
+ */
+vjs.addLanguage = function(code, data){
+  if(vjs.options['languages'][code] !== undefined) {
+    vjs.options['languages'][code] = vjs.util.mergeOptions(vjs.options['languages'][code], data);
+  } else {
+    vjs.options['languages'][code] = data;
+  }
+  return vjs.options['languages'];
+};
+
+/**
  * Global player list
  * @type {Object}
  */
@@ -1551,7 +1570,7 @@ vjs.util = {};
 vjs.util.mergeOptions = function(obj1, obj2){
   var key, val1, val2;
 
-  // make a copy of obj1 so we're not ovewriting original values.
+  // make a copy of obj1 so we're not overwriting original values.
   // like prototype.options_ and all sub options objects
   obj1 = vjs.obj.copy(obj1);
 
@@ -1569,10 +1588,7 @@ vjs.util.mergeOptions = function(obj1, obj2){
     }
   }
   return obj1;
-};
-
-
-/**
+};/**
  * @fileoverview Player Component - Base class for all UI objects
  *
  */
@@ -4416,7 +4432,7 @@ vjs.Player.prototype.sourceList_ = function(sources){
       this.loadTech(sourceTech.tech, sourceTech.source);
     }
   } else {
-    this.error({ code: 4, message: this.options()['notSupportedMessage'] });
+    this.error({ code: 4, message: this.localize(this.options()['notSupportedMessage']) });
     // we could not find an appropriate tech, but let's still notify the delegate that this is it
     // this needs a better comment about why this is needed
     this.triggerReady();
