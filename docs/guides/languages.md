@@ -45,16 +45,7 @@ Adding Languages to Video.js
 ----------------------------
 Additional language support can be added to Video.js in multiple ways.
 
-1. During Video.js build process. Once you have your language file created, add it to the /lang folder. Then proceed to build Video.js as normal;
-
-```bash
-  grunt build
-```
-
-Notes:
-- This will add your language key/values to the videojs global object, which all players source from.
-
-2. During a Video.js player instantiation. Adding the languages to the configuration object provided in the data-setup attribute.
+During a Video.js player instantiation. Adding the languages to the configuration object provided in the data-setup attribute.
 
 ```html
 <video id="example_video_1" class="video-js vjs-default-skin"  
