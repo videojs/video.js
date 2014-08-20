@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Added function for adding new language translations, updated docs, and fixed the notSupportedMessage translation ([view](https://github.com/videojs/video.js/pull/1427))
 
 --------------------
 
