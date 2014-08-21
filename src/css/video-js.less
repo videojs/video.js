@@ -866,6 +866,7 @@ body.vjs-full-window {
 .video-js.vjs-fullscreen {
   position: fixed;
   overflow: hidden;
+  padding-top: 0;
   z-index: 1000;
   left: 0;
   top: 0;
@@ -889,11 +890,15 @@ body.vjs-full-window {
   background-repeat: no-repeat;
   background-position: 50% 50%;
   background-size: contain;
+  bottom: 0;
   cursor: pointer;
   height: 100%;
+  left: 0;
   margin: 0;
   padding: 0;
-  position: relative;
+  position: absolute;
+  right: 0;
+  top: 0;
   width: 100%;
 }
 .vjs-poster img {
@@ -966,6 +971,23 @@ body.vjs-full-window {
 .vjs-no-js a, .vjs-no-js a:visited {
   color: #F4A460;
 }
+
+//  Responsive (fluid) mode enables videos to resize based on container/viewport.
+//  Reset vjs container in case of * {box-sizing: border-box}.
+//  See: http://www.paulirish.com/2012/box-sizing-border-box-ftw/
+.vjs-fluid {
+  -moz-box-sizing: content-box;
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
+  height: 0;
+  max-width: 100%; //  possibly omit?
+}
+
+//  Intrinsic ratios. The wrapper gets its height from the padding. See:
+//  http://alistapart.com/article/creating-intrinsic-ratios-for-video/
+.vjs-16-9-aspect-ratio {padding-top: 56.25%}
+.vjs-4-3-aspect-ratio {padding-top: 75%}
+
 
 // MIXINS
 // =============================================================================

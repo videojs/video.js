@@ -87,6 +87,9 @@ vjs.options = {
   // defaultVolume: 0.85,
   'defaultVolume': 0.00, // The freakin seaguls are driving me crazy!
 
+  'fluid': false,
+  'aspectRatio': '16:9',
+
   // default playback rates
   'playbackRates': [],
   // Add playback rate selection by adding rates

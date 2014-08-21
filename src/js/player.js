@@ -249,10 +249,23 @@ vjs.Player.prototype.createEl = function(){
   // Default state of video is paused
   this.addClass('vjs-paused');
 
-  // Make box use width/height of tag, or rely on default implementation
-  // Enforce with CSS since width/height attrs don't work on divs
-  this.width(this.options_['width'], true); // (true) Skip resize listener on load
-  this.height(this.options_['height'], true);
+
+
+  if (this.options_['fluid']) {
+    this.addClass('vjs-fluid');
+    this.applyResponsivePadding(this.options_['aspectRatio']);
+
+  } else {
+    // The "not fluid" case. Declaring fluid:true currently voids any
+    // "specified" height/width attributes. Authors should be using CSS.
+
+    // TO DO: harmonize with width/height API with responsive user stories.
+
+    // If not fluid, then apply supplied values of height/width options
+    // to the container div as inline CSS.
+    this.width(this.options_['width'], true); // (true) Skip resize listener on load
+    this.height(this.options_['height'], true);
+  }
 
   // Wrap video tag in div (el/box) container
   if (tag.parentNode) {
@@ -268,6 +281,7 @@ vjs.Player.prototype.createEl = function(){
   // adding children
   this.el_ = el;
   this.on('loadstart', this.onLoadStart);
+  this.on('loadedmetadata', this.onLoadedMetaData);
   this.on('waiting', this.onWaiting);
   this.on(['canplay', 'canplaythrough', 'playing', 'ended'], this.onWaitEnd);
   this.on('seeking', this.onSeeking);
@@ -401,7 +415,15 @@ vjs.Player.prototype.hasStarted = function(hasStarted){
  * Fired when the player has initial duration and dimension information
  * @event loadedmetadata
  */
-vjs.Player.prototype.onLoadedMetaData;
+vjs.Player.prototype.onLoadedMetaData = function(){
+
+  var intrinsicHeight = this.tag.videoHeight;
+  var intrinsicWidth = this.tag.videoWidth;
+
+  if (this.options_['fluid'] && intrinsicHeight && intrinsicWidth) {
+    this.applyResponsivePadding( intrinsicHeight / intrinsicWidth);
+  }
+};
 
 /**
  * Fired when the player has downloaded data at the current playback position
@@ -1534,6 +1556,43 @@ vjs.Player.prototype.playbackRate = function(rate) {
     return 1.0;
   }
 
+};
+
+
+vjs.Player.prototype.applyResponsivePadding = function(aspectRatio) {
+
+  var aspectRegEx;
+
+  function isCloseEnough(num1, num2) {
+	if (Math.abs(num1 - num2) < 0.02) {return true;}
+    return false;
+  }
+
+  // If ratio is supplied as string (e.g. "16:9"), do the division.
+  if (typeof aspectRatio === 'string') {
+    aspectRegEx = /(\d+):(\d+)/.exec(this.options_['aspectRatio']);
+    if (aspectRegEx[1] && aspectRegEx[2]) {
+      aspectRatio = aspectRegEx[2] / aspectRegEx[1];
+    }
+  }
+
+  if (isCloseEnough( aspectRatio, 9 / 16 )) {
+    this.addClass('vjs-16-9-aspect-ratio');
+    this.removeClass('vjs-4-3-aspect-ratio');
+    this.el_.style.paddingTop = '';
+
+  } else if (isCloseEnough( aspectRatio, 3 / 4 )) {
+    this.addClass('vjs-4-3-aspect-ratio');
+    this.removeClass('vjs-16-9-aspect-ratio');
+    this.el_.style.paddingTop = '';
+
+  } else {
+    this.el_.style.paddingTop = aspectRatio * 100 + '%';
+    this.removeClass('vjs-4-3-aspect-ratio');
+    this.removeClass('vjs-16-9-aspect-ratio');
+  }
+
+  return this;
 };
 
 // Methods to add support for
