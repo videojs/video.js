@@ -519,6 +519,32 @@ test('should restore attributes from the original video tag when creating a new 
   equal(el.getAttribute('webkit-playsinline'), '', 'webkit-playsinline attribute was set properly');
 });
 
+test('should honor default inactivity timeout', function() {
+    var player, html5Mock;
+
+    // default timeout is 2000ms
+    player = PlayerTest.makePlayer({});
+    html5Mock = { player_: player };
+
+    vjs.Html5.prototype.createEl.call(html5Mock);
+
+    equal(player.userActive(), true, 'User is active on creation');
+
+    // make sure user is still considered active after 1800ms
+    stop();
+    setTimeout(function() {
+        equal(player.userActive(), true, 'User is still active');
+        start();
+    }, 1800);
+
+    // make sure user is now inactive after 2500ms
+    stop();
+    setTimeout(function() {
+        equal(player.userActive(), false, 'User is inactive after timeout expired');
+        start();
+    }, 2500);
+});
+
 test('should honor configured inactivity timeout', function() {
     var player, html5Mock;
 
@@ -545,4 +571,25 @@ test('should honor configured inactivity timeout', function() {
         equal(player.userActive(), false, 'User is inactive after timeout expired');
         start();
     }, 500);
+});
+
+test('should honor disabled inactivity timeout', function() {
+    var player, html5Mock;
+
+    // default timeout is 2000ms, disable by setting to zero
+    player = PlayerTest.makePlayer({
+        'inactivityTimeout': 0
+    });
+    html5Mock = { player_: player };
+
+    vjs.Html5.prototype.createEl.call(html5Mock);
+
+    equal(player.userActive(), true, 'User is active on creation');
+
+    // make sure user is still considered active after several seconds
+    stop();
+    setTimeout(function() {
+        equal(player.userActive(), true, 'User is still active');
+        start();
+    }, 4000);
 });
