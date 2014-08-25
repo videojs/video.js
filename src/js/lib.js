@@ -172,6 +172,17 @@ vjs.obj.isArray = Array.isArray || function(arr) {
 };
 
 /**
+ * Check to see whether the input is NaN or not.
+ * NaN is the only JavaScript construct that isn't equal to itself
+ * @param {Number} num Number to check
+ * @return {Boolean} True if NaN, false otherwise
+ * @private
+ */
+vjs.isNaN = function(num) {
+  return num !== num;
+};
+
+/**
  * Bind (a.k.a proxy or Context). A simple method for changing the context of a function
    It also stores a unique id on the function so it can be easily removed from events
  * @param  {*}   context The object to bind as scope
