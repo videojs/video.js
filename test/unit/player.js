@@ -518,3 +518,31 @@ test('should restore attributes from the original video tag when creating a new 
   equal(el.getAttribute('controls'), '', 'controls attribute was set properly');
   equal(el.getAttribute('webkit-playsinline'), '', 'webkit-playsinline attribute was set properly');
 });
+
+test('should honor configured inactivity timeout', function() {
+    var player, html5Mock;
+
+    // default timeout is 2000ms, set to shorter 200ms
+    player = PlayerTest.makePlayer({
+        'inactivityTimeout': 200
+    });
+    html5Mock = { player_: player };
+
+    vjs.Html5.prototype.createEl.call(html5Mock);
+
+    equal(player.userActive(), true, 'User is active on creation');
+
+    // make sure user is still considered active after 150ms
+    stop();
+    setTimeout(function() {
+        equal(player.userActive(), true, 'User is still active');
+        start();
+    }, 150);
+
+    // make sure user is now inactive after 500ms
+    stop();
+    setTimeout(function() {
+        equal(player.userActive(), false, 'User is inactive after timeout expired');
+        start();
+    }, 500);
+});
