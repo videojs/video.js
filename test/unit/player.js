@@ -521,6 +521,7 @@ test('should restore attributes from the original video tag when creating a new 
 
 test('should honor default inactivity timeout', function() {
     var player, html5Mock;
+    var clock = sinon.useFakeTimers();
 
     // default timeout is 2000ms
     player = PlayerTest.makePlayer({});
@@ -529,24 +530,17 @@ test('should honor default inactivity timeout', function() {
     vjs.Html5.prototype.createEl.call(html5Mock);
 
     equal(player.userActive(), true, 'User is active on creation');
+    clock.tick(1800);
+    equal(player.userActive(), true, 'User is still active');
+    clock.tick(500);
+    equal(player.userActive(), false, 'User is inactive after timeout expired');
 
-    // make sure user is still considered active after 1800ms
-    stop();
-    setTimeout(function() {
-        equal(player.userActive(), true, 'User is still active');
-        start();
-    }, 1800);
-
-    // make sure user is now inactive after 2500ms
-    stop();
-    setTimeout(function() {
-        equal(player.userActive(), false, 'User is inactive after timeout expired');
-        start();
-    }, 2500);
+    clock.restore();
 });
 
 test('should honor configured inactivity timeout', function() {
     var player, html5Mock;
+    var clock = sinon.useFakeTimers();
 
     // default timeout is 2000ms, set to shorter 200ms
     player = PlayerTest.makePlayer({
@@ -557,24 +551,18 @@ test('should honor configured inactivity timeout', function() {
     vjs.Html5.prototype.createEl.call(html5Mock);
 
     equal(player.userActive(), true, 'User is active on creation');
-
-    // make sure user is still considered active after 150ms
-    stop();
-    setTimeout(function() {
-        equal(player.userActive(), true, 'User is still active');
-        start();
-    }, 150);
-
+    clock.tick(150);
+    equal(player.userActive(), true, 'User is still active');
+    clock.tick(350);
     // make sure user is now inactive after 500ms
-    stop();
-    setTimeout(function() {
-        equal(player.userActive(), false, 'User is inactive after timeout expired');
-        start();
-    }, 500);
+    equal(player.userActive(), false, 'User is inactive after timeout expired');
+
+    clock.restore();
 });
 
 test('should honor disabled inactivity timeout', function() {
     var player, html5Mock;
+    var clock = sinon.useFakeTimers();
 
     // default timeout is 2000ms, disable by setting to zero
     player = PlayerTest.makePlayer({
@@ -585,11 +573,8 @@ test('should honor disabled inactivity timeout', function() {
     vjs.Html5.prototype.createEl.call(html5Mock);
 
     equal(player.userActive(), true, 'User is active on creation');
+    clock.tick(5000);
+    equal(player.userActive(), true, 'User is still active');
 
-    // make sure user is still considered active after several seconds
-    stop();
-    setTimeout(function() {
-        equal(player.userActive(), true, 'User is still active');
-        start();
-    }, 4000);
+    clock.restore();
 });
