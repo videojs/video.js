@@ -1,7 +1,6 @@
 .DS_Store
 dist/*
 build/files/*
-build/lang/*
 docs/api/*
 dev.html
 projects
