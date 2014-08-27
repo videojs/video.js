@@ -34,7 +34,7 @@ module.exports = function(grunt) {
     videojs_languages: {
       defaults: {
         files: {
-          'build/lang': ['lang/*.json']
+          'build/files/lang': ['lang/*.json']
         }
       }
     },
@@ -45,8 +45,8 @@ module.exports = function(grunt) {
       }
     },
     clean: {
-      build: ['build/files/*', 'build/lang/*'],
-      dist: ['dist/*', 'build/lang/*']
+      build: ['build/files/*'],
+      dist: ['dist/*']
     },
     jshint: {
       src: {
@@ -547,7 +547,7 @@ module.exports = function(grunt) {
     });
 
     // Copy over language files
-    grunt.file.recurse('build/lang', function(absdir, rootdir, subdir, filename) {
+    grunt.file.recurse('build/files/lang', function(absdir, rootdir, subdir, filename) {
       // Block .DS_Store files
       if ('filename'.substring(0,1) !== '.') {
         grunt.file.copy(absdir, 'dist/cdn/lang/' + filename);
@@ -578,9 +578,6 @@ module.exports = function(grunt) {
     // GA Tracking Pixel (manually building the pixel URL)
     cdnjs = uglify.minify('src/js/cdn.js').code.replace('v0.0.0', 'v'+version.full);
     grunt.file.write('dist/cdn/video.js', jsmin + cdnjs);
-
-    // Add Language Support
-
   });
 
   grunt.registerTask('cdn-links', 'Update the version of CDN links in docs', function(){
