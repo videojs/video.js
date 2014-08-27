@@ -115,3 +115,21 @@ test('should synthesize progress events by default', function() {
   clock.tick(500);
   equal(progresses, 1, 'triggered one event');
 });
+
+test('dispose() should stop time tracking', function() {
+  var tech = new videojs.MediaTechController({
+    id: noop,
+    on: noop,
+    trigger: noop
+  });
+  tech.dispose();
+
+  // progress and timeupdate events will throw exceptions after the
+  // tech is disposed
+  try {
+    clock.tick(10 * 1000);
+  } catch (e) {
+    return equal(e, undefined, 'threw an exception');
+  }
+  ok(true, 'no exception was thrown');
+});
