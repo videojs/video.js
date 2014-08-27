@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @andekande added a German translation ([view](https://github.com/videojs/video.js/pull/1426))
 
 --------------------
 
