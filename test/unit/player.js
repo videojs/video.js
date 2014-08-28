@@ -525,9 +525,6 @@ test('should honor default inactivity timeout', function() {
 
     // default timeout is 2000ms
     player = PlayerTest.makePlayer({});
-    html5Mock = { player_: player };
-
-    vjs.Html5.prototype.createEl.call(html5Mock);
 
     equal(player.userActive(), true, 'User is active on creation');
     clock.tick(1800);
@@ -546,9 +543,6 @@ test('should honor configured inactivity timeout', function() {
     player = PlayerTest.makePlayer({
         'inactivityTimeout': 200
     });
-    html5Mock = { player_: player };
-
-    vjs.Html5.prototype.createEl.call(html5Mock);
 
     equal(player.userActive(), true, 'User is active on creation');
     clock.tick(150);
@@ -568,9 +562,6 @@ test('should honor disabled inactivity timeout', function() {
     player = PlayerTest.makePlayer({
         'inactivityTimeout': 0
     });
-    html5Mock = { player_: player };
-
-    vjs.Html5.prototype.createEl.call(html5Mock);
 
     equal(player.userActive(), true, 'User is active on creation');
     clock.tick(5000);
