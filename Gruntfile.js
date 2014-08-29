@@ -41,7 +41,7 @@ module.exports = function(grunt) {
       }
     },
     clean: {
-      build: ['build/files/*'],
+      build: ['build/files/*', '.sass-cache'],
       dist: ['dist/*']
     },
     jshint: {
@@ -128,12 +128,29 @@ module.exports = function(grunt) {
         src: ['video-js.css'],
         dest: 'build/files/',
         ext: '.min.css'
+      },
+      minify: {
+        expand: true,
+        cwd: 'build/files/',
+        src: ['video-js-scss.css'],
+        dest: 'build/files/',
+        ext: '.min.css'
       }
     },
     less: {
       dev: {
         files: {
           'build/files/video-js.css': 'src/css/video-js.less'
+        }
+      }
+    },
+    sass: {
+      dist: {
+        options: {
+          style: 'compressed'
+        },
+        files: {
+          'build/files/video-js-scss.css': 'src/css/video-js.scss'
         }
       }
     },
@@ -320,6 +337,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-less');
+  grunt.loadNpmTasks('grunt-contrib-sass');
   grunt.loadNpmTasks('grunt-s3');
   grunt.loadNpmTasks('contribflow');
   grunt.loadNpmTasks('grunt-karma');
@@ -333,11 +351,11 @@ module.exports = function(grunt) {
   // grunt.loadTasks('./docs/tasks/');
   // grunt.loadTasks('../videojs-doc-generator/tasks/');
 
-  grunt.registerTask('pretask', ['jshint', 'less', 'lang', 'build', 'minify', 'usebanner']);
+  grunt.registerTask('pretask', ['jshint', 'less', 'sass', 'lang', 'build', 'minify', 'usebanner']);
   // Default task.
   grunt.registerTask('default', ['pretask', 'dist']);
   // Development watch task
-  grunt.registerTask('dev', ['jshint', 'less', 'lang', 'build', 'qunit:source']);
+  grunt.registerTask('dev', ['jshint', 'less', 'sass', 'lang', 'build', 'qunit:source']);
   grunt.registerTask('test-qunit', ['pretask', 'qunit']);
 
   // The test task will run `karma:saucelabs` when running in travis,
@@ -473,6 +491,11 @@ module.exports = function(grunt) {
     css = css.replace(/GENERATED_AT_BUILD/g, version.full);
     grunt.file.write('build/files/video-js.css', css);
 
+    // Inject version number into css file (version compiled with sass)
+    var css = grunt.file.read('build/files/video-js-scss.css');
+    css = css.replace(/GENERATED_AT_BUILD/g, version.full);
+    grunt.file.write('build/files/video-js-scss.css', css);
+
     // Copy over font files
     grunt.file.recurse('src/css/font', function(absdir, rootdir, subdir, filename) {
       // Block .DS_Store files
@@ -546,11 +569,14 @@ module.exports = function(grunt) {
     grunt.file.copy('build/files/minified.video.js', 'dist/video-js/video.js');
     grunt.file.copy('build/files/combined.video.js', 'dist/video-js/video.dev.js');
     grunt.file.copy('build/files/video-js.css', 'dist/video-js/video-js.css');
+    grunt.file.copy('build/files/video-js-scss.css', 'dist/video-js/video-js-scss.css');
     grunt.file.copy('build/files/video-js.min.css', 'dist/video-js/video-js.min.css');
+    grunt.file.copy('build/files/video-js-scss.min.css', 'dist/video-js/video-js-scss.min.css');
     grunt.file.copy('node_modules/videojs-swf/dist/video-js.swf', 'dist/video-js/video-js.swf');
     grunt.file.copy('build/demo-files/demo.html', 'dist/video-js/demo.html');
     grunt.file.copy('build/demo-files/demo.captions.vtt', 'dist/video-js/demo.captions.vtt');
     grunt.file.copy('src/css/video-js.less', 'dist/video-js/video-js.less');
+    grunt.file.copy('src/css/video-js.scss', 'dist/video-js/video-js.scss');
 
 
     // Copy over font files
@@ -570,6 +596,7 @@ module.exports = function(grunt) {
     // Minified version only, doesn't need demo files
     grunt.file.copy('build/files/minified.video.js', 'dist/cdn/video.js');
     grunt.file.copy('build/files/video-js.min.css', 'dist/cdn/video-js.css');
+    grunt.file.copy('build/files/video-js-scss.min.css', 'dist/cdn/video-js-scss.css');
     grunt.file.copy('node_modules/videojs-swf/dist/video-js.swf', 'dist/cdn/video-js.swf');
     grunt.file.copy('build/demo-files/demo.captions.vtt', 'dist/cdn/demo.captions.vtt');
     grunt.file.copy('build/demo-files/demo.html', 'dist/cdn/demo.html');
@@ -578,6 +605,10 @@ module.exports = function(grunt) {
     css = grunt.file.read('dist/cdn/video-js.css');
     css = css.replace(/font\//g, '../f/3/');
     grunt.file.write('dist/cdn/video-js.css', css);
+
+    css-sass = grunt.file.read('dist/cdn/video-js-scss.css');
+    css-sass = css-sass.replace(/font\//g, '../f/3/');
+    grunt.file.write('dist/cdn/video-js-scss.css', css-sass);
 
     // Add CDN-specfic JS
     jsmin = grunt.file.read('dist/cdn/video.js');
