@@ -294,13 +294,27 @@ vjs.isEmpty = function(obj) {
 };
 
 /**
+ * Check if an element has a CSS class
+ * @param {Element} element Element to check
+ * @param {String} classToCheck Classname to check
+ * @private
+ */
+vjs.hasClass = function(element, classToCheck){
+  if ((' ' + element.className + ' ').indexOf(' ' + classToCheck + ' ') == -1) {
+    return false;
+  }
+  return true;
+};
+
+
+/**
  * Add a CSS class name to an element
  * @param {Element} element    Element to add class name to
  * @param {String} classToAdd Classname to add
  * @private
  */
 vjs.addClass = function(element, classToAdd){
-  if ((' '+element.className+' ').indexOf(' '+classToAdd+' ') == -1) {
+  if (!vjs.hasClass(element, classToAdd)) {
     element.className = element.className === '' ? classToAdd : element.className + ' ' + classToAdd;
   }
 };
@@ -314,18 +328,19 @@ vjs.addClass = function(element, classToAdd){
 vjs.removeClass = function(element, classToRemove){
   var classNames, i;
 
-  if (element.className.indexOf(classToRemove) == -1) { return; }
+  if (vjs.hasClass(element, classToRemove)) {
 
-  classNames = element.className.split(' ');
+    classNames = element.className.split(' ');
 
-  // no arr.indexOf in ie8, and we don't want to add a big shim
-  for (i = classNames.length - 1; i >= 0; i--) {
-    if (classNames[i] === classToRemove) {
-      classNames.splice(i,1);
+    // no arr.indexOf in ie8, and we don't want to add a big shim
+    for (i = classNames.length - 1; i >= 0; i--) {
+      if (classNames[i] === classToRemove) {
+        classNames.splice(i,1);
+      }
     }
-  }
 
-  element.className = classNames.join(' ');
+    element.className = classNames.join(' ');
+  }
 };
 
 /**
