@@ -1,14 +1,14 @@
-var noop = function() {}, clock, features;
+var noop = function() {}, clock, progessEventsFeature;
 
 module('Media Tech', {
   'setup': function() {
     clock = sinon.useFakeTimers();
-    features = videojs.util.mergeOptions({}, videojs.MediaTechController.prototype.features);
-    videojs.MediaTechController.prototype.features['progressEvents'] = false;
+    progessEventsFeature = videojs.MediaTechController.prototype['progessEventsFeature'];
+    videojs.MediaTechController.prototype['progressEventsFeature'] = false;
   },
   'teardown': function() {
     clock.restore();
-    videojs.MediaTechController.prototype.features = features;
+    videojs.MediaTechController.prototype['progessEventsFeature'] = progessEventsFeature;
   }
 });
 
