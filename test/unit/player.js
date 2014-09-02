@@ -518,3 +518,54 @@ test('should restore attributes from the original video tag when creating a new 
   equal(el.getAttribute('controls'), '', 'controls attribute was set properly');
   equal(el.getAttribute('webkit-playsinline'), '', 'webkit-playsinline attribute was set properly');
 });
+
+test('should honor default inactivity timeout', function() {
+    var player, html5Mock;
+    var clock = sinon.useFakeTimers();
+
+    // default timeout is 2000ms
+    player = PlayerTest.makePlayer({});
+
+    equal(player.userActive(), true, 'User is active on creation');
+    clock.tick(1800);
+    equal(player.userActive(), true, 'User is still active');
+    clock.tick(500);
+    equal(player.userActive(), false, 'User is inactive after timeout expired');
+
+    clock.restore();
+});
+
+test('should honor configured inactivity timeout', function() {
+    var player, html5Mock;
+    var clock = sinon.useFakeTimers();
+
+    // default timeout is 2000ms, set to shorter 200ms
+    player = PlayerTest.makePlayer({
+        'inactivityTimeout': 200
+    });
+
+    equal(player.userActive(), true, 'User is active on creation');
+    clock.tick(150);
+    equal(player.userActive(), true, 'User is still active');
+    clock.tick(350);
+    // make sure user is now inactive after 500ms
+    equal(player.userActive(), false, 'User is inactive after timeout expired');
+
+    clock.restore();
+});
+
+test('should honor disabled inactivity timeout', function() {
+    var player, html5Mock;
+    var clock = sinon.useFakeTimers();
+
+    // default timeout is 2000ms, disable by setting to zero
+    player = PlayerTest.makePlayer({
+        'inactivityTimeout': 0
+    });
+
+    equal(player.userActive(), true, 'User is active on creation');
+    clock.tick(5000);
+    equal(player.userActive(), true, 'User is still active');
+
+    clock.restore();
+});
