@@ -72,7 +72,7 @@ vjs.PlaybackRateMenuButton.prototype.onClick = function(){
 
 vjs.PlaybackRateMenuButton.prototype.playbackRateSupported = function(){
   return this.player().tech
-    && this.player().tech['playbackRateFeature']
+    && this.player().tech['featuresPlaybackRate']
     && this.player().options()['playbackRates']
     && this.player().options()['playbackRates'].length > 0
   ;

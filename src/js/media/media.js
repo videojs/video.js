@@ -19,12 +19,12 @@ vjs.MediaTechController = vjs.Component.extend({
     vjs.Component.call(this, player, options, ready);
 
     // Manually track progress in cases where the browser/flash player doesn't report it.
-    if (!this['progressEventsFeature']) {
+    if (!this['featuresProgressEvents']) {
       this.manualProgressOn();
     }
 
     // Manually track timeudpates in cases where the browser/flash player doesn't report it.
-    if (!this['timeupdateEventsFeature']) {
+    if (!this['featuresTimeupdateEvents']) {
       this.manualTimeUpdatesOn();
     }
 
@@ -210,7 +210,7 @@ vjs.MediaTechController.prototype.manualTimeUpdatesOn = function(){
   // Watch for native timeupdate event
   this.one('timeupdate', function(){
     // Update known progress support for this playback technology
-    this['timeupdateEventsFeature'] = true;
+    this['featuresTimeupdateEvents'] = true;
     // Turn off manual progress tracking
     this.manualTimeUpdatesOff();
   });
@@ -261,15 +261,15 @@ vjs.MediaTechController.prototype.setCurrentTime = function() {
  */
 vjs.MediaTechController.prototype.setPoster = function(){};
 
-vjs.MediaTechController.prototype['volumeControlFeature'] = true;
+vjs.MediaTechController.prototype['featuresVolumeControl'] = true;
 
 // Resizing plugins using request fullscreen reloads the plugin
-vjs.MediaTechController.prototype['fullscreenResizeFeature'] = false;
-vjs.MediaTechController.prototype['playbackRateFeature'] = false;
+vjs.MediaTechController.prototype['featuresFullscreenResize'] = false;
+vjs.MediaTechController.prototype['featuresPlaybackRate'] = false;
 
 // Optional events that we can manually mimic with timers
 // currently not triggered by video-js-swf
-vjs.MediaTechController.prototype['progressEventsFeature'] = false;
-vjs.MediaTechController.prototype['timeupdateEventsFeature'] = false;
+vjs.MediaTechController.prototype['featuresProgressEvents'] = false;
+vjs.MediaTechController.prototype['featuresTimeupdateEvents'] = false;
 
 vjs.media = {};
