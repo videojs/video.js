@@ -300,7 +300,7 @@ vjs.isEmpty = function(obj) {
  * @private
  */
 vjs.hasClass = function(element, classToCheck){
-  return (' ' + element.className + ' ').indexOf(' ' + classToCheck + ' ') === -1);
+  return ((' ' + element.className + ' ').indexOf(' ' + classToCheck + ' ') === -1);
 };
 
 
