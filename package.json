@@ -38,6 +38,7 @@
     "grunt-contrib-jshint": "~0.4.3",
     "grunt-contrib-less": "~0.6.4",
     "grunt-contrib-qunit": "~0.2.1",
+    "grunt-contrib-sass": "~0.8.1",
     "grunt-contrib-watch": "~0.1.4",
     "grunt-karma": "^0.8.3",
     "grunt-s3": "~0.2.0-alpha",
