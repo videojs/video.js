@@ -5,6 +5,7 @@ CHANGELOG
 * @andekande added a German translation ([view](https://github.com/videojs/video.js/pull/1426))
 * @mattosborn fixed a bug where getting the video element src would overwrite it ([view](https://github.com/videojs/video.js/pull/1430))
 * @songpete fixed a bug where keyboard events were bubbling and causing additional actions ([view](https://github.com/videojs/video.js/pull/1455))
+* @knabar made the inactivity timeout configurable ([view](https://github.com/videojs/video.js/pull/1409))
 
 --------------------
 
