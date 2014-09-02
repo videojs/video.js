@@ -520,7 +520,7 @@ test('should restore attributes from the original video tag when creating a new 
 });
 
 test('should honor default inactivity timeout', function() {
-    var player, html5Mock;
+    var player;
     var clock = sinon.useFakeTimers();
 
     // default timeout is 2000ms
@@ -536,12 +536,12 @@ test('should honor default inactivity timeout', function() {
 });
 
 test('should honor configured inactivity timeout', function() {
-    var player, html5Mock;
+    var player;
     var clock = sinon.useFakeTimers();
 
     // default timeout is 2000ms, set to shorter 200ms
     player = PlayerTest.makePlayer({
-        'inactivityTimeout': 200
+      'inactivityTimeout': 200
     });
 
     equal(player.userActive(), true, 'User is active on creation');
@@ -555,12 +555,12 @@ test('should honor configured inactivity timeout', function() {
 });
 
 test('should honor disabled inactivity timeout', function() {
-    var player, html5Mock;
+    var player;
     var clock = sinon.useFakeTimers();
 
     // default timeout is 2000ms, disable by setting to zero
     player = PlayerTest.makePlayer({
-        'inactivityTimeout': 0
+      'inactivityTimeout': 0
     });
 
     equal(player.userActive(), true, 'User is active on creation');
