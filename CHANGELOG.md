@@ -7,6 +7,7 @@ CHANGELOG
 * @songpete fixed a bug where keyboard events were bubbling and causing additional actions ([view](https://github.com/videojs/video.js/pull/1455))
 * @knabar made the inactivity timeout configurable ([view](https://github.com/videojs/video.js/pull/1409))
 * @seniorflexdeveloper added language files to the distribution for including specific languages ([view](https://github.com/videojs/video.js/pull/1453))
+* @gkatsev improved handling of null and NaN dimension values ([view](https://github.com/videojs/video.js/pull/1449))
 
 --------------------
 
