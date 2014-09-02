@@ -805,7 +805,10 @@ vjs.Component.prototype.dimensions = function(width, height){
  * @private
  */
 vjs.Component.prototype.dimension = function(widthOrHeight, num, skipListeners){
-  if (num !== undefined && num !== null && !vjs.isNaN(num)) {
+  if (num !== undefined) {
+    if (num === null || vjs.isNaN(num)) {
+      num = 0;
+    }
 
     // Check if using css width/height (% or px) and adjust
     if ((''+num).indexOf('%') !== -1 || (''+num).indexOf('px') !== -1) {
