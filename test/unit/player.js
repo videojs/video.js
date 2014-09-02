@@ -1,4 +1,13 @@
-module('Player');
+var playerClock;
+
+module('Player', {
+  'setup': function() {
+    playerClock = sinon.useFakeTimers();
+  },
+  'teardown': function() {
+    playerClock.restore();
+  }
+});
 
 // Compiler doesn't like using 'this' in setup/teardown.
 // module("Player", {
@@ -111,6 +120,29 @@ test('should get tag, source, and track settings', function(){
   ok(tag['player'] !== player, 'tag player ref killed');
   ok(!vjs.players['example_1'], 'global player ref killed');
   ok(player.el() === null, 'player el killed');
+});
+
+test('should asynchronously fire error events during source selection', function() {
+  expect(2);
+
+  sinon.stub(vjs.log, 'error');
+
+  var player = PlayerTest.makePlayer({
+    'techOrder': ['foo'],
+    'sources': [
+      { 'src': 'http://vjs.zencdn.net/v/oceans.mp4', 'type': 'video/mp4' }
+    ]
+  });
+  ok(player.options_['techOrder'][0] === 'foo', 'Foo listed as the only tech');
+
+  player.on('error', function(e) {
+    ok(player.error().code === 4, 'Source could not be played error thrown');
+  });
+
+  playerClock.tick(1);
+
+  player.dispose();
+  vjs.log.error.restore();
 });
 
 test('should set the width and height of the player', function(){
