@@ -31,13 +31,6 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     pkg: pkg,
-    vjslanguages: {
-      defaults: {
-        files: {
-          'build/files/lang': ['lang/*.json']
-        }
-      }
-    },
     build: {
       src: 'src/js/dependencies.js',
       options: {
@@ -259,6 +252,13 @@ module.exports = function(grunt) {
         dest: 'docs/api',
         options: {
           baseURL: 'https://github.com/videojs/video.js/blob/master/'
+        }
+      }
+    },
+    vjslanguages: {
+      defaults: {
+        files: {
+          'build/files/lang': ['lang/*.json']
         }
       }
     },
