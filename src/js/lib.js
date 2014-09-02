@@ -300,10 +300,7 @@ vjs.isEmpty = function(obj) {
  * @private
  */
 vjs.hasClass = function(element, classToCheck){
-  if ((' ' + element.className + ' ').indexOf(' ' + classToCheck + ' ') == -1) {
-    return false;
-  }
-  return true;
+  return (' ' + element.className + ' ').indexOf(' ' + classToCheck + ' ') === -1);
 };
 
 
@@ -328,19 +325,18 @@ vjs.addClass = function(element, classToAdd){
 vjs.removeClass = function(element, classToRemove){
   var classNames, i;
 
-  if (vjs.hasClass(element, classToRemove)) {
+  if (!vjs.hasClass(element, classToRemove)) {return;}
 
-    classNames = element.className.split(' ');
+  classNames = element.className.split(' ');
 
-    // no arr.indexOf in ie8, and we don't want to add a big shim
-    for (i = classNames.length - 1; i >= 0; i--) {
-      if (classNames[i] === classToRemove) {
-        classNames.splice(i,1);
-      }
+  // no arr.indexOf in ie8, and we don't want to add a big shim
+  for (i = classNames.length - 1; i >= 0; i--) {
+    if (classNames[i] === classToRemove) {
+      classNames.splice(i,1);
     }
-
-    element.className = classNames.join(' ');
   }
+
+  element.className = classNames.join(' ');
 };
 
 /**
