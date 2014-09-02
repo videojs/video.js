@@ -19,12 +19,12 @@ vjs.MediaTechController = vjs.Component.extend({
     vjs.Component.call(this, player, options, ready);
 
     // Manually track progress in cases where the browser/flash player doesn't report it.
-    if (!this.features['progressEvents']) {
+    if (!this['progressEventsFeature']) {
       this.manualProgressOn();
     }
 
     // Manually track timeudpates in cases where the browser/flash player doesn't report it.
-    if (!this.features['timeupdateEvents']) {
+    if (!this['timeupdateEventsFeature']) {
       this.manualTimeUpdatesOn();
     }
 
@@ -210,7 +210,7 @@ vjs.MediaTechController.prototype.manualTimeUpdatesOn = function(){
   // Watch for native timeupdate event
   this.one('timeupdate', function(){
     // Update known progress support for this playback technology
-    this.features['timeupdateEvents'] = true;
+    this['timeupdateEventsFeature'] = true;
     // Turn off manual progress tracking
     this.manualTimeUpdatesOff();
   });
