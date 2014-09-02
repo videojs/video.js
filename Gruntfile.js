@@ -31,8 +31,12 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     pkg: pkg,
-    lang: {
-      src: 'lang/*.json'
+    vjslanguages: {
+      defaults: {
+        files: {
+          'build/files/lang': ['lang/*.json']
+        }
+      }
     },
     build: {
       src: 'src/js/dependencies.js',
@@ -312,6 +316,7 @@ module.exports = function(grunt) {
     }
   });
 
+  grunt.loadNpmTasks('grunt-videojs-languages');
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-qunit');
@@ -333,11 +338,11 @@ module.exports = function(grunt) {
   // grunt.loadTasks('./docs/tasks/');
   // grunt.loadTasks('../videojs-doc-generator/tasks/');
 
-  grunt.registerTask('pretask', ['jshint', 'less', 'lang', 'build', 'minify', 'usebanner']);
+  grunt.registerTask('pretask', ['jshint', 'less', 'vjslanguages', 'build', 'minify', 'usebanner']);
   // Default task.
   grunt.registerTask('default', ['pretask', 'dist']);
   // Development watch task
-  grunt.registerTask('dev', ['jshint', 'less', 'lang', 'build', 'qunit:source']);
+  grunt.registerTask('dev', ['jshint', 'less', 'vjslanguages', 'build', 'qunit:source']);
   grunt.registerTask('test-qunit', ['pretask', 'qunit']);
 
   // The test task will run `karma:saucelabs` when running in travis,
@@ -424,24 +429,7 @@ module.exports = function(grunt) {
     }
   });
 
-  var fs = require('fs'),
-      gzip = require('zlib').gzip;
-
-  grunt.registerMultiTask('lang', 'Building Language Support', function() {
-    var combined = '';
-
-    grunt.log.writeln('Building Language Support');
-
-    // Create a combined languages file
-    this.files.forEach(function(file) {
-      file.src.forEach(function(src){
-        var code = src.replace('lang/', '').replace('.json', '');
-        combined += 'videojs.options[\'languages\'][\''+code+'\'] = '+ grunt.file.read(src).trim() + ';\n';
-      });
-    });
-
-    grunt.file.write('build/files/combined.languages.js', combined);
-  });
+  var fs = require('fs');
 
   grunt.registerMultiTask('build', 'Building Source', function(){
 
@@ -458,9 +446,6 @@ module.exports = function(grunt) {
     });
     // Replace CDN version ref in js. Use major/minor version.
     combined = combined.replace(/GENERATED_CDN_VSN/g, version.majorMinor);
-
-    // Add Combined Langauges
-    // combined += grunt.file.read('build/files/combined.languages.js');
 
     grunt.file.write('build/files/combined.video.js', combined);
 
@@ -558,6 +543,15 @@ module.exports = function(grunt) {
       // Block .DS_Store files
       if ('filename'.substring(0,1) !== '.') {
         grunt.file.copy(absdir, 'dist/video-js/font/' + filename);
+      }
+    });
+
+    // Copy over language files
+    grunt.file.recurse('build/files/lang', function(absdir, rootdir, subdir, filename) {
+      // Block .DS_Store files
+      if ('filename'.substring(0,1) !== '.') {
+        grunt.file.copy(absdir, 'dist/cdn/lang/' + filename);
+        grunt.file.copy(absdir, 'dist/video-js/lang/' + filename);
       }
     });
 
