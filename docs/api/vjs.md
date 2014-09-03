@@ -100,7 +100,7 @@ _defined in_: [src/js/core.js#L76](https://github.com/videojs/video.js/blob/mast
 ### players
 > Global player list
 
-_defined in_: [src/js/core.js#L144](https://github.com/videojs/video.js/blob/master/src/js/core.js#L144)
+_defined in_: [src/js/core.js#L147](https://github.com/videojs/video.js/blob/master/src/js/core.js#L147)
 
 ---
 
@@ -119,7 +119,7 @@ _defined in_: [src/js/core.js#L144](https://github.com/videojs/video.js/blob/mas
 ##### RETURNS: 
 * `Object` The resulting global languages dictionary object
 
-_defined in_: [src/js/core.js#L131](https://github.com/videojs/video.js/blob/master/src/js/core.js#L131)
+_defined in_: [src/js/core.js#L134](https://github.com/videojs/video.js/blob/master/src/js/core.js#L134)
 
 ---
 
@@ -132,7 +132,7 @@ _defined in_: [src/js/core.js#L131](https://github.com/videojs/video.js/blob/mas
 ##### RETURNS: 
 * `Object` An object of url details
 
-_defined in_: [src/js/lib.js#L723](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L723)
+_defined in_: [src/js/lib.js#L734](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L734)
 
 ---
 

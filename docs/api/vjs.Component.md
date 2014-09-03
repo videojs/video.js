@@ -220,7 +220,7 @@ _defined in_: [src/js/component.js#L214](https://github.com/videojs/video.js/blo
 > whenever touch events happen, and this can be turned off by components that
 > want touch events to act differently.
 
-_defined in_: [src/js/component.js#L963](https://github.com/videojs/video.js/blob/master/src/js/component.js#L963)
+_defined in_: [src/js/component.js#L966](https://github.com/videojs/video.js/blob/master/src/js/component.js#L966)
 
 ---
 
@@ -565,7 +565,7 @@ _defined in_: [src/js/component.js#L756](https://github.com/videojs/video.js/blo
 ### resize `EVENT`
 > Fired when the width and/or height of the component changes
 
-_defined in_: [src/js/component.js#L863](https://github.com/videojs/video.js/blob/master/src/js/component.js#L863)
+_defined in_: [src/js/component.js#L866](https://github.com/videojs/video.js/blob/master/src/js/component.js#L866)
 
 ---
 
