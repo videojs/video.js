@@ -42,7 +42,7 @@ vjs.Slider.prototype.dispose = function() {
 
   vjs.off(document, 'keyup', vjs.bind(this, this.onKeyPress));
 
-  vjs.Component.prototype.dispose(this);
+  vjs.Component.prototype.dispose.call(this);
 };
 
 vjs.Slider.prototype.createEl = function(type, props) {
