@@ -151,16 +151,8 @@
     "steps": [
       [ "git diff --exit-code",             "Ensure there's no unadded changes" ],
       [ "git diff --cached --exit-code",    "Ensure there's no added changes" ],
-      { "confirm": "Have the changes been merged into the release branch (stable)?" },
-      {
-        "id": "type",
-        "desc": "Provide the release type",
-        "prompt": {
-          "message": "release type",
-          "default": "patch",
-          "type": "text"
-        }
-      },
+      { "prompt": "confirm", "desc": "Have the changes been merged into the release branch (stable)?" },
+      { "prompt": "text",    "desc": "Provide the release type (major, minor, patch)", "id": "type" },
       [ "git checkout stable",                     "Checkout the release branch" ],
       [ "git pull upstream stable",                "Update the release branch" ],
       [ "grunt test",                              "Run tests" ],
