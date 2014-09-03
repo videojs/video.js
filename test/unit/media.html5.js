@@ -56,6 +56,12 @@ test('should re-link the player if the tech is moved', function(){
 test('test playbackRate', function() {
   var playbackRate;
 
+  // Android 2.3 always returns 0 for playback rate
+  if (!vjs.Html5.canControlPlaybackRate()) {
+    ok('Playback rate is not supported');
+    return;
+  }
+
   tech.createEl();
 
   tech.el().playbackRate = 1.25;
