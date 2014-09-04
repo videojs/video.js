@@ -601,3 +601,20 @@ test('should honor disabled inactivity timeout', function() {
 
     clock.restore();
 });
+
+test('should clear pending errors on disposal', function() {
+  var clock = sinon.useFakeTimers(), player;
+
+  player = PlayerTest.makePlayer();
+  player.src({
+    src: 'http://example.com/movie.unsupported-format',
+    type: 'video/unsupported-format'
+  });
+  player.dispose();
+  try {
+    clock.tick(5000);
+  } catch (e) {
+    return ok(!e, 'threw an error: ' + e.message);
+  }
+  ok(true, 'did not throw an error after disposal');
+});
