@@ -208,3 +208,16 @@ test('fullscreenToggle does not depend on minified player methods', function(){
 
   ok(exitFullscreen, 'exitFullscreen called');
 });
+
+test('component can be subclassed externally', function(){
+  var player = new (videojs.Component.extend({
+    languages: function(){},
+    reportUserActivity: function(){},
+    language: function(){},
+    textTracks: function(){ return []; }
+  }))({
+    id: function(){},
+    reportUserActivity: function(){}
+  });
+  ok(new videojs.ControlBar(player), 'created a control bar without throwing');
+});
