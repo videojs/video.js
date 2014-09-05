@@ -48,6 +48,11 @@ test('should be able to access expected player API methods', function() {
   ok(player.usingNativeControls, 'usingNativeControls exists');
   ok(player.isFullscreen, 'isFullscreen exists');
 
+  // Deprecated methods that should still exist
+  ok(player.requestFullScreen, 'requestFullScreen exists');
+  ok(player.isFullScreen, 'isFullScreen exists');
+  ok(player.cancelFullScreen, 'cancelFullScreen exists');
+
   player.dispose();
 });
 
