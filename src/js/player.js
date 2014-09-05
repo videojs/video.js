@@ -1155,7 +1155,8 @@ vjs.Player.prototype.src = function(source){
  * @private
  */
 vjs.Player.prototype.sourceList_ = function(sources){
-  var sourceTech = this.selectSource(sources), errorTimeout;
+  var sourceTech = this.selectSource(sources),
+      errorTimeout;
 
   if (sourceTech) {
     if (sourceTech.tech === this.techName) {
