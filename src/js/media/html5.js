@@ -123,9 +123,11 @@ vjs.Html5.prototype.setupTriggers = function(){
 };
 
 vjs.Html5.prototype.eventHandler = function(evt){
-  // In the case of an error, set the error prop on the player
-  // and let the player handle triggering the event.
-  if (evt.type == 'error') {
+  // In the case of an error on the video element, set the error prop
+  // on the player and let the player handle triggering the event. On
+  // some platforms, error events fire that do not cause the error
+  // property on the video element to be set. See #1465 for an example.
+  if (evt.type == 'error' && this.error()) {
     this.player().error(this.error().code);
 
   // in some cases we pass the event directly to the player

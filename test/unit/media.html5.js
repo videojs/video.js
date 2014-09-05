@@ -124,3 +124,9 @@ test('should return a maybe for mp4 on OLD ANDROID', function() {
   vjs.IS_OLD_ANDROID = isOldAndroid;
   vjs.Html5.unpatchCanPlayType();
 });
+
+test('error events may not set the errors property', function() {
+  equal(tech.error(), undefined, 'no tech-level error');
+  tech.trigger('error');
+  ok(true, 'no error was thrown');
+});

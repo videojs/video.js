@@ -252,7 +252,7 @@ _inherited from_: [src/js/component.js#L233](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Boolean` Controls are showing
 
-_defined in_: [src/js/player.js#L1277](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1277)
+_defined in_: [src/js/player.js#L1282](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1282)
 
 ---
 
@@ -298,7 +298,7 @@ _defined in_: [src/js/player.js#L669](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `String` The source MIME type
 
-_defined in_: [src/js/player.js#L1198](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1198)
+_defined in_: [src/js/player.js#L1203](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1203)
 
 ---
 
@@ -396,7 +396,7 @@ _inherited from_: [src/js/component.js#L966](https://github.com/videojs/video.js
 * `vjs.MediaError|null` when getting
 * `vjs.Player` when setting
 
-_defined in_: [src/js/player.js#L1362](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1362)
+_defined in_: [src/js/player.js#L1367](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1367)
 
 ---
 
@@ -784,7 +784,7 @@ _inherited from_: [src/js/component.js#L120](https://github.com/videojs/video.js
 * `String` poster URL when getting
 * `vjs.Player` self when setting
 
-_defined in_: [src/js/player.js#L1250](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1250)
+_defined in_: [src/js/player.js#L1255](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1255)
 
 ---
 

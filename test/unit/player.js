@@ -284,14 +284,14 @@ test('should set controls and trigger events', function() {
 //   var player = PlayerTest.makePlayer();
 //   player.on('fullscreenchange', function(){
 //     ok(true, 'fullscreenchange event fired');
-//     ok(this.isFullScreen() === true, 'isFullScreen is true');
+//     ok(this.isFullscreen() === true, 'isFullscreen is true');
 //     ok(this.el().className.indexOf('vjs-fullscreen') !== -1, 'vjs-fullscreen class added');
 
 //     player.dispose();
 //     start();
 //   });
 
-//   player.requestFullScreen();
+//   player.requestFullscreen();
 // });
 
 test('should toggle user the user state between active and inactive', function(){
@@ -600,4 +600,21 @@ test('should honor disabled inactivity timeout', function() {
     equal(player.userActive(), true, 'User is still active');
 
     clock.restore();
+});
+
+test('should clear pending errors on disposal', function() {
+  var clock = sinon.useFakeTimers(), player;
+
+  player = PlayerTest.makePlayer();
+  player.src({
+    src: 'http://example.com/movie.unsupported-format',
+    type: 'video/unsupported-format'
+  });
+  player.dispose();
+  try {
+    clock.tick(5000);
+  } catch (e) {
+    return ok(!e, 'threw an error: ' + e.message);
+  }
+  ok(true, 'did not throw an error after disposal');
 });
