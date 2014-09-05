@@ -7,6 +7,7 @@ CHANGELOG
 * @dmlap fixed an issue with languages and subclassing the player ([view](https://github.com/videojs/video.js/pull/1483))
 * @mmcc fixed a few CSS issues with the poster and the error 'X' ([view](https://github.com/videojs/video.js/pull/1487))
 * @MrVaykadji and @Calinou added a french translation ([view](https://github.com/videojs/video.js/pull/1467))
+* @heff fixed an internal deprecation warning and missing deprecated functions ([view](https://github.com/videojs/video.js/pull/1488))
 
 --------------------
 
