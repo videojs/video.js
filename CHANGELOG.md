@@ -3,6 +3,7 @@ CHANGELOG
 
 ## HEAD (Unreleased)
 * @dmlap fixed an issue where an error could be fired after player disposal ([view](https://github.com/videojs/video.js/pull/1481))
+* @dmlap fixed poster error handling ([view](https://github.com/videojs/video.js/pull/1482))
 
 --------------------
 
