@@ -614,6 +614,7 @@ easily in the skin designer. http://designer.videojs.com/
   vertical-align: middle;
 
   position: absolute;
+  left: 0;
   top: 50%;
   margin-top: -0.5em;
   width: 100%;
@@ -621,12 +622,15 @@ easily in the skin designer. http://designer.videojs.com/
 
 .vjs-error-display div {
   position: absolute;
+  bottom: 1em;
+  right: 0;
+  left: 0;
 
   font-size: 1.4em;
   text-align: center;
-  bottom: 1em;
-  right: 1em;
-  left: 1em;
+  padding: 3px;
+  background: rgb(0, 0, 0); // fallback to just black
+  background: rgba(0,0,0,0.5); // Normally show black at 50% opacity
 }
 
 .vjs-error-display a, .vjs-error-display a:visited {
@@ -890,11 +894,13 @@ body.vjs-full-window {
   background-position: 50% 50%;
   background-size: contain;
   cursor: pointer;
-  height: 100%;
   margin: 0;
   padding: 0;
-  position: relative;
-  width: 100%;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
 }
 .vjs-poster img {
   display: block;

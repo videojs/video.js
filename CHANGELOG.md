@@ -2,14 +2,17 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 4.8.1 (2014-09-05)
 * @dmlap fixed an issue where an error could be fired after player disposal ([view](https://github.com/videojs/video.js/pull/1481))
 * @dmlap fixed poster error handling ([view](https://github.com/videojs/video.js/pull/1482))
 * @dmlap fixed an issue with languages and subclassing the player ([view](https://github.com/videojs/video.js/pull/1483))
 * @mmcc fixed a few CSS issues with the poster and the error 'X' ([view](https://github.com/videojs/video.js/pull/1487))
 * @MrVaykadji and @Calinou added a french translation ([view](https://github.com/videojs/video.js/pull/1467))
 * @heff fixed an internal deprecation warning and missing deprecated functions ([view](https://github.com/videojs/video.js/pull/1488))
-
---------------------
 
 ## 4.8.0 (2014-09-03)
 * @andekande added a German translation ([view](https://github.com/videojs/video.js/pull/1426))

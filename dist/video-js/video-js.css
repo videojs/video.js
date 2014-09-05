@@ -1,6 +1,6 @@
 /*!
 Video.js Default Styles (http://videojs.com)
-Version 4.8.0
+Version 4.8.1
 Create your own skin at http://designer.videojs.com
 */
 /* SKIN
@@ -536,17 +536,21 @@ easily in the skin designer. http://designer.videojs.com/
   text-align: center /* Needed for IE8 */;
   vertical-align: middle;
   position: absolute;
+  left: 0;
   top: 50%;
   margin-top: -0.5em;
   width: 100%;
 }
 .vjs-error-display div {
   position: absolute;
+  bottom: 1em;
+  right: 0;
+  left: 0;
   font-size: 1.4em;
   text-align: center;
-  bottom: 1em;
-  right: 1em;
-  left: 1em;
+  padding: 3px;
+  background: #000000;
+  background: rgba(0, 0, 0, 0.5);
 }
 .vjs-error-display a,
 .vjs-error-display a:visited {
@@ -836,11 +840,13 @@ body.vjs-full-window {
   background-position: 50% 50%;
   background-size: contain;
   cursor: pointer;
-  height: 100%;
   margin: 0;
   padding: 0;
-  position: relative;
-  width: 100%;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
 }
 .vjs-poster img {
   display: block;
