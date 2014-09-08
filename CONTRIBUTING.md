@@ -4,7 +4,7 @@ So you want to help out? Great! There's a number of ways you can get involved.
 
   * [File and discuss issues](#filing-issues)
   * [Contribute code](#contributing-code)
-  * [Build and share plugins](docs/plugins.md)
+  * [Build and share plugins](docs/guides/plugins.md)
   * [Answer questions on Stack Overflow](http://stackoverflow.com/questions/tagged/video.js)
 
 There's also other Video.js projects where you can help. (check the [video.js org](https://github.com/videojs) for an up-to-date list of projects)
