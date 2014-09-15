@@ -209,6 +209,21 @@ vjs.Html5.prototype.supportsFullScreen = function(){
 
 vjs.Html5.prototype.enterFullScreen = function(){
   var video = this.el_;
+
+  if (vjs.IS_IOS) {
+    vjs.on(video, 'webkitbeginfullscreen', vjs.bind(this, function(e) {
+      this.player_.isFullscreen(video['webkitDisplayingFullscreen']);
+      if (this.player_.isFullscreen()) {
+        vjs.on(video, 'webkitendfullscreen', vjs.bind(this, function(e) {
+          this.player_.isFullscreen(video['webkitDisplayingFullscreen']);
+          this.player_.trigger('fullscreenchange');
+        }));
+
+        this.player_.trigger('fullscreenchange');
+      }
+    }));
+  }
+
   if (video.paused && video.networkState <= video.HAVE_METADATA) {
     // attempt to prime the video element for programmatic access
     // this isn't necessary on the desktop but shouldn't hurt
