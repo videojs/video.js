@@ -216,10 +216,7 @@ vjs.Html5.prototype.enterFullScreen = function(){
       if (this.player_.isFullscreen()) {
         vjs.on(video, 'webkitendfullscreen', vjs.bind(this, function(e) {
           this.player_.isFullscreen(video['webkitDisplayingFullscreen']);
-          this.player_.trigger('fullscreenchange');
         }));
-
-        this.player_.trigger('fullscreenchange');
       }
     }));
   }
