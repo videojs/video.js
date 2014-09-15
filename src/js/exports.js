@@ -79,7 +79,8 @@ goog.exportProperty(vjs.Player.prototype, 'supportsFullScreen', vjs.Player.proto
 goog.exportProperty(vjs.Player.prototype, 'currentType', vjs.Player.prototype.currentType);
 goog.exportProperty(vjs.Player.prototype, 'requestFullScreen', vjs.Player.prototype.currentType);
 goog.exportProperty(vjs.Player.prototype, 'cancelFullScreen', vjs.Player.prototype.currentType);
-goog.exportProperty(vjs.Player.prototype, 'isFullScreen', vjs.Player.prototype.currentType);
+goog.exportProperty(vjs.Player.prototype, 'isFullScreen', vjs.Player.prototype.isFullScreen);
+goog.exportProperty(vjs.Player.prototype, 'isFullscreen', vjs.Player.prototype.isFullscreen);
 
 goog.exportSymbol('videojs.MediaLoader', vjs.MediaLoader);
 goog.exportSymbol('videojs.TextTrackDisplay', vjs.TextTrackDisplay);
