@@ -211,10 +211,10 @@ vjs.Html5.prototype.enterFullScreen = function(){
   var video = this.el_;
 
   if (vjs.IS_IOS) {
-    vjs.on(video, 'webkitbeginfullscreen', vjs.bind(this, function(e) {
+    vjs.one(video, 'webkitbeginfullscreen', vjs.bind(this, function(e) {
       this.player_.isFullscreen(video['webkitDisplayingFullscreen']);
       if (this.player_.isFullscreen()) {
-        vjs.on(video, 'webkitendfullscreen', vjs.bind(this, function(e) {
+        vjs.one(video, 'webkitendfullscreen', vjs.bind(this, function(e) {
           this.player_.isFullscreen(video['webkitDisplayingFullscreen']);
         }));
       }
