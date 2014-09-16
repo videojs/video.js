@@ -625,7 +625,7 @@ test('pause is called when player ended event is fired and player is not paused'
       pauses = 0;
   player.paused = function() {
     return false;
-  }
+  };
   player.pause = function() {
     pauses++;
   };
@@ -639,7 +639,7 @@ test('pause is not called if the player is paused and ended is fired', function(
       pauses = 0;
   player.paused = function() {
     return true;
-  }
+  };
   player.pause = function() {
     pauses++;
   };
