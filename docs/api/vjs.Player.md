@@ -171,7 +171,7 @@ _inherited from_: [src/js/component.js#L672](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Object` A mock TimeRange object (following HTML spec)
 
-_defined in_: [src/js/player.js#L742](https://github.com/videojs/video.js/blob/master/src/js/player.js#L742)
+_defined in_: [src/js/player.js#L744](https://github.com/videojs/video.js/blob/master/src/js/player.js#L744)
 
 ---
 
@@ -183,7 +183,7 @@ _defined in_: [src/js/player.js#L742](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `Number` The end of the last buffered time range
 
-_defined in_: [src/js/player.js#L793](https://github.com/videojs/video.js/blob/master/src/js/player.js#L793)
+_defined in_: [src/js/player.js#L795](https://github.com/videojs/video.js/blob/master/src/js/player.js#L795)
 
 ---
 
@@ -198,7 +198,7 @@ _defined in_: [src/js/player.js#L793](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `Number` A decimal between 0 and 1 representing the percent
 
-_defined in_: [src/js/player.js#L762](https://github.com/videojs/video.js/blob/master/src/js/player.js#L762)
+_defined in_: [src/js/player.js#L764](https://github.com/videojs/video.js/blob/master/src/js/player.js#L764)
 
 ---
 
@@ -216,7 +216,7 @@ _inherited from_: [src/js/component.js#L515](https://github.com/videojs/video.js
 > Old naming for exitFullscreen
 **Deprecated** true
 
-_defined in_: [src/js/player.js#L998](https://github.com/videojs/video.js/blob/master/src/js/player.js#L998)
+_defined in_: [src/js/player.js#L1000](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1000)
 
 ---
 
@@ -252,7 +252,7 @@ _inherited from_: [src/js/component.js#L233](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Boolean` Controls are showing
 
-_defined in_: [src/js/player.js#L1282](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1282)
+_defined in_: [src/js/player.js#L1284](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1284)
 
 ---
 
@@ -286,7 +286,7 @@ _inherited from_: [src/js/component.js#L194](https://github.com/videojs/video.js
 * `Number` The time in seconds, when not setting
 * `vjs.Player` self, when the current time is set
 
-_defined in_: [src/js/player.js#L669](https://github.com/videojs/video.js/blob/master/src/js/player.js#L669)
+_defined in_: [src/js/player.js#L671](https://github.com/videojs/video.js/blob/master/src/js/player.js#L671)
 
 ---
 
@@ -298,7 +298,7 @@ _defined in_: [src/js/player.js#L669](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `String` The source MIME type
 
-_defined in_: [src/js/player.js#L1203](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1203)
+_defined in_: [src/js/player.js#L1205](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1205)
 
 ---
 
@@ -343,7 +343,7 @@ _defined in_: [src/js/player.js#L156](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `Number` The duration of the video in seconds
 
-_defined in_: [src/js/player.js#L697](https://github.com/videojs/video.js/blob/master/src/js/player.js#L697)
+_defined in_: [src/js/player.js#L699](https://github.com/videojs/video.js/blob/master/src/js/player.js#L699)
 
 ---
 
@@ -396,7 +396,7 @@ _inherited from_: [src/js/component.js#L966](https://github.com/videojs/video.js
 * `vjs.MediaError|null` when getting
 * `vjs.Player` when setting
 
-_defined in_: [src/js/player.js#L1367](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1367)
+_defined in_: [src/js/player.js#L1369](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1369)
 
 ---
 
@@ -408,7 +408,7 @@ _defined in_: [src/js/player.js#L1367](https://github.com/videojs/video.js/blob/
 ##### RETURNS: 
 * `vjs.Player` self
 
-_defined in_: [src/js/player.js#L977](https://github.com/videojs/video.js/blob/master/src/js/player.js#L977)
+_defined in_: [src/js/player.js#L979](https://github.com/videojs/video.js/blob/master/src/js/player.js#L979)
 
 ---
 
@@ -536,7 +536,7 @@ _inherited from_: [src/js/component.js#L475](https://github.com/videojs/video.js
 ##### PARAMETERS: 
 * __isFS__ 
 
-_defined in_: [src/js/player.js#L900](https://github.com/videojs/video.js/blob/master/src/js/player.js#L900)
+_defined in_: [src/js/player.js#L902](https://github.com/videojs/video.js/blob/master/src/js/player.js#L902)
 
 ---
 
@@ -560,7 +560,7 @@ _defined in_: [src/js/player.js#L900](https://github.com/videojs/video.js/blob/m
 * `Boolean` true if fullscreen, false if not
 * `vjs.Player` self, when setting
 
-_defined in_: [src/js/player.js#L888](https://github.com/videojs/video.js/blob/master/src/js/player.js#L888)
+_defined in_: [src/js/player.js#L890](https://github.com/videojs/video.js/blob/master/src/js/player.js#L890)
 
 ---
 
@@ -594,7 +594,7 @@ _defined in_: [src/js/player.js#L116](https://github.com/videojs/video.js/blob/m
 * `Boolean` True if mute is on, false if not, when getting
 * `vjs.Player` self, when setting mute
 
-_defined in_: [src/js/player.js#L850](https://github.com/videojs/video.js/blob/master/src/js/player.js#L850)
+_defined in_: [src/js/player.js#L852](https://github.com/videojs/video.js/blob/master/src/js/player.js#L852)
 
 ---
 
@@ -727,7 +727,7 @@ _inherited from_: [src/js/component.js#L173](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `vjs.Player` self
 
-_defined in_: [src/js/player.js#L638](https://github.com/videojs/video.js/blob/master/src/js/player.js#L638)
+_defined in_: [src/js/player.js#L640](https://github.com/videojs/video.js/blob/master/src/js/player.js#L640)
 
 ---
 
@@ -740,7 +740,7 @@ _defined in_: [src/js/player.js#L638](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `Boolean` false if the media is currently playing, or true otherwise
 
-_defined in_: [src/js/player.js#L651](https://github.com/videojs/video.js/blob/master/src/js/player.js#L651)
+_defined in_: [src/js/player.js#L653](https://github.com/videojs/video.js/blob/master/src/js/player.js#L653)
 
 ---
 
@@ -752,7 +752,7 @@ _defined in_: [src/js/player.js#L651](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `vjs.Player` self
 
-_defined in_: [src/js/player.js#L626](https://github.com/videojs/video.js/blob/master/src/js/player.js#L626)
+_defined in_: [src/js/player.js#L628](https://github.com/videojs/video.js/blob/master/src/js/player.js#L628)
 
 ---
 
@@ -784,7 +784,7 @@ _inherited from_: [src/js/component.js#L120](https://github.com/videojs/video.js
 * `String` poster URL when getting
 * `vjs.Player` self when setting
 
-_defined in_: [src/js/player.js#L1255](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1255)
+_defined in_: [src/js/player.js#L1257](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1257)
 
 ---
 
@@ -832,7 +832,7 @@ _inherited from_: [src/js/component.js#L683](https://github.com/videojs/video.js
 > Old naming for requestFullscreen
 **Deprecated** true
 
-_defined in_: [src/js/player.js#L964](https://github.com/videojs/video.js/blob/master/src/js/player.js#L964)
+_defined in_: [src/js/player.js#L966](https://github.com/videojs/video.js/blob/master/src/js/player.js#L966)
 
 ---
 
@@ -851,7 +851,7 @@ _defined in_: [src/js/player.js#L964](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `vjs.Player` self
 
-_defined in_: [src/js/player.js#L919](https://github.com/videojs/video.js/blob/master/src/js/player.js#L919)
+_defined in_: [src/js/player.js#L921](https://github.com/videojs/video.js/blob/master/src/js/player.js#L921)
 
 ---
 
@@ -900,7 +900,7 @@ _inherited from_: [src/js/component.js#L693](https://github.com/videojs/video.js
 * `String` The current video source when getting
 * `String` The player when setting
 
-_defined in_: [src/js/player.js#L1108](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1108)
+_defined in_: [src/js/player.js#L1110](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1110)
 
 ---
 
@@ -948,7 +948,7 @@ _inherited from_: [src/js/component.js#L644](https://github.com/videojs/video.js
 * `Number` The current volume, when getting
 * `vjs.Player` self, when setting
 
-_defined in_: [src/js/player.js#L820](https://github.com/videojs/video.js/blob/master/src/js/player.js#L820)
+_defined in_: [src/js/player.js#L822](https://github.com/videojs/video.js/blob/master/src/js/player.js#L822)
 
 ---
 
@@ -977,7 +977,7 @@ _inherited from_: [src/js/component.js#L756](https://github.com/videojs/video.js
 ### durationchange `EVENT`
 > Fired when the duration of the media resource is first known or changed
 
-_defined in_: [src/js/player.js#L521](https://github.com/videojs/video.js/blob/master/src/js/player.js#L521)
+_defined in_: [src/js/player.js#L523](https://github.com/videojs/video.js/blob/master/src/js/player.js#L523)
 
 ---
 
@@ -1002,7 +1002,7 @@ _defined in_: [src/js/player.js#L467](https://github.com/videojs/video.js/blob/m
 ### fullscreenchange `EVENT`
 > Fired when the player switches in or out of fullscreen mode
 
-_defined in_: [src/js/player.js#L550](https://github.com/videojs/video.js/blob/master/src/js/player.js#L550)
+_defined in_: [src/js/player.js#L552](https://github.com/videojs/video.js/blob/master/src/js/player.js#L552)
 
 ---
 
@@ -1089,7 +1089,7 @@ _defined in_: [src/js/player.js#L493](https://github.com/videojs/video.js/blob/m
 ### volumechange `EVENT`
 > Fired when the volume changes
 
-_defined in_: [src/js/player.js#L544](https://github.com/videojs/video.js/blob/master/src/js/player.js#L544)
+_defined in_: [src/js/player.js#L546](https://github.com/videojs/video.js/blob/master/src/js/player.js#L546)
 
 ---
 

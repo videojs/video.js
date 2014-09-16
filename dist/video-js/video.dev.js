@@ -3793,6 +3793,8 @@ vjs.Player.prototype.onEnded = function(){
   if (this.options_['loop']) {
     this.currentTime(0);
     this.play();
+  } else if (!this.paused()) {
+    this.pause();
   }
 };
 
