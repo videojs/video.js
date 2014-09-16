@@ -618,3 +618,31 @@ test('should clear pending errors on disposal', function() {
   }
   ok(true, 'did not throw an error after disposal');
 });
+
+test('pause is called when player ended event is fired and player is not paused', function() {
+  var video = document.createElement('video'),
+      player = PlayerTest.makePlayer({}, video),
+      pauses = 0;
+  player.paused = function() {
+    return false;
+  };
+  player.pause = function() {
+    pauses++;
+  };
+  player.trigger('ended');
+  equal(pauses, 1, 'pause was called');
+});
+
+test('pause is not called if the player is paused and ended is fired', function() {
+  var video = document.createElement('video'),
+      player = PlayerTest.makePlayer({}, video),
+      pauses = 0;
+  player.paused = function() {
+    return true;
+  };
+  player.pause = function() {
+    pauses++;
+  };
+  player.trigger('ended');
+  equal(pauses, 0, 'pause was not called when ended fired');
+});
