@@ -32,27 +32,33 @@
   ],
 
   "update": {
-    "all": [
-      { "include": "update stable" },
-      { "include": "update master" },
-      [ "npm install", "Download dependencies"],
-      [ "grunt", "Build the library" ]
-    ],
-    "master": [
-      [ "git checkout master",      "Switch to the development branch" ],
-      [ "git pull upstream master", "Get any changes to master in the main project" ],
-      [ "git push origin master",   "Push any changes to your copy of the main project" ]
-    ],
-    "stable": [
-      [ "git checkout stable",      "Switch to the release branch" ],
-      [ "git pull upstream stable", "Get any changes to stable in the main project" ],
-      [ "git push origin stable",   "Push any changes to your copy of the main project" ]
-    ]
+    "all": {
+      "steps": [
+        { "include": "update stable" },
+        { "include": "update master" },
+        [ "npm install", "Download dependencies"],
+        [ "grunt", "Build the library" ]
+      ]
+    },
+    "master": {
+      "steps": [
+        [ "git checkout master",      "Switch to the development branch" ],
+        [ "git pull upstream master", "Get any changes to master in the main project" ],
+        [ "git push origin master",   "Push any changes to your copy of the main project" ]
+      ]
+    },
+    "stable": {
+      "steps": [
+        [ "git checkout stable",      "Switch to the release branch" ],
+        [ "git pull upstream stable", "Get any changes to stable in the main project" ],
+        [ "git push origin stable",   "Push any changes to your copy of the main project" ]
+      ]
+    }
   },
 
-  "test": [ "grunt test" ],
-  "watch": [ "grunt watch" ],
-  "server": [ "grunt connect" ],
+  "test": "grunt test" ,
+  "watch": "grunt watch",
+  "server": "grunt connect",
 
   "feature": {
     "desc": "Create a new feature or general enhancement",
@@ -239,24 +245,26 @@
       ]
     },
 
-    "accept": [
-      { "prompt": "What is the the pull request number?",              "id": "prNum" },
-      { "get": "{{project.urls.repo_api}}/pulls/{{prNum}}",          "desc": "Get the PR information", "id": "pr" },
-      { "get": "{{project.urls.repo_api}}/pulls/{{prNum}}/commits",  "desc": "Get the PR commits to access author info", "id": "prCommits" },
-      [ "git checkout -b {{pr.user.login}}-{{pr.head.ref}} {{pr.base.ref}}", "Create a new branch for merging the changes" ],
-      [ "git fetch {{pr.head.repo.ssh_url}} {{pr.head.ref}}",                "Fetch the changes" ],
-      [ "git merge --no-commit --squash FETCH_HEAD",                         "Merge the changes in without committing so they can be squashed" ],
-      [ "grunt test",                                                        "Run tests to make sure they still pass" ],
-      { "prompt": "Describe this change in one line",                  "id": "line" },
-      [ "grunt chg-add:'{{line}} ([view](https\\://github.com/videojs/video.js/pull/{{prNum}}))'", "Add a line to the changelog" ],
-      [ "git add CHANGELOG.md",                                              "Add the changlelog change to be committed" ],
-      [ "git commit -a --author='{{prCommits.[0].commit.author.name}} <{{prCommits.[0].commit.author.email}}>' -m '{{line}}. closes #{{prNum}}'", "Commit the changes" ],
-      { "confirm": "Does everything look ok?" },
-      [ "git checkout {{pr.base.ref}}",                                      "Check out the base branch" ],
-      [ "git merge {{pr.user.login}}-{{pr.head.ref}}",                       "Merge the changes" ],
-      [ "git push origin {{pr.base.ref}}",                                   "Push the changes to your remote copy of the project" ],
-      [ "git push upstream {{pr.base.ref}}",                                 "Push the changes to the main project" ],
-      [ "git branch -D {{pr.user.login}}-{{pr.head.ref}}",                   "Delete the local branch used for merging" ]
-    ]
+    "accept": {
+      "steps": [
+        { "prompt": "What is the the pull request number?",              "id": "prNum" },
+        { "get": "{{project.urls.repo_api}}/pulls/{{prNum}}",          "desc": "Get the PR information", "id": "pr" },
+        { "get": "{{project.urls.repo_api}}/pulls/{{prNum}}/commits",  "desc": "Get the PR commits to access author info", "id": "prCommits" },
+        [ "git checkout -b {{pr.user.login}}-{{pr.head.ref}} {{pr.base.ref}}", "Create a new branch for merging the changes" ],
+        [ "git fetch {{pr.head.repo.ssh_url}} {{pr.head.ref}}",                "Fetch the changes" ],
+        [ "git merge --no-commit --squash FETCH_HEAD",                         "Merge the changes in without committing so they can be squashed" ],
+        [ "grunt test",                                                        "Run tests to make sure they still pass" ],
+        { "prompt": "Describe this change in one line",                  "id": "line" },
+        [ "grunt chg-add:'{{line}} ([view](https\\://github.com/videojs/video.js/pull/{{prNum}}))'", "Add a line to the changelog" ],
+        [ "git add CHANGELOG.md",                                              "Add the changlelog change to be committed" ],
+        [ "git commit -a --author='{{prCommits.[0].commit.author.name}} <{{prCommits.[0].commit.author.email}}>' -m '{{line}}. closes #{{prNum}}'", "Commit the changes" ],
+        { "confirm": "Does everything look ok?" },
+        [ "git checkout {{pr.base.ref}}",                                      "Check out the base branch" ],
+        [ "git merge {{pr.user.login}}-{{pr.head.ref}}",                       "Merge the changes" ],
+        [ "git push origin {{pr.base.ref}}",                                   "Push the changes to your remote copy of the project" ],
+        [ "git push upstream {{pr.base.ref}}",                                 "Push the changes to the main project" ],
+        [ "git branch -D {{pr.user.login}}-{{pr.head.ref}}",                   "Delete the local branch used for merging" ]
+      ]
+    }
   }
 }
