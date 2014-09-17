@@ -146,7 +146,7 @@
       { "prompt": "text", "desc": "Describe the feature/enhancement (be as detailed as possible so it's clear who, why, and how it would be used)", "id": "describe" },
       { "prompt": "text", "desc": "Is there any existing documentation or related specifications?", "id": "docs" },
       { "prompt": "text", "desc": "Are there any existing examples?", "id": "examples" },
-      { "confirm": "You will be redirected to Github where you can submit this issue, OK?" },
+      { "prompt": "confirm", "desc": "You will be redirected to Github where you can submit this issue, OK?" },
       { "open": "{{project.urls.repo_ui}}/issues/new?title={{ title }}&body=**Describe the feature/enhancement:**\n> {{ describe }}\n\n**Existing docs/specs:**\n> {{ docs }}\n\n**Existing examples:**\n> {{ examples }}" }
     ],
     "finished": "Thanks for submitting a feature request! One of our contributors will address it as soon as possible."
@@ -186,7 +186,7 @@
     "private": true,
     "start": {
       "steps": [
-        { "prompt": "Name the branch",                "id": "name" },
+        { "prompt": "text", "desc": "Name the branch",                "id": "name" },
         [ "git checkout -b {{name}} {{baseBranch}}",  "Create the branch" ],
         [ "git push -u origin {{name}}",              "Push the branch to your remote copy of the project" ]
       ]
@@ -198,8 +198,8 @@
         { "exec": "git diff --cached --exit-code", "desc": "Test for uncommitted changes", "fail": "Make sure all changes have been added and committed, or stashed, before switching branches" },
         { "include": "test" },
         { "exec": "git rev-parse --abbrev-ref HEAD", "desc": "Get the current branch", "id": "branch" },
-        { "confirm": "Are you sure {{branch}} is the branch you want to submit?" },
-        { "prompt": "Which github user or org are you submitting from?", "id": "user" },
+        { "prompt": "confirm", "desc": "Are you sure {{branch}} is the branch you want to submit?" },
+        { "prompt": "text", "desc": "Which github user or org are you submitting from?", "id": "user" },
         { "open": "{{project.urls.repo_ui}}/compare/videojs:{{baseBranch}}...{{user}}:{{branch}}", "desc": "Open the github pull request page" }
       ]
     },
@@ -207,7 +207,7 @@
       "desc": "Delete the current branch",
       "steps": [
         { "exec": "git rev-parse --abbrev-ref HEAD", "desc": "Get the current branch name", "id": "name" },
-        { "confirm": "Are you sure '{{name}}' is the branch you want to delete?" },
+        { "prompt": "confirm", "desc": "Are you sure '{{name}}' is the branch you want to delete?" },
         { "exec": "git branch -D {{name}}",          "desc": "Delete the local copy of the branch" },
         { "exec": "git push origin :{{name}}",       "desc": "Delete the remote copy of the branch" }
       ]
@@ -219,7 +219,7 @@
 
     "review": {
       "steps": [
-        { "prompt": "What is the the pull request number?",     "id": "prNum" },
+        { "prompt": "text", "desc": "What is the the pull request number?", "id": "prNum" },
         { "get": "{{project.urls.repo_api}}/pulls/{{prNum}}",   "desc": "Get the PR information", "id": "pr" },
         [ "git fetch {{pr.head.repo.ssh_url}} {{pr.head.ref}}", "Get the pull request changes but don't merge them" ],
         [ "git merge-base master FETCH_HEAD",                   "Get the common ancestor commit", "base" ],
@@ -236,9 +236,9 @@
         { "exec": "git diff --cached --exit-code",   "desc": "Test for uncommitted changes", "fail": "Make sure all changes have been committed before submitting changes" },
         { "include": "test" },
         { "exec": "git rev-parse --abbrev-ref HEAD", "desc": "Get the current branch", "id": "branch" },
-        { "confirm": "Are you sure {{branch}} is the branch you want to submit?" },
-        { "prompt": "Which github user or org are you submitting from?", "id": "user" },
-        { "prompt": "What is the the pull request number?",              "id": "prNum" },
+        { "prompt": "confirm", "desc": "Are you sure {{branch}} is the branch you want to submit?" },
+        { "prompt": "text", "desc": "Which github user or org are you submitting from?", "id": "user" },
+        { "prompt": "text", "desc": "What is the the pull request number?",              "id": "prNum" },
         { "get": "{{project.urls.repo_api}}/pulls/{{prNum}}", "desc": "Get the PR information", "id": "pr" },
         { "exec": "git push -u origin {{branch}}",                                "desc": "Push the changes to the remote repo" },
         { "open": "https://github.com/{{user}}/video.js/compare/{{pr.head.label}}...{{user}}:{{branch}}", "desc": "Open the github pull request page" }
@@ -247,18 +247,18 @@
 
     "accept": {
       "steps": [
-        { "prompt": "What is the the pull request number?",              "id": "prNum" },
+        { "prompt": "text", "desc": "What is the the pull request number?",              "id": "prNum" },
         { "get": "{{project.urls.repo_api}}/pulls/{{prNum}}",          "desc": "Get the PR information", "id": "pr" },
         { "get": "{{project.urls.repo_api}}/pulls/{{prNum}}/commits",  "desc": "Get the PR commits to access author info", "id": "prCommits" },
         [ "git checkout -b {{pr.user.login}}-{{pr.head.ref}} {{pr.base.ref}}", "Create a new branch for merging the changes" ],
         [ "git fetch {{pr.head.repo.ssh_url}} {{pr.head.ref}}",                "Fetch the changes" ],
         [ "git merge --no-commit --squash FETCH_HEAD",                         "Merge the changes in without committing so they can be squashed" ],
         [ "grunt test",                                                        "Run tests to make sure they still pass" ],
-        { "prompt": "Describe this change in one line",                  "id": "line" },
+        { "prompt": "text", "desc": "Describe this change in one line",                  "id": "line" },
         [ "grunt chg-add:'{{line}} ([view](https\\://github.com/videojs/video.js/pull/{{prNum}}))'", "Add a line to the changelog" ],
         [ "git add CHANGELOG.md",                                              "Add the changlelog change to be committed" ],
         [ "git commit -a --author='{{prCommits.[0].commit.author.name}} <{{prCommits.[0].commit.author.email}}>' -m '{{line}}. closes #{{prNum}}'", "Commit the changes" ],
-        { "confirm": "Does everything look ok?" },
+        { "prompt": "confirm",                                         "desc": "Does everything look ok?" },
         [ "git checkout {{pr.base.ref}}",                                      "Check out the base branch" ],
         [ "git merge {{pr.user.login}}-{{pr.head.ref}}",                       "Merge the changes" ],
         [ "git push origin {{pr.base.ref}}",                                   "Push the changes to your remote copy of the project" ],
