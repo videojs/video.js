@@ -211,11 +211,11 @@ vjs.Html5.prototype.enterFullScreen = function(){
   var video = this.el_;
 
   if (vjs.IS_IOS) {
-    vjs.one(video, 'webkitbeginfullscreen', vjs.bind(this, function(e) {
-      this.player_.isFullscreen(video['webkitDisplayingFullscreen']);
+    this.one('webkitbeginfullscreen', vjs.bind(this, function(e) {
+      this.player_.isFullscreen(true);
       if (this.player_.isFullscreen()) {
-        vjs.one(video, 'webkitendfullscreen', vjs.bind(this, function(e) {
-          this.player_.isFullscreen(video['webkitDisplayingFullscreen']);
+        this.one('webkitendfullscreen', vjs.bind(this, function(e) {
+          this.player_.isFullscreen(false);
         }));
       }
     }));
