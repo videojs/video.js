@@ -77,9 +77,12 @@ goog.exportProperty(vjs.Player.prototype, 'preload', vjs.Player.prototype.preloa
 goog.exportProperty(vjs.Player.prototype, 'remainingTime', vjs.Player.prototype.remainingTime);
 goog.exportProperty(vjs.Player.prototype, 'supportsFullScreen', vjs.Player.prototype.supportsFullScreen);
 goog.exportProperty(vjs.Player.prototype, 'currentType', vjs.Player.prototype.currentType);
-goog.exportProperty(vjs.Player.prototype, 'requestFullScreen', vjs.Player.prototype.currentType);
-goog.exportProperty(vjs.Player.prototype, 'cancelFullScreen', vjs.Player.prototype.currentType);
-goog.exportProperty(vjs.Player.prototype, 'isFullScreen', vjs.Player.prototype.currentType);
+goog.exportProperty(vjs.Player.prototype, 'requestFullScreen', vjs.Player.prototype.requestFullScreen);
+goog.exportProperty(vjs.Player.prototype, 'requestFullscreen', vjs.Player.prototype.requestFullscreen);
+goog.exportProperty(vjs.Player.prototype, 'cancelFullScreen', vjs.Player.prototype.cancelFullScreen);
+goog.exportProperty(vjs.Player.prototype, 'exitFullscreen', vjs.Player.prototype.exitFullscreen);
+goog.exportProperty(vjs.Player.prototype, 'isFullScreen', vjs.Player.prototype.isFullScreen);
+goog.exportProperty(vjs.Player.prototype, 'isFullscreen', vjs.Player.prototype.isFullscreen);
 
 goog.exportSymbol('videojs.MediaLoader', vjs.MediaLoader);
 goog.exportSymbol('videojs.TextTrackDisplay', vjs.TextTrackDisplay);
