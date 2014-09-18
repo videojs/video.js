@@ -179,7 +179,11 @@ vjs.Player.prototype.getTagSettings = function(tag){
 
   tagOptions = vjs.getElementAttributes(tag);
   dataSetup = tagOptions['data-setup'];
+
+  // Check if data-setup attr exists.
   if (dataSetup !== null){
+    // Parse options JSON
+    // If empty string, make it a parsable json object.
     vjs.obj.merge(tagOptions, vjs.JSON.parse(dataSetup || '{}'));
   }
 
