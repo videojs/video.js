@@ -30,6 +30,12 @@ vjs.VolumeMenuButton.prototype.createMenu = function(){
     contentElType: 'div'
   });
   var vc = new vjs.VolumeBar(this.player_, vjs.obj.merge({'vertical': true}, this.options_.volumeBar));
+  vc.on('focus', function() {
+    menu.addClass('vjs-visible-menu');
+  });
+  vc.on('blur', function() {
+    menu.removeClass('vjs-visible-menu');
+  });
   menu.addChild(vc);
   return menu;
 };

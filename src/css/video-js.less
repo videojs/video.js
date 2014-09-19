@@ -717,7 +717,8 @@ easily in the skin designer. http://designer.videojs.com/
 }
 
 .vjs-default-skin .vjs-menu {
-  display: none;
+  z-index: -1;
+  display: block;
   position: absolute;
   bottom: 0;
   left: 0em; /* (Width of vjs-menu - width of button) / 2 */
@@ -748,8 +749,9 @@ easily in the skin designer. http://designer.videojs.com/
   .box-shadow(-0.2em -0.2em 0.3em rgba(255, 255, 255, 0.2));
 }
 
-.vjs-default-skin .vjs-menu-button:hover .vjs-menu {
-  display: block;
+.vjs-default-skin .vjs-menu-button:hover .vjs-menu,
+.vjs-default-skin .vjs-menu-button .vjs-visible-menu {
+  z-index: 1;
 }
 .vjs-default-skin .vjs-menu-button ul li {
   list-style: none;

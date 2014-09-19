@@ -139,9 +139,17 @@ vjs.MenuButton.prototype.createMenu = function(){
   this.items = this['createItems']();
 
   if (this.items) {
+    var focusHandler = function(){
+      menu.addClass('vjs-visible-menu');
+    };
+    var blurHandler = function() {
+      menu.removeClass('vjs-visible-menu');
+    };
     // Add menu items to the menu
     for (var i = 0; i < this.items.length; i++) {
       menu.addItem(this.items[i]);
+      this.items[i].on('focus', focusHandler);
+      this.items[i].on('blur', blurHandler);
     }
   }
 
@@ -213,4 +221,3 @@ vjs.MenuButton.prototype.unpressButton = function(){
   this.menu.unlockShowing();
   this.el_.setAttribute('aria-pressed', false);
 };
-
