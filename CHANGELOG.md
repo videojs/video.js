@@ -6,6 +6,9 @@ CHANGELOG
 
 --------------------
 
+## 4.8.3 (2014-09-22)
+* @heff updated to the latest version of the SWF to 4.4.4 ([view](https://github.com/videojs/video.js/pull/1526))
+
 ## 4.8.2 (2014-09-16)
 * @gkatsev fixed an IE11 bug where pause was not fired when the video ends ([view](https://github.com/videojs/video.js/pull/1512))
 
