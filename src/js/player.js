@@ -175,7 +175,25 @@ vjs.Player.prototype.getTagSettings = function(tag){
     'tracks': []
   };
 
-  vjs.obj.merge(options, vjs.getElementAttributes(tag));
+  var tagAttributes = vjs.getElementAttributes(tag);
+
+  // Dimension attributes must be non-negative integers.
+  // http://www.w3.org/TR/2011/WD-html5-20110405/the-map-element.html#attr-dim-width
+  // Purge any non-numeric, negative, or floating point numbers,
+  // but allow zero.
+  function checkDimensionAttribute(heightOrWidth) {
+    if ( typeof tagAttributes[heightOrWidth] !== 'number' ||
+                tagAttributes[heightOrWidth] < 0 ||
+                tagAttributes[heightOrWidth] % 1 !== 0) {
+      delete tagAttributes[heightOrWidth];
+      // Possibly log a helpful message here?
+    }
+  }
+
+  checkDimensionAttribute('height');
+  checkDimensionAttribute('width');
+
+  vjs.obj.merge(options, tagAttributes);
 
   // Get tag children settings
   if (tag.hasChildNodes()) {
