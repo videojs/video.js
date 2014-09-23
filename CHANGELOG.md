@@ -6,6 +6,9 @@ CHANGELOG
 
 --------------------
 
+## 4.8.4 (2014-09-23)
+* @gkatsev fixed isFullscreen reporting on iOS devices ([view](https://github.com/videojs/video.js/pull/1511))
+
 ## 4.8.3 (2014-09-22)
 * @heff updated to the latest version of the SWF to 4.4.4 ([view](https://github.com/videojs/video.js/pull/1526))
 
