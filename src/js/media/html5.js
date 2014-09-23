@@ -210,7 +210,7 @@ vjs.Html5.prototype.supportsFullScreen = function(){
 vjs.Html5.prototype.enterFullScreen = function(){
   var video = this.el_;
 
-  if (vjs.IS_IOS) {
+  if ('webkitDisplayingFullscreen' in video) {
     this.one('webkitbeginfullscreen', vjs.bind(this, function(e) {
       this.player_.isFullscreen(true);
 
