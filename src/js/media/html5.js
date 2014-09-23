@@ -213,14 +213,13 @@ vjs.Html5.prototype.enterFullScreen = function(){
   if (vjs.IS_IOS) {
     this.one('webkitbeginfullscreen', vjs.bind(this, function(e) {
       this.player_.isFullscreen(true);
-      if (this.player_.isFullscreen()) {
-        this.one('webkitendfullscreen', vjs.bind(this, function(e) {
-          this.player_.isFullscreen(false);
-          this.player_.trigger('fullscreenchange');
-        }));
 
+      this.one('webkitendfullscreen', vjs.bind(this, function(e) {
+        this.player_.isFullscreen(false);
         this.player_.trigger('fullscreenchange');
-      }
+      }));
+
+      this.player_.trigger('fullscreenchange');
     }));
   }
 
