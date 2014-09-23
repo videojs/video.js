@@ -31,10 +31,10 @@ vjs.VolumeMenuButton.prototype.createMenu = function(){
   });
   var vc = new vjs.VolumeBar(this.player_, vjs.obj.merge({'vertical': true}, this.options_.volumeBar));
   vc.on('focus', function() {
-    menu.addClass('vjs-visible-menu');
+    menu.lockShowing();
   });
   vc.on('blur', function() {
-    menu.removeClass('vjs-visible-menu');
+    menu.unlockShowing();
   });
   menu.addChild(vc);
   return menu;
