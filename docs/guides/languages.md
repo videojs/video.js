@@ -45,7 +45,12 @@ Adding Languages to Video.js
 ----------------------------
 Additional language support can be added to Video.js in multiple ways.
 
-1. Add your JSON objects via the videojs.addLanguage API. Preferably in the HEAD element of your DOM or otherwise prior to player instantiation.
+1. Create language scripts out of your JSON objects by using our custom grunt task `vjslanguages`. This task is automatically run as part of the default grunt task in Video.JS, but can be configured to match your src/dist directories if different. Once these scripts are created, just add them to your DOM like any other script. 
+
+NOTE: These need to be added after the core Video.js script.
+
+
+2. Add your JSON objects via the videojs.addLanguage API. Preferably in the HEAD element of your DOM or otherwise prior to player instantiation.
 
 ```html
 <head>
@@ -81,7 +86,7 @@ Additional language support can be added to Video.js in multiple ways.
 </head>
 ```
 
-2. During a Video.js player instantiation. Adding the languages to the configuration object provided in the data-setup attribute.
+3. During a Video.js player instantiation. Adding the languages to the configuration object provided in the data-setup attribute.
 
 ```html
 <video id="example_video_1" class="video-js vjs-default-skin"  
