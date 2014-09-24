@@ -157,6 +157,7 @@ goog.exportSymbol('videojs.Flash', vjs.Flash);
 goog.exportProperty(vjs.Flash, 'isSupported', vjs.Flash.isSupported);
 goog.exportProperty(vjs.Flash, 'canPlaySource', vjs.Flash.canPlaySource);
 goog.exportProperty(vjs.Flash, 'onReady', vjs.Flash['onReady']);
+goog.exportProperty(vjs.Flash, 'embed', vjs.Flash.embed);
 
 goog.exportSymbol('videojs.TextTrack', vjs.TextTrack);
 goog.exportProperty(vjs.TextTrack.prototype, 'label', vjs.TextTrack.prototype.label);
