@@ -21,7 +21,7 @@
   },
   "main": "./dist/video-js/video.js",
   "dependencies": {
-    "videojs-swf": "4.4.4"
+    "videojs-swf": "4.4.5"
   },
   "devDependencies": {
     "calcdeps": "~0.1.7",
