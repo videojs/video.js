@@ -6,6 +6,9 @@ CHANGELOG
 
 --------------------
 
+## 4.8.5 (2014-09-25)
+* Updated to the latest version of the swf to fix HLS playback ([view](https://github.com/videojs/video.js/pull/1538))
+
 ## 4.8.4 (2014-09-23)
 * @gkatsev fixed isFullscreen reporting on iOS devices ([view](https://github.com/videojs/video.js/pull/1511))
 
