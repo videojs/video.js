@@ -145,9 +145,9 @@ test('ready triggering before and after disposing the tech', function() {
 });
 
 test('compareVersion compares versions properly', function(){
-  var stub = sinon.stub(vjs.Flash, 'version').returns([9, 1, 1]);
-  equal(vjs.Flash.compareVersion(10), -1);
+  var stub = sinon.stub(vjs.Flash, 'version').returns(['10', '1', '1']);
+  equal(vjs.Flash.compareVersion(11), -1);
   equal(vjs.Flash.compareVersion(9), 1);
-  equal(vjs.Flash.compareVersion('9,1,1'), 0);
+  equal(vjs.Flash.compareVersion('10,1,1'), 0);
   stub.restore();
 });

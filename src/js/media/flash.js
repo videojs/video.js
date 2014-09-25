@@ -337,8 +337,8 @@ vjs.Flash.compareVersion = function(version){
       requiredVer = String(version).split(',');
 
   for(var i = 0; i < 3; i++){
-    var myVerNum = myVer[i],
-        requiredVerNum = requiredVer[i] || 0;
+    var myVerNum = parseInt(myVer[i], 10),
+        requiredVerNum = parseInt(requiredVer[i] || 0, 10);
     if(myVerNum == requiredVerNum){
       continue;
     }else if(myVerNum > requiredVerNum){
