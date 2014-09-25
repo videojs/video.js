@@ -331,8 +331,32 @@ vjs.Flash.version = function(){
   return version.split(',');
 };
 
+// Compare Flash version. Returns -1 for lower version, 0 for same and 1 for bigger.
+vjs.Flash.compareVersion = function(version){
+  var myVer = vjs.Flash.version(),
+      requiredVer = String(version).split(',');
+
+  for(var i = 0; i < 3; i++){
+    var myVerNum = myVer[i],
+        requiredVerNum = requiredVer[i] || 0;
+    if(myVerNum == requiredVerNum){
+      continue;
+    }else if(myVerNum > requiredVerNum){
+      return 1;
+    }else{
+      return -1;
+    }
+  }
+
+  return 0;
+};
+
 // Flash embedding method. Only used in non-iframe mode
-vjs.Flash.embed = function(swf, placeHolder, flashVars, params, attributes){
+vjs.Flash.embed = function(swf, placeHolder, flashVars, params, attributes, version){
+  if(version && vjs.Flash.checkVersion(version) == -1){
+    throw new Error('The latest Flash Player is not installed on your machine. Please go <a href="http://get.adobe.com/flashplayer/">here</a> to install it and try again.');
+  }
+
   var code = vjs.Flash.getEmbedCode(swf, flashVars, params, attributes),
 
       // Get element by embedding code and retrieving created element
