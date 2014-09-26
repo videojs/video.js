@@ -54,6 +54,10 @@ vjs.Player = vjs.Component.extend({
     // Cache for video property values.
     this.cache_ = {};
 
+    // Holds bounded event handlers
+    this.boundEvents = {};
+    this.boundEvents['keydown'] = vjs.bind(this, this.fullWindowOnEscKey);
+
     // Set poster
     this.poster_ = options['poster'];
     // Set controls
@@ -157,6 +161,11 @@ vjs.Player.prototype.dispose = function(){
   this.trigger('dispose');
   // prevent dispose from being called twice
   this.off('dispose');
+
+  // remove document bounded events
+  for (var e in this.boundEvents) {
+    vjs.off(document, e, this.boundEvents[e]);
+  }
 
   // Kill reference to this player
   vjs.players[this.id_] = null;
@@ -932,19 +941,22 @@ vjs.Player.prototype.requestFullscreen = function(){
     // when cancelling fullscreen. Otherwise if there's multiple
     // players on a page, they would all be reacting to the same fullscreen
     // events
-    vjs.on(document, fsApi['fullscreenchange'], vjs.bind(this, function(e){
-      this.isFullscreen(document[fsApi.fullscreenElement]);
 
-      // If cancelling fullscreen, remove event listener.
-      if (this.isFullscreen() === false) {
-        vjs.off(document, fsApi['fullscreenchange'], arguments.callee);
-      }
+    if (this.boundEvents[fsApi['fullscreenchange']] == null) {
+      this.boundEvents[fsApi['fullscreenchange']] = vjs.bind(this, function(e) {
+        this.isFullscreen(document[fsApi.fullscreenElement]);
 
-      this.trigger('fullscreenchange');
-    }));
+        // If cancelling fullscreen, remove event listener.
+        if (this.isFullscreen() === false) {
+          vjs.off(document, fsApi['fullscreenchange'], this.boundEvents[fsApi['fullscreenchange']]);
+        }
 
+        this.trigger('fullscreenchange');
+      });
+    }
+
+    vjs.on(document, fsApi['fullscreenchange'], this.boundEvents[fsApi['fullscreenchange']]);
     this.el_[fsApi.requestFullscreen]();
-
   } else if (this.tech.supportsFullScreen()) {
     // we can't take the video.js controls fullscreen but we can go fullscreen
     // with native controls
