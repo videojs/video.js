@@ -1079,7 +1079,7 @@ _defined in_: [src/js/player.js#L446](https://github.com/videojs/video.js/blob/m
 ### timeupdate `EVENT`
 > Fired when the current playback position has changed
 > 
-> During playback this is fired every 15-250 milliseconds, depnding on the
+> During playback this is fired every 15-250 milliseconds, depending on the
 > playback technology in use.
 
 _defined in_: [src/js/player.js#L493](https://github.com/videojs/video.js/blob/master/src/js/player.js#L493)
