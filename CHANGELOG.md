@@ -6,6 +6,7 @@ CHANGELOG
 * @baloneysandwiches added a hasClass method ([view](https://github.com/videojs/video.js/pull/1464))
 * @mynameisstephen fixed an issue where slider event listeners were not being cleaned up ([view](https://github.com/videojs/video.js/pull/1475))
 * @alexrqs cleaned up the Spanish translation ([view](https://github.com/videojs/video.js/pull/1494))
+* @t2y added a Japanese translation ([view](https://github.com/videojs/video.js/pull/1497))
 
 --------------------
 
