@@ -664,6 +664,16 @@ vjs.Component.prototype.triggerReady = function(){
 ============================================================================= */
 
 /**
+ * Check if a component's element has a CSS class name
+ *
+ * @param {String} classToCheck Classname to check
+ * @return {vjs.Component}
+ */
+vjs.Component.prototype.hasClass = function(classToCheck){
+  return vjs.hasClass(this.el_, classToCheck);
+};
+
+/**
  * Add a CSS class name to the component's element
  *
  * @param {String} classToAdd Classname to add

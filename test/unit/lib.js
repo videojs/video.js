@@ -82,6 +82,14 @@ test('should add and remove a class name on an element', function(){
   ok(el.className === 'test-class2', 'removed first class');
 });
 
+test('should read class names on an element', function(){
+  var el = document.createElement('div');
+  vjs.addClass(el, 'test-class1');
+  ok(vjs.hasClass(el, 'test-class1') === true, 'class detected');
+  ok(vjs.hasClass(el, 'test-class') === false, 'substring correctly not detected');
+
+});
+
 test('should get and remove data from an element', function(){
   var el = document.createElement('div');
   var data = vjs.getData(el);

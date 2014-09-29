@@ -305,13 +305,24 @@ vjs.isEmpty = function(obj) {
 };
 
 /**
+ * Check if an element has a CSS class
+ * @param {Element} element Element to check
+ * @param {String} classToCheck Classname to check
+ * @private
+ */
+vjs.hasClass = function(element, classToCheck){
+  return ((' ' + element.className + ' ').indexOf(' ' + classToCheck + ' ') !== -1);
+};
+
+
+/**
  * Add a CSS class name to an element
  * @param {Element} element    Element to add class name to
  * @param {String} classToAdd Classname to add
  * @private
  */
 vjs.addClass = function(element, classToAdd){
-  if ((' '+element.className+' ').indexOf(' '+classToAdd+' ') == -1) {
+  if (!vjs.hasClass(element, classToAdd)) {
     element.className = element.className === '' ? classToAdd : element.className + ' ' + classToAdd;
   }
 };
@@ -325,7 +336,7 @@ vjs.addClass = function(element, classToAdd){
 vjs.removeClass = function(element, classToRemove){
   var classNames, i;
 
-  if (element.className.indexOf(classToRemove) == -1) { return; }
+  if (!vjs.hasClass(element, classToRemove)) {return;}
 
   classNames = element.className.split(' ');
 

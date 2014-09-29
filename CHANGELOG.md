@@ -3,6 +3,7 @@ CHANGELOG
 
 ## HEAD (Unreleased)
 * @deedos added a Brazilian Portuguese translation ([view](https://github.com/videojs/video.js/pull/1520))
+* @baloneysandwiches added a hasClass method ([view](https://github.com/videojs/video.js/pull/1464))
 
 --------------------
 
