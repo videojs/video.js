@@ -8,6 +8,7 @@ CHANGELOG
 * @alexrqs cleaned up the Spanish translation ([view](https://github.com/videojs/video.js/pull/1494))
 * @t2y added a Japanese translation ([view](https://github.com/videojs/video.js/pull/1497))
 * @chikathreesix fixed an issue where data-setup options could be missed ([view](https://github.com/videojs/video.js/pull/1514))
+* @seniorflexdeveloper added new translations and translation updates ([view](https://github.com/videojs/video.js/pull/1530))
 
 --------------------
 
