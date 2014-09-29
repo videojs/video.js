@@ -4,6 +4,7 @@ CHANGELOG
 ## HEAD (Unreleased)
 * @deedos added a Brazilian Portuguese translation ([view](https://github.com/videojs/video.js/pull/1520))
 * @baloneysandwiches added a hasClass method ([view](https://github.com/videojs/video.js/pull/1464))
+* @mynameisstephen fixed an issue where slider event listeners were not being cleaned up ([view](https://github.com/videojs/video.js/pull/1475))
 
 --------------------
 
