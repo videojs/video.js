@@ -6,7 +6,7 @@
 // Automatically set up any tags that have a data-setup attribute
 vjs.autoSetup = function(){
   var options, vid, player,
-      vids = document.getElementsByTagName('video');
+      vids = Array.prototype.slice.call(document.getElementsByTagName('video')).concat(Array.prototype.slice.call(document.getElementsByTagName('audio')));
 
   // Check if any media elements exist
   if (vids && vids.length > 0) {
