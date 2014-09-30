@@ -213,4 +213,3 @@ vjs.MenuButton.prototype.unpressButton = function(){
   this.menu.unlockShowing();
   this.el_.setAttribute('aria-pressed', false);
 };
-
