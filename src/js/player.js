@@ -247,7 +247,13 @@ vjs.Player.prototype.createEl = function(){
   // ID will now reference player box, not the video tag
   attrs = vjs.getElementAttributes(tag);
   vjs.obj.each(attrs, function(attr) {
-    el.setAttribute(attr, attrs[attr]);
+    // workaround so we don't totally break IE7
+    // http://stackoverflow.com/questions/3653444/css-styles-not-applied-on-dynamic-elements-in-internet-explorer-7
+    if (attr == 'class') {
+      el.className = attrs[attr];
+    } else {
+      el.setAttribute(attr, attrs[attr]);
+    }
   });
 
   // Update tag id/class for use as HTML5 playback tech
