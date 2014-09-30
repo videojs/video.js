@@ -48,6 +48,11 @@ test('should be able to access expected player API methods', function() {
   ok(player.usingNativeControls, 'usingNativeControls exists');
   ok(player.isFullscreen, 'isFullscreen exists');
 
+  // Deprecated methods that should still exist
+  ok(player.requestFullScreen, 'requestFullScreen exists');
+  ok(player.isFullScreen, 'isFullScreen exists');
+  ok(player.cancelFullScreen, 'cancelFullScreen exists');
+
   player.dispose();
 });
 
@@ -207,4 +212,17 @@ test('fullscreenToggle does not depend on minified player methods', function(){
   fullscreen.trigger('click');
 
   ok(exitFullscreen, 'exitFullscreen called');
+});
+
+test('component can be subclassed externally', function(){
+  var player = new (videojs.Component.extend({
+    languages: function(){},
+    reportUserActivity: function(){},
+    language: function(){},
+    textTracks: function(){ return []; }
+  }))({
+    id: function(){},
+    reportUserActivity: function(){}
+  });
+  ok(new videojs.ControlBar(player), 'created a control bar without throwing');
 });

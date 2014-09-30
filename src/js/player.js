@@ -170,12 +170,24 @@ vjs.Player.prototype.dispose = function(){
 };
 
 vjs.Player.prototype.getTagSettings = function(tag){
-  var options = {
-    'sources': [],
-    'tracks': []
-  };
+  var tagOptions,
+      dataSetup,
+      options = {
+        'sources': [],
+        'tracks': []
+      };
 
-  vjs.obj.merge(options, vjs.getElementAttributes(tag));
+  tagOptions = vjs.getElementAttributes(tag);
+  dataSetup = tagOptions['data-setup'];
+
+  // Check if data-setup attr exists.
+  if (dataSetup !== null){
+    // Parse options JSON
+    // If empty string, make it a parsable json object.
+    vjs.obj.merge(tagOptions, vjs.JSON.parse(dataSetup || '{}'));
+  }
+
+  vjs.obj.merge(options, tagOptions);
 
   // Get tag children settings
   if (tag.hasChildNodes()) {
@@ -349,7 +361,6 @@ vjs.Player.prototype.unloadTech = function(){
 //   vjs.log('loadedTech')
 // },
 
-
 // /* Player event handlers (how the player reacts to certain events)
 // ================================================================================ */
 
@@ -487,7 +498,7 @@ vjs.Player.prototype.onPause = function(){
 /**
  * Fired when the current playback position has changed
  *
- * During playback this is fired every 15-250 milliseconds, depnding on the
+ * During playback this is fired every 15-250 milliseconds, depending on the
  * playback technology in use.
  * @event timeupdate
  */
@@ -512,6 +523,8 @@ vjs.Player.prototype.onEnded = function(){
   if (this.options_['loop']) {
     this.currentTime(0);
     this.play();
+  } else if (!this.paused()) {
+    this.pause();
   }
 };
 
@@ -1156,7 +1169,8 @@ vjs.Player.prototype.src = function(source){
  * @private
  */
 vjs.Player.prototype.sourceList_ = function(sources){
-  var sourceTech = this.selectSource(sources);
+  var sourceTech = this.selectSource(sources),
+      errorTimeout;
 
   if (sourceTech) {
     if (sourceTech.tech === this.techName) {
@@ -1167,10 +1181,18 @@ vjs.Player.prototype.sourceList_ = function(sources){
       this.loadTech(sourceTech.tech, sourceTech.source);
     }
   } else {
-    this.error({ code: 4, message: this.options()['notSupportedMessage'] });
+    // We need to wrap this in a timeout to give folks a chance to add error event handlers
+    errorTimeout = setTimeout(vjs.bind(this, function() {
+      this.error({ code: 4, message: this.localize(this.options()['notSupportedMessage']) });
+    }), 0);
+
     // we could not find an appropriate tech, but let's still notify the delegate that this is it
     // this needs a better comment about why this is needed
     this.triggerReady();
+
+    this.on('dispose', function() {
+      clearTimeout(errorTimeout);
+    });
   }
 };
 
@@ -1502,16 +1524,19 @@ vjs.Player.prototype.listenForUserActivity = function(){
       // Clear any existing inactivity timeout to start the timer over
       clearTimeout(inactivityTimeout);
 
-      // In X seconds, if no more activity has occurred the user will be
-      // considered inactive
-      inactivityTimeout = setTimeout(vjs.bind(this, function() {
-        // Protect against the case where the inactivityTimeout can trigger just
-        // before the next user activity is picked up by the activityCheck loop
-        // causing a flicker
-        if (!this.userActivity_) {
-          this.userActive(false);
-        }
-      }), 2000);
+      var timeout = this.options()['inactivityTimeout'];
+      if (timeout > 0) {
+          // In <timeout> milliseconds, if no more activity has occurred the
+          // user will be considered inactive
+          inactivityTimeout = setTimeout(vjs.bind(this, function () {
+              // Protect against the case where the inactivityTimeout can trigger just
+              // before the next user activity is picked up by the activityCheck loop
+              // causing a flicker
+              if (!this.userActivity_) {
+                  this.userActive(false);
+              }
+          }), timeout);
+      }
     }
   }), 250);
 
@@ -1528,7 +1553,7 @@ vjs.Player.prototype.playbackRate = function(rate) {
     return this;
   }
 
-  if (this.tech && this.tech.features && this.tech.features['playbackRate']) {
+  if (this.tech && this.tech['featuresPlaybackRate']) {
     return this.techGet('playbackRate');
   } else {
     return 1.0;

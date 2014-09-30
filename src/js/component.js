@@ -664,6 +664,16 @@ vjs.Component.prototype.triggerReady = function(){
 ============================================================================= */
 
 /**
+ * Check if a component's element has a CSS class name
+ *
+ * @param {String} classToCheck Classname to check
+ * @return {vjs.Component}
+ */
+vjs.Component.prototype.hasClass = function(classToCheck){
+  return vjs.hasClass(this.el_, classToCheck);
+};
+
+/**
  * Add a CSS class name to the component's element
  *
  * @param {String} classToAdd Classname to add
@@ -806,6 +816,9 @@ vjs.Component.prototype.dimensions = function(width, height){
  */
 vjs.Component.prototype.dimension = function(widthOrHeight, num, skipListeners){
   if (num !== undefined) {
+    if (num === null || vjs.isNaN(num)) {
+      num = 0;
+    }
 
     // Check if using css width/height (% or px) and adjust
     if ((''+num).indexOf('%') !== -1 || (''+num).indexOf('px') !== -1) {

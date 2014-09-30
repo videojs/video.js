@@ -16,7 +16,7 @@ vjs.util = {};
 vjs.util.mergeOptions = function(obj1, obj2){
   var key, val1, val2;
 
-  // make a copy of obj1 so we're not ovewriting original values.
+  // make a copy of obj1 so we're not overwriting original values.
   // like prototype.options_ and all sub options objects
   obj1 = vjs.obj.copy(obj1);
 
@@ -35,5 +35,3 @@ vjs.util.mergeOptions = function(obj1, obj2){
   }
   return obj1;
 };
-
-

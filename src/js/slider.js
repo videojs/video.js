@@ -34,6 +34,17 @@ vjs.Slider = vjs.Component.extend({
   }
 });
 
+vjs.Slider.prototype.dispose = function() {
+  vjs.off(document, 'mousemove', this.boundEvents.move, false);
+  vjs.off(document, 'mouseup', this.boundEvents.end, false);
+  vjs.off(document, 'touchmove', this.boundEvents.move, false);
+  vjs.off(document, 'touchend', this.boundEvents.end, false);
+
+  vjs.off(document, 'keyup', vjs.bind(this, this.onKeyPress));
+
+  vjs.Component.prototype.dispose.call(this);
+};
+
 vjs.Slider.prototype.createEl = function(type, props) {
   props = props || {};
   // Add the slider element class to all sub classes

@@ -8,6 +8,7 @@ notifications:
     channels:
       - "chat.freenode.net#videojs"
     use_notice: true
+    on_success: never
 env:
   global:
   - secure: K6JpKwMkfNaJix3Bb0tLjVMzHMJgtBXdd/dvfw1BMb9DCBpd81PqXbDs7yXCddUxnUPTBPxZCrQgWsw71Wn+qEoIG5MU3uOT5A2rBbx/yZonVAGv5ed/9w0xk0OzO383CmPMFqwqtp9YmdmqGjQBkYXVXJjTvNTOAExFSdhO+3U=

@@ -25,13 +25,8 @@ vjs.autoSetup = function(){
           // Check if data-setup attr exists.
           // We only auto-setup if they've added the data-setup attr.
           if (options !== null) {
-
-            // Parse options JSON
-            // If empty string, make it a parsable json object.
-            options = vjs.JSON.parse(options || '{}');
-
             // Create new video.js instance.
-            player = videojs(vid, options);
+            player = videojs(vid);
           }
         }
 

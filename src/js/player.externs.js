@@ -63,6 +63,12 @@ videojs.Player.prototype.cancelFullScreen = function(){}; /* deprecated */
 videojs.Player.prototype.textTracks = function(){};
 
 /**
+ * Language support
+ */
+videojs.Player.prototype.language = function(){};
+videojs.Player.prototype.languages = function(){};
+
+/**
  * Component functions
  */
 videojs.Player.prototype.dispose = function(){};
@@ -82,3 +88,8 @@ videojs.Player.prototype.userActive = function(){};
  * Native controls
  */
 videojs.Player.prototype.usingNativeControls = function(){};
+
+/**
+ * Source selection
+ */
+videojs.Player.prototype.selectSource = function(){};

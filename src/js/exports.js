@@ -77,8 +77,12 @@ goog.exportProperty(vjs.Player.prototype, 'preload', vjs.Player.prototype.preloa
 goog.exportProperty(vjs.Player.prototype, 'remainingTime', vjs.Player.prototype.remainingTime);
 goog.exportProperty(vjs.Player.prototype, 'supportsFullScreen', vjs.Player.prototype.supportsFullScreen);
 goog.exportProperty(vjs.Player.prototype, 'currentType', vjs.Player.prototype.currentType);
-goog.exportProperty(vjs.Player.prototype, 'language', vjs.Player.prototype.language);
-goog.exportProperty(vjs.Player.prototype, 'languages', vjs.Player.prototype.languages);
+goog.exportProperty(vjs.Player.prototype, 'requestFullScreen', vjs.Player.prototype.requestFullScreen);
+goog.exportProperty(vjs.Player.prototype, 'requestFullscreen', vjs.Player.prototype.requestFullscreen);
+goog.exportProperty(vjs.Player.prototype, 'cancelFullScreen', vjs.Player.prototype.cancelFullScreen);
+goog.exportProperty(vjs.Player.prototype, 'exitFullscreen', vjs.Player.prototype.exitFullscreen);
+goog.exportProperty(vjs.Player.prototype, 'isFullScreen', vjs.Player.prototype.isFullScreen);
+goog.exportProperty(vjs.Player.prototype, 'isFullscreen', vjs.Player.prototype.isFullscreen);
 
 goog.exportSymbol('videojs.MediaLoader', vjs.MediaLoader);
 goog.exportSymbol('videojs.TextTrackDisplay', vjs.TextTrackDisplay);
@@ -121,11 +125,11 @@ goog.exportSymbol('videojs.CaptionsButton', vjs.CaptionsButton);
 goog.exportSymbol('videojs.ChaptersButton', vjs.ChaptersButton);
 
 goog.exportSymbol('videojs.MediaTechController', vjs.MediaTechController);
-goog.exportProperty(vjs.MediaTechController.prototype, 'features', vjs.MediaTechController.prototype.features);
-goog.exportProperty(vjs.MediaTechController.prototype.features, 'volumeControl', vjs.MediaTechController.prototype.features.volumeControl);
-goog.exportProperty(vjs.MediaTechController.prototype.features, 'fullscreenResize', vjs.MediaTechController.prototype.features.fullscreenResize);
-goog.exportProperty(vjs.MediaTechController.prototype.features, 'progressEvents', vjs.MediaTechController.prototype.features.progressEvents);
-goog.exportProperty(vjs.MediaTechController.prototype.features, 'timeupdateEvents', vjs.MediaTechController.prototype.features.timeupdateEvents);
+goog.exportProperty(vjs.MediaTechController.prototype, 'featuresVolumeControl', vjs.MediaTechController.prototype.featuresVolumeControl);
+goog.exportProperty(vjs.MediaTechController.prototype, 'featuresFullscreenResize', vjs.MediaTechController.prototype.featuresFullscreenResize);
+goog.exportProperty(vjs.MediaTechController.prototype, 'featuresPlaybackRate', vjs.MediaTechController.prototype.featuresPlaybackRate);
+goog.exportProperty(vjs.MediaTechController.prototype, 'featuresProgressEvents', vjs.MediaTechController.prototype.featuresProgressEvents);
+goog.exportProperty(vjs.MediaTechController.prototype, 'featuresTimeupdateEvents', vjs.MediaTechController.prototype.featuresTimeupdateEvents);
 goog.exportProperty(vjs.MediaTechController.prototype, 'setPoster', vjs.MediaTechController.prototype.setPoster);
 
 
@@ -173,3 +177,4 @@ goog.exportSymbol('videojs.createTimeRange', vjs.createTimeRange);
 
 goog.exportSymbol('videojs.util', vjs.util);
 goog.exportProperty(vjs.util, 'mergeOptions', vjs.util.mergeOptions);
+goog.exportProperty(vjs, 'addLanguage', vjs.addLanguage);

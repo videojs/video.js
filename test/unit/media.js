@@ -1,14 +1,14 @@
-var noop = function() {}, clock, features;
+var noop = function() {}, clock, featuresProgessEvents;
 
 module('Media Tech', {
   'setup': function() {
     clock = sinon.useFakeTimers();
-    features = videojs.util.mergeOptions({}, videojs.MediaTechController.prototype.features);
-    videojs.MediaTechController.prototype.features['progressEvents'] = false;
+    featuresProgessEvents = videojs.MediaTechController.prototype['featuresProgessEvents'];
+    videojs.MediaTechController.prototype['featuresProgressEvents'] = false;
   },
   'teardown': function() {
     clock.restore();
-    videojs.MediaTechController.prototype.features = features;
+    videojs.MediaTechController.prototype['featuresProgessEvents'] = featuresProgessEvents;
   }
 });
 
@@ -114,4 +114,22 @@ test('should synthesize progress events by default', function() {
 
   clock.tick(500);
   equal(progresses, 1, 'triggered one event');
+});
+
+test('dispose() should stop time tracking', function() {
+  var tech = new videojs.MediaTechController({
+    id: noop,
+    on: noop,
+    trigger: noop
+  });
+  tech.dispose();
+
+  // progress and timeupdate events will throw exceptions after the
+  // tech is disposed
+  try {
+    clock.tick(10 * 1000);
+  } catch (e) {
+    return equal(e, undefined, 'threw an exception');
+  }
+  ok(true, 'no exception was thrown');
 });

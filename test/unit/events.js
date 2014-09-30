@@ -136,7 +136,7 @@ test( 'should listen only once in multiple events from a single call', function(
   vjs.trigger(el, 'click'); // No click should happen.
   vjs.trigger(el, 'event1'); // event1 must be handled.
   vjs.trigger(el, 'event1'); // No event1 should be handled.
-  vjs.trigger(el, 'event2'); // event2 must be handled. 
+  vjs.trigger(el, 'event2'); // event2 must be handled.
   vjs.trigger(el, 'event2'); // No event2 should be handled.
 });
 

@@ -199,6 +199,34 @@ test('should show and hide an element', function(){
   ok(comp.el().style.display === 'block');
 });
 
+test('dimension() should treat NaN and null as zero', function() {
+  var comp, width, height, newWidth, newHeight;
+  width = 300;
+  height = 150;
+
+  comp = new vjs.Component(getFakePlayer(), {}),
+  // set component dimension
+
+  comp.dimensions(width, height);
+
+  newWidth = comp.dimension('width', null);
+
+  notEqual(newWidth, width, 'new width and old width are not the same');
+  equal(newWidth, comp, 'we set a value, so, return value is component');
+  equal(comp.width(), 0, 'the new width is zero');
+
+  newHeight = comp.dimension('height', NaN);
+
+  notEqual(newHeight, height, 'new height and old height are not the same');
+  equal(newHeight, comp, 'we set a value, so, return value is component');
+  equal(comp.height(), 0, 'the new height is zero');
+
+  comp.width(width);
+  newWidth = comp.dimension('width', undefined);
+
+  equal(newWidth, width, 'we did not set the width with undefined');
+});
+
 test('should change the width and height of a component', function(){
   var container = document.createElement('div');
   var comp = new vjs.Component(getFakePlayer(), {});

@@ -14,7 +14,7 @@ var PlayerTest = {
     fixture.appendChild(videoTag);
 
     playerOptions = playerOptions || {};
-    playerOptions['techOrder'] = ['mediaFaker'];
+    playerOptions['techOrder'] = playerOptions['techOrder'] || ['mediaFaker'];
 
     return player = new videojs.Player(videoTag, playerOptions);
   }

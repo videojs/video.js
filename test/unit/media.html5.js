@@ -56,6 +56,12 @@ test('should re-link the player if the tech is moved', function(){
 test('test playbackRate', function() {
   var playbackRate;
 
+  // Android 2.3 always returns 0 for playback rate
+  if (!vjs.Html5.canControlPlaybackRate()) {
+    ok('Playback rate is not supported');
+    return;
+  }
+
   tech.createEl();
 
   tech.el().playbackRate = 1.25;
@@ -117,4 +123,10 @@ test('should return a maybe for mp4 on OLD ANDROID', function() {
 
   vjs.IS_OLD_ANDROID = isOldAndroid;
   vjs.Html5.unpatchCanPlayType();
+});
+
+test('error events may not set the errors property', function() {
+  equal(tech.error(), undefined, 'no tech-level error');
+  tech.trigger('error');
+  ok(true, 'no error was thrown');
 });

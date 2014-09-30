@@ -12,9 +12,9 @@ vjs.MediaFaker = vjs.MediaTechController.extend({
   }
 });
 
-// Support everything
+// Support everything except for "video/unsupported-format"
 vjs.MediaFaker.isSupported = function(){ return true; };
-vjs.MediaFaker.canPlaySource = function(srcObj){ return true; };
+vjs.MediaFaker.canPlaySource = function(srcObj){ return srcObj.type !== 'video/unsupported-format'; };
 
 vjs.MediaFaker.prototype.createEl = function(){
   var el = vjs.MediaTechController.prototype.createEl.call(this, 'div', {
@@ -42,7 +42,6 @@ vjs.MediaFaker.prototype.muted = function(){ return false; };
 vjs.MediaFaker.prototype.pause = function(){ return false; };
 vjs.MediaFaker.prototype.paused = function(){ return true; };
 vjs.MediaFaker.prototype.supportsFullScreen = function(){ return false; };
-vjs.MediaFaker.prototype.features = {};
 vjs.MediaFaker.prototype.buffered = function(){ return {}; };
 vjs.MediaFaker.prototype.duration = function(){ return {}; };
 

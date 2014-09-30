@@ -1,4 +1,13 @@
-module('Player');
+var playerClock;
+
+module('Player', {
+  'setup': function() {
+    playerClock = sinon.useFakeTimers();
+  },
+  'teardown': function() {
+    playerClock.restore();
+  }
+});
 
 // Compiler doesn't like using 'this' in setup/teardown.
 // module("Player", {
@@ -111,6 +120,29 @@ test('should get tag, source, and track settings', function(){
   ok(tag['player'] !== player, 'tag player ref killed');
   ok(!vjs.players['example_1'], 'global player ref killed');
   ok(player.el() === null, 'player el killed');
+});
+
+test('should asynchronously fire error events during source selection', function() {
+  expect(2);
+
+  sinon.stub(vjs.log, 'error');
+
+  var player = PlayerTest.makePlayer({
+    'techOrder': ['foo'],
+    'sources': [
+      { 'src': 'http://vjs.zencdn.net/v/oceans.mp4', 'type': 'video/mp4' }
+    ]
+  });
+  ok(player.options_['techOrder'][0] === 'foo', 'Foo listed as the only tech');
+
+  player.on('error', function(e) {
+    ok(player.error().code === 4, 'Source could not be played error thrown');
+  });
+
+  playerClock.tick(1);
+
+  player.dispose();
+  vjs.log.error.restore();
 });
 
 test('should set the width and height of the player', function(){
@@ -252,14 +284,14 @@ test('should set controls and trigger events', function() {
 //   var player = PlayerTest.makePlayer();
 //   player.on('fullscreenchange', function(){
 //     ok(true, 'fullscreenchange event fired');
-//     ok(this.isFullScreen() === true, 'isFullScreen is true');
+//     ok(this.isFullscreen() === true, 'isFullscreen is true');
 //     ok(this.el().className.indexOf('vjs-fullscreen') !== -1, 'vjs-fullscreen class added');
 
 //     player.dispose();
 //     start();
 //   });
 
-//   player.requestFullScreen();
+//   player.requestFullscreen();
 // });
 
 test('should toggle user the user state between active and inactive', function(){
@@ -517,4 +549,100 @@ test('should restore attributes from the original video tag when creating a new 
   equal(el.getAttribute('preload'), 'none', 'attribute was successful overridden by an option');
   equal(el.getAttribute('controls'), '', 'controls attribute was set properly');
   equal(el.getAttribute('webkit-playsinline'), '', 'webkit-playsinline attribute was set properly');
+});
+
+test('should honor default inactivity timeout', function() {
+    var player;
+    var clock = sinon.useFakeTimers();
+
+    // default timeout is 2000ms
+    player = PlayerTest.makePlayer({});
+
+    equal(player.userActive(), true, 'User is active on creation');
+    clock.tick(1800);
+    equal(player.userActive(), true, 'User is still active');
+    clock.tick(500);
+    equal(player.userActive(), false, 'User is inactive after timeout expired');
+
+    clock.restore();
+});
+
+test('should honor configured inactivity timeout', function() {
+    var player;
+    var clock = sinon.useFakeTimers();
+
+    // default timeout is 2000ms, set to shorter 200ms
+    player = PlayerTest.makePlayer({
+      'inactivityTimeout': 200
+    });
+
+    equal(player.userActive(), true, 'User is active on creation');
+    clock.tick(150);
+    equal(player.userActive(), true, 'User is still active');
+    clock.tick(350);
+    // make sure user is now inactive after 500ms
+    equal(player.userActive(), false, 'User is inactive after timeout expired');
+
+    clock.restore();
+});
+
+test('should honor disabled inactivity timeout', function() {
+    var player;
+    var clock = sinon.useFakeTimers();
+
+    // default timeout is 2000ms, disable by setting to zero
+    player = PlayerTest.makePlayer({
+      'inactivityTimeout': 0
+    });
+
+    equal(player.userActive(), true, 'User is active on creation');
+    clock.tick(5000);
+    equal(player.userActive(), true, 'User is still active');
+
+    clock.restore();
+});
+
+test('should clear pending errors on disposal', function() {
+  var clock = sinon.useFakeTimers(), player;
+
+  player = PlayerTest.makePlayer();
+  player.src({
+    src: 'http://example.com/movie.unsupported-format',
+    type: 'video/unsupported-format'
+  });
+  player.dispose();
+  try {
+    clock.tick(5000);
+  } catch (e) {
+    return ok(!e, 'threw an error: ' + e.message);
+  }
+  ok(true, 'did not throw an error after disposal');
+});
+
+test('pause is called when player ended event is fired and player is not paused', function() {
+  var video = document.createElement('video'),
+      player = PlayerTest.makePlayer({}, video),
+      pauses = 0;
+  player.paused = function() {
+    return false;
+  };
+  player.pause = function() {
+    pauses++;
+  };
+  player.trigger('ended');
+  equal(pauses, 1, 'pause was called');
+});
+
+test('pause is not called if the player is paused and ended is fired', function() {
+  var video = document.createElement('video'),
+      player = PlayerTest.makePlayer({}, video),
+      pauses = 0;
+  player.paused = function() {
+    return true;
+  };
+  player.pause = function() {
+    pauses++;
+  };
+  player.trigger('ended');
+  equal(pauses, 0, 'pause was not called when ended fired');
 });

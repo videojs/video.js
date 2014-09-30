@@ -172,6 +172,17 @@ vjs.obj.isArray = Array.isArray || function(arr) {
 };
 
 /**
+ * Check to see whether the input is NaN or not.
+ * NaN is the only JavaScript construct that isn't equal to itself
+ * @param {Number} num Number to check
+ * @return {Boolean} True if NaN, false otherwise
+ * @private
+ */
+vjs.isNaN = function(num) {
+  return num !== num;
+};
+
+/**
  * Bind (a.k.a proxy or Context). A simple method for changing the context of a function
    It also stores a unique id on the function so it can be easily removed from events
  * @param  {*}   context The object to bind as scope
@@ -294,13 +305,24 @@ vjs.isEmpty = function(obj) {
 };
 
 /**
+ * Check if an element has a CSS class
+ * @param {Element} element Element to check
+ * @param {String} classToCheck Classname to check
+ * @private
+ */
+vjs.hasClass = function(element, classToCheck){
+  return ((' ' + element.className + ' ').indexOf(' ' + classToCheck + ' ') !== -1);
+};
+
+
+/**
  * Add a CSS class name to an element
  * @param {Element} element    Element to add class name to
  * @param {String} classToAdd Classname to add
  * @private
  */
 vjs.addClass = function(element, classToAdd){
-  if ((' '+element.className+' ').indexOf(' '+classToAdd+' ') == -1) {
+  if (!vjs.hasClass(element, classToAdd)) {
     element.className = element.className === '' ? classToAdd : element.className + ' ' + classToAdd;
   }
 };
@@ -314,7 +336,7 @@ vjs.addClass = function(element, classToAdd){
 vjs.removeClass = function(element, classToRemove){
   var classNames, i;
 
-  if (element.className.indexOf(classToRemove) == -1) { return; }
+  if (!vjs.hasClass(element, classToRemove)) {return;}
 
   classNames = element.className.split(' ');
 

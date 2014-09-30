@@ -92,6 +92,9 @@ vjs.options = {
   // Add playback rate selection by adding rates
   // 'playbackRates': [0.5, 1, 1.5, 2],
 
+  // default inactivity timeout
+  'inactivityTimeout': 2000,
+
   // Included control sets
   'children': {
     'mediaLoader': {},
@@ -117,6 +120,25 @@ vjs.options = {
 if (vjs.CDN_VERSION !== 'GENERATED'+'_CDN_VSN') {
   videojs.options['flash']['swf'] = vjs.ACCESS_PROTOCOL + 'vjs.zencdn.net/'+vjs.CDN_VERSION+'/video-js.swf';
 }
+
+/**
+ * Utility function for adding languages to the default options. Useful for
+ * amending multiple language support at runtime.
+ *
+ * Example: vjs.addLanguage('es', {'Hello':'Hola'});
+ *
+ * @param  {String} code The language code or dictionary property
+ * @param  {Object} data The data values to be translated
+ * @return {Object} The resulting global languages dictionary object
+ */
+vjs.addLanguage = function(code, data){
+  if(vjs.options['languages'][code] !== undefined) {
+    vjs.options['languages'][code] = vjs.util.mergeOptions(vjs.options['languages'][code], data);
+  } else {
+    vjs.options['languages'][code] = data;
+  }
+  return vjs.options['languages'];
+};
 
 /**
  * Global player list

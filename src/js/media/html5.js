@@ -13,19 +13,19 @@ vjs.Html5 = vjs.MediaTechController.extend({
   /** @constructor */
   init: function(player, options, ready){
     // volume cannot be changed from 1 on iOS
-    this.features['volumeControl'] = vjs.Html5.canControlVolume();
+    this['featuresVolumeControl'] = vjs.Html5.canControlVolume();
 
     // just in case; or is it excessively...
-    this.features['playbackRate'] = vjs.Html5.canControlPlaybackRate();
+    this['featuresPlaybackRate'] = vjs.Html5.canControlPlaybackRate();
 
     // In iOS, if you move a video element in the DOM, it breaks video playback.
-    this.features['movingMediaElementInDOM'] = !vjs.IS_IOS;
+    this['movingMediaElementInDOM'] = !vjs.IS_IOS;
 
     // HTML video is able to automatically resize when going to fullscreen
-    this.features['fullscreenResize'] = true;
+    this['featuresFullscreenResize'] = true;
 
     // HTML video supports progress events
-    this.features['progressEvents'] = true;
+    this['featuresProgressEvents'] = true;
 
     vjs.MediaTechController.call(this, player, options, ready);
     this.setupTriggers();
@@ -75,7 +75,7 @@ vjs.Html5.prototype.createEl = function(){
   // Check if this browser supports moving the element into the box.
   // On the iPhone video will break if you move the element,
   // So we have to create a brand new element.
-  if (!el || this.features['movingMediaElementInDOM'] === false) {
+  if (!el || this['movingMediaElementInDOM'] === false) {
 
     // If the original tag is still there, clone and remove it.
     if (el) {
@@ -123,9 +123,11 @@ vjs.Html5.prototype.setupTriggers = function(){
 };
 
 vjs.Html5.prototype.eventHandler = function(evt){
-  // In the case of an error, set the error prop on the player
-  // and let the player handle triggering the event.
-  if (evt.type == 'error') {
+  // In the case of an error on the video element, set the error prop
+  // on the player and let the player handle triggering the event. On
+  // some platforms, error events fire that do not cause the error
+  // property on the video element to be set. See #1465 for an example.
+  if (evt.type == 'error' && this.error()) {
     this.player().error(this.error().code);
 
   // in some cases we pass the event directly to the player
@@ -207,6 +209,20 @@ vjs.Html5.prototype.supportsFullScreen = function(){
 
 vjs.Html5.prototype.enterFullScreen = function(){
   var video = this.el_;
+
+  if ('webkitDisplayingFullscreen' in video) {
+    this.one('webkitbeginfullscreen', vjs.bind(this, function(e) {
+      this.player_.isFullscreen(true);
+
+      this.one('webkitendfullscreen', vjs.bind(this, function(e) {
+        this.player_.isFullscreen(false);
+        this.player_.trigger('fullscreenchange');
+      }));
+
+      this.player_.trigger('fullscreenchange');
+    }));
+  }
+
   if (video.paused && video.networkState <= video.HAVE_METADATA) {
     // attempt to prime the video element for programmatic access
     // this isn't necessary on the desktop but shouldn't hurt
@@ -225,7 +241,13 @@ vjs.Html5.prototype.enterFullScreen = function(){
 vjs.Html5.prototype.exitFullScreen = function(){
   this.el_.webkitExitFullScreen();
 };
-vjs.Html5.prototype.src = function(src){ this.el_.src = src; };
+vjs.Html5.prototype.src = function(src) {
+  if (src === undefined) {
+    return this.el_.src;
+  } else {
+    this.el_.src = src;
+  }
+};
 vjs.Html5.prototype.load = function(){ this.el_.load(); };
 vjs.Html5.prototype.currentSrc = function(){ return this.el_.currentSrc; };
 

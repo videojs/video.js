@@ -2,9 +2,49 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @deedos added a Brazilian Portuguese translation ([view](https://github.com/videojs/video.js/pull/1520))
+* @baloneysandwiches added a hasClass method ([view](https://github.com/videojs/video.js/pull/1464))
+* @mynameisstephen fixed an issue where slider event listeners were not being cleaned up ([view](https://github.com/videojs/video.js/pull/1475))
+* @alexrqs cleaned up the Spanish translation ([view](https://github.com/videojs/video.js/pull/1494))
+* @t2y added a Japanese translation ([view](https://github.com/videojs/video.js/pull/1497))
+* @chikathreesix fixed an issue where data-setup options could be missed ([view](https://github.com/videojs/video.js/pull/1514))
+* @seniorflexdeveloper added new translations and translation updates ([view](https://github.com/videojs/video.js/pull/1530))
 
 --------------------
+
+## 4.8.5 (2014-09-25)
+* Updated to the latest version of the swf to fix HLS playback ([view](https://github.com/videojs/video.js/pull/1538))
+
+## 4.8.4 (2014-09-23)
+* @gkatsev fixed isFullscreen reporting on iOS devices ([view](https://github.com/videojs/video.js/pull/1511))
+
+## 4.8.3 (2014-09-22)
+* @heff updated to the latest version of the SWF to 4.4.4 ([view](https://github.com/videojs/video.js/pull/1526))
+
+## 4.8.2 (2014-09-16)
+* @gkatsev fixed an IE11 bug where pause was not fired when the video ends ([view](https://github.com/videojs/video.js/pull/1512))
+
+## 4.8.1 (2014-09-05)
+* @dmlap fixed an issue where an error could be fired after player disposal ([view](https://github.com/videojs/video.js/pull/1481))
+* @dmlap fixed poster error handling ([view](https://github.com/videojs/video.js/pull/1482))
+* @dmlap fixed an issue with languages and subclassing the player ([view](https://github.com/videojs/video.js/pull/1483))
+* @mmcc fixed a few CSS issues with the poster and the error 'X' ([view](https://github.com/videojs/video.js/pull/1487))
+* @MrVaykadji and @Calinou added a french translation ([view](https://github.com/videojs/video.js/pull/1467))
+* @heff fixed an internal deprecation warning and missing deprecated functions ([view](https://github.com/videojs/video.js/pull/1488))
+
+## 4.8.0 (2014-09-03)
+* @andekande added a German translation ([view](https://github.com/videojs/video.js/pull/1426))
+* @mattosborn fixed a bug where getting the video element src would overwrite it ([view](https://github.com/videojs/video.js/pull/1430))
+* @songpete fixed a bug where keyboard events were bubbling and causing additional actions ([view](https://github.com/videojs/video.js/pull/1455))
+* @knabar made the inactivity timeout configurable ([view](https://github.com/videojs/video.js/pull/1409))
+* @seniorflexdeveloper added language files to the distribution for including specific languages ([view](https://github.com/videojs/video.js/pull/1453))
+* @gkatsev improved handling of null and NaN dimension values ([view](https://github.com/videojs/video.js/pull/1449))
+* @gkatsev fixed an issue where the controls would break if Flash was initialized too quickly ([view](https://github.com/videojs/video.js/pull/1470))
+* @mmcc fixed an issue where if no playback tech was supported the error could not be caught ([view](https://github.com/videojs/video.js/pull/1473))
+
+## 4.7.3 (2014-08-20)
+* Added function for adding new language translations, updated docs, and fixed the notSupportedMessage translation ([view](https://github.com/videojs/video.js/pull/1427))
+* Exposed the player.selectSource method to allow overriding the source selection order ([view](https://github.com/videojs/video.js/pull/1424))
 
 ## 4.7.2 (2014-08-14)
 * Fixed a case where timeupdate events were not firing, and fixed and issue with the Flash player version ([view](https://github.com/videojs/video.js/pull/1417))

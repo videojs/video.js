@@ -65,7 +65,7 @@ vjs.Button.prototype.onClick = function(){};
 
   // Focus - Add keyboard functionality to element
 vjs.Button.prototype.onFocus = function(){
-  vjs.on(document, 'keyup', vjs.bind(this, this.onKeyPress));
+  vjs.on(document, 'keydown', vjs.bind(this, this.onKeyPress));
 };
 
   // KeyPress (document level) - Trigger click when keys are pressed
@@ -79,5 +79,5 @@ vjs.Button.prototype.onKeyPress = function(event){
 
 // Blur - Remove keyboard triggers
 vjs.Button.prototype.onBlur = function(){
-  vjs.off(document, 'keyup', vjs.bind(this, this.onKeyPress));
+  vjs.off(document, 'keydown', vjs.bind(this, this.onKeyPress));
 };
