@@ -15,6 +15,7 @@ CHANGELOG
 * @philipgiuliani added an Italian translation ([view](https://github.com/videojs/video.js/pull/1550))
 * @twentyrogersc fixed the return value when setting the poster source ([view](https://github.com/videojs/video.js/pull/1552))
 * @heff updated to swf v4.5.0 to fix event issues ([view](https://github.com/videojs/video.js/pull/1554))
+* @rpless made the VolumeMenuButton volume more accesible via tab navigation ([view](https://github.com/videojs/video.js/pull/1519))
 
 --------------------
 
