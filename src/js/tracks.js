@@ -149,8 +149,6 @@ vjs.TextTrack = vjs.Component.extend({
     this.activeCues_ = [];
     this.readyState_ = 0;
     this.mode_ = 0;
-
-    this.player_.on('fullscreenchange', vjs.bind(this, this.adjustFontSize));
   }
 });
 
@@ -306,22 +304,6 @@ vjs.TextTrack.prototype.mode_;
  */
 vjs.TextTrack.prototype.mode = function(){
   return this.mode_;
-};
-
-/**
- * Change the font size of the text track to make it larger when playing in fullscreen mode
- * and restore it to its normal size when not in fullscreen mode.
- */
-vjs.TextTrack.prototype.adjustFontSize = function(){
-    if (this.player_.isFullscreen()) {
-        // Scale the font by the same factor as increasing the video width to the full screen window width.
-        // Additionally, multiply that factor by 1.4, which is the default font size for
-        // the caption track (from the CSS)
-        this.el_.style.fontSize = screen.width / this.player_.width() * 1.4 * 100 + '%';
-    } else {
-        // Change the font size of the text track back to its original non-fullscreen size
-        this.el_.style.fontSize = '';
-    }
 };
 
 /**
