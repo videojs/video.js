@@ -323,10 +323,6 @@ fonts to show/hide properly.
   margin: 1.1em auto 0;
 }
 
-.vjs-default-skin .vjs-volume-menu-button .vjs-menu-content {
-  height: 2.9em;
-}
-
 .vjs-default-skin .vjs-volume-level {
   position: absolute;
   top: 0;
@@ -357,9 +353,32 @@ fonts to show/hide properly.
   height: 1em;
 }
 
+/* The volume menu button is like menu buttons (captions/subtitles) but works
+    a little differently. It needs to be possible to tab to the volume slider
+    without hitting space bar on the menu button. To do this we're not using
+    display:none to hide the slider menu by default, and instead setting the
+    width and height to zero. */
+.vjs-default-skin .vjs-volume-menu-button .vjs-menu {
+  display: block;
+  width: 0;
+  height: 0;
+  border-top-color: transparent;
+}
+
 .vjs-default-skin .vjs-volume-menu-button .vjs-menu .vjs-menu-content {
-  width: 6em;
-  left: -4em;
+  height: 0;
+  width: 0;
+}
+
+.vjs-default-skin .vjs-volume-menu-button:hover .vjs-menu,
+.vjs-default-skin .vjs-volume-menu-button .vjs-menu.vjs-lock-showing {
+  border-top-color: rgba(7, 40, 50, 0.5); /* Same as ul background */
+}
+
+.vjs-default-skin .vjs-volume-menu-button:hover .vjs-menu .vjs-menu-content,
+.vjs-default-skin .vjs-volume-menu-button .vjs-menu.vjs-lock-showing .vjs-menu-content {
+  height: 2.9em;
+  width: 10em;
 }
 
 /* Progress
@@ -724,22 +743,12 @@ easily in the skin designer. http://designer.videojs.com/
   width: 0em;
   height: 0em;
   margin-bottom: 3em;
-}
 
-.vjs-default-skin .vjs-menu,
-.vjs-default-skin .vjs-volume-menu-button:hover .vjs-menu,
-.vjs-default-skin .vjs-volume-menu-button .vjs-menu.vjs-lock-showing {
   border-left: 2em solid transparent;
   border-right: 2em solid transparent;
 
   border-top: 1.55em solid rgb(0, 0, 0); /* Same width top as ul bottom */
   border-top-color: rgba(7, 40, 50, 0.5); /* Same as ul background */
-}
-
-.vjs-default-skin .vjs-volume-menu-button .vjs-menu {
-  display: block;
-  width: 0px;
-  border: none;
 }
 
 /* Button Pop-up Menu */
@@ -757,13 +766,7 @@ easily in the skin designer. http://designer.videojs.com/
   .background-color-with-alpha(@control-bg-color, @control-bg-alpha);
   .box-shadow(-0.2em -0.2em 0.3em rgba(255, 255, 255, 0.2));
 }
-.vjs-default-skin .vjs-volume-menu-button .vjs-menu .vjs-menu-content {
-  width: 0px;
-}
-.vjs-default-skin .vjs-volume-menu-button:hover .vjs-menu .vjs-menu-content,
-.vjs-default-skin .vjs-volume-menu-button .vjs-menu.vjs-lock-showing .vjs-menu-content {
-  width: 10em;
-}
+
 .vjs-default-skin .vjs-menu-button:hover .vjs-control-content .vjs-menu,
 .vjs-default-skin .vjs-control-content .vjs-menu.vjs-lock-showing {
   display: block;
