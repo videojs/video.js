@@ -1279,6 +1279,8 @@ vjs.Player.prototype.poster = function(src){
 
   // alert components that the poster has been set
   this.trigger('posterchange');
+
+  return this;
 };
 
 /**

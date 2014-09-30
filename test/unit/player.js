@@ -211,6 +211,8 @@ test('should set and update the poster value', function(){
   ok(pcEmitted, 'posterchange event was emitted');
   equal(player.poster(), updatedPoster, 'the updated poster is returned');
 
+  equal(player.poster(poster), player, 'the player is returned when setting a poster');
+
   player.dispose();
 });
 
