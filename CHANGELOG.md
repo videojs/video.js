@@ -13,6 +13,7 @@ CHANGELOG
 * @doublex fixed an issue with IE7 backwards compatibility ([view](https://github.com/videojs/video.js/pull/1542))
 * @mmcc made it possible to override the font-size of captions and subtitles ([view](https://github.com/videojs/video.js/pull/1547))
 * @philipgiuliani added an Italian translation ([view](https://github.com/videojs/video.js/pull/1550))
+* @twentyrogersc fixed the return value when setting the poster source ([view](https://github.com/videojs/video.js/pull/1552))
 
 --------------------
 
