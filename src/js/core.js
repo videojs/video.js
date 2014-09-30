@@ -93,7 +93,7 @@ vjs.options = {
   // 'playbackRates': [0.5, 1, 1.5, 2],
 
   // default inactivity timeout
-  'inactivityTimeout': 2000,
+  'inactivityTimeout': 5000,
 
   // Included control sets
   'children': {
