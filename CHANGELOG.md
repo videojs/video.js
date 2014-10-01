@@ -2,6 +2,11 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 4.9.0 (2014-09-30)
 * @deedos added a Brazilian Portuguese translation ([view](https://github.com/videojs/video.js/pull/1520))
 * @baloneysandwiches added a hasClass method ([view](https://github.com/videojs/video.js/pull/1464))
 * @mynameisstephen fixed an issue where slider event listeners were not being cleaned up ([view](https://github.com/videojs/video.js/pull/1475))
@@ -17,8 +22,6 @@ CHANGELOG
 * @heff updated to swf v4.5.0 to fix event issues ([view](https://github.com/videojs/video.js/pull/1554))
 * @rpless made the VolumeMenuButton volume more accesible via tab navigation ([view](https://github.com/videojs/video.js/pull/1519))
 * @mmcc added support for audio tags (html5 audio only) ([view](https://github.com/videojs/video.js/pull/1540))
-
---------------------
 
 ## 4.8.5 (2014-09-25)
 * Updated to the latest version of the swf to fix HLS playback ([view](https://github.com/videojs/video.js/pull/1538))
