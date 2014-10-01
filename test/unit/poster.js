@@ -40,7 +40,7 @@ test('should update the poster source', function(){
 test('should not hide the poster if audio track is used', function() {
   var audio = document.createElement('audio'),
       poster = 'http://example.com/poster.jpg',
-      player = PlayerTest.makePlayer({ 'techOrder': ['html5'], 'poster': poster, 'controls': true }, audio),
+      player = PlayerTest.makePlayer({ 'poster': poster, 'controls': true }, audio),
       posterImage = new vjs.PosterImage(player),
       posterEl = posterImage.el();
 

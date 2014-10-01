@@ -649,7 +649,7 @@ test('pause is not called if the player is paused and ended is fired', function(
 
 test('should add an audio class if an audio el is used', function() {
   var audio = document.createElement('audio'),
-      player = PlayerTest.makePlayer({ 'techOrder': ['html5'] }, audio),
+      player = PlayerTest.makePlayer({}, audio),
       audioClass = 'vjs-audio';
 
   ok(player.el().className.indexOf(audioClass) !== -1, 'added '+ audioClass +' css class');
