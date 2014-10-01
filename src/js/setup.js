@@ -5,28 +5,48 @@
 
 // Automatically set up any tags that have a data-setup attribute
 vjs.autoSetup = function(){
-  var options, vid, player,
-      vids = document.getElementsByTagName('video');
+  var options, mediaEl, player, i, e;
+
+  // One day, when we stop supporting IE8, go back to this, but in the meantime...*hack hack hack*
+  // var vids = Array.prototype.slice.call(document.getElementsByTagName('video'));
+  // var audios = Array.prototype.slice.call(document.getElementsByTagName('audio'));
+  // var mediaEls = vids.concat(audios);
+
+  // Because IE8 doesn't support calling slice on a node list, we need to loop through each list of elements
+  // to build up a new, combined list of elements.
+  var vids = document.getElementsByTagName('video');
+  var audios = document.getElementsByTagName('audio');
+  var mediaEls = [];
+  if (vids && vids.length > 0) {
+    for(i=0, e=vids.length; i<e; i++) {
+      mediaEls.push(vids[i]);
+    }
+  }
+  if (audios && audios.length > 0) {
+    for(i=0, e=audios.length; i<e; i++) {
+      mediaEls.push(audios[i]);
+    }
+  }
 
   // Check if any media elements exist
-  if (vids && vids.length > 0) {
+  if (mediaEls && mediaEls.length > 0) {
 
-    for (var i=0,j=vids.length; i<j; i++) {
-      vid = vids[i];
+    for (i=0,e=mediaEls.length; i<e; i++) {
+      mediaEl = mediaEls[i];
 
       // Check if element exists, has getAttribute func.
       // IE seems to consider typeof el.getAttribute == 'object' instead of 'function' like expected, at least when loading the player immediately.
-      if (vid && vid.getAttribute) {
+      if (mediaEl && mediaEl.getAttribute) {
 
         // Make sure this player hasn't already been set up.
-        if (vid['player'] === undefined) {
-          options = vid.getAttribute('data-setup');
+        if (mediaEl['player'] === undefined) {
+          options = mediaEl.getAttribute('data-setup');
 
           // Check if data-setup attr exists.
           // We only auto-setup if they've added the data-setup attr.
           if (options !== null) {
             // Create new video.js instance.
-            player = videojs(vid);
+            player = videojs(mediaEl);
           }
         }
 

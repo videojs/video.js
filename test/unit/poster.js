@@ -36,3 +36,14 @@ test('should update the poster source', function(){
 
   player.dispose();
 });
+
+test('should not hide the poster if audio track is used', function() {
+  var audio = document.createElement('audio'),
+      poster = 'http://example.com/poster.jpg',
+      player = PlayerTest.makePlayer({ 'poster': poster, 'controls': true }, audio),
+      posterImage = new vjs.PosterImage(player),
+      posterEl = posterImage.el();
+
+  player.trigger('play');
+  equal(posterEl.style.display, '', 'poster image is not hidden when audio track is used');
+});

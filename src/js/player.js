@@ -67,6 +67,9 @@ vjs.Player = vjs.Component.extend({
     // see enableTouchActivity in Component
     options.reportTouchActivity = false;
 
+    // Set isAudio based on whether or not an audio tag was used
+    this.isAudio(this.tag.nodeName.toLowerCase() === 'audio');
+
     // Run base component initializing with new options.
     // Builds the element through createEl()
     // Inits and embeds any child components in opts
@@ -78,6 +81,10 @@ vjs.Player = vjs.Component.extend({
       this.addClass('vjs-controls-enabled');
     } else {
       this.addClass('vjs-controls-disabled');
+    }
+
+    if (this.isAudio()) {
+      this.addClass('vjs-audio');
     }
 
     // TODO: Make this smarter. Toggle user state between touching/mousing
@@ -1567,6 +1574,16 @@ vjs.Player.prototype.playbackRate = function(rate) {
     return 1.0;
   }
 
+};
+
+vjs.Player.prototype.isAudio_ = false;
+vjs.Player.prototype.isAudio = function(bool) {
+  if (bool !== undefined) {
+    this.isAudio_ = !!bool;
+    return this;
+  }
+
+  return this.isAudio_;
 };
 
 // Methods to add support for

@@ -201,6 +201,12 @@ The default control bar that is a container for most of the controls.
   display: none;
 }
 
+/* Don't hide the control bar if it's audio */
+.vjs-audio.vjs-default-skin.vjs-has-started.vjs-user-inactive.vjs-playing .vjs-control-bar {
+  opacity: 1;
+  visibility: visible;
+}
+
 /* IE8 is flakey with fonts, and you have to change the actual content to force
 fonts to show/hide properly.
   - "\9" IE8 hack didn't work for this
@@ -223,7 +229,7 @@ fonts to show/hide properly.
   width: 4em;
 }
 
-/* FontAwsome button icons */
+/* Font button icons */
 .vjs-default-skin .vjs-control:before {
   font-family: VideoJS;
   font-size: 1.5em;
