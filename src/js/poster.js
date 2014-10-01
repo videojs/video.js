@@ -24,7 +24,9 @@ vjs.PosterImage = vjs.Button.extend({
       this.src(player.poster());
     }));
 
-    player.on('play', vjs.bind(this, this.hide));
+    if (!player.isAudio()) {
+      player.on('play', vjs.bind(this, this.hide));
+    }
   }
 });
 
