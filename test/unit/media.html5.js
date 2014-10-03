@@ -10,7 +10,7 @@ module('HTML5', {
       id: function(){ return 'id'; },
       el: function(){ return el; },
       options_: {},
-      options: function(){ return {}; },
+      options: function(){ return this.options_; },
       bufferedPercent: function() { return 0; },
       controls: function(){ return false; },
       usingNativeControls: function(){ return false; },
@@ -69,6 +69,19 @@ test('test playbackRate', function() {
 
   tech['setPlaybackRate'](0.75);
   strictEqual(tech.playbackRate(), 0.75);
+});
+
+test('should remove the controls attribute when recreating the element', function() {
+  var el;
+  player.tagAttributes = {
+    controls: true
+  };
+  // force custom controls so the test environment is equivalent on iOS
+  player.options_['nativeControlsForTouch'] = false;
+  el = tech.createEl();
+
+  ok(!el.controls, 'controls attribute is absent');
+  ok(player.tagAttributes.controls, 'tag attribute is still present');
 });
 
 test('patchCanPlayType patches canplaytype with our function, conditionally', function() {
