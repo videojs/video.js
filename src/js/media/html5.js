@@ -69,6 +69,7 @@ vjs.Html5.prototype.createEl = function(){
   var player = this.player_,
       // If possible, reuse original tag for HTML5 playback technology element
       el = player.tag,
+      attributes,
       newEl,
       clone;
 
@@ -85,8 +86,15 @@ vjs.Html5.prototype.createEl = function(){
       player.tag = null;
     } else {
       el = vjs.createEl('video');
+
+      // determine if native controls should be used
+      attributes = videojs.util.mergeOptions({}, player.tagAttributes);
+      if (!vjs.TOUCH_ENABLED || player.options()['nativeControlsForTouch'] === false) {
+        delete attributes.controls;
+      }
+
       vjs.setElementAttributes(el,
-        vjs.obj.merge(player.tagAttributes || {}, {
+        vjs.obj.merge(attributes, {
           id:player.id() + '_html5_api',
           'class':'vjs-tech'
         })

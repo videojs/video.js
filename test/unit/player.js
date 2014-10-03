@@ -536,7 +536,7 @@ test('should restore attributes from the original video tag when creating a new 
   // simulate attributes stored from the original tag
   player.tagAttributes = {
     'preload': 'auto',
-    'controls': true,
+    'autoplay': true,
     'webkit-playsinline': true
   };
 
@@ -547,7 +547,7 @@ test('should restore attributes from the original video tag when creating a new 
   el = vjs.Html5.prototype.createEl.call(html5Mock);
 
   equal(el.getAttribute('preload'), 'none', 'attribute was successful overridden by an option');
-  equal(el.getAttribute('controls'), '', 'controls attribute was set properly');
+  equal(el.getAttribute('autoplay'), '', 'autoplay attribute was set properly');
   equal(el.getAttribute('webkit-playsinline'), '', 'webkit-playsinline attribute was set properly');
 });
 
