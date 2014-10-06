@@ -15,7 +15,7 @@
  */
 vjs.JSON;
 
-if (typeof window.JSON !== 'undefined' && window.JSON.parse === 'function') {
+if (typeof window.JSON !== 'undefined' && typeof window.JSON.parse === 'function') {
   vjs.JSON = window.JSON;
 
 } else {
