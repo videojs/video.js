@@ -5,6 +5,7 @@ CHANGELOG
 * @aptx4869 fixed an issue where the native JSON parser wasn&#x27;t used ([view](https://github.com/videojs/video.js/pull/1565))
 * @andekande improved the German translation ([view](https://github.com/videojs/video.js/pull/1555))
 * @OlehTsvirko added a Ukrainian translation ([view](https://github.com/videojs/video.js/pull/1562))
+* @OlehTsvirko added a Russian translation ([view](https://github.com/videojs/video.js/pull/1563))
 
 --------------------
 
