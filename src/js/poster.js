@@ -12,27 +12,23 @@ vjs.PosterImage = vjs.Button.extend({
   init: function(player, options){
     vjs.Button.call(this, player, options);
 
-    if (player.poster()) {
-      this.src(player.poster());
-    }
-
-    if (!player.poster() || !player.controls()) {
-      this.hide();
-    }
-
-    player.on('posterchange', vjs.bind(this, function(){
-      this.src(player.poster());
-    }));
-
-    if (!player.isAudio()) {
-      player.on('play', vjs.bind(this, this.hide));
-    }
+    this.update();
+    player.on('posterchange', vjs.bind(this, this.update));
   }
 });
 
-// use the test el to check for backgroundSize style support
-var _backgroundSizeSupported = 'backgroundSize' in vjs.TEST_VID.style;
+/**
+ * Clean up the poster image
+ */
+vjs.PosterImage.prototype.dispose = function(){
+  this.player().off('posterchange', this.update);
+  vjs.Button.prototype.dispose.call(this);
+};
 
+/**
+ * Create the poster image element
+ * @return {Element}
+ */
 vjs.PosterImage.prototype.createEl = function(){
   var el = vjs.createEl('div', {
     className: 'vjs-poster',
@@ -41,40 +37,63 @@ vjs.PosterImage.prototype.createEl = function(){
     tabIndex: -1
   });
 
-  if (!_backgroundSizeSupported) {
-    // setup an img element as a fallback for IE8
-    el.appendChild(vjs.createEl('img'));
+  // To ensure the poster image resizes while maintaining its original aspect
+  // ratio, use a div with `background-size` when available. For browsers that
+  // do not support `background-size` (e.g. IE8), fall back on using a regular
+  // img element.
+  if (!vjs.BACKGROUND_SIZE_SUPPORTED) {
+    this.fallbackImg_ = vjs.createEl('img');
+    el.appendChild(this.fallbackImg_);
   }
 
   return el;
 };
 
-vjs.PosterImage.prototype.src = function(url){
-  var el = this.el();
+/**
+ * Event handler for updates to the player's poster source
+ */
+vjs.PosterImage.prototype.update = function(){
+  var url = this.player().poster();
 
-  // getter
-  // can't think of a need for a getter here
-  // see #838 if on is needed in the future
-  // still don't want a getter to set src as undefined
-  if (url === undefined) {
-    return;
-  }
+  this.setSrc(url);
 
-  // setter
-  // To ensure the poster image resizes while maintaining its original aspect
-  // ratio, use a div with `background-size` when available. For browsers that
-  // do not support `background-size` (e.g. IE8), fall back on using a regular
-  // img element.
-  if (_backgroundSizeSupported) {
-    el.style.backgroundImage = 'url("' + url + '")';
+  // If there's no poster source we should display:none on this component
+  // so it's not still clickable or right-clickable
+  if (url) {
+    // Remove the display style property that hide() adds
+    // as opposed to show() which sets display to block
+    // In the future it might be worth creating an `unhide` component method
+    this.el_.style.display = '';
   } else {
-    el.firstChild.src = url;
+    this.hide();
   }
 };
 
-vjs.PosterImage.prototype.onClick = function(){
-  // Only accept clicks when controls are enabled
-  if (this.player().controls()) {
-    this.player_.play();
+/**
+ * Set the poster source depending on the display method
+ */
+vjs.PosterImage.prototype.setSrc = function(url){
+  var backgroundImage;
+
+  if (this.fallbackImg_) {
+    this.fallbackImg_.src = url;
+  } else {
+    backgroundImage = '';
+    // Any falsey values should stay as an empty string, otherwise
+    // this will throw an extra error
+    if (url) {
+      backgroundImage = 'url("' + url + '")';
+    }
+
+    this.el_.style.backgroundImage = backgroundImage;
   }
+};
+
+/**
+ * Event handler for clicks on the poster image
+ */
+vjs.PosterImage.prototype.onClick = function(){
+  // We don't want a click to trigger playback when controls are disabled
+  // but CSS should be hiding the poster to prevent that from happening
+  this.player_.play();
 };
