@@ -22,8 +22,8 @@ vjs.Html5 = vjs.MediaTechController.extend({
     // 1) Check if the source is new (if not, we want to keep the original so playback isn't interrupted)
     // 2) Check to see if the network state of the tag was failed at init, and if so, reset the source
     // anyway so the error gets fired.
-    if (source && ((this.el_.currentSrc !== source.src) || (player.tag && player.tag.initNetworkState_ === 3))) {
-      this.el_.src = source.src;
+    if (source && (this.el_.currentSrc !== source.src || (player.tag && player.tag.initNetworkState_ === 3))) {
+      this.setSource(source);
     }
 
     // Determine if native controls should be used
@@ -307,18 +307,26 @@ vjs.Html5.nativeSourceHandler = {};
  * @return {String}         'probably', 'maybe', or '' (empty string)
  */
 vjs.Html5.nativeSourceHandler.canHandleSource = function(source){
-  var can = '';
+  var ext;
 
-  // IE9 on Windows 7 without MediaPlayer throws an error here
-  // https://github.com/videojs/video.js/issues/519
-  try {
-    can = !!vjs.TEST_VID.canPlayType(source.type);
-  } catch(e) {
-    can = '';
+  function canPlayType(type){
+    // IE9 on Windows 7 without MediaPlayer throws an error here
+    // https://github.com/videojs/video.js/issues/519
+    try {
+      return !!vjs.TEST_VID.canPlayType(type);
+    } catch(e) {
+      return '';
+    }
   }
-  // TODO: If no type, check the extension
 
-  return can;
+  // If a type was provided we should rely on that
+  if (source.type) {
+    return canPlayType(source.type);
+  } else {
+    // If no type, fall back to checking 'video/[EXTENSION]'
+    ext = source.src.match(/\.([^\/\?]+)(\?[^\/]+)?$/i)[1];
+    return canPlayType('video/'+ext);
+  }
 };
 
 /**

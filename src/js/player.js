@@ -1084,7 +1084,6 @@ vjs.Player.prototype.exitFullWindow = function(){
 };
 
 vjs.Player.prototype.selectSource = function(sources){
-
   // Loop through each playback technology in the options order
   for (var i=0,j=this.options_['techOrder'];i<j.length;i++) {
     var techName = vjs.capitalize(j[i]),

@@ -313,8 +313,6 @@ vjs.MediaTechController.withSourceHandlers = function(tech){
   tech.selectSourceHandler = function(source){
     var handlers = tech.sourceHandlers;
 
-    // console.log('here', handlers[0].canHandleSource);
-
     for (var i = 0; i < handlers.length; i++) {
       can = handlers[i].canHandleSource(source);
 
@@ -326,26 +324,23 @@ vjs.MediaTechController.withSourceHandlers = function(tech){
     return null;
   };
 
+  /**
+   * Create a function for setting the source using a source object
+   * and source handlers.
+   * Should never be called unless a source handler was found.
+   * @param {Object} source  A source object with src and type keys
+   */
   tech.prototype.setSource = function(source){
     var sh = tech.selectSourceHandler(source);
 
+    // Clean up any existing source handler
+    if (this.sourceHandler && this.sourceHandler.dispose) {
+      this.sourceHandler.dispose();
+    }
+
     this.currentSource_ = source;
 
-    if (sh) {
-      // Clean up any existing source handler
-      if (this.sourceHandler && this.sourceHandler.dispose) {
-        this.sourceHandler.dispose();
-      }
-
-      this.sourceHandler = sh;
-      sh.handleSource(source, this);
-    } else {
-      // If no source handler was found, attempt the existing one. It could be
-      // that it's a source object with no type.
-      // There should be no way to get here without loading an initial handler.
-      // The tech wouldn't be loaded if a handler wasn't found in canPlaySource.
-      this.sourceHandler.handleSource(source, this);
-    }
+    this.sourceHandler = sh.handleSource(source, this);
   };
 
   /**
