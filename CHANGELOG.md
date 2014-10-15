@@ -10,6 +10,9 @@ CHANGELOG
 
 --------------------
 
+## 4.9.1 (2014-10-15)
+* Bumped to videojs-swf v4.5.1 to fix a data sanitization issue ([view](https://github.com/videojs/video.js/pull/1587))
+
 ## 4.9.0 (2014-09-30)
 * @deedos added a Brazilian Portuguese translation ([view](https://github.com/videojs/video.js/pull/1520))
 * @baloneysandwiches added a hasClass method ([view](https://github.com/videojs/video.js/pull/1464))

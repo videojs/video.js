@@ -93,8 +93,7 @@
   "patch": {
     "desc": "Create an urgent fix for the latest stable version",
     "baseBranch": "stable",
-    "new": {
-      "alias": "start",
+    "start": {
       "desc": "Start a new patch",
       "finished": "Make your changes and then run `contrib patch submit`",
       "steps": [
