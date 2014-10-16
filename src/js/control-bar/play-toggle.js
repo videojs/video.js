@@ -10,8 +10,8 @@ vjs.PlayToggle = vjs.Button.extend({
   init: function(player, options){
     vjs.Button.call(this, player, options);
 
-    player.on('play', vjs.bind(this, this.onPlay));
-    player.on('pause', vjs.bind(this, this.onPause));
+    this.on(player, 'play', this.onPlay);
+    this.on(player, 'pause', this.onPause);
   }
 });
 
@@ -32,14 +32,14 @@ vjs.PlayToggle.prototype.onClick = function(){
 
   // OnPlay - Add the vjs-playing class to the element so it can change appearance
 vjs.PlayToggle.prototype.onPlay = function(){
-  vjs.removeClass(this.el_, 'vjs-paused');
-  vjs.addClass(this.el_, 'vjs-playing');
+  this.removeClass('vjs-paused');
+  this.addClass('vjs-playing');
   this.el_.children[0].children[0].innerHTML = this.localize('Pause'); // change the button text to "Pause"
 };
 
   // OnPause - Add the vjs-paused class to the element so it can change appearance
 vjs.PlayToggle.prototype.onPause = function(){
-  vjs.removeClass(this.el_, 'vjs-playing');
-  vjs.addClass(this.el_, 'vjs-paused');
+  this.removeClass('vjs-playing');
+  this.addClass('vjs-paused');
   this.el_.children[0].children[0].innerHTML = this.localize('Play'); // change the button text to "Play"
 };

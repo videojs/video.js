@@ -35,7 +35,10 @@ test('should test and toggle volume control on `loadstart`', function(){
     language: noop,
     languages: noop,
     on: function(event, callback){
-      listeners.push(callback);
+      // don't fire dispose listeners
+      if (event !== 'dispose') {
+        listeners.push(callback);
+      }
     },
     ready: noop,
     volume: function(){
@@ -53,30 +56,24 @@ test('should test and toggle volume control on `loadstart`', function(){
   volumeControl = new vjs.VolumeControl(player);
   muteToggle = new vjs.MuteToggle(player);
 
-  ok(volumeControl.el().className.indexOf('vjs-hidden') < 0,
-     'volumeControl is hidden initially');
-  ok(muteToggle.el().className.indexOf('vjs-hidden') < 0,
-     'muteToggle is hidden initially');
+  equal(volumeControl.hasClass('vjs-hidden'), false, 'volumeControl is hidden initially');
+  equal(muteToggle.hasClass('vjs-hidden'), false, 'muteToggle is hidden initially');
 
   player.tech['featuresVolumeControl'] = false;
   for (i = 0; i < listeners.length; i++) {
     listeners[i]();
   }
 
-  ok(volumeControl.el().className.indexOf('vjs-hidden') >= 0,
-     'volumeControl does not hide itself');
-  ok(muteToggle.el().className.indexOf('vjs-hidden') >= 0,
-     'muteToggle does not hide itself');
+  equal(volumeControl.hasClass('vjs-hidden'), true, 'volumeControl does not hide itself');
+  equal(muteToggle.hasClass('vjs-hidden'), true, 'muteToggle does not hide itself');
 
   player.tech['featuresVolumeControl'] = true;
   for (i = 0; i < listeners.length; i++) {
     listeners[i]();
   }
 
-  ok(volumeControl.el().className.indexOf('vjs-hidden') < 0,
-     'volumeControl does not show itself');
-  ok(muteToggle.el().className.indexOf('vjs-hidden') < 0,
-     'muteToggle does not show itself');
+  equal(volumeControl.hasClass('vjs-hidden'), false, 'volumeControl does not show itself');
+  equal(muteToggle.hasClass('vjs-hidden'), false, 'muteToggle does not show itself');
 });
 
 test('calculateDistance should use changedTouches, if available', function() {

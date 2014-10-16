@@ -22,13 +22,10 @@ vjs.Slider = vjs.Component.extend({
     this.on('blur', this.onBlur);
     this.on('click', this.onClick);
 
-    this.player_.on('controlsvisible', vjs.bind(this, this.update));
-
-    player.on(this.playerEvent, vjs.bind(this, this.update));
+    this.on(player, 'controlsvisible', this.update);
+    this.on(player, this.playerEvent, this.update);
 
     this.boundEvents = {};
-
-
     this.boundEvents.move = vjs.bind(this, this.onMouseMove);
     this.boundEvents.end = vjs.bind(this, this.onMouseUp);
   }

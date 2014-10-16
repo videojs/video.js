@@ -733,7 +733,7 @@ vjs.TextTrackMenuItem = vjs.MenuItem.extend({
     options['selected'] = track.dflt();
     vjs.MenuItem.call(this, player, options);
 
-    this.player_.on(track.kind() + 'trackchange', vjs.bind(this, this.update));
+    this.on(player, track.kind() + 'trackchange', this.update);
   }
 });
 

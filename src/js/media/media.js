@@ -53,24 +53,21 @@ vjs.MediaTechController = vjs.Component.extend({
  * any controls will still keep the user active
  */
 vjs.MediaTechController.prototype.initControlsListeners = function(){
-  var player, tech, activateControls, deactivateControls;
+  var player, activateControls;
 
-  tech = this;
   player = this.player();
 
-  var activateControls = function(){
+  activateControls = function(){
     if (player.controls() && !player.usingNativeControls()) {
-      tech.addControlsListeners();
+      this.addControlsListeners();
     }
   };
-
-  deactivateControls = vjs.bind(tech, tech.removeControlsListeners);
 
   // Set up event listeners once the tech is ready and has an element to apply
   // listeners to
   this.ready(activateControls);
-  player.on('controlsenabled', activateControls);
-  player.on('controlsdisabled', deactivateControls);
+  this.on(player, 'controlsenabled', activateControls);
+  this.on(player, 'controlsdisabled', this.removeControlsListeners);
 
   // if we're loading the playback object after it has started loading or playing the
   // video (often with autoplay on) then the loadstart event has already fired and we
@@ -201,10 +198,12 @@ vjs.MediaTechController.prototype.stopTrackingProgress = function(){ clearInterv
 
 /*! Time Tracking -------------------------------------------------------------- */
 vjs.MediaTechController.prototype.manualTimeUpdatesOn = function(){
+  var player = this.player_;
+
   this.manualTimeUpdates = true;
 
-  this.player().on('play', vjs.bind(this, this.trackCurrentTime));
-  this.player().on('pause', vjs.bind(this, this.stopTrackingCurrentTime));
+  this.on(player, 'play', this.trackCurrentTime);
+  this.on(player, 'pause', this.stopTrackingCurrentTime);
   // timeupdate is also called by .currentTime whenever current time is set
 
   // Watch for native timeupdate event

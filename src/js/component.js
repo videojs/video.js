@@ -549,7 +549,8 @@ vjs.Component.prototype.buildCSSClass = function(){
 vjs.Component.prototype.on = function(first, second, third){
   var otherComponent, type, fn, removeOnDispose, cleanRemover, thisComponent;
 
-  if (first instanceof vjs.Component) {
+  // Not using `instanceof vjs.Component` because it makes mock players difficult
+  if (first && typeof first.on === 'function') {
     otherComponent = first;
     type = second;
     fn = vjs.bind(this, third);
@@ -605,7 +606,7 @@ vjs.Component.prototype.on = function(first, second, third){
 vjs.Component.prototype.off = function(first, second, third){
   var otherComponent, type, fn;
 
-  if (first instanceof vjs.Component) {
+  if (first && typeof first.on === 'function') {
     otherComponent = first;
     type = second;
 
@@ -646,7 +647,7 @@ vjs.Component.prototype.off = function(first, second, third){
 vjs.Component.prototype.one = function(first, second, third) {
   var otherComponent, type, fn, thisComponent, newFunc;
 
-  if (first instanceof vjs.Component) {
+  if (first && typeof first.on === 'function') {
     otherComponent = first;
     type = second;
     fn = vjs.bind(this, third);

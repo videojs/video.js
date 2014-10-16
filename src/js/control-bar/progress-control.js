@@ -36,7 +36,7 @@ vjs.SeekBar = vjs.Slider.extend({
   /** @constructor */
   init: function(player, options){
     vjs.Slider.call(this, player, options);
-    player.on('timeupdate', vjs.bind(this, this.updateARIAAttributes));
+    this.on(player, 'timeupdate', this.updateARIAAttributes);
     player.ready(vjs.bind(this, this.updateARIAAttributes));
   }
 });
@@ -118,7 +118,7 @@ vjs.LoadProgressBar = vjs.Component.extend({
   /** @constructor */
   init: function(player, options){
     vjs.Component.call(this, player, options);
-    player.on('progress', vjs.bind(this, this.update));
+    this.on(player, 'progress', this.update);
   }
 });
 
@@ -197,7 +197,7 @@ vjs.PlayProgressBar.prototype.createEl = function(){
 vjs.SeekHandle = vjs.SliderHandle.extend({
   init: function(player, options) {
     vjs.SliderHandle.call(this, player, options);
-    player.on('timeupdate', vjs.bind(this, this.updateContent));
+    this.on(player, 'timeupdate', this.updateContent);
   }
 });
 
