@@ -55,9 +55,10 @@ vjs.Player = vjs.Component.extend({
     this.cache_ = {};
 
     // Set poster
-    this.poster_ = options['poster'];
+    this.poster_ = options['poster'] || '';
+
     // Set controls
-    this.controls_ = options['controls'];
+    this.controls_ = !!options['controls'];
     // Original tag settings stored in options
     // now remove immediately so native controls don't flash.
     // May be turned back on by HTML5 tech if nativeControlsForTouch is true
@@ -1282,6 +1283,12 @@ vjs.Player.prototype.poster_;
 vjs.Player.prototype.poster = function(src){
   if (src === undefined) {
     return this.poster_;
+  }
+
+  // The correct way to remove a poster is to set as an empty string
+  // other falsey values will throw errors
+  if (!src) {
+    src = '';
   }
 
   // update the internal poster variable

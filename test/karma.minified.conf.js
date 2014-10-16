@@ -7,6 +7,7 @@ module.exports = function(config) {
     singleRun: true,
 
     files: [
+      '../build/files/video-js.min.css',
       '../test/karma-qunit-shim.js',
       '../node_modules/sinon/pkg/sinon.js',
       '../build/files/test.minified.video.js'

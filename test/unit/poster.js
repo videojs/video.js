@@ -1,49 +1,91 @@
-module('PosterImage');
+module('PosterImage', {
+  'setup': function(){
+    // Store the original background support so we can test different vals
+    this.origVal = vjs.BACKGROUND_SIZE_SUPPORTED;
+    this.poster1 = 'http://example.com/poster.jpg';
+    this.poster2 = 'http://example.com/UPDATED.jpg';
 
-test('should update the poster source', function(){
-  var player, posterImage, posterEl, poster1, poster2;
-
-  poster1 = 'http://example.com/poster.jpg';
-  poster2 = 'http://example.com/UPDATED.jpg';
-
-  player = PlayerTest.makePlayer({ poster: poster1 });
-
-  posterImage = new vjs.PosterImage(player);
-  posterEl = posterImage.el();
-
-  // check alternative methods for displaying the poster
-  function checkPosterSource(src) {
-    var modern, oldIE;
-
-    // in modern browsers we use backgroundImage to display the poster
-    modern = posterEl.style.backgroundImage.toString().indexOf(src) !== -1;
-    // otherwise we create an image elemement
-    oldIE = posterEl.firstChild && posterEl.firstChild.src === src;
-
-    if (modern || oldIE) {
-      return true;
-    }
-    return false;
+    // Create a mock player object that responds as a player would
+    this.mockPlayer = {
+      poster_: this.poster1,
+      poster: function(){
+        return this.poster_;
+      },
+      handler_: null,
+      on: function(type, handler){
+        this.handler_ = handler;
+      },
+      trigger: function(type){
+        this.handler_.call();
+      }
+    };
+  },
+  'teardown': function(){
+    vjs.BACKGROUND_SIZE_SUPPORTED = this.origVal;
   }
-
-  ok(checkPosterSource(poster1), 'displays the correct poster');
-
-  posterImage.src(poster2);
-  ok(checkPosterSource(poster2), 'displays the correct poster after updating');
-
-  posterImage.src();
-  ok(checkPosterSource(poster2), 'doesnt change poster when attempting a get');
-
-  player.dispose();
 });
 
-test('should not hide the poster if audio track is used', function() {
-  var audio = document.createElement('audio'),
-      poster = 'http://example.com/poster.jpg',
-      player = PlayerTest.makePlayer({ 'poster': poster, 'controls': true }, audio),
-      posterImage = new vjs.PosterImage(player),
-      posterEl = posterImage.el();
+test('should create and update a poster image', function(){
+  var posterImage;
 
-  player.trigger('play');
-  equal(posterEl.style.display, '', 'poster image is not hidden when audio track is used');
+  vjs.BACKGROUND_SIZE_SUPPORTED = true;
+  posterImage = new vjs.PosterImage(this.mockPlayer);
+  equal(posterImage.el().style.backgroundImage, 'url('+this.poster1+')', 'Background image used');
+
+  // Update with a new poster source and check the new value
+  this.mockPlayer.poster_ = this.poster2;
+  this.mockPlayer.trigger('posterchange');
+  equal(posterImage.el().style.backgroundImage, 'url('+this.poster2+')', 'Background image updated');
 });
+
+test('should create and update a fallback image in older browsers', function(){
+  var posterImage;
+
+  vjs.BACKGROUND_SIZE_SUPPORTED = false;
+  posterImage = new vjs.PosterImage(this.mockPlayer);
+  equal(posterImage.fallbackImg_.src, this.poster1, 'Fallback image created');
+
+  // Update with a new poster source and check the new value
+  this.mockPlayer.poster_ = this.poster2;
+  this.mockPlayer.trigger('posterchange');
+  equal(posterImage.fallbackImg_.src, this.poster2, 'Fallback image updated');
+});
+
+test('should remove itself from the document flow when there is no poster', function(){
+  var posterImage;
+
+  posterImage = new vjs.PosterImage(this.mockPlayer);
+  equal(posterImage.el().style.display, '', 'Poster image shows by default');
+
+  // Update with an empty string
+  this.mockPlayer.poster_ = '';
+  this.mockPlayer.trigger('posterchange');
+  equal(posterImage.el().style.display, 'none', 'Poster image hides with an empty source');
+
+  // Updated with a valid source
+  this.mockPlayer.poster_ = this.poster2;
+  this.mockPlayer.trigger('posterchange');
+  equal(posterImage.el().style.display, '', 'Poster image shows again when there is a source');
+});
+
+test('should hide the poster in the appropriate player states', function(){
+  var posterImage = new vjs.PosterImage(this.mockPlayer);
+  var playerDiv = document.createElement('div');
+  var fixture = document.getElementById('qunit-fixture');
+  var el = posterImage.el();
+
+  // Remove the source so when we add to the DOM it doesn't throw an error
+  // We want to poster to still think it has a real source so it doesn't hide itself
+  posterImage.setSrc('');
+
+  // Add the elements to the DOM so styles are computed
+  playerDiv.appendChild(el);
+  fixture.appendChild(playerDiv);
+
+  playerDiv.className = 'video-js vjs-has-started';
+  equal(TestHelpers.getComputedStyle(el, 'display'), 'none', 'The poster hides when the video has started');
+
+  playerDiv.className = 'video-js vjs-has-started vjs-audio';
+  equal(TestHelpers.getComputedStyle(el, 'display'), 'block', 'The poster continues to show when playing audio');
+});
+
