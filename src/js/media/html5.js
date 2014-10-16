@@ -27,10 +27,6 @@ vjs.Html5 = vjs.MediaTechController.extend({
     // HTML video supports progress events
     this['featuresProgressEvents'] = true;
 
-    // vjs.insertFirst seems to cause the networkState to flicker from 3 to 2, so
-    // keep track of the original for later so we can know if the source originally failed
-    // this.tag.initNetworkState_ = this.tag.networkState;
-
     vjs.MediaTechController.call(this, player, options, ready);
     this.setupTriggers();
 
