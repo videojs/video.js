@@ -10,7 +10,7 @@ There are two categories of docs: [Guides](./guides/) and [API docs](./api/). Gu
 
 ### Getting Started
 
-* [Setup](./guides/setup.md) - Check out the [5 second setup](http://videojs.com/#section5) if you're just getting started. The setup documentation gives a deeper view of the additional methods you can use to trigger the player setup.
+* [Setup](./guides/setup.md) - The setup documentation gives a deeper view of the additional methods you can use to trigger the player setup.
 
 * [Options](./guides/options.md) - There are a number of options that can be used to change how the player behaves, starting with the HTML5 media options like autoplay and preload, and expanding to Video.JS specific options.
 

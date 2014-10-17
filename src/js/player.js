@@ -1222,13 +1222,21 @@ vjs.Player.prototype.sourceList_ = function(sources){
   }
 };
 
-// Begin loading the src data
+/**
+ * Begin loading the src data.
+ * @return {vjs.Player} Returns the player
+ */
 // http://dev.w3.org/html5/spec/video.html#dom-media-load
 vjs.Player.prototype.load = function(){
   this.techCall('load');
   return this;
 };
 
+/**
+ * Returns the fully qualified URL of the current source value e.g. http://mysite.com/video.mp4
+ * Can be used in conjuction with `currentType` to assist in rebuilding the current source object.
+ * @return {String} The current source
+ */
 // http://dev.w3.org/html5/spec/video.html#dom-media-currentsrc
 vjs.Player.prototype.currentSrc = function(){
   return this.techGet('currentSrc') || this.cache_.src || '';
