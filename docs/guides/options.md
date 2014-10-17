@@ -112,3 +112,31 @@ The height attribute sets the display height of the video.
 or
 { "height": 480 }
 ```
+
+Component Options
+-----------------
+
+You can set the options for any single player component. For instance, if you wanted to remove the `muteToggle` button, which
+is a child of `controlBar`:
+
+```javascript
+var player = videojs('video-id', {
+  children: {
+    controlBar: {
+      children: {
+        muteToggle: false
+      }
+    }
+  }
+});
+```
+
+This also works using the `data-setup` attribute on the video element, just remember the options need to use proper JSON
+notation.
+
+```html
+<video ... data-setup='{ "children": { "controlBar": { "children": { "muteToggle": false } } } }'></video>
+```
+
+The [components guide](/blob/master/docs/guides/components.md) has an excellent breakdown of the structure of a player, you
+just need to remember to nest child components in a `children` object for each level.
