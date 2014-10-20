@@ -97,6 +97,36 @@ test('should do a deep merge of child options', function(){
   vjs.Component.prototype.options_ = null;
 });
 
+test('should allows setting child options at the parent options level', function(){
+  var parent;
+
+  parent = new vjs.Component(getFakePlayer(), {
+    'children': [
+      'component'
+    ],
+    // parent-level option for child
+    'component': {
+      'foo': true
+    }
+  });
+
+  equal(parent.children()[0].options()['foo'], true, 'child options set when children array is used');
+
+  parent = new vjs.Component(getFakePlayer(), {
+    'children': {
+      'component': {
+        'foo': false
+      }
+    },
+    // parent-level option for child
+    'component': {
+      'foo': true
+    }
+  });
+
+  equal(parent.children()[0].options()['foo'], true, 'child options set when children object is used');
+});
+
 test('should dispose of component and children', function(){
   var comp = new vjs.Component(getFakePlayer());
 
