@@ -188,7 +188,7 @@ vjs.fixEvent = function(event) {
     for (var key in old) {
       // Safari 6.0.3 warns you if you try to copy deprecated layerX/Y
       // Chrome warns you if you try to copy deprecated keyboardEvent.keyLocation
-      if (key !== 'layerX' && key !== 'layerY' && key !== 'keyboardEvent.keyLocation') {
+      if (key !== 'layerX' && key !== 'layerY' && key !== 'keyLocation') {
         // Chrome 32+ warns if you try to copy deprecated returnValue, but
         // we still want to if preventDefault isn't supported (IE8).
         if (!(key == 'returnValue' && old.preventDefault)) {
