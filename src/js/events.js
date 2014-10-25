@@ -277,6 +277,8 @@ vjs.fixEvent = function(event) {
  * @private
  */
 vjs.trigger = function(elem, event) {
+  // Abort when elem is invalid
+  if(elem == null || typeof(elem) == 'undefined') return;
   // Fetches element data and a reference to the parent (for bubbling).
   // Don't want to add a data object to cache for every parent,
   // so checking hasData first.
