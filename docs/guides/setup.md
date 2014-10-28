@@ -25,7 +25,9 @@ You can download the Video.js source and host it on your own servers, or use the
 ```
 
 ### Self Hosted. ###
-With the self hosted option you'll also want to update the location of the video-js.swf file.
+To entirely self-host, you'll need to pull in the font files and let Video.js know where the swf is located. If you simply copy the dist folder or zip file contents into your project everything
+should Just Work™, but the paths can easily be changed by editing the LESS file and re-building, or by modifying the generated CSS file.
+
 ```html
 <link href="//example.com/path/to/video-js.css" rel="stylesheet">
 <script src="//example.com/path/to/video.js"></script>
