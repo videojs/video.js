@@ -111,7 +111,7 @@ vjs.MenuButton = vjs.Button.extend({
       this.hide();
     }
 
-    this.on('keyup', this.onKeyPress);
+    this.on('keydown', this.onKeyPress);
     this.el_.setAttribute('aria-haspopup', true);
     this.el_.setAttribute('role', 'button');
   }
