@@ -131,6 +131,17 @@ var player = videojs('video-id', {
 });
 ```
 
+All the children can start getting a little verbose, so to simplify things, you can also set options for child components directly on the parent options.
+This is functionally the exact same as the above, for instance.
+
+```javascript
+var player = videojs('video-id', {
+  controlBar: {
+    muteToggle: false
+  }
+});
+```
+
 This also works using the `data-setup` attribute on the video element, just remember the options need to use proper JSON
 notation.
 
