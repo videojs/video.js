@@ -360,17 +360,17 @@ vjs.Component.prototype.getChild = function(name){
  * @suppress {accessControls|checkRegExp|checkTypes|checkVars|const|constantProperty|deprecated|duplicate|es5Strict|fileoverviewTags|globalThis|invalidCasts|missingProperties|nonStandardJsDocs|strictModuleDepCheck|undefinedNames|undefinedVars|unknownDefines|uselessCode|visibility}
  */
 vjs.Component.prototype.addChild = function(child, options){
-  var component, componentClass, componentName, componentId;
+  var component, componentClass, componentName;
 
-  // If string, create new component with options
+  // If child is a string, create new component with options
   if (typeof child === 'string') {
-
     componentName = child;
 
     // Make sure options is at least an empty object to protect against errors
     options = options || {};
 
-    // Assume name of set is a lowercased name of the UI Class (PlayButton, etc.)
+    // If no componentClass in options, assume componentClass is the name lowercased
+    // (e.g. playButton)
     componentClass = options['componentClass'] || vjs.capitalize(componentName);
 
     // Set name through options
@@ -479,36 +479,51 @@ vjs.Component.prototype.removeChild = function(component){
  *
  */
 vjs.Component.prototype.initChildren = function(){
-  var parent, children, child, name, opts;
+  var parent, parentOptions, children, child, name, opts, handleAdd;
 
   parent = this;
-  children = this.options()['children'];
+  parentOptions = parent.options();
+  children = parentOptions['children'];
 
   if (children) {
+    handleAdd = function(name, opts){
+      // Allow options for children to be set at the parent options
+      // e.g. videojs(id, { controlBar: false });
+      // instead of videojs(id, { children: { controlBar: false });
+      if (parentOptions[name]) {
+        opts = parentOptions[name];
+      }
+
+      // Allow for disabling default components
+      // e.g. vjs.options['children']['posterImage'] = false
+      if (opts === false) return;
+
+      // Create and add the child component.
+      // Add a direct reference to the child by name on the parent instance.
+      // If two of the same component are used, different names should be supplied
+      // for each
+      parent[name] = parent.addChild(name, opts);
+    };
+
     // Allow for an array of children details to passed in the options
     if (vjs.obj.isArray(children)) {
       for (var i = 0; i < children.length; i++) {
         child = children[i];
 
         if (typeof child == 'string') {
+          // ['myComponent']
           name = child;
           opts = {};
         } else {
+          // [{ name: 'myComponent', otherOption: true }]
           name = child.name;
           opts = child;
         }
 
-        parent[name] = parent.addChild(name, opts);
+        handleAdd(name, opts);
       }
     } else {
-      vjs.obj.each(children, function(name, opts){
-        // Allow for disabling default components
-        // e.g. vjs.options['children']['posterImage'] = false
-        if (opts === false) return;
-
-        // Set property name on player. Could cause conflicts with other prop names, but it's worth making refs easy.
-        parent[name] = parent.addChild(name, opts);
-      });
+      vjs.obj.each(children, handleAdd);
     }
   }
 };
