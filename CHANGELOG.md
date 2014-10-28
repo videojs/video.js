@@ -11,6 +11,7 @@ CHANGELOG
 * @mmcc fixed an issue where errors on source tags could get missed ([view](https://github.com/videojs/video.js/pull/1575))
 * @heff enhanced the event listener API to allow for auto-cleanup of listeners on other componenets and elements ([view](https://github.com/videojs/video.js/pull/1588))
 * @mmcc fixed an issue with the VolumeButton assuming it was vertical by default ([view](https://github.com/videojs/video.js/pull/1592))
+* @DevGavin added a Simplified Chinese translation ([view](https://github.com/videojs/video.js/pull/1593))
 
 --------------------
 
