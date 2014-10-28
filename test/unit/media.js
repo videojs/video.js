@@ -120,6 +120,7 @@ test('dispose() should stop time tracking', function() {
   var tech = new videojs.MediaTechController({
     id: noop,
     on: noop,
+    off: noop,
     trigger: noop
   });
   tech.dispose();
