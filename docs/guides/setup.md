@@ -24,16 +24,32 @@ You can download the Video.js source and host it on your own servers, or use the
 <script src="//vjs.zencdn.net/4.9/video.js"></script>
 ```
 
-### Self Hosted. ###
-With the self hosted option you'll also want to update the location of the video-js.swf file.
-```html
-<link href="//example.com/path/to/video-js.css" rel="stylesheet">
-<script src="//example.com/path/to/video.js"></script>
-<script>
-  videojs.options.flash.swf = "http://example.com/path/to/video-js.swf"
-</script>
+### Self Hosting ###
+
+Download source code either as packaged zip file, or `git clone` from GitHub.  Copy the filetree under `video.js/dist/video-js` to your webserver.
+
+```shell
+# Clone video.js locally
+$ git clone git@github.com:videojs/videojs.com.git
+
+# Change to dist directory
+$ cd video.js/dist
+
+# Copy over font/ and lang/ directories & the css file, swf, and video.js lib
+# to the location of your webserver filetree (example.com)
+$ cp -rp video-js ~/www/example.com
 ```
 
+Reference the necessary js and css files in your html, and update the location of the video-js.swf file if in a non-standard location.
+
+```html
+<link href="//example.com/video-js/video-js.css" rel="stylesheet">
+<script src="//example.com/video-js/video.js"></script>
+<script>
+  // This is not needed unless you have customized the location of the video-js files
+  videojs.options.flash.swf = "http://example.com/video-js/video-js.swf";
+</script>
+```
 
 Step 2: Add an HTML5 video tag to your page.
 --------------------------------------------
