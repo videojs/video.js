@@ -13,8 +13,8 @@ vjs.PlaybackRateMenuButton = vjs.MenuButton.extend({
     this.updateVisibility();
     this.updateLabel();
 
-    player.on('loadstart', vjs.bind(this, this.updateVisibility));
-    player.on('ratechange', vjs.bind(this, this.updateLabel));
+    this.on(player, 'loadstart', this.updateVisibility);
+    this.on(player, 'ratechange', this.updateLabel);
   }
 });
 
@@ -115,7 +115,7 @@ vjs.PlaybackRateMenuItem = vjs.MenuItem.extend({
     options['selected'] = rate === 1;
     vjs.MenuItem.call(this, player, options);
 
-    this.player().on('ratechange', vjs.bind(this, this.update));
+    this.on(player, 'ratechange', this.update);
   }
 });
 

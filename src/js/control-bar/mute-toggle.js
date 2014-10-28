@@ -10,19 +10,20 @@ vjs.MuteToggle = vjs.Button.extend({
   init: function(player, options){
     vjs.Button.call(this, player, options);
 
-    player.on('volumechange', vjs.bind(this, this.update));
+    this.on(player, 'volumechange', this.update);
 
     // hide mute toggle if the current tech doesn't support volume control
     if (player.tech && player.tech['featuresVolumeControl'] === false) {
       this.addClass('vjs-hidden');
     }
-    player.on('loadstart', vjs.bind(this, function(){
+
+    this.on(player, 'loadstart', function(){
       if (player.tech['featuresVolumeControl'] === false) {
         this.addClass('vjs-hidden');
       } else {
         this.removeClass('vjs-hidden');
       }
-    }));
+    });
   }
 });
 
