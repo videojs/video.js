@@ -459,6 +459,7 @@ vjs.Player.prototype.onWaiting = function(){
 /**
  * A handler for events that signal that waiting has eneded
  * which is not consistent between browsers. See #1351
+ * @private
  */
 vjs.Player.prototype.onWaitEnd = function(){
   this.removeClass('vjs-waiting');
@@ -737,7 +738,14 @@ vjs.Player.prototype.duration = function(seconds){
   return this.cache_.duration || 0;
 };
 
-// Calculates how much time is left. Not in spec, but useful.
+/**
+ * Calculates how much time is left.
+ *
+ *     var timeLeft = myPlayer.remainingTime();
+ *
+ * Not a native video element function, but useful
+ * @return {Number} The time remaining in seconds
+ */
 vjs.Player.prototype.remainingTime = function(){
   return this.duration() - this.currentTime();
 };
