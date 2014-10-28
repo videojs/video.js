@@ -36,7 +36,7 @@ vjs.Slider.prototype.dispose = function() {
   vjs.off(document, 'mouseup', this.boundEvents.end, false);
   vjs.off(document, 'touchmove', this.boundEvents.move, false);
   vjs.off(document, 'touchend', this.boundEvents.end, false);
-
+  vjs.off(document, 'keydown', vjs.bind(this, this.onKeyPress));
   vjs.off(document, 'keyup', vjs.bind(this, this.onKeyPress));
 
   vjs.Component.prototype.dispose.call(this);
@@ -187,7 +187,7 @@ vjs.Slider.prototype.calculateDistance = function(event){
 };
 
 vjs.Slider.prototype.onFocus = function(){
-  vjs.on(document, 'keyup', vjs.bind(this, this.onKeyPress));
+  vjs.on(document, 'keydown', vjs.bind(this, this.onKeyPress));
 };
 
 vjs.Slider.prototype.onKeyPress = function(event){
