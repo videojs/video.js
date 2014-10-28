@@ -280,6 +280,10 @@ vjs.Player.prototype.createEl = function(){
   this.width(this.options_['width'], true); // (true) Skip resize listener on load
   this.height(this.options_['height'], true);
 
+  // vjs.insertFirst seems to cause the networkState to flicker from 3 to 2, so
+  // keep track of the original for later so we can know if the source originally failed
+  tag.initNetworkState_ = tag.networkState;
+
   // Wrap video tag in div (el/box) container
   if (tag.parentNode) {
     tag.parentNode.insertBefore(el, tag);

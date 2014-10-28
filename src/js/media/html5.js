@@ -32,8 +32,11 @@ vjs.Html5 = vjs.MediaTechController.extend({
 
     var source = options['source'];
 
-    // set the source if one was provided
-    if (source && this.el_.currentSrc !== source.src) {
+    // Set the source if one is provided
+    // 1) Check if the source is new (if not, we want to keep the original so playback isn't interrupted)
+    // 2) Check to see if the network state of the tag was failed at init, and if so, reset the source
+    // anyway so the error gets fired.
+    if (source && (this.el_.currentSrc !== source.src) || (player.tag && player.tag.initNetworkState_ === 3)) {
       this.el_.src = source.src;
     }
 

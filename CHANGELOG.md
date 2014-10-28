@@ -8,6 +8,7 @@ CHANGELOG
 * @OlehTsvirko added a Russian translation ([view](https://github.com/videojs/video.js/pull/1563))
 * @thijstriemstra added a Dutch translation ([view](https://github.com/videojs/video.js/pull/1566))
 * @heff updated the poster to use CSS styles to display; fixed the poster not showing if not originally set ([view](https://github.com/videojs/video.js/pull/1568))
+* @mmcc fixed an issue where errors on source tags could get missed ([view](https://github.com/videojs/video.js/pull/1575))
 
 --------------------
 
