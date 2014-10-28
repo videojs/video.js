@@ -26,6 +26,9 @@ You can download the Video.js source and host it on your own servers, or use the
 
 ### Self Hosted. ###
 With the self hosted option you'll also want to update the location of the video-js.swf file.
+
+> NOTE: Don't forget to keep the font folder within the css folder because the styles include relative paths.  Some people have reported glyphs not showing in previous versions [issue 1596](https://github.com/videojs/video.js/issues/1596).
+
 ```html
 <link href="//example.com/path/to/video-js.css" rel="stylesheet">
 <script src="//example.com/path/to/video.js"></script>
