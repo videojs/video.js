@@ -44,7 +44,8 @@ vjs.Html5 = vjs.MediaTechController.extend({
     // Our goal should be to get the custom controls on mobile solid everywhere
     // so we can remove this all together. Right now this will block custom
     // controls on touch enabled laptops like the Chrome Pixel
-    if (vjs.TOUCH_ENABLED && player.options()['nativeControlsForTouch'] !== false) {
+    if (vjs.TOUCH_ENABLED && player.options()['nativeControlsForTouch'] === true) {
+      alert('useNativeControls');
       this.useNativeControls();
     }
 

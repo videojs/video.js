@@ -13,6 +13,7 @@ CHANGELOG
 * @mmcc fixed an issue with the VolumeButton assuming it was vertical by default ([view](https://github.com/videojs/video.js/pull/1592))
 * @DevGavin added a Simplified Chinese translation ([view](https://github.com/videojs/video.js/pull/1593))
 * @heff Added the ability to set options for child components directly in the parent options ([view](https://github.com/videojs/video.js/pull/1599))
+* @heff turned on the custom html controls for touch devices ([view](https://github.com/videojs/video.js/pull/1617))
 
 --------------------
 
