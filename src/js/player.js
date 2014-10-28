@@ -55,9 +55,10 @@ vjs.Player = vjs.Component.extend({
     this.cache_ = {};
 
     // Set poster
-    this.poster_ = options['poster'];
+    this.poster_ = options['poster'] || '';
+
     // Set controls
-    this.controls_ = options['controls'];
+    this.controls_ = !!options['controls'];
     // Original tag settings stored in options
     // now remove immediately so native controls don't flash.
     // May be turned back on by HTML5 tech if nativeControlsForTouch is true
@@ -279,6 +280,10 @@ vjs.Player.prototype.createEl = function(){
   this.width(this.options_['width'], true); // (true) Skip resize listener on load
   this.height(this.options_['height'], true);
 
+  // vjs.insertFirst seems to cause the networkState to flicker from 3 to 2, so
+  // keep track of the original for later so we can know if the source originally failed
+  tag.initNetworkState_ = tag.networkState;
+
   // Wrap video tag in div (el/box) container
   if (tag.parentNode) {
     tag.parentNode.insertBefore(el, tag);
@@ -459,6 +464,7 @@ vjs.Player.prototype.onWaiting = function(){
 /**
  * A handler for events that signal that waiting has eneded
  * which is not consistent between browsers. See #1351
+ * @private
  */
 vjs.Player.prototype.onWaitEnd = function(){
   this.removeClass('vjs-waiting');
@@ -737,7 +743,14 @@ vjs.Player.prototype.duration = function(seconds){
   return this.cache_.duration || 0;
 };
 
-// Calculates how much time is left. Not in spec, but useful.
+/**
+ * Calculates how much time is left.
+ *
+ *     var timeLeft = myPlayer.remainingTime();
+ *
+ * Not a native video element function, but useful
+ * @return {Number} The time remaining in seconds
+ */
 vjs.Player.prototype.remainingTime = function(){
   return this.duration() - this.currentTime();
 };
@@ -1304,6 +1317,12 @@ vjs.Player.prototype.poster_;
 vjs.Player.prototype.poster = function(src){
   if (src === undefined) {
     return this.poster_;
+  }
+
+  // The correct way to remove a poster is to set as an empty string
+  // other falsey values will throw errors
+  if (!src) {
+    src = '';
   }
 
   // update the internal poster variable

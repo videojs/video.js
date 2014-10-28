@@ -59,6 +59,7 @@ module.exports = function(config) {
     customLaunchers: customLaunchers,
 
     files: [
+      '../build/files/video-js.css',
       '../test/karma-qunit-shim.js',
       "../src/js/core.js",
       "../src/js/core-object.js",

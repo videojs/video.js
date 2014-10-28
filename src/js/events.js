@@ -69,7 +69,7 @@ vjs.on = function(elem, type, fn){
  * Removes event listeners from an element
  * @param  {Element|Object}   elem Object to remove listeners from
  * @param  {String|Array=}   type Type of listener to remove. Don't include to remove all events from element.
- * @param  {Function} fn   Specific listener to remove. Don't incldue to remove listeners for an event type.
+ * @param  {Function} fn   Specific listener to remove. Don't include to remove listeners for an event type.
  * @private
  */
 vjs.off = function(elem, type, fn) {
@@ -188,7 +188,7 @@ vjs.fixEvent = function(event) {
     for (var key in old) {
       // Safari 6.0.3 warns you if you try to copy deprecated layerX/Y
       // Chrome warns you if you try to copy deprecated keyboardEvent.keyLocation
-      if (key !== 'layerX' && key !== 'layerY' && key !== 'keyboardEvent.keyLocation') {
+      if (key !== 'layerX' && key !== 'layerY' && key !== 'keyLocation') {
         // Chrome 32+ warns if you try to copy deprecated returnValue, but
         // we still want to if preventDefault isn't supported (IE8).
         if (!(key == 'returnValue' && old.preventDefault)) {

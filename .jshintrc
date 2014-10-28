@@ -25,6 +25,7 @@
         "process",
 
         "PlayerTest",
+        "TestHelpers",
         "asyncTest",
         "deepEqual",
         "equal",

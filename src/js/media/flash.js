@@ -92,10 +92,10 @@ vjs.Flash = vjs.MediaTechController.extend({
     // bugzilla bug: https://bugzilla.mozilla.org/show_bug.cgi?id=836786
     if (vjs.IS_FIREFOX) {
       this.ready(function(){
-        vjs.on(this.el(), 'mousemove', vjs.bind(this, function(){
+        this.on('mousemove', function(){
           // since it's a custom event, don't bubble higher than the player
           this.player().trigger({ 'type':'mousemove', 'bubbles': false });
-        }));
+        });
       });
     }
 

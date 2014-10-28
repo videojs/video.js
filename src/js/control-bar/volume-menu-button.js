@@ -8,19 +8,19 @@ vjs.VolumeMenuButton = vjs.MenuButton.extend({
     vjs.MenuButton.call(this, player, options);
 
     // Same listeners as MuteToggle
-    player.on('volumechange', vjs.bind(this, this.update));
+    this.on(player, 'volumechange', this.update);
 
     // hide mute toggle if the current tech doesn't support volume control
     if (player.tech && player.tech['featuresVolumeControl'] === false) {
       this.addClass('vjs-hidden');
     }
-    player.on('loadstart', vjs.bind(this, function(){
+    this.on(player, 'loadstart', function(){
       if (player.tech['featuresVolumeControl'] === false) {
         this.addClass('vjs-hidden');
       } else {
         this.removeClass('vjs-hidden');
       }
-    }));
+    });
     this.addClass('vjs-menu-button');
   }
 });
@@ -29,7 +29,7 @@ vjs.VolumeMenuButton.prototype.createMenu = function(){
   var menu = new vjs.Menu(this.player_, {
     contentElType: 'div'
   });
-  var vc = new vjs.VolumeBar(this.player_, vjs.obj.merge({'vertical': true}, this.options_.volumeBar));
+  var vc = new vjs.VolumeBar(this.player_, this.options_.volumeBar);
   vc.on('focus', function() {
     menu.lockShowing();
   });

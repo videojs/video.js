@@ -9,7 +9,7 @@ vjs.CurrentTimeDisplay = vjs.Component.extend({
   init: function(player, options){
     vjs.Component.call(this, player, options);
 
-    player.on('timeupdate', vjs.bind(this, this.updateContent));
+    this.on(player, 'timeupdate', this.updateContent);
   }
 });
 
@@ -50,7 +50,7 @@ vjs.DurationDisplay = vjs.Component.extend({
     // so the value cannot be written out using this method.
     // Once the order of durationchange and this.player_.duration() being set is figured out,
     // this can be updated.
-    player.on('timeupdate', vjs.bind(this, this.updateContent));
+    this.on(player, 'timeupdate', this.updateContent);
   }
 });
 
@@ -110,7 +110,7 @@ vjs.RemainingTimeDisplay = vjs.Component.extend({
   init: function(player, options){
     vjs.Component.call(this, player, options);
 
-    player.on('timeupdate', vjs.bind(this, this.updateContent));
+    this.on(player, 'timeupdate', this.updateContent);
   }
 });
 

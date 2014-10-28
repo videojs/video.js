@@ -412,6 +412,7 @@ vjs.IS_FIREFOX = (/Firefox/i).test(vjs.USER_AGENT);
 vjs.IS_CHROME = (/Chrome/i).test(vjs.USER_AGENT);
 
 vjs.TOUCH_ENABLED = !!(('ontouchstart' in window) || window.DocumentTouch && document instanceof window.DocumentTouch);
+vjs.BACKGROUND_SIZE_SUPPORTED = 'backgroundSize' in vjs.TEST_VID.style;
 
 /**
  * Apply attributes to an HTML element.

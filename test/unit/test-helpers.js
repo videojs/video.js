@@ -19,3 +19,18 @@ var PlayerTest = {
     return player = new videojs.Player(videoTag, playerOptions);
   }
 };
+
+var TestHelpers = {
+  getComputedStyle: function(el, rule){
+    var val;
+
+    if(window.getComputedStyle){
+      val = window.getComputedStyle(el, null).getPropertyValue(rule);
+    // IE8
+    } else if(el.currentStyle){
+      val = el.currentStyle[rule];
+    }
+
+    return val;
+  }
+};

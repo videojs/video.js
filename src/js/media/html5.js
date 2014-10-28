@@ -32,8 +32,11 @@ vjs.Html5 = vjs.MediaTechController.extend({
 
     var source = options['source'];
 
-    // set the source if one was provided
-    if (source && this.el_.currentSrc !== source.src) {
+    // Set the source if one is provided
+    // 1) Check if the source is new (if not, we want to keep the original so playback isn't interrupted)
+    // 2) Check to see if the network state of the tag was failed at init, and if so, reset the source
+    // anyway so the error gets fired.
+    if (source && (this.el_.currentSrc !== source.src) || (player.tag && player.tag.initNetworkState_ === 3)) {
       this.el_.src = source.src;
     }
 
@@ -118,7 +121,7 @@ vjs.Html5.prototype.createEl = function(){
 // Triggers removed using this.off when disposed
 vjs.Html5.prototype.setupTriggers = function(){
   for (var i = vjs.Html5.Events.length - 1; i >= 0; i--) {
-    vjs.on(this.el_, vjs.Html5.Events[i], vjs.bind(this, this.eventHandler));
+    this.on(vjs.Html5.Events[i], this.eventHandler);
   }
 };
 
@@ -211,16 +214,16 @@ vjs.Html5.prototype.enterFullScreen = function(){
   var video = this.el_;
 
   if ('webkitDisplayingFullscreen' in video) {
-    this.one('webkitbeginfullscreen', vjs.bind(this, function(e) {
+    this.one('webkitbeginfullscreen', function() {
       this.player_.isFullscreen(true);
 
-      this.one('webkitendfullscreen', vjs.bind(this, function(e) {
+      this.one('webkitendfullscreen', function() {
         this.player_.isFullscreen(false);
         this.player_.trigger('fullscreenchange');
-      }));
+      });
 
       this.player_.trigger('fullscreenchange');
-    }));
+    });
   }
 
   if (video.paused && video.networkState <= video.HAVE_METADATA) {

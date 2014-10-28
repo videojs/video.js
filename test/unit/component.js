@@ -97,6 +97,36 @@ test('should do a deep merge of child options', function(){
   vjs.Component.prototype.options_ = null;
 });
 
+test('should allows setting child options at the parent options level', function(){
+  var parent;
+
+  parent = new vjs.Component(getFakePlayer(), {
+    'children': [
+      'component'
+    ],
+    // parent-level option for child
+    'component': {
+      'foo': true
+    }
+  });
+
+  equal(parent.children()[0].options()['foo'], true, 'child options set when children array is used');
+
+  parent = new vjs.Component(getFakePlayer(), {
+    'children': {
+      'component': {
+        'foo': false
+      }
+    },
+    // parent-level option for child
+    'component': {
+      'foo': true
+    }
+  });
+
+  equal(parent.children()[0].options()['foo'], true, 'child options set when children object is used');
+});
+
 test('should dispose of component and children', function(){
   var comp = new vjs.Component(getFakePlayer());
 
@@ -159,6 +189,132 @@ test('should trigger a listener once using one()', function(){
   comp.one('test-event', testListener);
   comp.trigger('test-event');
   comp.trigger('test-event');
+});
+
+test('should add listeners to other components and remove them', function(){
+  var player = getFakePlayer(),
+      comp1 = new vjs.Component(player),
+      comp2 = new vjs.Component(player),
+      listenerFired = 0,
+      testListener;
+
+  testListener = function(){
+    equal(this, comp1, 'listener has the first component as context');
+    listenerFired++;
+  };
+
+  comp1.on(comp2, 'test-event', testListener);
+  comp2.trigger('test-event');
+  equal(listenerFired, 1, 'listener was fired once');
+
+  listenerFired = 0;
+  comp1.off(comp2, 'test-event', testListener);
+  comp2.trigger('test-event');
+  equal(listenerFired, 0, 'listener was not fired after being removed');
+
+  // this component is disposed first
+  listenerFired = 0;
+  comp1.on(comp2, 'test-event', testListener);
+  comp1.dispose();
+  comp2.trigger('test-event');
+  equal(listenerFired, 0, 'listener was removed when this component was disposed first');
+  comp1.off = function(){ throw 'Comp1 off called'; };
+  comp2.dispose();
+  ok(true, 'this component removed dispose listeners from other component');
+});
+
+test('should add listeners to other components and remove when them other component is disposed', function(){
+  var player = getFakePlayer(),
+      comp1 = new vjs.Component(player),
+      comp2 = new vjs.Component(player),
+      listenerFired = 0,
+      testListener;
+
+  testListener = function(){
+    equal(this, comp1, 'listener has the first component as context');
+    listenerFired++;
+  };
+
+  comp1.on(comp2, 'test-event', testListener);
+  comp2.dispose();
+  comp2.off = function(){ throw 'Comp2 off called'; };
+  comp1.dispose();
+  ok(true, 'this component removed dispose listener from this component that referenced other component');
+});
+
+test('should add listeners to other components that are fired once', function(){
+  var player = getFakePlayer(),
+      comp1 = new vjs.Component(player),
+      comp2 = new vjs.Component(player),
+      listenerFired = 0,
+      testListener;
+
+  testListener = function(){
+    equal(this, comp1, 'listener has the first component as context');
+    listenerFired++;
+  };
+
+  comp1.one(comp2, 'test-event', testListener);
+  comp2.trigger('test-event');
+  equal(listenerFired, 1, 'listener was executed once');
+  comp2.trigger('test-event');
+  equal(listenerFired, 1, 'listener was executed only once');
+});
+
+test('should add listeners to other element and remove them', function(){
+  var player = getFakePlayer(),
+      comp1 = new vjs.Component(player),
+      el = document.createElement('div'),
+      listenerFired = 0,
+      testListener;
+
+  testListener = function(){
+    equal(this, comp1, 'listener has the first component as context');
+    listenerFired++;
+  };
+
+  comp1.on(el, 'test-event', testListener);
+  vjs.trigger(el, 'test-event');
+  equal(listenerFired, 1, 'listener was fired once');
+
+  listenerFired = 0;
+  comp1.off(el, 'test-event', testListener);
+  vjs.trigger(el, 'test-event');
+  equal(listenerFired, 0, 'listener was not fired after being removed from other element');
+
+  // this component is disposed first
+  listenerFired = 0;
+  comp1.on(el, 'test-event', testListener);
+  comp1.dispose();
+  vjs.trigger(el, 'test-event');
+  equal(listenerFired, 0, 'listener was removed when this component was disposed first');
+  comp1.off = function(){ throw 'Comp1 off called'; };
+  try {
+    vjs.trigger(el, 'dispose');
+  } catch(e) {
+    ok(false, 'listener was not removed from other element');
+  }
+  vjs.trigger(el, 'dispose');
+  ok(true, 'this component removed dispose listeners from other element');
+});
+
+test('should add listeners to other components that are fired once', function(){
+  var player = getFakePlayer(),
+      comp1 = new vjs.Component(player),
+      el = document.createElement('div'),
+      listenerFired = 0,
+      testListener;
+
+  testListener = function(){
+    equal(this, comp1, 'listener has the first component as context');
+    listenerFired++;
+  };
+
+  comp1.one(el, 'test-event', testListener);
+  vjs.trigger(el, 'test-event');
+  equal(listenerFired, 1, 'listener was executed once');
+  vjs.trigger(el, 'test-event');
+  equal(listenerFired, 1, 'listener was executed only once');
 });
 
 test('should trigger a listener when ready', function(){

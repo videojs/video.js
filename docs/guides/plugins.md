@@ -1,6 +1,11 @@
 Plugins
 =======
-If you've built something cool with Video.js, you can easily share it with the rest of the world by creating a plugin.
+If you've built something cool with Video.js, you can easily share it with the rest of the world by creating a plugin. Although, you can roll your own, you can also use [generator-videojs-plugin](https://github.com/dmlap/generator-videojs-plugin), a [Yeoman](http://yeoman.io) generator that provides scaffolding for video.js plugins including:
+* [Grunt](http://gruntjs.com) for build management
+* [npm](https://www.npmjs.org) for dependency management
+* [QUnit](http://qunitjs.com) for testing
+
+
 
 Step 1: Write Some Javascript
 -----------------------------
