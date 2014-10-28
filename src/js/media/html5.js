@@ -121,7 +121,7 @@ vjs.Html5.prototype.createEl = function(){
 // Triggers removed using this.off when disposed
 vjs.Html5.prototype.setupTriggers = function(){
   for (var i = vjs.Html5.Events.length - 1; i >= 0; i--) {
-    vjs.on(this.el_, vjs.Html5.Events[i], vjs.bind(this, this.eventHandler));
+    this.on(vjs.Html5.Events[i], this.eventHandler);
   }
 };
 
@@ -214,16 +214,16 @@ vjs.Html5.prototype.enterFullScreen = function(){
   var video = this.el_;
 
   if ('webkitDisplayingFullscreen' in video) {
-    this.one('webkitbeginfullscreen', vjs.bind(this, function(e) {
+    this.one('webkitbeginfullscreen', function() {
       this.player_.isFullscreen(true);
 
-      this.one('webkitendfullscreen', vjs.bind(this, function(e) {
+      this.one('webkitendfullscreen', function() {
         this.player_.isFullscreen(false);
         this.player_.trigger('fullscreenchange');
-      }));
+      });
 
       this.player_.trigger('fullscreenchange');
-    }));
+    });
   }
 
   if (video.paused && video.networkState <= video.HAVE_METADATA) {

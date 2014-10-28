@@ -9,7 +9,7 @@ vjs.ErrorDisplay = vjs.Component.extend({
     vjs.Component.call(this, player, options);
 
     this.update();
-    player.on('error', vjs.bind(this, this.update));
+    this.on(player, 'error', this.update);
   }
 });
 

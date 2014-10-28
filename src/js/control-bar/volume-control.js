@@ -14,13 +14,13 @@ vjs.VolumeControl = vjs.Component.extend({
     if (player.tech && player.tech['featuresVolumeControl'] === false) {
       this.addClass('vjs-hidden');
     }
-    player.on('loadstart', vjs.bind(this, function(){
+    this.on(player, 'loadstart', function(){
       if (player.tech['featuresVolumeControl'] === false) {
         this.addClass('vjs-hidden');
       } else {
         this.removeClass('vjs-hidden');
       }
-    }));
+    });
   }
 });
 
@@ -47,7 +47,7 @@ vjs.VolumeBar = vjs.Slider.extend({
   /** @constructor */
   init: function(player, options){
     vjs.Slider.call(this, player, options);
-    player.on('volumechange', vjs.bind(this, this.updateARIAAttributes));
+    this.on(player, 'volumechange', this.updateARIAAttributes);
     player.ready(vjs.bind(this, this.updateARIAAttributes));
   }
 });
