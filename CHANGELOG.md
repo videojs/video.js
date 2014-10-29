@@ -6,6 +6,9 @@ _(none)_
 
 --------------------
 
+## 4.10.1 (2014-10-29)
+_(none)_
+
 ## 4.10.0 (2014-10-28)
 * @aptx4869 fixed an issue where the native JSON parser wasn&#x27;t used ([view](https://github.com/videojs/video.js/pull/1565))
 * @andekande improved the German translation ([view](https://github.com/videojs/video.js/pull/1555))
