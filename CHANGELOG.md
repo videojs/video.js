@@ -2,6 +2,11 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 4.10.0 (2014-10-28)
 * @aptx4869 fixed an issue where the native JSON parser wasn&#x27;t used ([view](https://github.com/videojs/video.js/pull/1565))
 * @andekande improved the German translation ([view](https://github.com/videojs/video.js/pull/1555))
 * @OlehTsvirko added a Ukrainian translation ([view](https://github.com/videojs/video.js/pull/1562))
@@ -14,8 +19,6 @@ CHANGELOG
 * @DevGavin added a Simplified Chinese translation ([view](https://github.com/videojs/video.js/pull/1593))
 * @heff Added the ability to set options for child components directly in the parent options ([view](https://github.com/videojs/video.js/pull/1599))
 * @heff turned on the custom html controls for touch devices ([view](https://github.com/videojs/video.js/pull/1617))
-
---------------------
 
 ## 4.9.1 (2014-10-15)
 * Bumped to videojs-swf v4.5.1 to fix a data sanitization issue ([view](https://github.com/videojs/video.js/pull/1587))
