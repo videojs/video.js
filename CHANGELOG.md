@@ -7,7 +7,7 @@ _(none)_
 --------------------
 
 ## 4.10.1 (2014-10-29)
-_(none)_
+@heff removed his own stupid error ([view])(https://github.com/videojs/video.js/commit/a12dd770572a7f16e436e2332eba7ffbb1f1b9b9)
 
 ## 4.10.0 (2014-10-28)
 * @aptx4869 fixed an issue where the native JSON parser wasn&#x27;t used ([view](https://github.com/videojs/video.js/pull/1565))
