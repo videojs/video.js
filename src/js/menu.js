@@ -64,7 +64,7 @@ vjs.MenuItem = vjs.Button.extend({
 vjs.MenuItem.prototype.createEl = function(type, props){
   return vjs.Button.prototype.createEl.call(this, 'li', vjs.obj.merge({
     className: 'vjs-menu-item',
-    innerHTML: this.options_['label']
+    innerHTML: this.localize(this.options_['label'])
   }, props));
 };
 

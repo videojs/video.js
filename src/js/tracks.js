@@ -759,7 +759,7 @@ vjs.OffTextTrackMenuItem = vjs.TextTrackMenuItem.extend({
     options['track'] = {
       kind: function() { return options['kind']; },
       player: player,
-      label: function(){ return player.localize(options['kind'] + ' off'); },
+      label: function(){ return options['kind'] + ' off'; },
       dflt: function(){ return false; },
       mode: function(){ return false; }
     };
