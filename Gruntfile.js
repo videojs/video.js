@@ -585,10 +585,10 @@ module.exports = function(grunt) {
     var version = pkg.version;
 
     // remove the patch version to point to the latest patch
-    version = version.replace(/(\d\.\d)\.\d/, '$1');
+    version = version.replace(/(\d+\.\d+)\.\d+/, '$1');
 
     // update the version in http://vjs.zencdn.net/4.3/video.js
-    doc = doc.replace(/(\/\/vjs\.zencdn\.net\/)\d\.\d(\.\d)?/g, '$1'+version);
+    doc = doc.replace(/(\/\/vjs\.zencdn\.net\/)\d+\.\d+(\.\d+)?/g, '$1'+version);
     grunt.file.write('docs/guides/setup.md', doc);
   });
 
