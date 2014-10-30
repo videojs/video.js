@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @heff fixed checking for child options in the parent options to allow for 'false'; ([view](https://github.com/videojs/video.js/pull/1630))
 
 --------------------
 
