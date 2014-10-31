@@ -2106,7 +2106,7 @@ vjs.Component.prototype.initChildren = function(){
       // Allow options for children to be set at the parent options
       // e.g. videojs(id, { controlBar: false });
       // instead of videojs(id, { children: { controlBar: false });
-      if (parentOptions[name]) {
+      if (parentOptions[name] !== undefined) {
         opts = parentOptions[name];
       }
 
@@ -3158,7 +3158,7 @@ vjs.MenuItem = vjs.Button.extend({
 vjs.MenuItem.prototype.createEl = function(type, props){
   return vjs.Button.prototype.createEl.call(this, 'li', vjs.obj.merge({
     className: 'vjs-menu-item',
-    innerHTML: this.options_['label']
+    innerHTML: this.localize(this.options_['label'])
   }, props));
 };
 
@@ -5879,7 +5879,7 @@ vjs.VolumeMenuButton.prototype.createMenu = function(){
   var menu = new vjs.Menu(this.player_, {
     contentElType: 'div'
   });
-  var vc = new vjs.VolumeBar(this.player_, this.options_.volumeBar);
+  var vc = new vjs.VolumeBar(this.player_, this.options_['volumeBar']);
   vc.on('focus', function() {
     menu.lockShowing();
   });
