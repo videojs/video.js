@@ -6,6 +6,11 @@ _(none)_
 
 --------------------
 
+## 4.10.2 (2014-10-30)
+* @heff fixed checking for child options in the parent options to allow for 'false' ([view](https://github.com/videojs/video.js/pull/1630))
+* @heff fixed the VolumeMenuButton options to allow passing 'vertical' to the VolumeBar ([view](https://github.com/videojs/video.js/pull/1631))
+* @mmcc fixed localization of captions/subtitles menu off buttons ([view](https://github.com/videojs/video.js/pull/1632))
+
 ## 4.10.1 (2014-10-29)
 @heff removed his own stupid error ([view])(https://github.com/videojs/video.js/commit/a12dd770572a7f16e436e2332eba7ffbb1f1b9b9)
 
