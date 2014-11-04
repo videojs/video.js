@@ -1195,8 +1195,7 @@ vjs.Player.prototype.src = function(source){
  * @private
  */
 vjs.Player.prototype.sourceList_ = function(sources){
-  var sourceTech = this.selectSource(sources),
-      errorTimeout;
+  var sourceTech = this.selectSource(sources);
 
   if (sourceTech) {
     if (sourceTech.tech === this.techName) {
@@ -1208,17 +1207,13 @@ vjs.Player.prototype.sourceList_ = function(sources){
     }
   } else {
     // We need to wrap this in a timeout to give folks a chance to add error event handlers
-    errorTimeout = setTimeout(vjs.bind(this, function() {
+    this.setTimeout(vjs.bind(this, function() {
       this.error({ code: 4, message: this.localize(this.options()['notSupportedMessage']) });
     }), 0);
 
     // we could not find an appropriate tech, but let's still notify the delegate that this is it
     // this needs a better comment about why this is needed
     this.triggerReady();
-
-    this.on('dispose', function() {
-      clearTimeout(errorTimeout);
-    });
   }
 };
 
@@ -1553,7 +1548,7 @@ vjs.Player.prototype.listenForUserActivity = function(){
     // Setting userActivity=true now and setting the interval to the same time
     // as the activityCheck interval (250) should ensure we never miss the
     // next activityCheck
-    mouseInProgress = setInterval(onActivity, 250);
+    mouseInProgress = this.setInterval(onActivity, 250);
   };
 
   onMouseUp = function(event) {
@@ -1577,7 +1572,7 @@ vjs.Player.prototype.listenForUserActivity = function(){
   // `this.reportUserActivity` simply sets this.userActivity_ to true, which
   // then gets picked up by this loop
   // http://ejohn.org/blog/learning-from-twitter/
-  activityCheck = setInterval(vjs.bind(this, function() {
+  activityCheck = this.setInterval(vjs.bind(this, function() {
     // Check to see if mouse/touch activity has happened
     if (this.userActivity_) {
       // Reset the activity tracker
@@ -1593,7 +1588,7 @@ vjs.Player.prototype.listenForUserActivity = function(){
       if (timeout > 0) {
           // In <timeout> milliseconds, if no more activity has occurred the
           // user will be considered inactive
-          inactivityTimeout = setTimeout(vjs.bind(this, function () {
+          inactivityTimeout = this.setTimeout(vjs.bind(this, function () {
               // Protect against the case where the inactivityTimeout can trigger just
               // before the next user activity is picked up by the activityCheck loop
               // causing a flicker
@@ -1604,12 +1599,6 @@ vjs.Player.prototype.listenForUserActivity = function(){
       }
     }
   }), 250);
-
-  // Clean up the intervals when we kill the player
-  this.on('dispose', function(){
-    clearInterval(activityCheck);
-    clearTimeout(inactivityTimeout);
-  });
 };
 
 /**
@@ -1654,6 +1643,34 @@ vjs.Player.prototype.isAudio = function(bool) {
   }
 
   return this.isAudio_;
+};
+
+vjs.Player.prototype.timeouts_ = [];
+
+/**
+ * Creates timeout and sets up disposal automatically.
+ */
+vjs.Player.prototype.setTimeout = function(fn, timeout) {
+  var timeoutId = setTimeout(fn, timeout);
+
+  this.on('dispose', function() {
+    clearTimeout(timeoutId);
+  });
+
+  return timeoutId;
+};
+
+/**
+ * Creates an interval and sets up disposal automatically.
+ */
+vjs.Player.prototype.setInterval = function(fn, interval) {
+  var intervalId = setInterval(fn, interval);
+
+  this.on('dispose', function() {
+    clearInterval(intervalId);
+  });
+
+  return intervalId;
 };
 
 // Methods to add support for

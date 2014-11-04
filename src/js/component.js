@@ -1118,7 +1118,7 @@ vjs.Component.prototype.emitTapEvents = function(){
  * want touch events to act differently.
  */
 vjs.Component.prototype.enableTouchActivity = function() {
-  var report, touchHolding, touchEnd;
+  var report, interval, touchHolding, touchEnd;
 
   // Don't continue if the root player doesn't support reporting user activity
   if (!this.player().reportUserActivity) {
@@ -1127,6 +1127,7 @@ vjs.Component.prototype.enableTouchActivity = function() {
 
   // listener for reporting that the user is active
   report = vjs.bind(this.player(), this.player().reportUserActivity);
+  interval = vjs.bind(this.player(), this.player().setInterval);
 
   this.on('touchstart', function() {
     report();
@@ -1135,7 +1136,7 @@ vjs.Component.prototype.enableTouchActivity = function() {
     // So we want to continue to update that they are active
     clearInterval(touchHolding);
     // report at the same interval as activityCheck
-    touchHolding = setInterval(report, 250);
+    touchHolding = interval(report, 250);
   });
 
   touchEnd = function(event) {
@@ -1148,4 +1149,3 @@ vjs.Component.prototype.enableTouchActivity = function() {
   this.on('touchend', touchEnd);
   this.on('touchcancel', touchEnd);
 };
-

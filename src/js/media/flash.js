@@ -138,7 +138,7 @@ vjs.Flash.prototype.src = function(src){
   // e.g. Load player w/ no source, wait 2s, set src.
   if (this.player_.autoplay()) {
     var tech = this;
-    setTimeout(function(){ tech.play(); }, 0);
+    this.player_.setTimeout(function(){ tech.play(); }, 0);
   }
 };
 
@@ -286,7 +286,7 @@ vjs.Flash['checkReady'] = function(tech){
     tech.triggerReady();
   } else {
     // wait longer
-    setTimeout(function(){
+    this.player_.setTimeout(function(){
       vjs.Flash['checkReady'](tech);
     }, 50);
   }

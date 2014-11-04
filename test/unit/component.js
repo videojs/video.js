@@ -4,7 +4,8 @@ var getFakePlayer = function(){
   return {
     // Fake player requries an ID
     id: function(){ return 'player_1'; },
-    reportUserActivity: function(){}
+    reportUserActivity: function(){},
+    setInterval: function(){}
   };
 };
 
