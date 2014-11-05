@@ -16,6 +16,7 @@ test('should synthesize timeupdate events by default', function() {
   var timeupdates = 0, playHandler, i, tech;
   tech = new videojs.MediaTechController({
     id: noop,
+    setInterval: setInterval,
     on: function(event, handler) {
       if (event === 'play') {
         playHandler = handler;
@@ -40,6 +41,7 @@ test('stops timeupdates if the tech produces them natively', function() {
   var timeupdates = 0, tech, playHandler, expected;
   tech = new videojs.MediaTechController({
     id: noop,
+    setInterval: setInterval,
     on: function(event, handler) {
       if (event === 'play') {
         playHandler = handler;
@@ -66,6 +68,7 @@ test('stops manual timeupdates while paused', function() {
   var timeupdates = 0, tech, playHandler, pauseHandler, expected;
   tech = new videojs.MediaTechController({
     id: noop,
+    setInterval: setInterval,
     on: function(event, handler) {
       if (event === 'play') {
         playHandler = handler;
@@ -99,6 +102,7 @@ test('should synthesize progress events by default', function() {
   tech = new videojs.MediaTechController({
     id: noop,
     on: noop,
+    setInterval: setInterval,
     bufferedPercent: function() {
       return 0;
     },
@@ -119,6 +123,7 @@ test('should synthesize progress events by default', function() {
 test('dispose() should stop time tracking', function() {
   var tech = new videojs.MediaTechController({
     id: noop,
+    setInterval: setInterval,
     on: noop,
     off: noop,
     trigger: noop

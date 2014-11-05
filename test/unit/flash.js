@@ -69,6 +69,7 @@ test('currentTime is the seek target during seeking', function() {
       parentEl = document.createElement('div'),
       tech = new vjs.Flash({
         id: noop,
+        setInterval: setInterval,
         bufferedPercent: noop,
         on: noop,
         trigger: noop,
@@ -105,6 +106,7 @@ test('dispose removes the object element even before ready fires', function() {
       tech = new vjs.Flash({
         id: noop,
         on: noop,
+        setInterval: setInterval,
         trigger: noop,
         options_: {}
       }, {

@@ -11,6 +11,7 @@ test('should hide volume control if it\'s not supported', function(){
     ready: noop,
     language: noop,
     languages: noop,
+    setInterval: setInterval,
     tech: {
       'featuresVolumeControl': false
     },
@@ -34,6 +35,7 @@ test('should test and toggle volume control on `loadstart`', function(){
     id: noop,
     language: noop,
     languages: noop,
+    setInterval: setInterval,
     on: function(event, callback){
       // don't fire dispose listeners
       if (event !== 'dispose') {
@@ -83,6 +85,7 @@ test('calculateDistance should use changedTouches, if available', function() {
     id: noop,
     on: noop,
     ready: noop,
+    setInterval: setInterval,
     reportUserActivity: noop
   };
   slider = new vjs.Slider(player);
