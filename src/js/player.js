@@ -1649,6 +1649,9 @@ vjs.Player.prototype.timeouts_ = [];
 
 /**
  * Creates timeout and sets up disposal automatically.
+ * @param {Function} The function to run after the timeout.
+ * @param {Number} Number of ms to delay before executing specified function.
+ * @return {Number} Returns the timeout ID
  */
 vjs.Player.prototype.setTimeout = function(fn, timeout) {
   var timeoutId = setTimeout(fn, timeout);
@@ -1662,6 +1665,9 @@ vjs.Player.prototype.setTimeout = function(fn, timeout) {
 
 /**
  * Creates an interval and sets up disposal automatically.
+ * @param {Function} The function to run every N seconds.
+ * @param {Number} Number of ms to delay before executing specified function.
+ * @return {Number} Returns the interval ID
  */
 vjs.Player.prototype.setInterval = function(fn, interval) {
   var intervalId = setInterval(fn, interval);
