@@ -77,7 +77,7 @@ test('should do a deep merge of child options', function(){
   var comp = new vjs.Component(getFakePlayer(), {
     'example': {
       'childOne': { 'foo': 'baz', 'abc': '123' },
-      'childThree': null,
+      'childThree': false,
       'childFour': {}
     }
   });
@@ -89,7 +89,7 @@ test('should do a deep merge of child options', function(){
   ok(children['childOne']['asdf'] === 'fdsa', 'value three levels deep maintained');
   ok(children['childOne']['abc'] === '123', 'value three levels deep added');
   ok(children['childTwo'], 'object two levels deep maintained');
-  ok(children['childThree'] === null, 'object two levels deep removed');
+  ok(children['childThree'] === false, 'object two levels deep removed');
   ok(children['childFour'], 'object two levels deep added');
 
   ok(vjs.Component.prototype.options_['example']['childOne']['foo'] === 'bar', 'prototype options were not overridden');
@@ -99,32 +99,48 @@ test('should do a deep merge of child options', function(){
 });
 
 test('should allows setting child options at the parent options level', function(){
-  var parent;
+  var parent, options;
 
-  parent = new vjs.Component(getFakePlayer(), {
+  // using children array
+  options = {
     'children': [
-      'component'
+      'component',
+      'nullComponent'
     ],
     // parent-level option for child
     'component': {
       'foo': true
-    }
-  });
+    },
+    'nullComponent': false
+  };
 
+  try {
+    parent = new vjs.Component(getFakePlayer(), options);
+  } catch(err) {
+    ok(false, 'Child with `false` option was initialized');
+  }
   equal(parent.children()[0].options()['foo'], true, 'child options set when children array is used');
 
-  parent = new vjs.Component(getFakePlayer(), {
+  // using children object
+  options = {
     'children': {
       'component': {
         'foo': false
-      }
+      },
+      'nullComponent': {}
     },
     // parent-level option for child
     'component': {
       'foo': true
-    }
-  });
+    },
+    'nullComponent': false
+  };
 
+  try {
+    parent = new vjs.Component(getFakePlayer(), options);
+  } catch(err) {
+    ok(false, 'Child with `false` option was initialized');
+  }
   equal(parent.children()[0].options()['foo'], true, 'child options set when children object is used');
 });
 
