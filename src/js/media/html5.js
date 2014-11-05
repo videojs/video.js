@@ -233,7 +233,7 @@ vjs.Html5.prototype.enterFullScreen = function(){
 
     // playing and pausing synchronously during the transition to fullscreen
     // can get iOS ~6.1 devices into a play/pause loop
-    this.player_.setTimeout(function(){
+    this.player().setTimeout(function(){
       video.pause();
       video.webkitEnterFullScreen();
     }, 0);
