@@ -1118,16 +1118,18 @@ vjs.Component.prototype.emitTapEvents = function(){
  * want touch events to act differently.
  */
 vjs.Component.prototype.enableTouchActivity = function() {
-  var report, interval, touchHolding, touchEnd;
+  var report, interval, touchHolding, touchEnd, player;
+
+  player = this.player();
 
   // Don't continue if the root player doesn't support reporting user activity
-  if (!this.player().reportUserActivity) {
+  if (!player.reportUserActivity) {
     return;
   }
 
   // listener for reporting that the user is active
-  report = vjs.bind(this.player(), this.player().reportUserActivity);
-  interval = vjs.bind(this.player(), this.player().setInterval);
+  report = vjs.bind(player, player.reportUserActivity);
+  interval = vjs.bind(player, player.setInterval);
 
   this.on('touchstart', function() {
     report();
