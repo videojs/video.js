@@ -94,6 +94,8 @@ vjs.Html5.prototype.createEl = function(){
           'class':'vjs-tech'
         })
       );
+      
+      el.removeAttribute('controls'); // Hide the native controls
     }
     // associate the player with the new tag
     el['player'] = player;
