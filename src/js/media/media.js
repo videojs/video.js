@@ -177,7 +177,7 @@ vjs.MediaTechController.prototype.manualProgressOff = function(){
 };
 
 vjs.MediaTechController.prototype.trackProgress = function(){
-  this.progressInterval = this.player().setInterval(vjs.bind(this, function(){
+  this.progressInterval = this.setInterval(vjs.bind(this, function(){
     // Don't trigger unless buffered amount is greater than last time
 
     var bufferedPercent = this.player().bufferedPercent();
@@ -223,7 +223,7 @@ vjs.MediaTechController.prototype.manualTimeUpdatesOff = function(){
 
 vjs.MediaTechController.prototype.trackCurrentTime = function(){
   if (this.currentTimeInterval) { this.stopTrackingCurrentTime(); }
-  this.currentTimeInterval = this.player().setInterval(vjs.bind(this, function(){
+  this.currentTimeInterval = this.setInterval(vjs.bind(this, function(){
     this.player().trigger('timeupdate');
   }), 250); // 42 = 24 fps // 250 is what Webkit uses // FF uses 15
 };
