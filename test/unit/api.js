@@ -57,7 +57,7 @@ test('should be able to access expected player API methods', function() {
 });
 
 test('should be able to access expected component API methods', function() {
-  var comp = videojs.Component.create({ id: function(){ return 1; }, reportUserActivity: function(){}, setTimeout: setTimeout, setInterval: setInterval });
+  var comp = videojs.Component.create({ id: function(){ return 1; }, reportUserActivity: function(){} });
 
   // Component methods
   ok(comp.player, 'player exists');
@@ -87,6 +87,8 @@ test('should be able to access expected component API methods', function() {
   ok(comp.addClass, 'addClass exists');
   ok(comp.removeClass, 'removeClass exists');
   ok(comp.buildCSSClass, 'buildCSSClass exists');
+  ok(comp.setInterval, 'setInterval exists');
+  ok(comp.setTimeout, 'setTimeout exists');
 });
 
 test('should be able to access expected MediaTech API methods', function() {
@@ -217,15 +219,11 @@ test('fullscreenToggle does not depend on minified player methods', function(){
 test('component can be subclassed externally', function(){
   var player = new (videojs.Component.extend({
     languages: function(){},
-    setInterval: setTimeout,
-    setTimeout: setInterval,
     reportUserActivity: function(){},
     language: function(){},
     textTracks: function(){ return []; }
   }))({
     id: function(){},
-    setInterval: setTimeout,
-    setTimeout: setInterval,
     reportUserActivity: function(){}
   });
   ok(new videojs.ControlBar(player), 'created a control bar without throwing');
