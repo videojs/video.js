@@ -1133,7 +1133,7 @@ vjs.Component.prototype.enableTouchActivity = function() {
     // For as long as the they are touching the device or have their mouse down,
     // we consider them active even if they're not moving their finger or mouse.
     // So we want to continue to update that they are active
-    clearInterval(touchHolding);
+    this.clearInterval(touchHolding);
     // report at the same interval as activityCheck
     touchHolding = this.setInterval(report, 250);
   });
@@ -1141,7 +1141,7 @@ vjs.Component.prototype.enableTouchActivity = function() {
   touchEnd = function(event) {
     report();
     // stop the interval that maintains activity if the touch is holding
-    clearInterval(touchHolding);
+    this.clearInterval(touchHolding);
   };
 
   this.on('touchmove', report);
@@ -1158,11 +1158,33 @@ vjs.Component.prototype.enableTouchActivity = function() {
 vjs.Component.prototype.setTimeout = function(fn, timeout) {
   fn = vjs.bind(this, fn);
 
+  // window.setTimeout would be preferable here, but due to some bizarre issue with Sinon and/or Phantomjs, we can't.
   var timeoutId = setTimeout(fn, timeout);
 
-  this.on('dispose', function() {
-    clearTimeout(timeoutId);
-  });
+  var disposeFn = function() {
+    this.clearTimeout(timeoutId);
+  };
+
+  disposeFn.guid = 'vjs-timeout-'+ timeoutId;
+
+  this.on('dispose', disposeFn);
+
+  return timeoutId;
+};
+
+
+/**
+ * Clears a timeout and removes the associated dispose listener
+ * @param {Number} The id of the timeout to clear
+ * @return {Number} Returns the timeout ID
+ */
+vjs.Component.prototype.clearTimeout = function(timeoutId) {
+  clearTimeout(timeoutId);
+
+  var disposeFn = function(){};
+  disposeFn.guid = 'vjs-timeout-'+ timeoutId;
+
+  this.off('dispose', disposeFn);
 
   return timeoutId;
 };
@@ -1178,9 +1200,29 @@ vjs.Component.prototype.setInterval = function(fn, interval) {
 
   var intervalId = setInterval(fn, interval);
 
-  this.on('dispose', function() {
-    clearInterval(intervalId);
-  });
+  var disposeFn = function() {
+    this.clearInterval(intervalId);
+  };
+
+  disposeFn.guid = 'vjs-interval-'+ intervalId;
+
+  this.on('dispose', disposeFn);
+
+  return intervalId;
+};
+
+/**
+ * Clears an interval and removes the associated dispose listener
+ * @param {Number} The id of the interval to clear
+ * @return {Number} Returns the interval ID
+ */
+vjs.Component.prototype.clearInterval = function(intervalId) {
+  clearInterval(intervalId);
+
+  var disposeFn = function(){};
+  disposeFn.guid = 'vjs-interval-'+ intervalId;
+
+  this.off('dispose', disposeFn);
 
   return intervalId;
 };

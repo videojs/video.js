@@ -193,7 +193,7 @@ vjs.MediaTechController.prototype.trackProgress = function(){
     }
   }, 500);
 };
-vjs.MediaTechController.prototype.stopTrackingProgress = function(){ clearInterval(this.progressInterval); };
+vjs.MediaTechController.prototype.stopTrackingProgress = function(){ this.clearInterval(this.progressInterval); };
 
 /*! Time Tracking -------------------------------------------------------------- */
 vjs.MediaTechController.prototype.manualTimeUpdatesOn = function(){
@@ -230,7 +230,7 @@ vjs.MediaTechController.prototype.trackCurrentTime = function(){
 
 // Turn off play progress tracking (when paused or dragging)
 vjs.MediaTechController.prototype.stopTrackingCurrentTime = function(){
-  clearInterval(this.currentTimeInterval);
+  this.clearInterval(this.currentTimeInterval);
 
   // #1002 - if the video ends right before the next timeupdate would happen,
   // the progress bar won't make it all the way to the end

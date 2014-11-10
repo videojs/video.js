@@ -1544,7 +1544,7 @@ vjs.Player.prototype.listenForUserActivity = function(){
     // For as long as the they are touching the device or have their mouse down,
     // we consider them active even if they're not moving their finger or mouse.
     // So we want to continue to update that they are active
-    clearInterval(mouseInProgress);
+    this.clearInterval(mouseInProgress);
     // Setting userActivity=true now and setting the interval to the same time
     // as the activityCheck interval (250) should ensure we never miss the
     // next activityCheck
@@ -1554,7 +1554,7 @@ vjs.Player.prototype.listenForUserActivity = function(){
   onMouseUp = function(event) {
     onActivity();
     // Stop the interval that maintains activity if the mouse/touch is down
-    clearInterval(mouseInProgress);
+    this.clearInterval(mouseInProgress);
   };
 
   // Any mouse movement will be considered user activity
@@ -1582,7 +1582,7 @@ vjs.Player.prototype.listenForUserActivity = function(){
       this.userActive(true);
 
       // Clear any existing inactivity timeout to start the timer over
-      clearTimeout(inactivityTimeout);
+      this.clearTimeout(inactivityTimeout);
 
       var timeout = this.options()['inactivityTimeout'];
       if (timeout > 0) {
