@@ -177,7 +177,7 @@ vjs.MediaTechController.prototype.manualProgressOff = function(){
 };
 
 vjs.MediaTechController.prototype.trackProgress = function(){
-  this.progressInterval = this.setInterval(vjs.bind(this, function(){
+  this.progressInterval = this.setInterval(function(){
     // Don't trigger unless buffered amount is greater than last time
 
     var bufferedPercent = this.player().bufferedPercent();
@@ -191,7 +191,7 @@ vjs.MediaTechController.prototype.trackProgress = function(){
     if (bufferedPercent === 1) {
       this.stopTrackingProgress();
     }
-  }), 500);
+  }, 500);
 };
 vjs.MediaTechController.prototype.stopTrackingProgress = function(){ clearInterval(this.progressInterval); };
 
@@ -223,9 +223,9 @@ vjs.MediaTechController.prototype.manualTimeUpdatesOff = function(){
 
 vjs.MediaTechController.prototype.trackCurrentTime = function(){
   if (this.currentTimeInterval) { this.stopTrackingCurrentTime(); }
-  this.currentTimeInterval = this.setInterval(vjs.bind(this, function(){
+  this.currentTimeInterval = this.setInterval(function(){
     this.player().trigger('timeupdate');
-  }), 250); // 42 = 24 fps // 250 is what Webkit uses // FF uses 15
+  }, 250); // 42 = 24 fps // 250 is what Webkit uses // FF uses 15
 };
 
 // Turn off play progress tracking (when paused or dragging)
