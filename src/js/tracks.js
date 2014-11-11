@@ -11,7 +11,6 @@ var getProp = function(obj, prop) {
   return (typeof obj[prop] === 'function') ? obj[prop]() : obj[prop];
 };
 
-// Player Additions - Functions add to the player object for easier access to tracks
 
 /**
  * Get an array of associated text tracks. captions, subtitles, chapters, descriptions
@@ -20,8 +19,6 @@ var getProp = function(obj, prop) {
  * @private
  */
 vjs.Player.prototype.textTracks = function(){
-  // cannot use techGet directly because it checks to see whether the tech is ready.
-  // Flash is unlikely to be ready in time but textTracks should still work.
   return (this.tech && this.tech['textTracks']()) || [];
 };
 
