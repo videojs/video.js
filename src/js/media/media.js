@@ -29,6 +29,12 @@ vjs.MediaTechController = vjs.Component.extend({
     }
 
     this.initControlsListeners();
+
+    if (!this['featuresNativeTracks']) {
+      this.player_.addChild(new window['videojs']['TextTrackDisplay'](player, {
+        name: 'textTrackDisplay'
+      }));
+    }
   }
 });
 
@@ -270,6 +276,8 @@ vjs.MediaTechController.prototype['featuresPlaybackRate'] = false;
 vjs.MediaTechController.prototype['featuresProgressEvents'] = false;
 vjs.MediaTechController.prototype['featuresTimeupdateEvents'] = false;
 
+vjs.MediaTechController.prototype['featuresNativeTracks'] = false;
+
 /**
  * A functional mixin for techs that want to use the Source Handler pattern.
  *
@@ -370,3 +378,5 @@ vjs.MediaTechController.withSourceHandlers = function(Tech){
   };
 
 };
+
+vjs.media = {};

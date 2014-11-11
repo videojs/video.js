@@ -12,6 +12,8 @@
 vjs.Html5 = vjs.MediaTechController.extend({
   /** @constructor */
   init: function(player, options, ready){
+    this['featuresNativeTracks'] = true;
+
     vjs.MediaTechController.call(this, player, options, ready);
 
     this.setupTriggers();
@@ -274,6 +276,14 @@ vjs.Html5.prototype.setPlaybackRate = function(val){ this.el_.playbackRate = val
 
 vjs.Html5.prototype.networkState = function(){ return this.el_.networkState; };
 
+vjs.Html5.prototype.textTracks = function() {
+  return this.el_.textTracks;
+}
+vjs.Html5.prototype.addTextTrack = function(kind, label, language) {
+  return this.el_.addTextTrack(kind, label, language);
+}
+
+/* HTML5 Support Testing ---------------------------------------------------- */
 
 /**
  * Check if HTML5 video is supported by this browser/device
