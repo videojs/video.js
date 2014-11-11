@@ -23,6 +23,8 @@ vjs.Html5 = vjs.MediaTechController.extend({
     }
     this['featuresTextTracks'] = options.nativeCaptions !== false && supportsTextTracks;
 
+    this['featuresNativeTracks'] = true;
+
     vjs.MediaTechController.call(this, player, options, ready);
 
     this.setupTriggers();
@@ -331,9 +333,9 @@ vjs.Html5.prototype.textTracks = function() {
 
   return this.el_.textTracks;
 }
-vjs.Html5.prototype.addTextTrack = function(kind, label, language, options) {
+vjs.Html5.prototype.addTextTrack = function(kind, label, language) {
   if (!this['featuresTextTracks']) {
-    return vjs.MediaTechController.prototype.addTextTrack.call(this, kind, label, language, options);
+    return vjs.MediaTechController.prototype.addTextTrack.call(this, kind, label, language);
   }
 
   return this.el_.addTextTrack(kind, label, language);
