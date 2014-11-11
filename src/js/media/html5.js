@@ -100,6 +100,20 @@ vjs.Html5.prototype.createEl = function(){
     // associate the player with the new tag
     el['player'] = player;
 
+    if (player.options_.tracks) {
+      vjs.obj.each(player.options_.tracks, function(i, track) {
+        var t = document.createElement('track');
+        t.kind = track.kind;
+        t.label = track.label;
+        t.srclang = track.srclang;
+        t.src = track.src;
+        if (track.default) {
+          t.default = true;
+        }
+        el.appendChild(t);
+      });
+    }
+
     vjs.insertFirst(el, player.el());
   }
 
