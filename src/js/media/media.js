@@ -29,6 +29,12 @@ vjs.MediaTechController = vjs.Component.extend({
     }
 
     this.initControlsListeners();
+
+    if (!this['featuresNativeTracks']) {
+      this.player_.addChild(new window['videojs']['TextTrackDisplay'](player, {
+        name: 'textTrackDisplay'
+      }));
+    }
   }
 });
 
@@ -270,5 +276,7 @@ vjs.MediaTechController.prototype['featuresPlaybackRate'] = false;
 // currently not triggered by video-js-swf
 vjs.MediaTechController.prototype['featuresProgressEvents'] = false;
 vjs.MediaTechController.prototype['featuresTimeupdateEvents'] = false;
+
+vjs.MediaTechController.prototype['featuresNativeTracks'] = false;
 
 vjs.media = {};

@@ -7,6 +7,10 @@
  * Descriptions (not supported yet) - audio descriptions that are read back to the user by a screen reading device
  */
 
+var getProp = function(obj, prop) {
+  return (typeof obj[prop] === 'function') ? obj[prop]() : obj[prop];
+};
+
 // Player Additions - Functions add to the player object for easier access to tracks
 
 /**
@@ -23,6 +27,10 @@ vjs.Player.prototype.textTracks_;
  * @private
  */
 vjs.Player.prototype.textTracks = function(){
+  if (this.tech['featuresNativeTracks']) {
+    return this.techGet('textTracks');
+  }
+
   this.textTracks_ = this.textTracks_ || [];
   return this.textTracks_;
 };
@@ -38,6 +46,10 @@ vjs.Player.prototype.textTracks = function(){
  * @private
  */
 vjs.Player.prototype.addTextTrack = function(kind, label, language, options){
+  if (this.tech && this.tech['featuresNativeTracks']) {
+    return this.tech.addTextTrack(kind, label, language);
+  }
+
   var tracks = this.textTracks_ = this.textTracks_ || [];
   options = options || {};
 
@@ -91,7 +103,7 @@ vjs.Player.prototype.addTextTracks = function(trackList){
 // Show a text track
 // disableSameKind: disable all other tracks of the same kind. Value should be a track kind (captions, etc.)
 vjs.Player.prototype.showTextTrack = function(id, disableSameKind){
-  var tracks = this.textTracks_,
+  var tracks = this.textTracks(),
       i = 0,
       j = tracks.length,
       track, showTrack, kind;
@@ -99,18 +111,26 @@ vjs.Player.prototype.showTextTrack = function(id, disableSameKind){
   // Find Track with same ID
   for (;i<j;i++) {
     track = tracks[i];
-    if (track.id() === id) {
-      track.show();
+    if (getProp(track, 'id') === id || track.language === id) {
+      if (track.show) {
+        track.show();
+      } else {
+        track.mode = 'showing';
+      }
       showTrack = track;
 
     // Disable tracks of the same kind
-    } else if (disableSameKind && track.kind() == disableSameKind && track.mode() > 0) {
-      track.disable();
+    } else if (disableSameKind && getProp(track, 'kind') == disableSameKind && getProp(track, 'mode') > 0 || getProp(track, 'mode') === 'showing') {
+      if (track.disable) {
+        track.disable();
+      } else {
+        track.mode = 'disabled';
+      }
     }
   }
 
   // Get track kind from shown track or disableSameKind
-  kind = (showTrack) ? showTrack.kind() : ((disableSameKind) ? disableSameKind : false);
+  kind = (showTrack) ? getProp(showTrack, 'kind') : ((disableSameKind) ? disableSameKind : false);
 
   // Trigger trackchange event, captionstrackchange, subtitlestrackchange, etc.
   if (kind) {
@@ -729,21 +749,21 @@ vjs.TextTrackMenuItem = vjs.MenuItem.extend({
     var track = this.track = options['track'];
 
     // Modify options for parent MenuItem class's init.
-    options['label'] = track.label();
-    options['selected'] = track.dflt();
+    options['label'] = getProp(track, 'label');
+    options['selected'] = track.dflt && track.dflt() || track.mode === 'showing';
     vjs.MenuItem.call(this, player, options);
 
-    this.on(player, track.kind() + 'trackchange', this.update);
+    this.on(player, getProp(track, 'kind') + 'trackchange', this.update);
   }
 });
 
 vjs.TextTrackMenuItem.prototype.onClick = function(){
   vjs.MenuItem.prototype.onClick.call(this);
-  this.player_.showTextTrack(this.track.id_, this.track.kind());
+  this.player_.showTextTrack(this.track.id_ || this.track.language, getProp(this.track, 'kind'));
 };
 
 vjs.TextTrackMenuItem.prototype.update = function(){
-  this.selected(this.track.mode() == 2);
+  this.selected(getProp(this.track, 'mode') == 2);
 };
 
 /**
@@ -780,7 +800,7 @@ vjs.OffTextTrackMenuItem.prototype.update = function(){
 
   for (;i<j;i++) {
     track = tracks[i];
-    if (track.kind() == this.track.kind() && track.mode() == 2) {
+    if (getProp(track, 'kind') === getProp(this.track, 'kind') && getProp(track, 'mode') == 2) {
       off = false;
     }
   }
@@ -838,7 +858,7 @@ vjs.TextTrackButton.prototype.createItems = function(){
 
   for (var i = 0; i < this.player_.textTracks().length; i++) {
     track = this.player_.textTracks()[i];
-    if (track.kind() === this.kind_) {
+    if (getProp(track, 'kind') === this.kind_) {
       items.push(new vjs.TextTrackMenuItem(this.player_, {
         'track': track
       }));
@@ -904,7 +924,7 @@ vjs.ChaptersButton.prototype.createItems = function(){
 
   for (var i = 0; i < this.player_.textTracks().length; i++) {
     track = this.player_.textTracks()[i];
-    if (track.kind() === this.kind_) {
+    if (getProp(track, 'kind') === this.kind_) {
       items.push(new vjs.TextTrackMenuItem(this.player_, {
         'track': track
       }));
@@ -923,7 +943,7 @@ vjs.ChaptersButton.prototype.createMenu = function(){
 
   for (;i<j;i++) {
     track = tracks[i];
-    if (track.kind() == this.kind_) {
+    if (getProp(track, 'kind') == this.kind_) {
       if (track.readyState() === 0) {
         track.load();
         track.on('loaded', vjs.bind(this, this.createMenu));
