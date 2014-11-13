@@ -106,11 +106,16 @@ vjs.Player.prototype.showTextTrack = function(id, disableSameKind){
   var tracks = this.textTracks(),
       i = 0,
       j = tracks.length,
-      track, showTrack, kind;
+      track,
+      showTrack,
+      mode,
+      kind;
 
   // Find Track with same ID
   for (;i<j;i++) {
     track = tracks[i];
+    mode = getProp(track, 'mode');
+
     if (getProp(track, 'id') === id || track.language === id) {
       if (track.show) {
         track.show();
@@ -120,7 +125,8 @@ vjs.Player.prototype.showTextTrack = function(id, disableSameKind){
       showTrack = track;
 
     // Disable tracks of the same kind
-    } else if (disableSameKind && getProp(track, 'kind') == disableSameKind && getProp(track, 'mode') > 0 || getProp(track, 'mode') === 'showing') {
+    } else if (disableSameKind && getProp(track, 'kind') === disableSameKind &&
+          (mode > 0 || mode === 'showing')) {
       if (track.disable) {
         track.disable();
       } else {

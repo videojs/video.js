@@ -228,34 +228,6 @@ vjs.Player.prototype.createEl = function(){
   tag.removeAttribute('width');
   tag.removeAttribute('height');
 
-  /* Don't clear out tracks
-
-  // Empty video tag tracks so the built-in player doesn't use them also.
-  // This may not be fast enough to stop HTML5 browsers from reading the tags
-  // so we'll need to turn off any default tracks if we're manually doing
-  // captions and subtitles. videoElement.textTracks
-  if (tag.hasChildNodes()) {
-    var nodes, nodesLength, i, node, nodeName, removeNodes;
-
-    nodes = tag.childNodes;
-    nodesLength = nodes.length;
-    removeNodes = [];
-
-    while (nodesLength--) {
-      node = nodes[nodesLength];
-      nodeName = node.nodeName.toLowerCase();
-      if (nodeName === 'track') {
-        removeNodes.push(node);
-      }
-    }
-
-    for (i=0; i<removeNodes.length; i++) {
-      tag.removeChild(removeNodes[i]);
-    }
-  }
-
-  */
-
   // Copy over all the attributes from the tag, including ID and class
   // ID will now reference player box, not the video tag
   attrs = vjs.getElementAttributes(tag);
