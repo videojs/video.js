@@ -12,7 +12,16 @@
 vjs.Html5 = vjs.MediaTechController.extend({
   /** @constructor */
   init: function(player, options, ready){
-    this['featuresNativeTracks'] = true;
+    var supportsTextTracks, nodes, nodesLength, i, node, nodeName, removeNodes;
+
+    supportsTextTracks = !!vjs.TEST_VID.textTracks;
+    if (options.parentEl &&
+        options.parentEl.firstChild &&
+        options.parentEl.firstChild.textTracks &&
+        options.parentEl.firstChild.textTracks.length > 0) {
+      supportsTextTracks = typeof options.parentEl.firstChild.textTracks[0].mode !== 'number';
+    }
+    this['featuresNativeTracks'] = supportsTextTracks;
 
     vjs.MediaTechController.call(this, player, options, ready);
 
@@ -26,6 +35,31 @@ vjs.Html5 = vjs.MediaTechController.extend({
     // anyway so the error gets fired.
     if (source && (this.el_.currentSrc !== source.src || (player.tag && player.tag.initNetworkState_ === 3))) {
       this.setSource(source);
+    }
+
+    if (!this['featuresNativeTracks']) {
+    // Empty video tag tracks so the built-in player doesn't use them also.
+    // This may not be fast enough to stop HTML5 browsers from reading the tags
+    // so we'll need to turn off any default tracks if we're manually doing
+      // captions and subtitles. videoElement.textTracks
+      if (this.el_.hasChildNodes()) {
+
+        nodes = this.el_.childNodes;
+        nodesLength = nodes.length;
+        removeNodes = [];
+
+        while (nodesLength--) {
+          node = nodes[nodesLength];
+          nodeName = node.nodeName.toLowerCase();
+          if (nodeName === 'track') {
+            removeNodes.push(node);
+          }
+        }
+
+        for (i=0; i<removeNodes.length; i++) {
+          this.el_.removeChild(removeNodes[i]);
+        }
+      }
     }
 
     // Determine if native controls should be used
