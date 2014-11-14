@@ -127,8 +127,8 @@ vjs.Html5.prototype.createEl = function(){
         t.label = track.label;
         t.srclang = track.srclang;
         t.src = track.src;
-        if (track.default) {
-          t.default = true;
+        if ('default' in track) {
+          t.setAttribute('default', 'default');
         }
         el.appendChild(t);
       });
