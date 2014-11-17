@@ -299,7 +299,7 @@ vjs.MediaTechController.prototype.addTextTrack = function(kind, label, language,
   var Kind = vjs.capitalize(kind || 'subtitles');
 
   // Create correct texttrack class. CaptionsTrack, etc.
-  var track = new window['videojs'][Kind + 'Track'](this, options);
+  var track = new window['videojs'][Kind + 'Track'](this.player_, options);
 
   tracks.push(track);
 
@@ -308,7 +308,7 @@ vjs.MediaTechController.prototype.addTextTrack = function(kind, label, language,
   // Incase there are mulitple defaulted tracks of the same kind
   // Or the user has a set preference of a specific language that should override the default
   // Note: The setTimeout is a workaround because with the html5 tech, the player is 'ready'
- //  before it's child components (including the textTrackDisplay) have finished loading.
+  // before it's child components (including the textTrackDisplay) have finished loading.
   if (track.dflt()) {
     this.ready(function(){
       setTimeout(function(){
