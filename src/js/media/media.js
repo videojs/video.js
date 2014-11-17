@@ -259,6 +259,50 @@ vjs.MediaTechController.prototype.setCurrentTime = function() {
 };
 
 /**
+ * Provide default methods for text tracks.
+ *
+ * Html5 tech overrides these.
+ */
+vjs.MediaTechController.prototype.textTracks = function() {
+  this.player_.textTracks_ = this.player_.textTracks_ || [];
+  return this.player_.textTracks_;
+};
+
+vjs.MediaTechController.prototype.addTextTrack = function(kind, label, language, options) {
+  var tracks = this.textTracks();
+  options = options || {};
+
+  options['kind'] = kind;
+  options['label'] = label;
+  options['language'] = language;
+
+  // HTML5 Spec says default to subtitles.
+  // Uppercase first letter to match class names
+  var Kind = vjs.capitalize(kind || 'subtitles');
+
+  // Create correct texttrack class. CaptionsTrack, etc.
+  var track = new window['videojs'][Kind + 'Track'](this, options);
+
+  tracks.push(track);
+
+  // If track.dflt() is set, start showing immediately
+  // TODO: Add a process to deterime the best track to show for the specific kind
+  // Incase there are mulitple defaulted tracks of the same kind
+  // Or the user has a set preference of a specific language that should override the default
+  // Note: The setTimeout is a workaround because with the html5 tech, the player is 'ready'
+ //  before it's child components (including the textTrackDisplay) have finished loading.
+  if (track.dflt()) {
+    this.ready(function(){
+      setTimeout(function(){
+        track.player().showTextTrack(track.id());
+      }, 0);
+    });
+  }
+
+  return track;
+}
+
+/**
  * Provide a default setPoster method for techs
  *
  * Poster support for techs should be optional, so we don't want techs to

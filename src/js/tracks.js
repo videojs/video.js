@@ -27,12 +27,9 @@ vjs.Player.prototype.textTracks_;
  * @private
  */
 vjs.Player.prototype.textTracks = function(){
-  if (this.tech['featuresNativeTracks']) {
-    return this.techGet('textTracks');
-  }
-
-  this.textTracks_ = this.textTracks_ || [];
-  return this.textTracks_;
+  // cannot use techGet directly because it checks to see whether the tech is ready.
+  // Flash is unlikely to be ready in time but textTracks should still work.
+  return (this.tech && this.tech['textTracks']()) || [];
 };
 
 /**
@@ -46,10 +43,12 @@ vjs.Player.prototype.textTracks = function(){
  * @private
  */
 vjs.Player.prototype.addTextTrack = function(kind, label, language, options){
-  if (this.tech && this.tech['featuresNativeTracks']) {
+  if (this.tech) {
     return this.tech.addTextTrack(kind, label, language);
   }
 
+  // if tech isn't available, we can't call tech.addTextTrack.
+  // This code should only ever be reached by flash techs before the tech isReady_
   var tracks = this.textTracks_ = this.textTracks_ || [];
   options = options || {};
 
