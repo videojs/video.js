@@ -21,6 +21,9 @@ vjs.Html5 = vjs.MediaTechController.extend({
         options.parentEl.firstChild.textTracks.length > 0) {
       supportsTextTracks = typeof options.parentEl.firstChild.textTracks[0].mode !== 'number';
     }
+    if (supportsTextTracks && vjs.IS_FIREFOX) {
+      supportsTextTracks = false;
+    }
     this['featuresNativeTracks'] = supportsTextTracks;
 
     vjs.MediaTechController.call(this, player, options, ready);
