@@ -43,43 +43,7 @@ vjs.Player.prototype.textTracks = function(){
  * @private
  */
 vjs.Player.prototype.addTextTrack = function(kind, label, language, options){
-  if (this.tech) {
-    return this.tech.addTextTrack(kind, label, language);
-  }
-
-  // if tech isn't available, we can't call tech.addTextTrack.
-  // This code should only ever be reached by flash techs before the tech isReady_
-  var tracks = this.textTracks_ = this.textTracks_ || [];
-  options = options || {};
-
-  options['kind'] = kind;
-  options['label'] = label;
-  options['language'] = language;
-
-  // HTML5 Spec says default to subtitles.
-  // Uppercase first letter to match class names
-  var Kind = vjs.capitalize(kind || 'subtitles');
-
-  // Create correct texttrack class. CaptionsTrack, etc.
-  var track = new window['videojs'][Kind + 'Track'](this, options);
-
-  tracks.push(track);
-
-  // If track.dflt() is set, start showing immediately
-  // TODO: Add a process to deterime the best track to show for the specific kind
-  // Incase there are mulitple defaulted tracks of the same kind
-  // Or the user has a set preference of a specific language that should override the default
-  // Note: The setTimeout is a workaround because with the html5 tech, the player is 'ready'
- //  before it's child components (including the textTrackDisplay) have finished loading.
-  if (track.dflt()) {
-    this.ready(function(){
-      setTimeout(function(){
-        track.player().showTextTrack(track.id());
-      }, 0);
-    });
-  }
-
-  return track;
+  return this.tech && this.tech.addTextTrack(kind, label, language, options);
 };
 
 /**
