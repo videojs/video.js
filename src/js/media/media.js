@@ -49,6 +49,25 @@ vjs.MediaTechController = vjs.Component.extend({
       this.textTracks().addEventListener('removetrack', textTracksChanges);
       this.textTracks().addEventListener('addtrack', textTracksChanges);
     }
+
+    player.ready(function() {
+      // Note: The setTimeout is a workaround because with the html5 tech, the player is 'ready'
+      // before it's child components (including the textTrackDisplay) have finished loading.
+      setTimeout(function() {
+        var controlBar;
+
+        controlBar = player.getChild('controlBar');
+        controlBar.addChild(new window['videojs']['SubtitlesButton'](player, {
+          name: 'subtitlesButton'
+        }));
+        controlBar.addChild(new window['videojs']['CaptionsButton'](player, {
+          name: 'captionsButton'
+        }));
+        controlBar.addChild(new window['videojs']['ChaptersButton'](player, {
+          name: 'chaptersButton'
+        }));
+      }, 0);
+    });
   }
 });
 
