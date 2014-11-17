@@ -1034,13 +1034,6 @@ vjs.ChaptersTrackMenuItem.prototype.update = function(){
   this.selected(cue.startTime <= currentTime && currentTime < cue.endTime);
 };
 
-// Add Buttons to controlBar
-vjs.obj.merge(vjs.ControlBar.prototype.options_['children'], {
-  'subtitlesButton': {},
-  'captionsButton': {},
-  'chaptersButton': {}
-});
-
 // vjs.Cue = vjs.Component.extend({
 //   /** @constructor */
 //   init: function(player, options){
