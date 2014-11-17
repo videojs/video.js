@@ -5,6 +5,7 @@ module('Media Tech', {
     clock = sinon.useFakeTimers();
     featuresProgessEvents = videojs.MediaTechController.prototype['featuresProgessEvents'];
     videojs.MediaTechController.prototype['featuresProgressEvents'] = false;
+    videojs.MediaTechController.prototype['featuresNativeTracks'] = true;
   },
   'teardown': function() {
     clock.restore();
