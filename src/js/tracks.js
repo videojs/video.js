@@ -732,9 +732,11 @@ vjs.TextTrackDisplay = vjs.Component.extend({
     // if a track should show by default and the display hadn't loaded yet.
     // Should probably be moved to an external track loader when we support
     // tracks that don't need a display.
-    if (player.options_['tracks'] && player.options_['tracks'].length > 0) {
-      this.player_.addTextTracks(player.options_['tracks']);
-    }
+    player.ready(function() {
+      if (player.options_['tracks'] && player.options_['tracks'].length > 0) {
+        this.player_.addTextTracks(player.options_['tracks']);
+      }
+    });
   }
 });
 
