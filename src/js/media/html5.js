@@ -328,9 +328,17 @@ vjs.Html5.prototype.setPlaybackRate = function(val){ this.el_.playbackRate = val
 vjs.Html5.prototype.networkState = function(){ return this.el_.networkState; };
 
 vjs.Html5.prototype.textTracks = function() {
+  if (!this['featuresNativeTracks']) {
+    return vjs.MediaTechController.prototype.textTracks.call(this);
+  }
+
   return this.el_.textTracks;
 }
-vjs.Html5.prototype.addTextTrack = function(kind, label, language) {
+vjs.Html5.prototype.addTextTrack = function(kind, label, language, options) {
+  if (!this['featuresNativeTracks']) {
+    return vjs.MediaTechController.prototype.addTextTrack.call(this, kind, label, language, options);
+  }
+
   return this.el_.addTextTrack(kind, label, language);
 }
 
