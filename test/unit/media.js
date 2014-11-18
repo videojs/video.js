@@ -9,6 +9,7 @@ module('Media Tech', {
   'teardown': function() {
     this.clock.restore();
     videojs.MediaTechController.prototype['featuresProgessEvents'] = this.featuresProgessEvents;
+    videojs.MediaTechController.prototype['featuresNativeTracks'] = false;
   }
 });
 
