@@ -697,9 +697,20 @@ vjs.TextTrackDisplay = vjs.Component.extend({
     // Should probably be moved to an external track loader when we support
     // tracks that don't need a display.
     player.ready(function() {
+      var controlBar;
+
       if (player.options_['tracks'] && player.options_['tracks'].length > 0) {
         this.player_.addTextTracks(player.options_['tracks']);
       }
+
+      controlBar = this.player_.getChild('controlBar');
+      if (!controlBar) {
+        return;
+      }
+
+      controlBar.getChild('subtitlesButton').update();
+      controlBar.getChild('captionsButton').update();
+      controlBar.getChild('chaptersButton').update();
     });
   }
 });
