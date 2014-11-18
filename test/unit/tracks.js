@@ -497,7 +497,9 @@ test('html5 tech supports native text tracks if the video supports it', function
   player = {
     controls: Function.prototype,
     ready: Function.prototype,
-    options: Function.prototype,
+    options: function() {
+      return {};
+    },
     addChild: Function.prototype,
     id: Function.prototype,
     el: function() {
@@ -530,7 +532,9 @@ test('html5 tech supports native text tracks if the video supports it, unless mo
   player = {
     controls: Function.prototype,
     ready: Function.prototype,
-    options: Function.prototype,
+    options: function() {
+      return {};
+    },
     addChild: Function.prototype,
     id: Function.prototype,
     el: function() {
@@ -572,7 +576,9 @@ test('html5 tech supports native text tracks if the video supports it, unless it
   player = {
     controls: Function.prototype,
     ready: Function.prototype,
-    options: Function.prototype,
+    options: function() {
+      return {};
+    },
     addChild: Function.prototype,
     id: Function.prototype,
     el: function() {
@@ -610,7 +616,9 @@ test('in html5, if native text tracks are not supported, create a texttrackdispl
   player = {
     controls: Function.prototype,
     ready: Function.prototype,
-    options: Function.prototype,
+    options: function() {
+      return {};
+    },
     addChild: Function.prototype,
     id: Function.prototype,
     el: function() {
@@ -650,7 +658,7 @@ test('a tech that does not support native text tracks, should create a texttrack
     ready: Function.prototype,
     addChild: Function.prototype,
     bufferedPercent: Function.prototype
-  },{}),
+  },{});
 
   ok(called, 'text track display was created');
 
