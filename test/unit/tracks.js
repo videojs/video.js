@@ -74,7 +74,7 @@ test('Player track methods call the tech', function() {
   player.addTextTrack();
   player.textTracks();
 
-  equal(calls, 2, 'both textTrack and addTextTrack defer to the tech')
+  equal(calls, 2, 'both textTrack and addTextTrack defer to the tech');
 });
 
 test('TextTrackDisplay initializes tracks on player ready', function() {
@@ -112,9 +112,9 @@ test('TextTrackDisplay adds tracks and updates children', function() {
                 update: function() {
                   update++;
                 }
-              }
+              };
             }
-          }
+          };
         },
         ready: function(cb) {
           cb.call(this);
