@@ -397,12 +397,18 @@ vjs.Player.prototype.onLoadStart = function() {
   // which can happen in any order for a new source
   if (!this.paused()) {
     this.trigger('firstplay');
+    if (this.hasClass('vjs-paused')) {
+      this.onPlay();
+    }
   } else {
     // reset the hasStarted state
     this.hasStarted(false);
     this.one('play', function(){
       this.hasStarted(true);
     });
+    if (this.hasClass('vjs-playing')) {
+      this.onPause();
+    }
   }
 };
 
