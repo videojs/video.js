@@ -101,21 +101,30 @@ vjs.MenuButton = vjs.Button.extend({
   init: function(player, options){
     vjs.Button.call(this, player, options);
 
-    this.menu = this.createMenu();
-
-    // Add list to element
-    this.addChild(this.menu);
-
-    // Automatically hide empty menu buttons
-    if (this.items && this.items.length === 0) {
-      this.hide();
-    }
+    this.update();
 
     this.on('keyup', this.onKeyPress);
     this.el_.setAttribute('aria-haspopup', true);
     this.el_.setAttribute('role', 'button');
   }
 });
+
+vjs.MenuButton.prototype.update = function() {
+  var menu = this.createMenu();
+
+  if (this.menu) {
+    this.removeChild(this.menu);
+  }
+
+  this.menu = menu;
+  this.addChild(menu);
+
+  if (this.items && this.items.length === 0) {
+    this.hide();
+  } else if (this.items && this.items.length > 1) {
+    this.show();
+  }
+};
 
 /**
  * Track the state of the menu button
