@@ -260,9 +260,17 @@ vjs.MediaTechController.prototype.setCurrentTime = function() {
  *
  * Html5 tech overrides these.
  */
+
+/**
+ * List of associated text tracks
+ * @type {Array}
+ * @private
+ */
+vjs.MediaTechController.prototype.textTracks_;
+
 vjs.MediaTechController.prototype.textTracks = function() {
-  this.player_.textTracks_ = this.player_.textTracks_ || [];
-  return this.player_.textTracks_;
+  this.textTracks_ = this.textTracks_ || [];
+  return this.textTracks_;
 };
 
 vjs.MediaTechController.prototype.addTextTrack = function(kind, label, language, options) {

@@ -14,13 +14,6 @@ var getProp = function(obj, prop) {
 // Player Additions - Functions add to the player object for easier access to tracks
 
 /**
- * List of associated text tracks
- * @type {Array}
- * @private
- */
-vjs.Player.prototype.textTracks_;
-
-/**
  * Get an array of associated text tracks. captions, subtitles, chapters, descriptions
  * http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-texttracks
  * @return {Array}           Array of track objects
