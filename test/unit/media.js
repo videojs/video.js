@@ -1,3 +1,5 @@
+var noop = function() {}, clock, oldTextTracks;
+
 module('Media Tech', {
   'setup': function() {
     this.noop = function() {};
