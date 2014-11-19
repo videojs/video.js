@@ -520,7 +520,7 @@ test('html5 tech supports native text tracks if the video supports it', function
 
   html = new vjs.Html5(player, options);
 
-  ok(html['featuresNativeTracks'], 'if textTracks are available on video element, native text tracks are supported');
+  ok(html['featuresTextTracks'], 'if textTracks are available on video element, native text tracks are supported');
 
   vjs.TEST_VID = oldTestVid;
 });
@@ -563,7 +563,7 @@ test('html5 tech supports native text tracks if the video supports it, unless mo
 
   html = new vjs.Html5(player, options);
 
-  ok(!html['featuresNativeTracks'], 'native text tracks are not supported if mode is a number');
+  ok(!html['featuresTextTracks'], 'native text tracks are not supported if mode is a number');
 
   vjs.TEST_VID = oldTestVid;
 });
@@ -600,7 +600,7 @@ test('html5 tech supports native text tracks if the video supports it, unless it
   vjs.IS_FIREFOX = true;
   html = new vjs.Html5(player, options);
 
-  ok(!html['featuresNativeTracks'], 'if textTracks are available on video element, native text tracks are supported');
+  ok(!html['featuresTextTracks'], 'if textTracks are available on video element, native text tracks are supported');
 
   vjs.TEST_VID = oldTestVid;
   vjs.IS_FIREFOX = oldIsFirefox;
