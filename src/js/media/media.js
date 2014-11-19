@@ -31,9 +31,7 @@ vjs.MediaTechController = vjs.Component.extend({
     this.initControlsListeners();
 
     if (!this['featuresNativeTracks']) {
-      player.addChild(new window['videojs']['TextTrackDisplay'](player, {
-        name: 'textTrackDisplay'
-      }));
+      player.addChild('textTrackDisplay');
     }
   }
 });
