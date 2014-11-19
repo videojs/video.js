@@ -155,7 +155,15 @@ test('html5 tech supports native text tracks if the video supports it', function
   var oldTestVid = vjs.TEST_VID,
       player,
       options,
+      oldTextTracks,
       html;
+
+  oldTextTracks = vjs.Html5.prototype.textTracks;
+  vjs.Html5.prototype.textTracks = function() {
+    return {
+      addEventListener: Function.prototype
+    };
+  };
 
   vjs.TEST_VID = {
     textTracks: []
@@ -184,6 +192,120 @@ test('html5 tech supports native text tracks if the video supports it', function
   ok(html['featuresTextTracks'], 'if textTracks are available on video element, native text tracks are supported');
 
   vjs.TEST_VID = oldTestVid;
+  vjs.Html5.prototype.textTracks = oldTextTracks;
+});
+
+test('listen ot remove and add track events in native text tracks', function() {
+  var oldTestVid = vjs.TEST_VID,
+      player,
+      options,
+      oldTextTracks,
+      events = {},
+      html;
+
+  oldTextTracks = vjs.Html5.prototype.textTracks;
+  vjs.Html5.prototype.textTracks = function() {
+    return {
+      addEventListener: function(type, handler) {
+        events[type] = true;
+      }
+    };
+  };
+
+  vjs.TEST_VID = {
+    textTracks: []
+  };
+
+  player = {
+    controls: Function.prototype,
+    ready: Function.prototype,
+    options: function() {
+      return {};
+    },
+    addChild: Function.prototype,
+    id: Function.prototype,
+    el: function() {
+      return {
+        insertBefore: Function.prototype,
+        appendChild: Function.prototype
+      };
+    }
+  };
+  player.player_ = player;
+  player.options_ = options = {};
+
+  html = new vjs.Html5(player, options);
+
+  ok(events['removetrack'], 'removetrack listener was added');
+  ok(events['addtrack'], 'addtrack listener was added');
+
+  vjs.TEST_VID = oldTestVid;
+  vjs.Html5.prototype.textTracks = oldTextTracks;
+});
+
+test('update texttrack buttons on removetrack or addtrack', function() {
+  var update = 0,
+      player,
+      tag,
+      track,
+      oldGetChild = vjs.Player.prototype.getChild,
+      oldTextTracks,
+      events = {},
+      ttd;
+
+  vjs.MediaTechController.prototype['featuresTextTracks'] = true;
+  oldTextTracks = videojs.MediaTechController.prototype.textTracks;
+  vjs.MediaTechController.prototype.textTracks = function() {
+    return {
+      addEventListener: function(type, handler) {
+        events[type] = handler;
+      }
+    };
+  };
+
+  tag = document.createElement('video');
+  track = document.createElement('track');
+  track.kind = 'captions';
+  track.label = 'en';
+  track.language = 'English';
+  track.src = 'en.vtt';
+  tag.appendChild(track);
+  track = document.createElement('track');
+  track.kind = 'captions';
+  track.label = 'es';
+  track.language = 'Spanish';
+  track.src = 'es.vtt';
+  tag.appendChild(track);
+
+  vjs.Player.prototype.getChild = function(child) {
+    return {
+      getChild: function() {
+        return {
+          update: function() {
+            update++;
+          }
+        };
+      }
+    };
+  };
+
+  player =  PlayerTest.makePlayer({}, tag);
+
+
+  player.player_ = player;
+
+
+  events['removetrack']();
+
+  equal(update, 3, 'update was called on the three buttons for remove track');
+
+  events['addtrack']();
+
+  equal(update, 6, 'update was called on the three buttons for remove track');
+
+  vjs.Player.prototype.getChild = oldGetChild;
+  vjs.MediaTechController.prototype.textTracks = oldTextTracks;
+  vjs.MediaTechController.prototype['featuresTextTracks'] = false;
 });
 
 test('html5 tech supports native text tracks if the video supports it, unless mode is a number', function() {

@@ -5,11 +5,18 @@ module('Media Tech', {
     this.featuresProgessEvents = videojs.MediaTechController.prototype['featuresProgessEvents'];
     videojs.MediaTechController.prototype['featuresProgressEvents'] = false;
     videojs.MediaTechController.prototype['featuresTextTracks'] = true;
+    oldTextTracks = videojs.MediaTechController.prototype.textTracks;
+    videojs.MediaTechController.prototype.textTracks = function() {
+      return {
+        addEventListener: Function.prototype
+      };
+    };
   },
   'teardown': function() {
     this.clock.restore();
     videojs.MediaTechController.prototype['featuresProgessEvents'] = this.featuresProgessEvents;
     videojs.MediaTechController.prototype['featuresTextTracks'] = false;
+    videojs.MediaTechController.prototype.textTracks = oldTextTracks;
   }
 });
 
