@@ -1,4 +1,4 @@
-var noop = function() {}, clock, featuresProgessEvents;
+var noop = function() {}, clock, featuresProgessEvents, oldTextTracks;
 
 module('Media Tech', {
   'setup': function() {
@@ -6,11 +6,18 @@ module('Media Tech', {
     featuresProgessEvents = videojs.MediaTechController.prototype['featuresProgessEvents'];
     videojs.MediaTechController.prototype['featuresProgressEvents'] = false;
     videojs.MediaTechController.prototype['featuresTextTracks'] = true;
+    oldTextTracks = videojs.MediaTechController.prototype.textTracks;
+    videojs.MediaTechController.prototype.textTracks = function() {
+      return {
+        addEventListener: Function.prototype
+      };
+    };
   },
   'teardown': function() {
     clock.restore();
     videojs.MediaTechController.prototype['featuresProgessEvents'] = featuresProgessEvents;
     videojs.MediaTechController.prototype['featuresTextTracks'] = false;
+    videojs.MediaTechController.prototype.textTracks = oldTextTracks;
   }
 });
 
