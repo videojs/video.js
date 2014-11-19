@@ -12,6 +12,8 @@
 vjs.MediaTechController = vjs.Component.extend({
   /** @constructor */
   init: function(player, options, ready){
+    var textTracksChanges;
+
     options = options || {};
     // we don't want the tech to report user activity automatically.
     // This is done manually in addControlsListeners
@@ -32,6 +34,20 @@ vjs.MediaTechController = vjs.Component.extend({
 
     if (!this['featuresTextTracks']) {
       player.addChild('textTrackDisplay');
+    } else {
+      textTracksChanges = function() {
+        var controlBar = player.getChild('controlBar');
+        if (!controlBar) {
+          return;
+        }
+
+        controlBar.getChild('subtitlesButton').update();
+        controlBar.getChild('captionsButton').update();
+        controlBar.getChild('chaptersButton').update();
+      };
+
+      this.textTracks().addEventListener('removetrack', textTracksChanges);
+      this.textTracks().addEventListener('addtrack', textTracksChanges);
     }
   }
 });
