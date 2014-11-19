@@ -61,6 +61,7 @@ videojs.Player.prototype.cancelFullScreen = function(){}; /* deprecated */
  * Text tracks
  */
 videojs.Player.prototype.textTracks = function(){};
+videojs.Player.prototype.addTextTrack = function(){};
 
 /**
  * Language support
