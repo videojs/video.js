@@ -98,51 +98,57 @@ test('TextTrackDisplay adds tracks and updates children', function() {
   var add = 0,
       get = 0,
       update = 0,
-      player = {
-        addTextTracks: vjs.Player.prototype.addTextTracks,
-        addTextTrack: function() {
-          add++;
-        },
-        getChild: function(child) {
-          get++;
-          return {
-            getChild: function() {
-              get++;
-              return {
-                update: function() {
-                  update++;
-                }
-              };
-            }
-          };
-        },
-        ready: function(cb) {
-          cb.call(this);
-        }
-      },
-      options = {
-        tracks: [{
-          kind: 'captions',
-          label: 'en',
-          language: 'English',
-          src: 'en.vtt'
-        }, {
-          kind: 'captions',
-          label: 'es',
-          language: 'Spanish',
-          src: 'es.vtt'
-        }]
-      },
+      player,
+      tag,
+      track,
+      oldAddTextTrack = vjs.Player.prototype.addTextTrack,
+      oldGetChild = vjs.Player.prototype.getChild,
       ttd;
 
-  player.player_ = player;
-  player.options_ = options;
+  tag = document.createElement('video');
+  track = document.createElement('track');
+  track.kind = 'captions';
+  track.label = 'en';
+  track.language = 'English';
+  track.src = 'en.vtt';
+  tag.appendChild(track);
+  track = document.createElement('track');
+  track.kind = 'captions';
+  track.label = 'es';
+  track.language = 'Spanish';
+  track.src = 'es.vtt';
+  tag.appendChild(track);
 
-  ttd = new vjs.TextTrackDisplay(player, options);
+  vjs.Player.prototype.addTextTrack = function() {
+    add++;
+  };
+  vjs.Player.prototype.getChild = function(child) {
+    get++;
+    return {
+      getChild: function() {
+        get++;
+        return {
+          update: function() {
+            update++;
+          }
+        };
+      }
+    };
+  };
+
+  player =  PlayerTest.makePlayer({}, tag);
+
+
+  player.player_ = player;
+
+  //ttd = new vjs.TextTrackDisplay(player, options);
 
   equal(add, 2, 'calls to addTextTrack');
   equal(get, 4, 'four children were request: controlBar and its children subtitles, captions, and chapters buttons');
   equal(update, 3, 'each button should have been updated');
+
+  vjs.Player.prototype.addTextTrack = oldAddTextTrack;
+  vjs.Player.prototype.getChild = oldGetChild;
 });
 
 test('html5 tech supports native text tracks if the video supports it', function() {
@@ -261,67 +267,46 @@ test('html5 tech supports native text tracks if the video supports it, unless it
   vjs.IS_FIREFOX = oldIsFirefox;
 });
 
-test('in html5, if native text tracks are not supported, create a texttrackdisplay', function() {
+test('if native text tracks are not supported, create a texttrackdisplay', function() {
   var oldTestVid = vjs.TEST_VID,
       oldIsFirefox = vjs.IS_FIREFOX,
-      oldTextTrackDisplay = vjs.TextTrackDisplay,
+      oldTextTrackDisplay = window['videojs']['TextTrackDisplay'],
       called = false,
       player,
+      tag,
+      track,
       options,
       html;
+
+  tag = document.createElement('video');
+  track = document.createElement('track');
+  track.kind = 'captions';
+  track.label = 'en';
+  track.language = 'English';
+  track.src = 'en.vtt';
+  tag.appendChild(track);
+  track = document.createElement('track');
+  track.kind = 'captions';
+  track.label = 'es';
+  track.language = 'Spanish';
+  track.src = 'es.vtt';
+  tag.appendChild(track);
 
   vjs.TEST_VID = {
     textTracks: []
   };
 
-  player = {
-    controls: Function.prototype,
-    ready: Function.prototype,
-    options: function() {
-      return {};
-    },
-    addChild: Function.prototype,
-    id: Function.prototype,
-    el: function() {
-      return {
-        insertBefore: Function.prototype,
-        appendChild: Function.prototype
-      };
-    }
-  };
-  player.player_ = player;
-  player.options_ = options = {};
-
-  vjs.TextTrackDisplay = function() {
+  vjs.IS_FIREFOX = true;
+  window['videojs']['TextTrackDisplay'] = function() {
     called = true;
   };
 
-  vjs.IS_FIREFOX = true;
-  html = new vjs.Html5(player, options);
+  player = PlayerTest.makePlayer({}, tag);
+
 
   ok(called, 'text track display was created');
 
   vjs.TEST_VID = oldTestVid;
   vjs.IS_FIREFOX = oldIsFirefox;
-  vjs.TextTrackDisplay = oldTextTrackDisplay;
-});
-
-test('a tech that does not support native text tracks, should create a texttrackdisplay', function() {
-  var tech,
-      oldTextTrackDisplay = vjs.TextTrackDisplay,
-      called = false;
-
-  vjs.TextTrackDisplay = function() {
-    called = true;
-  };
-
-  tech = new vjs.MediaTechController({
-    ready: Function.prototype,
-    addChild: Function.prototype,
-    bufferedPercent: Function.prototype
-  },{});
-
-  ok(called, 'text track display was created');
-
-  vjs.TextTrackDisplay = oldTextTrackDisplay;
+  window['videojs']['TextTrackDisplay'] = oldTextTrackDisplay;
 });
