@@ -24,7 +24,7 @@ vjs.Html5 = vjs.MediaTechController.extend({
     if (supportsTextTracks && vjs.IS_FIREFOX) {
       supportsTextTracks = false;
     }
-    this['featuresNativeTracks'] = supportsTextTracks;
+    this['featuresTextTracks'] = supportsTextTracks;
 
     vjs.MediaTechController.call(this, player, options, ready);
 
@@ -40,7 +40,7 @@ vjs.Html5 = vjs.MediaTechController.extend({
       this.setSource(source);
     }
 
-    if (!this['featuresNativeTracks']) {
+    if (!this['featuresTextTracks']) {
     // Empty video tag tracks so the built-in player doesn't use them also.
     // This may not be fast enough to stop HTML5 browsers from reading the tags
     // so we'll need to turn off any default tracks if we're manually doing
@@ -328,14 +328,14 @@ vjs.Html5.prototype.setPlaybackRate = function(val){ this.el_.playbackRate = val
 vjs.Html5.prototype.networkState = function(){ return this.el_.networkState; };
 
 vjs.Html5.prototype.textTracks = function() {
-  if (!this['featuresNativeTracks']) {
+  if (!this['featuresTextTracks']) {
     return vjs.MediaTechController.prototype.textTracks.call(this);
   }
 
   return this.el_.textTracks;
 }
 vjs.Html5.prototype.addTextTrack = function(kind, label, language, options) {
-  if (!this['featuresNativeTracks']) {
+  if (!this['featuresTextTracks']) {
     return vjs.MediaTechController.prototype.addTextTrack.call(this, kind, label, language, options);
   }
 

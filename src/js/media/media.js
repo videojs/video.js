@@ -30,7 +30,7 @@ vjs.MediaTechController = vjs.Component.extend({
 
     this.initControlsListeners();
 
-    if (!this['featuresNativeTracks']) {
+    if (!this['featuresTextTracks']) {
       player.addChild('textTrackDisplay');
     }
   }
@@ -318,7 +318,7 @@ vjs.MediaTechController.prototype['featuresPlaybackRate'] = false;
 vjs.MediaTechController.prototype['featuresProgressEvents'] = false;
 vjs.MediaTechController.prototype['featuresTimeupdateEvents'] = false;
 
-vjs.MediaTechController.prototype['featuresNativeTracks'] = false;
+vjs.MediaTechController.prototype['featuresTextTracks'] = false;
 
 /**
  * A functional mixin for techs that want to use the Source Handler pattern.

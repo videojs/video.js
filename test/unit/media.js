@@ -4,12 +4,12 @@ module('Media Tech', {
     this.clock = sinon.useFakeTimers();
     this.featuresProgessEvents = videojs.MediaTechController.prototype['featuresProgessEvents'];
     videojs.MediaTechController.prototype['featuresProgressEvents'] = false;
-    videojs.MediaTechController.prototype['featuresNativeTracks'] = true;
+    videojs.MediaTechController.prototype['featuresTextTracks'] = true;
   },
   'teardown': function() {
     this.clock.restore();
     videojs.MediaTechController.prototype['featuresProgessEvents'] = this.featuresProgessEvents;
-    videojs.MediaTechController.prototype['featuresNativeTracks'] = false;
+    videojs.MediaTechController.prototype['featuresTextTracks'] = false;
   }
 });
 
