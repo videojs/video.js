@@ -4,7 +4,11 @@
   "version": "4.10.2",
   "main": [
     "dist/video-js/video.js",
-    "dist/video-js/video-js.css"
+    "dist/video-js/video-js.css",
+    "dist/video-js/font/vjs.eot",
+    "dist/video-js/font/vjs.svg",
+    "dist/video-js/font/vjs.ttf",
+    "dist/video-js/font/vjs.woff"
   ],
   "keywords": [
     "videojs",
