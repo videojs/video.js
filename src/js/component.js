@@ -845,7 +845,7 @@ vjs.Component.prototype.removeClass = function(classToRemove){
  * @return {vjs.Component}
  */
 vjs.Component.prototype.show = function(){
-  this.el_.style.display = 'block';
+  this.removeClass('vjs-hidden');
   return this;
 };
 
@@ -855,7 +855,7 @@ vjs.Component.prototype.show = function(){
  * @return {vjs.Component}
  */
 vjs.Component.prototype.hide = function(){
-  this.el_.style.display = 'none';
+  this.addClass('vjs-hidden');
   return this;
 };
 
