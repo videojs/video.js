@@ -44,8 +44,8 @@ var player = videojs('really-cool-video', { /* Options */ }, function() {
 });
 ```
 
-If you're ready to dive in, the [documentation](/blob/master/docs/index.md) is the first place to go for more information. Generally the
-[player API docs](/blob/master/docs/api/vjs.Player.md) are the most pertinent.
+If you're ready to dive in, the [documentation](docs/index.md) is the first place to go for more information. Generally the
+[player API docs](docs/api/vjs.Player.md) are the most pertinent.
 
 ## Contributing
 Video.js is a free and open source library, and we appreciate any help you're willing to give. Check out the [contributing guide](CONTRIBUTING.md).
