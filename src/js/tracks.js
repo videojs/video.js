@@ -436,13 +436,13 @@ vjs.TextTrack.prototype.parseCues = function(srcContent) {
   }
 
   cues = this.cues_;
-  parser = new WebVTT.Parser(window, WebVTT.StringDecoder());
+  parser = new window.WebVTT.Parser(window, window.WebVTT.StringDecoder());
   parser.oncue = function(cue) {
     cues.push(cue);
   };
   parser.onparsingerror = function(error) {
     vjs.log(error);
-  }
+  };
 
   parser.parse(srcContent);
   parser.flush();
@@ -603,11 +603,7 @@ vjs.TextTrack.prototype.update = function(){
 
 // Add cue HTML to display
 vjs.TextTrack.prototype.updateDisplay = function(){
-  var cues = this.activeCues_,
-      html = '',
-      i=0,j=cues.length;
-
-  WebVTT.processCues(window, cues, this.el_)
+  window.WebVTT.processCues(window, this.activeCues_, this.el_);
 };
 
 // Set all loop helper values back
