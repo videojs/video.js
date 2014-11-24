@@ -305,14 +305,6 @@ vjs.MediaTechController.prototype.addTextTrack = function(kind, label, language,
   // Create correct texttrack class. CaptionsTrack, etc.
   var track = new window['videojs'][Kind + 'Track'](this.player_, options);
 
-  // lazy load vtt.js
-  if (!window.WebVTT) {
-    var script = document.createElement('script');
-    script.src = '../node_modules/vtt.js/dist/vtt.js';
-    this.el().appendChild(script);
-    window.WebVTT = true;
-  }
-
   tracks.push(track);
 
   // If track.dflt() is set, start showing immediately
