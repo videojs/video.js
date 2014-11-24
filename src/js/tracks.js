@@ -114,7 +114,16 @@ vjs.Player.prototype.showTextTrack = function(id, disableSameKind){
 vjs.TextTrack = vjs.Component.extend({
   /** @constructor */
   init: function(player, options){
+    var script;
     vjs.Component.call(this, player, options);
+
+    // lazy load vtt.js
+    if (!window.WebVTT) {
+      script = document.createElement('script');
+      script.src = options['vtt.js'] || '../node_modules/vtt.js/dist/vtt.js';
+      player.el().appendChild(script);
+      window.WebVTT = true;
+    }
 
     // Apply track info to track object
     // Options will often be a track element
@@ -420,53 +429,23 @@ vjs.TextTrack.prototype.onError = function(err){
 // Parse the WebVTT text format for cue times.
 // TODO: Separate parser into own class so alternative timed text formats can be used. (TTML, DFXP)
 vjs.TextTrack.prototype.parseCues = function(srcContent) {
-  var cue, time, text,
-      lines = srcContent.split('\n'),
-      line = '', id;
-
-  for (var i=1, j=lines.length; i<j; i++) {
-    // Line 0 should be 'WEBVTT', so skipping i=0
-
-    line = vjs.trim(lines[i]); // Trim whitespace and linebreaks
-
-    if (line) { // Loop until a line with content
-
-      // First line could be an optional cue ID
-      // Check if line has the time separator
-      if (line.indexOf('-->') == -1) {
-        id = line;
-        // Advance to next line for timing.
-        line = vjs.trim(lines[++i]);
-      } else {
-        id = this.cues_.length;
-      }
-
-      // First line - Number
-      cue = {
-        id: id, // Cue Number
-        index: this.cues_.length // Position in Array
-      };
-
-      // Timing line
-      time = line.split(/[\t ]+/);
-      cue.startTime = this.parseCueTime(time[0]);
-      cue.endTime = this.parseCueTime(time[2]);
-
-      // Additional lines - Cue Text
-      text = [];
-
-      // Loop until a blank line or end of lines
-      // Assumeing trim('') returns false for blank lines
-      while (lines[++i] && (line = vjs.trim(lines[i]))) {
-        text.push(line);
-      }
-
-      cue.text = text.join('<br/>');
-
-      // Add this cue
-      this.cues_.push(cue);
-    }
+  var parser, cues;
+  if (typeof window.WebVTT !== 'function') {
+    // try again a bit later
+    return window.setTimeout(vjs.bind(this, this.parseCues), 25);
   }
+
+  cues = this.cues_;
+  parser = new WebVTT.Parser(window, WebVTT.StringDecoder());
+  parser.oncue = function(cue) {
+    cues.push(cue);
+  };
+  parser.onparsingerror = function(error) {
+    vjs.log(error);
+  }
+
+  parser.parse(srcContent);
+  parser.flush();
 
   this.readyState_ = 2;
   this.trigger('loaded');
@@ -628,11 +607,7 @@ vjs.TextTrack.prototype.updateDisplay = function(){
       html = '',
       i=0,j=cues.length;
 
-  for (;i<j;i++) {
-    html += '<span class="vjs-tt-cue">'+cues[i].text+'</span>';
-  }
-
-  this.el_.innerHTML = html;
+  WebVTT.processCues(window, cues, this.el_)
 };
 
 // Set all loop helper values back

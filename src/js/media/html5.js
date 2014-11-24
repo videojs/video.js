@@ -36,7 +36,7 @@ vjs.Html5 = vjs.MediaTechController.extend({
     if (supportsTextTracks && vjs.IS_FIREFOX) {
       supportsTextTracks = false;
     }
-    this['featuresTextTracks'] = supportsTextTracks;
+    this['featuresTextTracks'] = options.nativeCaptions !== false && supportsTextTracks;
 
     vjs.MediaTechController.call(this, player, options, ready);
     this.setupTriggers();

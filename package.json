@@ -21,7 +21,8 @@
   },
   "main": "./dist/video-js/video.js",
   "dependencies": {
-    "videojs-swf": "4.5.1"
+    "videojs-swf": "4.5.1",
+    "vtt.js": "git+https://github.com/mozilla/vtt.js.git#v0.11.11"
   },
   "devDependencies": {
     "calcdeps": "~0.1.7",
