@@ -443,8 +443,7 @@ test('TextTrackDisplay adds tracks and updates children', function() {
       tag,
       track,
       oldAddTextTrack = vjs.Player.prototype.addTextTrack,
-      oldGetChild = vjs.Player.prototype.getChild,
-      ttd;
+      oldGetChild = vjs.Player.prototype.getChild;
 
   tag = document.createElement('video');
   track = document.createElement('track');
@@ -479,10 +478,7 @@ test('TextTrackDisplay adds tracks and updates children', function() {
 
   player =  PlayerTest.makePlayer({}, tag);
 
-
   player.player_ = player;
-
-  //ttd = new vjs.TextTrackDisplay(player, options);
 
   equal(add, 2, 'calls to addTextTrack');
   equal(get, 4, 'four children were request: controlBar and its children subtitles, captions, and chapters buttons');
@@ -594,8 +590,7 @@ test('update texttrack buttons on removetrack or addtrack', function() {
       track,
       oldGetChild = vjs.Player.prototype.getChild,
       oldTextTracks,
-      events = {},
-      ttd;
+      events = {};
 
   vjs.MediaTechController.prototype['featuresTextTracks'] = true;
   oldTextTracks = videojs.MediaTechController.prototype.textTracks;
