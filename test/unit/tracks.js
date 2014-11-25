@@ -323,7 +323,9 @@ test('html5 tech supports native text tracks if the video supports it, unless it
       html;
 
   vjs.TEST_VID = {
-    textTracks: []
+    textTracks: [{
+      mode: 0
+    }]
   };
 
   player = {
