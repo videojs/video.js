@@ -161,6 +161,7 @@ test('html5 tech supports native text tracks if the video supports it', function
   oldTextTracks = vjs.Html5.prototype.textTracks;
   vjs.Html5.prototype.textTracks = function() {
     return {
+      // Function.prototype is a built-in no-op function.
       addEventListener: Function.prototype
     };
   };
@@ -170,6 +171,7 @@ test('html5 tech supports native text tracks if the video supports it', function
   };
 
   player = {
+    // Function.prototype is a built-in no-op function.
     controls: Function.prototype,
     ready: Function.prototype,
     options: function() {
@@ -217,6 +219,7 @@ test('listen ot remove and add track events in native text tracks', function() {
   };
 
   player = {
+    // Function.prototype is a built-in no-op function.
     controls: Function.prototype,
     ready: Function.prototype,
     options: function() {
@@ -291,9 +294,7 @@ test('update texttrack buttons on removetrack or addtrack', function() {
 
   player =  PlayerTest.makePlayer({}, tag);
 
-
   player.player_ = player;
-
 
   events['removetrack']();
 
@@ -321,6 +322,7 @@ test('html5 tech supports native text tracks if the video supports it, unless mo
   };
 
   player = {
+    // Function.prototype is a built-in no-op function.
     controls: Function.prototype,
     ready: Function.prototype,
     options: function() {
@@ -365,6 +367,7 @@ test('html5 tech supports native text tracks if the video supports it, unless it
   };
 
   player = {
+    // Function.prototype is a built-in no-op function.
     controls: Function.prototype,
     ready: Function.prototype,
     options: function() {
@@ -426,7 +429,6 @@ test('if native text tracks are not supported, create a texttrackdisplay', funct
   };
 
   player = PlayerTest.makePlayer({}, tag);
-
 
   ok(called, 'text track display was created');
 
