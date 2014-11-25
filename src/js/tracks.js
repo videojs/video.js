@@ -120,7 +120,7 @@ vjs.TextTrack = vjs.Component.extend({
     // lazy load vtt.js
     if (!window.WebVTT) {
       script = document.createElement('script');
-      script.src = options['vtt.js'] || '../node_modules/vtt.js/dist/vtt.js';
+      script.src = player.options()['vtt.js'] || '../node_modules/vtt.js/dist/vtt.js';
       player.el().appendChild(script);
       window.WebVTT = true;
     }
