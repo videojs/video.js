@@ -15,11 +15,8 @@ vjs.Html5 = vjs.MediaTechController.extend({
     var supportsTextTracks, nodes, nodesLength, i, node, nodeName, removeNodes;
 
     supportsTextTracks = !!vjs.TEST_VID.textTracks;
-    if (options.parentEl &&
-        options.parentEl.firstChild &&
-        options.parentEl.firstChild.textTracks &&
-        options.parentEl.firstChild.textTracks.length > 0) {
-      supportsTextTracks = typeof options.parentEl.firstChild.textTracks[0].mode !== 'number';
+    if (supportsTextTracks && vjs.TEST_VID.textTracks.length > 0) {
+      supportsTextTracks = typeof vjs.TEST_VID.textTracks[0].mode !== 'number';
     }
     if (supportsTextTracks && vjs.IS_FIREFOX) {
       supportsTextTracks = false;
