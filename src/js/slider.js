@@ -24,23 +24,8 @@ vjs.Slider = vjs.Component.extend({
 
     this.on(player, 'controlsvisible', this.update);
     this.on(player, this.playerEvent, this.update);
-
-    this.boundEvents = {};
-    this.boundEvents.move = vjs.bind(this, this.onMouseMove);
-    this.boundEvents.end = vjs.bind(this, this.onMouseUp);
   }
 });
-
-vjs.Slider.prototype.dispose = function() {
-  vjs.off(document, 'mousemove', this.boundEvents.move, false);
-  vjs.off(document, 'mouseup', this.boundEvents.end, false);
-  vjs.off(document, 'touchmove', this.boundEvents.move, false);
-  vjs.off(document, 'touchend', this.boundEvents.end, false);
-  vjs.off(document, 'keydown', vjs.bind(this, this.onKeyPress));
-  vjs.off(document, 'keyup', vjs.bind(this, this.onKeyPress));
-
-  vjs.Component.prototype.dispose.call(this);
-};
 
 vjs.Slider.prototype.createEl = function(type, props) {
   props = props || {};
@@ -62,10 +47,10 @@ vjs.Slider.prototype.onMouseDown = function(event){
   vjs.blockTextSelection();
   this.addClass('vjs-sliding');
 
-  vjs.on(document, 'mousemove', this.boundEvents.move);
-  vjs.on(document, 'mouseup', this.boundEvents.end);
-  vjs.on(document, 'touchmove', this.boundEvents.move);
-  vjs.on(document, 'touchend', this.boundEvents.end);
+  this.on(document, 'mousemove', this.onMouseMove);
+  this.on(document, 'mouseup', this.onMouseUp);
+  this.on(document, 'touchmove', this.onMouseMove);
+  this.on(document, 'touchend', this.onMouseUp);
 
   this.onMouseMove(event);
 };
@@ -77,10 +62,10 @@ vjs.Slider.prototype.onMouseUp = function() {
   vjs.unblockTextSelection();
   this.removeClass('vjs-sliding');
 
-  vjs.off(document, 'mousemove', this.boundEvents.move, false);
-  vjs.off(document, 'mouseup', this.boundEvents.end, false);
-  vjs.off(document, 'touchmove', this.boundEvents.move, false);
-  vjs.off(document, 'touchend', this.boundEvents.end, false);
+  this.off(document, 'mousemove', this.onMouseMove);
+  this.off(document, 'mouseup', this.onMouseUp);
+  this.off(document, 'touchmove', this.onMouseMove);
+  this.off(document, 'touchend', this.onMouseUp);
 
   this.update();
 };
@@ -187,7 +172,7 @@ vjs.Slider.prototype.calculateDistance = function(event){
 };
 
 vjs.Slider.prototype.onFocus = function(){
-  vjs.on(document, 'keydown', vjs.bind(this, this.onKeyPress));
+  this.on(document, 'keydown', this.onKeyPress);
 };
 
 vjs.Slider.prototype.onKeyPress = function(event){
@@ -201,7 +186,7 @@ vjs.Slider.prototype.onKeyPress = function(event){
 };
 
 vjs.Slider.prototype.onBlur = function(){
-  vjs.off(document, 'keyup', vjs.bind(this, this.onKeyPress));
+  this.off(document, 'keydown', this.onKeyPress);
 };
 
 /**
