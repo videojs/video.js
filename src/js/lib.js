@@ -357,6 +357,13 @@ vjs.removeClass = function(element, classToRemove){
  * @private
  */
 vjs.TEST_VID = vjs.createEl('video');
+(function() {
+  var track = document.createElement('track');
+  track.kind = 'captions';
+  track.srclang = 'en';
+  track.label = 'English';
+  vjs.TEST_VID.appendChild(track);
+})();
 
 /**
  * Useragent for browser testing.
