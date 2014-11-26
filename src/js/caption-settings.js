@@ -14,10 +14,21 @@
 
       vjs.on(this.el().querySelector('.font-plus'), 'click', vjs.bind(this, function() {
         this.fontSize++;
+        this.updateDisplay();
       }));
       vjs.on(this.el().querySelector('.font-minus'), 'click', vjs.bind(this, function() {
         this.fontSize--;
+        this.updateDisplay();
       }));
+
+      vjs.on(this.el().querySelector('.fg-color > select'), 'change', vjs.bind(this, this.updateDisplay));
+      vjs.on(this.el().querySelector('.bg-color > select'), 'change', vjs.bind(this, this.updateDisplay));
+      vjs.on(this.el().querySelector('.window-color > select'), 'change', vjs.bind(this, this.updateDisplay));
+      vjs.on(this.el().querySelector('.text-opacity > select'), 'change', vjs.bind(this, this.updateDisplay));
+      vjs.on(this.el().querySelector('.bg-opacity > select'), 'change', vjs.bind(this, this.updateDisplay));
+      vjs.on(this.el().querySelector('.window-opacity > select'), 'change', vjs.bind(this, this.updateDisplay));
+      vjs.on(this.el().querySelector('.edge-style > select'), 'change', vjs.bind(this, this.updateDisplay));
+      vjs.on(this.el().querySelector('.font-family > select'), 'change', vjs.bind(this, this.updateDisplay));
     }
   });
 
@@ -58,9 +69,15 @@
       }
     }
     if (this.fontSize !== 12) {
-      result.fontSize = this.fontSize;
+      result.fontSize = this.fontSize + 'px';
     }
     return result;
+  };
+
+  vjs.TextTrackSettings.prototype.updateDisplay = function() {
+    vjs.obj.each(this.player().textTracks(), function(i, el) {
+      el.updateDisplay();
+    });
   };
 
   function getSelectedOptionValue(target) {

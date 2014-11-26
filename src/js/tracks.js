@@ -653,10 +653,8 @@ vjs.TextTrack.prototype.updateDisplay = function(){
     if (overrides.windowColor) {
       if (overrides.windowOpacity) {
         cueDiv.style.backgroundColor = constructColor(overrides.windowColor, overrides.windowOpacity);
-        console.log('transparency!', cueDiv.style.backgroundColor);
       } else {
         cueDiv.style.backgroundColor = overrides.windowColor;
-        console.log(cueDiv.style.backgroundColor);
       }
     }
     if (overrides.edgeStyle) {
@@ -669,6 +667,9 @@ vjs.TextTrack.prototype.updateDisplay = function(){
       } else if (overrides.edgeStyle === 'uniform') {
         cueDiv.firstChild.style.textShadow = '0 0 4px ' + darkGray + ', 0 0 4px ' + darkGray + ', 0 0 4px ' + darkGray + ', 0 0 4px ' + darkGray;
       }
+    }
+    if (overrides.fontSize) {
+      cueDiv.firstChild.style.fontSize = overrides.fontSize;
     }
     if (overrides.fontFamily && overrides.fontFamily !== 'default') {
       if (overrides.fontFamily === 'small-caps') {
