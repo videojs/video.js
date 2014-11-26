@@ -762,6 +762,24 @@ vjs.OffTextTrackMenuItem.prototype.update = function(){
   this.selected(off);
 };
 
+vjs.CaptionSettingsMenuItem = vjs.TextTrackMenuItem.extend({
+  init: function(player, options) {
+    options['track'] = {
+      kind: function() { return options['kind']; },
+      player: player,
+      label: function() { return options['kind'] + ' settings'; },
+      dftl: function() { return false; },
+      mode: function() { return false; }
+    };
+
+    vjs.TextTrackMenuItem.call(this, player, options);
+  }
+});
+
+vjs.CaptionSettingsMenuItem.prototype.onClick = function() {
+  this.player().getChild('captionSettings').show();
+}
+
 /**
  * The base class for buttons that toggle specific text track types (e.g. subtitles)
  *
@@ -809,6 +827,10 @@ vjs.TextTrackButton.prototype.createItems = function(){
 
   // Add an OFF menu item to turn all tracks off
   items.push(new vjs.OffTextTrackMenuItem(this.player_, { 'kind': this.kind_ }));
+
+  if (this instanceof vjs.CaptionsButton) {
+    items.push(new vjs.CaptionSettingsMenuItem(this.player_, { 'kind': this.kind_ }));
+  }
 
   for (var i = 0; i < this.player_.textTracks().length; i++) {
     track = this.player_.textTracks()[i];
