@@ -932,6 +932,16 @@ vjs.CaptionsButton.prototype.kind_ = 'captions';
 vjs.CaptionsButton.prototype.buttonText = 'Captions';
 vjs.CaptionsButton.prototype.className = 'vjs-captions-button';
 
+vjs.CaptionsButton.prototype.update = function() {
+  vjs.TextTrackButton.prototype.update.call(this);
+
+  if (this.items && this.items.length > 2) {
+    this.show();
+  } else {
+    this.hide();
+  }
+};
+
 /**
  * The button component for toggling and selecting subtitles
  *
