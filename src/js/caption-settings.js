@@ -1,5 +1,5 @@
 (function() {
-  "use strict";
+  'use strict';
 
   vjs.TextTrackSettings = vjs.Component.extend({
     init: function(player, options) {
@@ -25,7 +25,7 @@
     return vjs.Component.prototype.createEl.call(this, 'div', {
       className: 'vjs-caption-settings',
       innerHTML: captionOptionsMenuTemplate()
-    })
+    });
   };
 
   vjs.TextTrackSettings.prototype.getValues = function() {
@@ -44,15 +44,15 @@
     fntSize = this.fontSize + 'px';
 
     return {
-      "background-opacity": bgOpacity,
-      "text-opacity": textOpacity,
-      "window-opacity": windowOpacity,
-      "font-size": fntSize,
-      "edge-style": textEdge,
-      "font-family": fontFamily,
-      "text-color": fgColor,
-      "background-color": bgColor,
-      "window-color": windowColor
+      'background-opacity': bgOpacity,
+      'text-opacity': textOpacity,
+      'window-opacity': windowOpacity,
+      'font-size': fntSize,
+      'edge-style': textEdge,
+      'font-family': fontFamily,
+      'text-color': fgColor,
+      'background-color': bgColor,
+      'window-color': windowColor
     };
   };
 

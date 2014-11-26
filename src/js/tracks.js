@@ -775,7 +775,7 @@ vjs.CaptionSettingsMenuItem = vjs.TextTrackMenuItem.extend({
 
 vjs.CaptionSettingsMenuItem.prototype.onClick = function() {
   this.player().getChild('textTrackSetting').show();
-}
+};
 
 /**
  * The base class for buttons that toggle specific text track types (e.g. subtitles)
