@@ -8,7 +8,7 @@ vjs.VolumeMenuButton = vjs.MenuButton.extend({
     vjs.MenuButton.call(this, player, options);
 
     // Same listeners as MuteToggle
-    this.on(player, 'volumechange', this.update);
+    this.on(player, 'volumechange', this.volumeUpdate);
 
     // hide mute toggle if the current tech doesn't support volume control
     if (player.tech && player.tech['featuresVolumeControl'] === false) {
@@ -51,4 +51,4 @@ vjs.VolumeMenuButton.prototype.createEl = function(){
     innerHTML: '<div><span class="vjs-control-text">' + this.localize('Mute') + '</span></div>'
   });
 };
-vjs.VolumeMenuButton.prototype.update = vjs.MuteToggle.prototype.update;
+vjs.VolumeMenuButton.prototype.volumeUpdate = vjs.MuteToggle.prototype.update;
