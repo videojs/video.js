@@ -933,9 +933,15 @@ vjs.CaptionsButton.prototype.buttonText = 'Captions';
 vjs.CaptionsButton.prototype.className = 'vjs-captions-button';
 
 vjs.CaptionsButton.prototype.update = function() {
+  var threshold = 2;
   vjs.TextTrackButton.prototype.update.call(this);
 
-  if (this.items && this.items.length > 2) {
+  // if native, then threshold is 1 because no settings button
+  if (this.player().tech && this.player().tech.featuresTextTracks) {
+    threshold = 1;
+  }
+
+  if (this.items && this.items.length > threshold) {
     this.show();
   } else {
     this.hide();
