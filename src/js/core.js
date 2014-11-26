@@ -102,7 +102,8 @@ vjs.options = {
     'loadingSpinner': {},
     'bigPlayButton': {},
     'controlBar': {},
-    'errorDisplay': {}
+    'errorDisplay': {},
+    'captionSettings': {}
   },
 
   'language': document.getElementsByTagName('html')[0].getAttribute('lang') || navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language || 'en',
