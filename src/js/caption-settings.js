@@ -6,7 +6,7 @@
       vjs.Component.call(this, player, options);
       this.hide();
 
-      this.fontSize = 0;
+      this.fontSize = 12;
 
       vjs.on(this.el().querySelector('.done-button'), 'click', vjs.bind(this, function() {
         this.hide();
@@ -29,7 +29,7 @@
   };
 
   vjs.TextTrackSettings.prototype.getValues = function() {
-    var el, bgOpacity, textOpacity, windowOpacity, textEdge, fontFamily, fgColor, bgColor, windowColor, fntSize;
+    var el, bgOpacity, textOpacity, windowOpacity, textEdge, fontFamily, fgColor, bgColor, windowColor, result, name;
 
     el = this.el();
 
@@ -41,19 +41,26 @@
     bgOpacity = getSelectedOptionValue(el.querySelector('.bg-opacity > select'));
     windowColor = getSelectedOptionValue(el.querySelector('.window-color > select'));
     windowOpacity = getSelectedOptionValue(el.querySelector('.window-opacity > select'));
-    fntSize = this.fontSize + 'px';
 
-    return {
-      'background-opacity': bgOpacity,
-      'text-opacity': textOpacity,
-      'window-opacity': windowOpacity,
-      'font-size': fntSize,
-      'edge-style': textEdge,
-      'font-family': fontFamily,
-      'text-color': fgColor,
-      'background-color': bgColor,
-      'window-color': windowColor
+    result = {
+      'backgroundOpacity': bgOpacity,
+      'textOpacity': textOpacity,
+      'windowOpacity': windowOpacity,
+      'edgeStyle': textEdge,
+      'fontFamily': fontFamily,
+      'color': fgColor,
+      'backgroundColor': bgColor,
+      'windowColor': windowColor
     };
+    for (name in result) {
+      if (result[name] === '' || result[name] === 'none') {
+        delete result[name];
+      }
+    }
+    if (this.fontSize !== 12) {
+      result.fontSize = this.fontSize;
+    }
+    return result;
   };
 
   function getSelectedOptionValue(target) {
@@ -219,7 +226,7 @@
                 '<option value="proportionalSansSerif">Proportional Sans-Serif</option>' +
                 '<option value="casual">Casual</option>' +
                 '<option value="script">Script</option>' +
-                '<option value="smallcaps">Small Caps</option>' +
+                '<option value="small-caps">Small Caps</option>' +
               '</select>' +
             '</div>' +
           '</div>' +
