@@ -605,8 +605,79 @@ vjs.TextTrack.prototype.update = function(){
 };
 
 // Add cue HTML to display
+var constructColor = function(color, opacity) {
+  return 'rgba(' +
+    // color looks like "#f0e"
+    parseInt(color[1] + color[1], 16) + ',' +
+    parseInt(color[2] + color[2], 16) + ',' +
+    parseInt(color[3] + color[3], 16) + ',' +
+    opacity + ')';
+};
+var darkGray = '#222';
+var lightGray = '#ccc';
+var fontMap = {
+  monospace:             'monospace',
+  sansSerif:             'sans-serif',
+  serif:                 'serif',
+  monospaceSansSerif:    '"Andale Mono", "Lucida Console", monospace',
+  monospaceSerif:        '"Courier New", monospace',
+  proportionalSansSerif: 'sans-serif',
+  proportionalSerif:     'serif',
+  casual:                '"Comic Sans MS", Impact, fantasy',
+  script:                '"Monotype Corsiva", cursive',
+  smallcaps:             '"Andale Mono", "Lucida Console", monospace, sans-serif'
+};
 vjs.TextTrack.prototype.updateDisplay = function(){
+  var i = this.activeCues_.length,
+      property,
+      cueDiv,
+      overrides = this.player().textTrackSettings.getValues();
+
   window.WebVTT.processCues(window, this.activeCues_, this.el_);
+  while (i--) {
+    cueDiv = this.activeCues_[i].displayState;
+    if (overrides.color) {
+      cueDiv.firstChild.style.color = overrides.color;
+    }
+    if (overrides.textOpacity) {
+      cueDiv.firstChild.style.color = constructColor(overrides.color || '#fff',
+                                                                               overrides.textOpacity);
+    }
+    if (overrides.backgroundColor) {
+      cueDiv.firstChild.style.backgroundColor = overrides.backgroundColor;
+    }
+    if (overrides.backgroundOpacity) {
+      cueDiv.firstChild.style.backgroundColor = constructColor(overrides.backgroundColor || '#000',
+                                                                                         overrides.backgroundOpacity);
+    }
+    if (overrides.windowColor) {
+      if (overrides.windowOpacity) {
+        cueDiv.style.backgroundColor = constructColor(overrides.windowColor, overrides.windowOpacity);
+        console.log('transparency!', cueDiv.style.backgroundColor);
+      } else {
+        cueDiv.style.backgroundColor = overrides.windowColor;
+        console.log(cueDiv.style.backgroundColor);
+      }
+    }
+    if (overrides.edgeStyle) {
+      if (overrides.edgeStyle === 'dropshadow') {
+        cueDiv.firstChild.style.textShadow = '2px 2px 3px ' + darkGray + ', 2px 2px 4px ' + darkGray + ', 2px 2px 5px ' + darkGray;
+      } else if (overrides.edgeStyle === 'raised') {
+        cueDiv.firstChild.style.textShadow = '1px 1px ' + darkGray + ', 2px 2px ' + darkGray + ', 3px 3px ' + darkGray;
+      } else if (overrides.edgeStyle === 'depressed') {
+        cueDiv.firstChild.style.textShadow = '1px 1px ' + lightGray + ', 0 1px ' + lightGray + ', -1px -1px ' + darkGray + ', 0 -1px ' + darkGray;
+      } else if (overrides.edgeStyle === 'uniform') {
+        cueDiv.firstChild.style.textShadow = '0 0 4px ' + darkGray + ', 0 0 4px ' + darkGray + ', 0 0 4px ' + darkGray + ', 0 0 4px ' + darkGray;
+      }
+    }
+    if (overrides.fontFamily && overrides.fontFamily !== 'default') {
+      if (overrides.fontFamily === 'small-caps') {
+        cueDiv.firstChild.style.fontVariant = 'small-caps';
+      } else {
+        cueDiv.firstChild.style.fontFamily = fontMap[overrides.fontFamily];
+      }
+    }
+  }
 };
 
 // Set all loop helper values back
