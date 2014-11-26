@@ -12,6 +12,19 @@
         this.hide();
       }));
 
+      vjs.on(this.el().querySelector('.default-button'), 'click', vjs.bind(this, function() {
+        this.el().querySelector('.fg-color > select').selectedIndex = 0;
+        this.el().querySelector('.bg-color > select').selectedIndex = 0;
+        this.el().querySelector('.window-color > select').selectedIndex = 0;
+        this.el().querySelector('.text-opacity > select').selectedIndex = 0;
+        this.el().querySelector('.bg-opacity > select').selectedIndex = 0;
+        this.el().querySelector('.window-opacity > select').selectedIndex = 0;
+        this.el().querySelector('.edge-style > select').selectedIndex = 0;
+        this.el().querySelector('.font-family > select').selectedIndex = 0;
+        this.fontSize = 12;
+        this.updateDisplay();
+      }));
+
       vjs.on(this.el().querySelector('.font-plus'), 'click', vjs.bind(this, function() {
         this.fontSize++;
         this.updateDisplay();
