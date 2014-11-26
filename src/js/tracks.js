@@ -777,7 +777,7 @@ vjs.CaptionSettingsMenuItem = vjs.TextTrackMenuItem.extend({
 });
 
 vjs.CaptionSettingsMenuItem.prototype.onClick = function() {
-  this.player().getChild('captionSettings').show();
+  this.player().getChild('textTrackSetting').show();
 }
 
 /**

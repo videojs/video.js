@@ -1,7 +1,7 @@
 (function() {
   "use strict";
 
-  vjs.CaptionSettings = vjs.Component.extend({
+  vjs.TextTrackSettings = vjs.Component.extend({
     init: function(player, options) {
       vjs.Component.call(this, player, options);
       this.hide();
@@ -21,14 +21,14 @@
     }
   });
 
-  vjs.CaptionSettings.prototype.createEl = function() {
+  vjs.TextTrackSettings.prototype.createEl = function() {
     return vjs.Component.prototype.createEl.call(this, 'div', {
       className: 'vjs-caption-settings',
       innerHTML: captionOptionsMenuTemplate()
     })
   };
 
-  vjs.CaptionSettings.prototype.getValues = function() {
+  vjs.TextTrackSettings.prototype.getValues = function() {
     var el, bgOpacity, textOpacity, windowOpacity, textEdge, fontFamily, fgColor, bgColor, windowColor, fntSize;
 
     el = this.el();
