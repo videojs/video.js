@@ -901,6 +901,10 @@ vjs.TextTrackButton.prototype.createItems = function(){
   // Add an OFF menu item to turn all tracks off
   items.push(new vjs.OffTextTrackMenuItem(this.player_, { 'kind': this.kind_ }));
 
+  if (this instanceof vjs.CaptionsButton) {
+    items.push(new vjs.CaptionSettingsMenuItem(this.player_, { 'kind': this.kind_ }));
+  }
+
   for (var i = 0; i < this.player_.textTracks().length; i++) {
     track = this.player_.textTracks()[i];
     if (getProp(track, 'kind') === this.kind_) {

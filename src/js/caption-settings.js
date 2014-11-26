@@ -88,10 +88,14 @@
   };
 
   vjs.TextTrackSettings.prototype.updateDisplay = function() {
-    vjs.obj.each(this.player().textTracks(), function(i, el) {
-      el.updateDisplay();
-    });
-  };
+    var i, textTracks;
+    textTracks = this.player().textTracks();
+    i = textTracks.length;
+
+    while (i--) {
+      textTracks[i].updateDisplay();
+    }
+  });
 
   function getSelectedOptionValue(target) {
     var selectedOption;
