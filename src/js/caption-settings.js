@@ -8,7 +8,7 @@
 
       this.fontSize = 12;
 
-      vjs.on(this.el().querySelector('.done-button'), 'click', vjs.bind(this, function() {
+      vjs.on(this.el().querySelector('.vjs-done-button'), 'click', vjs.bind(this, function() {
         this.hide();
       }));
 
@@ -57,14 +57,14 @@
 
     el = this.el();
 
-    textEdge = getSelectedOptionValue(el.querySelector('.edge-style > select'));
-    fontFamily = getSelectedOptionValue(el.querySelector('.font-family > select'));
+    textEdge = getSelectedOptionValue(el.querySelector('.vjs-edge-style > select'));
+    fontFamily = getSelectedOptionValue(el.querySelector('.vjs-font-family > select'));
     fgColor = getSelectedOptionValue(el.querySelector('.vjs-fg-color > select'));
-    textOpacity = getSelectedOptionValue(el.querySelector('.text-opacity > select'));
+    textOpacity = getSelectedOptionValue(el.querySelector('.vjs-text-opacity > select'));
     bgColor = getSelectedOptionValue(el.querySelector('.vjs-bg-color > select'));
-    bgOpacity = getSelectedOptionValue(el.querySelector('.bg-opacity > select'));
+    bgOpacity = getSelectedOptionValue(el.querySelector('.vjs-bg-opacity > select'));
     windowColor = getSelectedOptionValue(el.querySelector('.window-color > select'));
-    windowOpacity = getSelectedOptionValue(el.querySelector('.window-opacity > select'));
+    windowOpacity = getSelectedOptionValue(el.querySelector('.vjs-window-opacity > select'));
 
     result = {
       'backgroundOpacity': bgOpacity,
@@ -106,10 +106,10 @@
   }
 
   function captionOptionsMenuTemplate() {
-    return '<div>' +
+    return '<div class="vjs-tracksettings">' +
         '<div class="vjs-tracksettings-colors">' +
           '<div class="vjs-fg-color vjs-tracksetting">' +
-              '<span style="width:65px;display:block">Foreground</span>' +
+              '<label class="vjs-label">Foreground</label>' +
               '<select>' +
                 '<option value="">---</option>' +
                 '<option value="#FFF">White</option>' +
@@ -121,16 +121,16 @@
                 '<option value="#F0F">Magenta</option>' +
                 '<option value="#0FF">Cyan</option>' +
               '</select>' +
-              '<div class="text-opacity" style="display:inline">' +
-                '<select class="center">' +
+              '<span class="vjs-text-opacity vjs-opacity">' +
+                '<select>' +
                   '<option value="">---</option>' +
                   '<option value="1">Opaque</option>' +
                   '<option value="0.5">Semi-Opaque</option>' +
                 '</select>' +
-              '</div>' +
-          '</div>' +
+              '</span>' +
+          '</div>' + // vjs-fg-color
           '<div class="vjs-bg-color vjs-tracksetting">' +
-              '<span style="width:65px;display:block">Background</span>' +
+              '<label class="vjs-label">Background</label>' +
               '<select>' +
                 '<option value="">---</option>' +
                 '<option value="#FFF">White</option>' +
@@ -142,17 +142,17 @@
                 '<option value="#F0F">Magenta</option>' +
                 '<option value="#0FF">Cyan</option>' +
               '</select>' +
-              '<div class="bg-opacity vjs-tracksetting" style="display:inline">' +
-                  '<select class="center">' +
+              '<span class="vjs-bg-opacity vjs-opacity vjs-tracksetting">' +
+                  '<select>' +
                     '<option value="">---</option>' +
                     '<option value="1">Opaque</option>' +
                     '<option value="0.5">Semi-Transparent</option>' +
                     '<option value="0">Transparent</option>' +
                   '</select>' +
-              '</div>' +
-          '</div>' +
+              '</span>' +
+          '</div>' + // vjs-bg-color
           '<div class="window-color vjs-tracksetting">' +
-              '<span style="width:65px;display:block">Window</span>' +
+              '<label class="vjs-label">Window</label>' +
               '<select>' +
                 '<option value="">---</option>' +
                 '<option value="#FFF">White</option>' +
@@ -164,50 +164,52 @@
                 '<option value="#F0F">Magenta</option>' +
                 '<option value="#0FF">Cyan</option>' +
               '</select>' +
-              '<div class="window-opacity" style="display:inline">' +
-                  '<select class="center">' +
+              '<span class="vjs-window-opacity vjs-opacity">' +
+                  '<select>' +
                     '<option value="">---</option>' +
                     '<option value="1">Opaque</option>' +
                     '<option value="0.5">Semi-Transparent</option>' +
                     '<option value="0">Transparent</option>' +
                   '</select>' +
-              '</div>' +
-          '</div>' +
-        '</div>' +
+              '</span>' +
+          '</div>' + // vjs-window-color
+        '</div>' + // vjs-tracksettings
         '<div class="vjs-tracksettings-font">' +
           '<div class="font-size vjs-tracksetting">' +
-            '<label>Font Size</label>' +
-            '<input type="button" name="font-size" class="font-minus" value="-"/>' +
-            '<input type="button" name="font-size" class="font-plus" value="+"/>' +
-          '</div>' +
-          '<div class="edge-style vjs-tracksetting">' +
-            '<label>Text Edge Style</label>' +
-            '<select>' +
-              '<option value="none">None</option>' +
-              '<option value="raised">Raised</option>' +
-              '<option value="depressed">Depressed</option>' +
-              '<option value="uniform">Uniform</option>' +
-              '<option value="dropshadow">Dropshadow</option>' +
-            '</select>' +
-          '</div>' +
-          '<div class="font-family vjs-tracksetting">' +
-            '<label>Font Family</label>' +
-            '<select>' +
-              '<option value="">---</option>' +
-              '<option value="monospaceSerif">Monospace Serif</option>' +
-              '<option value="proportionalSerif">Proportional Serif</option>' +
-              '<option value="monospaceSansSerif">Monospace Sans-Serif</option>' +
-              '<option value="proportionalSansSerif">Proportional Sans-Serif</option>' +
-              '<option value="casual">Casual</option>' +
-              '<option value="script">Script</option>' +
-              '<option value="small-caps">Small Caps</option>' +
-            '</select>' +
-          '</div>' +
+            '<label class="vjs-label">Font Size</label>' +
+            '<button name="font-size" class="font-minus">-</button>' +
+            '<button name="font-size" class="font-plus">+</button>' +
+          '</div>' + // vjs-font-size
+          '<div class="vjs-edge-style vjs-tracksetting">' +
+            '<label class="vjs-label">Text Edge Style' +
+              '<select>' +
+                '<option value="none">None</option>' +
+                '<option value="raised">Raised</option>' +
+                '<option value="depressed">Depressed</option>' +
+                '<option value="uniform">Uniform</option>' +
+                '<option value="dropshadow">Dropshadow</option>' +
+              '</select>' +
+            '</label>' +
+          '</div>' + // vjs-edge-style
+          '<div class="vjs-font-family vjs-tracksetting">' +
+            '<label class="vjs-label">Font Family' +
+              '<select>' +
+                '<option value="">Default</option>' +
+                '<option value="monospaceSerif">Monospace Serif</option>' +
+                '<option value="proportionalSerif">Proportional Serif</option>' +
+                '<option value="monospaceSansSerif">Monospace Sans-Serif</option>' +
+                '<option value="proportionalSansSerif">Proportional Sans-Serif</option>' +
+                '<option value="casual">Casual</option>' +
+                '<option value="script">Script</option>' +
+                '<option value="small-caps">Small Caps</option>' +
+              '</select>' +
+            '</label>' +
+          '</div>' + // vjs-font-family
         '</div>' +
       '</div>' +
       '<div class="vjs-tracksettings-controls">' +
-        '<button class="default-button">Defaults</button>' +
-        '<button class="done-button">Close</button>' +
+        '<button class="vjs-default-button">Defaults</button>' +
+        '<button class="vjs-done-button">Close</button>' +
       '</div>';
   }
 
