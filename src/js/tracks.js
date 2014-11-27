@@ -845,9 +845,9 @@ vjs.CaptionSettingsMenuItem = vjs.TextTrackMenuItem.extend({
     };
 
     vjs.TextTrackMenuItem.call(this, player, options);
+    this.addClass('vjs-texttrack-settings');
   }
 });
-
 vjs.CaptionSettingsMenuItem.prototype.onClick = function() {
   this.player().getChild('textTrackSettings').show();
 };
@@ -897,12 +897,12 @@ vjs.TextTrackButton = vjs.MenuButton.extend({
 vjs.TextTrackButton.prototype.createItems = function(){
   var items = [], track;
 
-  // Add an OFF menu item to turn all tracks off
-  items.push(new vjs.OffTextTrackMenuItem(this.player_, { 'kind': this.kind_ }));
-
   if (this instanceof vjs.CaptionsButton && !(this.player().tech && this.player().tech.featuresTextTracks)) {
     items.push(new vjs.CaptionSettingsMenuItem(this.player_, { 'kind': this.kind_ }));
   }
+
+  // Add an OFF menu item to turn all tracks off
+  items.push(new vjs.OffTextTrackMenuItem(this.player_, { 'kind': this.kind_ }));
 
   for (var i = 0; i < this.player_.textTracks().length; i++) {
     track = this.player_.textTracks()[i];

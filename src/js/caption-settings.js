@@ -12,15 +12,15 @@
         this.hide();
       }));
 
-      vjs.on(this.el().querySelector('.default-button'), 'click', vjs.bind(this, function() {
-        this.el().querySelector('.fg-color > select').selectedIndex = 0;
-        this.el().querySelector('.bg-color > select').selectedIndex = 0;
+      vjs.on(this.el().querySelector('.vjs-default-button'), 'click', vjs.bind(this, function() {
+        this.el().querySelector('.vjs-fg-color > select').selectedIndex = 0;
+        this.el().querySelector('.vjs-bg-color > select').selectedIndex = 0;
         this.el().querySelector('.window-color > select').selectedIndex = 0;
-        this.el().querySelector('.text-opacity > select').selectedIndex = 0;
-        this.el().querySelector('.bg-opacity > select').selectedIndex = 0;
-        this.el().querySelector('.window-opacity > select').selectedIndex = 0;
-        this.el().querySelector('.edge-style > select').selectedIndex = 0;
-        this.el().querySelector('.font-family > select').selectedIndex = 0;
+        this.el().querySelector('.vjs-text-opacity > select').selectedIndex = 0;
+        this.el().querySelector('.vjs-bg-opacity > select').selectedIndex = 0;
+        this.el().querySelector('.vjs-window-opacity > select').selectedIndex = 0;
+        this.el().querySelector('.vjs-edge-style select').selectedIndex = 0;
+        this.el().querySelector('.vjs-font-family select').selectedIndex = 0;
         this.fontSize = 12;
         this.updateDisplay();
       }));
@@ -34,14 +34,14 @@
         this.updateDisplay();
       }));
 
-      vjs.on(this.el().querySelector('.fg-color > select'), 'change', vjs.bind(this, this.updateDisplay));
-      vjs.on(this.el().querySelector('.bg-color > select'), 'change', vjs.bind(this, this.updateDisplay));
+      vjs.on(this.el().querySelector('.vjs-fg-color > select'), 'change', vjs.bind(this, this.updateDisplay));
+      vjs.on(this.el().querySelector('.vjs-bg-color > select'), 'change', vjs.bind(this, this.updateDisplay));
       vjs.on(this.el().querySelector('.window-color > select'), 'change', vjs.bind(this, this.updateDisplay));
-      vjs.on(this.el().querySelector('.text-opacity > select'), 'change', vjs.bind(this, this.updateDisplay));
-      vjs.on(this.el().querySelector('.bg-opacity > select'), 'change', vjs.bind(this, this.updateDisplay));
-      vjs.on(this.el().querySelector('.window-opacity > select'), 'change', vjs.bind(this, this.updateDisplay));
-      vjs.on(this.el().querySelector('.edge-style > select'), 'change', vjs.bind(this, this.updateDisplay));
-      vjs.on(this.el().querySelector('.font-family > select'), 'change', vjs.bind(this, this.updateDisplay));
+      vjs.on(this.el().querySelector('.vjs-text-opacity > select'), 'change', vjs.bind(this, this.updateDisplay));
+      vjs.on(this.el().querySelector('.vjs-bg-opacity > select'), 'change', vjs.bind(this, this.updateDisplay));
+      vjs.on(this.el().querySelector('.vjs-window-opacity > select'), 'change', vjs.bind(this, this.updateDisplay));
+      vjs.on(this.el().querySelector('.vjs-edge-style select'), 'change', vjs.bind(this, this.updateDisplay));
+      vjs.on(this.el().querySelector('.vjs-font-family select'), 'change', vjs.bind(this, this.updateDisplay));
     }
   });
 
@@ -57,8 +57,8 @@
 
     el = this.el();
 
-    textEdge = getSelectedOptionValue(el.querySelector('.vjs-edge-style > select'));
-    fontFamily = getSelectedOptionValue(el.querySelector('.vjs-font-family > select'));
+    textEdge = getSelectedOptionValue(el.querySelector('.vjs-edge-style select'));
+    fontFamily = getSelectedOptionValue(el.querySelector('.vjs-font-family select'));
     fgColor = getSelectedOptionValue(el.querySelector('.vjs-fg-color > select'));
     textOpacity = getSelectedOptionValue(el.querySelector('.vjs-text-opacity > select'));
     bgColor = getSelectedOptionValue(el.querySelector('.vjs-bg-color > select'));
