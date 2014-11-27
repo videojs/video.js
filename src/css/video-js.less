@@ -971,6 +971,58 @@ body.vjs-full-window {
 /* Increase font-size when fullscreen */
 .video-js.vjs-fullscreen .vjs-text-track { font-size: 3em; }
 
+/* Captions Settings Dialog */
+.vjs-caption-settings {
+  position: relative;
+  top: 1em;
+  background-color: #000;
+  opacity: 0.75;
+  color: #FFF;
+  margin: 0 auto;
+  min-height: 17em;
+  width: 45em;
+}
+
+.vjs-caption-settings .left {
+  float: left
+}
+
+.vjs-caption-settings .right {
+  float: right;
+}
+
+.vjs-caption-settings .clear,
+.vjs-caption-settings .left:after,
+.vjs-caption-settings .right:after {
+  clear: both;
+}
+
+.vjs-caption-settings .component {
+  margin: 0.5em;
+  padding: 0.3em;
+  min-height: 4em;
+}
+
+.vjs-caption-settings .component > div {
+  margin-bottom: 0.5em;
+  min-height: 2em;
+}
+
+.vjs-caption-settings .component > div:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  min-height: 0;
+}
+
+.vjs-caption-settings label > input {
+  margin-right: 1em;
+}
+
+.vjs-caption-settings input[type="button"] {
+  width: 4em;
+  height: 4em;
+}
+
 /* Hide disabled or unsupported controls */
 .vjs-default-skin .vjs-hidden { display: none; }
 
@@ -985,15 +1037,15 @@ body.vjs-full-window {
     This optional paragraph inside the video tag can provide a message to users
     about what's required to play video. */
 .vjs-no-js {
-  padding: 20px;
+  padding: 2em;
   color: #ccc;
   background-color: #333;
-  font-size: 18px;
+  font-size: 1.8em;
   font-family: Arial, sans-serif;
   text-align: center;
-  width: 300px;
-  height: 150px;
-  margin: 0px auto;
+  width: 30em;
+  height: 15em;
+  margin: 0 auto;
 }
 
 .vjs-no-js a, .vjs-no-js a:visited {
