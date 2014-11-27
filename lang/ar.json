@@ -7,7 +7,7 @@
   "Stream Type": "نوع التيار",
   "LIVE": "مباشر",
   "Loaded": "تم التحميل",
-  "Progress": "Status",
+  "Progress": "التقدم",
   "Fullscreen": "ملء الشاشة",
   "Non-Fullscreen": "غير ملء الشاشة",
   "Mute": "صامت",
@@ -19,8 +19,8 @@
   "captions off": "ايقاف التعليقات",
   "Chapters": "فصول",
   "You aborted the video playback": "لقد ألغيت تشغيل الفيديو",
-  "A network error caused the video download to fail part-way.": "",
-  "The video could not be loaded, either because the server or network failed or because the format is not supported.": "",
+  "A network error caused the video download to fail part-way.": "تسبب خطأ في الشبكة بفشل تحميل الفيديو بالكامل",
+  "The video could not be loaded, either because the server or network failed or because the format is not supported.": "لا يمكن تحميل الفيديو بسبب فشل في الخادم أو الشبكة ، أو فشل بسبب عدم امكانية قراءة تنسيق الفيديو",
   "The video playback was aborted due to a corruption problem or because the video used features your browser did not support.": "",
   "No compatible source was found for this video.": ""
 }
