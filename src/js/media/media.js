@@ -279,28 +279,28 @@ vjs.MediaTechController.prototype['featuresTimeupdateEvents'] = false;
  *   videojs.MediaTechController.withSourceHandlers.call(MyTech);
  *
  */
-vjs.MediaTechController.withSourceHandlers = function(tech){
+vjs.MediaTechController.withSourceHandlers = function(Tech){
   /**
-   * All registered source handlers.
+   * Register a source handler
    * Source handlers are scripts for handling specific formats.
    * The source handler pattern is used for adaptive formats (HLS, DASH) that
    * manually load video data and feed it into a Source Buffer (Media Source Extensions)
-   * @type {Array}
-   */
-  tech.sourceHandlers = [];
-
-  /**
-   * Register a source handler
    * @param  {Function} handler  The source handler
    * @param  {Boolean}  first    Register it before any existing handlers
    */
-  tech.registerSourceHandler = function(handler, index){
-    if (index === undefined) {
-      // add to the end of the list
-      index = tech.sourceHandlers.length;
+  Tech.registerSourceHandler = function(handler, index){
+    var handlers = Tech.sourceHandlers;
+
+    if (!handlers) {
+      handlers = Tech.sourceHandlers = [];
     }
 
-    tech.sourceHandlers.splice(index, 0, handler);
+    if (index === undefined) {
+      // add to the end of the list
+      index = handlers.length;
+    }
+
+    handlers.splice(index, 0, handler);
   };
 
   /**
@@ -310,8 +310,8 @@ vjs.MediaTechController.withSourceHandlers = function(tech){
    * @returns {Object}       The first source handler that supports the source
    * @returns {null}         Null if no source handler is found
    */
-  tech.selectSourceHandler = function(source){
-    var handlers = tech.sourceHandlers;
+  Tech.selectSourceHandler = function(source){
+    var handlers = Tech.sourceHandlers || [];
 
     for (var i = 0; i < handlers.length; i++) {
       can = handlers[i].canHandleSource(source);
@@ -325,31 +325,12 @@ vjs.MediaTechController.withSourceHandlers = function(tech){
   };
 
   /**
-   * Create a function for setting the source using a source object
-   * and source handlers.
-   * Should never be called unless a source handler was found.
-   * @param {Object} source  A source object with src and type keys
-   */
-  tech.prototype.setSource = function(source){
-    var sh = tech.selectSourceHandler(source);
-
-    // Clean up any existing source handler
-    if (this.sourceHandler && this.sourceHandler.dispose) {
-      this.sourceHandler.dispose();
-    }
-
-    this.currentSource_ = source;
-
-    this.sourceHandler = sh.handleSource(source, this);
-  };
-
-  /**
-   * Check if the HTML5 tech can support the given source
-   * @param  {Object} srcObj  The source object
-   * @return {String}         'probably', 'maybe', or '' (empty string)
-   */
-  tech.canPlaySource = function(srcObj){
-    var sh = tech.selectSourceHandler(srcObj);
+  * Check if the tech can support the given source
+  * @param  {Object} srcObj  The source object
+  * @return {String}         'probably', 'maybe', or '' (empty string)
+  */
+  Tech.canPlaySource = function(srcObj){
+    var sh = Tech.selectSourceHandler(srcObj);
 
     if (sh) {
       return sh.canHandleSource(srcObj);
@@ -357,5 +338,35 @@ vjs.MediaTechController.withSourceHandlers = function(tech){
 
     return '';
   };
-};
 
+  /**
+   * Create a function for setting the source using a source object
+   * and source handlers.
+   * Should never be called unless a source handler was found.
+   * @param {Object} source  A source object with src and type keys
+   * @return {vjs.MediaTechController} self
+   */
+  Tech.prototype.setSource = function(source){
+    var sh = Tech.selectSourceHandler(source);
+
+    // Dispose any existing source handler
+    this.disposeSourceHandler();
+    this.off('dispose', this.disposeSourceHandler);
+
+    this.currentSource_ = source;
+    this.sourceHandler_ = sh.handleSource(source, this);
+    this.on('dispose', this.disposeSourceHandler);
+
+    return this;
+  };
+
+  /**
+   * Clean up any existing source handler
+   */
+  Tech.prototype.disposeSourceHandler = function(){
+    if (this.sourceHandler_ && this.sourceHandler_.dispose) {
+      this.sourceHandler_.dispose();
+    }
+  };
+
+};

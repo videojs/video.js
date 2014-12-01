@@ -90,6 +90,7 @@ module.exports = function(config) {
       "../src/js/media/media.js",
       "../src/js/media/html5.js",
       "../src/js/media/flash.js",
+      "../src/js/media/flash.rtmp.js",
       "../src/js/media/loader.js",
       "../src/js/tracks.js",
       "../src/js/json.js",
