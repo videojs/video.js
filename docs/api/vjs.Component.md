@@ -413,7 +413,7 @@ _defined in_: [src/js/component.js#L646](https://github.com/videojs/video.js/blo
 > 
 > The benefit of using this over `vjs.on(otherElement, 'eventName', myFunc)`
 > and `otherComponent.on('eventName', myFunc)` is that this way the listeners
-> will be automatically cleaned up when either component is diposed.
+> will be automatically cleaned up when either component is disposed.
 > It will also bind myComponent as the context of myFunc.
 > 
 > **NOTE**: When using this on elements in the page other than window
@@ -517,7 +517,7 @@ _defined in_: [src/js/component.js#L126](https://github.com/videojs/video.js/blo
 ### ready( fn )
 > Bind a listener to the component's ready state
 > 
-> Different from event listeners in that if the ready event has already happend
+> Different from event listeners in that if the ready event has already happened
 > it will trigger the function immediately.
 
 ##### PARAMETERS: 

@@ -3,7 +3,7 @@
 # vjs.SliderHandle
 
 __EXTENDS__: [vjs.Component](vjs.Component.md)  
-__DEFINED IN__: [src/js/slider.js#L224](https://github.com/videojs/video.js/blob/master/src/js/slider.js#L224)  
+__DEFINED IN__: [src/js/slider.js#L209](https://github.com/videojs/video.js/blob/master/src/js/slider.js#L209)  
 
 SeekBar Behavior includes play progress bar, and seek handle
 Needed so it can determine seek position based on handle position/size
@@ -139,7 +139,7 @@ _inherited from_: [src/js/component.js#L239](https://github.com/videojs/video.js
 * __tagName__ `String` _(OPTIONAL)_ Element's node type. e.g. 'div'
 * __attributes__ `Object` _(OPTIONAL)_ An object of element attributes that should be set on the element
 
-_defined in_: [src/js/slider.js#L235](https://github.com/videojs/video.js/blob/master/src/js/slider.js#L235)
+_defined in_: [src/js/slider.js#L220](https://github.com/videojs/video.js/blob/master/src/js/slider.js#L220)
 
 ---
 
@@ -391,7 +391,7 @@ _inherited from_: [src/js/component.js#L646](https://github.com/videojs/video.js
 > 
 > The benefit of using this over `vjs.on(otherElement, 'eventName', myFunc)`
 > and `otherComponent.on('eventName', myFunc)` is that this way the listeners
-> will be automatically cleaned up when either component is diposed.
+> will be automatically cleaned up when either component is disposed.
 > It will also bind myComponent as the context of myFunc.
 > 
 > **NOTE**: When using this on elements in the page other than window
@@ -495,7 +495,7 @@ _inherited from_: [src/js/component.js#L126](https://github.com/videojs/video.js
 ### ready( fn )
 > Bind a listener to the component's ready state
 > 
-> Different from event listeners in that if the ready event has already happend
+> Different from event listeners in that if the ready event has already happened
 > it will trigger the function immediately.
 
 ##### PARAMETERS: 
