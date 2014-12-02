@@ -2,7 +2,7 @@
   var apiMap, specApi, browserApi, i;
 
   /**
-   * Store the browser-specifc methods for the fullscreen API
+   * Store the browser-specific methods for the fullscreen API
    * @type {Object|undefined}
    * @private
    */

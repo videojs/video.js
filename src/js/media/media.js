@@ -23,7 +23,7 @@ vjs.MediaTechController = vjs.Component.extend({
       this.manualProgressOn();
     }
 
-    // Manually track timeudpates in cases where the browser/flash player doesn't report it.
+    // Manually track timeupdates in cases where the browser/flash player doesn't report it.
     if (!this['featuresTimeupdateEvents']) {
       this.manualTimeUpdatesOn();
     }

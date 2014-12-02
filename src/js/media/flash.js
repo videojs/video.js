@@ -58,7 +58,7 @@ vjs.Flash = vjs.MediaTechController.extend({
         // Merge default attributes with ones passed in
         attributes = vjs.obj.merge({
           'id': objId,
-          'name': objId, // Both ID and Name needed or swf to identifty itself
+          'name': objId, // Both ID and Name needed or swf to identify itself
           'class': 'vjs-tech'
         }, options['attributes'])
     ;
@@ -129,7 +129,7 @@ vjs.Flash.prototype.src = function(src){
     this.setRtmpConnection(src.connection);
     this.setRtmpStream(src.stream);
   } else {
-    // Make sure source URL is abosolute.
+    // Make sure source URL is absolute.
     src = vjs.getAbsoluteURL(src);
     this.el_.vjs_src(src);
   }

@@ -108,7 +108,7 @@ vjs.Player = vjs.Component.extend({
 });
 
 /**
- * The players's stored language code
+ * The player's stored language code
  *
  * @type {String}
  * @private
@@ -131,7 +131,7 @@ vjs.Player.prototype.language = function (languageCode) {
 };
 
 /**
- * The players's stored language dictionary
+ * The player's stored language dictionary
  *
  * @type {Object}
  * @private
@@ -315,7 +315,7 @@ vjs.Player.prototype.createEl = function(){
 
 // /* Media Technology (tech)
 // ================================================================================ */
-// Load/Create an instance of playback technlogy including element and API methods
+// Load/Create an instance of playback technology including element and API methods
 // And append playback element in player div.
 vjs.Player.prototype.loadTech = function(techName, source){
 
@@ -454,7 +454,7 @@ vjs.Player.prototype.onPlay = function(){
 };
 
 /**
- * Fired whenever the media begins wating
+ * Fired whenever the media begins waiting
  * @event waiting
  */
 vjs.Player.prototype.onWaiting = function(){
@@ -462,7 +462,7 @@ vjs.Player.prototype.onWaiting = function(){
 };
 
 /**
- * A handler for events that signal that waiting has eneded
+ * A handler for events that signal that waiting has ended
  * which is not consistent between browsers. See #1351
  * @private
  */
@@ -552,7 +552,7 @@ vjs.Player.prototype.onEnded = function(){
  * @event durationchange
  */
 vjs.Player.prototype.onDurationChange = function(){
-  // Allows for cacheing value instead of asking player each time.
+  // Allows for caching value instead of asking player each time.
   // We need to get the techGet response and check for a value so we don't
   // accidentally cause the stack to blow up.
   var duration = this.techGet('duration');
@@ -710,7 +710,7 @@ vjs.Player.prototype.currentTime = function(seconds){
   // cache last currentTime and return. default to 0 seconds
   //
   // Caching the currentTime is meant to prevent a massive amount of reads on the tech's
-  // currentTime when scrubbing, but may not provide much performace benefit afterall.
+  // currentTime when scrubbing, but may not provide much performance benefit afterall.
   // Should be tested. Also something has to read the actual current time or the cache will
   // never get updated.
   return this.cache_.currentTime = (this.techGet('currentTime') || 0);
@@ -730,7 +730,7 @@ vjs.Player.prototype.currentTime = function(seconds){
 vjs.Player.prototype.duration = function(seconds){
   if (seconds !== undefined) {
 
-    // cache the last set value for optimiized scrubbing (esp. Flash)
+    // cache the last set value for optimized scrubbing (esp. Flash)
     this.cache_.duration = parseFloat(seconds);
 
     return this;
@@ -896,7 +896,7 @@ vjs.Player.prototype.muted = function(muted){
 };
 
 // Check if current tech can support native fullscreen
-// (e.g. with built in controls lik iOS, so not our flash swf)
+// (e.g. with built in controls like iOS, so not our flash swf)
 vjs.Player.prototype.supportsFullScreen = function(){
   return this.techGet('supportsFullScreen') || false;
 };
@@ -967,7 +967,7 @@ vjs.Player.prototype.requestFullscreen = function(){
 
     // Trigger fullscreenchange event after change
     // We have to specifically add this each time, and remove
-    // when cancelling fullscreen. Otherwise if there's multiple
+    // when canceling fullscreen. Otherwise if there's multiple
     // players on a page, they would all be reacting to the same fullscreen
     // events
     vjs.on(document, fsApi['fullscreenchange'], vjs.bind(this, function(e){

@@ -325,7 +325,7 @@ vjs.trigger = function(elem, event) {
    * We've since updated to the latest version, but keeping this around
    * for now just in case.
    */
-  // // Added in attion to book. Book code was broke.
+  // // Added in addition to book. Book code was broke.
   // event = typeof event === 'object' ?
   //   event[vjs.expando] ?
   //     event :
