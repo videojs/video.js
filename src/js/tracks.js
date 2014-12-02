@@ -1,8 +1,8 @@
 /**
  * @fileoverview Text Tracks
  * Text tracks are tracks of timed text events.
- * Captions - text displayed over the video for the hearing impared
- * Subtitles - text displayed over the video for those who don't understand langauge in the video
+ * Captions - text displayed over the video for the hearing impaired
+ * Subtitles - text displayed over the video for those who don't understand language in the video
  * Chapters - text displayed in a menu allowing the user to jump to particular points (chapters) in the video
  * Descriptions (not supported yet) - audio descriptions that are read back to the user by a screen reading device
  */
@@ -55,8 +55,8 @@ vjs.Player.prototype.addTextTrack = function(kind, label, language, options){
   tracks.push(track);
 
   // If track.dflt() is set, start showing immediately
-  // TODO: Add a process to deterime the best track to show for the specific kind
-  // Incase there are mulitple defaulted tracks of the same kind
+  // TODO: Add a process to determine the best track to show for the specific kind
+  // In case there are multiple defaulted tracks of the same kind
   // Or the user has a set preference of a specific language that should override the default
   // Note: The setTimeout is a workaround because with the html5 tech, the player is 'ready'
  //  before it's child components (including the textTrackDisplay) have finished loading.
@@ -472,7 +472,7 @@ vjs.TextTrack.prototype.parseCues = function(srcContent) {
       text = [];
 
       // Loop until a blank line or end of lines
-      // Assumeing trim('') returns false for blank lines
+      // Assuming trim('') returns false for blank lines
       while (lines[++i] && (line = vjs.trim(lines[i]))) {
         text.push(line);
       }

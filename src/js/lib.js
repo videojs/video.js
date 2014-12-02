@@ -117,7 +117,7 @@ vjs.obj.merge = function(obj1, obj2){
 vjs.obj.deepMerge = function(obj1, obj2){
   var key, val1, val2;
 
-  // make a copy of obj1 so we're not ovewriting original values.
+  // make a copy of obj1 so we're not overwriting original values.
   // like prototype.options_ and all sub options objects
   obj1 = vjs.obj.copy(obj1);
 
@@ -213,7 +213,7 @@ vjs.bind = function(context, fn, uid) {
 
 /**
  * Element Data Store. Allows for binding data to an element without putting it directly on the element.
- * Ex. Event listneres are stored here.
+ * Ex. Event listeners are stored here.
  * (also from jsninja.com, slightly modified and updated for closure compiler)
  * @type {Object}
  * @private
@@ -432,7 +432,7 @@ vjs.setElementAttributes = function(el, attributes){
 
 /**
  * Get an element's attribute values, as defined on the HTML tag
- * Attributs are not the same as properties. They're defined on the tag
+ * Attributes are not the same as properties. They're defined on the tag
  * or with setAttribute (which shouldn't be used with HTML)
  * This will return true or false for boolean attributes.
  * @param  {Element} tag Element from which to get tag attributes
@@ -695,7 +695,7 @@ vjs.get = function(url, onSuccess, onError, withCredentials){
 };
 
 /**
- * Add to local storage (may removeable)
+ * Add to local storage (may removable)
  * @private
  */
 vjs.setLocalStorage = function(key, value){
@@ -718,7 +718,7 @@ vjs.setLocalStorage = function(key, value){
 };
 
 /**
- * Get abosolute version of relative URL. Used to tell flash correct URL.
+ * Get absolute version of relative URL. Used to tell flash correct URL.
  * http://stackoverflow.com/questions/470832/getting-an-absolute-url-from-a-relative-one-ie6-issue
  * @param  {String} url URL to make absolute
  * @return {String}     Absolute URL
@@ -780,7 +780,7 @@ vjs.parseUrl = function(url) {
 };
 
 /**
- * Log messags to the console and history based on the type of message
+ * Log messages to the console and history based on the type of message
  *
  * @param  {String} type The type of message, or `null` for `log`
  * @param  {[type]} args The args to be passed to the log
