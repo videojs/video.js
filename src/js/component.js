@@ -1118,7 +1118,7 @@ vjs.Component.prototype.emitTapEvents = function(){
  * want touch events to act differently.
  */
 vjs.Component.prototype.enableTouchActivity = function() {
-  var report, interval, touchHolding, touchEnd;
+  var report, touchHolding, touchEnd;
 
   // Don't continue if the root player doesn't support reporting user activity
   if (!this.player().reportUserActivity) {
@@ -1151,8 +1151,8 @@ vjs.Component.prototype.enableTouchActivity = function() {
 
 /**
  * Creates timeout and sets up disposal automatically.
- * @param {Function} The function to run after the timeout.
- * @param {Number} Number of ms to delay before executing specified function.
+ * @param {Function} fn The function to run after the timeout.
+ * @param {Number} timeout Number of ms to delay before executing specified function.
  * @return {Number} Returns the timeout ID
  */
 vjs.Component.prototype.setTimeout = function(fn, timeout) {
@@ -1175,7 +1175,7 @@ vjs.Component.prototype.setTimeout = function(fn, timeout) {
 
 /**
  * Clears a timeout and removes the associated dispose listener
- * @param {Number} The id of the timeout to clear
+ * @param {Number} timeoutId The id of the timeout to clear
  * @return {Number} Returns the timeout ID
  */
 vjs.Component.prototype.clearTimeout = function(timeoutId) {
@@ -1191,8 +1191,8 @@ vjs.Component.prototype.clearTimeout = function(timeoutId) {
 
 /**
  * Creates an interval and sets up disposal automatically.
- * @param {Function} The function to run every N seconds.
- * @param {Number} Number of ms to delay before executing specified function.
+ * @param {Function} fn The function to run every N seconds.
+ * @param {Number} interval Number of ms to delay before executing specified function.
  * @return {Number} Returns the interval ID
  */
 vjs.Component.prototype.setInterval = function(fn, interval) {
@@ -1213,7 +1213,7 @@ vjs.Component.prototype.setInterval = function(fn, interval) {
 
 /**
  * Clears an interval and removes the associated dispose listener
- * @param {Number} The id of the interval to clear
+ * @param {Number} intervalId The id of the interval to clear
  * @return {Number} Returns the interval ID
  */
 vjs.Component.prototype.clearInterval = function(intervalId) {
