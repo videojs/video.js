@@ -356,7 +356,7 @@ vjs.Flash.embed = function(swf, placeHolder, flashVars, params, attributes){
 
 vjs.Flash.getEmbedCode = function(swf, flashVars, params, attributes){
 
-  var objTag = '<object type="application/x-shockwave-flash"',
+  var objTag = '<object type="application/x-shockwave-flash" ',
       flashVarsString = '',
       paramsString = '',
       attrsString = '';
