@@ -211,7 +211,7 @@ vjs.TextTrack.prototype.title = function(){
 
 /**
  * Language - two letter string to represent track language, e.g. 'en' for English
- * Spec def: read-only attribute DOMString language;
+ * Spec def: readonly attribute DOMString language;
  * @private
  */
 vjs.TextTrack.prototype.language_;
@@ -226,7 +226,7 @@ vjs.TextTrack.prototype.language = function(){
 
 /**
  * Track label e.g. 'English'
- * Spec def: read-only attribute DOMString label;
+ * Spec def: readonly attribute DOMString label;
  * @private
  */
 vjs.TextTrack.prototype.label_;
