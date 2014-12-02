@@ -1,11 +1,9 @@
-var componentClock;
-
 module('Component', {
   'setup': function() {
-    componentClock = sinon.useFakeTimers();
+    this.clock = sinon.useFakeTimers();
   },
   'teardown': function() {
-    componentClock.restore();
+    this.clock.restore();
   }
 });
 
@@ -525,15 +523,15 @@ test('should provide timeout methods that automatically get cleared on component
     ok(false, 'Timeout should have been disposed');
   }, 1000);
 
-  componentClock.tick(100);
+  this.clock.tick(100);
 
   comp.clearTimeout(timeoutToClear);
 
-  componentClock.tick(500);
+  this.clock.tick(500);
 
   comp.dispose();
 
-  componentClock.tick(1000);
+  this.clock.tick(1000);
 
   ok(timeoutsFired === 1, 'One timeout should have fired');
 });
@@ -555,19 +553,19 @@ test('should provide interval methods that automatically get cleared on componen
     ok(false, 'Interval should have been disposed');
   }, 1200);
 
-  componentClock.tick(500);
+  this.clock.tick(500);
 
   ok(intervalsFired === 5, 'Component interval fired 5 times');
 
   comp.clearInterval(interval);
 
-  componentClock.tick(600);
+  this.clock.tick(600);
 
   ok(intervalsFired === 5, 'Interval was manually cleared');
 
   comp.dispose();
 
-  componentClock.tick(1200);
+  this.clock.tick(1200);
 
   ok(intervalsFired === 5, 'Interval was cleared when component was disposed');
 });

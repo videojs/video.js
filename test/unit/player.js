@@ -1,11 +1,9 @@
-var playerClock;
-
 module('Player', {
   'setup': function() {
-    playerClock = sinon.useFakeTimers();
+    this.clock = sinon.useFakeTimers();
   },
   'teardown': function() {
-    playerClock.restore();
+    this.clock.restore();
   }
 });
 
@@ -139,7 +137,7 @@ test('should asynchronously fire error events during source selection', function
     ok(player.error().code === 4, 'Source could not be played error thrown');
   });
 
-  playerClock.tick(1);
+  this.clock.tick(1);
 
   player.dispose();
   vjs.log.error.restore();
