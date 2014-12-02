@@ -134,3 +134,86 @@ test('dispose() should stop time tracking', function() {
   }
   ok(true, 'no exception was thrown');
 });
+
+test('should add the source hanlder interface to a tech', function(){
+  var mockPlayer = {
+    off: noop,
+    trigger: noop
+  };
+  var sourceA = { src: 'foo.mp4', type: 'video/mp4' };
+  var sourceB = { src: 'no-support', type: 'no-support' };
+
+  // Define a new tech class
+  var Tech = videojs.MediaTechController.extend();
+
+  // Extend Tech with source handlers
+  vjs.MediaTechController.withSourceHandlers(Tech);
+
+  // Check for the expected class methods
+  ok(Tech.registerSourceHandler, 'added a registerSourceHandler function to the Tech');
+  ok(Tech.selectSourceHandler, 'added a selectSourceHandler function to the Tech');
+
+  // Create an instance of Tech
+  var tech = new Tech(mockPlayer);
+
+  // Check for the expected instance methods
+  ok(tech.setSource, 'added a setSource function to the tech instance');
+
+  // Create an internal state class for the source handler
+  // The internal class would be used by a source hanlder to maintain state
+  // and provde a dispose method for the handler.
+  // This is optional for source handlers
+  var disposeCalled = false;
+  var handlerInternalState = function(){};
+  handlerInternalState.prototype.dispose = function(){
+    disposeCalled = true;
+  };
+
+  // Create source handlers
+  var handlerOne = {
+    canHandleSource: function(source){
+      if (source.type !=='no-support') {
+        return 'probably';
+      }
+      return '';
+    },
+    handleSource: function(s, t){
+      strictEqual(tech, t, 'the tech instance was passed to the source handler');
+      strictEqual(sourceA, s, 'the tech instance was passed to the source handler');
+      return new handlerInternalState();
+    }
+  };
+
+  var handlerTwo = {
+    canHandleSource: function(source){
+      return ''; // no support
+    },
+    handleSource: function(source, tech){
+      ok(false, 'handlerTwo supports nothing and should never be called');
+    }
+  };
+
+  // Test registering source handlers
+  Tech.registerSourceHandler(handlerOne);
+  strictEqual(Tech.sourceHandlers[0], handlerOne, 'handlerOne was added to the source handler array');
+  Tech.registerSourceHandler(handlerTwo, 0);
+  strictEqual(Tech.sourceHandlers[0], handlerTwo, 'handlerTwo was registered at the correct index (0)');
+
+  // Test handler selection
+  strictEqual(Tech.selectSourceHandler(sourceA), handlerOne, 'handlerOne was selected to handle the valid source');
+  strictEqual(Tech.selectSourceHandler(sourceB), null, 'no handler was selected to handle the invalid source');
+
+  // Test canPlaySource return values
+  strictEqual(Tech.canPlaySource(sourceA), 'probably', 'the Tech returned probably for the valid source');
+  strictEqual(Tech.canPlaySource(sourceB), '', 'the Tech returned an empty string for the invalid source');
+
+  // Pass a source through the source handler process of a tech instance
+  tech.setSource(sourceA);
+  strictEqual(tech.currentSource_, sourceA, 'sourceA was handled and stored');
+  ok(tech.sourceHandler_.dispose, 'the handlerOne state instance was stored');
+
+  // Check that the handler dipose method works
+  ok(!disposeCalled, 'dispose has not been called for the handler yet');
+  tech.dispose();
+  ok(disposeCalled, 'the handler dispose method was called when the tech was disposed');
+});

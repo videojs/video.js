@@ -422,7 +422,13 @@ vjs.TextTrack.prototype.load = function(){
   // Only load if not loaded yet.
   if (this.readyState_ === 0) {
     this.readyState_ = 1;
-    vjs.get(this.src_, vjs.bind(this, this.parseCues), vjs.bind(this, this.onError));
+    vjs.xhr(this.src_, vjs.bind(function(err, response, responseBody){
+      if (err) {
+        return this.onError(err);
+      }
+
+      this.parseCues(responseBody);
+    }));
   }
 
 };

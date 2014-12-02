@@ -271,4 +271,102 @@ vjs.MediaTechController.prototype['featuresPlaybackRate'] = false;
 vjs.MediaTechController.prototype['featuresProgressEvents'] = false;
 vjs.MediaTechController.prototype['featuresTimeupdateEvents'] = false;
 
-vjs.media = {};
+/**
+ * A functional mixin for techs that want to use the Source Handler pattern.
+ *
+ * ##### EXAMPLE:
+ *
+ *   videojs.MediaTechController.withSourceHandlers.call(MyTech);
+ *
+ */
+vjs.MediaTechController.withSourceHandlers = function(Tech){
+  /**
+   * Register a source handler
+   * Source handlers are scripts for handling specific formats.
+   * The source handler pattern is used for adaptive formats (HLS, DASH) that
+   * manually load video data and feed it into a Source Buffer (Media Source Extensions)
+   * @param  {Function} handler  The source handler
+   * @param  {Boolean}  first    Register it before any existing handlers
+   */
+  Tech.registerSourceHandler = function(handler, index){
+    var handlers = Tech.sourceHandlers;
+
+    if (!handlers) {
+      handlers = Tech.sourceHandlers = [];
+    }
+
+    if (index === undefined) {
+      // add to the end of the list
+      index = handlers.length;
+    }
+
+    handlers.splice(index, 0, handler);
+  };
+
+  /**
+   * Return the first source handler that supports the source
+   * TODO: Answer question: should 'probably' be prioritized over 'maybe'
+   * @param  {Object} source The source object
+   * @returns {Object}       The first source handler that supports the source
+   * @returns {null}         Null if no source handler is found
+   */
+  Tech.selectSourceHandler = function(source){
+    var handlers = Tech.sourceHandlers || [];
+
+    for (var i = 0; i < handlers.length; i++) {
+      can = handlers[i].canHandleSource(source);
+
+      if (can) {
+        return handlers[i];
+      }
+    }
+
+    return null;
+  };
+
+  /**
+  * Check if the tech can support the given source
+  * @param  {Object} srcObj  The source object
+  * @return {String}         'probably', 'maybe', or '' (empty string)
+  */
+  Tech.canPlaySource = function(srcObj){
+    var sh = Tech.selectSourceHandler(srcObj);
+
+    if (sh) {
+      return sh.canHandleSource(srcObj);
+    }
+
+    return '';
+  };
+
+  /**
+   * Create a function for setting the source using a source object
+   * and source handlers.
+   * Should never be called unless a source handler was found.
+   * @param {Object} source  A source object with src and type keys
+   * @return {vjs.MediaTechController} self
+   */
+  Tech.prototype.setSource = function(source){
+    var sh = Tech.selectSourceHandler(source);
+
+    // Dispose any existing source handler
+    this.disposeSourceHandler();
+    this.off('dispose', this.disposeSourceHandler);
+
+    this.currentSource_ = source;
+    this.sourceHandler_ = sh.handleSource(source, this);
+    this.on('dispose', this.disposeSourceHandler);
+
+    return this;
+  };
+
+  /**
+   * Clean up any existing source handler
+   */
+  Tech.prototype.disposeSourceHandler = function(){
+    if (this.sourceHandler_ && this.sourceHandler_.dispose) {
+      this.sourceHandler_.dispose();
+    }
+  };
+
+};

@@ -65,14 +65,9 @@ vjs.Flash = vjs.MediaTechController.extend({
 
     // If source was supplied pass as a flash var.
     if (source) {
-      if (source.type && vjs.Flash.isStreamingType(source.type)) {
-        var parts = vjs.Flash.streamToParts(source.src);
-        flashVars['rtmpConnection'] = encodeURIComponent(parts.connection);
-        flashVars['rtmpStream'] = encodeURIComponent(parts.stream);
-      }
-      else {
-        flashVars['src'] = encodeURIComponent(vjs.getAbsoluteURL(source.src));
-      }
+      this.ready(function(){
+        this.setSource(source);
+      });
     }
 
     // Add placeholder to player div
@@ -124,15 +119,14 @@ vjs.Flash.prototype.src = function(src){
     return this['currentSrc']();
   }
 
-  if (vjs.Flash.isStreamingSrc(src)) {
-    src = vjs.Flash.streamToParts(src);
-    this.setRtmpConnection(src.connection);
-    this.setRtmpStream(src.stream);
-  } else {
-    // Make sure source URL is absolute.
-    src = vjs.getAbsoluteURL(src);
-    this.el_.vjs_src(src);
-  }
+  // Setting src through `src` not `setSrc` will be deprecated
+  return this.setSrc(src);
+};
+
+vjs.Flash.prototype.setSrc = function(src){
+  // Make sure source URL is absolute.
+  src = vjs.getAbsoluteURL(src);
+  this.el_.vjs_src(src);
 
   // Currently the SWF doesn't autoplay if you load a source later.
   // e.g. Load player w/ no source, wait 2s, set src.
@@ -158,17 +152,11 @@ vjs.Flash.prototype['currentTime'] = function(time){
 };
 
 vjs.Flash.prototype['currentSrc'] = function(){
-  var src = this.el_.vjs_getProperty('currentSrc');
-  // no src, check and see if RTMP
-  if (src == null) {
-    var connection = this['rtmpConnection'](),
-        stream = this['rtmpStream']();
-
-    if (connection && stream) {
-      src = vjs.Flash.streamFromParts(connection, stream);
-    }
+  if (this.currentSource_) {
+    return this.currentSource_.src;
+  } else {
+    return this.el_.vjs_getProperty('currentSrc');
   }
-  return src;
 };
 
 vjs.Flash.prototype.load = function(){
@@ -229,29 +217,64 @@ vjs.Flash.isSupported = function(){
   // return swfobject.hasFlashPlayerVersion('10');
 };
 
-vjs.Flash.canPlaySource = function(srcObj){
+// Add Source Handler pattern functions to this tech
+vjs.MediaTechController.withSourceHandlers(vjs.Flash);
+
+/**
+ * The default native source handler.
+ * This simply passes the source to the video element. Nothing fancy.
+ * @param  {Object} source   The source object
+ * @param  {vjs.Flash} tech  The instance of the Flash tech
+ */
+vjs.Flash.nativeSourceHandler = {};
+
+/**
+ * Check Flash can handle the source natively
+ * @param  {Object} source  The source object
+ * @return {String}         'probably', 'maybe', or '' (empty string)
+ */
+vjs.Flash.nativeSourceHandler.canHandleSource = function(source){
   var type;
 
-  if (!srcObj.type) {
+  if (!source.type) {
     return '';
   }
 
-  type = srcObj.type.replace(/;.*/,'').toLowerCase();
-  if (type in vjs.Flash.formats || type in vjs.Flash.streamingFormats) {
+  // Strip code information from the type because we don't get that specific
+  type = source.type.replace(/;.*/,'').toLowerCase();
+
+  if (type in vjs.Flash.formats) {
     return 'maybe';
   }
+
+  return '';
 };
+
+/**
+ * Pass the source to the flash object
+ * Adaptive source handlers will have more complicated workflows before passing
+ * video data to the video element
+ * @param  {Object} source    The source object
+ * @param  {vjs.Flash} tech   The instance of the Flash tech
+ */
+vjs.Flash.nativeSourceHandler.handleSource = function(source, tech){
+  tech.setSrc(source.src);
+};
+
+/**
+ * Clean up the source handler when disposing the player or switching sources..
+ * (no cleanup is needed when supporting the format natively)
+ */
+vjs.Flash.nativeSourceHandler.dispose = function(){};
+
+// Register the native source handler
+vjs.Flash.registerSourceHandler(vjs.Flash.nativeSourceHandler);
 
 vjs.Flash.formats = {
   'video/flv': 'FLV',
   'video/x-flv': 'FLV',
   'video/mp4': 'MP4',
   'video/m4v': 'MP4'
-};
-
-vjs.Flash.streamingFormats = {
-  'rtmp/mp4': 'MP4',
-  'rtmp/flv': 'FLV'
 };
 
 vjs.Flash['onReady'] = function(currSwf){
@@ -397,52 +420,4 @@ vjs.Flash.getEmbedCode = function(swf, flashVars, params, attributes){
   });
 
   return objTag + attrsString + '>' + paramsString + '</object>';
-};
-
-vjs.Flash.streamFromParts = function(connection, stream) {
-  return connection + '&' + stream;
-};
-
-vjs.Flash.streamToParts = function(src) {
-  var parts = {
-    connection: '',
-    stream: ''
-  };
-
-  if (! src) {
-    return parts;
-  }
-
-  // Look for the normal URL separator we expect, '&'.
-  // If found, we split the URL into two pieces around the
-  // first '&'.
-  var connEnd = src.indexOf('&');
-  var streamBegin;
-  if (connEnd !== -1) {
-    streamBegin = connEnd + 1;
-  }
-  else {
-    // If there's not a '&', we use the last '/' as the delimiter.
-    connEnd = streamBegin = src.lastIndexOf('/') + 1;
-    if (connEnd === 0) {
-      // really, there's not a '/'?
-      connEnd = streamBegin = src.length;
-    }
-  }
-  parts.connection = src.substring(0, connEnd);
-  parts.stream = src.substring(streamBegin, src.length);
-
-  return parts;
-};
-
-vjs.Flash.isStreamingType = function(srcType) {
-  return srcType in vjs.Flash.streamingFormats;
-};
-
-// RTMP has four variations, any string starting
-// with one of these protocols should be valid
-vjs.Flash.RTMP_RE = /^rtmp[set]?:\/\//i;
-
-vjs.Flash.isStreamingSrc = function(src) {
-  return vjs.Flash.RTMP_RE.test(src);
 };

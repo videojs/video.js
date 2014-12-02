@@ -12,22 +12,8 @@
 vjs.Html5 = vjs.MediaTechController.extend({
   /** @constructor */
   init: function(player, options, ready){
-    // volume cannot be changed from 1 on iOS
-    this['featuresVolumeControl'] = vjs.Html5.canControlVolume();
-
-    // just in case; or is it excessively...
-    this['featuresPlaybackRate'] = vjs.Html5.canControlPlaybackRate();
-
-    // In iOS, if you move a video element in the DOM, it breaks video playback.
-    this['movingMediaElementInDOM'] = !vjs.IS_IOS;
-
-    // HTML video is able to automatically resize when going to fullscreen
-    this['featuresFullscreenResize'] = true;
-
-    // HTML video supports progress events
-    this['featuresProgressEvents'] = true;
-
     vjs.MediaTechController.call(this, player, options, ready);
+
     this.setupTriggers();
 
     var source = options['source'];
@@ -36,8 +22,8 @@ vjs.Html5 = vjs.MediaTechController.extend({
     // 1) Check if the source is new (if not, we want to keep the original so playback isn't interrupted)
     // 2) Check to see if the network state of the tag was failed at init, and if so, reset the source
     // anyway so the error gets fired.
-    if (source && ((this.el_.currentSrc !== source.src) || (player.tag && player.tag.initNetworkState_ === 3))) {
-      this.el_.src = source.src;
+    if (source && (this.el_.currentSrc !== source.src || (player.tag && player.tag.initNetworkState_ === 3))) {
+      this.setSource(source);
     }
 
     // Determine if native controls should be used
@@ -241,16 +227,25 @@ vjs.Html5.prototype.enterFullScreen = function(){
     video.webkitEnterFullScreen();
   }
 };
+
 vjs.Html5.prototype.exitFullScreen = function(){
   this.el_.webkitExitFullScreen();
 };
+
+
 vjs.Html5.prototype.src = function(src) {
   if (src === undefined) {
     return this.el_.src;
   } else {
-    this.el_.src = src;
+    // Setting src through `src` instead of `setSrc` will be deprecated
+    this.setSrc(src);
   }
 };
+
+vjs.Html5.prototype.setSrc = function(src) {
+  this.el_.src = src;
+};
+
 vjs.Html5.prototype.load = function(){ this.el_.load(); };
 vjs.Html5.prototype.currentSrc = function(){ return this.el_.currentSrc; };
 
@@ -279,10 +274,13 @@ vjs.Html5.prototype.setPlaybackRate = function(val){ this.el_.playbackRate = val
 
 vjs.Html5.prototype.networkState = function(){ return this.el_.networkState; };
 
-/* HTML5 Support Testing ---------------------------------------------------- */
 
+/**
+ * Check if HTML5 video is supported by this browser/device
+ * @return {Boolean}
+ */
 vjs.Html5.isSupported = function(){
-  // ie9 with no Media Player is a LIAR! (#984)
+  // IE9 with no Media Player is a LIAR! (#984)
   try {
     vjs.TEST_VID['volume'] = 0.5;
   } catch (e) {
@@ -292,30 +290,118 @@ vjs.Html5.isSupported = function(){
   return !!vjs.TEST_VID.canPlayType;
 };
 
-vjs.Html5.canPlaySource = function(srcObj){
-  // IE9 on Windows 7 without MediaPlayer throws an error here
-  // https://github.com/videojs/video.js/issues/519
-  try {
-    return !!vjs.TEST_VID.canPlayType(srcObj.type);
-  } catch(e) {
-    return '';
+// Add Source Handler pattern functions to this tech
+vjs.MediaTechController.withSourceHandlers(vjs.Html5);
+
+/**
+ * The default native source handler.
+ * This simply passes the source to the video element. Nothing fancy.
+ * @param  {Object} source   The source object
+ * @param  {vjs.Html5} tech  The instance of the HTML5 tech
+ */
+vjs.Html5.nativeSourceHandler = {};
+
+/**
+ * Check if the video element can handle the source natively
+ * @param  {Object} source  The source object
+ * @return {String}         'probably', 'maybe', or '' (empty string)
+ */
+vjs.Html5.nativeSourceHandler.canHandleSource = function(source){
+  var ext;
+
+  function canPlayType(type){
+    // IE9 on Windows 7 without MediaPlayer throws an error here
+    // https://github.com/videojs/video.js/issues/519
+    try {
+      return !!vjs.TEST_VID.canPlayType(type);
+    } catch(e) {
+      return '';
+    }
   }
-  // TODO: Check Type
-  // If no Type, check ext
-  // Check Media Type
+
+  // If a type was provided we should rely on that
+  if (source.type) {
+    return canPlayType(source.type);
+  } else {
+    // If no type, fall back to checking 'video/[EXTENSION]'
+    ext = source.src.match(/\.([^\/\?]+)(\?[^\/]+)?$/i)[1];
+    return canPlayType('video/'+ext);
+  }
 };
 
+/**
+ * Pass the source to the video element
+ * Adaptive source handlers will have more complicated workflows before passing
+ * video data to the video element
+ * @param  {Object} source    The source object
+ * @param  {vjs.Html5} tech   The instance of the Html5 tech
+ */
+vjs.Html5.nativeSourceHandler.handleSource = function(source, tech){
+  tech.setSrc(source.src);
+};
+
+/**
+ * Clean up the source handler when disposing the player or switching sources..
+ * (no cleanup is needed when supporting the format natively)
+ */
+vjs.Html5.nativeSourceHandler.dispose = function(){};
+
+// Register the native source handler
+vjs.Html5.registerSourceHandler(vjs.Html5.nativeSourceHandler);
+
+/**
+ * Check if the volume can be changed in this browser/device.
+ * Volume cannot be changed in a lot of mobile devices.
+ * Specifically, it can't be changed from 1 on iOS.
+ * @return {Boolean}
+ */
 vjs.Html5.canControlVolume = function(){
   var volume =  vjs.TEST_VID.volume;
   vjs.TEST_VID.volume = (volume / 2) + 0.1;
   return volume !== vjs.TEST_VID.volume;
 };
 
+/**
+ * Check if playbackRate is supported in this browser/device.
+ * @return {[type]} [description]
+ */
 vjs.Html5.canControlPlaybackRate = function(){
   var playbackRate =  vjs.TEST_VID.playbackRate;
   vjs.TEST_VID.playbackRate = (playbackRate / 2) + 0.1;
   return playbackRate !== vjs.TEST_VID.playbackRate;
 };
+
+/**
+ * Set the tech's volume control support status
+ * @type {Boolean}
+ */
+vjs.Html5.prototype['featuresVolumeControl'] = vjs.Html5.canControlVolume();
+
+/**
+ * Set the tech's playbackRate support status
+ * @type {Boolean}
+ */
+vjs.Html5.prototype['featuresPlaybackRate'] = vjs.Html5.canControlPlaybackRate();
+
+/**
+ * Set the tech's status on moving the video element.
+ * In iOS, if you move a video element in the DOM, it breaks video playback.
+ * @type {Boolean}
+ */
+vjs.Html5.prototype['movingMediaElementInDOM'] = !vjs.IS_IOS;
+
+/**
+ * Set the the tech's fullscreen resize support status.
+ * HTML video is able to automatically resize when going to fullscreen.
+ * (No longer appears to be used. Can probably be removed.)
+ */
+vjs.Html5.prototype['featuresFullscreenResize'] = true;
+
+/**
+ * Set the tech's progress event support status
+ * (this disables the manual progress events of the MediaTechController)
+ */
+vjs.Html5.prototype['featuresProgressEvents'] = true;
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //
 (function() {
