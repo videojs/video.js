@@ -502,7 +502,7 @@ test('should emit a tap event', function(){
 });
 
 test('should provide timeout methods that automatically get cleared on component disposal', function() {
-  expect(3);
+  expect(4);
 
   var comp = new vjs.Component(getFakePlayer());
   var timeoutsFired = 0;
@@ -525,6 +525,8 @@ test('should provide timeout methods that automatically get cleared on component
 
   this.clock.tick(100);
 
+  ok(timeoutsFired === 1, 'One timeout should have fired by this point');
+
   comp.clearTimeout(timeoutToClear);
 
   this.clock.tick(500);
@@ -533,7 +535,7 @@ test('should provide timeout methods that automatically get cleared on component
 
   this.clock.tick(1000);
 
-  ok(timeoutsFired === 1, 'One timeout should have fired');
+  ok(timeoutsFired === 1, 'One timeout should have fired overall');
 });
 
 test('should provide interval methods that automatically get cleared on component disposal', function() {
