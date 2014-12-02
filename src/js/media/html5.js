@@ -12,6 +12,8 @@
 vjs.Html5 = vjs.MediaTechController.extend({
   /** @constructor */
   init: function(player, options, ready){
+    var supportsTextTracks, nodes, nodesLength, i, node, nodeName, removeNodes;
+
     // volume cannot be changed from 1 on iOS
     this['featuresVolumeControl'] = vjs.Html5.canControlVolume();
 
@@ -27,6 +29,15 @@ vjs.Html5 = vjs.MediaTechController.extend({
     // HTML video supports progress events
     this['featuresProgressEvents'] = true;
 
+    supportsTextTracks = !!vjs.TEST_VID.textTracks;
+    if (supportsTextTracks && vjs.TEST_VID.textTracks.length > 0) {
+      supportsTextTracks = typeof vjs.TEST_VID.textTracks[0]['mode'] !== 'number';
+    }
+    if (supportsTextTracks && vjs.IS_FIREFOX) {
+      supportsTextTracks = false;
+    }
+    this['featuresTextTracks'] = options.nativeCaptions !== false && supportsTextTracks;
+
     vjs.MediaTechController.call(this, player, options, ready);
     this.setupTriggers();
 
@@ -38,6 +49,31 @@ vjs.Html5 = vjs.MediaTechController.extend({
     // anyway so the error gets fired.
     if (source && ((this.el_.currentSrc !== source.src) || (player.tag && player.tag.initNetworkState_ === 3))) {
       this.el_.src = source.src;
+    }
+
+    if (!this['featuresTextTracks']) {
+    // Empty video tag tracks so the built-in player doesn't use them also.
+    // This may not be fast enough to stop HTML5 browsers from reading the tags
+    // so we'll need to turn off any default tracks if we're manually doing
+      // captions and subtitles. videoElement.textTracks
+      if (this.el_.hasChildNodes()) {
+
+        nodes = this.el_.childNodes;
+        nodesLength = nodes.length;
+        removeNodes = [];
+
+        while (nodesLength--) {
+          node = nodes[nodesLength];
+          nodeName = node.nodeName.toLowerCase();
+          if (nodeName === 'track') {
+            removeNodes.push(node);
+          }
+        }
+
+        for (i=0; i<removeNodes.length; i++) {
+          this.el_.removeChild(removeNodes[i]);
+        }
+      }
     }
 
     // Determine if native controls should be used
@@ -97,6 +133,20 @@ vjs.Html5.prototype.createEl = function(){
     }
     // associate the player with the new tag
     el['player'] = player;
+
+    if (player.options_.tracks) {
+      vjs.obj.each(player.options_.tracks, function(i, track) {
+        var t = document.createElement('track');
+        t.kind = track.kind;
+        t.label = track.label;
+        t.srclang = track.srclang;
+        t.src = track.src;
+        if ('default' in track) {
+          t.setAttribute('default', 'default');
+        }
+        el.appendChild(t);
+      });
+    }
 
     vjs.insertFirst(el, player.el());
   }
@@ -278,6 +328,21 @@ vjs.Html5.prototype.playbackRate = function(){ return this.el_.playbackRate; };
 vjs.Html5.prototype.setPlaybackRate = function(val){ this.el_.playbackRate = val; };
 
 vjs.Html5.prototype.networkState = function(){ return this.el_.networkState; };
+
+vjs.Html5.prototype.textTracks = function() {
+  if (!this['featuresTextTracks']) {
+    return vjs.MediaTechController.prototype.textTracks.call(this);
+  }
+
+  return this.el_.textTracks;
+}
+vjs.Html5.prototype.addTextTrack = function(kind, label, language, options) {
+  if (!this['featuresTextTracks']) {
+    return vjs.MediaTechController.prototype.addTextTrack.call(this, kind, label, language, options);
+  }
+
+  return this.el_.addTextTrack(kind, label, language);
+}
 
 /* HTML5 Support Testing ---------------------------------------------------- */
 

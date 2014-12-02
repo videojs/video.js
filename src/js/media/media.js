@@ -12,6 +12,8 @@
 vjs.MediaTechController = vjs.Component.extend({
   /** @constructor */
   init: function(player, options, ready){
+    var textTracksChanges;
+
     options = options || {};
     // we don't want the tech to report user activity automatically.
     // This is done manually in addControlsListeners
@@ -29,6 +31,24 @@ vjs.MediaTechController = vjs.Component.extend({
     }
 
     this.initControlsListeners();
+
+    if (!this['featuresTextTracks']) {
+      player.addChild('textTrackDisplay');
+    } else {
+      textTracksChanges = function() {
+        var controlBar = player.getChild('controlBar');
+        if (!controlBar) {
+          return;
+        }
+
+        controlBar.getChild('subtitlesButton').update();
+        controlBar.getChild('captionsButton').update();
+        controlBar.getChild('chaptersButton').update();
+      };
+
+      this.textTracks().addEventListener('removetrack', textTracksChanges);
+      this.textTracks().addEventListener('addtrack', textTracksChanges);
+    }
   }
 });
 
@@ -253,6 +273,58 @@ vjs.MediaTechController.prototype.setCurrentTime = function() {
 };
 
 /**
+ * Provide default methods for text tracks.
+ *
+ * Html5 tech overrides these.
+ */
+
+/**
+ * List of associated text tracks
+ * @type {Array}
+ * @private
+ */
+vjs.MediaTechController.prototype.textTracks_;
+
+vjs.MediaTechController.prototype.textTracks = function() {
+  this.textTracks_ = this.textTracks_ || [];
+  return this.textTracks_;
+};
+
+vjs.MediaTechController.prototype.addTextTrack = function(kind, label, language, options) {
+  var tracks = this.textTracks();
+  options = options || {};
+
+  options['kind'] = kind;
+  options['label'] = label;
+  options['language'] = language;
+
+  // HTML5 Spec says default to subtitles.
+  // Uppercase first letter to match class names
+  var Kind = vjs.capitalize(kind || 'subtitles');
+
+  // Create correct texttrack class. CaptionsTrack, etc.
+  var track = new window['videojs'][Kind + 'Track'](this.player_, options);
+
+  tracks.push(track);
+
+  // If track.dflt() is set, start showing immediately
+  // TODO: Add a process to deterime the best track to show for the specific kind
+  // Incase there are mulitple defaulted tracks of the same kind
+  // Or the user has a set preference of a specific language that should override the default
+  // Note: The setTimeout is a workaround because with the html5 tech, the player is 'ready'
+  // before it's child components (including the textTrackDisplay) have finished loading.
+  if (track.dflt()) {
+    this.ready(function(){
+      setTimeout(function(){
+        track.player().showTextTrack(track.id());
+      }, 0);
+    });
+  }
+
+  return track;
+}
+
+/**
  * Provide a default setPoster method for techs
  *
  * Poster support for techs should be optional, so we don't want techs to
@@ -270,5 +342,7 @@ vjs.MediaTechController.prototype['featuresPlaybackRate'] = false;
 // currently not triggered by video-js-swf
 vjs.MediaTechController.prototype['featuresProgressEvents'] = false;
 vjs.MediaTechController.prototype['featuresTimeupdateEvents'] = false;
+
+vjs.MediaTechController.prototype['featuresTextTracks'] = false;
 
 vjs.media = {};

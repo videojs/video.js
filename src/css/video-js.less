@@ -960,31 +960,13 @@ body.vjs-full-window {
 /* Text Track Styles */
 /* Overall track holder for both captions and subtitles */
 .video-js .vjs-text-track-display {
-  text-align: center;
   position: absolute;
-  bottom: 4em;
-  /* Leave padding on left and right *///
-  left: 1em;
-  right: 1em;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  pointer-events: none;
 }
-
-/* Move captions down when controls aren't being shown */
-.video-js.vjs-user-inactive.vjs-playing .vjs-text-track-display {
-  bottom: 1em;
-}
-
-/* Individual tracks */
-.video-js .vjs-text-track {
-  display: none;
-  font-size: 1.4em;
-  text-align: center;
-  margin-bottom: 0.1em;
-  /* Transparent black background, or fallback to all black (oldIE) *///
-  .background-color-with-alpha(rgb(0, 0, 0), 0.5);
-}
-.video-js .vjs-subtitles { color: #fff /* Subtitles are white */; }
-.video-js .vjs-captions { color: #fc6 /* Captions are yellow */; }
-.vjs-tt-cue { display: block; }
 
 /* Increase font-size when fullscreen */
 .video-js.vjs-fullscreen .vjs-text-track { font-size: 3em; }
