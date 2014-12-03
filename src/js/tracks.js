@@ -149,6 +149,8 @@ vjs.TextTrack = vjs.Component.extend({
     this.activeCues_ = [];
     this.readyState_ = 0;
     this.mode_ = 0;
+
+    player.on('dispose', vjs.bind(this, this.deactivate, this.id_));
   }
 });
 
