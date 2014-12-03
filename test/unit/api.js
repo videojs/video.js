@@ -87,6 +87,10 @@ test('should be able to access expected component API methods', function() {
   ok(comp.addClass, 'addClass exists');
   ok(comp.removeClass, 'removeClass exists');
   ok(comp.buildCSSClass, 'buildCSSClass exists');
+  ok(comp.setInterval, 'setInterval exists');
+  ok(comp.clearInterval, 'clearInterval exists');
+  ok(comp.setTimeout, 'setTimeout exists');
+  ok(comp.clearTimeout, 'clearTimeout exists');
 });
 
 test('should be able to access expected MediaTech API methods', function() {

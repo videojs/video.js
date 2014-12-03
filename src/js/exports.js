@@ -68,6 +68,8 @@ goog.exportProperty(vjs.Component.prototype, 'addClass', vjs.Component.prototype
 goog.exportProperty(vjs.Component.prototype, 'removeClass', vjs.Component.prototype.removeClass);
 goog.exportProperty(vjs.Component.prototype, 'buildCSSClass', vjs.Component.prototype.buildCSSClass);
 goog.exportProperty(vjs.Component.prototype, 'localize', vjs.Component.prototype.localize);
+goog.exportProperty(vjs.Component.prototype, 'setInterval', vjs.Component.prototype.setInterval);
+goog.exportProperty(vjs.Component.prototype, 'setTimeout', vjs.Component.prototype.setTimeout);
 
 // Need to export ended to ensure it's not removed by CC, since it's not used internally
 goog.exportProperty(vjs.Player.prototype, 'ended', vjs.Player.prototype.ended);

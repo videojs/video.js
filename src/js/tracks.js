@@ -62,7 +62,7 @@ vjs.Player.prototype.addTextTrack = function(kind, label, language, options){
  //  before it's child components (including the textTrackDisplay) have finished loading.
   if (track.dflt()) {
     this.ready(function(){
-      setTimeout(function(){
+      this.setTimeout(function(){
         track.player().showTextTrack(track.id());
       }, 0);
     });

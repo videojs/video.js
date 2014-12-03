@@ -1,4 +1,11 @@
-module('Component');
+module('Component', {
+  'setup': function() {
+    this.clock = sinon.useFakeTimers();
+  },
+  'teardown': function() {
+    this.clock.restore();
+  }
+});
 
 var getFakePlayer = function(){
   return {
@@ -492,4 +499,75 @@ test('should emit a tap event', function(){
 
   // Reset to orignial value
   vjs.TOUCH_ENABLED = origTouch;
+});
+
+test('should provide timeout methods that automatically get cleared on component disposal', function() {
+  expect(4);
+
+  var comp = new vjs.Component(getFakePlayer());
+  var timeoutsFired = 0;
+
+  comp.setTimeout(function() {
+    timeoutsFired++;
+    equal(this, comp, 'Timeout fn has the component as its context');
+    ok(true, 'Timeout created and fired.');
+  }, 100);
+
+  var timeoutToClear = comp.setTimeout(function() {
+    timeoutsFired++;
+    ok(false, 'Timeout should have been manually cleared');
+  }, 500);
+
+  comp.setTimeout(function() {
+    timeoutsFired++;
+    ok(false, 'Timeout should have been disposed');
+  }, 1000);
+
+  this.clock.tick(100);
+
+  ok(timeoutsFired === 1, 'One timeout should have fired by this point');
+
+  comp.clearTimeout(timeoutToClear);
+
+  this.clock.tick(500);
+
+  comp.dispose();
+
+  this.clock.tick(1000);
+
+  ok(timeoutsFired === 1, 'One timeout should have fired overall');
+});
+
+test('should provide interval methods that automatically get cleared on component disposal', function() {
+  expect(13);
+
+  var comp = new vjs.Component(getFakePlayer());
+  var intervalsFired = 0;
+
+  var interval = comp.setInterval(function() {
+    intervalsFired++;
+    equal(this, comp, 'Interval fn has the component as its context');
+    ok(true, 'Interval created and fired.');
+  }, 100);
+
+  comp.setInterval(function() {
+    intervalsFired++;
+    ok(false, 'Interval should have been disposed');
+  }, 1200);
+
+  this.clock.tick(500);
+
+  ok(intervalsFired === 5, 'Component interval fired 5 times');
+
+  comp.clearInterval(interval);
+
+  this.clock.tick(600);
+
+  ok(intervalsFired === 5, 'Interval was manually cleared');
+
+  comp.dispose();
+
+  this.clock.tick(1200);
+
+  ok(intervalsFired === 5, 'Interval was cleared when component was disposed');
 });

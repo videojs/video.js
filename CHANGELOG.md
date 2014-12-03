@@ -8,6 +8,7 @@ CHANGELOG
 * @thijstriemstra fixed a number of typos in the docs ([view](https://github.com/videojs/video.js/pull/1704))
 * @heff added the Source Handler interface for handling advanced formats including adaptive streaming ([view](https://github.com/videojs/video.js/pull/1560))
 * @azawawi added an Arabic translation ([view](https://github.com/videojs/video.js/pull/1692))
+* @mmcc added functions for better timeout and interval handling ([view](https://github.com/videojs/video.js/pull/1642))
 
 --------------------
 
