@@ -136,8 +136,8 @@ test('dispose() should stop time tracking', function() {
 
 test('should add the source hanlder interface to a tech', function(){
   var mockPlayer = {
-    off: noop,
-    trigger: noop
+    off: this.noop,
+    trigger: this.noop
   };
   var sourceA = { src: 'foo.mp4', type: 'video/mp4' };
   var sourceB = { src: 'no-support', type: 'no-support' };
