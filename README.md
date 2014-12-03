@@ -9,8 +9,8 @@ Thanks to the awesome folks over at [Fastly](http://www.fastly.com/), there's a 
 `<head>`:
 
 ```html
-<link href="http://vjs.zencdn.net/4.9/video-js.css" rel="stylesheet">
-<script src="http://vjs.zencdn.net/4.9/video.js"></script>
+<link href="http://vjs.zencdn.net/4.10/video-js.css" rel="stylesheet">
+<script src="http://vjs.zencdn.net/4.10/video.js"></script>
 ```
 
 Then, whenever you want to use Video.js you can simply use the `<video>` element as your normally would, but with an additional `data-setup` attribute containing any Video.js options. These options
@@ -44,8 +44,8 @@ var player = videojs('really-cool-video', { /* Options */ }, function() {
 });
 ```
 
-If you're ready to dive in, the [documentation](/blob/master/docs/index.md) is the first place to go for more information. Generally the
-[player API docs](/blob/master/docs/api/vjs.Player.md) are the most pertinent.
+If you're ready to dive in, the [documentation](docs/index.md) is the first place to go for more information. Generally the
+[player API docs](docs/api/vjs.Player.md) are the most pertinent.
 
 ## Contributing
 Video.js is a free and open source library, and we appreciate any help you're willing to give. Check out the [contributing guide](CONTRIBUTING.md).

@@ -1,6 +1,6 @@
 /**
  * @fileoverview Exports for Video.js.
- * Exports are publically available variables.
+ * Exports are publicly available variables.
  * All other variables (including function names) will probably
  * be renamed by closure compiler.
  */
@@ -10,7 +10,7 @@
  *
  * vjs is the same as the goog var in Closure Library. It holds all variables
  * used in Video.js development. Closure compiler will rename all variables,
- * including class prototype functions, except those specifcally
+ * including class prototype functions, except those specifically
  * exported (eports.js). Don't assume any function you can use in Video.js
  * development will be available on window.videojs for use with other js.
  *
@@ -18,7 +18,7 @@
  * to something like 'a.b', or actually more likely 'a' removing it from
  * a parent object.
  *
- * videojs is a var that helps bridge bewteen internal and external development.
+ * videojs is a var that helps bridge between internal and external development.
  * Avoid using it over vjs when developing the Video.js core.
  *
  * _V_ is only external. It's just cute and short(er). Like jQuery === $.

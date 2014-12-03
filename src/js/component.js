@@ -561,7 +561,7 @@ vjs.Component.prototype.buildCSSClass = function(){
  *
  * The benefit of using this over `vjs.on(otherElement, 'eventName', myFunc)`
  * and `otherComponent.on('eventName', myFunc)` is that this way the listeners
- * will be automatically cleaned up when either component is diposed.
+ * will be automatically cleaned up when either component is disposed.
  * It will also bind myComponent as the context of myFunc.
  *
  * **NOTE**: When using this on elements in the page other than window
@@ -742,7 +742,7 @@ vjs.Component.prototype.isReady_;
  *
  * Allows for delaying ready. Override on a sub class prototype.
  * If you set this.isReadyOnInitFinish_ it will affect all components.
- * Specially used when waiting for the Flash player to asynchrnously load.
+ * Specially used when waiting for the Flash player to asynchronously load.
  *
  * @type {Boolean}
  * @private
@@ -760,7 +760,7 @@ vjs.Component.prototype.readyQueue_;
 /**
  * Bind a listener to the component's ready state
  *
- * Different from event listeners in that if the ready event has already happend
+ * Different from event listeners in that if the ready event has already happened
  * it will trigger the function immediately.
  *
  * @param  {Function} fn Ready listener
@@ -886,7 +886,7 @@ vjs.Component.prototype.unlockShowing = function(){
 /**
  * Disable component by making it unshowable
  *
- * Currently private because we're movign towards more css-based states.
+ * Currently private because we're moving towards more css-based states.
  * @private
  */
 vjs.Component.prototype.disable = function(){
@@ -1024,7 +1024,7 @@ vjs.Component.prototype.onResize;
  *
  * This is used to support toggling the controls through a tap on the video.
  *
- * We're requireing them to be enabled because otherwise every component would
+ * We're requiring them to be enabled because otherwise every component would
  * have this extra overhead unnecessarily, on mobile devices where extra
  * overhead is especially bad.
  * @private
