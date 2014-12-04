@@ -25,6 +25,7 @@ The `vjs` function can be used to initialize or retrieve a player.
   - [addLanguage](#addlanguage-code-data-)
   - [parseUrl](#parseurl-url-)
   - [plugin](#plugin-name-init-)
+  - [xhr](#xhr-options-callback-)
 
 - CLASSES
   - [BigPlayButton](vjs.BigPlayButton.md)
@@ -132,7 +133,7 @@ _defined in_: [src/js/core.js#L134](https://github.com/videojs/video.js/blob/mas
 ##### RETURNS: 
 * `Object` An object of url details
 
-_defined in_: [src/js/lib.js#L746](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L746)
+_defined in_: [src/js/lib.js#L666](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L666)
 
 ---
 
@@ -144,6 +145,43 @@ _defined in_: [src/js/lib.js#L746](https://github.com/videojs/video.js/blob/mast
 * __init__ `Function` The function that is run when the player inits
 
 _defined in_: [src/js/plugins.js#L7](https://github.com/videojs/video.js/blob/master/src/js/plugins.js#L7)
+
+---
+
+### xhr( options, callback )
+> Simple http request for retrieving external files (e.g. text tracks)
+> 
+> ##### Example
+> 
+>     // using url string
+>     videojs.xhr('http://example.com/myfile.vtt', function(error, response, responseBody){});
+> 
+>     // or options block
+>     videojs.xhr({
+>       uri: 'http://example.com/myfile.vtt',
+>       method: 'GET',
+>       responseType: 'text'
+>     }, function(error, response, responseBody){
+>       if (error) {
+>         // log the error
+>       } else {
+>         // successful, do something with the response
+>       }
+>     });
+> 
+> 
+> API is modeled after the Raynos/xhr, which we hope to use after
+> getting browserify implemented.
+> https://github.com/Raynos/xhr/blob/master/index.js
+
+##### PARAMETERS: 
+* __options__ `Object|String` Options block or URL string
+* __callback__ `Function` The callback function
+
+##### RETURNS: 
+* `Object` The request
+
+_defined in_: [src/js/xhr.js#L31](https://github.com/videojs/video.js/blob/master/src/js/xhr.js#L31)
 
 ---
 

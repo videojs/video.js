@@ -18,10 +18,13 @@ Base class for media (HTML5 Video, Flash) controllers
   - [onTap](#ontap)
   - [removeControlsListeners](#removecontrolslisteners)
   - [setPoster](#setposter)
+  - [withSourceHandlers](#withsourcehandlers-tech--static)
   - [addChild](#addchild-child-options-) _`inherited`_
   - [addClass](#addclass-classtoadd-) _`inherited`_
   - [buildCSSClass](#buildcssclass) _`inherited`_
   - [children](#children) _`inherited`_
+  - [clearInterval](#clearinterval-intervalid-) _`inherited`_
+  - [clearTimeout](#cleartimeout-timeoutid-) _`inherited`_
   - [contentEl](#contentel) _`inherited`_
   - [createEl](#createel-tagname-attributes-) _`inherited`_
   - [dimensions](#dimensions-width-height-) _`inherited`_
@@ -44,6 +47,8 @@ Base class for media (HTML5 Video, Flash) controllers
   - [ready](#ready-fn-) _`inherited`_
   - [removeChild](#removechild-component-) _`inherited`_
   - [removeClass](#removeclass-classtoremove-) _`inherited`_
+  - [setInterval](#setinterval-fn-interval-) _`inherited`_
+  - [setTimeout](#settimeout-fn-timeout-) _`inherited`_
   - [show](#show) _`inherited`_
   - [trigger](#trigger-event-) _`inherited`_
   - [triggerReady](#triggerready) _`inherited`_
@@ -122,6 +127,32 @@ _inherited from_: [src/js/component.js#L536](https://github.com/videojs/video.js
 * `Array` The children
 
 _inherited from_: [src/js/component.js#L296](https://github.com/videojs/video.js/blob/master/src/js/component.js#L296)
+
+---
+
+### clearInterval( intervalId )
+> Clears an interval and removes the associated dispose listener
+
+##### PARAMETERS: 
+* __intervalId__ `Number` The id of the interval to clear
+
+##### RETURNS: 
+* `Number` Returns the interval ID
+
+_inherited from_: [src/js/component.js#L1219](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1219)
+
+---
+
+### clearTimeout( timeoutId )
+> Clears a timeout and removes the associated dispose listener
+
+##### PARAMETERS: 
+* __timeoutId__ `Number` The id of the timeout to clear
+
+##### RETURNS: 
+* `Number` Returns the timeout ID
+
+_inherited from_: [src/js/component.js#L1181](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1181)
 
 ---
 
@@ -421,7 +452,7 @@ _inherited from_: [src/js/component.js#L646](https://github.com/videojs/video.js
 > 
 > The benefit of using this over `vjs.on(otherElement, 'eventName', myFunc)`
 > and `otherComponent.on('eventName', myFunc)` is that this way the listeners
-> will be automatically cleaned up when either component is diposed.
+> will be automatically cleaned up when either component is disposed.
 > It will also bind myComponent as the context of myFunc.
 > 
 > **NOTE**: When using this on elements in the page other than window
@@ -543,7 +574,7 @@ _inherited from_: [src/js/component.js#L126](https://github.com/videojs/video.js
 ### ready( fn )
 > Bind a listener to the component's ready state
 > 
-> Different from event listeners in that if the ready event has already happend
+> Different from event listeners in that if the ready event has already happened
 > it will trigger the function immediately.
 
 ##### PARAMETERS: 
@@ -588,13 +619,41 @@ _defined in_: [src/js/media/media.js#L123](https://github.com/videojs/video.js/b
 
 ---
 
+### setInterval( fn, interval )
+> Creates an interval and sets up disposal automatically.
+
+##### PARAMETERS: 
+* __fn__ `Function` The function to run every N seconds.
+* __interval__ `Number` Number of ms to delay before executing specified function.
+
+##### RETURNS: 
+* `Number` Returns the interval ID
+
+_inherited from_: [src/js/component.js#L1198](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1198)
+
+---
+
 ### setPoster()
 > Provide a default setPoster method for techs
 > 
 > Poster support for techs should be optional, so we don't want techs to
 > break if they don't have a way to set a poster.
 
-_defined in_: [src/js/media/media.js#L261](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L261)
+_defined in_: [src/js/media/media.js#L260](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L260)
+
+---
+
+### setTimeout( fn, timeout )
+> Creates timeout and sets up disposal automatically.
+
+##### PARAMETERS: 
+* __fn__ `Function` The function to run after the timeout.
+* __timeout__ `Number` Number of ms to delay before executing specified function.
+
+##### RETURNS: 
+* `Number` Returns the timeout ID
+
+_inherited from_: [src/js/component.js#L1158](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1158)
 
 ---
 
@@ -651,6 +710,20 @@ _inherited from_: [src/js/component.js#L788](https://github.com/videojs/video.js
 * `Number|String` The width, when getting
 
 _inherited from_: [src/js/component.js#L910](https://github.com/videojs/video.js/blob/master/src/js/component.js#L910)
+
+---
+
+### withSourceHandlers( Tech ) `STATIC`
+> A functional mixin for techs that want to use the Source Handler pattern.
+> 
+> ##### EXAMPLE:
+> 
+>   videojs.MediaTechController.withSourceHandlers.call(MyTech);
+
+##### PARAMETERS: 
+* __Tech__ 
+
+_defined in_: [src/js/media/media.js#L281](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L281)
 
 ---
 

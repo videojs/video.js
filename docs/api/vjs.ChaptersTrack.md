@@ -3,7 +3,7 @@
 # vjs.ChaptersTrack
 
 __EXTENDS__: [vjs.TextTrack](vjs.TextTrack.md)  
-__DEFINED IN__: [src/js/tracks.js#L686](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L686)  
+__DEFINED IN__: [src/js/tracks.js#L694](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L694)  
 
 The track component for managing the hiding and showing of chapters
 
@@ -18,6 +18,8 @@ The track component for managing the hiding and showing of chapters
   - [addClass](#addclass-classtoadd-) _`inherited`_
   - [buildCSSClass](#buildcssclass) _`inherited`_
   - [children](#children) _`inherited`_
+  - [clearInterval](#clearinterval-intervalid-) _`inherited`_
+  - [clearTimeout](#cleartimeout-timeoutid-) _`inherited`_
   - [contentEl](#contentel) _`inherited`_
   - [createEl](#createel) _`inherited`_
   - [cues](#cues) _`inherited`_
@@ -50,6 +52,8 @@ The track component for managing the hiding and showing of chapters
   - [readyState](#readystate) _`inherited`_
   - [removeChild](#removechild-component-) _`inherited`_
   - [removeClass](#removeclass-classtoremove-) _`inherited`_
+  - [setInterval](#setinterval-fn-interval-) _`inherited`_
+  - [setTimeout](#settimeout-fn-timeout-) _`inherited`_
   - [show](#show) _`inherited`_
   - [src](#src) _`inherited`_
   - [title](#title) _`inherited`_
@@ -67,7 +71,7 @@ The track component for managing the hiding and showing of chapters
 ### activate()
 > Turn on cue tracking. Tracks that are showing OR hidden are active.
 
-_inherited from_: [src/js/tracks.js#L373](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L373)
+_inherited from_: [src/js/tracks.js#L375](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L375)
 
 ---
 
@@ -77,7 +81,7 @@ _inherited from_: [src/js/tracks.js#L373](https://github.com/videojs/video.js/bl
 ##### RETURNS: 
 * `Array` 
 
-_inherited from_: [src/js/tracks.js#L268](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L268)
+_inherited from_: [src/js/tracks.js#L270](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L270)
 
 ---
 
@@ -150,6 +154,32 @@ _inherited from_: [src/js/component.js#L296](https://github.com/videojs/video.js
 
 ---
 
+### clearInterval( intervalId )
+> Clears an interval and removes the associated dispose listener
+
+##### PARAMETERS: 
+* __intervalId__ `Number` The id of the interval to clear
+
+##### RETURNS: 
+* `Number` Returns the interval ID
+
+_inherited from_: [src/js/component.js#L1219](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1219)
+
+---
+
+### clearTimeout( timeoutId )
+> Clears a timeout and removes the associated dispose listener
+
+##### PARAMETERS: 
+* __timeoutId__ `Number` The id of the timeout to clear
+
+##### RETURNS: 
+* `Number` Returns the timeout ID
+
+_inherited from_: [src/js/component.js#L1181](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1181)
+
+---
+
 ### contentEl()
 > Return the component's DOM element for embedding content.
 > Will either be el_ or a new element defined in createEl.
@@ -167,7 +197,7 @@ _inherited from_: [src/js/component.js#L239](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Element` 
 
-_inherited from_: [src/js/tracks.js#L313](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L313)
+_inherited from_: [src/js/tracks.js#L315](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L315)
 
 ---
 
@@ -177,14 +207,14 @@ _inherited from_: [src/js/tracks.js#L313](https://github.com/videojs/video.js/bl
 ##### RETURNS: 
 * `Array` 
 
-_inherited from_: [src/js/tracks.js#L253](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L253)
+_inherited from_: [src/js/tracks.js#L255](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L255)
 
 ---
 
 ### deactivate()
 > Turn off cue tracking.
 
-_inherited from_: [src/js/tracks.js#L396](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L396)
+_inherited from_: [src/js/tracks.js#L398](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L398)
 
 ---
 
@@ -194,7 +224,7 @@ _inherited from_: [src/js/tracks.js#L396](https://github.com/videojs/video.js/bl
 ##### RETURNS: 
 * `Boolean` 
 
-_inherited from_: [src/js/tracks.js#L194](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L194)
+_inherited from_: [src/js/tracks.js#L196](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L196)
 
 ---
 
@@ -217,7 +247,7 @@ _inherited from_: [src/js/component.js#L938](https://github.com/videojs/video.js
 > Indicates that the text track is not active. Other than for the purposes of exposing the track in the DOM, the user agent is ignoring the text track.
 > No cues are active, no events are fired, and the user agent will not attempt to obtain the track's cues.
 
-_inherited from_: [src/js/tracks.js#L359](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L359)
+_inherited from_: [src/js/tracks.js#L361](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L361)
 
 ---
 
@@ -332,7 +362,7 @@ _inherited from_: [src/js/component.js#L927](https://github.com/videojs/video.js
 > If no attempt has yet been made to obtain the track's cues, the user agent will perform such an attempt momentarily.
 > The user agent is maintaining a list of which cues are active, and events are being fired accordingly.
 
-_inherited from_: [src/js/tracks.js#L344](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L344)
+_inherited from_: [src/js/tracks.js#L346](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L346)
 
 ---
 
@@ -401,7 +431,7 @@ _inherited from_: [src/js/component.js#L481](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `String` 
 
-_inherited from_: [src/js/tracks.js#L165](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L165)
+_inherited from_: [src/js/tracks.js#L167](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L167)
 
 ---
 
@@ -411,7 +441,7 @@ _inherited from_: [src/js/tracks.js#L165](https://github.com/videojs/video.js/bl
 ##### RETURNS: 
 * `String` 
 
-_inherited from_: [src/js/tracks.js#L238](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L238)
+_inherited from_: [src/js/tracks.js#L240](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L240)
 
 ---
 
@@ -421,7 +451,7 @@ _inherited from_: [src/js/tracks.js#L238](https://github.com/videojs/video.js/bl
 ##### RETURNS: 
 * `String` 
 
-_inherited from_: [src/js/tracks.js#L223](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L223)
+_inherited from_: [src/js/tracks.js#L225](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L225)
 
 ---
 
@@ -431,7 +461,7 @@ _inherited from_: [src/js/tracks.js#L223](https://github.com/videojs/video.js/bl
 ##### RETURNS: 
 * `Number` 
 
-_inherited from_: [src/js/tracks.js#L305](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L305)
+_inherited from_: [src/js/tracks.js#L307](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L307)
 
 ---
 
@@ -493,7 +523,7 @@ _inherited from_: [src/js/component.js#L646](https://github.com/videojs/video.js
 > 
 > The benefit of using this over `vjs.on(otherElement, 'eventName', myFunc)`
 > and `otherComponent.on('eventName', myFunc)` is that this way the listeners
-> will be automatically cleaned up when either component is diposed.
+> will be automatically cleaned up when either component is disposed.
 > It will also bind myComponent as the context of myFunc.
 > 
 > **NOTE**: When using this on elements in the page other than window
@@ -597,7 +627,7 @@ _inherited from_: [src/js/component.js#L126](https://github.com/videojs/video.js
 ### ready( fn )
 > Bind a listener to the component's ready state
 > 
-> Different from event listeners in that if the ready event has already happend
+> Different from event listeners in that if the ready event has already happened
 > it will trigger the function immediately.
 
 ##### PARAMETERS: 
@@ -616,7 +646,7 @@ _inherited from_: [src/js/component.js#L769](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Number` 
 
-_inherited from_: [src/js/tracks.js#L287](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L287)
+_inherited from_: [src/js/tracks.js#L289](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L289)
 
 ---
 
@@ -644,6 +674,34 @@ _inherited from_: [src/js/component.js#L837](https://github.com/videojs/video.js
 
 ---
 
+### setInterval( fn, interval )
+> Creates an interval and sets up disposal automatically.
+
+##### PARAMETERS: 
+* __fn__ `Function` The function to run every N seconds.
+* __interval__ `Number` Number of ms to delay before executing specified function.
+
+##### RETURNS: 
+* `Number` Returns the interval ID
+
+_inherited from_: [src/js/component.js#L1198](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1198)
+
+---
+
+### setTimeout( fn, timeout )
+> Creates timeout and sets up disposal automatically.
+
+##### PARAMETERS: 
+* __fn__ `Function` The function to run after the timeout.
+* __timeout__ `Number` Number of ms to delay before executing specified function.
+
+##### RETURNS: 
+* `Number` Returns the timeout ID
+
+_inherited from_: [src/js/component.js#L1158](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1158)
+
+---
+
 ### show()
 > Show: Mode Showing (2)
 > Indicates that the text track is active. If no attempt has yet been made to obtain the track's cues, the user agent will perform such an attempt momentarily.
@@ -654,7 +712,7 @@ _inherited from_: [src/js/component.js#L837](https://github.com/videojs/video.js
 > The showing by default state is used in conjunction with the default attribute on track elements to indicate that the text track was enabled due to that attribute.
 > This allows the user agent to override the state if a later track is discovered that is more appropriate per the user's preferences.
 
-_inherited from_: [src/js/tracks.js#L329](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L329)
+_inherited from_: [src/js/tracks.js#L331](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L331)
 
 ---
 
@@ -664,7 +722,7 @@ _inherited from_: [src/js/tracks.js#L329](https://github.com/videojs/video.js/bl
 ##### RETURNS: 
 * `String` 
 
-_inherited from_: [src/js/tracks.js#L179](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L179)
+_inherited from_: [src/js/tracks.js#L181](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L181)
 
 ---
 
@@ -674,7 +732,7 @@ _inherited from_: [src/js/tracks.js#L179](https://github.com/videojs/video.js/bl
 ##### RETURNS: 
 * `String` 
 
-_inherited from_: [src/js/tracks.js#L208](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L208)
+_inherited from_: [src/js/tracks.js#L210](https://github.com/videojs/video.js/blob/master/src/js/tracks.js#L210)
 
 ---
 

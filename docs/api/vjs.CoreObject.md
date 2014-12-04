@@ -4,7 +4,7 @@
 
 __DEFINED IN__: [src/js/core-object.js#L52](https://github.com/videojs/video.js/blob/master/src/js/core-object.js#L52)  
 
-Core Object/Class for objects that use inheritance + contstructors
+Core Object/Class for objects that use inheritance + constructors
 
 To create a class that can be subclassed itself, extend the CoreObject class.
 
@@ -64,7 +64,7 @@ Methods and properties can be overridden in subclasses.
 ## METHODS
 
 ### create() `STATIC`
-> Create a new instace of this Object class
+> Create a new instance of this Object class
 > 
 >     var myAnimal = Animal.create();
 

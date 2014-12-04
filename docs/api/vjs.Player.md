@@ -63,6 +63,8 @@ After an instance has been created it can be accessed globally using `Video('exa
   - [addClass](#addclass-classtoadd-) _`inherited`_
   - [buildCSSClass](#buildcssclass) _`inherited`_
   - [children](#children) _`inherited`_
+  - [clearInterval](#clearinterval-intervalid-) _`inherited`_
+  - [clearTimeout](#cleartimeout-timeoutid-) _`inherited`_
   - [contentEl](#contentel) _`inherited`_
   - [createEl](#createel-tagname-attributes-) _`inherited`_
   - [dimensions](#dimensions-width-height-) _`inherited`_
@@ -84,6 +86,8 @@ After an instance has been created it can be accessed globally using `Video('exa
   - [ready](#ready-fn-) _`inherited`_
   - [removeChild](#removechild-component-) _`inherited`_
   - [removeClass](#removeclass-classtoremove-) _`inherited`_
+  - [setInterval](#setinterval-fn-interval-) _`inherited`_
+  - [setTimeout](#settimeout-fn-timeout-) _`inherited`_
   - [show](#show) _`inherited`_
   - [trigger](#trigger-event-) _`inherited`_
   - [triggerReady](#triggerready) _`inherited`_
@@ -169,7 +173,7 @@ _inherited from_: [src/js/component.js#L826](https://github.com/videojs/video.js
 * `String` The autoplay attribute value when getting
 * `vjs.Player` Returns the player when setting
 
-_defined in_: [src/js/player.js#L1272](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1272)
+_defined in_: [src/js/player.js#L1273](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1273)
 
 ---
 
@@ -255,6 +259,32 @@ _inherited from_: [src/js/component.js#L296](https://github.com/videojs/video.js
 
 ---
 
+### clearInterval( intervalId )
+> Clears an interval and removes the associated dispose listener
+
+##### PARAMETERS: 
+* __intervalId__ `Number` The id of the interval to clear
+
+##### RETURNS: 
+* `Number` Returns the interval ID
+
+_inherited from_: [src/js/component.js#L1219](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1219)
+
+---
+
+### clearTimeout( timeoutId )
+> Clears a timeout and removes the associated dispose listener
+
+##### PARAMETERS: 
+* __timeoutId__ `Number` The id of the timeout to clear
+
+##### RETURNS: 
+* `Number` Returns the timeout ID
+
+_inherited from_: [src/js/component.js#L1181](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1181)
+
+---
+
 ### contentEl()
 > Return the component's DOM element for embedding content.
 > Will either be el_ or a new element defined in createEl.
@@ -275,7 +305,7 @@ _inherited from_: [src/js/component.js#L239](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Boolean` Controls are showing
 
-_defined in_: [src/js/player.js#L1352](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1352)
+_defined in_: [src/js/player.js#L1353](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1353)
 
 ---
 
@@ -300,7 +330,7 @@ _inherited from_: [src/js/component.js#L200](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `String` The current source
 
-_defined in_: [src/js/player.js#L1239](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1239)
+_defined in_: [src/js/player.js#L1240](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1240)
 
 ---
 
@@ -332,7 +362,7 @@ _defined in_: [src/js/player.js#L702](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `String` The source MIME type
 
-_defined in_: [src/js/player.js#L1249](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1249)
+_defined in_: [src/js/player.js#L1250](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1250)
 
 ---
 
@@ -426,7 +456,7 @@ _inherited from_: [src/js/component.js#L1120](https://github.com/videojs/video.j
 ##### RETURNS: 
 * `Boolean` True if the player is in the ended state, false if not.
 
-_defined in_: [src/js/player.js#L1473](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1473)
+_defined in_: [src/js/player.js#L1474](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1474)
 
 ---
 
@@ -440,7 +470,7 @@ _defined in_: [src/js/player.js#L1473](https://github.com/videojs/video.js/blob/
 * `vjs.MediaError|null` when getting
 * `vjs.Player` when setting
 
-_defined in_: [src/js/player.js#L1437](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1437)
+_defined in_: [src/js/player.js#L1438](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1438)
 
 ---
 
@@ -641,7 +671,7 @@ _defined in_: [src/js/player.js#L124](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `vjs.Player` Returns the player
 
-_defined in_: [src/js/player.js#L1229](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1229)
+_defined in_: [src/js/player.js#L1230](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1230)
 
 ---
 
@@ -655,7 +685,7 @@ _defined in_: [src/js/player.js#L1229](https://github.com/videojs/video.js/blob/
 * `String` The loop attribute value when getting
 * `vjs.Player` Returns the player when setting
 
-_defined in_: [src/js/player.js#L1286](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1286)
+_defined in_: [src/js/player.js#L1287](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1287)
 
 ---
 
@@ -737,7 +767,7 @@ _inherited from_: [src/js/component.js#L646](https://github.com/videojs/video.js
 > 
 > The benefit of using this over `vjs.on(otherElement, 'eventName', myFunc)`
 > and `otherComponent.on('eventName', myFunc)` is that this way the listeners
-> will be automatically cleaned up when either component is diposed.
+> will be automatically cleaned up when either component is disposed.
 > It will also bind myComponent as the context of myFunc.
 > 
 > **NOTE**: When using this on elements in the page other than window
@@ -875,7 +905,7 @@ _defined in_: [src/js/player.js#L659](https://github.com/videojs/video.js/blob/m
 * `Number` Returns the new playback rate when setting
 * `Number` Returns the current playback rate when getting
 
-_defined in_: [src/js/player.js#L1621](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1621)
+_defined in_: [src/js/player.js#L1616](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1616)
 
 ---
 
@@ -907,7 +937,7 @@ _inherited from_: [src/js/component.js#L126](https://github.com/videojs/video.js
 * `String` poster URL when getting
 * `vjs.Player` self when setting
 
-_defined in_: [src/js/player.js#L1317](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1317)
+_defined in_: [src/js/player.js#L1318](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1318)
 
 ---
 
@@ -921,14 +951,14 @@ _defined in_: [src/js/player.js#L1317](https://github.com/videojs/video.js/blob/
 * `String` The preload attribute value when getting
 * `vjs.Player` Returns the player when setting
 
-_defined in_: [src/js/player.js#L1258](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1258)
+_defined in_: [src/js/player.js#L1259](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1259)
 
 ---
 
 ### ready( fn )
 > Bind a listener to the component's ready state
 > 
-> Different from event listeners in that if the ready event has already happend
+> Different from event listeners in that if the ready event has already happened
 > it will trigger the function immediately.
 
 ##### PARAMETERS: 
@@ -1012,7 +1042,35 @@ _defined in_: [src/js/player.js#L959](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `Boolean` True if the player is in the seeking state, false if not.
 
-_defined in_: [src/js/player.js#L1479](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1479)
+_defined in_: [src/js/player.js#L1480](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1480)
+
+---
+
+### setInterval( fn, interval )
+> Creates an interval and sets up disposal automatically.
+
+##### PARAMETERS: 
+* __fn__ `Function` The function to run every N seconds.
+* __interval__ `Number` Number of ms to delay before executing specified function.
+
+##### RETURNS: 
+* `Number` Returns the interval ID
+
+_inherited from_: [src/js/component.js#L1198](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1198)
+
+---
+
+### setTimeout( fn, timeout )
+> Creates timeout and sets up disposal automatically.
+
+##### PARAMETERS: 
+* __fn__ `Function` The function to run after the timeout.
+* __timeout__ `Number` Number of ms to delay before executing specified function.
+
+##### RETURNS: 
+* `Number` Returns the timeout ID
+
+_inherited from_: [src/js/component.js#L1158](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1158)
 
 ---
 
@@ -1061,7 +1119,7 @@ _inherited from_: [src/js/component.js#L847](https://github.com/videojs/video.js
 * `String` The current video source when getting
 * `String` The player when setting
 
-_defined in_: [src/js/player.js#L1148](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1148)
+_defined in_: [src/js/player.js#L1147](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1147)
 
 ---
 
@@ -1255,7 +1313,7 @@ _defined in_: [src/js/player.js#L577](https://github.com/videojs/video.js/blob/m
 ---
 
 ### waiting `EVENT`
-> Fired whenever the media begins wating
+> Fired whenever the media begins waiting
 
 _defined in_: [src/js/player.js#L460](https://github.com/videojs/video.js/blob/master/src/js/player.js#L460)
 

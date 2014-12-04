@@ -36,6 +36,8 @@ Components are also event emitters.
   - [addClass](#addclass-classtoadd-)
   - [buildCSSClass](#buildcssclass)
   - [children](#children)
+  - [clearInterval](#clearinterval-intervalid-)
+  - [clearTimeout](#cleartimeout-timeoutid-)
   - [contentEl](#contentel)
   - [createEl](#createel-tagname-attributes-)
   - [dimensions](#dimensions-width-height-)
@@ -59,6 +61,8 @@ Components are also event emitters.
   - [ready](#ready-fn-)
   - [removeChild](#removechild-component-)
   - [removeClass](#removeclass-classtoremove-)
+  - [setInterval](#setinterval-fn-interval-)
+  - [setTimeout](#settimeout-fn-timeout-)
   - [show](#show)
   - [trigger](#trigger-event-)
   - [triggerReady](#triggerready)
@@ -137,6 +141,32 @@ _defined in_: [src/js/component.js#L536](https://github.com/videojs/video.js/blo
 * `Array` The children
 
 _defined in_: [src/js/component.js#L296](https://github.com/videojs/video.js/blob/master/src/js/component.js#L296)
+
+---
+
+### clearInterval( intervalId )
+> Clears an interval and removes the associated dispose listener
+
+##### PARAMETERS: 
+* __intervalId__ `Number` The id of the interval to clear
+
+##### RETURNS: 
+* `Number` Returns the interval ID
+
+_defined in_: [src/js/component.js#L1219](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1219)
+
+---
+
+### clearTimeout( timeoutId )
+> Clears a timeout and removes the associated dispose listener
+
+##### PARAMETERS: 
+* __timeoutId__ `Number` The id of the timeout to clear
+
+##### RETURNS: 
+* `Number` Returns the timeout ID
+
+_defined in_: [src/js/component.js#L1181](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1181)
 
 ---
 
@@ -413,7 +443,7 @@ _defined in_: [src/js/component.js#L646](https://github.com/videojs/video.js/blo
 > 
 > The benefit of using this over `vjs.on(otherElement, 'eventName', myFunc)`
 > and `otherComponent.on('eventName', myFunc)` is that this way the listeners
-> will be automatically cleaned up when either component is diposed.
+> will be automatically cleaned up when either component is disposed.
 > It will also bind myComponent as the context of myFunc.
 > 
 > **NOTE**: When using this on elements in the page other than window
@@ -517,7 +547,7 @@ _defined in_: [src/js/component.js#L126](https://github.com/videojs/video.js/blo
 ### ready( fn )
 > Bind a listener to the component's ready state
 > 
-> Different from event listeners in that if the ready event has already happend
+> Different from event listeners in that if the ready event has already happened
 > it will trigger the function immediately.
 
 ##### PARAMETERS: 
@@ -551,6 +581,34 @@ _defined in_: [src/js/component.js#L420](https://github.com/videojs/video.js/blo
 * `vjs.Component` 
 
 _defined in_: [src/js/component.js#L837](https://github.com/videojs/video.js/blob/master/src/js/component.js#L837)
+
+---
+
+### setInterval( fn, interval )
+> Creates an interval and sets up disposal automatically.
+
+##### PARAMETERS: 
+* __fn__ `Function` The function to run every N seconds.
+* __interval__ `Number` Number of ms to delay before executing specified function.
+
+##### RETURNS: 
+* `Number` Returns the interval ID
+
+_defined in_: [src/js/component.js#L1198](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1198)
+
+---
+
+### setTimeout( fn, timeout )
+> Creates timeout and sets up disposal automatically.
+
+##### PARAMETERS: 
+* __fn__ `Function` The function to run after the timeout.
+* __timeout__ `Number` Number of ms to delay before executing specified function.
+
+##### RETURNS: 
+* `Number` Returns the timeout ID
+
+_defined in_: [src/js/component.js#L1158](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1158)
 
 ---
 

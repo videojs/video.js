@@ -2,6 +2,11 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 4.11.0 (2014-12-04)
 * @rutkat updated sliders to use keydown instead of keyup for more responsive key control ([view](https://github.com/videojs/video.js/pull/1616))
 * @toloudis fixed an issue with checking for an existing source on the video element ([view](https://github.com/videojs/video.js/pull/1651))
 * @rafalwrzeszcz fixed the Flash object tag markup for strict XML ([view](https://github.com/videojs/video.js/pull/1702))
@@ -12,8 +17,6 @@ CHANGELOG
 * @mmcc fixed the vdata exception when you dispose a player with tracks ([view](https://github.com/videojs/video.js/pull/1710))
 * @nemesreviz added a Hungarian translation ([view](https://github.com/videojs/video.js/pull/1711))
 * @heff updated the SWF to the latest version ([view](https://github.com/videojs/video.js/pull/1714))
-
---------------------
 
 ## 4.10.2 (2014-10-30)
 * @heff fixed checking for child options in the parent options to allow for 'false' ([view](https://github.com/videojs/video.js/pull/1630))

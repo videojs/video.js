@@ -17,6 +17,8 @@ A button component for muting the audio
   - [addClass](#addclass-classtoadd-) _`inherited`_
   - [buildCSSClass](#buildcssclass) _`inherited`_
   - [children](#children) _`inherited`_
+  - [clearInterval](#clearinterval-intervalid-) _`inherited`_
+  - [clearTimeout](#cleartimeout-timeoutid-) _`inherited`_
   - [contentEl](#contentel) _`inherited`_
   - [createEl](#createel-tagname-attributes-) _`inherited`_
   - [dimensions](#dimensions-width-height-) _`inherited`_
@@ -39,6 +41,8 @@ A button component for muting the audio
   - [ready](#ready-fn-) _`inherited`_
   - [removeChild](#removechild-component-) _`inherited`_
   - [removeClass](#removeclass-classtoremove-) _`inherited`_
+  - [setInterval](#setinterval-fn-interval-) _`inherited`_
+  - [setTimeout](#settimeout-fn-timeout-) _`inherited`_
   - [show](#show) _`inherited`_
   - [trigger](#trigger-event-) _`inherited`_
   - [triggerReady](#triggerready) _`inherited`_
@@ -117,6 +121,32 @@ _inherited from_: [src/js/component.js#L536](https://github.com/videojs/video.js
 * `Array` The children
 
 _inherited from_: [src/js/component.js#L296](https://github.com/videojs/video.js/blob/master/src/js/component.js#L296)
+
+---
+
+### clearInterval( intervalId )
+> Clears an interval and removes the associated dispose listener
+
+##### PARAMETERS: 
+* __intervalId__ `Number` The id of the interval to clear
+
+##### RETURNS: 
+* `Number` Returns the interval ID
+
+_inherited from_: [src/js/component.js#L1219](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1219)
+
+---
+
+### clearTimeout( timeoutId )
+> Clears a timeout and removes the associated dispose listener
+
+##### PARAMETERS: 
+* __timeoutId__ `Number` The id of the timeout to clear
+
+##### RETURNS: 
+* `Number` Returns the timeout ID
+
+_inherited from_: [src/js/component.js#L1181](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1181)
 
 ---
 
@@ -391,7 +421,7 @@ _inherited from_: [src/js/component.js#L646](https://github.com/videojs/video.js
 > 
 > The benefit of using this over `vjs.on(otherElement, 'eventName', myFunc)`
 > and `otherComponent.on('eventName', myFunc)` is that this way the listeners
-> will be automatically cleaned up when either component is diposed.
+> will be automatically cleaned up when either component is disposed.
 > It will also bind myComponent as the context of myFunc.
 > 
 > **NOTE**: When using this on elements in the page other than window
@@ -495,7 +525,7 @@ _inherited from_: [src/js/component.js#L126](https://github.com/videojs/video.js
 ### ready( fn )
 > Bind a listener to the component's ready state
 > 
-> Different from event listeners in that if the ready event has already happend
+> Different from event listeners in that if the ready event has already happened
 > it will trigger the function immediately.
 
 ##### PARAMETERS: 
@@ -529,6 +559,34 @@ _inherited from_: [src/js/component.js#L420](https://github.com/videojs/video.js
 * `vjs.Component` 
 
 _inherited from_: [src/js/component.js#L837](https://github.com/videojs/video.js/blob/master/src/js/component.js#L837)
+
+---
+
+### setInterval( fn, interval )
+> Creates an interval and sets up disposal automatically.
+
+##### PARAMETERS: 
+* __fn__ `Function` The function to run every N seconds.
+* __interval__ `Number` Number of ms to delay before executing specified function.
+
+##### RETURNS: 
+* `Number` Returns the interval ID
+
+_inherited from_: [src/js/component.js#L1198](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1198)
+
+---
+
+### setTimeout( fn, timeout )
+> Creates timeout and sets up disposal automatically.
+
+##### PARAMETERS: 
+* __fn__ `Function` The function to run after the timeout.
+* __timeout__ `Number` Number of ms to delay before executing specified function.
+
+##### RETURNS: 
+* `Number` Returns the timeout ID
+
+_inherited from_: [src/js/component.js#L1158](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1158)
 
 ---
 
