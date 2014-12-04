@@ -39,6 +39,11 @@ vjs.TextTrackList = function(tracks) {
 vjs.TextTrackList.prototype = vjs.obj.create(vjs.EventEmitter.prototype);
 vjs.TextTrackList.prototype.constructor = vjs.TextTrackList;
 
+/*
+ * change - One or more tracks in the track list have been enabled or disabled.
+ * addtrack - A track has been added to the track list.
+ * removetrack - A track has been removed from the track list.
+*/
 vjs.TextTrackList.prototype.allowedEvents_ = {
   'change': 'change',
   'addtrack': 'addtrack',
@@ -55,6 +60,9 @@ vjs.TextTrackList.prototype.addTrack_ = function(track) {
     });
   }
 
+  track.on('modechange', vjs.bind(this, function() {
+    this.trigger('cuechange');
+  }));
   this.tracks_.push(track);
 
   this.trigger('addtrack');
