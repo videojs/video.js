@@ -75,6 +75,7 @@ vjs.TextTrack = function(options) {
         return;
       }
       mode = newMode;
+      this.trigger('modechange');
     }
   });
 
@@ -129,8 +130,11 @@ vjs.TextTrack = function(options) {
 vjs.TextTrack.prototype = vjs.obj.create(vjs.EventEmitter.prototype);
 vjs.TextTrack.prototype.constructor = vjs.TextTrack;
 
+/*
+ * cuechange - One or more cues in the track have become active or stopped being active.
+ */
 vjs.TextTrack.prototype.allowedEvents_ = {
-  'cuechange': 1
+  'cuechange': 'cuechange'
 };
 
 vjs.TextTrack.prototype.addCue = function(cue) {
