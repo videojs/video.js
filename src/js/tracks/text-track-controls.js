@@ -1,3 +1,7 @@
+var getProp = function(obj, prop) {
+  return (typeof obj[prop] === 'function') ? obj[prop]() : obj[prop];
+};
+
 /* Text Track Display
 ============================================================================= */
 // Global container for both subtitle and captions text. Simple div container.
