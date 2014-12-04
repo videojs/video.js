@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* @heff fixed a code bug in track XHR requests ([view](https://github.com/videojs/video.js/pull/1715))
+_(none)_
 
 --------------------
+
+## 4.11.1 (2014-12-04)
+* @heff fixed a code bug in track XHR requests ([view](https://github.com/videojs/video.js/pull/1715))
 
 ## 4.11.0 (2014-12-04)
 * @rutkat updated sliders to use keydown instead of keyup for more responsive key control ([view](https://github.com/videojs/video.js/pull/1616))
