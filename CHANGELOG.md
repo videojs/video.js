@@ -11,6 +11,7 @@ CHANGELOG
 * @mmcc added functions for better timeout and interval handling ([view](https://github.com/videojs/video.js/pull/1642))
 * @mmcc fixed the vdata exception when you dispose a player with tracks ([view](https://github.com/videojs/video.js/pull/1710))
 * @nemesreviz added a Hungarian translation ([view](https://github.com/videojs/video.js/pull/1711))
+* @heff updated the SWF to the latest version ([view](https://github.com/videojs/video.js/pull/1714))
 
 --------------------
 
