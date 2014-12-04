@@ -1,5 +1,5 @@
 vjs.EventEmitter = function() {
-}
+};
 
 vjs.EventEmitter.prototype.allowedEvents_ = {
 };
@@ -10,11 +10,11 @@ vjs.EventEmitter.prototype.on = function(type, fn) {
 
 vjs.EventEmitter.prototype.off = function(type, fn) {
   vjs.off(this, type, fn);
-}
+};
 
 vjs.EventEmitter.prototype.one = function(type, fn) {
   vjs.one(this, type, fn);
-}
+};
 
 vjs.EventEmitter.prototype.trigger = function(event) {
   var type = event.type || event;

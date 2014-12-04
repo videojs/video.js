@@ -365,13 +365,14 @@ vjs.Html5.prototype.textTracks = function() {
 
   return this.el_.textTracks;
 }
+};
 vjs.Html5.prototype.addTextTrack = function(kind, label, language) {
   if (!this['featuresTextTracks']) {
     return vjs.MediaTechController.prototype.addTextTrack.call(this, kind, label, language);
   }
 
   return this.el_.addTextTrack(kind, label, language);
-}
+};
 
 /* HTML5 Support Testing ---------------------------------------------------- */
 

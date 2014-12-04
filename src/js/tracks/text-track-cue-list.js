@@ -31,21 +31,24 @@ vjs.TextTrackCueList = function(cues) {
 vjs.TextTrackCueList.prototype.setCues_ = function(cues) {
   var oldLength = this.length || 0,
       i = 0,
-      l = cues.length;
+      l = cues.length,
+      defineProp;
 
   this.cues_ = cues;
   this.length_ = cues.length;
 
+  defineProp = function(i) {
+    Object.defineProperty(this, '' + i, {
+      get: function() {
+        return this.cues_[i];
+      }
+    });
+  };
+
   if (oldLength < l) {
     i = oldLength;
     for(; i < l; i++) {
-      (function(i) {
-        Object.defineProperty(this, '' + i, {
-          get: function() {
-            return this.cues_[i];
-          }
-        });
-      }).call(this, i);
+      defineProp.call(this, i);
     }
   }
 };

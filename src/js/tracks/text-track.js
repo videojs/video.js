@@ -22,7 +22,7 @@
  */
 
 vjs.TextTrack = function(options) {
-  var tt, id, mode, kind, label, language, cues, activeCues;
+  var tt, id, mode, kind, label, language, cues, activeCues, player;
 
   tt = this;
   if (vjs.IS_IE8) {
@@ -33,7 +33,7 @@ vjs.TextTrack = function(options) {
   mode = vjs.TextTrackMode[options.mode] || 'disabled';
   kind = vjs.TextTrackKind[options.kind] || 'subtitles';
   label = options.label || '';
-  langauge = options.language || '';
+  language = options.language || '';
   id = options.id || '';
 
   tt.cues_ = [];

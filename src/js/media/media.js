@@ -321,7 +321,7 @@ vjs.MediaTechController.prototype.addTextTrack = function(kind, label, language,
   }
 
   return track;
-}
+};
 
 /**
  * Provide a default setPoster method for techs
