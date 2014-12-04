@@ -151,13 +151,13 @@ vjs.LoadProgressBar.prototype.update = function(){
     part = children[i];
 
     if (!part) {
-      part = this.el_.appendChild(vjs.createEl())
-    };
+      part = this.el_.appendChild(vjs.createEl());
+    }
 
     // set the percent based on the width of the progress bar (bufferedEnd)
     part.style.left = percentify(start, bufferedEnd);
     part.style.width = percentify(end - start, bufferedEnd);
-  };
+  }
 
   // remove unused buffered range elements
   for (i = children.length; i > buffered.length; i--) {

@@ -44,7 +44,7 @@ vjs.PlaybackRateMenuButton.prototype.createMenu = function(){
       menu.addChild(
         new vjs.PlaybackRateMenuItem(this.player(), { 'rate': rates[i] + 'x'})
         );
-    };
+    }
   }
 
   return menu;
@@ -66,7 +66,7 @@ vjs.PlaybackRateMenuButton.prototype.onClick = function(){
       newRate = rates[i];
       break;
     }
-  };
+  }
   this.player().playbackRate(newRate);
 };
 

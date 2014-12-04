@@ -310,7 +310,8 @@ vjs.MediaTechController.withSourceHandlers = function(Tech){
    * @returns {null}         Null if no source handler is found
    */
   Tech.selectSourceHandler = function(source){
-    var handlers = Tech.sourceHandlers || [];
+    var handlers = Tech.sourceHandlers || [],
+        can;
 
     for (var i = 0; i < handlers.length; i++) {
       can = handlers[i].canHandleSource(source);

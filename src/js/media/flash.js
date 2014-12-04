@@ -193,10 +193,10 @@ vjs.Flash.prototype.enterFullScreen = function(){
   function createSetter(attr){
     var attrUpper = attr.charAt(0).toUpperCase() + attr.slice(1);
     api['set'+attrUpper] = function(val){ return this.el_.vjs_setProperty(attr, val); };
-  };
+  }
   function createGetter(attr) {
     api[attr] = function(){ return this.el_.vjs_getProperty(attr); };
-  };
+  }
 
   // Create getter and setters for all read/write attributes
   for (i = 0; i < readWrite.length; i++) {
