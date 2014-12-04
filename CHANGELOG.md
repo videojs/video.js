@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @heff fixed a code bug in track XHR requests ([view](https://github.com/videojs/video.js/pull/1715))
 
 --------------------
 
