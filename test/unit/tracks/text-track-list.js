@@ -1,0 +1,135 @@
+module('Text Track List');
+
+var TTL = vjs.TextTrackList,
+    noop = Function.prototype,
+    genericTracks = [{
+      id: '1',
+      on: noop
+    }, {
+      id: '2',
+      on: noop
+    }, {
+      id: '3',
+      on: noop
+    }];
+
+test('TextTrackList\'s length is set correctly', function() {
+  var ttl = new TTL(genericTracks);
+
+  equal(ttl.length, genericTracks.length, 'the length is ' + genericTracks.length);
+});
+
+test('can get text tracks by id', function() {
+  var ttl = new TTL(genericTracks);
+
+  equal(ttl.getTrackById('1').id, 1, 'id "1" has id of "1"');
+  equal(ttl.getTrackById('2').id, 2, 'id "2" has id of "2"');
+  equal(ttl.getTrackById('3').id, 3, 'id "3" has id of "3"');
+  ok(!ttl.getTrackById(1), 'there isn\'t an item with "numeric" id of `1`');
+});
+
+test('length is updated when new tracks are added or removed', function() {
+  var ttl = new TTL(genericTracks);
+
+  ttl.addTrack_({id: '100', on: noop});
+  equal(ttl.length, genericTracks.length + 1, 'the length is ' + (genericTracks.length + 1));
+  ttl.addTrack_({id: '101', on: noop});
+  equal(ttl.length, genericTracks.length + 2, 'the length is ' + (genericTracks.length + 2));
+
+  ttl.removeTrack_(ttl.getTrackById('101'));
+  equal(ttl.length, genericTracks.length + 1, 'the length is ' + (genericTracks.length + 1));
+  ttl.removeTrack_(ttl.getTrackById('100'));
+  equal(ttl.length, genericTracks.length, 'the length is ' + genericTracks.length);
+});
+
+test('can access items by index', function() {
+  var ttl = new TTL(genericTracks),
+      i = 0,
+      length = ttl.length;
+
+  expect(length);
+
+  for (; i < length; i++) {
+    equal(ttl[i].id, String(i + 1), 'the id of a track matches the index + 1');
+  }
+});
+
+test('can access new items by index', function() {
+  var ttl = new TTL(genericTracks);
+
+  ttl.addTrack_({id: '100', on: noop});
+  equal(ttl[3].id, '100', 'id of item at index 3 is 100');
+  ttl.addTrack_({id: '101', on: noop});
+  equal(ttl[4].id, '101', 'id of item at index 4 is 101');
+});
+
+test('cannot access removed items by index', function() {
+  var ttl = new TTL(genericTracks);
+
+  ttl.addTrack_({id: '100', on: noop});
+  ttl.addTrack_({id: '101', on: noop});
+  equal(ttl[3].id, '100', 'id of item at index 3 is 100');
+  equal(ttl[4].id, '101', 'id of item at index 4 is 101');
+
+  ttl.removeTrack_(ttl.getTrackById('101'));
+  ttl.removeTrack_(ttl.getTrackById('100'));
+
+  ok(!ttl[3], 'nothing at index 3');
+  ok(!ttl[4], 'nothing at index 4');
+});
+
+test('new item available at old index', function() {
+  var ttl = new TTL(genericTracks);
+
+  ttl.addTrack_({id: '100', on: noop});
+  equal(ttl[3].id, '100', 'id of item at index 3 is 100');
+
+  ttl.removeTrack_(ttl.getTrackById('100'));
+  ok(!ttl[3], 'nothing at index 3');
+
+  ttl.addTrack_({id: '101', on: noop});
+  equal(ttl[3].id, '101', 'id of new item at index 3 is now 101');
+});
+
+test('a "addtrack" event is triggered when new tracks are added', function() {
+  var ttl = new TTL(genericTracks),
+      adds = 0,
+      addHandler = function() {
+        adds++
+      };
+
+  ttl.on('addtrack', addHandler);
+
+  ttl.addTrack_({id: '100', on: noop});
+  ttl.addTrack_({id: '101', on: noop});
+
+  ttl.off('addtrack', addHandler);
+
+  ttl.onaddtrack = addHandler;
+
+  ttl.addTrack_({id: '102', on: noop});
+  ttl.addTrack_({id: '103', on: noop});
+
+  equal(adds, 4, 'we got ' + adds + ' "addtrack" events');
+});
+
+test('a "removetrack" event is triggered when tracks are removed', function() {
+  var ttl = new TTL(genericTracks),
+      rms = 0,
+      rmHandler = function() {
+        rms++;
+      };
+
+  ttl.on('removetrack', rmHandler);
+
+  ttl.removeTrack_(ttl.getTrackById('1'));
+  ttl.removeTrack_(ttl.getTrackById('2'));
+
+  ttl.off('removetrack', rmHandler);
+
+  ttl.onremovetrack = rmHandler;
+
+  ttl.removeTrack_(ttl.getTrackById('3'));
+
+  equal(rms, 3, 'we got ' + rms + ' "removetrack" events');
+});
