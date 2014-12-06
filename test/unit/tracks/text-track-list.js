@@ -133,3 +133,50 @@ test('a "removetrack" event is triggered when tracks are removed', function() {
 
   equal(rms, 3, 'we got ' + rms + ' "removetrack" events');
 });
+
+test('trigger "change" event when "modechange" is fired on a track', function() {
+  var tt = new vjs.EventEmitter(),
+      ttl = new TTL([tt]),
+      changes = 0,
+      changeHandler = function() {
+        changes++;
+      };
+
+  ttl.on('change', changeHandler);
+
+  tt.trigger('modechange');
+
+  ttl.off('change', changeHandler);
+
+  ttl.onchange = changeHandler;
+
+  tt.trigger('modechange');
+
+  equal(changes, 2, 'two change events should have fired');
+});
+
+test('trigger "change" event when mode changes on a TextTracl', function() {
+  var tt = new vjs.TextTrack({
+        player: {
+          on: noop
+        },
+      }),
+      ttl = new TTL([tt]),
+      changes = 0,
+      changeHandler = function() {
+        changes++;
+      };
+
+  ttl.on('change', changeHandler);
+
+  tt.mode = 'showing';
+
+  ttl.off('change', changeHandler);
+
+  ttl.onchange = changeHandler;
+
+  tt.mode = 'hidden';
+  tt.mode = 'disabled';
+
+  equal(changes, 3, 'three change events should have fired');
+});

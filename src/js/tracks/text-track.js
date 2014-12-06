@@ -71,7 +71,7 @@ vjs.TextTrack = function(options) {
       return mode;
     },
     set: function(newMode) {
-      if (vjs.TextTrackMode[newMode]) {
+      if (!vjs.TextTrackMode[newMode]) {
         return;
       }
       mode = newMode;

@@ -61,7 +61,7 @@ vjs.TextTrackList.prototype.addTrack_ = function(track) {
   }
 
   track.on('modechange', vjs.bind(this, function() {
-    this.trigger('cuechange');
+    this.trigger('change');
   }));
   this.tracks_.push(track);
 
