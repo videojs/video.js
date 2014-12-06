@@ -38,11 +38,13 @@ vjs.TextTrackCueList.prototype.setCues_ = function(cues) {
   this.length_ = cues.length;
 
   defineProp = function(i) {
-    Object.defineProperty(this, '' + i, {
-      get: function() {
-        return this.cues_[i];
-      }
-    });
+    if (!(''+i in this)) {
+      Object.defineProperty(this, '' + i, {
+        get: function() {
+          return this.cues_[i];
+        }
+      });
+    }
   };
 
   if (oldLength < l) {
