@@ -29,7 +29,11 @@ vjs.TextTrack = function(options) {
     tt = document.createElement('custom');
   }
 
-  player = options.player;
+  options = options || {};
+
+  player = options.player || {
+    on: Function.prototype
+  };
   mode = vjs.TextTrackMode[options.mode] || 'disabled';
   kind = vjs.TextTrackKind[options.kind] || 'subtitles';
   label = options.label || '';
@@ -45,25 +49,29 @@ vjs.TextTrack = function(options) {
   Object.defineProperty(tt, 'kind', {
     get: function() {
       return kind;
-    }
+    },
+    set: Function.prototype
   });
 
   Object.defineProperty(tt, 'label', {
     get: function() {
       return label;
-    }
+    },
+    set: Function.prototype
   });
 
-  Object.defineProperty(tt, 'langauge', {
+  Object.defineProperty(tt, 'language', {
     get: function() {
       return language;
-    }
+    },
+    set: Function.prototype
   });
 
   Object.defineProperty(tt, 'id', {
     get: function() {
       return id;
-    }
+    },
+    set: Function.prototype
   });
 
   Object.defineProperty(tt, 'mode', {
@@ -82,7 +90,8 @@ vjs.TextTrack = function(options) {
   Object.defineProperty(tt, 'cues', {
     get: function() {
       return cues;
-    }
+    },
+    set: Function.prototype
   });
 
   var changed = false;
@@ -91,7 +100,7 @@ vjs.TextTrack = function(options) {
       var i, l, active, ct, cue;
 
       if (this.cues.length === 0) {
-        return; // nothing to do
+        return activeCues; // nothing to do
       }
 
       ct = player.currentTime();
@@ -115,7 +124,8 @@ vjs.TextTrack = function(options) {
       }), 0);
 
       return activeCues;
-    }
+    },
+    set: Function.prototype
   });
 
   var timeupdateHandler = vjs.bind(this, function() {
