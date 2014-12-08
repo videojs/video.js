@@ -130,3 +130,7 @@ test('error events may not set the errors property', function() {
   tech.trigger('error');
   ok(true, 'no error was thrown');
 });
+
+test('should have the source handler interface', function() {
+  ok(vjs.Html5.registerSourceHandler, 'has the registerSourceHandler function');
+});

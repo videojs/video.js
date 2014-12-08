@@ -143,3 +143,7 @@ test('ready triggering before and after disposing the tech', function() {
 
   vjs.Flash['checkReady'].restore();
 });
+
+test('should have the source handler interface', function() {
+  ok(vjs.Flash.registerSourceHandler, 'has the registerSourceHandler function');
+});

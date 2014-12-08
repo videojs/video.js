@@ -117,7 +117,7 @@ vjs.obj.merge = function(obj1, obj2){
 vjs.obj.deepMerge = function(obj1, obj2){
   var key, val1, val2;
 
-  // make a copy of obj1 so we're not ovewriting original values.
+  // make a copy of obj1 so we're not overwriting original values.
   // like prototype.options_ and all sub options objects
   obj1 = vjs.obj.copy(obj1);
 
@@ -213,7 +213,7 @@ vjs.bind = function(context, fn, uid) {
 
 /**
  * Element Data Store. Allows for binding data to an element without putting it directly on the element.
- * Ex. Event listneres are stored here.
+ * Ex. Event listeners are stored here.
  * (also from jsninja.com, slightly modified and updated for closure compiler)
  * @type {Object}
  * @private
@@ -432,7 +432,7 @@ vjs.setElementAttributes = function(el, attributes){
 
 /**
  * Get an element's attribute values, as defined on the HTML tag
- * Attributs are not the same as properties. They're defined on the tag
+ * Attributes are not the same as properties. They're defined on the tag
  * or with setAttribute (which shouldn't be used with HTML)
  * This will return true or false for boolean attributes.
  * @param  {Element} tag Element from which to get tag attributes
@@ -615,87 +615,7 @@ vjs.createTimeRange = function(start, end){
 };
 
 /**
- * Simple http request for retrieving external files (e.g. text tracks)
- * @param  {String}    url             URL of resource
- * @param  {Function} onSuccess       Success callback
- * @param  {Function=} onError         Error callback
- * @param  {Boolean=}   withCredentials Flag which allow credentials
- * @private
- */
-vjs.get = function(url, onSuccess, onError, withCredentials){
-  var fileUrl, request, urlInfo, winLoc, crossOrigin;
-
-  onError = onError || function(){};
-
-  if (typeof XMLHttpRequest === 'undefined') {
-    // Shim XMLHttpRequest for older IEs
-    window.XMLHttpRequest = function () {
-      try { return new window.ActiveXObject('Msxml2.XMLHTTP.6.0'); } catch (e) {}
-      try { return new window.ActiveXObject('Msxml2.XMLHTTP.3.0'); } catch (f) {}
-      try { return new window.ActiveXObject('Msxml2.XMLHTTP'); } catch (g) {}
-      throw new Error('This browser does not support XMLHttpRequest.');
-    };
-  }
-
-  request = new XMLHttpRequest();
-
-  urlInfo = vjs.parseUrl(url);
-  winLoc = window.location;
-  // check if url is for another domain/origin
-  // ie8 doesn't know location.origin, so we won't rely on it here
-  crossOrigin = (urlInfo.protocol + urlInfo.host) !== (winLoc.protocol + winLoc.host);
-
-  // Use XDomainRequest for IE if XMLHTTPRequest2 isn't available
-  // 'withCredentials' is only available in XMLHTTPRequest2
-  // Also XDomainRequest has a lot of gotchas, so only use if cross domain
-  if(crossOrigin && window.XDomainRequest && !('withCredentials' in request)) {
-    request = new window.XDomainRequest();
-    request.onload = function() {
-      onSuccess(request.responseText);
-    };
-    request.onerror = onError;
-    // these blank handlers need to be set to fix ie9 http://cypressnorth.com/programming/internet-explorer-aborting-ajax-requests-fixed/
-    request.onprogress = function() {};
-    request.ontimeout = onError;
-
-  // XMLHTTPRequest
-  } else {
-    fileUrl = (urlInfo.protocol == 'file:' || winLoc.protocol == 'file:');
-
-    request.onreadystatechange = function() {
-      if (request.readyState === 4) {
-        if (request.status === 200 || fileUrl && request.status === 0) {
-          onSuccess(request.responseText);
-        } else {
-          onError(request.responseText);
-        }
-      }
-    };
-  }
-
-  // open the connection
-  try {
-    // Third arg is async, or ignored by XDomainRequest
-    request.open('GET', url, true);
-    // withCredentials only supported by XMLHttpRequest2
-    if(withCredentials) {
-      request.withCredentials = true;
-    }
-  } catch(e) {
-    onError(e);
-    return;
-  }
-
-  // send the request
-  try {
-    request.send();
-  } catch(e) {
-    onError(e);
-  }
-};
-
-/**
- * Add to local storage (may removeable)
+ * Add to local storage (may removable)
  * @private
  */
 vjs.setLocalStorage = function(key, value){
@@ -718,7 +638,7 @@ vjs.setLocalStorage = function(key, value){
 };
 
 /**
- * Get abosolute version of relative URL. Used to tell flash correct URL.
+ * Get absolute version of relative URL. Used to tell flash correct URL.
  * http://stackoverflow.com/questions/470832/getting-an-absolute-url-from-a-relative-one-ie6-issue
  * @param  {String} url URL to make absolute
  * @return {String}     Absolute URL
@@ -780,7 +700,7 @@ vjs.parseUrl = function(url) {
 };
 
 /**
- * Log messags to the console and history based on the type of message
+ * Log messages to the console and history based on the type of message
  *
  * @param  {String} type The type of message, or `null` for `log`
  * @param  {[type]} args The args to be passed to the log

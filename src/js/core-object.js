@@ -1,5 +1,5 @@
 /**
- * Core Object/Class for objects that use inheritance + contstructors
+ * Core Object/Class for objects that use inheritance + constructors
  *
  * To create a class that can be subclassed itself, extend the CoreObject class.
  *
@@ -52,7 +52,7 @@
 vjs.CoreObject = vjs['CoreObject'] = function(){};
 // Manually exporting vjs['CoreObject'] here for Closure Compiler
 // because of the use of the extend/create class methods
-// If we didn't do this, those functions would get flattend to something like
+// If we didn't do this, those functions would get flattened to something like
 // `a = ...` and `this.prototype` would refer to the global object instead of
 // CoreObject
 
@@ -78,10 +78,10 @@ vjs.CoreObject.extend = function(props){
   // In Resig's simple class inheritance (previously used) the constructor
   //  is a function that calls `this.init.apply(arguments)`
   // However that would prevent us from using `ParentObject.call(this);`
-  //  in a Child constuctor because the `this` in `this.init`
-  //  would still refer to the Child and cause an inifinite loop.
+  //  in a Child constructor because the `this` in `this.init`
+  //  would still refer to the Child and cause an infinite loop.
   // We would instead have to do
-  //    `ParentObject.prototype.init.apply(this, argumnents);`
+  //    `ParentObject.prototype.init.apply(this, arguments);`
   //  Bleh. We're not creating a _super() function, so it's good to keep
   //  the parent constructor reference simple.
   subObj = function(){
@@ -110,7 +110,7 @@ vjs.CoreObject.extend = function(props){
 };
 
 /**
- * Create a new instace of this Object class
+ * Create a new instance of this Object class
  *
  *     var myAnimal = Animal.create();
  *

@@ -149,5 +149,5 @@ notation.
 <video ... data-setup='{ "children": { "controlBar": { "children": { "muteToggle": false } } } }'></video>
 ```
 
-The [components guide](/docs/guides/components.md) has an excellent breakdown of the structure of a player, you
+The [components guide](components.md) has an excellent breakdown of the structure of a player, you
 just need to remember to nest child components in a `children` object for each level.
