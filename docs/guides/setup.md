@@ -32,7 +32,7 @@ should Just Work™, but the paths can easily be changed by editing the LESS fil
 <link href="//example.com/path/to/video-js.css" rel="stylesheet">
 <script src="//example.com/path/to/video.js"></script>
 <script>
-  videojs.options.flash.swf = "http://example.com/path/to/video-js.swf"
+  VideoJS.options.flash.swf = "http://example.com/path/to/video-js.swf"
 </script>
 ```
 
@@ -77,12 +77,12 @@ Alternative Setup for Dynamically Loaded HTML
 ---------------------------------------------
 If your web page or application loads the video tag dynamically (ajax, appendChild, etc.), so that it may not exist when the page loads, you'll want to manually set up the player instead of relying on the data-setup attribute. To do this, first remove the data-setup attribute from the tag so there's no confusion around when the player is initialized. Next, run the following javascript some time after the Video.js javascript library has loaded, and after the video tag has been loaded into the DOM.
 ```js
-videojs("example_video_1", {}, function(){
+VideoJS("example_video_1", {}, function(){
   // Player (this) is initialized and ready.
 });
 ```
 
-The first argument in the `videojs` function is the ID of your video tag. Replace it with your own.
+The first argument in the `VideoJS` function is the ID of your video tag. Replace it with your own.
 
 The second argument is an options object. It allows you to set additional options like you can with the data-setup attribute.
 
@@ -91,13 +91,13 @@ The third argument is a 'ready' callback. Once Video.js has initialized it will 
 Instead of using an element ID, you can also pass a reference to the element itself.
 
 ```js
-videojs(document.getElementById('example_video_1'), {}, function() {
+VideoJS(document.getElementById('example_video_1'), {}, function() {
   // This is functionally the same as the previous example.
 });
 ```
 
 ```js
-videojs(document.getElementsByClassName('awesome_video_class')[0], {}, function() {
+VideoJS(document.getElementsByClassName('awesome_video_class')[0], {}, function() {
   // You can grab an element by class if you'd like, just make sure
   // if it's an array that you pick one (here we chose the first).
 });
