@@ -41,6 +41,8 @@ Step 2: Add an HTML5 video tag to your page.
 --------------------------------------------
 With Video.js you just use an HTML5 video tag to embed a video. Video.js will then read the tag and make it work in all browsers, not just ones that support HTML5 video. Beyond the basic markup, Video.js needs a few extra pieces.
 
+> Note: The `data-setup` attribute described here should not be used if you use the alternative setup described in the next section.
+
   1. The 'data-setup' Attribute tells Video.js to automatically set up the video when the page is ready, and read any options (in JSON format) from the attribute (see [options](options.md)). There are other methods for initializing the player, but this is the easiest.
 
   2. The 'id' Attribute: Should be used and unique for every video on the same page.
