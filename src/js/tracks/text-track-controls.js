@@ -21,10 +21,12 @@ vjs.TextTrackDisplay = vjs.Component.extend({
     // Should probably be moved to an external track loader when we support
     // tracks that don't need a display.
     player.ready(function() {
-      var controlBar;
+      var controlBar, i, tracks, track;
 
-      if (player.options_['tracks'] && player.options_['tracks'].length > 0) {
-        this.player_.addTextTracks(player.options_['tracks']);
+      tracks = player.options_['tracks'] || [];
+      for (i = 0; i < tracks.length; i++) {
+        track = tracks[i];
+        this.player_.addRemoteTextTrack(track);
       }
 
       controlBar = this.player_.getChild('controlBar');
