@@ -23,7 +23,7 @@
  */
 
 vjs.TextTrack = function(options) {
-  var tt, id, mode, kind, label, language, cues, activeCues, player;
+  var tt, id, mode, kind, label, language, cues, activeCues, player, timeupdateHandler, changed;
 
   tt = this;
   if (vjs.IS_IE8) {
@@ -46,6 +46,15 @@ vjs.TextTrack = function(options) {
 
   cues = new vjs.TextTrackCueList(this.cues_);
   activeCues = new vjs.TextTrackCueList(this.activeCues_);
+
+  changed = false;
+  timeupdateHandler = vjs.bind(this, function() {
+    this.activeCues;
+    if (changed) {
+      this.trigger('cuechange');
+      changed = false;
+    }
+  });
 
   Object.defineProperty(tt, 'kind', {
     get: function() {
@@ -84,6 +93,9 @@ vjs.TextTrack = function(options) {
         return;
       }
       mode = newMode;
+      if (mode === 'showing') {
+        player.on('timeupdate', timeupdateHandler);
+      }
       this.trigger('modechange');
     }
   });
@@ -95,7 +107,6 @@ vjs.TextTrack = function(options) {
     set: Function.prototype
   });
 
-  var changed = false;
   Object.defineProperty(tt, 'activeCues', {
     get: function() {
       var i, l, active, ct, cue;
@@ -108,29 +119,25 @@ vjs.TextTrack = function(options) {
       i = 0;
       l = this.cues.length;
       active = [];
-      this.activeCues_ = [];
 
       for (; i < l; i++) {
         cue = this.cues[i];
         if (cue.startTime <= ct && cue.endTime >= ct) {
           active.push(cue);
         }
+        if (active[i] !== this.activeCues_[i]) {
+          changed = true;
+        }
       }
 
       this.activeCues_ = active;
       activeCues.setCues_(this.activeCues_);
-
-      this.trigger('cuechange');
 
       return activeCues;
     },
     set: Function.prototype
   });
 
-  var timeupdateHandler = vjs.bind(this, function() {
-    this.activeCues;
-  });
-  player.on('timeupdate', timeupdateHandler);
   player.on('dispose', function() {
     player.off('timeupdate', timeupdateHandler);
   });
