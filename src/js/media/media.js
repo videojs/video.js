@@ -1,3 +1,5 @@
+(function() {
+  var createTrackHelper;
 /**
  * @fileoverview Media Technology Controller - Base class for media playback
  * technology controllers like Flash and HTML5
@@ -34,21 +36,27 @@ vjs.MediaTechController = vjs.Component.extend({
 
     if (!this['featuresTextTracks']) {
       player.addChild('textTrackDisplay');
-    } else {
-      textTracksChanges = function() {
-        var controlBar = player.getChild('controlBar');
-        if (!controlBar) {
-          return;
-        }
-
-        controlBar.getChild('subtitlesButton').update();
-        controlBar.getChild('captionsButton').update();
-        controlBar.getChild('chaptersButton').update();
-      };
-
-      this.textTracks().addEventListener('removetrack', textTracksChanges);
-      this.textTracks().addEventListener('addtrack', textTracksChanges);
+      if (!window.WebVTT) {
+        script = document.createElement('script');
+        script.src = player.options()['vtt.js'] || '../node_modules/vtt.js/dist/vtt.js';
+        player.el().appendChild(script);
+        window.WebVTT = true;
+      }
     }
+
+    textTracksChanges = function() {
+      var controlBar = player.getChild('controlBar');
+      if (!controlBar) {
+        return;
+      }
+
+      controlBar.getChild('subtitlesButton').update();
+      controlBar.getChild('captionsButton').update();
+      controlBar.getChild('chaptersButton').update();
+    };
+
+    this.textTracks().addEventListener('removetrack', textTracksChanges);
+    this.textTracks().addEventListener('addtrack', textTracksChanges);
   }
 });
 
@@ -285,42 +293,41 @@ vjs.MediaTechController.prototype.setCurrentTime = function() {
 vjs.MediaTechController.prototype.textTracks_;
 
 vjs.MediaTechController.prototype.textTracks = function() {
-  this.textTracks_ = this.textTracks_ || [];
+  this.textTracks_ = this.textTracks_ || new vjs.TextTrackList()
   return this.textTracks_;
 };
 
-vjs.MediaTechController.prototype.addTextTrack = function(kind, label, language, options) {
-  var tracks = this.textTracks();
-  options = options || {};
-
-  options['kind'] = kind;
-  options['label'] = label;
-  options['language'] = language;
-
-  // HTML5 Spec says default to subtitles.
-  // Uppercase first letter to match class names
-  var Kind = vjs.capitalize(kind || 'subtitles');
-
-  // Create correct texttrack class. CaptionsTrack, etc.
-  var track = new window['videojs'][Kind + 'Track'](this.player_, options);
-
-  tracks.push(track);
-
-  // If track.dflt() is set, start showing immediately
-  // TODO: Add a process to deterime the best track to show for the specific kind
-  // Incase there are mulitple defaulted tracks of the same kind
-  // Or the user has a set preference of a specific language that should override the default
-  // Note: The setTimeout is a workaround because with the html5 tech, the player is 'ready'
-  // before it's child components (including the textTrackDisplay) have finished loading.
-  if (track.dflt()) {
-    this.ready(function(){
-      setTimeout(function(){
-        track.player().showTextTrack(track.id());
-      }, 0);
-    });
+createTrackHelper = function(self, kind, label, language, options) {
+  if (!kind) {
+    throw new Error('TextTrack kind is required but was not provided');
   }
 
+  var tracks = self.textTracks(),
+      track;
+
+  options = options || {};
+
+  options.kind = kind;
+  if (label) {
+    options.label = label;
+  }
+  if (language) {
+    options.language = language;
+  }
+  options.player = self.player_;
+
+  track = new vjs.TextTrack(options);
+  tracks.addTrack_(track);
+
   return track;
+};
+
+vjs.MediaTechController.prototype.addTextTrack = function(kind, label, language) {
+  return createTrackHelper(this, kind, label, language);
+};
+
+vjs.MediaTechController.prototype.addRemoteTextTrack = function(options) {
+  return createTrackHelper(this, options.kind, options.label, options.language, options);
 };
 
 /**
@@ -446,3 +453,5 @@ vjs.MediaTechController.withSourceHandlers = function(Tech){
 };
 
 vjs.media = {};
+
+})();

@@ -1,3 +1,4 @@
+(function() {
 /*
  * https://html.spec.whatwg.org/multipage/embedded-content.html#texttrack
  *
@@ -119,9 +120,7 @@ vjs.TextTrack = function(options) {
       this.activeCues_ = active;
       activeCues.setCues_(this.activeCues_);
 
-      setTimeout(vjs.bind(this, function() {
-        this.trigger('cuechange');
-      }), 0);
+      this.trigger('cuechange');
 
       return activeCues;
     },
@@ -135,6 +134,14 @@ vjs.TextTrack = function(options) {
   player.on('dispose', function() {
     player.off('timeupdate', timeupdateHandler);
   });
+
+  if (options.src) {
+    loadTrack(options.src, tt);
+  }
+
+  if (vjs.IS_IE8) {
+    return tt;
+  }
 };
 
 vjs.TextTrack.prototype = vjs.obj.create(vjs.EventEmitter.prototype);
@@ -172,3 +179,41 @@ vjs.TextTrack.prototype.removeCue = function(removeCue) {
 
   this.cues.setCues_(this.cues_);
 };
+
+/*
+ * Downloading stuff happens below this point
+ */
+var loadTrack, parseCues;
+
+loadTrack = function(src, track) {
+  vjs.xhr(src, vjs.bind(this, function(err, response, responseBody){
+    if (err) {
+      return vjs.log.error(err);
+    }
+
+    parseCues(responseBody, track);
+  }));
+};
+
+parseCues = function(srcContent, track) {
+  if (typeof window.WebVTT !== 'function') {
+    //try again a bit later
+    return window.setTimeout(function() {
+      parseCues(srcContent, track);
+    }, 25)
+  }
+
+  var parser = new window.WebVTT.Parser(window, window.WebVTT.StringDecoder());
+
+  parser.oncue = function(cue) {
+    track.addCue(cue);
+  };
+  parser.onparsingerror = function(error) {
+    vjs.log.error(error);
+  };
+
+  parser.parse(srcContent);
+  parser.flush();
+};
+
+})();
