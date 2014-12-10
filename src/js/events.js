@@ -57,7 +57,7 @@ vjs.on = function(elem, type, fn){
   }
 
   if (data.handlers[type].length == 1) {
-    if (elem.addEventListener) {
+    if (elem.addEventListener && vjs.fn.isNative(elem.addEventListener)) {
       elem.addEventListener(type, data.dispatcher, false);
     } else if (elem.attachEvent) {
       elem.attachEvent('on' + type, data.dispatcher);
