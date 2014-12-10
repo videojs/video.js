@@ -19,6 +19,7 @@ vjs.TextTrackList = function(tracks) {
     list = document.createElement('custom');
   }
 
+  tracks = tracks || [];
   this.tracks_ = [];
 
   Object.defineProperty(list, 'length', {
