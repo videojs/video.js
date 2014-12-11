@@ -47,61 +47,28 @@ vjs.Player.prototype.removeRemoteTextTrack = function(track) {
   this.tech && this.tech['removeRemoteTextTrack'](track);
 };
 
-var processCues = function(trackDisplay) {
-  var cues = [],
-      i = 0;
-
-  for (; i < this.activeCues.length; i++) {
-    cues.push(this.activeCues[i]);
-  }
-
-  window.WebVTT.processCues(window, cues, trackDisplay);
-};
-
 // Show a text track
 // disableSameKind: disable all other tracks of the same kind. Value should be a track kind (captions, etc.)
 vjs.Player.prototype.showTextTrack = function(id, disableSameKind){
   var tracks = this.textTracks(),
       i = 0,
-      j = tracks.length,
+      l = tracks.length,
       track,
       showTrack,
       mode,
       kind;
 
   // Find Track with same ID
-  for (;i<j;i++) {
+  for (; i < l; i++) {
     track = tracks[i];
-    mode = getProp(track, 'mode');
+    mode = track.mode;
 
-    if (getProp(track, 'id') === id || track.language === id) {
-      if (track.show) {
-        track.show();
-      } else {
-        track.mode = 'showing';
-      }
-      showTrack = track;
-
-      track.on('cuechange', processCues.bind(track, this.player_.getChild('textTrackDisplay').el()));
-
+    if (track.id === id || track.language === id) {
+      track.mode = 'showing';
     // Disable tracks of the same kind
-    } else if (disableSameKind && getProp(track, 'kind') === disableSameKind &&
-          (mode > 0 || mode === 'showing')) {
-      if (track.disable) {
-        track.disable();
-      } else {
-        track.mode = 'disabled';
-      }
-      track.off('cuechange', processCues.bind(track, this.player_.getChild('textTrackDisplay').el()));
+    } else if (disableSameKind && track.kind === disableSameKind && (mode === 'showing')) {
+      track.mode = 'disabled';
     }
-  }
-
-  // Get track kind from shown track or disableSameKind
-  kind = (showTrack) ? getProp(showTrack, 'kind') : ((disableSameKind) ? disableSameKind : false);
-
-  // Trigger trackchange event, captionstrackchange, subtitlestrackchange, etc.
-  if (kind) {
-    this.trigger(kind+'trackchange');
   }
 
   return this;

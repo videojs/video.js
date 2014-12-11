@@ -14,7 +14,7 @@
 vjs.MediaTechController = vjs.Component.extend({
   /** @constructor */
   init: function(player, options, ready){
-    var textTracksChanges;
+    var textTrackListChanges, textTracksChanges, textTrackDisplay, processCues;
 
     options = options || {};
     // we don't want the tech to report user activity automatically.
@@ -35,16 +35,45 @@ vjs.MediaTechController = vjs.Component.extend({
     this.initControlsListeners();
 
     if (!this['featuresTextTracks']) {
-      player.addChild('textTrackDisplay');
+      textTrackDisplay = player.addChild('textTrackDisplay');
+
       if (!window.WebVTT) {
         script = document.createElement('script');
         script.src = player.options()['vtt.js'] || '../node_modules/vtt.js/dist/vtt.js';
         player.el().appendChild(script);
         window.WebVTT = true;
       }
+
+      processCues = (function(trackDisplay) {
+        return function() {
+          var cues = [],
+              i = 0;
+
+          for (; i < this.activeCues.length; i++) {
+            cues.push(this.activeCues[i]);
+          }
+
+          window.WebVTT.processCues(window, cues, trackDisplay);
+        };
+      })(textTrackDisplay.el());
+
+      textTracksChanges = function() {
+        var i, track;
+
+        window.WebVTT.processCues(window, [], textTrackDisplay.el());
+        for (i = 0; i < this.length; i++) {
+          track = this[i];
+          track.removeEventListener('cuechange', vjs.bind(track, processCues));
+          if (track.mode === 'showing') {
+            track.addEventListener('cuechange', vjs.bind(track, processCues));
+          }
+        }
+      };
+
+      this.textTracks().addEventListener('change', textTracksChanges);
     }
 
-    textTracksChanges = function() {
+    textTrackListChanges = function() {
       var controlBar = player.getChild('controlBar');
       if (!controlBar) {
         return;
@@ -55,8 +84,8 @@ vjs.MediaTechController = vjs.Component.extend({
       controlBar.getChild('chaptersButton').update();
     };
 
-    this.textTracks().addEventListener('removetrack', textTracksChanges);
-    this.textTracks().addEventListener('addtrack', textTracksChanges);
+    this.textTracks().addEventListener('removetrack', textTrackListChanges);
+    this.textTracks().addEventListener('addtrack', textTrackListChanges);
   }
 });
 
