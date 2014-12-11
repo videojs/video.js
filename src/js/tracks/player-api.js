@@ -16,7 +16,6 @@ var getProp = function(obj, prop) {
  * Get an array of associated text tracks. captions, subtitles, chapters, descriptions
  * http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-texttracks
  * @return {Array}           Array of track objects
- * @private
  */
 vjs.Player.prototype.textTracks = function(){
   return (this.tech && this.tech['textTracks']()) || [];
@@ -37,23 +36,6 @@ vjs.Player.prototype.addTextTrack = function(kind, label, language) {
 vjs.Player.prototype.addRemoteTextTrack = function(options) {
   return this.tech && this.tech.addRemoteTextTrack(options);
 }
-
-/**
- * Add an array of text tracks. captions, subtitles, chapters, descriptions
- * Track objects will be stored in the player.textTracks() array
- * @param {Array} trackList Array of track elements or objects (fake track elements)
- * @private
- */
-vjs.Player.prototype.addTextTracks = function(trackList){
-  var trackObj;
-
-  for (var i = 0; i < trackList.length; i++) {
-    trackObj = trackList[i];
-    this.addTextTrack(trackObj['kind'], trackObj['label'], trackObj['language'], trackObj);
-  }
-
-  return this;
-};
 
 var processCues = function(trackDisplay) {
   var cues = [],
