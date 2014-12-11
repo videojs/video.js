@@ -373,7 +373,28 @@ vjs.Html5.prototype.addRemoteTextTrack = function(options) {
     track.track.mode = 'disabled';
   }, 0);
 
+  this.remoteTextTracks().addTrack_(track.track);
+
   return track.track;
+};
+
+vjs.Html5.prototype.removeRemoteTextTrack = function(track) {
+  if (!this['featuresTextTracks']) {
+    return vjs.MediaTechController.prototype.removeRemoteTextTrack.call(this, options);
+  }
+
+  var tracks, i;
+
+  this.remoteTextTracks().removeTrack_(track);
+
+  tracks = this.el().querySelectorAll('track');
+
+  for (i = 0; i < tracks.length; i++) {
+    if (tracks[i].track === track) {
+      tracks[i].parentNode.removeChild(tracks[i]);
+      break;
+    }
+  }
 };
 
 /* HTML5 Support Testing ---------------------------------------------------- */

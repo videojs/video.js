@@ -18,7 +18,13 @@ var getProp = function(obj, prop) {
  * @return {Array}           Array of track objects
  */
 vjs.Player.prototype.textTracks = function(){
-  return (this.tech && this.tech['textTracks']()) || [];
+  // cannot use techGet directly because it checks to see whether the tech is ready.
+  // Flash is unlikely to be ready in time but textTracks should still work.
+  return this.tech && this.tech['textTracks']();
+};
+
+vjs.Player.prototype.remoteTextTracks = function() {
+  return this.tech && this.tech['remoteTextTracks']();
 };
 
 /**
@@ -30,12 +36,16 @@ vjs.Player.prototype.textTracks = function(){
  * @param {String=} language    Optional language
  */
 vjs.Player.prototype.addTextTrack = function(kind, label, language) {
-  return this.tech && this.tech.addTextTrack(kind, label, language);
+  return this.tech && this.tech['addTextTrack'](kind, label, language);
 };
 
 vjs.Player.prototype.addRemoteTextTrack = function(options) {
-  return this.tech && this.tech.addRemoteTextTrack(options);
-}
+  return this.tech && this.tech['addRemoteTextTrack'](options);
+};
+
+vjs.Player.prototype.removeRemoteTextTrack = function(track) {
+  this.tech && this.tech['removeRemoteTextTrack'](track);
+};
 
 var processCues = function(trackDisplay) {
   var cues = [],
