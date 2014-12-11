@@ -297,6 +297,11 @@ vjs.MediaTechController.prototype.textTracks = function() {
   return this.textTracks_;
 };
 
+vjs.MediaTechController.prototype.remoteTextTracks = function() {
+  this.remoteTextTracks_ = this.remoteTextTracks_ || new vjs.TextTrackList();
+  return this.remoteTextTracks_;
+};
+
 createTrackHelper = function(self, kind, label, language, options) {
   if (!kind) {
     throw new Error('TextTrack kind is required but was not provided');
@@ -327,7 +332,13 @@ vjs.MediaTechController.prototype.addTextTrack = function(kind, label, language)
 };
 
 vjs.MediaTechController.prototype.addRemoteTextTrack = function(options) {
-  return createTrackHelper(this, options.kind, options.label, options.language, options);
+  var track = createTrackHelper(this, options.kind, options.label, options.language, options);
+  this.remoteTextTracks().addTrack_(track);
+  return track;
+};
+
+vjs.MediaTechController.prototype.removeRemoteTextTrack = function(track) {
+  this.remoteTextTracks().removeTrack_(track);
 };
 
 /**
