@@ -65,6 +65,23 @@ vjs.Flash = vjs.MediaTechController.extend({
         lastSeekTarget
     ;
 
+	// PseudoStreaming parameters
+	if( options.pseudoStreamStartParam ) {
+      if((source && source.type) || options.pseudoStreamStartParamType) {
+	    flashVars['pseudoStreamStartParam'] = options.pseudoStreamStartParam;
+
+	    if(source && source.type) {
+	      var startParamType = vjs.Flash.pseudoStreamingType(source.type);
+	      if(startParamType !== '') {
+	        flashVars['pseudoStreamStartParamType'] = startParamType;
+	      }
+	    }
+	    else {
+	      flashVars['pseudoStreamStartParamType'] = options.pseudoStreamStartParamType;
+	    }
+      }
+	}
+
     // If source was supplied pass as a flash var.
     if (source) {
       if (source.type && vjs.Flash.isStreamingType(source.type)) {
@@ -372,6 +389,21 @@ vjs.Flash.canPlaySource = function(srcObj){
   type = srcObj.type.replace(/;.*/,'').toLowerCase();
   if (type in vjs.Flash.formats || type in vjs.Flash.streamingFormats) {
     return 'maybe';
+  }
+};
+
+vjs.Flash.pseudoStreamingType = function(srcType) {
+  if(srcType in vjs.Flash.formats) {
+    switch (vjs.Flash.formats[srcType]) {
+      case 'FLV':
+        return 'bytes';
+        break;
+      default:
+        return 'seconds';
+        break;
+    }
+  } else {
+	  return '';
   }
 };
 
