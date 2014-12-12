@@ -876,5 +876,5 @@ vjs.arr.forEach = function(array, callback, thisArg) {
       // things like typed arrays as DOM methods which may not conform to the
       // normal native pattern.
       : (value && type == 'object' && reHostCtor.test(toString.call(value))) || false;
-  }
+  };
 })();

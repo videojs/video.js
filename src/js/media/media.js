@@ -14,7 +14,7 @@
 vjs.MediaTechController = vjs.Component.extend({
   /** @constructor */
   init: function(player, options, ready){
-    var textTrackListChanges, textTracksChanges, textTrackDisplay, processCues;
+    var textTrackListChanges, textTracksChanges, textTrackDisplay, processCues, script;
 
     options = options || {};
     // we don't want the tech to report user activity automatically.
@@ -322,7 +322,7 @@ vjs.MediaTechController.prototype.setCurrentTime = function() {
 vjs.MediaTechController.prototype.textTracks_;
 
 vjs.MediaTechController.prototype.textTracks = function() {
-  this.textTracks_ = this.textTracks_ || new vjs.TextTrackList()
+  this.textTracks_ = this.textTracks_ || new vjs.TextTrackList();
   return this.textTracks_;
 };
 
