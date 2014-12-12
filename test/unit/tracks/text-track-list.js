@@ -95,7 +95,7 @@ test('a "addtrack" event is triggered when new tracks are added', function() {
   var ttl = new TTL(genericTracks),
       adds = 0,
       addHandler = function() {
-        adds++
+        adds++;
       };
 
   ttl.on('addtrack', addHandler);
@@ -159,7 +159,7 @@ test('trigger "change" event when mode changes on a TextTracl', function() {
   var tt = new vjs.TextTrack({
         player: {
           on: noop
-        },
+        }
       }),
       ttl = new TTL([tt]),
       changes = 0,

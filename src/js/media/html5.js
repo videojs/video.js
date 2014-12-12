@@ -415,7 +415,7 @@ vjs.Html5.prototype.addRemoteTextTrack = function(options) {
 
 vjs.Html5.prototype.removeRemoteTextTrack = function(track) {
   if (!this['featuresTextTracks']) {
-    return vjs.MediaTechController.prototype.removeRemoteTextTrack.call(this, options);
+    return vjs.MediaTechController.prototype.removeRemoteTextTrack.call(this, track);
   }
 
   var tracks, i;

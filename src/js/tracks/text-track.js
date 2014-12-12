@@ -211,7 +211,7 @@ parseCues = function(srcContent, track) {
     //try again a bit later
     return window.setTimeout(function() {
       parseCues(srcContent, track);
-    }, 25)
+    }, 25);
   }
 
   var parser = new window.WebVTT.Parser(window, window.WebVTT.StringDecoder());
