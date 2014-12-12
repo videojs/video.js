@@ -356,8 +356,8 @@ vjs.Html5.prototype.addRemoteTextTrack = function(options) {
   if (options.language) {
     track.language = options.language;
   }
-  if (options.default) {
-    track.default = options.default;
+  if (options['default']) {
+    track['default'] = options['default'];
   }
   if (options.id) {
     track.id = options.id;

@@ -23,11 +23,15 @@
  */
 
 vjs.TextTrack = function(options) {
-  var tt, id, mode, kind, label, language, cues, activeCues, player, timeupdateHandler, changed;
+  var tt, id, mode, kind, label, language, cues, activeCues, player, timeupdateHandler, changed, prop;
 
   tt = this;
   if (vjs.IS_IE8) {
     tt = document.createElement('custom');
+
+    for (prop in vjs.TextTrack.prototype) {
+      tt[prop] = vjs.TextTrack.prototype[prop];
+    }
   }
 
   options = options || {};
@@ -44,11 +48,11 @@ vjs.TextTrack = function(options) {
   tt.cues_ = [];
   tt.activeCues_ = [];
 
-  cues = new vjs.TextTrackCueList(this.cues_);
-  activeCues = new vjs.TextTrackCueList(this.activeCues_);
+  cues = new vjs.TextTrackCueList(tt.cues_);
+  activeCues = new vjs.TextTrackCueList(tt.activeCues_);
 
   changed = false;
-  timeupdateHandler = vjs.bind(this, function() {
+  timeupdateHandler = vjs.bind(tt, function() {
     this.activeCues;
     if (changed) {
       this.trigger('cuechange');

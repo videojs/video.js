@@ -13,14 +13,19 @@
  */
 vjs.TextTrackList = function(tracks) {
   var list = this,
+      prop,
       i = 0;
 
   if (vjs.IS_IE8) {
     list = document.createElement('custom');
+
+    for (prop in vjs.TextTrackList.prototype) {
+      list[prop] = vjs.TextTrackList.prototype[prop];
+    }
   }
 
   tracks = tracks || [];
-  this.tracks_ = [];
+  list.tracks_ = [];
 
   Object.defineProperty(list, 'length', {
     get: function() {
@@ -29,7 +34,7 @@ vjs.TextTrackList = function(tracks) {
   });
 
   for (; i < tracks.length; i++) {
-    this.addTrack_(tracks[i]);
+    list.addTrack_(tracks[i]);
   }
 
   if (vjs.IS_IE8) {
