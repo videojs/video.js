@@ -75,6 +75,7 @@ vjs.SeekBar.prototype.onMouseDown = function(event){
   vjs.Slider.prototype.onMouseDown.call(this, event);
 
   this.player_.scrubbing = true;
+  this.player_.addClass('vjs-scrubbing');
 
   this.videoWasPlaying = !this.player_.paused();
   this.player_.pause();
@@ -94,6 +95,7 @@ vjs.SeekBar.prototype.onMouseUp = function(event){
   vjs.Slider.prototype.onMouseUp.call(this, event);
 
   this.player_.scrubbing = false;
+  this.player_.removeClass('vjs-scrubbing');
   if (this.videoWasPlaying) {
     this.player_.play();
   }
