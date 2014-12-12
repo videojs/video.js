@@ -9,10 +9,15 @@
  */
 
 vjs.TextTrackCueList = function(cues) {
-  var list = this;
+  var list = this,
+      prop;
 
   if (vjs.IS_IE8) {
     list = document.createElement('custom');
+
+    for (prop in vjs.TextTrackCueList.prototype) {
+      list[prop] = vjs.TextTrackCueList.prototype[prop];
+    }
   }
 
   vjs.TextTrackCueList.prototype.setCues_.call(list, cues);
