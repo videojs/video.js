@@ -122,6 +122,15 @@ During a Video.js player instantiation you can force it to localize to a specifi
 </video>
 ```
 
+Localization in Plugins
+-----------------------
+
+When you're developing a plugin, you can also introduce new localized strings. Simply wrap the string with the `localize` function:
+
+```javascript
+var details = '<div class="vjs-errors-details">' + this.localize('Technical details') + '</div>';
+```
+
 Language Codes
 --------------
 The following is a list of official language codes. 
