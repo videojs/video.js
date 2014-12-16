@@ -86,6 +86,11 @@ vjs.MediaTechController = vjs.Component.extend({
 
     this.textTracks().addEventListener('removetrack', textTrackListChanges);
     this.textTracks().addEventListener('addtrack', textTrackListChanges);
+    this.on('dispose', vjs.bind(this, function() {
+      this.textTracks().removeEventListener('removetrack', textTrackListChanges);
+      this.textTracks().removeEventListener('addtrack', textTrackListChanges);
+      this.textTracks().removeEventListener('change', textTracksChanges);
+    }));
   }
 });
 
