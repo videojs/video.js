@@ -76,7 +76,9 @@ vjs.MediaTechController = vjs.Component.extend({
     }
 
     textTrackListChanges = function() {
-      textTrackDisplay.updateDisplay();
+      if (textTrackDisplay) {
+        textTrackDisplay.updateDisplay();
+      }
 
       var controlBar = player.getChild('controlBar');
       if (!controlBar) {
