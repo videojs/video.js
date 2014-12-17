@@ -142,7 +142,7 @@ vjs.TextTrack = function(options) {
     set: Function.prototype
   });
 
-  this.player_.on('dispose', function() {
+  tt.player_.on('dispose', function() {
     this.player_.off('timeupdate', timeupdateHandler);
   });
 
