@@ -195,7 +195,10 @@ vjs.TextTrackButton.prototype.createItems = function(){
 
   for (var i = 0; i < this.player_.textTracks().length; i++) {
     track = this.player_.textTracks()[i];
-    if (getProp(track, 'kind') === this.kind_) {
+
+    // only add tracks that are of the appropriate kind and have a label
+    if (getProp(track, 'kind') === this.kind_
+        && getProp(track, 'label')) {
       items.push(new vjs.TextTrackMenuItem(this.player_, {
         'track': track
       }));
