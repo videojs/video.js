@@ -61,7 +61,8 @@ vjs.MediaTechController = vjs.Component.extend({
       textTracksChanges = function() {
         var i, track;
 
-        window.WebVTT.processCues(window, [], textTrackDisplay.el());
+        textTrackDisplay.updateDisplay();
+
         for (i = 0; i < this.length; i++) {
           track = this[i];
           track.removeEventListener('cuechange', vjs.bind(track, processCues));
@@ -75,6 +76,8 @@ vjs.MediaTechController = vjs.Component.extend({
     }
 
     textTrackListChanges = function() {
+      textTrackDisplay.updateDisplay();
+
       var controlBar = player.getChild('controlBar');
       if (!controlBar) {
         return;

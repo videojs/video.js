@@ -50,7 +50,9 @@ vjs.TextTrackDisplay.prototype.createEl = function(){
 };
 
 vjs.TextTrackDisplay.prototype.clearDisplay = function() {
-  window.WebVTT.processCues(window, [], this.el_);
+  if (typeof window.WebVTT === 'function') {
+    window.WebVTT.processCues(window, [], this.el_);
+  }
 };
 
 // Add cue HTML to display
@@ -91,6 +93,10 @@ vjs.TextTrackDisplay.prototype.updateDisplay = function() {
 };
 
 vjs.TextTrackDisplay.prototype.updateForTrack = function(track) {
+  if (typeof window.WebVTT !== 'function') {
+    return;
+  }
+
   var i = 0,
       property,
       cueDiv,
