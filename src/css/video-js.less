@@ -777,6 +777,10 @@ easily in the skin designer. http://designer.videojs.com/
 .vjs-default-skin .vjs-control-content .vjs-menu.vjs-lock-showing {
   display: block;
 }
+/* prevent menus from opening while scrubbing (FF, IE) */
+.vjs-default-skin.vjs-scrubbing .vjs-menu-button:hover .vjs-control-content .vjs-menu {
+  display: none;
+}
 .vjs-default-skin .vjs-menu-button ul li {
   list-style: none;
   margin: 0;
