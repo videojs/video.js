@@ -23,7 +23,7 @@
  */
 
 vjs.TextTrack = function(options) {
-  var tt, id, mode, kind, label, language, cues, activeCues, player, timeupdateHandler, changed, prop;
+  var tt, id, mode, kind, label, language, cues, activeCues, timeupdateHandler, changed, prop;
 
   tt = this;
   if (vjs.IS_IE8) {
@@ -36,14 +36,13 @@ vjs.TextTrack = function(options) {
 
   options = options || {};
 
-  player = options.player || {
-    on: Function.prototype
-  };
+  this.player_ = options.player;
+
   mode = vjs.TextTrackMode[options.mode] || 'disabled';
   kind = vjs.TextTrackKind[options.kind] || 'subtitles';
   label = options.label || '';
   language = options.language || '';
-  id = options.id || '';
+  id = options.id || 'vjs_text_track_' + vjs.guid++;
 
   tt.cues_ = [];
   tt.activeCues_ = [];
@@ -56,6 +55,7 @@ vjs.TextTrack = function(options) {
     this.activeCues;
     if (changed) {
       this.trigger('cuechange');
+      this.updateDisplay();
       changed = false;
     }
   });
@@ -98,7 +98,7 @@ vjs.TextTrack = function(options) {
       }
       mode = newMode;
       if (mode === 'showing') {
-        player.on('timeupdate', timeupdateHandler);
+        this.player_.on('timeupdate', timeupdateHandler);
       }
       this.trigger('modechange');
     }
@@ -119,7 +119,7 @@ vjs.TextTrack = function(options) {
         return activeCues; // nothing to do
       }
 
-      ct = player.currentTime();
+      ct = this.player_.currentTime();
       i = 0;
       l = this.cues.length;
       active = [];
@@ -142,8 +142,8 @@ vjs.TextTrack = function(options) {
     set: Function.prototype
   });
 
-  player.on('dispose', function() {
-    player.off('timeupdate', timeupdateHandler);
+  this.player_.on('dispose', function() {
+    this.player_.off('timeupdate', timeupdateHandler);
   });
 
   if (options.src) {
@@ -189,6 +189,84 @@ vjs.TextTrack.prototype.removeCue = function(removeCue) {
   }
 
   this.cues.setCues_(this.cues_);
+};
+
+// Add cue HTML to display
+var constructColor = function(color, opacity) {
+  return 'rgba(' +
+    // color looks like "#f0e"
+    parseInt(color[1] + color[1], 16) + ',' +
+    parseInt(color[2] + color[2], 16) + ',' +
+    parseInt(color[3] + color[3], 16) + ',' +
+    opacity + ')';
+};
+var darkGray = '#222';
+var lightGray = '#ccc';
+var fontMap = {
+  monospace:             'monospace',
+  sansSerif:             'sans-serif',
+  serif:                 'serif',
+  monospaceSansSerif:    '"Andale Mono", "Lucida Console", monospace',
+  monospaceSerif:        '"Courier New", monospace',
+  proportionalSansSerif: 'sans-serif',
+  proportionalSerif:     'serif',
+  casual:                '"Comic Sans MS", Impact, fantasy',
+  script:                '"Monotype Corsiva", cursive',
+  smallcaps:             '"Andale Mono", "Lucida Console", monospace, sans-serif'
+};
+
+vjs.TextTrack.prototype.updateDisplay = function() {
+  var i = this.activeCues_.length,
+      property,
+      cueDiv,
+      overrides = this.player_.textTrackSettings.getValues();
+
+  window.WebVTT.processCues(window, this.activeCues_, this.el_);
+  while (i--) {
+    cueDiv = this.activeCues_[i].displayState;
+    if (overrides.color) {
+      cueDiv.firstChild.style.color = overrides.color;
+    }
+    if (overrides.textOpacity) {
+      cueDiv.firstChild.style.color = constructColor(overrides.color || '#fff',
+                                                     overrides.textOpacity);
+    }
+    if (overrides.backgroundColor) {
+      cueDiv.firstChild.style.backgroundColor = overrides.backgroundColor;
+    }
+    if (overrides.backgroundOpacity) {
+      cueDiv.firstChild.style.backgroundColor = constructColor(overrides.backgroundColor || '#000',
+                                                               overrides.backgroundOpacity);
+    }
+    if (overrides.windowColor) {
+      if (overrides.windowOpacity) {
+        cueDiv.style.backgroundColor = constructColor(overrides.windowColor, overrides.windowOpacity);
+      } else {
+        cueDiv.style.backgroundColor = overrides.windowColor;
+      }
+    }
+    if (overrides.edgeStyle) {
+      if (overrides.edgeStyle === 'dropshadow') {
+        cueDiv.firstChild.style.textShadow = '2px 2px 3px ' + darkGray + ', 2px 2px 4px ' + darkGray + ', 2px 2px 5px ' + darkGray;
+      } else if (overrides.edgeStyle === 'raised') {
+        cueDiv.firstChild.style.textShadow = '1px 1px ' + darkGray + ', 2px 2px ' + darkGray + ', 3px 3px ' + darkGray;
+      } else if (overrides.edgeStyle === 'depressed') {
+        cueDiv.firstChild.style.textShadow = '1px 1px ' + lightGray + ', 0 1px ' + lightGray + ', -1px -1px ' + darkGray + ', 0 -1px ' + darkGray;
+      } else if (overrides.edgeStyle === 'uniform') {
+        cueDiv.firstChild.style.textShadow = '0 0 4px ' + darkGray + ', 0 0 4px ' + darkGray + ', 0 0 4px ' + darkGray + ', 0 0 4px ' + darkGray;
+      }
+    }
+    if (overrides.fontSize) {
+      cueDiv.firstChild.style.fontSize = overrides.fontSize;
+    }
+    if (overrides.fontFamily && overrides.fontFamily !== 'default') {
+      if (overrides.fontFamily === 'small-caps') {
+        cueDiv.firstChild.style.fontVariant = 'small-caps';
+      } else {
+        cueDiv.firstChild.style.fontFamily = fontMap[overrides.fontFamily];
+      }
+    }
+  }
 };
 
 /*

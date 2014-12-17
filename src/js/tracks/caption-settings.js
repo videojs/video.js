@@ -95,7 +95,7 @@
     while (i--) {
       textTracks[i].updateDisplay();
     }
-  });
+  };
 
   function getSelectedOptionValue(target) {
     var selectedOption;

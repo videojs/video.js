@@ -1152,7 +1152,7 @@ vjs.Player.prototype.src = function(source){
 
         // The setSource tech method was added with source handlers
         // so older techs won't support it
-        if (this.tech['setSource']) {
+        if (window['videojs'][this.techName].prototype.hasOwnProperty('setSource')) {
           this.techCall('setSource', source);
         } else {
           this.techCall('src', source.src);

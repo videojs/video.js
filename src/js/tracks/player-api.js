@@ -65,6 +65,7 @@ vjs.Player.prototype.showTextTrack = function(id, disableSameKind){
 
     if (track.id === id || track.language === id) {
       track.mode = 'showing';
+      kind = track.kind;
     // Disable tracks of the same kind
     } else if (disableSameKind && track.kind === disableSameKind && (mode === 'showing')) {
       track.mode = 'disabled';

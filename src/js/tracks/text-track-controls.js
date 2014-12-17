@@ -1,3 +1,5 @@
+(function() {
+'use strict';
 var getProp = function(obj, prop) {
   return (typeof obj[prop] === 'function') ? obj[prop]() : obj[prop];
 };
@@ -68,12 +70,14 @@ vjs.TextTrackMenuItem = vjs.MenuItem.extend({
 });
 
 vjs.TextTrackMenuItem.prototype.onClick = function(){
+  var kind = getProp(this.track, 'kind');
   vjs.MenuItem.prototype.onClick.call(this);
-  this.player_.showTextTrack(this.track.id_ || this.track.language, getProp(this.track, 'kind'));
+  this.player_.showTextTrack(this.track.id || this.track.language, kind);
+  this.player_.trigger(kind + 'trackchange');
 };
 
 vjs.TextTrackMenuItem.prototype.update = function(){
-  this.selected(getProp(this.track, 'mode') == 2);
+  this.selected(getProp(this.track, 'mode') === 'showing');
 };
 
 /**
@@ -110,7 +114,7 @@ vjs.OffTextTrackMenuItem.prototype.update = function(){
 
   for (;i<j;i++) {
     track = tracks[i];
-    if (getProp(track, 'kind') === getProp(this.track, 'kind') && getProp(track, 'mode') == 2) {
+    if (getProp(track, 'kind') === getProp(this.track, 'kind') && getProp(track, 'mode') === 'showing') {
       off = false;
     }
   }
@@ -129,6 +133,7 @@ vjs.CaptionSettingsMenuItem = vjs.TextTrackMenuItem.extend({
     };
 
     vjs.TextTrackMenuItem.call(this, player, options);
+    this.addClass('vjs-texttrack-settings');
   }
 });
 
@@ -181,12 +186,12 @@ vjs.TextTrackButton = vjs.MenuButton.extend({
 vjs.TextTrackButton.prototype.createItems = function(){
   var items = [], track;
 
-  // Add an OFF menu item to turn all tracks off
-  items.push(new vjs.OffTextTrackMenuItem(this.player_, { 'kind': this.kind_ }));
-
   if (this instanceof vjs.CaptionsButton && !(this.player().tech && this.player().tech.featuresTextTracks)) {
     items.push(new vjs.CaptionSettingsMenuItem(this.player_, { 'kind': this.kind_ }));
   }
+
+  // Add an OFF menu item to turn all tracks off
+  items.push(new vjs.OffTextTrackMenuItem(this.player_, { 'kind': this.kind_ }));
 
   for (var i = 0; i < this.player_.textTracks().length; i++) {
     track = this.player_.textTracks()[i];
@@ -372,10 +377,4 @@ vjs.ChaptersTrackMenuItem.prototype.update = function(){
   // vjs.log(currentTime, cue.startTime);
   this.selected(cue.startTime <= currentTime && currentTime < cue.endTime);
 };
-
-// vjs.Cue = vjs.Component.extend({
-//   /** @constructor */
-//   init: function(player, options){
-//     vjs.Component.call(this, player, options);
-//   }
-// });
+})();

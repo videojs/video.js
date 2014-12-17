@@ -46,11 +46,12 @@ vjs.MediaTechController = vjs.Component.extend({
 
       processCues = (function(trackDisplay) {
         return function() {
-          var cues = [],
+          var track = this,
+              cues = [],
               i = 0;
 
-          for (; i < this.activeCues.length; i++) {
-            cues.push(this.activeCues[i]);
+          for (; i < track.activeCues.length; i++) {
+            cues.push(track.activeCues[i]);
           }
 
           window.WebVTT.processCues(window, cues, trackDisplay);
@@ -86,6 +87,7 @@ vjs.MediaTechController = vjs.Component.extend({
 
     this.textTracks().addEventListener('removetrack', textTrackListChanges);
     this.textTracks().addEventListener('addtrack', textTrackListChanges);
+
     this.on('dispose', vjs.bind(this, function() {
       this.textTracks().removeEventListener('removetrack', textTrackListChanges);
       this.textTracks().removeEventListener('addtrack', textTrackListChanges);
