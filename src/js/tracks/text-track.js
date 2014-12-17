@@ -36,7 +36,7 @@ vjs.TextTrack = function(options) {
 
   options = options || {};
 
-  this.player_ = options.player;
+  tt.player_ = options.player;
 
   mode = vjs.TextTrackMode[options.mode] || 'disabled';
   kind = vjs.TextTrackKind[options.kind] || 'subtitles';

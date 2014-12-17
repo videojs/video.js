@@ -330,7 +330,6 @@ vjs.Html5.prototype.textTracks = function() {
   }
 
   return this.el_.textTracks;
-}
 };
 vjs.Html5.prototype.addTextTrack = function(kind, label, language) {
   if (!this['featuresTextTracks']) {
