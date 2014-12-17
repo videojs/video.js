@@ -88,12 +88,9 @@
   };
 
   vjs.TextTrackSettings.prototype.updateDisplay = function() {
-    var i, textTracks;
-    textTracks = this.player().textTracks();
-    i = textTracks.length;
-
-    while (i--) {
-      textTracks[i].updateDisplay();
+    var ttDisplay = this.player_.getChild('textTrackDisplay');
+    if (ttDisplay) {
+      ttDisplay.updateDisplay();
     }
   };
 

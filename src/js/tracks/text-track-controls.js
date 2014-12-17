@@ -49,6 +49,108 @@ vjs.TextTrackDisplay.prototype.createEl = function(){
   });
 };
 
+vjs.TextTrackDisplay.prototype.clearDisplay = function() {
+  window.WebVTT.processCues(window, [], this.el_);
+};
+
+// Add cue HTML to display
+var constructColor = function(color, opacity) {
+  return 'rgba(' +
+    // color looks like "#f0e"
+    parseInt(color[1] + color[1], 16) + ',' +
+    parseInt(color[2] + color[2], 16) + ',' +
+    parseInt(color[3] + color[3], 16) + ',' +
+    opacity + ')';
+};
+var darkGray = '#222';
+var lightGray = '#ccc';
+var fontMap = {
+  monospace:             'monospace',
+  sansSerif:             'sans-serif',
+  serif:                 'serif',
+  monospaceSansSerif:    '"Andale Mono", "Lucida Console", monospace',
+  monospaceSerif:        '"Courier New", monospace',
+  proportionalSansSerif: 'sans-serif',
+  proportionalSerif:     'serif',
+  casual:                '"Comic Sans MS", Impact, fantasy',
+  script:                '"Monotype Corsiva", cursive',
+  smallcaps:             '"Andale Mono", "Lucida Console", monospace, sans-serif'
+};
+
+vjs.TextTrackDisplay.prototype.updateDisplay = function() {
+  var tracks = this.player_.textTracks(),
+      i = 0,
+      track;
+
+  this.clearDisplay();
+
+  for (; i < tracks.length; i++) {
+    track = tracks[i];
+    this.updateForTrack(track);
+  }
+};
+
+vjs.TextTrackDisplay.prototype.updateForTrack = function(track) {
+  var i = 0,
+      property,
+      cueDiv,
+      overrides = this.player_.textTrackSettings.getValues(),
+      cues = [];
+
+  for (; i < track.activeCues.length; i++) {
+    cues.push(track.activeCues[i]);
+  }
+
+  window.WebVTT.processCues(window, track.activeCues, this.el_);
+
+  i = cues.length;
+  while (i--) {
+    cueDiv = cues[i].displayState;
+    if (overrides.color) {
+      cueDiv.firstChild.style.color = overrides.color;
+    }
+    if (overrides.textOpacity) {
+      cueDiv.firstChild.style.color = constructColor(overrides.color || '#fff',
+                                                     overrides.textOpacity);
+    }
+    if (overrides.backgroundColor) {
+      cueDiv.firstChild.style.backgroundColor = overrides.backgroundColor;
+    }
+    if (overrides.backgroundOpacity) {
+      cueDiv.firstChild.style.backgroundColor = constructColor(overrides.backgroundColor || '#000',
+                                                               overrides.backgroundOpacity);
+    }
+    if (overrides.windowColor) {
+      if (overrides.windowOpacity) {
+        cueDiv.style.backgroundColor = constructColor(overrides.windowColor, overrides.windowOpacity);
+      } else {
+        cueDiv.style.backgroundColor = overrides.windowColor;
+      }
+    }
+    if (overrides.edgeStyle) {
+      if (overrides.edgeStyle === 'dropshadow') {
+        cueDiv.firstChild.style.textShadow = '2px 2px 3px ' + darkGray + ', 2px 2px 4px ' + darkGray + ', 2px 2px 5px ' + darkGray;
+      } else if (overrides.edgeStyle === 'raised') {
+        cueDiv.firstChild.style.textShadow = '1px 1px ' + darkGray + ', 2px 2px ' + darkGray + ', 3px 3px ' + darkGray;
+      } else if (overrides.edgeStyle === 'depressed') {
+        cueDiv.firstChild.style.textShadow = '1px 1px ' + lightGray + ', 0 1px ' + lightGray + ', -1px -1px ' + darkGray + ', 0 -1px ' + darkGray;
+      } else if (overrides.edgeStyle === 'uniform') {
+        cueDiv.firstChild.style.textShadow = '0 0 4px ' + darkGray + ', 0 0 4px ' + darkGray + ', 0 0 4px ' + darkGray + ', 0 0 4px ' + darkGray;
+      }
+    }
+    if (overrides.fontSize) {
+      cueDiv.firstChild.style.fontSize = overrides.fontSize;
+    }
+    if (overrides.fontFamily && overrides.fontFamily !== 'default') {
+      if (overrides.fontFamily === 'small-caps') {
+        cueDiv.firstChild.style.fontVariant = 'small-caps';
+      } else {
+        cueDiv.firstChild.style.fontFamily = fontMap[overrides.fontFamily];
+      }
+    }
+  }
+};
+
 
 /**
  * The specific menu item type for selecting a language within a text track kind
