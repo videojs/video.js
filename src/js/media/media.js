@@ -374,6 +374,7 @@ vjs.MediaTechController.prototype.addRemoteTextTrack = function(options) {
 };
 
 vjs.MediaTechController.prototype.removeRemoteTextTrack = function(track) {
+  this.textTracks().removeTrack_(track);
   this.remoteTextTracks().removeTrack_(track);
 };
 
