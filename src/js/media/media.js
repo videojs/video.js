@@ -44,20 +44,6 @@ vjs.MediaTechController = vjs.Component.extend({
         window.WebVTT = true;
       }
 
-      processCues = (function(trackDisplay) {
-        return function() {
-          var track = this,
-              cues = [],
-              i = 0;
-
-          for (; i < track.activeCues.length; i++) {
-            cues.push(track.activeCues[i]);
-          }
-
-          window.WebVTT.processCues(window, cues, trackDisplay);
-        };
-      })(textTrackDisplay.el());
-
       textTracksChanges = function() {
         var i, track;
 
@@ -65,9 +51,9 @@ vjs.MediaTechController = vjs.Component.extend({
 
         for (i = 0; i < this.length; i++) {
           track = this[i];
-          track.removeEventListener('cuechange', vjs.bind(track, processCues));
+          track.removeEventListener('cuechange', vjs.bind(textTrackDisplay, textTrackDisplay.updateDisplay));
           if (track.mode === 'showing') {
-            track.addEventListener('cuechange', vjs.bind(track, processCues));
+            track.addEventListener('cuechange', vjs.bind(textTrackDisplay, textTrackDisplay.updateDisplay));
           }
         }
       };

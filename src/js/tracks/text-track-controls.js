@@ -88,7 +88,9 @@ vjs.TextTrackDisplay.prototype.updateDisplay = function() {
 
   for (; i < tracks.length; i++) {
     track = tracks[i];
-    this.updateForTrack(track);
+    if (track.mode === 'showing') {
+      this.updateForTrack(track);
+    }
   }
 };
 
