@@ -173,7 +173,7 @@ _inherited from_: [src/js/component.js#L826](https://github.com/videojs/video.js
 * `String` The autoplay attribute value when getting
 * `vjs.Player` Returns the player when setting
 
-_defined in_: [src/js/player.js#L1273](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1273)
+_defined in_: [src/js/player.js#L1275](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1275)
 
 ---
 
@@ -305,7 +305,7 @@ _inherited from_: [src/js/component.js#L239](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Boolean` Controls are showing
 
-_defined in_: [src/js/player.js#L1353](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1353)
+_defined in_: [src/js/player.js#L1355](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1355)
 
 ---
 
@@ -330,7 +330,7 @@ _inherited from_: [src/js/component.js#L200](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `String` The current source
 
-_defined in_: [src/js/player.js#L1240](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1240)
+_defined in_: [src/js/player.js#L1242](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1242)
 
 ---
 
@@ -362,7 +362,7 @@ _defined in_: [src/js/player.js#L702](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `String` The source MIME type
 
-_defined in_: [src/js/player.js#L1250](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1250)
+_defined in_: [src/js/player.js#L1252](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1252)
 
 ---
 
@@ -456,7 +456,7 @@ _inherited from_: [src/js/component.js#L1120](https://github.com/videojs/video.j
 ##### RETURNS: 
 * `Boolean` True if the player is in the ended state, false if not.
 
-_defined in_: [src/js/player.js#L1474](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1474)
+_defined in_: [src/js/player.js#L1476](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1476)
 
 ---
 
@@ -470,7 +470,7 @@ _defined in_: [src/js/player.js#L1474](https://github.com/videojs/video.js/blob/
 * `vjs.MediaError|null` when getting
 * `vjs.Player` when setting
 
-_defined in_: [src/js/player.js#L1438](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1438)
+_defined in_: [src/js/player.js#L1440](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1440)
 
 ---
 
@@ -671,7 +671,7 @@ _defined in_: [src/js/player.js#L124](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `vjs.Player` Returns the player
 
-_defined in_: [src/js/player.js#L1230](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1230)
+_defined in_: [src/js/player.js#L1232](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1232)
 
 ---
 
@@ -685,7 +685,7 @@ _defined in_: [src/js/player.js#L1230](https://github.com/videojs/video.js/blob/
 * `String` The loop attribute value when getting
 * `vjs.Player` Returns the player when setting
 
-_defined in_: [src/js/player.js#L1287](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1287)
+_defined in_: [src/js/player.js#L1289](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1289)
 
 ---
 
@@ -905,7 +905,7 @@ _defined in_: [src/js/player.js#L659](https://github.com/videojs/video.js/blob/m
 * `Number` Returns the new playback rate when setting
 * `Number` Returns the current playback rate when getting
 
-_defined in_: [src/js/player.js#L1616](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1616)
+_defined in_: [src/js/player.js#L1618](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1618)
 
 ---
 
@@ -937,7 +937,7 @@ _inherited from_: [src/js/component.js#L126](https://github.com/videojs/video.js
 * `String` poster URL when getting
 * `vjs.Player` self when setting
 
-_defined in_: [src/js/player.js#L1318](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1318)
+_defined in_: [src/js/player.js#L1320](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1320)
 
 ---
 
@@ -951,7 +951,7 @@ _defined in_: [src/js/player.js#L1318](https://github.com/videojs/video.js/blob/
 * `String` The preload attribute value when getting
 * `vjs.Player` Returns the player when setting
 
-_defined in_: [src/js/player.js#L1259](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1259)
+_defined in_: [src/js/player.js#L1261](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1261)
 
 ---
 
@@ -1042,7 +1042,7 @@ _defined in_: [src/js/player.js#L959](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `Boolean` True if the player is in the seeking state, false if not.
 
-_defined in_: [src/js/player.js#L1480](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1480)
+_defined in_: [src/js/player.js#L1482](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1482)
 
 ---
 

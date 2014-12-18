@@ -4768,7 +4768,9 @@ vjs.Player.prototype.src = function(source){
 
         // The setSource tech method was added with source handlers
         // so older techs won't support it
-        if (this.tech['setSource']) {
+        // We need to check the direct prototype for the case where subclasses
+        // of the tech do not support source handlers
+        if (window['videojs'][this.techName].prototype.hasOwnProperty('setSource')) {
           this.techCall('setSource', source);
         } else {
           this.techCall('src', source.src);
@@ -6050,11 +6052,11 @@ vjs.PlaybackRateMenuButton = vjs.MenuButton.extend({
   }
 });
 
+vjs.PlaybackRateMenuButton.prototype.buttonText = 'Playback Rate';
+vjs.PlaybackRateMenuButton.prototype.className = 'vjs-playback-rate';
+
 vjs.PlaybackRateMenuButton.prototype.createEl = function(){
-  var el = vjs.Component.prototype.createEl.call(this, 'div', {
-    className: 'vjs-playback-rate vjs-menu-button vjs-control',
-    innerHTML: '<div class="vjs-control-content"><span class="vjs-control-text">' + this.localize('Playback Rate') + '</span></div>'
-  });
+  var el = vjs.MenuButton.prototype.createEl.call(this);
 
   this.labelEl_ = vjs.createEl('div', {
     className: 'vjs-playback-rate-value',
