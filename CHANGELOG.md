@@ -6,6 +6,10 @@ CHANGELOG
 
 --------------------
 
+## 4.11.2 (2014-12-17)
+* @mmcc fixed a bug where the playback rate menu would not open ([view](https://github.com/videojs/video.js/pull/1716))
+* @gkatsev fixed an issue with source handlers that caused subclasses of source handler classes to break ([view](https://github.com/videojs/video.js/pull/1746))
+
 ## 4.11.1 (2014-12-04)
 * @heff fixed a code bug in track XHR requests ([view](https://github.com/videojs/video.js/pull/1715))
 
