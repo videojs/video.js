@@ -37,28 +37,30 @@ vjs.Html5 = vjs.MediaTechController.extend({
       this.setSource(source);
     }
 
-    if (!this['featuresTextTracks']) {
-    // Empty video tag tracks so the built-in player doesn't use them also.
-    // This may not be fast enough to stop HTML5 browsers from reading the tags
-    // so we'll need to turn off any default tracks if we're manually doing
-      // captions and subtitles. videoElement.textTracks
-      if (this.el_.hasChildNodes()) {
+    if (this.el_.hasChildNodes()) {
 
-        nodes = this.el_.childNodes;
-        nodesLength = nodes.length;
-        removeNodes = [];
+      nodes = this.el_.childNodes;
+      nodesLength = nodes.length;
+      removeNodes = [];
 
-        while (nodesLength--) {
-          node = nodes[nodesLength];
-          nodeName = node.nodeName.toLowerCase();
-          if (nodeName === 'track') {
+      while (nodesLength--) {
+        node = nodes[nodesLength];
+        nodeName = node.nodeName.toLowerCase();
+        if (nodeName === 'track') {
+          if (!this['featuresTextTracks']) {
+            // Empty video tag tracks so the built-in player doesn't use them also.
+            // This may not be fast enough to stop HTML5 browsers from reading the tags
+            // so we'll need to turn off any default tracks if we're manually doing
+            // captions and subtitles. videoElement.textTracks
             removeNodes.push(node);
+          } else {
+            this.remoteTextTracks().addTrack_(node.track);
           }
         }
+      }
 
-        for (i=0; i<removeNodes.length; i++) {
-          this.el_.removeChild(removeNodes[i]);
-        }
+      for (i=0; i<removeNodes.length; i++) {
+        this.el_.removeChild(removeNodes[i]);
       }
     }
 
