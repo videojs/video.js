@@ -127,9 +127,20 @@ vjs.TextTrack = function(options) {
         cue = this.cues[i];
         if (cue.startTime <= ct && cue.endTime >= ct) {
           active.push(cue);
+        } else if (cue.startTime === cue.endTime && cue.startTime <= ct && cue.startTime + 0.5 >= ct) {
+          active.push(cue);
         }
-        if (active[i] !== this.activeCues_[i]) {
-          changed = true;
+      }
+
+      changed = false;
+
+      if (active.length !== this.activeCues_.length) {
+        changed = true;
+      } else {
+        for (i = 0; i < active.length; i++) {
+          if (indexOf.call(this.activeCues_, active[i]) === -1) {
+            changed = true;
+          }
         }
       }
 
@@ -193,7 +204,7 @@ vjs.TextTrack.prototype.removeCue = function(removeCue) {
 /*
  * Downloading stuff happens below this point
  */
-var loadTrack, parseCues;
+var loadTrack, parseCues, indexOf;
 
 loadTrack = function(src, track) {
   vjs.xhr(src, vjs.bind(this, function(err, response, responseBody){
@@ -224,6 +235,43 @@ parseCues = function(srcContent, track) {
 
   parser.parse(srcContent);
   parser.flush();
+};
+
+indexOf = function(searchElement, fromIndex) {
+
+  var k;
+
+  if (this == null) {
+    throw new TypeError('"this" is null or not defined');
+  }
+
+  var O = Object(this);
+
+  var len = O.length >>> 0;
+
+  if (len === 0) {
+    return -1;
+  }
+
+  var n = +fromIndex || 0;
+
+  if (Math.abs(n) === Infinity) {
+    n = 0;
+  }
+
+  if (n >= len) {
+    return -1;
+  }
+
+  k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
+
+  while (k < len) {
+    if (k in O && O[k] === searchElement) {
+      return k;
+    }
+    k++;
+  }
+  return -1;
 };
 
 })();
