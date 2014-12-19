@@ -3409,7 +3409,6 @@ vjs.MenuButton.prototype.onClick = function(){
 };
 
 vjs.MenuButton.prototype.onKeyPress = function(event){
-  event.preventDefault();
 
   // Check for space bar (32) or enter (13) keys
   if (event.which == 32 || event.which == 13) {
@@ -3418,11 +3417,13 @@ vjs.MenuButton.prototype.onKeyPress = function(event){
     } else {
       this.pressButton();
     }
+    event.preventDefault();
   // Check for escape (27) key
   } else if (event.which == 27){
     if (this.buttonPressed_){
       this.unpressButton();
     }
+    event.preventDefault();
   }
 };
 
@@ -7718,8 +7719,8 @@ vjs.Flash.rtmpSourceHandler.canHandleSource = function(source){
 vjs.Flash.rtmpSourceHandler.handleSource = function(source, tech){
   var srcParts = vjs.Flash.streamToParts(source.src);
 
-  tech.setRtmpConnection(srcParts.connection);
-  tech.setRtmpStream(srcParts.stream);
+  tech['setRtmpConnection'](srcParts.connection);
+  tech['setRtmpStream'](srcParts.stream);
 };
 
 // Register the native source handler
