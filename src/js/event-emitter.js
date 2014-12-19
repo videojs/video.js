@@ -5,7 +5,10 @@ vjs.EventEmitter.prototype.allowedEvents_ = {
 };
 
 vjs.EventEmitter.prototype.on = function(type, fn) {
+  var ael = this.addEventListener;
+  this.addEventListener = Function.prototype;
   vjs.on(this, type, fn);
+  this.addEventListener = ael;
 };
 vjs.EventEmitter.prototype.addEventListener = vjs.EventEmitter.prototype.on;
 
