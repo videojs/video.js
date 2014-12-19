@@ -330,10 +330,6 @@ vjs.MediaTechController.prototype.remoteTextTracks = function() {
 };
 
 createTrackHelper = function(self, kind, label, language, options) {
-  if (!kind) {
-    throw new Error('TextTrack kind is required but was not provided');
-  }
-
   var tracks = self.textTracks(),
       track;
 
@@ -355,6 +351,10 @@ createTrackHelper = function(self, kind, label, language, options) {
 };
 
 vjs.MediaTechController.prototype.addTextTrack = function(kind, label, language) {
+  if (!kind) {
+    throw new Error('TextTrack kind is required but was not provided');
+  }
+
   return createTrackHelper(this, kind, label, language);
 };
 
