@@ -25,6 +25,12 @@
 vjs.TextTrack = function(options) {
   var tt, id, mode, kind, label, language, cues, activeCues, timeupdateHandler, changed, prop;
 
+  options = options || {};
+
+  if (!options.player) {
+    throw new Error('A player was not provided.');
+  }
+
   tt = this;
   if (vjs.IS_IE8) {
     tt = document.createElement('custom');
@@ -33,8 +39,6 @@ vjs.TextTrack = function(options) {
       tt[prop] = vjs.TextTrack.prototype[prop];
     }
   }
-
-  options = options || {};
 
   tt.player_ = options.player;
 

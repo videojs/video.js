@@ -4,7 +4,21 @@
 module('Text Track');
 
 var TT = vjs.TextTrack,
-    noop = Function.prototype;
+    noop = Function.prototype,
+    defaultPlayer = {
+      on: noop,
+      off: noop,
+      currentTime: noop
+    };
+
+
+test('text-track requires a player', function() {
+  throws(function() {
+           new TT()
+         },
+         new Error('A player was not provided.'),
+         'a player is required for text track');
+});
 
 test('can create a TextTrack with various properties', function() {
   var kind = 'captions',
@@ -13,6 +27,7 @@ test('can create a TextTrack with various properties', function() {
       id = '1',
       mode = 'disabled',
       tt = new TT({
+        player: defaultPlayer,
         kind: kind,
         label: label,
         language: language,
@@ -28,7 +43,9 @@ test('can create a TextTrack with various properties', function() {
 });
 
 test('defaults when items not provided', function() {
-  var tt = new TT();
+  var tt = new TT({
+    player: defaultPlayer
+  });
 
   equal(tt.kind, 'subtitles', 'kind defaulted to subtitles');
   equal(tt.mode, 'disabled', 'mode defaulted to disabled');
@@ -38,6 +55,7 @@ test('defaults when items not provided', function() {
 
 test('kind can only be one of several options, defaults to subtitles', function() {
   var tt = new TT({
+    player: defaultPlayer,
     kind: 'foo'
   });
 
@@ -45,30 +63,35 @@ test('kind can only be one of several options, defaults to subtitles', function(
   notEqual(tt.kind, 'foo', 'the kind is set to subtitles, not foo');
 
   tt = new TT({
+    player: defaultPlayer,
     kind: 'subtitles'
   });
 
   equal(tt.kind, 'subtitles', 'the kind is set to subtitles');
 
   tt = new TT({
+    player: defaultPlayer,
     kind: 'captions'
   });
 
   equal(tt.kind, 'captions', 'the kind is set to captions');
 
   tt = new TT({
+    player: defaultPlayer,
     kind: 'descriptions'
   });
 
   equal(tt.kind, 'descriptions', 'the kind is set to descriptions');
 
   tt = new TT({
+    player: defaultPlayer,
     kind: 'chapters'
   });
 
   equal(tt.kind, 'chapters', 'the kind is set to chapters');
 
   tt = new TT({
+    player: defaultPlayer,
     kind: 'metadata'
   });
 
@@ -77,6 +100,7 @@ test('kind can only be one of several options, defaults to subtitles', function(
 
 test('mode can only be one of several options, defaults to disabled', function() {
   var tt = new TT({
+    player: defaultPlayer,
     mode: 'foo'
   });
 
@@ -84,18 +108,21 @@ test('mode can only be one of several options, defaults to disabled', function()
   notEqual(tt.mode, 'foo', 'the mode is set to disabld, not foo');
 
   tt = new TT({
+    player: defaultPlayer,
     mode: 'disabled'
   });
 
   equal(tt.mode, 'disabled', 'the mode is set to disabled');
 
   tt = new TT({
+    player: defaultPlayer,
     mode: 'hidden'
   });
 
   equal(tt.mode, 'hidden', 'the mode is set to hidden');
 
   tt = new TT({
+    player: defaultPlayer,
     mode: 'showing'
   });
 
@@ -109,6 +136,7 @@ test('kind, label, language, id, cue, and activeCues are read only', function() 
       id = '1',
       mode = 'disabled',
       tt = new TT({
+        player: defaultPlayer,
         kind: kind,
         label: label,
         language: language,
@@ -132,7 +160,9 @@ test('kind, label, language, id, cue, and activeCues are read only', function() 
 });
 
 test('mode can only be set to a few options', function() {
-  var tt = new TT();
+  var tt = new TT({
+    player: defaultPlayer
+  });
 
   tt.mode = 'foo';
 
@@ -155,14 +185,18 @@ test('mode can only be set to a few options', function() {
 });
 
 test('cues and activeCues return a TextTrackCueList', function() {
-  var tt = new TT();
+  var tt = new TT({
+    player: defaultPlayer
+  });
 
   ok(tt.cues instanceof vjs.TextTrackCueList, 'cues are a TextTrackCueList');
   ok(tt.activeCues instanceof vjs.TextTrackCueList, 'activeCues are a TextTrackCueList');
 });
 
 test('cues can be added and removed from a TextTrack', function() {
-  var tt = new TT(),
+  var tt = new TT({
+        player: defaultPlayer
+      }),
       cues = tt.cues;
 
   equal(cues.length, 0, 'start with zero cues');
