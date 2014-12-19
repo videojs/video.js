@@ -296,7 +296,7 @@ vjs.TextTrackButton = vjs.MenuButton.extend({
 vjs.TextTrackButton.prototype.createItems = function(){
   var items = [], track;
 
-  if (this instanceof vjs.CaptionsButton && !(this.player().tech && this.player().tech.featuresTextTracks)) {
+  if (this instanceof vjs.CaptionsButton && !(this.player().tech && this.player().tech['featuresNativeTextTracks'])) {
     items.push(new vjs.CaptionSettingsMenuItem(this.player_, { 'kind': this.kind_ }));
   }
 
@@ -339,7 +339,7 @@ vjs.CaptionsButton.prototype.update = function() {
   vjs.TextTrackButton.prototype.update.call(this);
 
   // if native, then threshold is 1 because no settings button
-  if (this.player().tech && this.player().tech.featuresTextTracks) {
+  if (this.player().tech && this.player().tech['featuresNativeTextTracks']) {
     threshold = 1;
   }
 

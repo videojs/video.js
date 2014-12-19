@@ -152,7 +152,7 @@ test('html5 tech supports native text tracks if the video supports it', function
 
   html = new vjs.Html5(player, options);
 
-  ok(html['featuresTextTracks'], 'if textTracks are available on video element, native text tracks are supported');
+  ok(html['featuresNativeTextTracks'], 'if textTracks are available on video element, native text tracks are supported');
 
   vjs.TEST_VID = oldTestVid;
   vjs.Html5.prototype.textTracks = oldTextTracks;
@@ -216,7 +216,7 @@ test('update texttrack buttons on removetrack or addtrack', function() {
       oldTextTracks,
       events = {};
 
-  vjs.MediaTechController.prototype['featuresTextTracks'] = true;
+  vjs.MediaTechController.prototype['featuresNativeTextTracks'] = true;
   oldTextTracks = videojs.MediaTechController.prototype.textTracks;
   vjs.MediaTechController.prototype.textTracks = function() {
     return {
@@ -266,7 +266,7 @@ test('update texttrack buttons on removetrack or addtrack', function() {
 
   vjs.Player.prototype.getChild = oldGetChild;
   vjs.MediaTechController.prototype.textTracks = oldTextTracks;
-  vjs.MediaTechController.prototype['featuresTextTracks'] = false;
+  vjs.MediaTechController.prototype['featuresNativeTextTracks'] = false;
 });
 
 test('html5 tech supports native text tracks if the video supports it, unless mode is a number', function() {
@@ -310,7 +310,7 @@ test('html5 tech supports native text tracks if the video supports it, unless mo
 
   html = new vjs.Html5(player, options);
 
-  ok(!html['featuresTextTracks'], 'native text tracks are not supported if mode is a number');
+  ok(!html['featuresNativeTextTracks'], 'native text tracks are not supported if mode is a number');
 
   vjs.TEST_VID = oldTestVid;
 });
@@ -350,7 +350,7 @@ test('html5 tech supports native text tracks if the video supports it, unless it
   vjs.IS_FIREFOX = true;
   html = new vjs.Html5(player, options);
 
-  ok(!html['featuresTextTracks'], 'if textTracks are available on video element, native text tracks are supported');
+  ok(!html['featuresNativeTextTracks'], 'if textTracks are available on video element, native text tracks are supported');
 
   vjs.TEST_VID = oldTestVid;
   vjs.IS_FIREFOX = oldIsFirefox;
@@ -528,7 +528,7 @@ test('html5 tech supports native text tracks if the video supports it', function
 
   html = new vjs.Html5(player, options);
 
-  ok(html['featuresTextTracks'], 'if textTracks are available on video element, native text tracks are supported');
+  ok(html['featuresNativeTextTracks'], 'if textTracks are available on video element, native text tracks are supported');
 
   vjs.TEST_VID = oldTestVid;
   vjs.Html5.prototype.textTracks = oldTextTracks;
@@ -592,7 +592,7 @@ test('update texttrack buttons on removetrack or addtrack', function() {
       oldTextTracks,
       events = {};
 
-  vjs.MediaTechController.prototype['featuresTextTracks'] = true;
+  vjs.MediaTechController.prototype['featuresNativeTextTracks'] = true;
   oldTextTracks = videojs.MediaTechController.prototype.textTracks;
   vjs.MediaTechController.prototype.textTracks = function() {
     return {
@@ -642,7 +642,7 @@ test('update texttrack buttons on removetrack or addtrack', function() {
 
   vjs.Player.prototype.getChild = oldGetChild;
   vjs.MediaTechController.prototype.textTracks = oldTextTracks;
-  vjs.MediaTechController.prototype['featuresTextTracks'] = false;
+  vjs.MediaTechController.prototype['featuresNativeTextTracks'] = false;
 });
 
 test('html5 tech supports native text tracks if the video supports it, unless mode is a number', function() {
@@ -684,7 +684,7 @@ test('html5 tech supports native text tracks if the video supports it, unless mo
 
   html = new vjs.Html5(player, options);
 
-  ok(!html['featuresTextTracks'], 'native text tracks are not supported if mode is a number');
+  ok(!html['featuresNativeTextTracks'], 'native text tracks are not supported if mode is a number');
 
   vjs.TEST_VID = oldTestVid;
 });
@@ -722,7 +722,7 @@ test('html5 tech supports native text tracks if the video supports it, unless it
   vjs.IS_FIREFOX = true;
   html = new vjs.Html5(player, options);
 
-  ok(!html['featuresTextTracks'], 'if textTracks are available on video element, native text tracks are supported');
+  ok(!html['featuresNativeTextTracks'], 'if textTracks are available on video element, native text tracks are supported');
 
   vjs.TEST_VID = oldTestVid;
   vjs.IS_FIREFOX = oldIsFirefox;
