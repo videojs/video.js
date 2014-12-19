@@ -14,6 +14,10 @@ vjs.Html5 = vjs.MediaTechController.extend({
   init: function(player, options, ready){
     var supportsTextTracks, nodes, nodesLength, i, node, nodeName, removeNodes;
 
+    // Figure out native text track support
+    // If mode is a number, we cannot change it because it'll disappear from view.
+    // Browsers with numeric modes include IE10 and older (<=2013) samsung android models.
+    // Firefox isn't playing nice either with modifying the mode
     supportsTextTracks = !!vjs.TEST_VID.textTracks;
     if (supportsTextTracks && vjs.TEST_VID.textTracks.length > 0) {
       supportsTextTracks = typeof vjs.TEST_VID.textTracks[0]['mode'] !== 'number';
