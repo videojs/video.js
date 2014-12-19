@@ -13,8 +13,8 @@ var TT = vjs.TextTrack,
 
 
 test('text-track requires a player', function() {
-  throws(function() {
-           new TT()
+  window.throws(function() {
+           new TT();
          },
          new Error('A player was not provided.'),
          'a player is required for text track');
