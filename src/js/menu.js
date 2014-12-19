@@ -182,7 +182,6 @@ vjs.MenuButton.prototype.onClick = function(){
 };
 
 vjs.MenuButton.prototype.onKeyPress = function(event){
-  event.preventDefault();
 
   // Check for space bar (32) or enter (13) keys
   if (event.which == 32 || event.which == 13) {
@@ -191,11 +190,13 @@ vjs.MenuButton.prototype.onKeyPress = function(event){
     } else {
       this.pressButton();
     }
+    event.preventDefault();
   // Check for escape (27) key
   } else if (event.which == 27){
     if (this.buttonPressed_){
       this.unpressButton();
     }
+    event.preventDefault();
   }
 };
 
