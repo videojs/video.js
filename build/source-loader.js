@@ -54,7 +54,7 @@ var sourceFiles = [
   "src/js/tracks/text-track-list.js",
   "src/js/tracks/text-track-cue-list.js",
   "src/js/tracks/text-track-controls.js",
-  "src/js/tracks/caption-settings.js",
+  "src/js/tracks/text-track-settings.js",
   "src/js/json.js",
   "src/js/setup.js",
   "src/js/plugins.js",
