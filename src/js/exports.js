@@ -154,6 +154,7 @@ goog.exportProperty(vjs.Html5.prototype, 'enterFullScreen', vjs.Html5.prototype.
 goog.exportProperty(vjs.Html5.prototype, 'exitFullScreen', vjs.Html5.prototype.exitFullScreen);
 goog.exportProperty(vjs.Html5.prototype, 'playbackRate', vjs.Html5.prototype.playbackRate);
 goog.exportProperty(vjs.Html5.prototype, 'setPlaybackRate', vjs.Html5.prototype.setPlaybackRate);
+goog.exportProperty(vjs.Html5.prototype, 'setSource', vjs.Html5.prototype.setSource);
 
 goog.exportSymbol('videojs.Flash', vjs.Flash);
 goog.exportProperty(vjs.Flash, 'isSupported', vjs.Flash.isSupported);
@@ -161,6 +162,7 @@ goog.exportProperty(vjs.Flash, 'canPlaySource', vjs.Flash.canPlaySource);
 goog.exportProperty(vjs.Flash, 'onReady', vjs.Flash['onReady']);
 goog.exportProperty(vjs.Flash, 'embed', vjs.Flash.embed);
 goog.exportProperty(vjs.Flash, 'version', vjs.Flash.version);
+goog.exportProperty(vjs.Flash.prototype, 'setSource', vjs.Flash.prototype.setSource);
 
 goog.exportSymbol('videojs.TextTrack', vjs.TextTrack);
 goog.exportProperty(vjs.TextTrack.prototype, 'label', vjs.TextTrack.prototype.label);
