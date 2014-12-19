@@ -7,11 +7,6 @@
  * Descriptions (not supported yet) - audio descriptions that are read back to the user by a screen reading device
  */
 
-var getProp = function(obj, prop) {
-  return (typeof obj[prop] === 'function') ? obj[prop]() : obj[prop];
-};
-
-
 /**
  * Get an array of associated text tracks. captions, subtitles, chapters, descriptions
  * http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-texttracks

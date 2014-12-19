@@ -1,8 +1,5 @@
 (function() {
 'use strict';
-var getProp = function(obj, prop) {
-  return (typeof obj[prop] === 'function') ? obj[prop]() : obj[prop];
-};
 
 /* Text Track Display
 ============================================================================= */
@@ -171,23 +168,23 @@ vjs.TextTrackMenuItem = vjs.MenuItem.extend({
     var track = this.track = options['track'];
 
     // Modify options for parent MenuItem class's init.
-    options['label'] = getProp(track, 'label');
-    options['selected'] = track.dflt && track.dflt() || track.mode === 'showing';
+    options['label'] = track['label'];
+    options['selected'] = track['default'] || track.mode === 'showing';
     vjs.MenuItem.call(this, player, options);
 
-    this.on(player, getProp(track, 'kind') + 'trackchange', this.update);
+    this.on(player, track['kind'] + 'trackchange', this.update);
   }
 });
 
 vjs.TextTrackMenuItem.prototype.onClick = function(){
-  var kind = getProp(this.track, 'kind');
+  var kind = this.track['kind'];
   vjs.MenuItem.prototype.onClick.call(this);
   this.player_.showTextTrack(this.track.id || this.track.language, kind);
   this.player_.trigger(kind + 'trackchange');
 };
 
 vjs.TextTrackMenuItem.prototype.update = function(){
-  this.selected(getProp(this.track, 'mode') === 'showing');
+  this.selected(this.track['mode'] === 'showing');
 };
 
 /**
@@ -201,11 +198,11 @@ vjs.OffTextTrackMenuItem = vjs.TextTrackMenuItem.extend({
     // Create pseudo track info
     // Requires options['kind']
     options['track'] = {
-      kind: function() { return options['kind']; },
+      kind: options['kind'],
       player: player,
-      label: function(){ return options['kind'] + ' off'; },
-      dflt: function(){ return false; },
-      mode: function(){ return false; }
+      label: options['kind'] + ' off',
+      'default': false,
+      mode: 'disabled'
     };
     vjs.TextTrackMenuItem.call(this, player, options);
     this.selected(true);
@@ -214,7 +211,7 @@ vjs.OffTextTrackMenuItem = vjs.TextTrackMenuItem.extend({
 
 vjs.OffTextTrackMenuItem.prototype.onClick = function(){
   vjs.TextTrackMenuItem.prototype.onClick.call(this);
-  this.player_.showTextTrack(this.track.id_, this.track.kind());
+  this.player_.showTextTrack(this.track.id_, this.track.kind);
 };
 
 vjs.OffTextTrackMenuItem.prototype.update = function(){
@@ -224,7 +221,7 @@ vjs.OffTextTrackMenuItem.prototype.update = function(){
 
   for (;i<j;i++) {
     track = tracks[i];
-    if (getProp(track, 'kind') === getProp(this.track, 'kind') && getProp(track, 'mode') === 'showing') {
+    if (track['kind'] === this.track['kind'] && track['mode'] === 'showing') {
       off = false;
     }
   }
@@ -235,11 +232,11 @@ vjs.OffTextTrackMenuItem.prototype.update = function(){
 vjs.CaptionSettingsMenuItem = vjs.TextTrackMenuItem.extend({
   init: function(player, options) {
     options['track'] = {
-      kind: function() { return options['kind']; },
+      kind: options['kind'],
       player: player,
-      label: function() { return options['kind'] + ' settings'; },
-      dftl: function() { return false; },
-      mode: function() { return false; }
+      label: options['kind'] + ' settings',
+      'default': false,
+      mode: 'disabled'
     };
 
     vjs.TextTrackMenuItem.call(this, player, options);
@@ -307,8 +304,7 @@ vjs.TextTrackButton.prototype.createItems = function(){
     track = this.player_.textTracks()[i];
 
     // only add tracks that are of the appropriate kind and have a label
-    if (getProp(track, 'kind') === this.kind_
-        && getProp(track, 'label')) {
+    if (track['kind'] === this.kind_ && track['label']) {
       items.push(new vjs.TextTrackMenuItem(this.player_, {
         'track': track
       }));
@@ -390,7 +386,7 @@ vjs.ChaptersButton.prototype.createItems = function(){
 
   for (var i = 0; i < this.player_.textTracks().length; i++) {
     track = this.player_.textTracks()[i];
-    if (getProp(track, 'kind') === this.kind_) {
+    if (track['kind'] === this.kind_) {
       items.push(new vjs.TextTrackMenuItem(this.player_, {
         'track': track
       }));
@@ -409,7 +405,7 @@ vjs.ChaptersButton.prototype.createMenu = function(){
 
   for (;i<j;i++) {
     track = tracks[i];
-    if (getProp(track, 'kind') == this.kind_) {
+    if (track['kind'] == this.kind_) {
       if (track.readyState() === 0) {
         track.load();
         track.on('loaded', vjs.bind(this, this.createMenu));
