@@ -80,8 +80,8 @@ vjs.Flash.rtmpSourceHandler.canHandleSource = function(source){
 vjs.Flash.rtmpSourceHandler.handleSource = function(source, tech){
   var srcParts = vjs.Flash.streamToParts(source.src);
 
-  tech.setRtmpConnection(srcParts.connection);
-  tech.setRtmpStream(srcParts.stream);
+  tech['setRtmpConnection'](srcParts.connection);
+  tech['setRtmpStream'](srcParts.stream);
 };
 
 // Register the native source handler
