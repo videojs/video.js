@@ -18,11 +18,11 @@ vjs.PlaybackRateMenuButton = vjs.MenuButton.extend({
   }
 });
 
+vjs.PlaybackRateMenuButton.prototype.buttonText = 'Playback Rate';
+vjs.PlaybackRateMenuButton.prototype.className = 'vjs-playback-rate';
+
 vjs.PlaybackRateMenuButton.prototype.createEl = function(){
-  var el = vjs.Component.prototype.createEl.call(this, 'div', {
-    className: 'vjs-playback-rate vjs-menu-button vjs-control',
-    innerHTML: '<div class="vjs-control-content"><span class="vjs-control-text">' + this.localize('Playback Rate') + '</span></div>'
-  });
+  var el = vjs.MenuButton.prototype.createEl.call(this);
 
   this.labelEl_ = vjs.createEl('div', {
     className: 'vjs-playback-rate-value',
