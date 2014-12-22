@@ -692,6 +692,15 @@ vjs.parseUrl = function(url) {
     details[props[i]] = a[props[i]];
   }
 
+  // IE9 adds the port to the host property unlike everyone else. If
+  // a port identifier is added for standard ports, strip it.
+  if (details.protocol === 'http:') {
+    details.host = details.host.replace(/:80$/, '');
+  }
+  if (details.protocol === 'https:') {
+    details.host = details.host.replace(/:443$/, '');
+  }
+
   if (addToBody) {
     document.body.removeChild(div);
   }
