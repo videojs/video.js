@@ -121,7 +121,7 @@ vjs.Html5.prototype.createEl = function(){
     el['player'] = player;
 
     if (player.options_.tracks) {
-      for (i = 0; i < player.options_.tracks.length) {
+      for (i = 0; i < player.options_.tracks.length; i++) {
         track = player.options_.tracks[i];
         trackEl = document.createElement('track');
         trackEl.kind = track.kind;
