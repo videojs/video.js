@@ -268,15 +268,6 @@ vjs.MediaTechController.prototype.initTextTrackListeners = function() {
     if (textTrackDisplay) {
       textTrackDisplay.updateDisplay();
     }
-
-    controlBar = player.getChild('controlBar');
-    if (!controlBar) {
-      return;
-    }
-
-    controlBar.getChild('subtitlesButton').update();
-    controlBar.getChild('captionsButton').update();
-    controlBar.getChild('chaptersButton').update();
   };
 
   this.textTracks().addEventListener('removetrack', textTrackListChanges);

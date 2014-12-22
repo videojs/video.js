@@ -27,15 +27,6 @@ vjs.TextTrackDisplay = vjs.Component.extend({
         track = tracks[i];
         this.player_.addRemoteTextTrack(track);
       }
-
-      controlBar = this.player_.getChild('controlBar');
-      if (!controlBar) {
-        return;
-      }
-
-      controlBar.getChild('subtitlesButton').update();
-      controlBar.getChild('captionsButton').update();
-      controlBar.getChild('chaptersButton').update();
     });
   }
 });
@@ -291,7 +282,7 @@ vjs.TextTrackButton = vjs.MenuButton.extend({
 
 // Create a menu item for each text track
 vjs.TextTrackButton.prototype.createItems = function(){
-  var items = [], track;
+  var items = [], track, tracks, updateHandler;
 
   if (this instanceof vjs.CaptionsButton && !(this.player().tech && this.player().tech['featuresNativeTextTracks'])) {
     items.push(new vjs.CaptionSettingsMenuItem(this.player_, { 'kind': this.kind_ }));
@@ -300,8 +291,19 @@ vjs.TextTrackButton.prototype.createItems = function(){
   // Add an OFF menu item to turn all tracks off
   items.push(new vjs.OffTextTrackMenuItem(this.player_, { 'kind': this.kind_ }));
 
-  for (var i = 0; i < this.player_.textTracks().length; i++) {
-    track = this.player_.textTracks()[i];
+  tracks = this.player_.textTracks();
+
+  updateHandler = vjs.bind(this, this.update);
+  tracks.addEventListener('removetrack', updateHandler);
+  tracks.addEventListener('addtrack', updateHandler)
+
+  this.player_.on('dispose', function() {
+    tracks.removeEventListener('removetrack', updateHandler);
+    tracks.removeEventListener('addtrack', updateHandler);
+  });
+
+  for (var i = 0; i < tracks.length; i++) {
+    track = tracks[i];
 
     // only add tracks that are of the appropriate kind and have a label
     if (track['kind'] === this.kind_ && track['label']) {
