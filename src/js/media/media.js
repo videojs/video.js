@@ -281,7 +281,6 @@ vjs.MediaTechController.prototype.initTextTrackListeners = function() {
 
 vjs.MediaTechController.prototype.emulateTextTracks = function() {
   var player = this.player_,
-      textTrackDisplay = player.addChild('textTrackDisplay'),
       textTracksChanges,
       script;
 
@@ -293,7 +292,9 @@ vjs.MediaTechController.prototype.emulateTextTracks = function() {
   }
 
   textTracksChanges = function() {
-    var i, track;
+    var i, track, textTrackDisplay;
+
+    textTrackDisplay = player.getChild('textTrackDisplay'),
 
     textTrackDisplay.updateDisplay();
 

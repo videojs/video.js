@@ -101,6 +101,7 @@ vjs.options = {
     'posterImage': {},
     'loadingSpinner': {},
     'bigPlayButton': {},
+    'textTrackDisplay': {},
     'controlBar': {},
     'errorDisplay': {},
     'textTrackSettings': {}

@@ -15,21 +15,36 @@ vjs.TextTrackDisplay = vjs.Component.extend({
   init: function(player, options, ready){
     vjs.Component.call(this, player, options, ready);
 
+    player.on('loadstart', vjs.bind(this, this.toggleDisplay));
+
     // This used to be called during player init, but was causing an error
     // if a track should show by default and the display hadn't loaded yet.
     // Should probably be moved to an external track loader when we support
     // tracks that don't need a display.
-    player.ready(function() {
-      var controlBar, i, tracks, track;
+    player.ready(vjs.bind(this, function() {
+      if (player.tech['featuresNativeTextTracks']) {
+        this.hide();
+        return;
+      }
+
+      var i, tracks, track;
 
       tracks = player.options_['tracks'] || [];
       for (i = 0; i < tracks.length; i++) {
         track = tracks[i];
         this.player_.addRemoteTextTrack(track);
       }
-    });
+    }));
   }
 });
+
+vjs.TextTrackDisplay.prototype.toggleDisplay = function() {
+  if (this.player_.tech['featuresNativeTextTracks']) {
+    this.hide();
+  } else {
+    this.show();
+  }
+};
 
 vjs.TextTrackDisplay.prototype.createEl = function(){
   return vjs.Component.prototype.createEl.call(this, 'div', {
