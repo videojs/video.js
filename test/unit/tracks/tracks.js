@@ -15,14 +15,6 @@ test('should place title list item into ul', function() {
   player.dispose();
 });
 
-test('cue time parsing', function() {
-  var parse = vjs.TextTrack.prototype.parseCueTime;
-
-  equal(parse('11:11'), 671, 'Only minutes and seconds (11:11)');
-  equal(parse('11:11:11'), 40271, 'Hours, minutes, seconds (11:11:11)');
-  equal(parse('11:11:11.111'), 40271.111, 'Hours, minutes, seconds, decimals (11:11:11.111)');
-});
-
 test('Player track methods call the tech', function() {
   var player,
       calls = 0;
