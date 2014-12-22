@@ -81,6 +81,7 @@ test('TextTrackDisplay adds tracks and updates children', function() {
   vjs.Player.prototype.getChild = function(child) {
     get++;
     return {
+      updateDisplay: Function.prototype,
       getChild: function() {
         get++;
         return {
@@ -234,6 +235,7 @@ test('update texttrack buttons on removetrack or addtrack', function() {
 
   vjs.Player.prototype.getChild = function(child) {
     return {
+      updateDisplay: Function.prototype,
       getChild: function() {
         return {
           update: function() {

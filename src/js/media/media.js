@@ -285,7 +285,6 @@ vjs.MediaTechController.prototype.initTextTrackListeners = function() {
   this.on('dispose', vjs.bind(this, function() {
     this.textTracks().removeEventListener('removetrack', textTrackListChanges);
     this.textTracks().removeEventListener('addtrack', textTrackListChanges);
-    this.textTracks().removeEventListener('change', textTracksChanges);
   }));
 };
 
@@ -317,6 +316,10 @@ vjs.MediaTechController.prototype.emulateTextTracks = function() {
   };
 
   this.textTracks().addEventListener('change', textTracksChanges);
+
+  this.on('dispose', vjs.bind(this, function() {
+    this.textTracks().removeEventListener('change', textTracksChanges);
+  }));
 };
 
 /**
