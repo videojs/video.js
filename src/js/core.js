@@ -42,8 +42,9 @@ var vjs = function(id, options, ready){
       if (options) {
         vjs.log.warn ('Player "' + id + '" is already initialised. Options will not be applied.');
       }
+
       if (ready) {
-        vjs.log.warn ('Player "' + id + '" is already initialised. Ready function will not be executed.');
+        vjs.players[id].ready(ready);
       }
 
       return vjs.players[id];
