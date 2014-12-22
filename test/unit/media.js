@@ -10,7 +10,8 @@ module('Media Tech', {
     oldTextTracks = videojs.MediaTechController.prototype.textTracks;
     videojs.MediaTechController.prototype.textTracks = function() {
       return {
-        addEventListener: Function.prototype
+        addEventListener: Function.prototype,
+        removeEventListener: Function.prototype
       };
     };
   },
