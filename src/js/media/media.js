@@ -14,8 +14,6 @@
 vjs.MediaTechController = vjs.Component.extend({
   /** @constructor */
   init: function(player, options, ready){
-    var textTrackListChanges, textTracksChanges, textTrackDisplay, processCues, script;
-
     options = options || {};
     // we don't want the tech to report user activity automatically.
     // This is done manually in addControlsListeners
@@ -35,55 +33,10 @@ vjs.MediaTechController = vjs.Component.extend({
     this.initControlsListeners();
 
     if (!this['featuresNativeTextTracks']) {
-      textTrackDisplay = player.addChild('textTrackDisplay');
-
-      if (!window.WebVTT) {
-        script = document.createElement('script');
-        script.src = player.options()['vtt.js'] || '../node_modules/vtt.js/dist/vtt.js';
-        player.el().appendChild(script);
-        window.WebVTT = true;
-      }
-
-      textTracksChanges = function() {
-        var i, track;
-
-        textTrackDisplay.updateDisplay();
-
-        for (i = 0; i < this.length; i++) {
-          track = this[i];
-          track.removeEventListener('cuechange', vjs.bind(textTrackDisplay, textTrackDisplay.updateDisplay));
-          if (track.mode === 'showing') {
-            track.addEventListener('cuechange', vjs.bind(textTrackDisplay, textTrackDisplay.updateDisplay));
-          }
-        }
-      };
-
-      this.textTracks().addEventListener('change', textTracksChanges);
+      this.emulateTextTracks();
     }
 
-    textTrackListChanges = function() {
-      if (textTrackDisplay) {
-        textTrackDisplay.updateDisplay();
-      }
-
-      var controlBar = player.getChild('controlBar');
-      if (!controlBar) {
-        return;
-      }
-
-      controlBar.getChild('subtitlesButton').update();
-      controlBar.getChild('captionsButton').update();
-      controlBar.getChild('chaptersButton').update();
-    };
-
-    this.textTracks().addEventListener('removetrack', textTrackListChanges);
-    this.textTracks().addEventListener('addtrack', textTrackListChanges);
-
-    this.on('dispose', vjs.bind(this, function() {
-      this.textTracks().removeEventListener('removetrack', textTrackListChanges);
-      this.textTracks().removeEventListener('addtrack', textTrackListChanges);
-      this.textTracks().removeEventListener('change', textTracksChanges);
-    }));
+    this.initTextTrackListeners();
   }
 });
 
@@ -305,6 +258,66 @@ vjs.MediaTechController.prototype.setCurrentTime = function() {
   // improve the accuracy of manual timeupdates
   if (this.manualTimeUpdates) { this.player().trigger('timeupdate'); }
 };
+
+vjs.MediaTechController.prototype.initTextTrackListeners = function() {
+  var player = this.player_,
+    textTrackListChanges = function() {
+    var textTrackDisplay = player.getChild('textTrackDisplay'),
+        controlBar;
+
+    if (textTrackDisplay) {
+      textTrackDisplay.updateDisplay();
+    }
+
+    controlBar = player.getChild('controlBar');
+    if (!controlBar) {
+      return;
+    }
+
+    controlBar.getChild('subtitlesButton').update();
+    controlBar.getChild('captionsButton').update();
+    controlBar.getChild('chaptersButton').update();
+  };
+
+  this.textTracks().addEventListener('removetrack', textTrackListChanges);
+  this.textTracks().addEventListener('addtrack', textTrackListChanges);
+
+  this.on('dispose', vjs.bind(this, function() {
+    this.textTracks().removeEventListener('removetrack', textTrackListChanges);
+    this.textTracks().removeEventListener('addtrack', textTrackListChanges);
+    this.textTracks().removeEventListener('change', textTracksChanges);
+  }));
+}
+
+vjs.MediaTechController.prototype.emulateTextTracks = function() {
+  var player = this.player_,
+      textTrackDisplay = player.addChild('textTrackDisplay'),
+      textTracksChanges,
+      script;
+
+  if (!window.WebVTT) {
+    script = document.createElement('script');
+    script.src = player.options()['vtt.js'] || '../node_modules/vtt.js/dist/vtt.js';
+    player.el().appendChild(script);
+    window.WebVTT = true;
+  }
+
+  textTracksChanges = function() {
+    var i, track;
+
+    textTrackDisplay.updateDisplay();
+
+    for (i = 0; i < this.length; i++) {
+      track = this[i];
+      track.removeEventListener('cuechange', vjs.bind(textTrackDisplay, textTrackDisplay.updateDisplay));
+      if (track.mode === 'showing') {
+        track.addEventListener('cuechange', vjs.bind(textTrackDisplay, textTrackDisplay.updateDisplay));
+      }
+    }
+  };
+
+  this.textTracks().addEventListener('change', textTracksChanges);
+}
 
 /**
  * Provide default methods for text tracks.
