@@ -369,10 +369,12 @@ vjs.Html5.prototype.addRemoteTextTrack = function(options) {
 
   this.el().appendChild(track);
 
-  //TODO how to we get rid of this setTimeout?
-  setTimeout(function() {
-    track.track.mode = 'disabled';
-  }, 0);
+  track.onload = function() {
+    if (track.readyState >= 2) {
+      track.track.mode = 'disabled';
+      track.onload = null;
+    }
+  };
 
   this.remoteTextTracks().addTrack_(track.track);
 
