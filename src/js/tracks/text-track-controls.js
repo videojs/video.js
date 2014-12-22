@@ -22,7 +22,7 @@ vjs.TextTrackDisplay = vjs.Component.extend({
     // Should probably be moved to an external track loader when we support
     // tracks that don't need a display.
     player.ready(vjs.bind(this, function() {
-      if (player.tech['featuresNativeTextTracks']) {
+      if (player.tech && player.tech['featuresNativeTextTracks']) {
         this.hide();
         return;
       }
@@ -39,7 +39,7 @@ vjs.TextTrackDisplay = vjs.Component.extend({
 });
 
 vjs.TextTrackDisplay.prototype.toggleDisplay = function() {
-  if (this.player_.tech['featuresNativeTextTracks']) {
+  if (this.player_.tech && this.player_.tech['featuresNativeTextTracks']) {
     this.hide();
   } else {
     this.show();
@@ -88,6 +88,10 @@ vjs.TextTrackDisplay.prototype.updateDisplay = function() {
       track;
 
   this.clearDisplay();
+
+  if (!tracks) {
+    return;
+  }
 
   for (; i < tracks.length; i++) {
     track = tracks[i];
@@ -222,10 +226,16 @@ vjs.OffTextTrackMenuItem.prototype.onClick = function(){
 
 vjs.OffTextTrackMenuItem.prototype.update = function(){
   var tracks = this.player_.textTracks(),
-      i=0, j=tracks.length, track,
+      i = 0,
+      j = tracks.length,
+      track,
       off = true;
 
-  for (;i<j;i++) {
+  if (!tracks) {
+    return;
+  }
+
+  for (; i < j; i++) {
     track = tracks[i];
     if (track['kind'] === this.track['kind'] && track['mode'] === 'showing') {
       off = false;
@@ -307,6 +317,10 @@ vjs.TextTrackButton.prototype.createItems = function(){
   items.push(new vjs.OffTextTrackMenuItem(this.player_, { 'kind': this.kind_ }));
 
   tracks = this.player_.textTracks();
+
+  if (!tracks) {
+    return items;
+  }
 
   updateHandler = vjs.bind(this, this.update);
   tracks.addEventListener('removetrack', updateHandler);
@@ -399,10 +413,16 @@ vjs.ChaptersButton.prototype.className = 'vjs-chapters-button';
 
 // Create a menu item for each text track
 vjs.ChaptersButton.prototype.createItems = function(){
-  var items = [], track;
+  var items = [], track, tracks;
 
-  for (var i = 0; i < this.player_.textTracks().length; i++) {
-    track = this.player_.textTracks()[i];
+  tracks = this.player_.textTracks();
+
+  if (!tracks) {
+    return items;
+  }
+
+  for (var i = 0; i < tracks.length; i++) {
+    track = tracks[i];
     if (track['kind'] === this.kind_) {
       items.push(new vjs.TextTrackMenuItem(this.player_, {
         'track': track
@@ -414,13 +434,13 @@ vjs.ChaptersButton.prototype.createItems = function(){
 };
 
 vjs.ChaptersButton.prototype.createMenu = function(){
-  var tracks = this.player_.textTracks(),
+  var tracks = this.player_.textTracks() || [],
       i = 0,
       j = tracks.length,
       track, chaptersTrack,
       items = this.items = [];
 
-  for (;i<j;i++) {
+  for (; i < j; i++) {
     track = tracks[i];
     if (track['kind'] == this.kind_) {
       if (track.readyState() === 0) {

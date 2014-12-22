@@ -223,7 +223,11 @@ test('component can be subclassed externally', function(){
     languages: function(){},
     reportUserActivity: function(){},
     language: function(){},
-    textTracks: function(){ return []; }
+    textTracks: function(){ return {
+        addEventListener: Function.prototype,
+        removeEventListener: Function.prototype
+      };
+    }
   }))({
     id: function(){},
     reportUserActivity: function(){}

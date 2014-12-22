@@ -37,6 +37,7 @@ test('Player track methods call the tech', function() {
 test('TextTrackDisplay initializes tracks on player ready', function() {
   var calls = 0,
       ttd = new vjs.TextTrackDisplay({
+        on: Function.prototype,
         addTextTracks: function() {
           calls--;
         },

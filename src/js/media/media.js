@@ -261,27 +261,35 @@ vjs.MediaTechController.prototype.setCurrentTime = function() {
 
 vjs.MediaTechController.prototype.initTextTrackListeners = function() {
   var player = this.player_,
-    textTrackListChanges = function() {
-    var textTrackDisplay = player.getChild('textTrackDisplay'),
-        controlBar;
+      tracks,
+      textTrackListChanges = function() {
+        var textTrackDisplay = player.getChild('textTrackDisplay'),
+            controlBar;
 
-    if (textTrackDisplay) {
-      textTrackDisplay.updateDisplay();
-    }
-  };
+        if (textTrackDisplay) {
+          textTrackDisplay.updateDisplay();
+        }
+      };
 
-  this.textTracks().addEventListener('removetrack', textTrackListChanges);
-  this.textTracks().addEventListener('addtrack', textTrackListChanges);
+  tracks = this.textTracks();
+
+  if (!tracks) {
+    return;
+  }
+
+  tracks.addEventListener('removetrack', textTrackListChanges);
+  tracks.addEventListener('addtrack', textTrackListChanges);
 
   this.on('dispose', vjs.bind(this, function() {
-    this.textTracks().removeEventListener('removetrack', textTrackListChanges);
-    this.textTracks().removeEventListener('addtrack', textTrackListChanges);
+    tracks.removeEventListener('removetrack', textTrackListChanges);
+    tracks.removeEventListener('addtrack', textTrackListChanges);
   }));
 };
 
 vjs.MediaTechController.prototype.emulateTextTracks = function() {
   var player = this.player_,
       textTracksChanges,
+      tracks,
       script;
 
   if (!window.WebVTT) {
@@ -289,6 +297,11 @@ vjs.MediaTechController.prototype.emulateTextTracks = function() {
     script.src = player.options()['vtt.js'] || '../node_modules/vtt.js/dist/vtt.js';
     player.el().appendChild(script);
     window.WebVTT = true;
+  }
+
+  tracks = this.textTracks();
+  if (!tracks) {
+    return;
   }
 
   textTracksChanges = function() {
@@ -307,10 +320,10 @@ vjs.MediaTechController.prototype.emulateTextTracks = function() {
     }
   };
 
-  this.textTracks().addEventListener('change', textTracksChanges);
+  tracks.addEventListener('change', textTracksChanges);
 
   this.on('dispose', vjs.bind(this, function() {
-    this.textTracks().removeEventListener('change', textTracksChanges);
+    tracks.removeEventListener('change', textTracksChanges);
   }));
 };
 
