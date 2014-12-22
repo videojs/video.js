@@ -1,10 +1,10 @@
 var createElement;
 
 module('Lib', {
-  setup: function() {
+  'setup': function() {
     createElement = document.createElement;
   },
-  teardown: function() {
+  'teardown': function() {
     document.createElement = createElement;
   }
 });
