@@ -12,20 +12,11 @@
 vjs.Html5 = vjs.MediaTechController.extend({
   /** @constructor */
   init: function(player, options, ready){
-    var supportsTextTracks, nodes, nodesLength, i, node, nodeName, removeNodes;
+    var  nodes, nodesLength, i, node, nodeName, removeNodes;
 
-    // Figure out native text track support
-    // If mode is a number, we cannot change it because it'll disappear from view.
-    // Browsers with numeric modes include IE10 and older (<=2013) samsung android models.
-    // Firefox isn't playing nice either with modifying the mode
-    supportsTextTracks = !!vjs.TEST_VID.textTracks;
-    if (supportsTextTracks && vjs.TEST_VID.textTracks.length > 0) {
-      supportsTextTracks = typeof vjs.TEST_VID.textTracks[0]['mode'] !== 'number';
+    if (options.nativeCaptions === false || options.nativeTextTracks === false) {
+      this['featuresNativeTextTracks'] = false;
     }
-    if (supportsTextTracks && vjs.IS_FIREFOX) {
-      supportsTextTracks = false;
-    }
-    this['featuresNativeTextTracks'] = options.nativeCaptions !== false && supportsTextTracks;
 
     vjs.MediaTechController.call(this, player, options, ready);
 
@@ -502,6 +493,28 @@ vjs.Html5.canControlPlaybackRate = function(){
 };
 
 /**
+ * Check to see if native text tracks are supported by this browser/device
+ * @return {Boolean}
+ */
+vjs.Html5.supportsNativeTextTracks = function() {
+  var supportsTextTracks;
+
+  // Figure out native text track support
+  // If mode is a number, we cannot change it because it'll disappear from view.
+  // Browsers with numeric modes include IE10 and older (<=2013) samsung android models.
+  // Firefox isn't playing nice either with modifying the mode
+  supportsTextTracks = !!vjs.TEST_VID.textTracks;
+  if (supportsTextTracks && vjs.TEST_VID.textTracks.length > 0) {
+    supportsTextTracks = typeof vjs.TEST_VID.textTracks[0]['mode'] !== 'number';
+  }
+  if (supportsTextTracks && vjs.IS_FIREFOX) {
+    supportsTextTracks = false;
+  }
+
+  return supportsTextTracks;
+}
+
+/**
  * Set the tech's volume control support status
  * @type {Boolean}
  */
@@ -532,6 +545,12 @@ vjs.Html5.prototype['featuresFullscreenResize'] = true;
  * (this disables the manual progress events of the MediaTechController)
  */
 vjs.Html5.prototype['featuresProgressEvents'] = true;
+
+/**
+ * Sets the tech's status on native text track support
+ * @type {Boolean}
+ */
+vjs.Html5.prototype['featuresNativeTextTracks'] = vjs.Html5.supportsNativeTextTracks();
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //
 (function() {
