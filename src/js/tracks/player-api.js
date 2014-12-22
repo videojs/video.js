@@ -15,11 +15,11 @@
 vjs.Player.prototype.textTracks = function(){
   // cannot use techGet directly because it checks to see whether the tech is ready.
   // Flash is unlikely to be ready in time but textTracks should still work.
-  return this.tech && this.tech['textTracks']();
+  return this.tech && this.tech['textTracks']() || [];
 };
 
 vjs.Player.prototype.remoteTextTracks = function() {
-  return this.tech && this.tech['remoteTextTracks']();
+  return this.tech && this.tech['remoteTextTracks']() || [];
 };
 
 /**
