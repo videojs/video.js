@@ -89,6 +89,9 @@ vjs.Html5.prototype.dispose = function(){
 
 vjs.Html5.prototype.createEl = function(){
   var player = this.player_,
+      track,
+      trackEl,
+      i,
       // If possible, reuse original tag for HTML5 playback technology element
       el = player.tag,
       newEl,
@@ -118,17 +121,18 @@ vjs.Html5.prototype.createEl = function(){
     el['player'] = player;
 
     if (player.options_.tracks) {
-      vjs.obj.each(player.options_.tracks, function(i, track) {
-        var t = document.createElement('track');
-        t.kind = track.kind;
-        t.label = track.label;
-        t.srclang = track.srclang;
-        t.src = track.src;
+      for (i = 0; i < player.options_.tracks.length) {
+        track = player.options_.tracks[i];
+        trackEl = document.createElement('track');
+        trackEl.kind = track.kind;
+        trackEl.label = track.label;
+        trackEl.srclang = track.srclang;
+        trackEl.src = track.src;
         if ('default' in track) {
-          t.setAttribute('default', 'default');
+          trackEl.setAttribute('default', 'default');
         }
-        el.appendChild(t);
-      });
+        el.appendChild(trackEl);
+      }
     }
 
     vjs.insertFirst(el, player.el());
