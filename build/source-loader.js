@@ -21,6 +21,7 @@ var sourceFiles = [
   "src/js/lib.js",
   "src/js/xhr.js",
   "src/js/util.js",
+  "src/js/event-emitter.js",
   "src/js/component.js",
   "src/js/button.js",
   "src/js/slider.js",
@@ -47,10 +48,16 @@ var sourceFiles = [
   "src/js/media/flash.js",
   "src/js/media/flash.rtmp.js",
   "src/js/media/loader.js",
-  "src/js/tracks.js",
+  "src/js/tracks/player-api.js",
+  "src/js/tracks/text-track-enums.js",
+  "src/js/tracks/text-track.js",
+  "src/js/tracks/text-track-list.js",
+  "src/js/tracks/text-track-cue-list.js",
+  "src/js/tracks/text-track-controls.js",
+  "src/js/tracks/caption-settings.js",
   "src/js/json.js",
   "src/js/setup.js",
-  "src/js/plugins.js"
+  "src/js/plugins.js",
 ];
 
 // Allow overriding the default project root

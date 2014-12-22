@@ -357,6 +357,13 @@ vjs.removeClass = function(element, classToRemove){
  * @private
  */
 vjs.TEST_VID = vjs.createEl('video');
+(function() {
+  var track = document.createElement('track');
+  track.kind = 'captions';
+  track.srclang = 'en';
+  track.label = 'English';
+  vjs.TEST_VID.appendChild(track);
+})();
 
 /**
  * Useragent for browser testing.
@@ -410,6 +417,7 @@ vjs.IS_OLD_ANDROID = vjs.IS_ANDROID && (/webkit/i).test(vjs.USER_AGENT) && vjs.A
 
 vjs.IS_FIREFOX = (/Firefox/i).test(vjs.USER_AGENT);
 vjs.IS_CHROME = (/Chrome/i).test(vjs.USER_AGENT);
+vjs.IS_IE8 = (/MSIE\s8\.0/).test(vjs.USER_AGENT);
 
 vjs.TOUCH_ENABLED = !!(('ontouchstart' in window) || window.DocumentTouch && document instanceof window.DocumentTouch);
 vjs.BACKGROUND_SIZE_SUPPORTED = 'backgroundSize' in vjs.TEST_VID.style;
@@ -830,3 +838,43 @@ vjs.arr.forEach = function(array, callback, thisArg) {
 
   return array;
 };
+
+(function() {
+  // from https://gist.github.com/jdalton/5e34d890105aca44399f
+
+  var toString, fnToString, reHostCtor, reNative;
+
+  toString = Object.prototype.toString;
+
+  // Used to resolve the decompiled source of functions
+  fnToString = Function.prototype.toString;
+
+  // Used to detect host constructors (Safari > 4; really typed array specific)
+  reHostCtor = /^\[object .+?Constructor\]$/;
+
+  // Compile a regexp using a common native method as a template.
+  // We chose `Object#toString` because there's a good chance it is not being mucked with.
+  reNative = RegExp('^' +
+    // Coerce `Object#toString` to a string
+    String(toString)
+    // Escape any special regexp characters
+    .replace(/[.*+?^${}()|[\]\/\\]/g, '\\$&')
+    // Replace mentions of `toString` with `.*?` to keep the template generic.
+    // Replace thing like `for ...` to support environments like Rhino which add extra info
+    // such as method arity.
+    .replace(/toString|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
+  );
+
+  vjs.fn = {};
+  vjs.fn.isNative = function isNative(value) {
+    var type = typeof value;
+    return type == 'function'
+      // Use `Function#toString` to bypass the value's own `toString` method
+      // and avoid being faked out.
+      ? reNative.test(fnToString.call(value))
+      // Fallback to a host object check because some environments will represent
+      // things like typed arrays as DOM methods which may not conform to the
+      // normal native pattern.
+      : (value && type == 'object' && reHostCtor.test(toString.call(value))) || false;
+  };
+})();
