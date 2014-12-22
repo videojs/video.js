@@ -287,7 +287,7 @@ vjs.MediaTechController.prototype.initTextTrackListeners = function() {
     this.textTracks().removeEventListener('addtrack', textTrackListChanges);
     this.textTracks().removeEventListener('change', textTracksChanges);
   }));
-}
+};
 
 vjs.MediaTechController.prototype.emulateTextTracks = function() {
   var player = this.player_,
@@ -317,7 +317,7 @@ vjs.MediaTechController.prototype.emulateTextTracks = function() {
   };
 
   this.textTracks().addEventListener('change', textTracksChanges);
-}
+};
 
 /**
  * Provide default methods for text tracks.
