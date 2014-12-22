@@ -4,13 +4,13 @@ var TTL = vjs.TextTrackList,
     noop = Function.prototype,
     genericTracks = [{
       id: '1',
-      on: noop
+      addEventListener: noop
     }, {
       id: '2',
-      on: noop
+      addEventListener: noop
     }, {
       id: '3',
-      on: noop
+      addEventListener: noop
     }];
 
 test('TextTrackList\'s length is set correctly', function() {
@@ -31,9 +31,9 @@ test('can get text tracks by id', function() {
 test('length is updated when new tracks are added or removed', function() {
   var ttl = new TTL(genericTracks);
 
-  ttl.addTrack_({id: '100', on: noop});
+  ttl.addTrack_({id: '100', addEventListener: noop});
   equal(ttl.length, genericTracks.length + 1, 'the length is ' + (genericTracks.length + 1));
-  ttl.addTrack_({id: '101', on: noop});
+  ttl.addTrack_({id: '101', addEventListener: noop});
   equal(ttl.length, genericTracks.length + 2, 'the length is ' + (genericTracks.length + 2));
 
   ttl.removeTrack_(ttl.getTrackById('101'));
@@ -57,17 +57,17 @@ test('can access items by index', function() {
 test('can access new items by index', function() {
   var ttl = new TTL(genericTracks);
 
-  ttl.addTrack_({id: '100', on: noop});
+  ttl.addTrack_({id: '100', addEventListener: noop});
   equal(ttl[3].id, '100', 'id of item at index 3 is 100');
-  ttl.addTrack_({id: '101', on: noop});
+  ttl.addTrack_({id: '101', addEventListener: noop});
   equal(ttl[4].id, '101', 'id of item at index 4 is 101');
 });
 
 test('cannot access removed items by index', function() {
   var ttl = new TTL(genericTracks);
 
-  ttl.addTrack_({id: '100', on: noop});
-  ttl.addTrack_({id: '101', on: noop});
+  ttl.addTrack_({id: '100', addEventListener: noop});
+  ttl.addTrack_({id: '101', addEventListener: noop});
   equal(ttl[3].id, '100', 'id of item at index 3 is 100');
   equal(ttl[4].id, '101', 'id of item at index 4 is 101');
 
@@ -81,13 +81,13 @@ test('cannot access removed items by index', function() {
 test('new item available at old index', function() {
   var ttl = new TTL(genericTracks);
 
-  ttl.addTrack_({id: '100', on: noop});
+  ttl.addTrack_({id: '100', addEventListener: noop});
   equal(ttl[3].id, '100', 'id of item at index 3 is 100');
 
   ttl.removeTrack_(ttl.getTrackById('100'));
   ok(!ttl[3], 'nothing at index 3');
 
-  ttl.addTrack_({id: '101', on: noop});
+  ttl.addTrack_({id: '101', addEventListener: noop});
   equal(ttl[3].id, '101', 'id of new item at index 3 is now 101');
 });
 
@@ -100,15 +100,15 @@ test('a "addtrack" event is triggered when new tracks are added', function() {
 
   ttl.on('addtrack', addHandler);
 
-  ttl.addTrack_({id: '100', on: noop});
-  ttl.addTrack_({id: '101', on: noop});
+  ttl.addTrack_({id: '100', addEventListener: noop});
+  ttl.addTrack_({id: '101', addEventListener: noop});
 
   ttl.off('addtrack', addHandler);
 
   ttl.onaddtrack = addHandler;
 
-  ttl.addTrack_({id: '102', on: noop});
-  ttl.addTrack_({id: '103', on: noop});
+  ttl.addTrack_({id: '102', addEventListener: noop});
+  ttl.addTrack_({id: '103', addEventListener: noop});
 
   equal(adds, 4, 'we got ' + adds + ' "addtrack" events');
 });
