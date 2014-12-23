@@ -6,6 +6,7 @@ module('Text Track');
 var TT = vjs.TextTrack,
     noop = Function.prototype,
     defaultPlayer = {
+      textTracks: noop,
       on: noop,
       off: noop,
       currentTime: noop
