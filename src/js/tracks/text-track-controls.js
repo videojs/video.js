@@ -175,7 +175,17 @@ vjs.TextTrackDisplay.prototype.updateForTrack = function(track) {
 vjs.TextTrackMenuItem = vjs.MenuItem.extend({
   /** @constructor */
   init: function(player, options){
-    var track = this.track = options['track'];
+    var track = this.track = options['track'],
+        tracks = player.textTracks(),
+        changeHandler;
+
+    if (tracks) {
+      changeHandler = vjs.bind(this, this.update);
+      tracks.addEventListener('change', changeHandler);
+      player.on('dispose', function() {
+        tracks.removeEventListener('change', changeHandler)
+      });
+    }
 
     // Modify options for parent MenuItem class's init.
     options['label'] = track['label'];
