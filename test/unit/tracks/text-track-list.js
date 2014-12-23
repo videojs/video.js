@@ -93,8 +93,10 @@ test('new item available at old index', function() {
 
 test('a "addtrack" event is triggered when new tracks are added', function() {
   var ttl = new TTL(genericTracks),
+      tracks = 0,
       adds = 0,
-      addHandler = function() {
+      addHandler = function(e) {
+        e.track && tracks++;
         adds++;
       };
 
@@ -111,12 +113,15 @@ test('a "addtrack" event is triggered when new tracks are added', function() {
   ttl.addTrack_({id: '103', addEventListener: noop});
 
   equal(adds, 4, 'we got ' + adds + ' "addtrack" events');
+  equal(tracks, 4, 'we got a track with every event');
 });
 
 test('a "removetrack" event is triggered when tracks are removed', function() {
   var ttl = new TTL(genericTracks),
+      tracks = 0,
       rms = 0,
-      rmHandler = function() {
+      rmHandler = function(e) {
+        e.track && tracks++
         rms++;
       };
 
@@ -132,6 +137,7 @@ test('a "removetrack" event is triggered when tracks are removed', function() {
   ttl.removeTrack_(ttl.getTrackById('3'));
 
   equal(rms, 3, 'we got ' + rms + ' "removetrack" events');
+  equal(tracks, 3, 'we got a track with every event');
 });
 
 test('trigger "change" event when "modechange" is fired on a track', function() {

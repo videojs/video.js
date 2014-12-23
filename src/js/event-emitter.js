@@ -24,8 +24,15 @@ vjs.EventEmitter.prototype.one = function(type, fn) {
 vjs.EventEmitter.prototype.trigger = function(event) {
   var type = event.type || event;
 
+  if (typeof event === 'string') {
+    event = {
+      type: type
+    };
+  }
+  event = vjs.fixEvent(event);
+
   if (this.allowedEvents_[type] && this['on' + type]) {
-    this['on' + type]();
+    this['on' + type](event);
   }
 
   vjs.trigger(this, event);
