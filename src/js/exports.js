@@ -148,7 +148,7 @@ goog.exportProperty(vjs.MediaTechController.prototype, 'textTracks', vjs.MediaTe
 goog.exportProperty(vjs.MediaTechController.prototype, 'remoteTextTracks', vjs.MediaTechController.prototype.remoteTextTracks);
 goog.exportProperty(vjs.MediaTechController.prototype, 'addTextTrack', vjs.MediaTechController.prototype.addTextTrack);
 goog.exportProperty(vjs.MediaTechController.prototype, 'addRemoteTextTrack', vjs.MediaTechController.prototype.addRemoteTextTrack);
-
+goog.exportProperty(vjs.MediaTechController.prototype, 'removeRemoteTextTrack', vjs.MediaTechController.prototype.removeRemoteTextTrack);
 
 goog.exportSymbol('videojs.Html5', vjs.Html5);
 goog.exportProperty(vjs.Html5, 'Events', vjs.Html5.Events);
@@ -174,6 +174,7 @@ goog.exportProperty(vjs.Html5.prototype, 'textTracks', vjs.Html5.prototype.textT
 goog.exportProperty(vjs.Html5.prototype, 'remoteTextTracks', vjs.Html5.prototype.remoteTextTracks);
 goog.exportProperty(vjs.Html5.prototype, 'addTextTrack', vjs.Html5.prototype.addTextTrack);
 goog.exportProperty(vjs.Html5.prototype, 'addRemoteTextTrack', vjs.Html5.prototype.addRemoteTextTrack);
+goog.exportProperty(vjs.Html5.prototype, 'removeRemoteTextTrack', vjs.Html5.prototype.removeRemoteTextTrack);
 
 goog.exportSymbol('videojs.Flash', vjs.Flash);
 goog.exportProperty(vjs.Flash, 'isSupported', vjs.Flash.isSupported);
