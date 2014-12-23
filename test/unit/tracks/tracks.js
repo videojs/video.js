@@ -53,49 +53,15 @@ test('TextTrackDisplay initializes tracks on player ready', function() {
 });
 
 test('html5 tech supports native text tracks if the video supports it', function() {
-  var oldTestVid = vjs.TEST_VID,
-      player,
-      options,
-      oldTextTracks,
-      html;
-
-  oldTextTracks = vjs.Html5.prototype.textTracks;
-  vjs.Html5.prototype.textTracks = function() {
-    return {
-      // Function.prototype is a built-in no-op function.
-      addEventListener: Function.prototype
-    };
-  };
+  var oldTestVid = vjs.TEST_VID;
 
   vjs.TEST_VID = {
     textTracks: []
   };
 
-  player = {
-    // Function.prototype is a built-in no-op function.
-    controls: Function.prototype,
-    ready: Function.prototype,
-    options: function() {
-      return {};
-    },
-    addChild: Function.prototype,
-    id: Function.prototype,
-    el: function() {
-      return {
-        insertBefore: Function.prototype,
-        appendChild: Function.prototype
-      };
-    }
-  };
-  player.player_ = player;
-  player.options_ = options = {};
-
-  html = new vjs.Html5(player, options);
-
-  ok(html['featuresNativeTextTracks'], 'if textTracks are available on video element, native text tracks are supported');
+  ok(vjs.Html5.supportsNativeTextTracks(), 'if textTracks are available on video element, native text tracks are supported');
 
   vjs.TEST_VID = oldTestVid;
-  vjs.Html5.prototype.textTracks = oldTextTracks;
 });
 
 test('listen ot remove and add track events in native text tracks', function() {
@@ -291,10 +257,7 @@ test('Player track methods call the tech', function() {
 });
 
 test('html5 tech supports native text tracks if the video supports it, unless mode is a number', function() {
-  var oldTestVid = vjs.TEST_VID,
-      player,
-      options,
-      html;
+  var oldTestVid = vjs.TEST_VID;
 
   vjs.TEST_VID = {
     textTracks: [{
@@ -309,10 +272,7 @@ test('html5 tech supports native text tracks if the video supports it, unless mo
 
 test('html5 tech supports native text tracks if the video supports it, unless it is firefox', function() {
   var oldTestVid = vjs.TEST_VID,
-      oldIsFirefox = vjs.IS_FIREFOX,
-      player,
-      options,
-      html;
+      oldIsFirefox = vjs.IS_FIREFOX;
 
   vjs.TEST_VID = {
     textTracks: []
