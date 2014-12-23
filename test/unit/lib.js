@@ -1,4 +1,13 @@
-module('Lib');
+var createElement;
+
+module('Lib', {
+  'setup': function() {
+    createElement = document.createElement;
+  },
+  'teardown': function() {
+    document.createElement = createElement;
+  }
+});
 
 test('should create an element', function(){
   var div = vjs.createEl();
@@ -281,6 +290,27 @@ test('should parse the details of a url correctly', function(){
 
   equal(vjs.parseUrl('http://example.com:1234').port, '1234', 'parsed example url port');
 });
+
+test('should strip port from hosts using http or https', function() {
+  var url;
+
+  // attempts to create elements will return an anchor tag that
+  // misbehaves like IE9
+  document.createElement = function() {
+    return {
+      hostname: 'example.com',
+      host: 'example.com:80',
+      protocol: 'http:',
+      port: '80',
+      pathname: '/domain/relative/url',
+      hash: ''
+    };
+  };
+
+  url = videojs.parseUrl('/domain/relative/url');
+  ok(!(/.*:80$/).test(url.host), ':80 is not appended to the host');
+});
+
 
 test('vjs.findPosition should find top and left position', function() {
   var d = document.createElement('div'),

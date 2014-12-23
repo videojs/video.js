@@ -8,6 +8,7 @@ CHANGELOG
 * @anhskohbo added a Vietnamese translation ([view](https://github.com/videojs/video.js/pull/1734))
 * @Sxmanek added a Czech translation ([view](https://github.com/videojs/video.js/pull/1739))
 * @jcaron23 added the vjs-scrubbing CSS class and prevented menus from showing while scrubbing ([view](https://github.com/videojs/video.js/pull/1741))
+* @dmlap fixed URL parsing in IE9 ([view](https://github.com/videojs/video.js/pull/1765))
 
 --------------------
 
