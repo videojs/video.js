@@ -89,6 +89,7 @@ goog.exportProperty(vjs.Player.prototype, 'textTracks', vjs.Player.prototype.tex
 goog.exportProperty(vjs.Player.prototype, 'remoteTextTracks', vjs.Player.prototype.remoteTextTracks);
 goog.exportProperty(vjs.Player.prototype, 'addTextTrack', vjs.Player.prototype.addTextTrack);
 goog.exportProperty(vjs.Player.prototype, 'addRemoteTextTrack', vjs.Player.prototype.addRemoteTextTrack);
+goog.exportProperty(vjs.Player.prototype, 'removeRemoteTextTrack', vjs.Player.prototype.removeRemoteTextTrack);
 
 goog.exportSymbol('videojs.MediaLoader', vjs.MediaLoader);
 goog.exportSymbol('videojs.TextTrackDisplay', vjs.TextTrackDisplay);
@@ -122,6 +123,12 @@ goog.exportSymbol('videojs.Menu', vjs.Menu);
 goog.exportSymbol('videojs.MenuItem', vjs.MenuItem);
 goog.exportSymbol('videojs.MenuButton', vjs.MenuButton);
 goog.exportSymbol('videojs.PlaybackRateMenuButton', vjs.PlaybackRateMenuButton);
+goog.exportSymbol('videojs.ChaptersTrackMenuItem', vjs.ChaptersTrackMenuItem);
+goog.exportSymbol('videojs.TextTrackButton', vjs.TextTrackButton);
+goog.exportSymbol('videojs.TextTrackMenuItem', vjs.TextTrackMenuItem);
+goog.exportSymbol('videojs.OffTextTrackMenuItem', vjs.OffTextTrackMenuItem);
+goog.exportSymbol('videojs.CaptionSettingsMenuItem', vjs.CaptionSettingsMenuItem);
+
 goog.exportProperty(vjs.MenuButton.prototype, 'createItems', vjs.MenuButton.prototype.createItems);
 goog.exportProperty(vjs.TextTrackButton.prototype, 'createItems', vjs.TextTrackButton.prototype.createItems);
 goog.exportProperty(vjs.ChaptersButton.prototype, 'createItems', vjs.ChaptersButton.prototype.createItems);

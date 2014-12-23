@@ -48,6 +48,13 @@ test('should be able to access expected player API methods', function() {
   ok(player.usingNativeControls, 'usingNativeControls exists');
   ok(player.isFullscreen, 'isFullscreen exists');
 
+  // TextTrack methods
+  ok(player.textTracks, 'textTracks exists');
+  ok(player.remoteTextTracks, 'remoteTextTracks exists');
+  ok(player.addTextTrack, 'addTextTrack exists');
+  ok(player.addRemoteTextTrack, 'addRemoteTextTrack exists');
+  ok(player.removeRemoteTextTrack, 'removeRemoteTextTrack exists');
+
   // Deprecated methods that should still exist
   ok(player.requestFullScreen, 'requestFullScreen exists');
   ok(player.isFullScreen, 'isFullScreen exists');
@@ -149,6 +156,16 @@ test('should export useful components to the public', function () {
   ok(videojs.MenuItem, 'MenuItem should be public');
   ok(videojs.MenuButton, 'MenuButton should be public');
   ok(videojs.PlaybackRateMenuButton, 'PlaybackRateMenuButton should be public');
+
+  ok(videojs.CaptionSettingsMenuItem, 'CaptionSettingsMenuItem should be public');
+  ok(videojs.OffTextTrackMenuItem, 'OffTextTrackMenuItem should be public');
+  ok(videojs.TextTrackMenuItem, 'TextTrackMenuItem should be public');
+  ok(videojs.TextTrackDisplay, 'TextTrackDisplay should be public');
+  ok(videojs.TextTrackButton, 'TextTrackButton should be public');
+  ok(videojs.CaptionsButton, 'CaptionsButton should be public');
+  ok(videojs.SubtitlesButton, 'SubtitlesButton should be public');
+  ok(videojs.ChaptersButton, 'ChaptersButton should be public');
+  ok(videojs.ChaptersTrackMenuItem, 'ChaptersTrackMenuItem should be public');
 
   ok(videojs.util, 'util namespace should be public');
   ok(videojs.util.mergeOptions, 'mergeOptions should be public');
