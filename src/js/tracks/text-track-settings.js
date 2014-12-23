@@ -208,7 +208,7 @@
       '</div>' +
       '<div class="vjs-tracksettings-controls clear right">' +
         '<button class="vjs-default-button">Defaults</button>' +
-        '<button class="vjs-done-button">Close</button>' +
+        '<button class="vjs-done-button">Done</button>' +
       '</div>';
   }
 
