@@ -52,60 +52,6 @@ test('TextTrackDisplay initializes tracks on player ready', function() {
   equal(calls, 1, 'only a player.ready call was made');
 });
 
-test('TextTrackDisplay adds tracks and updates children', function() {
-  var add = 0,
-      get = 0,
-      update = 0,
-      player,
-      tag,
-      track,
-      oldAddTextTrack = vjs.Player.prototype.addTextTrack,
-      oldGetChild = vjs.Player.prototype.getChild;
-
-  tag = document.createElement('video');
-  track = document.createElement('track');
-  track.kind = 'captions';
-  track.label = 'en';
-  track.language = 'English';
-  track.src = 'en.vtt';
-  tag.appendChild(track);
-  track = document.createElement('track');
-  track.kind = 'captions';
-  track.label = 'es';
-  track.language = 'Spanish';
-  track.src = 'es.vtt';
-  tag.appendChild(track);
-
-  vjs.Player.prototype.addTextTrack = function() {
-    add++;
-  };
-  vjs.Player.prototype.getChild = function(child) {
-    get++;
-    return {
-      updateDisplay: Function.prototype,
-      getChild: function() {
-        get++;
-        return {
-          update: function() {
-            update++;
-          }
-        };
-      }
-    };
-  };
-
-  player =  PlayerTest.makePlayer({}, tag);
-
-  player.player_ = player;
-
-  equal(add, 2, 'calls to addTextTrack');
-  equal(get, 4, 'four children were request: controlBar and its children subtitles, captions, and chapters buttons');
-  equal(update, 3, 'each button should have been updated');
-
-  vjs.Player.prototype.addTextTrack = oldAddTextTrack;
-  vjs.Player.prototype.getChild = oldGetChild;
-});
-
 test('html5 tech supports native text tracks if the video supports it', function() {
   var oldTestVid = vjs.TEST_VID,
       player,
@@ -203,19 +149,42 @@ test('listen ot remove and add track events in native text tracks', function() {
 
 test('update texttrack buttons on removetrack or addtrack', function() {
   var update = 0,
+      i,
       player,
       tag,
       track,
-      oldGetChild = vjs.Player.prototype.getChild,
       oldTextTracks,
-      events = {};
+      events = {},
+      oldCaptionsUpdate,
+      oldSubsUpdate,
+      oldChaptersUpdate;
+
+  oldCaptionsUpdate = vjs.CaptionsButton.prototype.update;
+  oldSubsUpdate = vjs.SubtitlesButton.prototype.update;
+  oldChaptersUpdate = vjs.ChaptersButton.prototype.update;
+  vjs.CaptionsButton.prototype.update = function() {
+    update++;
+    oldCaptionsUpdate.call(this);
+  };
+  vjs.SubtitlesButton.prototype.update = function() {
+    update++;
+    oldSubsUpdate.call(this);
+  }
+  vjs.ChaptersButton.prototype.update = function() {
+    update++;
+    oldChaptersUpdate.call(this);
+  };
 
   vjs.MediaTechController.prototype['featuresNativeTextTracks'] = true;
   oldTextTracks = videojs.MediaTechController.prototype.textTracks;
   vjs.MediaTechController.prototype.textTracks = function() {
     return {
+      length: 0,
       addEventListener: function(type, handler) {
-        events[type] = handler;
+        if (!events[type]) {
+          events[type] = [];
+        }
+        events[type].push(handler);
       }
     };
   };
@@ -234,34 +203,29 @@ test('update texttrack buttons on removetrack or addtrack', function() {
   track.src = 'es.vtt';
   tag.appendChild(track);
 
-  vjs.Player.prototype.getChild = function(child) {
-    return {
-      updateDisplay: Function.prototype,
-      getChild: function() {
-        return {
-          update: function() {
-            update++;
-          }
-        };
-      }
-    };
-  };
-
   player =  PlayerTest.makePlayer({}, tag);
 
   player.player_ = player;
 
-  events['removetrack']();
+  equal(update, 3, 'update was called on the three buttons during init');
 
-  equal(update, 3, 'update was called on the three buttons for remove track');
-
-  events['addtrack']();
+  for (i = 0; i < events['removetrack'].length; i++) {
+    events['removetrack'][i]();
+  }
 
   equal(update, 6, 'update was called on the three buttons for remove track');
 
-  vjs.Player.prototype.getChild = oldGetChild;
+  for (i = 0; i < events['addtrack'].length; i++) {
+    events['addtrack'][i]();
+  }
+
+  equal(update, 9, 'update was called on the three buttons for remove track');
+
   vjs.MediaTechController.prototype.textTracks = oldTextTracks;
   vjs.MediaTechController.prototype['featuresNativeTextTracks'] = false;
+  vjs.CaptionsButton.prototype.update = oldCaptionsUpdate;
+  vjs.SubtitlesButton.prototype.update = oldSubsUpdate;
+  vjs.ChaptersButton.prototype.update = oldChaptersUpdate;
 });
 
 test('if native text tracks are not supported, create a texttrackdisplay', function() {
