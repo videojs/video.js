@@ -107,8 +107,8 @@
   }
 
   function captionOptionsMenuTemplate() {
-    return '<div class="vjs-tracksettings">' +
-        '<div class="vjs-tracksettings-colors">' +
+    return '<div>' +
+        '<div class="vjs-tracksettings-colors left">' +
           '<div class="vjs-fg-color vjs-tracksetting">' +
               '<label class="vjs-label">Foreground</label>' +
               '<select>' +
@@ -143,7 +143,7 @@
                 '<option value="#F0F">Magenta</option>' +
                 '<option value="#0FF">Cyan</option>' +
               '</select>' +
-              '<span class="vjs-bg-opacity vjs-opacity vjs-tracksetting">' +
+              '<span class="vjs-bg-opacity vjs-opacity">' +
                   '<select>' +
                     '<option value="">---</option>' +
                     '<option value="1">Opaque</option>' +
@@ -175,40 +175,38 @@
               '</span>' +
           '</div>' + // vjs-window-color
         '</div>' + // vjs-tracksettings
-        '<div class="vjs-tracksettings-font">' +
+        '<div class="vjs-tracksettings-font left">' +
           '<div class="font-size vjs-tracksetting">' +
             '<label class="vjs-label">Font Size</label>' +
             '<button name="font-size" class="font-minus">-</button>' +
             '<button name="font-size" class="font-plus">+</button>' +
           '</div>' + // vjs-font-size
           '<div class="vjs-edge-style vjs-tracksetting">' +
-            '<label class="vjs-label">Text Edge Style' +
-              '<select>' +
-                '<option value="none">None</option>' +
-                '<option value="raised">Raised</option>' +
-                '<option value="depressed">Depressed</option>' +
-                '<option value="uniform">Uniform</option>' +
-                '<option value="dropshadow">Dropshadow</option>' +
-              '</select>' +
-            '</label>' +
+            '<label class="vjs-label">Text Edge Style</label>' +
+            '<select>' +
+              '<option value="none">None</option>' +
+              '<option value="raised">Raised</option>' +
+              '<option value="depressed">Depressed</option>' +
+              '<option value="uniform">Uniform</option>' +
+              '<option value="dropshadow">Dropshadow</option>' +
+            '</select>' +
           '</div>' + // vjs-edge-style
           '<div class="vjs-font-family vjs-tracksetting">' +
-            '<label class="vjs-label">Font Family' +
-              '<select>' +
-                '<option value="">Default</option>' +
-                '<option value="monospaceSerif">Monospace Serif</option>' +
-                '<option value="proportionalSerif">Proportional Serif</option>' +
-                '<option value="monospaceSansSerif">Monospace Sans-Serif</option>' +
-                '<option value="proportionalSansSerif">Proportional Sans-Serif</option>' +
-                '<option value="casual">Casual</option>' +
-                '<option value="script">Script</option>' +
-                '<option value="small-caps">Small Caps</option>' +
-              '</select>' +
-            '</label>' +
+            '<label class="vjs-label">Font Family</label>' +
+            '<select>' +
+              '<option value="">Default</option>' +
+              '<option value="monospaceSerif">Monospace Serif</option>' +
+              '<option value="proportionalSerif">Proportional Serif</option>' +
+              '<option value="monospaceSansSerif">Monospace Sans-Serif</option>' +
+              '<option value="proportionalSansSerif">Proportional Sans-Serif</option>' +
+              '<option value="casual">Casual</option>' +
+              '<option value="script">Script</option>' +
+              '<option value="small-caps">Small Caps</option>' +
+            '</select>' +
           '</div>' + // vjs-font-family
         '</div>' +
       '</div>' +
-      '<div class="vjs-tracksettings-controls">' +
+      '<div class="vjs-tracksettings-controls clear right">' +
         '<button class="vjs-default-button">Defaults</button>' +
         '<button class="vjs-done-button">Close</button>' +
       '</div>';

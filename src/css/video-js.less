@@ -979,8 +979,12 @@ body.vjs-full-window {
   opacity: 0.75;
   color: #FFF;
   margin: 0 auto;
-  min-height: 17em;
-  width: 45em;
+  padding: 0.5em;
+  overflow-y: scroll;
+  height: 15em;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  width: 40em;
 }
 
 .vjs-caption-settings .left {
@@ -997,30 +1001,40 @@ body.vjs-full-window {
   clear: both;
 }
 
-.vjs-caption-settings .component {
-  margin: 0.5em;
-  padding: 0.3em;
-  min-height: 4em;
+.vjs-caption-settings .vjs-tracksetting {
+  margin: 5px;
+  padding: 3px;
+  min-height: 40px;
+}
+.vjs-caption-settings .vjs-tracksetting label {
+  display: block;
+  width: 100px;
+  margin-bottom: 5px;
 }
 
-.vjs-caption-settings .component > div {
-  margin-bottom: 0.5em;
-  min-height: 2em;
+.vjs-caption-settings .vjs-tracksetting span {
+  display: inline;
+  margin-left: 5px;
 }
 
-.vjs-caption-settings .component > div:last-child {
+.vjs-caption-settings .vjs-tracksetting > div {
+  margin-bottom: 5px;
+  min-height: 20px;
+}
+
+.vjs-caption-settings .vjs-tracksetting > div:last-child {
   margin-bottom: 0;
   padding-bottom: 0;
   min-height: 0;
 }
 
 .vjs-caption-settings label > input {
-  margin-right: 1em;
+  margin-right: 10px;
 }
 
 .vjs-caption-settings input[type="button"] {
-  width: 4em;
-  height: 4em;
+  width: 40px;
+  height: 40px;
 }
 
 /* Hide disabled or unsupported controls */
