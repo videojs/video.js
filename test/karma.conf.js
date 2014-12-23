@@ -1,3 +1,19 @@
+var fs = require('fs'),
+    vm = require('vm'),
+    sourceLoader = fs.readFileSync('./build/source-loader.js', 'utf8');
+    sandbox = {
+      blockSourceLoading: true,
+      document: {},
+      window: {}
+    };
+    sourceFiles = [];
+
+
+vm.runInNewContext(sourceLoader, sandbox, 'build/source-loader.js');
+sourceFiles = sandbox.sourceFiles.map(function(src) {
+  return '../' + src;
+});
+
 module.exports = function(config) {
   var customLaunchers = {
     chrome_sl: {
@@ -60,10 +76,10 @@ module.exports = function(config) {
 
     files: [
       '../build/files/video-js.css',
-      '../test/karma-qunit-shim.js',
-      "../src/js/**/*.js",
+      '../test/karma-qunit-shim.js'
+    ].concat(sourceFiles).concat([
       '../test/unit/**/*.js'
-    ],
+    ]),
 
     plugins: [
       'karma-qunit',

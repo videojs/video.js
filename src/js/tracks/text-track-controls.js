@@ -205,7 +205,7 @@ vjs.TextTrackMenuItem = vjs.MenuItem.extend({
       });
       tracks.addEventListener('change', changeHandler);
       player.on('dispose', function() {
-        tracks.removeEventListener('change', changeHandler)
+        tracks.removeEventListener('change', changeHandler);
       });
     }
 
@@ -293,7 +293,24 @@ vjs.CaptionSettingsMenuItem.prototype.onClick = function() {
 vjs.TextTrackButton = vjs.MenuButton.extend({
   /** @constructor */
   init: function(player, options){
+    var tracks, updateHandler;
+
     vjs.MenuButton.call(this, player, options);
+
+    tracks = this.player_.textTracks();
+
+    if (!tracks) {
+      return;
+    }
+
+    updateHandler = vjs.bind(this, this.update);
+    tracks.addEventListener('removetrack', updateHandler);
+    tracks.addEventListener('addtrack', updateHandler);
+
+    this.player_.on('dispose', function() {
+      tracks.removeEventListener('removetrack', updateHandler);
+      tracks.removeEventListener('addtrack', updateHandler);
+    });
 
     if (this.items.length <= 1) {
       this.hide();
@@ -303,7 +320,7 @@ vjs.TextTrackButton = vjs.MenuButton.extend({
 
 // Create a menu item for each text track
 vjs.TextTrackButton.prototype.createItems = function(){
-  var items = [], track, tracks, updateHandler;
+  var items = [], track, tracks;
 
   if (this instanceof vjs.CaptionsButton && !(this.player().tech && this.player().tech['featuresNativeTextTracks'])) {
     items.push(new vjs.CaptionSettingsMenuItem(this.player_, { 'kind': this.kind_ }));
@@ -317,15 +334,6 @@ vjs.TextTrackButton.prototype.createItems = function(){
   if (!tracks) {
     return items;
   }
-
-  updateHandler = vjs.bind(this, this.update);
-  tracks.addEventListener('removetrack', updateHandler);
-  tracks.addEventListener('addtrack', updateHandler)
-
-  this.player_.on('dispose', function() {
-    tracks.removeEventListener('removetrack', updateHandler);
-    tracks.removeEventListener('addtrack', updateHandler);
-  });
 
   for (var i = 0; i < tracks.length; i++) {
     track = tracks[i];

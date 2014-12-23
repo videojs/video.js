@@ -140,7 +140,7 @@ vjs.Html5.prototype.createEl = function(){
 
   // Update specific tag settings, in case they were overridden
   var settingsAttrs = ['autoplay','preload','loop','muted'];
-  for (var i = settingsAttrs.length - 1; i >= 0; i--) {
+  for (i = settingsAttrs.length - 1; i >= 0; i--) {
     var attr = settingsAttrs[i];
     var overwriteAttrs = {};
     if (typeof player.options_[attr] !== 'undefined') {
@@ -518,7 +518,7 @@ vjs.Html5.supportsNativeTextTracks = function() {
   }
 
   return supportsTextTracks;
-}
+};
 
 /**
  * Set the tech's volume control support status

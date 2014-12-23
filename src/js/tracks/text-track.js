@@ -176,6 +176,17 @@ vjs.TextTrack.prototype.allowedEvents_ = {
 };
 
 vjs.TextTrack.prototype.addCue = function(cue) {
+  var tracks = this.player_.textTracks(),
+      i = 0;
+
+  if (tracks) {
+    for (; i < tracks.length; i++) {
+      if (tracks[i] !== this) {
+        tracks[i].removeCue(cue);
+      }
+    }
+  }
+
   this.cues_.push(cue);
   this.cues.setCues_(this.cues_);
 };

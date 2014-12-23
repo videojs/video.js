@@ -71,7 +71,10 @@ vjs.TextTrackList.prototype.addTrack_ = function(track) {
   }));
   this.tracks_.push(track);
 
-  this.trigger('addtrack');
+  this.trigger({
+    type: 'addtrack',
+    track: track
+  });
 };
 
 vjs.TextTrackList.prototype.removeTrack_ = function(rtrack) {
@@ -88,7 +91,10 @@ vjs.TextTrackList.prototype.removeTrack_ = function(rtrack) {
     }
   }
 
-  this.trigger('removetrack');
+  this.trigger({
+    type: 'removetrack',
+    track: rtrack
+  });
 };
 
 vjs.TextTrackList.prototype.getTrackById = function(id) {
