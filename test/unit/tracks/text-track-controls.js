@@ -1,4 +1,4 @@
-module('Text Track UI Controls');
+module('Text Track Controls');
 
 var track = {
   kind: 'captions',
