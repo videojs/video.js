@@ -13,7 +13,7 @@ test('should open on click', function() {
     .style['display'], 'block', 'settings opened');
 });
 
-test('should open on done click', function() {
+test('should close on done click', function() {
   var player = PlayerTest.makePlayer(tracks);
   vjs.trigger(player.el().querySelector('.vjs-done-button'), 'click');
   equal(player.el()
