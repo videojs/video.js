@@ -373,9 +373,9 @@ test('should show and hide an element', function(){
   var comp = new vjs.Component(getFakePlayer(), {});
 
   comp.hide();
-  ok(comp.el().style.display === 'none');
+  ok(comp.hasClass('vjs-hidden') === true);
   comp.show();
-  ok(comp.el().style.display === 'block');
+  ok(comp.hasClass('vjs-hidden') === false);
 });
 
 test('dimension() should treat NaN and null as zero', function() {

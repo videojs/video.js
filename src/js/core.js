@@ -37,6 +37,16 @@ var vjs = function(id, options, ready){
 
     // If a player instance has already been created for this ID return it.
     if (vjs.players[id]) {
+
+      // If options or ready funtion are passed, warn
+      if (options) {
+        vjs.log.warn ('Player "' + id + '" is already initialised. Options will not be applied.');
+      }
+
+      if (ready) {
+        vjs.players[id].ready(ready);
+      }
+
       return vjs.players[id];
 
     // Otherwise get element for ID

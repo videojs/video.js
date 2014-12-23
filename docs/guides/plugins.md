@@ -43,4 +43,4 @@ If you've already initialized your video tag, you can activate a plugin at any t
 
     video.examplePlugin({ exampleOption: true });
 
-That's it. Head on over to the Video.js wiki and add your plugin to the list so everyone else can check it out.
+That's it. Head on over to the [Video.js wiki](https://github.com/videojs/video.js/wiki/Plugins) and add your plugin to the list so everyone else can check it out.

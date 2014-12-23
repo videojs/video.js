@@ -1,11 +1,11 @@
 Languages
 =========
 
-Multiple language support allows for users of non-English locales to natively interact with the displayed player. Video.js will compile multiple langauge files (see below) and instantiate with a global dictionary of language key/value support. Video.js player instances can be created with per-player language support that amends/overrides this default values. Player instances can also hard-set default languges to values other than English as of version 4.7.
+Multiple language support allows for users of non-English locales to natively interact with the displayed player. Video.js will compile multiple language files (see below) and instantiate with a global dictionary of language key/value support. Video.js player instances can be created with per-player language support that amends/overrides these default values. Player instances can also hard-set default languages to values other than English as of version 4.7.
 
 Creating the Language File
 --------------------------
-Video.js uses key/value object dictionaries in JSON form. A sample dictionary for Spanish ['es'] would look as follows;
+Video.js uses key/value object dictionaries in JSON form. A sample dictionary for Spanish `['es']` would look as follows;
 
 ```JSON
 {
@@ -38,14 +38,14 @@ Video.js uses key/value object dictionaries in JSON form. A sample dictionary fo
 
 Notes:
  
-- The file name should always be in the format XX.json, where XX is the two letter value of the language reported to the browser (for options see the bottom of this document).
-- For automatic inclusion at build time, add your language file to the /lang directory (see 'Adding Languages to Video.js below').
+- The file name should always be in the format `XX.json`, where `XX` is the two letter value of the language reported to the browser (for options see the bottom of this document).
+- For automatic inclusion at build time, add your language file to the `/lang` directory (see 'Adding Languages to Video.js below').
 
 Adding Languages to Video.js
 ----------------------------
 Additional language support can be added to Video.js in multiple ways.
 
-1. Create language scripts out of your JSON objects by using our custom grunt task `vjslanguages`. This task is automatically run as part of the default grunt task in Video.JS, but can be configured to match your src/dist directories if different. Once these scripts are created, just add them to your DOM like any other script. 
+1. Create language scripts out of your JSON objects by using our custom grunt task `vjslanguages`. This task is automatically run as part of the default grunt task in Video.JS, but can be configured to match your `src`/`dist` directories if different. Once these scripts are created, just add them to your DOM like any other script. 
 
 NOTE: These need to be added after the core Video.js script.
 
@@ -86,7 +86,7 @@ NOTE: These need to be added after the core Video.js script.
 </head>
 ```
 
-3. During a Video.js player instantiation. Adding the languages to the configuration object provided in the data-setup attribute.
+3. During a Video.js player instantiation. Adding the languages to the configuration object provided in the `data-setup` attribute.
 
 ```html
 <video id="example_video_1" class="video-js vjs-default-skin"  
@@ -102,12 +102,12 @@ NOTE: These need to be added after the core Video.js script.
 ```
 
 Notes:
-- This will add your language key/values to the videojs player instances individually. If these values already exist in the global dictionary via the process above, those will be overridden for the player instance in question.
+- This will add your language key/values to the Video.js player instances individually. If these values already exist in the global dictionary via the process above, those will be overridden for the player instance in question.
 
 
 Setting Default Language in a Video.js Player
 ---------------------------------------------
-During a Video.js player instantiation you can force it to localize to a specific language by including the locale value into the configuration object via the data-setup attribute. Valid options listed at the bottom of the page for reference.
+During a Video.js player instantiation you can force it to localize to a specific language by including the locale value into the configuration object via the `data-setup` attribute. Valid options listed at the bottom of the page for reference.
 
 ```html
 <video id="example_video_1" class="video-js vjs-default-skin"  
@@ -120,6 +120,15 @@ During a Video.js player instantiation you can force it to localize to a specifi
  <track kind="captions" src="http://example.com/path/to/captions.vtt" srclang="en" label="English" default>
 
 </video>
+```
+
+Localization in Plugins
+-----------------------
+
+When you're developing a plugin, you can also introduce new localized strings. Simply wrap the string with the player's `localize` function:
+
+```javascript
+var details = '<div class="vjs-errors-details">' + player.localize('Technical details') + '</div>';
 ```
 
 Language Codes
