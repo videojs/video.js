@@ -8,17 +8,13 @@ var tracks = [{
 test('should open on click', function() {
   var player = PlayerTest.makePlayer(tracks);
   vjs.trigger(player.el().querySelector('.vjs-texttrack-settings'), 'click');
-  equal(player.el()
-    .querySelector('.vjs-caption-settings')
-    .style['display'], 'block', 'settings opened');
+  ok(!player.textTrackSettings.hasClass('vjs-hidden'), 'settings open');
 });
 
 test('should close on done click', function() {
   var player = PlayerTest.makePlayer(tracks);
   vjs.trigger(player.el().querySelector('.vjs-done-button'), 'click');
-  equal(player.el()
-    .querySelector('.vjs-caption-settings')
-    .style['display'], 'none', 'settings closed');
+  ok(player.textTrackSettings.hasClass('vjs-hidden'), 'settings closed');
 });
 
 test('should increase font on click', function() {

@@ -10,10 +10,7 @@ test('should be displayed when text tracks list is not empty', function() {
     tracks: [track]
   });
 
-  equal(player
-    .el()
-    .querySelector('.vjs-captions-button')
-    .style['display'], 'block', 'control is displayed');
+  ok(!player.controlBar.captionsButton.hasClass('vjs-hidden'), 'control is displayed');
   equal(player.textTracks().length, 1, 'textTracks contains one item');
 });
 
@@ -22,20 +19,14 @@ test('should be displayed when a text track is added to an empty track list', fu
 
   player.addRemoteTextTrack(track);
 
-  equal(player
-    .el()
-    .querySelector('.vjs-captions-button')
-    .style['display'], 'block', 'control is displayed');
+  ok(!player.controlBar.captionsButton.hasClass('vjs-hidden'), 'control is displayed');
   equal(player.textTracks().length, 1, 'textTracks contains one item');
 });
 
 test('should not be displayed when text tracks list is empty', function() {
   var player = PlayerTest.makePlayer();
 
-  equal(player
-    .el()
-    .querySelector('.vjs-captions-button')
-    .style['display'], 'none', 'control is not displayed');
+  ok(player.controlBar.captionsButton.hasClass('vjs-hidden'), 'control is not displayed');
   equal(player.textTracks().length, 0, 'textTracks is empty');
 });
 
@@ -46,10 +37,7 @@ test('should not be displayed when last text track is removed', function() {
 
   player.removeRemoteTextTrack(player.textTracks()[0]);
 
-  equal(player
-    .el()
-    .querySelector('.vjs-captions-button')
-    .style['display'], 'none', 'control is not displayed');
+  ok(player.controlBar.captionsButton.hasClass('vjs-hidden'), 'control is not displayed');
   equal(player.textTracks().length, 0, 'textTracks is empty');
 });
 
