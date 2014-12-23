@@ -1673,38 +1673,6 @@ vjs.Player.prototype.removeRemoteTextTrack = function(track) {
   this.tech && this.tech['removeRemoteTextTrack'](track);
 };
 
-// Show a text track
-// disableSameKind: disable all other tracks of the same kind. Value should be a track kind (captions, etc.)
-vjs.Player.prototype.showTextTrack = function(id, disableSameKind){
-  var tracks = this.textTracks(),
-      i = 0,
-      l = tracks.length,
-      track,
-      showTrack,
-      mode,
-      kind;
-
-  if (!tracks) {
-    return this;
-  }
-
-  // Find Track with same ID
-  for (; i < l; i++) {
-    track = tracks[i];
-    mode = track.mode;
-
-    if (track.id === id || track.language === id) {
-      track.mode = 'showing';
-      kind = track.kind;
-    // Disable tracks of the same kind
-    } else if (disableSameKind && track.kind === disableSameKind && (mode === 'showing')) {
-      track.mode = 'disabled';
-    }
-  }
-
-  return this;
-};
-
 // Methods to add support for
 // networkState: function(){ return this.techCall('networkState'); },
 // readyState: function(){ return this.techCall('readyState'); },

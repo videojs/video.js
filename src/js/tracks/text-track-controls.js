@@ -180,7 +180,29 @@ vjs.TextTrackMenuItem = vjs.MenuItem.extend({
         changeHandler;
 
     if (tracks) {
-      changeHandler = vjs.bind(this, this.update);
+      changeHandler = vjs.bind(this, function() {
+        var selected = this.track.mode === 'showing',
+            track,
+            i,
+            l;
+
+        if (this instanceof vjs.OffTextTrackMenuItem) {
+          selected = true;
+
+          i = 0,
+          l = tracks.length;
+
+          for (; i < l; i++) {
+            track = tracks[i];
+            if (track.kind === this.track.kind && track.mode === 'showing') {
+              selected = false;
+              break;
+            }
+          }
+        }
+
+        this.selected(selected);
+      });
       tracks.addEventListener('change', changeHandler);
       player.on('dispose', function() {
         tracks.removeEventListener('change', changeHandler)
@@ -191,20 +213,35 @@ vjs.TextTrackMenuItem = vjs.MenuItem.extend({
     options['label'] = track['label'];
     options['selected'] = track['default'] || track.mode === 'showing';
     vjs.MenuItem.call(this, player, options);
-
-    this.on(player, track['kind'] + 'trackchange', this.update);
   }
 });
 
 vjs.TextTrackMenuItem.prototype.onClick = function(){
-  var kind = this.track['kind'];
-  vjs.MenuItem.prototype.onClick.call(this);
-  this.player_.showTextTrack(this.track.id || this.track.language, kind);
-  this.player_.trigger(kind + 'trackchange');
-};
+  var kind = this.track['kind'],
+      tracks = this.player_.textTracks(),
+      mode,
+      track,
+      i = 0;
 
-vjs.TextTrackMenuItem.prototype.update = function(){
-  this.selected(this.track['mode'] === 'showing');
+  vjs.MenuItem.prototype.onClick.call(this);
+
+  if (!tracks) {
+    return;
+  }
+
+  for (; i < tracks.length; i++) {
+    track = tracks[i];
+
+    if (track.kind !== kind) {
+      continue;
+    }
+
+    if (track === this.track) {
+      track.mode = 'showing';
+    } else {
+      track.mode = 'disabled';
+    }
+  }
 };
 
 /**
@@ -228,32 +265,6 @@ vjs.OffTextTrackMenuItem = vjs.TextTrackMenuItem.extend({
     this.selected(true);
   }
 });
-
-vjs.OffTextTrackMenuItem.prototype.onClick = function(){
-  vjs.TextTrackMenuItem.prototype.onClick.call(this);
-  this.player_.showTextTrack(this.track.id_, this.track.kind);
-};
-
-vjs.OffTextTrackMenuItem.prototype.update = function(){
-  var tracks = this.player_.textTracks(),
-      i = 0,
-      j = tracks.length,
-      track,
-      off = true;
-
-  if (!tracks) {
-    return;
-  }
-
-  for (; i < j; i++) {
-    track = tracks[i];
-    if (track['kind'] === this.track['kind'] && track['mode'] === 'showing') {
-      off = false;
-    }
-  }
-
-  this.selected(off);
-};
 
 vjs.CaptionSettingsMenuItem = vjs.TextTrackMenuItem.extend({
   init: function(player, options) {
@@ -289,31 +300,6 @@ vjs.TextTrackButton = vjs.MenuButton.extend({
     }
   }
 });
-
-// vjs.TextTrackButton.prototype.buttonPressed = false;
-
-// vjs.TextTrackButton.prototype.createMenu = function(){
-//   var menu = new vjs.Menu(this.player_);
-
-//   // Add a title list item to the top
-//   // menu.el().appendChild(vjs.createEl('li', {
-//   //   className: 'vjs-menu-title',
-//   //   innerHTML: vjs.capitalize(this.kind_),
-//   //   tabindex: -1
-//   // }));
-
-//   this.items = this.createItems();
-
-//   // Add menu items to the menu
-//   for (var i = 0; i < this.items.length; i++) {
-//     menu.addItem(this.items[i]);
-//   }
-
-//   // Add list to element
-//   this.addChild(menu);
-
-//   return menu;
-// };
 
 // Create a menu item for each text track
 vjs.TextTrackButton.prototype.createItems = function(){
