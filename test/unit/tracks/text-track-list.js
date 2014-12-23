@@ -121,7 +121,7 @@ test('a "removetrack" event is triggered when tracks are removed', function() {
       tracks = 0,
       rms = 0,
       rmHandler = function(e) {
-        e.track && tracks++
+        e.track && tracks++;
         rms++;
       };
 

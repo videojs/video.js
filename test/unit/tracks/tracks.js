@@ -169,7 +169,7 @@ test('update texttrack buttons on removetrack or addtrack', function() {
   vjs.SubtitlesButton.prototype.update = function() {
     update++;
     oldSubsUpdate.call(this);
-  }
+  };
   vjs.ChaptersButton.prototype.update = function() {
     update++;
     oldChaptersUpdate.call(this);

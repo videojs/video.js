@@ -205,7 +205,7 @@ vjs.TextTrackMenuItem = vjs.MenuItem.extend({
       });
       tracks.addEventListener('change', changeHandler);
       player.on('dispose', function() {
-        tracks.removeEventListener('change', changeHandler)
+        tracks.removeEventListener('change', changeHandler);
       });
     }
 
@@ -305,7 +305,7 @@ vjs.TextTrackButton = vjs.MenuButton.extend({
 
     updateHandler = vjs.bind(this, this.update);
     tracks.addEventListener('removetrack', updateHandler);
-    tracks.addEventListener('addtrack', updateHandler)
+    tracks.addEventListener('addtrack', updateHandler);
 
     this.player_.on('dispose', function() {
       tracks.removeEventListener('removetrack', updateHandler);
