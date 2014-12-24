@@ -19,7 +19,7 @@
         this.el().querySelector('.vjs-window-opacity > select').selectedIndex = 0;
         this.el().querySelector('.vjs-edge-style select').selectedIndex = 0;
         this.el().querySelector('.vjs-font-family select').selectedIndex = 0;
-        this.el().querySelector('.vjs-font-percent select').selectedIndex = 0;
+        this.el().querySelector('.vjs-font-percent select').selectedIndex = 2;
         this.updateDisplay();
       }));
 
