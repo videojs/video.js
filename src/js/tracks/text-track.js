@@ -62,6 +62,9 @@ vjs.TextTrack = function(options) {
       changed = false;
     }
   });
+  if (mode === 'showing') {
+    this.player_.on('timeupdate', timeupdateHandler);
+  }
 
   Object.defineProperty(tt, 'kind', {
     get: function() {

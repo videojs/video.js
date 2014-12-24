@@ -217,4 +217,43 @@ test('cues can be added and removed from a TextTrack', function() {
   equal(cues.length, 3, 'we now have 3 cues');
 });
 
+test('fires cuechange when cues become active and inactive', function() {
+  var player = PlayerTest.makePlayer(),
+      changes = 0,
+      cuechangeHandler,
+      tt = new TT({
+        player: player,
+        mode: 'showing'
+      });
+
+  cuechangeHandler = function() {
+    changes++;
+  };
+
+  tt.addCue({
+    id: '1',
+    startTime: 1,
+    endTime: 5,
+  });
+
+  tt.oncuechange = cuechangeHandler;
+  tt.addEventListener('cuechange', cuechangeHandler);
+
+  player.currentTime = function() {
+    return 2;
+  };
+
+  player.trigger('timeupdate');
+
+  equal(changes, 2, 'a cuechange event trigger addEventListener and oncuechange');
+
+  player.currentTime = function() {
+    return 7;
+  };
+
+  player.trigger('timeupdate');
+
+  equal(changes, 4, 'a cuechange event trigger addEventListener and oncuechange');
+});
+
 })();
