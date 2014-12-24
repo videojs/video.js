@@ -222,7 +222,7 @@ Make sure your changes are pushed to origin
 git push
 ```
 
-Use contrib to submit a a pull request (make sure you're in your feature branch)
+Use contrib to submit a pull request (make sure you're in your feature branch)
 
 ```bash
 contrib feature submit
