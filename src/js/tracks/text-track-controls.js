@@ -157,6 +157,8 @@ vjs.TextTrackDisplay.prototype.updateForTrack = function(track) {
     if (overrides.fontPercent) {
       fontSize = window.parseFloat(cueDiv.style.fontSize);
       cueDiv.style.fontSize = (fontSize * overrides.fontPercent) + 'px';
+      cueDiv.style.height = 'auto';
+      cueDiv.style.top = 'auto';
     }
     if (overrides.fontFamily && overrides.fontFamily !== 'default') {
       if (overrides.fontFamily === 'small-caps') {
