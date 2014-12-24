@@ -233,7 +233,7 @@ test('fires cuechange when cues become active and inactive', function() {
   tt.addCue({
     id: '1',
     startTime: 1,
-    endTime: 5,
+    endTime: 5
   });
 
   tt.oncuechange = cuechangeHandler;

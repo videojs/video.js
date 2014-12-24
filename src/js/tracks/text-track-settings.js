@@ -7,6 +7,7 @@
       this.hide();
 
       vjs.on(this.el().querySelector('.vjs-done-button'), 'click', vjs.bind(this, function() {
+        this.saveSettings();
         this.hide();
       }));
 
@@ -32,6 +33,10 @@
       vjs.on(this.el().querySelector('.vjs-font-percent select'), 'change', vjs.bind(this, this.updateDisplay));
       vjs.on(this.el().querySelector('.vjs-edge-style select'), 'change', vjs.bind(this, this.updateDisplay));
       vjs.on(this.el().querySelector('.vjs-font-family select'), 'change', vjs.bind(this, this.updateDisplay));
+
+      if (player.options()['persistTextTrackSettings']) {
+        this.restoreSettings();
+      }
     }
   });
 
@@ -76,6 +81,51 @@
     return result;
   };
 
+  vjs.TextTrackSettings.prototype.setValues = function(values) {
+    var el = this.el(), fontPercent;
+
+    setSelectedOption(el.querySelector('.vjs-edge-style select'), values.edgeStyle);
+    setSelectedOption(el.querySelector('.vjs-font-family select'), values.fontFamily);
+    setSelectedOption(el.querySelector('.vjs-fg-color > select'), values.color);
+    setSelectedOption(el.querySelector('.vjs-text-opacity > select'), values.textOpacity);
+    setSelectedOption(el.querySelector('.vjs-bg-color > select'), values.backgroundColor);
+    setSelectedOption(el.querySelector('.vjs-bg-opacity > select'), values.backgroundOpacity);
+    setSelectedOption(el.querySelector('.window-color > select'), values.windowColor);
+    setSelectedOption(el.querySelector('.vjs-window-opacity > select'), values.windowOpacity);
+
+    fontPercent = values.fontPercent;
+
+    if (fontPercent) {
+      fontPercent.toFixed(2);
+    }
+
+    setSelectedOption(el.querySelector('.vjs-font-percent > select'), fontPercent);
+  };
+
+  vjs.TextTrackSettings.prototype.restoreSettings = function() {
+    var values;
+    try {
+      values = JSON.parse(window.localStorage.getItem('vjs-text-track-settings'));
+    } catch (e) {}
+
+    if (values) {
+      this.setValues(values);
+    }
+  };
+
+  vjs.TextTrackSettings.prototype.saveSettings = function() {
+    var values;
+
+    if (!this.player_.options()['persistTextTrackSettings']) {
+      return;
+    }
+
+    values = this.getValues();
+    try {
+      window.localStorage.setItem('vjs-text-track-settings', JSON.stringify(values));
+    } catch (e) {}
+  };
+
   vjs.TextTrackSettings.prototype.updateDisplay = function() {
     var ttDisplay = this.player_.getChild('textTrackDisplay');
     if (ttDisplay) {
@@ -93,6 +143,27 @@
     }
 
     return selectedOption.value;
+  }
+
+  function setSelectedOption(target, value) {
+    var i, option;
+
+    if (!value) {
+      return;
+    }
+
+    for (i = 0; i < target.options.length; i++) {
+      option = target.options[i];
+      if (option.value === value) {
+        break;
+      }
+    }
+
+    if (target.selectedOptions) {
+      target.selectedOptions[0] = option;
+    }
+
+    target.selectedIndex = i;
   }
 
   function captionOptionsMenuTemplate() {
