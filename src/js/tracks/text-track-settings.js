@@ -6,8 +6,6 @@
       vjs.Component.call(this, player, options);
       this.hide();
 
-      this.fontSize = 12;
-
       vjs.on(this.el().querySelector('.vjs-done-button'), 'click', vjs.bind(this, function() {
         this.hide();
       }));
@@ -21,16 +19,7 @@
         this.el().querySelector('.vjs-window-opacity > select').selectedIndex = 0;
         this.el().querySelector('.vjs-edge-style select').selectedIndex = 0;
         this.el().querySelector('.vjs-font-family select').selectedIndex = 0;
-        this.fontSize = 12;
-        this.updateDisplay();
-      }));
-
-      vjs.on(this.el().querySelector('.font-plus'), 'click', vjs.bind(this, function() {
-        this.fontSize++;
-        this.updateDisplay();
-      }));
-      vjs.on(this.el().querySelector('.font-minus'), 'click', vjs.bind(this, function() {
-        this.fontSize--;
+        this.el().querySelector('.vjs-font-percent select').selectedIndex = 0;
         this.updateDisplay();
       }));
 
@@ -40,6 +29,7 @@
       vjs.on(this.el().querySelector('.vjs-text-opacity > select'), 'change', vjs.bind(this, this.updateDisplay));
       vjs.on(this.el().querySelector('.vjs-bg-opacity > select'), 'change', vjs.bind(this, this.updateDisplay));
       vjs.on(this.el().querySelector('.vjs-window-opacity > select'), 'change', vjs.bind(this, this.updateDisplay));
+      vjs.on(this.el().querySelector('.vjs-font-percent select'), 'change', vjs.bind(this, this.updateDisplay));
       vjs.on(this.el().querySelector('.vjs-edge-style select'), 'change', vjs.bind(this, this.updateDisplay));
       vjs.on(this.el().querySelector('.vjs-font-family select'), 'change', vjs.bind(this, this.updateDisplay));
     }
@@ -53,7 +43,7 @@
   };
 
   vjs.TextTrackSettings.prototype.getValues = function() {
-    var el, bgOpacity, textOpacity, windowOpacity, textEdge, fontFamily, fgColor, bgColor, windowColor, result, name;
+    var el, bgOpacity, textOpacity, windowOpacity, textEdge, fontFamily, fgColor, bgColor, windowColor, result, name, fontPercent;
 
     el = this.el();
 
@@ -65,6 +55,7 @@
     bgOpacity = getSelectedOptionValue(el.querySelector('.vjs-bg-opacity > select'));
     windowColor = getSelectedOptionValue(el.querySelector('.window-color > select'));
     windowOpacity = getSelectedOptionValue(el.querySelector('.vjs-window-opacity > select'));
+    fontPercent = window.parseFloat(getSelectedOptionValue(el.querySelector('.vjs-font-percent > select')));
 
     result = {
       'backgroundOpacity': bgOpacity,
@@ -74,15 +65,13 @@
       'fontFamily': fontFamily,
       'color': fgColor,
       'backgroundColor': bgColor,
-      'windowColor': windowColor
+      'windowColor': windowColor,
+      'fontPercent': fontPercent
     };
     for (name in result) {
       if (result[name] === '' || result[name] === 'none') {
         delete result[name];
       }
-    }
-    if (this.fontSize !== 12) {
-      result.fontSize = this.fontSize + 'px';
     }
     return result;
   };
@@ -176,11 +165,20 @@
           '</div>' + // vjs-window-color
         '</div>' + // vjs-tracksettings
         '<div class="vjs-tracksettings-font left">' +
-          '<div class="font-size vjs-tracksetting">' +
+          '<div class="vjs-font-percent vjs-tracksetting">' +
             '<label class="vjs-label">Font Size</label>' +
-            '<button name="font-size" class="font-minus">-</button>' +
-            '<button name="font-size" class="font-plus">+</button>' +
-          '</div>' + // vjs-font-size
+            '<select>' +
+              '<option value="0.50">50%</option>' +
+              '<option value="0.75">75%</option>' +
+              '<option value="1.00" selected>100%</option>' +
+              '<option value="1.25">125%</option>' +
+              '<option value="1.50">150%</option>' +
+              '<option value="1.75">175%</option>' +
+              '<option value="2.00">200%</option>' +
+              '<option value="3.00">300%</option>' +
+              '<option value="4.00">400%</option>' +
+            '</select>' +
+          '</div>' + // vjs-font-percent
           '<div class="vjs-edge-style vjs-tracksetting">' +
             '<label class="vjs-label">Text Edge Style</label>' +
             '<select>' +

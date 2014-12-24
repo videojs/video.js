@@ -110,6 +110,7 @@ vjs.TextTrackDisplay.prototype.updateForTrack = function(track) {
       property,
       cueDiv,
       overrides = this.player_.textTrackSettings.getValues(),
+      fontSize,
       cues = [];
 
   for (; i < track.activeCues.length; i++) {
@@ -153,8 +154,9 @@ vjs.TextTrackDisplay.prototype.updateForTrack = function(track) {
         cueDiv.firstChild.style.textShadow = '0 0 4px ' + darkGray + ', 0 0 4px ' + darkGray + ', 0 0 4px ' + darkGray + ', 0 0 4px ' + darkGray;
       }
     }
-    if (overrides.fontSize) {
-      cueDiv.firstChild.style.fontSize = overrides.fontSize;
+    if (overrides.fontPercent) {
+      fontSize = window.parseFloat(cueDiv.style.fontSize);
+      cueDiv.style.fontSize = (fontSize * overrides.fontPercent) + 'px';
     }
     if (overrides.fontFamily && overrides.fontFamily !== 'default') {
       if (overrides.fontFamily === 'small-caps') {
