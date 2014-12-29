@@ -984,25 +984,35 @@ body.vjs-full-window {
   color: #FFF;
   margin: 0 auto;
   padding: 0.5em;
-  overflow-y: scroll;
   height: 15em;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;
   width: 40em;
 }
 
-.vjs-caption-settings .left {
-  float: left
+.vjs-caption-settings .vjs-tracksettings {
+  top: 0;
+  bottom: 2em;
+  left: 0;
+  right: 0;
+  position: absolute;
+  overflow: auto;
 }
 
-.vjs-caption-settings .right {
-  float: right;
+.vjs-caption-settings .vjs-tracksettings-colors,
+.vjs-caption-settings .vjs-tracksettings-font {
+  float: left;
 }
-
-.vjs-caption-settings .clear,
-.vjs-caption-settings .left:after,
-.vjs-caption-settings .right:after {
+.vjs-caption-settings .vjs-tracksettings-colors:after,
+.vjs-caption-settings .vjs-tracksettings-font:after,
+.vjs-caption-settings .vjs-tracksettings-controls:after {
   clear: both;
+}
+
+.vjs-caption-settings .vjs-tracksettings-controls {
+  position: absolute;
+  bottom: 1em;
+  right: 1em;
 }
 
 .vjs-caption-settings .vjs-tracksetting {

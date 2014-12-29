@@ -167,8 +167,8 @@
   }
 
   function captionOptionsMenuTemplate() {
-    return '<div>' +
-        '<div class="vjs-tracksettings-colors left">' +
+    return '<div class="vjs-tracksettings">' +
+        '<div class="vjs-tracksettings-colors">' +
           '<div class="vjs-fg-color vjs-tracksetting">' +
               '<label class="vjs-label">Foreground</label>' +
               '<select>' +
@@ -235,7 +235,7 @@
               '</span>' +
           '</div>' + // vjs-window-color
         '</div>' + // vjs-tracksettings
-        '<div class="vjs-tracksettings-font left">' +
+        '<div class="vjs-tracksettings-font">' +
           '<div class="vjs-font-percent vjs-tracksetting">' +
             '<label class="vjs-label">Font Size</label>' +
             '<select>' +
@@ -275,7 +275,7 @@
           '</div>' + // vjs-font-family
         '</div>' +
       '</div>' +
-      '<div class="vjs-tracksettings-controls clear right">' +
+      '<div class="vjs-tracksettings-controls">' +
         '<button class="vjs-default-button">Defaults</button>' +
         '<button class="vjs-done-button">Done</button>' +
       '</div>';
