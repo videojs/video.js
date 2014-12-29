@@ -96,7 +96,7 @@
     fontPercent = values.fontPercent;
 
     if (fontPercent) {
-      fontPercent.toFixed(2);
+      fontPercent = fontPercent.toFixed(2);
     }
 
     setSelectedOption(el.querySelector('.vjs-font-percent > select'), fontPercent);
