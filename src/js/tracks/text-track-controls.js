@@ -154,11 +154,12 @@ vjs.TextTrackDisplay.prototype.updateForTrack = function(track) {
         cueDiv.firstChild.style.textShadow = '0 0 4px ' + darkGray + ', 0 0 4px ' + darkGray + ', 0 0 4px ' + darkGray + ', 0 0 4px ' + darkGray;
       }
     }
-    if (overrides.fontPercent) {
+    if (overrides.fontPercent && overrides.fontPercent !== 1) {
       fontSize = window.parseFloat(cueDiv.style.fontSize);
       cueDiv.style.fontSize = (fontSize * overrides.fontPercent) + 'px';
       cueDiv.style.height = 'auto';
       cueDiv.style.top = 'auto';
+      cueDiv.style.bottom = '2px';
     }
     if (overrides.fontFamily && overrides.fontFamily !== 'default') {
       if (overrides.fontFamily === 'small-caps') {
