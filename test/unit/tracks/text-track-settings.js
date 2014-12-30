@@ -23,15 +23,15 @@ test('should update settings', function() {
 
   deepEqual(player.textTrackSettings.getValues(), newSettings, 'values are updated');
 
-  equal(player.el().querySelector('.vjs-fg-color > select').selectedIndex, 1, 'fg-color is set to default value');
-  equal(player.el().querySelector('.vjs-bg-color > select').selectedIndex, 1, 'bg-color is set to default value');
-  equal(player.el().querySelector('.window-color > select').selectedIndex, 1, 'window-color is set to default value');
-  equal(player.el().querySelector('.vjs-text-opacity > select').selectedIndex, 1, 'text-opacity is set to default value');
-  equal(player.el().querySelector('.vjs-bg-opacity > select').selectedIndex, 1, 'bg-opacity is set to default value');
-  equal(player.el().querySelector('.vjs-window-opacity > select').selectedIndex, 1, 'window-opacity is set to default value');
-  equal(player.el().querySelector('.vjs-edge-style select').selectedIndex, 1, 'edge-style is set to default value');
-  equal(player.el().querySelector('.vjs-font-family select').selectedIndex, 1, 'font-family is set to default value');
-  equal(player.el().querySelector('.vjs-font-percent select').selectedIndex, 3, 'font-percent is set to default value');
+  equal(player.el().querySelector('.vjs-fg-color > select').selectedIndex, 1, 'fg-color is set to new value');
+  equal(player.el().querySelector('.vjs-bg-color > select').selectedIndex, 1, 'bg-color is set to new value');
+  equal(player.el().querySelector('.window-color > select').selectedIndex, 1, 'window-color is set to new value');
+  equal(player.el().querySelector('.vjs-text-opacity > select').selectedIndex, 1, 'text-opacity is set to new value');
+  equal(player.el().querySelector('.vjs-bg-opacity > select').selectedIndex, 1, 'bg-opacity is set to new value');
+  equal(player.el().querySelector('.vjs-window-opacity > select').selectedIndex, 1, 'window-opacity is set to new value');
+  equal(player.el().querySelector('.vjs-edge-style select').selectedIndex, 1, 'edge-style is set to new value');
+  equal(player.el().querySelector('.vjs-font-family select').selectedIndex, 1, 'font-family is set to new value');
+  equal(player.el().querySelector('.vjs-font-percent select').selectedIndex, 3, 'font-percent is set to new value');
 });
 
 test('should restore default settings', function() {
