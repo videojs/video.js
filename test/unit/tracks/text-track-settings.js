@@ -1,4 +1,8 @@
-module('Text Track Settings');
+module('Text Track Settings', {
+  beforeEach: function() {
+    window.localStorage.clear();
+  }
+});
 
 var tracks = [{
   kind: 'captions',
@@ -7,7 +11,8 @@ var tracks = [{
 
 test('should update settings', function() {
   var player = PlayerTest.makePlayer({
-      tracks: tracks
+      tracks: tracks,
+      persistTextTrackSettings: true
     }),
     newSettings = {
       'backgroundOpacity': '1',
@@ -22,7 +27,6 @@ test('should update settings', function() {
     };
 
   player.textTrackSettings.setValues(newSettings);
-
   deepEqual(player.textTrackSettings.getValues(), newSettings, 'values are updated');
 
   equal(player.el().querySelector('.vjs-fg-color > select').selectedIndex, 1, 'fg-color is set to new value');
@@ -34,11 +38,15 @@ test('should update settings', function() {
   equal(player.el().querySelector('.vjs-edge-style select').selectedIndex, 1, 'edge-style is set to new value');
   equal(player.el().querySelector('.vjs-font-family select').selectedIndex, 1, 'font-family is set to new value');
   equal(player.el().querySelector('.vjs-font-percent select').selectedIndex, 3, 'font-percent is set to new value');
+
+  vjs.trigger(player.el().querySelector('.vjs-done-button'), 'click');
+  deepEqual(JSON.parse(window.localStorage.getItem('vjs-text-track-settings')), newSettings, 'values are saved');
 });
 
 test('should restore default settings', function() {
   var player = PlayerTest.makePlayer({
-    tracks: tracks
+    tracks: tracks,
+    persistTextTrackSettings: true
   });
 
   player.el().querySelector('.vjs-fg-color > select').selectedIndex = 1;
@@ -55,9 +63,8 @@ test('should restore default settings', function() {
   vjs.trigger(player.el().querySelector('.vjs-default-button'), 'click');
   vjs.trigger(player.el().querySelector('.vjs-done-button'), 'click');
 
-  deepEqual(player.textTrackSettings.getValues(), {
-    'fontPercent': 1.00
-  }, 'values are defaulted');
+  deepEqual(player.textTrackSettings.getValues(), {}, 'values are defaulted');
+  deepEqual(window.localStorage.getItem('vjs-text-track-settings'), null, 'values are saved');
 
   equal(player.el().querySelector('.vjs-fg-color > select').selectedIndex, 0, 'fg-color is set to default value');
   equal(player.el().querySelector('.vjs-bg-color > select').selectedIndex, 0, 'bg-color is set to default value');
@@ -200,5 +207,5 @@ test('should not restore saved settings', function() {
     persistTextTrackSettings: false
   });
 
-  deepEqual(player.textTrackSettings.getValues(), {'fontPercent': 1.00});
+  deepEqual(player.textTrackSettings.getValues(), {});
 });
