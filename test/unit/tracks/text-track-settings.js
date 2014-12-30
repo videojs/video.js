@@ -141,15 +141,64 @@ test('do not try to restore or save settings if persist option is not set', func
 
   player = PlayerTest.makePlayer({
     tracks: tracks,
-    persistTextTrackSettings: true
+    persistTextTrackSettings: false
   });
 
-  equal(restore, 1, 'restore was not called');
+  equal(restore, 0, 'restore was not called');
 
   vjs.trigger(player.el().querySelector('.vjs-done-button'), 'click');
 
+  // saveSettings is called but does nothing
   equal(save, 1, 'save was not called');
 
   vjs.TextTrackSettings.prototype.saveSettings = oldSaveSettings;
   vjs.TextTrackSettings.prototype.restoreSettings = oldRestoreSettings;
+});
+
+test('should restore saved settings', function() {
+  var player,
+    newSettings = {
+      'backgroundOpacity': '1',
+      'textOpacity': '1',
+      'windowOpacity': '1',
+      'edgeStyle': 'raised',
+      'fontFamily': 'monospaceSerif',
+      'color': '#FFF',
+      'backgroundColor': '#FFF',
+      'windowColor': '#FFF',
+      'fontPercent': 1.25
+    };
+
+  window.localStorage.setItem('vjs-text-track-settings', JSON.stringify(newSettings));
+
+  player = PlayerTest.makePlayer({
+    tracks: tracks,
+    persistTextTrackSettings: true
+  });
+
+  deepEqual(player.textTrackSettings.getValues(), newSettings);
+});
+
+test('should not restore saved settings', function() {
+  var player,
+    newSettings = {
+      'backgroundOpacity': '1',
+      'textOpacity': '1',
+      'windowOpacity': '1',
+      'edgeStyle': 'raised',
+      'fontFamily': 'monospaceSerif',
+      'color': '#FFF',
+      'backgroundColor': '#FFF',
+      'windowColor': '#FFF',
+      'fontPercent': 1.25
+    };
+
+  window.localStorage.setItem('vjs-text-track-settings', JSON.stringify(newSettings));
+
+  player = PlayerTest.makePlayer({
+    tracks: tracks,
+    persistTextTrackSettings: false
+  });
+
+  deepEqual(player.textTrackSettings.getValues(), {'fontPercent': 1.00});
 });
