@@ -64,7 +64,7 @@ test('html5 tech supports native text tracks if the video supports it', function
   vjs.TEST_VID = oldTestVid;
 });
 
-test('listen ot remove and add track events in native text tracks', function() {
+test('listen to remove and add track events in native text tracks', function() {
   var oldTestVid = vjs.TEST_VID,
       player,
       options,
