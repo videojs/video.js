@@ -208,11 +208,9 @@ vjs.TextTrack.prototype.removeCue = function(removeCue) {
     }
   }
 
-  if (!removed) {
-    throw new Error('Cue Not Found');
+  if (removed) {
+    this.cues.setCues_(this.cues_);
   }
-
-  this.cues.setCues_(this.cues_);
 };
 
 /*
