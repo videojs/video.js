@@ -74,7 +74,7 @@
       'fontPercent': fontPercent
     };
     for (name in result) {
-      if (result[name] === '' || result[name] === 'none') {
+      if (result[name] === '' || result[name] === 'none' || (name === 'fontPercent' && result[name] === 1.00)) {
         delete result[name];
       }
     }
@@ -122,7 +122,11 @@
 
     values = this.getValues();
     try {
-      window.localStorage.setItem('vjs-text-track-settings', JSON.stringify(values));
+      if (!vjs.isEmpty(values)) {
+        window.localStorage.setItem('vjs-text-track-settings', JSON.stringify(values));
+      } else {
+        window.localStorage.removeItem('vjs-text-track-settings');
+      }
     } catch (e) {}
   };
 
