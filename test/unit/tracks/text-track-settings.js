@@ -6,7 +6,9 @@ var tracks = [{
 }];
 
 test('should update settings', function() {
-  var player = PlayerTest.makePlayer(tracks),
+  var player = PlayerTest.makePlayer({
+      tracks: tracks
+    }),
     newSettings = {
       'backgroundOpacity': '1',
       'textOpacity': '1',
@@ -35,7 +37,9 @@ test('should update settings', function() {
 });
 
 test('should restore default settings', function() {
-  var player = PlayerTest.makePlayer(tracks);
+  var player = PlayerTest.makePlayer({
+    tracks: tracks
+  });
 
   player.el().querySelector('.vjs-fg-color > select').selectedIndex = 1;
   player.el().querySelector('.vjs-bg-color > select').selectedIndex = 1;
@@ -67,13 +71,17 @@ test('should restore default settings', function() {
 });
 
 test('should open on click', function() {
-  var player = PlayerTest.makePlayer(tracks);
+  var player = PlayerTest.makePlayer({
+    tracks: tracks
+  });
   vjs.trigger(player.el().querySelector('.vjs-texttrack-settings'), 'click');
   ok(!player.textTrackSettings.hasClass('vjs-hidden'), 'settings open');
 });
 
 test('should close on done click', function() {
-  var player = PlayerTest.makePlayer(tracks);
+  var player = PlayerTest.makePlayer({
+    tracks: tracks
+  });
   vjs.trigger(player.el().querySelector('.vjs-texttrack-settings'), 'click');
   vjs.trigger(player.el().querySelector('.vjs-done-button'), 'click');
   ok(player.textTrackSettings.hasClass('vjs-hidden'), 'settings closed');
