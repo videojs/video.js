@@ -378,7 +378,7 @@ vjs.Html5.prototype.addRemoteTextTrack = function(options) {
 
   this.remoteTextTracks().addTrack_(track.track);
 
-  return track.track;
+  return track;
 };
 
 vjs.Html5.prototype.removeRemoteTextTrack = function(track) {
@@ -393,7 +393,7 @@ vjs.Html5.prototype.removeRemoteTextTrack = function(track) {
   tracks = this.el().querySelectorAll('track');
 
   for (i = 0; i < tracks.length; i++) {
-    if (tracks[i].track === track) {
+    if (tracks[i] === track || tracks[i].track === track) {
       tracks[i].parentNode.removeChild(tracks[i]);
       break;
     }
