@@ -101,16 +101,8 @@ vjs.Slider.prototype.update = function(){
         // The width of the handle in percent of the containing box
         // In IE, widths may not be ready yet causing NaN
         handlePercent = (handleWidth) ? handleWidth / boxWidth : 0,
-
-        // Get the adjusted size of the box, considering that the handle's center never touches the left or right side.
-        // There is a margin of half the handle's width on both sides.
-        boxAdjustedPercent = 1 - handlePercent,
-
-        // Adjust the progress that we'll use to set widths to the new adjusted box width
-        adjustedProgress = progress * boxAdjustedPercent;
-
-    // The bar does reach the left side, so we need to account for this in the bar's width
-    barProgress = adjustedProgress + (handlePercent / 2);
+        //make the center of the handler is align to the left side of the progress bar horizontally
+        adjustedProgress = progress - handlePercent/2;
 
     // Move the handle from the left based on the adjected progress
     handle.el().style.left = vjs.round(adjustedProgress * 100, 2) + '%';
