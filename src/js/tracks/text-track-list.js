@@ -44,6 +44,10 @@ vjs.TextTrackList = function(tracks) {
 
 vjs.TextTrackList.prototype = vjs.obj.create(vjs.EventEmitter.prototype);
 vjs.TextTrackList.prototype.constructor = vjs.TextTrackList;
+// emulate attribute EventHandler support to allow for feature detection
+vjs.TextTrackList.prototype.onchange = null;
+vjs.TextTrackList.prototype.onaddtrack = null;
+vjs.TextTrackList.prototype.onremovetrack = null;
 
 /*
  * change - One or more tracks in the track list have been enabled or disabled.

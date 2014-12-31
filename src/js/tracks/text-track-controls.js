@@ -182,7 +182,8 @@ vjs.TextTrackMenuItem = vjs.MenuItem.extend({
   init: function(player, options){
     var track = this.track = options['track'],
         tracks = player.textTracks(),
-        changeHandler;
+        changeHandler,
+        event;
 
     if (tracks) {
       changeHandler = vjs.bind(this, function() {
@@ -218,6 +219,24 @@ vjs.TextTrackMenuItem = vjs.MenuItem.extend({
     options['label'] = track['label'];
     options['selected'] = track['default'] || track.mode === 'showing';
     vjs.MenuItem.call(this, player, options);
+
+    // iOS7 doesn't dispatch change events to TextTrackLists when an
+    // associated track's mode changes. Without something like
+    // Object.observe() (also not present on iOS7), it's not
+    // possible to detect changes to the mode attribute and polyfill
+    // the change event. As a poor substitute, we manually dispatch
+    // change events whenever the controls modify the mode.
+    if (tracks && tracks.onchange === undefined) {
+      this.on(['tap', 'click'], function() {
+        if (typeof window.Event !== 'object') {
+          event = new window.Event('change');
+        } else {
+          event = document.createEvent('Event');
+          event.initEvent('change', true, true);
+        }
+        tracks.dispatchEvent(event);
+      });
+    }
   }
 });
 
