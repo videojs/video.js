@@ -382,7 +382,9 @@ vjs.MediaTechController.prototype.addTextTrack = function(kind, label, language)
 vjs.MediaTechController.prototype.addRemoteTextTrack = function(options) {
   var track = createTrackHelper(this, options.kind, options.label, options.language, options);
   this.remoteTextTracks().addTrack_(track);
-  return track;
+  return {
+    track: track
+  };
 };
 
 vjs.MediaTechController.prototype.removeRemoteTextTrack = function(track) {
