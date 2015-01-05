@@ -71,6 +71,16 @@ goog.exportProperty(vjs.Component.prototype, 'localize', vjs.Component.prototype
 goog.exportProperty(vjs.Component.prototype, 'setInterval', vjs.Component.prototype.setInterval);
 goog.exportProperty(vjs.Component.prototype, 'setTimeout', vjs.Component.prototype.setTimeout);
 
+goog.exportSymbol('videojs.EventEmitter', vjs.EventEmitter);
+goog.exportProperty(vjs.EventEmitter.prototype, 'on', vjs.EventEmitter.prototype.on);
+goog.exportProperty(vjs.EventEmitter.prototype, 'addEventListener', vjs.EventEmitter.prototype.addEventListener);
+goog.exportProperty(vjs.EventEmitter.prototype, 'off', vjs.EventEmitter.prototype.off);
+goog.exportProperty(vjs.EventEmitter.prototype, 'removeEventListener', vjs.EventEmitter.prototype.removeEventListener);
+goog.exportProperty(vjs.EventEmitter.prototype, 'one', vjs.EventEmitter.prototype.one);
+goog.exportProperty(vjs.EventEmitter.prototype, 'trigger', vjs.EventEmitter.prototype.trigger);
+goog.exportProperty(vjs.EventEmitter.prototype, 'dispatchEvent', vjs.EventEmitter.prototype.dispatchEvent);
+
+
 // Need to export ended to ensure it's not removed by CC, since it's not used internally
 goog.exportProperty(vjs.Player.prototype, 'ended', vjs.Player.prototype.ended);
 goog.exportProperty(vjs.Player.prototype, 'enterFullWindow', vjs.Player.prototype.enterFullWindow);

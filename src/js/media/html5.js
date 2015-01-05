@@ -14,7 +14,7 @@ vjs.Html5 = vjs.MediaTechController.extend({
   init: function(player, options, ready){
     var  nodes, nodesLength, i, node, nodeName, removeNodes;
 
-    if (options.nativeCaptions === false || options.nativeTextTracks === false) {
+    if (options['nativeCaptions'] === false || options['nativeTextTracks'] === false) {
       this['featuresNativeTextTracks'] = false;
     }
 
@@ -49,7 +49,7 @@ vjs.Html5 = vjs.MediaTechController.extend({
             // captions and subtitles. videoElement.textTracks
             removeNodes.push(node);
           } else {
-            this.remoteTextTracks().addTrack_(node.track);
+            this.remoteTextTracks().addTrack_(node['track']);
           }
         }
       }
