@@ -74,3 +74,26 @@ test('menu should update with removeRemoteTextTrack', function() {
   equal(player.controlBar.captionsButton.items.length, 3, 'menu does not contain removed track');
   equal(player.textTracks().length, 1, 'textTracks contains one item');
 });
+
+test('menu items should polyfill mode change events', function() {
+  var player = PlayerTest.makePlayer({}),
+      changes,
+      trackMenuItem;
+
+  // emulate a TextTrackList that doesn't report track mode changes,
+  // like iOS7
+  player.textTracks().onchange = undefined;
+  trackMenuItem = new vjs.TextTrackMenuItem(player, {
+    track: track
+  });
+
+  player.textTracks().on('change', function() {
+    changes++;
+  });
+  changes = 0;
+  trackMenuItem.trigger('tap');
+  equal(changes, 1, 'taps trigger change events');
+
+  trackMenuItem.trigger('click');
+  equal(changes, 2, 'clicks trigger change events');
+});

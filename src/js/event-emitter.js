@@ -37,3 +37,5 @@ vjs.EventEmitter.prototype.trigger = function(event) {
 
   vjs.trigger(this, event);
 };
+// The standard DOM EventTarget.dispatchEvent() is aliased to trigger()
+vjs.EventEmitter.prototype.dispatchEvent = vjs.EventEmitter.prototype.trigger;
