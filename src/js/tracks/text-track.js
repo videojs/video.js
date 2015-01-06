@@ -48,6 +48,10 @@ vjs.TextTrack = function(options) {
   language = options.language || '';
   id = options.id || 'vjs_text_track_' + vjs.guid++;
 
+  if (kind === 'metadata') {
+    mode = 'hidden';
+  }
+
   tt.cues_ = [];
   tt.activeCues_ = [];
 
@@ -62,7 +66,7 @@ vjs.TextTrack = function(options) {
       changed = false;
     }
   });
-  if (mode === 'showing') {
+  if (mode !== 'disabled') {
     this.player_.on('timeupdate', timeupdateHandler);
   }
 
