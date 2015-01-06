@@ -323,6 +323,10 @@ vjs.TextTrackButton = vjs.MenuButton.extend({
 
     tracks = this.player_.textTracks();
 
+    if (this.items.length <= 1) {
+      this.hide();
+    }
+
     if (!tracks) {
       return;
     }
@@ -335,10 +339,6 @@ vjs.TextTrackButton = vjs.MenuButton.extend({
       tracks.removeEventListener('removetrack', updateHandler);
       tracks.removeEventListener('addtrack', updateHandler);
     });
-
-    if (this.items.length <= 1) {
-      this.hide();
-    }
   }
 });
 
