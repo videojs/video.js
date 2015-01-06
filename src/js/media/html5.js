@@ -369,12 +369,19 @@ vjs.Html5.prototype.addRemoteTextTrack = function(options) {
 
   this.el().appendChild(track);
 
+  if (track.track.kind === 'metadata') {
+    track.track.mode = 'hidden';
+  } else {
+    track.track.mode = 'disabled';
+  }
+
   track.onload = function() {
+    var tt = track.track;
     if (track.readyState >= 2) {
-      if (track.track.kind === 'metadata') {
-        track.track.mode = 'hidden';
-      } else {
-        track.track.mode = 'disabled';
+      if (tt.kind === 'metadata' && tt.mode !== 'hidden') {
+        tt.mode = 'hidden';
+      } else if (tt.kind !== 'metadata' && tt.mode !== 'disabled') {
+        tt.mode = 'disabled';
       }
       track.onload = null;
     }
