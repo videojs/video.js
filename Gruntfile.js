@@ -143,10 +143,10 @@ module.exports = function(grunt) {
         ext: '.min.css'
       }
     },
-    less: {
-      dev: {
+    sass: {
+      dist: {
         files: {
-          'build/temp/video-js.css': 'src/css/video-js.less'
+          'build/temp/video-js.css': 'src/css/video-js.scss'
         }
       }
     },
@@ -308,7 +308,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
-  grunt.loadNpmTasks('grunt-contrib-less');
+  grunt.loadNpmTasks('grunt-contrib-sass');
+  grunt.loadNpmTasks('grunt-s3');
+  grunt.loadNpmTasks('contribflow');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('videojs-doc-generator');
   grunt.loadNpmTasks('grunt-zip');
@@ -333,7 +335,7 @@ module.exports = function(grunt) {
     'concat:vtt',
     'exorcise',
     'uglify',
-    'less',
+    'sass',
     'version:css',
     'cssmin',
     'copy:fonts',
