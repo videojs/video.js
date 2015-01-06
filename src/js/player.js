@@ -800,10 +800,10 @@ vjs.Player.prototype.buffered = function(){
  * @return {Number} A decimal between 0 and 1 representing the percent
  */
 vjs.Player.prototype.bufferedPercent = function(){
-  var duration = this.duration(),
-      buffered = this.buffered(),
-      bufferedDuration = 0,
-      start, end;
+  var duration = this.duration();
+  var buffered = this.buffered();
+  var bufferedDuration = 0;
+  var start, end;
 
   if (!duration) {
     return 0;
@@ -831,9 +831,9 @@ vjs.Player.prototype.bufferedPercent = function(){
  * @return {Number} The end of the last buffered time range
  */
 vjs.Player.prototype.bufferedEnd = function(){
-  var buffered = this.buffered(),
-      duration = this.duration(),
-      end = buffered.end(buffered.length-1);
+  var buffered = this.buffered();
+  var duration = this.duration();
+  var end = buffered.end(buffered.length-1);
 
   if (end > duration) {
     end = duration;
@@ -1086,8 +1086,8 @@ vjs.Player.prototype.exitFullWindow = function(){
 vjs.Player.prototype.selectSource = function(sources){
   // Loop through each playback technology in the options order
   for (var i=0,j=this.options_['techOrder'];i<j.length;i++) {
-    var techName = vjs.capitalize(j[i]),
-        tech = window['videojs'][techName];
+    var techName = vjs.capitalize(j[i]);
+    var tech = window['videojs'][techName];
 
     // Check if the current tech is defined before continuing
     if (!tech) {
