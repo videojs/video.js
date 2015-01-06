@@ -1,0 +1,63 @@
+.video-js .vjs-big-play-button {
+  font-size: $big-play-font-size;
+  display: block;
+  z-index: 2;
+  position: absolute;
+  width: $big-play-width;
+  height: $big-play-height;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  opacity: 1;
+
+  /* Need a slightly gray bg so it can be seen on black backgrounds *///
+  @include background-color-with-alpha($big-play-bg-color, $big-play-bg-alpha);
+
+  border-right: $big-play-border-width solid $big-play-border-color;
+  border-bottom: $big-play-border-width solid $big-play-border-color;
+
+  @include transition(all 0.4s);
+}
+
+/* Hide if controls are disabled */
+.video-js.vjs-controls-disabled .vjs-big-play-button {
+  display: none;
+}
+/* Hide when video starts playing */
+.video-js.vjs-has-started .vjs-big-play-button {
+  display: none;
+}
+/* Hide on mobile devices. Remove when we stop using native controls
+by default on mobile  */
+.video-js.vjs-using-native-controls .vjs-big-play-button {
+  display: none;
+}
+
+.video-js:hover .vjs-big-play-button,
+.video-js .vjs-big-play-button:focus {
+  outline: 0;
+  border-color: #fff;
+  /* IE8 needs a non-glow hover state *///
+  background-color: rgb(80, 80, 80);
+  background-color: rgba(50, 50, 50, 0.75);
+
+  @include transition(all 0s);
+}
+
+.video-js .vjs-big-play-button:before {
+  content: $icon-play;
+  font-family: VideoJS;
+  /* In order to center the play icon vertically we need to set the line height
+  to the same as the button height */
+  line-height: $big-play-height;
+  text-align: center /* Needed for IE8 */;
+
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.vjs-error .vjs-big-play-button {
+  display: none;
+}

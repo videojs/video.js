@@ -1,0 +1,12 @@
+.video-js .vjs-fullscreen-control {
+  width: 3.8em;
+  cursor: pointer;
+  float: right;
+}
+.video-js .vjs-fullscreen-control:before {
+  content: $icon-fullscreen-enter;
+}
+/* Switch to the exit icon when the player is in fullscreen */
+.video-js.vjs-fullscreen .vjs-fullscreen-control:before {
+  content: $icon-fullscreen-exit;
+}

@@ -1,0 +1,10 @@
+.video-js .vjs-play-control {
+  width: 5em;
+  cursor: pointer;
+}
+.video-js .vjs-play-control:before {
+  content: $icon-play;
+}
+.video-js.vjs-playing .vjs-play-control:before {
+  content: $icon-pause;
+}

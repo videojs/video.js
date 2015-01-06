@@ -1,0 +1,14 @@
+.video-js.vjs-live .vjs-time-controls,
+.video-js.vjs-live .vjs-time-divider,
+.video-js.vjs-live .vjs-progress-control {
+  display: none;
+}
+.video-js.vjs-live .vjs-live-display {
+  display: block;
+}
+
+.video-js .vjs-live-display {
+  display: none;
+  font-size: 1em;
+  line-height: 3em;
+}

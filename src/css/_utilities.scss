@@ -1,0 +1,35 @@
+@mixin background-color-with-alpha($color, $alpha) {
+  background-color: $color;
+  background-color: rgba($color, $alpha);
+}
+
+@mixin transition($string: $transition--default) {
+  -webkit-transition: $string;
+  -moz-transition: $string;
+  -o-transition: $string;
+  transition: $string;
+}
+
+@mixin hide-visually {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+@mixin border-radius($radius) {
+  -webkit-border-radius: $radius;
+  -moz-border-radius: $radius;
+  border-radius: $radius;
+}
+
+@mixin animation($string: spin 1s infinite linear) {
+  -webkit-animation: $string;
+  -moz-animation: $string;
+  -o-animation: $string;
+  animation: $string;
+}

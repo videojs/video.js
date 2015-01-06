@@ -1,0 +1,75 @@
+.video-js .vjs-menu-button {
+  float: right;
+  cursor: pointer;
+}
+
+.video-js .vjs-menu {
+  display: none;
+  position: absolute;
+  bottom: 0;
+  left: 0em; /* (Width of vjs-menu - width of button) / 2 */
+  width: 0em;
+  height: 0em;
+  margin-bottom: 3em;
+
+  border-left: 2em solid transparent;
+  border-right: 2em solid transparent;
+
+  border-top: 1.55em solid rgb(0, 0, 0); /* Same width top as ul bottom */
+  border-top-color: rgba(7, 40, 50, 0.5); /* Same as ul background */
+}
+
+/* Button Pop-up Menu */
+.video-js .vjs-menu-button .vjs-menu .vjs-menu-content {
+  display: block;
+  padding: 0; margin: 0;
+  position: absolute;
+  width: 10em;
+  bottom: 1.5em; /* Same bottom as vjs-menu border-top */
+  max-height: 15em;
+  overflow: auto;
+
+  left: -5em; /* Width of menu - width of button / 2 */
+
+  @include background-color-with-alpha($control-bg-color, $control-bg-alpha);
+}
+
+.video-js .vjs-menu-button:hover .vjs-control-content .vjs-menu,
+.video-js .vjs-control-content .vjs-menu.vjs-lock-showing {
+  display: block;
+}
+/* prevent menus from opening while scrubbing (FF, IE) */
+.video-js.vjs-scrubbing .vjs-menu-button:hover .vjs-control-content .vjs-menu {
+  display: none;
+}
+.video-js .vjs-menu-button ul li {
+  list-style: none;
+  margin: 0;
+  padding: 0.3em 0 0.3em 0;
+  line-height: 1.4em;
+  font-size: 1.2em;
+  text-align: center;
+  text-transform: lowercase;
+}
+.video-js .vjs-menu-button ul li.vjs-selected {
+  background-color: #000;
+}
+.video-js .vjs-menu-button ul li:focus,
+.video-js .vjs-menu-button ul li:hover,
+.video-js .vjs-menu-button ul li.vjs-selected:focus,
+.video-js .vjs-menu-button ul li.vjs-selected:hover {
+  outline: 0;
+  color: #111;
+
+  @include background-color-with-alpha(rgb(255, 255, 255), 0.75);
+}
+.video-js .vjs-menu-button ul li.vjs-menu-title {
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 1em;
+  line-height: 2em;
+  padding: 0;
+  margin: 0 0 0.3em 0;
+  font-weight: bold;
+  cursor: default;
+}

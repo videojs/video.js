@@ -1,0 +1,34 @@
+.video-js .vjs-control {
+  outline: none;
+  position: relative;
+  float: left;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  height: 3.0em;
+  width: 4em;
+}
+
+.video-js .vjs-control:before {
+  font-family: $font-family;
+  font-size: 1.5em;
+  line-height: 2;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
+
+/* Replacement for focus outline */
+.video-js .vjs-control:focus:before,
+.video-js .vjs-control:hover:before {
+  text-shadow: 0em 0em 1em rgba(255, 255, 255, 1);
+}
+
+/* Hide control text visually, but have it available for screenreaders */
+.video-js .vjs-control-text {
+  @include hide-visually;
+}

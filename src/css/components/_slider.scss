@@ -1,0 +1,27 @@
+.video-js .vjs-slider {
+  outline: 0;
+  position: relative;
+  cursor: pointer;
+  padding: 0;
+
+  @include background-color-with-alpha($slider-background-color, $slider-background-alpha);
+}
+
+.video-js .vjs-slider-handle {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.video-js .vjs-slider-handle:before {
+  content: $icon-square;
+  font-family: VideoJS;
+  font-size: 1em;
+  line-height: 1;
+  text-align: center;
+  text-shadow: 0em 0em 1em #fff;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+}
