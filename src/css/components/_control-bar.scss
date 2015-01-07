@@ -11,7 +11,7 @@
 
 // Video has started playing
 .video-js.vjs-has-started .vjs-control-bar {
-  display: block;
+  @include display-flex;
   visibility: visible;
   opacity: 1;
 
@@ -21,7 +21,7 @@
 
 // Video has started playing AND user is inactive
 .video-js.vjs-has-started.vjs-user-inactive.vjs-playing .vjs-control-bar {
-  display: block;
+  @include display-flex;
   visibility: hidden;
   opacity: 0;
 

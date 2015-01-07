@@ -1,6 +1,8 @@
 .video-js .vjs-play-control {
   width: 5em;
   cursor: pointer;
+  @include flex(none);
+  @include order(0);
 }
 .video-js .vjs-play-control:before {
   content: $icon-play;

@@ -1,7 +1,8 @@
 .video-js .vjs-fullscreen-control {
   width: 3.8em;
   cursor: pointer;
-  float: right;
+  @include flex(none);
+  @include order(10);
 }
 .video-js .vjs-fullscreen-control:before {
   content: $icon-fullscreen-enter;

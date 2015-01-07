@@ -1,7 +1,8 @@
 .video-js .vjs-mute-control,
 .video-js .vjs-volume-menu-button {
   cursor: pointer;
-  float: right;
+  @include flex(none);
+  @include order(8);
 }
 .video-js .vjs-mute-control:before,
 .video-js .vjs-volume-menu-button:before {
@@ -22,23 +23,24 @@
 
 .video-js .vjs-volume-control {
   width: 5em;
-  float: right;
+  @include flex(none);
+  @include order(9);
+  @include display-flex(center);
 }
 .video-js .vjs-volume-bar {
   width: 5em;
-  height: 0.6em;
-  margin: 1.1em auto 0;
+  height: 0.3em;
 }
 
 .video-js .vjs-volume-level {
   position: absolute;
   top: 0;
   left: 0;
-  height: 0.5em;
+  height: 0.3em;
   /* assuming volume starts at 1.0 */
   width: 100%;
 
-  background-color: $slider-bar-color;
+  background-color: $primary-text;
 }
 .video-js .vjs-volume-bar .vjs-volume-handle {
   width: 0.5em;

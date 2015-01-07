@@ -1,31 +1,15 @@
 .video-js .vjs-progress-control {
-  position: absolute;
-  left: 0;
-  right: 0;
-  width: auto;
-  font-size: 0.3em;
-  height: 1em;
-  /* Set above the rest of the controls. *///
-  top: -1em;
+  @include flex(auto);
+  @include order(2);
+  @include display-flex(center);
 
-  /* Shrink the bar slower than it grows. *///
   @include transition(all 0.4s);
-}
-
-/* On hover, make the progress bar grow to something that's more clickable.
-This simply changes the overall font for the progress bar, and this
-updates both the em-based widths and heights, as wells as the icon font */
-.video-js:hover .vjs-progress-control {
-  font-size: .9em;
-
-  /* Even though we're not changing the top/height, we need to include them in
-  the transition so they're handled correctly. */
-  @include transition(all 0.2s);
 }
 
 /* Box containing play and load progresses. Also acts as seek scrubber. */
 .video-js .vjs-progress-holder {
-  height: 100%;
+  @include flex(auto);
+  height: 0.3em;
 }
 
 /* Progress Bars */
@@ -53,9 +37,7 @@ updates both the em-based widths and heights, as wells as the icon font */
   Also using a paralax effect to make the lines move backwards.
   The -50% left position makes that happen.
   */
-  background: $slider-bar-color
-  url($slider-bar-pattern)
-  -50% 0 repeat;
+  background-color: $primary-text;
 }
 .video-js .vjs-load-progress {
   background: rgb(100, 100, 100) /* IE8- Fallback */;
@@ -69,11 +51,8 @@ specific time ranges that have been buffered */
   background: rgba(255, 255, 255, 0.1);
 }
 
-.video-js .vjs-seek-handle {
+.video-js .vjs-slider-handle.vjs-seek-handle {
   width: 1.5em;
   height: 100%;
-}
-
-.video-js .vjs-seek-handle:before {
-  padding-top: 0.1em /* Minor adjustment */;
+  top: -0.3em;
 }
