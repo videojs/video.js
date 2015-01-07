@@ -19,7 +19,7 @@
   text-align: center;
   margin-bottom: 0.1em;
   /* Transparent black background, or fallback to all black (oldIE) */
-  @include background-color-with-alpha(#000, 0.5);
+  @include background-color-with-alpha($primary-bg, 0.5);
 }
 
 .video-js .vjs-subtitles { color: #fff /* Subtitles are white */; }

@@ -1,10 +1,11 @@
 .video-js .vjs-time-controls {
+  @include flex(none);
+  @include order(2);
   font-size: 1em;
   /* Align vertically by making the line height the same as the control bar *///
   line-height: 3em;
-  display: none;
 }
-.video-js .vjs-current-time { float: left; }
-.video-js .vjs-duration { float: left; }
-.video-js .vjs-remaining-time { display: none; float: left; }
-.vjs-time-divider { float: left; line-height: 3em; }
+.video-js .vjs-current-time { display: none; }
+.video-js .vjs-duration { display: none; }
+.video-js .vjs-remaining-time { display: none; }
+.vjs-time-divider { display: none; line-height: 3em; }

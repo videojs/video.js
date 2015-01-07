@@ -57,13 +57,16 @@
 
 @mixin flex($value) {
   -webkit-box-flex: $value;
+  -moz-box-flex: $value;
   -webkit-flex: $value;
   -ms-flex: $value;
   flex: $value;
 }
 
 @mixin order($value) {
-  -webkit-order: $value;
+  -webkit-box-ordinal-group: $value;
+  -moz-box-ordinal-group: $value;
   -ms-flex-order: $value;
-  order: $value
+  -webkit-order: $value;
+  order: $value;
 }

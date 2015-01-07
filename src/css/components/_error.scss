@@ -13,7 +13,7 @@
 
 .vjs-error .vjs-error-display:before {
   content: 'X';
-  font-family: Arial;
+  font-family: $text-font-family;
   font-size: 4em;
   color: #666666;
   /* In order to center the play icon vertically we need to set the line height

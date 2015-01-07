@@ -35,7 +35,7 @@
 
 .video-js .vjs-big-play-button:before {
   content: $icon-play;
-  font-family: VideoJS;
+  font-family: $icon-font-family;
 }
 
 .vjs-error .vjs-big-play-button {

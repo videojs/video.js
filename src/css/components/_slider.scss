@@ -15,11 +15,11 @@
 
 .video-js .vjs-slider-handle:before {
   content: $icon-circle;
-  font-family: VideoJS;
+  font-family: $icon-font-family;
   font-size: 1em;
   line-height: 1;
   text-align: center;
-  text-shadow: 0em 0em 1em #fff;
+  text-shadow: 0em 0em 1em $primary-text;
 
   position: absolute;
   top: 0;

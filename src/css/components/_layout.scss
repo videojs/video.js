@@ -1,6 +1,6 @@
 .video-js {
   color: $primary-text;
-  background-color: #000;
+  background-color: $primary-bg;
   position: relative;
   padding: 0;
   /* Start with 10px for base font size so other dimensions can be em based and
@@ -14,7 +14,7 @@
   font-weight: normal;
   font-style: normal;
   /* Avoiding helvetica: issue #376 */
-  font-family: Arial, sans-serif;
+  font-family: $text-font-family;
 
 
   /* Fix for Firefox 9 fullscreen (only if it is enabled). Not needed when
@@ -76,10 +76,10 @@ This optional paragraph inside the video tag can provide a message to users
 about what's required to play video. */
 .vjs-no-js {
   padding: 20px;
-  color: #ccc;
-  background-color: #333;
+  color: $primary-text;
+  background-color: $primary-bg;
   font-size: 18px;
-  font-family: Arial, sans-serif;
+  font-family: $text-font-family;
   text-align: center;
   width: 300px;
   height: 150px;

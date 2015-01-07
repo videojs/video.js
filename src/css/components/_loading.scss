@@ -36,7 +36,7 @@
 
 .video-js .vjs-loading-spinner:before {
   content: $icon-spinner;
-  font-family: VideoJS;
+  font-family: $icon-font-family;
 
   position: absolute;
   top: 0;
@@ -44,7 +44,7 @@
   width: 1em;
   height: 1em;
   text-align: center;
-  text-shadow: 0em 0em 0.1em #000;
+  text-shadow: 0em 0em 0.1em $primary-bg;
 }
 
 @-moz-keyframes spin {
