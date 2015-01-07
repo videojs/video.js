@@ -45,7 +45,7 @@ vjs.TextTrack = function(options) {
   mode = vjs.TextTrackMode[options.mode] || 'disabled';
   kind = vjs.TextTrackKind[options.kind] || 'subtitles';
   label = options.label || '';
-  language = options.language || '';
+  language = options.language || options.srclang || '';
   id = options.id || 'vjs_text_track_' + vjs.guid++;
 
   if (kind === 'metadata') {
