@@ -67,7 +67,7 @@ vjs.TextTrack = function(options) {
     }
   });
   if (mode !== 'disabled') {
-    this.player_.on('timeupdate', timeupdateHandler);
+    tt.player_.on('timeupdate', timeupdateHandler);
   }
 
   Object.defineProperty(tt, 'kind', {
