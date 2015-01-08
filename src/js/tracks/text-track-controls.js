@@ -83,6 +83,12 @@ var fontMap = {
   script:                '"Monotype Corsiva", cursive',
   smallcaps:             '"Andale Mono", "Lucida Console", monospace, sans-serif'
 };
+var tryUpdateStyle = function(el, style, rule) {
+  // some style changes will throw an error, particularly in IE8. Those should be noops.
+  try {
+    el.style[style] = rule;
+  } catch (e) {}
+};
 
 vjs.TextTrackDisplay.prototype.updateDisplay = function() {
   var tracks = this.player_.textTracks(),
@@ -128,19 +134,25 @@ vjs.TextTrackDisplay.prototype.updateForTrack = function(track) {
       cueDiv.firstChild.style.color = overrides.color;
     }
     if (overrides.textOpacity) {
-      cueDiv.firstChild.style.color = constructColor(overrides.color || '#fff',
-                                                     overrides.textOpacity);
+      tryUpdateStyle(cueDiv.firstChild,
+                     'color',
+                     constructColor(overrides.color || '#fff',
+                                    overrides.textOpacity));
     }
     if (overrides.backgroundColor) {
       cueDiv.firstChild.style.backgroundColor = overrides.backgroundColor;
     }
     if (overrides.backgroundOpacity) {
-      cueDiv.firstChild.style.backgroundColor = constructColor(overrides.backgroundColor || '#000',
-                                                               overrides.backgroundOpacity);
+      tryUpdateStyle(cueDiv.firstChild,
+                     'backgroundColor',
+                     constructColor(overrides.backgroundColor || '#000',
+                                    overrides.backgroundOpacity));
     }
     if (overrides.windowColor) {
       if (overrides.windowOpacity) {
-        cueDiv.style.backgroundColor = constructColor(overrides.windowColor, overrides.windowOpacity);
+        tryUpdateStyle(cueDiv,
+                       'backgroundColor',
+                       constructColor(overrides.windowColor, overrides.windowOpacity));
       } else {
         cueDiv.style.backgroundColor = overrides.windowColor;
       }
