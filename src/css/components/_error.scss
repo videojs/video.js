@@ -15,11 +15,11 @@
   content: 'X';
   font-family: $text-font-family;
   font-size: 4em;
-  color: #666666;
+  color: $secondary-bg;
   /* In order to center the play icon vertically we need to set the line height
   to the same as the button height */
   line-height: 1;
-  text-shadow: 0.05em 0.05em 0.1em #000;
+  text-shadow: 0.05em 0.05em 0.1em $primary-bg;
   text-align: center /* Needed for IE8 */;
   vertical-align: middle;
 
@@ -35,14 +35,13 @@
   bottom: 1em;
   right: 0;
   left: 0;
-
   font-size: 1.4em;
   text-align: center;
   padding: 3px;
-  background: rgb(0, 0, 0); // fallback to just black
-  background: rgba(0,0,0,0.5); // Normally show black at 50% opacity
+
+  @include background-color-with-alpha($primary-bg, 0.5);
 }
 
 .vjs-error-display a, .vjs-error-display a:visited {
-  color: #F4A460;
+  color: $secondary-text;
 }

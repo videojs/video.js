@@ -12,7 +12,7 @@
   border: 2px solid $primary-text;
 
   /* Need a slightly gray bg so it can be seen on black backgrounds *///
-  @include background-color-with-alpha($big-play-bg-color, $big-play-bg-alpha);
+  @include background-color-with-alpha($primary-bg, 0.8);
   @include border-radius(0.3em);
   @include transition(all 0.4s);
 }
@@ -28,8 +28,8 @@
 .video-js .vjs-big-play-button:focus {
   outline: 0;
   border-color: $primary-text;
-  background-color: rgba(lighten($primary-bg, 20%), 0.75);
 
+  @include background-color-with-alpha($secondary-bg, 0.75);
   @include transition(all 0s);
 }
 

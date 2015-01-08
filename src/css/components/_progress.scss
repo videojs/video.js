@@ -29,14 +29,6 @@
 }
 
 .video-js .vjs-play-progress {
-  /*
-  Using a data URI to create the white diagonal lines with a transparent
-  background. Surprisingly works in IE8.
-  Created using http://www.patternify.com
-  Changing the first color value will change the bar color.
-  Also using a paralax effect to make the lines move backwards.
-  The -50% left position makes that happen.
-  */
   background-color: $primary-text;
 }
 .video-js .vjs-load-progress {
@@ -47,12 +39,15 @@
 /* there are child elements of the load progress bar that represent the
 specific time ranges that have been buffered */
 .video-js .vjs-load-progress div {
-  background: rgb(120, 120, 120) /* IE8- Fallback */;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba($secondary-bg, 0.1);
 }
 
 .video-js .vjs-slider-handle.vjs-seek-handle {
   width: 1.5em;
   height: 100%;
-  top: -0.3em;
+}
+
+
+.video-js.vjs-no-flex .vjs-progress-control {
+  width: auto;
 }

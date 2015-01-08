@@ -1,12 +1,13 @@
 .video-js .vjs-control-bar {
   display: none;
+  width: 100%;
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   height: 3.0em;
 
-  @include background-color-with-alpha($control-bg-color, $control-bg-alpha);
+  @include background-color-with-alpha($primary-bg, 0.5);
 }
 
 // Video has started playing
@@ -43,4 +44,9 @@ fonts to show/hide properly.
 $ie8screen: "\0screen";
 .video-js.vjs-user-inactive.vjs-playing .vjs-control-bar :before {
   @media #{$ie8screen} { content: ""; }
+}
+
+/* IE 8 + 9 Support */
+.video-js.vjs-has-started.vjs-no-flex .vjs-control-bar {
+  display: table;
 }

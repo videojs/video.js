@@ -8,7 +8,6 @@
   font-size: $base-font-size;
   /* Allow poster to be vertially aligned. */
   vertical-align: middle;
-  /*  display: table-cell; */ /*This works in Safari but not Firefox.*/
 
   /* Provide some basic defaults for fonts */
   font-weight: normal;
@@ -42,7 +41,7 @@ body.vjs-full-window {
   padding: 0;
   margin: 0;
   height: 100%;
-  /* Fix for IE6 full-window. http://www.cssplay.co.uk/layouts/fixed.html *///
+  /* Fix for IE6 full-window. http://www.cssplay.co.uk/layouts/fixed.html */
   overflow-y: auto;
 }
 .video-js.vjs-fullscreen {
@@ -61,8 +60,8 @@ body.vjs-full-window {
 }
 
 
-/* Hide disabled or unsupported controls */
-.vjs-default-skin .vjs-hidden { display: none; }
+/* Hide disabled or unsupported controls. */
+.vjs-hidden { display: none !important; }
 
 .vjs-lock-showing {
   display: block !important;
@@ -87,5 +86,5 @@ about what's required to play video. */
 }
 
 .vjs-no-js a, .vjs-no-js a:visited {
-  color: #F4A460;
+  color: $secondary-text;
 }

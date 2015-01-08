@@ -34,7 +34,19 @@
   animation: $string;
 }
 
+@mixin context($old-context, $new-context) {
+  @at-root #{selector-replace(&, $old-context, $new-context)} {
+    @content;
+  }
+}
+
 @mixin display-flex($alignment: '', $justification: '') {
+  // This is bad. I feel bad. So should you for making me support IE 8 + 9, which doesn't even lift, bro.
+  // @include context('.video-js', '.video-js.vjs-no-flex') {
+  //   display: table;
+  //   width: 100%;
+  // }
+
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -56,6 +68,14 @@
 }
 
 @mixin flex($value) {
+  // @include context('.video-js', '.video-js.vjs-no-flex') {
+  //   display: table-cell;
+  //   vertical-align: middle;
+  //   @if ($value == 'auto') {
+  //     width: auto;
+  //   }
+  // }
+
   -webkit-box-flex: $value;
   -moz-box-flex: $value;
   -webkit-flex: $value;

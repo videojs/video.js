@@ -4,7 +4,7 @@
   display: none;
 }
 
-.video-js .vjs-live-controls {
+.video-js .vjs-live-controls, .video-js.vjs-no-flex .vjs-live-controls {
   display: none;
   font-size: 1em;
   line-height: 3em;

@@ -1,72 +1,9 @@
 $primary-text: #fff;
+$secondary-text: #F4A460; // currently just used for visited links in errors and such.
+
 $primary-bg: #000;
+$secondary-bg: lighten($primary-bg, 35%);
+
 $icon-font-family: 'VideoJS';
 $text-font-family: Arial, sans-serif;
 $base-font-size: 10px;
-
-// OLD SHIT
-
-// All of these variables can be overridden since they all use !default.
-// Reference: http://sass-lang.com/documentation/file.SASS_REFERENCE.html#variable_defaults_
-
-// By default let's use the version of the font from the CDN.
-// $font-path: 'font' !default;
-$font-path: 'http://vjs.zencdn.net/f/2' !default;
-$font-family: 'VideoJS';
-// The base font size controls the size of everything, not just text. All
-// diminensions use em-based sizes so that the scale along with the font size.
-// Try increasing it to 20px and see what happens.
-$base-font-size: 10px !default;
-$touch-device-font-size: 15px !default;
-
-// The main font color controls the color of the text and the icons (font icons)
-$main-font-color: #CCCCCC !default; // e.g. rgb(255, 255, 255) or #ffffff
-
-// The default color of control backgrounds is mostly black but with a little
-// bit of blue so it can still be seen on all black video frames, which are
-// common.
-$control-bg-color: #07141E !default; // e.g. rgb(255, 255, 255) or #ffffff
-$control-bg-alpha: 0.7 !default; // 1.0 = 100% opacity, 0.0 = 0% opacity
-
-// The slider bar color is used for the progress bar and the volume bar
-$slider-bar-color: #66A8CC !default; // e.g. rgb(255, 255, 255) or #ffffff
-// The background of the progress bar and volume bar have a lined pattern that
-// is created from a base64 encoded image. You can generate your own pattern at
-// http://www.patternify.com/ then replace the value in the quotes with your own
-$slider-bar-pattern: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAYAAADgzO9IAAAAP0lEQVQIHWWMAQoAIAgDR/QJ/Ub//04+w7ZICBwcOg5FZi5iBB82AGzixEglJrd4TVK5XUJpskSTEvpdFzX9AB2pGziSQcvAAAAAAElFTkSuQmCC'  !default;
-// The color of the slider background
-$slider-background-color: #333333 !default;
-$slider-background-alpha: 0.9 !default; // 1.0 = 100% opacity, 0.0 = 0% opacity
-
-// The "Big Play Button" is the play button that shows before the video plays.
-// To center it set the align values to center and middle. The typical location
-// of the button is the center, but there is trend towards moving it to a corner
-// where it gets out of the way of valuable content in the poster image.
-$big-play-align: left !default; // left, center, or right
-$big-play-vertical-align: top !default; // top, middle, or bottom
-// The button colors match the control colors by default but you can customize
-// them by replace the variables (@control-bg-color) with your own color values.
-$big-play-bg-color: $control-bg-color !default;
-$big-play-bg-alpha: $control-bg-alpha !default;
-// The font size is what makes the big play button, big. All width/height values
-// use ems, which are a multiple of the font size.
-// If the @base-font-size is 10px, then 3em equals 30px.
-$big-play-font-size: 3em !default;
-// Now that font size is set, the following em values will be a multiple of the
-// new font size. If @big-play-font-size is 3em (30px), then setting the any of
-// the following values to 2em would equal 60px. 2 * font-size
-$big-play-margin: 0.5em !default;
-$big-play-width: 4em !default;
-$big-play-height: 2.6em !default;
-$big-play-border-radius: 0.8em !default;
-$big-play-border-width: 0.1em !default;
-$big-play-border-color: #3b4249 !default;
-
-// vars appended with "--default" are used as default values in mixins
-$box-shadow--default: 0 0 1em rgba(0, 0, 0, 0.25) !default;
-$border-radius--default: 5px !default;
-$transition--default: all 1s linear !default;
-$transition-delay--default: 1s !default;
-$animation--default: spin 1s infinite linear !default;
-$transform--default: rotate(-45deg) !default;
-$user-select--default: none !default;

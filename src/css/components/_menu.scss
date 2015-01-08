@@ -1,5 +1,4 @@
 .video-js .vjs-menu-button {
-  float: right;
   cursor: pointer;
 }
 
@@ -15,7 +14,7 @@
   border-left: 2em solid transparent;
   border-right: 2em solid transparent;
 
-  border-top: 1.55em solid rgb(0, 0, 0); /* Same width top as ul bottom */
+  border-top: 1.55em solid $primary-bg; /* Same width top as ul bottom */
   border-top-color: rgba(7, 40, 50, 0.5); /* Same as ul background */
 }
 
@@ -31,7 +30,7 @@
 
   left: -5em; /* Width of menu - width of button / 2 */
 
-  @include background-color-with-alpha($control-bg-color, $control-bg-alpha);
+  @include background-color-with-alpha($primary-bg, 0.7);
 }
 
 .video-js .vjs-menu-button:hover .vjs-control-content .vjs-menu,
@@ -52,16 +51,16 @@
   text-transform: lowercase;
 }
 .video-js .vjs-menu-button ul li.vjs-selected {
-  background-color: #000;
+  background-color: $primary-bg;
 }
 .video-js .vjs-menu-button ul li:focus,
 .video-js .vjs-menu-button ul li:hover,
 .video-js .vjs-menu-button ul li.vjs-selected:focus,
 .video-js .vjs-menu-button ul li.vjs-selected:hover {
   outline: 0;
-  color: #111;
+  color: $primary-bg;
 
-  @include background-color-with-alpha(rgb(255, 255, 255), 0.75);
+  @include background-color-with-alpha($primary-text, 0.75);
 }
 .video-js .vjs-menu-button ul li.vjs-menu-title {
   text-align: center;

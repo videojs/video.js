@@ -4,7 +4,7 @@
   text-align: center;
   margin: 0;
   padding: 0;
-  height: 3.0em;
+  height: 100%;
   width: 4em;
   @include flex(none);
   @include order(3);
@@ -25,10 +25,16 @@
 /* Replacement for focus outline */
 .video-js .vjs-control:focus:before,
 .video-js .vjs-control:hover:before {
-  text-shadow: 0em 0em 1em rgba(255, 255, 255, 1);
+  text-shadow: 0em 0em 1em rgba($primary-text, 1);
 }
 
 /* Hide control text visually, but have it available for screenreaders */
 .video-js .vjs-control-text {
   @include hide-visually;
+}
+
+/* IE 8 + 9 Support */
+.video-js.vjs-no-flex .vjs-control {
+  display: table-cell;
+  vertical-align: middle;
 }

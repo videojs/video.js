@@ -4,13 +4,13 @@
   cursor: pointer;
   padding: 0;
 
-  @include background-color-with-alpha($slider-background-color, $slider-background-alpha);
+  @include background-color-with-alpha($secondary-bg, 0.9);
 }
 
 .video-js .vjs-slider-handle {
   position: absolute;
   left: 0;
-  top: 0;
+  top: -0.3em;
 }
 
 .video-js .vjs-slider-handle:before {
@@ -19,7 +19,6 @@
   font-size: 1em;
   line-height: 1;
   text-align: center;
-  text-shadow: 0em 0em 1em $primary-text;
 
   position: absolute;
   top: 0;
