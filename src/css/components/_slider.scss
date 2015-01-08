@@ -9,8 +9,16 @@
 
 .video-js .vjs-slider-handle {
   position: absolute;
+}
+
+.video-js .vjs-slider-horizontal .vjs-slider-handle {
   left: 0;
   top: -0.3em;
+}
+
+.video-js .vjs-slider-vertical .vjs-slider-handle {
+  left: -0.3em;
+  bottom: 0;
 }
 
 .video-js .vjs-slider-handle:before {

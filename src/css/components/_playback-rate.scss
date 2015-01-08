@@ -10,8 +10,11 @@
   text-align: center;
 }
 
+.video-js .vjs-playback-rate .vjs-menu {
+  left: 0em;
+}
 .video-js .vjs-playback-rate.vjs-menu-button .vjs-menu .vjs-menu-content {
   width: 4em;
-  left: -2em;
+  left: 0;
   list-style: none;
 }

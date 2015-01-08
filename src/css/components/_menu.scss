@@ -6,16 +6,11 @@
   display: none;
   position: absolute;
   bottom: 0;
-  left: 0em; /* (Width of vjs-menu - width of button) / 2 */
+  left: -3em; /* (Width of vjs-menu - width of button) / 2 */
   width: 0em;
   height: 0em;
-  margin-bottom: 3em;
-
-  border-left: 2em solid transparent;
-  border-right: 2em solid transparent;
-
-  border-top: 1.55em solid $primary-bg; /* Same width top as ul bottom */
-  border-top-color: rgba(7, 40, 50, 0.5); /* Same as ul background */
+  margin-bottom: 1.5em;
+  border-top-color: rgba(7, 40, 50, $control-bar-transparency); /* Same as ul background */
 }
 
 /* Button Pop-up Menu */
@@ -27,8 +22,6 @@
   bottom: 1.5em; /* Same bottom as vjs-menu border-top */
   max-height: 15em;
   overflow: auto;
-
-  left: -5em; /* Width of menu - width of button / 2 */
 
   @include background-color-with-alpha($primary-bg, 0.7);
 }
@@ -44,7 +37,7 @@
 .video-js .vjs-menu-button ul li {
   list-style: none;
   margin: 0;
-  padding: 0.3em 0 0.3em 0;
+  padding: 0.2em 0;
   line-height: 1.4em;
   font-size: 1.2em;
   text-align: center;

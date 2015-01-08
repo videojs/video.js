@@ -37,24 +37,24 @@ class ControlBar extends Component {
 
 ControlBar.prototype.options_ = {
   loadEvent: 'play',
-  children: {
-    'playToggle': {},
-    'currentTimeDisplay': {},
-    'timeDivider': {},
-    'durationDisplay': {},
-    'remainingTimeDisplay': {},
-    'liveDisplay': {},
-    'progressControl': {},
-    'customControlSpacer': {},
-    'fullscreenToggle': {},
-    'volumeControl': {},
-    'muteToggle': {},
-    // 'volumeMenuButton': {},
-    'playbackRateMenuButton': {},
-    'subtitlesButton': {},
-    'captionsButton': {},
-    'chaptersButton': {}
-  }
+  children: [
+    'playToggle',
+    'currentTimeDisplay',
+    'timeDivider',
+    'durationDisplay',
+    'progressControl',
+    'liveDisplay',
+    'remainingTimeDisplay',
+	'customControlSpacer',
+    'playbackRateMenuButton',
+	'subtitlesButton',
+	'captionsButton',
+	'chaptersButton',
+    // 'muteToggle',
+    // 'volumeControl',
+    'volumeMenuButton',
+    'fullscreenToggle',
+  ]
 };
 
 Component.registerComponent('ControlBar', ControlBar);
