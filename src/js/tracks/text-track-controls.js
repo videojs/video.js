@@ -29,6 +29,8 @@ vjs.TextTrackDisplay = vjs.Component.extend({
 
       var i, tracks, track;
 
+      player.on('fullscreenchange', vjs.bind(this, this.updateDisplay));
+
       tracks = player.options_['tracks'] || [];
       for (i = 0; i < tracks.length; i++) {
         track = tracks[i];
