@@ -167,6 +167,18 @@ The default control bar that is a container for most of the controls.
   .background-color-with-alpha(@control-bg-color, @control-bg-alpha);
 }
 
+/* The right side of the control bar */
+.vjs-default-skin .vjs-control-bar .vjs-control-bar-right {
+    float: right;
+}
+
+/* The middle section of the control bar 
+It's technically the content that is visually just to the left of the right-most controls.
+*/
+.vjs-default-skin .vjs-control-bar .vjs-control-bar-middle {
+    float: left;
+}
+
 /* Show the control bar only once the video has started playing */
 .vjs-default-skin.vjs-has-started .vjs-control-bar {
   display: block;
@@ -300,7 +312,7 @@ fonts to show/hide properly.
 .vjs-default-skin .vjs-mute-control,
 .vjs-default-skin .vjs-volume-menu-button {
   cursor: pointer;
-  float: right;
+  float: left;
 }
 .vjs-default-skin .vjs-mute-control:before,
 .vjs-default-skin .vjs-volume-menu-button:before {
@@ -321,7 +333,7 @@ fonts to show/hide properly.
 
 .vjs-default-skin .vjs-volume-control {
   width: 5em;
-  float: right;
+  float: left;
 }
 .vjs-default-skin .vjs-volume-bar {
   width: 5em;
@@ -511,7 +523,7 @@ fonts to show/hide properly.
 .vjs-default-skin .vjs-fullscreen-control {
   width: 3.8em;
   cursor: pointer;
-  float: right;
+  float: left;
 }
 .vjs-default-skin .vjs-fullscreen-control:before {
   content: @fullscreen-enter-icon;
@@ -737,7 +749,7 @@ easily in the skin designer. http://designer.videojs.com/
 --------------------------------------------------------------------------------
 */
 .vjs-default-skin .vjs-menu-button {
-  float: right;
+  float: left;
   cursor: pointer;
 }
 
