@@ -9,6 +9,7 @@
 
 .video-js .vjs-slider-handle {
   position: absolute;
+  @extend .vjs-icon-circle;
 }
 
 .video-js .vjs-slider-horizontal .vjs-slider-handle {
@@ -22,8 +23,6 @@
 }
 
 .video-js .vjs-slider-handle:before {
-  content: $icon-circle;
-  font-family: $icon-font-family;
   font-size: 1em;
   line-height: 1;
   text-align: center;

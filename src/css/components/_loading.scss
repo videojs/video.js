@@ -1,3 +1,31 @@
+// .vjs-loading-spinner {
+//   display: block;
+//
+//   font-family: $icon-font-family;
+//
+//   position: absolute;
+//   top: 50%;
+//   left: 50%;
+//
+//   font-size: 4em;
+//   line-height: 1;
+//
+//   width: 1em;
+//   height: 1em;
+//
+//   margin-left: -0.5em;
+//   margin-top: -0.5em;
+//
+//   opacity: 0.75;
+// }
+//
+// .vjs-loading-spinner:before {
+//   content: map-get($icons, circle);
+// }
+// .vjs-loading-spinner:after {
+//   content: map-get($icons, circle);
+// }
+
 .vjs-loading-spinner {
   display: none;
 
@@ -32,12 +60,10 @@
 
   /* ensure animation doesn't continue while hidden *///
   @include animation(none);
+  @extend .vjs-icon-spinner;
 }
 
 .video-js .vjs-loading-spinner:before {
-  content: $icon-spinner;
-  font-family: $icon-font-family;
-
   position: absolute;
   top: 0;
   left: 0;

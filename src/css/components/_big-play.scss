@@ -15,6 +15,8 @@
   @include background-color-with-alpha($primary-bg, 0.8);
   @include border-radius(0.3em);
   @include transition(all 0.4s);
+
+  @extend .vjs-icon-play;
 }
 
 /* Hide if controls are disabled, the video is playing, or native controls are used. */
@@ -31,11 +33,6 @@
 
   @include background-color-with-alpha($secondary-bg, 0.75);
   @include transition(all 0s);
-}
-
-.video-js .vjs-big-play-button:before {
-  content: $icon-play;
-  font-family: $icon-font-family;
 }
 
 .vjs-error .vjs-big-play-button {

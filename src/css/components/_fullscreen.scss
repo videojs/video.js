@@ -4,10 +4,10 @@
   @include flex(none);
   @include order(10);
 }
-.video-js .vjs-fullscreen-control:before {
-  content: $icon-fullscreen-enter;
+.video-js .vjs-fullscreen-control {
+  @extend .vjs-icon-fullscreen-enter;
 }
 /* Switch to the exit icon when the player is in fullscreen */
-.video-js.vjs-fullscreen .vjs-fullscreen-control:before {
-  content: $icon-fullscreen-exit;
+.video-js.vjs-fullscreen .vjs-fullscreen-control {
+  @extend .vjs-icon-fullscreen-exit;
 }

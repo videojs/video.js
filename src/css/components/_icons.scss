@@ -10,21 +10,70 @@
   font-style: normal;
 }
 
-$icon-play: "\25b6";
-$icon-pause: "\e830";
-$icon-volume-mute: "\e84b";
-$icon-volume-low: "\e84a";
-$icon-volume-mid: "\e849";
-$icon-volume-high: "\e84c";
-$icon-fullscreen-enter: "\e64b";
-$icon-fullscreen-exit: "\e64c";
-$icon-square: "\e009";
-$icon-spinner: "\e650";
-$icon-subtitles: "\e80d";
-$icon-captions: "\e81e";
-$icon-chapters: "\e891";
-$icon-share: "\e61a";
-$icon-cog: "\e8b1";
-$icon-circle: "\e692";
-$icon-circle-outline: "\e6f2";
-$icon-circle-inner-circle: "\e603";
+// http://sass-lang.com/documentation/file.SASS_REFERENCE.html#maps
+$icons: (
+  play: "\25b6",
+  pause: "\e830",
+  volume-mute: "\e84b",
+  volume-low: "\e84a",
+  volume-mid: "\e849",
+  volume-high: "\e84c",
+  fullscreen-enter: "\e64b",
+  fullscreen-exit: "\e64c",
+  square: "\e009",
+  spinner: "\e650",
+  subtitles: "\e80d",
+  captions: "\e81e",
+  chapters: "\e891",
+  share: "\e61a",
+  cog: "\e8b1",
+  circle: "\e692",
+  circle-outline: "\e6f2",
+  circle-inner-circle: "\e603"
+);
+
+// NOTE: This is as complex as we want to get with SCSS functionality.
+//
+// Now that we have a map of icons above, we can iterate over that map and create an icon class
+// for each icon in that list. The iterator below produces CSS classes like this:
+//
+// .vjs-icon-play {
+//   font-family: VideoJS;
+//   font-weight: normal;
+//   font-style: normal;
+// }
+// .vjs-icon-play:before { content: "\25b6"; }
+//
+// We can then use @extend in the codebase when we need to add an icon to a class. @extend builds up
+// the selectors for you so you can avoid duplication. This is generally a bad idea, but since each
+// icon should only be extended one or two other places, we'll roll with it.
+@each $name, $content in $icons {
+  .vjs-icon-#{$name} {
+    font-family: $icon-font-family;
+    font-weight: normal;
+    font-style: normal;
+
+    &:before {
+      content: $content;
+    }
+  }
+}
+
+// $icon-play: "\25b6";
+// $icon-pause: "\e830";
+// $icon-volume-mute: "\e84b";
+// $icon-volume-low: "\e84a";
+// $icon-volume-mid: "\e849";
+// $icon-volume-high: "\e84c";
+// $icon-fullscreen-enter: "\e64b";
+// $icon-fullscreen-exit: "\e64c";
+// $icon-square: "\e009";
+// $icon-spinner: "\e650";
+// $icon-subtitles: "\e80d";
+// $icon-captions: "\e81e";
+// $icon-chapters: "\e891";
+// $icon-share: "\e61a";
+// $icon-cog: "\e8b1";
+// $icon-circle: "\e692";
+// $icon-circle-outline: "\e6f2";
+// $icon-circle-inner-circle: "\e603";

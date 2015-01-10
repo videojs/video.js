@@ -3,22 +3,20 @@
   cursor: pointer;
   @include flex(none);
   @include order(8);
+  @extend .vjs-icon-volume-high;
 }
-.video-js .vjs-mute-control:before,
-.video-js .vjs-volume-menu-button:before {
-  content: $icon-volume-high;
+
+.video-js .vjs-mute-control.vjs-vol-0,
+.video-js .vjs-volume-menu-button.vjs-vol-0 {
+  @extend .vjs-icon-volume-mute;
 }
-.video-js .vjs-mute-control.vjs-vol-0:before,
-.video-js .vjs-volume-menu-button.vjs-vol-0:before {
-  content: $icon-volume-mute;
+.video-js .vjs-mute-control.vjs-vol-1,
+.video-js .vjs-volume-menu-button.vjs-vol-1 {
+  @extend .vjs-icon-volume-low;
 }
-.video-js .vjs-mute-control.vjs-vol-1:before,
-.video-js .vjs-volume-menu-button.vjs-vol-1:before {
-  content: $icon-volume-low;
-}
-.video-js .vjs-mute-control.vjs-vol-2:before,
-.video-js .vjs-volume-menu-button.vjs-vol-2:before {
-  content: $icon-volume-mid;
+.video-js .vjs-mute-control.vjs-vol-2,
+.video-js .vjs-volume-menu-button.vjs-vol-2 {
+  @extend .vjs-icon-volume-mid;
 }
 
 .video-js .vjs-volume-control {
@@ -44,20 +42,16 @@
   background-color: $primary-text;
 }
 .video-js .vjs-volume-bar .vjs-volume-handle {
-  width: 0.9em;
-  height: 0.9em;
+  width: 0.8em;
+  height: 0.8em;
   /* Assumes volume starts at 1.0. If you change the size of the
   handle relative to the volume bar, you'll need to update this value
   too. */
-  bottom: 4.1em;
+  bottom: 4.3em;
 }
 
 .video-js .vjs-volume-handle:before {
   font-size: 0.9em;
-  top: 0em;
-
-  width: 0.9em;
-  height: 0.9em;
 }
 
 /* The volume menu button is like menu buttons (captions/subtitles) but works
@@ -76,7 +70,6 @@ width and height to zero. */
 .video-js .vjs-menu-button.vjs-volume-menu-button .vjs-menu .vjs-menu-content {
   height: 0;
   width: 0;
-  // transform: translate(-3.65em, -2.5em) rotate(-90deg);
 }
 
 .video-js .vjs-volume-menu-button:hover .vjs-menu,

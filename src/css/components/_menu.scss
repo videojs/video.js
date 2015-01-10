@@ -14,6 +14,10 @@
 }
 
 /* Button Pop-up Menu */
+.video-js .vjs-menu-content {
+  @include background-color-with-alpha($primary-bg, 0.7);
+}
+
 .video-js .vjs-menu-button .vjs-menu .vjs-menu-content {
   display: block;
   padding: 0; margin: 0;
@@ -22,8 +26,6 @@
   bottom: 1.5em; /* Same bottom as vjs-menu border-top */
   max-height: 15em;
   overflow: auto;
-
-  @include background-color-with-alpha($primary-bg, 0.7);
 }
 
 .video-js .vjs-menu-button:hover .vjs-control-content .vjs-menu,
