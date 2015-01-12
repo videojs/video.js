@@ -77,8 +77,8 @@ vjs.CDN_VERSION = 'GENERATED_CDN_VSN';
 vjs.ACCESS_PROTOCOL = ('https:' == document.location.protocol ? 'https://' : 'http://');
 
 /**
-* Player version
-* @return {number} The version of Video.js
+* Full player version
+* @type {number}
 */
 vjs.VERSION = 'GENERATED_FULL_VSN';
 
