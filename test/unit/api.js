@@ -94,19 +94,34 @@ test('should be able to access expected component API methods', function() {
 });
 
 test('should be able to access expected MediaTech API methods', function() {
-  var techProto = videojs.MediaTechController.prototype;
+  var media = videojs.MediaTechController;
+  var mediaProto = videojs.MediaTechController.prototype;
+  var html5 = videojs.Html5;
   var html5Proto = videojs.Html5.prototype;
+  var flash = videojs.Flash;
   var flashProto = videojs.Flash.prototype;
 
-  ok(techProto.setPoster, 'setPoster should exist on the Media tech');
+  ok(mediaProto.setPoster, 'setPoster should exist on the Media tech');
   ok(html5Proto.setPoster, 'setPoster should exist on the HTML5 tech');
   ok(flashProto.setPoster, 'setPoster should exist on the Flash tech');
 
   ok(videojs.Html5.patchCanPlayType, 'patchCanPlayType should exist for HTML5');
   ok(videojs.Html5.unpatchCanPlayType, 'unpatchCanPlayType should exist for HTML5');
 
+  // Source Handler Functions
+  ok(media.withSourceHandlers, 'withSourceHandlers should exist for Media Tech');
+
   ok(videojs.Html5.canPlaySource, 'canPlaySource should exist for HTML5');
+  ok(videojs.Html5.registerSourceHandler, 'registerSourceHandler should exist for Html5');
+  ok(videojs.Html5.selectSourceHandler, 'selectSourceHandler should exist for Html5');
+  ok(videojs.Html5.prototype.setSource, 'setSource should exist for Html5');
+  ok(videojs.Html5.prototype.disposeSourceHandler, 'disposeSourceHandler should exist for Html5');
+
   ok(videojs.Flash.canPlaySource, 'canPlaySource should exist for Flash');
+  ok(videojs.Flash.registerSourceHandler, 'registerSourceHandler should exist for Flash');
+  ok(videojs.Flash.selectSourceHandler, 'selectSourceHandler should exist for Flash');
+  ok(videojs.Flash.prototype.setSource, 'setSource should exist for Flash');
+  ok(videojs.Flash.prototype.disposeSourceHandler, 'disposeSourceHandler should exist for Flash');
 });
 
 test('should export ready api call to public', function() {

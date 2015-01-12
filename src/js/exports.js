@@ -127,13 +127,13 @@ goog.exportSymbol('videojs.CaptionsButton', vjs.CaptionsButton);
 goog.exportSymbol('videojs.ChaptersButton', vjs.ChaptersButton);
 
 goog.exportSymbol('videojs.MediaTechController', vjs.MediaTechController);
+goog.exportProperty(vjs.MediaTechController, 'withSourceHandlers', vjs.MediaTechController.withSourceHandlers);
 goog.exportProperty(vjs.MediaTechController.prototype, 'featuresVolumeControl', vjs.MediaTechController.prototype.featuresVolumeControl);
 goog.exportProperty(vjs.MediaTechController.prototype, 'featuresFullscreenResize', vjs.MediaTechController.prototype.featuresFullscreenResize);
 goog.exportProperty(vjs.MediaTechController.prototype, 'featuresPlaybackRate', vjs.MediaTechController.prototype.featuresPlaybackRate);
 goog.exportProperty(vjs.MediaTechController.prototype, 'featuresProgressEvents', vjs.MediaTechController.prototype.featuresProgressEvents);
 goog.exportProperty(vjs.MediaTechController.prototype, 'featuresTimeupdateEvents', vjs.MediaTechController.prototype.featuresTimeupdateEvents);
 goog.exportProperty(vjs.MediaTechController.prototype, 'setPoster', vjs.MediaTechController.prototype.setPoster);
-
 
 goog.exportSymbol('videojs.Html5', vjs.Html5);
 goog.exportProperty(vjs.Html5, 'Events', vjs.Html5.Events);
@@ -154,7 +154,11 @@ goog.exportProperty(vjs.Html5.prototype, 'enterFullScreen', vjs.Html5.prototype.
 goog.exportProperty(vjs.Html5.prototype, 'exitFullScreen', vjs.Html5.prototype.exitFullScreen);
 goog.exportProperty(vjs.Html5.prototype, 'playbackRate', vjs.Html5.prototype.playbackRate);
 goog.exportProperty(vjs.Html5.prototype, 'setPlaybackRate', vjs.Html5.prototype.setPlaybackRate);
+// Source Handler Functions
+goog.exportProperty(vjs.Html5, 'registerSourceHandler', vjs.Html5.registerSourceHandler);
+goog.exportProperty(vjs.Html5, 'selectSourceHandler', vjs.Html5.selectSourceHandler);
 goog.exportProperty(vjs.Html5.prototype, 'setSource', vjs.Html5.prototype.setSource);
+goog.exportProperty(vjs.Html5.prototype, 'disposeSourceHandler', vjs.Html5.prototype.disposeSourceHandler);
 
 goog.exportSymbol('videojs.Flash', vjs.Flash);
 goog.exportProperty(vjs.Flash, 'isSupported', vjs.Flash.isSupported);
@@ -163,6 +167,11 @@ goog.exportProperty(vjs.Flash, 'onReady', vjs.Flash['onReady']);
 goog.exportProperty(vjs.Flash, 'embed', vjs.Flash.embed);
 goog.exportProperty(vjs.Flash, 'version', vjs.Flash.version);
 goog.exportProperty(vjs.Flash.prototype, 'setSource', vjs.Flash.prototype.setSource);
+// Source Handler Functions
+goog.exportProperty(vjs.Flash, 'registerSourceHandler', vjs.Flash.registerSourceHandler);
+goog.exportProperty(vjs.Flash, 'selectSourceHandler', vjs.Flash.selectSourceHandler);
+goog.exportProperty(vjs.Flash.prototype, 'setSource', vjs.Flash.prototype.setSource);
+goog.exportProperty(vjs.Flash.prototype, 'disposeSourceHandler', vjs.Flash.prototype.disposeSourceHandler);
 
 goog.exportSymbol('videojs.TextTrack', vjs.TextTrack);
 goog.exportProperty(vjs.TextTrack.prototype, 'label', vjs.TextTrack.prototype.label);
