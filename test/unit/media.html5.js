@@ -134,3 +134,29 @@ test('error events may not set the errors property', function() {
 test('should have the source handler interface', function() {
   ok(vjs.Html5.registerSourceHandler, 'has the registerSourceHandler function');
 });
+
+test('native source handler canHandleSource', function(){
+  var result;
+
+  // Stub the test video canPlayType (used in canHandleSource) to control results
+  var origCPT = vjs.TEST_VID.canPlayType;
+  vjs.TEST_VID.canPlayType = function(type){
+    if (type === 'video/mp4') {
+      return 'maybe';
+    }
+    return '';
+  };
+
+  var canHandleSource = vjs.Html5.nativeSourceHandler.canHandleSource;
+
+  equal(canHandleSource({ type: 'video/mp4', src: 'video.flv' }), 'maybe', 'Native source handler reported type support');
+  equal(canHandleSource({ src: 'http://www.example.com/video.mp4' }), 'maybe', 'Native source handler reported extension support');
+  // Test for issue videojs/video.js#1785 and other potential failures
+  equal(canHandleSource({ src: '' }), '', 'Native source handler handled empty src');
+  equal(canHandleSource({}), '', 'Native source handler handled empty object');
+  equal(canHandleSource({ src: 'foo' }), '', 'Native source handler handled bad src');
+  equal(canHandleSource({ type: 'foo' }), '', 'Native source handler handled bad type');
+
+  // Reset test video canPlayType
+  vjs.TEST_VID.canPlayType = origCPT;
+});
