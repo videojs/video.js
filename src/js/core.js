@@ -78,7 +78,7 @@ vjs.ACCESS_PROTOCOL = ('https:' == document.location.protocol ? 'https://' : 'ht
 
 /**
 * Full player version
-* @type {number}
+* @type {string}
 */
 vjs.VERSION = 'GENERATED_FULL_VSN';
 
