@@ -30,6 +30,8 @@ There are two categories of docs: [Guides](./guides/) and [API docs](./api/). Gu
 
 * [Glossary](./guides/glossary.md) - Some helpful definitions.
 
+* [Removing Players](./guides/removing-players.md) - Helpful for using VideoJS in single page apps.
+
 ## API Docs
 - The most relevant API doc is the [player API doc](./api/vjs.Player.md).
 - [Full list of API Docs](./api/)
