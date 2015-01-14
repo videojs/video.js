@@ -25,7 +25,13 @@
   @include order(9);
   @include display-flex(center);
 }
-.video-js .vjs-volume-bar {
+
+.video-js .vjs-volume-bar.vjs-slider-horizontal {
+  width: 5em;
+  height: 0.3em;
+}
+
+.video-js .vjs-volume-bar.vjs-slider-vertical {
   width: 0.3em;
   height: 5em;
   margin: 1.3em;
@@ -36,19 +42,21 @@
   bottom: 0;
   left: 0;
   width: 0.3em;
-  /* assuming volume starts at 1.0 */
-  height: 100%;
 
   background-color: $primary-text;
 }
 .video-js .vjs-volume-bar .vjs-volume-handle {
   width: 0.8em;
   height: 0.8em;
-  /* Assumes volume starts at 1.0. If you change the size of the
-  handle relative to the volume bar, you'll need to update this value
-  too. */
-  bottom: 4.3em;
 }
+
+/* Assumes volume starts at 1.0. If you change the size of the
+handle relative to the volume bar, you'll need to update this value
+too. */
+.video-js .vjs-volume-bar.vjs-slider-vertical .vjs-volume-level { height: 100%; }
+.video-js .vjs-volume-bar.vjs-slider-vertical .vjs-volume-handle { bottom: 4.3em; }
+.video-js .vjs-volume-bar.vjs-slider-horizontal .vjs-volume-level { width: 100%; }
+.video-js .vjs-volume-bar.vjs-slider-horizontal .vjs-volume-handle { left: 4.3em; }
 
 .video-js .vjs-volume-handle:before {
   font-size: 0.9em;

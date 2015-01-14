@@ -498,7 +498,11 @@ specific time ranges that have been buffered */
   -ms-flex-align: center;
   align-items: center; }
 
-.video-js .vjs-volume-bar {
+.video-js .vjs-volume-bar.vjs-slider-horizontal {
+  width: 5em;
+  height: 0.3em; }
+
+.video-js .vjs-volume-bar.vjs-slider-vertical {
   width: 0.3em;
   height: 5em;
   margin: 1.3em; }
