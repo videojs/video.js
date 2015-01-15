@@ -6,13 +6,17 @@ Sometimes, you want to remove players after page load (in single page apps or mo
 Call `.dispose()`
 -----------------
 
-Before removing the html associated with your videojs player from the page always call the player's `dispose()` method
+To remove the html associated with your videojs player from the page always call the player's [`dispose()`](https://github.com/videojs/video.js/blob/stable/docs/api/vjs.Player.md#dispose) method:
 
 ```javascript```
 var oldPlayer = document.getElementById('my-player');
-videojs(oldPlayer).dispose(); // Don't skip this step!
-oldPlayer.parentNode.removeChild(oldPlayer);
+videojs(oldPlayer).dispose(); 
 ```
+
+This method will:
+
+ 1) reset the internal state of videojs
+ 2) remove the player's dom from the page
 
 Showing / Hiding a Player
 -------------------------
