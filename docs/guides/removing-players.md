@@ -17,7 +17,7 @@ oldPlayer.parentNode.removeChild(oldPlayer);
 Showing / Hiding a Player
 -------------------------
 
-For instance, if you have a modal that a player appears in, you should create the player when the modal pops up, and dispose the player when the player shows / hides. If the Flash tech is used and you try to hide it, things will go poorly. Even with other tech, calling `dispose()` on a player will free up resources for the browser.
+For instance, if you have a modal that a player appears in, you should create the player when the modal pops up. When the modal hides, dispose the player. If you try to hide the Flash tech, things will go poorly. Even with other tech, calling `dispose()` on a player that's not needed will free up resources for the browser.
 
 Why Is This Needed?
 -------------------
