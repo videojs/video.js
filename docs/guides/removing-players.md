@@ -15,8 +15,8 @@ videojs(oldPlayer).dispose();
 
 This method will:
 
- 1) reset the internal state of videojs
- 2) remove the player's dom from the page
+  1. reset the internal state of videojs
+  2. remove the player's dom from the page
 
 Showing / Hiding a Player
 -------------------------
