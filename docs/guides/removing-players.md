@@ -1,7 +1,7 @@
-RemovingPlayers
-===============
+Removing Players
+================
 
-Sometimes, you want to remove players after page load (in single page apps, for instance). It's easy to manage, but there are some simple rules you need to follow.
+Sometimes, you want to remove players after page load (in single page apps or modals, for instance). It's easy to manage, but there are some simple rules you need to follow.
 
 Call `.dispose()`
 -----------------
@@ -14,10 +14,10 @@ videojs(oldPlayer).dispose(); // Don't skip this step!
 oldPlayer.parentNode.removeChild(oldPlayer);
 ```
 
-Or...Use Unique Ids
--------------------
+Showing / Hiding a Player
+-------------------------
 
-If you prefer not to call `dispose()` on a player, you can always create new players with unique ids for that page load.
+For instance, if you have a modal that a player appears in, you should create the player when the modal pops up, and dispose the player when the player shows / hides. If the Flash tech is used and you try to hide it, things will go poorly. Even with other tech, calling `dispose()` on a player will free up resources for the browser.
 
 Why Is This Needed?
 -------------------
@@ -27,8 +27,6 @@ VideoJS internally tracks all players and their associated data by html id attri
 Signs You Did It Wrong
 -------------------------
 
-If you encounter an console error in browser similar to this, you've probably forgotten to dispose() a player before removing it from the dom:
-
 ```
 TypeError: this.el_.vjs_getProperty is not a function
 "VIDEOJS:" "Video.js: buffered unavailable on Hls playback technology element." TypeError: this.el_.vjs_getProperty is not a function
@@ -36,3 +34,4 @@ Stack trace:
 ...
 ```
 
+If you encounter a console error in the browser similar to the above, you've probably forgotten to `dispose()` a player before removing it from the dom. This would happen when using the [contrib-hls](https://github.com/videojs/videojs-contrib-hls) plugin.
