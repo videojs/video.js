@@ -307,13 +307,13 @@ vjs.Html5.nativeSourceHandler = {};
  * @return {String}         'probably', 'maybe', or '' (empty string)
  */
 vjs.Html5.nativeSourceHandler.canHandleSource = function(source){
-  var ext;
+  var match, ext;
 
   function canPlayType(type){
     // IE9 on Windows 7 without MediaPlayer throws an error here
     // https://github.com/videojs/video.js/issues/519
     try {
-      return !!vjs.TEST_VID.canPlayType(type);
+      return vjs.TEST_VID.canPlayType(type);
     } catch(e) {
       return '';
     }
@@ -322,11 +322,15 @@ vjs.Html5.nativeSourceHandler.canHandleSource = function(source){
   // If a type was provided we should rely on that
   if (source.type) {
     return canPlayType(source.type);
-  } else {
+  } else if (source.src) {
     // If no type, fall back to checking 'video/[EXTENSION]'
-    ext = source.src.match(/\.([^\/\?]+)(\?[^\/]+)?$/i)[1];
+    match = source.src.match(/\.([^\/\?]+)(\?[^\/]+)?$/i);
+    ext = match && match[1];
+
     return canPlayType('video/'+ext);
   }
+
+  return '';
 };
 
 /**
