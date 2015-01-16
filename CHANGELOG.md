@@ -9,8 +9,8 @@ CHANGELOG
 * @Sxmanek added a Czech translation ([view](https://github.com/videojs/video.js/pull/1739))
 * @jcaron23 added the vjs-scrubbing CSS class and prevented menus from showing while scrubbing ([view](https://github.com/videojs/video.js/pull/1741))
 * @dmlap fixed URL parsing in IE9 ([view](https://github.com/videojs/video.js/pull/1765))
-* Fixed issue where ManualTimeUpdatesOff was not de-registering events ([view](https://github.com/videojs/video.js/pull/1793))
-
+* @gkatsev Fixed issue where ManualTimeUpdatesOff was not de-registering events ([view](https://github.com/videojs/video.js/pull/1793))
+* @brycefisher Added a guide on player disposal ([view](https://github.com/videojs/video.js/pull/1803))
 --------------------
 
 ## 4.11.3 (2014-12-19)
@@ -43,7 +43,7 @@ CHANGELOG
 * @mmcc fixed localization of captions/subtitles menu off buttons ([view](https://github.com/videojs/video.js/pull/1632))
 
 ## 4.10.1 (2014-10-29)
-@heff removed his own stupid error ([view])(https://github.com/videojs/video.js/commit/a12dd770572a7f16e436e2332eba7ffbb1f1b9b9)
+@heff removed his own stupid error [view](https://github.com/videojs/video.js/commit/a12dd770572a7f16e436e2332eba7ffbb1f1b9b9)
 
 ## 4.10.0 (2014-10-28)
 * @aptx4869 fixed an issue where the native JSON parser wasn&#x27;t used ([view](https://github.com/videojs/video.js/pull/1565))
