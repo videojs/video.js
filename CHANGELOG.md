@@ -11,6 +11,7 @@ CHANGELOG
 * @dmlap fixed URL parsing in IE9 ([view](https://github.com/videojs/video.js/pull/1765))
 * Fixed issue where ManualTimeUpdatesOff was not de-registering events ([view](https://github.com/videojs/video.js/pull/1793))
 * @gkatsev Fixed an issue where ManualTimeUpdatesOff was not de-registering events ([view](https://github.com/videojs/video.js/pull/1793))
+* @gkatsev Fixed an issue where ManualTimeUpdatesOff was not de-registering events. ([view](https://github.com/videojs/video.js/pull/1793))
 
 --------------------
 
