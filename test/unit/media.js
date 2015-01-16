@@ -39,6 +39,7 @@ test('stops timeupdates if the tech produces them natively', function() {
   var timeupdates = 0, tech, playHandler, expected;
   tech = new videojs.MediaTechController({
     id: this.noop,
+    off: this.noop,
     on: function(event, handler) {
       if (event === 'play') {
         playHandler = handler;

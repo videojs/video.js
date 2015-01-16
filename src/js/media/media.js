@@ -215,10 +215,12 @@ vjs.MediaTechController.prototype.manualTimeUpdatesOn = function(){
 };
 
 vjs.MediaTechController.prototype.manualTimeUpdatesOff = function(){
+  var player = this.player_;
+
   this.manualTimeUpdates = false;
   this.stopTrackingCurrentTime();
-  this.off('play', this.trackCurrentTime);
-  this.off('pause', this.stopTrackingCurrentTime);
+  this.off(player, 'play', this.trackCurrentTime);
+  this.off(player, 'pause', this.stopTrackingCurrentTime);
 };
 
 vjs.MediaTechController.prototype.trackCurrentTime = function(){
