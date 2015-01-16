@@ -2,7 +2,8 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* Exported missing source handler functions ([view](https://github.com/videojs/video.js/pull/1787))
+* @heff exported missing source handler functions ([view](https://github.com/videojs/video.js/pull/1787))
+* @heff fixed type support checking for an empty src string ([view](https://github.com/videojs/video.js/pull/1797))
 
 --------------------
 
