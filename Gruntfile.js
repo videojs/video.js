@@ -57,10 +57,16 @@ module.exports = function(grunt) {
       tasks: 'dev'
     },
     connect: {
-      dev: {
+      preview: {
         options: {
           port: 9999,
           keepalive: true
+        }
+      },
+      dev: {
+        options: {
+          port: 9999,
+          livereload: true
         }
       }
     },

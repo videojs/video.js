@@ -1,31 +1,3 @@
-// .vjs-loading-spinner {
-//   display: block;
-//
-//   font-family: $icon-font-family;
-//
-//   position: absolute;
-//   top: 50%;
-//   left: 50%;
-//
-//   font-size: 4em;
-//   line-height: 1;
-//
-//   width: 1em;
-//   height: 1em;
-//
-//   margin-left: -0.5em;
-//   margin-top: -0.5em;
-//
-//   opacity: 0.75;
-// }
-//
-// .vjs-loading-spinner:before {
-//   content: map-get($icons, circle);
-// }
-// .vjs-loading-spinner:after {
-//   content: map-get($icons, circle);
-// }
-
 .vjs-loading-spinner {
   display: none;
 
@@ -43,6 +15,8 @@
   margin-top: -0.5em;
 
   opacity: 0.75;
+
+  @extend .vjs-icon-spinner;
 }
 
 /* Show the spinner when waiting for data and seeking to a new time */
@@ -60,7 +34,6 @@
 
   /* ensure animation doesn't continue while hidden *///
   @include animation(none);
-  @extend .vjs-icon-spinner;
 }
 
 .video-js .vjs-loading-spinner:before {

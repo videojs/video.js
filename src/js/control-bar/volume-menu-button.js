@@ -35,7 +35,13 @@ class VolumeMenuButton extends MenuButton {
     let menu = new Menu(this.player_, {
       contentElType: 'div'
     });
-    let vc = new VolumeBar(this.player_, this.options_['volumeBar']);
+
+    // The volumeBar is vertical by default in the base theme when used with a VolumeMenuButton
+    var options = this.options_['volumeBar'] || {};
+    options['vertical'] = options['vertical'] || true;
+
+    let vc = new VolumeBar(this.player_, options);
+
     vc.on('focus', function() {
       menu.lockShowing();
     });
