@@ -1043,7 +1043,7 @@ vjs.Component.prototype.emitTapEvents = function(){
   this.on('touchstart', function(event) {
     // If more than one finger, don't consider treating this as a click
     if (event.touches.length === 1) {
-      firstTouch = event.touches[0];
+      firstTouch = vjs.obj.copy(event.touches[0]);
       // Record start time so we can detect a tap vs. "touch and hold"
       touchStart = new Date().getTime();
       // Reset couldBeTap tracking
