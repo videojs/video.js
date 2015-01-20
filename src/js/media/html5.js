@@ -324,7 +324,7 @@ vjs.Html5.nativeSourceHandler.canHandleSource = function(source){
     return canPlayType(source.type);
   } else if (source.src) {
     // If no type, fall back to checking 'video/[EXTENSION]'
-    match = source.src.match(/\.([^\/\?]+)(\?[^\/]+)?$/i);
+    match = source.src.match(/\.([^.\/\?]+)(\?[^\/]+)?$/i);
     ext = match && match[1];
 
     return canPlayType('video/'+ext);
