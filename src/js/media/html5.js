@@ -78,7 +78,7 @@ vjs.Html5.prototype.createEl = function(){
 
       // determine if native controls should be used
       attributes = videojs.util.mergeOptions({}, player.tagAttributes);
-      if (!vjs.TOUCH_ENABLED || player.options()['nativeControlsForTouch'] === false) {
+      if (!vjs.TOUCH_ENABLED || player.options()['nativeControlsForTouch'] !== true) {
         delete attributes.controls;
       }
 
