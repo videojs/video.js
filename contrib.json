@@ -1,6 +1,6 @@
 {
-  "project": {
-    "owner": "videojs",
+  "meta": {
+    "org": "videojs",
     "name": "video.js",
     "requirements": [
       {
@@ -23,13 +23,28 @@
     }
   },
 
-  "install": [
-    [ "git fetch origin",                             "Get all git branches" ],
-    [ "git checkout -b stable origin/stable",         "Create the stable branch for patches" ],
-    [ "git remote add upstream {{project.urls.git}}", "Add the upstream project as a remote for pulling changes" ],
-    [ "git fetch upstream",                           "Get all upstream branches and changes" ],
-    { "include": "update all" }
-  ],
+  "install": {
+    "desc": "Fork, download, and setup the project",
+    "steps": [
+      { "prompt":   "confirm", "desc": "You will now be taken to Github where you will choose an account to fork the project under. Remember which account you choose." },
+      { "exec": "open https://github.com/{{meta.org}}/{{meta.name}}/fork" },
+      { "prompt": "text", "desc": "Which account did you choose? (no '@')", "id": "owner" },
+      { "exec":     "git clone https://github.com/{{ owner }}/{{ meta.name }}.git" },
+      { "exec": "cd {{ meta.name }}" },
+      { "include": "setup" }
+    ]
+  },
+
+  "setup": {
+    "desc": "Set up version control and install dependencies",
+    "steps": [
+      [ "git fetch origin",                      "Get all git branches" ],
+      [ "git checkout -b stable origin/stable",  "Create the stable branch for patches" ],
+      [ "git remote add upstream https://github.com/{{meta.org}}/{{meta.name}}.git",  "Add the upstream project as a remote for pulling changes" ],
+      [ "git fetch upstream",                    "Get all upstream branches and changes" ],
+      { "include": "update all" }
+    ]
+  },
 
   "update": {
     "all": {
@@ -66,7 +81,7 @@
     "start": {
       "desc": "Start a new feature",
       "steps": [
-        { "include": "update {{project.branches.development}}" },
+        { "include": "update {{meta.branches.development}}" },
         { "include": "branch start" }
       ]
     },
@@ -84,7 +99,7 @@
     },
     "accept": {
       "steps": [
-        { "include": "update {{project.branches.development}}" },
+        { "include": "update {{meta.branches.development}}" },
         { "include": "pull_request accept" }
       ]
     }
@@ -97,7 +112,7 @@
       "desc": "Start a new patch",
       "finished": "Make your changes and then run `contrib patch submit`",
       "steps": [
-        { "include": "update {{project.branches.release}}" },
+        { "include": "update {{meta.branches.release}}" },
         { "include": "branch start" }
       ]
     },
@@ -115,7 +130,7 @@
     },
     "accept": {
       "steps": [
-        { "include": "update {{project.branches.release}}" },
+        { "include": "update {{meta.branches.release}}" },
         { "include": "pull_request accept" }
       ]
     }
@@ -133,7 +148,7 @@
       { "prompt": "text", "desc": "What browsers/platforms did you experience this in (e.g. Win 7, IE10; Android 4, Chrome;)?", "id": "browsers" },
       { "prompt": "text", "desc": "Is there a URL to a live example, or a jsbin (e.g. http://jsbin.com/axedog/9999/edit)?",     "id": "example" },
       { "prompt": "text", "desc": "Are there any other details you'd like to provide?",                                         "id": "details" },
-      { "open": "{{project.urls.repo_ui}}/issues/new?title={{title}}&body=**Steps to reproduce:**\n> {{reproduce}}\n\n**What was expected:**\n> {{expected}}\n\n**What Happened:**\n> {{actual}}\n\n**Video.js Version:**\n> {{version}}\n\n**Plugins:**\n> {{plugins}}\n\n**Browsers experienced on:**\n> {{browsers}}\n\n**Example:**\n> {{example}}\n\n**Other details:**\n> {{details}}" }
+      { "open": "{{meta.urls.repo_ui}}/issues/new?title={{title}}&body=**Steps to reproduce:**\n> {{reproduce}}\n\n**What was expected:**\n> {{expected}}\n\n**What Happened:**\n> {{actual}}\n\n**Video.js Version:**\n> {{version}}\n\n**Plugins:**\n> {{plugins}}\n\n**Browsers experienced on:**\n> {{browsers}}\n\n**Example:**\n> {{example}}\n\n**Other details:**\n> {{details}}" }
     ],
     "finished": "Thanks for submitting a bug report! One of our contributors will address it as soon as possible."
   },
@@ -146,7 +161,7 @@
       { "prompt": "text", "desc": "Is there any existing documentation or related specifications?", "id": "docs" },
       { "prompt": "text", "desc": "Are there any existing examples?", "id": "examples" },
       { "prompt": "confirm", "desc": "You will be redirected to Github where you can submit this issue, OK?" },
-      { "open": "{{project.urls.repo_ui}}/issues/new?title={{ title }}&body=**Describe the feature/enhancement:**\n> {{ describe }}\n\n**Existing docs/specs:**\n> {{ docs }}\n\n**Existing examples:**\n> {{ examples }}" }
+      { "open": "{{meta.urls.repo_ui}}/issues/new?title={{ title }}&body=**Describe the feature/enhancement:**\n> {{ describe }}\n\n**Existing docs/specs:**\n> {{ docs }}\n\n**Existing examples:**\n> {{ examples }}" }
     ],
     "finished": "Thanks for submitting a feature request! One of our contributors will address it as soon as possible."
   },
@@ -199,7 +214,7 @@
         { "exec": "git rev-parse --abbrev-ref HEAD", "desc": "Get the current branch", "id": "branch" },
         { "prompt": "confirm", "desc": "Are you sure {{branch}} is the branch you want to submit?" },
         { "prompt": "text", "desc": "Which github user or org are you submitting from?", "id": "user" },
-        { "open": "{{project.urls.repo_ui}}/compare/videojs:{{baseBranch}}...{{user}}:{{branch}}", "desc": "Open the github pull request page" }
+        { "open": "{{meta.urls.repo_ui}}/compare/videojs:{{baseBranch}}...{{user}}:{{branch}}", "desc": "Open the github pull request page" }
       ]
     },
     "delete": {
@@ -219,7 +234,7 @@
     "review": {
       "steps": [
         { "prompt": "text", "desc": "What is the the pull request number?", "id": "prNum" },
-        { "get": "{{project.urls.repo_api}}/pulls/{{prNum}}",   "desc": "Get the PR information", "id": "pr" },
+        { "get": "{{meta.urls.repo_api}}/pulls/{{prNum}}",   "desc": "Get the PR information", "id": "pr" },
         [ "git fetch {{pr.head.repo.ssh_url}} {{pr.head.ref}}", "Get the pull request changes but don't merge them" ],
         [ "git merge-base master FETCH_HEAD",                   "Get the common ancestor commit", "base" ],
         [ "git checkout -b review-{{pr.user.login}}-{{pr.head.ref}} {{base}}", "Create a new local branch for the pull request that has a base of the common commit" ],
@@ -238,7 +253,7 @@
         { "prompt": "confirm", "desc": "Are you sure {{branch}} is the branch you want to submit?" },
         { "prompt": "text", "desc": "Which github user or org are you submitting from?", "id": "user" },
         { "prompt": "text", "desc": "What is the the pull request number?",              "id": "prNum" },
-        { "get": "{{project.urls.repo_api}}/pulls/{{prNum}}", "desc": "Get the PR information", "id": "pr" },
+        { "get": "{{meta.urls.repo_api}}/pulls/{{prNum}}", "desc": "Get the PR information", "id": "pr" },
         { "exec": "git push -u origin {{branch}}",                                "desc": "Push the changes to the remote repo" },
         { "open": "https://github.com/{{user}}/video.js/compare/{{pr.head.label}}...{{user}}:{{branch}}", "desc": "Open the github pull request page" }
       ]
@@ -247,8 +262,8 @@
     "accept": {
       "steps": [
         { "prompt": "text", "desc": "What is the the pull request number?",              "id": "prNum" },
-        { "get": "{{project.urls.repo_api}}/pulls/{{prNum}}",          "desc": "Get the PR information", "id": "pr" },
-        { "get": "{{project.urls.repo_api}}/pulls/{{prNum}}/commits",  "desc": "Get the PR commits to access author info", "id": "prCommits" },
+        { "get": "{{meta.urls.repo_api}}/pulls/{{prNum}}",          "desc": "Get the PR information", "id": "pr" },
+        { "get": "{{meta.urls.repo_api}}/pulls/{{prNum}}/commits",  "desc": "Get the PR commits to access author info", "id": "prCommits" },
         [ "git checkout -b {{pr.user.login}}-{{pr.head.ref}} {{pr.base.ref}}", "Create a new branch for merging the changes" ],
         [ "git fetch {{pr.head.repo.ssh_url}} {{pr.head.ref}}",                "Fetch the changes" ],
         [ "git merge --no-commit --squash FETCH_HEAD",                         "Merge the changes in without committing so they can be squashed" ],
