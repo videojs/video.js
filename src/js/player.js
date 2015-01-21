@@ -588,6 +588,12 @@ vjs.Player.prototype.onFullscreenChange = function() {
   }
 };
 
+/**
+ * Fired when an error occurred
+ * @event error
+ */
+vjs.Player.prototype.onError;
+
 // /* Player API
 // ================================================================================ */
 
