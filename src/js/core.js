@@ -77,6 +77,12 @@ vjs.CDN_VERSION = 'GENERATED_CDN_VSN';
 vjs.ACCESS_PROTOCOL = ('https:' == document.location.protocol ? 'https://' : 'http://');
 
 /**
+* Full player version
+* @type {string}
+*/
+vjs['VERSION'] = 'GENERATED_FULL_VSN';
+
+/**
  * Global Player instance options, surfaced from vjs.Player.prototype.options_
  * vjs.options = vjs.Player.prototype.options_
  * All options should use string keys so they avoid
