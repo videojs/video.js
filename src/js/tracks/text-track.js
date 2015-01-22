@@ -240,7 +240,7 @@ parseCues = function(srcContent, track) {
     }, 25);
   }
 
-  var parser = new window.WebVTT.Parser(window, window.WebVTT.StringDecoder());
+  var parser = new window.WebVTT.Parser(window, window.vttjs, window.WebVTT.StringDecoder());
 
   parser.oncue = function(cue) {
     track.addCue(cue);
