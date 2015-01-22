@@ -1,6 +1,5 @@
 .video-js .vjs-time-controls {
   @include flex(none);
-  @include order(2);
   font-size: 1em;
   line-height: 3em;
 }

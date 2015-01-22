@@ -7,7 +7,6 @@
   height: 100%;
   width: 4em;
   @include flex(none);
-  @include order(3);
 }
 
 .video-js .vjs-control:before {

@@ -1,6 +1,5 @@
 .video-js .vjs-progress-control {
   @include flex(auto);
-  @include order(2);
   @include display-flex(center);
 
   @include transition(all 0.4s);

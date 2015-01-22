@@ -2,7 +2,6 @@
 .video-js .vjs-volume-menu-button {
   cursor: pointer;
   @include flex(none);
-  @include order(8);
   @extend .vjs-icon-volume-high;
 }
 
@@ -22,7 +21,6 @@
 .video-js .vjs-volume-control {
   width: 5em;
   @include flex(none);
-  @include order(9);
   @include display-flex(center);
 }
 
@@ -41,10 +39,13 @@
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 0.3em;
 
   background-color: $primary-text;
 }
+
+.video-js .vjs-slider-vertical .vjs-volume-level { width: 0.3em; }
+.video-js .vjs-slider-horizontal .vjs-volume-level { height: 0.3em; }
+
 .video-js .vjs-volume-bar .vjs-volume-handle {
   width: 0.8em;
   height: 0.8em;
@@ -89,4 +90,11 @@ width and height to zero. */
 .video-js .vjs-volume-menu-button .vjs-menu.vjs-lock-showing .vjs-menu-content {
   height: 8em;
   width: 2.9em;
+}
+
+// By default, all menu items are shown, but we hide .vjs-mute-control and .vjs-volume-control
+// so that the volume menu button is the only visible volume control.
+.video-js .vjs-mute-control,
+.video-js .vjs-volume-control {
+  display: none;
 }

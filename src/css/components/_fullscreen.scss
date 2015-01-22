@@ -2,7 +2,6 @@
   width: 3.8em;
   cursor: pointer;
   @include flex(none);
-  @include order(10);
 }
 .video-js .vjs-fullscreen-control {
   @extend .vjs-icon-fullscreen-enter;

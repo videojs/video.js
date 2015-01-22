@@ -331,12 +331,7 @@ fonts to show/hide properly.
   -moz-box-flex: none;
   -webkit-flex: none;
   -ms-flex: none;
-  flex: none;
-  -webkit-box-ordinal-group: 3;
-  -moz-box-ordinal-group: 3;
-  -ms-flex-order: 3;
-  -webkit-order: 3;
-  order: 3; }
+  flex: none; }
 
 .video-js .vjs-control:before {
   font-size: 1.8em;
@@ -375,11 +370,6 @@ fonts to show/hide properly.
   -webkit-flex: auto;
   -ms-flex: auto;
   flex: auto;
-  -webkit-box-ordinal-group: 2;
-  -moz-box-ordinal-group: 2;
-  -ms-flex-order: 2;
-  -webkit-order: 2;
-  order: 2;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -470,12 +460,7 @@ specific time ranges that have been buffered */
   -moz-box-flex: none;
   -webkit-flex: none;
   -ms-flex: none;
-  flex: none;
-  -webkit-box-ordinal-group: 8;
-  -moz-box-ordinal-group: 8;
-  -ms-flex-order: 8;
-  -webkit-order: 8;
-  order: 8; }
+  flex: none; }
 
 .video-js .vjs-volume-control {
   width: 5em;
@@ -484,11 +469,6 @@ specific time ranges that have been buffered */
   -webkit-flex: none;
   -ms-flex: none;
   flex: none;
-  -webkit-box-ordinal-group: 9;
-  -moz-box-ordinal-group: 9;
-  -ms-flex-order: 9;
-  -webkit-order: 9;
-  order: 9;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -511,8 +491,13 @@ specific time ranges that have been buffered */
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 0.3em;
   background-color: #fff; }
+
+.video-js .vjs-slider-vertical .vjs-volume-level {
+  width: 0.3em; }
+
+.video-js .vjs-slider-horizontal .vjs-volume-level {
+  height: 0.3em; }
 
 .video-js .vjs-volume-bar .vjs-volume-handle {
   width: 0.8em;
@@ -556,6 +541,10 @@ width and height to zero. */
 .video-js .vjs-volume-menu-button .vjs-menu.vjs-lock-showing .vjs-menu-content {
   height: 8em;
   width: 2.9em; }
+
+.video-js .vjs-mute-control,
+.video-js .vjs-volume-control {
+  display: none; }
 
 .video-js .vjs-menu-button {
   cursor: pointer; }
@@ -680,11 +669,6 @@ and the native poster can take over */
   -webkit-flex: none;
   -ms-flex: none;
   flex: none;
-  -webkit-box-ordinal-group: 2;
-  -moz-box-ordinal-group: 2;
-  -ms-flex-order: 2;
-  -webkit-order: 2;
-  order: 2;
   font-size: 1em;
   line-height: 3em; }
 
@@ -709,12 +693,7 @@ and the native poster can take over */
   -moz-box-flex: none;
   -webkit-flex: none;
   -ms-flex: none;
-  flex: none;
-  -webkit-box-ordinal-group: 0;
-  -moz-box-ordinal-group: 0;
-  -ms-flex-order: 0;
-  -webkit-order: 0;
-  order: 0; }
+  flex: none; }
 
 .video-js .vjs-text-track-display {
   text-align: center;
@@ -753,12 +732,7 @@ and the native poster can take over */
   -moz-box-flex: none;
   -webkit-flex: none;
   -ms-flex: none;
-  flex: none;
-  -webkit-box-ordinal-group: 10;
-  -moz-box-ordinal-group: 10;
-  -ms-flex-order: 10;
-  -webkit-order: 10;
-  order: 10; }
+  flex: none; }
 
 /* Switch to the exit icon when the player is in fullscreen */
 .video-js .vjs-playback-rate .vjs-playback-rate-value {
