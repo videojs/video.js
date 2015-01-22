@@ -446,6 +446,7 @@ module.exports = function(grunt) {
     });
     // Replace CDN version ref in js. Use major/minor version.
     combined = combined.replace(/GENERATED_CDN_VSN/g, version.majorMinor);
+    combined = combined.replace(/GENERATED_FULL_VSN/g, version.full);
 
     grunt.file.write('build/files/combined.video.js', combined);
 

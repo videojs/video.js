@@ -12,6 +12,7 @@ CHANGELOG
 * @gkatsev Fixed issue where ManualTimeUpdatesOff was not de-registering events ([view](https://github.com/videojs/video.js/pull/1793))
 * @brycefisher Added a guide on player disposal ([view](https://github.com/videojs/video.js/pull/1803))
 * @toniher added a Catalan translation ([view](https://github.com/videojs/video.js/pull/1794))
+* @mmcc added a VERSION key to the videojs object ([view](https://github.com/videojs/video.js/pull/1798))
 
 --------------------
 
