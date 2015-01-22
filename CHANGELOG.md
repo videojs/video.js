@@ -6,6 +6,7 @@ CHANGELOG
 * @heff fixed type support checking for an empty src string ([view](https://github.com/videojs/video.js/pull/1797))
 * @carpasse fixed a bug in updating child indexes after removing components ([view](https://github.com/videojs/video.js/pull/1814))
 * @dmlap fixed a bug where native controls would show after switching techs ([view](https://github.com/videojs/video.js/pull/1811))
+* @H1D fixed an issue with file extension type detection ([view](https://github.com/videojs/video.js/pull/1818))
 
 --------------------
 

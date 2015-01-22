@@ -164,6 +164,9 @@ test('native source handler canHandleSource', function(){
 
   equal(canHandleSource({ type: 'video/mp4', src: 'video.flv' }), 'maybe', 'Native source handler reported type support');
   equal(canHandleSource({ src: 'http://www.example.com/video.mp4' }), 'maybe', 'Native source handler reported extension support');
+  equal(canHandleSource({ src: 'https://example.com/video.sd.mp4?s=foo&token=bar' }), 'maybe', 'Native source handler reported extension support');
+  equal(canHandleSource({ src: 'https://example.com/video.sd.mp4?s=foo' }), 'maybe', 'Native source handler reported extension support');
+
   // Test for issue videojs/video.js#1785 and other potential failures
   equal(canHandleSource({ src: '' }), '', 'Native source handler handled empty src');
   equal(canHandleSource({}), '', 'Native source handler handled empty object');
