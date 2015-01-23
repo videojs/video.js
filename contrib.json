@@ -175,6 +175,7 @@
       { "prompt": "text",    "desc": "Provide the release type (major, minor, patch)", "id": "type" },
       [ "git checkout stable",                     "Checkout the release branch" ],
       [ "git pull upstream stable",                "Update the release branch" ],
+      [ "npm install",                             "Ensure dependency updates have been installed" ],
       [ "grunt test",                              "Run tests" ],
       [ "grunt chg-release:{{ type }}",            "Update the changelog with the new release" ],
       [ "grunt version:{{ type }}",                "Bump package versions" ],
@@ -222,6 +223,7 @@
       "steps": [
         { "exec": "git rev-parse --abbrev-ref HEAD", "desc": "Get the current branch name", "id": "name" },
         { "prompt": "confirm", "desc": "Are you sure '{{name}}' is the branch you want to delete?" },
+        { "exec": "git checkout master",             "desc": "Exit the branch being deleted" },
         { "exec": "git branch -D {{name}}",          "desc": "Delete the local copy of the branch" },
         { "exec": "git push origin :{{name}}",       "desc": "Delete the remote copy of the branch" }
       ]
