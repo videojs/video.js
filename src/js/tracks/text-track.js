@@ -27,7 +27,7 @@ vjs.TextTrack = function(options) {
 
   options = options || {};
 
-  if (!options.player) {
+  if (!options['player']) {
     throw new Error('A player was not provided.');
   }
 
@@ -40,13 +40,13 @@ vjs.TextTrack = function(options) {
     }
   }
 
-  tt.player_ = options.player;
+  tt.player_ = options['player'];
 
-  mode = vjs.TextTrackMode[options.mode] || 'disabled';
-  kind = vjs.TextTrackKind[options.kind] || 'subtitles';
-  label = options.label || '';
-  language = options.language || options.srclang || '';
-  id = options.id || 'vjs_text_track_' + vjs.guid++;
+  mode = vjs.TextTrackMode[options['mode']] || 'disabled';
+  kind = vjs.TextTrackKind[options['kind']] || 'subtitles';
+  label = options['label'] || '';
+  language = options['language'] || options['srclang'] || '';
+  id = options['id'] || 'vjs_text_track_' + vjs.guid++;
 
   if (kind === 'metadata') {
     mode = 'hidden';
@@ -60,9 +60,9 @@ vjs.TextTrack = function(options) {
 
   changed = false;
   timeupdateHandler = vjs.bind(tt, function() {
-    this.activeCues;
+    this['activeCues'];
     if (changed) {
-      this.trigger('cuechange');
+      this['trigger']('cuechange');
       changed = false;
     }
   });
@@ -125,20 +125,20 @@ vjs.TextTrack = function(options) {
     get: function() {
       var i, l, active, ct, cue;
 
-      if (this.cues.length === 0) {
+      if (this['cues'].length === 0) {
         return activeCues; // nothing to do
       }
 
       ct = this.player_.currentTime();
       i = 0;
-      l = this.cues.length;
+      l = this['cues'].length;
       active = [];
 
       for (; i < l; i++) {
-        cue = this.cues[i];
-        if (cue.startTime <= ct && cue.endTime >= ct) {
+        cue = this['cues'][i];
+        if (cue['startTime'] <= ct && cue['endTime'] >= ct) {
           active.push(cue);
-        } else if (cue.startTime === cue.endTime && cue.startTime <= ct && cue.startTime + 0.5 >= ct) {
+        } else if (cue['startTime'] === cue['endTime'] && cue['startTime'] <= ct && cue['startTime'] + 0.5 >= ct) {
           active.push(cue);
         }
       }
@@ -195,7 +195,7 @@ vjs.TextTrack.prototype.addCue = function(cue) {
   }
 
   this.cues_.push(cue);
-  this.cues.setCues_(this.cues_);
+  this['cues'].setCues_(this.cues_);
 };
 
 vjs.TextTrack.prototype.removeCue = function(removeCue) {
@@ -233,24 +233,24 @@ loadTrack = function(src, track) {
 };
 
 parseCues = function(srcContent, track) {
-  if (typeof window.WebVTT !== 'function') {
+  if (typeof window['WebVTT'] !== 'function') {
     //try again a bit later
     return window.setTimeout(function() {
       parseCues(srcContent, track);
     }, 25);
   }
 
-  var parser = new window.WebVTT.Parser(window, window.vttjs, window.WebVTT.StringDecoder());
+  var parser = new window['WebVTT']['Parser'](window, window['vttjs'], window['WebVTT']['StringDecoder']());
 
-  parser.oncue = function(cue) {
+  parser['oncue'] = function(cue) {
     track.addCue(cue);
   };
-  parser.onparsingerror = function(error) {
+  parser['onparsingerror'] = function(error) {
     vjs.log.error(error);
   };
 
-  parser.parse(srcContent);
-  parser.flush();
+  parser['parse'](srcContent);
+  parser['flush']();
 };
 
 indexOf = function(searchElement, fromIndex) {

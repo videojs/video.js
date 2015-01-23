@@ -348,42 +348,42 @@ vjs.Html5.prototype.addRemoteTextTrack = function(options) {
   var track = document.createElement('track');
   options = options || {};
 
-  if (options.kind) {
-    track.kind = options.kind;
+  if (options['kind']) {
+    track['kind'] = options['kind'];
   }
-  if (options.label) {
-    track.label = options.label;
+  if (options['label']) {
+    track['label'] = options['label'];
   }
-  if (options.language || options.srclang) {
-    track.srclang = options.language || options.srclang;
+  if (options['language'] || options['srclang']) {
+    track['srclang'] = options['language'] || options['srclang'];
   }
   if (options['default']) {
     track['default'] = options['default'];
   }
-  if (options.id) {
-    track.id = options.id;
+  if (options['id']) {
+    track['id'] = options['id'];
   }
-  if (options.src) {
-    track.src = options.src;
+  if (options['src']) {
+    track['src'] = options['src'];
   }
 
   this.el().appendChild(track);
 
-  if (track.track.kind === 'metadata') {
-    track.track.mode = 'hidden';
+  if (track.track['kind'] === 'metadata') {
+    track['track']['mode'] = 'hidden';
   } else {
-    track.track.mode = 'disabled';
+    track['track']['mode'] = 'disabled';
   }
 
-  track.onload = function() {
-    var tt = track.track;
+  track['onload'] = function() {
+    var tt = track['track'];
     if (track.readyState >= 2) {
-      if (tt.kind === 'metadata' && tt.mode !== 'hidden') {
-        tt.mode = 'hidden';
-      } else if (tt.kind !== 'metadata' && tt.mode !== 'disabled') {
-        tt.mode = 'disabled';
+      if (tt['kind'] === 'metadata' && tt['mode'] !== 'hidden') {
+        tt['mode'] = 'hidden';
+      } else if (tt['kind'] !== 'metadata' && tt['mode'] !== 'disabled') {
+        tt['mode'] = 'disabled';
       }
-      track.onload = null;
+      track['onload'] = null;
     }
   };
 
@@ -401,11 +401,11 @@ vjs.Html5.prototype.removeRemoteTextTrack = function(track) {
 
   this.remoteTextTracks().removeTrack_(track);
 
-  tracks = this.el().querySelectorAll('track');
+  tracks = this.el()['querySelectorAll']('track');
 
   for (i = 0; i < tracks.length; i++) {
-    if (tracks[i] === track || tracks[i].track === track) {
-      tracks[i].parentNode.removeChild(tracks[i]);
+    if (tracks[i] === track || tracks[i]['track'] === track) {
+      tracks[i]['parentNode']['removeChild'](tracks[i]);
       break;
     }
   }

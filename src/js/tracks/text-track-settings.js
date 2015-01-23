@@ -60,7 +60,7 @@
     bgOpacity = getSelectedOptionValue(el.querySelector('.vjs-bg-opacity > select'));
     windowColor = getSelectedOptionValue(el.querySelector('.window-color > select'));
     windowOpacity = getSelectedOptionValue(el.querySelector('.vjs-window-opacity > select'));
-    fontPercent = window.parseFloat(getSelectedOptionValue(el.querySelector('.vjs-font-percent > select')));
+    fontPercent = window['parseFloat'](getSelectedOptionValue(el.querySelector('.vjs-font-percent > select')));
 
     result = {
       'backgroundOpacity': bgOpacity,

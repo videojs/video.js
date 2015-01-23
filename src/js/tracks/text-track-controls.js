@@ -55,8 +55,8 @@ vjs.TextTrackDisplay.prototype.createEl = function(){
 };
 
 vjs.TextTrackDisplay.prototype.clearDisplay = function() {
-  if (typeof window.WebVTT === 'function') {
-    window.WebVTT.processCues(window, [], this.el_);
+  if (typeof window['WebVTT'] === 'function') {
+    window['WebVTT']['processCues'](window, [], this.el_);
   }
 };
 
@@ -103,29 +103,29 @@ vjs.TextTrackDisplay.prototype.updateDisplay = function() {
 
   for (; i < tracks.length; i++) {
     track = tracks[i];
-    if (track.mode === 'showing') {
+    if (track['mode'] === 'showing') {
       this.updateForTrack(track);
     }
   }
 };
 
 vjs.TextTrackDisplay.prototype.updateForTrack = function(track) {
-  if (typeof window.WebVTT !== 'function') {
+  if (typeof window['WebVTT'] !== 'function') {
     return;
   }
 
   var i = 0,
       property,
       cueDiv,
-      overrides = this.player_.textTrackSettings.getValues(),
+      overrides = this.player_['textTrackSettings'].getValues(),
       fontSize,
       cues = [];
 
-  for (; i < track.activeCues.length; i++) {
-    cues.push(track.activeCues[i]);
+  for (; i < track['activeCues'].length; i++) {
+    cues.push(track['activeCues'][i]);
   }
 
-  window.WebVTT.processCues(window, track.activeCues, this.el_);
+  window['WebVTT']['processCues'](window, track['activeCues'], this.el_);
 
   i = cues.length;
   while (i--) {
@@ -201,7 +201,7 @@ vjs.TextTrackMenuItem = vjs.MenuItem.extend({
 
     if (tracks) {
       changeHandler = vjs.bind(this, function() {
-        var selected = this.track.mode === 'showing',
+        var selected = this.track['mode'] === 'showing',
             track,
             i,
             l;
@@ -214,7 +214,7 @@ vjs.TextTrackMenuItem = vjs.MenuItem.extend({
 
           for (; i < l; i++) {
             track = tracks[i];
-            if (track.kind === this.track.kind && track.mode === 'showing') {
+            if (track['kind'] === this.track['kind'] && track['mode'] === 'showing') {
               selected = false;
               break;
             }
@@ -231,7 +231,7 @@ vjs.TextTrackMenuItem = vjs.MenuItem.extend({
 
     // Modify options for parent MenuItem class's init.
     options['label'] = track['label'];
-    options['selected'] = track['default'] || track.mode === 'showing';
+    options['selected'] = track['default'] || track['mode'] === 'showing';
     vjs.MenuItem.call(this, player, options);
 
     // iOS7 doesn't dispatch change events to TextTrackLists when an
@@ -270,14 +270,14 @@ vjs.TextTrackMenuItem.prototype.onClick = function(){
   for (; i < tracks.length; i++) {
     track = tracks[i];
 
-    if (track.kind !== kind) {
+    if (track['kind'] !== kind) {
       continue;
     }
 
     if (track === this.track) {
-      track.mode = 'showing';
+      track['mode'] = 'showing';
     } else {
-      track.mode = 'disabled';
+      track['mode'] = 'disabled';
     }
   }
 };
@@ -293,11 +293,11 @@ vjs.OffTextTrackMenuItem = vjs.TextTrackMenuItem.extend({
     // Create pseudo track info
     // Requires options['kind']
     options['track'] = {
-      kind: options['kind'],
-      player: player,
-      label: options['kind'] + ' off',
+      'kind': options['kind'],
+      'player': player,
+      'label': options['kind'] + ' off',
       'default': false,
-      mode: 'disabled'
+      'mode': 'disabled'
     };
     vjs.TextTrackMenuItem.call(this, player, options);
     this.selected(true);
@@ -307,9 +307,9 @@ vjs.OffTextTrackMenuItem = vjs.TextTrackMenuItem.extend({
 vjs.CaptionSettingsMenuItem = vjs.TextTrackMenuItem.extend({
   init: function(player, options) {
     options['track'] = {
-      kind: options['kind'],
-      player: player,
-      label: options['kind'] + ' settings',
+      'kind': options['kind'],
+      'player': player,
+      'label': options['kind'] + ' settings',
       'default': false,
       mode: 'disabled'
     };

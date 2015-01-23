@@ -294,11 +294,11 @@ vjs.MediaTechController.prototype.emulateTextTracks = function() {
       tracks,
       script;
 
-  if (!window.WebVTT) {
+  if (!window['WebVTT']) {
     script = document.createElement('script');
     script.src = player.options()['vtt.js'] || '../node_modules/vtt.js/dist/vtt.js';
     player.el().appendChild(script);
-    window.WebVTT = true;
+    window['WebVTT'] = true;
   }
 
   tracks = this.textTracks();
@@ -358,14 +358,14 @@ createTrackHelper = function(self, kind, label, language, options) {
 
   options = options || {};
 
-  options.kind = kind;
+  options['kind'] = kind;
   if (label) {
-    options.label = label;
+    options['label'] = label;
   }
   if (language) {
-    options.language = language;
+    options['language'] = language;
   }
-  options.player = self.player_;
+  options['player'] = self.player_;
 
   track = new vjs.TextTrack(options);
   tracks.addTrack_(track);
@@ -382,7 +382,7 @@ vjs.MediaTechController.prototype.addTextTrack = function(kind, label, language)
 };
 
 vjs.MediaTechController.prototype.addRemoteTextTrack = function(options) {
-  var track = createTrackHelper(this, options.kind, options.label, options.language, options);
+  var track = createTrackHelper(this, options['kind'], options['label'], options['language'], options);
   this.remoteTextTracks().addTrack_(track);
   return {
     track: track
