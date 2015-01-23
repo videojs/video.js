@@ -447,8 +447,8 @@ module.exports = function(grunt) {
     vjsMin = grunt.file.read('build/files/minified.video.js');
 
     // write out the concatenated files
-    grunt.file.write('build/files/combined.video.js', vttjs + '\n' + vjs);
-    grunt.file.write('build/files/minified.video.js', vttjsMin + '\n' + vjsMin);
+    grunt.file.write('build/files/combined.video.js', vjs + '\n' + vttjs);
+    grunt.file.write('build/files/minified.video.js', vjsMin + '\n' + vttjsMin);
   });
 
   grunt.registerMultiTask('build', 'Building Source', function(){
