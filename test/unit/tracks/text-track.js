@@ -185,14 +185,17 @@ test('mode can only be set to a few options', function() {
   equal(tt.mode, 'showing', 'still on the previous mode, showing');
 });
 
-test('cues and activeCues return a TextTrackCueList', function() {
-  var tt = new TT({
-    player: defaultPlayer
-  });
+if (!vjs.IS_IE8) {
+  // this test cannot run on IE8 because TextTrackCueList is made with a custom element
+  test('cues and activeCues return a TextTrackCueList', function() {
+    var tt = new TT({
+      player: defaultPlayer
+    });
 
-  ok(tt.cues instanceof vjs.TextTrackCueList, 'cues are a TextTrackCueList');
-  ok(tt.activeCues instanceof vjs.TextTrackCueList, 'activeCues are a TextTrackCueList');
-});
+    ok(tt.cues instanceof vjs.TextTrackCueList, 'cues are a TextTrackCueList');
+    ok(tt.activeCues instanceof vjs.TextTrackCueList, 'activeCues are a TextTrackCueList');
+  });
+}
 
 test('cues can be added and removed from a TextTrack', function() {
   var tt = new TT({

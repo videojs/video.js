@@ -75,25 +75,28 @@ test('menu should update with removeRemoteTextTrack', function() {
   equal(player.textTracks().length, 1, 'textTracks contains one item');
 });
 
-test('menu items should polyfill mode change events', function() {
-  var player = PlayerTest.makePlayer({}),
-      changes,
-      trackMenuItem;
+if (!vjs.IS_IE8) {
+  // doesn't work on IE8
+  test('menu items should polyfill mode change events', function() {
+    var player = PlayerTest.makePlayer({}),
+        changes,
+        trackMenuItem;
 
-  // emulate a TextTrackList that doesn't report track mode changes,
-  // like iOS7
-  player.textTracks().onchange = undefined;
-  trackMenuItem = new vjs.TextTrackMenuItem(player, {
-    track: track
+    // emulate a TextTrackList that doesn't report track mode changes,
+    // like iOS7
+    player.textTracks().onchange = undefined;
+    trackMenuItem = new vjs.TextTrackMenuItem(player, {
+      track: track
+    });
+
+    player.textTracks().on('change', function() {
+      changes++;
+    });
+    changes = 0;
+    trackMenuItem.trigger('tap');
+    equal(changes, 1, 'taps trigger change events');
+
+    trackMenuItem.trigger('click');
+    equal(changes, 2, 'clicks trigger change events');
   });
-
-  player.textTracks().on('change', function() {
-    changes++;
-  });
-  changes = 0;
-  trackMenuItem.trigger('tap');
-  equal(changes, 1, 'taps trigger change events');
-
-  trackMenuItem.trigger('click');
-  equal(changes, 2, 'clicks trigger change events');
-});
+}
