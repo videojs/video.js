@@ -85,7 +85,12 @@ vjs.Slider.prototype.update = function(){
       bar = this.bar;
 
   // Protect against no duration and other division issues
-  if (isNaN(progress)) { progress = 0; }
+  if (typeof progress !== 'number' ||
+      progress !== progress ||
+      progress < 0 ||
+      progress === window.Infinity) {
+        progress = 0;
+  }
 
   barProgress = progress;
 
