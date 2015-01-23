@@ -2,14 +2,17 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 4.11.4 (2015-01-23)
 * @heff exported missing source handler functions ([view](https://github.com/videojs/video.js/pull/1787))
 * @heff fixed type support checking for an empty src string ([view](https://github.com/videojs/video.js/pull/1797))
 * @carpasse fixed a bug in updating child indexes after removing components ([view](https://github.com/videojs/video.js/pull/1814))
 * @dmlap fixed a bug where native controls would show after switching techs ([view](https://github.com/videojs/video.js/pull/1811))
 * @H1D fixed an issue with file extension type detection ([view](https://github.com/videojs/video.js/pull/1818))
 * @bclwhitaker updated to v4.5.3 of video-js-swf ([view](https://github.com/videojs/video.js/pull/1823))
-
---------------------
 
 ## 4.11.3 (2014-12-19)
 * @gdkraus fixed a bug where you could no longer tab-navigate passed a menu button ([view](https://github.com/videojs/video.js/pull/1760))

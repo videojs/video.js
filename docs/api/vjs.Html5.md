@@ -129,7 +129,7 @@ _inherited from_: [src/js/component.js#L536](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `[type]` [description]
 
-_defined in_: [src/js/media/html5.js#L368](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L368)
+_defined in_: [src/js/media/html5.js#L380](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L380)
 
 ---
 
@@ -141,7 +141,7 @@ _defined in_: [src/js/media/html5.js#L368](https://github.com/videojs/video.js/b
 ##### RETURNS: 
 * `Boolean` 
 
-_defined in_: [src/js/media/html5.js#L358](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L358)
+_defined in_: [src/js/media/html5.js#L370](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L370)
 
 ---
 
@@ -427,7 +427,7 @@ _inherited from_: [src/js/media/media.js#L55](https://github.com/videojs/video.j
 ##### RETURNS: 
 * `Boolean` 
 
-_defined in_: [src/js/media/html5.js#L282](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L282)
+_defined in_: [src/js/media/html5.js#L290](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L290)
 
 ---
 
@@ -769,7 +769,7 @@ _inherited from_: [src/js/component.js#L1020](https://github.com/videojs/video.j
 * __source__ `Object` The source object
 * __tech__ `vjs.Html5` The instance of the HTML5 tech
 
-_defined in_: [src/js/media/html5.js#L302](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L302)
+_defined in_: [src/js/media/html5.js#L310](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L310)
 
 ---
 
