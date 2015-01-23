@@ -5,6 +5,8 @@ vjs.EventEmitter.prototype.allowedEvents_ = {
 };
 
 vjs.EventEmitter.prototype.on = function(type, fn) {
+  // Remove the addEventListener alias before calling vjs.on
+  // so we don't get into an infinite type loop
   var ael = this.addEventListener;
   this.addEventListener = Function.prototype;
   vjs.on(this, type, fn);
