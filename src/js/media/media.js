@@ -413,7 +413,7 @@ vjs.MediaTechController.prototype['featuresPlaybackRate'] = false;
 vjs.MediaTechController.prototype['featuresProgressEvents'] = false;
 vjs.MediaTechController.prototype['featuresTimeupdateEvents'] = false;
 
-vjs.MediaTechController.prototype['featuresNativeTracks'] = false;
+vjs.MediaTechController.prototype['featuresNativeTextTracks'] = false;
 
 /**
  * A functional mixin for techs that want to use the Source Handler pattern.
