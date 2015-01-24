@@ -508,7 +508,7 @@ vjs.ChaptersButton.prototype.createMenu = function(){
   }
 
   if (chaptersTrack) {
-    var cues = chaptersTrack.cues, cue, mi;
+    var cues = chaptersTrack['cues'], cue, mi;
     i = 0;
     l = cues.length;
 
