@@ -478,16 +478,18 @@ vjs.ChaptersButton.prototype.createItems = function(){
 vjs.ChaptersButton.prototype.createMenu = function(){
   var tracks = this.player_.textTracks() || [],
       i = 0,
-      j = tracks.length,
+      l = tracks.length,
       track, chaptersTrack,
       items = this.items = [];
 
-  for (; i < j; i++) {
+  for (; i < l; i++) {
     track = tracks[i];
     if (track['kind'] == this.kind_) {
-      if (track.readyState() === 0) {
-        track.load();
-        track.on('loaded', vjs.bind(this, this.createMenu));
+      if (!track.cues) {
+        track['mode'] = 'hidden';
+        window.setTimeout(vjs.bind(this, function() {
+          this.createMenu();
+        }), 100);
       } else {
         chaptersTrack = track;
         break;
@@ -506,11 +508,11 @@ vjs.ChaptersButton.prototype.createMenu = function(){
   }
 
   if (chaptersTrack) {
-    var cues = chaptersTrack.cues_, cue, mi;
+    var cues = chaptersTrack.cues, cue, mi;
     i = 0;
-    j = cues.length;
+    l = cues.length;
 
-    for (;i<j;i++) {
+    for (; i < l; i++) {
       cue = cues[i];
 
       mi = new vjs.ChaptersTrackMenuItem(this.player_, {
@@ -545,10 +547,10 @@ vjs.ChaptersTrackMenuItem = vjs.MenuItem.extend({
 
     // Modify options for parent MenuItem class's init.
     options['label'] = cue.text;
-    options['selected'] = (cue.startTime <= currentTime && currentTime < cue.endTime);
+    options['selected'] = (cue['startTime'] <= currentTime && currentTime < cue['endTime']);
     vjs.MenuItem.call(this, player, options);
 
-    track.on('cuechange', vjs.bind(this, this.update));
+    track.addEventListener('cuechange', vjs.bind(this, this.update));
   }
 });
 
@@ -563,6 +565,6 @@ vjs.ChaptersTrackMenuItem.prototype.update = function(){
       currentTime = this.player_.currentTime();
 
   // vjs.log(currentTime, cue.startTime);
-  this.selected(cue.startTime <= currentTime && currentTime < cue.endTime);
+  this.selected(cue['startTime'] <= currentTime && currentTime < cue['endTime']);
 };
 })();

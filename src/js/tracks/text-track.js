@@ -48,7 +48,7 @@ vjs.TextTrack = function(options) {
   language = options['language'] || options['srclang'] || '';
   id = options['id'] || 'vjs_text_track_' + vjs.guid++;
 
-  if (kind === 'metadata') {
+  if (kind === 'metadata' || kind === 'chapters') {
     mode = 'hidden';
   }
 
@@ -116,6 +116,10 @@ vjs.TextTrack = function(options) {
 
   Object.defineProperty(tt, 'cues', {
     get: function() {
+      if (!this.loaded_) {
+        return null;
+      }
+
       return cues;
     },
     set: Function.prototype
@@ -124,6 +128,10 @@ vjs.TextTrack = function(options) {
   Object.defineProperty(tt, 'activeCues', {
     get: function() {
       var i, l, active, ct, cue;
+
+      if (!this.loaded_) {
+        return null;
+      }
 
       if (this['cues'].length === 0) {
         return activeCues; // nothing to do
@@ -228,6 +236,8 @@ loadTrack = function(src, track) {
       return vjs.log.error(err);
     }
 
+
+    track.loaded_ = true;
     parseCues(responseBody, track);
   }));
 };
