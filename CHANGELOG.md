@@ -9,8 +9,21 @@ CHANGELOG
 * @Sxmanek added a Czech translation ([view](https://github.com/videojs/video.js/pull/1739))
 * @jcaron23 added the vjs-scrubbing CSS class and prevented menus from showing while scrubbing ([view](https://github.com/videojs/video.js/pull/1741))
 * @dmlap fixed URL parsing in IE9 ([view](https://github.com/videojs/video.js/pull/1765))
+* @gkatsev Fixed issue where ManualTimeUpdatesOff was not de-registering events ([view](https://github.com/videojs/video.js/pull/1793))
+* @brycefisher Added a guide on player disposal ([view](https://github.com/videojs/video.js/pull/1803))
+* @toniher added a Catalan translation ([view](https://github.com/videojs/video.js/pull/1794))
+* @mmcc added a VERSION key to the videojs object ([view](https://github.com/videojs/video.js/pull/1798))
+* @mmcc fixed an issue with text track hiding introduced in #1681 ([view](https://github.com/videojs/video.js/pull/1804))
 
 --------------------
+
+## 4.11.4 (2015-01-23)
+* @heff exported missing source handler functions ([view](https://github.com/videojs/video.js/pull/1787))
+* @heff fixed type support checking for an empty src string ([view](https://github.com/videojs/video.js/pull/1797))
+* @carpasse fixed a bug in updating child indexes after removing components ([view](https://github.com/videojs/video.js/pull/1814))
+* @dmlap fixed a bug where native controls would show after switching techs ([view](https://github.com/videojs/video.js/pull/1811))
+* @H1D fixed an issue with file extension type detection ([view](https://github.com/videojs/video.js/pull/1818))
+* @bclwhitaker updated to v4.5.3 of video-js-swf ([view](https://github.com/videojs/video.js/pull/1823))
 
 ## 4.11.3 (2014-12-19)
 * @gdkraus fixed a bug where you could no longer tab-navigate passed a menu button ([view](https://github.com/videojs/video.js/pull/1760))
@@ -42,7 +55,7 @@ CHANGELOG
 * @mmcc fixed localization of captions/subtitles menu off buttons ([view](https://github.com/videojs/video.js/pull/1632))
 
 ## 4.10.1 (2014-10-29)
-@heff removed his own stupid error ([view])(https://github.com/videojs/video.js/commit/a12dd770572a7f16e436e2332eba7ffbb1f1b9b9)
+@heff removed his own stupid error [view](https://github.com/videojs/video.js/commit/a12dd770572a7f16e436e2332eba7ffbb1f1b9b9)
 
 ## 4.10.0 (2014-10-28)
 * @aptx4869 fixed an issue where the native JSON parser wasn&#x27;t used ([view](https://github.com/videojs/video.js/pull/1565))

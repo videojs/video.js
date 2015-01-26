@@ -9,8 +9,8 @@ Thanks to the awesome folks over at [Fastly](http://www.fastly.com/), there's a 
 `<head>`:
 
 ```html
-<link href="http://vjs.zencdn.net/4.10/video-js.css" rel="stylesheet">
-<script src="http://vjs.zencdn.net/4.10/video.js"></script>
+<link href="http://vjs.zencdn.net/4.11/video-js.css" rel="stylesheet">
+<script src="http://vjs.zencdn.net/4.11/video.js"></script>
 ```
 
 Then, whenever you want to use Video.js you can simply use the `<video>` element as your normally would, but with an additional `data-setup` attribute containing any Video.js options. These options

@@ -94,6 +94,7 @@ vjs.Html5.prototype.createEl = function(){
       i,
       // If possible, reuse original tag for HTML5 playback technology element
       el = player.tag,
+      attributes,
       newEl,
       clone;
 
@@ -110,8 +111,15 @@ vjs.Html5.prototype.createEl = function(){
       player.tag = null;
     } else {
       el = vjs.createEl('video');
+
+      // determine if native controls should be used
+      attributes = videojs.util.mergeOptions({}, player.tagAttributes);
+      if (!vjs.TOUCH_ENABLED || player.options()['nativeControlsForTouch'] !== true) {
+        delete attributes.controls;
+      }
+
       vjs.setElementAttributes(el,
-        vjs.obj.merge(player.tagAttributes || {}, {
+        vjs.obj.merge(attributes, {
           id:player.id() + '_html5_api',
           'class':'vjs-tech'
         })
@@ -445,13 +453,13 @@ vjs.Html5.nativeSourceHandler = {};
  * @return {String}         'probably', 'maybe', or '' (empty string)
  */
 vjs.Html5.nativeSourceHandler.canHandleSource = function(source){
-  var ext;
+  var match, ext;
 
   function canPlayType(type){
     // IE9 on Windows 7 without MediaPlayer throws an error here
     // https://github.com/videojs/video.js/issues/519
     try {
-      return !!vjs.TEST_VID.canPlayType(type);
+      return vjs.TEST_VID.canPlayType(type);
     } catch(e) {
       return '';
     }
@@ -460,11 +468,15 @@ vjs.Html5.nativeSourceHandler.canHandleSource = function(source){
   // If a type was provided we should rely on that
   if (source.type) {
     return canPlayType(source.type);
-  } else {
+  } else if (source.src) {
     // If no type, fall back to checking 'video/[EXTENSION]'
-    ext = source.src.match(/\.([^\/\?]+)(\?[^\/]+)?$/i)[1];
+    match = source.src.match(/\.([^.\/\?]+)(\?[^\/]+)?$/i);
+    ext = match && match[1];
+
     return canPlayType('video/'+ext);
   }
+
+  return '';
 };
 
 /**
