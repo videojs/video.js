@@ -1663,6 +1663,9 @@ vjs.Player.prototype.isAudio = function(bool) {
 };
 
 /**
+ * This is an advanced feature. Prefixing player events may cause
+ * plugins and functionality that relies on video events to break.
+ *
  * Trigger an event on the player.
  *
  *     myPlayer.trigger('eventName');
