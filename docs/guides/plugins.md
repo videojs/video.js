@@ -23,7 +23,7 @@ Step 2: Registering A Plugin
 -------------------------------
 It's time to give the rest of the world the opportunity to be awed by your genius. When your plugin is loaded, it needs to let Video.js know this amazing new functionality is now available:
 
-    vjs.plugin('examplePlugin', examplePlugin);
+    videojs.plugin('examplePlugin', examplePlugin);
 
 From this point on, your plugin will be added to the Video.js prototype and will show up as a property on every instance created. Make sure you choose a unique name that doesn't clash with any of the properties already in Video.js. Which leads us to...
 
@@ -31,7 +31,7 @@ Step 3: Using A Plugin
 ----------------------
 There are two ways to initialize a plugin. If you're creating your video tag dynamically, you can specify the plugins you'd like to initialize with it and any options you want to pass to them:
 
-    vjs('vidId', {
+    videojs('vidId', {
       plugins: {
         examplePlugin: {
           exampleOption: true
@@ -41,6 +41,7 @@ There are two ways to initialize a plugin. If you're creating your video tag dyn
 
 If you've already initialized your video tag, you can activate a plugin at any time by calling its setup function directly:
 
+    var video = videojs('cool-vid');
     video.examplePlugin({ exampleOption: true });
 
 That's it. Head on over to the [Video.js wiki](https://github.com/videojs/video.js/wiki/Plugins) and add your plugin to the list so everyone else can check it out.
