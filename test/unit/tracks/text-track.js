@@ -192,6 +192,9 @@ if (!vjs.IS_IE8) {
       player: defaultPlayer
     });
 
+    // pretend the track has loaded
+    tt.loaded_ = true;
+
     ok(tt.cues instanceof vjs.TextTrackCueList, 'cues are a TextTrackCueList');
     ok(tt.activeCues instanceof vjs.TextTrackCueList, 'activeCues are a TextTrackCueList');
   });
@@ -201,7 +204,13 @@ test('cues can be added and removed from a TextTrack', function() {
   var tt = new TT({
         player: defaultPlayer
       }),
-      cues = tt.cues;
+      cues;
+
+  // pretend the track has loaded
+  tt.loaded_ = true;
+
+  cues = tt.cues;
+
 
   equal(cues.length, 0, 'start with zero cues');
 
@@ -228,6 +237,9 @@ test('fires cuechange when cues become active and inactive', function() {
         player: player,
         mode: 'showing'
       });
+
+  // pretend the track has loaded
+  tt.loaded_ = true;
 
   cuechangeHandler = function() {
     changes++;
