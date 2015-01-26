@@ -230,7 +230,7 @@ vjs.TextTrackMenuItem = vjs.MenuItem.extend({
     }
 
     // Modify options for parent MenuItem class's init.
-    options['label'] = track['label'];
+    options['label'] = track['label'] || track['language'] || 'Unknown';
     options['selected'] = track['default'] || track['mode'] === 'showing';
     vjs.MenuItem.call(this, player, options);
 
@@ -377,7 +377,7 @@ vjs.TextTrackButton.prototype.createItems = function(){
     track = tracks[i];
 
     // only add tracks that are of the appropriate kind and have a label
-    if (track['kind'] === this.kind_ && track['label']) {
+    if (track['kind'] === this.kind_) {
       items.push(new vjs.TextTrackMenuItem(this.player_, {
         'track': track
       }));
