@@ -652,3 +652,47 @@ test('should add an audio class if an audio el is used', function() {
 
   ok(player.el().className.indexOf(audioClass) !== -1, 'added '+ audioClass +' css class');
 });
+
+test('allows events player events to be prefixed', function() {
+  var player = PlayerTest.makePlayer(),
+      unprefixed = [],
+      prefixed = [];
+
+  player.on('test', function(event) {
+    unprefixed.push(event);
+  });
+  player.on('prefixtest', function(event) {
+    prefixed.push(event);
+  });
+
+  // default behavior should be unprefixed
+  equal('', player.eventPrefix(), 'no prefix by default');
+  player.trigger('test');
+  player.trigger({
+    type: 'test'
+  });
+  equal(unprefixed.length, 2, 'triggered an unprefixed event');
+  equal(prefixed.length, 0, 'did not trigger a prefixed event');
+
+  // try out prefixed behavior
+  prefixed.length = 0;
+  unprefixed.length = 0;
+  player.eventPrefix('prefix');
+  player.trigger('test');
+  player.trigger({
+    type: 'test'
+  });
+  equal(unprefixed.length, 0, 'did not trigger an unprefixed event');
+  equal(prefixed.length, 2, 'triggered a prefixed event');
+
+  // reset things back to normal
+  prefixed.length = 0;
+  unprefixed.length = 0;
+  player.eventPrefix('');
+  player.trigger('test');
+  player.trigger({
+    type: 'test'
+  });
+  equal(unprefixed.length, 2, 'triggered an unprefixed event');
+  equal(prefixed.length, 0, 'did not trigger a prefixed event');
+});
