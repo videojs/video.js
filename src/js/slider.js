@@ -88,7 +88,7 @@ vjs.Slider.prototype.update = function(){
   if (typeof progress !== 'number' ||
       progress !== progress ||
       progress < 0 ||
-      progress === window.Infinity) {
+      progress === Infinity) {
         progress = 0;
   }
 

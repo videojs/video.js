@@ -487,9 +487,11 @@ vjs.ChaptersButton.prototype.createMenu = function(){
     if (track['kind'] == this.kind_) {
       if (!track.cues) {
         track['mode'] = 'hidden';
+        /* jshint loopfunc:true */
         window.setTimeout(vjs.bind(this, function() {
           this.createMenu();
         }), 100);
+        /* jshint loopfunc:false */
       } else {
         chaptersTrack = track;
         break;
