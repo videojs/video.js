@@ -493,7 +493,7 @@ test('should emit a tap event', function(){
     { pageX: 0, pageY: 0 }
   ]});
   vjs.trigger(comp.el(), {type: 'touchmove', touches: [
-    { pageX: 10, pageY: 10 }
+    { pageX: 7, pageY: 7 }
   ]});
   comp.trigger('touchend');
 
