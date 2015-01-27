@@ -1663,9 +1663,6 @@ vjs.Player.prototype.isAudio = function(bool) {
 };
 
 /**
- * This is an advanced feature. Prefixing player events may cause
- * plugins and functionality that relies on video events to break.
- *
  * Trigger an event on the player.
  *
  *     myPlayer.trigger('eventName');
@@ -1686,6 +1683,25 @@ vjs.Player.prototype.trigger = function(event) {
   }
   return vjs.Component.prototype.trigger.apply(this, arguments);
 };
+
+/**
+ * This is an advanced feature. Prefixing player events may cause
+ * plugins and functionality that relies on video events to break.
+ *
+ * Set a prefix to be inserted in front of the event type for all
+ * events triggered on the player. For instance, this code:
+ *
+ *     myPlayer.eventPrefix('custom');
+ *     myPlayer.trigger('seeked');
+ *
+ * will dispatch events to handlers registered on "customseeked" but
+ * _not_ event handlers that have been registered for "seeked". Set
+ * the event prefix to the empty string to return to the default
+ * behavior.
+ *
+ * @param {String} prefix  the string to prefix to all player emitted events
+ * @return {String}  the current player event prefix
+ */
 vjs.Player.prototype.eventPrefix = function(prefix) {
   if (prefix !== undefined) {
 
