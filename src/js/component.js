@@ -1039,7 +1039,7 @@ vjs.Component.prototype.emitTapEvents = function(){
 
   // Maximum movement allowed during a touch event to still be considered a tap
   // Other popular libs use anywhere from 2 (hammer.js) to 15, so 10 seems like a nice, round number.
-  tapMovementThreshold = 22;
+  tapMovementThreshold = 10;
 
   // The maximum length a touch can be while still being considered a tap
   touchTimeThreshold = 200;
