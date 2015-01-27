@@ -1031,14 +1031,18 @@ vjs.Component.prototype.onResize;
  */
 vjs.Component.prototype.emitTapEvents = function(){
   var touchStart, firstTouch, touchTime, couldBeTap, noTap,
-      xdiff, ydiff, touchDistance, tapMovementThreshold;
+      xdiff, ydiff, touchDistance, tapMovementThreshold, touchTimeThreshold;
 
   // Track the start time so we can determine how long the touch lasted
   touchStart = 0;
   firstTouch = null;
 
   // Maximum movement allowed during a touch event to still be considered a tap
-  tapMovementThreshold = 22;
+  // Other popular libs use anywhere from 2 (hammer.js) to 15, so 10 seems like a nice, round number.
+  tapMovementThreshold = 10;
+
+  // The maximum length a touch can be while still being considered a tap
+  touchTimeThreshold = 200;
 
   this.on('touchstart', function(event) {
     // If more than one finger, don't consider treating this as a click
@@ -1082,8 +1086,8 @@ vjs.Component.prototype.emitTapEvents = function(){
     if (couldBeTap === true) {
       // Measure how long the touch lasted
       touchTime = new Date().getTime() - touchStart;
-      // The touch needs to be quick in order to consider it a tap
-      if (touchTime < 250) {
+      // Make sure the touch was less than the threshold to be considered a tap
+      if (touchTime < touchTimeThreshold) {
         event.preventDefault(); // Don't let browser turn this into a click
         this.trigger('tap');
         // It may be good to copy the touchend event object and change the
