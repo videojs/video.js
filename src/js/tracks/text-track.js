@@ -173,6 +173,8 @@ vjs.TextTrack = function(options) {
 
   if (options.src) {
     loadTrack(options.src, tt);
+  } else {
+    tt.loaded_ = true;
   }
 
   if (vjs.IS_IE8) {
