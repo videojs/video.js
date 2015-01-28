@@ -110,7 +110,7 @@ vjs.TextTrackDisplay.prototype.updateDisplay = function() {
 };
 
 vjs.TextTrackDisplay.prototype.updateForTrack = function(track) {
-  if (typeof window['WebVTT'] !== 'function') {
+  if (typeof window['WebVTT'] !== 'function' || !track['activeCues']) {
     return;
   }
 
