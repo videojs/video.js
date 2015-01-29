@@ -99,7 +99,7 @@ vjs.Slider.prototype.update = function(){
   var percentage = vjs.round(barProgress * 100, 2) + '%';
 
   // Set the new bar width or height
-  if (this.options()['vertical']) {
+  if (this.vertical()) {
     bar.el().style.height = percentage;
   } else {
     bar.el().style.width = percentage;
@@ -113,7 +113,7 @@ vjs.Slider.prototype.updateHandlePosition = function(progress) {
   var handle = this.handle;
   if (!handle) return;
 
-  var vertical = this.options()['vertical'];
+  var vertical = this.vertical();
   var box = this.el_;
 
   var boxSize, handleSize;
