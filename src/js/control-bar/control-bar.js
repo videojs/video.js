@@ -44,6 +44,7 @@ ControlBar.prototype.options_ = {
     'remainingTimeDisplay': {},
     'liveDisplay': {},
     'progressControl': {},
+    // 'separator': {},
     'fullscreenToggle': {},
     'volumeControl': {},
     'muteToggle': {},
