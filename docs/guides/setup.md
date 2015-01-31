@@ -24,6 +24,14 @@ You can download the Video.js source and host it on your own servers, or use the
 <script src="//vjs.zencdn.net/4.11/video.js"></script>
 ```
 
+
+### Bower install ###
+```html
+bower install --save videojs
+```
+Three important files (`video-js.min.css`, `video.js`, `video-js.swf`) to link in your html file are contained in the `dist` folder
+
+
 ### Self Hosted. ###
 To entirely self-host, you'll need to pull in the font files and let Video.js know where the swf is located. If you simply copy the dist folder or zip file contents into your project everything
 should Just Work™, but the paths can easily be changed by editing the LESS file and re-building, or by modifying the generated CSS file.
