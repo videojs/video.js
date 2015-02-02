@@ -25,11 +25,17 @@ You can download the Video.js source and host it on your own servers, or use the
 ```
 
 
-### Bower install ###
-```html
-bower install --save videojs
+## Install via package manager
+
+### NPM
 ```
-Three important files (`video-js.min.css`, `video.js`, `video-js.swf`) to link in your html file are contained in the `dist` folder
+$ npm install --save video.js
+```
+
+### Bower
+```
+$ bower install --save video.js
+```
 
 
 ### Self Hosted. ###
