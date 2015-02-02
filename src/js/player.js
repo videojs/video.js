@@ -451,9 +451,7 @@ vjs.Player.prototype.onPlay = function(){
 
   // hide the poster when the user hits play
   // https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-play
-  if (!this.hasStarted()) {
-    this.hasStarted(true);
-  }
+  this.hasStarted(true);
 };
 
 /**

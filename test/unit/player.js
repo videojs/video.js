@@ -212,6 +212,8 @@ test('should set and update the poster value', function(){
   player.dispose();
 });
 
+// hasStarted() is equivalent to the "show poster flag" in the
+// standard, for the purpose of displaying the poster image
 // https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-play
 test('should hide the poster when play is called', function() {
   var player = PlayerTest.makePlayer({
