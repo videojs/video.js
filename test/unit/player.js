@@ -645,6 +645,24 @@ test('pause is not called if the player is paused and ended is fired', function(
   equal(pauses, 0, 'pause was not called when ended fired');
 });
 
+test('classes reflect paused attribute after loadstart', function() {
+  var video = document.createElement('video'),
+      player = PlayerTest.makePlayer({}, video),
+      paused = true;
+  player.paused = function() {
+    return paused;
+  };
+
+  player.trigger('loadstart');
+  ok((/\bvjs-paused\b/).test(player.el().className), 'has class vjs-paused');
+  ok(!(/\bvjs-playing\b/).test(player.el().className), 'does not have class vjs-playing');
+
+  paused = false;
+  player.trigger('loadstart');
+  ok(!(/\bvjs-paused\b/).test(player.el().className), 'does not have class vjs-paused');
+  ok((/\bvjs-playing\b/).test(player.el().className), 'has class vjs-playing');
+});
+
 test('should add an audio class if an audio el is used', function() {
   var audio = document.createElement('audio'),
       player = PlayerTest.makePlayer({}, audio),

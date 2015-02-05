@@ -3,8 +3,8 @@ module('Controls');
 test('should hide volume control if it\'s not supported', function(){
   expect(2);
 
-  var noop, player, volumeControl, muteToggle;
-  noop = function(){};
+  var player, volumeControl, noop, muteToggle;
+  noop = function() {};
   player = {
     id: noop,
     on: noop,
@@ -27,8 +27,8 @@ test('should hide volume control if it\'s not supported', function(){
 });
 
 test('should test and toggle volume control on `loadstart`', function(){
-  var noop, listeners, player, volumeControl, muteToggle, i;
-  noop = function(){};
+  var listeners, player, volumeControl, noop, muteToggle, i;
+  noop = function() {};
   listeners = [];
   player = {
     id: noop,
@@ -76,9 +76,28 @@ test('should test and toggle volume control on `loadstart`', function(){
   equal(muteToggle.hasClass('vjs-hidden'), false, 'muteToggle does not show itself');
 });
 
+test('should test and toggle play control on `loadstart`', function(){
+  var player, playToggle, paused;
+  player = PlayerTest.makePlayer();
+  player.paused = function() {
+    return paused;
+  };
+  paused = true;
+  playToggle = new vjs.PlayToggle(player);
+  player.trigger('ready');
+
+  ok((/\bvjs-paused\b/).test(playToggle.el().className), 'has class vjs-paused');
+  ok(!(/\bvjs-playing\b/).test(playToggle.el().className), 'does not have class vjs-playing');
+
+  paused = false;
+  player.trigger('loadstart');
+  ok(!(/\bvjs-paused\b/).test(playToggle.el().className), 'does not have class vjs-paused');
+  ok((/\bvjs-playing\b/).test(playToggle.el().className), 'has class vjs-playing');
+});
+
 test('calculateDistance should use changedTouches, if available', function() {
   var noop, player, slider, event;
-  noop = function(){};
+  noop = function() {};
   player = {
     id: noop,
     on: noop,

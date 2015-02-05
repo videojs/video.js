@@ -10,8 +10,17 @@ vjs.PlayToggle = vjs.Button.extend({
   init: function(player, options){
     vjs.Button.call(this, player, options);
 
+    this.on(player, 'ready', function(){
+      if (this.player_.paused()) {
+        this.addClass('vjs-paused');
+      } else {
+        this.addClass('vjs-playing');
+      }
+    });
+
     this.on(player, 'play', this.onPlay);
     this.on(player, 'pause', this.onPause);
+    this.on(player, 'loadstart', this.onLoadStart);
   }
 });
 
@@ -30,7 +39,19 @@ vjs.PlayToggle.prototype.onClick = function(){
   }
 };
 
-  // OnPlay - Add the vjs-playing class to the element so it can change appearance
+// OnLoadStart - determine whether the playback state has changed and
+// update the element if it has
+vjs.PlayToggle.prototype.onLoadStart = function(){
+  // invoke the approprate event handlers if the player's paused
+  // attribute has changed
+  if (!this.player_.paused() && !this.hasClass('vjs-playing')) {
+    this.onPlay();
+  } else if (!this.hasClass('vjs-paused')) {
+    this.onPause();
+  }
+};
+
+// OnPlay - Add the vjs-playing class to the element so it can change appearance
 vjs.PlayToggle.prototype.onPlay = function(){
   this.removeClass('vjs-paused');
   this.addClass('vjs-playing');
