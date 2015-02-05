@@ -14,6 +14,7 @@ CHANGELOG
 * @toniher added a Catalan translation ([view](https://github.com/videojs/video.js/pull/1794))
 * @mmcc added a VERSION key to the videojs object ([view](https://github.com/videojs/video.js/pull/1798))
 * @mmcc fixed an issue with text track hiding introduced in #1681 ([view](https://github.com/videojs/video.js/pull/1804))
+* Export video.js as a named AMD module ([view](https://github.com/videojs/video.js/pull/1844))
 
 --------------------
 
