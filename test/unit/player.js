@@ -212,6 +212,27 @@ test('should set and update the poster value', function(){
   player.dispose();
 });
 
+// hasStarted() is equivalent to the "show poster flag" in the
+// standard, for the purpose of displaying the poster image
+// https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-play
+test('should hide the poster when play is called', function() {
+  var player = PlayerTest.makePlayer({
+    poster: 'https://example.com/poster.jpg'
+  });
+
+  equal(player.hasStarted(), false, 'the show poster flag is true before play');
+  player.play();
+  equal(player.hasStarted(), true, 'the show poster flag is false after play');
+
+  player.trigger('loadstart');
+  equal(player.hasStarted(),
+        false,
+        'the resource selection algorithm sets the show poster flag to true');
+
+  player.play();
+  equal(player.hasStarted(), true, 'the show poster flag is false after play');
+});
+
 test('should load a media controller', function(){
   var player = PlayerTest.makePlayer({
     preload: 'none',
