@@ -400,9 +400,6 @@ vjs.Player.prototype.onLoadStart = function() {
   } else {
     // reset the hasStarted state
     this.hasStarted(false);
-    this.one('play', function(){
-      this.hasStarted(true);
-    });
   }
 };
 
@@ -451,6 +448,10 @@ vjs.Player.prototype.onLoadedAllData;
 vjs.Player.prototype.onPlay = function(){
   this.removeClass('vjs-paused');
   this.addClass('vjs-playing');
+
+  // hide the poster when the user hits play
+  // https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-play
+  this.hasStarted(true);
 };
 
 /**
