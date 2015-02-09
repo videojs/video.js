@@ -29,10 +29,10 @@ test('should be able to access expected player API methods', function() {
   ok(player.exitFullscreen, 'exitFullscreen exists');
   ok(player.playbackRate, 'playbackRate exists');
   ok(player.networkState, 'networkState exists');
+  ok(player.readyState, 'readyState exists');
 
   // Unsupported Native HTML5 Methods
   // ok(player.canPlayType, 'canPlayType exists');
-  // ok(player.readyState, 'readyState exists');
   // ok(player.startTime, 'startTime exists');
   // ok(player.defaultPlaybackRate, 'defaultPlaybackRate exists');
   // ok(player.playbackRate, 'playbackRate exists');

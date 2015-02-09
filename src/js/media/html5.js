@@ -281,7 +281,7 @@ vjs.Html5.prototype.playbackRate = function(){ return this.el_.playbackRate; };
 vjs.Html5.prototype.setPlaybackRate = function(val){ this.el_.playbackRate = val; };
 
 vjs.Html5.prototype.networkState = function(){ return this.el_.networkState; };
-
+vjs.Html5.prototype.readyState = function(){ return this.el_.readyState; };
 
 /**
  * Check if HTML5 video is supported by this browser/device

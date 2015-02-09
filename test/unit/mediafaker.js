@@ -45,6 +45,7 @@ vjs.MediaFaker.prototype.supportsFullScreen = function(){ return false; };
 vjs.MediaFaker.prototype.buffered = function(){ return {}; };
 vjs.MediaFaker.prototype.duration = function(){ return {}; };
 vjs.MediaFaker.prototype.networkState = function(){ return 0; };
+vjs.MediaFaker.prototype.readyState = function(){ return 0; };
 
 // Export vars for Closure Compiler
 vjs['MediaFaker'] = vjs.MediaFaker;
