@@ -47,6 +47,7 @@ test('should be able to access expected player API methods', function() {
   ok(player.userActive, 'userActive exists');
   ok(player.usingNativeControls, 'usingNativeControls exists');
   ok(player.isFullscreen, 'isFullscreen exists');
+  ok(player.eventPrefix, 'eventPrefix exists');
 
   // Deprecated methods that should still exist
   ok(player.requestFullScreen, 'requestFullScreen exists');

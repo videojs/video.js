@@ -88,6 +88,9 @@ vjs.Player = vjs.Component.extend({
       this.addClass('vjs-audio');
     }
 
+    // by default, there is no event prefix
+    this.eventPrefix_ = '';
+
     // TODO: Make this smarter. Toggle user state between touching/mousing
     // using events, since devices can have both touch and mouse events.
     // if (vjs.TOUCH_ENABLED) {
@@ -1658,6 +1661,56 @@ vjs.Player.prototype.isAudio = function(bool) {
   }
 
   return this.isAudio_;
+};
+
+/**
+ * Trigger an event on the player.
+ *
+ *     myPlayer.trigger('eventName');
+ *     myPlayer.trigger({'type':'eventName'});
+ *
+ * Event names will be prefixed with the current value of this.eventPrefix()
+ *
+ * @param  {Event|Object|String} event  A string (the type) or an event object with a type attribute
+ * @return {vjs.Player}       self
+ */
+vjs.Player.prototype.trigger = function(event) {
+  if (this.eventPrefix_ !== '') {
+    if (typeof event === 'string') {
+      event = this.eventPrefix_ + event;
+    } else if (typeof event === 'object') {
+      event.type = this.eventPrefix_ + event.type;
+    }
+  }
+  return vjs.Component.prototype.trigger.apply(this, arguments);
+};
+
+/**
+ * This is an advanced feature. Prefixing player events may cause
+ * plugins and functionality that relies on video events to break.
+ *
+ * Set a prefix to be inserted in front of the event type for all
+ * events triggered on the player. For instance, this code:
+ *
+ *     myPlayer.eventPrefix('custom');
+ *     myPlayer.trigger('seeked');
+ *
+ * will dispatch events to handlers registered on "customseeked" but
+ * _not_ event handlers that have been registered for "seeked". Set
+ * the event prefix to the empty string to return to the default
+ * behavior.
+ *
+ * @param {String} prefix  the string to prefix to all player emitted events
+ * @return {String}  the current player event prefix
+ */
+vjs.Player.prototype.eventPrefix = function(prefix) {
+  if (prefix !== undefined) {
+
+    // force a string conversion immediately rather than doing it for
+    // every event
+    this.eventPrefix_ = '' + prefix;
+  }
+  return this.eventPrefix_;
 };
 
 // Methods to add support for
