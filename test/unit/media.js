@@ -45,6 +45,7 @@ test('stops timeupdates if the tech produces them natively', function() {
         playHandler = handler;
       }
     },
+    off: this.noop,
     bufferedPercent: this.noop,
     trigger: function(event) {
       if (event === 'timeupdate') {
