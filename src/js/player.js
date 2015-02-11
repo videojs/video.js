@@ -389,6 +389,8 @@ vjs.Player.prototype.unloadTech = function(){
 vjs.Player.prototype.onLoadStart = function() {
   // TODO: Update to use `emptied` event instead. See #1277.
 
+  this.removeClass('vjs-ended');
+
   // reset the error state
   this.error(null);
 

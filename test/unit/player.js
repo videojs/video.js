@@ -484,7 +484,7 @@ test('should remove vjs-has-started class', function(){
 });
 
 test('should add and remove vjs-ended class', function() {
-  expect(2);
+  expect(4);
 
   var player = PlayerTest.makePlayer({});
 
@@ -494,6 +494,12 @@ test('should add and remove vjs-ended class', function() {
   ok(player.el().className.indexOf('vjs-ended') !== -1, 'vjs-ended class added');
 
   player.trigger('play');
+  ok(player.el().className.indexOf('vjs-ended') === -1, 'vjs-ended class removed');
+
+  player.trigger('ended');
+  ok(player.el().className.indexOf('vjs-ended') !== -1, 'vjs-ended class re-added');
+
+  player.trigger('loadstart');
   ok(player.el().className.indexOf('vjs-ended') === -1, 'vjs-ended class removed');
 });
 
