@@ -1,0 +1,11 @@
+{
+  "name": "videojs",
+  "description": "videojs",
+  "main": [
+    "build/files/minified.videojs.js",
+    "build/files/video-js.min.css"
+  ],
+  "keywords": [
+    "videojs"
+  ]
+}
