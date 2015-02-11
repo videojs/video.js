@@ -105,6 +105,7 @@ test('dispose removes the object element even before ready fires', function() {
       tech = new vjs.Flash({
         id: noop,
         on: noop,
+        off: noop,
         trigger: noop,
         options_: {}
       }, {
