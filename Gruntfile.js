@@ -276,20 +276,5 @@ module.exports = function(grunt) {
     // GA Tracking Pixel (manually building the pixel URL)
     cdnjs = uglify.minify('src/js/cdn.js').code.replace('v0.0.0', 'v'+version.full);
     grunt.file.write('dist/cdn/video.js', jsmin + cdnjs);
-
-    // Zip up into video-js-VERSION.zip
-    exec('cd dist && zip -r video-js-'+version.full+'.zip video-js && cd ..', { maxBuffer: 500*1024 }, function(err, stdout, stderr){
-
-      if (err) {
-        grunt.warn(err);
-        done(false);
-      }
-
-      if (stdout) {
-        grunt.log.writeln(stdout);
-      }
-
-      done();
-    });
   });
 };
