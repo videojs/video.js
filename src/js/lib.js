@@ -245,6 +245,8 @@ vjs.getData = function(el){
   var id = el[vjs.expando];
   if (!id) {
     id = el[vjs.expando] = vjs.guid++;
+  }
+  if (!vjs.cache[id]) {
     vjs.cache[id] = {};
   }
   return vjs.cache[id];
