@@ -66,6 +66,7 @@ goog.exportProperty(vjs.Component.prototype, 'dimensions', vjs.Component.prototy
 goog.exportProperty(vjs.Component.prototype, 'ready', vjs.Component.prototype.ready);
 goog.exportProperty(vjs.Component.prototype, 'addClass', vjs.Component.prototype.addClass);
 goog.exportProperty(vjs.Component.prototype, 'removeClass', vjs.Component.prototype.removeClass);
+goog.exportProperty(vjs.Component.prototype, 'hasClass', vjs.Component.prototype.hasClass);
 goog.exportProperty(vjs.Component.prototype, 'buildCSSClass', vjs.Component.prototype.buildCSSClass);
 goog.exportProperty(vjs.Component.prototype, 'localize', vjs.Component.prototype.localize);
 goog.exportProperty(vjs.Component.prototype, 'setInterval', vjs.Component.prototype.setInterval);

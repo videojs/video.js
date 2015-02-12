@@ -21,6 +21,7 @@ CHANGELOG
 * @mmcc improved tap sensitivity ([view](https://github.com/videojs/video.js/pull/1830))
 * Add vjs-ended class when playback reaches the end of the timeline ([view](https://github.com/videojs/video.js/pull/1857))
 * @dmlap Add network and ready state properties ([view](https://github.com/videojs/video.js/pull/1854))
+* @woollybogger exported the hasClass function ([view](https://github.com/videojs/video.js/pull/1839))
 
 --------------------
 
