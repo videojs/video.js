@@ -21,6 +21,7 @@ CHANGELOG
 * @steverandy fixed an issue with scrolling over the player on touch devices ([view](https://github.com/videojs/video.js/pull/1809))
 * @mmcc improved tap sensitivity ([view](https://github.com/videojs/video.js/pull/1830))
 * Add vjs-ended class when playback reaches the end of the timeline ([view](https://github.com/videojs/video.js/pull/1857))
+* @dmlap Add network and ready state properties ([view](https://github.com/videojs/video.js/pull/1854))
 
 --------------------
 
