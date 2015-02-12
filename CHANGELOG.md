@@ -23,6 +23,7 @@ CHANGELOG
 * @dmlap Add network and ready state properties ([view](https://github.com/videojs/video.js/pull/1854))
 * @woollybogger exported the hasClass function ([view](https://github.com/videojs/video.js/pull/1839))
 * @DevGavin fixed the Chinese translation ([view](https://github.com/videojs/video.js/pull/1841))
+* @iSimonWeb added font-path variable ([view](https://github.com/videojs/video.js/pull/1847))
 
 --------------------
 
