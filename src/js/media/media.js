@@ -75,7 +75,7 @@ vjs.MediaTechController.prototype.initControlsListeners = function(){
   });
 };
 
-vjs.MediaTechController.prototype.disableControlsListeners = function () {
+vjs.MediaTechController.prototype.desactivateControls = function () {
   var player;
 
   player = this.player();
@@ -257,7 +257,7 @@ vjs.MediaTechController.prototype.stopTrackingCurrentTime = function(){
 };
 
 vjs.MediaTechController.prototype.dispose = function(){
-  this.disableControlsListeners();
+  this.desactivateControls();
   // Turn off any manual progress or timeupdate tracking
   if (this.manualProgress) { this.manualProgressOff(); }
 
