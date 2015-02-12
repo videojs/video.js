@@ -18,6 +18,7 @@ CHANGELOG
 * Export video.js as a named AMD module ([view](https://github.com/videojs/video.js/pull/1844))
 * Hide the poster when play fires ([view](https://github.com/videojs/video.js/pull/1834))
 * @chikathreesix fixed an object delete error in Chrome ([view](https://github.com/videojs/video.js/pull/1858))
+* @steverandy fixed an issue with scrolling over the player on touch devices ([view](https://github.com/videojs/video.js/pull/1809))
 
 --------------------
 
