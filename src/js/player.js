@@ -389,6 +389,8 @@ vjs.Player.prototype.unloadTech = function(){
 vjs.Player.prototype.onLoadStart = function() {
   // TODO: Update to use `emptied` event instead. See #1277.
 
+  this.removeClass('vjs-ended');
+
   // reset the error state
   this.error(null);
 
@@ -446,6 +448,7 @@ vjs.Player.prototype.onLoadedAllData;
  * @event play
  */
 vjs.Player.prototype.onPlay = function(){
+  this.removeClass('vjs-ended');
   this.removeClass('vjs-paused');
   this.addClass('vjs-playing');
 
@@ -540,6 +543,7 @@ vjs.Player.prototype.onProgress = function(){
  * @event ended
  */
 vjs.Player.prototype.onEnded = function(){
+  this.addClass('vjs-ended');
   if (this.options_['loop']) {
     this.currentTime(0);
     this.play();
