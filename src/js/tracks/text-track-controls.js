@@ -488,6 +488,7 @@ vjs.ChaptersButton.prototype.createMenu = function(){
       if (!track.cues) {
         track['mode'] = 'hidden';
         /* jshint loopfunc:true */
+        // TODO see if we can figure out a better way of doing this https://github.com/videojs/video.js/issues/1864
         window.setTimeout(vjs.bind(this, function() {
           this.createMenu();
         }), 100);
