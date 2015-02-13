@@ -261,6 +261,8 @@ vjs.MediaTechController.prototype.setCurrentTime = function() {
   if (this.manualTimeUpdates) { this.player().trigger('timeupdate'); }
 };
 
+// TODO: Consider looking at moving this into the text track display directly
+// https://github.com/videojs/video.js/issues/1863
 vjs.MediaTechController.prototype.initTextTrackListeners = function() {
   var player = this.player_,
       tracks,
