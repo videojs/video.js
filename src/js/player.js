@@ -227,29 +227,6 @@ vjs.Player.prototype.createEl = function(){
   // Remove width/height attrs from tag so CSS can make it 100% width/height
   tag.removeAttribute('width');
   tag.removeAttribute('height');
-  // Empty video tag tracks so the built-in player doesn't use them also.
-  // This may not be fast enough to stop HTML5 browsers from reading the tags
-  // so we'll need to turn off any default tracks if we're manually doing
-  // captions and subtitles. videoElement.textTracks
-  if (tag.hasChildNodes()) {
-    var nodes, nodesLength, i, node, nodeName, removeNodes;
-
-    nodes = tag.childNodes;
-    nodesLength = nodes.length;
-    removeNodes = [];
-
-    while (nodesLength--) {
-      node = nodes[nodesLength];
-      nodeName = node.nodeName.toLowerCase();
-      if (nodeName === 'track') {
-        removeNodes.push(node);
-      }
-    }
-
-    for (i=0; i<removeNodes.length; i++) {
-      tag.removeChild(removeNodes[i]);
-    }
-  }
 
   // Copy over all the attributes from the tag, including ID and class
   // ID will now reference player box, not the video tag
@@ -1711,8 +1688,50 @@ vjs.Player.prototype.readyState = function(){
   return this.techGet('readyState');
 };
 
-// Methods to add support for
+/**
+ * Text tracks are tracks of timed text events.
+ * Captions - text displayed over the video for the hearing impaired
+ * Subtitles - text displayed over the video for those who don't understand language in the video
+ * Chapters - text displayed in a menu allowing the user to jump to particular points (chapters) in the video
+ * Descriptions (not supported yet) - audio descriptions that are read back to the user by a screen reading device
+ */
 
+/**
+ * Get an array of associated text tracks. captions, subtitles, chapters, descriptions
+ * http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-texttracks
+ * @return {Array}           Array of track objects
+ */
+vjs.Player.prototype.textTracks = function(){
+  // cannot use techGet directly because it checks to see whether the tech is ready.
+  // Flash is unlikely to be ready in time but textTracks should still work.
+  return this.tech && this.tech['textTracks']();
+};
+
+vjs.Player.prototype.remoteTextTracks = function() {
+  return this.tech && this.tech['remoteTextTracks']();
+};
+
+/**
+ * Add a text track
+ * In addition to the W3C settings we allow adding additional info through options.
+ * http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-addtexttrack
+ * @param {String}  kind        Captions, subtitles, chapters, descriptions, or metadata
+ * @param {String=} label       Optional label
+ * @param {String=} language    Optional language
+ */
+vjs.Player.prototype.addTextTrack = function(kind, label, language) {
+  return this.tech && this.tech['addTextTrack'](kind, label, language);
+};
+
+vjs.Player.prototype.addRemoteTextTrack = function(options) {
+  return this.tech && this.tech['addRemoteTextTrack'](options);
+};
+
+vjs.Player.prototype.removeRemoteTextTrack = function(track) {
+  this.tech && this.tech['removeRemoteTextTrack'](track);
+};
+
+// Methods to add support for
 // initialTime: function(){ return this.techCall('initialTime'); },
 // startOffsetTime: function(){ return this.techCall('startOffsetTime'); },
 // played: function(){ return this.techCall('played'); },

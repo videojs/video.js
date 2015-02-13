@@ -17,6 +17,7 @@ module('HTML5', {
       on: function(){ return this; },
       off: function() { return this; },
       ready: function(){},
+      addChild: function(){},
       trigger: function(){}
     };
     tech = new vjs.Html5(player, {});

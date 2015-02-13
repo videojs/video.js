@@ -72,6 +72,8 @@ test('currentTime is the seek target during seeking', function() {
         bufferedPercent: noop,
         on: noop,
         trigger: noop,
+        ready: noop,
+        addChild: noop,
         options_: {}
       }, {
         'parentEl': parentEl
@@ -107,6 +109,8 @@ test('dispose removes the object element even before ready fires', function() {
         on: noop,
         off: noop,
         trigger: noop,
+        ready: noop,
+        addChild: noop,
         options_: {}
       }, {
         'parentEl': parentEl

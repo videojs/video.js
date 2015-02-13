@@ -338,7 +338,7 @@ module.exports = function(grunt) {
   // grunt.loadTasks('./docs/tasks/');
   // grunt.loadTasks('../videojs-doc-generator/tasks/');
 
-  grunt.registerTask('pretask', ['jshint', 'less', 'vjslanguages', 'build', 'minify', 'usebanner']);
+  grunt.registerTask('pretask', ['jshint', 'less', 'vjslanguages', 'build', 'minify', 'vttjs', 'usebanner']);
   // Default task.
   grunt.registerTask('default', ['pretask', 'dist']);
   // Development watch task
@@ -430,6 +430,26 @@ module.exports = function(grunt) {
   });
 
   var fs = require('fs');
+
+  grunt.registerTask('vttjs', 'prepend vttjs to videojs source files', function() {
+    var vttjs, vttjsMin, vjs, vjsMin;
+
+    // copy the current files to make a novttjs build
+    grunt.file.copy('build/files/combined.video.js', 'build/files/combined.video.novtt.js');
+    grunt.file.copy('build/files/minified.video.js', 'build/files/minified.video.novtt.js');
+
+    // read in vttjs files
+    vttjs = grunt.file.read('node_modules/vtt.js/dist/vtt.js');
+    vttjsMin = grunt.file.read('node_modules/vtt.js/dist/vtt.min.js');
+
+    // read in videojs files
+    vjs = grunt.file.read('build/files/combined.video.js');
+    vjsMin = grunt.file.read('build/files/minified.video.js');
+
+    // write out the concatenated files
+    grunt.file.write('build/files/combined.video.js', vjs + '\n' + vttjs);
+    grunt.file.write('build/files/minified.video.js', vjsMin + '\n' + vttjsMin);
+  });
 
   grunt.registerMultiTask('build', 'Building Source', function(){
 
@@ -531,6 +551,8 @@ module.exports = function(grunt) {
     // Manually copy each source file
     grunt.file.copy('build/files/minified.video.js', 'dist/video-js/video.js');
     grunt.file.copy('build/files/combined.video.js', 'dist/video-js/video.dev.js');
+    grunt.file.copy('build/files/minified.video.novtt.js', 'dist/video-js/video.novtt.js');
+    grunt.file.copy('build/files/combined.video.novtt.js', 'dist/video-js/video.novtt.dev.js');
     grunt.file.copy('build/files/video-js.css', 'dist/video-js/video-js.css');
     grunt.file.copy('build/files/video-js.min.css', 'dist/video-js/video-js.min.css');
     grunt.file.copy('node_modules/videojs-swf/dist/video-js.swf', 'dist/video-js/video-js.swf');

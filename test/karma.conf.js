@@ -1,3 +1,19 @@
+var fs = require('fs'),
+    vm = require('vm'),
+    sourceLoader = fs.readFileSync('./build/source-loader.js', 'utf8');
+    sandbox = {
+      blockSourceLoading: true,
+      document: {},
+      window: {}
+    };
+    sourceFiles = [];
+
+
+vm.runInNewContext(sourceLoader, sandbox, 'build/source-loader.js');
+sourceFiles = sandbox.sourceFiles.map(function(src) {
+  return '../' + src;
+});
+
 module.exports = function(config) {
   var customLaunchers = {
     chrome_sl: {
@@ -60,44 +76,10 @@ module.exports = function(config) {
 
     files: [
       '../build/files/video-js.css',
-      '../test/karma-qunit-shim.js',
-      "../src/js/core.js",
-      "../src/js/core-object.js",
-      "../src/js/events.js",
-      "../src/js/lib.js",
-      "../src/js/xhr.js",
-      "../src/js/util.js",
-      "../src/js/component.js",
-      "../src/js/button.js",
-      "../src/js/slider.js",
-      "../src/js/menu.js",
-      "../src/js/media-error.js",
-      "../src/js/player.js",
-      "../src/js/control-bar/control-bar.js",
-      "../src/js/control-bar/live-display.js",
-      "../src/js/control-bar/play-toggle.js",
-      "../src/js/control-bar/time-display.js",
-      "../src/js/control-bar/fullscreen-toggle.js",
-      "../src/js/control-bar/progress-control.js",
-      "../src/js/control-bar/volume-control.js",
-      "../src/js/control-bar/mute-toggle.js",
-      "../src/js/control-bar/volume-menu-button.js",
-      "../src/js/control-bar/playback-rate-menu-button.js",
-      "../src/js/poster.js",
-      "../src/js/loading-spinner.js",
-      "../src/js/big-play-button.js",
-      "../src/js/error-display.js",
-      "../src/js/media/media.js",
-      "../src/js/media/html5.js",
-      "../src/js/media/flash.js",
-      "../src/js/media/flash.rtmp.js",
-      "../src/js/media/loader.js",
-      "../src/js/tracks.js",
-      "../src/js/json.js",
-      "../src/js/setup.js",
-      "../src/js/plugins.js",
-      '../test/unit/*.js'
-    ],
+      '../test/karma-qunit-shim.js'
+    ].concat(sourceFiles).concat([
+      '../test/unit/**/*.js'
+    ]),
 
     plugins: [
       'karma-qunit',
