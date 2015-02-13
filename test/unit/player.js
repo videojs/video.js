@@ -87,7 +87,7 @@ test('should get tag, source, and track settings', function(){
   var html = '<video id="example_1" class="video-js" autoplay preload="none">';
       html += '<source src="http://google.com" type="video/mp4">';
       html += '<source src="http://google.com" type="video/webm">';
-      html += '<track src="http://google.com" kind="captions" attrtest>';
+      html += '<track kind="captions" attrtest>';
       html += '</video>';
 
   fixture.innerHTML += html;

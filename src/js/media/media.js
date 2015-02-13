@@ -1,3 +1,5 @@
+(function() {
+  var createTrackHelper;
 /**
  * @fileoverview Media Technology Controller - Base class for media playback
  * technology controllers like Flash and HTML5
@@ -29,6 +31,12 @@ vjs.MediaTechController = vjs.Component.extend({
     }
 
     this.initControlsListeners();
+
+    if (!this['featuresNativeTextTracks']) {
+      this.emulateTextTracks();
+    }
+
+    this.initTextTrackListeners();
   }
 });
 
@@ -253,6 +261,141 @@ vjs.MediaTechController.prototype.setCurrentTime = function() {
   if (this.manualTimeUpdates) { this.player().trigger('timeupdate'); }
 };
 
+// TODO: Consider looking at moving this into the text track display directly
+// https://github.com/videojs/video.js/issues/1863
+vjs.MediaTechController.prototype.initTextTrackListeners = function() {
+  var player = this.player_,
+      tracks,
+      textTrackListChanges = function() {
+        var textTrackDisplay = player.getChild('textTrackDisplay'),
+            controlBar;
+
+        if (textTrackDisplay) {
+          textTrackDisplay.updateDisplay();
+        }
+      };
+
+  tracks = this.textTracks();
+
+  if (!tracks) {
+    return;
+  }
+
+  tracks.addEventListener('removetrack', textTrackListChanges);
+  tracks.addEventListener('addtrack', textTrackListChanges);
+
+  this.on('dispose', vjs.bind(this, function() {
+    tracks.removeEventListener('removetrack', textTrackListChanges);
+    tracks.removeEventListener('addtrack', textTrackListChanges);
+  }));
+};
+
+vjs.MediaTechController.prototype.emulateTextTracks = function() {
+  var player = this.player_,
+      textTracksChanges,
+      tracks,
+      script;
+
+  if (!window['WebVTT']) {
+    script = document.createElement('script');
+    script.src = player.options()['vtt.js'] || '../node_modules/vtt.js/dist/vtt.js';
+    player.el().appendChild(script);
+    window['WebVTT'] = true;
+  }
+
+  tracks = this.textTracks();
+  if (!tracks) {
+    return;
+  }
+
+  textTracksChanges = function() {
+    var i, track, textTrackDisplay;
+
+    textTrackDisplay = player.getChild('textTrackDisplay'),
+
+    textTrackDisplay.updateDisplay();
+
+    for (i = 0; i < this.length; i++) {
+      track = this[i];
+      track.removeEventListener('cuechange', vjs.bind(textTrackDisplay, textTrackDisplay.updateDisplay));
+      if (track.mode === 'showing') {
+        track.addEventListener('cuechange', vjs.bind(textTrackDisplay, textTrackDisplay.updateDisplay));
+      }
+    }
+  };
+
+  tracks.addEventListener('change', textTracksChanges);
+
+  this.on('dispose', vjs.bind(this, function() {
+    tracks.removeEventListener('change', textTracksChanges);
+  }));
+};
+
+/**
+ * Provide default methods for text tracks.
+ *
+ * Html5 tech overrides these.
+ */
+
+/**
+ * List of associated text tracks
+ * @type {Array}
+ * @private
+ */
+vjs.MediaTechController.prototype.textTracks_;
+
+vjs.MediaTechController.prototype.textTracks = function() {
+  this.textTracks_ = this.textTracks_ || new vjs.TextTrackList();
+  return this.textTracks_;
+};
+
+vjs.MediaTechController.prototype.remoteTextTracks = function() {
+  this.remoteTextTracks_ = this.remoteTextTracks_ || new vjs.TextTrackList();
+  return this.remoteTextTracks_;
+};
+
+createTrackHelper = function(self, kind, label, language, options) {
+  var tracks = self.textTracks(),
+      track;
+
+  options = options || {};
+
+  options['kind'] = kind;
+  if (label) {
+    options['label'] = label;
+  }
+  if (language) {
+    options['language'] = language;
+  }
+  options['player'] = self.player_;
+
+  track = new vjs.TextTrack(options);
+  tracks.addTrack_(track);
+
+  return track;
+};
+
+vjs.MediaTechController.prototype.addTextTrack = function(kind, label, language) {
+  if (!kind) {
+    throw new Error('TextTrack kind is required but was not provided');
+  }
+
+  return createTrackHelper(this, kind, label, language);
+};
+
+vjs.MediaTechController.prototype.addRemoteTextTrack = function(options) {
+  var track = createTrackHelper(this, options['kind'], options['label'], options['language'], options);
+  this.remoteTextTracks().addTrack_(track);
+  return {
+    track: track
+  };
+};
+
+vjs.MediaTechController.prototype.removeRemoteTextTrack = function(track) {
+  this.textTracks().removeTrack_(track);
+  this.remoteTextTracks().removeTrack_(track);
+};
+
 /**
  * Provide a default setPoster method for techs
  *
@@ -271,6 +414,8 @@ vjs.MediaTechController.prototype['featuresPlaybackRate'] = false;
 // currently not triggered by video-js-swf
 vjs.MediaTechController.prototype['featuresProgressEvents'] = false;
 vjs.MediaTechController.prototype['featuresTimeupdateEvents'] = false;
+
+vjs.MediaTechController.prototype['featuresNativeTextTracks'] = false;
 
 /**
  * A functional mixin for techs that want to use the Source Handler pattern.
@@ -372,3 +517,7 @@ vjs.MediaTechController.withSourceHandlers = function(Tech){
   };
 
 };
+
+vjs.media = {};
+
+})();

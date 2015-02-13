@@ -26,6 +26,7 @@ CHANGELOG
 * @iSimonWeb added font-path variable ([view](https://github.com/videojs/video.js/pull/1847))
 * @shoshomiga added a Bulgarian translation ([view](https://github.com/videojs/video.js/pull/1849))
 * @ragecub3 added a Turkish translation ([view](https://github.com/videojs/video.js/pull/1853))
+* @gkatsev greatly improved text track support and implemented vtt.js as the webvtt parser ([view](https://github.com/videojs/video.js/pull/1749))
 
 --------------------
 

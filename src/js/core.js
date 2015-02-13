@@ -115,11 +115,12 @@ vjs.options = {
   'children': {
     'mediaLoader': {},
     'posterImage': {},
-    'textTrackDisplay': {},
     'loadingSpinner': {},
+    'textTrackDisplay': {},
     'bigPlayButton': {},
     'controlBar': {},
-    'errorDisplay': {}
+    'errorDisplay': {},
+    'textTrackSettings': {}
   },
 
   'language': document.getElementsByTagName('html')[0].getAttribute('lang') || navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language || 'en',
