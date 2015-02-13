@@ -532,6 +532,7 @@ vjs.Html5.supportsNativeTextTracks = function() {
   // If mode is a number, we cannot change it because it'll disappear from view.
   // Browsers with numeric modes include IE10 and older (<=2013) samsung android models.
   // Firefox isn't playing nice either with modifying the mode
+  // TODO: Investigate firefox: https://github.com/videojs/video.js/issues/1862
   supportsTextTracks = !!vjs.TEST_VID.textTracks;
   if (supportsTextTracks && vjs.TEST_VID.textTracks.length > 0) {
     supportsTextTracks = typeof vjs.TEST_VID.textTracks[0]['mode'] !== 'number';
