@@ -190,8 +190,8 @@ test('cues and activeCues return a TextTrackCueList', function() {
     player: defaultPlayer
   });
 
-  ok(tt.cues.getTrackById, 'cues are a TextTrackCueList');
-  ok(tt.activeCues.getTrackById, 'activeCues are a TextTrackCueList');
+  ok(tt.cues.getCueById, 'cues are a TextTrackCueList');
+  ok(tt.activeCues.getCueById, 'activeCues are a TextTrackCueList');
 });
 
 test('cues can be added and removed from a TextTrack', function() {
