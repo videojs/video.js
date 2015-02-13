@@ -76,7 +76,9 @@ test('menu should update with removeRemoteTextTrack', function() {
 });
 
 if (!vjs.IS_IE8) {
-  // doesn't work on IE8
+  // This test doesn't work on IE8.
+  // However, this test tests a specific with iOS7 where the TextTrackList doesn't report track mode changes.
+  // TODO: figure out why this test doens't work on IE8. https://github.com/videojs/video.js/issues/1861
   test('menu items should polyfill mode change events', function() {
     var player = PlayerTest.makePlayer({}),
         changes,
