@@ -75,13 +75,14 @@ e.g. <video class="video-js my-skin-name">
 The control icons are from a custom font. Each icon corresponds to a character
 (e.g. "\e001"). Font icons allow for easy scaling and coloring of icons.
 */
+@vjs-font-path: 'font';
 @font-face{
   font-family: 'VideoJS';
-  src: url('font/vjs.eot');
-  src: url('font/vjs.eot?#iefix') format('embedded-opentype'),
-  url('font/vjs.woff') format('woff'),
-  url('font/vjs.ttf') format('truetype'),
-  url('font/vjs.svg#icomoon') format('svg');
+  src: url('@{vjs-font-path}/vjs.eot');
+  src: url('@{vjs-font-path}/vjs.eot?#iefix') format('embedded-opentype'),
+  url('@{vjs-font-path}/vjs.woff') format('woff'),
+  url('@{vjs-font-path}/vjs.ttf') format('truetype'),
+  url('@{vjs-font-path}/vjs.svg#icomoon') format('svg');
 
   font-weight: normal;
   font-style: normal;
