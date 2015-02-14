@@ -59,6 +59,10 @@ vjs.Html5 = vjs.MediaTechController.extend({
       }
     }
 
+    if (this['featuresNativeTextTracks']) {
+      this.on('loadstart', vjs.bind(this, this.hideCaptions));
+    }
+
     // Determine if native controls should be used
     // Our goal should be to get the custom controls on mobile solid everywhere
     // so we can remove this all together. Right now this will block custom
@@ -159,6 +163,24 @@ vjs.Html5.prototype.createEl = function(){
 
   return el;
   // jenniisawesome = true;
+};
+
+
+vjs.Html5.prototype.hideCaptions = function() {
+  var tracks = this.el_.textTracks,
+      track,
+      i = tracks.length,
+      kinds = {
+        'captions': 1,
+        'subtitles': 1
+      };
+
+  while (i--) {
+    track = tracks[i];
+    if (track && track['kind'] in kinds) {
+      track.mode = 'disabled';
+    }
+  }
 };
 
 // Make video events trigger player events
