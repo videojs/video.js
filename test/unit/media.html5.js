@@ -81,7 +81,11 @@ test('should remove the controls attribute when recreating the element', functio
   player.options_['nativeControlsForTouch'] = false;
   el = tech.createEl();
 
-  ok(!el.controls, 'controls attribute is absent');
+  // On the iPhone controls are always true
+  if (!vjs.IS_IPHONE) {
+    ok(!el.controls, 'controls attribute is absent');
+  }
+
   ok(player.tagAttributes.controls, 'tag attribute is still present');
 });
 
