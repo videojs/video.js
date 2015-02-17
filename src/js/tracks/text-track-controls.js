@@ -243,11 +243,17 @@ vjs.TextTrackMenuItem = vjs.MenuItem.extend({
     if (tracks && tracks.onchange === undefined) {
       this.on(['tap', 'click'], function() {
         if (typeof window.Event !== 'object') {
-          event = new window.Event('change');
-        } else {
+          // Android 2.3 throws an Illegal Constructor error for window.Event
+          try {
+            event = new window.Event('change');
+          } catch(err){}
+        }
+
+        if (!event) {
           event = document.createEvent('Event');
           event.initEvent('change', true, true);
         }
+
         tracks.dispatchEvent(event);
       });
     }
