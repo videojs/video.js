@@ -201,11 +201,24 @@ vjs.Component.prototype.createEl = function(tagName, attributes){
   return vjs.createEl(tagName, attributes);
 };
 
+/**
+ * Return a localised string if available
+ *
+ * @param  {String} string  String to be localised
+ * @return {String}
+ */
 vjs.Component.prototype.localize = function(string){
-  var lang = this.player_.language(),
-      languages = this.player_.languages();
-  if (languages && languages[lang] && languages[lang][string]) {
+  var lang = ('' + this.player_.language()).toLowerCase();
+  var languages = this.player_.languages();
+  if (!languages) {
+    return string;
+  }
+  if (languages[lang] && languages[lang][string]) {
     return languages[lang][string];
+  }
+  var primaryCode = lang.split('-')[0];
+  if (primaryCode !== lang && languages[primaryCode] && languages[primaryCode][string]) {
+    return languages[primaryCode][string];
   }
   return string;
 };

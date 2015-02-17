@@ -590,3 +590,27 @@ test('should provide interval methods that automatically get cleared on componen
 
   ok(intervalsFired === 5, 'Interval was cleared when component was disposed');
 });
+
+test('should ignore case in language codes and try primary code', function() {
+  expect(3);
+
+  var player = PlayerTest.makePlayer({
+    'languages': {
+      'en-gb': {
+        'Good': 'Brilliant'
+      },
+      'EN': {
+        'Good': 'Awesome',
+        'Error': 'Problem'
+      }
+    }
+  });
+
+  var comp = new vjs.Component(player);
+
+  player.language('en-gb');
+  ok(comp.localize('Good') === 'Brilliant', 'Used subcode specific localization');
+  ok(comp.localize('Error') === 'Problem', 'Used primary code localization');
+  player.language('en-GB');
+  ok(comp.localize('Good') === 'Brilliant', 'Ignored case');
+});
