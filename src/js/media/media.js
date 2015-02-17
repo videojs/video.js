@@ -345,13 +345,13 @@ vjs.MediaTechController.prototype.emulateTextTracks = function() {
 vjs.MediaTechController.prototype.textTracks_;
 
 vjs.MediaTechController.prototype.textTracks = function() {
-  this.textTracks_ = this.textTracks_ || new vjs.TextTrackList();
-  return this.textTracks_;
+  this.player_.textTracks_ = this.player_.textTracks_ || new vjs.TextTrackList();
+  return this.player_.textTracks_;
 };
 
 vjs.MediaTechController.prototype.remoteTextTracks = function() {
-  this.remoteTextTracks_ = this.remoteTextTracks_ || new vjs.TextTrackList();
-  return this.remoteTextTracks_;
+  this.player_.remoteTextTracks_ = this.player_.remoteTextTracks_ || new vjs.TextTrackList();
+  return this.player_.remoteTextTracks_;
 };
 
 createTrackHelper = function(self, kind, label, language, options) {
