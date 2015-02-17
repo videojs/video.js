@@ -99,6 +99,7 @@ if (videojs.CDN_VERSION !== '__VERSION_'+'NO_PATCH__') {
  * @return {Object} The resulting global languages dictionary object
  */
 videojs.addLanguage = function(code, data){
+  code = ('' + code).toLowerCase();
   if(Options['languages'][code] !== undefined) {
     Options['languages'][code] = VjsUtil.mergeOptions(Options['languages'][code], data);
   } else {

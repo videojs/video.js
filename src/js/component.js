@@ -209,14 +209,26 @@ class Component {
     return Lib.createEl(tagName, attributes);
   }
 
+  /**
+   * Return a localised string if available
+   *
+   * @param  {String=} string  String to be localised
+   * @return {String}
+   */
   localize(string) {
-    let lang = this.player_.language();
+    let lang = ('' + this.player_.language()).toLowerCase();
+    let primaryCode = lang.split('-')[0];
     let languages = this.player_.languages();
 
-    if (languages && languages[lang] && languages[lang][string]) {
+    if (!languages) {
+      return string;
+    }
+    if (languages[lang] && languages[lang][string]) {
       return languages[lang][string];
     }
-
+    if (primaryCode !== lang && languages[primaryCode] && languages[primaryCode][string]) {
+      return languages[primaryCode][string];
+    }
     return string;
   }
 
