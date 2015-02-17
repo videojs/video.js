@@ -285,3 +285,23 @@ test('html5 tech supports native text tracks if the video supports it, unless it
   vjs.TEST_VID = oldTestVid;
   vjs.IS_FIREFOX = oldIsFirefox;
 });
+
+test('when switching techs, we should not get a new text track', function() {
+  var player = PlayerTest.makePlayer({
+        html5: {
+          nativeTextTracks: false
+        }
+      }),
+      htmltracks,
+      flashtracks;
+
+  player.loadTech('Html5');
+
+  htmltracks = player.textTracks();
+
+  player.loadTech('Flash');
+
+  flashtracks = player.textTracks();
+
+  ok(htmltracks === flashtracks, 'the tracks are equal');
+});
