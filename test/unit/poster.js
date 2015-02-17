@@ -28,14 +28,19 @@ module('PosterImage', {
 test('should create and update a poster image', function(){
   var posterImage;
 
+  // IE11 adds quotes in the returned background url so need to normalize the result
+  function normalizeUrl(url){
+    return url.replace(new RegExp('\\"', 'g'),'');
+  }
+
   vjs.BACKGROUND_SIZE_SUPPORTED = true;
   posterImage = new vjs.PosterImage(this.mockPlayer);
-  equal(posterImage.el().style.backgroundImage, 'url('+this.poster1+')', 'Background image used');
+  equal(normalizeUrl(posterImage.el().style.backgroundImage), 'url('+this.poster1+')', 'Background image used');
 
   // Update with a new poster source and check the new value
   this.mockPlayer.poster_ = this.poster2;
   this.mockPlayer.trigger('posterchange');
-  equal(posterImage.el().style.backgroundImage, 'url('+this.poster2+')', 'Background image updated');
+  equal(normalizeUrl(posterImage.el().style.backgroundImage), 'url('+this.poster2+')', 'Background image updated');
 });
 
 test('should create and update a fallback image in older browsers', function(){
