@@ -163,10 +163,6 @@
       }
     }
 
-    if (target.selectedOptions) {
-      target.selectedOptions[0] = option;
-    }
-
     target.selectedIndex = i;
   }
 
