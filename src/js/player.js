@@ -1599,7 +1599,7 @@ vjs.Player.prototype.listenForUserActivity = function(){
 
 /**
  * Gets or sets the current playback rate.
- * @param  {Boolean} rate   New playback rate to set.
+ * @param  {Number} rate    New playback rate to set.
  * @return {Number}         Returns the new playback rate when setting
  * @return {Number}         Returns the current playback rate when getting
  */
