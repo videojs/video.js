@@ -6,12 +6,6 @@ module.exports = function(grunt) {
   uglify = require('uglify-js');
   exec = require('child_process').exec;
 
-  try {
-    s3 = grunt.file.readJSON('.s3config.json');
-  } catch(e) {
-    s3 = {};
-  }
-
   verParts = pkg.version.split('.');
   version = {
     full: pkg.version,
@@ -92,7 +86,12 @@ module.exports = function(grunt) {
       }
     },
     s3: {
-      options: s3,
+      options: {
+        key: process.env.VJS_S3_KEY,
+        secret: process.env.VJS_S3_SECRET,
+        bucket: process.env.VJS_S3_BUCKET,
+        access: 'public-read'
+      },
       minor: {
         upload: [
           {
