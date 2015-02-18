@@ -2,6 +2,11 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 4.12.0 (2015-02-17)
 * @PeterDaveHello added a Traditional Chinese translation ([view](https://github.com/videojs/video.js/pull/1729))
 * @mmcc updated the hide/show functions to use a class instead of inline styles ([view](https://github.com/videojs/video.js/pull/1681))
 * @mister-ben added better handling of the additional videojs() arguments when the player is already initialized ([view](https://github.com/videojs/video.js/pull/1730))
@@ -29,8 +34,6 @@ CHANGELOG
 * @gkatsev greatly improved text track support and implemented vtt.js as the webvtt parser ([view](https://github.com/videojs/video.js/pull/1749))
 * @gkatsev fixed captions showing by default in Chrome and Safari ([view](https://github.com/videojs/video.js/pull/1865))
 * @mister-ben fixed a woff warning in Firefox ([view](https://github.com/videojs/video.js/pull/1870))
-
---------------------
 
 ## 4.11.4 (2015-01-23)
 * @heff exported missing source handler functions ([view](https://github.com/videojs/video.js/pull/1787))

@@ -153,7 +153,7 @@ _defined in_: [src/js/component.js#L296](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `Number` Returns the interval ID
 
-_defined in_: [src/js/component.js#L1219](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1219)
+_defined in_: [src/js/component.js#L1223](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1223)
 
 ---
 
@@ -166,7 +166,7 @@ _defined in_: [src/js/component.js#L1219](https://github.com/videojs/video.js/bl
 ##### RETURNS: 
 * `Number` Returns the timeout ID
 
-_defined in_: [src/js/component.js#L1181](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1181)
+_defined in_: [src/js/component.js#L1185](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1185)
 
 ---
 
@@ -251,7 +251,7 @@ _defined in_: [src/js/component.js#L220](https://github.com/videojs/video.js/blo
 > whenever touch events happen, and this can be turned off by components that
 > want touch events to act differently.
 
-_defined in_: [src/js/component.js#L1120](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1120)
+_defined in_: [src/js/component.js#L1124](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1124)
 
 ---
 
@@ -594,7 +594,7 @@ _defined in_: [src/js/component.js#L837](https://github.com/videojs/video.js/blo
 ##### RETURNS: 
 * `Number` Returns the interval ID
 
-_defined in_: [src/js/component.js#L1198](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1198)
+_defined in_: [src/js/component.js#L1202](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1202)
 
 ---
 
@@ -608,7 +608,7 @@ _defined in_: [src/js/component.js#L1198](https://github.com/videojs/video.js/bl
 ##### RETURNS: 
 * `Number` Returns the timeout ID
 
-_defined in_: [src/js/component.js#L1158](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1158)
+_defined in_: [src/js/component.js#L1162](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1162)
 
 ---
 
