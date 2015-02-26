@@ -167,7 +167,7 @@ vjs.Html5.prototype.createEl = function(){
 
 
 vjs.Html5.prototype.hideCaptions = function() {
-  var tracks = this.el_.textTracks,
+  var tracks = this.el_.querySelectorAll('track'),
       track,
       i = tracks.length,
       kinds = {
@@ -176,8 +176,9 @@ vjs.Html5.prototype.hideCaptions = function() {
       };
 
   while (i--) {
-    track = tracks[i];
-    if (track && track['kind'] in kinds) {
+    track = tracks[i].track;
+    if ((track && track['kind'] in kinds) &&
+        (!tracks[i]['default'])) {
       track.mode = 'disabled';
     }
   }

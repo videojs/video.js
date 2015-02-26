@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @gkatsev fixed disabling of default text tracks ([view](https://github.com/videojs/video.js/pull/1892))
 
 --------------------
 
