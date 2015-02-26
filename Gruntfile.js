@@ -328,12 +328,6 @@ module.exports = function(grunt) {
         src: ['package.json', 'bower.json', 'component.json']
       }
     },
-    tagrelease: {
-      file: 'package.json',
-      commit:  true,
-      message: 'Release %version%',
-      prefix:  'v'
-    },
     'github-release': {
       options: {
         repository: 'videojs/video.js',
@@ -342,6 +336,7 @@ module.exports = function(grunt) {
           password: process.env.VJS_GITHUB_TOKEN
         },
         release: {
+          tag_name: 'v'+ version.full,
           name: version.full,
           body: require('chg').find(version.full).changesRaw
         }
@@ -368,7 +363,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-zip');
   grunt.loadNpmTasks('grunt-banner');
   grunt.loadNpmTasks('grunt-version');
-  grunt.loadNpmTasks('grunt-tagrelease');
   grunt.loadNpmTasks('chg');
   grunt.loadNpmTasks('grunt-fastly');
   grunt.loadNpmTasks('grunt-github-releaser');

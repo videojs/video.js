@@ -44,7 +44,6 @@
     "grunt-github-releaser": "^0.1.17",
     "grunt-karma": "^0.8.3",
     "grunt-s3": "~0.2.0-alpha",
-    "grunt-tagrelease": "~0.3.3",
     "grunt-version": "~0.3.0",
     "grunt-videojs-languages": "0.0.4",
     "grunt-zip": "0.10.2",
