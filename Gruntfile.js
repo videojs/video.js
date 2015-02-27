@@ -1,5 +1,5 @@
 module.exports = function(grunt) {
-  var pkg, s3, version, verParts;
+  var pkg, version, verParts;
 
   pkg = grunt.file.readJSON('package.json');
 
@@ -85,34 +85,33 @@ module.exports = function(grunt) {
         ]
       }
     },
-    s3: {
+    aws_s3: {
       options: {
-        key: process.env.VJS_S3_KEY,
-        secret: process.env.VJS_S3_SECRET,
+        accessKeyId: process.env.VJS_S3_KEY,
+        secretAccessKey: process.env.VJS_S3_SECRET,
         bucket: process.env.VJS_S3_BUCKET,
-        access: 'public-read'
+        access: 'public-read',
+        uploadConcurrency: 5
       },
-      minor: {
-        upload: [
+      patch: {
+        files: [
           {
-            src: 'dist/cdn/*',
-            dest: 'vjs/'+version.majorMinor+'/',
-            rel: 'dist/cdn/',
-            headers: {
-              'Cache-Control': 'public, max-age=2628000'
-            }
+            expand: true,
+            cwd: 'dist/cdn/',
+            src: ['**'],
+            dest: 'vjs/'+version.full+'/',
+            params: { CacheControl: 'public, max-age=31536000' }
           }
         ]
       },
-      patch: {
-        upload: [
+      minor: {
+        files: [
           {
-            src: 'dist/cdn/*',
-            dest: 'vjs/'+version.full+'/',
-            rel: 'dist/cdn/',
-            headers: {
-              'Cache-Control': 'public, max-age=31536000'
-            }
+            expand: true,
+            cwd: 'dist/cdn/',
+            src: ['**'],
+            dest: 'vjs/'+version.majorMinor+'/',
+            params: { CacheControl: 'public, max-age=2628000' }
           }
         ]
       }
@@ -356,7 +355,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-less');
-  grunt.loadNpmTasks('grunt-s3');
   grunt.loadNpmTasks('contribflow');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('videojs-doc-generator');
@@ -366,6 +364,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('chg');
   grunt.loadNpmTasks('grunt-fastly');
   grunt.loadNpmTasks('grunt-github-releaser');
+  grunt.loadNpmTasks('grunt-aws-s3');
 
   // grunt.loadTasks('./docs/tasks/');
   // grunt.loadTasks('../videojs-doc-generator/tasks/');
