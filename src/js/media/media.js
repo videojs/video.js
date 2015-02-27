@@ -496,6 +496,16 @@ vjs.MediaTechController.withSourceHandlers = function(Tech){
   Tech.prototype.setSource = function(source){
     var sh = Tech.selectSourceHandler(source);
 
+    if (!sh) {
+      // Fall back to a native source hander when unsupported sources are
+      // deliberately set
+      if (Tech.nativeSourceHandler) {
+        sh = Tech.nativeSourceHandler;
+      } else {
+        vjs.log.error('No source hander found for the current source.');
+      }
+    }
+
     // Dispose any existing source handler
     this.disposeSourceHandler();
     this.off('dispose', this.disposeSourceHandler);
