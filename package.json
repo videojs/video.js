@@ -1,11 +1,7 @@
 {
   "name": "video.js",
   "description": "An HTML5 and Flash video player with a common API and skin for both.",
-<<<<<<< HEAD
-  "version": "4.11.3",
-=======
-  "version": "4.12.1",
->>>>>>> Release 4.12.1
+  "version": "4.12.2",
   "copyright": "Copyright 2014 Brightcove, Inc. https://github.com/videojs/video.js/blob/master/LICENSE",
   "keywords": [
     "videojs",

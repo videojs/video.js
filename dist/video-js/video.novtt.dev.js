@@ -80,7 +80,7 @@ vjs.ACCESS_PROTOCOL = ('https:' == document.location.protocol ? 'https://' : 'ht
 * Full player version
 * @type {string}
 */
-vjs['VERSION'] = '4.12.1';
+vjs['VERSION'] = '4.12.2';
 
 /**
  * Global Player instance options, surfaced from vjs.Player.prototype.options_
@@ -7223,7 +7223,7 @@ vjs.Html5.prototype.createEl = function(){
 
 
 vjs.Html5.prototype.hideCaptions = function() {
-  var tracks = this.el_.textTracks,
+  var tracks = this.el_.querySelectorAll('track'),
       track,
       i = tracks.length,
       kinds = {
@@ -7232,8 +7232,9 @@ vjs.Html5.prototype.hideCaptions = function() {
       };
 
   while (i--) {
-    track = tracks[i];
-    if (track && track['kind'] in kinds) {
+    track = tracks[i].track;
+    if ((track && track['kind'] in kinds) &&
+        (!tracks[i]['default'])) {
       track.mode = 'disabled';
     }
   }
