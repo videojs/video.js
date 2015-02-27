@@ -61,20 +61,14 @@ vjs.MediaTechController = vjs.Component.extend({
  * any controls will still keep the user active
  */
 vjs.MediaTechController.prototype.initControlsListeners = function(){
-  var player, activateControls;
+  var player;
 
   player = this.player();
 
-  activateControls = function(){
-    if (player.controls() && !player.usingNativeControls()) {
-      this.addControlsListeners();
-    }
-  };
-
   // Set up event listeners once the tech is ready and has an element to apply
   // listeners to
-  this.ready(activateControls);
-  this.on(player, 'controlsenabled', activateControls);
+  this.ready(this.activateControls);
+  this.on(player, 'controlsenabled', this.activateControls);
   this.on(player, 'controlsdisabled', this.removeControlsListeners);
 
   // if we're loading the playback object after it has started loading or playing the
@@ -87,6 +81,15 @@ vjs.MediaTechController.prototype.initControlsListeners = function(){
       this.player().trigger('loadstart');
     }
   });
+};
+
+vjs.MediaTechController.prototype.desactivateControls = function () {
+  var player;
+
+  player = this.player();
+
+  this.off(player, 'controlsenabled', this.activateControls);
+  this.off(player, 'controlsdisabled', this.removeControlsListeners);
 };
 
 vjs.MediaTechController.prototype.addControlsListeners = function(){
@@ -139,6 +142,19 @@ vjs.MediaTechController.prototype.removeControlsListeners = function(){
   this.off('touchend');
   this.off('click');
   this.off('mousedown');
+};
+
+/**
+ * Activate contols listeners handler
+ */
+vjs.MediaTechController.prototype.activateControls = function () {
+  var player;
+
+  player = this.player();
+
+  if (player.controls() && !player.usingNativeControls()) {
+    this.addControlsListeners();
+  }
 };
 
 /**
@@ -226,6 +242,7 @@ vjs.MediaTechController.prototype.manualTimeUpdatesOff = function(){
   var player = this.player_;
 
   this.manualTimeUpdates = false;
+
   this.stopTrackingCurrentTime();
   this.off(player, 'play', this.trackCurrentTime);
   this.off(player, 'pause', this.stopTrackingCurrentTime);
@@ -247,7 +264,8 @@ vjs.MediaTechController.prototype.stopTrackingCurrentTime = function(){
   this.player().trigger('timeupdate');
 };
 
-vjs.MediaTechController.prototype.dispose = function() {
+vjs.MediaTechController.prototype.dispose = function(){
+  this.desactivateControls();
   // Turn off any manual progress or timeupdate tracking
   if (this.manualProgress) { this.manualProgressOff(); }
 
@@ -256,7 +274,7 @@ vjs.MediaTechController.prototype.dispose = function() {
   vjs.Component.prototype.dispose.call(this);
 };
 
-vjs.MediaTechController.prototype.setCurrentTime = function() {
+vjs.MediaTechController.prototype.setCurrentTime = function(){
   // improve the accuracy of manual timeupdates
   if (this.manualTimeUpdates) { this.player().trigger('timeupdate'); }
 };
