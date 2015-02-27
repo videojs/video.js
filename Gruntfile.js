@@ -1,10 +1,7 @@
 module.exports = function(grunt) {
-  var pkg, s3, semver, version, verParts, uglify, exec;
+  var pkg, s3, version, verParts;
 
-  semver = require('semver');
   pkg = grunt.file.readJSON('package.json');
-  uglify = require('uglify-js');
-  exec = require('child_process').exec;
 
   verParts = pkg.version.split('.');
   version = {
@@ -14,6 +11,7 @@ module.exports = function(grunt) {
     patch: verParts[2]
   };
   version.majorMinor = version.major + '.' + version.minor;
+  grunt.vjsVersion = version;
 
   // loading predefined source order from source-loader.js
   // trust me, this is the easist way to do it so far
@@ -21,6 +19,8 @@ module.exports = function(grunt) {
   var blockSourceLoading = true;
   var sourceFiles; // Needed to satisfy jshint
   eval(grunt.file.read('./build/source-loader.js'));
+
+  grunt.sourceFiles = sourceFiles;
 
   // Project configuration.
   grunt.initConfig({
@@ -115,6 +115,27 @@ module.exports = function(grunt) {
             }
           }
         ]
+      }
+    },
+    fastly: {
+      options: {
+        key: process.env.VJS_FASTLY_API_KEY
+      },
+      minor: {
+        options: {
+          host: 'vjs.zencdn.net',
+          urls: [
+            version.majorMinor+'/*'
+          ]
+        }
+      },
+      patch: {
+        options: {
+          host: 'vjs.zencdn.net',
+          urls: [
+            version.full+'/*'
+          ]
+        }
       }
     },
     cssmin: {
@@ -307,11 +328,22 @@ module.exports = function(grunt) {
         src: ['package.json', 'bower.json', 'component.json']
       }
     },
-    tagrelease: {
-      file: 'package.json',
-      commit:  true,
-      message: 'Release %version%',
-      prefix:  'v'
+    'github-release': {
+      options: {
+        repository: 'videojs/video.js',
+        auth: {
+          user: process.env.VJS_GITHUB_USER,
+          password: process.env.VJS_GITHUB_TOKEN
+        },
+        release: {
+          tag_name: 'v'+ version.full,
+          name: version.full,
+          body: require('chg').find(version.full).changesRaw
+        }
+      },
+      files: {
+        src: ['dist/video-js-'+ version.full +'.zip'] // Files that you want to attach to Release
+      }
     }
   });
 
@@ -331,8 +363,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-zip');
   grunt.loadNpmTasks('grunt-banner');
   grunt.loadNpmTasks('grunt-version');
-  grunt.loadNpmTasks('grunt-tagrelease');
   grunt.loadNpmTasks('chg');
+  grunt.loadNpmTasks('grunt-fastly');
+  grunt.loadNpmTasks('grunt-github-releaser');
 
   // grunt.loadTasks('./docs/tasks/');
   // grunt.loadTasks('../videojs-doc-generator/tasks/');
@@ -344,357 +377,8 @@ module.exports = function(grunt) {
   grunt.registerTask('dev', ['jshint', 'less', 'vjslanguages', 'build', 'qunit:source']);
   grunt.registerTask('test-qunit', ['pretask', 'qunit']);
 
-  // The test task will run `karma:saucelabs` when running in travis,
-  // when running via a PR from a fork, it'll run qunit tests in phantom using
-  // karma otherwise, it'll run the tests in chrome via karma
-  // You can specify which browsers to build with by using grunt-style arguments
-  // or separating them with a comma:
-  //   grunt test:chrome:firefox  # grunt-style
-  //   grunt test:chrome,firefox  # comma-separated
-  grunt.registerTask('test', function() {
-    var tasks = this.args,
-        tasksMinified,
-        tasksMinifiedApi;
-
-    grunt.task.run(['pretask']);
-
-    if (process.env.TRAVIS_PULL_REQUEST !== 'false') {
-      grunt.task.run(['karma:phantomjs', 'karma:minified_phantomjs', 'karma:minified_api_phantomjs']);
-    } else if (process.env.TRAVIS) {
-      grunt.task.run(['karma:phantomjs', 'karma:minified_phantomjs', 'karma:minified_api_phantomjs']);
-      //Disabling saucelabs until we figure out how to make it run reliably.
-      //grunt.task.run([
-        //'karma:chrome_sl',
-        //'karma:firefox_sl',
-        //'karma:safari_sl',
-        //'karma:ipad_sl',
-        //'karma:android_sl',
-        //'karma:ie_sl'
-      //]);
-    } else {
-      // if we aren't running this in a CI, but running it manually, we can
-      // supply arguments to this task. These arguments are either colon (`:`)
-      // separated which is the default grunt separator for arguments, or they
-      // are comma (`,`) separated to make it easier.
-      // The arguments are the names of which browsers you want. It'll then
-      // make sure you have the `minified` and `minified_api` for those browsers
-      // as well.
-      if (tasks.length === 0) {
-        tasks.push('chrome');
-      }
-      if (tasks.length === 1) {
-        tasks = tasks[0].split(',');
-      }
-
-      tasksMinified = tasks.slice();
-      tasksMinifiedApi = tasks.slice();
-
-      tasksMinified = tasksMinified.map(function(task) {
-        return 'minified_' + task;
-      });
-
-      tasksMinifiedApi = tasksMinifiedApi.map(function(task) {
-        return 'minified_api_' + task;
-      });
-
-      tasks = tasks.concat(tasksMinified).concat(tasksMinifiedApi);
-      tasks = tasks.map(function(task) {
-        return 'karma:' + task;
-      });
-
-      grunt.task.run(tasks);
-    }
-  });
-
-  grunt.registerTask('saucelabs', function() {
-    var done = this.async();
-
-    if (this.args[0] == 'connect') {
-      exec('curl https://gist.githubusercontent.com/santiycr/5139565/raw/sauce_connect_setup.sh | bash',
-        function(error, stdout, stderr) {
-          if (error) {
-            grunt.log.error(error);
-            return done();
-          }
-
-          grunt.verbose.error(stderr.toString());
-          grunt.verbose.writeln(stdout.toString());
-          grunt.task.run(['karma:saucelabs']);
-          done();
-      });
-    } else {
-      grunt.task.run(['karma:saucelabs']);
-      done();
-    }
-  });
-
-  var fs = require('fs');
-
-  grunt.registerTask('vttjs', 'prepend vttjs to videojs source files', function() {
-    var vttjs, vttjsMin, vjs, vjsMin;
-
-    // copy the current files to make a novttjs build
-    grunt.file.copy('build/files/combined.video.js', 'build/files/combined.video.novtt.js');
-    grunt.file.copy('build/files/minified.video.js', 'build/files/minified.video.novtt.js');
-
-    // read in vttjs files
-    vttjs = grunt.file.read('node_modules/vtt.js/dist/vtt.js');
-    vttjsMin = grunt.file.read('node_modules/vtt.js/dist/vtt.min.js');
-
-    // read in videojs files
-    vjs = grunt.file.read('build/files/combined.video.js');
-    vjsMin = grunt.file.read('build/files/minified.video.js');
-
-    // write out the concatenated files
-    grunt.file.write('build/files/combined.video.js', vjs + '\n' + vttjs);
-    grunt.file.write('build/files/minified.video.js', vjsMin + '\n' + vttjsMin);
-  });
-
-  grunt.registerMultiTask('build', 'Building Source', function(){
-
-    // Fix windows file path delimiter issue
-    var i = sourceFiles.length;
-    while (i--) {
-      sourceFiles[i] = sourceFiles[i].replace(/\\/g, '/');
-    }
-
-    // Create a combined sources file. https://github.com/zencoder/video-js/issues/287
-    var combined = '';
-    sourceFiles.forEach(function(result){
-      combined += grunt.file.read(result);
-    });
-    // Replace CDN version ref in js. Use major/minor version.
-    combined = combined.replace(/GENERATED_CDN_VSN/g, version.majorMinor);
-    combined = combined.replace(/GENERATED_FULL_VSN/g, version.full);
-
-    grunt.file.write('build/files/combined.video.js', combined);
-
-    // Copy over other files
-    // grunt.file.copy('src/css/video-js.png', 'build/files/video-js.png');
-    grunt.file.copy('node_modules/videojs-swf/dist/video-js.swf', 'build/files/video-js.swf');
-
-    // Inject version number into css file
-    var css = grunt.file.read('build/files/video-js.css');
-    css = css.replace(/GENERATED_AT_BUILD/g, version.full);
-    grunt.file.write('build/files/video-js.css', css);
-
-    // Copy over font files
-    grunt.file.recurse('src/css/font', function(absdir, rootdir, subdir, filename) {
-      // Block .DS_Store files
-      if ('filename'.substring(0,1) !== '.') {
-        grunt.file.copy(absdir, 'build/files/font/' + filename);
-      }
-    });
-
-    // Minify CSS
-    grunt.task.run(['cssmin']);
-  });
-
-  grunt.registerMultiTask('minify', 'Minify JS files using Closure Compiler.', function() {
-    var done = this.async();
-    var exec = require('child_process').exec;
-
-    var externs = this.data.externs || [];
-    var dest = this.data.dest;
-    var filePatterns = [];
-
-    // Make sure deeper directories exist for compiler
-    grunt.file.write(dest, '');
-
-    if (this.data.sourcelist) {
-      filePatterns = filePatterns.concat(grunt.file.read(this.data.sourcelist).split(','));
-    }
-    if (this.data.src) {
-      filePatterns = filePatterns.concat(this.data.src);
-    }
-
-    // Build closure compiler shell command
-    var command = 'java -jar build/compiler/compiler.jar'
-                + ' --compilation_level ADVANCED_OPTIMIZATIONS'
-                // + ' --formatting=pretty_print'
-                + ' --js_output_file=' + dest
-                + ' --create_source_map ' + dest + '.map --source_map_format=V3'
-                + ' --jscomp_warning=checkTypes --warning_level=VERBOSE'
-                + ' --output_wrapper "(function() {%output%})();"';
-                //@ sourceMappingURL=video.js.map
-
-    // Add each js file
-    grunt.file.expand(filePatterns).forEach(function(file){
-      command += ' --js='+file;
-    });
-
-    // Add externs
-    externs.forEach(function(extern){
-      command += ' --externs='+extern;
-    });
-
-    // Run command
-    exec(command, { maxBuffer: 500*1024 }, function(err, stdout, stderr){
-
-      if (err) {
-        grunt.warn(err);
-        done(false);
-      }
-
-      if (stdout) {
-        grunt.log.writeln(stdout);
-      }
-
-      done();
-    });
-  });
-
-  grunt.registerTask('dist-copy', 'Assembling distribution', function(){
-    var css, jsmin, jsdev, cdnjs;
-
-    // Manually copy each source file
-    grunt.file.copy('build/files/minified.video.js', 'dist/video-js/video.js');
-    grunt.file.copy('build/files/combined.video.js', 'dist/video-js/video.dev.js');
-    grunt.file.copy('build/files/minified.video.novtt.js', 'dist/video-js/video.novtt.js');
-    grunt.file.copy('build/files/combined.video.novtt.js', 'dist/video-js/video.novtt.dev.js');
-    grunt.file.copy('build/files/video-js.css', 'dist/video-js/video-js.css');
-    grunt.file.copy('build/files/video-js.min.css', 'dist/video-js/video-js.min.css');
-    grunt.file.copy('node_modules/videojs-swf/dist/video-js.swf', 'dist/video-js/video-js.swf');
-    grunt.file.copy('build/demo-files/demo.html', 'dist/video-js/demo.html');
-    grunt.file.copy('build/demo-files/demo.captions.vtt', 'dist/video-js/demo.captions.vtt');
-    grunt.file.copy('src/css/video-js.less', 'dist/video-js/video-js.less');
-
-
-    // Copy over font files
-    grunt.file.recurse('build/files/font', function(absdir, rootdir, subdir, filename) {
-      // Block .DS_Store files
-      if ('filename'.substring(0,1) !== '.') {
-        grunt.file.copy(absdir, 'dist/video-js/font/' + filename);
-      }
-    });
-
-    // Copy over language files
-    grunt.file.recurse('build/files/lang', function(absdir, rootdir, subdir, filename) {
-      // Block .DS_Store files
-      if ('filename'.substring(0,1) !== '.') {
-        grunt.file.copy(absdir, 'dist/cdn/lang/' + filename);
-        grunt.file.copy(absdir, 'dist/video-js/lang/' + filename);
-      }
-    });
-
-    // ds_store files sometime find their way in
-    if (grunt.file.exists('dist/video-js/.DS_Store')) {
-      grunt.file['delete']('dist/video-js/.DS_Store');
-    }
-
-    // CDN version uses already hosted font files
-    // Minified version only, doesn't need demo files
-    grunt.file.copy('build/files/minified.video.js', 'dist/cdn/video.js');
-    grunt.file.copy('build/files/video-js.min.css', 'dist/cdn/video-js.css');
-    grunt.file.copy('node_modules/videojs-swf/dist/video-js.swf', 'dist/cdn/video-js.swf');
-    grunt.file.copy('build/demo-files/demo.captions.vtt', 'dist/cdn/demo.captions.vtt');
-    grunt.file.copy('build/demo-files/demo.html', 'dist/cdn/demo.html');
-
-    // Replace font urls with CDN versions
-    css = grunt.file.read('dist/cdn/video-js.css');
-    css = css.replace(/font\//g, '../f/3/');
-    grunt.file.write('dist/cdn/video-js.css', css);
-
-    // Add CDN-specfic JS
-    jsmin = grunt.file.read('dist/cdn/video.js');
-    // GA Tracking Pixel (manually building the pixel URL)
-    cdnjs = uglify.minify('src/js/cdn.js').code.replace('v0.0.0', 'v'+version.full);
-    grunt.file.write('dist/cdn/video.js', jsmin + cdnjs);
-  });
-
-  grunt.registerTask('cdn-links', 'Update the version of CDN links in docs', function(){
-    var doc = grunt.file.read('docs/guides/setup.md');
-    var version = pkg.version;
-
-    // remove the patch version to point to the latest patch
-    version = version.replace(/(\d+\.\d+)\.\d+/, '$1');
-
-    // update the version in http://vjs.zencdn.net/4.3/video.js
-    doc = doc.replace(/(\/\/vjs\.zencdn\.net\/)\d+\.\d+(\.\d+)?/g, '$1'+version);
-    grunt.file.write('docs/guides/setup.md', doc);
-  });
-
   grunt.registerTask('dist', 'Creating distribution', ['dist-copy', 'zip:dist']);
 
-  grunt.registerTask('next-issue', 'Get the next issue that needs a response', function(){
-    var done = this.async();
-    var GitHubApi = require('github');
-    var open = require('open');
-
-    var github = new GitHubApi({
-        // required
-        version: '3.0.0',
-        // optional
-        debug: true,
-        protocol: 'https',
-        // host: 'github.my-GHE-enabled-company.com',
-        // pathPrefix: '/api/v3', // for some GHEs
-        timeout: 5000
-    });
-
-    github.issues.repoIssues({
-        // optional:
-        // headers: {
-        //     'cookie': 'blahblah'
-        // },
-        user: 'videojs',
-        repo: 'video.js',
-        sort: 'updated',
-        direction: 'asc',
-        state: 'open',
-        per_page: 100
-    }, function(err, res) {
-      var issueToOpen;
-      var usersWithWrite = ['heff', 'mmcc'];
-      var categoryLabels = ['enhancement', 'bug', 'question', 'feature'];
-
-      console.log('Number of issues: '+res.length);
-
-      // TODO: Find the best way to exclude an issue where a question has been asked of the
-      // issue owner/submitter that hasn't been answerd yet.
-      // A stupid simple first step would be to check for the needs: more info label
-      // and exactly one comment (the question)
-
-      // find issues that need categorizing, no category labels
-      res.some(function(issue){
-        if (issue.labels.length === 0) {
-          return issueToOpen = issue; // break
-        }
-        // look for category labels
-        var categorized = issue.labels.some(function(label){
-          return categoryLabels.indexOf(label.name) >= 0;
-        });
-        if (!categorized) {
-          return issueToOpen = issue; // break
-        }
-      });
-      if (issueToOpen) {
-        open(issueToOpen.html_url);
-        return done();
-      }
-
-      // find issues that need confirming or answering
-      res.some(function(issue){
-        // look for confirmed label
-        var confirmed = issue.labels.some(function(label){
-          return label.name === 'confirmed';
-        });
-        // Was exluding questions, but that might leave a lot of people hanging
-        // var question = issue.labels.some(function(label){
-        //   return label.name === 'question';
-        // });
-        if (!confirmed) { //  && !question
-          return issueToOpen = issue; // break
-        }
-      });
-      if (issueToOpen) {
-        open(issueToOpen.html_url);
-        return done();
-      }
-
-      grunt.log.writeln('No next issue found');
-      done();
-    });
-  });
-
+  // Load all the tasks in the tasks directory
+  grunt.loadTasks('tasks');
 };

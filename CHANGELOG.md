@@ -6,6 +6,9 @@ _(none)_
 
 --------------------
 
+## 4.12.2 (2015-02-27)
+* @gkatsev fixed disabling of default text tracks ([view](https://github.com/videojs/video.js/pull/1892))
+
 ## 4.12.1 (2015-02-19)
 * @gkatsev fixed the track list reference while switching techs that use emulated tracks ([view](https://github.com/videojs/video.js/pull/1874))
 * @gkatsev fixed a Firefox error with the captions settings select menu options ([view](https://github.com/videojs/video.js/pull/1877))
