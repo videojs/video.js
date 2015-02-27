@@ -30,6 +30,7 @@
     "contribflow": "~0.2.0",
     "github": "~0.1.14",
     "grunt": "^0.4.4",
+    "grunt-aws-s3": "^0.12.1",
     "grunt-banner": "~0.2.0",
     "grunt-cli": "~0.1.0",
     "grunt-contrib-clean": "~0.4.0a",
