@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @heff fixed setting the source to an empty string ([view](https://github.com/videojs/video.js/pull/1905))
 
 --------------------
 
