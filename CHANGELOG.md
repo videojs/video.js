@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* @heff fixed setting the source to an empty string ([view](https://github.com/videojs/video.js/pull/1905))
+_(none)_
 
 --------------------
+
+## 4.12.3 (2015-02-28)
+* @heff fixed setting the source to an empty string ([view](https://github.com/videojs/video.js/pull/1905))
 
 ## 4.12.2 (2015-02-27)
 * @gkatsev fixed disabling of default text tracks ([view](https://github.com/videojs/video.js/pull/1892))

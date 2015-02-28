@@ -80,7 +80,7 @@ vjs.ACCESS_PROTOCOL = ('https:' == document.location.protocol ? 'https://' : 'ht
 * Full player version
 * @type {string}
 */
-vjs['VERSION'] = '4.12.2';
+vjs['VERSION'] = '4.12.3';
 
 /**
  * Global Player instance options, surfaced from vjs.Player.prototype.options_
@@ -7028,6 +7028,16 @@ vjs.MediaTechController.withSourceHandlers = function(Tech){
    */
   Tech.prototype.setSource = function(source){
     var sh = Tech.selectSourceHandler(source);
+
+    if (!sh) {
+      // Fall back to a native source hander when unsupported sources are
+      // deliberately set
+      if (Tech.nativeSourceHandler) {
+        sh = Tech.nativeSourceHandler;
+      } else {
+        vjs.log.error('No source hander found for the current source.');
+      }
+    }
 
     // Dispose any existing source handler
     this.disposeSourceHandler();
