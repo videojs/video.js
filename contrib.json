@@ -203,7 +203,7 @@
         [ "npm install",                               "Ensure dependency updates have been installed" ],
         [ "grunt test",                                "Run tests" ],
         [ "grunt version:{{ release_type }}",          "Bump package versions" ],
-        [ "grunt vjs-version",                         "Return the current VJS Version from the package.json file", "version" ],
+        [ "./build/bin/version",                       "Return the current VJS Version from the package.json file", "version" ],
         [ "grunt chg-release:{{ version }}",           "Update the changelog with the new release" ],
         [ "grunt clean:dist",                          "Clean out the dist folder before the build" ],
         [ "grunt",                                     "Build the release" ],
