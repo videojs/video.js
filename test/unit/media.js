@@ -229,3 +229,25 @@ test('should add the source hanlder interface to a tech', function(){
   tech.dispose();
   ok(disposeCalled, 'the handler dispose method was called when the tech was disposed');
 });
+
+test('should handle unsupported sources with the source hanlder API', function(){
+  var mockPlayer = {
+    off: this.noop,
+    trigger: this.noop
+  };
+
+  // Define a new tech class
+  var Tech = videojs.MediaTechController.extend();
+  // Extend Tech with source handlers
+  vjs.MediaTechController.withSourceHandlers(Tech);
+  // Create an instance of Tech
+  var tech = new Tech(mockPlayer);
+
+  var usedNative;
+  Tech.nativeSourceHandler = {
+    handleSource: function(){ usedNative = true; }
+  };
+
+  tech.setSource('');
+  ok(usedNative, 'native source handler was used when an unsupported source was set');
+});
