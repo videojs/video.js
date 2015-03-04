@@ -421,6 +421,18 @@ vjs.Player.prototype.onLoadedData;
 vjs.Player.prototype.onLoadedAllData;
 
 /**
+ * Fired when the user is active, e.g. moves the mouse over the player 
+ * @event useractive
+ */
+vjs.Player.prototype.onUserActive;
+
+/**
+ * Fired when the user is inactive, e.g. a short delay after the last mouse move or control interaction
+ * @event userinactive
+ */
+vjs.Player.prototype.onUserInactive;
+
+/**
  * Fired whenever the media begins or resumes playback
  * @event play
  */
