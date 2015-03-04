@@ -113,6 +113,8 @@ After an instance has been created it can be accessed globally using `Video('exa
   - [seeked](#seeked-event)
   - [seeking](#seeking-event)
   - [timeupdate](#timeupdate-event)
+  - [useractive](#useractive-event)
+  - [userinactive](#userinactive-event)
   - [volumechange](#volumechange-event)
   - [waiting](#waiting-event)
   - [resize](#resize-event) _`inherited`_
@@ -1388,6 +1390,16 @@ _defined in_: [src/js/player.js#L458](https://github.com/videojs/video.js/blob/m
 > playback technology in use.
 
 _defined in_: [src/js/player.js#L505](https://github.com/videojs/video.js/blob/master/src/js/player.js#L505)
+
+---
+
+### useractive `EVENT`
+> Fired when the user is active, e.g. moves the mouse over the player 
+
+---
+
+### userinactive `EVENT`
+> Fired when the user is inactive, e.g. a short delay after the last mouse move or control interaction
 
 ---
 
