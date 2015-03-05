@@ -75,6 +75,47 @@ test('menu should update with removeRemoteTextTrack', function() {
   equal(player.textTracks().length, 1, 'textTracks contains one item');
 });
 
+var descriptionstrack = {
+  kind: 'descriptions',
+  label: 'desc'
+};
+
+test('should be displayed when text tracks list is not empty', function() {
+  var player = PlayerTest.makePlayer({
+    tracks: [descriptionstrack]
+  });
+
+  ok(!player.controlBar.descriptionsButton.hasClass('vjs-hidden'), 'descriptions control is displayed');
+  equal(player.textTracks().length, 1, 'textTracks contains one item');
+});
+
+test('should be displayed when a text track is added to an empty track list', function() {
+  var player = PlayerTest.makePlayer();
+
+  player.addRemoteTextTrack(descriptionstrack);
+
+  ok(!player.controlBar.descriptionsButton.hasClass('vjs-hidden'), 'control is displayed');
+  equal(player.textTracks().length, 1, 'textTracks contains one item');
+});
+
+test('should not be displayed when text tracks list is empty', function() {
+  var player = PlayerTest.makePlayer();
+
+  ok(player.controlBar.descriptionsButton.hasClass('vjs-hidden'), 'descriptions control is not displayed');
+  equal(player.textTracks().length, 0, 'textTracks is empty');
+});
+
+test('menu should contain "Settings", "Off" and one track', function() {
+  var player = PlayerTest.makePlayer({
+      tracks: [descriptionstrack]
+    }),
+    menuItems = player.controlBar.descriptionsButton.items;
+
+  equal(menuItems.length, 2, 'menu contains two items');
+  equal(menuItems[0].track.label, 'descriptions off', 'menu contains "descriptions off"');
+  equal(menuItems[1].track.label, 'desc', 'menu contains "desc" track');
+});
+
 if (!vjs.IS_IE8) {
   // This test doesn't work on IE8.
   // However, this test tests a specific with iOS7 where the TextTrackList doesn't report track mode changes.

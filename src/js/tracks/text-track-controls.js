@@ -49,14 +49,32 @@ vjs.TextTrackDisplay.prototype.toggleDisplay = function() {
 };
 
 vjs.TextTrackDisplay.prototype.createEl = function(){
-  return vjs.Component.prototype.createEl.call(this, 'div', {
+  var parentEl = vjs.Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-text-track-display'
   });
+
+  // Element for visible text tracks
+  this.visibleEl = vjs.Component.prototype.createEl.call(this, 'div', {
+    className: 'vjs-text-track-visible-display'
+  });
+  parentEl.appendChild(this.visibleEl);
+
+  // Element for hidden, but screen-reader 'alert/assertive', text tracks
+  this.hiddenEl = vjs.Component.prototype.createEl.call(this, 'div', {
+    className: 'vjs-text-track-hidden-display',
+    'role' : 'alert',
+    'aria-live' : 'assertive',
+    'aria-atomic' : 'true'
+  });
+  parentEl.appendChild(this.hiddenEl);
+
+  return parentEl;
 };
 
 vjs.TextTrackDisplay.prototype.clearDisplay = function() {
   if (typeof window['WebVTT'] === 'function') {
-    window['WebVTT']['processCues'](window, [], this.el_);
+    window['WebVTT']['processCues'](window, [], this.visibleEl);
+    window['WebVTT']['processCues'](window, [], this.hiddenEl);
   }
 };
 
@@ -125,7 +143,12 @@ vjs.TextTrackDisplay.prototype.updateForTrack = function(track) {
     cues.push(track['activeCues'][i]);
   }
 
-  window['WebVTT']['processCues'](window, track['activeCues'], this.el_);
+  //TODO: Add a preference to allow descriptions to be visible
+  if ( track['kind'] === 'descriptions' ) {
+    window['WebVTT']['processCues'](window, track['activeCues'], this.hiddenEl);
+  } else {
+    window['WebVTT']['processCues'](window, track['activeCues'], this.visibleEl);
+  }
 
   i = cues.length;
   while (i--) {
@@ -440,6 +463,22 @@ vjs.SubtitlesButton = vjs.TextTrackButton.extend({
 vjs.SubtitlesButton.prototype.kind_ = 'subtitles';
 vjs.SubtitlesButton.prototype.buttonText = 'Subtitles';
 vjs.SubtitlesButton.prototype.className = 'vjs-subtitles-button';
+
+/**
+ * The button component for toggling and selecting descriptions
+ *
+ * @constructor
+ */
+vjs.DescriptionsButton = vjs.TextTrackButton.extend({
+  /** @constructor */
+  init: function(player, options, ready){
+    vjs.TextTrackButton.call(this, player, options, ready);
+    this.el_.setAttribute('aria-label','Descriptions Menu');
+  }
+});
+vjs.DescriptionsButton.prototype.kind_ = 'descriptions';
+vjs.DescriptionsButton.prototype.buttonText = 'Descriptions';
+vjs.DescriptionsButton.prototype.className = 'vjs-descriptions-button';
 
 // Chapters act much differently than other text tracks
 // Cues are navigation vs. other tracks of alternative languages

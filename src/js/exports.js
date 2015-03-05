@@ -146,6 +146,7 @@ goog.exportProperty(vjs.ChaptersButton.prototype, 'createItems', vjs.ChaptersBut
 
 goog.exportSymbol('videojs.SubtitlesButton', vjs.SubtitlesButton);
 goog.exportSymbol('videojs.CaptionsButton', vjs.CaptionsButton);
+goog.exportSymbol('videojs.DescriptionsButton', vjs.DescriptionsButton);
 goog.exportSymbol('videojs.ChaptersButton', vjs.ChaptersButton);
 
 goog.exportSymbol('videojs.MediaTechController', vjs.MediaTechController);
@@ -222,6 +223,7 @@ goog.exportProperty(vjs.TextTrackCueList.prototype, 'getCueById', vjs.TextTrackL
 
 goog.exportSymbol('videojs.CaptionsTrack', vjs.CaptionsTrack);
 goog.exportSymbol('videojs.SubtitlesTrack', vjs.SubtitlesTrack);
+goog.exportSymbol('videojs.DescriptionsTrack', vjs.DescriptionsTrack);
 goog.exportSymbol('videojs.ChaptersTrack', vjs.ChaptersTrack);
 
 goog.exportSymbol('videojs.autoSetup', vjs.autoSetup);
