@@ -6,6 +6,9 @@ _(none)_
 
 --------------------
 
+## 4.12.4 (2015-03-05)
+* Randomized the Google Analytics calls to stay under the limit ([view](https://github.com/videojs/video.js/pull/1916))
+
 ## 4.12.3 (2015-02-28)
 * @heff fixed setting the source to an empty string ([view](https://github.com/videojs/video.js/pull/1905))
 
