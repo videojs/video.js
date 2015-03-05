@@ -80,7 +80,7 @@ vjs.ACCESS_PROTOCOL = ('https:' == document.location.protocol ? 'https://' : 'ht
 * Full player version
 * @type {string}
 */
-vjs['VERSION'] = '4.12.3';
+vjs['VERSION'] = '4.12.4';
 
 /**
  * Global Player instance options, surfaced from vjs.Player.prototype.options_
