@@ -11,6 +11,12 @@
 ;(function(i,w,n,e,l){
   l=w.location;
 
+  // Google Analytics has a limit of 10 million hits per month for free accounts.
+  // The Video.js CDN goes over this (by a lot) and they've asked us to stop.
+  if (Math.random() > 0.01) {
+    return;
+  }
+
   // Setting the source of an image will load the URL even without adding to dom
   // Using //www, still seems to work for https even though ssl.google is used by google
   i.src='//www.google-analytics.com/__utm.gif'
