@@ -21,6 +21,7 @@ test('should update settings', function() {
       'edgeStyle': 'raised',
       'fontFamily': 'monospaceSerif',
       'color': '#FFF',
+      'descriptionsPlayback': 'screenReaderOnly',
       'backgroundColor': '#FFF',
       'windowColor': '#FFF',
       'fontPercent': 1.25
@@ -38,6 +39,7 @@ test('should update settings', function() {
   equal(player.el().querySelector('.vjs-edge-style select').selectedIndex, 1, 'edge-style is set to new value');
   equal(player.el().querySelector('.vjs-font-family select').selectedIndex, 1, 'font-family is set to new value');
   equal(player.el().querySelector('.vjs-font-percent select').selectedIndex, 3, 'font-percent is set to new value');
+  equal(player.el().querySelector('.vjs-descriptions-playback select').selectedIndex, 1, 'descriptions playback is set to new value');
 
   vjs.trigger(player.el().querySelector('.vjs-done-button'), 'click');
   deepEqual(JSON.parse(window.localStorage.getItem('vjs-text-track-settings')), newSettings, 'values are saved');
@@ -58,6 +60,7 @@ test('should restore default settings', function() {
   player.el().querySelector('.vjs-edge-style select').selectedIndex = 1;
   player.el().querySelector('.vjs-font-family select').selectedIndex = 1;
   player.el().querySelector('.vjs-font-percent select').selectedIndex = 3;
+  player.el().querySelector('.vjs-descriptions-playback select').selectedIndex = 1;
 
   vjs.trigger(player.el().querySelector('.vjs-done-button'), 'click');
   vjs.trigger(player.el().querySelector('.vjs-default-button'), 'click');
@@ -75,6 +78,7 @@ test('should restore default settings', function() {
   equal(player.el().querySelector('.vjs-edge-style select').selectedIndex, 0, 'edge-style is set to default value');
   equal(player.el().querySelector('.vjs-font-family select').selectedIndex, 0, 'font-family is set to default value');
   equal(player.el().querySelector('.vjs-font-percent select').selectedIndex, 2, 'font-percent is set to default value');
+  equal(player.el().querySelector('.vjs-descriptions-playback select').selectedIndex, 0, 'descriptions playback is set to default value');
 });
 
 test('should open on click', function() {
@@ -171,6 +175,7 @@ test('should restore saved settings', function() {
       'edgeStyle': 'raised',
       'fontFamily': 'monospaceSerif',
       'color': '#FFF',
+      'descriptionsPlayback': 'screenReaderOnly',
       'backgroundColor': '#FFF',
       'windowColor': '#FFF',
       'fontPercent': 1.25
@@ -195,6 +200,7 @@ test('should not restore saved settings', function() {
       'edgeStyle': 'raised',
       'fontFamily': 'monospaceSerif',
       'color': '#FFF',
+      'descriptionsPlayback': 'screenReaderOnly',
       'backgroundColor': '#FFF',
       'windowColor': '#FFF',
       'fontPercent': 1.25

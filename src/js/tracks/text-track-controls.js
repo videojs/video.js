@@ -53,28 +53,28 @@ vjs.TextTrackDisplay.prototype.createEl = function(){
     className: 'vjs-text-track-display'
   });
 
-  // Element for visible text tracks
-  this.visibleEl = vjs.Component.prototype.createEl.call(this, 'div', {
+  // Element for captions/subtitles text tracks
+  this.captionsSubtitlesEl = vjs.Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-text-track-visible-display'
   });
-  parentEl.appendChild(this.visibleEl);
+  parentEl.appendChild(this.captionsSubtitlesEl);
 
-  // Element for hidden, but screen-reader 'alert/assertive', text tracks
-  this.hiddenEl = vjs.Component.prototype.createEl.call(this, 'div', {
+  // Element for descriptions text track, which is screen-reader 'alert/assertive'
+  this.descriptionsEl = vjs.Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-text-track-hidden-display',
     'role' : 'alert',
     'aria-live' : 'assertive',
     'aria-atomic' : 'true'
   });
-  parentEl.appendChild(this.hiddenEl);
+  parentEl.appendChild(this.descriptionsEl);
 
   return parentEl;
 };
 
 vjs.TextTrackDisplay.prototype.clearDisplay = function() {
   if (typeof window['WebVTT'] === 'function') {
-    window['WebVTT']['processCues'](window, [], this.visibleEl);
-    window['WebVTT']['processCues'](window, [], this.hiddenEl);
+    window['WebVTT']['processCues'](window, [], this.captionsSubtitlesEl);
+    window['WebVTT']['processCues'](window, [], this.descriptionsEl);
   }
 };
 
@@ -143,11 +143,20 @@ vjs.TextTrackDisplay.prototype.updateForTrack = function(track) {
     cues.push(track['activeCues'][i]);
   }
 
-  //TODO: Add a preference to allow descriptions to be visible
   if ( track['kind'] === 'descriptions' ) {
-    window['WebVTT']['processCues'](window, track['activeCues'], this.hiddenEl);
+
+    if ( (overrides.descriptionsPlayback ) && ( overrides.descriptionsPlayback === 'screenReaderOnly' ) ) {
+      vjs.removeClass(this.descriptionsEl, 'vjs-text-track-visible-display');
+      vjs.addClass(this.descriptionsEl, 'vjs-text-track-hidden-display');
+    } else {
+      vjs.addClass(this.descriptionsEl, 'vjs-text-track-visible-display');
+      vjs.removeClass(this.descriptionsEl, 'vjs-text-track-hidden-display');
+    }
+
+    window['WebVTT']['processCues'](window, track['activeCues'], this.descriptionsEl);
+
   } else {
-    window['WebVTT']['processCues'](window, track['activeCues'], this.visibleEl);
+    window['WebVTT']['processCues'](window, track['activeCues'], this.captionsSubtitlesEl);
   }
 
   i = cues.length;
@@ -389,7 +398,7 @@ vjs.TextTrackButton = vjs.MenuButton.extend({
 vjs.TextTrackButton.prototype.createItems = function(){
   var items = [], track, tracks;
 
-  if (this instanceof vjs.CaptionsButton && !(this.player().tech && this.player().tech['featuresNativeTextTracks'])) {
+  if ((this instanceof vjs.CaptionsButton || this instanceof vjs.DescriptionsButton) && !(this.player().tech && this.player().tech['featuresNativeTextTracks'])) {
     items.push(new vjs.CaptionSettingsMenuItem(this.player_, { 'kind': this.kind_ }));
   }
 
@@ -469,7 +478,7 @@ vjs.SubtitlesButton.prototype.className = 'vjs-subtitles-button';
  *
  * @constructor
  */
-vjs.DescriptionsButton = vjs.TextTrackButton.extend({
+vjs.DescriptionsButton = vjs.CaptionsButton.extend({
   /** @constructor */
   init: function(player, options, ready){
     vjs.TextTrackButton.call(this, player, options, ready);
