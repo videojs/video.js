@@ -27,6 +27,8 @@ vjs.Button = vjs.Component.extend({
 vjs.Button.prototype.createEl = function(type, props){
   var el;
 
+  type = type || 'button';
+
   // Add standard Aria and Tabindex info
   props = vjs.obj.merge({
     className: this.buildCSSClass(),
@@ -36,6 +38,7 @@ vjs.Button.prototype.createEl = function(type, props){
   }, props);
 
   el = vjs.Component.prototype.createEl.call(this, type, props);
+  el.setAttribute('type', 'button');
 
   // if innerHTML hasn't been overridden (bigPlayButton), add content elements
   if (!props.innerHTML) {
