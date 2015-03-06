@@ -53,6 +53,7 @@ CHANGELOG
 * @pavelhoral fixed a bug with user activity that caused the control bar to flicker ([view](https://github.com/videojs/video.js/pull/2299))
 * @dmlap updated to videojs-swf@4.7.1 to fix a video dimensions issue on subsequent loads ([view](https://github.com/videojs/video.js/pull/2281))
 * @mmcc added the vjs-big-play-centered class ([view](https://github.com/videojs/video.js/pull/2293))
+* @thijstriemstra added a logged error when a plugin is missing ([view](https://github.com/videojs/video.js/pull/1931))
 
 --------------------
 

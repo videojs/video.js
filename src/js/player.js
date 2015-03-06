@@ -154,7 +154,11 @@ class Player extends Component {
 
       Object.getOwnPropertyNames(plugins).forEach(function(name){
         plugins[name].playerOptions = playerOptionsCopy;
-        this[name](plugins[name]);
+        if (typeof this[name] === 'function') {
+          this[name](plugins[name]);
+        } else {
+          log.error('Unable to find plugin:', name);
+        }
       }, this);
     }
 
