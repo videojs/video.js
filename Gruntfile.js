@@ -55,6 +55,21 @@ module.exports = function(grunt) {
         dest: 'build/files/test.minified.video.js'
       }
     },
+    uglify: {
+      options: {
+        mangle: true
+      },
+      source: {
+        files: {
+          'build/files/minified.video.js': 'build/files/combined.video.js'
+        }
+      },
+      tests: {
+        files: {
+          'build/files/test.minified.video.js': ['build/files/combined.video.js', 'test/unit/*.js']
+        }
+      }
+    },
     dist: {},
     qunit: {
       source: ['test/index.html'],
@@ -365,11 +380,12 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-fastly');
   grunt.loadNpmTasks('grunt-github-releaser');
   grunt.loadNpmTasks('grunt-aws-s3');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
 
   // grunt.loadTasks('./docs/tasks/');
   // grunt.loadTasks('../videojs-doc-generator/tasks/');
 
-  grunt.registerTask('pretask', ['jshint', 'less', 'vjslanguages', 'build', 'minify', 'vttjs', 'usebanner']);
+  grunt.registerTask('pretask', ['jshint', 'less', 'vjslanguages', 'build', 'uglify', 'vttjs', 'usebanner']);
   // Default task.
   grunt.registerTask('default', ['pretask', 'dist']);
   // Development watch task
