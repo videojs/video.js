@@ -162,3 +162,18 @@ test('Plugins should not get events after stopImmediatePropagation is called', f
   equal(order.length, 1, 'only one event listener should have triggered');
   player.dispose();
 });
+
+test('Plugin that does not exist throws error', function(){
+  window.throws(function() {
+      PlayerTest.makePlayer({
+        plugins: {
+          nonExistingPlugin: {
+            foo: 'bar'
+          }
+        }
+      });
+    },
+    new Error('Unable to find plugin: nonExistingPlugin'),
+    'raised error message contains the plugin name'
+  );
+});

@@ -99,7 +99,11 @@ vjs.Player = vjs.Component.extend({
 
     if (options['plugins']) {
       vjs.obj.each(options['plugins'], function(key, val){
-        this[key](val);
+        try {
+          this[key](val);
+        } catch (err) {
+          throw new Error('Unable to find plugin: ' + key);
+        }
       }, this);
     }
 
