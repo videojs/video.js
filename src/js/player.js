@@ -19,6 +19,7 @@ import ErrorDisplay from './error-display.js';
 import TextTrackSettings from './tracks/text-track-settings.js';
 // Require html5 for disposing the original video tag
 import Html5 from './tech/html5.js';
+import Tech from './tech/tech.js';
 
 /**
  * An instance of the `vjs.Player` class is created when any of the Video.js setup methods are used to initialize a video.
@@ -1281,6 +1282,8 @@ class Player extends Component {
     if (err === undefined) {
       return this.error_ || null;
     }
+
+    if (this.tech) { Tech.prototype.stopTracking.call(this.tech); }
 
     // restoring to default
     if (err === null) {
