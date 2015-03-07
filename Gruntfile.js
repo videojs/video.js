@@ -1,5 +1,5 @@
 module.exports = function(grunt) {
-  var pkg, version, verParts;
+  var pkg, version, verParts, license, licenseNoVtt;
 
   pkg = grunt.file.readJSON('package.json');
 
@@ -12,6 +12,21 @@ module.exports = function(grunt) {
   };
   version.majorMinor = version.major + '.' + version.minor;
   grunt.vjsVersion = version;
+
+  licenseNoVtt = '/**\n'+
+  ' * @license\n'+
+  ' * Video.js '+version.full+' <http://videojs.com/>\n'+
+  ' * <%= pkg.copyright %>\n'+
+  ' * Available under Apache License Version 2.0\n'+
+  ' * <https://github.com/videojs/video.js/blob/master/LICENSE>\n'+
+  ' */\n';
+
+  license = licenseNoVtt.slice(0, -4) +
+  ' * \n'+
+  ' * Includes vtt.js <https://github.com/mozilla/vtt.js>\n'+
+  ' * Available under Apache License Version 2.0\n'+
+  ' * <https://github.com/mozilla/vtt.js/blob/master/LICENSE>\n'+
+  ' */\n';
 
   // loading predefined source order from source-loader.js
   // trust me, this is the easist way to do it so far
@@ -45,11 +60,24 @@ module.exports = function(grunt) {
     },
     uglify: {
       options: {
-        mangle: true
+        sourceMap: true,
+        preserveComments: 'some',
+        mangle: true,
+        compress: {
+          sequences: true,
+          dead_code: true,
+          conditionals: true,
+          booleans: true,
+          unused: true,
+          if_return: true,
+          join_vars: true,
+          drop_console: true
+        }
       },
       source: {
         files: {
-          'build/files/minified.video.js': 'build/files/combined.video.js'
+          'build/files/minified.video.js': 'build/files/combined.video.js',
+          'build/files/minified.video.novtt.js': 'build/files/combined.video.novtt.js'
         }
       },
       tests: {
@@ -296,14 +324,25 @@ module.exports = function(grunt) {
       }
     },
     usebanner: {
+      options: {
+        position: 'top',
+        banner: license,
+        linebreak: true
+      },
       dist: {
         options: {
-          position: 'top',
-          banner: '/*! Video.js v' + version.full + ' <%= pkg.copyright %> */ ',
-          linebreak: true
+          banner: license
         },
         files: {
-          src: [ 'build/files/minified.video.js']
+          src: [ 'build/files/combined.video.js']
+        }
+      },
+      novtt: {
+        options: {
+          banner: licenseNoVtt
+        },
+        files: {
+          src: [ 'build/files/combined.video.novtt.js']
         }
       }
     },
@@ -373,11 +412,11 @@ module.exports = function(grunt) {
   // grunt.loadTasks('./docs/tasks/');
   // grunt.loadTasks('../videojs-doc-generator/tasks/');
 
-  grunt.registerTask('pretask', ['jshint', 'less', 'vjslanguages', 'build', 'uglify', 'vttjs', 'usebanner']);
+  grunt.registerTask('pretask', ['jshint', 'less', 'vjslanguages', 'build', 'usebanner', 'uglify']);
   // Default task.
   grunt.registerTask('default', ['pretask', 'dist']);
   // Development watch task
-  grunt.registerTask('dev', ['jshint', 'less', 'vjslanguages', 'build', 'qunit:source']);
+  grunt.registerTask('dev', ['jshint', 'less', 'vjslanguages', 'build', 'usebanner', 'qunit:source']);
   grunt.registerTask('test-qunit', ['pretask', 'qunit']);
 
   grunt.registerTask('dist', 'Creating distribution', ['dist-copy', 'zip:dist']);

@@ -1,5 +1,6 @@
 module.exports = function(grunt) {
   grunt.registerMultiTask('build', 'Building Source', function(){
+    var vtt, novtt;
 
     // Fix windows file path delimiter issue
     var i = grunt.sourceFiles.length;
@@ -16,7 +17,12 @@ module.exports = function(grunt) {
     combined = combined.replace(/GENERATED_CDN_VSN/g, grunt.vjsVersion.majorMinor);
     combined = combined.replace(/GENERATED_FULL_VSN/g, grunt.vjsVersion.full);
 
+    vtt = grunt.file.read('node_modules/vtt.js/dist/vtt.js');
+    novtt = combined;
+    combined += '\n'+vtt;
+
     grunt.file.write('build/files/combined.video.js', combined);
+    grunt.file.write('build/files/combined.video.novtt.js', novtt);
 
     // Copy over other files
     // grunt.file.copy('src/css/video-js.png', 'build/files/video-js.png');
