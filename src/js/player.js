@@ -97,12 +97,13 @@ vjs.Player = vjs.Component.extend({
     // Make player easily findable by ID
     vjs.players[this.id_] = this;
 
+    // scan plugins
     if (options['plugins']) {
       vjs.obj.each(options['plugins'], function(key, val){
-        try {
+        if (typeof this[key] === 'function') {
           this[key](val);
-        } catch (err) {
-          throw new Error('Unable to find plugin: ' + key);
+        } else {
+          vjs.log.error('Unable to find plugin:', key);
         }
       }, this);
     }
