@@ -3,7 +3,7 @@
 # vjs.SeekHandle
 
 __EXTENDS__: [vjs.SliderHandle](vjs.SliderHandle.md)  
-__DEFINED IN__: [src/js/control-bar/progress-control.js#L197](https://github.com/videojs/video.js/blob/master/src/js/control-bar/progress-control.js#L197)  
+__DEFINED IN__: [src/js/control-bar/progress-control.js#L199](https://github.com/videojs/video.js/blob/master/src/js/control-bar/progress-control.js#L199)  
 
 The Seek Handle shows the current position of the playhead during playback,
 and can be dragged to adjust the playhead.
@@ -134,7 +134,7 @@ _inherited from_: [src/js/component.js#L296](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Number` Returns the interval ID
 
-_inherited from_: [src/js/component.js#L1219](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1219)
+_inherited from_: [src/js/component.js#L1223](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1223)
 
 ---
 
@@ -147,7 +147,7 @@ _inherited from_: [src/js/component.js#L1219](https://github.com/videojs/video.j
 ##### RETURNS: 
 * `Number` Returns the timeout ID
 
-_inherited from_: [src/js/component.js#L1181](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1181)
+_inherited from_: [src/js/component.js#L1185](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1185)
 
 ---
 
@@ -169,7 +169,7 @@ _inherited from_: [src/js/component.js#L239](https://github.com/videojs/video.js
 * __tagName__ `String` _(OPTIONAL)_ Element's node type. e.g. 'div'
 * __attributes__ `Object` _(OPTIONAL)_ An object of element attributes that should be set on the element
 
-_defined in_: [src/js/control-bar/progress-control.js#L213](https://github.com/videojs/video.js/blob/master/src/js/control-bar/progress-control.js#L213)
+_defined in_: [src/js/control-bar/progress-control.js#L215](https://github.com/videojs/video.js/blob/master/src/js/control-bar/progress-control.js#L215)
 
 ---
 
@@ -229,7 +229,7 @@ _inherited from_: [src/js/component.js#L220](https://github.com/videojs/video.js
 > whenever touch events happen, and this can be turned off by components that
 > want touch events to act differently.
 
-_inherited from_: [src/js/component.js#L1120](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1120)
+_inherited from_: [src/js/component.js#L1124](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1124)
 
 ---
 
@@ -572,7 +572,7 @@ _inherited from_: [src/js/component.js#L837](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Number` Returns the interval ID
 
-_inherited from_: [src/js/component.js#L1198](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1198)
+_inherited from_: [src/js/component.js#L1202](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1202)
 
 ---
 
@@ -586,7 +586,7 @@ _inherited from_: [src/js/component.js#L1198](https://github.com/videojs/video.j
 ##### RETURNS: 
 * `Number` Returns the timeout ID
 
-_inherited from_: [src/js/component.js#L1158](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1158)
+_inherited from_: [src/js/component.js#L1162](https://github.com/videojs/video.js/blob/master/src/js/component.js#L1162)
 
 ---
 

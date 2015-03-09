@@ -2,6 +2,24 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 4.12.4 (2015-03-05)
+* Randomized the Google Analytics calls to stay under the limit ([view](https://github.com/videojs/video.js/pull/1916))
+
+## 4.12.3 (2015-02-28)
+* @heff fixed setting the source to an empty string ([view](https://github.com/videojs/video.js/pull/1905))
+
+## 4.12.2 (2015-02-27)
+* @gkatsev fixed disabling of default text tracks ([view](https://github.com/videojs/video.js/pull/1892))
+
+## 4.12.1 (2015-02-19)
+* @gkatsev fixed the track list reference while switching techs that use emulated tracks ([view](https://github.com/videojs/video.js/pull/1874))
+* @gkatsev fixed a Firefox error with the captions settings select menu options ([view](https://github.com/videojs/video.js/pull/1877))
+
+## 4.12.0 (2015-02-17)
 * @PeterDaveHello added a Traditional Chinese translation ([view](https://github.com/videojs/video.js/pull/1729))
 * @mmcc updated the hide/show functions to use a class instead of inline styles ([view](https://github.com/videojs/video.js/pull/1681))
 * @mister-ben added better handling of the additional videojs() arguments when the player is already initialized ([view](https://github.com/videojs/video.js/pull/1730))
@@ -11,7 +29,32 @@ CHANGELOG
 * @dmlap fixed URL parsing in IE9 ([view](https://github.com/videojs/video.js/pull/1765))
 * @gkatsev Fixed issue where ManualTimeUpdatesOff was not de-registering events ([view](https://github.com/videojs/video.js/pull/1793))
 * @brycefisher Added a guide on player disposal ([view](https://github.com/videojs/video.js/pull/1803))
---------------------
+* @toniher added a Catalan translation ([view](https://github.com/videojs/video.js/pull/1794))
+* @mmcc added a VERSION key to the videojs object ([view](https://github.com/videojs/video.js/pull/1798))
+* @mmcc fixed an issue with text track hiding introduced in #1681 ([view](https://github.com/videojs/video.js/pull/1804))
+* @dmlap exported video.js as a named AMD module ([view](https://github.com/videojs/video.js/pull/1844))
+* @dmlap fixed poster hiding when the loadstart event does not fire ([view](https://github.com/videojs/video.js/pull/1834))
+* @chikathreesix fixed an object delete error in Chrome ([view](https://github.com/videojs/video.js/pull/1858))
+* @steverandy fixed an issue with scrolling over the player on touch devices ([view](https://github.com/videojs/video.js/pull/1809))
+* @mmcc improved tap sensitivity ([view](https://github.com/videojs/video.js/pull/1830))
+* @mister-ben added a vjs-ended class when playback reaches the end of the timeline ([view](https://github.com/videojs/video.js/pull/1857))
+* @dmlap Add network and ready state properties ([view](https://github.com/videojs/video.js/pull/1854))
+* @woollybogger exported the hasClass function ([view](https://github.com/videojs/video.js/pull/1839))
+* @DevGavin fixed the Chinese translation ([view](https://github.com/videojs/video.js/pull/1841))
+* @iSimonWeb added font-path variable ([view](https://github.com/videojs/video.js/pull/1847))
+* @shoshomiga added a Bulgarian translation ([view](https://github.com/videojs/video.js/pull/1849))
+* @ragecub3 added a Turkish translation ([view](https://github.com/videojs/video.js/pull/1853))
+* @gkatsev greatly improved text track support and implemented vtt.js as the webvtt parser ([view](https://github.com/videojs/video.js/pull/1749))
+* @gkatsev fixed captions showing by default in Chrome and Safari ([view](https://github.com/videojs/video.js/pull/1865))
+* @mister-ben fixed a woff warning in Firefox ([view](https://github.com/videojs/video.js/pull/1870))
+
+## 4.11.4 (2015-01-23)
+* @heff exported missing source handler functions ([view](https://github.com/videojs/video.js/pull/1787))
+* @heff fixed type support checking for an empty src string ([view](https://github.com/videojs/video.js/pull/1797))
+* @carpasse fixed a bug in updating child indexes after removing components ([view](https://github.com/videojs/video.js/pull/1814))
+* @dmlap fixed a bug where native controls would show after switching techs ([view](https://github.com/videojs/video.js/pull/1811))
+* @H1D fixed an issue with file extension type detection ([view](https://github.com/videojs/video.js/pull/1818))
+* @bclwhitaker updated to v4.5.3 of video-js-swf ([view](https://github.com/videojs/video.js/pull/1823))
 
 ## 4.11.3 (2014-12-19)
 * @gdkraus fixed a bug where you could no longer tab-navigate passed a menu button ([view](https://github.com/videojs/video.js/pull/1760))

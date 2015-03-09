@@ -1,13 +1,25 @@
+var noop = function() {}, clock, oldTextTracks;
+
 module('Media Tech', {
   'setup': function() {
     this.noop = function() {};
     this.clock = sinon.useFakeTimers();
     this.featuresProgessEvents = videojs.MediaTechController.prototype['featuresProgessEvents'];
     videojs.MediaTechController.prototype['featuresProgressEvents'] = false;
+    videojs.MediaTechController.prototype['featuresNativeTextTracks'] = true;
+    oldTextTracks = videojs.MediaTechController.prototype.textTracks;
+    videojs.MediaTechController.prototype.textTracks = function() {
+      return {
+        addEventListener: Function.prototype,
+        removeEventListener: Function.prototype
+      };
+    };
   },
   'teardown': function() {
     this.clock.restore();
     videojs.MediaTechController.prototype['featuresProgessEvents'] = this.featuresProgessEvents;
+    videojs.MediaTechController.prototype['featuresNativeTextTracks'] = false;
+    videojs.MediaTechController.prototype.textTracks = oldTextTracks;
   }
 });
 
@@ -216,4 +228,26 @@ test('should add the source hanlder interface to a tech', function(){
   ok(!disposeCalled, 'dispose has not been called for the handler yet');
   tech.dispose();
   ok(disposeCalled, 'the handler dispose method was called when the tech was disposed');
+});
+
+test('should handle unsupported sources with the source hanlder API', function(){
+  var mockPlayer = {
+    off: this.noop,
+    trigger: this.noop
+  };
+
+  // Define a new tech class
+  var Tech = videojs.MediaTechController.extend();
+  // Extend Tech with source handlers
+  vjs.MediaTechController.withSourceHandlers(Tech);
+  // Create an instance of Tech
+  var tech = new Tech(mockPlayer);
+
+  var usedNative;
+  Tech.nativeSourceHandler = {
+    handleSource: function(){ usedNative = true; }
+  };
+
+  tech.setSource('');
+  ok(usedNative, 'native source handler was used when an unsupported source was set');
 });

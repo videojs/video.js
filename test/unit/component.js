@@ -462,13 +462,14 @@ test('should use a defined content el for appending children', function(){
 });
 
 test('should emit a tap event', function(){
-  expect(2);
+  expect(3);
 
   // Fake touch support. Real touch support isn't needed for this test.
   var origTouch = vjs.TOUCH_ENABLED;
   vjs.TOUCH_ENABLED = true;
 
   var comp = new vjs.Component(getFakePlayer());
+  var singleTouch = {};
 
   comp.emitTapEvents();
   comp.on('tap', function(){
@@ -493,8 +494,26 @@ test('should emit a tap event', function(){
     { pageX: 0, pageY: 0 }
   ]});
   vjs.trigger(comp.el(), {type: 'touchmove', touches: [
-    { pageX: 10, pageY: 10 }
+    { pageX: 7, pageY: 7 }
   ]});
+  comp.trigger('touchend');
+
+  // A touchmove with a lot of movement by modifying the exisiting touch object
+  // should not trigger a tap
+  singleTouch = { pageX: 0, pageY: 0 };
+  vjs.trigger(comp.el(), {type: 'touchstart', touches: [singleTouch]});
+  singleTouch.pageX = 100;
+  singleTouch.pageY = 100;
+  vjs.trigger(comp.el(), {type: 'touchmove', touches: [singleTouch]});
+  comp.trigger('touchend');
+
+  // A touchmove with not much movement by modifying the exisiting touch object
+  // should still allow a tap
+  singleTouch = { pageX: 0, pageY: 0 };
+  vjs.trigger(comp.el(), {type: 'touchstart', touches: [singleTouch]});
+  singleTouch.pageX = 7;
+  singleTouch.pageY = 7;
+  vjs.trigger(comp.el(), {type: 'touchmove', touches: [singleTouch]});
   comp.trigger('touchend');
 
   // Reset to orignial value

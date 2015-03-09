@@ -89,7 +89,12 @@ vjs.Slider.prototype.update = function(){
   if (!bar) return;
 
   // Protect against no duration and other division issues
-  if (isNaN(progress)) { progress = 0; }
+  if (typeof progress !== 'number' ||
+      progress !== progress ||
+      progress < 0 ||
+      progress === Infinity) {
+        progress = 0;
+  }
 
   // If there is a handle, we need to account for the handle in our calculation for progress bar
   // so that it doesn't fall short of or extend past the handle.

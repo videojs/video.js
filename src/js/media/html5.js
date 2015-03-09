@@ -12,6 +12,12 @@
 vjs.Html5 = vjs.MediaTechController.extend({
   /** @constructor */
   init: function(player, options, ready){
+    var  nodes, nodesLength, i, node, nodeName, removeNodes;
+
+    if (options['nativeCaptions'] === false || options['nativeTextTracks'] === false) {
+      this['featuresNativeTextTracks'] = false;
+    }
+
     vjs.MediaTechController.call(this, player, options, ready);
 
     this.setupTriggers();
@@ -24,6 +30,37 @@ vjs.Html5 = vjs.MediaTechController.extend({
     // anyway so the error gets fired.
     if (source && (this.el_.currentSrc !== source.src || (player.tag && player.tag.initNetworkState_ === 3))) {
       this.setSource(source);
+    }
+
+    if (this.el_.hasChildNodes()) {
+
+      nodes = this.el_.childNodes;
+      nodesLength = nodes.length;
+      removeNodes = [];
+
+      while (nodesLength--) {
+        node = nodes[nodesLength];
+        nodeName = node.nodeName.toLowerCase();
+        if (nodeName === 'track') {
+          if (!this['featuresNativeTextTracks']) {
+            // Empty video tag tracks so the built-in player doesn't use them also.
+            // This may not be fast enough to stop HTML5 browsers from reading the tags
+            // so we'll need to turn off any default tracks if we're manually doing
+            // captions and subtitles. videoElement.textTracks
+            removeNodes.push(node);
+          } else {
+            this.remoteTextTracks().addTrack_(node['track']);
+          }
+        }
+      }
+
+      for (i=0; i<removeNodes.length; i++) {
+        this.el_.removeChild(removeNodes[i]);
+      }
+    }
+
+    if (this['featuresNativeTextTracks']) {
+      this.on('loadstart', vjs.bind(this, this.hideCaptions));
     }
 
     // Determine if native controls should be used
@@ -56,8 +93,12 @@ vjs.Html5.prototype.dispose = function(){
 
 vjs.Html5.prototype.createEl = function(){
   var player = this.player_,
+      track,
+      trackEl,
+      i,
       // If possible, reuse original tag for HTML5 playback technology element
       el = player.tag,
+      attributes,
       newEl,
       clone;
 
@@ -74,8 +115,15 @@ vjs.Html5.prototype.createEl = function(){
       player.tag = null;
     } else {
       el = vjs.createEl('video');
+
+      // determine if native controls should be used
+      attributes = videojs.util.mergeOptions({}, player.tagAttributes);
+      if (!vjs.TOUCH_ENABLED || player.options()['nativeControlsForTouch'] !== true) {
+        delete attributes.controls;
+      }
+
       vjs.setElementAttributes(el,
-        vjs.obj.merge(player.tagAttributes || {}, {
+        vjs.obj.merge(attributes, {
           id:player.id() + '_html5_api',
           'class':'vjs-tech'
         })
@@ -84,12 +132,27 @@ vjs.Html5.prototype.createEl = function(){
     // associate the player with the new tag
     el['player'] = player;
 
+    if (player.options_.tracks) {
+      for (i = 0; i < player.options_.tracks.length; i++) {
+        track = player.options_.tracks[i];
+        trackEl = document.createElement('track');
+        trackEl.kind = track.kind;
+        trackEl.label = track.label;
+        trackEl.srclang = track.srclang;
+        trackEl.src = track.src;
+        if ('default' in track) {
+          trackEl.setAttribute('default', 'default');
+        }
+        el.appendChild(trackEl);
+      }
+    }
+
     vjs.insertFirst(el, player.el());
   }
 
   // Update specific tag settings, in case they were overridden
   var settingsAttrs = ['autoplay','preload','loop','muted'];
-  for (var i = settingsAttrs.length - 1; i >= 0; i--) {
+  for (i = settingsAttrs.length - 1; i >= 0; i--) {
     var attr = settingsAttrs[i];
     var overwriteAttrs = {};
     if (typeof player.options_[attr] !== 'undefined') {
@@ -100,6 +163,25 @@ vjs.Html5.prototype.createEl = function(){
 
   return el;
   // jenniisawesome = true;
+};
+
+
+vjs.Html5.prototype.hideCaptions = function() {
+  var tracks = this.el_.querySelectorAll('track'),
+      track,
+      i = tracks.length,
+      kinds = {
+        'captions': 1,
+        'subtitles': 1
+      };
+
+  while (i--) {
+    track = tracks[i].track;
+    if ((track && track['kind'] in kinds) &&
+        (!tracks[i]['default'])) {
+      track.mode = 'disabled';
+    }
+  }
 };
 
 // Make video events trigger player events
@@ -273,7 +355,95 @@ vjs.Html5.prototype.playbackRate = function(){ return this.el_.playbackRate; };
 vjs.Html5.prototype.setPlaybackRate = function(val){ this.el_.playbackRate = val; };
 
 vjs.Html5.prototype.networkState = function(){ return this.el_.networkState; };
+vjs.Html5.prototype.readyState = function(){ return this.el_.readyState; };
 
+vjs.Html5.prototype.textTracks = function() {
+  if (!this['featuresNativeTextTracks']) {
+    return vjs.MediaTechController.prototype.textTracks.call(this);
+  }
+
+  return this.el_.textTracks;
+};
+vjs.Html5.prototype.addTextTrack = function(kind, label, language) {
+  if (!this['featuresNativeTextTracks']) {
+    return vjs.MediaTechController.prototype.addTextTrack.call(this, kind, label, language);
+  }
+
+  return this.el_.addTextTrack(kind, label, language);
+};
+
+vjs.Html5.prototype.addRemoteTextTrack = function(options) {
+  if (!this['featuresNativeTextTracks']) {
+    return vjs.MediaTechController.prototype.addRemoteTextTrack.call(this, options);
+  }
+
+  var track = document.createElement('track');
+  options = options || {};
+
+  if (options['kind']) {
+    track['kind'] = options['kind'];
+  }
+  if (options['label']) {
+    track['label'] = options['label'];
+  }
+  if (options['language'] || options['srclang']) {
+    track['srclang'] = options['language'] || options['srclang'];
+  }
+  if (options['default']) {
+    track['default'] = options['default'];
+  }
+  if (options['id']) {
+    track['id'] = options['id'];
+  }
+  if (options['src']) {
+    track['src'] = options['src'];
+  }
+
+  this.el().appendChild(track);
+
+  if (track.track['kind'] === 'metadata') {
+    track['track']['mode'] = 'hidden';
+  } else {
+    track['track']['mode'] = 'disabled';
+  }
+
+  track['onload'] = function() {
+    var tt = track['track'];
+    if (track.readyState >= 2) {
+      if (tt['kind'] === 'metadata' && tt['mode'] !== 'hidden') {
+        tt['mode'] = 'hidden';
+      } else if (tt['kind'] !== 'metadata' && tt['mode'] !== 'disabled') {
+        tt['mode'] = 'disabled';
+      }
+      track['onload'] = null;
+    }
+  };
+
+  this.remoteTextTracks().addTrack_(track.track);
+
+  return track;
+};
+
+vjs.Html5.prototype.removeRemoteTextTrack = function(track) {
+  if (!this['featuresNativeTextTracks']) {
+    return vjs.MediaTechController.prototype.removeRemoteTextTrack.call(this, track);
+  }
+
+  var tracks, i;
+
+  this.remoteTextTracks().removeTrack_(track);
+
+  tracks = this.el()['querySelectorAll']('track');
+
+  for (i = 0; i < tracks.length; i++) {
+    if (tracks[i] === track || tracks[i]['track'] === track) {
+      tracks[i]['parentNode']['removeChild'](tracks[i]);
+      break;
+    }
+  }
+};
+
+/* HTML5 Support Testing ---------------------------------------------------- */
 
 /**
  * Check if HTML5 video is supported by this browser/device
@@ -307,13 +477,13 @@ vjs.Html5.nativeSourceHandler = {};
  * @return {String}         'probably', 'maybe', or '' (empty string)
  */
 vjs.Html5.nativeSourceHandler.canHandleSource = function(source){
-  var ext;
+  var match, ext;
 
   function canPlayType(type){
     // IE9 on Windows 7 without MediaPlayer throws an error here
     // https://github.com/videojs/video.js/issues/519
     try {
-      return !!vjs.TEST_VID.canPlayType(type);
+      return vjs.TEST_VID.canPlayType(type);
     } catch(e) {
       return '';
     }
@@ -322,11 +492,15 @@ vjs.Html5.nativeSourceHandler.canHandleSource = function(source){
   // If a type was provided we should rely on that
   if (source.type) {
     return canPlayType(source.type);
-  } else {
+  } else if (source.src) {
     // If no type, fall back to checking 'video/[EXTENSION]'
-    ext = source.src.match(/\.([^\/\?]+)(\?[^\/]+)?$/i)[1];
+    match = source.src.match(/\.([^.\/\?]+)(\?[^\/]+)?$/i);
+    ext = match && match[1];
+
     return canPlayType('video/'+ext);
   }
+
+  return '';
 };
 
 /**
@@ -372,6 +546,29 @@ vjs.Html5.canControlPlaybackRate = function(){
 };
 
 /**
+ * Check to see if native text tracks are supported by this browser/device
+ * @return {Boolean}
+ */
+vjs.Html5.supportsNativeTextTracks = function() {
+  var supportsTextTracks;
+
+  // Figure out native text track support
+  // If mode is a number, we cannot change it because it'll disappear from view.
+  // Browsers with numeric modes include IE10 and older (<=2013) samsung android models.
+  // Firefox isn't playing nice either with modifying the mode
+  // TODO: Investigate firefox: https://github.com/videojs/video.js/issues/1862
+  supportsTextTracks = !!vjs.TEST_VID.textTracks;
+  if (supportsTextTracks && vjs.TEST_VID.textTracks.length > 0) {
+    supportsTextTracks = typeof vjs.TEST_VID.textTracks[0]['mode'] !== 'number';
+  }
+  if (supportsTextTracks && vjs.IS_FIREFOX) {
+    supportsTextTracks = false;
+  }
+
+  return supportsTextTracks;
+};
+
+/**
  * Set the tech's volume control support status
  * @type {Boolean}
  */
@@ -402,6 +599,12 @@ vjs.Html5.prototype['featuresFullscreenResize'] = true;
  * (this disables the manual progress events of the MediaTechController)
  */
 vjs.Html5.prototype['featuresProgressEvents'] = true;
+
+/**
+ * Sets the tech's status on native text track support
+ * @type {Boolean}
+ */
+vjs.Html5.prototype['featuresNativeTextTracks'] = vjs.Html5.supportsNativeTextTracks();
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //
 (function() {

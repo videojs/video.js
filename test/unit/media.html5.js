@@ -10,13 +10,14 @@ module('HTML5', {
       id: function(){ return 'id'; },
       el: function(){ return el; },
       options_: {},
-      options: function(){ return {}; },
+      options: function(){ return this.options_; },
       bufferedPercent: function() { return 0; },
       controls: function(){ return false; },
       usingNativeControls: function(){ return false; },
       on: function(){ return this; },
       off: function() { return this; },
       ready: function(){},
+      addChild: function(){},
       trigger: function(){}
     };
     tech = new vjs.Html5(player, {});
@@ -69,6 +70,23 @@ test('test playbackRate', function() {
 
   tech['setPlaybackRate'](0.75);
   strictEqual(tech.playbackRate(), 0.75);
+});
+
+test('should remove the controls attribute when recreating the element', function() {
+  var el;
+  player.tagAttributes = {
+    controls: true
+  };
+  // force custom controls so the test environment is equivalent on iOS
+  player.options_['nativeControlsForTouch'] = false;
+  el = tech.createEl();
+
+  // On the iPhone controls are always true
+  if (!vjs.IS_IPHONE) {
+    ok(!el.controls, 'controls attribute is absent');
+  }
+
+  ok(player.tagAttributes.controls, 'tag attribute is still present');
 });
 
 test('patchCanPlayType patches canplaytype with our function, conditionally', function() {
@@ -133,4 +151,33 @@ test('error events may not set the errors property', function() {
 
 test('should have the source handler interface', function() {
   ok(vjs.Html5.registerSourceHandler, 'has the registerSourceHandler function');
+});
+
+test('native source handler canHandleSource', function(){
+  var result;
+
+  // Stub the test video canPlayType (used in canHandleSource) to control results
+  var origCPT = vjs.TEST_VID.canPlayType;
+  vjs.TEST_VID.canPlayType = function(type){
+    if (type === 'video/mp4') {
+      return 'maybe';
+    }
+    return '';
+  };
+
+  var canHandleSource = vjs.Html5.nativeSourceHandler.canHandleSource;
+
+  equal(canHandleSource({ type: 'video/mp4', src: 'video.flv' }), 'maybe', 'Native source handler reported type support');
+  equal(canHandleSource({ src: 'http://www.example.com/video.mp4' }), 'maybe', 'Native source handler reported extension support');
+  equal(canHandleSource({ src: 'https://example.com/video.sd.mp4?s=foo&token=bar' }), 'maybe', 'Native source handler reported extension support');
+  equal(canHandleSource({ src: 'https://example.com/video.sd.mp4?s=foo' }), 'maybe', 'Native source handler reported extension support');
+
+  // Test for issue videojs/video.js#1785 and other potential failures
+  equal(canHandleSource({ src: '' }), '', 'Native source handler handled empty src');
+  equal(canHandleSource({}), '', 'Native source handler handled empty object');
+  equal(canHandleSource({ src: 'foo' }), '', 'Native source handler handled bad src');
+  equal(canHandleSource({ type: 'foo' }), '', 'Native source handler handled bad type');
+
+  // Reset test video canPlayType
+  vjs.TEST_VID.canPlayType = origCPT;
 });

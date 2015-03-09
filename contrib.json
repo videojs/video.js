@@ -1,6 +1,6 @@
 {
-  "project": {
-    "owner": "videojs",
+  "meta": {
+    "org": "videojs",
     "name": "video.js",
     "requirements": [
       {
@@ -13,7 +13,6 @@
       }
     ],
     "urls": {
-      "git": "https://github.com/videojs/video.js.git",
       "repo_api": "https://api.github.com/repos/videojs/video.js",
       "repo_ui": "https://github.com/videojs/video.js"
     },
@@ -23,13 +22,28 @@
     }
   },
 
-  "install": [
-    [ "git fetch origin",                             "Get all git branches" ],
-    [ "git checkout -b stable origin/stable",         "Create the stable branch for patches" ],
-    [ "git remote add upstream {{project.urls.git}}", "Add the upstream project as a remote for pulling changes" ],
-    [ "git fetch upstream",                           "Get all upstream branches and changes" ],
-    { "include": "update all" }
-  ],
+  "install": {
+    "desc": "Fork, download, and setup the project",
+    "steps": [
+      { "prompt": "confirm", "desc": "You will now be taken to Github where you will choose an account to fork the project under. Remember which account you choose." },
+      { "exec": "open https://github.com/{{meta.org}}/{{meta.name}}/fork" },
+      { "prompt": "text", "desc": "Which account did you choose? (no '@')", "id": "owner" },
+      { "exec": "git clone https://github.com/{{ owner }}/{{ meta.name }}.git" },
+      { "exec": "cd {{ meta.name }}", "desc": "Change to the project directory" },
+      { "include": "setup" }
+    ]
+  },
+
+  "setup": {
+    "desc": "Set up version control and install dependencies",
+    "steps": [
+      [ "git fetch origin",                      "Get all git branches" ],
+      [ "git checkout -b stable origin/stable",  "Create the stable branch for patches" ],
+      [ "git remote add upstream https://github.com/{{meta.org}}/{{meta.name}}.git",  "Add the upstream project as a remote for pulling changes" ],
+      [ "git fetch upstream",                    "Get all upstream branches and changes" ],
+      { "include": "update all" }
+    ]
+  },
 
   "update": {
     "all": {
@@ -66,25 +80,34 @@
     "start": {
       "desc": "Start a new feature",
       "steps": [
-        { "include": "update {{project.branches.development}}" },
+        { "include": "update {{meta.branches.development}}" },
         { "include": "branch start" }
       ]
     },
+    "save": {
+      "desc": "Save changes to your feature",
+      "steps": [{ "include": "branch save" }]
+    },
     "submit": {
       "desc": "Submit a pull request for a feature when it's finished",
-      "steps": [
-        { "include": "branch submit" }
-      ]
+      "steps": [{ "include": "pull_request submit" }]
     },
     "delete": {
       "desc": "Delete the current feature branch",
-      "steps": [
-        { "include": "branch delete" }
-      ]
+      "steps": [{ "include": "branch delete" }]
+    },
+    "review": {
+      "desc": "Review a submitted feature",
+      "steps": [{ "include": "pull_request review" }]
+    },
+    "modify": {
+      "desc": "Modify a submitted feature that you are reviewing",
+      "steps": [{ "include": "pull_request modify" }]
     },
     "accept": {
+      "desc": "Merge a submitted feature",
       "steps": [
-        { "include": "update {{project.branches.development}}" },
+        { "include": "update {{meta.branches.development}}" },
         { "include": "pull_request accept" }
       ]
     }
@@ -97,25 +120,34 @@
       "desc": "Start a new patch",
       "finished": "Make your changes and then run `contrib patch submit`",
       "steps": [
-        { "include": "update {{project.branches.release}}" },
+        { "include": "update {{meta.branches.release}}" },
         { "include": "branch start" }
       ]
     },
+    "save": {
+      "desc": "Save changes to your feature",
+      "steps": [{ "include": "branch save" }]
+    },
     "submit": {
       "desc": "Submit a pull request for a patch when it's finished",
-      "steps": [
-        { "include": "branch submit" }
-      ]
+      "steps": [{ "include": "pull_request submit" }]
     },
     "delete": {
       "desc": "Delete the current patch branch",
-      "steps": [
-        { "include": "branch delete" }
-      ]
+      "steps": [{ "include": "branch delete" }]
+    },
+    "review": {
+      "desc": "Review a submitted patch",
+      "steps": [{ "include": "pull_request review" }]
+    },
+    "modify": {
+      "desc": "Modify a submitted patch that you are reviewing",
+      "steps": [{ "include": "pull_request modify" }]
     },
     "accept": {
+      "desc": "Merge a submitted patch",
       "steps": [
-        { "include": "update {{project.branches.release}}" },
+        { "include": "update {{meta.branches.release}}" },
         { "include": "pull_request accept" }
       ]
     }
@@ -133,7 +165,7 @@
       { "prompt": "text", "desc": "What browsers/platforms did you experience this in (e.g. Win 7, IE10; Android 4, Chrome;)?", "id": "browsers" },
       { "prompt": "text", "desc": "Is there a URL to a live example, or a jsbin (e.g. http://jsbin.com/axedog/9999/edit)?",     "id": "example" },
       { "prompt": "text", "desc": "Are there any other details you'd like to provide?",                                         "id": "details" },
-      { "open": "{{project.urls.repo_ui}}/issues/new?title={{title}}&body=**Steps to reproduce:**\n> {{reproduce}}\n\n**What was expected:**\n> {{expected}}\n\n**What Happened:**\n> {{actual}}\n\n**Video.js Version:**\n> {{version}}\n\n**Plugins:**\n> {{plugins}}\n\n**Browsers experienced on:**\n> {{browsers}}\n\n**Example:**\n> {{example}}\n\n**Other details:**\n> {{details}}" }
+      { "open": "{{meta.urls.repo_ui}}/issues/new?title={{title}}&body=**Steps to reproduce:**\n> {{reproduce}}\n\n**What was expected:**\n> {{expected}}\n\n**What Happened:**\n> {{actual}}\n\n**Video.js Version:**\n> {{version}}\n\n**Plugins:**\n> {{plugins}}\n\n**Browsers experienced on:**\n> {{browsers}}\n\n**Example:**\n> {{example}}\n\n**Other details:**\n> {{details}}" }
     ],
     "finished": "Thanks for submitting a bug report! One of our contributors will address it as soon as possible."
   },
@@ -146,80 +178,131 @@
       { "prompt": "text", "desc": "Is there any existing documentation or related specifications?", "id": "docs" },
       { "prompt": "text", "desc": "Are there any existing examples?", "id": "examples" },
       { "prompt": "confirm", "desc": "You will be redirected to Github where you can submit this issue, OK?" },
-      { "open": "{{project.urls.repo_ui}}/issues/new?title={{ title }}&body=**Describe the feature/enhancement:**\n> {{ describe }}\n\n**Existing docs/specs:**\n> {{ docs }}\n\n**Existing examples:**\n> {{ examples }}" }
+      { "open": "{{meta.urls.repo_ui}}/issues/new?title={{ title }}&body=**Describe the feature/enhancement:**\n> {{ describe }}\n\n**Existing docs/specs:**\n> {{ docs }}\n\n**Existing examples:**\n> {{ examples }}" }
     ],
     "finished": "Thanks for submitting a feature request! One of our contributors will address it as soon as possible."
   },
 
   "release": {
-    "desc": "Create and publish a release",
-    "steps": [
-      [ "git diff --exit-code",             "Ensure there's no unadded changes" ],
-      [ "git diff --cached --exit-code",    "Ensure there's no added changes" ],
-      { "prompt": "confirm", "desc": "Have the changes been merged into the release branch (stable)?" },
-      { "prompt": "text",    "desc": "Provide the release type (major, minor, patch)", "id": "type" },
-      [ "git checkout stable",                     "Checkout the release branch" ],
-      [ "git pull upstream stable",                "Update the release branch" ],
-      [ "grunt test",                              "Run tests" ],
-      [ "grunt chg-release:{{ type }}",            "Update the changelog with the new release" ],
-      [ "grunt version:{{ type }}",                "Bump package versions" ],
-      [ "grunt",                                   "Build the release" ],
-      [ "git add dist/video-js --force",           "Add the (otherwise ignored) release files" ],
-      [ "grunt vjsdocs",                           "Rebuild the docs" ],
-      [ "grunt cdn-links",                         "Update the cdn urls in the docs" ],
-      [ "grunt tagrelease",                        "Tag the release" ],
-      [ "git push upstream stable",                "Push changes to the remote" ],
-      [ "git push upstream --tags",                "Push tags to the remote" ],
-      [ "npm publish",                             "Publish to npm" ],
-      [ "git checkout master",                     "Checkout the development branch" ],
-      [ "git pull upstream master",                "Update the development branch" ],
-      [ "git merge stable",                        "Merge changes" ],
-      [ "grunt clean:dist",                        "Remove built dist files to re-ignore them" ],
-      [ "git add -u",                              "Add the changes for the removed dist files" ],
-      [ "git commit -m 'Removed dist files'",      "Commit the removed dist files" ],
-      [ "git push upstream master",                "Push development branch changes" ]
-    ]
+    "desc": "Create and publish releases",
+
+    "patch": {
+      "release_type": "patch",
+      "steps": [{ "include": "release run" }]
+    },
+    "minor": {
+      "release_type": "minor",
+      "steps": [{ "include": "release run" }]
+    },
+
+    "run": {
+      "steps": [
+        { "include": "branch check" },
+        [ "git checkout stable",                       "Checkout the release branch" ],
+        [ "git pull upstream stable",                  "Update the release branch" ],
+        [ "npm install",                               "Ensure dependency updates have been installed" ],
+        [ "grunt test",                                "Run tests" ],
+        [ "grunt version:{{ release_type }}",          "Bump package versions" ],
+        [ "./build/bin/version",                       "Return the current VJS Version from the package.json file", "version" ],
+        [ "grunt chg-release:{{ version }}",           "Update the changelog with the new release" ],
+        [ "grunt clean:dist",                          "Clean out the dist folder before the build" ],
+        [ "grunt",                                     "Build the release" ],
+        [ "git add dist/video-js --force",             "Add the (otherwise ignored) release files" ],
+        [ "grunt vjsdocs",                             "Rebuild the docs" ],
+        [ "grunt cdn-links",                           "Update the cdn urls in the docs" ],
+        [ "git commit -am 'Release v{{ version }}'",   "Commit the unstaged changes (package.json, changelog, etc)" ],
+        [ "git tag -a v{{version}} -m 'v{{version}}'", "Tag the current version" ],
+        [ "git push upstream stable",                  "Push changes to the remote" ],
+        [ "git push upstream --tags",                  "Push tags to the remote" ],
+        [ "npm publish",                               "Publish to npm" ],
+        [ "grunt github-release",                      "Create a new release on Github" ],
+        [ "git checkout master",                       "Checkout the development branch" ],
+        [ "git pull upstream master",                  "Update the development branch" ],
+        [ "git merge stable",                          "Merge changes" ],
+        [ "grunt clean:dist",                          "Remove built dist files again to re-ignore them" ],
+        [ "git add -u",                                "Add the changes for the removed dist files" ],
+        [ "git commit -m 'Removed dist files'",        "Commit the removed dist files" ],
+        [ "git push upstream master",                  "Push development branch changes" ]
+      ]
+    }
   },
 
   "branch": {
     "private": true,
+
     "start": {
       "steps": [
-        { "prompt": "text", "desc": "Name the branch",                "id": "name" },
-        [ "git checkout -b {{name}} {{baseBranch}}",  "Create the branch" ],
-        [ "git push -u origin {{name}}",              "Push the branch to your remote copy of the project" ]
+        { "prompt": "text", "id": "name",                     "desc": "Name the branch" },
+        { "exec": "git checkout -b {{name}} {{baseBranch}}",  "desc": "Create the branch" },
+        { "exec": "git push -u origin {{name}}",              "desc": "Push the branch to your remote copy of the project" }
       ]
     },
-    "submit": {
-      "desc": "Submit a pull request for when the change is finished",
+    "save": {
+      "desc": "Commit and push changes made to files in the project",
       "steps": [
-        { "exec": "git diff --exit-code", "desc": "Test for unadded changes {{ args.[0] }}", "fail": "Make sure all changes have been added and committed, or stashed, before switching branches" },
-        { "exec": "git diff --cached --exit-code", "desc": "Test for uncommitted changes", "fail": "Make sure all changes have been added and committed, or stashed, before switching branches" },
-        { "include": "test" },
-        { "exec": "git rev-parse --abbrev-ref HEAD", "desc": "Get the current branch", "id": "branch" },
-        { "prompt": "confirm", "desc": "Are you sure {{branch}} is the branch you want to submit?" },
-        { "prompt": "text", "desc": "Which github user or org are you submitting from?", "id": "user" },
-        { "open": "{{project.urls.repo_ui}}/compare/videojs:{{baseBranch}}...{{user}}:{{branch}}", "desc": "Open the github pull request page" }
+        { "include": "branch confirm" },
+        { "prompt": "text", "id": "message",         "desc": "Briefly describe the changes made" },
+        { "exec": "git add .",                       "desc": "Add the changes" },
+        { "exec": "git commit -m '{{message}}'",     "desc": "Commit the changes" },
+        { "exec": "git push origin {{branch_name}}", "desc": "Push the changes to your remote copy of the project" }
+      ]
+    },
+    "check": {
+      "private": true,
+      "desc": "Check for unsaved changes",
+      "steps": [
+        { "exec": "git diff --exit-code",          "desc": "Ensure there's no unadded changes",     "fail": "Make sure all changes have been saved (added and committed) or stashed" },
+        { "exec": "git diff --cached --exit-code", "desc": "Ensure there's no uncommitted changes", "fail": "Make sure all changes have been saved (added and committed) or stashed" }
+      ]
+    },
+    "name": {
+      "private": true,
+      "steps": [
+        { "exec": "git rev-parse --abbrev-ref HEAD", "desc": "Get the current branch", "id": "branch_name" }
+      ]
+    },
+    "confirm": {
+      "private": true,
+      "steps": [
+        { "include": "branch name" },
+        { "prompt": "confirm", "desc": "Are you sure *{{branch_name}}* is the correct branch?" }
       ]
     },
     "delete": {
       "desc": "Delete the current branch",
       "steps": [
-        { "exec": "git rev-parse --abbrev-ref HEAD", "desc": "Get the current branch name", "id": "name" },
-        { "prompt": "confirm", "desc": "Are you sure '{{name}}' is the branch you want to delete?" },
-        { "exec": "git branch -D {{name}}",          "desc": "Delete the local copy of the branch" },
-        { "exec": "git push origin :{{name}}",       "desc": "Delete the remote copy of the branch" }
+        { "include": "branch confirm" },
+        { "exec": "git checkout master",              "desc": "Exit the branch being deleted" },
+        { "exec": "git branch -D {{branch_name}}",    "desc": "Delete the local copy of the branch" },
+        { "exec": "git push origin :{{branch_name}}", "desc": "Delete the remote copy of the branch" }
       ]
     }
   },
 
   "pull_request": {
     "private": true,
+    "desc": "Pull request related commands",
 
+    "prepare": {
+      "private": true,
+      "steps": [
+        { "include": "branch check" },
+        { "include": "branch confirm" },
+        { "include": "test" },
+        { "prompt": "text", "desc": "Which github user or org are you submitting from?", "id": "user" }
+      ]
+    },
+    "submit": {
+      "desc": "Submit a pull request for when the change is finished",
+      "steps": [
+        { "include": "pull_request prepare" },
+        { "open": "{{meta.urls.repo_ui}}/compare/videojs:{{baseBranch}}...{{user}}:{{branch_name}}", "desc": "Open the github pull request page" }
+      ]
+    },
     "review": {
       "steps": [
         { "prompt": "text", "desc": "What is the the pull request number?", "id": "prNum" },
-        { "get": "{{project.urls.repo_api}}/pulls/{{prNum}}",   "desc": "Get the PR information", "id": "pr" },
+        { "get": "{{meta.urls.repo_api}}/pulls/{{prNum}}",   "desc": "Get the PR information", "id": "pr" },
         [ "git fetch {{pr.head.repo.ssh_url}} {{pr.head.ref}}", "Get the pull request changes but don't merge them" ],
         [ "git merge-base master FETCH_HEAD",                   "Get the common ancestor commit", "base" ],
         [ "git checkout -b review-{{pr.user.login}}-{{pr.head.ref}} {{base}}", "Create a new local branch for the pull request that has a base of the common commit" ],
@@ -227,33 +310,26 @@
         [ "grunt test",                                         "Build and run tests" ]
       ]
     },
-
     "modify": {
-      "desc": "Submit a modification to an existing pull request",
+      "desc": "Submit a modification to a pull request that you are currently reviewing",
       "steps": [
-        { "exec": "git diff --exit-code",            "desc": "Test for unadded changes",     "fail": "Make sure all changes have been added and committed before submitting changes" },
-        { "exec": "git diff --cached --exit-code",   "desc": "Test for uncommitted changes", "fail": "Make sure all changes have been committed before submitting changes" },
-        { "include": "test" },
-        { "exec": "git rev-parse --abbrev-ref HEAD", "desc": "Get the current branch", "id": "branch" },
-        { "prompt": "confirm", "desc": "Are you sure {{branch}} is the branch you want to submit?" },
-        { "prompt": "text", "desc": "Which github user or org are you submitting from?", "id": "user" },
-        { "prompt": "text", "desc": "What is the the pull request number?",              "id": "prNum" },
-        { "get": "{{project.urls.repo_api}}/pulls/{{prNum}}", "desc": "Get the PR information", "id": "pr" },
-        { "exec": "git push -u origin {{branch}}",                                "desc": "Push the changes to the remote repo" },
-        { "open": "https://github.com/{{user}}/video.js/compare/{{pr.head.label}}...{{user}}:{{branch}}", "desc": "Open the github pull request page" }
+        { "include": "pull_request prepare" },
+        { "prompt": "text", "desc": "What is the the pull request number?",                  "id": "prNum" },
+        { "get": "{{meta.urls.repo_api}}/pulls/{{prNum}}", "desc": "Get the PR information", "id": "pr" },
+        { "exec": "git push -u origin {{branch_name}}",                                "desc": "Push the changes to the remote repo" },
+        { "open": "https://github.com/{{user}}/video.js/compare/{{pr.head.label}}...{{user}}:{{branch_name}}", "desc": "Open the github pull request page" }
       ]
     },
-
     "accept": {
       "steps": [
-        { "prompt": "text", "desc": "What is the the pull request number?",              "id": "prNum" },
-        { "get": "{{project.urls.repo_api}}/pulls/{{prNum}}",          "desc": "Get the PR information", "id": "pr" },
-        { "get": "{{project.urls.repo_api}}/pulls/{{prNum}}/commits",  "desc": "Get the PR commits to access author info", "id": "prCommits" },
+        { "prompt": "text", "id": "prNum",                             "desc": "What is the the pull request number?" },
+        { "get": "{{meta.urls.repo_api}}/pulls/{{prNum}}",             "desc": "Get the PR information", "id": "pr" },
+        { "get": "{{meta.urls.repo_api}}/pulls/{{prNum}}/commits",     "desc": "Get the PR commits to access author info", "id": "prCommits" },
         [ "git checkout -b {{pr.user.login}}-{{pr.head.ref}} {{pr.base.ref}}", "Create a new branch for merging the changes" ],
         [ "git fetch {{pr.head.repo.ssh_url}} {{pr.head.ref}}",                "Fetch the changes" ],
         [ "git merge --no-commit --squash FETCH_HEAD",                         "Merge the changes in without committing so they can be squashed" ],
         [ "grunt test",                                                        "Run tests to make sure they still pass" ],
-        { "prompt": "text", "desc": "Describe this change in one line",                  "id": "line" },
+        { "prompt": "text", "id": "line",                              "desc": "Describe this change in one line" },
         [ "grunt chg-add:'{{line}} ([view](https\\://github.com/videojs/video.js/pull/{{prNum}}))'", "Add a line to the changelog" ],
         [ "git add CHANGELOG.md",                                              "Add the changlelog change to be committed" ],
         [ "git commit -a --author='{{prCommits.[0].commit.author.name}} <{{prCommits.[0].commit.author.email}}>' -m '{{line}}. closes #{{prNum}}'", "Commit the changes" ],

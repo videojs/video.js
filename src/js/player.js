@@ -227,29 +227,6 @@ vjs.Player.prototype.createEl = function(){
   // Remove width/height attrs from tag so CSS can make it 100% width/height
   tag.removeAttribute('width');
   tag.removeAttribute('height');
-  // Empty video tag tracks so the built-in player doesn't use them also.
-  // This may not be fast enough to stop HTML5 browsers from reading the tags
-  // so we'll need to turn off any default tracks if we're manually doing
-  // captions and subtitles. videoElement.textTracks
-  if (tag.hasChildNodes()) {
-    var nodes, nodesLength, i, node, nodeName, removeNodes;
-
-    nodes = tag.childNodes;
-    nodesLength = nodes.length;
-    removeNodes = [];
-
-    while (nodesLength--) {
-      node = nodes[nodesLength];
-      nodeName = node.nodeName.toLowerCase();
-      if (nodeName === 'track') {
-        removeNodes.push(node);
-      }
-    }
-
-    for (i=0; i<removeNodes.length; i++) {
-      tag.removeChild(removeNodes[i]);
-    }
-  }
 
   // Copy over all the attributes from the tag, including ID and class
   // ID will now reference player box, not the video tag
@@ -389,6 +366,8 @@ vjs.Player.prototype.unloadTech = function(){
 vjs.Player.prototype.onLoadStart = function() {
   // TODO: Update to use `emptied` event instead. See #1277.
 
+  this.removeClass('vjs-ended');
+
   // reset the error state
   this.error(null);
 
@@ -400,9 +379,6 @@ vjs.Player.prototype.onLoadStart = function() {
   } else {
     // reset the hasStarted state
     this.hasStarted(false);
-    this.one('play', function(){
-      this.hasStarted(true);
-    });
   }
 };
 
@@ -449,8 +425,13 @@ vjs.Player.prototype.onLoadedAllData;
  * @event play
  */
 vjs.Player.prototype.onPlay = function(){
+  this.removeClass('vjs-ended');
   this.removeClass('vjs-paused');
   this.addClass('vjs-playing');
+
+  // hide the poster when the user hits play
+  // https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-play
+  this.hasStarted(true);
 };
 
 /**
@@ -539,6 +520,7 @@ vjs.Player.prototype.onProgress = function(){
  * @event ended
  */
 vjs.Player.prototype.onEnded = function(){
+  this.addClass('vjs-ended');
   if (this.options_['loop']) {
     this.currentTime(0);
     this.play();
@@ -587,6 +569,12 @@ vjs.Player.prototype.onFullscreenChange = function() {
     this.removeClass('vjs-fullscreen');
   }
 };
+
+/**
+ * Fired when an error occurs
+ * @event error
+ */
+vjs.Player.prototype.onError;
 
 // /* Player API
 // ================================================================================ */
@@ -1610,10 +1598,13 @@ vjs.Player.prototype.listenForUserActivity = function(){
 };
 
 /**
- * Gets or sets the current playback rate.
- * @param  {Boolean} rate   New playback rate to set.
+ * Gets or sets the current playback rate.  A playback rate of 
+ * 1.0 represents normal speed and 0.5 would indicate half-speed
+ * playback, for instance.
+ * @param  {Number} rate    New playback rate to set.
  * @return {Number}         Returns the new playback rate when setting
  * @return {Number}         Returns the current playback rate when getting
+ * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-playbackrate
  */
 vjs.Player.prototype.playbackRate = function(rate) {
   if (rate !== undefined) {
@@ -1653,9 +1644,97 @@ vjs.Player.prototype.isAudio = function(bool) {
   return this.isAudio_;
 };
 
+/**
+ * Returns the current state of network activity for the element, from
+ * the codes in the list below.
+ * - NETWORK_EMPTY (numeric value 0)
+ *   The element has not yet been initialised. All attributes are in
+ *   their initial states.
+ * - NETWORK_IDLE (numeric value 1)
+ *   The element's resource selection algorithm is active and has
+ *   selected a resource, but it is not actually using the network at
+ *   this time.
+ * - NETWORK_LOADING (numeric value 2)
+ *   The user agent is actively trying to download data.
+ * - NETWORK_NO_SOURCE (numeric value 3)
+ *   The element's resource selection algorithm is active, but it has
+ *   not yet found a resource to use.
+ * @return {Number} the current network activity state
+ * @see https://html.spec.whatwg.org/multipage/embedded-content.html#network-states
+ */
+vjs.Player.prototype.networkState = function(){
+  return this.techGet('networkState');
+};
+
+/**
+ * Returns a value that expresses the current state of the element
+ * with respect to rendering the current playback position, from the
+ * codes in the list below.
+ * - HAVE_NOTHING (numeric value 0)
+ *   No information regarding the media resource is available.
+ * - HAVE_METADATA (numeric value 1)
+ *   Enough of the resource has been obtained that the duration of the
+ *   resource is available.
+ * - HAVE_CURRENT_DATA (numeric value 2)
+ *   Data for the immediate current playback position is available.
+ * - HAVE_FUTURE_DATA (numeric value 3)
+ *   Data for the immediate current playback position is available, as
+ *   well as enough data for the user agent to advance the current
+ *   playback position in the direction of playback.
+ * - HAVE_ENOUGH_DATA (numeric value 4)
+ *   The user agent estimates that enough data is available for
+ *   playback to proceed uninterrupted.
+ * @return {Number} the current playback rendering state
+ * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-readystate
+ */
+vjs.Player.prototype.readyState = function(){
+  return this.techGet('readyState');
+};
+
+/**
+ * Text tracks are tracks of timed text events.
+ * Captions - text displayed over the video for the hearing impaired
+ * Subtitles - text displayed over the video for those who don't understand language in the video
+ * Chapters - text displayed in a menu allowing the user to jump to particular points (chapters) in the video
+ * Descriptions (not supported yet) - audio descriptions that are read back to the user by a screen reading device
+ */
+
+/**
+ * Get an array of associated text tracks. captions, subtitles, chapters, descriptions
+ * http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-texttracks
+ * @return {Array}           Array of track objects
+ */
+vjs.Player.prototype.textTracks = function(){
+  // cannot use techGet directly because it checks to see whether the tech is ready.
+  // Flash is unlikely to be ready in time but textTracks should still work.
+  return this.tech && this.tech['textTracks']();
+};
+
+vjs.Player.prototype.remoteTextTracks = function() {
+  return this.tech && this.tech['remoteTextTracks']();
+};
+
+/**
+ * Add a text track
+ * In addition to the W3C settings we allow adding additional info through options.
+ * http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-addtexttrack
+ * @param {String}  kind        Captions, subtitles, chapters, descriptions, or metadata
+ * @param {String=} label       Optional label
+ * @param {String=} language    Optional language
+ */
+vjs.Player.prototype.addTextTrack = function(kind, label, language) {
+  return this.tech && this.tech['addTextTrack'](kind, label, language);
+};
+
+vjs.Player.prototype.addRemoteTextTrack = function(options) {
+  return this.tech && this.tech['addRemoteTextTrack'](options);
+};
+
+vjs.Player.prototype.removeRemoteTextTrack = function(track) {
+  this.tech && this.tech['removeRemoteTextTrack'](track);
+};
+
 // Methods to add support for
-// networkState: function(){ return this.techCall('networkState'); },
-// readyState: function(){ return this.techCall('readyState'); },
 // initialTime: function(){ return this.techCall('initialTime'); },
 // startOffsetTime: function(){ return this.techCall('startOffsetTime'); },
 // played: function(){ return this.techCall('played'); },

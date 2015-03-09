@@ -20,9 +20,23 @@ You can download the Video.js source and host it on your own servers, or use the
 
 ### CDN Version ###
 ```html
-<link href="//vjs.zencdn.net/4.11/video-js.css" rel="stylesheet">
-<script src="//vjs.zencdn.net/4.11/video.js"></script>
+<link href="//vjs.zencdn.net/4.12/video-js.css" rel="stylesheet">
+<script src="//vjs.zencdn.net/4.12/video.js"></script>
 ```
+
+
+## Install via package manager
+
+### NPM
+```
+$ npm install --save video.js
+```
+
+### Bower
+```
+$ bower install --save video.js
+```
+
 
 ### Self Hosted. ###
 To entirely self-host, you'll need to pull in the font files and let Video.js know where the swf is located. If you simply copy the dist folder or zip file contents into your project everything
