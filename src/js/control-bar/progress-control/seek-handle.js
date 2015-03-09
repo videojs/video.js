@@ -18,7 +18,7 @@ class SeekHandle extends SliderHandle {
 
   /** @inheritDoc */
   createEl() {
-    return super.createEl.call('div', {
+    return super.createEl('div', {
       className: 'vjs-seek-handle',
       'aria-live': 'off'
     });
