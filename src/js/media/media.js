@@ -262,10 +262,10 @@ vjs.MediaTechController.prototype.stopTracking = function () {
   if (this.manualProgress) { this.manualProgressOff(); }
 
   if (this.manualTimeUpdates) { this.manualTimeUpdatesOff(); }
-}
+};
 
 vjs.MediaTechController.prototype.dispose = function() {
-  this.stopTracking();  
+  this.stopTracking();
   this.removeControls();
 
   vjs.Component.prototype.dispose.call(this);
