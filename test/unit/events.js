@@ -1,5 +1,7 @@
 module('Events');
 
+var Events = vjs.Events;
+
 test('should add and remove an event listener to an element', function(){
   expect(1);
 
@@ -8,10 +10,10 @@ test('should add and remove an event listener to an element', function(){
     ok(true, 'Click Triggered');
   };
 
-  vjs.on(el, 'click', listener);
-  vjs.trigger(el, 'click'); // 1 click
-  vjs.off(el, 'click', listener);
-  vjs.trigger(el, 'click'); // No click should happen.
+  Events.on(el, 'click', listener);
+  Events.trigger(el, 'click'); // 1 click
+  Events.off(el, 'click', listener);
+  Events.trigger(el, 'click'); // No click should happen.
 });
 
 test('should add and remove multiple event listeners to an element with a single call', function(){
@@ -22,22 +24,22 @@ test('should add and remove multiple event listeners to an element with a single
     ok(true, 'Callback triggered');
   };
 
-  vjs.on(el, ['click', 'event1', 'event2'], listener);
+  Events.on(el, ['click', 'event1', 'event2'], listener);
 
-  vjs.trigger(el, 'click');
-  vjs.trigger(el, 'click');
-  vjs.off(el, 'click', listener);
-  vjs.trigger(el, 'click'); // No click should happen.
+  Events.trigger(el, 'click');
+  Events.trigger(el, 'click');
+  Events.off(el, 'click', listener);
+  Events.trigger(el, 'click'); // No click should happen.
 
-  vjs.trigger(el, 'event1');
-  vjs.trigger(el, 'event1');
-  vjs.off(el, 'event1', listener);
-  vjs.trigger(el, 'event1'); // No event1 should happen.
+  Events.trigger(el, 'event1');
+  Events.trigger(el, 'event1');
+  Events.off(el, 'event1', listener);
+  Events.trigger(el, 'event1'); // No event1 should happen.
 
-  vjs.trigger(el, 'event2');
-  vjs.trigger(el, 'event2');
-  vjs.off(el, 'event2', listener);
-  vjs.trigger(el, 'event2'); // No event2 should happen.
+  Events.trigger(el, 'event2');
+  Events.trigger(el, 'event2');
+  Events.off(el, 'event2', listener);
+  Events.trigger(el, 'event2'); // No event2 should happen.
 });
 
 test('should remove all listeners of a type', function(){
@@ -50,14 +52,14 @@ test('should remove all listeners of a type', function(){
     clicks++;
   };
 
-  vjs.on(el, 'click', listener);
-  vjs.on(el, 'click', listener2);
-  vjs.trigger(el, 'click'); // 2 clicks
+  Events.on(el, 'click', listener);
+  Events.on(el, 'click', listener2);
+  Events.trigger(el, 'click'); // 2 clicks
 
   ok(clicks === 2, 'both click listeners fired');
 
-  vjs.off(el, 'click');
-  vjs.trigger(el, 'click'); // No click should happen.
+  Events.off(el, 'click');
+  Events.trigger(el, 'click'); // No click should happen.
 
   ok(clicks === 2, 'no click listeners fired');
 });
@@ -72,16 +74,16 @@ test('should remove all listeners of an array of types', function(){
     calls++;
   };
 
-  vjs.on(el, ['click', 'event1'], listener);
-  vjs.on(el, ['click', 'event1'], listener2);
-  vjs.trigger(el, 'click'); // 2 calls
-  vjs.trigger(el, 'event1'); // 2 calls
+  Events.on(el, ['click', 'event1'], listener);
+  Events.on(el, ['click', 'event1'], listener2);
+  Events.trigger(el, 'click'); // 2 calls
+  Events.trigger(el, 'event1'); // 2 calls
 
   ok(calls === 4, 'both click listeners fired');
 
-  vjs.off(el, ['click', 'event1']);
-  vjs.trigger(el, 'click'); // No click should happen.
-  vjs.trigger(el, 'event1'); // No event1 should happen.
+  Events.off(el, ['click', 'event1']);
+  Events.trigger(el, 'click'); // No click should happen.
+  Events.trigger(el, 'event1'); // No event1 should happen.
 
   ok(calls === 4, 'no event listeners fired');
 });
@@ -97,17 +99,17 @@ test('should remove all listeners from an element', function(){
     ok(true, 'Fake2 Triggered');
   };
 
-  vjs.on(el, 'fake1', listener);
-  vjs.on(el, 'fake2', listener2);
+  Events.on(el, 'fake1', listener);
+  Events.on(el, 'fake2', listener2);
 
-  vjs.trigger(el, 'fake1');
-  vjs.trigger(el, 'fake2');
+  Events.trigger(el, 'fake1');
+  Events.trigger(el, 'fake2');
 
-  vjs.off(el);
+  Events.off(el);
 
   // No listener should happen.
-  vjs.trigger(el, 'fake1');
-  vjs.trigger(el, 'fake2');
+  Events.trigger(el, 'fake1');
+  Events.trigger(el, 'fake2');
 });
 
 test('should listen only once', function(){
@@ -118,9 +120,9 @@ test('should listen only once', function(){
     ok(true, 'Click Triggered');
   };
 
-  vjs.one(el, 'click', listener);
-  vjs.trigger(el, 'click'); // 1 click
-  vjs.trigger(el, 'click'); // No click should happen.
+  Events.one(el, 'click', listener);
+  Events.trigger(el, 'click'); // 1 click
+  Events.trigger(el, 'click'); // No click should happen.
 });
 
 test( 'should listen only once in multiple events from a single call', function(){
@@ -131,13 +133,13 @@ test( 'should listen only once in multiple events from a single call', function(
     ok(true, 'Callback Triggered');
   };
 
-  vjs.one(el, ['click', 'event1', 'event2'], listener);
-  vjs.trigger(el, 'click'); // 1 click
-  vjs.trigger(el, 'click'); // No click should happen.
-  vjs.trigger(el, 'event1'); // event1 must be handled.
-  vjs.trigger(el, 'event1'); // No event1 should be handled.
-  vjs.trigger(el, 'event2'); // event2 must be handled.
-  vjs.trigger(el, 'event2'); // No event2 should be handled.
+  Events.one(el, ['click', 'event1', 'event2'], listener);
+  Events.trigger(el, 'click'); // 1 click
+  Events.trigger(el, 'click'); // No click should happen.
+  Events.trigger(el, 'event1'); // event1 must be handled.
+  Events.trigger(el, 'event1'); // No event1 should be handled.
+  Events.trigger(el, 'event2'); // event2 must be handled.
+  Events.trigger(el, 'event2'); // No event2 should be handled.
 });
 
 test('should stop immediate propagtion', function(){
@@ -145,16 +147,16 @@ test('should stop immediate propagtion', function(){
 
   var el = document.createElement('div');
 
-  vjs.on(el, 'test', function(e){
+  Events.on(el, 'test', function(e){
     ok(true, 'First listener fired');
     e.stopImmediatePropagation();
   });
 
-  vjs.on(el, 'test', function(e){
+  Events.on(el, 'test', function(e){
     ok(false, 'Second listener fired');
   });
 
-  vjs.trigger(el, 'test');
+  Events.trigger(el, 'test');
 });
 
 test('should bubble up DOM unless bubbles == false', function(){
@@ -164,22 +166,22 @@ test('should bubble up DOM unless bubbles == false', function(){
   var inner = outer.appendChild(document.createElement('div'));
 
   // Verify that if bubbles === true, event bubbles up dom.
-  vjs.on(inner, 'bubbles', function(e){
+  Events.on(inner, 'bubbles', function(e){
     ok(true, 'Inner listener fired');
   });
-  vjs.on(outer, 'bubbles', function(e){
+  Events.on(outer, 'bubbles', function(e){
     ok(true, 'Outer listener fired');
   });
-  vjs.trigger(inner, { type:'bubbles', target:inner, bubbles:true });
+  Events.trigger(inner, { type:'bubbles', target:inner, bubbles:true });
 
   // Only change 'bubbles' to false, and verify only inner handler is called.
-  vjs.on(inner, 'nobub', function(e){
+  Events.on(inner, 'nobub', function(e){
     ok(true, 'Inner listener fired');
   });
-  vjs.on(outer, 'nobub', function(e){
+  Events.on(outer, 'nobub', function(e){
     ok(false, 'Outer listener fired');
   });
-  vjs.trigger(inner, { type:'nobub', target:inner, bubbles:false });
+  Events.trigger(inner, { type:'nobub', target:inner, bubbles:false });
 });
 
 test('should have a defaultPrevented property on an event that was prevent from doing default action', function() {
@@ -187,14 +189,14 @@ test('should have a defaultPrevented property on an event that was prevent from 
 
   var el = document.createElement('div');
 
-  vjs.on(el, 'test', function(e){
+  Events.on(el, 'test', function(e){
     ok(true, 'First listener fired');
     e.preventDefault();
   });
 
-  vjs.on(el, 'test', function(e){
+  Events.on(el, 'test', function(e){
     ok(e.defaultPrevented, 'Should have `defaultPrevented` to signify preventDefault being called');
   });
 
-  vjs.trigger(el, 'test');
+  Events.trigger(el, 'test');
 });

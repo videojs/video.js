@@ -1,5 +1,7 @@
 module('Button');
 
+var Button = vjs.Button;
+
 test('should localize its text', function(){
   expect(1);
 
@@ -14,7 +16,7 @@ test('should localize its text', function(){
     }
   });
 
-  testButton = new vjs.Button(player);
+  testButton = new Button(player);
   testButton.buttonText = 'Play';
   el = testButton.createEl();
 

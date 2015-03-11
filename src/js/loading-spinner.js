@@ -1,3 +1,5 @@
+import Component from './component';
+
 /* Loading Spinner
 ================================================================================ */
 /**
@@ -7,10 +9,10 @@
  * @class
  * @constructor
  */
-vjs.LoadingSpinner = vjs.Component.extend({
+let LoadingSpinner = Component.extend({
   /** @constructor */
   init: function(player, options){
-    vjs.Component.call(this, player, options);
+    Component.call(this, player, options);
 
     // MOVING DISPLAY HANDLING TO CSS
 
@@ -34,8 +36,12 @@ vjs.LoadingSpinner = vjs.Component.extend({
   }
 });
 
-vjs.LoadingSpinner.prototype.createEl = function(){
-  return vjs.Component.prototype.createEl.call(this, 'div', {
+Component.registerComponent('LoadingSpinner', LoadingSpinner);
+
+LoadingSpinner.prototype.createEl = function(){
+  return Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-loading-spinner'
   });
 };
+
+export default LoadingSpinner;

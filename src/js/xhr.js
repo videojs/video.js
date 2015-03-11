@@ -1,3 +1,7 @@
+import VjsUtils from './utils';
+import * as VjsLib from './lib';
+import window from 'global/window';
+
 /**
  * Simple http request for retrieving external files (e.g. text tracks)
  *
@@ -28,8 +32,8 @@
  * @param  {Function}       callback  The callback function
  * @returns {Object}                  The request
  */
-vjs.xhr = function(options, callback){
-  var XHR, request, urlInfo, winLoc, fileUrl, crossOrigin, abortTimeout, successHandler, errorHandler;
+var xhr = function(options, callback){
+  let abortTimeout;
 
   // If options is a string it's the url
   if (typeof options === 'string') {
@@ -39,29 +43,14 @@ vjs.xhr = function(options, callback){
   }
 
   // Merge with default options
-  videojs.util.mergeOptions({
+  VjsUtils.mergeOptions({
     method: 'GET',
     timeout: 45 * 1000
   }, options);
 
   callback = callback || function(){};
 
-  successHandler = function(){
-    window.clearTimeout(abortTimeout);
-    callback(null, request, request.response || request.responseText);
-  };
-
-  errorHandler = function(err){
-    window.clearTimeout(abortTimeout);
-
-    if (!err || typeof err === 'string') {
-      err = new Error(err);
-    }
-
-    callback(err, request);
-  };
-
-  XHR = window.XMLHttpRequest;
+  let XHR = window.XMLHttpRequest;
 
   if (typeof XHR === 'undefined') {
     // Shim XMLHttpRequest for older IEs
@@ -73,15 +62,31 @@ vjs.xhr = function(options, callback){
     };
   }
 
-  request = new XHR();
+  let request = new XHR();
   // Store a reference to the url on the request instance
   request.uri = options.uri;
 
-  urlInfo = vjs.parseUrl(options.uri);
-  winLoc = window.location;
+  let urlInfo = VjsLib.parseUrl(options.uri);
+  let winLoc = window.location;
+
+  let successHandler = function(){
+    window.clearTimeout(abortTimeout);
+    callback(null, request, request.response || request.responseText);
+  };
+
+  let errorHandler = function(err){
+    window.clearTimeout(abortTimeout);
+
+    if (!err || typeof err === 'string') {
+      err = new Error(err);
+    }
+
+    callback(err, request);
+  };
+
   // Check if url is for another domain/origin
   // IE8 doesn't know location.origin, so we won't rely on it here
-  crossOrigin = (urlInfo.protocol + urlInfo.host) !== (winLoc.protocol + winLoc.host);
+  const crossOrigin = (urlInfo.protocol + urlInfo.host) !== (winLoc.protocol + winLoc.host);
 
   // XDomainRequest -- Use for IE if XMLHTTPRequest2 isn't available
   // 'withCredentials' is only available in XMLHTTPRequest2
@@ -97,7 +102,7 @@ vjs.xhr = function(options, callback){
 
   // XMLHTTPRequest
   } else {
-    fileUrl = (urlInfo.protocol == 'file:' || winLoc.protocol == 'file:');
+    const fileUrl = (urlInfo.protocol == 'file:' || winLoc.protocol == 'file:');
 
     request.onreadystatechange = function() {
       if (request.readyState === 4) {
@@ -149,3 +154,5 @@ vjs.xhr = function(options, callback){
 
   return request;
 };
+
+export default xhr;

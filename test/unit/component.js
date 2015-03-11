@@ -7,6 +7,8 @@ module('Component', {
   }
 });
 
+var Component = vjs.Component;
+
 var getFakePlayer = function(){
   return {
     // Fake player requries an ID
@@ -16,13 +18,13 @@ var getFakePlayer = function(){
 };
 
 test('should create an element', function(){
-  var comp = new vjs.Component(getFakePlayer(), {});
+  var comp = new Component(getFakePlayer(), {});
 
   ok(comp.el().nodeName);
 });
 
 test('should add a child component', function(){
-  var comp = new vjs.Component(getFakePlayer());
+  var comp = new Component(getFakePlayer());
 
   var child = comp.addChild('component');
 
@@ -34,7 +36,7 @@ test('should add a child component', function(){
 });
 
 test('should init child components from options', function(){
-  var comp = new vjs.Component(getFakePlayer(), {
+  var comp = new Component(getFakePlayer(), {
     children: {
       'component': true
     }
@@ -45,7 +47,7 @@ test('should init child components from options', function(){
 });
 
 test('should init child components from simple children array', function(){
-  var comp = new vjs.Component(getFakePlayer(), {
+  var comp = new Component(getFakePlayer(), {
     children: [
       'component',
       'component',
@@ -58,7 +60,7 @@ test('should init child components from simple children array', function(){
 });
 
 test('should init child components from children array of objects', function(){
-  var comp = new vjs.Component(getFakePlayer(), {
+  var comp = new Component(getFakePlayer(), {
     children: [
       { 'name': 'component' },
       { 'name': 'component' },
@@ -72,7 +74,7 @@ test('should init child components from children array of objects', function(){
 
 test('should do a deep merge of child options', function(){
   // Create a default option for component
-  vjs.Component.prototype.options_ = {
+  Component.prototype.options_ = {
     'example': {
       'childOne': { 'foo': 'bar', 'asdf': 'fdsa' },
       'childTwo': {},
@@ -80,7 +82,7 @@ test('should do a deep merge of child options', function(){
     }
   };
 
-  var comp = new vjs.Component(getFakePlayer(), {
+  var comp = new Component(getFakePlayer(), {
     'example': {
       'childOne': { 'foo': 'baz', 'abc': '123' },
       'childThree': false,
@@ -98,10 +100,10 @@ test('should do a deep merge of child options', function(){
   ok(children['childThree'] === false, 'object two levels deep removed');
   ok(children['childFour'], 'object two levels deep added');
 
-  ok(vjs.Component.prototype.options_['example']['childOne']['foo'] === 'bar', 'prototype options were not overridden');
+  ok(Component.prototype.options_['example']['childOne']['foo'] === 'bar', 'prototype options were not overridden');
 
   // Reset default component options to none
-  vjs.Component.prototype.options_ = null;
+  Component.prototype.options_ = null;
 });
 
 test('should allows setting child options at the parent options level', function(){
@@ -121,7 +123,7 @@ test('should allows setting child options at the parent options level', function
   };
 
   try {
-    parent = new vjs.Component(getFakePlayer(), options);
+    parent = new Component(getFakePlayer(), options);
   } catch(err) {
     ok(false, 'Child with `false` option was initialized');
   }
@@ -143,7 +145,7 @@ test('should allows setting child options at the parent options level', function
   };
 
   try {
-    parent = new vjs.Component(getFakePlayer(), options);
+    parent = new Component(getFakePlayer(), options);
   } catch(err) {
     ok(false, 'Child with `false` option was initialized');
   }
@@ -151,7 +153,7 @@ test('should allows setting child options at the parent options level', function
 });
 
 test('should dispose of component and children', function(){
-  var comp = new vjs.Component(getFakePlayer());
+  var comp = new Component(getFakePlayer());
 
   // Add a child
   var child = comp.addChild('Component');
@@ -182,7 +184,7 @@ test('should dispose of component and children', function(){
 });
 
 test('should add and remove event listeners to element', function(){
-  var comp = new vjs.Component(getFakePlayer(), {});
+  var comp = new Component(getFakePlayer(), {});
 
   // No need to make this async because we're triggering events inline.
   // We're going to trigger the event after removing the listener,
@@ -201,7 +203,7 @@ test('should add and remove event listeners to element', function(){
 });
 
 test('should trigger a listener once using one()', function(){
-  var comp = new vjs.Component(getFakePlayer(), {});
+  var comp = new Component(getFakePlayer(), {});
 
   expect(1);
 
@@ -216,8 +218,8 @@ test('should trigger a listener once using one()', function(){
 
 test('should add listeners to other components and remove them', function(){
   var player = getFakePlayer(),
-      comp1 = new vjs.Component(player),
-      comp2 = new vjs.Component(player),
+      comp1 = new Component(player),
+      comp2 = new Component(player),
       listenerFired = 0,
       testListener;
 
@@ -248,8 +250,8 @@ test('should add listeners to other components and remove them', function(){
 
 test('should add listeners to other components and remove when them other component is disposed', function(){
   var player = getFakePlayer(),
-      comp1 = new vjs.Component(player),
-      comp2 = new vjs.Component(player),
+      comp1 = new Component(player),
+      comp2 = new Component(player),
       listenerFired = 0,
       testListener;
 
@@ -267,8 +269,8 @@ test('should add listeners to other components and remove when them other compon
 
 test('should add listeners to other components that are fired once', function(){
   var player = getFakePlayer(),
-      comp1 = new vjs.Component(player),
-      comp2 = new vjs.Component(player),
+      comp1 = new Component(player),
+      comp2 = new Component(player),
       listenerFired = 0,
       testListener;
 
@@ -286,7 +288,7 @@ test('should add listeners to other components that are fired once', function(){
 
 test('should add listeners to other element and remove them', function(){
   var player = getFakePlayer(),
-      comp1 = new vjs.Component(player),
+      comp1 = new Component(player),
       el = document.createElement('div'),
       listenerFired = 0,
       testListener;
@@ -323,7 +325,7 @@ test('should add listeners to other element and remove them', function(){
 
 test('should add listeners to other components that are fired once', function(){
   var player = getFakePlayer(),
-      comp1 = new vjs.Component(player),
+      comp1 = new Component(player),
       el = document.createElement('div'),
       listenerFired = 0,
       testListener;
@@ -350,7 +352,7 @@ test('should trigger a listener when ready', function(){
     ok(true, 'ready method listener fired');
   };
 
-  var comp = new vjs.Component(getFakePlayer(), {}, optionsReadyListener);
+  var comp = new Component(getFakePlayer(), {}, optionsReadyListener);
 
   comp.triggerReady();
 
@@ -361,7 +363,7 @@ test('should trigger a listener when ready', function(){
 });
 
 test('should add and remove a CSS class', function(){
-  var comp = new vjs.Component(getFakePlayer(), {});
+  var comp = new Component(getFakePlayer(), {});
 
   comp.addClass('test-class');
   ok(comp.el().className.indexOf('test-class') !== -1);
@@ -370,7 +372,7 @@ test('should add and remove a CSS class', function(){
 });
 
 test('should show and hide an element', function(){
-  var comp = new vjs.Component(getFakePlayer(), {});
+  var comp = new Component(getFakePlayer(), {});
 
   comp.hide();
   ok(comp.hasClass('vjs-hidden') === true);
@@ -383,7 +385,7 @@ test('dimension() should treat NaN and null as zero', function() {
   width = 300;
   height = 150;
 
-  comp = new vjs.Component(getFakePlayer(), {}),
+  comp = new Component(getFakePlayer(), {}),
   // set component dimension
 
   comp.dimensions(width, height);
@@ -408,7 +410,7 @@ test('dimension() should treat NaN and null as zero', function() {
 
 test('should change the width and height of a component', function(){
   var container = document.createElement('div');
-  var comp = new vjs.Component(getFakePlayer(), {});
+  var comp = new Component(getFakePlayer(), {});
   var el = comp.el();
   var fixture = document.getElementById('qunit-fixture');
 
@@ -437,7 +439,7 @@ test('should change the width and height of a component', function(){
 
 
 test('should use a defined content el for appending children', function(){
-  var CompWithContent = vjs.Component.extend();
+  var CompWithContent = Component.extend();
   CompWithContent.prototype.createEl = function(){
     // Create the main componenent element
     var el = vjs.createEl('div');
@@ -468,7 +470,7 @@ test('should emit a tap event', function(){
   var origTouch = vjs.TOUCH_ENABLED;
   vjs.TOUCH_ENABLED = true;
 
-  var comp = new vjs.Component(getFakePlayer());
+  var comp = new Component(getFakePlayer());
   var singleTouch = {};
 
   comp.emitTapEvents();
@@ -523,7 +525,7 @@ test('should emit a tap event', function(){
 test('should provide timeout methods that automatically get cleared on component disposal', function() {
   expect(4);
 
-  var comp = new vjs.Component(getFakePlayer());
+  var comp = new Component(getFakePlayer());
   var timeoutsFired = 0;
 
   comp.setTimeout(function() {
@@ -560,7 +562,7 @@ test('should provide timeout methods that automatically get cleared on component
 test('should provide interval methods that automatically get cleared on component disposal', function() {
   expect(13);
 
-  var comp = new vjs.Component(getFakePlayer());
+  var comp = new Component(getFakePlayer());
   var intervalsFired = 0;
 
   var interval = comp.setInterval(function() {

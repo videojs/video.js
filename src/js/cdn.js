@@ -1,3 +1,6 @@
+import pkg from '../../package.json';
+import window from 'global/window';
+
 /**
  * Google Analytics tracking pixel for the freely hosted version of Video.js
  * at vjs.zencdn.net. We'll use this data to develop a support matrix of
@@ -8,8 +11,12 @@
  *
  * @type {Image}
  */
-;(function(i,w,n,e,l){
-  l=w.location;
+var sendGaEvent = function(image) {
+  const i = new window.Image();
+  const w = window;
+  const n = window.navigator;
+  const l = window.location;
+  const e = window.encodeURIComponent;
 
   // Google Analytics has a limit of 10 million hits per month for free accounts.
   // The Video.js CDN goes over this (by a lot) and they've asked us to stop.
@@ -57,6 +64,8 @@
     // Random number used as cache buster instead of utmn
     +'&utmcc=__utma%3D1.'+Math.floor(Math.random()*1e10)+'.1.1.1.1%3B'
     // Custom Var: vjsv is the variable name and 1.0.0 is the VJS version
-    +'&utme=8(vjsv)9(v0.0.0)'
+    +'&utme=8(vjsv)9('+ pkg.version +')'
   ;
-})(new Image(),window,navigator,encodeURIComponent);
+};
+
+export default sendGaEvent;

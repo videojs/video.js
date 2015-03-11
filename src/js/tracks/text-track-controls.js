@@ -1,5 +1,7 @@
-(function() {
-'use strict';
+import Component from '../component';
+import Menu, { MenuItem, MenuButton } from '../menu';
+import * as VjsLib from '../lib';
+import window from 'global/window';
 
 /* Text Track Display
 ============================================================================= */
@@ -10,37 +12,37 @@
  *
  * @constructor
  */
-vjs.TextTrackDisplay = vjs.Component.extend({
+let TextTrackDisplay = Component.extend({
   /** @constructor */
   init: function(player, options, ready){
-    vjs.Component.call(this, player, options, ready);
+    Component.call(this, player, options, ready);
 
-    player.on('loadstart', vjs.bind(this, this.toggleDisplay));
+    player.on('loadstart', VjsLib.bind(this, this.toggleDisplay));
 
     // This used to be called during player init, but was causing an error
     // if a track should show by default and the display hadn't loaded yet.
     // Should probably be moved to an external track loader when we support
     // tracks that don't need a display.
-    player.ready(vjs.bind(this, function() {
+    player.ready(VjsLib.bind(this, function() {
       if (player.tech && player.tech['featuresNativeTextTracks']) {
         this.hide();
         return;
       }
 
-      var i, tracks, track;
+      player.on('fullscreenchange', VjsLib.bind(this, this.updateDisplay));
 
-      player.on('fullscreenchange', vjs.bind(this, this.updateDisplay));
-
-      tracks = player.options_['tracks'] || [];
-      for (i = 0; i < tracks.length; i++) {
-        track = tracks[i];
+      let tracks = player.options_['tracks'] || [];
+      for (let i = 0; i < tracks.length; i++) {
+        let track = tracks[i];
         this.player_.addRemoteTextTrack(track);
       }
     }));
   }
 });
 
-vjs.TextTrackDisplay.prototype.toggleDisplay = function() {
+Component.registerComponent('TextTrackDisplay', TextTrackDisplay);
+
+TextTrackDisplay.prototype.toggleDisplay = function() {
   if (this.player_.tech && this.player_.tech['featuresNativeTextTracks']) {
     this.hide();
   } else {
@@ -48,20 +50,20 @@ vjs.TextTrackDisplay.prototype.toggleDisplay = function() {
   }
 };
 
-vjs.TextTrackDisplay.prototype.createEl = function(){
-  return vjs.Component.prototype.createEl.call(this, 'div', {
+TextTrackDisplay.prototype.createEl = function(){
+  return Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-text-track-display'
   });
 };
 
-vjs.TextTrackDisplay.prototype.clearDisplay = function() {
+TextTrackDisplay.prototype.clearDisplay = function() {
   if (typeof window['WebVTT'] === 'function') {
     window['WebVTT']['processCues'](window, [], this.el_);
   }
 };
 
 // Add cue HTML to display
-var constructColor = function(color, opacity) {
+let constructColor = function(color, opacity) {
   return 'rgba(' +
     // color looks like "#f0e"
     parseInt(color[1] + color[1], 16) + ',' +
@@ -69,9 +71,9 @@ var constructColor = function(color, opacity) {
     parseInt(color[3] + color[3], 16) + ',' +
     opacity + ')';
 };
-var darkGray = '#222';
-var lightGray = '#ccc';
-var fontMap = {
+const darkGray = '#222';
+const lightGray = '#ccc';
+const fontMap = {
   monospace:             'monospace',
   sansSerif:             'sans-serif',
   serif:                 'serif',
@@ -83,17 +85,15 @@ var fontMap = {
   script:                '"Monotype Corsiva", cursive',
   smallcaps:             '"Andale Mono", "Lucida Console", monospace, sans-serif'
 };
-var tryUpdateStyle = function(el, style, rule) {
+let tryUpdateStyle = function(el, style, rule) {
   // some style changes will throw an error, particularly in IE8. Those should be noops.
   try {
     el.style[style] = rule;
   } catch (e) {}
 };
 
-vjs.TextTrackDisplay.prototype.updateDisplay = function() {
-  var tracks = this.player_.textTracks(),
-      i = 0,
-      track;
+TextTrackDisplay.prototype.updateDisplay = function() {
+  var tracks = this.player_.textTracks();
 
   this.clearDisplay();
 
@@ -101,35 +101,31 @@ vjs.TextTrackDisplay.prototype.updateDisplay = function() {
     return;
   }
 
-  for (; i < tracks.length; i++) {
-    track = tracks[i];
+  for (let i=0; i < tracks.length; i++) {
+    let track = tracks[i];
     if (track['mode'] === 'showing') {
       this.updateForTrack(track);
     }
   }
 };
 
-vjs.TextTrackDisplay.prototype.updateForTrack = function(track) {
+TextTrackDisplay.prototype.updateForTrack = function(track) {
   if (typeof window['WebVTT'] !== 'function' || !track['activeCues']) {
     return;
   }
 
-  var i = 0,
-      property,
-      cueDiv,
-      overrides = this.player_['textTrackSettings'].getValues(),
-      fontSize,
-      cues = [];
+  let overrides = this.player_['textTrackSettings'].getValues();
 
-  for (; i < track['activeCues'].length; i++) {
+  let cues = [];
+  for (let i = 0; i < track['activeCues'].length; i++) {
     cues.push(track['activeCues'][i]);
   }
 
   window['WebVTT']['processCues'](window, track['activeCues'], this.el_);
 
-  i = cues.length;
+  let i = cues.length;
   while (i--) {
-    cueDiv = cues[i].displayState;
+    let cueDiv = cues[i].displayState;
     if (overrides.color) {
       cueDiv.firstChild.style.color = overrides.color;
     }
@@ -169,7 +165,7 @@ vjs.TextTrackDisplay.prototype.updateForTrack = function(track) {
       }
     }
     if (overrides.fontPercent && overrides.fontPercent !== 1) {
-      fontSize = window.parseFloat(cueDiv.style.fontSize);
+      const fontSize = window.parseFloat(cueDiv.style.fontSize);
       cueDiv.style.fontSize = (fontSize * overrides.fontPercent) + 'px';
       cueDiv.style.height = 'auto';
       cueDiv.style.top = 'auto';
@@ -185,35 +181,28 @@ vjs.TextTrackDisplay.prototype.updateForTrack = function(track) {
   }
 };
 
-
 /**
  * The specific menu item type for selecting a language within a text track kind
  *
  * @constructor
  */
-vjs.TextTrackMenuItem = vjs.MenuItem.extend({
+let TextTrackMenuItem = MenuItem.extend({
   /** @constructor */
   init: function(player, options){
-    var track = this.track = options['track'],
-        tracks = player.textTracks(),
-        changeHandler,
-        event;
+    let track = this.track = options['track'];
+    let tracks = player.textTracks();
+
+    let changeHandler;
 
     if (tracks) {
-      changeHandler = vjs.bind(this, function() {
-        var selected = this.track['mode'] === 'showing',
-            track,
-            i,
-            l;
+      changeHandler = VjsLib.bind(this, function() {
+        let selected = this.track['mode'] === 'showing';
 
-        if (this instanceof vjs.OffTextTrackMenuItem) {
+        if (this instanceof OffTextTrackMenuItem) {
           selected = true;
 
-          i = 0,
-          l = tracks.length;
-
-          for (; i < l; i++) {
-            track = tracks[i];
+          for (let i = 0, l = tracks.length; i < l; i++) {
+            let track = tracks[i];
             if (track['kind'] === this.track['kind'] && track['mode'] === 'showing') {
               selected = false;
               break;
@@ -232,7 +221,7 @@ vjs.TextTrackMenuItem = vjs.MenuItem.extend({
     // Modify options for parent MenuItem class's init.
     options['label'] = track['label'] || track['language'] || 'Unknown';
     options['selected'] = track['default'] || track['mode'] === 'showing';
-    vjs.MenuItem.call(this, player, options);
+    MenuItem.call(this, player, options);
 
     // iOS7 doesn't dispatch change events to TextTrackLists when an
     // associated track's mode changes. Without something like
@@ -241,6 +230,8 @@ vjs.TextTrackMenuItem = vjs.MenuItem.extend({
     // the change event. As a poor substitute, we manually dispatch
     // change events whenever the controls modify the mode.
     if (tracks && tracks.onchange === undefined) {
+      let event;
+
       this.on(['tap', 'click'], function() {
         if (typeof window.Event !== 'object') {
           // Android 2.3 throws an Illegal Constructor error for window.Event
@@ -260,21 +251,18 @@ vjs.TextTrackMenuItem = vjs.MenuItem.extend({
   }
 });
 
-vjs.TextTrackMenuItem.prototype.onClick = function(){
-  var kind = this.track['kind'],
-      tracks = this.player_.textTracks(),
-      mode,
-      track,
-      i = 0;
+Component.registerComponent('TextTrackMenuItem', TextTrackMenuItem);
 
-  vjs.MenuItem.prototype.onClick.call(this);
+TextTrackMenuItem.prototype.onClick = function(){
+  let kind = this.track['kind'];
+  let tracks = this.player_.textTracks();
 
-  if (!tracks) {
-    return;
-  }
+  MenuItem.prototype.onClick.call(this);
 
-  for (; i < tracks.length; i++) {
-    track = tracks[i];
+  if (!tracks) return;
+
+  for (let i = 0; i < tracks.length; i++) {
+    let track = tracks[i];
 
     if (track['kind'] !== kind) {
       continue;
@@ -293,7 +281,7 @@ vjs.TextTrackMenuItem.prototype.onClick = function(){
  *
  * @constructor
  */
-vjs.OffTextTrackMenuItem = vjs.TextTrackMenuItem.extend({
+let OffTextTrackMenuItem = TextTrackMenuItem.extend({
   /** @constructor */
   init: function(player, options){
     // Create pseudo track info
@@ -305,12 +293,14 @@ vjs.OffTextTrackMenuItem = vjs.TextTrackMenuItem.extend({
       'default': false,
       'mode': 'disabled'
     };
-    vjs.TextTrackMenuItem.call(this, player, options);
+    TextTrackMenuItem.call(this, player, options);
     this.selected(true);
   }
 });
 
-vjs.CaptionSettingsMenuItem = vjs.TextTrackMenuItem.extend({
+Component.registerComponent('OffTextTrackMenuItem', OffTextTrackMenuItem);
+
+let CaptionSettingsMenuItem = TextTrackMenuItem.extend({
   init: function(player, options) {
     options['track'] = {
       'kind': options['kind'],
@@ -320,12 +310,14 @@ vjs.CaptionSettingsMenuItem = vjs.TextTrackMenuItem.extend({
       mode: 'disabled'
     };
 
-    vjs.TextTrackMenuItem.call(this, player, options);
+    TextTrackMenuItem.call(this, player, options);
     this.addClass('vjs-texttrack-settings');
   }
 });
 
-vjs.CaptionSettingsMenuItem.prototype.onClick = function() {
+Component.registerComponent('CaptionSettingsMenuItem', CaptionSettingsMenuItem);
+
+CaptionSettingsMenuItem.prototype.onClick = function() {
   this.player().getChild('textTrackSettings').show();
 };
 
@@ -334,14 +326,12 @@ vjs.CaptionSettingsMenuItem.prototype.onClick = function() {
  *
  * @constructor
  */
-vjs.TextTrackButton = vjs.MenuButton.extend({
+let TextTrackButton = MenuButton.extend({
   /** @constructor */
   init: function(player, options){
-    var tracks, updateHandler;
+    MenuButton.call(this, player, options);
 
-    vjs.MenuButton.call(this, player, options);
-
-    tracks = this.player_.textTracks();
+    let tracks = this.player_.textTracks();
 
     if (this.items.length <= 1) {
       this.hide();
@@ -351,7 +341,7 @@ vjs.TextTrackButton = vjs.MenuButton.extend({
       return;
     }
 
-    updateHandler = vjs.bind(this, this.update);
+    let updateHandler = VjsLib.bind(this, this.update);
     tracks.addEventListener('removetrack', updateHandler);
     tracks.addEventListener('addtrack', updateHandler);
 
@@ -362,29 +352,31 @@ vjs.TextTrackButton = vjs.MenuButton.extend({
   }
 });
 
-// Create a menu item for each text track
-vjs.TextTrackButton.prototype.createItems = function(){
-  var items = [], track, tracks;
+Component.registerComponent('TextTrackButton', TextTrackButton);
 
-  if (this instanceof vjs.CaptionsButton && !(this.player().tech && this.player().tech['featuresNativeTextTracks'])) {
-    items.push(new vjs.CaptionSettingsMenuItem(this.player_, { 'kind': this.kind_ }));
+// Create a menu item for each text track
+TextTrackButton.prototype.createItems = function(){
+  let items = [];
+
+  if (this instanceof CaptionsButton && !(this.player().tech && this.player().tech['featuresNativeTextTracks'])) {
+    items.push(new CaptionSettingsMenuItem(this.player_, { 'kind': this.kind_ }));
   }
 
   // Add an OFF menu item to turn all tracks off
-  items.push(new vjs.OffTextTrackMenuItem(this.player_, { 'kind': this.kind_ }));
+  items.push(new OffTextTrackMenuItem(this.player_, { 'kind': this.kind_ }));
 
-  tracks = this.player_.textTracks();
+  let tracks = this.player_.textTracks();
 
   if (!tracks) {
     return items;
   }
 
-  for (var i = 0; i < tracks.length; i++) {
-    track = tracks[i];
+  for (let i = 0; i < tracks.length; i++) {
+    let track = tracks[i];
 
     // only add tracks that are of the appropriate kind and have a label
     if (track['kind'] === this.kind_) {
-      items.push(new vjs.TextTrackMenuItem(this.player_, {
+      items.push(new TextTrackMenuItem(this.player_, {
         'track': track
       }));
     }
@@ -398,20 +390,23 @@ vjs.TextTrackButton.prototype.createItems = function(){
  *
  * @constructor
  */
-vjs.CaptionsButton = vjs.TextTrackButton.extend({
+let CaptionsButton = TextTrackButton.extend({
   /** @constructor */
   init: function(player, options, ready){
-    vjs.TextTrackButton.call(this, player, options, ready);
+    TextTrackButton.call(this, player, options, ready);
     this.el_.setAttribute('aria-label','Captions Menu');
   }
 });
-vjs.CaptionsButton.prototype.kind_ = 'captions';
-vjs.CaptionsButton.prototype.buttonText = 'Captions';
-vjs.CaptionsButton.prototype.className = 'vjs-captions-button';
 
-vjs.CaptionsButton.prototype.update = function() {
-  var threshold = 2;
-  vjs.TextTrackButton.prototype.update.call(this);
+Component.registerComponent('CaptionsButton', CaptionsButton);
+
+CaptionsButton.prototype.kind_ = 'captions';
+CaptionsButton.prototype.buttonText = 'Captions';
+CaptionsButton.prototype.className = 'vjs-captions-button';
+
+CaptionsButton.prototype.update = function() {
+  let threshold = 2;
+  TextTrackButton.prototype.update.call(this);
 
   // if native, then threshold is 1 because no settings button
   if (this.player().tech && this.player().tech['featuresNativeTextTracks']) {
@@ -430,16 +425,19 @@ vjs.CaptionsButton.prototype.update = function() {
  *
  * @constructor
  */
-vjs.SubtitlesButton = vjs.TextTrackButton.extend({
+let SubtitlesButton = TextTrackButton.extend({
   /** @constructor */
   init: function(player, options, ready){
-    vjs.TextTrackButton.call(this, player, options, ready);
+    TextTrackButton.call(this, player, options, ready);
     this.el_.setAttribute('aria-label','Subtitles Menu');
   }
 });
-vjs.SubtitlesButton.prototype.kind_ = 'subtitles';
-vjs.SubtitlesButton.prototype.buttonText = 'Subtitles';
-vjs.SubtitlesButton.prototype.className = 'vjs-subtitles-button';
+
+Component.registerComponent('SubtitlesButton', SubtitlesButton);
+
+SubtitlesButton.prototype.kind_ = 'subtitles';
+SubtitlesButton.prototype.buttonText = 'Subtitles';
+SubtitlesButton.prototype.className = 'vjs-subtitles-button';
 
 // Chapters act much differently than other text tracks
 // Cues are navigation vs. other tracks of alternative languages
@@ -448,31 +446,34 @@ vjs.SubtitlesButton.prototype.className = 'vjs-subtitles-button';
  *
  * @constructor
  */
-vjs.ChaptersButton = vjs.TextTrackButton.extend({
+let ChaptersButton = TextTrackButton.extend({
   /** @constructor */
   init: function(player, options, ready){
-    vjs.TextTrackButton.call(this, player, options, ready);
+    TextTrackButton.call(this, player, options, ready);
     this.el_.setAttribute('aria-label','Chapters Menu');
   }
 });
-vjs.ChaptersButton.prototype.kind_ = 'chapters';
-vjs.ChaptersButton.prototype.buttonText = 'Chapters';
-vjs.ChaptersButton.prototype.className = 'vjs-chapters-button';
+
+Component.registerComponent('ChaptersButton', ChaptersButton);
+
+ChaptersButton.prototype.kind_ = 'chapters';
+ChaptersButton.prototype.buttonText = 'Chapters';
+ChaptersButton.prototype.className = 'vjs-chapters-button';
 
 // Create a menu item for each text track
-vjs.ChaptersButton.prototype.createItems = function(){
-  var items = [], track, tracks;
+ChaptersButton.prototype.createItems = function(){
+  let items = [];
 
-  tracks = this.player_.textTracks();
+  let tracks = this.player_.textTracks();
 
   if (!tracks) {
     return items;
   }
 
-  for (var i = 0; i < tracks.length; i++) {
-    track = tracks[i];
+  for (let i = 0; i < tracks.length; i++) {
+    let track = tracks[i];
     if (track['kind'] === this.kind_) {
-      items.push(new vjs.TextTrackMenuItem(this.player_, {
+      items.push(new TextTrackMenuItem(this.player_, {
         'track': track
       }));
     }
@@ -481,21 +482,19 @@ vjs.ChaptersButton.prototype.createItems = function(){
   return items;
 };
 
-vjs.ChaptersButton.prototype.createMenu = function(){
-  var tracks = this.player_.textTracks() || [],
-      i = 0,
-      l = tracks.length,
-      track, chaptersTrack,
-      items = this.items = [];
+ChaptersButton.prototype.createMenu = function(){
+  let tracks = this.player_.textTracks() || [];
+  let chaptersTrack;
+  let items = this.items = [];
 
-  for (; i < l; i++) {
-    track = tracks[i];
+  for (let i = 0, l = tracks.length; i < l; i++) {
+    let track = tracks[i];
     if (track['kind'] == this.kind_) {
       if (!track.cues) {
         track['mode'] = 'hidden';
         /* jshint loopfunc:true */
         // TODO see if we can figure out a better way of doing this https://github.com/videojs/video.js/issues/1864
-        window.setTimeout(vjs.bind(this, function() {
+        window.setTimeout(VjsLib.bind(this, function() {
           this.createMenu();
         }), 100);
         /* jshint loopfunc:false */
@@ -506,25 +505,23 @@ vjs.ChaptersButton.prototype.createMenu = function(){
     }
   }
 
-  var menu = this.menu;
+  let menu = this.menu;
   if (menu === undefined) {
-    menu = new vjs.Menu(this.player_);
-    menu.contentEl().appendChild(vjs.createEl('li', {
+    menu = new Menu(this.player_);
+    menu.contentEl().appendChild(VjsLib.createEl('li', {
       className: 'vjs-menu-title',
-      innerHTML: vjs.capitalize(this.kind_),
+      innerHTML: VjsLib.capitalize(this.kind_),
       tabindex: -1
     }));
   }
 
   if (chaptersTrack) {
-    var cues = chaptersTrack['cues'], cue, mi;
-    i = 0;
-    l = cues.length;
+    let cues = chaptersTrack['cues'], cue;
 
-    for (; i < l; i++) {
+    for (let i = 0, l = cues.length; i < l; i++) {
       cue = cues[i];
 
-      mi = new vjs.ChaptersTrackMenuItem(this.player_, {
+      let mi = new ChaptersTrackMenuItem(this.player_, {
         'track': chaptersTrack,
         'cue': cue
       });
@@ -547,33 +544,36 @@ vjs.ChaptersButton.prototype.createMenu = function(){
 /**
  * @constructor
  */
-vjs.ChaptersTrackMenuItem = vjs.MenuItem.extend({
+let ChaptersTrackMenuItem = MenuItem.extend({
   /** @constructor */
   init: function(player, options){
-    var track = this.track = options['track'],
-        cue = this.cue = options['cue'],
-        currentTime = player.currentTime();
+    let track = this.track = options['track'];
+    let cue = this.cue = options['cue'];
+    let currentTime = player.currentTime();
 
     // Modify options for parent MenuItem class's init.
     options['label'] = cue.text;
     options['selected'] = (cue['startTime'] <= currentTime && currentTime < cue['endTime']);
-    vjs.MenuItem.call(this, player, options);
+    MenuItem.call(this, player, options);
 
-    track.addEventListener('cuechange', vjs.bind(this, this.update));
+    track.addEventListener('cuechange', VjsLib.bind(this, this.update));
   }
 });
 
-vjs.ChaptersTrackMenuItem.prototype.onClick = function(){
-  vjs.MenuItem.prototype.onClick.call(this);
+Component.registerComponent('ChaptersTrackMenuItem', ChaptersTrackMenuItem);
+
+ChaptersTrackMenuItem.prototype.onClick = function(){
+  MenuItem.prototype.onClick.call(this);
   this.player_.currentTime(this.cue.startTime);
   this.update(this.cue.startTime);
 };
 
-vjs.ChaptersTrackMenuItem.prototype.update = function(){
-  var cue = this.cue,
-      currentTime = this.player_.currentTime();
+ChaptersTrackMenuItem.prototype.update = function(){
+  let cue = this.cue;
+  let currentTime = this.player_.currentTime();
 
   // vjs.log(currentTime, cue.startTime);
   this.selected(cue['startTime'] <= currentTime && currentTime < cue['endTime']);
 };
-})();
+
+export { TextTrackDisplay, TextTrackButton, CaptionsButton, SubtitlesButton, ChaptersButton, ChaptersTrackMenuItem };

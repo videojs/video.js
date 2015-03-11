@@ -1,12 +1,13 @@
-var fs = require('fs'),
-    vm = require('vm'),
-    sourceLoader = fs.readFileSync('./build/source-loader.js', 'utf8');
-    sandbox = {
-      blockSourceLoading: true,
-      document: {},
-      window: {}
-    };
-    sourceFiles = [];
+var fs = require('fs');
+var vm = require('vm');
+var babelify = require('babelify');
+var sourceLoader = fs.readFileSync('./build/source-loader.js', 'utf8');
+var sandbox = {
+  blockSourceLoading: true,
+  document: {},
+  window: {}
+};
+var sourceFiles = [];
 
 
 vm.runInNewContext(sourceLoader, sandbox, 'build/source-loader.js');
@@ -66,20 +67,28 @@ module.exports = function(config) {
   config.set({
     basePath: '',
 
-    frameworks: ['qunit', 'sinon'],
+    frameworks: ['browserify', 'qunit', 'sinon'],
 
     autoWatch: false,
 
     singleRun: true,
 
-    customLaunchers: customLaunchers,
+    // customLaunchers: customLaunchers,
 
     files: [
       '../build/files/video-js.css',
-      '../test/karma-qunit-shim.js'
-    ].concat(sourceFiles).concat([
+      '../test/karma-qunit-shim.js',
       '../test/unit/**/*.js'
-    ]),
+    ],
+
+    preprocessors: {
+      'test/**/*.js': [ 'browserify' ]
+    },
+
+    browserify: {
+      debug: true,
+      transform: [ 'babelify' ]
+    },
 
     plugins: [
       'karma-qunit',
@@ -90,7 +99,8 @@ module.exports = function(config) {
       'karma-phantomjs-launcher',
       'karma-safari-launcher',
       'karma-sauce-launcher',
-      'karma-sinon'
+      'karma-sinon',
+      'karma-browserify'
     ],
 
     reporters: ['dots'],

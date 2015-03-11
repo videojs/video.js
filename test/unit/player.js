@@ -7,6 +7,8 @@ module('Player', {
   }
 });
 
+var Player = vjs.Player;
+
 // Compiler doesn't like using 'this' in setup/teardown.
 // module("Player", {
 //   /**
@@ -57,7 +59,7 @@ test('should accept options from multiple sources and override in correct order'
   vjs.options['attr'] = 1;
 
   var tag0 = PlayerTest.makeTag();
-  var player0 = new vjs.Player(tag0);
+  var player0 = new Player(tag0);
 
   ok(player0.options_['attr'] === 1, 'global option was set');
   player0.dispose();
@@ -66,7 +68,7 @@ test('should accept options from multiple sources and override in correct order'
   var tag1 = PlayerTest.makeTag();
   tag1.setAttribute('attr', 'asdf'); // Attributes must be set as strings
 
-  var player1 = new vjs.Player(tag1);
+  var player1 = new Player(tag1);
   ok(player1.options_['attr'] === 'asdf', 'Tag options overrode global options');
   player1.dispose();
 
@@ -74,7 +76,7 @@ test('should accept options from multiple sources and override in correct order'
   var tag2 = PlayerTest.makeTag();
   tag2.setAttribute('attr', 'asdf');
 
-  var player2 = new vjs.Player(tag2, { 'attr': 'fdsa' });
+  var player2 = new Player(tag2, { 'attr': 'fdsa' });
   ok(player2.options_['attr'] === 'fdsa', 'Init options overrode tag and global options');
   player2.dispose();
 });
@@ -109,21 +111,21 @@ test('should get tag, source, and track settings', function(){
   ok(player.el().className.indexOf('video-js') !== -1, 'transferred class from tag to player div');
   ok(player.el().id === 'example_1', 'transferred id from tag to player div');
 
-  ok(vjs.players[player.id()] === player, 'player referenceable from global list');
+  ok(Player.players[player.id()] === player, 'player referenceable from global list');
   ok(tag.id !== player.id, 'tag ID no longer is the same as player ID');
   ok(tag.className !== player.el().className, 'tag classname updated');
 
   player.dispose();
 
   ok(tag['player'] !== player, 'tag player ref killed');
-  ok(!vjs.players['example_1'], 'global player ref killed');
+  ok(!Player.players['example_1'], 'global player ref killed');
   ok(player.el() === null, 'player el killed');
 });
 
 test('should asynchronously fire error events during source selection', function() {
   expect(2);
 
-  sinon.stub(vjs.log, 'error');
+  sinon.stub(Lib.log, 'error');
 
   var player = PlayerTest.makePlayer({
     'techOrder': ['foo'],
@@ -140,7 +142,7 @@ test('should asynchronously fire error events during source selection', function
   this.clock.tick(1);
 
   player.dispose();
-  vjs.log.error.restore();
+  Lib.log.error.restore();
 });
 
 test('should set the width and height of the player', function(){
@@ -178,7 +180,7 @@ test('should wrap the original tag in the player div', function(){
   container.appendChild(tag);
   fixture.appendChild(container);
 
-  var player = new vjs.Player(tag);
+  var player = new Player(tag);
   var el = player.el();
 
   ok(el.parentNode === container, 'player placed at same level as tag');
@@ -399,7 +401,7 @@ test('should allow for tracking when native controls are used', function(){
 //   fixture.innerHTML += html;
 
 //   var tag = document.getElementById('example_1');
-//   var player = new vjs.Player(tag);
+//   var player = new Player(tag);
 
 //   var incompatibilityMessage = player.el().getElementsByTagName('p')[0];
 //   // ie8 capitalizes tag names
@@ -416,11 +418,11 @@ test('should register players with generated ids', function(){
   video.className = 'vjs-default-skin video-js';
   fixture.appendChild(video);
 
-  player = new vjs.Player(video);
+  player = new Player(video);
   id = player.el().id;
 
   equal(player.el().id, player.id(), 'the player and element ids are equal');
-  ok(vjs.players[id], 'the generated id is registered');
+  ok(Player.players[id], 'the generated id is registered');
 });
 
 test('should not add multiple first play events despite subsequent loads', function() {

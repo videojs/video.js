@@ -4,6 +4,12 @@
  * Not using setupTriggers. Using global onEvent func to distribute events
  */
 
+import MediaTechController from './media';
+import * as VjsLib from '../lib';
+import FlashRtmpDecorator from './flash-rtmp';
+import Component from '../component';
+import window from 'global/window';
+
 /**
  * Flash Media Controller - Wrapper for fallback SWF API
  *
@@ -12,56 +18,55 @@
  * @param {Function=} ready
  * @constructor
  */
-vjs.Flash = vjs.MediaTechController.extend({
+var Flash = MediaTechController.extend({
   /** @constructor */
   init: function(player, options, ready){
-    vjs.MediaTechController.call(this, player, options, ready);
+    MediaTechController.call(this, player, options, ready);
 
-    var source = options['source'],
+    let source = options['source'];
 
-        // Which element to embed in
-        parentEl = options['parentEl'],
+    // Which element to embed in
+    let parentEl = options['parentEl'];
 
-        // Create a temporary element to be replaced by swf object
-        placeHolder = this.el_ = vjs.createEl('div', { id: player.id() + '_temp_flash' }),
+    // Create a temporary element to be replaced by swf object
+    let placeHolder = this.el_ = VjsLib.createEl('div', { id: player.id() + '_temp_flash' });
 
-        // Generate ID for swf object
-        objId = player.id()+'_flash_api',
+    // Generate ID for swf object
+    let objId = player.id()+'_flash_api';
 
-        // Store player options in local var for optimization
-        // TODO: switch to using player methods instead of options
-        // e.g. player.autoplay();
-        playerOptions = player.options_,
+    // Store player options in local var for optimization
+    // TODO: switch to using player methods instead of options
+    // e.g. player.autoplay();
+    let playerOptions = player.options_;
 
-        // Merge default flashvars with ones passed in to init
-        flashVars = vjs.obj.merge({
+    // Merge default flashvars with ones passed in to init
+    let flashVars = VjsLib.obj.merge({
 
-          // SWF Callback Functions
-          'readyFunction': 'videojs.Flash.onReady',
-          'eventProxyFunction': 'videojs.Flash.onEvent',
-          'errorEventProxyFunction': 'videojs.Flash.onError',
+      // SWF Callback Functions
+      'readyFunction': 'videojs.Flash.onReady',
+      'eventProxyFunction': 'videojs.Flash.onEvent',
+      'errorEventProxyFunction': 'videojs.Flash.onError',
 
-          // Player Settings
-          'autoplay': playerOptions.autoplay,
-          'preload': playerOptions.preload,
-          'loop': playerOptions.loop,
-          'muted': playerOptions.muted
+      // Player Settings
+      'autoplay': playerOptions.autoplay,
+      'preload': playerOptions.preload,
+      'loop': playerOptions.loop,
+      'muted': playerOptions.muted
 
-        }, options['flashVars']),
+    }, options['flashVars']);
 
-        // Merge default parames with ones passed in
-        params = vjs.obj.merge({
-          'wmode': 'opaque', // Opaque is needed to overlay controls, but can affect playback performance
-          'bgcolor': '#000000' // Using bgcolor prevents a white flash when the object is loading
-        }, options['params']),
+    // Merge default parames with ones passed in
+    let params = VjsLib.obj.merge({
+      'wmode': 'opaque', // Opaque is needed to overlay controls, but can affect playback performance
+      'bgcolor': '#000000' // Using bgcolor prevents a white flash when the object is loading
+    }, options['params']);
 
-        // Merge default attributes with ones passed in
-        attributes = vjs.obj.merge({
-          'id': objId,
-          'name': objId, // Both ID and Name needed or swf to identify itself
-          'class': 'vjs-tech'
-        }, options['attributes'])
-    ;
+    // Merge default attributes with ones passed in
+    let attributes = VjsLib.obj.merge({
+      'id': objId,
+      'name': objId, // Both ID and Name needed or swf to identify itself
+      'class': 'vjs-tech'
+    }, options['attributes']);
 
     // If source was supplied pass as a flash var.
     if (source) {
@@ -71,7 +76,7 @@ vjs.Flash = vjs.MediaTechController.extend({
     }
 
     // Add placeholder to player div
-    vjs.insertFirst(placeHolder, parentEl);
+    VjsLib.insertFirst(placeHolder, parentEl);
 
     // Having issues with Flash reloading on certain page actions (hide/resize/fullscreen) in certain browsers
     // This allows resetting the playhead when we catch the reload
@@ -85,7 +90,7 @@ vjs.Flash = vjs.MediaTechController.extend({
 
     // firefox doesn't bubble mousemove events to parent. videojs/video-js-swf#37
     // bugzilla bug: https://bugzilla.mozilla.org/show_bug.cgi?id=836786
-    if (vjs.IS_FIREFOX) {
+    if (VjsLib.IS_FIREFOX) {
       this.ready(function(){
         this.on('mousemove', function(){
           // since it's a custom event, don't bubble higher than the player
@@ -98,23 +103,25 @@ vjs.Flash = vjs.MediaTechController.extend({
     // use stageclick events triggered from inside the SWF instead
     player.on('stageclick', player.reportUserActivity);
 
-    this.el_ = vjs.Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
+    this.el_ = Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
   }
 });
 
-vjs.Flash.prototype.dispose = function(){
-  vjs.MediaTechController.prototype.dispose.call(this);
+Component.registerComponent('Flash', Flash);
+
+Flash.prototype.dispose = function(){
+  MediaTechController.prototype.dispose.call(this);
 };
 
-vjs.Flash.prototype.play = function(){
+Flash.prototype.play = function(){
   this.el_.vjs_play();
 };
 
-vjs.Flash.prototype.pause = function(){
+Flash.prototype.pause = function(){
   this.el_.vjs_pause();
 };
 
-vjs.Flash.prototype.src = function(src){
+Flash.prototype.src = function(src){
   if (src === undefined) {
     return this['currentSrc']();
   }
@@ -123,9 +130,9 @@ vjs.Flash.prototype.src = function(src){
   return this.setSrc(src);
 };
 
-vjs.Flash.prototype.setSrc = function(src){
+Flash.prototype.setSrc = function(src){
   // Make sure source URL is absolute.
-  src = vjs.getAbsoluteURL(src);
+  src = VjsLib.getAbsoluteURL(src);
   this.el_.vjs_src(src);
 
   // Currently the SWF doesn't autoplay if you load a source later.
@@ -136,13 +143,13 @@ vjs.Flash.prototype.setSrc = function(src){
   }
 };
 
-vjs.Flash.prototype['setCurrentTime'] = function(time){
+Flash.prototype['setCurrentTime'] = function(time){
   this.lastSeekTarget_ = time;
   this.el_.vjs_setProperty('currentTime', time);
-  vjs.MediaTechController.prototype.setCurrentTime.call(this);
+  MediaTechController.prototype.setCurrentTime.call(this);
 };
 
-vjs.Flash.prototype['currentTime'] = function(time){
+Flash.prototype['currentTime'] = function(time){
   // when seeking make the reported time keep up with the requested time
   // by reading the time we're seeking to
   if (this.seeking()) {
@@ -151,7 +158,7 @@ vjs.Flash.prototype['currentTime'] = function(time){
   return this.el_.vjs_getProperty('currentTime');
 };
 
-vjs.Flash.prototype['currentSrc'] = function(){
+Flash.prototype['currentSrc'] = function(){
   if (this.currentSource_) {
     return this.currentSource_.src;
   } else {
@@ -159,66 +166,62 @@ vjs.Flash.prototype['currentSrc'] = function(){
   }
 };
 
-vjs.Flash.prototype.load = function(){
+Flash.prototype.load = function(){
   this.el_.vjs_load();
 };
 
-vjs.Flash.prototype.poster = function(){
+Flash.prototype.poster = function(){
   this.el_.vjs_getProperty('poster');
 };
-vjs.Flash.prototype['setPoster'] = function(){
+Flash.prototype['setPoster'] = function(){
   // poster images are not handled by the Flash tech so make this a no-op
 };
 
-vjs.Flash.prototype.buffered = function(){
-  return vjs.createTimeRange(0, this.el_.vjs_getProperty('buffered'));
+Flash.prototype.buffered = function(){
+  return VjsLib.createTimeRange(0, this.el_.vjs_getProperty('buffered'));
 };
 
-vjs.Flash.prototype.supportsFullScreen = function(){
+Flash.prototype.supportsFullScreen = function(){
   return false; // Flash does not allow fullscreen through javascript
 };
 
-vjs.Flash.prototype.enterFullScreen = function(){
+Flash.prototype.enterFullScreen = function(){
   return false;
 };
 
-(function(){
-  // Create setters and getters for attributes
-  var api = vjs.Flash.prototype,
-    readWrite = 'rtmpConnection,rtmpStream,preload,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted'.split(','),
-    readOnly = 'error,networkState,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight'.split(','),
-    // Overridden: buffered, currentTime, currentSrc
-    i;
+// Create setters and getters for attributes
+const _api = Flash.prototype;
+const _readWrite = 'rtmpConnection,rtmpStream,preload,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted'.split(',');
+const _readOnly = 'error,networkState,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight'.split(',');
 
-  function createSetter(attr){
-    var attrUpper = attr.charAt(0).toUpperCase() + attr.slice(1);
-    api['set'+attrUpper] = function(val){ return this.el_.vjs_setProperty(attr, val); };
-  }
-  function createGetter(attr) {
-    api[attr] = function(){ return this.el_.vjs_getProperty(attr); };
-  }
+function _createSetter(attr){
+  var attrUpper = attr.charAt(0).toUpperCase() + attr.slice(1);
+  _api['set'+attrUpper] = function(val){ return this.el_.vjs_setProperty(attr, val); };
+}
+function _createGetter(attr) {
+  _api[attr] = function(){ return this.el_.vjs_getProperty(attr); };
+}
 
-  // Create getter and setters for all read/write attributes
-  for (i = 0; i < readWrite.length; i++) {
-    createGetter(readWrite[i]);
-    createSetter(readWrite[i]);
-  }
+// Create getter and setters for all read/write attributes
+for (let i = 0; i < _readWrite.length; i++) {
+  _createGetter(_readWrite[i]);
+  _createSetter(_readWrite[i]);
+}
 
-  // Create getters for read-only attributes
-  for (i = 0; i < readOnly.length; i++) {
-    createGetter(readOnly[i]);
-  }
-})();
+// Create getters for read-only attributes
+for (let i = 0; i < _readOnly.length; i++) {
+  _createGetter(_readOnly[i]);
+}
 
 /* Flash Support Testing -------------------------------------------------------- */
 
-vjs.Flash.isSupported = function(){
-  return vjs.Flash.version()[0] >= 10;
+Flash.isSupported = function(){
+  return Flash.version()[0] >= 10;
   // return swfobject.hasFlashPlayerVersion('10');
 };
 
 // Add Source Handler pattern functions to this tech
-vjs.MediaTechController.withSourceHandlers(vjs.Flash);
+MediaTechController.withSourceHandlers(Flash);
 
 /**
  * The default native source handler.
@@ -226,15 +229,14 @@ vjs.MediaTechController.withSourceHandlers(vjs.Flash);
  * @param  {Object} source   The source object
  * @param  {vjs.Flash} tech  The instance of the Flash tech
  */
-vjs.Flash.nativeSourceHandler = {};
+Flash.nativeSourceHandler = {};
 
 /**
  * Check Flash can handle the source natively
  * @param  {Object} source  The source object
  * @return {String}         'probably', 'maybe', or '' (empty string)
  */
-
-vjs.Flash.nativeSourceHandler.canHandleSource = function (source) {
+Flash.nativeSourceHandler.canHandleSource = function(source){
   var type;
 
   function guessMimeType(src) {
@@ -252,7 +254,7 @@ vjs.Flash.nativeSourceHandler.canHandleSource = function (source) {
     type = source.type.replace(/;.*/, '').toLowerCase();
   }
 
-  if (type in vjs.Flash.formats) {
+  if (type in Flash.formats) {
     return 'maybe';
   }
 
@@ -266,7 +268,7 @@ vjs.Flash.nativeSourceHandler.canHandleSource = function (source) {
  * @param  {Object} source    The source object
  * @param  {vjs.Flash} tech   The instance of the Flash tech
  */
-vjs.Flash.nativeSourceHandler.handleSource = function(source, tech){
+Flash.nativeSourceHandler.handleSource = function(source, tech){
   tech.setSrc(source.src);
 };
 
@@ -274,25 +276,23 @@ vjs.Flash.nativeSourceHandler.handleSource = function(source, tech){
  * Clean up the source handler when disposing the player or switching sources..
  * (no cleanup is needed when supporting the format natively)
  */
-vjs.Flash.nativeSourceHandler.dispose = function(){};
+Flash.nativeSourceHandler.dispose = function(){};
 
 // Register the native source handler
-vjs.Flash.registerSourceHandler(vjs.Flash.nativeSourceHandler);
+Flash.registerSourceHandler(Flash.nativeSourceHandler);
 
-vjs.Flash.formats = {
+Flash.formats = {
   'video/flv': 'FLV',
   'video/x-flv': 'FLV',
   'video/mp4': 'MP4',
   'video/m4v': 'MP4'
 };
 
-vjs.Flash['onReady'] = function(currSwf){
-  var el, player;
-
-  el = vjs.el(currSwf);
+Flash['onReady'] = function(currSwf){
+  let el = VjsLib.el(currSwf);
 
   // get player from the player div property
-  player = el && el.parentNode && el.parentNode['player'];
+  const player = el && el.parentNode && el.parentNode['player'];
 
   // if there is no el or player then the tech has been disposed
   // and the tech element was removed from the player div
@@ -300,13 +300,13 @@ vjs.Flash['onReady'] = function(currSwf){
     // reference player on tech element
     el['player'] = player;
     // check that the flash object is really ready
-    vjs.Flash['checkReady'](player.tech);
+    Flash['checkReady'](player.tech);
   }
 };
 
 // The SWF isn't always ready when it says it is. Sometimes the API functions still need to be added to the object.
 // If it's not ready, we set a timeout to check again shortly.
-vjs.Flash['checkReady'] = function(tech){
+Flash['checkReady'] = function(tech){
   // stop worrying if the tech has been disposed
   if (!tech.el()) {
     return;
@@ -319,21 +319,21 @@ vjs.Flash['checkReady'] = function(tech){
   } else {
     // wait longer
     this.setTimeout(function(){
-      vjs.Flash['checkReady'](tech);
+      Flash['checkReady'](tech);
     }, 50);
   }
 };
 
 // Trigger events from the swf on the player
-vjs.Flash['onEvent'] = function(swfID, eventName){
-  var player = vjs.el(swfID)['player'];
+Flash['onEvent'] = function(swfID, eventName){
+  let player = VjsLib.el(swfID)['player'];
   player.trigger(eventName);
 };
 
 // Log errors from the swf
-vjs.Flash['onError'] = function(swfID, err){
-  var player = vjs.el(swfID)['player'];
-  var msg = 'FLASH: '+err;
+Flash['onError'] = function(swfID, err){
+  const player = VjsLib.el(swfID)['player'];
+  const msg = 'FLASH: '+err;
 
   if (err == 'srcnotfound') {
     player.error({ code: 4, message: msg });
@@ -345,8 +345,8 @@ vjs.Flash['onError'] = function(swfID, err){
 };
 
 // Flash Version Check
-vjs.Flash.version = function(){
-  var version = '0,0,0';
+Flash.version = function(){
+  let version = '0,0,0';
 
   // IE
   try {
@@ -364,35 +364,33 @@ vjs.Flash.version = function(){
 };
 
 // Flash embedding method. Only used in non-iframe mode
-vjs.Flash.embed = function(swf, placeHolder, flashVars, params, attributes){
-  var code = vjs.Flash.getEmbedCode(swf, flashVars, params, attributes),
+Flash.embed = function(swf, placeHolder, flashVars, params, attributes){
+  const code = Flash.getEmbedCode(swf, flashVars, params, attributes);
 
-      // Get element by embedding code and retrieving created element
-      obj = vjs.createEl('div', { innerHTML: code }).childNodes[0],
+  // Get element by embedding code and retrieving created element
+  const obj = VjsLib.createEl('div', { innerHTML: code }).childNodes[0];
 
-      par = placeHolder.parentNode
-  ;
+  const par = placeHolder.parentNode;
 
   placeHolder.parentNode.replaceChild(obj, placeHolder);
   return obj;
 };
 
-vjs.Flash.getEmbedCode = function(swf, flashVars, params, attributes){
-
-  var objTag = '<object type="application/x-shockwave-flash" ',
-      flashVarsString = '',
-      paramsString = '',
-      attrsString = '';
+Flash.getEmbedCode = function(swf, flashVars, params, attributes){
+  const objTag = '<object type="application/x-shockwave-flash" ';
+  let flashVarsString = '';
+  let paramsString = '';
+  let attrsString = '';
 
   // Convert flash vars to string
   if (flashVars) {
-    vjs.obj.each(flashVars, function(key, val){
+    VjsLib.obj.each(flashVars, function(key, val){
       flashVarsString += (key + '=' + val + '&amp;');
     });
   }
 
   // Add swf, flashVars, and other default params
-  params = vjs.obj.merge({
+  params = VjsLib.obj.merge({
     'movie': swf,
     'flashvars': flashVarsString,
     'allowScriptAccess': 'always', // Required to talk to swf
@@ -400,11 +398,11 @@ vjs.Flash.getEmbedCode = function(swf, flashVars, params, attributes){
   }, params);
 
   // Create param tags string
-  vjs.obj.each(params, function(key, val){
+  VjsLib.obj.each(params, function(key, val){
     paramsString += '<param name="'+key+'" value="'+val+'" />';
   });
 
-  attributes = vjs.obj.merge({
+  attributes = VjsLib.obj.merge({
     // Add swf to attributes (need both for IE and Others to work)
     'data': swf,
 
@@ -415,9 +413,14 @@ vjs.Flash.getEmbedCode = function(swf, flashVars, params, attributes){
   }, attributes);
 
   // Create Attributes string
-  vjs.obj.each(attributes, function(key, val){
+  VjsLib.obj.each(attributes, function(key, val){
     attrsString += (key + '="' + val + '" ');
   });
 
   return objTag + attrsString + '>' + paramsString + '</object>';
 };
+
+// Run Flash through the RTMP decorator
+FlashRtmpDecorator(Flash);
+
+export default Flash;

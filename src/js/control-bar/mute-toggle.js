@@ -1,3 +1,7 @@
+import Button from '../button';
+import Component from '../component';
+import * as VjsLib from '../lib';
+
 /**
  * A button component for muting the audio
  *
@@ -5,10 +9,10 @@
  * @param {Object=} options
  * @constructor
  */
-vjs.MuteToggle = vjs.Button.extend({
+var MuteToggle = Button.extend({
   /** @constructor */
   init: function(player, options){
-    vjs.Button.call(this, player, options);
+    Button.call(this, player, options);
 
     this.on(player, 'volumechange', this.update);
 
@@ -27,18 +31,20 @@ vjs.MuteToggle = vjs.Button.extend({
   }
 });
 
-vjs.MuteToggle.prototype.createEl = function(){
-  return vjs.Button.prototype.createEl.call(this, 'div', {
+Component.registerComponent('MuteToggle', MuteToggle);
+
+MuteToggle.prototype.createEl = function(){
+  return Button.prototype.createEl.call(this, 'div', {
     className: 'vjs-mute-control vjs-control',
     innerHTML: '<div><span class="vjs-control-text">' + this.localize('Mute') + '</span></div>'
   });
 };
 
-vjs.MuteToggle.prototype.onClick = function(){
+MuteToggle.prototype.onClick = function(){
   this.player_.muted( this.player_.muted() ? false : true );
 };
 
-vjs.MuteToggle.prototype.update = function(){
+MuteToggle.prototype.update = function(){
   var vol = this.player_.volume(),
       level = 3;
 
@@ -65,7 +71,9 @@ vjs.MuteToggle.prototype.update = function(){
 
   /* TODO improve muted icon classes */
   for (var i = 0; i < 4; i++) {
-    vjs.removeClass(this.el_, 'vjs-vol-'+i);
+    VjsLib.removeClass(this.el_, 'vjs-vol-'+i);
   }
-  vjs.addClass(this.el_, 'vjs-vol-'+level);
+  VjsLib.addClass(this.el_, 'vjs-vol-'+level);
 };
+
+export default MuteToggle;

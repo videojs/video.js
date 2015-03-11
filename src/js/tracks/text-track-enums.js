@@ -3,7 +3,7 @@
  *
  * enum TextTrackMode { "disabled",  "hidden",  "showing" };
  */
-vjs.TextTrackMode = {
+let TextTrackMode = {
   'disabled': 'disabled',
   'hidden': 'hidden',
   'showing': 'showing'
@@ -14,10 +14,12 @@ vjs.TextTrackMode = {
  *
  * enum TextTrackKind { "subtitles",  "captions",  "descriptions",  "chapters",  "metadata" };
  */
-vjs.TextTrackKind = {
+let TextTrackKind = {
   'subtitles': 'subtitles',
   'captions': 'captions',
   'descriptions': 'descriptions',
   'chapters': 'chapters',
   'metadata': 'metadata'
 };
+
+export { TextTrackMode, TextTrackKind };

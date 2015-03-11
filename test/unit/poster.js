@@ -1,7 +1,7 @@
 module('PosterImage', {
   'setup': function(){
     // Store the original background support so we can test different vals
-    this.origVal = vjs.BACKGROUND_SIZE_SUPPORTED;
+    this.origVal = Lib.BACKGROUND_SIZE_SUPPORTED;
     this.poster1 = 'http://example.com/poster.jpg';
     this.poster2 = 'http://example.com/UPDATED.jpg';
 
@@ -21,9 +21,11 @@ module('PosterImage', {
     };
   },
   'teardown': function(){
-    vjs.BACKGROUND_SIZE_SUPPORTED = this.origVal;
+    Lib.BACKGROUND_SIZE_SUPPORTED = this.origVal;
   }
 });
+
+var PosterImage = vjs.PosterImage;
 
 test('should create and update a poster image', function(){
   var posterImage;
@@ -34,7 +36,7 @@ test('should create and update a poster image', function(){
   }
 
   vjs.BACKGROUND_SIZE_SUPPORTED = true;
-  posterImage = new vjs.PosterImage(this.mockPlayer);
+  posterImage = new PosterImage(this.mockPlayer);
   equal(normalizeUrl(posterImage.el().style.backgroundImage), 'url('+this.poster1+')', 'Background image used');
 
   // Update with a new poster source and check the new value
@@ -47,7 +49,7 @@ test('should create and update a fallback image in older browsers', function(){
   var posterImage;
 
   vjs.BACKGROUND_SIZE_SUPPORTED = false;
-  posterImage = new vjs.PosterImage(this.mockPlayer);
+  posterImage = new PosterImage(this.mockPlayer);
   equal(posterImage.fallbackImg_.src, this.poster1, 'Fallback image created');
 
   // Update with a new poster source and check the new value
@@ -59,7 +61,7 @@ test('should create and update a fallback image in older browsers', function(){
 test('should remove itself from the document flow when there is no poster', function(){
   var posterImage;
 
-  posterImage = new vjs.PosterImage(this.mockPlayer);
+  posterImage = new PosterImage(this.mockPlayer);
   equal(posterImage.el().style.display, '', 'Poster image shows by default');
 
   // Update with an empty string
@@ -74,7 +76,7 @@ test('should remove itself from the document flow when there is no poster', func
 });
 
 test('should hide the poster in the appropriate player states', function(){
-  var posterImage = new vjs.PosterImage(this.mockPlayer);
+  var posterImage = new PosterImage(this.mockPlayer);
   var playerDiv = document.createElement('div');
   var fixture = document.getElementById('qunit-fixture');
   var el = posterImage.el();

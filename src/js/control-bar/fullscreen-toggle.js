@@ -1,3 +1,6 @@
+import Component from '../component';
+import Button from '../button';
+
 /**
  * Toggle fullscreen video
  * @param {vjs.Player|Object} player
@@ -5,24 +8,26 @@
  * @class
  * @extends vjs.Button
  */
-vjs.FullscreenToggle = vjs.Button.extend({
+var FullscreenToggle = Button.extend({
   /**
    * @constructor
    * @memberof vjs.FullscreenToggle
    * @instance
    */
   init: function(player, options){
-    vjs.Button.call(this, player, options);
+    Button.call(this, player, options);
   }
 });
 
-vjs.FullscreenToggle.prototype.buttonText = 'Fullscreen';
+Component.registerComponent('FullscreenToggle', FullscreenToggle);
 
-vjs.FullscreenToggle.prototype.buildCSSClass = function(){
-  return 'vjs-fullscreen-control ' + vjs.Button.prototype.buildCSSClass.call(this);
+FullscreenToggle.prototype.buttonText = 'Fullscreen';
+
+FullscreenToggle.prototype.buildCSSClass = function(){
+  return 'vjs-fullscreen-control ' + Button.prototype.buildCSSClass.call(this);
 };
 
-vjs.FullscreenToggle.prototype.onClick = function(){
+FullscreenToggle.prototype.onClick = function(){
   if (!this.player_.isFullscreen()) {
     this.player_.requestFullscreen();
     this.controlText_.innerHTML = this.localize('Non-Fullscreen');
@@ -31,3 +36,5 @@ vjs.FullscreenToggle.prototype.onClick = function(){
     this.controlText_.innerHTML = this.localize('Fullscreen');
   }
 };
+
+export default FullscreenToggle;

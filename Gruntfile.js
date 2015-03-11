@@ -90,7 +90,8 @@ module.exports = function(grunt) {
     qunit: {
       source: ['test/index.html'],
       minified: ['test/minified.html'],
-      minified_api: ['test/minified-api.html']
+      minified_api: ['test/minified-api.html'],
+      es6: ['test/es6.html']
     },
     watch: {
       files: [ 'src/**/*', 'test/unit/*.js', 'Gruntfile.js' ],
@@ -385,6 +386,40 @@ module.exports = function(grunt) {
       files: {
         src: ['dist/video-js-'+ version.full +'.zip'] // Files that you want to attach to Release
       }
+    },
+    browserify: {
+      dist: {
+        files: {
+          'build/files/video-es6.js': ['src/js/video.js']
+        },
+        options: {
+          browserifyOptions: {
+            debug: true,
+            standalone: 'videojs'
+          },
+          transform: [
+            require('babelify').configure({
+              sourceMapRelative: './src/js'
+            })
+          ]
+        }
+      },
+      test: {
+        files: {
+          'build/files/video-es6.test.js': ['test/es6-browserify.js']
+        },
+        options: {
+          browserifyOptions: {
+            debug: true,
+            standalone: 'videojs'
+          },
+          transform: [
+            require('babelify').configure({
+              sourceMapRelative: './src/js'
+            })
+          ]
+        }
+      }
     }
   });
 
@@ -408,6 +443,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-github-releaser');
   grunt.loadNpmTasks('grunt-aws-s3');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-browserify');
 
   // grunt.loadTasks('./docs/tasks/');
   // grunt.loadTasks('../videojs-doc-generator/tasks/');
@@ -418,6 +454,7 @@ module.exports = function(grunt) {
   // Development watch task
   grunt.registerTask('dev', ['jshint', 'less', 'vjslanguages', 'build', 'usebanner', 'qunit:source']);
   grunt.registerTask('test-qunit', ['pretask', 'qunit']);
+  grunt.registerTask('test-es6', ['browserify:test', 'qunit:es6']);
 
   grunt.registerTask('dist', 'Creating distribution', ['dist-copy', 'zip:dist']);
 

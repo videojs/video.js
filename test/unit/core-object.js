@@ -1,5 +1,7 @@
 module('Core Object');
 
+var vjs = videojs.TEST;
+
 test('should verify CoreObject extension', function(){
   var TestObject = vjs.CoreObject.extend({
     init: function(initOptions){

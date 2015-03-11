@@ -1,3 +1,15 @@
+import Component from '../component';
+import * as VjsLib from '../lib';
+
+import PlayToggle from './play-toggle';
+import CurrentTimeDisplay from './time-display';
+import LiveDisplay from './live-display';
+import ProgressControl from './progress-control';
+import FullscreenToggle from './fullscreen-toggle';
+import VolumeControl from './volume-control';
+import MuteToggle from './mute-toggle';
+import PlaybackRateMenuButton from './playback-rate-menu-button';
+
 /**
  * Container of main controls
  * @param {vjs.Player|Object} player
@@ -6,9 +18,11 @@
  * @constructor
  * @extends vjs.Component
  */
-vjs.ControlBar = vjs.Component.extend();
+var ControlBar = Component.extend();
 
-vjs.ControlBar.prototype.options_ = {
+Component.registerComponent('ControlBar', ControlBar);
+
+ControlBar.prototype.options_ = {
   loadEvent: 'play',
   children: {
     'playToggle': {},
@@ -29,8 +43,8 @@ vjs.ControlBar.prototype.options_ = {
   }
 };
 
-vjs.ControlBar.prototype.createEl = function(){
-  return vjs.createEl('div', {
+ControlBar.prototype.createEl = function(){
+  return VjsLib.createEl('div', {
     className: 'vjs-control-bar'
   });
 };

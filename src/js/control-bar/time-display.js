@@ -1,24 +1,29 @@
+import Component from '../component';
+import * as VjsLib from '../lib';
+
 /**
  * Displays the current time
  * @param {vjs.Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-vjs.CurrentTimeDisplay = vjs.Component.extend({
+let CurrentTimeDisplay = Component.extend({
   /** @constructor */
   init: function(player, options){
-    vjs.Component.call(this, player, options);
+    Component.call(this, player, options);
 
     this.on(player, 'timeupdate', this.updateContent);
   }
 });
 
-vjs.CurrentTimeDisplay.prototype.createEl = function(){
-  var el = vjs.Component.prototype.createEl.call(this, 'div', {
+Component.registerComponent('CurrentTimeDisplay', CurrentTimeDisplay);
+
+CurrentTimeDisplay.prototype.createEl = function(){
+  let el = Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-current-time vjs-time-controls vjs-control'
   });
 
-  this.contentEl_ = vjs.createEl('div', {
+  this.contentEl_ = VjsLib.createEl('div', {
     className: 'vjs-current-time-display',
     innerHTML: '<span class="vjs-control-text">Current Time </span>' + '0:00', // label the current time for screen reader users
     'aria-live': 'off' // tell screen readers not to automatically read the time as it changes
@@ -28,10 +33,10 @@ vjs.CurrentTimeDisplay.prototype.createEl = function(){
   return el;
 };
 
-vjs.CurrentTimeDisplay.prototype.updateContent = function(){
+CurrentTimeDisplay.prototype.updateContent = function(){
   // Allows for smooth scrubbing, when player can't keep up.
-  var time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
-  this.contentEl_.innerHTML = '<span class="vjs-control-text">' + this.localize('Current Time') + '</span> ' + vjs.formatTime(time, this.player_.duration());
+  let time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
+  this.contentEl_.innerHTML = '<span class="vjs-control-text">' + this.localize('Current Time') + '</span> ' + VjsLib.formatTime(time, this.player_.duration());
 };
 
 /**
@@ -40,10 +45,10 @@ vjs.CurrentTimeDisplay.prototype.updateContent = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.DurationDisplay = vjs.Component.extend({
+let DurationDisplay = Component.extend({
   /** @constructor */
   init: function(player, options){
-    vjs.Component.call(this, player, options);
+    Component.call(this, player, options);
 
     // this might need to be changed to 'durationchange' instead of 'timeupdate' eventually,
     // however the durationchange event fires before this.player_.duration() is set,
@@ -54,12 +59,14 @@ vjs.DurationDisplay = vjs.Component.extend({
   }
 });
 
-vjs.DurationDisplay.prototype.createEl = function(){
-  var el = vjs.Component.prototype.createEl.call(this, 'div', {
+Component.registerComponent('DurationDisplay', DurationDisplay);
+
+DurationDisplay.prototype.createEl = function(){
+  let el = Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-duration vjs-time-controls vjs-control'
   });
 
-  this.contentEl_ = vjs.createEl('div', {
+  this.contentEl_ = VjsLib.createEl('div', {
     className: 'vjs-duration-display',
     innerHTML: '<span class="vjs-control-text">' + this.localize('Duration Time') + '</span> ' + '0:00', // label the duration time for screen reader users
     'aria-live': 'off' // tell screen readers not to automatically read the time as it changes
@@ -69,10 +76,10 @@ vjs.DurationDisplay.prototype.createEl = function(){
   return el;
 };
 
-vjs.DurationDisplay.prototype.updateContent = function(){
-  var duration = this.player_.duration();
+DurationDisplay.prototype.updateContent = function(){
+  let duration = this.player_.duration();
   if (duration) {
-      this.contentEl_.innerHTML = '<span class="vjs-control-text">' + this.localize('Duration Time') + '</span> ' + vjs.formatTime(duration); // label the duration time for screen reader users
+    this.contentEl_.innerHTML = '<span class="vjs-control-text">' + this.localize('Duration Time') + '</span> ' + VjsLib.formatTime(duration); // label the duration time for screen reader users
   }
 };
 
@@ -85,15 +92,17 @@ vjs.DurationDisplay.prototype.updateContent = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.TimeDivider = vjs.Component.extend({
+let TimeDivider = Component.extend({
   /** @constructor */
   init: function(player, options){
-    vjs.Component.call(this, player, options);
+    Component.call(this, player, options);
   }
 });
 
-vjs.TimeDivider.prototype.createEl = function(){
-  return vjs.Component.prototype.createEl.call(this, 'div', {
+Component.registerComponent('TimeDivider', TimeDivider);
+
+TimeDivider.prototype.createEl = function(){
+  return Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-time-divider',
     innerHTML: '<div><span>/</span></div>'
   });
@@ -101,25 +110,27 @@ vjs.TimeDivider.prototype.createEl = function(){
 
 /**
  * Displays the time left in the video
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */
-vjs.RemainingTimeDisplay = vjs.Component.extend({
+let RemainingTimeDisplay = Component.extend({
   /** @constructor */
   init: function(player, options){
-    vjs.Component.call(this, player, options);
+    Component.call(this, player, options);
 
     this.on(player, 'timeupdate', this.updateContent);
   }
 });
 
-vjs.RemainingTimeDisplay.prototype.createEl = function(){
-  var el = vjs.Component.prototype.createEl.call(this, 'div', {
+Component.registerComponent('RemainingTimeDisplay', RemainingTimeDisplay);
+
+RemainingTimeDisplay.prototype.createEl = function(){
+  let el = Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-remaining-time vjs-time-controls vjs-control'
   });
 
-  this.contentEl_ = vjs.createEl('div', {
+  this.contentEl_ = VjsLib.createEl('div', {
     className: 'vjs-remaining-time-display',
     innerHTML: '<span class="vjs-control-text">' + this.localize('Remaining Time') + '</span> ' + '-0:00', // label the remaining time for screen reader users
     'aria-live': 'off' // tell screen readers not to automatically read the time as it changes
@@ -129,12 +140,15 @@ vjs.RemainingTimeDisplay.prototype.createEl = function(){
   return el;
 };
 
-vjs.RemainingTimeDisplay.prototype.updateContent = function(){
+RemainingTimeDisplay.prototype.updateContent = function(){
   if (this.player_.duration()) {
-    this.contentEl_.innerHTML = '<span class="vjs-control-text">' + this.localize('Remaining Time') + '</span> ' + '-'+ vjs.formatTime(this.player_.remainingTime());
+    this.contentEl_.innerHTML = '<span class="vjs-control-text">' + this.localize('Remaining Time') + '</span> ' + '-'+ VjsLib.formatTime(this.player_.remainingTime());
   }
 
   // Allows for smooth scrubbing, when player can't keep up.
   // var time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
   // this.contentEl_.innerHTML = vjs.formatTime(time, this.player_.duration());
 };
+
+export default CurrentTimeDisplay;
+export { DurationDisplay, TimeDivider, RemainingTimeDisplay };

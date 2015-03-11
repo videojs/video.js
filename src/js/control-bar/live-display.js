@@ -1,3 +1,6 @@
+import Component from '../component';
+import * as VjsLib from '../lib';
+
 /**
  * Displays the live indicator
  * TODO - Future make it click to snap to live
@@ -5,18 +8,20 @@
  * @param {Object=} options
  * @constructor
  */
-vjs.LiveDisplay = vjs.Component.extend({
+var LiveDisplay = Component.extend({
   init: function(player, options){
-    vjs.Component.call(this, player, options);
+    Component.call(this, player, options);
   }
 });
 
-vjs.LiveDisplay.prototype.createEl = function(){
-  var el = vjs.Component.prototype.createEl.call(this, 'div', {
+Component.registerComponent('LiveDisplay', LiveDisplay);
+
+LiveDisplay.prototype.createEl = function(){
+  var el = Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-live-controls vjs-control'
   });
 
-  this.contentEl_ = vjs.createEl('div', {
+  this.contentEl_ = VjsLib.createEl('div', {
     className: 'vjs-live-display',
     innerHTML: '<span class="vjs-control-text">' + this.localize('Stream Type') + '</span>' + this.localize('LIVE'),
     'aria-live': 'off'
@@ -26,3 +31,5 @@ vjs.LiveDisplay.prototype.createEl = function(){
 
   return el;
 };
+
+export default LiveDisplay;

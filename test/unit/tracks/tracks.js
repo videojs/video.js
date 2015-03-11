@@ -1,11 +1,13 @@
 module('Tracks');
 
+var ChaptersButton = vjs.ChaptersButton;
+
 test('should place title list item into ul', function() {
   var player, chaptersButton;
 
   player = PlayerTest.makePlayer();
 
-  chaptersButton = new vjs.ChaptersButton(player);
+  chaptersButton = new ChaptersButton(player);
 
   var menuContentElement = chaptersButton.el().getElementsByTagName('UL')[0];
   var titleElement = menuContentElement.children[0];

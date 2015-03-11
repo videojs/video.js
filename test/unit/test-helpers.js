@@ -16,7 +16,7 @@ var PlayerTest = {
     playerOptions = playerOptions || {};
     playerOptions['techOrder'] = playerOptions['techOrder'] || ['mediaFaker'];
 
-    return player = new videojs.Player(videoTag, playerOptions);
+    return player = new vjs.Player(videoTag, playerOptions);
   }
 };
 
