@@ -163,7 +163,7 @@ vjs.addLanguage = function(code, data){
  */
 vjs.players = {};
 
-/*!
+/**
  * Custom Universal Module Definition (UMD)
  *
  * Video.js will never be a non-browser lib so we can simplify UMD a bunch and
