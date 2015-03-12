@@ -365,16 +365,7 @@ vjs.Flash.embed = function(swf, placeHolder, flashVars, params, attributes){
   ;
 
   placeHolder.parentNode.replaceChild(obj, placeHolder);
-
-  // IE6 seems to have an issue where it won't initialize the swf object after injecting it.
-  // This is a dumb fix
-  var newObj = par.childNodes[0];
-  setTimeout(function(){
-    newObj.style.display = 'block';
-  }, 1000);
-
   return obj;
-
 };
 
 vjs.Flash.getEmbedCode = function(swf, flashVars, params, attributes){

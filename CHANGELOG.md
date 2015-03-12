@@ -3,6 +3,7 @@ CHANGELOG
 
 ## HEAD (Unreleased)
 * @mmcc updated the slider to allow for vertical orientation ([view](https://github.com/videojs/video.js/pull/1816))
+* @dmlap removed an ie6 hack for flash object embedding ([view](https://github.com/videojs/video.js/pull/1946))
 
 --------------------
 
