@@ -11,7 +11,7 @@
 ;(function(i,w,n,e,l){
   // Allow people to disable CDN tracking themselves by specifying a global
   // (VIDEOJS_NO_ANALYTICS) as true
-  if (window.VIDEOJS_NO_ANALYTICS) return;
+  if (w.VIDEOJS_NO_ANALYTICS) return;
 
   l=w.location;
 
