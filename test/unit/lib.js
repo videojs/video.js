@@ -403,3 +403,23 @@ test('should loop through each element of an array', function() {
     }
   });
 });
+
+
+//getFileExtension tests
+test('should get the file extension of the passed path', function() {
+  equal(vjs.getFileExtension('/foo/bar/test.video.wgg'), 'wgg');
+  equal(vjs.getFileExtension('test./video.mp4'), 'mp4');
+  equal(vjs.getFileExtension('.bar/test.video.m4v'), 'm4v');
+  equal(vjs.getFileExtension('foo/.bar/test.video.flv'), 'flv');
+  equal(vjs.getFileExtension('foo/.bar/test.video.flv?foo=bar'), 'flv');
+
+  //edge cases
+  equal(vjs.getFileExtension('foo/.bar/testvideo'), '');
+  equal(vjs.getFileExtension(''), '');
+  equal(vjs.getFileExtension(null), '');
+  equal(vjs.getFileExtension(undefined), '');
+
+  //with capital letters
+  equal(vjs.getFileExtension('test.video.MP4'), 'mp4');
+  equal(vjs.getFileExtension('test.video.FLV'), 'flv');
+});

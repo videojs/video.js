@@ -237,9 +237,9 @@ vjs.Flash.nativeSourceHandler.canHandleSource = function (source) {
   var type;
 
   function guessMimeType(src) {
-    var match = src.match(/\.([^\.]+)$/);
-    if (match) {
-      return 'video/' + match[1].toLowerCase();
+    var ext = vjs.getFileExtension(src);
+    if (ext) {
+      return 'video/' + ext;
     }
     return '';
   }
