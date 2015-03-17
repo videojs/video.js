@@ -2,8 +2,8 @@
 
 # vjs.Html5
 
-__EXTENDS__: [vjs.MediaTechController](vjs.MediaTechController.md)  
-__DEFINED IN__: [src/js/media/html5.js#L12](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L12)  
+__EXTENDS__: [vjs.MediaTechController](vjs.MediaTechController.md)
+__DEFINED IN__: [src/js/media/html5.js#L12](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L12)
 
 HTML5 Media Controller - Wrapper for HTML5 Media API
 
@@ -28,7 +28,7 @@ HTML5 Media Controller - Wrapper for HTML5 Media API
 ### canControlPlaybackRate() `STATIC`
 > Check if playbackRate is supported in this browser/device.
 
-##### RETURNS: 
+##### RETURNS:
 * `[type]` [description]
 
 _defined in_: [src/js/media/html5.js#L542](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L542)
@@ -40,8 +40,8 @@ _defined in_: [src/js/media/html5.js#L542](https://github.com/videojs/video.js/b
 > Volume cannot be changed in a lot of mobile devices.
 > Specifically, it can't be changed from 1 on iOS.
 
-##### RETURNS: 
-* `Boolean` 
+##### RETURNS:
+* `Boolean`
 
 _defined in_: [src/js/media/html5.js#L532](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L532)
 
@@ -49,10 +49,10 @@ _defined in_: [src/js/media/html5.js#L532](https://github.com/videojs/video.js/b
 
 ### init( player, options, ready )
 
-##### PARAMETERS: 
-* __player__ 
-* __options__ 
-* __ready__ 
+##### PARAMETERS:
+* __player__
+* __options__
+* __ready__
 
 _defined in_: [src/js/media/html5.js#L14](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L14)
 
@@ -61,8 +61,8 @@ _defined in_: [src/js/media/html5.js#L14](https://github.com/videojs/video.js/bl
 ### isSupported() `STATIC`
 > Check if HTML5 video is supported by this browser/device
 
-##### RETURNS: 
-* `Boolean` 
+##### RETURNS:
+* `Boolean`
 
 _defined in_: [src/js/media/html5.js#L452](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L452)
 
@@ -71,8 +71,8 @@ _defined in_: [src/js/media/html5.js#L452](https://github.com/videojs/video.js/b
 ### supportsNativeTextTracks() `STATIC`
 > Check to see if native text tracks are supported by this browser/device
 
-##### RETURNS: 
-* `Boolean` 
+##### RETURNS:
+* `Boolean`
 
 _defined in_: [src/js/media/html5.js#L552](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L552)
 
@@ -84,7 +84,7 @@ _defined in_: [src/js/media/html5.js#L552](https://github.com/videojs/video.js/b
 > The default native source handler.
 > This simply passes the source to the video element. Nothing fancy.
 
-##### PARAMETERS: 
+##### PARAMETERS:
 * __source__ `Object` The source object
 * __tech__ `vjs.Html5` The instance of the HTML5 tech
 
