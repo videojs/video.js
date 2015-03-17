@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* Updated to videojs-swf v4.5.4 to fix a potential security issue ([view](https://github.com/videojs/video.js/pull/1955))
+_(none)_
 
 --------------------
+
+## 4.12.5 (2015-03-17)
+* Updated to videojs-swf v4.5.4 to fix a potential security issue ([view](https://github.com/videojs/video.js/pull/1955))
 
 ## 4.12.4 (2015-03-05)
 * Randomized the Google Analytics calls to stay under the limit ([view](https://github.com/videojs/video.js/pull/1916))
