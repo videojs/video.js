@@ -64,8 +64,23 @@ replace all occurrences of 'vjs-default-skin' with a new name. Then add your new
 skin name to your video tag instead of the default skin.
 e.g. <video class="video-js my-skin-name">
 */
-.vjs-default-skin {
+.vjs-default-skin,
+.vjs-default-skin button {
   color: @main-font-color;
+}
+
+/* Button reset */
+button.vjs-control {
+  -webkit-appearance: none;
+  -moz-appearance:    none;
+  appearance:         none;
+
+  border: none;
+  background: none;
+  box-sizing: border-box;
+  font-size: 1em;
+
+  overflow: visible; /* IE8 */
 }
 
 /* Custom Icon Font
