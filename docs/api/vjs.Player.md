@@ -126,7 +126,7 @@ After an instance has been created it can be accessed globally using `Video('exa
 > 
 >     myComponent.el();
 >     // -> <div class='my-component'></div>
->     myComonent.children();
+>     myComponent.children();
 >     // [empty array]
 > 
 >     var myButton = myComponent.addChild('MyButton');
