@@ -336,7 +336,7 @@ vjs.Component.prototype.getChild = function(name){
  *
  *     myComponent.el();
  *     // -> <div class='my-component'></div>
- *     myComonent.children();
+ *     myComponent.children();
  *     // [empty array]
  *
  *     var myButton = myComponent.addChild('MyButton');
