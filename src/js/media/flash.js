@@ -233,15 +233,24 @@ vjs.Flash.nativeSourceHandler = {};
  * @param  {Object} source  The source object
  * @return {String}         'probably', 'maybe', or '' (empty string)
  */
-vjs.Flash.nativeSourceHandler.canHandleSource = function(source){
+vjs.Flash.nativeSourceHandler.canHandleSource = function (source) {
   var type;
 
-  if (!source.type) {
+  function guessMimeType(src) {
+    var ext = vjs.getFileExtension(src);
+    if (ext) {
+      return 'video/' + ext;
+    }
     return '';
   }
 
-  // Strip code information from the type because we don't get that specific
-  type = source.type.replace(/;.*/,'').toLowerCase();
+  if (!source.type) {
+    type = guessMimeType(source.src);
+  } else {
+    // Strip code information from the type because we don't get that specific
+    type = source.type.replace(/;.*/, '').toLowerCase();
+  }
+
 
   if (type in vjs.Flash.formats) {
     return 'maybe';
