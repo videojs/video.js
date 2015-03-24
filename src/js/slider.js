@@ -16,6 +16,9 @@ vjs.Slider = vjs.Component.extend({
     this.bar = this.getChild(this.options_['barName']);
     this.handle = this.getChild(this.options_['handleName']);
 
+    // Set a horizontal or vertical class on the slider depending on the slider type
+    this.vertical(!!this.options()['vertical']);
+
     this.on('mousedown', this.onMouseDown);
     this.on('touchstart', this.onMouseDown);
     this.on('focus', this.onFocus);
@@ -78,11 +81,11 @@ vjs.Slider.prototype.update = function(){
   // If scrubbing, we could use a cached value to make the handle keep up with the user's mouse.
   // On HTML5 browsers scrubbing is really smooth, but some flash players are slow, so we might want to utilize this later.
   // var progress =  (this.player_.scrubbing) ? this.player_.getCache().currentTime / this.player_.duration() : this.player_.currentTime() / this.player_.duration();
+  var progress = this.getPercent();
+  var bar = this.bar;
 
-  var barProgress,
-      progress = this.getPercent(),
-      handle = this.handle,
-      bar = this.bar;
+  // If there's no bar...
+  if (!bar) return;
 
   // Protect against no duration and other division issues
   if (typeof progress !== 'number' ||
@@ -92,39 +95,63 @@ vjs.Slider.prototype.update = function(){
         progress = 0;
   }
 
-  barProgress = progress;
-
   // If there is a handle, we need to account for the handle in our calculation for progress bar
   // so that it doesn't fall short of or extend past the handle.
-  if (handle) {
+  var barProgress = this.updateHandlePosition(progress);
 
-    var box = this.el_,
-        boxWidth = box.offsetWidth,
+  // Convert to a percentage for setting
+  var percentage = vjs.round(barProgress * 100, 2) + '%';
 
-        handleWidth = handle.el().offsetWidth,
+  // Set the new bar width or height
+  if (this.vertical()) {
+    bar.el().style.height = percentage;
+  } else {
+    bar.el().style.width = percentage;
+  }
+};
 
-        // The width of the handle in percent of the containing box
-        // In IE, widths may not be ready yet causing NaN
-        handlePercent = (handleWidth) ? handleWidth / boxWidth : 0,
+/**
+* Update the handle position.
+*/
+vjs.Slider.prototype.updateHandlePosition = function(progress) {
+  var handle = this.handle;
+  if (!handle) return;
 
-        // Get the adjusted size of the box, considering that the handle's center never touches the left or right side.
-        // There is a margin of half the handle's width on both sides.
-        boxAdjustedPercent = 1 - handlePercent,
+  var vertical = this.vertical();
+  var box = this.el_;
 
-        // Adjust the progress that we'll use to set widths to the new adjusted box width
-        adjustedProgress = progress * boxAdjustedPercent;
-
-    // The bar does reach the left side, so we need to account for this in the bar's width
-    barProgress = adjustedProgress + (handlePercent / 2);
-
-    // Move the handle from the left based on the adjected progress
-    handle.el().style.left = vjs.round(adjustedProgress * 100, 2) + '%';
+  var boxSize, handleSize;
+  if (vertical) {
+    boxSize = box.offsetHeight;
+    handleSize = handle.el().offsetHeight;
+  } else {
+    boxSize = box.offsetWidth;
+    handleSize = handle.el().offsetWidth;
   }
 
-  // Set the new bar width
-  if (bar) {
-    bar.el().style.width = vjs.round(barProgress * 100, 2) + '%';
+  // The width of the handle in percent of the containing box
+  // In IE, widths may not be ready yet causing NaN
+  var handlePercent = (handleSize) ? handleSize / boxSize : 0,
+
+  // Get the adjusted size of the box, considering that the handle's center never touches the left or right side.
+  // There is a margin of half the handle's width on both sides.
+  boxAdjustedPercent = 1 - handlePercent,
+
+  // Adjust the progress that we'll use to set widths to the new adjusted box width
+  adjustedProgress = progress * boxAdjustedPercent;
+
+  // The bar does reach the left side, so we need to account for this in the bar's width
+  var barProgress = adjustedProgress + (handlePercent / 2);
+
+  var percentage = vjs.round(adjustedProgress * 100, 2) + '%';
+
+  if (vertical) {
+    handle.el().style.bottom = percentage;
+  } else {
+    handle.el().style.left = percentage;
   }
+
+  return barProgress;
 };
 
 vjs.Slider.prototype.calculateDistance = function(event){
@@ -132,7 +159,8 @@ vjs.Slider.prototype.calculateDistance = function(event){
 
   el = this.el_;
   box = vjs.findPosition(el);
-  boxW = boxH = el.offsetWidth;
+  boxW = el.offsetWidth;
+  boxH = el.offsetHeight;
   handle = this.handle;
 
   if (this.options()['vertical']) {
@@ -202,6 +230,23 @@ vjs.Slider.prototype.onBlur = function(){
 vjs.Slider.prototype.onClick = function(event){
   event.stopImmediatePropagation();
   event.preventDefault();
+};
+
+vjs.Slider.prototype.vertical_ = false;
+vjs.Slider.prototype.vertical = function(bool) {
+  if (bool === undefined) {
+    return this.vertical_;
+  }
+
+  this.vertical_ = !!bool;
+
+  if (this.vertical_) {
+    this.addClass('vjs-slider-vertical');
+  } else {
+    this.addClass('vjs-slider-horizontal');
+  }
+
+  return this;
 };
 
 /**

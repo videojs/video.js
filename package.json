@@ -1,8 +1,9 @@
 {
   "name": "video.js",
   "description": "An HTML5 and Flash video player with a common API and skin for both.",
-  "version": "4.12.3",
-  "copyright": "Copyright 2014 Brightcove, Inc. https://github.com/videojs/video.js/blob/master/LICENSE",
+  "version": "4.12.5",
+  "copyright": "Copyright Brightcove, Inc. <https://www.brightcove.com/>",
+  "license": "Apache-2.0",
   "keywords": [
     "videojs",
     "html5",
@@ -21,7 +22,7 @@
   },
   "main": "./dist/video-js/video.js",
   "dependencies": {
-    "videojs-swf": "4.5.3",
+    "videojs-swf": "4.5.4",
     "vtt.js": "git+https://github.com/gkatsev/vtt.js.git#shim-build"
   },
   "devDependencies": {
@@ -40,6 +41,7 @@
     "grunt-contrib-jshint": "~0.4.3",
     "grunt-contrib-less": "~0.6.4",
     "grunt-contrib-qunit": "~0.2.1",
+    "grunt-contrib-uglify": "^0.8.0",
     "grunt-contrib-watch": "~0.1.4",
     "grunt-fastly": "^0.1.3",
     "grunt-github-releaser": "^0.1.17",
