@@ -941,7 +941,7 @@ _defined in_: [src/js/player.js#L647](https://github.com/videojs/video.js/blob/m
 > Gets or sets the current playback rate.
 
 ##### PARAMETERS: 
-* __rate__ `Boolean` New playback rate to set.
+* __rate__ `Number` New playback rate to set.
 
 ##### RETURNS: 
 * `Number` Returns the new playback rate when setting
