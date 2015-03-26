@@ -1,5 +1,5 @@
 import Component from '../component';
-import * as VjsLib from '../lib';
+import * as Lib from '../lib';
 import window from 'global/window';
 
 /**
@@ -17,7 +17,7 @@ let MediaLoader = Component.extend({
     // load the first supported playback technology.
     if (!player.options_['sources'] || player.options_['sources'].length === 0) {
       for (let i=0, j=player.options_['techOrder']; i<j.length; i++) {
-        let techName = VjsLib.capitalize(j[i]);
+        let techName = Lib.capitalize(j[i]);
         let tech = Component.getComponent(techName);
 
         // Check if the browser supports this technology

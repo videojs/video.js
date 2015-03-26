@@ -1,8 +1,10 @@
 import TextTrackCueList from './text-track-cue-list';
-import * as VjsLib from '../lib';
+import * as Lib from '../lib';
 import * as TextTrackEnum from './text-track-enums';
 import EventEmitter from '../event-emitter';
 import document from 'global/document';
+import window from 'global/window';
+import XHR from '../xhr.js';
 
 /*
  * https://html.spec.whatwg.org/multipage/embedded-content.html#texttrack
@@ -35,7 +37,7 @@ let TextTrack = function(options) {
   }
 
   let tt = this;
-  if (VjsLib.IS_IE8) {
+  if (Lib.IS_IE8) {
     tt = document.createElement('custom');
 
     for (let prop in TextTrack.prototype) {
@@ -49,7 +51,7 @@ let TextTrack = function(options) {
   let kind = TextTrackEnum.TextTrackKind[options['kind']] || 'subtitles';
   let label = options['label'] || '';
   let language = options['language'] || options['srclang'] || '';
-  let id = options['id'] || 'vjs_text_track_' + VjsLib.guid++;
+  let id = options['id'] || 'vjs_text_track_' + Lib.guid++;
 
   if (kind === 'metadata' || kind === 'chapters') {
     mode = 'hidden';
@@ -62,7 +64,7 @@ let TextTrack = function(options) {
   let activeCues = new TextTrackCueList(tt.activeCues_);
 
   let changed = false;
-  let timeupdateHandler = VjsLib.bind(tt, function() {
+  let timeupdateHandler = Lib.bind(tt, function() {
     this['activeCues'];
     if (changed) {
       this['trigger']('cuechange');
@@ -176,12 +178,12 @@ let TextTrack = function(options) {
     tt.loaded_ = true;
   }
 
-  if (VjsLib.IS_IE8) {
+  if (Lib.IS_IE8) {
     return tt;
   }
 };
 
-TextTrack.prototype = VjsLib.obj.create(EventEmitter.prototype);
+TextTrack.prototype = Lib.obj.create(EventEmitter.prototype);
 TextTrack.prototype.constructor = TextTrack;
 
 /*
@@ -239,17 +241,17 @@ let parseCues = function(srcContent, track) {
     track.addCue(cue);
   };
   parser['onparsingerror'] = function(error) {
-    VjsLib.log.error(error);
+    Lib.log.error(error);
   };
 
   parser['parse'](srcContent);
   parser['flush']();
 };
 
-let loadTrack = function(src, track) {
-  VjsLib.xhr(src, VjsLib.bind(this, function(err, response, responseBody){
+var loadTrack = function(src, track) {
+  XHR(src, Lib.bind(this, function(err, response, responseBody){
     if (err) {
-      return VjsLib.log.error(err);
+      return Lib.log.error(err);
     }
 
 
@@ -258,7 +260,7 @@ let loadTrack = function(src, track) {
   }));
 };
 
-let indexOf = function(searchElement, fromIndex) {
+var indexOf = function(searchElement, fromIndex) {
   if (this == null) {
     throw new TypeError('"this" is null or not defined');
   }

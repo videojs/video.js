@@ -5,10 +5,11 @@
  */
 
 import MediaTechController from './media';
-import * as VjsLib from '../lib';
+import * as Lib from '../lib';
 import FlashRtmpDecorator from './flash-rtmp';
 import Component from '../component';
 import window from 'global/window';
+let navigator = window.navigator;
 
 /**
  * Flash Media Controller - Wrapper for fallback SWF API
@@ -29,7 +30,7 @@ var Flash = MediaTechController.extend({
     let parentEl = options['parentEl'];
 
     // Create a temporary element to be replaced by swf object
-    let placeHolder = this.el_ = VjsLib.createEl('div', { id: player.id() + '_temp_flash' });
+    let placeHolder = this.el_ = Lib.createEl('div', { id: player.id() + '_temp_flash' });
 
     // Generate ID for swf object
     let objId = player.id()+'_flash_api';
@@ -40,7 +41,7 @@ var Flash = MediaTechController.extend({
     let playerOptions = player.options_;
 
     // Merge default flashvars with ones passed in to init
-    let flashVars = VjsLib.obj.merge({
+    let flashVars = Lib.obj.merge({
 
       // SWF Callback Functions
       'readyFunction': 'videojs.Flash.onReady',
@@ -56,13 +57,13 @@ var Flash = MediaTechController.extend({
     }, options['flashVars']);
 
     // Merge default parames with ones passed in
-    let params = VjsLib.obj.merge({
+    let params = Lib.obj.merge({
       'wmode': 'opaque', // Opaque is needed to overlay controls, but can affect playback performance
       'bgcolor': '#000000' // Using bgcolor prevents a white flash when the object is loading
     }, options['params']);
 
     // Merge default attributes with ones passed in
-    let attributes = VjsLib.obj.merge({
+    let attributes = Lib.obj.merge({
       'id': objId,
       'name': objId, // Both ID and Name needed or swf to identify itself
       'class': 'vjs-tech'
@@ -76,7 +77,7 @@ var Flash = MediaTechController.extend({
     }
 
     // Add placeholder to player div
-    VjsLib.insertFirst(placeHolder, parentEl);
+    Lib.insertFirst(placeHolder, parentEl);
 
     // Having issues with Flash reloading on certain page actions (hide/resize/fullscreen) in certain browsers
     // This allows resetting the playhead when we catch the reload
@@ -90,7 +91,7 @@ var Flash = MediaTechController.extend({
 
     // firefox doesn't bubble mousemove events to parent. videojs/video-js-swf#37
     // bugzilla bug: https://bugzilla.mozilla.org/show_bug.cgi?id=836786
-    if (VjsLib.IS_FIREFOX) {
+    if (Lib.IS_FIREFOX) {
       this.ready(function(){
         this.on('mousemove', function(){
           // since it's a custom event, don't bubble higher than the player
@@ -132,7 +133,7 @@ Flash.prototype.src = function(src){
 
 Flash.prototype.setSrc = function(src){
   // Make sure source URL is absolute.
-  src = VjsLib.getAbsoluteURL(src);
+  src = Lib.getAbsoluteURL(src);
   this.el_.vjs_src(src);
 
   // Currently the SWF doesn't autoplay if you load a source later.
@@ -178,7 +179,7 @@ Flash.prototype['setPoster'] = function(){
 };
 
 Flash.prototype.buffered = function(){
-  return VjsLib.createTimeRange(0, this.el_.vjs_getProperty('buffered'));
+  return Lib.createTimeRange(0, this.el_.vjs_getProperty('buffered'));
 };
 
 Flash.prototype.supportsFullScreen = function(){
@@ -289,7 +290,7 @@ Flash.formats = {
 };
 
 Flash['onReady'] = function(currSwf){
-  let el = VjsLib.el(currSwf);
+  let el = Lib.el(currSwf);
 
   // get player from the player div property
   const player = el && el.parentNode && el.parentNode['player'];
@@ -326,13 +327,13 @@ Flash['checkReady'] = function(tech){
 
 // Trigger events from the swf on the player
 Flash['onEvent'] = function(swfID, eventName){
-  let player = VjsLib.el(swfID)['player'];
+  let player = Lib.el(swfID)['player'];
   player.trigger(eventName);
 };
 
 // Log errors from the swf
 Flash['onError'] = function(swfID, err){
-  const player = VjsLib.el(swfID)['player'];
+  const player = Lib.el(swfID)['player'];
   const msg = 'FLASH: '+err;
 
   if (err == 'srcnotfound') {
@@ -368,7 +369,7 @@ Flash.embed = function(swf, placeHolder, flashVars, params, attributes){
   const code = Flash.getEmbedCode(swf, flashVars, params, attributes);
 
   // Get element by embedding code and retrieving created element
-  const obj = VjsLib.createEl('div', { innerHTML: code }).childNodes[0];
+  const obj = Lib.createEl('div', { innerHTML: code }).childNodes[0];
 
   const par = placeHolder.parentNode;
 
@@ -384,13 +385,13 @@ Flash.getEmbedCode = function(swf, flashVars, params, attributes){
 
   // Convert flash vars to string
   if (flashVars) {
-    VjsLib.obj.each(flashVars, function(key, val){
+    Lib.obj.each(flashVars, function(key, val){
       flashVarsString += (key + '=' + val + '&amp;');
     });
   }
 
   // Add swf, flashVars, and other default params
-  params = VjsLib.obj.merge({
+  params = Lib.obj.merge({
     'movie': swf,
     'flashvars': flashVarsString,
     'allowScriptAccess': 'always', // Required to talk to swf
@@ -398,11 +399,11 @@ Flash.getEmbedCode = function(swf, flashVars, params, attributes){
   }, params);
 
   // Create param tags string
-  VjsLib.obj.each(params, function(key, val){
+  Lib.obj.each(params, function(key, val){
     paramsString += '<param name="'+key+'" value="'+val+'" />';
   });
 
-  attributes = VjsLib.obj.merge({
+  attributes = Lib.obj.merge({
     // Add swf to attributes (need both for IE and Others to work)
     'data': swf,
 
@@ -413,7 +414,7 @@ Flash.getEmbedCode = function(swf, flashVars, params, attributes){
   }, attributes);
 
   // Create Attributes string
-  VjsLib.obj.each(attributes, function(key, val){
+  Lib.obj.each(attributes, function(key, val){
     attrsString += (key + '="' + val + '" ');
   });
 

@@ -1,21 +1,20 @@
-(function() {
-'use strict';
+import TextTrack from '../../../src/js/tracks/text-track.js';
+import window from 'global/window';
+import TestHelpers from '../test-helpers.js';
 
-module('Text Track');
+var noop = Function.prototype;
+var defaultPlayer = {
+  textTracks: noop,
+  on: noop,
+  off: noop,
+  currentTime: noop
+};
 
-var TT = vjs.TextTrack,
-    noop = Function.prototype,
-    defaultPlayer = {
-      textTracks: noop,
-      on: noop,
-      off: noop,
-      currentTime: noop
-    };
-
+q.module('Text Track');
 
 test('text-track requires a player', function() {
   window.throws(function() {
-           new TT();
+           new TextTrack();
          },
          new Error('A player was not provided.'),
          'a player is required for text track');
@@ -27,7 +26,7 @@ test('can create a TextTrack with various properties', function() {
       language = 'en',
       id = '1',
       mode = 'disabled',
-      tt = new TT({
+      tt = new TextTrack({
         player: defaultPlayer,
         kind: kind,
         label: label,
@@ -44,7 +43,7 @@ test('can create a TextTrack with various properties', function() {
 });
 
 test('defaults when items not provided', function() {
-  var tt = new TT({
+  var tt = new TextTrack({
     player: defaultPlayer
   });
 
@@ -55,7 +54,7 @@ test('defaults when items not provided', function() {
 });
 
 test('kind can only be one of several options, defaults to subtitles', function() {
-  var tt = new TT({
+  var tt = new TextTrack({
     player: defaultPlayer,
     kind: 'foo'
   });
@@ -63,35 +62,35 @@ test('kind can only be one of several options, defaults to subtitles', function(
   equal(tt.kind, 'subtitles', 'the kind is set to subtitles, not foo');
   notEqual(tt.kind, 'foo', 'the kind is set to subtitles, not foo');
 
-  tt = new TT({
+  tt = new TextTrack({
     player: defaultPlayer,
     kind: 'subtitles'
   });
 
   equal(tt.kind, 'subtitles', 'the kind is set to subtitles');
 
-  tt = new TT({
+  tt = new TextTrack({
     player: defaultPlayer,
     kind: 'captions'
   });
 
   equal(tt.kind, 'captions', 'the kind is set to captions');
 
-  tt = new TT({
+  tt = new TextTrack({
     player: defaultPlayer,
     kind: 'descriptions'
   });
 
   equal(tt.kind, 'descriptions', 'the kind is set to descriptions');
 
-  tt = new TT({
+  tt = new TextTrack({
     player: defaultPlayer,
     kind: 'chapters'
   });
 
   equal(tt.kind, 'chapters', 'the kind is set to chapters');
 
-  tt = new TT({
+  tt = new TextTrack({
     player: defaultPlayer,
     kind: 'metadata'
   });
@@ -100,7 +99,7 @@ test('kind can only be one of several options, defaults to subtitles', function(
 });
 
 test('mode can only be one of several options, defaults to disabled', function() {
-  var tt = new TT({
+  var tt = new TextTrack({
     player: defaultPlayer,
     mode: 'foo'
   });
@@ -108,21 +107,21 @@ test('mode can only be one of several options, defaults to disabled', function()
   equal(tt.mode, 'disabled', 'the mode is set to disabled, not foo');
   notEqual(tt.mode, 'foo', 'the mode is set to disabld, not foo');
 
-  tt = new TT({
+  tt = new TextTrack({
     player: defaultPlayer,
     mode: 'disabled'
   });
 
   equal(tt.mode, 'disabled', 'the mode is set to disabled');
 
-  tt = new TT({
+  tt = new TextTrack({
     player: defaultPlayer,
     mode: 'hidden'
   });
 
   equal(tt.mode, 'hidden', 'the mode is set to hidden');
 
-  tt = new TT({
+  tt = new TextTrack({
     player: defaultPlayer,
     mode: 'showing'
   });
@@ -136,7 +135,7 @@ test('kind, label, language, id, cue, and activeCues are read only', function() 
       language = 'en',
       id = '1',
       mode = 'disabled',
-      tt = new TT({
+      tt = new TextTrack({
         player: defaultPlayer,
         kind: kind,
         label: label,
@@ -161,7 +160,7 @@ test('kind, label, language, id, cue, and activeCues are read only', function() 
 });
 
 test('mode can only be set to a few options', function() {
-  var tt = new TT({
+  var tt = new TextTrack({
     player: defaultPlayer
   });
 
@@ -186,7 +185,7 @@ test('mode can only be set to a few options', function() {
 });
 
 test('cues and activeCues return a TextTrackCueList', function() {
-  var tt = new TT({
+  var tt = new TextTrack({
     player: defaultPlayer
   });
 
@@ -195,7 +194,7 @@ test('cues and activeCues return a TextTrackCueList', function() {
 });
 
 test('cues can be added and removed from a TextTrack', function() {
-  var tt = new TT({
+  var tt = new TextTrack({
         player: defaultPlayer
       }),
       cues;
@@ -221,10 +220,10 @@ test('cues can be added and removed from a TextTrack', function() {
 });
 
 test('fires cuechange when cues become active and inactive', function() {
-  var player = PlayerTest.makePlayer(),
+  var player = TestHelpers.makePlayer(),
       changes = 0,
       cuechangeHandler,
-      tt = new TT({
+      tt = new TextTrack({
         player: player,
         mode: 'showing'
       });
@@ -258,5 +257,3 @@ test('fires cuechange when cues become active and inactive', function() {
 
   equal(changes, 4, 'a cuechange event trigger addEventListener and oncuechange');
 });
-
-})();

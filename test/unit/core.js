@@ -1,4 +1,10 @@
-module('Core');
+import videojs from '../../src/js/core.js';
+import Player from '../../src/js/player.js';
+import * as Lib from '../../src/js/lib.js';
+import Options from '../../src/js/options.js';
+import document from 'global/document';
+
+q.module('Core');
 
 test('should create a video tag and have access children in old IE', function(){
   var fixture = document.getElementById('qunit-fixture');
@@ -18,7 +24,7 @@ test('should return a video player instance', function(){
   var player = videojs('test_vid_id');
   ok(player, 'created player from tag');
   ok(player.id() === 'test_vid_id');
-  ok(videojs.players['test_vid_id'] === player, 'added player to global reference');
+  ok(Player.players['test_vid_id'] === player, 'added player to global reference');
 
   var playerAgain = videojs('test_vid_id');
   ok(player === playerAgain, 'did not create a second player from same tag');
@@ -33,9 +39,9 @@ test('should add the value to the languages object', function() {
 
   code = 'es';
   data = {'Hello': 'Hola'};
-  result = vjs.addLanguage(code, data);
+  result = videojs.addLanguage(code, data);
 
-  ok(vjs.options['languages'][code], 'should exist');
-  equal(vjs.options['languages'][code], data, 'should match');
-  deepEqual(result[code], vjs.options['languages'][code], 'should also match');
+  ok(Options['languages'][code], 'should exist');
+  equal(Options['languages'][code], data, 'should match');
+  deepEqual(result[code], Options['languages'][code], 'should also match');
 });

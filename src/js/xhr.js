@@ -1,5 +1,5 @@
-import VjsUtils from './utils';
-import * as VjsLib from './lib';
+import * as VjsUtils from './util';
+import * as Lib from './lib';
 import window from 'global/window';
 
 /**
@@ -66,7 +66,7 @@ var xhr = function(options, callback){
   // Store a reference to the url on the request instance
   request.uri = options.uri;
 
-  let urlInfo = VjsLib.parseUrl(options.uri);
+  let urlInfo = Lib.parseUrl(options.uri);
   let winLoc = window.location;
 
   let successHandler = function(){

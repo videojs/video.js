@@ -13,7 +13,9 @@ import ErrorDisplay from './error-display';
 import videojs from './core';
 import * as setup from './setup';
 import Component from './component';
-import * as VjsLib from './lib';
+import * as Lib from './lib';
+import * as Util from './util.js';
+
 
 if (typeof HTMLVideoElement === 'undefined') {
   document.createElement('video');
@@ -28,18 +30,31 @@ setup.autoSetupTimeout(1, videojs);
 videojs.getComponent = Component.getComponent;
 videojs.registerComponent = Component.registerComponent;
 
-// Expose but deprecate the window[componentName] method for accessing components
-VjsLib.obj.each(Component.components, function(name, component){
-  // A deprecation warning as the constuctor
-  module.exports[name] = function(player, options, ready){
-    VjsLib.log.warn('Using videojs.'+name+' to access the '+name+' component has been deprecated. Please use videojs.getComponent("componentName")');
+// APIs that will be removed with 5.0, but need them to get tests passing
+// in ES6 transition
+videojs.TOUCH_ENABLED = Lib.TOUCH_ENABLED;
+videojs.util = Util;
 
-    return new Component(player, options, ready);
-  };
+// Probably want to keep this one for 5.0?
+import Player from './player';
+videojs.players = Player.players;
 
-  // Allow the prototype and class methods to be accessible still this way
-  // Though anything that attempts to override class methods will no longer work
-  VjsLib.obj.merge(module.exports[name], component);
-});
+// REMOVING: We probably should not include this in 5.0 thought it would make it
+// more backwards compatible
+// // Expose but deprecate the window[componentName] method for accessing components
+// Lib.obj.each(Component.components, function(name, component){
+//   // A deprecation warning as the constuctor
+//   module.exports[name] = function(player, options, ready){
+//     Lib.log.warn('Using videojs.'+name+' to access the '+name+' component has been deprecated. Please use videojs.getComponent("componentName")');
+//
+//     return new Component(player, options, ready);
+//   };
+//
+//   // Allow the prototype and class methods to be accessible still this way
+//   // Though anything that attempts to override class methods will no longer work
+//   Lib.obj.merge(module.exports[name], component);
+// });
+
+
 
 export default videojs;

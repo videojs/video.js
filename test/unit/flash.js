@@ -1,6 +1,7 @@
-module('Flash');
+import Flash from '../../src/js/media/flash.js';
+import document from 'global/document';
 
-var Flash = vjs.Flash;
+q.module('Flash');
 
 var streamToPartsAndBack = function(url) {
   var parts = Flash.streamToParts(url);
@@ -76,7 +77,15 @@ test('currentTime is the seek target during seeking', function() {
         trigger: noop,
         ready: noop,
         addChild: noop,
-        options_: {}
+        options_: {},
+        // This complexity is needed because of the VTT.js loading
+        // It'd be great if we can find a better solution for that
+        options: function(){ return {}; },
+        el: function(){
+          return {
+            appendChild: noop
+          };
+        }
       }, {
         'parentEl': parentEl
       }),
@@ -113,6 +122,7 @@ test('dispose removes the object element even before ready fires', function() {
         trigger: noop,
         ready: noop,
         addChild: noop,
+        options: function(){ return {}; },
         options_: {}
       }, {
         'parentEl': parentEl
@@ -126,7 +136,7 @@ test('dispose removes the object element even before ready fires', function() {
 test('ready triggering before and after disposing the tech', function() {
   var checkReady, fixtureDiv, playerDiv, techEl;
 
-  checkReady = sinon.stub(vjs.Flash, 'checkReady');
+  checkReady = sinon.stub(Flash, 'checkReady');
 
   fixtureDiv = document.getElementById('qunit-fixture');
   playerDiv = document.createElement('div');

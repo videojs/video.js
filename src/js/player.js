@@ -1,12 +1,24 @@
-import Component from './component';
-import * as VjsLib from './lib';
-import * as VjsEvents from './events';
-import FullscreenApi from './fullscreen-api';
-import MediaError from './media-error';
-import options from './options';
-import JSON from './json';
+import Component from './component.js';
+import * as Lib from './lib.js';
+import * as Events from './events.js';
+import FullscreenApi from './fullscreen-api.js';
+import MediaError from './media-error.js';
+import options from './options.js';
+import JSON from './json.js';
 import window from 'global/window';
 import document from 'global/document';
+
+// Include required child components
+import MediaLoader from './media/loader.js';
+import Poster from './poster.js';
+import TextTrackDisplay from './tracks/text-track-controls.js';
+import LoadingSpinner from './loading-spinner.js';
+import BigPlayButton from './big-play-button.js';
+import controlBar from './control-bar/control-bar.js';
+import ErrorDisplay from './error-display.js';
+import TextTrackSettings from './tracks/text-track-settings.js';
+// Require html5 for disposing the original video tag
+import Html5 from './media/html5.js';
 
 /**
  * An instance of the `vjs.Player` class is created when any of the Video.js setup methods are used to initialize a video.
@@ -43,17 +55,17 @@ let Player = Component.extend({
     this.tag = tag; // Store the original tag used to set options
 
     // Make sure tag ID exists
-    tag.id = tag.id || 'vjs_video_' + VjsLib.guid++;
+    tag.id = tag.id || 'vjs_video_' + Lib.guid++;
 
     // Store the tag attributes used to restore html5 element
-    this.tagAttributes = tag && VjsLib.getElementAttributes(tag);
+    this.tagAttributes = tag && Lib.getElementAttributes(tag);
 
     // Set Options
     // The options argument overrides options set in the video tag
     // which overrides globally set options.
     // This latter part coincides with the load order
     // (tag must exist before Player)
-    options = VjsLib.obj.merge(this.getTagSettings(tag), options);
+    options = Lib.obj.merge(this.getTagSettings(tag), options);
 
     // Update Current Language
     this.language_ = options['language'] || options['language'];
@@ -108,7 +120,7 @@ let Player = Component.extend({
     Player.players[this.id_] = this;
 
     if (options['plugins']) {
-      VjsLib.obj.each(options['plugins'], function(key, val){
+      Lib.obj.each(options['plugins'], function(key, val){
         this[key](val);
       }, this);
     }
@@ -201,17 +213,17 @@ Player.prototype.getTagSettings = function(tag){
     'tracks': []
   };
 
-  const tagOptions = VjsLib.getElementAttributes(tag);
+  const tagOptions = Lib.getElementAttributes(tag);
   const dataSetup = tagOptions['data-setup'];
 
   // Check if data-setup attr exists.
   if (dataSetup !== null){
     // Parse options JSON
     // If empty string, make it a parsable json object.
-    VjsLib.obj.merge(tagOptions, JSON.parse(dataSetup || '{}'));
+    Lib.obj.merge(tagOptions, JSON.parse(dataSetup || '{}'));
   }
 
-  VjsLib.obj.merge(baseOptions, tagOptions);
+  Lib.obj.merge(baseOptions, tagOptions);
 
   // Get tag children settings
   if (tag.hasChildNodes()) {
@@ -222,9 +234,9 @@ Player.prototype.getTagSettings = function(tag){
       // Change case needed: http://ejohn.org/blog/nodename-case-sensitivity/
       const childName = child.nodeName.toLowerCase();
       if (childName === 'source') {
-        baseOptions['sources'].push(VjsLib.getElementAttributes(child));
+        baseOptions['sources'].push(Lib.getElementAttributes(child));
       } else if (childName === 'track') {
-        baseOptions['tracks'].push(VjsLib.getElementAttributes(child));
+        baseOptions['tracks'].push(Lib.getElementAttributes(child));
       }
     }
   }
@@ -242,8 +254,8 @@ Player.prototype.createEl = function(){
 
   // Copy over all the attributes from the tag, including ID and class
   // ID will now reference player box, not the video tag
-  const attrs = VjsLib.getElementAttributes(tag);
-  VjsLib.obj.each(attrs, function(attr) {
+  const attrs = Lib.getElementAttributes(tag);
+  Lib.obj.each(attrs, function(attr) {
     // workaround so we don't totally break IE7
     // http://stackoverflow.com/questions/3653444/css-styles-not-applied-on-dynamic-elements-in-internet-explorer-7
     if (attr == 'class') {
@@ -277,7 +289,7 @@ Player.prototype.createEl = function(){
   if (tag.parentNode) {
     tag.parentNode.insertBefore(el, tag);
   }
-  VjsLib.insertFirst(tag, el); // Breaks iPhone, fixed in HTML5 setup.
+  Lib.insertFirst(tag, el); // Breaks iPhone, fixed in HTML5 setup.
 
   // The event listeners need to be added before the children are added
   // in the component init because the tech (loaded with mediaLoader) may
@@ -329,7 +341,7 @@ Player.prototype.loadTech = function(techName, source){
   };
 
   // Grab tech-specific options from player options and add source and parent element to use.
-  var techOptions = VjsLib.obj.merge({ 'source': source, 'parentEl': this.el_ }, this.options_[techName.toLowerCase()]);
+  var techOptions = Lib.obj.merge({ 'source': source, 'parentEl': this.el_ }, this.options_[techName.toLowerCase()]);
 
   if (source) {
     this.currentType_ = source.type;
@@ -626,7 +638,7 @@ Player.prototype.techCall = function(method, arg){
     try {
       this.tech[method](arg);
     } catch(e) {
-      VjsLib.log(e);
+      Lib.log(e);
       throw e;
     }
   }
@@ -644,14 +656,14 @@ Player.prototype.techGet = function(method){
     } catch(e) {
       // When building additional tech libs, an expected method may not be defined yet
       if (this.tech[method] === undefined) {
-        VjsLib.log('Video.js: ' + method + ' method not defined for '+this.techName+' playback technology.', e);
+        Lib.log('Video.js: ' + method + ' method not defined for '+this.techName+' playback technology.', e);
       } else {
         // When a method isn't available on the object it throws a TypeError
         if (e.name == 'TypeError') {
-          VjsLib.log('Video.js: ' + method + ' unavailable on '+this.techName+' playback technology element.', e);
+          Lib.log('Video.js: ' + method + ' unavailable on '+this.techName+' playback technology element.', e);
           this.tech.isReady_ = false;
         } else {
-          VjsLib.log(e);
+          Lib.log(e);
         }
       }
       throw e;
@@ -795,7 +807,7 @@ Player.prototype.buffered = function(){
   var buffered = this.techGet('buffered');
 
   if (!buffered || !buffered.length) {
-    buffered = VjsLib.createTimeRange(0,0);
+    buffered = Lib.createTimeRange(0,0);
   }
 
   return buffered;
@@ -876,7 +888,7 @@ Player.prototype.volume = function(percentAsDecimal){
     vol = Math.max(0, Math.min(1, parseFloat(percentAsDecimal))); // Force value to between 0 and 1
     this.cache_.volume = vol;
     this.techCall('setVolume', vol);
-    VjsLib.setLocalStorage('volume', vol);
+    Lib.setLocalStorage('volume', vol);
     return this;
   }
 
@@ -950,7 +962,7 @@ Player.prototype.isFullscreen = function(isFS){
  * @deprecated for lowercase 's' version
  */
 Player.prototype.isFullScreen = function(isFS){
-  VjsLib.log.warn('player.isFullScreen() has been deprecated, use player.isFullscreen() with a lowercase "s")');
+  Lib.log.warn('player.isFullScreen() has been deprecated, use player.isFullscreen() with a lowercase "s")');
   return this.isFullscreen(isFS);
 };
 
@@ -982,12 +994,12 @@ Player.prototype.requestFullscreen = function(){
     // when canceling fullscreen. Otherwise if there's multiple
     // players on a page, they would all be reacting to the same fullscreen
     // events
-    VjsEvents.on(document, fsApi['fullscreenchange'], VjsLib.bind(this, function documentFullscreenChange(e){
+    Events.on(document, fsApi['fullscreenchange'], Lib.bind(this, function documentFullscreenChange(e){
       this.isFullscreen(document[fsApi.fullscreenElement]);
 
       // If cancelling fullscreen, remove event listener.
       if (this.isFullscreen() === false) {
-        VjsEvents.off(document, fsApi['fullscreenchange'], documentFullscreenChange);
+        Events.off(document, fsApi['fullscreenchange'], documentFullscreenChange);
       }
 
       this.trigger('fullscreenchange');
@@ -1014,7 +1026,7 @@ Player.prototype.requestFullscreen = function(){
  * @deprecated for lower case 's' version
  */
 Player.prototype.requestFullScreen = function(){
-  VjsLib.log.warn('player.requestFullScreen() has been deprecated, use player.requestFullscreen() with a lowercase "s")');
+  Lib.log.warn('player.requestFullScreen() has been deprecated, use player.requestFullscreen() with a lowercase "s")');
   return this.requestFullscreen();
 };
 
@@ -1047,7 +1059,7 @@ Player.prototype.exitFullscreen = function(){
  * @deprecated for exitFullscreen
  */
 Player.prototype.cancelFullScreen = function(){
-  VjsLib.log.warn('player.cancelFullScreen() has been deprecated, use player.exitFullscreen()');
+  Lib.log.warn('player.cancelFullScreen() has been deprecated, use player.exitFullscreen()');
   return this.exitFullscreen();
 };
 
@@ -1059,13 +1071,13 @@ Player.prototype.enterFullWindow = function(){
   this.docOrigOverflow = document.documentElement.style.overflow;
 
   // Add listener for esc key to exit fullscreen
-  VjsEvents.on(document, 'keydown', VjsLib.bind(this, this.fullWindowOnEscKey));
+  Events.on(document, 'keydown', Lib.bind(this, this.fullWindowOnEscKey));
 
   // Hide any scroll bars
   document.documentElement.style.overflow = 'hidden';
 
   // Apply fullscreen styles
-  VjsLib.addClass(document.body, 'vjs-full-window');
+  Lib.addClass(document.body, 'vjs-full-window');
 
   this.trigger('enterFullWindow');
 };
@@ -1082,13 +1094,13 @@ Player.prototype.fullWindowOnEscKey = function(event){
 
 Player.prototype.exitFullWindow = function(){
   this.isFullWindow = false;
-  VjsEvents.off(document, 'keydown', this.fullWindowOnEscKey);
+  Events.off(document, 'keydown', this.fullWindowOnEscKey);
 
   // Unhide scroll bars.
   document.documentElement.style.overflow = this.docOrigOverflow;
 
   // Remove fullscreen styles
-  VjsLib.removeClass(document.body, 'vjs-full-window');
+  Lib.removeClass(document.body, 'vjs-full-window');
 
   // Resize the box, controller, and poster to original sizes
   // this.positionAll();
@@ -1098,12 +1110,12 @@ Player.prototype.exitFullWindow = function(){
 Player.prototype.selectSource = function(sources){
   // Loop through each playback technology in the options order
   for (var i=0,j=this.options_['techOrder'];i<j.length;i++) {
-    let techName = VjsLib.capitalize(j[i]);
+    let techName = Lib.capitalize(j[i]);
     let tech = Component.getComponent(techName);
 
     // Check if the current tech is defined before continuing
     if (!tech) {
-      VjsLib.log.error('The "' + techName + '" tech is undefined. Skipped browser support check for that tech.');
+      Lib.log.error('The "' + techName + '" tech is undefined. Skipped browser support check for that tech.');
       continue;
     }
 
@@ -1164,7 +1176,7 @@ Player.prototype.src = function(source){
   }
 
   // case: Array of source objects to choose from and pick the best to play
-  if (VjsLib.obj.isArray(source)) {
+  if (Lib.obj.isArray(source)) {
     this.sourceList_(source);
 
   // case: URL String (http://myvideo...)
@@ -1478,7 +1490,7 @@ Player.prototype.error = function(err){
 
   // log the name of the error type and any message
   // ie8 just logs "[object object]" if you just log the error object
-  VjsLib.log.error('(CODE:'+this.error_.code+' '+MediaError.errorTypes[this.error_.code]+')', this.error_.message, this.error_);
+  Lib.log.error('(CODE:'+this.error_.code+' '+MediaError.errorTypes[this.error_.code]+')', this.error_.message, this.error_);
 
   return this;
 };
@@ -1548,7 +1560,7 @@ Player.prototype.userActive = function(bool){
 Player.prototype.listenForUserActivity = function(){
   let mouseInProgress, lastMoveX, lastMoveY;
 
-  let onActivity = VjsLib.bind(this, this.reportUserActivity);
+  let onActivity = Lib.bind(this, this.reportUserActivity);
 
   let onMouseMove = function(e) {
     // #1068 - Prevent mousemove spamming

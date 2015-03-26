@@ -1,6 +1,6 @@
 import Button from '../button';
 import Component from '../component';
-import * as VjsLib from '../lib';
+import * as Lib from '../lib';
 
 /**
  * A button component for muting the audio
@@ -30,8 +30,6 @@ var MuteToggle = Button.extend({
     });
   }
 });
-
-Component.registerComponent('MuteToggle', MuteToggle);
 
 MuteToggle.prototype.createEl = function(){
   return Button.prototype.createEl.call(this, 'div', {
@@ -71,9 +69,10 @@ MuteToggle.prototype.update = function(){
 
   /* TODO improve muted icon classes */
   for (var i = 0; i < 4; i++) {
-    VjsLib.removeClass(this.el_, 'vjs-vol-'+i);
+    Lib.removeClass(this.el_, 'vjs-vol-'+i);
   }
-  VjsLib.addClass(this.el_, 'vjs-vol-'+level);
+  Lib.addClass(this.el_, 'vjs-vol-'+level);
 };
 
+Component.registerComponent('MuteToggle', MuteToggle);
 export default MuteToggle;

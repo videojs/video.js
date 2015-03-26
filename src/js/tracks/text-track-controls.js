@@ -1,6 +1,7 @@
 import Component from '../component';
 import Menu, { MenuItem, MenuButton } from '../menu';
-import * as VjsLib from '../lib';
+import * as Lib from '../lib';
+import document from 'global/document';
 import window from 'global/window';
 
 /* Text Track Display
@@ -12,24 +13,24 @@ import window from 'global/window';
  *
  * @constructor
  */
-let TextTrackDisplay = Component.extend({
+var TextTrackDisplay = Component.extend({
   /** @constructor */
   init: function(player, options, ready){
     Component.call(this, player, options, ready);
 
-    player.on('loadstart', VjsLib.bind(this, this.toggleDisplay));
+    player.on('loadstart', Lib.bind(this, this.toggleDisplay));
 
     // This used to be called during player init, but was causing an error
     // if a track should show by default and the display hadn't loaded yet.
     // Should probably be moved to an external track loader when we support
     // tracks that don't need a display.
-    player.ready(VjsLib.bind(this, function() {
+    player.ready(Lib.bind(this, function() {
       if (player.tech && player.tech['featuresNativeTextTracks']) {
         this.hide();
         return;
       }
 
-      player.on('fullscreenchange', VjsLib.bind(this, this.updateDisplay));
+      player.on('fullscreenchange', Lib.bind(this, this.updateDisplay));
 
       let tracks = player.options_['tracks'] || [];
       for (let i = 0; i < tracks.length; i++) {
@@ -186,7 +187,7 @@ TextTrackDisplay.prototype.updateForTrack = function(track) {
  *
  * @constructor
  */
-let TextTrackMenuItem = MenuItem.extend({
+var TextTrackMenuItem = MenuItem.extend({
   /** @constructor */
   init: function(player, options){
     let track = this.track = options['track'];
@@ -195,7 +196,7 @@ let TextTrackMenuItem = MenuItem.extend({
     let changeHandler;
 
     if (tracks) {
-      changeHandler = VjsLib.bind(this, function() {
+      changeHandler = Lib.bind(this, function() {
         let selected = this.track['mode'] === 'showing';
 
         if (this instanceof OffTextTrackMenuItem) {
@@ -281,7 +282,7 @@ TextTrackMenuItem.prototype.onClick = function(){
  *
  * @constructor
  */
-let OffTextTrackMenuItem = TextTrackMenuItem.extend({
+var OffTextTrackMenuItem = TextTrackMenuItem.extend({
   /** @constructor */
   init: function(player, options){
     // Create pseudo track info
@@ -326,7 +327,7 @@ CaptionSettingsMenuItem.prototype.onClick = function() {
  *
  * @constructor
  */
-let TextTrackButton = MenuButton.extend({
+var TextTrackButton = MenuButton.extend({
   /** @constructor */
   init: function(player, options){
     MenuButton.call(this, player, options);
@@ -341,7 +342,7 @@ let TextTrackButton = MenuButton.extend({
       return;
     }
 
-    let updateHandler = VjsLib.bind(this, this.update);
+    let updateHandler = Lib.bind(this, this.update);
     tracks.addEventListener('removetrack', updateHandler);
     tracks.addEventListener('addtrack', updateHandler);
 
@@ -390,7 +391,7 @@ TextTrackButton.prototype.createItems = function(){
  *
  * @constructor
  */
-let CaptionsButton = TextTrackButton.extend({
+var CaptionsButton = TextTrackButton.extend({
   /** @constructor */
   init: function(player, options, ready){
     TextTrackButton.call(this, player, options, ready);
@@ -425,7 +426,7 @@ CaptionsButton.prototype.update = function() {
  *
  * @constructor
  */
-let SubtitlesButton = TextTrackButton.extend({
+var SubtitlesButton = TextTrackButton.extend({
   /** @constructor */
   init: function(player, options, ready){
     TextTrackButton.call(this, player, options, ready);
@@ -446,7 +447,7 @@ SubtitlesButton.prototype.className = 'vjs-subtitles-button';
  *
  * @constructor
  */
-let ChaptersButton = TextTrackButton.extend({
+var ChaptersButton = TextTrackButton.extend({
   /** @constructor */
   init: function(player, options, ready){
     TextTrackButton.call(this, player, options, ready);
@@ -494,7 +495,7 @@ ChaptersButton.prototype.createMenu = function(){
         track['mode'] = 'hidden';
         /* jshint loopfunc:true */
         // TODO see if we can figure out a better way of doing this https://github.com/videojs/video.js/issues/1864
-        window.setTimeout(VjsLib.bind(this, function() {
+        window.setTimeout(Lib.bind(this, function() {
           this.createMenu();
         }), 100);
         /* jshint loopfunc:false */
@@ -508,9 +509,9 @@ ChaptersButton.prototype.createMenu = function(){
   let menu = this.menu;
   if (menu === undefined) {
     menu = new Menu(this.player_);
-    menu.contentEl().appendChild(VjsLib.createEl('li', {
+    menu.contentEl().appendChild(Lib.createEl('li', {
       className: 'vjs-menu-title',
-      innerHTML: VjsLib.capitalize(this.kind_),
+      innerHTML: Lib.capitalize(this.kind_),
       tabindex: -1
     }));
   }
@@ -544,7 +545,7 @@ ChaptersButton.prototype.createMenu = function(){
 /**
  * @constructor
  */
-let ChaptersTrackMenuItem = MenuItem.extend({
+var ChaptersTrackMenuItem = MenuItem.extend({
   /** @constructor */
   init: function(player, options){
     let track = this.track = options['track'];
@@ -556,7 +557,7 @@ let ChaptersTrackMenuItem = MenuItem.extend({
     options['selected'] = (cue['startTime'] <= currentTime && currentTime < cue['endTime']);
     MenuItem.call(this, player, options);
 
-    track.addEventListener('cuechange', VjsLib.bind(this, this.update));
+    track.addEventListener('cuechange', Lib.bind(this, this.update));
   }
 });
 
@@ -576,4 +577,4 @@ ChaptersTrackMenuItem.prototype.update = function(){
   this.selected(cue['startTime'] <= currentTime && currentTime < cue['endTime']);
 };
 
-export { TextTrackDisplay, TextTrackButton, CaptionsButton, SubtitlesButton, ChaptersButton, ChaptersTrackMenuItem };
+export { TextTrackDisplay, TextTrackButton, CaptionsButton, SubtitlesButton, ChaptersButton, TextTrackMenuItem, ChaptersTrackMenuItem };

@@ -5,7 +5,8 @@
  */
 
 import window from 'global/window';
-let JSON = window.JSON;
+// Changing 'JSON' throws jshint errors
+var json = window.JSON;
 
 /**
  * Javascript JSON implementation
@@ -16,8 +17,8 @@ let JSON = window.JSON;
  * @namespace
  * @private
  */
-if (!(typeof JSON !== 'undefined' && typeof JSON.parse === 'function')) {
-  JSON = {};
+if (!(typeof json !== 'undefined' && typeof json.parse === 'function')) {
+  json = {};
 
   var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
 
@@ -29,7 +30,7 @@ if (!(typeof JSON !== 'undefined' && typeof JSON.parse === 'function')) {
    * @param {Function=} [reviver] Optional function that can transform the results
    * @return {Object|Array} The parsed JSON
    */
-  JSON.parse = function (text, reviver) {
+   json.parse = function (text, reviver) {
     var j;
 
     function walk(holder, key) {
@@ -71,4 +72,4 @@ if (!(typeof JSON !== 'undefined' && typeof JSON.parse === 'function')) {
   };
 }
 
-export default JSON;
+export default json;

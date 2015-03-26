@@ -11,7 +11,7 @@ let hasOwnProp = Object.prototype.hasOwnProperty;
  * @return {Element}
  * @private
  */
-let createEl = function(tagName, properties){
+var createEl = function(tagName, properties){
   tagName = tagName || 'div';
   properties = properties || {};
 
@@ -259,7 +259,7 @@ var hasData = function(el){
  * @param  {Element} el Remove data for an element
  * @private
  */
-let removeData = function(el){
+var removeData = function(el){
   var id = el[expando];
   if (!id) { return; }
   // Remove all stored data
@@ -812,7 +812,7 @@ var findPosition = function(el) {
  * @type {Object}
  * @private
  */
-let arr = {};
+var arr = {};
 
 /*
  * Loops through an array and runs a function for each item inside it.
@@ -823,7 +823,7 @@ let arr = {};
  * @private
  */
 arr.forEach = function(array, callback, thisArg) {
-  thisArg = thisArg || videojs;
+  thisArg = thisArg || this;
 
   if (obj.isArray(array) && callback instanceof Function) {
     for (var i = 0, len = array.length; i < len; ++i) {

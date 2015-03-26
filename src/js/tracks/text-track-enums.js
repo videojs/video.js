@@ -3,7 +3,7 @@
  *
  * enum TextTrackMode { "disabled",  "hidden",  "showing" };
  */
-let TextTrackMode = {
+var TextTrackMode = {
   'disabled': 'disabled',
   'hidden': 'hidden',
   'showing': 'showing'
@@ -14,7 +14,7 @@ let TextTrackMode = {
  *
  * enum TextTrackKind { "subtitles",  "captions",  "descriptions",  "chapters",  "metadata" };
  */
-let TextTrackKind = {
+var TextTrackKind = {
   'subtitles': 'subtitles',
   'captions': 'captions',
   'descriptions': 'descriptions',

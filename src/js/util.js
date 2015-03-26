@@ -15,7 +15,7 @@ var util = {};
  * @param  {Object} obj2 Overriding object
  * @return {Object}      New object -- obj1 and obj2 will be untouched
  */
-let mergeOptions = function(obj1, obj2){
+var mergeOptions = function(obj1, obj2){
   var key, val1, val2;
 
   // make a copy of obj1 so we're not overwriting original values.

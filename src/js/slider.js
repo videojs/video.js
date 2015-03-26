@@ -1,5 +1,5 @@
 import Component from './component';
-import * as VjsLib from './lib';
+import * as Lib from './lib';
 import document from 'global/document';
 
 /* Slider
@@ -40,7 +40,7 @@ Slider.prototype.createEl = function(type, props) {
   props = props || {};
   // Add the slider element class to all sub classes
   props.className = props.className + ' vjs-slider';
-  props = VjsLib.obj.merge({
+  props = Lib.obj.merge({
     'role': 'slider',
     'aria-valuenow': 0,
     'aria-valuemin': 0,
@@ -53,7 +53,7 @@ Slider.prototype.createEl = function(type, props) {
 
 Slider.prototype.onMouseDown = function(event){
   event.preventDefault();
-  VjsLib.blockTextSelection();
+  Lib.blockTextSelection();
   this.addClass('vjs-sliding');
 
   this.on(document, 'mousemove', this.onMouseMove);
@@ -68,7 +68,7 @@ Slider.prototype.onMouseDown = function(event){
 Slider.prototype.onMouseMove = function(){};
 
 Slider.prototype.onMouseUp = function() {
-  VjsLib.unblockTextSelection();
+  Lib.unblockTextSelection();
   this.removeClass('vjs-sliding');
 
   this.off(document, 'mousemove', this.onMouseMove);
@@ -106,7 +106,7 @@ Slider.prototype.update = function(){
   let barProgress = this.updateHandlePosition(progress);
 
   // Convert to a percentage for setting
-  let percentage = VjsLib.round(barProgress * 100, 2) + '%';
+  let percentage = Lib.round(barProgress * 100, 2) + '%';
 
   // Set the new bar width or height
   if (this.vertical()) {
@@ -149,7 +149,7 @@ Slider.prototype.updateHandlePosition = function(progress) {
   // The bar does reach the left side, so we need to account for this in the bar's width
   let barProgress = adjustedProgress + (handlePercent / 2);
 
-  let percentage = VjsLib.round(adjustedProgress * 100, 2) + '%';
+  let percentage = Lib.round(adjustedProgress * 100, 2) + '%';
 
   if (vertical) {
     handle.el().style.bottom = percentage;
@@ -162,7 +162,7 @@ Slider.prototype.updateHandlePosition = function(progress) {
 
 Slider.prototype.calculateDistance = function(event){
   let el = this.el_;
-  let box = VjsLib.findPosition(el);
+  let box = Lib.findPosition(el);
   let boxW = el.offsetWidth;
   let boxH = el.offsetHeight;
   let handle = this.handle;
@@ -262,7 +262,7 @@ Slider.prototype.vertical = function(bool) {
  * @param {Object=} options
  * @constructor
  */
-let SliderHandle = Component.extend();
+var SliderHandle = Component.extend();
 
 Component.registerComponent('Slider', Slider);
 
@@ -279,7 +279,7 @@ SliderHandle.prototype.createEl = function(type, props) {
   props = props || {};
   // Add the slider element class to all sub classes
   props.className = props.className + ' vjs-slider-handle';
-  props = VjsLib.obj.merge({
+  props = Lib.obj.merge({
     innerHTML: '<span class="vjs-control-text">'+this.defaultValue+'</span>'
   }, props);
 

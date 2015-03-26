@@ -1,4 +1,9 @@
-module('Component', {
+import Component from '../../src/js/component.js';
+import * as Lib from '../../src/js/lib.js';
+import * as Events from '../../src/js/events.js';
+import document from 'global/document';
+
+q.module('Component', {
   'setup': function() {
     this.clock = sinon.useFakeTimers();
   },
@@ -6,8 +11,6 @@ module('Component', {
     this.clock.restore();
   }
 });
-
-var Component = vjs.Component;
 
 var getFakePlayer = function(){
   return {
@@ -161,8 +164,8 @@ test('should dispose of component and children', function(){
 
   // Add a listener
   comp.on('click', function(){ return true; });
-  var data = vjs.getData(comp.el());
-  var id = comp.el()[vjs.expando];
+  var data = Lib.getData(comp.el());
+  var id = comp.el()[Lib.expando];
 
   var hasDisposed = false;
   var bubbles = null;
@@ -179,8 +182,8 @@ test('should dispose of component and children', function(){
   ok(!comp.el(), 'component element was deleted');
   ok(!child.children(), 'child children were deleted');
   ok(!child.el(), 'child element was deleted');
-  ok(!vjs.cache[id], 'listener cache nulled');
-  ok(vjs.isEmpty(data), 'original listener cache object was emptied');
+  ok(!Lib.cache[id], 'listener cache nulled');
+  ok(Lib.isEmpty(data), 'original listener cache object was emptied');
 });
 
 test('should add and remove event listeners to element', function(){
@@ -299,27 +302,27 @@ test('should add listeners to other element and remove them', function(){
   };
 
   comp1.on(el, 'test-event', testListener);
-  vjs.trigger(el, 'test-event');
+  Events.trigger(el, 'test-event');
   equal(listenerFired, 1, 'listener was fired once');
 
   listenerFired = 0;
   comp1.off(el, 'test-event', testListener);
-  vjs.trigger(el, 'test-event');
+  Events.trigger(el, 'test-event');
   equal(listenerFired, 0, 'listener was not fired after being removed from other element');
 
   // this component is disposed first
   listenerFired = 0;
   comp1.on(el, 'test-event', testListener);
   comp1.dispose();
-  vjs.trigger(el, 'test-event');
+  Events.trigger(el, 'test-event');
   equal(listenerFired, 0, 'listener was removed when this component was disposed first');
   comp1.off = function(){ throw 'Comp1 off called'; };
   try {
-    vjs.trigger(el, 'dispose');
+    Events.trigger(el, 'dispose');
   } catch(e) {
     ok(false, 'listener was not removed from other element');
   }
-  vjs.trigger(el, 'dispose');
+  Events.trigger(el, 'dispose');
   ok(true, 'this component removed dispose listeners from other element');
 });
 
@@ -336,9 +339,9 @@ test('should add listeners to other components that are fired once', function(){
   };
 
   comp1.one(el, 'test-event', testListener);
-  vjs.trigger(el, 'test-event');
+  Events.trigger(el, 'test-event');
   equal(listenerFired, 1, 'listener was executed once');
-  vjs.trigger(el, 'test-event');
+  Events.trigger(el, 'test-event');
   equal(listenerFired, 1, 'listener was executed only once');
 });
 
@@ -424,7 +427,7 @@ test('should change the width and height of a component', function(){
   comp.height('123px');
 
   ok(comp.width() === 500, 'percent values working');
-  var compStyle = vjs.getComputedDimension(el, 'width');
+  var compStyle = Lib.getComputedDimension(el, 'width');
   ok(compStyle === comp.width() + 'px', 'matches computed style');
   ok(comp.height() === 123, 'px values working');
 
@@ -442,9 +445,9 @@ test('should use a defined content el for appending children', function(){
   var CompWithContent = Component.extend();
   CompWithContent.prototype.createEl = function(){
     // Create the main componenent element
-    var el = vjs.createEl('div');
+    var el = Lib.createEl('div');
     // Create the element where children will be appended
-    this.contentEl_ = vjs.createEl('div', { 'id': 'contentEl' });
+    this.contentEl_ = Lib.createEl('div', { 'id': 'contentEl' });
     el.appendChild(this.contentEl_);
     return el;
   };
@@ -467,8 +470,8 @@ test('should emit a tap event', function(){
   expect(3);
 
   // Fake touch support. Real touch support isn't needed for this test.
-  var origTouch = vjs.TOUCH_ENABLED;
-  vjs.TOUCH_ENABLED = true;
+  var origTouch = Lib.TOUCH_ENABLED;
+  Lib.TOUCH_ENABLED = true;
 
   var comp = new Component(getFakePlayer());
   var singleTouch = {};
@@ -479,23 +482,23 @@ test('should emit a tap event', function(){
   });
 
   // A touchstart followed by touchend should trigger a tap
-  vjs.trigger(comp.el(), {type: 'touchstart', touches: [{}]});
+  Events.trigger(comp.el(), {type: 'touchstart', touches: [{}]});
   comp.trigger('touchend');
 
   // A touchmove with a lot of movement should not trigger a tap
-  vjs.trigger(comp.el(), {type: 'touchstart', touches: [
+  Events.trigger(comp.el(), {type: 'touchstart', touches: [
     { pageX: 0, pageY: 0 }
   ]});
-  vjs.trigger(comp.el(), {type: 'touchmove', touches: [
+  Events.trigger(comp.el(), {type: 'touchmove', touches: [
     { pageX: 100, pageY: 100 }
   ]});
   comp.trigger('touchend');
 
   // A touchmove with not much movement should still allow a tap
-  vjs.trigger(comp.el(), {type: 'touchstart', touches: [
+  Events.trigger(comp.el(), {type: 'touchstart', touches: [
     { pageX: 0, pageY: 0 }
   ]});
-  vjs.trigger(comp.el(), {type: 'touchmove', touches: [
+  Events.trigger(comp.el(), {type: 'touchmove', touches: [
     { pageX: 7, pageY: 7 }
   ]});
   comp.trigger('touchend');
@@ -503,23 +506,23 @@ test('should emit a tap event', function(){
   // A touchmove with a lot of movement by modifying the exisiting touch object
   // should not trigger a tap
   singleTouch = { pageX: 0, pageY: 0 };
-  vjs.trigger(comp.el(), {type: 'touchstart', touches: [singleTouch]});
+  Events.trigger(comp.el(), {type: 'touchstart', touches: [singleTouch]});
   singleTouch.pageX = 100;
   singleTouch.pageY = 100;
-  vjs.trigger(comp.el(), {type: 'touchmove', touches: [singleTouch]});
+  Events.trigger(comp.el(), {type: 'touchmove', touches: [singleTouch]});
   comp.trigger('touchend');
 
   // A touchmove with not much movement by modifying the exisiting touch object
   // should still allow a tap
   singleTouch = { pageX: 0, pageY: 0 };
-  vjs.trigger(comp.el(), {type: 'touchstart', touches: [singleTouch]});
+  Events.trigger(comp.el(), {type: 'touchstart', touches: [singleTouch]});
   singleTouch.pageX = 7;
   singleTouch.pageY = 7;
-  vjs.trigger(comp.el(), {type: 'touchmove', touches: [singleTouch]});
+  Events.trigger(comp.el(), {type: 'touchmove', touches: [singleTouch]});
   comp.trigger('touchend');
 
   // Reset to orignial value
-  vjs.TOUCH_ENABLED = origTouch;
+  Lib.TOUCH_ENABLED = origTouch;
 });
 
 test('should provide timeout methods that automatically get cleared on component disposal', function() {

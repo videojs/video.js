@@ -1,5 +1,5 @@
 import Component from '../component';
-import * as VjsLib from '../lib';
+import * as Lib from '../lib';
 
 import PlayToggle from './play-toggle';
 import CurrentTimeDisplay from './time-display';
@@ -7,6 +7,7 @@ import LiveDisplay from './live-display';
 import ProgressControl from './progress-control';
 import FullscreenToggle from './fullscreen-toggle';
 import VolumeControl from './volume-control';
+import VolumeMenuButton from './volume-menu-button';
 import MuteToggle from './mute-toggle';
 import PlaybackRateMenuButton from './playback-rate-menu-button';
 
@@ -44,7 +45,7 @@ ControlBar.prototype.options_ = {
 };
 
 ControlBar.prototype.createEl = function(){
-  return VjsLib.createEl('div', {
+  return Lib.createEl('div', {
     className: 'vjs-control-bar'
   });
 };

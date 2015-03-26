@@ -4,7 +4,7 @@
 
 import MediaTechController from './media';
 import Component from '../component';
-import * as VjsLib from '../lib';
+import * as Lib from '../lib';
 import * as VjsUtil from '../util';
 import document from 'global/document';
 
@@ -64,14 +64,14 @@ var Html5 = MediaTechController.extend({
     }
 
     if (this['featuresNativeTextTracks']) {
-      this.on('loadstart', VjsLib.bind(this, this.hideCaptions));
+      this.on('loadstart', Lib.bind(this, this.hideCaptions));
     }
 
     // Determine if native controls should be used
     // Our goal should be to get the custom controls on mobile solid everywhere
     // so we can remove this all together. Right now this will block custom
     // controls on touch enabled laptops like the Chrome Pixel
-    if (VjsLib.TOUCH_ENABLED && player.options()['nativeControlsForTouch'] === true) {
+    if (Lib.TOUCH_ENABLED && player.options()['nativeControlsForTouch'] === true) {
       this.useNativeControls();
     }
 
@@ -113,16 +113,16 @@ Html5.prototype.createEl = function(){
       el = clone;
       player.tag = null;
     } else {
-      el = VjsLib.createEl('video');
+      el = Lib.createEl('video');
 
       // determine if native controls should be used
       let attributes = VjsUtil.mergeOptions({}, player.tagAttributes);
-      if (!VjsLib.TOUCH_ENABLED || player.options()['nativeControlsForTouch'] !== true) {
+      if (!Lib.TOUCH_ENABLED || player.options()['nativeControlsForTouch'] !== true) {
         delete attributes.controls;
       }
 
-      VjsLib.setElementAttributes(el,
-        VjsLib.obj.merge(attributes, {
+      Lib.setElementAttributes(el,
+        Lib.obj.merge(attributes, {
           id: player.id() + '_html5_api',
           class: 'vjs-tech'
         })
@@ -146,7 +146,7 @@ Html5.prototype.createEl = function(){
       }
     }
 
-    VjsLib.insertFirst(el, player.el());
+    Lib.insertFirst(el, player.el());
   }
 
   // Update specific tag settings, in case they were overridden
@@ -157,7 +157,7 @@ Html5.prototype.createEl = function(){
     if (typeof player.options_[attr] !== 'undefined') {
       overwriteAttrs[attr] = player.options_[attr];
     }
-    VjsLib.setElementAttributes(el, overwriteAttrs);
+    Lib.setElementAttributes(el, overwriteAttrs);
   }
 
   return el;
@@ -247,7 +247,7 @@ Html5.prototype.setCurrentTime = function(seconds){
   try {
     this.el_.currentTime = seconds;
   } catch(e) {
-    VjsLib.log(e, 'Video is not ready. (Video.js)');
+    Lib.log(e, 'Video is not ready. (Video.js)');
     // this.warning(VideoJS.warnings.videoNotReady);
   }
 };
@@ -267,7 +267,7 @@ Html5.prototype.supportsFullScreen = function(){
   if (typeof this.el_.webkitEnterFullScreen == 'function') {
 
     // Seems to be broken in Chromium/Chrome && Safari in Leopard
-    if (/Android/.test(VjsLib.USER_AGENT) || !/Chrome|Mac OS X 10.5/.test(VjsLib.USER_AGENT)) {
+    if (/Android/.test(Lib.USER_AGENT) || !/Chrome|Mac OS X 10.5/.test(Lib.USER_AGENT)) {
       return true;
     }
   }
@@ -448,12 +448,12 @@ Html5.prototype.removeRemoteTextTrack = function(track) {
 Html5.isSupported = function(){
   // IE9 with no Media Player is a LIAR! (#984)
   try {
-    VjsLib.TEST_VID['volume'] = 0.5;
+    Lib.TEST_VID['volume'] = 0.5;
   } catch (e) {
     return false;
   }
 
-  return !!VjsLib.TEST_VID.canPlayType;
+  return !!Lib.TEST_VID.canPlayType;
 };
 
 // Add Source Handler pattern functions to this tech
@@ -479,7 +479,7 @@ Html5.nativeSourceHandler.canHandleSource = function(source){
     // IE9 on Windows 7 without MediaPlayer throws an error here
     // https://github.com/videojs/video.js/issues/519
     try {
-      return VjsLib.TEST_VID.canPlayType(type);
+      return Lib.TEST_VID.canPlayType(type);
     } catch(e) {
       return '';
     }
@@ -525,9 +525,9 @@ Html5.registerSourceHandler(Html5.nativeSourceHandler);
  * @return {Boolean}
  */
 Html5.canControlVolume = function(){
-  var volume =  VjsLib.TEST_VID.volume;
-  VjsLib.TEST_VID.volume = (volume / 2) + 0.1;
-  return volume !== VjsLib.TEST_VID.volume;
+  var volume =  Lib.TEST_VID.volume;
+  Lib.TEST_VID.volume = (volume / 2) + 0.1;
+  return volume !== Lib.TEST_VID.volume;
 };
 
 /**
@@ -535,9 +535,9 @@ Html5.canControlVolume = function(){
  * @return {[type]} [description]
  */
 Html5.canControlPlaybackRate = function(){
-  var playbackRate =  VjsLib.TEST_VID.playbackRate;
-  VjsLib.TEST_VID.playbackRate = (playbackRate / 2) + 0.1;
-  return playbackRate !== VjsLib.TEST_VID.playbackRate;
+  var playbackRate =  Lib.TEST_VID.playbackRate;
+  Lib.TEST_VID.playbackRate = (playbackRate / 2) + 0.1;
+  return playbackRate !== Lib.TEST_VID.playbackRate;
 };
 
 /**
@@ -552,11 +552,11 @@ Html5.supportsNativeTextTracks = function() {
   // Browsers with numeric modes include IE10 and older (<=2013) samsung android models.
   // Firefox isn't playing nice either with modifying the mode
   // TODO: Investigate firefox: https://github.com/videojs/video.js/issues/1862
-  supportsTextTracks = !!VjsLib.TEST_VID.textTracks;
-  if (supportsTextTracks && VjsLib.TEST_VID.textTracks.length > 0) {
-    supportsTextTracks = typeof VjsLib.TEST_VID.textTracks[0]['mode'] !== 'number';
+  supportsTextTracks = !!Lib.TEST_VID.textTracks;
+  if (supportsTextTracks && Lib.TEST_VID.textTracks.length > 0) {
+    supportsTextTracks = typeof Lib.TEST_VID.textTracks[0]['mode'] !== 'number';
   }
-  if (supportsTextTracks && VjsLib.IS_FIREFOX) {
+  if (supportsTextTracks && Lib.IS_FIREFOX) {
     supportsTextTracks = false;
   }
 
@@ -580,7 +580,7 @@ Html5.prototype['featuresPlaybackRate'] = Html5.canControlPlaybackRate();
  * In iOS, if you move a video element in the DOM, it breaks video playback.
  * @type {Boolean}
  */
-Html5.prototype['movingMediaElementInDOM'] = !VjsLib.IS_IOS;
+Html5.prototype['movingMediaElementInDOM'] = !Lib.IS_IOS;
 
 /**
  * Set the the tech's fullscreen resize support status.
@@ -608,12 +608,12 @@ const mp4RE = /^video\/mp4/i;
 
 Html5.patchCanPlayType = function() {
   // Android 4.0 and above can play HLS to some extent but it reports being unable to do so
-  if (VjsLib.ANDROID_VERSION >= 4.0) {
+  if (Lib.ANDROID_VERSION >= 4.0) {
     if (!canPlayType) {
-      canPlayType = VjsLib.TEST_VID.constructor.prototype.canPlayType;
+      canPlayType = Lib.TEST_VID.constructor.prototype.canPlayType;
     }
 
-    VjsLib.TEST_VID.constructor.prototype.canPlayType = function(type) {
+    Lib.TEST_VID.constructor.prototype.canPlayType = function(type) {
       if (type && mpegurlRE.test(type)) {
         return 'maybe';
       }
@@ -622,12 +622,12 @@ Html5.patchCanPlayType = function() {
   }
 
   // Override Android 2.2 and less canPlayType method which is broken
-  if (VjsLib.IS_OLD_ANDROID) {
+  if (Lib.IS_OLD_ANDROID) {
     if (!canPlayType) {
-      canPlayType = VjsLib.TEST_VID.constructor.prototype.canPlayType;
+      canPlayType = Lib.TEST_VID.constructor.prototype.canPlayType;
     }
 
-    VjsLib.TEST_VID.constructor.prototype.canPlayType = function(type){
+    Lib.TEST_VID.constructor.prototype.canPlayType = function(type){
       if (type && mp4RE.test(type)) {
         return 'maybe';
       }
@@ -637,8 +637,8 @@ Html5.patchCanPlayType = function() {
 };
 
 Html5.unpatchCanPlayType = function() {
-  var r = VjsLib.TEST_VID.constructor.prototype.canPlayType;
-  VjsLib.TEST_VID.constructor.prototype.canPlayType = canPlayType;
+  var r = Lib.TEST_VID.constructor.prototype.canPlayType;
+  Lib.TEST_VID.constructor.prototype.canPlayType = canPlayType;
   canPlayType = null;
   return r;
 };

@@ -1,18 +1,22 @@
-module('Plugins');
+import Plugin from '../../src/js/plugins.js';
+import Player from '../../src/js/player.js';
+import TestHelpers from './test-helpers.js';
+
+q.module('Plugins');
 
 test('Plugin should get initialized and receive options', function(){
   expect(2);
 
-  vjs.plugin('myPlugin1', function(options){
+  Plugin('myPlugin1', function(options){
     ok(true, 'Plugin initialized');
     ok(options['test'], 'Option passed through');
   });
 
-  vjs.plugin('myPlugin2', function(options){
+  Plugin('myPlugin2', function(options){
     ok(false, 'Plugin initialized and should not have been');
   });
 
-  var player = PlayerTest.makePlayer({
+  var player = TestHelpers.makePlayer({
     'plugins': {
       'myPlugin1': {
         'test': true
@@ -26,12 +30,12 @@ test('Plugin should get initialized and receive options', function(){
 test('Plugin should have the option of being initilized outside of player init', function(){
   expect(3);
 
-  vjs.plugin('myPlugin3', function(options){
+  Plugin('myPlugin3', function(options){
     ok(true, 'Plugin initialized after player init');
     ok(options['test'], 'Option passed through');
   });
 
-  var player = PlayerTest.makePlayer({});
+  var player = TestHelpers.makePlayer({});
 
   ok(player['myPlugin3'], 'Plugin has direct access on player instance');
 
@@ -45,12 +49,12 @@ test('Plugin should have the option of being initilized outside of player init',
 test('Plugin should be able to add a UI component', function(){
   expect(2);
 
-  vjs.plugin('myPlugin4', function(options){
-    ok((this instanceof vjs.Player), 'Plugin executed in player scope by default');
+  Plugin('myPlugin4', function(options){
+    ok((this instanceof Player), 'Plugin executed in player scope by default');
     this.addChild('component');
   });
 
-  var player = PlayerTest.makePlayer({});
+  var player = TestHelpers.makePlayer({});
   player['myPlugin4']({
     'test': true
   });
@@ -67,21 +71,21 @@ test('Plugin should overwrite plugin of same name', function(){
       v3Called = 0;
 
   // Create initial plugin
-  vjs.plugin('myPlugin5', function(options){
+  Plugin('myPlugin5', function(options){
     v1Called++;
   });
-  var player = PlayerTest.makePlayer({});
+  var player = TestHelpers.makePlayer({});
   player['myPlugin5']({});
 
   // Overwrite and create new player
-  vjs.plugin('myPlugin5', function(options){
+  Plugin('myPlugin5', function(options){
     v2Called++;
   });
-  var player2 = PlayerTest.makePlayer({});
+  var player2 = TestHelpers.makePlayer({});
   player2['myPlugin5']({});
 
   // Overwrite and init new version on existing player
-  vjs.plugin('myPlugin5', function(options){
+  Plugin('myPlugin5', function(options){
     v3Called++;
   });
   player2['myPlugin5']({});
@@ -102,9 +106,9 @@ test('Plugins should get events in registration order', function() {
   var pluginName = 'orderPlugin';
   var i = 0;
   var name;
-  var player = PlayerTest.makePlayer({});
+  var player = TestHelpers.makePlayer({});
   var plugin = function (name) {
-    vjs.plugin(name, function (opts) {
+    Plugin(name, function (opts) {
       this.on('test', function (event) {
         order.push(name);
       });
@@ -118,7 +122,7 @@ test('Plugins should get events in registration order', function() {
     plugin(name);
   }
 
-  vjs.plugin('testerPlugin', function (opts) {
+  Plugin('testerPlugin', function (opts) {
     this.trigger('test');
   });
 
@@ -134,9 +138,9 @@ test('Plugins should not get events after stopImmediatePropagation is called', f
   var pluginName = 'orderPlugin';
   var i = 0;
   var name;
-  var player = PlayerTest.makePlayer({});
+  var player = TestHelpers.makePlayer({});
   var plugin = function (name) {
-    vjs.plugin(name, function (opts) {
+    Plugin(name, function (opts) {
       this.on('test', function (event) {
         order.push(name);
         event.stopImmediatePropagation();
@@ -151,7 +155,7 @@ test('Plugins should not get events after stopImmediatePropagation is called', f
     plugin(name);
   }
 
-  vjs.plugin('testerPlugin', function (opts) {
+  Plugin('testerPlugin', function (opts) {
     this.trigger('test');
   });
 

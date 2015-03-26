@@ -1,3 +1,7 @@
+import document from 'global/document';
+import window from 'global/window';
+let navigator = window.navigator;
+
 /**
  * Global Player instance options, surfaced from vjs.Player.prototype.options_
  * vjs.options = vjs.Player.prototype.options_
@@ -35,8 +39,14 @@ export default {
     'loadingSpinner': {},
     'bigPlayButton': {},
     'controlBar': {},
-    'errorDisplay': {}
+    'errorDisplay': {},
+    'textTrackSettings': {}
   },
+
+  'language': document.getElementsByTagName('html')[0].getAttribute('lang') || navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language || 'en',
+
+  // locales and their language translations
+  'languages': {},
 
   // Default message to show when a video cannot be played.
   'notSupportedMessage': 'No compatible source was found for this video.'

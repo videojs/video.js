@@ -1,6 +1,6 @@
 import Component from '../component';
-import * as VjsLib from '../lib';
-import * as VjsEvents from '../events';
+import * as Lib from '../lib';
+import * as Events from '../events';
 import window from 'global/window';
 
 let TextTrackSettings = Component.extend({
@@ -8,12 +8,12 @@ let TextTrackSettings = Component.extend({
     Component.call(this, player, options);
     this.hide();
 
-    VjsEvents.on(this.el().querySelector('.vjs-done-button'), 'click', VjsLib.bind(this, function() {
+    Events.on(this.el().querySelector('.vjs-done-button'), 'click', Lib.bind(this, function() {
       this.saveSettings();
       this.hide();
     }));
 
-    VjsEvents.on(this.el().querySelector('.vjs-default-button'), 'click', VjsLib.bind(this, function() {
+    Events.on(this.el().querySelector('.vjs-default-button'), 'click', Lib.bind(this, function() {
       this.el().querySelector('.vjs-fg-color > select').selectedIndex = 0;
       this.el().querySelector('.vjs-bg-color > select').selectedIndex = 0;
       this.el().querySelector('.window-color > select').selectedIndex = 0;
@@ -26,15 +26,15 @@ let TextTrackSettings = Component.extend({
       this.updateDisplay();
     }));
 
-    VjsEvents.on(this.el().querySelector('.vjs-fg-color > select'), 'change', VjsLib.bind(this, this.updateDisplay));
-    VjsEvents.on(this.el().querySelector('.vjs-bg-color > select'), 'change', VjsLib.bind(this, this.updateDisplay));
-    VjsEvents.on(this.el().querySelector('.window-color > select'), 'change', VjsLib.bind(this, this.updateDisplay));
-    VjsEvents.on(this.el().querySelector('.vjs-text-opacity > select'), 'change', VjsLib.bind(this, this.updateDisplay));
-    VjsEvents.on(this.el().querySelector('.vjs-bg-opacity > select'), 'change', VjsLib.bind(this, this.updateDisplay));
-    VjsEvents.on(this.el().querySelector('.vjs-window-opacity > select'), 'change', VjsLib.bind(this, this.updateDisplay));
-    VjsEvents.on(this.el().querySelector('.vjs-font-percent select'), 'change', VjsLib.bind(this, this.updateDisplay));
-    VjsEvents.on(this.el().querySelector('.vjs-edge-style select'), 'change', VjsLib.bind(this, this.updateDisplay));
-    VjsEvents.on(this.el().querySelector('.vjs-font-family select'), 'change', VjsLib.bind(this, this.updateDisplay));
+    Events.on(this.el().querySelector('.vjs-fg-color > select'), 'change', Lib.bind(this, this.updateDisplay));
+    Events.on(this.el().querySelector('.vjs-bg-color > select'), 'change', Lib.bind(this, this.updateDisplay));
+    Events.on(this.el().querySelector('.window-color > select'), 'change', Lib.bind(this, this.updateDisplay));
+    Events.on(this.el().querySelector('.vjs-text-opacity > select'), 'change', Lib.bind(this, this.updateDisplay));
+    Events.on(this.el().querySelector('.vjs-bg-opacity > select'), 'change', Lib.bind(this, this.updateDisplay));
+    Events.on(this.el().querySelector('.vjs-window-opacity > select'), 'change', Lib.bind(this, this.updateDisplay));
+    Events.on(this.el().querySelector('.vjs-font-percent select'), 'change', Lib.bind(this, this.updateDisplay));
+    Events.on(this.el().querySelector('.vjs-edge-style select'), 'change', Lib.bind(this, this.updateDisplay));
+    Events.on(this.el().querySelector('.vjs-font-family select'), 'change', Lib.bind(this, this.updateDisplay));
 
     if (player.options()['persistTextTrackSettings']) {
       this.restoreSettings();
@@ -122,7 +122,7 @@ TextTrackSettings.prototype.saveSettings = function() {
 
   let values = this.getValues();
   try {
-    if (!VjsLib.isEmpty(values)) {
+    if (!Lib.isEmpty(values)) {
       window.localStorage.setItem('vjs-text-track-settings', JSON.stringify(values));
     } else {
       window.localStorage.removeItem('vjs-text-track-settings');

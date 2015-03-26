@@ -1,6 +1,7 @@
-module('Events');
+import * as Events from '../../src/js/events.js';
+import document from 'global/document';
 
-var Events = vjs.Events;
+q.module('Events');
 
 test('should add and remove an event listener to an element', function(){
   expect(1);

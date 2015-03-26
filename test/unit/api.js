@@ -1,7 +1,11 @@
-module('Player Minified');
+import videojs from '../../src/js/video.js';
+import TestHelpers from './test-helpers.js';
+import document from 'global/document';
+
+q.module('Player Minified');
 
 test('should be able to access expected player API methods', function() {
-  var player = PlayerTest.makePlayer();
+  var player = TestHelpers.makePlayer();
 
   // Native HTML5 Methods
   ok(player.error, 'error exists');
@@ -64,7 +68,7 @@ test('should be able to access expected player API methods', function() {
 });
 
 test('should be able to access expected component API methods', function() {
-  var comp = videojs.Component.create({ id: function(){ return 1; }, reportUserActivity: function(){} });
+  var comp = videojs.getComponent('Component').create({ id: function(){ return 1; }, reportUserActivity: function(){} });
 
   // Component methods
   ok(comp.player, 'player exists');
@@ -101,38 +105,38 @@ test('should be able to access expected component API methods', function() {
 });
 
 test('should be able to access expected MediaTech API methods', function() {
-  var media = videojs.MediaTechController;
-  var mediaProto = videojs.MediaTechController.prototype;
-  var html5 = videojs.Html5;
-  var html5Proto = videojs.Html5.prototype;
-  var flash = videojs.Flash;
-  var flashProto = videojs.Flash.prototype;
+  var media = videojs.getComponent('MediaTechController');
+  var mediaProto = media.prototype;
+  var html5 = videojs.getComponent('Html5');
+  var html5Proto = html5.prototype;
+  var flash = videojs.getComponent('Flash');
+  var flashProto = flash.prototype;
 
   ok(mediaProto.setPoster, 'setPoster should exist on the Media tech');
   ok(html5Proto.setPoster, 'setPoster should exist on the HTML5 tech');
   ok(flashProto.setPoster, 'setPoster should exist on the Flash tech');
 
-  ok(videojs.Html5.patchCanPlayType, 'patchCanPlayType should exist for HTML5');
-  ok(videojs.Html5.unpatchCanPlayType, 'unpatchCanPlayType should exist for HTML5');
+  ok(html5.patchCanPlayType, 'patchCanPlayType should exist for HTML5');
+  ok(html5.unpatchCanPlayType, 'unpatchCanPlayType should exist for HTML5');
 
   // Source Handler Functions
   ok(media.withSourceHandlers, 'withSourceHandlers should exist for Media Tech');
 
-  ok(videojs.Html5.canPlaySource, 'canPlaySource should exist for HTML5');
-  ok(videojs.Html5.registerSourceHandler, 'registerSourceHandler should exist for Html5');
-  ok(videojs.Html5.selectSourceHandler, 'selectSourceHandler should exist for Html5');
-  ok(videojs.Html5.prototype.setSource, 'setSource should exist for Html5');
-  ok(videojs.Html5.prototype.disposeSourceHandler, 'disposeSourceHandler should exist for Html5');
+  ok(html5.canPlaySource, 'canPlaySource should exist for HTML5');
+  ok(html5.registerSourceHandler, 'registerSourceHandler should exist for Html5');
+  ok(html5.selectSourceHandler, 'selectSourceHandler should exist for Html5');
+  ok(html5.prototype.setSource, 'setSource should exist for Html5');
+  ok(html5.prototype.disposeSourceHandler, 'disposeSourceHandler should exist for Html5');
 
-  ok(videojs.Flash.canPlaySource, 'canPlaySource should exist for Flash');
-  ok(videojs.Flash.registerSourceHandler, 'registerSourceHandler should exist for Flash');
-  ok(videojs.Flash.selectSourceHandler, 'selectSourceHandler should exist for Flash');
-  ok(videojs.Flash.prototype.setSource, 'setSource should exist for Flash');
-  ok(videojs.Flash.prototype.disposeSourceHandler, 'disposeSourceHandler should exist for Flash');
+  ok(flash.canPlaySource, 'canPlaySource should exist for Flash');
+  ok(flash.registerSourceHandler, 'registerSourceHandler should exist for Flash');
+  ok(flash.selectSourceHandler, 'selectSourceHandler should exist for Flash');
+  ok(flash.prototype.setSource, 'setSource should exist for Flash');
+  ok(flash.prototype.disposeSourceHandler, 'disposeSourceHandler should exist for Flash');
 });
 
 test('should export ready api call to public', function() {
-  var videoTag = PlayerTest.makeTag();
+  var videoTag = TestHelpers.makeTag();
 
   var fixture = document.getElementById('qunit-fixture');
   fixture.appendChild(videoTag);
@@ -144,50 +148,50 @@ test('should export ready api call to public', function() {
 
 test('should export useful components to the public', function () {
   ok(videojs.TOUCH_ENABLED !== undefined, 'Touch detection should be public');
-  ok(videojs.ControlBar, 'ControlBar should be public');
-  ok(videojs.Button, 'Button should be public');
-  ok(videojs.PlayToggle, 'PlayToggle should be public');
-  ok(videojs.FullscreenToggle, 'FullscreenToggle should be public');
-  ok(videojs.BigPlayButton, 'BigPlayButton should be public');
-  ok(videojs.LoadingSpinner, 'LoadingSpinner should be public');
-  ok(videojs.CurrentTimeDisplay, 'CurrentTimeDisplay should be public');
-  ok(videojs.DurationDisplay, 'DurationDisplay should be public');
-  ok(videojs.TimeDivider, 'TimeDivider should be public');
-  ok(videojs.RemainingTimeDisplay, 'RemainingTimeDisplay should be public');
-  ok(videojs.Slider, 'Slider should be public');
-  ok(videojs.ProgressControl, 'ProgressControl should be public');
-  ok(videojs.SeekBar, 'SeekBar should be public');
-  ok(videojs.LoadProgressBar, 'LoadProgressBar should be public');
-  ok(videojs.PlayProgressBar, 'PlayProgressBar should be public');
-  ok(videojs.SeekHandle, 'SeekHandle should be public');
-  ok(videojs.VolumeControl, 'VolumeControl should be public');
-  ok(videojs.VolumeBar, 'VolumeBar should be public');
-  ok(videojs.VolumeLevel, 'VolumeLevel should be public');
-  ok(videojs.VolumeMenuButton, 'VolumeMenuButton should be public');
-  ok(videojs.VolumeHandle, 'VolumeHandle should be public');
-  ok(videojs.MuteToggle, 'MuteToggle should be public');
-  ok(videojs.PosterImage, 'PosterImage should be public');
-  ok(videojs.Menu, 'Menu should be public');
-  ok(videojs.MenuItem, 'MenuItem should be public');
-  ok(videojs.MenuButton, 'MenuButton should be public');
-  ok(videojs.PlaybackRateMenuButton, 'PlaybackRateMenuButton should be public');
+  ok(videojs.getComponent('ControlBar'), 'ControlBar should be public');
+  ok(videojs.getComponent('Button'), 'Button should be public');
+  ok(videojs.getComponent('PlayToggle'), 'PlayToggle should be public');
+  ok(videojs.getComponent('FullscreenToggle'), 'FullscreenToggle should be public');
+  ok(videojs.getComponent('BigPlayButton'), 'BigPlayButton should be public');
+  ok(videojs.getComponent('LoadingSpinner'), 'LoadingSpinner should be public');
+  ok(videojs.getComponent('CurrentTimeDisplay'), 'CurrentTimeDisplay should be public');
+  ok(videojs.getComponent('DurationDisplay'), 'DurationDisplay should be public');
+  ok(videojs.getComponent('TimeDivider'), 'TimeDivider should be public');
+  ok(videojs.getComponent('RemainingTimeDisplay'), 'RemainingTimeDisplay should be public');
+  ok(videojs.getComponent('Slider'), 'Slider should be public');
+  ok(videojs.getComponent('ProgressControl'), 'ProgressControl should be public');
+  ok(videojs.getComponent('SeekBar'), 'SeekBar should be public');
+  ok(videojs.getComponent('LoadProgressBar'), 'LoadProgressBar should be public');
+  ok(videojs.getComponent('PlayProgressBar'), 'PlayProgressBar should be public');
+  ok(videojs.getComponent('SeekHandle'), 'SeekHandle should be public');
+  ok(videojs.getComponent('VolumeControl'), 'VolumeControl should be public');
+  ok(videojs.getComponent('VolumeBar'), 'VolumeBar should be public');
+  ok(videojs.getComponent('VolumeLevel'), 'VolumeLevel should be public');
+  ok(videojs.getComponent('VolumeMenuButton'), 'VolumeMenuButton should be public');
+  ok(videojs.getComponent('VolumeHandle'), 'VolumeHandle should be public');
+  ok(videojs.getComponent('MuteToggle'), 'MuteToggle should be public');
+  ok(videojs.getComponent('PosterImage'), 'PosterImage should be public');
+  ok(videojs.getComponent('Menu'), 'Menu should be public');
+  ok(videojs.getComponent('MenuItem'), 'MenuItem should be public');
+  ok(videojs.getComponent('MenuButton'), 'MenuButton should be public');
+  ok(videojs.getComponent('PlaybackRateMenuButton'), 'PlaybackRateMenuButton should be public');
 
-  ok(videojs.CaptionSettingsMenuItem, 'CaptionSettingsMenuItem should be public');
-  ok(videojs.OffTextTrackMenuItem, 'OffTextTrackMenuItem should be public');
-  ok(videojs.TextTrackMenuItem, 'TextTrackMenuItem should be public');
-  ok(videojs.TextTrackDisplay, 'TextTrackDisplay should be public');
-  ok(videojs.TextTrackButton, 'TextTrackButton should be public');
-  ok(videojs.CaptionsButton, 'CaptionsButton should be public');
-  ok(videojs.SubtitlesButton, 'SubtitlesButton should be public');
-  ok(videojs.ChaptersButton, 'ChaptersButton should be public');
-  ok(videojs.ChaptersTrackMenuItem, 'ChaptersTrackMenuItem should be public');
+  ok(videojs.getComponent('CaptionSettingsMenuItem'), 'CaptionSettingsMenuItem should be public');
+  ok(videojs.getComponent('OffTextTrackMenuItem'), 'OffTextTrackMenuItem should be public');
+  ok(videojs.getComponent('TextTrackMenuItem'), 'TextTrackMenuItem should be public');
+  ok(videojs.getComponent('TextTrackDisplay'), 'TextTrackDisplay should be public');
+  ok(videojs.getComponent('TextTrackButton'), 'TextTrackButton should be public');
+  ok(videojs.getComponent('CaptionsButton'), 'CaptionsButton should be public');
+  ok(videojs.getComponent('SubtitlesButton'), 'SubtitlesButton should be public');
+  ok(videojs.getComponent('ChaptersButton'), 'ChaptersButton should be public');
+  ok(videojs.getComponent('ChaptersTrackMenuItem'), 'ChaptersTrackMenuItem should be public');
 
   ok(videojs.util, 'util namespace should be public');
   ok(videojs.util.mergeOptions, 'mergeOptions should be public');
 });
 
 test('should be able to initialize player twice on the same tag using string reference', function() {
-  var videoTag = PlayerTest.makeTag();
+  var videoTag = TestHelpers.makeTag();
   var id = videoTag.id;
 
   var fixture = document.getElementById('qunit-fixture');
@@ -197,7 +201,7 @@ test('should be able to initialize player twice on the same tag using string ref
   player.dispose();
   ok(!document.getElementById(id), 'element is removed');
 
-  videoTag = PlayerTest.makeTag();
+  videoTag = TestHelpers.makeTag();
   fixture.appendChild(videoTag);
 
   player = videojs('example_1');
@@ -205,7 +209,7 @@ test('should be able to initialize player twice on the same tag using string ref
 });
 
 test('videojs.players should be available after minification', function() {
-  var videoTag = PlayerTest.makeTag();
+  var videoTag = TestHelpers.makeTag();
   var id = videoTag.id;
 
   var fixture = document.getElementById('qunit-fixture');
@@ -217,41 +221,11 @@ test('videojs.players should be available after minification', function() {
   player.dispose();
 });
 
-// NOTE: This test could be removed after we've landed on a permanent
-// externs/exports strategy. See comment on videojs/video.js#853
-test('fullscreenToggle does not depend on minified player methods', function(){
-  var noop, player, fullscreen, requestFullscreen, exitFullscreen, isFullscreen_;
-  noop = function(){};
-  requestFullscreen = false;
-  exitFullscreen = false;
-
-  player = PlayerTest.makePlayer();
-
-  player['requestFullscreen'] = function(){
-    requestFullscreen = true;
-  };
-  player['exitFullscreen'] = function(){
-    exitFullscreen = true;
-  };
-
-  isFullscreen_ = false;
-  player['isFullscreen'] = function(){
-    return isFullscreen_;
-  };
-
-  fullscreen = new videojs.FullscreenToggle(player);
-  fullscreen.trigger('click');
-
-  ok(requestFullscreen, 'requestFullscreen called');
-
-  isFullscreen_ = true;
-  fullscreen.trigger('click');
-
-  ok(exitFullscreen, 'exitFullscreen called');
-});
-
 test('component can be subclassed externally', function(){
-  var player = new (videojs.Component.extend({
+  var Component = videojs.getComponent('Component');
+  var ControlBar = videojs.getComponent('ControlBar');
+
+  var player = new (Component.extend({
     languages: function(){},
     reportUserActivity: function(){},
     language: function(){},
@@ -264,5 +238,6 @@ test('component can be subclassed externally', function(){
     id: function(){},
     reportUserActivity: function(){}
   });
-  ok(new videojs.ControlBar(player), 'created a control bar without throwing');
+
+  ok(new ControlBar(player), 'created a control bar without throwing');
 });

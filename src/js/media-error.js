@@ -1,4 +1,4 @@
-import * as VjsLib from './lib';
+import * as Lib from './lib';
 
 /**
  * Custom MediaError to mimic the HTML5 MediaError
@@ -11,7 +11,7 @@ let MediaError = function(code){
     // default code is zero, so this is a custom error
     this.message = code;
   } else if (typeof code === 'object') { // object
-    VjsLib.obj.merge(this, code);
+    Lib.obj.merge(this, code);
   }
 
   if (!this.message) {

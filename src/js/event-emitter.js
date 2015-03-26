@@ -1,5 +1,5 @@
-import * as VjsEvents from './events';
-import * as VjsLib from './lib';
+import * as Events from './events';
+import * as Lib from './lib';
 
 var EventEmitter = function() {};
 
@@ -10,18 +10,18 @@ EventEmitter.prototype.on = function(type, fn) {
   // so we don't get into an infinite type loop
   let ael = this.addEventListener;
   this.addEventListener = Function.prototype;
-  VjsEvents.on(this, type, fn);
+  Events.on(this, type, fn);
   this.addEventListener = ael;
 };
 EventEmitter.prototype.addEventListener = EventEmitter.prototype.on;
 
 EventEmitter.prototype.off = function(type, fn) {
-  VjsEvents.off(this, type, fn);
+  Events.off(this, type, fn);
 };
 EventEmitter.prototype.removeEventListener = EventEmitter.prototype.off;
 
 EventEmitter.prototype.one = function(type, fn) {
-  VjsEvents.one(this, type, fn);
+  Events.one(this, type, fn);
 };
 
 EventEmitter.prototype.trigger = function(event) {
@@ -32,13 +32,13 @@ EventEmitter.prototype.trigger = function(event) {
       type: type
     };
   }
-  event = VjsEvents.fixEvent(event);
+  event = Events.fixEvent(event);
 
   if (this.allowedEvents_[type] && this['on' + type]) {
     this['on' + type](event);
   }
 
-  VjsEvents.trigger(this, event);
+  Events.trigger(this, event);
 };
 // The standard DOM EventTarget.dispatchEvent() is aliased to trigger()
 EventEmitter.prototype.dispatchEvent = EventEmitter.prototype.trigger;

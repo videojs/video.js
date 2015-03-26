@@ -1,26 +1,31 @@
-module('Text Track List');
+import TextTrackList from '../../../src/js/tracks/text-track-list.js';
+import TextTrack from '../../../src/js/tracks/text-track.js';
+import EventEmitter from '../../../src/js/event-emitter.js';
 
-var TTL = vjs.TextTrackList,
-    noop = Function.prototype,
-    genericTracks = [{
-      id: '1',
-      addEventListener: noop
-    }, {
-      id: '2',
-      addEventListener: noop
-    }, {
-      id: '3',
-      addEventListener: noop
-    }];
+var noop = Function.prototype;
+var genericTracks = [
+  {
+    id: '1',
+    addEventListener: noop
+  }, {
+    id: '2',
+    addEventListener: noop
+  }, {
+    id: '3',
+    addEventListener: noop
+  }
+];
+
+q.module('Text Track List');
 
 test('TextTrackList\'s length is set correctly', function() {
-  var ttl = new TTL(genericTracks);
+  var ttl = new TextTrackList(genericTracks);
 
   equal(ttl.length, genericTracks.length, 'the length is ' + genericTracks.length);
 });
 
 test('can get text tracks by id', function() {
-  var ttl = new TTL(genericTracks);
+  var ttl = new TextTrackList(genericTracks);
 
   equal(ttl.getTrackById('1').id, 1, 'id "1" has id of "1"');
   equal(ttl.getTrackById('2').id, 2, 'id "2" has id of "2"');
@@ -29,7 +34,7 @@ test('can get text tracks by id', function() {
 });
 
 test('length is updated when new tracks are added or removed', function() {
-  var ttl = new TTL(genericTracks);
+  var ttl = new TextTrackList(genericTracks);
 
   ttl.addTrack_({id: '100', addEventListener: noop});
   equal(ttl.length, genericTracks.length + 1, 'the length is ' + (genericTracks.length + 1));
@@ -43,7 +48,7 @@ test('length is updated when new tracks are added or removed', function() {
 });
 
 test('can access items by index', function() {
-  var ttl = new TTL(genericTracks),
+  var ttl = new TextTrackList(genericTracks),
       i = 0,
       length = ttl.length;
 
@@ -55,7 +60,7 @@ test('can access items by index', function() {
 });
 
 test('can access new items by index', function() {
-  var ttl = new TTL(genericTracks);
+  var ttl = new TextTrackList(genericTracks);
 
   ttl.addTrack_({id: '100', addEventListener: noop});
   equal(ttl[3].id, '100', 'id of item at index 3 is 100');
@@ -64,7 +69,7 @@ test('can access new items by index', function() {
 });
 
 test('cannot access removed items by index', function() {
-  var ttl = new TTL(genericTracks);
+  var ttl = new TextTrackList(genericTracks);
 
   ttl.addTrack_({id: '100', addEventListener: noop});
   ttl.addTrack_({id: '101', addEventListener: noop});
@@ -79,7 +84,7 @@ test('cannot access removed items by index', function() {
 });
 
 test('new item available at old index', function() {
-  var ttl = new TTL(genericTracks);
+  var ttl = new TextTrackList(genericTracks);
 
   ttl.addTrack_({id: '100', addEventListener: noop});
   equal(ttl[3].id, '100', 'id of item at index 3 is 100');
@@ -92,7 +97,7 @@ test('new item available at old index', function() {
 });
 
 test('a "addtrack" event is triggered when new tracks are added', function() {
-  var ttl = new TTL(genericTracks),
+  var ttl = new TextTrackList(genericTracks),
       tracks = 0,
       adds = 0,
       addHandler = function(e) {
@@ -117,7 +122,7 @@ test('a "addtrack" event is triggered when new tracks are added', function() {
 });
 
 test('a "removetrack" event is triggered when tracks are removed', function() {
-  var ttl = new TTL(genericTracks),
+  var ttl = new TextTrackList(genericTracks),
       tracks = 0,
       rms = 0,
       rmHandler = function(e) {
@@ -141,8 +146,8 @@ test('a "removetrack" event is triggered when tracks are removed', function() {
 });
 
 test('trigger "change" event when "modechange" is fired on a track', function() {
-  var tt = new vjs.EventEmitter(),
-      ttl = new TTL([tt]),
+  var tt = new EventEmitter(),
+      ttl = new TextTrackList([tt]),
       changes = 0,
       changeHandler = function() {
         changes++;
@@ -162,12 +167,12 @@ test('trigger "change" event when "modechange" is fired on a track', function() 
 });
 
 test('trigger "change" event when mode changes on a TextTracl', function() {
-  var tt = new vjs.TextTrack({
+  var tt = new TextTrack({
         player: {
           on: noop
         }
       }),
-      ttl = new TTL([tt]),
+      ttl = new TextTrackList([tt]),
       changes = 0,
       changeHandler = function() {
         changes++;

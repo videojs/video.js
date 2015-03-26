@@ -1,6 +1,6 @@
 import Component from '../component';
 import Slider, { SliderHandle } from '../slider';
-import * as VjsLib from '../lib';
+import * as Lib from '../lib';
 
 /**
  * The Progress Control component contains the seek bar, load progress,
@@ -43,7 +43,7 @@ var SeekBar = Slider.extend({
   init: function(player, options){
     Slider.call(this, player, options);
     this.on(player, 'timeupdate', this.updateARIAAttributes);
-    player.ready(VjsLib.bind(this, this.updateARIAAttributes));
+    player.ready(Lib.bind(this, this.updateARIAAttributes));
   }
 });
 
@@ -71,8 +71,8 @@ SeekBar.prototype.createEl = function(){
 SeekBar.prototype.updateARIAAttributes = function(){
     // Allows for smooth scrubbing, when player can't keep up.
     let time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
-    this.el_.setAttribute('aria-valuenow', VjsLib.round(this.getPercent()*100, 2)); // machine readable value of progress bar (percentage complete)
-    this.el_.setAttribute('aria-valuetext', VjsLib.formatTime(time, this.player_.duration())); // human readable value of progress bar (time complete)
+    this.el_.setAttribute('aria-valuenow', Lib.round(this.getPercent()*100, 2)); // machine readable value of progress bar (percentage complete)
+    this.el_.setAttribute('aria-valuetext', Lib.formatTime(time, this.player_.duration())); // human readable value of progress bar (time complete)
 };
 
 SeekBar.prototype.getPercent = function(){
@@ -163,7 +163,7 @@ LoadProgressBar.prototype.update = function(){
     let part = children[i];
 
     if (!part) {
-      part = this.el_.appendChild(VjsLib.createEl());
+      part = this.el_.appendChild(Lib.createEl());
     }
 
     // set the percent based on the width of the progress bar (bufferedEnd)
@@ -184,7 +184,7 @@ LoadProgressBar.prototype.update = function(){
  * @param {Object=} options
  * @constructor
  */
-let PlayProgressBar = Component.extend({
+var PlayProgressBar = Component.extend({
   /** @constructor */
   init: function(player, options){
     Component.call(this, player, options);
@@ -235,7 +235,7 @@ SeekHandle.prototype.createEl = function() {
 
 SeekHandle.prototype.updateContent = function() {
   let time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
-  this.el_.innerHTML = '<span class="vjs-control-text">' + VjsLib.formatTime(time, this.player_.duration()) + '</span>';
+  this.el_.innerHTML = '<span class="vjs-control-text">' + Lib.formatTime(time, this.player_.duration()) + '</span>';
 };
 
 export default ProgressControl;

@@ -1,11 +1,14 @@
-module('MenuButton');
+import { MenuButton } from '../../src/js/menu.js';
+import TestHelpers from './test-helpers.js';
+
+q.module('MenuButton');
 
 test('should place title list item into ul', function() {
   var player, menuButton;
 
-  player = PlayerTest.makePlayer();
+  player = TestHelpers.makePlayer();
 
-  menuButton = new vjs.MenuButton(player, {
+  menuButton = new MenuButton(player, {
     'title': 'testTitle'
   });
 

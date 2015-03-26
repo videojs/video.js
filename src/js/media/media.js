@@ -6,7 +6,7 @@
 import Component from '../component';
 import TextTrack from '../tracks/text-track';
 import TextTrackList from '../tracks/text-track-list';
-import * as VjsLib from '../lib';
+import * as Lib from '../lib';
 import window from 'global/window';
 import document from 'global/document';
 
@@ -286,7 +286,7 @@ MediaTechController.prototype.initTextTrackListeners = function() {
   tracks.addEventListener('removetrack', textTrackListChanges);
   tracks.addEventListener('addtrack', textTrackListChanges);
 
-  this.on('dispose', VjsLib.bind(this, function() {
+  this.on('dispose', Lib.bind(this, function() {
     tracks.removeEventListener('removetrack', textTrackListChanges);
     tracks.removeEventListener('addtrack', textTrackListChanges);
   }));
@@ -314,16 +314,16 @@ MediaTechController.prototype.emulateTextTracks = function() {
 
     for (let i = 0; i < this.length; i++) {
       let track = this[i];
-      track.removeEventListener('cuechange', VjsLib.bind(textTrackDisplay, textTrackDisplay.updateDisplay));
+      track.removeEventListener('cuechange', Lib.bind(textTrackDisplay, textTrackDisplay.updateDisplay));
       if (track.mode === 'showing') {
-        track.addEventListener('cuechange', VjsLib.bind(textTrackDisplay, textTrackDisplay.updateDisplay));
+        track.addEventListener('cuechange', Lib.bind(textTrackDisplay, textTrackDisplay.updateDisplay));
       }
     }
   };
 
   tracks.addEventListener('change', textTracksChanges);
 
-  this.on('dispose', VjsLib.bind(this, function() {
+  this.on('dispose', Lib.bind(this, function() {
     tracks.removeEventListener('change', textTracksChanges);
   }));
 };
@@ -498,7 +498,7 @@ MediaTechController.withSourceHandlers = function(Tech){
       if (Tech.nativeSourceHandler) {
         sh = Tech.nativeSourceHandler;
       } else {
-        VjsLib.log.error('No source hander found for the current source.');
+        Lib.log.error('No source hander found for the current source.');
       }
     }
 

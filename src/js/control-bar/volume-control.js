@@ -1,5 +1,5 @@
 import Component from '../component';
-import * as VjsLib from '../lib';
+import * as Lib from '../lib';
 import Slider, { SliderHandle } from '../slider';
 
 /**
@@ -49,12 +49,12 @@ VolumeControl.prototype.createEl = function(){
  * @param {Object=} options
  * @constructor
  */
-let VolumeBar = Slider.extend({
+var VolumeBar = Slider.extend({
   /** @constructor */
   init: function(player, options){
     Slider.call(this, player, options);
     this.on(player, 'volumechange', this.updateARIAAttributes);
-    player.ready(VjsLib.bind(this, this.updateARIAAttributes));
+    player.ready(Lib.bind(this, this.updateARIAAttributes));
   }
 });
 
@@ -62,8 +62,8 @@ Component.registerComponent('VolumeBar', VolumeBar);
 
 VolumeBar.prototype.updateARIAAttributes = function(){
   // Current value of volume bar as a percentage
-  this.el_.setAttribute('aria-valuenow', VjsLib.round(this.player_.volume()*100, 2));
-  this.el_.setAttribute('aria-valuetext', VjsLib.round(this.player_.volume()*100, 2)+'%');
+  this.el_.setAttribute('aria-valuenow', Lib.round(this.player_.volume()*100, 2));
+  this.el_.setAttribute('aria-valuetext', Lib.round(this.player_.volume()*100, 2)+'%');
 };
 
 VolumeBar.prototype.options_ = {
@@ -115,7 +115,7 @@ VolumeBar.prototype.stepBack = function(){
  * @param {Object=} options
  * @constructor
  */
-let VolumeLevel = Component.extend({
+var VolumeLevel = Component.extend({
   /** @constructor */
   init: function(player, options){
     Component.call(this, player, options);
@@ -138,7 +138,7 @@ VolumeLevel.prototype.createEl = function(){
  * @param {Object=} options
  * @constructor
  */
-let VolumeHandle = SliderHandle.extend();
+var VolumeHandle = SliderHandle.extend();
 
 Component.registerComponent('VolumeHandle', VolumeHandle);
 
@@ -152,4 +152,4 @@ VolumeHandle.prototype.createEl = function(){
 };
 
 export default VolumeControl;
-export { VolumeBar, VolumeLevel, VolumeHandle }
+export { VolumeBar, VolumeLevel, VolumeHandle };

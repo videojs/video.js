@@ -1,5 +1,5 @@
 import Component from '../component';
-import * as VjsLib from '../lib';
+import * as Lib from '../lib';
 
 /**
  * Displays the live indicator
@@ -21,7 +21,7 @@ LiveDisplay.prototype.createEl = function(){
     className: 'vjs-live-controls vjs-control'
   });
 
-  this.contentEl_ = VjsLib.createEl('div', {
+  this.contentEl_ = Lib.createEl('div', {
     className: 'vjs-live-display',
     innerHTML: '<span class="vjs-control-text">' + this.localize('Stream Type') + '</span>' + this.localize('LIVE'),
     'aria-live': 'off'

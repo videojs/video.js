@@ -1,6 +1,6 @@
 import Button from '../button';
 import Component from '../component';
-import * as VjsLib from '../lib';
+import * as Lib from '../lib';
 
 /**
  * Button to toggle between play and pause

@@ -1,4 +1,4 @@
-import * as VjsLib from './lib';
+import * as Lib from './lib';
 
 /**
  * Core Object/Class for objects that use inheritance + constructors
@@ -89,7 +89,7 @@ CoreObject.extend = function(props){
   };
 
   // Inherit from this object's prototype
-  subObj.prototype = VjsLib.obj.create(this.prototype);
+  subObj.prototype = Lib.obj.create(this.prototype);
   // Reset the constructor property for subObj otherwise
   // instances of subObj would have the constructor of the parent Object
   subObj.prototype.constructor = subObj;
@@ -119,7 +119,7 @@ CoreObject.extend = function(props){
  */
 CoreObject.create = function(){
   // Create a new object that inherits from this object's prototype
-  var inst = VjsLib.obj.create(this.prototype);
+  var inst = Lib.obj.create(this.prototype);
 
   // Apply this constructor function to the new object
   this.apply(inst, arguments);

@@ -1,13 +1,14 @@
-var createElement;
+import * as Lib from '../../src/js/lib.js';
+import window from 'global/window';
+import document from 'global/document';
 
-var Lib = vjs.Lib;
-
-module('Lib', {
+q.module('Lib', {
   'setup': function() {
-    createElement = document.createElement;
+    // Allow for stubbing createElement, should replace with sinon now
+    this.createElement = document.createElement;
   },
   'teardown': function() {
-    document.createElement = createElement;
+    document.createElement = this.createElement;
   }
 });
 
@@ -396,15 +397,13 @@ test('should loop through each element of an array', function() {
     deepEqual(array, a, 'The array arg should match the original array');
     equal(i++, iterator, 'The indexes should match');
     equal(this, thisArg, 'The context should equal the thisArg');
-  }, thisArg);
-  ok(sum, 6);
 
-  Lib.arr.forEach(a, function(){
-    console.log(this);
-    if (this !== videojs) {
-      ok(false, 'default context should be vjs');
+    if (this !== thisArg) {
+      ok(false, 'should allow setting the context');
     }
-  });
+  }, thisArg);
+
+  ok(sum, 6);
 });
 
 //getFileExtension tests

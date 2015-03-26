@@ -1,6 +1,6 @@
-module('Util');
+import * as Util from '../../src/js/util.js';
 
-var Util = vjs.Util;
+q.module('Util');
 
 test('should merge options objects', function(){
   var ob1, ob2, ob3;

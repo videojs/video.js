@@ -1,5 +1,5 @@
 import EventEmitter from '../event-emitter';
-import * as VjsLib from '../lib';
+import * as Lib from '../lib';
 import document from 'global/document';
 
 /*
@@ -18,7 +18,7 @@ import document from 'global/document';
 let TextTrackList = function(tracks) {
   let list = this;
 
-  if (VjsLib.IS_IE8) {
+  if (Lib.IS_IE8) {
     list = document.createElement('custom');
 
     for (let prop in TextTrackList.prototype) {
@@ -39,12 +39,12 @@ let TextTrackList = function(tracks) {
     list.addTrack_(tracks[i]);
   }
 
-  if (VjsLib.IS_IE8) {
+  if (Lib.IS_IE8) {
     return list;
   }
 };
 
-TextTrackList.prototype = VjsLib.obj.create(EventEmitter.prototype);
+TextTrackList.prototype = Lib.obj.create(EventEmitter.prototype);
 TextTrackList.prototype.constructor = TextTrackList;
 
 /*
@@ -73,7 +73,7 @@ TextTrackList.prototype.addTrack_ = function(track) {
     });
   }
 
-  track.addEventListener('modechange', VjsLib.bind(this, function() {
+  track.addEventListener('modechange', Lib.bind(this, function() {
     this.trigger('change');
   }));
   this.tracks_.push(track);
@@ -105,7 +105,7 @@ TextTrackList.prototype.removeTrack_ = function(rtrack) {
 TextTrackList.prototype.getTrackById = function(id) {
   let result = null;
 
-  for (let i = 0, i = this.length; i < l; i++) {
+  for (let i = 0, l = this.length; i < l; i++) {
     let track = this[i];
     if (track.id === id) {
       result = track;

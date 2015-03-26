@@ -1,4 +1,8 @@
-module('Text Track Controls');
+import { TextTrackMenuItem } from '../../../src/js/tracks/text-track-controls';
+import TestHelpers from '../test-helpers.js';
+import * as Lib from '../../../src/js/lib.js';
+
+q.module('Text Track Controls');
 
 var track = {
   kind: 'captions',
@@ -6,7 +10,7 @@ var track = {
 };
 
 test('should be displayed when text tracks list is not empty', function() {
-  var player = PlayerTest.makePlayer({
+  var player = TestHelpers.makePlayer({
     tracks: [track]
   });
 
@@ -15,7 +19,7 @@ test('should be displayed when text tracks list is not empty', function() {
 });
 
 test('should be displayed when a text track is added to an empty track list', function() {
-  var player = PlayerTest.makePlayer();
+  var player = TestHelpers.makePlayer();
 
   player.addRemoteTextTrack(track);
 
@@ -24,14 +28,14 @@ test('should be displayed when a text track is added to an empty track list', fu
 });
 
 test('should not be displayed when text tracks list is empty', function() {
-  var player = PlayerTest.makePlayer();
+  var player = TestHelpers.makePlayer();
 
   ok(player.controlBar.captionsButton.hasClass('vjs-hidden'), 'control is not displayed');
   equal(player.textTracks().length, 0, 'textTracks is empty');
 });
 
 test('should not be displayed when last text track is removed', function() {
-  var player = PlayerTest.makePlayer({
+  var player = TestHelpers.makePlayer({
     tracks: [track]
   });
 
@@ -42,7 +46,7 @@ test('should not be displayed when last text track is removed', function() {
 });
 
 test('menu should contain "Settings", "Off" and one track', function() {
-  var player = PlayerTest.makePlayer({
+  var player = TestHelpers.makePlayer({
       tracks: [track]
     }),
     menuItems = player.controlBar.captionsButton.items;
@@ -54,7 +58,7 @@ test('menu should contain "Settings", "Off" and one track', function() {
 });
 
 test('menu should update with addRemoteTextTrack', function() {
-  var player = PlayerTest.makePlayer({
+  var player = TestHelpers.makePlayer({
     tracks: [track]
   });
 
@@ -65,7 +69,7 @@ test('menu should update with addRemoteTextTrack', function() {
 });
 
 test('menu should update with removeRemoteTextTrack', function() {
-  var player = PlayerTest.makePlayer({
+  var player = TestHelpers.makePlayer({
     tracks: [track, track]
   });
 
@@ -75,19 +79,19 @@ test('menu should update with removeRemoteTextTrack', function() {
   equal(player.textTracks().length, 1, 'textTracks contains one item');
 });
 
-if (!vjs.IS_IE8) {
+if (!Lib.IS_IE8) {
   // This test doesn't work on IE8.
   // However, this test tests a specific with iOS7 where the TextTrackList doesn't report track mode changes.
   // TODO: figure out why this test doens't work on IE8. https://github.com/videojs/video.js/issues/1861
   test('menu items should polyfill mode change events', function() {
-    var player = PlayerTest.makePlayer({}),
+    var player = TestHelpers.makePlayer({}),
         changes,
         trackMenuItem;
 
     // emulate a TextTrackList that doesn't report track mode changes,
     // like iOS7
     player.textTracks().onchange = undefined;
-    trackMenuItem = new vjs.TextTrackMenuItem(player, {
+    trackMenuItem = new TextTrackMenuItem(player, {
       track: track
     });
 

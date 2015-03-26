@@ -1,4 +1,4 @@
-import * as VjsLib from '../lib';
+import * as Lib from '../lib';
 import document from 'global/document';
 
 /*
@@ -14,7 +14,7 @@ import document from 'global/document';
 let TextTrackCueList = function(cues) {
   let list = this;
 
-  if (VjsLib.IS_IE8) {
+  if (Lib.IS_IE8) {
     list = document.createElement('custom');
 
     for (let prop in TextTrackCueList.prototype) {
@@ -30,12 +30,16 @@ let TextTrackCueList = function(cues) {
     }
   });
 
-  if (VjsLib.IS_IE8) {
+  if (Lib.IS_IE8) {
     return list;
   }
 };
 
 TextTrackCueList.prototype.setCues_ = function(cues) {
+  let oldLength = this.length || 0;
+  let i = 0;
+  let l = cues.length;
+
   this.cues_ = cues;
   this.length_ = cues.length;
 
@@ -49,10 +53,10 @@ TextTrackCueList.prototype.setCues_ = function(cues) {
     }
   };
 
-  let oldLength = this.length || 0;
-  let l = cues.length;
   if (oldLength < l) {
-    for(let i = oldLength; i < l; i++) {
+    i = oldLength;
+
+    for(; i < l; i++) {
       defineProp.call(this, i);
     }
   }

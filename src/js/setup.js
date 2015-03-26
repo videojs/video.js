@@ -1,5 +1,5 @@
 import JSON from './json';
-import * as VjsEvents from './events';
+import * as Events from './events';
 import document from 'global/document';
 import window from 'global/window';
 
@@ -12,7 +12,7 @@ let videojs;
  */
 
 // Automatically set up any tags that have a data-setup attribute
-let autoSetup = function(){
+var autoSetup = function(){
   // One day, when we stop supporting IE8, go back to this, but in the meantime...*hack hack hack*
   // var vids = Array.prototype.slice.call(document.getElementsByTagName('video'));
   // var audios = Array.prototype.slice.call(document.getElementsByTagName('audio'));
@@ -78,7 +78,7 @@ var autoSetupTimeout = function(wait, vjs){
 if (document.readyState === 'complete') {
   _windowLoaded = true;
 } else {
-  VjsEvents.one(window, 'load', function(){
+  Events.one(window, 'load', function(){
     _windowLoaded = true;
   });
 }

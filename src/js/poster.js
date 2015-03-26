@@ -1,5 +1,5 @@
 import Button from './button';
-import * as VjsLib from './lib';
+import * as Lib from './lib';
 import Component from './component';
 
 /* Poster Image
@@ -17,7 +17,7 @@ let PosterImage = Button.extend({
     Button.call(this, player, options);
 
     this.update();
-    player.on('posterchange', VjsLib.bind(this, this.update));
+    player.on('posterchange', Lib.bind(this, this.update));
   }
 });
 
@@ -36,7 +36,7 @@ PosterImage.prototype.dispose = function(){
  * @return {Element}
  */
 PosterImage.prototype.createEl = function(){
-  let el = VjsLib.createEl('div', {
+  let el = Lib.createEl('div', {
     className: 'vjs-poster',
 
     // Don't want poster to be tabbable.
@@ -47,8 +47,8 @@ PosterImage.prototype.createEl = function(){
   // ratio, use a div with `background-size` when available. For browsers that
   // do not support `background-size` (e.g. IE8), fall back on using a regular
   // img element.
-  if (!VjsLib.BACKGROUND_SIZE_SUPPORTED) {
-    this.fallbackImg_ = VjsLib.createEl('img');
+  if (!Lib.BACKGROUND_SIZE_SUPPORTED) {
+    this.fallbackImg_ = Lib.createEl('img');
     el.appendChild(this.fallbackImg_);
   }
 

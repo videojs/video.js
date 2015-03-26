@@ -5,7 +5,7 @@
 import Player from './player';
 import Plugins from './plugins';
 import Options from './options';
-import * as VjsLib from './lib';
+import * as Lib from './lib';
 import * as VjsUtil from './util';
 import CoreObject from './core-object';
 import document from 'global/document';
@@ -43,7 +43,7 @@ var videojs = function(id, options, ready){
 
       // If options or ready funtion are passed, warn
       if (options) {
-        VjsLib.log.warn ('Player "' + id + '" is already initialised. Options will not be applied.');
+        Lib.log.warn ('Player "' + id + '" is already initialised. Options will not be applied.');
       }
 
       if (ready) {
@@ -54,7 +54,7 @@ var videojs = function(id, options, ready){
 
     // Otherwise get element for ID
     } else {
-      tag = VjsLib.el(id);
+      tag = Lib.el(id);
     }
 
   // ID is a media element

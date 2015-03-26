@@ -1,6 +1,6 @@
 import Component from '../component';
 import Menu, { MenuButton, MenuItem } from '../menu';
-import * as VjsLib from '../lib';
+import * as Lib from '../lib';
 
 /**
  * The component for controlling the playback rate
@@ -22,15 +22,13 @@ let PlaybackRateMenuButton = MenuButton.extend({
   }
 });
 
-Component.registerComponent('PlaybackRateMenuButton', PlaybackRateMenuButton);
-
 PlaybackRateMenuButton.prototype.buttonText = 'Playback Rate';
 PlaybackRateMenuButton.prototype.className = 'vjs-playback-rate';
 
 PlaybackRateMenuButton.prototype.createEl = function(){
   let el = MenuButton.prototype.createEl.call(this);
 
-  this.labelEl_ = VjsLib.createEl('div', {
+  this.labelEl_ = Lib.createEl('div', {
     className: 'vjs-playback-rate-value',
     innerHTML: 1.0
   });
@@ -109,7 +107,7 @@ PlaybackRateMenuButton.prototype.updateLabel = function(){
  *
  * @constructor
  */
-let PlaybackRateMenuItem = MenuItem.extend({
+var PlaybackRateMenuItem = MenuItem.extend({
   contentElType: 'button',
   /** @constructor */
   init: function(player, options){
@@ -136,5 +134,6 @@ PlaybackRateMenuItem.prototype.update = function(){
   this.selected(this.player().playbackRate() == this.rate);
 };
 
+Component.registerComponent('PlaybackRateMenuButton', PlaybackRateMenuButton);
 export default PlaybackRateMenuButton;
 export { PlaybackRateMenuItem };

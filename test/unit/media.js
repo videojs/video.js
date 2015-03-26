@@ -1,8 +1,8 @@
 var noop = function() {}, clock, oldTextTracks;
 
-var MediaTechController = vjs.MediaTechController;
+import MediaTechController from '../../src/js/media/media.js';
 
-module('Media Tech', {
+q.module('Media Tech', {
   'setup': function() {
     this.noop = function() {};
     this.clock = sinon.useFakeTimers();

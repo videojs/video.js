@@ -1,5 +1,5 @@
 import Component from './component';
-import * as VjsLib from './lib';
+import * as Lib from './lib';
 
 /**
  * Display that an error has occurred making the video unplayable
@@ -23,7 +23,7 @@ ErrorDisplay.prototype.createEl = function(){
     className: 'vjs-error-display'
   });
 
-  this.contentEl_ = VjsLib.createEl('div');
+  this.contentEl_ = Lib.createEl('div');
   el.appendChild(this.contentEl_);
 
   return el;
