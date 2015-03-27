@@ -46,7 +46,7 @@ var sourceFiles = [
   "src/js/media/media.js",
   "src/js/media/html5.js",
   "src/js/media/flash.js",
-  "src/js/media/flash.rtmp.js",
+  "src/js/media/flash-rtmp.js",
   "src/js/media/loader.js",
   "src/js/tracks/text-track-enums.js",
   "src/js/tracks/text-track.js",
@@ -82,5 +82,3 @@ if (typeof blockSourceLoading === 'undefined') {
     document.write('<script>videojs.options.techOrder = ["flash"];videojs.options.flash.swf = "../src/swf/video-js.swf";</script>')
   }
 }
-
-

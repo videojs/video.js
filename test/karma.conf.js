@@ -1,6 +1,5 @@
 var fs = require('fs');
 var vm = require('vm');
-var babelify = require('babelify');
 // var sourceLoader = fs.readFileSync('./build/source-loader.js', 'utf8');
 // var sandbox = {
 //   blockSourceLoading: true,
@@ -87,7 +86,7 @@ module.exports = function(config) {
 
     browserify: {
       debug: true,
-      transform: [ 'babelify' ]
+      transform: [ 'babelify', 'browserify-istanbul' ]
     },
 
     plugins: [
@@ -100,10 +99,11 @@ module.exports = function(config) {
       'karma-safari-launcher',
       'karma-sauce-launcher',
       'karma-sinon',
-      'karma-browserify'
+      'karma-browserify',
+      'karma-coverage'
     ],
 
-    reporters: ['dots'],
+    reporters: ['dots', 'coverage'],
 
     // web server port
     port: 9876,
@@ -123,6 +123,24 @@ module.exports = function(config) {
       build: process.env.TRAVIS_BUILD_NUMBER,
       testName: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH,
       recordScreenshots: false
+    },
+
+    // The HTML reporter seems to be busted right now, so we're just using text in the meantime
+    // along with the summary after the test run.
+    coverageReporter: {
+      reporters: [
+        {
+          type: 'text',
+          dir: 'coverage/',
+          file: 'coverage.txt'
+        },
+        {
+          type: 'lcovonly',
+          dir: 'coverage/',
+          subdir: '.'
+        },
+        { type: 'text-summary' }
+      ]
     }
   });
 };

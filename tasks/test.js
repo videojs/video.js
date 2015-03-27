@@ -14,9 +14,9 @@ module.exports = function(grunt) {
     grunt.task.run(['pretask']);
 
     if (process.env.TRAVIS_PULL_REQUEST !== 'false') {
-      grunt.task.run(['karma:phantomjs', 'karma:minified_phantomjs', 'karma:minified_api_phantomjs']);
+      grunt.task.run(['karma:firefox', 'coveralls']);
     } else if (process.env.TRAVIS) {
-      grunt.task.run(['karma:phantomjs', 'karma:minified_phantomjs', 'karma:minified_api_phantomjs']);
+      grunt.task.run(['karma:firefox', 'coveralls']);
       //Disabling saucelabs until we figure out how to make it run reliably.
       //grunt.task.run([
       //'karma:chrome_sl',

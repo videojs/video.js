@@ -403,22 +403,11 @@ module.exports = function(grunt) {
             })
           ]
         }
-      },
-      test: {
-        files: {
-          'build/files/video-es6.test.js': ['test/es6-browserify.js']
-        },
-        options: {
-          browserifyOptions: {
-            debug: true,
-            standalone: 'videojs'
-          },
-          transform: [
-            require('babelify').configure({
-              sourceMapRelative: './src/js'
-            })
-          ]
-        }
+      }
+    },
+    coveralls: {
+      all: {
+        src: 'test/coverage/lcov.info'
       }
     }
   });
@@ -444,13 +433,13 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-aws-s3');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-browserify');
+  grunt.loadNpmTasks('grunt-coveralls');
 
-  grunt.registerTask('pretask', ['jshint', 'less', 'vjslanguages', 'build', 'usebanner', 'uglify']);
+  grunt.registerTask('pretask', ['jshint', 'less', 'vjslanguages', 'browserify', 'usebanner']);
   // Default task.
   grunt.registerTask('default', ['pretask', 'dist']);
   // Development watch task
   grunt.registerTask('dev', ['jshint', 'less', 'vjslanguages', 'browserify:dist', 'usebanner', 'karma:chrome']);
-  grunt.registerTask('test-qunit', ['pretask', 'qunit']);
 
   grunt.registerTask('dist', 'Creating distribution', ['dist-copy', 'zip:dist']);
 

@@ -22,3 +22,6 @@ sandbox/*
 
 *results.xml
 *.log
+
+test/coverage/*
+.coveralls.yml
