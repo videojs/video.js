@@ -1,11 +1,18 @@
-import videojs from '../../src/js/video.js';
-import TestHelpers from './test-helpers.js';
-import document from 'global/document';
+/**
+ * These tests run on the minified, window.videojs and ensure the needed
+ * APIs still exist
+ */
+
+(function(){
 
 q.module('Player Minified');
 
+test('videojs should exist on the window', function() {
+  ok(window.videojs, 'videojs exists on the window');
+});
+
 test('should be able to access expected player API methods', function() {
-  var player = TestHelpers.makePlayer();
+  var player = videojs.getComponent('Player').prototype;
 
   // Native HTML5 Methods
   ok(player.error, 'error exists');
@@ -63,8 +70,6 @@ test('should be able to access expected player API methods', function() {
   ok(player.requestFullScreen, 'requestFullScreen exists');
   ok(player.isFullScreen, 'isFullScreen exists');
   ok(player.cancelFullScreen, 'cancelFullScreen exists');
-
-  player.dispose();
 });
 
 test('should be able to access expected component API methods', function() {
@@ -136,7 +141,7 @@ test('should be able to access expected MediaTech API methods', function() {
 });
 
 test('should export ready api call to public', function() {
-  var videoTag = TestHelpers.makeTag();
+  var videoTag = testHelperMakeTag();
 
   var fixture = document.getElementById('qunit-fixture');
   fixture.appendChild(videoTag);
@@ -191,7 +196,7 @@ test('should export useful components to the public', function () {
 });
 
 test('should be able to initialize player twice on the same tag using string reference', function() {
-  var videoTag = TestHelpers.makeTag();
+  var videoTag = testHelperMakeTag();
   var id = videoTag.id;
 
   var fixture = document.getElementById('qunit-fixture');
@@ -201,7 +206,7 @@ test('should be able to initialize player twice on the same tag using string ref
   player.dispose();
   ok(!document.getElementById(id), 'element is removed');
 
-  videoTag = TestHelpers.makeTag();
+  videoTag = testHelperMakeTag();
   fixture.appendChild(videoTag);
 
   player = videojs('example_1');
@@ -209,7 +214,7 @@ test('should be able to initialize player twice on the same tag using string ref
 });
 
 test('videojs.players should be available after minification', function() {
-  var videoTag = TestHelpers.makeTag();
+  var videoTag = testHelperMakeTag();
   var id = videoTag.id;
 
   var fixture = document.getElementById('qunit-fixture');
@@ -241,3 +246,12 @@ test('component can be subclassed externally', function(){
 
   ok(new ControlBar(player), 'created a control bar without throwing');
 });
+
+function testHelperMakeTag(){
+  var videoTag = document.createElement('video');
+  videoTag.id = 'example_1';
+  videoTag.className = 'video-js vjs-default-skin';
+  return videoTag;
+}
+
+})();

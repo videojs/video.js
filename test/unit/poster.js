@@ -93,7 +93,7 @@ test('should hide the poster in the appropriate player states', function(){
   fixture.appendChild(playerDiv);
 
   playerDiv.className = 'video-js vjs-has-started';
-  equal(TestHelpers.getComputedStyle(el, 'display'), 'none', 'The poster hides when the video has started');
+  equal(TestHelpers.getComputedStyle(el, 'display'), 'none', 'The poster hides when the video has started (CSS may not be loaded)');
 
   playerDiv.className = 'video-js vjs-has-started vjs-audio';
   equal(TestHelpers.getComputedStyle(el, 'display'), 'block', 'The poster continues to show when playing audio');

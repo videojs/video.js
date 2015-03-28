@@ -39,4 +39,4 @@ var TestHelpers = {
   }
 };
 
-module.exports = TestHelpers;
+export default TestHelpers;

@@ -5,10 +5,10 @@
   <meta charset="utf-8" />
   <title>VideoJS Languages Demo</title>
 
-  <link href="../build/files/video-js.css" rel="stylesheet" type="text/css">
+  <link href="../build/temp/video-js.css" rel="stylesheet" type="text/css">
 
   <!-- LOAD VIDEO.JS SOURCE FILES IN ORDER -->
-  <script src="../build/source-loader.js"></script>
+  <script src="../build/temp/video.js"></script>
 
   <!-- Set the location of the flash SWF -->
   <!-- Add support for Spanish 'es' -->

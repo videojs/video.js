@@ -76,18 +76,18 @@ var videojs = function(id, options, ready){
 // var videojs = window['videojs'] = vjs;
 
 // CDN Version. Used to target right flash swf.
-videojs.CDN_VERSION = 'GENERATED_CDN_VSN';
+videojs.CDN_VERSION = '__VERSION_NO_PATCH__';
 videojs.ACCESS_PROTOCOL = ('https:' == document.location.protocol ? 'https://' : 'http://');
 
 /**
 * Full player version
 * @type {string}
 */
-videojs['VERSION'] = 'GENERATED_FULL_VSN';
+videojs['VERSION'] = '__VERSION__';
 
 // Set CDN Version of swf
-// The added (+) blocks the replace from changing this GENERATED_CDN_VSN string
-if (videojs.CDN_VERSION !== 'GENERATED'+'_CDN_VSN') {
+// The added (+) blocks the replace from changing this _VERSION_NO_PATCH_ string
+if (videojs.CDN_VERSION !== '__VERSION_'+'NO_PATCH__') {
   Options['flash']['swf'] = videojs.ACCESS_PROTOCOL + 'vjs.zencdn.net/'+videojs.CDN_VERSION+'/video-js.swf';
 }
 

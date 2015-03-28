@@ -1,19 +1,3 @@
-var fs = require('fs');
-var vm = require('vm');
-// var sourceLoader = fs.readFileSync('./build/source-loader.js', 'utf8');
-// var sandbox = {
-//   blockSourceLoading: true,
-//   document: {},
-//   window: {}
-// };
-// var sourceFiles = [];
-//
-//
-// vm.runInNewContext(sourceLoader, sandbox, 'build/source-loader.js');
-// sourceFiles = sandbox.sourceFiles.map(function(src) {
-//   return '../' + src;
-// });
-
 module.exports = function(config) {
   var customLaunchers = {
     chrome_sl: {
@@ -75,9 +59,11 @@ module.exports = function(config) {
     // customLaunchers: customLaunchers,
 
     files: [
-      '../build/files/video-js.css',
+      '../build/temp/video-js.min.css',
       '../test/karma-qunit-shim.js',
-      '../test/unit/**/*.js'
+      '../test/unit/**/*.js',
+      '../build/temp/video.min.js',
+      '../test/api/**/*.js',
     ],
 
     preprocessors: {
