@@ -364,6 +364,14 @@ module.exports = function(grunt) {
   // Development watch task. Doing the minimum required.
   grunt.registerTask('dev', ['jshint', 'less', 'browserify', 'karma:chrome']);
 
+  // Tests.
+  // We want to run things a little differently if it's coming from Travis vs local
+  if (process.env.TRAVIS) {
+    grunt.registerTask('test', ['build', 'test-travis', 'coveralls']);
+  } else {
+    grunt.registerTask('test', ['build', 'test-local']);
+  }
+
   // Load all the tasks in the tasks directory
   grunt.loadTasks('build/tasks');
 };
