@@ -11,9 +11,9 @@ module.exports = function(grunt) {
     tasksMinified,
     tasksMinifiedApi;
 
-    grunt.task.run(['pretask']);
-
-    if (process.env.TRAVIS_PULL_REQUEST !== 'false') {
+    // I believe this was done originally because of security implications around running
+    // Saucelabs automatically on PRs.
+    if (process.env.TRAVIS && process.env.TRAVIS_PULL_REQUEST !== 'false') {
       grunt.task.run(['karma:firefox', 'coveralls']);
     } else if (process.env.TRAVIS) {
       grunt.task.run(['karma:firefox', 'coveralls']);
