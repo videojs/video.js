@@ -1,3 +1,7 @@
+## Please Note!
+The master branch is now the development branch for 5.0 and should be considered unstable until the first 5.0 release. If you're looking for the most recent stable release, please refer to the [stable branch](https://github.com/videojs/video.js/tree/stable).
+
+
 ![Video.js logo](https://i.cloudup.com/C3nAUZ-l4c.png)
 
 # [Video.js - HTML5 Video Player](http://videojs.com)  [![Build Status](https://travis-ci.org/videojs/video.js.svg?branch=master)](https://travis-ci.org/videojs/video.js)
