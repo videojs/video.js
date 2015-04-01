@@ -109,6 +109,7 @@ After an instance has been created it can be accessed globally using `Video('exa
   - [loadstart](#loadstart-event)
   - [pause](#pause-event)
   - [play](#play-event)
+  - [playing](#playing)
   - [progress](#progress-event)
   - [seeked](#seeked-event)
   - [seeking](#seeking-event)
@@ -1347,9 +1348,16 @@ _defined in_: [src/js/player.js#L493](https://github.com/videojs/video.js/blob/m
 ---
 
 ### play `EVENT`
-> Fired whenever the media begins or resumes playback
+> Fired whenever media is requested to begin or resume playback
 
 _defined in_: [src/js/player.js#L427](https://github.com/videojs/video.js/blob/master/src/js/player.js#L427)
+
+---
+
+### playing `EVENT`
+> Fired whenever media begins or resumes playback
+
+_defined in_: [src/js/media/html5.js#L657](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L657)
 
 ---
 
