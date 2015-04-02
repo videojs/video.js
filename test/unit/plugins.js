@@ -162,3 +162,34 @@ test('Plugins should not get events after stopImmediatePropagation is called', f
   equal(order.length, 1, 'only one event listener should have triggered');
   player.dispose();
 });
+
+test('Plugin that does not exist logs an error', function() {
+  // stub the global log functions
+  var console, log, error, origConsole;
+  origConsole = window['console'];
+  console = window['console'] = {
+    log: function(){},
+    warn: function(){},
+    error: function(){}
+  };
+  log = sinon.stub(console, 'log');
+  error = sinon.stub(console, 'error');
+
+  // enable a non-existing plugin
+  PlayerTest.makePlayer({
+    plugins: {
+      'nonExistingPlugin': {
+        'foo': 'bar'
+      }
+    }
+  });
+
+  ok(error.called, 'error was called');
+  equal(error.firstCall.args[2], 'Unable to find plugin:');
+  equal(error.firstCall.args[3], 'nonExistingPlugin');
+
+  // tear down logging stubs
+  log.restore();
+  error.restore();
+  window['console'] = origConsole;
+});

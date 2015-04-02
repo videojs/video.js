@@ -37,6 +37,7 @@
         "ok",
         "QUnit",
         "raises",
+        "throws",
         "start",
         "stop",
         "strictEqual",
