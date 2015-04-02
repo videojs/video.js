@@ -53,7 +53,7 @@ ControlBar.prototype.options_ = {
     'subtitlesButton',
     'captionsButton',
     'volumeMenuButton',
-    'fullscreenToggle',
+    'fullscreenToggle'
   ]
 };
 
