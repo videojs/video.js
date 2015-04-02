@@ -1442,6 +1442,8 @@ vjs.Player.prototype.error = function(err){
     return this.error_;
   }
 
+  if (this.tech) { vjs.MediaTechController.prototype.stopTracking.call(this.tech); }
+
   // restoring to default
   if (err === null) {
     this.error_ = err;
