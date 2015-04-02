@@ -186,9 +186,11 @@ vjs.TextTrack.prototype = vjs.obj.create(vjs.EventEmitter.prototype);
 vjs.TextTrack.prototype.constructor = vjs.TextTrack;
 
 /*
+ * loadeddata - The text track was downloaded and parsed
  * cuechange - One or more cues in the track have become active or stopped being active.
  */
 vjs.TextTrack.prototype.allowedEvents_ = {
+  'loadeddata': 'loadeddata',
   'cuechange': 'cuechange'
 };
 
@@ -241,6 +243,7 @@ loadTrack = function(src, track) {
 
     track.loaded_ = true;
     parseCues(responseBody, track);
+    track.trigger('loadeddata');
   }));
 };
 

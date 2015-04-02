@@ -488,22 +488,21 @@ vjs.ChaptersButton.prototype.createMenu = function(){
       track, chaptersTrack,
       items = this.items = [];
 
+  //TODO: Handle more than one chapters track
   for (; i < l; i++) {
     track = tracks[i];
     if (track['kind'] == this.kind_) {
-      if (!track.cues) {
-        track['mode'] = 'hidden';
-        /* jshint loopfunc:true */
-        // TODO see if we can figure out a better way of doing this https://github.com/videojs/video.js/issues/1864
-        window.setTimeout(vjs.bind(this, function() {
-          this.createMenu();
-        }), 100);
-        /* jshint loopfunc:false */
-      } else {
-        chaptersTrack = track;
-        break;
-      }
+      chaptersTrack = track;
+      break;
     }
+  }
+
+  if (chaptersTrack && !chaptersTrack.cues) {
+    chaptersTrack['mode'] = 'hidden';
+
+    chaptersTrack.addEventListener('loadeddata', vjs.bind(this, function() {
+      this.update();
+    }));
   }
 
   var menu = this.menu;
@@ -516,7 +515,7 @@ vjs.ChaptersButton.prototype.createMenu = function(){
     }));
   }
 
-  if (chaptersTrack) {
+  if (chaptersTrack && chaptersTrack.cues) {
     var cues = chaptersTrack['cues'], cue, mi;
     i = 0;
     l = cues.length;
