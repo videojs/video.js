@@ -849,3 +849,22 @@ vjs.arr.forEach = function(array, callback, thisArg) {
 
   return array;
 };
+
+vjs.extend = function (obj) {
+  var arg, i, k;
+  for (i = 1; i < arguments.length; i++) {
+    arg = arguments[i];
+    for (k in arg) {
+      if (arg.hasOwnProperty(k)) {
+        if (vjs.obj.isPlain(obj[k]) && vjs.obj.isPlain(arg[k])) {
+          obj[k] = vjs.extend({}, obj[k], arg[k]);
+        } else if (vjs.obj.isPlain(arg[k])) {
+          obj[k] = vjs.extend({}, arg[k]);
+        } else {
+          obj[k] = arg[k];
+        }
+      }
+    }
+  }
+  return obj;
+};

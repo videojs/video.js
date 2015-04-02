@@ -403,3 +403,246 @@ test('should loop through each element of an array', function() {
     }
   });
 });
+
+test('should copy a given object', function(){
+  var obj = {
+    person: {
+      name: 'John',
+      surname: 'Doe',
+      location: {
+        country: 'EEUU',
+        city: 'New York'
+      }
+    }
+  };
+
+  var objCopy = vjs.obj.copy(obj);
+  notEqual(objCopy, obj);
+  deepEqual(objCopy, obj);
+});
+
+test('should do a deep merge of primitive values', function(){
+  var obj1 = {
+    num1: 1,
+    num2: 1,
+    str1: 'one',
+    str2: 'one',
+    bool1: true,
+    bool2: true
+  };
+
+  var obj2 = {
+    num2: 2,
+    str2: 'two',
+    bool2: false
+  };
+
+  deepEqual(vjs.obj.deepMerge(obj1, obj2), {
+    num1: 1,
+    num2: 2,
+    str1: 'one',
+    str2: 'two',
+    bool1: true,
+    bool2: false
+  });
+});
+
+test('should override arrays on when deep merging two objs', function () {
+  var obj1 = {
+    array1: ['one', 'two', 'three']
+  };
+
+  var obj2 = {
+    array1: [1, 2, 3]
+  };
+
+  deepEqual(vjs.obj.deepMerge(obj1, obj2), {
+    array1: [1, 2, 3]
+  });
+});
+
+test('should merge nested objs when you do a deep merge of two objs', function () {
+  var obj1 = {
+    person: {
+      name: 'John',
+      surname: 'Doe',
+      location: {
+        country: 'EEUU',
+        city: 'New York'
+      }
+    }
+  };
+
+  var obj2 = {
+    person: {
+      name: 'Susan',
+      location: {
+        city: 'San Francisco'
+      }
+    }
+  };
+
+  deepEqual(vjs.obj.deepMerge(obj1, obj2), {
+    person: {
+      name: 'Susan',
+      surname: 'Doe',
+      location: {
+        country: 'EEUU',
+        city: 'San Francisco'
+      }
+    }
+  });
+});
+
+test('should be possible to extend different option maps of primitive types', function () {
+  var obj1 = {
+    num1: 1,
+    num2: 1,
+    str1: 'one',
+    str2: 'one',
+    bool1: true,
+    bool2: true
+  };
+  var obj2 = {
+    num2: 2,
+    str2: 'two',
+    bool2: false
+  };
+
+  var extendedObj = {};
+
+  vjs.extend(extendedObj, obj1, obj2);
+
+  deepEqual(extendedObj, {
+    num1: 1,
+    num2: 2,
+    str1: 'one',
+    str2: 'two',
+    bool1: true,
+    bool2: false
+  });
+});
+
+test('should be override arrays when you extend option maps', function () {
+  var obj1 = {
+    array1: ['one', 'two', 'three']
+  };
+  var obj2 = {
+    array1: [1, 2, 3]
+  };
+  var extendedObj = {};
+
+  vjs.extend(extendedObj, obj1, obj2);
+  deepEqual(extendedObj, {
+    array1: [1, 2, 3]
+  });
+});
+
+test('should be able be able to merge nested objs when you extend', function(){
+  var obj1 = {
+    person: {
+      name: 'John',
+      surname: 'Doe',
+      location: {
+        country: 'EEUU',
+        city: 'New York'
+      }
+    }
+  };
+
+  var obj2 = {
+    person: {
+      name: 'Susan',
+      location: {
+        city: 'San Francisco'
+      }
+    }
+  };
+  var extendedObj = {};
+
+  vjs.extend(extendedObj, obj1, obj2);
+  deepEqual(extendedObj, {
+    person: {
+      name: 'Susan',
+      surname: 'Doe',
+      location: {
+        country: 'EEUU',
+        city: 'San Francisco'
+      }
+    }
+  });
+
+  //A Modification on an extended obj should not modify the original objs
+  extendedObj.person.name = 'Matt';
+  extendedObj.person.location.city = 'Washington D.C.';
+
+  equal(obj1.person.name, 'John');
+  equal(obj1.person.location.city, 'New York');
+
+  equal(obj2.person.name, 'Susan');
+  equal(obj2.person.location.city, 'San Francisco');
+});
+
+test('should when extending preserve the original obj', function () {
+  var obj1 = {
+    person: {
+      name: 'John',
+      surname: 'Doe',
+      location: {
+        country: 'EEUU',
+        city: 'New York'
+      }
+    }
+  };
+
+  var obj2 = {
+    person: {
+      name: 'Susan',
+      location: {
+        city: 'San Francisco'
+      }
+    }
+  };
+  var extendedObj = {};
+
+  vjs.extend(extendedObj, obj1, obj2);
+  deepEqual(obj1, {
+    person: {
+      name: 'John',
+      surname: 'Doe',
+      location: {
+        country: 'EEUU',
+        city: 'New York'
+      }
+    }
+  });
+
+  deepEqual(obj2, {
+    person: {
+      name: 'Susan',
+      location: {
+        city: 'San Francisco'
+      }
+    }
+  });
+});
+
+test('should when extending not preserve any reference to the original objs', function () {
+  var obj1 = {
+    person: {
+      name: 'Susan',
+      location: {
+        city: 'San Francisco'
+      }
+    }
+  };
+  var extendedObj = {};
+
+  vjs.extend(extendedObj, obj1);
+
+  extendedObj.person.name = 'Matt';
+  extendedObj.person.location.city = 'Washington D.C.';
+
+  equal(obj1.person.name, 'Susan');
+  equal(obj1.person.location.city, 'San Francisco');
+});
