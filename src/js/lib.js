@@ -849,25 +849,3 @@ vjs.arr.forEach = function(array, callback, thisArg) {
 
   return array;
 };
-
-/**
- * Returns the extension of the passed file name. It will return an empty string if you pass an invalid path
- *
- * @param {String}    path    The fileName path like '/path/to/file.mp4'
- * @returns {String}          The extension in lower case or an empty string if no extension could be found.
- */
-vjs.getFileExtension = function(path) {
-  var splitPathRe;
-  var pathParts;
-
-  if(typeof path === 'string'){
-    splitPathRe = /^(\/?)([\s\S]*?)((?:\.{1,2}|[^\/]+?)(\.([^\.\/\?]+)))(?:[\/]*|[\?].*)$/i;
-    pathParts = splitPathRe.exec(path);
-
-    if (pathParts) {
-      return pathParts.pop().toLowerCase();
-    }
-  }
-
-  return '';
-};
