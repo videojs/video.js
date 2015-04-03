@@ -43,7 +43,7 @@ var videojs = function(id, options, ready){
 
       // If options or ready funtion are passed, warn
       if (options) {
-        Lib.log.warn ('Player "' + id + '" is already initialised. Options will not be applied.');
+        Lib.log.warn('Player "' + id + '" is already initialised. Options will not be applied.');
       }
 
       if (ready) {

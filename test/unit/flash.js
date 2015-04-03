@@ -166,10 +166,9 @@ test('should have the source handler interface', function() {
 });
 
 test('canHandleSource should be able to work with src objects without a type', function () {
-  var canHandleSource = vjs.Flash.nativeSourceHandler.canHandleSource;
+  var canHandleSource = Flash.nativeSourceHandler.canHandleSource;
   equal('maybe', canHandleSource({src: 'test.video.mp4'}), 'should guess that it is a mp4 video');
   equal('maybe', canHandleSource({src: 'test.video.m4v'}), 'should guess that it is a m4v video');
   equal('maybe', canHandleSource({src: 'test.video.flv'}), 'should guess that it is a flash video');
   equal('', canHandleSource({src: 'test.video.wgg'}), 'should return empty string if it can not play the video');
 });
-

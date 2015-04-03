@@ -3,7 +3,7 @@ import * as Lib from './lib.js';
 import * as Events from './events.js';
 import FullscreenApi from './fullscreen-api.js';
 import MediaError from './media-error.js';
-import options from './options.js';
+import Options from './options.js';
 import JSON from './json.js';
 import window from 'global/window';
 import document from 'global/document';
@@ -68,10 +68,10 @@ let Player = Component.extend({
     options = Lib.obj.merge(this.getTagSettings(tag), options);
 
     // Update Current Language
-    this.language_ = options['language'] || options['language'];
+    this.language_ = options['language'] || Options['language'];
 
     // Update Supported Languages
-    this.languages_ = options['languages'] || options['languages'];
+    this.languages_ = options['languages'] || Options['languages'];
 
     // Cache for video property values.
     this.cache_ = {};
@@ -181,7 +181,7 @@ Player.prototype.languages = function(){
  * @type {Object}
  * @private
  */
-Player.prototype.options_ = options;
+Player.prototype.options_ = Options;
 
 /**
  * Destroys the video player and does any necessary cleanup

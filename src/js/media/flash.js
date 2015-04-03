@@ -24,10 +24,7 @@ var Flash = MediaTechController.extend({
   init: function(player, options, ready){
     MediaTechController.call(this, player, options, ready);
 
-    let source = options['source'];
-
-    // Which element to embed in
-    let parentEl = options['parentEl'];
+    let { source, parentEl } = options;
 
     // Create a temporary element to be replaced by swf object
     let placeHolder = this.el_ = Lib.createEl('div', { id: player.id() + '_temp_flash' });
@@ -241,7 +238,7 @@ Flash.nativeSourceHandler.canHandleSource = function(source){
   var type;
 
   function guessMimeType(src) {
-    var ext = vjs.getFileExtension(src);
+    var ext = Lib.getFileExtension(src);
     if (ext) {
       return 'video/' + ext;
     }

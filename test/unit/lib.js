@@ -408,22 +408,22 @@ test('should loop through each element of an array', function() {
 
 //getFileExtension tests
 test('should get the file extension of the passed path', function() {
-  equal(vjs.getFileExtension('/foo/bar/test.video.wgg'), 'wgg');
-  equal(vjs.getFileExtension('test./video.mp4'), 'mp4');
-  equal(vjs.getFileExtension('.bar/test.video.m4v'), 'm4v');
-  equal(vjs.getFileExtension('foo/.bar/test.video.flv'), 'flv');
-  equal(vjs.getFileExtension('foo/.bar/test.video.flv?foo=bar'), 'flv');
-  equal(vjs.getFileExtension('http://www.test.com/video.mp4'), 'mp4');
-  equal(vjs.getFileExtension('http://foo/bar/test.video.wgg'), 'wgg');
+  equal(Lib.getFileExtension('/foo/bar/test.video.wgg'), 'wgg');
+  equal(Lib.getFileExtension('test./video.mp4'), 'mp4');
+  equal(Lib.getFileExtension('.bar/test.video.m4v'), 'm4v');
+  equal(Lib.getFileExtension('foo/.bar/test.video.flv'), 'flv');
+  equal(Lib.getFileExtension('foo/.bar/test.video.flv?foo=bar'), 'flv');
+  equal(Lib.getFileExtension('http://www.test.com/video.mp4'), 'mp4');
+  equal(Lib.getFileExtension('http://foo/bar/test.video.wgg'), 'wgg');
 
   //edge cases
-  equal(vjs.getFileExtension('http://...'), '');
-  equal(vjs.getFileExtension('foo/.bar/testvideo'), '');
-  equal(vjs.getFileExtension(''), '');
-  equal(vjs.getFileExtension(null), '');
-  equal(vjs.getFileExtension(undefined), '');
+  equal(Lib.getFileExtension('http://...'), '');
+  equal(Lib.getFileExtension('foo/.bar/testvideo'), '');
+  equal(Lib.getFileExtension(''), '');
+  equal(Lib.getFileExtension(null), '');
+  equal(Lib.getFileExtension(undefined), '');
 
   //with capital letters
-  equal(vjs.getFileExtension('test.video.MP4'), 'mp4');
-  equal(vjs.getFileExtension('test.video.FLV'), 'flv');
+  equal(Lib.getFileExtension('test.video.MP4'), 'mp4');
+  equal(Lib.getFileExtension('test.video.FLV'), 'flv');
 });

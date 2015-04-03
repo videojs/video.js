@@ -490,7 +490,7 @@ Html5.nativeSourceHandler.canHandleSource = function(source){
     return canPlayType(source.type);
   } else if (source.src) {
     // If no type, fall back to checking 'video/[EXTENSION]'
-    ext = vjs.getFileExtension(source.src);
+    ext = Lib.getFileExtension(source.src);
 
     return canPlayType('video/'+ext);
   }
