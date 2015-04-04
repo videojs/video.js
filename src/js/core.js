@@ -2,10 +2,13 @@
  * @fileoverview Main function src.
  */
 
-// HTML5 Shiv. Must be in <head> to support older browsers.
-document.createElement('video');
-document.createElement('audio');
-document.createElement('track');
+import Player from './player';
+import Plugins from './plugins';
+import Options from './options';
+import * as Lib from './lib';
+import * as VjsUtil from './util';
+import CoreObject from './core-object';
+import document from 'global/document';
 
 /**
  * Doubles as the main function for users to create a player instance and also
@@ -23,7 +26,7 @@ document.createElement('track');
  * @return {vjs.Player}             A player instance
  * @namespace
  */
-var vjs = function(id, options, ready){
+var videojs = function(id, options, ready){
   var tag; // Element of ID
 
   // Allow for element or ID to be passed in
@@ -36,22 +39,22 @@ var vjs = function(id, options, ready){
     }
 
     // If a player instance has already been created for this ID return it.
-    if (vjs.players[id]) {
+    if (Player.players[id]) {
 
       // If options or ready funtion are passed, warn
       if (options) {
-        vjs.log.warn ('Player "' + id + '" is already initialised. Options will not be applied.');
+        Lib.log.warn('Player "' + id + '" is already initialised. Options will not be applied.');
       }
 
       if (ready) {
-        vjs.players[id].ready(ready);
+        Player.players[id].ready(ready);
       }
 
-      return vjs.players[id];
+      return Player.players[id];
 
     // Otherwise get element for ID
     } else {
-      tag = vjs.el(id);
+      tag = Lib.el(id);
     }
 
   // ID is a media element
@@ -66,76 +69,26 @@ var vjs = function(id, options, ready){
 
   // Element may have a player attr referring to an already created player instance.
   // If not, set up a new player and return the instance.
-  return tag['player'] || new vjs.Player(tag, options, ready);
+  return tag['player'] || new Player(tag, options, ready);
 };
 
 // Extended name, also available externally, window.videojs
-var videojs = window['videojs'] = vjs;
+// var videojs = window['videojs'] = vjs;
 
 // CDN Version. Used to target right flash swf.
-vjs.CDN_VERSION = 'GENERATED_CDN_VSN';
-vjs.ACCESS_PROTOCOL = ('https:' == document.location.protocol ? 'https://' : 'http://');
+videojs.CDN_VERSION = '__VERSION_NO_PATCH__';
+videojs.ACCESS_PROTOCOL = ('https:' == document.location.protocol ? 'https://' : 'http://');
 
 /**
 * Full player version
 * @type {string}
 */
-vjs['VERSION'] = 'GENERATED_FULL_VSN';
-
-/**
- * Global Player instance options, surfaced from vjs.Player.prototype.options_
- * vjs.options = vjs.Player.prototype.options_
- * All options should use string keys so they avoid
- * renaming by closure compiler
- * @type {Object}
- */
-vjs.options = {
-  // Default order of fallback technology
-  'techOrder': ['html5','flash'],
-  // techOrder: ['flash','html5'],
-
-  'html5': {},
-  'flash': {},
-
-  // Default of web browser is 300x150. Should rely on source width/height.
-  'width': 300,
-  'height': 150,
-  // defaultVolume: 0.85,
-  'defaultVolume': 0.00, // The freakin seaguls are driving me crazy!
-
-  // default playback rates
-  'playbackRates': [],
-  // Add playback rate selection by adding rates
-  // 'playbackRates': [0.5, 1, 1.5, 2],
-
-  // default inactivity timeout
-  'inactivityTimeout': 2000,
-
-  // Included control sets
-  'children': {
-    'mediaLoader': {},
-    'posterImage': {},
-    'loadingSpinner': {},
-    'textTrackDisplay': {},
-    'bigPlayButton': {},
-    'controlBar': {},
-    'errorDisplay': {},
-    'textTrackSettings': {}
-  },
-
-  'language': document.getElementsByTagName('html')[0].getAttribute('lang') || navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language || 'en',
-
-  // locales and their language translations
-  'languages': {},
-
-  // Default message to show when a video cannot be played.
-  'notSupportedMessage': 'No compatible source was found for this video.'
-};
+videojs['VERSION'] = '__VERSION__';
 
 // Set CDN Version of swf
-// The added (+) blocks the replace from changing this GENERATED_CDN_VSN string
-if (vjs.CDN_VERSION !== 'GENERATED'+'_CDN_VSN') {
-  videojs.options['flash']['swf'] = vjs.ACCESS_PROTOCOL + 'vjs.zencdn.net/'+vjs.CDN_VERSION+'/video-js.swf';
+// The added (+) blocks the replace from changing this _VERSION_NO_PATCH_ string
+if (videojs.CDN_VERSION !== '__VERSION_'+'NO_PATCH__') {
+  Options['flash']['swf'] = videojs.ACCESS_PROTOCOL + 'vjs.zencdn.net/'+videojs.CDN_VERSION+'/video-js.swf';
 }
 
 /**
@@ -148,20 +101,14 @@ if (vjs.CDN_VERSION !== 'GENERATED'+'_CDN_VSN') {
  * @param  {Object} data The data values to be translated
  * @return {Object} The resulting global languages dictionary object
  */
-vjs.addLanguage = function(code, data){
-  if(vjs.options['languages'][code] !== undefined) {
-    vjs.options['languages'][code] = vjs.util.mergeOptions(vjs.options['languages'][code], data);
+videojs.addLanguage = function(code, data){
+  if(Options['languages'][code] !== undefined) {
+    Options['languages'][code] = VjsUtil.mergeOptions(Options['languages'][code], data);
   } else {
-    vjs.options['languages'][code] = data;
+    Options['languages'][code] = data;
   }
-  return vjs.options['languages'];
+  return Options['languages'];
 };
-
-/**
- * Global player list
- * @type {Object}
- */
-vjs.players = {};
 
 /**
  * Custom Universal Module Definition (UMD)
@@ -177,3 +124,5 @@ if (typeof define === 'function' && define['amd']) {
 } else if (typeof exports === 'object' && typeof module === 'object') {
   module['exports'] = videojs;
 }
+
+export default videojs;

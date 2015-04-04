@@ -1,4 +1,13 @@
-module('Player', {
+import Player from '../../src/js/player.js';
+import videojs from '../../src/js/core.js';
+import Options from '../../src/js/options.js';
+import * as Lib from '../../src/js/lib.js';
+import MediaError from '../../src/js/media-error.js';
+import Html5 from '../../src/js/media/html5.js';
+import TestHelpers from './test-helpers.js';
+import document from 'global/document';
+
+q.module('Player', {
   'setup': function() {
     this.clock = sinon.useFakeTimers();
   },
@@ -38,7 +47,7 @@ module('Player', {
 
 
 test('should create player instance that inherits from component and dispose it', function(){
-  var player = PlayerTest.makePlayer();
+  var player = TestHelpers.makePlayer();
 
   ok(player.el().nodeName === 'DIV');
   ok(player.on, 'component function exists');
@@ -54,27 +63,27 @@ test('should accept options from multiple sources and override in correct order'
   // version of the key for all version.
 
   // Set a global option
-  vjs.options['attr'] = 1;
+  Options['attr'] = 1;
 
-  var tag0 = PlayerTest.makeTag();
-  var player0 = new vjs.Player(tag0);
+  var tag0 = TestHelpers.makeTag();
+  var player0 = new Player(tag0);
 
   ok(player0.options_['attr'] === 1, 'global option was set');
   player0.dispose();
 
   // Set a tag level option
-  var tag1 = PlayerTest.makeTag();
+  var tag1 = TestHelpers.makeTag();
   tag1.setAttribute('attr', 'asdf'); // Attributes must be set as strings
 
-  var player1 = new vjs.Player(tag1);
+  var player1 = new Player(tag1);
   ok(player1.options_['attr'] === 'asdf', 'Tag options overrode global options');
   player1.dispose();
 
   // Set a tag level option
-  var tag2 = PlayerTest.makeTag();
+  var tag2 = TestHelpers.makeTag();
   tag2.setAttribute('attr', 'asdf');
 
-  var player2 = new vjs.Player(tag2, { 'attr': 'fdsa' });
+  var player2 = new Player(tag2, { 'attr': 'fdsa' });
   ok(player2.options_['attr'] === 'fdsa', 'Init options overrode tag and global options');
   player2.dispose();
 });
@@ -93,7 +102,7 @@ test('should get tag, source, and track settings', function(){
   fixture.innerHTML += html;
 
   var tag = document.getElementById('example_1');
-  var player = PlayerTest.makePlayer({}, tag);
+  var player = TestHelpers.makePlayer({}, tag);
 
   ok(player.options_['autoplay'] === true);
   ok(player.options_['preload'] === 'none'); // No extern. Use string.
@@ -109,23 +118,23 @@ test('should get tag, source, and track settings', function(){
   ok(player.el().className.indexOf('video-js') !== -1, 'transferred class from tag to player div');
   ok(player.el().id === 'example_1', 'transferred id from tag to player div');
 
-  ok(vjs.players[player.id()] === player, 'player referenceable from global list');
+  ok(Player.players[player.id()] === player, 'player referenceable from global list');
   ok(tag.id !== player.id, 'tag ID no longer is the same as player ID');
   ok(tag.className !== player.el().className, 'tag classname updated');
 
   player.dispose();
 
   ok(tag['player'] !== player, 'tag player ref killed');
-  ok(!vjs.players['example_1'], 'global player ref killed');
+  ok(!Player.players['example_1'], 'global player ref killed');
   ok(player.el() === null, 'player el killed');
 });
 
 test('should asynchronously fire error events during source selection', function() {
   expect(2);
 
-  sinon.stub(vjs.log, 'error');
+  sinon.stub(Lib.log, 'error');
 
-  var player = PlayerTest.makePlayer({
+  var player = TestHelpers.makePlayer({
     'techOrder': ['foo'],
     'sources': [
       { 'src': 'http://vjs.zencdn.net/v/oceans.mp4', 'type': 'video/mp4' }
@@ -140,11 +149,11 @@ test('should asynchronously fire error events during source selection', function
   this.clock.tick(1);
 
   player.dispose();
-  vjs.log.error.restore();
+  Lib.log.error.restore();
 });
 
 test('should set the width and height of the player', function(){
-  var player = PlayerTest.makePlayer({ width: 123, height: '100%' });
+  var player = TestHelpers.makePlayer({ width: 123, height: '100%' });
 
   ok(player.width() === 123);
   ok(player.el().style.width === '123px');
@@ -163,7 +172,7 @@ test('should set the width and height of the player', function(){
 });
 
 test('should not force width and height', function() {
-  var player = PlayerTest.makePlayer({ width: 'auto', height: 'auto' });
+  var player = TestHelpers.makePlayer({ width: 'auto', height: 'auto' });
   ok(player.el().style.width === '', 'Width is not forced');
   ok(player.el().style.height === '', 'Height is not forced');
 
@@ -171,14 +180,14 @@ test('should not force width and height', function() {
 });
 
 test('should wrap the original tag in the player div', function(){
-  var tag = PlayerTest.makeTag();
+  var tag = TestHelpers.makeTag();
   var container = document.createElement('div');
   var fixture = document.getElementById('qunit-fixture');
 
   container.appendChild(tag);
   fixture.appendChild(container);
 
-  var player = new vjs.Player(tag);
+  var player = new Player(tag);
   var el = player.el();
 
   ok(el.parentNode === container, 'player placed at same level as tag');
@@ -194,10 +203,10 @@ test('should set and update the poster value', function(){
   poster = 'http://example.com/poster.jpg';
   updatedPoster = 'http://example.com/updated-poster.jpg';
 
-  tag = PlayerTest.makeTag();
+  tag = TestHelpers.makeTag();
   tag.setAttribute('poster', poster);
 
-  player = PlayerTest.makePlayer({}, tag);
+  player = TestHelpers.makePlayer({}, tag);
   equal(player.poster(), poster, 'the poster property should equal the tag attribute');
 
   var pcEmitted = false;
@@ -216,7 +225,7 @@ test('should set and update the poster value', function(){
 // standard, for the purpose of displaying the poster image
 // https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-play
 test('should hide the poster when play is called', function() {
-  var player = PlayerTest.makePlayer({
+  var player = TestHelpers.makePlayer({
     poster: 'https://example.com/poster.jpg'
   });
 
@@ -234,7 +243,7 @@ test('should hide the poster when play is called', function() {
 });
 
 test('should load a media controller', function(){
-  var player = PlayerTest.makePlayer({
+  var player = TestHelpers.makePlayer({
     preload: 'none',
     sources: [
       { src: 'http://google.com', type: 'video/mp4' },
@@ -248,22 +257,22 @@ test('should load a media controller', function(){
 });
 
 test('should be able to initialize player twice on the same tag using string reference', function() {
-  var videoTag = PlayerTest.makeTag();
+  var videoTag = TestHelpers.makeTag();
   var id = videoTag.id;
 
   var fixture = document.getElementById('qunit-fixture');
   fixture.appendChild(videoTag);
 
-  var player = vjs(videoTag.id);
+  var player = videojs(videoTag.id);
   ok(player, 'player is created');
   player.dispose();
 
   ok(!document.getElementById(id), 'element is removed');
-  videoTag = PlayerTest.makeTag();
+  videoTag = TestHelpers.makeTag();
   fixture.appendChild(videoTag);
 
   //here we receive cached version instead of real
-  player = vjs(videoTag.id);
+  player = videojs(videoTag.id);
   //here it triggers error, because player was destroyed already after first dispose
   player.dispose();
 });
@@ -271,7 +280,7 @@ test('should be able to initialize player twice on the same tag using string ref
 test('should set controls and trigger events', function() {
   expect(6);
 
-  var player = PlayerTest.makePlayer({ 'controls': false });
+  var player = TestHelpers.makePlayer({ 'controls': false });
   ok(player.controls() === false, 'controls set through options');
   var hasDisabledClass = player.el().className.indexOf('vjs-controls-disabled');
   ok(hasDisabledClass !== -1, 'Disabled class added to player');
@@ -300,7 +309,7 @@ test('should set controls and trigger events', function() {
 // asyncTest('should trigger the fullscreenchange event', function() {
 //   expect(3);
 
-//   var player = PlayerTest.makePlayer();
+//   var player = TestHelpers.makePlayer();
 //   player.on('fullscreenchange', function(){
 //     ok(true, 'fullscreenchange event fired');
 //     ok(this.isFullscreen() === true, 'isFullscreen is true');
@@ -314,7 +323,7 @@ test('should set controls and trigger events', function() {
 // });
 
 test('should toggle user the user state between active and inactive', function(){
-  var player = PlayerTest.makePlayer({});
+  var player = TestHelpers.makePlayer({});
 
   expect(9);
 
@@ -347,20 +356,20 @@ test('should add a touch-enabled classname when touch is supported', function(){
   expect(1);
 
   // Fake touch support. Real touch support isn't needed for this test.
-  var origTouch = vjs.TOUCH_ENABLED;
-  vjs.TOUCH_ENABLED = true;
+  var origTouch = Lib.TOUCH_ENABLED;
+  Lib.TOUCH_ENABLED = true;
 
-  player = PlayerTest.makePlayer({});
+  player = TestHelpers.makePlayer({});
 
   ok(player.el().className.indexOf('vjs-touch-enabled'), 'touch-enabled classname added');
 
 
-  vjs.TOUCH_ENABLED = origTouch;
+  Lib.TOUCH_ENABLED = origTouch;
   player.dispose();
 });
 
 test('should allow for tracking when native controls are used', function(){
-  var player = PlayerTest.makePlayer({});
+  var player = TestHelpers.makePlayer({});
 
   expect(6);
 
@@ -399,7 +408,7 @@ test('should allow for tracking when native controls are used', function(){
 //   fixture.innerHTML += html;
 
 //   var tag = document.getElementById('example_1');
-//   var player = new vjs.Player(tag);
+//   var player = new Player(tag);
 
 //   var incompatibilityMessage = player.el().getElementsByTagName('p')[0];
 //   // ie8 capitalizes tag names
@@ -416,17 +425,17 @@ test('should register players with generated ids', function(){
   video.className = 'vjs-default-skin video-js';
   fixture.appendChild(video);
 
-  player = new vjs.Player(video);
+  player = new Player(video);
   id = player.el().id;
 
   equal(player.el().id, player.id(), 'the player and element ids are equal');
-  ok(vjs.players[id], 'the generated id is registered');
+  ok(Player.players[id], 'the generated id is registered');
 });
 
 test('should not add multiple first play events despite subsequent loads', function() {
   expect(1);
 
-  var player = PlayerTest.makePlayer({});
+  var player = TestHelpers.makePlayer({});
 
   player.on('firstplay', function(){
     ok(true, 'First play should fire once.');
@@ -439,7 +448,7 @@ test('should not add multiple first play events despite subsequent loads', funct
 });
 
 test('should fire firstplay after resetting the player', function() {
-  var player = PlayerTest.makePlayer({});
+  var player = TestHelpers.makePlayer({});
 
   var fpFired = false;
   player.on('firstplay', function(){
@@ -470,7 +479,7 @@ test('should fire firstplay after resetting the player', function() {
 test('should remove vjs-has-started class', function(){
   expect(3);
 
-  var player = PlayerTest.makePlayer({});
+  var player = TestHelpers.makePlayer({});
 
   player.trigger('loadstart');
   player.trigger('play');
@@ -486,7 +495,7 @@ test('should remove vjs-has-started class', function(){
 test('should add and remove vjs-ended class', function() {
   expect(4);
 
-  var player = PlayerTest.makePlayer({});
+  var player = TestHelpers.makePlayer({});
 
   player.trigger('loadstart');
   player.trigger('play');
@@ -505,11 +514,11 @@ test('should add and remove vjs-ended class', function() {
 
 test('player should handle different error types', function(){
   expect(8);
-  var player = PlayerTest.makePlayer({});
+  var player = TestHelpers.makePlayer({});
   var testMsg = 'test message';
 
   // prevent error log messages in the console
-  sinon.stub(vjs.log, 'error');
+  sinon.stub(Lib.log, 'error');
 
   // error code supplied
   function errCode(){
@@ -525,7 +534,7 @@ test('player should handle different error types', function(){
     equal(player.error().message, testMsg, 'MediaError message is correct');
   }
   player.on('error', errInst);
-  player.error(new vjs.MediaError({ code: 2, message: testMsg }));
+  player.error(new MediaError({ code: 2, message: testMsg }));
   player.off('error', errInst);
 
   // error message supplied
@@ -550,7 +559,7 @@ test('player should handle different error types', function(){
   ok(player.el().className.indexOf('vjs-error') >= 0, 'player does not have vjs-error classname');
 
   // restore error logging
-  vjs.log.error.restore();
+  Lib.log.error.restore();
 });
 
 test('Data attributes on the video element should persist in the new wrapper element', function() {
@@ -558,10 +567,10 @@ test('Data attributes on the video element should persist in the new wrapper ele
 
   dataId = 123;
 
-  tag = PlayerTest.makeTag();
+  tag = TestHelpers.makeTag();
   tag.setAttribute('data-id', dataId);
 
-  player = PlayerTest.makePlayer({}, tag);
+  player = TestHelpers.makePlayer({}, tag);
 
   equal(player.el().getAttribute('data-id'), dataId, 'data-id should be available on the new player element after creation');
 });
@@ -569,7 +578,7 @@ test('Data attributes on the video element should persist in the new wrapper ele
 test('should restore attributes from the original video tag when creating a new element', function(){
   var player, html5Mock, el;
 
-  player = PlayerTest.makePlayer();
+  player = TestHelpers.makePlayer();
   html5Mock = { player_: player };
 
   // simulate attributes stored from the original tag
@@ -583,7 +592,7 @@ test('should restore attributes from the original video tag when creating a new 
   player.options_['preload'] = 'none';
 
   // create the element
-  el = vjs.Html5.prototype.createEl.call(html5Mock);
+  el = Html5.prototype.createEl.call(html5Mock);
 
   equal(el.getAttribute('preload'), 'none', 'attribute was successful overridden by an option');
   equal(el.getAttribute('autoplay'), '', 'autoplay attribute was set properly');
@@ -595,7 +604,7 @@ test('should honor default inactivity timeout', function() {
     var clock = sinon.useFakeTimers();
 
     // default timeout is 2000ms
-    player = PlayerTest.makePlayer({});
+    player = TestHelpers.makePlayer({});
 
     equal(player.userActive(), true, 'User is active on creation');
     clock.tick(1800);
@@ -611,7 +620,7 @@ test('should honor configured inactivity timeout', function() {
     var clock = sinon.useFakeTimers();
 
     // default timeout is 2000ms, set to shorter 200ms
-    player = PlayerTest.makePlayer({
+    player = TestHelpers.makePlayer({
       'inactivityTimeout': 200
     });
 
@@ -630,7 +639,7 @@ test('should honor disabled inactivity timeout', function() {
     var clock = sinon.useFakeTimers();
 
     // default timeout is 2000ms, disable by setting to zero
-    player = PlayerTest.makePlayer({
+    player = TestHelpers.makePlayer({
       'inactivityTimeout': 0
     });
 
@@ -644,7 +653,7 @@ test('should honor disabled inactivity timeout', function() {
 test('should clear pending errors on disposal', function() {
   var clock = sinon.useFakeTimers(), player;
 
-  player = PlayerTest.makePlayer();
+  player = TestHelpers.makePlayer();
   player.src({
     src: 'http://example.com/movie.unsupported-format',
     type: 'video/unsupported-format'
@@ -660,7 +669,7 @@ test('should clear pending errors on disposal', function() {
 
 test('pause is called when player ended event is fired and player is not paused', function() {
   var video = document.createElement('video'),
-      player = PlayerTest.makePlayer({}, video),
+      player = TestHelpers.makePlayer({}, video),
       pauses = 0;
   player.paused = function() {
     return false;
@@ -674,7 +683,7 @@ test('pause is called when player ended event is fired and player is not paused'
 
 test('pause is not called if the player is paused and ended is fired', function() {
   var video = document.createElement('video'),
-      player = PlayerTest.makePlayer({}, video),
+      player = TestHelpers.makePlayer({}, video),
       pauses = 0;
   player.paused = function() {
     return true;
@@ -688,7 +697,7 @@ test('pause is not called if the player is paused and ended is fired', function(
 
 test('should add an audio class if an audio el is used', function() {
   var audio = document.createElement('audio'),
-      player = PlayerTest.makePlayer({}, audio),
+      player = TestHelpers.makePlayer({}, audio),
       audioClass = 'vjs-audio';
 
   ok(player.el().className.indexOf(audioClass) !== -1, 'added '+ audioClass +' css class');

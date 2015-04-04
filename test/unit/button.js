@@ -1,11 +1,14 @@
-module('Button');
+import Button from '../../src/js/button.js';
+import TestHelpers from './test-helpers.js';
+
+q.module('Button');
 
 test('should localize its text', function(){
   expect(1);
 
   var player, testButton, el;
 
-  player = PlayerTest.makePlayer({
+  player = TestHelpers.makePlayer({
     'language': 'es',
     'languages': {
       'es': {
@@ -14,7 +17,7 @@ test('should localize its text', function(){
     }
   });
 
-  testButton = new vjs.Button(player);
+  testButton = new Button(player);
   testButton.buttonText = 'Play';
   el = testButton.createEl();
 

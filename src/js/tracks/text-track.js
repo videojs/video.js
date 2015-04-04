@@ -1,4 +1,11 @@
-(function() {
+import TextTrackCueList from './text-track-cue-list';
+import * as Lib from '../lib';
+import * as TextTrackEnum from './text-track-enums';
+import EventEmitter from '../event-emitter';
+import document from 'global/document';
+import window from 'global/window';
+import XHR from '../xhr.js';
+
 /*
  * https://html.spec.whatwg.org/multipage/embedded-content.html#texttrack
  *
@@ -22,31 +29,29 @@
  * };
  */
 
-vjs.TextTrack = function(options) {
-  var tt, id, mode, kind, label, language, cues, activeCues, timeupdateHandler, changed, prop;
-
+let TextTrack = function(options) {
   options = options || {};
 
   if (!options['player']) {
     throw new Error('A player was not provided.');
   }
 
-  tt = this;
-  if (vjs.IS_IE8) {
+  let tt = this;
+  if (Lib.IS_IE8) {
     tt = document.createElement('custom');
 
-    for (prop in vjs.TextTrack.prototype) {
-      tt[prop] = vjs.TextTrack.prototype[prop];
+    for (let prop in TextTrack.prototype) {
+      tt[prop] = TextTrack.prototype[prop];
     }
   }
 
   tt.player_ = options['player'];
 
-  mode = vjs.TextTrackMode[options['mode']] || 'disabled';
-  kind = vjs.TextTrackKind[options['kind']] || 'subtitles';
-  label = options['label'] || '';
-  language = options['language'] || options['srclang'] || '';
-  id = options['id'] || 'vjs_text_track_' + vjs.guid++;
+  let mode = TextTrackEnum.TextTrackMode[options['mode']] || 'disabled';
+  let kind = TextTrackEnum.TextTrackKind[options['kind']] || 'subtitles';
+  let label = options['label'] || '';
+  let language = options['language'] || options['srclang'] || '';
+  let id = options['id'] || 'vjs_text_track_' + Lib.guid++;
 
   if (kind === 'metadata' || kind === 'chapters') {
     mode = 'hidden';
@@ -55,11 +60,11 @@ vjs.TextTrack = function(options) {
   tt.cues_ = [];
   tt.activeCues_ = [];
 
-  cues = new vjs.TextTrackCueList(tt.cues_);
-  activeCues = new vjs.TextTrackCueList(tt.activeCues_);
+  let cues = new TextTrackCueList(tt.cues_);
+  let activeCues = new TextTrackCueList(tt.activeCues_);
 
-  changed = false;
-  timeupdateHandler = vjs.bind(tt, function() {
+  let changed = false;
+  let timeupdateHandler = Lib.bind(tt, function() {
     this['activeCues'];
     if (changed) {
       this['trigger']('cuechange');
@@ -103,7 +108,7 @@ vjs.TextTrack = function(options) {
       return mode;
     },
     set: function(newMode) {
-      if (!vjs.TextTrackMode[newMode]) {
+      if (!TextTrackEnum.TextTrackMode[newMode]) {
         return;
       }
       mode = newMode;
@@ -127,8 +132,6 @@ vjs.TextTrack = function(options) {
 
   Object.defineProperty(tt, 'activeCues', {
     get: function() {
-      var i, l, active, ct, cue;
-
       if (!this.loaded_) {
         return null;
       }
@@ -137,13 +140,11 @@ vjs.TextTrack = function(options) {
         return activeCues; // nothing to do
       }
 
-      ct = this.player_.currentTime();
-      i = 0;
-      l = this['cues'].length;
-      active = [];
+      let ct = this.player_.currentTime();
+      let active = [];
 
-      for (; i < l; i++) {
-        cue = this['cues'][i];
+      for (let i = 0, l = this['cues'].length; i < l; i++) {
+        let cue = this['cues'][i];
         if (cue['startTime'] <= ct && cue['endTime'] >= ct) {
           active.push(cue);
         } else if (cue['startTime'] === cue['endTime'] && cue['startTime'] <= ct && cue['startTime'] + 0.5 >= ct) {
@@ -156,7 +157,7 @@ vjs.TextTrack = function(options) {
       if (active.length !== this.activeCues_.length) {
         changed = true;
       } else {
-        for (i = 0; i < active.length; i++) {
+        for (let i = 0; i < active.length; i++) {
           if (indexOf.call(this.activeCues_, active[i]) === -1) {
             changed = true;
           }
@@ -177,27 +178,26 @@ vjs.TextTrack = function(options) {
     tt.loaded_ = true;
   }
 
-  if (vjs.IS_IE8) {
+  if (Lib.IS_IE8) {
     return tt;
   }
 };
 
-vjs.TextTrack.prototype = vjs.obj.create(vjs.EventEmitter.prototype);
-vjs.TextTrack.prototype.constructor = vjs.TextTrack;
+TextTrack.prototype = Lib.obj.create(EventEmitter.prototype);
+TextTrack.prototype.constructor = TextTrack;
 
 /*
  * cuechange - One or more cues in the track have become active or stopped being active.
  */
-vjs.TextTrack.prototype.allowedEvents_ = {
+TextTrack.prototype.allowedEvents_ = {
   'cuechange': 'cuechange'
 };
 
-vjs.TextTrack.prototype.addCue = function(cue) {
-  var tracks = this.player_.textTracks(),
-      i = 0;
+TextTrack.prototype.addCue = function(cue) {
+  let tracks = this.player_.textTracks();
 
   if (tracks) {
-    for (; i < tracks.length; i++) {
+    for (let i = 0; i < tracks.length; i++) {
       if (tracks[i] !== this) {
         tracks[i].removeCue(cue);
       }
@@ -208,14 +208,11 @@ vjs.TextTrack.prototype.addCue = function(cue) {
   this['cues'].setCues_(this.cues_);
 };
 
-vjs.TextTrack.prototype.removeCue = function(removeCue) {
-  var i = 0,
-      l = this.cues_.length,
-      cue,
-      removed = false;
+TextTrack.prototype.removeCue = function(removeCue) {
+  let removed = false;
 
-  for (; i < l; i++) {
-    cue = this.cues_[i];
+  for (let i = 0, l = this.cues_.length; i < l; i++) {
+    let cue = this.cues_[i];
     if (cue === removeCue) {
       this.cues_.splice(i, 1);
       removed = true;
@@ -230,12 +227,31 @@ vjs.TextTrack.prototype.removeCue = function(removeCue) {
 /*
  * Downloading stuff happens below this point
  */
-var loadTrack, parseCues, indexOf;
+let parseCues = function(srcContent, track) {
+  if (typeof window['WebVTT'] !== 'function') {
+    //try again a bit later
+    return window.setTimeout(function() {
+      parseCues(srcContent, track);
+    }, 25);
+  }
 
-loadTrack = function(src, track) {
-  vjs.xhr(src, vjs.bind(this, function(err, response, responseBody){
+  let parser = new window['WebVTT']['Parser'](window, window['vttjs'], window['WebVTT']['StringDecoder']());
+
+  parser['oncue'] = function(cue) {
+    track.addCue(cue);
+  };
+  parser['onparsingerror'] = function(error) {
+    Lib.log.error(error);
+  };
+
+  parser['parse'](srcContent);
+  parser['flush']();
+};
+
+var loadTrack = function(src, track) {
+  XHR(src, Lib.bind(this, function(err, response, responseBody){
     if (err) {
-      return vjs.log.error(err);
+      return Lib.log.error(err);
     }
 
 
@@ -244,44 +260,20 @@ loadTrack = function(src, track) {
   }));
 };
 
-parseCues = function(srcContent, track) {
-  if (typeof window['WebVTT'] !== 'function') {
-    //try again a bit later
-    return window.setTimeout(function() {
-      parseCues(srcContent, track);
-    }, 25);
-  }
-
-  var parser = new window['WebVTT']['Parser'](window, window['vttjs'], window['WebVTT']['StringDecoder']());
-
-  parser['oncue'] = function(cue) {
-    track.addCue(cue);
-  };
-  parser['onparsingerror'] = function(error) {
-    vjs.log.error(error);
-  };
-
-  parser['parse'](srcContent);
-  parser['flush']();
-};
-
-indexOf = function(searchElement, fromIndex) {
-
-  var k;
-
+var indexOf = function(searchElement, fromIndex) {
   if (this == null) {
     throw new TypeError('"this" is null or not defined');
   }
 
-  var O = Object(this);
+  let O = Object(this);
 
-  var len = O.length >>> 0;
+  let len = O.length >>> 0;
 
   if (len === 0) {
     return -1;
   }
 
-  var n = +fromIndex || 0;
+  let n = +fromIndex || 0;
 
   if (Math.abs(n) === Infinity) {
     n = 0;
@@ -291,7 +283,7 @@ indexOf = function(searchElement, fromIndex) {
     return -1;
   }
 
-  k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
+  let k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
 
   while (k < len) {
     if (k in O && O[k] === searchElement) {
@@ -302,4 +294,4 @@ indexOf = function(searchElement, fromIndex) {
   return -1;
 };
 
-})();
+export default TextTrack;

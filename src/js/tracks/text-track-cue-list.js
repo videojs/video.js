@@ -1,3 +1,6 @@
+import * as Lib from '../lib';
+import document from 'global/document';
+
 /*
  * https://html.spec.whatwg.org/multipage/embedded-content.html#texttrackcuelist
  *
@@ -8,19 +11,18 @@
  * };
  */
 
-vjs.TextTrackCueList = function(cues) {
-  var list = this,
-      prop;
+let TextTrackCueList = function(cues) {
+  let list = this;
 
-  if (vjs.IS_IE8) {
+  if (Lib.IS_IE8) {
     list = document.createElement('custom');
 
-    for (prop in vjs.TextTrackCueList.prototype) {
-      list[prop] = vjs.TextTrackCueList.prototype[prop];
+    for (let prop in TextTrackCueList.prototype) {
+      list[prop] = TextTrackCueList.prototype[prop];
     }
   }
 
-  vjs.TextTrackCueList.prototype.setCues_.call(list, cues);
+  TextTrackCueList.prototype.setCues_.call(list, cues);
 
   Object.defineProperty(list, 'length', {
     get: function() {
@@ -28,21 +30,20 @@ vjs.TextTrackCueList = function(cues) {
     }
   });
 
-  if (vjs.IS_IE8) {
+  if (Lib.IS_IE8) {
     return list;
   }
 };
 
-vjs.TextTrackCueList.prototype.setCues_ = function(cues) {
-  var oldLength = this.length || 0,
-      i = 0,
-      l = cues.length,
-      defineProp;
+TextTrackCueList.prototype.setCues_ = function(cues) {
+  let oldLength = this.length || 0;
+  let i = 0;
+  let l = cues.length;
 
   this.cues_ = cues;
   this.length_ = cues.length;
 
-  defineProp = function(i) {
+  let defineProp = function(i) {
     if (!(''+i in this)) {
       Object.defineProperty(this, '' + i, {
         get: function() {
@@ -54,20 +55,17 @@ vjs.TextTrackCueList.prototype.setCues_ = function(cues) {
 
   if (oldLength < l) {
     i = oldLength;
+
     for(; i < l; i++) {
       defineProp.call(this, i);
     }
   }
 };
 
-vjs.TextTrackCueList.prototype.getCueById = function(id) {
-  var i = 0,
-      l = this.length,
-      result = null,
-      cue;
-
-  for (; i < l; i++) {
-    cue = this[i];
+TextTrackCueList.prototype.getCueById = function(id) {
+  let result = null;
+  for (let i = 0, l = this.length; i < l; i++) {
+    let cue = this[i];
     if (cue.id === id) {
       result = cue;
       break;
@@ -76,3 +74,5 @@ vjs.TextTrackCueList.prototype.getCueById = function(id) {
 
   return result;
 };
+
+export default TextTrackCueList;

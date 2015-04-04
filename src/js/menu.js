@@ -1,3 +1,8 @@
+import Button from './button';
+import Component from './component';
+import * as Lib from './lib';
+import * as Events from './events';
+
 /* Menu
 ================================================================================ */
 /**
@@ -9,26 +14,26 @@
  * @class
  * @constructor
  */
-vjs.Menu = vjs.Component.extend();
+let Menu = Component.extend();
 
 /**
  * Add a menu item to the menu
  * @param {Object|String} component Component or component type to add
  */
-vjs.Menu.prototype.addItem = function(component){
+Menu.prototype.addItem = function(component){
   this.addChild(component);
-  component.on('click', vjs.bind(this, function(){
+  component.on('click', Lib.bind(this, function(){
     this.unlockShowing();
   }));
 };
 
 /** @inheritDoc */
-vjs.Menu.prototype.createEl = function(){
-  var contentElType = this.options().contentElType || 'ul';
-  this.contentEl_ = vjs.createEl(contentElType, {
+Menu.prototype.createEl = function(){
+  let contentElType = this.options().contentElType || 'ul';
+  this.contentEl_ = Lib.createEl(contentElType, {
     className: 'vjs-menu-content'
   });
-  var el = vjs.Component.prototype.createEl.call(this, 'div', {
+  var el = Component.prototype.createEl.call(this, 'div', {
     append: this.contentEl_,
     className: 'vjs-menu'
   });
@@ -36,7 +41,7 @@ vjs.Menu.prototype.createEl = function(){
 
   // Prevent clicks from bubbling up. Needed for Menu Buttons,
   // where a click on the parent is significant
-  vjs.on(el, 'click', function(event){
+  Events.on(el, 'click', function(event){
     event.preventDefault();
     event.stopImmediatePropagation();
   });
@@ -52,17 +57,17 @@ vjs.Menu.prototype.createEl = function(){
  * @class
  * @constructor
  */
-vjs.MenuItem = vjs.Button.extend({
+var MenuItem = Button.extend({
   /** @constructor */
   init: function(player, options){
-    vjs.Button.call(this, player, options);
+    Button.call(this, player, options);
     this.selected(options['selected']);
   }
 });
 
 /** @inheritDoc */
-vjs.MenuItem.prototype.createEl = function(type, props){
-  return vjs.Button.prototype.createEl.call(this, 'li', vjs.obj.merge({
+MenuItem.prototype.createEl = function(type, props){
+  return Button.prototype.createEl.call(this, 'li', Lib.obj.merge({
     className: 'vjs-menu-item',
     innerHTML: this.localize(this.options_['label'])
   }, props));
@@ -71,7 +76,7 @@ vjs.MenuItem.prototype.createEl = function(type, props){
 /**
  * Handle a click on the menu item, and set it to selected
  */
-vjs.MenuItem.prototype.onClick = function(){
+MenuItem.prototype.onClick = function(){
   this.selected(true);
 };
 
@@ -79,7 +84,7 @@ vjs.MenuItem.prototype.onClick = function(){
  * Set this menu item as selected or not
  * @param  {Boolean} selected
  */
-vjs.MenuItem.prototype.selected = function(selected){
+MenuItem.prototype.selected = function(selected){
   if (selected) {
     this.addClass('vjs-selected');
     this.el_.setAttribute('aria-selected',true);
@@ -96,10 +101,10 @@ vjs.MenuItem.prototype.selected = function(selected){
  * @param {Object=} options
  * @constructor
  */
-vjs.MenuButton = vjs.Button.extend({
+var MenuButton = Button.extend({
   /** @constructor */
   init: function(player, options){
-    vjs.Button.call(this, player, options);
+    Button.call(this, player, options);
 
     this.update();
 
@@ -109,8 +114,8 @@ vjs.MenuButton = vjs.Button.extend({
   }
 });
 
-vjs.MenuButton.prototype.update = function() {
-  var menu = this.createMenu();
+MenuButton.prototype.update = function() {
+  let menu = this.createMenu();
 
   if (this.menu) {
     this.removeChild(this.menu);
@@ -131,16 +136,16 @@ vjs.MenuButton.prototype.update = function() {
  * @type {Boolean}
  * @private
  */
-vjs.MenuButton.prototype.buttonPressed_ = false;
+MenuButton.prototype.buttonPressed_ = false;
 
-vjs.MenuButton.prototype.createMenu = function(){
-  var menu = new vjs.Menu(this.player_);
+MenuButton.prototype.createMenu = function(){
+  var menu = new Menu(this.player_);
 
   // Add a title list item to the top
   if (this.options().title) {
-    menu.contentEl().appendChild(vjs.createEl('li', {
+    menu.contentEl().appendChild(Lib.createEl('li', {
       className: 'vjs-menu-title',
-      innerHTML: vjs.capitalize(this.options().title),
+      innerHTML: Lib.capitalize(this.options().title),
       tabindex: -1
     }));
   }
@@ -160,26 +165,26 @@ vjs.MenuButton.prototype.createMenu = function(){
 /**
  * Create the list of menu items. Specific to each subclass.
  */
-vjs.MenuButton.prototype.createItems = function(){};
+MenuButton.prototype.createItems = function(){};
 
 /** @inheritDoc */
-vjs.MenuButton.prototype.buildCSSClass = function(){
-  return this.className + ' vjs-menu-button ' + vjs.Button.prototype.buildCSSClass.call(this);
+MenuButton.prototype.buildCSSClass = function(){
+  return this.className + ' vjs-menu-button ' + Button.prototype.buildCSSClass.call(this);
 };
 
 // Focus - Add keyboard functionality to element
 // This function is not needed anymore. Instead, the keyboard functionality is handled by
 // treating the button as triggering a submenu. When the button is pressed, the submenu
 // appears. Pressing the button again makes the submenu disappear.
-vjs.MenuButton.prototype.onFocus = function(){};
+MenuButton.prototype.onFocus = function(){};
 // Can't turn off list display that we turned on with focus, because list would go away.
-vjs.MenuButton.prototype.onBlur = function(){};
+MenuButton.prototype.onBlur = function(){};
 
-vjs.MenuButton.prototype.onClick = function(){
+MenuButton.prototype.onClick = function(){
   // When you click the button it adds focus, which will show the menu indefinitely.
   // So we'll remove focus when the mouse leaves the button.
   // Focus is needed for tab navigation.
-  this.one('mouseout', vjs.bind(this, function(){
+  this.one('mouseout', Lib.bind(this, function(){
     this.menu.unlockShowing();
     this.el_.blur();
   }));
@@ -190,7 +195,7 @@ vjs.MenuButton.prototype.onClick = function(){
   }
 };
 
-vjs.MenuButton.prototype.onKeyPress = function(event){
+MenuButton.prototype.onKeyPress = function(event){
 
   // Check for space bar (32) or enter (13) keys
   if (event.which == 32 || event.which == 13) {
@@ -209,7 +214,7 @@ vjs.MenuButton.prototype.onKeyPress = function(event){
   }
 };
 
-vjs.MenuButton.prototype.pressButton = function(){
+MenuButton.prototype.pressButton = function(){
   this.buttonPressed_ = true;
   this.menu.lockShowing();
   this.el_.setAttribute('aria-pressed', true);
@@ -218,8 +223,15 @@ vjs.MenuButton.prototype.pressButton = function(){
   }
 };
 
-vjs.MenuButton.prototype.unpressButton = function(){
+MenuButton.prototype.unpressButton = function(){
   this.buttonPressed_ = false;
   this.menu.unlockShowing();
   this.el_.setAttribute('aria-pressed', false);
 };
+
+Component.registerComponent('Menu', Menu);
+Component.registerComponent('MenuButton', MenuButton);
+Component.registerComponent('MenuItem', MenuItem);
+
+export default Menu;
+export { MenuItem, MenuButton };

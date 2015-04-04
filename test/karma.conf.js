@@ -1,19 +1,3 @@
-var fs = require('fs'),
-    vm = require('vm'),
-    sourceLoader = fs.readFileSync('./build/source-loader.js', 'utf8');
-    sandbox = {
-      blockSourceLoading: true,
-      document: {},
-      window: {}
-    };
-    sourceFiles = [];
-
-
-vm.runInNewContext(sourceLoader, sandbox, 'build/source-loader.js');
-sourceFiles = sandbox.sourceFiles.map(function(src) {
-  return '../' + src;
-});
-
 module.exports = function(config) {
   var customLaunchers = {
     chrome_sl: {
@@ -66,20 +50,30 @@ module.exports = function(config) {
   config.set({
     basePath: '',
 
-    frameworks: ['qunit', 'sinon'],
+    frameworks: ['browserify', 'qunit', 'sinon'],
 
     autoWatch: false,
 
     singleRun: true,
 
-    customLaunchers: customLaunchers,
+    // customLaunchers: customLaunchers,
 
     files: [
-      '../build/files/video-js.css',
-      '../test/karma-qunit-shim.js'
-    ].concat(sourceFiles).concat([
-      '../test/unit/**/*.js'
-    ]),
+      '../build/temp/video-js.min.css',
+      '../test/karma-qunit-shim.js',
+      '../test/unit/**/*.js',
+      '../build/temp/video.min.js',
+      '../test/api/**/*.js',
+    ],
+
+    preprocessors: {
+      '../test/unit/**/*.js': [ 'browserify' ]
+    },
+
+    browserify: {
+      debug: true,
+      transform: [ 'babelify', 'browserify-istanbul' ]
+    },
 
     plugins: [
       'karma-qunit',
@@ -90,10 +84,12 @@ module.exports = function(config) {
       'karma-phantomjs-launcher',
       'karma-safari-launcher',
       'karma-sauce-launcher',
-      'karma-sinon'
+      'karma-sinon',
+      'karma-browserify',
+      'karma-coverage'
     ],
 
-    reporters: ['dots'],
+    reporters: ['dots', 'coverage'],
 
     // web server port
     port: 9876,
@@ -113,6 +109,24 @@ module.exports = function(config) {
       build: process.env.TRAVIS_BUILD_NUMBER,
       testName: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH,
       recordScreenshots: false
+    },
+
+    // The HTML reporter seems to be busted right now, so we're just using text in the meantime
+    // along with the summary after the test run.
+    coverageReporter: {
+      reporters: [
+        {
+          type: 'text',
+          dir: 'coverage/',
+          file: 'coverage.txt'
+        },
+        {
+          type: 'lcovonly',
+          dir: 'coverage/',
+          subdir: '.'
+        },
+        { type: 'text-summary' }
+      ]
     }
   });
 };

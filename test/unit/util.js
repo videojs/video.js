@@ -1,4 +1,6 @@
-module('util');
+import * as Util from '../../src/js/util.js';
+
+q.module('Util');
 
 test('should merge options objects', function(){
   var ob1, ob2, ob3;
@@ -18,7 +20,7 @@ test('should merge options objects', function(){
     d: true
   };
 
-  ob3 = vjs.util.mergeOptions(ob1, ob2);
+  ob3 = Util.mergeOptions(ob1, ob2);
 
   deepEqual(ob3, {
     a: false,

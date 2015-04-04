@@ -4,6 +4,10 @@
  * (Compiler doesn't like JSON not being declared)
  */
 
+import window from 'global/window';
+// Changing 'JSON' throws jshint errors
+var json = window.JSON;
+
 /**
  * Javascript JSON implementation
  * (Parse Method Only)
@@ -13,13 +17,8 @@
  * @namespace
  * @private
  */
-vjs.JSON;
-
-if (typeof window.JSON !== 'undefined' && typeof window.JSON.parse === 'function') {
-  vjs.JSON = window.JSON;
-
-} else {
-  vjs.JSON = {};
+if (!(typeof json !== 'undefined' && typeof json.parse === 'function')) {
+  json = {};
 
   var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
 
@@ -31,45 +30,46 @@ if (typeof window.JSON !== 'undefined' && typeof window.JSON.parse === 'function
    * @param {Function=} [reviver] Optional function that can transform the results
    * @return {Object|Array} The parsed JSON
    */
-  vjs.JSON.parse = function (text, reviver) {
-      var j;
+   json.parse = function (text, reviver) {
+    var j;
 
-      function walk(holder, key) {
-          var k, v, value = holder[key];
-          if (value && typeof value === 'object') {
-              for (k in value) {
-                  if (Object.prototype.hasOwnProperty.call(value, k)) {
-                      v = walk(value, k);
-                      if (v !== undefined) {
-                          value[k] = v;
-                      } else {
-                          delete value[k];
-                      }
-                  }
-              }
+    function walk(holder, key) {
+      var k, v, value = holder[key];
+      if (value && typeof value === 'object') {
+        for (k in value) {
+          if (Object.prototype.hasOwnProperty.call(value, k)) {
+            v = walk(value, k);
+            if (v !== undefined) {
+              value[k] = v;
+            } else {
+              delete value[k];
+            }
           }
-          return reviver.call(holder, key, value);
+        }
       }
-      text = String(text);
-      cx.lastIndex = 0;
-      if (cx.test(text)) {
-          text = text.replace(cx, function (a) {
-              return '\\u' +
-                  ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
-          });
-      }
+      return reviver.call(holder, key, value);
+    }
 
-      if (/^[\],:{}\s]*$/
-              .test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@')
-                  .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
-                  .replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
+    text = String(text);
+    cx.lastIndex = 0;
+    if (cx.test(text)) {
+      text = text.replace(cx, function (a) {
+        return '\\u'+ ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+      });
+    }
 
-          j = eval('(' + text + ')');
+    if (/^[\],:{}\s]*$/
+      .test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@')
+      .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
+      .replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 
-          return typeof reviver === 'function' ?
-              walk({'': j}, '') : j;
-      }
+      j = eval('(' + text + ')');
 
-      throw new SyntaxError('JSON.parse(): invalid or malformed JSON data');
+      return typeof reviver === 'function' ? walk({'': j}, '') : j;
+    }
+
+    throw new SyntaxError('JSON.parse(): invalid or malformed JSON data');
   };
 }
+
+export default json;

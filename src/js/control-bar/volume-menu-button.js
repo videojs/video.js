@@ -1,11 +1,18 @@
+import Button from '../button';
+import Component from '../component';
+import Menu, { MenuButton } from '../menu';
+import MuteToggle from './mute-toggle';
+import * as Lib from '../lib';
+import { VolumeBar } from './volume-control';
+
 /**
  * Menu button with a popup for showing the volume slider.
  * @constructor
  */
-vjs.VolumeMenuButton = vjs.MenuButton.extend({
+let VolumeMenuButton = MenuButton.extend({
   /** @constructor */
   init: function(player, options){
-    vjs.MenuButton.call(this, player, options);
+    MenuButton.call(this, player, options);
 
     // Same listeners as MuteToggle
     this.on(player, 'volumechange', this.volumeUpdate);
@@ -25,11 +32,11 @@ vjs.VolumeMenuButton = vjs.MenuButton.extend({
   }
 });
 
-vjs.VolumeMenuButton.prototype.createMenu = function(){
-  var menu = new vjs.Menu(this.player_, {
+VolumeMenuButton.prototype.createMenu = function(){
+  let menu = new Menu(this.player_, {
     contentElType: 'div'
   });
-  var vc = new vjs.VolumeBar(this.player_, this.options_['volumeBar']);
+  let vc = new VolumeBar(this.player_, this.options_['volumeBar']);
   vc.on('focus', function() {
     menu.lockShowing();
   });
@@ -40,15 +47,19 @@ vjs.VolumeMenuButton.prototype.createMenu = function(){
   return menu;
 };
 
-vjs.VolumeMenuButton.prototype.onClick = function(){
-  vjs.MuteToggle.prototype.onClick.call(this);
-  vjs.MenuButton.prototype.onClick.call(this);
+VolumeMenuButton.prototype.onClick = function(){
+  MuteToggle.prototype.onClick.call(this);
+  MenuButton.prototype.onClick.call(this);
 };
 
-vjs.VolumeMenuButton.prototype.createEl = function(){
-  return vjs.Button.prototype.createEl.call(this, 'div', {
+VolumeMenuButton.prototype.createEl = function(){
+  return Button.prototype.createEl.call(this, 'div', {
     className: 'vjs-volume-menu-button vjs-menu-button vjs-control',
     innerHTML: '<div><span class="vjs-control-text">' + this.localize('Mute') + '</span></div>'
   });
 };
-vjs.VolumeMenuButton.prototype.volumeUpdate = vjs.MuteToggle.prototype.update;
+
+VolumeMenuButton.prototype.volumeUpdate = MuteToggle.prototype.update;
+
+Component.registerComponent('VolumeMenuButton', VolumeMenuButton);
+export default VolumeMenuButton;

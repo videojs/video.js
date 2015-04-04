@@ -1,3 +1,7 @@
+import EventEmitter from '../event-emitter';
+import * as Lib from '../lib';
+import document from 'global/document';
+
 /*
  * https://html.spec.whatwg.org/multipage/embedded-content.html#texttracklist
  *
@@ -5,22 +9,20 @@
  *   readonly attribute unsigned long length;
  *   getter TextTrack (unsigned long index);
  *   TextTrack? getTrackById(DOMString id);
- * 
+ *
  *   attribute EventHandler onchange;
  *   attribute EventHandler onaddtrack;
  *   attribute EventHandler onremovetrack;
  * };
  */
-vjs.TextTrackList = function(tracks) {
-  var list = this,
-      prop,
-      i = 0;
+let TextTrackList = function(tracks) {
+  let list = this;
 
-  if (vjs.IS_IE8) {
+  if (Lib.IS_IE8) {
     list = document.createElement('custom');
 
-    for (prop in vjs.TextTrackList.prototype) {
-      list[prop] = vjs.TextTrackList.prototype[prop];
+    for (let prop in TextTrackList.prototype) {
+      list[prop] = TextTrackList.prototype[prop];
     }
   }
 
@@ -33,40 +35,36 @@ vjs.TextTrackList = function(tracks) {
     }
   });
 
-  for (; i < tracks.length; i++) {
+  for (let i = 0; i < tracks.length; i++) {
     list.addTrack_(tracks[i]);
   }
 
-  if (vjs.IS_IE8) {
+  if (Lib.IS_IE8) {
     return list;
   }
 };
 
-vjs.TextTrackList.prototype = vjs.obj.create(vjs.EventEmitter.prototype);
-vjs.TextTrackList.prototype.constructor = vjs.TextTrackList;
+TextTrackList.prototype = Lib.obj.create(EventEmitter.prototype);
+TextTrackList.prototype.constructor = TextTrackList;
 
 /*
  * change - One or more tracks in the track list have been enabled or disabled.
  * addtrack - A track has been added to the track list.
  * removetrack - A track has been removed from the track list.
 */
-vjs.TextTrackList.prototype.allowedEvents_ = {
+TextTrackList.prototype.allowedEvents_ = {
   'change': 'change',
   'addtrack': 'addtrack',
   'removetrack': 'removetrack'
 };
 
 // emulate attribute EventHandler support to allow for feature detection
-(function() {
-  var event;
+for (let event in TextTrackList.prototype.allowedEvents_) {
+  TextTrackList.prototype['on' + event] = null;
+}
 
-  for (event in vjs.TextTrackList.prototype.allowedEvents_) {
-    vjs.TextTrackList.prototype['on' + event] = null;
-  }
-})();
-
-vjs.TextTrackList.prototype.addTrack_ = function(track) {
-  var index = this.tracks_.length;
+TextTrackList.prototype.addTrack_ = function(track) {
+  let index = this.tracks_.length;
   if (!(''+index in this)) {
     Object.defineProperty(this, index, {
       get: function() {
@@ -75,7 +73,7 @@ vjs.TextTrackList.prototype.addTrack_ = function(track) {
     });
   }
 
-  track.addEventListener('modechange', vjs.bind(this, function() {
+  track.addEventListener('modechange', Lib.bind(this, function() {
     this.trigger('change');
   }));
   this.tracks_.push(track);
@@ -86,13 +84,11 @@ vjs.TextTrackList.prototype.addTrack_ = function(track) {
   });
 };
 
-vjs.TextTrackList.prototype.removeTrack_ = function(rtrack) {
-  var i = 0,
-      l = this.length,
-      result = null,
-      track;
+TextTrackList.prototype.removeTrack_ = function(rtrack) {
+  let result = null;
+  let track;
 
-  for (; i < l; i++) {
+  for (let i = 0, l = this.length; i < l; i++) {
     track = this[i];
     if (track === rtrack) {
       this.tracks_.splice(i, 1);
@@ -102,18 +98,15 @@ vjs.TextTrackList.prototype.removeTrack_ = function(rtrack) {
 
   this.trigger({
     type: 'removetrack',
-    track: rtrack
+    track: track
   });
 };
 
-vjs.TextTrackList.prototype.getTrackById = function(id) {
-  var i = 0,
-      l = this.length,
-      result = null,
-      track;
+TextTrackList.prototype.getTrackById = function(id) {
+  let result = null;
 
-  for (; i < l; i++) {
-    track = this[i];
+  for (let i = 0, l = this.length; i < l; i++) {
+    let track = this[i];
     if (track.id === id) {
       result = track;
       break;
@@ -122,3 +115,5 @@ vjs.TextTrackList.prototype.getTrackById = function(id) {
 
   return result;
 };
+
+export default TextTrackList;

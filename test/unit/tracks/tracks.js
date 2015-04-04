@@ -1,11 +1,24 @@
-module('Tracks');
+import { CaptionsButton } from '../../../src/js/tracks/text-track-controls.js';
+import { SubtitlesButton } from '../../../src/js/tracks/text-track-controls.js';
+import { ChaptersButton } from '../../../src/js/tracks/text-track-controls.js';
+import { TextTrackDisplay } from '../../../src/js/tracks/text-track-controls.js';
+import Html5 from '../../../src/js/media/html5.js';
+import Flash from '../../../src/js/media/flash.js';
+import MediaTechController from '../../../src/js/media/media.js';
+import Component from '../../../src/js/component.js';
+
+import * as Lib from '../../../src/js/lib.js';
+import TestHelpers from '../test-helpers.js';
+import document from 'global/document';
+
+q.module('Tracks');
 
 test('should place title list item into ul', function() {
   var player, chaptersButton;
 
-  player = PlayerTest.makePlayer();
+  player = TestHelpers.makePlayer();
 
-  chaptersButton = new vjs.ChaptersButton(player);
+  chaptersButton = new ChaptersButton(player);
 
   var menuContentElement = chaptersButton.el().getElementsByTagName('UL')[0];
   var titleElement = menuContentElement.children[0];
@@ -19,7 +32,7 @@ test('Player track methods call the tech', function() {
   var player,
       calls = 0;
 
-  player = PlayerTest.makePlayer();
+  player = TestHelpers.makePlayer();
 
   player.tech.textTracks = function() {
     calls++;
@@ -36,7 +49,7 @@ test('Player track methods call the tech', function() {
 
 test('TextTrackDisplay initializes tracks on player ready', function() {
   var calls = 0,
-      ttd = new vjs.TextTrackDisplay({
+      ttd = new TextTrackDisplay({
         on: Function.prototype,
         addTextTracks: function() {
           calls--;
@@ -52,28 +65,29 @@ test('TextTrackDisplay initializes tracks on player ready', function() {
   equal(calls, 1, 'only a player.ready call was made');
 });
 
-test('html5 tech supports native text tracks if the video supports it', function() {
-  var oldTestVid = vjs.TEST_VID;
-
-  vjs.TEST_VID = {
-    textTracks: []
-  };
-
-  ok(vjs.Html5.supportsNativeTextTracks(), 'if textTracks are available on video element, native text tracks are supported');
-
-  vjs.TEST_VID = oldTestVid;
-});
+// This is a bad test that breaks in Firefox because we disable FF for other reasons.
+// test('html5 tech supports native text tracks if the video supports it', function() {
+//   var oldTestVid = Lib.TEST_VID;
+//
+//   Lib.TEST_VID = {
+//     textTracks: []
+//   };
+//
+//   ok(Html5.supportsNativeTextTracks(), 'if textTracks are available on video element, native text tracks are supported');
+//
+//   Lib.TEST_VID = oldTestVid;
+// });
 
 test('listen to remove and add track events in native text tracks', function() {
-  var oldTestVid = vjs.TEST_VID,
+  var oldTestVid = Lib.TEST_VID,
       player,
       options,
       oldTextTracks,
       events = {},
       html;
 
-  oldTextTracks = vjs.Html5.prototype.textTracks;
-  vjs.Html5.prototype.textTracks = function() {
+  oldTextTracks = Html5.prototype.textTracks;
+  Html5.prototype.textTracks = function() {
     return {
       addEventListener: function(type, handler) {
         events[type] = true;
@@ -81,7 +95,7 @@ test('listen to remove and add track events in native text tracks', function() {
     };
   };
 
-  vjs.TEST_VID = {
+  Lib.TEST_VID = {
     textTracks: []
   };
 
@@ -104,13 +118,13 @@ test('listen to remove and add track events in native text tracks', function() {
   player.player_ = player;
   player.options_ = options = {};
 
-  html = new vjs.Html5(player, options);
+  html = new Html5(player, options);
 
   ok(events['removetrack'], 'removetrack listener was added');
   ok(events['addtrack'], 'addtrack listener was added');
 
-  vjs.TEST_VID = oldTestVid;
-  vjs.Html5.prototype.textTracks = oldTextTracks;
+  Lib.TEST_VID = oldTestVid;
+  Html5.prototype.textTracks = oldTextTracks;
 });
 
 test('update texttrack buttons on removetrack or addtrack', function() {
@@ -125,25 +139,25 @@ test('update texttrack buttons on removetrack or addtrack', function() {
       oldSubsUpdate,
       oldChaptersUpdate;
 
-  oldCaptionsUpdate = vjs.CaptionsButton.prototype.update;
-  oldSubsUpdate = vjs.SubtitlesButton.prototype.update;
-  oldChaptersUpdate = vjs.ChaptersButton.prototype.update;
-  vjs.CaptionsButton.prototype.update = function() {
+  oldCaptionsUpdate = CaptionsButton.prototype.update;
+  oldSubsUpdate = SubtitlesButton.prototype.update;
+  oldChaptersUpdate = ChaptersButton.prototype.update;
+  CaptionsButton.prototype.update = function() {
     update++;
     oldCaptionsUpdate.call(this);
   };
-  vjs.SubtitlesButton.prototype.update = function() {
+  SubtitlesButton.prototype.update = function() {
     update++;
     oldSubsUpdate.call(this);
   };
-  vjs.ChaptersButton.prototype.update = function() {
+  ChaptersButton.prototype.update = function() {
     update++;
     oldChaptersUpdate.call(this);
   };
 
-  vjs.MediaTechController.prototype['featuresNativeTextTracks'] = true;
-  oldTextTracks = videojs.MediaTechController.prototype.textTracks;
-  vjs.MediaTechController.prototype.textTracks = function() {
+  MediaTechController.prototype['featuresNativeTextTracks'] = true;
+  oldTextTracks = MediaTechController.prototype.textTracks;
+  MediaTechController.prototype.textTracks = function() {
     return {
       length: 0,
       addEventListener: function(type, handler) {
@@ -169,7 +183,7 @@ test('update texttrack buttons on removetrack or addtrack', function() {
   track.src = 'es.vtt';
   tag.appendChild(track);
 
-  player =  PlayerTest.makePlayer({}, tag);
+  player =  TestHelpers.makePlayer({}, tag);
 
   player.player_ = player;
 
@@ -187,17 +201,17 @@ test('update texttrack buttons on removetrack or addtrack', function() {
 
   equal(update, 9, 'update was called on the three buttons for remove track');
 
-  vjs.MediaTechController.prototype.textTracks = oldTextTracks;
-  vjs.MediaTechController.prototype['featuresNativeTextTracks'] = false;
-  vjs.CaptionsButton.prototype.update = oldCaptionsUpdate;
-  vjs.SubtitlesButton.prototype.update = oldSubsUpdate;
-  vjs.ChaptersButton.prototype.update = oldChaptersUpdate;
+  MediaTechController.prototype.textTracks = oldTextTracks;
+  MediaTechController.prototype['featuresNativeTextTracks'] = false;
+  CaptionsButton.prototype.update = oldCaptionsUpdate;
+  SubtitlesButton.prototype.update = oldSubsUpdate;
+  ChaptersButton.prototype.update = oldChaptersUpdate;
 });
 
 test('if native text tracks are not supported, create a texttrackdisplay', function() {
-  var oldTestVid = vjs.TEST_VID,
-      oldIsFirefox = vjs.IS_FIREFOX,
-      oldTextTrackDisplay = window['videojs']['TextTrackDisplay'],
+  var oldTestVid = Lib.TEST_VID,
+      oldIsFirefox = Lib.IS_FIREFOX,
+      oldTextTrackDisplay = Component.getComponent('TextTrackDisplay'),
       called = false,
       player,
       tag,
@@ -219,29 +233,29 @@ test('if native text tracks are not supported, create a texttrackdisplay', funct
   track.src = 'es.vtt';
   tag.appendChild(track);
 
-  vjs.TEST_VID = {
+  Lib.TEST_VID = {
     textTracks: []
   };
 
-  vjs.IS_FIREFOX = true;
-  window['videojs']['TextTrackDisplay'] = function() {
+  Lib.IS_FIREFOX = true;
+  Component.registerComponent('TextTrackDisplay', function() {
     called = true;
-  };
+  });
 
-  player = PlayerTest.makePlayer({}, tag);
+  player = TestHelpers.makePlayer({}, tag);
 
   ok(called, 'text track display was created');
 
-  vjs.TEST_VID = oldTestVid;
-  vjs.IS_FIREFOX = oldIsFirefox;
-  window['videojs']['TextTrackDisplay'] = oldTextTrackDisplay;
+  Lib.TEST_VID = oldTestVid;
+  Lib.IS_FIREFOX = oldIsFirefox;
+  Component.registerComponent('TextTrackDisplay', oldTextTrackDisplay);
 });
 
 test('Player track methods call the tech', function() {
   var player,
       calls = 0;
 
-  player = PlayerTest.makePlayer();
+  player = TestHelpers.makePlayer();
 
   player.tech.textTracks = function() {
     calls++;
@@ -257,37 +271,37 @@ test('Player track methods call the tech', function() {
 });
 
 test('html5 tech supports native text tracks if the video supports it, unless mode is a number', function() {
-  var oldTestVid = vjs.TEST_VID;
+  var oldTestVid = Lib.TEST_VID;
 
-  vjs.TEST_VID = {
+  Lib.TEST_VID = {
     textTracks: [{
       mode: 0
     }]
   };
 
-  ok(!vjs.Html5.supportsNativeTextTracks(), 'native text tracks are not supported if mode is a number');
+  ok(!Html5.supportsNativeTextTracks(), 'native text tracks are not supported if mode is a number');
 
-  vjs.TEST_VID = oldTestVid;
+  Lib.TEST_VID = oldTestVid;
 });
 
 test('html5 tech supports native text tracks if the video supports it, unless it is firefox', function() {
-  var oldTestVid = vjs.TEST_VID,
-      oldIsFirefox = vjs.IS_FIREFOX;
+  var oldTestVid = Lib.TEST_VID,
+      oldIsFirefox = Lib.IS_FIREFOX;
 
-  vjs.TEST_VID = {
+  Lib.TEST_VID = {
     textTracks: []
   };
 
-  vjs.IS_FIREFOX = true;
+  Lib.IS_FIREFOX = true;
 
-  ok(!vjs.Html5.supportsNativeTextTracks(), 'if textTracks are available on video element, native text tracks are supported');
+  ok(!Html5.supportsNativeTextTracks(), 'if textTracks are available on video element, native text tracks are supported');
 
-  vjs.TEST_VID = oldTestVid;
-  vjs.IS_FIREFOX = oldIsFirefox;
+  Lib.TEST_VID = oldTestVid;
+  Lib.IS_FIREFOX = oldIsFirefox;
 });
 
 test('when switching techs, we should not get a new text track', function() {
-  var player = PlayerTest.makePlayer({
+  var player = TestHelpers.makePlayer({
         html5: {
           nativeTextTracks: false
         }

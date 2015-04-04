@@ -1,3 +1,7 @@
+import Component from '../component';
+import * as Lib from '../lib';
+import Slider, { SliderHandle } from '../slider';
+
 /**
  * The component for controlling the volume level
  *
@@ -5,10 +9,10 @@
  * @param {Object=} options
  * @constructor
  */
-vjs.VolumeControl = vjs.Component.extend({
+let VolumeControl = Component.extend({
   /** @constructor */
   init: function(player, options){
-    vjs.Component.call(this, player, options);
+    Component.call(this, player, options);
 
     // hide volume controls when they're not supported by the current tech
     if (player.tech && player.tech['featuresVolumeControl'] === false) {
@@ -24,14 +28,16 @@ vjs.VolumeControl = vjs.Component.extend({
   }
 });
 
-vjs.VolumeControl.prototype.options_ = {
+Component.registerComponent('VolumeControl', VolumeControl);
+
+VolumeControl.prototype.options_ = {
   children: {
     'volumeBar': {}
   }
 };
 
-vjs.VolumeControl.prototype.createEl = function(){
-  return vjs.Component.prototype.createEl.call(this, 'div', {
+VolumeControl.prototype.createEl = function(){
+  return Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-volume-control vjs-control'
   });
 };
@@ -43,22 +49,24 @@ vjs.VolumeControl.prototype.createEl = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.VolumeBar = vjs.Slider.extend({
+var VolumeBar = Slider.extend({
   /** @constructor */
   init: function(player, options){
-    vjs.Slider.call(this, player, options);
+    Slider.call(this, player, options);
     this.on(player, 'volumechange', this.updateARIAAttributes);
-    player.ready(vjs.bind(this, this.updateARIAAttributes));
+    player.ready(Lib.bind(this, this.updateARIAAttributes));
   }
 });
 
-vjs.VolumeBar.prototype.updateARIAAttributes = function(){
+Component.registerComponent('VolumeBar', VolumeBar);
+
+VolumeBar.prototype.updateARIAAttributes = function(){
   // Current value of volume bar as a percentage
-  this.el_.setAttribute('aria-valuenow',vjs.round(this.player_.volume()*100, 2));
-  this.el_.setAttribute('aria-valuetext',vjs.round(this.player_.volume()*100, 2)+'%');
+  this.el_.setAttribute('aria-valuenow', Lib.round(this.player_.volume()*100, 2));
+  this.el_.setAttribute('aria-valuetext', Lib.round(this.player_.volume()*100, 2)+'%');
 };
 
-vjs.VolumeBar.prototype.options_ = {
+VolumeBar.prototype.options_ = {
   children: {
     'volumeLevel': {},
     'volumeHandle': {}
@@ -67,16 +75,16 @@ vjs.VolumeBar.prototype.options_ = {
   'handleName': 'volumeHandle'
 };
 
-vjs.VolumeBar.prototype.playerEvent = 'volumechange';
+VolumeBar.prototype.playerEvent = 'volumechange';
 
-vjs.VolumeBar.prototype.createEl = function(){
-  return vjs.Slider.prototype.createEl.call(this, 'div', {
+VolumeBar.prototype.createEl = function(){
+  return Slider.prototype.createEl.call(this, 'div', {
     className: 'vjs-volume-bar',
     'aria-label': 'volume level'
   });
 };
 
-vjs.VolumeBar.prototype.onMouseMove = function(event) {
+VolumeBar.prototype.onMouseMove = function(event) {
   if (this.player_.muted()) {
     this.player_.muted(false);
   }
@@ -84,7 +92,7 @@ vjs.VolumeBar.prototype.onMouseMove = function(event) {
   this.player_.volume(this.calculateDistance(event));
 };
 
-vjs.VolumeBar.prototype.getPercent = function(){
+VolumeBar.prototype.getPercent = function(){
   if (this.player_.muted()) {
     return 0;
   } else {
@@ -92,11 +100,11 @@ vjs.VolumeBar.prototype.getPercent = function(){
   }
 };
 
-vjs.VolumeBar.prototype.stepForward = function(){
+VolumeBar.prototype.stepForward = function(){
   this.player_.volume(this.player_.volume() + 0.1);
 };
 
-vjs.VolumeBar.prototype.stepBack = function(){
+VolumeBar.prototype.stepBack = function(){
   this.player_.volume(this.player_.volume() - 0.1);
 };
 
@@ -107,15 +115,17 @@ vjs.VolumeBar.prototype.stepBack = function(){
  * @param {Object=} options
  * @constructor
  */
-vjs.VolumeLevel = vjs.Component.extend({
+var VolumeLevel = Component.extend({
   /** @constructor */
   init: function(player, options){
-    vjs.Component.call(this, player, options);
+    Component.call(this, player, options);
   }
 });
 
-vjs.VolumeLevel.prototype.createEl = function(){
-  return vjs.Component.prototype.createEl.call(this, 'div', {
+Component.registerComponent('VolumeLevel', VolumeLevel);
+
+VolumeLevel.prototype.createEl = function(){
+  return Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-volume-level',
     innerHTML: '<span class="vjs-control-text"></span>'
   });
@@ -128,13 +138,18 @@ vjs.VolumeLevel.prototype.createEl = function(){
  * @param {Object=} options
  * @constructor
  */
- vjs.VolumeHandle = vjs.SliderHandle.extend();
+var VolumeHandle = SliderHandle.extend();
 
- vjs.VolumeHandle.prototype.defaultValue = '00:00';
+Component.registerComponent('VolumeHandle', VolumeHandle);
 
- /** @inheritDoc */
- vjs.VolumeHandle.prototype.createEl = function(){
-   return vjs.SliderHandle.prototype.createEl.call(this, 'div', {
-     className: 'vjs-volume-handle'
-   });
- };
+VolumeHandle.prototype.defaultValue = '00:00';
+
+/** @inheritDoc */
+VolumeHandle.prototype.createEl = function(){
+  return SliderHandle.prototype.createEl.call(this, 'div', {
+    className: 'vjs-volume-handle'
+  });
+};
+
+export default VolumeControl;
+export { VolumeBar, VolumeLevel, VolumeHandle };

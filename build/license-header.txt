@@ -1,0 +1,11 @@
+/**
+ * @license
+ * Video.js <%= pkg.version %> <http://videojs.com/>
+ * <%= pkg.copyright %>
+ * Available under Apache License Version 2.0
+ * <https://github.com/videojs/video.js/blob/master/LICENSE>
+ *
+ * Includes vtt.js <https://github.com/mozilla/vtt.js>
+ * Available under Apache License Version 2.0
+ * <https://github.com/mozilla/vtt.js/blob/master/LICENSE>
+ */

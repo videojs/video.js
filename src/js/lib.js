@@ -1,4 +1,8 @@
-var hasOwnProp = Object.prototype.hasOwnProperty;
+import window from 'global/window';
+import document from 'global/document';
+let navigator = window.navigator;
+
+let hasOwnProp = Object.prototype.hasOwnProperty;
 
 /**
  * Creates an element and applies properties.
@@ -7,15 +11,13 @@ var hasOwnProp = Object.prototype.hasOwnProperty;
  * @return {Element}
  * @private
  */
-vjs.createEl = function(tagName, properties){
-  var el;
-
+var createEl = function(tagName, properties){
   tagName = tagName || 'div';
   properties = properties || {};
 
-  el = document.createElement(tagName);
+  let el = document.createElement(tagName);
 
-  vjs.obj.each(properties, function(propName, val){
+  obj.each(properties, function(propName, val){
     // Not remembering why we were checking for dash
     // but using setAttribute means you have to use getAttribute
 
@@ -40,7 +42,7 @@ vjs.createEl = function(tagName, properties){
  * @return {String}
  * @private
  */
-vjs.capitalize = function(string){
+var capitalize = function(string){
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
@@ -49,7 +51,7 @@ vjs.capitalize = function(string){
  * @type {Object}
  * @private
  */
-vjs.obj = {};
+var obj = {};
 
 /**
  * Object.create shim for prototypal inheritance
@@ -60,7 +62,7 @@ vjs.obj = {};
  * @param  {Object}   obj Object to use as prototype
  * @private
  */
-vjs.obj.create = Object.create || function(obj){
+obj.create = Object.create || function(obj){
   //Create a new function called 'F' which is just an empty object.
   function F() {}
 
@@ -80,7 +82,7 @@ vjs.obj.create = Object.create || function(obj){
  * @this {*}
  * @private
  */
-vjs.obj.each = function(obj, fn, context){
+obj.each = function(obj, fn, context){
   for (var key in obj) {
     if (hasOwnProp.call(obj, key)) {
       fn.call(context || this, key, obj[key]);
@@ -95,7 +97,7 @@ vjs.obj.each = function(obj, fn, context){
  * @return {Object}
  * @private
  */
-vjs.obj.merge = function(obj1, obj2){
+obj.merge = function(obj1, obj2){
   if (!obj2) { return obj1; }
   for (var key in obj2){
     if (hasOwnProp.call(obj2, key)) {
@@ -114,12 +116,12 @@ vjs.obj.merge = function(obj1, obj2){
  * @return {Object}      New object. Obj1 and Obj2 will be untouched.
  * @private
  */
-vjs.obj.deepMerge = function(obj1, obj2){
+obj.deepMerge = function(obj1, obj2){
   var key, val1, val2;
 
   // make a copy of obj1 so we're not overwriting original values.
   // like prototype.options_ and all sub options objects
-  obj1 = vjs.obj.copy(obj1);
+  obj1 = obj.copy(obj1);
 
   for (key in obj2){
     if (hasOwnProp.call(obj2, key)) {
@@ -127,8 +129,8 @@ vjs.obj.deepMerge = function(obj1, obj2){
       val2 = obj2[key];
 
       // Check if both properties are pure objects and do a deep merge if so
-      if (vjs.obj.isPlain(val1) && vjs.obj.isPlain(val2)) {
-        obj1[key] = vjs.obj.deepMerge(val1, val2);
+      if (obj.isPlain(val1) && obj.isPlain(val2)) {
+        obj1[key] = obj.deepMerge(val1, val2);
       } else {
         obj1[key] = obj2[key];
       }
@@ -143,8 +145,8 @@ vjs.obj.deepMerge = function(obj1, obj2){
  * @return {Object}     Copy of object
  * @private
  */
-vjs.obj.copy = function(obj){
-  return vjs.obj.merge({}, obj);
+obj.copy = function(objToCopy){
+  return obj.merge({}, objToCopy);
 };
 
 /**
@@ -153,7 +155,7 @@ vjs.obj.copy = function(obj){
  * @return {Boolean}     True if plain, false otherwise
  * @private
  */
-vjs.obj.isPlain = function(obj){
+obj.isPlain = function(obj){
   return !!obj
     && typeof obj === 'object'
     && obj.toString() === '[object Object]'
@@ -167,19 +169,8 @@ vjs.obj.isPlain = function(obj){
  * @return {Boolean}     True if plain, false otherwise
  * @private
  */
-vjs.obj.isArray = Array.isArray || function(arr) {
+obj.isArray = Array.isArray || function(arr) {
   return Object.prototype.toString.call(arr) === '[object Array]';
-};
-
-/**
- * Check to see whether the input is NaN or not.
- * NaN is the only JavaScript construct that isn't equal to itself
- * @param {Number} num Number to check
- * @return {Boolean} True if NaN, false otherwise
- * @private
- */
-vjs.isNaN = function(num) {
-  return num !== num;
 };
 
 /**
@@ -191,12 +182,12 @@ vjs.isNaN = function(num) {
  * @return {Function}
  * @private
  */
-vjs.bind = function(context, fn, uid) {
+var bind = function(context, fn, uid) {
   // Make sure the function has a unique ID
-  if (!fn.guid) { fn.guid = vjs.guid++; }
+  if (!fn.guid) { fn.guid = guid++; }
 
   // Create the new function that changes the context
-  var ret = function() {
+  let ret = function() {
     return fn.apply(context, arguments);
   };
 
@@ -218,14 +209,14 @@ vjs.bind = function(context, fn, uid) {
  * @type {Object}
  * @private
  */
-vjs.cache = {};
+var cache = {};
 
 /**
  * Unique ID for an element or function
  * @type {Number}
  * @private
  */
-vjs.guid = 1;
+var guid = 1;
 
 /**
  * Unique attribute name to store an element's guid in
@@ -233,7 +224,7 @@ vjs.guid = 1;
  * @constant
  * @private
  */
-vjs.expando = 'vdata' + (new Date()).getTime();
+var expando = 'vdata' + (new Date()).getTime();
 
 /**
  * Returns the cache object where data for an element is stored
@@ -241,15 +232,15 @@ vjs.expando = 'vdata' + (new Date()).getTime();
  * @return {Object}
  * @private
  */
-vjs.getData = function(el){
-  var id = el[vjs.expando];
+var getData = function(el){
+  var id = el[expando];
   if (!id) {
-    id = el[vjs.expando] = vjs.guid++;
+    id = el[expando] = guid++;
   }
-  if (!vjs.cache[id]) {
-    vjs.cache[id] = {};
+  if (!cache[id]) {
+    cache[id] = {};
   }
-  return vjs.cache[id];
+  return cache[id];
 };
 
 /**
@@ -258,9 +249,9 @@ vjs.getData = function(el){
  * @return {Object}
  * @private
  */
-vjs.hasData = function(el){
-  var id = el[vjs.expando];
-  return !(!id || vjs.isEmpty(vjs.cache[id]));
+var hasData = function(el){
+  var id = el[expando];
+  return !(!id || isEmpty(cache[id]));
 };
 
 /**
@@ -268,24 +259,24 @@ vjs.hasData = function(el){
  * @param  {Element} el Remove data for an element
  * @private
  */
-vjs.removeData = function(el){
-  var id = el[vjs.expando];
+var removeData = function(el){
+  var id = el[expando];
   if (!id) { return; }
   // Remove all stored data
   // Changed to = null
   // http://coding.smashingmagazine.com/2012/11/05/writing-fast-memory-efficient-javascript/
   // vjs.cache[id] = null;
-  delete vjs.cache[id];
+  delete cache[id];
 
   // Remove the expando property from the DOM node
   try {
-    delete el[vjs.expando];
+    delete el[expando];
   } catch(e) {
     if (el.removeAttribute) {
-      el.removeAttribute(vjs.expando);
+      el.removeAttribute(expando);
     } else {
       // IE doesn't appear to support removeAttribute on the document element
-      el[vjs.expando] = null;
+      el[expando] = null;
     }
   }
 };
@@ -296,7 +287,7 @@ vjs.removeData = function(el){
  * @return {Boolean}
  * @private
  */
-vjs.isEmpty = function(obj) {
+var isEmpty = function(obj) {
   for (var prop in obj) {
     // Inlude null properties as empty.
     if (obj[prop] !== null) {
@@ -312,10 +303,9 @@ vjs.isEmpty = function(obj) {
  * @param {String} classToCheck Classname to check
  * @private
  */
-vjs.hasClass = function(element, classToCheck){
+var hasClass = function(element, classToCheck){
   return ((' ' + element.className + ' ').indexOf(' ' + classToCheck + ' ') !== -1);
 };
-
 
 /**
  * Add a CSS class name to an element
@@ -323,8 +313,8 @@ vjs.hasClass = function(element, classToCheck){
  * @param {String} classToAdd Classname to add
  * @private
  */
-vjs.addClass = function(element, classToAdd){
-  if (!vjs.hasClass(element, classToAdd)) {
+var addClass = function(element, classToAdd){
+  if (!hasClass(element, classToAdd)) {
     element.className = element.className === '' ? classToAdd : element.className + ' ' + classToAdd;
   }
 };
@@ -335,15 +325,13 @@ vjs.addClass = function(element, classToAdd){
  * @param {String} classToAdd Classname to remove
  * @private
  */
-vjs.removeClass = function(element, classToRemove){
-  var classNames, i;
+var removeClass = function(element, classToRemove){
+  if (!hasClass(element, classToRemove)) {return;}
 
-  if (!vjs.hasClass(element, classToRemove)) {return;}
-
-  classNames = element.className.split(' ');
+  let classNames = element.className.split(' ');
 
   // no arr.indexOf in ie8, and we don't want to add a big shim
-  for (i = classNames.length - 1; i >= 0; i--) {
+  for (let i = classNames.length - 1; i >= 0; i--) {
     if (classNames[i] === classToRemove) {
       classNames.splice(i,1);
     }
@@ -358,14 +346,12 @@ vjs.removeClass = function(element, classToRemove){
  * @constant
  * @private
  */
-vjs.TEST_VID = vjs.createEl('video');
-(function() {
-  var track = document.createElement('track');
-  track.kind = 'captions';
-  track.srclang = 'en';
-  track.label = 'English';
-  vjs.TEST_VID.appendChild(track);
-})();
+var TEST_VID = createEl('video');
+let track = document.createElement('track');
+track.kind = 'captions';
+track.srclang = 'en';
+track.label = 'English';
+TEST_VID.appendChild(track);
 
 /**
  * Useragent for browser testing.
@@ -373,7 +359,7 @@ vjs.TEST_VID = vjs.createEl('video');
  * @constant
  * @private
  */
-vjs.USER_AGENT = navigator.userAgent;
+var USER_AGENT = navigator.userAgent;
 
 /**
  * Device is an iPhone
@@ -381,21 +367,21 @@ vjs.USER_AGENT = navigator.userAgent;
  * @constant
  * @private
  */
-vjs.IS_IPHONE = (/iPhone/i).test(vjs.USER_AGENT);
-vjs.IS_IPAD = (/iPad/i).test(vjs.USER_AGENT);
-vjs.IS_IPOD = (/iPod/i).test(vjs.USER_AGENT);
-vjs.IS_IOS = vjs.IS_IPHONE || vjs.IS_IPAD || vjs.IS_IPOD;
+var IS_IPHONE = (/iPhone/i).test(USER_AGENT);
+var IS_IPAD = (/iPad/i).test(USER_AGENT);
+var IS_IPOD = (/iPod/i).test(USER_AGENT);
+var IS_IOS = IS_IPHONE || IS_IPAD || IS_IPOD;
 
-vjs.IOS_VERSION = (function(){
-  var match = vjs.USER_AGENT.match(/OS (\d+)_/i);
+var IOS_VERSION = (function(){
+  var match = USER_AGENT.match(/OS (\d+)_/i);
   if (match && match[1]) { return match[1]; }
 })();
 
-vjs.IS_ANDROID = (/Android/i).test(vjs.USER_AGENT);
-vjs.ANDROID_VERSION = (function() {
+var IS_ANDROID = (/Android/i).test(USER_AGENT);
+var ANDROID_VERSION = (function() {
   // This matches Android Major.Minor.Patch versions
   // ANDROID_VERSION is Major.Minor as a Number, if Minor isn't available, then only Major is returned
-  var match = vjs.USER_AGENT.match(/Android (\d+)(?:\.(\d+))?(?:\.(\d+))*/i),
+  var match = USER_AGENT.match(/Android (\d+)(?:\.(\d+))?(?:\.(\d+))*/i),
     major,
     minor;
 
@@ -415,14 +401,14 @@ vjs.ANDROID_VERSION = (function() {
   }
 })();
 // Old Android is defined as Version older than 2.3, and requiring a webkit version of the android browser
-vjs.IS_OLD_ANDROID = vjs.IS_ANDROID && (/webkit/i).test(vjs.USER_AGENT) && vjs.ANDROID_VERSION < 2.3;
+var IS_OLD_ANDROID = IS_ANDROID && (/webkit/i).test(USER_AGENT) && ANDROID_VERSION < 2.3;
 
-vjs.IS_FIREFOX = (/Firefox/i).test(vjs.USER_AGENT);
-vjs.IS_CHROME = (/Chrome/i).test(vjs.USER_AGENT);
-vjs.IS_IE8 = (/MSIE\s8\.0/).test(vjs.USER_AGENT);
+var IS_FIREFOX = (/Firefox/i).test(USER_AGENT);
+var IS_CHROME = (/Chrome/i).test(USER_AGENT);
+var IS_IE8 = (/MSIE\s8\.0/).test(USER_AGENT);
 
-vjs.TOUCH_ENABLED = !!(('ontouchstart' in window) || window.DocumentTouch && document instanceof window.DocumentTouch);
-vjs.BACKGROUND_SIZE_SUPPORTED = 'backgroundSize' in vjs.TEST_VID.style;
+var TOUCH_ENABLED = !!(('ontouchstart' in window) || window.DocumentTouch && document instanceof window.DocumentTouch);
+var BACKGROUND_SIZE_SUPPORTED = 'backgroundSize' in TEST_VID.style;
 
 /**
  * Apply attributes to an HTML element.
@@ -430,8 +416,8 @@ vjs.BACKGROUND_SIZE_SUPPORTED = 'backgroundSize' in vjs.TEST_VID.style;
  * @param  {Object=} attributes Element attributes to be applied.
  * @private
  */
-vjs.setElementAttributes = function(el, attributes){
-  vjs.obj.each(attributes, function(attrName, attrValue) {
+var setElementAttributes = function(el, attributes){
+  obj.each(attributes, function(attrName, attrValue) {
     if (attrValue === null || typeof attrValue === 'undefined' || attrValue === false) {
       el.removeAttribute(attrName);
     } else {
@@ -449,7 +435,7 @@ vjs.setElementAttributes = function(el, attributes){
  * @return {Object}
  * @private
  */
-vjs.getElementAttributes = function(tag){
+var getElementAttributes = function(tag){
   var obj, knownBooleans, attrs, attrName, attrVal;
 
   obj = {};
@@ -490,7 +476,7 @@ vjs.getElementAttributes = function(tag){
  * @return {String}            Style value
  * @private
  */
-vjs.getComputedDimension = function(el, strCssRule){
+var getComputedDimension = function(el, strCssRule){
   var strValue = '';
   if(document.defaultView && document.defaultView.getComputedStyle){
     strValue = document.defaultView.getComputedStyle(el, '').getPropertyValue(strCssRule);
@@ -508,7 +494,7 @@ vjs.getComputedDimension = function(el, strCssRule){
  * @param  {[type]} parent Element to insert child into
  * @private
  */
-vjs.insertFirst = function(child, parent){
+var insertFirst = function(child, parent){
   if (parent.firstChild) {
     parent.insertBefore(child, parent.firstChild);
   } else {
@@ -521,7 +507,7 @@ vjs.insertFirst = function(child, parent){
  * @type {Object}
  * @private
  */
-vjs.browser = {};
+var browser = {};
 
 /**
  * Shorthand for document.getElementById()
@@ -530,7 +516,7 @@ vjs.browser = {};
  * @return {Element}    Element with supplied ID
  * @private
  */
-vjs.el = function(id){
+var el = function(id){
   if (id.indexOf('#') === 0) {
     id = id.slice(1);
   }
@@ -547,7 +533,7 @@ vjs.el = function(id){
  * @return {String}         Time formatted as H:MM:SS or M:SS
  * @private
  */
-vjs.formatTime = function(seconds, guide) {
+var formatTime = function(seconds, guide) {
   // Default to using seconds as guide
   guide = guide || seconds;
   var s = Math.floor(seconds % 60),
@@ -577,12 +563,12 @@ vjs.formatTime = function(seconds, guide) {
 };
 
 // Attempt to block the ability to select text while dragging controls
-vjs.blockTextSelection = function(){
+var blockTextSelection = function(){
   document.body.focus();
   document.onselectstart = function () { return false; };
 };
 // Turn off text selection blocking
-vjs.unblockTextSelection = function(){ document.onselectstart = function () { return true; }; };
+var unblockTextSelection = function(){ document.onselectstart = function () { return true; }; };
 
 /**
  * Trim whitespace from the ends of a string.
@@ -590,7 +576,7 @@ vjs.unblockTextSelection = function(){ document.onselectstart = function () { re
  * @return {String}        Trimmed string
  * @private
  */
-vjs.trim = function(str){
+var trim = function(str){
   return (str+'').replace(/^\s+|\s+$/g, '');
 };
 
@@ -601,7 +587,7 @@ vjs.trim = function(str){
  * @return {Number}     Rounded number
  * @private
  */
-vjs.round = function(num, dec) {
+var round = function(num, dec) {
   if (!dec) { dec = 0; }
   return Math.round(num*Math.pow(10,dec))/Math.pow(10,dec);
 };
@@ -616,7 +602,7 @@ vjs.round = function(num, dec) {
  * @return {Object}       Fake TimeRange object
  * @private
  */
-vjs.createTimeRange = function(start, end){
+var createTimeRange = function(start, end){
   return {
     length: 1,
     start: function() { return start; },
@@ -625,23 +611,23 @@ vjs.createTimeRange = function(start, end){
 };
 
 /**
- * Add to local storage (may removable)
+ * Add to local storage (maybe removable)
  * @private
  */
-vjs.setLocalStorage = function(key, value){
+var setLocalStorage = function(key, value){
   try {
     // IE was throwing errors referencing the var anywhere without this
-    var localStorage = window.localStorage || false;
+    let localStorage = window.localStorage || false;
     if (!localStorage) { return; }
     localStorage[key] = value;
   } catch(e) {
     if (e.code == 22 || e.code == 1014) { // Webkit == 22 / Firefox == 1014
-      vjs.log('LocalStorage Full (VideoJS)', e);
+      log('LocalStorage Full (VideoJS)', e);
     } else {
       if (e.code == 18) {
-        vjs.log('LocalStorage not allowed (VideoJS)', e);
+        log('LocalStorage not allowed (VideoJS)', e);
       } else {
-        vjs.log('LocalStorage Error (VideoJS)', e);
+        log('LocalStorage Error (VideoJS)', e);
       }
     }
   }
@@ -654,12 +640,11 @@ vjs.setLocalStorage = function(key, value){
  * @return {String}     Absolute URL
  * @private
  */
-vjs.getAbsoluteURL = function(url){
-
+var getAbsoluteURL = function(url){
   // Check if absolute URL
   if (!url.match(/^https?:\/\//)) {
     // Convert to absolute URL. Flash hosted off-site needs an absolute URL.
-    url = vjs.createEl('div', {
+    url = createEl('div', {
       innerHTML: '<a href="'+url+'">x</a>'
     }).firstChild.href;
   }
@@ -667,26 +652,24 @@ vjs.getAbsoluteURL = function(url){
   return url;
 };
 
-
 /**
  * Resolve and parse the elements of a URL
  * @param  {String} url The url to parse
  * @return {Object}     An object of url details
  */
-vjs.parseUrl = function(url) {
-  var div, a, addToBody, props, details;
-
-  props = ['protocol', 'hostname', 'port', 'pathname', 'search', 'hash', 'host'];
+var parseUrl = function(url) {
+  const props = ['protocol', 'hostname', 'port', 'pathname', 'search', 'hash', 'host'];
 
   // add the url to an anchor and let the browser parse the URL
-  a = vjs.createEl('a', { href: url });
+  let a = createEl('a', { href: url });
 
   // IE8 (and 9?) Fix
   // ie8 doesn't parse the URL correctly until the anchor is actually
   // added to the body, and an innerHTML is needed to trigger the parsing
-  addToBody = (a.host === '' && a.protocol !== 'file:');
+  let addToBody = (a.host === '' && a.protocol !== 'file:');
+  let div;
   if (addToBody) {
-    div = vjs.createEl('div');
+    div = createEl('div');
     div.innerHTML = '<a href="'+url+'"></a>';
     a = div.firstChild;
     // prevent the div from affecting layout
@@ -697,7 +680,7 @@ vjs.parseUrl = function(url) {
   // Copy the specific URL properties to a new object
   // This is also needed for IE8 because the anchor loses its
   // properties when it's removed from the dom
-  details = {};
+  let details = {};
   for (var i = 0; i < props.length; i++) {
     details[props[i]] = a[props[i]];
   }
@@ -726,16 +709,15 @@ vjs.parseUrl = function(url) {
  * @private
  */
 function _logType(type, args){
-  var argsArray, noop, console;
-
   // convert args to an array to get array functions
-  argsArray = Array.prototype.slice.call(args);
+  let argsArray = Array.prototype.slice.call(args);
   // if there's no console then don't try to output messages
   // they will still be stored in vjs.log.history
   // Was setting these once outside of this function, but containing them
   // in the function makes it easier to test cases where console doesn't exist
-  noop = function(){};
-  console = window['console'] || {
+  let noop = function(){};
+
+  let console = window['console'] || {
     'log': noop,
     'warn': noop,
     'error': noop
@@ -750,7 +732,7 @@ function _logType(type, args){
   }
 
   // add to history
-  vjs.log.history.push(argsArray);
+  log.history.push(argsArray);
 
   // add console prefix after adding to history
   argsArray.unshift('VIDEOJS:');
@@ -767,7 +749,7 @@ function _logType(type, args){
 /**
  * Log plain debug messages
  */
-vjs.log = function(){
+var log = function(){
   _logType(null, arguments);
 };
 
@@ -775,26 +757,26 @@ vjs.log = function(){
  * Keep a history of log messages
  * @type {Array}
  */
-vjs.log.history = [];
+log.history = [];
 
 /**
  * Log error messages
  */
-vjs.log.error = function(){
+log.error = function(){
   _logType('error', arguments);
 };
 
 /**
  * Log warning messages
  */
-vjs.log.warn = function(){
+log.warn = function(){
   _logType('warn', arguments);
 };
 
 // Offset Left
 // getBoundingClientRect technique from John Resig http://ejohn.org/blog/getboundingclientrect-is-awesome/
-vjs.findPosition = function(el) {
-  var box, docEl, body, clientLeft, scrollLeft, left, clientTop, scrollTop, top;
+var findPosition = function(el) {
+  let box;
 
   if (el.getBoundingClientRect && el.parentNode) {
     box = el.getBoundingClientRect();
@@ -807,21 +789,21 @@ vjs.findPosition = function(el) {
     };
   }
 
-  docEl = document.documentElement;
-  body = document.body;
+  const docEl = document.documentElement;
+  const body = document.body;
 
-  clientLeft = docEl.clientLeft || body.clientLeft || 0;
-  scrollLeft = window.pageXOffset || body.scrollLeft;
-  left = box.left + scrollLeft - clientLeft;
+  const clientLeft = docEl.clientLeft || body.clientLeft || 0;
+  const scrollLeft = window.pageXOffset || body.scrollLeft;
+  const left = box.left + scrollLeft - clientLeft;
 
-  clientTop = docEl.clientTop || body.clientTop || 0;
-  scrollTop = window.pageYOffset || body.scrollTop;
-  top = box.top + scrollTop - clientTop;
+  const clientTop = docEl.clientTop || body.clientTop || 0;
+  const scrollTop = window.pageYOffset || body.scrollTop;
+  const top = box.top + scrollTop - clientTop;
 
   // Android sometimes returns slightly off decimal values, so need to round
   return {
-    left: vjs.round(left),
-    top: vjs.round(top)
+    left: round(left),
+    top: round(top)
   };
 };
 
@@ -830,7 +812,7 @@ vjs.findPosition = function(el) {
  * @type {Object}
  * @private
  */
-vjs.arr = {};
+var arr = {};
 
 /*
  * Loops through an array and runs a function for each item inside it.
@@ -840,10 +822,12 @@ vjs.arr = {};
  * @returns {Array}               The array
  * @private
  */
-vjs.arr.forEach = function(array, callback, thisArg) {
-  if (vjs.obj.isArray(array) && callback instanceof Function) {
+arr.forEach = function(array, callback, thisArg) {
+  thisArg = thisArg || this;
+
+  if (obj.isArray(array) && callback instanceof Function) {
     for (var i = 0, len = array.length; i < len; ++i) {
-      callback.call(thisArg || vjs, array[i], i, array);
+      callback.call(thisArg, array[i], i, array);
     }
   }
 
@@ -856,13 +840,10 @@ vjs.arr.forEach = function(array, callback, thisArg) {
  * @param {String}    path    The fileName path like '/path/to/file.mp4'
  * @returns {String}          The extension in lower case or an empty string if no extension could be found.
  */
-vjs.getFileExtension = function(path) {
-  var splitPathRe;
-  var pathParts;
-
+var getFileExtension = function(path) {
   if(typeof path === 'string'){
-    splitPathRe = /^(\/?)([\s\S]*?)((?:\.{1,2}|[^\/]+?)(\.([^\.\/\?]+)))(?:[\/]*|[\?].*)$/i;
-    pathParts = splitPathRe.exec(path);
+    let splitPathRe = /^(\/?)([\s\S]*?)((?:\.{1,2}|[^\/]+?)(\.([^\.\/\?]+)))(?:[\/]*|[\?].*)$/i;
+    let pathParts = splitPathRe.exec(path);
 
     if (pathParts) {
       return pathParts.pop().toLowerCase();
@@ -870,4 +851,56 @@ vjs.getFileExtension = function(path) {
   }
 
   return '';
+};
+
+export {
+  createEl,
+  capitalize,
+  obj,
+  isNaN,
+  bind,
+  cache,
+  guid,
+  expando,
+  getData,
+  hasData,
+  removeData,
+  isEmpty,
+  hasClass,
+  addClass,
+  removeClass,
+  TEST_VID,
+  USER_AGENT,
+  IS_IPHONE,
+  IS_IPAD,
+  IS_IPOD,
+  IS_IOS,
+  IOS_VERSION,
+  IS_ANDROID,
+  ANDROID_VERSION,
+  IS_OLD_ANDROID,
+  IS_FIREFOX,
+  IS_IE8,
+  IS_CHROME,
+  TOUCH_ENABLED,
+  BACKGROUND_SIZE_SUPPORTED,
+  setElementAttributes,
+  getElementAttributes,
+  getComputedDimension,
+  insertFirst,
+  browser,
+  el,
+  formatTime,
+  blockTextSelection,
+  unblockTextSelection,
+  trim,
+  round,
+  createTimeRange,
+  setLocalStorage,
+  getAbsoluteURL,
+  parseUrl,
+  log,
+  findPosition,
+  arr,
+  getFileExtension
 };

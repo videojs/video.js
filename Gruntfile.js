@@ -1,53 +1,22 @@
 module.exports = function(grunt) {
-  var pkg, version, verParts, license, licenseNoVtt;
-
-  pkg = grunt.file.readJSON('package.json');
-
-  verParts = pkg.version.split('.');
-  version = {
+  var pkg = grunt.file.readJSON('package.json');
+  var license = grunt.file.read('build/license-header.txt');
+  var verParts = pkg.version.split('.');
+  var version = {
     full: pkg.version,
     major: verParts[0],
     minor: verParts[1],
     patch: verParts[2]
   };
+
   version.majorMinor = version.major + '.' + version.minor;
   grunt.vjsVersion = version;
-
-  licenseNoVtt = '/**\n'+
-  ' * @license\n'+
-  ' * Video.js '+version.full+' <http://videojs.com/>\n'+
-  ' * <%= pkg.copyright %>\n'+
-  ' * Available under Apache License Version 2.0\n'+
-  ' * <https://github.com/videojs/video.js/blob/master/LICENSE>\n'+
-  ' */\n';
-
-  license = licenseNoVtt.slice(0, -4) +
-  ' * \n'+
-  ' * Includes vtt.js <https://github.com/mozilla/vtt.js>\n'+
-  ' * Available under Apache License Version 2.0\n'+
-  ' * <https://github.com/mozilla/vtt.js/blob/master/LICENSE>\n'+
-  ' */\n';
-
-  // loading predefined source order from source-loader.js
-  // trust me, this is the easist way to do it so far
-  /*jshint undef:false, evil:true */
-  var blockSourceLoading = true;
-  var sourceFiles; // Needed to satisfy jshint
-  eval(grunt.file.read('./build/source-loader.js'));
-
-  grunt.sourceFiles = sourceFiles;
 
   // Project configuration.
   grunt.initConfig({
     pkg: pkg,
-    build: {
-      src: 'src/js/dependencies.js',
-      options: {
-        baseDir: 'src/js/'
-      }
-    },
     clean: {
-      build: ['build/files/*'],
+      build: ['build/temp/*'],
       dist: ['dist/*']
     },
     jshint: {
@@ -61,6 +30,8 @@ module.exports = function(grunt) {
     uglify: {
       options: {
         sourceMap: true,
+        sourceMapIn: 'build/temp/video.js.map',
+        sourceMapRoot: '../../src/js',
         preserveComments: 'some',
         mangle: true,
         compress: {
@@ -74,26 +45,15 @@ module.exports = function(grunt) {
           drop_console: true
         }
       },
-      source: {
+      build: {
         files: {
-          'build/files/minified.video.js': 'build/files/combined.video.js',
-          'build/files/minified.video.novtt.js': 'build/files/combined.video.novtt.js'
-        }
-      },
-      tests: {
-        files: {
-          'build/files/test.minified.video.js': ['build/files/combined.video.js', 'test/unit/*.js']
+          'build/temp/video.min.js': 'build/temp/video.js'
         }
       }
     },
     dist: {},
-    qunit: {
-      source: ['test/index.html'],
-      minified: ['test/minified.html'],
-      minified_api: ['test/minified-api.html']
-    },
     watch: {
-      files: [ 'src/**/*', 'test/unit/*.js', 'Gruntfile.js' ],
+      files: [ 'src/**/*', 'test/unit/**/*.js', 'Gruntfile.js' ],
       tasks: 'dev'
     },
     connect: {
@@ -107,14 +67,20 @@ module.exports = function(grunt) {
     copy: {
       minor: {
         files: [
-          {expand: true, cwd: 'build/files/', src: ['*'], dest: 'dist/'+version.majorMinor+'/', filter: 'isFile'} // includes files in path
+          {expand: true, cwd: 'build/temp/', src: ['*'], dest: 'dist/'+version.majorMinor+'/', filter: 'isFile'} // includes files in path
         ]
       },
       patch: {
         files: [
-          {expand: true, cwd: 'build/files/', src: ['*'], dest: 'dist/'+version.full+'/', filter: 'isFile'} // includes files in path
+          {expand: true, cwd: 'build/temp/', src: ['*'], dest: 'dist/'+version.full+'/', filter: 'isFile'} // includes files in path
         ]
-      }
+      },
+      fonts: { expand: true, cwd: 'src/css/font/', src: ['*'], dest: 'build/temp/font/', filter: 'isFile' },
+      swf: { src: './node_modules/videojs-swf/dist/video-js.swf', dest: './build/temp/video-js.swf' },
+      novtt: { src: './build/temp/video.js', dest: './build/temp/alt/video.novtt.js' },
+      dist: { expand: true, cwd: 'build/temp/', src: ['**/**'], dest: 'dist/', filter: 'isFile' },
+      examples: { expand: true, cwd: 'build/examples/', src: ['**/**'], dest: 'dist/examples/', filter: 'isFile' },
+      cdn: { expand: true, cwd: 'dist/', src: ['**/**'], dest: 'dist/cdn/', filter: 'isFile' },
     },
     aws_s3: {
       options: {
@@ -171,16 +137,16 @@ module.exports = function(grunt) {
     cssmin: {
       minify: {
         expand: true,
-        cwd: 'build/files/',
+        cwd: 'build/temp/',
         src: ['video-js.css'],
-        dest: 'build/files/',
+        dest: 'build/temp/',
         ext: '.min.css'
       }
     },
     less: {
       dev: {
         files: {
-          'build/files/video-js.css': 'src/css/video-js.less'
+          'build/temp/video-js.css': 'src/css/video-js.less'
         }
       }
     },
@@ -190,115 +156,30 @@ module.exports = function(grunt) {
         configFile: 'test/karma.conf.js'
       },
 
-      // this only runs on PRs from the mainrepo on saucelabs
-      saucelabs: {
-        browsers: ['chrome_sl']
-      },
-      chrome_sl: {
-        browsers: ['chrome_sl']
-      },
-      firefox_sl: {
-        browsers: ['firefox_sl']
-      },
-      safari_sl: {
-        browsers: ['safari_sl']
-      },
-      ipad_sl: {
-        browsers: ['ipad_sl']
-      },
-      android_sl: {
-        browsers: ['android_sl']
-      },
-      ie_sl: {
-        browsers: ['ie_sl']
-      },
-
       // these are run locally on local browsers
       dev: {
         browsers: ['Chrome', 'Firefox', 'Safari']
       },
-      chromecanary: {
-        browsers: ['ChromeCanary']
-      },
-      chrome: {
-        browsers: ['Chrome']
-      },
-      firefox: {
-        browsers: ['Firefox']
-      },
-      safari: {
-        browsers: ['Safari']
-      },
-      ie: {
-        browsers: ['IE']
-      },
-      phantomjs: {
-        browsers: ['PhantomJS']
-      },
+      chromecanary: { browsers: ['ChromeCanary'] },
+      chrome:       { browsers: ['Chrome'] },
+      firefox:      { browsers: ['Firefox'] },
+      safari:       { browsers: ['Safari'] },
+      ie:           { browsers: ['IE'] },
+      phantomjs:    { browsers: ['PhantomJS'] },
 
-      // This is all the minified tests run locally on local browsers
-      minified_dev: {
-        browsers: ['Chrome', 'Firefox', 'Safari'],
-        configFile: 'test/karma.minified.conf.js'
-      },
-      minified_chromecanary: {
-        browsers: ['ChromeCanary'],
-        configFile: 'test/karma.minified.conf.js'
-      },
-      minified_chrome: {
-        browsers: ['Chrome'],
-        configFile: 'test/karma.minified.conf.js'
-      },
-      minified_firefox: {
-        browsers: ['Firefox'],
-        configFile: 'test/karma.minified.conf.js'
-      },
-      minified_safari: {
-        browsers: ['Safari'],
-        configFile: 'test/karma.minified.conf.js'
-      },
-      minified_ie: {
-        browsers: ['IE'],
-        configFile: 'test/karma.minified.conf.js'
-      },
-      minified_phantomjs: {
-        browsers: ['PhantomJS'],
-        configFile: 'test/karma.minified.conf.js'
-      },
-
-      // This is all the minified api tests run locally on local browsers
-      minified_api_dev: {
-        browsers: ['Chrome', 'Firefox', 'Safari'],
-        configFile: 'test/karma.minified.api.conf.js'
-      },
-      minified_api_chromecanary: {
-        browsers: ['ChromeCanary'],
-        configFile: 'test/karma.minified.api.conf.js'
-      },
-      minified_api_chrome: {
-        browsers: ['Chrome'],
-        configFile: 'test/karma.minified.api.conf.js'
-      },
-      minified_api_firefox: {
-        browsers: ['Firefox'],
-        configFile: 'test/karma.minified.api.conf.js'
-      },
-      minified_api_safari: {
-        browsers: ['Safari'],
-        configFile: 'test/karma.minified.api.conf.js'
-      },
-      minified_api_ie: {
-        browsers: ['IE'],
-        configFile: 'test/karma.minified.api.conf.js'
-      },
-      minified_api_phantomjs: {
-        browsers: ['PhantomJS'],
-        configFile: 'test/karma.minified.api.conf.js'
-      }
+      // this only runs on PRs from the mainrepo on saucelabs
+      saucelabs:  { browsers: ['chrome_sl'] },
+      chrome_sl:  { browsers: ['chrome_sl'] },
+      firefox_sl: { browsers: ['firefox_sl'] },
+      safari_sl:  { browsers: ['safari_sl'] },
+      ipad_sl:    { browsers: ['ipad_sl'] },
+      android_sl: { browsers: ['android_sl'] },
+      ie_sl:      { browsers: ['ie_sl'] }
     },
     vjsdocs: {
       all: {
-        src: sourceFiles,
+        // TODO: Update vjsdocs to support new build, or switch to jsdoc
+        src: '',
         dest: 'docs/api',
         options: {
           baseURL: 'https://github.com/videojs/video.js/blob/master/'
@@ -308,7 +189,7 @@ module.exports = function(grunt) {
     vjslanguages: {
       defaults: {
         files: {
-          'build/files/lang': ['lang/*.json']
+          'build/temp/lang': ['lang/*.json']
         }
       }
     },
@@ -319,31 +200,8 @@ module.exports = function(grunt) {
           return path.relative('dist', filepath);
         },
         // compression: 'DEFLATE',
-        src: ['dist/video-js/**/*'],
+        src: ['dist/**/*'],
         dest: 'dist/video-js-' + version.full + '.zip'
-      }
-    },
-    usebanner: {
-      options: {
-        position: 'top',
-        banner: license,
-        linebreak: true
-      },
-      dist: {
-        options: {
-          banner: license
-        },
-        files: {
-          src: [ 'build/files/combined.video.js']
-        }
-      },
-      novtt: {
-        options: {
-          banner: licenseNoVtt
-        },
-        files: {
-          src: [ 'build/files/combined.video.novtt.js']
-        }
       }
     },
     version: {
@@ -367,6 +225,12 @@ module.exports = function(grunt) {
           release: 'patch'
         },
         src: ['package.json', 'bower.json', 'component.json']
+      },
+      css: {
+        options: {
+          prefix: '@version\\s*'
+        },
+        src: 'build/temp/video-js.css'
       }
     },
     'github-release': {
@@ -385,19 +249,66 @@ module.exports = function(grunt) {
       files: {
         src: ['dist/video-js-'+ version.full +'.zip'] // Files that you want to attach to Release
       }
+    },
+    browserify: {
+      build: {
+        files: {
+          'build/temp/video.js': ['src/js/video.js']
+        },
+        options: {
+          browserifyOptions: {
+            debug: true,
+            standalone: 'videojs'
+          },
+          banner: license,
+          transform: [
+            require('babelify').configure({
+              sourceMapRelative: './src/js'
+            }),
+            ['browserify-versionify', {
+              placeholder: '__VERSION__',
+              version: pkg.version
+            }],
+            ['browserify-versionify', {
+              placeholder: '__VERSION_NO_PATCH__',
+              version: version.majorMinor
+            }]
+          ]
+        }
+      }
+    },
+    exorcise: {
+      build: {
+        options: {},
+        files: {
+          'build/temp/video.js.map': ['build/temp/video.js'],
+        }
+      }
+    },
+    coveralls: {
+      all: {
+        src: 'test/coverage/lcov.info'
+      }
+    },
+    concat: {
+      vtt: {
+        options: {
+          separator: '\n',
+        },
+        src: ['build/temp/video.js', 'node_modules/vtt.js/dist/vtt.js'],
+        dest: 'build/temp/video.js',
+      },
     }
   });
 
   grunt.loadNpmTasks('grunt-videojs-languages');
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-qunit');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-less');
-  grunt.loadNpmTasks('contribflow');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('videojs-doc-generator');
   grunt.loadNpmTasks('grunt-zip');
@@ -408,19 +319,59 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-github-releaser');
   grunt.loadNpmTasks('grunt-aws-s3');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-browserify');
+  grunt.loadNpmTasks('grunt-coveralls');
+  grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-exorcise');
 
-  // grunt.loadTasks('./docs/tasks/');
-  // grunt.loadTasks('../videojs-doc-generator/tasks/');
+  grunt.registerTask('build', [
+    'clean:build',
+    'jshint',
+    'browserify',
+    'copy:novtt',
+    'concat:vtt',
+    'exorcise',
+    'uglify',
+    'less',
+    'version:css',
+    'cssmin',
+    'copy:fonts',
+    'copy:swf',
+    'vjslanguages'
+  ]);
 
-  grunt.registerTask('pretask', ['jshint', 'less', 'vjslanguages', 'build', 'usebanner', 'uglify']);
+  grunt.registerTask('dist', [
+    'clean:dist',
+    'build',
+    'copy:dist',
+    'copy:examples',
+    'zip:dist'
+  ]);
+
+  grunt.registerTask('cdn', [
+    'dist',
+    'copy:cdn',
+    'dist-cdn'
+  ]);
+
+  // Remove this and add to the test task once mmcc's coverall changes are merged
+  grunt.registerTask('newtest', ['build', 'karma:chrome']);
+
   // Default task.
-  grunt.registerTask('default', ['pretask', 'dist']);
-  // Development watch task
-  grunt.registerTask('dev', ['jshint', 'less', 'vjslanguages', 'build', 'usebanner', 'qunit:source']);
-  grunt.registerTask('test-qunit', ['pretask', 'qunit']);
+  grunt.registerTask('default', ['build', 'test']);
 
-  grunt.registerTask('dist', 'Creating distribution', ['dist-copy', 'zip:dist']);
+  // Development watch task. Doing the minimum required.
+  grunt.registerTask('dev', ['jshint', 'less', 'browserify', 'karma:chrome']);
+
+  // Tests.
+  // We want to run things a little differently if it's coming from Travis vs local
+  if (process.env.TRAVIS) {
+    grunt.registerTask('test', ['build', 'test-travis', 'coveralls']);
+  } else {
+    grunt.registerTask('test', ['build', 'test-local']);
+  }
 
   // Load all the tasks in the tasks directory
-  grunt.loadTasks('tasks');
+  grunt.loadTasks('build/tasks');
 };

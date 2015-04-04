@@ -1,14 +1,16 @@
 var noop = function() {}, clock, oldTextTracks;
 
-module('Media Tech', {
+import MediaTechController from '../../src/js/media/media.js';
+
+q.module('Media Tech', {
   'setup': function() {
     this.noop = function() {};
     this.clock = sinon.useFakeTimers();
-    this.featuresProgessEvents = videojs.MediaTechController.prototype['featuresProgessEvents'];
-    videojs.MediaTechController.prototype['featuresProgressEvents'] = false;
-    videojs.MediaTechController.prototype['featuresNativeTextTracks'] = true;
-    oldTextTracks = videojs.MediaTechController.prototype.textTracks;
-    videojs.MediaTechController.prototype.textTracks = function() {
+    this.featuresProgessEvents = MediaTechController.prototype['featuresProgessEvents'];
+    MediaTechController.prototype['featuresProgressEvents'] = false;
+    MediaTechController.prototype['featuresNativeTextTracks'] = true;
+    oldTextTracks = MediaTechController.prototype.textTracks;
+    MediaTechController.prototype.textTracks = function() {
       return {
         addEventListener: Function.prototype,
         removeEventListener: Function.prototype
@@ -17,15 +19,15 @@ module('Media Tech', {
   },
   'teardown': function() {
     this.clock.restore();
-    videojs.MediaTechController.prototype['featuresProgessEvents'] = this.featuresProgessEvents;
-    videojs.MediaTechController.prototype['featuresNativeTextTracks'] = false;
-    videojs.MediaTechController.prototype.textTracks = oldTextTracks;
+    MediaTechController.prototype['featuresProgessEvents'] = this.featuresProgessEvents;
+    MediaTechController.prototype['featuresNativeTextTracks'] = false;
+    MediaTechController.prototype.textTracks = oldTextTracks;
   }
 });
 
 test('should synthesize timeupdate events by default', function() {
   var timeupdates = 0, playHandler, i, tech;
-  tech = new videojs.MediaTechController({
+  tech = new MediaTechController({
     id: this.noop,
     on: function(event, handler) {
       if (event === 'play') {
@@ -49,7 +51,7 @@ test('should synthesize timeupdate events by default', function() {
 
 test('stops timeupdates if the tech produces them natively', function() {
   var timeupdates = 0, tech, playHandler, expected;
-  tech = new videojs.MediaTechController({
+  tech = new MediaTechController({
     id: this.noop,
     off: this.noop,
     on: function(event, handler) {
@@ -76,7 +78,7 @@ test('stops timeupdates if the tech produces them natively', function() {
 
 test('stops manual timeupdates while paused', function() {
   var timeupdates = 0, tech, playHandler, pauseHandler, expected;
-  tech = new videojs.MediaTechController({
+  tech = new MediaTechController({
     id: this.noop,
     on: function(event, handler) {
       if (event === 'play') {
@@ -108,7 +110,7 @@ test('stops manual timeupdates while paused', function() {
 
 test('should synthesize progress events by default', function() {
   var progresses = 0, tech;
-  tech = new videojs.MediaTechController({
+  tech = new MediaTechController({
     id: this.noop,
     on: this.noop,
     bufferedPercent: function() {
@@ -129,7 +131,7 @@ test('should synthesize progress events by default', function() {
 });
 
 test('dispose() should stop time tracking', function() {
-  var tech = new videojs.MediaTechController({
+  var tech = new MediaTechController({
     id: this.noop,
     on: this.noop,
     off: this.noop,
@@ -156,10 +158,10 @@ test('should add the source hanlder interface to a tech', function(){
   var sourceB = { src: 'no-support', type: 'no-support' };
 
   // Define a new tech class
-  var Tech = videojs.MediaTechController.extend();
+  var Tech = MediaTechController.extend();
 
   // Extend Tech with source handlers
-  vjs.MediaTechController.withSourceHandlers(Tech);
+  MediaTechController.withSourceHandlers(Tech);
 
   // Check for the expected class methods
   ok(Tech.registerSourceHandler, 'added a registerSourceHandler function to the Tech');
@@ -237,9 +239,9 @@ test('should handle unsupported sources with the source hanlder API', function()
   };
 
   // Define a new tech class
-  var Tech = videojs.MediaTechController.extend();
+  var Tech = MediaTechController.extend();
   // Extend Tech with source handlers
-  vjs.MediaTechController.withSourceHandlers(Tech);
+  MediaTechController.withSourceHandlers(Tech);
   // Create an instance of Tech
   var tech = new Tech(mockPlayer);
 
