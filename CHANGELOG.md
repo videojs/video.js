@@ -8,6 +8,7 @@ CHANGELOG
 * @heff replaced Closure Compiler with Uglify for minification ([view](https://github.com/videojs/video.js/pull/1940))
 * @OleLaursen added a Danish translation ([view](https://github.com/videojs/video.js/pull/1899))
 * @dn5 Added new translations (Bosnian, Serbian, Croatian) ([view](https://github.com/videojs/video.js/pull/1897))
+* @mmcc (and others) converted the whole project to use ES6, Babel and Browserify ([view](https://github.com/videojs/video.js/pull/1976))
 
 --------------------
 
