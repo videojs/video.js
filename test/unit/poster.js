@@ -1,4 +1,4 @@
-import PosterImage from '../../src/js/poster.js';
+import PosterImage from '../../src/js/poster-image.js';
 import * as Lib from '../../src/js/lib.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';

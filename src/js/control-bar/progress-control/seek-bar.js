@@ -1,0 +1,93 @@
+import Slider from '../../slider/slider.js';
+import LoadProgressBar from './load-progress-bar.js';
+import PlayProgressBar from './play-progress-bar.js';
+import SeekHandle from './seek-handle.js';
+import * as Lib from '../../lib.js';
+
+/**
+ * Seek Bar and holder for the progress bars
+ *
+ * @param {vjs.Player|Object} player
+ * @param {Object=} options
+ * @constructor
+ */
+class SeekBar extends Slider {
+
+  constructor(player, options){
+    super(player, options);
+    this.on(player, 'timeupdate', this.updateARIAAttributes);
+    player.ready(Lib.bind(this, this.updateARIAAttributes));
+  }
+
+  createEl() {
+    return Slider.prototype.createEl.call(this, 'div', {
+      className: 'vjs-progress-holder',
+      'aria-label': 'video progress bar'
+    });
+  }
+
+  updateARIAAttributes() {
+      // Allows for smooth scrubbing, when player can't keep up.
+      let time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
+      this.el_.setAttribute('aria-valuenow', Lib.round(this.getPercent()*100, 2)); // machine readable value of progress bar (percentage complete)
+      this.el_.setAttribute('aria-valuetext', Lib.formatTime(time, this.player_.duration())); // human readable value of progress bar (time complete)
+  }
+
+  getPercent() {
+    return this.player_.currentTime() / this.player_.duration();
+  }
+
+  onMouseDown(event) {
+    super.onMouseDown(event);
+
+    this.player_.scrubbing = true;
+    this.player_.addClass('vjs-scrubbing');
+
+    this.videoWasPlaying = !this.player_.paused();
+    this.player_.pause();
+  }
+
+  onMouseMove(event) {
+    let newTime = this.calculateDistance(event) * this.player_.duration();
+
+    // Don't let video end while scrubbing.
+    if (newTime == this.player_.duration()) { newTime = newTime - 0.1; }
+
+    // Set new time (tell player to seek to new time)
+    this.player_.currentTime(newTime);
+  }
+
+  onMouseUp(event) {
+    super.onMouseUp(event);
+
+    this.player_.scrubbing = false;
+    this.player_.removeClass('vjs-scrubbing');
+    if (this.videoWasPlaying) {
+      this.player_.play();
+    }
+  }
+
+  stepForward() {
+    this.player_.currentTime(this.player_.currentTime() + 5); // more quickly fast forward for keyboard-only users
+  }
+
+  stepBack() {
+    this.player_.currentTime(this.player_.currentTime() - 5); // more quickly rewind for keyboard-only users
+  }
+
+}
+
+SeekBar.prototype.options_ = {
+  children: {
+    'loadProgressBar': {},
+    'playProgressBar': {},
+    'seekHandle': {}
+  },
+  'barName': 'playProgressBar',
+  'handleName': 'seekHandle'
+};
+
+SeekBar.prototype.playerEvent = 'timeupdate';
+
+Slider.registerComponent('SeekBar', SeekBar);
+export default SeekBar;

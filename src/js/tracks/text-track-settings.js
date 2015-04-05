@@ -3,9 +3,10 @@ import * as Lib from '../lib';
 import * as Events from '../events';
 import window from 'global/window';
 
-let TextTrackSettings = Component.extend({
-  init: function(player, options) {
-    Component.call(this, player, options);
+class TextTrackSettings extends Component {
+
+  constructor(player, options) {
+    super(player, options);
     this.hide();
 
     Events.on(this.el().querySelector('.vjs-done-button'), 'click', Lib.bind(this, function() {
@@ -40,102 +41,103 @@ let TextTrackSettings = Component.extend({
       this.restoreSettings();
     }
   }
-});
+
+  createEl() {
+    return super.createEl('div', {
+      className: 'vjs-caption-settings vjs-modal-overlay',
+      innerHTML: captionOptionsMenuTemplate()
+    });
+  }
+
+  getValues() {
+    const el = this.el();
+
+    const textEdge = getSelectedOptionValue(el.querySelector('.vjs-edge-style select'));
+    const fontFamily = getSelectedOptionValue(el.querySelector('.vjs-font-family select'));
+    const fgColor = getSelectedOptionValue(el.querySelector('.vjs-fg-color > select'));
+    const textOpacity = getSelectedOptionValue(el.querySelector('.vjs-text-opacity > select'));
+    const bgColor = getSelectedOptionValue(el.querySelector('.vjs-bg-color > select'));
+    const bgOpacity = getSelectedOptionValue(el.querySelector('.vjs-bg-opacity > select'));
+    const windowColor = getSelectedOptionValue(el.querySelector('.window-color > select'));
+    const windowOpacity = getSelectedOptionValue(el.querySelector('.vjs-window-opacity > select'));
+    const fontPercent = window['parseFloat'](getSelectedOptionValue(el.querySelector('.vjs-font-percent > select')));
+
+    let result = {
+      'backgroundOpacity': bgOpacity,
+      'textOpacity': textOpacity,
+      'windowOpacity': windowOpacity,
+      'edgeStyle': textEdge,
+      'fontFamily': fontFamily,
+      'color': fgColor,
+      'backgroundColor': bgColor,
+      'windowColor': windowColor,
+      'fontPercent': fontPercent
+    };
+    for (let name in result) {
+      if (result[name] === '' || result[name] === 'none' || (name === 'fontPercent' && result[name] === 1.00)) {
+        delete result[name];
+      }
+    }
+    return result;
+  }
+
+  setValues(values) {
+    const el = this.el();
+
+    setSelectedOption(el.querySelector('.vjs-edge-style select'), values.edgeStyle);
+    setSelectedOption(el.querySelector('.vjs-font-family select'), values.fontFamily);
+    setSelectedOption(el.querySelector('.vjs-fg-color > select'), values.color);
+    setSelectedOption(el.querySelector('.vjs-text-opacity > select'), values.textOpacity);
+    setSelectedOption(el.querySelector('.vjs-bg-color > select'), values.backgroundColor);
+    setSelectedOption(el.querySelector('.vjs-bg-opacity > select'), values.backgroundOpacity);
+    setSelectedOption(el.querySelector('.window-color > select'), values.windowColor);
+    setSelectedOption(el.querySelector('.vjs-window-opacity > select'), values.windowOpacity);
+
+    let fontPercent = values.fontPercent;
+
+    if (fontPercent) {
+      fontPercent = fontPercent.toFixed(2);
+    }
+
+    setSelectedOption(el.querySelector('.vjs-font-percent > select'), fontPercent);
+  }
+
+  restoreSettings() {
+    let values;
+    try {
+      values = JSON.parse(window.localStorage.getItem('vjs-text-track-settings'));
+    } catch (e) {}
+
+    if (values) {
+      this.setValues(values);
+    }
+  }
+
+  saveSettings() {
+    if (!this.player_.options()['persistTextTrackSettings']) {
+      return;
+    }
+
+    let values = this.getValues();
+    try {
+      if (!Lib.isEmpty(values)) {
+        window.localStorage.setItem('vjs-text-track-settings', JSON.stringify(values));
+      } else {
+        window.localStorage.removeItem('vjs-text-track-settings');
+      }
+    } catch (e) {}
+  }
+
+  updateDisplay() {
+    let ttDisplay = this.player_.getChild('textTrackDisplay');
+    if (ttDisplay) {
+      ttDisplay.updateDisplay();
+    }
+  }
+
+}
 
 Component.registerComponent('TextTrackSettings', TextTrackSettings);
-
-TextTrackSettings.prototype.createEl = function() {
-  return Component.prototype.createEl.call(this, 'div', {
-    className: 'vjs-caption-settings vjs-modal-overlay',
-    innerHTML: captionOptionsMenuTemplate()
-  });
-};
-
-TextTrackSettings.prototype.getValues = function() {
-  const el = this.el();
-
-  const textEdge = getSelectedOptionValue(el.querySelector('.vjs-edge-style select'));
-  const fontFamily = getSelectedOptionValue(el.querySelector('.vjs-font-family select'));
-  const fgColor = getSelectedOptionValue(el.querySelector('.vjs-fg-color > select'));
-  const textOpacity = getSelectedOptionValue(el.querySelector('.vjs-text-opacity > select'));
-  const bgColor = getSelectedOptionValue(el.querySelector('.vjs-bg-color > select'));
-  const bgOpacity = getSelectedOptionValue(el.querySelector('.vjs-bg-opacity > select'));
-  const windowColor = getSelectedOptionValue(el.querySelector('.window-color > select'));
-  const windowOpacity = getSelectedOptionValue(el.querySelector('.vjs-window-opacity > select'));
-  const fontPercent = window['parseFloat'](getSelectedOptionValue(el.querySelector('.vjs-font-percent > select')));
-
-  let result = {
-    'backgroundOpacity': bgOpacity,
-    'textOpacity': textOpacity,
-    'windowOpacity': windowOpacity,
-    'edgeStyle': textEdge,
-    'fontFamily': fontFamily,
-    'color': fgColor,
-    'backgroundColor': bgColor,
-    'windowColor': windowColor,
-    'fontPercent': fontPercent
-  };
-  for (let name in result) {
-    if (result[name] === '' || result[name] === 'none' || (name === 'fontPercent' && result[name] === 1.00)) {
-      delete result[name];
-    }
-  }
-  return result;
-};
-
-TextTrackSettings.prototype.setValues = function(values) {
-  const el = this.el();
-
-  setSelectedOption(el.querySelector('.vjs-edge-style select'), values.edgeStyle);
-  setSelectedOption(el.querySelector('.vjs-font-family select'), values.fontFamily);
-  setSelectedOption(el.querySelector('.vjs-fg-color > select'), values.color);
-  setSelectedOption(el.querySelector('.vjs-text-opacity > select'), values.textOpacity);
-  setSelectedOption(el.querySelector('.vjs-bg-color > select'), values.backgroundColor);
-  setSelectedOption(el.querySelector('.vjs-bg-opacity > select'), values.backgroundOpacity);
-  setSelectedOption(el.querySelector('.window-color > select'), values.windowColor);
-  setSelectedOption(el.querySelector('.vjs-window-opacity > select'), values.windowOpacity);
-
-  let fontPercent = values.fontPercent;
-
-  if (fontPercent) {
-    fontPercent = fontPercent.toFixed(2);
-  }
-
-  setSelectedOption(el.querySelector('.vjs-font-percent > select'), fontPercent);
-};
-
-TextTrackSettings.prototype.restoreSettings = function() {
-  let values;
-  try {
-    values = JSON.parse(window.localStorage.getItem('vjs-text-track-settings'));
-  } catch (e) {}
-
-  if (values) {
-    this.setValues(values);
-  }
-};
-
-TextTrackSettings.prototype.saveSettings = function() {
-  if (!this.player_.options()['persistTextTrackSettings']) {
-    return;
-  }
-
-  let values = this.getValues();
-  try {
-    if (!Lib.isEmpty(values)) {
-      window.localStorage.setItem('vjs-text-track-settings', JSON.stringify(values));
-    } else {
-      window.localStorage.removeItem('vjs-text-track-settings');
-    }
-  } catch (e) {}
-};
-
-TextTrackSettings.prototype.updateDisplay = function() {
-  let ttDisplay = this.player_.getChild('textTrackDisplay');
-  if (ttDisplay) {
-    ttDisplay.updateDisplay();
-  }
-};
 
 function getSelectedOptionValue(target) {
   let selectedOption;

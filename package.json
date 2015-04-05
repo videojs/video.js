@@ -27,7 +27,7 @@
     "global": "^4.3.0"
   },
   "devDependencies": {
-    "babelify": "^5.0.4",
+    "babelify": "^6.0.1",
     "blanket": "^1.1.6",
     "browserify-istanbul": "^0.2.1",
     "browserify-versionify": "^1.0.4",

@@ -1,6 +1,6 @@
 var player, tech, el;
 
-import Html5 from '../../src/js/media/html5.js';
+import Html5 from '../../src/js/tech/html5.js';
 import * as Lib from '../../src/js/lib.js';
 import document from 'global/document';
 

@@ -1,10 +1,11 @@
-import { CaptionsButton } from '../../../src/js/tracks/text-track-controls.js';
-import { SubtitlesButton } from '../../../src/js/tracks/text-track-controls.js';
-import { ChaptersButton } from '../../../src/js/tracks/text-track-controls.js';
-import { TextTrackDisplay } from '../../../src/js/tracks/text-track-controls.js';
-import Html5 from '../../../src/js/media/html5.js';
-import Flash from '../../../src/js/media/flash.js';
-import MediaTechController from '../../../src/js/media/media.js';
+import ChaptersButton from '../../../src/js/control-bar/text-track-controls/chapters-button.js';
+import SubtitlesButton from '../../../src/js/control-bar/text-track-controls/subtitles-button.js';
+import CaptionsButton from '../../../src/js/control-bar/text-track-controls/captions-button.js';
+
+import TextTrackDisplay from '../../../src/js/tracks/text-track-display.js';
+import Html5 from '../../../src/js/tech/html5.js';
+import Flash from '../../../src/js/tech/flash.js';
+import Tech from '../../../src/js/tech/tech.js';
 import Component from '../../../src/js/component.js';
 
 import * as Lib from '../../../src/js/lib.js';
@@ -155,9 +156,9 @@ test('update texttrack buttons on removetrack or addtrack', function() {
     oldChaptersUpdate.call(this);
   };
 
-  MediaTechController.prototype['featuresNativeTextTracks'] = true;
-  oldTextTracks = MediaTechController.prototype.textTracks;
-  MediaTechController.prototype.textTracks = function() {
+  Tech.prototype['featuresNativeTextTracks'] = true;
+  oldTextTracks = Tech.prototype.textTracks;
+  Tech.prototype.textTracks = function() {
     return {
       length: 0,
       addEventListener: function(type, handler) {
@@ -201,8 +202,8 @@ test('update texttrack buttons on removetrack or addtrack', function() {
 
   equal(update, 9, 'update was called on the three buttons for remove track');
 
-  MediaTechController.prototype.textTracks = oldTextTracks;
-  MediaTechController.prototype['featuresNativeTextTracks'] = false;
+  Tech.prototype.textTracks = oldTextTracks;
+  Tech.prototype['featuresNativeTextTracks'] = false;
   CaptionsButton.prototype.update = oldCaptionsUpdate;
   SubtitlesButton.prototype.update = oldSubsUpdate;
   ChaptersButton.prototype.update = oldChaptersUpdate;

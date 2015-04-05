@@ -442,7 +442,8 @@ test('should change the width and height of a component', function(){
 
 
 test('should use a defined content el for appending children', function(){
-  var CompWithContent = Component.extend();
+  class CompWithContent extends Component {}
+
   CompWithContent.prototype.createEl = function(){
     // Create the main componenent element
     var el = Lib.createEl('div');

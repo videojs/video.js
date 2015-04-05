@@ -1,4 +1,4 @@
-import { TextTrackMenuItem } from '../../../src/js/tracks/text-track-controls';
+import TextTrackMenuItem from '../../../src/js/control-bar/text-track-controls/text-track-menu-item.js';
 import TestHelpers from '../test-helpers.js';
 import * as Lib from '../../../src/js/lib.js';
 

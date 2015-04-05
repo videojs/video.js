@@ -1,16 +1,16 @@
 // Fake a media playback tech controller so that player tests
 // can run without HTML5 or Flash, of which PhantomJS supports neither.
 
-import MediaTechController from '../../src/js/media/media.js';
+import Tech from '../../src/js/tech/tech.js';
 import * as Lib from '../../src/js/lib.js';
 import Component from '../../src/js/component.js';
 
 /**
  * @constructor
  */
-var MediaFaker = MediaTechController.extend({
+var MediaFaker = Tech.extend({
   init: function(player, options, onReady){
-    MediaTechController.call(this, player, options, onReady);
+    Tech.call(this, player, options, onReady);
 
     this.triggerReady();
   }
@@ -21,7 +21,7 @@ MediaFaker.isSupported = function(){ return true; };
 MediaFaker.canPlaySource = function(srcObj){ return srcObj.type !== 'video/unsupported-format'; };
 
 MediaFaker.prototype.createEl = function(){
-  var el = MediaTechController.prototype.createEl.call(this, 'div', {
+  var el = Tech.prototype.createEl.call(this, 'div', {
     className: 'vjs-tech'
   });
   if (this.player().poster()) {

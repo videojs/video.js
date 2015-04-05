@@ -7,32 +7,32 @@ import * as Lib from './lib';
  * @param {Object=} options
  * @constructor
  */
-let ErrorDisplay = Component.extend({
-  init: function(player, options){
-    Component.call(this, player, options);
+class ErrorDisplay extends Component {
+
+  constructor(player, options) {
+    super(player, options);
 
     this.update();
     this.on(player, 'error', this.update);
   }
-});
+
+  createEl() {
+    var el = super.createEl('div', {
+      className: 'vjs-error-display'
+    });
+
+    this.contentEl_ = Lib.createEl('div');
+    el.appendChild(this.contentEl_);
+
+    return el;
+  }
+
+  update() {
+    if (this.player().error()) {
+      this.contentEl_.innerHTML = this.localize(this.player().error().message);
+    }
+  }
+}
 
 Component.registerComponent('ErrorDisplay', ErrorDisplay);
-
-ErrorDisplay.prototype.createEl = function(){
-  var el = Component.prototype.createEl.call(this, 'div', {
-    className: 'vjs-error-display'
-  });
-
-  this.contentEl_ = Lib.createEl('div');
-  el.appendChild(this.contentEl_);
-
-  return el;
-};
-
-ErrorDisplay.prototype.update = function(){
-  if (this.player().error()) {
-    this.contentEl_.innerHTML = this.localize(this.player().error().message);
-  }
-};
-
 export default ErrorDisplay;

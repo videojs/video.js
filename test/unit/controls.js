@@ -1,7 +1,7 @@
-import VolumeControl from '../../src/js/control-bar/volume-control.js';
+import VolumeControl from '../../src/js/control-bar/volume-control/volume-control.js';
 import MuteToggle from '../../src/js/control-bar/mute-toggle.js';
-import PlaybackRateMenuButton from '../../src/js/control-bar/playback-rate-menu-button.js';
-import Slider from '../../src/js/slider.js';
+import PlaybackRateMenuButton from '../../src/js/control-bar/playback-rate-menu/playback-rate-menu-button.js';
+import Slider from '../../src/js/slider/slider.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
 

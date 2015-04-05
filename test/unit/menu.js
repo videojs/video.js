@@ -1,4 +1,4 @@
-import { MenuButton } from '../../src/js/menu.js';
+import MenuButton from '../../src/js/menu/menu-button.js';
 import TestHelpers from './test-helpers.js';
 
 q.module('MenuButton');
