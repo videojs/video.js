@@ -55,6 +55,7 @@ CHANGELOG
 * @mmcc added the vjs-big-play-centered class ([view](https://github.com/videojs/video.js/pull/2293))
 * @thijstriemstra added a logged error when a plugin is missing ([view](https://github.com/videojs/video.js/pull/1931))
 * @gkatsev fixed the texttrackchange event and text track display for non-native tracks ([view](https://github.com/videojs/video.js/pull/2215))
+* @mischizzle fixed event.relatedTarget in Firefox ([view](https://github.com/videojs/video.js/pull/2025))
 
 --------------------
 
