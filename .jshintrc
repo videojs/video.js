@@ -16,13 +16,11 @@
         "_V_",
         "goog",
         "console",
-
         "require",
         "define",
         "module",
         "exports",
         "process",
-
         "q",
         "asyncTest",
         "deepEqual",
@@ -39,6 +37,7 @@
         "stop",
         "strictEqual",
         "test",
-        "sinon"
+        "sinon",
+        "MouseEvent"
     ]
 }

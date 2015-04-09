@@ -25,6 +25,23 @@ var TestHelpers = {
     return player = new Player(videoTag, playerOptions);
   },
 
+  makeMouseEvent: function(type, relatedTarget){
+    var event;
+
+    if(MouseEvent) {
+      return new MouseEvent(type, {relatedTarget: relatedTarget || null});
+    }
+
+    event = document.createEvent('MouseEvents');
+
+    if(event.initMouseEvent) {
+      event.initMouseEvent(type, true, true, window, 0, 0, 0, 80, 20, false, false, false, false, 0, relatedTarget || null);
+    } else {
+      event.initEvent(type, true, false);
+    }
+    return event;
+  },
+
   getComputedStyle: function(el, rule){
     var val;
 
