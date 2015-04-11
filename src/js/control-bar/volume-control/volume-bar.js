@@ -21,7 +21,7 @@ class VolumeBar extends Slider {
   }
 
   createEl() {
-    return Slider.prototype.createEl.call(this, 'div', {
+    return super.createEl('div', {
       className: 'vjs-volume-bar',
       'aria-label': 'volume level'
     });

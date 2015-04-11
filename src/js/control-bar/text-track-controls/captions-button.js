@@ -15,7 +15,7 @@ class CaptionsButton extends TextTrackButton {
 
   update() {
     let threshold = 2;
-    TextTrackButton.prototype.update.call(this);
+    super.update();
 
     // if native, then threshold is 1 because no settings button
     if (this.player().tech && this.player().tech['featuresNativeTextTracks']) {

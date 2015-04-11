@@ -8,51 +8,50 @@ import Component from '../../src/js/component.js';
 /**
  * @constructor
  */
-var MediaFaker = Tech.extend({
-  init: function(player, options, onReady){
-    Tech.call(this, player, options, onReady);
+class MediaFaker extends Tech {
 
+  constructor(player, options, onReady){
+    super(player, options, onReady);
     this.triggerReady();
   }
-});
 
-// Support everything except for "video/unsupported-format"
-MediaFaker.isSupported = function(){ return true; };
-MediaFaker.canPlaySource = function(srcObj){ return srcObj.type !== 'video/unsupported-format'; };
+  createEl() {
+    var el = super.createEl('div', {
+      className: 'vjs-tech'
+    });
 
-MediaFaker.prototype.createEl = function(){
-  var el = Tech.prototype.createEl.call(this, 'div', {
-    className: 'vjs-tech'
-  });
-  if (this.player().poster()) {
-    // transfer the poster image to mimic HTML
-    el.poster = this.player().poster();
+    if (this.player().poster()) {
+      // transfer the poster image to mimic HTML
+      el.poster = this.player().poster();
+    }
+
+    Lib.insertFirst(el, this.player_.el());
+
+    return el;
   }
 
-  Lib.insertFirst(el, this.player_.el());
+  // fake a poster attribute to mimic the video element
+  poster() { return this.el().poster; }
+  setPoster(val) { this.el().poster = val; }
 
-  return el;
-};
+  currentTime() { return 0; }
+  seeking() { return false; }
+  src() { return 'movie.mp4'; }
+  volume() { return 0; }
+  muted() { return false; }
+  pause() { return false; }
+  paused() { return true; }
+  play() { this.player().trigger('play'); }
+  supportsFullScreen() { return false; }
+  buffered() { return {}; }
+  duration() { return {}; }
+  networkState() { return 0; }
+  readyState() { return 0; }
 
-// fake a poster attribute to mimic the video element
-MediaFaker.prototype.poster = function(){ return this.el().poster; };
-MediaFaker.prototype['setPoster'] = function(val){ this.el().poster = val; };
-
-MediaFaker.prototype.currentTime = function(){ return 0; };
-MediaFaker.prototype.seeking = function(){ return false; };
-MediaFaker.prototype.src = function(){ return 'movie.mp4'; };
-MediaFaker.prototype.volume = function(){ return 0; };
-MediaFaker.prototype.muted = function(){ return false; };
-MediaFaker.prototype.pause = function(){ return false; };
-MediaFaker.prototype.paused = function(){ return true; };
-MediaFaker.prototype.play = function() {
-  this.player().trigger('play');
-};
-MediaFaker.prototype.supportsFullScreen = function(){ return false; };
-MediaFaker.prototype.buffered = function(){ return {}; };
-MediaFaker.prototype.duration = function(){ return {}; };
-MediaFaker.prototype.networkState = function(){ return 0; };
-MediaFaker.prototype.readyState = function(){ return 0; };
+  // Support everything except for "video/unsupported-format"
+  static isSupported() { return true; }
+  static canPlaySource(srcObj) { return srcObj.type !== 'video/unsupported-format'; }
+}
 
 Component.registerComponent('MediaFaker', MediaFaker);
 module.exports = MediaFaker;

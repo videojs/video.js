@@ -16,7 +16,7 @@ class RemainingTimeDisplay extends Component {
   }
 
   createEl() {
-    let el = Component.prototype.createEl.call(this, 'div', {
+    let el = super.createEl('div', {
       className: 'vjs-remaining-time vjs-time-controls vjs-control'
     });
 

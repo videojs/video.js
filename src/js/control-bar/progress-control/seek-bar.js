@@ -20,7 +20,7 @@ class SeekBar extends Slider {
   }
 
   createEl() {
-    return Slider.prototype.createEl.call(this, 'div', {
+    return super.createEl('div', {
       className: 'vjs-progress-holder',
       'aria-label': 'video progress bar'
     });

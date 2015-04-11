@@ -3,7 +3,6 @@
  *
  */
 
-// import CoreObject from './core-object.js';
 import * as Lib from './lib.js';
 import * as VjsUtil from './util.js';
 import * as Events from './events.js';
@@ -67,8 +66,8 @@ class Component {
     this.name_ = options['name'] || null;
 
     // Create element if one wasn't provided in options
-    if (options['el']) {
-      this.el_ = options['el'];
+    if (options.el) {
+      this.el_ = options.el;
     } else if (options.createEl !== false) {
       this.el_ = this.createEl();
     }
@@ -306,7 +305,9 @@ class Component {
    * @suppress {accessControls|checkRegExp|checkTypes|checkVars|const|constantProperty|deprecated|duplicate|es5Strict|fileoverviewTags|globalThis|invalidCasts|missingProperties|nonStandardJsDocs|strictModuleDepCheck|undefinedNames|undefinedVars|unknownDefines|uselessCode|visibility}
    */
   addChild(child, options){
-    let component, componentName;
+    let component;
+    let componentName;
+
     // If child is a string, create nt with options
     if (typeof child === 'string') {
       let componentName = child;
@@ -352,8 +353,8 @@ class Component {
 
     // Add the UI object's element to the container div (box)
     // Having an element is not required
-    if (typeof component['el'] === 'function' && component['el']()) {
-      this.contentEl().appendChild(component['el']());
+    if (typeof component.el === 'function' && component.el()) {
+      this.contentEl().appendChild(component.el());
     }
 
     // Return so it can stored on parent object if desired.
@@ -373,7 +374,7 @@ class Component {
 
     if (!component || !this.children_) return;
 
-    var childFound = false;
+    let childFound = false;
     for (var i = this.children_.length - 1; i >= 0; i--) {
       if (this.children_[i] === component) {
         childFound = true;
@@ -427,14 +428,13 @@ class Component {
    *     });
    *
    */
-  initChildren(){
-    let parent = this;
-    let parentOptions = parent.options();
-    let children = parentOptions['children'];
+  initChildren() {
+    let children = this.options_.children;
 
-    let handleAdd;
     if (children) {
-      handleAdd = function(name, opts){
+      let parent = this;
+      let parentOptions = parent.options();
+      let handleAdd = function(name, opts){
         // Allow options for children to be set at the parent options
         // e.g. videojs(id, { controlBar: false });
         // instead of videojs(id, { children: { controlBar: false });
@@ -686,9 +686,7 @@ class Component {
       if (this.isReady_) {
         fn.call(this);
       } else {
-        if (this.readyQueue_ === undefined) {
-          this.readyQueue_ = [];
-        }
+        this.readyQueue_ = this.readyQueue_ || [];
         this.readyQueue_.push(fn);
       }
     }

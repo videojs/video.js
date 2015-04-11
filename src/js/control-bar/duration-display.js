@@ -21,7 +21,7 @@ class DurationDisplay extends Component {
   }
 
   createEl() {
-    let el = Component.prototype.createEl.call(this, 'div', {
+    let el = super.createEl('div', {
       className: 'vjs-duration vjs-time-controls vjs-control'
     });
 

@@ -88,7 +88,7 @@ class Html5 extends Tech {
 
   dispose() {
     Html5.disposeMediaElement(this.el_);
-    Tech.prototype.dispose.call(this);
+    super.dispose();
   }
 
   createEl() {
@@ -349,14 +349,14 @@ class Html5 extends Tech {
 
   textTracks() {
     if (!this['featuresNativeTextTracks']) {
-      return Tech.prototype.textTracks.call(this);
+      return super.textTracks();
     }
 
     return this.el_.textTracks;
   }
   addTextTrack(kind, label, language) {
     if (!this['featuresNativeTextTracks']) {
-      return Tech.prototype.addTextTrack.call(this, kind, label, language);
+      return super.addTextTrack(kind, label, language);
     }
 
     return this.el_.addTextTrack(kind, label, language);
@@ -364,7 +364,7 @@ class Html5 extends Tech {
 
   addRemoteTextTrack(options) {
     if (!this['featuresNativeTextTracks']) {
-      return Tech.prototype.addRemoteTextTrack.call(this, options);
+      return super.addRemoteTextTrack(options);
     }
 
     var track = document.createElement('track');
@@ -416,7 +416,7 @@ class Html5 extends Tech {
 
   removeRemoteTextTrack(track) {
     if (!this['featuresNativeTextTracks']) {
-      return Tech.prototype.removeRemoteTextTrack.call(this, track);
+      return super.removeRemoteTextTrack(track);
     }
 
     var tracks, i;

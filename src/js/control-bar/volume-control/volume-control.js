@@ -30,7 +30,7 @@ class VolumeControl extends Component {
   }
 
   createEl() {
-    return Component.prototype.createEl.call(this, 'div', {
+    return super.createEl('div', {
       className: 'vjs-volume-control vjs-control'
     });
   }

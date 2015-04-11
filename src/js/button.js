@@ -14,7 +14,7 @@ import document from 'global/document';
  */
 class Button extends Component {
 
-  constructor(player, options){
+  constructor(player, options) {
     super(player, options);
 
     this.emitTapEvents();
@@ -34,7 +34,7 @@ class Button extends Component {
       tabIndex: 0
     }, props);
 
-    let el = Component.prototype.createEl.call(this, type, props);
+    let el = super.createEl(type, props);
 
     // if innerHTML hasn't been overridden (bigPlayButton), add content elements
     if (!props.innerHTML) {
@@ -56,19 +56,19 @@ class Button extends Component {
 
   buildCSSClass() {
     // TODO: Change vjs-control to vjs-button?
-    return 'vjs-control ' + Component.prototype.buildCSSClass.call(this);
+    return 'vjs-control ' + super.buildCSSClass();
   }
 
   // Click - Override with specific functionality for button
-  onClick(){}
+  onClick() {}
 
   // Focus - Add keyboard functionality to element
-  onFocus(){
+  onFocus() {
     Events.on(document, 'keydown', Lib.bind(this, this.onKeyPress));
   }
 
   // KeyPress (document level) - Trigger click when keys are pressed
-  onKeyPress(event){
+  onKeyPress(event) {
     // Check for space bar (32) or enter (13) keys
     if (event.which == 32 || event.which == 13) {
       event.preventDefault();
@@ -77,7 +77,7 @@ class Button extends Component {
   }
 
   // Blur - Remove keyboard triggers
-  onBlur(){
+  onBlur() {
     Events.off(document, 'keydown', Lib.bind(this, this.onKeyPress));
   }
 

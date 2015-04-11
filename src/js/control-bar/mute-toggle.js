@@ -31,7 +31,7 @@ class MuteToggle extends Button {
   }
 
   createEl() {
-    return Button.prototype.createEl.call(this, 'div', {
+    return super.createEl('div', {
       className: 'vjs-mute-control vjs-control',
       innerHTML: '<div><span class="vjs-control-text">' + this.localize('Mute') + '</span></div>'
     });
@@ -56,14 +56,10 @@ class MuteToggle extends Button {
     // Don't rewrite the button text if the actual text doesn't change.
     // This causes unnecessary and confusing information for screen reader users.
     // This check is needed because this function gets called every time the volume level is changed.
-    if(this.player_.muted()){
-        if(this.el_.children[0].children[0].innerHTML!=this.localize('Unmute')){
-            this.el_.children[0].children[0].innerHTML = this.localize('Unmute'); // change the button text to "Unmute"
-        }
-    } else {
-        if(this.el_.children[0].children[0].innerHTML!=this.localize('Mute')){
-            this.el_.children[0].children[0].innerHTML = this.localize('Mute'); // change the button text to "Mute"
-        }
+    let toMute = this.player_.muted() ? 'Unmute' : 'Mute';
+    let localizedMute = this.localize(toMute);
+    if (this.el_.children[0].children[0].innerHTML !== localizedMute) {
+      this.el_.children[0].children[0].innerHTML = localizedMute;
     }
 
     /* TODO improve muted icon classes */

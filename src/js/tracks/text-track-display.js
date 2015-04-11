@@ -62,7 +62,7 @@ class TextTrackDisplay extends Component {
   }
 
   createEl() {
-    return Component.prototype.createEl.call(this, 'div', {
+    return super.createEl('div', {
       className: 'vjs-text-track-display'
     });
   }

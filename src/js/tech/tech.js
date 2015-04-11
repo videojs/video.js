@@ -40,7 +40,7 @@ class Tech extends Component {
     if (options['nativeCaptions'] === false || options['nativeTextTracks'] === false) {
       this['featuresNativeTextTracks'] = false;
     }
-    
+
     if (!this['featuresNativeTextTracks']) {
       this.emulateTextTracks();
     }
@@ -262,7 +262,7 @@ class Tech extends Component {
 
     if (this.manualTimeUpdates) { this.manualTimeUpdatesOff(); }
 
-    Component.prototype.dispose.call(this);
+    super.dispose();
   }
 
   setCurrentTime() {

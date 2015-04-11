@@ -22,7 +22,7 @@ class ChaptersTrackMenuItem extends MenuItem {
   }
 
   onClick() {
-    MenuItem.prototype.onClick.call(this);
+    super.onClick();
     this.player_.currentTime(this.cue.startTime);
     this.update(this.cue.startTime);
   }

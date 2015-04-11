@@ -23,7 +23,7 @@ class PlaybackRateMenuButton extends MenuButton {
   }
 
   createEl() {
-    let el = MenuButton.prototype.createEl.call(this);
+    let el = super.createEl();
 
     this.labelEl_ = Lib.createEl('div', {
       className: 'vjs-playback-rate-value',

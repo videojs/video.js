@@ -24,7 +24,7 @@ class PosterImage extends Button {
    */
   dispose() {
     this.player().off('posterchange', this.update);
-    Button.prototype.dispose.call(this);
+    super.dispose();
   }
 
   /**

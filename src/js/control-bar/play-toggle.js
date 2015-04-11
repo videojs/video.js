@@ -18,7 +18,7 @@ class PlayToggle extends Button {
   }
 
   buildCSSClass() {
-    return 'vjs-play-control ' + Button.prototype.buildCSSClass.call(this);
+    return 'vjs-play-control ' + super.buildCSSClass();
   }
 
   // OnClick - Toggle between play and pause
