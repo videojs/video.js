@@ -34,12 +34,6 @@
   animation: $string;
 }
 
-@mixin context($old-context, $new-context) {
-  @at-root #{selector-replace(&, $old-context, $new-context)} {
-    @content;
-  }
-}
-
 @mixin display-flex($alignment: '', $justification: '') {
   display: -webkit-box;
   display: -webkit-flex;
