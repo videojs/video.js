@@ -1,6 +1,5 @@
 import * as Events from '../../src/js/events.js';
 import document from 'global/document';
-import TestHelpers from './test-helpers.js';
 
 q.module('Events');
 
@@ -211,14 +210,14 @@ test('should have relatedTarget correctly set on the event', function() {
       relatedEl = document.createElement('div');
 
   Events.on(el1, 'click', function(e){
-    equal(e.relatedTarget, relatedEl, 'relatedTarget is set for all browsers when referring element is set on the event');
+    equal(e.relatedTarget, relatedEl, 'relatedTarget is set for all browsers when related element is set on the event');
   });
 
-  Events.trigger(el1, TestHelpers.makeMouseEvent('click', relatedEl));
+  Events.trigger(el1, { type:'click', relatedTarget:relatedEl });
 
   Events.on(el2, 'click', function(e) {
     equal(e.relatedTarget, null, 'relatedTarget is null when none is provided');
   });
 
-  Events.trigger(el2, TestHelpers.makeMouseEvent('click'));
+  Events.trigger(el2, { type:'click', relatedTarget:undefined });
 });
