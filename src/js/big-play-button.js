@@ -1,4 +1,3 @@
-import Component from './component';
 import Button from './button';
 
 /* Big Play Button
@@ -11,20 +10,21 @@ import Button from './button';
  * @class
  * @constructor
  */
-var BigPlayButton = Button.extend();
+class BigPlayButton extends Button {
 
-Component.registerComponent('BigPlayButton', BigPlayButton);
+  createEl() {
+    return super.createEl('div', {
+      className: 'vjs-big-play-button',
+      innerHTML: '<span aria-hidden="true"></span>',
+      'aria-label': 'play video'
+    });
+  }
 
-BigPlayButton.prototype.createEl = function(){
-  return Button.prototype.createEl.call(this, 'div', {
-    className: 'vjs-big-play-button',
-    innerHTML: '<span aria-hidden="true"></span>',
-    'aria-label': 'play video'
-  });
-};
+  onClick() {
+    this.player_.play();
+  }
 
-BigPlayButton.prototype.onClick = function(){
-  this.player_.play();
-};
+}
 
+Button.registerComponent('BigPlayButton', BigPlayButton);
 export default BigPlayButton;

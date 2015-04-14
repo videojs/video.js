@@ -1,14 +1,14 @@
 import document from 'global/document';
 
-import MediaLoader from './media/loader';
-import Html5 from './media/html5';
-import Flash from './media/flash';
-import PosterImage from './poster';
-import { TextTrackDisplay } from './tracks/text-track-controls';
-import LoadingSpinner from './loading-spinner';
-import BigPlayButton from './big-play-button';
-import ControlBar from './control-bar/control-bar';
-import ErrorDisplay from './error-display';
+import MediaLoader from './tech/loader.js';
+import Html5 from './tech/html5.js';
+import Flash from './tech/flash.js';
+import PosterImage from './poster-image.js';
+import TextTrackDisplay from './tracks/text-track-display.js';
+import LoadingSpinner from './loading-spinner.js';
+import BigPlayButton from './big-play-button.js';
+import ControlBar from './control-bar/control-bar.js';
+import ErrorDisplay from './error-display.js';
 
 import videojs from './core';
 import * as setup from './setup';

@@ -3,7 +3,7 @@ import videojs from '../../src/js/core.js';
 import Options from '../../src/js/options.js';
 import * as Lib from '../../src/js/lib.js';
 import MediaError from '../../src/js/media-error.js';
-import Html5 from '../../src/js/media/html5.js';
+import Html5 from '../../src/js/tech/html5.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
 

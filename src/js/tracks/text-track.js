@@ -28,7 +28,6 @@ import XHR from '../xhr.js';
  *   attribute EventHandler oncuechange;
  * };
  */
-
 let TextTrack = function(options) {
   options = options || {};
 
@@ -227,7 +226,7 @@ TextTrack.prototype.removeCue = function(removeCue) {
 /*
  * Downloading stuff happens below this point
  */
-let parseCues = function(srcContent, track) {
+var parseCues = function(srcContent, track) {
   if (typeof window['WebVTT'] !== 'function') {
     //try again a bit later
     return window.setTimeout(function() {

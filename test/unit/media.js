@@ -1,16 +1,16 @@
 var noop = function() {}, clock, oldTextTracks;
 
-import MediaTechController from '../../src/js/media/media.js';
+import Tech from '../../src/js/tech/tech.js';
 
 q.module('Media Tech', {
   'setup': function() {
     this.noop = function() {};
     this.clock = sinon.useFakeTimers();
-    this.featuresProgessEvents = MediaTechController.prototype['featuresProgessEvents'];
-    MediaTechController.prototype['featuresProgressEvents'] = false;
-    MediaTechController.prototype['featuresNativeTextTracks'] = true;
-    oldTextTracks = MediaTechController.prototype.textTracks;
-    MediaTechController.prototype.textTracks = function() {
+    this.featuresProgessEvents = Tech.prototype['featuresProgessEvents'];
+    Tech.prototype['featuresProgressEvents'] = false;
+    Tech.prototype['featuresNativeTextTracks'] = true;
+    oldTextTracks = Tech.prototype.textTracks;
+    Tech.prototype.textTracks = function() {
       return {
         addEventListener: Function.prototype,
         removeEventListener: Function.prototype
@@ -19,15 +19,15 @@ q.module('Media Tech', {
   },
   'teardown': function() {
     this.clock.restore();
-    MediaTechController.prototype['featuresProgessEvents'] = this.featuresProgessEvents;
-    MediaTechController.prototype['featuresNativeTextTracks'] = false;
-    MediaTechController.prototype.textTracks = oldTextTracks;
+    Tech.prototype['featuresProgessEvents'] = this.featuresProgessEvents;
+    Tech.prototype['featuresNativeTextTracks'] = false;
+    Tech.prototype.textTracks = oldTextTracks;
   }
 });
 
 test('should synthesize timeupdate events by default', function() {
   var timeupdates = 0, playHandler, i, tech;
-  tech = new MediaTechController({
+  tech = new Tech({
     id: this.noop,
     on: function(event, handler) {
       if (event === 'play') {
@@ -51,7 +51,7 @@ test('should synthesize timeupdate events by default', function() {
 
 test('stops timeupdates if the tech produces them natively', function() {
   var timeupdates = 0, tech, playHandler, expected;
-  tech = new MediaTechController({
+  tech = new Tech({
     id: this.noop,
     off: this.noop,
     on: function(event, handler) {
@@ -78,7 +78,7 @@ test('stops timeupdates if the tech produces them natively', function() {
 
 test('stops manual timeupdates while paused', function() {
   var timeupdates = 0, tech, playHandler, pauseHandler, expected;
-  tech = new MediaTechController({
+  tech = new Tech({
     id: this.noop,
     on: function(event, handler) {
       if (event === 'play') {
@@ -110,7 +110,7 @@ test('stops manual timeupdates while paused', function() {
 
 test('should synthesize progress events by default', function() {
   var progresses = 0, tech;
-  tech = new MediaTechController({
+  tech = new Tech({
     id: this.noop,
     on: this.noop,
     bufferedPercent: function() {
@@ -131,7 +131,7 @@ test('should synthesize progress events by default', function() {
 });
 
 test('dispose() should stop time tracking', function() {
-  var tech = new MediaTechController({
+  var tech = new Tech({
     id: this.noop,
     on: this.noop,
     off: this.noop,
@@ -158,17 +158,17 @@ test('should add the source hanlder interface to a tech', function(){
   var sourceB = { src: 'no-support', type: 'no-support' };
 
   // Define a new tech class
-  var Tech = MediaTechController.extend();
+  var MyTech = Tech.extend();
 
   // Extend Tech with source handlers
-  MediaTechController.withSourceHandlers(Tech);
+  Tech.withSourceHandlers(MyTech);
 
   // Check for the expected class methods
-  ok(Tech.registerSourceHandler, 'added a registerSourceHandler function to the Tech');
-  ok(Tech.selectSourceHandler, 'added a selectSourceHandler function to the Tech');
+  ok(MyTech.registerSourceHandler, 'added a registerSourceHandler function to the Tech');
+  ok(MyTech.selectSourceHandler, 'added a selectSourceHandler function to the Tech');
 
   // Create an instance of Tech
-  var tech = new Tech(mockPlayer);
+  var tech = new MyTech(mockPlayer);
 
   // Check for the expected instance methods
   ok(tech.setSource, 'added a setSource function to the tech instance');
@@ -208,18 +208,18 @@ test('should add the source hanlder interface to a tech', function(){
   };
 
   // Test registering source handlers
-  Tech.registerSourceHandler(handlerOne);
-  strictEqual(Tech.sourceHandlers[0], handlerOne, 'handlerOne was added to the source handler array');
-  Tech.registerSourceHandler(handlerTwo, 0);
-  strictEqual(Tech.sourceHandlers[0], handlerTwo, 'handlerTwo was registered at the correct index (0)');
+  MyTech.registerSourceHandler(handlerOne);
+  strictEqual(MyTech.sourceHandlers[0], handlerOne, 'handlerOne was added to the source handler array');
+  MyTech.registerSourceHandler(handlerTwo, 0);
+  strictEqual(MyTech.sourceHandlers[0], handlerTwo, 'handlerTwo was registered at the correct index (0)');
 
   // Test handler selection
-  strictEqual(Tech.selectSourceHandler(sourceA), handlerOne, 'handlerOne was selected to handle the valid source');
-  strictEqual(Tech.selectSourceHandler(sourceB), null, 'no handler was selected to handle the invalid source');
+  strictEqual(MyTech.selectSourceHandler(sourceA), handlerOne, 'handlerOne was selected to handle the valid source');
+  strictEqual(MyTech.selectSourceHandler(sourceB), null, 'no handler was selected to handle the invalid source');
 
   // Test canPlaySource return values
-  strictEqual(Tech.canPlaySource(sourceA), 'probably', 'the Tech returned probably for the valid source');
-  strictEqual(Tech.canPlaySource(sourceB), '', 'the Tech returned an empty string for the invalid source');
+  strictEqual(MyTech.canPlaySource(sourceA), 'probably', 'the Tech returned probably for the valid source');
+  strictEqual(MyTech.canPlaySource(sourceB), '', 'the Tech returned an empty string for the invalid source');
 
   // Pass a source through the source handler process of a tech instance
   tech.setSource(sourceA);
@@ -239,14 +239,14 @@ test('should handle unsupported sources with the source hanlder API', function()
   };
 
   // Define a new tech class
-  var Tech = MediaTechController.extend();
+  var MyTech = Tech.extend();
   // Extend Tech with source handlers
-  MediaTechController.withSourceHandlers(Tech);
+  Tech.withSourceHandlers(MyTech);
   // Create an instance of Tech
-  var tech = new Tech(mockPlayer);
+  var tech = new MyTech(mockPlayer);
 
   var usedNative;
-  Tech.nativeSourceHandler = {
+  MyTech.nativeSourceHandler = {
     handleSource: function(){ usedNative = true; }
   };
 

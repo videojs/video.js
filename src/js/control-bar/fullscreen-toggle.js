@@ -1,4 +1,3 @@
-import Component from '../component';
 import Button from '../button';
 
 /**
@@ -8,33 +7,25 @@ import Button from '../button';
  * @class
  * @extends vjs.Button
  */
-var FullscreenToggle = Button.extend({
-  /**
-   * @constructor
-   * @memberof vjs.FullscreenToggle
-   * @instance
-   */
-  init: function(player, options){
-    Button.call(this, player, options);
-  }
-});
+class FullscreenToggle extends Button {
 
-Component.registerComponent('FullscreenToggle', FullscreenToggle);
+  buildCSSClass() {
+    return 'vjs-fullscreen-control ' + super.buildCSSClass();
+  }
+
+  onClick() {
+    if (!this.player_.isFullscreen()) {
+      this.player_.requestFullscreen();
+      this.controlText_.innerHTML = this.localize('Non-Fullscreen');
+    } else {
+      this.player_.exitFullscreen();
+      this.controlText_.innerHTML = this.localize('Fullscreen');
+    }
+  }
+
+}
 
 FullscreenToggle.prototype.buttonText = 'Fullscreen';
 
-FullscreenToggle.prototype.buildCSSClass = function(){
-  return 'vjs-fullscreen-control ' + Button.prototype.buildCSSClass.call(this);
-};
-
-FullscreenToggle.prototype.onClick = function(){
-  if (!this.player_.isFullscreen()) {
-    this.player_.requestFullscreen();
-    this.controlText_.innerHTML = this.localize('Non-Fullscreen');
-  } else {
-    this.player_.exitFullscreen();
-    this.controlText_.innerHTML = this.localize('Fullscreen');
-  }
-};
-
+Button.registerComponent('FullscreenToggle', FullscreenToggle);
 export default FullscreenToggle;

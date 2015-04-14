@@ -1,18 +1,18 @@
-import Button from '../button';
-import Component from '../component';
-import Menu, { MenuButton } from '../menu';
-import MuteToggle from './mute-toggle';
-import * as Lib from '../lib';
-import { VolumeBar } from './volume-control';
+import Button from '../button.js';
+import Menu from '../menu/menu.js';
+import MenuButton from '../menu/menu-button.js';
+import MuteToggle from './mute-toggle.js';
+import * as Lib from '../lib.js';
+import VolumeBar from './volume-control/volume-bar.js';
 
 /**
  * Menu button with a popup for showing the volume slider.
  * @constructor
  */
-let VolumeMenuButton = MenuButton.extend({
-  /** @constructor */
-  init: function(player, options){
-    MenuButton.call(this, player, options);
+class VolumeMenuButton extends MenuButton {
+
+  constructor(player, options){
+    super(player, options);
 
     // Same listeners as MuteToggle
     this.on(player, 'volumechange', this.volumeUpdate);
@@ -30,36 +30,37 @@ let VolumeMenuButton = MenuButton.extend({
     });
     this.addClass('vjs-menu-button');
   }
-});
 
-VolumeMenuButton.prototype.createMenu = function(){
-  let menu = new Menu(this.player_, {
-    contentElType: 'div'
-  });
-  let vc = new VolumeBar(this.player_, this.options_['volumeBar']);
-  vc.on('focus', function() {
-    menu.lockShowing();
-  });
-  vc.on('blur', function() {
-    menu.unlockShowing();
-  });
-  menu.addChild(vc);
-  return menu;
-};
+  createMenu() {
+    let menu = new Menu(this.player_, {
+      contentElType: 'div'
+    });
+    let vc = new VolumeBar(this.player_, this.options_['volumeBar']);
+    vc.on('focus', function() {
+      menu.lockShowing();
+    });
+    vc.on('blur', function() {
+      menu.unlockShowing();
+    });
+    menu.addChild(vc);
+    return menu;
+  }
 
-VolumeMenuButton.prototype.onClick = function(){
-  MuteToggle.prototype.onClick.call(this);
-  MenuButton.prototype.onClick.call(this);
-};
+  onClick() {
+    MuteToggle.prototype.onClick.call(this);
+    super.onClick();
+  }
 
-VolumeMenuButton.prototype.createEl = function(){
-  return Button.prototype.createEl.call(this, 'div', {
-    className: 'vjs-volume-menu-button vjs-menu-button vjs-control',
-    innerHTML: '<div><span class="vjs-control-text">' + this.localize('Mute') + '</span></div>'
-  });
-};
+  createEl() {
+    return super.createEl('div', {
+      className: 'vjs-volume-menu-button vjs-menu-button vjs-control',
+      innerHTML: '<div><span class="vjs-control-text">' + this.localize('Mute') + '</span></div>'
+    });
+  }
+
+}
 
 VolumeMenuButton.prototype.volumeUpdate = MuteToggle.prototype.update;
 
-Component.registerComponent('VolumeMenuButton', VolumeMenuButton);
+Button.registerComponent('VolumeMenuButton', VolumeMenuButton);
 export default VolumeMenuButton;

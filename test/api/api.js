@@ -73,7 +73,8 @@ test('should be able to access expected player API methods', function() {
 });
 
 test('should be able to access expected component API methods', function() {
-  var comp = videojs.getComponent('Component').create({ id: function(){ return 1; }, reportUserActivity: function(){} });
+  var Component = videojs.getComponent('Component');
+  var comp = new Component({ id: function(){ return 1; }, reportUserActivity: function(){} });
 
   // Component methods
   ok(comp.player, 'player exists');
@@ -110,7 +111,7 @@ test('should be able to access expected component API methods', function() {
 });
 
 test('should be able to access expected MediaTech API methods', function() {
-  var media = videojs.getComponent('MediaTechController');
+  var media = videojs.getComponent('Tech');
   var mediaProto = media.prototype;
   var html5 = videojs.getComponent('Html5');
   var html5Proto = html5.prototype;
