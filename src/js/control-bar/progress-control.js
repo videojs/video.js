@@ -76,7 +76,8 @@ SeekBar.prototype.updateARIAAttributes = function(){
 };
 
 SeekBar.prototype.getPercent = function(){
-  return this.player_.currentTime() / this.player_.duration();
+  let percent = this.player_.currentTime() / this.player_.duration();
+  return percent >= 1 ? 1 : percent;
 };
 
 SeekBar.prototype.onMouseDown = function(event){
@@ -150,7 +151,7 @@ LoadProgressBar.prototype.update = function(){
   // get the percent width of a time compared to the total end
   let percentify = function (time, end){
     let percent = (time / end) || 0; // no NaN
-    return (percent * 100) + '%';
+    return ((percent >= 1 ? 1 : percent) * 100) + '%';
   };
 
   // update the width of the progress bar
