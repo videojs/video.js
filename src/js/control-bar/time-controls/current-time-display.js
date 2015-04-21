@@ -1,5 +1,5 @@
-import Component from '../component.js';
-import * as Lib from '../lib.js';
+import Component from '../../component.js';
+import * as Lib from '../../lib.js';
 
 /**
  * Displays the current time

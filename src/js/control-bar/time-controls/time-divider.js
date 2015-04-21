@@ -1,4 +1,4 @@
-import Component from '../component.js';
+import Component from '../../component.js';
 
 /**
  * The separator between the current time and duration

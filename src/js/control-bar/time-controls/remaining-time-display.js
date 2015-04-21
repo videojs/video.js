@@ -1,5 +1,5 @@
-import Component from '../component.js';
-import * as Lib from '../lib';
+import Component from '../../component.js';
+import * as Lib from '../../lib';
 
 /**
  * Displays the time left in the video

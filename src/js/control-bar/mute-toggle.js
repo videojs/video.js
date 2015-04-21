@@ -64,7 +64,7 @@ class MuteToggle extends Button {
 
     /* TODO improve muted icon classes */
     for (var i = 0; i < 4; i++) {
-      Lib.removeClass(this.el_, `vjs-vol-${+i}`);
+      Lib.removeClass(this.el_, `vjs-vol-${i}`);
     }
     Lib.addClass(this.el_, `vjs-vol-${level}`);
   }
