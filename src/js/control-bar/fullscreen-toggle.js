@@ -10,7 +10,7 @@ import Button from '../button';
 class FullscreenToggle extends Button {
 
   buildCSSClass() {
-    return 'vjs-fullscreen-control ' + super.buildCSSClass();
+    return `vjs-fullscreen-control ${super.buildCSSClass()}`;
   }
 
   onClick() {

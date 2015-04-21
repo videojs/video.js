@@ -53,7 +53,7 @@ class Player extends Component {
    */
   constructor(tag, options, ready){
     // Make sure tag ID exists
-    tag.id = tag.id || 'vjs_video_' + Lib.guid++;
+    tag.id = tag.id || `vjs_video_${Lib.guid++}`;
 
     // Set Options
     // The options argument overrides options set in the video tag
@@ -500,11 +500,11 @@ class Player extends Component {
       } catch(e) {
         // When building additional tech libs, an expected method may not be defined yet
         if (this.tech[method] === undefined) {
-          Lib.log('Video.js: ' + method + ' method not defined for '+this.techName+' playback technology.', e);
+          Lib.log(`Video.js: ${method} method not defined for ${this.techName} playback technology.`, e);
         } else {
           // When a method isn't available on the object it throws a TypeError
           if (e.name == 'TypeError') {
-            Lib.log('Video.js: ' + method + ' unavailable on '+this.techName+' playback technology element.', e);
+            Lib.log(`Video.js: ${method} unavailable on ${this.techName} playback technology element.`, e);
             this.tech.isReady_ = false;
           } else {
             Lib.log(e);
@@ -952,7 +952,7 @@ class Player extends Component {
 
       // Check if the current tech is defined before continuing
       if (!tech) {
-        Lib.log.error('The "' + techName + '" tech is undefined. Skipped browser support check for that tech.');
+        Lib.log.error(`The "${techName}" tech is undefined. Skipped browser support check for that tech.`);
         continue;
       }
 
@@ -1005,12 +1005,8 @@ class Player extends Component {
    * @return {String} The current video source when getting
    * @return {String} The player when setting
    */
-  src(source) {
+  src(source=this.techGet('src')) {
     let currentTech = Component.getComponent(this.techName);
-
-    if (source === undefined) {
-      return this.techGet('src');
-    }
 
     // case: Array of source objects to choose from and pick the best to play
     if (Lib.obj.isArray(source)) {
@@ -1304,7 +1300,7 @@ class Player extends Component {
 
     // log the name of the error type and any message
     // ie8 just logs "[object object]" if you just log the error object
-    Lib.log.error('(CODE:'+this.error_.code+' '+MediaError.errorTypes[this.error_.code]+')', this.error_.message, this.error_);
+    Lib.log.error(`(CODE:${this.error_.code} ${MediaError.errorTypes[this.error_.code]})`, this.error_.message, this.error_);
 
     return this;
   }

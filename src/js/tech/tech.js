@@ -18,8 +18,7 @@ import document from 'global/document';
  */
 class Tech extends Component {
 
-  constructor(player, options, ready){
-    options = options || {};
+  constructor(player, options={}, ready=function(){}){
     // we don't want the tech to report user activity automatically.
     // This is done manually in addControlsListeners
     options.reportTouchActivity = false;
@@ -386,10 +385,8 @@ class Tech extends Component {
  */
 Tech.prototype.textTracks_;
 
-var createTrackHelper = function(self, kind, label, language, options) {
+var createTrackHelper = function(self, kind, label, language, options={}) {
   let tracks = self.textTracks();
-
-  options = options || {};
 
   options['kind'] = kind;
   if (label) {

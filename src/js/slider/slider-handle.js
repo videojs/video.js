@@ -16,7 +16,7 @@ class SliderHandle extends Component {
     // Add the slider element class to all sub classes
     props.className = props.className + ' vjs-slider-handle';
     props = Lib.obj.merge({
-      innerHTML: '<span class="vjs-control-text">'+(this.defaultValue || 0)+'</span>'
+      innerHTML: `<span class="vjs-control-text">${this.defaultValue || 0}</span>`
     }, props);
 
     return super.createEl('div', props);

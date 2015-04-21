@@ -59,7 +59,8 @@ class Component {
     // If there was no ID from the options, generate one
     if (!this.id_) {
       // Don't require the player ID function in the case of mock players
-      this.id_ = ((player.id && player.id()) || 'no_player') + '_component_' + Lib.guid++;
+      let id = player.id && player.id() || 'no_player';
+      this.id_ = `${id}_component_${Lib.guid++}`;
     }
 
     this.name_ = options['name'] || null;
@@ -206,11 +207,13 @@ class Component {
   }
 
   localize(string){
-    var lang = this.player_.language(),
-        languages = this.player_.languages();
+    let lang = this.player_.language();
+    let languages = this.player_.languages();
+
     if (languages && languages[lang] && languages[lang][string]) {
       return languages[lang][string];
     }
+
     return string;
   }
 
@@ -303,16 +306,22 @@ class Component {
    * @return {Component} The child component (created by this process if a string was used)
    * @suppress {accessControls|checkRegExp|checkTypes|checkVars|const|constantProperty|deprecated|duplicate|es5Strict|fileoverviewTags|globalThis|invalidCasts|missingProperties|nonStandardJsDocs|strictModuleDepCheck|undefinedNames|undefinedVars|unknownDefines|uselessCode|visibility}
    */
-  addChild(child, options){
+  addChild(child, options={}){
     let component;
     let componentName;
 
     // If child is a string, create nt with options
     if (typeof child === 'string') {
-      let componentName = child;
+      componentName = child;
 
-      // Make sure options is at least an empty object to protect against errors
-      if (!options || options === true) {
+      // Options can also be specified as a boolean, so convert to an empty object if false.
+      if (!options) {
+        options = {};
+      }
+
+      // Same as above, but true is deprecated so show a warning.
+      if (options === true) {
+        Lib.log.warn('Initializing a child component with `true` is deprecated. Children should be defined in an array when possible, but if necessary use an object instead of `true`.');
         options = {};
       }
 
@@ -518,20 +527,18 @@ class Component {
    * @return {Component}        self
    */
   on(first, second, third){
-    var target, type, fn, removeOnDispose, cleanRemover, thisComponent;
-
     if (typeof first === 'string' || Lib.obj.isArray(first)) {
       Events.on(this.el_, first, Lib.bind(this, second));
 
     // Targeting another component or element
     } else {
-      target = first;
-      type = second;
-      fn = Lib.bind(this, third);
-      thisComponent = this;
+      const target = first;
+      const type = second;
+      const fn = Lib.bind(this, third);
+      const thisComponent = this;
 
       // When this component is disposed, remove the listener from the other component
-      removeOnDispose = function(){
+      const removeOnDispose = function(){
         thisComponent.off(target, type, fn);
       };
       // Use the same function ID so we can remove it later it using the ID
@@ -542,7 +549,7 @@ class Component {
       // If the other component is disposed first we need to clean the reference
       // to the other component in this component's removeOnDispose listener
       // Otherwise we create a memory leak.
-      cleanRemover = function(){
+      const cleanRemover = function(){
         thisComponent.off('dispose', removeOnDispose);
       };
       // Add the same function ID so we can easily remove it later
@@ -587,15 +594,13 @@ class Component {
    * @return {Component}
    */
   off(first, second, third){
-    var target, otherComponent, type, fn, otherEl;
-
     if (!first || typeof first === 'string' || Lib.obj.isArray(first)) {
       Events.off(this.el_, first, second);
     } else {
-      target = first;
-      type = second;
+      const target = first;
+      const type = second;
       // Ensure there's at least a guid, even if the function hasn't been used
-      fn = Lib.bind(this, third);
+      const fn = Lib.bind(this, third);
 
       // Remove the dispose listener on this component,
       // which was given the same guid as the event listener
@@ -632,17 +637,15 @@ class Component {
    * @return {Component}
    */
   one(first, second, third) {
-    var target, type, fn, thisComponent, newFunc;
-
     if (typeof first === 'string' || Lib.obj.isArray(first)) {
       Events.one(this.el_, first, Lib.bind(this, second));
     } else {
-      target = first;
-      type = second;
-      fn = Lib.bind(this, third);
-      thisComponent = this;
+      const target = first;
+      const type = second;
+      const fn = Lib.bind(this, third);
+      const thisComponent = this;
 
-      newFunc = function(){
+      const newFunc = function(){
         thisComponent.off(target, type, newFunc);
         fn.apply(this, arguments);
       };
@@ -921,20 +924,18 @@ class Component {
    * @private
    */
   emitTapEvents(){
-    var touchStart, firstTouch, touchTime, couldBeTap, noTap,
-        xdiff, ydiff, touchDistance, tapMovementThreshold, touchTimeThreshold;
-
     // Track the start time so we can determine how long the touch lasted
-    touchStart = 0;
-    firstTouch = null;
+    let touchStart = 0;
+    let firstTouch = null;
 
     // Maximum movement allowed during a touch event to still be considered a tap
     // Other popular libs use anywhere from 2 (hammer.js) to 15, so 10 seems like a nice, round number.
-    tapMovementThreshold = 10;
+    const tapMovementThreshold = 10;
 
     // The maximum length a touch can be while still being considered a tap
-    touchTimeThreshold = 200;
+    const touchTimeThreshold = 200;
 
+    let couldBeTap;
     this.on('touchstart', function(event) {
       // If more than one finger, don't consider treating this as a click
       if (event.touches.length === 1) {
@@ -953,16 +954,16 @@ class Component {
       } else if (firstTouch) {
         // Some devices will throw touchmoves for all but the slightest of taps.
         // So, if we moved only a small distance, this could still be a tap
-        xdiff = event.touches[0].pageX - firstTouch.pageX;
-        ydiff = event.touches[0].pageY - firstTouch.pageY;
-        touchDistance = Math.sqrt(xdiff * xdiff + ydiff * ydiff);
+        const xdiff = event.touches[0].pageX - firstTouch.pageX;
+        const ydiff = event.touches[0].pageY - firstTouch.pageY;
+        const touchDistance = Math.sqrt(xdiff * xdiff + ydiff * ydiff);
         if (touchDistance > tapMovementThreshold) {
           couldBeTap = false;
         }
       }
     });
 
-    noTap = function(){
+    const noTap = function(){
       couldBeTap = false;
     };
     // TODO: Listen to the original target. http://youtu.be/DujfpXOKUp8?t=13m8s
@@ -976,7 +977,7 @@ class Component {
       // Proceed only if the touchmove/leave/cancel event didn't happen
       if (couldBeTap === true) {
         // Measure how long the touch lasted
-        touchTime = new Date().getTime() - touchStart;
+        const touchTime = new Date().getTime() - touchStart;
         // Make sure the touch was less than the threshold to be considered a tap
         if (touchTime < touchTimeThreshold) {
           event.preventDefault(); // Don't let browser turn this into a click
@@ -1013,16 +1014,15 @@ class Component {
    * want touch events to act differently.
    */
   enableTouchActivity() {
-    var report, touchHolding, touchEnd;
-
     // Don't continue if the root player doesn't support reporting user activity
     if (!this.player().reportUserActivity) {
       return;
     }
 
     // listener for reporting that the user is active
-    report = Lib.bind(this.player(), this.player().reportUserActivity);
+    const report = Lib.bind(this.player(), this.player().reportUserActivity);
 
+    let touchHolding;
     this.on('touchstart', function() {
       report();
       // For as long as the they are touching the device or have their mouse down,
@@ -1033,7 +1033,7 @@ class Component {
       touchHolding = this.setInterval(report, 250);
     });
 
-    touchEnd = function(event) {
+    const touchEnd = function(event) {
       report();
       // stop the interval that maintains activity if the touch is holding
       this.clearInterval(touchHolding);
@@ -1060,7 +1060,7 @@ class Component {
       this.clearTimeout(timeoutId);
     };
 
-    disposeFn.guid = 'vjs-timeout-'+ timeoutId;
+    disposeFn.guid = `vjs-timeout-${timeoutId}`;
 
     this.on('dispose', disposeFn);
 
@@ -1077,7 +1077,7 @@ class Component {
     clearTimeout(timeoutId);
 
     var disposeFn = function(){};
-    disposeFn.guid = 'vjs-timeout-'+ timeoutId;
+    disposeFn.guid = `vjs-timeout-${timeoutId}`;
 
     this.off('dispose', disposeFn);
 
@@ -1099,7 +1099,7 @@ class Component {
       this.clearInterval(intervalId);
     };
 
-    disposeFn.guid = 'vjs-interval-'+ intervalId;
+    disposeFn.guid = `vjs-interval-${intervalId}`;
 
     this.on('dispose', disposeFn);
 
@@ -1115,7 +1115,7 @@ class Component {
     clearInterval(intervalId);
 
     var disposeFn = function(){};
-    disposeFn.guid = 'vjs-interval-'+ intervalId;
+    disposeFn.guid = `vjs-interval-${intervalId}`;
 
     this.off('dispose', disposeFn);
 
@@ -1137,7 +1137,7 @@ class Component {
     }
 
     if (window && window.videojs && window.videojs[name]) {
-      Lib.log.warn('The '+name+' component was added to the videojs object when it should be registered using videojs.registerComponent(name, component)');
+      Lib.log.warn(`The ${name} component was added to the videojs object when it should be registered using videojs.registerComponent(name, component)`);
       return window.videojs[name];
     }
   }

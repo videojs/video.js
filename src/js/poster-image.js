@@ -79,7 +79,7 @@ class PosterImage extends Button {
       // Any falsey values should stay as an empty string, otherwise
       // this will throw an extra error
       if (url) {
-        backgroundImage = 'url("' + url + '")';
+        backgroundImage = `url("${url}")`;
       }
 
       this.el_.style.backgroundImage = backgroundImage;

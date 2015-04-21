@@ -69,8 +69,7 @@ var CoreObject = function(){};
  * @return {CoreObject} An object that inherits from CoreObject
  * @this {*}
  */
-CoreObject.extend = function(props){
-  props = props || {};
+CoreObject.extend = function(props={}){
   // Set up the constructor using the supplied init method
   // or using the init of the parent object
   // Make sure to check the unobfuscated version for external libs

@@ -18,7 +18,7 @@ class LoadProgressBar extends Component {
   createEl() {
     return super.createEl('div', {
       className: 'vjs-load-progress',
-      innerHTML: '<span class="vjs-control-text"><span>' + this.localize('Loaded') + '</span>: 0%</span>'
+      innerHTML: `<span class="vjs-control-text"><span>${this.localize('Loaded')}</span>: 0%</span>`
     });
   }
 

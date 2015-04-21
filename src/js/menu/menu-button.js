@@ -75,7 +75,7 @@ class MenuButton extends Button {
 
   /** @inheritDoc */
   buildCSSClass() {
-    return this.className + ' vjs-menu-button ' + super.buildCSSClass();
+    return `${this.className} vjs-menu-button ${super.buildCSSClass()}`;
   }
 
   // Focus - Add keyboard functionality to element

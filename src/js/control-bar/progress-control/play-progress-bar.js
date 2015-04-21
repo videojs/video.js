@@ -12,7 +12,7 @@ class PlayProgressBar extends Component {
   createEl() {
     return super.createEl('div', {
       className: 'vjs-play-progress',
-      innerHTML: '<span class="vjs-control-text"><span>' + this.localize('Progress') + '</span>: 0%</span>'
+      innerHTML: `<span class="vjs-control-text"><span>${this.localize('Progress')}</span>: 0%</span>`
     });
   }
 

@@ -362,13 +362,12 @@ class Html5 extends Tech {
     return this.el_.addTextTrack(kind, label, language);
   }
 
-  addRemoteTextTrack(options) {
+  addRemoteTextTrack(options={}) {
     if (!this['featuresNativeTextTracks']) {
       return super.addRemoteTextTrack(options);
     }
 
     var track = document.createElement('track');
-    options = options || {};
 
     if (options['kind']) {
       track['kind'] = options['kind'];
@@ -489,7 +488,7 @@ Html5.nativeSourceHandler.canHandleSource = function(source){
     // If no type, fall back to checking 'video/[EXTENSION]'
     ext = Lib.getFileExtension(source.src);
 
-    return canPlayType('video/'+ext);
+    return canPlayType(`video/${ext}`);
   }
 
   return '';
