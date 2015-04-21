@@ -4,7 +4,7 @@ import * as Lib from '../lib.js';
 /**
  * SeekBar Behavior includes play progress bar, and seek handle
  * Needed so it can determine seek position based on handle position/size
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */

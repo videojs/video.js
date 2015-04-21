@@ -4,7 +4,7 @@ import * as Lib from '../lib.js';
 
 /**
  * A button class with a popup menu
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */

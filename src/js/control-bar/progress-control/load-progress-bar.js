@@ -4,7 +4,7 @@ import * as Lib from '../../lib.js';
 /**
  * Shows load progress
  *
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */

@@ -12,7 +12,7 @@ import document from 'global/document';
 
 /**
  * Base class for media (HTML5 Video, Flash) controllers
- * @param {vjs.Player|Object} player  Central player instance
+ * @param {Player|Object} player  Central player instance
  * @param {Object=} options Options object
  * @constructor
  */

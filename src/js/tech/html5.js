@@ -10,7 +10,7 @@ import document from 'global/document';
 
 /**
  * HTML5 Media Controller - Wrapper for HTML5 Media API
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @param {Function=} ready
  * @constructor
@@ -460,7 +460,7 @@ Tech.withSourceHandlers(Html5);
  * The default native source handler.
  * This simply passes the source to the video element. Nothing fancy.
  * @param  {Object} source   The source object
- * @param  {vjs.Html5} tech  The instance of the HTML5 tech
+ * @param  {Html5} tech  The instance of the HTML5 tech
  */
 Html5.nativeSourceHandler = {};
 
@@ -500,7 +500,7 @@ Html5.nativeSourceHandler.canHandleSource = function(source){
  * Adaptive source handlers will have more complicated workflows before passing
  * video data to the video element
  * @param  {Object} source    The source object
- * @param  {vjs.Html5} tech   The instance of the Html5 tech
+ * @param  {Html5} tech   The instance of the Html5 tech
  */
 Html5.nativeSourceHandler.handleSource = function(source, tech){
   tech.setSrc(source.src);

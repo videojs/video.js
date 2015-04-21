@@ -265,7 +265,7 @@ var removeData = function(el){
   // Remove all stored data
   // Changed to = null
   // http://coding.smashingmagazine.com/2012/11/05/writing-fast-memory-efficient-javascript/
-  // vjs.cache[id] = null;
+  // cache[id] = null;
   delete cache[id];
 
   // Remove the expando property from the DOM node
@@ -712,7 +712,7 @@ function _logType(type, args){
   // convert args to an array to get array functions
   let argsArray = Array.prototype.slice.call(args);
   // if there's no console then don't try to output messages
-  // they will still be stored in vjs.log.history
+  // they will still be stored in Lib.log.history
   // Was setting these once outside of this function, but containing them
   // in the function makes it easier to test cases where console doesn't exist
   let noop = function(){};

@@ -23,7 +23,7 @@ import document from 'global/document';
  * @param  {String|Element} id      Video element or video element ID
  * @param  {Object=} options        Optional options object for config/settings
  * @param  {Function=} ready        Optional ready callback
- * @return {vjs.Player}             A player instance
+ * @return {Player}             A player instance
  * @namespace
  */
 var videojs = function(id, options, ready){

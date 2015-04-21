@@ -7,7 +7,7 @@ import document from 'global/document';
 /**
  * The base functionality for sliders like the volume bar and seek bar
  *
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */

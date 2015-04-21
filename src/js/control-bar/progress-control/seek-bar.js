@@ -7,7 +7,7 @@ import * as Lib from '../../lib.js';
 /**
  * Seek Bar and holder for the progress bars
  *
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */

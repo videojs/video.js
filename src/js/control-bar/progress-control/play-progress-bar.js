@@ -3,7 +3,7 @@ import Component from '../../component.js';
 /**
  * Shows play progress
  *
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */

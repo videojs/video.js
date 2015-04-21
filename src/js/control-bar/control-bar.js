@@ -20,11 +20,11 @@ import PlaybackRateMenuButton from './playback-rate-menu/playback-rate-menu-butt
 
 /**
  * Container of main controls
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @class
  * @constructor
- * @extends vjs.Component
+ * @extends Component
  */
 class ControlBar extends Component {
   createEl() {

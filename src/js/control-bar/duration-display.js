@@ -3,7 +3,7 @@ import * as Lib from '../lib.js';
 
 /**
  * Displays the duration
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */

@@ -6,7 +6,7 @@ import * as Lib from './lib';
 /**
  * The component that handles showing the poster image.
  *
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */

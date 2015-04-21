@@ -14,7 +14,7 @@ let navigator = window.navigator;
 /**
  * Flash Media Controller - Wrapper for fallback SWF API
  *
- * @param {vjs.Player} player
+ * @param {Player} player
  * @param {Object=} options
  * @param {Function=} ready
  * @constructor
@@ -221,7 +221,7 @@ Tech.withSourceHandlers(Flash);
  * The default native source handler.
  * This simply passes the source to the video element. Nothing fancy.
  * @param  {Object} source   The source object
- * @param  {vjs.Flash} tech  The instance of the Flash tech
+ * @param  {Flash} tech  The instance of the Flash tech
  */
 Flash.nativeSourceHandler = {};
 
@@ -260,7 +260,7 @@ Flash.nativeSourceHandler.canHandleSource = function(source){
  * Adaptive source handlers will have more complicated workflows before passing
  * video data to the video element
  * @param  {Object} source    The source object
- * @param  {vjs.Flash} tech   The instance of the Flash tech
+ * @param  {Flash} tech   The instance of the Flash tech
  */
 Flash.nativeSourceHandler.handleSource = function(source, tech){
   tech.setSrc(source.src);

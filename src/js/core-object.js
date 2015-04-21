@@ -66,7 +66,7 @@ var CoreObject = function(){};
  *
  * @param {Object} props Functions and properties to be applied to the
  *                       new object's prototype
- * @return {vjs.CoreObject} An object that inherits from CoreObject
+ * @return {CoreObject} An object that inherits from CoreObject
  * @this {*}
  */
 CoreObject.extend = function(props){
@@ -114,7 +114,7 @@ CoreObject.extend = function(props){
  *
  *     var myAnimal = Animal.create();
  *
- * @return {vjs.CoreObject} An instance of a CoreObject subclass
+ * @return {CoreObject} An instance of a CoreObject subclass
  * @this {*}
  */
 CoreObject.create = function(){

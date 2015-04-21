@@ -4,7 +4,7 @@ import * as Lib from '../lib.js';
 /**
  * The component for a menu item. `<li>`
  *
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @class
  * @constructor

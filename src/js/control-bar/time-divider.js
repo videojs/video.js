@@ -5,7 +5,7 @@ import Component from '../component.js';
  *
  * Can be hidden if it's not needed in the design.
  *
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */

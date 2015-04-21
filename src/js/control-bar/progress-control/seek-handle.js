@@ -5,7 +5,7 @@ import * as Lib from '../../lib.js';
  * The Seek Handle shows the current position of the playhead during playback,
  * and can be dragged to adjust the playhead.
  *
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */

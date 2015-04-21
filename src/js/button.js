@@ -7,7 +7,7 @@ import document from 'global/document';
 ================================================================================ */
 /**
  * Base class for all buttons
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @class
  * @constructor
