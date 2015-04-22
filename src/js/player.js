@@ -280,22 +280,6 @@ class Player extends Component {
   unloadTech() {
     this.isReady_ = false;
 
-    this.off(this.tech, 'loadstart', this.onTechLoadStart);
-    this.off(this.tech, 'waiting', this.onTechWaiting);
-    this.off(this.tech, 'canplay', this.onTechCanPlay);
-    this.off(this.tech, 'canplaythrough', this.onTechCanPlayThrough);
-    this.off(this.tech, 'playing', this.onTechPlaying);
-    this.off(this.tech, 'ended', this.onTechEnded);
-    this.off(this.tech, 'seeking', this.onTechSeeking);
-    this.off(this.tech, 'seeked', this.onTechSeeked);
-    this.off(this.tech, 'ended', this.onTechEnded);
-    this.off(this.tech, 'play', this.onTechPlay);
-    this.off(this.tech, 'firstplay', this.onTechFirstPlay);
-    this.off(this.tech, 'pause', this.onTechPause);
-    this.off(this.tech, 'progress', this.onTechProgress);
-    this.off(this.tech, 'durationchange', this.onTechDurationChange);
-    this.off(this.tech, 'fullscreenchange', this.onTechFullscreenChange);
-
     this.tech.dispose();
 
     this.tech = false;
