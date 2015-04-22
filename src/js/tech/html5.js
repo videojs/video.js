@@ -20,8 +20,6 @@ class Html5 extends Tech {
   constructor(player, options, ready){
     super(player, options, ready);
 
-    this.setupTriggers();
-
     const source = options['source'];
 
     // Set the source if one is provided
@@ -173,32 +171,6 @@ class Html5 extends Tech {
           (!tracks[i]['default'])) {
         track.mode = 'disabled';
       }
-    }
-  }
-
-  // Make video events trigger player events
-  // May seem verbose here, but makes other APIs possible.
-  // Triggers removed using this.off when disposed
-  setupTriggers() {
-    for (let i = Html5.Events.length - 1; i >= 0; i--) {
-      this.on(Html5.Events[i], this.eventHandler);
-    }
-  }
-
-  eventHandler(evt) {
-    // In the case of an error on the video element, set the error prop
-    // on the player and let the player handle triggering the event. On
-    // some platforms, error events fire that do not cause the error
-    // property on the video element to be set. See #1465 for an example.
-    if (evt.type == 'error' && this.error()) {
-      this.player().error(this.error().code);
-
-    // in some cases we pass the event directly to the player
-    } else {
-      // No need for media events to bubble up.
-      evt.bubbles = false;
-
-      this.player().trigger(evt);
     }
   }
 

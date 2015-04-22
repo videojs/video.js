@@ -210,25 +210,7 @@ class Player extends Component {
     }
     Lib.insertFirst(tag, el); // Breaks iPhone, fixed in HTML5 setup.
 
-    // The event listeners need to be added before the children are added
-    // in the component init because the tech (loaded with mediaLoader) may
-    // fire events, like loadstart, that these events need to capture.
-    // Long term it might be better to expose a way to do this in component.init
-    // like component.initEventListeners() that runs between el creation and
-    // adding children
     this.el_ = el;
-    this.on('loadstart', this.onLoadStart);
-    this.on('waiting', this.onWaiting);
-    this.on(['canplay', 'canplaythrough', 'playing', 'ended'], this.onWaitEnd);
-    this.on('seeking', this.onSeeking);
-    this.on('seeked', this.onSeeked);
-    this.on('ended', this.onEnded);
-    this.on('play', this.onPlay);
-    this.on('firstplay', this.onFirstPlay);
-    this.on('pause', this.onPause);
-    this.on('progress', this.onProgress);
-    this.on('durationchange', this.onDurationChange);
-    this.on('fullscreenchange', this.onFullscreenChange);
 
     return el;
   }
@@ -276,11 +258,43 @@ class Player extends Component {
     let techComponent = Component.getComponent(techName);
     this.tech = new techComponent(this, techOptions);
 
+    this.on(this.tech, 'loadstart', this.onTechLoadStart);
+    this.on(this.tech, 'waiting', this.onTechWaiting);
+    this.on(this.tech, 'canplay', this.onTechCanPlay);
+    this.on(this.tech, 'canplaythrough', this.onTechCanPlayThrough);
+    this.on(this.tech, 'playing', this.onTechPlaying);
+    this.on(this.tech, 'ended', this.onTechEnded);
+    this.on(this.tech, 'seeking', this.onTechSeeking);
+    this.on(this.tech, 'seeked', this.onTechSeeked);
+    this.on(this.tech, 'ended', this.onTechEnded);
+    this.on(this.tech, 'play', this.onTechPlay);
+    this.on(this.tech, 'firstplay', this.onTechFirstPlay);
+    this.on(this.tech, 'pause', this.onTechPause);
+    this.on(this.tech, 'progress', this.onTechProgress);
+    this.on(this.tech, 'durationchange', this.onTechDurationChange);
+    this.on(this.tech, 'fullscreenchange', this.onTechFullscreenChange);
+
     this.tech.ready(techReady);
   }
 
   unloadTech() {
     this.isReady_ = false;
+
+    this.off(this.tech, 'loadstart', this.onTechLoadStart);
+    this.off(this.tech, 'waiting', this.onTechWaiting);
+    this.off(this.tech, 'canplay', this.onTechCanPlay);
+    this.off(this.tech, 'canplaythrough', this.onTechCanPlayThrough);
+    this.off(this.tech, 'playing', this.onTechPlaying);
+    this.off(this.tech, 'ended', this.onTechEnded);
+    this.off(this.tech, 'seeking', this.onTechSeeking);
+    this.off(this.tech, 'seeked', this.onTechSeeked);
+    this.off(this.tech, 'ended', this.onTechEnded);
+    this.off(this.tech, 'play', this.onTechPlay);
+    this.off(this.tech, 'firstplay', this.onTechFirstPlay);
+    this.off(this.tech, 'pause', this.onTechPause);
+    this.off(this.tech, 'progress', this.onTechProgress);
+    this.off(this.tech, 'durationchange', this.onTechDurationChange);
+    this.off(this.tech, 'fullscreenchange', this.onTechFullscreenChange);
 
     this.tech.dispose();
 
@@ -291,7 +305,7 @@ class Player extends Component {
    * Fired when the user agent begins looking for media data
    * @event loadstart
    */
-  onLoadStart() {
+  onTechLoadStart() {
     // TODO: Update to use `emptied` event instead. See #1277.
 
     this.removeClass('vjs-ended');
@@ -303,10 +317,12 @@ class Player extends Component {
     // The firstplay event relies on both the play and loadstart events
     // which can happen in any order for a new source
     if (!this.paused()) {
+      this.trigger('loadstart');
       this.trigger('firstplay');
     } else {
       // reset the hasStarted state
       this.hasStarted(false);
+      this.trigger('loadstart');
     }
   }
 
@@ -332,7 +348,7 @@ class Player extends Component {
    * Fired whenever the media begins or resumes playback
    * @event play
    */
-  onPlay() {
+  onTechPlay() {
     this.removeClass('vjs-ended');
     this.removeClass('vjs-paused');
     this.addClass('vjs-playing');
@@ -340,39 +356,65 @@ class Player extends Component {
     // hide the poster when the user hits play
     // https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-play
     this.hasStarted(true);
+
+    this.trigger('play');
   }
 
   /**
    * Fired whenever the media begins waiting
    * @event waiting
    */
-  onWaiting() {
+  onTechWaiting() {
     this.addClass('vjs-waiting');
+    this.trigger('waiting');
   }
 
   /**
    * A handler for events that signal that waiting has ended
    * which is not consistent between browsers. See #1351
-   * @private
+   * @event canplay
    */
-  onWaitEnd() {
+  onTechCanPlay() {
     this.removeClass('vjs-waiting');
+    this.trigger('canplay');
+  }
+
+  /**
+   * A handler for events that signal that waiting has ended
+   * which is not consistent between browsers. See #1351
+   * @event canplaythrough
+   */
+  onTechCanPlayThrough() {
+    this.removeClass('vjs-waiting');
+    this.trigger('canplaythrough');
+  }
+
+  /**
+   * A handler for events that signal that waiting has ended
+   * which is not consistent between browsers. See #1351
+   * @event playing
+   */
+  onTechPlaying() {
+    this.removeClass('vjs-waiting');
+    this.trigger('playing');
   }
 
   /**
    * Fired whenever the player is jumping to a new time
    * @event seeking
    */
-  onSeeking() {
+  onTechSeeking() {
     this.addClass('vjs-seeking');
+    this.trigger('seeking');
   }
 
   /**
    * Fired when the player has finished jumping to a new time
    * @event seeked
    */
-  onSeeked() {
+  onTechSeeked() {
     this.removeClass('vjs-seeking');
+    this.trigger('seeked');
   }
 
   /**
@@ -384,7 +426,7 @@ class Player extends Component {
    *
    * @event firstplay
    */
-  onFirstPlay() {
+  onTechFirstPlay() {
     //If the first starttime attribute is specified
     //then we will start at the given offset in seconds
     if(this.options_['starttime']){
@@ -392,21 +434,26 @@ class Player extends Component {
     }
 
     this.addClass('vjs-has-started');
+    this.trigger('firstplay');
   }
 
   /**
    * Fired whenever the media has been paused
    * @event pause
    */
-  onPause() {
+  onTechPause() {
+    this.removeClass('vjs-playing');
     this.addClass('vjs-paused');
+    this.trigger('pause');
   }
 
   /**
    * Fired while the user agent is downloading media data
    * @event progress
    */
-  onProgress() {
+  onTechProgress() {
+    this.trigger('progress');
+
     // Add custom event for when source is finished downloading.
     if (this.bufferedPercent() == 1) {
       this.trigger('loadedalldata');
@@ -417,7 +464,7 @@ class Player extends Component {
    * Fired when the end of the media resource is reached (currentTime == duration)
    * @event ended
    */
-  onEnded() {
+  onTechEnded() {
     this.addClass('vjs-ended');
     if (this.options_['loop']) {
       this.currentTime(0);
@@ -425,13 +472,23 @@ class Player extends Component {
     } else if (!this.paused()) {
       this.pause();
     }
+
+    this.trigger('ended');
   }
 
   /**
    * Fired when the duration of the media resource is first known or changed
    * @event durationchange
    */
-  onDurationChange() {
+  onTechDurationChange() {
+    this.updateDuration();
+    this.trigger('durationchange');
+  }
+
+  /**
+   * Update the duration of the player using the tech
+   */
+  updateDuration() {
     // Allows for caching value instead of asking player each time.
     // We need to get the techGet response and check for a value so we don't
     // accidentally cause the stack to blow up.
@@ -454,12 +511,14 @@ class Player extends Component {
    * Fired when the player switches in or out of fullscreen mode
    * @event fullscreenchange
    */
-  onFullscreenChange() {
+  onTechFullscreenChange() {
     if (this.isFullscreen()) {
       this.addClass('vjs-fullscreen');
     } else {
       this.removeClass('vjs-fullscreen');
     }
+
+    this.trigger('fullscreenchange');
   }
 
   /**
@@ -605,7 +664,7 @@ class Player extends Component {
     }
 
     if (this.cache_.duration === undefined) {
-      this.onDurationChange();
+      this.updateDuration();
     }
 
     return this.cache_.duration || 0;

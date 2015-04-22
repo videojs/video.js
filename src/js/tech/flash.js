@@ -321,7 +321,7 @@ Flash['checkReady'] = function(tech){
 // Trigger events from the swf on the player
 Flash['onEvent'] = function(swfID, eventName){
   let player = Lib.el(swfID)['player'];
-  player.trigger(eventName);
+  player.tech.trigger(eventName);
 };
 
 // Log errors from the swf
