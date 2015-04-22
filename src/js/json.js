@@ -25,7 +25,7 @@ if (!(typeof json !== 'undefined' && typeof json.parse === 'function')) {
   /**
    * parse the json
    *
-   * @memberof vjs.JSON
+   * @memberof JSON
    * @param {String} text The JSON string to parse
    * @param {Function=} [reviver] Optional function that can transform the results
    * @return {Object|Array} The parsed JSON

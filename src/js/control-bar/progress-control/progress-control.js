@@ -5,7 +5,7 @@ import SeekBar from './seek-bar.js';
  * The Progress Control component contains the seek bar, load progress,
  * and play progress
  *
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */

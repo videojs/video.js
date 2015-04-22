@@ -4,7 +4,7 @@ import Component from './component';
 ================================================================================ */
 /**
  * Loading spinner for waiting events
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @class
  * @constructor

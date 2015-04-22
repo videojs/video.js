@@ -14,7 +14,7 @@ let navigator = window.navigator;
 /**
  * Flash Media Controller - Wrapper for fallback SWF API
  *
- * @param {vjs.Player} player
+ * @param {Player} player
  * @param {Object=} options
  * @param {Function=} ready
  * @constructor
@@ -221,7 +221,7 @@ Tech.withSourceHandlers(Flash);
  * The default native source handler.
  * This simply passes the source to the video element. Nothing fancy.
  * @param  {Object} source   The source object
- * @param  {vjs.Flash} tech  The instance of the Flash tech
+ * @param  {Flash} tech  The instance of the Flash tech
  */
 Flash.nativeSourceHandler = {};
 
@@ -236,7 +236,7 @@ Flash.nativeSourceHandler.canHandleSource = function(source){
   function guessMimeType(src) {
     var ext = Lib.getFileExtension(src);
     if (ext) {
-      return 'video/' + ext;
+      return `video/${ext}`;
     }
     return '';
   }
@@ -260,7 +260,7 @@ Flash.nativeSourceHandler.canHandleSource = function(source){
  * Adaptive source handlers will have more complicated workflows before passing
  * video data to the video element
  * @param  {Object} source    The source object
- * @param  {vjs.Flash} tech   The instance of the Flash tech
+ * @param  {Flash} tech   The instance of the Flash tech
  */
 Flash.nativeSourceHandler.handleSource = function(source, tech){
   tech.setSrc(source.src);
@@ -379,7 +379,7 @@ Flash.getEmbedCode = function(swf, flashVars, params, attributes){
   // Convert flash vars to string
   if (flashVars) {
     Lib.obj.each(flashVars, function(key, val){
-      flashVarsString += (key + '=' + val + '&amp;');
+      flashVarsString += `${key}=${val}&amp;`;
     });
   }
 
@@ -393,7 +393,7 @@ Flash.getEmbedCode = function(swf, flashVars, params, attributes){
 
   // Create param tags string
   Lib.obj.each(params, function(key, val){
-    paramsString += '<param name="'+key+'" value="'+val+'" />';
+    paramsString += `<param name="${key}" value="${val}" />`;
   });
 
   attributes = Lib.obj.merge({
@@ -408,10 +408,10 @@ Flash.getEmbedCode = function(swf, flashVars, params, attributes){
 
   // Create Attributes string
   Lib.obj.each(attributes, function(key, val){
-    attrsString += (key + '="' + val + '" ');
+    attrsString += `${key}="${val}" `;
   });
 
-  return objTag + attrsString + '>' + paramsString + '</object>';
+  return `${objTag}${attrsString}>${paramsString}</object>`;
 };
 
 // Run Flash through the RTMP decorator

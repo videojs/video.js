@@ -21,7 +21,7 @@ import TextTrackSettings from './tracks/text-track-settings.js';
 import Html5 from './tech/html5.js';
 
 /**
- * An instance of the `vjs.Player` class is created when any of the Video.js setup methods are used to initialize a video.
+ * An instance of the `Player` class is created when any of the Video.js setup methods are used to initialize a video.
  *
  * ```js
  * var myPlayer = videojs('example_video_1');
@@ -38,7 +38,7 @@ import Html5 from './tech/html5.js';
  * After an instance has been created it can be accessed globally using `Video('example_video_1')`.
  *
  * @class
- * @extends vjs.Component
+ * @extends Component
  */
 class Player extends Component {
 
@@ -53,7 +53,7 @@ class Player extends Component {
    */
   constructor(tag, options, ready){
     // Make sure tag ID exists
-    tag.id = tag.id || 'vjs_video_' + Lib.guid++;
+    tag.id = tag.id || `vjs_video_${Lib.guid++}`;
 
     // Set Options
     // The options argument overrides options set in the video tag
@@ -120,7 +120,7 @@ class Player extends Component {
 
     // TODO: Make this smarter. Toggle user state between touching/mousing
     // using events, since devices can have both touch and mouse events.
-    // if (vjs.TOUCH_ENABLED) {
+    // if (Lib.TOUCH_ENABLED) {
     //   this.addClass('vjs-touch-enabled');
     // }
 
@@ -200,7 +200,7 @@ class Player extends Component {
     this.width(this.options_['width'], true); // (true) Skip resize listener on load
     this.height(this.options_['height'], true);
 
-    // vjs.insertFirst seems to cause the networkState to flicker from 3 to 2, so
+    // Lib.insertFirst seems to cause the networkState to flicker from 3 to 2, so
     // keep track of the original for later so we can know if the source originally failed
     tag.initNetworkState_ = tag.networkState;
 
@@ -500,11 +500,11 @@ class Player extends Component {
       } catch(e) {
         // When building additional tech libs, an expected method may not be defined yet
         if (this.tech[method] === undefined) {
-          Lib.log('Video.js: ' + method + ' method not defined for '+this.techName+' playback technology.', e);
+          Lib.log(`Video.js: ${method} method not defined for ${this.techName} playback technology.`, e);
         } else {
           // When a method isn't available on the object it throws a TypeError
           if (e.name == 'TypeError') {
-            Lib.log('Video.js: ' + method + ' unavailable on '+this.techName+' playback technology element.', e);
+            Lib.log(`Video.js: ${method} unavailable on ${this.techName} playback technology element.`, e);
             this.tech.isReady_ = false;
           } else {
             Lib.log(e);
@@ -522,7 +522,7 @@ class Player extends Component {
    *
    *     myPlayer.play();
    *
-   * @return {vjs.Player} self
+   * @return {Player} self
    */
   play() {
     this.techCall('play');
@@ -534,7 +534,7 @@ class Player extends Component {
    *
    *     myPlayer.pause();
    *
-   * @return {vjs.Player} self
+   * @return {Player} self
    */
   pause() {
     this.techCall('pause');
@@ -565,7 +565,7 @@ class Player extends Component {
    *
    * @param  {Number|String=} seconds The time to seek to
    * @return {Number}        The time in seconds, when not setting
-   * @return {vjs.Player}    self, when the current time is set
+   * @return {Player}    self, when the current time is set
    */
   currentTime(seconds) {
     if (seconds !== undefined) {
@@ -723,7 +723,7 @@ class Player extends Component {
    *
    * @param  {Number} percentAsDecimal The new volume as a decimal percent
    * @return {Number}                  The current volume, when getting
-   * @return {vjs.Player}              self, when setting
+   * @return {Player}              self, when setting
    */
   volume(percentAsDecimal) {
     let vol;
@@ -753,7 +753,7 @@ class Player extends Component {
    *
    * @param  {Boolean=} muted True to mute, false to unmute
    * @return {Boolean} True if mute is on, false if not, when getting
-   * @return {vjs.Player} self, when setting mute
+   * @return {Player} self, when setting mute
    */
   muted(muted) {
     if (muted !== undefined) {
@@ -784,7 +784,7 @@ class Player extends Component {
    *
    * @param  {Boolean=} isFS Update the player's fullscreen state
    * @return {Boolean} true if fullscreen, false if not
-   * @return {vjs.Player} self, when setting
+   * @return {Player} self, when setting
    */
   isFullscreen(isFS) {
     if (isFS !== undefined) {
@@ -815,7 +815,7 @@ class Player extends Component {
    * This includes most mobile devices (iOS, Android) and older versions of
    * Safari.
    *
-   * @return {vjs.Player} self
+   * @return {Player} self
    */
   requestFullscreen() {
     var fsApi = FullscreenApi;
@@ -872,7 +872,7 @@ class Player extends Component {
    *
    *     myPlayer.exitFullscreen();
    *
-   * @return {vjs.Player} self
+   * @return {Player} self
    */
   exitFullscreen() {
     var fsApi = FullscreenApi;
@@ -952,7 +952,7 @@ class Player extends Component {
 
       // Check if the current tech is defined before continuing
       if (!tech) {
-        Lib.log.error('The "' + techName + '" tech is undefined. Skipped browser support check for that tech.');
+        Lib.log.error(`The "${techName}" tech is undefined. Skipped browser support check for that tech.`);
         continue;
       }
 
@@ -1005,12 +1005,8 @@ class Player extends Component {
    * @return {String} The current video source when getting
    * @return {String} The player when setting
    */
-  src(source) {
+  src(source=this.techGet('src')) {
     let currentTech = Component.getComponent(this.techName);
-
-    if (source === undefined) {
-      return this.techGet('src');
-    }
 
     // case: Array of source objects to choose from and pick the best to play
     if (Lib.obj.isArray(source)) {
@@ -1090,7 +1086,7 @@ class Player extends Component {
 
   /**
    * Begin loading the src data.
-   * @return {vjs.Player} Returns the player
+   * @return {Player} Returns the player
    */
   load() {
     this.techCall('load');
@@ -1119,7 +1115,7 @@ class Player extends Component {
   /**
    * Get or set the preload attribute.
    * @return {String} The preload attribute value when getting
-   * @return {vjs.Player} Returns the player when setting
+   * @return {Player} Returns the player when setting
    */
   preload(value) {
     if (value !== undefined) {
@@ -1133,7 +1129,7 @@ class Player extends Component {
   /**
    * Get or set the autoplay attribute.
    * @return {String} The autoplay attribute value when getting
-   * @return {vjs.Player} Returns the player when setting
+   * @return {Player} Returns the player when setting
    */
   autoplay(value) {
     if (value !== undefined) {
@@ -1147,7 +1143,7 @@ class Player extends Component {
   /**
    * Get or set the loop attribute on the video element.
    * @return {String} The loop attribute value when getting
-   * @return {vjs.Player} Returns the player when setting
+   * @return {Player} Returns the player when setting
    */
   loop(value) {
     if (value !== undefined) {
@@ -1171,7 +1167,7 @@ class Player extends Component {
    *
    * @param  {String=} [src] Poster image source URL
    * @return {String} poster URL when getting
-   * @return {vjs.Player} self when setting
+   * @return {Player} self when setting
    */
   poster(src) {
     if (src === undefined) {
@@ -1231,7 +1227,7 @@ class Player extends Component {
    * if it can support native controls**
    *
    * @param  {Boolean} bool    True signals that native controls are on
-   * @return {vjs.Player}      Returns the player
+   * @return {Player}      Returns the player
    * @private
    */
   usingNativeControls(bool) {
@@ -1247,7 +1243,7 @@ class Player extends Component {
            * player is using the native device controls
            *
            * @event usingnativecontrols
-           * @memberof vjs.Player
+           * @memberof Player
            * @instance
            * @private
            */
@@ -1259,7 +1255,7 @@ class Player extends Component {
            * player is using the custom HTML controls
            *
            * @event usingcustomcontrols
-           * @memberof vjs.Player
+           * @memberof Player
            * @instance
            * @private
            */
@@ -1274,8 +1270,8 @@ class Player extends Component {
   /**
    * Set or get the current MediaError
    * @param  {*} err A MediaError or a String/Number to be turned into a MediaError
-   * @return {vjs.MediaError|null}     when getting
-   * @return {vjs.Player}              when setting
+   * @return {MediaError|null}     when getting
+   * @return {Player}              when setting
    */
   error(err) {
     if (err === undefined) {
@@ -1304,7 +1300,7 @@ class Player extends Component {
 
     // log the name of the error type and any message
     // ie8 just logs "[object object]" if you just log the error object
-    Lib.log.error('(CODE:'+this.error_.code+' '+MediaError.errorTypes[this.error_.code]+')', this.error_.message, this.error_);
+    Lib.log.error(`(CODE:${this.error_.code} ${MediaError.errorTypes[this.error_.code]})`, this.error_.message, this.error_);
 
     return this;
   }
@@ -1473,7 +1469,7 @@ class Player extends Component {
    *
    * @param  {Boolean} bool    True signals that this is an audio player.
    * @return {Boolean}         Returns true if player is audio, false if not when getting
-   * @return {vjs.Player}      Returns the player if setting
+   * @return {Player}      Returns the player if setting
    * @private
    */
   isAudio(bool) {
@@ -1597,7 +1593,7 @@ class Player extends Component {
    * The player's language code
    * @param  {String} languageCode  The locale string
    * @return {String}             The locale string when getting
-   * @return {vjs.Player}         self, when setting
+   * @return {Player}         self, when setting
    */
   language(languageCode) {
     if (languageCode === undefined) {
@@ -1661,9 +1657,9 @@ class Player extends Component {
 Player.players = {};
 
 /**
- * Player instance options, surfaced using vjs.options
- * vjs.options = vjs.Player.prototype.options_
- * Make changes in vjs.options, not here.
+ * Player instance options, surfaced using options
+ * options = Player.prototype.options_
+ * Make changes in options, not here.
  * All options should use string keys so they avoid
  * renaming by closure compiler
  * @type {Object}

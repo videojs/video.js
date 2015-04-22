@@ -8,7 +8,7 @@ import VolumeLevel from './volume-level.js';
 /**
  * The bar that contains the volume level and can be clicked on to adjust the level
  *
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */

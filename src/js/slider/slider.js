@@ -7,7 +7,7 @@ import document from 'global/document';
 /**
  * The base functionality for sliders like the volume bar and seek bar
  *
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */
@@ -33,8 +33,7 @@ class Slider extends Component {
     this.on(player, this.playerEvent, this.update);
   }
 
-  createEl(type, props) {
-    props = props || {};
+  createEl(type, props={}) {
     // Add the slider element class to all sub classes
     props.className = props.className + ' vjs-slider';
     props = Lib.obj.merge({

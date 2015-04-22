@@ -7,7 +7,7 @@ import document from 'global/document';
 ================================================================================ */
 /**
  * Base class for all buttons
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @class
  * @constructor
@@ -56,7 +56,7 @@ class Button extends Component {
 
   buildCSSClass() {
     // TODO: Change vjs-control to vjs-button?
-    return 'vjs-control ' + super.buildCSSClass();
+    return `vjs-control ${super.buildCSSClass()}`;
   }
 
   // Click - Override with specific functionality for button

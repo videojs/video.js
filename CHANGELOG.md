@@ -10,6 +10,7 @@ CHANGELOG
 * @dn5 Added new translations (Bosnian, Serbian, Croatian) ([view](https://github.com/videojs/video.js/pull/1897))
 * @mmcc (and others) converted the whole project to use ES6, Babel and Browserify ([view](https://github.com/videojs/video.js/pull/1976))
 * @heff converted all classes to use ES6 classes ([view](https://github.com/videojs/video.js/pull/1993))
+* @mmcc added ES6 default args and template strings ([view](https://github.com/videojs/video.js/pull/2015))
 
 --------------------
 

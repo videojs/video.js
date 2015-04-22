@@ -23,7 +23,7 @@ import document from 'global/document';
  * @param  {String|Element} id      Video element or video element ID
  * @param  {Object=} options        Optional options object for config/settings
  * @param  {Function=} ready        Optional ready callback
- * @return {vjs.Player}             A player instance
+ * @return {Player}             A player instance
  * @namespace
  */
 var videojs = function(id, options, ready){
@@ -43,7 +43,7 @@ var videojs = function(id, options, ready){
 
       // If options or ready funtion are passed, warn
       if (options) {
-        Lib.log.warn('Player "' + id + '" is already initialised. Options will not be applied.');
+        Lib.log.warn(`Player "${id}" is already initialised. Options will not be applied.`);
       }
 
       if (ready) {
@@ -88,14 +88,14 @@ videojs['VERSION'] = '__VERSION__';
 // Set CDN Version of swf
 // The added (+) blocks the replace from changing this _VERSION_NO_PATCH_ string
 if (videojs.CDN_VERSION !== '__VERSION_'+'NO_PATCH__') {
-  Options['flash']['swf'] = videojs.ACCESS_PROTOCOL + 'vjs.zencdn.net/'+videojs.CDN_VERSION+'/video-js.swf';
+  Options['flash']['swf'] = `${videojs.ACCESS_PROTOCOL}vjs.zencdn.net/${videojs.CDN_VERSION}/video-js.swf`;
 }
 
 /**
  * Utility function for adding languages to the default options. Useful for
  * amending multiple language support at runtime.
  *
- * Example: vjs.addLanguage('es', {'Hello':'Hola'});
+ * Example: videojs.addLanguage('es', {'Hello':'Hola'});
  *
  * @param  {String} code The language code or dictionary property
  * @param  {Object} data The data values to be translated

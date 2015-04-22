@@ -325,25 +325,6 @@ var trigger = function(elem, event) {
 
   // Inform the triggerer if the default was prevented by returning false
   return !event.defaultPrevented;
-  /* Original version of js ninja events wasn't complete.
-   * We've since updated to the latest version, but keeping this around
-   * for now just in case.
-   */
-  // // Added in addition to book. Book code was broke.
-  // event = typeof event === 'object' ?
-  //   event[vjs.expando] ?
-  //     event :
-  //     new vjs.Event(type, event) :
-  //   new vjs.Event(type);
-
-  // event.type = type;
-  // if (handler) {
-  //   handler.call(elem, event);
-  // }
-
-  // // Clean up the event in case it is being reused
-  // event.result = undefined;
-  // event.target = elem;
 };
 
 /**

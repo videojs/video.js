@@ -3,10 +3,10 @@ import * as Lib from '../lib.js';
 
 // Required children
 import PlayToggle from './play-toggle.js';
-import CurrentTimeDisplay from './current-time-display.js';
-import DurationDisplay from './duration-display.js';
-import TimeDivider from './time-divider.js';
-import RemainingTimeDisplay from './remaining-time-display.js';
+import CurrentTimeDisplay from './time-controls/current-time-display.js';
+import DurationDisplay from './time-controls/duration-display.js';
+import TimeDivider from './time-controls/time-divider.js';
+import RemainingTimeDisplay from './time-controls/remaining-time-display.js';
 import LiveDisplay from './live-display.js';
 import ProgressControl from './progress-control/progress-control.js';
 import FullscreenToggle from './fullscreen-toggle.js';
@@ -20,11 +20,11 @@ import PlaybackRateMenuButton from './playback-rate-menu/playback-rate-menu-butt
 
 /**
  * Container of main controls
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @class
  * @constructor
- * @extends vjs.Component
+ * @extends Component
  */
 class ControlBar extends Component {
   createEl() {

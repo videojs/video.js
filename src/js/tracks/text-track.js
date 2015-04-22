@@ -28,9 +28,7 @@ import XHR from '../xhr.js';
  *   attribute EventHandler oncuechange;
  * };
  */
-let TextTrack = function(options) {
-  options = options || {};
-
+let TextTrack = function(options={}) {
   if (!options['player']) {
     throw new Error('A player was not provided.');
   }
