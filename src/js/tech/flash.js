@@ -26,9 +26,6 @@ class Flash extends Tech {
 
     let { source, parentEl } = options;
 
-    // Create a temporary element to be replaced by swf object
-    let placeHolder = this.el_ = Lib.createEl('div', { id: player.id() + '_temp_flash' });
-
     // Generate ID for swf object
     let objId = player.id()+'_flash_api';
 
@@ -73,9 +70,6 @@ class Flash extends Tech {
       });
     }
 
-    // Add placeholder to player div
-    Lib.insertFirst(placeHolder, parentEl);
-
     // Having issues with Flash reloading on certain page actions (hide/resize/fullscreen) in certain browsers
     // This allows resetting the playhead when we catch the reload
     if (options['startTime']) {
@@ -101,7 +95,7 @@ class Flash extends Tech {
     // use stageclick events triggered from inside the SWF instead
     player.on('stageclick', player.reportUserActivity);
 
-    this.el_ = Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
+    this.el_ = Flash.embed(options['swf'], flashVars, params, attributes);
     this.el_['tech'] = this;
   }
 
@@ -359,15 +353,13 @@ Flash.version = function(){
 };
 
 // Flash embedding method. Only used in non-iframe mode
-Flash.embed = function(swf, placeHolder, flashVars, params, attributes){
+Flash.embed = function(swf, flashVars, params, attributes){
   const code = Flash.getEmbedCode(swf, flashVars, params, attributes);
 
   // Get element by embedding code and retrieving created element
   const obj = Lib.createEl('div', { innerHTML: code }).childNodes[0];
+  obj.parentNode.removeChild(obj);
 
-  const par = placeHolder.parentNode;
-
-  placeHolder.parentNode.replaceChild(obj, placeHolder);
   return obj;
 };
 

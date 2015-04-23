@@ -258,6 +258,7 @@ class Player extends Component {
     let techComponent = Component.getComponent(techName);
     this.tech = new techComponent(this, techOptions);
 
+    // Listen to every HTML5 events and trigger them back on the player for the plugins
     this.on(this.tech, 'loadstart', this.onTechLoadStart);
     this.on(this.tech, 'waiting', this.onTechWaiting);
     this.on(this.tech, 'canplay', this.onTechCanPlay);
@@ -283,6 +284,11 @@ class Player extends Component {
     this.on(this.tech, 'timeupdate', this.onTechTimeUpdate);
     this.on(this.tech, 'ratechange', this.onTechRateChange);
     this.on(this.tech, 'volumechange', this.onTechVolumeChange);
+
+    // Add the tech element in the DOM if it was not already there
+    if (this.tech.el().parentNode == null) {
+      Lib.insertFirst(this.tech.el(), this.el());
+    }
 
     this.tech.ready(techReady);
   }

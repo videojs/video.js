@@ -137,8 +137,6 @@ class Html5 extends Tech {
           el.appendChild(trackEl);
         }
       }
-
-      Lib.insertFirst(el, player.el());
     }
 
     // Update specific tag settings, in case they were overridden
