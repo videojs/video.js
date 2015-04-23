@@ -65,8 +65,8 @@ vjs.MediaTechController.prototype.initControlsListeners = function(){
 
   // Set up event listeners once the tech is ready and has an element to apply
   // listeners to
-  this.ready(this.activateControls);
-  this.on(player, 'controlsenabled', this.activateControls);
+  this.ready(this.addEventListeners);
+  this.on(player, 'controlsenabled', this.addEventListeners);
   this.on(player, 'controlsdisabled', this.removeControlsListeners);
 
   // if we're loading the playback object after it has started loading or playing the
@@ -84,10 +84,10 @@ vjs.MediaTechController.prototype.initControlsListeners = function(){
 /**
  * Remove the controls handler.
  */
-vjs.MediaTechController.prototype.removeControls = function () {
+vjs.MediaTechController.prototype.removeEventListeners = function () {
   var player = this.player();
 
-  this.off(player, 'controlsenabled', this.activateControls);
+  this.off(player, 'controlsenabled', this.addEventListeners);
   this.off(player, 'controlsdisabled', this.removeControlsListeners);
 };
 
@@ -126,7 +126,7 @@ vjs.MediaTechController.prototype.addControlsListeners = function(){
   this.on('tap', this.onTap);
 };
 
-vjs.MediaTechController.prototype.activateControls = function () {
+vjs.MediaTechController.prototype.addEventListeners = function () {
     var player = this.player();
 
     if (player.controls() && !player.usingNativeControls()) {
@@ -266,7 +266,7 @@ vjs.MediaTechController.prototype.stopTracking = function () {
 
 vjs.MediaTechController.prototype.dispose = function() {
   this.stopTracking();
-  this.removeControls();
+  this.removeEventListeners();
 
   vjs.Component.prototype.dispose.call(this);
 };
