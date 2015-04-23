@@ -1,10 +1,16 @@
 /**
 * This code injects the required base styles in the head of the document.
 */
+import window from 'global/window';
+import document from 'global/document';
 
-(function prependStylesToHead(styles) {
-  if (window.VIDEOJS_NO_BASE_THEME) return;
-  var styleNode = document.createElement('style');
-  styleNode.innerHTML = styles;
-  document.head.insertBefore(styleNode, document.head.firstChild);
-})('{{GENERATED_STYLES}}');
+if (window.VIDEOJS_NO_BASE_THEME) return;
+
+const styles = '{{GENERATED_STYLES}}';
+
+if (styles === '{{GENERATED'+'_STYLES}}');
+
+const styleNode = document.createElement('style');
+styleNode.innerHTML = styles;
+
+document.head.insertBefore(styleNode, document.head.firstChild);
