@@ -277,6 +277,34 @@ module.exports = function(grunt) {
         }
       }
     },
+    watchify: {
+      options: {
+        debug: true,
+        standalone: 'videojs',
+        keepalive: true,
+        callback: function(bundle) {
+          bundle.transform(require('babelify').configure({
+            sourceMapRelative: './src/js'
+          }));
+
+          bundle.transform('browserify-versionify', {
+            placeholder: '__VERSION__',
+            version: pkg.version
+          });
+
+          bundle.transform('browserify-versionify', {
+            placeholder: '__VERSION_NO_PATCH__',
+            version: version.majorMinor
+          });
+
+          return bundle;
+        }
+      },
+      build: {
+        src: ['./src/js/video.js'],
+        dest: './build/temp/video.js',
+      }
+    },
     exorcise: {
       build: {
         options: {},
@@ -320,6 +348,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-aws-s3');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-browserify');
+  grunt.loadNpmTasks('grunt-watchify');
   grunt.loadNpmTasks('grunt-coveralls');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-concat');

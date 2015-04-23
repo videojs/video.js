@@ -52,6 +52,7 @@
     "grunt-karma": "^0.8.3",
     "grunt-version": "~0.3.0",
     "grunt-videojs-languages": "0.0.4",
+    "grunt-watchify": "^0.1.0",
     "grunt-zip": "0.10.2",
     "karma": "^0.12.14",
     "karma-browserify": "^4.0.0",
