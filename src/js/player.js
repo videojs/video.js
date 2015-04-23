@@ -273,6 +273,7 @@ class Player extends Component {
     this.on(this.tech, 'progress', this.onTechProgress);
     this.on(this.tech, 'durationchange', this.onTechDurationChange);
     this.on(this.tech, 'fullscreenchange', this.onTechFullscreenChange);
+    this.on(this.tech, 'error', this.onTechError);
 
     this.tech.ready(techReady);
   }
@@ -471,6 +472,7 @@ class Player extends Component {
 
   /**
    * Update the duration of the player using the tech
+   * @private
    */
   updateDuration() {
     // Allows for caching value instead of asking player each time.
@@ -503,6 +505,14 @@ class Player extends Component {
     }
 
     this.trigger('fullscreenchange');
+  }
+
+  /**
+   * Fired when an error occur
+   * @event error
+   */
+  onTechError() {
+    this.error(this.tech.error().code);
   }
 
   /**

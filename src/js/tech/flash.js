@@ -102,6 +102,7 @@ class Flash extends Tech {
     player.on('stageclick', player.reportUserActivity);
 
     this.el_ = Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
+    this.el_['tech'] = this;
   }
 
   play() {
@@ -320,8 +321,8 @@ Flash['checkReady'] = function(tech){
 
 // Trigger events from the swf on the player
 Flash['onEvent'] = function(swfID, eventName){
-  let player = Lib.el(swfID)['player'];
-  player.tech.trigger(eventName);
+  let tech = Lib.el(swfID)['tech'];
+  tech.trigger(eventName);
 };
 
 // Log errors from the swf
