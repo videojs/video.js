@@ -286,7 +286,7 @@ class Player extends Component {
     this.on(this.tech, 'volumechange', this.onTechVolumeChange);
 
     // Add the tech element in the DOM if it was not already there
-    if (this.tech.el().parentNode == null) {
+    if (this.tech.el().parentNode != this.el()) {
       Lib.insertFirst(this.tech.el(), this.el());
     }
 

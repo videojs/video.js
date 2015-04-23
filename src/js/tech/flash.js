@@ -358,7 +358,6 @@ Flash.embed = function(swf, flashVars, params, attributes){
 
   // Get element by embedding code and retrieving created element
   const obj = Lib.createEl('div', { innerHTML: code }).childNodes[0];
-  obj.parentNode.removeChild(obj);
 
   return obj;
 };
