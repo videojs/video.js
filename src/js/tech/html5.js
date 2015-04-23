@@ -615,9 +615,6 @@ Html5.unpatchCanPlayType = function() {
 // by default, patch the video element
 Html5.patchCanPlayType();
 
-// List of all HTML5 events (various uses).
-Html5.Events = 'loadstart,suspend,abort,error,emptied,stalled,loadedmetadata,loadeddata,canplay,canplaythrough,playing,waiting,seeking,seeked,ended,durationchange,timeupdate,progress,play,pause,ratechange,volumechange'.split(',');
-
 Html5.disposeMediaElement = function(el){
   if (!el) { return; }
 

@@ -274,6 +274,15 @@ class Player extends Component {
     this.on(this.tech, 'durationchange', this.onTechDurationChange);
     this.on(this.tech, 'fullscreenchange', this.onTechFullscreenChange);
     this.on(this.tech, 'error', this.onTechError);
+    this.on(this.tech, 'suspend', this.onTechSuspend);
+    this.on(this.tech, 'abort', this.onTechAbort);
+    this.on(this.tech, 'emptied', this.onTechEmptied);
+    this.on(this.tech, 'stalled', this.onTechStalled);
+    this.on(this.tech, 'loadedmetadata', this.onTechLoadedMetaData);
+    this.on(this.tech, 'loadeddata', this.onTechLoadedData);
+    this.on(this.tech, 'timeupdate', this.onTechTimeUpdate);
+    this.on(this.tech, 'ratechange', this.onTechRateChange);
+    this.on(this.tech, 'volumechange', this.onTechVolumeChange);
 
     this.tech.ready(techReady);
   }
@@ -508,11 +517,84 @@ class Player extends Component {
   }
 
   /**
-   * Fired when an error occur
+   * Fires when an error occurred during the loading of an audio/video
    * @event error
    */
   onTechError() {
     this.error(this.tech.error().code);
+    this.trigger('error');
+  }
+
+  /**
+   * Fires when the browser is intentionally not getting media data
+   * @event suspend
+   */
+  onTechSuspend() {
+    this.trigger('suspend');
+  }
+
+  /**
+   * Fires when the loading of an audio/video is aborted
+   * @event abort
+   */
+  onTechAbort() {
+    this.trigger('abort');
+  }
+
+  /**
+   * Fires when the current playlist is empty
+   * @event emptied
+   */
+  onTechEmptied() {
+    this.trigger('emptied');
+  }
+
+  /**
+   * Fires when the browser is trying to get media data, but data is not available
+   * @event stalled
+   */
+  onTechStalled() {
+    this.trigger('stalled');
+  }
+
+  /**
+   * Fires when the browser has loaded meta data for the audio/video
+   * @event loadedmetadata
+   */
+  onTechLoadedMetaData() {
+    this.trigger('loadedmetadata');
+  }
+
+  /**
+   * Fires when the browser has loaded the current frame of the audio/video
+   * @event loaddata
+   */
+  onTechLoadedData() {
+    this.trigger('loadeddata');
+  }
+
+  /**
+   * Fires when the current playback position has changed
+   * @event timeupdate
+   */
+  onTechTimeUpdate() {
+    this.trigger('timeupdate');
+  }
+
+  /**
+   * Fires when the playing speed of the audio/video is changed
+   * @event ratechange
+   */
+  onTechRateChange() {
+    this.trigger('ratechange');
+  }
+
+  /**
+   * Fires when the volume has been changed
+   * @event volumechange
+   */
+  onTechVolumeChange() {
+    this.trigger('volumechange');
   }
 
   /**
