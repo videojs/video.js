@@ -275,34 +275,33 @@ module.exports = function(grunt) {
             }]
           ]
         }
-      }
-    },
-    watchify: {
-      options: {
-        debug: true,
-        standalone: 'videojs',
-        keepalive: true,
-        callback: function(bundle) {
-          bundle.transform(require('babelify').configure({
-            sourceMapRelative: './src/js'
-          }));
-
-          bundle.transform('browserify-versionify', {
-            placeholder: '__VERSION__',
-            version: pkg.version
-          });
-
-          bundle.transform('browserify-versionify', {
-            placeholder: '__VERSION_NO_PATCH__',
-            version: version.majorMinor
-          });
-
-          return bundle;
-        }
       },
-      build: {
-        src: ['./src/js/video.js'],
-        dest: './build/temp/video.js',
+      watch: {
+        files: {
+          'build/temp/video.js': ['src/js/video.js']
+        },
+        options: {
+          watch: true,
+          keepAlive: true,
+          browserifyOptions: {
+            debug: true,
+            standalone: 'videojs'
+          },
+          banner: license,
+          transform: [
+            require('babelify').configure({
+              sourceMapRelative: './src/js'
+            }),
+            ['browserify-versionify', {
+              placeholder: '__VERSION__',
+              version: pkg.version
+            }],
+            ['browserify-versionify', {
+              placeholder: '__VERSION_NO_PATCH__',
+              version: version.majorMinor
+            }]
+          ]
+        }
       }
     },
     exorcise: {
@@ -348,7 +347,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-aws-s3');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-browserify');
-  grunt.loadNpmTasks('grunt-watchify');
   grunt.loadNpmTasks('grunt-coveralls');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-concat');
@@ -357,7 +355,7 @@ module.exports = function(grunt) {
   grunt.registerTask('build', [
     'clean:build',
     'jshint',
-    'browserify',
+    'browserify:build',
     'copy:novtt',
     'concat:vtt',
     'exorcise',
@@ -391,7 +389,7 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['build', 'test']);
 
   // Development watch task. Doing the minimum required.
-  grunt.registerTask('dev', ['jshint', 'less', 'browserify', 'karma:chrome']);
+  grunt.registerTask('dev', ['jshint', 'less', 'browserify:build', 'karma:chrome']);
 
   // Tests.
   // We want to run things a little differently if it's coming from Travis vs local
