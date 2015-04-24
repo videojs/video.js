@@ -53,8 +53,14 @@ module.exports = function(grunt) {
     },
     dist: {},
     watch: {
-      files: [ 'src/**/*', 'test/unit/**/*.js', 'Gruntfile.js' ],
-      tasks: 'dev'
+      default: {
+        files: [ 'src/**/*', 'test/unit/**/*.js', 'Gruntfile.js' ],
+        tasks: 'dev'
+      },
+      skin: {
+        files: ['src/css/**/*'],
+        tasks: 'sass'
+      }
     },
     connect: {
       preview: {
@@ -371,6 +377,9 @@ module.exports = function(grunt) {
 
   // Development watch task. Doing the minimum required.
   grunt.registerTask('dev', ['connect:dev', 'jshint', 'sass', 'browserify', 'karma:chrome']);
+
+  // Skin development watch task.
+  grunt.registerTask('skin-dev', ['connect:dev', 'watch:skin']);
 
   // Tests.
   // We want to run things a little differently if it's coming from Travis vs local

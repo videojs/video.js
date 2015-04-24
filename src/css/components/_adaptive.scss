@@ -1,23 +1,23 @@
 // When the player is absurdly tiny, display nothing but:
 // - Play button
-// - Captions Button
-.video-js.vjs-layout-tiny {
+// - Fullscreen Button
+.video-js.vjs-layout-tiny:not(.vjs-fullscreen) {
   .vjs-custom-control-spacer { @include flex(auto); }
   &.vjs-no-flex .vjs-custom-control-spacer { width: auto; }
 
   .vjs-current-time, .vjs-captions-button, .vjs-time-divider,
   .vjs-progress-control, .vjs-duration, .vjs-remaining-time, .vjs-playback-rate,
-  .vjs-mute-control, .vjs-volume-control, .vjs-chapters-button,
-  .vjs-subtitles-button, .vjs-volume-button, .vjs-fullscreen-control { display: none; }
+  .vjs-mute-control, .vjs-volume-control, .vjs-chapters-button, .vjs-captions-button,
+  .vjs-subtitles-button, .vjs-volume-menu-button { display: none; }
 }
 
 // When the player is x-small, display nothing but:
 // - Play button
 // - Progress bar
-// - Captions Button
-.video-js.vjs-layout-x-small {
+// - Fullscreen Button
+.video-js.vjs-layout-x-small:not(.vjs-fullscreen) {
   .vjs-current-time, .vjs-captions-button, .vjs-time-divider,
-  .vjs-duration, .vjs-remaining-time, .vjs-playback-rate,
+  .vjs-duration, .vjs-remaining-time, .vjs-playback-rate, .vjs-captions-button,
   .vjs-mute-control, .vjs-volume-control, .vjs-chapters-button,
   .vjs-subtitles-button, .vjs-volume-button, .vjs-fullscreen-control { display: none; }
 }
@@ -29,7 +29,7 @@
 // - Volume menu button
 // - Captions Button
 // - Fullscreen button
-.video-js.vjs-layout-small {
+.video-js.vjs-layout-small:not(.vjs-fullscreen) {
   .vjs-current-time, .vjs-captions-button, .vjs-time-divider,
   .vjs-duration, .vjs-remaining-time, .vjs-playback-rate,
   .vjs-mute-control, .vjs-volume-control, .vjs-chapters-button,
