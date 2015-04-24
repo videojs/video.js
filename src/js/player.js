@@ -284,6 +284,11 @@ class Player extends Component {
     this.on(this.tech, 'timeupdate', this.onTechTimeUpdate);
     this.on(this.tech, 'ratechange', this.onTechRateChange);
     this.on(this.tech, 'volumechange', this.onTechVolumeChange);
+    this.on(this.tech, 'texttrackchange', this.onTextTrackChange)
+
+    // Private events between the player and the tech
+    this.on(this.tech, 'useractive', this.onTechUserActive);
+    this.on(this.tech, 'userinactive', this.onTechUserInactive);
 
     // Add the tech element in the DOM if it was not already there
     // Make sure to not insert the original video element if using Html5
@@ -602,6 +607,30 @@ class Player extends Component {
    */
   onTechVolumeChange() {
     this.trigger('volumechange');
+  }
+
+  /**
+   * Fires when the text track has been changed
+   * @event texttrackchange
+   */
+  onTextTrackChange() {
+    this.trigger('texttrackchange');
+  }
+
+  /**
+   * Fires when the tech detect user activity
+   * @private
+   */
+  onTechUserActive() {
+    this.userActive(true);
+  }
+
+  /**
+   * Fires when the tech want the user to be inactive
+   * @private
+   */
+  onTechUserInactive() {
+    this.userActive(false);
   }
 
   /**
@@ -1349,6 +1378,8 @@ class Player extends Component {
       // Don't trigger a change event unless it actually changed
       if (this.controls_ !== bool) {
         this.controls_ = bool;
+        this.techCall('setControls', bool);
+
         if (bool) {
           this.removeClass('vjs-controls-disabled');
           this.addClass('vjs-controls-enabled');
@@ -1382,6 +1413,8 @@ class Player extends Component {
       // Don't trigger a change event unless it actually changed
       if (this.usingNativeControls_ !== bool) {
         this.usingNativeControls_ = bool;
+        this.techCall('setNativeControls', bool);
+
         if (bool) {
           this.addClass('vjs-using-native-controls');
 
@@ -1472,6 +1505,8 @@ class Player extends Component {
       bool = !!bool;
       if (bool !== this.userActive_) {
         this.userActive_ = bool;
+        this.techCall('setUserActive', bool);
+
         if (bool) {
           // If the user was inactive and is now active we want to reset the
           // inactivity timer
