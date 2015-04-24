@@ -79,6 +79,10 @@ width and height to zero. */
 .video-js .vjs-menu-button.vjs-volume-menu-button .vjs-menu .vjs-menu-content {
   height: 0;
   width: 0;
+
+  // Avoids unnecessary scrollbars in the menu content. Primarily noticed in Chrome on Linux.
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 .video-js .vjs-volume-menu-button:hover .vjs-menu,
