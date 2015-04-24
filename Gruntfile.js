@@ -370,7 +370,7 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['build', 'test']);
 
   // Development watch task. Doing the minimum required.
-  grunt.registerTask('dev', ['jshint', 'less', 'browserify', 'karma:chrome']);
+  grunt.registerTask('dev', ['connect:dev', 'jshint', 'sass', 'browserify', 'karma:chrome']);
 
   // Tests.
   // We want to run things a little differently if it's coming from Travis vs local
