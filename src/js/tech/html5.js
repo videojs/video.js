@@ -141,6 +141,11 @@ class Html5 extends Tech {
       }
 
       Lib.insertFirst(el, player.el());
+    } else {
+      // need to make sure we add the video tag back in the UI, when we are changing tech to html5.
+      if (el.parentNode !== player.el()) {
+        Lib.insertFirst(el, player.el());
+      }
     }
 
     // Update specific tag settings, in case they were overridden
