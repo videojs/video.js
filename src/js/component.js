@@ -459,7 +459,7 @@ class Component {
           let child = children[i];
 
           let name, opts;
-          if (typeof child == 'string') {
+          if (typeof child === 'string') {
             // ['myComponent']
             name = child;
             opts = {};

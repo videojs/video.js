@@ -170,7 +170,7 @@ var on = function(elem, type, fn){
     };
   }
 
-  if (data.handlers[type].length == 1) {
+  if (data.handlers[type].length === 1) {
     if (elem.addEventListener) {
       elem.addEventListener(type, data.dispatcher, false);
     } else if (elem.attachEvent) {

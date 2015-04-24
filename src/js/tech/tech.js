@@ -233,7 +233,7 @@ class Tech extends Component {
 
       let bufferedPercent = this.bufferedPercent();
 
-      if (this.bufferedPercent_ != bufferedPercent) {
+      if (this.bufferedPercent_ !== bufferedPercent) {
         this.trigger('progress');
       }
 
@@ -246,14 +246,14 @@ class Tech extends Component {
   }
 
   onDurationChange() {
-    duration_ = this.duration();
+    this.duration_ = this.duration();
   }
 
   bufferedPercent() {
     let bufferedDuration = 0,
         start, end;
 
-    if (!duration_) {
+    if (!this.duration_) {
       return 0;
     }
 
@@ -268,14 +268,14 @@ class Tech extends Component {
       end   = buffered.end(i);
 
       // buffered end can be bigger than duration by a very small fraction
-      if (end > duration_) {
-        end = duration_;
+      if (end > this.duration_) {
+        end = this.duration_;
       }
 
       bufferedDuration += end - start;
     }
 
-    return bufferedDuration / duration_;
+    return bufferedDuration / this.duration_;
   }
 
   stopTrackingProgress() {

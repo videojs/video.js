@@ -102,7 +102,7 @@ var xhr = function(options, callback){
 
   // XMLHTTPRequest
   } else {
-    const fileUrl = (urlInfo.protocol == 'file:' || winLoc.protocol == 'file:');
+    const fileUrl = (urlInfo.protocol === 'file:' || winLoc.protocol === 'file:');
 
     request.onreadystatechange = function() {
       if (request.readyState === 4) {

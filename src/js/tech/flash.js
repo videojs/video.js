@@ -324,7 +324,7 @@ Flash['onError'] = function(swfID, err){
   const player = Lib.el(swfID)['player'];
   const msg = 'FLASH: '+err;
 
-  if (err == 'srcnotfound') {
+  if (err === 'srcnotfound') {
     player.error({ code: 4, message: msg });
 
   // errors we haven't categorized into the media errors

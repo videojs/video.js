@@ -77,7 +77,7 @@ var videojs = function(id, options, ready){
 
 // CDN Version. Used to target right flash swf.
 videojs.CDN_VERSION = '__VERSION_NO_PATCH__';
-videojs.ACCESS_PROTOCOL = ('https:' == document.location.protocol ? 'https://' : 'http://');
+videojs.ACCESS_PROTOCOL = ('https:' === document.location.protocol ? 'https://' : 'http://');
 
 /**
 * Full player version

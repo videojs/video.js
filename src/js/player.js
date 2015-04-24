@@ -177,7 +177,7 @@ class Player extends Component {
     Lib.obj.each(attrs, function(attr) {
       // workaround so we don't totally break IE7
       // http://stackoverflow.com/questions/3653444/css-styles-not-applied-on-dynamic-elements-in-internet-explorer-7
-      if (attr == 'class') {
+      if (attr === 'class') {
         el.className = attrs[attr];
       } else {
         el.setAttribute(attr, attrs[attr]);
@@ -247,7 +247,7 @@ class Player extends Component {
 
     if (source) {
       this.currentType_ = source.type;
-      if (source.src == this.cache_.src && this.cache_.currentTime > 0) {
+      if (source.src === this.cache_.src && this.cache_.currentTime > 0) {
         techOptions['startTime'] = this.cache_.currentTime;
       }
 
@@ -284,7 +284,7 @@ class Player extends Component {
     this.on(this.tech, 'timeupdate', this.onTechTimeUpdate);
     this.on(this.tech, 'ratechange', this.onTechRateChange);
     this.on(this.tech, 'volumechange', this.onTechVolumeChange);
-    this.on(this.tech, 'texttrackchange', this.onTextTrackChange)
+    this.on(this.tech, 'texttrackchange', this.onTextTrackChange);
 
     // Private events between the player and the tech
     this.on(this.tech, 'useractive', this.onTechUserActive);
@@ -292,7 +292,7 @@ class Player extends Component {
 
     // Add the tech element in the DOM if it was not already there
     // Make sure to not insert the original video element if using Html5
-    if (this.tech.el().parentNode != this.el() && (techName !== 'Html5' || !this.tag)) {
+    if (this.tech.el().parentNode !== this.el() && (techName !== 'Html5' || !this.tag)) {
       Lib.insertFirst(this.tech.el(), this.el());
     }
 
@@ -461,7 +461,7 @@ class Player extends Component {
     this.trigger('progress');
 
     // Add custom event for when source is finished downloading.
-    if (this.bufferedPercent() == 1) {
+    if (this.bufferedPercent() === 1) {
       this.trigger('loadedalldata');
     }
   }
@@ -674,7 +674,7 @@ class Player extends Component {
           Lib.log('Video.js: ' + method + ' method not defined for '+this.techName+' playback technology.', e);
         } else {
           // When a method isn't available on the object it throws a TypeError
-          if (e.name == 'TypeError') {
+          if (e.name === 'TypeError') {
             Lib.log('Video.js: ' + method + ' unavailable on '+this.techName+' playback technology element.', e);
             this.tech.isReady_ = false;
           } else {
@@ -1217,7 +1217,7 @@ class Player extends Component {
             this.techCall('src', source.src);
           }
 
-          if (this.options_['preload'] == 'auto') {
+          if (this.options_['preload'] === 'auto') {
             this.load();
           }
 
@@ -1552,7 +1552,7 @@ class Player extends Component {
     let onMouseMove = function(e) {
       // #1068 - Prevent mousemove spamming
       // Chrome Bug: https://code.google.com/p/chromium/issues/detail?id=366970
-      if(e.screenX != lastMoveX || e.screenY != lastMoveY) {
+      if(e.screenX !== lastMoveX || e.screenY !== lastMoveY) {
         lastMoveX = e.screenX;
         lastMoveY = e.screenY;
         onActivity();

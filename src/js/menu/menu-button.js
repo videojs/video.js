@@ -105,7 +105,7 @@ class MenuButton extends Button {
   onKeyPress(event) {
 
     // Check for space bar (32) or enter (13) keys
-    if (event.which == 32 || event.which == 13) {
+    if (event.which === 32 || event.which === 13) {
       if (this.buttonPressed_){
         this.unpressButton();
       } else {
@@ -113,7 +113,7 @@ class MenuButton extends Button {
       }
       event.preventDefault();
     // Check for escape (27) key
-    } else if (event.which == 27){
+    } else if (event.which === 27){
       if (this.buttonPressed_){
         this.unpressButton();
       }

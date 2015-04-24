@@ -230,7 +230,7 @@ class Html5 extends Tech {
   height() {  return this.el_.offsetHeight; }
 
   supportsFullScreen() {
-    if (typeof this.el_.webkitEnterFullScreen == 'function') {
+    if (typeof this.el_.webkitEnterFullScreen === 'function') {
 
       // Seems to be broken in Chromium/Chrome && Safari in Leopard
       if (/Android/.test(Lib.USER_AGENT) || !/Chrome|Mac OS X 10.5/.test(Lib.USER_AGENT)) {

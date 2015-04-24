@@ -12,6 +12,7 @@
     "undef"    : true,
     "laxbreak" : true,
     "esnext"   : true,
+    "eqeqeq"   : true,
     "predef"   : [
         "_V_",
         "goog",
