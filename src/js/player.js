@@ -286,7 +286,8 @@ class Player extends Component {
     this.on(this.tech, 'volumechange', this.onTechVolumeChange);
 
     // Add the tech element in the DOM if it was not already there
-    if (this.tech.el().parentNode != this.el()) {
+    // Make sure to not insert the original video element if using Html5
+    if (this.tech.el().parentNode != this.el() && (techName !== 'Html5' || !this.tag)) {
       Lib.insertFirst(this.tech.el(), this.el());
     }
 
