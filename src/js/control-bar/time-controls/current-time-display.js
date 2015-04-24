@@ -17,7 +17,7 @@ class CurrentTimeDisplay extends Component {
 
   createEl() {
     let el = super.createEl('div', {
-      className: 'vjs-current-time vjs-time-controls vjs-control'
+      className: 'vjs-current-time vjs-time-control vjs-control'
     });
 
     this.contentEl_ = Lib.createEl('div', {

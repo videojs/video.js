@@ -403,6 +403,7 @@ class Player extends Component {
    * @event pause
    */
   onPause() {
+    this.removeClass('vjs-playing');
     this.addClass('vjs-paused');
   }
 
