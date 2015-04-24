@@ -301,10 +301,7 @@ class Html5 extends Tech {
   setAutoplay(val) { this.el_.autoplay = val; }
 
   controls() { return this.el_.controls; }
-  setControls(val) {
-    super.setControls(val);
-    this.el_.controls = !!val;
-  }
+  setControls(val) { this.el_.controls = !!val; }
 
   loop() { return this.el_.loop; }
   setLoop(val) { this.el_.loop = val; }

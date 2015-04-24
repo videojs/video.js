@@ -46,7 +46,6 @@ class Tech extends Component {
     }
 
     this.initTextTrackListeners();
-    this.userActive_ = true;
   }
 
   /**
@@ -76,135 +75,10 @@ class Tech extends Component {
     // Long term we might consider how we would do this for other events like 'canplay'
     // that may also have fired.
     this.ready(function(){
-      this.controls_ = !!this.options.controls;
-
-      // Set up event listeners once the tech is ready and has an element to apply
-      // listeners to
-      if (this.controls_ && !this.nativeControls_) {
-        this.addControlsListener();
-      }
-
       if (this.networkState && this.networkState() > 0) {
         this.trigger('loadstart');
       }
     });
-  }
-
-  setControls(bool) {
-    this.controls_ = bool;
-
-    if (bool) {
-      if (this.controls_ && !this.nativeControls_) {
-        this.addControlsListener();
-      }
-    } else {
-      this.removeControlsListeners();
-    }
-  }
-
-  setNativeControls(bool) {
-    this.nativeControls_ = bool;
-  }
-
-  setUserActive(bool) {
-    this.userActive_ = bool;
-  }
-
-  addControlsListeners() {
-    let userWasActive;
-
-    // Some browsers (Chrome & IE) don't trigger a click on a flash swf, but do
-    // trigger mousedown/up.
-    // http://stackoverflow.com/questions/1444562/javascript-onclick-event-over-flash-object
-    // Any touch events are set to block the mousedown event from happening
-    this.on('mousedown', this.onClick);
-
-    // Track the pause status
-    this.on('play', this.onPlay);
-    this.on('pause', this.onPause);
-
-    // If the controls were hidden we don't want that to change without a tap event
-    // so we'll check if the controls were already showing before reporting user
-    // activity
-    this.on('touchstart', function(event) {
-      userWasActive = this.userActive_;
-    });
-
-    this.on('touchmove', function(event) {
-      if (userWasActive){
-        this.trigger('useractive');
-      }
-    });
-
-    this.on('touchend', function(event) {
-      // Stop the mouse events from also happening
-      event.preventDefault();
-    });
-
-    // Turn on component tap events
-    this.emitTapEvents();
-
-    // The tap listener needs to come after the touchend listener because the tap
-    // listener cancels out any reportedUserActivity when setting userActive(false)
-    this.on('tap', this.onTap);
-  }
-
-  /**
-   * Remove the listeners used for click and tap controls. This is needed for
-   * toggling to controls disabled, where a tap/touch should do nothing.
-   */
-  removeControlsListeners() {
-    // We don't want to just use `this.off()` because there might be other needed
-    // listeners added by techs that extend this.
-    this.off('tap');
-    this.off('touchstart');
-    this.off('touchmove');
-    this.off('touchleave');
-    this.off('touchcancel');
-    this.off('touchend');
-    this.off('click');
-    this.off('pause', this.onPause); // event also used to track time
-    this.off('play', this.onPlay); // event also used to track time
-    this.off('mousedown');
-  }
-
-  /**
-   * Handle a click on the media element. By default will play/pause the media.
-   */
-  onClick(event) {
-    // We're using mousedown to detect clicks thanks to Flash, but mousedown
-    // will also be triggered with right-clicks, so we need to prevent that
-    if (event.button !== 0) return;
-
-    // When controls are disabled a click should not toggle playback because
-    // the click is considered a control
-    if (this.controls_) {
-      if (this.paused_) {
-        this.trigger('play');
-      } else {
-        this.trigger('pause');
-      }
-    }
-  }
-
-  onPlay() {
-    this.paused_ = false;
-  }
-
-  onPause() {
-    this.paused_ = true;
-  }
-
-  /**
-   * Handle a tap on the media element. By default it will toggle the user
-   * activity state, which hides and shows the controls.
-   */
-  onTap() {
-    if (this.userActive_) {
-      this.trigger('userinactive');
-    } else {
-      this.trigger('useractive');
-    }
   }
 
   /* Fallbacks for unsupported event types
@@ -336,8 +210,6 @@ class Tech extends Component {
     if (this.manualTimeUpdates) { this.trigger('timeupdate'); }
   }
 
-  // TODO: Consider looking at moving this into the text track display directly
-  // https://github.com/videojs/video.js/issues/1863
   initTextTrackListeners() {
     let textTrackListChanges = Lib.bind(this, function() {
       this.trigger('texttrackchange');
@@ -370,13 +242,17 @@ class Tech extends Component {
     }
 
     let textTracksChanges = function() {
+      let updateDisplay = Lib.bind(this, function() {
+        this.trigger('texttrackchange');
+      });
+      
       this.trigger('texttrackchange');
 
       for (let i = 0; i < this.length; i++) {
         let track = this[i];
-        track.removeEventListener('cuechange', Lib.bind(textTrackDisplay, textTrackDisplay.updateDisplay));
+        track.removeEventListener('cuechange', updateDisplay);
         if (track.mode === 'showing') {
-          track.addEventListener('cuechange', Lib.bind(textTrackDisplay, textTrackDisplay.updateDisplay));
+          track.addEventListener('cuechange', updateDisplay);
         }
       }
     };

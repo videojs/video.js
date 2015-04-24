@@ -211,6 +211,7 @@ class Player extends Component {
     Lib.insertFirst(tag, el); // Breaks iPhone, fixed in HTML5 setup.
 
     this.el_ = el;
+    this.on('fullscreenchange', this.onFullscreenChange);
 
     return el;
   }
@@ -285,10 +286,10 @@ class Player extends Component {
     this.on(this.tech, 'ratechange', this.onTechRateChange);
     this.on(this.tech, 'volumechange', this.onTechVolumeChange);
     this.on(this.tech, 'texttrackchange', this.onTextTrackChange);
-
-    // Private events between the player and the tech
-    this.on(this.tech, 'useractive', this.onTechUserActive);
-    this.on(this.tech, 'userinactive', this.onTechUserInactive);
+    
+    if (this.controls() && !this.usingNativeControls()) {
+      this.addTechControlsListeners();
+    }
 
     // Add the tech element in the DOM if it was not already there
     // Make sure to not insert the original video element if using Html5
@@ -305,6 +306,57 @@ class Player extends Component {
     this.tech.dispose();
 
     this.tech = false;
+  }
+  
+  addTechControlsListeners() {
+    let userWasActive;
+
+    // Some browsers (Chrome & IE) don't trigger a click on a flash swf, but do
+    // trigger mousedown/up.
+    // http://stackoverflow.com/questions/1444562/javascript-onclick-event-over-flash-object
+    // Any touch events are set to block the mousedown event from happening
+    this.on(this.tech, 'mousedown', this.onTechClick);
+
+    // If the controls were hidden we don't want that to change without a tap event
+    // so we'll check if the controls were already showing before reporting user
+    // activity
+    this.on(this.tech, 'touchstart', function(event) {
+      userWasActive = this.userActive();
+    });
+
+    this.on(this.tech, 'touchmove', function(event) {
+      if (userWasActive){
+        this.reportUserActivity();
+      }
+    });
+
+    this.on(this.tech, 'touchend', function(event) {
+      // Stop the mouse events from also happening
+      event.preventDefault();
+    });
+
+    // Turn on component tap events
+    this.tech.emitTapEvents();
+
+    // The tap listener needs to come after the touchend listener because the tap
+    // listener cancels out any reportedUserActivity when setting userActive(false)
+    this.on(this.tech, 'tap', this.onTechTap);
+  }
+  
+  /**
+   * Remove the listeners used for click and tap controls. This is needed for
+   * toggling to controls disabled, where a tap/touch should do nothing.
+   */
+  removeControlsListeners() {
+    // We don't want to just use `this.off()` because there might be other needed
+    // listeners added by techs that extend this.
+    this.off(this.tech, 'tap', this.onTechTap);
+    this.off(this.tech, 'touchstart');
+    this.off(this.tech, 'touchmove');
+    this.off(this.tech, 'touchleave');
+    this.off(this.tech, 'touchcancel');
+    this.off(this.tech, 'touchend');
+    this.off(this.tech, 'mousedown', this.onTechClick);
   }
 
   /**
@@ -490,6 +542,33 @@ class Player extends Component {
     this.updateDuration();
     this.trigger('durationchange');
   }
+  
+  /**
+   * Handle a click on the media element to play/pause
+   */
+  onTechClick(event) {
+    // We're using mousedown to detect clicks thanks to Flash, but mousedown
+    // will also be triggered with right-clicks, so we need to prevent that
+    if (event.button !== 0) return;
+
+    // When controls are disabled a click should not toggle playback because
+    // the click is considered a control
+    if (this.controls()) {
+      if (this.paused()) {
+        this.play();
+      } else {
+        this.pause();
+      }
+    }
+  }
+  
+  /**
+   * Handle a tap on the media element. It will toggle the user
+   * activity state, which hides and shows the controls.
+   */
+  onTechTap() {
+    this.userActive(!this.userActive());
+  }
 
   /**
    * Update the duration of the player using the tech
@@ -518,13 +597,15 @@ class Player extends Component {
    * Fired when the player switches in or out of fullscreen mode
    * @event fullscreenchange
    */
-  onTechFullscreenChange() {
+  onFullscreenChange() {
     if (this.isFullscreen()) {
       this.addClass('vjs-fullscreen');
     } else {
       this.removeClass('vjs-fullscreen');
     }
-
+  }
+  
+  onTechFullscreenChange() {
     this.trigger('fullscreenchange');
   }
 
@@ -534,7 +615,6 @@ class Player extends Component {
    */
   onTechError() {
     this.error(this.tech.error().code);
-    this.trigger('error');
   }
 
   /**
@@ -615,22 +695,6 @@ class Player extends Component {
    */
   onTextTrackChange() {
     this.trigger('texttrackchange');
-  }
-
-  /**
-   * Fires when the tech detect user activity
-   * @private
-   */
-  onTechUserActive() {
-    this.userActive(true);
-  }
-
-  /**
-   * Fires when the tech want the user to be inactive
-   * @private
-   */
-  onTechUserInactive() {
-    this.userActive(false);
   }
 
   /**
@@ -1378,16 +1442,20 @@ class Player extends Component {
       // Don't trigger a change event unless it actually changed
       if (this.controls_ !== bool) {
         this.controls_ = bool;
-        this.techCall('setControls', bool);
-
         if (bool) {
           this.removeClass('vjs-controls-disabled');
           this.addClass('vjs-controls-enabled');
           this.trigger('controlsenabled');
+          
+          if (this.controls() && !this.usingNativeControls()) {
+            this.addTechControlsListeners();
+          }
         } else {
           this.removeClass('vjs-controls-enabled');
           this.addClass('vjs-controls-disabled');
           this.trigger('controlsdisabled');
+          
+          this.removeTechControlsListeners();
         }
       }
       return this;
@@ -1413,8 +1481,6 @@ class Player extends Component {
       // Don't trigger a change event unless it actually changed
       if (this.usingNativeControls_ !== bool) {
         this.usingNativeControls_ = bool;
-        this.techCall('setNativeControls', bool);
-
         if (bool) {
           this.addClass('vjs-using-native-controls');
 
@@ -1505,8 +1571,6 @@ class Player extends Component {
       bool = !!bool;
       if (bool !== this.userActive_) {
         this.userActive_ = bool;
-        this.techCall('setUserActive', bool);
-
         if (bool) {
           // If the user was inactive and is now active we want to reset the
           // inactivity timer
