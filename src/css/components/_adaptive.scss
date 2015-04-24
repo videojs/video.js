@@ -2,8 +2,8 @@
 // - Play button
 // - Captions Button
 .video-js.vjs-layout-tiny {
-  .vjs-separator-control { @include flex(auto); }
-  &.vjs-no-flex .vjs-separator-control { width: auto; }
+  .vjs-custom-control-spacer { @include flex(auto); }
+  &.vjs-no-flex .vjs-custom-control-spacer { width: auto; }
 
   .vjs-current-time, .vjs-captions-button, .vjs-time-divider,
   .vjs-progress-control, .vjs-duration, .vjs-remaining-time, .vjs-playback-rate,
