@@ -148,8 +148,7 @@ vjs.Html5.prototype.createEl = function(){
     }
 
     vjs.insertFirst(el, player.el());
-  }
-  else {
+  } else {
     // need to make sure we add the video tag back in the UI, when we are changing tech to html5.
     if (el.parentNode !== player.el()) {
       vjs.insertFirst(el, player.el());
