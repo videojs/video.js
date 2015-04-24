@@ -70,16 +70,10 @@ class Tech extends Component {
   initControlsListeners() {
     let player = this.player();
 
-    let activateControls = function(){
-      if (player.controls() && !player.usingNativeControls()) {
-        this.addControlsListeners();
-      }
-    };
-
     // Set up event listeners once the tech is ready and has an element to apply
     // listeners to
-    this.ready(activateControls);
-    this.on(player, 'controlsenabled', activateControls);
+    this.ready(this.activateControls);
+    this.on(player, 'controlsenabled', this.activateControls);
     this.on(player, 'controlsdisabled', this.removeControlsListeners);
 
     // if we're loading the playback object after it has started loading or playing the
@@ -144,6 +138,21 @@ class Tech extends Component {
     this.off('touchend');
     this.off('click');
     this.off('mousedown');
+  }
+
+  removeControls() {
+    let player = this.player();
+
+    this.off(player, 'controlsenabled', this.activateControls);
+    this.off(player, 'controlsdisabled', this.removeControlsListeners);
+  }
+
+  activateControls() {
+    let player = this.player();
+
+    if (player.controls() && !player.usingNativeControls()) {
+      this.addControlsListeners();
+    }
   }
 
   /**
@@ -255,11 +264,17 @@ class Tech extends Component {
     this.player().trigger('timeupdate');
   }
 
-  dispose() {
+  stopTracking() {
     // Turn off any manual progress or timeupdate tracking
+    
     if (this.manualProgress) { this.manualProgressOff(); }
 
     if (this.manualTimeUpdates) { this.manualTimeUpdatesOff(); }
+  }
+
+  dispose() {
+    this.stopTracking();
+    this.removeControls();
 
     super.dispose();
   }
