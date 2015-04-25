@@ -18,30 +18,30 @@ import document from 'global/document';
  */
 class Tech extends Component {
 
-  constructor(player, options, ready){
+  constructor(options, ready){
     options = options || {};
     // we don't want the tech to report user activity automatically.
     // This is done manually in addControlsListeners
     options.reportTouchActivity = false;
-    super(player, options, ready);
+    super(null, options, ready);
 
     // Manually track progress in cases where the browser/flash player doesn't report it.
-    if (!this['featuresProgressEvents']) {
+    if (!this.featuresProgressEvents) {
       this.manualProgressOn();
     }
 
     // Manually track timeupdates in cases where the browser/flash player doesn't report it.
-    if (!this['featuresTimeupdateEvents']) {
+    if (!this.featuresTimeupdateEvents) {
       this.manualTimeUpdatesOn();
     }
 
     this.initControlsListeners();
 
-    if (options['nativeCaptions'] === false || options['nativeTextTracks'] === false) {
-      this['featuresNativeTextTracks'] = false;
+    if (options.nativeCaptions === false || options.nativeTextTracks === false) {
+      this.featuresNativeTextTracks = false;
     }
 
-    if (!this['featuresNativeTextTracks']) {
+    if (!this.featuresNativeTextTracks) {
       this.emulateTextTracks();
     }
 
@@ -167,7 +167,7 @@ class Tech extends Component {
     // Watch for native timeupdate event
     this.one('timeupdate', function(){
       // Update known progress support for this playback technology
-      this['featuresTimeupdateEvents'] = true;
+      this.featuresTimeupdateEvents = true;
       // Turn off manual progress tracking
       this.manualTimeUpdatesOff();
     });
@@ -245,7 +245,7 @@ class Tech extends Component {
       let updateDisplay = Lib.bind(this, function() {
         this.trigger('texttrackchange');
       });
-      
+
       this.trigger('texttrackchange');
 
       for (let i = 0; i < this.length; i++) {
@@ -289,7 +289,7 @@ class Tech extends Component {
   }
 
   addRemoteTextTrack(options) {
-    let track = createTrackHelper(this, options['kind'], options['label'], options['language'], options);
+    let track = createTrackHelper(this, options.kind, options.label, options.language, options);
     this.remoteTextTracks().addTrack_(track);
     return {
       track: track
@@ -323,12 +323,12 @@ var createTrackHelper = function(self, kind, label, language, options) {
 
   options = options || {};
 
-  options['kind'] = kind;
+  options.kind = kind;
   if (label) {
-    options['label'] = label;
+    options.label = label;
   }
   if (language) {
-    options['language'] = language;
+    options.language = language;
   }
   options.tech = self;
 
@@ -338,18 +338,18 @@ var createTrackHelper = function(self, kind, label, language, options) {
   return track;
 };
 
-Tech.prototype['featuresVolumeControl'] = true;
+Tech.prototype.featuresVolumeControl = true;
 
 // Resizing plugins using request fullscreen reloads the plugin
-Tech.prototype['featuresFullscreenResize'] = false;
-Tech.prototype['featuresPlaybackRate'] = false;
+Tech.prototype.featuresFullscreenResize = false;
+Tech.prototype.featuresPlaybackRate = false;
 
 // Optional events that we can manually mimic with timers
 // currently not triggered by video-js-swf
-Tech.prototype['featuresProgressEvents'] = false;
-Tech.prototype['featuresTimeupdateEvents'] = false;
+Tech.prototype.featuresProgressEvents = false;
+Tech.prototype.featuresTimeupdateEvents = false;
 
-Tech.prototype['featuresNativeTextTracks'] = false;
+Tech.prototype.featuresNativeTextTracks = false;
 
 /**
  * A functional mixin for techs that want to use the Source Handler pattern.

@@ -263,7 +263,7 @@ class Player extends Component {
 
     // Initialize tech instance
     let techComponent = Component.getComponent(techName);
-    this.tech = new techComponent(this, techOptions);
+    this.tech = new techComponent(techOptions);
 
     this.on(this.tech, 'ready', this.onTechReady);
     this.on(this.tech, 'usenativecontrols', this.onTechUseNativeControls);

@@ -17,8 +17,8 @@ import document from 'global/document';
  */
 class Html5 extends Tech {
 
-  constructor(player, options, ready){
-    super(player, options, ready);
+  constructor(options, ready){
+    super(options, ready);
 
     const source = options.source;
 

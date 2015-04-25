@@ -21,8 +21,8 @@ let navigator = window.navigator;
  */
 class Flash extends Tech {
 
-  constructor(player, options, ready){
-    super(player, options, ready);
+  constructor(options, ready){
+    super(options, ready);
 
     let { source, parentEl } = options;
 
