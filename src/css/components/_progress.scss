@@ -1,8 +1,6 @@
 .video-js .vjs-progress-control {
   @include flex(auto);
   @include display-flex(center);
-
-  @include transition(all 0.4s);
 }
 
 /* Box containing play and load progresses. Also acts as seek scrubber. */

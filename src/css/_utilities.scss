@@ -71,6 +71,14 @@
   flex: $value;
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/user-select
+@mixin user-select($string: none) {
+  -webkit-user-select: $string;
+  -moz-user-select: $string;
+  -ms-user-select: $string;
+  user-select: $string
+}
+
 @mixin order($value) {
   -webkit-box-ordinal-group: $value;
   -moz-box-ordinal-group: $value;
