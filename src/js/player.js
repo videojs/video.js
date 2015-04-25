@@ -1499,14 +1499,17 @@ class Player extends Component {
       // Don't trigger a change event unless it actually changed
       if (this.controls_ !== bool) {
         this.controls_ = bool;
-        this.techCall('setControls', this.controls);
+
+        if (!this.usingNativeControls()) {
+          this.techCall('setControls', this.controls);
+        }
 
         if (bool) {
           this.removeClass('vjs-controls-disabled');
           this.addClass('vjs-controls-enabled');
           this.trigger('controlsenabled');
 
-          if (this.controls() && !this.usingNativeControls()) {
+          if (!this.usingNativeControls()) {
             this.addTechControlsListeners();
           }
         } else {
