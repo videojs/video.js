@@ -244,7 +244,11 @@ class Player extends Component {
     };
 
     // Grab tech-specific options from player options and add source and parent element to use.
-    var techOptions = Lib.obj.merge({ 'source': source, 'parentEl': this.el_ }, this.options_[techName.toLowerCase()]);
+    var techOptions = Lib.obj.merge({ 'source': source, 'playerId': this.id() }, this.options_[techName.toLowerCase()]);
+    
+    if (this.tag) {
+      techOptions.tag = this.tag;
+    }
 
     if (source) {
       this.currentType_ = source.type;
@@ -259,6 +263,9 @@ class Player extends Component {
     let techComponent = Component.getComponent(techName);
     this.tech = new techComponent(this, techOptions);
 
+    this.on(this.tech, 'ready', this.onTechReady);
+    this.on(this.tech, 'usenativecontrols', this.onTechUseNativeControls);
+    
     // Listen to every HTML5 events and trigger them back on the player for the plugins
     this.on(this.tech, 'loadstart', this.onTechLoadStart);
     this.on(this.tech, 'waiting', this.onTechWaiting);
@@ -357,6 +364,31 @@ class Player extends Component {
     this.off(this.tech, 'touchcancel');
     this.off(this.tech, 'touchend');
     this.off(this.tech, 'mousedown', this.onTechClick);
+  }
+  
+  /**
+   * Player waits for the tech to be ready
+   * @private
+   */
+  onTechReady() {
+    this.triggerReady();
+    
+    // Chrome and Safari both have issues with autoplay.
+    // In Safari (5.1.1), when we move the video element into the container div, autoplay doesn't work.
+    // In Chrome (15), if you have autoplay + a poster + no controls, the video gets hidden (but audio plays)
+    // This fixes both issues. Need to wait for API, so it updates displays correctly
+    if (this.tag && this.options_.autoplay && this.paused()) {
+      delete this.tag.poster; // Chrome Fix. Fixed in Chrome v16.
+      this.play();
+    }
+  }
+  
+  /**
+   * Fired when the native controls are used
+   * @private
+   */
+  onTechUseNativeControls() {
+    this.usingNativeControls(true);
   }
 
   /**
@@ -1442,6 +1474,8 @@ class Player extends Component {
       // Don't trigger a change event unless it actually changed
       if (this.controls_ !== bool) {
         this.controls_ = bool;
+        this.techCall('setControls', this.controls);
+        
         if (bool) {
           this.removeClass('vjs-controls-disabled');
           this.addClass('vjs-controls-enabled');
