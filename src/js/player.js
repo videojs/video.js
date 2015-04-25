@@ -138,6 +138,9 @@ class Player extends Component {
     this.userActive_ = true;
     this.reportUserActivity();
     this.listenForUserActivity();
+
+    this.on('fullscreenchange', this.onFullscreenChange);
+    this.on('stageclick', this.onStageClick);
   }
 
   /**
@@ -211,7 +214,6 @@ class Player extends Component {
     Lib.insertFirst(tag, el); // Breaks iPhone, fixed in HTML5 setup.
 
     this.el_ = el;
-    this.on('fullscreenchange', this.onFullscreenChange);
 
     return el;
   }
@@ -245,7 +247,7 @@ class Player extends Component {
 
     // Grab tech-specific options from player options and add source and parent element to use.
     var techOptions = Lib.obj.merge({ 'source': source, 'playerId': this.id() }, this.options_[techName.toLowerCase()]);
-    
+
     if (this.tag) {
       techOptions.tag = this.tag;
     }
@@ -265,7 +267,13 @@ class Player extends Component {
 
     this.on(this.tech, 'ready', this.onTechReady);
     this.on(this.tech, 'usenativecontrols', this.onTechUseNativeControls);
-    
+
+    // firefox doesn't bubble mousemove events to parent. videojs/video-js-swf#37
+    // bugzilla bug: https://bugzilla.mozilla.org/show_bug.cgi?id=836786
+    if (Lib.IS_FIREFOX) {
+      this.on(this.tech, 'mousemove', this.onTechMouseMove);
+    }
+
     // Listen to every HTML5 events and trigger them back on the player for the plugins
     this.on(this.tech, 'loadstart', this.onTechLoadStart);
     this.on(this.tech, 'waiting', this.onTechWaiting);
@@ -293,7 +301,7 @@ class Player extends Component {
     this.on(this.tech, 'ratechange', this.onTechRateChange);
     this.on(this.tech, 'volumechange', this.onTechVolumeChange);
     this.on(this.tech, 'texttrackchange', this.onTextTrackChange);
-    
+
     if (this.controls() && !this.usingNativeControls()) {
       this.addTechControlsListeners();
     }
@@ -314,7 +322,7 @@ class Player extends Component {
 
     this.tech = false;
   }
-  
+
   addTechControlsListeners() {
     let userWasActive;
 
@@ -349,7 +357,7 @@ class Player extends Component {
     // listener cancels out any reportedUserActivity when setting userActive(false)
     this.on(this.tech, 'tap', this.onTechTap);
   }
-  
+
   /**
    * Remove the listeners used for click and tap controls. This is needed for
    * toggling to controls disabled, where a tap/touch should do nothing.
@@ -365,14 +373,14 @@ class Player extends Component {
     this.off(this.tech, 'touchend');
     this.off(this.tech, 'mousedown', this.onTechClick);
   }
-  
+
   /**
    * Player waits for the tech to be ready
    * @private
    */
   onTechReady() {
     this.triggerReady();
-    
+
     // Chrome and Safari both have issues with autoplay.
     // In Safari (5.1.1), when we move the video element into the container div, autoplay doesn't work.
     // In Chrome (15), if you have autoplay + a poster + no controls, the video gets hidden (but audio plays)
@@ -382,7 +390,15 @@ class Player extends Component {
       this.play();
     }
   }
-  
+
+  /**
+   * Fired when a mouse move on the tech element
+   * @private
+   */
+  onTechMouseMove() {
+    this.reportUserActivity();
+  }
+
   /**
    * Fired when the native controls are used
    * @private
@@ -574,7 +590,7 @@ class Player extends Component {
     this.updateDuration();
     this.trigger('durationchange');
   }
-  
+
   /**
    * Handle a click on the media element to play/pause
    */
@@ -593,7 +609,7 @@ class Player extends Component {
       }
     }
   }
-  
+
   /**
    * Handle a tap on the media element. It will toggle the user
    * activity state, which hides and shows the controls.
@@ -636,7 +652,16 @@ class Player extends Component {
       this.removeClass('vjs-fullscreen');
     }
   }
-  
+
+  /**
+   * native click events on the SWF aren't triggered on IE11, Win8.1RT
+   * use stageclick events triggered from inside the SWF instead
+   * @private
+   */
+  onStageClick() {
+    this.reportUserActivity();
+  }
+
   onTechFullscreenChange() {
     this.trigger('fullscreenchange');
   }
@@ -1475,12 +1500,12 @@ class Player extends Component {
       if (this.controls_ !== bool) {
         this.controls_ = bool;
         this.techCall('setControls', this.controls);
-        
+
         if (bool) {
           this.removeClass('vjs-controls-disabled');
           this.addClass('vjs-controls-enabled');
           this.trigger('controlsenabled');
-          
+
           if (this.controls() && !this.usingNativeControls()) {
             this.addTechControlsListeners();
           }
@@ -1488,7 +1513,7 @@ class Player extends Component {
           this.removeClass('vjs-controls-enabled');
           this.addClass('vjs-controls-disabled');
           this.trigger('controlsdisabled');
-          
+
           this.removeTechControlsListeners();
         }
       }

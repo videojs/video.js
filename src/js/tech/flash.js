@@ -27,12 +27,7 @@ class Flash extends Tech {
     let { source, parentEl } = options;
 
     // Generate ID for swf object
-    let objId = player.id()+'_flash_api';
-
-    // Store player options in local var for optimization
-    // TODO: switch to using player methods instead of options
-    // e.g. player.autoplay();
-    let playerOptions = player.options_;
+    let objId = options.playerId+'_flash_api';
 
     // Merge default flashvars with ones passed in to init
     let flashVars = Lib.obj.merge({
@@ -43,25 +38,25 @@ class Flash extends Tech {
       'errorEventProxyFunction': 'videojs.Flash.onError',
 
       // Player Settings
-      'autoplay': playerOptions.autoplay,
-      'preload': playerOptions.preload,
-      'loop': playerOptions.loop,
-      'muted': playerOptions.muted
+      'autoplay': options.autoplay,
+      'preload': options.preload,
+      'loop': options.loop,
+      'muted': options.muted
 
-    }, options['flashVars']);
+    }, options.flashVars);
 
     // Merge default parames with ones passed in
     let params = Lib.obj.merge({
       'wmode': 'opaque', // Opaque is needed to overlay controls, but can affect playback performance
       'bgcolor': '#000000' // Using bgcolor prevents a white flash when the object is loading
-    }, options['params']);
+    }, options.params);
 
     // Merge default attributes with ones passed in
     let attributes = Lib.obj.merge({
       'id': objId,
       'name': objId, // Both ID and Name needed or swf to identify itself
       'class': 'vjs-tech'
-    }, options['attributes']);
+    }, options.attributes);
 
     // If source was supplied pass as a flash var.
     if (source) {
@@ -72,31 +67,16 @@ class Flash extends Tech {
 
     // Having issues with Flash reloading on certain page actions (hide/resize/fullscreen) in certain browsers
     // This allows resetting the playhead when we catch the reload
-    if (options['startTime']) {
+    if (options.startTime) {
       this.ready(function(){
         this.load();
         this.play();
-        this['currentTime'](options['startTime']);
+        this.currentTime(options.startTime);
       });
     }
 
-    // firefox doesn't bubble mousemove events to parent. videojs/video-js-swf#37
-    // bugzilla bug: https://bugzilla.mozilla.org/show_bug.cgi?id=836786
-    if (Lib.IS_FIREFOX) {
-      this.ready(function(){
-        this.on('mousemove', function(){
-          // since it's a custom event, don't bubble higher than the player
-          this.player().trigger({ 'type':'mousemove', 'bubbles': false });
-        });
-      });
-    }
-
-    // native click events on the SWF aren't triggered on IE11, Win8.1RT
-    // use stageclick events triggered from inside the SWF instead
-    player.on('stageclick', player.reportUserActivity);
-
-    this.el_ = Flash.embed(options['swf'], flashVars, params, attributes);
-    this.el_['tech'] = this;
+    this.el_ = Flash.embed(options.swf, flashVars, params, attributes);
+    this.el_.tech = this;
   }
 
   play() {
@@ -109,7 +89,7 @@ class Flash extends Tech {
 
   src(src) {
     if (src === undefined) {
-      return this['currentSrc']();
+      return this.currentSrc();
     }
 
     // Setting src through `src` not `setSrc` will be deprecated
@@ -123,7 +103,7 @@ class Flash extends Tech {
 
     // Currently the SWF doesn't autoplay if you load a source later.
     // e.g. Load player w/ no source, wait 2s, set src.
-    if (this.player_.autoplay()) {
+    if (this.autoplay()) {
       var tech = this;
       this.setTimeout(function(){ tech.play(); }, 0);
     }
@@ -277,25 +257,20 @@ Flash.formats = {
   'video/m4v': 'MP4'
 };
 
-Flash['onReady'] = function(currSwf){
-  let el = Lib.el(currSwf);
+Flash.onReady = function(currSwf){
+  let tech = Lib.el(currSwf).tech;
 
-  // get player from the player div property
-  const player = el && el.parentNode && el.parentNode['player'];
-
-  // if there is no el or player then the tech has been disposed
+  // if there is no el then the tech has been disposed
   // and the tech element was removed from the player div
-  if (player) {
-    // reference player on tech element
-    el['player'] = player;
+  if (tech && tech.el()) {
     // check that the flash object is really ready
-    Flash['checkReady'](player.tech);
+    Flash.checkReady(tech);
   }
 };
 
 // The SWF isn't always ready when it says it is. Sometimes the API functions still need to be added to the object.
 // If it's not ready, we set a timeout to check again shortly.
-Flash['checkReady'] = function(tech){
+Flash.checkReady = function(tech){
   // stop worrying if the tech has been disposed
   if (!tech.el()) {
     return;
@@ -314,22 +289,22 @@ Flash['checkReady'] = function(tech){
 };
 
 // Trigger events from the swf on the player
-Flash['onEvent'] = function(swfID, eventName){
-  let tech = Lib.el(swfID)['tech'];
+Flash.onEvent = function(swfID, eventName){
+  let tech = Lib.el(swfID).tech;
   tech.trigger(eventName);
 };
 
 // Log errors from the swf
-Flash['onError'] = function(swfID, err){
-  const player = Lib.el(swfID)['player'];
+Flash.onError = function(swfID, err){
+  const tech = Lib.el(swfID).tech;
   const msg = 'FLASH: '+err;
 
   if (err === 'srcnotfound') {
-    player.error({ code: 4, message: msg });
+    tech.trigger('error', { code: 4, message: msg });
 
   // errors we haven't categorized into the media errors
   } else {
-    player.error(msg);
+    tech.trigger('error', msg);
   }
 };
 
