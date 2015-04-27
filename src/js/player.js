@@ -90,6 +90,13 @@ class Player extends Component {
     // Cache for video property values.
     this.cache_ = {};
 
+    // Load plugins
+    if (options['plugins']) {
+      Lib.obj.each(options['plugins'], function(key, val){
+        this[key](val);
+      }, this);
+    }
+
     // Set poster
     this.poster_ = options['poster'] || '';
 
@@ -126,12 +133,6 @@ class Player extends Component {
 
     // Make player easily findable by ID
     Player.players[this.id_] = this;
-
-    if (options['plugins']) {
-      Lib.obj.each(options['plugins'], function(key, val){
-        this[key](val);
-      }, this);
-    }
 
     // When the player is first initialized, trigger activity so components
     // like the control bar show themselves if needed
