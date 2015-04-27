@@ -22,9 +22,10 @@
   },
   "main": "src/js/video.js",
   "dependencies": {
+    "global": "^4.3.0",
+    "safe-json-parse": "^4.0.0",
     "videojs-swf": "4.5.4",
-    "vtt.js": "git+https://github.com/gkatsev/vtt.js.git#shim-build",
-    "global": "^4.3.0"
+    "vtt.js": "git+https://github.com/gkatsev/vtt.js.git#shim-build"
   },
   "devDependencies": {
     "babelify": "^6.0.1",
@@ -34,6 +35,7 @@
     "chg": "~0.2.0",
     "grunt": "^0.4.4",
     "grunt-aws-s3": "^0.12.1",
+    "grunt-banner": "^0.3.1",
     "grunt-browserify": "^3.5.0",
     "grunt-cli": "~0.1.0",
     "grunt-contrib-clean": "~0.4.0a",

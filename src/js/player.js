@@ -4,7 +4,7 @@ import * as Events from './events.js';
 import FullscreenApi from './fullscreen-api.js';
 import MediaError from './media-error.js';
 import Options from './options.js';
-import JSON from './json.js';
+import safeParseTuple from 'safe-json-parse/tuple';
 import window from 'global/window';
 import document from 'global/document';
 
@@ -1624,7 +1624,7 @@ class Player extends Component {
     if (dataSetup !== null){
       // Parse options JSON
       // If empty string, make it a parsable json object.
-      Lib.obj.merge(tagOptions, JSON.parse(dataSetup || '{}'));
+      Lib.obj.merge(tagOptions, safeParseTuple(dataSetup || '{}')[1]);
     }
 
     Lib.obj.merge(baseOptions, tagOptions);
