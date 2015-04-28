@@ -15,7 +15,7 @@ class MenuButton extends Button {
 
     this.update();
 
-    this.on('keydown', this.onKeyPress);
+    this.on('keydown', this.handleKeyPress);
     this.el_.setAttribute('aria-haspopup', true);
     this.el_.setAttribute('role', 'button');
   }
@@ -82,12 +82,12 @@ class MenuButton extends Button {
   // This function is not needed anymore. Instead, the keyboard functionality is handled by
   // treating the button as triggering a submenu. When the button is pressed, the submenu
   // appears. Pressing the button again makes the submenu disappear.
-  onFocus() {}
+  handleFocus() {}
 
   // Can't turn off list display that we turned on with focus, because list would go away.
-  onBlur() {}
+  handleBlur() {}
 
-  onClick() {
+  handleClick() {
     // When you click the button it adds focus, which will show the menu indefinitely.
     // So we'll remove focus when the mouse leaves the button.
     // Focus is needed for tab navigation.
@@ -102,7 +102,7 @@ class MenuButton extends Button {
     }
   }
 
-  onKeyPress(event) {
+  handleKeyPress(event) {
 
     // Check for space bar (32) or enter (13) keys
     if (event.which == 32 || event.which == 13) {

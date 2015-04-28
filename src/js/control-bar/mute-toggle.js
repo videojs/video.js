@@ -37,7 +37,7 @@ class MuteToggle extends Button {
     });
   }
 
-  onClick() {
+  handleClick() {
     this.player_.muted( this.player_.muted() ? false : true );
   }
 

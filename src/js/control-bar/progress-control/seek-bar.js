@@ -37,8 +37,8 @@ class SeekBar extends Slider {
     return this.player_.currentTime() / this.player_.duration();
   }
 
-  onMouseDown(event) {
-    super.onMouseDown(event);
+  handleMouseDown(event) {
+    super.handleMouseDown(event);
 
     this.player_.scrubbing = true;
     this.player_.addClass('vjs-scrubbing');
@@ -47,7 +47,7 @@ class SeekBar extends Slider {
     this.player_.pause();
   }
 
-  onMouseMove(event) {
+  handleMouseMove(event) {
     let newTime = this.calculateDistance(event) * this.player_.duration();
 
     // Don't let video end while scrubbing.
@@ -57,8 +57,8 @@ class SeekBar extends Slider {
     this.player_.currentTime(newTime);
   }
 
-  onMouseUp(event) {
-    super.onMouseUp(event);
+  handleMouseUp(event) {
+    super.handleMouseUp(event);
 
     this.player_.scrubbing = false;
     this.player_.removeClass('vjs-scrubbing');

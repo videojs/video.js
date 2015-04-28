@@ -22,8 +22,8 @@ class PlaybackRateMenuItem extends MenuItem {
     this.on(player, 'ratechange', this.update);
   }
 
-  onClick() {
-    super.onClick();
+  handleClick() {
+    super.handleClick();
     this.player().playbackRate(this.rate);
   }
 

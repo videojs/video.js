@@ -46,9 +46,9 @@ class VolumeMenuButton extends MenuButton {
     return menu;
   }
 
-  onClick() {
-    MuteToggle.prototype.onClick.call(this);
-    super.onClick();
+  handleClick() {
+    MuteToggle.prototype.handleClick.call(this);
+    super.handleClick();
   }
 
   createEl() {
