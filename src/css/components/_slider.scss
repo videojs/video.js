@@ -7,6 +7,12 @@
   @include background-color-with-alpha($secondary-bg, 0.9);
 }
 
+.video-js .vjs-slider:focus {
+  text-shadow: 0em 0em 1em rgba($primary-text, 1);
+
+  @include box-shadow(0 0 1em $primary-text);
+}
+
 .video-js .vjs-slider-handle {
   position: absolute;
   @extend .vjs-icon-circle;

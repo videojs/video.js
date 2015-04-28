@@ -22,7 +22,8 @@
 
 /* Replacement for focus outline */
 .video-js .vjs-control:focus:before,
-.video-js .vjs-control:hover:before {
+.video-js .vjs-control:hover:before,
+.video-js .vjs-control:focus {
   text-shadow: 0em 0em 1em rgba($primary-text, 1);
 }
 

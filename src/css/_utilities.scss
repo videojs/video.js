@@ -79,6 +79,13 @@
   user-select: $string
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow
+@mixin box-shadow ($string: 0 0 1em rgba(0, 0, 0, 0.25)) {
+  -webkit-box-shadow: $string;
+  -moz-box-shadow: $string;
+  box-shadow: $string;
+}
+
 @mixin order($value) {
   -webkit-box-ordinal-group: $value;
   -moz-box-ordinal-group: $value;
