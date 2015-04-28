@@ -6,7 +6,7 @@ import * as Lib from './lib';
 /**
  * The component that handles showing the poster image.
  *
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */
@@ -79,7 +79,7 @@ class PosterImage extends Button {
       // Any falsey values should stay as an empty string, otherwise
       // this will throw an extra error
       if (url) {
-        backgroundImage = 'url("' + url + '")';
+        backgroundImage = `url("${url}")`;
       }
 
       this.el_.style.backgroundImage = backgroundImage;

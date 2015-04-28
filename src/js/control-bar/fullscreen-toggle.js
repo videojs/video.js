@@ -2,7 +2,7 @@ import Button from '../button';
 
 /**
  * Toggle fullscreen video
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @class
  * @extends vjs.Button
@@ -10,7 +10,7 @@ import Button from '../button';
 class FullscreenToggle extends Button {
 
   buildCSSClass() {
-    return 'vjs-fullscreen-control ' + super.buildCSSClass();
+    return `vjs-fullscreen-control ${super.buildCSSClass()}`;
   }
 
   onClick() {

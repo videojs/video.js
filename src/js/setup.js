@@ -1,4 +1,3 @@
-import JSON from './json';
 import * as Events from './events';
 import document from 'global/document';
 import window from 'global/window';

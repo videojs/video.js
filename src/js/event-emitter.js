@@ -6,7 +6,7 @@ var EventEmitter = function() {};
 EventEmitter.prototype.allowedEvents_ = {};
 
 EventEmitter.prototype.on = function(type, fn) {
-  // Remove the addEventListener alias before calling vjs.on
+  // Remove the addEventListener alias before calling Events.on
   // so we don't get into an infinite type loop
   let ael = this.addEventListener;
   this.addEventListener = Function.prototype;

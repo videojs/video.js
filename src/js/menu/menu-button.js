@@ -4,7 +4,7 @@ import * as Lib from '../lib.js';
 
 /**
  * A button class with a popup menu
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */
@@ -75,7 +75,7 @@ class MenuButton extends Button {
 
   /** @inheritDoc */
   buildCSSClass() {
-    return this.className + ' vjs-menu-button ' + super.buildCSSClass();
+    return `${this.className} vjs-menu-button ${super.buildCSSClass()}`;
   }
 
   // Focus - Add keyboard functionality to element

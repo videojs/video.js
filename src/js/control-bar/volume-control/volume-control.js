@@ -7,7 +7,7 @@ import VolumeBar from './volume-bar.js';
 /**
  * The component for controlling the volume level
  *
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */

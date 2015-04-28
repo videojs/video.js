@@ -41,7 +41,7 @@ test('should add a child component', function(){
 test('should init child components from options', function(){
   var comp = new Component(getFakePlayer(), {
     children: {
-      'component': true
+      'component': {}
     }
   });
 

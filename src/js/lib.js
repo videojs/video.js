@@ -11,10 +11,7 @@ let hasOwnProp = Object.prototype.hasOwnProperty;
  * @return {Element}
  * @private
  */
-var createEl = function(tagName, properties){
-  tagName = tagName || 'div';
-  properties = properties || {};
-
+var createEl = function(tagName='div', properties={}){
   let el = document.createElement(tagName);
 
   obj.each(properties, function(propName, val){
@@ -265,7 +262,7 @@ var removeData = function(el){
   // Remove all stored data
   // Changed to = null
   // http://coding.smashingmagazine.com/2012/11/05/writing-fast-memory-efficient-javascript/
-  // vjs.cache[id] = null;
+  // cache[id] = null;
   delete cache[id];
 
   // Remove the expando property from the DOM node
@@ -483,7 +480,8 @@ var getComputedDimension = function(el, strCssRule){
 
   } else if(el.currentStyle){
     // IE8 Width/Height support
-    strValue = el['client'+strCssRule.substr(0,1).toUpperCase() + strCssRule.substr(1)] + 'px';
+    let upperCasedRule = strCssRule.substr(0,1).toUpperCase() + strCssRule.substr(1);
+    strValue = el[`client${upperCasedRule}`] + 'px';
   }
   return strValue;
 };
@@ -533,14 +531,12 @@ var el = function(id){
  * @return {String}         Time formatted as H:MM:SS or M:SS
  * @private
  */
-var formatTime = function(seconds, guide) {
-  // Default to using seconds as guide
-  guide = guide || seconds;
-  var s = Math.floor(seconds % 60),
-      m = Math.floor(seconds / 60 % 60),
-      h = Math.floor(seconds / 3600),
-      gm = Math.floor(guide / 60 % 60),
-      gh = Math.floor(guide / 3600);
+var formatTime = function(seconds, guide=seconds) {
+  let s = Math.floor(seconds % 60);
+  let m = Math.floor(seconds / 60 % 60);
+  let h = Math.floor(seconds / 3600);
+  const gm = Math.floor(guide / 60 % 60);
+  const gh = Math.floor(guide / 3600);
 
   // handle invalid times
   if (isNaN(seconds) || seconds === Infinity) {
@@ -587,8 +583,7 @@ var trim = function(str){
  * @return {Number}     Rounded number
  * @private
  */
-var round = function(num, dec) {
-  if (!dec) { dec = 0; }
+var round = function(num, dec=0) {
   return Math.round(num*Math.pow(10,dec))/Math.pow(10,dec);
 };
 
@@ -645,7 +640,7 @@ var getAbsoluteURL = function(url){
   if (!url.match(/^https?:\/\//)) {
     // Convert to absolute URL. Flash hosted off-site needs an absolute URL.
     url = createEl('div', {
-      innerHTML: '<a href="'+url+'">x</a>'
+      innerHTML: `<a href="${url}">x</a>`
     }).firstChild.href;
   }
 
@@ -670,7 +665,7 @@ var parseUrl = function(url) {
   let div;
   if (addToBody) {
     div = createEl('div');
-    div.innerHTML = '<a href="'+url+'"></a>';
+    div.innerHTML = `<a href="${url}"></a>`;
     a = div.firstChild;
     // prevent the div from affecting layout
     div.setAttribute('style', 'display:none; position:absolute;');
@@ -712,7 +707,7 @@ function _logType(type, args){
   // convert args to an array to get array functions
   let argsArray = Array.prototype.slice.call(args);
   // if there's no console then don't try to output messages
-  // they will still be stored in vjs.log.history
+  // they will still be stored in Lib.log.history
   // Was setting these once outside of this function, but containing them
   // in the function makes it easier to test cases where console doesn't exist
   let noop = function(){};

@@ -5,7 +5,7 @@ import Button from './button';
 /**
  * Initial play button. Shows before the video has played. The hiding of the
  * big play button is done via CSS and player states.
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @class
  * @constructor

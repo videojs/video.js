@@ -3,7 +3,7 @@ import * as Lib from './lib';
 
 /**
  * Display that an error has occurred making the video unplayable
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */

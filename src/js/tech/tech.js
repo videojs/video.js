@@ -12,13 +12,13 @@ import document from 'global/document';
 
 /**
  * Base class for media (HTML5 Video, Flash) controllers
- * @param {vjs.Player|Object} player  Central player instance
+ * @param {Player|Object} player  Central player instance
  * @param {Object=} options Options object
  * @constructor
  */
 class Tech extends Component {
 
-  constructor(options, ready){
+  constructor(options={}, ready=function(){}){
     options = options || {};
     // we don't want the tech to report user activity automatically.
     // This is done manually in addControlsListeners
@@ -318,12 +318,11 @@ class Tech extends Component {
  */
 Tech.prototype.textTracks_;
 
-var createTrackHelper = function(self, kind, label, language, options) {
+var createTrackHelper = function(self, kind, label, language, options={}) {
   let tracks = self.textTracks();
 
-  options = options || {};
-
   options.kind = kind;
+
   if (label) {
     options.label = label;
   }

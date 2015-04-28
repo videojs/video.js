@@ -6,7 +6,7 @@ import * as Lib from '../../lib.js';
 /**
  * The component for controlling the playback rate
  *
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */

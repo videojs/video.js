@@ -1,9 +1,9 @@
-import Component from '../component.js';
-import * as Lib from '../lib.js';
+import Component from '../../component.js';
+import * as Lib from '../../lib.js';
 
 /**
  * Displays the current time
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */
@@ -33,7 +33,9 @@ class CurrentTimeDisplay extends Component {
   updateContent() {
     // Allows for smooth scrubbing, when player can't keep up.
     let time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
-    this.contentEl_.innerHTML = '<span class="vjs-control-text">' + this.localize('Current Time') + '</span> ' + Lib.formatTime(time, this.player_.duration());
+    let localizedText = this.localize('Current Time');
+    let formattedTime = Lib.formatTime(time, this.player_.duration());
+    this.contentEl_.innerHTML = `<span class="vjs-control-text">${localizedText}</span> ${formattedTime}`;
   }
 
 }

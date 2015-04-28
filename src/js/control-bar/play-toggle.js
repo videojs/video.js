@@ -3,7 +3,7 @@ import * as Lib from '../lib';
 
 /**
  * Button to toggle between play and pause
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @class
  * @constructor
@@ -18,7 +18,7 @@ class PlayToggle extends Button {
   }
 
   buildCSSClass() {
-    return 'vjs-play-control ' + super.buildCSSClass();
+    return `vjs-play-control ${super.buildCSSClass()}`;
   }
 
   // OnClick - Toggle between play and pause
