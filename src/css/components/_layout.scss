@@ -1,5 +1,7 @@
 .video-js {
-  display: border-box;
+  display: block;
+  box-sizing: border-box;
+
   color: $primary-text;
   background-color: $primary-bg;
   position: relative;
@@ -26,6 +28,13 @@
     width: 100% !important;
     height: 100% !important;
   }
+}
+
+/* All elements inherit border-box sizing */
+.video-js *,
+.video-js *:before,
+.video-js *:after {
+  box-sizing: inherit;
 }
 
 /* Playback technology elements expand to the width/height of the containing div

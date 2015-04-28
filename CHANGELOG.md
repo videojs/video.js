@@ -16,6 +16,7 @@ CHANGELOG
 * @gkatsev removed event.isDefaultPrevented in favor of event.defaultPrevented ([view](https://github.com/videojs/video.js/pull/2081))
 * @heff added and `extends` function for external subclassing ([view](https://github.com/videojs/video.js/pull/2078))
 * @forbesjo added the `scrubbing` property ([view](https://github.com/videojs/video.js/pull/2080))
+* @heff switched to border-box sizing for all player elements ([view](https://github.com/videojs/video.js/pull/2082))
 
 --------------------
 
