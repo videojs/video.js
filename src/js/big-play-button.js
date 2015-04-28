@@ -20,7 +20,7 @@ class BigPlayButton extends Button {
     });
   }
 
-  onClick() {
+  handleClick() {
     this.player_.play();
   }
 
