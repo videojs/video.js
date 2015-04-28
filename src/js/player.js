@@ -1753,6 +1753,7 @@ Player.prototype.handleVolumeChange;
  * @event error
  */
 Player.prototype.handleError;
+<<<<<<< HEAD
 
 Player.prototype.flexNotSupported_ = function() {
   var elem = document.createElement('i');
@@ -1762,6 +1763,8 @@ Player.prototype.flexNotSupported_ = function() {
           'mozFlexBasis' in elem.style ||
           'msFlexBasis' in elem.style);
 };
+=======
+>>>>>>> origin/handleEvents
 
 Component.registerComponent('Player', Player);
 export default Player;
