@@ -24,6 +24,7 @@
   "dependencies": {
     "global": "^4.3.0",
     "safe-json-parse": "^4.0.0",
+    "inherits": "^2.0.1",
     "videojs-swf": "4.5.4",
     "vtt.js": "git+https://github.com/gkatsev/vtt.js.git#shim-build"
   },
