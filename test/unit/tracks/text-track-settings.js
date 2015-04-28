@@ -1,6 +1,7 @@
 import TextTrackSettings from '../../../src/js/tracks/text-track-settings.js';
 import TestHelpers from '../test-helpers.js';
 import * as Events from '../../../src/js/events.js';
+import safeParseTuple from 'safe-json-parse/tuple';
 import window from 'global/window';
 
 var tracks = [{
@@ -45,7 +46,7 @@ test('should update settings', function() {
   equal(player.el().querySelector('.vjs-font-percent select').selectedIndex, 3, 'font-percent is set to new value');
 
   Events.trigger(player.el().querySelector('.vjs-done-button'), 'click');
-  deepEqual(JSON.parse(window.localStorage.getItem('vjs-text-track-settings')), newSettings, 'values are saved');
+  deepEqual(safeParseTuple(window.localStorage.getItem('vjs-text-track-settings'))[1], newSettings, 'values are saved');
 });
 
 test('should restore default settings', function() {
