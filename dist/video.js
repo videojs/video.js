@@ -1,6 +1,6 @@
 /**
  * @license
- * Video.js 4.12.5 <http://videojs.com/>
+ * Video.js 5.0.0-0 <http://videojs.com/>
  * Copyright Brightcove, Inc. <https://www.brightcove.com/>
  * Available under Apache License Version 2.0
  * <https://github.com/videojs/video.js/blob/master/LICENSE>
@@ -4586,14 +4586,14 @@ var videojs = function videojs(id, options, ready) {
 // var videojs = window['videojs'] = vjs;
 
 // CDN Version. Used to target right flash swf.
-videojs.CDN_VERSION = '4.12';
+videojs.CDN_VERSION = '5.0';
 videojs.ACCESS_PROTOCOL = 'https:' == _document2['default'].location.protocol ? 'https://' : 'http://';
 
 /**
 * Full player version
 * @type {string}
 */
-videojs.VERSION = '4.12.5';
+videojs.VERSION = '5.0.0-0';
 
 // Set CDN Version of swf
 // The added (+) blocks the replace from changing this _VERSION_NO_PATCH_ string
