@@ -28,7 +28,7 @@ class SeekBar extends Slider {
 
   updateARIAAttributes() {
       // Allows for smooth scrubbing, when player can't keep up.
-      let time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
+      let time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
       this.el_.setAttribute('aria-valuenow', Lib.round(this.getPercent()*100, 2)); // machine readable value of progress bar (percentage complete)
       this.el_.setAttribute('aria-valuetext', Lib.formatTime(time, this.player_.duration())); // human readable value of progress bar (time complete)
   }
@@ -40,8 +40,7 @@ class SeekBar extends Slider {
   onMouseDown(event) {
     super.onMouseDown(event);
 
-    this.player_.scrubbing = true;
-    this.player_.addClass('vjs-scrubbing');
+    this.player_.scrubbing(true);
 
     this.videoWasPlaying = !this.player_.paused();
     this.player_.pause();
@@ -60,8 +59,7 @@ class SeekBar extends Slider {
   onMouseUp(event) {
     super.onMouseUp(event);
 
-    this.player_.scrubbing = false;
-    this.player_.removeClass('vjs-scrubbing');
+    this.player_.scrubbing(false);
     if (this.videoWasPlaying) {
       this.player_.play();
     }

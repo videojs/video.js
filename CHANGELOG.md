@@ -14,7 +14,8 @@ CHANGELOG
 * @dconnolly replaced JSON.parse with a safe non-eval JSON parse ([view](https://github.com/videojs/video.js/pull/2077))
 * @mmcc added a new default skin, switched to SASS, modified the html ([view](https://github.com/videojs/video.js/pull/1999))
 * @gkatsev removed event.isDefaultPrevented in favor of event.defaultPrevented ([view](https://github.com/videojs/video.js/pull/2081))
-* @heff added and &#x60;extends&#x60; function for external subclassing ([view](https://github.com/videojs/video.js/pull/2078))
+* @heff added and `extends` function for external subclassing ([view](https://github.com/videojs/video.js/pull/2078))
+* @forbesjo added the `scrubbing` property ([view](https://github.com/videojs/video.js/pull/2080))
 
 --------------------
 
