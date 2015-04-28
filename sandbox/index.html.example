@@ -6,12 +6,11 @@
 
   <link href="../build/temp/video-js.css" rel="stylesheet" type="text/css">
 
-  <!-- LOAD VIDEO.JS SOURCE FILES IN ORDER -->
   <script src="../build/temp/video.js"></script>
 
   <!-- Set the location of the flash SWF -->
   <script>
-    vjs.options.flash.swf = '../build/temp/video-js.swf'
+    videojs.options.flash.swf = '../build/temp/video-js.swf';
   </script>
 
 </head>

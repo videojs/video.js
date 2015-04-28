@@ -1,0 +1,64 @@
+.vjs-loading-spinner {
+  display: none;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  font-size: 4em;
+  line-height: 1;
+
+  width: 1em;
+  height: 1em;
+
+  margin-left: -0.5em;
+  margin-top: -0.5em;
+
+  opacity: 0.75;
+
+  @extend .vjs-icon-spinner;
+}
+
+/* Show the spinner when waiting for data and seeking to a new time */
+.vjs-waiting .vjs-loading-spinner,
+.vjs-seeking .vjs-loading-spinner {
+  display: block;
+
+  /* only animate when showing because it can be processor heavy *///
+  @include animation(spin 1.5s infinite linear);
+}
+
+/* Errors are unrecoverable without user interaction so hide the spinner */
+.vjs-error .vjs-loading-spinner {
+  display: none;
+
+  /* ensure animation doesn't continue while hidden *///
+  @include animation(none);
+}
+
+.video-js .vjs-loading-spinner:before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1em;
+  height: 1em;
+  text-align: center;
+  text-shadow: 0em 0em 0.1em $primary-bg;
+}
+
+@-moz-keyframes spin {
+  0% { -moz-transform: rotate(0deg); }
+  100% { -moz-transform: rotate(359deg); }
+}
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(359deg); }
+}
+@-o-keyframes spin {
+  0% { -o-transform: rotate(0deg); }
+  100% { -o-transform: rotate(359deg); }
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(359deg); }
+}

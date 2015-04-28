@@ -12,6 +12,7 @@ CHANGELOG
 * @heff converted all classes to use ES6 classes ([view](https://github.com/videojs/video.js/pull/1993))
 * @mmcc added ES6 default args and template strings ([view](https://github.com/videojs/video.js/pull/2015))
 * @dconnolly replaced JSON.parse with a safe non-eval JSON parse ([view](https://github.com/videojs/video.js/pull/2077))
+* @mmcc added a new default skin, switched to SASS, modified the html ([view](https://github.com/videojs/video.js/pull/1999))
 
 --------------------
 

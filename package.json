@@ -52,6 +52,7 @@
     "grunt-fastly": "^0.1.3",
     "grunt-github-releaser": "^0.1.17",
     "grunt-karma": "^0.8.3",
+    "grunt-sass": "^0.18.1",
     "grunt-version": "~0.3.0",
     "grunt-videojs-languages": "0.0.4",
     "grunt-zip": "0.10.2",

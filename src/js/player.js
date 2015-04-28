@@ -118,6 +118,10 @@ class Player extends Component {
       this.addClass('vjs-audio');
     }
 
+    if (this.flexNotSupported_()) {
+      this.addClass('vjs-no-flex');
+    }
+
     // TODO: Make this smarter. Toggle user state between touching/mousing
     // using events, since devices can have both touch and mouse events.
     // if (Lib.TOUCH_ENABLED) {
@@ -399,6 +403,7 @@ class Player extends Component {
    * @event pause
    */
   onPause() {
+    this.removeClass('vjs-playing');
     this.addClass('vjs-paused');
   }
 
@@ -1717,6 +1722,15 @@ Player.prototype.onVolumeChange;
  * @event error
  */
 Player.prototype.onError;
+
+Player.prototype.flexNotSupported_ = function() {
+  var elem = document.createElement('i');
+
+  return !('flexBasis' in elem.style ||
+          'webkitFlexBasis' in elem.style ||
+          'mozFlexBasis' in elem.style ||
+          'msFlexBasis' in elem.style);
+};
 
 Component.registerComponent('Player', Player);
 export default Player;
