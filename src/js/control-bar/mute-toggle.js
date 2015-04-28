@@ -32,7 +32,7 @@ class MuteToggle extends Button {
 
   createEl() {
     return super.createEl('div', {
-      className: 'vjs-mute-control vjs-control',
+      className: 'vjs-mute-control vjs-control vjs-button',
       innerHTML: `<div><span class="vjs-control-text">${this.localize('Mute')}</span></div>`
     });
   }

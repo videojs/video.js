@@ -59,7 +59,7 @@ class VolumeMenuButton extends MenuButton {
 
   createEl() {
     return super.createEl('div', {
-      className: 'vjs-volume-menu-button vjs-menu-button vjs-control',
+      className: 'vjs-volume-menu-button vjs-menu-button vjs-control vjs-button',
       innerHTML: `<div><span class="vjs-control-text">${this.localize('Mute')}</span></div>`
     });
   }
