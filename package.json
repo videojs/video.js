@@ -20,7 +20,7 @@
     "type": "git",
     "url": "https://github.com/videojs/video.js.git"
   },
-  "main": "src/js/video.js",
+  "main": "./dist/video.min.js",
   "dependencies": {
     "global": "^4.3.0",
     "safe-json-parse": "^4.0.0",
@@ -31,6 +31,7 @@
   "devDependencies": {
     "babelify": "^6.0.1",
     "blanket": "^1.1.6",
+    "browserify-derequire": "^0.9.4",
     "browserify-istanbul": "^0.2.1",
     "browserify-versionify": "^1.0.4",
     "chg": "~0.2.0",

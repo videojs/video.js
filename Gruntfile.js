@@ -273,6 +273,9 @@ module.exports = function(grunt) {
             standalone: 'videojs'
           },
           banner: license,
+          plugin: [
+            [ 'browserify-derequire' ]
+          ],
           transform: [
             require('babelify').configure({
               sourceMapRelative: './src/js'
@@ -371,7 +374,7 @@ module.exports = function(grunt) {
   grunt.registerTask('newtest', ['build', 'karma:chrome']);
 
   // Default task.
-  grunt.registerTask('default', ['build', 'test']);
+  grunt.registerTask('default', ['build', 'test-local']);
 
   // Development watch task. Doing the minimum required.
   grunt.registerTask('dev', ['connect:dev', 'jshint', 'sass', 'browserify', 'karma:chrome']);
