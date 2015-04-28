@@ -1,5 +1,4 @@
-.video-js .vjs-control,
-.video-js .vjs-button {
+.video-js .vjs-control {
   outline: none;
   position: relative;
   text-align: center;
@@ -10,8 +9,7 @@
   @include flex(none);
 }
 
-.video-js .vjs-control:before,
-.video-js .vjs-button:before {
+.video-js .vjs-control:before {
   font-size: 1.8em;
   line-height: 1.67;
   position: absolute;
@@ -25,10 +23,7 @@
 /* Replacement for focus outline */
 .video-js .vjs-control:focus:before,
 .video-js .vjs-control:hover:before,
-.video-js .vjs-control:focus,
-.video-js .vjs-button:focus:before,
-.video-js .vjs-button:hover:before,
-.video-js .vjs-button:focus {
+.video-js .vjs-control:focus {
   text-shadow: 0em 0em 1em rgba($primary-text, 1);
 }
 
@@ -38,8 +33,7 @@
 }
 
 /* IE 8 + 9 Support */
-.vjs-no-flex .vjs-control,
-.vjs-no-flex .vjs-button {
+.vjs-no-flex .vjs-control {
   display: table-cell;
   vertical-align: middle;
 }
