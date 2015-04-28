@@ -15,6 +15,8 @@ import * as setup from './setup';
 import Component from './component';
 import * as Lib from './lib';
 import * as Util from './util.js';
+import Player from './player';
+import extendsFn from './extends.js';
 
 if (typeof HTMLVideoElement === 'undefined') {
   document.createElement('video');
@@ -35,10 +37,8 @@ videojs.TOUCH_ENABLED = Lib.TOUCH_ENABLED;
 videojs.util = Util;
 
 // Probably want to keep this one for 5.0?
-import Player from './player';
 videojs.players = Player.players;
 
-import extendsFn from './extends.js';
 videojs.extends = extendsFn;
 
 // REMOVING: We probably should not include this in 5.0 thought it would make it
