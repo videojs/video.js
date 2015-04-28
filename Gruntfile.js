@@ -80,7 +80,7 @@ module.exports = function(grunt) {
       novtt: { src: './build/temp/video.js', dest: './build/temp/alt/video.novtt.js' },
       dist: { expand: true, cwd: 'build/temp/', src: ['**/**'], dest: 'dist/', filter: 'isFile' },
       examples: { expand: true, cwd: 'build/examples/', src: ['**/**'], dest: 'dist/examples/', filter: 'isFile' },
-      cdn: { expand: true, cwd: 'dist/', src: ['**/**'], dest: 'dist/cdn/', filter: 'isFile' },
+      cdn: { expand: true, cwd: 'dist/', src: ['**/**'], dest: 'dist/cdn/', filter: 'isFile' }
     },
     aws_s3: {
       options: {
@@ -281,7 +281,7 @@ module.exports = function(grunt) {
       build: {
         options: {},
         files: {
-          'build/temp/video.js.map': ['build/temp/video.js'],
+          'build/temp/video.js.map': ['build/temp/video.js']
         }
       }
     },
@@ -293,11 +293,11 @@ module.exports = function(grunt) {
     concat: {
       vtt: {
         options: {
-          separator: '\n',
+          separator: '\n'
         },
         src: ['build/temp/video.js', 'node_modules/vtt.js/dist/vtt.js'],
-        dest: 'build/temp/video.js',
-      },
+        dest: 'build/temp/video.js'
+      }
     }
   });
 

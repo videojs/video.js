@@ -201,3 +201,23 @@ test('should have a defaultPrevented property on an event that was prevent from 
 
   Events.trigger(el, 'test');
 });
+
+test('should have relatedTarget correctly set on the event', function() {
+  expect(2);
+
+  var el1 = document.createElement('div'),
+      el2 = document.createElement('div'),
+      relatedEl = document.createElement('div');
+
+  Events.on(el1, 'click', function(e){
+    equal(e.relatedTarget, relatedEl, 'relatedTarget is set for all browsers when related element is set on the event');
+  });
+
+  Events.trigger(el1, { type:'click', relatedTarget:relatedEl });
+
+  Events.on(el2, 'click', function(e) {
+    equal(e.relatedTarget, null, 'relatedTarget is null when none is provided');
+  });
+
+  Events.trigger(el2, { type:'click', relatedTarget:undefined });
+});

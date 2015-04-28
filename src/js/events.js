@@ -52,9 +52,11 @@ var fixEvent = function(event) {
     }
 
     // Handle which other element the event is related to
-    event.relatedTarget = event.fromElement === event.target ?
-      event.toElement :
-      event.fromElement;
+    if(!event.relatedTarget) {
+      event.relatedTarget = event.fromElement === event.target ?
+        event.toElement :
+        event.fromElement;
+    }
 
     // Stop the default browser action
     event.preventDefault = function () {
