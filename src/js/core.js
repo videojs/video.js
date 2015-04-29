@@ -72,9 +72,6 @@ var videojs = function(id, options, ready){
   return tag['player'] || new Player(tag, options, ready);
 };
 
-// Extended name, also available externally, window.videojs
-// var videojs = window['videojs'] = vjs;
-
 // CDN Version. Used to target right flash swf.
 videojs.CDN_VERSION = '__VERSION_NO_PATCH__';
 videojs.ACCESS_PROTOCOL = ('https:' == document.location.protocol ? 'https://' : 'http://');

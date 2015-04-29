@@ -1,4 +1,6 @@
 module.exports = function(grunt) {
+  require('time-grunt')(grunt);
+
   var pkg = grunt.file.readJSON('package.json');
   var license = grunt.file.read('build/license-header.txt');
   var verParts = pkg.version.split('.');
@@ -269,21 +271,6 @@ module.exports = function(grunt) {
       }
     },
     browserify: {
-      options: {
-        transform: [
-          require('babelify').configure({
-            sourceMapRelative: './src/js'
-          }),
-          ['browserify-versionify', {
-            placeholder: '__VERSION__',
-            version: pkg.version
-          }],
-          ['browserify-versionify', {
-            placeholder: '__VERSION_NO_PATCH__',
-            version: version.majorMinor
-          }]
-        ]
-      },
       build: {
         files: {
           'build/temp/video.js': ['src/js/video.js']
@@ -296,6 +283,19 @@ module.exports = function(grunt) {
           banner: license,
           plugin: [
             [ 'browserify-derequire' ]
+          ],
+          transform: [
+            require('babelify').configure({
+              sourceMapRelative: './src/js'
+            }),
+            ['browserify-versionify', {
+              placeholder: '__VERSION__',
+              version: pkg.version
+            }],
+            ['browserify-versionify', {
+              placeholder: '__VERSION_NO_PATCH__',
+              version: version.majorMinor
+            }]
           ]
         }
       },
@@ -303,8 +303,13 @@ module.exports = function(grunt) {
         files: {
           'build/temp/tests.js': [
             'test/globals-shim.js',
-            'test/unit/**/*.js',
-            'test/api/**.js'
+            'test/unit/**/*.js'
+          ]
+        },
+        options: {
+          transform: [
+            require('babelify').configure(),
+            'browserify-istanbul'
           ]
         }
       }
@@ -319,6 +324,8 @@ module.exports = function(grunt) {
     },
     coveralls: {
       options: {
+        // warn instead of failing when coveralls errors
+        // we've seen coveralls 503 relatively frequently
         force: true
       },
       all: {
@@ -336,29 +343,8 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.loadNpmTasks('grunt-videojs-languages');
-  grunt.loadNpmTasks('grunt-contrib-connect');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.loadNpmTasks('grunt-contrib-cssmin');
-  grunt.loadNpmTasks('grunt-sass');
-  grunt.loadNpmTasks('grunt-karma');
-  grunt.loadNpmTasks('videojs-doc-generator');
-  grunt.loadNpmTasks('grunt-zip');
-  grunt.loadNpmTasks('grunt-banner');
-  grunt.loadNpmTasks('grunt-version');
-  grunt.loadNpmTasks('chg');
-  grunt.loadNpmTasks('grunt-fastly');
-  grunt.loadNpmTasks('grunt-github-releaser');
-  grunt.loadNpmTasks('grunt-aws-s3');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-browserify');
-  grunt.loadNpmTasks('grunt-coveralls');
-  grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-exorcise');
+  // load all the npm grunt tasks
+  require('load-grunt-tasks')(grunt);
 
   grunt.registerTask('build', [
     'clean:build',
