@@ -13,16 +13,16 @@ class PlayToggle extends Button {
   constructor(player, options){
     super(player, options);
 
-    this.on(player, 'play', this.onPlay);
-    this.on(player, 'pause', this.onPause);
+    this.on(player, 'play', this.handlePlay);
+    this.on(player, 'pause', this.handlePause);
   }
 
   buildCSSClass() {
     return `vjs-play-control ${super.buildCSSClass()}`;
   }
 
-  // OnClick - Toggle between play and pause
-  onClick() {
+  // handleClick - Toggle between play and pause
+  handleClick() {
     if (this.player_.paused()) {
       this.player_.play();
     } else {
@@ -30,15 +30,15 @@ class PlayToggle extends Button {
     }
   }
 
-  // OnPlay - Add the vjs-playing class to the element so it can change appearance
-  onPlay() {
+  // handlePlay - Add the vjs-playing class to the element so it can change appearance
+  handlePlay() {
     this.removeClass('vjs-paused');
     this.addClass('vjs-playing');
     this.el_.children[0].children[0].innerHTML = this.localize('Pause'); // change the button text to "Pause"
   }
 
-  // OnPause - Add the vjs-paused class to the element so it can change appearance
-  onPause() {
+  // handlePause - Add the vjs-paused class to the element so it can change appearance
+  handlePause() {
     this.removeClass('vjs-playing');
     this.addClass('vjs-paused');
     this.el_.children[0].children[0].innerHTML = this.localize('Play'); // change the button text to "Play"

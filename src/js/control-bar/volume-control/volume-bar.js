@@ -27,7 +27,7 @@ class VolumeBar extends Slider {
     });
   }
 
-  onMouseMove(event) {
+  handleMouseMove(event) {
     if (this.player_.muted()) {
       this.player_.muted(false);
     }

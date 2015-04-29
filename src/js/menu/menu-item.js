@@ -27,7 +27,7 @@ class MenuItem extends Button {
   /**
    * Handle a click on the menu item, and set it to selected
    */
-  onClick() {
+  handleClick() {
     this.selected(true);
   }
 

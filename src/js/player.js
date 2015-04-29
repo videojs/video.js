@@ -228,18 +228,18 @@ class Player extends Component {
     // like component.initEventListeners() that runs between el creation and
     // adding children
     this.el_ = el;
-    this.on('loadstart', this.onLoadStart);
-    this.on('waiting', this.onWaiting);
-    this.on(['canplay', 'canplaythrough', 'playing', 'ended'], this.onWaitEnd);
-    this.on('seeking', this.onSeeking);
-    this.on('seeked', this.onSeeked);
-    this.on('ended', this.onEnded);
-    this.on('play', this.onPlay);
-    this.on('firstplay', this.onFirstPlay);
-    this.on('pause', this.onPause);
-    this.on('progress', this.onProgress);
-    this.on('durationchange', this.onDurationChange);
-    this.on('fullscreenchange', this.onFullscreenChange);
+    this.on('loadstart', this.handleLoadStart);
+    this.on('waiting', this.handleWaiting);
+    this.on(['canplay', 'canplaythrough', 'playing', 'ended'], this.handleWaitEnd);
+    this.on('seeking', this.handleSeeking);
+    this.on('seeked', this.handleSeeked);
+    this.on('ended', this.handleEnded);
+    this.on('play', this.handlePlay);
+    this.on('firstplay', this.handleFirstPlay);
+    this.on('pause', this.handlePause);
+    this.on('progress', this.handleProgress);
+    this.on('durationchange', this.handleDurationChange);
+    this.on('fullscreenchange', this.handleFullscreenChange);
 
     return el;
   }
@@ -302,7 +302,7 @@ class Player extends Component {
    * Fired when the user agent begins looking for media data
    * @event loadstart
    */
-  onLoadStart() {
+  handleLoadStart() {
     // TODO: Update to use `emptied` event instead. See #1277.
 
     this.removeClass('vjs-ended');
@@ -343,7 +343,7 @@ class Player extends Component {
    * Fired whenever the media begins or resumes playback
    * @event play
    */
-  onPlay() {
+  handlePlay() {
     this.removeClass('vjs-ended');
     this.removeClass('vjs-paused');
     this.addClass('vjs-playing');
@@ -357,7 +357,7 @@ class Player extends Component {
    * Fired whenever the media begins waiting
    * @event waiting
    */
-  onWaiting() {
+  handleWaiting() {
     this.addClass('vjs-waiting');
   }
 
@@ -366,7 +366,7 @@ class Player extends Component {
    * which is not consistent between browsers. See #1351
    * @private
    */
-  onWaitEnd() {
+  handleWaitEnd() {
     this.removeClass('vjs-waiting');
   }
 
@@ -374,7 +374,7 @@ class Player extends Component {
    * Fired whenever the player is jumping to a new time
    * @event seeking
    */
-  onSeeking() {
+  handleSeeking() {
     this.addClass('vjs-seeking');
   }
 
@@ -382,7 +382,7 @@ class Player extends Component {
    * Fired when the player has finished jumping to a new time
    * @event seeked
    */
-  onSeeked() {
+  handleSeeked() {
     this.removeClass('vjs-seeking');
   }
 
@@ -395,7 +395,7 @@ class Player extends Component {
    *
    * @event firstplay
    */
-  onFirstPlay() {
+  handleFirstPlay() {
     //If the first starttime attribute is specified
     //then we will start at the given offset in seconds
     if(this.options_['starttime']){
@@ -409,7 +409,7 @@ class Player extends Component {
    * Fired whenever the media has been paused
    * @event pause
    */
-  onPause() {
+  handlePause() {
     this.removeClass('vjs-playing');
     this.addClass('vjs-paused');
   }
@@ -418,7 +418,7 @@ class Player extends Component {
    * Fired while the user agent is downloading media data
    * @event progress
    */
-  onProgress() {
+  handleProgress() {
     // Add custom event for when source is finished downloading.
     if (this.bufferedPercent() == 1) {
       this.trigger('loadedalldata');
@@ -429,7 +429,7 @@ class Player extends Component {
    * Fired when the end of the media resource is reached (currentTime == duration)
    * @event ended
    */
-  onEnded() {
+  handleEnded() {
     this.addClass('vjs-ended');
     if (this.options_['loop']) {
       this.currentTime(0);
@@ -443,7 +443,7 @@ class Player extends Component {
    * Fired when the duration of the media resource is first known or changed
    * @event durationchange
    */
-  onDurationChange() {
+  handleDurationChange() {
     // Allows for caching value instead of asking player each time.
     // We need to get the techGet response and check for a value so we don't
     // accidentally cause the stack to blow up.
@@ -466,7 +466,7 @@ class Player extends Component {
    * Fired when the player switches in or out of fullscreen mode
    * @event fullscreenchange
    */
-  onFullscreenChange() {
+  handleFullscreenChange() {
     if (this.isFullscreen()) {
       this.addClass('vjs-fullscreen');
     } else {
@@ -640,7 +640,7 @@ class Player extends Component {
     }
 
     if (this.cache_.duration === undefined) {
-      this.onDurationChange();
+      this.handleDurationChange();
     }
 
     return this.cache_.duration || 0;
@@ -1401,20 +1401,20 @@ class Player extends Component {
   listenForUserActivity() {
     let mouseInProgress, lastMoveX, lastMoveY;
 
-    let onActivity = Lib.bind(this, this.reportUserActivity);
+    let handleActivity = Lib.bind(this, this.reportUserActivity);
 
-    let onMouseMove = function(e) {
+    let handleMouseMove = function(e) {
       // #1068 - Prevent mousemove spamming
       // Chrome Bug: https://code.google.com/p/chromium/issues/detail?id=366970
       if(e.screenX != lastMoveX || e.screenY != lastMoveY) {
         lastMoveX = e.screenX;
         lastMoveY = e.screenY;
-        onActivity();
+        handleActivity();
       }
     };
 
-    let onMouseDown = function() {
-      onActivity();
+    let handleMouseDown = function() {
+      handleActivity();
       // For as long as the they are touching the device or have their mouse down,
       // we consider them active even if they're not moving their finger or mouse.
       // So we want to continue to update that they are active
@@ -1422,24 +1422,24 @@ class Player extends Component {
       // Setting userActivity=true now and setting the interval to the same time
       // as the activityCheck interval (250) should ensure we never miss the
       // next activityCheck
-      mouseInProgress = this.setInterval(onActivity, 250);
+      mouseInProgress = this.setInterval(handleActivity, 250);
     };
 
-    let onMouseUp = function(event) {
-      onActivity();
+    let handleMouseUp = function(event) {
+      handleActivity();
       // Stop the interval that maintains activity if the mouse/touch is down
       this.clearInterval(mouseInProgress);
     };
 
     // Any mouse movement will be considered user activity
-    this.on('mousedown', onMouseDown);
-    this.on('mousemove', onMouseMove);
-    this.on('mouseup', onMouseUp);
+    this.on('mousedown', handleMouseDown);
+    this.on('mousemove', handleMouseMove);
+    this.on('mouseup', handleMouseUp);
 
     // Listen for keyboard navigation
     // Shouldn't need to use inProgress interval because of key repeat
-    this.on('keydown', onActivity);
-    this.on('keyup', onActivity);
+    this.on('keydown', handleActivity);
+    this.on('keyup', handleActivity);
 
     // Run an interval every 250 milliseconds instead of stuffing everything into
     // the mousemove/touchmove function itself, to prevent performance degradation.
@@ -1706,31 +1706,31 @@ Player.prototype.options_ = Options;
  * Fired when the player has initial duration and dimension information
  * @event loadedmetadata
  */
-Player.prototype.onLoadedMetaData;
+Player.prototype.handleLoadedMetaData;
 
 /**
  * Fired when the player has downloaded data at the current playback position
  * @event loadeddata
  */
-Player.prototype.onLoadedData;
+Player.prototype.handleLoadedData;
 
 /**
  * Fired when the player has finished downloading the source data
  * @event loadedalldata
  */
-Player.prototype.onLoadedAllData;
+Player.prototype.handleLoadedAllData;
 
 /**
  * Fired when the user is active, e.g. moves the mouse over the player
  * @event useractive
  */
-Player.prototype.onUserActive;
+Player.prototype.handleUserActive;
 
 /**
  * Fired when the user is inactive, e.g. a short delay after the last mouse move or control interaction
  * @event userinactive
  */
-Player.prototype.onUserInactive;
+Player.prototype.handleUserInactive;
 
 /**
  * Fired when the current playback position has changed
@@ -1739,19 +1739,19 @@ Player.prototype.onUserInactive;
  * playback technology in use.
  * @event timeupdate
  */
-Player.prototype.onTimeUpdate;
+Player.prototype.handleTimeUpdate;
 
 /**
  * Fired when the volume changes
  * @event volumechange
  */
-Player.prototype.onVolumeChange;
+Player.prototype.handleVolumeChange;
 
 /**
  * Fired when an error occurs
  * @event error
  */
-Player.prototype.onError;
+Player.prototype.handleError;
 
 Player.prototype.flexNotSupported_ = function() {
   var elem = document.createElement('i');

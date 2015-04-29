@@ -15,7 +15,7 @@ class CaptionSettingsMenuItem extends TextTrackMenuItem {
     this.addClass('vjs-texttrack-settings');
   }
 
-  onClick() {
+  handleClick() {
     this.player().getChild('textTrackSettings').show();
   }
 
