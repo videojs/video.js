@@ -26,3 +26,5 @@ sandbox/*
 test/coverage/*
 .coveralls.yml
 .sass-cache
+
+dist/*
