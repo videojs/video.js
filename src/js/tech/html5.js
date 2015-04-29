@@ -91,8 +91,6 @@ class Html5 extends Tech {
         const clone = el.cloneNode(false);
         Html5.disposeMediaElement(el);
         el = clone;
-        // Is it really necessary?
-        //player.tag = null;
       } else {
         el = Lib.createEl('video');
 

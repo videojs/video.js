@@ -258,7 +258,8 @@ Flash.formats = {
 };
 
 Flash.onReady = function(currSwf){
-  let tech = Lib.el(currSwf).tech;
+  let el = Lib.el(currSwf);
+  let tech = el && el.tech;
 
   // if there is no el then the tech has been disposed
   // and the tech element was removed from the player div

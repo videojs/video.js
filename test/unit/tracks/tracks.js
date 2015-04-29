@@ -119,7 +119,7 @@ test('listen to remove and add track events in native text tracks', function() {
   player.player_ = player;
   player.options_ = options = {};
 
-  html = new Html5(player, options);
+  html = new Html5(options);
 
   ok(events['removetrack'], 'removetrack listener was added');
   ok(events['addtrack'], 'addtrack listener was added');

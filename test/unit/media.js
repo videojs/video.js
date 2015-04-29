@@ -26,48 +26,28 @@ q.module('Media Tech', {
 });
 
 test('should synthesize timeupdate events by default', function() {
-  var timeupdates = 0, playHandler, i, tech;
-  tech = new Tech({
-    id: this.noop,
-    on: function(event, handler) {
-      if (event === 'play') {
-        playHandler = handler;
-      }
-    },
-    trigger: function(event) {
-      if (event === 'timeupdate') {
-        timeupdates++;
-      }
-    }
-  });
-  playHandler.call(tech);
+  var timeupdates = 0, tech;
+
+  tech = new Tech();
   tech.on('timeupdate', function() {
     timeupdates++;
   });
 
+  tech.trigger('play');
+
   this.clock.tick(250);
-  equal(timeupdates, 1, 'triggered one timeupdate');
+  equal(timeupdates, 1, 'triggered at least one timeupdate');
 });
 
 test('stops timeupdates if the tech produces them natively', function() {
-  var timeupdates = 0, tech, playHandler, expected;
-  tech = new Tech({
-    id: this.noop,
-    off: this.noop,
-    on: function(event, handler) {
-      if (event === 'play') {
-        playHandler = handler;
-      }
-    },
-    bufferedPercent: this.noop,
-    trigger: function(event) {
-      if (event === 'timeupdate') {
-        timeupdates++;
-      }
-    }
+  var timeupdates = 0, tech, expected;
+  tech = new Tech();
+  tech.on('timeupdate', function() {
+    timeupdates++;
   });
 
-  playHandler.call(tech);
+  tech.trigger('play');
+
   // simulate a native timeupdate event
   tech.trigger('timeupdate');
 
@@ -77,51 +57,29 @@ test('stops timeupdates if the tech produces them natively', function() {
 });
 
 test('stops manual timeupdates while paused', function() {
-  var timeupdates = 0, tech, playHandler, pauseHandler, expected;
-  tech = new Tech({
-    id: this.noop,
-    on: function(event, handler) {
-      if (event === 'play') {
-        playHandler = handler;
-      } else if (event === 'pause') {
-        pauseHandler = handler;
-      }
-    },
-    bufferedPercent: this.noop,
-    trigger: function(event) {
-      if (event === 'timeupdate') {
-        timeupdates++;
-      }
-    }
+  var timeupdates = 0, tech, expected;
+  tech = new Tech();
+  tech.on('timeupdate', function() {
+    timeupdates++;
   });
-  playHandler.call(tech);
+
+  tech.trigger('play');
   this.clock.tick(10 * 250);
   ok(timeupdates > 0, 'timeupdates fire during playback');
 
-  pauseHandler.call(tech);
+  tech.trigger('pause');
   timeupdates = 0;
   this.clock.tick(10 * 250);
   equal(timeupdates, 0, 'timeupdates do not fire when paused');
 
-  playHandler.call(tech);
+  tech.trigger('play');
   this.clock.tick(10 * 250);
   ok(timeupdates > 0, 'timeupdates fire when playback resumes');
 });
 
 test('should synthesize progress events by default', function() {
   var progresses = 0, tech;
-  tech = new Tech({
-    id: this.noop,
-    on: this.noop,
-    bufferedPercent: function() {
-      return 0;
-    },
-    trigger: function(event) {
-      if (event === 'progress') {
-        progresses++;
-      }
-    }
-  });
+  tech = new Tech();
   tech.on('progress', function() {
     progresses++;
   });
@@ -131,12 +89,7 @@ test('should synthesize progress events by default', function() {
 });
 
 test('dispose() should stop time tracking', function() {
-  var tech = new Tech({
-    id: this.noop,
-    on: this.noop,
-    off: this.noop,
-    trigger: this.noop
-  });
+  var tech = new Tech();
   tech.dispose();
 
   // progress and timeupdate events will throw exceptions after the
@@ -150,10 +103,6 @@ test('dispose() should stop time tracking', function() {
 });
 
 test('should add the source hanlder interface to a tech', function(){
-  var mockPlayer = {
-    off: this.noop,
-    trigger: this.noop
-  };
   var sourceA = { src: 'foo.mp4', type: 'video/mp4' };
   var sourceB = { src: 'no-support', type: 'no-support' };
 
@@ -168,7 +117,7 @@ test('should add the source hanlder interface to a tech', function(){
   ok(MyTech.selectSourceHandler, 'added a selectSourceHandler function to the Tech');
 
   // Create an instance of Tech
-  var tech = new MyTech(mockPlayer);
+  var tech = new MyTech();
 
   // Check for the expected instance methods
   ok(tech.setSource, 'added a setSource function to the tech instance');
@@ -233,17 +182,12 @@ test('should add the source hanlder interface to a tech', function(){
 });
 
 test('should handle unsupported sources with the source hanlder API', function(){
-  var mockPlayer = {
-    off: this.noop,
-    trigger: this.noop
-  };
-
   // Define a new tech class
   var MyTech = Tech.extend();
   // Extend Tech with source handlers
   Tech.withSourceHandlers(MyTech);
   // Create an instance of Tech
-  var tech = new MyTech(mockPlayer);
+  var tech = new MyTech();
 
   var usedNative;
   MyTech.nativeSourceHandler = {

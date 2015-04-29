@@ -283,7 +283,6 @@ class Player extends Component {
     this.on(this.tech, 'ended', this.onTechEnded);
     this.on(this.tech, 'seeking', this.onTechSeeking);
     this.on(this.tech, 'seeked', this.onTechSeeked);
-    this.on(this.tech, 'ended', this.onTechEnded);
     this.on(this.tech, 'play', this.onTechPlay);
     this.on(this.tech, 'firstplay', this.onTechFirstPlay);
     this.on(this.tech, 'pause', this.onTechPause);
@@ -312,6 +311,11 @@ class Player extends Component {
       Lib.insertFirst(this.tech.el(), this.el());
     }
 
+    // Get rid of the original video tag reference after the first tech is loaded
+    if (this.tag) {
+      this.tag = null;
+    }
+
     this.tech.ready(techReady);
   }
 
@@ -335,20 +339,9 @@ class Player extends Component {
     // If the controls were hidden we don't want that to change without a tap event
     // so we'll check if the controls were already showing before reporting user
     // activity
-    this.on(this.tech, 'touchstart', function(event) {
-      userWasActive = this.userActive();
-    });
-
-    this.on(this.tech, 'touchmove', function(event) {
-      if (userWasActive){
-        this.reportUserActivity();
-      }
-    });
-
-    this.on(this.tech, 'touchend', function(event) {
-      // Stop the mouse events from also happening
-      event.preventDefault();
-    });
+    this.on(this.tech, 'touchstart', this.onTechTouchStart);
+    this.on(this.tech, 'touchmove', this.onTechTouchMove);
+    this.on(this.tech, 'touchend', this.onTechTouchEnd);
 
     // Turn on component tap events
     this.tech.emitTapEvents();
@@ -362,15 +355,13 @@ class Player extends Component {
    * Remove the listeners used for click and tap controls. This is needed for
    * toggling to controls disabled, where a tap/touch should do nothing.
    */
-  removeControlsListeners() {
+  removeTechControlsListeners() {
     // We don't want to just use `this.off()` because there might be other needed
     // listeners added by techs that extend this.
     this.off(this.tech, 'tap', this.onTechTap);
-    this.off(this.tech, 'touchstart');
-    this.off(this.tech, 'touchmove');
-    this.off(this.tech, 'touchleave');
-    this.off(this.tech, 'touchcancel');
-    this.off(this.tech, 'touchend');
+    this.off(this.tech, 'touchstart', this.onTechTouchStart);
+    this.off(this.tech, 'touchmove', this.onTechTouchMove);
+    this.off(this.tech, 'touchend', this.onTechTouchEnd);
     this.off(this.tech, 'mousedown', this.onTechClick);
   }
 
@@ -618,6 +609,21 @@ class Player extends Component {
     this.userActive(!this.userActive());
   }
 
+  onTechTouchStart() {
+    this.userWasActive = this.userActive();
+  }
+
+  onTechTouchMove() {
+    if (this.userWasActive){
+      this.reportUserActivity();
+    }
+  }
+
+  onTechTouchEnd(event) {
+    // Stop the mouse events from also happening
+    event.preventDefault();
+  }
+
   /**
    * Update the duration of the player using the tech
    * @private
@@ -795,7 +801,7 @@ class Player extends Component {
           Lib.log(`Video.js: ${method} method not defined for ${this.techName} playback technology.`, e);
         } else {
           // When a method isn't available on the object it throws a TypeError
-          if (e.name == 'TypeError') {
+          if (e.name === 'TypeError') {
             Lib.log(`Video.js: ${method} unavailable on ${this.techName} playback technology element.`, e);
             this.tech.isReady_ = false;
           } else {
@@ -1497,7 +1503,7 @@ class Player extends Component {
         this.controls_ = bool;
 
         if (!this.usingNativeControls()) {
-          this.techCall('setControls', this.controls);
+          this.techCall('setControls', bool);
         }
 
         if (bool) {
@@ -1513,7 +1519,9 @@ class Player extends Component {
           this.addClass('vjs-controls-disabled');
           this.trigger('controlsdisabled');
 
-          this.removeTechControlsListeners();
+          if (!this.usingNativeControls()) {
+            this.removeTechControlsListeners();
+          }
         }
       }
       return this;

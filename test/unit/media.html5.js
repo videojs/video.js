@@ -24,7 +24,7 @@ q.module('HTML5', {
       addChild: function(){},
       trigger: function(){}
     };
-    tech = new Html5(player, {});
+    tech = new Html5({});
   },
   'teardown': function() {
     tech.dispose();
@@ -49,13 +49,6 @@ test('should detect whether the volume can be changed', function(){
 
   ok(!Html5.canControlVolume());
   Lib.TEST_VID = testVid;
-});
-
-test('should re-link the player if the tech is moved', function(){
-  Html5.movingMediaElementInDOM = false;
-  tech.createEl();
-
-  strictEqual(player, tech.el()['player']);
 });
 
 test('test playbackRate', function() {

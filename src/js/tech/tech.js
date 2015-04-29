@@ -164,13 +164,19 @@ class Tech extends Component {
     this.on('pause', this.stopTrackingCurrentTime);
     // timeupdate is also called by .currentTime whenever current time is set
 
-    // Watch for native timeupdate event
-    this.one('timeupdate', function(){
+    // Watch for native timeupdate event only
+    var onTimeUpdate = function(e){
+      if (e.manuallyTriggered) return;
+
+      this.off('timeupdate', onTimeUpdate);
+
       // Update known progress support for this playback technology
       this.featuresTimeupdateEvents = true;
       // Turn off manual progress tracking
       this.manualTimeUpdatesOff();
-    });
+    };
+
+    this.on('timeupdate', onTimeUpdate);
   }
 
   manualTimeUpdatesOff() {
@@ -183,7 +189,7 @@ class Tech extends Component {
   trackCurrentTime() {
     if (this.currentTimeInterval) { this.stopTrackingCurrentTime(); }
     this.currentTimeInterval = this.setInterval(function(){
-      this.trigger('timeupdate');
+      this.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true });
     }, 250); // 42 = 24 fps // 250 is what Webkit uses // FF uses 15
   }
 
@@ -193,7 +199,7 @@ class Tech extends Component {
 
     // #1002 - if the video ends right before the next timeupdate would happen,
     // the progress bar won't make it all the way to the end
-    this.trigger('timeupdate');
+    this.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true });
   }
 
   dispose() {
@@ -207,7 +213,7 @@ class Tech extends Component {
 
   setCurrentTime() {
     // improve the accuracy of manual timeupdates
-    if (this.manualTimeUpdates) { this.trigger('timeupdate'); }
+    if (this.manualTimeUpdates) { this.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true }); }
   }
 
   initTextTrackListeners() {
@@ -229,7 +235,7 @@ class Tech extends Component {
   }
 
   emulateTextTracks() {
-    if (!window['WebVTT']) {
+    if (!window['WebVTT'] && this.el().parentNode != null) {
       let script = document.createElement('script');
       script.src = this.options_['vtt.js'] || '../node_modules/vtt.js/dist/vtt.js';
       this.el().parentNode.appendChild(script);
