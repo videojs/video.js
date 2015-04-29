@@ -108,6 +108,14 @@ class Player extends Component {
     this.scrubbing_ = false;
 
     this.el_ = this.createEl();
+
+    // Load plugins
+    if (options['plugins']) {
+      Lib.obj.each(options['plugins'], function(key, val){
+        this[key](val);
+      }, this);
+    }
+
     this.initChildren();
 
     // Set isAudio based on whether or not an audio tag was used
@@ -137,12 +145,6 @@ class Player extends Component {
 
     // Make player easily findable by ID
     Player.players[this.id_] = this;
-
-    if (options['plugins']) {
-      Lib.obj.each(options['plugins'], function(key, val){
-        this[key](val);
-      }, this);
-    }
 
     // When the player is first initialized, trigger activity so components
     // like the control bar show themselves if needed
