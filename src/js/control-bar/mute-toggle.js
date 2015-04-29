@@ -41,7 +41,7 @@ class MuteToggle extends Button {
     return `vjs-mute-control ${super.buildCSSClass()}`;
   }
 
-  onClick() {
+  handleClick() {
     this.player_.muted( this.player_.muted() ? false : true );
   }
 

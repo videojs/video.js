@@ -23,11 +23,11 @@ class Slider extends Component {
     // Set a horizontal or vertical class on the slider depending on the slider type
     this.vertical(!!this.options()['vertical']);
 
-    this.on('mousedown', this.onMouseDown);
-    this.on('touchstart', this.onMouseDown);
-    this.on('focus', this.onFocus);
-    this.on('blur', this.onBlur);
-    this.on('click', this.onClick);
+    this.on('mousedown', this.handleMouseDown);
+    this.on('touchstart', this.handleMouseDown);
+    this.on('focus', this.handleFocus);
+    this.on('blur', this.handleBlur);
+    this.on('click', this.handleClick);
 
     this.on(player, 'controlsvisible', this.update);
     this.on(player, this.playerEvent, this.update);
@@ -47,30 +47,30 @@ class Slider extends Component {
     return super.createEl(type, props);
   }
 
-  onMouseDown(event) {
+  handleMouseDown(event) {
     event.preventDefault();
     Lib.blockTextSelection();
     this.addClass('vjs-sliding');
 
-    this.on(document, 'mousemove', this.onMouseMove);
-    this.on(document, 'mouseup', this.onMouseUp);
-    this.on(document, 'touchmove', this.onMouseMove);
-    this.on(document, 'touchend', this.onMouseUp);
+    this.on(document, 'mousemove', this.handleMouseMove);
+    this.on(document, 'mouseup', this.handleMouseUp);
+    this.on(document, 'touchmove', this.handleMouseMove);
+    this.on(document, 'touchend', this.handleMouseUp);
 
-    this.onMouseMove(event);
+    this.handleMouseMove(event);
   }
 
   // To be overridden by a subclass
-  onMouseMove() {}
+  handleMouseMove() {}
 
-  onMouseUp() {
+  handleMouseUp() {
     Lib.unblockTextSelection();
     this.removeClass('vjs-sliding');
 
-    this.off(document, 'mousemove', this.onMouseMove);
-    this.off(document, 'mouseup', this.onMouseUp);
-    this.off(document, 'touchmove', this.onMouseMove);
-    this.off(document, 'touchend', this.onMouseUp);
+    this.off(document, 'mousemove', this.handleMouseMove);
+    this.off(document, 'mouseup', this.handleMouseUp);
+    this.off(document, 'touchmove', this.handleMouseMove);
+    this.off(document, 'touchend', this.handleMouseUp);
 
     this.update();
   }
@@ -206,11 +206,11 @@ class Slider extends Component {
     }
   }
 
-  onFocus() {
-    this.on(document, 'keydown', this.onKeyPress);
+  handleFocus() {
+    this.on(document, 'keydown', this.handleKeyPress);
   }
 
-  onKeyPress(event) {
+  handleKeyPress(event) {
     if (event.which == 37 || event.which == 40) { // Left and Down Arrows
       event.preventDefault();
       this.stepBack();
@@ -220,8 +220,8 @@ class Slider extends Component {
     }
   }
 
-  onBlur() {
-    this.off(document, 'keydown', this.onKeyPress);
+  handleBlur() {
+    this.off(document, 'keydown', this.handleKeyPress);
   }
 
   /**
@@ -229,7 +229,7 @@ class Slider extends Component {
    *   from bubbling up to parent elements like button menus.
    * @param  {Object} event Event object
    */
-  onClick(event) {
+  handleClick(event) {
     event.stopImmediatePropagation();
     event.preventDefault();
   }

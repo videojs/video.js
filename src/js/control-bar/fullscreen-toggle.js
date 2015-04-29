@@ -13,7 +13,7 @@ class FullscreenToggle extends Button {
     return `vjs-fullscreen-control ${super.buildCSSClass()}`;
   }
 
-  onClick() {
+  handleClick() {
     if (!this.player_.isFullscreen()) {
       this.player_.requestFullscreen();
       this.controlText_.innerHTML = this.localize('Non-Fullscreen');

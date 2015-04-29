@@ -441,7 +441,7 @@ test('should not add multiple first play events despite subsequent loads', funct
     ok(true, 'First play should fire once.');
   });
 
-  // Checking to make sure onLoadStart removes first play listener before adding a new one.
+  // Checking to make sure handleLoadStart removes first play listener before adding a new one.
   player.trigger('loadstart');
   player.trigger('loadstart');
   player.trigger('play');

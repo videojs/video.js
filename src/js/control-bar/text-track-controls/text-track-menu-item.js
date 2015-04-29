@@ -58,11 +58,11 @@ class TextTrackMenuItem extends MenuItem {
     }
   }
 
-  onClick(event) {
+  handleClick(event) {
     let kind = this.track['kind'];
     let tracks = this.player_.textTracks();
 
-    super.onClick(event);
+    super.handleClick(event);
 
     if (!tracks) return;
 

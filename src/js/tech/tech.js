@@ -101,7 +101,7 @@ class Tech extends Component {
     // trigger mousedown/up.
     // http://stackoverflow.com/questions/1444562/javascript-onclick-event-over-flash-object
     // Any touch events are set to block the mousedown event from happening
-    this.on('mousedown', this.onClick);
+    this.on('mousedown', this.handleClick);
 
     // If the controls were hidden we don't want that to change without a tap event
     // so we'll check if the controls were already showing before reporting user
@@ -126,7 +126,7 @@ class Tech extends Component {
 
     // The tap listener needs to come after the touchend listener because the tap
     // listener cancels out any reportedUserActivity when setting userActive(false)
-    this.on('tap', this.onTap);
+    this.on('tap', this.handleTap);
   }
 
   /**
@@ -149,7 +149,7 @@ class Tech extends Component {
   /**
    * Handle a click on the media element. By default will play/pause the media.
    */
-  onClick(event) {
+  handleClick(event) {
     // We're using mousedown to detect clicks thanks to Flash, but mousedown
     // will also be triggered with right-clicks, so we need to prevent that
     if (event.button !== 0) return;
@@ -169,7 +169,7 @@ class Tech extends Component {
    * Handle a tap on the media element. By default it will toggle the user
    * activity state, which hides and shows the controls.
    */
-  onTap() {
+  handleTap() {
     this.player().userActive(!this.player().userActive());
   }
 
