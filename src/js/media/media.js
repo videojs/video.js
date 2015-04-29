@@ -82,7 +82,7 @@ vjs.MediaTechController.prototype.initControlsListeners = function(){
 };
 
 /**
- * Remove the controls handler.
+ * Remove the event control listeners.
  */
 vjs.MediaTechController.prototype.removeEventListeners = function () {
   var player = this.player();
