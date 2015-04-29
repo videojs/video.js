@@ -2,6 +2,7 @@ module.exports = function(grunt) {
   var pkg = grunt.file.readJSON('package.json');
   var license = grunt.file.read('build/license-header.txt');
   var verParts = pkg.version.split('.');
+  var testBuildArray;
   var version = {
     full: pkg.version,
     major: verParts[0],
@@ -404,12 +405,16 @@ module.exports = function(grunt) {
   grunt.registerTask('skin-dev', ['connect:dev', 'watch:skin']);
 
   // Tests.
+  testBuildArray = ['standard', 'build'];
+
   // We want to run things a little differently if it's coming from Travis vs local
   if (process.env.TRAVIS) {
-    grunt.registerTask('test', ['build', 'test-travis', 'coveralls']);
+    testBuildArray = testBuildArray.concat(['test-travis', 'coveralls']);
   } else {
-    grunt.registerTask('test', ['build', 'test-local']);
+    testBuildArray = testBuildArray.concat(['test-local']);
   }
+
+  grunt.registerTask('test', testBuildArray);
 
   // Load all the tasks in the tasks directory
   grunt.loadTasks('build/tasks');
