@@ -1,6 +1,7 @@
 import Component from '../component';
 import * as Lib from '../lib';
 import * as Events from '../events';
+import safeParseTuple from 'safe-json-parse/tuple';
 import window from 'global/window';
 
 class TextTrackSettings extends Component {
@@ -105,7 +106,7 @@ class TextTrackSettings extends Component {
   restoreSettings() {
     let values;
     try {
-      values = JSON.parse(window.localStorage.getItem('vjs-text-track-settings'));
+      values = safeParseTuple(window.localStorage.getItem('vjs-text-track-settings'))[1];
     } catch (e) {}
 
     if (values) {

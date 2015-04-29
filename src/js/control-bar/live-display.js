@@ -12,7 +12,7 @@ class LiveDisplay extends Component {
 
   createEl() {
     var el = super.createEl('div', {
-      className: 'vjs-live-controls vjs-control'
+      className: 'vjs-live-control vjs-control'
     });
 
     this.contentEl_ = Lib.createEl('div', {

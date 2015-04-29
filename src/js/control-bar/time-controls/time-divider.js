@@ -13,7 +13,7 @@ class TimeDivider extends Component {
 
   createEl() {
     return super.createEl('div', {
-      className: 'vjs-time-divider',
+      className: 'vjs-time-control vjs-time-divider',
       innerHTML: '<div><span>/</span></div>'
     });
   }

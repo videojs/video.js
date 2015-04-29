@@ -1,0 +1,47 @@
+.vjs-error-display {
+  display: none;
+}
+
+.vjs-error .vjs-error-display {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.vjs-error .vjs-error-display:before {
+  content: 'X';
+  font-family: $text-font-family;
+  font-size: 4em;
+  color: $secondary-bg;
+  /* In order to center the play icon vertically we need to set the line height
+  to the same as the button height */
+  line-height: 1;
+  text-shadow: 0.05em 0.05em 0.1em $primary-bg;
+  text-align: center /* Needed for IE8 */;
+  vertical-align: middle;
+
+  position: absolute;
+  left: 0;
+  top: 50%;
+  margin-top: -0.5em;
+  width: 100%;
+}
+
+.vjs-error-display div {
+  position: absolute;
+  bottom: 1em;
+  right: 0;
+  left: 0;
+  font-size: 1.4em;
+  text-align: center;
+  padding: 3px;
+
+  @include background-color-with-alpha($primary-bg, 0.5);
+}
+
+.vjs-error-display a, .vjs-error-display a:visited {
+  color: $secondary-text;
+}

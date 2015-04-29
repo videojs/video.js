@@ -53,14 +53,26 @@ module.exports = function(grunt) {
     },
     dist: {},
     watch: {
-      files: [ 'src/**/*', 'test/unit/**/*.js', 'Gruntfile.js' ],
-      tasks: 'dev'
+      default: {
+        files: [ 'src/**/*', 'test/unit/**/*.js', 'Gruntfile.js' ],
+        tasks: 'dev'
+      },
+      skin: {
+        files: ['src/css/**/*'],
+        tasks: 'sass'
+      }
     },
     connect: {
-      dev: {
+      preview: {
         options: {
           port: 9999,
           keepalive: true
+        }
+      },
+      dev: {
+        options: {
+          port: 9999,
+          livereload: true
         }
       }
     },
@@ -143,10 +155,10 @@ module.exports = function(grunt) {
         ext: '.min.css'
       }
     },
-    less: {
-      dev: {
+    sass: {
+      dist: {
         files: {
-          'build/temp/video-js.css': 'src/css/video-js.less'
+          'build/temp/video-js.css': 'src/css/video-js.scss'
         }
       }
     },
@@ -261,6 +273,9 @@ module.exports = function(grunt) {
             standalone: 'videojs'
           },
           banner: license,
+          plugin: [
+            [ 'browserify-derequire' ]
+          ],
           transform: [
             require('babelify').configure({
               sourceMapRelative: './src/js'
@@ -308,7 +323,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
-  grunt.loadNpmTasks('grunt-contrib-less');
+  grunt.loadNpmTasks('grunt-sass');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('videojs-doc-generator');
   grunt.loadNpmTasks('grunt-zip');
@@ -333,7 +348,7 @@ module.exports = function(grunt) {
     'concat:vtt',
     'exorcise',
     'uglify',
-    'less',
+    'sass',
     'version:css',
     'cssmin',
     'copy:fonts',
@@ -359,10 +374,13 @@ module.exports = function(grunt) {
   grunt.registerTask('newtest', ['build', 'karma:chrome']);
 
   // Default task.
-  grunt.registerTask('default', ['build', 'test']);
+  grunt.registerTask('default', ['build', 'test-local']);
 
   // Development watch task. Doing the minimum required.
-  grunt.registerTask('dev', ['jshint', 'less', 'browserify', 'karma:chrome']);
+  grunt.registerTask('dev', ['connect:dev', 'jshint', 'sass', 'browserify', 'karma:chrome']);
+
+  // Skin development watch task.
+  grunt.registerTask('skin-dev', ['connect:dev', 'watch:skin']);
 
   // Tests.
   // We want to run things a little differently if it's coming from Travis vs local
