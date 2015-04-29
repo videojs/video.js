@@ -21,6 +21,7 @@
     "url": "https://github.com/videojs/video.js.git"
   },
   "main": "./dist/video.js",
+  "style": "./dist/video-js.css",
   "dependencies": {
     "global": "^4.3.0",
     "safe-json-parse": "^4.0.0",
