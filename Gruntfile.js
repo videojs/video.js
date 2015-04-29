@@ -244,6 +244,12 @@ module.exports = function(grunt) {
         },
         src: ['package.json', 'bower.json', 'component.json']
       },
+      prerelease: {
+        options: {
+          release: 'prerelease'
+        },
+        src: ['package.json', 'bower.json', 'component.json']
+      },
       css: {
         options: {
           prefix: '@version\\s*'
