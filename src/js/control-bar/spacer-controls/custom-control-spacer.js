@@ -8,7 +8,7 @@ import Spacer from './spacer.js';
  */
 class CustomControlSpacer extends Spacer {
   buildCSSClass() {
-    return `vjs-custom-control-spacer ${super.buildCSSClass}`;
+    return `vjs-custom-control-spacer ${super.buildCSSClass()}`;
   }
 
   createEl() {
