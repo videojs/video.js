@@ -100,6 +100,13 @@ class Player extends Component {
     // May be turned back on by HTML5 tech if nativeControlsForTouch is true
     tag.controls = false;
 
+    /**
+    * Store the internal state of scrubbing
+    * @private
+    * @return {Boolean} True if the user is scrubbing
+    */
+    this.scrubbing_ = false;
+
     this.el_ = this.createEl();
     this.initChildren();
 
@@ -116,6 +123,10 @@ class Player extends Component {
 
     if (this.isAudio()) {
       this.addClass('vjs-audio');
+    }
+
+    if (this.flexNotSupported_()) {
+      this.addClass('vjs-no-flex');
     }
 
     // TODO: Make this smarter. Toggle user state between touching/mousing
@@ -850,6 +861,29 @@ class Player extends Component {
   paused() {
     // The initial state of paused should be true (in Safari it's actually false)
     return (this.techGet('paused') === false) ? false : true;
+  }
+
+  /**
+  * Returns whether or not the user is "scrubbing". Scrubbing is when the user
+  * has clicked the progress bar handle and is dragging it along the progress bar.
+  * @param  {Boolean} isScrubbing   True/false the user is scrubbing
+  * @return {Boolean}               The scrubbing status when getting
+  * @return {Object}                The player when setting
+  */
+  scrubbing(isScrubbing) {
+    if (isScrubbing !== undefined) {
+      this.scrubbing_ = !!isScrubbing;
+
+      if (isScrubbing) {
+        this.addClass('vjs-scrubbing');
+      } else {
+        this.removeClass('vjs-scrubbing');
+      }
+
+      return this;
+    }
+
+    return this.scrubbing_;
   }
 
   /**
@@ -2028,6 +2062,15 @@ Player.prototype.onVolumeChange;
  * @event error
  */
 Player.prototype.onError;
+
+Player.prototype.flexNotSupported_ = function() {
+  var elem = document.createElement('i');
+
+  return !('flexBasis' in elem.style ||
+          'webkitFlexBasis' in elem.style ||
+          'mozFlexBasis' in elem.style ||
+          'msFlexBasis' in elem.style);
+};
 
 Component.registerComponent('Player', Player);
 export default Player;

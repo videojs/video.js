@@ -700,3 +700,18 @@ test('should add an audio class if an audio el is used', function() {
 
   ok(player.el().className.indexOf(audioClass) !== -1, 'added '+ audioClass +' css class');
 });
+
+test('should not be scrubbing while not seeking', function(){
+  var player = TestHelpers.makePlayer();
+  equal(player.scrubbing(), false, 'player is not scrubbing');
+  ok(player.el().className.indexOf('scrubbing') === -1, 'scrubbing class is not present');
+  player.scrubbing(false);
+  equal(player.scrubbing(), false, 'player is not scrubbing');
+});
+
+test('should be scrubbing while seeking', function(){
+  var player = TestHelpers.makePlayer();
+  player.scrubbing(true);
+  equal(player.scrubbing(), true, 'player is scrubbing');
+  ok(player.el().className.indexOf('scrubbing') !== -1, 'scrubbing class is present');
+});

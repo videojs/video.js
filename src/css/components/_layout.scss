@@ -1,0 +1,101 @@
+.video-js {
+  display: block;
+  box-sizing: border-box;
+
+  color: $primary-text;
+  background-color: $primary-bg;
+  position: relative;
+  padding: 0;
+  /* Start with 10px for base font size so other dimensions can be em based and
+  easily calculable. */
+  font-size: $base-font-size;
+  /* Allow poster to be vertially aligned. */
+  vertical-align: middle;
+
+  /* Provide some basic defaults for fonts */
+  font-weight: normal;
+  font-style: normal;
+  /* Avoiding helvetica: issue #376 */
+  font-family: $text-font-family;
+
+  @include user-select(none);
+
+  /* Fix for Firefox 9 fullscreen (only if it is enabled). Not needed when
+  checking fullScreenEnabled. */
+  &:-moz-full-screen { position: absolute; }
+
+  &:-webkit-full-screen {
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
+
+/* All elements inherit border-box sizing */
+.video-js *,
+.video-js *:before,
+.video-js *:after {
+  box-sizing: inherit;
+}
+
+/* Playback technology elements expand to the width/height of the containing div
+<video> or <object> */
+.video-js .vjs-tech {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Fullscreen Styles */
+body.vjs-full-window {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  /* Fix for IE6 full-window. http://www.cssplay.co.uk/layouts/fixed.html */
+  overflow-y: auto;
+}
+.video-js.vjs-fullscreen {
+  position: fixed;
+  overflow: hidden;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+.video-js.vjs-fullscreen.vjs-user-inactive {
+  cursor: none;
+}
+
+
+/* Hide disabled or unsupported controls. */
+.vjs-hidden { display: none !important; }
+
+.vjs-lock-showing {
+  display: block !important;
+  opacity: 1;
+  visibility: visible;
+}
+
+/*  In IE8 w/ no JavaScript (no HTML5 shim), the video tag doesn't register.
+The .video-js classname on the video tag also isn't considered.
+This optional paragraph inside the video tag can provide a message to users
+about what's required to play video. */
+.vjs-no-js {
+  padding: 20px;
+  color: $primary-text;
+  background-color: $primary-bg;
+  font-size: 18px;
+  font-family: $text-font-family;
+  text-align: center;
+  width: 300px;
+  height: 150px;
+  margin: 0px auto;
+}
+
+.vjs-no-js a, .vjs-no-js a:visited {
+  color: $secondary-text;
+}

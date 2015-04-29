@@ -62,11 +62,9 @@ var fixEvent = function(event) {
         old.preventDefault();
       }
       event.returnValue = false;
-      event.isDefaultPrevented = returnTrue;
       event.defaultPrevented = true;
     };
 
-    event.isDefaultPrevented = returnFalse;
     event.defaultPrevented = false;
 
     // Stop the event from bubbling

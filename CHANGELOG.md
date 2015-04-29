@@ -12,6 +12,12 @@ CHANGELOG
 * @heff converted all classes to use ES6 classes ([view](https://github.com/videojs/video.js/pull/1993))
 * @mmcc added ES6 default args and template strings ([view](https://github.com/videojs/video.js/pull/2015))
 * @dconnolly replaced JSON.parse with a safe non-eval JSON parse ([view](https://github.com/videojs/video.js/pull/2077))
+* @mmcc added a new default skin, switched to SASS, modified the html ([view](https://github.com/videojs/video.js/pull/1999))
+* @gkatsev removed event.isDefaultPrevented in favor of event.defaultPrevented ([view](https://github.com/videojs/video.js/pull/2081))
+* @heff added and `extends` function for external subclassing ([view](https://github.com/videojs/video.js/pull/2078))
+* @forbesjo added the `scrubbing` property ([view](https://github.com/videojs/video.js/pull/2080))
+* @heff switched to border-box sizing for all player elements ([view](https://github.com/videojs/video.js/pull/2082))
+* @forbesjo added a vjs-button class to button controls ([view](https://github.com/videojs/video.js/pull/2084))
 
 --------------------
 

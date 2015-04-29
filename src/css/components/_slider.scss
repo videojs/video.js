@@ -1,0 +1,39 @@
+.video-js .vjs-slider {
+  outline: 0;
+  position: relative;
+  cursor: pointer;
+  padding: 0;
+
+  @include background-color-with-alpha($secondary-bg, 0.9);
+}
+
+.video-js .vjs-slider:focus {
+  text-shadow: 0em 0em 1em rgba($primary-text, 1);
+
+  @include box-shadow(0 0 1em $primary-text);
+}
+
+.video-js .vjs-slider-handle {
+  position: absolute;
+  @extend .vjs-icon-circle;
+}
+
+.video-js .vjs-slider-horizontal .vjs-slider-handle {
+  left: 0;
+  top: -0.34em;
+}
+
+.video-js .vjs-slider-vertical .vjs-slider-handle {
+  left: -0.3em;
+  bottom: 0;
+}
+
+.video-js .vjs-slider-handle:before {
+  font-size: 1em;
+  line-height: 1;
+  text-align: center;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+}
