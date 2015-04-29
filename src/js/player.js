@@ -76,6 +76,17 @@ class Player extends Component {
     // Run base component initializing with new options
     super(null, options, ready);
 
+
+    // if the global option object was accidentally blown away by
+    // someone, bail early with an informative error
+    if (!this.options_ ||
+        !this.options_.techOrder ||
+        !this.options_.techOrder.length) {
+      throw new Error('No techOrder specified. Did you overwrite ' +
+                      'videojs.options instead of just changing the ' +
+                      'properties you want to override?');
+    }
+
     this.tag = tag; // Store the original tag used to set options
 
     // Store the tag attributes used to restore html5 element

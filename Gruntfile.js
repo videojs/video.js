@@ -269,6 +269,21 @@ module.exports = function(grunt) {
       }
     },
     browserify: {
+      options: {
+        transform: [
+          require('babelify').configure({
+            sourceMapRelative: './src/js'
+          }),
+          ['browserify-versionify', {
+            placeholder: '__VERSION__',
+            version: pkg.version
+          }],
+          ['browserify-versionify', {
+            placeholder: '__VERSION_NO_PATCH__',
+            version: version.majorMinor
+          }]
+        ]
+      },
       build: {
         files: {
           'build/temp/video.js': ['src/js/video.js']
@@ -281,19 +296,15 @@ module.exports = function(grunt) {
           banner: license,
           plugin: [
             [ 'browserify-derequire' ]
-          ],
-          transform: [
-            require('babelify').configure({
-              sourceMapRelative: './src/js'
-            }),
-            ['browserify-versionify', {
-              placeholder: '__VERSION__',
-              version: pkg.version
-            }],
-            ['browserify-versionify', {
-              placeholder: '__VERSION_NO_PATCH__',
-              version: version.majorMinor
-            }]
+          ]
+        }
+      },
+      test: {
+        files: {
+          'build/temp/tests.js': [
+            'test/globals-shim.js',
+            'test/unit/**/*.js',
+            'test/api/**.js'
           ]
         }
       }
@@ -307,6 +318,9 @@ module.exports = function(grunt) {
       }
     },
     coveralls: {
+      options: {
+        force: true
+      },
       all: {
         src: 'test/coverage/lcov.info'
       }
