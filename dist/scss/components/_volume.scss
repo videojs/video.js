@@ -1,0 +1,104 @@
+.video-js .vjs-mute-control,
+.video-js .vjs-volume-menu-button {
+  cursor: pointer;
+  @include flex(none);
+  @extend .vjs-icon-volume-high;
+}
+
+.video-js .vjs-mute-control.vjs-vol-0,
+.video-js .vjs-volume-menu-button.vjs-vol-0 {
+  @extend .vjs-icon-volume-mute;
+}
+.video-js .vjs-mute-control.vjs-vol-1,
+.video-js .vjs-volume-menu-button.vjs-vol-1 {
+  @extend .vjs-icon-volume-low;
+}
+.video-js .vjs-mute-control.vjs-vol-2,
+.video-js .vjs-volume-menu-button.vjs-vol-2 {
+  @extend .vjs-icon-volume-mid;
+}
+
+.video-js .vjs-volume-control {
+  width: 5em;
+  @include flex(none);
+  @include display-flex(center);
+}
+
+.video-js .vjs-volume-bar.vjs-slider-horizontal {
+  width: 5em;
+  height: 0.3em;
+}
+
+.video-js .vjs-volume-bar.vjs-slider-vertical {
+  width: 0.3em;
+  height: 5em;
+  margin: 1.3em;
+}
+
+.video-js .vjs-volume-level {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+
+  background-color: $primary-text;
+}
+
+.video-js .vjs-slider-vertical .vjs-volume-level { width: 0.3em; }
+.video-js .vjs-slider-horizontal .vjs-volume-level { height: 0.3em; }
+
+.video-js .vjs-volume-bar .vjs-volume-handle {
+  width: 0.8em;
+  height: 0.8em;
+}
+
+/* Assumes volume starts at 1.0. If you change the size of the
+handle relative to the volume bar, you'll need to update this value
+too. */
+.video-js .vjs-volume-bar.vjs-slider-vertical .vjs-volume-level { height: 100%; }
+.video-js .vjs-volume-bar.vjs-slider-vertical .vjs-volume-handle { bottom: 4.3em; }
+.video-js .vjs-volume-bar.vjs-slider-horizontal .vjs-volume-level { width: 100%; }
+.video-js .vjs-volume-bar.vjs-slider-horizontal .vjs-volume-handle { left: 4.3em; }
+
+.video-js .vjs-volume-handle:before {
+  font-size: 0.9em;
+}
+
+/* The volume menu button is like menu buttons (captions/subtitles) but works
+a little differently. It needs to be possible to tab to the volume slider
+without hitting space bar on the menu button. To do this we're not using
+display:none to hide the slider menu by default, and instead setting the
+width and height to zero. */
+.video-js .vjs-volume-menu-button .vjs-menu {
+  display: block;
+  width: 0;
+  height: 0;
+  left: 0.5em;
+  border-top-color: transparent;
+}
+
+.video-js .vjs-menu-button.vjs-volume-menu-button .vjs-menu .vjs-menu-content {
+  height: 0;
+  width: 0;
+
+  // Avoids unnecessary scrollbars in the menu content. Primarily noticed in Chrome on Linux.
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+.video-js .vjs-volume-menu-button:hover .vjs-menu,
+.video-js .vjs-volume-menu-button .vjs-menu.vjs-lock-showing {
+  // border-top-color: rgba(7, 40, 50, 0.5); /* Same as ul background */
+}
+
+.video-js .vjs-volume-menu-button:hover .vjs-menu .vjs-menu-content,
+.video-js .vjs-volume-menu-button .vjs-menu.vjs-lock-showing .vjs-menu-content {
+  height: 8em;
+  width: 2.9em;
+}
+
+// By default, all menu items are shown, but we hide .vjs-mute-control and .vjs-volume-control
+// so that the volume menu button is the only visible volume control.
+.video-js .vjs-mute-control,
+.video-js .vjs-volume-control {
+  display: none;
+}
