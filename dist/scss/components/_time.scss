@@ -1,0 +1,11 @@
+.video-js .vjs-time-control {
+  @include flex(none);
+  font-size: 1em;
+  line-height: 3em;
+}
+
+/* We need the extra specificity that referencing .vjs-no-flex provides. */
+.video-js .vjs-current-time, .video-js.vjs-no-flex .vjs-current-time { display: none; }
+.video-js .vjs-duration, .video-js.vjs-no-flex .vjs-duration { display: none; }
+.video-js .vjs-remaining-time, .video-js.vjs-no-flex .vjs-remaining-time { display: none; }
+.vjs-time-divider { display: none; line-height: 3em; }

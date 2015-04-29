@@ -1,0 +1,31 @@
+.video-js .vjs-slider {
+  outline: 0;
+  position: relative;
+  cursor: pointer;
+  padding: 0;
+
+  @include background-color-with-alpha($secondary-bg, 0.9);
+}
+
+.video-js .vjs-slider-handle {
+  position: absolute;
+<<<<<<< HEAD
+=======
+  @extend .vjs-icon-circle;
+}
+
+.video-js .vjs-slider-horizontal .vjs-slider-handle {
+>>>>>>> fa545f0... moved to using extend for icons
+  left: 0;
+  top: -0.3em;
+}
+
+.video-js .vjs-slider-handle:before {
+  font-size: 1em;
+  line-height: 1;
+  text-align: center;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+}
