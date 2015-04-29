@@ -65,8 +65,8 @@ vjs.MediaTechController.prototype.initControlsListeners = function(){
 
   // Set up event listeners once the tech is ready and has an element to apply
   // listeners to
-  this.ready(this.addControlsListeners);
-  this.on(player, 'controlsenabled', this.addControlsListeners);
+  this.ready(this.addEventListeners);
+  this.on(player, 'controlsenabled', this.addEventListeners);
   this.on(player, 'controlsdisabled', this.removeControlsListeners);
 
   // if we're loading the playback object after it has started loading or playing the
@@ -81,13 +81,18 @@ vjs.MediaTechController.prototype.initControlsListeners = function(){
   });
 };
 
-vjs.MediaTechController.prototype.addControlsListeners = function(){
-  var userWasActive;
+/**
+ * Remove the controls handler.
+ */
+vjs.MediaTechController.prototype.removeEventListeners = function () {
   var player = this.player();
 
-  if (!player.controls() || player.usingNativeControls()) {
-    return;
-  }
+  this.off(player, 'controlsenabled', this.addEventListeners);
+  this.off(player, 'controlsdisabled', this.removeControlsListeners);
+};
+
+vjs.MediaTechController.prototype.addControlsListeners = function(){
+  var userWasActive;
 
   // Some browsers (Chrome & IE) don't trigger a click on a flash swf, but do
   // trigger mousedown/up.
@@ -119,6 +124,14 @@ vjs.MediaTechController.prototype.addControlsListeners = function(){
   // The tap listener needs to come after the touchend listener because the tap
   // listener cancels out any reportedUserActivity when setting userActive(false)
   this.on('tap', this.onTap);
+};
+
+vjs.MediaTechController.prototype.addEventListeners = function () {
+    var player = this.player();
+
+    if (player.controls() && !player.usingNativeControls()) {
+        this.addControlsListeners();
+    }
 };
 
 /**
@@ -174,9 +187,6 @@ vjs.MediaTechController.prototype.manualProgressOn = function(){
 
   // Trigger progress watching when a source begins loading
   this.trackProgress();
-
-  this.on('dispose', this.manualProgressOff);
-  this.on(this.player(), 'error', this.manualProgressOff);
 };
 
 vjs.MediaTechController.prototype.manualProgressOff = function(){
@@ -220,9 +230,6 @@ vjs.MediaTechController.prototype.manualTimeUpdatesOn = function(){
     // Turn off manual progress tracking
     this.manualTimeUpdatesOff();
   });
-
-  this.on('dispose', this.manualTimeUpdatesOff);
-  this.on(player, 'error', this.manualTimeUpdatesOff);
 };
 
 vjs.MediaTechController.prototype.manualTimeUpdatesOff = function(){
@@ -248,6 +255,20 @@ vjs.MediaTechController.prototype.stopTrackingCurrentTime = function(){
   // #1002 - if the video ends right before the next timeupdate would happen,
   // the progress bar won't make it all the way to the end
   this.player().trigger('timeupdate');
+};
+
+vjs.MediaTechController.prototype.stopTracking = function () {
+  // Turn off any manual progress or timeupdate tracking
+  if (this.manualProgress) { this.manualProgressOff(); }
+
+  if (this.manualTimeUpdates) { this.manualTimeUpdatesOff(); }
+};
+
+vjs.MediaTechController.prototype.dispose = function() {
+  this.stopTracking();
+  this.removeEventListeners();
+
+  vjs.Component.prototype.dispose.call(this);
 };
 
 vjs.MediaTechController.prototype.setCurrentTime = function() {

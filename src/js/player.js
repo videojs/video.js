@@ -1430,6 +1430,8 @@ vjs.Player.prototype.error = function(err){
     return this.error_;
   }
 
+  if (this.tech) { this.tech.stopTracking(); }
+
   // restoring to default
   if (err === null) {
     this.error_ = err;
