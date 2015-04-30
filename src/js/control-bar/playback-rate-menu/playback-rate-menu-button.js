@@ -56,7 +56,7 @@ class PlaybackRateMenuButton extends MenuButton {
     this.el().setAttribute('aria-valuenow', this.player().playbackRate());
   }
 
-  onClick() {
+  handleClick() {
     // select next rate option
     let currentRate = this.player().playbackRate();
     let rates = this.player().options()['playbackRates'];

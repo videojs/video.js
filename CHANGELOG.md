@@ -18,6 +18,9 @@ CHANGELOG
 * @forbesjo added the `scrubbing` property ([view](https://github.com/videojs/video.js/pull/2080))
 * @heff switched to border-box sizing for all player elements ([view](https://github.com/videojs/video.js/pull/2082))
 * @forbesjo added a vjs-button class to button controls ([view](https://github.com/videojs/video.js/pull/2084))
+* @bc-bbay Load plugins before controls ([view](https://github.com/videojs/video.js/pull/2094))
+* @bc-bbay rename onEvent methods to handleEvent ([view](https://github.com/videojs/video.js/pull/2093))
+* @dmlap added an error message if techOrder is not in options ([view](https://github.com/videojs/video.js/pull/2097))
 
 --------------------
 

@@ -89,7 +89,7 @@ class PosterImage extends Button {
   /**
    * Event handler for clicks on the poster image
    */
-  onClick() {
+  handleClick() {
     // We don't want a click to trigger playback when controls are disabled
     // but CSS should be hiding the poster to prevent that from happening
     if (this.player_.paused()) {

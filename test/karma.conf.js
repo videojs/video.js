@@ -50,20 +50,16 @@ module.exports = function(config) {
   config.set({
     basePath: '',
 
-    frameworks: ['browserify', 'qunit', 'sinon'],
+    frameworks: ['browserify', 'qunit'],
 
     autoWatch: false,
 
     singleRun: true,
 
-    // customLaunchers: customLaunchers,
-
     files: [
       '../build/temp/video-js.min.css',
-      '../test/karma-qunit-shim.js',
-      '../test/unit/**/*.js',
       '../build/temp/video.min.js',
-      '../test/api/**/*.js',
+      '../build/temp/tests.js',
     ],
 
     preprocessors: {
@@ -84,7 +80,6 @@ module.exports = function(config) {
       'karma-phantomjs-launcher',
       'karma-safari-launcher',
       'karma-sauce-launcher',
-      'karma-sinon',
       'karma-browserify',
       'karma-coverage'
     ],

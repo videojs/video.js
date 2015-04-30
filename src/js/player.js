@@ -76,6 +76,17 @@ class Player extends Component {
     // Run base component initializing with new options
     super(null, options, ready);
 
+
+    // if the global option object was accidentally blown away by
+    // someone, bail early with an informative error
+    if (!this.options_ ||
+        !this.options_.techOrder ||
+        !this.options_.techOrder.length) {
+      throw new Error('No techOrder specified. Did you overwrite ' +
+                      'videojs.options instead of just changing the ' +
+                      'properties you want to override?');
+    }
+
     this.tag = tag; // Store the original tag used to set options
 
     // Store the tag attributes used to restore html5 element
@@ -108,6 +119,14 @@ class Player extends Component {
     this.scrubbing_ = false;
 
     this.el_ = this.createEl();
+
+    // Load plugins
+    if (options['plugins']) {
+      Lib.obj.each(options['plugins'], function(key, val){
+        this[key](val);
+      }, this);
+    }
+
     this.initChildren();
 
     // Set isAudio based on whether or not an audio tag was used
@@ -138,20 +157,14 @@ class Player extends Component {
     // Make player easily findable by ID
     Player.players[this.id_] = this;
 
-    if (options['plugins']) {
-      Lib.obj.each(options['plugins'], function(key, val){
-        this[key](val);
-      }, this);
-    }
-
     // When the player is first initialized, trigger activity so components
     // like the control bar show themselves if needed
     this.userActive_ = true;
     this.reportUserActivity();
     this.listenForUserActivity();
 
-    this.on('fullscreenchange', this.onFullscreenChange);
-    this.on('stageclick', this.onStageClick);
+    this.on('fullscreenchange', this.handleFullscreenChange);
+    this.on('stageclick', this.handleStageClick);
   }
 
   /**
@@ -281,40 +294,40 @@ class Player extends Component {
     let techComponent = Component.getComponent(techName);
     this.tech = new techComponent(techOptions);
 
-    this.on(this.tech, 'ready', this.onTechReady);
-    this.on(this.tech, 'usenativecontrols', this.onTechUseNativeControls);
+    this.on(this.tech, 'ready', this.handleTechReady);
+    this.on(this.tech, 'usenativecontrols', this.handleTechUseNativeControls);
 
     // firefox doesn't bubble mousemove events to parent. videojs/video-js-swf#37
     // bugzilla bug: https://bugzilla.mozilla.org/show_bug.cgi?id=836786
     if (Lib.IS_FIREFOX) {
-      this.on(this.tech, 'mousemove', this.onTechMouseMove);
+      this.on(this.tech, 'mousemove', this.handleTechMouseMove);
     }
 
     // Listen to every HTML5 events and trigger them back on the player for the plugins
-    this.on(this.tech, 'loadstart', this.onTechLoadStart);
-    this.on(this.tech, 'waiting', this.onTechWaiting);
-    this.on(this.tech, 'canplay', this.onTechCanPlay);
-    this.on(this.tech, 'canplaythrough', this.onTechCanPlayThrough);
-    this.on(this.tech, 'playing', this.onTechPlaying);
-    this.on(this.tech, 'ended', this.onTechEnded);
-    this.on(this.tech, 'seeking', this.onTechSeeking);
-    this.on(this.tech, 'seeked', this.onTechSeeked);
-    this.on(this.tech, 'play', this.onTechPlay);
-    this.on(this.tech, 'firstplay', this.onTechFirstPlay);
-    this.on(this.tech, 'pause', this.onTechPause);
-    this.on(this.tech, 'progress', this.onTechProgress);
-    this.on(this.tech, 'durationchange', this.onTechDurationChange);
-    this.on(this.tech, 'fullscreenchange', this.onTechFullscreenChange);
-    this.on(this.tech, 'error', this.onTechError);
-    this.on(this.tech, 'suspend', this.onTechSuspend);
-    this.on(this.tech, 'abort', this.onTechAbort);
-    this.on(this.tech, 'emptied', this.onTechEmptied);
-    this.on(this.tech, 'stalled', this.onTechStalled);
-    this.on(this.tech, 'loadedmetadata', this.onTechLoadedMetaData);
-    this.on(this.tech, 'loadeddata', this.onTechLoadedData);
-    this.on(this.tech, 'timeupdate', this.onTechTimeUpdate);
-    this.on(this.tech, 'ratechange', this.onTechRateChange);
-    this.on(this.tech, 'volumechange', this.onTechVolumeChange);
+    this.on(this.tech, 'loadstart', this.handleTechLoadStart);
+    this.on(this.tech, 'waiting', this.handleTechWaiting);
+    this.on(this.tech, 'canplay', this.handleTechCanPlay);
+    this.on(this.tech, 'canplaythrough', this.handleTechCanPlayThrough);
+    this.on(this.tech, 'playing', this.handleTechPlaying);
+    this.on(this.tech, 'ended', this.handleTechEnded);
+    this.on(this.tech, 'seeking', this.handleTechSeeking);
+    this.on(this.tech, 'seeked', this.handleTechSeeked);
+    this.on(this.tech, 'play', this.handleTechPlay);
+    this.on(this.tech, 'firstplay', this.handleTechFirstPlay);
+    this.on(this.tech, 'pause', this.handleTechPause);
+    this.on(this.tech, 'progress', this.handleTechProgress);
+    this.on(this.tech, 'durationchange', this.handleTechDurationChange);
+    this.on(this.tech, 'fullscreenchange', this.handleTechFullscreenChange);
+    this.on(this.tech, 'error', this.handleTechError);
+    this.on(this.tech, 'suspend', this.handleTechSuspend);
+    this.on(this.tech, 'abort', this.handleTechAbort);
+    this.on(this.tech, 'emptied', this.handleTechEmptied);
+    this.on(this.tech, 'stalled', this.handleTechStalled);
+    this.on(this.tech, 'loadedmetadata', this.handleTechLoadedMetaData);
+    this.on(this.tech, 'loadeddata', this.handleTechLoadedData);
+    this.on(this.tech, 'timeupdate', this.handleTechTimeUpdate);
+    this.on(this.tech, 'ratechange', this.handleTechRateChange);
+    this.on(this.tech, 'volumechange', this.handleTechVolumeChange);
     this.on(this.tech, 'texttrackchange', this.onTextTrackChange);
 
     if (this.controls() && !this.usingNativeControls()) {
@@ -354,21 +367,21 @@ class Player extends Component {
     // trigger mousedown/up.
     // http://stackoverflow.com/questions/1444562/javascript-onclick-event-over-flash-object
     // Any touch events are set to block the mousedown event from happening
-    this.on(this.tech, 'mousedown', this.onTechClick);
+    this.on(this.tech, 'mousedown', this.handleTechClick);
 
     // If the controls were hidden we don't want that to change without a tap event
     // so we'll check if the controls were already showing before reporting user
     // activity
-    this.on(this.tech, 'touchstart', this.onTechTouchStart);
-    this.on(this.tech, 'touchmove', this.onTechTouchMove);
-    this.on(this.tech, 'touchend', this.onTechTouchEnd);
+    this.on(this.tech, 'touchstart', this.handleTechTouchStart);
+    this.on(this.tech, 'touchmove', this.handleTechTouchMove);
+    this.on(this.tech, 'touchend', this.handleTechTouchEnd);
 
     // Turn on component tap events
     this.tech.emitTapEvents();
 
     // The tap listener needs to come after the touchend listener because the tap
     // listener cancels out any reportedUserActivity when setting userActive(false)
-    this.on(this.tech, 'tap', this.onTechTap);
+    this.on(this.tech, 'tap', this.handleTechTap);
   }
 
   /**
@@ -378,18 +391,18 @@ class Player extends Component {
   removeTechControlsListeners() {
     // We don't want to just use `this.off()` because there might be other needed
     // listeners added by techs that extend this.
-    this.off(this.tech, 'tap', this.onTechTap);
-    this.off(this.tech, 'touchstart', this.onTechTouchStart);
-    this.off(this.tech, 'touchmove', this.onTechTouchMove);
-    this.off(this.tech, 'touchend', this.onTechTouchEnd);
-    this.off(this.tech, 'mousedown', this.onTechClick);
+    this.off(this.tech, 'tap', this.handleTechTap);
+    this.off(this.tech, 'touchstart', this.handleTechTouchStart);
+    this.off(this.tech, 'touchmove', this.handleTechTouchMove);
+    this.off(this.tech, 'touchend', this.handleTechTouchEnd);
+    this.off(this.tech, 'mousedown', this.handleTechClick);
   }
 
   /**
    * Player waits for the tech to be ready
    * @private
    */
-  onTechReady() {
+  handleTechReady() {
     this.triggerReady();
 
     // Chrome and Safari both have issues with autoplay.
@@ -406,7 +419,7 @@ class Player extends Component {
    * Fired when a mouse move on the tech element
    * @private
    */
-  onTechMouseMove() {
+  handleTechMouseMove() {
     this.reportUserActivity();
   }
 
@@ -414,7 +427,7 @@ class Player extends Component {
    * Fired when the native controls are used
    * @private
    */
-  onTechUseNativeControls() {
+  handleTechUseNativeControls() {
     this.usingNativeControls(true);
   }
 
@@ -422,7 +435,7 @@ class Player extends Component {
    * Fired when the user agent begins looking for media data
    * @event loadstart
    */
-  onTechLoadStart() {
+  handleTechLoadStart() {
     // TODO: Update to use `emptied` event instead. See #1277.
 
     this.removeClass('vjs-ended');
@@ -465,7 +478,7 @@ class Player extends Component {
    * Fired whenever the media begins or resumes playback
    * @event play
    */
-  onTechPlay() {
+  handleTechPlay() {
     this.removeClass('vjs-ended');
     this.removeClass('vjs-paused');
     this.addClass('vjs-playing');
@@ -481,7 +494,7 @@ class Player extends Component {
    * Fired whenever the media begins waiting
    * @event waiting
    */
-  onTechWaiting() {
+  handleTechWaiting() {
     this.addClass('vjs-waiting');
     this.trigger('waiting');
   }
@@ -491,7 +504,7 @@ class Player extends Component {
    * which is not consistent between browsers. See #1351
    * @event canplay
    */
-  onTechCanPlay() {
+  handleTechCanPlay() {
     this.removeClass('vjs-waiting');
     this.trigger('canplay');
   }
@@ -501,7 +514,7 @@ class Player extends Component {
    * which is not consistent between browsers. See #1351
    * @event canplaythrough
    */
-  onTechCanPlayThrough() {
+  handleTechCanPlayThrough() {
     this.removeClass('vjs-waiting');
     this.trigger('canplaythrough');
   }
@@ -511,7 +524,7 @@ class Player extends Component {
    * which is not consistent between browsers. See #1351
    * @event playing
    */
-  onTechPlaying() {
+  handleTechPlaying() {
     this.removeClass('vjs-waiting');
     this.trigger('playing');
   }
@@ -520,7 +533,7 @@ class Player extends Component {
    * Fired whenever the player is jumping to a new time
    * @event seeking
    */
-  onTechSeeking() {
+  handleTechSeeking() {
     this.addClass('vjs-seeking');
     this.trigger('seeking');
   }
@@ -529,7 +542,7 @@ class Player extends Component {
    * Fired when the player has finished jumping to a new time
    * @event seeked
    */
-  onTechSeeked() {
+  handleTechSeeked() {
     this.removeClass('vjs-seeking');
     this.trigger('seeked');
   }
@@ -543,7 +556,7 @@ class Player extends Component {
    *
    * @event firstplay
    */
-  onTechFirstPlay() {
+  handleTechFirstPlay() {
     //If the first starttime attribute is specified
     //then we will start at the given offset in seconds
     if(this.options_['starttime']){
@@ -558,7 +571,7 @@ class Player extends Component {
    * Fired whenever the media has been paused
    * @event pause
    */
-  onTechPause() {
+  handleTechPause() {
     this.removeClass('vjs-playing');
     this.addClass('vjs-paused');
     this.trigger('pause');
@@ -568,7 +581,7 @@ class Player extends Component {
    * Fired while the user agent is downloading media data
    * @event progress
    */
-  onTechProgress() {
+  handleTechProgress() {
     this.trigger('progress');
 
     // Add custom event for when source is finished downloading.
@@ -581,7 +594,7 @@ class Player extends Component {
    * Fired when the end of the media resource is reached (currentTime == duration)
    * @event ended
    */
-  onTechEnded() {
+  handleTechEnded() {
     this.addClass('vjs-ended');
     if (this.options_['loop']) {
       this.currentTime(0);
@@ -597,7 +610,7 @@ class Player extends Component {
    * Fired when the duration of the media resource is first known or changed
    * @event durationchange
    */
-  onTechDurationChange() {
+  handleTechDurationChange() {
     this.updateDuration();
     this.trigger('durationchange');
   }
@@ -605,7 +618,7 @@ class Player extends Component {
   /**
    * Handle a click on the media element to play/pause
    */
-  onTechClick(event) {
+  handleTechClick(event) {
     // We're using mousedown to detect clicks thanks to Flash, but mousedown
     // will also be triggered with right-clicks, so we need to prevent that
     if (event.button !== 0) return;
@@ -625,21 +638,21 @@ class Player extends Component {
    * Handle a tap on the media element. It will toggle the user
    * activity state, which hides and shows the controls.
    */
-  onTechTap() {
+  handleTechTap() {
     this.userActive(!this.userActive());
   }
 
-  onTechTouchStart() {
+  handleTechTouchStart() {
     this.userWasActive = this.userActive();
   }
 
-  onTechTouchMove() {
+  handleTechTouchMove() {
     if (this.userWasActive){
       this.reportUserActivity();
     }
   }
 
-  onTechTouchEnd(event) {
+  handleTechTouchEnd(event) {
     // Stop the mouse events from also happening
     event.preventDefault();
   }
@@ -671,7 +684,7 @@ class Player extends Component {
    * Fired when the player switches in or out of fullscreen mode
    * @event fullscreenchange
    */
-  onFullscreenChange() {
+  handleFullscreenChange() {
     if (this.isFullscreen()) {
       this.addClass('vjs-fullscreen');
     } else {
@@ -684,11 +697,11 @@ class Player extends Component {
    * use stageclick events triggered from inside the SWF instead
    * @private
    */
-  onStageClick() {
+  handleStageClick() {
     this.reportUserActivity();
   }
 
-  onTechFullscreenChange() {
+  handleTechFullscreenChange() {
     this.trigger('fullscreenchange');
   }
 
@@ -696,7 +709,7 @@ class Player extends Component {
    * Fires when an error occurred during the loading of an audio/video
    * @event error
    */
-  onTechError() {
+  handleTechError() {
     this.error(this.tech.error().code);
   }
 
@@ -704,7 +717,7 @@ class Player extends Component {
    * Fires when the browser is intentionally not getting media data
    * @event suspend
    */
-  onTechSuspend() {
+  handleTechSuspend() {
     this.trigger('suspend');
   }
 
@@ -712,7 +725,7 @@ class Player extends Component {
    * Fires when the loading of an audio/video is aborted
    * @event abort
    */
-  onTechAbort() {
+  handleTechAbort() {
     this.trigger('abort');
   }
 
@@ -720,7 +733,7 @@ class Player extends Component {
    * Fires when the current playlist is empty
    * @event emptied
    */
-  onTechEmptied() {
+  handleTechEmptied() {
     this.trigger('emptied');
   }
 
@@ -728,7 +741,7 @@ class Player extends Component {
    * Fires when the browser is trying to get media data, but data is not available
    * @event stalled
    */
-  onTechStalled() {
+  handleTechStalled() {
     this.trigger('stalled');
   }
 
@@ -736,7 +749,7 @@ class Player extends Component {
    * Fires when the browser has loaded meta data for the audio/video
    * @event loadedmetadata
    */
-  onTechLoadedMetaData() {
+  handleTechLoadedMetaData() {
     this.trigger('loadedmetadata');
   }
 
@@ -744,7 +757,7 @@ class Player extends Component {
    * Fires when the browser has loaded the current frame of the audio/video
    * @event loaddata
    */
-  onTechLoadedData() {
+  handleTechLoadedData() {
     this.trigger('loadeddata');
   }
 
@@ -752,7 +765,7 @@ class Player extends Component {
    * Fires when the current playback position has changed
    * @event timeupdate
    */
-  onTechTimeUpdate() {
+  handleTechTimeUpdate() {
     this.trigger('timeupdate');
   }
 
@@ -760,7 +773,7 @@ class Player extends Component {
    * Fires when the playing speed of the audio/video is changed
    * @event ratechange
    */
-  onTechRateChange() {
+  handleTechRateChange() {
     this.trigger('ratechange');
   }
 
@@ -768,7 +781,7 @@ class Player extends Component {
    * Fires when the volume has been changed
    * @event volumechange
    */
-  onTechVolumeChange() {
+  handleTechVolumeChange() {
     this.trigger('volumechange');
   }
 
@@ -1720,20 +1733,20 @@ class Player extends Component {
   listenForUserActivity() {
     let mouseInProgress, lastMoveX, lastMoveY;
 
-    let onActivity = Lib.bind(this, this.reportUserActivity);
+    let handleActivity = Lib.bind(this, this.reportUserActivity);
 
-    let onMouseMove = function(e) {
+    let handleMouseMove = function(e) {
       // #1068 - Prevent mousemove spamming
       // Chrome Bug: https://code.google.com/p/chromium/issues/detail?id=366970
       if(e.screenX !== lastMoveX || e.screenY !== lastMoveY) {
         lastMoveX = e.screenX;
         lastMoveY = e.screenY;
-        onActivity();
+        handleActivity();
       }
     };
 
-    let onMouseDown = function() {
-      onActivity();
+    let handleMouseDown = function() {
+      handleActivity();
       // For as long as the they are touching the device or have their mouse down,
       // we consider them active even if they're not moving their finger or mouse.
       // So we want to continue to update that they are active
@@ -1741,24 +1754,24 @@ class Player extends Component {
       // Setting userActivity=true now and setting the interval to the same time
       // as the activityCheck interval (250) should ensure we never miss the
       // next activityCheck
-      mouseInProgress = this.setInterval(onActivity, 250);
+      mouseInProgress = this.setInterval(handleActivity, 250);
     };
 
-    let onMouseUp = function(event) {
-      onActivity();
+    let handleMouseUp = function(event) {
+      handleActivity();
       // Stop the interval that maintains activity if the mouse/touch is down
       this.clearInterval(mouseInProgress);
     };
 
     // Any mouse movement will be considered user activity
-    this.on('mousedown', onMouseDown);
-    this.on('mousemove', onMouseMove);
-    this.on('mouseup', onMouseUp);
+    this.on('mousedown', handleMouseDown);
+    this.on('mousemove', handleMouseMove);
+    this.on('mouseup', handleMouseUp);
 
     // Listen for keyboard navigation
     // Shouldn't need to use inProgress interval because of key repeat
-    this.on('keydown', onActivity);
-    this.on('keyup', onActivity);
+    this.on('keydown', handleActivity);
+    this.on('keyup', handleActivity);
 
     // Run an interval every 250 milliseconds instead of stuffing everything into
     // the mousemove/touchmove function itself, to prevent performance degradation.
@@ -2025,31 +2038,31 @@ Player.prototype.options_ = Options;
  * Fired when the player has initial duration and dimension information
  * @event loadedmetadata
  */
-Player.prototype.onLoadedMetaData;
+Player.prototype.handleLoadedMetaData;
 
 /**
  * Fired when the player has downloaded data at the current playback position
  * @event loadeddata
  */
-Player.prototype.onLoadedData;
+Player.prototype.handleLoadedData;
 
 /**
  * Fired when the player has finished downloading the source data
  * @event loadedalldata
  */
-Player.prototype.onLoadedAllData;
+Player.prototype.handleLoadedAllData;
 
 /**
  * Fired when the user is active, e.g. moves the mouse over the player
  * @event useractive
  */
-Player.prototype.onUserActive;
+Player.prototype.handleUserActive;
 
 /**
  * Fired when the user is inactive, e.g. a short delay after the last mouse move or control interaction
  * @event userinactive
  */
-Player.prototype.onUserInactive;
+Player.prototype.handleUserInactive;
 
 /**
  * Fired when the current playback position has changed
@@ -2058,19 +2071,19 @@ Player.prototype.onUserInactive;
  * playback technology in use.
  * @event timeupdate
  */
-Player.prototype.onTimeUpdate;
+Player.prototype.handleTimeUpdate;
 
 /**
  * Fired when the volume changes
  * @event volumechange
  */
-Player.prototype.onVolumeChange;
+Player.prototype.handleVolumeChange;
 
 /**
  * Fired when an error occurs
  * @event error
  */
-Player.prototype.onError;
+Player.prototype.handleError;
 
 Player.prototype.flexNotSupported_ = function() {
   var elem = document.createElement('i');

@@ -10,8 +10,8 @@ import Component from '../../src/js/component.js';
  */
 class MediaFaker extends Tech {
 
-  constructor(options, onReady){
-    super(options, onReady);
+  constructor(options, handleReady){
+    super(options, handleReady);
     this.triggerReady();
   }
 
@@ -31,7 +31,7 @@ class MediaFaker extends Tech {
   // fake a poster attribute to mimic the video element
   poster() { return this.el().poster; }
   setPoster(val) { this.el().poster = val; }
-  
+
   setControls(val) {}
 
   currentTime() { return 0; }

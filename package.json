@@ -1,7 +1,7 @@
 {
   "name": "video.js",
   "description": "An HTML5 and Flash video player with a common API and skin for both.",
-  "version": "5.0.0-0",
+  "version": "5.0.0-1",
   "copyright": "Copyright Brightcove, Inc. <https://www.brightcove.com/>",
   "license": "Apache-2.0",
   "keywords": [
@@ -21,6 +21,7 @@
     "url": "https://github.com/videojs/video.js.git"
   },
   "main": "./dist/video.js",
+  "style": "./dist/video-js.css",
   "dependencies": {
     "global": "^4.3.0",
     "safe-json-parse": "^4.0.0",

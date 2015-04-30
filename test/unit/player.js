@@ -715,3 +715,14 @@ test('should be scrubbing while seeking', function(){
   equal(player.scrubbing(), true, 'player is scrubbing');
   ok(player.el().className.indexOf('scrubbing') !== -1, 'scrubbing class is present');
 });
+
+test('should throw on startup no techs are specified', function() {
+  const techOrder = Options.techOrder;
+
+  Options.techOrder = null;
+  q.throws(function() {
+    videojs(TestHelpers.makeTag());
+  }, 'a falsey techOrder should throw');
+
+  Options.techOrder = techOrder;
+});

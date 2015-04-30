@@ -21,8 +21,8 @@ class ChaptersTrackMenuItem extends MenuItem {
     track.addEventListener('cuechange', Lib.bind(this, this.update));
   }
 
-  onClick() {
-    super.onClick();
+  handleClick() {
+    super.handleClick();
     this.player_.currentTime(this.cue.startTime);
     this.update(this.cue.startTime);
   }

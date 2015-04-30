@@ -87,6 +87,12 @@ module.exports = function(grunt) {
           {expand: true, cwd: 'build/temp/', src: ['*'], dest: 'dist/'+version.full+'/', filter: 'isFile'} // includes files in path
         ]
       },
+      scss: {
+        expand: true,
+        cwd: 'src/css',
+        src: ['**/*', '!font/**'],
+        dest: 'build/temp/scss'
+      },
       fonts: { expand: true, cwd: 'src/css/font/', src: ['*'], dest: 'build/temp/font/', filter: 'isFile' },
       swf: { src: './node_modules/videojs-swf/dist/video-js.swf', dest: './build/temp/video-js.swf' },
       novtt: { src: './build/temp/video.js', dest: './build/temp/alt/video.novtt.js' },
@@ -238,6 +244,12 @@ module.exports = function(grunt) {
         },
         src: ['package.json', 'bower.json', 'component.json']
       },
+      prerelease: {
+        options: {
+          release: 'prerelease'
+        },
+        src: ['package.json', 'bower.json', 'component.json']
+      },
       css: {
         options: {
           prefix: '@version\\s*'
@@ -263,6 +275,21 @@ module.exports = function(grunt) {
       }
     },
     browserify: {
+      options: {
+        transform: [
+          require('babelify').configure({
+            sourceMapRelative: './src/js'
+          }),
+          ['browserify-versionify', {
+            placeholder: '__VERSION__',
+            version: pkg.version
+          }],
+          ['browserify-versionify', {
+            placeholder: '__VERSION_NO_PATCH__',
+            version: version.majorMinor
+          }]
+        ]
+      },
       build: {
         files: {
           'build/temp/video.js': ['src/js/video.js']
@@ -275,19 +302,15 @@ module.exports = function(grunt) {
           banner: license,
           plugin: [
             [ 'browserify-derequire' ]
-          ],
-          transform: [
-            require('babelify').configure({
-              sourceMapRelative: './src/js'
-            }),
-            ['browserify-versionify', {
-              placeholder: '__VERSION__',
-              version: pkg.version
-            }],
-            ['browserify-versionify', {
-              placeholder: '__VERSION_NO_PATCH__',
-              version: version.majorMinor
-            }]
+          ]
+        }
+      },
+      test: {
+        files: {
+          'build/temp/tests.js': [
+            'test/globals-shim.js',
+            'test/unit/**/*.js',
+            'test/api/**.js'
           ]
         }
       }
@@ -301,6 +324,9 @@ module.exports = function(grunt) {
       }
     },
     coveralls: {
+      options: {
+        force: true
+      },
       all: {
         src: 'test/coverage/lcov.info'
       }
@@ -353,6 +379,7 @@ module.exports = function(grunt) {
     'cssmin',
     'copy:fonts',
     'copy:swf',
+    'copy:scss',
     'vjslanguages'
   ]);
 
