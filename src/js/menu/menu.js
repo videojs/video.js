@@ -8,7 +8,7 @@ import * as Events from '../events.js';
  * The Menu component is used to build pop up menus, including subtitle and
  * captions selection menus.
  *
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @class
  * @constructor

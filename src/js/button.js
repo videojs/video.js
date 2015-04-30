@@ -7,7 +7,7 @@ import document from 'global/document';
 ================================================================================ */
 /**
  * Base class for all buttons
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @class
  * @constructor
@@ -19,10 +19,10 @@ class Button extends Component {
 
     this.emitTapEvents();
 
-    this.on('tap', this.onClick);
-    this.on('click', this.onClick);
-    this.on('focus', this.onFocus);
-    this.on('blur', this.onBlur);
+    this.on('tap', this.handleClick);
+    this.on('click', this.handleClick);
+    this.on('focus', this.handleFocus);
+    this.on('blur', this.handleBlur);
   }
 
   createEl(type, props) {
@@ -55,30 +55,29 @@ class Button extends Component {
   }
 
   buildCSSClass() {
-    // TODO: Change vjs-control to vjs-button?
-    return 'vjs-control ' + super.buildCSSClass();
+    return `vjs-control vjs-button ${super.buildCSSClass()}`;
   }
 
   // Click - Override with specific functionality for button
-  onClick() {}
+  handleClick() {}
 
   // Focus - Add keyboard functionality to element
-  onFocus() {
-    Events.on(document, 'keydown', Lib.bind(this, this.onKeyPress));
+  handleFocus() {
+    Events.on(document, 'keydown', Lib.bind(this, this.handleKeyPress));
   }
 
   // KeyPress (document level) - Trigger click when keys are pressed
-  onKeyPress(event) {
+  handleKeyPress(event) {
     // Check for space bar (32) or enter (13) keys
     if (event.which == 32 || event.which == 13) {
       event.preventDefault();
-      this.onClick();
+      this.handleClick();
     }
   }
 
   // Blur - Remove keyboard triggers
-  onBlur() {
-    Events.off(document, 'keydown', Lib.bind(this, this.onKeyPress));
+  handleBlur() {
+    Events.off(document, 'keydown', Lib.bind(this, this.handleKeyPress));
   }
 
 }

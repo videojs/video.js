@@ -53,14 +53,26 @@ module.exports = function(grunt) {
     },
     dist: {},
     watch: {
-      files: [ 'src/**/*', 'test/unit/**/*.js', 'Gruntfile.js' ],
-      tasks: 'dev'
+      default: {
+        files: [ 'src/**/*', 'test/unit/**/*.js', 'Gruntfile.js' ],
+        tasks: 'dev'
+      },
+      skin: {
+        files: ['src/css/**/*'],
+        tasks: 'sass'
+      }
     },
     connect: {
-      dev: {
+      preview: {
         options: {
           port: 9999,
           keepalive: true
+        }
+      },
+      dev: {
+        options: {
+          port: 9999,
+          livereload: true
         }
       }
     },
@@ -143,10 +155,10 @@ module.exports = function(grunt) {
         ext: '.min.css'
       }
     },
-    less: {
-      dev: {
+    sass: {
+      dist: {
         files: {
-          'build/temp/video-js.css': 'src/css/video-js.less'
+          'build/temp/video-js.css': 'src/css/video-js.scss'
         }
       }
     },
@@ -226,6 +238,12 @@ module.exports = function(grunt) {
         },
         src: ['package.json', 'bower.json', 'component.json']
       },
+      prerelease: {
+        options: {
+          release: 'prerelease'
+        },
+        src: ['package.json', 'bower.json', 'component.json']
+      },
       css: {
         options: {
           prefix: '@version\\s*'
@@ -251,6 +269,21 @@ module.exports = function(grunt) {
       }
     },
     browserify: {
+      options: {
+        transform: [
+          require('babelify').configure({
+            sourceMapRelative: './src/js'
+          }),
+          ['browserify-versionify', {
+            placeholder: '__VERSION__',
+            version: pkg.version
+          }],
+          ['browserify-versionify', {
+            placeholder: '__VERSION_NO_PATCH__',
+            version: version.majorMinor
+          }]
+        ]
+      },
       build: {
         files: {
           'build/temp/video.js': ['src/js/video.js']
@@ -261,18 +294,17 @@ module.exports = function(grunt) {
             standalone: 'videojs'
           },
           banner: license,
-          transform: [
-            require('babelify').configure({
-              sourceMapRelative: './src/js'
-            }),
-            ['browserify-versionify', {
-              placeholder: '__VERSION__',
-              version: pkg.version
-            }],
-            ['browserify-versionify', {
-              placeholder: '__VERSION_NO_PATCH__',
-              version: version.majorMinor
-            }]
+          plugin: [
+            [ 'browserify-derequire' ]
+          ]
+        }
+      },
+      test: {
+        files: {
+          'build/temp/tests.js': [
+            'test/globals-shim.js',
+            'test/unit/**/*.js',
+            'test/api/**.js'
           ]
         }
       },
@@ -288,18 +320,8 @@ module.exports = function(grunt) {
             standalone: 'videojs'
           },
           banner: license,
-          transform: [
-            require('babelify').configure({
-              sourceMapRelative: './src/js'
-            }),
-            ['browserify-versionify', {
-              placeholder: '__VERSION__',
-              version: pkg.version
-            }],
-            ['browserify-versionify', {
-              placeholder: '__VERSION_NO_PATCH__',
-              version: version.majorMinor
-            }]
+          plugin: [
+            [ 'browserify-derequire' ]
           ]
         }
       }
@@ -313,6 +335,9 @@ module.exports = function(grunt) {
       }
     },
     coveralls: {
+      options: {
+        force: true
+      },
       all: {
         src: 'test/coverage/lcov.info'
       }
@@ -335,7 +360,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
-  grunt.loadNpmTasks('grunt-contrib-less');
+  grunt.loadNpmTasks('grunt-sass');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('videojs-doc-generator');
   grunt.loadNpmTasks('grunt-zip');
@@ -360,7 +385,7 @@ module.exports = function(grunt) {
     'concat:vtt',
     'exorcise',
     'uglify',
-    'less',
+    'sass',
     'version:css',
     'cssmin',
     'copy:fonts',
@@ -386,10 +411,13 @@ module.exports = function(grunt) {
   grunt.registerTask('newtest', ['build', 'karma:chrome']);
 
   // Default task.
-  grunt.registerTask('default', ['build', 'test']);
+  grunt.registerTask('default', ['build', 'test-local']);
 
   // Development watch task. Doing the minimum required.
-  grunt.registerTask('dev', ['jshint', 'less', 'browserify:build', 'karma:chrome']);
+  grunt.registerTask('dev', ['connect:dev', 'jshint', 'sass', 'browserify:build', 'karma:chrome']);
+
+  // Skin development watch task.
+  grunt.registerTask('skin-dev', ['connect:dev', 'watch:skin']);
 
   // Tests.
   // We want to run things a little differently if it's coming from Travis vs local

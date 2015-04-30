@@ -4,7 +4,7 @@ import * as Events from './events.js';
 import FullscreenApi from './fullscreen-api.js';
 import MediaError from './media-error.js';
 import Options from './options.js';
-import JSON from './json.js';
+import safeParseTuple from 'safe-json-parse/tuple';
 import window from 'global/window';
 import document from 'global/document';
 
@@ -21,7 +21,7 @@ import TextTrackSettings from './tracks/text-track-settings.js';
 import Html5 from './tech/html5.js';
 
 /**
- * An instance of the `vjs.Player` class is created when any of the Video.js setup methods are used to initialize a video.
+ * An instance of the `Player` class is created when any of the Video.js setup methods are used to initialize a video.
  *
  * ```js
  * var myPlayer = videojs('example_video_1');
@@ -38,7 +38,7 @@ import Html5 from './tech/html5.js';
  * After an instance has been created it can be accessed globally using `Video('example_video_1')`.
  *
  * @class
- * @extends vjs.Component
+ * @extends Component
  */
 class Player extends Component {
 
@@ -53,7 +53,7 @@ class Player extends Component {
    */
   constructor(tag, options, ready){
     // Make sure tag ID exists
-    tag.id = tag.id || 'vjs_video_' + Lib.guid++;
+    tag.id = tag.id || `vjs_video_${Lib.guid++}`;
 
     // Set Options
     // The options argument overrides options set in the video tag
@@ -75,6 +75,17 @@ class Player extends Component {
 
     // Run base component initializing with new options
     super(null, options, ready);
+
+
+    // if the global option object was accidentally blown away by
+    // someone, bail early with an informative error
+    if (!this.options_ ||
+        !this.options_.techOrder ||
+        !this.options_.techOrder.length) {
+      throw new Error('No techOrder specified. Did you overwrite ' +
+                      'videojs.options instead of just changing the ' +
+                      'properties you want to override?');
+    }
 
     this.tag = tag; // Store the original tag used to set options
 
@@ -100,7 +111,22 @@ class Player extends Component {
     // May be turned back on by HTML5 tech if nativeControlsForTouch is true
     tag.controls = false;
 
+    /**
+    * Store the internal state of scrubbing
+    * @private
+    * @return {Boolean} True if the user is scrubbing
+    */
+    this.scrubbing_ = false;
+
     this.el_ = this.createEl();
+
+    // Load plugins
+    if (options['plugins']) {
+      Lib.obj.each(options['plugins'], function(key, val){
+        this[key](val);
+      }, this);
+    }
+
     this.initChildren();
 
     // Set isAudio based on whether or not an audio tag was used
@@ -118,20 +144,18 @@ class Player extends Component {
       this.addClass('vjs-audio');
     }
 
+    if (this.flexNotSupported_()) {
+      this.addClass('vjs-no-flex');
+    }
+
     // TODO: Make this smarter. Toggle user state between touching/mousing
     // using events, since devices can have both touch and mouse events.
-    // if (vjs.TOUCH_ENABLED) {
+    // if (Lib.TOUCH_ENABLED) {
     //   this.addClass('vjs-touch-enabled');
     // }
 
     // Make player easily findable by ID
     Player.players[this.id_] = this;
-
-    if (options['plugins']) {
-      Lib.obj.each(options['plugins'], function(key, val){
-        this[key](val);
-      }, this);
-    }
 
     // When the player is first initialized, trigger activity so components
     // like the control bar show themselves if needed
@@ -200,7 +224,7 @@ class Player extends Component {
     this.width(this.options_['width'], true); // (true) Skip resize listener on load
     this.height(this.options_['height'], true);
 
-    // vjs.insertFirst seems to cause the networkState to flicker from 3 to 2, so
+    // Lib.insertFirst seems to cause the networkState to flicker from 3 to 2, so
     // keep track of the original for later so we can know if the source originally failed
     tag.initNetworkState_ = tag.networkState;
 
@@ -217,18 +241,18 @@ class Player extends Component {
     // like component.initEventListeners() that runs between el creation and
     // adding children
     this.el_ = el;
-    this.on('loadstart', this.onLoadStart);
-    this.on('waiting', this.onWaiting);
-    this.on(['canplay', 'canplaythrough', 'playing', 'ended'], this.onWaitEnd);
-    this.on('seeking', this.onSeeking);
-    this.on('seeked', this.onSeeked);
-    this.on('ended', this.onEnded);
-    this.on('play', this.onPlay);
-    this.on('firstplay', this.onFirstPlay);
-    this.on('pause', this.onPause);
-    this.on('progress', this.onProgress);
-    this.on('durationchange', this.onDurationChange);
-    this.on('fullscreenchange', this.onFullscreenChange);
+    this.on('loadstart', this.handleLoadStart);
+    this.on('waiting', this.handleWaiting);
+    this.on(['canplay', 'canplaythrough', 'playing', 'ended'], this.handleWaitEnd);
+    this.on('seeking', this.handleSeeking);
+    this.on('seeked', this.handleSeeked);
+    this.on('ended', this.handleEnded);
+    this.on('play', this.handlePlay);
+    this.on('firstplay', this.handleFirstPlay);
+    this.on('pause', this.handlePause);
+    this.on('progress', this.handleProgress);
+    this.on('durationchange', this.handleDurationChange);
+    this.on('fullscreenchange', this.handleFullscreenChange);
 
     return el;
   }
@@ -291,7 +315,7 @@ class Player extends Component {
    * Fired when the user agent begins looking for media data
    * @event loadstart
    */
-  onLoadStart() {
+  handleLoadStart() {
     // TODO: Update to use `emptied` event instead. See #1277.
 
     this.removeClass('vjs-ended');
@@ -332,7 +356,7 @@ class Player extends Component {
    * Fired whenever the media begins or resumes playback
    * @event play
    */
-  onPlay() {
+  handlePlay() {
     this.removeClass('vjs-ended');
     this.removeClass('vjs-paused');
     this.addClass('vjs-playing');
@@ -346,7 +370,7 @@ class Player extends Component {
    * Fired whenever the media begins waiting
    * @event waiting
    */
-  onWaiting() {
+  handleWaiting() {
     this.addClass('vjs-waiting');
   }
 
@@ -355,7 +379,7 @@ class Player extends Component {
    * which is not consistent between browsers. See #1351
    * @private
    */
-  onWaitEnd() {
+  handleWaitEnd() {
     this.removeClass('vjs-waiting');
   }
 
@@ -363,7 +387,7 @@ class Player extends Component {
    * Fired whenever the player is jumping to a new time
    * @event seeking
    */
-  onSeeking() {
+  handleSeeking() {
     this.addClass('vjs-seeking');
   }
 
@@ -371,7 +395,7 @@ class Player extends Component {
    * Fired when the player has finished jumping to a new time
    * @event seeked
    */
-  onSeeked() {
+  handleSeeked() {
     this.removeClass('vjs-seeking');
   }
 
@@ -384,7 +408,7 @@ class Player extends Component {
    *
    * @event firstplay
    */
-  onFirstPlay() {
+  handleFirstPlay() {
     //If the first starttime attribute is specified
     //then we will start at the given offset in seconds
     if(this.options_['starttime']){
@@ -398,7 +422,8 @@ class Player extends Component {
    * Fired whenever the media has been paused
    * @event pause
    */
-  onPause() {
+  handlePause() {
+    this.removeClass('vjs-playing');
     this.addClass('vjs-paused');
   }
 
@@ -406,7 +431,7 @@ class Player extends Component {
    * Fired while the user agent is downloading media data
    * @event progress
    */
-  onProgress() {
+  handleProgress() {
     // Add custom event for when source is finished downloading.
     if (this.bufferedPercent() == 1) {
       this.trigger('loadedalldata');
@@ -417,7 +442,7 @@ class Player extends Component {
    * Fired when the end of the media resource is reached (currentTime == duration)
    * @event ended
    */
-  onEnded() {
+  handleEnded() {
     this.addClass('vjs-ended');
     if (this.options_['loop']) {
       this.currentTime(0);
@@ -431,7 +456,7 @@ class Player extends Component {
    * Fired when the duration of the media resource is first known or changed
    * @event durationchange
    */
-  onDurationChange() {
+  handleDurationChange() {
     // Allows for caching value instead of asking player each time.
     // We need to get the techGet response and check for a value so we don't
     // accidentally cause the stack to blow up.
@@ -454,7 +479,7 @@ class Player extends Component {
    * Fired when the player switches in or out of fullscreen mode
    * @event fullscreenchange
    */
-  onFullscreenChange() {
+  handleFullscreenChange() {
     if (this.isFullscreen()) {
       this.addClass('vjs-fullscreen');
     } else {
@@ -500,11 +525,11 @@ class Player extends Component {
       } catch(e) {
         // When building additional tech libs, an expected method may not be defined yet
         if (this.tech[method] === undefined) {
-          Lib.log('Video.js: ' + method + ' method not defined for '+this.techName+' playback technology.', e);
+          Lib.log(`Video.js: ${method} method not defined for ${this.techName} playback technology.`, e);
         } else {
           // When a method isn't available on the object it throws a TypeError
           if (e.name == 'TypeError') {
-            Lib.log('Video.js: ' + method + ' unavailable on '+this.techName+' playback technology element.', e);
+            Lib.log(`Video.js: ${method} unavailable on ${this.techName} playback technology element.`, e);
             this.tech.isReady_ = false;
           } else {
             Lib.log(e);
@@ -522,7 +547,7 @@ class Player extends Component {
    *
    *     myPlayer.play();
    *
-   * @return {vjs.Player} self
+   * @return {Player} self
    */
   play() {
     this.techCall('play');
@@ -534,7 +559,7 @@ class Player extends Component {
    *
    *     myPlayer.pause();
    *
-   * @return {vjs.Player} self
+   * @return {Player} self
    */
   pause() {
     this.techCall('pause');
@@ -555,6 +580,29 @@ class Player extends Component {
   }
 
   /**
+  * Returns whether or not the user is "scrubbing". Scrubbing is when the user
+  * has clicked the progress bar handle and is dragging it along the progress bar.
+  * @param  {Boolean} isScrubbing   True/false the user is scrubbing
+  * @return {Boolean}               The scrubbing status when getting
+  * @return {Object}                The player when setting
+  */
+  scrubbing(isScrubbing) {
+    if (isScrubbing !== undefined) {
+      this.scrubbing_ = !!isScrubbing;
+
+      if (isScrubbing) {
+        this.addClass('vjs-scrubbing');
+      } else {
+        this.removeClass('vjs-scrubbing');
+      }
+
+      return this;
+    }
+
+    return this.scrubbing_;
+  }
+
+  /**
    * Get or set the current time (in seconds)
    *
    *     // get
@@ -565,7 +613,7 @@ class Player extends Component {
    *
    * @param  {Number|String=} seconds The time to seek to
    * @return {Number}        The time in seconds, when not setting
-   * @return {vjs.Player}    self, when the current time is set
+   * @return {Player}    self, when the current time is set
    */
   currentTime(seconds) {
     if (seconds !== undefined) {
@@ -605,7 +653,7 @@ class Player extends Component {
     }
 
     if (this.cache_.duration === undefined) {
-      this.onDurationChange();
+      this.handleDurationChange();
     }
 
     return this.cache_.duration || 0;
@@ -723,7 +771,7 @@ class Player extends Component {
    *
    * @param  {Number} percentAsDecimal The new volume as a decimal percent
    * @return {Number}                  The current volume, when getting
-   * @return {vjs.Player}              self, when setting
+   * @return {Player}              self, when setting
    */
   volume(percentAsDecimal) {
     let vol;
@@ -753,7 +801,7 @@ class Player extends Component {
    *
    * @param  {Boolean=} muted True to mute, false to unmute
    * @return {Boolean} True if mute is on, false if not, when getting
-   * @return {vjs.Player} self, when setting mute
+   * @return {Player} self, when setting mute
    */
   muted(muted) {
     if (muted !== undefined) {
@@ -784,7 +832,7 @@ class Player extends Component {
    *
    * @param  {Boolean=} isFS Update the player's fullscreen state
    * @return {Boolean} true if fullscreen, false if not
-   * @return {vjs.Player} self, when setting
+   * @return {Player} self, when setting
    */
   isFullscreen(isFS) {
     if (isFS !== undefined) {
@@ -815,7 +863,7 @@ class Player extends Component {
    * This includes most mobile devices (iOS, Android) and older versions of
    * Safari.
    *
-   * @return {vjs.Player} self
+   * @return {Player} self
    */
   requestFullscreen() {
     var fsApi = FullscreenApi;
@@ -872,7 +920,7 @@ class Player extends Component {
    *
    *     myPlayer.exitFullscreen();
    *
-   * @return {vjs.Player} self
+   * @return {Player} self
    */
   exitFullscreen() {
     var fsApi = FullscreenApi;
@@ -952,7 +1000,7 @@ class Player extends Component {
 
       // Check if the current tech is defined before continuing
       if (!tech) {
-        Lib.log.error('The "' + techName + '" tech is undefined. Skipped browser support check for that tech.');
+        Lib.log.error(`The "${techName}" tech is undefined. Skipped browser support check for that tech.`);
         continue;
       }
 
@@ -1005,12 +1053,8 @@ class Player extends Component {
    * @return {String} The current video source when getting
    * @return {String} The player when setting
    */
-  src(source) {
+  src(source=this.techGet('src')) {
     let currentTech = Component.getComponent(this.techName);
-
-    if (source === undefined) {
-      return this.techGet('src');
-    }
 
     // case: Array of source objects to choose from and pick the best to play
     if (Lib.obj.isArray(source)) {
@@ -1090,7 +1134,7 @@ class Player extends Component {
 
   /**
    * Begin loading the src data.
-   * @return {vjs.Player} Returns the player
+   * @return {Player} Returns the player
    */
   load() {
     this.techCall('load');
@@ -1119,7 +1163,7 @@ class Player extends Component {
   /**
    * Get or set the preload attribute.
    * @return {String} The preload attribute value when getting
-   * @return {vjs.Player} Returns the player when setting
+   * @return {Player} Returns the player when setting
    */
   preload(value) {
     if (value !== undefined) {
@@ -1133,7 +1177,7 @@ class Player extends Component {
   /**
    * Get or set the autoplay attribute.
    * @return {String} The autoplay attribute value when getting
-   * @return {vjs.Player} Returns the player when setting
+   * @return {Player} Returns the player when setting
    */
   autoplay(value) {
     if (value !== undefined) {
@@ -1147,7 +1191,7 @@ class Player extends Component {
   /**
    * Get or set the loop attribute on the video element.
    * @return {String} The loop attribute value when getting
-   * @return {vjs.Player} Returns the player when setting
+   * @return {Player} Returns the player when setting
    */
   loop(value) {
     if (value !== undefined) {
@@ -1171,7 +1215,7 @@ class Player extends Component {
    *
    * @param  {String=} [src] Poster image source URL
    * @return {String} poster URL when getting
-   * @return {vjs.Player} self when setting
+   * @return {Player} self when setting
    */
   poster(src) {
     if (src === undefined) {
@@ -1231,7 +1275,7 @@ class Player extends Component {
    * if it can support native controls**
    *
    * @param  {Boolean} bool    True signals that native controls are on
-   * @return {vjs.Player}      Returns the player
+   * @return {Player}      Returns the player
    * @private
    */
   usingNativeControls(bool) {
@@ -1247,7 +1291,7 @@ class Player extends Component {
            * player is using the native device controls
            *
            * @event usingnativecontrols
-           * @memberof vjs.Player
+           * @memberof Player
            * @instance
            * @private
            */
@@ -1259,7 +1303,7 @@ class Player extends Component {
            * player is using the custom HTML controls
            *
            * @event usingcustomcontrols
-           * @memberof vjs.Player
+           * @memberof Player
            * @instance
            * @private
            */
@@ -1274,8 +1318,8 @@ class Player extends Component {
   /**
    * Set or get the current MediaError
    * @param  {*} err A MediaError or a String/Number to be turned into a MediaError
-   * @return {vjs.MediaError|null}     when getting
-   * @return {vjs.Player}              when setting
+   * @return {MediaError|null}     when getting
+   * @return {Player}              when setting
    */
   error(err) {
     if (err === undefined) {
@@ -1304,7 +1348,7 @@ class Player extends Component {
 
     // log the name of the error type and any message
     // ie8 just logs "[object object]" if you just log the error object
-    Lib.log.error('(CODE:'+this.error_.code+' '+MediaError.errorTypes[this.error_.code]+')', this.error_.message, this.error_);
+    Lib.log.error(`(CODE:${this.error_.code} ${MediaError.errorTypes[this.error_.code]})`, this.error_.message, this.error_);
 
     return this;
   }
@@ -1370,20 +1414,20 @@ class Player extends Component {
   listenForUserActivity() {
     let mouseInProgress, lastMoveX, lastMoveY;
 
-    let onActivity = Lib.bind(this, this.reportUserActivity);
+    let handleActivity = Lib.bind(this, this.reportUserActivity);
 
-    let onMouseMove = function(e) {
+    let handleMouseMove = function(e) {
       // #1068 - Prevent mousemove spamming
       // Chrome Bug: https://code.google.com/p/chromium/issues/detail?id=366970
       if(e.screenX != lastMoveX || e.screenY != lastMoveY) {
         lastMoveX = e.screenX;
         lastMoveY = e.screenY;
-        onActivity();
+        handleActivity();
       }
     };
 
-    let onMouseDown = function() {
-      onActivity();
+    let handleMouseDown = function() {
+      handleActivity();
       // For as long as the they are touching the device or have their mouse down,
       // we consider them active even if they're not moving their finger or mouse.
       // So we want to continue to update that they are active
@@ -1391,24 +1435,24 @@ class Player extends Component {
       // Setting userActivity=true now and setting the interval to the same time
       // as the activityCheck interval (250) should ensure we never miss the
       // next activityCheck
-      mouseInProgress = this.setInterval(onActivity, 250);
+      mouseInProgress = this.setInterval(handleActivity, 250);
     };
 
-    let onMouseUp = function(event) {
-      onActivity();
+    let handleMouseUp = function(event) {
+      handleActivity();
       // Stop the interval that maintains activity if the mouse/touch is down
       this.clearInterval(mouseInProgress);
     };
 
     // Any mouse movement will be considered user activity
-    this.on('mousedown', onMouseDown);
-    this.on('mousemove', onMouseMove);
-    this.on('mouseup', onMouseUp);
+    this.on('mousedown', handleMouseDown);
+    this.on('mousemove', handleMouseMove);
+    this.on('mouseup', handleMouseUp);
 
     // Listen for keyboard navigation
     // Shouldn't need to use inProgress interval because of key repeat
-    this.on('keydown', onActivity);
-    this.on('keyup', onActivity);
+    this.on('keydown', handleActivity);
+    this.on('keyup', handleActivity);
 
     // Run an interval every 250 milliseconds instead of stuffing everything into
     // the mousemove/touchmove function itself, to prevent performance degradation.
@@ -1473,7 +1517,7 @@ class Player extends Component {
    *
    * @param  {Boolean} bool    True signals that this is an audio player.
    * @return {Boolean}         Returns true if player is audio, false if not when getting
-   * @return {vjs.Player}      Returns the player if setting
+   * @return {Player}      Returns the player if setting
    * @private
    */
   isAudio(bool) {
@@ -1597,7 +1641,7 @@ class Player extends Component {
    * The player's language code
    * @param  {String} languageCode  The locale string
    * @return {String}             The locale string when getting
-   * @return {vjs.Player}         self, when setting
+   * @return {Player}         self, when setting
    */
   language(languageCode) {
     if (languageCode === undefined) {
@@ -1628,7 +1672,7 @@ class Player extends Component {
     if (dataSetup !== null){
       // Parse options JSON
       // If empty string, make it a parsable json object.
-      Lib.obj.merge(tagOptions, JSON.parse(dataSetup || '{}'));
+      Lib.obj.merge(tagOptions, safeParseTuple(dataSetup || '{}')[1]);
     }
 
     Lib.obj.merge(baseOptions, tagOptions);
@@ -1661,9 +1705,9 @@ class Player extends Component {
 Player.players = {};
 
 /**
- * Player instance options, surfaced using vjs.options
- * vjs.options = vjs.Player.prototype.options_
- * Make changes in vjs.options, not here.
+ * Player instance options, surfaced using options
+ * options = Player.prototype.options_
+ * Make changes in options, not here.
  * All options should use string keys so they avoid
  * renaming by closure compiler
  * @type {Object}
@@ -1675,31 +1719,31 @@ Player.prototype.options_ = Options;
  * Fired when the player has initial duration and dimension information
  * @event loadedmetadata
  */
-Player.prototype.onLoadedMetaData;
+Player.prototype.handleLoadedMetaData;
 
 /**
  * Fired when the player has downloaded data at the current playback position
  * @event loadeddata
  */
-Player.prototype.onLoadedData;
+Player.prototype.handleLoadedData;
 
 /**
  * Fired when the player has finished downloading the source data
  * @event loadedalldata
  */
-Player.prototype.onLoadedAllData;
+Player.prototype.handleLoadedAllData;
 
 /**
  * Fired when the user is active, e.g. moves the mouse over the player
  * @event useractive
  */
-Player.prototype.onUserActive;
+Player.prototype.handleUserActive;
 
 /**
  * Fired when the user is inactive, e.g. a short delay after the last mouse move or control interaction
  * @event userinactive
  */
-Player.prototype.onUserInactive;
+Player.prototype.handleUserInactive;
 
 /**
  * Fired when the current playback position has changed
@@ -1708,19 +1752,28 @@ Player.prototype.onUserInactive;
  * playback technology in use.
  * @event timeupdate
  */
-Player.prototype.onTimeUpdate;
+Player.prototype.handleTimeUpdate;
 
 /**
  * Fired when the volume changes
  * @event volumechange
  */
-Player.prototype.onVolumeChange;
+Player.prototype.handleVolumeChange;
 
 /**
  * Fired when an error occurs
  * @event error
  */
-Player.prototype.onError;
+Player.prototype.handleError;
+
+Player.prototype.flexNotSupported_ = function() {
+  var elem = document.createElement('i');
+
+  return !('flexBasis' in elem.style ||
+          'webkitFlexBasis' in elem.style ||
+          'mozFlexBasis' in elem.style ||
+          'msFlexBasis' in elem.style);
+};
 
 Component.registerComponent('Player', Player);
 export default Player;

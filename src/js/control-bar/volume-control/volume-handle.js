@@ -3,7 +3,7 @@ import SliderHandle from '../../slider/slider-handle.js';
 /**
  * The volume handle can be dragged to adjust the volume level
  *
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */

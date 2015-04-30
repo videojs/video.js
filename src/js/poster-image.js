@@ -6,7 +6,7 @@ import * as Lib from './lib';
 /**
  * The component that handles showing the poster image.
  *
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */
@@ -79,7 +79,7 @@ class PosterImage extends Button {
       // Any falsey values should stay as an empty string, otherwise
       // this will throw an extra error
       if (url) {
-        backgroundImage = 'url("' + url + '")';
+        backgroundImage = `url("${url}")`;
       }
 
       this.el_.style.backgroundImage = backgroundImage;
@@ -89,10 +89,14 @@ class PosterImage extends Button {
   /**
    * Event handler for clicks on the poster image
    */
-  onClick() {
+  handleClick() {
     // We don't want a click to trigger playback when controls are disabled
     // but CSS should be hiding the poster to prevent that from happening
-    this.player_.play();
+    if (this.player_.paused()) {
+      this.player_.play();
+    } else {
+      this.player_.pause();
+    }
   }
 
 }

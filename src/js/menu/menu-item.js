@@ -4,7 +4,7 @@ import * as Lib from '../lib.js';
 /**
  * The component for a menu item. `<li>`
  *
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @class
  * @constructor
@@ -27,7 +27,7 @@ class MenuItem extends Button {
   /**
    * Handle a click on the menu item, and set it to selected
    */
-  onClick() {
+  handleClick() {
     this.selected(true);
   }
 

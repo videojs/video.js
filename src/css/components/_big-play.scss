@@ -1,0 +1,40 @@
+.video-js .vjs-big-play-button {
+  font-size: 3em;
+  line-height: 1em;
+  display: block;
+  z-index: 2;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 0.2em 1em;
+  cursor: pointer;
+  opacity: 1;
+  border: 2px solid $primary-text;
+
+  /* Need a slightly gray bg so it can be seen on black backgrounds *///
+  @include background-color-with-alpha($primary-bg, 0.8);
+  @include border-radius(0.3em);
+  @include transition(all 0.4s);
+
+  @extend .vjs-icon-play;
+}
+
+/* Hide if controls are disabled, the video is playing, or native controls are used. */
+.video-js.vjs-controls-disabled .vjs-big-play-button,
+.video-js.vjs-has-started .vjs-big-play-button,
+.video-js.vjs-using-native-controls .vjs-big-play-button {
+  display: none;
+}
+
+.video-js:hover .vjs-big-play-button,
+.video-js .vjs-big-play-button:focus {
+  outline: 0;
+  border-color: $primary-text;
+
+  @include background-color-with-alpha($secondary-bg, 0.75);
+  @include transition(all 0s);
+}
+
+.vjs-error .vjs-big-play-button {
+  display: none;
+}

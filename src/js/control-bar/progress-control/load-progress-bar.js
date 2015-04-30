@@ -4,7 +4,7 @@ import * as Lib from '../../lib.js';
 /**
  * Shows load progress
  *
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */
@@ -18,7 +18,7 @@ class LoadProgressBar extends Component {
   createEl() {
     return super.createEl('div', {
       className: 'vjs-load-progress',
-      innerHTML: '<span class="vjs-control-text"><span>' + this.localize('Loaded') + '</span>: 0%</span>'
+      innerHTML: `<span class="vjs-control-text"><span>${this.localize('Loaded')}</span>: 0%</span>`
     });
   }
 

@@ -12,14 +12,13 @@ import document from 'global/document';
 
 /**
  * Base class for media (HTML5 Video, Flash) controllers
- * @param {vjs.Player|Object} player  Central player instance
+ * @param {Player|Object} player  Central player instance
  * @param {Object=} options Options object
  * @constructor
  */
 class Tech extends Component {
 
-  constructor(player, options, ready){
-    options = options || {};
+  constructor(player, options={}, ready=function(){}){
     // we don't want the tech to report user activity automatically.
     // This is done manually in addControlsListeners
     options.reportTouchActivity = false;
@@ -102,7 +101,7 @@ class Tech extends Component {
     // trigger mousedown/up.
     // http://stackoverflow.com/questions/1444562/javascript-onclick-event-over-flash-object
     // Any touch events are set to block the mousedown event from happening
-    this.on('mousedown', this.onClick);
+    this.on('mousedown', this.handleClick);
 
     // If the controls were hidden we don't want that to change without a tap event
     // so we'll check if the controls were already showing before reporting user
@@ -127,7 +126,7 @@ class Tech extends Component {
 
     // The tap listener needs to come after the touchend listener because the tap
     // listener cancels out any reportedUserActivity when setting userActive(false)
-    this.on('tap', this.onTap);
+    this.on('tap', this.handleTap);
   }
 
   /**
@@ -150,7 +149,7 @@ class Tech extends Component {
   /**
    * Handle a click on the media element. By default will play/pause the media.
    */
-  onClick(event) {
+  handleClick(event) {
     // We're using mousedown to detect clicks thanks to Flash, but mousedown
     // will also be triggered with right-clicks, so we need to prevent that
     if (event.button !== 0) return;
@@ -170,7 +169,7 @@ class Tech extends Component {
    * Handle a tap on the media element. By default it will toggle the user
    * activity state, which hides and shows the controls.
    */
-  onTap() {
+  handleTap() {
     this.player().userActive(!this.player().userActive());
   }
 
@@ -386,10 +385,8 @@ class Tech extends Component {
  */
 Tech.prototype.textTracks_;
 
-var createTrackHelper = function(self, kind, label, language, options) {
+var createTrackHelper = function(self, kind, label, language, options={}) {
   let tracks = self.textTracks();
-
-  options = options || {};
 
   options['kind'] = kind;
   if (label) {

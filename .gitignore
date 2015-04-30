@@ -1,5 +1,4 @@
 .DS_Store
-dist/*
 build/files/*
 build/temp/*
 docs/api/*
@@ -26,3 +25,6 @@ sandbox/*
 
 test/coverage/*
 .coveralls.yml
+.sass-cache
+
+dist/*

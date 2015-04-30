@@ -35,7 +35,13 @@ class VolumeMenuButton extends MenuButton {
     let menu = new Menu(this.player_, {
       contentElType: 'div'
     });
-    let vc = new VolumeBar(this.player_, this.options_['volumeBar']);
+
+    // The volumeBar is vertical by default in the base theme when used with a VolumeMenuButton
+    var options = this.options_['volumeBar'] || {};
+    options['vertical'] = options['vertical'] || true;
+
+    let vc = new VolumeBar(this.player_, options);
+
     vc.on('focus', function() {
       menu.lockShowing();
     });
@@ -46,15 +52,15 @@ class VolumeMenuButton extends MenuButton {
     return menu;
   }
 
-  onClick() {
-    MuteToggle.prototype.onClick.call(this);
-    super.onClick();
+  handleClick() {
+    MuteToggle.prototype.handleClick.call(this);
+    super.handleClick();
   }
 
   createEl() {
     return super.createEl('div', {
-      className: 'vjs-volume-menu-button vjs-menu-button vjs-control',
-      innerHTML: '<div><span class="vjs-control-text">' + this.localize('Mute') + '</span></div>'
+      className: 'vjs-volume-menu-button vjs-menu-button vjs-control vjs-button',
+      innerHTML: `<div><span class="vjs-control-text">${this.localize('Mute')}</span></div>`
     });
   }
 

@@ -6,7 +6,7 @@ import * as Lib from '../../lib.js';
 /**
  * The component for controlling the playback rate
  *
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */
@@ -56,7 +56,7 @@ class PlaybackRateMenuButton extends MenuButton {
     this.el().setAttribute('aria-valuenow', this.player().playbackRate());
   }
 
-  onClick() {
+  handleClick() {
     // select next rate option
     let currentRate = this.player().playbackRate();
     let rates = this.player().options()['playbackRates'];

@@ -255,4 +255,27 @@ function testHelperMakeTag(){
   return videoTag;
 }
 
+test('should extend Component', function(){
+  var Component = videojs.getComponent('Component');
+  var MyComponent = videojs.extends(Component, {
+    constructor: function() {
+      this.bar = true;
+    },
+    foo: function() {
+      return true;
+    }
+  });
+
+  var myComponent = new MyComponent();
+  ok(myComponent instanceof Component, 'creates an instance of Component');
+  ok(myComponent instanceof MyComponent, 'creates an instance of MyComponent');
+  ok(myComponent.bar, 'the constructor function is used');
+  ok(myComponent.foo(), 'instance methods are applied');
+
+  var NoMethods = videojs.extends(Component);
+  var noMethods = new NoMethods({});
+  ok(noMethods.on, 'should extend component with no methods or constructor');
+});
+
+
 })();

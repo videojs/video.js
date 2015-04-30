@@ -5,7 +5,7 @@ import * as Lib from '../lib';
 /**
  * A button component for muting the audio
  *
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */
@@ -32,12 +32,16 @@ class MuteToggle extends Button {
 
   createEl() {
     return super.createEl('div', {
-      className: 'vjs-mute-control vjs-control',
-      innerHTML: '<div><span class="vjs-control-text">' + this.localize('Mute') + '</span></div>'
+      className: this.buildCSSClass(),
+      innerHTML: `<div><span class="vjs-control-text">${this.localize('Mute')}</span></div>`
     });
   }
 
-  onClick() {
+  buildCSSClass() {
+    return `vjs-mute-control ${super.buildCSSClass()}`;
+  }
+
+  handleClick() {
     this.player_.muted( this.player_.muted() ? false : true );
   }
 
@@ -64,9 +68,9 @@ class MuteToggle extends Button {
 
     /* TODO improve muted icon classes */
     for (var i = 0; i < 4; i++) {
-      Lib.removeClass(this.el_, 'vjs-vol-'+i);
+      Lib.removeClass(this.el_, `vjs-vol-${i}`);
     }
-    Lib.addClass(this.el_, 'vjs-vol-'+level);
+    Lib.addClass(this.el_, `vjs-vol-${level}`);
   }
 
 }

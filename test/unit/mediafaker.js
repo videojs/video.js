@@ -10,8 +10,8 @@ import Component from '../../src/js/component.js';
  */
 class MediaFaker extends Tech {
 
-  constructor(player, options, onReady){
-    super(player, options, onReady);
+  constructor(player, options, handleReady){
+    super(player, options, handleReady);
     this.triggerReady();
   }
 

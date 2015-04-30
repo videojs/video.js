@@ -1,0 +1,20 @@
+// TODO: I feel like this should be a generic menu. Research later.
+.video-js .vjs-playback-rate .vjs-playback-rate-value {
+  font-size: 1.5em;
+  line-height: 2;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+.video-js .vjs-playback-rate .vjs-menu {
+  left: 0em;
+}
+.video-js .vjs-playback-rate.vjs-menu-button .vjs-menu .vjs-menu-content {
+  width: 4em;
+  left: 0;
+  list-style: none;
+}

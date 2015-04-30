@@ -1,9 +1,9 @@
-import Component from '../component.js';
-import * as Lib from '../lib.js';
+import Component from '../../component.js';
+import * as Lib from '../../lib.js';
 
 /**
  * Displays the duration
- * @param {vjs.Player|Object} player
+ * @param {Player|Object} player
  * @param {Object=} options
  * @constructor
  */
@@ -22,12 +22,12 @@ class DurationDisplay extends Component {
 
   createEl() {
     let el = super.createEl('div', {
-      className: 'vjs-duration vjs-time-controls vjs-control'
+      className: 'vjs-duration vjs-time-control vjs-control'
     });
 
     this.contentEl_ = Lib.createEl('div', {
       className: 'vjs-duration-display',
-      innerHTML: '<span class="vjs-control-text">' + this.localize('Duration Time') + '</span> ' + '0:00', // label the duration time for screen reader users
+      innerHTML: `<span class="vjs-control-text">${this.localize('Duration Time')}</span> 0:00`, // label the duration time for screen reader users
       'aria-live': 'off' // tell screen readers not to automatically read the time as it changes
     });
 
@@ -38,7 +38,9 @@ class DurationDisplay extends Component {
   updateContent() {
     let duration = this.player_.duration();
     if (duration) {
-      this.contentEl_.innerHTML = '<span class="vjs-control-text">' + this.localize('Duration Time') + '</span> ' + Lib.formatTime(duration); // label the duration time for screen reader users
+      let localizedText = this.localize('Duration Time');
+      let formattedTime = Lib.formatTime(duration);
+      this.contentEl_.innerHTML = `<span class="vjs-control-text">${localizedText}</span> ${formattedTime}`; // label the duration time for screen reader users
     }
   }
 

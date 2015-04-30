@@ -1,0 +1,57 @@
+.video-js .vjs-control-bar {
+  display: none;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3.0em;
+
+  @include background-color-with-alpha($control-bar-bg, $control-bar-transparency);
+}
+
+// Video has started playing
+.video-js.vjs-has-started .vjs-control-bar {
+  @include display-flex;
+  visibility: visible;
+  opacity: 1;
+
+  $trans: visibility 0.1s, opacity 0.1s; // Var needed because of comma
+  @include transition($trans);
+}
+
+// Video has started playing AND user is inactive
+.video-js.vjs-has-started.vjs-user-inactive.vjs-playing .vjs-control-bar {
+  visibility: hidden;
+  opacity: 0;
+
+  $trans: visibility 1.0s, opacity 1.0s;
+  @include transition($trans);
+}
+
+.video-js.vjs-controls-disabled .vjs-control-bar,
+.video-js.vjs-using-native-controls .vjs-control-bar,
+.video-js.vjs-error .vjs-control-bar {
+  display: none;
+}
+
+// Don't hide the control bar if it's audio
+.video-js.vjs-audio.vjs-has-started.vjs-user-inactive.vjs-playing .vjs-control-bar {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* IE8 is flakey with fonts, and you have to change the actual content to force
+fonts to show/hide properly.
+- "\9" IE8 hack didn't work for this
+- Found in XP IE8 from http://modern.ie. Does not show up in "IE8 mode" in IE9
+*/
+$ie8screen: "\0screen";
+.video-js.vjs-user-inactive.vjs-playing .vjs-control-bar :before {
+  @media #{$ie8screen} { content: ""; }
+}
+
+/* IE 8 + 9 Support */
+.video-js.vjs-has-started.vjs-no-flex .vjs-control-bar {
+  display: table;
+}
