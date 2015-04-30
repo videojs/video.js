@@ -362,6 +362,8 @@ module.exports = function(grunt) {
 
   // load all the npm grunt tasks
   require('load-grunt-tasks')(grunt);
+  grunt.loadNpmTasks('videojs-doc-generator');
+  grunt.loadNpmTasks('chg');
 
   grunt.registerTask('build', [
     'clean:build',
