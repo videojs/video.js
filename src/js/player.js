@@ -244,6 +244,7 @@ class Player extends Component {
     // get rid of the HTML5 video tag as soon as we are using another tech
     if (techName !== 'Html5' && this.tag) {
       Component.getComponent('Html5').disposeMediaElement(this.tag);
+      this.tag.player = null;
       this.tag = null;
     }
 
@@ -252,12 +253,16 @@ class Player extends Component {
     // Turn off API access because we're loading a new tech that might load asynchronously
     this.isReady_ = false;
 
-    var techReady = function(){
-      this.player_.triggerReady();
-    };
+    var techReady = Lib.bind(this, function() {
+      this.triggerReady();
+    });
 
     // Grab tech-specific options from player options and add source and parent element to use.
-    var techOptions = Lib.obj.merge({ 'source': source, 'playerId': this.id() }, this.options_[techName.toLowerCase()]);
+    var techOptions = Lib.obj.merge({
+      'source': source,
+      'playerId': this.id(),
+      'textTracks': this.textTracks_
+    }, this.options_[techName.toLowerCase()]);
 
     if (this.tag) {
       techOptions.tag = this.tag;
@@ -324,6 +329,7 @@ class Player extends Component {
 
     // Get rid of the original video tag reference after the first tech is loaded
     if (this.tag) {
+      this.tag.player = null;
       this.tag = null;
     }
 
@@ -331,6 +337,9 @@ class Player extends Component {
   }
 
   unloadTech() {
+    // Save the current text tracks so that we can reuse the same text tracks with the next tech
+    this.textTracks_ = this.textTracks();
+
     this.isReady_ = false;
 
     this.tech.dispose();
