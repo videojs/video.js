@@ -194,6 +194,29 @@
       "release_type": "minor",
       "steps": [{ "include": "release run" }]
     },
+    "prerelease": {
+      "release_type": "prerelease",
+      "steps": [
+        [ "git checkout master",                       "Checkout the developmet branch" ],
+        [ "git pull upstream master",                  "Update the developmet branch" ],
+        { "include": "branch check" },
+        [ "git checkout -b temp-release-branch master","Create a temporary branch for the dist" ],
+        [ "grunt version:{{release_type}}",            "Bump package versions" ],
+        [ "./build/bin/version",                       "Return the current VJS Version from the package.json file", "version" ],
+        [ "git commit -am 'v{{version}}'",             "Add and commit the package changes" ],
+        [ "git checkout master",                       "Checkout the developmet branch" ],
+        [ "git merge temp-release-branch",             "Merge package changes into the dev brach" ],
+        [ "git checkout temp-release-branch",          "Checkout the temp branch again" ],
+        [ "grunt dist",                                "Build the dist" ],
+        [ "git add dist --force",                      "Add the (otherwise ignored) release files" ],
+        [ "git commit -am 'v{{version}} dist'",        "Add and commit the dist changes" ],
+        [ "git tag -a v{{version}} -m 'v{{version}}'", "Tag the release" ],
+        [ "git push upstream --tags",                  "Push the new tag to the repo" ],
+        [ "npm publish --tag next",                    "Publish to npm as 'next'" ],
+        [ "git checkout master",                       "Checkout the developmet branch" ],
+        [ "git branch -D temp-release-branch",         "Delete the temp release branch" ]
+      ]
+    },
 
     "run": {
       "steps": [
