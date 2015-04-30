@@ -89,12 +89,6 @@ module.exports = function(grunt) {
           {expand: true, cwd: 'build/temp/', src: ['*'], dest: 'dist/'+version.full+'/', filter: 'isFile'} // includes files in path
         ]
       },
-      scss: {
-        expand: true,
-        cwd: 'src/css',
-        src: ['**/*', '!font/**'],
-        dest: 'build/temp/scss'
-      },
       fonts: { expand: true, cwd: 'src/css/font/', src: ['*'], dest: 'build/temp/font/', filter: 'isFile' },
       swf: { src: './node_modules/videojs-swf/dist/video-js.swf', dest: './build/temp/video-js.swf' },
       novtt: { src: './build/temp/video.js', dest: './build/temp/alt/video.novtt.js' },
@@ -246,6 +240,12 @@ module.exports = function(grunt) {
         },
         src: ['package.json', 'bower.json', 'component.json']
       },
+      prerelease: {
+        options: {
+          release: 'prerelease'
+        },
+        src: ['package.json', 'bower.json', 'component.json']
+      },
       css: {
         options: {
           prefix: '@version\\s*'
@@ -312,6 +312,23 @@ module.exports = function(grunt) {
             'browserify-istanbul'
           ]
         }
+      },
+      watch: {
+        files: {
+          'build/temp/video.js': ['src/js/video.js']
+        },
+        options: {
+          watch: true,
+          keepAlive: true,
+          browserifyOptions: {
+            debug: true,
+            standalone: 'videojs'
+          },
+          banner: license,
+          plugin: [
+            [ 'browserify-derequire' ]
+          ]
+        }
       }
     },
     exorcise: {
@@ -349,7 +366,8 @@ module.exports = function(grunt) {
   grunt.registerTask('build', [
     'clean:build',
     'jshint',
-    'browserify',
+    'browserify:build',
+    'browserify:test',
     'copy:novtt',
     'concat:vtt',
     'exorcise',
@@ -359,7 +377,6 @@ module.exports = function(grunt) {
     'cssmin',
     'copy:fonts',
     'copy:swf',
-    'copy:scss',
     'vjslanguages'
   ]);
 
@@ -384,7 +401,7 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['build', 'test-local']);
 
   // Development watch task. Doing the minimum required.
-  grunt.registerTask('dev', ['connect:dev', 'jshint', 'sass', 'browserify', 'karma:chrome']);
+  grunt.registerTask('dev', ['connect:dev', 'jshint', 'sass', 'browserify:build', 'karma:chrome']);
 
   // Skin development watch task.
   grunt.registerTask('skin-dev', ['connect:dev', 'watch:skin']);
