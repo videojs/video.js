@@ -17,6 +17,7 @@ import * as Lib from './lib';
 import * as Util from './util.js';
 import Player from './player';
 import extendsFn from './extends.js';
+import plugin from './Plugins.js';
 
 if (typeof HTMLVideoElement === 'undefined') {
   document.createElement('video');
@@ -40,6 +41,8 @@ videojs.util = Util;
 videojs.players = Player.players;
 
 videojs.extends = extendsFn;
+
+videojs.plugin = plugin;
 
 // REMOVING: We probably should not include this in 5.0 thought it would make it
 // more backwards compatible
