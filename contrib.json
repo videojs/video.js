@@ -206,10 +206,11 @@
         [ "git commit -am 'v{{version}}'",             "Add and commit the package changes" ],
         [ "git checkout master",                       "Checkout the developmet branch" ],
         [ "git merge temp-release-branch",             "Merge package changes into the dev brach" ],
+        [ "git push upstream master",                  "Push the dev branch changes to the repo" ],
         [ "git checkout temp-release-branch",          "Checkout the temp branch again" ],
         [ "grunt dist",                                "Build the dist" ],
         [ "git add dist --force",                      "Add the (otherwise ignored) release files" ],
-        [ "git commit -am 'v{{version}} dist'",        "Add and commit the dist changes" ],
+        [ "git commit -m 'v{{version}} dist'",         "Commit the dist changes" ],
         [ "git tag -a v{{version}} -m 'v{{version}}'", "Tag the release" ],
         [ "git push upstream --tags",                  "Push the new tag to the repo" ],
         [ "npm publish --tag next",                    "Publish to npm as 'next'" ],
@@ -217,7 +218,6 @@
         [ "git branch -D temp-release-branch",         "Delete the temp release branch" ]
       ]
     },
-
     "run": {
       "steps": [
         { "include": "branch check" },
