@@ -1672,7 +1672,11 @@ class Player extends Component {
     if (dataSetup !== null){
       // Parse options JSON
       // If empty string, make it a parsable json object.
-      Lib.obj.merge(tagOptions, safeParseTuple(dataSetup || '{}')[1]);
+      const [err, data] = safeParseTuple(dataSetup);
+      if (err) {
+        Lib.log.error(err);
+      }
+      Lib.obj.merge(tagOptions, data || {});
     }
 
     Lib.obj.merge(baseOptions, tagOptions);
