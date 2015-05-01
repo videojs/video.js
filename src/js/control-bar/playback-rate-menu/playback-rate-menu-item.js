@@ -28,7 +28,7 @@ class PlaybackRateMenuItem extends MenuItem {
   }
 
   update() {
-    this.selected(this.player().playbackRate() == this.rate);
+    this.selected(this.player().playbackRate() === this.rate);
   }
 
 }

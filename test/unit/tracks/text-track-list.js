@@ -168,7 +168,7 @@ test('trigger "change" event when "modechange" is fired on a track', function() 
 
 test('trigger "change" event when mode changes on a TextTracl', function() {
   var tt = new TextTrack({
-        player: {
+        tech: {
           on: noop
         }
       }),

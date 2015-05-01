@@ -59,8 +59,7 @@ class Component {
     // If there was no ID from the options, generate one
     if (!this.id_) {
       // Don't require the player ID function in the case of mock players
-      let id = player.id && player.id() || 'no_player';
-
+      let id = player && player.id && player.id() || 'no_player';
       this.id_ = `${id}_component_${Lib.guid++}`;
     }
 
@@ -1033,7 +1032,7 @@ class Component {
    */
   enableTouchActivity() {
     // Don't continue if the root player doesn't support reporting user activity
-    if (!this.player().reportUserActivity) {
+    if (!this.player() || !this.player().reportUserActivity) {
       return;
     }
 

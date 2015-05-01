@@ -18,31 +18,34 @@ import document from 'global/document';
  */
 class Tech extends Component {
 
-  constructor(player, options={}, ready=function(){}){
+  constructor(options={}, ready=function(){}){
+    options = options || {};
     // we don't want the tech to report user activity automatically.
     // This is done manually in addControlsListeners
     options.reportTouchActivity = false;
-    super(player, options, ready);
+    super(null, options, ready);
 
     // Manually track progress in cases where the browser/flash player doesn't report it.
-    if (!this['featuresProgressEvents']) {
+    if (!this.featuresProgressEvents) {
       this.manualProgressOn();
     }
 
     // Manually track timeupdates in cases where the browser/flash player doesn't report it.
-    if (!this['featuresTimeupdateEvents']) {
+    if (!this.featuresTimeupdateEvents) {
       this.manualTimeUpdatesOn();
     }
 
     this.initControlsListeners();
 
-    if (options['nativeCaptions'] === false || options['nativeTextTracks'] === false) {
-      this['featuresNativeTextTracks'] = false;
+    if (options.nativeCaptions === false || options.nativeTextTracks === false) {
+      this.featuresNativeTextTracks = false;
     }
 
-    if (!this['featuresNativeTextTracks']) {
+    if (!this.featuresNativeTextTracks) {
       this.emulateTextTracks();
     }
+
+    this.textTracks_ = options.textTracks;
 
     this.initTextTrackListeners();
   }
@@ -68,20 +71,6 @@ class Tech extends Component {
    * any controls will still keep the user active
    */
   initControlsListeners() {
-    let player = this.player();
-
-    let activateControls = function(){
-      if (player.controls() && !player.usingNativeControls()) {
-        this.addControlsListeners();
-      }
-    };
-
-    // Set up event listeners once the tech is ready and has an element to apply
-    // listeners to
-    this.ready(activateControls);
-    this.on(player, 'controlsenabled', activateControls);
-    this.on(player, 'controlsdisabled', this.removeControlsListeners);
-
     // if we're loading the playback object after it has started loading or playing the
     // video (often with autoplay on) then the loadstart event has already fired and we
     // need to fire it manually because many things rely on it.
@@ -89,88 +78,9 @@ class Tech extends Component {
     // that may also have fired.
     this.ready(function(){
       if (this.networkState && this.networkState() > 0) {
-        this.player().trigger('loadstart');
+        this.trigger('loadstart');
       }
     });
-  }
-
-  addControlsListeners() {
-    let userWasActive;
-
-    // Some browsers (Chrome & IE) don't trigger a click on a flash swf, but do
-    // trigger mousedown/up.
-    // http://stackoverflow.com/questions/1444562/javascript-onclick-event-over-flash-object
-    // Any touch events are set to block the mousedown event from happening
-    this.on('mousedown', this.handleClick);
-
-    // If the controls were hidden we don't want that to change without a tap event
-    // so we'll check if the controls were already showing before reporting user
-    // activity
-    this.on('touchstart', function(event) {
-      userWasActive = this.player_.userActive();
-    });
-
-    this.on('touchmove', function(event) {
-      if (userWasActive){
-        this.player().reportUserActivity();
-      }
-    });
-
-    this.on('touchend', function(event) {
-      // Stop the mouse events from also happening
-      event.preventDefault();
-    });
-
-    // Turn on component tap events
-    this.emitTapEvents();
-
-    // The tap listener needs to come after the touchend listener because the tap
-    // listener cancels out any reportedUserActivity when setting userActive(false)
-    this.on('tap', this.handleTap);
-  }
-
-  /**
-   * Remove the listeners used for click and tap controls. This is needed for
-   * toggling to controls disabled, where a tap/touch should do nothing.
-   */
-  removeControlsListeners() {
-    // We don't want to just use `this.off()` because there might be other needed
-    // listeners added by techs that extend this.
-    this.off('tap');
-    this.off('touchstart');
-    this.off('touchmove');
-    this.off('touchleave');
-    this.off('touchcancel');
-    this.off('touchend');
-    this.off('click');
-    this.off('mousedown');
-  }
-
-  /**
-   * Handle a click on the media element. By default will play/pause the media.
-   */
-  handleClick(event) {
-    // We're using mousedown to detect clicks thanks to Flash, but mousedown
-    // will also be triggered with right-clicks, so we need to prevent that
-    if (event.button !== 0) return;
-
-    // When controls are disabled a click should not toggle playback because
-    // the click is considered a control
-    if (this.player().controls()) {
-      if (this.player().paused()) {
-        this.player().play();
-      } else {
-        this.player().pause();
-      }
-    }
-  }
-
-  /**
-   * Handle a tap on the media element. By default it will toggle the user
-   * activity state, which hides and shows the controls.
-   */
-  handleTap() {
-    this.player().userActive(!this.player().userActive());
   }
 
   /* Fallbacks for unsupported event types
@@ -178,6 +88,8 @@ class Tech extends Component {
   // Manually trigger progress events based on changes to the buffered amount
   // Many flash players and older HTML5 browsers don't send progress or progress-like events
   manualProgressOn() {
+    this.on('durationchange', this.onDurationChange);
+
     this.manualProgress = true;
 
     // Trigger progress watching when a source begins loading
@@ -187,16 +99,18 @@ class Tech extends Component {
   manualProgressOff() {
     this.manualProgress = false;
     this.stopTrackingProgress();
+
+    this.off('durationchange', this.onDurationChange);
   }
 
   trackProgress() {
-    this.progressInterval = this.setInterval(function(){
+    this.progressInterval = this.setInterval(Lib.bind(this, function(){
       // Don't trigger unless buffered amount is greater than last time
 
-      let bufferedPercent = this.player().bufferedPercent();
+      let bufferedPercent = this.bufferedPercent();
 
-      if (this.bufferedPercent_ != bufferedPercent) {
-        this.player().trigger('progress');
+      if (this.bufferedPercent_ !== bufferedPercent) {
+        this.trigger('progress');
       }
 
       this.bufferedPercent_ = bufferedPercent;
@@ -204,7 +118,40 @@ class Tech extends Component {
       if (bufferedPercent === 1) {
         this.stopTrackingProgress();
       }
-    }, 500);
+    }), 500);
+  }
+
+  onDurationChange() {
+    this.duration_ = this.duration();
+  }
+
+  bufferedPercent() {
+    let bufferedDuration = 0,
+        start, end;
+
+    if (!this.duration_) {
+      return 0;
+    }
+
+    let buffered = this.buffered();
+
+    if (!buffered || !buffered.length) {
+      buffered = Lib.createTimeRange(0,0);
+    }
+
+    for (var i=0; i<buffered.length; i++){
+      start = buffered.start(i);
+      end   = buffered.end(i);
+
+      // buffered end can be bigger than duration by a very small fraction
+      if (end > this.duration_) {
+        end = this.duration_;
+      }
+
+      bufferedDuration += end - start;
+    }
+
+    return bufferedDuration / this.duration_;
   }
 
   stopTrackingProgress() {
@@ -213,36 +160,38 @@ class Tech extends Component {
 
   /*! Time Tracking -------------------------------------------------------------- */
   manualTimeUpdatesOn() {
-    let player = this.player_;
-
     this.manualTimeUpdates = true;
 
-    this.on(player, 'play', this.trackCurrentTime);
-    this.on(player, 'pause', this.stopTrackingCurrentTime);
+    this.on('play', this.trackCurrentTime);
+    this.on('pause', this.stopTrackingCurrentTime);
     // timeupdate is also called by .currentTime whenever current time is set
 
-    // Watch for native timeupdate event
-    this.one('timeupdate', function(){
+    // Watch for native timeupdate event only
+    var onTimeUpdate = function(e){
+      if (e.manuallyTriggered) return;
+
+      this.off('timeupdate', onTimeUpdate);
+
       // Update known progress support for this playback technology
-      this['featuresTimeupdateEvents'] = true;
+      this.featuresTimeupdateEvents = true;
       // Turn off manual progress tracking
       this.manualTimeUpdatesOff();
-    });
+    };
+
+    this.on('timeupdate', onTimeUpdate);
   }
 
   manualTimeUpdatesOff() {
-    let player = this.player_;
-
     this.manualTimeUpdates = false;
     this.stopTrackingCurrentTime();
-    this.off(player, 'play', this.trackCurrentTime);
-    this.off(player, 'pause', this.stopTrackingCurrentTime);
+    this.off('play', this.trackCurrentTime);
+    this.off('pause', this.stopTrackingCurrentTime);
   }
 
   trackCurrentTime() {
     if (this.currentTimeInterval) { this.stopTrackingCurrentTime(); }
     this.currentTimeInterval = this.setInterval(function(){
-      this.player().trigger('timeupdate');
+      this.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true });
     }, 250); // 42 = 24 fps // 250 is what Webkit uses // FF uses 15
   }
 
@@ -252,7 +201,7 @@ class Tech extends Component {
 
     // #1002 - if the video ends right before the next timeupdate would happen,
     // the progress bar won't make it all the way to the end
-    this.player().trigger('timeupdate');
+    this.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true });
   }
 
   dispose() {
@@ -266,21 +215,13 @@ class Tech extends Component {
 
   setCurrentTime() {
     // improve the accuracy of manual timeupdates
-    if (this.manualTimeUpdates) { this.player().trigger('timeupdate'); }
+    if (this.manualTimeUpdates) { this.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true }); }
   }
 
-  // TODO: Consider looking at moving this into the text track display directly
-  // https://github.com/videojs/video.js/issues/1863
   initTextTrackListeners() {
-    let player = this.player_;
-
-    let textTrackListChanges = function() {
-      let textTrackDisplay = player.getChild('textTrackDisplay');
-
-      if (textTrackDisplay) {
-        textTrackDisplay.updateDisplay();
-      }
-    };
+    let textTrackListChanges = Lib.bind(this, function() {
+      this.trigger('texttrackchange');
+    });
 
     let tracks = this.textTracks();
 
@@ -296,12 +237,10 @@ class Tech extends Component {
   }
 
   emulateTextTracks() {
-    let player = this.player_;
-
-    if (!window['WebVTT']) {
+    if (!window['WebVTT'] && this.el().parentNode != null) {
       let script = document.createElement('script');
-      script.src = player.options()['vtt.js'] || '../node_modules/vtt.js/dist/vtt.js';
-      player.el().appendChild(script);
+      script.src = this.options_['vtt.js'] || '../node_modules/vtt.js/dist/vtt.js';
+      this.el().parentNode.appendChild(script);
       window['WebVTT'] = true;
     }
 
@@ -311,15 +250,17 @@ class Tech extends Component {
     }
 
     let textTracksChanges = function() {
-      let textTrackDisplay = player.getChild('textTrackDisplay');
+      let updateDisplay = Lib.bind(this, function() {
+        this.trigger('texttrackchange');
+      });
 
-      textTrackDisplay.updateDisplay();
+      this.trigger('texttrackchange');
 
       for (let i = 0; i < this.length; i++) {
         let track = this[i];
-        track.removeEventListener('cuechange', Lib.bind(textTrackDisplay, textTrackDisplay.updateDisplay));
+        track.removeEventListener('cuechange', updateDisplay);
         if (track.mode === 'showing') {
-          track.addEventListener('cuechange', Lib.bind(textTrackDisplay, textTrackDisplay.updateDisplay));
+          track.addEventListener('cuechange', updateDisplay);
         }
       }
     };
@@ -338,13 +279,13 @@ class Tech extends Component {
    */
 
   textTracks() {
-    this.player_.textTracks_ = this.player_.textTracks_ || new TextTrackList();
-    return this.player_.textTracks_;
+    this.textTracks_ = this.textTracks_ || new TextTrackList();
+    return this.textTracks_;
   }
 
   remoteTextTracks() {
-    this.player_.remoteTextTracks_ = this.player_.remoteTextTracks_ || new TextTrackList();
-    return this.player_.remoteTextTracks_;
+    this.remoteTextTracks_ = this.remoteTextTracks_ || new TextTrackList();
+    return this.remoteTextTracks_;
   }
 
   addTextTrack(kind, label, language) {
@@ -356,7 +297,7 @@ class Tech extends Component {
   }
 
   addRemoteTextTrack(options) {
-    let track = createTrackHelper(this, options['kind'], options['label'], options['language'], options);
+    let track = createTrackHelper(this, options.kind, options.label, options.language, options);
     this.remoteTextTracks().addTrack_(track);
     return {
       track: track
@@ -388,14 +329,15 @@ Tech.prototype.textTracks_;
 var createTrackHelper = function(self, kind, label, language, options={}) {
   let tracks = self.textTracks();
 
-  options['kind'] = kind;
+  options.kind = kind;
+
   if (label) {
-    options['label'] = label;
+    options.label = label;
   }
   if (language) {
-    options['language'] = language;
+    options.language = language;
   }
-  options['player'] = self.player_;
+  options.tech = self;
 
   let track = new TextTrack(options);
   tracks.addTrack_(track);
@@ -403,18 +345,18 @@ var createTrackHelper = function(self, kind, label, language, options={}) {
   return track;
 };
 
-Tech.prototype['featuresVolumeControl'] = true;
+Tech.prototype.featuresVolumeControl = true;
 
 // Resizing plugins using request fullscreen reloads the plugin
-Tech.prototype['featuresFullscreenResize'] = false;
-Tech.prototype['featuresPlaybackRate'] = false;
+Tech.prototype.featuresFullscreenResize = false;
+Tech.prototype.featuresPlaybackRate = false;
 
 // Optional events that we can manually mimic with timers
 // currently not triggered by video-js-swf
-Tech.prototype['featuresProgressEvents'] = false;
-Tech.prototype['featuresTimeupdateEvents'] = false;
+Tech.prototype.featuresProgressEvents = false;
+Tech.prototype.featuresTimeupdateEvents = false;
 
-Tech.prototype['featuresNativeTextTracks'] = false;
+Tech.prototype.featuresNativeTextTracks = false;
 
 /**
  * A functional mixin for techs that want to use the Source Handler pattern.

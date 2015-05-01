@@ -92,6 +92,8 @@ module.exports = function(config) {
 
     captureTimeout: 60000,
 
+    browserNoActivityTimeout: 60000,
+
     sauceLabs: {
       startConnect: true,
       tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
