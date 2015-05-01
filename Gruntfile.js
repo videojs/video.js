@@ -307,6 +307,10 @@ module.exports = function(grunt) {
           ]
         },
         options: {
+          browserifyOptions: {
+            debug: true,
+            standalone: 'videojs'
+          },
           transform: [
             require('babelify').configure(),
             'browserify-istanbul'
