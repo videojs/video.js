@@ -77,5 +77,16 @@
     "time-grunt": "^1.1.1",
     "uglify-js": "~2.3.6",
     "videojs-doc-generator": "0.0.1"
+  },
+  "standard": {
+    "ignore": [
+      "**/build/**",
+      "**/dist/**",
+      "**/docs/**",
+      "**/lang/**",
+      "**/sandbox/**",
+      "**/test/**",
+      "**/Gruntfile.js"
+    ]
   }
 }
