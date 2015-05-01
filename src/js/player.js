@@ -1665,12 +1665,12 @@ class Player extends Component {
 
     options.tracks = [];
 
-    for (let i = 0; i < options.tracks.length; i++) {
-      let track = options.tracks[i];
+    for (let i = 0; i < tracks.length; i++) {
+      let track = tracks[i];
 
       // deep merge tracks and null out player so no circular references
       track = Lib.obj.deepMerge({}, track);
-      track.player = null;
+      track.player = undefined;
       options.tracks[i] = track;
     }
 
