@@ -45,7 +45,7 @@ videojs.extends = extendsFn;
 
 videojs.getGlobalOptions = () => options;
 videojs.setGlobalOptions = function(newOptions) {
-  Lib.obj.merge(options, newOptions);
+  Lib.util.mergeOptions(options, newOptions);
 };
 
 videojs.plugin = plugin;
