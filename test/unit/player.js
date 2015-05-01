@@ -742,10 +742,10 @@ test('should have a sensible toJSON that is equivalent to player.options', funct
 
   const playerOptions2 = {
     tracks: [{
-      label: "English",
-      srclang: "en",
-      src: "../docs/examples/shared/example-captions.vtt",
-      kind: "captions"
+      label: 'English',
+      srclang: 'en',
+      src: '../docs/examples/shared/example-captions.vtt',
+      kind: 'captions'
     }]
   };
 
