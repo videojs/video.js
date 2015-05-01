@@ -7,8 +7,8 @@ module.exports = function(grunt) {
   //   grunt test:chrome:firefox  # grunt-style
   //   grunt test:chrome,firefox  # comma-separated
   grunt.registerTask('test-travis', function() {
-    var tasks = this.args;
-    var tasksMinified;
+    let tasks = this.args;
+    let tasksMinified;
 
     // I believe this was done originally because of security implications around running
     // Saucelabs automatically on PRs.
