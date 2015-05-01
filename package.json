@@ -30,6 +30,7 @@
     "vtt.js": "git+https://github.com/gkatsev/vtt.js.git#shim-build"
   },
   "devDependencies": {
+    "babel": "^5.2.2",
     "babelify": "^6.0.1",
     "blanket": "^1.1.6",
     "browserify-derequire": "^0.9.4",

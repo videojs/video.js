@@ -4,8 +4,8 @@ module.exports = function(grunt) {
   //   grunt test:chrome:firefox  # grunt-style
   //   grunt test:chrome,firefox  # comma-separated
   grunt.registerTask('test-local', function() {
-    var tasks = this.args;
-    var tasksMinified;
+    let tasks = this.args;
+    let tasksMinified;
 
     // if we aren't running this in a CI, but running it manually, we can
     // supply arguments to this task. These arguments are either colon (`:`)
@@ -19,9 +19,7 @@ module.exports = function(grunt) {
       tasks = tasks[0].split(',');
     }
 
-    tasks = tasks.map(function(task) {
-      return 'karma:' + task;
-    });
+    tasks = tasks.map((task) => `karma:${task}`);
 
     grunt.task.run(tasks);
   });
