@@ -18,6 +18,7 @@ import * as Util from './util.js';
 import Player from './player';
 import extendsFn from './extends.js';
 import plugin from './plugins.js';
+import options from './options.js';
 
 if (typeof HTMLVideoElement === 'undefined') {
   document.createElement('video');
@@ -41,6 +42,11 @@ videojs.util = Util;
 videojs.players = Player.players;
 
 videojs.extends = extendsFn;
+
+videojs.getGlobalOptions = () => options;
+videojs.setGlobalOptions = function(newOptions) {
+  Lib.obj.merge(options, newOptions);
+};
 
 videojs.plugin = plugin;
 
