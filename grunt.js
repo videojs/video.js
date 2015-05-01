@@ -329,6 +329,7 @@ module.exports = function(grunt) {
             standalone: 'videojs'
           },
           banner: license,
+          transform: ['babelify'],
           plugin: [
             [ 'browserify-derequire' ]
           ]
