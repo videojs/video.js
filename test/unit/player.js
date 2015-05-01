@@ -728,3 +728,33 @@ test('should throw on startup no techs are specified', function() {
 
   Options.techOrder = techOrder;
 });
+
+test('should have a sensible toJSON that is equivalent to player.options', function() {
+  const playerOptions = {
+    html5: {
+      nativeTextTracks: false
+    }
+  };
+
+  const player = TestHelpers.makePlayer(playerOptions);
+
+  deepEqual(player.toJSON(), player.options(), 'simple player options toJSON produces output equivalent to player.options()');
+
+  const playerOptions2 = {
+    tracks: [{
+      label: 'English',
+      srclang: 'en',
+      src: '../docs/examples/shared/example-captions.vtt',
+      kind: 'captions'
+    }]
+  };
+
+  const player2 = TestHelpers.makePlayer(playerOptions2);
+
+  playerOptions2.tracks[0].player = player2;
+
+  const popts = player2.options();
+  popts.tracks[0].player = undefined;
+
+  deepEqual(player2.toJSON(), popts, 'no circular references');
+});
