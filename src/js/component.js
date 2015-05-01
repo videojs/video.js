@@ -1054,7 +1054,7 @@ class Component {
     fn = Lib.bind(this, fn);
 
     // window.setTimeout would be preferable here, but due to some bizarre issue with Sinon and/or Phantomjs, we can't.
-    var timeoutId = setTimeout(fn, timeout);
+    var timeoutId = window.setTimeout(fn, timeout);
 
     var disposeFn = function() {
       this.clearTimeout(timeoutId);
@@ -1074,7 +1074,7 @@ class Component {
    * @return {Number} Returns the timeout ID
    */
   clearTimeout(timeoutId) {
-    clearTimeout(timeoutId);
+    window.clearTimeout(timeoutId);
 
     var disposeFn = function(){};
     disposeFn.guid = `vjs-timeout-${timeoutId}`;
@@ -1093,7 +1093,7 @@ class Component {
   setInterval(fn, interval) {
     fn = Lib.bind(this, fn);
 
-    var intervalId = setInterval(fn, interval);
+    var intervalId = window.setInterval(fn, interval);
 
     var disposeFn = function() {
       this.clearInterval(intervalId);
@@ -1112,7 +1112,7 @@ class Component {
    * @return {Number} Returns the interval ID
    */
   clearInterval(intervalId) {
-    clearInterval(intervalId);
+    window.clearInterval(intervalId);
 
     var disposeFn = function(){};
     disposeFn.guid = `vjs-interval-${intervalId}`;
