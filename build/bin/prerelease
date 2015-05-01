@@ -7,23 +7,30 @@ set -e
 # otherwise we cause an inifite loop when package version
 # bumps get pushed back to master
 if [[ $CI_MESSAGE = v[0-9]* ]]; then
+  echo "Version commit found. Exiting."
   exit 0
 fi
 
-# install our task runner
+# exit if this is just a change to the build process not source
+if [[ $CI_MESSAGE = build:* ]]; then
+  echo "Build commit found. Exiting."
+  exit 0
+fi
+
+echo "Install our task runner..."
 npm install -g contrib
 
-# configure npm for publishing
+echo "Configure npm for publishing..."
 printf "_auth=$NPM_AUTH_TOKEN\nemail=$NPM_EMAIL\n" > .npmrc
 
-# set git user to last committer
+echo "Set git user to last committer..."
 git config --global user.email $CI_COMMITTER_EMAIL
 git config --global user.name $CI_COMMITTER_NAME
 
-# setup git branches and remotes
+echo "Setup git branches and remotes..."
 git remote set-branches origin stable master
 git fetch
 git remote add upstream git@github.com:videojs/video.js.git
 
-# run the task
+echo "Run the task..."
 contrib release prerelease
