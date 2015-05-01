@@ -50,26 +50,21 @@ module.exports = function(config) {
   config.set({
     basePath: '',
 
-    frameworks: ['browserify', 'qunit'],
+    frameworks: ['qunit'],
 
     autoWatch: false,
 
     singleRun: true,
 
     files: [
+      // include and execute the standalone test bundle first
+      '../build/temp/tests.js',
+
+      // then include video.js through globals to run the API tests
       '../build/temp/video-js.min.css',
       '../build/temp/video.min.js',
-      '../build/temp/tests.js',
+      'api/api.js'
     ],
-
-    preprocessors: {
-      '../test/unit/**/*.js': [ 'browserify' ]
-    },
-
-    browserify: {
-      debug: true,
-      transform: [ 'babelify', 'browserify-istanbul' ]
-    },
 
     plugins: [
       'karma-qunit',
@@ -80,7 +75,6 @@ module.exports = function(config) {
       'karma-phantomjs-launcher',
       'karma-safari-launcher',
       'karma-sauce-launcher',
-      'karma-browserify',
       'karma-coverage'
     ],
 

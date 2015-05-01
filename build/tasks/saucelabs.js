@@ -1,7 +1,7 @@
 module.exports = function(grunt) {
   grunt.registerTask('saucelabs', function() {
-    var exec = require('child_process').exec;
-    var done = this.async();
+    const exec = require('child_process').exec;
+    const done = this.async();
 
     if (this.args[0] == 'connect') {
       exec('curl https://gist.githubusercontent.com/santiycr/5139565/raw/sauce_connect_setup.sh | bash',

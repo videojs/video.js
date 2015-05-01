@@ -21,6 +21,9 @@ CHANGELOG
 * @bc-bbay Load plugins before controls ([view](https://github.com/videojs/video.js/pull/2094))
 * @bc-bbay rename onEvent methods to handleEvent ([view](https://github.com/videojs/video.js/pull/2093))
 * @dmlap added an error message if techOrder is not in options ([view](https://github.com/videojs/video.js/pull/2097))
+* @dconnolly exported the missing videojs.plugin function ([view](https://github.com/videojs/video.js/pull/2103))
+* @mmcc added back the captions settings styles ([view](https://github.com/videojs/video.js/pull/2112))
+* @gkatsev updated the component.js styles to match the new style guide ([view](https://github.com/videojs/video.js/pull/2105))
 
 --------------------
 

@@ -1,10 +1,10 @@
 .video-js .vjs-text-track-display {
-  text-align: center;
   position: absolute;
-  bottom: 4em;
-  /* Leave padding on left and right */
-  left: 1em;
-  right: 1em;
+  bottom: 3em;
+  left: 0;
+  right: 0;
+  top: 0;
+  pointer-events: none;
 }
 
 /* Move captions down when controls aren't being shown */

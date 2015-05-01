@@ -5,7 +5,7 @@
 
 (function(){
 
-q.module('Player Minified');
+q.module('Player API');
 
 test('videojs should exist on the window', function() {
   ok(window.videojs, 'videojs exists on the window');

@@ -38,11 +38,11 @@ import window from 'global/window';
  */
 class Component {
 
-  constructor(player, options, ready){
+  constructor(player, options, ready) {
 
     // The component might be the player itself and we can't pass `this` to super
     if (!player && this.play) {
-      this.player_ = player = this;
+      this.player_ = player = this; // eslint-disable-line
     } else {
       this.player_ = player;
     }
@@ -63,7 +63,7 @@ class Component {
       this.id_ = `${id}_component_${Lib.guid++}`;
     }
 
-    this.name_ = options['name'] || null;
+    this.name_ = options.name || null;
 
     // Create element if one wasn't provided in options
     if (options.el) {
@@ -100,11 +100,11 @@ class Component {
    * Dispose of the component and all child components
    */
   dispose() {
-    this.trigger({ type: 'dispose', 'bubbles': false });
+    this.trigger({ type: 'dispose', bubbles: false });
 
     // Dispose all children.
     if (this.children_) {
-      for (var i = this.children_.length - 1; i >= 0; i--) {
+      for (let i = this.children_.length - 1; i >= 0; i--) {
         if (this.children_[i].dispose) {
           this.children_[i].dispose();
         }
@@ -178,10 +178,13 @@ class Component {
    * @param  {Object} obj Object of new option values
    * @return {Object}     A NEW object of this.options_ and obj merged
    */
-  options(obj){
-    if (obj === undefined) return this.options_;
+  options(obj) {
+    if (!obj) {
+      return this.options_;
+    }
 
-    return this.options_ = VjsUtil.mergeOptions(this.options_, obj);
+    this.options_ = VjsUtil.mergeOptions(this.options_, obj);
+    return this.options_;
   }
 
   /**
@@ -191,7 +194,7 @@ class Component {
    *
    * @return {Element}
    */
-  el(){
+  el() {
     return this.el_;
   }
 
@@ -202,11 +205,11 @@ class Component {
    * @param  {Object=} attributes An object of element attributes that should be set on the element
    * @return {Element}
    */
-  createEl(tagName, attributes){
+  createEl(tagName, attributes) {
     return Lib.createEl(tagName, attributes);
   }
 
-  localize(string){
+  localize(string) {
     let lang = this.player_.language();
     let languages = this.player_.languages();
 
@@ -223,7 +226,7 @@ class Component {
    *
    * @return {Element}
    */
-  contentEl(){
+  contentEl() {
     return this.contentEl_ || this.el_;
   }
 
@@ -234,7 +237,7 @@ class Component {
    *
    * @return {String}
    */
-  id(){
+  id() {
     return this.id_;
   }
 
@@ -245,7 +248,7 @@ class Component {
    *
    * @return {String}
    */
-  name(){
+  name() {
     return this.name_;
   }
 
@@ -256,7 +259,7 @@ class Component {
    *
    * @return {Array} The children
    */
-  children(){
+  children() {
     return this.children_;
   }
 
@@ -265,7 +268,7 @@ class Component {
    *
    * @return {Component}
    */
-  getChildById(id){
+  getChildById(id) {
     return this.childIndex_[id];
   }
 
@@ -274,7 +277,7 @@ class Component {
    *
    * @return {Component}
    */
-  getChild(name){
+  getChild(name) {
     return this.childNameIndex_[name];
   }
 
@@ -306,7 +309,7 @@ class Component {
    * @return {Component} The child component (created by this process if a string was used)
    * @suppress {accessControls|checkRegExp|checkTypes|checkVars|const|constantProperty|deprecated|duplicate|es5Strict|fileoverviewTags|globalThis|invalidCasts|missingProperties|nonStandardJsDocs|strictModuleDepCheck|undefinedNames|undefinedVars|unknownDefines|uselessCode|visibility}
    */
-  addChild(child, options={}){
+  addChild(child, options={}) {
     let component;
     let componentName;
 
@@ -327,16 +330,16 @@ class Component {
 
       // If no componentClass in options, assume componentClass is the name lowercased
       // (e.g. playButton)
-      let componentClassName = options['componentClass'] || Lib.capitalize(componentName);
+      let componentClassName = options.componentClass || Lib.capitalize(componentName);
 
       // Set name through options
-      options['name'] = componentName;
+      options.name = componentName;
 
       // Create a new object & element for this controls set
       // If there's no .player_, this is a player
-      let componentClass = Component.getComponent(componentClassName);
+      let ComponentClass = Component.getComponent(componentClassName);
 
-      component = new componentClass(this.player_ || this, options);
+      component = new ComponentClass(this.player_ || this, options);
 
     // child is a component instance
     } else {
@@ -373,28 +376,34 @@ class Component {
    *
    * @param  {Component} component Component to remove
    */
-  removeChild(component){
+  removeChild(component) {
     if (typeof component === 'string') {
       component = this.getChild(component);
     }
 
-    if (!component || !this.children_) return;
+    if (!component || !this.children_) {
+      return;
+    }
 
     let childFound = false;
-    for (var i = this.children_.length - 1; i >= 0; i--) {
+
+    for (let i = this.children_.length - 1; i >= 0; i--) {
       if (this.children_[i] === component) {
         childFound = true;
-        this.children_.splice(i,1);
+        this.children_.splice(i, 1);
         break;
       }
     }
 
-    if (!childFound) return;
+    if (!childFound) {
+      return;
+    }
 
     this.childIndex_[component.id()] = null;
     this.childNameIndex_[component.name()] = null;
 
-    var compEl = component.el();
+    let compEl = component.el();
+
     if (compEl && compEl.parentNode === this.contentEl()) {
       this.contentEl().removeChild(component.el());
     }
@@ -438,9 +447,9 @@ class Component {
     let children = this.options_.children;
 
     if (children) {
-      let parent = this;
-      let parentOptions = parent.options();
-      let handleAdd = function(name, opts){
+      // `this` is `parent`
+      let parentOptions = this.options();
+      let handleAdd = (name, opts) => {
         // Allow options for children to be set at the parent options
         // e.g. videojs(id, { controlBar: false });
         // instead of videojs(id, { children: { controlBar: false });
@@ -450,21 +459,24 @@ class Component {
 
         // Allow for disabling default components
         // e.g. options['children']['posterImage'] = false
-        if (opts === false) return;
+        if (opts === false) {
+          return;
+        }
 
         // Create and add the child component.
         // Add a direct reference to the child by name on the parent instance.
         // If two of the same component are used, different names should be supplied
         // for each
-        parent[name] = parent.addChild(name, opts);
+        this[name] = this.addChild(name, opts);
       };
 
       // Allow for an array of children details to passed in the options
       if (Lib.obj.isArray(children)) {
-        for (var i = 0; i < children.length; i++) {
+        for (let i = 0; i < children.length; i++) {
           let child = children[i];
+          let name;
+          let opts;
 
-          let name, opts;
           if (typeof child === 'string') {
             // ['myComponent']
             name = child;
@@ -488,10 +500,10 @@ class Component {
    *
    * @return {String} The constructed class name
    */
-  buildCSSClass(){
-      // Child classes can include a function that does:
-      // return 'CLASS NAME' + this._super();
-      return '';
+  buildCSSClass() {
+    // Child classes can include a function that does:
+    // return 'CLASS NAME' + this._super();
+    return '';
   }
 
   /**
@@ -526,7 +538,7 @@ class Component {
    * @param  {Function}             third   The event handler
    * @return {Component}        self
    */
-  on(first, second, third){
+  on(first, second, third) {
     if (typeof first === 'string' || Lib.obj.isArray(first)) {
       Events.on(this.el_, first, Lib.bind(this, second));
 
@@ -535,12 +547,10 @@ class Component {
       const target = first;
       const type = second;
       const fn = Lib.bind(this, third);
-      const thisComponent = this;
 
       // When this component is disposed, remove the listener from the other component
-      const removeOnDispose = function(){
-        thisComponent.off(target, type, fn);
-      };
+      const removeOnDispose = () => this.off(target, type, fn);
+
       // Use the same function ID so we can remove it later it using the ID
       // of the original listener
       removeOnDispose.guid = fn.guid;
@@ -549,9 +559,8 @@ class Component {
       // If the other component is disposed first we need to clean the reference
       // to the other component in this component's removeOnDispose listener
       // Otherwise we create a memory leak.
-      const cleanRemover = function(){
-        thisComponent.off('dispose', removeOnDispose);
-      };
+      const cleanRemover = () => this.off('dispose', removeOnDispose);
+
       // Add the same function ID so we can easily remove it later
       cleanRemover.guid = fn.guid;
 
@@ -593,7 +602,7 @@ class Component {
    * @param  {Function=}              third  The listener for other component
    * @return {Component}
    */
-  off(first, second, third){
+  off(first, second, third) {
     if (!first || typeof first === 'string' || Lib.obj.isArray(first)) {
       Events.off(this.el_, first, second);
     } else {
@@ -643,12 +652,12 @@ class Component {
       const target = first;
       const type = second;
       const fn = Lib.bind(this, third);
-      const thisComponent = this;
 
-      const newFunc = function(){
-        thisComponent.off(target, type, newFunc);
-        fn.apply(this, arguments);
+      const newFunc = () => {
+        this.off(target, type, newFunc);
+        fn.apply(null, arguments);
       };
+
       // Keep the same function ID so we can remove it later
       newFunc.guid = fn.guid;
 
@@ -667,7 +676,7 @@ class Component {
    * @param  {Event|Object|String} event  A string (the type) or an event object with a type attribute
    * @return {Component}       self
    */
-  trigger(event){
+  trigger(event) {
     Events.trigger(this.el_, event);
     return this;
   }
@@ -681,7 +690,7 @@ class Component {
    * @param  {Function} fn Ready listener
    * @return {Component}
    */
-  ready(fn){
+  ready(fn) {
     if (fn) {
       if (this.isReady_) {
         fn.call(this);
@@ -698,14 +707,14 @@ class Component {
    *
    * @return {Component}
    */
-  triggerReady(){
+  triggerReady() {
     this.isReady_ = true;
 
-    var readyQueue = this.readyQueue_;
+    let readyQueue = this.readyQueue_;
 
     if (readyQueue && readyQueue.length > 0) {
 
-      for (var i = 0, j = readyQueue.length; i < j; i++) {
+      for (let i = 0; i < readyQueue.length; i++) {
         readyQueue[i].call(this);
       }
 
@@ -723,7 +732,7 @@ class Component {
    * @param {String} classToCheck Classname to check
    * @return {Component}
    */
-  hasClass(classToCheck){
+  hasClass(classToCheck) {
     return Lib.hasClass(this.el_, classToCheck);
   }
 
@@ -733,7 +742,7 @@ class Component {
    * @param {String} classToAdd Classname to add
    * @return {Component}
    */
-  addClass(classToAdd){
+  addClass(classToAdd) {
     Lib.addClass(this.el_, classToAdd);
     return this;
   }
@@ -744,7 +753,7 @@ class Component {
    * @param {String} classToRemove Classname to remove
    * @return {Component}
    */
-  removeClass(classToRemove){
+  removeClass(classToRemove) {
     Lib.removeClass(this.el_, classToRemove);
     return this;
   }
@@ -754,7 +763,7 @@ class Component {
    *
    * @return {Component}
    */
-  show(){
+  show() {
     this.removeClass('vjs-hidden');
     return this;
   }
@@ -764,7 +773,7 @@ class Component {
    *
    * @return {Component}
    */
-  hide(){
+  hide() {
     this.addClass('vjs-hidden');
     return this;
   }
@@ -776,7 +785,7 @@ class Component {
    * @return {Component}
    * @private
    */
-  lockShowing(){
+  lockShowing() {
     this.addClass('vjs-lock-showing');
     return this;
   }
@@ -788,7 +797,7 @@ class Component {
    * @return {Component}
    * @private
    */
-  unlockShowing(){
+  unlockShowing() {
     this.removeClass('vjs-lock-showing');
     return this;
   }
@@ -806,7 +815,7 @@ class Component {
    * @return {Component} This component, when setting the width
    * @return {Number|String} The width, when getting
    */
-  width(num, skipListeners){
+  width(num, skipListeners) {
     return this.dimension('width', num, skipListeners);
   }
 
@@ -823,7 +832,7 @@ class Component {
    * @return {Component} This component, when setting the height
    * @return {Number|String} The height, when getting
    */
-  height(num, skipListeners){
+  height(num, skipListeners) {
     return this.dimension('height', num, skipListeners);
   }
 
@@ -834,7 +843,7 @@ class Component {
    * @param  {Number|String} height
    * @return {Component} The component
    */
-  dimensions(width, height){
+  dimensions(width, height) {
     // Skip resize listeners on width for optimization
     return this.width(width, true).height(height);
   }
@@ -857,7 +866,7 @@ class Component {
    * @return {Number|String} The dimension if nothing was set
    * @private
    */
-  dimension(widthOrHeight, num, skipListeners){
+  dimension(widthOrHeight, num, skipListeners) {
     if (num !== undefined) {
       // Set to zero if null or literally NaN (NaN !== NaN)
       if (num === null || num !== num) {
@@ -865,16 +874,18 @@ class Component {
       }
 
       // Check if using css width/height (% or px) and adjust
-      if ((''+num).indexOf('%') !== -1 || (''+num).indexOf('px') !== -1) {
+      if (('' + num).indexOf('%') !== -1 || ('' + num).indexOf('px') !== -1) {
         this.el_.style[widthOrHeight] = num;
       } else if (num === 'auto') {
         this.el_.style[widthOrHeight] = '';
       } else {
-        this.el_.style[widthOrHeight] = num+'px';
+        this.el_.style[widthOrHeight] = num + 'px';
       }
 
       // skipListeners allows us to avoid triggering the resize event when setting both width and height
-      if (!skipListeners) { this.trigger('resize'); }
+      if (!skipListeners) {
+        this.trigger('resize');
+      }
 
       // Return component
       return this;
@@ -882,35 +893,36 @@ class Component {
 
     // Not setting a value, so getting it
     // Make sure element exists
-    if (!this.el_) return 0;
+    if (!this.el_) {
+      return 0;
+    }
 
     // Get dimension value from style
-    var val = this.el_.style[widthOrHeight];
-    var pxIndex = val.indexOf('px');
+    let val = this.el_.style[widthOrHeight];
+    let pxIndex = val.indexOf('px');
+
     if (pxIndex !== -1) {
       // Return the pixel value with no 'px'
-      return parseInt(val.slice(0,pxIndex), 10);
+      return parseInt(val.slice(0, pxIndex), 10);
+    }
 
     // No px so using % or no style was set, so falling back to offsetWidth/height
     // If component has display:none, offset will return 0
     // TODO: handle display:none and no dimension style using px
-    } else {
+    return parseInt(this.el_['offset' + Lib.capitalize(widthOrHeight)], 10);
 
-      return parseInt(this.el_['offset'+Lib.capitalize(widthOrHeight)], 10);
+    // ComputedStyle version.
+    // Only difference is if the element is hidden it will return
+    // the percent value (e.g. '100%'')
+    // instead of zero like offsetWidth returns.
+    // var val = Lib.getComputedStyleValue(this.el_, widthOrHeight);
+    // var pxIndex = val.indexOf('px');
 
-      // ComputedStyle version.
-      // Only difference is if the element is hidden it will return
-      // the percent value (e.g. '100%'')
-      // instead of zero like offsetWidth returns.
-      // var val = Lib.getComputedStyleValue(this.el_, widthOrHeight);
-      // var pxIndex = val.indexOf('px');
-
-      // if (pxIndex !== -1) {
-      //   return val.slice(0, pxIndex);
-      // } else {
-      //   return val;
-      // }
-    }
+    // if (pxIndex !== -1) {
+    //   return val.slice(0, pxIndex);
+    // } else {
+    //   return val;
+    // }
   }
 
   /**
@@ -923,7 +935,7 @@ class Component {
    * overhead is especially bad.
    * @private
    */
-  emitTapEvents(){
+  emitTapEvents() {
     // Track the start time so we can determine how long the touch lasted
     let touchStart = 0;
     let firstTouch = null;
@@ -936,6 +948,7 @@ class Component {
     const touchTimeThreshold = 200;
 
     let couldBeTap;
+
     this.on('touchstart', function(event) {
       // If more than one finger, don't consider treating this as a click
       if (event.touches.length === 1) {
@@ -957,15 +970,17 @@ class Component {
         const xdiff = event.touches[0].pageX - firstTouch.pageX;
         const ydiff = event.touches[0].pageY - firstTouch.pageY;
         const touchDistance = Math.sqrt(xdiff * xdiff + ydiff * ydiff);
+
         if (touchDistance > tapMovementThreshold) {
           couldBeTap = false;
         }
       }
     });
 
-    const noTap = function(){
+    const noTap = function() {
       couldBeTap = false;
     };
+
     // TODO: Listen to the original target. http://youtu.be/DujfpXOKUp8?t=13m8s
     this.on('touchleave', noTap);
     this.on('touchcancel', noTap);
@@ -978,9 +993,11 @@ class Component {
       if (couldBeTap === true) {
         // Measure how long the touch lasted
         const touchTime = new Date().getTime() - touchStart;
+
         // Make sure the touch was less than the threshold to be considered a tap
         if (touchTime < touchTimeThreshold) {
-          event.preventDefault(); // Don't let browser turn this into a click
+          // Don't let browser turn this into a click
+          event.preventDefault();
           this.trigger('tap');
           // It may be good to copy the touchend event object and change the
           // type to tap, if the other event properties aren't exact after
@@ -1023,6 +1040,7 @@ class Component {
     const report = Lib.bind(this.player(), this.player().reportUserActivity);
 
     let touchHolding;
+
     this.on('touchstart', function() {
       report();
       // For as long as the they are touching the device or have their mouse down,
@@ -1054,9 +1072,9 @@ class Component {
     fn = Lib.bind(this, fn);
 
     // window.setTimeout would be preferable here, but due to some bizarre issue with Sinon and/or Phantomjs, we can't.
-    var timeoutId = setTimeout(fn, timeout);
+    let timeoutId = window.setTimeout(fn, timeout);
 
-    var disposeFn = function() {
+    const disposeFn = function() {
       this.clearTimeout(timeoutId);
     };
 
@@ -1067,16 +1085,16 @@ class Component {
     return timeoutId;
   }
 
-
   /**
    * Clears a timeout and removes the associated dispose listener
    * @param {Number} timeoutId The id of the timeout to clear
    * @return {Number} Returns the timeout ID
    */
   clearTimeout(timeoutId) {
-    clearTimeout(timeoutId);
+    window.clearTimeout(timeoutId);
 
-    var disposeFn = function(){};
+    const disposeFn = function() {};
+
     disposeFn.guid = `vjs-timeout-${timeoutId}`;
 
     this.off('dispose', disposeFn);
@@ -1093,9 +1111,9 @@ class Component {
   setInterval(fn, interval) {
     fn = Lib.bind(this, fn);
 
-    var intervalId = setInterval(fn, interval);
+    let intervalId = window.setInterval(fn, interval);
 
-    var disposeFn = function() {
+    const disposeFn = function() {
       this.clearInterval(intervalId);
     };
 
@@ -1112,9 +1130,10 @@ class Component {
    * @return {Number} Returns the interval ID
    */
   clearInterval(intervalId) {
-    clearInterval(intervalId);
+    window.clearInterval(intervalId);
 
-    var disposeFn = function(){};
+    const disposeFn = function() {};
+
     disposeFn.guid = `vjs-interval-${intervalId}`;
 
     this.off('dispose', disposeFn);
@@ -1122,7 +1141,7 @@ class Component {
     return intervalId;
   }
 
-  static registerComponent(name, comp){
+  static registerComponent(name, comp) {
     if (!Component.components_) {
       Component.components_ = {};
     }
@@ -1131,7 +1150,7 @@ class Component {
     return comp;
   }
 
-  static getComponent(name){
+  static getComponent(name) {
     if (Component.components_ && Component.components_[name]) {
       return Component.components_[name];
     }
@@ -1142,12 +1161,12 @@ class Component {
     }
   }
 
-  static extend(props){
+  static extend(props) {
     props = props || {};
     // Set up the constructor using the supplied init method
     // or using the init of the parent object
     // Make sure to check the unobfuscated version for external libs
-    let init = props['init'] || props.init || this.prototype['init'] || this.prototype.init || function(){};
+    let init = props.init || props.init || this.prototype.init || this.prototype.init || function() {};
     // In Resig's simple class inheritance (previously used) the constructor
     //  is a function that calls `this.init.apply(arguments)`
     // However that would prevent us from using `ParentObject.call(this);`
@@ -1157,7 +1176,7 @@ class Component {
     //    `ParentObject.prototype.init.apply(this, arguments);`
     //  Bleh. We're not creating a _super() function, so it's good to keep
     //  the parent constructor reference simple.
-    let subObj = function(){
+    let subObj = function() {
       init.apply(this, arguments);
     };
 
@@ -1173,7 +1192,7 @@ class Component {
     // subObj.create = CoreObject.create;
 
     // Extend subObj's prototype with functions and other properties from props
-    for (var name in props) {
+    for (let name in props) {
       if (props.hasOwnProperty(name)) {
         subObj.prototype[name] = props[name];
       }
