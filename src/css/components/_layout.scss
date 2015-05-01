@@ -1,6 +1,14 @@
 .video-js {
-  display: block;
+  /* inline-block is as close as we get to the video el's display:inline */
+  display: inline-block;
+  /* Make video.js videos align top when next to video elements */
+  vertical-align: top;
   box-sizing: border-box;
+
+  /* Default to the video element width/height. This will be overridden by
+   * the source width height unless changed elsewhere. */
+  width: 300px;
+  height: 150px;
 
   color: $primary-text;
   background-color: $primary-bg;
@@ -9,8 +17,6 @@
   /* Start with 10px for base font size so other dimensions can be em based and
   easily calculable. */
   font-size: $base-font-size;
-  /* Allow poster to be vertially aligned. */
-  vertical-align: middle;
 
   /* Provide some basic defaults for fonts */
   font-weight: normal;
@@ -35,6 +41,28 @@
 .video-js *:before,
 .video-js *:after {
   box-sizing: inherit;
+}
+
+/* Fill the width of the containing element and use padding to create the
+   desired aspect ratio. Default to 16x9 unless another ratio is given. */
+.video-js.vjs-fluid,
+.video-js.vjs-16-9 {
+  width: 100%;
+  max-width:100%;
+  height: 0;
+  padding-top: 56.25%;
+}
+
+.video-js.vjs-4-3 {
+  width: 100%;
+  max-width:100%;
+  height: 0;
+  padding-top: 75%;
+}
+
+.video-js.vjs-fill {
+  width: 100%;
+  height: 100%;
 }
 
 /* Playback technology elements expand to the width/height of the containing div
@@ -65,6 +93,8 @@ body.vjs-full-window {
   right: 0;
   width: 100% !important;
   height: 100% !important;
+  /* Undo any aspect ratio padding for fluid layouts */
+  padding-top: 0 !important;
 }
 .video-js.vjs-fullscreen.vjs-user-inactive {
   cursor: none;

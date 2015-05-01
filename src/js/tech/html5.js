@@ -270,6 +270,9 @@ class Html5 extends Tech {
   networkState() { return this.el_.networkState; }
   readyState() { return this.el_.readyState; }
 
+  videoWidth() { return this.el_.videoWidth; }
+  videoHeight() { return this.el_.videoHeight; }
+
   textTracks() {
     if (!this['featuresNativeTextTracks']) {
       return super.textTracks();

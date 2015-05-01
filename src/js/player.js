@@ -222,10 +222,17 @@ class Player extends Component {
     // Default state of video is paused
     this.addClass('vjs-paused');
 
-    // Make box use width/height of tag, or rely on default implementation
-    // Enforce with CSS since width/height attrs don't work on divs
-    this.width(this.options_['width'], true); // (true) Skip resize listener on load
-    this.height(this.options_['height'], true);
+    // Add a style element in the player that we'll use to set the width/height
+    // of the player in a way that's still overrideable by CSS, just like the
+    // video element
+    this.styleEl_ = document.createElement('style');
+    el.appendChild(this.styleEl_);
+
+    // Pass in the width/height/aspectRatio options which will update the style el
+    this.width(this.options_['width']);
+    this.height(this.options_['height']);
+    this.fluid(this.options_['fluid']);
+    this.aspectRatio(this.options_['aspectRatio']);
 
     // Lib.insertFirst seems to cause the networkState to flicker from 3 to 2, so
     // keep track of the original for later so we can know if the source originally failed
@@ -240,6 +247,114 @@ class Player extends Component {
     this.el_ = el;
 
     return el;
+  }
+
+  width(width) {
+    if (width === undefined) {
+      return this.width_ || 0;
+    }
+    this.width_ = parseInt(width, 10);
+    this.updateStyleEl_();
+    return this;
+  }
+
+  height(height) {
+    if (height === undefined) {
+      return this.height_ || 0;
+    }
+    this.height_ = parseInt(height, 10);
+    this.updateStyleEl_();
+    return this;
+  }
+
+  fluid(bool) {
+    if (bool === undefined) {
+      return !!this.fluid_;
+    }
+
+    this.fluid_ = !!bool;
+
+    if (bool) {
+      this.addClass('vjs-fluid');
+    } else {
+      this.removeClass('vjs-fluid');
+    }
+  }
+
+  aspectRatio(ratio) {
+    if (ratio === undefined) {
+      return this.aspectRatio_;
+    }
+
+    // Check for width:height format
+    if (!/^\d+\:\d+$/.test(ratio)) {
+      throw new Error('Improper value suplied for aspect ratio. The format should be width:height, for example 16:9.');
+    }
+    this.aspectRatio_ = ratio;
+
+    // We're assuming if you set an aspect ratio you want fluid mode,
+    // because in fixed mode you could calculate width and height yourself.
+    this.fluid(true);
+
+    this.updateStyleEl_();
+  }
+
+  updateStyleEl_() {
+    let width;
+    let height;
+    let aspectRatio;
+
+    // The aspect ratio is either used directly or to calculate width and height.
+    if (this.aspectRatio_ !== undefined && this.aspectRatio_ !== 'auto') {
+      // Use any aspectRatio that's been specifically set
+      aspectRatio = this.aspectRatio_;
+    } else if (this.videoWidth()) {
+      // Otherwise try to get the aspect ratio from the video metadata
+      aspectRatio = this.videoWidth() + ':' + this.videoHeight();
+    } else {
+      // Or use a default. The video element's is 2:1, but 16:9 is more common.
+      aspectRatio = '16:9';
+    }
+
+    // Get the ratio as a decimal we can use to calculate dimensions
+    let ratioParts = aspectRatio.split(':');
+    let ratioMultiplier = ratioParts[1] / ratioParts[0];
+
+    if (this.width_ !== undefined) {
+      // Use any width that's been specifically set
+      width = this.width_;
+    } else if (this.height_ !== undefined) {
+      // Or calulate the width from the aspect ratio if a height has been set
+      width = this.height_ / ratioMultiplier;
+    } else {
+      // Or use the video's metadata, or use the video el's default of 300
+      width = this.videoWidth() || 300;
+    }
+
+    if (this.height_ !== undefined) {
+      // Use any height that's been specifically set
+      height = this.height_;
+    } else {
+      // Otherwise calculate the height from the ratio and the width
+      height = width * ratioMultiplier;
+    }
+
+    let idClass = this.id()+'-dimensions';
+
+    // Ensure the right class is still on the player for the style element
+    this.addClass(idClass);
+
+    // Create the width/height CSS
+    var css = `.${idClass} { width: ${width}px; height: ${height}px; }`;
+    // Add the aspect ratio CSS for when using a fluid layout
+    css += `.${idClass}.vjs-fluid { padding-top: ${ratioMultiplier * 100}%; }`;
+
+    // Update the style el
+    if (this.styleEl_.styleSheet){
+      this.styleEl_.styleSheet.cssText = css;
+    } else {
+      this.styleEl_.innerHTML = css;
+    }
   }
 
   /**
@@ -323,6 +438,7 @@ class Player extends Component {
     this.on(this.tech, 'ratechange', this.handleTechRateChange);
     this.on(this.tech, 'volumechange', this.handleTechVolumeChange);
     this.on(this.tech, 'texttrackchange', this.onTextTrackChange);
+	this.on(this.tech, 'loadedmetadata', this.updateStyleEl_);
 
     if (this.controls() && !this.usingNativeControls()) {
       this.addTechControlsListeners();
@@ -1922,6 +2038,14 @@ class Player extends Component {
     this.tech && this.tech['removeRemoteTextTrack'](track);
   }
 
+  videoWidth() {
+    return this.tech && this.tech.videoWidth && this.tech.videoWidth() || 0;
+  }
+
+  videoHeight() {
+    return this.tech && this.tech.videoHeight && this.tech.videoHeight() || 0;
+  }
+
   // Methods to add support for
   // initialTime: function(){ return this.techCall('initialTime'); },
   // startOffsetTime: function(){ return this.techCall('startOffsetTime'); },
@@ -1929,8 +2053,6 @@ class Player extends Component {
   // seekable: function(){ return this.techCall('seekable'); },
   // videoTracks: function(){ return this.techCall('videoTracks'); },
   // audioTracks: function(){ return this.techCall('audioTracks'); },
-  // videoWidth: function(){ return this.techCall('videoWidth'); },
-  // videoHeight: function(){ return this.techCall('videoHeight'); },
   // defaultPlaybackRate: function(){ return this.techCall('defaultPlaybackRate'); },
   // mediaGroup: function(){ return this.techCall('mediaGroup'); },
   // controller: function(){ return this.techCall('controller'); },
