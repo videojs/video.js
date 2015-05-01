@@ -24,6 +24,7 @@ CHANGELOG
 * @dconnolly exported the missing videojs.plugin function ([view](https://github.com/videojs/video.js/pull/2103))
 * @mmcc added back the captions settings styles ([view](https://github.com/videojs/video.js/pull/2112))
 * @gkatsev updated the component.js styles to match the new style guide ([view](https://github.com/videojs/video.js/pull/2105))
+* @gkatsev added error logging for bad JSON formatting ([view](https://github.com/videojs/video.js/pull/2113))
 
 --------------------
 

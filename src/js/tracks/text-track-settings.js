@@ -104,10 +104,11 @@ class TextTrackSettings extends Component {
   }
 
   restoreSettings() {
-    let values;
-    try {
-      values = safeParseTuple(window.localStorage.getItem('vjs-text-track-settings'))[1];
-    } catch (e) {}
+    let [err, values] = safeParseTuple(window.localStorage.getItem('vjs-text-track-settings'));
+
+    if (err) {
+      Lib.log.error(err);
+    }
 
     if (values) {
       this.setValues(values);
