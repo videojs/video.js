@@ -297,12 +297,6 @@ class Player extends Component {
     this.on(this.tech, 'ready', this.handleTechReady);
     this.on(this.tech, 'usenativecontrols', this.handleTechUseNativeControls);
 
-    // firefox doesn't bubble mousemove events to parent. videojs/video-js-swf#37
-    // bugzilla bug: https://bugzilla.mozilla.org/show_bug.cgi?id=836786
-    if (Lib.IS_FIREFOX) {
-      this.on(this.tech, 'mousemove', this.handleTechMouseMove);
-    }
-
     // Listen to every HTML5 events and trigger them back on the player for the plugins
     this.on(this.tech, 'loadstart', this.handleTechLoadStart);
     this.on(this.tech, 'waiting', this.handleTechWaiting);
@@ -411,14 +405,6 @@ class Player extends Component {
       delete this.tag.poster; // Chrome Fix. Fixed in Chrome v16.
       this.play();
     }
-  }
-
-  /**
-   * Fired when a mouse move on the tech element
-   * @private
-   */
-  handleTechMouseMove() {
-    this.reportUserActivity();
   }
 
   /**
