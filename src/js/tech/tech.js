@@ -25,6 +25,8 @@ class Tech extends Component {
     options.reportTouchActivity = false;
     super(null, options, ready);
 
+    this.textTracks_ = options.textTracks;
+
     // Manually track progress in cases where the browser/flash player doesn't report it.
     if (!this.featuresProgressEvents) {
       this.manualProgressOn();
@@ -44,8 +46,6 @@ class Tech extends Component {
     if (!this.featuresNativeTextTracks) {
       this.emulateTextTracks();
     }
-
-    this.textTracks_ = options.textTracks;
 
     this.initTextTrackListeners();
   }
