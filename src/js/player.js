@@ -361,8 +361,6 @@ class Player extends Component {
   }
 
   addTechControlsListeners() {
-    let userWasActive;
-
     // Some browsers (Chrome & IE) don't trigger a click on a flash swf, but do
     // trigger mousedown/up.
     // http://stackoverflow.com/questions/1444562/javascript-onclick-event-over-flash-object
