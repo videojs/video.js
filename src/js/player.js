@@ -1558,7 +1558,7 @@ class Player extends Component {
       if (this.controls_ !== bool) {
         this.controls_ = bool;
 
-        if (!this.usingNativeControls()) {
+        if (this.usingNativeControls()) {
           this.techCall('setControls', bool);
         }
 
