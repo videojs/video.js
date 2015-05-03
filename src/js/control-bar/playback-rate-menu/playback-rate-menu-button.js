@@ -1,7 +1,7 @@
 import MenuButton from '../../menu/menu-button.js';
 import Menu from '../../menu/menu.js';
 import PlaybackRateMenuItem from './playback-rate-menu-item.js';
-import * as Lib from '../../lib.js';
+import * as Dom from '../../utils/dom.js';
 
 /**
  * The component for controlling the playback rate
@@ -25,7 +25,7 @@ class PlaybackRateMenuButton extends MenuButton {
   createEl() {
     let el = super.createEl();
 
-    this.labelEl_ = Lib.createEl('div', {
+    this.labelEl_ = Dom.createEl('div', {
       className: 'vjs-playback-rate-value',
       innerHTML: 1.0
     });

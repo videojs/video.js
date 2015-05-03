@@ -1,6 +1,5 @@
 import MenuButton from '../../menu/menu-button.js';
-import * as Lib from '../../lib.js';
-
+import * as Fn from '../../utils/fn.js';
 import TextTrackMenuItem from './text-track-menu-item.js';
 import OffTextTrackMenuItem from './off-text-track-menu-item.js';
 
@@ -24,7 +23,7 @@ class TextTrackButton extends MenuButton {
       return;
     }
 
-    let updateHandler = Lib.bind(this, this.update);
+    let updateHandler = Fn.bind(this, this.update);
     tracks.addEventListener('removetrack', updateHandler);
     tracks.addEventListener('addtrack', updateHandler);
 

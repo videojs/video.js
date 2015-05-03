@@ -1,5 +1,6 @@
 import EventEmitter from '../event-emitter';
-import * as Lib from '../lib';
+import * as Fn from '../utils/fn.js';
+import * as browser from '../utils/browser.js';
 import document from 'global/document';
 
 /*
@@ -18,7 +19,7 @@ import document from 'global/document';
 let TextTrackList = function(tracks) {
   let list = this;
 
-  if (Lib.IS_IE8) {
+  if (browser.IS_IE8) {
     list = document.createElement('custom');
 
     for (let prop in TextTrackList.prototype) {
@@ -39,12 +40,12 @@ let TextTrackList = function(tracks) {
     list.addTrack_(tracks[i]);
   }
 
-  if (Lib.IS_IE8) {
+  if (browser.IS_IE8) {
     return list;
   }
 };
 
-TextTrackList.prototype = Lib.obj.create(EventEmitter.prototype);
+TextTrackList.prototype = Object.create(EventEmitter.prototype);
 TextTrackList.prototype.constructor = TextTrackList;
 
 /*
@@ -73,7 +74,7 @@ TextTrackList.prototype.addTrack_ = function(track) {
     });
   }
 
-  track.addEventListener('modechange', Lib.bind(this, function() {
+  track.addEventListener('modechange', Fn.bind(this, function() {
     this.trigger('change');
   }));
   this.tracks_.push(track);

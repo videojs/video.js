@@ -2,7 +2,6 @@ import Button from '../button.js';
 import Menu from '../menu/menu.js';
 import MenuButton from '../menu/menu-button.js';
 import MuteToggle from './mute-toggle.js';
-import * as Lib from '../lib.js';
 import VolumeBar from './volume-control/volume-bar.js';
 
 /**

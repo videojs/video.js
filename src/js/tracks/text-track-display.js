@@ -2,7 +2,7 @@ import Component from '../component';
 import Menu from '../menu/menu.js';
 import MenuItem from '../menu/menu-item.js';
 import MenuButton from '../menu/menu-button.js';
-import * as Lib from '../lib.js';
+import * as Fn from '../utils/fn.js';
 import document from 'global/document';
 import window from 'global/window';
 
@@ -31,20 +31,20 @@ class TextTrackDisplay extends Component {
   constructor(player, options, ready){
     super(player, options, ready);
 
-    player.on('loadstart', Lib.bind(this, this.toggleDisplay));
-    player.on('texttrackchange', Lib.bind(this, this.toggleDisplay));
+    player.on('loadstart', Fn.bind(this, this.toggleDisplay));
+    player.on('texttrackchange', Fn.bind(this, this.toggleDisplay));
 
     // This used to be called during player init, but was causing an error
     // if a track should show by default and the display hadn't loaded yet.
     // Should probably be moved to an external track loader when we support
     // tracks that don't need a display.
-    player.ready(Lib.bind(this, function() {
+    player.ready(Fn.bind(this, function() {
       if (player.tech && player.tech['featuresNativeTextTracks']) {
         this.hide();
         return;
       }
 
-      player.on('fullscreenchange', Lib.bind(this, this.updateDisplay));
+      player.on('fullscreenchange', Fn.bind(this, this.updateDisplay));
 
       let tracks = player.options_['tracks'] || [];
       for (let i = 0; i < tracks.length; i++) {

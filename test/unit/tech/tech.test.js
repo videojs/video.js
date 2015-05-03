@@ -1,6 +1,6 @@
 var noop = function() {}, clock, oldTextTracks;
 
-import Tech from '../../src/js/tech/tech.js';
+import Tech from '../../../src/js/tech/tech.js';
 
 q.module('Media Tech', {
   'setup': function() {

@@ -1,5 +1,4 @@
 import Button from '../button';
-import * as Lib from '../lib';
 
 /**
  * Button to toggle between play and pause

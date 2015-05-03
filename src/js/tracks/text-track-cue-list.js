@@ -1,4 +1,4 @@
-import * as Lib from '../lib';
+import * as browser from '../utils/browser.js';
 import document from 'global/document';
 
 /*
@@ -14,7 +14,7 @@ import document from 'global/document';
 let TextTrackCueList = function(cues) {
   let list = this;
 
-  if (Lib.IS_IE8) {
+  if (browser.IS_IE8) {
     list = document.createElement('custom');
 
     for (let prop in TextTrackCueList.prototype) {
@@ -30,7 +30,7 @@ let TextTrackCueList = function(cues) {
     }
   });
 
-  if (Lib.IS_IE8) {
+  if (browser.IS_IE8) {
     return list;
   }
 };

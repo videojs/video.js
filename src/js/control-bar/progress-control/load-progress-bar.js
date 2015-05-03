@@ -1,5 +1,5 @@
 import Component from '../../component.js';
-import * as Lib from '../../lib.js';
+import * as Dom from '../../utils/dom.js';
 
 /**
  * Shows load progress
@@ -44,7 +44,7 @@ class LoadProgressBar extends Component {
       let part = children[i];
 
       if (!part) {
-        part = this.el_.appendChild(Lib.createEl());
+        part = this.el_.appendChild(Dom.createEl());
       }
 
       // set the percent based on the width of the progress bar (bufferedEnd)

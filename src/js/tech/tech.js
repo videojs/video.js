@@ -6,7 +6,9 @@
 import Component from '../component';
 import TextTrack from '../tracks/text-track';
 import TextTrackList from '../tracks/text-track-list';
-import * as Lib from '../lib';
+import * as Fn from '../utils/fn.js';
+import log from '../utils/log.js';
+import { createTimeRange } from '../utils/time-ranges.js';
 import window from 'global/window';
 import document from 'global/document';
 
@@ -104,7 +106,7 @@ class Tech extends Component {
   }
 
   trackProgress() {
-    this.progressInterval = this.setInterval(Lib.bind(this, function(){
+    this.progressInterval = this.setInterval(Fn.bind(this, function(){
       // Don't trigger unless buffered amount is greater than last time
 
       let bufferedPercent = this.bufferedPercent();
@@ -136,7 +138,7 @@ class Tech extends Component {
     let buffered = this.buffered();
 
     if (!buffered || !buffered.length) {
-      buffered = Lib.createTimeRange(0,0);
+      buffered = createTimeRange(0,0);
     }
 
     for (var i=0; i<buffered.length; i++){
@@ -219,7 +221,7 @@ class Tech extends Component {
   }
 
   initTextTrackListeners() {
-    let textTrackListChanges = Lib.bind(this, function() {
+    let textTrackListChanges = Fn.bind(this, function() {
       this.trigger('texttrackchange');
     });
 
@@ -230,7 +232,7 @@ class Tech extends Component {
     tracks.addEventListener('removetrack', textTrackListChanges);
     tracks.addEventListener('addtrack', textTrackListChanges);
 
-    this.on('dispose', Lib.bind(this, function() {
+    this.on('dispose', Fn.bind(this, function() {
       tracks.removeEventListener('removetrack', textTrackListChanges);
       tracks.removeEventListener('addtrack', textTrackListChanges);
     }));
@@ -250,7 +252,7 @@ class Tech extends Component {
     }
 
     let textTracksChanges = function() {
-      let updateDisplay = Lib.bind(this, function() {
+      let updateDisplay = Fn.bind(this, function() {
         this.trigger('texttrackchange');
       });
 
@@ -267,7 +269,7 @@ class Tech extends Component {
 
     tracks.addEventListener('change', textTracksChanges);
 
-    this.on('dispose', Lib.bind(this, function() {
+    this.on('dispose', Fn.bind(this, function() {
       tracks.removeEventListener('change', textTracksChanges);
     }));
   }
@@ -443,7 +445,7 @@ Tech.withSourceHandlers = function(_Tech){
       if (_Tech.nativeSourceHandler) {
         sh = _Tech.nativeSourceHandler;
       } else {
-        Lib.log.error('No source hander found for the current source.');
+        log.error('No source hander found for the current source.');
       }
     }
 

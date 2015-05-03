@@ -1,4 +1,4 @@
-import * as Lib from './lib';
+import assign from 'object.assign';
 
 /**
  * Custom MediaError to mimic the HTML5 MediaError
@@ -11,7 +11,7 @@ let MediaError = function(code){
     // default code is zero, so this is a custom error
     this.message = code;
   } else if (typeof code === 'object') { // object
-    Lib.obj.merge(this, code);
+    assign(this, code);
   }
 
   if (!this.message) {

@@ -1,5 +1,5 @@
 import Button from '../button.js';
-import * as Lib from '../lib.js';
+import assign from 'object.assign';
 
 /**
  * The component for a menu item. `<li>`
@@ -18,7 +18,7 @@ class MenuItem extends Button {
 
   /** @inheritDoc */
   createEl(type, props) {
-    return super.createEl('li', Lib.obj.merge({
+    return super.createEl('li', assign({
       className: 'vjs-menu-item',
       innerHTML: this.localize(this.options_['label'])
     }, props));

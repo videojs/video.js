@@ -1,6 +1,8 @@
 import Component from '../component.js';
-import * as Lib from '../lib.js';
+import * as Dom from '../utils/dom.js';
+import roundFloat from '../utils/round-float.js';
 import document from 'global/document';
+import assign from 'object.assign';
 
 /* Slider
 ================================================================================ */
@@ -36,7 +38,7 @@ class Slider extends Component {
   createEl(type, props={}) {
     // Add the slider element class to all sub classes
     props.className = props.className + ' vjs-slider';
-    props = Lib.obj.merge({
+    props = assign({
       'role': 'slider',
       'aria-valuenow': 0,
       'aria-valuemin': 0,
@@ -49,7 +51,7 @@ class Slider extends Component {
 
   handleMouseDown(event) {
     event.preventDefault();
-    Lib.blockTextSelection();
+    Dom.blockTextSelection();
     this.addClass('vjs-sliding');
 
     this.on(document, 'mousemove', this.handleMouseMove);
@@ -64,7 +66,7 @@ class Slider extends Component {
   handleMouseMove() {}
 
   handleMouseUp() {
-    Lib.unblockTextSelection();
+    Dom.unblockTextSelection();
     this.removeClass('vjs-sliding');
 
     this.off(document, 'mousemove', this.handleMouseMove);
@@ -102,7 +104,7 @@ class Slider extends Component {
     let barProgress = this.updateHandlePosition(progress);
 
     // Convert to a percentage for setting
-    let percentage = Lib.round(barProgress * 100, 2) + '%';
+    let percentage = roundFloat(barProgress * 100, 2) + '%';
 
     // Set the new bar width or height
     if (this.vertical()) {
@@ -145,7 +147,7 @@ class Slider extends Component {
     // The bar does reach the left side, so we need to account for this in the bar's width
     let barProgress = adjustedProgress + (handlePercent / 2);
 
-    let percentage = Lib.round(adjustedProgress * 100, 2) + '%';
+    let percentage = roundFloat(adjustedProgress * 100, 2) + '%';
 
     if (vertical) {
       handle.el().style.bottom = percentage;
@@ -158,7 +160,7 @@ class Slider extends Component {
 
   calculateDistance(event){
     let el = this.el_;
-    let box = Lib.findPosition(el);
+    let box = Dom.findPosition(el);
     let boxW = el.offsetWidth;
     let boxH = el.offsetHeight;
     let handle = this.handle;

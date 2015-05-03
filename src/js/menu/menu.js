@@ -1,6 +1,7 @@
 import Component from '../component.js';
-import * as Lib from '../lib.js';
-import * as Events from '../events.js';
+import * as Dom from '../utils/dom.js';
+import * as Fn from '../utils/fn.js';
+import * as Events from '../utils/events.js';
 
 /* Menu
 ================================================================================ */
@@ -21,14 +22,14 @@ class Menu extends Component {
    */
   addItem(component) {
     this.addChild(component);
-    component.on('click', Lib.bind(this, function(){
+    component.on('click', Fn.bind(this, function(){
       this.unlockShowing();
     }));
   }
 
   createEl() {
     let contentElType = this.options().contentElType || 'ul';
-    this.contentEl_ = Lib.createEl(contentElType, {
+    this.contentEl_ = Dom.createEl(contentElType, {
       className: 'vjs-menu-content'
     });
     var el = super.createEl('div', {

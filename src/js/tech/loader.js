@@ -1,6 +1,6 @@
 import Component from '../component';
-import * as Lib from '../lib';
 import window from 'global/window';
+import toTitleCase from '../utils/to-title-case.js';
 
 /**
  * The Media Loader is the component that decides which playback technology to load
@@ -17,7 +17,7 @@ class MediaLoader extends Component {
     // load the first supported playback technology.
     if (!player.options_['sources'] || player.options_['sources'].length === 0) {
       for (let i=0, j=player.options_['techOrder']; i<j.length; i++) {
-        let techName = Lib.capitalize(j[i]);
+        let techName = toTitleCase(j[i]);
         let tech = Component.getComponent(techName);
 
         // Check if the browser supports this technology

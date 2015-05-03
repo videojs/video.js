@@ -1,10 +1,10 @@
-import videojs from '../../src/js/core.js';
+import videojs from '../../src/js/video.js';
+import TestHelpers from './test-helpers.js';
 import Player from '../../src/js/player.js';
-import * as Lib from '../../src/js/lib.js';
 import Options from '../../src/js/options.js';
 import document from 'global/document';
 
-q.module('Core');
+q.module('video.js');
 
 test('should create a video tag and have access children in old IE', function(){
   var fixture = document.getElementById('qunit-fixture');
@@ -44,4 +44,23 @@ test('should add the value to the languages object', function() {
   ok(Options['languages'][code], 'should exist');
   equal(Options['languages'][code], data, 'should match');
   deepEqual(result[code], Options['languages'][code], 'should also match');
+});
+
+
+test('should expose plugin registry function', function() {
+  var pluginName, pluginFunction, player;
+
+  pluginName = 'foo';
+  pluginFunction = function(options) {
+    console.log(this);
+  };
+
+  ok(videojs.plugin, 'should exist');
+
+  videojs.plugin(pluginName, pluginFunction);
+
+  player = TestHelpers.makePlayer();
+
+  ok(player.foo, 'should exist');
+  equal(player.foo, pluginFunction, 'should be equal');
 });

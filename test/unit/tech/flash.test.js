@@ -1,4 +1,4 @@
-import Flash from '../../src/js/tech/flash.js';
+import Flash from '../../../src/js/tech/flash.js';
 import document from 'global/document';
 
 q.module('Flash');

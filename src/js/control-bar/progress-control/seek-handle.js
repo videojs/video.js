@@ -1,5 +1,5 @@
 import SliderHandle from '../../slider/slider-handle.js';
-import * as Lib from '../../lib.js';
+import formatTime from '../../utils/format-time.js';
 
 /**
  * The Seek Handle shows the current position of the playhead during playback,
@@ -26,7 +26,7 @@ class SeekHandle extends SliderHandle {
 
   updateContent() {
     let time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
-    this.el_.innerHTML = `<span class="vjs-control-text">${Lib.formatTime(time, this.player_.duration())}</span>`;
+    this.el_.innerHTML = `<span class="vjs-control-text">${formatTime(time, this.player_.duration())}</span>`;
   }
 
 }

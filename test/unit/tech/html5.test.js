@@ -1,7 +1,7 @@
 var player, tech, el;
 
-import Html5 from '../../src/js/tech/html5.js';
-import * as Lib from '../../src/js/lib.js';
+import Html5 from '../../../src/js/tech/html5.js';
+import * as browser from '../../../src/js/utils/browser.js';
 import document from 'global/document';
 
 q.module('HTML5', {
@@ -40,15 +40,15 @@ test('should detect whether the volume can be changed', function(){
     ok(true, 'your browser does not support this test, skipping it');
     return;
   }
-  testVid = Lib.TEST_VID;
+  testVid = Html5.TEST_VID;
   ConstVolumeVideo = function(){
     this.volume = 1;
     this.__defineSetter__('volume', function(){});
   };
-  Lib.TEST_VID = new ConstVolumeVideo();
+  Html5.TEST_VID = new ConstVolumeVideo();
 
   ok(!Html5.canControlVolume());
-  Lib.TEST_VID = testVid;
+  Html5.TEST_VID = testVid;
 });
 
 test('test playbackRate', function() {
@@ -79,7 +79,7 @@ test('should remove the controls attribute when recreating the element', functio
   el = tech.createEl();
 
   // On the iPhone controls are always true
-  if (!Lib.IS_IPHONE) {
+  if (!browser.IS_IPHONE) {
     ok(!el.controls, 'controls attribute is absent');
   }
 
@@ -90,13 +90,13 @@ test('patchCanPlayType patches canplaytype with our function, conditionally', fu
   // the patch runs automatically so we need to first unpatch
   Html5.unpatchCanPlayType();
 
-  var oldAV = Lib.ANDROID_VERSION,
+  var oldAV = browser.ANDROID_VERSION,
       video = document.createElement('video'),
-      canPlayType = Lib.TEST_VID.constructor.prototype.canPlayType,
+      canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType,
       patchedCanPlayType,
       unpatchedCanPlayType;
 
-  Lib.ANDROID_VERSION = 4.0;
+  browser.ANDROID_VERSION = 4.0;
   Html5.patchCanPlayType();
 
   notStrictEqual(video.canPlayType, canPlayType, 'original canPlayType and patched canPlayType should not be equal');
@@ -104,18 +104,18 @@ test('patchCanPlayType patches canplaytype with our function, conditionally', fu
   patchedCanPlayType = video.canPlayType;
   unpatchedCanPlayType = Html5.unpatchCanPlayType();
 
-  strictEqual(canPlayType, Lib.TEST_VID.constructor.prototype.canPlayType, 'original canPlayType and unpatched canPlayType should be equal');
+  strictEqual(canPlayType, Html5.TEST_VID.constructor.prototype.canPlayType, 'original canPlayType and unpatched canPlayType should be equal');
   strictEqual(patchedCanPlayType, unpatchedCanPlayType, 'patched canPlayType and function returned from unpatch are equal');
 
-  Lib.ANDROID_VERSION = oldAV;
+  browser.ANDROID_VERSION = oldAV;
   Html5.unpatchCanPlayType();
 });
 
 test('should return maybe for HLS urls on Android 4.0 or above', function() {
-  var oldAV = Lib.ANDROID_VERSION,
+  var oldAV = browser.ANDROID_VERSION,
       video = document.createElement('video');
 
-  Lib.ANDROID_VERSION = 4.0;
+  browser.ANDROID_VERSION = 4.0;
   Html5.patchCanPlayType();
 
   strictEqual(video.canPlayType('application/x-mpegurl'), 'maybe', 'android version 4.0 or above should be a maybe for x-mpegurl');
@@ -123,20 +123,20 @@ test('should return maybe for HLS urls on Android 4.0 or above', function() {
   strictEqual(video.canPlayType('application/vnd.apple.mpegurl'), 'maybe', 'android version 4.0 or above should be a maybe for vnd.apple.mpegurl');
   strictEqual(video.canPlayType('application/vnd.apple.mpegURL'), 'maybe', 'android version 4.0 or above should be a maybe for vnd.apple.mpegurl');
 
-  Lib.ANDROID_VERSION = oldAV;
+  browser.ANDROID_VERSION = oldAV;
   Html5.unpatchCanPlayType();
 });
 
 test('should return a maybe for mp4 on OLD ANDROID', function() {
-  var isOldAndroid = Lib.IS_OLD_ANDROID,
+  var isOldAndroid = browser.IS_OLD_ANDROID,
       video = document.createElement('video');
 
-  Lib.IS_OLD_ANDROID = true;
+  browser.IS_OLD_ANDROID = true;
   Html5.patchCanPlayType();
 
   strictEqual(video.canPlayType('video/mp4'), 'maybe', 'old android should return a maybe for video/mp4');
 
-  Lib.IS_OLD_ANDROID = isOldAndroid;
+  browser.IS_OLD_ANDROID = isOldAndroid;
   Html5.unpatchCanPlayType();
 });
 
@@ -154,8 +154,8 @@ test('native source handler canHandleSource', function(){
   var result;
 
   // Stub the test video canPlayType (used in canHandleSource) to control results
-  var origCPT = Lib.TEST_VID.canPlayType;
-  Lib.TEST_VID.canPlayType = function(type){
+  var origCPT = Html5.TEST_VID.canPlayType;
+  Html5.TEST_VID.canPlayType = function(type){
     if (type === 'video/mp4') {
       return 'maybe';
     }
@@ -176,5 +176,5 @@ test('native source handler canHandleSource', function(){
   equal(canHandleSource({ type: 'foo' }), '', 'Native source handler handled bad type');
 
   // Reset test video canPlayType
-  Lib.TEST_VID.canPlayType = origCPT;
+  Html5.TEST_VID.canPlayType = origCPT;
 });

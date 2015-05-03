@@ -1,6 +1,8 @@
 import Button from '../button.js';
 import Menu from './menu.js';
-import * as Lib from '../lib.js';
+import * as Dom from '../utils/dom.js';
+import * as Fn from '../utils/fn.js';
+import toTitleCase from '../utils/to-title-case.js';
 
 /**
  * A button class with a popup menu
@@ -49,9 +51,9 @@ class MenuButton extends Button {
 
     // Add a title list item to the top
     if (this.options().title) {
-      menu.contentEl().appendChild(Lib.createEl('li', {
+      menu.contentEl().appendChild(Dom.createEl('li', {
         className: 'vjs-menu-title',
-        innerHTML: Lib.capitalize(this.options().title),
+        innerHTML: toTitleCase(this.options().title),
         tabindex: -1
       }));
     }
@@ -91,7 +93,7 @@ class MenuButton extends Button {
     // When you click the button it adds focus, which will show the menu indefinitely.
     // So we'll remove focus when the mouse leaves the button.
     // Focus is needed for tab navigation.
-    this.one('mouseout', Lib.bind(this, function(){
+    this.one('mouseout', Fn.bind(this, function(){
       this.menu.unlockShowing();
       this.el_.blur();
     }));

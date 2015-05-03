@@ -1,6 +1,6 @@
 import TextTrackMenuItem from '../../../src/js/control-bar/text-track-controls/text-track-menu-item.js';
 import TestHelpers from '../test-helpers.js';
-import * as Lib from '../../../src/js/lib.js';
+import * as browser from '../../../src/js/utils/browser.js';
 
 q.module('Text Track Controls');
 
@@ -79,7 +79,7 @@ test('menu should update with removeRemoteTextTrack', function() {
   equal(player.textTracks().length, 1, 'textTracks contains one item');
 });
 
-if (!Lib.IS_IE8) {
+if (!browser.IS_IE8) {
   // This test doesn't work on IE8.
   // However, this test tests a specific with iOS7 where the TextTrackList doesn't report track mode changes.
   // TODO: figure out why this test doens't work on IE8. https://github.com/videojs/video.js/issues/1861

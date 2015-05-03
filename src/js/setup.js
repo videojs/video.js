@@ -1,4 +1,4 @@
-import * as Events from './events';
+import * as Events from './utils/events.js';
 import document from 'global/document';
 import window from 'global/window';
 

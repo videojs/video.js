@@ -1,5 +1,4 @@
 import Component from '../component.js';
-import * as Lib from '../lib.js';
 
 // Required children
 import PlayToggle from './play-toggle.js';
@@ -29,7 +28,7 @@ import CustomControlSpacer from './spacer-controls/custom-control-spacer.js';
  */
 class ControlBar extends Component {
   createEl() {
-    return Lib.createEl('div', {
+    return super.createEl('div', {
       className: 'vjs-control-bar'
     });
   }

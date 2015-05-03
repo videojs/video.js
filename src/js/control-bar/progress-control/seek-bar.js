@@ -2,7 +2,9 @@ import Slider from '../../slider/slider.js';
 import LoadProgressBar from './load-progress-bar.js';
 import PlayProgressBar from './play-progress-bar.js';
 import SeekHandle from './seek-handle.js';
-import * as Lib from '../../lib.js';
+import * as Fn from '../../utils/fn.js';
+import formatTime from '../../utils/format-time.js';
+import roundFloat from '../../utils/round-float.js';
 
 /**
  * Seek Bar and holder for the progress bars
@@ -16,7 +18,7 @@ class SeekBar extends Slider {
   constructor(player, options){
     super(player, options);
     this.on(player, 'timeupdate', this.updateARIAAttributes);
-    player.ready(Lib.bind(this, this.updateARIAAttributes));
+    player.ready(Fn.bind(this, this.updateARIAAttributes));
   }
 
   createEl() {
@@ -29,8 +31,8 @@ class SeekBar extends Slider {
   updateARIAAttributes() {
       // Allows for smooth scrubbing, when player can't keep up.
       let time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
-      this.el_.setAttribute('aria-valuenow', Lib.round(this.getPercent()*100, 2)); // machine readable value of progress bar (percentage complete)
-      this.el_.setAttribute('aria-valuetext', Lib.formatTime(time, this.player_.duration())); // human readable value of progress bar (time complete)
+      this.el_.setAttribute('aria-valuenow', roundFloat(this.getPercent()*100, 2)); // machine readable value of progress bar (percentage complete)
+      this.el_.setAttribute('aria-valuetext', formatTime(time, this.player_.duration())); // human readable value of progress bar (time complete)
   }
 
   getPercent() {

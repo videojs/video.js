@@ -1,5 +1,4 @@
-import * as Events from './events';
-import * as Lib from './lib';
+import * as Events from './utils/events.js';
 
 var EventEmitter = function() {};
 

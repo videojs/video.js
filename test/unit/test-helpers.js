@@ -1,5 +1,5 @@
 import Player from '../../src/js/player.js';
-import MediaFaker from './mediafaker.js';
+import TechFaker from './tech/tech-faker.js';
 import window from 'global/window';
 import document from 'global/document';
 
@@ -20,7 +20,7 @@ var TestHelpers = {
     fixture.appendChild(videoTag);
 
     playerOptions = playerOptions || {};
-    playerOptions['techOrder'] = playerOptions['techOrder'] || ['mediaFaker'];
+    playerOptions['techOrder'] = playerOptions['techOrder'] || ['techFaker'];
 
     return player = new Player(videoTag, playerOptions);
   },

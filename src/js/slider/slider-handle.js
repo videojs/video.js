@@ -1,5 +1,5 @@
 import Component from '../component.js';
-import * as Lib from '../lib.js';
+import assign from 'object.assign';
 
 /**
  * SeekBar Behavior includes play progress bar, and seek handle
@@ -15,7 +15,7 @@ class SliderHandle extends Component {
     props = props || {};
     // Add the slider element class to all sub classes
     props.className = props.className + ' vjs-slider-handle';
-    props = Lib.obj.merge({
+    props = assign({
       innerHTML: `<span class="vjs-control-text">${this.defaultValue || 0}</span>`
     }, props);
 

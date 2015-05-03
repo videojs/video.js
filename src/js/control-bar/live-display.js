@@ -1,5 +1,5 @@
 import Component from '../component';
-import * as Lib from '../lib';
+import * as Dom from '../utils/dom.js';
 
 /**
  * Displays the live indicator
@@ -15,7 +15,7 @@ class LiveDisplay extends Component {
       className: 'vjs-live-control vjs-control'
     });
 
-    this.contentEl_ = Lib.createEl('div', {
+    this.contentEl_ = Dom.createEl('div', {
       className: 'vjs-live-display',
       innerHTML: `<span class="vjs-control-text">${this.localize('Stream Type')}</span>${this.localize('LIVE')}`,
       'aria-live': 'off'

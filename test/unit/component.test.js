@@ -1,6 +1,7 @@
 import Component from '../../src/js/component.js';
-import * as Lib from '../../src/js/lib.js';
-import * as Events from '../../src/js/events.js';
+import * as Dom from '../../src/js/utils/dom.js';
+import * as Events from '../../src/js/utils/events.js';
+import * as browser from '../../src/js/utils/browser.js';
 import document from 'global/document';
 
 q.module('Component', {
@@ -164,8 +165,8 @@ test('should dispose of component and children', function(){
 
   // Add a listener
   comp.on('click', function(){ return true; });
-  var data = Lib.getData(comp.el());
-  var id = comp.el()[Lib.expando];
+  var data = Dom.getData(comp.el());
+  var id = comp.el()[Dom.expando];
 
   var hasDisposed = false;
   var bubbles = null;
@@ -182,8 +183,8 @@ test('should dispose of component and children', function(){
   ok(!comp.el(), 'component element was deleted');
   ok(!child.children(), 'child children were deleted');
   ok(!child.el(), 'child element was deleted');
-  ok(!Lib.cache[id], 'listener cache nulled');
-  ok(Lib.isEmpty(data), 'original listener cache object was emptied');
+  ok(!Dom.cache[id], 'listener cache nulled');
+  ok(!Object.getOwnPropertyNames(data).length, 'original listener cache object was emptied');
 });
 
 test('should add and remove event listeners to element', function(){
@@ -427,7 +428,7 @@ test('should change the width and height of a component', function(){
   comp.height('123px');
 
   ok(comp.width() === 500, 'percent values working');
-  var compStyle = Lib.getComputedDimension(el, 'width');
+  var compStyle = Dom.getComputedDimension(el, 'width');
   ok(compStyle === comp.width() + 'px', 'matches computed style');
   ok(comp.height() === 123, 'px values working');
 
@@ -446,9 +447,9 @@ test('should use a defined content el for appending children', function(){
 
   CompWithContent.prototype.createEl = function(){
     // Create the main componenent element
-    var el = Lib.createEl('div');
+    var el = Dom.createEl('div');
     // Create the element where children will be appended
-    this.contentEl_ = Lib.createEl('div', { 'id': 'contentEl' });
+    this.contentEl_ = Dom.createEl('div', { 'id': 'contentEl' });
     el.appendChild(this.contentEl_);
     return el;
   };
@@ -471,8 +472,8 @@ test('should emit a tap event', function(){
   expect(3);
 
   // Fake touch support. Real touch support isn't needed for this test.
-  var origTouch = Lib.TOUCH_ENABLED;
-  Lib.TOUCH_ENABLED = true;
+  var origTouch = browser.TOUCH_ENABLED;
+  browser.TOUCH_ENABLED = true;
 
   var comp = new Component(getFakePlayer());
   var singleTouch = {};
@@ -523,7 +524,7 @@ test('should emit a tap event', function(){
   comp.trigger('touchend');
 
   // Reset to orignial value
-  Lib.TOUCH_ENABLED = origTouch;
+  browser.TOUCH_ENABLED = origTouch;
 });
 
 test('should provide timeout methods that automatically get cleared on component disposal', function() {

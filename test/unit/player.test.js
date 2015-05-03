@@ -1,7 +1,9 @@
 import Player from '../../src/js/player.js';
-import videojs from '../../src/js/core.js';
+import videojs from '../../src/js/video.js';
 import Options from '../../src/js/options.js';
-import * as Lib from '../../src/js/lib.js';
+import * as Dom from '../../src/js/utils/dom.js';
+import * as browser from '../../src/js/utils/browser.js';
+import log from '../../src/js/utils/log.js';
 import MediaError from '../../src/js/media-error.js';
 import Html5 from '../../src/js/tech/html5.js';
 import TestHelpers from './test-helpers.js';
@@ -133,7 +135,7 @@ test('should get tag, source, and track settings', function(){
 test('should asynchronously fire error events during source selection', function() {
   expect(2);
 
-  sinon.stub(Lib.log, 'error');
+  sinon.stub(log, 'error');
 
   var player = TestHelpers.makePlayer({
     'techOrder': ['foo'],
@@ -150,7 +152,7 @@ test('should asynchronously fire error events during source selection', function
   this.clock.tick(1);
 
   player.dispose();
-  Lib.log.error.restore();
+  log.error.restore();
 });
 
 test('should set the width, height, and aspect ratio via a css class', function(){
@@ -389,15 +391,15 @@ test('should add a touch-enabled classname when touch is supported', function(){
   expect(1);
 
   // Fake touch support. Real touch support isn't needed for this test.
-  var origTouch = Lib.TOUCH_ENABLED;
-  Lib.TOUCH_ENABLED = true;
+  var origTouch = browser.TOUCH_ENABLED;
+  browser.TOUCH_ENABLED = true;
 
   player = TestHelpers.makePlayer({});
 
   ok(player.el().className.indexOf('vjs-touch-enabled'), 'touch-enabled classname added');
 
 
-  Lib.TOUCH_ENABLED = origTouch;
+  browser.TOUCH_ENABLED = origTouch;
   player.dispose();
 });
 
@@ -551,7 +553,7 @@ test('player should handle different error types', function(){
   var testMsg = 'test message';
 
   // prevent error log messages in the console
-  sinon.stub(Lib.log, 'error');
+  sinon.stub(log, 'error');
 
   // error code supplied
   function errCode(){
@@ -592,7 +594,7 @@ test('player should handle different error types', function(){
   ok(player.el().className.indexOf('vjs-error') >= 0, 'player does not have vjs-error classname');
 
   // restore error logging
-  Lib.log.error.restore();
+  log.error.restore();
 });
 
 test('Data attributes on the video element should persist in the new wrapper element', function() {
@@ -612,7 +614,7 @@ test('should restore attributes from the original video tag when creating a new 
   var tag, html5Mock, el;
 
   // simulate attributes stored from the original tag
-  tag = Lib.createEl('video');
+  tag = Dom.createEl('video');
   tag.setAttribute('preload', 'auto');
   tag.setAttribute('autoplay', '');
   tag.setAttribute('webkit-playsinline', '');

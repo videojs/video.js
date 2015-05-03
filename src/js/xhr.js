@@ -1,5 +1,6 @@
-import * as VjsUtils from './util';
-import * as Lib from './lib';
+import * as Url from './utils/url.js';
+import log from './utils/log.js';
+import mergeOptions from './utils/merge-options.js';
 import window from 'global/window';
 
 /**
@@ -43,7 +44,7 @@ var xhr = function(options, callback){
   }
 
   // Merge with default options
-  VjsUtils.mergeOptions({
+  mergeOptions({
     method: 'GET',
     timeout: 45 * 1000
   }, options);
@@ -66,7 +67,7 @@ var xhr = function(options, callback){
   // Store a reference to the url on the request instance
   request.uri = options.uri;
 
-  let urlInfo = Lib.parseUrl(options.uri);
+  let urlInfo = Url.parseUrl(options.uri);
   let winLoc = window.location;
 
   let successHandler = function(){

@@ -1,12 +1,20 @@
 import Component from './component.js';
-import * as Lib from './lib.js';
-import * as Events from './events.js';
+import * as Events from './utils/events.js';
+import * as Dom from './utils/dom.js';
+import * as Fn from './utils/fn.js';
+import * as Guid from './utils/guid.js';
+import * as browser from './utils/browser.js';
+import log from './utils/log.js';
+import toTitleCase from './utils/to-title-case.js';
+import { createTimeRange } from './utils/time-ranges.js';
 import FullscreenApi from './fullscreen-api.js';
 import MediaError from './media-error.js';
 import Options from './options.js';
 import safeParseTuple from 'safe-json-parse/tuple';
 import window from 'global/window';
 import document from 'global/document';
+import assign from 'object.assign';
+import mergeOptions from './utils/merge-options.js';
 
 // Include required child components
 import MediaLoader from './tech/loader.js';
@@ -53,14 +61,14 @@ class Player extends Component {
    */
   constructor(tag, options, ready){
     // Make sure tag ID exists
-    tag.id = tag.id || `vjs_video_${Lib.guid++}`;
+    tag.id = tag.id || `vjs_video_${Guid.newGUID()}`;
 
     // Set Options
     // The options argument overrides options set in the video tag
     // which overrides globally set options.
     // This latter part coincides with the load order
     // (tag must exist before Player)
-    options = Lib.obj.merge(Player.getTagSettings(tag), options);
+    options = assign(Player.getTagSettings(tag), options);
 
     // Delay the initialization of children because we need to set up
     // player properties first, and can't use `this` before `super()`
@@ -90,7 +98,7 @@ class Player extends Component {
     this.tag = tag; // Store the original tag used to set options
 
     // Store the tag attributes used to restore html5 element
-    this.tagAttributes = tag && Lib.getElementAttributes(tag);
+    this.tagAttributes = tag && Dom.getElementAttributes(tag);
 
     // Update Current Language
     this.language_ = options['language'] || Options['language'];
@@ -122,8 +130,10 @@ class Player extends Component {
 
     // Load plugins
     if (options['plugins']) {
-      Lib.obj.each(options['plugins'], function(key, val){
-        this[key](val);
+      let plugins = options['plugins'];
+
+      Object.getOwnPropertyNames(plugins).forEach(function(name){
+        this[name](plugins[name]);
       }, this);
     }
 
@@ -150,7 +160,7 @@ class Player extends Component {
 
     // TODO: Make this smarter. Toggle user state between touching/mousing
     // using events, since devices can have both touch and mouse events.
-    // if (Lib.TOUCH_ENABLED) {
+    // if (browser.TOUCH_ENABLED) {
     //   this.addClass('vjs-touch-enabled');
     // }
 
@@ -200,8 +210,9 @@ class Player extends Component {
 
     // Copy over all the attributes from the tag, including ID and class
     // ID will now reference player box, not the video tag
-    const attrs = Lib.getElementAttributes(tag);
-    Lib.obj.each(attrs, function(attr) {
+    const attrs = Dom.getElementAttributes(tag);
+
+    Object.getOwnPropertyNames(attrs).forEach(function(attr){
       // workaround so we don't totally break IE7
       // http://stackoverflow.com/questions/3653444/css-styles-not-applied-on-dynamic-elements-in-internet-explorer-7
       if (attr === 'class') {
@@ -234,7 +245,7 @@ class Player extends Component {
     this.fluid(this.options_['fluid']);
     this.aspectRatio(this.options_['aspectRatio']);
 
-    // Lib.insertFirst seems to cause the networkState to flicker from 3 to 2, so
+    // insertFirst seems to cause the networkState to flicker from 3 to 2, so
     // keep track of the original for later so we can know if the source originally failed
     tag.initNetworkState_ = tag.networkState;
 
@@ -242,7 +253,7 @@ class Player extends Component {
     if (tag.parentNode) {
       tag.parentNode.insertBefore(el, tag);
     }
-    Lib.insertFirst(tag, el); // Breaks iPhone, fixed in HTML5 setup.
+    Dom.insertFirst(tag, el); // Breaks iPhone, fixed in HTML5 setup.
 
     this.el_ = el;
 
@@ -271,7 +282,7 @@ class Player extends Component {
       let parsedVal = parseFloat(value);
 
       if (isNaN(parsedVal)) {
-        Lib.log.error(`Improper value "${value}" supplied for for ${dimension}`);
+        log.error(`Improper value "${value}" supplied for for ${dimension}`);
         return this;
       }
 
@@ -396,12 +407,12 @@ class Player extends Component {
     // Turn off API access because we're loading a new tech that might load asynchronously
     this.isReady_ = false;
 
-    var techReady = Lib.bind(this, function() {
+    var techReady = Fn.bind(this, function() {
       this.triggerReady();
     });
 
     // Grab tech-specific options from player options and add source and parent element to use.
-    var techOptions = Lib.obj.merge({
+    var techOptions = assign({
       'source': source,
       'playerId': this.id(),
       'textTracks': this.textTracks_
@@ -462,7 +473,7 @@ class Player extends Component {
     // Add the tech element in the DOM if it was not already there
     // Make sure to not insert the original video element if using Html5
     if (this.tech.el().parentNode !== this.el() && (techName !== 'Html5' || !this.tag)) {
-      Lib.insertFirst(this.tech.el(), this.el());
+      Dom.insertFirst(this.tech.el(), this.el());
     }
 
     // Get rid of the original video tag reference after the first tech is loaded
@@ -928,7 +939,7 @@ class Player extends Component {
       try {
         this.tech[method](arg);
       } catch(e) {
-        Lib.log(e);
+        log(e);
         throw e;
       }
     }
@@ -946,14 +957,14 @@ class Player extends Component {
       } catch(e) {
         // When building additional tech libs, an expected method may not be defined yet
         if (this.tech[method] === undefined) {
-          Lib.log(`Video.js: ${method} method not defined for ${this.techName} playback technology.`, e);
+          log(`Video.js: ${method} method not defined for ${this.techName} playback technology.`, e);
         } else {
           // When a method isn't available on the object it throws a TypeError
           if (e.name === 'TypeError') {
-            Lib.log(`Video.js: ${method} unavailable on ${this.techName} playback technology element.`, e);
+            log(`Video.js: ${method} unavailable on ${this.techName} playback technology element.`, e);
             this.tech.isReady_ = false;
           } else {
-            Lib.log(e);
+            log(e);
           }
         }
         throw e;
@@ -1120,7 +1131,7 @@ class Player extends Component {
     var buffered = this.techGet('buffered');
 
     if (!buffered || !buffered.length) {
-      buffered = Lib.createTimeRange(0,0);
+      buffered = createTimeRange(0,0);
     }
 
     return buffered;
@@ -1201,7 +1212,7 @@ class Player extends Component {
       vol = Math.max(0, Math.min(1, parseFloat(percentAsDecimal))); // Force value to between 0 and 1
       this.cache_.volume = vol;
       this.techCall('setVolume', vol);
-      Lib.setLocalStorage('volume', vol);
+
       return this;
     }
 
@@ -1268,7 +1279,7 @@ class Player extends Component {
    * @deprecated for lowercase 's' version
    */
   isFullScreen(isFS) {
-    Lib.log.warn('player.isFullScreen() has been deprecated, use player.isFullscreen() with a lowercase "s")');
+    log.warn('player.isFullScreen() has been deprecated, use player.isFullscreen() with a lowercase "s")');
     return this.isFullscreen(isFS);
   }
 
@@ -1300,7 +1311,7 @@ class Player extends Component {
       // when canceling fullscreen. Otherwise if there's multiple
       // players on a page, they would all be reacting to the same fullscreen
       // events
-      Events.on(document, fsApi['fullscreenchange'], Lib.bind(this, function documentFullscreenChange(e){
+      Events.on(document, fsApi['fullscreenchange'], Fn.bind(this, function documentFullscreenChange(e){
         this.isFullscreen(document[fsApi.fullscreenElement]);
 
         // If cancelling fullscreen, remove event listener.
@@ -1332,7 +1343,7 @@ class Player extends Component {
    * @deprecated for lower case 's' version
    */
   requestFullScreen() {
-    Lib.log.warn('player.requestFullScreen() has been deprecated, use player.requestFullscreen() with a lowercase "s")');
+    log.warn('player.requestFullScreen() has been deprecated, use player.requestFullscreen() with a lowercase "s")');
     return this.requestFullscreen();
   }
 
@@ -1365,7 +1376,7 @@ class Player extends Component {
    * @deprecated for exitFullscreen
    */
   cancelFullScreen() {
-    Lib.log.warn('player.cancelFullScreen() has been deprecated, use player.exitFullscreen()');
+    log.warn('player.cancelFullScreen() has been deprecated, use player.exitFullscreen()');
     return this.exitFullscreen();
   }
 
@@ -1377,13 +1388,13 @@ class Player extends Component {
     this.docOrigOverflow = document.documentElement.style.overflow;
 
     // Add listener for esc key to exit fullscreen
-    Events.on(document, 'keydown', Lib.bind(this, this.fullWindowOnEscKey));
+    Events.on(document, 'keydown', Fn.bind(this, this.fullWindowOnEscKey));
 
     // Hide any scroll bars
     document.documentElement.style.overflow = 'hidden';
 
     // Apply fullscreen styles
-    Lib.addClass(document.body, 'vjs-full-window');
+    Dom.addClass(document.body, 'vjs-full-window');
 
     this.trigger('enterFullWindow');
   }
@@ -1406,7 +1417,7 @@ class Player extends Component {
     document.documentElement.style.overflow = this.docOrigOverflow;
 
     // Remove fullscreen styles
-    Lib.removeClass(document.body, 'vjs-full-window');
+    Dom.removeClass(document.body, 'vjs-full-window');
 
     // Resize the box, controller, and poster to original sizes
     // this.positionAll();
@@ -1416,12 +1427,12 @@ class Player extends Component {
   selectSource(sources) {
     // Loop through each playback technology in the options order
     for (var i=0,j=this.options_['techOrder'];i<j.length;i++) {
-      let techName = Lib.capitalize(j[i]);
+      let techName = toTitleCase(j[i]);
       let tech = Component.getComponent(techName);
 
       // Check if the current tech is defined before continuing
       if (!tech) {
-        Lib.log.error(`The "${techName}" tech is undefined. Skipped browser support check for that tech.`);
+        log.error(`The "${techName}" tech is undefined. Skipped browser support check for that tech.`);
         continue;
       }
 
@@ -1478,7 +1489,7 @@ class Player extends Component {
     let currentTech = Component.getComponent(this.techName);
 
     // case: Array of source objects to choose from and pick the best to play
-    if (Lib.obj.isArray(source)) {
+    if (Array.isArray(source)) {
       this.sourceList_(source);
 
     // case: URL String (http://myvideo...)
@@ -1782,7 +1793,7 @@ class Player extends Component {
 
     // log the name of the error type and any message
     // ie8 just logs "[object object]" if you just log the error object
-    Lib.log.error(`(CODE:${this.error_.code} ${MediaError.errorTypes[this.error_.code]})`, this.error_.message, this.error_);
+    log.error(`(CODE:${this.error_.code} ${MediaError.errorTypes[this.error_.code]})`, this.error_.message, this.error_);
 
     return this;
   }
@@ -1848,7 +1859,7 @@ class Player extends Component {
   listenForUserActivity() {
     let mouseInProgress, lastMoveX, lastMoveY;
 
-    let handleActivity = Lib.bind(this, this.reportUserActivity);
+    let handleActivity = Fn.bind(this, this.reportUserActivity);
 
     let handleMouseMove = function(e) {
       // #1068 - Prevent mousemove spamming
@@ -2100,7 +2111,7 @@ class Player extends Component {
   }
 
   toJSON() {
-    let options = Lib.obj.deepMerge({}, this.options());
+    let options = mergeOptions(this.options());
     let tracks = options.tracks;
 
     options.tracks = [];
@@ -2109,7 +2120,7 @@ class Player extends Component {
       let track = tracks[i];
 
       // deep merge tracks and null out player so no circular references
-      track = Lib.obj.deepMerge({}, track);
+      track = mergeOptions(track);
       track.player = undefined;
       options.tracks[i] = track;
     }
@@ -2123,7 +2134,7 @@ class Player extends Component {
       'tracks': []
     };
 
-    const tagOptions = Lib.getElementAttributes(tag);
+    const tagOptions = Dom.getElementAttributes(tag);
     const dataSetup = tagOptions['data-setup'];
 
     // Check if data-setup attr exists.
@@ -2132,12 +2143,12 @@ class Player extends Component {
       // If empty string, make it a parsable json object.
       const [err, data] = safeParseTuple(dataSetup || '{}');
       if (err) {
-        Lib.log.error(err);
+        log.error(err);
       }
-      Lib.obj.merge(tagOptions, data);
+      assign(tagOptions, data);
     }
 
-    Lib.obj.merge(baseOptions, tagOptions);
+    assign(baseOptions, tagOptions);
 
     // Get tag children settings
     if (tag.hasChildNodes()) {
@@ -2148,9 +2159,9 @@ class Player extends Component {
         // Change case needed: http://ejohn.org/blog/nodename-case-sensitivity/
         const childName = child.nodeName.toLowerCase();
         if (childName === 'source') {
-          baseOptions['sources'].push(Lib.getElementAttributes(child));
+          baseOptions['sources'].push(Dom.getElementAttributes(child));
         } else if (childName === 'track') {
-          baseOptions['tracks'].push(Lib.getElementAttributes(child));
+          baseOptions['tracks'].push(Dom.getElementAttributes(child));
         }
       }
     }

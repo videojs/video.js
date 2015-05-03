@@ -1,6 +1,9 @@
 import TextTrackCueList from './text-track-cue-list';
-import * as Lib from '../lib';
+import * as Fn from '../utils/fn.js';
+import * as Guid from '../utils/guid.js';
+import * as browser from '../utils/browser.js';
 import * as TextTrackEnum from './text-track-enums';
+import log from '../utils/log.js';
 import EventEmitter from '../event-emitter';
 import document from 'global/document';
 import window from 'global/window';
@@ -34,7 +37,7 @@ let TextTrack = function(options={}) {
   }
 
   let tt = this;
-  if (Lib.IS_IE8) {
+  if (browser.IS_IE8) {
     tt = document.createElement('custom');
 
     for (let prop in TextTrack.prototype) {
@@ -48,7 +51,7 @@ let TextTrack = function(options={}) {
   let kind = TextTrackEnum.TextTrackKind[options['kind']] || 'subtitles';
   let label = options['label'] || '';
   let language = options['language'] || options['srclang'] || '';
-  let id = options['id'] || 'vjs_text_track_' + Lib.guid++;
+  let id = options['id'] || 'vjs_text_track_' + Guid.newGUID();
 
   if (kind === 'metadata' || kind === 'chapters') {
     mode = 'hidden';
@@ -61,7 +64,7 @@ let TextTrack = function(options={}) {
   let activeCues = new TextTrackCueList(tt.activeCues_);
 
   let changed = false;
-  let timeupdateHandler = Lib.bind(tt, function() {
+  let timeupdateHandler = Fn.bind(tt, function() {
     this['activeCues'];
     if (changed) {
       this['trigger']('cuechange');
@@ -175,12 +178,12 @@ let TextTrack = function(options={}) {
     tt.loaded_ = true;
   }
 
-  if (Lib.IS_IE8) {
+  if (browser.IS_IE8) {
     return tt;
   }
 };
 
-TextTrack.prototype = Lib.obj.create(EventEmitter.prototype);
+TextTrack.prototype = Object.create(EventEmitter.prototype);
 TextTrack.prototype.constructor = TextTrack;
 
 /*
@@ -238,7 +241,7 @@ var parseCues = function(srcContent, track) {
     track.addCue(cue);
   };
   parser['onparsingerror'] = function(error) {
-    Lib.log.error(error);
+    log.error(error);
   };
 
   parser['parse'](srcContent);
@@ -246,9 +249,9 @@ var parseCues = function(srcContent, track) {
 };
 
 var loadTrack = function(src, track) {
-  XHR(src, Lib.bind(this, function(err, response, responseBody){
+  XHR(src, Fn.bind(this, function(err, response, responseBody){
     if (err) {
-      return Lib.log.error(err);
+      return log.error(err);
     }
 
 

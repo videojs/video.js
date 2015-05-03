@@ -8,7 +8,7 @@ import Flash from '../../../src/js/tech/flash.js';
 import Tech from '../../../src/js/tech/tech.js';
 import Component from '../../../src/js/component.js';
 
-import * as Lib from '../../../src/js/lib.js';
+import * as browser from '../../../src/js/utils/browser.js';
 import TestHelpers from '../test-helpers.js';
 import document from 'global/document';
 
@@ -66,21 +66,8 @@ test('TextTrackDisplay initializes tracks on player ready', function() {
   equal(calls, 1, 'only a player.ready call was made');
 });
 
-// This is a bad test that breaks in Firefox because we disable FF for other reasons.
-// test('html5 tech supports native text tracks if the video supports it', function() {
-//   var oldTestVid = Lib.TEST_VID;
-//
-//   Lib.TEST_VID = {
-//     textTracks: []
-//   };
-//
-//   ok(Html5.supportsNativeTextTracks(), 'if textTracks are available on video element, native text tracks are supported');
-//
-//   Lib.TEST_VID = oldTestVid;
-// });
-
 test('listen to remove and add track events in native text tracks', function() {
-  var oldTestVid = Lib.TEST_VID,
+  var oldTestVid = Html5.TEST_VID,
       player,
       options,
       oldTextTracks,
@@ -96,7 +83,7 @@ test('listen to remove and add track events in native text tracks', function() {
     };
   };
 
-  Lib.TEST_VID = {
+  Html5.TEST_VID = {
     textTracks: []
   };
 
@@ -124,7 +111,7 @@ test('listen to remove and add track events in native text tracks', function() {
   ok(events['removetrack'], 'removetrack listener was added');
   ok(events['addtrack'], 'addtrack listener was added');
 
-  Lib.TEST_VID = oldTestVid;
+  Html5.TEST_VID = oldTestVid;
   Html5.prototype.textTracks = oldTextTracks;
 });
 
@@ -210,8 +197,8 @@ test('update texttrack buttons on removetrack or addtrack', function() {
 });
 
 test('if native text tracks are not supported, create a texttrackdisplay', function() {
-  var oldTestVid = Lib.TEST_VID,
-      oldIsFirefox = Lib.IS_FIREFOX,
+  var oldTestVid = Html5.TEST_VID,
+      oldIsFirefox = browser.IS_FIREFOX,
       oldTextTrackDisplay = Component.getComponent('TextTrackDisplay'),
       called = false,
       player,
@@ -234,11 +221,11 @@ test('if native text tracks are not supported, create a texttrackdisplay', funct
   track.src = 'es.vtt';
   tag.appendChild(track);
 
-  Lib.TEST_VID = {
+  Html5.TEST_VID = {
     textTracks: []
   };
 
-  Lib.IS_FIREFOX = true;
+  browser.IS_FIREFOX = true;
   Component.registerComponent('TextTrackDisplay', function() {
     called = true;
   });
@@ -247,8 +234,8 @@ test('if native text tracks are not supported, create a texttrackdisplay', funct
 
   ok(called, 'text track display was created');
 
-  Lib.TEST_VID = oldTestVid;
-  Lib.IS_FIREFOX = oldIsFirefox;
+  Html5.TEST_VID = oldTestVid;
+  browser.IS_FIREFOX = oldIsFirefox;
   Component.registerComponent('TextTrackDisplay', oldTextTrackDisplay);
 });
 
@@ -272,9 +259,9 @@ test('Player track methods call the tech', function() {
 });
 
 test('html5 tech supports native text tracks if the video supports it, unless mode is a number', function() {
-  var oldTestVid = Lib.TEST_VID;
+  var oldTestVid = Html5.TEST_VID;
 
-  Lib.TEST_VID = {
+  Html5.TEST_VID = {
     textTracks: [{
       mode: 0
     }]
@@ -282,23 +269,23 @@ test('html5 tech supports native text tracks if the video supports it, unless mo
 
   ok(!Html5.supportsNativeTextTracks(), 'native text tracks are not supported if mode is a number');
 
-  Lib.TEST_VID = oldTestVid;
+  Html5.TEST_VID = oldTestVid;
 });
 
 test('html5 tech supports native text tracks if the video supports it, unless it is firefox', function() {
-  var oldTestVid = Lib.TEST_VID,
-      oldIsFirefox = Lib.IS_FIREFOX;
+  var oldTestVid = Html5.TEST_VID,
+      oldIsFirefox = browser.IS_FIREFOX;
 
-  Lib.TEST_VID = {
+  Html5.TEST_VID = {
     textTracks: []
   };
 
-  Lib.IS_FIREFOX = true;
+  browser.IS_FIREFOX = true;
 
   ok(!Html5.supportsNativeTextTracks(), 'if textTracks are available on video element, native text tracks are supported');
 
-  Lib.TEST_VID = oldTestVid;
-  Lib.IS_FIREFOX = oldIsFirefox;
+  Html5.TEST_VID = oldTestVid;
+  browser.IS_FIREFOX = oldIsFirefox;
 });
 
 test('when switching techs, we should not get a new text track', function() {

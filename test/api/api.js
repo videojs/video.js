@@ -192,8 +192,7 @@ test('should export useful components to the public', function () {
   ok(videojs.getComponent('ChaptersButton'), 'ChaptersButton should be public');
   ok(videojs.getComponent('ChaptersTrackMenuItem'), 'ChaptersTrackMenuItem should be public');
 
-  ok(videojs.util, 'util namespace should be public');
-  ok(videojs.util.mergeOptions, 'mergeOptions should be public');
+  ok(videojs.mergeOptions, 'mergeOptions should be public');
 });
 
 test('should be able to initialize player twice on the same tag using string reference', function() {

@@ -5,10 +5,13 @@
  */
 
 import Tech from './tech';
-import * as Lib from '../lib';
+import * as Dom from '../utils/dom.js';
+import * as Url from '../utils/url.js';
+import { createTimeRange } from '../utils/time-ranges.js';
 import FlashRtmpDecorator from './flash-rtmp';
 import Component from '../component';
 import window from 'global/window';
+import assign from 'object.assign';
 
 let navigator = window.navigator;
 /**
@@ -30,7 +33,7 @@ class Flash extends Tech {
     let objId = options.playerId+'_flash_api';
 
     // Merge default flashvars with ones passed in to init
-    let flashVars = Lib.obj.merge({
+    let flashVars = assign({
 
       // SWF Callback Functions
       'readyFunction': 'videojs.Flash.onReady',
@@ -46,13 +49,13 @@ class Flash extends Tech {
     }, options.flashVars);
 
     // Merge default parames with ones passed in
-    let params = Lib.obj.merge({
+    let params = assign({
       'wmode': 'opaque', // Opaque is needed to overlay controls, but can affect playback performance
       'bgcolor': '#000000' // Using bgcolor prevents a white flash when the object is loading
     }, options.params);
 
     // Merge default attributes with ones passed in
-    let attributes = Lib.obj.merge({
+    let attributes = assign({
       'id': objId,
       'name': objId, // Both ID and Name needed or swf to identify itself
       'class': 'vjs-tech'
@@ -104,7 +107,7 @@ class Flash extends Tech {
 
   setSrc(src) {
     // Make sure source URL is absolute.
-    src = Lib.getAbsoluteURL(src);
+    src = Url.getAbsoluteURL(src);
     this.el_.vjs_src(src);
 
     // Currently the SWF doesn't autoplay if you load a source later.
@@ -150,7 +153,7 @@ class Flash extends Tech {
   setPoster() {}
 
   buffered() {
-    return Lib.createTimeRange(0, this.el_.vjs_getProperty('buffered'));
+    return createTimeRange(0, this.el_.vjs_getProperty('buffered'));
   }
 
   supportsFullScreen() {
@@ -215,7 +218,7 @@ Flash.nativeSourceHandler.canHandleSource = function(source){
   var type;
 
   function guessMimeType(src) {
-    var ext = Lib.getFileExtension(src);
+    var ext = Url.getFileExtension(src);
     if (ext) {
       return `video/${ext}`;
     }
@@ -264,7 +267,7 @@ Flash.formats = {
 };
 
 Flash.onReady = function(currSwf){
-  let el = Lib.el(currSwf);
+  let el = Dom.el(currSwf);
   let tech = el && el.tech;
 
   // if there is no el then the tech has been disposed
@@ -297,13 +300,13 @@ Flash.checkReady = function(tech){
 
 // Trigger events from the swf on the player
 Flash.onEvent = function(swfID, eventName){
-  let tech = Lib.el(swfID).tech;
+  let tech = Dom.el(swfID).tech;
   tech.trigger(eventName);
 };
 
 // Log errors from the swf
 Flash.onError = function(swfID, err){
-  const tech = Lib.el(swfID).tech;
+  const tech = Dom.el(swfID).tech;
   const msg = 'FLASH: '+err;
 
   if (err === 'srcnotfound') {
@@ -339,7 +342,7 @@ Flash.embed = function(swf, flashVars, params, attributes){
   const code = Flash.getEmbedCode(swf, flashVars, params, attributes);
 
   // Get element by embedding code and retrieving created element
-  const obj = Lib.createEl('div', { innerHTML: code }).childNodes[0];
+  const obj = Dom.createEl('div', { innerHTML: code }).childNodes[0];
 
   return obj;
 };
@@ -352,13 +355,13 @@ Flash.getEmbedCode = function(swf, flashVars, params, attributes){
 
   // Convert flash vars to string
   if (flashVars) {
-    Lib.obj.each(flashVars, function(key, val){
-      flashVarsString += `${key}=${val}&amp;`;
+    Object.getOwnPropertyNames(flashVars).forEach(function(key){
+      flashVarsString += `${key}=${flashVars[key]}&amp;`;
     });
   }
 
   // Add swf, flashVars, and other default params
-  params = Lib.obj.merge({
+  params = assign({
     'movie': swf,
     'flashvars': flashVarsString,
     'allowScriptAccess': 'always', // Required to talk to swf
@@ -366,11 +369,11 @@ Flash.getEmbedCode = function(swf, flashVars, params, attributes){
   }, params);
 
   // Create param tags string
-  Lib.obj.each(params, function(key, val){
-    paramsString += `<param name="${key}" value="${val}" />`;
+  Object.getOwnPropertyNames(params).forEach(function(key){
+    paramsString += `<param name="${key}" value="${params[key]}" />`;
   });
 
-  attributes = Lib.obj.merge({
+  attributes = assign({
     // Add swf to attributes (need both for IE and Others to work)
     'data': swf,
 
@@ -381,8 +384,8 @@ Flash.getEmbedCode = function(swf, flashVars, params, attributes){
   }, attributes);
 
   // Create Attributes string
-  Lib.obj.each(attributes, function(key, val){
-    attrsString += `${key}="${val}" `;
+  Object.getOwnPropertyNames(attributes).forEach(function(key){
+    attrsString += `${key}="${attributes[key]}" `;
   });
 
   return `${objTag}${attrsString}>${paramsString}</object>`;

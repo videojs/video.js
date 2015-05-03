@@ -1,5 +1,7 @@
 import Button from './button';
-import * as Lib from './lib';
+import * as Fn from './utils/fn.js';
+import * as Dom from './utils/dom.js';
+import * as browser from './utils/browser.js';
 
 /* Poster Image
 ================================================================================ */
@@ -16,7 +18,7 @@ class PosterImage extends Button {
     super(player, options);
 
     this.update();
-    player.on('posterchange', Lib.bind(this, this.update));
+    player.on('posterchange', Fn.bind(this, this.update));
   }
 
   /**
@@ -32,7 +34,7 @@ class PosterImage extends Button {
    * @return {Element}
    */
   createEl() {
-    let el = Lib.createEl('div', {
+    let el = Dom.createEl('div', {
       className: 'vjs-poster',
 
       // Don't want poster to be tabbable.
@@ -43,8 +45,8 @@ class PosterImage extends Button {
     // ratio, use a div with `background-size` when available. For browsers that
     // do not support `background-size` (e.g. IE8), fall back on using a regular
     // img element.
-    if (!Lib.BACKGROUND_SIZE_SUPPORTED) {
-      this.fallbackImg_ = Lib.createEl('img');
+    if (!browser.BACKGROUND_SIZE_SUPPORTED) {
+      this.fallbackImg_ = Dom.createEl('img');
       el.appendChild(this.fallbackImg_);
     }
 

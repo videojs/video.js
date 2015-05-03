@@ -1,14 +1,12 @@
 // Fake a media playback tech controller so that player tests
 // can run without HTML5 or Flash, of which PhantomJS supports neither.
 
-import Tech from '../../src/js/tech/tech.js';
-import * as Lib from '../../src/js/lib.js';
-import Component from '../../src/js/component.js';
+import Tech from '../../../src/js/tech/tech.js';
 
 /**
  * @constructor
  */
-class MediaFaker extends Tech {
+class TechFaker extends Tech {
 
   constructor(options, handleReady){
     super(options, handleReady);
@@ -53,5 +51,5 @@ class MediaFaker extends Tech {
   static canPlaySource(srcObj) { return srcObj.type !== 'video/unsupported-format'; }
 }
 
-Component.registerComponent('MediaFaker', MediaFaker);
-module.exports = MediaFaker;
+Tech.registerComponent('TechFaker', TechFaker);
+export default TechFaker;

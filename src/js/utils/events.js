@@ -5,9 +5,194 @@
  * robust as jquery's, so there's probably some differences.
  */
 
-import * as Lib from './lib';
+import * as Dom from './dom.js';
+import * as Guid from './guid.js';
 import window from 'global/window';
 import document from 'global/document';
+
+/**
+ * Add an event listener to element
+ * It stores the handler function in a separate cache object
+ * and adds a generic handler to the element's event,
+ * along with a unique id (guid) to the element.
+ * @param  {Element|Object}   elem Element or object to bind listeners to
+ * @param  {String|Array}   type Type of event to bind to.
+ * @param  {Function} fn   Event listener.
+ */
+export function on(elem, type, fn){
+  if (Array.isArray(type)) {
+    return _handleMultipleEvents(on, elem, type, fn);
+  }
+
+  let data = Dom.getData(elem);
+
+  // We need a place to store all our handler data
+  if (!data.handlers) data.handlers = {};
+
+  if (!data.handlers[type]) data.handlers[type] = [];
+
+  if (!fn.guid) fn.guid = Guid.newGUID();
+
+  data.handlers[type].push(fn);
+
+  if (!data.dispatcher) {
+    data.disabled = false;
+
+    data.dispatcher = function (event){
+
+      if (data.disabled) return;
+      event = fixEvent(event);
+
+      var handlers = data.handlers[event.type];
+
+      if (handlers) {
+        // Copy handlers so if handlers are added/removed during the process it doesn't throw everything off.
+        var handlersCopy = handlers.slice(0);
+
+        for (var m = 0, n = handlersCopy.length; m < n; m++) {
+          if (event.isImmediatePropagationStopped()) {
+            break;
+          } else {
+            handlersCopy[m].call(elem, event);
+          }
+        }
+      }
+    };
+  }
+
+  if (data.handlers[type].length === 1) {
+    if (elem.addEventListener) {
+      elem.addEventListener(type, data.dispatcher, false);
+    } else if (elem.attachEvent) {
+      elem.attachEvent('on' + type, data.dispatcher);
+    }
+  }
+}
+
+/**
+ * Removes event listeners from an element
+ * @param  {Element|Object}   elem Object to remove listeners from
+ * @param  {String|Array=}   type Type of listener to remove. Don't include to remove all events from element.
+ * @param  {Function} fn   Specific listener to remove. Don't include to remove listeners for an event type.
+ */
+export function off(elem, type, fn) {
+  // Don't want to add a cache object through getData if not needed
+  if (!Dom.hasData(elem)) return;
+
+  let data = Dom.getData(elem);
+
+  // If no events exist, nothing to unbind
+  if (!data.handlers) { return; }
+
+  if (Array.isArray(type)) {
+    return _handleMultipleEvents(off, elem, type, fn);
+  }
+
+  // Utility function
+  var removeType = function(t){
+     data.handlers[t] = [];
+     _cleanUpEvents(elem,t);
+  };
+
+  // Are we removing all bound events?
+  if (!type) {
+    for (let t in data.handlers) removeType(t);
+    return;
+  }
+
+  var handlers = data.handlers[type];
+
+  // If no handlers exist, nothing to unbind
+  if (!handlers) return;
+
+  // If no listener was provided, remove all listeners for type
+  if (!fn) {
+    removeType(type);
+    return;
+  }
+
+  // We're only removing a single handler
+  if (fn.guid) {
+    for (let n = 0; n < handlers.length; n++) {
+      if (handlers[n].guid === fn.guid) {
+        handlers.splice(n--, 1);
+      }
+    }
+  }
+
+  _cleanUpEvents(elem, type);
+}
+
+/**
+ * Trigger an event for an element
+ * @param  {Element|Object}      elem  Element to trigger an event on
+ * @param  {Event|Object|String} event A string (the type) or an event object with a type attribute
+ */
+export function trigger(elem, event) {
+  // Fetches element data and a reference to the parent (for bubbling).
+  // Don't want to add a data object to cache for every parent,
+  // so checking hasData first.
+  var elemData = (Dom.hasData(elem)) ? Dom.getData(elem) : {};
+  var parent = elem.parentNode || elem.ownerDocument;
+      // type = event.type || event,
+      // handler;
+
+  // If an event name was passed as a string, creates an event out of it
+  if (typeof event === 'string') {
+    event = { type:event, target:elem };
+  }
+  // Normalizes the event properties.
+  event = fixEvent(event);
+
+  // If the passed element has a dispatcher, executes the established handlers.
+  if (elemData.dispatcher) {
+    elemData.dispatcher.call(elem, event);
+  }
+
+  // Unless explicitly stopped or the event does not bubble (e.g. media events)
+    // recursively calls this function to bubble the event up the DOM.
+    if (parent && !event.isPropagationStopped() && event.bubbles !== false) {
+    trigger(parent, event);
+
+  // If at the top of the DOM, triggers the default action unless disabled.
+  } else if (!parent && !event.defaultPrevented) {
+    var targetData = Dom.getData(event.target);
+
+    // Checks if the target has a default action for this event.
+    if (event.target[event.type]) {
+      // Temporarily disables event dispatching on the target as we have already executed the handler.
+      targetData.disabled = true;
+      // Executes the default action.
+      if (typeof event.target[event.type] === 'function') {
+        event.target[event.type]();
+      }
+      // Re-enables event dispatching.
+      targetData.disabled = false;
+    }
+  }
+
+  // Inform the triggerer if the default was prevented by returning false
+  return !event.defaultPrevented;
+}
+
+/**
+ * Trigger a listener only once for an event
+ * @param  {Element|Object}   elem Element or object to
+ * @param  {String|Array}   type
+ * @param  {Function} fn
+ */
+export function one(elem, type, fn) {
+  if (Array.isArray(type)) {
+    return _handleMultipleEvents(one, elem, type, fn);
+  }
+  var func = function(){
+    off(elem, type, func);
+    fn.apply(this, arguments);
+  };
+  // copy the guid to the new function so it can removed using the original function's ID
+  func.guid = fn.guid = fn.guid || Guid.newGUID();
+  on(elem, type, func);
+}
 
 /**
  * Fix a native event to have standard property values
@@ -15,7 +200,7 @@ import document from 'global/document';
  * @return {Object}
  * @private
  */
-var fixEvent = function(event) {
+export function fixEvent(event) {
 
   function returnTrue() { return true; }
   function returnFalse() { return false; }
@@ -115,122 +300,7 @@ var fixEvent = function(event) {
 
   // Returns fixed-up instance
   return event;
-};
-
-/**
- * Add an event listener to element
- * It stores the handler function in a separate cache object
- * and adds a generic handler to the element's event,
- * along with a unique id (guid) to the element.
- * @param  {Element|Object}   elem Element or object to bind listeners to
- * @param  {String|Array}   type Type of event to bind to.
- * @param  {Function} fn   Event listener.
- * @private
- */
-var on = function(elem, type, fn){
-  if (Lib.obj.isArray(type)) {
-    return _handleMultipleEvents(on, elem, type, fn);
-  }
-
-  let data = Lib.getData(elem);
-
-  // We need a place to store all our handler data
-  if (!data.handlers) data.handlers = {};
-
-  if (!data.handlers[type]) data.handlers[type] = [];
-
-  if (!fn.guid) fn.guid = Lib.guid++;
-
-  data.handlers[type].push(fn);
-
-  if (!data.dispatcher) {
-    data.disabled = false;
-
-    data.dispatcher = function (event){
-
-      if (data.disabled) return;
-      event = fixEvent(event);
-
-      var handlers = data.handlers[event.type];
-
-      if (handlers) {
-        // Copy handlers so if handlers are added/removed during the process it doesn't throw everything off.
-        var handlersCopy = handlers.slice(0);
-
-        for (var m = 0, n = handlersCopy.length; m < n; m++) {
-          if (event.isImmediatePropagationStopped()) {
-            break;
-          } else {
-            handlersCopy[m].call(elem, event);
-          }
-        }
-      }
-    };
-  }
-
-  if (data.handlers[type].length === 1) {
-    if (elem.addEventListener) {
-      elem.addEventListener(type, data.dispatcher, false);
-    } else if (elem.attachEvent) {
-      elem.attachEvent('on' + type, data.dispatcher);
-    }
-  }
-};
-
-/**
- * Removes event listeners from an element
- * @param  {Element|Object}   elem Object to remove listeners from
- * @param  {String|Array=}   type Type of listener to remove. Don't include to remove all events from element.
- * @param  {Function} fn   Specific listener to remove. Don't include to remove listeners for an event type.
- * @private
- */
-var off = function(elem, type, fn) {
-  // Don't want to add a cache object through getData if not needed
-  if (!Lib.hasData(elem)) return;
-
-  let data = Lib.getData(elem);
-
-  // If no events exist, nothing to unbind
-  if (!data.handlers) { return; }
-
-  if (Lib.obj.isArray(type)) {
-    return _handleMultipleEvents(off, elem, type, fn);
-  }
-
-  // Utility function
-  var removeType = function(t){
-     data.handlers[t] = [];
-     cleanUpEvents(elem,t);
-  };
-
-  // Are we removing all bound events?
-  if (!type) {
-    for (let t in data.handlers) removeType(t);
-    return;
-  }
-
-  var handlers = data.handlers[type];
-
-  // If no handlers exist, nothing to unbind
-  if (!handlers) return;
-
-  // If no listener was provided, remove all listeners for type
-  if (!fn) {
-    removeType(type);
-    return;
-  }
-
-  // We're only removing a single handler
-  if (fn.guid) {
-    for (let n = 0; n < handlers.length; n++) {
-      if (handlers[n].guid === fn.guid) {
-        handlers.splice(n--, 1);
-      }
-    }
-  }
-
-  cleanUpEvents(elem, type);
-};
+}
 
 /**
  * Clean up the listener cache and dispatchers
@@ -238,8 +308,8 @@ var off = function(elem, type, fn) {
  * @param  {String} type Type of event to clean up
  * @private
  */
-var cleanUpEvents = function(elem, type) {
-  var data = Lib.getData(elem);
+function _cleanUpEvents(elem, type) {
+  var data = Dom.getData(elem);
 
   // Remove the events of a particular type if there are none left
   if (data.handlers[type].length === 0) {
@@ -256,7 +326,7 @@ var cleanUpEvents = function(elem, type) {
   }
 
   // Remove the events object if there are no types left
-  if (Lib.isEmpty(data.handlers)) {
+  if (Object.getOwnPropertyNames(data.handlers).length <= 0) {
     delete data.handlers;
     delete data.dispatcher;
     delete data.disabled;
@@ -267,83 +337,10 @@ var cleanUpEvents = function(elem, type) {
   }
 
   // Finally remove the expando if there is no data left
-  if (Lib.isEmpty(data)) {
-    Lib.removeData(elem);
+  if (Object.getOwnPropertyNames(data).length <= 0) {
+    Dom.removeData(elem);
   }
-};
-
-/**
- * Trigger an event for an element
- * @param  {Element|Object}      elem  Element to trigger an event on
- * @param  {Event|Object|String} event A string (the type) or an event object with a type attribute
- * @private
- */
-var trigger = function(elem, event) {
-  // Fetches element data and a reference to the parent (for bubbling).
-  // Don't want to add a data object to cache for every parent,
-  // so checking hasData first.
-  var elemData = (Lib.hasData(elem)) ? Lib.getData(elem) : {};
-  var parent = elem.parentNode || elem.ownerDocument;
-      // type = event.type || event,
-      // handler;
-
-  // If an event name was passed as a string, creates an event out of it
-  if (typeof event === 'string') {
-    event = { type:event, target:elem };
-  }
-  // Normalizes the event properties.
-  event = fixEvent(event);
-
-  // If the passed element has a dispatcher, executes the established handlers.
-  if (elemData.dispatcher) {
-    elemData.dispatcher.call(elem, event);
-  }
-
-  // Unless explicitly stopped or the event does not bubble (e.g. media events)
-    // recursively calls this function to bubble the event up the DOM.
-    if (parent && !event.isPropagationStopped() && event.bubbles !== false) {
-    trigger(parent, event);
-
-  // If at the top of the DOM, triggers the default action unless disabled.
-  } else if (!parent && !event.defaultPrevented) {
-    var targetData = Lib.getData(event.target);
-
-    // Checks if the target has a default action for this event.
-    if (event.target[event.type]) {
-      // Temporarily disables event dispatching on the target as we have already executed the handler.
-      targetData.disabled = true;
-      // Executes the default action.
-      if (typeof event.target[event.type] === 'function') {
-        event.target[event.type]();
-      }
-      // Re-enables event dispatching.
-      targetData.disabled = false;
-    }
-  }
-
-  // Inform the triggerer if the default was prevented by returning false
-  return !event.defaultPrevented;
-};
-
-/**
- * Trigger a listener only once for an event
- * @param  {Element|Object}   elem Element or object to
- * @param  {String|Array}   type
- * @param  {Function} fn
- * @private
- */
-var one = function(elem, type, fn) {
-  if (Lib.obj.isArray(type)) {
-    return _handleMultipleEvents(one, elem, type, fn);
-  }
-  var func = function(){
-    off(elem, type, func);
-    fn.apply(this, arguments);
-  };
-  // copy the guid to the new function so it can removed using the original function's ID
-  func.guid = fn.guid = fn.guid || Lib.guid++;
-  on(elem, type, func);
-};
+}
 
 /**
  * Loops through an array of event types and calls the requested method for each type.
@@ -353,10 +350,9 @@ var one = function(elem, type, fn) {
  * @param  {Function} callback   Event listener.
  * @private
  */
-function _handleMultipleEvents(fn, elem, type, callback) {
-  Lib.arr.forEach(type, function(type) {
-    fn(elem, type, callback); //Call the event method for each one of the types
+function _handleMultipleEvents(fn, elem, types, callback) {
+  types.forEach(function(type) {
+    //Call the event method for each one of the types
+    fn(elem, type, callback);
   });
 }
-
-export { on, off, cleanUpEvents, fixEvent, one, trigger };

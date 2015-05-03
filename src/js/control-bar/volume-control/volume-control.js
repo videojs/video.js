@@ -1,5 +1,4 @@
 import Component from '../../component.js';
-import * as Lib from '../../lib.js';
 
 // Required children
 import VolumeBar from './volume-bar.js';

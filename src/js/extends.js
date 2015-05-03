@@ -1,5 +1,3 @@
-import * as Lib from './lib';
-
 /**
  * A combination of node inherits and babel's inherits (after transpile).
  * Both work the same but node adds `super_` to the subClass

@@ -1,5 +1,6 @@
 import Component from '../../component.js';
-import * as Lib from '../../lib';
+import * as Dom from '../../utils/dom.js';
+import formatTime from '../../utils/format-time.js';
 
 /**
  * Displays the time left in the video
@@ -20,7 +21,7 @@ class RemainingTimeDisplay extends Component {
       className: 'vjs-remaining-time vjs-time-control vjs-control'
     });
 
-    this.contentEl_ = Lib.createEl('div', {
+    this.contentEl_ = Dom.createEl('div', {
       className: 'vjs-remaining-time-display',
       innerHTML: `<span class="vjs-control-text">${this.localize('Remaining Time')}</span> -0:00`, // label the remaining time for screen reader users
       'aria-live': 'off' // tell screen readers not to automatically read the time as it changes
@@ -33,7 +34,7 @@ class RemainingTimeDisplay extends Component {
   updateContent() {
     if (this.player_.duration()) {
       const localizedText = this.localize('Remaining Time');
-      const formattedTime = Lib.formatTime(this.player_.remainingTime());
+      const formattedTime = formatTime(this.player_.remainingTime());
       this.contentEl_.innerHTML = `<span class="vjs-control-text">${localizedText}</span> -${formattedTime}`;
     }
 

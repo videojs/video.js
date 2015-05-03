@@ -2,7 +2,9 @@ import TextTrackButton from './text-track-button.js';
 import TextTrackMenuItem from './text-track-menu-item.js';
 import ChaptersTrackMenuItem from './chapters-track-menu-item.js';
 import Menu from '../../menu/menu.js';
-import * as Lib from '../../lib.js';
+import * as Dom from '../../utils/dom.js';
+import * as Fn from '../../utils/fn.js';
+import toTitleCase from '../../utils/to-title-case.js';
 import window from 'global/window';
 
 // Chapters act much differently than other text tracks
@@ -53,7 +55,7 @@ class ChaptersButton extends TextTrackButton {
           track['mode'] = 'hidden';
           /* jshint loopfunc:true */
           // TODO see if we can figure out a better way of doing this https://github.com/videojs/video.js/issues/1864
-          window.setTimeout(Lib.bind(this, function() {
+          window.setTimeout(Fn.bind(this, function() {
             this.createMenu();
           }), 100);
           /* jshint loopfunc:false */
@@ -67,9 +69,9 @@ class ChaptersButton extends TextTrackButton {
     let menu = this.menu;
     if (menu === undefined) {
       menu = new Menu(this.player_);
-      menu.contentEl().appendChild(Lib.createEl('li', {
+      menu.contentEl().appendChild(Dom.createEl('li', {
         className: 'vjs-menu-title',
-        innerHTML: Lib.capitalize(this.kind_),
+        innerHTML: toTitleCase(this.kind_),
         tabindex: -1
       }));
     }
