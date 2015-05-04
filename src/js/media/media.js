@@ -61,20 +61,12 @@ vjs.MediaTechController = vjs.Component.extend({
  * any controls will still keep the user active
  */
 vjs.MediaTechController.prototype.initControlsListeners = function(){
-  var player, activateControls;
-
-  player = this.player();
-
-  activateControls = function(){
-    if (player.controls() && !player.usingNativeControls()) {
-      this.addControlsListeners();
-    }
-  };
+  var player = this.player();
 
   // Set up event listeners once the tech is ready and has an element to apply
   // listeners to
-  this.ready(activateControls);
-  this.on(player, 'controlsenabled', activateControls);
+  this.ready(this.addEventListeners);
+  this.on(player, 'controlsenabled', this.addEventListeners);
   this.on(player, 'controlsdisabled', this.removeControlsListeners);
 
   // if we're loading the playback object after it has started loading or playing the
@@ -87,6 +79,16 @@ vjs.MediaTechController.prototype.initControlsListeners = function(){
       this.player().trigger('loadstart');
     }
   });
+};
+
+/**
+ * Remove the event control listeners.
+ */
+vjs.MediaTechController.prototype.removeEventListeners = function () {
+  var player = this.player();
+
+  this.off(player, 'controlsenabled', this.addEventListeners);
+  this.off(player, 'controlsdisabled', this.removeControlsListeners);
 };
 
 vjs.MediaTechController.prototype.addControlsListeners = function(){
@@ -122,6 +124,14 @@ vjs.MediaTechController.prototype.addControlsListeners = function(){
   // The tap listener needs to come after the touchend listener because the tap
   // listener cancels out any reportedUserActivity when setting userActive(false)
   this.on('tap', this.onTap);
+};
+
+vjs.MediaTechController.prototype.addEventListeners = function () {
+    var player = this.player();
+
+    if (player.controls() && !player.usingNativeControls()) {
+        this.addControlsListeners();
+    }
 };
 
 /**
@@ -247,11 +257,16 @@ vjs.MediaTechController.prototype.stopTrackingCurrentTime = function(){
   this.player().trigger('timeupdate');
 };
 
-vjs.MediaTechController.prototype.dispose = function() {
+vjs.MediaTechController.prototype.stopTracking = function () {
   // Turn off any manual progress or timeupdate tracking
   if (this.manualProgress) { this.manualProgressOff(); }
 
   if (this.manualTimeUpdates) { this.manualTimeUpdatesOff(); }
+};
+
+vjs.MediaTechController.prototype.dispose = function() {
+  this.stopTracking();
+  this.removeEventListeners();
 
   vjs.Component.prototype.dispose.call(this);
 };

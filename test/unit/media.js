@@ -147,6 +147,47 @@ test('dispose() should stop time tracking', function() {
   ok(true, 'no exception was thrown');
 });
 
+test('dispose() should not throw exception', function() {
+  var timeupdates = 0, playHandler, i, tech, arr=[];
+  tech = new videojs.MediaTechController({
+    id: this.noop,
+    on: function(event, handler) {
+      if (event === 'play') {
+        arr.push(event);
+        playHandler = handler;
+      }
+    },
+    off: function(event, handler) {
+      if (event === 'dispose') {
+        arr.pop();
+      }
+    },
+    trigger: function(event) {
+      if (event === 'timeupdate') {
+        timeupdates++;
+      }
+    }
+  });
+
+  playHandler.call(tech);
+  tech.on('timeupdate', function() {
+    timeupdates++;
+  });
+
+  tech.dispose();
+
+  // progress and timeupdate events will throw exceptions after the
+  // tech is disposed
+  try {
+    this.clock.tick(10 * 1000);
+    equal(timeupdates, 1, 'triggered one timeupdate');
+    equal(arr.length, 0, 'items were not taken out from an array');
+  } catch (e) {
+    return equal(e, undefined, 'threw an exception');
+  }
+  ok(true, 'no exception was thrown');
+});
+
 test('should add the source hanlder interface to a tech', function(){
   var mockPlayer = {
     off: this.noop,
