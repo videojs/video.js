@@ -9,8 +9,8 @@ import * as Lib from '../lib';
 import FlashRtmpDecorator from './flash-rtmp';
 import Component from '../component';
 import window from 'global/window';
-let navigator = window.navigator;
 
+let navigator = window.navigator;
 /**
  * Flash Media Controller - Wrapper for fallback SWF API
  *
@@ -100,6 +100,12 @@ class Flash extends Tech {
     // native click events on the SWF aren't triggered on IE11, Win8.1RT
     // use stageclick events triggered from inside the SWF instead
     player.on('stageclick', player.reportUserActivity);
+
+    window.videojs = window.videojs || {};
+    window.videojs.Flash = window.videojs.Flash || {};
+    window.videojs.Flash.onReady = Flash.onReady;
+    window.videojs.Flash.onEvent = Flash.onEvent;
+    window.videojs.Flash.onError = Flash.onError;
 
     this.el_ = Flash.embed(options['swf'], placeHolder, flashVars, params, attributes);
   }
@@ -282,7 +288,7 @@ Flash.formats = {
   'video/m4v': 'MP4'
 };
 
-Flash['onReady'] = function(currSwf){
+Flash.onReady = function(currSwf){
   let el = Lib.el(currSwf);
 
   // get player from the player div property
@@ -300,7 +306,7 @@ Flash['onReady'] = function(currSwf){
 
 // The SWF isn't always ready when it says it is. Sometimes the API functions still need to be added to the object.
 // If it's not ready, we set a timeout to check again shortly.
-Flash['checkReady'] = function(tech){
+Flash.checkReady = function(tech){
   // stop worrying if the tech has been disposed
   if (!tech.el()) {
     return;
@@ -319,13 +325,13 @@ Flash['checkReady'] = function(tech){
 };
 
 // Trigger events from the swf on the player
-Flash['onEvent'] = function(swfID, eventName){
+Flash.onEvent = function(swfID, eventName){
   let player = Lib.el(swfID)['player'];
   player.trigger(eventName);
 };
 
 // Log errors from the swf
-Flash['onError'] = function(swfID, err){
+Flash.onError = function(swfID, err){
   const player = Lib.el(swfID)['player'];
   const msg = 'FLASH: '+err;
 
