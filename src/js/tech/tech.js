@@ -70,16 +70,10 @@ class Tech extends Component {
   initControlsListeners() {
     let player = this.player();
 
-    let activateControls = function(){
-      if (player.controls() && !player.usingNativeControls()) {
-        this.addControlsListeners();
-      }
-    };
-
     // Set up event listeners once the tech is ready and has an element to apply
     // listeners to
-    this.ready(activateControls);
-    this.on(player, 'controlsenabled', activateControls);
+    this.ready(this.addControlsListeners);
+    this.on(player, 'controlsenabled', this.addControlsListeners);
     this.on(player, 'controlsdisabled', this.removeControlsListeners);
 
     // if we're loading the playback object after it has started loading or playing the
@@ -96,6 +90,12 @@ class Tech extends Component {
 
   addControlsListeners() {
     let userWasActive;
+
+    let player = this.player();
+
+    if (!player.controls() || player.usingNativeControls()) {
+      return;
+    }
 
     // Some browsers (Chrome & IE) don't trigger a click on a flash swf, but do
     // trigger mousedown/up.
@@ -182,6 +182,9 @@ class Tech extends Component {
 
     // Trigger progress watching when a source begins loading
     this.trackProgress();
+
+    this.on('dispose', this.manualProgressOff);
+    this.on(this.player(), 'error', this.manualProgressOff);
   }
 
   manualProgressOff() {
@@ -228,6 +231,9 @@ class Tech extends Component {
       // Turn off manual progress tracking
       this.manualTimeUpdatesOff();
     });
+
+    this.on('dispose', this.manualTimeUpdatesOff);
+    this.on(player, 'error', this.manualTimeUpdatesOff);
   }
 
   manualTimeUpdatesOff() {
@@ -253,15 +259,6 @@ class Tech extends Component {
     // #1002 - if the video ends right before the next timeupdate would happen,
     // the progress bar won't make it all the way to the end
     this.player().trigger('timeupdate');
-  }
-
-  dispose() {
-    // Turn off any manual progress or timeupdate tracking
-    if (this.manualProgress) { this.manualProgressOff(); }
-
-    if (this.manualTimeUpdates) { this.manualTimeUpdatesOff(); }
-
-    super.dispose();
   }
 
   setCurrentTime() {
