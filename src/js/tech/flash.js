@@ -9,8 +9,8 @@ import * as Lib from '../lib';
 import FlashRtmpDecorator from './flash-rtmp';
 import Component from '../component';
 import window from 'global/window';
-let navigator = window.navigator;
 
+let navigator = window.navigator;
 /**
  * Flash Media Controller - Wrapper for fallback SWF API
  *
@@ -74,6 +74,12 @@ class Flash extends Tech {
         this.currentTime(options.startTime);
       });
     }
+
+    window.videojs = window.videojs || {};
+    window.videojs.Flash = window.videojs.Flash || {};
+    window.videojs.Flash.onReady = Flash.onReady;
+    window.videojs.Flash.onEvent = Flash.onEvent;
+    window.videojs.Flash.onError = Flash.onError;
 
     this.el_ = Flash.embed(options.swf, flashVars, params, attributes);
     this.el_.tech = this;

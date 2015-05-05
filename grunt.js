@@ -319,16 +319,20 @@ module.exports = function(grunt) {
       },
       watch: {
         files: {
-          'build/temp/video.js': ['src/js/video.js']
+          'build/temp/video.js': ['src/js/video.js'],
+          'build/temp/tests.js': [
+            'test/globals-shim.js',
+            'test/unit/**/*.js'
+          ]
         },
         options: {
           watch: true,
           keepAlive: true,
           browserifyOptions: {
-            debug: true,
             standalone: 'videojs'
           },
           banner: license,
+          transform: ['babelify'],
           plugin: [
             [ 'browserify-derequire' ]
           ]

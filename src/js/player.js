@@ -1962,6 +1962,24 @@ class Player extends Component {
     return this.languages_;
   }
 
+  toJSON() {
+    let options = Lib.obj.deepMerge({}, this.options());
+    let tracks = options.tracks;
+
+    options.tracks = [];
+
+    for (let i = 0; i < tracks.length; i++) {
+      let track = tracks[i];
+
+      // deep merge tracks and null out player so no circular references
+      track = Lib.obj.deepMerge({}, track);
+      track.player = undefined;
+      options.tracks[i] = track;
+    }
+
+    return options;
+  }
+
   static getTagSettings(tag) {
     let baseOptions = {
       'sources': [],
@@ -1975,7 +1993,11 @@ class Player extends Component {
     if (dataSetup !== null){
       // Parse options JSON
       // If empty string, make it a parsable json object.
-      Lib.obj.merge(tagOptions, safeParseTuple(dataSetup || '{}')[1]);
+      const [err, data] = safeParseTuple(dataSetup || '{}');
+      if (err) {
+        Lib.log.error(err);
+      }
+      Lib.obj.merge(tagOptions, data);
     }
 
     Lib.obj.merge(baseOptions, tagOptions);
