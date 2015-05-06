@@ -31,7 +31,7 @@ class LoadProgressBar extends Component {
     // get the percent width of a time compared to the total end
     let percentify = function (time, end){
       let percent = (time / end) || 0; // no NaN
-      return (percent * 100) + '%';
+      return ((percent >= 1 ? 1 : percent) * 100) + '%';
     };
 
     // update the width of the progress bar

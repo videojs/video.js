@@ -26,6 +26,7 @@ CHANGELOG
 * @gkatsev updated the component.js styles to match the new style guide ([view](https://github.com/videojs/video.js/pull/2105))
 * @gkatsev added error logging for bad JSON formatting ([view](https://github.com/videojs/video.js/pull/2113))
 * @gkatsev added a sensible toJSON function ([view](https://github.com/videojs/video.js/pull/2114))
+* @bc-bbay fixed instance where progress bars would go passed 100% ([view](https://github.com/videojs/video.js/pull/2040))
 
 --------------------
 

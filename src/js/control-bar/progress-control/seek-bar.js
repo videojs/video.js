@@ -34,7 +34,8 @@ class SeekBar extends Slider {
   }
 
   getPercent() {
-    return this.player_.currentTime() / this.player_.duration();
+    let percent = this.player_.currentTime() / this.player_.duration();
+    return percent >= 1 ? 1 : percent;
   }
 
   handleMouseDown(event) {
