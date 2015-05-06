@@ -693,3 +693,34 @@ test('should add an audio class if an audio el is used', function() {
 
   ok(player.el().className.indexOf(audioClass) !== -1, 'added '+ audioClass +' css class');
 });
+
+test('dispose should not throw exceptions when changing the tech', function() {
+  var fixture, video, player, id;
+  fixture = document.getElementById('qunit-fixture');
+
+  video = document.createElement('video');
+  video.className = 'vjs-default-skin video-js';
+  fixture.appendChild(video);
+
+  player = videojs(video);
+
+  player.loadTech('Flash');
+  player.controls(true);
+
+  player.loadTech('Html5');
+  player.src({
+    src: 'http://media.sundaysky.com/oat/videos/SGE2015_mp4/clip.mp4',
+    type: 'video/mp4'
+  });
+
+  player.trigger('loadstart');
+  player.trigger('loadedmetadata');
+  player.trigger('timeupdate');
+
+  try {
+    player.dispose();
+  } catch (e) {
+    return equal(e, undefined, 'threw an exception');
+  }
+  ok(true, 'no exception was thrown');
+});
