@@ -211,10 +211,10 @@ class Slider extends Component {
   }
 
   handleKeyPress(event) {
-    if (event.which == 37 || event.which == 40) { // Left and Down Arrows
+    if (event.which === 37 || event.which === 40) { // Left and Down Arrows
       event.preventDefault();
       this.stepBack();
-    } else if (event.which == 38 || event.which == 39) { // Up and Right Arrows
+    } else if (event.which === 38 || event.which === 39) { // Up and Right Arrows
       event.preventDefault();
       this.stepForward();
     }

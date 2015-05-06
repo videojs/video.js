@@ -17,18 +17,16 @@ import document from 'global/document';
  */
 class Html5 extends Tech {
 
-  constructor(player, options, ready){
-    super(player, options, ready);
+  constructor(options, ready){
+    super(options, ready);
 
-    this.setupTriggers();
-
-    const source = options['source'];
+    const source = options.source;
 
     // Set the source if one is provided
     // 1) Check if the source is new (if not, we want to keep the original so playback isn't interrupted)
     // 2) Check to see if the network state of the tag was failed at init, and if so, reset the source
     // anyway so the error gets fired.
-    if (source && (this.el_.currentSrc !== source.src || (player.tag && player.tag.initNetworkState_ === 3))) {
+    if (source && (this.el_.currentSrc !== source.src || (options.tag && options.tag.initNetworkState_ === 3))) {
       this.setSource(source);
     }
 
@@ -42,14 +40,14 @@ class Html5 extends Tech {
         let node = nodes[nodesLength];
         let nodeName = node.nodeName.toLowerCase();
         if (nodeName === 'track') {
-          if (!this['featuresNativeTextTracks']) {
+          if (!this.featuresNativeTextTracks) {
             // Empty video tag tracks so the built-in player doesn't use them also.
             // This may not be fast enough to stop HTML5 browsers from reading the tags
             // so we'll need to turn off any default tracks if we're manually doing
             // captions and subtitles. videoElement.textTracks
             removeNodes.push(node);
           } else {
-            this.remoteTextTracks().addTrack_(node['track']);
+            this.remoteTextTracks().addTrack_(node.track);
           }
         }
       }
@@ -59,7 +57,7 @@ class Html5 extends Tech {
       }
     }
 
-    if (this['featuresNativeTextTracks']) {
+    if (this.featuresNativeTextTracks) {
       this.on('loadstart', Lib.bind(this, this.hideCaptions));
     }
 
@@ -67,20 +65,9 @@ class Html5 extends Tech {
     // Our goal should be to get the custom controls on mobile solid everywhere
     // so we can remove this all together. Right now this will block custom
     // controls on touch enabled laptops like the Chrome Pixel
-    if (Lib.TOUCH_ENABLED && player.options()['nativeControlsForTouch'] === true) {
-      this.useNativeControls();
+    if (Lib.TOUCH_ENABLED && options.nativeControlsForTouch === true) {
+      this.trigger('usenativecontrols');
     }
-
-    // Chrome and Safari both have issues with autoplay.
-    // In Safari (5.1.1), when we move the video element into the container div, autoplay doesn't work.
-    // In Chrome (15), if you have autoplay + a poster + no controls, the video gets hidden (but audio plays)
-    // This fixes both issues. Need to wait for API, so it updates displays correctly
-    player.ready(function(){
-      if (this.tag && this.options_['autoplay'] && this.paused()) {
-        delete this.tag['poster']; // Chrome Fix. Fixed in Chrome v16.
-        this.play();
-      }
-    });
 
     this.triggerReady();
   }
@@ -92,8 +79,7 @@ class Html5 extends Tech {
   }
 
   createEl() {
-    let player = this.player_;
-    let el = player.tag;
+    let el = this.options_.tag;
 
     // Check if this browser supports moving the element into the box.
     // On the iPhone video will break if you move the element,
@@ -105,29 +91,27 @@ class Html5 extends Tech {
         const clone = el.cloneNode(false);
         Html5.disposeMediaElement(el);
         el = clone;
-        player.tag = null;
       } else {
         el = Lib.createEl('video');
 
         // determine if native controls should be used
-        let attributes = VjsUtil.mergeOptions({}, player.tagAttributes);
-        if (!Lib.TOUCH_ENABLED || player.options()['nativeControlsForTouch'] !== true) {
+        let tagAttributes = this.options_.tag && Lib.getElementAttributes(this.options_.tag);
+        let attributes = VjsUtil.mergeOptions({}, tagAttributes);
+        if (!Lib.TOUCH_ENABLED || this.options_.nativeControlsForTouch !== true) {
           delete attributes.controls;
         }
 
         Lib.setElementAttributes(el,
           Lib.obj.merge(attributes, {
-            id: player.id() + '_html5_api',
+            id: this.options_.playerId + '_html5_api',
             class: 'vjs-tech'
           })
         );
       }
-      // associate the player with the new tag
-      el['player'] = player;
 
-      if (player.options_.tracks) {
-        for (let i = 0; i < player.options_.tracks.length; i++) {
-          const track = player.options_.tracks[i];
+      if (this.options_.tracks) {
+        for (let i = 0; i < this.options_.tracks.length; i++) {
+          const track = this.options_.tracks[i];
           let trackEl = document.createElement('track');
           trackEl.kind = track.kind;
           trackEl.label = track.label;
@@ -139,8 +123,6 @@ class Html5 extends Tech {
           el.appendChild(trackEl);
         }
       }
-
-      Lib.insertFirst(el, player.el());
     }
 
     // Update specific tag settings, in case they were overridden
@@ -148,8 +130,8 @@ class Html5 extends Tech {
     for (let i = settingsAttrs.length - 1; i >= 0; i--) {
       const attr = settingsAttrs[i];
       let overwriteAttrs = {};
-      if (typeof player.options_[attr] !== 'undefined') {
-        overwriteAttrs[attr] = player.options_[attr];
+      if (typeof this.options_[attr] !== 'undefined') {
+        overwriteAttrs[attr] = this.options_[attr];
       }
       Lib.setElementAttributes(el, overwriteAttrs);
     }
@@ -175,62 +157,6 @@ class Html5 extends Tech {
       }
     }
   }
-
-  // Make video events trigger player events
-  // May seem verbose here, but makes other APIs possible.
-  // Triggers removed using this.off when disposed
-  setupTriggers() {
-    for (let i = Html5.Events.length - 1; i >= 0; i--) {
-      this.on(Html5.Events[i], this.eventHandler);
-    }
-  }
-
-  eventHandler(evt) {
-    // In the case of an error on the video element, set the error prop
-    // on the player and let the player handle triggering the event. On
-    // some platforms, error events fire that do not cause the error
-    // property on the video element to be set. See #1465 for an example.
-    if (evt.type == 'error' && this.error()) {
-      this.player().error(this.error().code);
-
-    // in some cases we pass the event directly to the player
-    } else {
-      // No need for media events to bubble up.
-      evt.bubbles = false;
-
-      this.player().trigger(evt);
-    }
-  }
-
-  useNativeControls() {
-    let tech = this;
-    let player = this.player();
-
-    // If the player controls are enabled turn on the native controls
-    tech.setControls(player.controls());
-
-    // Update the native controls when player controls state is updated
-    let controlsOn = function(){
-      tech.setControls(true);
-    };
-    let controlsOff = function(){
-      tech.setControls(false);
-    };
-    player.on('controlsenabled', controlsOn);
-    player.on('controlsdisabled', controlsOff);
-
-    // Clean up when not using native controls anymore
-    let cleanUp = function(){
-      player.off('controlsenabled', controlsOn);
-      player.off('controlsdisabled', controlsOff);
-    };
-    tech.on('dispose', cleanUp);
-    player.on('usingcustomcontrols', cleanUp);
-
-    // Update the state of the player to using native controls
-    player.usingNativeControls(true);
-  }
-
 
   play() { this.el_.play(); }
   pause() { this.el_.pause(); }
@@ -260,7 +186,7 @@ class Html5 extends Tech {
   height() {  return this.el_.offsetHeight; }
 
   supportsFullScreen() {
-    if (typeof this.el_.webkitEnterFullScreen == 'function') {
+    if (typeof this.el_.webkitEnterFullScreen === 'function') {
 
       // Seems to be broken in Chromium/Chrome && Safari in Leopard
       if (/Android/.test(Lib.USER_AGENT) || !/Chrome|Mac OS X 10.5/.test(Lib.USER_AGENT)) {
@@ -275,14 +201,11 @@ class Html5 extends Tech {
 
     if ('webkitDisplayingFullscreen' in video) {
       this.one('webkitbeginfullscreen', function() {
-        this.player_.isFullscreen(true);
-
         this.one('webkitendfullscreen', function() {
-          this.player_.isFullscreen(false);
-          this.player_.trigger('fullscreenchange');
+          this.trigger('fullscreenchange');
         });
 
-        this.player_.trigger('fullscreenchange');
+        this.trigger('fullscreenchange');
       });
     }
 
@@ -642,13 +565,8 @@ Html5.unpatchCanPlayType = function() {
 // by default, patch the video element
 Html5.patchCanPlayType();
 
-// List of all HTML5 events (various uses).
-Html5.Events = 'loadstart,suspend,abort,error,emptied,stalled,loadedmetadata,loadeddata,canplay,canplaythrough,playing,waiting,seeking,seeked,ended,durationchange,timeupdate,progress,play,pause,ratechange,volumechange'.split(',');
-
 Html5.disposeMediaElement = function(el){
   if (!el) { return; }
-
-  el['player'] = null;
 
   if (el.parentNode) {
     el.parentNode.removeChild(el);

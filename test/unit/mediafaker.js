@@ -10,8 +10,8 @@ import Component from '../../src/js/component.js';
  */
 class MediaFaker extends Tech {
 
-  constructor(player, options, handleReady){
-    super(player, options, handleReady);
+  constructor(options, handleReady){
+    super(options, handleReady);
     this.triggerReady();
   }
 
@@ -20,12 +20,10 @@ class MediaFaker extends Tech {
       className: 'vjs-tech'
     });
 
-    if (this.player().poster()) {
+    /*if (this.player().poster()) {
       // transfer the poster image to mimic HTML
       el.poster = this.player().poster();
-    }
-
-    Lib.insertFirst(el, this.player_.el());
+    }*/
 
     return el;
   }
@@ -34,6 +32,8 @@ class MediaFaker extends Tech {
   poster() { return this.el().poster; }
   setPoster(val) { this.el().poster = val; }
 
+  setControls(val) {}
+
   currentTime() { return 0; }
   seeking() { return false; }
   src() { return 'movie.mp4'; }
@@ -41,7 +41,7 @@ class MediaFaker extends Tech {
   muted() { return false; }
   pause() { return false; }
   paused() { return true; }
-  play() { this.player().trigger('play'); }
+  play() { this.trigger('play'); }
   supportsFullScreen() { return false; }
   buffered() { return {}; }
   duration() { return {}; }

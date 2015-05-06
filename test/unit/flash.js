@@ -146,8 +146,13 @@ test('ready triggering before and after disposing the tech', function() {
   fixtureDiv.appendChild(playerDiv);
 
   techEl.id = 'foo1234';
+
+  techEl.tech = {
+    el() { return techEl; }
+  };
+
   playerDiv['player'] = {
-    tech: {}
+    tech: techEl.tech
   };
 
   Flash['onReady'](techEl.id);

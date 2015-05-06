@@ -51,7 +51,7 @@ class SeekBar extends Slider {
     let newTime = this.calculateDistance(event) * this.player_.duration();
 
     // Don't let video end while scrubbing.
-    if (newTime == this.player_.duration()) { newTime = newTime - 0.1; }
+    if (newTime === this.player_.duration()) { newTime = newTime - 0.1; }
 
     // Set new time (tell player to seek to new time)
     this.player_.currentTime(newTime);

@@ -69,7 +69,7 @@ class Button extends Component {
   // KeyPress (document level) - Trigger click when keys are pressed
   handleKeyPress(event) {
     // Check for space bar (32) or enter (13) keys
-    if (event.which == 32 || event.which == 13) {
+    if (event.which === 32 || event.which === 13) {
       event.preventDefault();
       this.handleClick();
     }

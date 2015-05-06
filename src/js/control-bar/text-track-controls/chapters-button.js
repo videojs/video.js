@@ -48,7 +48,7 @@ class ChaptersButton extends TextTrackButton {
 
     for (let i = 0, l = tracks.length; i < l; i++) {
       let track = tracks[i];
-      if (track['kind'] == this.kind_) {
+      if (track['kind'] === this.kind_) {
         if (!track.cues) {
           track['mode'] = 'hidden';
           /* jshint loopfunc:true */

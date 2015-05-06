@@ -27,6 +27,7 @@ CHANGELOG
 * @gkatsev added error logging for bad JSON formatting ([view](https://github.com/videojs/video.js/pull/2113))
 * @gkatsev added a sensible toJSON function ([view](https://github.com/videojs/video.js/pull/2114))
 * @bc-bbay fixed instance where progress bars would go passed 100% ([view](https://github.com/videojs/video.js/pull/2040))
+* @eXon began Tech 2.0 work, improved how tech events are handled by the player ([view](https://github.com/videojs/video.js/pull/2057))
 
 --------------------
 

@@ -29,8 +29,8 @@ import XHR from '../xhr.js';
  * };
  */
 let TextTrack = function(options={}) {
-  if (!options['player']) {
-    throw new Error('A player was not provided.');
+  if (!options.tech) {
+    throw new Error('A tech was not provided.');
   }
 
   let tt = this;
@@ -42,7 +42,7 @@ let TextTrack = function(options={}) {
     }
   }
 
-  tt.player_ = options['player'];
+  tt.tech_ = options.tech;
 
   let mode = TextTrackEnum.TextTrackMode[options['mode']] || 'disabled';
   let kind = TextTrackEnum.TextTrackKind[options['kind']] || 'subtitles';
@@ -69,7 +69,7 @@ let TextTrack = function(options={}) {
     }
   });
   if (mode !== 'disabled') {
-    tt.player_.on('timeupdate', timeupdateHandler);
+    tt.tech_.on('timeupdate', timeupdateHandler);
   }
 
   Object.defineProperty(tt, 'kind', {
@@ -110,7 +110,7 @@ let TextTrack = function(options={}) {
       }
       mode = newMode;
       if (mode === 'showing') {
-        this.player_.on('timeupdate', timeupdateHandler);
+        this.tech_.on('timeupdate', timeupdateHandler);
       }
       this.trigger('modechange');
     }
@@ -137,7 +137,7 @@ let TextTrack = function(options={}) {
         return activeCues; // nothing to do
       }
 
-      let ct = this.player_.currentTime();
+      let ct = this.tech_.currentTime();
       let active = [];
 
       for (let i = 0, l = this['cues'].length; i < l; i++) {
@@ -191,7 +191,7 @@ TextTrack.prototype.allowedEvents_ = {
 };
 
 TextTrack.prototype.addCue = function(cue) {
-  let tracks = this.player_.textTracks();
+  let tracks = this.tech_.textTracks();
 
   if (tracks) {
     for (let i = 0; i < tracks.length; i++) {

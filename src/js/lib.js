@@ -23,7 +23,7 @@ var createEl = function(tagName='div', properties={}){
     // add the attribute "role". My guess is because it's not a valid attribute in some namespaces, although
     // browsers handle the attribute just fine. The W3C allows for aria-* attributes to be used in pre-HTML5 docs.
     // http://www.w3.org/TR/wai-aria-primer/#ariahtml. Using setAttribute gets around this problem.
-    if (propName.indexOf('aria-') !== -1 || propName == 'role') {
+    if (propName.indexOf('aria-') !== -1 || propName === 'role') {
      el.setAttribute(propName, val);
     } else {
      el[propName] = val;
@@ -616,10 +616,10 @@ var setLocalStorage = function(key, value){
     if (!localStorage) { return; }
     localStorage[key] = value;
   } catch(e) {
-    if (e.code == 22 || e.code == 1014) { // Webkit == 22 / Firefox == 1014
+    if (e.code === 22 || e.code === 1014) { // Webkit == 22 / Firefox == 1014
       log('LocalStorage Full (VideoJS)', e);
     } else {
-      if (e.code == 18) {
+      if (e.code === 18) {
         log('LocalStorage not allowed (VideoJS)', e);
       } else {
         log('LocalStorage Error (VideoJS)', e);
