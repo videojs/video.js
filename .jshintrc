@@ -11,10 +11,13 @@
     "trailing" : true,
     "undef"    : true,
     "laxbreak" : true,
+    "globals"  : {
+        "vjs": true,
+        "videojs": true,
+        "PlayerTest": true,
+        "TestHelpers": true
+    },
     "predef"   : [
-        "_V_",
-        "videojs",
-        "vjs",
         "goog",
         "console",
 
@@ -24,8 +27,6 @@
         "exports",
         "process",
 
-        "PlayerTest",
-        "TestHelpers",
         "asyncTest",
         "deepEqual",
         "equal",
