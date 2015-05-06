@@ -157,6 +157,38 @@ test('should have the source handler interface', function() {
   ok(Html5.registerSourceHandler, 'has the registerSourceHandler function');
 });
 
+test('should not autoplay if there is no source', function() {
+  let plays = 0;
+  let i = 0;
+  let readyQueue = [];
+
+  player.play = function() {
+    plays ++;
+  };
+
+  player.ready = function(func) {
+    readyQueue.push(func);
+  };
+
+  player.src = '';
+
+  //re-initialized the tech to catch the callback in the readyQueue
+  tech = new vjs.Html5(player, {});
+
+  //set up other options to bypass the condition
+  player.options_['autoplay'] = true;
+  player.paused = function () {
+    return true;
+  };
+  player.tag = 'tag';
+
+  for (; i < readyQueue.length; i++) {
+    readyQueue[i].call(player);
+  }
+
+  equal(plays, 0, 'did not autoplay');
+});
+
 test('native source handler canHandleSource', function(){
   var result;
 
