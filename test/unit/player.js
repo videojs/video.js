@@ -694,7 +694,7 @@ test('should add an audio class if an audio el is used', function() {
   ok(player.el().className.indexOf(audioClass) !== -1, 'added '+ audioClass +' css class');
 });
 
-test('dispose should not throw exceptions', function() {
+test('dispose should not throw exceptions when changing the tech', function() {
   var fixture, video, player, id;
   fixture = document.getElementById('qunit-fixture');
 
