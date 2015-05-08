@@ -33,6 +33,7 @@ CHANGELOG
 * @heff reorganized all utility functions in the codebase ([view](https://github.com/videojs/video.js/pull/2139))
 * @eXon made additional tech 2.0 improvements listed in #2126 ([view](https://github.com/videojs/video.js/pull/2166))
 * @heff Cleaned up and documented src/js/video.js and DOM functions ([view](https://github.com/videojs/video.js/pull/2182))
+* @mmcc Changed to pure CSS slider handles ([view](https://github.com/videojs/video.js/pull/2132))
 
 --------------------
 

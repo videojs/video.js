@@ -27,7 +27,17 @@
 
 .video-js .vjs-play-progress {
   background-color: $primary-text;
+  @extend .vjs-icon-circle;
+
+  // Progress handle
+  &:before {
+    position: absolute;
+    top: -0.35em;
+    right: -0.5em;
+
+  }
 }
+
 .video-js .vjs-load-progress {
   background: rgb(100, 100, 100) /* IE8- Fallback */;
   background: rgba(255, 255, 255, 0.2);
@@ -38,12 +48,6 @@ specific time ranges that have been buffered */
 .video-js .vjs-load-progress div {
   background: rgba($secondary-bg, 0.1);
 }
-
-.video-js .vjs-slider-handle.vjs-seek-handle {
-  width: 0.95em;
-  height: 0.95em;
-}
-
 
 .video-js.vjs-no-flex .vjs-progress-control {
   width: auto;
