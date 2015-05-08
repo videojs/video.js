@@ -41,12 +41,33 @@
   left: 0;
 
   background-color: $primary-text;
+
+  @extend .vjs-icon-circle;
+
+  &:before {
+    position: absolute;
+  }
 }
 
-.video-js .vjs-slider-vertical .vjs-volume-level { width: 0.3em; }
-.video-js .vjs-slider-horizontal .vjs-volume-level { height: 0.3em; }
+.video-js .vjs-slider-vertical .vjs-volume-level {
+  width: 0.3em;
+
+  &:before {
+    top: -0.5em;
+    left: -0.3em;
+  }
+}
+.video-js .vjs-slider-horizontal .vjs-volume-level {
+  height: 0.3em;
+
+  &:before {
+    top: -0.3em;
+    right: -0.5em;
+  }
+}
 
 .video-js .vjs-volume-bar .vjs-volume-handle {
+  display: none;
   width: 0.8em;
   height: 0.8em;
 }
