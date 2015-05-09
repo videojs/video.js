@@ -268,7 +268,7 @@ class Player extends Component {
       // If an empty string is given, reset the dimension to be automatic
       this[property] = undefined;
     } else {
-      this[property] = parseInt(value, 10);
+      this[property] = parseFloat(value);
 
       if (isNaN(this[property])) {
         Lib.log.error(`Improper value "${value}" supplied for for ${dimension}`);
