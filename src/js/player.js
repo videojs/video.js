@@ -249,20 +249,32 @@ class Player extends Component {
     return el;
   }
 
-  width(width) {
-    if (width === undefined) {
-      return this.width_ || 0;
-    }
-    this.width_ = parseInt(width, 10);
-    this.updateStyleEl_();
-    return this;
+  width(value) {
+    return this.dimension('width', value);
   }
 
-  height(height) {
-    if (height === undefined) {
-      return this.height_ || 0;
+  height(value) {
+    return this.dimension('height', value);
+  }
+
+  dimension(dimension, value) {
+    let property = dimension + '_';
+
+    if (value === undefined) {
+      return this[property] || 0;
     }
-    this.height_ = parseInt(height, 10);
+
+    if (value === '') {
+      // If an empty string is given, reset the dimension to be automatic
+      this[property] = undefined;
+    } else {
+      this[property] = parseInt(value, 10);
+
+      if (isNaN(this[property])) {
+        Lib.log.error(`Improper value "${value}" supplied for for ${dimension}`);
+      }
+    }
+
     this.updateStyleEl_();
     return this;
   }

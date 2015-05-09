@@ -6,6 +6,7 @@ import MediaError from '../../src/js/media-error.js';
 import Html5 from '../../src/js/tech/html5.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
+import css from 'css';
 
 q.module('Player', {
   'setup': function() {
@@ -173,23 +174,61 @@ test('should asynchronously fire error events during source selection', function
 
 test('should set the width, height, and aspect ratio via a css class', function(){
   let player = TestHelpers.makePlayer();
-  let styleEls = player.el().getElementsByTagName('style');
-
-  ok(styleEls[0] && player.styleEl_ === styleEls[0], 'player has a style element');
-
-  function getStyleText(styleEl){
+  let getStyleText = function(styleEl){
     return (styleEl.styleSheet && styleEl.styleSheet.cssText) || styleEl.innerHTML;
+  };
+
+  ok(player.styleEl_.parentNode === player.el(), 'player has a style element');
+  ok(!getStyleText(player.styleEl_), 'style element should be empty when the player is given no dimensions');
+
+  let rules;
+
+  function getStyleRules(){
+    const styleText = getStyleText(player.styleEl_);
+    const cssAST = css.parse(styleText);
+    const styleRules = {};
+
+    cssAST.stylesheet.rules.forEach(function(ruleAST){
+      let selector = ruleAST.selectors.join(' ');
+      styleRules[selector] = {};
+      let rule = styleRules[selector];
+
+      ruleAST.declarations.forEach(function(dec){
+        rule[dec.property] = dec.value;
+      });
+    });
+
+    return styleRules;
   }
 
-  console.log(getStyleText(styleEls[0]));
-});
+  // Set only the width
+  player.width(100);
+  rules = getStyleRules();
+  equal(rules['.example_1-dimensions'].width, '100px', 'style width should equal the supplied width in pixels');
+  equal(rules['.example_1-dimensions'].height, '56.25px', 'style height should match the default aspect ratio of the width');
 
-test('should not force width and height', function() {
-  var player = TestHelpers.makePlayer({ width: 'auto', height: 'auto' });
-  ok(player.el().style.width === '', 'Width is not forced');
-  ok(player.el().style.height === '', 'Height is not forced');
+  // Set the height
+  player.height(200);
+  rules = getStyleRules();
+  equal(rules['.example_1-dimensions'].height, '200px', 'style height should match the supplied height in pixels');
 
-  player.dispose();
+  // Reset the width and height to defaults
+  player.width('');
+  player.height('');
+  rules = getStyleRules();
+  equal(rules['.example_1-dimensions'].width, '300px', 'supplying an empty string should reset the width');
+  equal(rules['.example_1-dimensions'].height, '168.75px', 'supplying an empty string should reset the height');
+
+  // Switch to fluid mode
+  player.fluid(true);
+  rules = getStyleRules();
+  ok(player.hasClass('vjs-fluid'), 'the vjs-fluid class should be added to the player');
+  equal(rules['.example_1-dimensions.vjs-fluid']['padding-top'], '56.25%', 'fluid aspect ratio should match the default aspect ratio');
+
+  // Change the aspect ratio
+  player.aspectRatio('4:1');
+  rules = getStyleRules();
+  equal(rules['.example_1-dimensions.vjs-fluid']['padding-top'], '56.25%', 'aspect ratio percent should match the newly set aspect ratio');
 });
 
 test('should wrap the original tag in the player div', function(){
