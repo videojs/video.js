@@ -228,7 +228,7 @@ test('should set the width, height, and aspect ratio via a css class', function(
   // Change the aspect ratio
   player.aspectRatio('4:1');
   rules = getStyleRules();
-  equal(rules['.example_1-dimensions.vjs-fluid']['padding-top'], '56.25%', 'aspect ratio percent should match the newly set aspect ratio');
+  equal(rules['.example_1-dimensions.vjs-fluid']['padding-top'], '25%', 'aspect ratio percent should match the newly set aspect ratio');
 });
 
 test('should wrap the original tag in the player div', function(){
