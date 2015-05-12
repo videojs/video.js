@@ -258,21 +258,24 @@ class Player extends Component {
   }
 
   dimension(dimension, value) {
-    let property = dimension + '_';
+    let privDimension = dimension + '_';
 
     if (value === undefined) {
-      return this[property] || 0;
+      return this[privDimension] || 0;
     }
 
     if (value === '') {
       // If an empty string is given, reset the dimension to be automatic
-      this[property] = undefined;
+      this[privDimension] = undefined;
     } else {
-      this[property] = parseFloat(value);
+      let parsedVal = parseFloat(value);
 
-      if (isNaN(this[property])) {
+      if (isNaN(parsedVal)) {
         Lib.log.error(`Improper value "${value}" supplied for for ${dimension}`);
+        return this;
       }
+
+      this[privDimension] = parsedVal;
     }
 
     this.updateStyleEl_();
@@ -450,7 +453,7 @@ class Player extends Component {
     this.on(this.tech, 'ratechange', this.handleTechRateChange);
     this.on(this.tech, 'volumechange', this.handleTechVolumeChange);
     this.on(this.tech, 'texttrackchange', this.onTextTrackChange);
-	this.on(this.tech, 'loadedmetadata', this.updateStyleEl_);
+    this.on(this.tech, 'loadedmetadata', this.updateStyleEl_);
 
     if (this.controls() && !this.usingNativeControls()) {
       this.addTechControlsListeners();

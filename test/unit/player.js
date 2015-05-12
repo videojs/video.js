@@ -153,25 +153,6 @@ test('should asynchronously fire error events during source selection', function
   Lib.log.error.restore();
 });
 
-// test('should set the width and height of the player', function(){
-//   var player = TestHelpers.makePlayer({ width: 123, height: '100%' });
-//
-//   ok(player.width() === 123);
-//   ok(player.el().style.width === '123px');
-//
-//   var fixture = document.getElementById('qunit-fixture');
-//   var container = document.createElement('div');
-//   fixture.appendChild(container);
-//
-//   // Player container needs to have height in order to have height
-//   // Don't want to mess with the fixture itself
-//   container.appendChild(player.el());
-//   container.style.height = '1000px';
-//   ok(player.height() === 1000);
-//
-//   player.dispose();
-// });
-
 test('should set the width, height, and aspect ratio via a css class', function(){
   let player = TestHelpers.makePlayer();
   let getStyleText = function(styleEl){
