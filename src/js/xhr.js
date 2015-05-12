@@ -5,6 +5,7 @@ import window from 'global/window';
 /**
  * Simple http request for retrieving external files (e.g. text tracks)
  *
+ * 
  * ##### Example
  *
  *     // using url string
