@@ -78,7 +78,7 @@ module.exports = function(config) {
       'karma-coverage'
     ],
 
-    reporters: ['dots', 'coverage'],
+    reporters: ['dots', 'saucelabs', 'coverage'],
 
     // web server port
     port: 9876,
@@ -101,6 +101,7 @@ module.exports = function(config) {
       testName: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH,
       recordScreenshots: false
     },
+    customLaunchers: customLaunchers,
 
     // The HTML reporter seems to be busted right now, so we're just using text in the meantime
     // along with the summary after the test run.

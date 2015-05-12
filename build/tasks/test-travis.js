@@ -12,19 +12,17 @@ module.exports = function(grunt) {
 
     // I believe this was done originally because of security implications around running
     // Saucelabs automatically on PRs.
-    if (process.env.TRAVIS_PULL_REQUEST !== 'false') {
+    if (!process.env.SAUCE_ACCESS_KEY) {
       grunt.task.run(['karma:firefox']);
     } else {
-      grunt.task.run(['karma:firefox']);
-      //Disabling saucelabs until we figure out how to make it run reliably.
-      //grunt.task.run([
-      //'karma:chrome_sl',
-      //'karma:firefox_sl',
-      //'karma:safari_sl',
-      //'karma:ipad_sl',
-      //'karma:android_sl',
-      //'karma:ie_sl'
-      //]);
+      grunt.task.run([
+        'karma:chrome_sl',
+        'karma:firefox_sl',
+        'karma:safari_sl',
+        'karma:ipad_sl',
+        'karma:android_sl',
+        'karma:ie_sl'
+      ]);
     }
   });
 };
