@@ -96,12 +96,7 @@ class Player extends Component {
     this.language_ = options['language'] || Options['language'];
 
     // Update Supported Languages
-    var languages = vjs.obj.copy(options['languages'] || vjs.options['languages']);
-    vjs.options['languages'] = {};
-    vjs.obj.each(languages, function(name, value) {
-      vjs.addLanguage(name, languages[name]);
-    });
-    this.languages_ = vjs.options['languages'];
+    this.languages_ = this.options['languages'];
 
     // Cache for video property values.
     this.cache_ = {};
