@@ -170,7 +170,7 @@ test('should not autoplay if there is no source', function() {
     readyQueue.push(func);
   };
 
-  player.src = '';
+  player.src = function() { return ''; };
 
   //re-initialized the tech to catch the callback in the readyQueue
   tech = new vjs.Html5(player, {});
