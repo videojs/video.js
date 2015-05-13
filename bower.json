@@ -4,11 +4,7 @@
   "version": "5.0.0-13",
   "main": [
     "dist/video-js/video.js",
-    "dist/video-js/video-js.css",
-    "dist/video-js/font/vjs.eot",
-    "dist/video-js/font/vjs.svg",
-    "dist/video-js/font/vjs.ttf",
-    "dist/video-js/font/vjs.woff"
+    "dist/video-js/video-js.css"
   ],
   "keywords": [
     "videojs",
