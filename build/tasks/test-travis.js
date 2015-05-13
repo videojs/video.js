@@ -15,14 +15,7 @@ module.exports = function(grunt) {
     if (!process.env.SAUCE_ACCESS_KEY) {
       grunt.task.run(['karma:firefox']);
     } else {
-      grunt.task.run([
-        'karma:chrome_sl',
-        'karma:firefox_sl',
-        'karma:safari_sl',
-        // 'karma:ipad_sl',
-        // 'karma:android_sl',
-        'karma:ie_sl'
-      ]);
+      grunt.task.run([ 'connect:dev', 'saucelabs-qunit' ]);
     }
   });
 };
