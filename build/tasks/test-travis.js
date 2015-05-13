@@ -19,8 +19,8 @@ module.exports = function(grunt) {
         'karma:chrome_sl',
         'karma:firefox_sl',
         'karma:safari_sl',
-        'karma:ipad_sl',
-        'karma:android_sl',
+        // 'karma:ipad_sl',
+        // 'karma:android_sl',
         'karma:ie_sl'
       ]);
     }

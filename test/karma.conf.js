@@ -20,22 +20,18 @@ module.exports = function(config) {
 
     ipad_sl: {
       base: 'SauceLabs',
-      browserName: 'ipad',
-      platform:'OS X 10.10',
+      browserName: 'iPad',
       version: '8.2'
     },
 
     android_sl: {
       base: 'SauceLabs',
-      browserName: 'android',
-      platform:'Linux'
+      browserName: 'Android'
     },
 
     ie_sl: {
       base: 'SauceLabs',
-      browserName: 'internet explorer',
-      platform: 'Windows 8.1',
-      version: '11'
+      browserName: 'internet explorer'
     }
   };
 
