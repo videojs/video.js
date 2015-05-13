@@ -5,6 +5,7 @@ import MenuButton from '../menu/menu-button.js';
 import * as Fn from '../utils/fn.js';
 import document from 'global/document';
 import window from 'global/window';
+import * as Dom from '../utils/dom.js';
 
 const darkGray = '#222';
 const lightGray = '#ccc';
@@ -64,31 +65,30 @@ class TextTrackDisplay extends Component {
 
   createEl() {
     var parentEl = super.createEl('div', {
-      className: 'vjs-text-track-display'
     });
 
     // Element for visible text tracks
-    this.visibleEl = super.createEl( 'div', {
+    this.captionsSubtitlesEl = super.createEl( 'div', {
       className: 'vjs-text-track-display'
     });
-    parentEl.appendChild(this.visibleEl);
+    parentEl.appendChild(this.captionsSubtitlesEl);
 
     // Element for hidden, but screen-reader 'alert/assertive', text tracks
-    this.hiddenEl = super.createEl( 'div', {
+    this.descriptionsEl = super.createEl( 'div', {
       className: 'vjs-text-track-hidden-display',
       'role': 'alert',
       'aria-live': 'assertive',
       'aria-atomic': 'true'
     });
-    parentEl.appendChild(this.hiddenEl);
+    parentEl.appendChild(this.descriptionsEl);
 
     return parentEl;
   }
 
   clearDisplay() {
     if (typeof window['WebVTT'] === 'function') {
-      window['WebVTT']['processCues'](window, [], this.visibleEl);
-      window['WebVTT']['processCues'](window, [], this.hiddenEl);
+      window['WebVTT']['processCues'](window, [], this.captionsSubtitlesEl);
+      window['WebVTT']['processCues'](window, [], this.descriptionsEl);
     }
   }
 
@@ -121,11 +121,19 @@ class TextTrackDisplay extends Component {
       cues.push(track['activeCues'][i]);
     }
 
-    //TODO: Add a preference to allow descriptions to be visible
-    if ( track['kind'] === 'descriptions' ) {
-      window['WebVTT']['processCues'](window, track['activeCues'], this.hiddenEl);
+    if (track['kind'] === 'descriptions') {
+
+      if ((overrides.descriptionsPlayback) && (overrides.descriptionsPlayback === 'screenReaderOnly')) {
+        Dom.addElClass(this.descriptionsEl, 'vjs-text-track-hidden-display');
+        Dom.removeElClass(this.descriptionsEl, 'vjs-text-track-display');
+      } else {
+        Dom.removeElClass(this.descriptionsEl, 'vjs-text-track-hidden-display');
+        Dom.addElClass(this.descriptionsEl, 'vjs-text-track-display');
+      }
+
+      window['WebVTT']['processCues'](window, track['activeCues'], this.descriptionsEl);
     } else {
-      window['WebVTT']['processCues'](window, track['activeCues'], this.visibleEl);
+      window['WebVTT']['processCues'](window, track['activeCues'], this.captionsSubtitlesEl);
     }
 
     let i = cues.length;

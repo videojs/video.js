@@ -31,6 +31,7 @@ class TextTrackSettings extends Component {
       this.el().querySelector('.vjs-edge-style select').selectedIndex = 0;
       this.el().querySelector('.vjs-font-family select').selectedIndex = 0;
       this.el().querySelector('.vjs-font-percent select').selectedIndex = 2;
+      this.el().querySelector('.vjs-descriptions-playback select').selectedIndex = 0;
       this.updateDisplay();
     }));
 
@@ -43,6 +44,7 @@ class TextTrackSettings extends Component {
     Events.on(this.el().querySelector('.vjs-font-percent select'), 'change', Fn.bind(this, this.updateDisplay));
     Events.on(this.el().querySelector('.vjs-edge-style select'), 'change', Fn.bind(this, this.updateDisplay));
     Events.on(this.el().querySelector('.vjs-font-family select'), 'change', Fn.bind(this, this.updateDisplay));
+    Events.on(this.el().querySelector('.vjs-descriptions-playback select'), 'change', Fn.bind(this, this.updateDisplay));
 
     if (this.options_.persistTextTrackSettings) {
       this.restoreSettings();
@@ -68,6 +70,7 @@ class TextTrackSettings extends Component {
     const windowColor = getSelectedOptionValue(el.querySelector('.window-color > select'));
     const windowOpacity = getSelectedOptionValue(el.querySelector('.vjs-window-opacity > select'));
     const fontPercent = window['parseFloat'](getSelectedOptionValue(el.querySelector('.vjs-font-percent > select')));
+    const descriptionsPlayback = getSelectedOptionValue(el.querySelector('.vjs-descriptions-playback > select'));
 
     let result = {
       'backgroundOpacity': bgOpacity,
@@ -78,7 +81,8 @@ class TextTrackSettings extends Component {
       'color': fgColor,
       'backgroundColor': bgColor,
       'windowColor': windowColor,
-      'fontPercent': fontPercent
+      'fontPercent': fontPercent,
+      'descriptionsPlayback' : descriptionsPlayback
     };
     for (let name in result) {
       if (result[name] === '' || result[name] === 'none' || (name === 'fontPercent' && result[name] === 1.00)) {
@@ -99,6 +103,7 @@ class TextTrackSettings extends Component {
     setSelectedOption(el.querySelector('.vjs-bg-opacity > select'), values.backgroundOpacity);
     setSelectedOption(el.querySelector('.window-color > select'), values.windowColor);
     setSelectedOption(el.querySelector('.vjs-window-opacity > select'), values.windowOpacity);
+    setSelectedOption(el.querySelector('.vjs-descriptions-playback > select'), values.descriptionsPlayback);
 
     let fontPercent = values.fontPercent;
 
@@ -107,6 +112,7 @@ class TextTrackSettings extends Component {
     }
 
     setSelectedOption(el.querySelector('.vjs-font-percent > select'), fontPercent);
+    setSelectedOption(el.querySelector('.vjs-descriptions-playback > select'), values.descriptionsPlayback);
   }
 
   restoreSettings() {
@@ -282,6 +288,13 @@ function captionOptionsMenuTemplate() {
             <option value="small-caps">Small Caps</option>
           </select>
         </div> <!-- vjs-font-family -->
+        <div class="vjs-descriptions-playback vjs-tracksetting">
+          <label class="vjs-label">Descriptions</label>
+          <select>
+            <option value="">Visible</option>
+            <option value="screenReaderOnly">Hidden (for screen reader users)</option>
+          </select>
+        </div> <!-- vjs-descriptions-playback -->
       </div>
     </div>
     <div class="vjs-tracksettings-controls">

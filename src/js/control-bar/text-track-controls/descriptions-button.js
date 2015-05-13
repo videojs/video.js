@@ -1,11 +1,11 @@
-import TextTrackButton from './text-track-button.js';
+import CaptionsButton from './captions-button.js';
 
 /**
  * The button component for toggling and selecting descriptions
  *
  * @constructor
  */
-class DescriptionsButton extends TextTrackButton {
+class DescriptionsButton extends CaptionsButton {
 
   constructor(player, options, ready){
     super(player, options, ready);
@@ -21,5 +21,5 @@ class DescriptionsButton extends TextTrackButton {
 DescriptionsButton.prototype.kind_ = 'descriptions';
 DescriptionsButton.prototype.controlText_ = 'Descriptions';
 
-TextTrackButton.registerComponent('DescriptionsButton', DescriptionsButton);
+CaptionsButton.registerComponent('DescriptionsButton', DescriptionsButton);
 export default DescriptionsButton;

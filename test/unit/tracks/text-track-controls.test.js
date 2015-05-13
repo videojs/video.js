@@ -132,9 +132,10 @@ test('menu should contain "Settings", "Off" and one track', function() {
     }),
     menuItems = player.controlBar.descriptionsButton.items;
 
-  equal(menuItems.length, 2, 'menu contains two items');
-  equal(menuItems[0].track.label, 'descriptions off', 'menu contains "descriptions off"');
-  equal(menuItems[1].track.label, 'desc', 'menu contains "desc" track');
+  equal(menuItems.length, 3, 'menu contains three items');
+  equal(menuItems[0].track.label, 'descriptions settings', 'menu contains "descriptions settings"');
+  equal(menuItems[1].track.label, 'descriptions off', 'menu contains "descriptions off"');
+  equal(menuItems[2].track.label, 'desc', 'menu contains "desc" track');
 });
 
 if (!browser.IS_IE8) {
