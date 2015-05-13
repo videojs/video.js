@@ -226,25 +226,25 @@ module.exports = function(grunt) {
         options: {
           release: 'major'
         },
-        src: ['package.json', 'bower.json', 'component.json']
+        src: ['package.json', 'component.json']
       },
       minor: {
         options: {
           release: 'minor'
         },
-        src: ['package.json', 'bower.json', 'component.json']
+        src: ['package.json', 'component.json']
       },
       patch: {
         options: {
           release: 'patch'
         },
-        src: ['package.json', 'bower.json', 'component.json']
+        src: ['package.json', 'component.json']
       },
       prerelease: {
         options: {
           release: 'prerelease'
         },
-        src: ['package.json', 'bower.json', 'component.json']
+        src: ['package.json', 'component.json']
       },
       css: {
         options: {
