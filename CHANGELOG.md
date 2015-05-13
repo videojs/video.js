@@ -3,6 +3,7 @@ CHANGELOG
 
 ## HEAD (Unreleased)
 * @tjenkinson Added background-color to vjs-poster to remove transparent borders around scaled poster image ([view](https://github.com/videojs/video.js/pull/2138))
+* @bc-bbay fixed a bug where the player would try to autoplay when there was no source ([view](https://github.com/videojs/video.js/pull/2127))
 
 --------------------
 
