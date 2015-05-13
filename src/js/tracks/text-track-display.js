@@ -63,14 +63,32 @@ class TextTrackDisplay extends Component {
   }
 
   createEl() {
-    return super.createEl('div', {
+    var parentEl = super.createEl('div', {
       className: 'vjs-text-track-display'
     });
+
+    // Element for visible text tracks
+    this.visibleEl = super.createEl( 'div', {
+      className: 'vjs-text-track-display'
+    });
+    parentEl.appendChild(this.visibleEl);
+
+    // Element for hidden, but screen-reader 'alert/assertive', text tracks
+    this.hiddenEl = super.createEl( 'div', {
+      className: 'vjs-text-track-hidden-display',
+      'role': 'alert',
+      'aria-live': 'assertive',
+      'aria-atomic': 'true'
+    });
+    parentEl.appendChild(this.hiddenEl);
+
+    return parentEl;
   }
 
   clearDisplay() {
     if (typeof window['WebVTT'] === 'function') {
-      window['WebVTT']['processCues'](window, [], this.el_);
+      window['WebVTT']['processCues'](window, [], this.visibleEl);
+      window['WebVTT']['processCues'](window, [], this.hiddenEl);
     }
   }
 
@@ -103,7 +121,12 @@ class TextTrackDisplay extends Component {
       cues.push(track['activeCues'][i]);
     }
 
-    window['WebVTT']['processCues'](window, track['activeCues'], this.el_);
+    //TODO: Add a preference to allow descriptions to be visible
+    if ( track['kind'] === 'descriptions' ) {
+      window['WebVTT']['processCues'](window, track['activeCues'], this.hiddenEl);
+    } else {
+      window['WebVTT']['processCues'](window, track['activeCues'], this.visibleEl);
+    }
 
     let i = cues.length;
     while (i--) {
