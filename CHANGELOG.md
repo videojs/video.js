@@ -29,6 +29,7 @@ CHANGELOG
 * @bc-bbay fixed instance where progress bars would go passed 100% ([view](https://github.com/videojs/video.js/pull/2040))
 * @eXon began Tech 2.0 work, improved how tech events are handled by the player ([view](https://github.com/videojs/video.js/pull/2057))
 * @gkatsev added get and set global options methods ([view](https://github.com/videojs/video.js/pull/2115))
+* @heff added support for fluid widths, aspect ratios, and metadata defaults ([view](https://github.com/videojs/video.js/pull/1952))
 
 --------------------
 

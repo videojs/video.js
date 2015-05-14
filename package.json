@@ -37,6 +37,7 @@
     "browserify-istanbul": "^0.2.1",
     "browserify-versionify": "^1.0.4",
     "chg": "~0.2.0",
+    "css": "^2.2.0",
     "grunt": "^0.4.4",
     "grunt-aws-s3": "^0.12.1",
     "grunt-banner": "^0.3.1",

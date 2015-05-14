@@ -6,6 +6,7 @@ import MediaError from '../../src/js/media-error.js';
 import Html5 from '../../src/js/tech/html5.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
+import css from 'css';
 
 q.module('Player', {
   'setup': function() {
@@ -152,31 +153,63 @@ test('should asynchronously fire error events during source selection', function
   Lib.log.error.restore();
 });
 
-test('should set the width and height of the player', function(){
-  var player = TestHelpers.makePlayer({ width: 123, height: '100%' });
+test('should set the width, height, and aspect ratio via a css class', function(){
+  let player = TestHelpers.makePlayer();
+  let getStyleText = function(styleEl){
+    return (styleEl.styleSheet && styleEl.styleSheet.cssText) || styleEl.innerHTML;
+  };
 
-  ok(player.width() === 123);
-  ok(player.el().style.width === '123px');
+  ok(player.styleEl_.parentNode === player.el(), 'player has a style element');
+  ok(!getStyleText(player.styleEl_), 'style element should be empty when the player is given no dimensions');
 
-  var fixture = document.getElementById('qunit-fixture');
-  var container = document.createElement('div');
-  fixture.appendChild(container);
+  let rules;
 
-  // Player container needs to have height in order to have height
-  // Don't want to mess with the fixture itself
-  container.appendChild(player.el());
-  container.style.height = '1000px';
-  ok(player.height() === 1000);
+  function getStyleRules(){
+    const styleText = getStyleText(player.styleEl_);
+    const cssAST = css.parse(styleText);
+    const styleRules = {};
 
-  player.dispose();
-});
+    cssAST.stylesheet.rules.forEach(function(ruleAST){
+      let selector = ruleAST.selectors.join(' ');
+      styleRules[selector] = {};
+      let rule = styleRules[selector];
 
-test('should not force width and height', function() {
-  var player = TestHelpers.makePlayer({ width: 'auto', height: 'auto' });
-  ok(player.el().style.width === '', 'Width is not forced');
-  ok(player.el().style.height === '', 'Height is not forced');
+      ruleAST.declarations.forEach(function(dec){
+        rule[dec.property] = dec.value;
+      });
+    });
 
-  player.dispose();
+    return styleRules;
+  }
+
+  // Set only the width
+  player.width(100);
+  rules = getStyleRules();
+  equal(rules['.example_1-dimensions'].width, '100px', 'style width should equal the supplied width in pixels');
+  equal(rules['.example_1-dimensions'].height, '56.25px', 'style height should match the default aspect ratio of the width');
+
+  // Set the height
+  player.height(200);
+  rules = getStyleRules();
+  equal(rules['.example_1-dimensions'].height, '200px', 'style height should match the supplied height in pixels');
+
+  // Reset the width and height to defaults
+  player.width('');
+  player.height('');
+  rules = getStyleRules();
+  equal(rules['.example_1-dimensions'].width, '300px', 'supplying an empty string should reset the width');
+  equal(rules['.example_1-dimensions'].height, '168.75px', 'supplying an empty string should reset the height');
+
+  // Switch to fluid mode
+  player.fluid(true);
+  rules = getStyleRules();
+  ok(player.hasClass('vjs-fluid'), 'the vjs-fluid class should be added to the player');
+  equal(rules['.example_1-dimensions.vjs-fluid']['padding-top'], '56.25%', 'fluid aspect ratio should match the default aspect ratio');
+
+  // Change the aspect ratio
+  player.aspectRatio('4:1');
+  rules = getStyleRules();
+  equal(rules['.example_1-dimensions.vjs-fluid']['padding-top'], '25%', 'aspect ratio percent should match the newly set aspect ratio');
 });
 
 test('should wrap the original tag in the player div', function(){

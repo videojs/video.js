@@ -17,9 +17,6 @@ export default {
   'html5': {},
   'flash': {},
 
-  // Default of web browser is 300x150. Should rely on source width/height.
-  'width': 300,
-  'height': 150,
   // defaultVolume: 0.85,
   'defaultVolume': 0.00, // The freakin seaguls are driving me crazy!
 
