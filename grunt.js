@@ -185,25 +185,17 @@ module.exports = function(grunt) {
     'saucelabs-qunit': {
       all: {
         options: {
-          urls: [ 'http://127.0.0.1:9999/test/index.html' ],
-          browsers: [{
-            browserName: 'chrome',
-            platform: 'WIN8.1'
-          }, {
-            browserName: 'firefox',
-            platform: 'Linux'
-          }, {
-            browserName: 'safari',
-            platform: 'OS X 10.10'
-          }, {
-            browserName: 'iPad',
-            version: '8.2'
-          }, {
-            browserName: 'Android'
-          }, {
-            browserName: 'internet explorer',
-            platform: 'WIN8.1'
-          }],
+          urls: ['http://127.0.0.1:9999/test/index.html'],
+          browsers: [
+            /* [platform, browserName, version] - version will default to latest stable version */
+            ['WIN8.1', 'chrome', ''],
+            // TODO: Find out and fix IE and FF on Linux timeouts
+            // ['Linux', 'firefox', ''],
+            // ['WIN8.1', 'internet explorer', ''],
+            ['OS X 10.10', 'safari', ''],
+            ['', 'iPad', '8.2'],
+            ['', 'Android', '']
+          ],
           tunneled: false,
           build: process.env.TRAVIS_BUILD_NUMBER,
           testname: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH,

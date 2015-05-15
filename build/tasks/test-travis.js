@@ -15,7 +15,7 @@ module.exports = function(grunt) {
     if (!process.env.SAUCE_ACCESS_KEY) {
       grunt.task.run(['karma:firefox']);
     } else {
-      grunt.task.run([ 'connect:dev', 'saucelabs-qunit' ]);
+      grunt.task.run(['connect:dev', 'saucelabs-qunit']);
     }
   });
 };
