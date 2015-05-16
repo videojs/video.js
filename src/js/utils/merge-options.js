@@ -1,33 +1,39 @@
 import merge from 'lodash.merge';
 import isPlainObject from 'lodash.isplainobject';
-import cloneDeep from 'lodash.clonedeep';
 
 /**
- * Merge two options objects, recursively merging any plain object properties as
- * well.  Previously `deepMerge`
+ * Merge two options objects, recursively merging **only** plain object
+ * properties.  Previously `deepMerge`.
  *
- * @param  {Object} obj1 Object to override values in
- * @param  {Object} obj2 Overriding object
- * @return {Object}      New object -- obj1 and obj2 will be untouched
+ * @param  {Object} object    The destination object
+ * @param  {...Object} source One or more objects to merge into the first
+ *
+ * @returns {Object}          The updated first object
  */
-export default function mergeOptions(obj1){
-  // Copy to ensure we're not modifying the defaults somewhere
-  obj1 = cloneDeep(obj1, function(value) {
-    if (!isPlainObject(value)) {
-      return value;
-    }
-  });
+export default function mergeOptions(object={}) {
 
   // Allow for infinite additional object args to merge
-  Array.prototype.slice.call(arguments, 1).forEach(function(argObj){
+  Array.prototype.slice.call(arguments, 1).forEach(function(source){
+
     // Recursively merge only plain objects
     // All other values will be directly copied
-    merge(obj1, argObj, function(a, b) {
-      if (!isPlainObject(a) || !isPlainObject(b)) {
+    merge(object, source, function(a, b) {
+
+      // If we're not working with a plain object, copy the value as is
+      if (!isPlainObject(b)) {
         return b;
+      }
+
+      // If the new value is a plain object but the first object value is not
+      // we need to create a new object for the first object to merge with.
+      // This makes it consistent with how merge() works by default
+      // and also protects from later changes the to first object affecting
+      // the second object's values.
+      if (!isPlainObject(a)) {
+        return mergeOptions({}, b);
       }
     });
   });
 
-  return obj1;
+  return object;
 }

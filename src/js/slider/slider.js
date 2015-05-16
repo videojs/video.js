@@ -160,7 +160,7 @@ class Slider extends Component {
 
   calculateDistance(event){
     let el = this.el_;
-    let box = Dom.findPosition(el);
+    let box = Dom.findElPosition(el);
     let boxW = el.offsetWidth;
     let boxH = el.offsetHeight;
     let handle = this.handle;

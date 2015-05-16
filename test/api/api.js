@@ -153,7 +153,7 @@ test('should export ready api call to public', function() {
 });
 
 test('should export useful components to the public', function () {
-  ok(videojs.TOUCH_ENABLED !== undefined, 'Touch detection should be public');
+  ok(videojs.browser.TOUCH_ENABLED !== undefined, 'Touch detection should be public');
   ok(videojs.getComponent('ControlBar'), 'ControlBar should be public');
   ok(videojs.getComponent('Button'), 'Button should be public');
   ok(videojs.getComponent('PlayToggle'), 'PlayToggle should be public');
@@ -213,7 +213,7 @@ test('should be able to initialize player twice on the same tag using string ref
   player.dispose();
 });
 
-test('videojs.players should be available after minification', function() {
+test('videojs.getPlayers() should be available after minification', function() {
   var videoTag = testHelperMakeTag();
   var id = videoTag.id;
 
@@ -221,7 +221,7 @@ test('videojs.players should be available after minification', function() {
   fixture.appendChild(videoTag);
 
   var player = videojs(id);
-  ok(videojs.players[id] === player, 'videojs.players is available');
+  ok(videojs.getPlayers()[id] === player, 'videojs.getPlayers() is available');
 
   player.dispose();
 });

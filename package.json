@@ -24,7 +24,6 @@
   "style": "./dist/video-js.css",
   "dependencies": {
     "global": "^4.3.0",
-    "lodash.clonedeep": "^3.0.0",
     "lodash.isplainobject": "^3.0.2",
     "lodash.merge": "^3.2.1",
     "object.assign": "^2.0.1",

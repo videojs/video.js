@@ -13,6 +13,7 @@ import toTitleCase from './utils/to-title-case.js';
 import assign from 'object.assign';
 import mergeOptions from './utils/merge-options.js';
 
+
 /**
  * Base UI Component class
  *
@@ -52,8 +53,8 @@ class Component {
       this.player_ = player;
     }
 
-    // Make a copy of prototype.options_ to protect against overriding global defaults
-    this.options_ = assign({}, this.options_);
+    // Make a copy of prototype.options_ to protect against overriding defaults
+    this.options_ = mergeOptions({}, this.options_);
 
     // Updated options with supplied options
     options = this.options(options);
@@ -130,7 +131,7 @@ class Component {
       this.el_.parentNode.removeChild(this.el_);
     }
 
-    Dom.removeData(this.el_);
+    Dom.removeElData(this.el_);
     this.el_ = null;
   }
 
@@ -741,7 +742,7 @@ class Component {
    * @return {Component}
    */
   hasClass(classToCheck) {
-    return Dom.hasClass(this.el_, classToCheck);
+    return Dom.hasElClass(this.el_, classToCheck);
   }
 
   /**
@@ -751,7 +752,7 @@ class Component {
    * @return {Component}
    */
   addClass(classToAdd) {
-    Dom.addClass(this.el_, classToAdd);
+    Dom.addElClass(this.el_, classToAdd);
     return this;
   }
 
@@ -762,7 +763,7 @@ class Component {
    * @return {Component}
    */
   removeClass(classToRemove) {
-    Dom.removeClass(this.el_, classToRemove);
+    Dom.removeElClass(this.el_, classToRemove);
     return this;
   }
 
@@ -918,19 +919,6 @@ class Component {
     // If component has display:none, offset will return 0
     // TODO: handle display:none and no dimension style using px
     return parseInt(this.el_['offset' + toTitleCase(widthOrHeight)], 10);
-
-    // ComputedStyle version.
-    // Only difference is if the element is hidden it will return
-    // the percent value (e.g. '100%'')
-    // instead of zero like offsetWidth returns.
-    // var val = Dom.getComputedStyleValue(this.el_, widthOrHeight);
-    // var pxIndex = val.indexOf('px');
-
-    // if (pxIndex !== -1) {
-    //   return val.slice(0, pxIndex);
-    // } else {
-    //   return val;
-    // }
   }
 
   /**

@@ -3,6 +3,7 @@ import * as Dom from '../../src/js/utils/dom.js';
 import * as Events from '../../src/js/utils/events.js';
 import * as browser from '../../src/js/utils/browser.js';
 import document from 'global/document';
+import TestHelpers from './test-helpers.js';
 
 q.module('Component', {
   'setup': function() {
@@ -97,14 +98,14 @@ test('should do a deep merge of child options', function(){
   var mergedOptions = comp.options();
   var children = mergedOptions['example'];
 
-  ok(children['childOne']['foo'] === 'baz', 'value three levels deep overridden');
-  ok(children['childOne']['asdf'] === 'fdsa', 'value three levels deep maintained');
-  ok(children['childOne']['abc'] === '123', 'value three levels deep added');
+  strictEqual(children['childOne']['foo'], 'baz', 'value three levels deep overridden');
+  strictEqual(children['childOne']['asdf'], 'fdsa', 'value three levels deep maintained');
+  strictEqual(children['childOne']['abc'], '123', 'value three levels deep added');
   ok(children['childTwo'], 'object two levels deep maintained');
-  ok(children['childThree'] === false, 'object two levels deep removed');
+  strictEqual(children['childThree'], false, 'object two levels deep removed');
   ok(children['childFour'], 'object two levels deep added');
 
-  ok(Component.prototype.options_['example']['childOne']['foo'] === 'bar', 'prototype options were not overridden');
+  strictEqual(Component.prototype.options_['example']['childOne']['foo'], 'bar', 'prototype options were not overridden');
 
   // Reset default component options to none
   Component.prototype.options_ = null;
@@ -165,8 +166,8 @@ test('should dispose of component and children', function(){
 
   // Add a listener
   comp.on('click', function(){ return true; });
-  var data = Dom.getData(comp.el());
-  var id = comp.el()[Dom.expando];
+  var el = comp.el();
+  var data = Dom.getElData(el);
 
   var hasDisposed = false;
   var bubbles = null;
@@ -183,8 +184,8 @@ test('should dispose of component and children', function(){
   ok(!comp.el(), 'component element was deleted');
   ok(!child.children(), 'child children were deleted');
   ok(!child.el(), 'child element was deleted');
-  ok(!Dom.cache[id], 'listener cache nulled');
-  ok(!Object.getOwnPropertyNames(data).length, 'original listener cache object was emptied');
+  ok(!Dom.hasElData(el), 'listener data nulled');
+  ok(!Object.getOwnPropertyNames(data).length, 'original listener data object was emptied');
 });
 
 test('should add and remove event listeners to element', function(){
@@ -428,7 +429,7 @@ test('should change the width and height of a component', function(){
   comp.height('123px');
 
   ok(comp.width() === 500, 'percent values working');
-  var compStyle = Dom.getComputedDimension(el, 'width');
+  var compStyle = TestHelpers.getComputedStyle(el, 'width');
   ok(compStyle === comp.width() + 'px', 'matches computed style');
   ok(comp.height() === 123, 'px values working');
 

@@ -1,6 +1,6 @@
 import Player from '../../src/js/player.js';
 import videojs from '../../src/js/video.js';
-import Options from '../../src/js/options.js';
+import globalOptions from '../../src/js/global-options.js';
 import * as Dom from '../../src/js/utils/dom.js';
 import * as browser from '../../src/js/utils/browser.js';
 import log from '../../src/js/utils/log.js';
@@ -66,7 +66,7 @@ test('should accept options from multiple sources and override in correct order'
   // version of the key for all version.
 
   // Set a global option
-  Options['attr'] = 1;
+  globalOptions['attr'] = 1;
 
   var tag0 = TestHelpers.makeTag();
   var player0 = new Player(tag0);
@@ -92,7 +92,7 @@ test('should accept options from multiple sources and override in correct order'
 });
 
 test('should get tag, source, and track settings', function(){
-  // Partially tested in lib->getElementAttributes
+  // Partially tested in lib->getElAttributes
 
   var fixture = document.getElementById('qunit-fixture');
 
@@ -752,14 +752,14 @@ test('should be scrubbing while seeking', function(){
 });
 
 test('should throw on startup no techs are specified', function() {
-  const techOrder = Options.techOrder;
+  const techOrder = globalOptions.techOrder;
 
-  Options.techOrder = null;
+  globalOptions.techOrder = null;
   q.throws(function() {
     videojs(TestHelpers.makeTag());
   }, 'a falsey techOrder should throw');
 
-  Options.techOrder = techOrder;
+  globalOptions.techOrder = techOrder;
 });
 
 test('should have a sensible toJSON that is equivalent to player.options', function() {
