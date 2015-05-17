@@ -101,7 +101,7 @@ if (videojs.CDN_VERSION !== '__VERSION_'+'NO_PATCH__') {
 videojs.addLanguage = function(code, data){
   code = ('' + code).toLowerCase();
   if(Options['languages'][code] !== undefined) {
-    Options['languages'][code] = VjsUtil.mergeOptions(Options['languages'][code], data);
+    Options['languages'][code] = Lib.obj.mergeOptions(Options['languages'][code], data);
   } else {
     Options['languages'][code] = data;
   }
