@@ -147,21 +147,6 @@ class Tech extends Component {
 
     this.on('play', this.trackCurrentTime);
     this.on('pause', this.stopTrackingCurrentTime);
-    // timeupdate is also called by .currentTime whenever current time is set
-
-    // Watch for native timeupdate event only
-    var onTimeUpdate = function(e){
-      if (e.manuallyTriggered) return;
-
-      this.off('timeupdate', onTimeUpdate);
-
-      // Update known progress support for this playback technology
-      this.featuresTimeupdateEvents = true;
-      // Turn off manual progress tracking
-      this.manualTimeUpdatesOff();
-    };
-
-    this.on('timeupdate', onTimeUpdate);
   }
 
   manualTimeUpdatesOff() {
