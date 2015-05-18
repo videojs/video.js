@@ -16,10 +16,10 @@ export function bufferedPercent(buffered, duration) {
   }
 
   if (!buffered || !buffered.length) {
-    buffered = createTimeRange(0,0);
+    buffered = createTimeRange(0, 0);
   }
 
-  for (let i=0; i<buffered.length; i++){
+  for (let i = 0; i < buffered.length; i++){
     start = buffered.start(i);
     end   = buffered.end(i);
 
