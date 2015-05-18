@@ -416,6 +416,7 @@ class Player extends Component {
     var techOptions = assign({
       'source': source,
       'playerId': this.id(),
+      'techId': `${this.id()}_${techName}_api`,
       'textTracks': this.textTracks_
     }, this.options_[techName.toLowerCase()]);
 
