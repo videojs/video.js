@@ -619,4 +619,5 @@ test('should provide interval methods that automatically get cleared on componen
   strictEqual(comp.localize('Error'), 'Problem', 'Used primary code localization');
   player.language('en-GB');
   strictEqual(comp.localize('Good'), 'Brilliant', 'Ignored case');
+
 });*/
