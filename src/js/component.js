@@ -684,8 +684,8 @@ class Component {
    * @param  {Event|Object|String} event  A string (the type) or an event object with a type attribute
    * @return {Component}       self
    */
-  trigger(event) {
-    Events.trigger(this.el_, event);
+  trigger(event, ...data) {
+    Events.trigger.apply(Events, [this.el_, event].concat(data));
     return this;
   }
 

@@ -43,6 +43,24 @@ test('should add and remove multiple event listeners to an element with a single
   Events.trigger(el, 'event2'); // No event2 should happen.
 });
 
+test('should be possible to pass data when you trigger an event', function () {
+  expect(6);
+  var el = document.createElement('div');
+  var fakeData1 = 'Fake Data 1';
+  var fakeData2 = {txt: 'Fake Data 2'};
+
+  var listener = function(evt, data1, data2){
+    ok(true, 'Callback triggered');
+    deepEqual(fakeData1, data1, 'Shoulbe be passed to the hander');
+    deepEqual(fakeData2, data2, 'Shoulbe be passed to the hander');
+  };
+
+  Events.on(el, ['event1', 'event2'], listener);
+  Events.trigger(el, 'event1', fakeData1, fakeData2);
+  Events.trigger(el, 'event2', fakeData1, fakeData2);
+
+});
+
 test('should remove all listeners of a type', function(){
   var el = document.createElement('div');
   var clicks = 0;
