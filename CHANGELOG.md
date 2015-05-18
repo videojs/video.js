@@ -31,6 +31,7 @@ CHANGELOG
 * @gkatsev added get and set global options methods ([view](https://github.com/videojs/video.js/pull/2115))
 * @heff added support for fluid widths, aspect ratios, and metadata defaults ([view](https://github.com/videojs/video.js/pull/1952))
 * @heff reorganized all utility functions in the codebase ([view](https://github.com/videojs/video.js/pull/2139))
+* @eXon made additional tech 2.0 improvements listed in #2126 ([view](https://github.com/videojs/video.js/pull/2166))
 
 --------------------
 

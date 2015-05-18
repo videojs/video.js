@@ -7,6 +7,7 @@ import * as browser from './utils/browser.js';
 import log from './utils/log.js';
 import toTitleCase from './utils/to-title-case.js';
 import { createTimeRange } from './utils/time-ranges.js';
+import { bufferedPercent } from './utils/buffer.js';
 import FullscreenApi from './fullscreen-api.js';
 import MediaError from './media-error.js';
 import Options from './options.js';
@@ -415,7 +416,12 @@ class Player extends Component {
     var techOptions = assign({
       'source': source,
       'playerId': this.id(),
-      'textTracks': this.textTracks_
+      'techId': `${this.id()}_${techName}_api`,
+      'textTracks': this.textTracks_,
+      'autoplay': this.options_.autoplay,
+      'preload': this.options_.preload,
+      'loop': this.options_.loop,
+      'muted': this.options_.muted
     }, this.options_[techName.toLowerCase()]);
 
     if (this.tag) {
@@ -509,9 +515,6 @@ class Player extends Component {
     this.on(this.tech, 'touchstart', this.handleTechTouchStart);
     this.on(this.tech, 'touchmove', this.handleTechTouchMove);
     this.on(this.tech, 'touchend', this.handleTechTouchEnd);
-
-    // Turn on component tap events
-    this.tech.emitTapEvents();
 
     // The tap listener needs to come after the touchend listener because the tap
     // listener cancels out any reportedUserActivity when setting userActive(false)
@@ -1148,28 +1151,7 @@ class Player extends Component {
    * @return {Number} A decimal between 0 and 1 representing the percent
    */
   bufferedPercent() {
-    var duration = this.duration(),
-        buffered = this.buffered(),
-        bufferedDuration = 0,
-        start, end;
-
-    if (!duration) {
-      return 0;
-    }
-
-    for (var i=0; i<buffered.length; i++){
-      start = buffered.start(i);
-      end   = buffered.end(i);
-
-      // buffered end can be bigger than duration by a very small fraction
-      if (end > duration) {
-        end = duration;
-      }
-
-      bufferedDuration += end - start;
-    }
-
-    return bufferedDuration / duration;
+    return bufferedPercent(this.buffered(), this.duration());
   }
 
   /**

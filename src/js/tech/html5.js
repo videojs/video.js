@@ -109,7 +109,7 @@ class Html5 extends Tech {
 
         Dom.setElementAttributes(el,
           assign(attributes, {
-            id: this.options_.playerId + '_html5_api',
+            id: this.options_.techId,
             class: 'vjs-tech'
           })
         );

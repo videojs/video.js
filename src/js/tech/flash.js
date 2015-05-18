@@ -30,7 +30,7 @@ class Flash extends Tech {
     let { source, parentEl } = options;
 
     // Generate ID for swf object
-    let objId = options.playerId+'_flash_api';
+    let objId = options.techId;
 
     // Merge default flashvars with ones passed in to init
     let flashVars = assign({
