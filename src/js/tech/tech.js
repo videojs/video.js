@@ -8,7 +8,7 @@ import TextTrack from '../tracks/text-track';
 import TextTrackList from '../tracks/text-track-list';
 import * as Fn from '../utils/fn.js';
 import log from '../utils/log.js';
-import { createTimeRange } from '../utils/time-ranges.js';
+import { bufferedPercent } from '../utils/buffer.js';
 import window from 'global/window';
 import document from 'global/document';
 
@@ -111,15 +111,15 @@ class Tech extends Component {
     this.progressInterval = this.setInterval(Fn.bind(this, function(){
       // Don't trigger unless buffered amount is greater than last time
 
-      let bufferedPercent = this.bufferedPercent();
+      let numBufferedPercent = this.bufferedPercent();
 
-      if (this.bufferedPercent_ !== bufferedPercent) {
+      if (this.bufferedPercent_ !== numBufferedPercent) {
         this.trigger('progress');
       }
 
-      this.bufferedPercent_ = bufferedPercent;
+      this.bufferedPercent_ = numBufferedPercent;
 
-      if (bufferedPercent === 1) {
+      if (numBufferedPercent === 1) {
         this.stopTrackingProgress();
       }
     }), 500);
@@ -129,33 +129,12 @@ class Tech extends Component {
     this.duration_ = this.duration();
   }
 
+  buffered() {
+    return null;
+  }
+
   bufferedPercent() {
-    let bufferedDuration = 0,
-        start, end;
-
-    if (!this.duration_) {
-      return 0;
-    }
-
-    let buffered = this.buffered();
-
-    if (!buffered || !buffered.length) {
-      buffered = createTimeRange(0,0);
-    }
-
-    for (var i=0; i<buffered.length; i++){
-      start = buffered.start(i);
-      end   = buffered.end(i);
-
-      // buffered end can be bigger than duration by a very small fraction
-      if (end > this.duration_) {
-        end = this.duration_;
-      }
-
-      bufferedDuration += end - start;
-    }
-
-    return bufferedDuration / this.duration_;
+    return bufferedPercent(this.buffered(), this.duration_);
   }
 
   stopTrackingProgress() {
