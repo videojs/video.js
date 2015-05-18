@@ -29,6 +29,7 @@
   background-color: $primary-text;
   @extend .vjs-icon-circle;
 
+  // Progress handle
   &:before {
     position: absolute;
     top: -0.35em;
@@ -47,13 +48,6 @@ specific time ranges that have been buffered */
 .video-js .vjs-load-progress div {
   background: rgba($secondary-bg, 0.1);
 }
-
-.video-js .vjs-slider-handle.vjs-seek-handle {
-  width: 0.95em;
-  height: 0.95em;
-  display: none;
-}
-
 
 .video-js.vjs-no-flex .vjs-progress-control {
   width: auto;
