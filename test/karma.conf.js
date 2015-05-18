@@ -41,9 +41,9 @@ module.exports = function(config) {
 
     logLevel: config.LOG_INFO,
 
-    captureTimeout: 300000,
+    captureTimeout: 60000,
 
-    browserNoActivityTimeout: 300000,
+    browserNoActivityTimeout: 60000,
 
     // The HTML reporter seems to be busted right now, so we're just using text in the meantime
     // along with the summary after the test run.
