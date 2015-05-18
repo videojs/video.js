@@ -169,12 +169,10 @@ test('should export useful components to the public', function () {
   ok(videojs.getComponent('SeekBar'), 'SeekBar should be public');
   ok(videojs.getComponent('LoadProgressBar'), 'LoadProgressBar should be public');
   ok(videojs.getComponent('PlayProgressBar'), 'PlayProgressBar should be public');
-  ok(videojs.getComponent('SeekHandle'), 'SeekHandle should be public');
   ok(videojs.getComponent('VolumeControl'), 'VolumeControl should be public');
   ok(videojs.getComponent('VolumeBar'), 'VolumeBar should be public');
   ok(videojs.getComponent('VolumeLevel'), 'VolumeLevel should be public');
   ok(videojs.getComponent('VolumeMenuButton'), 'VolumeMenuButton should be public');
-  ok(videojs.getComponent('VolumeHandle'), 'VolumeHandle should be public');
   ok(videojs.getComponent('MuteToggle'), 'MuteToggle should be public');
   ok(videojs.getComponent('PosterImage'), 'PosterImage should be public');
   ok(videojs.getComponent('Menu'), 'Menu should be public');

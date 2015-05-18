@@ -3,7 +3,6 @@ import * as Fn from '../../utils/fn.js';
 import roundFloat from '../../utils/round-float.js';
 
 // Required children
-import VolumeHandle from './volume-handle.js';
 import VolumeLevel from './volume-level.js';
 
 /**
@@ -62,11 +61,9 @@ class VolumeBar extends Slider {
 
 VolumeBar.prototype.options_ = {
   children: {
-    'volumeLevel': {},
-    'volumeHandle': {}
+    'volumeLevel': {}
   },
-  'barName': 'volumeLevel',
-  'handleName': 'volumeHandle'
+  'barName': 'volumeLevel'
 };
 
 VolumeBar.prototype.playerEvent = 'volumechange';

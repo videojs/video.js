@@ -1,7 +1,6 @@
 import Slider from '../../slider/slider.js';
 import LoadProgressBar from './load-progress-bar.js';
 import PlayProgressBar from './play-progress-bar.js';
-import SeekHandle from './seek-handle.js';
 import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
 import roundFloat from '../../utils/round-float.js';
@@ -81,11 +80,9 @@ class SeekBar extends Slider {
 SeekBar.prototype.options_ = {
   children: {
     'loadProgressBar': {},
-    'playProgressBar': {},
-    'seekHandle': {}
+    'playProgressBar': {}
   },
-  'barName': 'playProgressBar',
-  'handleName': 'seekHandle'
+  'barName': 'playProgressBar'
 };
 
 SeekBar.prototype.playerEvent = 'timeupdate';
