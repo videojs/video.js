@@ -597,7 +597,9 @@ test('should provide interval methods that automatically get cleared on componen
   ok(intervalsFired === 5, 'Interval was cleared when component was disposed');
 });
 
-/*test('should ignore case in language codes and try primary code', function() {
+/* Needs to be redone:
+
+  test('should ignore case in language codes and try primary code', function() {
   expect(3);
 
   var player = TestHelpers.makePlayer({
