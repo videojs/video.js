@@ -510,9 +510,6 @@ class Player extends Component {
     this.on(this.tech, 'touchmove', this.handleTechTouchMove);
     this.on(this.tech, 'touchend', this.handleTechTouchEnd);
 
-    // Turn on component tap events
-    this.tech.emitTapEvents();
-
     // The tap listener needs to come after the touchend listener because the tap
     // listener cancels out any reportedUserActivity when setting userActive(false)
     this.on(this.tech, 'tap', this.handleTechTap);

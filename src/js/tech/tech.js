@@ -49,6 +49,9 @@ class Tech extends Component {
     }
 
     this.initTextTrackListeners();
+
+    // Turn on component tap events
+    this.emitTapEvents();
   }
 
   /**
