@@ -21,7 +21,6 @@ import document from 'global/document';
 class Tech extends Component {
 
   constructor(options={}, ready=function(){}){
-    options = options || {};
     // we don't want the tech to report user activity automatically.
     // This is done manually in addControlsListeners
     options.reportTouchActivity = false;
