@@ -417,7 +417,11 @@ class Player extends Component {
       'source': source,
       'playerId': this.id(),
       'techId': `${this.id()}_${techName}_api`,
-      'textTracks': this.textTracks_
+      'textTracks': this.textTracks_,
+      'autoplay': this.options_.autoplay,
+      'preload': this.options_.preload,
+      'loop': this.options_.loop,
+      'muted': this.options_.muted
     }, this.options_[techName.toLowerCase()]);
 
     if (this.tag) {
