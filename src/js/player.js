@@ -104,7 +104,17 @@ class Player extends Component {
     this.language_ = options['language'] || Options['language'];
 
     // Update Supported Languages
-    this.languages_ = options['languages'] || Options['languages'];
+    if (options['languages']) {
+      // Normalise player option languages to lowercase
+      let languagesToLower = {};
+      Object.getOwnPropertyNames(options['languages']).forEach(function(value,index,array){
+        languagesToLower[value.toLowerCase()] = options['languages'][value];
+      });
+      this.languages_ = languagesToLower;
+    }
+    else {
+      this.languages_ = Options['languages'];
+    }
 
     // Cache for video property values.
     this.cache_ = {};

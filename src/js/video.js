@@ -142,12 +142,13 @@ videojs.plugin = plugin;
  * @return {Object} The resulting global languages dictionary object
  */
 videojs.addLanguage = function(code, data){
-  if(Options['languages'][code] !== undefined) {
-    Options['languages'][code] = mergeOptions(Options['languages'][code], data);
-  } else {
-    Options['languages'][code] = data;
-  }
-  return Options['languages'];
+ code = ('' + code).toLowerCase();
+ if(Options['languages'][code] !== undefined) {
+   Options['languages'][code] = mergeOptions(Options['languages'][code], data);
+ } else {
+   Options['languages'][code] = data;
+ }
+ return Options['languages'];
 };
 
 // REMOVING: We probably should add this to the migration plugin
