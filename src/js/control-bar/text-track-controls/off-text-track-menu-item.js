@@ -1,4 +1,5 @@
 import TextTrackMenuItem from './text-track-menu-item.js';
+import Component from '../../component.js';
 
 /**
  * A special menu item for turning of a specific type of text track
@@ -39,5 +40,5 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
 
 }
 
-TextTrackMenuItem.registerComponent('OffTextTrackMenuItem', OffTextTrackMenuItem);
+Component.registerComponent('OffTextTrackMenuItem', OffTextTrackMenuItem);
 export default OffTextTrackMenuItem;

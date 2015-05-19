@@ -1,4 +1,5 @@
 import MenuButton from '../../menu/menu-button.js';
+import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
 import TextTrackMenuItem from './text-track-menu-item.js';
 import OffTextTrackMenuItem from './off-text-track-menu-item.js';
@@ -60,5 +61,5 @@ class TextTrackButton extends MenuButton {
 
 }
 
-MenuButton.registerComponent('TextTrackButton', TextTrackButton);
+Component.registerComponent('TextTrackButton', TextTrackButton);
 export default TextTrackButton;

@@ -1,4 +1,5 @@
 import MenuItem from '../../menu/menu-item.js';
+import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
 import window from 'global/window';
 import document from 'global/document';
@@ -86,5 +87,5 @@ class TextTrackMenuItem extends MenuItem {
 
 }
 
-MenuItem.registerComponent('TextTrackMenuItem', TextTrackMenuItem);
+Component.registerComponent('TextTrackMenuItem', TextTrackMenuItem);
 export default TextTrackMenuItem;

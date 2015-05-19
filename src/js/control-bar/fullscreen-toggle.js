@@ -1,4 +1,5 @@
-import Button from '../button';
+import Button from '../button.js';
+import Component from '../component.js';
 
 /**
  * Toggle fullscreen video
@@ -27,5 +28,5 @@ class FullscreenToggle extends Button {
 
 FullscreenToggle.prototype.buttonText = 'Fullscreen';
 
-Button.registerComponent('FullscreenToggle', FullscreenToggle);
+Component.registerComponent('FullscreenToggle', FullscreenToggle);
 export default FullscreenToggle;

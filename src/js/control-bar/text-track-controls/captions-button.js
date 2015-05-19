@@ -1,4 +1,5 @@
 import TextTrackButton from './text-track-button.js';
+import Component from '../../component.js';
 import CaptionSettingsMenuItem from './caption-settings-menu-item.js';
 
 /**
@@ -45,5 +46,5 @@ CaptionsButton.prototype.kind_ = 'captions';
 CaptionsButton.prototype.buttonText = 'Captions';
 CaptionsButton.prototype.className = 'vjs-captions-button';
 
-TextTrackButton.registerComponent('CaptionsButton', CaptionsButton);
+Component.registerComponent('CaptionsButton', CaptionsButton);
 export default CaptionsButton;
