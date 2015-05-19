@@ -2115,9 +2115,11 @@ class Player extends Component {
 
   /**
    * Get the player's language dictionary
+   * Merge every time, because a newly added plugin might call videojs.addLanguage() at any time
+   * Languages specified directly in the player options have precedence
    */
   languages() {
-    return this.languages_;
+    return  mergeOptions(Options['languages'], this.languages_);
   }
 
   toJSON() {
