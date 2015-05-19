@@ -46,6 +46,17 @@ test('should add the value to the languages object', function() {
   deepEqual(result['Hello'], globalOptions.languages['es']['Hello'], 'should also match');
 });
 
+test('should add the value to the languages object with lower case lang code', function() {
+  var code, data, result;
+
+  code = 'DE';
+  data = {'Hello': 'Guten Tag'};
+  result = videojs.addLanguage(code, data);
+
+  ok(globalOptions['languages'][code.toLowerCase()], 'should exist');
+  equal(globalOptions['languages'][code.toLowerCase()]['Hello'], 'Guten Tag', 'should match');
+  deepEqual(result, globalOptions['languages'][code.toLowerCase()], 'should also match');
+});
 
 test('should expose plugin registry function', function() {
   var pluginName, pluginFunction, player;

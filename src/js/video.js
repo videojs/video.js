@@ -312,6 +312,7 @@ videojs.plugin = plugin;
  * @return {Object} The resulting language dictionary object
  */
 videojs.addLanguage = function(code, data){
+  code = ('' + code).toLowerCase();
   return merge(globalOptions.languages, { [code]: data })[code];
 };
 

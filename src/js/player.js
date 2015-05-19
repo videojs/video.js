@@ -104,11 +104,21 @@ class Player extends Component {
     // Store the tag attributes used to restore html5 element
     this.tagAttributes = tag && Dom.getElAttributes(tag);
 
-    // Update Current Language
-    this.language_ = options['language'] || globalOptions['language'];
+    // Update current language
+    this.language(options.language || globalOptions.language);
 
     // Update Supported Languages
-    this.languages_ = options['languages'] || globalOptions['languages'];
+    if (options['languages']) {
+      // Normalise player option languages to lowercase
+      let languagesToLower = {};
+
+      Object.getOwnPropertyNames(options['languages']).forEach(function(name) {
+        languagesToLower[name.toLowerCase()] = options['languages'][name];
+      });
+      this.languages_ = languagesToLower;
+    } else {
+      this.languages_ = globalOptions['languages'];
+    }
 
     // Cache for video property values.
     this.cache_ = {};
@@ -2075,24 +2085,31 @@ class Player extends Component {
 
   /**
    * The player's language code
-   * @param  {String} languageCode  The locale string
-   * @return {String}             The locale string when getting
-   * @return {Player}         self, when setting
+   *
+   * NOTE: The language should be set in the player options if you want the
+   * the controls to be built with a specific language. Changing the lanugage
+   * later will not update controls text.
+   *
+   * @param {String} code  The locale string
+   * @return {String}      The locale string when getting
+   * @return {Player}      self, when setting
    */
-  language(languageCode) {
-    if (languageCode === undefined) {
+  language(code) {
+    if (code === undefined) {
       return this.language_;
     }
 
-    this.language_ = languageCode;
+    this.language_ = (''+code).toLowerCase();
     return this;
   }
 
   /**
    * Get the player's language dictionary
+   * Merge every time, because a newly added plugin might call videojs.addLanguage() at any time
+   * Languages specified directly in the player options have precedence
    */
   languages() {
-    return this.languages_;
+    return  mergeOptions(globalOptions['languages'], this.languages_);
   }
 
   toJSON() {
