@@ -3,7 +3,7 @@
 # vjs.TimeDivider
 
 __EXTENDS__: [vjs.Component](vjs.Component.md)  
-__DEFINED IN__: [src/js/control-bar/time-display.js#L88](https://github.com/videojs/video.js/blob/master/src/js/control-bar/time-display.js#L88)  
+__DEFINED IN__: [src/js/control-bar/time-display.js#L89](https://github.com/videojs/video.js/blob/master/src/js/control-bar/time-display.js#L89)  
 
 The separator between the current time and duration
 
@@ -324,7 +324,7 @@ _inherited from_: [src/js/component.js#L258](https://github.com/videojs/video.js
 * __player__ 
 * __options__ 
 
-_defined in_: [src/js/control-bar/time-display.js#L90](https://github.com/videojs/video.js/blob/master/src/js/control-bar/time-display.js#L90)
+_defined in_: [src/js/control-bar/time-display.js#L91](https://github.com/videojs/video.js/blob/master/src/js/control-bar/time-display.js#L91)
 
 ---
 
