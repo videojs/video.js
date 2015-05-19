@@ -5,6 +5,7 @@ CHANGELOG
 * @tjenkinson Added background-color to vjs-poster to remove transparent borders around scaled poster image ([view](https://github.com/videojs/video.js/pull/2138))
 * @bc-bbay fixed a bug where the player would try to autoplay when there was no source ([view](https://github.com/videojs/video.js/pull/2127))
 * @bc-bbay update time display on loadedmetadata ([view](https://github.com/videojs/video.js/pull/2151))
+* @dmlap update swf to 4.7 to pick up preload fix ([view](https://github.com/videojs/video.js/pull/2170))
 
 --------------------
 
