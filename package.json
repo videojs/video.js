@@ -28,7 +28,7 @@
     "lodash.merge": "^3.2.1",
     "object.assign": "^2.0.1",
     "safe-json-parse": "^4.0.0",
-    "videojs-swf": "4.5.4",
+    "videojs-swf": "4.7.0",
     "vtt.js": "git+https://github.com/gkatsev/vtt.js.git#shim-build"
   },
   "devDependencies": {
