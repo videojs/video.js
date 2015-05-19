@@ -680,12 +680,15 @@ class Component {
    *
    *     myComponent.trigger('eventName');
    *     myComponent.trigger({'type':'eventName'});
+   *     myComponent.trigger('eventName', {data: 'some data'});
+   *     myComponent.trigger({'type':'eventName'}, {data: 'some data'});
    *
    * @param  {Event|Object|String} event  A string (the type) or an event object with a type attribute
+   * @param  {Object} [hash] data hash to pass along with the event
    * @return {Component}       self
    */
-  trigger(event, ...data) {
-    Events.trigger.apply(Events, [this.el_, event].concat(data));
+  trigger(event, hash) {
+    Events.trigger(this.el_, event, hash);
     return this;
   }
 

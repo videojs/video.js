@@ -127,6 +127,7 @@ export function off(elem, type, fn) {
  * Trigger an event for an element
  * @param  {Element|Object}      elem  Element to trigger an event on
  * @param  {Event|Object|String} event A string (the type) or an event object with a type attribute
+ * @param  {...*} [evtData] you may pass additional data with the event
  */
 export function trigger(elem, event, ...evtData) {
   // Fetches element data and a reference to the parent (for bubbling).
@@ -146,13 +147,13 @@ export function trigger(elem, event, ...evtData) {
 
   // If the passed element has a dispatcher, executes the established handlers.
   if (elemData.dispatcher) {
-    elemData.dispatcher.apply(elem, [event].concat(evtData));
+    elemData.dispatcher.call(elem, event, ...evtData);
   }
 
   // Unless explicitly stopped or the event does not bubble (e.g. media events)
     // recursively calls this function to bubble the event up the DOM.
     if (parent && !event.isPropagationStopped() && event.bubbles !== false) {
-      trigger.apply(null, [parent, event].concat(evtData));
+      trigger.call(null, parent, event, ...evtData);
 
   // If at the top of the DOM, triggers the default action unless disabled.
   } else if (!parent && !event.defaultPrevented) {
