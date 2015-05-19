@@ -1,4 +1,5 @@
 import Spacer from './spacer.js';
+import Component from '../../component.js';
 
 /**
  * Spacer specifically meant to be used as an insertion point for new plugins, etc.
@@ -18,6 +19,5 @@ class CustomControlSpacer extends Spacer {
   }
 }
 
-Spacer.registerComponent('CustomControlSpacer', CustomControlSpacer);
-
+Component.registerComponent('CustomControlSpacer', CustomControlSpacer);
 export default CustomControlSpacer;

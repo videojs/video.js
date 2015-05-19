@@ -1,4 +1,5 @@
-import Button from './button';
+import Button from './button.js';
+import Component from './component.js';
 import * as Fn from './utils/fn.js';
 import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
@@ -103,5 +104,5 @@ class PosterImage extends Button {
 
 }
 
-Button.registerComponent('PosterImage', PosterImage);
+Component.registerComponent('PosterImage', PosterImage);
 export default PosterImage;

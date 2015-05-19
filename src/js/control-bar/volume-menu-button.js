@@ -1,4 +1,5 @@
 import Button from '../button.js';
+import Component from '../component.js';
 import Menu from '../menu/menu.js';
 import MenuButton from '../menu/menu-button.js';
 import MuteToggle from './mute-toggle.js';
@@ -67,5 +68,5 @@ class VolumeMenuButton extends MenuButton {
 
 VolumeMenuButton.prototype.volumeUpdate = MuteToggle.prototype.update;
 
-Button.registerComponent('VolumeMenuButton', VolumeMenuButton);
+Component.registerComponent('VolumeMenuButton', VolumeMenuButton);
 export default VolumeMenuButton;

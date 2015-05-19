@@ -1,4 +1,5 @@
 import TextTrackButton from './text-track-button.js';
+import Component from '../../component.js';
 import TextTrackMenuItem from './text-track-menu-item.js';
 import ChaptersTrackMenuItem from './chapters-track-menu-item.js';
 import Menu from '../../menu/menu.js';
@@ -107,5 +108,5 @@ ChaptersButton.prototype.kind_ = 'chapters';
 ChaptersButton.prototype.buttonText = 'Chapters';
 ChaptersButton.prototype.className = 'vjs-chapters-button';
 
-TextTrackButton.registerComponent('ChaptersButton', ChaptersButton);
+Component.registerComponent('ChaptersButton', ChaptersButton);
 export default ChaptersButton;

@@ -1,4 +1,5 @@
 import Button from '../button.js';
+import Component from '../component.js';
 import Menu from './menu.js';
 import * as Dom from '../utils/dom.js';
 import * as Fn from '../utils/fn.js';
@@ -139,5 +140,5 @@ class MenuButton extends Button {
   }
 }
 
-Button.registerComponent('MenuButton', MenuButton);
+Component.registerComponent('MenuButton', MenuButton);
 export default MenuButton;

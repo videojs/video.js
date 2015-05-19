@@ -1,4 +1,5 @@
 import MenuItem from '../../menu/menu-item.js';
+import Component from '../../component.js';
 
 /**
  * The specific menu item type for selecting a playback rate
@@ -35,5 +36,5 @@ class PlaybackRateMenuItem extends MenuItem {
 
 PlaybackRateMenuItem.prototype.contentElType = 'button';
 
-MenuItem.registerComponent('PlaybackRateMenuItem', PlaybackRateMenuItem);
+Component.registerComponent('PlaybackRateMenuItem', PlaybackRateMenuItem);
 export default PlaybackRateMenuItem;

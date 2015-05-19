@@ -1,4 +1,5 @@
-import Button from '../button';
+import Button from '../button.js';
+import Component from '../component.js';
 
 /**
  * Button to toggle between play and pause
@@ -47,5 +48,5 @@ class PlayToggle extends Button {
 
 PlayToggle.prototype.buttonText = 'Play';
 
-Button.registerComponent('PlayToggle', PlayToggle);
+Component.registerComponent('PlayToggle', PlayToggle);
 export default PlayToggle;

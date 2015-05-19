@@ -394,5 +394,5 @@ Flash.getEmbedCode = function(swf, flashVars, params, attributes){
 // Run Flash through the RTMP decorator
 FlashRtmpDecorator(Flash);
 
-Tech.registerComponent('Flash', Flash);
+Component.registerComponent('Flash', Flash);
 export default Flash;
