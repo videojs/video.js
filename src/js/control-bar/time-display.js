@@ -51,6 +51,7 @@ vjs.DurationDisplay = vjs.Component.extend({
     // Once the order of durationchange and this.player_.duration() being set is figured out,
     // this can be updated.
     this.on(player, 'timeupdate', this.updateContent);
+    this.on(player, 'loadedmetadata', this.updateContent);
   }
 });
 
