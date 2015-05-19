@@ -49,15 +49,15 @@ test('should be possible to pass data when you trigger an event', function () {
   var fakeData1 = 'Fake Data 1';
   var fakeData2 = {txt: 'Fake Data 2'};
 
-  var listener = function(evt, data1, data2){
+  var listener = function(evt, hash){
     ok(true, 'Callback triggered');
-    deepEqual(fakeData1, data1, 'Shoulbe be passed to the hander');
-    deepEqual(fakeData2, data2, 'Shoulbe be passed to the hander');
+    deepEqual(fakeData1, hash.d1, 'Shoulbe be passed to the handler');
+    deepEqual(fakeData2, hash.d2, 'Shoulbe be passed to the handler');
   };
 
   Events.on(el, ['event1', 'event2'], listener);
-  Events.trigger(el, 'event1', fakeData1, fakeData2);
-  Events.trigger(el, 'event2', fakeData1, fakeData2);
+  Events.trigger(el, 'event1', { d1: fakeData1, d2:fakeData2});
+  Events.trigger(el, 'event2', { d1: fakeData1, d2:fakeData2});
 
 });
 
