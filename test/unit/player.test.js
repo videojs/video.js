@@ -791,3 +791,25 @@ test('should have a sensible toJSON that is equivalent to player.options', funct
 
   deepEqual(player2.toJSON(), popts, 'no circular references');
 });
+
+test('should ignore case in language codes and try primary code', function() {
+expect(3);
+
+  var player = TestHelpers.makePlayer({
+    'languages': {
+      'en-gb': {
+        'Good': 'Brilliant'
+      },
+      'EN': {
+        'Good': 'Awesome',
+        'Error': 'Problem'
+      }
+    }
+  });
+
+  player.language('en-gb');
+  strictEqual(player.localize('Good'), 'Brilliant', 'Used subcode specific localisation');
+  strictEqual(player.localize('Error'), 'Problem', 'Used primary code localisation');
+  player.language('en-GB');
+  strictEqual(player.localize('Good'), 'Brilliant', 'Ignored case');
+});
