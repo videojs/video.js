@@ -9,6 +9,10 @@
  * @type {Image}
  */
 ;(function(i,w,n,e,l){
+  // Allow people to disable CDN tracking themselves by specifying a global
+  // (VIDEOJS_NO_ANALYTICS) as true
+  if (w.VIDEOJS_NO_ANALYTICS) return;
+
   l=w.location;
 
   // Google Analytics has a limit of 10 million hits per month for free accounts.
