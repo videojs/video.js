@@ -142,7 +142,8 @@ videojs.plugin = plugin;
  * @return {Object} The resulting global languages dictionary object
  */
 videojs.addLanguage = function(code, data){
-  if(Options['languages'][code] !== undefined) {
+  code = ('' + code).toLowerCase();
+  if(typeof Options['languages'][code] !== 'undefined') {
     Options['languages'][code] = mergeOptions(Options['languages'][code], data);
   } else {
     Options['languages'][code] = data;

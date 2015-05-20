@@ -104,7 +104,17 @@ class Player extends Component {
     this.language_ = options['language'] || Options['language'];
 
     // Update Supported Languages
-    this.languages_ = options['languages'] || Options['languages'];
+    if (options['languages']) {
+      // Normalise player option languages to lowercase
+      let languagesToLower = {};
+
+      Object.getOwnPropertyNames(options['languages']).forEach(function(name) {
+        languagesToLower[name.toLowerCase()] = options['languages'][name];
+      });
+      this.languages_ = languagesToLower;
+    } else {
+      this.languages_ = Options['languages'];
+    }
 
     // Cache for video property values.
     this.cache_ = {};
@@ -2105,9 +2115,11 @@ class Player extends Component {
 
   /**
    * Get the player's language dictionary
+   * Merge every time, because a newly added plugin might call videojs.addLanguage() at any time
+   * Languages specified directly in the player options have precedence
    */
   languages() {
-    return this.languages_;
+    return  mergeOptions(Options['languages'], this.languages_);
   }
 
   toJSON() {
