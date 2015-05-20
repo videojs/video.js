@@ -226,7 +226,9 @@ class Component {
     if (languages[lang] && languages[lang][string]) {
       return languages[lang][string];
     }
-    if (primaryCode !== lang && languages[primaryCode] && languages[primaryCode][string]) {
+    if (primaryCode !== lang &&
+        languages[primaryCode] &&
+        languages[primaryCode][string]) {
       return languages[primaryCode][string];
     }
     return string;

@@ -107,12 +107,12 @@ class Player extends Component {
     if (options['languages']) {
       // Normalise player option languages to lowercase
       let languagesToLower = {};
-      Object.getOwnPropertyNames(options['languages']).forEach(function(value,index,array){
-        languagesToLower[value.toLowerCase()] = options['languages'][value];
+
+      Object.getOwnPropertyNames(options['languages']).forEach(function(name) {
+        languagesToLower[name.toLowerCase()] = options['languages'][name];
       });
       this.languages_ = languagesToLower;
-    }
-    else {
+    } else {
       this.languages_ = Options['languages'];
     }
 
