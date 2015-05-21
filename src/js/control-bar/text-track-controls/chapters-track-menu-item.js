@@ -1,4 +1,5 @@
 import MenuItem from '../../menu/menu-item.js';
+import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
 
 /**
@@ -37,5 +38,5 @@ class ChaptersTrackMenuItem extends MenuItem {
 
 }
 
-MenuItem.registerComponent('ChaptersTrackMenuItem', ChaptersTrackMenuItem);
+Component.registerComponent('ChaptersTrackMenuItem', ChaptersTrackMenuItem);
 export default ChaptersTrackMenuItem;

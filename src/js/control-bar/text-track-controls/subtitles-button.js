@@ -1,4 +1,5 @@
 import TextTrackButton from './text-track-button.js';
+import Component from '../../component.js';
 
 /**
  * The button component for toggling and selecting subtitles
@@ -18,5 +19,5 @@ SubtitlesButton.prototype.kind_ = 'subtitles';
 SubtitlesButton.prototype.buttonText = 'Subtitles';
 SubtitlesButton.prototype.className = 'vjs-subtitles-button';
 
-TextTrackButton.registerComponent('SubtitlesButton', SubtitlesButton);
+Component.registerComponent('SubtitlesButton', SubtitlesButton);
 export default SubtitlesButton;

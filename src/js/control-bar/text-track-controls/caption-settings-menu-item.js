@@ -1,4 +1,5 @@
 import TextTrackMenuItem from './text-track-menu-item.js';
+import Component from '../../component.js';
 
 class CaptionSettingsMenuItem extends TextTrackMenuItem {
 
@@ -21,5 +22,5 @@ class CaptionSettingsMenuItem extends TextTrackMenuItem {
 
 }
 
-TextTrackMenuItem.registerComponent('CaptionSettingsMenuItem', CaptionSettingsMenuItem);
+Component.registerComponent('CaptionSettingsMenuItem', CaptionSettingsMenuItem);
 export default CaptionSettingsMenuItem;

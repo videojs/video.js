@@ -1,4 +1,5 @@
 import SliderHandle from '../../slider/slider-handle.js';
+import Component from '../../component.js';
 
 /**
  * The volume handle can be dragged to adjust the volume level
@@ -20,5 +21,5 @@ class VolumeHandle extends SliderHandle {
 
 VolumeHandle.prototype.defaultValue = '00:00';
 
-SliderHandle.registerComponent('VolumeHandle', VolumeHandle);
+Component.registerComponent('VolumeHandle', VolumeHandle);
 export default VolumeHandle;

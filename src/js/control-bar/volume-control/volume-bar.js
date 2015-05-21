@@ -1,4 +1,5 @@
 import Slider from '../../slider/slider.js';
+import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
 import roundFloat from '../../utils/round-float.js';
 
@@ -71,5 +72,5 @@ VolumeBar.prototype.options_ = {
 
 VolumeBar.prototype.playerEvent = 'volumechange';
 
-Slider.registerComponent('VolumeBar', VolumeBar);
+Component.registerComponent('VolumeBar', VolumeBar);
 export default VolumeBar;

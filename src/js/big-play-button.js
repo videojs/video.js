@@ -1,4 +1,5 @@
-import Button from './button';
+import Button from './button.js';
+import Component from './component.js';
 
 /* Big Play Button
 ================================================================================ */
@@ -26,5 +27,5 @@ class BigPlayButton extends Button {
 
 }
 
-Button.registerComponent('BigPlayButton', BigPlayButton);
+Component.registerComponent('BigPlayButton', BigPlayButton);
 export default BigPlayButton;

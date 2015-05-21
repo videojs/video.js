@@ -1,4 +1,5 @@
 import Slider from '../../slider/slider.js';
+import Component from '../../component.js';
 import LoadProgressBar from './load-progress-bar.js';
 import PlayProgressBar from './play-progress-bar.js';
 import SeekHandle from './seek-handle.js';
@@ -90,5 +91,5 @@ SeekBar.prototype.options_ = {
 
 SeekBar.prototype.playerEvent = 'timeupdate';
 
-Slider.registerComponent('SeekBar', SeekBar);
+Component.registerComponent('SeekBar', SeekBar);
 export default SeekBar;

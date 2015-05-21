@@ -1,4 +1,5 @@
 import Button from '../button.js';
+import Component from '../component.js';
 import assign from 'object.assign';
 
 /**
@@ -47,5 +48,5 @@ class MenuItem extends Button {
 
 }
 
-Button.registerComponent('MenuItem', MenuItem);
+Component.registerComponent('MenuItem', MenuItem);
 export default MenuItem;

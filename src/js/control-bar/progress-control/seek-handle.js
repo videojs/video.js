@@ -1,4 +1,5 @@
 import SliderHandle from '../../slider/slider-handle.js';
+import Component from '../../component.js';
 import formatTime from '../../utils/format-time.js';
 
 /**
@@ -39,5 +40,5 @@ class SeekHandle extends SliderHandle {
  */
 SeekHandle.prototype.defaultValue = '00:00';
 
-SliderHandle.registerComponent('SeekHandle', SeekHandle);
+Component.registerComponent('SeekHandle', SeekHandle);
 export default SeekHandle;
