@@ -8,6 +8,7 @@ import TextTrack from '../tracks/text-track';
 import TextTrackList from '../tracks/text-track-list';
 import * as Fn from '../utils/fn.js';
 import log from '../utils/log.js';
+import { createTimeRange } from '../utils/time-ranges.js';
 import { bufferedPercent } from '../utils/buffer.js';
 import window from 'global/window';
 import document from 'global/document';
@@ -130,7 +131,7 @@ class Tech extends Component {
   }
 
   buffered() {
-    return null;
+    return createTimeRange(0, 0);
   }
 
   bufferedPercent() {
