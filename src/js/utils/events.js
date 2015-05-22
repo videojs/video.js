@@ -38,7 +38,7 @@ export function on(elem, type, fn){
   if (!data.dispatcher) {
     data.disabled = false;
 
-    data.dispatcher = function (event, ...evtData){
+    data.dispatcher = function (event, hash){
 
       if (data.disabled) return;
       event = fixEvent(event);
@@ -53,7 +53,7 @@ export function on(elem, type, fn){
           if (event.isImmediatePropagationStopped()) {
             break;
           } else {
-            handlersCopy[m].apply(elem, [event].concat(evtData));
+            handlersCopy[m].call(elem, event, hash);
           }
         }
       }
