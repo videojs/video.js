@@ -26,16 +26,20 @@ var TestHelpers = {
   },
 
   getComputedStyle: function(el, rule){
-    var val;
-
-    if(window.getComputedStyle){
-      val = window.getComputedStyle(el, null).getPropertyValue(rule);
-    // IE8
-    } else if(el.currentStyle){
-      val = el.currentStyle[rule];
+    if (document.defaultView && document.defaultView.getComputedStyle) {
+      return document.defaultView.getComputedStyle(el, null).getPropertyValue(rule);
     }
 
-    return val;
+    // IE8
+    if (el.currentStyle) {
+      if (rule === 'width' || rule === 'height') {
+        // return clientWidth or clientHeight instead for better accuracy
+        rule = 'client' + rule.substr(0, 1).toUpperCase() + rule.substr(1);
+        return el[rule] + 'px';
+      } else {
+        return el.currentStyle[rule];
+      }
+    }
   }
 };
 

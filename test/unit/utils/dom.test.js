@@ -1,5 +1,6 @@
 import document from 'global/document';
 import * as Dom from '../../../src/js/utils/dom.js';
+import TestHelpers from '../test-helpers.js';
 
 test('should return the element with the ID', function(){
   var el1 = document.createElement('div');
@@ -12,8 +13,8 @@ test('should return the element with the ID', function(){
   el1.id = 'test_id1';
   el2.id = 'test_id2';
 
-  ok(Dom.el('test_id1') === el1, 'found element for ID');
-  ok(Dom.el('#test_id2') === el2, 'found element for CSS ID');
+  ok(Dom.getEl('test_id1') === el1, 'found element for ID');
+  ok(Dom.getEl('#test_id2') === el2, 'found element for CSS ID');
 });
 
 test('should create an element', function(){
@@ -30,49 +31,47 @@ test('should insert an element first in another', function(){
   var el2 = document.createElement('div');
   var parent = document.createElement('div');
 
-  Dom.insertFirst(el1, parent);
+  Dom.insertElFirst(el1, parent);
   ok(parent.firstChild === el1, 'inserts first into empty parent');
 
-  Dom.insertFirst(el2, parent);
+  Dom.insertElFirst(el2, parent);
   ok(parent.firstChild === el2, 'inserts first into parent with child');
 });
 
 test('should get and remove data from an element', function(){
   var el = document.createElement('div');
-  var data = Dom.getData(el);
-  var id = el[Dom.expando];
+  var data = Dom.getElData(el);
 
   ok(typeof data === 'object', 'data object created');
 
   // Add data
   var testData = { asdf: 'fdsa' };
   data.test = testData;
-  ok(Dom.getData(el).test === testData, 'data added');
+  ok(Dom.getElData(el).test === testData, 'data added');
 
   // Remove all data
-  Dom.removeData(el);
+  Dom.removeElData(el);
 
-  ok(!Dom.cache[id], 'cached item nulled');
-  ok(el[Dom.expando] === null || el[Dom.expando] === undefined, 'element data id removed');
+  ok(!Dom.hasElData(el), 'cached item emptied');
 });
 
 test('should add and remove a class name on an element', function(){
   var el = document.createElement('div');
-  Dom.addClass(el, 'test-class');
+  Dom.addElClass(el, 'test-class');
   ok(el.className === 'test-class', 'class added');
-  Dom.addClass(el, 'test-class');
+  Dom.addElClass(el, 'test-class');
   ok(el.className === 'test-class', 'same class not duplicated');
-  Dom.addClass(el, 'test-class2');
+  Dom.addElClass(el, 'test-class2');
   ok(el.className === 'test-class test-class2', 'added second class');
-  Dom.removeClass(el, 'test-class');
+  Dom.removeElClass(el, 'test-class');
   ok(el.className === 'test-class2', 'removed first class');
 });
 
 test('should read class names on an element', function(){
   var el = document.createElement('div');
-  Dom.addClass(el, 'test-class1');
-  ok(Dom.hasClass(el, 'test-class1') === true, 'class detected');
-  ok(Dom.hasClass(el, 'test-class') === false, 'substring correctly not detected');
+  Dom.addElClass(el, 'test-class1');
+  ok(Dom.hasElClass(el, 'test-class1') === true, 'class detected');
+  ok(Dom.hasElClass(el, 'test-class') === false, 'substring correctly not detected');
 });
 
 test('should set element attributes from object', function(){
@@ -81,7 +80,7 @@ test('should set element attributes from object', function(){
   el = document.createElement('div');
   el.id = 'el1';
 
-  Dom.setElementAttributes(el, { controls: true, 'data-test': 'asdf' });
+  Dom.setElAttributes(el, { controls: true, 'data-test': 'asdf' });
 
   equal(el.getAttribute('id'), 'el1');
   equal(el.getAttribute('controls'), '');
@@ -100,10 +99,10 @@ test('should read tag attributes from elements, including HTML5 in all browsers'
 
   document.getElementById('qunit-fixture').innerHTML += tags;
 
-  var vid1Vals = Dom.getElementAttributes(document.getElementById('vid1'));
-  var vid2Vals = Dom.getElementAttributes(document.getElementById('vid2'));
-  var sourceVals = Dom.getElementAttributes(document.getElementById('source'));
-  var trackVals = Dom.getElementAttributes(document.getElementById('track'));
+  var vid1Vals = Dom.getElAttributes(document.getElementById('vid1'));
+  var vid2Vals = Dom.getElAttributes(document.getElementById('vid2'));
+  var sourceVals = Dom.getElAttributes(document.getElementById('source'));
+  var trackVals = Dom.getElAttributes(document.getElementById('track'));
 
   // was using deepEqual, but ie8 would send all properties as attributes
 
@@ -139,29 +138,9 @@ test('should read tag attributes from elements, including HTML5 in all browsers'
   equal(trackVals['title'], 'test');
 });
 
-test('should get the right style values for an element', function(){
-  var el = document.createElement('div');
-  var container = document.createElement('div');
-  var fixture = document.getElementById('qunit-fixture');
-
-  container.appendChild(el);
-  fixture.appendChild(container);
-
-  container.style.width = '1000px';
-  container.style.height = '1000px';
-
-  el.style.height = '100%';
-  el.style.width = '123px';
-
-  // integer px values may get translated int very-close floats in Chrome/OS X
-  // so round the dimensions to ignore this
-  equal(Math.round(parseFloat(Dom.getComputedDimension(el, 'height'))), 1000, 'the computed height is equal');
-  equal(Math.round(parseFloat(Dom.getComputedDimension(el, 'width'))), 123, 'the computed width is equal');
-});
-
-test('Dom.findPosition should find top and left position', function() {
+test('Dom.findElPosition should find top and left position', function() {
   const d = document.createElement('div');
-  let position = Dom.findPosition(d);
+  let position = Dom.findElPosition(d);
   d.style.top = '10px';
   d.style.left = '20px';
   d.style.position = 'absolute';
@@ -169,10 +148,10 @@ test('Dom.findPosition should find top and left position', function() {
   deepEqual(position, {left: 0, top: 0}, 'If element isn\'t in the DOM, we should get zeros');
 
   document.body.appendChild(d);
-  position = Dom.findPosition(d);
+  position = Dom.findElPosition(d);
   deepEqual(position, {left: 20, top: 10}, 'The position was not correct');
 
   d.getBoundingClientRect = null;
-  position = Dom.findPosition(d);
+  position = Dom.findElPosition(d);
   deepEqual(position, {left: 0, top: 0}, 'If there is no gBCR, we should get zeros');
 });

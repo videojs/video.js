@@ -1,7 +1,7 @@
 import videojs from '../../src/js/video.js';
 import TestHelpers from './test-helpers.js';
 import Player from '../../src/js/player.js';
-import Options from '../../src/js/options.js';
+import globalOptions from '../../src/js/global-options.js';
 import document from 'global/document';
 
 q.module('video.js');
@@ -41,11 +41,22 @@ test('should add the value to the languages object', function() {
   data = {'Hello': 'Hola'};
   result = videojs.addLanguage(code, data);
 
-  ok(Options['languages'][code], 'should exist');
-  equal(Options['languages'][code], data, 'should match');
-  deepEqual(result[code], Options['languages'][code], 'should also match');
+  ok(globalOptions.languages[code], 'should exist');
+  equal(globalOptions.languages['es']['Hello'], 'Hola', 'should match');
+  deepEqual(result['Hello'], globalOptions.languages['es']['Hello'], 'should also match');
 });
 
+test('should add the value to the languages object with lower case lang code', function() {
+  var code, data, result;
+
+  code = 'DE';
+  data = {'Hello': 'Guten Tag'};
+  result = videojs.addLanguage(code, data);
+
+  ok(globalOptions['languages'][code.toLowerCase()], 'should exist');
+  equal(globalOptions['languages'][code.toLowerCase()]['Hello'], 'Guten Tag', 'should match');
+  deepEqual(result, globalOptions['languages'][code.toLowerCase()], 'should also match');
+});
 
 test('should expose plugin registry function', function() {
   var pluginName, pluginFunction, player;

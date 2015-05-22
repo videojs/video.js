@@ -1,4 +1,8 @@
+// Subclasses Component
 import Component from './component.js';
+
+import document from 'global/document';
+import window from 'global/window';
 import * as Events from './utils/events.js';
 import * as Dom from './utils/dom.js';
 import * as Fn from './utils/fn.js';
@@ -7,25 +11,25 @@ import * as browser from './utils/browser.js';
 import log from './utils/log.js';
 import toTitleCase from './utils/to-title-case.js';
 import { createTimeRange } from './utils/time-ranges.js';
+import { bufferedPercent } from './utils/buffer.js';
 import FullscreenApi from './fullscreen-api.js';
 import MediaError from './media-error.js';
-import Options from './options.js';
+import globalOptions from './global-options.js';
 import safeParseTuple from 'safe-json-parse/tuple';
-import window from 'global/window';
-import document from 'global/document';
 import assign from 'object.assign';
 import mergeOptions from './utils/merge-options.js';
 
-// Include required child components
+// Include required child components (importing also registers them)
 import MediaLoader from './tech/loader.js';
-import Poster from './poster-image.js';
+import PosterImage from './poster-image.js';
 import TextTrackDisplay from './tracks/text-track-display.js';
 import LoadingSpinner from './loading-spinner.js';
 import BigPlayButton from './big-play-button.js';
-import controlBar from './control-bar/control-bar.js';
+import ControlBar from './control-bar/control-bar.js';
 import ErrorDisplay from './error-display.js';
 import TextTrackSettings from './tracks/text-track-settings.js';
-// Require html5 for disposing the original video tag
+
+// Require html5 tech, at least for disposing the original video tag
 import Html5 from './tech/html5.js';
 
 /**
@@ -98,13 +102,23 @@ class Player extends Component {
     this.tag = tag; // Store the original tag used to set options
 
     // Store the tag attributes used to restore html5 element
-    this.tagAttributes = tag && Dom.getElementAttributes(tag);
+    this.tagAttributes = tag && Dom.getElAttributes(tag);
 
-    // Update Current Language
-    this.language_ = options['language'] || Options['language'];
+    // Update current language
+    this.language(options.language || globalOptions.language);
 
     // Update Supported Languages
-    this.languages_ = options['languages'] || Options['languages'];
+    if (options['languages']) {
+      // Normalise player option languages to lowercase
+      let languagesToLower = {};
+
+      Object.getOwnPropertyNames(options['languages']).forEach(function(name) {
+        languagesToLower[name.toLowerCase()] = options['languages'][name];
+      });
+      this.languages_ = languagesToLower;
+    } else {
+      this.languages_ = globalOptions['languages'];
+    }
 
     // Cache for video property values.
     this.cache_ = {};
@@ -210,7 +224,7 @@ class Player extends Component {
 
     // Copy over all the attributes from the tag, including ID and class
     // ID will now reference player box, not the video tag
-    const attrs = Dom.getElementAttributes(tag);
+    const attrs = Dom.getElAttributes(tag);
 
     Object.getOwnPropertyNames(attrs).forEach(function(attr){
       // workaround so we don't totally break IE7
@@ -245,7 +259,7 @@ class Player extends Component {
     this.fluid(this.options_['fluid']);
     this.aspectRatio(this.options_['aspectRatio']);
 
-    // insertFirst seems to cause the networkState to flicker from 3 to 2, so
+    // insertElFirst seems to cause the networkState to flicker from 3 to 2, so
     // keep track of the original for later so we can know if the source originally failed
     tag.initNetworkState_ = tag.networkState;
 
@@ -253,7 +267,7 @@ class Player extends Component {
     if (tag.parentNode) {
       tag.parentNode.insertBefore(el, tag);
     }
-    Dom.insertFirst(tag, el); // Breaks iPhone, fixed in HTML5 setup.
+    Dom.insertElFirst(tag, el); // Breaks iPhone, fixed in HTML5 setup.
 
     this.el_ = el;
 
@@ -415,7 +429,12 @@ class Player extends Component {
     var techOptions = assign({
       'source': source,
       'playerId': this.id(),
-      'textTracks': this.textTracks_
+      'techId': `${this.id()}_${techName}_api`,
+      'textTracks': this.textTracks_,
+      'autoplay': this.options_.autoplay,
+      'preload': this.options_.preload,
+      'loop': this.options_.loop,
+      'muted': this.options_.muted
     }, this.options_[techName.toLowerCase()]);
 
     if (this.tag) {
@@ -473,7 +492,7 @@ class Player extends Component {
     // Add the tech element in the DOM if it was not already there
     // Make sure to not insert the original video element if using Html5
     if (this.tech.el().parentNode !== this.el() && (techName !== 'Html5' || !this.tag)) {
-      Dom.insertFirst(this.tech.el(), this.el());
+      Dom.insertElFirst(this.tech.el(), this.el());
     }
 
     // Get rid of the original video tag reference after the first tech is loaded
@@ -509,9 +528,6 @@ class Player extends Component {
     this.on(this.tech, 'touchstart', this.handleTechTouchStart);
     this.on(this.tech, 'touchmove', this.handleTechTouchMove);
     this.on(this.tech, 'touchend', this.handleTechTouchEnd);
-
-    // Turn on component tap events
-    this.tech.emitTapEvents();
 
     // The tap listener needs to come after the touchend listener because the tap
     // listener cancels out any reportedUserActivity when setting userActive(false)
@@ -1148,28 +1164,7 @@ class Player extends Component {
    * @return {Number} A decimal between 0 and 1 representing the percent
    */
   bufferedPercent() {
-    var duration = this.duration(),
-        buffered = this.buffered(),
-        bufferedDuration = 0,
-        start, end;
-
-    if (!duration) {
-      return 0;
-    }
-
-    for (var i=0; i<buffered.length; i++){
-      start = buffered.start(i);
-      end   = buffered.end(i);
-
-      // buffered end can be bigger than duration by a very small fraction
-      if (end > duration) {
-        end = duration;
-      }
-
-      bufferedDuration += end - start;
-    }
-
-    return bufferedDuration / duration;
+    return bufferedPercent(this.buffered(), this.duration());
   }
 
   /**
@@ -1394,7 +1389,7 @@ class Player extends Component {
     document.documentElement.style.overflow = 'hidden';
 
     // Apply fullscreen styles
-    Dom.addClass(document.body, 'vjs-full-window');
+    Dom.addElClass(document.body, 'vjs-full-window');
 
     this.trigger('enterFullWindow');
   }
@@ -1417,7 +1412,7 @@ class Player extends Component {
     document.documentElement.style.overflow = this.docOrigOverflow;
 
     // Remove fullscreen styles
-    Dom.removeClass(document.body, 'vjs-full-window');
+    Dom.removeElClass(document.body, 'vjs-full-window');
 
     // Resize the box, controller, and poster to original sizes
     // this.positionAll();
@@ -1485,7 +1480,11 @@ class Player extends Component {
    * @return {String} The current video source when getting
    * @return {String} The player when setting
    */
-  src(source=this.techGet('src')) {
+  src(source) {
+    if (source === undefined) {
+      return this.techGet('src');
+    }
+
     let currentTech = Component.getComponent(this.techName);
 
     // case: Array of source objects to choose from and pick the best to play
@@ -2090,24 +2089,31 @@ class Player extends Component {
 
   /**
    * The player's language code
-   * @param  {String} languageCode  The locale string
-   * @return {String}             The locale string when getting
-   * @return {Player}         self, when setting
+   *
+   * NOTE: The language should be set in the player options if you want the
+   * the controls to be built with a specific language. Changing the lanugage
+   * later will not update controls text.
+   *
+   * @param {String} code  The locale string
+   * @return {String}      The locale string when getting
+   * @return {Player}      self, when setting
    */
-  language(languageCode) {
-    if (languageCode === undefined) {
+  language(code) {
+    if (code === undefined) {
       return this.language_;
     }
 
-    this.language_ = languageCode;
+    this.language_ = (''+code).toLowerCase();
     return this;
   }
 
   /**
    * Get the player's language dictionary
+   * Merge every time, because a newly added plugin might call videojs.addLanguage() at any time
+   * Languages specified directly in the player options have precedence
    */
   languages() {
-    return this.languages_;
+    return  mergeOptions(globalOptions['languages'], this.languages_);
   }
 
   toJSON() {
@@ -2134,7 +2140,7 @@ class Player extends Component {
       'tracks': []
     };
 
-    const tagOptions = Dom.getElementAttributes(tag);
+    const tagOptions = Dom.getElAttributes(tag);
     const dataSetup = tagOptions['data-setup'];
 
     // Check if data-setup attr exists.
@@ -2159,9 +2165,9 @@ class Player extends Component {
         // Change case needed: http://ejohn.org/blog/nodename-case-sensitivity/
         const childName = child.nodeName.toLowerCase();
         if (childName === 'source') {
-          baseOptions['sources'].push(Dom.getElementAttributes(child));
+          baseOptions['sources'].push(Dom.getElAttributes(child));
         } else if (childName === 'track') {
-          baseOptions['tracks'].push(Dom.getElementAttributes(child));
+          baseOptions['tracks'].push(Dom.getElAttributes(child));
         }
       }
     }
@@ -2186,7 +2192,7 @@ Player.players = {};
  * @type {Object}
  * @private
  */
-Player.prototype.options_ = Options;
+Player.prototype.options_ = globalOptions;
 
 /**
  * Fired when the player has initial duration and dimension information

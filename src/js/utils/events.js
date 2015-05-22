@@ -24,7 +24,7 @@ export function on(elem, type, fn){
     return _handleMultipleEvents(on, elem, type, fn);
   }
 
-  let data = Dom.getData(elem);
+  let data = Dom.getElData(elem);
 
   // We need a place to store all our handler data
   if (!data.handlers) data.handlers = {};
@@ -76,10 +76,10 @@ export function on(elem, type, fn){
  * @param  {Function} fn   Specific listener to remove. Don't include to remove listeners for an event type.
  */
 export function off(elem, type, fn) {
-  // Don't want to add a cache object through getData if not needed
-  if (!Dom.hasData(elem)) return;
+  // Don't want to add a cache object through getElData if not needed
+  if (!Dom.hasElData(elem)) return;
 
-  let data = Dom.getData(elem);
+  let data = Dom.getElData(elem);
 
   // If no events exist, nothing to unbind
   if (!data.handlers) { return; }
@@ -132,8 +132,8 @@ export function off(elem, type, fn) {
 export function trigger(elem, event, hash) {
   // Fetches element data and a reference to the parent (for bubbling).
   // Don't want to add a data object to cache for every parent,
-  // so checking hasData first.
-  var elemData = (Dom.hasData(elem)) ? Dom.getData(elem) : {};
+  // so checking hasElData first.
+  var elemData = (Dom.hasElData(elem)) ? Dom.getElData(elem) : {};
   var parent = elem.parentNode || elem.ownerDocument;
       // type = event.type || event,
       // handler;
@@ -157,7 +157,7 @@ export function trigger(elem, event, hash) {
 
   // If at the top of the DOM, triggers the default action unless disabled.
   } else if (!parent && !event.defaultPrevented) {
-    var targetData = Dom.getData(event.target);
+    var targetData = Dom.getElData(event.target);
 
     // Checks if the target has a default action for this event.
     if (event.target[event.type]) {
@@ -310,7 +310,7 @@ export function fixEvent(event) {
  * @private
  */
 function _cleanUpEvents(elem, type) {
-  var data = Dom.getData(elem);
+  var data = Dom.getElData(elem);
 
   // Remove the events of a particular type if there are none left
   if (data.handlers[type].length === 0) {
@@ -331,15 +331,11 @@ function _cleanUpEvents(elem, type) {
     delete data.handlers;
     delete data.dispatcher;
     delete data.disabled;
-
-    // data.handlers = null;
-    // data.dispatcher = null;
-    // data.disabled = null;
   }
 
-  // Finally remove the expando if there is no data left
-  if (Object.getOwnPropertyNames(data).length <= 0) {
-    Dom.removeData(elem);
+  // Finally remove the element data if there is no data left
+  if (Object.getOwnPropertyNames(data).length === 0) {
+    Dom.removeElData(elem);
   }
 }
 

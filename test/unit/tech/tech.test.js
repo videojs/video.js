@@ -39,23 +39,6 @@ test('should synthesize timeupdate events by default', function() {
   equal(timeupdates, 1, 'triggered at least one timeupdate');
 });
 
-test('stops timeupdates if the tech produces them natively', function() {
-  var timeupdates = 0, tech, expected;
-  tech = new Tech();
-  tech.on('timeupdate', function() {
-    timeupdates++;
-  });
-
-  tech.trigger('play');
-
-  // simulate a native timeupdate event
-  tech.trigger('timeupdate');
-
-  expected = timeupdates;
-  this.clock.tick(10 * 1000);
-  equal(timeupdates, expected, 'did not simulate timeupdates');
-});
-
 test('stops manual timeupdates while paused', function() {
   var timeupdates = 0, tech, expected;
   tech = new Tech();

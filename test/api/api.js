@@ -153,7 +153,7 @@ test('should export ready api call to public', function() {
 });
 
 test('should export useful components to the public', function () {
-  ok(videojs.TOUCH_ENABLED !== undefined, 'Touch detection should be public');
+  ok(videojs.browser.TOUCH_ENABLED !== undefined, 'Touch detection should be public');
   ok(videojs.getComponent('ControlBar'), 'ControlBar should be public');
   ok(videojs.getComponent('Button'), 'Button should be public');
   ok(videojs.getComponent('PlayToggle'), 'PlayToggle should be public');
@@ -169,12 +169,10 @@ test('should export useful components to the public', function () {
   ok(videojs.getComponent('SeekBar'), 'SeekBar should be public');
   ok(videojs.getComponent('LoadProgressBar'), 'LoadProgressBar should be public');
   ok(videojs.getComponent('PlayProgressBar'), 'PlayProgressBar should be public');
-  ok(videojs.getComponent('SeekHandle'), 'SeekHandle should be public');
   ok(videojs.getComponent('VolumeControl'), 'VolumeControl should be public');
   ok(videojs.getComponent('VolumeBar'), 'VolumeBar should be public');
   ok(videojs.getComponent('VolumeLevel'), 'VolumeLevel should be public');
   ok(videojs.getComponent('VolumeMenuButton'), 'VolumeMenuButton should be public');
-  ok(videojs.getComponent('VolumeHandle'), 'VolumeHandle should be public');
   ok(videojs.getComponent('MuteToggle'), 'MuteToggle should be public');
   ok(videojs.getComponent('PosterImage'), 'PosterImage should be public');
   ok(videojs.getComponent('Menu'), 'Menu should be public');
@@ -213,7 +211,7 @@ test('should be able to initialize player twice on the same tag using string ref
   player.dispose();
 });
 
-test('videojs.players should be available after minification', function() {
+test('videojs.getPlayers() should be available after minification', function() {
   var videoTag = testHelperMakeTag();
   var id = videoTag.id;
 
@@ -221,7 +219,7 @@ test('videojs.players should be available after minification', function() {
   fixture.appendChild(videoTag);
 
   var player = videojs(id);
-  ok(videojs.players[id] === player, 'videojs.players is available');
+  ok(videojs.getPlayers()[id] === player, 'videojs.getPlayers() is available');
 
   player.dispose();
 });
@@ -231,9 +229,7 @@ test('component can be subclassed externally', function(){
   var ControlBar = videojs.getComponent('ControlBar');
 
   var player = new (Component.extend({
-    languages: function(){},
     reportUserActivity: function(){},
-    language: function(){},
     textTracks: function(){ return {
         addEventListener: Function.prototype,
         removeEventListener: Function.prototype

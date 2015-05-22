@@ -99,12 +99,8 @@ class Slider extends Component {
           progress = 0;
     }
 
-    // If there is a handle, we need to account for the handle in our calculation for progress bar
-    // so that it doesn't fall short of or extend past the handle.
-    let barProgress = this.updateHandlePosition(progress);
-
     // Convert to a percentage for setting
-    let percentage = roundFloat(barProgress * 100, 2) + '%';
+    let percentage = roundFloat(progress * 100, 2) + '%';
 
     // Set the new bar width or height
     if (this.vertical()) {
@@ -114,53 +110,9 @@ class Slider extends Component {
     }
   }
 
-  /**
-  * Update the handle position.
-  */
-  updateHandlePosition(progress) {
-    let handle = this.handle;
-    if (!handle) return;
-
-    let vertical = this.vertical();
-    let box = this.el_;
-
-    let boxSize, handleSize;
-    if (vertical) {
-      boxSize = box.offsetHeight;
-      handleSize = handle.el().offsetHeight;
-    } else {
-      boxSize = box.offsetWidth;
-      handleSize = handle.el().offsetWidth;
-    }
-
-    // The width of the handle in percent of the containing box
-    // In IE, widths may not be ready yet causing NaN
-    let handlePercent = (handleSize) ? handleSize / boxSize : 0;
-
-    // Get the adjusted size of the box, considering that the handle's center never touches the left or right side.
-    // There is a margin of half the handle's width on both sides.
-    let boxAdjustedPercent = 1 - handlePercent;
-
-    // Adjust the progress that we'll use to set widths to the new adjusted box width
-    let adjustedProgress = progress * boxAdjustedPercent;
-
-    // The bar does reach the left side, so we need to account for this in the bar's width
-    let barProgress = adjustedProgress + (handlePercent / 2);
-
-    let percentage = roundFloat(adjustedProgress * 100, 2) + '%';
-
-    if (vertical) {
-      handle.el().style.bottom = percentage;
-    } else {
-      handle.el().style.left = percentage;
-    }
-
-    return barProgress;
-  }
-
   calculateDistance(event){
     let el = this.el_;
-    let box = Dom.findPosition(el);
+    let box = Dom.findElPosition(el);
     let boxW = el.offsetWidth;
     let boxH = el.offsetHeight;
     let handle = this.handle;

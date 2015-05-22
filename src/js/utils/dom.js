@@ -8,24 +8,22 @@ import roundFloat from './round-float.js';
  * Also allows for CSS (jQuery) ID syntax. But nothing other than IDs.
  * @param  {String} id  Element ID
  * @return {Element}    Element with supplied ID
- * @private
  */
-export const el = function(id){
+export function getEl(id){
   if (id.indexOf('#') === 0) {
     id = id.slice(1);
   }
 
   return document.getElementById(id);
-};
+}
 
 /**
  * Creates an element and applies properties.
  * @param  {String=} tagName    Name of tag to be created.
  * @param  {Object=} properties Element properties to be applied.
  * @return {Element}
- * @private
  */
-export const createEl = function(tagName='div', properties={}){
+export function createEl(tagName='div', properties={}){
   let el = document.createElement(tagName);
 
   Object.getOwnPropertyNames(properties).forEach(function(propName){
@@ -47,7 +45,7 @@ export const createEl = function(tagName='div', properties={}){
   });
 
   return el;
-};
+}
 
 /**
  * Insert an element as the first child node of another
@@ -55,13 +53,13 @@ export const createEl = function(tagName='div', properties={}){
  * @param  {[type]} parent Element to insert child into
  * @private
  */
-export const insertFirst = function(child, parent){
+export function insertElFirst(child, parent){
   if (parent.firstChild) {
     parent.insertBefore(child, parent.firstChild);
   } else {
     parent.appendChild(child);
   }
-};
+}
 
 /**
  * Element Data Store. Allows for binding data to an element without putting it directly on the element.
@@ -70,7 +68,7 @@ export const insertFirst = function(child, parent){
  * @type {Object}
  * @private
  */
-export const cache = {};
+const elData = {};
 
 /**
  * Unique attribute name to store an element's guid in
@@ -78,24 +76,26 @@ export const cache = {};
  * @constant
  * @private
  */
-export const expando = 'vdata' + (new Date()).getTime();
+const elIdAttr = 'vdata' + (new Date()).getTime();
 
 /**
  * Returns the cache object where data for an element is stored
  * @param  {Element} el Element to store data for.
  * @return {Object}
- * @private
  */
-export const getData = function(el){
-  var id = el[expando];
+export function getElData(el) {
+  let id = el[elIdAttr];
+
   if (!id) {
-    id = el[expando] = Guid.newGUID();
+    id = el[elIdAttr] = Guid.newGUID();
   }
-  if (!cache[id]) {
-    cache[id] = {};
+
+  if (!elData[id]) {
+    elData[id] = {};
   }
-  return cache[id];
-};
+
+  return elData[id];
+}
 
 /**
  * Returns whether or not an element has cached data
@@ -103,73 +103,71 @@ export const getData = function(el){
  * @return {Boolean}
  * @private
  */
-export const hasData = function(el){
-  const id = el[expando];
+export function hasElData(el) {
+  const id = el[elIdAttr];
 
   if (!id) {
     return false;
   }
 
-  return !!Object.getOwnPropertyNames(cache[id]).length;
-};
+  return !!Object.getOwnPropertyNames(elData[id]).length;
+}
 
 /**
  * Delete data for the element from the cache and the guid attr from getElementById
  * @param  {Element} el Remove data for an element
  * @private
  */
-export const removeData = function(el){
-  var id = el[expando];
-  if (!id) { return; }
-  // Remove all stored data
-  // Changed to = null
-  // http://coding.smashingmagazine.com/2012/11/05/writing-fast-memory-efficient-javascript/
-  // cache[id] = null;
-  delete cache[id];
+export function removeElData(el) {
+  let id = el[elIdAttr];
 
-  // Remove the expando property from the DOM node
+  if (!id) {
+    return;
+  }
+
+  // Remove all stored data
+  delete elData[id];
+
+  // Remove the elIdAttr property from the DOM node
   try {
-    delete el[expando];
+    delete el[elIdAttr];
   } catch(e) {
     if (el.removeAttribute) {
-      el.removeAttribute(expando);
+      el.removeAttribute(elIdAttr);
     } else {
       // IE doesn't appear to support removeAttribute on the document element
-      el[expando] = null;
+      el[elIdAttr] = null;
     }
   }
-};
+}
 
 /**
  * Check if an element has a CSS class
  * @param {Element} element Element to check
  * @param {String} classToCheck Classname to check
- * @private
  */
-export const hasClass = function(element, classToCheck){
+export function hasElClass(element, classToCheck) {
   return ((' ' + element.className + ' ').indexOf(' ' + classToCheck + ' ') !== -1);
-};
+}
 
 /**
  * Add a CSS class name to an element
  * @param {Element} element    Element to add class name to
  * @param {String} classToAdd Classname to add
- * @private
  */
-export const addClass = function(element, classToAdd){
-  if (!hasClass(element, classToAdd)) {
+export function addElClass(element, classToAdd) {
+  if (!hasElClass(element, classToAdd)) {
     element.className = element.className === '' ? classToAdd : element.className + ' ' + classToAdd;
   }
-};
+}
 
 /**
  * Remove a CSS class name from an element
  * @param {Element} element    Element to remove from class name
  * @param {String} classToAdd Classname to remove
- * @private
  */
-export const removeClass = function(element, classToRemove){
-  if (!hasClass(element, classToRemove)) {return;}
+export function removeElClass(element, classToRemove) {
+  if (!hasElClass(element, classToRemove)) {return;}
 
   let classNames = element.className.split(' ');
 
@@ -181,7 +179,7 @@ export const removeClass = function(element, classToRemove){
   }
 
   element.className = classNames.join(' ');
-};
+}
 
 /**
  * Apply attributes to an HTML element.
@@ -189,7 +187,7 @@ export const removeClass = function(element, classToRemove){
  * @param  {Object=} attributes Element attributes to be applied.
  * @private
  */
-export const setElementAttributes = function(el, attributes){
+export function setElAttributes(el, attributes) {
   Object.getOwnPropertyNames(attributes).forEach(function(attrName){
     let attrValue = attributes[attrName];
 
@@ -199,7 +197,7 @@ export const setElementAttributes = function(el, attributes){
       el.setAttribute(attrName, (attrValue === true ? '' : attrValue));
     }
   });
-};
+}
 
 /**
  * Get an element's attribute values, as defined on the HTML tag
@@ -210,7 +208,7 @@ export const setElementAttributes = function(el, attributes){
  * @return {Object}
  * @private
  */
-export const getElementAttributes = function(tag){
+export function getElAttributes(tag) {
   var obj, knownBooleans, attrs, attrName, attrVal;
 
   obj = {};
@@ -241,40 +239,26 @@ export const getElementAttributes = function(tag){
   }
 
   return obj;
-};
-
-/**
- * Get the computed style value for an element
- * From http://robertnyman.com/2006/04/24/get-the-rendered-style-of-an-element/
- * @param  {Element} el        Element to get style value for
- * @param  {String} strCssRule Style name
- * @return {String}            Style value
- * @private
- */
-export const getComputedDimension = function(el, strCssRule){
-  var strValue = '';
-  if(document.defaultView && document.defaultView.getComputedStyle){
-    strValue = document.defaultView.getComputedStyle(el, '').getPropertyValue(strCssRule);
-
-  } else if(el.currentStyle){
-    // IE8 Width/Height support
-    let upperCasedRule = strCssRule.substr(0,1).toUpperCase() + strCssRule.substr(1);
-    strValue = el[`client${upperCasedRule}`] + 'px';
-  }
-  return strValue;
-};
+}
 
 // Attempt to block the ability to select text while dragging controls
-export const blockTextSelection = function(){
+export function blockTextSelection() {
   document.body.focus();
-  document.onselectstart = function () { return false; };
-};
+  document.onselectstart = function() {
+    return false;
+  };
+}
+
 // Turn off text selection blocking
-export const unblockTextSelection = function(){ document.onselectstart = function () { return true; }; };
+export function unblockTextSelection() {
+  document.onselectstart = function() {
+    return true;
+  };
+}
 
 // Offset Left
 // getBoundingClientRect technique from John Resig http://ejohn.org/blog/getboundingclientrect-is-awesome/
-export const findPosition = function(el) {
+export function findElPosition(el) {
   let box;
 
   if (el.getBoundingClientRect && el.parentNode) {
@@ -304,4 +288,4 @@ export const findPosition = function(el) {
     left: roundFloat(left),
     top: roundFloat(top)
   };
-};
+}

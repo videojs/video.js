@@ -30,7 +30,7 @@ class Flash extends Tech {
     let { source, parentEl } = options;
 
     // Generate ID for swf object
-    let objId = options.playerId+'_flash_api';
+    let objId = options.techId;
 
     // Merge default flashvars with ones passed in to init
     let flashVars = assign({
@@ -267,7 +267,7 @@ Flash.formats = {
 };
 
 Flash.onReady = function(currSwf){
-  let el = Dom.el(currSwf);
+  let el = Dom.getEl(currSwf);
   let tech = el && el.tech;
 
   // if there is no el then the tech has been disposed
@@ -300,13 +300,13 @@ Flash.checkReady = function(tech){
 
 // Trigger events from the swf on the player
 Flash.onEvent = function(swfID, eventName){
-  let tech = Dom.el(swfID).tech;
+  let tech = Dom.getEl(swfID).tech;
   tech.trigger(eventName);
 };
 
 // Log errors from the swf
 Flash.onError = function(swfID, err){
-  const tech = Dom.el(swfID).tech;
+  const tech = Dom.getEl(swfID).tech;
   const msg = 'FLASH: '+err;
 
   if (err === 'srcnotfound') {
