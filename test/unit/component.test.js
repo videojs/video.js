@@ -360,11 +360,14 @@ test('should trigger a listener when ready', function(){
   var comp = new Component(getFakePlayer(), {}, optionsReadyListener);
 
   comp.triggerReady();
+  this.clock.tick(1);
 
   comp.ready(methodReadyListener);
+  this.clock.tick(1);
 
   // First two listeners should only be fired once and then removed
   comp.triggerReady();
+  this.clock.tick(1);
 });
 
 test('should add and remove a CSS class', function(){

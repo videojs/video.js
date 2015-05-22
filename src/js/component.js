@@ -715,7 +715,8 @@ class Component {
   ready(fn) {
     if (fn) {
       if (this.isReady_) {
-        fn.call(this);
+        // Ensure function is always called asynchronously
+        this.setTimeout(fn, 1);
       } else {
         this.readyQueue_ = this.readyQueue_ || [];
         this.readyQueue_.push(fn);
@@ -732,20 +733,22 @@ class Component {
   triggerReady() {
     this.isReady_ = true;
 
-    let readyQueue = this.readyQueue_;
+    // Ensure ready is triggerd asynchronously
+    this.setTimeout(function(){
+      let readyQueue = this.readyQueue_;
 
-    if (readyQueue && readyQueue.length > 0) {
+      if (readyQueue && readyQueue.length > 0) {
+        readyQueue.forEach(function(fn){
+          fn.call(this);
+        }, this);
 
-      for (let i = 0; i < readyQueue.length; i++) {
-        readyQueue[i].call(this);
+        // Reset Ready Queue
+        this.readyQueue_ = [];
       }
 
-      // Reset Ready Queue
-      this.readyQueue_ = [];
-
-      // Allow for using event listeners also, in case you want to do something everytime a source is ready.
+      // Allow for using event listeners also
       this.trigger('ready');
-    }
+    }, 1);
   }
 
   /**

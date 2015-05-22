@@ -35,6 +35,7 @@ CHANGELOG
 * @heff Cleaned up and documented src/js/video.js and DOM functions ([view](https://github.com/videojs/video.js/pull/2182))
 * @mmcc Changed to pure CSS slider handles ([view](https://github.com/videojs/video.js/pull/2132))
 * @mister-ben updated language support to handle language codes with regions ([view](https://github.com/videojs/video.js/pull/2177))
+* @heff changed the 'ready' event to always be asynchronous  ([view](https://github.com/videojs/video.js/pull/2188))
 
 --------------------
 

@@ -2,7 +2,14 @@ import TextTrackMenuItem from '../../../src/js/control-bar/text-track-controls/t
 import TestHelpers from '../test-helpers.js';
 import * as browser from '../../../src/js/utils/browser.js';
 
-q.module('Text Track Controls');
+q.module('Text Track Controls', {
+  'setup': function() {
+    this.clock = sinon.useFakeTimers();
+  },
+  'teardown': function() {
+    this.clock.restore();
+  }
+});
 
 var track = {
   kind: 'captions',
@@ -10,9 +17,11 @@ var track = {
 };
 
 test('should be displayed when text tracks list is not empty', function() {
-  var player = TestHelpers.makePlayer({
+  let player = TestHelpers.makePlayer({
     tracks: [track]
   });
+
+  this.clock.tick(1000);
 
   ok(!player.controlBar.captionsButton.hasClass('vjs-hidden'), 'control is displayed');
   equal(player.textTracks().length, 1, 'textTracks contains one item');
@@ -49,7 +58,11 @@ test('menu should contain "Settings", "Off" and one track', function() {
   var player = TestHelpers.makePlayer({
       tracks: [track]
     }),
-    menuItems = player.controlBar.captionsButton.items;
+    menuItems;
+
+  this.clock.tick(1000);
+
+  menuItems = player.controlBar.captionsButton.items;
 
   equal(menuItems.length, 3, 'menu contains three items');
   equal(menuItems[0].track.label, 'captions settings', 'menu contains "captions settings"');
@@ -62,6 +75,8 @@ test('menu should update with addRemoteTextTrack', function() {
     tracks: [track]
   });
 
+  this.clock.tick(1000);
+
   player.addRemoteTextTrack(track);
 
   equal(player.controlBar.captionsButton.items.length, 4, 'menu does contain added track');
@@ -72,6 +87,8 @@ test('menu should update with removeRemoteTextTrack', function() {
   var player = TestHelpers.makePlayer({
     tracks: [track, track]
   });
+
+  this.clock.tick(1000);
 
   player.removeRemoteTextTrack(player.textTracks()[0]);
 
