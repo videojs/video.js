@@ -1480,7 +1480,11 @@ class Player extends Component {
    * @return {String} The current video source when getting
    * @return {String} The player when setting
    */
-  src(source=this.techGet('src')) {
+  src(source) {
+    if (source === undefined) {
+      return this.techGet('src');
+    }
+
     let currentTech = Component.getComponent(this.techName);
 
     // case: Array of source objects to choose from and pick the best to play
