@@ -107,6 +107,11 @@ vjs.TextTrack = function(options) {
         return;
       }
       mode = newMode;
+
+      if (mode !== 'disabled' && this['cues'].length === 0) {
+	loadTrack(this.src_, this);
+      }
+
       if (mode === 'showing') {
         this.player_.on('timeupdate', timeupdateHandler);
       }
@@ -172,7 +177,11 @@ vjs.TextTrack = function(options) {
   });
 
   if (options.src) {
-    loadTrack(options.src, tt);
+    tt.loaded_ = true;
+    tt.src_ = options.src;
+    if (options.default) {
+      loadTrack(options.src, tt);
+    }
   } else {
     tt.loaded_ = true;
   }
@@ -184,6 +193,10 @@ vjs.TextTrack = function(options) {
 
 vjs.TextTrack.prototype = vjs.obj.create(vjs.EventEmitter.prototype);
 vjs.TextTrack.prototype.constructor = vjs.TextTrack;
+
+vjs.TextTrack.prototype.load_ = function() {
+  loadTrack(this.src_, this);
+};
 
 /*
  * cuechange - One or more cues in the track have become active or stopped being active.
@@ -233,6 +246,10 @@ vjs.TextTrack.prototype.removeCue = function(removeCue) {
 var loadTrack, parseCues, indexOf;
 
 loadTrack = function(src, track) {
+  if (!src) {
+    return;
+  }
+
   vjs.xhr(src, vjs.bind(this, function(err, response, responseBody){
     if (err) {
       return vjs.log.error(err);
