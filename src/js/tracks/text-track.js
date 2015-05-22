@@ -179,7 +179,7 @@ vjs.TextTrack = function(options) {
   if (options.src) {
     tt.loaded_ = true;
     tt.src_ = options.src;
-    if (options.default) {
+    if (options['default']) {
       loadTrack(options.src, tt);
     }
   } else {
