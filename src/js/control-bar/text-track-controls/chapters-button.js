@@ -73,7 +73,7 @@ class ChaptersButton extends TextTrackButton {
       menu.contentEl().appendChild(Dom.createEl('li', {
         className: 'vjs-menu-title',
         innerHTML: toTitleCase(this.kind_),
-        tabindex: -1
+        tabIndex: -1
       }));
     }
 

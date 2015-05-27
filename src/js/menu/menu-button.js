@@ -55,7 +55,7 @@ class MenuButton extends Button {
       menu.contentEl().appendChild(Dom.createEl('li', {
         className: 'vjs-menu-title',
         innerHTML: toTitleCase(this.options().title),
-        tabindex: -1
+        tabIndex: -1
       }));
     }
 
