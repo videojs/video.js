@@ -27,7 +27,7 @@ class Button extends Component {
     this.on('blur', this.handleBlur);
   }
 
-  createEl(type, props) {
+  createEl(type='button', props={}) {
     // Add standard Aria and Tabindex info
     props = assign({
       className: this.buildCSSClass(),
@@ -38,22 +38,25 @@ class Button extends Component {
 
     let el = super.createEl(type, props);
 
-    // if innerHTML hasn't been overridden (bigPlayButton), add content elements
-    if (!props.innerHTML) {
-      this.contentEl_ = Dom.createEl('div', {
-        className: 'vjs-control-content'
-      });
+    this.controlTextEl_ = Dom.createEl('span', {
+      className: 'vjs-control-text'
+    });
 
-      this.controlText_ = Dom.createEl('span', {
-        className: 'vjs-control-text',
-        innerHTML: this.localize(this.buttonText) || 'Need Text'
-      });
+    el.appendChild(this.controlTextEl_);
 
-      this.contentEl_.appendChild(this.controlText_);
-      el.appendChild(this.contentEl_);
-    }
+    this.controlText();
 
     return el;
+  }
+
+  controlText(text) {
+    if (!text && (this.controlTextEl_ && this.controlTextEl_.innerHTML)) return this.controlText_ || 'Need Text';
+
+    if (text) this.controlText_ = text;
+
+    this.controlTextEl_.innerHTML = this.localize(this.controlText_);
+
+    return this;
   }
 
   buildCSSClass() {

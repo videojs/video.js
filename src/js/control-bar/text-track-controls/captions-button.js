@@ -43,7 +43,7 @@ class CaptionsButton extends TextTrackButton {
 }
 
 CaptionsButton.prototype.kind_ = 'captions';
-CaptionsButton.prototype.buttonText = 'Captions';
+CaptionsButton.prototype.controlText_ = 'Captions';
 CaptionsButton.prototype.className = 'vjs-captions-button';
 
 Component.registerComponent('CaptionsButton', CaptionsButton);

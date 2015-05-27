@@ -105,7 +105,7 @@ class ChaptersButton extends TextTrackButton {
 }
 
 ChaptersButton.prototype.kind_ = 'chapters';
-ChaptersButton.prototype.buttonText = 'Chapters';
+ChaptersButton.prototype.controlText_ = 'Chapters';
 ChaptersButton.prototype.className = 'vjs-chapters-button';
 
 Component.registerComponent('ChaptersButton', ChaptersButton);

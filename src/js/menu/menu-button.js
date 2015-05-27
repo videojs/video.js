@@ -76,9 +76,30 @@ class MenuButton extends Button {
    */
   createItems(){}
 
+  // createEl() {
+  //   return super.createEl('div', {
+  //     className: this.buildCSSClass(),
+  //     innerHTML: `<span class="vjs-control-text">${this.localize(this.buttonText())}</span>`
+  //   });
+  // }
+  createEl() {
+    return super.createEl('div', {
+      className: this.buildCSSClass()
+    });
+  }
+
   /** @inheritDoc */
   buildCSSClass() {
     return `${this.className} vjs-menu-button ${super.buildCSSClass()}`;
+  }
+
+  controlText(text) {
+    if (!text) return super.controlText();
+
+    this.controlText_ = text;
+    this.el().children[0].children[0].innerHTML = this.controlText_;
+
+    return this;
   }
 
   // Focus - Add keyboard functionality to element

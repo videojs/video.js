@@ -102,8 +102,8 @@ class PlaybackRateMenuButton extends MenuButton {
 
 }
 
-PlaybackRateMenuButton.prototype.buttonText = 'Playback Rate';
 PlaybackRateMenuButton.prototype.className = 'vjs-playback-rate';
+PlaybackRateMenuButton.prototype.controlText_ = 'Playback Rate';
 
 Component.registerComponent('PlaybackRateMenuButton', PlaybackRateMenuButton);
 export default PlaybackRateMenuButton;

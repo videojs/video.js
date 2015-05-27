@@ -16,7 +16,7 @@ class SubtitlesButton extends TextTrackButton {
 }
 
 SubtitlesButton.prototype.kind_ = 'subtitles';
-SubtitlesButton.prototype.buttonText = 'Subtitles';
+SubtitlesButton.prototype.controlText_ = 'Subtitles';
 SubtitlesButton.prototype.className = 'vjs-subtitles-button';
 
 Component.registerComponent('SubtitlesButton', SubtitlesButton);

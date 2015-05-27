@@ -17,16 +17,16 @@ class FullscreenToggle extends Button {
   handleClick() {
     if (!this.player_.isFullscreen()) {
       this.player_.requestFullscreen();
-      this.controlText_.innerHTML = this.localize('Non-Fullscreen');
+      this.controlText(this.localize('Non-Fullscreen'));
     } else {
       this.player_.exitFullscreen();
-      this.controlText_.innerHTML = this.localize('Fullscreen');
+      this.controlText(this.localize('Fullscreen'));
     }
   }
 
 }
 
-FullscreenToggle.prototype.buttonText = 'Fullscreen';
+FullscreenToggle.prototype.controlText_ = 'Fullscreen';
 
 Component.registerComponent('FullscreenToggle', FullscreenToggle);
 export default FullscreenToggle;
