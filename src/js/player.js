@@ -1297,7 +1297,7 @@ class Player extends Component {
 
     this.isFullscreen(true);
 
-    if (fsApi) {
+    if (fsApi.requestFullscreen) {
       // the browser supports going fullscreen at the element level so we can
       // take the controls fullscreen as well as the video
 
@@ -1354,7 +1354,7 @@ class Player extends Component {
     this.isFullscreen(false);
 
     // Check for browser element fullscreen support
-    if (fsApi) {
+    if (fsApi.requestFullscreen) {
       document[fsApi.exitFullscreen]();
     } else if (this.tech.supportsFullScreen()) {
      this.techCall('exitFullScreen');

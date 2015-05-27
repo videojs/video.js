@@ -24,7 +24,6 @@
   "style": "./dist/video-js.css",
   "dependencies": {
     "global": "^4.3.0",
-    "lodash.isplainobject": "^3.0.2",
     "lodash.merge": "^3.2.1",
     "object.assign": "^2.0.1",
     "safe-json-parse": "^4.0.0",
@@ -40,6 +39,7 @@
     "browserify-versionify": "^1.0.4",
     "chg": "~0.2.0",
     "css": "^2.2.0",
+    "es5-shim": "^4.1.3",
     "grunt": "^0.4.4",
     "grunt-aws-s3": "^0.12.1",
     "grunt-banner": "^0.3.1",

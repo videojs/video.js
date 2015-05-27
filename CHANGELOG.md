@@ -37,6 +37,7 @@ CHANGELOG
 * @mister-ben updated language support to handle language codes with regions ([view](https://github.com/videojs/video.js/pull/2177))
 * @heff changed the 'ready' event to always be asynchronous  ([view](https://github.com/videojs/video.js/pull/2188))
 * @heff fixed instances of tabIndex that did not have a capital I   ([view](https://github.com/videojs/video.js/pull/2204))
+* @heff fixed a number of IE8 and Flash related issues  ([view](https://github.com/videojs/video.js/pull/2206))
 
 --------------------
 

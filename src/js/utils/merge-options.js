@@ -1,5 +1,11 @@
 import merge from 'lodash.merge';
-import isPlainObject from 'lodash.isplainobject';
+
+function isPlain(obj) {
+  return !!obj
+    && typeof obj === 'object'
+    && obj.toString() === '[object Object]'
+    && obj.constructor === Object;
+}
 
 /**
  * Merge two options objects, recursively merging **only** plain object
@@ -20,7 +26,7 @@ export default function mergeOptions(object={}) {
     merge(object, source, function(a, b) {
 
       // If we're not working with a plain object, copy the value as is
-      if (!isPlainObject(b)) {
+      if (!isPlain(b)) {
         return b;
       }
 
@@ -29,7 +35,7 @@ export default function mergeOptions(object={}) {
       // This makes it consistent with how merge() works by default
       // and also protects from later changes the to first object affecting
       // the second object's values.
-      if (!isPlainObject(a)) {
+      if (!isPlain(a)) {
         return mergeOptions({}, b);
       }
     });

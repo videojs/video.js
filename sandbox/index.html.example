@@ -4,8 +4,12 @@
   <meta charset="utf-8" />
   <title>Video.js Sandbox</title>
 
-  <link href="../build/temp/video-js.css" rel="stylesheet" type="text/css">
+  <!-- Add ES5 shim and sham for IE8 -->
+  <script src="../node_modules/es5-shim/es5-shim.js"></script>
+  <script src="../node_modules/es5-shim/es5-sham.js"></script>
 
+  <!-- Load the source files -->
+  <link href="../build/temp/video-js.css" rel="stylesheet" type="text/css">
   <script src="../build/temp/video.js"></script>
 
   <!-- Set the location of the flash SWF -->

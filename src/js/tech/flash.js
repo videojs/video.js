@@ -27,7 +27,36 @@ class Flash extends Tech {
   constructor(options, ready){
     super(options, ready);
 
-    let { source, parentEl } = options;
+    // If source was supplied pass as a flash var.
+    if (options.source) {
+      this.ready(function(){
+        this.setSource(options.source);
+      });
+    }
+
+    // Having issues with Flash reloading on certain page actions (hide/resize/fullscreen) in certain browsers
+    // This allows resetting the playhead when we catch the reload
+    if (options.startTime) {
+      this.ready(function(){
+        this.load();
+        this.play();
+        this.currentTime(options.startTime);
+      });
+    }
+
+    // Add global window functions that the swf expects
+    // A 4.x workflow we weren't able to solve for in 5.0
+    // because of the need to hard code these functions
+    // into the swf for security reasons
+    window.videojs = window.videojs || {};
+    window.videojs.Flash = window.videojs.Flash || {};
+    window.videojs.Flash.onReady = Flash.onReady;
+    window.videojs.Flash.onEvent = Flash.onEvent;
+    window.videojs.Flash.onError = Flash.onError;
+  }
+
+  createEl() {
+    let options = this.options();
 
     // Generate ID for swf object
     let objId = options.techId;
@@ -61,31 +90,10 @@ class Flash extends Tech {
       'class': 'vjs-tech'
     }, options.attributes);
 
-    // If source was supplied pass as a flash var.
-    if (source) {
-      this.ready(function(){
-        this.setSource(source);
-      });
-    }
-
-    // Having issues with Flash reloading on certain page actions (hide/resize/fullscreen) in certain browsers
-    // This allows resetting the playhead when we catch the reload
-    if (options.startTime) {
-      this.ready(function(){
-        this.load();
-        this.play();
-        this.currentTime(options.startTime);
-      });
-    }
-
-    window.videojs = window.videojs || {};
-    window.videojs.Flash = window.videojs.Flash || {};
-    window.videojs.Flash.onReady = Flash.onReady;
-    window.videojs.Flash.onEvent = Flash.onEvent;
-    window.videojs.Flash.onError = Flash.onError;
-
     this.el_ = Flash.embed(options.swf, flashVars, params, attributes);
     this.el_.tech = this;
+
+    return this.el_;
   }
 
   play() {

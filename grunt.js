@@ -286,7 +286,8 @@ module.exports = function(grunt) {
           ],
           transform: [
             require('babelify').configure({
-              sourceMapRelative: './src/js'
+              sourceMapRelative: './src/js',
+              loose: 'all'
             }),
             ['browserify-versionify', {
               placeholder: '__VERSION__',
