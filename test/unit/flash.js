@@ -152,3 +152,37 @@ test('ready triggering before and after disposing the tech', function() {
 test('should have the source handler interface', function() {
   ok(vjs.Flash.registerSourceHandler, 'has the registerSourceHandler function');
 });
+
+test('seekable should be for the length of the loaded video', function() {
+  var player = PlayerTest.makePlayer(),
+      tech = new vjs.Flash(player, {
+        'parentEl': player.el()
+      }),
+      duration = 23;
+
+  // mock out duration
+  tech.el().vjs_getProperty = function(name) {
+    if (name === 'duration') {
+      return duration;
+    }
+  };
+  equal(tech.seekable().length, 1, 'seekable is non-empty');
+  equal(tech.seekable().start(0), 0, 'starts at zero');
+  equal(tech.seekable().end(0), duration, 'ends at the duration');
+});
+
+test('seekable should be empty if no video is loaded', function() {
+  var player = PlayerTest.makePlayer(),
+      tech = new vjs.Flash(player, {
+        'parentEl': player.el()
+      });
+
+  // mock out duration
+  tech.el().vjs_getProperty = function(name) {
+    if (name === 'duration') {
+      return 0;
+    }
+  };
+
+  equal(tech.seekable().length, 0, 'seekable is empty');
+});

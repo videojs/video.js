@@ -1469,6 +1469,13 @@ vjs.Player.prototype.ended = function(){ return this.techGet('ended'); };
  */
 vjs.Player.prototype.seeking = function(){ return this.techGet('seeking'); };
 
+/**
+ * Returns the TimeRanges of the media that are currently available
+ * for seeking to.
+ * @return {TimeRanges} the seekable intervals of the media timeline
+ */
+vjs.Player.prototype.seekable = function(){ return this.techGet('seekable'); };
+
 // When the player is first initialized, trigger activity so components
 // like the control bar show themselves if needed
 vjs.Player.prototype.userActivity_ = true;

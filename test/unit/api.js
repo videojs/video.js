@@ -10,6 +10,7 @@ test('should be able to access expected player API methods', function() {
   ok(player.buffered, 'buffered exists');
   ok(player.load, 'load exists');
   ok(player.seeking, 'seeking exists');
+  ok(player.seekable, 'seekable exists');
   ok(player.currentTime, 'currentTime exists');
   ok(player.duration, 'duration exists');
   ok(player.paused, 'paused exists');
@@ -37,7 +38,6 @@ test('should be able to access expected player API methods', function() {
   // ok(player.defaultPlaybackRate, 'defaultPlaybackRate exists');
   // ok(player.playbackRate, 'playbackRate exists');
   // ok(player.played, 'played exists');
-  // ok(player.seekable, 'seekable exists');
   // ok(player.videoWidth, 'videoWidth exists');
   // ok(player.videoHeight, 'videoHeight exists');
 
