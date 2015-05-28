@@ -9,6 +9,17 @@
  * @private
  */
 export function createTimeRange(start, end){
+  if (start === undefined && end === undefined) {
+    return {
+      length: 0,
+      start: function() {
+        throw new Error('This TimeRanges object is empty');
+      },
+      end: function() {
+        throw new Error('This TimeRanges object is empty');
+      }
+    };
+  }
   return {
     length: 1,
     start: function() { return start; },

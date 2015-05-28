@@ -1809,6 +1809,13 @@ class Player extends Component {
    */
   seeking() { return this.techGet('seeking'); }
 
+  /**
+   * Returns the TimeRanges of the media that are currently available
+   * for seeking to.
+   * @return {TimeRanges} the seekable intervals of the media timeline
+   */
+  seekable() { return this.techGet('seekable'); }
+
   reportUserActivity(event) {
     this.userActivity_ = true;
   }
