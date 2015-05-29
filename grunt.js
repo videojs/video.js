@@ -412,7 +412,7 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['build', 'test-local']);
 
   // Development watch task. Doing the minimum required.
-  grunt.registerTask('dev', ['connect:dev', 'jshint', 'sass', 'browserify:build', 'karma:chrome']);
+  grunt.registerTask('dev', ['jshint', 'sass', 'browserify:build', 'karma:chrome']);
 
   // Skin development watch task.
   grunt.registerTask('skin-dev', ['connect:dev', 'watch:skin']);

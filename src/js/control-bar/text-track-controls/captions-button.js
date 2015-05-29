@@ -14,6 +14,10 @@ class CaptionsButton extends TextTrackButton {
     this.el_.setAttribute('aria-label','Captions Menu');
   }
 
+  buildCSSClass() {
+    return `vjs-captions-button ${super.buildCSSClass()}`;
+  }
+
   update() {
     let threshold = 2;
     super.update();
@@ -43,8 +47,7 @@ class CaptionsButton extends TextTrackButton {
 }
 
 CaptionsButton.prototype.kind_ = 'captions';
-CaptionsButton.prototype.buttonText = 'Captions';
-CaptionsButton.prototype.className = 'vjs-captions-button';
+CaptionsButton.prototype.controlText_ = 'Captions';
 
 Component.registerComponent('CaptionsButton', CaptionsButton);
 export default CaptionsButton;

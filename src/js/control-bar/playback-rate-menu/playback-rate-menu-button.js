@@ -36,6 +36,10 @@ class PlaybackRateMenuButton extends MenuButton {
     return el;
   }
 
+  buildCSSClass() {
+    return `vjs-playback-rate ${super.buildCSSClass()}`;
+  }
+
   // Menu creation
   createMenu() {
     let menu = new Menu(this.player());
@@ -102,8 +106,7 @@ class PlaybackRateMenuButton extends MenuButton {
 
 }
 
-PlaybackRateMenuButton.prototype.buttonText = 'Playback Rate';
-PlaybackRateMenuButton.prototype.className = 'vjs-playback-rate';
+PlaybackRateMenuButton.prototype.controlText_ = 'Playback Rate';
 
 Component.registerComponent('PlaybackRateMenuButton', PlaybackRateMenuButton);
 export default PlaybackRateMenuButton;

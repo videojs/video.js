@@ -1,0 +1,13 @@
+.video-js button {
+  background: none;
+  border: none;
+  color: $primary-text;
+  display: inline-block;
+
+  overflow: visible; // IE8
+  font-size: inherit; // IE in general. WTF.
+
+  -webkit-appearance: none;
+  -moz-appearance:    none;
+  appearance:         none;
+}

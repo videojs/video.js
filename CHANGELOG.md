@@ -39,6 +39,7 @@ CHANGELOG
 * @heff fixed instances of tabIndex that did not have a capital I   ([view](https://github.com/videojs/video.js/pull/2204))
 * @heff fixed a number of IE8 and Flash related issues  ([view](https://github.com/videojs/video.js/pull/2206))
 * @heff Reverted .video-js inline-block style to fix Flash fullscreen  ([view](https://github.com/videojs/video.js/pull/2217))
+* @mmcc switched to using button elements for button components ([view](https://github.com/videojs/video.js/pull/2209))
 
 --------------------
 

@@ -28,12 +28,12 @@
   overflow: auto;
 }
 
-.video-js .vjs-menu-button:hover .vjs-control-content .vjs-menu,
-.video-js .vjs-control-content .vjs-menu.vjs-lock-showing {
+.video-js .vjs-menu-button:hover .vjs-menu,
+.video-js .vjs-menu.vjs-lock-showing {
   display: block;
 }
 /* prevent menus from opening while scrubbing (FF, IE) */
-.video-js.vjs-scrubbing .vjs-menu-button:hover .vjs-control-content .vjs-menu {
+.video-js.vjs-scrubbing .vjs-menu-button:hover .vjs-menu {
   display: none;
 }
 .video-js .vjs-menu-button ul li {
