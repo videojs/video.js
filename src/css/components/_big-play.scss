@@ -23,12 +23,7 @@
   // Since the big play button doesn't inherit from vjs-control, we need to specify a bit more than
   // other buttons for the icon.
   &:before {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    text-align: center;
+    @extend %icon-default
   }
 }
 
