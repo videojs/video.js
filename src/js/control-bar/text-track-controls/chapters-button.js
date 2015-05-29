@@ -22,6 +22,10 @@ class ChaptersButton extends TextTrackButton {
     this.el_.setAttribute('aria-label','Chapters Menu');
   }
 
+  buildCSSClass() {
+    return `vjs-chapters-button ${super.buildCSSClass()}`;
+  }
+
   // Create a menu item for each text track
   createItems() {
     let items = [];
@@ -106,7 +110,6 @@ class ChaptersButton extends TextTrackButton {
 
 ChaptersButton.prototype.kind_ = 'chapters';
 ChaptersButton.prototype.controlText_ = 'Chapters';
-ChaptersButton.prototype.className = 'vjs-chapters-button';
 
 Component.registerComponent('ChaptersButton', ChaptersButton);
 export default ChaptersButton;

@@ -2,7 +2,7 @@
   font-size: 3em;
   line-height: 1.5em;
   height: 1.5em;
-  width: 3em; // Firefox bug
+  width: 3em; // Firefox bug: For some reason without width the icon wouldn't show up. Switched to using width and removed padding.
   display: block;
   z-index: 2;
   position: absolute;

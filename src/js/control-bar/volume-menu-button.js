@@ -64,7 +64,7 @@ class VolumeMenuButton extends MenuButton {
 }
 
 VolumeMenuButton.prototype.volumeUpdate = MuteToggle.prototype.update;
-VolumeMenuButton.prototype.contentText_ = 'Mute';
+VolumeMenuButton.prototype.controlText_ = 'Mute';
 
 Component.registerComponent('VolumeMenuButton', VolumeMenuButton);
 export default VolumeMenuButton;

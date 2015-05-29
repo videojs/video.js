@@ -44,16 +44,15 @@ class Button extends Component {
 
     el.appendChild(this.controlTextEl_);
 
-    this.controlText();
+    this.controlText(this.controlText_);
 
     return el;
   }
 
   controlText(text) {
-    if (!text && (this.controlTextEl_ && this.controlTextEl_.innerHTML)) return this.controlText_ || 'Need Text';
+    if (!text) return this.controlText_ || 'Need Text';
 
-    if (text) this.controlText_ = text;
-
+    this.controlText_ = text;
     this.controlTextEl_.innerHTML = this.localize(this.controlText_);
 
     return this;

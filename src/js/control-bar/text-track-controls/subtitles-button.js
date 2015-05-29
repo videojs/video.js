@@ -13,11 +13,14 @@ class SubtitlesButton extends TextTrackButton {
     this.el_.setAttribute('aria-label','Subtitles Menu');
   }
 
+  buildCSSClass() {
+    return `vjs-subtitles-button ${super.buildCSSClass()}`;
+  }
+
 }
 
 SubtitlesButton.prototype.kind_ = 'subtitles';
 SubtitlesButton.prototype.controlText_ = 'Subtitles';
-SubtitlesButton.prototype.className = 'vjs-subtitles-button';
 
 Component.registerComponent('SubtitlesButton', SubtitlesButton);
 export default SubtitlesButton;
