@@ -218,12 +218,13 @@ class Tech extends Component {
       return;
     }
 
+    let player = this.player();
     let textTracksChanges = function() {
       let updateDisplay = Fn.bind(this, function() {
-        this.trigger('texttrackchange');
+        player.trigger('texttrackchange');
       });
 
-      this.trigger('texttrackchange');
+      player.trigger('texttrackchange');
 
       for (let i = 0; i < this.length; i++) {
         let track = this[i];
