@@ -1,4 +1,4 @@
-import merge from 'lodash.merge';
+import merge from 'lodash-compat/object/merge';
 
 function isPlain(obj) {
   return !!obj

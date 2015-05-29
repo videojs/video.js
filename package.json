@@ -24,7 +24,7 @@
   "style": "./dist/video-js.css",
   "dependencies": {
     "global": "^4.3.0",
-    "lodash.merge": "^3.2.1",
+    "lodash-compat": "^3.9.3",
     "object.assign": "^2.0.1",
     "safe-json-parse": "^4.0.0",
     "videojs-swf": "4.7.0",

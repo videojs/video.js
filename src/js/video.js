@@ -11,7 +11,7 @@ import log from './utils/log.js';
 import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
 import extendsFn from './extends.js';
-import merge from 'lodash.merge';
+import merge from 'lodash-compat/object/merge';
 
 // Include the built-in techs
 import Html5 from './tech/html5.js';
