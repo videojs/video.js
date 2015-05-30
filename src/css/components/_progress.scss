@@ -6,13 +6,12 @@
 /* Box containing play and load progresses. Also acts as seek scrubber. */
 .video-js .vjs-progress-holder {
   @include flex(auto);
-  @include transition(height 0.2s);
+  @include transition(font-size 0.2s);
   height: 0.3em;
 }
 
 /* We need an increased hit area on hover */
-.video-js .vjs-progress-control:hover .vjs-progress-holder { height: 0.7em; }
-.video-js .vjs-progress-control:hover .vjs-play-progress:before { font-size: 1.7em; } // also increase the size of the handle
+.video-js .vjs-progress-control:hover > * { font-size: 1.7em }
 
 /* Progress Bars */
 .video-js .vjs-progress-holder .vjs-play-progress,
@@ -36,7 +35,6 @@
 
   // Progress handle
   &:before {
-    @include transition(font-size 0.2s);
     position: absolute;
     top: -0.35em;
     right: -0.5em;
