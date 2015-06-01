@@ -179,7 +179,7 @@ vjs.TextTrack = function(options) {
   if (options.src) {
     tt.loaded_ = true;
     tt.src_ = options.src;
-    if (options['default']) {
+    if (options['default'] || (kind !== 'subtitles' && kind !== 'captions')) {
       loadTrack(options.src, tt);
     }
   } else {
@@ -254,7 +254,6 @@ loadTrack = function(src, track) {
     if (err) {
       return vjs.log.error(err);
     }
-
 
     track.loaded_ = true;
     parseCues(responseBody, track);
