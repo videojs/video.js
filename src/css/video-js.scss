@@ -1,7 +1,8 @@
 @import "variables";
 @import "utilities";
 
-@import "components/icons";
+@import "../../node_modules/videojs-font/scss/icons";
+
 @import "components/layout";
 @import "components/big-play";
 @import "components/button";
