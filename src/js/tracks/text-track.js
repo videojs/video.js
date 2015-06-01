@@ -112,7 +112,7 @@ vjs.TextTrack = function(options) {
 	loadTrack(this.src_, this);
       }
 
-      if (mode === 'showing') {
+      if (mode !== 'disabled') {
         this.player_.on('timeupdate', timeupdateHandler);
       }
       this.trigger('modechange');
