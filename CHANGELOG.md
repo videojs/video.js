@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @dmlap add the seekable property ([view](https://github.com/videojs/video.js/pull/2207))
 
 --------------------
 

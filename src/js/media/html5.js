@@ -348,6 +348,7 @@ vjs.Html5.prototype.setLoop = function(val){ this.el_.loop = val; };
 
 vjs.Html5.prototype.error = function(){ return this.el_.error; };
 vjs.Html5.prototype.seeking = function(){ return this.el_.seeking; };
+vjs.Html5.prototype.seekable = function(){ return this.el_.seekable; };
 vjs.Html5.prototype.ended = function(){ return this.el_.ended; };
 vjs.Html5.prototype.defaultMuted = function(){ return this.el_.defaultMuted; };
 
