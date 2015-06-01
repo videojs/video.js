@@ -218,16 +218,13 @@ class Tech extends Component {
       return;
     }
 
-    let player = this.player();
     let textTracksChanges = function() {
-      let updateDisplay = Fn.bind(this, function() {
-        player.trigger('texttrackchange');
-      });
+      let updateDisplay = () => this.trigger('texttrackchange');
 
-      player.trigger('texttrackchange');
+      updateDisplay();
 
-      for (let i = 0; i < this.length; i++) {
-        let track = this[i];
+      for (let i = 0; i < tracks.length; i++) {
+        let track = tracks[i];
         track.removeEventListener('cuechange', updateDisplay);
         if (track.mode === 'showing') {
           track.addEventListener('cuechange', updateDisplay);
@@ -235,10 +232,10 @@ class Tech extends Component {
       }
     };
 
-    tracks.addEventListener('change', textTracksChanges);
+    tracks.addEventListener('change', Fn.bind(this, textTracksChanges));
 
     this.on('dispose', Fn.bind(this, function() {
-      tracks.removeEventListener('change', textTracksChanges);
+      tracks.removeEventListener('change', Fn.bind(this, textTracksChanges));
     }));
   }
 
