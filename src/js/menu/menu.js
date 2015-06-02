@@ -28,7 +28,7 @@ class Menu extends Component {
   }
 
   createEl() {
-    let contentElType = this.options().contentElType || 'ul';
+    let contentElType = this.options_.contentElType || 'ul';
     this.contentEl_ = Dom.createEl(contentElType, {
       className: 'vjs-menu-content'
     });

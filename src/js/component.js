@@ -186,6 +186,7 @@ class Component {
    * @return {Object}     A NEW object of this.options_ and obj merged
    */
   options(obj) {
+    log.warn('this.options() has been deprecated and will be moved to the constructor in 6.0');
     if (!obj) {
       return this.options_;
     }
@@ -468,7 +469,7 @@ class Component {
 
     if (children) {
       // `this` is `parent`
-      let parentOptions = this.options();
+      let parentOptions = this.options_;
       let handleAdd = (name, opts) => {
         // Allow options for children to be set at the parent options
         // e.g. videojs(id, { controlBar: false });

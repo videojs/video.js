@@ -51,10 +51,10 @@ class MenuButton extends Button {
     var menu = new Menu(this.player_);
 
     // Add a title list item to the top
-    if (this.options().title) {
+    if (this.options_.title) {
       menu.contentEl().appendChild(Dom.createEl('li', {
         className: 'vjs-menu-title',
-        innerHTML: toTitleCase(this.options().title),
+        innerHTML: toTitleCase(this.options_.title),
         tabIndex: -1
       }));
     }
