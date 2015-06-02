@@ -89,7 +89,7 @@ module.exports = function(grunt) {
           {expand: true, cwd: 'build/temp/', src: ['*'], dest: 'dist/'+version.full+'/', filter: 'isFile'} // includes files in path
         ]
       },
-      fonts: { expand: true, cwd: 'src/css/font/', src: ['*'], dest: 'build/temp/font/', filter: 'isFile' },
+      fonts: { expand: true, cwd: './node_modules/videojs-font/fonts/', src: ['*'], dest: 'build/temp/font/', filter: 'isFile' },
       swf: { src: './node_modules/videojs-swf/dist/video-js.swf', dest: './build/temp/video-js.swf' },
       novtt: { src: './build/temp/video.js', dest: './build/temp/alt/video.novtt.js' },
       dist: { expand: true, cwd: 'build/temp/', src: ['**/**'], dest: 'dist/', filter: 'isFile' },
