@@ -12,7 +12,9 @@ class TextTrackSettings extends Component {
     this.hide();
 
     // Grab `persistTextTrackSettings` from the player options if not passed in child options
-    this.options_.persistTextTrackSettings = options.persistTextTrackSettings || this.options_.playerOptions.persistTextTrackSettings;
+    if (options.persistTextTrackSettings === undefined) {
+      this.options_.persistTextTrackSettings = this.options_.playerOptions.persistTextTrackSettings;
+    }
 
     Events.on(this.el().querySelector('.vjs-done-button'), 'click', Fn.bind(this, function() {
       this.saveSettings();
