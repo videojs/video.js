@@ -153,8 +153,7 @@ class Player extends Component {
 
     // We also want to pass the original player options to each component as well
     // so they don't need to reach back into the player for options later. We also
-    // need to do another shallow copy of this.options_ so we don't end up with an
-    // infinite loop.
+    // need to do another copy of this.options_ so we don't end up with an infinite loop.
     this.options_.playerOptions = mergeOptions({}, this.options_);
 
     this.initChildren();
