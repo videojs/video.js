@@ -15,8 +15,9 @@ class MediaLoader extends Component {
 
     // If there are no sources when the player is initialized,
     // load the first supported playback technology.
-    if (!player.options_['sources'] || player.options_['sources'].length === 0) {
-      for (let i=0, j=player.options_['techOrder']; i<j.length; i++) {
+
+    if (!options.playerOptions['sources'] || options.playerOptions['sources'].length === 0) {
+      for (let i=0, j=options.playerOptions['techOrder']; i<j.length; i++) {
         let techName = toTitleCase(j[i]);
         let tech = Component.getComponent(techName);
 
@@ -31,7 +32,7 @@ class MediaLoader extends Component {
       // // Then load the best source.
       // // A few assumptions here:
       // //   All playback technologies respect preload false.
-      player.src(player.options_['sources']);
+      player.src(options.playerOptions['sources']);
     }
   }
 }

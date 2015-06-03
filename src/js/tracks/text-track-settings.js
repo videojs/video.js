@@ -11,6 +11,9 @@ class TextTrackSettings extends Component {
     super(player, options);
     this.hide();
 
+    // Grab `persistTextTrackSettings` from the player options if not passed in child options
+    this.options_.persistTextTrackSettings = options.persistTextTrackSettings || this.options_.playerOptions.persistTextTrackSettings;
+
     Events.on(this.el().querySelector('.vjs-done-button'), 'click', Fn.bind(this, function() {
       this.saveSettings();
       this.hide();
@@ -39,7 +42,7 @@ class TextTrackSettings extends Component {
     Events.on(this.el().querySelector('.vjs-edge-style select'), 'change', Fn.bind(this, this.updateDisplay));
     Events.on(this.el().querySelector('.vjs-font-family select'), 'change', Fn.bind(this, this.updateDisplay));
 
-    if (player.options()['persistTextTrackSettings']) {
+    if (this.options_.persistTextTrackSettings) {
       this.restoreSettings();
     }
   }
@@ -117,7 +120,7 @@ class TextTrackSettings extends Component {
   }
 
   saveSettings() {
-    if (!this.player_.options()['persistTextTrackSettings']) {
+    if (!this.options_.persistTextTrackSettings) {
       return;
     }
 

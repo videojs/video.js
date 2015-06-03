@@ -57,7 +57,7 @@ class Component {
     this.options_ = mergeOptions({}, this.options_);
 
     // Updated options with supplied options
-    options = this.options(options);
+    options = this.options_ = mergeOptions(this.options_, options);
 
     // Get ID from options or options element if one is supplied
     this.id_ = options.id || (options.el && options.el.id);
@@ -187,6 +187,7 @@ class Component {
    */
   options(obj) {
     log.warn('this.options() has been deprecated and will be moved to the constructor in 6.0');
+
     if (!obj) {
       return this.options_;
     }
@@ -470,6 +471,7 @@ class Component {
     if (children) {
       // `this` is `parent`
       let parentOptions = this.options_;
+
       let handleAdd = (name, opts) => {
         // Allow options for children to be set at the parent options
         // e.g. videojs(id, { controlBar: false });
@@ -483,6 +485,10 @@ class Component {
         if (opts === false) {
           return;
         }
+
+        // We also want to pass the original player options to each component as well so they don't need to
+        // reach back into the player for options later.
+        opts.playerOptions = this.options_.playerOptions;
 
         // Create and add the child component.
         // Add a direct reference to the child by name on the parent instance.

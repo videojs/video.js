@@ -46,7 +46,7 @@ class TextTrackDisplay extends Component {
 
       player.on('fullscreenchange', Fn.bind(this, this.updateDisplay));
 
-      let tracks = player.options_['tracks'] || [];
+      let tracks = this.options_.playerOptions['tracks'] || [];
       for (let i = 0; i < tracks.length; i++) {
         let track = tracks[i];
         this.player_.addRemoteTextTrack(track);
