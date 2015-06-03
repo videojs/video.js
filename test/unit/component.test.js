@@ -95,7 +95,7 @@ test('should do a deep merge of child options', function(){
     }
   });
 
-  var mergedOptions = comp.options();
+  var mergedOptions = comp.options_;
   var children = mergedOptions['example'];
 
   strictEqual(children['childOne']['foo'], 'baz', 'value three levels deep overridden');
@@ -132,7 +132,7 @@ test('should allows setting child options at the parent options level', function
   } catch(err) {
     ok(false, 'Child with `false` option was initialized');
   }
-  equal(parent.children()[0].options()['foo'], true, 'child options set when children array is used');
+  equal(parent.children()[0].options_['foo'], true, 'child options set when children array is used');
 
   // using children object
   options = {
@@ -154,7 +154,7 @@ test('should allows setting child options at the parent options level', function
   } catch(err) {
     ok(false, 'Child with `false` option was initialized');
   }
-  equal(parent.children()[0].options()['foo'], true, 'child options set when children object is used');
+  equal(parent.children()[0].options_['foo'], true, 'child options set when children object is used');
 });
 
 test('should dispose of component and children', function(){
