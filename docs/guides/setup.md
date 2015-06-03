@@ -24,6 +24,11 @@ You can download the Video.js source and host it on your own servers, or use the
 <script src="//vjs.zencdn.net/4.12/video.min.js"></script>
 ```
 
+We include a stripped down Google Analytics pixel that tracks a random percentage (currently 1%) of players loaded from the CDN. This allows us to see (roughly) what browsers are in use in the wild, along with other useful metrics such as OS and device. If you'd like to disable analytics, you can simply include the following global **before** including Video.js:
+
+```js
+window.HELP_IMPROVE_VIDEOJS = false;
+```
 
 ## Install via package manager
 
