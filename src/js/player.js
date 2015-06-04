@@ -142,19 +142,23 @@ class Player extends Component {
 
     this.el_ = this.createEl();
 
+    // We also want to pass the original player options to each component and plugin
+    // as well so they don't need to reach back into the player for options later.
+    // We also need to do another copy of this.options_ so we don't end up with
+    // an infinite loop.
+    let playerOptionsCopy = mergeOptions({}, this.options_);
+
     // Load plugins
     if (options['plugins']) {
       let plugins = options['plugins'];
 
       Object.getOwnPropertyNames(plugins).forEach(function(name){
+        plugins[name].playerOptions = playerOptionsCopy;
         this[name](plugins[name]);
       }, this);
     }
 
-    // We also want to pass the original player options to each component as well
-    // so they don't need to reach back into the player for options later. We also
-    // need to do another copy of this.options_ so we don't end up with an infinite loop.
-    this.options_.playerOptions = mergeOptions({}, this.options_);
+    this.options_.playerOptions = playerOptionsCopy;
 
     this.initChildren();
 

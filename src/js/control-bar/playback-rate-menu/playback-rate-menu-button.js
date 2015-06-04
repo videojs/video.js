@@ -78,7 +78,7 @@ class PlaybackRateMenuButton extends MenuButton {
   }
 
   playbackRates() {
-    return (this.options_.playerOptions && this.options_.playerOptions['playbackRates']) || this.options_['playbackRates'];
+    return this.options_['playbackRates'] || (this.options_.playerOptions && this.options_.playerOptions['playbackRates']);
   }
 
   playbackRateSupported() {
