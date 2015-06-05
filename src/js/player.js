@@ -2257,10 +2257,13 @@ Player.prototype.handleError;
 Player.prototype.flexNotSupported_ = function() {
   var elem = document.createElement('i');
 
+  // Note: We don't actually use flexBasis (or flexOrder), but it's one of the more
+  // common flex features that we can rely on when checking for flex support.
   return !('flexBasis' in elem.style ||
           'webkitFlexBasis' in elem.style ||
           'mozFlexBasis' in elem.style ||
-          'msFlexBasis' in elem.style);
+          'msFlexBasis' in elem.style ||
+          'msFlexOrder' in elem.style /* IE10-specific (2012 flex spec) */);
 };
 
 Component.registerComponent('Player', Player);
