@@ -27,7 +27,7 @@
     "lodash-compat": "^3.9.3",
     "object.assign": "^2.0.1",
     "safe-json-parse": "^4.0.0",
-    "videojs-font": "1.2.0",
+    "videojs-font": "1.3.0",
     "videojs-ie8": "1.1.0",
     "videojs-swf": "4.7.0",
     "vtt.js": "git+https://github.com/gkatsev/vtt.js.git#shim-build"
