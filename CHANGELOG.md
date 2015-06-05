@@ -3,6 +3,7 @@ CHANGELOG
 
 ## HEAD (Unreleased)
 * @dmlap add the seekable property ([view](https://github.com/videojs/video.js/pull/2207))
+* @dmlap fix seekable export ([view](https://github.com/videojs/video.js/pull/2227))
 
 --------------------
 

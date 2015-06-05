@@ -101,7 +101,7 @@ goog.exportProperty(vjs.Player.prototype, 'remoteTextTracks', vjs.Player.prototy
 goog.exportProperty(vjs.Player.prototype, 'addTextTrack', vjs.Player.prototype.addTextTrack);
 goog.exportProperty(vjs.Player.prototype, 'addRemoteTextTrack', vjs.Player.prototype.addRemoteTextTrack);
 goog.exportProperty(vjs.Player.prototype, 'removeRemoteTextTrack', vjs.Player.prototype.removeRemoteTextTrack);
-goog.exportProperty(vjs.Player.prototype, 'seekable', vjs.Player.prototype.removeRemoteTextTrack);
+goog.exportProperty(vjs.Player.prototype, 'seekable', vjs.Player.prototype.seekable);
 
 goog.exportSymbol('videojs.MediaLoader', vjs.MediaLoader);
 goog.exportSymbol('videojs.TextTrackDisplay', vjs.TextTrackDisplay);

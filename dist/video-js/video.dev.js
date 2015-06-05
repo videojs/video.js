@@ -1302,6 +1302,18 @@ vjs.round = function(num, dec) {
  * @private
  */
 vjs.createTimeRange = function(start, end){
+  if (start === undefined && end === undefined) {
+    return {
+      length: 0,
+      start: function() {
+        throw new Error('This TimeRanges object is empty');
+      },
+      end: function() {
+        throw new Error('This TimeRanges object is empty');
+      }
+    };
+  }
+
   return {
     length: 1,
     start: function() { return start; },
@@ -5160,6 +5172,13 @@ vjs.Player.prototype.ended = function(){ return this.techGet('ended'); };
  */
 vjs.Player.prototype.seeking = function(){ return this.techGet('seeking'); };
 
+/**
+ * Returns the TimeRanges of the media that are currently available
+ * for seeking to.
+ * @return {TimeRanges} the seekable intervals of the media timeline
+ */
+vjs.Player.prototype.seekable = function(){ return this.techGet('seekable'); };
+
 // When the player is first initialized, trigger activity so components
 // like the control bar show themselves if needed
 vjs.Player.prototype.userActivity_ = true;
@@ -7415,6 +7434,7 @@ vjs.Html5.prototype.setLoop = function(val){ this.el_.loop = val; };
 
 vjs.Html5.prototype.error = function(){ return this.el_.error; };
 vjs.Html5.prototype.seeking = function(){ return this.el_.seeking; };
+vjs.Html5.prototype.seekable = function(){ return this.el_.seekable; };
 vjs.Html5.prototype.ended = function(){ return this.el_.ended; };
 vjs.Html5.prototype.defaultMuted = function(){ return this.el_.defaultMuted; };
 
@@ -7920,6 +7940,15 @@ vjs.Flash.prototype['setPoster'] = function(){
   // poster images are not handled by the Flash tech so make this a no-op
 };
 
+vjs.Flash.prototype.seekable = function() {
+  var duration = this.duration();
+  if (duration === 0) {
+    // The SWF reports a duration of zero when the actual duration is unknown
+    return vjs.createTimeRange();
+  }
+  return vjs.createTimeRange(0, this.duration());
+};
+
 vjs.Flash.prototype.buffered = function(){
   return vjs.createTimeRange(0, this.el_.vjs_getProperty('buffered'));
 };
@@ -7936,7 +7965,7 @@ vjs.Flash.prototype.enterFullScreen = function(){
   // Create setters and getters for attributes
   var api = vjs.Flash.prototype,
     readWrite = 'rtmpConnection,rtmpStream,preload,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted'.split(','),
-    readOnly = 'error,networkState,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight'.split(','),
+    readOnly = 'error,networkState,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,ended,videoTracks,audioTracks,videoWidth,videoHeight'.split(','),
     // Overridden: buffered, currentTime, currentSrc
     i;
 
