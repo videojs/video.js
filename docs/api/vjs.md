@@ -129,7 +129,7 @@ _defined in_: [src/js/core.js#L151](https://github.com/videojs/video.js/blob/mas
 ##### RETURNS: 
 * `Object` An object of url details
 
-_defined in_: [src/js/lib.js#L676](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L676)
+_defined in_: [src/js/lib.js#L688](https://github.com/videojs/video.js/blob/master/src/js/lib.js#L688)
 
 ---
 

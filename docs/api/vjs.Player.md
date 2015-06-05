@@ -59,6 +59,7 @@ After an instance has been created it can be accessed globally using `Video('exa
   - [remainingTime](#remainingtime)
   - [requestFullScreen](#requestfullscreen) _`deprecated`_
   - [requestFullscreen](#requestfullscreen)
+  - [seekable](#seekable)
   - [seeking](#seeking)
   - [src](#src-source-)
   - [textTracks](#texttracks)
@@ -178,7 +179,7 @@ _inherited from_: [src/js/component.js#L826](https://github.com/videojs/video.js
 * __label__ `String` _(OPTIONAL)_ Optional label
 * __language__ `String` _(OPTIONAL)_ Optional language
 
-_defined in_: [src/js/player.js#L1722](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1722)
+_defined in_: [src/js/player.js#L1729](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1729)
 
 ---
 
@@ -759,7 +760,7 @@ _inherited from_: [src/js/component.js#L277](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Number` the current network activity state
 
-_defined in_: [src/js/player.js#L1662](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1662)
+_defined in_: [src/js/player.js#L1669](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1669)
 
 ---
 
@@ -947,7 +948,7 @@ _defined in_: [src/js/player.js#L647](https://github.com/videojs/video.js/blob/m
 * `Number` Returns the new playback rate when setting
 * `Number` Returns the current playback rate when getting
 
-_defined in_: [src/js/player.js#L1606](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1606)
+_defined in_: [src/js/player.js#L1613](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1613)
 
 ---
 
@@ -1035,7 +1036,7 @@ _inherited from_: [src/js/component.js#L769](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Number` the current playback rendering state
 
-_defined in_: [src/js/player.js#L1687](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1687)
+_defined in_: [src/js/player.js#L1694](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1694)
 
 ---
 
@@ -1101,6 +1102,17 @@ _defined in_: [src/js/player.js#L992](https://github.com/videojs/video.js/blob/m
 * `vjs.Player` self
 
 _defined in_: [src/js/player.js#L947](https://github.com/videojs/video.js/blob/master/src/js/player.js#L947)
+
+---
+
+### seekable()
+> Returns the TimeRanges of the media that are currently available
+> for seeking to.
+
+##### RETURNS: 
+* `TimeRanges` the seekable intervals of the media timeline
+
+_defined in_: [src/js/player.js#L1477](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1477)
 
 ---
 
@@ -1198,7 +1210,7 @@ _defined in_: [src/js/player.js#L1135](https://github.com/videojs/video.js/blob/
 ##### RETURNS: 
 * `Array` Array of track objects
 
-_defined in_: [src/js/player.js#L1704](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1704)
+_defined in_: [src/js/player.js#L1711](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1711)
 
 ---
 
