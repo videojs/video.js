@@ -495,6 +495,7 @@ vjs.MediaTechController.withSourceHandlers = function(Tech){
    */
   Tech.prototype.setSource = function(source){
     var sh = Tech.selectSourceHandler(source);
+    var tech = this;
 
     if (!sh) {
       // Fall back to a native source hander when unsupported sources are
@@ -510,7 +511,14 @@ vjs.MediaTechController.withSourceHandlers = function(Tech){
     this.disposeSourceHandler();
     this.off('dispose', this.disposeSourceHandler);
 
-    this.currentSource_ = source;
+    // Set currentSource_ asynchronously to simulate the media element's
+    // asynchronous execution of the `resource selection algorithm`
+    setTimeout(function () {
+      if (source && source.src !== '') {
+        tech.currentSource_ = source;
+      }
+    }, 0);
+
     this.sourceHandler_ = sh.handleSource(source, this);
     this.on('dispose', this.disposeSourceHandler);
 
