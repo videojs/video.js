@@ -142,14 +142,23 @@ class Player extends Component {
 
     this.el_ = this.createEl();
 
+    // We also want to pass the original player options to each component and plugin
+    // as well so they don't need to reach back into the player for options later.
+    // We also need to do another copy of this.options_ so we don't end up with
+    // an infinite loop.
+    let playerOptionsCopy = mergeOptions({}, this.options_);
+
     // Load plugins
     if (options['plugins']) {
       let plugins = options['plugins'];
 
       Object.getOwnPropertyNames(plugins).forEach(function(name){
+        plugins[name].playerOptions = playerOptionsCopy;
         this[name](plugins[name]);
       }, this);
     }
+
+    this.options_.playerOptions = playerOptionsCopy;
 
     this.initChildren();
 
@@ -1554,7 +1563,7 @@ class Player extends Component {
     } else {
       // We need to wrap this in a timeout to give folks a chance to add error event handlers
       this.setTimeout( function() {
-        this.error({ code: 4, message: this.localize(this.options()['notSupportedMessage']) });
+        this.error({ code: 4, message: this.localize(this.options_['notSupportedMessage']) });
       }, 0);
 
       // we could not find an appropriate tech, but let's still notify the delegate that this is it
@@ -1917,7 +1926,7 @@ class Player extends Component {
         // Clear any existing inactivity timeout to start the timer over
         this.clearTimeout(inactivityTimeout);
 
-        var timeout = this.options()['inactivityTimeout'];
+        var timeout = this.options_['inactivityTimeout'];
         if (timeout > 0) {
           // In <timeout> milliseconds, if no more activity has occurred the
           // user will be considered inactive
@@ -2117,7 +2126,7 @@ class Player extends Component {
   }
 
   toJSON() {
-    let options = mergeOptions(this.options());
+    let options = mergeOptions(this.options_);
     let tracks = options.tracks;
 
     options.tracks = [];

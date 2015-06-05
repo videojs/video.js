@@ -771,7 +771,7 @@ test('should have a sensible toJSON that is equivalent to player.options', funct
 
   const player = TestHelpers.makePlayer(playerOptions);
 
-  deepEqual(player.toJSON(), player.options(), 'simple player options toJSON produces output equivalent to player.options()');
+  deepEqual(player.toJSON(), player.options_, 'simple player options toJSON produces output equivalent to player.options_');
 
   const playerOptions2 = {
     tracks: [{
@@ -786,7 +786,7 @@ test('should have a sensible toJSON that is equivalent to player.options', funct
 
   playerOptions2.tracks[0].player = player2;
 
-  const popts = player2.options();
+  const popts = player2.options_;
   popts.tracks[0].player = undefined;
 
   deepEqual(player2.toJSON(), popts, 'no circular references');

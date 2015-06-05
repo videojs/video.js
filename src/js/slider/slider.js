@@ -23,7 +23,7 @@ class Slider extends Component {
     this.handle = this.getChild(this.options_['handleName']);
 
     // Set a horizontal or vertical class on the slider depending on the slider type
-    this.vertical(!!this.options()['vertical']);
+    this.vertical(!!this.options_['vertical']);
 
     this.on('mousedown', this.handleMouseDown);
     this.on('touchstart', this.handleMouseDown);
@@ -117,7 +117,7 @@ class Slider extends Component {
     let boxH = el.offsetHeight;
     let handle = this.handle;
 
-    if (this.options()['vertical']) {
+    if (this.options_['vertical']) {
       let boxY = box.top;
 
       let pageY;

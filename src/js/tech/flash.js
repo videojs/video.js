@@ -56,7 +56,7 @@ class Flash extends Tech {
   }
 
   createEl() {
-    let options = this.options();
+    let options = this.options_;
 
     // Generate ID for swf object
     let objId = options.techId;
