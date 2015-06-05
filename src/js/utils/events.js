@@ -38,7 +38,7 @@ export function on(elem, type, fn){
   if (!data.dispatcher) {
     data.disabled = false;
 
-    data.dispatcher = function (event){
+    data.dispatcher = function (event, hash){
 
       if (data.disabled) return;
       event = fixEvent(event);
@@ -53,7 +53,7 @@ export function on(elem, type, fn){
           if (event.isImmediatePropagationStopped()) {
             break;
           } else {
-            handlersCopy[m].call(elem, event);
+            handlersCopy[m].call(elem, event, hash);
           }
         }
       }
@@ -127,8 +127,9 @@ export function off(elem, type, fn) {
  * Trigger an event for an element
  * @param  {Element|Object}      elem  Element to trigger an event on
  * @param  {Event|Object|String} event A string (the type) or an event object with a type attribute
+ * @param  {Object} [hash] data hash to pass along with the event
  */
-export function trigger(elem, event) {
+export function trigger(elem, event, hash) {
   // Fetches element data and a reference to the parent (for bubbling).
   // Don't want to add a data object to cache for every parent,
   // so checking hasElData first.
@@ -146,13 +147,13 @@ export function trigger(elem, event) {
 
   // If the passed element has a dispatcher, executes the established handlers.
   if (elemData.dispatcher) {
-    elemData.dispatcher.call(elem, event);
+    elemData.dispatcher.call(elem, event, hash);
   }
 
   // Unless explicitly stopped or the event does not bubble (e.g. media events)
     // recursively calls this function to bubble the event up the DOM.
     if (parent && !event.isPropagationStopped() && event.bubbles !== false) {
-    trigger(parent, event);
+      trigger.call(null, parent, event, hash);
 
   // If at the top of the DOM, triggers the default action unless disabled.
   } else if (!parent && !event.defaultPrevented) {

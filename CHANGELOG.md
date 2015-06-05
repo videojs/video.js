@@ -43,6 +43,7 @@ CHANGELOG
 * @mmcc increased the size of the progress bar and handle on hover ([view](https://github.com/videojs/video.js/pull/2216))
 * @mmcc moved the fonts into their own repo ([view](https://github.com/videojs/video.js/pull/2223))
 * @mmcc deprecated the options() function and removed internal uses ([view](https://github.com/videojs/video.js/pull/2229))
+* @carpasse enhanced events to allow passing a second data argument ([view](https://github.com/videojs/video.js/pull/2163))
 
 --------------------
 

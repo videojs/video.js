@@ -221,6 +221,23 @@ test('should trigger a listener once using one()', function(){
   comp.trigger('test-event');
 });
 
+test('should be possible to pass data when you trigger an event', function () {
+  var comp = new Component(getFakePlayer(), {});
+  var data1 = 'Data1';
+  var data2 = {txt: 'Data2'};
+  expect(3);
+
+  var testListener = function(evt, hash){
+    ok(true, 'fired event once');
+    deepEqual(hash.d1, data1);
+    deepEqual(hash.d2, data2);
+  };
+
+  comp.one('test-event', testListener);
+  comp.trigger('test-event', {d1: data1, d2: data2});
+  comp.trigger('test-event');
+});
+
 test('should add listeners to other components and remove them', function(){
   var player = getFakePlayer(),
       comp1 = new Component(player),
