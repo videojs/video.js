@@ -6,7 +6,7 @@
 /* Box containing play and load progresses. Also acts as seek scrubber. */
 .video-js .vjs-progress-holder {
   @include flex(auto);
-  @include transition(font-size 0.2s);
+  @include transition(all 0.2s);
   height: 0.3em;
 }
 
