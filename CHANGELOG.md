@@ -47,6 +47,7 @@ CHANGELOG
 * @bc-bbay made the duration display update itself on loadedmetadata ([view](https://github.com/videojs/video.js/pull/2169))
 * @arwidt added Swedish and Finnish translations ([view](https://github.com/videojs/video.js/pull/2189))
 * @heff moved all the CDN logic into videojs/cdn ([view](https://github.com/videojs/video.js/pull/2230))
+* @mmcc fixed the progress handle transition jerkiness ([view](https://github.com/videojs/video.js/pull/2219))
 
 --------------------
 

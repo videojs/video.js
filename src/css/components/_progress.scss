@@ -1,3 +1,17 @@
+/**
+ * Let's talk pixel math!
+ * Start with a base font size of 10px (assuming that hasn't changed)
+ * No Hover:
+ * - Progress holder is 3px
+ * - Progress handle is 9px
+ * - Progress handle is pulled up 3px to center it.
+ *
+ * Hover:
+ * - Progress holder becomes 5px
+ * - Progress handle becomes 15px
+ * - Progress handle is pulled up 5px to center it
+ */
+
 .video-js .vjs-progress-control {
   @include flex(auto);
   @include display-flex(center);
@@ -6,13 +20,12 @@
 /* Box containing play and load progresses. Also acts as seek scrubber. */
 .video-js .vjs-progress-holder {
   @include flex(auto);
-  @include transition(height 0.2s);
+  @include transition(all 0.2s);
   height: 0.3em;
 }
 
 /* We need an increased hit area on hover */
-.video-js .vjs-progress-control:hover .vjs-progress-holder { height: 0.7em; }
-.video-js .vjs-progress-control:hover .vjs-play-progress:before { font-size: 1.7em; } // also increase the size of the handle
+.video-js .vjs-progress-control:hover .vjs-progress-holder { font-size: 1.666666666666666666em }
 
 /* Progress Bars */
 .video-js .vjs-progress-holder .vjs-play-progress,
@@ -20,7 +33,7 @@
 .video-js .vjs-progress-holder .vjs-load-progress div {
   position: absolute;
   display: block;
-  height: 100%;
+  height: 0.3em;
   margin: 0;
   padding: 0;
   /* updated by javascript during playback */
@@ -36,11 +49,12 @@
 
   // Progress handle
   &:before {
-    @include transition(font-size 0.2s);
     position: absolute;
-    top: -0.35em;
+    top: -0.333333333333333em;
     right: -0.5em;
-
+    font-size: 0.9em;
+    height: 1em;
+    line-height: 1em;
   }
 }
 
