@@ -1,68 +1,12 @@
 import Flash from '../../../src/js/tech/flash.js';
 import document from 'global/document';
 
-let tech;
+q.module('Flash');
 
-q.module('Flash', {
-  setup() {
-    tech = new Flash({});
-  },
-  teardown() {
-    tech.dispose();
-  }
-});
-
-var streamToPartsAndBack = function(url) {
-  var parts = Flash.streamToParts(url);
-  return Flash.streamFromParts(parts.connection, parts.stream);
-};
-
-test('test using both streamToParts and streamFromParts', function() {
-  ok('rtmp://myurl.com/&isthis' === streamToPartsAndBack('rtmp://myurl.com/isthis'));
-  ok('rtmp://myurl.com/&isthis' === streamToPartsAndBack('rtmp://myurl.com/&isthis'));
-  ok('rtmp://myurl.com/isthis/&andthis' === streamToPartsAndBack('rtmp://myurl.com/isthis/andthis'));
-});
-
-test('test streamToParts', function() {
-  var parts = Flash.streamToParts('http://myurl.com/streaming&/is/fun');
-  ok(parts.connection === 'http://myurl.com/streaming');
-  ok(parts.stream === '/is/fun');
-
-  parts = Flash.streamToParts('http://myurl.com/&streaming&/is/fun');
-  ok(parts.connection === 'http://myurl.com/');
-  ok(parts.stream === 'streaming&/is/fun');
-
-  parts = Flash.streamToParts('http://myurl.com/streaming/is/fun');
-  ok(parts.connection === 'http://myurl.com/streaming/is/');
-  ok(parts.stream === 'fun');
-
-  parts = Flash.streamToParts('whatisgoingonhere');
-  ok(parts.connection === 'whatisgoingonhere');
-  ok(parts.stream === '');
-
-  parts = Flash.streamToParts();
-  ok(parts.connection === '');
-  ok(parts.stream === '');
-});
-
-test('test isStreamingSrc', function() {
-  var isStreamingSrc = Flash.isStreamingSrc;
-  ok(isStreamingSrc('rtmp://streaming.is/fun'));
-  ok(isStreamingSrc('rtmps://streaming.is/fun'));
-  ok(isStreamingSrc('rtmpe://streaming.is/fun'));
-  ok(isStreamingSrc('rtmpt://streaming.is/fun'));
-  // test invalid protocols
-  ok(!isStreamingSrc('rtmp:streaming.is/fun'));
-  ok(!isStreamingSrc('rtmpz://streaming.is/fun'));
-  ok(!isStreamingSrc('http://streaming.is/fun'));
-  ok(!isStreamingSrc('https://streaming.is/fun'));
-  ok(!isStreamingSrc('file://streaming.is/fun'));
-});
-
-test('test canPlaySource', function() {
+test('Flash.canPlaySource', function() {
   var canPlaySource = Flash.canPlaySource;
 
-  // supported
+  // Supported
   ok(canPlaySource({ type: 'video/mp4; codecs=avc1.42E01E,mp4a.40.2' }), 'codecs supported');
   ok(canPlaySource({ type: 'video/mp4' }), 'video/mp4 supported');
   ok(canPlaySource({ type: 'video/x-flv' }), 'video/x-flv supported');
@@ -70,109 +14,97 @@ test('test canPlaySource', function() {
   ok(canPlaySource({ type: 'video/m4v' }), 'video/m4v supported');
   ok(canPlaySource({ type: 'VIDEO/FLV' }), 'capitalized mime type');
 
-  // not supported
+  // Not supported
   ok(!canPlaySource({ type: 'video/webm; codecs="vp8, vorbis"' }));
   ok(!canPlaySource({ type: 'video/webm' }));
 });
 
-test('currentTime is the seek target during seeking', function() {
-  var noop = function() {},
-      seeking = false,
-      parentEl = document.createElement('div'),
-      tech = new Flash({
-        id: noop,
-        bufferedPercent: noop,
-        on: noop,
-        trigger: noop,
-        ready: noop,
-        addChild: noop,
-        options_: {},
-        // This complexity is needed because of the VTT.js loading
-        // It'd be great if we can find a better solution for that
-        options: function(){ return {}; },
-        el: function(){
-          return {
-            appendChild: noop
-          };
-        }
-      }, {
-        'parentEl': parentEl
-      }),
-      currentTime;
+test('currentTime', function() {
+  let getCurrentTime = Flash.prototype.currentTime;
+  let setCurrentTime = Flash.prototype.setCurrentTime;
+  let seeking = false;
+  let setPropVal;
+  let getPropVal;
+  let result;
 
-  tech.el().vjs_setProperty = function(property, value) {
-    if (property === 'currentTime') {
-      currentTime = value;
-    }
-  };
-  tech.el().vjs_getProperty = function(name) {
-    if (name === 'currentTime') {
-      return currentTime;
-    } else if (name === 'seeking') {
+  // Mock out a Flash instance to avoid creating the swf object
+  let mockFlash = {
+    el_: {
+      vjs_setProperty: function(prop, val){
+        setPropVal = val;
+      },
+      vjs_getProperty: function(){
+        return getPropVal;
+      }
+    },
+    seeking: function(){
       return seeking;
     }
   };
 
-  currentTime = 3;
-  strictEqual(3, tech.currentTime(), 'currentTime is retreived from the SWF');
+  // Test the currentTime getter
+  getPropVal = 3;
+  result = getCurrentTime.call(mockFlash);
+  equal(result, 3, 'currentTime is retreived from the swf element');
 
-  tech['setCurrentTime'](7);
+  // Test the currentTime setter
+  setCurrentTime.call(mockFlash, 10);
+  equal(setPropVal, 10, 'currentTime is set on the swf element');
+
+  // Test current time while seeking
+  setCurrentTime.call(mockFlash, 20);
   seeking = true;
-  strictEqual(7, tech.currentTime(), 'during seeks the target time is returned');
+  result = getCurrentTime.call(mockFlash);
+  equal(result, 20, 'currentTime is retrieved from the lastSeekTarget while seeking');
+  notEqual(result, getPropVal, 'currentTime is not retrieved from the element while seeking');
 });
 
 test('dispose removes the object element even before ready fires', function() {
-  var noop = function() {},
-      parentEl = document.createElement('div'),
-      tech = new Flash({
-        id: noop,
-        on: noop,
-        off: noop,
-        trigger: noop,
-        ready: noop,
-        addChild: noop,
-        options: function(){ return {}; },
-        options_: {}
-      }, {
-        'parentEl': parentEl
-      });
+  // This test appears to test bad functionaly that was fixed
+  // so it's debateable whether or not it's useful
+  let dispose = Flash.prototype.dispose;
+  let mockFlash = {};
+  let noop = function(){};
 
-  tech.dispose();
-  strictEqual(tech.el(), null, 'tech el is null');
-  strictEqual(parentEl.children.length, 0, 'parent el is empty');
+  // Mock required functions for dispose
+  mockFlash.off = noop;
+  mockFlash.trigger = noop;
+  mockFlash.el_ = {};
+
+  dispose.call(mockFlash);
+  strictEqual(mockFlash.el_, null, 'swf el is nulled');
 });
 
 test('ready triggering before and after disposing the tech', function() {
-  var checkReady, fixtureDiv, playerDiv, techEl;
+  let checkReady = sinon.stub(Flash, 'checkReady');
+  let fixtureDiv = document.getElementById('qunit-fixture');
+  let playerDiv = document.createElement('div');
+  let techEl = document.createElement('div');
 
-  checkReady = sinon.stub(Flash, 'checkReady');
-
-  fixtureDiv = document.getElementById('qunit-fixture');
-  playerDiv = document.createElement('div');
-  techEl = document.createElement('div');
-
+  techEl.id = 'foo1234';
   playerDiv.appendChild(techEl);
   fixtureDiv.appendChild(playerDiv);
 
-  techEl.id = 'foo1234';
-
+  // Mock the swf element
   techEl.tech = {
-    el() { return techEl; }
+    el: function() {
+      return techEl;
+    }
   };
 
-  playerDiv['player'] = {
+  playerDiv.player = {
     tech: techEl.tech
   };
 
-  Flash['onReady'](techEl.id);
+  Flash.onReady(techEl.id);
   ok(checkReady.called, 'checkReady should be called before the tech is disposed');
 
   // remove the tech el from the player div to simulate being disposed
   playerDiv.removeChild(techEl);
-  Flash['onReady'](techEl.id);
+  Flash.onReady(techEl.id);
   ok(!checkReady.calledTwice, 'checkReady should not be called after the tech is disposed');
 
-  Flash['checkReady'].restore();
+  Flash.checkReady.restore();
 });
 
 test('should have the source handler interface', function() {
@@ -180,34 +112,32 @@ test('should have the source handler interface', function() {
 });
 
 test('canHandleSource should be able to work with src objects without a type', function () {
-  var canHandleSource = Flash.nativeSourceHandler.canHandleSource;
-  equal('maybe', canHandleSource({src: 'test.video.mp4'}), 'should guess that it is a mp4 video');
-  equal('maybe', canHandleSource({src: 'test.video.m4v'}), 'should guess that it is a m4v video');
-  equal('maybe', canHandleSource({src: 'test.video.flv'}), 'should guess that it is a flash video');
-  equal('', canHandleSource({src: 'test.video.wgg'}), 'should return empty string if it can not play the video');
+  let canHandleSource = Flash.nativeSourceHandler.canHandleSource;
+
+  equal('maybe', canHandleSource({ src: 'test.video.mp4' }), 'should guess that it is a mp4 video');
+  equal('maybe', canHandleSource({ src: 'test.video.m4v' }), 'should guess that it is a m4v video');
+  equal('maybe', canHandleSource({ src: 'test.video.flv' }), 'should guess that it is a flash video');
+  equal('', canHandleSource({ src: 'test.video.wgg' }), 'should return empty string if it can not play the video');
 });
 
-test('seekable should be for the length of the loaded video', function() {
-  let duration = 23;
-
-  // mock out duration
-  tech.el().vjs_getProperty = function(name) {
-    if (name === 'duration') {
-      return duration;
-    }
-  };
-  equal(tech.seekable().length, 1, 'seekable is non-empty');
-  equal(tech.seekable().start(0), 0, 'starts at zero');
-  equal(tech.seekable().end(0), duration, 'ends at the duration');
-});
-
-test('seekable should be empty if no video is loaded', function() {
-  // mock out duration
-  tech.el().vjs_getProperty = function(name) {
-    if (name === 'duration') {
-      return 0;
+test('seekable', function() {
+  let seekable = Flash.prototype.seekable;
+  let result;
+  let mockFlash = {
+    duration: function() {
+      return this.duration_;
     }
   };
 
-  equal(tech.seekable().length, 0, 'seekable is empty');
+  // Test a normal duration
+  mockFlash.duration_ = 23;
+  result = seekable.call(mockFlash);
+  equal(result.length, 1, 'seekable is non-empty');
+  equal(result.start(0), 0, 'starts at zero');
+  equal(result.end(0), mockFlash.duration_, 'ends at the duration');
+
+  // Test a zero duration
+  mockFlash.duration_ = 0;
+  result = seekable.call(mockFlash);
+  equal(result.length, mockFlash.duration_, 'seekable is empty with a zero duration');
 });
