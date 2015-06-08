@@ -160,6 +160,14 @@ class Flash extends Tech {
   // poster images are not handled by the Flash tech so make this a no-op
   setPoster() {}
 
+  seekable() {
+    const duration = this.duration();
+    if (duration === 0) {
+      return createTimeRange();
+    }
+    return createTimeRange(0, duration);
+  }
+
   buffered() {
     return createTimeRange(0, this.el_.vjs_getProperty('buffered'));
   }
@@ -178,7 +186,7 @@ class Flash extends Tech {
 // Create setters and getters for attributes
 const _api = Flash.prototype;
 const _readWrite = 'rtmpConnection,rtmpStream,preload,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted'.split(',');
-const _readOnly = 'error,networkState,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,seekable,ended,videoTracks,audioTracks,videoWidth,videoHeight'.split(',');
+const _readOnly = 'error,networkState,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,ended,videoTracks,audioTracks,videoWidth,videoHeight'.split(',');
 
 function _createSetter(attr){
   var attrUpper = attr.charAt(0).toUpperCase() + attr.slice(1);

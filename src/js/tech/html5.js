@@ -267,6 +267,7 @@ class Html5 extends Tech {
 
   error() { return this.el_.error; }
   seeking() { return this.el_.seeking; }
+  seekable() { return this.el_.seekable; }
   ended() { return this.el_.ended; }
   defaultMuted() { return this.el_.defaultMuted; }
 
