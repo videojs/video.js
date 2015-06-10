@@ -221,6 +221,10 @@ test('should add the source hanlder interface to a tech', function(){
 
   // Pass a source through the source handler process of a tech instance
   tech.setSource(sourceA);
+
+  // Increment clock since currentSource_ is set asynchronously
+  this.clock.tick(1);
+
   strictEqual(tech.currentSource_, sourceA, 'sourceA was handled and stored');
   ok(tech.sourceHandler_.dispose, 'the handlerOne state instance was stored');
 
@@ -250,4 +254,54 @@ test('should handle unsupported sources with the source hanlder API', function()
 
   tech.setSource('');
   ok(usedNative, 'native source handler was used when an unsupported source was set');
+});
+
+test('should emulate the video element\'s behavior for currentSrc when src is set', function(){
+  var mockPlayer = {
+    off: this.noop,
+    trigger: this.noop
+  };
+  var sourceA = { src: 'foo.mp4', type: 'video/mp4' };
+  var sourceB = { src: '', type: 'video/mp4' };
+
+  // Define a new tech class
+  var Tech = videojs.MediaTechController.extend();
+
+  // Extend Tech with source handlers
+  vjs.MediaTechController.withSourceHandlers(Tech);
+
+  // Create an instance of Tech
+  var tech = new Tech(mockPlayer);
+
+  // Create source handlers
+  var handler = {
+    canHandleSource: function(source){
+      return 'probably';
+    },
+    handleSource: function(s, t){return {};}
+  };
+
+  Tech.registerSourceHandler(handler);
+
+  // Pass a source through the source handler process of a tech instance
+  tech.setSource(sourceA);
+
+  // Test that currentSource_ is not immediately specified
+  strictEqual(tech.currentSource_, undefined, 'sourceA was not stored immediately');
+
+  this.clock.tick(1);
+
+  // Test that currentSource_ is specified after yielding to the event loop
+  strictEqual(tech.currentSource_, sourceA, 'sourceA was handled and stored');
+
+  // Pass a source with an empty src
+  tech.setSource(sourceB);
+
+  // Test that currentSource_ is not immediately changed
+  strictEqual(tech.currentSource_, sourceA, 'sourceB was not stored immediately');
+
+  this.clock.tick(1);
+
+  // Test that currentSource_ is still unchanged
+  strictEqual(tech.currentSource_, sourceA, 'sourceB was not stored if equal to the empty string');
 });

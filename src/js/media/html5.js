@@ -329,7 +329,13 @@ vjs.Html5.prototype.setSrc = function(src) {
 };
 
 vjs.Html5.prototype.load = function(){ this.el_.load(); };
-vjs.Html5.prototype.currentSrc = function(){ return this.el_.currentSrc; };
+vjs.Html5.prototype.currentSrc = function(){
+  if (this.currentSource_) {
+    return this.currentSource_.src;
+  } else {
+    return this.el_.currentSrc;
+  }
+};
 
 vjs.Html5.prototype.poster = function(){ return this.el_.poster; };
 vjs.Html5.prototype.setPoster = function(val){ this.el_.poster = val; };
