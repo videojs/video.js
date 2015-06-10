@@ -55,9 +55,9 @@ module.exports = function(grunt) {
     },
     dist: {},
     watch: {
-      default: {
-        files: [ 'src/**/*', 'test/unit/**/*.js', 'Gruntfile.js' ],
-        tasks: 'dev'
+      jshint: {
+        files: ['src/**/*', 'test/unit/**/*.js', 'Gruntfile.js'],
+        tasks: 'jshint'
       },
       skin: {
         files: ['src/css/**/*'],
@@ -65,12 +65,6 @@ module.exports = function(grunt) {
       }
     },
     connect: {
-      preview: {
-        options: {
-          port: 9999,
-          keepalive: true
-        }
-      },
       dev: {
         options: {
           port: 9999,
@@ -106,7 +100,7 @@ module.exports = function(grunt) {
       }
     },
     sass: {
-      dist: {
+      build: {
         files: {
           'build/temp/video-js.css': 'src/css/video-js.scss'
         }
@@ -118,10 +112,15 @@ module.exports = function(grunt) {
         configFile: 'test/karma.conf.js'
       },
 
-      // these are run locally on local browsers
-      dev: {
-        browsers: ['Chrome', 'Firefox', 'Safari']
+      defaults: {},
+
+      watch: {
+        autoWatch: true,
+        singleRun: false
       },
+
+      // these are run locally on local browsers
+      dev: { browsers: ['Chrome', 'Firefox', 'Safari'] },
       chromecanary: { browsers: ['ChromeCanary'] },
       chrome:       { browsers: ['Chrome'] },
       firefox:      { browsers: ['Firefox'] },
@@ -219,71 +218,58 @@ module.exports = function(grunt) {
       }
     },
     browserify: {
+      options: {
+        browserifyOptions: {
+          debug: true,
+          standalone: 'videojs'
+        },
+        banner: license,
+        plugin: [
+          ['browserify-derequire']
+        ],
+        transform: [
+          require('babelify').configure({
+            sourceMapRelative: './',
+            loose: ['all']
+          }),
+          ['browserify-versionify', {
+            placeholder: '__VERSION__',
+            version: pkg.version
+          }],
+          ['browserify-versionify', {
+            placeholder: '__VERSION_NO_PATCH__',
+            version: version.majorMinor
+          }]
+        ]
+      },
       build: {
         files: {
           'build/temp/video.js': ['src/js/video.js']
-        },
-        options: {
-          browserifyOptions: {
-            debug: true,
-            standalone: 'videojs'
-          },
-          banner: license,
-          plugin: [
-            [ 'browserify-derequire' ]
-          ],
-          transform: [
-            require('babelify').configure({
-              sourceMapRelative: './src/js',
-              loose: 'all'
-            }),
-            ['browserify-versionify', {
-              placeholder: '__VERSION__',
-              version: pkg.version
-            }],
-            ['browserify-versionify', {
-              placeholder: '__VERSION_NO_PATCH__',
-              version: version.majorMinor
-            }]
-          ]
-        }
-      },
-      test: {
-        files: {
-          'build/temp/tests.js': [
-            'test/globals-shim.js',
-            'test/unit/**/*.js'
-          ]
-        },
-        options: {
-          browserifyOptions: {
-            debug: true,
-            standalone: 'videojs'
-          },
-          transform: [
-            require('babelify').configure(),
-            'browserify-istanbul'
-          ]
         }
       },
       watch: {
+        options: {
+          watch: true,
+          keepAlive: true
+        },
         files: {
-          'build/temp/video.js': ['src/js/video.js'],
+          'build/temp/video.js': ['src/js/video.js']
+        }
+      },
+      tests: {
+        options: {
+          browserifyOptions: {
+            debug: true,
+            standalone: false
+          },
+          banner: false,
+          watch: true,
+          keepAlive: true
+        },
+        files: {
           'build/temp/tests.js': [
             'test/globals-shim.js',
             'test/unit/**/*.js'
-          ]
-        },
-        options: {
-          watch: true,
-          keepAlive: true,
-          browserifyOptions: {
-            standalone: 'videojs'
-          },
-          banner: license,
-          transform: ['babelify'],
-          plugin: [
-            [ 'browserify-derequire' ]
           ]
         }
       }
@@ -314,6 +300,23 @@ module.exports = function(grunt) {
         src: ['build/temp/video.js', 'node_modules/vtt.js/dist/vtt.js'],
         dest: 'build/temp/video.js',
       },
+    },
+    concurrent: {
+      options: {
+        logConcurrentOutput: true
+      },
+      // Run multiple watch tasks in parallel
+      // Needed so watchify can cache intelligently
+      watchAll: [
+        'watch',
+        'browserify:watch',
+        'browserify:tests',
+        'karma:watch'
+      ],
+      watchSandbox: [
+        'watch',
+        'browserify:watch'
+      ]
     }
   });
 
@@ -324,16 +327,18 @@ module.exports = function(grunt) {
 
   grunt.registerTask('build', [
     'clean:build',
+
     'jshint',
     'browserify:build',
-    'browserify:test',
+    'exorcise:build',
     'copy:novtt',
     'concat:vtt',
-    'exorcise',
     'uglify',
+
     'sass',
     'version:css',
     'cssmin',
+
     'copy:fonts',
     'copy:swf',
     'copy:ie8',
@@ -348,25 +353,19 @@ module.exports = function(grunt) {
     'zip:dist'
   ]);
 
-  // Remove this and add to the test task once mmcc's coverall changes are merged
-  grunt.registerTask('newtest', ['build', 'karma:chrome']);
+  // Default task - build and test
+  grunt.registerTask('default', ['test']);
 
-  // Default task.
-  grunt.registerTask('default', ['build', 'test-local']);
+  grunt.registerTask('test', ['build', 'karma:defaults']);
 
-  // Development watch task. Doing the minimum required.
-  grunt.registerTask('dev', ['jshint', 'sass', 'browserify:build', 'karma:chrome']);
+  // Run while developing
+  grunt.registerTask('dev', ['build', 'connect:dev', 'concurrent:watchSandbox']);
 
-  // Skin development watch task.
-  grunt.registerTask('skin-dev', ['connect:dev', 'watch:skin']);
+  grunt.registerTask('watchAll', ['build', 'connect:dev', 'concurrent:watchAll']);
 
-  // Tests.
-  // We want to run things a little differently if it's coming from Travis vs local
-  if (process.env.TRAVIS) {
-    grunt.registerTask('test', ['build', 'test-travis', 'coveralls']);
-  } else {
-    grunt.registerTask('test', ['build', 'test-local']);
-  }
+  // Pick your testing, or run both in different terminals
+  grunt.registerTask('test-ui', ['browserify:tests']);
+  grunt.registerTask('test-cli', ['karma:watch']);
 
   // Load all the tasks in the tasks directory
   grunt.loadTasks('build/tasks');
