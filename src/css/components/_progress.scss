@@ -58,6 +58,19 @@
   }
 }
 
+// Current Time "tooltip"
+.video-js .vjs-progress-control:hover .vjs-play-progress:after {
+  position: absolute;
+  top: -2.4em;
+  right: -1.5em;
+  font-size: 0.6em;
+  color: $primary-bg;
+  content: attr(data-current-time);
+  padding: 0.2em 0.5em;
+  @include background-color-with-alpha($primary-text, 0.8);
+  @include border-radius(0.3em);
+}
+
 .video-js .vjs-load-progress {
   background: rgb(100, 100, 100) /* IE8- Fallback */;
   background: rgba(255, 255, 255, 0.2);
