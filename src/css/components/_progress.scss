@@ -27,6 +27,16 @@
 /* We need an increased hit area on hover */
 .video-js .vjs-progress-control:hover .vjs-progress-holder { font-size: 1.666666666666666666em }
 
+/* Also show the current time tooltip */
+.video-js .vjs-progress-control:hover .vjs-play-progress:after {
+  display: block;
+
+  /* If we let the font size grow as much as everything else, the current time tooltip ends up
+     ginormous. If you'd like to enable the current time tooltip all the time, this should be disabled
+     to avoid a weird hitch when you roll off the hover. */
+  font-size: 0.6em;
+}
+
 /* Progress Bars */
 .video-js .vjs-progress-holder .vjs-play-progress,
 .video-js .vjs-progress-holder .vjs-load-progress,
@@ -59,11 +69,13 @@
 }
 
 // Current Time "tooltip"
-.video-js .vjs-progress-control:hover .vjs-play-progress:after {
+.video-js .vjs-play-progress:after {
+  /* By default this is hidden and only shown when hovering over the progress control */
+  display: none;
   position: absolute;
   top: -2.4em;
   right: -1.5em;
-  font-size: 0.6em;
+  font-size: 0.9em;
   color: $primary-bg;
   content: attr(data-current-time);
   padding: 0.2em 0.5em;
