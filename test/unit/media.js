@@ -287,7 +287,7 @@ test('should emulate the video element\'s behavior for currentSrc when src is se
   tech.setSource(sourceA);
 
   // Test that currentSource_ is not immediately specified
-  strictEqual(tech.currentSource_, undefined, 'sourceA was not stored immediately');
+  deepEqual(tech.currentSource_, {src:''}, 'sourceA was not stored immediately');
 
   this.clock.tick(1);
 
