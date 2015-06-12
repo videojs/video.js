@@ -1,3 +1,6 @@
+/**
+ * @file play-progress-bar.js
+ */
 import Component from '../../component.js';
 
 /**
@@ -5,10 +8,17 @@ import Component from '../../component.js';
  *
  * @param {Player|Object} player
  * @param {Object=} options
- * @constructor
+ * @extends Component
+ * @class PlayProgressBar
  */
 class PlayProgressBar extends Component {
 
+  /**
+   * Create the component's DOM element
+   *
+   * @return {Element}
+   * @method createEl
+   */
   createEl() {
     return super.createEl('div', {
       className: 'vjs-play-progress',

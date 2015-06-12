@@ -1,3 +1,6 @@
+/**
+ * @file loader.js
+ */
 import Component from '../component';
 import window from 'global/window';
 import toTitleCase from '../utils/to-title-case.js';
@@ -6,7 +9,11 @@ import toTitleCase from '../utils/to-title-case.js';
  * The Media Loader is the component that decides which playback technology to load
  * when the player is initialized.
  *
- * @constructor
+ * @param {Object} player  Main Player
+ * @param {Object=} options Object of option names and values
+ * @param {Function=} ready    Ready callback function
+ * @extends Component
+ * @class MediaLoader
  */
 class MediaLoader extends Component {
 

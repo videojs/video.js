@@ -1,3 +1,6 @@
+/**
+ * @file text-track.js
+ */
 import TextTrackCueList from './text-track-cue-list';
 import * as Fn from '../utils/fn.js';
 import * as Guid from '../utils/guid.js';
@@ -225,8 +228,8 @@ TextTrack.prototype.removeCue = function(removeCue) {
 };
 
 /*
- * Downloading stuff happens below this point
- */
+* Downloading stuff happens below this point
+*/
 var parseCues = function(srcContent, track) {
   if (typeof window['WebVTT'] !== 'function') {
     //try again a bit later

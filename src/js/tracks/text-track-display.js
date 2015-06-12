@@ -1,3 +1,6 @@
+/**
+ * @file text-track-display.js
+ */
 import Component from '../component';
 import Menu from '../menu/menu.js';
 import MenuItem from '../menu/menu-item.js';
@@ -24,7 +27,11 @@ const fontMap = {
 /**
  * The component for displaying text track cues
  *
- * @constructor
+ * @param {Object} player  Main Player
+ * @param {Object=} options Object of option names and values
+ * @param {Function=} ready    Ready callback function
+ * @extends Component
+ * @class TextTrackDisplay
  */
 class TextTrackDisplay extends Component {
 
@@ -54,6 +61,11 @@ class TextTrackDisplay extends Component {
     }));
   }
 
+  /**
+   * Toggle display texttracks 
+   *
+   * @method toggleDisplay
+   */
   toggleDisplay() {
     if (this.player_.tech && this.player_.tech['featuresNativeTextTracks']) {
       this.hide();
@@ -62,18 +74,34 @@ class TextTrackDisplay extends Component {
     }
   }
 
+  /**
+   * Create the component's DOM element
+   *
+   * @return {Element}
+   * @method createEl
+   */
   createEl() {
     return super.createEl('div', {
       className: 'vjs-text-track-display'
     });
   }
 
+  /**
+   * Clear display texttracks 
+   *
+   * @method clearDisplay
+   */
   clearDisplay() {
     if (typeof window['WebVTT'] === 'function') {
       window['WebVTT']['processCues'](window, [], this.el_);
     }
   }
 
+  /**
+   * Update display texttracks 
+   *
+   * @method updateDisplay
+   */
   updateDisplay() {
     var tracks = this.player_.textTracks();
 
@@ -91,6 +119,12 @@ class TextTrackDisplay extends Component {
     }
   }
 
+  /**
+   * Add texttrack to texttrack list 
+   *
+   * @param {TextTrackObject} track Texttrack object to be added to list
+   * @method updateForTrack
+   */
   updateForTrack(track) {
     if (typeof window['WebVTT'] !== 'function' || !track['activeCues']) {
       return;
@@ -165,7 +199,14 @@ class TextTrackDisplay extends Component {
 
 }
 
-// Add cue HTML to display
+/**
+* Add cue HTML to display
+*
+* @param {Number} color Hex number for color, like #f0e
+* @param {Number} opacity Value for opacity,0.0 - 1.0
+* @return {RGBAColor} In the form 'rgba(255, 0, 0, 0.3)'
+* @method constructColor
+*/
 function constructColor(color, opacity) {
   return 'rgba(' +
     // color looks like "#f0e"
@@ -175,8 +216,17 @@ function constructColor(color, opacity) {
     opacity + ')';
 }
 
+/**
+ * Try to update style
+ * Some style changes will throw an error, particularly in IE8. Those should be noops.
+ *
+ * @param {Element} el The element to be styles
+ * @param {CSSProperty} style The CSS property to be styled
+ * @param {CSSStyle} rule The actual style to be applied to the property
+ * @method tryUpdateStyle
+ */
 function tryUpdateStyle(el, style, rule) {
-  // some style changes will throw an error, particularly in IE8. Those should be noops.
+  // 
   try {
     el.style[style] = rule;
   } catch (e) {}

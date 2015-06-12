@@ -1,3 +1,6 @@
+/**
+ * @file captions-button.js
+ */
 import TextTrackButton from './text-track-button.js';
 import Component from '../../component.js';
 import CaptionSettingsMenuItem from './caption-settings-menu-item.js';
@@ -5,7 +8,11 @@ import CaptionSettingsMenuItem from './caption-settings-menu-item.js';
 /**
  * The button component for toggling and selecting captions
  *
- * @constructor
+ * @param {Object} player  Player object
+ * @param {Object=} options Object of option names and values
+ * @param {Function=} ready    Ready callback function
+ * @extends TextTrackButton
+ * @class CaptionsButton
  */
 class CaptionsButton extends TextTrackButton {
 
@@ -14,10 +21,21 @@ class CaptionsButton extends TextTrackButton {
     this.el_.setAttribute('aria-label','Captions Menu');
   }
 
+  /**
+   * Allow sub components to stack CSS class names
+   *
+   * @return {String} The constructed class name
+   * @method buildCSSClass
+   */
   buildCSSClass() {
     return `vjs-captions-button ${super.buildCSSClass()}`;
   }
 
+  /**
+   * Update caption menu items
+   *
+   * @method update
+   */
   update() {
     let threshold = 2;
     super.update();
@@ -34,6 +52,12 @@ class CaptionsButton extends TextTrackButton {
     }
   }
 
+  /**
+   * Create caption menu items
+   *
+   * @return {Array} Array of menu items
+   * @method createItems
+   */
   createItems() {
     let items = [];
 

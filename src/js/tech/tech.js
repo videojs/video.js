@@ -1,5 +1,6 @@
 /**
- * @fileoverview Media Technology Controller - Base class for media playback
+ * @file tech.js
+ * Media Technology Controller - Base class for media playback
  * technology controllers like Flash and HTML5
  */
 
@@ -15,9 +16,11 @@ import document from 'global/document';
 
 /**
  * Base class for media (HTML5 Video, Flash) controllers
- * @param {Player|Object} player  Central player instance
+ *
  * @param {Object=} options Options object
- * @constructor
+ * @param {Function=} ready Ready callback function
+ * @extends Component
+ * @class Tech
  */
 class Tech extends Component {
 
@@ -61,19 +64,18 @@ class Tech extends Component {
    * on a mobile device a click on the video toggles controls.
    * (toggling controls is done by toggling the user state between active and
    * inactive)
-   *
    * A tap can signal that a user has become active, or has become inactive
    * e.g. a quick tap on an iPhone movie should reveal the controls. Another
    * quick tap should hide them again (signaling the user is in an inactive
    * viewing state)
-   *
    * In addition to this, we still want the user to be considered inactive after
    * a few seconds of inactivity.
-   *
    * Note: the only part of iOS interaction we can't mimic with this setup
    * is a touch and hold on the video element counting as activity in order to
    * keep the controls showing, but that shouldn't be an issue. A touch and hold on
    * any controls will still keep the user active
+   *
+   * @method initControlsListeners
    */
   initControlsListeners() {
     // if we're loading the playback object after it has started loading or playing the
@@ -92,6 +94,11 @@ class Tech extends Component {
   ================================================================================ */
   // Manually trigger progress events based on changes to the buffered amount
   // Many flash players and older HTML5 browsers don't send progress or progress-like events
+  /**
+   * Turn on progress events 
+   *
+   * @method manualProgressOn
+   */
   manualProgressOn() {
     this.on('durationchange', this.onDurationChange);
 
@@ -101,6 +108,11 @@ class Tech extends Component {
     this.trackProgress();
   }
 
+  /**
+   * Turn off progress events 
+   *
+   * @method manualProgressOff
+   */
   manualProgressOff() {
     this.manualProgress = false;
     this.stopTrackingProgress();
@@ -108,6 +120,11 @@ class Tech extends Component {
     this.off('durationchange', this.onDurationChange);
   }
 
+  /**
+   * Track progress 
+   *
+   * @method trackProgress
+   */
   trackProgress() {
     this.progressInterval = this.setInterval(Fn.bind(this, function(){
       // Don't trigger unless buffered amount is greater than last time
@@ -126,23 +143,50 @@ class Tech extends Component {
     }), 500);
   }
 
+  /**
+   * Update duration 
+   *
+   * @method onDurationChange
+   */
   onDurationChange() {
     this.duration_ = this.duration();
   }
 
+  /**
+   * Create and get TimeRange object for buffering 
+   *
+   * @return {TimeRangeObject}
+   * @method buffered
+   */
   buffered() {
     return createTimeRange(0, 0);
   }
 
+  /**
+   * Get buffered percent
+   *
+   * @return {Number}
+   * @method bufferedPercent
+   */
   bufferedPercent() {
     return bufferedPercent(this.buffered(), this.duration_);
   }
 
+  /**
+   * Stops tracking progress by clearing progress interval 
+   *
+   * @method stopTrackingProgress
+   */
   stopTrackingProgress() {
     this.clearInterval(this.progressInterval);
   }
 
   /*! Time Tracking -------------------------------------------------------------- */
+  /**
+   * Set event listeners for on play and pause and tracking current time
+   *
+   * @method manualTimeUpdatesOn
+   */
   manualTimeUpdatesOn() {
     this.manualTimeUpdates = true;
 
@@ -150,6 +194,11 @@ class Tech extends Component {
     this.on('pause', this.stopTrackingCurrentTime);
   }
 
+  /**
+   * Remove event listeners for on play and pause and tracking current time
+   *
+   * @method manualTimeUpdatesOff
+   */
   manualTimeUpdatesOff() {
     this.manualTimeUpdates = false;
     this.stopTrackingCurrentTime();
@@ -157,6 +206,11 @@ class Tech extends Component {
     this.off('pause', this.stopTrackingCurrentTime);
   }
 
+  /**
+   * Tracks current time
+   *
+   * @method trackCurrentTime
+   */
   trackCurrentTime() {
     if (this.currentTimeInterval) { this.stopTrackingCurrentTime(); }
     this.currentTimeInterval = this.setInterval(function(){
@@ -164,7 +218,11 @@ class Tech extends Component {
     }, 250); // 42 = 24 fps // 250 is what Webkit uses // FF uses 15
   }
 
-  // Turn off play progress tracking (when paused or dragging)
+  /**
+   * Turn off play progress tracking (when paused or dragging)
+   *
+   * @method stopTrackingCurrentTime
+   */
   stopTrackingCurrentTime() {
     this.clearInterval(this.currentTimeInterval);
 
@@ -173,6 +231,11 @@ class Tech extends Component {
     this.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true });
   }
 
+  /**
+   * Turn off any manual progress or timeupdate tracking
+   *
+   * @method dispose
+   */
   dispose() {
     // Turn off any manual progress or timeupdate tracking
     if (this.manualProgress) { this.manualProgressOff(); }
@@ -182,11 +245,21 @@ class Tech extends Component {
     super.dispose();
   }
 
+  /**
+   * Set current time 
+   *
+   * @method setCurrentTime
+   */
   setCurrentTime() {
     // improve the accuracy of manual timeupdates
     if (this.manualTimeUpdates) { this.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true }); }
   }
 
+  /**
+   * Initialize texttrack listeners 
+   *
+   * @method initTextTrackListeners
+   */
   initTextTrackListeners() {
     let textTrackListChanges = Fn.bind(this, function() {
       this.trigger('texttrackchange');
@@ -205,6 +278,11 @@ class Tech extends Component {
     }));
   }
 
+  /**
+   * Emulate texttracks 
+   *
+   * @method emulateTextTracks
+   */
   emulateTextTracks() {
     if (!window['WebVTT'] && this.el().parentNode != null) {
       let script = document.createElement('script');
@@ -239,22 +317,44 @@ class Tech extends Component {
     });
   }
 
-  /**
+  /*
    * Provide default methods for text tracks.
    *
    * Html5 tech overrides these.
    */
 
+  /**
+   * Get texttracks 
+   *
+   * @returns {TextTrackList}
+   * @method textTracks
+   */
   textTracks() {
     this.textTracks_ = this.textTracks_ || new TextTrackList();
     return this.textTracks_;
   }
 
+  /**
+   * Get remote texttracks 
+   *
+   * @returns {TextTrackList}
+   * @method remoteTextTracks
+   */
   remoteTextTracks() {
     this.remoteTextTracks_ = this.remoteTextTracks_ || new TextTrackList();
     return this.remoteTextTracks_;
   }
 
+  /**
+   * Creates and returns a remote text track object 
+   *
+   * @param {String} kind Text track kind (subtitles, captions, descriptions
+   *                                       chapters and metadata)
+   * @param {String=} label Label to identify the text track
+   * @param {String=} language Two letter language abbreviation
+   * @return {TextTrackObject}
+   * @method addTextTrack
+   */
   addTextTrack(kind, label, language) {
     if (!kind) {
       throw new Error('TextTrack kind is required but was not provided');
@@ -263,6 +363,14 @@ class Tech extends Component {
     return createTrackHelper(this, kind, label, language);
   }
 
+  /**
+   * Creates and returns a remote text track object 
+   *
+   * @param {Object} options The object should contain values for
+   * kind, language, label and src (location of the WebVTT file)
+   * @return {TextTrackObject}
+   * @method addRemoteTextTrack
+   */
   addRemoteTextTrack(options) {
     let track = createTrackHelper(this, options.kind, options.label, options.language, options);
     this.remoteTextTracks().addTrack_(track);
@@ -271,6 +379,12 @@ class Tech extends Component {
     };
   }
 
+  /**
+   * Remove remote texttrack 
+   *
+   * @param {TextTrackObject} track Texttrack to remove
+   * @method removeRemoteTextTrack
+   */
   removeRemoteTextTrack(track) {
     this.textTracks().removeTrack_(track);
     this.remoteTextTracks().removeTrack_(track);
@@ -278,16 +392,18 @@ class Tech extends Component {
 
   /**
    * Provide a default setPoster method for techs
-   *
    * Poster support for techs should be optional, so we don't want techs to
    * break if they don't have a way to set a poster.
+   *
+   * @method setPoster
    */
   setPoster() {}
 
 }
 
-/**
+/*
  * List of associated text tracks
+ *
  * @type {Array}
  * @private
  */
@@ -325,8 +441,8 @@ Tech.prototype.featuresTimeupdateEvents = false;
 
 Tech.prototype.featuresNativeTextTracks = false;
 
-/**
- * A functional mixin for techs that want to use the Source Handler pattern.
+/*
+ * A functional mixin for techs that want to use the Source Handler pattern. 
  *
  * ##### EXAMPLE:
  *
@@ -334,14 +450,14 @@ Tech.prototype.featuresNativeTextTracks = false;
  *
  */
 Tech.withSourceHandlers = function(_Tech){
-  /**
-   * Register a source handler
-   * Source handlers are scripts for handling specific formats.
-   * The source handler pattern is used for adaptive formats (HLS, DASH) that
-   * manually load video data and feed it into a Source Buffer (Media Source Extensions)
-   * @param  {Function} handler  The source handler
-   * @param  {Boolean}  first    Register it before any existing handlers
-   */
+   /*
+    * Register a source handler
+    * Source handlers are scripts for handling specific formats.
+    * The source handler pattern is used for adaptive formats (HLS, DASH) that
+    * manually load video data and feed it into a Source Buffer (Media Source Extensions)
+    * @param  {Function} handler  The source handler
+    * @param  {Boolean}  first    Register it before any existing handlers
+    */
    _Tech.registerSourceHandler = function(handler, index){
     let handlers = _Tech.sourceHandlers;
 
@@ -357,13 +473,13 @@ Tech.withSourceHandlers = function(_Tech){
     handlers.splice(index, 0, handler);
   };
 
-  /**
-   * Return the first source handler that supports the source
-   * TODO: Answer question: should 'probably' be prioritized over 'maybe'
-   * @param  {Object} source The source object
-   * @returns {Object}       The first source handler that supports the source
-   * @returns {null}         Null if no source handler is found
-   */
+   /*
+    * Return the first source handler that supports the source
+    * TODO: Answer question: should 'probably' be prioritized over 'maybe'
+    * @param  {Object} source The source object
+    * @returns {Object}       The first source handler that supports the source
+    * @returns {null}         Null if no source handler is found
+    */
    _Tech.selectSourceHandler = function(source){
     let handlers = _Tech.sourceHandlers || [];
     let can;
@@ -379,11 +495,11 @@ Tech.withSourceHandlers = function(_Tech){
     return null;
   };
 
-  /**
-  * Check if the tech can support the given source
-  * @param  {Object} srcObj  The source object
-  * @return {String}         'probably', 'maybe', or '' (empty string)
-  */
+  /*
+   * Check if the tech can support the given source
+   * @param  {Object} srcObj  The source object
+   * @return {String}         'probably', 'maybe', or '' (empty string)
+   */
   _Tech.canPlaySource = function(srcObj){
     let sh = _Tech.selectSourceHandler(srcObj);
 
@@ -394,13 +510,13 @@ Tech.withSourceHandlers = function(_Tech){
     return '';
   };
 
-  /**
-   * Create a function for setting the source using a source object
-   * and source handlers.
-   * Should never be called unless a source handler was found.
-   * @param {Object} source  A source object with src and type keys
-   * @return {Tech} self
-   */
+   /*
+    * Create a function for setting the source using a source object
+    * and source handlers.
+    * Should never be called unless a source handler was found.
+    * @param {Object} source  A source object with src and type keys
+    * @return {Tech} self
+    */
    _Tech.prototype.setSource = function(source){
     let sh = _Tech.selectSourceHandler(source);
 
@@ -425,9 +541,9 @@ Tech.withSourceHandlers = function(_Tech){
     return this;
   };
 
-  /**
-   * Clean up any existing source handler
-   */
+   /*
+    * Clean up any existing source handler
+    */
    _Tech.prototype.disposeSourceHandler = function(){
     if (this.sourceHandler_ && this.sourceHandler_.dispose) {
       this.sourceHandler_.dispose();

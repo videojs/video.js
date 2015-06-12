@@ -1,3 +1,6 @@
+/**
+ * @file text-track-menu-item.js
+ */
 import MenuItem from '../../menu/menu-item.js';
 import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
@@ -7,7 +10,10 @@ import document from 'global/document';
 /**
  * The specific menu item type for selecting a language within a text track kind
  *
- * @constructor
+ * @param {Player|Object} player
+ * @param {Object=} options
+ * @extends MenuItem
+ * @class TextTrackMenuItem
  */
 class TextTrackMenuItem extends MenuItem {
 
@@ -58,6 +64,11 @@ class TextTrackMenuItem extends MenuItem {
     }
   }
 
+  /**
+   * Handle click on text track
+   *
+   * @method handleClick
+   */
   handleClick(event) {
     let kind = this.track['kind'];
     let tracks = this.player_.textTracks();
@@ -81,6 +92,11 @@ class TextTrackMenuItem extends MenuItem {
     }
   }
 
+  /**
+   * Handle text track change
+   *
+   * @method handleTracksChange
+   */
   handleTracksChange(event){
     this.selected(this.track['mode'] === 'showing');
   }

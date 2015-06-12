@@ -1,13 +1,14 @@
-import * as Url from './utils/url.js';
+/**
+ * @file xhr.js
+ */
+import  * as Url from './utils/url.js';
 import log from './utils/log.js';
 import mergeOptions from './utils/merge-options.js';
 import window from 'global/window';
 
-/**
+/*
  * Simple http request for retrieving external files (e.g. text tracks)
- *
  * ##### Example
- *
  *     // using url string
  *     videojs.xhr('http://example.com/myfile.vtt', function(error, response, responseBody){});
  *
@@ -23,15 +24,15 @@ import window from 'global/window';
  *         // successful, do something with the response
  *       }
  *     });
- *
- *
+ * /////////////
  * API is modeled after the Raynos/xhr, which we hope to use after
  * getting browserify implemented.
  * https://github.com/Raynos/xhr/blob/master/index.js
  *
  * @param  {Object|String}  options   Options block or URL string
  * @param  {Function}       callback  The callback function
- * @returns {Object}                  The request
+ * @return {Object}                  The request
+ * @method xhr
  */
 var xhr = function(options, callback){
   let abortTimeout;
@@ -46,7 +47,7 @@ var xhr = function(options, callback){
   // Merge with default options
   mergeOptions({
     method: 'GET',
-    timeout: 45 * 1000
+    timeout: 45  * 1000
   }, options);
 
   callback = callback || function(){};

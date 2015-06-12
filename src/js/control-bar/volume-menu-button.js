@@ -1,3 +1,6 @@
+/**
+ * @file volume-menu-button.js
+ */
 import Button from '../button.js';
 import Component from '../component.js';
 import Menu from '../menu/menu.js';
@@ -6,8 +9,12 @@ import MuteToggle from './mute-toggle.js';
 import VolumeBar from './volume-control/volume-bar.js';
 
 /**
- * Menu button with a popup for showing the volume slider.
- * @constructor
+ * Button for volume menu
+ *
+ * @param {Player|Object} player
+ * @param {Object=} options
+ * @extends MenuButton
+ * @class VolumeMenuButton
  */
 class VolumeMenuButton extends MenuButton {
 
@@ -31,10 +38,22 @@ class VolumeMenuButton extends MenuButton {
     this.addClass('vjs-menu-button');
   }
 
+  /**
+   * Allow sub components to stack CSS class names
+   *
+   * @return {String} The constructed class name
+   * @method buildCSSClass
+   */
   buildCSSClass() {
     return `vjs-volume-menu-button ${super.buildCSSClass()}`;
   }
 
+  /**
+   * Allow sub components to stack CSS class names
+   *
+   * @return {Menu} The volume menu button
+   * @method createMenu
+   */
   createMenu() {
     let menu = new Menu(this.player_, {
       contentElType: 'div'
@@ -56,6 +75,11 @@ class VolumeMenuButton extends MenuButton {
     return menu;
   }
 
+  /**
+   * Handle click on volume menu and calls super
+   *
+   * @method handleClick
+   */
   handleClick() {
     MuteToggle.prototype.handleClick.call(this);
     super.handleClick();
