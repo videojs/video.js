@@ -36,6 +36,8 @@ vjs.MediaTechController = vjs.Component.extend({
       this.emulateTextTracks();
     }
 
+    this.on('loadstart', this.updateCurrentSource);
+
     this.initTextTrackListeners();
   }
 });
@@ -166,6 +168,24 @@ vjs.MediaTechController.prototype.onClick = function(event){
  */
 vjs.MediaTechController.prototype.onTap = function(){
   this.player().userActive(!this.player().userActive());
+};
+
+/**
+ * Set currentSource_ asynchronously to simulate the media element's
+ * asynchronous execution of the `resource selection algorithm`
+ *
+ * currentSource_ is set either as the first loadstart event OR
+ * in a timeout to make sure it is set asynchronously before anything else
+ * but before other loadstart handlers have had a chance to execute
+ */
+vjs.MediaTechController.prototype.updateCurrentSource = function () {
+  // We could have been called with a 0-ms setTimeout OR via loadstart (which ever
+  // happens first) so we should clear the timeout to be a good citizen
+  this.clearTimeout(this.updateSourceTimer_);
+
+  if (this.pendingSource_) {
+    this.currentSource_ = this.pendingSource_;
+  }
 };
 
 /* Fallbacks for unsupported event types
@@ -510,13 +530,11 @@ vjs.MediaTechController.withSourceHandlers = function(Tech){
     this.disposeSourceHandler();
     this.off('dispose', this.disposeSourceHandler);
 
-    // Set currentSource_ asynchronously to simulate the media element's
-    // asynchronous execution of the `resource selection algorithm`
-    this.setTimeout(vjs.bind(this, function () {
-      if (source && source.src !== '') {
-        this.currentSource_ = source;
-      }
-    }), 0);
+    // Schedule currentSource_ to be set asynchronously
+    if (source && source.src !== '') {
+      this.pendingSource_ = source;
+      this.updateSourceTimer_ = this.setTimeout(vjs.bind(this, this.updateCurrentSource), 0);
+    }
 
     this.sourceHandler_ = sh.handleSource(source, this);
     this.on('dispose', this.disposeSourceHandler);
