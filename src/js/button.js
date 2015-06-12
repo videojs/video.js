@@ -11,8 +11,8 @@ import assign from 'object.assign';
  * Base class for all buttons
  * @param {Player|Object} player
  * @param {Object=} options
- * @class
- * @constructor
+ * @extends Component
+ * @class Button
  */
 class Button extends Component {
 
