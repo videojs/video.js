@@ -446,6 +446,8 @@ vjs.MediaTechController.prototype['featuresNativeTextTracks'] = false;
  *
  */
 vjs.MediaTechController.withSourceHandlers = function(Tech){
+  Tech.prototype.currentSource_ = {src: ''};
+
   /**
    * Register a source handler
    * Source handlers are scripts for handling specific formats.
