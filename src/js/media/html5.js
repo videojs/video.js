@@ -325,7 +325,11 @@ vjs.Html5.prototype.src = function(src) {
 };
 
 vjs.Html5.prototype.setSrc = function(src) {
+  this.toggleCrossorigin({crossorigin: null});
   this.el_.src = src;
+  setTimeout(vjs.bind(this, function() {
+    this.toggleCrossorigin({crossorigin: 'anonymous'});
+  }));
 };
 
 vjs.Html5.prototype.load = function(){ this.el_.load(); };
@@ -447,6 +451,35 @@ vjs.Html5.prototype.removeRemoteTextTrack = function(track) {
       tracks[i]['parentNode']['removeChild'](tracks[i]);
       break;
     }
+  }
+};
+
+/*
+ * This toggles the crossorigin attribute on the element.
+ * If no options object is specified it will toggle between presence and absence of the crossorigin attribute.
+ * The input to the function is an options object with a property called `crossorigin`.
+ * The value can be either 'anonymous' or 'use-credentials' as seen here <https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_settings_attributes>.
+ * Falsey values will remove the attribute, truthy values other than the two above strings will be interpreted as default (or 'anonymous').
+ */
+vjs.Html5.prototype.toggleCrossorigin = function(opt) {
+  var el = this.el(),
+      remove = false,
+      value = 'anonymous';
+
+  if (!opt) {
+    remove = el.hasAttribute('crossorigin');
+  } else if (opt.crossorigin === 'use-credentials') {
+    value = 'use-credentials';
+  } else if (opt.crossorigin) {
+    value = 'anonymous';
+  } else {
+    remove = true;
+  }
+
+  if (remove) {
+    el.removeAttribute('crossorigin');
+  } else {
+    el.setAttribute('crossorigin', value);
   }
 };
 
