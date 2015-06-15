@@ -49,8 +49,11 @@ import Html5 from './tech/html5.js';
  *
  * After an instance has been created it can be accessed globally using `Video('example_video_1')`.
  *
- * @class
+ * @param {Element} tag        The original video tag used for configuring options
+ * @param {Object=} options    Player options
+ * @param {Function=} ready    Ready callback function
  * @extends Component
+ * @class Player
  */
 class Player extends Component {
 
@@ -207,6 +210,7 @@ class Player extends Component {
    *
    * This is especially helpful if you are dynamically adding and removing videos
    * to/from the DOM.
+   * @method dispose
    */
   dispose() {
     this.trigger('dispose');
@@ -223,6 +227,12 @@ class Player extends Component {
     super.dispose();
   }
 
+  /**
+  * Create the component's DOM element
+  *
+  * @returns HTML Element
+  * @method createEl
+  */
   createEl() {
     let el = this.el_ = super.createEl('div');
     let tag = this.tag;
@@ -283,14 +293,36 @@ class Player extends Component {
     return el;
   }
 
+  // TODO Steve please check
+  /**
+  * Get/set player width
+  *
+  * @param {Number=} value Value for width
+  * @method width
+  */
   width(value) {
     return this.dimension('width', value);
   }
 
+  // TODO Steve please check
+  /**
+  * Get/set player height
+  *
+  * @param {Number=} value Value for height
+  * @method height
+  */
   height(value) {
     return this.dimension('height', value);
   }
 
+  // TODO Steve please check
+  /**
+  * Get/set dimension for player
+  *
+  * @param {String} dimension Either width or height
+  * @param {Number=} value Value for dimension
+  * @method dimension
+  */
   dimension(dimension, value) {
     let privDimension = dimension + '_';
 
@@ -316,6 +348,12 @@ class Player extends Component {
     return this;
   }
 
+  /**
+  * Add/remove the vjs-fluid class
+  *
+  * @param {Boolean} bool Value of true adds the class, value of false removes the class 
+  * @method fluid
+  */
   fluid(bool) {
     if (bool === undefined) {
       return !!this.fluid_;
@@ -330,6 +368,13 @@ class Player extends Component {
     }
   }
 
+  /**
+  * Get/Set the aspect ratio
+  *
+  * @param {String=} ratio Aspect ratio for player
+  * @returns aspectRatio
+  * @method aspectRatio
+  */
   aspectRatio(ratio) {
     if (ratio === undefined) {
       return this.aspectRatio_;
@@ -337,7 +382,7 @@ class Player extends Component {
 
     // Check for width:height format
     if (!/^\d+\:\d+$/.test(ratio)) {
-      throw new Error('Improper value suplied for aspect ratio. The format should be width:height, for example 16:9.');
+      throw new Error('Improper value supplied for aspect ratio. The format should be width:height, for example 16:9.');
     }
     this.aspectRatio_ = ratio;
 
@@ -348,6 +393,11 @@ class Player extends Component {
     this.updateStyleEl_();
   }
 
+  /**
+  * Update styles of the player element (height, width and aspect ratio)
+  *
+  * @method updateStyleEl_
+  */
   updateStyleEl_() {
     let width;
     let height;
@@ -407,10 +457,14 @@ class Player extends Component {
   }
 
   /**
-   * Load the Media Playback Technology (tech)
-   * Load/Create an instance of playback technology including element and API methods
-   * And append playback element in player div.
-   */
+  * Load the Media Playback Technology (tech)
+  * Load/Create an instance of playback technology including element and API methods
+  * And append playback element in player div.
+  *
+  * @param {String} techName Name of the playback technology
+  * @param {String} source Video source
+  * @method loadTech
+  */
   loadTech(techName, source) {
 
     // Pause and remove current playback technology
@@ -513,6 +567,11 @@ class Player extends Component {
     this.tech.ready(techReady);
   }
 
+  /**
+  * Unload playback technology
+  *
+  * @method unloadTech
+  */
   unloadTech() {
     // Save the current text tracks so that we can reuse the same text tracks with the next tech
     this.textTracks_ = this.textTracks();
@@ -524,6 +583,11 @@ class Player extends Component {
     this.tech = false;
   }
 
+  /**
+  * Add playback technology listeners
+  *
+  * @method addTechControlsListeners
+  */
   addTechControlsListeners() {
     // Some browsers (Chrome & IE) don't trigger a click on a flash swf, but do
     // trigger mousedown/up.
@@ -546,7 +610,9 @@ class Player extends Component {
   /**
    * Remove the listeners used for click and tap controls. This is needed for
    * toggling to controls disabled, where a tap/touch should do nothing.
-   */
+  *
+  * @method removeTechControlsListeners
+  */
   removeTechControlsListeners() {
     // We don't want to just use `this.off()` because there might be other needed
     // listeners added by techs that extend this.
@@ -560,6 +626,7 @@ class Player extends Component {
   /**
    * Player waits for the tech to be ready
    * @private
+   * @method handleTechReady
    */
   handleTechReady() {
     this.triggerReady();
@@ -577,6 +644,7 @@ class Player extends Component {
   /**
    * Fired when the native controls are used
    * @private
+   * @method handleTechUseNativeControls
    */
   handleTechUseNativeControls() {
     this.usingNativeControls(true);

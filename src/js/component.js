@@ -39,8 +39,7 @@ import mergeOptions from './utils/merge-options.js';
  *
  * @param {Object} player  Main Player
  * @param {Object=} options
- * @class
- * @constructor
+ * @class Component
  */
 class Component {
 
@@ -105,6 +104,7 @@ class Component {
 
   /**
    * Dispose of the component and all child components
+   * @method dispose
    */
   dispose() {
     this.trigger({ type: 'dispose', bubbles: false });
@@ -139,6 +139,7 @@ class Component {
    * Return the component's player
    *
    * @return {Player}
+   * @method player
    */
   player() {
     return this.player_;
@@ -184,6 +185,7 @@ class Component {
    *
    * @param  {Object} obj Object of new option values
    * @return {Object}     A NEW object of this.options_ and obj merged
+   * @method options
    */
   options(obj) {
     log.warn('this.options() has been deprecated and will be moved to the constructor in 6.0');
@@ -202,6 +204,7 @@ class Component {
    *     var domEl = myComponent.el();
    *
    * @return {Element}
+   * @method el
    */
   el() {
     return this.el_;
@@ -213,6 +216,7 @@ class Component {
    * @param  {String=} tagName  Element's node type. e.g. 'div'
    * @param  {Object=} attributes An object of element attributes that should be set on the element
    * @return {Element}
+   * @method createEl
    */
   createEl(tagName, attributes) {
     return Dom.createEl(tagName, attributes);
@@ -247,6 +251,7 @@ class Component {
    * Will either be the same as el() or a new element defined in createEl().
    *
    * @return {Element}
+   * @method contentEl
    */
   contentEl() {
     return this.contentEl_ || this.el_;
@@ -258,7 +263,8 @@ class Component {
    *     var id = myComponent.id();
    *
    * @return {String}
-   */
+   * @method id
+  */
   id() {
     return this.id_;
   }
@@ -269,6 +275,7 @@ class Component {
    *     var name = myComponent.name();
    *
    * @return {String}
+   * @method name
    */
   name() {
     return this.name_;
@@ -280,6 +287,7 @@ class Component {
    *     var kids = myComponent.children();
    *
    * @return {Array} The children
+   * @method children
    */
   children() {
     return this.children_;
@@ -289,6 +297,7 @@ class Component {
    * Returns a child component with the provided ID
    *
    * @return {Component}
+   * @method getChildById
    */
   getChildById(id) {
     return this.childIndex_[id];
@@ -298,6 +307,7 @@ class Component {
    * Returns a child component with the provided name
    *
    * @return {Component}
+   * @method getChild
    */
   getChild(name) {
     return this.childNameIndex_[name];
@@ -330,6 +340,7 @@ class Component {
    * @param {Object=} options Options, including options to be passed to children of the child.
    * @return {Component} The child component (created by this process if a string was used)
    * @suppress {accessControls|checkRegExp|checkTypes|checkVars|const|constantProperty|deprecated|duplicate|es5Strict|fileoverviewTags|globalThis|invalidCasts|missingProperties|nonStandardJsDocs|strictModuleDepCheck|undefinedNames|undefinedVars|unknownDefines|uselessCode|visibility}
+   * @method addChild
    */
   addChild(child, options={}) {
     let component;
@@ -397,6 +408,7 @@ class Component {
    * child component's element from this component's element
    *
    * @param  {Component} component Component to remove
+   * @method removeChild
    */
   removeChild(component) {
     if (typeof component === 'string') {
@@ -463,7 +475,7 @@ class Component {
    *         }
    *       ]
    *     });
-   *
+   * @method initChildren
    */
   initChildren() {
     let children = this.options_.children;
@@ -528,6 +540,7 @@ class Component {
    * Allows sub components to stack CSS class names
    *
    * @return {String} The constructed class name
+   * @method buildCSSClass
    */
   buildCSSClass() {
     // Child classes can include a function that does:
@@ -566,6 +579,7 @@ class Component {
    * @param  {Function|String}      second  The event handler or event type
    * @param  {Function}             third   The event handler
    * @return {Component}        self
+   * @method on
    */
   on(first, second, third) {
     if (typeof first === 'string' || Array.isArray(first)) {
@@ -630,6 +644,7 @@ class Component {
    * @param  {Function=|String}       second The listener function or event type
    * @param  {Function=}              third  The listener for other component
    * @return {Component}
+   * @method off
    */
   off(first, second, third) {
     if (!first || typeof first === 'string' || Array.isArray(first)) {
@@ -673,6 +688,7 @@ class Component {
    * @param  {Function|String}       second  The listener function or event type
    * @param  {Function=}             third   The listener function for other component
    * @return {Component}
+   * @method one
    */
   one(first, second, third) {
     if (typeof first === 'string' || Array.isArray(first)) {
@@ -707,6 +723,7 @@ class Component {
    * @param  {Event|Object|String} event  A string (the type) or an event object with a type attribute
    * @param  {Object} [hash] data hash to pass along with the event
    * @return {Component}       self
+   * @method trigger
    */
   trigger(event, hash) {
     Events.trigger(this.el_, event, hash);
@@ -721,6 +738,7 @@ class Component {
    *
    * @param  {Function} fn Ready listener
    * @return {Component}
+   * @method ready
    */
   ready(fn) {
     if (fn) {
@@ -739,6 +757,7 @@ class Component {
    * Trigger the ready listeners
    *
    * @return {Component}
+   * @method triggerReady
    */
   triggerReady() {
     this.isReady_ = true;
@@ -766,6 +785,7 @@ class Component {
    *
    * @param {String} classToCheck Classname to check
    * @return {Component}
+   * @method hasClass
    */
   hasClass(classToCheck) {
     return Dom.hasElClass(this.el_, classToCheck);
@@ -776,6 +796,7 @@ class Component {
    *
    * @param {String} classToAdd Classname to add
    * @return {Component}
+   * @method addClass
    */
   addClass(classToAdd) {
     Dom.addElClass(this.el_, classToAdd);
@@ -787,6 +808,7 @@ class Component {
    *
    * @param {String} classToRemove Classname to remove
    * @return {Component}
+   * @method removeClass
    */
   removeClass(classToRemove) {
     Dom.removeElClass(this.el_, classToRemove);
@@ -797,6 +819,7 @@ class Component {
    * Show the component element if hidden
    *
    * @return {Component}
+   * @method show
    */
   show() {
     this.removeClass('vjs-hidden');
@@ -807,6 +830,7 @@ class Component {
    * Hide the component element if currently showing
    *
    * @return {Component}
+   * @method hide
    */
   hide() {
     this.addClass('vjs-hidden');
@@ -819,6 +843,7 @@ class Component {
    *
    * @return {Component}
    * @private
+   * @method lockShowing
    */
   lockShowing() {
     this.addClass('vjs-lock-showing');
@@ -831,6 +856,7 @@ class Component {
    *
    * @return {Component}
    * @private
+   * @method unlockShowing
    */
   unlockShowing() {
     this.removeClass('vjs-lock-showing');
@@ -849,6 +875,7 @@ class Component {
    * @param  {Boolean} skipListeners Skip the 'resize' event trigger
    * @return {Component} This component, when setting the width
    * @return {Number|String} The width, when getting
+   * @method width
    */
   width(num, skipListeners) {
     return this.dimension('width', num, skipListeners);
@@ -866,6 +893,7 @@ class Component {
    * @param  {Boolean=} skipListeners Skip the resize event trigger
    * @return {Component} This component, when setting the height
    * @return {Number|String} The height, when getting
+   * @method height
    */
   height(num, skipListeners) {
     return this.dimension('height', num, skipListeners);
@@ -877,6 +905,7 @@ class Component {
    * @param  {Number|String} width
    * @param  {Number|String} height
    * @return {Component} The component
+   * @method dimensions
    */
   dimensions(width, height) {
     // Skip resize listeners on width for optimization
@@ -900,6 +929,7 @@ class Component {
    * @return {Component} The component if a dimension was set
    * @return {Number|String} The dimension if nothing was set
    * @private
+   * @method dimension
    */
   dimension(widthOrHeight, num, skipListeners) {
     if (num !== undefined) {
@@ -956,6 +986,7 @@ class Component {
    * have this extra overhead unnecessarily, on mobile devices where extra
    * overhead is especially bad.
    * @private
+   * @method emitTapEvents
    */
   emitTapEvents() {
     // Track the start time so we can determine how long the touch lasted
@@ -1052,6 +1083,7 @@ class Component {
    * Here we're setting the default component behavior to report user activity
    * whenever touch events happen, and this can be turned off by components that
    * want touch events to act differently.
+   * @method enableTouchActivity
    */
   enableTouchActivity() {
     // Don't continue if the root player doesn't support reporting user activity
@@ -1090,6 +1122,7 @@ class Component {
    * @param {Function} fn The function to run after the timeout.
    * @param {Number} timeout Number of ms to delay before executing specified function.
    * @return {Number} Returns the timeout ID
+   * @method setTimeout
    */
   setTimeout(fn, timeout) {
     fn = Fn.bind(this, fn);
@@ -1112,6 +1145,7 @@ class Component {
    * Clears a timeout and removes the associated dispose listener
    * @param {Number} timeoutId The id of the timeout to clear
    * @return {Number} Returns the timeout ID
+   * @method clearTimeout
    */
   clearTimeout(timeoutId) {
     window.clearTimeout(timeoutId);
@@ -1130,6 +1164,7 @@ class Component {
    * @param {Function} fn The function to run every N seconds.
    * @param {Number} interval Number of ms to delay before executing specified function.
    * @return {Number} Returns the interval ID
+   * @method setInterval
    */
   setInterval(fn, interval) {
     fn = Fn.bind(this, fn);
@@ -1151,6 +1186,7 @@ class Component {
    * Clears an interval and removes the associated dispose listener
    * @param {Number} intervalId The id of the interval to clear
    * @return {Number} Returns the interval ID
+   * @method clearInterval
    */
   clearInterval(intervalId) {
     window.clearInterval(intervalId);
@@ -1164,6 +1200,14 @@ class Component {
     return intervalId;
   }
 
+  // TODO Steve please check
+  /**
+  * Registers a component
+  * @param {String} name Name of the component to register
+  * @param {Object} comp The component to register  
+  * @static
+  * @method registerComponent
+  */
   static registerComponent(name, comp) {
     if (!Component.components_) {
       Component.components_ = {};
@@ -1173,6 +1217,13 @@ class Component {
     return comp;
   }
 
+  // TODO Steve please check
+  /**
+  * Gets a component by name
+  * @param {String} name Name of the component to get
+  * @static
+  * @method getComponent
+  */
   static getComponent(name) {
     if (Component.components_ && Component.components_[name]) {
       return Component.components_[name];
@@ -1184,6 +1235,14 @@ class Component {
     }
   }
 
+  // TODO Steve please check
+  /**
+  * Sets up the constructor using the supplied init method
+  * or uses the init of the parent object
+  * @param {Object} props An object of properties  
+  * @static
+  * @method extend
+  */
   static extend(props) {
     props = props || {};
     // Set up the constructor using the supplied init method

@@ -8,8 +8,8 @@ import Component from './component.js';
  * big play button is done via CSS and player states.
  * @param {Player|Object} player
  * @param {Object=} options
- * @class
  * @constructor
+ * @class BigPlayButton
  */
 class BigPlayButton extends Button {
 

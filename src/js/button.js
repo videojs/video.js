@@ -27,6 +27,17 @@ class Button extends Component {
     this.on('blur', this.handleBlur);
   }
 
+  /**
+  * Create the component's DOM element
+  *
+  *     //This is test code
+  *     var myPlayer = this;
+  *
+  * @param {String=} type - Element's node type. e.g. 'div'
+  * @param {Object=} props - An object of element attributes that should be set on the element Tag name 
+  * @return HTML Element
+  * @method createEl
+  */
   createEl(type='button', props={}) {
     // Add standard Aria and Tabindex info
     props = assign({
@@ -58,6 +69,11 @@ class Button extends Component {
     return this;
   }
 
+  /**
+  * Allows sub components to stack CSS class names
+  * @return {String}
+  * @method buildCSSClass
+  */
   buildCSSClass() {
     return `vjs-control vjs-button ${super.buildCSSClass()}`;
   }
