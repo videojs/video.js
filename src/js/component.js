@@ -39,6 +39,7 @@ import mergeOptions from './utils/merge-options.js';
  *
  * @param {Object} player  Main Player
  * @param {Object=} options
+ * @param {Function} ready Ready listener
  * @class Component
  */
 class Component {
@@ -1200,7 +1201,6 @@ class Component {
     return intervalId;
   }
 
-  // TODO Steve please check
   /**
   * Registers a component
   * @param {String} name Name of the component to register
@@ -1217,7 +1217,6 @@ class Component {
     return comp;
   }
 
-  // TODO Steve please check
   /**
   * Gets a component by name
   * @param {String} name Name of the component to get
@@ -1235,7 +1234,6 @@ class Component {
     }
   }
 
-  // TODO Steve please check
   /**
   * Sets up the constructor using the supplied init method
   * or uses the init of the parent object
