@@ -36,7 +36,7 @@ vjs.MediaTechController = vjs.Component.extend({
       this.emulateTextTracks();
     }
 
-    this.on('loadstart', this.updateCurrentSource);
+    this.on('loadstart', this.updateCurrentSource_);
 
     this.initTextTrackListeners();
   }
@@ -178,7 +178,7 @@ vjs.MediaTechController.prototype.onTap = function(){
  * in a timeout to make sure it is set asynchronously before anything else
  * but before other loadstart handlers have had a chance to execute
  */
-vjs.MediaTechController.prototype.updateCurrentSource = function () {
+vjs.MediaTechController.prototype.updateCurrentSource_ = function () {
   // We could have been called with a 0-ms setTimeout OR via loadstart (which ever
   // happens first) so we should clear the timeout to be a good citizen
   this.clearTimeout(this.updateSourceTimer_);
@@ -535,7 +535,7 @@ vjs.MediaTechController.withSourceHandlers = function(Tech){
     // Schedule currentSource_ to be set asynchronously
     if (source && source.src !== '') {
       this.pendingSource_ = source;
-      this.updateSourceTimer_ = this.setTimeout(vjs.bind(this, this.updateCurrentSource), 0);
+      this.updateSourceTimer_ = this.setTimeout(vjs.bind(this, this.updateCurrentSource_), 0);
     }
 
     this.sourceHandler_ = sh.handleSource(source, this);
