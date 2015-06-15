@@ -675,6 +675,13 @@ class Player extends Component {
     }
   }
 
+  /**
+  * Add/remove the vjs-has-started class
+  *
+  * @param {Boolean} hasStarted The value of true adds the class the value of false remove the class
+  * @returns ???
+  * @method createEl
+  */
   hasStarted(hasStarted) {
     if (hasStarted !== undefined) {
       // only update if this is a new value
@@ -836,6 +843,9 @@ class Player extends Component {
 
   /**
    * Handle a click on the media element to play/pause
+   *
+   * @param {Object=} event Event object 
+   * @method handleTechClick
    */
   handleTechClick(event) {
     // We're using mousedown to detect clicks thanks to Flash, but mousedown
@@ -856,21 +866,38 @@ class Player extends Component {
   /**
    * Handle a tap on the media element. It will toggle the user
    * activity state, which hides and shows the controls.
+   *
+   * @method handleTechTap
    */
   handleTechTap() {
     this.userActive(!this.userActive());
   }
 
+  /**
+   * Handle ???
+   *
+   * @method handleTechTouchStart
+   */
   handleTechTouchStart() {
     this.userWasActive = this.userActive();
   }
 
+  /**
+   * Handle ???
+   *
+   * @method handleTechTouchMove
+   */
   handleTechTouchMove() {
     if (this.userWasActive){
       this.reportUserActivity();
     }
   }
 
+  /**
+   * Handle ???
+   *
+   * @method handleTechTouchEnd
+   */
   handleTechTouchEnd(event) {
     // Stop the mouse events from also happening
     event.preventDefault();
@@ -879,6 +906,7 @@ class Player extends Component {
   /**
    * Update the duration of the player using the tech
    * @private
+   * @method updateDuration
    */
   updateDuration() {
     // Allows for caching value instead of asking player each time.
@@ -920,6 +948,9 @@ class Player extends Component {
     this.reportUserActivity();
   }
 
+  /**
+  * 
+  */
   handleTechFullscreenChange() {
     this.trigger('fullscreenchange');
   }
@@ -1013,13 +1044,20 @@ class Player extends Component {
   }
 
   /**
-   * Object for cached values.
+   * Get object for cached values.
+   * @method getCache
    */
   getCache() {
     return this.cache_;
   }
 
-  // Pass values to the playback tech
+  /**
+  * Pass values to the playback tech
+  *
+  * @param {String=} method Method 
+  * @param {Object=} arg Argument 
+  * @method techCall
+  */
   techCall(method, arg) {
     // If it's not ready yet, call method when it is
     if (this.tech && !this.tech.isReady_) {
@@ -1038,7 +1076,13 @@ class Player extends Component {
     }
   }
 
-  // Get calls can't wait for the tech, and sometimes don't need to.
+  /**
+  * Get calls can't wait for the tech, and sometimes don't need to.
+  *
+  * @param {String} method Method
+  * @returns Method
+  * @method techGet
+  */
   techGet(method) {
     if (this.tech && this.tech.isReady_) {
 
@@ -1073,6 +1117,7 @@ class Player extends Component {
    *     myPlayer.play();
    *
    * @return {Player} self
+   * @method play
    */
   play() {
     this.techCall('play');
@@ -1085,6 +1130,7 @@ class Player extends Component {
    *     myPlayer.pause();
    *
    * @return {Player} self
+   * @method pause
    */
   pause() {
     this.techCall('pause');
@@ -1098,6 +1144,7 @@ class Player extends Component {
    *     var isPlaying = !myPlayer.paused();
    *
    * @return {Boolean} false if the media is currently playing, or true otherwise
+   * @method paused
    */
   paused() {
     // The initial state of paused should be true (in Safari it's actually false)
@@ -1110,6 +1157,7 @@ class Player extends Component {
   * @param  {Boolean} isScrubbing   True/false the user is scrubbing
   * @return {Boolean}               The scrubbing status when getting
   * @return {Object}                The player when setting
+   * @method scrubbing
   */
   scrubbing(isScrubbing) {
     if (isScrubbing !== undefined) {
@@ -1139,6 +1187,7 @@ class Player extends Component {
    * @param  {Number|String=} seconds The time to seek to
    * @return {Number}        The time in seconds, when not setting
    * @return {Player}    self, when the current time is set
+   * @method currentTime
    */
   currentTime(seconds) {
     if (seconds !== undefined) {
@@ -1167,6 +1216,7 @@ class Player extends Component {
    * playing.
    *
    * @return {Number} The duration of the video in seconds
+   * @method duration
    */
   duration(seconds) {
     if (seconds !== undefined) {
@@ -1191,6 +1241,7 @@ class Player extends Component {
    *
    * Not a native video element function, but useful
    * @return {Number} The time remaining in seconds
+   * @method remainingTime
    */
   remainingTime() {
     return this.duration() - this.currentTime();
@@ -1219,6 +1270,7 @@ class Player extends Component {
    *     firstRangeLength = firstRangeEnd - firstRangeStart;
    *
    * @return {Object} A mock TimeRange object (following HTML spec)
+   * @method buffered
    */
   buffered() {
     var buffered = this.techGet('buffered');
@@ -1239,6 +1291,7 @@ class Player extends Component {
    * (This method isn't in the HTML5 spec, but it's very convenient)
    *
    * @return {Number} A decimal between 0 and 1 representing the percent
+   * @method bufferedPercent
    */
   bufferedPercent() {
     return bufferedPercent(this.buffered(), this.duration());
@@ -1249,6 +1302,7 @@ class Player extends Component {
    *
    * This is used in the progress bar to encapsulate all time ranges.
    * @return {Number} The end of the last buffered time range
+   * @method bufferedEnd
    */
   bufferedEnd() {
     var buffered = this.buffered(),
@@ -1276,6 +1330,7 @@ class Player extends Component {
    * @param  {Number} percentAsDecimal The new volume as a decimal percent
    * @return {Number}                  The current volume, when getting
    * @return {Player}              self, when setting
+   * @method volume
    */
   volume(percentAsDecimal) {
     let vol;
@@ -1306,6 +1361,7 @@ class Player extends Component {
    * @param  {Boolean=} muted True to mute, false to unmute
    * @return {Boolean} True if mute is on, false if not, when getting
    * @return {Player} self, when setting mute
+   * @method muted
    */
   muted(muted) {
     if (muted !== undefined) {
@@ -1337,6 +1393,7 @@ class Player extends Component {
    * @param  {Boolean=} isFS Update the player's fullscreen state
    * @return {Boolean} true if fullscreen, false if not
    * @return {Player} self, when setting
+   * @method isFullscreen
    */
   isFullscreen(isFS) {
     if (isFS !== undefined) {
@@ -1368,6 +1425,7 @@ class Player extends Component {
    * Safari.
    *
    * @return {Player} self
+   * @method requestFullscreen
    */
   requestFullscreen() {
     var fsApi = FullscreenApi;
@@ -1425,6 +1483,7 @@ class Player extends Component {
    *     myPlayer.exitFullscreen();
    *
    * @return {Player} self
+   * @method exitFullscreen
    */
   exitFullscreen() {
     var fsApi = FullscreenApi;
@@ -1452,7 +1511,11 @@ class Player extends Component {
     return this.exitFullscreen();
   }
 
-  // When fullscreen isn't supported we can stretch the video container to as wide as the browser will let us.
+  /**
+  *  When fullscreen isn't supported we can stretch the video container to as wide as the browser will let us.
+  *
+  * @method enterFullWindow
+  */
   enterFullWindow() {
     this.isFullWindow = true;
 
@@ -1471,6 +1534,12 @@ class Player extends Component {
     this.trigger('enterFullWindow');
   }
 
+  /**
+  *  Check for call to either exit full window or full screen on ESC key
+  *
+  * @param {String} event Event to check for key press
+  * @method fullWindowOnEscKey
+  */
   fullWindowOnEscKey(event) {
     if (event.keyCode === 27) {
       if (this.isFullscreen() === true) {
@@ -1481,6 +1550,11 @@ class Player extends Component {
     }
   }
 
+  /**
+  * Exit full window 
+  *
+  * @method exitFullWindow
+  */
   exitFullWindow() {
     this.isFullWindow = false;
     Events.off(document, 'keydown', this.fullWindowOnEscKey);
@@ -1496,6 +1570,13 @@ class Player extends Component {
     this.trigger('exitFullWindow');
   }
 
+  /**
+  * Select source based on tech order
+  *
+  * @param {Array} sources The sources for a media asset
+  * @returns Object of source and tech order, otherwise false
+  * @method selectSource
+  */
   selectSource(sources) {
     // Loop through each playback technology in the options order
     for (var i=0,j=this.options_['techOrder'];i<j.length;i++) {
@@ -1556,6 +1637,7 @@ class Player extends Component {
    * @param  {String|Object|Array=} source The source URL, object, or array of sources
    * @return {String} The current video source when getting
    * @return {String} The player when setting
+   * @method src
    */
   src(source) {
     if (source === undefined) {
@@ -1616,6 +1698,7 @@ class Player extends Component {
    * Handle an array of source objects
    * @param  {[type]} sources Array of source objects
    * @private
+   * @method sourceList_
    */
   sourceList_(sources) {
     var sourceTech = this.selectSource(sources);
@@ -1643,6 +1726,7 @@ class Player extends Component {
   /**
    * Begin loading the src data.
    * @return {Player} Returns the player
+   * @method load
    */
   load() {
     this.techCall('load');
@@ -1653,6 +1737,7 @@ class Player extends Component {
    * Returns the fully qualified URL of the current source value e.g. http://mysite.com/video.mp4
    * Can be used in conjuction with `currentType` to assist in rebuilding the current source object.
    * @return {String} The current source
+   * @method currentSrc
    */
   currentSrc() {
     return this.techGet('currentSrc') || this.cache_.src || '';
@@ -1663,6 +1748,7 @@ class Player extends Component {
    * This can allow you rebuild the current source object so that you could load the same
    * source and tech later
    * @return {String} The source MIME type
+   * @method currentType
    */
   currentType() {
       return this.currentType_ || '';
@@ -1672,6 +1758,7 @@ class Player extends Component {
    * Get or set the preload attribute.
    * @return {String} The preload attribute value when getting
    * @return {Player} Returns the player when setting
+   * @method preload
    */
   preload(value) {
     if (value !== undefined) {
@@ -1686,6 +1773,7 @@ class Player extends Component {
    * Get or set the autoplay attribute.
    * @return {String} The autoplay attribute value when getting
    * @return {Player} Returns the player when setting
+   * @method autoplay
    */
   autoplay(value) {
     if (value !== undefined) {
@@ -1700,6 +1788,7 @@ class Player extends Component {
    * Get or set the loop attribute on the video element.
    * @return {String} The loop attribute value when getting
    * @return {Player} Returns the player when setting
+   * @method loop
    */
   loop(value) {
     if (value !== undefined) {
@@ -1724,6 +1813,7 @@ class Player extends Component {
    * @param  {String=} [src] Poster image source URL
    * @return {String} poster URL when getting
    * @return {Player} self when setting
+   * @method poster
    */
   poster(src) {
     if (src === undefined) {
@@ -1752,6 +1842,7 @@ class Player extends Component {
    * Get or set whether or not the controls are showing.
    * @param  {Boolean} controls Set controls to showing or not
    * @return {Boolean}    Controls are showing
+   * @method controls
    */
   controls(bool) {
     if (bool !== undefined) {
@@ -1798,6 +1889,7 @@ class Player extends Component {
    * @param  {Boolean} bool    True signals that native controls are on
    * @return {Player}      Returns the player
    * @private
+   * @method usingNativeControls
    */
   usingNativeControls(bool) {
     if (bool !== undefined) {
@@ -1841,6 +1933,7 @@ class Player extends Component {
    * @param  {*} err A MediaError or a String/Number to be turned into a MediaError
    * @return {MediaError|null}     when getting
    * @return {Player}              when setting
+   * @method error
    */
   error(err) {
     if (err === undefined) {
@@ -1877,12 +1970,14 @@ class Player extends Component {
   /**
    * Returns whether or not the player is in the "ended" state.
    * @return {Boolean} True if the player is in the ended state, false if not.
+   * @method ended
    */
   ended() { return this.techGet('ended'); }
 
   /**
    * Returns whether or not the player is in the "seeking" state.
    * @return {Boolean} True if the player is in the seeking state, false if not.
+   * @method seeking
    */
   seeking() { return this.techGet('seeking'); }
 
@@ -1890,6 +1985,7 @@ class Player extends Component {
    * Returns the TimeRanges of the media that are currently available
    * for seeking to.
    * @return {TimeRanges} the seekable intervals of the media timeline
+   * @method seekable
    */
   seekable() { return this.techGet('seekable'); }
 
@@ -1897,6 +1993,13 @@ class Player extends Component {
     this.userActivity_ = true;
   }
 
+  /**
+  * Get/set if user is active
+  *
+  * @param {Boolean} bool Value for setter
+  * @returns Boolean value for active user
+  * @method userActive
+  */
   userActive(bool) {
     if (bool !== undefined) {
       bool = !!bool;
@@ -1939,6 +2042,11 @@ class Player extends Component {
     return this.userActive_;
   }
 
+  /**
+  * Listen for user activity based on timeout value
+  *
+  * @method listenForUserActivity
+  */
   listenForUserActivity() {
     let mouseInProgress, lastMoveX, lastMoveY;
 
@@ -2022,10 +2130,11 @@ class Player extends Component {
    * Gets or sets the current playback rate.  A playback rate of
    * 1.0 represents normal speed and 0.5 would indicate half-speed
    * playback, for instance.
+   * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-playbackrate
    * @param  {Number} rate    New playback rate to set.
    * @return {Number}         Returns the new playback rate when setting
    * @return {Number}         Returns the current playback rate when getting
-   * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-playbackrate
+   * @method playbackRate
    */
   playbackRate(rate) {
     if (rate !== undefined) {
@@ -2047,6 +2156,7 @@ class Player extends Component {
    * @return {Boolean}         Returns true if player is audio, false if not when getting
    * @return {Player}      Returns the player if setting
    * @private
+   * @method isAudio
    */
   isAudio(bool) {
     if (bool !== undefined) {
@@ -2072,8 +2182,9 @@ class Player extends Component {
    * - NETWORK_NO_SOURCE (numeric value 3)
    *   The element's resource selection algorithm is active, but it has
    *   not yet found a resource to use.
-   * @return {Number} the current network activity state
    * @see https://html.spec.whatwg.org/multipage/embedded-content.html#network-states
+   * @return {Number} the current network activity state
+   * @method networkState
    */
   networkState() {
     return this.techGet('networkState');
@@ -2097,8 +2208,9 @@ class Player extends Component {
    * - HAVE_ENOUGH_DATA (numeric value 4)
    *   The user agent estimates that enough data is available for
    *   playback to proceed uninterrupted.
-   * @return {Number} the current playback rendering state
    * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-readystate
+   * @return {Number} the current playback rendering state
+   * @method readyState
    */
   readyState() {
     return this.techGet('readyState');
@@ -2116,6 +2228,7 @@ class Player extends Component {
    * Get an array of associated text tracks. captions, subtitles, chapters, descriptions
    * http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-texttracks
    * @return {Array}           Array of track objects
+   * @method textTracks
    */
   textTracks() {
     // cannot use techGet directly because it checks to see whether the tech is ready.
@@ -2123,6 +2236,12 @@ class Player extends Component {
     return this.tech && this.tech['textTracks']();
   }
 
+  /**
+  * Get an array of remote text tracks
+  *
+  * @return {Array}
+  * @method remoteTextTracks
+  */
   remoteTextTracks() {
     return this.tech && this.tech['remoteTextTracks']();
   }
@@ -2134,23 +2253,48 @@ class Player extends Component {
    * @param {String}  kind        Captions, subtitles, chapters, descriptions, or metadata
    * @param {String=} label       Optional label
    * @param {String=} language    Optional language
+   * @method addTextTrack
    */
   addTextTrack(kind, label, language) {
     return this.tech && this.tech['addTextTrack'](kind, label, language);
   }
 
+  /**
+   * Add a remote text track
+   *
+   * @param {Object} options    Options for remote text track
+   * @method addRemoteTextTrack
+   */
   addRemoteTextTrack(options) {
     return this.tech && this.tech['addRemoteTextTrack'](options);
   }
 
+  /**
+   * Remove a remote text track
+   *
+   * @param {Object} trace    Remote text track to remove
+   * @method removeRemoteTextTrack
+   */
   removeRemoteTextTrack(track) {
     this.tech && this.tech['removeRemoteTextTrack'](track);
   }
 
+  /**
+   * Get video width
+   *
+   * @returns {Number} Video width
+   * @method videoWidth
+   */
   videoWidth() {
     return this.tech && this.tech.videoWidth && this.tech.videoWidth() || 0;
   }
 
+  /**
+   * Get video height
+   *
+   * @returns {Number} Video height
+   * @method videoHeight
+   */
   videoHeight() {
     return this.tech && this.tech.videoHeight && this.tech.videoHeight() || 0;
   }
@@ -2181,6 +2325,7 @@ class Player extends Component {
    * @param {String} code  The locale string
    * @return {String}      The locale string when getting
    * @return {Player}      self, when setting
+   * @method language
    */
   language(code) {
     if (code === undefined) {
@@ -2195,11 +2340,18 @@ class Player extends Component {
    * Get the player's language dictionary
    * Merge every time, because a newly added plugin might call videojs.addLanguage() at any time
    * Languages specified directly in the player options have precedence
+   * @method languages
    */
   languages() {
     return  mergeOptions(globalOptions['languages'], this.languages_);
   }
 
+  /**
+   * Converts track info to JSON
+   *
+   * @returns {Object} JSON object
+   * @method toJSON
+   */
   toJSON() {
     let options = mergeOptions(this.options_);
     let tracks = options.tracks;
@@ -2218,6 +2370,12 @@ class Player extends Component {
     return options;
   }
 
+  /**
+  * Gets tag settings
+  * @param {Element} tag The player tag
+  * @static
+  * @method getTagSettings
+  */
   static getTagSettings(tag) {
     let baseOptions = {
       'sources': [],
