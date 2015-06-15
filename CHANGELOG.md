@@ -2,10 +2,13 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* @imbcmdth updated currentSrc to return src instead of blob urls in html5 tech. Fixes #2232 ([view](https://github.com/videojs/video.js/pull/2232))
-* @imbcmdth fixed async currentSrc behavior ([view](https://github.com/videojs/video.js/pull/2256))
+_(none)_
 
 --------------------
+
+## 4.12.9 (2015-06-15)
+* @imbcmdth updated currentSrc to return src instead of blob urls in html5 tech. Fixes #2232 ([view](https://github.com/videojs/video.js/pull/2232))
+* @imbcmdth fixed async currentSrc behavior ([view](https://github.com/videojs/video.js/pull/2256))
 
 ## 4.12.8 (2015-06-05)
 * @dmlap add the seekable property ([view](https://github.com/videojs/video.js/pull/2207))

@@ -80,7 +80,7 @@ vjs.ACCESS_PROTOCOL = ('https:' == document.location.protocol ? 'https://' : 'ht
 * Full player version
 * @type {string}
 */
-vjs['VERSION'] = '4.12.8';
+vjs['VERSION'] = '4.12.9';
 
 /**
  * Global Player instance options, surfaced from vjs.Player.prototype.options_
@@ -4931,7 +4931,12 @@ vjs.Player.prototype.load = function(){
  * @return {String} The current source
  */
 vjs.Player.prototype.currentSrc = function(){
-  return this.techGet('currentSrc') || this.cache_.src || '';
+  var techSrc = this.techGet('currentSrc');
+
+  if (techSrc === undefined) {
+    return this.cache_.src || '';
+  }
+  return techSrc;
 };
 
 /**
@@ -6589,6 +6594,8 @@ vjs.MediaTechController = vjs.Component.extend({
       this.emulateTextTracks();
     }
 
+    this.on('loadstart', this.updateCurrentSource_);
+
     this.initTextTrackListeners();
   }
 });
@@ -6719,6 +6726,24 @@ vjs.MediaTechController.prototype.onClick = function(event){
  */
 vjs.MediaTechController.prototype.onTap = function(){
   this.player().userActive(!this.player().userActive());
+};
+
+/**
+ * Set currentSource_ asynchronously to simulate the media element's
+ * asynchronous execution of the `resource selection algorithm`
+ *
+ * currentSource_ is set either as the first loadstart event OR
+ * in a timeout to make sure it is set asynchronously before anything else
+ * but before other loadstart handlers have had a chance to execute
+ */
+vjs.MediaTechController.prototype.updateCurrentSource_ = function () {
+  // We could have been called with a 0-ms setTimeout OR via loadstart (which ever
+  // happens first) so we should clear the timeout to be a good citizen
+  this.clearTimeout(this.updateSourceTimer_);
+
+  if (this.pendingSource_) {
+    this.currentSource_ = this.pendingSource_;
+  }
 };
 
 /* Fallbacks for unsupported event types
@@ -6979,6 +7004,8 @@ vjs.MediaTechController.prototype['featuresNativeTextTracks'] = false;
  *
  */
 vjs.MediaTechController.withSourceHandlers = function(Tech){
+  Tech.prototype.currentSource_ = {src: ''};
+
   /**
    * Register a source handler
    * Source handlers are scripts for handling specific formats.
@@ -7063,7 +7090,12 @@ vjs.MediaTechController.withSourceHandlers = function(Tech){
     this.disposeSourceHandler();
     this.off('dispose', this.disposeSourceHandler);
 
-    this.currentSource_ = source;
+    // Schedule currentSource_ to be set asynchronously
+    if (source && source.src !== '') {
+      this.pendingSource_ = source;
+      this.updateSourceTimer_ = this.setTimeout(vjs.bind(this, this.updateCurrentSource_), 0);
+    }
+
     this.sourceHandler_ = sh.handleSource(source, this);
     this.on('dispose', this.disposeSourceHandler);
 
@@ -7415,7 +7447,13 @@ vjs.Html5.prototype.setSrc = function(src) {
 };
 
 vjs.Html5.prototype.load = function(){ this.el_.load(); };
-vjs.Html5.prototype.currentSrc = function(){ return this.el_.currentSrc; };
+vjs.Html5.prototype.currentSrc = function(){
+  if (this.currentSource_) {
+    return this.currentSource_.src;
+  } else {
+    return this.el_.currentSrc;
+  }
+};
 
 vjs.Html5.prototype.poster = function(){ return this.el_.poster; };
 vjs.Html5.prototype.setPoster = function(val){ this.el_.poster = val; };

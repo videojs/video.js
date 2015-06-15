@@ -179,7 +179,7 @@ _inherited from_: [src/js/component.js#L826](https://github.com/videojs/video.js
 * __label__ `String` _(OPTIONAL)_ Optional label
 * __language__ `String` _(OPTIONAL)_ Optional language
 
-_defined in_: [src/js/player.js#L1729](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1729)
+_defined in_: [src/js/player.js#L1734](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1734)
 
 ---
 
@@ -193,7 +193,7 @@ _defined in_: [src/js/player.js#L1729](https://github.com/videojs/video.js/blob/
 * `String` The autoplay attribute value when getting
 * `vjs.Player` Returns the player when setting
 
-_defined in_: [src/js/player.js#L1263](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1263)
+_defined in_: [src/js/player.js#L1268](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1268)
 
 ---
 
@@ -325,7 +325,7 @@ _inherited from_: [src/js/component.js#L239](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Boolean` Controls are showing
 
-_defined in_: [src/js/player.js#L1343](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1343)
+_defined in_: [src/js/player.js#L1348](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1348)
 
 ---
 
@@ -382,7 +382,7 @@ _defined in_: [src/js/player.js#L690](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `String` The source MIME type
 
-_defined in_: [src/js/player.js#L1240](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1240)
+_defined in_: [src/js/player.js#L1245](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1245)
 
 ---
 
@@ -476,7 +476,7 @@ _inherited from_: [src/js/component.js#L1124](https://github.com/videojs/video.j
 ##### RETURNS: 
 * `Boolean` True if the player is in the ended state, false if not.
 
-_defined in_: [src/js/player.js#L1464](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1464)
+_defined in_: [src/js/player.js#L1469](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1469)
 
 ---
 
@@ -490,7 +490,7 @@ _defined in_: [src/js/player.js#L1464](https://github.com/videojs/video.js/blob/
 * `vjs.MediaError|null` when getting
 * `vjs.Player` when setting
 
-_defined in_: [src/js/player.js#L1428](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1428)
+_defined in_: [src/js/player.js#L1433](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1433)
 
 ---
 
@@ -705,7 +705,7 @@ _defined in_: [src/js/player.js#L1220](https://github.com/videojs/video.js/blob/
 * `String` The loop attribute value when getting
 * `vjs.Player` Returns the player when setting
 
-_defined in_: [src/js/player.js#L1277](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1277)
+_defined in_: [src/js/player.js#L1282](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1282)
 
 ---
 
@@ -760,7 +760,7 @@ _inherited from_: [src/js/component.js#L277](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Number` the current network activity state
 
-_defined in_: [src/js/player.js#L1669](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1669)
+_defined in_: [src/js/player.js#L1674](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1674)
 
 ---
 
@@ -948,7 +948,7 @@ _defined in_: [src/js/player.js#L647](https://github.com/videojs/video.js/blob/m
 * `Number` Returns the new playback rate when setting
 * `Number` Returns the current playback rate when getting
 
-_defined in_: [src/js/player.js#L1613](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1613)
+_defined in_: [src/js/player.js#L1618](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1618)
 
 ---
 
@@ -980,7 +980,7 @@ _inherited from_: [src/js/component.js#L126](https://github.com/videojs/video.js
 * `String` poster URL when getting
 * `vjs.Player` self when setting
 
-_defined in_: [src/js/player.js#L1308](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1308)
+_defined in_: [src/js/player.js#L1313](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1313)
 
 ---
 
@@ -994,7 +994,7 @@ _defined in_: [src/js/player.js#L1308](https://github.com/videojs/video.js/blob/
 * `String` The preload attribute value when getting
 * `vjs.Player` Returns the player when setting
 
-_defined in_: [src/js/player.js#L1249](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1249)
+_defined in_: [src/js/player.js#L1254](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1254)
 
 ---
 
@@ -1036,7 +1036,7 @@ _inherited from_: [src/js/component.js#L769](https://github.com/videojs/video.js
 ##### RETURNS: 
 * `Number` the current playback rendering state
 
-_defined in_: [src/js/player.js#L1694](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1694)
+_defined in_: [src/js/player.js#L1699](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1699)
 
 ---
 
@@ -1112,7 +1112,7 @@ _defined in_: [src/js/player.js#L947](https://github.com/videojs/video.js/blob/m
 ##### RETURNS: 
 * `TimeRanges` the seekable intervals of the media timeline
 
-_defined in_: [src/js/player.js#L1477](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1477)
+_defined in_: [src/js/player.js#L1482](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1482)
 
 ---
 
@@ -1122,7 +1122,7 @@ _defined in_: [src/js/player.js#L1477](https://github.com/videojs/video.js/blob/
 ##### RETURNS: 
 * `Boolean` True if the player is in the seeking state, false if not.
 
-_defined in_: [src/js/player.js#L1470](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1470)
+_defined in_: [src/js/player.js#L1475](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1475)
 
 ---
 
@@ -1210,7 +1210,7 @@ _defined in_: [src/js/player.js#L1135](https://github.com/videojs/video.js/blob/
 ##### RETURNS: 
 * `Array` Array of track objects
 
-_defined in_: [src/js/player.js#L1711](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1711)
+_defined in_: [src/js/player.js#L1716](https://github.com/videojs/video.js/blob/master/src/js/player.js#L1716)
 
 ---
 

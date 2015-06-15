@@ -27,7 +27,7 @@ Base class for media (HTML5 Video, Flash) controllers
 ##### PARAMETERS: 
 * __Tech__ 
 
-_defined in_: [src/js/media/media.js#L428](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L428)
+_defined in_: [src/js/media/media.js#L448](https://github.com/videojs/video.js/blob/master/src/js/media/media.js#L448)
 
 ---
 
