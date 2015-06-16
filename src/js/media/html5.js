@@ -391,8 +391,6 @@ vjs.Html5.prototype.addRemoteTextTrack = function(options) {
     return vjs.MediaTechController.prototype.addRemoteTextTrack.call(this, options);
   }
 
-  this.addCrossorigin();
-
   var track = document.createElement('track');
   options = options || {};
 
@@ -416,6 +414,8 @@ vjs.Html5.prototype.addRemoteTextTrack = function(options) {
   }
 
   this.el().appendChild(track);
+
+  this.addCrossorigin();
 
   if (track.track['kind'] === 'metadata') {
     track['track']['mode'] = 'hidden';
