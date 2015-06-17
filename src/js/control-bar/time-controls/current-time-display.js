@@ -6,7 +6,8 @@ import formatTime from '../../utils/format-time.js';
  * Displays the current time
  * @param {Player|Object} player
  * @param {Object=} options
- * @constructor
+ * @extends Component
+ * @class CurrentTimeDisplay
  */
 class CurrentTimeDisplay extends Component {
 
@@ -16,6 +17,12 @@ class CurrentTimeDisplay extends Component {
     this.on(player, 'timeupdate', this.updateContent);
   }
 
+  /**
+  * Create the component's DOM element
+  *
+  * @return {Element}
+  * @method createEl
+  */
   createEl() {
     let el = super.createEl('div', {
       className: 'vjs-current-time vjs-time-control vjs-control'
@@ -31,6 +38,11 @@ class CurrentTimeDisplay extends Component {
     return el;
   }
 
+  /**
+  * Update current time display 
+  *
+  * @method updateContent
+  */
   updateContent() {
     // Allows for smooth scrubbing, when player can't keep up.
     let time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
