@@ -30,9 +30,6 @@ class Button extends Component {
   /**
   * Create the component's DOM element
   *
-  *     //This is test code
-  *     var myPlayer = this;
-  *
   * @param {String=} type - Element's node type. e.g. 'div'
   * @param {Object=} props - An object of element attributes that should be set on the element Tag name 
   * @return HTML Element

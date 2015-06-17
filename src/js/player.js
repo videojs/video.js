@@ -1696,7 +1696,7 @@ class Player extends Component {
 
   /**
    * Handle an array of source objects
-   * @param  {[type]} sources Array of source objects
+   * @param  {Array} sources Array of source objects
    * @private
    * @method sourceList_
    */
