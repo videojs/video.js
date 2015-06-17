@@ -230,7 +230,7 @@ class Player extends Component {
   /**
   * Create the component's DOM element
   *
-  * @returns HTML Element
+  * @return {Element}
   * @method createEl
   */
   createEl() {
@@ -293,7 +293,6 @@ class Player extends Component {
     return el;
   }
 
-  // TODO Steve please check
   /**
   * Get/set player width
   *
@@ -304,7 +303,6 @@ class Player extends Component {
     return this.dimension('width', value);
   }
 
-  // TODO Steve please check
   /**
   * Get/set player height
   *
@@ -315,7 +313,6 @@ class Player extends Component {
     return this.dimension('height', value);
   }
 
-  // TODO Steve please check
   /**
   * Get/set dimension for player
   *
@@ -372,7 +369,7 @@ class Player extends Component {
   * Get/Set the aspect ratio
   *
   * @param {String=} ratio Aspect ratio for player
-  * @returns aspectRatio
+  * @return aspectRatio
   * @method aspectRatio
   */
   aspectRatio(ratio) {
@@ -679,7 +676,7 @@ class Player extends Component {
   * Add/remove the vjs-has-started class
   *
   * @param {Boolean} hasStarted The value of true adds the class the value of false remove the class
-  * @returns ???
+  * @return {Boolean} Boolean value if has started
   * @method createEl
   */
   hasStarted(hasStarted) {
@@ -1080,7 +1077,7 @@ class Player extends Component {
   * Get calls can't wait for the tech, and sometimes don't need to.
   *
   * @param {String} method Method
-  * @returns Method
+  * @return {Method}
   * @method techGet
   */
   techGet(method) {
@@ -1574,7 +1571,7 @@ class Player extends Component {
   * Select source based on tech order
   *
   * @param {Array} sources The sources for a media asset
-  * @returns Object of source and tech order, otherwise false
+  * @return {Object|Boolean} Object of source and tech order, otherwise false
   * @method selectSource
   */
   selectSource(sources) {
@@ -1997,7 +1994,7 @@ class Player extends Component {
   * Get/set if user is active
   *
   * @param {Boolean} bool Value for setter
-  * @returns Boolean value for active user
+  * @return {Boolean} Value if user is active user
   * @method userActive
   */
   userActive(bool) {
@@ -2282,7 +2279,7 @@ class Player extends Component {
   /**
    * Get video width
    *
-   * @returns {Number} Video width
+   * @return {Number} Video width
    * @method videoWidth
    */
   videoWidth() {
@@ -2292,7 +2289,7 @@ class Player extends Component {
   /**
    * Get video height
    *
-   * @returns {Number} Video height
+   * @return {Number} Video height
    * @method videoHeight
    */
   videoHeight() {
@@ -2349,7 +2346,7 @@ class Player extends Component {
   /**
    * Converts track info to JSON
    *
-   * @returns {Object} JSON object
+   * @return {Object} JSON object
    * @method toJSON
    */
   toJSON() {

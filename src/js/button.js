@@ -32,7 +32,7 @@ class Button extends Component {
   *
   * @param {String=} type - Element's node type. e.g. 'div'
   * @param {Object=} props - An object of element attributes that should be set on the element Tag name 
-  * @return HTML Element
+  * @return {Element}
   * @method createEl
   */
   createEl(type='button', props={}) {

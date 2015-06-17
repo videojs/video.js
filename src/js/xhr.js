@@ -31,7 +31,8 @@ import window from 'global/window';
  *
  * @param  {Object|String}  options   Options block or URL string
  * @param  {Function}       callback  The callback function
- * @returns {Object}                  The request
+ * @return {Object}                  The request
+ * @method xhr
  */
 var xhr = function(options, callback){
   let abortTimeout;

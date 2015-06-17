@@ -35,8 +35,8 @@ if (typeof HTMLVideoElement === 'undefined') {
  * @param  {String|Element} id      Video element or video element ID
  * @param  {Object=} options        Optional options object for config/settings
  * @param  {Function=} ready        Optional ready callback
- * @return {Player}             A player instance
- * @namespace
+ * @return {Player}                 A player instance
+ * @method videojs
  */
 var videojs = function(id, options, ready){
   var tag; // Element of ID
@@ -97,7 +97,7 @@ videojs.VERSION = '__VERSION__';
 /**
  * Get the global options object
  *
- * @returns {Object} The global options object
+ * @return {Object} The global options object
  */
 videojs.getGlobalOptions = () => globalOptions;
 
@@ -112,7 +112,7 @@ videojs.getGlobalOptions = () => globalOptions;
  * NOTE: This will do a deep merge with the new options,
  * not overwrite the entire global options object.
  *
- * @returns {Object} The updated global options object
+ * @return {Object} The updated global options object
  */
 videojs.setGlobalOptions = function(newOptions) {
   return mergeOptions(globalOptions, newOptions);
@@ -121,7 +121,7 @@ videojs.setGlobalOptions = function(newOptions) {
 /**
  * Get an object with the currently created players, keyed by player ID
  *
- * @returns {Object} The created players
+ * @return {Object} The created players
  */
 videojs.getPlayers = function() {
   return Player.players;
@@ -164,7 +164,7 @@ videojs.getComponent = Component.getComponent;
  *
  * @param {String} The class name of the component
  * @param {Component} The component class
- * @returns {Component} The newly registered component
+ * @return {Component} The newly registered component
  */
 videojs.registerComponent = Component.registerComponent;
 
@@ -206,7 +206,7 @@ videojs.browser = browser;
  * @param {Object} An object including instace methods for the new class
  *                   Optionally including a `constructor` function
  *
- * @returns {Function} The newly created subclass
+ * @return {Function} The newly created subclass
  */
 videojs.extends = extendsFn;
 
@@ -239,7 +239,7 @@ videojs.extends = extendsFn;
  * @param {Object} The options object with values to override the first
  * @param {Object} Any number of additional options objects
  *
- * @returns {Object} a new object with the merged values
+ * @return {Object} a new object with the merged values
  */
 videojs.mergeOptions = mergeOptions;
 

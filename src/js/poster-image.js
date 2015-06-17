@@ -11,7 +11,8 @@ import * as browser from './utils/browser.js';
  *
  * @param {Player|Object} player
  * @param {Object=} options
- * @constructor
+ * @extends Button
+ * @class PosterImage
  */
 class PosterImage extends Button {
 
@@ -24,6 +25,8 @@ class PosterImage extends Button {
 
   /**
    * Clean up the poster image
+   *
+   * @method dispose
    */
   dispose() {
     this.player().off('posterchange', this.update);
@@ -31,9 +34,11 @@ class PosterImage extends Button {
   }
 
   /**
-   * Create the poster image element
-   * @return {Element}
-   */
+  * Create the poster's image element
+  *
+  * @return {Element}
+  * @method createEl
+  */
   createEl() {
     let el = Dom.createEl('div', {
       className: 'vjs-poster',
@@ -56,6 +61,8 @@ class PosterImage extends Button {
 
   /**
    * Event handler for updates to the player's poster source
+   *
+   * @method update
    */
   update() {
     let url = this.player().poster();
@@ -72,8 +79,11 @@ class PosterImage extends Button {
   }
 
   /**
-   * Set the poster source depending on the display method
-   */
+  * Set the poster source depending on the display method
+  *
+  * @param {String} url The URL to the poster source
+  * @method setSrc
+  */
   setSrc(url) {
     if (this.fallbackImg_) {
       this.fallbackImg_.src = url;
@@ -91,6 +101,8 @@ class PosterImage extends Button {
 
   /**
    * Event handler for clicks on the poster image
+   * 
+   * @method handleClick
    */
   handleClick() {
     // We don't want a click to trigger playback when controls are disabled
