@@ -61,6 +61,9 @@ vjs.Html5 = vjs.MediaTechController.extend({
 
     if (this['featuresNativeTextTracks']) {
       this.on('loadstart', vjs.bind(this, this.hideCaptions));
+    } else {
+      // allow us to view the in-band metadata tracks from our shimmed TextTrackList
+      this.on('loadedmetadata', vjs.bind(this, this.addInBandMetadataTracks));
     }
 
     // Determine if native controls should be used
@@ -180,6 +183,18 @@ vjs.Html5.prototype.hideCaptions = function() {
     if ((track && track['kind'] in kinds) &&
         (!tracks[i]['default'])) {
       track.mode = 'disabled';
+    }
+  }
+};
+
+vjs.Html5.prototype.addInBandMetadataTracks = function() {
+  var tracks = this.textTracks(),
+      nativeTracks = this.el().textTracks,
+      i = 0;
+
+  for (; i < nativeTracks.length; i++) {
+    if (nativeTracks[i].inBandMetadataTrackDispatchType) {
+      tracks.addTrack_(nativeTracks[i]);
     }
   }
 };
