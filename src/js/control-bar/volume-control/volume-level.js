@@ -5,10 +5,17 @@ import Component from '../../component.js';
  *
  * @param {Player|Object} player
  * @param {Object=} options
- * @constructor
+ * @extends Component
+ * @class VolumeLevel
  */
 class VolumeLevel extends Component {
 
+  /**
+  * Create the component's DOM element
+  *
+  * @return {Element}
+  * @method createEl
+  */
   createEl() {
     return super.createEl('div', {
       className: 'vjs-volume-level',
