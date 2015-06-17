@@ -477,7 +477,7 @@ vjs.Html5.prototype.addCrossorigin = function(value) {
 vjs.Html5.prototype.enableCrossorigin_ = function(value) {
   var attrVal = value;
 
-  if (value !== 'anonymous' || value !== 'use-credentials') {
+  if (value !== 'anonymous' && value !== 'use-credentials') {
     attrVal = 'anonymous';
   }
 
