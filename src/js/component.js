@@ -39,7 +39,7 @@ import mergeOptions from './utils/merge-options.js';
  *
  * @param {Object} player  Main Player
  * @param {Object=} options
- * @param {Function} ready Ready listener
+ * @param {Function=} ready    Ready callback function
  * @class Component
  */
 class Component {
