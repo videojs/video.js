@@ -214,3 +214,105 @@ test('native source handler canHandleSource', function(){
   // Reset test video canPlayType
   vjs.TEST_VID.canPlayType = origCPT;
 });
+
+test('set crossorigin on loadstart if native text tracks and textTracks', function() {
+  var el;
+  tech.textTracks = function() {
+    return ['track'];
+  };
+
+  el = tech.el();
+  ok(!el.hasAttribute('crossorigin'), 'there is no crossorigin attribute before loadstart');
+
+  tech.trigger('loadstart');
+
+  el = tech.el();
+  ok(el.hasAttribute('crossorigin'), 'there is a crossorigin attribute after a loadstart');
+  equal(el.getAttribute('crossorigin'), 'anonymous', 'the value should be "anonymous"');
+});
+
+test('do not set crossorigin on loadstart if native text tracks and no text tracks', function() {
+  var el;
+
+  el = tech.el();
+  ok(!el.hasAttribute('crossorigin'), 'there is no crossorigin attribute before loadstart');
+
+  tech.trigger('loadstart');
+
+  el = tech.el();
+  ok(!el.hasAttribute('crossorigin'), 'there is no crossorigin attribute after a loadstart');
+});
+
+test('unset crossorigin during setSrc and re-set on loadstart or timeout afterwards, if necessary', function() {
+  var el;
+
+  tech.textTracks = function() {
+    return ['track'];
+  };
+
+  el = tech.el();
+  ok(!el.hasAttribute('crossorigin'), 'there is no crossorigin attribute at the beginning');
+
+  tech.setSrc('foo');
+  el = tech.el();
+  ok(!el.hasAttribute('crossorigin'), 'there is no crossorigin attribute after a setSrc');
+
+  tech.trigger('loadstart');
+
+  el = tech.el();
+  ok(el.hasAttribute('crossorigin'), 'there is a crossorigin attribute after a setSrc and loadstart');
+  equal(el.getAttribute('crossorigin'), 'anonymous', 'the value should be "anonymous"');
+
+  tech.textTracks = function() {
+    return [];
+  };
+
+  tech.setSrc('bar');
+
+  el = tech.el();
+  ok(!el.hasAttribute('crossorigin'), 'there is no crossorigin attribute after a setSrc');
+
+  tech.trigger('loadstart');
+
+  el = tech.el();
+  ok(!el.hasAttribute('crossorigin'), 'there is no crossorigin attribute after a loadstart');
+});
+
+test('add and remove corssorigin work add if textTracks and remove always', function() {
+  var el = tech.el();
+  ok(!el.hasAttribute('crossorigin'), 'there is no crossorigin attribute at the start');
+
+  tech.addCrossorigin();
+
+  ok(!el.hasAttribute('crossorigin'), 'there is no crossorigin attribute after add if no text tracks');
+
+  tech.textTracks = function() {
+    return ['track'];
+  };
+
+  tech.addCrossorigin();
+
+  ok(el.hasAttribute('crossorigin'), 'there is a crossorigin attribute after add if text tracks');
+  equal(el.getAttribute('crossorigin'), 'anonymous', 'there is a crossorigin attribute after add if text tracks');
+
+  tech.removeCrossorigin();
+
+  ok(!el.hasAttribute('crossorigin'), 'there is no crossorigin attribute after remove');
+
+  tech.addCrossorigin('use-credentials');
+
+  ok(el.hasAttribute('crossorigin'), 'there is a crossorigin attribute after add if text tracks');
+  equal(el.getAttribute('crossorigin'), 'use-credentials', 'the value is set to "use-credentials"');
+
+  tech.removeCrossorigin();
+  tech.addCrossorigin('anonymous');
+
+  ok(el.hasAttribute('crossorigin'), 'there is a crossorigin attribute after add if text tracks');
+  equal(el.getAttribute('crossorigin'), 'anonymous', 'the value is set to "anonymous"');
+
+  tech.removeCrossorigin();
+  tech.addCrossorigin('foo');
+
+  ok(el.hasAttribute('crossorigin'), 'there is a crossorigin attribute after add if text tracks');
+  equal(el.getAttribute('crossorigin'), 'anonymous', 'the value is set to "anonymous"');
+});
