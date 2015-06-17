@@ -478,7 +478,7 @@ vjs.MediaTechController.withSourceHandlers(vjs.Html5);
  * the HTML5 Media Element returns blob urls when utilizing MSE and we
  * want to still return proper source urls even when in that case
  */
-!function(){
+(function(){
   var
     origSetSource = vjs.Html5.prototype.setSource,
     origDisposeSourceHandler = vjs.Html5.prototype.disposeSourceHandler;
@@ -496,7 +496,7 @@ vjs.MediaTechController.withSourceHandlers(vjs.Html5);
       this.source_ = undefined;
     }
   };
-}();
+})();
 
 /**
  * The default native source handler.
