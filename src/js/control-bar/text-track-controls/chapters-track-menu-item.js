@@ -3,7 +3,12 @@ import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
 
 /**
- * @constructor
+ * The chapter track menu item
+ *
+ * @param {Player|Object} player
+ * @param {Object=} options
+ * @extends MenuItem
+ * @class ChaptersTrackMenuItem
  */
 class ChaptersTrackMenuItem extends MenuItem {
 
@@ -22,12 +27,22 @@ class ChaptersTrackMenuItem extends MenuItem {
     track.addEventListener('cuechange', Fn.bind(this, this.update));
   }
 
+ /**
+  * Handle click on menu item
+  *
+  * @method handleClick
+  */
   handleClick() {
     super.handleClick();
     this.player_.currentTime(this.cue.startTime);
     this.update(this.cue.startTime);
   }
 
+ /**
+  * Update chapter menu item
+  *
+  * @method update
+  */
   update() {
     let cue = this.cue;
     let currentTime = this.player_.currentTime();

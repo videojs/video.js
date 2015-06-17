@@ -4,7 +4,10 @@ import Component from '../../component.js';
 /**
  * A special menu item for turning of a specific type of text track
  *
- * @constructor
+ * @param {Player|Object} player
+ * @param {Object=} options
+ * @extends TextTrackMenuItem
+ * @class OffTextTrackMenuItem
  */
 class OffTextTrackMenuItem extends TextTrackMenuItem {
 
@@ -23,6 +26,11 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
     this.selected(true);
   }
 
+  /**
+  * Handle text track change
+  *
+  * @method handleTracksChange
+  */
   handleTracksChange(event){
     let tracks = this.player().textTracks();
     let selected = true;

@@ -13,7 +13,11 @@ import window from 'global/window';
 /**
  * The button component for toggling and selecting chapters
  *
- * @constructor
+ * @param {Object} player  Player object
+ * @param {Object=} options Object of option names and values
+ * @param {Function=} ready    Ready callback function
+ * @extends TextTrackButton
+ * @class ChaptersButton
  */
 class ChaptersButton extends TextTrackButton {
 
@@ -22,11 +26,22 @@ class ChaptersButton extends TextTrackButton {
     this.el_.setAttribute('aria-label','Chapters Menu');
   }
 
+ /**
+  * Allow sub components to stack CSS class names
+  *
+  * @return {String} The constructed class name
+  * @method buildCSSClass
+  */
   buildCSSClass() {
     return `vjs-chapters-button ${super.buildCSSClass()}`;
   }
 
-  // Create a menu item for each text track
+ /**
+  * Create a menu item for each text track
+  *
+  * @return {Array} Array of menu items
+  * @method createItems
+  */
   createItems() {
     let items = [];
 
@@ -48,6 +63,12 @@ class ChaptersButton extends TextTrackButton {
     return items;
   }
 
+ /**
+  * Create menu from chapter buttons
+  *
+  * @return {Menu} Menu of chapter buttons
+  * @method createMenu
+  */
   createMenu() {
     let tracks = this.player_.textTracks() || [];
     let chaptersTrack;

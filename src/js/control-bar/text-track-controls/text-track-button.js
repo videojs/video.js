@@ -7,7 +7,10 @@ import OffTextTrackMenuItem from './off-text-track-menu-item.js';
 /**
  * The base class for buttons that toggle specific text track types (e.g. subtitles)
  *
- * @constructor
+ * @param {Player|Object} player
+ * @param {Object=} options
+ * @extends MenuButton
+ * @class TextTrackButton
  */
 class TextTrackButton extends MenuButton {
 
