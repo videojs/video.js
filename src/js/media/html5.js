@@ -317,6 +317,9 @@ vjs.Html5.prototype.exitFullScreen = function(){
 
 vjs.Html5.prototype.src = function(src) {
   if (src === undefined) {
+    if (this.source_) {
+      return this.source_;
+    }
     return this.el_.src;
   } else {
     // Setting src through `src` instead of `setSrc` will be deprecated
@@ -329,7 +332,13 @@ vjs.Html5.prototype.setSrc = function(src) {
 };
 
 vjs.Html5.prototype.load = function(){ this.el_.load(); };
-vjs.Html5.prototype.currentSrc = function(){ return this.el_.currentSrc; };
+vjs.Html5.prototype.currentSrc = function(){
+  if (this.currentSource_) {
+    return this.currentSource_.src;
+  } else {
+    return this.el_.currentSrc;
+  }
+};
 
 vjs.Html5.prototype.poster = function(){ return this.el_.poster; };
 vjs.Html5.prototype.setPoster = function(val){ this.el_.poster = val; };
@@ -463,6 +472,31 @@ vjs.Html5.isSupported = function(){
 
 // Add Source Handler pattern functions to this tech
 vjs.MediaTechController.withSourceHandlers(vjs.Html5);
+
+/*
+ * Override the withSourceHandler mixin's methods with our own because
+ * the HTML5 Media Element returns blob urls when utilizing MSE and we
+ * want to still return proper source urls even when in that case
+ */
+!function(){
+  var
+    origSetSource = vjs.Html5.prototype.setSource,
+    origDisposeSourceHandler = vjs.Html5.prototype.disposeSourceHandler;
+
+  vjs.Html5.prototype.setSource = function (source) {
+    origSetSource.call(this, source);
+    this.source_ = source.src;
+
+    return this;
+  };
+
+  vjs.Html5.prototype.disposeSourceHandler = function () {
+    origDisposeSourceHandler.call(this);
+    if (this.sourceHandler_) {
+      this.source_ = undefined;
+    }
+  };
+}();
 
 /**
  * The default native source handler.
