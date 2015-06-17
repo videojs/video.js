@@ -9,7 +9,8 @@ import * as Dom from '../../utils/dom.js';
  *
  * @param {Player|Object} player
  * @param {Object=} options
- * @constructor
+ * @extends MenuButton
+ * @class PlaybackRateMenuButton
  */
 class PlaybackRateMenuButton extends MenuButton {
 
@@ -23,6 +24,12 @@ class PlaybackRateMenuButton extends MenuButton {
     this.on(player, 'ratechange', this.updateLabel);
   }
 
+  /**
+  * Create the component's DOM element
+  *
+  * @return {Element}
+  * @method createEl
+  */
   createEl() {
     let el = super.createEl();
 
@@ -36,11 +43,22 @@ class PlaybackRateMenuButton extends MenuButton {
     return el;
   }
 
+  /**
+  * Allow sub components to stack CSS class names
+  *
+  * @return {String} The constructed class name
+  * @method buildCSSClass
+  */
   buildCSSClass() {
     return `vjs-playback-rate ${super.buildCSSClass()}`;
   }
 
-  // Menu creation
+  /**
+  * Create the playback rate menu
+  *
+  * @return {Menu} Menu object populated with items
+  * @method createMenu
+  */
   createMenu() {
     let menu = new Menu(this.player());
     let rates = this.playbackRates();
@@ -56,11 +74,21 @@ class PlaybackRateMenuButton extends MenuButton {
     return menu;
   }
 
+  /**
+  * Updates ARIA accessibility attributes
+  *
+  * @method updateARIAAttributes
+  */
   updateARIAAttributes() {
     // Current playback rate
     this.el().setAttribute('aria-valuenow', this.player().playbackRate());
   }
 
+  /**
+  * Handle menu item click
+  *
+  * @method handleClick
+  */
   handleClick() {
     // select next rate option
     let currentRate = this.player().playbackRate();
@@ -77,10 +105,22 @@ class PlaybackRateMenuButton extends MenuButton {
     this.player().playbackRate(newRate);
   }
 
+  /**
+  * Get possible playback rates
+  *
+  * @return {Array} Possible playback rates
+  * @method playbackRates
+  */
   playbackRates() {
     return this.options_['playbackRates'] || (this.options_.playerOptions && this.options_.playerOptions['playbackRates']);
   }
 
+  /**
+  * Get supported playback rates
+  *
+  * @return {Array} Supported playback rates
+  * @method playbackRateSupported
+  */
   playbackRateSupported() {
     return this.player().tech
       && this.player().tech['featuresPlaybackRate']
@@ -90,8 +130,10 @@ class PlaybackRateMenuButton extends MenuButton {
   }
 
   /**
-   * Hide playback rate controls when they're no playback rate options to select
-   */
+  * Hide playback rate controls when they're no playback rate options to select
+  *
+  * @method updateVisibility
+  */
   updateVisibility() {
     if (this.playbackRateSupported()) {
       this.removeClass('vjs-hidden');
@@ -101,8 +143,10 @@ class PlaybackRateMenuButton extends MenuButton {
   }
 
   /**
-   * Update button label when rate changed
-   */
+  * Update button label when rate changed
+  *
+  * @method updateLabel
+  */
   updateLabel() {
     if (this.playbackRateSupported()) {
       this.labelEl_.innerHTML = this.player().playbackRate() + 'x';
