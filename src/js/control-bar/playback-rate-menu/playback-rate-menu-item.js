@@ -4,7 +4,10 @@ import Component from '../../component.js';
 /**
  * The specific menu item type for selecting a playback rate
  *
- * @constructor
+ * @param {Player|Object} player
+ * @param {Object=} options
+ * @extends MenuItem
+ * @class PlaybackRateMenuItem
  */
 class PlaybackRateMenuItem extends MenuItem {
 
@@ -23,11 +26,21 @@ class PlaybackRateMenuItem extends MenuItem {
     this.on(player, 'ratechange', this.update);
   }
 
+  /**
+  * Handle click on menu item
+  *
+  * @method handleClick
+  */
   handleClick() {
     super.handleClick();
     this.player().playbackRate(this.rate);
   }
 
+  /**
+  * Update playback rate with selected rate
+  *
+  * @method update
+  */
   update() {
     this.selected(this.player().playbackRate() === this.rate);
   }

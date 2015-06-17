@@ -6,7 +6,8 @@ import * as Dom from '../../utils/dom.js';
  *
  * @param {Player|Object} player
  * @param {Object=} options
- * @constructor
+ * @extends Component
+ * @class LoadProgressBar
  */
 class LoadProgressBar extends Component {
 
@@ -15,6 +16,12 @@ class LoadProgressBar extends Component {
     this.on(player, 'progress', this.update);
   }
 
+  /**
+  * Create the component's DOM element
+  *
+  * @return {Element}
+  * @method createEl
+  */
   createEl() {
     return super.createEl('div', {
       className: 'vjs-load-progress',
@@ -22,6 +29,11 @@ class LoadProgressBar extends Component {
     });
   }
 
+  /**
+  * Update progress bar
+  *
+  * @method update
+  */
   update() {
     let buffered = this.player_.buffered();
     let duration = this.player_.duration();

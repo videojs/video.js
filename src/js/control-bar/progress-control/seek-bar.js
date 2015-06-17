@@ -11,7 +11,8 @@ import roundFloat from '../../utils/round-float.js';
  *
  * @param {Player|Object} player
  * @param {Object=} options
- * @constructor
+ * @extends Slider
+ * @class SeekBar
  */
 class SeekBar extends Slider {
 
@@ -21,6 +22,12 @@ class SeekBar extends Slider {
     player.ready(Fn.bind(this, this.updateARIAAttributes));
   }
 
+  /**
+  * Create the component's DOM element
+  *
+  * @return {Element}
+  * @method createEl
+  */
   createEl() {
     return super.createEl('div', {
       className: 'vjs-progress-holder',
@@ -28,6 +35,11 @@ class SeekBar extends Slider {
     });
   }
 
+  /**
+  * Update ARIA accessibility attributes
+  *
+  * @method updateARIAAttributes
+  */
   updateARIAAttributes() {
       // Allows for smooth scrubbing, when player can't keep up.
       let time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
@@ -35,11 +47,22 @@ class SeekBar extends Slider {
       this.el_.setAttribute('aria-valuetext', formatTime(time, this.player_.duration())); // human readable value of progress bar (time complete)
   }
 
+  /**
+  * Get percentage of video played
+  *
+  * @return {Number} Percentage played
+  * @method getPercent
+  */
   getPercent() {
     let percent = this.player_.currentTime() / this.player_.duration();
     return percent >= 1 ? 1 : percent;
   }
 
+  /**
+  * Handle mouse down on seek bar
+  *
+  * @method handleMouseDown
+  */
   handleMouseDown(event) {
     super.handleMouseDown(event);
 
@@ -49,6 +72,11 @@ class SeekBar extends Slider {
     this.player_.pause();
   }
 
+  /**
+  * Handle mouse move on seek bar
+  *
+  * @method handleMouseMove
+  */
   handleMouseMove(event) {
     let newTime = this.calculateDistance(event) * this.player_.duration();
 
@@ -59,6 +87,11 @@ class SeekBar extends Slider {
     this.player_.currentTime(newTime);
   }
 
+  /**
+  * Handle mouse up on seek bar
+  *
+  * @method handleMouseUp
+  */
   handleMouseUp(event) {
     super.handleMouseUp(event);
 
@@ -68,10 +101,20 @@ class SeekBar extends Slider {
     }
   }
 
+  /**
+  * Move more quickly fast forward for keyboard-only users
+  *
+  * @method stepForward
+  */
   stepForward() {
     this.player_.currentTime(this.player_.currentTime() + 5); // more quickly fast forward for keyboard-only users
   }
 
+  /**
+  * Move more quickly rewind for keyboard-only users
+  *
+  * @method stepBack
+  */
   stepBack() {
     this.player_.currentTime(this.player_.currentTime() - 5); // more quickly rewind for keyboard-only users
   }
