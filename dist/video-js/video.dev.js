@@ -8135,6 +8135,26 @@ vjs.Flash['checkReady'] = function(tech){
 // Trigger events from the swf on the player
 vjs.Flash['onEvent'] = function(swfID, eventName){
   var player = vjs.el(swfID)['player'];
+  if(eventName == 'cuepoint'){
+    var textTracks = player.textTracks(),
+      timedMetadataTT, i, track, cue;
+    for(i = 0; i < textTracks.length; i++){
+      track = textTracks[i];
+      if(track.label === 'Timed Metadata'){
+        timedMetadataTT = track;
+      }
+    }
+    if(!timedMetadataTT) {
+      timedMetadataTT = player.addTextTrack('metadata', 'Timed Metadata');
+      //@cgcladera TODO: I don't know how to construct the band metadata dispatch type for a RTMP live stream
+      //https://html.spec.whatwg.org/multipage/embedded-content.html#guidelines-for-exposing-cues-in-various-formats-as-text-track-cues
+      timedMetadataTT.inBandMetadataTrackDispatchType = '';
+      //Notify when a new in-band-metadata text track has been created.
+      player.trigger('inbandmetadata');
+    }
+    cue = new window.VTTCue(player.currentTime(), player.currentTime(), JSON.stringify(arguments[2]));
+    timedMetadataTT.addCue(cue);
+  }
   player.trigger(eventName);
 };
 
