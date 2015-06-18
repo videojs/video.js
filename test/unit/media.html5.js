@@ -217,6 +217,7 @@ test('native source handler canHandleSource', function(){
 
 test('set crossorigin on loadstart if native text tracks and textTracks', function() {
   var el;
+  tech['featuresNativeTextTracks'] = true;
   tech.textTracks = function() {
     return ['track'];
   };
@@ -233,6 +234,7 @@ test('set crossorigin on loadstart if native text tracks and textTracks', functi
 
 test('do not set crossorigin on loadstart if native text tracks and no text tracks', function() {
   var el;
+  tech['featuresNativeTextTracks'] = true;
 
   el = tech.el();
   ok(!el.hasAttribute('crossorigin'), 'there is no crossorigin attribute before loadstart');
@@ -245,6 +247,7 @@ test('do not set crossorigin on loadstart if native text tracks and no text trac
 
 test('unset crossorigin during setSrc and re-set on loadstart or timeout afterwards, if necessary', function() {
   var el;
+  tech['featuresNativeTextTracks'] = true;
 
   tech.textTracks = function() {
     return ['track'];
@@ -280,6 +283,8 @@ test('unset crossorigin during setSrc and re-set on loadstart or timeout afterwa
 
 test('add and remove corssorigin work add if textTracks and remove always', function() {
   var el = tech.el();
+  tech['featuresNativeTextTracks'] = true;
+
   ok(!el.hasAttribute('crossorigin'), 'there is no crossorigin attribute at the start');
 
   tech.addCrossorigin();
