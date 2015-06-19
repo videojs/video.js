@@ -3,10 +3,11 @@ import Component from '../component.js';
 
 /**
  * Button to toggle between play and pause
+ *
  * @param {Player|Object} player
  * @param {Object=} options
- * @class
- * @constructor
+ * @extends Button
+ * @class PlayToggle
  */
 class PlayToggle extends Button {
 
@@ -17,11 +18,21 @@ class PlayToggle extends Button {
     this.on(player, 'pause', this.handlePause);
   }
 
+  /**
+  * Allow sub components to stack CSS class names
+  *
+  * @return {String} The constructed class name
+  * @method buildCSSClass
+  */
   buildCSSClass() {
     return `vjs-play-control ${super.buildCSSClass()}`;
   }
 
-  // handleClick - Toggle between play and pause
+  /**
+  * Handle click to toggle between play and pause
+  *
+  * @method handleClick
+  */
   handleClick() {
     if (this.player_.paused()) {
       this.player_.play();
@@ -30,14 +41,22 @@ class PlayToggle extends Button {
     }
   }
 
-  // handlePlay - Add the vjs-playing class to the element so it can change appearance
+  /**
+  * Add the vjs-playing class to the element so it can change appearance
+  *
+  * @method handlePlay
+  */
   handlePlay() {
     this.removeClass('vjs-paused');
     this.addClass('vjs-playing');
     this.controlText('Pause'); // change the button text to "Pause"
   }
 
-  // handlePause - Add the vjs-paused class to the element so it can change appearance
+  /**
+  * Add the vjs-paused class to the element so it can change appearance
+  *
+  * @method handlePause
+  */
   handlePause() {
     this.removeClass('vjs-playing');
     this.addClass('vjs-paused');

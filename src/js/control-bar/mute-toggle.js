@@ -7,7 +7,8 @@ import * as Dom from '../utils/dom.js';
  *
  * @param {Player|Object} player
  * @param {Object=} options
- * @constructor
+ * @extends Button
+ * @class MuteToggle
  */
 class MuteToggle extends Button {
 
@@ -30,14 +31,30 @@ class MuteToggle extends Button {
     });
   }
 
+  /**
+  * Allow sub components to stack CSS class names
+  *
+  * @return {String} The constructed class name
+  * @method buildCSSClass
+  */
   buildCSSClass() {
     return `vjs-mute-control ${super.buildCSSClass()}`;
   }
 
+  /**
+  * Handle click on mute
+  *
+  * @method handleClick
+  */
   handleClick() {
     this.player_.muted( this.player_.muted() ? false : true );
   }
 
+  /**
+  * Update volume
+  *
+  * @method update
+  */
   update() {
     var vol = this.player_.volume(),
         level = 3;

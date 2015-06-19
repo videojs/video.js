@@ -4,12 +4,18 @@ import * as Dom from '../utils/dom.js';
 /**
  * Displays the live indicator
  * TODO - Future make it click to snap to live
- * @param {Player|Object} player
- * @param {Object=} options
- * @constructor
+ * 
+ * @extends Component
+ * @class LiveDisplay
  */
 class LiveDisplay extends Component {
 
+  /**
+  * Create the component's DOM element
+  *
+  * @return {Element}
+  * @method createEl
+  */
   createEl() {
     var el = super.createEl('div', {
       className: 'vjs-live-control vjs-control'
