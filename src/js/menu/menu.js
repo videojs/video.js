@@ -9,17 +9,17 @@ import * as Events from '../utils/events.js';
  * The Menu component is used to build pop up menus, including subtitle and
  * captions selection menus.
  *
- * @param {Player|Object} player
- * @param {Object=} options
- * @class
- * @constructor
+ * @extends Component
+ * @class Menu
  */
 class Menu extends Component {
 
   /**
-   * Add a menu item to the menu
-   * @param {Object|String} component Component or component type to add
-   */
+  * Add a menu item to the menu
+  *
+  * @param {Object|String} component Component or component type to add
+  * @method addItem
+  */
   addItem(component) {
     this.addChild(component);
     component.on('click', Fn.bind(this, function(){
@@ -27,6 +27,12 @@ class Menu extends Component {
     }));
   }
 
+  /**
+  * Create the component's DOM element
+  *
+  * @return {Element}
+  * @method createEl
+  */
   createEl() {
     let contentElType = this.options_.contentElType || 'ul';
     this.contentEl_ = Dom.createEl(contentElType, {
