@@ -11,7 +11,8 @@ import assign from 'object.assign';
  *
  * @param {Player|Object} player
  * @param {Object=} options
- * @constructor
+ * @extends Component
+ * @class Slider
  */
 class Slider extends Component {
 
@@ -34,7 +35,15 @@ class Slider extends Component {
     this.on(player, 'controlsvisible', this.update);
     this.on(player, this.playerEvent, this.update);
   }
-
+  
+  /**
+  * Create the component's DOM element
+  *
+  * @param {String} type Type of element to create
+  * @param {Object} props List of properties in Object form 
+  * @return {Element}
+  * @method createEl
+  */
   createEl(type, props={}) {
     // Add the slider element class to all sub classes
     props.className = props.className + ' vjs-slider';
@@ -49,6 +58,12 @@ class Slider extends Component {
     return super.createEl(type, props);
   }
 
+  /**
+  * Handle mouse down on slider
+  *
+  * @param {Object} event Mouse down event object
+  * @method handleMouseDown
+  */
   handleMouseDown(event) {
     event.preventDefault();
     Dom.blockTextSelection();
@@ -62,9 +77,18 @@ class Slider extends Component {
     this.handleMouseMove(event);
   }
 
-  // To be overridden by a subclass
+  /**
+  * To be overridden by a subclass
+  *
+  * @method handleMouseMove
+  */
   handleMouseMove() {}
 
+  /**
+  * Handle mouse up on Slider 
+  *
+  * @method handleMouseUp
+  */
   handleMouseUp() {
     Dom.unblockTextSelection();
     this.removeClass('vjs-sliding');
@@ -77,6 +101,11 @@ class Slider extends Component {
     this.update();
   }
 
+  /**
+  * Update slider
+  *
+  * @method update
+  */
   update() {
     // In VolumeBar init we have a setTimeout for update that pops and update to the end of the
     // execution stack. The player is destroyed before then update will cause an error
@@ -110,6 +139,12 @@ class Slider extends Component {
     }
   }
 
+  /**
+  * Calculate distance for slider
+  *
+  * @param {Object} event Event object
+  * @method calculateDistance
+  */
   calculateDistance(event){
     let el = this.el_;
     let box = Dom.findElPosition(el);
@@ -160,10 +195,21 @@ class Slider extends Component {
     }
   }
 
+  /**
+  * Handle on focus for slider
+  *
+  * @method handleFocus
+  */
   handleFocus() {
     this.on(document, 'keydown', this.handleKeyPress);
   }
 
+  /**
+  * Handle key press for slider
+  *
+  * @param {Object} event Event object
+  * @method handleKeyPress
+  */
   handleKeyPress(event) {
     if (event.which === 37 || event.which === 40) { // Left and Down Arrows
       event.preventDefault();
@@ -174,6 +220,11 @@ class Slider extends Component {
     }
   }
 
+  /**
+  * Handle on blur for slider
+  *
+  * @method handleBlur
+  */
   handleBlur() {
     this.off(document, 'keydown', this.handleKeyPress);
   }
@@ -181,13 +232,22 @@ class Slider extends Component {
   /**
    * Listener for click events on slider, used to prevent clicks
    *   from bubbling up to parent elements like button menus.
-   * @param  {Object} event Event object
-   */
+  *
+  * @param {Object} event Event object
+  * @method handleClick
+  */
   handleClick(event) {
     event.stopImmediatePropagation();
     event.preventDefault();
   }
 
+  /**
+  * Get/set if slider is horizontal for vertical
+  *
+  * @param {Boolean} bool True if slider is vertical, false is horizontal
+  * @return {Boolean} True if slider is vertical, false is horizontal
+  * @method vertical
+  */
   vertical(bool) {
     if (bool === undefined) {
       return this.vertical_ || false;
