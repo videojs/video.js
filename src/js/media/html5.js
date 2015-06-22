@@ -314,13 +314,20 @@ vjs.Html5.prototype.exitFullScreen = function(){
   this.el_.webkitExitFullScreen();
 };
 
+vjs.Html5.prototype.returnFakeIfBlobURI_ = function (realValue, fakeValue) {
+  var blobURIRegExp = /^blob\:/i;
+
+  if (realValue && blobURIRegExp.test(realValue)) {
+    return fakeValue;
+  }
+  return realValue;
+};
 
 vjs.Html5.prototype.src = function(src) {
+  var realSrc = this.el_.src;
+
   if (src === undefined) {
-    if (this.source_) {
-      return this.source_;
-    }
-    return this.el_.src;
+    return this.returnFakeIfBlobURI_(realSrc, this.source_);
   } else {
     // Setting src through `src` instead of `setSrc` will be deprecated
     this.setSrc(src);
@@ -333,11 +340,13 @@ vjs.Html5.prototype.setSrc = function(src) {
 
 vjs.Html5.prototype.load = function(){ this.el_.load(); };
 vjs.Html5.prototype.currentSrc = function(){
-  if (this.currentSource_) {
-    return this.currentSource_.src;
-  } else {
-    return this.el_.currentSrc;
+  var realSrc = this.el_.currentSrc;
+
+  if (!this.currentSource_) {
+    return realSrc;
   }
+
+  return this.returnFakeIfBlobURI_(realSrc, this.currentSource_.src);
 };
 
 vjs.Html5.prototype.poster = function(){ return this.el_.poster; };
@@ -484,17 +493,13 @@ vjs.MediaTechController.withSourceHandlers(vjs.Html5);
     origDisposeSourceHandler = vjs.Html5.prototype.disposeSourceHandler;
 
   vjs.Html5.prototype.setSource = function (source) {
-    origSetSource.call(this, source);
     this.source_ = source.src;
-
-    return this;
+    return origSetSource.call(this, source);
   };
 
   vjs.Html5.prototype.disposeSourceHandler = function () {
-    origDisposeSourceHandler.call(this);
-    if (this.sourceHandler_) {
-      this.source_ = undefined;
-    }
+    this.source_ = undefined;
+    return origDisposeSourceHandler.call(this);
   };
 })();
 
