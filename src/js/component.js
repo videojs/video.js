@@ -38,7 +38,7 @@ import mergeOptions from './utils/merge-options.js';
  *     button.trigger('customevent');
  *
  * @param {Object} player  Main Player
- * @param {Object=} options
+ * @param {Object=} options Object of option names and values
  * @param {Function=} ready    Ready callback function
  * @class Component
  */

@@ -50,7 +50,7 @@ import Html5 from './tech/html5.js';
  * After an instance has been created it can be accessed globally using `Video('example_video_1')`.
  *
  * @param {Element} tag        The original video tag used for configuring options
- * @param {Object=} options    Player options
+ * @param {Object=} options    Object of option names and values
  * @param {Function=} ready    Ready callback function
  * @extends Component
  * @class Player

@@ -17,10 +17,10 @@ let navigator = window.navigator;
 /**
  * Flash Media Controller - Wrapper for fallback SWF API
  *
- * @param {Player} player
- * @param {Object=} options
- * @param {Function=} ready
- * @constructor
+ * @param {Object=} options Object of option names and values
+ * @param {Function=} ready Ready callback function
+ * @extends Tech
+ * @class Flash
  */
 class Flash extends Tech {
 
@@ -55,6 +55,12 @@ class Flash extends Tech {
     window.videojs.Flash.onError = Flash.onError;
   }
 
+  /**
+  * Create the component's DOM element
+  *
+  * @return {Element}
+  * @method createEl
+  */
   createEl() {
     let options = this.options_;
 
@@ -96,14 +102,31 @@ class Flash extends Tech {
     return this.el_;
   }
 
+  /**
+  * Play for flash tech
+  *
+  * @method play
+  */
   play() {
     this.el_.vjs_play();
   }
 
+  /**
+  * Pause for flash tech
+  *
+  * @method pause
+  */
   pause() {
     this.el_.vjs_pause();
   }
 
+  /**
+  * Get/set video
+  *
+  * @param {Object=} src Source object 
+  * @return {Object} 
+  * @method src
+  */
   src(src) {
     if (src === undefined) {
       return this.currentSrc();
@@ -113,6 +136,13 @@ class Flash extends Tech {
     return this.setSrc(src);
   }
 
+  /**
+  * Set video
+  *
+  * @param {Object=} src Source object 
+  * @deprecated
+  * @method setSrc
+  */
   setSrc(src) {
     // Make sure source URL is absolute.
     src = Url.getAbsoluteURL(src);
@@ -126,12 +156,25 @@ class Flash extends Tech {
     }
   }
 
+  /**
+  * Set current time
+  *
+  * @param {Number} time Current time of video 
+  * @method setCurrentTime
+  */
   setCurrentTime(time) {
     this.lastSeekTarget_ = time;
     this.el_.vjs_setProperty('currentTime', time);
     super.setCurrentTime();
   }
 
+  /**
+  * Get current time
+  *
+  * @param {Number=} time Current time of video 
+  * @return {Number} Current time
+  * @method currentTime
+  */
   currentTime(time) {
     // when seeking make the reported time keep up with the requested time
     // by reading the time we're seeking to
@@ -141,6 +184,11 @@ class Flash extends Tech {
     return this.el_.vjs_getProperty('currentTime');
   }
 
+  /**
+  * Get current source
+  *
+  * @method currentSrc
+  */
   currentSrc() {
     if (this.currentSource_) {
       return this.currentSource_.src;
@@ -149,17 +197,37 @@ class Flash extends Tech {
     }
   }
 
+  /**
+  * Load media into player
+  *
+  * @method load
+  */
   load() {
     this.el_.vjs_load();
   }
 
+  /**
+  * Get poster
+  *
+  * @method poster
+  */
   poster() {
     this.el_.vjs_getProperty('poster');
   }
 
-  // poster images are not handled by the Flash tech so make this a no-op
+  /**
+  * Poster images are not handled by the Flash tech so make this a no-op
+  *
+  * @method setPoster
+  */
   setPoster() {}
 
+  /**
+  * Determine if can seek in media
+  *
+  * @return {TimeRangeObject}
+  * @method seekable
+  */
   seekable() {
     const duration = this.duration();
     if (duration === 0) {
@@ -168,14 +236,36 @@ class Flash extends Tech {
     return createTimeRange(0, duration);
   }
 
+  /**
+  * Get buffered time range
+  *
+  * @return {TimeRangeObject} 
+  * @method buffered
+  */
   buffered() {
     return createTimeRange(0, this.el_.vjs_getProperty('buffered'));
   }
 
+  /**
+  * Get fullscreen support - 
+  * Flash does not allow fullscreen through javascript
+  * so always returns false
+  *
+  * @return {Boolean} false 
+  * @method supportsFullScreen
+  */
   supportsFullScreen() {
     return false; // Flash does not allow fullscreen through javascript
   }
 
+  /**
+  * Request to enter fullscreen
+  * Flash does not allow fullscreen through javascript
+  * so always returns false
+  *
+  * @return {Boolean} false 
+  * @method enterFullScreen
+  */
   enterFullScreen() {
     return false;
   }
@@ -217,7 +307,7 @@ Flash.isSupported = function(){
 // Add Source Handler pattern functions to this tech
 Tech.withSourceHandlers(Flash);
 
-/**
+/*
  * The default native source handler.
  * This simply passes the source to the video element. Nothing fancy.
  * @param  {Object} source   The source object
@@ -225,7 +315,7 @@ Tech.withSourceHandlers(Flash);
  */
 Flash.nativeSourceHandler = {};
 
-/**
+/*
  * Check Flash can handle the source natively
  * @param  {Object} source  The source object
  * @return {String}         'probably', 'maybe', or '' (empty string)
@@ -255,7 +345,7 @@ Flash.nativeSourceHandler.canHandleSource = function(source){
   return '';
 };
 
-/**
+/*
  * Pass the source to the flash object
  * Adaptive source handlers will have more complicated workflows before passing
  * video data to the video element
@@ -266,7 +356,7 @@ Flash.nativeSourceHandler.handleSource = function(source, tech){
   tech.setSrc(source.src);
 };
 
-/**
+/*
  * Clean up the source handler when disposing the player or switching sources..
  * (no cleanup is needed when supporting the format natively)
  */
