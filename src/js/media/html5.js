@@ -12,7 +12,7 @@
 vjs.Html5 = vjs.MediaTechController.extend({
   /** @constructor */
   init: function(player, options, ready){
-    var  nodes, nodesLength, i, node, nodeName, removeNodes;
+    var  nodes, nodesLength, i, node, nodeName, removeNodes, textTracks;
 
     if (options['nativeCaptions'] === false || options['nativeTextTracks'] === false) {
       this['featuresNativeTextTracks'] = false;
@@ -62,9 +62,14 @@ vjs.Html5 = vjs.MediaTechController.extend({
     if (this['featuresNativeTextTracks']) {
       this.on('loadstart', vjs.bind(this, this.hideCaptions));
     } else {
+      textTracks = this.el().textTracks;
+
       // allow us to view the in-band metadata tracks from our shimmed TextTrackList
       this.on('loadstart', vjs.bind(this, this.removeInBandMetadataTracks));
-      this.el().textTracks.addEventListener('addtrack', vjs.bind(this, this.addInBandMetadataTracks));
+
+      if (textTracks) {
+        this.el().textTracks.addEventListener('addtrack', vjs.bind(this, this.addInBandMetadataTracks));
+      }
     }
 
     // Determine if native controls should be used
