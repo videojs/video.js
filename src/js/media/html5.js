@@ -324,10 +324,10 @@ vjs.Html5.prototype.returnOriginalIfBlobURI_ = function (elementURI, originalURI
   // If originalURI is undefined then we are probably in a non-source-handler-enabled
   // tech that inherits from the Html5 tech so we should just return the elementURI
   // regardless of it's blobby-ness
-  if (!originalURI || (elementURI && blobURIRegExp.test(elementURI))) {
-    return elementURI;
+  if (originalURI && elementURI && blobURIRegExp.test(elementURI)) {
+    return originalURI;
   }
-  return originalURI;
+  return elementURI;
 };
 
 vjs.Html5.prototype.src = function(src) {
