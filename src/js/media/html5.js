@@ -500,8 +500,9 @@ vjs.MediaTechController.withSourceHandlers(vjs.Html5);
     origDisposeSourceHandler = vjs.Html5.prototype.disposeSourceHandler;
 
   vjs.Html5.prototype.setSource = function (source) {
+    var retVal = origSetSource.call(this, source);
     this.source_ = source.src;
-    return origSetSource.call(this, source);
+    return retVal;
   };
 
   vjs.Html5.prototype.disposeSourceHandler = function () {
