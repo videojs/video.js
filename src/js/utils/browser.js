@@ -3,7 +3,7 @@ import window from 'global/window';
 
 const USER_AGENT = window.navigator.userAgent;
 
-/**
+/*
  * Device is an iPhone
  * @type {Boolean}
  * @constant

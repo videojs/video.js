@@ -33,6 +33,7 @@ log.warn = function(){
  * @param  {String} type The type of message, or `null` for `log`
  * @param  {[type]} args The args to be passed to the log
  * @private
+ * @method _logType
  */
 function _logType(type, args){
   // convert args to an array to get array functions

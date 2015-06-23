@@ -15,6 +15,7 @@ function isPlain(obj) {
  * @param  {...Object} source One or more objects to merge into the first
  *
  * @returns {Object}          The updated first object
+ * @function mergeOptions
  */
 export default function mergeOptions(object={}) {
 

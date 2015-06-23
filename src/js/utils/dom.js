@@ -6,8 +6,10 @@ import roundFloat from './round-float.js';
 /**
  * Shorthand for document.getElementById()
  * Also allows for CSS (jQuery) ID syntax. But nothing other than IDs.
+ *
  * @param  {String} id  Element ID
  * @return {Element}    Element with supplied ID
+ * @function getEl
  */
 export function getEl(id){
   if (id.indexOf('#') === 0) {
@@ -19,9 +21,11 @@ export function getEl(id){
 
 /**
  * Creates an element and applies properties.
+ *
  * @param  {String=} tagName    Name of tag to be created.
  * @param  {Object=} properties Element properties to be applied.
  * @return {Element}
+ * @function createEl
  */
 export function createEl(tagName='div', properties={}){
   let el = document.createElement(tagName);
@@ -49,9 +53,11 @@ export function createEl(tagName='div', properties={}){
 
 /**
  * Insert an element as the first child node of another
+ * 
  * @param  {Element} child   Element to insert
  * @param  {[type]} parent Element to insert child into
  * @private
+ * @function insertElFirst
  */
 export function insertElFirst(child, parent){
   if (parent.firstChild) {
@@ -65,12 +71,13 @@ export function insertElFirst(child, parent){
  * Element Data Store. Allows for binding data to an element without putting it directly on the element.
  * Ex. Event listeners are stored here.
  * (also from jsninja.com, slightly modified and updated for closure compiler)
+ *
  * @type {Object}
  * @private
  */
 const elData = {};
 
-/**
+/*
  * Unique attribute name to store an element's guid in
  * @type {String}
  * @constant
@@ -80,8 +87,10 @@ const elIdAttr = 'vdata' + (new Date()).getTime();
 
 /**
  * Returns the cache object where data for an element is stored
+ *
  * @param  {Element} el Element to store data for.
  * @return {Object}
+ * @function getElData
  */
 export function getElData(el) {
   let id = el[elIdAttr];
@@ -99,9 +108,11 @@ export function getElData(el) {
 
 /**
  * Returns whether or not an element has cached data
+ *
  * @param  {Element} el A dom element
  * @return {Boolean}
  * @private
+ * @function hasElData
  */
 export function hasElData(el) {
   const id = el[elIdAttr];
@@ -115,8 +126,10 @@ export function hasElData(el) {
 
 /**
  * Delete data for the element from the cache and the guid attr from getElementById
+ *
  * @param  {Element} el Remove data for an element
  * @private
+ * @function removeElData
  */
 export function removeElData(el) {
   let id = el[elIdAttr];
@@ -143,8 +156,10 @@ export function removeElData(el) {
 
 /**
  * Check if an element has a CSS class
+ *
  * @param {Element} element Element to check
  * @param {String} classToCheck Classname to check
+ * @function hasElClass
  */
 export function hasElClass(element, classToCheck) {
   return ((' ' + element.className + ' ').indexOf(' ' + classToCheck + ' ') !== -1);
@@ -152,8 +167,10 @@ export function hasElClass(element, classToCheck) {
 
 /**
  * Add a CSS class name to an element
+ *
  * @param {Element} element    Element to add class name to
  * @param {String} classToAdd Classname to add
+ * @function addElClass
  */
 export function addElClass(element, classToAdd) {
   if (!hasElClass(element, classToAdd)) {
@@ -163,8 +180,10 @@ export function addElClass(element, classToAdd) {
 
 /**
  * Remove a CSS class name from an element
+ *
  * @param {Element} element    Element to remove from class name
- * @param {String} classToAdd Classname to remove
+ * @param {String} classToRemove Classname to remove
+ * @function removeElClass
  */
 export function removeElClass(element, classToRemove) {
   if (!hasElClass(element, classToRemove)) {return;}
@@ -183,9 +202,11 @@ export function removeElClass(element, classToRemove) {
 
 /**
  * Apply attributes to an HTML element.
+ *
  * @param  {Element} el         Target element.
  * @param  {Object=} attributes Element attributes to be applied.
  * @private
+ * @function setElAttributes
  */
 export function setElAttributes(el, attributes) {
   Object.getOwnPropertyNames(attributes).forEach(function(attrName){
@@ -204,9 +225,11 @@ export function setElAttributes(el, attributes) {
  * Attributes are not the same as properties. They're defined on the tag
  * or with setAttribute (which shouldn't be used with HTML)
  * This will return true or false for boolean attributes.
+ *
  * @param  {Element} tag Element from which to get tag attributes
  * @return {Object}
  * @private
+ * @function getElAttributes
  */
 export function getElAttributes(tag) {
   var obj, knownBooleans, attrs, attrName, attrVal;
@@ -241,7 +264,12 @@ export function getElAttributes(tag) {
   return obj;
 }
 
-// Attempt to block the ability to select text while dragging controls
+  /**
+  * Attempt to block the ability to select text while dragging controls
+  *
+  * @return {Boolean} 
+  * @method blockTextSelection
+  */
 export function blockTextSelection() {
   document.body.focus();
   document.onselectstart = function() {
@@ -249,15 +277,27 @@ export function blockTextSelection() {
   };
 }
 
-// Turn off text selection blocking
+  /**
+  * Turn off text selection blocking
+  *
+  * @return {Boolean} 
+  * @method unblockTextSelection
+  */
 export function unblockTextSelection() {
   document.onselectstart = function() {
     return true;
   };
 }
 
-// Offset Left
-// getBoundingClientRect technique from John Resig http://ejohn.org/blog/getboundingclientrect-is-awesome/
+  /**
+  * Offset Left
+  * getBoundingClientRect technique from 
+  * John Resig http://ejohn.org/blog/getboundingclientrect-is-awesome/
+  *
+  * @param {Element} el Element from which to get offset
+  * @return {Object=} 
+  * @method findElPosition
+  */
 export function findElPosition(el) {
   let box;
 

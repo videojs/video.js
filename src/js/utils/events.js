@@ -15,9 +15,11 @@ import document from 'global/document';
  * It stores the handler function in a separate cache object
  * and adds a generic handler to the element's event,
  * along with a unique id (guid) to the element.
+ * 
  * @param  {Element|Object}   elem Element or object to bind listeners to
  * @param  {String|Array}   type Type of event to bind to.
  * @param  {Function} fn   Event listener.
+ * @method on
  */
 export function on(elem, type, fn){
   if (Array.isArray(type)) {
@@ -71,9 +73,11 @@ export function on(elem, type, fn){
 
 /**
  * Removes event listeners from an element
+ *
  * @param  {Element|Object}   elem Object to remove listeners from
  * @param  {String|Array=}   type Type of listener to remove. Don't include to remove all events from element.
  * @param  {Function} fn   Specific listener to remove. Don't include to remove listeners for an event type.
+ * @method off
  */
 export function off(elem, type, fn) {
   // Don't want to add a cache object through getElData if not needed
@@ -125,9 +129,12 @@ export function off(elem, type, fn) {
 
 /**
  * Trigger an event for an element
+ *
  * @param  {Element|Object}      elem  Element to trigger an event on
  * @param  {Event|Object|String} event A string (the type) or an event object with a type attribute
  * @param  {Object} [hash] data hash to pass along with the event
+ * @return {Boolean=} Returned only if default was prevented
+ * @method trigger
  */
 export function trigger(elem, event, hash) {
   // Fetches element data and a reference to the parent (for bubbling).
@@ -178,9 +185,11 @@ export function trigger(elem, event, hash) {
 
 /**
  * Trigger a listener only once for an event
+ *
  * @param  {Element|Object}   elem Element or object to
- * @param  {String|Array}   type
- * @param  {Function} fn
+ * @param  {String|Array}   type Name/type of event
+ * @param  {Function} fn Event handler function
+ * @method one
  */
 export function one(elem, type, fn) {
   if (Array.isArray(type)) {
@@ -197,9 +206,11 @@ export function one(elem, type, fn) {
 
 /**
  * Fix a native event to have standard property values
+ * 
  * @param  {Object} event Event object to fix
  * @return {Object}
  * @private
+ * @method fixEvent
  */
 export function fixEvent(event) {
 
@@ -305,9 +316,11 @@ export function fixEvent(event) {
 
 /**
  * Clean up the listener cache and dispatchers
+ *
  * @param  {Element|Object} elem Element to clean up
  * @param  {String} type Type of event to clean up
  * @private
+ * @method _cleanUpEvents
  */
 function _cleanUpEvents(elem, type) {
   var data = Dom.getElData(elem);
@@ -341,11 +354,13 @@ function _cleanUpEvents(elem, type) {
 
 /**
  * Loops through an array of event types and calls the requested method for each type.
+ *
  * @param  {Function} fn   The event method we want to use.
  * @param  {Element|Object} elem Element or object to bind listeners to
  * @param  {String}   type Type of event to bind to.
  * @param  {Function} callback   Event listener.
  * @private
+ * @function _handleMultipleEvents
  */
 function _handleMultipleEvents(fn, elem, types, callback) {
   types.forEach(function(type) {

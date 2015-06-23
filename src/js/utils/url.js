@@ -2,8 +2,10 @@ import document from 'global/document';
 
 /**
  * Resolve and parse the elements of a URL
+ *
  * @param  {String} url The url to parse
  * @return {Object}     An object of url details
+ * @method parseUrl
  */
 export const parseUrl = function(url) {
   const props = ['protocol', 'hostname', 'port', 'pathname', 'search', 'hash', 'host'];
@@ -53,9 +55,11 @@ export const parseUrl = function(url) {
 /**
  * Get absolute version of relative URL. Used to tell flash correct URL.
  * http://stackoverflow.com/questions/470832/getting-an-absolute-url-from-a-relative-one-ie6-issue
+ *
  * @param  {String} url URL to make absolute
  * @return {String}     Absolute URL
  * @private
+ * @method getAbsoluteURL
  */
 export const getAbsoluteURL = function(url){
   // Check if absolute URL
@@ -74,6 +78,7 @@ export const getAbsoluteURL = function(url){
  *
  * @param {String}    path    The fileName path like '/path/to/file.mp4'
  * @returns {String}          The extension in lower case or an empty string if no extension could be found.
+ * @method getFileExtension
  */
 export const getFileExtension = function(path) {
   if(typeof path === 'string'){
