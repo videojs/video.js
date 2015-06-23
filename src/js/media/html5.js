@@ -20,6 +20,9 @@ vjs.Html5 = vjs.MediaTechController.extend({
 
     vjs.MediaTechController.call(this, player, options, ready);
 
+    // If we need a crossorigin attribute, make sure it gets added by loadstart
+    this.on('loadstart', vjs.bind(this, this.addCrossorigin));
+
     this.setupTriggers();
 
     var source = options['source'];
@@ -325,7 +328,11 @@ vjs.Html5.prototype.src = function(src) {
 };
 
 vjs.Html5.prototype.setSrc = function(src) {
+  this.removeCrossorigin();
   this.el_.src = src;
+  this.crossoriginTimeout_ = this.setTimeout(vjs.bind(this, function() {
+    this.addCrossorigin();
+  }));
 };
 
 vjs.Html5.prototype.load = function(){ this.el_.load(); };
@@ -408,6 +415,8 @@ vjs.Html5.prototype.addRemoteTextTrack = function(options) {
 
   this.el().appendChild(track);
 
+  this.addCrossorigin();
+
   if (track.track['kind'] === 'metadata') {
     track['track']['mode'] = 'hidden';
   } else {
@@ -448,6 +457,38 @@ vjs.Html5.prototype.removeRemoteTextTrack = function(track) {
       break;
     }
   }
+};
+
+/*
+ * Conditionally, add the crossorigin property to the element.
+ * The value can be either 'anonymous' or 'use-credentials' as seen here <https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_settings_attributes>.
+ * Defaults to 'anonymous'.
+ */
+vjs.Html5.prototype.addCrossorigin = function(value) {
+  var textTracks = this.textTracks();
+
+  this.clearTimeout(this.crossoriginTimeout_);
+
+  if (textTracks && textTracks.length > 0 && this['featuresNativeTextTracks']) {
+    this.enableCrossorigin_(value);
+  }
+};
+
+vjs.Html5.prototype.enableCrossorigin_ = function(value) {
+  var attrVal = value;
+
+  if (value !== 'anonymous' && value !== 'use-credentials') {
+    attrVal = 'anonymous';
+  }
+
+  this.el().setAttribute('crossorigin', attrVal);
+};
+
+/*
+ * Remove the crossorigin attribute, unconditionally.
+ */
+vjs.Html5.prototype.removeCrossorigin = function() {
+  this.el().removeAttribute('crossorigin');
 };
 
 /* HTML5 Support Testing ---------------------------------------------------- */
