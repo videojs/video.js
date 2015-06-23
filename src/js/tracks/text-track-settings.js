@@ -5,6 +5,14 @@ import log from '../utils/log.js';
 import safeParseTuple from 'safe-json-parse/tuple';
 import window from 'global/window';
 
+/**
+ * Manipulate settings of texttracks
+ *
+ * @param {Object} player  Main Player
+ * @param {Object=} options Object of option names and values
+ * @extends Component
+ * @class TextTrackSettings
+ */
 class TextTrackSettings extends Component {
 
   constructor(player, options) {
@@ -49,6 +57,12 @@ class TextTrackSettings extends Component {
     }
   }
 
+  /**
+  * Create the component's DOM element
+  *
+  * @return {Element}
+  * @method createEl
+  */
   createEl() {
     return super.createEl('div', {
       className: 'vjs-caption-settings vjs-modal-overlay',
@@ -56,6 +70,21 @@ class TextTrackSettings extends Component {
     });
   }
 
+  /**
+  * Get texttrack settings 
+  * Settings are
+  * .vjs-edge-style
+  * .vjs-font-family
+  * .vjs-fg-color
+  * .vjs-text-opacity
+  * .vjs-bg-color
+  * .vjs-bg-opacity
+  * .window-color
+  * .vjs-window-opacity 
+  *
+  * @return {Object} 
+  * @method getValues
+  */
   getValues() {
     const el = this.el();
 
@@ -88,6 +117,21 @@ class TextTrackSettings extends Component {
     return result;
   }
 
+  /**
+  * Set texttrack settings 
+  * Settings are
+  * .vjs-edge-style
+  * .vjs-font-family
+  * .vjs-fg-color
+  * .vjs-text-opacity
+  * .vjs-bg-color
+  * .vjs-bg-opacity
+  * .window-color
+  * .vjs-window-opacity 
+  *
+  * @param {Object} values Object with texttrack setting values
+  * @method setValues
+  */
   setValues(values) {
     const el = this.el();
 
@@ -109,6 +153,11 @@ class TextTrackSettings extends Component {
     setSelectedOption(el.querySelector('.vjs-font-percent > select'), fontPercent);
   }
 
+  /**
+  * Restore texttrack settings 
+  *
+  * @method restoreSettings
+  */
   restoreSettings() {
     let [err, values] = safeParseTuple(window.localStorage.getItem('vjs-text-track-settings'));
 
@@ -121,6 +170,11 @@ class TextTrackSettings extends Component {
     }
   }
 
+  /**
+  * Save texttrack settings to local storage 
+  *
+  * @method saveSettings
+  */
   saveSettings() {
     if (!this.options_.persistTextTrackSettings) {
       return;
@@ -136,6 +190,11 @@ class TextTrackSettings extends Component {
     } catch (e) {}
   }
 
+  /**
+  * Update display of texttrack settings  
+  *
+  * @method updateDisplay
+  */
   updateDisplay() {
     let ttDisplay = this.player_.getChild('textTrackDisplay');
     if (ttDisplay) {
