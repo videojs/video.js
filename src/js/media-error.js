@@ -41,7 +41,7 @@ MediaError.prototype.message = '';
  * HTTP status code that was returned when the error
  * occurred, then allowing a custom error overlay
  * to display more information.
- * @type {[type]}
+ * @type {Array}
  */
 MediaError.prototype.status = null;
 

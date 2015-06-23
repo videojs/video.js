@@ -55,7 +55,7 @@ export function createEl(tagName='div', properties={}){
  * Insert an element as the first child node of another
  * 
  * @param  {Element} child   Element to insert
- * @param  {[type]} parent Element to insert child into
+ * @param  {Element} parent Element to insert child into
  * @private
  * @function insertElFirst
  */

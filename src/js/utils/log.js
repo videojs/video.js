@@ -31,7 +31,7 @@ log.warn = function(){
  * Log messages to the console and history based on the type of message
  *
  * @param  {String} type The type of message, or `null` for `log`
- * @param  {[type]} args The args to be passed to the log
+ * @param  {Object} args The args to be passed to the log
  * @private
  * @method _logType
  */

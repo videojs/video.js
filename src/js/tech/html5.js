@@ -799,7 +799,7 @@ Html5.canControlVolume = function(){
 
 /*
  * Check if playbackRate is supported in this browser/device.
- * @return {[type]} [description]
+ * @return {Number} [description]
  */
 Html5.canControlPlaybackRate = function(){
   var playbackRate = Html5.TEST_VID.playbackRate;
