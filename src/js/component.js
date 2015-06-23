@@ -105,6 +105,7 @@ class Component {
 
   /**
    * Dispose of the component and all child components
+   *
    * @method dispose
    */
   dispose() {
@@ -340,7 +341,6 @@ class Component {
    * @param {String|Component} child The class name or instance of a child to add
    * @param {Object=} options Options, including options to be passed to children of the child.
    * @return {Component} The child component (created by this process if a string was used)
-   * @suppress {accessControls|checkRegExp|checkTypes|checkVars|const|constantProperty|deprecated|duplicate|es5Strict|fileoverviewTags|globalThis|invalidCasts|missingProperties|nonStandardJsDocs|strictModuleDepCheck|undefinedNames|undefinedVars|unknownDefines|uselessCode|visibility}
    * @method addChild
    */
   addChild(child, options={}) {
@@ -476,6 +476,7 @@ class Component {
    *         }
    *       ]
    *     });
+   *
    * @method initChildren
    */
   initChildren() {
@@ -579,7 +580,7 @@ class Component {
    * @param  {String|Component} first   The event type or other component
    * @param  {Function|String}      second  The event handler or event type
    * @param  {Function}             third   The event handler
-   * @return {Component}        self
+   * @return {Component} 
    * @method on
    */
   on(first, second, third) {
@@ -805,7 +806,7 @@ class Component {
   }
 
   /**
-   * Remove a CSS class name from the component's element
+   * Remove and return a CSS class name from the component's element
    *
    * @param {String} classToRemove Classname to remove
    * @return {Component}
@@ -903,8 +904,8 @@ class Component {
   /**
    * Set both width and height at the same time
    *
-   * @param  {Number|String} width
-   * @param  {Number|String} height
+   * @param  {Number|String} width Width of player
+   * @param  {Number|String} height Height of player
    * @return {Component} The component
    * @method dimensions
    */
@@ -986,6 +987,7 @@ class Component {
    * We're requiring them to be enabled because otherwise every component would
    * have this extra overhead unnecessarily, on mobile devices where extra
    * overhead is especially bad.
+   *
    * @private
    * @method emitTapEvents
    */
@@ -1084,6 +1086,7 @@ class Component {
    * Here we're setting the default component behavior to report user activity
    * whenever touch events happen, and this can be turned off by components that
    * want touch events to act differently.
+   *
    * @method enableTouchActivity
    */
   enableTouchActivity() {
@@ -1120,6 +1123,7 @@ class Component {
 
   /**
    * Creates timeout and sets up disposal automatically.
+   *
    * @param {Function} fn The function to run after the timeout.
    * @param {Number} timeout Number of ms to delay before executing specified function.
    * @return {Number} Returns the timeout ID
@@ -1144,6 +1148,7 @@ class Component {
 
   /**
    * Clears a timeout and removes the associated dispose listener
+   *
    * @param {Number} timeoutId The id of the timeout to clear
    * @return {Number} Returns the timeout ID
    * @method clearTimeout
@@ -1162,6 +1167,7 @@ class Component {
 
   /**
    * Creates an interval and sets up disposal automatically.
+   *
    * @param {Function} fn The function to run every N seconds.
    * @param {Number} interval Number of ms to delay before executing specified function.
    * @return {Number} Returns the interval ID
@@ -1185,6 +1191,7 @@ class Component {
 
   /**
    * Clears an interval and removes the associated dispose listener
+   *
    * @param {Number} intervalId The id of the interval to clear
    * @return {Number} Returns the interval ID
    * @method clearInterval
@@ -1203,6 +1210,7 @@ class Component {
 
   /**
   * Registers a component
+  *
   * @param {String} name Name of the component to register
   * @param {Object} comp The component to register  
   * @static
@@ -1219,7 +1227,9 @@ class Component {
 
   /**
   * Gets a component by name
+  *
   * @param {String} name Name of the component to get
+  * @return {Component}
   * @static
   * @method getComponent
   */
@@ -1237,6 +1247,7 @@ class Component {
   /**
   * Sets up the constructor using the supplied init method
   * or uses the init of the parent object
+  *
   * @param {Object} props An object of properties  
   * @static
   * @method extend

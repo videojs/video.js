@@ -88,13 +88,13 @@ var videojs = function(id, options, ready){
 // You have to wait at least once in case this script is loaded after your video in the DOM (weird behavior only with minified version)
 setup.autoSetupTimeout(1, videojs);
 
-/**
+/*
  * Current software version (semver)
  * @type {String}
  */
 videojs.VERSION = '__VERSION__';
 
-/**
+/*
  * Get the global options object
  *
  * @return {Object} The global options object
@@ -113,6 +113,7 @@ videojs.getGlobalOptions = () => globalOptions;
  * not overwrite the entire global options object.
  *
  * @return {Object} The updated global options object
+ * @method setGlobalOptions
  */
 videojs.setGlobalOptions = function(newOptions) {
   return mergeOptions(globalOptions, newOptions);
@@ -122,12 +123,13 @@ videojs.setGlobalOptions = function(newOptions) {
  * Get an object with the currently created players, keyed by player ID
  *
  * @return {Object} The created players
+ * @method getPlayers
  */
 videojs.getPlayers = function() {
   return Player.players;
 };
 
-/**
+/*
  * Get a component class object by name
  *
  *     var VjsButton = videojs.getComponent('Button');
@@ -138,7 +140,7 @@ videojs.getPlayers = function() {
  */
 videojs.getComponent = Component.getComponent;
 
-/**
+/*
  * Register a component so it can referred to by name
  *
  * Used when adding to other
@@ -168,13 +170,13 @@ videojs.getComponent = Component.getComponent;
  */
 videojs.registerComponent = Component.registerComponent;
 
-/**
+/*
  * A suite of browser and device tests
  * @type {Object}
  */
 videojs.browser = browser;
 
-/**
+/*
  * Subclass an existing class
  * Mimics ES6 subclassing with the `extends` keyword
  *
@@ -210,7 +212,7 @@ videojs.browser = browser;
  */
 videojs.extends = extendsFn;
 
-/**
+/*
  * Merge two options objects recursively
  * Performs a deep merge like lodash.merge but **only merges plain objects**
  * (not arrays, elements, anything else)
@@ -243,7 +245,7 @@ videojs.extends = extendsFn;
  */
 videojs.mergeOptions = mergeOptions;
 
-/**
+/*
  * Create a Video.js player plugin
  *
  * Plugins are only initialized when options for the plugin are included
@@ -292,7 +294,7 @@ videojs.mergeOptions = mergeOptions;
  */
 videojs.plugin = plugin;
 
-/**
+/*
  * Adding languages so that they're available to all players.
  *
  *     videojs.addLanguage('es', { 'Hello': 'Hola' });
@@ -324,7 +326,7 @@ videojs.addLanguage = function(code, data){
 //   assign(module.exports[name], component);
 // });
 
-/**
+/*
  * Custom Universal Module Definition (UMD)
  *
  * Video.js will never be a non-browser lib so we can simplify UMD a bunch and

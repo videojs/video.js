@@ -210,6 +210,7 @@ class Player extends Component {
    *
    * This is especially helpful if you are dynamically adding and removing videos
    * to/from the DOM.
+   *
    * @method dispose
    */
   dispose() {
@@ -297,6 +298,7 @@ class Player extends Component {
   * Get/set player width
   *
   * @param {Number=} value Value for width
+  * @return {Number} Width when getting
   * @method width
   */
   width(value) {
@@ -307,6 +309,7 @@ class Player extends Component {
   * Get/set player height
   *
   * @param {Number=} value Value for height
+  * @return {Number} Height when getting
   * @method height
   */
   height(value) {
@@ -318,6 +321,7 @@ class Player extends Component {
   *
   * @param {String} dimension Either width or height
   * @param {Number=} value Value for dimension
+  * @return {Component}
   * @method dimension
   */
   dimension(dimension, value) {
@@ -649,6 +653,7 @@ class Player extends Component {
 
   /**
    * Fired when the user agent begins looking for media data
+   *
    * @event loadstart
    */
   handleTechLoadStart() {
@@ -677,7 +682,7 @@ class Player extends Component {
   *
   * @param {Boolean} hasStarted The value of true adds the class the value of false remove the class
   * @return {Boolean} Boolean value if has started
-  * @method createEl
+  * @method hasStarted
   */
   hasStarted(hasStarted) {
     if (hasStarted !== undefined) {
@@ -699,6 +704,7 @@ class Player extends Component {
 
   /**
    * Fired whenever the media begins or resumes playback
+   *
    * @event play
    */
   handleTechPlay() {
@@ -715,6 +721,7 @@ class Player extends Component {
 
   /**
    * Fired whenever the media begins waiting
+   *
    * @event waiting
    */
   handleTechWaiting() {
@@ -725,6 +732,7 @@ class Player extends Component {
   /**
    * A handler for events that signal that waiting has ended
    * which is not consistent between browsers. See #1351
+   *
    * @event canplay
    */
   handleTechCanPlay() {
@@ -735,6 +743,7 @@ class Player extends Component {
   /**
    * A handler for events that signal that waiting has ended
    * which is not consistent between browsers. See #1351
+   *
    * @event canplaythrough
    */
   handleTechCanPlayThrough() {
@@ -745,6 +754,7 @@ class Player extends Component {
   /**
    * A handler for events that signal that waiting has ended
    * which is not consistent between browsers. See #1351
+   *
    * @event playing
    */
   handleTechPlaying() {
@@ -754,6 +764,7 @@ class Player extends Component {
 
   /**
    * Fired whenever the player is jumping to a new time
+   *
    * @event seeking
    */
   handleTechSeeking() {
@@ -763,6 +774,7 @@ class Player extends Component {
 
   /**
    * Fired when the player has finished jumping to a new time
+   *
    * @event seeked
    */
   handleTechSeeked() {
@@ -792,6 +804,7 @@ class Player extends Component {
 
   /**
    * Fired whenever the media has been paused
+   *
    * @event pause
    */
   handleTechPause() {
@@ -802,6 +815,7 @@ class Player extends Component {
 
   /**
    * Fired while the user agent is downloading media data
+   *
    * @event progress
    */
   handleTechProgress() {
@@ -815,6 +829,7 @@ class Player extends Component {
 
   /**
    * Fired when the end of the media resource is reached (currentTime == duration)
+   *
    * @event ended
    */
   handleTechEnded() {
@@ -831,6 +846,7 @@ class Player extends Component {
 
   /**
    * Fired when the duration of the media resource is first known or changed
+   *
    * @event durationchange
    */
   handleTechDurationChange() {
@@ -871,7 +887,7 @@ class Player extends Component {
   }
 
   /**
-   * Handle ???
+   * Handle touch to start
    *
    * @method handleTechTouchStart
    */
@@ -880,7 +896,7 @@ class Player extends Component {
   }
 
   /**
-   * Handle ???
+   * Handle touch to move
    *
    * @method handleTechTouchMove
    */
@@ -891,7 +907,7 @@ class Player extends Component {
   }
 
   /**
-   * Handle ???
+   * Handle touch to end
    *
    * @method handleTechTouchEnd
    */
@@ -902,6 +918,7 @@ class Player extends Component {
 
   /**
    * Update the duration of the player using the tech
+   *
    * @private
    * @method updateDuration
    */
@@ -926,6 +943,7 @@ class Player extends Component {
 
   /**
    * Fired when the player switches in or out of fullscreen mode
+   *
    * @event fullscreenchange
    */
   handleFullscreenChange() {
@@ -939,14 +957,18 @@ class Player extends Component {
   /**
    * native click events on the SWF aren't triggered on IE11, Win8.1RT
    * use stageclick events triggered from inside the SWF instead
+   *
    * @private
+   * @method handleStageClick
    */
   handleStageClick() {
     this.reportUserActivity();
   }
 
   /**
-  * 
+  * Handle Tech Fullscreen Change
+  *
+  * @method handleTechFullscreenChange
   */
   handleTechFullscreenChange() {
     this.trigger('fullscreenchange');
@@ -954,6 +976,7 @@ class Player extends Component {
 
   /**
    * Fires when an error occurred during the loading of an audio/video
+   *
    * @event error
    */
   handleTechError() {
@@ -962,6 +985,7 @@ class Player extends Component {
 
   /**
    * Fires when the browser is intentionally not getting media data
+   *
    * @event suspend
    */
   handleTechSuspend() {
@@ -970,6 +994,7 @@ class Player extends Component {
 
   /**
    * Fires when the loading of an audio/video is aborted
+   *
    * @event abort
    */
   handleTechAbort() {
@@ -978,6 +1003,7 @@ class Player extends Component {
 
   /**
    * Fires when the current playlist is empty
+   *
    * @event emptied
    */
   handleTechEmptied() {
@@ -986,6 +1012,7 @@ class Player extends Component {
 
   /**
    * Fires when the browser is trying to get media data, but data is not available
+   *
    * @event stalled
    */
   handleTechStalled() {
@@ -994,6 +1021,7 @@ class Player extends Component {
 
   /**
    * Fires when the browser has loaded meta data for the audio/video
+   *
    * @event loadedmetadata
    */
   handleTechLoadedMetaData() {
@@ -1002,6 +1030,7 @@ class Player extends Component {
 
   /**
    * Fires when the browser has loaded the current frame of the audio/video
+   *
    * @event loaddata
    */
   handleTechLoadedData() {
@@ -1010,6 +1039,7 @@ class Player extends Component {
 
   /**
    * Fires when the current playback position has changed
+   *
    * @event timeupdate
    */
   handleTechTimeUpdate() {
@@ -1018,6 +1048,7 @@ class Player extends Component {
 
   /**
    * Fires when the playing speed of the audio/video is changed
+   *
    * @event ratechange
    */
   handleTechRateChange() {
@@ -1026,6 +1057,7 @@ class Player extends Component {
 
   /**
    * Fires when the volume has been changed
+   *
    * @event volumechange
    */
   handleTechVolumeChange() {
@@ -1034,6 +1066,7 @@ class Player extends Component {
 
   /**
    * Fires when the text track has been changed
+   *
    * @event texttrackchange
    */
   onTextTrackChange() {
@@ -1042,6 +1075,8 @@ class Player extends Component {
 
   /**
    * Get object for cached values.
+   *
+   * @return {Object} 
    * @method getCache
    */
   getCache() {
@@ -1076,7 +1111,7 @@ class Player extends Component {
   /**
   * Get calls can't wait for the tech, and sometimes don't need to.
   *
-  * @param {String} method Method
+  * @param {String} method Tech method
   * @return {Method}
   * @method techGet
   */
@@ -1151,10 +1186,11 @@ class Player extends Component {
   /**
   * Returns whether or not the user is "scrubbing". Scrubbing is when the user
   * has clicked the progress bar handle and is dragging it along the progress bar.
+  *
   * @param  {Boolean} isScrubbing   True/false the user is scrubbing
   * @return {Boolean}               The scrubbing status when getting
   * @return {Object}                The player when setting
-   * @method scrubbing
+  * @method scrubbing
   */
   scrubbing(isScrubbing) {
     if (isScrubbing !== undefined) {
@@ -1212,7 +1248,8 @@ class Player extends Component {
    * known, and in the case of Flash, may not be known until the video starts
    * playing.
    *
-   * @return {Number} The duration of the video in seconds
+   * @param {Number} seconds Duration when setting
+   * @return {Number} The duration of the video in seconds when getting
    * @method duration
    */
   duration(seconds) {
@@ -1237,6 +1274,7 @@ class Player extends Component {
    *     var timeLeft = myPlayer.remainingTime();
    *
    * Not a native video element function, but useful
+   *
    * @return {Number} The time remaining in seconds
    * @method remainingTime
    */
@@ -1325,8 +1363,8 @@ class Player extends Component {
    * 0 is off (muted), 1.0 is all the way up, 0.5 is half way.
    *
    * @param  {Number} percentAsDecimal The new volume as a decimal percent
-   * @return {Number}                  The current volume, when getting
-   * @return {Player}              self, when setting
+   * @return {Number}              The current volume when getting
+   * @return {Player}              self when setting
    * @method volume
    */
   volume(percentAsDecimal) {
@@ -1356,8 +1394,8 @@ class Player extends Component {
    *     myPlayer.muted(true); // mute the volume
    *
    * @param  {Boolean=} muted True to mute, false to unmute
-   * @return {Boolean} True if mute is on, false if not, when getting
-   * @return {Player} self, when setting mute
+   * @return {Boolean} True if mute is on, false if not when getting
+   * @return {Player} self when setting mute
    * @method muted
    */
   muted(muted) {
@@ -1370,6 +1408,12 @@ class Player extends Component {
 
   // Check if current tech can support native fullscreen
   // (e.g. with built in controls like iOS, so not our flash swf)
+  /**
+  * Check to see if fullscreen is supported
+  *
+  * @return {Boolean} 
+  * @method supportsFullScreen
+  */
   supportsFullScreen() {
     return this.techGet('supportsFullScreen') || false;
   }
@@ -1388,8 +1432,8 @@ class Player extends Component {
    * still a valuable property for internal player workings.
    *
    * @param  {Boolean=} isFS Update the player's fullscreen state
-   * @return {Boolean} true if fullscreen, false if not
-   * @return {Player} self, when setting
+   * @return {Boolean} true if fullscreen false if not when getting
+   * @return {Player} self when setting
    * @method isFullscreen
    */
   isFullscreen(isFS) {
@@ -1402,7 +1446,12 @@ class Player extends Component {
 
   /**
    * Old naming for isFullscreen()
-   * @deprecated for lowercase 's' version
+   *
+   * @param  {Boolean=} isFS Update the player's fullscreen state
+   * @return {Boolean} true if fullscreen false if not when getting
+   * @return {Player} self when setting
+   * @deprecated
+   * @method isFullscreen
    */
   isFullScreen(isFS) {
     log.warn('player.isFullScreen() has been deprecated, use player.isFullscreen() with a lowercase "s")');
@@ -1467,7 +1516,10 @@ class Player extends Component {
 
   /**
    * Old naming for requestFullscreen
-   * @deprecated for lower case 's' version
+   *
+   * @return {Boolean} true if fullscreen false if not when getting
+   * @deprecated
+   * @method requestFullScreen
    */
   requestFullScreen() {
     log.warn('player.requestFullScreen() has been deprecated, use player.requestFullscreen() with a lowercase "s")');
@@ -1501,7 +1553,10 @@ class Player extends Component {
 
   /**
    * Old naming for exitFullscreen
-   * @deprecated for exitFullscreen
+   *
+   * @return {Player} self
+   * @deprecated
+   * @method cancelFullScreen
    */
   cancelFullScreen() {
     log.warn('player.cancelFullScreen() has been deprecated, use player.exitFullscreen()');
@@ -1693,6 +1748,7 @@ class Player extends Component {
 
   /**
    * Handle an array of source objects
+   *
    * @param  {Array} sources Array of source objects
    * @private
    * @method sourceList_
@@ -1722,6 +1778,7 @@ class Player extends Component {
 
   /**
    * Begin loading the src data.
+   *
    * @return {Player} Returns the player
    * @method load
    */
@@ -1733,6 +1790,7 @@ class Player extends Component {
   /**
    * Returns the fully qualified URL of the current source value e.g. http://mysite.com/video.mp4
    * Can be used in conjuction with `currentType` to assist in rebuilding the current source object.
+   *
    * @return {String} The current source
    * @method currentSrc
    */
@@ -1744,6 +1802,7 @@ class Player extends Component {
    * Get the current source type e.g. video/mp4
    * This can allow you rebuild the current source object so that you could load the same
    * source and tech later
+   *
    * @return {String} The source MIME type
    * @method currentType
    */
@@ -1752,7 +1811,9 @@ class Player extends Component {
   }
 
   /**
-   * Get or set the preload attribute.
+   * Get or set the preload attribute
+   *
+   * @param {Boolean} value Boolean to determine if preload should be used
    * @return {String} The preload attribute value when getting
    * @return {Player} Returns the player when setting
    * @method preload
@@ -1768,6 +1829,8 @@ class Player extends Component {
 
   /**
    * Get or set the autoplay attribute.
+   *
+   * @param {Boolean} value Boolean to determine if preload should be used
    * @return {String} The autoplay attribute value when getting
    * @return {Player} Returns the player when setting
    * @method autoplay
@@ -1783,6 +1846,8 @@ class Player extends Component {
 
   /**
    * Get or set the loop attribute on the video element.
+   *
+   * @param {Boolean} value Boolean to determine if preload should be used
    * @return {String} The loop attribute value when getting
    * @return {Player} Returns the player when setting
    * @method loop
@@ -1807,7 +1872,7 @@ class Player extends Component {
    *     // setting
    *     myPlayer.poster('http://example.com/myImage.jpg');
    *
-   * @param  {String=} [src] Poster image source URL
+   * @param  {String=} src Poster image source URL
    * @return {String} poster URL when getting
    * @return {Player} self when setting
    * @method poster
@@ -1837,7 +1902,8 @@ class Player extends Component {
 
   /**
    * Get or set whether or not the controls are showing.
-   * @param  {Boolean} controls Set controls to showing or not
+   *
+   * @param  {Boolean} bool Set controls to showing or not
    * @return {Boolean}    Controls are showing
    * @method controls
    */
@@ -1966,6 +2032,7 @@ class Player extends Component {
 
   /**
    * Returns whether or not the player is in the "ended" state.
+   *
    * @return {Boolean} True if the player is in the ended state, false if not.
    * @method ended
    */
@@ -1973,6 +2040,7 @@ class Player extends Component {
 
   /**
    * Returns whether or not the player is in the "seeking" state.
+   *
    * @return {Boolean} True if the player is in the seeking state, false if not.
    * @method seeking
    */
@@ -1981,11 +2049,18 @@ class Player extends Component {
   /**
    * Returns the TimeRanges of the media that are currently available
    * for seeking to.
+   *
    * @return {TimeRanges} the seekable intervals of the media timeline
    * @method seekable
    */
   seekable() { return this.techGet('seekable'); }
 
+  /**
+  * Report user activity 
+  *
+  * @param {Object} event Event object
+  * @method reportUserActivity
+  */
   reportUserActivity(event) {
     this.userActivity_ = true;
   }
@@ -1993,8 +2068,8 @@ class Player extends Component {
   /**
   * Get/set if user is active
   *
-  * @param {Boolean} bool Value for setter
-  * @return {Boolean} Value if user is active user
+  * @param {Boolean} bool Value when setting
+  * @return {Boolean} Value if user is active user when getting
   * @method userActive
   */
   userActive(bool) {
@@ -2128,6 +2203,7 @@ class Player extends Component {
    * 1.0 represents normal speed and 0.5 would indicate half-speed
    * playback, for instance.
    * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-playbackrate
+   *
    * @param  {Number} rate    New playback rate to set.
    * @return {Number}         Returns the new playback rate when setting
    * @return {Number}         Returns the current playback rate when getting
@@ -2179,6 +2255,7 @@ class Player extends Component {
    * - NETWORK_NO_SOURCE (numeric value 3)
    *   The element's resource selection algorithm is active, but it has
    *   not yet found a resource to use.
+   *
    * @see https://html.spec.whatwg.org/multipage/embedded-content.html#network-states
    * @return {Number} the current network activity state
    * @method networkState
@@ -2205,6 +2282,7 @@ class Player extends Component {
    * - HAVE_ENOUGH_DATA (numeric value 4)
    *   The user agent estimates that enough data is available for
    *   playback to proceed uninterrupted.
+   *
    * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-readystate
    * @return {Number} the current playback rendering state
    * @method readyState
@@ -2213,7 +2291,7 @@ class Player extends Component {
     return this.techGet('readyState');
   }
 
-  /**
+  /*
    * Text tracks are tracks of timed text events.
    * Captions - text displayed over the video for the hearing impaired
    * Subtitles - text displayed over the video for those who don't understand language in the video
@@ -2224,6 +2302,7 @@ class Player extends Component {
   /**
    * Get an array of associated text tracks. captions, subtitles, chapters, descriptions
    * http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-texttracks
+   *
    * @return {Array}           Array of track objects
    * @method textTracks
    */
@@ -2269,7 +2348,7 @@ class Player extends Component {
   /**
    * Remove a remote text track
    *
-   * @param {Object} trace    Remote text track to remove
+   * @param {Object} track    Remote text track to remove
    * @method removeRemoteTextTrack
    */
   removeRemoteTextTrack(track) {
@@ -2321,7 +2400,7 @@ class Player extends Component {
    *
    * @param {String} code  The locale string
    * @return {String}      The locale string when getting
-   * @return {Player}      self, when setting
+   * @return {Player}      self when setting
    * @method language
    */
   language(code) {
@@ -2337,6 +2416,8 @@ class Player extends Component {
    * Get the player's language dictionary
    * Merge every time, because a newly added plugin might call videojs.addLanguage() at any time
    * Languages specified directly in the player options have precedence
+   *
+   * @return {Array} Array of languages
    * @method languages
    */
   languages() {
@@ -2346,7 +2427,7 @@ class Player extends Component {
   /**
    * Converts track info to JSON
    *
-   * @return {Object} JSON object
+   * @return {Object} JSON object of options
    * @method toJSON
    */
   toJSON() {
@@ -2369,7 +2450,9 @@ class Player extends Component {
 
   /**
   * Gets tag settings
+  *
   * @param {Element} tag The player tag
+  * @return {Array} An array of sources and track objects
   * @static
   * @method getTagSettings
   */
@@ -2416,13 +2499,14 @@ class Player extends Component {
 
 }
 
-/**
+/*
  * Global player list
+ *
  * @type {Object}
  */
 Player.players = {};
 
-/**
+/*
  * Player instance options, surfaced using options
  * options = Player.prototype.options_
  * Make changes in options, not here.
@@ -2435,51 +2519,58 @@ Player.prototype.options_ = globalOptions;
 
 /**
  * Fired when the player has initial duration and dimension information
+ *
  * @event loadedmetadata
  */
 Player.prototype.handleLoadedMetaData;
 
 /**
  * Fired when the player has downloaded data at the current playback position
+ *
  * @event loadeddata
  */
 Player.prototype.handleLoadedData;
 
 /**
  * Fired when the player has finished downloading the source data
+ *
  * @event loadedalldata
  */
 Player.prototype.handleLoadedAllData;
 
 /**
  * Fired when the user is active, e.g. moves the mouse over the player
+ *
  * @event useractive
  */
 Player.prototype.handleUserActive;
 
 /**
  * Fired when the user is inactive, e.g. a short delay after the last mouse move or control interaction
+ *
  * @event userinactive
  */
 Player.prototype.handleUserInactive;
 
 /**
- * Fired when the current playback position has changed
- *
+ * Fired when the current playback position has changed *
  * During playback this is fired every 15-250 milliseconds, depending on the
  * playback technology in use.
+ *
  * @event timeupdate
  */
 Player.prototype.handleTimeUpdate;
 
 /**
  * Fired when the volume changes
+ *
  * @event volumechange
  */
 Player.prototype.handleVolumeChange;
 
 /**
  * Fired when an error occurs
+ *
  * @event error
  */
 Player.prototype.handleError;

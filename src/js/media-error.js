@@ -1,6 +1,6 @@
 import assign from 'object.assign';
 
-/**
+/*
  * Custom MediaError to mimic the HTML5 MediaError
  * @param {Number} code The media error code
  */
@@ -19,14 +19,14 @@ let MediaError = function(code){
   }
 };
 
-/**
+/*
  * The error code that refers two one of the defined
  * MediaError types
  * @type {Number}
  */
 MediaError.prototype.code = 0;
 
-/**
+/*
  * An optional message to be shown with the error.
  * Message is not part of the HTML5 video spec
  * but allows for more informative custom errors.
@@ -34,7 +34,7 @@ MediaError.prototype.code = 0;
  */
 MediaError.prototype.message = '';
 
-/**
+/*
  * An optional status code that can be set by plugins
  * to allow even more detail about the error.
  * For example the HLS plugin might provide the specific

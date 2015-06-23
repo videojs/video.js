@@ -3,8 +3,10 @@ import * as Dom from './utils/dom.js';
 
 /**
  * Display that an error has occurred making the video unplayable
- * @param {Player|Object} player
- * @param {Object=} options
+ *
+ * @param {Object} player  Main Player
+ * @param {Object=} options Object of option names and values
+ * @extends Component
  * @class ErrorDisplay
  */
 class ErrorDisplay extends Component {
