@@ -31,7 +31,7 @@ HTML5 Media Controller - Wrapper for HTML5 Media API
 ##### RETURNS: 
 * `[type]` [description]
 
-_defined in_: [src/js/media/html5.js#L549](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L549)
+_defined in_: [src/js/media/html5.js#L590](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L590)
 
 ---
 
@@ -43,7 +43,7 @@ _defined in_: [src/js/media/html5.js#L549](https://github.com/videojs/video.js/b
 ##### RETURNS: 
 * `Boolean` 
 
-_defined in_: [src/js/media/html5.js#L539](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L539)
+_defined in_: [src/js/media/html5.js#L580](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L580)
 
 ---
 
@@ -64,7 +64,7 @@ _defined in_: [src/js/media/html5.js#L14](https://github.com/videojs/video.js/bl
 ##### RETURNS: 
 * `Boolean` 
 
-_defined in_: [src/js/media/html5.js#L459](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L459)
+_defined in_: [src/js/media/html5.js#L478](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L478)
 
 ---
 
@@ -74,7 +74,7 @@ _defined in_: [src/js/media/html5.js#L459](https://github.com/videojs/video.js/b
 ##### RETURNS: 
 * `Boolean` 
 
-_defined in_: [src/js/media/html5.js#L559](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L559)
+_defined in_: [src/js/media/html5.js#L600](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L600)
 
 ---
 
@@ -88,7 +88,7 @@ _defined in_: [src/js/media/html5.js#L559](https://github.com/videojs/video.js/b
 * __source__ `Object` The source object
 * __tech__ `vjs.Html5` The instance of the HTML5 tech
 
-_defined in_: [src/js/media/html5.js#L479](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L479)
+_defined in_: [src/js/media/html5.js#L520](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L520)
 
 ---
 

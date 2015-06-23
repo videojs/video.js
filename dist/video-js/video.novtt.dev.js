@@ -80,7 +80,7 @@ vjs.ACCESS_PROTOCOL = ('https:' == document.location.protocol ? 'https://' : 'ht
 * Full player version
 * @type {string}
 */
-vjs['VERSION'] = '4.12.9';
+vjs['VERSION'] = '4.12.10';
 
 /**
  * Global Player instance options, surfaced from vjs.Player.prototype.options_
@@ -4931,12 +4931,7 @@ vjs.Player.prototype.load = function(){
  * @return {String} The current source
  */
 vjs.Player.prototype.currentSrc = function(){
-  var techSrc = this.techGet('currentSrc');
-
-  if (techSrc === undefined) {
-    return this.cache_.src || '';
-  }
-  return techSrc;
+  return this.techGet('currentSrc') || this.cache_.src || '';
 };
 
 /**
@@ -6594,8 +6589,6 @@ vjs.MediaTechController = vjs.Component.extend({
       this.emulateTextTracks();
     }
 
-    this.on('loadstart', this.updateCurrentSource_);
-
     this.initTextTrackListeners();
   }
 });
@@ -6726,24 +6719,6 @@ vjs.MediaTechController.prototype.onClick = function(event){
  */
 vjs.MediaTechController.prototype.onTap = function(){
   this.player().userActive(!this.player().userActive());
-};
-
-/**
- * Set currentSource_ asynchronously to simulate the media element's
- * asynchronous execution of the `resource selection algorithm`
- *
- * currentSource_ is set either as the first loadstart event OR
- * in a timeout to make sure it is set asynchronously before anything else
- * but before other loadstart handlers have had a chance to execute
- */
-vjs.MediaTechController.prototype.updateCurrentSource_ = function () {
-  // We could have been called with a 0-ms setTimeout OR via loadstart (which ever
-  // happens first) so we should clear the timeout to be a good citizen
-  this.clearTimeout(this.updateSourceTimer_);
-
-  if (this.pendingSource_) {
-    this.currentSource_ = this.pendingSource_;
-  }
 };
 
 /* Fallbacks for unsupported event types
@@ -7004,8 +6979,6 @@ vjs.MediaTechController.prototype['featuresNativeTextTracks'] = false;
  *
  */
 vjs.MediaTechController.withSourceHandlers = function(Tech){
-  Tech.prototype.currentSource_ = {src: ''};
-
   /**
    * Register a source handler
    * Source handlers are scripts for handling specific formats.
@@ -7090,12 +7063,7 @@ vjs.MediaTechController.withSourceHandlers = function(Tech){
     this.disposeSourceHandler();
     this.off('dispose', this.disposeSourceHandler);
 
-    // Schedule currentSource_ to be set asynchronously
-    if (source && source.src !== '') {
-      this.pendingSource_ = source;
-      this.updateSourceTimer_ = this.setTimeout(vjs.bind(this, this.updateCurrentSource_), 0);
-    }
-
+    this.currentSource_ = source;
     this.sourceHandler_ = sh.handleSource(source, this);
     this.on('dispose', this.disposeSourceHandler);
 
@@ -7432,10 +7400,27 @@ vjs.Html5.prototype.exitFullScreen = function(){
   this.el_.webkitExitFullScreen();
 };
 
+// Checks to see if the element's reported URI (either from `el_.src`
+// or `el_.currentSrc`) is a blob-uri and, if so, returns the uri that
+// was passed into the source-handler when it was first invoked instead
+// of the blob-uri
+vjs.Html5.prototype.returnOriginalIfBlobURI_ = function (elementURI, originalURI) {
+  var blobURIRegExp = /^blob\:/i;
+
+  // If originalURI is undefined then we are probably in a non-source-handler-enabled
+  // tech that inherits from the Html5 tech so we should just return the elementURI
+  // regardless of it's blobby-ness
+  if (originalURI && elementURI && blobURIRegExp.test(elementURI)) {
+    return originalURI;
+  }
+  return elementURI;
+};
 
 vjs.Html5.prototype.src = function(src) {
+  var elementSrc = this.el_.src;
+
   if (src === undefined) {
-    return this.el_.src;
+    return this.returnOriginalIfBlobURI_(elementSrc, this.source_);
   } else {
     // Setting src through `src` instead of `setSrc` will be deprecated
     this.setSrc(src);
@@ -7448,11 +7433,13 @@ vjs.Html5.prototype.setSrc = function(src) {
 
 vjs.Html5.prototype.load = function(){ this.el_.load(); };
 vjs.Html5.prototype.currentSrc = function(){
-  if (this.currentSource_) {
-    return this.currentSource_.src;
-  } else {
-    return this.el_.currentSrc;
+  var elementSrc = this.el_.currentSrc;
+
+  if (!this.currentSource_) {
+    return elementSrc;
   }
+
+  return this.returnOriginalIfBlobURI_(elementSrc, this.currentSource_.src);
 };
 
 vjs.Html5.prototype.poster = function(){ return this.el_.poster; };
@@ -7587,6 +7574,28 @@ vjs.Html5.isSupported = function(){
 
 // Add Source Handler pattern functions to this tech
 vjs.MediaTechController.withSourceHandlers(vjs.Html5);
+
+/*
+ * Override the withSourceHandler mixin's methods with our own because
+ * the HTML5 Media Element returns blob urls when utilizing MSE and we
+ * want to still return proper source urls even when in that case
+ */
+(function(){
+  var
+    origSetSource = vjs.Html5.prototype.setSource,
+    origDisposeSourceHandler = vjs.Html5.prototype.disposeSourceHandler;
+
+  vjs.Html5.prototype.setSource = function (source) {
+    var retVal = origSetSource.call(this, source);
+    this.source_ = source.src;
+    return retVal;
+  };
+
+  vjs.Html5.prototype.disposeSourceHandler = function () {
+    this.source_ = undefined;
+    return origDisposeSourceHandler.call(this);
+  };
+})();
 
 /**
  * The default native source handler.
