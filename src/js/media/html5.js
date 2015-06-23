@@ -314,20 +314,27 @@ vjs.Html5.prototype.exitFullScreen = function(){
   this.el_.webkitExitFullScreen();
 };
 
-vjs.Html5.prototype.returnFakeIfBlobURI_ = function (realValue, fakeValue) {
+// Checks to see if the element's reported URI (either from `el_.src`
+// or `el_.currentSrc`) is a blob-uri and, if so, returns the uri that
+// was passed into the source-handler when it was first invoked instead
+// of the blob-uri
+vjs.Html5.prototype.returnOriginalIfBlobURI_ = function (elementURI, originalURI) {
   var blobURIRegExp = /^blob\:/i;
 
-  if (realValue && blobURIRegExp.test(realValue)) {
-    return fakeValue;
+  // If originalURI is undefined then we are probably in a non-source-handler-enabled
+  // tech that inherits from the Html5 tech so we should just return the elementURI
+  // regardless of it's blobby-ness
+  if (!originalURI || (elementURI && blobURIRegExp.test(elementURI))) {
+    return elementURI;
   }
-  return realValue;
+  return originalURI;
 };
 
 vjs.Html5.prototype.src = function(src) {
-  var realSrc = this.el_.src;
+  var elementSrc = this.el_.src;
 
   if (src === undefined) {
-    return this.returnFakeIfBlobURI_(realSrc, this.source_);
+    return this.returnOriginalIfBlobURI_(elementSrc, this.source_);
   } else {
     // Setting src through `src` instead of `setSrc` will be deprecated
     this.setSrc(src);
@@ -340,13 +347,13 @@ vjs.Html5.prototype.setSrc = function(src) {
 
 vjs.Html5.prototype.load = function(){ this.el_.load(); };
 vjs.Html5.prototype.currentSrc = function(){
-  var realSrc = this.el_.currentSrc;
+  var elementSrc = this.el_.currentSrc;
 
   if (!this.currentSource_) {
-    return realSrc;
+    return elementSrc;
   }
 
-  return this.returnFakeIfBlobURI_(realSrc, this.currentSource_.src);
+  return this.returnOriginalIfBlobURI_(elementSrc, this.currentSource_.src);
 };
 
 vjs.Html5.prototype.poster = function(){ return this.el_.poster; };
