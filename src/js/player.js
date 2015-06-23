@@ -1228,12 +1228,7 @@ vjs.Player.prototype.load = function(){
  * @return {String} The current source
  */
 vjs.Player.prototype.currentSrc = function(){
-  var techSrc = this.techGet('currentSrc');
-
-  if (techSrc === undefined) {
-    return this.cache_.src || '';
-  }
-  return techSrc;
+  return this.techGet('currentSrc') || this.cache_.src || '';
 };
 
 /**

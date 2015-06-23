@@ -214,3 +214,21 @@ test('native source handler canHandleSource', function(){
   // Reset test video canPlayType
   vjs.TEST_VID.canPlayType = origCPT;
 });
+
+test('handling of blob URIs with a source handler', function(){
+  var origEl = tech.el_;
+
+  // Override element
+  tech.el_ = {};
+
+  tech.setSource({ type: 'video/mp4', src: 'video.flv' });
+  equal(tech.src(), 'video.flv', 'el_.src is properly set');
+
+  tech.el_.src = 'http://url';
+  equal(tech.src(), 'http://url', 'el_.src is returned if not a blob uri');
+
+  tech.el_.src = 'blob:http://blob-url';
+  equal(tech.src(), 'video.flv', 'original src set via setSource is returned if el_.src is a blob uri');
+
+  tech.el_ = origEl;
+});

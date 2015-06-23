@@ -314,10 +314,27 @@ vjs.Html5.prototype.exitFullScreen = function(){
   this.el_.webkitExitFullScreen();
 };
 
+// Checks to see if the element's reported URI (either from `el_.src`
+// or `el_.currentSrc`) is a blob-uri and, if so, returns the uri that
+// was passed into the source-handler when it was first invoked instead
+// of the blob-uri
+vjs.Html5.prototype.returnOriginalIfBlobURI_ = function (elementURI, originalURI) {
+  var blobURIRegExp = /^blob\:/i;
+
+  // If originalURI is undefined then we are probably in a non-source-handler-enabled
+  // tech that inherits from the Html5 tech so we should just return the elementURI
+  // regardless of it's blobby-ness
+  if (originalURI && elementURI && blobURIRegExp.test(elementURI)) {
+    return originalURI;
+  }
+  return elementURI;
+};
 
 vjs.Html5.prototype.src = function(src) {
+  var elementSrc = this.el_.src;
+
   if (src === undefined) {
-    return this.el_.src;
+    return this.returnOriginalIfBlobURI_(elementSrc, this.source_);
   } else {
     // Setting src through `src` instead of `setSrc` will be deprecated
     this.setSrc(src);
@@ -330,11 +347,13 @@ vjs.Html5.prototype.setSrc = function(src) {
 
 vjs.Html5.prototype.load = function(){ this.el_.load(); };
 vjs.Html5.prototype.currentSrc = function(){
-  if (this.currentSource_) {
-    return this.currentSource_.src;
-  } else {
-    return this.el_.currentSrc;
+  var elementSrc = this.el_.currentSrc;
+
+  if (!this.currentSource_) {
+    return elementSrc;
   }
+
+  return this.returnOriginalIfBlobURI_(elementSrc, this.currentSource_.src);
 };
 
 vjs.Html5.prototype.poster = function(){ return this.el_.poster; };
@@ -469,6 +488,28 @@ vjs.Html5.isSupported = function(){
 
 // Add Source Handler pattern functions to this tech
 vjs.MediaTechController.withSourceHandlers(vjs.Html5);
+
+/*
+ * Override the withSourceHandler mixin's methods with our own because
+ * the HTML5 Media Element returns blob urls when utilizing MSE and we
+ * want to still return proper source urls even when in that case
+ */
+(function(){
+  var
+    origSetSource = vjs.Html5.prototype.setSource,
+    origDisposeSourceHandler = vjs.Html5.prototype.disposeSourceHandler;
+
+  vjs.Html5.prototype.setSource = function (source) {
+    var retVal = origSetSource.call(this, source);
+    this.source_ = source.src;
+    return retVal;
+  };
+
+  vjs.Html5.prototype.disposeSourceHandler = function () {
+    this.source_ = undefined;
+    return origDisposeSourceHandler.call(this);
+  };
+})();
 
 /**
  * The default native source handler.
