@@ -1451,7 +1451,7 @@ class Player extends Component {
    * @return {Boolean} true if fullscreen false if not when getting
    * @return {Player} self when setting
    * @deprecated
-   * @method isFullscreen
+   * @method isFullScreen
    */
   isFullScreen(isFS) {
     log.warn('player.isFullScreen() has been deprecated, use player.isFullscreen() with a lowercase "s")');
