@@ -1,3 +1,6 @@
+/**
+ * @file Needed for full path retrieval
+ */
 // Subclasses Component
 import Component from './component.js';
 

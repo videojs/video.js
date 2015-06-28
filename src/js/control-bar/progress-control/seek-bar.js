@@ -1,3 +1,6 @@
+/**
+ * @file Needed for full path retrieval
+ */
 import Slider from '../../slider/slider.js';
 import Component from '../../component.js';
 import LoadProgressBar from './load-progress-bar.js';

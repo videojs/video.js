@@ -1,5 +1,5 @@
 /**
- * @fileoverview Player Component - Base class for all UI objects
+ * @file Player Component - Base class for all UI objects
  *
  */
 

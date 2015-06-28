@@ -1,3 +1,6 @@
+/**
+ * @file Needed for full path retrieval
+ */
 import MenuButton from '../../menu/menu-button.js';
 import Menu from '../../menu/menu.js';
 import PlaybackRateMenuItem from './playback-rate-menu-item.js';

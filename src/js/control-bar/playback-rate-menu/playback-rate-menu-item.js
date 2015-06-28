@@ -1,3 +1,6 @@
+/**
+ * @file Needed for full path retrieval
+ */
 import MenuItem from '../../menu/menu-item.js';
 import Component from '../../component.js';
 

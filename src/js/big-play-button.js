@@ -1,3 +1,6 @@
+/**
+ * @file Needed for full path retrieval
+ */
 import Button from './button.js';
 import Component from './component.js';
 

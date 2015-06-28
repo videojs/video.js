@@ -1,3 +1,6 @@
+/**
+ * @file Needed for full path retrieval
+ */
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 
