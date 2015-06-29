@@ -14,7 +14,7 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
     options['track'] = {
       'kind': options['kind'],
       'player': player,
-      'label': options['kind'] + ' off',
+      'label': options['label'] || (options['kind'] + ' off'),
       'default': false,
       'mode': 'disabled'
     };
