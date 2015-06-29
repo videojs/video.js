@@ -1,8 +1,8 @@
 .video-js .vjs-big-play-button {
   font-size: 3em;
-  line-height: 1.5em;
-  height: 1.5em;
-  width: 3em; // Firefox bug: For some reason without width the icon wouldn't show up. Switched to using width and removed padding.
+  line-height: $big-play-button--height;
+  height: $big-play-button--height;
+  width: $big-play-button--width; // Firefox bug: For some reason without width the icon wouldn't show up. Switched to using width and removed padding.
   display: block;
   z-index: 2;
   position: absolute;
@@ -13,8 +13,8 @@
   opacity: 1;
   border: 2px solid $primary-text;
 
-  /* Need a slightly gray bg so it can be seen on black backgrounds *///
-  @include background-color-with-alpha($primary-bg, 0.8);
+  /* Need a slightly gray bg so it can be seen on black backgrounds */
+  @include background-color-with-alpha($primary-bg, $big-play-button--transparency);
   @include border-radius(0.3em);
   @include transition(all 0.4s);
 
@@ -23,11 +23,19 @@
   // Since the big play button doesn't inherit from vjs-control, we need to specify a bit more than
   // other buttons for the icon.
   &:before {
-    @extend %icon-default
+    @extend %icon-default;
   }
 }
 
-/* Hide if controls are disabled, the video is playing, or native controls are used. */
+// Allow people that hate their poster image to center the big play button.
+.video-js.vjs-big-play-centered .vjs-big-play-button {
+  top: 50%;
+  left: 50%;
+  margin-top: -($big-play-button--height / 2);
+  margin-left: -($big-play-button--width / 2);
+}
+
+// Hide if controls are disabled, the video is playing, or native controls are used.
 .video-js.vjs-controls-disabled .vjs-big-play-button,
 .video-js.vjs-has-started .vjs-big-play-button,
 .video-js.vjs-using-native-controls .vjs-big-play-button {
