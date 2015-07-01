@@ -21,7 +21,7 @@
   },
   "main": "./dist/video-js/video.js",
   "dependencies": {
-    "videojs-swf": "4.7.1",
+    "videojs-swf": "4.7.2",
     "vtt.js": "git+https://github.com/gkatsev/vtt.js.git#shim-build"
   },
   "devDependencies": {
