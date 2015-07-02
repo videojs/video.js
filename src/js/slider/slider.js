@@ -1,19 +1,20 @@
+/**
+* @file slider.js
+*/
 import Component from '../component.js';
 import * as Dom from '../utils/dom.js';
 import roundFloat from '../utils/round-float.js';
 import document from 'global/document';
 import assign from 'object.assign';
 
-/* Slider
-================================================================================ */
 /**
- * The base functionality for sliders like the volume bar and seek bar
- *
- * @param {Player|Object} player
- * @param {Object=} options
- * @extends Component
- * @class Slider
- */
+* The base functionality for sliders like the volume bar and seek bar
+*
+* @param {Player|Object} player
+* @param {Object=} options
+* @extends Component
+* @class Slider
+*/
 class Slider extends Component {
 
   constructor(player, options) {
@@ -230,8 +231,8 @@ class Slider extends Component {
   }
 
   /**
-   * Listener for click events on slider, used to prevent clicks
-   *   from bubbling up to parent elements like button menus.
+  * Listener for click events on slider, used to prevent clicks
+  *   from bubbling up to parent elements like button menus.
   *
   * @param {Object} event Event object
   * @method handleClick

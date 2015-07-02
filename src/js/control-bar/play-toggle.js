@@ -1,14 +1,17 @@
+/**
+* @file play-toggle.js
+*/
 import Button from '../button.js';
 import Component from '../component.js';
 
 /**
- * Button to toggle between play and pause
- *
- * @param {Player|Object} player
- * @param {Object=} options
- * @extends Button
- * @class PlayToggle
- */
+* Button to toggle between play and pause
+*
+* @param {Player|Object} player
+* @param {Object=} options
+* @extends Button
+* @class PlayToggle
+*/
 class PlayToggle extends Button {
 
   constructor(player, options){

@@ -1,3 +1,6 @@
+/**
+* @file volume-menu-button.js
+*/
 import Button from '../button.js';
 import Component from '../component.js';
 import Menu from '../menu/menu.js';
@@ -6,13 +9,13 @@ import MuteToggle from './mute-toggle.js';
 import VolumeBar from './volume-control/volume-bar.js';
 
 /**
- * Base class for all buttons
- *
- * @param {Player|Object} player
- * @param {Object=} options
- * @extends MenuButton
- * @class VolumeMenuButton
- */
+* Button for volume menu
+*
+* @param {Player|Object} player
+* @param {Object=} options
+* @extends MenuButton
+* @class VolumeMenuButton
+*/
 class VolumeMenuButton extends MenuButton {
 
   constructor(player, options){

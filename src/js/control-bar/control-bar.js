@@ -1,3 +1,6 @@
+/**
+* @file control-bar.js
+*/
 import Component from '../component.js';
 
 // Required children
@@ -19,11 +22,11 @@ import PlaybackRateMenuButton from './playback-rate-menu/playback-rate-menu-butt
 import CustomControlSpacer from './spacer-controls/custom-control-spacer.js';
 
 /**
- * Container of main controls
- *
- * @extends Component
- * @class ControlBar
- */
+* Container of main controls
+*
+* @extends Component
+* @class ControlBar
+*/
 class ControlBar extends Component {
 
   /**

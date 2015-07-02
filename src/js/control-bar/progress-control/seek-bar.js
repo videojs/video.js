@@ -1,6 +1,6 @@
 /**
- * @file Needed for full path retrieval
- */
+* @file seek-bar.js
+*/
 import Slider from '../../slider/slider.js';
 import Component from '../../component.js';
 import LoadProgressBar from './load-progress-bar.js';
@@ -10,13 +10,13 @@ import formatTime from '../../utils/format-time.js';
 import roundFloat from '../../utils/round-float.js';
 
 /**
- * Seek Bar and holder for the progress bars
- *
- * @param {Player|Object} player
- * @param {Object=} options
- * @extends Slider
- * @class SeekBar
- */
+* Seek Bar and holder for the progress bars
+*
+* @param {Player|Object} player
+* @param {Object=} options
+* @extends Slider
+* @class SeekBar
+*/
 class SeekBar extends Slider {
 
   constructor(player, options){

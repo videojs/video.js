@@ -1,12 +1,15 @@
+/**
+* @file custom-control-spacer.js
+*/
 import Spacer from './spacer.js';
 import Component from '../../component.js';
 
 /**
- * Spacer specifically meant to be used as an insertion point for new plugins, etc.
- *
- * @extends Spacer
- * @class CustomControlSpacer
- */
+* Spacer specifically meant to be used as an insertion point for new plugins, etc.
+*
+* @extends Spacer
+* @class CustomControlSpacer
+*/
 class CustomControlSpacer extends Spacer {
 
   /**

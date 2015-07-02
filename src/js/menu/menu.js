@@ -1,20 +1,18 @@
 /**
- * @file Needed for full path retrieval
- */
+* @file menu.js
+*/
 import Component from '../component.js';
 import * as Dom from '../utils/dom.js';
 import * as Fn from '../utils/fn.js';
 import * as Events from '../utils/events.js';
 
-/* Menu
-================================================================================ */
 /**
- * The Menu component is used to build pop up menus, including subtitle and
- * captions selection menus.
- *
- * @extends Component
- * @class Menu
- */
+* The Menu component is used to build pop up menus, including subtitle and
+* captions selection menus.
+*
+* @extends Component
+* @class Menu
+*/
 class Menu extends Component {
 
   /**

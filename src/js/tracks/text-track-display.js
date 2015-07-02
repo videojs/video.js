@@ -1,3 +1,6 @@
+/**
+* @file text-track-display.js
+*/
 import Component from '../component';
 import Menu from '../menu/menu.js';
 import MenuItem from '../menu/menu-item.js';
@@ -22,14 +25,14 @@ const fontMap = {
 };
 
 /**
- * The component for displaying text track cues
- *
- * @param {Object} player  Main Player
- * @param {Object=} options Object of option names and values
- * @param {Function=} ready    Ready callback function
- * @extends Component
- * @class TextTrackDisplay
- */
+* The component for displaying text track cues
+*
+* @param {Object} player  Main Player
+* @param {Object=} options Object of option names and values
+* @param {Function=} ready    Ready callback function
+* @extends Component
+* @class TextTrackDisplay
+*/
 class TextTrackDisplay extends Component {
 
   constructor(player, options, ready){

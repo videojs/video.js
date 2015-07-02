@@ -1,14 +1,17 @@
+/**
+* @file current-time-display.js
+*/
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 import formatTime from '../../utils/format-time.js';
 
 /**
- * Displays the current time
- * @param {Player|Object} player
- * @param {Object=} options
- * @extends Component
- * @class CurrentTimeDisplay
- */
+* Displays the current time
+* @param {Player|Object} player
+* @param {Object=} options
+* @extends Component
+* @class CurrentTimeDisplay
+*/
 class CurrentTimeDisplay extends Component {
 
   constructor(player, options){

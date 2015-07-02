@@ -1,14 +1,17 @@
+/**
+* @file remaining-time-display.js
+*/
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 import formatTime from '../../utils/format-time.js';
 
 /**
- * Displays the time left in the video
- * @param {Player|Object} player
- * @param {Object=} options
- * @extends Component
- * @class RemainingTimeDisplay
- */
+* Displays the time left in the video
+* @param {Player|Object} player
+* @param {Object=} options
+* @extends Component
+* @class RemainingTimeDisplay
+*/
 class RemainingTimeDisplay extends Component {
 
   constructor(player, options){

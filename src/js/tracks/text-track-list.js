@@ -1,21 +1,24 @@
+/**
+* @file text-track-list.js
+*/
 import EventEmitter from '../event-emitter';
 import * as Fn from '../utils/fn.js';
 import * as browser from '../utils/browser.js';
 import document from 'global/document';
 
 /*
- * https://html.spec.whatwg.org/multipage/embedded-content.html#texttracklist
- *
- * interface TextTrackList : EventTarget {
- *   readonly attribute unsigned long length;
- *   getter TextTrack (unsigned long index);
- *   TextTrack? getTrackById(DOMString id);
- *
- *   attribute EventHandler onchange;
- *   attribute EventHandler onaddtrack;
- *   attribute EventHandler onremovetrack;
- * };
- */
+* https://html.spec.whatwg.org/multipage/embedded-content.html#texttracklist
+*
+* interface TextTrackList : EventTarget {
+*   readonly attribute unsigned long length;
+*   getter TextTrack (unsigned long index);
+*   TextTrack? getTrackById(DOMString id);
+*
+*   attribute EventHandler onchange;
+*   attribute EventHandler onaddtrack;
+*   attribute EventHandler onremovetrack;
+* };
+*/
 let TextTrackList = function(tracks) {
   let list = this;
 

@@ -1,16 +1,16 @@
 /**
- * @file Needed for full path retrieval
- */
+* @file play-progress-bar.js
+*/
 import Component from '../../component.js';
 
 /**
- * Shows play progress
- *
- * @param {Player|Object} player
- * @param {Object=} options
- * @extends Component
- * @class PlayProgressBar
- */
+* Shows play progress
+*
+* @param {Player|Object} player
+* @param {Object=} options
+* @extends Component
+* @class PlayProgressBar
+*/
 class PlayProgressBar extends Component {
 
   /**

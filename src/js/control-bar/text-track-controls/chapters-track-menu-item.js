@@ -1,15 +1,18 @@
+/**
+* @file chapters-track-menu-item.js
+*/
 import MenuItem from '../../menu/menu-item.js';
 import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
 
 /**
- * The chapter track menu item
- *
- * @param {Player|Object} player
- * @param {Object=} options
- * @extends MenuItem
- * @class ChaptersTrackMenuItem
- */
+* The chapter track menu item
+*
+* @param {Player|Object} player
+* @param {Object=} options
+* @extends MenuItem
+* @class ChaptersTrackMenuItem
+*/
 class ChaptersTrackMenuItem extends MenuItem {
 
   constructor(player, options){
@@ -27,7 +30,7 @@ class ChaptersTrackMenuItem extends MenuItem {
     track.addEventListener('cuechange', Fn.bind(this, this.update));
   }
 
- /**
+  /**
   * Handle click on menu item
   *
   * @method handleClick
@@ -38,7 +41,7 @@ class ChaptersTrackMenuItem extends MenuItem {
     this.update(this.cue.startTime);
   }
 
- /**
+  /**
   * Update chapter menu item
   *
   * @method update

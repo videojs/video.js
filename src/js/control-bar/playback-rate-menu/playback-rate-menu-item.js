@@ -1,17 +1,17 @@
 /**
- * @file Needed for full path retrieval
- */
+* @file playback-rate-menu-item.js
+*/
 import MenuItem from '../../menu/menu-item.js';
 import Component from '../../component.js';
 
 /**
- * The specific menu item type for selecting a playback rate
- *
- * @param {Player|Object} player
- * @param {Object=} options
- * @extends MenuItem
- * @class PlaybackRateMenuItem
- */
+* The specific menu item type for selecting a playback rate
+*
+* @param {Player|Object} player
+* @param {Object=} options
+* @extends MenuItem
+* @class PlaybackRateMenuItem
+*/
 class PlaybackRateMenuItem extends MenuItem {
 
   constructor(player, options){

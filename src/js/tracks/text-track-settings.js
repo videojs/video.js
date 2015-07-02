@@ -1,3 +1,6 @@
+/**
+* @file text-track-settings.js
+*/
 import Component from '../component';
 import * as Events from '../utils/events.js';
 import * as Fn from '../utils/fn.js';
@@ -6,13 +9,13 @@ import safeParseTuple from 'safe-json-parse/tuple';
 import window from 'global/window';
 
 /**
- * Manipulate settings of texttracks
- *
- * @param {Object} player  Main Player
- * @param {Object=} options Object of option names and values
- * @extends Component
- * @class TextTrackSettings
- */
+* Manipulate settings of texttracks
+*
+* @param {Object} player  Main Player
+* @param {Object=} options Object of option names and values
+* @extends Component
+* @class TextTrackSettings
+*/
 class TextTrackSettings extends Component {
 
   constructor(player, options) {

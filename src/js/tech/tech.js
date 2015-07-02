@@ -1,7 +1,8 @@
 /**
- * @fileoverview Media Technology Controller - Base class for media playback
- * technology controllers like Flash and HTML5
- */
+* @file tech.js
+* Media Technology Controller - Base class for media playback
+* technology controllers like Flash and HTML5
+*/
 
 import Component from '../component';
 import TextTrack from '../tracks/text-track';
@@ -14,13 +15,13 @@ import window from 'global/window';
 import document from 'global/document';
 
 /**
- * Base class for media (HTML5 Video, Flash) controllers
- *
- * @param {Object=} options Options object
- * @param {Function=} ready Ready callback function
- * @extends Component
- * @class Tech
- */
+* Base class for media (HTML5 Video, Flash) controllers
+*
+* @param {Object=} options Options object
+* @param {Function=} ready Ready callback function
+* @extends Component
+* @class Tech
+*/
 class Tech extends Component {
 
   constructor(options={}, ready=function(){}){
@@ -58,27 +59,27 @@ class Tech extends Component {
   }
 
   /**
-   * Set up click and touch listeners for the playback element
-   * On desktops, a click on the video itself will toggle playback,
-   * on a mobile device a click on the video toggles controls.
-   * (toggling controls is done by toggling the user state between active and
-   * inactive)
-   *
-   * A tap can signal that a user has become active, or has become inactive
-   * e.g. a quick tap on an iPhone movie should reveal the controls. Another
-   * quick tap should hide them again (signaling the user is in an inactive
-   * viewing state)
-   *
-   * In addition to this, we still want the user to be considered inactive after
-   * a few seconds of inactivity.
-   *
-   * Note: the only part of iOS interaction we can't mimic with this setup
-   * is a touch and hold on the video element counting as activity in order to
-   * keep the controls showing, but that shouldn't be an issue. A touch and hold on
-   * any controls will still keep the user active
-   *
-   * @method initControlsListeners
-   */
+  * Set up click and touch listeners for the playback element
+  * On desktops, a click on the video itself will toggle playback,
+  * on a mobile device a click on the video toggles controls.
+  * (toggling controls is done by toggling the user state between active and
+  * inactive)
+  *
+  * A tap can signal that a user has become active, or has become inactive
+  * e.g. a quick tap on an iPhone movie should reveal the controls. Another
+  * quick tap should hide them again (signaling the user is in an inactive
+  * viewing state)
+  *
+  * In addition to this, we still want the user to be considered inactive after
+  * a few seconds of inactivity.
+  *
+  * Note: the only part of iOS interaction we can't mimic with this setup
+  * is a touch and hold on the video element counting as activity in order to
+  * keep the controls showing, but that shouldn't be an issue. A touch and hold on
+  * any controls will still keep the user active
+  *
+  * @method initControlsListeners
+  */
   initControlsListeners() {
     // if we're loading the playback object after it has started loading or playing the
     // video (often with autoplay on) then the loadstart event has already fired and we
@@ -322,10 +323,10 @@ class Tech extends Component {
   }
 
   /*
-   * Provide default methods for text tracks.
-   *
-   * Html5 tech overrides these.
-   */
+  * Provide default methods for text tracks.
+  *
+  * Html5 tech overrides these.
+  */
 
   /**
   * Get texttracks 
@@ -395,12 +396,12 @@ class Tech extends Component {
   }
 
   /**
-   * Provide a default setPoster method for techs
-   * Poster support for techs should be optional, so we don't want techs to
-   * break if they don't have a way to set a poster.
-   *
-   * @method setPoster
-   */
+  * Provide a default setPoster method for techs
+  * Poster support for techs should be optional, so we don't want techs to
+  * break if they don't have a way to set a poster.
+  *
+  * @method setPoster
+  */
   setPoster() {}
 
 }
@@ -445,15 +446,15 @@ Tech.prototype.featuresTimeupdateEvents = false;
 Tech.prototype.featuresNativeTextTracks = false;
 
 /*
- * A functional mixin for techs that want to use the Source Handler pattern.
- *
- * ##### EXAMPLE:
- *
- *   Tech.withSourceHandlers.call(MyTech);
- *
- */
+* A functional mixin for techs that want to use the Source Handler pattern.
+*
+* ##### EXAMPLE:
+*
+*   Tech.withSourceHandlers.call(MyTech);
+*
+*/
 Tech.withSourceHandlers = function(_Tech){
-  /*
+   /*
    * Register a source handler
    * Source handlers are scripts for handling specific formats.
    * The source handler pattern is used for adaptive formats (HLS, DASH) that
@@ -476,7 +477,7 @@ Tech.withSourceHandlers = function(_Tech){
     handlers.splice(index, 0, handler);
   };
 
-  /*
+   /*
    * Return the first source handler that supports the source
    * TODO: Answer question: should 'probably' be prioritized over 'maybe'
    * @param  {Object} source The source object
@@ -513,7 +514,7 @@ Tech.withSourceHandlers = function(_Tech){
     return '';
   };
 
-  /*
+   /*
    * Create a function for setting the source using a source object
    * and source handlers.
    * Should never be called unless a source handler was found.
@@ -544,7 +545,7 @@ Tech.withSourceHandlers = function(_Tech){
     return this;
   };
 
-  /*
+   /*
    * Clean up any existing source handler
    */
    _Tech.prototype.disposeSourceHandler = function(){

@@ -1,3 +1,6 @@
+/**
+* @file flash-rtmp.js
+*/
 function FlashRtmpDecorator(Flash) {
   Flash.streamingFormats = {
     'rtmp/mp4': 'MP4',

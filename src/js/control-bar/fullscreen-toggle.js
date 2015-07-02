@@ -1,12 +1,15 @@
+/**
+* @file fullscreen-toggle.js
+*/
 import Button from '../button.js';
 import Component from '../component.js';
 
 /**
- * Toggle fullscreen video
- *
- * @extends Button
- * @class FullscreenToggle
- */
+* Toggle fullscreen video
+*
+* @extends Button
+* @class FullscreenToggle
+*/
 class FullscreenToggle extends Button {
 
   /**

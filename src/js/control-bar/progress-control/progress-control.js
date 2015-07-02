@@ -1,18 +1,18 @@
 /**
- * @file Needed for full path retrieval
- */
+* @file progress-control.js
+*/
 import Component from '../../component.js';
 import SeekBar from './seek-bar.js';
 
 /**
- * The Progress Control component contains the seek bar, load progress,
- * and play progress
- *
- * @param {Player|Object} player
- * @param {Object=} options
- * @extends Component
- * @class ProgressControl
- */
+* The Progress Control component contains the seek bar, load progress,
+* and play progress
+*
+* @param {Player|Object} player
+* @param {Object=} options
+* @extends Component
+* @class ProgressControl
+*/
 class ProgressControl extends Component {
 
   /**

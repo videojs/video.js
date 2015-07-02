@@ -1,13 +1,16 @@
+/**
+* @file live-display.js
+*/
 import Component from '../component';
 import * as Dom from '../utils/dom.js';
 
 /**
- * Displays the live indicator
- * TODO - Future make it click to snap to live
- * 
- * @extends Component
- * @class LiveDisplay
- */
+* Displays the live indicator
+* TODO - Future make it click to snap to live
+* 
+* @extends Component
+* @class LiveDisplay
+*/
 class LiveDisplay extends Component {
 
   /**

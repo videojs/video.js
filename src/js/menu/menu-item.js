@@ -1,18 +1,18 @@
 /**
- * @file Needed for full path retrieval
- */
+* @file menu-item.js
+*/
 import Button from '../button.js';
 import Component from '../component.js';
 import assign from 'object.assign';
 
 /**
- * The component for a menu item. `<li>`
- *
- * @param {Player|Object} player
- * @param {Object=} options
- * @extends Button
- * @class MenuItem
- */
+* The component for a menu item. `<li>`
+*
+* @param {Player|Object} player
+* @param {Object=} options
+* @extends Button
+* @class MenuItem
+*/
 class MenuItem extends Button {
 
   constructor(player, options) {

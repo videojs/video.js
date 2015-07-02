@@ -1,17 +1,17 @@
 /**
- * @file Needed for full path retrieval
- */
+* @file load-progress-bar.js
+*/
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 
 /**
- * Shows load progress
- *
- * @param {Player|Object} player
- * @param {Object=} options
- * @extends Component
- * @class LoadProgressBar
- */
+* Shows load progress
+*
+* @param {Player|Object} player
+* @param {Object=} options
+* @extends Component
+* @class LoadProgressBar
+*/
 class LoadProgressBar extends Component {
 
   constructor(player, options){

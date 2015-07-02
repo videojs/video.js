@@ -1,14 +1,17 @@
+/**
+* @file duration-display.js
+*/
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 import formatTime from '../../utils/format-time.js';
 
 /**
- * Displays the duration
- * @param {Player|Object} player
- * @param {Object=} options
- * @extends Component
- * @class DurationDisplay
- */
+* Displays the duration
+* @param {Player|Object} player
+* @param {Object=} options
+* @extends Component
+* @class DurationDisplay
+*/
 class DurationDisplay extends Component {
 
   constructor(player, options){

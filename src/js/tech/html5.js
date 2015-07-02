@@ -1,6 +1,7 @@
 /**
- * @fileoverview HTML5 Media Controller - Wrapper for HTML5 Media API
- */
+* @file html5.js 
+* HTML5 Media Controller - Wrapper for HTML5 Media API
+*/
 
 import Tech from './tech.js';
 import Component from '../component';
@@ -15,12 +16,12 @@ import assign from 'object.assign';
 import mergeOptions from '../utils/merge-options.js';
 
 /**
- * HTML5 Media Controller - Wrapper for HTML5 Media API
- * @param {Object=} options Object of option names and values
- * @param {Function=} ready Ready callback function
- * @extends Tech
- * @class Html5
- */
+* HTML5 Media Controller - Wrapper for HTML5 Media API
+* @param {Object=} options Object of option names and values
+* @param {Function=} ready Ready callback function
+* @extends Tech
+* @class Html5
+*/
 class Html5 extends Tech {
 
   constructor(options, ready){
@@ -696,11 +697,11 @@ class Html5 extends Tech {
 /* HTML5 Support Testing ---------------------------------------------------- */
 
 /*
- * Element for testing browser HTML5 video capabilities
- * @type {Element}
- * @constant
- * @private
- */
+* Element for testing browser HTML5 video capabilities
+* @type {Element}
+* @constant
+* @private
+*/
 Html5.TEST_VID = document.createElement('video');
 let track = document.createElement('track');
 track.kind = 'captions';
@@ -709,9 +710,9 @@ track.label = 'English';
 Html5.TEST_VID.appendChild(track);
 
 /*
- * Check if HTML5 video is supported by this browser/device
- * @return {Boolean}
- */
+* Check if HTML5 video is supported by this browser/device
+* @return {Boolean}
+*/
 Html5.isSupported = function(){
   // IE9 with no Media Player is a LIAR! (#984)
   try {
@@ -727,18 +728,18 @@ Html5.isSupported = function(){
 Tech.withSourceHandlers(Html5);
 
 /*
- * The default native source handler.
- * This simply passes the source to the video element. Nothing fancy.
- * @param  {Object} source   The source object
- * @param  {Html5} tech  The instance of the HTML5 tech
- */
+* The default native source handler.
+* This simply passes the source to the video element. Nothing fancy.
+* @param  {Object} source   The source object
+* @param  {Html5} tech  The instance of the HTML5 tech
+*/
 Html5.nativeSourceHandler = {};
 
 /*
- * Check if the video element can handle the source natively
- * @param  {Object} source  The source object
- * @return {String}         'probably', 'maybe', or '' (empty string)
- */
+* Check if the video element can handle the source natively
+* @param  {Object} source  The source object
+* @return {String}         'probably', 'maybe', or '' (empty string)
+*/
 Html5.nativeSourceHandler.canHandleSource = function(source){
   var match, ext;
 
@@ -766,31 +767,31 @@ Html5.nativeSourceHandler.canHandleSource = function(source){
 };
 
 /*
- * Pass the source to the video element
- * Adaptive source handlers will have more complicated workflows before passing
- * video data to the video element
- * @param  {Object} source    The source object
- * @param  {Html5} tech   The instance of the Html5 tech
- */
+* Pass the source to the video element
+* Adaptive source handlers will have more complicated workflows before passing
+* video data to the video element
+* @param  {Object} source    The source object
+* @param  {Html5} tech   The instance of the Html5 tech
+*/
 Html5.nativeSourceHandler.handleSource = function(source, tech){
   tech.setSrc(source.src);
 };
 
 /*
- * Clean up the source handler when disposing the player or switching sources..
- * (no cleanup is needed when supporting the format natively)
- */
+* Clean up the source handler when disposing the player or switching sources..
+* (no cleanup is needed when supporting the format natively)
+*/
 Html5.nativeSourceHandler.dispose = function(){};
 
 // Register the native source handler
 Html5.registerSourceHandler(Html5.nativeSourceHandler);
 
 /*
- * Check if the volume can be changed in this browser/device.
- * Volume cannot be changed in a lot of mobile devices.
- * Specifically, it can't be changed from 1 on iOS.
- * @return {Boolean}
- */
+* Check if the volume can be changed in this browser/device.
+* Volume cannot be changed in a lot of mobile devices.
+* Specifically, it can't be changed from 1 on iOS.
+* @return {Boolean}
+*/
 Html5.canControlVolume = function(){
   var volume =  Html5.TEST_VID.volume;
   Html5.TEST_VID.volume = (volume / 2) + 0.1;
@@ -798,9 +799,9 @@ Html5.canControlVolume = function(){
 };
 
 /*
- * Check if playbackRate is supported in this browser/device.
- * @return {Number} [description]
- */
+* Check if playbackRate is supported in this browser/device.
+* @return {Number} [description]
+*/
 Html5.canControlPlaybackRate = function(){
   var playbackRate = Html5.TEST_VID.playbackRate;
   Html5.TEST_VID.playbackRate = (playbackRate / 2) + 0.1;
@@ -808,9 +809,9 @@ Html5.canControlPlaybackRate = function(){
 };
 
 /*
- * Check to see if native text tracks are supported by this browser/device
- * @return {Boolean}
- */
+* Check to see if native text tracks are supported by this browser/device
+* @return {Boolean}
+*/
 Html5.supportsNativeTextTracks = function() {
   var supportsTextTracks;
 
@@ -831,41 +832,41 @@ Html5.supportsNativeTextTracks = function() {
 };
 
 /*
- * Set the tech's volume control support status
- * @type {Boolean}
- */
+* Set the tech's volume control support status
+* @type {Boolean}
+*/
 Html5.prototype['featuresVolumeControl'] = Html5.canControlVolume();
 
 /*
- * Set the tech's playbackRate support status
- * @type {Boolean}
- */
+* Set the tech's playbackRate support status
+* @type {Boolean}
+*/
 Html5.prototype['featuresPlaybackRate'] = Html5.canControlPlaybackRate();
 
 /*
- * Set the tech's status on moving the video element.
- * In iOS, if you move a video element in the DOM, it breaks video playback.
- * @type {Boolean}
- */
+* Set the tech's status on moving the video element.
+* In iOS, if you move a video element in the DOM, it breaks video playback.
+* @type {Boolean}
+*/
 Html5.prototype['movingMediaElementInDOM'] = !browser.IS_IOS;
 
 /*
- * Set the the tech's fullscreen resize support status.
- * HTML video is able to automatically resize when going to fullscreen.
- * (No longer appears to be used. Can probably be removed.)
- */
+* Set the the tech's fullscreen resize support status.
+* HTML video is able to automatically resize when going to fullscreen.
+* (No longer appears to be used. Can probably be removed.)
+*/
 Html5.prototype['featuresFullscreenResize'] = true;
 
 /*
- * Set the tech's progress event support status
- * (this disables the manual progress events of the Tech)
- */
+* Set the tech's progress event support status
+* (this disables the manual progress events of the Tech)
+*/
 Html5.prototype['featuresProgressEvents'] = true;
 
 /*
- * Sets the tech's status on native text track support
- * @type {Boolean}
- */
+* Sets the tech's status on native text track support
+* @type {Boolean}
+*/
 Html5.prototype['featuresNativeTextTracks'] = Html5.supportsNativeTextTracks();
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //

@@ -1,3 +1,6 @@
+/**
+* @file chapters-button.js
+*/
 import TextTrackButton from './text-track-button.js';
 import Component from '../../component.js';
 import TextTrackMenuItem from './text-track-menu-item.js';
@@ -8,17 +11,17 @@ import * as Fn from '../../utils/fn.js';
 import toTitleCase from '../../utils/to-title-case.js';
 import window from 'global/window';
 
-// Chapters act much differently than other text tracks
-// Cues are navigation vs. other tracks of alternative languages
 /**
- * The button component for toggling and selecting chapters
- *
- * @param {Object} player  Player object
- * @param {Object=} options Object of option names and values
- * @param {Function=} ready    Ready callback function
- * @extends TextTrackButton
- * @class ChaptersButton
- */
+* The button component for toggling and selecting chapters
+* Chapters act much differently than other text tracks
+* Cues are navigation vs. other tracks of alternative languages
+*
+* @param {Object} player  Player object
+* @param {Object=} options Object of option names and values
+* @param {Function=} ready    Ready callback function
+* @extends TextTrackButton
+* @class ChaptersButton
+*/
 class ChaptersButton extends TextTrackButton {
 
   constructor(player, options, ready){
@@ -26,7 +29,7 @@ class ChaptersButton extends TextTrackButton {
     this.el_.setAttribute('aria-label','Chapters Menu');
   }
 
- /**
+  /**
   * Allow sub components to stack CSS class names
   *
   * @return {String} The constructed class name
@@ -36,7 +39,7 @@ class ChaptersButton extends TextTrackButton {
     return `vjs-chapters-button ${super.buildCSSClass()}`;
   }
 
- /**
+  /**
   * Create a menu item for each text track
   *
   * @return {Array} Array of menu items
@@ -63,7 +66,7 @@ class ChaptersButton extends TextTrackButton {
     return items;
   }
 
- /**
+  /**
   * Create menu from chapter buttons
   *
   * @return {Menu} Menu of chapter buttons

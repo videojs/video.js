@@ -1,15 +1,18 @@
+/**
+* @file mute-toggle.js
+*/
 import Button from '../button';
 import Component from '../component';
 import * as Dom from '../utils/dom.js';
 
 /**
- * A button component for muting the audio
- *
- * @param {Player|Object} player
- * @param {Object=} options
- * @extends Button
- * @class MuteToggle
- */
+* A button component for muting the audio
+*
+* @param {Player|Object} player
+* @param {Object=} options
+* @extends Button
+* @class MuteToggle
+*/
 class MuteToggle extends Button {
 
   constructor(player, options) {

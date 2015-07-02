@@ -1,8 +1,9 @@
 /**
- * @fileoverview VideoJS-SWF - Custom Flash Player with HTML5-ish API
- * https://github.com/zencoder/video-js-swf
- * Not using setupTriggers. Using global onEvent func to distribute events
- */
+* @file flash.js 
+* VideoJS-SWF - Custom Flash Player with HTML5-ish API
+* https://github.com/zencoder/video-js-swf
+* Not using setupTriggers. Using global onEvent func to distribute events
+*/
 
 import Tech from './tech';
 import * as Dom from '../utils/dom.js';
@@ -15,13 +16,13 @@ import assign from 'object.assign';
 
 let navigator = window.navigator;
 /**
- * Flash Media Controller - Wrapper for fallback SWF API
- *
- * @param {Object=} options Object of option names and values
- * @param {Function=} ready Ready callback function
- * @extends Tech
- * @class Flash
- */
+* Flash Media Controller - Wrapper for fallback SWF API
+*
+* @param {Object=} options Object of option names and values
+* @param {Function=} ready Ready callback function
+* @extends Tech
+* @class Flash
+*/
 class Flash extends Tech {
 
   constructor(options, ready){
@@ -308,18 +309,18 @@ Flash.isSupported = function(){
 Tech.withSourceHandlers(Flash);
 
 /*
- * The default native source handler.
- * This simply passes the source to the video element. Nothing fancy.
- * @param  {Object} source   The source object
- * @param  {Flash} tech  The instance of the Flash tech
- */
+* The default native source handler.
+* This simply passes the source to the video element. Nothing fancy.
+* @param  {Object} source   The source object
+* @param  {Flash} tech  The instance of the Flash tech
+*/
 Flash.nativeSourceHandler = {};
 
 /*
- * Check Flash can handle the source natively
- * @param  {Object} source  The source object
- * @return {String}         'probably', 'maybe', or '' (empty string)
- */
+* Check Flash can handle the source natively
+* @param  {Object} source  The source object
+* @return {String}         'probably', 'maybe', or '' (empty string)
+*/
 Flash.nativeSourceHandler.canHandleSource = function(source){
   var type;
 
@@ -346,20 +347,20 @@ Flash.nativeSourceHandler.canHandleSource = function(source){
 };
 
 /*
- * Pass the source to the flash object
- * Adaptive source handlers will have more complicated workflows before passing
- * video data to the video element
- * @param  {Object} source    The source object
- * @param  {Flash} tech   The instance of the Flash tech
- */
+* Pass the source to the flash object
+* Adaptive source handlers will have more complicated workflows before passing
+* video data to the video element
+* @param  {Object} source    The source object
+* @param  {Flash} tech   The instance of the Flash tech
+*/
 Flash.nativeSourceHandler.handleSource = function(source, tech){
   tech.setSrc(source.src);
 };
 
 /*
- * Clean up the source handler when disposing the player or switching sources..
- * (no cleanup is needed when supporting the format natively)
- */
+* Clean up the source handler when disposing the player or switching sources..
+* (no cleanup is needed when supporting the format natively)
+*/
 Flash.nativeSourceHandler.dispose = function(){};
 
 // Register the native source handler

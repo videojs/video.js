@@ -1,6 +1,6 @@
 /**
- * @file Needed for full path retrieval
- */
+* @file menu-button.js
+*/
 import Button from '../button.js';
 import Component from '../component.js';
 import Menu from './menu.js';
@@ -9,12 +9,12 @@ import * as Fn from '../utils/fn.js';
 import toTitleCase from '../utils/to-title-case.js';
 
 /**
- * A button class with a popup menu
- * @param {Player|Object} player
- * @param {Object=} options
- * @extends Button
- * @class MenuButton
- */
+* A button class with a popup menu
+* @param {Player|Object} player
+* @param {Object=} options
+* @extends Button
+* @class MenuButton
+*/
 class MenuButton extends Button {
 
   constructor(player, options){
