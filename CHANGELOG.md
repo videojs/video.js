@@ -50,6 +50,7 @@ CHANGELOG
 * @mmcc fixed the progress handle transition jerkiness ([view](https://github.com/videojs/video.js/pull/2219))
 * @dmlap added support for the seekable property ([view](https://github.com/videojs/video.js/pull/2208))
 * @mmcc un-hid the current and remaining times by default ([view](https://github.com/videojs/video.js/pull/2241))
+* @pavelhoral fixed a bug with user activity that caused the control bar to flicker ([view](https://github.com/videojs/video.js/pull/2299))
 
 --------------------
 

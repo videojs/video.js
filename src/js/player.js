@@ -1919,9 +1919,8 @@ class Player extends Component {
     // `this.reportUserActivity` simply sets this.userActivity_ to true, which
     // then gets picked up by this loop
     // http://ejohn.org/blog/learning-from-twitter/
+    let inactivityTimeout;
     let activityCheck = this.setInterval(function() {
-      let inactivityTimeout;
-
       // Check to see if mouse/touch activity has happened
       if (this.userActivity_) {
         // Reset the activity tracker
