@@ -64,15 +64,12 @@ class Tech extends Component {
   * on a mobile device a click on the video toggles controls.
   * (toggling controls is done by toggling the user state between active and
   * inactive)
-  *
   * A tap can signal that a user has become active, or has become inactive
   * e.g. a quick tap on an iPhone movie should reveal the controls. Another
   * quick tap should hide them again (signaling the user is in an inactive
   * viewing state)
-  *
   * In addition to this, we still want the user to be considered inactive after
   * a few seconds of inactivity.
-  *
   * Note: the only part of iOS interaction we can't mimic with this setup
   * is a touch and hold on the video element counting as activity in order to
   * keep the controls showing, but that shouldn't be an issue. A touch and hold on
@@ -407,10 +404,11 @@ class Tech extends Component {
 }
 
 /*
- * List of associated text tracks
- * @type {Array}
- * @private
- */
+* List of associated text tracks
+*
+* @type {Array}
+* @private
+*/
 Tech.prototype.textTracks_;
 
 var createTrackHelper = function(self, kind, label, language, options={}) {

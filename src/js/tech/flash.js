@@ -311,6 +311,7 @@ Tech.withSourceHandlers(Flash);
 /*
 * The default native source handler.
 * This simply passes the source to the video element. Nothing fancy.
+*
 * @param  {Object} source   The source object
 * @param  {Flash} tech  The instance of the Flash tech
 */
@@ -318,6 +319,7 @@ Flash.nativeSourceHandler = {};
 
 /*
 * Check Flash can handle the source natively
+*
 * @param  {Object} source  The source object
 * @return {String}         'probably', 'maybe', or '' (empty string)
 */
@@ -350,6 +352,7 @@ Flash.nativeSourceHandler.canHandleSource = function(source){
 * Pass the source to the flash object
 * Adaptive source handlers will have more complicated workflows before passing
 * video data to the video element
+*
 * @param  {Object} source    The source object
 * @param  {Flash} tech   The instance of the Flash tech
 */

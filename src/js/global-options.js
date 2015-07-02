@@ -10,6 +10,7 @@ let navigator = window.navigator;
 * options = Player.prototype.options_
 * All options should use string keys so they avoid
 * renaming by closure compiler
+*
 * @type {Object}
 */
 export default {

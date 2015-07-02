@@ -82,6 +82,7 @@ const elData = {};
 
 /*
 * Unique attribute name to store an element's guid in
+*
 * @type {String}
 * @constant
 * @private

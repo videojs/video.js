@@ -5,6 +5,7 @@ import assign from 'object.assign';
 
 /*
 * Custom MediaError to mimic the HTML5 MediaError
+*
 * @param {Number} code The media error code
 */
 let MediaError = function(code){
@@ -25,6 +26,7 @@ let MediaError = function(code){
 /*
 * The error code that refers two one of the defined
 * MediaError types
+*
 * @type {Number}
 */
 MediaError.prototype.code = 0;
@@ -33,6 +35,7 @@ MediaError.prototype.code = 0;
 * An optional message to be shown with the error.
 * Message is not part of the HTML5 video spec
 * but allows for more informative custom errors.
+*
 * @type {String}
 */
 MediaError.prototype.message = '';
@@ -44,6 +47,7 @@ MediaError.prototype.message = '';
 * HTTP status code that was returned when the error
 * occurred, then allowing a custom error overlay
 * to display more information.
+*
 * @type {Array}
 */
 MediaError.prototype.status = null;

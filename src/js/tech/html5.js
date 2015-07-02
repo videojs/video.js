@@ -17,6 +17,7 @@ import mergeOptions from '../utils/merge-options.js';
 
 /**
 * HTML5 Media Controller - Wrapper for HTML5 Media API
+*
 * @param {Object=} options Object of option names and values
 * @param {Function=} ready Ready callback function
 * @extends Tech
@@ -698,6 +699,7 @@ class Html5 extends Tech {
 
 /*
 * Element for testing browser HTML5 video capabilities
+*
 * @type {Element}
 * @constant
 * @private
@@ -711,6 +713,7 @@ Html5.TEST_VID.appendChild(track);
 
 /*
 * Check if HTML5 video is supported by this browser/device
+*
 * @return {Boolean}
 */
 Html5.isSupported = function(){
@@ -730,6 +733,7 @@ Tech.withSourceHandlers(Html5);
 /*
 * The default native source handler.
 * This simply passes the source to the video element. Nothing fancy.
+*
 * @param  {Object} source   The source object
 * @param  {Html5} tech  The instance of the HTML5 tech
 */
@@ -737,6 +741,7 @@ Html5.nativeSourceHandler = {};
 
 /*
 * Check if the video element can handle the source natively
+*
 * @param  {Object} source  The source object
 * @return {String}         'probably', 'maybe', or '' (empty string)
 */
@@ -770,6 +775,7 @@ Html5.nativeSourceHandler.canHandleSource = function(source){
 * Pass the source to the video element
 * Adaptive source handlers will have more complicated workflows before passing
 * video data to the video element
+*
 * @param  {Object} source    The source object
 * @param  {Html5} tech   The instance of the Html5 tech
 */
@@ -790,6 +796,7 @@ Html5.registerSourceHandler(Html5.nativeSourceHandler);
 * Check if the volume can be changed in this browser/device.
 * Volume cannot be changed in a lot of mobile devices.
 * Specifically, it can't be changed from 1 on iOS.
+*
 * @return {Boolean}
 */
 Html5.canControlVolume = function(){
@@ -800,6 +807,7 @@ Html5.canControlVolume = function(){
 
 /*
 * Check if playbackRate is supported in this browser/device.
+*
 * @return {Number} [description]
 */
 Html5.canControlPlaybackRate = function(){
@@ -810,6 +818,7 @@ Html5.canControlPlaybackRate = function(){
 
 /*
 * Check to see if native text tracks are supported by this browser/device
+*
 * @return {Boolean}
 */
 Html5.supportsNativeTextTracks = function() {
@@ -833,12 +842,14 @@ Html5.supportsNativeTextTracks = function() {
 
 /*
 * Set the tech's volume control support status
+*
 * @type {Boolean}
 */
 Html5.prototype['featuresVolumeControl'] = Html5.canControlVolume();
 
 /*
 * Set the tech's playbackRate support status
+*
 * @type {Boolean}
 */
 Html5.prototype['featuresPlaybackRate'] = Html5.canControlPlaybackRate();
@@ -846,6 +857,7 @@ Html5.prototype['featuresPlaybackRate'] = Html5.canControlPlaybackRate();
 /*
 * Set the tech's status on moving the video element.
 * In iOS, if you move a video element in the DOM, it breaks video playback.
+*
 * @type {Boolean}
 */
 Html5.prototype['movingMediaElementInDOM'] = !browser.IS_IOS;
@@ -865,6 +877,7 @@ Html5.prototype['featuresProgressEvents'] = true;
 
 /*
 * Sets the tech's status on native text track support
+*
 * @type {Boolean}
 */
 Html5.prototype['featuresNativeTextTracks'] = Html5.supportsNativeTextTracks();

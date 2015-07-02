@@ -8,6 +8,7 @@ const USER_AGENT = window.navigator.userAgent;
 
 /*
 * Device is an iPhone
+*
 * @type {Boolean}
 * @constant
 * @private

@@ -17,26 +17,26 @@ import mergeOptions from './utils/merge-options.js';
 
 /**
 * Base UI Component class
-*
 * Components are embeddable UI objects that are represented by both a
 * javascript object and an element in the DOM. They can be children of other
 * components, and can have many children themselves.
-*
+* ```js
 *     // adding a button to the player
 *     var button = player.addChild('button');
 *     button.el(); // -> button element
-*
+* ```
+* ```html
 *     <div class="video-js">
 *       <div class="vjs-button">Button</div>
 *     </div>
-*
+* ```
 * Components are also event emitters.
-*
+* ```js
 *     button.on('click', function(){
 *       console.log('Button Clicked!');
 *     });
-*
 *     button.trigger('customevent');
+* ```
 *
 * @param {Object} player  Main Player
 * @param {Object=} options Object of option names and values
@@ -150,14 +150,12 @@ class Component {
 
   /**
   * Deep merge of options objects
-  *
   * Whenever a property is an object on both options objects
   * the two properties will be merged using mergeOptions.
-  *
   * This is used for merging options for child components. We
   * want it to be easy to override individual options on a child
   * component without having to rewrite all the other default options.
-  *
+  * ```js
   *     Parent.prototype.options_ = {
   *       children: {
   *         'childOne': { 'foo': 'bar', 'asdf': 'fdsa' },
@@ -174,9 +172,9 @@ class Component {
   *     }
   *
   *     this.options(newOptions);
-  *
+  * ```
   * RESULT
-  *
+  *```js
   *     {
   *       children: {
   *         'childOne': { 'foo': 'baz', 'asdf': 'fdsa', 'abc': '123' },
@@ -185,6 +183,7 @@ class Component {
   *         'childFour': {}
   *       }
   *     }
+  * ```
   *
   * @param  {Object} obj Object of new option values
   * @return {Object}     A NEW object of this.options_ and obj merged
@@ -203,8 +202,9 @@ class Component {
 
   /**
   * Get the component's DOM element
-  *
+  * ```js
   *     var domEl = myComponent.el();
+  * ```
   *
   * @return {Element}
   * @method el
@@ -262,8 +262,9 @@ class Component {
 
   /**
   * Get the component's ID
-  *
+  * ```js
   *     var id = myComponent.id();
+  * ```
   *
   * @return {String}
   * @method id
@@ -274,8 +275,9 @@ class Component {
 
   /**
   * Get the component's name. The name is often used to reference the component.
-  *
+  * ```js
   *     var name = myComponent.name();
+  * ```
   *
   * @return {String}
   * @method name
@@ -286,8 +288,9 @@ class Component {
 
   /**
   * Get an array of all child components
-  *
+  * ```js
   *     var kids = myComponent.children();
+  * ```
   *
   * @return {Array} The children
   * @method children
@@ -318,7 +321,7 @@ class Component {
 
   /**
   * Adds a child component inside this component
-  *
+  * ```js
   *     myComponent.el();
   *     // -> <div class='my-component'></div>
   *     myComponent.children();
@@ -327,9 +330,9 @@ class Component {
   *     var myButton = myComponent.addChild('MyButton');
   *     // -> <div class='my-component'><div class="my-button">myButton<div></div>
   *     // -> myButton === myComonent.children()[0];
-  *
+  * ```
   * Pass in options for child constructors and options for children of the child
-  *
+  * ```js
   *     var myButton = myComponent.addChild('MyButton', {
   *       text: 'Press Me',
   *       children: {
@@ -338,6 +341,7 @@ class Component {
   *         }
   *       }
   *     });
+  * ```
   *
   * @param {String|Component} child The class name or instance of a child to add
   * @param {Object=} options Options, including options to be passed to children of the child.
@@ -447,7 +451,7 @@ class Component {
 
   /**
   * Add and initialize default child components from options
-  *
+  * ```js
   *     // when an instance of MyComponent is created, all children in options
   *     // will be added to the instance by their name strings and options
   *     MyComponent.prototype.options_.children = {
@@ -455,8 +459,9 @@ class Component {
   *         myChildOption: true
   *       }
   *     }
-  *
+  * ```
   *     // Or when creating the component
+  * ```js
   *     var myComp = new MyComponent(player, {
   *       children: {
   *         myChildComponent: {
@@ -464,10 +469,10 @@ class Component {
   *         }
   *       }
   *     });
-  *
+  * ```
   * The children option can also be an Array of child names or
   * child options objects (that also include a 'name' key).
-  *
+  * ```js
   *     var myComp = new MyComponent(player, {
   *       children: [
   *         'button',
@@ -477,6 +482,7 @@ class Component {
   *         }
   *       ]
   *     });
+  * ```
   *
   * @method initChildren
   */
@@ -553,26 +559,24 @@ class Component {
 
   /**
   * Add an event listener to this component's element
-  *
+  * ```js
   *     var myFunc = function(){
   *       var myComponent = this;
   *       // Do something when the event is fired
   *     };
   *
   *     myComponent.on('eventType', myFunc);
-  *
+  * ```
   * The context of myFunc will be myComponent unless previously bound.
-  *
   * Alternatively, you can add a listener to another element or component.
-  *
+  * ```js
   *     myComponent.on(otherElement, 'eventName', myFunc);
   *     myComponent.on(otherComponent, 'eventName', myFunc);
-  *
+  * ```
   * The benefit of using this over `VjsEvents.on(otherElement, 'eventName', myFunc)`
   * and `otherComponent.on('eventName', myFunc)` is that this way the listeners
   * will be automatically cleaned up when either component is disposed.
   * It will also bind myComponent as the context of myFunc.
-  *
   * **NOTE**: When using this on elements in the page other than window
   * and document (both permanent), if you remove the element from the DOM
   * you need to call `myComponent.trigger(el, 'dispose')` on it to clean up
@@ -630,18 +634,18 @@ class Component {
 
   /**
   * Remove an event listener from this component's element
-  *
+  * ```js
   *     myComponent.off('eventType', myFunc);
-  *
+  * ```
   * If myFunc is excluded, ALL listeners for the event type will be removed.
   * If eventType is excluded, ALL listeners will be removed from the component.
-  *
   * Alternatively you can use `off` to remove listeners that were added to other
   * elements or components using `myComponent.on(otherComponent...`.
   * In this case both the event type and listener function are REQUIRED.
-  *
+  * ```js
   *     myComponent.off(otherElement, 'eventType', myFunc);
   *     myComponent.off(otherComponent, 'eventType', myFunc);
+  * ```
   *
   * @param  {String=|Component}  first  The event type or other component
   * @param  {Function=|String}       second The listener function or event type
@@ -678,14 +682,15 @@ class Component {
 
   /**
   * Add an event listener to be triggered only once and then removed
-  *
+  * ```js
   *     myComponent.one('eventName', myFunc);
-  *
+  * ```
   * Alternatively you can add a listener to another element or component
   * that will be triggered only once.
-  *
+  * ```js
   *     myComponent.one(otherElement, 'eventName', myFunc);
   *     myComponent.one(otherComponent, 'eventName', myFunc);
+  * ```
   *
   * @param  {String|Component}  first   The event type or other component
   * @param  {Function|String}       second  The listener function or event type
@@ -717,11 +722,12 @@ class Component {
 
   /**
   * Trigger an event on an element
-  *
+  * ```js
   *     myComponent.trigger('eventName');
   *     myComponent.trigger({'type':'eventName'});
   *     myComponent.trigger('eventName', {data: 'some data'});
   *     myComponent.trigger({'type':'eventName'}, {data: 'some data'});
+  * ```
   *
   * @param  {Event|Object|String} event  A string (the type) or an event object with a type attribute
   * @param  {Object} [hash] data hash to pass along with the event
@@ -734,8 +740,7 @@ class Component {
   }
 
   /**
-  * Bind a listener to the component's ready state
-  *
+  * Bind a listener to the component's ready state.
   * Different from event listeners in that if the ready event has already happened
   * it will trigger the function immediately.
   *
@@ -868,7 +873,6 @@ class Component {
 
   /**
   * Set or get the width of the component (CSS values)
-  *
   * Setting the video tag dimension values only works with values in pixels.
   * Percent values will not work.
   * Some percents can be used, but width()/height() will return the number + %,
@@ -886,7 +890,6 @@ class Component {
 
   /**
   * Get or set the height of the component (CSS values)
-  *
   * Setting the video tag dimension values only works with values in pixels.
   * Percent values will not work.
   * Some percents can be used, but width()/height() will return the number + %,
@@ -917,10 +920,8 @@ class Component {
 
   /**
   * Get or set width or height
-  *
   * This is the shared code for the width() and height() methods.
   * All for an integer, integer + 'px' or integer + '%';
-  *
   * Known issue: Hidden elements officially have a width of 0. We're defaulting
   * to the style.width value and falling back to computedStyle which has the
   * hidden element issue. Info, but probably not an efficient fix:
@@ -982,9 +983,7 @@ class Component {
 
   /**
   * Emit 'tap' events when touch events are supported
-  *
   * This is used to support toggling the controls through a tap on the video.
-  *
   * We're requiring them to be enabled because otherwise every component would
   * have this extra overhead unnecessarily, on mobile devices where extra
   * overhead is especially bad.
@@ -1067,12 +1066,10 @@ class Component {
 
   /**
   * Report user touch activity when touch events occur
-  *
   * User activity is used to determine when controls should show/hide. It's
   * relatively simple when it comes to mouse events, because any mouse event
   * should show the controls. So we capture mouse events that bubble up to the
   * player and report activity when that happens.
-  *
   * With touch events it isn't as easy. We can't rely on touch events at the
   * player level, because a tap (touchstart + touchend) on the video itself on
   * mobile devices is meant to turn controls off (and on). User activity is
@@ -1080,10 +1077,8 @@ class Component {
   * turns the controls off, then the touchend event bubbles up to the player,
   * which if it reported user activity, would turn the controls right back on.
   * (We also don't want to completely block touch events from bubbling up)
-  *
   * Also a touchmove, touch+hold, and anything other than a tap is not supposed
   * to turn the controls back on on a mobile device.
-  *
   * Here we're setting the default component behavior to report user activity
   * whenever touch events happen, and this can be turned off by components that
   * want touch events to act differently.

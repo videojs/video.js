@@ -5,8 +5,8 @@ import { newGUID } from './guid.js';
 
 /**
 * Bind (a.k.a proxy or Context). A simple method for changing the context of a function
- It also stores a unique id on the function so it can be easily removed from events
- *
+* It also stores a unique id on the function so it can be easily removed from events
+*
 * @param  {*}   context The object to bind as scope
 * @param  {Function} fn      The function to be bound to a scope
 * @param  {Number=}   uid     An optional unique ID for the function to be set

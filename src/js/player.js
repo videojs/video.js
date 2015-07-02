@@ -37,19 +37,15 @@ import Html5 from './tech/html5.js';
 
 /**
 * An instance of the `Player` class is created when any of the Video.js setup methods are used to initialize a video.
-*
 * ```js
 * var myPlayer = videojs('example_video_1');
 * ```
-*
 * In the following example, the `data-setup` attribute tells the Video.js library to create a player instance when the library is ready.
-*
 * ```html
 * <video id="example_video_1" data-setup='{}' controls>
 *   <source src="my-source.mp4" type="video/mp4">
 * </video>
 * ```
-*
 * After an instance has been created it can be accessed globally using `Video('example_video_1')`.
 *
 * @param {Element} tag        The original video tag used for configuring options
@@ -139,7 +135,7 @@ class Player extends Component {
     // May be turned back on by HTML5 tech if nativeControlsForTouch is true
     tag.controls = false;
 
-    /**
+    /*
     * Store the internal state of scrubbing
     * @private
     * @return {Boolean} True if the user is scrubbing
@@ -208,9 +204,9 @@ class Player extends Component {
 
   /**
   * Destroys the video player and does any necessary cleanup
-  *
+  * ```js
   *     myPlayer.dispose();
-  *
+  * ```
   * This is especially helpful if you are dynamically adding and removing videos
   * to/from the DOM.
   *
@@ -629,6 +625,7 @@ class Player extends Component {
 
   /**
   * Player waits for the tech to be ready
+  *
   * @private
   * @method handleTechReady
   */
@@ -647,6 +644,7 @@ class Player extends Component {
 
   /**
   * Fired when the native controls are used
+  *
   * @private
   * @method handleTechUseNativeControls
   */
@@ -787,7 +785,6 @@ class Player extends Component {
 
   /**
   * Fired the first time a video is played
-  *
   * Not part of the HLS spec, and we're not sure if this is the best
   * implementation yet, so use sparingly. If you don't have a reason to
   * prevent playback, use `myPlayer.one('play');` instead.
@@ -1148,8 +1145,9 @@ class Player extends Component {
 
   /**
   * start media playback
-  *
+  * ```js
   *     myPlayer.play();
+  * ```
   *
   * @return {Player} self
   * @method play
@@ -1161,8 +1159,9 @@ class Player extends Component {
 
   /**
   * Pause the video playback
-  *
+  * ```js
   *     myPlayer.pause();
+  * ```
   *
   * @return {Player} self
   * @method pause
@@ -1174,9 +1173,10 @@ class Player extends Component {
 
   /**
   * Check if the player is paused
-  *
+  * ```js
   *     var isPaused = myPlayer.paused();
   *     var isPlaying = !myPlayer.paused();
+  * ```
   *
   * @return {Boolean} false if the media is currently playing, or true otherwise
   * @method paused
@@ -1213,12 +1213,12 @@ class Player extends Component {
 
   /**
   * Get or set the current time (in seconds)
-  *
+  * ```js
   *     // get
   *     var whereYouAt = myPlayer.currentTime();
-  *
   *     // set
   *     myPlayer.currentTime(120); // 2 minutes into the video
+  * ```
   *
   * @param  {Number|String=} seconds The time to seek to
   * @return {Number}        The time in seconds, when not setting
@@ -1244,9 +1244,9 @@ class Player extends Component {
 
   /**
   * Get the length in time of the video in seconds
-  *
+  * ```js
   *     var lengthOfVideo = myPlayer.duration();
-  *
+  * ```
   * **NOTE**: The video must have started loading before the duration can be
   * known, and in the case of Flash, may not be known until the video starts
   * playing.
@@ -1273,9 +1273,9 @@ class Player extends Component {
 
   /**
   * Calculates how much time is left.
-  *
+  * ```js
   *     var timeLeft = myPlayer.remainingTime();
-  *
+  * ```
   * Not a native video element function, but useful
   *
   * @return {Number} The time remaining in seconds
@@ -1294,18 +1294,16 @@ class Player extends Component {
   *
   * If you just want the percent of the video that's been downloaded,
   * use bufferedPercent.
-  *
+  * ```js
   *     // Number of different ranges of time have been buffered. Usually 1.
   *     numberOfRanges = bufferedTimeRange.length,
-  *
   *     // Time in seconds when the first range starts. Usually 0.
   *     firstRangeStart = bufferedTimeRange.start(0),
-  *
   *     // Time in seconds when the first range ends
   *     firstRangeEnd = bufferedTimeRange.end(0),
-  *
   *     // Length in seconds of the first time range
   *     firstRangeLength = firstRangeEnd - firstRangeStart;
+  * ```
   *
   * @return {Object} A mock TimeRange object (following HTML spec)
   * @method buffered
@@ -1322,9 +1320,9 @@ class Player extends Component {
 
   /**
   * Get the percent (as a decimal) of the video that's been downloaded
-  *
+  * ```js
   *     var howMuchIsDownloaded = myPlayer.bufferedPercent();
-  *
+  * ```
   * 0 means none, 1 means all.
   * (This method isn't in the HTML5 spec, but it's very convenient)
   *
@@ -1337,8 +1335,8 @@ class Player extends Component {
 
   /**
   * Get the ending time of the last buffered time range
-  *
   * This is used in the progress bar to encapsulate all time ranges.
+  *
   * @return {Number} The end of the last buffered time range
   * @method bufferedEnd
   */
@@ -1356,13 +1354,12 @@ class Player extends Component {
 
   /**
   * Get or set the current volume of the media
-  *
+  * ```js
   *     // get
   *     var howLoudIsIt = myPlayer.volume();
-  *
-  *     // set
+ *     // set
   *     myPlayer.volume(0.5); // Set volume to half
-  *
+  * ```
   * 0 is off (muted), 1.0 is all the way up, 0.5 is half way.
   *
   * @param  {Number} percentAsDecimal The new volume as a decimal percent
@@ -1389,12 +1386,12 @@ class Player extends Component {
 
   /**
   * Get the current muted state, or turn mute on or off
-  *
+  * ```js
   *     // get
   *     var isVolumeMuted = myPlayer.muted();
-  *
   *     // set
   *     myPlayer.muted(true); // mute the volume
+  * ```
   *
   * @param  {Boolean=} muted True to mute, false to unmute
   * @return {Boolean} True if mute is on, false if not when getting
@@ -1423,13 +1420,12 @@ class Player extends Component {
 
   /**
   * Check if the player is in fullscreen mode
-  *
+  * ```js
   *     // get
   *     var fullscreenOrNot = myPlayer.isFullscreen();
-  *
   *     // set
   *     myPlayer.isFullscreen(true); // tell the player it's in fullscreen
-  *
+  * ```
   * NOTE: As of the latest HTML5 spec, isFullscreen is no longer an official
   * property and instead document.fullscreenElement is used. But isFullscreen is
   * still a valuable property for internal player workings.
@@ -1463,9 +1459,9 @@ class Player extends Component {
 
   /**
   * Increase the size of the video to full screen
-  *
+  * ```js
   *     myPlayer.requestFullscreen();
-  *
+  * ```
   * In some browsers, full screen is not supported natively, so it enters
   * "full window mode", where the video fills the browser window.
   * In browsers and devices that support native full screen, sometimes the
@@ -1531,8 +1527,9 @@ class Player extends Component {
 
   /**
   * Return the video to its normal size after having been in full screen mode
-  *
+  * ```js
   *     myPlayer.exitFullscreen();
+  * ```
   *
   * @return {Player} self
   * @method exitFullscreen
@@ -1567,7 +1564,7 @@ class Player extends Component {
   }
 
   /**
-  *  When fullscreen isn't supported we can stretch the video container to as wide as the browser will let us.
+  * When fullscreen isn't supported we can stretch the video container to as wide as the browser will let us.
   *
   * @method enterFullWindow
   */
@@ -1590,7 +1587,7 @@ class Player extends Component {
   }
 
   /**
-  *  Check for call to either exit full window or full screen on ESC key
+  * Check for call to either exit full window or full screen on ESC key
   *
   * @param {String} event Event to check for key press
   * @method fullWindowOnEscKey
@@ -1663,31 +1660,30 @@ class Player extends Component {
 
   /**
   * The source function updates the video source
-  *
   * There are three types of variables you can pass as the argument.
-  *
   * **URL String**: A URL to the the video file. Use this method if you are sure
   * the current playback technology (HTML5/Flash) can support the source you
   * provide. Currently only MP4 files can be used in both HTML5 and Flash.
-  *
+  * ```js
   *     myPlayer.src("http://www.example.com/path/to/video.mp4");
-  *
+  * ```
   * **Source Object (or element):** A javascript object containing information
   * about the source file. Use this method if you want the player to determine if
   * it can support the file using the type information.
-  *
+  * ```js
   *     myPlayer.src({ type: "video/mp4", src: "http://www.example.com/path/to/video.mp4" });
-  *
+  * ```
   * **Array of Source Objects:** To provide multiple versions of the source so
   * that it can be played using HTML5 across browsers you can use an array of
   * source objects. Video.js will detect which version is supported and load that
   * file.
-  *
+  * ```js
   *     myPlayer.src([
   *       { type: "video/mp4", src: "http://www.example.com/path/to/video.mp4" },
   *       { type: "video/webm", src: "http://www.example.com/path/to/video.webm" },
   *       { type: "video/ogg", src: "http://www.example.com/path/to/video.ogv" }
   *     ]);
+  * ```
   *
   * @param  {String|Object|Array=} source The source URL, object, or array of sources
   * @return {String} The current video source when getting
@@ -1866,14 +1862,13 @@ class Player extends Component {
 
   /**
   * get or set the poster image source url
-  *
   * ##### EXAMPLE:
-  *
-  *     // getting
+  * ```js
+  *     // get
   *     var currentPoster = myPlayer.poster();
-  *
-  *     // setting
+  *     // set
   *     myPlayer.poster('http://example.com/myImage.jpg');
+  * ```
   *
   * @param  {String=} src Poster image source URL
   * @return {String} poster URL when getting
@@ -1948,7 +1943,6 @@ class Player extends Component {
   * Toggle native controls on/off. Native controls are the controls built into
   * devices (e.g. default iPhone controls), Flash, or other techs
   * (e.g. Vimeo Controls)
-  *
   * **This should only be set by the current tech, because only the tech knows
   * if it can support native controls**
   *
@@ -1996,6 +1990,7 @@ class Player extends Component {
 
   /**
   * Set or get the current MediaError
+  *
   * @param  {*} err A MediaError or a String/Number to be turned into a MediaError
   * @return {MediaError|null}     when getting
   * @return {Player}              when setting
@@ -2329,6 +2324,7 @@ class Player extends Component {
   * Add a text track
   * In addition to the W3C settings we allow adding additional info through options.
   * http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-addtexttrack
+  *
   * @param {String}  kind        Captions, subtitles, chapters, descriptions, or metadata
   * @param {String=} label       Optional label
   * @param {String=} language    Optional language
@@ -2396,7 +2392,6 @@ class Player extends Component {
 
   /**
   * The player's language code
-  *
   * NOTE: The language should be set in the player options if you want the
   * the controls to be built with a specific language. Changing the lanugage
   * later will not update controls text.
@@ -2515,6 +2510,7 @@ Player.players = {};
 * Make changes in options, not here.
 * All options should use string keys so they avoid
 * renaming by closure compiler
+*
 * @type {Object}
 * @private
 */

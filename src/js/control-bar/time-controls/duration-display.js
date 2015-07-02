@@ -7,6 +7,7 @@ import formatTime from '../../utils/format-time.js';
 
 /**
 * Displays the duration
+*
 * @param {Player|Object} player
 * @param {Object=} options
 * @extends Component

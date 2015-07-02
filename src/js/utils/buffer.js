@@ -5,6 +5,7 @@ import { createTimeRange } from './time-ranges.js';
 
 /**
 * Compute how much your video has been buffered
+*
 * @param  {Object} Buffered object
 * @param  {Number} Total duration
 * @return {Number} Percent buffered of the total duration

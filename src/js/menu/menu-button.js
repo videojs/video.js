@@ -10,6 +10,7 @@ import toTitleCase from '../utils/to-title-case.js';
 
 /**
 * A button class with a popup menu
+*
 * @param {Player|Object} player
 * @param {Object=} options
 * @extends Button
@@ -44,6 +45,7 @@ class MenuButton extends Button {
 
     /**
      * Track the state of the menu button
+     *
      * @type {Boolean}
      * @private
      */

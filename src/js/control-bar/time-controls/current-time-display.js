@@ -7,6 +7,7 @@ import formatTime from '../../utils/format-time.js';
 
 /**
 * Displays the current time
+*
 * @param {Player|Object} player
 * @param {Object=} options
 * @extends Component
