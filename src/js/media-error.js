@@ -1,9 +1,12 @@
+/**
+* @file media-error.js
+*/
 import assign from 'object.assign';
 
 /*
- * Custom MediaError to mimic the HTML5 MediaError
- * @param {Number} code The media error code
- */
+* Custom MediaError to mimic the HTML5 MediaError
+* @param {Number} code The media error code
+*/
 let MediaError = function(code){
   if (typeof code === 'number') {
     this.code = code;
@@ -20,29 +23,29 @@ let MediaError = function(code){
 };
 
 /*
- * The error code that refers two one of the defined
- * MediaError types
- * @type {Number}
- */
+* The error code that refers two one of the defined
+* MediaError types
+* @type {Number}
+*/
 MediaError.prototype.code = 0;
 
 /*
- * An optional message to be shown with the error.
- * Message is not part of the HTML5 video spec
- * but allows for more informative custom errors.
- * @type {String}
- */
+* An optional message to be shown with the error.
+* Message is not part of the HTML5 video spec
+* but allows for more informative custom errors.
+* @type {String}
+*/
 MediaError.prototype.message = '';
 
 /*
- * An optional status code that can be set by plugins
- * to allow even more detail about the error.
- * For example the HLS plugin might provide the specific
- * HTTP status code that was returned when the error
- * occurred, then allowing a custom error overlay
- * to display more information.
- * @type {Array}
- */
+* An optional status code that can be set by plugins
+* to allow even more detail about the error.
+* For example the HLS plugin might provide the specific
+* HTTP status code that was returned when the error
+* occurred, then allowing a custom error overlay
+* to display more information.
+* @type {Array}
+*/
 MediaError.prototype.status = null;
 
 MediaError.errorTypes = [

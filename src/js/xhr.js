@@ -1,39 +1,42 @@
+/**
+* @file xhr.js
+*/
 import * as Url from './utils/url.js';
 import log from './utils/log.js';
 import mergeOptions from './utils/merge-options.js';
 import window from 'global/window';
 
-/**
- * Simple http request for retrieving external files (e.g. text tracks)
- *
- * ##### Example
- *
- *     // using url string
- *     videojs.xhr('http://example.com/myfile.vtt', function(error, response, responseBody){});
- *
- *     // or options block
- *     videojs.xhr({
- *       uri: 'http://example.com/myfile.vtt',
- *       method: 'GET',
- *       responseType: 'text'
- *     }, function(error, response, responseBody){
- *       if (error) {
- *         // log the error
- *       } else {
- *         // successful, do something with the response
- *       }
- *     });
- *
- *
- * API is modeled after the Raynos/xhr, which we hope to use after
- * getting browserify implemented.
- * https://github.com/Raynos/xhr/blob/master/index.js
- *
- * @param  {Object|String}  options   Options block or URL string
- * @param  {Function}       callback  The callback function
- * @return {Object}                  The request
- * @method xhr
- */
+/*
+* Simple http request for retrieving external files (e.g. text tracks)
+*
+* ##### Example
+*
+*     // using url string
+*     videojs.xhr('http://example.com/myfile.vtt', function(error, response, responseBody){});
+*
+*     // or options block
+*     videojs.xhr({
+*       uri: 'http://example.com/myfile.vtt',
+*       method: 'GET',
+*       responseType: 'text'
+*     }, function(error, response, responseBody){
+*       if (error) {
+*         // log the error
+*       } else {
+*         // successful, do something with the response
+*       }
+*     });
+*
+*
+* API is modeled after the Raynos/xhr, which we hope to use after
+* getting browserify implemented.
+* https://github.com/Raynos/xhr/blob/master/index.js
+*
+* @param  {Object|String}  options   Options block or URL string
+* @param  {Function}       callback  The callback function
+* @return {Object}                  The request
+* @method xhr
+*/
 var xhr = function(options, callback){
   let abortTimeout;
 

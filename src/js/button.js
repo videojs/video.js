@@ -1,6 +1,6 @@
 /**
- * @file Needed for full path retrieval
- */
+* @file button.js
+*/
 import Component from './component';
 import * as Dom from './utils/dom.js';
 import * as Events from './utils/events.js';
@@ -11,13 +11,13 @@ import assign from 'object.assign';
 /* Button - Base class for all buttons
 ================================================================================ */
 /**
- * Base class for all buttons
- *
- * @param {Object} player  Main Player
- * @param {Object=} options Object of option names and values
- * @extends Component
- * @class Button
- */
+* Base class for all buttons
+*
+* @param {Object} player  Main Player
+* @param {Object=} options Object of option names and values
+* @extends Component
+* @class Button
+*/
 class Button extends Component {
 
   constructor(player, options) {

@@ -1,13 +1,16 @@
+/**
+* @file loading-spinner.js
+*/
 import Component from './component';
 
 /* Loading Spinner
 ================================================================================ */
 /**
- * Loading spinner for waiting events
- *
- * @extends Component
- * @class LoadingSpinner
- */
+* Loading spinner for waiting events
+*
+* @extends Component
+* @class LoadingSpinner
+*/
 class LoadingSpinner extends Component {
 
   /**

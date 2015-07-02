@@ -1,18 +1,18 @@
 /**
- * @file Needed for full path retrieval
- */
+* @file big-play-button.js
+*/
 import Button from './button.js';
 import Component from './component.js';
 
 /* Big Play Button
 ================================================================================ */
 /**
- * Initial play button. Shows before the video has played. The hiding of the
- * big play button is done via CSS and player states.
- *
- * @extends Button
- * @class BigPlayButton
- */
+* Initial play button. Shows before the video has played. The hiding of the
+* big play button is done via CSS and player states.
+*
+* @extends Button
+* @class BigPlayButton
+*/
 class BigPlayButton extends Button {
 
   /**

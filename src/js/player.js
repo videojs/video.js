@@ -1,6 +1,6 @@
 /**
- * @file Needed for full path retrieval
- */
+* @file player.js
+*/
 // Subclasses Component
 import Component from './component.js';
 
@@ -36,39 +36,39 @@ import TextTrackSettings from './tracks/text-track-settings.js';
 import Html5 from './tech/html5.js';
 
 /**
- * An instance of the `Player` class is created when any of the Video.js setup methods are used to initialize a video.
- *
- * ```js
- * var myPlayer = videojs('example_video_1');
- * ```
- *
- * In the following example, the `data-setup` attribute tells the Video.js library to create a player instance when the library is ready.
- *
- * ```html
- * <video id="example_video_1" data-setup='{}' controls>
- *   <source src="my-source.mp4" type="video/mp4">
- * </video>
- * ```
- *
- * After an instance has been created it can be accessed globally using `Video('example_video_1')`.
- *
- * @param {Element} tag        The original video tag used for configuring options
- * @param {Object=} options    Object of option names and values
- * @param {Function=} ready    Ready callback function
- * @extends Component
- * @class Player
- */
+* An instance of the `Player` class is created when any of the Video.js setup methods are used to initialize a video.
+*
+* ```js
+* var myPlayer = videojs('example_video_1');
+* ```
+*
+* In the following example, the `data-setup` attribute tells the Video.js library to create a player instance when the library is ready.
+*
+* ```html
+* <video id="example_video_1" data-setup='{}' controls>
+*   <source src="my-source.mp4" type="video/mp4">
+* </video>
+* ```
+*
+* After an instance has been created it can be accessed globally using `Video('example_video_1')`.
+*
+* @param {Element} tag        The original video tag used for configuring options
+* @param {Object=} options    Object of option names and values
+* @param {Function=} ready    Ready callback function
+* @extends Component
+* @class Player
+*/
 class Player extends Component {
 
   /**
-   * player's constructor function
-   *
-   * @constructs
-   * @method init
-   * @param {Element} tag        The original video tag used for configuring options
-   * @param {Object=} options    Player options
-   * @param {Function=} ready    Ready callback function
-   */
+  * player's constructor function
+  *
+  * @constructs
+  * @method init
+  * @param {Element} tag        The original video tag used for configuring options
+  * @param {Object=} options    Player options
+  * @param {Function=} ready    Ready callback function
+  */
   constructor(tag, options, ready){
     // Make sure tag ID exists
     tag.id = tag.id || `vjs_video_${Guid.newGUID()}`;
@@ -207,15 +207,15 @@ class Player extends Component {
   }
 
   /**
-   * Destroys the video player and does any necessary cleanup
-   *
-   *     myPlayer.dispose();
-   *
-   * This is especially helpful if you are dynamically adding and removing videos
-   * to/from the DOM.
-   *
-   * @method dispose
-   */
+  * Destroys the video player and does any necessary cleanup
+  *
+  *     myPlayer.dispose();
+  *
+  * This is especially helpful if you are dynamically adding and removing videos
+  * to/from the DOM.
+  *
+  * @method dispose
+  */
   dispose() {
     this.trigger('dispose');
     // prevent dispose from being called twice
@@ -612,8 +612,8 @@ class Player extends Component {
   }
 
   /**
-   * Remove the listeners used for click and tap controls. This is needed for
-   * toggling to controls disabled, where a tap/touch should do nothing.
+  * Remove the listeners used for click and tap controls. This is needed for
+  * toggling to controls disabled, where a tap/touch should do nothing.
   *
   * @method removeTechControlsListeners
   */
@@ -628,10 +628,10 @@ class Player extends Component {
   }
 
   /**
-   * Player waits for the tech to be ready
-   * @private
-   * @method handleTechReady
-   */
+  * Player waits for the tech to be ready
+  * @private
+  * @method handleTechReady
+  */
   handleTechReady() {
     this.triggerReady();
 
@@ -646,19 +646,19 @@ class Player extends Component {
   }
 
   /**
-   * Fired when the native controls are used
-   * @private
-   * @method handleTechUseNativeControls
-   */
+  * Fired when the native controls are used
+  * @private
+  * @method handleTechUseNativeControls
+  */
   handleTechUseNativeControls() {
     this.usingNativeControls(true);
   }
 
   /**
-   * Fired when the user agent begins looking for media data
-   *
-   * @event loadstart
-   */
+  * Fired when the user agent begins looking for media data
+  *
+  * @event loadstart
+  */
   handleTechLoadStart() {
     // TODO: Update to use `emptied` event instead. See #1277.
 
@@ -706,10 +706,10 @@ class Player extends Component {
   }
 
   /**
-   * Fired whenever the media begins or resumes playback
-   *
-   * @event play
-   */
+  * Fired whenever the media begins or resumes playback
+  *
+  * @event play
+  */
   handleTechPlay() {
     this.removeClass('vjs-ended');
     this.removeClass('vjs-paused');
@@ -723,77 +723,77 @@ class Player extends Component {
   }
 
   /**
-   * Fired whenever the media begins waiting
-   *
-   * @event waiting
-   */
+  * Fired whenever the media begins waiting
+  *
+  * @event waiting
+  */
   handleTechWaiting() {
     this.addClass('vjs-waiting');
     this.trigger('waiting');
   }
 
   /**
-   * A handler for events that signal that waiting has ended
-   * which is not consistent between browsers. See #1351
-   *
-   * @event canplay
-   */
+  * A handler for events that signal that waiting has ended
+  * which is not consistent between browsers. See #1351
+  *
+  * @event canplay
+  */
   handleTechCanPlay() {
     this.removeClass('vjs-waiting');
     this.trigger('canplay');
   }
 
   /**
-   * A handler for events that signal that waiting has ended
-   * which is not consistent between browsers. See #1351
-   *
-   * @event canplaythrough
-   */
+  * A handler for events that signal that waiting has ended
+  * which is not consistent between browsers. See #1351
+  *
+  * @event canplaythrough
+  */
   handleTechCanPlayThrough() {
     this.removeClass('vjs-waiting');
     this.trigger('canplaythrough');
   }
 
   /**
-   * A handler for events that signal that waiting has ended
-   * which is not consistent between browsers. See #1351
-   *
-   * @event playing
-   */
+  * A handler for events that signal that waiting has ended
+  * which is not consistent between browsers. See #1351
+  *
+  * @event playing
+  */
   handleTechPlaying() {
     this.removeClass('vjs-waiting');
     this.trigger('playing');
   }
 
   /**
-   * Fired whenever the player is jumping to a new time
-   *
-   * @event seeking
-   */
+  * Fired whenever the player is jumping to a new time
+  *
+  * @event seeking
+  */
   handleTechSeeking() {
     this.addClass('vjs-seeking');
     this.trigger('seeking');
   }
 
   /**
-   * Fired when the player has finished jumping to a new time
-   *
-   * @event seeked
-   */
+  * Fired when the player has finished jumping to a new time
+  *
+  * @event seeked
+  */
   handleTechSeeked() {
     this.removeClass('vjs-seeking');
     this.trigger('seeked');
   }
 
   /**
-   * Fired the first time a video is played
-   *
-   * Not part of the HLS spec, and we're not sure if this is the best
-   * implementation yet, so use sparingly. If you don't have a reason to
-   * prevent playback, use `myPlayer.one('play');` instead.
-   *
-   * @event firstplay
-   */
+  * Fired the first time a video is played
+  *
+  * Not part of the HLS spec, and we're not sure if this is the best
+  * implementation yet, so use sparingly. If you don't have a reason to
+  * prevent playback, use `myPlayer.one('play');` instead.
+  *
+  * @event firstplay
+  */
   handleTechFirstPlay() {
     //If the first starttime attribute is specified
     //then we will start at the given offset in seconds
@@ -806,10 +806,10 @@ class Player extends Component {
   }
 
   /**
-   * Fired whenever the media has been paused
-   *
-   * @event pause
-   */
+  * Fired whenever the media has been paused
+  *
+  * @event pause
+  */
   handleTechPause() {
     this.removeClass('vjs-playing');
     this.addClass('vjs-paused');
@@ -817,10 +817,10 @@ class Player extends Component {
   }
 
   /**
-   * Fired while the user agent is downloading media data
-   *
-   * @event progress
-   */
+  * Fired while the user agent is downloading media data
+  *
+  * @event progress
+  */
   handleTechProgress() {
     this.trigger('progress');
 
@@ -831,10 +831,10 @@ class Player extends Component {
   }
 
   /**
-   * Fired when the end of the media resource is reached (currentTime == duration)
-   *
-   * @event ended
-   */
+  * Fired when the end of the media resource is reached (currentTime == duration)
+  *
+  * @event ended
+  */
   handleTechEnded() {
     this.addClass('vjs-ended');
     if (this.options_['loop']) {
@@ -848,21 +848,21 @@ class Player extends Component {
   }
 
   /**
-   * Fired when the duration of the media resource is first known or changed
-   *
-   * @event durationchange
-   */
+  * Fired when the duration of the media resource is first known or changed
+  *
+  * @event durationchange
+  */
   handleTechDurationChange() {
     this.updateDuration();
     this.trigger('durationchange');
   }
 
   /**
-   * Handle a click on the media element to play/pause
-   *
-   * @param {Object=} event Event object 
-   * @method handleTechClick
-   */
+  * Handle a click on the media element to play/pause
+  *
+  * @param {Object=} event Event object 
+  * @method handleTechClick
+  */
   handleTechClick(event) {
     // We're using mousedown to detect clicks thanks to Flash, but mousedown
     // will also be triggered with right-clicks, so we need to prevent that
@@ -880,29 +880,29 @@ class Player extends Component {
   }
 
   /**
-   * Handle a tap on the media element. It will toggle the user
-   * activity state, which hides and shows the controls.
-   *
-   * @method handleTechTap
-   */
+  * Handle a tap on the media element. It will toggle the user
+  * activity state, which hides and shows the controls.
+  *
+  * @method handleTechTap
+  */
   handleTechTap() {
     this.userActive(!this.userActive());
   }
 
   /**
-   * Handle touch to start
-   *
-   * @method handleTechTouchStart
-   */
+  * Handle touch to start
+  *
+  * @method handleTechTouchStart
+  */
   handleTechTouchStart() {
     this.userWasActive = this.userActive();
   }
 
   /**
-   * Handle touch to move
-   *
-   * @method handleTechTouchMove
-   */
+  * Handle touch to move
+  *
+  * @method handleTechTouchMove
+  */
   handleTechTouchMove() {
     if (this.userWasActive){
       this.reportUserActivity();
@@ -910,21 +910,21 @@ class Player extends Component {
   }
 
   /**
-   * Handle touch to end
-   *
-   * @method handleTechTouchEnd
-   */
+  * Handle touch to end
+  *
+  * @method handleTechTouchEnd
+  */
   handleTechTouchEnd(event) {
     // Stop the mouse events from also happening
     event.preventDefault();
   }
 
   /**
-   * Update the duration of the player using the tech
-   *
-   * @private
-   * @method updateDuration
-   */
+  * Update the duration of the player using the tech
+  *
+  * @private
+  * @method updateDuration
+  */
   updateDuration() {
     // Allows for caching value instead of asking player each time.
     // We need to get the techGet response and check for a value so we don't
@@ -945,10 +945,10 @@ class Player extends Component {
   }
 
   /**
-   * Fired when the player switches in or out of fullscreen mode
-   *
-   * @event fullscreenchange
-   */
+  * Fired when the player switches in or out of fullscreen mode
+  *
+  * @event fullscreenchange
+  */
   handleFullscreenChange() {
     if (this.isFullscreen()) {
       this.addClass('vjs-fullscreen');
@@ -958,12 +958,12 @@ class Player extends Component {
   }
 
   /**
-   * native click events on the SWF aren't triggered on IE11, Win8.1RT
-   * use stageclick events triggered from inside the SWF instead
-   *
-   * @private
-   * @method handleStageClick
-   */
+  * native click events on the SWF aren't triggered on IE11, Win8.1RT
+  * use stageclick events triggered from inside the SWF instead
+  *
+  * @private
+  * @method handleStageClick
+  */
   handleStageClick() {
     this.reportUserActivity();
   }
@@ -978,110 +978,110 @@ class Player extends Component {
   }
 
   /**
-   * Fires when an error occurred during the loading of an audio/video
-   *
-   * @event error
-   */
+  * Fires when an error occurred during the loading of an audio/video
+  *
+  * @event error
+  */
   handleTechError() {
     this.error(this.tech.error().code);
   }
 
   /**
-   * Fires when the browser is intentionally not getting media data
-   *
-   * @event suspend
-   */
+  * Fires when the browser is intentionally not getting media data
+  *
+  * @event suspend
+  */
   handleTechSuspend() {
     this.trigger('suspend');
   }
 
   /**
-   * Fires when the loading of an audio/video is aborted
-   *
-   * @event abort
-   */
+  * Fires when the loading of an audio/video is aborted
+  *
+  * @event abort
+  */
   handleTechAbort() {
     this.trigger('abort');
   }
 
   /**
-   * Fires when the current playlist is empty
-   *
-   * @event emptied
-   */
+  * Fires when the current playlist is empty
+  *
+  * @event emptied
+  */
   handleTechEmptied() {
     this.trigger('emptied');
   }
 
   /**
-   * Fires when the browser is trying to get media data, but data is not available
-   *
-   * @event stalled
-   */
+  * Fires when the browser is trying to get media data, but data is not available
+  *
+  * @event stalled
+  */
   handleTechStalled() {
     this.trigger('stalled');
   }
 
   /**
-   * Fires when the browser has loaded meta data for the audio/video
-   *
-   * @event loadedmetadata
-   */
+  * Fires when the browser has loaded meta data for the audio/video
+  *
+  * @event loadedmetadata
+  */
   handleTechLoadedMetaData() {
     this.trigger('loadedmetadata');
   }
 
   /**
-   * Fires when the browser has loaded the current frame of the audio/video
-   *
-   * @event loaddata
-   */
+  * Fires when the browser has loaded the current frame of the audio/video
+  *
+  * @event loaddata
+  */
   handleTechLoadedData() {
     this.trigger('loadeddata');
   }
 
   /**
-   * Fires when the current playback position has changed
-   *
-   * @event timeupdate
-   */
+  * Fires when the current playback position has changed
+  *
+  * @event timeupdate
+  */
   handleTechTimeUpdate() {
     this.trigger('timeupdate');
   }
 
   /**
-   * Fires when the playing speed of the audio/video is changed
-   *
-   * @event ratechange
-   */
+  * Fires when the playing speed of the audio/video is changed
+  *
+  * @event ratechange
+  */
   handleTechRateChange() {
     this.trigger('ratechange');
   }
 
   /**
-   * Fires when the volume has been changed
-   *
-   * @event volumechange
-   */
+  * Fires when the volume has been changed
+  *
+  * @event volumechange
+  */
   handleTechVolumeChange() {
     this.trigger('volumechange');
   }
 
   /**
-   * Fires when the text track has been changed
-   *
-   * @event texttrackchange
-   */
+  * Fires when the text track has been changed
+  *
+  * @event texttrackchange
+  */
   onTextTrackChange() {
     this.trigger('texttrackchange');
   }
 
   /**
-   * Get object for cached values.
-   *
-   * @return {Object} 
-   * @method getCache
-   */
+  * Get object for cached values.
+  *
+  * @return {Object} 
+  * @method getCache
+  */
   getCache() {
     return this.cache_;
   }
@@ -1147,40 +1147,40 @@ class Player extends Component {
   }
 
   /**
-   * start media playback
-   *
-   *     myPlayer.play();
-   *
-   * @return {Player} self
-   * @method play
-   */
+  * start media playback
+  *
+  *     myPlayer.play();
+  *
+  * @return {Player} self
+  * @method play
+  */
   play() {
     this.techCall('play');
     return this;
   }
 
   /**
-   * Pause the video playback
-   *
-   *     myPlayer.pause();
-   *
-   * @return {Player} self
-   * @method pause
-   */
+  * Pause the video playback
+  *
+  *     myPlayer.pause();
+  *
+  * @return {Player} self
+  * @method pause
+  */
   pause() {
     this.techCall('pause');
     return this;
   }
 
   /**
-   * Check if the player is paused
-   *
-   *     var isPaused = myPlayer.paused();
-   *     var isPlaying = !myPlayer.paused();
-   *
-   * @return {Boolean} false if the media is currently playing, or true otherwise
-   * @method paused
-   */
+  * Check if the player is paused
+  *
+  *     var isPaused = myPlayer.paused();
+  *     var isPlaying = !myPlayer.paused();
+  *
+  * @return {Boolean} false if the media is currently playing, or true otherwise
+  * @method paused
+  */
   paused() {
     // The initial state of paused should be true (in Safari it's actually false)
     return (this.techGet('paused') === false) ? false : true;
@@ -1212,19 +1212,19 @@ class Player extends Component {
   }
 
   /**
-   * Get or set the current time (in seconds)
-   *
-   *     // get
-   *     var whereYouAt = myPlayer.currentTime();
-   *
-   *     // set
-   *     myPlayer.currentTime(120); // 2 minutes into the video
-   *
-   * @param  {Number|String=} seconds The time to seek to
-   * @return {Number}        The time in seconds, when not setting
-   * @return {Player}    self, when the current time is set
-   * @method currentTime
-   */
+  * Get or set the current time (in seconds)
+  *
+  *     // get
+  *     var whereYouAt = myPlayer.currentTime();
+  *
+  *     // set
+  *     myPlayer.currentTime(120); // 2 minutes into the video
+  *
+  * @param  {Number|String=} seconds The time to seek to
+  * @return {Number}        The time in seconds, when not setting
+  * @return {Player}    self, when the current time is set
+  * @method currentTime
+  */
   currentTime(seconds) {
     if (seconds !== undefined) {
 
@@ -1243,18 +1243,18 @@ class Player extends Component {
   }
 
   /**
-   * Get the length in time of the video in seconds
-   *
-   *     var lengthOfVideo = myPlayer.duration();
-   *
-   * **NOTE**: The video must have started loading before the duration can be
-   * known, and in the case of Flash, may not be known until the video starts
-   * playing.
-   *
-   * @param {Number} seconds Duration when setting
-   * @return {Number} The duration of the video in seconds when getting
-   * @method duration
-   */
+  * Get the length in time of the video in seconds
+  *
+  *     var lengthOfVideo = myPlayer.duration();
+  *
+  * **NOTE**: The video must have started loading before the duration can be
+  * known, and in the case of Flash, may not be known until the video starts
+  * playing.
+  *
+  * @param {Number} seconds Duration when setting
+  * @return {Number} The duration of the video in seconds when getting
+  * @method duration
+  */
   duration(seconds) {
     if (seconds !== undefined) {
 
@@ -1272,15 +1272,15 @@ class Player extends Component {
   }
 
   /**
-   * Calculates how much time is left.
-   *
-   *     var timeLeft = myPlayer.remainingTime();
-   *
-   * Not a native video element function, but useful
-   *
-   * @return {Number} The time remaining in seconds
-   * @method remainingTime
-   */
+  * Calculates how much time is left.
+  *
+  *     var timeLeft = myPlayer.remainingTime();
+  *
+  * Not a native video element function, but useful
+  *
+  * @return {Number} The time remaining in seconds
+  * @method remainingTime
+  */
   remainingTime() {
     return this.duration() - this.currentTime();
   }
@@ -1290,26 +1290,26 @@ class Player extends Component {
   // Kind of like an array of portions of the video that have been downloaded.
 
   /**
-   * Get a TimeRange object with the times of the video that have been downloaded
-   *
-   * If you just want the percent of the video that's been downloaded,
-   * use bufferedPercent.
-   *
-   *     // Number of different ranges of time have been buffered. Usually 1.
-   *     numberOfRanges = bufferedTimeRange.length,
-   *
-   *     // Time in seconds when the first range starts. Usually 0.
-   *     firstRangeStart = bufferedTimeRange.start(0),
-   *
-   *     // Time in seconds when the first range ends
-   *     firstRangeEnd = bufferedTimeRange.end(0),
-   *
-   *     // Length in seconds of the first time range
-   *     firstRangeLength = firstRangeEnd - firstRangeStart;
-   *
-   * @return {Object} A mock TimeRange object (following HTML spec)
-   * @method buffered
-   */
+  * Get a TimeRange object with the times of the video that have been downloaded
+  *
+  * If you just want the percent of the video that's been downloaded,
+  * use bufferedPercent.
+  *
+  *     // Number of different ranges of time have been buffered. Usually 1.
+  *     numberOfRanges = bufferedTimeRange.length,
+  *
+  *     // Time in seconds when the first range starts. Usually 0.
+  *     firstRangeStart = bufferedTimeRange.start(0),
+  *
+  *     // Time in seconds when the first range ends
+  *     firstRangeEnd = bufferedTimeRange.end(0),
+  *
+  *     // Length in seconds of the first time range
+  *     firstRangeLength = firstRangeEnd - firstRangeStart;
+  *
+  * @return {Object} A mock TimeRange object (following HTML spec)
+  * @method buffered
+  */
   buffered() {
     var buffered = this.techGet('buffered');
 
@@ -1321,27 +1321,27 @@ class Player extends Component {
   }
 
   /**
-   * Get the percent (as a decimal) of the video that's been downloaded
-   *
-   *     var howMuchIsDownloaded = myPlayer.bufferedPercent();
-   *
-   * 0 means none, 1 means all.
-   * (This method isn't in the HTML5 spec, but it's very convenient)
-   *
-   * @return {Number} A decimal between 0 and 1 representing the percent
-   * @method bufferedPercent
-   */
+  * Get the percent (as a decimal) of the video that's been downloaded
+  *
+  *     var howMuchIsDownloaded = myPlayer.bufferedPercent();
+  *
+  * 0 means none, 1 means all.
+  * (This method isn't in the HTML5 spec, but it's very convenient)
+  *
+  * @return {Number} A decimal between 0 and 1 representing the percent
+  * @method bufferedPercent
+  */
   bufferedPercent() {
     return bufferedPercent(this.buffered(), this.duration());
   }
 
   /**
-   * Get the ending time of the last buffered time range
-   *
-   * This is used in the progress bar to encapsulate all time ranges.
-   * @return {Number} The end of the last buffered time range
-   * @method bufferedEnd
-   */
+  * Get the ending time of the last buffered time range
+  *
+  * This is used in the progress bar to encapsulate all time ranges.
+  * @return {Number} The end of the last buffered time range
+  * @method bufferedEnd
+  */
   bufferedEnd() {
     var buffered = this.buffered(),
         duration = this.duration(),
@@ -1355,21 +1355,21 @@ class Player extends Component {
   }
 
   /**
-   * Get or set the current volume of the media
-   *
-   *     // get
-   *     var howLoudIsIt = myPlayer.volume();
-   *
-   *     // set
-   *     myPlayer.volume(0.5); // Set volume to half
-   *
-   * 0 is off (muted), 1.0 is all the way up, 0.5 is half way.
-   *
-   * @param  {Number} percentAsDecimal The new volume as a decimal percent
-   * @return {Number}              The current volume when getting
-   * @return {Player}              self when setting
-   * @method volume
-   */
+  * Get or set the current volume of the media
+  *
+  *     // get
+  *     var howLoudIsIt = myPlayer.volume();
+  *
+  *     // set
+  *     myPlayer.volume(0.5); // Set volume to half
+  *
+  * 0 is off (muted), 1.0 is all the way up, 0.5 is half way.
+  *
+  * @param  {Number} percentAsDecimal The new volume as a decimal percent
+  * @return {Number}              The current volume when getting
+  * @return {Player}              self when setting
+  * @method volume
+  */
   volume(percentAsDecimal) {
     let vol;
 
@@ -1388,19 +1388,19 @@ class Player extends Component {
 
 
   /**
-   * Get the current muted state, or turn mute on or off
-   *
-   *     // get
-   *     var isVolumeMuted = myPlayer.muted();
-   *
-   *     // set
-   *     myPlayer.muted(true); // mute the volume
-   *
-   * @param  {Boolean=} muted True to mute, false to unmute
-   * @return {Boolean} True if mute is on, false if not when getting
-   * @return {Player} self when setting mute
-   * @method muted
-   */
+  * Get the current muted state, or turn mute on or off
+  *
+  *     // get
+  *     var isVolumeMuted = myPlayer.muted();
+  *
+  *     // set
+  *     myPlayer.muted(true); // mute the volume
+  *
+  * @param  {Boolean=} muted True to mute, false to unmute
+  * @return {Boolean} True if mute is on, false if not when getting
+  * @return {Player} self when setting mute
+  * @method muted
+  */
   muted(muted) {
     if (muted !== undefined) {
       this.techCall('setMuted', muted);
@@ -1422,23 +1422,23 @@ class Player extends Component {
   }
 
   /**
-   * Check if the player is in fullscreen mode
-   *
-   *     // get
-   *     var fullscreenOrNot = myPlayer.isFullscreen();
-   *
-   *     // set
-   *     myPlayer.isFullscreen(true); // tell the player it's in fullscreen
-   *
-   * NOTE: As of the latest HTML5 spec, isFullscreen is no longer an official
-   * property and instead document.fullscreenElement is used. But isFullscreen is
-   * still a valuable property for internal player workings.
-   *
-   * @param  {Boolean=} isFS Update the player's fullscreen state
-   * @return {Boolean} true if fullscreen false if not when getting
-   * @return {Player} self when setting
-   * @method isFullscreen
-   */
+  * Check if the player is in fullscreen mode
+  *
+  *     // get
+  *     var fullscreenOrNot = myPlayer.isFullscreen();
+  *
+  *     // set
+  *     myPlayer.isFullscreen(true); // tell the player it's in fullscreen
+  *
+  * NOTE: As of the latest HTML5 spec, isFullscreen is no longer an official
+  * property and instead document.fullscreenElement is used. But isFullscreen is
+  * still a valuable property for internal player workings.
+  *
+  * @param  {Boolean=} isFS Update the player's fullscreen state
+  * @return {Boolean} true if fullscreen false if not when getting
+  * @return {Player} self when setting
+  * @method isFullscreen
+  */
   isFullscreen(isFS) {
     if (isFS !== undefined) {
       this.isFullscreen_ = !!isFS;
@@ -1448,34 +1448,34 @@ class Player extends Component {
   }
 
   /**
-   * Old naming for isFullscreen()
-   *
-   * @param  {Boolean=} isFS Update the player's fullscreen state
-   * @return {Boolean} true if fullscreen false if not when getting
-   * @return {Player} self when setting
-   * @deprecated
-   * @method isFullScreen
-   */
+  * Old naming for isFullscreen()
+  *
+  * @param  {Boolean=} isFS Update the player's fullscreen state
+  * @return {Boolean} true if fullscreen false if not when getting
+  * @return {Player} self when setting
+  * @deprecated
+  * @method isFullScreen
+  */
   isFullScreen(isFS) {
     log.warn('player.isFullScreen() has been deprecated, use player.isFullscreen() with a lowercase "s")');
     return this.isFullscreen(isFS);
   }
 
   /**
-   * Increase the size of the video to full screen
-   *
-   *     myPlayer.requestFullscreen();
-   *
-   * In some browsers, full screen is not supported natively, so it enters
-   * "full window mode", where the video fills the browser window.
-   * In browsers and devices that support native full screen, sometimes the
-   * browser's default controls will be shown, and not the Video.js custom skin.
-   * This includes most mobile devices (iOS, Android) and older versions of
-   * Safari.
-   *
-   * @return {Player} self
-   * @method requestFullscreen
-   */
+  * Increase the size of the video to full screen
+  *
+  *     myPlayer.requestFullscreen();
+  *
+  * In some browsers, full screen is not supported natively, so it enters
+  * "full window mode", where the video fills the browser window.
+  * In browsers and devices that support native full screen, sometimes the
+  * browser's default controls will be shown, and not the Video.js custom skin.
+  * This includes most mobile devices (iOS, Android) and older versions of
+  * Safari.
+  *
+  * @return {Player} self
+  * @method requestFullscreen
+  */
   requestFullscreen() {
     var fsApi = FullscreenApi;
 
@@ -1518,25 +1518,25 @@ class Player extends Component {
   }
 
   /**
-   * Old naming for requestFullscreen
-   *
-   * @return {Boolean} true if fullscreen false if not when getting
-   * @deprecated
-   * @method requestFullScreen
-   */
+  * Old naming for requestFullscreen
+  *
+  * @return {Boolean} true if fullscreen false if not when getting
+  * @deprecated
+  * @method requestFullScreen
+  */
   requestFullScreen() {
     log.warn('player.requestFullScreen() has been deprecated, use player.requestFullscreen() with a lowercase "s")');
     return this.requestFullscreen();
   }
 
   /**
-   * Return the video to its normal size after having been in full screen mode
-   *
-   *     myPlayer.exitFullscreen();
-   *
-   * @return {Player} self
-   * @method exitFullscreen
-   */
+  * Return the video to its normal size after having been in full screen mode
+  *
+  *     myPlayer.exitFullscreen();
+  *
+  * @return {Player} self
+  * @method exitFullscreen
+  */
   exitFullscreen() {
     var fsApi = FullscreenApi;
     this.isFullscreen(false);
@@ -1555,12 +1555,12 @@ class Player extends Component {
   }
 
   /**
-   * Old naming for exitFullscreen
-   *
-   * @return {Player} self
-   * @deprecated
-   * @method cancelFullScreen
-   */
+  * Old naming for exitFullscreen
+  *
+  * @return {Player} self
+  * @deprecated
+  * @method cancelFullScreen
+  */
   cancelFullScreen() {
     log.warn('player.cancelFullScreen() has been deprecated, use player.exitFullscreen()');
     return this.exitFullscreen();
@@ -1662,38 +1662,38 @@ class Player extends Component {
   }
 
   /**
-   * The source function updates the video source
-   *
-   * There are three types of variables you can pass as the argument.
-   *
-   * **URL String**: A URL to the the video file. Use this method if you are sure
-   * the current playback technology (HTML5/Flash) can support the source you
-   * provide. Currently only MP4 files can be used in both HTML5 and Flash.
-   *
-   *     myPlayer.src("http://www.example.com/path/to/video.mp4");
-   *
-   * **Source Object (or element):** A javascript object containing information
-   * about the source file. Use this method if you want the player to determine if
-   * it can support the file using the type information.
-   *
-   *     myPlayer.src({ type: "video/mp4", src: "http://www.example.com/path/to/video.mp4" });
-   *
-   * **Array of Source Objects:** To provide multiple versions of the source so
-   * that it can be played using HTML5 across browsers you can use an array of
-   * source objects. Video.js will detect which version is supported and load that
-   * file.
-   *
-   *     myPlayer.src([
-   *       { type: "video/mp4", src: "http://www.example.com/path/to/video.mp4" },
-   *       { type: "video/webm", src: "http://www.example.com/path/to/video.webm" },
-   *       { type: "video/ogg", src: "http://www.example.com/path/to/video.ogv" }
-   *     ]);
-   *
-   * @param  {String|Object|Array=} source The source URL, object, or array of sources
-   * @return {String} The current video source when getting
-   * @return {String} The player when setting
-   * @method src
-   */
+  * The source function updates the video source
+  *
+  * There are three types of variables you can pass as the argument.
+  *
+  * **URL String**: A URL to the the video file. Use this method if you are sure
+  * the current playback technology (HTML5/Flash) can support the source you
+  * provide. Currently only MP4 files can be used in both HTML5 and Flash.
+  *
+  *     myPlayer.src("http://www.example.com/path/to/video.mp4");
+  *
+  * **Source Object (or element):** A javascript object containing information
+  * about the source file. Use this method if you want the player to determine if
+  * it can support the file using the type information.
+  *
+  *     myPlayer.src({ type: "video/mp4", src: "http://www.example.com/path/to/video.mp4" });
+  *
+  * **Array of Source Objects:** To provide multiple versions of the source so
+  * that it can be played using HTML5 across browsers you can use an array of
+  * source objects. Video.js will detect which version is supported and load that
+  * file.
+  *
+  *     myPlayer.src([
+  *       { type: "video/mp4", src: "http://www.example.com/path/to/video.mp4" },
+  *       { type: "video/webm", src: "http://www.example.com/path/to/video.webm" },
+  *       { type: "video/ogg", src: "http://www.example.com/path/to/video.ogv" }
+  *     ]);
+  *
+  * @param  {String|Object|Array=} source The source URL, object, or array of sources
+  * @return {String} The current video source when getting
+  * @return {String} The player when setting
+  * @method src
+  */
   src(source) {
     if (source === undefined) {
       return this.techGet('src');
@@ -1750,12 +1750,12 @@ class Player extends Component {
   }
 
   /**
-   * Handle an array of source objects
-   *
-   * @param  {Array} sources Array of source objects
-   * @private
-   * @method sourceList_
-   */
+  * Handle an array of source objects
+  *
+  * @param  {Array} sources Array of source objects
+  * @private
+  * @method sourceList_
+  */
   sourceList_(sources) {
     var sourceTech = this.selectSource(sources);
 
@@ -1780,47 +1780,47 @@ class Player extends Component {
   }
 
   /**
-   * Begin loading the src data.
-   *
-   * @return {Player} Returns the player
-   * @method load
-   */
+  * Begin loading the src data.
+  *
+  * @return {Player} Returns the player
+  * @method load
+  */
   load() {
     this.techCall('load');
     return this;
   }
 
   /**
-   * Returns the fully qualified URL of the current source value e.g. http://mysite.com/video.mp4
-   * Can be used in conjuction with `currentType` to assist in rebuilding the current source object.
-   *
-   * @return {String} The current source
-   * @method currentSrc
-   */
+  * Returns the fully qualified URL of the current source value e.g. http://mysite.com/video.mp4
+  * Can be used in conjuction with `currentType` to assist in rebuilding the current source object.
+  *
+  * @return {String} The current source
+  * @method currentSrc
+  */
   currentSrc() {
     return this.techGet('currentSrc') || this.cache_.src || '';
   }
 
   /**
-   * Get the current source type e.g. video/mp4
-   * This can allow you rebuild the current source object so that you could load the same
-   * source and tech later
-   *
-   * @return {String} The source MIME type
-   * @method currentType
-   */
+  * Get the current source type e.g. video/mp4
+  * This can allow you rebuild the current source object so that you could load the same
+  * source and tech later
+  *
+  * @return {String} The source MIME type
+  * @method currentType
+  */
   currentType() {
       return this.currentType_ || '';
   }
 
   /**
-   * Get or set the preload attribute
-   *
-   * @param {Boolean} value Boolean to determine if preload should be used
-   * @return {String} The preload attribute value when getting
-   * @return {Player} Returns the player when setting
-   * @method preload
-   */
+  * Get or set the preload attribute
+  *
+  * @param {Boolean} value Boolean to determine if preload should be used
+  * @return {String} The preload attribute value when getting
+  * @return {Player} Returns the player when setting
+  * @method preload
+  */
   preload(value) {
     if (value !== undefined) {
       this.techCall('setPreload', value);
@@ -1831,13 +1831,13 @@ class Player extends Component {
   }
 
   /**
-   * Get or set the autoplay attribute.
-   *
-   * @param {Boolean} value Boolean to determine if preload should be used
-   * @return {String} The autoplay attribute value when getting
-   * @return {Player} Returns the player when setting
-   * @method autoplay
-   */
+  * Get or set the autoplay attribute.
+  *
+  * @param {Boolean} value Boolean to determine if preload should be used
+  * @return {String} The autoplay attribute value when getting
+  * @return {Player} Returns the player when setting
+  * @method autoplay
+  */
   autoplay(value) {
     if (value !== undefined) {
       this.techCall('setAutoplay', value);
@@ -1848,13 +1848,13 @@ class Player extends Component {
   }
 
   /**
-   * Get or set the loop attribute on the video element.
-   *
-   * @param {Boolean} value Boolean to determine if preload should be used
-   * @return {String} The loop attribute value when getting
-   * @return {Player} Returns the player when setting
-   * @method loop
-   */
+  * Get or set the loop attribute on the video element.
+  *
+  * @param {Boolean} value Boolean to determine if preload should be used
+  * @return {String} The loop attribute value when getting
+  * @return {Player} Returns the player when setting
+  * @method loop
+  */
   loop(value) {
     if (value !== undefined) {
       this.techCall('setLoop', value);
@@ -1865,21 +1865,21 @@ class Player extends Component {
   }
 
   /**
-   * get or set the poster image source url
-   *
-   * ##### EXAMPLE:
-   *
-   *     // getting
-   *     var currentPoster = myPlayer.poster();
-   *
-   *     // setting
-   *     myPlayer.poster('http://example.com/myImage.jpg');
-   *
-   * @param  {String=} src Poster image source URL
-   * @return {String} poster URL when getting
-   * @return {Player} self when setting
-   * @method poster
-   */
+  * get or set the poster image source url
+  *
+  * ##### EXAMPLE:
+  *
+  *     // getting
+  *     var currentPoster = myPlayer.poster();
+  *
+  *     // setting
+  *     myPlayer.poster('http://example.com/myImage.jpg');
+  *
+  * @param  {String=} src Poster image source URL
+  * @return {String} poster URL when getting
+  * @return {Player} self when setting
+  * @method poster
+  */
   poster(src) {
     if (src === undefined) {
       return this.poster_;
@@ -1904,12 +1904,12 @@ class Player extends Component {
   }
 
   /**
-   * Get or set whether or not the controls are showing.
-   *
-   * @param  {Boolean} bool Set controls to showing or not
-   * @return {Boolean}    Controls are showing
-   * @method controls
-   */
+  * Get or set whether or not the controls are showing.
+  *
+  * @param  {Boolean} bool Set controls to showing or not
+  * @return {Boolean}    Controls are showing
+  * @method controls
+  */
   controls(bool) {
     if (bool !== undefined) {
       bool = !!bool; // force boolean
@@ -1945,18 +1945,18 @@ class Player extends Component {
   }
 
   /**
-   * Toggle native controls on/off. Native controls are the controls built into
-   * devices (e.g. default iPhone controls), Flash, or other techs
-   * (e.g. Vimeo Controls)
-   *
-   * **This should only be set by the current tech, because only the tech knows
-   * if it can support native controls**
-   *
-   * @param  {Boolean} bool    True signals that native controls are on
-   * @return {Player}      Returns the player
-   * @private
-   * @method usingNativeControls
-   */
+  * Toggle native controls on/off. Native controls are the controls built into
+  * devices (e.g. default iPhone controls), Flash, or other techs
+  * (e.g. Vimeo Controls)
+  *
+  * **This should only be set by the current tech, because only the tech knows
+  * if it can support native controls**
+  *
+  * @param  {Boolean} bool    True signals that native controls are on
+  * @return {Player}      Returns the player
+  * @private
+  * @method usingNativeControls
+  */
   usingNativeControls(bool) {
     if (bool !== undefined) {
       bool = !!bool; // force boolean
@@ -1995,12 +1995,12 @@ class Player extends Component {
   }
 
   /**
-   * Set or get the current MediaError
-   * @param  {*} err A MediaError or a String/Number to be turned into a MediaError
-   * @return {MediaError|null}     when getting
-   * @return {Player}              when setting
-   * @method error
-   */
+  * Set or get the current MediaError
+  * @param  {*} err A MediaError or a String/Number to be turned into a MediaError
+  * @return {MediaError|null}     when getting
+  * @return {Player}              when setting
+  * @method error
+  */
   error(err) {
     if (err === undefined) {
       return this.error_ || null;
@@ -2034,28 +2034,28 @@ class Player extends Component {
   }
 
   /**
-   * Returns whether or not the player is in the "ended" state.
-   *
-   * @return {Boolean} True if the player is in the ended state, false if not.
-   * @method ended
-   */
+  * Returns whether or not the player is in the "ended" state.
+  *
+  * @return {Boolean} True if the player is in the ended state, false if not.
+  * @method ended
+  */
   ended() { return this.techGet('ended'); }
 
   /**
-   * Returns whether or not the player is in the "seeking" state.
-   *
-   * @return {Boolean} True if the player is in the seeking state, false if not.
-   * @method seeking
-   */
+  * Returns whether or not the player is in the "seeking" state.
+  *
+  * @return {Boolean} True if the player is in the seeking state, false if not.
+  * @method seeking
+  */
   seeking() { return this.techGet('seeking'); }
 
   /**
-   * Returns the TimeRanges of the media that are currently available
-   * for seeking to.
-   *
-   * @return {TimeRanges} the seekable intervals of the media timeline
-   * @method seekable
-   */
+  * Returns the TimeRanges of the media that are currently available
+  * for seeking to.
+  *
+  * @return {TimeRanges} the seekable intervals of the media timeline
+  * @method seekable
+  */
   seekable() { return this.techGet('seekable'); }
 
   /**
@@ -2202,16 +2202,16 @@ class Player extends Component {
   }
 
   /**
-   * Gets or sets the current playback rate.  A playback rate of
-   * 1.0 represents normal speed and 0.5 would indicate half-speed
-   * playback, for instance.
-   * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-playbackrate
-   *
-   * @param  {Number} rate    New playback rate to set.
-   * @return {Number}         Returns the new playback rate when setting
-   * @return {Number}         Returns the current playback rate when getting
-   * @method playbackRate
-   */
+  * Gets or sets the current playback rate.  A playback rate of
+  * 1.0 represents normal speed and 0.5 would indicate half-speed
+  * playback, for instance.
+  * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-playbackrate
+  *
+  * @param  {Number} rate    New playback rate to set.
+  * @return {Number}         Returns the new playback rate when setting
+  * @return {Number}         Returns the current playback rate when getting
+  * @method playbackRate
+  */
   playbackRate(rate) {
     if (rate !== undefined) {
       this.techCall('setPlaybackRate', rate);
@@ -2226,14 +2226,14 @@ class Player extends Component {
   }
 
   /**
-   * Gets or sets the audio flag
-   *
-   * @param  {Boolean} bool    True signals that this is an audio player.
-   * @return {Boolean}         Returns true if player is audio, false if not when getting
-   * @return {Player}      Returns the player if setting
-   * @private
-   * @method isAudio
-   */
+  * Gets or sets the audio flag
+  *
+  * @param  {Boolean} bool    True signals that this is an audio player.
+  * @return {Boolean}         Returns true if player is audio, false if not when getting
+  * @return {Player}      Returns the player if setting
+  * @private
+  * @method isAudio
+  */
   isAudio(bool) {
     if (bool !== undefined) {
       this.isAudio_ = !!bool;
@@ -2244,52 +2244,52 @@ class Player extends Component {
   }
 
   /**
-   * Returns the current state of network activity for the element, from
-   * the codes in the list below.
-   * - NETWORK_EMPTY (numeric value 0)
-   *   The element has not yet been initialised. All attributes are in
-   *   their initial states.
-   * - NETWORK_IDLE (numeric value 1)
-   *   The element's resource selection algorithm is active and has
-   *   selected a resource, but it is not actually using the network at
-   *   this time.
-   * - NETWORK_LOADING (numeric value 2)
-   *   The user agent is actively trying to download data.
-   * - NETWORK_NO_SOURCE (numeric value 3)
-   *   The element's resource selection algorithm is active, but it has
-   *   not yet found a resource to use.
-   *
-   * @see https://html.spec.whatwg.org/multipage/embedded-content.html#network-states
-   * @return {Number} the current network activity state
-   * @method networkState
-   */
+  * Returns the current state of network activity for the element, from
+  * the codes in the list below.
+  * - NETWORK_EMPTY (numeric value 0)
+  *   The element has not yet been initialised. All attributes are in
+  *   their initial states.
+  * - NETWORK_IDLE (numeric value 1)
+  *   The element's resource selection algorithm is active and has
+  *   selected a resource, but it is not actually using the network at
+  *   this time.
+  * - NETWORK_LOADING (numeric value 2)
+  *   The user agent is actively trying to download data.
+  * - NETWORK_NO_SOURCE (numeric value 3)
+  *   The element's resource selection algorithm is active, but it has
+  *   not yet found a resource to use.
+  *
+  * @see https://html.spec.whatwg.org/multipage/embedded-content.html#network-states
+  * @return {Number} the current network activity state
+  * @method networkState
+  */
   networkState() {
     return this.techGet('networkState');
   }
 
   /**
-   * Returns a value that expresses the current state of the element
-   * with respect to rendering the current playback position, from the
-   * codes in the list below.
-   * - HAVE_NOTHING (numeric value 0)
-   *   No information regarding the media resource is available.
-   * - HAVE_METADATA (numeric value 1)
-   *   Enough of the resource has been obtained that the duration of the
-   *   resource is available.
-   * - HAVE_CURRENT_DATA (numeric value 2)
-   *   Data for the immediate current playback position is available.
-   * - HAVE_FUTURE_DATA (numeric value 3)
-   *   Data for the immediate current playback position is available, as
-   *   well as enough data for the user agent to advance the current
-   *   playback position in the direction of playback.
-   * - HAVE_ENOUGH_DATA (numeric value 4)
-   *   The user agent estimates that enough data is available for
-   *   playback to proceed uninterrupted.
-   *
-   * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-readystate
-   * @return {Number} the current playback rendering state
-   * @method readyState
-   */
+  * Returns a value that expresses the current state of the element
+  * with respect to rendering the current playback position, from the
+  * codes in the list below.
+  * - HAVE_NOTHING (numeric value 0)
+  *   No information regarding the media resource is available.
+  * - HAVE_METADATA (numeric value 1)
+  *   Enough of the resource has been obtained that the duration of the
+  *   resource is available.
+  * - HAVE_CURRENT_DATA (numeric value 2)
+  *   Data for the immediate current playback position is available.
+  * - HAVE_FUTURE_DATA (numeric value 3)
+  *   Data for the immediate current playback position is available, as
+  *   well as enough data for the user agent to advance the current
+  *   playback position in the direction of playback.
+  * - HAVE_ENOUGH_DATA (numeric value 4)
+  *   The user agent estimates that enough data is available for
+  *   playback to proceed uninterrupted.
+  *
+  * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-readystate
+  * @return {Number} the current playback rendering state
+  * @method readyState
+  */
   readyState() {
     return this.techGet('readyState');
   }
@@ -2303,12 +2303,12 @@ class Player extends Component {
    */
 
   /**
-   * Get an array of associated text tracks. captions, subtitles, chapters, descriptions
-   * http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-texttracks
-   *
-   * @return {Array}           Array of track objects
-   * @method textTracks
-   */
+  * Get an array of associated text tracks. captions, subtitles, chapters, descriptions
+  * http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-texttracks
+  *
+  * @return {Array}           Array of track objects
+  * @method textTracks
+  */
   textTracks() {
     // cannot use techGet directly because it checks to see whether the tech is ready.
     // Flash is unlikely to be ready in time but textTracks should still work.
@@ -2326,54 +2326,54 @@ class Player extends Component {
   }
 
   /**
-   * Add a text track
-   * In addition to the W3C settings we allow adding additional info through options.
-   * http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-addtexttrack
-   * @param {String}  kind        Captions, subtitles, chapters, descriptions, or metadata
-   * @param {String=} label       Optional label
-   * @param {String=} language    Optional language
-   * @method addTextTrack
-   */
+  * Add a text track
+  * In addition to the W3C settings we allow adding additional info through options.
+  * http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-addtexttrack
+  * @param {String}  kind        Captions, subtitles, chapters, descriptions, or metadata
+  * @param {String=} label       Optional label
+  * @param {String=} language    Optional language
+  * @method addTextTrack
+  */
   addTextTrack(kind, label, language) {
     return this.tech && this.tech['addTextTrack'](kind, label, language);
   }
 
   /**
-   * Add a remote text track
-   *
-   * @param {Object} options    Options for remote text track
-   * @method addRemoteTextTrack
-   */
+  * Add a remote text track
+  *
+  * @param {Object} options    Options for remote text track
+  * @method addRemoteTextTrack
+  */
   addRemoteTextTrack(options) {
     return this.tech && this.tech['addRemoteTextTrack'](options);
   }
 
   /**
-   * Remove a remote text track
-   *
-   * @param {Object} track    Remote text track to remove
-   * @method removeRemoteTextTrack
-   */
+  * Remove a remote text track
+  *
+  * @param {Object} track    Remote text track to remove
+  * @method removeRemoteTextTrack
+  */
   removeRemoteTextTrack(track) {
     this.tech && this.tech['removeRemoteTextTrack'](track);
   }
 
   /**
-   * Get video width
-   *
-   * @return {Number} Video width
-   * @method videoWidth
-   */
+  * Get video width
+  *
+  * @return {Number} Video width
+  * @method videoWidth
+  */
   videoWidth() {
     return this.tech && this.tech.videoWidth && this.tech.videoWidth() || 0;
   }
 
   /**
-   * Get video height
-   *
-   * @return {Number} Video height
-   * @method videoHeight
-   */
+  * Get video height
+  *
+  * @return {Number} Video height
+  * @method videoHeight
+  */
   videoHeight() {
     return this.tech && this.tech.videoHeight && this.tech.videoHeight() || 0;
   }
@@ -2395,17 +2395,17 @@ class Player extends Component {
   // playList: array of source lists in order of playback
 
   /**
-   * The player's language code
-   *
-   * NOTE: The language should be set in the player options if you want the
-   * the controls to be built with a specific language. Changing the lanugage
-   * later will not update controls text.
-   *
-   * @param {String} code  The locale string
-   * @return {String}      The locale string when getting
-   * @return {Player}      self when setting
-   * @method language
-   */
+  * The player's language code
+  *
+  * NOTE: The language should be set in the player options if you want the
+  * the controls to be built with a specific language. Changing the lanugage
+  * later will not update controls text.
+  *
+  * @param {String} code  The locale string
+  * @return {String}      The locale string when getting
+  * @return {Player}      self when setting
+  * @method language
+  */
   language(code) {
     if (code === undefined) {
       return this.language_;
@@ -2416,23 +2416,23 @@ class Player extends Component {
   }
 
   /**
-   * Get the player's language dictionary
-   * Merge every time, because a newly added plugin might call videojs.addLanguage() at any time
-   * Languages specified directly in the player options have precedence
-   *
-   * @return {Array} Array of languages
-   * @method languages
-   */
+  * Get the player's language dictionary
+  * Merge every time, because a newly added plugin might call videojs.addLanguage() at any time
+  * Languages specified directly in the player options have precedence
+  *
+  * @return {Array} Array of languages
+  * @method languages
+  */
   languages() {
     return  mergeOptions(globalOptions['languages'], this.languages_);
   }
 
   /**
-   * Converts track info to JSON
-   *
-   * @return {Object} JSON object of options
-   * @method toJSON
-   */
+  * Converts track info to JSON
+  *
+  * @return {Object} JSON object of options
+  * @method toJSON
+  */
   toJSON() {
     let options = mergeOptions(this.options_);
     let tracks = options.tracks;
@@ -2503,79 +2503,79 @@ class Player extends Component {
 }
 
 /*
- * Global player list
- *
- * @type {Object}
- */
+* Global player list
+*
+* @type {Object}
+*/
 Player.players = {};
 
 /*
- * Player instance options, surfaced using options
- * options = Player.prototype.options_
- * Make changes in options, not here.
- * All options should use string keys so they avoid
- * renaming by closure compiler
- * @type {Object}
- * @private
- */
+* Player instance options, surfaced using options
+* options = Player.prototype.options_
+* Make changes in options, not here.
+* All options should use string keys so they avoid
+* renaming by closure compiler
+* @type {Object}
+* @private
+*/
 Player.prototype.options_ = globalOptions;
 
 /**
- * Fired when the player has initial duration and dimension information
- *
- * @event loadedmetadata
- */
+* Fired when the player has initial duration and dimension information
+*
+* @event loadedmetadata
+*/
 Player.prototype.handleLoadedMetaData;
 
 /**
- * Fired when the player has downloaded data at the current playback position
- *
- * @event loadeddata
- */
+* Fired when the player has downloaded data at the current playback position
+*
+* @event loadeddata
+*/
 Player.prototype.handleLoadedData;
 
 /**
- * Fired when the player has finished downloading the source data
- *
- * @event loadedalldata
- */
+* Fired when the player has finished downloading the source data
+*
+* @event loadedalldata
+*/
 Player.prototype.handleLoadedAllData;
 
 /**
- * Fired when the user is active, e.g. moves the mouse over the player
- *
- * @event useractive
- */
+* Fired when the user is active, e.g. moves the mouse over the player
+*
+* @event useractive
+*/
 Player.prototype.handleUserActive;
 
 /**
- * Fired when the user is inactive, e.g. a short delay after the last mouse move or control interaction
- *
- * @event userinactive
- */
+* Fired when the user is inactive, e.g. a short delay after the last mouse move or control interaction
+*
+* @event userinactive
+*/
 Player.prototype.handleUserInactive;
 
 /**
- * Fired when the current playback position has changed *
- * During playback this is fired every 15-250 milliseconds, depending on the
- * playback technology in use.
- *
- * @event timeupdate
- */
+* Fired when the current playback position has changed *
+* During playback this is fired every 15-250 milliseconds, depending on the
+* playback technology in use.
+*
+* @event timeupdate
+*/
 Player.prototype.handleTimeUpdate;
 
 /**
- * Fired when the volume changes
- *
- * @event volumechange
- */
+* Fired when the volume changes
+*
+* @event volumechange
+*/
 Player.prototype.handleVolumeChange;
 
 /**
- * Fired when an error occurs
- *
- * @event error
- */
+* Fired when an error occurs
+*
+* @event error
+*/
 Player.prototype.handleError;
 
 Player.prototype.flexNotSupported_ = function() {
