@@ -1,14 +1,17 @@
+/**
+* @file browser.js
+*/
 import document from 'global/document';
 import window from 'global/window';
 
 const USER_AGENT = window.navigator.userAgent;
 
 /*
- * Device is an iPhone
- * @type {Boolean}
- * @constant
- * @private
- */
+* Device is an iPhone
+* @type {Boolean}
+* @constant
+* @private
+*/
 export const IS_IPHONE = (/iPhone/i).test(USER_AGENT);
 export const IS_IPAD = (/iPad/i).test(USER_AGENT);
 export const IS_IPOD = (/iPod/i).test(USER_AGENT);

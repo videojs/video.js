@@ -1,9 +1,11 @@
 /**
- * @fileoverview Event System (John Resig - Secrets of a JS Ninja http://jsninja.com/)
- * (Original book version wasn't completely usable, so fixed some things and made Closure Compiler compatible)
- * This should work very similarly to jQuery's events, however it's based off the book version which isn't as
- * robust as jquery's, so there's probably some differences.
- */
+* @file events.js
+*
+* Event System (John Resig - Secrets of a JS Ninja http://jsninja.com/)
+* (Original book version wasn't completely usable, so fixed some things and made Closure Compiler compatible)
+* This should work very similarly to jQuery's events, however it's based off the book version which isn't as
+* robust as jquery's, so there's probably some differences.
+*/
 
 import * as Dom from './dom.js';
 import * as Guid from './guid.js';
@@ -11,16 +13,16 @@ import window from 'global/window';
 import document from 'global/document';
 
 /**
- * Add an event listener to element
- * It stores the handler function in a separate cache object
- * and adds a generic handler to the element's event,
- * along with a unique id (guid) to the element.
- * 
- * @param  {Element|Object}   elem Element or object to bind listeners to
- * @param  {String|Array}   type Type of event to bind to.
- * @param  {Function} fn   Event listener.
- * @method on
- */
+* Add an event listener to element
+* It stores the handler function in a separate cache object
+* and adds a generic handler to the element's event,
+* along with a unique id (guid) to the element.
+* 
+* @param  {Element|Object}   elem Element or object to bind listeners to
+* @param  {String|Array}   type Type of event to bind to.
+* @param  {Function} fn   Event listener.
+* @method on
+*/
 export function on(elem, type, fn){
   if (Array.isArray(type)) {
     return _handleMultipleEvents(on, elem, type, fn);
@@ -72,13 +74,13 @@ export function on(elem, type, fn){
 }
 
 /**
- * Removes event listeners from an element
- *
- * @param  {Element|Object}   elem Object to remove listeners from
- * @param  {String|Array=}   type Type of listener to remove. Don't include to remove all events from element.
- * @param  {Function} fn   Specific listener to remove. Don't include to remove listeners for an event type.
- * @method off
- */
+* Removes event listeners from an element
+*
+* @param  {Element|Object}   elem Object to remove listeners from
+* @param  {String|Array=}   type Type of listener to remove. Don't include to remove all events from element.
+* @param  {Function} fn   Specific listener to remove. Don't include to remove listeners for an event type.
+* @method off
+*/
 export function off(elem, type, fn) {
   // Don't want to add a cache object through getElData if not needed
   if (!Dom.hasElData(elem)) return;
@@ -128,14 +130,14 @@ export function off(elem, type, fn) {
 }
 
 /**
- * Trigger an event for an element
- *
- * @param  {Element|Object}      elem  Element to trigger an event on
- * @param  {Event|Object|String} event A string (the type) or an event object with a type attribute
- * @param  {Object} [hash] data hash to pass along with the event
- * @return {Boolean=} Returned only if default was prevented
- * @method trigger
- */
+* Trigger an event for an element
+*
+* @param  {Element|Object}      elem  Element to trigger an event on
+* @param  {Event|Object|String} event A string (the type) or an event object with a type attribute
+* @param  {Object} [hash] data hash to pass along with the event
+* @return {Boolean=} Returned only if default was prevented
+* @method trigger
+*/
 export function trigger(elem, event, hash) {
   // Fetches element data and a reference to the parent (for bubbling).
   // Don't want to add a data object to cache for every parent,
@@ -184,13 +186,13 @@ export function trigger(elem, event, hash) {
 }
 
 /**
- * Trigger a listener only once for an event
- *
- * @param  {Element|Object}   elem Element or object to
- * @param  {String|Array}   type Name/type of event
- * @param  {Function} fn Event handler function
- * @method one
- */
+* Trigger a listener only once for an event
+*
+* @param  {Element|Object}   elem Element or object to
+* @param  {String|Array}   type Name/type of event
+* @param  {Function} fn Event handler function
+* @method one
+*/
 export function one(elem, type, fn) {
   if (Array.isArray(type)) {
     return _handleMultipleEvents(one, elem, type, fn);
@@ -205,13 +207,13 @@ export function one(elem, type, fn) {
 }
 
 /**
- * Fix a native event to have standard property values
- * 
- * @param  {Object} event Event object to fix
- * @return {Object}
- * @private
- * @method fixEvent
- */
+* Fix a native event to have standard property values
+* 
+* @param  {Object} event Event object to fix
+* @return {Object}
+* @private
+* @method fixEvent
+*/
 export function fixEvent(event) {
 
   function returnTrue() { return true; }
@@ -315,13 +317,13 @@ export function fixEvent(event) {
 }
 
 /**
- * Clean up the listener cache and dispatchers
- *
- * @param  {Element|Object} elem Element to clean up
- * @param  {String} type Type of event to clean up
- * @private
- * @method _cleanUpEvents
- */
+* Clean up the listener cache and dispatchers
+*
+* @param  {Element|Object} elem Element to clean up
+* @param  {String} type Type of event to clean up
+* @private
+* @method _cleanUpEvents
+*/
 function _cleanUpEvents(elem, type) {
   var data = Dom.getElData(elem);
 
@@ -353,15 +355,15 @@ function _cleanUpEvents(elem, type) {
 }
 
 /**
- * Loops through an array of event types and calls the requested method for each type.
- *
- * @param  {Function} fn   The event method we want to use.
- * @param  {Element|Object} elem Element or object to bind listeners to
- * @param  {String}   type Type of event to bind to.
- * @param  {Function} callback   Event listener.
- * @private
- * @function _handleMultipleEvents
- */
+* Loops through an array of event types and calls the requested method for each type.
+*
+* @param  {Function} fn   The event method we want to use.
+* @param  {Element|Object} elem Element or object to bind listeners to
+* @param  {String}   type Type of event to bind to.
+* @param  {Function} callback   Event listener.
+* @private
+* @function _handleMultipleEvents
+*/
 function _handleMultipleEvents(fn, elem, types, callback) {
   types.forEach(function(type) {
     //Call the event method for each one of the types
