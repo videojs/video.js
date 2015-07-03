@@ -1,7 +1,8 @@
 function FlashRtmpDecorator(Flash) {
   Flash.streamingFormats = {
     'rtmp/mp4': 'MP4',
-    'rtmp/flv': 'FLV'
+    'rtmp/flv': 'FLV',
+    'rtmp/mp3': 'MP3'
   };
 
   Flash.streamFromParts = function(connection, stream) {
