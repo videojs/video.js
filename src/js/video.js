@@ -12,6 +12,7 @@ import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
 import extendsFn from './extends.js';
 import merge from 'lodash-compat/object/merge';
+import xhr from 'xhr/index.js';
 
 // Include the built-in techs
 import Html5 from './tech/html5.js';
@@ -306,6 +307,29 @@ videojs.addLanguage = function(code, data){
   code = ('' + code).toLowerCase();
   return merge(globalOptions.languages, { [code]: data })[code];
 };
+
+/**
+ * A cross-browser XMLHttpRequest wrapper. Here's a simple example:
+ *
+ *     xhr({
+ *       body: someJSONString,
+ *       uri: "/foo",
+ *       headers: {
+ *         "Content-Type": "application/json"
+ *       }
+ *     }, function (err, resp, body) {
+ *       // check resp.statusCode
+ *     });
+ *
+ * Check out the [full
+ * documentation](https://github.com/Raynos/xhr/blob/master/README.md)
+ * for more options.
+ *
+ * @param {Object} options settings for the request.
+ * @return {XMLHttpRequest|XDomainRequest} the request object.
+ * @see https://github.com/Raynos/xhr
+ */
+videojs.xhr = xhr;
 
 // REMOVING: We probably should add this to the migration plugin
 // // Expose but deprecate the window[componentName] method for accessing components
