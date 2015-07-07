@@ -95,7 +95,7 @@ class Tech extends Component {
   // Manually trigger progress events based on changes to the buffered amount
   // Many flash players and older HTML5 browsers don't send progress or progress-like events
   /**
-   * Turn on progress events 
+   * Turn on progress events
    *
    * @method manualProgressOn
    */
@@ -105,11 +105,11 @@ class Tech extends Component {
     this.manualProgress = true;
 
     // Trigger progress watching when a source begins loading
-    this.trackProgress();
+    this.one('ready', this.trackProgress);
   }
 
   /**
-   * Turn off progress events 
+   * Turn off progress events
    *
    * @method manualProgressOff
    */
@@ -121,11 +121,12 @@ class Tech extends Component {
   }
 
   /**
-   * Track progress 
+   * Track progress
    *
    * @method trackProgress
    */
   trackProgress() {
+    this.stopTrackingProgress();
     this.progressInterval = this.setInterval(Fn.bind(this, function(){
       // Don't trigger unless buffered amount is greater than last time
 
@@ -144,7 +145,7 @@ class Tech extends Component {
   }
 
   /**
-   * Update duration 
+   * Update duration
    *
    * @method onDurationChange
    */
@@ -153,7 +154,7 @@ class Tech extends Component {
   }
 
   /**
-   * Create and get TimeRange object for buffering 
+   * Create and get TimeRange object for buffering
    *
    * @return {TimeRangeObject}
    * @method buffered
@@ -173,7 +174,7 @@ class Tech extends Component {
   }
 
   /**
-   * Stops tracking progress by clearing progress interval 
+   * Stops tracking progress by clearing progress interval
    *
    * @method stopTrackingProgress
    */
@@ -246,7 +247,7 @@ class Tech extends Component {
   }
 
   /**
-   * Set current time 
+   * Set current time
    *
    * @method setCurrentTime
    */
@@ -256,7 +257,7 @@ class Tech extends Component {
   }
 
   /**
-   * Initialize texttrack listeners 
+   * Initialize texttrack listeners
    *
    * @method initTextTrackListeners
    */
@@ -279,7 +280,7 @@ class Tech extends Component {
   }
 
   /**
-   * Emulate texttracks 
+   * Emulate texttracks
    *
    * @method emulateTextTracks
    */
@@ -324,7 +325,7 @@ class Tech extends Component {
    */
 
   /**
-   * Get texttracks 
+   * Get texttracks
    *
    * @returns {TextTrackList}
    * @method textTracks
@@ -335,7 +336,7 @@ class Tech extends Component {
   }
 
   /**
-   * Get remote texttracks 
+   * Get remote texttracks
    *
    * @returns {TextTrackList}
    * @method remoteTextTracks
@@ -346,7 +347,7 @@ class Tech extends Component {
   }
 
   /**
-   * Creates and returns a remote text track object 
+   * Creates and returns a remote text track object
    *
    * @param {String} kind Text track kind (subtitles, captions, descriptions
    *                                       chapters and metadata)
@@ -364,7 +365,7 @@ class Tech extends Component {
   }
 
   /**
-   * Creates and returns a remote text track object 
+   * Creates and returns a remote text track object
    *
    * @param {Object} options The object should contain values for
    * kind, language, label and src (location of the WebVTT file)
@@ -380,7 +381,7 @@ class Tech extends Component {
   }
 
   /**
-   * Remove remote texttrack 
+   * Remove remote texttrack
    *
    * @param {TextTrackObject} track Texttrack to remove
    * @method removeRemoteTextTrack
@@ -442,7 +443,7 @@ Tech.prototype.featuresTimeupdateEvents = false;
 Tech.prototype.featuresNativeTextTracks = false;
 
 /*
- * A functional mixin for techs that want to use the Source Handler pattern. 
+ * A functional mixin for techs that want to use the Source Handler pattern.
  *
  * ##### EXAMPLE:
  *
