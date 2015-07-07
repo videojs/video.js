@@ -98,7 +98,9 @@ class Tech extends Component {
     this.manualProgress = true;
 
     // Trigger progress watching when a source begins loading
-    this.trackProgress();
+    this.one('ready', () => {
+      this.trackProgress();
+    });
   }
 
   manualProgressOff() {
@@ -109,6 +111,7 @@ class Tech extends Component {
   }
 
   trackProgress() {
+    this.stopTrackingProgress();
     this.progressInterval = this.setInterval(Fn.bind(this, function(){
       // Don't trigger unless buffered amount is greater than last time
 

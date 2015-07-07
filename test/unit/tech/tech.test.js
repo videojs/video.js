@@ -61,14 +61,26 @@ test('stops manual timeupdates while paused', function() {
 });
 
 test('should synthesize progress events by default', function() {
-  var progresses = 0, tech;
+  var progresses = 0, bufferedPercent = 0.5, tech;
   tech = new Tech();
   tech.on('progress', function() {
     progresses++;
   });
+  tech.bufferedPercent = function() {
+    return bufferedPercent;
+  };
 
   this.clock.tick(500);
+  equal(progresses, 0, 'waits until ready');
+
+  tech.trigger('ready');
+  this.clock.tick(500);
   equal(progresses, 1, 'triggered one event');
+
+  tech.trigger('ready');
+  bufferedPercent = 0.75;
+  this.clock.tick(500);
+  equal(progresses, 2, 'repeated readies are ok');
 });
 
 test('dispose() should stop time tracking', function() {
