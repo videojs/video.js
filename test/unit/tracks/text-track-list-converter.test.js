@@ -5,14 +5,7 @@ import Html5 from '../../../src/js/tech/html5.js';
 import document from 'global/document';
 import window from 'global/window';
 
-q.module('Text Track List Converter', {
-  setup: function() {
-    this.xhr = sinon.useFakeXMLHttpRequest();
-  },
-  teardown: function() {
-    this.xhr.restore();
-  }
-});
+q.module('Text Track List Converter', {});
 
 let clean = (item) => {
   delete item.id;

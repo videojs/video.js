@@ -134,6 +134,7 @@ CHANGELOG
 * @heff added an attributes argument to createEl() ([view](https://github.com/videojs/video.js/pull/2589))
 * @heff made tech related functions private in the player ([view](https://github.com/videojs/video.js/pull/2590))
 * @heff removed the loadedalldata event ([view](https://github.com/videojs/video.js/pull/2591))
+* @dmlap switched to using raynos/xhr for requests ([view](https://github.com/videojs/video.js/pull/2594))
 
 --------------------
 

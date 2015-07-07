@@ -14,14 +14,7 @@ import document from 'global/document';
 import window from 'global/window';
 import TechFaker from '../tech/tech-faker.js';
 
-q.module('Tracks', {
-  setup: function() {
-    this.xhr = sinon.useFakeXMLHttpRequest();
-  },
-  teardown: function() {
-    this.xhr.restore();
-  }
-});
+q.module('Tracks');
 
 test('should place title list item into ul', function() {
   var player, chaptersButton;

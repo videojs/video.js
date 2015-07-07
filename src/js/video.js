@@ -16,13 +16,13 @@ import assign from 'object.assign';
 import { createTimeRange } from './utils/time-ranges.js';
 import formatTime from './utils/format-time.js';
 import log from './utils/log.js';
-import xhr from './xhr.js';
 import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
 import * as Url from './utils/url.js';
 import extendsFn from './extends.js';
 import merge from 'lodash-compat/object/merge';
 import createDeprecationProxy from './utils/create-deprecation-proxy.js';
+import xhr from 'xhr';
 
 // Include the built-in techs
 import Html5 from './tech/html5.js';
@@ -394,37 +394,6 @@ videojs.createTimeRange = createTimeRange;
 videojs.formatTime = formatTime;
 
 /**
- * Simple http request for retrieving external files (e.g. text tracks)
- *
- * ##### Example
- *
- *     // using url string
- *     videojs.xhr('http://example.com/myfile.vtt', function(error, response, responseBody){});
- *
- *     // or options block
- *     videojs.xhr({
- *       uri: 'http://example.com/myfile.vtt',
- *       method: 'GET',
- *       responseType: 'text'
- *     }, function(error, response, responseBody){
- *       if (error) {
- *         // log the error
- *       } else {
- *         // successful, do something with the response
- *       }
- *     });
- *
- *
- * API is modeled after the Raynos/xhr.
- * https://github.com/Raynos/xhr/blob/master/index.js
- *
- * @param  {Object|String}  options   Options block or URL string
- * @param  {Function}       callback  The callback function
- * @returns {Object}                  The request
- */
-videojs.xhr = xhr;
-
-/**
  * Resolve and parse the elements of a URL
  *
  * @param  {String} url The url to parse
@@ -483,6 +452,29 @@ videojs.off = Events.off;
  * @method trigger
  */
 videojs.trigger = Events.trigger;
+
+/**
+ * A cross-browser XMLHttpRequest wrapper. Here's a simple example:
+ *
+ *     videojs.xhr({
+ *       body: someJSONString,
+ *       uri: "/foo",
+ *       headers: {
+ *         "Content-Type": "application/json"
+ *       }
+ *     }, function (err, resp, body) {
+ *       // check resp.statusCode
+ *     });
+ *
+ * Check out the [full
+ * documentation](https://github.com/Raynos/xhr/blob/v2.1.0/README.md)
+ * for more options.
+ *
+ * @param {Object} options settings for the request.
+ * @return {XMLHttpRequest|XDomainRequest} the request object.
+ * @see https://github.com/Raynos/xhr
+ */
+videojs.xhr = xhr;
 
 // REMOVING: We probably should add this to the migration plugin
 // // Expose but deprecate the window[componentName] method for accessing components
