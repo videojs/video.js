@@ -52,6 +52,7 @@ CHANGELOG
 * @mmcc un-hid the current and remaining times by default ([view](https://github.com/videojs/video.js/pull/2241))
 * @pavelhoral fixed a bug with user activity that caused the control bar to flicker ([view](https://github.com/videojs/video.js/pull/2299))
 * @dmlap updated to videojs-swf@4.7.1 to fix a video dimensions issue on subsequent loads ([view](https://github.com/videojs/video.js/pull/2281))
+* @mmcc added the vjs-big-play-centered class ([view](https://github.com/videojs/video.js/pull/2293))
 
 --------------------
 

@@ -7,7 +7,7 @@
   right: 0;
   height: 3.0em;
 
-  @include background-color-with-alpha($control-bar-bg, $control-bar-transparency);
+  @include background-color-with-alpha($control-bar--bg, $control-bar--transparency);
 }
 
 // Video has started playing
