@@ -10,10 +10,16 @@ import Component from './component.js';
 * Initial play button. Shows before the video has played. The hiding of the
 * big play button is done via CSS and player states.
 *
+* @param {Object} player  Main Player
+* @param {Object=} options Object of option names and values
 * @extends Button
 * @class BigPlayButton
 */
 class BigPlayButton extends Button {
+
+  constructor(player, options) {
+    super(player, options);
+  }
 
   /**
   * Allow sub components to stack CSS class names
