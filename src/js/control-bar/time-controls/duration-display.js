@@ -1,18 +1,18 @@
 /**
-* @file duration-display.js
-*/
+ * @file duration-display.js
+ */
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 import formatTime from '../../utils/format-time.js';
 
 /**
-* Displays the duration
-*
-* @param {Player|Object} player
-* @param {Object=} options
-* @extends Component
-* @class DurationDisplay
-*/
+ * Displays the duration
+ *
+ * @param {Player|Object} player
+ * @param {Object=} options
+ * @extends Component
+ * @class DurationDisplay
+ */
 class DurationDisplay extends Component {
 
   constructor(player, options){
@@ -28,11 +28,11 @@ class DurationDisplay extends Component {
   }
 
   /**
-  * Create the component's DOM element
-  *
-  * @return {Element}
-  * @method createEl
-  */
+   * Create the component's DOM element
+   *
+   * @return {Element}
+   * @method createEl
+   */
   createEl() {
     let el = super.createEl('div', {
       className: 'vjs-duration vjs-time-control vjs-control'
@@ -49,10 +49,10 @@ class DurationDisplay extends Component {
   }
 
   /**
-  * Update duration time display 
-  *
-  * @method updateContent
-  */
+   * Update duration time display   
+   *
+   * @method updateContent
+   */
   updateContent() {
     let duration = this.player_.duration();
     if (duration) {

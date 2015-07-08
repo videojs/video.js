@@ -1,17 +1,17 @@
 /**
-* @file caption-settings-menu-item.js
-*/
+ * @file caption-settings-menu-item.js
+ */
 import TextTrackMenuItem from './text-track-menu-item.js';
 import Component from '../../component.js';
 
 /**
-* The menu item for caption track settings menu
-*
-* @param {Player|Object} player
-* @param {Object=} options
-* @extends TextTrackMenuItem
-* @class CaptionSettingsMenuItem
-*/
+ * The menu item for caption track settings menu
+ *
+ * @param {Player|Object} player
+ * @param {Object=} options
+ * @extends TextTrackMenuItem
+ * @class CaptionSettingsMenuItem
+ * /
  class CaptionSettingsMenuItem extends TextTrackMenuItem {
 
   constructor(player, options) {
@@ -28,10 +28,10 @@ import Component from '../../component.js';
   }
 
   /**
-  * Handle click on menu item
-  *
-  * @method handleClick
-  */
+   * Handle click on menu item
+   *
+   * @method handleClick
+   */
   handleClick() {
     this.player().getChild('textTrackSettings').show();
   }

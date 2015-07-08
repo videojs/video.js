@@ -1,18 +1,18 @@
 /**
-* @file current-time-display.js
-*/
+ * @file current-time-display.js
+ */
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 import formatTime from '../../utils/format-time.js';
 
 /**
-* Displays the current time
-*
-* @param {Player|Object} player
-* @param {Object=} options
-* @extends Component
-* @class CurrentTimeDisplay
-*/
+ * Displays the current time
+ *
+ * @param {Player|Object} player
+ * @param {Object=} options
+ * @extends Component
+ * @class CurrentTimeDisplay
+ */
 class CurrentTimeDisplay extends Component {
 
   constructor(player, options){
@@ -22,11 +22,11 @@ class CurrentTimeDisplay extends Component {
   }
 
   /**
-  * Create the component's DOM element
-  *
-  * @return {Element}
-  * @method createEl
-  */
+   * Create the component's DOM element
+   *
+   * @return {Element}
+   * @method createEl
+   */
   createEl() {
     let el = super.createEl('div', {
       className: 'vjs-current-time vjs-time-control vjs-control'
@@ -43,10 +43,10 @@ class CurrentTimeDisplay extends Component {
   }
 
   /**
-  * Update current time display 
-  *
-  * @method updateContent
-  */
+   * Update current time display 
+   *
+   * @method updateContent
+   */
   updateContent() {
     // Allows for smooth scrubbing, when player can't keep up.
     let time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();

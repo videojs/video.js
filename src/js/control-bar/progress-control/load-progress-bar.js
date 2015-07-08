@@ -1,17 +1,17 @@
 /**
-* @file load-progress-bar.js
-*/
+ * @file load-progress-bar.js
+ */
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 
 /**
-* Shows load progress
-*
-* @param {Player|Object} player
-* @param {Object=} options
-* @extends Component
-* @class LoadProgressBar
-*/
+ * Shows load progress
+ *
+ * @param {Player|Object} player
+ * @param {Object=} options
+ * @extends Component
+ * @class LoadProgressBar
+ */
 class LoadProgressBar extends Component {
 
   constructor(player, options){
@@ -20,11 +20,11 @@ class LoadProgressBar extends Component {
   }
 
   /**
-  * Create the component's DOM element
-  *
-  * @return {Element}
-  * @method createEl
-  */
+   * Create the component's DOM element
+   *
+   * @return {Element}
+   * @method createEl
+   */
   createEl() {
     return super.createEl('div', {
       className: 'vjs-load-progress',
@@ -33,10 +33,10 @@ class LoadProgressBar extends Component {
   }
 
   /**
-  * Update progress bar
-  *
-  * @method update
-  */
+   * Update progress bar
+   *
+   * @method update
+   */
   update() {
     let buffered = this.player_.buffered();
     let duration = this.player_.duration();

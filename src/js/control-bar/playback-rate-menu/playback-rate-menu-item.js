@@ -1,17 +1,17 @@
 /**
-* @file playback-rate-menu-item.js
-*/
+ * @file playback-rate-menu-item.js
+ */
 import MenuItem from '../../menu/menu-item.js';
 import Component from '../../component.js';
 
 /**
-* The specific menu item type for selecting a playback rate
-*
-* @param {Player|Object} player
-* @param {Object=} options
-* @extends MenuItem
-* @class PlaybackRateMenuItem
-*/
+ * The specific menu item type for selecting a playback rate
+ *
+ * @param {Player|Object} player
+ * @param {Object=} options
+ * @extends MenuItem
+ * @class PlaybackRateMenuItem
+ */
 class PlaybackRateMenuItem extends MenuItem {
 
   constructor(player, options){
@@ -30,20 +30,20 @@ class PlaybackRateMenuItem extends MenuItem {
   }
 
   /**
-  * Handle click on menu item
-  *
-  * @method handleClick
-  */
+   * Handle click on menu item
+   *
+   * @method handleClick
+   */
   handleClick() {
     super.handleClick();
     this.player().playbackRate(this.rate);
   }
 
   /**
-  * Update playback rate with selected rate
-  *
-  * @method update
-  */
+   * Update playback rate with selected rate
+   *
+   * @method update
+   */
   update() {
     this.selected(this.player().playbackRate() === this.rate);
   }

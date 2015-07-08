@@ -1,17 +1,17 @@
 /**
-* @file off-text-track-menu-item.js
-*/
+ * @file off-text-track-menu-item.js
+ */
 import TextTrackMenuItem from './text-track-menu-item.js';
 import Component from '../../component.js';
 
 /**
-* A special menu item for turning of a specific type of text track
-*
-* @param {Player|Object} player
-* @param {Object=} options
-* @extends TextTrackMenuItem
-* @class OffTextTrackMenuItem
-*/
+ * A special menu item for turning of a specific type of text track
+ *
+ * @param {Player|Object} player
+ * @param {Object=} options
+ * @extends TextTrackMenuItem
+ * @class OffTextTrackMenuItem
+ */
 class OffTextTrackMenuItem extends TextTrackMenuItem {
 
   constructor(player, options){
@@ -30,11 +30,11 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
   }
 
   /**
-  * Handle text track change
-  *
-  * @param {Object} event Event object
-  * @method handleTracksChange
-  */
+   * Handle text track change
+   *
+   * @param {Object} event Event object
+   * @method handleTracksChange
+   */
   handleTracksChange(event){
     let tracks = this.player().textTracks();
     let selected = true;

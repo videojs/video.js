@@ -1,18 +1,18 @@
 /**
-* @file remaining-time-display.js
-*/
+ * @file remaining-time-display.js
+ */
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 import formatTime from '../../utils/format-time.js';
 
 /**
-* Displays the time left in the video
-*
-* @param {Player|Object} player
-* @param {Object=} options
-* @extends Component
-* @class RemainingTimeDisplay
-*/
+ * Displays the time left in the video
+ *
+ * @param {Player|Object} player
+ * @param {Object=} options
+ * @extends Component
+ * @class RemainingTimeDisplay
+ */
 class RemainingTimeDisplay extends Component {
 
   constructor(player, options){
@@ -22,11 +22,11 @@ class RemainingTimeDisplay extends Component {
   }
 
   /**
-  * Create the component's DOM element
-  *
-  * @return {Element}
-  * @method createEl
-  */
+   * Create the component's DOM element
+   *
+   * @return {Element}
+   * @method createEl
+   */
   createEl() {
     let el = super.createEl('div', {
       className: 'vjs-remaining-time vjs-time-control vjs-control'
@@ -43,10 +43,10 @@ class RemainingTimeDisplay extends Component {
   }
 
   /**
-  * Update remaining time display 
-  *
-  * @method updateContent
-  */
+   * Update remaining time display 
+   *
+   * @method updateContent
+   */
   updateContent() {
     if (this.player_.duration()) {
       const localizedText = this.localize('Remaining Time');

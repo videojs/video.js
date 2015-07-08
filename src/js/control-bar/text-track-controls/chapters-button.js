@@ -1,6 +1,6 @@
 /**
-* @file chapters-button.js
-*/
+ * @file chapters-button.js
+ */
 import TextTrackButton from './text-track-button.js';
 import Component from '../../component.js';
 import TextTrackMenuItem from './text-track-menu-item.js';
@@ -12,16 +12,16 @@ import toTitleCase from '../../utils/to-title-case.js';
 import window from 'global/window';
 
 /**
-* The button component for toggling and selecting chapters
-* Chapters act much differently than other text tracks
-* Cues are navigation vs. other tracks of alternative languages
-*
-* @param {Object} player  Player object
-* @param {Object=} options Object of option names and values
-* @param {Function=} ready    Ready callback function
-* @extends TextTrackButton
-* @class ChaptersButton
-*/
+ * The button component for toggling and selecting chapters
+ * Chapters act much differently than other text tracks
+ * Cues are navigation vs. other tracks of alternative languages
+ *
+ * @param {Object} player  Player object
+ * @param {Object=} options Object of option names and values
+ * @param {Function=} ready    Ready callback function
+ * @extends TextTrackButton
+ * @class ChaptersButton
+ */
 class ChaptersButton extends TextTrackButton {
 
   constructor(player, options, ready){
@@ -30,21 +30,21 @@ class ChaptersButton extends TextTrackButton {
   }
 
   /**
-  * Allow sub components to stack CSS class names
-  *
-  * @return {String} The constructed class name
-  * @method buildCSSClass
-  */
+   * Allow sub components to stack CSS class names
+   *
+   * @return {String} The constructed class name
+   * @method buildCSSClass
+   */
   buildCSSClass() {
     return `vjs-chapters-button ${super.buildCSSClass()}`;
   }
 
   /**
-  * Create a menu item for each text track
-  *
-  * @return {Array} Array of menu items
-  * @method createItems
-  */
+   * Create a menu item for each text track
+   *
+   * @return {Array} Array of menu items
+   * @method createItems
+   */
   createItems() {
     let items = [];
 
@@ -67,11 +67,11 @@ class ChaptersButton extends TextTrackButton {
   }
 
   /**
-  * Create menu from chapter buttons
-  *
-  * @return {Menu} Menu of chapter buttons
-  * @method createMenu
-  */
+   * Create menu from chapter buttons
+   *
+   * @return {Menu} Menu of chapter buttons
+   * @method createMenu
+   */
   createMenu() {
     let tracks = this.player_.textTracks() || [];
     let chaptersTrack;
