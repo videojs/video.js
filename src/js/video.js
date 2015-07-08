@@ -13,6 +13,7 @@ import * as Fn from './utils/fn.js';
 import assign from 'object.assign';
 import { createTimeRange } from './utils/time-ranges.js';
 import log from './utils/log.js';
+import xhr from './xhr.js';
 import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
 import extendsFn from './extends.js';
@@ -356,6 +357,37 @@ videojs.log = log;
  * @method createTimeRange
  */
 videojs.createTimeRange = createTimeRange;
+
+/**
+ * Simple http request for retrieving external files (e.g. text tracks)
+ *
+ * ##### Example
+ *
+ *     // using url string
+ *     videojs.xhr('http://example.com/myfile.vtt', function(error, response, responseBody){});
+ *
+ *     // or options block
+ *     videojs.xhr({
+ *       uri: 'http://example.com/myfile.vtt',
+ *       method: 'GET',
+ *       responseType: 'text'
+ *     }, function(error, response, responseBody){
+ *       if (error) {
+ *         // log the error
+ *       } else {
+ *         // successful, do something with the response
+ *       }
+ *     });
+ *
+ *
+ * API is modeled after the Raynos/xhr.
+ * https://github.com/Raynos/xhr/blob/master/index.js
+ *
+ * @param  {Object|String}  options   Options block or URL string
+ * @param  {Function}       callback  The callback function
+ * @returns {Object}                  The request
+ */
+videojs.xhr = xhr;
 
 // REMOVING: We probably should add this to the migration plugin
 // // Expose but deprecate the window[componentName] method for accessing components
