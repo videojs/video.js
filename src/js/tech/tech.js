@@ -218,7 +218,7 @@ class Tech extends Component {
       return;
     }
 
-    let textTracksChanges = function() {
+    let textTracksChanges = Fn.bind(this, function() {
       let updateDisplay = () => this.trigger('texttrackchange');
 
       updateDisplay();
@@ -230,12 +230,12 @@ class Tech extends Component {
           track.addEventListener('cuechange', updateDisplay);
         }
       }
-    };
+    });
 
-    tracks.addEventListener('change', Fn.bind(this, textTracksChanges));
+    tracks.addEventListener('change', textTracksChanges);
 
     this.on('dispose', function() {
-      tracks.removeEventListener('change', Fn.bind(this, textTracksChanges));
+      tracks.removeEventListener('change', textTracksChanges);
     });
   }
 
