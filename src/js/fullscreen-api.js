@@ -1,13 +1,13 @@
 /**
-* @file fullscreen-api.js
-*/
+ * @file fullscreen-api.js
+ */
 import document from 'global/document';
 
 /*
-* Store the browser-specific methods for the fullscreen API
-* @type {Object|undefined}
-* @private
-*/
+ * Store the browser-specific methods for the fullscreen API
+ * @type {Object|undefined}
+ * @private
+ */
 let FullscreenApi = {};
 
 // browser API methods

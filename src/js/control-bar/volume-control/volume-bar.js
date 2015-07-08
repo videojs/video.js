@@ -1,3 +1,6 @@
+/**
+ * @file volume-bar.js
+ */
 import Slider from '../../slider/slider.js';
 import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
@@ -23,11 +26,11 @@ class VolumeBar extends Slider {
   }
 
   /**
-  * Create the component's DOM element
-  *
-  * @return {Element}
-  * @method createEl
-  */
+   * Create the component's DOM element
+   *
+   * @return {Element}
+   * @method createEl
+   */
   createEl() {
     return super.createEl('div', {
       className: 'vjs-volume-bar',
@@ -36,10 +39,10 @@ class VolumeBar extends Slider {
   }
 
   /**
-  * Handle mouse move on volume bar
-  *
-  * @method handleMouseMove
-  */
+   * Handle mouse move on volume bar
+   *
+   * @method handleMouseMove
+   */
   handleMouseMove(event) {
     if (this.player_.muted()) {
       this.player_.muted(false);
@@ -49,11 +52,11 @@ class VolumeBar extends Slider {
   }
 
   /**
-  * Get percent of volume level
-  *
-  * @retun {Number} Volume level percent
-  * @method getPercent
-  */
+   * Get percent of volume level
+   *
+   * @retun {Number} Volume level percent
+   * @method getPercent
+   */
   getPercent() {
     if (this.player_.muted()) {
       return 0;
@@ -63,28 +66,28 @@ class VolumeBar extends Slider {
   }
 
   /**
-  * Increase volume level for keyboard users
-  *
-  * @method stepForward
-  */
+   * Increase volume level for keyboard users
+   *
+   * @method stepForward
+   */
   stepForward() {
     this.player_.volume(this.player_.volume() + 0.1);
   }
 
   /**
-  * Decrease volume level for keyboard users
-  *
-  * @method stepBack
-  */
+   * Decrease volume level for keyboard users
+   *
+   * @method stepBack
+   */
   stepBack() {
     this.player_.volume(this.player_.volume() - 0.1);
   }
 
   /**
-  * Update ARIA accessibility attributes
-  *
-  * @method updateARIAAttributes
-  */
+   * Update ARIA accessibility attributes
+   *
+   * @method updateARIAAttributes
+   */
   updateARIAAttributes() {
     // Current value of volume bar as a percentage
     this.el_.setAttribute('aria-valuenow', roundFloat(this.player_.volume()*100, 2));

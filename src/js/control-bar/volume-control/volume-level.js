@@ -1,3 +1,6 @@
+/**
+ * @file volume-level.js
+ */
 import Component from '../../component.js';
 
 /**
@@ -11,11 +14,11 @@ import Component from '../../component.js';
 class VolumeLevel extends Component {
 
   /**
-  * Create the component's DOM element
-  *
-  * @return {Element}
-  * @method createEl
-  */
+   * Create the component's DOM element
+   *
+   * @return {Element}
+   * @method createEl
+   */
   createEl() {
     return super.createEl('div', {
       className: 'vjs-volume-level',

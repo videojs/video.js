@@ -1,17 +1,17 @@
 /**
-* @file error-display.js
-*/
+ * @file error-display.js
+ */
 import Component from './component';
-import * as Dom from './utils/dom.js';
+import  * as Dom from './utils/dom.js';
 
 /**
-* Display that an error has occurred making the video unplayable
-*
-* @param {Object} player  Main Player
-* @param {Object=} options Object of option names and values
-* @extends Component
-* @class ErrorDisplay
-*/
+ * Display that an error has occurred making the video unplayable
+ *
+ * @param {Object} player  Main Player
+ * @param {Object=} options Object of option names and values
+ * @extends Component
+ * @class ErrorDisplay
+ */
 class ErrorDisplay extends Component {
 
   constructor(player, options) {
@@ -22,11 +22,11 @@ class ErrorDisplay extends Component {
   }
 
   /**
-  * Create the component's DOM element
-  *
-  * @return {Element}
-  * @method createEl
-  */
+   * Create the component's DOM element
+   *
+   * @return {Element}
+   * @method createEl
+   */
   createEl() {
     var el = super.createEl('div', {
       className: 'vjs-error-display'
@@ -39,10 +39,10 @@ class ErrorDisplay extends Component {
   }
 
   /**
-  * Update the error message in localized language
-  *
-  * @method update
-  */
+   * Update the error message in localized language
+   *
+   * @method update
+   */
   update() {
     if (this.player().error()) {
       this.contentEl_.innerHTML = this.localize(this.player().error().message);

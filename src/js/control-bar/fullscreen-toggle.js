@@ -1,32 +1,32 @@
 /**
-* @file fullscreen-toggle.js
-*/
+ * @file fullscreen-toggle.js
+ */
 import Button from '../button.js';
 import Component from '../component.js';
 
 /**
-* Toggle fullscreen video
-*
-* @extends Button
-* @class FullscreenToggle
-*/
+ * Toggle fullscreen video
+ *
+ * @extends Button
+ * @class FullscreenToggle
+ */
 class FullscreenToggle extends Button {
 
   /**
-  * Allow sub components to stack CSS class names
-  *
-  * @return {String} The constructed class name
-  * @method buildCSSClass
-  */
+   * Allow sub components to stack CSS class names
+   *
+   * @return {String} The constructed class name
+   * @method buildCSSClass
+   */
   buildCSSClass() {
     return `vjs-fullscreen-control ${super.buildCSSClass()}`;
   }
 
   /**
-  * Handles click for full screen
-  *
-  * @method handleClick
-  */
+   * Handles click for full screen
+   *
+   * @method handleClick
+   */
   handleClick() {
     if (!this.player_.isFullscreen()) {
       this.player_.requestFullscreen();

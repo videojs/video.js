@@ -1,18 +1,18 @@
 /**
-* @file text-track-cue-list.js
-*/
+ * @file text-track-cue-list.js
+ */
 import * as browser from '../utils/browser.js';
 import document from 'global/document';
 
 /*
-* https://html.spec.whatwg.org/multipage/embedded-content.html#texttrackcuelist
-*
-* interface TextTrackCueList {
-*   readonly attribute unsigned long length;
-*   getter TextTrackCue (unsigned long index);
-*   TextTrackCue? getCueById(DOMString id);
-* };
-*/
+ * https://html.spec.whatwg.org/multipage/embedded-content.html#texttrackcuelist
+ *
+ * interface TextTrackCueList {
+ *   readonly attribute unsigned long length;
+ *   getter TextTrackCue (unsigned long index);
+ *   TextTrackCue? getCueById(DOMString id);
+ * };
+ */
 
 let TextTrackCueList = function(cues) {
   let list = this;

@@ -1,16 +1,16 @@
 /**
-* @file format-time.js
-*
-* Format seconds as a time string, H:MM:SS or M:SS
-* Supplying a guide (in seconds) will force a number of leading zeros
-* to cover the length of the guide
-*
-* @param  {Number} seconds Number of seconds to be turned into a string
-* @param  {Number} guide   Number (in seconds) to model the string after
-* @return {String}         Time formatted as H:MM:SS or M:SS
-* @private
-* @function formatTime
-*/
+ * @file format-time.js
+ *
+ * Format seconds as a time string, H:MM:SS or M:SS
+ * Supplying a guide (in seconds) will force a number of leading zeros
+ * to cover the length of the guide
+ *
+ * @param  {Number} seconds Number of seconds to be turned into a string
+ * @param  {Number} guide   Number (in seconds) to model the string after
+ * @return {String}         Time formatted as H:MM:SS or M:SS
+ * @private
+ * @function formatTime
+ */
 function formatTime(seconds, guide=seconds) {
   let s = Math.floor(seconds % 60);
   let m = Math.floor(seconds / 60 % 60);

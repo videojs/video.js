@@ -1,6 +1,6 @@
 /**
-* @file text-track.js
-*/
+ * @file text-track.js
+ */
 import TextTrackCueList from './text-track-cue-list';
 import * as Fn from '../utils/fn.js';
 import * as Guid from '../utils/guid.js';
@@ -13,27 +13,27 @@ import window from 'global/window';
 import XHR from '../xhr.js';
 
 /*
-* https://html.spec.whatwg.org/multipage/embedded-content.html#texttrack
-*
-* interface TextTrack : EventTarget {
-*   readonly attribute TextTrackKind kind;
-*   readonly attribute DOMString label;
-*   readonly attribute DOMString language;
-*
-*   readonly attribute DOMString id;
-*   readonly attribute DOMString inBandMetadataTrackDispatchType;
-*
-*   attribute TextTrackMode mode;
-*
-*   readonly attribute TextTrackCueList? cues;
-*   readonly attribute TextTrackCueList? activeCues;
-*
-*   void addCue(TextTrackCue cue);
-*   void removeCue(TextTrackCue cue);
-*
-*   attribute EventHandler oncuechange;
-* };
-*/
+ * https://html.spec.whatwg.org/multipage/embedded-content.html#texttrack
+ *
+ * interface TextTrack : EventTarget {
+ *   readonly attribute TextTrackKind kind;
+ *   readonly attribute DOMString label;
+ *   readonly attribute DOMString language;
+ *
+ *   readonly attribute DOMString id;
+ *   readonly attribute DOMString inBandMetadataTrackDispatchType;
+ *
+ *   attribute TextTrackMode mode;
+ *
+ *   readonly attribute TextTrackCueList? cues;
+ *   readonly attribute TextTrackCueList? activeCues;
+ *
+ *   void addCue(TextTrackCue cue);
+ *   void removeCue(TextTrackCue cue);
+ *
+ *   attribute EventHandler oncuechange;
+ * };
+ */
 let TextTrack = function(options={}) {
   if (!options.tech) {
     throw new Error('A tech was not provided.');

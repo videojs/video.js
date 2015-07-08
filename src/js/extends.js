@@ -1,10 +1,10 @@
 /*
-* @file extends.js
-*
-* A combination of node inherits and babel's inherits (after transpile).
-* Both work the same but node adds `super_` to the subClass
-* and Bable adds the superClass as __proto__. Both seem useful.
-*/
+ * @file extends.js
+ *
+ * A combination of node inherits and babel's inherits (after transpile).
+ * Both work the same but node adds `super_` to the subClass
+ * and Bable adds the superClass as __proto__. Both seem useful.
+ */
 const _inherits = function (subClass, superClass) {
   if (typeof superClass !== 'function' && superClass !== null) {
     throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass);
@@ -26,22 +26,22 @@ const _inherits = function (subClass, superClass) {
 };
 
 /*
-* Function for subclassing using the same inheritance that
-* videojs uses internally
-* ```js
-* var Button = videojs.getComponent('Button');
-  * ```
-  * ```js
-* var MyButton = videojs.extends(Button, {
-*   constructor: function(player, options) {
-*     Button.call(this, player, options);
-*   },
-*   onClick: function() {
-*     // doSomething
-*   }
-* });
-* ```
-*/
+ * Function for subclassing using the same inheritance that
+ * videojs uses internally
+ * ```js
+ * var Button = videojs.getComponent('Button');
+ * ```
+ * ```js
+ * var MyButton = videojs.extends(Button, {
+ *   constructor: function(player, options) {
+ *     Button.call(this, player, options);
+ *   },
+ *   onClick: function() {
+ *     // doSomething
+ *   }
+ * });
+ * ```
+ */
 const extendsFn = function(superClass, subClassMethods={}) {
   let subClass = function() {
     superClass.apply(this, arguments);

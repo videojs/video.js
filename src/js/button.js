@@ -1,6 +1,6 @@
 /**
-* @file button.js
-*/
+ * @file button.js
+ */
 import Component from './component';
 import * as Dom from './utils/dom.js';
 import * as Events from './utils/events.js';
@@ -8,16 +8,16 @@ import * as Fn from './utils/fn.js';
 import document from 'global/document';
 import assign from 'object.assign';
 
-/* Button - Base class for all buttons
-================================================================================ */
+/ * Button - Base class for all buttons
+================================================================================  */
 /**
-* Base class for all buttons
-*
-* @param {Object} player  Main Player
-* @param {Object=} options Object of option names and values
-* @extends Component
-* @class Button
-*/
+ * Base class for all buttons
+ *
+ * @param {Object} player  Main Player
+ * @param {Object=} options Object of option names and values
+ * @extends Component
+ * @class Button
+ */
 class Button extends Component {
 
   constructor(player, options) {
@@ -32,13 +32,13 @@ class Button extends Component {
   }
 
   /**
-  * Create the component's DOM element
-  *
-  * @param {String=} type Element's node type. e.g. 'div'
-  * @param {Object=} props An object of element attributes that should be set on the element Tag name 
-  * @return {Element}
-  * @method createEl
-  */
+   * Create the component's DOM element
+   *
+   * @param {String=} type Element's node type. e.g. 'div'
+   * @param {Object=} props An object of element attributes that should be set on the element Tag name 
+   * @return {Element}
+   * @method createEl
+   */
   createEl(type='button', props={}) {
     // Add standard Aria and Tabindex info
     props = assign({
@@ -62,12 +62,12 @@ class Button extends Component {
   }
 
   /**
-  * Controls text - both request and localize 
-  *
-  * @param {String} text Text for button
-  * @return {String}
-  * @method controlText
-  */
+   * Controls text - both request and localize 
+   *
+   * @param {String} text Text for button
+   * @return {String}
+   * @method controlText
+   */
   controlText(text) {
     if (!text) return this.controlText_ || 'Need Text';
 
@@ -78,36 +78,36 @@ class Button extends Component {
   }
 
   /**
-  * Allows sub components to stack CSS class names
-  *
-  * @return {String}
-  * @method buildCSSClass
-  */
+   * Allows sub components to stack CSS class names
+   *
+   * @return {String}
+   * @method buildCSSClass
+   */
   buildCSSClass() {
     return `vjs-control vjs-button ${super.buildCSSClass()}`;
   }
 
   /**
-  * Handle Click - Override with specific functionality for button
-  *
-  * @method handleClick
-  */
+   * Handle Click - Override with specific functionality for button
+   *
+   * @method handleClick
+   */
   handleClick() {}
 
   /**
-  * Handle Focus - Add keyboard functionality to element
-  *
-  * @method handleFocus
-  */
+   * Handle Focus - Add keyboard functionality to element
+   *
+   * @method handleFocus
+   */
   handleFocus() {
     Events.on(document, 'keydown', Fn.bind(this, this.handleKeyPress));
   }
 
   /**
-  * Handle KeyPress (document level) - Trigger click when keys are pressed
-  *
-  * @method handleKeyPress
-  */
+   * Handle KeyPress (document level) - Trigger click when keys are pressed
+   *
+   * @method handleKeyPress
+   */
   handleKeyPress(event) {
     // Check for space bar (32) or enter (13) keys
     if (event.which === 32 || event.which === 13) {
@@ -117,10 +117,10 @@ class Button extends Component {
   }
 
   /**
-  * Handle Blur - Remove keyboard triggers
-  *
-  * @method handleBlur
-  */
+   * Handle Blur - Remove keyboard triggers
+   *
+   * @method handleBlur
+   */
   handleBlur() {
     Events.off(document, 'keydown', Fn.bind(this, this.handleKeyPress));
   }

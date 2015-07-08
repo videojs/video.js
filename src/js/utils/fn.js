@@ -1,19 +1,19 @@
 /**
-* @file fn.js
-*/
+ * @file fn.js
+ */
 import { newGUID } from './guid.js';
 
 /**
-* Bind (a.k.a proxy or Context). A simple method for changing the context of a function
-* It also stores a unique id on the function so it can be easily removed from events
-*
-* @param  {*}   context The object to bind as scope
-* @param  {Function} fn      The function to be bound to a scope
-* @param  {Number=}   uid     An optional unique ID for the function to be set
-* @return {Function}
-* @private
-* @method bind
-*/
+ * Bind (a.k.a proxy or Context). A simple method for changing the context of a function
+ * It also stores a unique id on the function so it can be easily removed from events
+ *
+ * @param  {*}   context The object to bind as scope
+ * @param  {Function} fn      The function to be bound to a scope
+ * @param  {Number=}   uid     An optional unique ID for the function to be set
+ * @return {Function}
+ * @private
+ * @method bind
+ */
 export const bind = function(context, fn, uid) {
   // Make sure the function has a unique ID
   if (!fn.guid) { fn.guid = newGUID(); }

@@ -1,17 +1,17 @@
 /**
-* @file buffer.js
-*/
+ * @file buffer.js
+ */
 import { createTimeRange } from './time-ranges.js';
 
 /**
-* Compute how much your video has been buffered
-*
-* @param  {Object} Buffered object
-* @param  {Number} Total duration
-* @return {Number} Percent buffered of the total duration
-* @private
-* @function bufferedPercent
-*/
+ * Compute how much your video has been buffered
+ *
+ * @param  {Object} Buffered object
+ * @param  {Number} Total duration
+ * @return {Number} Percent buffered of the total duration
+ * @private
+ * @function bufferedPercent
+ */
 export function bufferedPercent(buffered, duration) {
   var bufferedDuration = 0,
       start, end;

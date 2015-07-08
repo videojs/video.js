@@ -1,6 +1,6 @@
 /**
-* @file event-emitter.js
-*/
+ * @file event-emitter.js
+ */
 import * as Events from './utils/events.js';
 
 var EventEmitter = function() {};

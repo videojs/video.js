@@ -1,19 +1,19 @@
 /**
-* @file dom.js
-*/
+ * @file dom.js
+ */
 import document from 'global/document';
 import window from 'global/window';
-import * as Guid from './guid.js';
+import  * as Guid from './guid.js';
 import roundFloat from './round-float.js';
 
 /**
-* Shorthand for document.getElementById()
-* Also allows for CSS (jQuery) ID syntax. But nothing other than IDs.
-*
-* @param  {String} id  Element ID
-* @return {Element}    Element with supplied ID
-* @function getEl
-*/
+ * Shorthand for document.getElementById()
+ * Also allows for CSS (jQuery) ID syntax. But nothing other than IDs.
+ *
+ * @param  {String} id  Element ID
+ * @return {Element}    Element with supplied ID
+ * @function getEl
+ */
 export function getEl(id){
   if (id.indexOf('#') === 0) {
     id = id.slice(1);
@@ -23,13 +23,13 @@ export function getEl(id){
 }
 
 /**
-* Creates an element and applies properties.
-*
-* @param  {String=} tagName    Name of tag to be created.
-* @param  {Object=} properties Element properties to be applied.
-* @return {Element}
-* @function createEl
-*/
+ * Creates an element and applies properties.
+ *
+ * @param  {String=} tagName    Name of tag to be created.
+ * @param  {Object=} properties Element properties to be applied.
+ * @return {Element}
+ * @function createEl
+ */
 export function createEl(tagName='div', properties={}){
   let el = document.createElement(tagName);
 
@@ -39,10 +39,10 @@ export function createEl(tagName='div', properties={}){
       // Not remembering why we were checking for dash
       // but using setAttribute means you have to use getAttribute
 
-      // The check for dash checks for the aria-* attributes, like aria-label, aria-valuemin.
+      // The check for dash checks for the aria- * attributes, like aria-label, aria-valuemin.
       // The additional check for "role" is because the default method for adding attributes does not
       // add the attribute "role". My guess is because it's not a valid attribute in some namespaces, although
-      // browsers handle the attribute just fine. The W3C allows for aria-* attributes to be used in pre-HTML5 docs.
+      // browsers handle the attribute just fine. The W3C allows for aria- * attributes to be used in pre-HTML5 docs.
       // http://www.w3.org/TR/wai-aria-primer/#ariahtml. Using setAttribute gets around this problem.
       if (propName.indexOf('aria-') !== -1 || propName === 'role') {
        el.setAttribute(propName, val);
@@ -55,13 +55,13 @@ export function createEl(tagName='div', properties={}){
 }
 
 /**
-* Insert an element as the first child node of another
-* 
-* @param  {Element} child   Element to insert
-* @param  {Element} parent Element to insert child into
-* @private
-* @function insertElFirst
-*/
+ * Insert an element as the first child node of another
+ * 
+ * @param  {Element} child   Element to insert
+ * @param  {Element} parent Element to insert child into
+ * @private
+ * @function insertElFirst
+ */
 export function insertElFirst(child, parent){
   if (parent.firstChild) {
     parent.insertBefore(child, parent.firstChild);
@@ -71,31 +71,31 @@ export function insertElFirst(child, parent){
 }
 
 /**
-* Element Data Store. Allows for binding data to an element without putting it directly on the element.
-* Ex. Event listeners are stored here.
-* (also from jsninja.com, slightly modified and updated for closure compiler)
-*
-* @type {Object}
-* @private
-*/
+ * Element Data Store. Allows for binding data to an element without putting it directly on the element.
+ * Ex. Event listeners are stored here.
+ * (also from jsninja.com, slightly modified and updated for closure compiler)
+ *
+ * @type {Object}
+ * @private
+ */
 const elData = {};
 
 /*
-* Unique attribute name to store an element's guid in
-*
-* @type {String}
-* @constant
-* @private
-*/
+ * Unique attribute name to store an element's guid in
+ *
+ * @type {String}
+ * @constant
+ * @private
+ */
 const elIdAttr = 'vdata' + (new Date()).getTime();
 
 /**
-* Returns the cache object where data for an element is stored
-*
-* @param  {Element} el Element to store data for.
-* @return {Object}
-* @function getElData
-*/
+ * Returns the cache object where data for an element is stored
+ *
+ * @param  {Element} el Element to store data for.
+ * @return {Object}
+ * @function getElData
+ */
 export function getElData(el) {
   let id = el[elIdAttr];
 
@@ -111,13 +111,13 @@ export function getElData(el) {
 }
 
 /**
-* Returns whether or not an element has cached data
-*
-* @param  {Element} el A dom element
-* @return {Boolean}
-* @private
-* @function hasElData
-*/
+ * Returns whether or not an element has cached data
+ *
+ * @param  {Element} el A dom element
+ * @return {Boolean}
+ * @private
+ * @function hasElData
+ */
 export function hasElData(el) {
   const id = el[elIdAttr];
 
@@ -129,12 +129,12 @@ export function hasElData(el) {
 }
 
 /**
-* Delete data for the element from the cache and the guid attr from getElementById
-*
-* @param  {Element} el Remove data for an element
-* @private
-* @function removeElData
-*/
+ * Delete data for the element from the cache and the guid attr from getElementById
+ *
+ * @param  {Element} el Remove data for an element
+ * @private
+ * @function removeElData
+ */
 export function removeElData(el) {
   let id = el[elIdAttr];
 
@@ -159,23 +159,23 @@ export function removeElData(el) {
 }
 
 /**
-* Check if an element has a CSS class
-*
-* @param {Element} element Element to check
-* @param {String} classToCheck Classname to check
-* @function hasElClass
-*/
+ * Check if an element has a CSS class
+ *
+ * @param {Element} element Element to check
+ * @param {String} classToCheck Classname to check
+ * @function hasElClass
+ */
 export function hasElClass(element, classToCheck) {
   return ((' ' + element.className + ' ').indexOf(' ' + classToCheck + ' ') !== -1);
 }
 
 /**
-* Add a CSS class name to an element
-*
-* @param {Element} element    Element to add class name to
-* @param {String} classToAdd Classname to add
-* @function addElClass
-*/
+ * Add a CSS class name to an element
+ *
+ * @param {Element} element    Element to add class name to
+ * @param {String} classToAdd Classname to add
+ * @function addElClass
+ */
 export function addElClass(element, classToAdd) {
   if (!hasElClass(element, classToAdd)) {
     element.className = element.className === '' ? classToAdd : element.className + ' ' + classToAdd;
@@ -183,12 +183,12 @@ export function addElClass(element, classToAdd) {
 }
 
 /**
-* Remove a CSS class name from an element
-*
-* @param {Element} element    Element to remove from class name
-* @param {String} classToRemove Classname to remove
-* @function removeElClass
-*/
+ * Remove a CSS class name from an element
+ *
+ * @param {Element} element    Element to remove from class name
+ * @param {String} classToRemove Classname to remove
+ * @function removeElClass
+ */
 export function removeElClass(element, classToRemove) {
   if (!hasElClass(element, classToRemove)) {return;}
 
@@ -205,13 +205,13 @@ export function removeElClass(element, classToRemove) {
 }
 
 /**
-* Apply attributes to an HTML element.
-*
-* @param  {Element} el         Target element.
-* @param  {Object=} attributes Element attributes to be applied.
-* @private
-* @function setElAttributes
-*/
+ * Apply attributes to an HTML element.
+ *
+ * @param  {Element} el         Target element.
+ * @param  {Object=} attributes Element attributes to be applied.
+ * @private
+ * @function setElAttributes
+ */
 export function setElAttributes(el, attributes) {
   Object.getOwnPropertyNames(attributes).forEach(function(attrName){
     let attrValue = attributes[attrName];
@@ -225,16 +225,16 @@ export function setElAttributes(el, attributes) {
 }
 
 /**
-* Get an element's attribute values, as defined on the HTML tag
-* Attributes are not the same as properties. They're defined on the tag
-* or with setAttribute (which shouldn't be used with HTML)
-* This will return true or false for boolean attributes.
-*
-* @param  {Element} tag Element from which to get tag attributes
-* @return {Object}
-* @private
-* @function getElAttributes
-*/
+ * Get an element's attribute values, as defined on the HTML tag
+ * Attributes are not the same as properties. They're defined on the tag
+ * or with setAttribute (which shouldn't be used with HTML)
+ * This will return true or false for boolean attributes.
+ *
+ * @param  {Element} tag Element from which to get tag attributes
+ * @return {Object}
+ * @private
+ * @function getElAttributes
+ */
 export function getElAttributes(tag) {
   var obj, knownBooleans, attrs, attrName, attrVal;
 
@@ -269,11 +269,11 @@ export function getElAttributes(tag) {
 }
 
 /**
-* Attempt to block the ability to select text while dragging controls
-*
-* @return {Boolean} 
-* @method blockTextSelection
-*/
+ * Attempt to block the ability to select text while dragging controls
+ *
+ * @return {Boolean} 
+ * @method blockTextSelection
+ */
 export function blockTextSelection() {
   document.body.focus();
   document.onselectstart = function() {
@@ -282,11 +282,11 @@ export function blockTextSelection() {
 }
 
 /**
-* Turn off text selection blocking
-*
-* @return {Boolean} 
-* @method unblockTextSelection
-*/
+ * Turn off text selection blocking
+ *
+ * @return {Boolean} 
+ * @method unblockTextSelection
+ */
 export function unblockTextSelection() {
   document.onselectstart = function() {
     return true;
@@ -294,14 +294,14 @@ export function unblockTextSelection() {
 }
 
 /**
-* Offset Left
-* getBoundingClientRect technique from 
-* John Resig http://ejohn.org/blog/getboundingclientrect-is-awesome/
-*
-* @param {Element} el Element from which to get offset
-* @return {Object=} 
-* @method findElPosition
-*/
+ * Offset Left
+ * getBoundingClientRect technique from 
+ * John Resig http://ejohn.org/blog/getboundingclientrect-is-awesome/
+ *
+ * @param {Element} el Element from which to get offset
+ * @return {Object=} 
+ * @method findElPosition
+ */
 export function findElPosition(el) {
   let box;
 

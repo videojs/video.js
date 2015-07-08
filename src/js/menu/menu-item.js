@@ -1,18 +1,18 @@
 /**
-* @file menu-item.js
-*/
+ * @file menu-item.js
+ */
 import Button from '../button.js';
 import Component from '../component.js';
 import assign from 'object.assign';
 
 /**
-* The component for a menu item. `<li>`
-*
-* @param {Player|Object} player
-* @param {Object=} options
-* @extends Button
-* @class MenuItem
-*/
+ * The component for a menu item. `<li>`
+ *
+ * @param {Player|Object} player
+ * @param {Object=} options
+ * @extends Button
+ * @class MenuItem
+ */
 class MenuItem extends Button {
 
   constructor(player, options) {
@@ -21,13 +21,13 @@ class MenuItem extends Button {
   }
 
   /**
-  * Create the component's DOM element
-  *
-  * @param {String=} type Desc
-  * @param {Object=} props Desc 
-  * @return {Element}
-  * @method createEl
-  */
+   * Create the component's DOM element
+   *
+   * @param {String=} type Desc
+   * @param {Object=} props Desc 
+   * @return {Element}
+   * @method createEl
+   */
   createEl(type, props) {
     return super.createEl('li', assign({
       className: 'vjs-menu-item',
@@ -36,20 +36,20 @@ class MenuItem extends Button {
   }
 
   /**
-  * Handle a click on the menu item, and set it to selected
-  *
-  * @method handleClick
-  */
+   * Handle a click on the menu item, and set it to selected
+   *
+   * @method handleClick
+   */
   handleClick() {
     this.selected(true);
   }
 
   /**
-  * Set this menu item as selected or not
-  *
-  * @param  {Boolean} selected
-  * @method selected
-  */
+   * Set this menu item as selected or not
+   *
+   * @param  {Boolean} selected
+   * @method selected
+   */
   selected(selected) {
     if (selected) {
       this.addClass('vjs-selected');

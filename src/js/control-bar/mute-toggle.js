@@ -1,18 +1,18 @@
 /**
-* @file mute-toggle.js
-*/
+ * @file mute-toggle.js
+ */
 import Button from '../button';
 import Component from '../component';
 import * as Dom from '../utils/dom.js';
 
 /**
-* A button component for muting the audio
-*
-* @param {Player|Object} player
-* @param {Object=} options
-* @extends Button
-* @class MuteToggle
-*/
+ * A button component for muting the audio 
+ *
+ * @param {Player|Object} player
+ * @param {Object=} options
+ * @extends Button
+ * @class MuteToggle
+ */
 class MuteToggle extends Button {
 
   constructor(player, options) {
@@ -35,29 +35,29 @@ class MuteToggle extends Button {
   }
 
   /**
-  * Allow sub components to stack CSS class names
-  *
-  * @return {String} The constructed class name
-  * @method buildCSSClass
-  */
+   * Allow sub components to stack CSS class names
+   *
+   * @return {String} The constructed class name
+   * @method buildCSSClass
+   */
   buildCSSClass() {
     return `vjs-mute-control ${super.buildCSSClass()}`;
   }
 
   /**
-  * Handle click on mute
-  *
-  * @method handleClick
-  */
+   * Handle click on mute
+   *
+   * @method handleClick
+   */
   handleClick() {
     this.player_.muted( this.player_.muted() ? false : true );
   }
 
   /**
-  * Update volume
-  *
-  * @method update
-  */
+   * Update volume
+   *
+   * @method update
+   */
   update() {
     var vol = this.player_.volume(),
         level = 3;

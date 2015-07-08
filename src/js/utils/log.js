@@ -1,43 +1,43 @@
 /**
-* @file log.js
-*/
+ * @file log.js
+ */
 import window from 'global/window';
 
 /**
-* Log plain debug messages
-*/
+ * Log plain debug messages
+ */
 const log = function(){
   _logType(null, arguments);
 };
 
 /**
-* Keep a history of log messages
-* @type {Array}
-*/
+ * Keep a history of log messages
+ * @type {Array}
+ */
 log.history = [];
 
 /**
-* Log error messages
-*/
+ * Log error messages
+ */
 log.error = function(){
   _logType('error', arguments);
 };
 
 /**
-* Log warning messages
-*/
+ * Log warning messages
+ */
 log.warn = function(){
   _logType('warn', arguments);
 };
 
 /**
-* Log messages to the console and history based on the type of message
-*
-* @param  {String} type The type of message, or `null` for `log`
-* @param  {Object} args The args to be passed to the log
-* @private
-* @method _logType
-*/
+ * Log messages to the console and history based on the type of message
+ *
+ * @param  {String} type The type of message, or `null` for `log`
+ * @param  {Object} args The args to be passed to the log
+ * @private
+ * @method _logType
+ */
 function _logType(type, args){
   // convert args to an array to get array functions
   let argsArray = Array.prototype.slice.call(args);

@@ -1,9 +1,9 @@
 /**
-* @file setup.js
-*
-* Functions for automatically setting up a player
-* based on the data-setup attribute of the video tag
-*/
+ * @file setup.js
+ *
+ * Functions for automatically setting up a player
+ * based on the data-setup attribute of the video tag
+ */
 import * as Events from './utils/events.js';
 import document from 'global/document';
 import window from 'global/window';

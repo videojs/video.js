@@ -1,6 +1,6 @@
 /**
-* @file menu-button.js
-*/
+ * @file menu-button.js
+ */
 import Button from '../button.js';
 import Component from '../component.js';
 import Menu from './menu.js';
@@ -9,13 +9,13 @@ import * as Fn from '../utils/fn.js';
 import toTitleCase from '../utils/to-title-case.js';
 
 /**
-* A button class with a popup menu
-*
-* @param {Player|Object} player
-* @param {Object=} options
-* @extends Button
-* @class MenuButton
-*/
+ * A button class with a popup menu
+ *
+ * @param {Player|Object} player
+ * @param {Object=} options
+ * @extends Button
+ * @class MenuButton
+ */
 class MenuButton extends Button {
 
   constructor(player, options){
@@ -29,10 +29,10 @@ class MenuButton extends Button {
   }
 
   /**
-  * Update menu
-  *
-  * @method update
-  */
+   * Update menu
+   *
+   * @method update
+   */
   update() {
     let menu = this.createMenu();
 
@@ -59,11 +59,11 @@ class MenuButton extends Button {
   }
 
   /**
-  * Create menu
-  *
-  * @return {Menu} The constructed menu
-  * @method createMenu
-  */
+   * Create menu
+   *
+   * @return {Menu} The constructed menu
+   * @method createMenu
+   */
   createMenu() {
     var menu = new Menu(this.player_);
 
@@ -89,18 +89,18 @@ class MenuButton extends Button {
   }
 
   /**
-  * Create the list of menu items. Specific to each subclass.
-  *
-  * @method createItems
-  */
+   * Create the list of menu items. Specific to each subclass.
+   *
+   * @method createItems
+   */
   createItems(){}
 
   /**
-  * Create the component's DOM element
-  *
-  * @return {Element}
-  * @method createEl
-  */
+   * Create the component's DOM element
+   *
+   * @return {Element}
+   * @method createEl
+   */
   createEl() {
     return super.createEl('div', {
       className: this.buildCSSClass()
@@ -108,45 +108,45 @@ class MenuButton extends Button {
   }
 
   /**
-  * Allow sub components to stack CSS class names
-  *
-  * @return {String} The constructed class name
-  * @method buildCSSClass
-  */
+   * Allow sub components to stack CSS class names
+   *
+   * @return {String} The constructed class name
+   * @method buildCSSClass
+   */
   buildCSSClass() {
     return `vjs-menu-button ${super.buildCSSClass()}`;
   }
 
   /**
-  * Focus - Add keyboard functionality to element
-  * This function is not needed anymore. Instead, the 
-  * keyboard functionality is handled by
-  * treating the button as triggering a submenu. 
-  * When the button is pressed, the submenu
-  * appears. Pressing the button again makes 
-  * the submenu disappear.
-  *
-  * @method handleFocus
-  */
+   * Focus - Add keyboard functionality to element
+   * This function is not needed anymore. Instead, the 
+   * keyboard functionality is handled by
+   * treating the button as triggering a submenu. 
+   * When the button is pressed, the submenu
+   * appears. Pressing the button again makes 
+   * the submenu disappear.
+   *
+   * @method handleFocus
+   */
   handleFocus() {}
 
   /**
-  * Can't turn off list display that we turned
-  * on with focus, because list would go away.
-  *
-  * @method handleBlur
-  */
+   * Can't turn off list display that we turned
+   * on with focus, because list would go away.
+   *
+   * @method handleBlur
+   */
   handleBlur() {}
 
   /**
-  * When you click the button it adds focus, which 
-  * will show the menu indefinitely.
-  * So we'll remove focus when the mouse leaves the button.
-  * Focus is needed for tab navigation.
-  * Allow sub components to stack CSS class names
-  *
-  * @method handleClick
-  */
+   * When you click the button it adds focus, which 
+   * will show the menu indefinitely.
+   * So we'll remove focus when the mouse leaves the button.
+   * Focus is needed for tab navigation.
+   * Allow sub components to stack CSS class names
+   *
+   * @method handleClick
+   */
   handleClick() {
     this.one('mouseout', Fn.bind(this, function(){
       this.menu.unlockShowing();
@@ -160,11 +160,11 @@ class MenuButton extends Button {
   }
 
   /**
-  * Handle key press on menu
-  *
-  * @param {Object} Key press event
-  * @method handleKeyPress
-  */
+   * Handle key press on menu
+   *
+   * @param {Object} Key press event
+   * @method handleKeyPress
+   */
   handleKeyPress(event) {
 
     // Check for space bar (32) or enter (13) keys
@@ -185,10 +185,10 @@ class MenuButton extends Button {
   }
 
   /**
-  * Makes changes based on button pressed
-  *
-  * @method pressButton
-  */
+   * Makes changes based on button pressed
+   *
+   * @method pressButton
+   */
   pressButton() {
     this.buttonPressed_ = true;
     this.menu.lockShowing();
@@ -199,10 +199,10 @@ class MenuButton extends Button {
   }
 
   /**
-  * Makes changes based on button unpressed
-  *
-  * @method unpressButton
-  */
+   * Makes changes based on button unpressed
+   *
+   * @method unpressButton
+   */
   unpressButton() {
     this.buttonPressed_ = false;
     this.menu.unlockShowing();

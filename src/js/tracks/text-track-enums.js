@@ -1,10 +1,10 @@
 /**
-* @file text-track-enums.js
-*
-* https://html.spec.whatwg.org/multipage/embedded-content.html#texttrackmode
-*
-* enum TextTrackMode { "disabled",  "hidden",  "showing" };
-*/
+ * @file text-track-enums.js
+ *
+ * https://html.spec.whatwg.org/multipage/embedded-content.html#texttrackmode
+ *
+ * enum TextTrackMode { "disabled",  "hidden",  "showing" };
+ */
 var TextTrackMode = {
   'disabled': 'disabled',
   'hidden': 'hidden',

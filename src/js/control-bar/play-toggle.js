@@ -1,17 +1,17 @@
 /**
-* @file play-toggle.js
-*/
+ * @file play-toggle.js
+ */
 import Button from '../button.js';
 import Component from '../component.js';
 
 /**
-* Button to toggle between play and pause
-*
-* @param {Player|Object} player
-* @param {Object=} options
-* @extends Button
-* @class PlayToggle
-*/
+ * Button to toggle between play and pause
+ *
+ * @param {Player|Object} player
+ * @param {Object=} options
+ * @extends Button
+ * @class PlayToggle
+ */
 class PlayToggle extends Button {
 
   constructor(player, options){
@@ -22,20 +22,20 @@ class PlayToggle extends Button {
   }
 
   /**
-  * Allow sub components to stack CSS class names
-  *
-  * @return {String} The constructed class name
-  * @method buildCSSClass
-  */
+   * Allow sub components to stack CSS class names
+   *
+   * @return {String} The constructed class name
+   * @method buildCSSClass
+   */
   buildCSSClass() {
     return `vjs-play-control ${super.buildCSSClass()}`;
   }
 
   /**
-  * Handle click to toggle between play and pause
-  *
-  * @method handleClick
-  */
+   * Handle click to toggle between play and pause
+   *
+   * @method handleClick
+   */
   handleClick() {
     if (this.player_.paused()) {
       this.player_.play();
@@ -45,10 +45,10 @@ class PlayToggle extends Button {
   }
 
   /**
-  * Add the vjs-playing class to the element so it can change appearance
-  *
-  * @method handlePlay
-  */
+   * Add the vjs-playing class to the element so it can change appearance
+   *
+   * @method handlePlay
+   */
   handlePlay() {
     this.removeClass('vjs-paused');
     this.addClass('vjs-playing');
@@ -56,10 +56,10 @@ class PlayToggle extends Button {
   }
 
   /**
-  * Add the vjs-paused class to the element so it can change appearance
-  *
-  * @method handlePause
-  */
+   * Add the vjs-paused class to the element so it can change appearance
+   *
+   * @method handlePause
+   */
   handlePause() {
     this.removeClass('vjs-playing');
     this.addClass('vjs-paused');

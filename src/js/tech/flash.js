@@ -1,9 +1,9 @@
 /**
-* @file flash.js 
-* VideoJS-SWF - Custom Flash Player with HTML5-ish API
-* https://github.com/zencoder/video-js-swf
-* Not using setupTriggers. Using global onEvent func to distribute events
-*/
+ * @file flash.js 
+ * VideoJS-SWF - Custom Flash Player with HTML5-ish API
+ * https://github.com/zencoder/video-js-swf
+ * Not using setupTriggers. Using global onEvent func to distribute events
+ */
 
 import Tech from './tech';
 import * as Dom from '../utils/dom.js';
@@ -16,13 +16,13 @@ import assign from 'object.assign';
 
 let navigator = window.navigator;
 /**
-* Flash Media Controller - Wrapper for fallback SWF API
-*
-* @param {Object=} options Object of option names and values
-* @param {Function=} ready Ready callback function
-* @extends Tech
-* @class Flash
-*/
+ * Flash Media Controller - Wrapper for fallback SWF API
+ *
+ * @param {Object=} options Object of option names and values
+ * @param {Function=} ready Ready callback function
+ * @extends Tech
+ * @class Flash
+ */
 class Flash extends Tech {
 
   constructor(options, ready){
@@ -57,11 +57,11 @@ class Flash extends Tech {
   }
 
   /**
-  * Create the component's DOM element
-  *
-  * @return {Element}
-  * @method createEl
-  */
+   * Create the component's DOM element
+   *
+   * @return {Element}
+   * @method createEl
+   */
   createEl() {
     let options = this.options_;
 
@@ -104,30 +104,30 @@ class Flash extends Tech {
   }
 
   /**
-  * Play for flash tech
-  *
-  * @method play
-  */
+   * Play for flash tech
+   *
+   * @method play
+   */
   play() {
     this.el_.vjs_play();
   }
 
   /**
-  * Pause for flash tech
-  *
-  * @method pause
-  */
+   * Pause for flash tech
+   *
+   * @method pause
+   */
   pause() {
     this.el_.vjs_pause();
   }
 
   /**
-  * Get/set video
-  *
-  * @param {Object=} src Source object 
-  * @return {Object} 
-  * @method src
-  */
+   * Get/set video
+   *
+   * @param {Object=} src Source object 
+   * @return {Object} 
+   * @method src
+   */
   src(src) {
     if (src === undefined) {
       return this.currentSrc();
@@ -138,12 +138,12 @@ class Flash extends Tech {
   }
 
   /**
-  * Set video
-  *
-  * @param {Object=} src Source object 
-  * @deprecated
-  * @method setSrc
-  */
+   * Set video
+   *
+   * @param {Object=} src Source object 
+   * @deprecated
+   * @method setSrc
+   */
   setSrc(src) {
     // Make sure source URL is absolute.
     src = Url.getAbsoluteURL(src);
@@ -158,11 +158,11 @@ class Flash extends Tech {
   }
 
   /**
-  * Set current time
-  *
-  * @param {Number} time Current time of video 
-  * @method setCurrentTime
-  */
+   * Set current time
+   *
+   * @param {Number} time Current time of video 
+   * @method setCurrentTime
+   */
   setCurrentTime(time) {
     this.lastSeekTarget_ = time;
     this.el_.vjs_setProperty('currentTime', time);
@@ -170,12 +170,12 @@ class Flash extends Tech {
   }
 
   /**
-  * Get current time
-  *
-  * @param {Number=} time Current time of video 
-  * @return {Number} Current time
-  * @method currentTime
-  */
+   * Get current time
+   *
+   * @param {Number=} time Current time of video 
+   * @return {Number} Current time
+   * @method currentTime
+   */
   currentTime(time) {
     // when seeking make the reported time keep up with the requested time
     // by reading the time we're seeking to
@@ -186,10 +186,10 @@ class Flash extends Tech {
   }
 
   /**
-  * Get current source
-  *
-  * @method currentSrc
-  */
+   * Get current source
+   *
+   * @method currentSrc
+   */
   currentSrc() {
     if (this.currentSource_) {
       return this.currentSource_.src;
@@ -199,36 +199,36 @@ class Flash extends Tech {
   }
 
   /**
-  * Load media into player
-  *
-  * @method load
-  */
+   * Load media into player
+   *
+   * @method load
+   */
   load() {
     this.el_.vjs_load();
   }
 
   /**
-  * Get poster
-  *
-  * @method poster
-  */
+   * Get poster
+   *
+   * @method poster
+   */
   poster() {
     this.el_.vjs_getProperty('poster');
   }
 
   /**
-  * Poster images are not handled by the Flash tech so make this a no-op
-  *
-  * @method setPoster
-  */
+   * Poster images are not handled by the Flash tech so make this a no-op
+   *
+   * @method setPoster
+   */
   setPoster() {}
 
   /**
-  * Determine if can seek in media
-  *
-  * @return {TimeRangeObject}
-  * @method seekable
-  */
+   * Determine if can seek in media
+   *
+   * @return {TimeRangeObject}
+   * @method seekable
+   */
   seekable() {
     const duration = this.duration();
     if (duration === 0) {
@@ -238,35 +238,35 @@ class Flash extends Tech {
   }
 
   /**
-  * Get buffered time range
-  *
-  * @return {TimeRangeObject} 
-  * @method buffered
-  */
+   * Get buffered time range
+   *
+   * @return {TimeRangeObject} 
+   * @method buffered
+   */
   buffered() {
     return createTimeRange(0, this.el_.vjs_getProperty('buffered'));
   }
 
   /**
-  * Get fullscreen support - 
-  * Flash does not allow fullscreen through javascript
-  * so always returns false
-  *
-  * @return {Boolean} false 
-  * @method supportsFullScreen
-  */
+   * Get fullscreen support - 
+   * Flash does not allow fullscreen through javascript
+   * so always returns false
+   *
+   * @return {Boolean} false 
+   * @method supportsFullScreen
+   */
   supportsFullScreen() {
     return false; // Flash does not allow fullscreen through javascript
   }
 
   /**
-  * Request to enter fullscreen
-  * Flash does not allow fullscreen through javascript
-  * so always returns false
-  *
-  * @return {Boolean} false 
-  * @method enterFullScreen
-  */
+   * Request to enter fullscreen
+   * Flash does not allow fullscreen through javascript
+   * so always returns false
+   *
+   * @return {Boolean} false 
+   * @method enterFullScreen
+   */
   enterFullScreen() {
     return false;
   }
@@ -309,20 +309,20 @@ Flash.isSupported = function(){
 Tech.withSourceHandlers(Flash);
 
 /*
-* The default native source handler.
-* This simply passes the source to the video element. Nothing fancy.
-*
-* @param  {Object} source   The source object
-* @param  {Flash} tech  The instance of the Flash tech
-*/
+ * The default native source handler.
+ * This simply passes the source to the video element. Nothing fancy.
+ *
+ * @param  {Object} source   The source object
+ * @param  {Flash} tech  The instance of the Flash tech
+ */
 Flash.nativeSourceHandler = {};
 
 /*
-* Check Flash can handle the source natively
-*
-* @param  {Object} source  The source object
-* @return {String}         'probably', 'maybe', or '' (empty string)
-*/
+ * Check Flash can handle the source natively
+ *
+ * @param  {Object} source  The source object
+ * @return {String}         'probably', 'maybe', or '' (empty string)
+ */
 Flash.nativeSourceHandler.canHandleSource = function(source){
   var type;
 
@@ -349,21 +349,21 @@ Flash.nativeSourceHandler.canHandleSource = function(source){
 };
 
 /*
-* Pass the source to the flash object
-* Adaptive source handlers will have more complicated workflows before passing
-* video data to the video element
-*
-* @param  {Object} source    The source object
-* @param  {Flash} tech   The instance of the Flash tech
-*/
+ * Pass the source to the flash object
+ * Adaptive source handlers will have more complicated workflows before passing
+ * video data to the video element
+ *
+ * @param  {Object} source    The source object
+ * @param  {Flash} tech   The instance of the Flash tech
+ */
 Flash.nativeSourceHandler.handleSource = function(source, tech){
   tech.setSrc(source.src);
 };
 
 /*
-* Clean up the source handler when disposing the player or switching sources..
-* (no cleanup is needed when supporting the format natively)
-*/
+ * Clean up the source handler when disposing the player or switching sources..
+ * (no cleanup is needed when supporting the format natively)
+ */
 Flash.nativeSourceHandler.dispose = function(){};
 
 // Register the native source handler

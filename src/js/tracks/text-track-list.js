@@ -1,24 +1,24 @@
 /**
-* @file text-track-list.js
-*/
+ * @file text-track-list.js
+ */
 import EventEmitter from '../event-emitter';
 import * as Fn from '../utils/fn.js';
 import * as browser from '../utils/browser.js';
 import document from 'global/document';
 
 /*
-* https://html.spec.whatwg.org/multipage/embedded-content.html#texttracklist
-*
-* interface TextTrackList : EventTarget {
-*   readonly attribute unsigned long length;
-*   getter TextTrack (unsigned long index);
-*   TextTrack? getTrackById(DOMString id);
-*
-*   attribute EventHandler onchange;
-*   attribute EventHandler onaddtrack;
-*   attribute EventHandler onremovetrack;
-* };
-*/
+ * https://html.spec.whatwg.org/multipage/embedded-content.html#texttracklist
+ *
+ * interface TextTrackList : EventTarget {
+ *   readonly attribute unsigned long length;
+ *   getter TextTrack (unsigned long index);
+ *   TextTrack? getTrackById(DOMString id);
+ *
+ *   attribute EventHandler onchange;
+ *   attribute EventHandler onaddtrack;
+ *   attribute EventHandler onremovetrack;
+ * };
+ */
 let TextTrackList = function(tracks) {
   let list = this;
 
@@ -55,7 +55,7 @@ TextTrackList.prototype.constructor = TextTrackList;
  * change - One or more tracks in the track list have been enabled or disabled.
  * addtrack - A track has been added to the track list.
  * removetrack - A track has been removed from the track list.
-*/
+ */
 TextTrackList.prototype.allowedEvents_ = {
   'change': 'change',
   'addtrack': 'addtrack',

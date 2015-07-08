@@ -1,23 +1,23 @@
 /**
-* @file loading-spinner.js
-*/
+ * @file loading-spinner.js
+ */
 import Component from './component';
 
-/* Loading Spinner
+/ * Loading Spinner
 ================================================================================ */
 /**
-* Loading spinner for waiting events
-*
-* @extends Component
-* @class LoadingSpinner
-*/
+ * Loading spinner for waiting events
+ *
+ * @extends Component
+ * @class LoadingSpinner
+ */
 class LoadingSpinner extends Component {
 
   /**
-  * Create the component's DOM element
-  *
-  * @method createEl
-  */
+   * Create the component's DOM element
+   *
+   * @method createEl
+   */
   createEl() {
     return super.createEl('div', {
       className: 'vjs-loading-spinner'
