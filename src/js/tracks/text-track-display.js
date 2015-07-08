@@ -32,7 +32,7 @@ class TextTrackDisplay extends Component {
     super(player, options, ready);
 
     player.on('loadstart', Fn.bind(this, this.toggleDisplay));
-    player.on('texttrackchange', Fn.bind(this, this.toggleDisplay));
+    player.on('texttrackchange', Fn.bind(this, this.updateDisplay));
 
     // This used to be called during player init, but was causing an error
     // if a track should show by default and the display hadn't loaded yet.

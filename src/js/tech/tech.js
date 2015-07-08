@@ -218,27 +218,25 @@ class Tech extends Component {
       return;
     }
 
-    let textTracksChanges = function() {
-      let updateDisplay = Fn.bind(this, function() {
-        this.trigger('texttrackchange');
-      });
+    let textTracksChanges = Fn.bind(this, function() {
+      let updateDisplay = () => this.trigger('texttrackchange');
 
-      this.trigger('texttrackchange');
+      updateDisplay();
 
-      for (let i = 0; i < this.length; i++) {
-        let track = this[i];
+      for (let i = 0; i < tracks.length; i++) {
+        let track = tracks[i];
         track.removeEventListener('cuechange', updateDisplay);
         if (track.mode === 'showing') {
           track.addEventListener('cuechange', updateDisplay);
         }
       }
-    };
+    });
 
     tracks.addEventListener('change', textTracksChanges);
 
-    this.on('dispose', Fn.bind(this, function() {
+    this.on('dispose', function() {
       tracks.removeEventListener('change', textTracksChanges);
-    }));
+    });
   }
 
   /**
