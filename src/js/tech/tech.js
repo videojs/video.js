@@ -234,9 +234,9 @@ class Tech extends Component {
 
     tracks.addEventListener('change', Fn.bind(this, textTracksChanges));
 
-    this.on('dispose', Fn.bind(this, function() {
+    this.on('dispose', function() {
       tracks.removeEventListener('change', Fn.bind(this, textTracksChanges));
-    }));
+    });
   }
 
   /**
