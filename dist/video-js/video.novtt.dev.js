@@ -80,7 +80,7 @@ vjs.ACCESS_PROTOCOL = ('https:' == document.location.protocol ? 'https://' : 'ht
 * Full player version
 * @type {string}
 */
-vjs['VERSION'] = '4.12.10';
+vjs['VERSION'] = '4.12.11';
 
 /**
  * Global Player instance options, surfaced from vjs.Player.prototype.options_
@@ -7997,7 +7997,17 @@ vjs.Flash.prototype.seekable = function() {
 };
 
 vjs.Flash.prototype.buffered = function(){
+  if (!this.el_.vjs_getProperty) {
+    return vjs.createTimeRange();
+  }
   return vjs.createTimeRange(0, this.el_.vjs_getProperty('buffered'));
+};
+
+vjs.Flash.prototype.duration = function(){
+  if (!this.el_.vjs_getProperty) {
+    return 0;
+  }
+  return this.el_.vjs_getProperty('duration');
 };
 
 vjs.Flash.prototype.supportsFullScreen = function(){
@@ -8012,7 +8022,7 @@ vjs.Flash.prototype.enterFullScreen = function(){
   // Create setters and getters for attributes
   var api = vjs.Flash.prototype,
     readWrite = 'rtmpConnection,rtmpStream,preload,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted'.split(','),
-    readOnly = 'error,networkState,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,ended,videoTracks,audioTracks,videoWidth,videoHeight'.split(','),
+    readOnly = 'error,networkState,readyState,seeking,initialTime,startOffsetTime,paused,played,ended,videoTracks,audioTracks,videoWidth,videoHeight'.split(','),
     // Overridden: buffered, currentTime, currentSrc
     i;
 

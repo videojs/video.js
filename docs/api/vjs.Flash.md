@@ -43,7 +43,7 @@ _defined in_: [src/js/media/flash.js#L17](https://github.com/videojs/video.js/bl
 * __source__ `Object` The source object
 * __tech__ `vjs.Flash` The instance of the Flash tech
 
-_defined in_: [src/js/media/flash.js#L232](https://github.com/videojs/video.js/blob/master/src/js/media/flash.js#L232)
+_defined in_: [src/js/media/flash.js#L242](https://github.com/videojs/video.js/blob/master/src/js/media/flash.js#L242)
 
 ---
 

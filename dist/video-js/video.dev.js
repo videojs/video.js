@@ -80,7 +80,7 @@ vjs.ACCESS_PROTOCOL = ('https:' == document.location.protocol ? 'https://' : 'ht
 * Full player version
 * @type {string}
 */
-vjs['VERSION'] = '4.12.10';
+vjs['VERSION'] = '4.12.11';
 
 /**
  * Global Player instance options, surfaced from vjs.Player.prototype.options_
@@ -7997,7 +7997,17 @@ vjs.Flash.prototype.seekable = function() {
 };
 
 vjs.Flash.prototype.buffered = function(){
+  if (!this.el_.vjs_getProperty) {
+    return vjs.createTimeRange();
+  }
   return vjs.createTimeRange(0, this.el_.vjs_getProperty('buffered'));
+};
+
+vjs.Flash.prototype.duration = function(){
+  if (!this.el_.vjs_getProperty) {
+    return 0;
+  }
+  return this.el_.vjs_getProperty('duration');
 };
 
 vjs.Flash.prototype.supportsFullScreen = function(){
@@ -8012,7 +8022,7 @@ vjs.Flash.prototype.enterFullScreen = function(){
   // Create setters and getters for attributes
   var api = vjs.Flash.prototype,
     readWrite = 'rtmpConnection,rtmpStream,preload,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted'.split(','),
-    readOnly = 'error,networkState,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,ended,videoTracks,audioTracks,videoWidth,videoHeight'.split(','),
+    readOnly = 'error,networkState,readyState,seeking,initialTime,startOffsetTime,paused,played,ended,videoTracks,audioTracks,videoWidth,videoHeight'.split(','),
     // Overridden: buffered, currentTime, currentSrc
     i;
 
@@ -9928,7 +9938,7 @@ vjs.plugin = function(name, init){
   vjs.Player.prototype[name] = init;
 };
 
-/* vtt.js - v0.11.11 (https://github.com/mozilla/vtt.js) built on 22-01-2015 */
+/* vtt.js - v0.12.1 (https://github.com/mozilla/vtt.js) built on 08-07-2015 */
 
 (function(root) {
   var vttjs = root.vttjs = {};
@@ -10278,7 +10288,7 @@ vjs.plugin = function(name, init){
 
   var scrollSetting = {
     "": true,
-    "up": true,
+    "up": true
   };
 
   function findScrollSetting(value) {
@@ -11194,7 +11204,7 @@ vjs.plugin = function(name, init){
     if (cue.vertical === "") {
       this.applyStyles({
         left:  this.formatStyle(textPos, "%"),
-        width: this.formatStyle(cue.size, "%"),
+        width: this.formatStyle(cue.size, "%")
       });
     // Vertical box orientation; textPos is the distance from the top edge of the
     // area to the top edge of the box and cue.size is the height extending
@@ -11213,7 +11223,7 @@ vjs.plugin = function(name, init){
         left: this.formatStyle(box.left, "px"),
         right: this.formatStyle(box.right, "px"),
         height: this.formatStyle(box.height, "px"),
-        width: this.formatStyle(box.width, "px"),
+        width: this.formatStyle(box.width, "px")
       });
     };
   }
