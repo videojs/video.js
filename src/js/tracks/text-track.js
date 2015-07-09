@@ -7,7 +7,7 @@ import log from '../utils/log.js';
 import EventEmitter from '../event-emitter';
 import document from 'global/document';
 import window from 'global/window';
-import XHR from '../xhr.js';
+import XHR from 'xhr/index.js';
 
 /*
  * https://html.spec.whatwg.org/multipage/embedded-content.html#texttrack
@@ -249,7 +249,7 @@ var parseCues = function(srcContent, track) {
 };
 
 var loadTrack = function(src, track) {
-  XHR(src, Fn.bind(this, function(err, response, responseBody){
+  XHR({ uri: src }, Fn.bind(this, function(err, response, responseBody){
     if (err) {
       return log.error(err);
     }
