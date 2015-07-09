@@ -95,6 +95,7 @@ class Html5 extends Tech {
       // If the original tag is still there, clone and remove it.
       if (el) {
         const clone = el.cloneNode(false);
+        el.parentNode.insertBefore(clone, el);
         Html5.disposeMediaElement(el);
         el = clone;
       } else {
