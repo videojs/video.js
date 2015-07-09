@@ -8,6 +8,7 @@ import globalOptions from './global-options.js';
 import Player from './player';
 import plugin from './plugins.js';
 import mergeOptions from '../../src/js/utils/merge-options.js';
+import * as Fn from './utils/fn.js';
 
 import assign from 'object.assign';
 import log from './utils/log.js';
@@ -256,6 +257,23 @@ videojs.extends = extendsFn;
  * @method mergeOptions
  */
 videojs.mergeOptions = mergeOptions;
+
+/**
+ * Change the context (this) of a function
+ *
+ *     videojs.bind(newContext, function(){
+ *       this === newContext
+ *     });
+ *
+ * NOTE: as of v5.0 we require an ES5 shim, so you should use the native
+ * `function(){}.bind(newContext);` instead of this.
+ *
+ * @param  {*}        context The object to bind as scope
+ * @param  {Function} fn      The function to be bound to a scope
+ * @param  {Number=}  uid     An optional unique ID for the function to be set
+ * @return {Function}
+ */
+videojs.bind = Fn.bind;
 
 /**
  * Create a Video.js player plugin
