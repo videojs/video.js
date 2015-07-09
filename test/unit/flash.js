@@ -186,3 +186,17 @@ test('seekable should be empty if no video is loaded', function() {
 
   equal(tech.seekable().length, 0, 'seekable is empty');
 });
+
+test('calling methods before the SWF loads is safe', function() {
+  var player = PlayerTest.makePlayer(),
+      tech = new vjs.Flash(player, {
+        'parentEl': player.el()
+      });
+
+  // force Flash callbacks to be undefined as they would be before the
+  // SWF is ready
+  tech.el().vjs_getProperty = undefined;
+
+  equal(tech.buffered().length, 0, 'buffered percent is 0');
+  equal(tech.duration(), 0, 'duration is 0');
+});
