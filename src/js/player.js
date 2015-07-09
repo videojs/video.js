@@ -1700,7 +1700,7 @@ vjs.Player.prototype.readyState = function(){
  * Captions - text displayed over the video for the hearing impaired
  * Subtitles - text displayed over the video for those who don't understand language in the video
  * Chapters - text displayed in a menu allowing the user to jump to particular points (chapters) in the video
- * Descriptions (not supported yet) - audio descriptions that are read back to the user by a screen reading device
+ * Descriptions - audio descriptions that are read back to the user by a screen reading device
  */
 
 /**

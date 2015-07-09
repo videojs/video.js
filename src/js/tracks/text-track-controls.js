@@ -49,14 +49,32 @@ vjs.TextTrackDisplay.prototype.toggleDisplay = function() {
 };
 
 vjs.TextTrackDisplay.prototype.createEl = function(){
-  return vjs.Component.prototype.createEl.call(this, 'div', {
+  var parentEl = vjs.Component.prototype.createEl.call(this, 'div', {
     className: 'vjs-text-track-display'
   });
+
+  // Element for captions/subtitles text tracks
+  this.captionsSubtitlesEl = vjs.Component.prototype.createEl.call(this, 'div', {
+    className: 'vjs-text-track-visible-display'
+  });
+  parentEl.appendChild(this.captionsSubtitlesEl);
+
+  // Element for descriptions text track, which is screen-reader 'alert/assertive'
+  this.descriptionsEl = vjs.Component.prototype.createEl.call(this, 'div', {
+    className: 'vjs-text-track-hidden-display',
+    'role' : 'alert',
+    'aria-live' : 'assertive',
+    'aria-atomic' : 'true'
+  });
+  parentEl.appendChild(this.descriptionsEl);
+
+  return parentEl;
 };
 
 vjs.TextTrackDisplay.prototype.clearDisplay = function() {
   if (typeof window['WebVTT'] === 'function') {
-    window['WebVTT']['processCues'](window, [], this.el_);
+    window['WebVTT']['processCues'](window, [], this.captionsSubtitlesEl);
+    window['WebVTT']['processCues'](window, [], this.descriptionsEl);
   }
 };
 
@@ -125,7 +143,21 @@ vjs.TextTrackDisplay.prototype.updateForTrack = function(track) {
     cues.push(track['activeCues'][i]);
   }
 
-  window['WebVTT']['processCues'](window, track['activeCues'], this.el_);
+  if ( track['kind'] === 'descriptions' ) {
+
+    if ( (overrides.descriptionsPlayback ) && ( overrides.descriptionsPlayback === 'screenReaderOnly' ) ) {
+      vjs.removeClass(this.descriptionsEl, 'vjs-text-track-visible-display');
+      vjs.addClass(this.descriptionsEl, 'vjs-text-track-hidden-display');
+    } else {
+      vjs.addClass(this.descriptionsEl, 'vjs-text-track-visible-display');
+      vjs.removeClass(this.descriptionsEl, 'vjs-text-track-hidden-display');
+    }
+
+    window['WebVTT']['processCues'](window, track['activeCues'], this.descriptionsEl);
+
+  } else {
+    window['WebVTT']['processCues'](window, track['activeCues'], this.captionsSubtitlesEl);
+  }
 
   i = cues.length;
   while (i--) {
@@ -366,7 +398,7 @@ vjs.TextTrackButton = vjs.MenuButton.extend({
 vjs.TextTrackButton.prototype.createItems = function(){
   var items = [], track, tracks;
 
-  if (this instanceof vjs.CaptionsButton && !(this.player().tech && this.player().tech['featuresNativeTextTracks'])) {
+  if ((this instanceof vjs.CaptionsButton || this instanceof vjs.DescriptionsButton) && !(this.player().tech && this.player().tech['featuresNativeTextTracks'])) {
     items.push(new vjs.CaptionSettingsMenuItem(this.player_, { 'kind': this.kind_ }));
   }
 
@@ -440,6 +472,22 @@ vjs.SubtitlesButton = vjs.TextTrackButton.extend({
 vjs.SubtitlesButton.prototype.kind_ = 'subtitles';
 vjs.SubtitlesButton.prototype.buttonText = 'Subtitles';
 vjs.SubtitlesButton.prototype.className = 'vjs-subtitles-button';
+
+/**
+ * The button component for toggling and selecting descriptions
+ *
+ * @constructor
+ */
+vjs.DescriptionsButton = vjs.CaptionsButton.extend({
+  /** @constructor */
+  init: function(player, options, ready){
+    vjs.TextTrackButton.call(this, player, options, ready);
+    this.el_.setAttribute('aria-label','Descriptions Menu');
+  }
+});
+vjs.DescriptionsButton.prototype.kind_ = 'descriptions';
+vjs.DescriptionsButton.prototype.buttonText = 'Descriptions';
+vjs.DescriptionsButton.prototype.className = 'vjs-descriptions-button';
 
 // Chapters act much differently than other text tracks
 // Cues are navigation vs. other tracks of alternative languages

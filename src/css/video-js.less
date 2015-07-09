@@ -102,6 +102,7 @@ The control icons are from a custom font. Each icon corresponds to a character
 @spinner4-icon: "\e01f";
 @subtitles-icon: "\e00c";
 @captions-icon: "\e008";
+@descriptions-icon: "D))"; //TODO Add a proper 'AD))' icon to the font
 @chapters-icon: "\e00c";
 @share-icon: "\e00e";
 @cog-icon: "\e600";
@@ -825,6 +826,11 @@ easily in the skin designer. http://designer.videojs.com/
   content: @captions-icon;
 }
 
+/* Descriptions Button */
+.vjs-default-skin .vjs-descriptions-button:before {
+  content: @descriptions-icon;
+}
+
 /* Chapters Button */
 .vjs-default-skin .vjs-chapters-button:before {
   content: @chapters-icon;
@@ -964,13 +970,35 @@ body.vjs-full-window {
 }
 
 /* Text Track Styles */
-/* Overall track holder for both captions and subtitles */
+/* Overall track holder for all text tracks */
 .video-js .vjs-text-track-display {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+/* Overall track holder for both captions and subtitles */
+.video-js .vjs-text-track-visible-display {
   position: absolute;
   top: 0;
   left: 0;
   bottom: 3em;
   right: 0;
+  pointer-events: none;
+}
+
+/* Overall track holder for tracks which are not visible,
+   (but accessible with a screen reader) */
+.video-js .vjs-text-track-hidden-display {
+/* See http://www.w3.org/TR/2012/NOTE-WCAG20-TECHS-20120103/C7.html */
+	position: absolute !important;
+	top: -10000px;
+	overflow: hidden;
+	width: 1px;
+	height: 1px;
   pointer-events: none;
 }
 
@@ -983,7 +1011,7 @@ body.vjs-full-window {
   color: #FFF;
   margin: 0 auto;
   padding: 0.5em;
-  height: 15em;
+  height: 20em;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 12px;
   width: 40em;

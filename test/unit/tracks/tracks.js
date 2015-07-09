@@ -123,10 +123,12 @@ test('update texttrack buttons on removetrack or addtrack', function() {
       events = {},
       oldCaptionsUpdate,
       oldSubsUpdate,
+      oldDescriptionsUpdate,
       oldChaptersUpdate;
 
   oldCaptionsUpdate = vjs.CaptionsButton.prototype.update;
   oldSubsUpdate = vjs.SubtitlesButton.prototype.update;
+  oldDescriptionsUpdate = vjs.DescriptionsButton.prototype.update;
   oldChaptersUpdate = vjs.ChaptersButton.prototype.update;
   vjs.CaptionsButton.prototype.update = function() {
     update++;
@@ -135,6 +137,10 @@ test('update texttrack buttons on removetrack or addtrack', function() {
   vjs.SubtitlesButton.prototype.update = function() {
     update++;
     oldSubsUpdate.call(this);
+  };
+  vjs.DescriptionsButton.prototype.update = function() {
+    update++;
+    oldDescriptionsUpdate.call(this);
   };
   vjs.ChaptersButton.prototype.update = function() {
     update++;
@@ -173,19 +179,19 @@ test('update texttrack buttons on removetrack or addtrack', function() {
 
   player.player_ = player;
 
-  equal(update, 3, 'update was called on the three buttons during init');
+  equal(update, 4, 'update was called on the four buttons during init');
 
   for (i = 0; i < events['removetrack'].length; i++) {
     events['removetrack'][i]();
   }
 
-  equal(update, 6, 'update was called on the three buttons for remove track');
+  equal(update, 8, 'update was called on the four buttons for remove track');
 
   for (i = 0; i < events['addtrack'].length; i++) {
     events['addtrack'][i]();
   }
 
-  equal(update, 9, 'update was called on the three buttons for remove track');
+  equal(update, 12, 'update was called on the four buttons for remove track');
 
   vjs.MediaTechController.prototype.textTracks = oldTextTracks;
   vjs.MediaTechController.prototype['featuresNativeTextTracks'] = false;

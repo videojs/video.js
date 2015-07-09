@@ -21,6 +21,7 @@
         this.el().querySelector('.vjs-edge-style select').selectedIndex = 0;
         this.el().querySelector('.vjs-font-family select').selectedIndex = 0;
         this.el().querySelector('.vjs-font-percent select').selectedIndex = 2;
+        this.el().querySelector('.vjs-descriptions-playback select').selectedIndex = 0;
         this.updateDisplay();
       }));
 
@@ -33,6 +34,7 @@
       vjs.on(this.el().querySelector('.vjs-font-percent select'), 'change', vjs.bind(this, this.updateDisplay));
       vjs.on(this.el().querySelector('.vjs-edge-style select'), 'change', vjs.bind(this, this.updateDisplay));
       vjs.on(this.el().querySelector('.vjs-font-family select'), 'change', vjs.bind(this, this.updateDisplay));
+      vjs.on(this.el().querySelector('.vjs-descriptions-playback select'), 'change', vjs.bind(this, this.updateDisplay));
 
       if (player.options()['persistTextTrackSettings']) {
         this.restoreSettings();
@@ -48,7 +50,7 @@
   };
 
   vjs.TextTrackSettings.prototype.getValues = function() {
-    var el, bgOpacity, textOpacity, windowOpacity, textEdge, fontFamily, fgColor, bgColor, windowColor, result, name, fontPercent;
+    var el, bgOpacity, textOpacity, windowOpacity, textEdge, fontFamily, fgColor, bgColor, windowColor, result, name, fontPercent, descriptionsPlayback;
 
     el = this.el();
 
@@ -61,6 +63,7 @@
     windowColor = getSelectedOptionValue(el.querySelector('.window-color > select'));
     windowOpacity = getSelectedOptionValue(el.querySelector('.vjs-window-opacity > select'));
     fontPercent = window['parseFloat'](getSelectedOptionValue(el.querySelector('.vjs-font-percent > select')));
+    descriptionsPlayback = getSelectedOptionValue(el.querySelector('.vjs-descriptions-playback > select'));
 
     result = {
       'backgroundOpacity': bgOpacity,
@@ -71,7 +74,8 @@
       'color': fgColor,
       'backgroundColor': bgColor,
       'windowColor': windowColor,
-      'fontPercent': fontPercent
+      'fontPercent': fontPercent,
+      'descriptionsPlayback' : descriptionsPlayback
     };
     for (name in result) {
       if (result[name] === '' || result[name] === 'none' || (name === 'fontPercent' && result[name] === 1.00)) {
@@ -92,6 +96,7 @@
     setSelectedOption(el.querySelector('.vjs-bg-opacity > select'), values.backgroundOpacity);
     setSelectedOption(el.querySelector('.window-color > select'), values.windowColor);
     setSelectedOption(el.querySelector('.vjs-window-opacity > select'), values.windowOpacity);
+    setSelectedOption(el.querySelector('.vjs-descriptions-playback > select'), values.descriptionsPlayback);
 
     fontPercent = values.fontPercent;
 
@@ -100,6 +105,8 @@
     }
 
     setSelectedOption(el.querySelector('.vjs-font-percent > select'), fontPercent);
+
+    setSelectedOption(el.querySelector('.vjs-descriptions-playback > select'), values.descriptionsPlayback);
   };
 
   vjs.TextTrackSettings.prototype.restoreSettings = function() {
@@ -273,6 +280,13 @@
               '<option value="small-caps">Small Caps</option>' +
             '</select>' +
           '</div>' + // vjs-font-family
+          '<div class="vjs-descriptions-playback vjs-tracksetting">' +
+            '<label class="vjs-label">Descriptions</label>' +
+            '<select>' +
+              '<option value="">Visible</option>' +
+              '<option value="screenReaderOnly">Hidden (for screen reader users)</option>' +
+            '</select>' +
+          '</div>' + // vjs-descriptions-playback
         '</div>' +
       '</div>' +
       '<div class="vjs-tracksettings-controls">' +
