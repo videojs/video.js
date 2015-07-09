@@ -1,7 +1,18 @@
+/**
+ * @file caption-settings-menu-item.js
+ */
 import TextTrackMenuItem from './text-track-menu-item.js';
 import Component from '../../component.js';
 
-class CaptionSettingsMenuItem extends TextTrackMenuItem {
+/**
+ * The menu item for caption track settings menu
+ *
+ * @param {Player|Object} player
+ * @param {Object=} options
+ * @extends TextTrackMenuItem
+ * @class CaptionSettingsMenuItem
+ * /
+ class CaptionSettingsMenuItem extends TextTrackMenuItem {
 
   constructor(player, options) {
     options['track'] = {
@@ -16,6 +27,11 @@ class CaptionSettingsMenuItem extends TextTrackMenuItem {
     this.addClass('vjs-texttrack-settings');
   }
 
+  /**
+   * Handle click on menu item
+   *
+   * @method handleClick
+   */
   handleClick() {
     this.player().getChild('textTrackSettings').show();
   }

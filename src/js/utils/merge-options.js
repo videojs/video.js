@@ -1,3 +1,6 @@
+/**
+ * @file merge-options.js
+ */
 import merge from 'lodash-compat/object/merge';
 
 function isPlain(obj) {
@@ -8,13 +11,13 @@ function isPlain(obj) {
 }
 
 /**
- * Merge two options objects, recursively merging **only** plain object
+ * Merge two options objects, recursively merging **only* * plain object
  * properties.  Previously `deepMerge`.
  *
  * @param  {Object} object    The destination object
  * @param  {...Object} source One or more objects to merge into the first
- *
  * @returns {Object}          The updated first object
+ * @function mergeOptions
  */
 export default function mergeOptions(object={}) {
 

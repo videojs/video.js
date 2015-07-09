@@ -1,3 +1,6 @@
+/**
+ * @file text-track-list.js
+ */
 import EventEmitter from '../event-emitter';
 import * as Fn from '../utils/fn.js';
 import * as browser from '../utils/browser.js';
@@ -52,7 +55,7 @@ TextTrackList.prototype.constructor = TextTrackList;
  * change - One or more tracks in the track list have been enabled or disabled.
  * addtrack - A track has been added to the track list.
  * removetrack - A track has been removed from the track list.
-*/
+ */
 TextTrackList.prototype.allowedEvents_ = {
   'change': 'change',
   'addtrack': 'addtrack',

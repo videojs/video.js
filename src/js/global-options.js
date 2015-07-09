@@ -1,12 +1,16 @@
+/**
+ * @file global-options.js
+ */
 import document from 'global/document';
 import window from 'global/window';
 let navigator = window.navigator;
 
-/**
+/*
  * Global Player instance options, surfaced from Player.prototype.options_
  * options = Player.prototype.options_
  * All options should use string keys so they avoid
  * renaming by closure compiler
+ *
  * @type {Object}
  */
 export default {

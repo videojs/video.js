@@ -1,3 +1,6 @@
+/**
+ * @file volume-control.js
+ */
 import Component from '../../component.js';
 
 // Required children
@@ -8,7 +11,8 @@ import VolumeBar from './volume-bar.js';
  *
  * @param {Player|Object} player
  * @param {Object=} options
- * @constructor
+ * @extends Component
+ * @class VolumeControl
  */
 class VolumeControl extends Component {
 
@@ -28,6 +32,12 @@ class VolumeControl extends Component {
     });
   }
 
+  /**
+   * Create the component's DOM element
+   *
+   * @return {Element}
+   * @method createEl
+   */
   createEl() {
     return super.createEl('div', {
       className: 'vjs-volume-control vjs-control'
