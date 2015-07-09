@@ -61,6 +61,7 @@ CHANGELOG
 * @pavelhoral fixed subclassing without a constructor ([view](https://github.com/videojs/video.js/pull/2308))
 * @dmlap fixed a vjs_getProperty error caused by a progress check before the swf was ready ([view](https://github.com/videojs/video.js/pull/2316))
 * @dmlap exported the videojs.log function ([view](https://github.com/videojs/video.js/pull/2317))
+* @gkatsev updated vttjs to fix a trailing comma JSON error ([view](https://github.com/videojs/video.js/pull/2331))
 
 --------------------
 
