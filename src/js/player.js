@@ -636,6 +636,11 @@ class Player extends Component {
    */
   handleTechReady() {
     this.triggerReady();
+    
+    // Keep the same volume as before
+    if (this.cache_.volume) {
+      this.techCall('setVolume', this.cache_.volume);
+    }
 
     // Chrome and Safari both have issues with autoplay.
     // In Safari (5.1.1), when we move the video element into the container div, autoplay doesn't work.
