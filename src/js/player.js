@@ -540,6 +540,7 @@ class Player extends Component {
     this.on(this.tech, 'progress', this.handleTechProgress);
     this.on(this.tech, 'durationchange', this.handleTechDurationChange);
     this.on(this.tech, 'fullscreenchange', this.handleTechFullscreenChange);
+    this.on(this.tech, 'posterchange', this.handleTechPosterChange)
     this.on(this.tech, 'error', this.handleTechError);
     this.on(this.tech, 'suspend', this.handleTechSuspend);
     this.on(this.tech, 'abort', this.handleTechAbort);
@@ -977,6 +978,15 @@ class Player extends Component {
    */
   handleTechFullscreenChange() {
     this.trigger('fullscreenchange');
+  }
+  
+  /**
+   * Handle Tech Poster Change
+   *
+   * @method handleTechPosterChange
+   */
+  handleTechPosterChange() {
+    this.trigger('posterchange');
   }
 
   /**
