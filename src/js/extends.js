@@ -48,8 +48,10 @@ const extendsFn = function(superClass, subClassMethods={}) {
   };
   let methods = {};
 
-  if (subClassMethods.constructor !== Object.prototype.constructor) {
-    subClass = subClassMethods.constructor;
+  if (typeof subClassMethods === 'object') {
+    if (subClassMethods.constructor !== Object.prototype.constructor) {
+      subClass = subClassMethods.constructor;
+    }
     methods = subClassMethods;
   } else if (typeof subClassMethods === 'function') {
     subClass = subClassMethods;
