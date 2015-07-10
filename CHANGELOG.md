@@ -60,6 +60,7 @@ CHANGELOG
 * @mmcc added a currentTime tooltip to the progress handle ([view](https://github.com/videojs/video.js/pull/2255))
 * @pavelhoral fixed subclassing without a constructor ([view](https://github.com/videojs/video.js/pull/2308))
 * @dmlap fixed a vjs_getProperty error caused by a progress check before the swf was ready ([view](https://github.com/videojs/video.js/pull/2316))
+* @dmlap exported the videojs.log function ([view](https://github.com/videojs/video.js/pull/2317))
 
 --------------------
 

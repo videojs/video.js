@@ -321,6 +321,13 @@ videojs.addLanguage = function(code, data){
   return merge(globalOptions.languages, { [code]: data })[code];
 };
 
+/**
+ * Log debug messages.
+ *
+ * @param {...Object} messages One or more messages to log
+ */
+videojs.log = log;
+
 // REMOVING: We probably should add this to the migration plugin
 // // Expose but deprecate the window[componentName] method for accessing components
 // Object.getOwnPropertyNames(Component.components).forEach(function(name){
