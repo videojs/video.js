@@ -235,7 +235,7 @@ module.exports = function(grunt) {
           transform: [
             require('babelify').configure({
               sourceMapRelative: './src/js',
-              loose: 'all'
+              loose: ['all']
             }),
             ['browserify-versionify', {
               placeholder: '__VERSION__',
@@ -261,7 +261,9 @@ module.exports = function(grunt) {
             standalone: 'videojs'
           },
           transform: [
-            require('babelify').configure(),
+            require('babelify').configure({
+              loose: ['all']
+            }),
             'browserify-istanbul'
           ]
         }
@@ -281,7 +283,9 @@ module.exports = function(grunt) {
             standalone: 'videojs'
           },
           banner: license,
-          transform: ['babelify'],
+          transform: [require('babelify').configure({
+            loose: ['all']
+          })],
           plugin: [
             [ 'browserify-derequire' ]
           ]
