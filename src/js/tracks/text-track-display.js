@@ -64,8 +64,7 @@ class TextTrackDisplay extends Component {
   }
 
   createEl() {
-    var parentEl = super.createEl('div', {
-    });
+    var parentEl = super.createEl('div', {});
 
     // Element for visible text tracks
     this.captionsSubtitlesEl = super.createEl( 'div', {
