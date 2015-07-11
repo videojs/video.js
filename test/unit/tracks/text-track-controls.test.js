@@ -106,6 +106,8 @@ test('should be displayed when text tracks list is not empty', function() {
     tracks: [descriptionstrack]
   });
 
+  this.clock.tick(1000);
+
   ok(!player.controlBar.descriptionsButton.hasClass('vjs-hidden'), 'descriptions control is displayed');
   equal(player.textTracks().length, 1, 'textTracks contains one item');
 });
@@ -113,14 +115,18 @@ test('should be displayed when text tracks list is not empty', function() {
 test('should be displayed when a text track is added to an empty track list', function() {
   var player = TestHelpers.makePlayer();
 
+  this.clock.tick(1000);
+
   player.addRemoteTextTrack(descriptionstrack);
 
-  ok(!player.controlBar.descriptionsButton.hasClass('vjs-hidden'), 'control is displayed');
+  ok(!player.controlBar.descriptionsButton.hasClass('vjs-hidden'), 'descriptions control is displayed');
   equal(player.textTracks().length, 1, 'textTracks contains one item');
 });
 
 test('should not be displayed when text tracks list is empty', function() {
   var player = TestHelpers.makePlayer();
+
+  this.clock.tick(1000);
 
   ok(player.controlBar.descriptionsButton.hasClass('vjs-hidden'), 'descriptions control is not displayed');
   equal(player.textTracks().length, 0, 'textTracks is empty');
@@ -130,7 +136,11 @@ test('menu should contain "Settings", "Off" and one track', function() {
   var player = TestHelpers.makePlayer({
       tracks: [descriptionstrack]
     }),
-    menuItems = player.controlBar.descriptionsButton.items;
+    menuItems;
+
+  this.clock.tick(1000);
+
+  menuItems = player.controlBar.descriptionsButton.items;
 
   equal(menuItems.length, 3, 'menu contains three items');
   equal(menuItems[0].track.label, 'descriptions settings', 'menu contains "descriptions settings"');
