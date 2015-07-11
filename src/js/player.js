@@ -503,7 +503,8 @@ class Player extends Component {
       'preload': this.options_.preload,
       'loop': this.options_.loop,
       'muted': this.options_.muted,
-      'poster': this.poster()
+      'poster': this.poster(),
+      'language': this.language()
     }, this.options_[techName.toLowerCase()]);
 
     if (this.tag) {
