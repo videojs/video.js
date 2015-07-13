@@ -159,10 +159,10 @@ test('should add the source hanlder interface to a tech', function(){
   var Tech = videojs.MediaTechController.extend();
 
   // Extend Tech with source handlers
-  vjs.MediaTechController.withSourceHandlers(Tech);
+  vjs.MediaTechController['withSourceHandlers'](Tech);
 
   // Check for the expected class methods
-  ok(Tech.registerSourceHandler, 'added a registerSourceHandler function to the Tech');
+  ok(Tech['registerSourceHandler'], 'added a registerSourceHandler function to the Tech');
   ok(Tech.selectSourceHandler, 'added a selectSourceHandler function to the Tech');
 
   // Create an instance of Tech
@@ -183,13 +183,13 @@ test('should add the source hanlder interface to a tech', function(){
 
   // Create source handlers
   var handlerOne = {
-    canHandleSource: function(source){
+    'canHandleSource': function(source){
       if (source.type !=='no-support') {
         return 'probably';
       }
       return '';
     },
-    handleSource: function(s, t){
+    'handleSource': function(s, t){
       strictEqual(tech, t, 'the tech instance was passed to the source handler');
       strictEqual(sourceA, s, 'the tech instance was passed to the source handler');
       return new handlerInternalState();
@@ -197,18 +197,18 @@ test('should add the source hanlder interface to a tech', function(){
   };
 
   var handlerTwo = {
-    canHandleSource: function(source){
+    'canHandleSource': function(source){
       return ''; // no support
     },
-    handleSource: function(source, tech){
+    'handleSource': function(source, tech){
       ok(false, 'handlerTwo supports nothing and should never be called');
     }
   };
 
   // Test registering source handlers
-  Tech.registerSourceHandler(handlerOne);
+  Tech['registerSourceHandler'](handlerOne);
   strictEqual(Tech.sourceHandlers[0], handlerOne, 'handlerOne was added to the source handler array');
-  Tech.registerSourceHandler(handlerTwo, 0);
+  Tech['registerSourceHandler'](handlerTwo, 0);
   strictEqual(Tech.sourceHandlers[0], handlerTwo, 'handlerTwo was registered at the correct index (0)');
 
   // Test handler selection
@@ -230,7 +230,7 @@ test('should add the source hanlder interface to a tech', function(){
   ok(disposeCalled, 'the handler dispose method was called when the tech was disposed');
 });
 
-test('should handle unsupported sources with the source hanlder API', function(){
+test('should handle unsupported sources with the source handler API', function(){
   var mockPlayer = {
     off: this.noop,
     trigger: this.noop
@@ -239,13 +239,13 @@ test('should handle unsupported sources with the source hanlder API', function()
   // Define a new tech class
   var Tech = videojs.MediaTechController.extend();
   // Extend Tech with source handlers
-  vjs.MediaTechController.withSourceHandlers(Tech);
+  vjs.MediaTechController['withSourceHandlers'](Tech);
   // Create an instance of Tech
   var tech = new Tech(mockPlayer);
 
   var usedNative;
-  Tech.nativeSourceHandler = {
-    handleSource: function(){ usedNative = true; }
+  Tech['nativeSourceHandler'] = {
+    'handleSource': function(){ usedNative = true; }
   };
 
   tech.setSource('');
