@@ -2039,13 +2039,13 @@ class Player extends Component {
     return this.techGet('readyState');
   }
 
-  /**
-   * Text tracks are tracks of timed text events.
-   * Captions - text displayed over the video for the hearing impaired
-   * Subtitles - text displayed over the video for those who don't understand language in the video
-   * Chapters - text displayed in a menu allowing the user to jump to particular points (chapters) in the video
-   * Descriptions - audio descriptions that are read back to the user by a screen reading device
-   */
+  /*
+    * Text tracks are tracks of timed text events.
+    * Captions - text displayed over the video for the hearing impaired
+    * Subtitles - text displayed over the video for those who don't understand language in the video
+    * Chapters - text displayed in a menu allowing the user to jump to particular points (chapters) in the video
+    * Descriptions - audio descriptions that are read back to the user by a screen reading device
+    */
 
   /**
    * Get an array of associated text tracks. captions, subtitles, chapters, descriptions
