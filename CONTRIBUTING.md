@@ -146,6 +146,7 @@ Build a local copy of video.js and run tests
 ```bash
 grunt
 grunt test
+grunt dist
 ```
 
 Video.js is also configured to run tests with Karma. Karma is installed as a grunt plugin to run QUnit tests in real browsers, as opposed to simply running the tests in phantomjs, a headless browser. To run the tests with Karma:
