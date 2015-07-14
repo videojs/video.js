@@ -128,15 +128,28 @@ module.exports = function(grunt) {
       safari:       { browsers: ['Safari'] },
       ie:           { browsers: ['IE'] },
       phantomjs:    { browsers: ['PhantomJS'] },
-
-      // this only runs on PRs from the mainrepo on saucelabs
-      saucelabs:  { browsers: ['chrome_sl'] },
-      chrome_sl:  { browsers: ['chrome_sl'] },
-      firefox_sl: { browsers: ['firefox_sl'] },
-      safari_sl:  { browsers: ['safari_sl'] },
-      ipad_sl:    { browsers: ['ipad_sl'] },
-      android_sl: { browsers: ['android_sl'] },
-      ie_sl:      { browsers: ['ie_sl'] }
+    },
+    // this only runs on PRs from the mainrepo on saucelabs
+    'saucelabs-qunit': {
+      all: {
+        options: {
+          urls: ['http://127.0.0.1:9999/test/index.html'],
+          browsers: [
+            /* [platform, browserName, version] - version will default to latest stable version */
+            ['OS X 10.10', 'safari', ''],
+            ['WIN8.1', 'chrome', ''],
+            ['WIN8.1', 'internet explorer', ''],
+            ['', 'iPad', '8.2'],
+            ['', 'Android', '']
+          ],
+          tunneled: true,
+          build: process.env.TRAVIS_BUILD_NUMBER,
+          testname: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH,
+          throttled: 3,
+          'max-duration': 500,
+          maxRetries: 3
+        }
+      }
     },
     vjsdocs: {
       all: {

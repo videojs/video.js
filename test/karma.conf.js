@@ -1,52 +1,4 @@
 module.exports = function(config) {
-  var customLaunchers = {
-    chrome_sl: {
-      singleRun: true,
-      base: 'SauceLabs',
-      browserName: 'chrome',
-      platform: 'Windows 8.1',
-      version: '34'
-    },
-
-    firefox_sl: {
-      singleRun: true,
-      base: 'SauceLabs',
-      browserName: 'firefox',
-      platform: 'Linux',
-      version: '29'
-    },
-
-    safari_sl: {
-      singleRun: true,
-      base: 'SauceLabs',
-      browserName: 'safari',
-      platform: 'OS X 10.8'
-    },
-
-    ipad_sl: {
-      singleRun: true,
-      base: 'SauceLabs',
-      browserName: 'ipad',
-      platform:'OS X 10.9',
-      version: '7.1'
-    },
-
-    android_sl: {
-      singleRun: true,
-      base: 'SauceLabs',
-      browserName: 'android',
-      platform:'Linux'
-    },
-
-    ie_sl: {
-      singleRun: true,
-      base: 'SauceLabs',
-      browserName: 'internet explorer',
-      platform: 'Windows 8.1',
-      version: '11'
-    }
-  };
-
   config.set({
     basePath: '',
 
@@ -74,11 +26,10 @@ module.exports = function(config) {
       'karma-opera-launcher',
       'karma-phantomjs-launcher',
       'karma-safari-launcher',
-      'karma-sauce-launcher',
       'karma-coverage'
     ],
 
-    reporters: ['dots', 'saucelabs', 'coverage'],
+    reporters: ['dots', 'coverage'],
 
     // web server port
     port: 9876,
@@ -93,15 +44,6 @@ module.exports = function(config) {
     captureTimeout: 60000,
 
     browserNoActivityTimeout: 60000,
-
-    sauceLabs: {
-      startConnect: true,
-      tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
-      build: process.env.TRAVIS_BUILD_NUMBER,
-      testName: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH,
-      recordScreenshots: false
-    },
-    customLaunchers: customLaunchers,
 
     // The HTML reporter seems to be busted right now, so we're just using text in the meantime
     // along with the summary after the test run.
