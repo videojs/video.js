@@ -20,14 +20,14 @@ class VolumeMenuButton extends MenuButton {
 
   constructor(player, options={}){
     // If the vertical option isn't passed at all, default to true.
-    if (options['vertical'] === undefined) {
-      options['vertical'] = true;
+    if (options.vertical === undefined) {
+      options.vertical = true;
     }
 
     // The vertical option needs to be set on the volumeBar as well, since that will
     // need to be passed along to the VolumeBar constructor
-    options['volumeBar'] = options['volumeBar'] || {};
-    options['volumeBar']['vertical'] = !!options['vertical'];
+    options.volumeBar = options.volumeBar || {};
+    options.volumeBar.vertical = !!options.vertical;
 
     super(player, options);
 
@@ -69,7 +69,7 @@ class VolumeMenuButton extends MenuButton {
       contentElType: 'div'
     });
 
-    let vc = new VolumeBar(this.player_, this.options_['volumeBar']);
+    let vc = new VolumeBar(this.player_, this.options_.volumeBar);
 
     vc.on('focus', function() {
       menu.lockShowing();
@@ -87,7 +87,7 @@ class VolumeMenuButton extends MenuButton {
    * @method orientationClassName
    */
   orientationClassName() {
-    if (!!this.options_['vertical']) {
+    if (!!this.options_.vertical) {
       return 'vjs-volume-menu-button-vertical';
     }
 
