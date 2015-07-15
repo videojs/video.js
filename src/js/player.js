@@ -255,9 +255,12 @@ class Player extends Component {
       // http://stackoverflow.com/questions/3653444/css-styles-not-applied-on-dynamic-elements-in-internet-explorer-7
       if (attr === 'class') {
         el.className = attrs[attr];
+      } else if (attr === 'data-reactid') {
+        el.setAttribute(attr, attrs[attr] + '_cloned');
       } else {
         el.setAttribute(attr, attrs[attr]);
       }
+
     });
 
     // Update tag id/class for use as HTML5 playback tech
