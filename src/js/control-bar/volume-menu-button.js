@@ -55,7 +55,14 @@ class VolumeMenuButton extends MenuButton {
    * @method buildCSSClass
    */
   buildCSSClass() {
-    return `vjs-volume-menu-button ${super.buildCSSClass()} ${this.orientationClassName()}`;
+    let orientationClass = '';
+    if (!!this.options_.vertical) {
+      orientationClass = 'vjs-volume-menu-button-vertical';
+    } else {
+      orientationClass = 'vjs-volume-menu-button-horizontal';
+    }
+
+    return `vjs-volume-menu-button ${super.buildCSSClass()} ${orientationClass}`;
   }
 
   /**
@@ -79,19 +86,6 @@ class VolumeMenuButton extends MenuButton {
     });
     menu.addChild(vc);
     return menu;
-  }
-
-  /**
-   * Generates a class name with the appropriate orientation for the slider
-   *
-   * @method orientationClassName
-   */
-  orientationClassName() {
-    if (!!this.options_.vertical) {
-      return 'vjs-volume-menu-button-vertical';
-    }
-
-    return 'vjs-volume-menu-button-horizontal';
   }
 
   /**
