@@ -321,7 +321,7 @@ class Html5 extends Tech {
     if ('webkitDisplayingFullscreen' in video) {
       this.one('webkitbeginfullscreen', function() {
         this.one('webkitendfullscreen', function() {
-          this.trigger('fullscreenchange');
+          this.trigger('fullscreenchange', 'not-fullscreen');
         });
 
         this.trigger('fullscreenchange');

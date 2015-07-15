@@ -975,7 +975,10 @@ class Player extends Component {
    *
    * @method handleTechFullscreenChange
    */
-  handleTechFullscreenChange() {
+  handleTechFullscreenChange(event, data) {
+    if (data && data === 'not-fullscreen') {
+      this.isFullscreen(false);
+    }
     this.trigger('fullscreenchange');
   }
 
