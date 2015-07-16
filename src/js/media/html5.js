@@ -12,7 +12,7 @@
 vjs.Html5 = vjs.MediaTechController.extend({
   /** @constructor */
   init: function(player, options, ready){
-    var  nodes, nodesLength, i, node, nodeName, removeNodes;
+    var  nodes, nodesLength, i, node, nodeName, removeNodes, textTracks;
 
     if (options['nativeCaptions'] === false || options['nativeTextTracks'] === false) {
       this['featuresNativeTextTracks'] = false;
@@ -61,6 +61,15 @@ vjs.Html5 = vjs.MediaTechController.extend({
 
     if (this['featuresNativeTextTracks']) {
       this.on('loadstart', vjs.bind(this, this.hideCaptions));
+    } else {
+      textTracks = this.el().textTracks;
+
+      // allow us to view the in-band metadata tracks from our shimmed TextTrackList
+      this.on('loadstart', vjs.bind(this, this.removeInBandMetadataTracks));
+
+      if (textTracks) {
+        this.el().textTracks.addEventListener('addtrack', vjs.bind(this, this.addInBandMetadataTracks));
+      }
     }
 
     // Determine if native controls should be used
@@ -180,6 +189,39 @@ vjs.Html5.prototype.hideCaptions = function() {
     if ((track && track['kind'] in kinds) &&
         (!tracks[i]['default'])) {
       track.mode = 'disabled';
+    }
+  }
+};
+
+vjs.Html5.prototype.addInBandMetadataTracks = function(event) {
+  var tracks = this.textTracks(),
+      newTrack = event.track || null,
+      track,
+      i = 0;
+
+  for (i = 0; i < tracks.length; i++) {
+    track = tracks[i];
+    if (track === newTrack) {
+      // we already have the track in there, so, just return
+      return;
+    }
+  }
+
+  // if new track is metadata, add it in
+  if (newTrack && newTrack.inBandMetadataTrackDispatchType) {
+    tracks.addTrack_(newTrack);
+  }
+};
+
+vjs.Html5.prototype.removeInBandMetadataTracks = function(event) {
+  var tracks = this.textTracks(),
+      track,
+      i = 0;
+
+  for (; i < tracks.length; i++) {
+    track = tracks[i];
+    if (track.inBandMetadataTrackDispatchType) {
+      tracks.removeTrack_(track);
     }
   }
 };
