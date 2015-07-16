@@ -62,7 +62,7 @@ vjs.Flash.rtmpSourceHandler = {};
  * @param  {Object} source  The source object
  * @return {String}         'probably', 'maybe', or '' (empty string)
  */
-vjs.Flash.rtmpSourceHandler.canHandleSource = function(source){
+vjs.Flash.rtmpSourceHandler['canHandleSource'] = function(source){
   if (vjs.Flash.isStreamingType(source.type) || vjs.Flash.isStreamingSrc(source.src)) {
     return 'maybe';
   }
@@ -77,7 +77,7 @@ vjs.Flash.rtmpSourceHandler.canHandleSource = function(source){
  * @param  {Object} source    The source object
  * @param  {vjs.Flash} tech   The instance of the Flash tech
  */
-vjs.Flash.rtmpSourceHandler.handleSource = function(source, tech){
+vjs.Flash.rtmpSourceHandler['handleSource'] = function(source, tech){
   var srcParts = vjs.Flash.streamToParts(source.src);
 
   tech['setRtmpConnection'](srcParts.connection);
@@ -85,4 +85,4 @@ vjs.Flash.rtmpSourceHandler.handleSource = function(source, tech){
 };
 
 // Register the native source handler
-vjs.Flash.registerSourceHandler(vjs.Flash.rtmpSourceHandler);
+vjs.Flash['registerSourceHandler'](vjs.Flash.rtmpSourceHandler);

@@ -150,7 +150,7 @@ test('ready triggering before and after disposing the tech', function() {
 });
 
 test('should have the source handler interface', function() {
-  ok(vjs.Flash.registerSourceHandler, 'has the registerSourceHandler function');
+  ok(vjs.Flash['registerSourceHandler'], 'has the registerSourceHandler function');
 });
 
 test('seekable should be for the length of the loaded video', function() {

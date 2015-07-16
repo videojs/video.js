@@ -434,7 +434,7 @@ vjs.MediaTechController.withSourceHandlers = function(Tech){
    * @param  {Function} handler  The source handler
    * @param  {Boolean}  first    Register it before any existing handlers
    */
-  Tech.registerSourceHandler = function(handler, index){
+  Tech['registerSourceHandler'] = function(handler, index){
     var handlers = Tech.sourceHandlers;
 
     if (!handlers) {
@@ -461,7 +461,7 @@ vjs.MediaTechController.withSourceHandlers = function(Tech){
         can;
 
     for (var i = 0; i < handlers.length; i++) {
-      can = handlers[i].canHandleSource(source);
+      can = handlers[i]['canHandleSource'](source);
 
       if (can) {
         return handlers[i];
@@ -480,7 +480,7 @@ vjs.MediaTechController.withSourceHandlers = function(Tech){
     var sh = Tech.selectSourceHandler(srcObj);
 
     if (sh) {
-      return sh.canHandleSource(srcObj);
+      return sh['canHandleSource'](srcObj);
     }
 
     return '';
@@ -499,8 +499,8 @@ vjs.MediaTechController.withSourceHandlers = function(Tech){
     if (!sh) {
       // Fall back to a native source hander when unsupported sources are
       // deliberately set
-      if (Tech.nativeSourceHandler) {
-        sh = Tech.nativeSourceHandler;
+      if (Tech['nativeSourceHandler']) {
+        sh = Tech['nativeSourceHandler'];
       } else {
         vjs.log.error('No source hander found for the current source.');
       }
@@ -511,7 +511,7 @@ vjs.MediaTechController.withSourceHandlers = function(Tech){
     this.off('dispose', this.disposeSourceHandler);
 
     this.currentSource_ = source;
-    this.sourceHandler_ = sh.handleSource(source, this);
+    this.sourceHandler_ = sh['handleSource'](source, this);
     this.on('dispose', this.disposeSourceHandler);
 
     return this;
@@ -521,8 +521,8 @@ vjs.MediaTechController.withSourceHandlers = function(Tech){
    * Clean up any existing source handler
    */
   Tech.prototype.disposeSourceHandler = function(){
-    if (this.sourceHandler_ && this.sourceHandler_.dispose) {
-      this.sourceHandler_.dispose();
+    if (this.sourceHandler_ && this.sourceHandler_['dispose']) {
+      this.sourceHandler_['dispose']();
     }
   };
 

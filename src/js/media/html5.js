@@ -517,14 +517,14 @@ vjs.MediaTechController.withSourceHandlers(vjs.Html5);
  * @param  {Object} source   The source object
  * @param  {vjs.Html5} tech  The instance of the HTML5 tech
  */
-vjs.Html5.nativeSourceHandler = {};
+vjs.Html5['nativeSourceHandler'] = {};
 
 /**
  * Check if the video element can handle the source natively
  * @param  {Object} source  The source object
  * @return {String}         'probably', 'maybe', or '' (empty string)
  */
-vjs.Html5.nativeSourceHandler.canHandleSource = function(source){
+vjs.Html5['nativeSourceHandler']['canHandleSource'] = function(source){
   var match, ext;
 
   function canPlayType(type){
@@ -558,7 +558,7 @@ vjs.Html5.nativeSourceHandler.canHandleSource = function(source){
  * @param  {Object} source    The source object
  * @param  {vjs.Html5} tech   The instance of the Html5 tech
  */
-vjs.Html5.nativeSourceHandler.handleSource = function(source, tech){
+vjs.Html5['nativeSourceHandler']['handleSource'] = function(source, tech){
   tech.setSrc(source.src);
 };
 
@@ -566,10 +566,10 @@ vjs.Html5.nativeSourceHandler.handleSource = function(source, tech){
  * Clean up the source handler when disposing the player or switching sources..
  * (no cleanup is needed when supporting the format natively)
  */
-vjs.Html5.nativeSourceHandler.dispose = function(){};
+vjs.Html5['nativeSourceHandler']['dispose'] = function(){};
 
 // Register the native source handler
-vjs.Html5.registerSourceHandler(vjs.Html5.nativeSourceHandler);
+vjs.Html5['registerSourceHandler'](vjs.Html5['nativeSourceHandler']);
 
 /**
  * Check if the volume can be changed in this browser/device.
