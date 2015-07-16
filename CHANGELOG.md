@@ -65,6 +65,7 @@ CHANGELOG
 * @gkatsev exported the videojs.bind() function ([view](https://github.com/videojs/video.js/pull/2332))
 * Insert cloned el back into DOM. Fixes #2214 ([view](https://github.com/videojs/video.js/pull/2334))
 * @heff sped up testing ([view](https://github.com/videojs/video.js/pull/2254))
+* pass fs state to player from enterFullscreen, split full-window styles into their own selector ([view](https://github.com/videojs/video.js/pull/2357))
 
 --------------------
 
