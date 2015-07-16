@@ -226,7 +226,7 @@ vjs.Flash.prototype.enterFullScreen = function(){
 /* Flash Support Testing -------------------------------------------------------- */
 
 vjs.Flash.isSupported = function(){
-  return vjs.Flash.version()[0] >= 10;
+  return vjs.Flash.version()[0] >= 10 && !vjs.Flash.isBlocked();
   // return swfobject.hasFlashPlayerVersion('10');
 };
 
@@ -365,6 +365,18 @@ vjs.Flash.version = function(){
     } catch(err) {}
   }
   return version.split(',');
+};
+
+vjs.Flash.isBlocked = function() {
+  var o = document.createElement('object');
+  o.setAttribute('type', 'application/x-shockwave-flash');
+  if (vjs.IS_IE8) {
+    o.setAttribute('classid', 'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000');
+  }
+  document.body.appendChild(o);
+  var flash = typeof o.PercentLoaded === 'undefined';
+  document.body.removeChild(o);
+  return flash;
 };
 
 // Flash embedding method. Only used in non-iframe mode
