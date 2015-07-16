@@ -324,7 +324,7 @@ class Html5 extends Tech {
           this.trigger('fullscreenchange', { isFullscreen: false });
         });
 
-        this.trigger('fullscreenchange');
+        this.trigger('fullscreenchange', { isFullscreen: true });
       });
     }
 
