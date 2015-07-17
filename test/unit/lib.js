@@ -289,6 +289,31 @@ test('should parse the details of a url correctly', function(){
   equal(vjs.parseUrl('http://example.com').hostname, 'example.com', 'parsed example url hostname');
 
   equal(vjs.parseUrl('http://example.com:1234').port, '1234', 'parsed example url port');
+
+
+  deepEqual(vjs.parseUrl('http://www.example.com/index.html?foo=bar').parameters, {
+    'foo': 'bar'
+  }, 'parsed a parameter');
+
+  deepEqual(vjs.parseUrl('http://www.example.com/index.html?foo=bar&biz=baz%20buzz').parameters, {
+    'foo': 'bar',
+    'biz': 'baz buzz'
+  }, 'parsed multiple parameters');
+
+  deepEqual(vjs.parseUrl('http://www.example.com/index.html?foo=bar&foo=baz').parameters, {
+    'foo': 'baz'
+  }, 'parsed duplicate parameters');
+
+  deepEqual(vjs.parseUrl('http://www.example.com/index.html?foo&bar=baz').parameters, {
+    'foo': true,
+    'bar': 'baz'
+  }, 'parsed duplicate parameters');
+
+  deepEqual(vjs.parseUrl('http://www.example.com/index.html').parameters, {}, 'no parameters');
+
+  deepEqual(vjs.parseUrl('?foo=bar').parameters, {
+    'foo': 'bar'
+  }, 'window.location.search case');
 });
 
 test('should strip port from hosts using http or https', function() {

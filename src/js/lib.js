@@ -686,7 +686,26 @@ vjs.getAbsoluteURL = function(url){
  * @return {Object}     An object of url details
  */
 vjs.parseUrl = function(url) {
-  var div, a, addToBody, props, details;
+  var div, a, addToBody, props, details, parameters,
+    getQueryParameters = function(url) {
+      var parameters = {}, urlParameters, urlParameter, i , name, value;
+
+      if (url.indexOf('?') === -1) {
+        return parameters;
+      }
+
+      urlParameters = url.split('?');
+
+      urlParameters = urlParameters[1].split('&');
+      for (i = 0; i < urlParameters.length; i++) {
+        urlParameter = urlParameters[i].split('=');
+        name = urlParameter[0];
+        value = urlParameter.length === 2 ? decodeURIComponent(urlParameter[1]) : true;
+        parameters[name] = value;
+      }
+
+      return parameters;
+    };
 
   props = ['protocol', 'hostname', 'port', 'pathname', 'search', 'hash', 'host'];
 
@@ -726,6 +745,8 @@ vjs.parseUrl = function(url) {
   if (addToBody) {
     document.body.removeChild(div);
   }
+
+  details.parameters = getQueryParameters(url);
 
   return details;
 };
