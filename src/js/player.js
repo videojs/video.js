@@ -637,6 +637,11 @@ class Player extends Component {
   handleTechReady() {
     this.triggerReady();
 
+    // add vjs-autoplay to hide poster and big-play-button if autoplay:true
+    if(this.options_.autoplay) {
+      this.addClass('vjs-autoplay');
+    }
+
     // Chrome and Safari both have issues with autoplay.
     // In Safari (5.1.1), when we move the video element into the container div, autoplay doesn't work.
     // In Chrome (15), if you have autoplay + a poster + no controls, the video gets hidden (but audio plays)
