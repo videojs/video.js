@@ -310,6 +310,10 @@ test('should parse the details of a url correctly', function(){
   }, 'parsed duplicate parameters');
 
   deepEqual(vjs.parseUrl('http://www.example.com/index.html').parameters, undefined, 'no parameters');
+
+  deepEqual(vjs.parseUrl('?foo=bar').parameters, {
+    'foo': 'bar'
+  }, 'window.location.search case');
 });
 
 test('should strip port from hosts using http or https', function() {

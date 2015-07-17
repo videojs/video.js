@@ -690,10 +690,11 @@ vjs.parseUrl = function(url) {
     getQueryParameters = function(url) {
       var parameters = {}, urlParameters, urlParameter, i , name, value;
 
-      urlParameters = url.split('?');
-      if (urlParameters.length !== 2) {
+      if (url.indexOf('?') === -1) {
         return undefined;
       }
+
+      urlParameters = url.split('?');
 
       urlParameters = urlParameters[1].split('&');
       for (i = 0; i < urlParameters.length; i++) {
