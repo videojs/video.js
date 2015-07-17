@@ -688,7 +688,7 @@ vjs.getAbsoluteURL = function(url){
 vjs.parseUrl = function(url) {
   var div, a, addToBody, props, details,
     getQueryParameters = function(url) {
-      var parameters = {}, urlParameters, name, value;
+      var parameters = {}, urlParameters, urlParameter, i , name, value;
 
       urlParameters = url.split('?');
       if (urlParameters.length !== 2) {
@@ -696,12 +696,12 @@ vjs.parseUrl = function(url) {
       }
 
       urlParameters = urlParameters[1].split('&');
-      urlParameters.map(function(urlParameter) {
-        urlParameter = urlParameter.split('=');
+      for (i = 0; i < urlParameters.length; i++) {
+        urlParameter = urlParameters[i].split('=');
         name = urlParameter[0];
         value = urlParameter.length === 2 ? decodeURIComponent(urlParameter[1]) : true;
         parameters[name] = value;
-      });
+      }
 
       return parameters;
     };
