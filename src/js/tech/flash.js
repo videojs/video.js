@@ -164,9 +164,16 @@ class Flash extends Tech {
    * @method setCurrentTime
    */
   setCurrentTime(time) {
-    this.lastSeekTarget_ = time;
-    this.el_.vjs_setProperty('currentTime', time);
-    super.setCurrentTime();
+    let seekable = this.seekable();
+    if (seekable.length) {
+      // clamp to the current seekable range
+      time = time > seekable.start(0) ? time : seekable.start(0);
+      time = time < seekable.end(seekable.length - 1) ? time : seekable.end(seekable.length - 1);
+
+      this.lastSeekTarget_ = time;
+      this.el_.vjs_setProperty('currentTime', time);
+      super.setCurrentTime();
+    }
   }
 
   /**
