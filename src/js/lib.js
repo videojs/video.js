@@ -686,7 +686,7 @@ vjs.getAbsoluteURL = function(url){
  * @return {Object}     An object of url details
  */
 vjs.parseUrl = function(url) {
-  var div, a, addToBody, props, details,
+  var div, a, addToBody, props, details, parameters,
     getQueryParameters = function(url) {
       var parameters = {}, urlParameters, urlParameter, i , name, value;
 
@@ -745,8 +745,9 @@ vjs.parseUrl = function(url) {
     document.body.removeChild(div);
   }
 
-  if(getQueryParameters(url)){
-    details.parameters = getQueryParameters(url);
+  parameters = getQueryParameters(url);
+  if (parameters) {
+    details.parameters = parameters;
   }
 
   return details;
