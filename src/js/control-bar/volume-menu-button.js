@@ -18,7 +18,17 @@ import VolumeBar from './volume-control/volume-bar.js';
  */
 class VolumeMenuButton extends MenuButton {
 
-  constructor(player, options){
+  constructor(player, options={}){
+    // If the vertical option isn't passed at all, default to true.
+    if (options.vertical === undefined) {
+      options.vertical = true;
+    }
+
+    // The vertical option needs to be set on the volumeBar as well, since that will
+    // need to be passed along to the VolumeBar constructor
+    options.volumeBar = options.volumeBar || {};
+    options.volumeBar.vertical = !!options.vertical;
+
     super(player, options);
 
     // Same listeners as MuteToggle
@@ -45,7 +55,14 @@ class VolumeMenuButton extends MenuButton {
    * @method buildCSSClass
    */
   buildCSSClass() {
-    return `vjs-volume-menu-button ${super.buildCSSClass()}`;
+    let orientationClass = '';
+    if (!!this.options_.vertical) {
+      orientationClass = 'vjs-volume-menu-button-vertical';
+    } else {
+      orientationClass = 'vjs-volume-menu-button-horizontal';
+    }
+
+    return `vjs-volume-menu-button ${super.buildCSSClass()} ${orientationClass}`;
   }
 
   /**
@@ -59,11 +76,7 @@ class VolumeMenuButton extends MenuButton {
       contentElType: 'div'
     });
 
-    // The volumeBar is vertical by default in the base theme when used with a VolumeMenuButton
-    var options = this.options_['volumeBar'] || {};
-    options['vertical'] = options['vertical'] || true;
-
-    let vc = new VolumeBar(this.player_, options);
+    let vc = new VolumeBar(this.player_, this.options_.volumeBar);
 
     vc.on('focus', function() {
       menu.lockShowing();
