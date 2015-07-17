@@ -691,7 +691,7 @@ vjs.parseUrl = function(url) {
       var parameters = {}, urlParameters, urlParameter, i , name, value;
 
       if (url.indexOf('?') === -1) {
-        return undefined;
+        return parameters;
       }
 
       urlParameters = url.split('?');
@@ -746,10 +746,7 @@ vjs.parseUrl = function(url) {
     document.body.removeChild(div);
   }
 
-  parameters = getQueryParameters(url);
-  if (parameters) {
-    details.parameters = parameters;
-  }
+  details.parameters = getQueryParameters(url);
 
   return details;
 };

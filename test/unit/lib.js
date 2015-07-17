@@ -309,7 +309,7 @@ test('should parse the details of a url correctly', function(){
     'bar': 'baz'
   }, 'parsed duplicate parameters');
 
-  deepEqual(vjs.parseUrl('http://www.example.com/index.html').parameters, undefined, 'no parameters');
+  deepEqual(vjs.parseUrl('http://www.example.com/index.html').parameters, {}, 'no parameters');
 
   deepEqual(vjs.parseUrl('?foo=bar').parameters, {
     'foo': 'bar'
