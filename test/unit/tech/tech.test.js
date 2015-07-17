@@ -1,6 +1,7 @@
 var noop = function() {}, clock, oldTextTracks;
 
 import Tech from '../../../src/js/tech/tech.js';
+import { createTimeRange } from '../../../src/js/utils/time-ranges.js';
 
 q.module('Media Tech', {
   'setup': function() {
@@ -97,7 +98,7 @@ test('dispose() should stop time tracking', function() {
   ok(true, 'no exception was thrown');
 });
 
-test('should add the source hanlder interface to a tech', function(){
+test('should add the source handler interface to a tech', function(){
   var sourceA = { src: 'foo.mp4', type: 'video/mp4' };
   var sourceB = { src: 'no-support', type: 'no-support' };
 
@@ -176,7 +177,7 @@ test('should add the source hanlder interface to a tech', function(){
   ok(disposeCalled, 'the handler dispose method was called when the tech was disposed');
 });
 
-test('should handle unsupported sources with the source hanlder API', function(){
+test('should handle unsupported sources with the source handler API', function(){
   // Define a new tech class
   var MyTech = Tech.extend();
   // Extend Tech with source handlers
@@ -197,7 +198,40 @@ test('should track whether a video has played', function() {
   let tech = new Tech();
 
   equal(tech.played().length, 0, 'starts with zero length');
-
   tech.trigger('playing');
   equal(tech.played().length, 1, 'has length after playing');
+});
+
+test('delegates seekable to the source handler', function(){
+  let MyTech = Tech.extend({
+    seekable: function() {
+      throw new Error('You should not be calling me!');
+    }
+  });
+  Tech.withSourceHandlers(MyTech);
+
+  let seekableCount = 0;
+  let handler = {
+    seekable: function() {
+      seekableCount++;
+      return createTimeRange(0, 0);
+    }
+  };
+
+  MyTech.registerSourceHandler({
+    canHandleSource: function() {
+      return true;
+    },
+    handleSource: function(source, tech) {
+      return handler;
+    }
+  });
+
+  let tech = new MyTech();
+  tech.setSource({
+    src: 'example.mp4',
+    type: 'video/mp4'
+  });
+  tech.seekable();
+  equal(seekableCount, 1, 'called the source handler');
 });
