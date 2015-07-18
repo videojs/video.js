@@ -81,7 +81,7 @@ a little differently. It needs to be possible to tab to the volume slider
 without hitting space bar on the menu button. To do this we're not using
 display:none to hide the slider menu by default, and instead setting the
 width and height to zero. */
-.video-js .vjs-volume-menu-button .vjs-menu {
+.video-js .vjs-menu-button-popup.vjs-volume-menu-button .vjs-menu {
   display: block;
   width: 0;
   height: 0;
@@ -94,7 +94,7 @@ width and height to zero. */
   left: -2em;
 }
 
-.video-js .vjs-menu-button.vjs-volume-menu-button .vjs-menu .vjs-menu-content {
+.video-js .vjs-menu-button.vjs-menu-button-popup.vjs-volume-menu-button .vjs-menu .vjs-menu-content {
   height: 0;
   width: 0;
 

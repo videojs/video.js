@@ -1,0 +1,47 @@
+.video-js .vjs-menu-button {
+  cursor: pointer;
+}
+
+.video-js .vjs-menu .vjs-menu-content {
+  display: block;
+  padding: 0; margin: 0;
+  overflow: auto;
+}
+
+/* prevent menus from opening while scrubbing (FF, IE) */
+.video-js.vjs-scrubbing .vjs-menu-button:hover .vjs-menu {
+  display: none;
+}
+
+.video-js .vjs-menu ul li {
+  list-style: none;
+  margin: 0;
+  padding: 0.2em 0;
+  line-height: 1.4em;
+  font-size: 1.2em;
+  text-align: center;
+  text-transform: lowercase;
+}
+
+.video-js .vjs-menu ul li.vjs-selected {
+  background-color: $primary-bg;
+}
+.video-js .vjs-menu ul li:focus,
+.video-js .vjs-menu ul li:hover,
+.video-js .vjs-menu ul li.vjs-selected:focus,
+.video-js .vjs-menu ul li.vjs-selected:hover {
+  outline: 0;
+  color: $primary-bg;
+
+  @include background-color-with-alpha($primary-text, 0.75);
+}
+.video-js .vjs-menu ul li.vjs-menu-title {
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 1em;
+  line-height: 2em;
+  padding: 0;
+  margin: 0 0 0.3em 0;
+  font-weight: bold;
+  cursor: default;
+}
