@@ -192,3 +192,12 @@ test('should handle unsupported sources with the source hanlder API', function()
   tech.setSource('');
   ok(usedNative, 'native source handler was used when an unsupported source was set');
 });
+
+test('should track whether a video has played', function() {
+  let tech = new Tech();
+
+  equal(tech.played().length, 0, 'starts with zero length');
+
+  tech.trigger('playing');
+  equal(tech.played().length, 1, 'has length after playing');
+});

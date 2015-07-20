@@ -30,6 +30,16 @@ class Tech extends Component {
     options.reportTouchActivity = false;
     super(null, options, ready);
 
+    // keep track of whether the current source has played at all to
+    // implement a very limited played()
+    this.hasStarted_ = false;
+    this.on('playing', function() {
+      this.hasStarted_ = true;
+    });
+    this.on('loadstart', function() {
+      this.hasStarted_ = false;
+    });
+
     this.textTracks_ = options.textTracks;
 
     // Manually track progress in cases where the browser/flash player doesn't report it.
@@ -244,6 +254,22 @@ class Tech extends Component {
     if (this.manualTimeUpdates) { this.manualTimeUpdatesOff(); }
 
     super.dispose();
+  }
+
+  /**
+   * Return the time ranges that have been played through for the
+   * current source. This implementation is incomplete. It does not
+   * track the played time ranges, only whether the source has played
+   * at all or not.
+   * @return {TimeRangeObject} a single time range if this video has
+   * played or an empty set of ranges if not.
+   * @method played
+   */
+  played() {
+    if (this.hasStarted_) {
+      return createTimeRange(0, 0);
+    }
+    return createTimeRange();
   }
 
   /**
