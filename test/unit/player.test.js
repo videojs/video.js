@@ -142,7 +142,7 @@ test('should asynchronously fire error events during source selection', function
       { 'src': 'http://vjs.zencdn.net/v/oceans.mp4', 'type': 'video/mp4' }
     ]
   });
-  ok(player.options_['techOrder'][0] === 'foo', 'Foo listed as the only tech');
+  equal(player.options_['techOrder'][0], 'foo', 'Foo listed as the only tech');
 
   player.on('error', function(e) {
     ok(player.error().code === 4, 'Source could not be played error thrown');
