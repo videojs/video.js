@@ -1,5 +1,5 @@
 .video-js .vjs-menu-button-inline {
-  @include transition(all 1s);
+  @include transition(all 0.8s);
 
   overflow-x: hidden;
   overflow-y: hidden;
@@ -16,7 +16,7 @@
   margin-left: 2.5em;
   opacity: 0;
 
-  @include transition(width 0.2s);
+  @include transition(all 0.4s);
 }
 
 .video-js .vjs-menu-button-inline .vjs-menu .vjs-menu-content {
