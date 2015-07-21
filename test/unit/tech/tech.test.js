@@ -120,7 +120,7 @@ test('should add the source handler interface to a tech', function(){
   ok(tech.setSource, 'added a setSource function to the tech instance');
 
   // Create an internal state class for the source handler
-  // The internal class would be used by a source hanlder to maintain state
+  // The internal class would be used by a source handler to maintain state
   // and provde a dispose method for the handler.
   // This is optional for source handlers
   var disposeCalled = false;
