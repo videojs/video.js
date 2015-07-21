@@ -112,6 +112,14 @@ videojs.VERSION = '__VERSION__';
 videojs.getGlobalOptions = () => globalOptions;
 
 /**
+ * For backward compatibility, expose global options.
+ *
+ * @deprecated
+ * @type {Object}
+ */
+videojs.options = globalOptions;
+
+/**
  * Set options that will apply to every player
  * ```js
  *     videojs.setGlobalOptions({
@@ -140,6 +148,14 @@ videojs.setGlobalOptions = function(newOptions) {
 videojs.getPlayers = function() {
   return Player.players;
 };
+
+/**
+ * For backward compatibility, expose players object.
+ *
+ * @deprecated
+ * @type {Object}
+ */
+videojs.players = Player.players;
 
 /**
  * Get a component class object by name
