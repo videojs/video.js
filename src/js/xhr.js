@@ -45,7 +45,7 @@ var xhr = function(options, callback){
   }
 
   // Merge with default options
-  mergeOptions({
+  options = mergeOptions({
     method: 'GET',
     timeout: 45  * 1000
   }, options);
