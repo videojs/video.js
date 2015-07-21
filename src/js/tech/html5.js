@@ -67,6 +67,7 @@ class Html5 extends Tech {
 
     if (this.featuresNativeTextTracks) {
       this.on('loadstart', Fn.bind(this, this.hideCaptions));
+      this.proxyNativeTextTracks_();
     }
 
     // Determine if native controls should be used
@@ -86,6 +87,12 @@ class Html5 extends Tech {
    * @method dispose
    */
   dispose() {
+    let tt = this.el().textTracks;
+
+    tt.removeEventListener('change', Fn.bind(this, this.handleTextTrackChange));
+    tt.removeEventListener('addtrack', Fn.bind(this, this.handleTextTrackAdd));
+    tt.removeEventListener('removetrack', Fn.bind(this, this.handleTextTrackRemove));
+
     Html5.disposeMediaElement(this.el_);
     super.dispose();
   }
@@ -180,6 +187,32 @@ class Html5 extends Tech {
         track.mode = 'disabled';
       }
     }
+  }
+
+  proxyNativeTextTracks_() {
+    let tt = this.el().textTracks;
+
+    tt.addEventListener('change', Fn.bind(this, this.handleTextTrackChange));
+    tt.addEventListener('addtrack', Fn.bind(this, this.handleTextTrackAdd));
+    tt.addEventListener('removetrack', Fn.bind(this, this.handleTextTrackRemove));
+  }
+
+  handleTextTrackChange(e) {
+    let tt = this.textTracks();
+    this.textTracks().trigger({
+      type: 'change',
+      target: tt,
+      currentTarget: tt,
+      srcElement: tt
+    });
+  }
+
+  handleTextTrackAdd(e) {
+    this.textTracks().addTrack_(e.track);
+  }
+
+  handleTextTrackRemove(e) {
+    this.textTracks().removeTrack_(e.track);
   }
 
   /**
@@ -593,11 +626,7 @@ class Html5 extends Tech {
    * @method textTracks
    */
   textTracks() {
-    if (!this['featuresNativeTextTracks']) {
-      return super.textTracks();
-    }
-
-    return this.el_.textTracks;
+    return super.textTracks();
   }
 
   /**
