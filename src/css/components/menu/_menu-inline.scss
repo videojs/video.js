@@ -15,12 +15,14 @@
 .video-js .vjs-menu-button-inline .vjs-menu {
   margin-left: 2.5em;
   opacity: 0;
+  height: 100%;
 
   @include transition(all 0.4s);
 }
 
 .video-js .vjs-menu-button-inline .vjs-menu .vjs-menu-content {
   width: auto;
+  height: 100%;
 }
 
 // Hover state

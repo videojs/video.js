@@ -25,7 +25,7 @@
 }
 
 .video-js .vjs-volume-bar {
-  margin: 1.3em;
+  margin: 1.35em;
 }
 
 .video-js .vjs-volume-bar.vjs-slider-horizontal {
@@ -50,6 +50,7 @@
   // Volume handle
   &:before {
     position: absolute;
+    font-size: 0.9em; // Doing this to match the handle on play progress.
   }
 }
 
