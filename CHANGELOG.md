@@ -67,6 +67,7 @@ CHANGELOG
 * @heff sped up testing ([view](https://github.com/videojs/video.js/pull/2254))
 * pass fs state to player from enterFullscreen, split full-window styles into their own selector ([view](https://github.com/videojs/video.js/pull/2357))
 * Fixed vertical option for volumeMenuButton ([view](https://github.com/videojs/video.js/pull/2352))
+* @dmlap switched events to not bubble by default ([view](https://github.com/videojs/video.js/pull/2351))
 
 --------------------
 

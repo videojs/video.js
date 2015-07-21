@@ -17,7 +17,7 @@ import document from 'global/document';
  * It stores the handler function in a separate cache object
  * and adds a generic handler to the element's event,
  * along with a unique id (guid) to the element.
- * 
+ *
  * @param  {Element|Object}   elem Element or object to bind listeners to
  * @param  {String|Array}   type Type of event to bind to.
  * @param  {Function} fn   Event listener.
@@ -161,7 +161,7 @@ export function trigger(elem, event, hash) {
 
   // Unless explicitly stopped or the event does not bubble (e.g. media events)
     // recursively calls this function to bubble the event up the DOM.
-    if (parent && !event.isPropagationStopped() && event.bubbles !== false) {
+    if (parent && !event.isPropagationStopped() && event.bubbles === true) {
       trigger.call(null, parent, event, hash);
 
   // If at the top of the DOM, triggers the default action unless disabled.
@@ -208,7 +208,7 @@ export function one(elem, type, fn) {
 
 /**
  * Fix a native event to have standard property values
- * 
+ *
  * @param  {Object} event Event object to fix
  * @return {Object}
  * @private
