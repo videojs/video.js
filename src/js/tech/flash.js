@@ -54,6 +54,10 @@ class Flash extends Tech {
     window.videojs.Flash.onReady = Flash.onReady;
     window.videojs.Flash.onEvent = Flash.onEvent;
     window.videojs.Flash.onError = Flash.onError;
+
+    this.on('seeked', function() {
+      this.lastSeekTarget_ = undefined;
+    });
   }
 
   /**
@@ -158,6 +162,14 @@ class Flash extends Tech {
   }
 
   /**
+   * Returns true if the tech is currently seeking.
+   * @return {boolean} true if seeking
+   */
+  seeking() {
+    return this.lastSeekTarget_ !== undefined;
+  }
+
+  /**
    * Set current time
    *
    * @param {Number} time Current time of video
@@ -171,6 +183,7 @@ class Flash extends Tech {
       time = time < seekable.end(seekable.length - 1) ? time : seekable.end(seekable.length - 1);
 
       this.lastSeekTarget_ = time;
+      this.trigger('seeking');
       this.el_.vjs_setProperty('currentTime', time);
       super.setCurrentTime();
     }
@@ -284,7 +297,7 @@ class Flash extends Tech {
 // Create setters and getters for attributes
 const _api = Flash.prototype;
 const _readWrite = 'rtmpConnection,rtmpStream,preload,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted'.split(',');
-const _readOnly = 'error,networkState,readyState,seeking,initialTime,duration,startOffsetTime,paused,ended,videoTracks,audioTracks,videoWidth,videoHeight'.split(',');
+const _readOnly = 'error,networkState,readyState,initialTime,duration,startOffsetTime,paused,ended,videoTracks,audioTracks,videoWidth,videoHeight'.split(',');
 
 function _createSetter(attr){
   var attrUpper = attr.charAt(0).toUpperCase() + attr.slice(1);

@@ -71,6 +71,7 @@ CHANGELOG
 * @dmlap export videojs.createTimeRange ([view](https://github.com/videojs/video.js/pull/2361))
 * @dmlap export a basic played() on techs ([view](https://github.com/videojs/video.js/pull/2384))
 * @dmlap use seekable on source handlers when defined ([view](https://github.com/videojs/video.js/pull/2376))
+* @dmlap fire seeking in the flash tech, not the SWF ([view](https://github.com/videojs/video.js/pull/2372))
 
 --------------------
 

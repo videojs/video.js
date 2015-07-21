@@ -23,6 +23,7 @@ test('Flash.canPlaySource', function() {
 test('currentTime', function() {
   let getCurrentTime = Flash.prototype.currentTime;
   let setCurrentTime = Flash.prototype.setCurrentTime;
+  let seekingCount = 0;
   let seeking = false;
   let setPropVal;
   let getPropVal;
@@ -41,6 +42,11 @@ test('currentTime', function() {
     seekable(){
       return createTimeRange(5, 1000);
     },
+    trigger(event){
+      if (event === 'seeking') {
+        seekingCount++;
+      }
+    },
     seeking(){
       return seeking;
     }
@@ -54,6 +60,7 @@ test('currentTime', function() {
   // Test the currentTime setter
   setCurrentTime.call(mockFlash, 10);
   equal(setPropVal, 10, 'currentTime is set on the swf element');
+  equal(seekingCount, 1, 'triggered seeking');
 
   // Test current time while seeking
   setCurrentTime.call(mockFlash, 20);
@@ -61,15 +68,18 @@ test('currentTime', function() {
   result = getCurrentTime.call(mockFlash);
   equal(result, 20, 'currentTime is retrieved from the lastSeekTarget while seeking');
   notEqual(result, getPropVal, 'currentTime is not retrieved from the element while seeking');
+  equal(seekingCount, 2, 'triggered seeking');
 
   // clamp seeks to seekable
   setCurrentTime.call(mockFlash, 1001);
   result = getCurrentTime.call(mockFlash);
   equal(result, mockFlash.seekable().end(0), 'clamped to the seekable end');
+  equal(seekingCount, 3, 'triggered seeking');
 
   setCurrentTime.call(mockFlash, 1);
   result = getCurrentTime.call(mockFlash);
   equal(result, mockFlash.seekable().start(0), 'clamped to the seekable start');
+  equal(seekingCount, 4, 'triggered seeking');
 });
 
 test('dispose removes the object element even before ready fires', function() {
