@@ -176,6 +176,7 @@ let TextTrack = function(options={}) {
   });
 
   if (options.src) {
+    tt.src = options.src;
     loadTrack(options.src, tt);
   } else {
     tt.loaded_ = true;
