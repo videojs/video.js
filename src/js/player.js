@@ -21,6 +21,7 @@ import globalOptions from './global-options.js';
 import safeParseTuple from 'safe-json-parse/tuple';
 import assign from 'object.assign';
 import mergeOptions from './utils/merge-options.js';
+import textTrackConverter from './tracks/text-track-list-converter.js';
 
 // Include required child components (importing also registers them)
 import MediaLoader from './tech/loader.js';
@@ -522,6 +523,8 @@ class Player extends Component {
     let techComponent = Component.getComponent(techName);
     this.tech = new techComponent(techOptions);
 
+    textTrackConverter.jsonToTextTracks(this.textTracksJson_ || [], this.tech);
+
     this.on(this.tech, 'ready', this.handleTechReady);
     this.on(this.tech, 'usenativecontrols', this.handleTechUseNativeControls);
 
@@ -580,6 +583,7 @@ class Player extends Component {
   unloadTech() {
     // Save the current text tracks so that we can reuse the same text tracks with the next tech
     this.textTracks_ = this.textTracks();
+    this.textTracksJson_ = textTrackConverter.textTracksToJson(this);
 
     this.isReady_ = false;
 
