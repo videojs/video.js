@@ -565,6 +565,16 @@ Tech.withSourceHandlers = function(_Tech){
     this.sourceHandler_ = sh.handleSource(source, this);
     this.on('dispose', this.disposeSourceHandler);
 
+    this.originalSeekable_ = this.seekable;
+    // when a source handler is registered, prefer its implementation of
+    // seekable when present.
+    this.seekable = function() {
+      if (this.sourceHandler_ && this.sourceHandler_.seekable) {
+        return this.sourceHandler_.seekable();
+      }
+      return this.originalSeekable_.call(this);
+    };
+
     return this;
   };
 
@@ -574,6 +584,7 @@ Tech.withSourceHandlers = function(_Tech){
    _Tech.prototype.disposeSourceHandler = function(){
     if (this.sourceHandler_ && this.sourceHandler_.dispose) {
       this.sourceHandler_.dispose();
+      this.seekable = this.originalSeekable_;
     }
   };
 

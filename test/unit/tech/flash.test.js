@@ -1,4 +1,5 @@
 import Flash from '../../../src/js/tech/flash.js';
+import { createTimeRange } from '../../../src/js/utils/time-ranges.js';
 import document from 'global/document';
 
 q.module('Flash');
@@ -30,14 +31,17 @@ test('currentTime', function() {
   // Mock out a Flash instance to avoid creating the swf object
   let mockFlash = {
     el_: {
-      vjs_setProperty: function(prop, val){
+      vjs_setProperty(prop, val){
         setPropVal = val;
       },
-      vjs_getProperty: function(){
+      vjs_getProperty(){
         return getPropVal;
       }
     },
-    seeking: function(){
+    seekable(){
+      return createTimeRange(5, 1000);
+    },
+    seeking(){
       return seeking;
     }
   };
@@ -57,6 +61,15 @@ test('currentTime', function() {
   result = getCurrentTime.call(mockFlash);
   equal(result, 20, 'currentTime is retrieved from the lastSeekTarget while seeking');
   notEqual(result, getPropVal, 'currentTime is not retrieved from the element while seeking');
+
+  // clamp seeks to seekable
+  setCurrentTime.call(mockFlash, 1001);
+  result = getCurrentTime.call(mockFlash);
+  equal(result, mockFlash.seekable().end(0), 'clamped to the seekable end');
+
+  setCurrentTime.call(mockFlash, 1);
+  result = getCurrentTime.call(mockFlash);
+  equal(result, mockFlash.seekable().start(0), 'clamped to the seekable start');
 });
 
 test('dispose removes the object element even before ready fires', function() {
@@ -141,3 +154,10 @@ test('seekable', function() {
   result = seekable.call(mockFlash);
   equal(result.length, mockFlash.duration_, 'seekable is empty with a zero duration');
 });
+
+// fake out the <object> interaction but leave all the other logic intact
+class MockFlash extends Flash {
+  constructor() {
+    super({});
+  }
+}

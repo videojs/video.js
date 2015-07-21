@@ -70,6 +70,7 @@ CHANGELOG
 * @dmlap switched events to not bubble by default ([view](https://github.com/videojs/video.js/pull/2351))
 * @dmlap export videojs.createTimeRange ([view](https://github.com/videojs/video.js/pull/2361))
 * @dmlap export a basic played() on techs ([view](https://github.com/videojs/video.js/pull/2384))
+* @dmlap use seekable on source handlers when defined ([view](https://github.com/videojs/video.js/pull/2376))
 
 --------------------
 
