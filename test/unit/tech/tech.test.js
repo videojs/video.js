@@ -1,6 +1,6 @@
 var noop = function() {}, clock, oldTextTracks;
 
-import videojs from '../../../src/js/video.js';
+import extendsFn from '../../../src/js/extends.js';
 import Tech from '../../../src/js/tech/tech.js';
 import { createTimeRange } from '../../../src/js/utils/time-ranges.js';
 
@@ -104,7 +104,7 @@ test('should add the source handler interface to a tech', function(){
   var sourceB = { src: 'no-support', type: 'no-support' };
 
   // Define a new tech class
-  var MyTech = videojs.extends(Tech);
+  var MyTech = extendsFn(Tech);
 
   // Extend Tech with source handlers
   Tech.withSourceHandlers(MyTech);
@@ -180,7 +180,7 @@ test('should add the source handler interface to a tech', function(){
 
 test('should handle unsupported sources with the source handler API', function(){
   // Define a new tech class
-  var MyTech = videojs.extends(Tech);
+  var MyTech = extendsFn(Tech);
   // Extend Tech with source handlers
   Tech.withSourceHandlers(MyTech);
   // Create an instance of Tech
