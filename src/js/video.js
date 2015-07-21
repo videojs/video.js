@@ -91,6 +91,34 @@ var videojs = function(id, options, ready){
   return tag['player'] || new Player(tag, options, ready);
 };
 
+/**
+ * Expose private objects on the global videojs namespace using a Proxy if
+ * supported. Browsers that support Proxy will log a deprecation warning for
+ * directly accessing or modifying a deprecated object.
+ *
+ * @private
+ * @param {String} name The key name for the deprecated property.
+ * @param {Object} target The target object.
+ * @return {Object} A Proxy if supported or the `target` argument.
+ */
+const createDeprecationProxy = (name, target) => {
+  if (typeof Proxy === 'function') {
+    videojs[name] = new Proxy(target, {
+      get: function(obj, key) {
+        log.warn(`access to videojs.${name} is deprecated; getting ${key}`);
+        return obj[key];
+      },
+      set: function(obj, key, value) {
+        log.warn(`modification of videojs.${name} is deprecated; setting ${key}`);
+        obj[key] = value;
+      }
+    });
+  } else {
+    videojs[name] = target;
+  }
+  return videojs[name];
+};
+
 // Run Auto-load players
 // You have to wait at least once in case this script is loaded after your video in the DOM (weird behavior only with minified version)
 setup.autoSetupTimeout(1, videojs);
@@ -115,9 +143,10 @@ videojs.getGlobalOptions = () => globalOptions;
  * For backward compatibility, expose global options.
  *
  * @deprecated
- * @type {Object}
+ * @memberOf videojs
+ * @property {Object|Proxy} options
  */
-videojs.options = globalOptions;
+createDeprecationProxy('options', globalOptions);
 
 /**
  * Set options that will apply to every player
@@ -153,9 +182,10 @@ videojs.getPlayers = function() {
  * For backward compatibility, expose players object.
  *
  * @deprecated
- * @type {Object}
+ * @memberOf videojs
+ * @property {Object|Proxy} players
  */
-videojs.players = Player.players;
+createDeprecationProxy('players', Player.players);
 
 /**
  * Get a component class object by name
