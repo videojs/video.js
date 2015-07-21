@@ -69,6 +69,7 @@ CHANGELOG
 * Fixed vertical option for volumeMenuButton ([view](https://github.com/videojs/video.js/pull/2352))
 * @dmlap switched events to not bubble by default ([view](https://github.com/videojs/video.js/pull/2351))
 * @dmlap export videojs.createTimeRange ([view](https://github.com/videojs/video.js/pull/2361))
+* @dmlap export a basic played() on techs ([view](https://github.com/videojs/video.js/pull/2384))
 
 --------------------
 

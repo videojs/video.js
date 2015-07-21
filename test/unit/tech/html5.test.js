@@ -69,6 +69,11 @@ test('test playbackRate', function() {
   strictEqual(tech.playbackRate(), 0.75);
 });
 
+test('should export played', function() {
+  tech.createEl();
+  deepEqual(tech.played(), tech.el().played, 'returns the played attribute');
+});
+
 test('should remove the controls attribute when recreating the element', function() {
   var el;
   player.tagAttributes = {
