@@ -585,7 +585,7 @@ class Component {
    * @param  {String|Component} first   The event type or other component
    * @param  {Function|String}      second  The event handler or event type
    * @param  {Function}             third   The event handler
-   * @return {Component} 
+   * @return {Component}
    * @method on
    */
   on(first, second, third) {
@@ -745,14 +745,19 @@ class Component {
    * it will trigger the function immediately.
    *
    * @param  {Function} fn Ready listener
+   * @param  {Boolean} sync Exec the listener synchronously if component is ready
    * @return {Component}
    * @method ready
    */
-  ready(fn) {
+  ready(fn, sync=false) {
     if (fn) {
       if (this.isReady_) {
-        // Ensure function is always called asynchronously
-        this.setTimeout(fn, 1);
+        if (sync) {
+          fn.call(this);
+        } else {
+          // Call the function asynchronously by default for consistency
+          this.setTimeout(fn, 1);
+        }
       } else {
         this.readyQueue_ = this.readyQueue_ || [];
         this.readyQueue_.push(fn);
@@ -1208,7 +1213,7 @@ class Component {
    * Registers a component
    *
    * @param {String} name Name of the component to register
-   * @param {Object} comp The component to register  
+   * @param {Object} comp The component to register
    * @static
    * @method registerComponent
    */
@@ -1244,7 +1249,7 @@ class Component {
    * Sets up the constructor using the supplied init method
    * or uses the init of the parent object
    *
-   * @param {Object} props An object of properties  
+   * @param {Object} props An object of properties
    * @static
    * @method extend
    */
