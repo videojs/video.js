@@ -23,6 +23,9 @@
 .video-js .vjs-menu-button-inline .vjs-menu .vjs-menu-content {
   width: auto;
   height: 100%;
+
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 // Hover state
