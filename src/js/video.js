@@ -18,6 +18,7 @@ import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
 import extendsFn from './extends.js';
 import merge from 'lodash-compat/object/merge';
+import createDeprecationProxy from './utils/create-deprecation-proxy.js';
 
 // Include the built-in techs
 import Html5 from './tech/html5.js';
@@ -91,36 +92,6 @@ var videojs = function(id, options, ready){
   return tag['player'] || new Player(tag, options, ready);
 };
 
-/**
- * Expose private objects on the global videojs namespace using a Proxy if
- * supported. Browsers that support Proxy will log a deprecation warning for
- * directly accessing or modifying a deprecated object.
- *
- * @private
- * @param {String} name The key name for the deprecated property.
- * @param {Object} target The target object.
- * @param {Object} messages String messages to display from a Proxy, mapping to get/set operations.
- * @return {Object} A Proxy if supported or the `target` argument.
- */
-const createDeprecationProxy = (name, target, messages) => {
-  if (typeof Proxy === 'function') {
-    videojs[name] = new Proxy(target, {
-      get: function(obj, key) {
-        log.warn(messages.get);
-        return obj[key];
-      },
-      set: function(obj, key, value) {
-        log.warn(messages.set);
-        obj[key] = value;
-        return true;
-      }
-    });
-  } else {
-    videojs[name] = target;
-  }
-  return videojs[name];
-};
-
 // Run Auto-load players
 // You have to wait at least once in case this script is loaded after your video in the DOM (weird behavior only with minified version)
 setup.autoSetupTimeout(1, videojs);
@@ -148,7 +119,7 @@ videojs.getGlobalOptions = () => globalOptions;
  * @memberOf videojs
  * @property {Object|Proxy} options
  */
-createDeprecationProxy('options', globalOptions, {
+videojs.options = createDeprecationProxy(globalOptions, {
   get: 'access to videojs.options is deprecated; use videojs.getGlobalOptions instead',
   set: 'modification of videojs.options is deprecated; use videojs.setGlobalOptions instead'
 });
@@ -190,7 +161,7 @@ videojs.getPlayers = function() {
  * @memberOf videojs
  * @property {Object|Proxy} players
  */
-createDeprecationProxy('players', Player.players, {
+videojs.players = createDeprecationProxy(Player.players, {
   get: 'access to videojs.players is deprecated; use videojs.getPlayers instead',
   set: 'modification of videojs.players is deprecated'
 });

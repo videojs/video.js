@@ -78,29 +78,6 @@ test('should expose plugin registry function', function() {
 });
 
 test('should expose options and players properties for backward-compatibility', function() {
-
-  // This test forks based on Proxy support because there is slightly different
-  // behavior and test cases (i.e., wanting to ensure that deprecation warnings
-  // were logged.
-  if (typeof Proxy === 'function') {
-    let fixture = document.getElementById('qunit-fixture');
-    fixture.innerHTML += '<video id="test_vid_id"></video>';
-
-    let player = videojs('test_vid_id');
-
-    sinon.stub(log, 'warn');
-
-    strictEqual(videojs.options.html5, globalOptions.html5, 'proxies global options object');
-    strictEqual(videojs.players.test_vid_id, Player.players.test_vid_id, 'proxies players object');
-
-    videojs.options.foo = videojs.players.foo = 'bar';
-
-    // Expecting 2 gets and 2 sets.
-    equal(log.warn.callCount, 4, 'each proxy operation logged a deprecation warning');
-
-    log.warn.restore();
-  } else {
-    strictEqual(videojs.options, videojs.getGlobalOptions(), 'identical to global options object');
-    strictEqual(videojs.players, videojs.getPlayers(), 'identical to players object');
-  }
+  ok(typeof videojs.options, 'object', 'options should be an object');
+  ok(typeof videojs.players, 'object', 'players should be an object');
 });
