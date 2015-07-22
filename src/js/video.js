@@ -99,17 +99,18 @@ var videojs = function(id, options, ready){
  * @private
  * @param {String} name The key name for the deprecated property.
  * @param {Object} target The target object.
+ * @param {Object} messages String messages to display from a Proxy, mapping to get/set operations.
  * @return {Object} A Proxy if supported or the `target` argument.
  */
-const createDeprecationProxy = (name, target) => {
+const createDeprecationProxy = (name, target, messages) => {
   if (typeof Proxy === 'function') {
     videojs[name] = new Proxy(target, {
       get: function(obj, key) {
-        log.warn(`access to videojs.${name} is deprecated; getting ${key}`);
+        log.warn(messages.get);
         return obj[key];
       },
       set: function(obj, key, value) {
-        log.warn(`modification of videojs.${name} is deprecated; setting ${key}`);
+        log.warn(messages.set);
         obj[key] = value;
       }
     });
@@ -146,7 +147,10 @@ videojs.getGlobalOptions = () => globalOptions;
  * @memberOf videojs
  * @property {Object|Proxy} options
  */
-createDeprecationProxy('options', globalOptions);
+createDeprecationProxy('options', globalOptions, {
+  get: 'access to videojs.options is deprecated; use videojs.getGlobalOptions instead',
+  set: 'modification of videojs.options is deprecated; use videojs.setGlobalOptions instead'
+});
 
 /**
  * Set options that will apply to every player
@@ -185,7 +189,10 @@ videojs.getPlayers = function() {
  * @memberOf videojs
  * @property {Object|Proxy} players
  */
-createDeprecationProxy('players', Player.players);
+createDeprecationProxy('players', Player.players, {
+  get: 'access to videojs.players is deprecated; use videojs.getPlayers instead',
+  set: 'modification of videojs.players is deprecated'
+});
 
 /**
  * Get a component class object by name
