@@ -112,6 +112,7 @@ const createDeprecationProxy = (name, target, messages) => {
       set: function(obj, key, value) {
         log.warn(messages.set);
         obj[key] = value;
+        return true;
       }
     });
   } else {

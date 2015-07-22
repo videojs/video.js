@@ -92,7 +92,11 @@ test('should expose options and players properties for backward-compatibility', 
 
     strictEqual(videojs.options.html5, globalOptions.html5, 'proxies global options object');
     strictEqual(videojs.players.test_vid_id, Player.players.test_vid_id, 'proxies players object');
-    ok(log.warn.calledTwice, 'each proxy logged a deprecation warning');
+
+    videojs.options.foo = videojs.players.foo = 'bar';
+
+    // Expecting 2 gets and 2 sets.
+    equal(log.warn.callCount, 4, 'each proxy operation logged a deprecation warning');
 
     log.warn.restore();
   } else {
