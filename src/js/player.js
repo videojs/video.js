@@ -569,7 +569,8 @@ class Player extends Component {
       this.tag = null;
     }
 
-    this.tech.ready(techReady);
+    // player.triggerReady is always async, so don't need this to be async
+    this.tech.ready(techReady, true);
   }
 
   /**
@@ -1103,7 +1104,7 @@ class Player extends Component {
     if (this.tech && !this.tech.isReady_) {
       this.tech.ready(function(){
         this[method](arg);
-      });
+      }, true);
 
     // Otherwise call method now
     } else {
@@ -1745,7 +1746,9 @@ class Player extends Component {
           if (this.options_['autoplay']) {
             this.play();
           }
-        });
+
+        // Set the source synchronously if possible (#2326)
+        }, true);
       }
     }
 

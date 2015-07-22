@@ -97,7 +97,8 @@ class Tech extends Component {
       if (this.networkState && this.networkState() > 0) {
         this.trigger('loadstart');
       }
-    });
+    // Allow the tech ready event to handle synchronisity
+    }, true);
   }
 
   /* Fallbacks for unsupported event types
