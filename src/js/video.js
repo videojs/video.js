@@ -120,8 +120,8 @@ videojs.getGlobalOptions = () => globalOptions;
  * @property {Object|Proxy} options
  */
 videojs.options = createDeprecationProxy(globalOptions, {
-  get: 'access to videojs.options is deprecated; use videojs.getGlobalOptions instead',
-  set: 'modification of videojs.options is deprecated; use videojs.setGlobalOptions instead'
+  get: 'Access to videojs.options is deprecated; use videojs.getGlobalOptions instead',
+  set: 'Modification of videojs.options is deprecated; use videojs.setGlobalOptions instead'
 });
 
 /**
@@ -162,8 +162,8 @@ videojs.getPlayers = function() {
  * @property {Object|Proxy} players
  */
 videojs.players = createDeprecationProxy(Player.players, {
-  get: 'access to videojs.players is deprecated; use videojs.getPlayers instead',
-  set: 'modification of videojs.players is deprecated'
+  get: 'Access to videojs.players is deprecated; use videojs.getPlayers instead',
+  set: 'Modification of videojs.players is deprecated'
 });
 
 /**
