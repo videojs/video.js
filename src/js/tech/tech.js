@@ -584,6 +584,8 @@ Tech.withSourceHandlers = function(_Tech){
    _Tech.prototype.disposeSourceHandler = function(){
     if (this.sourceHandler_ && this.sourceHandler_.dispose) {
       this.sourceHandler_.dispose();
+    }
+    if (this.originalSeekable_) {
       this.seekable = this.originalSeekable_;
     }
   };
