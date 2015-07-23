@@ -1,8 +1,7 @@
 .video-js .vjs-menu-button-inline {
-  @include transition(all 0.8s);
+  @include transition(all 0.4s);
 
-  overflow-x: hidden;
-  overflow-y: hidden;
+  overflow: hidden;
 }
 
 .video-js .vjs-menu-button.vjs-menu-button-inline:before {
@@ -13,19 +12,35 @@
 }
 
 .video-js .vjs-menu-button-inline .vjs-menu {
-  margin-left: 2.5em;
   opacity: 0;
   height: 100%;
+  width: auto;
 
-  @include transition(all 0.4s);
+  position: absolute;
+  left: 2.2222222em;
+  top: 0;
+
+  padding: 0;
+  margin: 0;
+
+  @include transition(all 0.2s);
+}
+
+.video-js.vjs-no-flex .vjs-menu-button-inline .vjs-menu {
+  position: relative;
+  width: 0;
+}
+
+.video-js.vjs-no-flex .vjs-menu-button-inline:hover .vjs-menu {
+  width: auto;
 }
 
 .video-js .vjs-menu-button-inline .vjs-menu .vjs-menu-content {
   width: auto;
   height: 100%;
+  margin: 0;
 
-  overflow-x: hidden;
-  overflow-y: hidden;
+  overflow: hidden;
 }
 
 // Hover state
