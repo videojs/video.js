@@ -18,9 +18,6 @@ HTML5 Media Controller - Wrapper for HTML5 Media API
   - [isSupported](#issupported-static)
   - [supportsNativeTextTracks](#supportsnativetexttracks-static)
 
-- [UNDEFINED](#undefined)
-  - [nativeSourceHandler](#nativesourcehandler-static)
-
 ---
 
 ## METHODS
@@ -75,20 +72,6 @@ _defined in_: [src/js/media/html5.js#L478](https://github.com/videojs/video.js/b
 * `Boolean` 
 
 _defined in_: [src/js/media/html5.js#L600](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L600)
-
----
-
-## UNDEFINED
-
-### nativeSourceHandler `STATIC`
-> The default native source handler.
-> This simply passes the source to the video element. Nothing fancy.
-
-##### PARAMETERS: 
-* __source__ `Object` The source object
-* __tech__ `vjs.Html5` The instance of the HTML5 tech
-
-_defined in_: [src/js/media/html5.js#L520](https://github.com/videojs/video.js/blob/master/src/js/media/html5.js#L520)
 
 ---
 

@@ -15,7 +15,6 @@ Flash Media Controller - Wrapper for fallback SWF API
   - [init](#init-player-options-ready-)
 
 - [UNDEFINED](#undefined)
-  - [nativeSourceHandler](#nativesourcehandler-static)
   - [rtmpSourceHandler](#rtmpsourcehandler-static)
 
 ---
@@ -34,18 +33,6 @@ _defined in_: [src/js/media/flash.js#L17](https://github.com/videojs/video.js/bl
 ---
 
 ## UNDEFINED
-
-### nativeSourceHandler `STATIC`
-> The default native source handler.
-> This simply passes the source to the video element. Nothing fancy.
-
-##### PARAMETERS: 
-* __source__ `Object` The source object
-* __tech__ `vjs.Flash` The instance of the Flash tech
-
-_defined in_: [src/js/media/flash.js#L242](https://github.com/videojs/video.js/blob/master/src/js/media/flash.js#L242)
-
----
 
 ### rtmpSourceHandler `STATIC`
 > A source handler for RTMP urls
