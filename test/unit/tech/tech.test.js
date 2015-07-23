@@ -1,8 +1,8 @@
 var noop = function() {}, clock, oldTextTracks;
 
-import extendsFn from '../../../src/js/extends.js';
 import Tech from '../../../src/js/tech/tech.js';
 import { createTimeRange } from '../../../src/js/utils/time-ranges.js';
+import extendsFn from '../../../src/js/extends.js';
 
 q.module('Media Tech', {
   'setup': function() {
@@ -204,7 +204,7 @@ test('should track whether a video has played', function() {
 });
 
 test('delegates seekable to the source handler', function(){
-  let MyTech = Tech.extend({
+  let MyTech = extendsFn(Tech, {
     seekable: function() {
       throw new Error('You should not be calling me!');
     }

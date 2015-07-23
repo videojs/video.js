@@ -8,7 +8,6 @@ import MediaError from '../../src/js/media-error.js';
 import Html5 from '../../src/js/tech/html5.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
-import css from 'css';
 
 q.module('Player', {
   'setup': function() {
@@ -161,57 +160,45 @@ test('should set the width, height, and aspect ratio via a css class', function(
     return (styleEl.styleSheet && styleEl.styleSheet.cssText) || styleEl.innerHTML;
   };
 
+  // NOTE: was using npm/css to parse the actual CSS ast
+  // but the css module doesn't support ie8
+  let confirmSetting = function(prop, val) {
+    let styleText = getStyleText(player.styleEl_);
+    let re = new RegExp(prop+':\\s?'+val);
+
+    // Lowercase string for IE8
+    styleText = styleText.toLowerCase();
+
+    return !!re.test(styleText);
+  };
+
+  // Initial state
   ok(player.styleEl_.parentNode === player.el(), 'player has a style element');
   ok(!getStyleText(player.styleEl_), 'style element should be empty when the player is given no dimensions');
 
-  let rules;
-
-  function getStyleRules(){
-    const styleText = getStyleText(player.styleEl_);
-    const cssAST = css.parse(styleText);
-    const styleRules = {};
-
-    cssAST.stylesheet.rules.forEach(function(ruleAST){
-      let selector = ruleAST.selectors.join(' ');
-      styleRules[selector] = {};
-      let rule = styleRules[selector];
-
-      ruleAST.declarations.forEach(function(dec){
-        rule[dec.property] = dec.value;
-      });
-    });
-
-    return styleRules;
-  }
-
   // Set only the width
   player.width(100);
-  rules = getStyleRules();
-  equal(rules['.example_1-dimensions'].width, '100px', 'style width should equal the supplied width in pixels');
-  equal(rules['.example_1-dimensions'].height, '56.25px', 'style height should match the default aspect ratio of the width');
+  ok(confirmSetting('width', '100px'), 'style width should equal the supplied width in pixels');
+  ok(confirmSetting('height', '56.25px'), 'style height should match the default aspect ratio of the width');
 
   // Set the height
   player.height(200);
-  rules = getStyleRules();
-  equal(rules['.example_1-dimensions'].height, '200px', 'style height should match the supplied height in pixels');
+  ok(confirmSetting('height', '200px'), 'style height should match the supplied height in pixels');
 
   // Reset the width and height to defaults
   player.width('');
   player.height('');
-  rules = getStyleRules();
-  equal(rules['.example_1-dimensions'].width, '300px', 'supplying an empty string should reset the width');
-  equal(rules['.example_1-dimensions'].height, '168.75px', 'supplying an empty string should reset the height');
+  ok(confirmSetting('width', '300px'), 'supplying an empty string should reset the width');
+  ok(confirmSetting('height', '168.75px'), 'supplying an empty string should reset the height');
 
   // Switch to fluid mode
   player.fluid(true);
-  rules = getStyleRules();
   ok(player.hasClass('vjs-fluid'), 'the vjs-fluid class should be added to the player');
-  equal(rules['.example_1-dimensions.vjs-fluid']['padding-top'], '56.25%', 'fluid aspect ratio should match the default aspect ratio');
+  ok(confirmSetting('padding-top', '56.25%'), 'fluid aspect ratio should match the default aspect ratio');
 
   // Change the aspect ratio
   player.aspectRatio('4:1');
-  rules = getStyleRules();
-  equal(rules['.example_1-dimensions.vjs-fluid']['padding-top'], '25%', 'aspect ratio percent should match the newly set aspect ratio');
+  ok(confirmSetting('padding-top', '25%'), 'aspect ratio percent should match the newly set aspect ratio');
 });
 
 test('should wrap the original tag in the player div', function(){
