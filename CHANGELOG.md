@@ -75,6 +75,7 @@ CHANGELOG
 * @dmlap expose the xhr helper utility ([view](https://github.com/videojs/video.js/pull/2321))
 * @misteroneill fixed internal extends usage and added a deprecation warning ([view](https://github.com/videojs/video.js/pull/2390))
 * @eXon added the poster to the options the tech receives ([view](https://github.com/videojs/video.js/pull/2338))
+* @eXon made sure the volume persists between tech changes ([view](https://github.com/videojs/video.js/pull/2340))
 
 --------------------
 
