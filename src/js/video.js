@@ -183,12 +183,22 @@ videojs.getComponent = Component.getComponent;
  */
 videojs.registerComponent = Component.registerComponent;
 
-/*
+/**
  * A suite of browser and device tests
  *
  * @type {Object}
  */
 videojs.browser = browser;
+
+/**
+ * Whether or not the browser supports touch events. Included for backward
+ * compatibility with 4.x, but deprecated. Use `videojs.browser.TOUCH_ENABLED`
+ * instead going forward.
+ *
+ * @deprecated
+ * @type {Boolean}
+ */
+videojs.TOUCH_ENABLED = browser.TOUCH_ENABLED;
 
 /**
  * Subclass an existing class
