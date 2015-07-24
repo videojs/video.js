@@ -502,7 +502,8 @@ class Player extends Component {
       'autoplay': this.options_.autoplay,
       'preload': this.options_.preload,
       'loop': this.options_.loop,
-      'muted': this.options_.muted
+      'muted': this.options_.muted,
+      'poster': this.poster()
     }, this.options_[techName.toLowerCase()]);
 
     if (this.tag) {

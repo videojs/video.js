@@ -74,6 +74,7 @@ CHANGELOG
 * @dmlap fire seeking in the flash tech, not the SWF ([view](https://github.com/videojs/video.js/pull/2372))
 * @dmlap expose the xhr helper utility ([view](https://github.com/videojs/video.js/pull/2321))
 * @misteroneill fixed internal extends usage and added a deprecation warning ([view](https://github.com/videojs/video.js/pull/2390))
+* @eXon added the poster to the options the tech receives ([view](https://github.com/videojs/video.js/pull/2338))
 
 --------------------
 
