@@ -16,6 +16,7 @@ import log from './utils/log.js';
 import xhr from './xhr.js';
 import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
+import * as Url from './utils/url.js';
 import extendsFn from './extends.js';
 import merge from 'lodash-compat/object/merge';
 
@@ -398,6 +399,15 @@ videojs.createTimeRange = createTimeRange;
  * @returns {Object}                  The request
  */
 videojs.xhr = xhr;
+
+/**
+ * Resolve and parse the elements of a URL
+ *
+ * @param  {String} url The url to parse
+ * @return {Object}     An object of url details
+ * @method parseUrl
+ */
+videojs.parseUrl = Url.parseUrl;
 
 // REMOVING: We probably should add this to the migration plugin
 // // Expose but deprecate the window[componentName] method for accessing components
