@@ -198,6 +198,10 @@ class Player extends Component {
     // Make player easily findable by ID
     Player.players[this.id_] = this;
 
+    // If the muted attribute is set on the player, we need to set volume(0) so
+    // the controls are in sync with the video element.
+    if (options.muted) this.volume(0);
+
     // When the player is first initialized, trigger activity so components
     // like the control bar show themselves if needed
     this.userActive_ = true;
