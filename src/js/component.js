@@ -585,7 +585,7 @@ class Component {
    * @param  {String|Component} first   The event type or other component
    * @param  {Function|String}      second  The event handler or event type
    * @param  {Function}             third   The event handler
-   * @return {Component} 
+   * @return {Component}
    * @method on
    */
   on(first, second, third) {
@@ -1208,7 +1208,7 @@ class Component {
    * Registers a component
    *
    * @param {String} name Name of the component to register
-   * @param {Object} comp The component to register  
+   * @param {Object} comp The component to register
    * @static
    * @method registerComponent
    */
@@ -1244,12 +1244,16 @@ class Component {
    * Sets up the constructor using the supplied init method
    * or uses the init of the parent object
    *
-   * @param {Object} props An object of properties  
+   * @param {Object} props An object of properties
    * @static
+   * @deprecated
    * @method extend
    */
   static extend(props) {
     props = props || {};
+
+    log.warn('Component.extend({}) has been deprecated, use videojs.extends(Component, {}) instead');
+
     // Set up the constructor using the supplied init method
     // or using the init of the parent object
     // Make sure to check the unobfuscated version for external libs
@@ -1275,8 +1279,6 @@ class Component {
 
     // Make the class extendable
     subObj.extend = Component.extend;
-    // Make a function for creating instances
-    // subObj.create = CoreObject.create;
 
     // Extend subObj's prototype with functions and other properties from props
     for (let name in props) {

@@ -1,5 +1,6 @@
 var noop = function() {}, clock, oldTextTracks;
 
+import extendsFn from '../../../src/js/extends.js';
 import Tech from '../../../src/js/tech/tech.js';
 import { createTimeRange } from '../../../src/js/utils/time-ranges.js';
 
@@ -103,7 +104,7 @@ test('should add the source handler interface to a tech', function(){
   var sourceB = { src: 'no-support', type: 'no-support' };
 
   // Define a new tech class
-  var MyTech = Tech.extend();
+  var MyTech = extendsFn(Tech);
 
   // Extend Tech with source handlers
   Tech.withSourceHandlers(MyTech);
@@ -119,7 +120,7 @@ test('should add the source handler interface to a tech', function(){
   ok(tech.setSource, 'added a setSource function to the tech instance');
 
   // Create an internal state class for the source handler
-  // The internal class would be used by a source hanlder to maintain state
+  // The internal class would be used by a source handler to maintain state
   // and provde a dispose method for the handler.
   // This is optional for source handlers
   var disposeCalled = false;
@@ -179,7 +180,7 @@ test('should add the source handler interface to a tech', function(){
 
 test('should handle unsupported sources with the source handler API', function(){
   // Define a new tech class
-  var MyTech = Tech.extend();
+  var MyTech = extendsFn(Tech);
   // Extend Tech with source handlers
   Tech.withSourceHandlers(MyTech);
   // Create an instance of Tech

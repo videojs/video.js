@@ -73,6 +73,7 @@ CHANGELOG
 * @dmlap use seekable on source handlers when defined ([view](https://github.com/videojs/video.js/pull/2376))
 * @dmlap fire seeking in the flash tech, not the SWF ([view](https://github.com/videojs/video.js/pull/2372))
 * @dmlap expose the xhr helper utility ([view](https://github.com/videojs/video.js/pull/2321))
+* @misteroneill fixed internal extends usage and added a deprecation warning ([view](https://github.com/videojs/video.js/pull/2390))
 
 --------------------
 
