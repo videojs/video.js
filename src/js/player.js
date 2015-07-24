@@ -638,7 +638,7 @@ class Player extends Component {
    */
   handleTechReady() {
     this.triggerReady();
-    
+
     // Keep the same volume as before
     if (this.cache_.volume) {
       this.techCall('setVolume', this.cache_.volume);
@@ -1458,20 +1458,6 @@ class Player extends Component {
   }
 
   /**
-   * Old naming for isFullscreen()
-   *
-   * @param  {Boolean=} isFS Update the player's fullscreen state
-   * @return {Boolean} true if fullscreen false if not when getting
-   * @return {Player} self when setting
-   * @deprecated
-   * @method isFullScreen
-   */
-  isFullScreen(isFS) {
-    log.warn('player.isFullScreen() has been deprecated, use player.isFullscreen() with a lowercase "s")');
-    return this.isFullscreen(isFS);
-  }
-
-  /**
    * Increase the size of the video to full screen
    * ```js
    *     myPlayer.requestFullscreen();
@@ -1528,18 +1514,6 @@ class Player extends Component {
   }
 
   /**
-   * Old naming for requestFullscreen
-   *
-   * @return {Boolean} true if fullscreen false if not when getting
-   * @deprecated
-   * @method requestFullScreen
-   */
-  requestFullScreen() {
-    log.warn('player.requestFullScreen() has been deprecated, use player.requestFullscreen() with a lowercase "s")');
-    return this.requestFullscreen();
-  }
-
-  /**
    * Return the video to its normal size after having been in full screen mode
    * ```js
    *     myPlayer.exitFullscreen();
@@ -1563,18 +1537,6 @@ class Player extends Component {
     }
 
     return this;
-  }
-
-  /**
-   * Old naming for exitFullscreen
-   *
-   * @return {Player} self
-   * @deprecated
-   * @method cancelFullScreen
-   */
-  cancelFullScreen() {
-    log.warn('player.cancelFullScreen() has been deprecated, use player.exitFullscreen()');
-    return this.exitFullscreen();
   }
 
   /**
