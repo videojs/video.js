@@ -16,6 +16,7 @@ import log from './utils/log.js';
 import xhr from './xhr.js';
 import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
+import roundFloat from './utils/round-float';
 import * as Url from './utils/url.js';
 import extendsFn from './extends.js';
 import merge from 'lodash-compat/object/merge';
@@ -408,6 +409,16 @@ videojs.xhr = xhr;
  * @method parseUrl
  */
 videojs.parseUrl = Url.parseUrl;
+
+/**
+ * Should round off a number to a decimal place
+ *
+ * @param  {Number} num Number to round
+ * @param  {Number} dec Number of decimal places to round to
+ * @return {Number}     Rounded number
+ * @method roundFloat
+ */
+videojs.round = roundFloat;
 
 // REMOVING: We probably should add this to the migration plugin
 // // Expose but deprecate the window[componentName] method for accessing components
