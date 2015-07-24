@@ -130,7 +130,7 @@ function getCustomLaunchers(){
       singleRun: true,
       base: 'SauceLabs',
       browserName: 'safari',
-      platform: 'OS X 10.8'
+      platform: 'OS X 10.10'
     },
 
     ipad_sl: {
