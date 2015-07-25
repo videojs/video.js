@@ -62,11 +62,11 @@ MediaError.errorTypes = [
 ];
 
 MediaError.defaultMessages = {
-  1: 'You aborted the video playback',
-  2: 'A network error caused the video download to fail part-way.',
-  3: 'The video playback was aborted due to a corruption problem or because the video used features your browser did not support.',
-  4: 'The video could not be loaded, either because the server or network failed or because the format is not supported.',
-  5: 'The video is encrypted and we do not have the keys to decrypt it.'
+  1: 'You aborted the media playback',
+  2: 'A network error caused the media download to fail part-way.',
+  3: 'The media playback was aborted due to a corruption problem or because the media used features your browser did not support.',
+  4: 'The media could not be loaded, either because the server or network failed or because the format is not supported.',
+  5: 'The media is encrypted and we do not have the keys to decrypt it.'
 };
 
 // Add types as properties on MediaError
