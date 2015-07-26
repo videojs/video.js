@@ -18,9 +18,9 @@
   "Captions": "Magyarázó szöveg",
   "captions off": "Magyarázó szöveg kikapcsolva",
   "Chapters": "Fejezetek",
-  "You aborted the video playback": "Leállította a lejátszást",
-  "A network error caused the video download to fail part-way.": "Hálózati hiba miatt a videó részlegesen töltődött le.",
-  "The video could not be loaded, either because the server or network failed or because the format is not supported.": "A videó nem tölthető be hálózati vagy kiszolgálói hiba miatt, vagy a formátuma nem támogatott.",
-  "The video playback was aborted due to a corruption problem or because the video used features your browser did not support.": "A lejátszás adatsérülés miatt leállt, vagy a videó egyes tulajdonságait a böngészője nem támogatja.",
-  "No compatible source was found for this video.": "Nincs kompatibilis forrás ehhez a videóhoz."
+  "You aborted the media playback": "Leállította a lejátszást",
+  "A network error caused the media download to fail part-way.": "Hálózati hiba miatt a videó részlegesen töltődött le.",
+  "The media could not be loaded, either because the server or network failed or because the format is not supported.": "A videó nem tölthető be hálózati vagy kiszolgálói hiba miatt, vagy a formátuma nem támogatott.",
+  "The media playback was aborted due to a corruption problem or because the media used features your browser did not support.": "A lejátszás adatsérülés miatt leállt, vagy a videó egyes tulajdonságait a böngészője nem támogatja.",
+  "No compatible source was found for this media.": "Nincs kompatibilis forrás ehhez a videóhoz."
 }
