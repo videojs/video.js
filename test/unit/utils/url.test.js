@@ -32,9 +32,11 @@ test('should strip port from hosts using http or https', function() {
   };
 
   url = Url.parseUrl('/domain/relative/url');
-  ok(!(/.*:80$/).test(url.host), ':80 is not appended to the host');
 
   document.createElement = origDocCreate;
+
+  ok(!(/.*:80$/).test(url.host), ':80 is not appended to the host');
+
 });
 
 test('should get an absolute URL', function(){
