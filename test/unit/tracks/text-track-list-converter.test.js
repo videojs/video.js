@@ -5,11 +5,16 @@ import Html5 from '../../../src/js/tech/html5.js';
 
 q.module('Text Track List Converter');
 
-let removeIds = (item) => {
+let clean = (item) => {
+  delete item.id;
+  delete item.inBandMetadataTrackDispatchType;
+}
+
+let cleanup = (item) => {
   if (Array.isArray(item)) {
-    item.forEach((a) => { delete a.id });
+    item.forEach(clean);
   } else {
-    delete item.id;
+    clean(item);
   }
   return item;
 };
@@ -22,13 +27,12 @@ if (Html5.supportsNativeTextTracks()) {
     track.srclang = 'en';
     track.label = 'English';
 
-    a.deepEqual(removeIds(c.trackToJson(track.track)), {
+    a.deepEqual(cleanup(c.trackToJson(track.track)), {
       src: undefined,
       kind: 'captions',
       label: 'English',
       language: 'en',
       mode: 'disabled',
-      inBandMetadataTrackDispatchType: undefined,
       cues: null
     }, 'the json output is same');
   });
@@ -65,13 +69,12 @@ if (Html5.supportsNativeTextTracks()) {
       }
     };
 
-    a.deepEqual(removeIds(c.textTracksToJson(tech)), [{
+    a.deepEqual(cleanup(c.textTracksToJson(tech)), [{
       src: 'http://example.com/spanish.vtt',
       kind: 'captions',
       label: 'Spanish',
       language: 'es',
       mode: 'disabled',
-      inBandMetadataTrackDispatchType: undefined,
       cues: null
     }, {
       src: 'http://example.com/english.vtt',
@@ -79,7 +82,6 @@ if (Html5.supportsNativeTextTracks()) {
       label: 'English',
       language: 'en',
       mode: 'disabled',
-      inBandMetadataTrackDispatchType: undefined,
       cues: null
     }], 'the output is correct')
   });
@@ -123,7 +125,7 @@ if (Html5.supportsNativeTextTracks()) {
       }
     };
 
-    c.jsonToTextTracks(removeIds(c.textTracksToJson(tech)), tech);
+    c.jsonToTextTracks(cleanup(c.textTracksToJson(tech)), tech);
 
     a.equal(addRemotes, 2, 'we added two text tracks');
   });
@@ -138,13 +140,12 @@ q.test('trackToJson produces correct representation for emulated track object', 
     tech: {}
   });
 
-  a.deepEqual(removeIds(c.trackToJson(track)), {
+  a.deepEqual(cleanup(c.trackToJson(track)), {
     src: 'http://example.com/english.vtt',
     kind: 'captions',
     label: 'English',
     language: 'en',
     mode: 'disabled',
-    inBandMetadataTrackDispatchType: undefined,
     cues: null
   }, 'the json output is same');
 });
@@ -183,13 +184,12 @@ q.test('textTracksToJson produces good json output for emulated only', function(
     }
   };
 
-  a.deepEqual(removeIds(c.textTracksToJson(tech)), [{
+  a.deepEqual(cleanup(c.textTracksToJson(tech)), [{
     src: 'http://example.com/spanish.vtt',
     kind: 'captions',
     label: 'Spanish',
     language: 'es',
     mode: 'disabled',
-    inBandMetadataTrackDispatchType: undefined,
     cues: null
   }, {
     src: 'http://example.com/english.vtt',
@@ -197,7 +197,6 @@ q.test('textTracksToJson produces good json output for emulated only', function(
     label: 'English',
     language: 'en',
     mode: 'disabled',
-    inBandMetadataTrackDispatchType: undefined,
     cues: null
   }], 'the output is correct')
 });
@@ -243,7 +242,7 @@ q.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated trac
     }
   };
 
-  c.jsonToTextTracks(removeIds(c.textTracksToJson(tech)), tech);
+  c.jsonToTextTracks(cleanup(c.textTracksToJson(tech)), tech);
 
   a.equal(addRemotes, 2, 'we added two text tracks');
 });
