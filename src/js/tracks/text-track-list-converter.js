@@ -1,11 +1,11 @@
-let ttToJson = function(track) {
+let trackToJson = function(track) {
   return {
     kind: track.kind,
     label: track.label,
     language: track.language,
     id: track.id,
     inBandMetadataTrackDispatchType: track.inBandMetadataTrackDispatchType,
-    mode: track.mode,
+    //mode: track.mode,
     cues: track.cues && Array.prototype.map.call(track.cues, function(cue) {
       return {
         startTime: cue.startTime,
@@ -23,14 +23,14 @@ let textTracksToJson = function(tech) {
 
   let trackObjs = Array.prototype.map.call(trackEls, (t) => t.track);
   let tracks = Array.prototype.map.call(trackEls, function(trackEl) {
-    let json = ttToJson(trackEl.track);
+    let json = trackToJson(trackEl.track);
     json.src = trackEl.src;
     return json;
   });
 
   return tracks.concat(Array.prototype.filter.call(tech.textTracks(), function(track) {
     return trackObjs.indexOf(track) === -1;
-  }).map(ttToJson));
+  }).map(trackToJson));
 };
 
 let jsonToTextTracks = function(json, tech) {
@@ -44,4 +44,4 @@ let jsonToTextTracks = function(json, tech) {
   return tech.textTracks();
 };
 
-export default {textTracksToJson, jsonToTextTracks};
+export default {textTracksToJson, jsonToTextTracks, trackToJson};
