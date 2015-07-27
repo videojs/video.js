@@ -730,12 +730,12 @@ class Html5 extends Tech {
 
     this.remoteTextTracks().removeTrack_(track);
 
-    tracks = this.el()['querySelectorAll']('track');
+    tracks = this.el().querySelectorAll('track');
 
-    for (i = 0; i < tracks.length; i++) {
-      if (tracks[i] === track || tracks[i]['track'] === track) {
-        tracks[i]['parentNode']['removeChild'](tracks[i]);
-        break;
+    i = tracks.length;
+    while (i--) {
+      if (track === tracks[i] || track === tracks[i].track) {
+        this.el().removeChild(tracks[i]);
       }
     }
   }
