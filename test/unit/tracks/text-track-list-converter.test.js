@@ -2,13 +2,14 @@ import c from '../../../src/js/tracks/text-track-list-converter.js';
 import TextTrack from '../../../src/js/tracks/text-track.js';
 import TextTrackList from '../../../src/js/tracks/text-track-list.js';
 import Html5 from '../../../src/js/tech/html5.js';
+import document from 'global/document';
 
 q.module('Text Track List Converter');
 
 let clean = (item) => {
   delete item.id;
   delete item.inBandMetadataTrackDispatchType;
-}
+};
 
 let cleanup = (item) => {
   if (Array.isArray(item)) {
@@ -16,6 +17,7 @@ let cleanup = (item) => {
   } else {
     clean(item);
   }
+
   return item;
 };
 
@@ -62,7 +64,7 @@ if (Html5.supportsNativeTextTracks()) {
           querySelectorAll() {
             return [nativeTrack];
           }
-        }
+        };
       },
       textTracks() {
         return tt;
@@ -83,7 +85,7 @@ if (Html5.supportsNativeTextTracks()) {
       language: 'en',
       mode: 'disabled',
       cues: null
-    }], 'the output is correct')
+    }], 'the output is correct');
   });
 
   q.test('jsonToTextTracks calls addRemoteTextTrack on the tech with mixed tracks', function(a) {
@@ -112,7 +114,7 @@ if (Html5.supportsNativeTextTracks()) {
           querySelectorAll() {
             return [nativeTrack];
           }
-        }
+        };
       },
       textTracks() {
         return tt;
@@ -177,7 +179,7 @@ q.test('textTracksToJson produces good json output for emulated only', function(
         querySelectorAll() {
           return [];
         }
-      }
+      };
     },
     textTracks() {
       return tt;
@@ -198,7 +200,7 @@ q.test('textTracksToJson produces good json output for emulated only', function(
     language: 'en',
     mode: 'disabled',
     cues: null
-  }], 'the output is correct')
+  }], 'the output is correct');
 });
 
 q.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated tracks only', function(a) {
@@ -229,7 +231,7 @@ q.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated trac
         querySelectorAll() {
           return [];
         }
-      }
+      };
     },
     textTracks() {
       return tt;
