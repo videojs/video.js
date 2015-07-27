@@ -92,17 +92,23 @@ class Html5 extends Tech {
    */
   dispose() {
     let tt = this.el().textTracks;
+    let emulatedTt = this.textTracks();
+
+    // remove native event listeners
     tt.removeEventListener('change', this.handleTextTrackChange_);
     tt.removeEventListener('addtrack', this.handleTextTrackAdd_);
+    tt.removeEventListener('removetrack', this.handleTextTrackRemove_);
+
+    // clearout the emulated text track list.
+    let i = emulatedTt.length;
+
+    while (i--) {
+      emulatedTt.removeTrack_(emulatedTt[i]);
+    }
+
 
     Html5.disposeMediaElement(this.el_);
     super.dispose();
-
-    // events get triggered asynchronously and we want to get all the `removetrack` events
-    // so we need to remove the `removetrack` handler asynchronously.
-    setTimeout(() => {
-      tt.removeEventListener('removetrack', this.handleTextTrackRemove_);
-    }, 0);
   }
 
   /**
