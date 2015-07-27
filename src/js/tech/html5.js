@@ -67,6 +67,10 @@ class Html5 extends Tech {
 
     if (this.featuresNativeTextTracks) {
       this.on('loadstart', Fn.bind(this, this.hideCaptions));
+
+      this.handleTextTrackChange_ = Fn.bind(this, this.handleTextTrackChange);
+      this.handleTextTrackAdd_ = Fn.bind(this, this.handleTextTrackAdd);
+      this.handleTextTrackRemove_ = Fn.bind(this, this.handleTextTrackRemove);
       this.proxyNativeTextTracks_();
     }
 
@@ -88,13 +92,18 @@ class Html5 extends Tech {
    */
   dispose() {
     let tt = this.el().textTracks;
-
-    tt.removeEventListener('change', Fn.bind(this, this.handleTextTrackChange));
-    tt.removeEventListener('addtrack', Fn.bind(this, this.handleTextTrackAdd));
-    tt.removeEventListener('removetrack', Fn.bind(this, this.handleTextTrackRemove));
+    tt.removeEventListener('change', this.handleTextTrackChange_);
+    tt.removeEventListener('addtrack', this.handleTextTrackAdd_);
+    // events get triggered asynchronously and we want to get all the `removetrack` events
+    // so we need to remove the `removetrack` handler asynchronously.
+    setTimeout(() => {
+      tt.removeEventListener('removetrack', this.handleTextTrackRemove_);
+    }, 0);
 
     Html5.disposeMediaElement(this.el_);
     super.dispose();
+
+
   }
 
   /**
@@ -192,9 +201,9 @@ class Html5 extends Tech {
   proxyNativeTextTracks_() {
     let tt = this.el().textTracks;
 
-    tt.addEventListener('change', Fn.bind(this, this.handleTextTrackChange));
-    tt.addEventListener('addtrack', Fn.bind(this, this.handleTextTrackAdd));
-    tt.addEventListener('removetrack', Fn.bind(this, this.handleTextTrackRemove));
+    tt.addEventListener('change', this.handleTextTrackChange_);
+    tt.addEventListener('addtrack', this.handleTextTrackAdd_);
+    tt.addEventListener('removetrack', this.handleTextTrackRemove_);
   }
 
   handleTextTrackChange(e) {
