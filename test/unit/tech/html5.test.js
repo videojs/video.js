@@ -178,3 +178,46 @@ test('native source handler canHandleSource', function(){
   // Reset test video canPlayType
   Html5.TEST_VID.canPlayType = origCPT;
 });
+
+test('add native textTrack listeners on startup', function() {
+  let adds = [];
+  let rems = [];
+  let tt = {
+    length: 0,
+    addEventListener: (type, fn) => adds.push([type, fn]),
+    removeEventListener: (type, fn) => rems.push([type, fn]),
+  };
+  let el = document.createElement('div');
+  el.textTracks = tt;
+
+  let htmlTech = new Html5({el});
+
+  equal(adds[0][0], 'change', 'change event handler added');
+  equal(adds[1][0], 'addtrack', 'addtrack event handler added');
+  equal(adds[2][0], 'removetrack', 'removetrack event handler added');
+});
+
+test('remove all tracks from emulated list on dispose', function() {
+  let adds = [];
+  let rems = [];
+  let tt = {
+    length: 0,
+    addEventListener: (type, fn) => adds.push([type, fn]),
+    removeEventListener: (type, fn) => rems.push([type, fn]),
+  };
+  let el = document.createElement('div');
+  el.textTracks = tt;
+
+  let htmlTech = new Html5({el});
+  htmlTech.dispose();
+
+  equal(adds[0][0], 'change', 'change event handler added');
+  equal(adds[1][0], 'addtrack', 'addtrack event handler added');
+  equal(adds[2][0], 'removetrack', 'removetrack event handler added');
+  equal(rems[0][0], 'change', 'change event handler removed');
+  equal(rems[1][0], 'addtrack', 'addtrack event handler removed');
+  equal(rems[2][0], 'removetrack', 'removetrack event handler removed');
+  equal(adds[0][0], rems[0][0], 'change event handler removed');
+  equal(adds[1][0], rems[1][0], 'addtrack event handler removed');
+  equal(adds[2][0], rems[2][0], 'removetrack event handler removed');
+});
