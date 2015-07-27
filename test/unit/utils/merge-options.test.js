@@ -1,5 +1,7 @@
 import mergeOptions from '../../../src/js/utils/merge-options.js';
 
+q.module('merge-options');
+
 test('should merge options objects', function(){
   var ob1, ob2, ob3;
 

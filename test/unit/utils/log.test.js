@@ -1,6 +1,8 @@
 import log from '../../../src/js/utils/log.js';
 import window from 'global/window';
 
+q.module('log');
+
 test('should confirm logging functions work', function() {
   let origConsole = window['console'];
   // replace the native console for testing
