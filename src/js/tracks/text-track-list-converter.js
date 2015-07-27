@@ -5,7 +5,7 @@ let trackToJson = function(track) {
     language: track.language,
     id: track.id,
     inBandMetadataTrackDispatchType: track.inBandMetadataTrackDispatchType,
-    //mode: track.mode,
+    mode: track.mode,
     cues: track.cues && Array.prototype.map.call(track.cues, function(cue) {
       return {
         startTime: cue.startTime,
@@ -36,7 +36,7 @@ let textTracksToJson = function(tech) {
 let jsonToTextTracks = function(json, tech) {
   json.forEach(function(track) {
     let addedTrack = tech.addRemoteTextTrack(track).track;
-    if (!track.src) {
+    if (!track.src && track.cues) {
       track.cues.forEach((cue) => addedTrack.addCue(cue));
     }
   });
