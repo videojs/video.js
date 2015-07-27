@@ -4,7 +4,7 @@
 import document from 'global/document';
 import * as setup from './setup';
 import Component from './component';
-import EventEmitter from './event-emitter';
+import EventTarget from './event-target';
 import globalOptions from './global-options.js';
 import Player from './player';
 import plugin from './plugins.js';
@@ -426,7 +426,7 @@ videojs.round = roundFloat;
  *
  * @type {Function}
  */
-videojs.EventTarget = EventEmitter;
+videojs.EventTarget = EventTarget;
 
 // REMOVING: We probably should add this to the migration plugin
 // // Expose but deprecate the window[componentName] method for accessing components
