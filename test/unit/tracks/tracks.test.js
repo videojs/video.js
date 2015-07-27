@@ -307,3 +307,56 @@ test('when switching techs, we should not get a new text track', function() {
 
   ok(htmltracks === flashtracks, 'the tracks are equal');
 });
+
+if (Html5.supportsNativeTextTracks()) {
+  test('listen to remove and add track events in native text tracks', function(assert) {
+    let done = assert.async();
+
+    let el = document.createElement('video');
+    let html = new Html5({el});
+    let tt = el.textTracks;
+    let emulatedTt = html.textTracks();
+    let track = document.createElement('track');
+    el.appendChild(track);
+
+    let addtrack = function() {
+      equal(emulatedTt.length, tt.length, 'we have matching tracks length');
+      equal(emulatedTt.length, 1, 'we have one text track');
+
+      emulatedTt.off('addtrack', addtrack);
+      el.removeChild(track);
+    };
+    emulatedTt.on('addtrack', addtrack);
+    emulatedTt.on('removetrack', function() {
+      equal(emulatedTt.length, tt.length, 'we have matching tracks length');
+      equal(emulatedTt.length, 0, 'we have no more text tracks');
+      done();
+    });
+  });
+
+  test('should have removed tracks on dispose', function(assert) {
+    let done = assert.async();
+
+    let el = document.createElement('video');
+    let html = new Html5({el});
+    let tt = el.textTracks;
+    let emulatedTt = html.textTracks();
+    let track = document.createElement('track');
+    el.appendChild(track);
+
+    let addtrack = function() {
+      equal(emulatedTt.length, tt.length, 'we have matching tracks length');
+      equal(emulatedTt.length, 1, 'we have one text track');
+
+      emulatedTt.off('addtrack', addtrack);
+      html.dispose();
+
+      equal(emulatedTt.length, tt.length, 'we have matching tracks length');
+      equal(emulatedTt.length, 0, 'we have no more text tracks');
+
+      done();
+    };
+    emulatedTt.on('addtrack', addtrack);
+
+  });
+}
