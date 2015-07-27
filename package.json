@@ -5,11 +5,11 @@
   "copyright": "Copyright Brightcove, Inc. <https://www.brightcove.com/>",
   "license": "Apache-2.0",
   "keywords": [
-    "videojs",
-    "html5",
     "flash",
+    "html5",
+    "player",
     "video",
-    "player"
+    "videojs"
   ],
   "homepage": "http://videojs.com",
   "author": "Steve Heffernan",
@@ -79,7 +79,7 @@
     "karma-sauce-launcher": "^0.2.8",
     "karma-sinon": "^1.0.3",
     "load-grunt-tasks": "^3.1.0",
-    "qunitjs": "~1.14.0",
+    "qunitjs": "^1.18.0",
     "sinon": "~1.9.1",
     "time-grunt": "^1.1.1",
     "uglify-js": "~2.3.6",
@@ -87,13 +87,13 @@
   },
   "standard": {
     "ignore": [
+      "**/Gruntfile.js",
       "**/build/**",
       "**/dist/**",
       "**/docs/**",
       "**/lang/**",
       "**/sandbox/**",
-      "**/test/**",
-      "**/Gruntfile.js"
+      "**/test/**"
     ]
   }
 }
