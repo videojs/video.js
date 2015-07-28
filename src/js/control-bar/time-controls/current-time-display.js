@@ -43,13 +43,13 @@ class CurrentTimeDisplay extends Component {
   }
 
   /**
-   * Update current time display 
+   * Update current time display
    *
    * @method updateContent
    */
   updateContent() {
     // Allows for smooth scrubbing, when player can't keep up.
-    let time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
+    let time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
     let localizedText = this.localize('Current Time');
     let formattedTime = formatTime(time, this.player_.duration());
     this.contentEl_.innerHTML = `<span class="vjs-control-text">${localizedText}</span> ${formattedTime}`;
