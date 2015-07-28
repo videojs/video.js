@@ -328,7 +328,7 @@ export function findElPosition(el) {
 
   // Android sometimes returns slightly off decimal values, so need to round
   return {
-    left: Number(left.toFixed()),
-    top: Number(top.toFixed())
+    left: Math.round(left),
+    top: Math.round(top)
   };
 }
