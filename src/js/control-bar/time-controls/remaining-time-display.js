@@ -43,7 +43,7 @@ class RemainingTimeDisplay extends Component {
   }
 
   /**
-   * Update remaining time display 
+   * Update remaining time display
    *
    * @method updateContent
    */
@@ -55,7 +55,7 @@ class RemainingTimeDisplay extends Component {
     }
 
     // Allows for smooth scrubbing, when player can't keep up.
-    // var time = (this.player_.scrubbing) ? this.player_.getCache().currentTime : this.player_.currentTime();
+    // var time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
     // this.contentEl_.innerHTML = vjs.formatTime(time, this.player_.duration());
   }
 
