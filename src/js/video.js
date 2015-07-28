@@ -189,6 +189,7 @@ videojs.registerComponent = Component.registerComponent;
  * A suite of browser and device tests
  *
  * @type {Object}
+ * @private
  */
 videojs.browser = browser;
 
