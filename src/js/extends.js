@@ -54,7 +54,6 @@ const extendsFn = function(superClass, subClassMethods={}) {
     if (typeof subClassMethods.init === 'function') {
       log.warn('Constructor logic via init() is deprecated; please use constructor() instead.');
       subClassMethods.constructor = subClassMethods.init;
-      delete subClassMethods.init;
     }
     if (subClassMethods.constructor !== Object.prototype.constructor) {
       subClass = subClassMethods.constructor;
