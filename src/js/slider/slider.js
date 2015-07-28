@@ -41,7 +41,7 @@ class Slider extends Component {
    * Create the component's DOM element
    *
    * @param {String} type Type of element to create
-   * @param {Object=} props List of properties in Object form 
+   * @param {Object=} props List of properties in Object form
    * @return {Element}
    * @method createEl
    */
@@ -86,7 +86,7 @@ class Slider extends Component {
   handleMouseMove() {}
 
   /**
-   * Handle mouse up on Slider 
+   * Handle mouse up on Slider
    *
    * @method handleMouseUp
    */

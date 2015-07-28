@@ -21,7 +21,13 @@ class VolumeMenuButton extends MenuButton {
   constructor(player, options={}){
     // If the vertical option isn't passed at all, default to true.
     if (options.vertical === undefined) {
-      options.vertical = true;
+      // If an inline volumeMenuButton is used, we should default to using a horizontal
+      // slider for obvious reasons.
+      if (options.inline) {
+        options.vertical = false;
+      } else {
+        options.vertical = true;
+      }
     }
 
     // The vertical option needs to be set on the volumeBar as well, since that will

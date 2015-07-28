@@ -18,7 +18,7 @@ import toTitleCase from '../utils/to-title-case.js';
  */
 class MenuButton extends Button {
 
-  constructor(player, options){
+  constructor(player, options={}){
     super(player, options);
 
     this.update();
@@ -114,16 +114,25 @@ class MenuButton extends Button {
    * @method buildCSSClass
    */
   buildCSSClass() {
-    return `vjs-menu-button ${super.buildCSSClass()}`;
+    var menuButtonClass = 'vjs-menu-button';
+
+    // If the inline option is passed, we want to use different styles altogether.
+    if (this.options_.inline === true) {
+      menuButtonClass += '-inline';
+    } else {
+      menuButtonClass += '-popup';
+    }
+
+    return `vjs-menu-button ${menuButtonClass} ${super.buildCSSClass()}`;
   }
 
   /**
    * Focus - Add keyboard functionality to element
-   * This function is not needed anymore. Instead, the 
+   * This function is not needed anymore. Instead, the
    * keyboard functionality is handled by
-   * treating the button as triggering a submenu. 
+   * treating the button as triggering a submenu.
    * When the button is pressed, the submenu
-   * appears. Pressing the button again makes 
+   * appears. Pressing the button again makes
    * the submenu disappear.
    *
    * @method handleFocus
@@ -139,7 +148,7 @@ class MenuButton extends Button {
   handleBlur() {}
 
   /**
-   * When you click the button it adds focus, which 
+   * When you click the button it adds focus, which
    * will show the menu indefinitely.
    * So we'll remove focus when the mouse leaves the button.
    * Focus is needed for tab navigation.

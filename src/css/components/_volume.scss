@@ -25,7 +25,7 @@
 }
 
 .video-js .vjs-volume-bar {
-  margin: 1.3em;
+  margin: 1.35em;
 }
 
 .video-js .vjs-volume-bar.vjs-slider-horizontal {
@@ -50,6 +50,7 @@
   // Volume handle
   &:before {
     position: absolute;
+    font-size: 0.9em; // Doing this to match the handle on play progress.
   }
 }
 
@@ -59,7 +60,7 @@
   // Volume handle
   &:before {
     top: -0.5em;
-    left: -0.35em;
+    left: -0.3em;
   }
 }
 .video-js .vjs-slider-horizontal .vjs-volume-level {
@@ -67,7 +68,7 @@
 
   // Volume handle
   &:before {
-    top: -0.35em;
+    top: -0.3em;
     right: -0.5em;
   }
 }
@@ -81,7 +82,7 @@ a little differently. It needs to be possible to tab to the volume slider
 without hitting space bar on the menu button. To do this we're not using
 display:none to hide the slider menu by default, and instead setting the
 width and height to zero. */
-.video-js .vjs-volume-menu-button .vjs-menu {
+.video-js .vjs-menu-button-popup.vjs-volume-menu-button .vjs-menu {
   display: block;
   width: 0;
   height: 0;
@@ -90,11 +91,11 @@ width and height to zero. */
 .video-js .vjs-volume-menu-button.vjs-volume-menu-button-vertical .vjs-menu {
   left: 0.5em;
 }
-.video-js .vjs-volume-menu-button.vjs-volume-menu-button-horizontal .vjs-menu {
+.video-js .vjs-volume-menu-button-popup.vjs-volume-menu-button-horizontal .vjs-menu {
   left: -2em;
 }
 
-.video-js .vjs-menu-button.vjs-volume-menu-button .vjs-menu .vjs-menu-content {
+.video-js .vjs-menu-button.vjs-menu-button-popup.vjs-volume-menu-button .vjs-menu .vjs-menu-content {
   height: 0;
   width: 0;
 

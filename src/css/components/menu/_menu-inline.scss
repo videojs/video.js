@@ -1,0 +1,56 @@
+.video-js .vjs-menu-button-inline {
+  @include transition(all 0.4s);
+
+  overflow: hidden;
+}
+
+.video-js .vjs-menu-button.vjs-menu-button-inline:before {
+  // Icon pseudoelement has a different base font size (1.8em), so we need to
+  // account for that in the width. 4em (standard button width) divided by 1.8
+  // to get the same button width as normal.
+  width: 2.222222222em;
+}
+
+.video-js .vjs-menu-button-inline .vjs-menu {
+  opacity: 0;
+  height: 100%;
+  width: auto;
+
+  position: absolute;
+  left: 2.2222222em;
+  top: 0;
+
+  padding: 0;
+  margin: 0;
+
+  @include transition(all 0.2s);
+}
+
+.video-js.vjs-no-flex .vjs-menu-button-inline .vjs-menu {
+  position: relative;
+  width: 0;
+}
+
+.video-js.vjs-no-flex .vjs-menu-button-inline:hover .vjs-menu {
+  width: auto;
+}
+
+.video-js .vjs-menu-button-inline .vjs-menu .vjs-menu-content {
+  width: auto;
+  height: 100%;
+  margin: 0;
+
+  overflow: hidden;
+}
+
+// Hover state
+.video-js .vjs-menu-button-inline:hover {
+  // This width is currently specific to the inline volume bar.
+  width: 10em;
+}
+
+.video-js .vjs-menu-button.vjs-menu-button-inline:hover .vjs-menu,
+.video-js .vjs-menu-button-inline .vjs-menu.vjs-lock-showing {
+  display: block;
+  opacity: 1;
+}

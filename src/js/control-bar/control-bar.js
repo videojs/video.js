@@ -46,6 +46,7 @@ ControlBar.prototype.options_ = {
   loadEvent: 'play',
   children: [
     'playToggle',
+    'volumeMenuButton',
     'currentTimeDisplay',
     'timeDivider',
     'durationDisplay',
@@ -59,7 +60,6 @@ ControlBar.prototype.options_ = {
     'chaptersButton',
     'subtitlesButton',
     'captionsButton',
-    'volumeMenuButton',
     'fullscreenToggle'
   ]
 };
