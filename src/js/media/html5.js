@@ -452,7 +452,7 @@ vjs.Html5.prototype.addRemoteTextTrack = function(options) {
 
   track['onload'] = function() {
     var tt = track['track'];
-    if (track.readyState >= 2) {
+    if (track.readyState >= 2 && !track.hasAttribute('default')) {
       if (tt['kind'] === 'metadata' && tt['mode'] !== 'hidden') {
         tt['mode'] = 'hidden';
       } else if (tt['kind'] !== 'metadata' && tt['mode'] !== 'disabled') {
