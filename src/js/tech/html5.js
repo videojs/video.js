@@ -72,6 +72,22 @@ class Html5 extends Tech {
       this.handleTextTrackAdd_ = Fn.bind(this, this.handleTextTrackAdd);
       this.handleTextTrackRemove_ = Fn.bind(this, this.handleTextTrackRemove);
       this.proxyNativeTextTracks_();
+
+      // native captions load on demand. Sometimes, some of the tracks get loaded in by default
+      // by the user agent. We don't want the user agent to load stuff by default
+      // (unless it's a `default` track) so we add an `onload` handler to `disable` the tracks.
+      // However, if a user chooses the track, we want to let it through.
+      // `playing` is our arbitrary cutoff for user-agent vs user events.
+      this.one('playing', function() {
+        this.textTracks().addEventListener('change', Fn.bind(this, function() {
+          let tracks = this.el().querySelectorAll('track');
+          for (let i = 0; i < tracks.length; i++) {
+            if (tracks[i].track.mode === 'showing') {
+              tracks[i].onload = null;
+            }
+          }
+        }));
+      });
     }
 
     // Determine if native controls should be used
@@ -705,7 +721,7 @@ class Html5 extends Tech {
 
     track['onload'] = function() {
       var tt = track['track'];
-      if (track.readyState >= 2) {
+      if (track.readyState >= 2 && !track.hasAttribute('default')) {
         if (tt['kind'] === 'metadata' && tt['mode'] !== 'hidden') {
           tt['mode'] = 'hidden';
         } else if (tt['kind'] !== 'metadata' && tt['mode'] !== 'disabled') {
