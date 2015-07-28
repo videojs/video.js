@@ -77,7 +77,7 @@ vjs.Html5 = vjs.MediaTechController.extend({
             }
           }
         }));
-      })
+      });
     }
 
     // Determine if native controls should be used
