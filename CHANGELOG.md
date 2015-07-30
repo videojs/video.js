@@ -80,6 +80,7 @@ CHANGELOG
 * @mmcc Added &quot;inline&quot; option to MenuButton and updated VolumeMenuButton to be able to utilize it ([view](https://github.com/videojs/video.js/pull/2378))
 * @misteroneill restore some properties on window.videojs. ([view](https://github.com/videojs/video.js/pull/2395))
 * @misteroneill restore some 4.x utilities and remove deprecated functionality ([view](https://github.com/videojs/video.js/pull/2406))
+* @heff use a synchronous ready() internally ([view](https://github.com/videojs/video.js/pull/2392))
 
 --------------------
 

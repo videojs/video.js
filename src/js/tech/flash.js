@@ -28,11 +28,11 @@ class Flash extends Tech {
   constructor(options, ready){
     super(options, ready);
 
-    // If source was supplied pass as a flash var.
+    // Set the source when ready
     if (options.source) {
       this.ready(function(){
         this.setSource(options.source);
-      });
+      }, true);
     }
 
     // Having issues with Flash reloading on certain page actions (hide/resize/fullscreen) in certain browsers
@@ -42,7 +42,7 @@ class Flash extends Tech {
         this.load();
         this.play();
         this.currentTime(options.startTime);
-      });
+      }, true);
     }
 
     // Add global window functions that the swf expects

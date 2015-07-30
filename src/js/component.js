@@ -745,14 +745,19 @@ class Component {
    * it will trigger the function immediately.
    *
    * @param  {Function} fn Ready listener
+   * @param  {Boolean} sync Exec the listener synchronously if component is ready
    * @return {Component}
    * @method ready
    */
-  ready(fn) {
+  ready(fn, sync=false) {
     if (fn) {
       if (this.isReady_) {
-        // Ensure function is always called asynchronously
-        this.setTimeout(fn, 1);
+        if (sync) {
+          fn.call(this);
+        } else {
+          // Call the function asynchronously by default for consistency
+          this.setTimeout(fn, 1);
+        }
       } else {
         this.readyQueue_ = this.readyQueue_ || [];
         this.readyQueue_.push(fn);
