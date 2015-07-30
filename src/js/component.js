@@ -30,7 +30,7 @@ import mergeOptions from './utils/merge-options.js';
  *       <div class="vjs-button">Button</div>
  *     </div>
  * ```
- * Components are also event emitters.
+ * Components are also event targets.
  * ```js
  *     button.on('click', function(){
  *       console.log('Button Clicked!');

@@ -4,7 +4,6 @@
 import document from 'global/document';
 import window from 'global/window';
 import  * as Guid from './guid.js';
-import roundFloat from './round-float.js';
 
 /**
  * Shorthand for document.getElementById()
@@ -56,7 +55,7 @@ export function createEl(tagName='div', properties={}){
 
 /**
  * Insert an element as the first child node of another
- * 
+ *
  * @param  {Element} child   Element to insert
  * @param  {Element} parent Element to insert child into
  * @private
@@ -271,7 +270,7 @@ export function getElAttributes(tag) {
 /**
  * Attempt to block the ability to select text while dragging controls
  *
- * @return {Boolean} 
+ * @return {Boolean}
  * @method blockTextSelection
  */
 export function blockTextSelection() {
@@ -284,7 +283,7 @@ export function blockTextSelection() {
 /**
  * Turn off text selection blocking
  *
- * @return {Boolean} 
+ * @return {Boolean}
  * @method unblockTextSelection
  */
 export function unblockTextSelection() {
@@ -295,11 +294,11 @@ export function unblockTextSelection() {
 
 /**
  * Offset Left
- * getBoundingClientRect technique from 
+ * getBoundingClientRect technique from
  * John Resig http://ejohn.org/blog/getboundingclientrect-is-awesome/
  *
  * @param {Element} el Element from which to get offset
- * @return {Object=} 
+ * @return {Object=}
  * @method findElPosition
  */
 export function findElPosition(el) {
@@ -329,7 +328,7 @@ export function findElPosition(el) {
 
   // Android sometimes returns slightly off decimal values, so need to round
   return {
-    left: roundFloat(left),
-    top: roundFloat(top)
+    left: Math.round(left),
+    top: Math.round(top)
   };
 }

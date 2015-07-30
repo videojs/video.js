@@ -7,7 +7,7 @@ import * as Guid from '../utils/guid.js';
 import * as browser from '../utils/browser.js';
 import * as TextTrackEnum from './text-track-enums';
 import log from '../utils/log.js';
-import EventEmitter from '../event-emitter';
+import EventTarget from '../event-target';
 import document from 'global/document';
 import window from 'global/window';
 import XHR from '../xhr.js';
@@ -186,7 +186,7 @@ let TextTrack = function(options={}) {
   }
 };
 
-TextTrack.prototype = Object.create(EventEmitter.prototype);
+TextTrack.prototype = Object.create(EventTarget.prototype);
 TextTrack.prototype.constructor = TextTrack;
 
 /*

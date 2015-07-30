@@ -7,7 +7,6 @@ import LoadProgressBar from './load-progress-bar.js';
 import PlayProgressBar from './play-progress-bar.js';
 import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
-import roundFloat from '../../utils/round-float.js';
 
 /**
  * Seek Bar and holder for the progress bars
@@ -46,7 +45,7 @@ class SeekBar extends Slider {
   updateARIAAttributes() {
       // Allows for smooth scrubbing, when player can't keep up.
       let time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
-      this.el_.setAttribute('aria-valuenow', roundFloat(this.getPercent()*100, 2)); // machine readable value of progress bar (percentage complete)
+      this.el_.setAttribute('aria-valuenow', (this.getPercent() * 100).toFixed(2)); // machine readable value of progress bar (percentage complete)
       this.el_.setAttribute('aria-valuetext', formatTime(time, this.player_.duration())); // human readable value of progress bar (time complete)
   }
 

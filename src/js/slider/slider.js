@@ -3,7 +3,6 @@
  */
 import Component from '../component.js';
 import * as Dom from '../utils/dom.js';
-import roundFloat from '../utils/round-float.js';
 import document from 'global/document';
 import assign from 'object.assign';
 
@@ -130,7 +129,7 @@ class Slider extends Component {
     }
 
     // Convert to a percentage for setting
-    let percentage = roundFloat(progress * 100, 2) + '%';
+    let percentage = (progress * 100).toFixed(2) + '%';
 
     // Set the new bar width or height
     if (this.vertical()) {

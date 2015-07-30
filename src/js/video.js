@@ -4,6 +4,7 @@
 import document from 'global/document';
 import * as setup from './setup';
 import Component from './component';
+import EventTarget from './event-target';
 import globalOptions from './global-options.js';
 import Player from './player';
 import plugin from './plugins.js';
@@ -16,6 +17,7 @@ import log from './utils/log.js';
 import xhr from './xhr.js';
 import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
+import * as Url from './utils/url.js';
 import extendsFn from './extends.js';
 import merge from 'lodash-compat/object/merge';
 import createDeprecationProxy from './utils/create-deprecation-proxy.js';
@@ -208,12 +210,23 @@ videojs.getComponent = Component.getComponent;
  */
 videojs.registerComponent = Component.registerComponent;
 
-/*
+/**
  * A suite of browser and device tests
  *
  * @type {Object}
+ * @private
  */
 videojs.browser = browser;
+
+/**
+ * Whether or not the browser supports touch events. Included for backward
+ * compatibility with 4.x, but deprecated. Use `videojs.browser.TOUCH_ENABLED`
+ * instead going forward.
+ *
+ * @deprecated
+ * @type {Boolean}
+ */
+videojs.TOUCH_ENABLED = browser.TOUCH_ENABLED;
 
 /**
  * Subclass an existing class
@@ -413,6 +426,22 @@ videojs.createTimeRange = createTimeRange;
  * @returns {Object}                  The request
  */
 videojs.xhr = xhr;
+
+/**
+ * Resolve and parse the elements of a URL
+ *
+ * @param  {String} url The url to parse
+ * @return {Object}     An object of url details
+ * @method parseUrl
+ */
+videojs.parseUrl = Url.parseUrl;
+
+/**
+ * Event target class.
+ *
+ * @type {Function}
+ */
+videojs.EventTarget = EventTarget;
 
 // REMOVING: We probably should add this to the migration plugin
 // // Expose but deprecate the window[componentName] method for accessing components
