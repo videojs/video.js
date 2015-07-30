@@ -18,6 +18,7 @@ import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
 import extendsFn from './extends.js';
 import merge from 'lodash-compat/object/merge';
+import createDeprecationProxy from './utils/create-deprecation-proxy.js';
 
 // Include the built-in techs
 import Html5 from './tech/html5.js';
@@ -112,6 +113,18 @@ videojs.VERSION = '__VERSION__';
 videojs.getGlobalOptions = () => globalOptions;
 
 /**
+ * For backward compatibility, expose global options.
+ *
+ * @deprecated
+ * @memberOf videojs
+ * @property {Object|Proxy} options
+ */
+videojs.options = createDeprecationProxy(globalOptions, {
+  get: 'Access to videojs.options is deprecated; use videojs.getGlobalOptions instead',
+  set: 'Modification of videojs.options is deprecated; use videojs.setGlobalOptions instead'
+});
+
+/**
  * Set options that will apply to every player
  * ```js
  *     videojs.setGlobalOptions({
@@ -140,6 +153,18 @@ videojs.setGlobalOptions = function(newOptions) {
 videojs.getPlayers = function() {
   return Player.players;
 };
+
+/**
+ * For backward compatibility, expose players object.
+ *
+ * @deprecated
+ * @memberOf videojs
+ * @property {Object|Proxy} players
+ */
+videojs.players = createDeprecationProxy(Player.players, {
+  get: 'Access to videojs.players is deprecated; use videojs.getPlayers instead',
+  set: 'Modification of videojs.players is deprecated'
+});
 
 /**
  * Get a component class object by name

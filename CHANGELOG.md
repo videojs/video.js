@@ -78,6 +78,7 @@ CHANGELOG
 * @eXon made sure the volume persists between tech changes ([view](https://github.com/videojs/video.js/pull/2340))
 * @eXon added the language to the options the tech receives ([view](https://github.com/videojs/video.js/pull/2338))
 * @mmcc Added &quot;inline&quot; option to MenuButton and updated VolumeMenuButton to be able to utilize it ([view](https://github.com/videojs/video.js/pull/2378))
+* @misteroneill restore some properties on window.videojs. ([view](https://github.com/videojs/video.js/pull/2395))
 
 --------------------
 

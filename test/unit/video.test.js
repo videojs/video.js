@@ -2,6 +2,7 @@ import videojs from '../../src/js/video.js';
 import TestHelpers from './test-helpers.js';
 import Player from '../../src/js/player.js';
 import globalOptions from '../../src/js/global-options.js';
+import log from '../../src/js/utils/log.js';
 import document from 'global/document';
 
 q.module('video.js');
@@ -74,4 +75,9 @@ test('should expose plugin registry function', function() {
 
   ok(player.foo, 'should exist');
   equal(player.foo, pluginFunction, 'should be equal');
+});
+
+test('should expose options and players properties for backward-compatibility', function() {
+  ok(typeof videojs.options, 'object', 'options should be an object');
+  ok(typeof videojs.players, 'object', 'players should be an object');
 });
