@@ -13,6 +13,7 @@ import * as Fn from './utils/fn.js';
 
 import assign from 'object.assign';
 import { createTimeRange } from './utils/time-ranges.js';
+import formatTime from './utils/format-time.js';
 import log from './utils/log.js';
 import xhr from './xhr.js';
 import * as Dom from './utils/dom.js';
@@ -395,6 +396,20 @@ videojs.log = log;
  * @method createTimeRange
  */
 videojs.createTimeRange = createTimeRange;
+
+/**
+ * @file format-time.js
+ *
+ * Format seconds as a time string, H:MM:SS or M:SS
+ * Supplying a guide (in seconds) will force a number of leading zeros
+ * to cover the length of the guide
+ *
+ * @param  {Number} seconds Number of seconds to be turned into a string
+ * @param  {Number} guide   Number (in seconds) to model the string after
+ * @return {String}         Time formatted as H:MM:SS or M:SS
+ * @method formatTime
+ */
+videojs.formatTime = formatTime;
 
 /**
  * Simple http request for retrieving external files (e.g. text tracks)
