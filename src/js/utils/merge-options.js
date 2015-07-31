@@ -2,7 +2,6 @@
  * @file merge-options.js
  */
 import merge from 'lodash-compat/object/merge';
-import isArray from 'lodash-compat/lang/isArray';
 
 const isPlain = function(obj) {
   return !!obj
