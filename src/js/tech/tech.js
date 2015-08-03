@@ -312,16 +312,16 @@ class Tech extends Component {
    * @method emulateTextTracks
    */
   emulateTextTracks() {
+    let tracks = this.textTracks();
+    if (!tracks) {
+      return;
+    }
+
     if (!window['WebVTT'] && this.el().parentNode != null) {
       let script = document.createElement('script');
       script.src = this.options_['vtt.js'] || '../node_modules/vtt.js/dist/vtt.js';
       this.el().parentNode.appendChild(script);
       window['WebVTT'] = true;
-    }
-
-    let tracks = this.textTracks();
-    if (!tracks) {
-      return;
     }
 
     let textTracksChanges = Fn.bind(this, function() {
