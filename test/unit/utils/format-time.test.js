@@ -1,5 +1,7 @@
 import formatTime from '../../../src/js/utils/format-time.js';
 
+q.module('format-time');
+
 test('should format time as a string', function(){
   ok(formatTime(1) === '0:01');
   ok(formatTime(10) === '0:10');

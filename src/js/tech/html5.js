@@ -67,6 +67,11 @@ class Html5 extends Tech {
 
     if (this.featuresNativeTextTracks) {
       this.on('loadstart', Fn.bind(this, this.hideCaptions));
+
+      this.handleTextTrackChange_ = Fn.bind(this, this.handleTextTrackChange);
+      this.handleTextTrackAdd_ = Fn.bind(this, this.handleTextTrackAdd);
+      this.handleTextTrackRemove_ = Fn.bind(this, this.handleTextTrackRemove);
+      this.proxyNativeTextTracks_();
     }
 
     // Determine if native controls should be used
@@ -86,6 +91,22 @@ class Html5 extends Tech {
    * @method dispose
    */
   dispose() {
+    let tt = this.el().textTracks;
+    let emulatedTt = this.textTracks();
+
+    // remove native event listeners
+    tt.removeEventListener('change', this.handleTextTrackChange_);
+    tt.removeEventListener('addtrack', this.handleTextTrackAdd_);
+    tt.removeEventListener('removetrack', this.handleTextTrackRemove_);
+
+    // clearout the emulated text track list.
+    let i = emulatedTt.length;
+
+    while (i--) {
+      emulatedTt.removeTrack_(emulatedTt[i]);
+    }
+
+
     Html5.disposeMediaElement(this.el_);
     super.dispose();
   }
@@ -180,6 +201,32 @@ class Html5 extends Tech {
         track.mode = 'disabled';
       }
     }
+  }
+
+  proxyNativeTextTracks_() {
+    let tt = this.el().textTracks;
+
+    tt.addEventListener('change', this.handleTextTrackChange_);
+    tt.addEventListener('addtrack', this.handleTextTrackAdd_);
+    tt.addEventListener('removetrack', this.handleTextTrackRemove_);
+  }
+
+  handleTextTrackChange(e) {
+    let tt = this.textTracks();
+    this.textTracks().trigger({
+      type: 'change',
+      target: tt,
+      currentTarget: tt,
+      srcElement: tt
+    });
+  }
+
+  handleTextTrackAdd(e) {
+    this.textTracks().addTrack_(e.track);
+  }
+
+  handleTextTrackRemove(e) {
+    this.textTracks().removeTrack_(e.track);
   }
 
   /**
@@ -593,11 +640,7 @@ class Html5 extends Tech {
    * @method textTracks
    */
   textTracks() {
-    if (!this['featuresNativeTextTracks']) {
-      return super.textTracks();
-    }
-
-    return this.el_.textTracks;
+    return super.textTracks();
   }
 
   /**
@@ -692,12 +735,12 @@ class Html5 extends Tech {
 
     this.remoteTextTracks().removeTrack_(track);
 
-    tracks = this.el()['querySelectorAll']('track');
+    tracks = this.el().querySelectorAll('track');
 
-    for (i = 0; i < tracks.length; i++) {
-      if (tracks[i] === track || tracks[i]['track'] === track) {
-        tracks[i]['parentNode']['removeChild'](tracks[i]);
-        break;
+    i = tracks.length;
+    while (i--) {
+      if (track === tracks[i] || track === tracks[i].track) {
+        this.el().removeChild(tracks[i]);
       }
     }
   }

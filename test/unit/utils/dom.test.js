@@ -2,6 +2,8 @@ import document from 'global/document';
 import * as Dom from '../../../src/js/utils/dom.js';
 import TestHelpers from '../test-helpers.js';
 
+q.module('dom');
+
 test('should return the element with the ID', function(){
   var el1 = document.createElement('div');
   var el2 = document.createElement('div');
