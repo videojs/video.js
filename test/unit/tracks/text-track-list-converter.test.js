@@ -22,14 +22,14 @@ let cleanup = (item) => {
 };
 
 if (Html5.supportsNativeTextTracks()) {
-  q.test('trackToJson produces correct representation for native track object', function(a) {
+  q.test('trackToJson_ produces correct representation for native track object', function(a) {
     let track = document.createElement('track');
     track.src = 'http://example.com/english.vtt';
     track.kind = 'captions';
     track.srclang = 'en';
     track.label = 'English';
 
-    a.deepEqual(cleanup(c.trackToJson(track.track)), {
+    a.deepEqual(cleanup(c.trackToJson_(track.track)), {
       src: undefined,
       kind: 'captions',
       label: 'English',
@@ -133,7 +133,7 @@ if (Html5.supportsNativeTextTracks()) {
   });
 }
 
-q.test('trackToJson produces correct representation for emulated track object', function(a) {
+q.test('trackToJson_ produces correct representation for emulated track object', function(a) {
   let track = new TextTrack({
     kind: 'captions',
     label: 'English',
@@ -142,7 +142,7 @@ q.test('trackToJson produces correct representation for emulated track object', 
     tech: {}
   });
 
-  a.deepEqual(cleanup(c.trackToJson(track)), {
+  a.deepEqual(cleanup(c.trackToJson_(track)), {
     src: 'http://example.com/english.vtt',
     kind: 'captions',
     label: 'English',
