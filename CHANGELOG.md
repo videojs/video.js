@@ -82,6 +82,7 @@ CHANGELOG
 * @misteroneill restore some 4.x utilities and remove deprecated functionality ([view](https://github.com/videojs/video.js/pull/2406))
 * @heff use a synchronous ready() internally ([view](https://github.com/videojs/video.js/pull/2392))
 * @nickygerritsen scrubbing() is a method, not a property ([view](https://github.com/videojs/video.js/pull/2411))
+* @sirlancelot change &quot;video&quot; to &quot;media&quot; in error messages ([view](https://github.com/videojs/video.js/pull/2409))
 
 --------------------
 

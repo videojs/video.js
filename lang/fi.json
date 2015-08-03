@@ -18,9 +18,9 @@
   "Captions": "Tekstitys",
   "captions off": "Tekstitys pois",
   "Chapters": "Kappaleet",
-  "You aborted the video playback": "Olet keskeyttänyt videotoiston.",
-  "A network error caused the video download to fail part-way.": "Verkkovirhe keskeytti videon latauksen.",
-  "The video could not be loaded, either because the server or network failed or because the format is not supported.": "Videon lataus ei onnistunut joko palvelin- tai verkkovirheestä tai väärästä formaatista johtuen.",
-  "The video playback was aborted due to a corruption problem or because the video used features your browser did not support.": "Videon toisto keskeytyi, koska video on vaurioitunut tai käyttää käyttää toimintoja, joita selaimesi ei tue.",
-  "No compatible source was found for this video.": "Tälle videolle ei löytynyt yhteensopivaa lähdettä."
+  "You aborted the media playback": "Olet keskeyttänyt videotoiston.",
+  "A network error caused the media download to fail part-way.": "Verkkovirhe keskeytti videon latauksen.",
+  "The media could not be loaded, either because the server or network failed or because the format is not supported.": "Videon lataus ei onnistunut joko palvelin- tai verkkovirheestä tai väärästä formaatista johtuen.",
+  "The media playback was aborted due to a corruption problem or because the media used features your browser did not support.": "Videon toisto keskeytyi, koska media on vaurioitunut tai käyttää käyttää toimintoja, joita selaimesi ei tue.",
+  "No compatible source was found for this media.": "Tälle videolle ei löytynyt yhteensopivaa lähdettä."
 }
