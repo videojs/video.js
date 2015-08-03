@@ -850,6 +850,37 @@ Html5.supportsNativeTextTracks = function() {
   return supportsTextTracks;
 };
 
+/**
+ * An array of events available on the Html5 tech.
+ *
+ * @private
+ * @type {Array}
+ */
+Html5.Events = [
+  'loadstart',
+  'suspend',
+  'abort',
+  'error',
+  'emptied',
+  'stalled',
+  'loadedmetadata',
+  'loadeddata',
+  'canplay',
+  'canplaythrough',
+  'playing',
+  'waiting',
+  'seeking',
+  'seeked',
+  'ended',
+  'durationchange',
+  'timeupdate',
+  'progress',
+  'play',
+  'pause',
+  'ratechange',
+  'volumechange'
+];
+
 /*
  * Set the tech's volume control support status
  *
