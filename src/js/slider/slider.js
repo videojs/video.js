@@ -113,7 +113,7 @@ class Slider extends Component {
 
     // If scrubbing, we could use a cached value to make the handle keep up with the user's mouse.
     // On HTML5 browsers scrubbing is really smooth, but some flash players are slow, so we might want to utilize this later.
-    // var progress =  (this.player_.scrubbing) ? this.player_.getCache().currentTime / this.player_.duration() : this.player_.currentTime() / this.player_.duration();
+    // var progress =  (this.player_.scrubbing()) ? this.player_.getCache().currentTime / this.player_.duration() : this.player_.currentTime() / this.player_.duration();
     let progress = this.getPercent();
     let bar = this.bar;
 
