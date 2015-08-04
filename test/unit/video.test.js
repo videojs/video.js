@@ -59,6 +59,15 @@ test('should add the value to the languages object with lower case lang code', f
   deepEqual(result, globalOptions['languages'][code.toLowerCase()], 'should also match');
 });
 
+test('should allow setting global options', function() {
+  videojs.setGlobalOptions({
+    nonsense: true
+  });
+
+  equal(videojs.getGlobalOptions().nonsense, true, 'set the new option');
+  deepEqual(videojs.options, videojs.getGlobalOptions(), 'updated the options property');
+});
+
 test('should expose plugin registry function', function() {
   var pluginName, pluginFunction, player;
 

@@ -142,7 +142,7 @@ videojs.options = createDeprecationProxy(globalOptions, {
  * @method setGlobalOptions
  */
 videojs.setGlobalOptions = function(newOptions) {
-  return mergeOptions(globalOptions, newOptions);
+  return merge(globalOptions, newOptions);
 };
 
 /**
@@ -264,7 +264,7 @@ videojs.TOUCH_ENABLED = browser.TOUCH_ENABLED;
 videojs.extends = extendsFn;
 
 /**
- * Merge two options objects recursively
+ * Merge options objects recursively
  * Performs a deep merge like lodash.merge but **only merges plain objects**
  * (not arrays, elements, anything else)
  * Other values will be copied directly from the second object.
@@ -288,9 +288,7 @@ videojs.extends = extendsFn;
  *     // result.bar.b = [4,5,6];
  * ```
  *
- * @param {Object} The options object whose values will be overriden
- * @param {Object} The options object with values to override the first
- * @param {Object} Any number of additional options objects
+ * @param  {...Object} source One or more objects to merge
  *
  * @return {Object} a new object with the merged values
  * @mixes videojs
