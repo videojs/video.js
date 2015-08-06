@@ -87,6 +87,7 @@ CHANGELOG
 * @nickygerritsen use the default seekable when a source handler is unset ([view](https://github.com/videojs/video.js/pull/2401))
 * @gkatsev always use emulated TextTrackLists so tracks survive tech switches ([view](https://github.com/videojs/video.js/pull/2425))
 * @misteroneill restore Html5.Events ([view](https://github.com/videojs/video.js/pull/2421))
+* @misteroneill removed the deprecated Component init method ([view](https://github.com/videojs/video.js/pull/2427))
 
 --------------------
 

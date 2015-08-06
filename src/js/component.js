@@ -98,12 +98,6 @@ class Component {
     }
   }
 
-  // Temp for ES6 class transition, remove before 5.0
-  init() {
-    // console.log('init called on Component');
-    Component.apply(this, arguments);
-  }
-
   /**
    * Dispose of the component and all child components
    *
