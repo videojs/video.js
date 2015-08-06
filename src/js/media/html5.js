@@ -59,6 +59,27 @@ vjs.Html5 = vjs.MediaTechController.extend({
       }
     }
 
+    if (this['featuresNativeTextTracks']) {
+      this.on('loadstart', vjs.bind(this, this.hideCaptions));
+
+      // native captions load on demand. Sometimes, some of the tracks get loaded in by default
+      // by the user agent. We don't want the user agent to load stuff by default
+      // (unless it's a `default` track) so we add an `onload` handler to `disable` the tracks.
+      // However, if a user chooses the track, we want to let it through.
+      // `playing` is our arbitrary cutoff for user-agent vs user events.
+      this.one('playing', function() {
+        this.textTracks().addEventListener('change', vjs.bind(this, function() {
+          var tracks = this.el().querySelectorAll('track'),
+              i = 0;
+          for (; i < tracks.length; i++) {
+            if (tracks[i]['track']['mode'] === 'showing') {
+              tracks[i]['onload'] = null;
+            }
+          }
+        }));
+      });
+    }
+
     // Determine if native controls should be used
     // Our goal should be to get the custom controls on mobile solid everywhere
     // so we can remove this all together. Right now this will block custom
@@ -159,6 +180,25 @@ vjs.Html5.prototype.createEl = function(){
 
   return el;
   // jenniisawesome = true;
+};
+
+
+vjs.Html5.prototype.hideCaptions = function() {
+  var tracks = this.el_.querySelectorAll('track'),
+      track,
+      i = tracks.length,
+      kinds = {
+        'captions': 1,
+        'subtitles': 1
+      };
+
+  while (i--) {
+    track = tracks[i].track;
+    if ((track && track['kind'] in kinds) &&
+        (!tracks[i]['default'])) {
+      track.mode = 'disabled';
+    }
+  }
 };
 
 // Make video events trigger player events
@@ -412,9 +452,11 @@ vjs.Html5.prototype.addRemoteTextTrack = function(options) {
 
   track['onload'] = function() {
     var tt = track['track'];
-    if (track.readyState >= 2) {
+    if (track.readyState >= 2 && !track.hasAttribute('default')) {
       if (tt['kind'] === 'metadata' && tt['mode'] !== 'hidden') {
         tt['mode'] = 'hidden';
+      } else if (tt['kind'] !== 'metadata' && tt['mode'] !== 'disabled') {
+        tt['mode'] = 'disabled';
       }
       track['onload'] = null;
     }
