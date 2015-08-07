@@ -1,14 +1,32 @@
 module.exports = function(grunt) {
   require('time-grunt')(grunt);
 
+  let _ = require('lodash-compat');
   let pkg = grunt.file.readJSON('package.json');
   let license = grunt.file.read('build/license-header.txt');
+  let bannerCommonData = _.pick(pkg, ['version', 'copyright']);
   let verParts = pkg.version.split('.');
   let version = {
     full: pkg.version,
     major: verParts[0],
     minor: verParts[1],
     patch: verParts[2]
+  };
+
+  /**
+   * Creates processor functions for license banners.
+   *
+   * @private
+   * @param  {Object} data Custom data overriding `bannerCommonData`. Will
+   *                       not be mutated.
+   * @return {Function}    A function which returns a processed grunt template
+   *                       using an object constructed from `bannerCommonData`
+   *                       and the `data` argument.
+   */
+  let createLicenseProcessor = (data) => function () {
+    return grunt.template.process(license, {
+      data: _.merge({}, bannerCommonData, data)
+    });
   };
 
   version.majorMinor = `${version.major}.${version.minor}`;
@@ -49,6 +67,7 @@ module.exports = function(grunt) {
       },
       build: {
         files: {
+          'build/temp/alt/video.novtt.min.js': 'build/temp/alt/video.novtt.js',
           'build/temp/video.min.js': 'build/temp/video.js'
         }
       }
@@ -223,7 +242,6 @@ module.exports = function(grunt) {
           debug: true,
           standalone: 'videojs'
         },
-        banner: license,
         plugin: [
           ['browserify-derequire']
         ],
@@ -293,6 +311,13 @@ module.exports = function(grunt) {
       }
     },
     concat: {
+      novtt: {
+        options: {
+          separator: '\n'
+        },
+        src: ['build/temp/video.js'],
+        dest: 'build/temp/video.novtt.js'
+      },
       vtt: {
         options: {
           separator: '\n',
@@ -317,6 +342,24 @@ module.exports = function(grunt) {
         'watch',
         'browserify:watch'
       ]
+    },
+    usebanner: {
+      novtt: {
+        options: {
+          process: createLicenseProcessor({includesVtt: false})
+        },
+        files: {
+          src: ['build/temp/alt/video.novtt.js']
+        }
+      },
+      vtt: {
+        options: {
+          process: createLicenseProcessor({includesVtt: true})
+        },
+        files: {
+          src: ['build/temp/video.js']
+        }
+      }
     }
   });
 
@@ -331,8 +374,11 @@ module.exports = function(grunt) {
     'jshint',
     'browserify:build',
     'exorcise:build',
-    'copy:novtt',
+    'concat:novtt',
     'concat:vtt',
+    'copy:novtt',
+    'usebanner:novtt',
+    'usebanner:vtt',
     'uglify',
 
     'sass',

@@ -44,7 +44,7 @@
     "es5-shim": "^4.1.3",
     "grunt": "^0.4.4",
     "grunt-aws-s3": "^0.12.1",
-    "grunt-banner": "^0.3.1",
+    "grunt-banner": "^0.4.0",
     "grunt-browserify": "3.5.1",
     "grunt-cli": "~0.1.0",
     "grunt-concurrent": "^1.0.0",
