@@ -499,6 +499,7 @@ class Player extends Component {
       'playerId': this.id(),
       'techId': `${this.id()}_${techName}_api`,
       'textTracks': this.textTracks_,
+      'tracks': this.options_.tracks,
       'autoplay': this.options_.autoplay,
       'preload': this.options_.preload,
       'loop': this.options_.loop,
