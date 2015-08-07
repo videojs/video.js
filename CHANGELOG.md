@@ -83,7 +83,6 @@ CHANGELOG
 * @heff use a synchronous ready() internally ([view](https://github.com/videojs/video.js/pull/2392))
 * @nickygerritsen scrubbing() is a method, not a property ([view](https://github.com/videojs/video.js/pull/2411))
 * @sirlancelot change &quot;video&quot; to &quot;media&quot; in error messages ([view](https://github.com/videojs/video.js/pull/2409))
-* @sirlancelot change &quot;video&quot; to &quot;media&quot; in error messages ([view](https://github.com/videojs/video.js/pull/2409))
 * @nickygerritsen use the default seekable when a source handler is unset ([view](https://github.com/videojs/video.js/pull/2401))
 * @gkatsev always use emulated TextTrackLists so tracks survive tech switches ([view](https://github.com/videojs/video.js/pull/2425))
 * @misteroneill restore Html5.Events ([view](https://github.com/videojs/video.js/pull/2421))
