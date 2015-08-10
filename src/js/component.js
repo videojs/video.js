@@ -501,6 +501,12 @@ class Component {
           return;
         }
 
+        // Allow options to be passed as a simple boolean if no configuration
+        // is necessary.
+        if (opts === true) {
+          opts = {};
+        }
+
         // We also want to pass the original player options to each component as well so they don't need to
         // reach back into the player for options later.
         opts.playerOptions = this.options_.playerOptions;
