@@ -91,6 +91,7 @@ CHANGELOG
 * @misteroneill restore videojs.formatTime ([view](https://github.com/videojs/video.js/pull/2420))
 * @misteroneill include child components with &#x60;true&#x60; in options ([view](https://github.com/videojs/video.js/pull/2424))
 * @misteroneill create video.novtt.js in dist builds ([view](https://github.com/videojs/video.js/pull/2447))
+* @misteroneill pass vtt.js option to tech ([view](https://github.com/videojs/video.js/pull/2448))
 
 --------------------
 

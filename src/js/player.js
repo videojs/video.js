@@ -505,7 +505,8 @@ class Player extends Component {
       'loop': this.options_.loop,
       'muted': this.options_.muted,
       'poster': this.poster(),
-      'language': this.language()
+      'language': this.language(),
+      'vtt.js': this.options_['vtt.js']
     }, this.options_[techName.toLowerCase()]);
 
     if (this.tag) {
