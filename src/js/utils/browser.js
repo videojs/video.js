@@ -4,7 +4,7 @@
 import document from 'global/document';
 import window from 'global/window';
 
-const USER_AGENT = window.navigator.userAgent;
+export const USER_AGENT = window.navigator.userAgent;
 
 /*
  * Device is an iPhone
