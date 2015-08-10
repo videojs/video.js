@@ -88,6 +88,7 @@ CHANGELOG
 * @gkatsev always use emulated TextTrackLists so tracks survive tech switches ([view](https://github.com/videojs/video.js/pull/2425))
 * @misteroneill restore Html5.Events ([view](https://github.com/videojs/video.js/pull/2421))
 * @misteroneill removed the deprecated Component init method ([view](https://github.com/videojs/video.js/pull/2427))
+* @misteroneill restore videojs.formatTime ([view](https://github.com/videojs/video.js/pull/2420))
 
 --------------------
 
