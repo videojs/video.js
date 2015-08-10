@@ -152,7 +152,7 @@ class Slider extends Component {
     let boxH = el.offsetHeight;
     let handle = this.handle;
 
-    if (this.options_['vertical']) {
+    if (this.vertical()) {
       let boxY = box.top;
 
       let pageY;
