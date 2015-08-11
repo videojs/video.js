@@ -131,6 +131,9 @@ class Player extends Component {
 
     // Set controls
     this.controls_ = !!options.controls;
+
+    // Set the muted value
+    this.muted_ = !!options.muted;
     // Original tag settings stored in options
     // now remove immediately so native controls don't flash.
     // May be turned back on by HTML5 tech if nativeControlsForTouch is true
@@ -197,9 +200,6 @@ class Player extends Component {
 
     // Make player easily findable by ID
     Player.players[this.id_] = this;
-
-    // We need to explicitly mute (if set) so the controls are in sync with the video element.
-    this.muted(!!options.muted);
 
     // When the player is first initialized, trigger activity so components
     // like the control bar show themselves if needed
@@ -506,7 +506,7 @@ class Player extends Component {
       'autoplay': this.options_.autoplay,
       'preload': this.options_.preload,
       'loop': this.options_.loop,
-      'muted': this.options_.muted,
+      'muted': this.muted_,
       'poster': this.poster(),
       'language': this.language(),
       'vtt.js': this.options_['vtt.js']

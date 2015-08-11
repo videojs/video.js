@@ -6,7 +6,7 @@ import Component from '../component';
 import * as Dom from '../utils/dom.js';
 
 /**
- * A button component for muting the audio 
+ * A button component for muting the audio
  *
  * @param {Player|Object} player
  * @param {Object=} options
@@ -25,7 +25,9 @@ class MuteToggle extends Button {
       this.addClass('vjs-hidden');
     }
 
-    this.on(player, 'loadstart', function(){
+    this.on(player, 'loadstart', function() {
+      this.update(); // We need to update the button to account for a default muted state.
+
       if (player.tech['featuresVolumeControl'] === false) {
         this.addClass('vjs-hidden');
       } else {

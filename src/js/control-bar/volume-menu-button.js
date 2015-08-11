@@ -39,6 +39,7 @@ class VolumeMenuButton extends MenuButton {
 
     // Same listeners as MuteToggle
     this.on(player, 'volumechange', this.volumeUpdate);
+    this.on(player, 'loadstart', this.volumeUpdate);
 
     // hide mute toggle if the current tech doesn't support volume control
     if (player.tech && player.tech['featuresVolumeControl'] === false) {
