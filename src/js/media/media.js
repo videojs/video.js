@@ -332,6 +332,14 @@ vjs.MediaTechController.prototype.emulateTextTracks = function() {
 };
 
 /**
+ * Returns the current source object that was sent to a source handler.
+ * @returns {Object} current source object
+ */
+vjs.MediaTechController.prototype.currentSource = function(){
+  return this.currentSource_;
+};
+
+/**
  * Provide default methods for text tracks.
  *
  * Html5 tech overrides these.

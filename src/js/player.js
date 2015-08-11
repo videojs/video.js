@@ -1223,6 +1223,14 @@ vjs.Player.prototype.load = function(){
 };
 
 /**
+ * Returns the currently configured source object.
+ * @return {String} The current source object
+ */
+vjs.Player.prototype.currentSource = function(){
+    return this.techGet('currentSource') || {};
+};
+
+/**
  * Returns the fully qualified URL of the current source value e.g. http://mysite.com/video.mp4
  * Can be used in conjuction with `currentType` to assist in rebuilding the current source object.
  * @return {String} The current source
