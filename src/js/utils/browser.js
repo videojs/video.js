@@ -52,6 +52,7 @@ export const IS_OLD_ANDROID = IS_ANDROID && (/webkit/i).test(USER_AGENT) && ANDR
 export const IS_FIREFOX = (/Firefox/i).test(USER_AGENT);
 export const IS_CHROME = (/Chrome/i).test(USER_AGENT);
 export const IS_IE8 = (/MSIE\s8\.0/).test(USER_AGENT);
+export const IS_SAFARI = (/Safari/i).test(USER_AGENT) && (!IS_CHROME) && (!IS_ANDROID);
 
 export const TOUCH_ENABLED = !!(('ontouchstart' in window) || window.DocumentTouch && document instanceof window.DocumentTouch);
 export const BACKGROUND_SIZE_SUPPORTED = 'backgroundSize' in document.createElement('video').style;
