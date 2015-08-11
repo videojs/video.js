@@ -5,7 +5,6 @@ import document from 'global/document';
 import * as setup from './setup';
 import Component from './component';
 import EventTarget from './event-target';
-import globalOptions from './global-options.js';
 import Player from './player';
 import plugin from './plugins.js';
 import mergeOptions from '../../src/js/utils/merge-options.js';
@@ -62,7 +61,7 @@ var videojs = function(id, options, ready){
     }
 
     // If a player instance has already been created for this ID return it.
-    if (Player.players[id]) {
+    if (videojs.getPlayers()[id]) {
 
       // If options or ready funtion are passed, warn
       if (options) {
@@ -70,10 +69,10 @@ var videojs = function(id, options, ready){
       }
 
       if (ready) {
-        Player.players[id].ready(ready);
+        videojs.getPlayers()[id].ready(ready);
       }
 
-      return Player.players[id];
+      return videojs.getPlayers()[id];
 
     // Otherwise get element for ID
     } else {
@@ -107,44 +106,17 @@ setup.autoSetupTimeout(1, videojs);
 videojs.VERSION = '__VERSION__';
 
 /**
- * Get the global options object
+ * The global options object. These are the settings that take effect
+ * if no overrides are specified when the player is created.
  *
- * @return {Object} The global options object
- * @mixes videojs
- * @method getGlobalOptions
- */
-videojs.getGlobalOptions = () => globalOptions;
-
-/**
- * For backward compatibility, expose global options.
- *
- * @deprecated
- * @memberOf videojs
- * @property {Object|Proxy} options
- */
-videojs.options = createDeprecationProxy(globalOptions, {
-  get: 'Access to videojs.options is deprecated; use videojs.getGlobalOptions instead',
-  set: 'Modification of videojs.options is deprecated; use videojs.setGlobalOptions instead'
-});
-
-/**
- * Set options that will apply to every player
  * ```js
- *     videojs.setGlobalOptions({
- *       autoplay: true
- *     });
+ *     videojs.options.autoplay = true
  *     // -> all players will autoplay by default
  * ```
- * NOTE: This will do a deep merge with the new options,
- * not overwrite the entire global options object.
  *
- * @return {Object} The updated global options object
- * @mixes videojs
- * @method setGlobalOptions
+ * @type {Object}
  */
-videojs.setGlobalOptions = function(newOptions) {
-  return mergeOptions(globalOptions, newOptions);
-};
+videojs.options = Player.prototype.options_;
 
 /**
  * Get an object with the currently created players, keyed by player ID
@@ -377,7 +349,7 @@ videojs.plugin = plugin;
  */
 videojs.addLanguage = function(code, data){
   code = ('' + code).toLowerCase();
-  return merge(globalOptions.languages, { [code]: data })[code];
+  return merge(videojs.options.languages, { [code]: data })[code];
 };
 
 /**
