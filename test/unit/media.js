@@ -222,6 +222,7 @@ test('should add the source hanlder interface to a tech', function(){
   // Pass a source through the source handler process of a tech instance
   tech.setSource(sourceA);
   strictEqual(tech.currentSource_, sourceA, 'sourceA was handled and stored');
+  strictEqual(tech.currentSource(), sourceA, 'sourceA was retrievable after being handled and stored.');
   ok(tech.sourceHandler_.dispose, 'the handlerOne state instance was stored');
 
   // Check that the handler dipose method works
