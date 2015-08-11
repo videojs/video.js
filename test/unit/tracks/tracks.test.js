@@ -308,8 +308,8 @@ test('when switching techs, we should not get a new text track', function() {
   ok(htmltracks === flashtracks, 'the tracks are equal');
 });
 
-if (Html5.supportsNativeTextTracks()) {
-  test('listen to remove and add track events in native text tracks', function(assert) {
+if (Html5.supportsNativeTextTracks() && ('removetrack' in Html5.TEST_VID.textTracks)) {
+  test('listen to native remove and add track events in native text tracks', function(assert) {
     let done = assert.async();
 
     let el = document.createElement('video');
@@ -357,6 +357,5 @@ if (Html5.supportsNativeTextTracks()) {
       done();
     };
     emulatedTt.on('addtrack', addtrack);
-
   });
 }
