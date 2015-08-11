@@ -9,6 +9,7 @@ q.module('Text Track List Converter');
 let clean = (item) => {
   delete item.id;
   delete item.inBandMetadataTrackDispatchType;
+  delete item.cues;
 };
 
 let cleanup = (item) => {
@@ -34,8 +35,7 @@ if (Html5.supportsNativeTextTracks()) {
       kind: 'captions',
       label: 'English',
       language: 'en',
-      mode: 'disabled',
-      cues: null
+      mode: 'disabled'
     }, 'the json output is same');
   });
 
@@ -76,15 +76,13 @@ if (Html5.supportsNativeTextTracks()) {
       kind: 'captions',
       label: 'Spanish',
       language: 'es',
-      mode: 'disabled',
-      cues: null
+      mode: 'disabled'
     }, {
       src: 'http://example.com/english.vtt',
       kind: 'captions',
       label: 'English',
       language: 'en',
-      mode: 'disabled',
-      cues: null
+      mode: 'disabled'
     }], 'the output is correct');
   });
 
@@ -147,8 +145,7 @@ q.test('trackToJson_ produces correct representation for emulated track object',
     kind: 'captions',
     label: 'English',
     language: 'en',
-    mode: 'disabled',
-    cues: null
+    mode: 'disabled'
   }, 'the json output is same');
 });
 
@@ -191,15 +188,13 @@ q.test('textTracksToJson produces good json output for emulated only', function(
     kind: 'captions',
     label: 'Spanish',
     language: 'es',
-    mode: 'disabled',
-    cues: null
+    mode: 'disabled'
   }, {
     src: 'http://example.com/english.vtt',
     kind: 'captions',
     label: 'English',
     language: 'en',
-    mode: 'disabled',
-    cues: null
+    mode: 'disabled'
   }], 'the output is correct');
 });
 
