@@ -29,3 +29,16 @@ test('should merge options objects', function(){
     d: true
   }, 'options objects merged correctly');
 });
+
+test('should not mutate the first argument', function(){
+  let obj = {
+    prop: {
+      a: 'a'
+    }
+  };
+  let merged = mergeOptions(obj, { prop: { b: 'b' } });
+
+  ok(obj !== merged, 'did not return the original');
+  deepEqual(merged, { prop: { a: 'a', b: 'b' } }, 'merged the sub object');
+  ok(!('b' in obj.prop), 'did not mutate the original');
+});
