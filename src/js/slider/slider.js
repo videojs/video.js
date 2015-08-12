@@ -20,10 +20,10 @@ class Slider extends Component {
     super(player, options);
 
     // Set property names to bar to match with the child Slider class is looking for
-    this.bar = this.getChild(this.options_['barName']);
+    this.bar = this.getChild(this.options_.barName);
 
     // Set a horizontal or vertical class on the slider depending on the slider type
-    this.vertical(!!this.options_['vertical']);
+    this.vertical(!!this.options_.vertical);
 
     this.on('mousedown', this.handleMouseDown);
     this.on('touchstart', this.handleMouseDown);
