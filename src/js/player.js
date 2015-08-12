@@ -132,8 +132,6 @@ class Player extends Component {
     // Set controls
     this.controls_ = !!options.controls;
 
-    // Set the muted value
-    this.muted_ = !!options.muted;
     // Original tag settings stored in options
     // now remove immediately so native controls don't flash.
     // May be turned back on by HTML5 tech if nativeControlsForTouch is true
@@ -506,7 +504,7 @@ class Player extends Component {
       'autoplay': this.options_.autoplay,
       'preload': this.options_.preload,
       'loop': this.options_.loop,
-      'muted': this.muted_,
+      'muted': this.options_.muted,
       'poster': this.poster(),
       'language': this.language(),
       'vtt.js': this.options_['vtt.js']
