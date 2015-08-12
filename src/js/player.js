@@ -17,7 +17,6 @@ import { createTimeRange } from './utils/time-ranges.js';
 import { bufferedPercent } from './utils/buffer.js';
 import FullscreenApi from './fullscreen-api.js';
 import MediaError from './media-error.js';
-import globalOptions from './global-options.js';
 import safeParseTuple from 'safe-json-parse/tuple';
 import assign from 'object.assign';
 import mergeOptions from './utils/merge-options.js';
@@ -91,7 +90,6 @@ class Player extends Component {
     // Run base component initializing with new options
     super(null, options, ready);
 
-
     // if the global option object was accidentally blown away by
     // someone, bail early with an informative error
     if (!this.options_ ||
@@ -108,7 +106,7 @@ class Player extends Component {
     this.tagAttributes = tag && Dom.getElAttributes(tag);
 
     // Update current language
-    this.language(options.language || globalOptions.language);
+    this.language(this.options_.language);
 
     // Update Supported Languages
     if (options.languages) {
@@ -120,7 +118,7 @@ class Player extends Component {
       });
       this.languages_ = languagesToLower;
     } else {
-      this.languages_ = globalOptions.languages;
+      this.languages_ = Player.prototype.options_.languages;
     }
 
     // Cache for video property values.
@@ -151,7 +149,7 @@ class Player extends Component {
     // as well so they don't need to reach back into the player for options later.
     // We also need to do another copy of this.options_ so we don't end up with
     // an infinite loop.
-    let playerOptionsCopy = mergeOptions({}, this.options_);
+    let playerOptionsCopy = mergeOptions(this.options_);
 
     // Load plugins
     if (options.plugins) {
@@ -2403,7 +2401,7 @@ class Player extends Component {
    * @method languages
    */
   languages() {
-    return  mergeOptions(globalOptions.languages, this.languages_);
+    return  mergeOptions(Player.prototype.options_.languages, this.languages_);
   }
 
   /**
@@ -2488,17 +2486,54 @@ class Player extends Component {
  */
 Player.players = {};
 
+let navigator = window.navigator;
 /*
  * Player instance options, surfaced using options
  * options = Player.prototype.options_
  * Make changes in options, not here.
- * All options should use string keys so they avoid
- * renaming by closure compiler
  *
  * @type {Object}
  * @private
  */
-Player.prototype.options_ = globalOptions;
+Player.prototype.options_ = {
+  // Default order of fallback technology
+  techOrder: ['html5','flash'],
+  // techOrder: ['flash','html5'],
+
+  html5: {},
+  flash: {},
+
+  // defaultVolume: 0.85,
+  defaultVolume: 0.00, // The freakin seaguls are driving me crazy!
+
+  // default inactivity timeout
+  inactivityTimeout: 2000,
+
+  // default playback rates
+  playbackRates: [],
+  // Add playback rate selection by adding rates
+  // 'playbackRates': [0.5, 1, 1.5, 2],
+
+  // Included control sets
+  children: {
+    mediaLoader: {},
+    posterImage: {},
+    textTrackDisplay: {},
+    loadingSpinner: {},
+    bigPlayButton: {},
+    controlBar: {},
+    errorDisplay: {},
+    textTrackSettings: {}
+  },
+
+  language: document.getElementsByTagName('html')[0].getAttribute('lang') || navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language || 'en',
+
+  // locales and their language translations
+  languages: {},
+
+  // Default message to show when a video cannot be played.
+  notSupportedMessage: 'No compatible source was found for this video.'
+};
 
 /**
  * Fired when the player has initial duration and dimension information

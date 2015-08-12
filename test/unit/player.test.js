@@ -1,6 +1,5 @@
 import Player from '../../src/js/player.js';
 import videojs from '../../src/js/video.js';
-import globalOptions from '../../src/js/global-options.js';
 import * as Dom from '../../src/js/utils/dom.js';
 import * as browser from '../../src/js/utils/browser.js';
 import log from '../../src/js/utils/log.js';
@@ -58,36 +57,36 @@ test('should create player instance that inherits from component and dispose it'
   ok(player.el() === null, 'element disposed');
 });
 
+// technically, all uses of videojs.options should be replaced with
+// Player.prototype.options_ in this file and a equivalent test using
+// videojs.options should be made in video.test.js. Keeping this here
+// until we make that move.
 test('should accept options from multiple sources and override in correct order', function(){
-  // For closure compiler to work, all reference to the prop have to be the same type
-  // As in options['attr'] or options.attr. Compiler will minimize each separately.
-  // Since we're using setAttribute which requires a string, we have to use the string
-  // version of the key for all version.
 
   // Set a global option
-  globalOptions['attr'] = 1;
+  videojs.options.attr = 1;
 
-  var tag0 = TestHelpers.makeTag();
-  var player0 = new Player(tag0);
+  let tag0 = TestHelpers.makeTag();
+  let player0 = new Player(tag0);
 
-  ok(player0.options_['attr'] === 1, 'global option was set');
+  equal(player0.options_.attr, 1, 'global option was set');
   player0.dispose();
 
   // Set a tag level option
-  var tag1 = TestHelpers.makeTag();
-  tag1.setAttribute('attr', 'asdf'); // Attributes must be set as strings
+  let tag2 = TestHelpers.makeTag();
+  tag2.setAttribute('attr', 'asdf'); // Attributes must be set as strings
 
-  var player1 = new Player(tag1);
-  ok(player1.options_['attr'] === 'asdf', 'Tag options overrode global options');
-  player1.dispose();
+  let player2 = new Player(tag2);
+  equal(player2.options_.attr, 'asdf', 'Tag options overrode global options');
+  player2.dispose();
 
   // Set a tag level option
-  var tag2 = TestHelpers.makeTag();
-  tag2.setAttribute('attr', 'asdf');
+  let tag3 = TestHelpers.makeTag();
+  tag3.setAttribute('attr', 'asdf');
 
-  var player2 = new Player(tag2, { 'attr': 'fdsa' });
-  ok(player2.options_['attr'] === 'fdsa', 'Init options overrode tag and global options');
-  player2.dispose();
+  let player3 = new Player(tag3, { 'attr': 'fdsa' });
+  equal(player3.options_.attr, 'fdsa', 'Init options overrode tag and global options');
+  player3.dispose();
 });
 
 test('should get tag, source, and track settings', function(){
@@ -739,14 +738,14 @@ test('should be scrubbing while seeking', function(){
 });
 
 test('should throw on startup no techs are specified', function() {
-  const techOrder = globalOptions.techOrder;
+  const techOrder = videojs.options.techOrder;
 
-  globalOptions.techOrder = null;
+  videojs.options.techOrder = null;
   q.throws(function() {
     videojs(TestHelpers.makeTag());
   }, 'a falsey techOrder should throw');
 
-  globalOptions.techOrder = techOrder;
+  videojs.options.techOrder = techOrder;
 });
 
 test('should have a sensible toJSON that is equivalent to player.options', function() {

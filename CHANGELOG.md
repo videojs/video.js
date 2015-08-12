@@ -93,6 +93,7 @@ CHANGELOG
 * @misteroneill pass vtt.js option to tech ([view](https://github.com/videojs/video.js/pull/2448))
 * @forbesjo updated the sauce labs config and browser versions ([view](https://github.com/videojs/video.js/pull/2450))
 * @mmcc made sure controls respect muted attribute ([view](https://github.com/videojs/video.js/pull/2408))
+* @dmlap switched global options back to an object at videojs.options ([view](https://github.com/videojs/video.js/pull/2461))
 
 --------------------
 
