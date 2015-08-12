@@ -62,7 +62,7 @@ module.exports = function(config) {
     browserNoActivityTimeout: 60000,
 
     sauceLabs: {
-      startConnect: true,
+      startConnect: false,
       tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
       build: process.env.TRAVIS_BUILD_NUMBER,
       testName: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH,
@@ -111,45 +111,37 @@ module.exports = function(config) {
 function getCustomLaunchers(){
   return {
     chrome_sl: {
-      singleRun: true,
       base: 'SauceLabs',
       browserName: 'chrome',
-      platform: 'Windows 8.1',
-      version: '34'
+      platform: 'Windows 8.1'
     },
 
     firefox_sl: {
-      singleRun: true,
       base: 'SauceLabs',
       browserName: 'firefox',
-      platform: 'Linux',
-      version: '29'
+      platform: 'Linux'
     },
 
     safari_sl: {
-      singleRun: true,
       base: 'SauceLabs',
       browserName: 'safari',
       platform: 'OS X 10.10'
     },
 
     ipad_sl: {
-      singleRun: true,
       base: 'SauceLabs',
       browserName: 'ipad',
-      platform:'OS X 10.9',
-      version: '7.1'
+      platform: 'OS X 10.10',
+      version: '8.4'
     },
 
     android_sl: {
-      singleRun: true,
       base: 'SauceLabs',
       browserName: 'android',
       platform:'Linux'
     },
 
     ie_sl: {
-      singleRun: true,
       base: 'SauceLabs',
       browserName: 'internet explorer',
       platform: 'Windows 8.1',
