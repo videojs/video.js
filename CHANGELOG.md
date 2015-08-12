@@ -94,7 +94,7 @@ CHANGELOG
 * @forbesjo updated the sauce labs config and browser versions ([view](https://github.com/videojs/video.js/pull/2450))
 * @mmcc made sure controls respect muted attribute ([view](https://github.com/videojs/video.js/pull/2408))
 * @dmlap switched global options back to an object at videojs.options ([view](https://github.com/videojs/video.js/pull/2461))
-* @misteroneill fixed a potential issue with vertical sliders by replacing an options check with the appropriate getter ([view](https://github.com/videojs/video.js/pull/2460))
+* @ogun fixed a typo in the Turkish translation ([view](https://github.com/videojs/video.js/pull/2460))
 
 --------------------
 
