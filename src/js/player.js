@@ -106,7 +106,7 @@ class Player extends Component {
     this.tagAttributes = tag && Dom.getElAttributes(tag);
 
     // Update current language
-    this.language(options.language);
+    this.language(this.options_.language);
 
     // Update Supported Languages
     if (options.languages) {
