@@ -893,6 +893,9 @@ Html5.supportsNativeTextTracks = function() {
   if (supportsTextTracks && browser.IS_FIREFOX) {
     supportsTextTracks = false;
   }
+  if (supportsTextTracks && ('onremovetrack' in Html5.TEST_VID.textTracks)) {
+    supportsTextTracks = false;
+  }
 
   return supportsTextTracks;
 };
