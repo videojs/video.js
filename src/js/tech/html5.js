@@ -95,7 +95,7 @@ class Html5 extends Tech {
     let emulatedTt = this.textTracks();
 
     // remove native event listeners
-    if (tt && tt.removeEventListener) {
+    if (tt) {
       tt.removeEventListener('change', this.handleTextTrackChange_);
       tt.removeEventListener('addtrack', this.handleTextTrackAdd_);
       tt.removeEventListener('removetrack', this.handleTextTrackRemove_);
@@ -208,7 +208,7 @@ class Html5 extends Tech {
   proxyNativeTextTracks_() {
     let tt = this.el().textTracks;
 
-    if (tt && tt.addEventListener) {
+    if (tt) {
       tt.addEventListener('change', this.handleTextTrackChange_);
       tt.addEventListener('addtrack', this.handleTextTrackAdd_);
       tt.addEventListener('removetrack', this.handleTextTrackRemove_);

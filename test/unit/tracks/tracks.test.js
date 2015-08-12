@@ -308,7 +308,7 @@ test('when switching techs, we should not get a new text track', function() {
   ok(htmltracks === flashtracks, 'the tracks are equal');
 });
 
-if (Html5.supportsNativeTextTracks() && ('removetrack' in Html5.TEST_VID.textTracks)) {
+if (Html5.supportsNativeTextTracks() && ('onremovetrack' in Html5.TEST_VID.textTracks)) {
   test('listen to native remove and add track events in native text tracks', function(assert) {
     let done = assert.async();
 
