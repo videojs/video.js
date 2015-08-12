@@ -57,6 +57,10 @@ test('should create player instance that inherits from component and dispose it'
   ok(player.el() === null, 'element disposed');
 });
 
+// technically, all uses of videojs.options should be replaced with
+// Player.prototype.options_ in this file and a equivalent test using
+// videojs.options should be made in video.test.js. Keeping this here
+// until we make that move.
 test('should accept options from multiple sources and override in correct order', function(){
 
   // Set a global option
@@ -115,14 +119,14 @@ test('should get tag, source, and track settings', function(){
   ok(player.el().className.indexOf('video-js') !== -1, 'transferred class from tag to player div');
   ok(player.el().id === 'example_1', 'transferred id from tag to player div');
 
-  ok(videojs.getPlayers()[player.id()] === player, 'player referenceable from global list');
+  ok(Player.players[player.id()] === player, 'player referenceable from global list');
   ok(tag.id !== player.id, 'tag ID no longer is the same as player ID');
   ok(tag.className !== player.el().className, 'tag classname updated');
 
   player.dispose();
 
   ok(tag['player'] !== player, 'tag player ref killed');
-  ok(!videojs.getPlayers()['example_1'], 'global player ref killed');
+  ok(!Player.players['example_1'], 'global player ref killed');
   ok(player.el() === null, 'player el killed');
 });
 
@@ -446,7 +450,7 @@ test('should register players with generated ids', function(){
   id = player.el().id;
 
   equal(player.el().id, player.id(), 'the player and element ids are equal');
-  ok(videojs.getPlayers()[id], 'the generated id is registered');
+  ok(Player.players[id], 'the generated id is registered');
 });
 
 test('should not add multiple first play events despite subsequent loads', function() {

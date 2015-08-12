@@ -28,7 +28,7 @@ const customizer = function(destination, source) {
   // and also protects from later changes the to first object affecting
   // the second object's values.
   if (!isPlain(destination)) {
-    return mergeOptions({}, source);
+    return mergeOptions(source);
   }
 };
 
