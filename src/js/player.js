@@ -111,26 +111,27 @@ class Player extends Component {
     this.language(options.language || globalOptions.language);
 
     // Update Supported Languages
-    if (options['languages']) {
+    if (options.languages) {
       // Normalise player option languages to lowercase
       let languagesToLower = {};
 
-      Object.getOwnPropertyNames(options['languages']).forEach(function(name) {
-        languagesToLower[name.toLowerCase()] = options['languages'][name];
+      Object.getOwnPropertyNames(options.languages).forEach(function(name) {
+        languagesToLower[name.toLowerCase()] = options.languages[name];
       });
       this.languages_ = languagesToLower;
     } else {
-      this.languages_ = globalOptions['languages'];
+      this.languages_ = globalOptions.languages;
     }
 
     // Cache for video property values.
     this.cache_ = {};
 
     // Set poster
-    this.poster_ = options['poster'] || '';
+    this.poster_ = options.poster || '';
 
     // Set controls
-    this.controls_ = !!options['controls'];
+    this.controls_ = !!options.controls;
+
     // Original tag settings stored in options
     // now remove immediately so native controls don't flash.
     // May be turned back on by HTML5 tech if nativeControlsForTouch is true
@@ -153,8 +154,8 @@ class Player extends Component {
     let playerOptionsCopy = mergeOptions({}, this.options_);
 
     // Load plugins
-    if (options['plugins']) {
-      let plugins = options['plugins'];
+    if (options.plugins) {
+      let plugins = options.plugins;
 
       Object.getOwnPropertyNames(plugins).forEach(function(name){
         plugins[name].playerOptions = playerOptionsCopy;
@@ -225,8 +226,8 @@ class Player extends Component {
 
     // Kill reference to this player
     Player.players[this.id_] = null;
-    if (this.tag && this.tag['player']) { this.tag['player'] = null; }
-    if (this.el_ && this.el_['player']) { this.el_['player'] = null; }
+    if (this.tag && this.tag.player) { this.tag.player = null; }
+    if (this.el_ && this.el_.player) { this.el_.player = null; }
 
     if (this.tech) { this.tech.dispose(); }
 
@@ -268,7 +269,7 @@ class Player extends Component {
     tag.className = 'vjs-tech';
 
     // Make player findable on elements
-    tag['player'] = el['player'] = this;
+    tag.player = el.player = this;
     // Default state of video is paused
     this.addClass('vjs-paused');
 
@@ -279,10 +280,10 @@ class Player extends Component {
     el.appendChild(this.styleEl_);
 
     // Pass in the width/height/aspectRatio options which will update the style el
-    this.width(this.options_['width']);
-    this.height(this.options_['height']);
-    this.fluid(this.options_['fluid']);
-    this.aspectRatio(this.options_['aspectRatio']);
+    this.width(this.options_.width);
+    this.height(this.options_.height);
+    this.fluid(this.options_.fluid);
+    this.aspectRatio(this.options_.aspectRatio);
 
     // insertElFirst seems to cause the networkState to flicker from 3 to 2, so
     // keep track of the original for later so we can know if the source originally failed
@@ -516,7 +517,7 @@ class Player extends Component {
     if (source) {
       this.currentType_ = source.type;
       if (source.src === this.cache_.src && this.cache_.currentTime > 0) {
-        techOptions['startTime'] = this.cache_.currentTime;
+        techOptions.startTime = this.cache_.currentTime;
       }
 
       this.cache_.src = source.src;
@@ -812,8 +813,8 @@ class Player extends Component {
   handleTechFirstPlay() {
     //If the first starttime attribute is specified
     //then we will start at the given offset in seconds
-    if(this.options_['starttime']){
-      this.currentTime(this.options_['starttime']);
+    if(this.options_.starttime){
+      this.currentTime(this.options_.starttime);
     }
 
     this.addClass('vjs-has-started');
@@ -852,7 +853,7 @@ class Player extends Component {
    */
   handleTechEnded() {
     this.addClass('vjs-ended');
-    if (this.options_['loop']) {
+    if (this.options_.loop) {
       this.currentTime(0);
       this.play();
     } else if (!this.paused()) {
@@ -1492,12 +1493,12 @@ class Player extends Component {
       // when canceling fullscreen. Otherwise if there's multiple
       // players on a page, they would all be reacting to the same fullscreen
       // events
-      Events.on(document, fsApi['fullscreenchange'], Fn.bind(this, function documentFullscreenChange(e){
+      Events.on(document, fsApi.fullscreenchange, Fn.bind(this, function documentFullscreenChange(e){
         this.isFullscreen(document[fsApi.fullscreenElement]);
 
         // If cancelling fullscreen, remove event listener.
         if (this.isFullscreen() === false) {
-          Events.off(document, fsApi['fullscreenchange'], documentFullscreenChange);
+          Events.off(document, fsApi.fullscreenchange, documentFullscreenChange);
         }
 
         this.trigger('fullscreenchange');
@@ -1613,7 +1614,7 @@ class Player extends Component {
    */
   selectSource(sources) {
     // Loop through each playback technology in the options order
-    for (var i=0,j=this.options_['techOrder'];i<j.length;i++) {
+    for (var i=0,j=this.options_.techOrder;i<j.length;i++) {
       let techName = toTitleCase(j[i]);
       let tech = Component.getComponent(techName);
 
@@ -1630,7 +1631,7 @@ class Player extends Component {
           var source = b[a];
 
           // Check if source can be played with this technology
-          if (tech['canPlaySource'](source)) {
+          if (tech.canPlaySource(source)) {
             return { source: source, tech: techName };
           }
         }
@@ -1692,7 +1693,7 @@ class Player extends Component {
     } else if (source instanceof Object) {
       // check if the source has a type and the loaded tech cannot play the source
       // if there's no type we'll just try the current tech
-      if (source.type && !currentTech['canPlaySource'](source)) {
+      if (source.type && !currentTech.canPlaySource(source)) {
         // create a source list with the current source and send through
         // the tech loop to check for a compatible technology
         this.sourceList_([source]);
@@ -1713,11 +1714,11 @@ class Player extends Component {
             this.techCall('src', source.src);
           }
 
-          if (this.options_['preload'] === 'auto') {
+          if (this.options_.preload === 'auto') {
             this.load();
           }
 
-          if (this.options_['autoplay']) {
+          if (this.options_.autoplay) {
             this.play();
           }
 
@@ -1750,7 +1751,7 @@ class Player extends Component {
     } else {
       // We need to wrap this in a timeout to give folks a chance to add error event handlers
       this.setTimeout( function() {
-        this.error({ code: 4, message: this.localize(this.options_['notSupportedMessage']) });
+        this.error({ code: 4, message: this.localize(this.options_.notSupportedMessage) });
       }, 0);
 
       // we could not find an appropriate tech, but let's still notify the delegate that this is it
@@ -1804,7 +1805,7 @@ class Player extends Component {
   preload(value) {
     if (value !== undefined) {
       this.techCall('setPreload', value);
-      this.options_['preload'] = value;
+      this.options_.preload = value;
       return this;
     }
     return this.techGet('preload');
@@ -1821,7 +1822,7 @@ class Player extends Component {
   autoplay(value) {
     if (value !== undefined) {
       this.techCall('setAutoplay', value);
-      this.options_['autoplay'] = value;
+      this.options_.autoplay = value;
       return this;
     }
     return this.techGet('autoplay', value);
@@ -2402,7 +2403,7 @@ class Player extends Component {
    * @method languages
    */
   languages() {
-    return  mergeOptions(globalOptions['languages'], this.languages_);
+    return  mergeOptions(globalOptions.languages, this.languages_);
   }
 
   /**
@@ -2468,9 +2469,9 @@ class Player extends Component {
         // Change case needed: http://ejohn.org/blog/nodename-case-sensitivity/
         const childName = child.nodeName.toLowerCase();
         if (childName === 'source') {
-          baseOptions['sources'].push(Dom.getElAttributes(child));
+          baseOptions.sources.push(Dom.getElAttributes(child));
         } else if (childName === 'track') {
-          baseOptions['tracks'].push(Dom.getElAttributes(child));
+          baseOptions.tracks.push(Dom.getElAttributes(child));
         }
       }
     }
