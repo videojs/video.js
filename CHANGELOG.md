@@ -96,6 +96,7 @@ CHANGELOG
 * @dmlap switched global options back to an object at videojs.options ([view](https://github.com/videojs/video.js/pull/2461))
 * @ogun fixed a typo in the Turkish translation ([view](https://github.com/videojs/video.js/pull/2460))
 * @gkatsev fixed text track errors on dispose and in cross-browser testing ([view](https://github.com/videojs/video.js/pull/2466))
+* @mmcc added type=button to button components ([view](https://github.com/videojs/video.js/pull/2471))
 
 --------------------
 
