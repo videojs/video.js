@@ -146,19 +146,17 @@ class Component {
    * Deep merge of options objects
    * Whenever a property is an object on both options objects
    * the two properties will be merged using mergeOptions.
-   * This is used for merging options for child components. We
-   * want it to be easy to override individual options on a child
-   * component without having to rewrite all the other default options.
+   *
    * ```js
    *     Parent.prototype.options_ = {
-   *       children: {
+   *       optionSet: {
    *         'childOne': { 'foo': 'bar', 'asdf': 'fdsa' },
    *         'childTwo': {},
    *         'childThree': {}
    *       }
    *     }
    *     newOptions = {
-   *       children: {
+   *       optionSet: {
    *         'childOne': { 'foo': 'baz', 'abc': '123' }
    *         'childTwo': null,
    *         'childFour': {}
@@ -170,7 +168,7 @@ class Component {
    * RESULT
    * ```js
    *     {
-   *       children: {
+   *       optionSet: {
    *         'childOne': { 'foo': 'baz', 'asdf': 'fdsa', 'abc': '123' },
    *         'childTwo': null, // Disabled. Won't be initialized.
    *         'childThree': {},
@@ -324,16 +322,14 @@ class Component {
    *
    *     var myButton = myComponent.addChild('MyButton');
    *     // -> <div class='my-component'><div class="my-button">myButton<div></div>
-   *     // -> myButton === myComonent.children()[0];
+   *     // -> myButton === myComponent.children()[0];
    * ```
    * Pass in options for child constructors and options for children of the child
    * ```js
    *     var myButton = myComponent.addChild('MyButton', {
    *       text: 'Press Me',
-   *       children: {
-   *         buttonChildExample: {
-   *           buttonChildOption: true
-   *         }
+   *       buttonChildExample: {
+   *         buttonChildOption: true
    *       }
    *     });
    * ```
@@ -449,24 +445,29 @@ class Component {
    * ```js
    *     // when an instance of MyComponent is created, all children in options
    *     // will be added to the instance by their name strings and options
-   *     MyComponent.prototype.options_.children = {
+   *     MyComponent.prototype.options_ = {
+   *       children: [
+   *         'myChildComponent'
+   *       ],
    *       myChildComponent: {
    *         myChildOption: true
    *       }
-   *     }
-   * ```
+   *     };
+   *
    *     // Or when creating the component
-   * ```js
    *     var myComp = new MyComponent(player, {
-   *       children: {
-   *         myChildComponent: {
-   *           myChildOption: true
-   *         }
+   *       children: [
+   *         'myChildComponent'
+   *       ],
+   *       myChildComponent: {
+   *         myChildOption: true
    *       }
    *     });
    * ```
-   * The children option can also be an Array of child names or
+   * The children option can also be an array of
    * child options objects (that also include a 'name' key).
+   * This can be used if you have two child components of the
+   * same type that need different options.
    * ```js
    *     var myComp = new MyComponent(player, {
    *       children: [
@@ -474,6 +475,10 @@ class Component {
    *         {
    *           name: 'button',
    *           someOtherOption: true
+   *         },
+   *         {
+   *           name: 'button',
+   *           someOtherOption: false
    *         }
    *       ]
    *     });

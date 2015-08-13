@@ -2566,16 +2566,16 @@ Player.prototype.options_ = {
   // 'playbackRates': [0.5, 1, 1.5, 2],
 
   // Included control sets
-  children: {
-    mediaLoader: {},
-    posterImage: {},
-    textTrackDisplay: {},
-    loadingSpinner: {},
-    bigPlayButton: {},
-    controlBar: {},
-    errorDisplay: {},
-    textTrackSettings: {}
-  },
+  children: [
+    'mediaLoader',
+    'posterImage',
+    'textTrackDisplay',
+    'loadingSpinner',
+    'bigPlayButton',
+    'controlBar',
+    'errorDisplay',
+    'textTrackSettings'
+  ],
 
   language: document.getElementsByTagName('html')[0].getAttribute('lang') || navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language || 'en',
 
