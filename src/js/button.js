@@ -37,16 +37,17 @@ class Button extends Component {
    * @return {Element}
    * @method createEl
    */
-  createEl(type='button', props={}) {
+  createEl(tag='button', props={}) {
     // Add standard Aria and Tabindex info
     props = assign({
       className: this.buildCSSClass(),
       'role': 'button',
+      'type': 'button', // Necessary since the default button type is "submit"
       'aria-live': 'polite', // let the screen reader user know that the text of the button may change
       tabIndex: 0
     }, props);
 
-    let el = super.createEl(type, props);
+    let el = super.createEl(tag, props);
 
     this.controlTextEl_ = Dom.createEl('span', {
       className: 'vjs-control-text'
