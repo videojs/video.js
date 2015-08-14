@@ -15,6 +15,7 @@ import log from './utils/log.js';
 import toTitleCase from './utils/to-title-case.js';
 import { createTimeRange } from './utils/time-ranges.js';
 import { bufferedPercent } from './utils/buffer.js';
+import * as stylesheet from './utils/stylesheet.js';
 import FullscreenApi from './fullscreen-api.js';
 import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
@@ -274,8 +275,10 @@ class Player extends Component {
     // Add a style element in the player that we'll use to set the width/height
     // of the player in a way that's still overrideable by CSS, just like the
     // video element
-    this.styleEl_ = document.createElement('style');
-    el.appendChild(this.styleEl_);
+    this.styleEl_ = stylesheet.getStyleElement('vjs-styles-dimensions');
+    let defaultsStyleEl = document.querySelector('.vjs-styles-defaults');
+    let head = document.querySelector('head');
+    head.insertBefore(this.styleEl_, defaultsStyleEl ? defaultsStyleEl.nextSibling : head.firstChild);
 
     // Pass in the width/height/aspectRatio options which will update the style el
     this.width(this.options_.width);
@@ -448,17 +451,16 @@ class Player extends Component {
     // Ensure the right class is still on the player for the style element
     this.addClass(idClass);
 
-    // Create the width/height CSS
-    var css = `.${idClass} { width: ${width}px; height: ${height}px; }`;
-    // Add the aspect ratio CSS for when using a fluid layout
-    css += `.${idClass}.vjs-fluid { padding-top: ${ratioMultiplier  * 100}%; }`;
-
-    // Update the style el
-    if (this.styleEl_.styleSheet){
-      this.styleEl_.styleSheet.cssText = css;
-    } else {
-      this.styleEl_.innerHTML = css;
-    }
+    stylesheet.clearStylesheet(this.styleEl_.sheet);
+    stylesheet.addCssRules(this.styleEl_.sheet, [
+      ['.' + idClass,
+        ['width', width + 'px'],
+        ['height', height + 'px']
+      ],
+      ['.' + idClass + '.vjs-fluid',
+        ['padding-top', (ratioMultiplier*100) + '%']
+      ]
+    ]);
   }
 
   /**
