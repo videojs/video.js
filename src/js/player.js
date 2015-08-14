@@ -321,10 +321,12 @@ vjs.Player.prototype.loadTech = function(techName, source){
 
   if (source) {
     this.currentType_ = source.type;
+
     if (source.src == this.cache_.src && this.cache_.currentTime > 0) {
       techOptions['startTime'] = this.cache_.currentTime;
     }
 
+    this.cache_.source = source;
     this.cache_.src = source.src;
   }
 
@@ -1155,6 +1157,7 @@ vjs.Player.prototype.src = function(source){
       // the tech loop to check for a compatible technology
       this.sourceList_([source]);
     } else {
+      this.cache_.source = source;
       this.cache_.src = source.src;
       this.currentType_ = source.type || '';
 
@@ -1201,6 +1204,8 @@ vjs.Player.prototype.sourceList_ = function(sources){
       // load this technology with the chosen source
       this.loadTech(sourceTech.tech, sourceTech.source);
     }
+
+    this.cache_.sources = sources;
   } else {
     // We need to wrap this in a timeout to give folks a chance to add error event handlers
     this.setTimeout( function() {
@@ -1220,6 +1225,22 @@ vjs.Player.prototype.sourceList_ = function(sources){
 vjs.Player.prototype.load = function(){
   this.techCall('load');
   return this;
+};
+
+/**
+ * Returns the current source objects.
+ * @return {Object[]} The current source objects
+ */
+vjs.Player.prototype.currentSources = function(){
+  return this.cache_.sources || [this.currentSource()];
+};
+
+/**
+ * Returns the current source object.
+ * @return {Object} The current source object
+ */
+vjs.Player.prototype.currentSource = function(){
+  return this.cache_.source || {};
 };
 
 /**

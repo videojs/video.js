@@ -120,6 +120,118 @@ test('should get tag, source, and track settings', function(){
   ok(player.el() === null, 'player el killed');
 });
 
+test('should get current source from source tag', function(){
+  var fixture = document.getElementById('qunit-fixture');
+
+  var html = [
+    '<video id="example_1" class="video-js" autoplay preload="none">',
+      '<source src="http://google.com" type="video/mp4">',
+      '<source src="http://hugo.com" type="video/webm">',
+    '</video>'
+  ].join('');
+
+  fixture.innerHTML += html;
+
+  var tag = document.getElementById('example_1');
+  var player = PlayerTest.makePlayer({}, tag);
+
+  ok(player.currentSource().src === 'http://google.com');
+  ok(player.currentSource().type === 'video/mp4');
+});
+
+test('should get current sources from source tag', function(){
+  var fixture = document.getElementById('qunit-fixture');
+
+  var html = [
+    '<video id="example_1" class="video-js" autoplay preload="none">',
+      '<source src="http://google.com" type="video/mp4">',
+      '<source src="http://hugo.com" type="video/webm">',
+    '</video>'
+  ].join('');
+
+  fixture.innerHTML += html;
+
+  var tag = document.getElementById('example_1');
+  var player = PlayerTest.makePlayer({}, tag);
+
+  ok(player.currentSources()[0].src === 'http://google.com');
+  ok(player.currentSources()[0].type === 'video/mp4');
+  ok(player.currentSources()[1].src === 'http://hugo.com');
+  ok(player.currentSources()[1].type === 'video/webm');
+});
+
+test('should get current source from src set', function(){
+  var fixture = document.getElementById('qunit-fixture');
+
+  var html = '<video id="example_1" class="video-js" autoplay preload="none"></video>';
+
+  fixture.innerHTML += html;
+
+  var tag = document.getElementById('example_1');
+  var player = PlayerTest.makePlayer({}, tag);
+
+  // check for empty object
+  ok(Object.keys(player.currentSource()).length === 0);
+
+  player.src('http://google.com');
+
+  ok(player.currentSource().src === 'http://google.com');
+  ok(player.currentSource().type === undefined);
+
+  player.src({
+    src: 'http://google.com'
+  });
+
+  ok(player.currentSource().src === 'http://google.com');
+  ok(player.currentSource().type === undefined);
+
+  player.src({
+    src: 'http://google.com',
+    type: 'video/mp4'
+  });
+
+  ok(player.currentSource().src === 'http://google.com');
+  ok(player.currentSource().type === 'video/mp4');
+});
+
+test('should get current sources from src set', function(){
+  var fixture = document.getElementById('qunit-fixture');
+
+  var html = '<video id="example_1" class="video-js" autoplay preload="none"></video>';
+
+  fixture.innerHTML += html;
+
+  var tag = document.getElementById('example_1');
+  var player = PlayerTest.makePlayer({}, tag);
+
+  // check for empty object
+  ok(Object.keys(player.currentSources()[0]).length === 0);
+
+  player.src([{
+    src: 'http://google.com'
+  }, {
+    src: 'http://hugo.com'
+  }]);
+
+  ok(player.currentSources()[0].src === 'http://google.com');
+  ok(player.currentSources()[0].type === undefined);
+  ok(player.currentSources()[1].src === 'http://hugo.com');
+  ok(player.currentSources()[1].type === undefined);
+
+  player.src([{
+    src: 'http://google.com',
+    type: 'video/mp4'
+  }, {
+    src: 'http://hugo.com',
+    type: 'video/webm'
+  }]);
+
+  ok(player.currentSources()[0].src === 'http://google.com');
+  ok(player.currentSources()[0].type === 'video/mp4');
+  ok(player.currentSources()[1].src === 'http://hugo.com');
+  ok(player.currentSources()[1].type === 'video/webm');
+});
+
 test('should asynchronously fire error events during source selection', function() {
   expect(2);
 
