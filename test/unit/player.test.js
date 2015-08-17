@@ -172,7 +172,6 @@ test('should set the width, height, and aspect ratio via a css class', function(
   };
 
   // Initial state
-  ok(player.styleEl_.parentNode === player.el(), 'player has a style element');
   ok(!getStyleText(player.styleEl_), 'style element should be empty when the player is given no dimensions');
 
   // Set only the width
