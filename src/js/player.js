@@ -15,7 +15,7 @@ import log from './utils/log.js';
 import toTitleCase from './utils/to-title-case.js';
 import { createTimeRange } from './utils/time-ranges.js';
 import { bufferedPercent } from './utils/buffer.js';
-import getStyleElement from './utils/stylesheet.js';
+import * as stylesheet from './utils/stylesheet.js';
 import FullscreenApi from './fullscreen-api.js';
 import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
@@ -275,7 +275,7 @@ class Player extends Component {
     // Add a style element in the player that we'll use to set the width/height
     // of the player in a way that's still overrideable by CSS, just like the
     // video element
-    this.styleEl_ = getStyleElement('vjs-styles-dimensions');
+    this.styleEl_ = stylesheet.getStyleElement('vjs-styles-dimensions');
     let defaultsStyleEl = document.querySelector('.vjs-styles-defaults');
     let head = document.querySelector('head');
     head.insertBefore(this.styleEl_, defaultsStyleEl ? defaultsStyleEl.nextSibling : head.firstChild);
@@ -451,7 +451,7 @@ class Player extends Component {
     // Ensure the right class is still on the player for the style element
     this.addClass(idClass);
 
-    this.styleEl_.textContent = `
+    stylesheet.setTextContent(this.styleEl_, `
       .${idClass} {
         width: ${width}px;
         height: ${height}px;
@@ -460,7 +460,7 @@ class Player extends Component {
       .${idClass}.vjs-fluid {
         padding-top: ${ratioMultiplier * 100}%;
       }
-    `;
+    `);
   }
 
   /**
