@@ -223,6 +223,8 @@ class Player extends Component {
     // prevent dispose from being called twice
     this.off('dispose');
 
+    this.styleEl_.parentNode.removeChild(this.styleEl_);
+
     // Kill reference to this player
     Player.players[this.id_] = null;
     if (this.tag && this.tag.player) { this.tag.player = null; }
