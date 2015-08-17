@@ -1,6 +1,6 @@
 import document from 'global/document';
 
-export let getStyleElement = function(className) {
+export let createStyleElement = function(className) {
   let style = document.createElement('style');
   style.className = className;
 

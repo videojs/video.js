@@ -275,7 +275,7 @@ class Player extends Component {
     // Add a style element in the player that we'll use to set the width/height
     // of the player in a way that's still overrideable by CSS, just like the
     // video element
-    this.styleEl_ = stylesheet.getStyleElement('vjs-styles-dimensions');
+    this.styleEl_ = stylesheet.createStyleElement('vjs-styles-dimensions');
     let defaultsStyleEl = document.querySelector('.vjs-styles-defaults');
     let head = document.querySelector('head');
     head.insertBefore(this.styleEl_, defaultsStyleEl ? defaultsStyleEl.nextSibling : head.firstChild);

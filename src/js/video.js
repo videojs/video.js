@@ -96,7 +96,7 @@ var videojs = function(id, options, ready){
 };
 
 // Add default styles
-let style = stylesheet.getStyleElement('vjs-styles-defaults');
+let style = stylesheet.createStyleElement('vjs-styles-defaults');
 let head = document.querySelector('head');
 head.insertBefore(style, head.firstChild);
 stylesheet.setTextContent(style, `
