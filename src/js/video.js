@@ -3,7 +3,7 @@
  */
 import document from 'global/document';
 import * as setup from './setup';
-import * as stylesheet from './utils/stylesheet.js';
+import getStyleElement from './utils/stylesheet.js';
 import Component from './component';
 import EventTarget from './event-target';
 import Player from './player';
@@ -96,15 +96,14 @@ var videojs = function(id, options, ready){
 };
 
 // Add default styles
-let style = stylesheet.getStyleElement('vjs-styles-defaults');
+let style = getStyleElement('vjs-styles-defaults');
 let head = document.querySelector('head');
+style.textContent = `
+  .video-js {
+    width: 300px;
+    height: 150px;
+`;
 head.insertBefore(style, head.firstChild);
-stylesheet.addCssRules(style.sheet, [
-  ['.video-js',
-    ['width', '300px'],
-    ['height', '150px']
-  ]
-]);
 
 // Run Auto-load players
 // You have to wait at least once in case this script is loaded after your video in the DOM (weird behavior only with minified version)
