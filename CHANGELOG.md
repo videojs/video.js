@@ -97,6 +97,7 @@ CHANGELOG
 * @ogun fixed a typo in the Turkish translation ([view](https://github.com/videojs/video.js/pull/2460))
 * @gkatsev fixed text track errors on dispose and in cross-browser testing ([view](https://github.com/videojs/video.js/pull/2466))
 * @mmcc added type=button to button components ([view](https://github.com/videojs/video.js/pull/2471))
+* @mmcc Fixed IE by using setAttribute to set &#x27;type&#x27; property ([view](https://github.com/videojs/video.js/pull/2487))
 
 --------------------
 
