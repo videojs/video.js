@@ -43,7 +43,7 @@ export function createEl(tagName='div', properties={}){
       // add the attribute "role". My guess is because it's not a valid attribute in some namespaces, although
       // browsers handle the attribute just fine. The W3C allows for aria- * attributes to be used in pre-HTML5 docs.
       // http://www.w3.org/TR/wai-aria-primer/#ariahtml. Using setAttribute gets around this problem.
-      if (propName.indexOf('aria-') !== -1 || propName === 'role') {
+      if (propName.indexOf('aria-') !== -1 || propName === 'role' || propName === 'type') {
        el.setAttribute(propName, val);
       } else {
        el[propName] = val;
