@@ -326,6 +326,7 @@ vjs.Player.prototype.loadTech = function(techName, source){
       techOptions['startTime'] = this.cache_.currentTime;
     }
 
+    this.cache_.sources = null;
     this.cache_.source = source;
     this.cache_.src = source.src;
   }
@@ -1157,8 +1158,10 @@ vjs.Player.prototype.src = function(source){
       // the tech loop to check for a compatible technology
       this.sourceList_([source]);
     } else {
+      this.cache_.sources = null;
       this.cache_.source = source;
       this.cache_.src = source.src;
+
       this.currentType_ = source.type || '';
 
       // wait until the tech is ready to set the source
@@ -1240,7 +1243,7 @@ vjs.Player.prototype.currentSources = function(){
  * @return {Object} The current source object
  */
 vjs.Player.prototype.currentSource = function(){
-  return this.cache_.source || {};
+  return this.cache_.source || { src: this.currentSrc() };
 };
 
 /**
