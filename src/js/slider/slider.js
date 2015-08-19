@@ -19,12 +19,11 @@ class Slider extends Component {
   constructor(player, options) {
     super(player, options);
 
-    // Set property names to bar and handle to match with the child Slider class is looking for
-    this.bar = this.getChild(this.options_['barName']);
-    this.handle = this.getChild(this.options_['handleName']);
+    // Set property names to bar to match with the child Slider class is looking for
+    this.bar = this.getChild(this.options_.barName);
 
     // Set a horizontal or vertical class on the slider depending on the slider type
-    this.vertical(!!this.options_['vertical']);
+    this.vertical(!!this.options_.vertical);
 
     this.on('mousedown', this.handleMouseDown);
     this.on('touchstart', this.handleMouseDown);
@@ -150,9 +149,8 @@ class Slider extends Component {
     let box = Dom.findElPosition(el);
     let boxW = el.offsetWidth;
     let boxH = el.offsetHeight;
-    let handle = this.handle;
 
-    if (this.options_['vertical']) {
+    if (this.vertical()) {
       let boxY = box.top;
 
       let pageY;
@@ -160,13 +158,6 @@ class Slider extends Component {
         pageY = event.changedTouches[0].pageY;
       } else {
         pageY = event.pageY;
-      }
-
-      if (handle) {
-        var handleH = handle.el().offsetHeight;
-        // Adjusted X and Width, so handle doesn't go outside the bar
-        boxY = boxY + (handleH / 2);
-        boxH = boxH - handleH;
       }
 
       // Percent that the click is through the adjusted area
@@ -180,14 +171,6 @@ class Slider extends Component {
         pageX = event.changedTouches[0].pageX;
       } else {
         pageX = event.pageX;
-      }
-
-      if (handle) {
-        var handleW = handle.el().offsetWidth;
-
-        // Adjusted X and Width, so handle doesn't go outside the bar
-        boxX = boxX + (handleW / 2);
-        boxW = boxW - handleW;
       }
 
       // Percent that the click is through the adjusted area
