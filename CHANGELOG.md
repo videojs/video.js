@@ -101,6 +101,7 @@ CHANGELOG
 * @misternoneill fixed vertical slider issues ([view](https://github.com/videojs/video.js/pull/2469))
 * @gkatsev moved default and player dimensions to style els at the top of HEAD ([view](https://github.com/videojs/video.js/pull/2482))
 * @gkatsev moved default and player dimensions to style els at the top of HEAD el ([view](https://github.com/videojs/video.js/pull/2482))
+* @gkatsev removed non-default track auto-disabling ([view](https://github.com/videojs/video.js/pull/2475))
 
 --------------------
 

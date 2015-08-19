@@ -66,8 +66,6 @@ class Html5 extends Tech {
     }
 
     if (this.featuresNativeTextTracks) {
-      this.on('loadstart', Fn.bind(this, this.hideCaptions));
-
       this.handleTextTrackChange_ = Fn.bind(this, this.handleTextTrackChange);
       this.handleTextTrackAdd_ = Fn.bind(this, this.handleTextTrackAdd);
       this.handleTextTrackRemove_ = Fn.bind(this, this.handleTextTrackRemove);
@@ -182,28 +180,6 @@ class Html5 extends Tech {
     // jenniisawesome = true;
   }
 
-
-  /**
-   * Hide captions from text track
-   *
-   * @method hideCaptions
-   */
-  hideCaptions() {
-    let tracks = this.el_.querySelectorAll('track');
-    let i = tracks.length;
-    const kinds = {
-      'captions': 1,
-      'subtitles': 1
-    };
-
-    while (i--) {
-      let track = tracks[i].track;
-      if ((track && track['kind'] in kinds) &&
-          (!tracks[i]['default'])) {
-        track.mode = 'disabled';
-      }
-    }
-  }
 
   proxyNativeTextTracks_() {
     let tt = this.el().textTracks;
@@ -700,24 +676,6 @@ class Html5 extends Tech {
     }
 
     this.el().appendChild(track);
-
-    if (track.track['kind'] === 'metadata') {
-      track['track']['mode'] = 'hidden';
-    } else {
-      track['track']['mode'] = 'disabled';
-    }
-
-    track['onload'] = function() {
-      var tt = track['track'];
-      if (track.readyState >= 2) {
-        if (tt['kind'] === 'metadata' && tt['mode'] !== 'hidden') {
-          tt['mode'] = 'hidden';
-        } else if (tt['kind'] !== 'metadata' && tt['mode'] !== 'disabled') {
-          tt['mode'] = 'disabled';
-        }
-        track['onload'] = null;
-      }
-    };
 
     this.remoteTextTracks().addTrack_(track.track);
 
