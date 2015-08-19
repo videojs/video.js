@@ -20,7 +20,6 @@ class TextTrackButton extends MenuButton {
   constructor(player, options){
     super(player, options);
 
-    this.update();
     let tracks = this.player_.textTracks();
 
     if (this.items.length <= 1) {
