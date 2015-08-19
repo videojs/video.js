@@ -127,7 +127,7 @@ class Html5 extends Tech {
 
       // If the original tag is still there, clone and remove it.
       if (el) {
-        const clone = el.cloneNode(false);
+        const clone = el.cloneNode(true);
         el.parentNode.insertBefore(clone, el);
         Html5.disposeMediaElement(el);
         el = clone;
@@ -147,21 +147,6 @@ class Html5 extends Tech {
             class: 'vjs-tech'
           })
         );
-      }
-
-      if (this.options_.tracks) {
-        for (let i = 0; i < this.options_.tracks.length; i++) {
-          const track = this.options_.tracks[i];
-          let trackEl = document.createElement('track');
-          trackEl.kind = track.kind;
-          trackEl.label = track.label;
-          trackEl.srclang = track.srclang;
-          trackEl.src = track.src;
-          if ('default' in track) {
-            trackEl.setAttribute('default', 'default');
-          }
-          el.appendChild(trackEl);
-        }
       }
     }
 
