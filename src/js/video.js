@@ -5,6 +5,7 @@ import document from 'global/document';
 import * as setup from './setup';
 import Component from './component';
 import EventTarget from './event-target';
+import * as Events from './utils/events.js';
 import Player from './player';
 import plugin from './plugins.js';
 import mergeOptions from '../../src/js/utils/merge-options.js';
@@ -427,6 +428,50 @@ videojs.parseUrl = Url.parseUrl;
  * @type {Function}
  */
 videojs.EventTarget = EventTarget;
+
+/**
+ * Add an event listener to element
+ * It stores the handler function in a separate cache object
+ * and adds a generic handler to the element's event,
+ * along with a unique id (guid) to the element.
+ *
+ * @param  {Element|Object}   elem Element or object to bind listeners to
+ * @param  {String|Array}   type Type of event to bind to.
+ * @param  {Function} fn   Event listener.
+ * @method on
+ */
+videojs.on = Events.on;
+
+/**
+ * Trigger a listener only once for an event
+ *
+ * @param  {Element|Object}   elem Element or object to
+ * @param  {String|Array}   type Name/type of event
+ * @param  {Function} fn Event handler function
+ * @method one
+ */
+videojs.one = Events.one;
+
+/**
+ * Removes event listeners from an element
+ *
+ * @param  {Element|Object}   elem Object to remove listeners from
+ * @param  {String|Array=}   type Type of listener to remove. Don't include to remove all events from element.
+ * @param  {Function} fn   Specific listener to remove. Don't include to remove listeners for an event type.
+ * @method off
+ */
+videojs.off = Events.off;
+
+/**
+ * Trigger an event for an element
+ *
+ * @param  {Element|Object}      elem  Element to trigger an event on
+ * @param  {Event|Object|String} event A string (the type) or an event object with a type attribute
+ * @param  {Object} [hash] data hash to pass along with the event
+ * @return {Boolean=} Returned only if default was prevented
+ * @method trigger
+ */
+videojs.trigger = Events.trigger;
 
 // REMOVING: We probably should add this to the migration plugin
 // // Expose but deprecate the window[componentName] method for accessing components
