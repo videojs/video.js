@@ -103,6 +103,7 @@ CHANGELOG
 * @gkatsev moved default and player dimensions to style els at the top of HEAD el ([view](https://github.com/videojs/video.js/pull/2482))
 * @gkatsev removed non-default track auto-disabling ([view](https://github.com/videojs/video.js/pull/2475))
 * @gkatsev exported event helpers on videojs object ([view](https://github.com/videojs/video.js/pull/2491))
+* @nickygerritsen fixed texttrack handling in IE10 ([view](https://github.com/videojs/video.js/pull/2481))
 
 --------------------
 
