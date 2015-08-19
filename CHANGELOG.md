@@ -100,6 +100,7 @@ CHANGELOG
 * @mmcc Fixed IE by using setAttribute to set &#x27;type&#x27; property ([view](https://github.com/videojs/video.js/pull/2487))
 * @misternoneill fixed vertical slider issues ([view](https://github.com/videojs/video.js/pull/2469))
 * @gkatsev moved default and player dimensions to style els at the top of HEAD ([view](https://github.com/videojs/video.js/pull/2482))
+* @gkatsev moved default and player dimensions to style els at the top of HEAD el ([view](https://github.com/videojs/video.js/pull/2482))
 
 --------------------
 
