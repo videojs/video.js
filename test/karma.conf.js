@@ -44,12 +44,12 @@ module.exports = function(config) {
       'karma-opera-launcher',
       'karma-phantomjs-launcher',
       'karma-safari-launcher',
-      'karma-sauce-launcher',
+      'karma-browserstack-launcher',
       'karma-browserify',
       'karma-coverage'
     ],
 
-    reporters: ['dots', 'saucelabs'],
+    reporters: ['dots'],
 
     // web server port
     port: 9876,
@@ -61,12 +61,8 @@ module.exports = function(config) {
     captureTimeout: 60000,
     browserNoActivityTimeout: 60000,
 
-    sauceLabs: {
-      startConnect: false,
-      tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
-      build: process.env.TRAVIS_BUILD_NUMBER,
-      testName: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH,
-      recordScreenshots: false
+    browserStack: {
+      name: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH
     },
     customLaunchers: getCustomLaunchers(),
 
@@ -93,12 +89,12 @@ module.exports = function(config) {
     settings.browserify.transform.push('browserify-istanbul');
     settings.reporters.push('coverage');
 
-    if (process.env.SAUCE_ACCESS_KEY) {
+    if (process.env.BROWSER_STACK_USERNAME) {
       settings.browsers = [
-        'chrome_sl',
-        'firefox_sl',
-        'safari_sl',
-        'ie_sl'
+        'chrome_bs',
+        'firefox_bs',
+        'safari_bs',
+        'ie_bs'
       ];
     } else {
       settings.browsers = ['Firefox'];
@@ -110,42 +106,32 @@ module.exports = function(config) {
 
 function getCustomLaunchers(){
   return {
-    chrome_sl: {
-      base: 'SauceLabs',
-      browserName: 'chrome',
-      platform: 'Windows 8.1'
+    chrome_bs: {
+      base: 'BrowserStack',
+      browser: 'chrome',
+      os: 'Windows',
+      os_version: '8.1'
     },
 
-    firefox_sl: {
-      base: 'SauceLabs',
-      browserName: 'firefox',
-      platform: 'Linux'
+    firefox_bs: {
+      base: 'BrowserStack',
+      browser: 'firefox',
+      os: 'Windows',
+      os_version: '8.1'
     },
 
-    safari_sl: {
-      base: 'SauceLabs',
-      browserName: 'safari',
-      platform: 'OS X 10.10'
+    safari_bs: {
+      base: 'BrowserStack',
+      browser: 'safari',
+      os: 'OS X',
+      os_version: 'Yosemite'
     },
 
-    ipad_sl: {
-      base: 'SauceLabs',
-      browserName: 'ipad',
-      platform: 'OS X 10.10',
-      version: '8.4'
-    },
-
-    android_sl: {
-      base: 'SauceLabs',
-      browserName: 'android',
-      platform:'Linux'
-    },
-
-    ie_sl: {
-      base: 'SauceLabs',
-      browserName: 'internet explorer',
-      platform: 'Windows 8.1',
-      version: '11'
+    ie_bs: {
+      base: 'BrowserStack',
+      browser: 'ie',
+      os: 'Windows',
+      os_version: '8.1'
     }
   };
 }
