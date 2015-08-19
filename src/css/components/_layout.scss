@@ -7,11 +7,6 @@
   vertical-align: top;
   box-sizing: border-box;
 
-  /* Default to the video element width/height. This will be overridden by
-   * the source width height unless changed elsewhere. */
-  width: 300px;
-  height: 150px;
-
   color: $primary-text;
   background-color: $primary-bg;
   position: relative;
