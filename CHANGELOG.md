@@ -105,6 +105,7 @@ CHANGELOG
 * @gkatsev exported event helpers on videojs object ([view](https://github.com/videojs/video.js/pull/2491))
 * @nickygerritsen fixed texttrack handling in IE10 ([view](https://github.com/videojs/video.js/pull/2481))
 * @gkatsev deep clone el for iOS to preserve tracks ([view](https://github.com/videojs/video.js/pull/2494))
+* @forbesjo switched automated testing to BrowserStack ([view](https://github.com/videojs/video.js/pull/2492))
 
 --------------------
 

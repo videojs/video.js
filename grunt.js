@@ -148,14 +148,15 @@ module.exports = function(grunt) {
       ie:           { browsers: ['IE'] },
       phantomjs:    { browsers: ['PhantomJS'] },
 
-      // this only runs on PRs from the mainrepo on saucelabs
-      saucelabs:  { browsers: ['chrome_sl'] },
-      chrome_sl:  { browsers: ['chrome_sl'] },
-      firefox_sl: { browsers: ['firefox_sl'] },
-      safari_sl:  { browsers: ['safari_sl'] },
-      ipad_sl:    { browsers: ['ipad_sl'] },
-      android_sl: { browsers: ['android_sl'] },
-      ie_sl:      { browsers: ['ie_sl'] }
+      // this only runs on PRs from the mainrepo on BrowserStack
+      browserstack: { browsers: ['chrome_bs'] },
+      chrome_bs:    { browsers: ['chrome_bs'] },
+      firefox_bs:   { browsers: ['firefox_bs'] },
+      safari_bs:    { browsers: ['safari_bs'] },
+      ie11_bs:      { browsers: ['ie11_bs'] },
+      ie10_bs:      { browsers: ['ie10_bs'] },
+      ie9_bs:       { browsers: ['ie9_bs'] },
+      ie8_bs:       { browsers: ['ie8_bs'] }
     },
     vjsdocs: {
       all: {
