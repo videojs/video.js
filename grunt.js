@@ -149,11 +149,14 @@ module.exports = function(grunt) {
       phantomjs:    { browsers: ['PhantomJS'] },
 
       // this only runs on PRs from the mainrepo on BrowserStack
-      browserstack:  { browsers: ['chrome_bs'] },
-      chrome_bs:  { browsers: ['chrome_bs'] },
-      firefox_bs: { browsers: ['firefox_bs'] },
-      safari_bs:  { browsers: ['safari_bs'] },
-      ie_bs:      { browsers: ['ie_bs'] }
+      browserstack: { browsers: ['chrome_bs'] },
+      chrome_bs:    { browsers: ['chrome_bs'] },
+      firefox_bs:   { browsers: ['firefox_bs'] },
+      safari_bs:    { browsers: ['safari_bs'] },
+      ie11_bs:      { browsers: ['ie11_bs'] },
+      ie10_bs:      { browsers: ['ie10_bs'] },
+      ie9_bs:       { browsers: ['ie9_bs'] },
+      ie8_bs:       { browsers: ['ie8_bs'] }
     },
     vjsdocs: {
       all: {

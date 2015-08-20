@@ -11,6 +11,7 @@ module.exports = function(config) {
     // Compling tests here
     files: [
       '../build/temp/video-js.css',
+      '../build/temp/ie8/videojs-ie8.min.js',
       '../test/globals-shim.js',
       '../test/unit/**/*.js',
       { pattern: '../src/**/*.js', watched: true, included: false, served: false }
@@ -94,7 +95,10 @@ module.exports = function(config) {
         'chrome_bs',
         'firefox_bs',
         'safari_bs',
-        'ie_bs'
+        'ie11_bs',
+        'ie10_bs',
+        'ie9_bs',
+        'ie8_bs'
       ];
     } else {
       settings.browsers = ['Firefox'];
@@ -127,11 +131,36 @@ function getCustomLaunchers(){
       os_version: 'Yosemite'
     },
 
-    ie_bs: {
+    ie11_bs: {
       base: 'BrowserStack',
       browser: 'ie',
+      browser_version: '11',
       os: 'Windows',
       os_version: '8.1'
+    },
+
+    ie10_bs: {
+      base: 'BrowserStack',
+      browser: 'ie',
+      browser_version: '10',
+      os: 'Windows',
+      os_version: '7'
+    },
+
+    ie9_bs: {
+      base: 'BrowserStack',
+      browser: 'ie',
+      browser_version: '9',
+      os: 'Windows',
+      os_version: '7'
+    },
+
+    ie8_bs: {
+      base: 'BrowserStack',
+      browser: 'ie',
+      browser_version: '8',
+      os: 'Windows',
+      os_version: '7'
     }
   };
 }
