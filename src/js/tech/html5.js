@@ -76,7 +76,9 @@ class Html5 extends Tech {
     // Our goal should be to get the custom controls on mobile solid everywhere
     // so we can remove this all together. Right now this will block custom
     // controls on touch enabled laptops like the Chrome Pixel
-    if (browser.TOUCH_ENABLED && options.nativeControlsForTouch === true) {
+    if (browser.TOUCH_ENABLED && options.nativeControlsForTouch === true ||
+        browser.IS_IPHONE ||
+        browser.IS_NATIVE_ANDROID) {
       this.setControls(true);
     }
 
