@@ -29,9 +29,9 @@
   @include transition($trans);
 }
 
-.video-js.vjs-controls-disabled .vjs-control-bar,
-.video-js.vjs-using-native-controls .vjs-control-bar,
-.video-js.vjs-error .vjs-control-bar {
+.video-js.video-js.video-js.vjs-controls-disabled .vjs-control-bar,
+.video-js.video-js.video-js.vjs-using-native-controls .vjs-control-bar,
+.video-js.video-js.video-js.vjs-error .vjs-control-bar {
   display: none;
 }
 
