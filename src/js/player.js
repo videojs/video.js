@@ -1953,6 +1953,7 @@ class Player extends Component {
             */
           this.trigger('usingnativecontrols');
         } else {
+          this.addTechControlsListeners();
           this.removeClass('vjs-using-native-controls');
           this.techCall('setControls', false);
 
