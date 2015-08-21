@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* @gkatsev removed non-default track auto-disabling ([view](https://github.com/videojs/video.js/pull/2468))
+_(none)_
 
 --------------------
+
+## 4.12.14 (2015-08-21)
+* @gkatsev removed non-default track auto-disabling ([view](https://github.com/videojs/video.js/pull/2468))
 
 ## 4.12.13 (2015-08-10)
 * @dmlap update to videojs-swf v4.7.3 ([view](https://github.com/videojs/video.js/pull/2457))

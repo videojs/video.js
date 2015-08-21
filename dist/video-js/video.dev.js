@@ -80,7 +80,7 @@ vjs.ACCESS_PROTOCOL = ('https:' == document.location.protocol ? 'https://' : 'ht
 * Full player version
 * @type {string}
 */
-vjs['VERSION'] = '4.12.13';
+vjs['VERSION'] = '4.12.14';
 
 /**
  * Global Player instance options, surfaced from vjs.Player.prototype.options_
@@ -7145,10 +7145,6 @@ vjs.Html5 = vjs.MediaTechController.extend({
       }
     }
 
-    if (this['featuresNativeTextTracks']) {
-      this.on('loadstart', vjs.bind(this, this.hideCaptions));
-    }
-
     // Determine if native controls should be used
     // Our goal should be to get the custom controls on mobile solid everywhere
     // so we can remove this all together. Right now this will block custom
@@ -7249,25 +7245,6 @@ vjs.Html5.prototype.createEl = function(){
 
   return el;
   // jenniisawesome = true;
-};
-
-
-vjs.Html5.prototype.hideCaptions = function() {
-  var tracks = this.el_.querySelectorAll('track'),
-      track,
-      i = tracks.length,
-      kinds = {
-        'captions': 1,
-        'subtitles': 1
-      };
-
-  while (i--) {
-    track = tracks[i].track;
-    if ((track && track['kind'] in kinds) &&
-        (!tracks[i]['default'])) {
-      track.mode = 'disabled';
-    }
-  }
 };
 
 // Make video events trigger player events
@@ -7512,25 +7489,6 @@ vjs.Html5.prototype.addRemoteTextTrack = function(options) {
   }
 
   this.el().appendChild(track);
-
-  if (track.track['kind'] === 'metadata') {
-    track['track']['mode'] = 'hidden';
-  } else {
-    track['track']['mode'] = 'disabled';
-  }
-
-  track['onload'] = function() {
-    var tt = track['track'];
-    if (track.readyState >= 2) {
-      if (tt['kind'] === 'metadata' && tt['mode'] !== 'hidden') {
-        tt['mode'] = 'hidden';
-      } else if (tt['kind'] !== 'metadata' && tt['mode'] !== 'disabled') {
-        tt['mode'] = 'disabled';
-      }
-      track['onload'] = null;
-    }
-  };
-
   this.remoteTextTracks().addTrack_(track.track);
 
   return track;
