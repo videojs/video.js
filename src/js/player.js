@@ -1941,7 +1941,6 @@ class Player extends Component {
         if (bool) {
           this.removeTechControlsListeners();
           this.addClass('vjs-using-native-controls');
-          this.techCall('setControls', true);
 
           /**
             * player is using the native device controls
@@ -1955,7 +1954,6 @@ class Player extends Component {
         } else {
           this.addTechControlsListeners();
           this.removeClass('vjs-using-native-controls');
-          this.techCall('setControls', false);
 
           /**
             * player is using the custom HTML controls
