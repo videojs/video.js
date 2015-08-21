@@ -46,8 +46,7 @@ module.exports = function(config) {
       'karma-phantomjs-launcher',
       'karma-safari-launcher',
       'karma-browserstack-launcher',
-      'karma-browserify',
-      'karma-coverage'
+      'karma-browserify'
     ],
 
     reporters: ['dots'],
@@ -65,30 +64,11 @@ module.exports = function(config) {
     browserStack: {
       name: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH
     },
-    customLaunchers: getCustomLaunchers(),
-
-    // The HTML reporter seems to be busted right now, so we're just using text in the meantime
-    // along with the summary after the test run.
-    coverageReporter: {
-      reporters: [
-        {
-          type: 'text',
-          dir: 'coverage/',
-          file: 'coverage.txt'
-        },
-        {
-          type: 'lcovonly',
-          dir: 'coverage/',
-          subdir: '.'
-        },
-        { type: 'text-summary' }
-      ]
-    }
+    customLaunchers: getCustomLaunchers()
   };
 
   if (process.env.TRAVIS) {
     settings.browserify.transform.push('browserify-istanbul');
-    settings.reporters.push('coverage');
 
     if (process.env.BROWSER_STACK_USERNAME) {
       settings.browsers = [
