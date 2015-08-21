@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @gkatsev removed non-default track auto-disabling ([view](https://github.com/videojs/video.js/pull/2468))
 
 --------------------
 
