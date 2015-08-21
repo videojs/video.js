@@ -63,7 +63,8 @@ module.exports = function(config) {
     browserNoActivityTimeout: 60000,
 
     browserStack: {
-      name: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH
+      name: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH,
+      pollingTimeout: 10000
     },
     customLaunchers: getCustomLaunchers(),
 
