@@ -46,6 +46,7 @@ class TechFaker extends Tech {
   duration() { return {}; }
   networkState() { return 0; }
   readyState() { return 0; }
+  controls() { return false; }
 
   // Support everything except for "video/unsupported-format"
   static isSupported() { return true; }

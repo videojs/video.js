@@ -501,6 +501,7 @@ class Player extends Component {
 
     // Grab tech-specific options from player options and add source and parent element to use.
     var techOptions = assign({
+      'nativeControlsForTouch': this.options_.nativeControlsForTouch,
       'source': source,
       'playerId': this.id(),
       'techId': `${this.id()}_${techName}_api`,
@@ -534,7 +535,6 @@ class Player extends Component {
     textTrackConverter.jsonToTextTracks(this.textTracksJson_ || [], this.tech);
 
     this.on(this.tech, 'ready', this.handleTechReady);
-    this.on(this.tech, 'usenativecontrols', this.handleTechUseNativeControls);
 
     // Listen to every HTML5 events and trigger them back on the player for the plugins
     this.on(this.tech, 'loadstart', this.handleTechLoadStart);
@@ -563,6 +563,8 @@ class Player extends Component {
     this.on(this.tech, 'volumechange', this.handleTechVolumeChange);
     this.on(this.tech, 'texttrackchange', this.onTextTrackChange);
     this.on(this.tech, 'loadedmetadata', this.updateStyleEl_);
+
+    this.usingNativeControls(this.techGet('controls'));
 
     if (this.controls() && !this.usingNativeControls()) {
       this.addTechControlsListeners();
@@ -663,16 +665,6 @@ class Player extends Component {
       delete this.tag.poster; // Chrome Fix. Fixed in Chrome v16.
       this.play();
     }
-  }
-
-  /**
-   * Fired when the native controls are used
-   *
-   * @private
-   * @method handleTechUseNativeControls
-   */
-  handleTechUseNativeControls() {
-    this.usingNativeControls(true);
   }
 
   /**
@@ -1947,6 +1939,7 @@ class Player extends Component {
       if (this.usingNativeControls_ !== bool) {
         this.usingNativeControls_ = bool;
         if (bool) {
+          this.removeTechControlsListeners();
           this.addClass('vjs-using-native-controls');
 
           /**
@@ -1959,6 +1952,7 @@ class Player extends Component {
             */
           this.trigger('usingnativecontrols');
         } else {
+          this.addTechControlsListeners();
           this.removeClass('vjs-using-native-controls');
 
           /**

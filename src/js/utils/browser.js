@@ -5,6 +5,8 @@ import document from 'global/document';
 import window from 'global/window';
 
 const USER_AGENT = window.navigator.userAgent;
+const webkitVersionMap = (/AppleWebKit\/([\d.]+)/i).exec(USER_AGENT);
+const appleWebkitVersion = webkitVersionMap ? parseFloat(webkitVersionMap.pop()) : null;
 
 /*
  * Device is an iPhone
@@ -48,6 +50,7 @@ export const ANDROID_VERSION = (function() {
 })();
 // Old Android is defined as Version older than 2.3, and requiring a webkit version of the android browser
 export const IS_OLD_ANDROID = IS_ANDROID && (/webkit/i).test(USER_AGENT) && ANDROID_VERSION < 2.3;
+export const IS_NATIVE_ANDROID = IS_ANDROID && ANDROID_VERSION < 5 && appleWebkitVersion < 537;
 
 export const IS_FIREFOX = (/Firefox/i).test(USER_AGENT);
 export const IS_CHROME = (/Chrome/i).test(USER_AGENT);
