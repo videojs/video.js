@@ -264,7 +264,11 @@ class Flash extends Tech {
    * @method buffered
    */
   buffered() {
-    return createTimeRange(0, this.el_.vjs_getProperty('buffered'));
+    let ranges = this.el_.vjs_getProperty('buffered');
+    if (ranges.length === 0) {
+      return createTimeRange();
+    }
+    return createTimeRange(ranges[0][0], ranges[0][1]);
   }
 
   /**
