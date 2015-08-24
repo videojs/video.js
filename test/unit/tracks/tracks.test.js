@@ -11,6 +11,7 @@ import Component from '../../../src/js/component.js';
 import * as browser from '../../../src/js/utils/browser.js';
 import TestHelpers from '../test-helpers.js';
 import document from 'global/document';
+import TechFaker from '../tech/tech-faker.js';
 
 q.module('Tracks');
 
@@ -289,23 +290,15 @@ test('html5 tech supports native text tracks if the video supports it, unless it
 });
 
 test('when switching techs, we should not get a new text track', function() {
-  var player = TestHelpers.makePlayer({
-        html5: {
-          nativeTextTracks: false
-        }
-      }),
-      htmltracks,
-      flashtracks;
+  let player = TestHelpers.makePlayer();
 
-  player.loadTech('Html5');
+  player.loadTech('TechFaker');
+  let firstTracks = player.textTracks();
 
-  htmltracks = player.textTracks();
+  player.loadTech('TechFaker');
+  let secondTracks = player.textTracks();
 
-  player.loadTech('Flash');
-
-  flashtracks = player.textTracks();
-
-  ok(htmltracks === flashtracks, 'the tracks are equal');
+  ok(firstTracks === secondTracks, 'the tracks are equal');
 });
 
 if (Html5.supportsNativeTextTracks()) {
