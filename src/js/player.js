@@ -1942,7 +1942,6 @@ class Player extends Component {
       if (this.usingNativeControls_ !== bool) {
         this.usingNativeControls_ = bool;
         if (bool) {
-          this.removeTechControlsListeners();
           this.addClass('vjs-using-native-controls');
 
           /**
@@ -1955,7 +1954,6 @@ class Player extends Component {
             */
           this.trigger('usingnativecontrols');
         } else {
-          this.addTechControlsListeners();
           this.removeClass('vjs-using-native-controls');
 
           /**
