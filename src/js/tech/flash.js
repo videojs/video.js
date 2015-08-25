@@ -456,12 +456,9 @@ Flash.onError = function(swfID, err){
 
   if (err === 'srcnotfound') {
     errorObj.code = 4;
-    tech.trigger('error', errorObj);
-
-  // errors we haven't categorized into the media errors
-  } else {
-    tech.trigger('error', errorObj);
   }
+
+  tech.trigger('error', errorObj);
 };
 
 // Flash Version Check
