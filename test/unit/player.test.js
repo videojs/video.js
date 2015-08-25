@@ -421,7 +421,7 @@ test('make sure that controls listeners do not get added too many times', functi
 
   player.addTechControlsListeners = function() {
     listeners++;
-  }
+  };
 
   // Make sure native controls is false before starting test
   player.usingNativeControls(false);
@@ -436,7 +436,7 @@ test('make sure that controls listeners do not get added too many times', functi
   player.controls(false);
 
   player.controls(true);
-  equal(listeners, 1, 'addTechControlsListeners should have gotten called once')
+  equal(listeners, 1, 'addTechControlsListeners should have gotten called once');
 
   player.dispose();
 });
