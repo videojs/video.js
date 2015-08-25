@@ -268,6 +268,16 @@ class Flash extends Tech {
   }
 
   /**
+   * Get the last error object
+   *
+   * @return {Object}
+   * @method error
+   */
+  error() {
+    return this.error_ || {};
+  }
+
+  /**
    * Get fullscreen support -
    * Flash does not allow fullscreen through javascript
    * so always returns false
@@ -297,7 +307,7 @@ class Flash extends Tech {
 // Create setters and getters for attributes
 const _api = Flash.prototype;
 const _readWrite = 'rtmpConnection,rtmpStream,preload,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted'.split(',');
-const _readOnly = 'error,networkState,readyState,initialTime,duration,startOffsetTime,paused,ended,videoTracks,audioTracks,videoWidth,videoHeight'.split(',');
+const _readOnly = 'networkState,readyState,initialTime,duration,startOffsetTime,paused,ended,videoTracks,audioTracks,videoWidth,videoHeight'.split(',');
 
 function _createSetter(attr){
   var attrUpper = attr.charAt(0).toUpperCase() + attr.slice(1);
@@ -438,13 +448,19 @@ Flash.onEvent = function(swfID, eventName){
 Flash.onError = function(swfID, err){
   const tech = Dom.getEl(swfID).tech;
   const msg = 'FLASH: '+err;
+  const errorObj = {
+    message: msg
+  };
+
+  tech.error_ = errorObj;
 
   if (err === 'srcnotfound') {
-    tech.trigger('error', { code: 4, message: msg });
+    errorObj.code = 4;
+    tech.trigger('error', errorObj);
 
   // errors we haven't categorized into the media errors
   } else {
-    tech.trigger('error', msg);
+    tech.trigger('error', errorObj);
   }
 };
 
