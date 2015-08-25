@@ -268,18 +268,6 @@ class Flash extends Tech {
   }
 
   /**
-   * Get the last error object
-   *
-   * @return {Object}
-   * @method error
-   */
-  error() {
-    let error = this.error_;
-    this.error_ = null;
-    return error || null;
-  }
-
-  /**
    * Get fullscreen support -
    * Flash does not allow fullscreen through javascript
    * so always returns false
@@ -449,18 +437,14 @@ Flash.onEvent = function(swfID, eventName){
 // Log errors from the swf
 Flash.onError = function(swfID, err){
   const tech = Dom.getEl(swfID).tech;
-  const msg = 'FLASH: '+err;
-  const errorObj = {
-    message: msg
-  };
 
-  tech.error_ = errorObj;
-
+  // trigger MEDIA_ERR_SRC_NOT_SUPPORTED
   if (err === 'srcnotfound') {
-    errorObj.code = 4;
+    return tech.error(4);
   }
 
-  tech.trigger('error', errorObj);
+  // trigger a custom error
+  tech.error('FLASH: ' + err);
 };
 
 // Flash Version Check

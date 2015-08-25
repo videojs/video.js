@@ -11,6 +11,7 @@ import * as Fn from '../utils/fn.js';
 import log from '../utils/log.js';
 import { createTimeRange } from '../utils/time-ranges.js';
 import { bufferedPercent } from '../utils/buffer.js';
+import MediaError from '../media-error.js';
 import window from 'global/window';
 import document from 'global/document';
 
@@ -263,6 +264,27 @@ class Tech extends Component {
     if (this.manualTimeUpdates) { this.manualTimeUpdatesOff(); }
 
     super.dispose();
+  }
+
+  /**
+   * When invoked without an argument, returns a MediaError object
+   * representing the current error state of the player or null if
+   * there is no error. When invoked with an argument, set the current
+   * error state of the player.
+   * @param {MediaError=} err    Optional an error object
+   * @return {MediaError}        the current error object or null
+   * @method error
+   */
+  error(err) {
+    if (err !== undefined) {
+      if (err instanceof MediaError) {
+        this.error_ = err;
+      } else {
+        this.error_ = new MediaError(err);
+      }
+      this.trigger('error');
+    }
+    return this.error_;
   }
 
   /**
