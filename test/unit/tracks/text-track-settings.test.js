@@ -47,6 +47,8 @@ test('should update settings', function() {
 
   Events.trigger(player.el().querySelector('.vjs-done-button'), 'click');
   deepEqual(safeParseTuple(window.localStorage.getItem('vjs-text-track-settings'))[1], newSettings, 'values are saved');
+
+  player.dispose();
 });
 
 test('should restore default settings', function() {
@@ -81,6 +83,8 @@ test('should restore default settings', function() {
   equal(player.el().querySelector('.vjs-edge-style select').selectedIndex, 0, 'edge-style is set to default value');
   equal(player.el().querySelector('.vjs-font-family select').selectedIndex, 0, 'font-family is set to default value');
   equal(player.el().querySelector('.vjs-font-percent select').selectedIndex, 2, 'font-percent is set to default value');
+
+  player.dispose();
 });
 
 test('should open on click', function() {
@@ -89,6 +93,8 @@ test('should open on click', function() {
   });
   Events.trigger(player.el().querySelector('.vjs-texttrack-settings'), 'click');
   ok(!player.textTrackSettings.hasClass('vjs-hidden'), 'settings open');
+
+  player.dispose();
 });
 
 test('should close on done click', function() {
@@ -98,6 +104,8 @@ test('should close on done click', function() {
   Events.trigger(player.el().querySelector('.vjs-texttrack-settings'), 'click');
   Events.trigger(player.el().querySelector('.vjs-done-button'), 'click');
   ok(player.textTrackSettings.hasClass('vjs-hidden'), 'settings closed');
+
+  player.dispose();
 });
 
 test('if persist option is set, restore settings on init', function() {
@@ -117,6 +125,8 @@ test('if persist option is set, restore settings on init', function() {
   equal(restore, 1, 'restore was called');
 
   TextTrackSettings.prototype.restoreSettings = oldRestoreSettings;
+
+  player.dispose();
 });
 
 test('if persist option is set, save settings when "done"', function() {
@@ -136,6 +146,8 @@ test('if persist option is set, save settings when "done"', function() {
   equal(save, 1, 'save was called');
 
   TextTrackSettings.prototype.saveSettings = oldSaveSettings;
+
+  player.dispose();
 });
 
 test('do not try to restore or save settings if persist option is not set', function() {
@@ -166,6 +178,8 @@ test('do not try to restore or save settings if persist option is not set', func
 
   TextTrackSettings.prototype.saveSettings = oldSaveSettings;
   TextTrackSettings.prototype.restoreSettings = oldRestoreSettings;
+
+  player.dispose();
 });
 
 test('should restore saved settings', function() {
@@ -190,6 +204,8 @@ test('should restore saved settings', function() {
   });
 
   deepEqual(player.textTrackSettings.getValues(), newSettings);
+
+  player.dispose();
 });
 
 test('should not restore saved settings', function() {
@@ -214,4 +230,6 @@ test('should not restore saved settings', function() {
   });
 
   deepEqual(player.textTrackSettings.getValues(), {});
+
+  player.dispose();
 });

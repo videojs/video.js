@@ -220,7 +220,7 @@ test('should wrap the original tag in the player div', function(){
 test('should set and update the poster value', function(){
   var tag, poster, updatedPoster, player;
 
-  poster = 'http://example.com/poster.jpg';
+  poster = '#';
   updatedPoster = 'http://example.com/updated-poster.jpg';
 
   tag = TestHelpers.makeTag();

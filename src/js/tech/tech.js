@@ -251,12 +251,14 @@ class Tech extends Component {
    */
   dispose() {
     // clear out text tracks because we can't reuse them between techs
-    let tt = this.textTracks();
-    let i = tt.length;
-    while(i--) {
-      this.removeRemoteTextTrack(tt[i]);
-    }
+    let textTracks = this.textTracks();
 
+    if (textTracks) {
+      let i = textTracks.length;
+      while(i--) {
+        this.removeRemoteTextTrack(textTracks[i]);
+      }
+    }
 
     // Turn off any manual progress or timeupdate tracking
     if (this.manualProgress) { this.manualProgressOff(); }

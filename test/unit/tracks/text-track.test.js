@@ -256,4 +256,6 @@ test('fires cuechange when cues become active and inactive', function() {
   player.tech.trigger('timeupdate');
 
   equal(changes, 4, 'a cuechange event trigger addEventListener and oncuechange');
+
+  player.dispose();
 });

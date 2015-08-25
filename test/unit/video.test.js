@@ -62,9 +62,7 @@ test('should expose plugin registry function', function() {
   var pluginName, pluginFunction, player;
 
   pluginName = 'foo';
-  pluginFunction = function(options) {
-    console.log(this);
-  };
+  pluginFunction = function(options) {};
 
   ok(videojs.plugin, 'should exist');
 

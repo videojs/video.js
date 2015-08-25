@@ -3,8 +3,16 @@ import TextTrack from '../../../src/js/tracks/text-track.js';
 import TextTrackList from '../../../src/js/tracks/text-track-list.js';
 import Html5 from '../../../src/js/tech/html5.js';
 import document from 'global/document';
+import window from 'global/window';
 
-q.module('Text Track List Converter');
+q.module('Text Track List Converter', {
+  setup: function() {
+    this.xhr = sinon.useFakeXMLHttpRequest();
+  },
+  teardown: function() {
+    this.xhr.restore();
+  }
+});
 
 let clean = (item) => {
   delete item.id;
