@@ -998,7 +998,8 @@ class Player extends Component {
    * @event error
    */
   handleTechError() {
-    this.error(this.tech.error().code);
+    let error = this.tech.error();
+    this.error(error && error.code);
   }
 
   /**

@@ -274,7 +274,9 @@ class Flash extends Tech {
    * @method error
    */
   error() {
-    return this.error_ || {};
+    let error = this.error_;
+    this.error_ = null;
+    return error || null;
   }
 
   /**
