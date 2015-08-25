@@ -415,6 +415,32 @@ test('should allow for tracking when native controls are used', function(){
   player.dispose();
 });
 
+test('make sure that controls listeners do not get added too many times', function(){
+  var player = TestHelpers.makePlayer({});
+  var listeners = 0;
+
+  player.addTechControlsListeners = function() {
+    listeners++;
+  }
+
+  // Make sure native controls is false before starting test
+  player.usingNativeControls(false);
+
+  player.usingNativeControls(true);
+
+  player.controls(true);
+
+  equal(listeners, 0, 'addTechControlsListeners should not have gotten called yet');
+
+  player.usingNativeControls(false);
+  player.controls(false);
+
+  player.controls(true);
+  equal(listeners, 1, 'addTechControlsListeners should have gotten called once')
+
+  player.dispose();
+});
+
 // test('should use custom message when encountering an unsupported video type',
 //     function() {
 //   videojs.options['notSupportedMessage'] = 'Video no go <a href="">link</a>';
