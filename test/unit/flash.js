@@ -187,6 +187,38 @@ test('seekable should be empty if no video is loaded', function() {
   equal(tech.seekable().length, 0, 'seekable is empty');
 });
 
+test('hitting play again after video ends resets current time to 0', function() {
+  var player = PlayerTest.makePlayer(),
+    currentTime = 60,
+    tech = new vjs.Flash(player, {
+      'parentEl': player.el()
+    });
+
+  // mock out currentTime
+  tech.el().vjs_getProperty = function(name) {
+    if (name === 'currentTime') {
+      return currentTime;
+    }
+  };
+
+  vjs.Flash.prototype['setCurrentTime'] = function(time) {
+    currentTime = time;
+  };
+
+  // mock out ended
+  vjs.Flash.prototype['ended'] = function() {
+    return true;
+  };
+
+  // mock out el play
+  vjs.Flash.prototype.el_ = tech.el();
+  tech.el().vjs_play = function() {};
+
+  vjs.Flash.prototype.play();
+
+  equal(tech.currentTime(), 0, 'current time was not 0');
+});
+
 test('calling methods before the SWF loads is safe', function() {
   var player = PlayerTest.makePlayer(),
       tech = new vjs.Flash(player, {
