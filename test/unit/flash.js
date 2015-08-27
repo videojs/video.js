@@ -195,26 +195,24 @@ test('hitting play again after video ends resets current time to 0', function() 
     });
 
   // mock out currentTime
-  tech.el().vjs_getProperty = function(name) {
+  tech.el()['vjs_getProperty'] = function(name) {
     if (name === 'currentTime') {
       return currentTime;
     }
+    if (name === 'ended') {
+      return true;
+    }
   };
 
-  vjs.Flash.prototype['setCurrentTime'] = function(time) {
-    currentTime = time;
+  tech.el()['vjs_setProperty'] = function(property, value) {
+    if (property === 'currentTime') {
+      currentTime = value;
+    }
   };
 
-  // mock out ended
-  vjs.Flash.prototype['ended'] = function() {
-    return true;
-  };
-
-  // mock out el play
-  vjs.Flash.prototype.el_ = tech.el();
   tech.el().vjs_play = function() {};
 
-  vjs.Flash.prototype.play();
+  tech.play();
 
   equal(tech.currentTime(), 0, 'current time was not 0');
 });
