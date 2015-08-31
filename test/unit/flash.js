@@ -210,7 +210,7 @@ test('hitting play again after video ends resets current time to 0', function() 
     }
   };
 
-  tech.el().vjs_play = function() {};
+  tech.el()['vjs_play'] = function() {};
 
   tech.play();
 

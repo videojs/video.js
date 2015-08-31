@@ -102,7 +102,7 @@ vjs.Flash.prototype.dispose = function(){
 
 vjs.Flash.prototype.play = function(){
   if (this.ended()) {
-    this.setCurrentTime(0);
+    this['setCurrentTime'](0);
   }
 
   this.el_.vjs_play();
