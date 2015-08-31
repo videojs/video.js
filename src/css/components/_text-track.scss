@@ -7,6 +7,16 @@
   pointer-events: none;
 }
 
+/*  Track display for tracks which are hidden but still accessible with a screen reader */
+/* See http://www.w3.org/TR/2012/NOTE-WCAG20-TECHS-20120103/C7.html */
+.video-js .vjs-text-track-hidden-display {
+  position: absolute !important;
+  top: -10000px;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+}
+
 /* Move captions down when controls aren't being shown */
 .video-js.vjs-user-inactive.vjs-playing .vjs-text-track-display {
   bottom: 1em;
