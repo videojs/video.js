@@ -3,6 +3,7 @@ CHANGELOG
 
 ## HEAD (Unreleased)
 * @dmlap update to videojs-swf 4.7.4 ([view](https://github.com/videojs/video.js/pull/2463))
+* @bc-bbay migrate seeking on replay to the flash tech ([view](https://github.com/videojs/video.js/pull/2519))
 
 --------------------
 
