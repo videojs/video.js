@@ -2,11 +2,14 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 4.12.15 (2015-08-31)
 * @dmlap update to videojs-swf 4.7.4 ([view](https://github.com/videojs/video.js/pull/2463))
 * @bc-bbay migrate seeking on replay to the flash tech ([view](https://github.com/videojs/video.js/pull/2519))
 * Updated to v4.7.5 of the swf ([view](https://github.com/videojs/video.js/pull/2531))
-
---------------------
 
 ## 4.12.14 (2015-08-21)
 * @gkatsev removed non-default track auto-disabling ([view](https://github.com/videojs/video.js/pull/2468))
