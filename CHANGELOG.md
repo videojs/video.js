@@ -109,6 +109,7 @@ CHANGELOG
 * @gkatsev fixed nativeControlsForTouch handling. Defaults to native controls on iphone and native android browsers. ([view](https://github.com/videojs/video.js/pull/2499))
 * @heff fixed cross-platform track tests by switching to a fake tech ([view](https://github.com/videojs/video.js/pull/2496))
 * @gkatsev improved tech controls listener handling. ([view](https://github.com/videojs/video.js/pull/2511))
+* @dmlap move seek on replay into the flash tech ([view](https://github.com/videojs/video.js/pull/2527))
 
 --------------------
 

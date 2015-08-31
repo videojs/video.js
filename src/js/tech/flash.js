@@ -113,6 +113,9 @@ class Flash extends Tech {
    * @method play
    */
   play() {
+    if (this.ended()) {
+      this.setCurrentTime(0);
+    }
     this.el_.vjs_play();
   }
 
