@@ -300,7 +300,7 @@ class Flash extends Tech {
 // Create setters and getters for attributes
 const _api = Flash.prototype;
 const _readWrite = 'rtmpConnection,rtmpStream,preload,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted'.split(',');
-const _readOnly = 'error,networkState,readyState,initialTime,duration,startOffsetTime,paused,ended,videoTracks,audioTracks,videoWidth,videoHeight'.split(',');
+const _readOnly = 'networkState,readyState,initialTime,duration,startOffsetTime,paused,ended,videoTracks,audioTracks,videoWidth,videoHeight'.split(',');
 
 function _createSetter(attr){
   var attrUpper = attr.charAt(0).toUpperCase() + attr.slice(1);
@@ -440,15 +440,14 @@ Flash.onEvent = function(swfID, eventName){
 // Log errors from the swf
 Flash.onError = function(swfID, err){
   const tech = Dom.getEl(swfID).tech;
-  const msg = 'FLASH: '+err;
 
+  // trigger MEDIA_ERR_SRC_NOT_SUPPORTED
   if (err === 'srcnotfound') {
-    tech.trigger('error', { code: 4, message: msg });
-
-  // errors we haven't categorized into the media errors
-  } else {
-    tech.trigger('error', msg);
+    return tech.error(4);
   }
+
+  // trigger a custom error
+  tech.error('FLASH: ' + err);
 };
 
 // Flash Version Check

@@ -110,6 +110,7 @@ CHANGELOG
 * @heff fixed cross-platform track tests by switching to a fake tech ([view](https://github.com/videojs/video.js/pull/2496))
 * @gkatsev improved tech controls listener handling. ([view](https://github.com/videojs/video.js/pull/2511))
 * @dmlap move seek on replay into the flash tech ([view](https://github.com/videojs/video.js/pull/2527))
+* @dmlap @gkatsev improve Flash tech error property and add an error setter to the base tech ([view](https://github.com/videojs/video.js/pull/2517))
 
 --------------------
 
