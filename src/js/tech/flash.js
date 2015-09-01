@@ -28,6 +28,12 @@ class Flash extends Tech {
   constructor(options, ready){
     super(options, ready);
 
+    // The swf URL needs to be relative to the page (not video.js)
+    // so this probably won't work for most, but it's the best we can do.
+    // The CDN auto-adds a better swf URL for that specific version.
+    // Otherwise you just need to set your swf location.
+    options.swf = options.swf || 'video-js.swf';
+
     // Set the source when ready
     if (options.source) {
       this.ready(function(){
