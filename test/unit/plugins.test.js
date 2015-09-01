@@ -1,4 +1,4 @@
-import Plugin from '../../src/js/plugins.js';
+import registerPlugin from '../../src/js/plugins.js';
 import Player from '../../src/js/player.js';
 import TestHelpers from './test-helpers.js';
 import window from 'global/window';
@@ -8,12 +8,12 @@ q.module('Plugins');
 test('Plugin should get initialized and receive options', function(){
   expect(2);
 
-  Plugin('myPlugin1', function(options){
+  registerPlugin('myPlugin1', function(options){
     ok(true, 'Plugin initialized');
     ok(options['test'], 'Option passed through');
   });
 
-  Plugin('myPlugin2', function(options){
+  registerPlugin('myPlugin2', function(options){
     ok(false, 'Plugin initialized and should not have been');
   });
 
@@ -31,7 +31,7 @@ test('Plugin should get initialized and receive options', function(){
 test('Plugin should have the option of being initilized outside of player init', function(){
   expect(3);
 
-  Plugin('myPlugin3', function(options){
+  registerPlugin('myPlugin3', function(options){
     ok(true, 'Plugin initialized after player init');
     ok(options['test'], 'Option passed through');
   });
@@ -50,7 +50,7 @@ test('Plugin should have the option of being initilized outside of player init',
 test('Plugin should be able to add a UI component', function(){
   expect(2);
 
-  Plugin('myPlugin4', function(options){
+  registerPlugin('myPlugin4', function(options){
     ok((this instanceof Player), 'Plugin executed in player scope by default');
     this.addChild('component');
   });
@@ -72,21 +72,21 @@ test('Plugin should overwrite plugin of same name', function(){
       v3Called = 0;
 
   // Create initial plugin
-  Plugin('myPlugin5', function(options){
+  registerPlugin('myPlugin5', function(options){
     v1Called++;
   });
   var player = TestHelpers.makePlayer({});
   player['myPlugin5']({});
 
   // Overwrite and create new player
-  Plugin('myPlugin5', function(options){
+  registerPlugin('myPlugin5', function(options){
     v2Called++;
   });
   var player2 = TestHelpers.makePlayer({});
   player2['myPlugin5']({});
 
   // Overwrite and init new version on existing player
-  Plugin('myPlugin5', function(options){
+  registerPlugin('myPlugin5', function(options){
     v3Called++;
   });
   player2['myPlugin5']({});
@@ -109,7 +109,7 @@ test('Plugins should get events in registration order', function() {
   var name;
   var player = TestHelpers.makePlayer({});
   var plugin = function (name) {
-    Plugin(name, function (opts) {
+    registerPlugin(name, function (opts) {
       this.on('test', function (event) {
         order.push(name);
       });
@@ -123,7 +123,7 @@ test('Plugins should get events in registration order', function() {
     plugin(name);
   }
 
-  Plugin('testerPlugin', function (opts) {
+  registerPlugin('testerPlugin', function (opts) {
     this.trigger('test');
   });
 
@@ -141,7 +141,7 @@ test('Plugins should not get events after stopImmediatePropagation is called', f
   var name;
   var player = TestHelpers.makePlayer({});
   var plugin = function (name) {
-    Plugin(name, function (opts) {
+    registerPlugin(name, function (opts) {
       this.on('test', function (event) {
         order.push(name);
         event.stopImmediatePropagation();
@@ -156,7 +156,7 @@ test('Plugins should not get events after stopImmediatePropagation is called', f
     plugin(name);
   }
 
-  Plugin('testerPlugin', function (opts) {
+  registerPlugin('testerPlugin', function (opts) {
     this.trigger('test');
   });
 
