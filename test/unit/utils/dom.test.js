@@ -92,8 +92,9 @@ test('should set element attributes from object', function(){
 test('should read tag attributes from elements, including HTML5 in all browsers', function(){
   // Creating the source/track tags outside of the video tag prevents log errors
   let tags = `
-  <video id="vid1" controls autoplay loop muted preload="none" src="http://google.com" poster="http://www2.videojs.com/img/video-js-html5-video-player.png" data-test="asdf" data-empty-string=""></video>
-  <source id="source" src="http://google.com" type="video/mp4" media="fdsa" title="test" >
+  <video id="vid1" controls autoplay loop muted preload="none" src="http://google.com" poster="http://www2.videojs.com/img/video-js-html5-video-player.png" data-test="asdf" data-empty-string="">
+    <source id="source" src="http://google.com" type="video/mp4" media="fdsa" title="test" >
+  </video>
   <track id="track" default src="http://google.com" kind="captions" srclang="en" label="testlabel" title="test" >
   `;
 
