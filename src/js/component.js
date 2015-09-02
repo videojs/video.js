@@ -343,7 +343,7 @@ class Component {
    * @return {Component} The child component (created by this process if a string was used)
    * @method addChild
    */
-  addChild(child, options={}, index='undefined') {
+  addChild(child, options={}, index=this.children_.length) {
     let component;
     let componentName;
 
@@ -380,11 +380,7 @@ class Component {
       component = child;
     }
 
-    if (typeof index === 'number') {
-      this.children_.splice(index, 0, component);
-    } else {
-      this.children_.push(component);
-    }
+    this.children_.splice(index, 0, component);
 
     if (typeof component.id === 'function') {
       this.childIndex_[component.id()] = component;
@@ -401,7 +397,7 @@ class Component {
     // Add the UI object's element to the container div (box)
     // Having an element is not required
     if (typeof component.el === 'function' && component.el()) {
-      this.contentEl().appendChild(component.el());
+      this.contentEl().insertBefore(component.el(), this.contentEl().children[index]);
     }
 
     // Return so it can stored on parent object if desired.
