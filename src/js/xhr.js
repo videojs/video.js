@@ -142,7 +142,11 @@ vjs.xhr = function(options, callback){
 
   // send the request
   try {
-    request.send();
+    if (options.body) {
+      request.send(options.body);
+    } else {
+      request.send();
+    }
   } catch(err) {
     return errorHandler(err);
   }
