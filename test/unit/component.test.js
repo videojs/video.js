@@ -57,18 +57,14 @@ test('should add a child component to an index', function(){
   ok(comp.children().length === 3);
   ok(comp.children()[2] === child1);
 
-  var child2 = comp.addChild('component', {}, null);
+  var child2 = comp.addChild('component', {}, undefined);
   ok(comp.children().length === 4);
   ok(comp.children()[3] === child2);
 
-  var child3 = comp.addChild('component', {}, undefined);
+  var child3 = comp.addChild('component', {}, -1);
   ok(comp.children().length === 5);
-  ok(comp.children()[4] === child3);
-
-  var child4 = comp.addChild('component', {}, -1);
-  ok(comp.children().length === 6);
-  ok(comp.children()[4] === child4);
-  ok(comp.children()[5] === child3);
+  ok(comp.children()[3] === child3);
+  ok(comp.children()[4] === child2);
 
 });
 
