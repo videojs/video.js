@@ -271,7 +271,9 @@ test('should load a media controller', function(){
     ]
   });
 
-  ok(player.el().children[0].className.indexOf('vjs-tech') !== -1, 'media controller loaded');
+  var it = player.el().children;
+  //ok(player.el().children[0].className.indexOf('vjs-tech') !== -1, 'media controller loaded');
+  ok(player.el().children[it.length-1].className.indexOf('vjs-tech') !== -1, 'media controller loaded');
 
   player.dispose();
 });
