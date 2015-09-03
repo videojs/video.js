@@ -259,6 +259,10 @@ module.exports = function(grunt) {
           ['browserify-versionify', {
             placeholder: '__VERSION_NO_PATCH__',
             version: version.majorMinor
+          }],
+          ['browserify-versionify', {
+            placeholder: '__SWF_VERSION__',
+            version: pkg.dependencies['videojs-swf']
           }]
         ]
       },
