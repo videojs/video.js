@@ -121,6 +121,7 @@ CHANGELOG
 * @gkatsev fixed the default state of userActive ([view](https://github.com/videojs/video.js/pull/2557))
 * @heff fixed event bubbling in IE8 ([view](https://github.com/videojs/video.js/pull/2563))
 * @heff cleaned up internal duration handling ([view](https://github.com/videojs/video.js/pull/2552))
+* @heff fixed the UI for live streams ([view](https://github.com/videojs/video.js/pull/2557))
 
 --------------------
 

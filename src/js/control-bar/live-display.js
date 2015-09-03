@@ -7,11 +7,18 @@ import * as Dom from '../utils/dom.js';
 /**
  * Displays the live indicator
  * TODO - Future make it click to snap to live
- * 
+ *
  * @extends Component
  * @class LiveDisplay
  */
 class LiveDisplay extends Component {
+
+  constructor(player, options) {
+    super(player, options);
+
+    this.updateShowing();
+    this.on(this.player(), 'durationchange', this.updateShowing);
+  }
 
   /**
    * Create the component's DOM element
@@ -31,8 +38,15 @@ class LiveDisplay extends Component {
     });
 
     el.appendChild(this.contentEl_);
-
     return el;
+  }
+
+  updateShowing() {
+    if (this.player().duration() === Infinity) {
+      this.show();
+    } else {
+      this.hide();
+    }
   }
 
 }

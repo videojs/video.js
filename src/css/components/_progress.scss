@@ -17,6 +17,10 @@
   @include display-flex(center);
 }
 
+.vjs-live .vjs-progress-control {
+  display: none;
+}
+
 /* Box containing play and load progresses. Also acts as seek scrubber. */
 .video-js .vjs-progress-holder {
   @include flex(auto);
@@ -25,7 +29,9 @@
 }
 
 /* We need an increased hit area on hover */
-.video-js .vjs-progress-control:hover .vjs-progress-holder { font-size: 1.666666666666666666em }
+.video-js .vjs-progress-control:hover .vjs-progress-holder {
+  font-size: 1.666666666666666666em
+}
 
 /* Also show the current time tooltip */
 .video-js .vjs-progress-control:hover .vjs-play-progress:after {
