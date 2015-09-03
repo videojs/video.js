@@ -116,6 +116,7 @@ CHANGELOG
 * @heff fixed a number of console errors after testing ([view](https://github.com/videojs/video.js/pull/2513))
 * @gkatsev made the sass files available via npm in src/css ([view](https://github.com/videojs/video.js/pull/2546))
 * @heff removed playerOptions from plugin options because it created an inconsistency in plugin inits ([view](https://github.com/videojs/video.js/pull/2532))
+* @heff added a default data attribute to fix the progress handle display in IE8 ([view](https://github.com/videojs/video.js/pull/2547))
 
 --------------------
 
