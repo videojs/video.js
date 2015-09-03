@@ -13,6 +13,7 @@ import FlashRtmpDecorator from './flash-rtmp';
 import Component from '../component';
 import window from 'global/window';
 import assign from 'object.assign';
+import pkg from '../../../package.json';
 
 let navigator = window.navigator;
 /**
@@ -27,12 +28,6 @@ class Flash extends Tech {
 
   constructor(options, ready){
     super(options, ready);
-
-    // The swf URL needs to be relative to the page (not video.js)
-    // so this probably won't work for most, but it's the best we can do.
-    // The CDN auto-adds a better swf URL for that specific version.
-    // Otherwise you just need to set your swf location.
-    options.swf = options.swf || 'video-js.swf';
 
     // Set the source when ready
     if (options.source) {
@@ -74,6 +69,15 @@ class Flash extends Tech {
    */
   createEl() {
     let options = this.options_;
+
+    // If video.js is hosted locally you should also set the location
+    // for the hosted swf, which should be relative to the page (not video.js)
+    // Otherwise this adds a CDN url.
+    // The CDN also auto-adds a swf URL for that specific version.
+    if (!options.swf) {
+      let ACCESS_PROTOCOL = ('https:' === window.location.protocol ? 'https://' : 'http://');
+      options.swf = ACCESS_PROTOCOL+'vjs.zencdn.net/swf/'+pkg.dependencies['videojs-swf']+'/video-js.swf';
+    }
 
     // Generate ID for swf object
     let objId = options.techId;
