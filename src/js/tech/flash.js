@@ -69,6 +69,14 @@ class Flash extends Tech {
   createEl() {
     let options = this.options_;
 
+    // If video.js is hosted locally you should also set the location
+    // for the hosted swf, which should be relative to the page (not video.js)
+    // Otherwise this adds a CDN url.
+    // The CDN also auto-adds a swf URL for that specific version.
+    if (!options.swf) {
+      options.swf = '//vjs.zencdn.net/swf/__SWF_VERSION__/video-js.swf';
+    }
+
     // Generate ID for swf object
     let objId = options.techId;
 
