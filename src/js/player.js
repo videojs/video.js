@@ -298,7 +298,17 @@ class Player extends Component {
     if (tag.parentNode) {
       tag.parentNode.insertBefore(el, tag);
     }
-    Dom.insertElFirst(tag, el); // Breaks iPhone, fixed in HTML5 setup.
+
+    //Dom.insertElFirst(tag, el); // Breaks iPhone, fixed in HTML5 setup.
+
+    // append the DOM el function to make use of our component.addChild method
+    // to properly be injected into the children Array
+    tag.el = function () {
+      return this;
+    };
+
+    // add our tag as the first child
+    this.addChild(tag, {}, 0);
 
     this.el_ = el;
 
