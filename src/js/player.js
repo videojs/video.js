@@ -659,6 +659,9 @@ class Player extends Component {
       this.techCall('setVolume', this.cache_.volume);
     }
 
+    // Update the duration if available
+    this.handleTechDurationChange();
+
     // Chrome and Safari both have issues with autoplay.
     // In Safari (5.1.1), when we move the video element into the container div, autoplay doesn't work.
     // In Chrome (15), if you have autoplay + a poster + no controls, the video gets hidden (but audio plays)
@@ -867,8 +870,7 @@ class Player extends Component {
    * @event durationchange
    */
   handleTechDurationChange() {
-    this.updateDuration();
-    this.trigger('durationchange');
+    this.duration(this.techGet('duration'));
   }
 
   /**
@@ -931,31 +933,6 @@ class Player extends Component {
   handleTechTouchEnd(event) {
     // Stop the mouse events from also happening
     event.preventDefault();
-  }
-
-  /**
-   * Update the duration of the player using the tech
-   *
-   * @private
-   * @method updateDuration
-   */
-  updateDuration() {
-    // Allows for caching value instead of asking player each time.
-    // We need to get the techGet response and check for a value so we don't
-    // accidentally cause the stack to blow up.
-    var duration = this.techGet('duration');
-    if (duration) {
-      if (duration < 0) {
-        duration = Infinity;
-      }
-      this.duration(duration);
-      // Determine if the stream is live and propagate styles down to UI.
-      if (duration === Infinity) {
-        this.addClass('vjs-live');
-      } else {
-        this.removeClass('vjs-live');
-      }
-    }
   }
 
   /**
@@ -1277,19 +1254,31 @@ class Player extends Component {
    * @method duration
    */
   duration(seconds) {
-    if (seconds !== undefined) {
-
-      // cache the last set value for optimized scrubbing (esp. Flash)
-      this.cache_.duration = parseFloat(seconds);
-
-      return this;
+    if (seconds === undefined) {
+      return this.cache_.duration || 0;
     }
 
-    if (this.cache_.duration === undefined) {
-      this.updateDuration();
+    seconds = parseFloat(seconds) || 0;
+
+    // Standardize on Inifity for signaling video is live
+    if (seconds < 0) {
+      seconds = Infinity;
     }
 
-    return this.cache_.duration || 0;
+    if (seconds !== this.cache_.duration) {
+      // Cache the last set value for optimized scrubbing (esp. Flash)
+      this.cache_.duration = seconds;
+
+      if (seconds === Infinity) {
+        this.addClass('vjs-live');
+      } else {
+        this.removeClass('vjs-live');
+      }
+
+      this.trigger('durationchange');
+    }
+
+    return this;
   }
 
   /**

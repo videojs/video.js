@@ -120,6 +120,7 @@ CHANGELOG
 * @heff added back the default cdn url for the swf ([view](https://github.com/videojs/video.js/pull/2533))
 * @gkatsev fixed the default state of userActive ([view](https://github.com/videojs/video.js/pull/2557))
 * @heff fixed event bubbling in IE8 ([view](https://github.com/videojs/video.js/pull/2563))
+* @heff cleaned up internal duration handling ([view](https://github.com/videojs/video.js/pull/2552))
 
 --------------------
 
