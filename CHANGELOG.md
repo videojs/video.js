@@ -118,6 +118,7 @@ CHANGELOG
 * @heff removed playerOptions from plugin options because it created an inconsistency in plugin inits ([view](https://github.com/videojs/video.js/pull/2532))
 * @heff added a default data attribute to fix the progress handle display in IE8 ([view](https://github.com/videojs/video.js/pull/2547))
 * @heff added back the default cdn url for the swf ([view](https://github.com/videojs/video.js/pull/2533))
+* @gkatsev fixed the default state of userActive ([view](https://github.com/videojs/video.js/pull/2557))
 
 --------------------
 

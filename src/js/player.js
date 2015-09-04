@@ -199,7 +199,7 @@ class Player extends Component {
 
     // When the player is first initialized, trigger activity so components
     // like the control bar show themselves if needed
-    this.userActive_ = true;
+    this.userActive(true);
     this.reportUserActivity();
     this.listenForUserActivity();
 
