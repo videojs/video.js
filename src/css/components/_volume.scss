@@ -115,9 +115,9 @@ width and height to zero. */
   width: 2.9em;
 }
 
-
 .video-js .vjs-volume-menu-button.vjs-volume-menu-button-horizontal:hover .vjs-menu .vjs-menu-content,
-.video-js .vjs-volume-menu-button.vjs-volume-menu-button-horizontal .vjs-menu.vjs-lock-showing .vjs-menu-content {
+.video-js .vjs-volume-menu-button.vjs-volume-menu-button-horizontal .vjs-menu.vjs-lock-showing .vjs-menu-content
+.video-js .vjs-volume-menu-button.vjs-volume-menu-button-horizontal.vjs-slider-active .vjs-menu .vjs-menu-content {
   height: 2.9em;
   width: 8em;
 }

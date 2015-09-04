@@ -42,17 +42,24 @@ class VolumeMenuButton extends MenuButton {
     this.on(player, 'loadstart', this.volumeUpdate);
 
     // hide mute toggle if the current tech doesn't support volume control
-    if (player.tech && player.tech['featuresVolumeControl'] === false) {
-      this.addClass('vjs-hidden');
-    }
-    this.on(player, 'loadstart', function(){
-      if (player.tech['featuresVolumeControl'] === false) {
+    function updateVisibility() {
+      if (player.tech && player.tech['featuresVolumeControl'] === false) {
         this.addClass('vjs-hidden');
       } else {
         this.removeClass('vjs-hidden');
       }
+    }
+
+    updateVisibility.call(this);
+    this.on(player, 'loadstart', updateVisibility);
+
+    this.on(this.volumeBar, ['slideractive', 'focus'], function(){
+      this.addClass('vjs-slider-active');
     });
-    this.addClass('vjs-menu-button');
+
+    this.on(this.volumeBar, ['sliderinactive', 'blur'], function(){
+      this.removeClass('vjs-slider-active');
+    });
   }
 
   /**
@@ -83,15 +90,11 @@ class VolumeMenuButton extends MenuButton {
       contentElType: 'div'
     });
 
-    let vc = new VolumeBar(this.player_, this.options_.volumeBar);
+    let vb = new VolumeBar(this.player_, this.options_.volumeBar);
 
-    vc.on('focus', function() {
-      menu.lockShowing();
-    });
-    vc.on('blur', function() {
-      menu.unlockShowing();
-    });
-    menu.addChild(vc);
+    menu.addChild(vb);
+
+    this.volumeBar = vb;
     return menu;
   }
 

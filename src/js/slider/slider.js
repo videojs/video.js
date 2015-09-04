@@ -66,7 +66,9 @@ class Slider extends Component {
   handleMouseDown(event) {
     event.preventDefault();
     Dom.blockTextSelection();
+
     this.addClass('vjs-sliding');
+    this.trigger('slideractive');
 
     this.on(document, 'mousemove', this.handleMouseMove);
     this.on(document, 'mouseup', this.handleMouseUp);
@@ -90,7 +92,9 @@ class Slider extends Component {
    */
   handleMouseUp() {
     Dom.unblockTextSelection();
+
     this.removeClass('vjs-sliding');
+    this.trigger('sliderinactive');
 
     this.off(document, 'mousemove', this.handleMouseMove);
     this.off(document, 'mouseup', this.handleMouseUp);
