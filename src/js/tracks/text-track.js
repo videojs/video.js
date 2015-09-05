@@ -255,9 +255,8 @@ var parseCues = function(srcContent, track) {
 var loadTrack = function(src, track) {
   XHR(src, Fn.bind(this, function(err, response, responseBody){
     if (err) {
-      return log.error(err);
+      return log.error(err, response);
     }
-
 
     track.loaded_ = true;
     parseCues(responseBody, track);

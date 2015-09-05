@@ -80,7 +80,7 @@ var xhr = function(options, callback){
     window.clearTimeout(abortTimeout);
 
     if (!err || typeof err === 'string') {
-      err = new Error(err);
+      err = new Error(err || 'XHR Failed with a response of: '+(request && (request.response || request.responseText)));
     }
 
     callback(err, request);

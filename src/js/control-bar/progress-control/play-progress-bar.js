@@ -17,6 +17,7 @@ class PlayProgressBar extends Component {
 
   constructor(player, options){
     super(player, options);
+    this.updateDataAttr();
     this.on(player, 'timeupdate', this.updateDataAttr);
     player.ready(Fn.bind(this, this.updateDataAttr));
   }

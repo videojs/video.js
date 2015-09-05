@@ -166,6 +166,28 @@ test('seekable', function() {
   equal(result.length, mockFlash.duration_, 'seekable is empty with a zero duration');
 });
 
+test('play after ended seeks to the beginning', function() {
+  let plays = 0, seeks = [];
+
+  Flash.prototype.play.call({
+    el_: {
+      vjs_play() {
+        plays++;
+      }
+    },
+    ended() {
+      return true;
+    },
+    setCurrentTime(time) {
+      seeks.push(time);
+    }
+  });
+
+  equal(plays, 1, 'called play on the SWF');
+  equal(seeks.length, 1, 'seeked on play');
+  equal(seeks[0], 0, 'seeked to the beginning');
+});
+
 // fake out the <object> interaction but leave all the other logic intact
 class MockFlash extends Flash {
   constructor() {

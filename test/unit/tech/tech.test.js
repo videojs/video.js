@@ -3,6 +3,7 @@ var noop = function() {}, clock, oldTextTracks;
 import Tech from '../../../src/js/tech/tech.js';
 import { createTimeRange } from '../../../src/js/utils/time-ranges.js';
 import extendsFn from '../../../src/js/extends.js';
+import MediaError from '../../../src/js/media-error.js';
 
 q.module('Media Tech', {
   'setup': function() {
@@ -193,6 +194,24 @@ test('should handle unsupported sources with the source handler API', function()
 
   tech.setSource('');
   ok(usedNative, 'native source handler was used when an unsupported source was set');
+});
+
+test('should allow custom error events to be set', function() {
+  let tech = new Tech();
+  let errors = [];
+  tech.on('error', function() {
+    errors.push(tech.error());
+  });
+
+  equal(tech.error(), null, 'error is null by default');
+
+  tech.error(new MediaError(1));
+  equal(errors.length, 1, 'triggered an error event');
+  equal(errors[0].code, 1, 'set the proper code');
+
+  tech.error(2);
+  equal(errors.length, 2, 'triggered an error event');
+  equal(errors[1].code, 2, 'wrapped the error code');
 });
 
 test('should track whether a video has played', function() {

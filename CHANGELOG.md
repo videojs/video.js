@@ -107,6 +107,18 @@ CHANGELOG
 * @gkatsev deep clone el for iOS to preserve tracks ([view](https://github.com/videojs/video.js/pull/2494))
 * @forbesjo switched automated testing to BrowserStack ([view](https://github.com/videojs/video.js/pull/2492))
 * @gkatsev fixed nativeControlsForTouch handling. Defaults to native controls on iphone and native android browsers. ([view](https://github.com/videojs/video.js/pull/2499))
+* @heff fixed cross-platform track tests by switching to a fake tech ([view](https://github.com/videojs/video.js/pull/2496))
+* @gkatsev improved tech controls listener handling. ([view](https://github.com/videojs/video.js/pull/2511))
+* @dmlap move seek on replay into the flash tech ([view](https://github.com/videojs/video.js/pull/2527))
+* @dmlap @gkatsev improve Flash tech error property and add an error setter to the base tech ([view](https://github.com/videojs/video.js/pull/2517))
+* @dmlap update to videojs-swf 5.0.0-rc1 ([view](https://github.com/videojs/video.js/pull/2528))
+* @dmlap expose start and end buffered times ([view](https://github.com/videojs/video.js/pull/2501))
+* @heff fixed a number of console errors after testing ([view](https://github.com/videojs/video.js/pull/2513))
+* @gkatsev made the sass files available via npm in src/css ([view](https://github.com/videojs/video.js/pull/2546))
+* @heff removed playerOptions from plugin options because it created an inconsistency in plugin inits ([view](https://github.com/videojs/video.js/pull/2532))
+* @heff added a default data attribute to fix the progress handle display in IE8 ([view](https://github.com/videojs/video.js/pull/2547))
+* @heff added back the default cdn url for the swf ([view](https://github.com/videojs/video.js/pull/2533))
+* @gkatsev fixed the default state of userActive ([view](https://github.com/videojs/video.js/pull/2557))
 
 --------------------
 

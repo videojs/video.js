@@ -157,7 +157,6 @@ class Player extends Component {
       let plugins = options.plugins;
 
       Object.getOwnPropertyNames(plugins).forEach(function(name){
-        plugins[name].playerOptions = playerOptionsCopy;
         if (typeof this[name] === 'function') {
           this[name](plugins[name]);
         } else {
@@ -200,7 +199,7 @@ class Player extends Component {
 
     // When the player is first initialized, trigger activity so components
     // like the control bar show themselves if needed
-    this.userActive_ = true;
+    this.userActive(true);
     this.reportUserActivity();
     this.listenForUserActivity();
 
@@ -609,6 +608,9 @@ class Player extends Component {
    * @method addTechControlsListeners
    */
   addTechControlsListeners() {
+    // Make sure to remove all the previous listeners in case we are called multiple times.
+    this.removeTechControlsListeners();
+
     // Some browsers (Chrome & IE) don't trigger a click on a flash swf, but do
     // trigger mousedown/up.
     // http://stackoverflow.com/questions/1444562/javascript-onclick-event-over-flash-object
@@ -998,7 +1000,8 @@ class Player extends Component {
    * @event error
    */
   handleTechError() {
-    this.error(this.tech.error().code);
+    let error = this.tech.error();
+    this.error(error && error.code);
   }
 
   /**
@@ -1939,7 +1942,6 @@ class Player extends Component {
       if (this.usingNativeControls_ !== bool) {
         this.usingNativeControls_ = bool;
         if (bool) {
-          this.removeTechControlsListeners();
           this.addClass('vjs-using-native-controls');
 
           /**
@@ -1952,7 +1954,6 @@ class Player extends Component {
             */
           this.trigger('usingnativecontrols');
         } else {
-          this.addTechControlsListeners();
           this.removeClass('vjs-using-native-controls');
 
           /**

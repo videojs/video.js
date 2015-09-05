@@ -11,8 +11,17 @@ import Component from '../../../src/js/component.js';
 import * as browser from '../../../src/js/utils/browser.js';
 import TestHelpers from '../test-helpers.js';
 import document from 'global/document';
+import window from 'global/window';
+import TechFaker from '../tech/tech-faker.js';
 
-q.module('Tracks');
+q.module('Tracks', {
+  setup: function() {
+    this.xhr = sinon.useFakeXMLHttpRequest();
+  },
+  teardown: function() {
+    this.xhr.restore();
+  }
+});
 
 test('should place title list item into ul', function() {
   var player, chaptersButton;
@@ -46,6 +55,8 @@ test('Player track methods call the tech', function() {
   player.textTracks();
 
   equal(calls, 2, 'both textTrack and addTextTrack defer to the tech');
+
+  player.dispose();
 });
 
 test('TextTrackDisplay initializes tracks on player ready', function() {
@@ -153,7 +164,9 @@ test('update texttrack buttons on removetrack or addtrack', function() {
           events[type] = [];
         }
         events[type].push(handler);
-      }
+      },
+      // Requrired in player.dispose()
+      removeEventListener: function(){}
     };
   };
 
@@ -162,13 +175,13 @@ test('update texttrack buttons on removetrack or addtrack', function() {
   track.kind = 'captions';
   track.label = 'en';
   track.language = 'English';
-  track.src = 'en.vtt';
+  track.src = '#en.vtt';
   tag.appendChild(track);
   track = document.createElement('track');
   track.kind = 'captions';
   track.label = 'es';
   track.language = 'Spanish';
-  track.src = 'es.vtt';
+  track.src = '#es.vtt';
   tag.appendChild(track);
 
   player =  TestHelpers.makePlayer({}, tag);
@@ -194,6 +207,8 @@ test('update texttrack buttons on removetrack or addtrack', function() {
   CaptionsButton.prototype.update = oldCaptionsUpdate;
   SubtitlesButton.prototype.update = oldSubsUpdate;
   ChaptersButton.prototype.update = oldChaptersUpdate;
+
+  player.dispose();
 });
 
 test('if native text tracks are not supported, create a texttrackdisplay', function() {
@@ -237,25 +252,8 @@ test('if native text tracks are not supported, create a texttrackdisplay', funct
   Html5.TEST_VID = oldTestVid;
   browser.IS_FIREFOX = oldIsFirefox;
   Component.registerComponent('TextTrackDisplay', oldTextTrackDisplay);
-});
 
-test('Player track methods call the tech', function() {
-  var player,
-      calls = 0;
-
-  player = TestHelpers.makePlayer();
-
-  player.tech.textTracks = function() {
-    calls++;
-  };
-  player.tech.addTextTrack = function() {
-    calls++;
-  };
-
-  player.addTextTrack();
-  player.textTracks();
-
-  equal(calls, 2, 'both textTrack and addTextTrack defer to the tech');
+  player.dispose();
 });
 
 test('html5 tech supports native text tracks if the video supports it, unless mode is a number', function() {
@@ -289,23 +287,15 @@ test('html5 tech supports native text tracks if the video supports it, unless it
 });
 
 test('when switching techs, we should not get a new text track', function() {
-  var player = TestHelpers.makePlayer({
-        html5: {
-          nativeTextTracks: false
-        }
-      }),
-      htmltracks,
-      flashtracks;
+  let player = TestHelpers.makePlayer();
 
-  player.loadTech('Html5');
+  player.loadTech('TechFaker');
+  let firstTracks = player.textTracks();
 
-  htmltracks = player.textTracks();
+  player.loadTech('TechFaker');
+  let secondTracks = player.textTracks();
 
-  player.loadTech('Flash');
-
-  flashtracks = player.textTracks();
-
-  ok(htmltracks === flashtracks, 'the tracks are equal');
+  ok(firstTracks === secondTracks, 'the tracks are equal');
 });
 
 if (Html5.supportsNativeTextTracks()) {

@@ -69,6 +69,14 @@ class Flash extends Tech {
   createEl() {
     let options = this.options_;
 
+    // If video.js is hosted locally you should also set the location
+    // for the hosted swf, which should be relative to the page (not video.js)
+    // Otherwise this adds a CDN url.
+    // The CDN also auto-adds a swf URL for that specific version.
+    if (!options.swf) {
+      options.swf = '//vjs.zencdn.net/swf/__SWF_VERSION__/video-js.swf';
+    }
+
     // Generate ID for swf object
     let objId = options.techId;
 
@@ -113,6 +121,9 @@ class Flash extends Tech {
    * @method play
    */
   play() {
+    if (this.ended()) {
+      this.setCurrentTime(0);
+    }
     this.el_.vjs_play();
   }
 
@@ -264,7 +275,11 @@ class Flash extends Tech {
    * @method buffered
    */
   buffered() {
-    return createTimeRange(0, this.el_.vjs_getProperty('buffered'));
+    let ranges = this.el_.vjs_getProperty('buffered');
+    if (ranges.length === 0) {
+      return createTimeRange();
+    }
+    return createTimeRange(ranges[0][0], ranges[0][1]);
   }
 
   /**
@@ -297,7 +312,7 @@ class Flash extends Tech {
 // Create setters and getters for attributes
 const _api = Flash.prototype;
 const _readWrite = 'rtmpConnection,rtmpStream,preload,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted'.split(',');
-const _readOnly = 'error,networkState,readyState,initialTime,duration,startOffsetTime,paused,ended,videoTracks,audioTracks,videoWidth,videoHeight'.split(',');
+const _readOnly = 'networkState,readyState,initialTime,duration,startOffsetTime,paused,ended,videoTracks,audioTracks,videoWidth,videoHeight'.split(',');
 
 function _createSetter(attr){
   var attrUpper = attr.charAt(0).toUpperCase() + attr.slice(1);
@@ -437,15 +452,14 @@ Flash.onEvent = function(swfID, eventName){
 // Log errors from the swf
 Flash.onError = function(swfID, err){
   const tech = Dom.getEl(swfID).tech;
-  const msg = 'FLASH: '+err;
 
+  // trigger MEDIA_ERR_SRC_NOT_SUPPORTED
   if (err === 'srcnotfound') {
-    tech.trigger('error', { code: 4, message: msg });
-
-  // errors we haven't categorized into the media errors
-  } else {
-    tech.trigger('error', msg);
+    return tech.error(4);
   }
+
+  // trigger a custom error
+  tech.error('FLASH: ' + err);
 };
 
 // Flash Version Check

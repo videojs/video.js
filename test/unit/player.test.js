@@ -220,7 +220,7 @@ test('should wrap the original tag in the player div', function(){
 test('should set and update the poster value', function(){
   var tag, poster, updatedPoster, player;
 
-  poster = 'http://example.com/poster.jpg';
+  poster = '#';
   updatedPoster = 'http://example.com/updated-poster.jpg';
 
   tag = TestHelpers.makeTag();
@@ -411,6 +411,32 @@ test('should allow for tracking when native controls are used', function(){
   player.usingNativeControls(false);
   ok(player.usingNativeControls() === false, 'Using native controls is false');
   ok(player.el().className.indexOf('vjs-using-native-controls') === -1, 'Native controls class removed');
+
+  player.dispose();
+});
+
+test('make sure that controls listeners do not get added too many times', function(){
+  var player = TestHelpers.makePlayer({});
+  var listeners = 0;
+
+  player.addTechControlsListeners = function() {
+    listeners++;
+  };
+
+  // Make sure native controls is false before starting test
+  player.usingNativeControls(false);
+
+  player.usingNativeControls(true);
+
+  player.controls(true);
+
+  equal(listeners, 0, 'addTechControlsListeners should not have gotten called yet');
+
+  player.usingNativeControls(false);
+  player.controls(false);
+
+  player.controls(true);
+  equal(listeners, 1, 'addTechControlsListeners should have gotten called once');
 
   player.dispose();
 });
