@@ -44,12 +44,9 @@ class ControlBar extends Component {
 
 ControlBar.prototype.options_ = {
   loadEvent: 'play',
-  volumeMenuButton: {
-    inline: true
-  },
   children: [
     'playToggle',
-    'volumeMenuButton',
+    { name: 'volumeMenuButton', inline: true },
     'currentTimeDisplay',
     'timeDivider',
     'durationDisplay',

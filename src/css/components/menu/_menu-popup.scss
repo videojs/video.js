@@ -1,4 +1,4 @@
-.video-js .vjs-menu-button-popup .vjs-menu {
+.vjs-menu-button-popup .vjs-menu {
   display: none;
   position: absolute;
   bottom: 0;
@@ -10,18 +10,18 @@
 }
 
 /* Button Pop-up Menu */
-.video-js .vjs-menu-button-popup .vjs-menu-content {
+.vjs-menu-button-popup .vjs-menu-content {
   @include background-color-with-alpha($primary-bg, 0.7);
 }
 
-.video-js .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+.vjs-menu-button-popup .vjs-menu-content {
   position: absolute;
   width: 10em;
   bottom: 1.5em; /* Same bottom as vjs-menu border-top */
   max-height: 15em;
 }
 
-.video-js .vjs-menu-button.vjs-menu-button-popup:hover .vjs-menu,
-.video-js .vjs-menu-button-popup .vjs-menu.vjs-lock-showing {
+.vjs-menu-button-popup:hover .vjs-menu,
+.vjs-menu-button-popup .vjs-menu.vjs-lock-showing {
   display: block;
 }
