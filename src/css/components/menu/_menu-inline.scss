@@ -13,6 +13,7 @@
 // Hover state
 .video-js .vjs-menu-button-inline:hover,
 .video-js .vjs-menu-button-inline:focus,
+.video-js .vjs-menu-button-inline.vjs-slider-active,
 .video-js.vjs-no-flex .vjs-menu-button-inline {
   // This width is currently specific to the inline volume bar.
   width: 12em;
