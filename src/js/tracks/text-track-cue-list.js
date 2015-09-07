@@ -21,7 +21,7 @@ let TextTrackCueList = function(cues) {
     list = document.createElement('custom');
 
     for (let prop in TextTrackCueList.prototype) {
-      if(prop!='constructor'){
+      if(prop!=='constructor'){
         list[prop] = TextTrackCueList.prototype[prop];
       }
     }
