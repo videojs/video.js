@@ -28,7 +28,7 @@ can include any Video.js option plus potential [plugin](https://github.com/video
   <source src="really-cool-video.webm" type='video/webm'>
   <p class="vjs-no-js">
     To view this video please enable JavaScript, and consider upgrading to a web browser
-    that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+    that <a href="http://www.videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
   </p>
 </video>
 ```
