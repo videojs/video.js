@@ -263,6 +263,7 @@ export function fixEvent(event) {
         old.preventDefault();
       }
       event.returnValue = false;
+      old.returnValue = false;
       event.defaultPrevented = true;
     };
 
@@ -274,6 +275,7 @@ export function fixEvent(event) {
         old.stopPropagation();
       }
       event.cancelBubble = true;
+      old.cancelBubble = true;
       event.isPropagationStopped = returnTrue;
     };
 
