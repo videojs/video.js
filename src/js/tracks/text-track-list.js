@@ -26,7 +26,7 @@ let TextTrackList = function(tracks) {
     list = document.createElement('custom');
 
     for (let prop in TextTrackList.prototype) {
-      if(prop!='constructor'){
+      if(prop!=='constructor'){
         list[prop] = TextTrackList.prototype[prop];
       }
     }
