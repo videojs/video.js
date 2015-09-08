@@ -97,3 +97,19 @@ specific time ranges that have been buffered */
 .video-js.vjs-no-flex .vjs-progress-control {
   width: auto;
 }
+
+.video-js .vjs-progress-control .vjs-mouse-display {
+  visibility: hidden;
+  position: absolute;
+  right: 0;
+  left: 0;
+  top: calc(50% - 0.15em);
+}
+.video-js .vjs-progress-control .vjs-mouse-display .vjs-mouse-display-bar {
+  visibility: hidden;
+}
+.video-js .vjs-progress-control .vjs-mouse-display .vjs-mouse-display-bar:after {
+  visibility: visible;
+  filter: invert(100%);
+  -webkit-filter: invert(100%);
+}
