@@ -127,6 +127,18 @@ vjs.xhr = function(options, callback){
   try {
     // Third arg is async, or ignored by XDomainRequest
     request.open(options.method || 'GET', options.uri, true);
+
+    var headers = request.headers = options.headers || {},
+      key;
+
+    if (request.setRequestHeader) {
+      for (key in headers) {
+        if (headers.hasOwnProperty(key)) {
+          // set custom request headers, ie 'Content-Type'
+          request.setRequestHeader(key, headers[key]);
+        }
+      }
+    }
   } catch(err) {
     return errorHandler(err);
   }
