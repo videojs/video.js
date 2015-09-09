@@ -123,6 +123,7 @@ CHANGELOG
 * @heff cleaned up internal duration handling ([view](https://github.com/videojs/video.js/pull/2552))
 * @heff fixed the UI for live streams ([view](https://github.com/videojs/video.js/pull/2557))
 * @gkatsev updated opacity of caption settings background color ([view](https://github.com/videojs/video.js/pull/2573))
+* @gkatsev made all sass variables !default ([view](https://github.com/videojs/video.js/pull/2574))
 
 --------------------
 
