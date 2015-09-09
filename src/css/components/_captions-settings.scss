@@ -2,7 +2,7 @@
   position: relative;
   top: 1em;
   background-color: $primary-bg;
-  opacity: 0.75;
+  background-color: rgba($primary-bg, 0.75);
   color: $primary-text;
   margin: 0 auto;
   padding: 0.5em;
