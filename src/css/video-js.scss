@@ -1,7 +1,7 @@
 @import "variables";
 @import "utilities";
 
-$icon-font-path: 'font';
+$icon-font-path: 'font' !default;
 @import "../../node_modules/videojs-font/scss/icons";
 
 @import "components/layout";
