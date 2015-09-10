@@ -55,8 +55,6 @@ ControlBar.prototype.options_ = {
     'remainingTimeDisplay',
     'customControlSpacer',
     'playbackRateMenuButton',
-    'muteToggle',
-    'volumeControl',
     'chaptersButton',
     'subtitlesButton',
     'captionsButton',
