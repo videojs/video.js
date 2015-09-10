@@ -314,6 +314,11 @@ vjs.Player.prototype.loadTech = function(techName, source){
 
   var techReady = function(){
     this.player_.triggerReady();
+
+    // add vjs-autoplay to hide poster and big-play-button if autoplay:true
+    if (this.options_['autoplay']) {
+      this.addClass('vjs-autoplay');
+    }
   };
 
   // Grab tech-specific options from player options and add source and parent element to use.
