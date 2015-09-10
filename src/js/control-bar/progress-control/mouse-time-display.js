@@ -51,7 +51,7 @@ class MouseTimeDisplay extends SeekBar {
 
   update() {
     this.updateDataAttr();
-    this.update_();
+    super.update();
   }
 
   updateDataAttr() {
