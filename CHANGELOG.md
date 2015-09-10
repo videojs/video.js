@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @forbesjo fixed webkit deprecation warnings ([view](https://github.com/videojs/video.js/pull/2559))
 
 --------------------
 
