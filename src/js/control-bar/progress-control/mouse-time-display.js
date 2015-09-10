@@ -25,6 +25,11 @@ class MouseTimeDisplay extends SeekBar {
     player.on('ready', () => {
       this.on(player.controlBar.progressControl.el(), 'mousemove', throttle(Fn.bind(this, this.handleMouseMove), 50));
     });
+
+    this.bar_ = this.el().querySelector('.vjs-mouse-display-bar')
+    this.bar = {
+      el: () => this.bar_
+    };
   }
 
   /**
@@ -35,7 +40,8 @@ class MouseTimeDisplay extends SeekBar {
    */
   createEl() {
     return super.createEl('div', {
-      className: 'vjs-mouse-display'
+      className: 'vjs-mouse-display',
+      innerHTML: `<div class="vjs-mouse-display-bar vjs-play-progress"></div>`
     });
   }
 
@@ -55,15 +61,14 @@ class MouseTimeDisplay extends SeekBar {
   }
 
   updateDataAttr() {
-    this.mouseDisplayBar.updateDataAttr(formatTime(this.newTime, this.player_.duration()));
+    //this.mouseDisplayBar.updateDataAttr(formatTime(this.newTime, this.player_.duration()));
+    let time = formatTime(this.newTime, this.player_.duration());
+    this.bar && this.bar.el().setAttribute('data-current-time', time);
   }
 }
 
 MouseTimeDisplay.prototype.options_ = {
-  children: {
-    'mouseDisplayBar': {}
-  },
-  'barName': 'mouseDisplayBar'
+  'barName': 'mouseTimeDisplay'
 };
 MouseTimeDisplay.prototype.handleMouseDown = MouseTimeDisplay.prototype.handleMouseMove;
 
