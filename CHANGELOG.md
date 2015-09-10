@@ -125,6 +125,7 @@ CHANGELOG
 * @gkatsev updated opacity of caption settings background color ([view](https://github.com/videojs/video.js/pull/2573))
 * @gkatsev made all sass variables !default ([view](https://github.com/videojs/video.js/pull/2574))
 * @heff fixed the inline volume control and made it the default ([view](https://github.com/videojs/video.js/pull/2553))
+* @forbesjo fixed webkit deprecation warnings ([view](https://github.com/videojs/video.js/pull/2558))
 
 --------------------
 
