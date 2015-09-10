@@ -26,7 +26,7 @@ class MouseTimeDisplay extends SeekBar {
       this.on(player.controlBar.progressControl.el(), 'mousemove', throttle(Fn.bind(this, this.handleMouseMove), 50));
     });
 
-    this.bar_ = this.el().querySelector('.vjs-mouse-display-bar')
+    this.bar_ = this.el().querySelector('.vjs-mouse-display-bar');
     this.bar = {
       el: () => this.bar_
     };
@@ -61,7 +61,6 @@ class MouseTimeDisplay extends SeekBar {
   }
 
   updateDataAttr() {
-    //this.mouseDisplayBar.updateDataAttr(formatTime(this.newTime, this.player_.duration()));
     let time = formatTime(this.newTime, this.player_.duration());
     this.bar && this.bar.el().setAttribute('data-current-time', time);
   }
