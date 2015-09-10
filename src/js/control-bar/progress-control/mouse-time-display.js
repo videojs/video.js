@@ -2,7 +2,6 @@
  * @file mouse-time-display.js
  */
 import Component from '../../component.js';
-import MouseDisplayBar from './mouse-display-bar.js';
 import SeekBar from './seek-bar.js';
 import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
