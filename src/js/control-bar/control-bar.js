@@ -46,7 +46,7 @@ ControlBar.prototype.options_ = {
   loadEvent: 'play',
   children: [
     'playToggle',
-    { name: 'volumeMenuButton', inline: true },
+    'volumeMenuButton',
     'currentTimeDisplay',
     'timeDivider',
     'durationDisplay',

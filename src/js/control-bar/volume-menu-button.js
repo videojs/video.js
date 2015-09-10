@@ -19,10 +19,15 @@ import VolumeBar from './volume-control/volume-bar.js';
 class VolumeMenuButton extends MenuButton {
 
   constructor(player, options={}){
+    // Default to inline
+    if (options.inline === undefined) {
+      options.inline = true;
+    }
+
     // If the vertical option isn't passed at all, default to true.
     if (options.vertical === undefined) {
-      // If an inline volumeMenuButton is used, we should default to using a horizontal
-      // slider for obvious reasons.
+      // If an inline volumeMenuButton is used, we should default to using
+      // a horizontal slider for obvious reasons.
       if (options.inline) {
         options.vertical = false;
       } else {
@@ -30,8 +35,8 @@ class VolumeMenuButton extends MenuButton {
       }
     }
 
-    // The vertical option needs to be set on the volumeBar as well, since that will
-    // need to be passed along to the VolumeBar constructor
+    // The vertical option needs to be set on the volumeBar as well,
+    // since that will need to be passed along to the VolumeBar constructor
     options.volumeBar = options.volumeBar || {};
     options.volumeBar.vertical = !!options.vertical;
 
