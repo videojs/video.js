@@ -1,64 +1,93 @@
 .vjs-loading-spinner {
   display: none;
-
   position: absolute;
   top: 50%;
   left: 50%;
+  margin: -25px 0 0 -25px;
 
-  font-size: 4em;
-  line-height: 1;
+  border: 6px solid rgba(255, 255, 255, 0.3);
+  // border: 6px solid rgba(43, 51, 63, 0.5);
 
-  width: 1em;
-  height: 1em;
-
-  margin-left: -0.5em;
-  margin-top: -0.5em;
-
-  opacity: 0.75;
-
-  @extend .vjs-icon-spinner;
+  box-sizing: border-box;
+  background-clip: padding-box;
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
 }
 
-/* Show the spinner when waiting for data and seeking to a new time */
-.vjs-waiting .vjs-loading-spinner,
-.vjs-seeking .vjs-loading-spinner {
+.vjs-seeking .vjs-loading-spinner,
+.vjs-waiting .vjs-loading-spinner {
   display: block;
-
-  /* only animate when showing because it can be processor heavy *///
-  @include animation(spin 1.5s infinite linear);
 }
 
-/* Errors are unrecoverable without user interaction so hide the spinner */
-.vjs-error .vjs-loading-spinner {
-  display: none;
-
-  /* ensure animation doesn't continue while hidden *///
-  @include animation(none);
-}
-
-.video-js .vjs-loading-spinner:before {
+.vjs-loading-spinner:before,
+.vjs-loading-spinner:after {
+  content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 1em;
-  height: 1em;
-  text-align: center;
-  text-shadow: 0em 0em 0.1em $primary-bg;
+  margin: -6px;
+  box-sizing: inherit;
+  width: inherit;
+  height: inherit;
+  border-radius: inherit;
+  opacity: .85;
+  border: inherit;
+  border-color: transparent;
+  border-top-color: white;
 }
 
-@-moz-keyframes spin {
-  0% { -moz-transform: rotate(0deg); }
-  100% { -moz-transform: rotate(359deg); }
+/* only animate when showing because it can be processor heavy */
+.vjs-seeking .vjs-loading-spinner:before,
+.vjs-seeking .vjs-loading-spinner:after,
+.vjs-waiting .vjs-loading-spinner:before,
+.vjs-waiting .vjs-loading-spinner:after {
+  -webkit-animation: vjs-spinner-spin 1.2s cubic-bezier(0.6, 0.2, 0, 0.8) infinite, vjs-spinner-fade 1.2s linear infinite;
+  animation: vjs-spinner-spin 1.2s cubic-bezier(0.6, 0.2, 0, 0.8) infinite, vjs-spinner-fade 1.2s linear infinite;
 }
-@-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(359deg); }
+
+.vjs-seeking .vjs-loading-spinner:before,
+.vjs-waiting .vjs-loading-spinner:before {
+  border-top-color: white;
 }
-@-o-keyframes spin {
-  0% { -o-transform: rotate(0deg); }
-  100% { -o-transform: rotate(359deg); }
+
+.vjs-seeking .vjs-loading-spinner:after,
+.vjs-waiting .vjs-loading-spinner:after {
+  border-top-color: white;
+  -webkit-animation-delay: 0.36s;
+  animation-delay: 0.36s;
 }
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(359deg); }
+
+@keyframes vjs-spinner-spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@-webkit-keyframes vjs-spinner-spin {
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@keyframes vjs-spinner-fade {
+  20% {
+    opacity: .1;
+  }
+  40% {
+    opacity: 1;
+  }
+  60% {
+    opacity: .1;
+  }
+}
+
+@-webkit-keyframes vjs-spinner-fade {
+  20% {
+    opacity: .1;
+  }
+  40% {
+    opacity: 1;
+  }
+  60% {
+    opacity: .1;
+  }
 }
