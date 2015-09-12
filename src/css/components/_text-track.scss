@@ -1,4 +1,4 @@
-.video-js .vjs-text-track-display {
+.vjs-text-track-display {
   position: absolute;
   bottom: 3em;
   left: 0;
@@ -21,6 +21,6 @@
   @include background-color-with-alpha($primary-bg, 0.5);
 }
 
-.video-js .vjs-subtitles { color: #fff /* Subtitles are white */; }
-.video-js .vjs-captions { color: #fc6 /* Captions are yellow */; }
+.vjs-subtitles { color: #fff /* Subtitles are white */; }
+.vjs-captions { color: #fc6 /* Captions are yellow */; }
 .vjs-tt-cue { display: block; }

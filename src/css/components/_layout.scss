@@ -55,7 +55,6 @@
   margin-bottom: 0;
 }
 
-
 /* Fill the width of the containing element and use padding to create the
    desired aspect ratio. Default to 16x9 unless another ratio is given. */
 @mixin apply-aspect-ratio($width, $height) {

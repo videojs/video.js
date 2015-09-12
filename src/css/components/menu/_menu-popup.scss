@@ -2,21 +2,19 @@
   display: none;
   position: absolute;
   bottom: 0;
+  width: 10em;
   left: -3em; /* (Width of vjs-menu - width of button) / 2 */
-  width: 0em;
   height: 0em;
   margin-bottom: 1.5em;
   border-top-color: rgba(7, 40, 50, $control-bar--transparency); /* Same as ul background */
 }
 
 /* Button Pop-up Menu */
-.vjs-menu-button-popup .vjs-menu-content {
+.vjs-menu-button-popup .vjs-menu ul {
   @include background-color-with-alpha($primary-bg, 0.7);
-}
 
-.vjs-menu-button-popup .vjs-menu-content {
   position: absolute;
-  width: 10em;
+  width: 100%;
   bottom: 1.5em; /* Same bottom as vjs-menu border-top */
   max-height: 15em;
 }
