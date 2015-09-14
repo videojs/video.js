@@ -145,37 +145,11 @@ class Slider extends Component {
    * @method calculateDistance
    */
   calculateDistance(event){
-    let el = this.el_;
-    let box = Dom.findElPosition(el);
-    let boxW = el.offsetWidth;
-    let boxH = el.offsetHeight;
-
+    let position = Dom.getPointerPosition(this.el_, event);
     if (this.vertical()) {
-      let boxY = box.top;
-
-      let pageY;
-      if (event.changedTouches) {
-        pageY = event.changedTouches[0].pageY;
-      } else {
-        pageY = event.pageY;
-      }
-
-      // Percent that the click is through the adjusted area
-      return Math.max(0, Math.min(1, ((boxY - pageY) + boxH) / boxH));
-
-    } else {
-      let boxX = box.left;
-
-      let pageX;
-      if (event.changedTouches) {
-        pageX = event.changedTouches[0].pageX;
-      } else {
-        pageX = event.pageX;
-      }
-
-      // Percent that the click is through the adjusted area
-      return Math.max(0, Math.min(1, (pageX - boxX) / boxW));
+      return position.y;
     }
+    return position.x;
   }
 
   /**
