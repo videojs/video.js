@@ -31,12 +31,11 @@ class SeekBar extends Slider {
    * @return {Element}
    * @method createEl
    */
-  createEl(type='div', props={}) {
-    props = assign({
+  createEl() {
+    return super.createEl('div', {
+      className: 'vjs-progress-holder',
       'aria-label': 'video progress bar'
-    }, props);
-    props.className = 'vjs-progress-holder' + (props.className ? ' ' + props.className : '');
-    return super.createEl(type, props);
+    });
   }
 
   /**
