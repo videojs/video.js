@@ -73,7 +73,6 @@
     font-size: 0.9em;
     height: 1em;
     line-height: 1em;
-    z-index: 1;
   }
 }
 
@@ -91,6 +90,9 @@
   padding: 0.2em 0.5em;
   @include background-color-with-alpha($primary-text, 0.8);
   @include border-radius(0.3em);
+}
+.video-js .vjs-play-progress:before,
+.video-js .vjs-play-progress:after {
   z-index: 1;
 }
 
@@ -115,7 +117,10 @@ specific time ranges that have been buffered */
   width: 1px;
   height: 100%;
   background-color: $primary-bg;
-  opacity: 0.9;
+  z-index: 1;
+}
+.vjs-no-flex .vjs-progress-control .vjs-mouse-display {
+  z-index: 0;
 }
 .video-js .vjs-progress-control:hover .vjs-mouse-display {
   display: block;
