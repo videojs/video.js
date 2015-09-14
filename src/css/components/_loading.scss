@@ -4,8 +4,9 @@
   top: 50%;
   left: 50%;
   margin: -25px 0 0 -25px;
+  opacity: 0.85;
 
-  border: 6px solid rgba(255, 255, 255, 0.3);
+  border: 6px solid rgba(113, 119, 129, 0.75);
   // border: 6px solid rgba(43, 51, 63, 0.5);
 
   box-sizing: border-box;
@@ -29,7 +30,8 @@
   width: inherit;
   height: inherit;
   border-radius: inherit;
-  opacity: .85;
+  /* Keep 100% opacity so they don't show through each other */
+  opacity: 1;
   border: inherit;
   border-color: transparent;
   border-top-color: white;
@@ -40,20 +42,20 @@
 .vjs-seeking .vjs-loading-spinner:after,
 .vjs-waiting .vjs-loading-spinner:before,
 .vjs-waiting .vjs-loading-spinner:after {
-  -webkit-animation: vjs-spinner-spin 1.2s cubic-bezier(0.6, 0.2, 0, 0.8) infinite, vjs-spinner-fade 1.2s linear infinite;
-  animation: vjs-spinner-spin 1.2s cubic-bezier(0.6, 0.2, 0, 0.8) infinite, vjs-spinner-fade 1.2s linear infinite;
+  -webkit-animation: vjs-spinner-spin 1.1s cubic-bezier(0.6, 0.2, 0, 0.8) infinite, vjs-spinner-fade 1.1s linear infinite;
+  animation: vjs-spinner-spin 1.1s cubic-bezier(0.6, 0.2, 0, 0.8) infinite, vjs-spinner-fade 1.1s linear infinite;
 }
 
 .vjs-seeking .vjs-loading-spinner:before,
 .vjs-waiting .vjs-loading-spinner:before {
-  border-top-color: white;
+  border-top-color: rgb(255,255,255);
 }
 
 .vjs-seeking .vjs-loading-spinner:after,
 .vjs-waiting .vjs-loading-spinner:after {
-  border-top-color: white;
-  -webkit-animation-delay: 0.36s;
-  animation-delay: 0.36s;
+  border-top-color: rgb(255,255,255);
+  -webkit-animation-delay: 0.44s;
+  animation-delay: 0.44s;
 }
 
 @keyframes vjs-spinner-spin {
@@ -69,25 +71,37 @@
 }
 
 @keyframes vjs-spinner-fade {
-  20% {
-    opacity: .1;
+  0% {
+    border-top-color: #a6aab0;
   }
-  40% {
-    opacity: 1;
+  20% {
+    border-top-color: #a6aab0;
+  }
+  35% {
+    border-top-color: white;
   }
   60% {
-    opacity: .1;
+    border-top-color: #a6aab0;
+  }
+  100% {
+    border-top-color: #a6aab0;
   }
 }
 
 @-webkit-keyframes vjs-spinner-fade {
-  20% {
-    opacity: .1;
+  0% {
+    border-top-color: #a6aab0;
   }
-  40% {
-    opacity: 1;
+  20% {
+    border-top-color: #a6aab0;
+  }
+  35% {
+    border-top-color: white;
   }
   60% {
-    opacity: .1;
+    border-top-color: #a6aab0;
+  }
+  100% {
+    border-top-color: #a6aab0;
   }
 }
