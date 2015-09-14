@@ -20,7 +20,11 @@ class MouseTimeDisplay extends Component {
 
   constructor(player, options) {
     super(player, options);
+
+    this.position = 0;
+    this.newTime = 0;
     this.update();
+
     player.on('ready', () => {
       this.on(player.controlBar.progressControl.el(), 'mousemove', throttle(Fn.bind(this, this.handleMouseMove), 50));
     });
@@ -45,7 +49,7 @@ class MouseTimeDisplay extends Component {
   handleMouseMove(event) {
     this.newTime = this.calculateDistance(event) * this.player_.duration();
 
-    this.position = event.pageX - Dom.findElPosition(this.el().parentNode).left;
+    this.position = (event.pageX - Dom.findElPosition(this.el().parentNode).left) || 0;
 
     this.update();
   }
