@@ -10,12 +10,12 @@
 
 /* We need the extra specificity that referencing .vjs-no-flex provides. */
 .video-js .vjs-current-time,
-.video-js.vjs-no-flex .vjs-current-time {
+.vjs-no-flex .vjs-current-time {
   display: none;
 }
 
 .video-js .vjs-duration,
-.video-js.vjs-no-flex .vjs-duration {
+.vjs-no-flex .vjs-duration {
   display: none;
 }
 

@@ -127,6 +127,7 @@ CHANGELOG
 * @heff fixed the inline volume control and made it the default ([view](https://github.com/videojs/video.js/pull/2553))
 * @forbesjo fixed webkit deprecation warnings ([view](https://github.com/videojs/video.js/pull/2558))
 * @forbesjo added Android and iOS browser testing ([view](https://github.com/videojs/video.js/pull/2538))
+* @heff improved css selector strengths ([view](https://github.com/videojs/video.js/pull/2583))
 
 --------------------
 

@@ -14,6 +14,7 @@
   /* Start with 10px for base font size so other dimensions can be em based and
   easily calculable. */
   font-size: $base-font-size;
+  line-height: 1;
 
   /* Provide some basic defaults for fonts */
   font-weight: normal;
@@ -38,6 +39,20 @@
 .video-js *:before,
 .video-js *:after {
   box-sizing: inherit;
+}
+
+/* List style reset */
+.video-js ul {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  list-style-position: outside;
+
+  /* Important to specify each */
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 /* Fill the width of the containing element and use padding to create the
