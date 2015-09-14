@@ -135,6 +135,7 @@ CHANGELOG
 * @heff made tech related functions private in the player ([view](https://github.com/videojs/video.js/pull/2590))
 * @heff removed the loadedalldata event ([view](https://github.com/videojs/video.js/pull/2591))
 * @dmlap switched to using raynos/xhr for requests ([view](https://github.com/videojs/video.js/pull/2594))
+* @heff Fixed double loadstart and ready events ([view](https://github.com/videojs/video.js/pull/2605))
 
 --------------------
 

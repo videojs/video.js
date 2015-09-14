@@ -36,6 +36,8 @@ class Html5 extends Tech {
     // anyway so the error gets fired.
     if (source && (this.el_.currentSrc !== source.src || (options.tag && options.tag.initNetworkState_ === 3))) {
       this.setSource(source);
+    } else {
+      this.handleLateInit_(this.el_);
     }
 
     if (this.el_.hasChildNodes()) {
@@ -167,6 +169,87 @@ class Html5 extends Tech {
     // jenniisawesome = true;
   }
 
+  // If we're loading the playback object after it has started loading
+  // or playing the video (often with autoplay on) then the loadstart event
+  // has already fired and we need to fire it manually because many things
+  // rely on it.
+  handleLateInit_(el) {
+    if (el.networkState === 0 || el.networkState === 3) {
+      // The video element hasn't started loading the source yet
+      // or didn't find a source
+      return;
+    }
+
+    if (el.readyState === 0) {
+      // NetworkState is set synchronously BUT loadstart is fired at the
+      // end of the current stack, usually before setInterval(fn, 0).
+      // So at this point we know loadstart may have already fired or is
+      // about to fire, and either way the player hasn't seen it yet.
+      // We don't want to fire loadstart prematurely here and cause a
+      // double loadstart so we'll wait and see if it happens between now
+      // and the next loop, and fire it if not.
+      // HOWEVER, we also want to make sure it fires before loadedmetadata
+      // which could also happen between now and the next loop, so we'll
+      // watch for that also.
+      let loadstartFired = false;
+      let setLoadstartFired = function() {
+        loadstartFired = true;
+      };
+      this.on('loadstart', setLoadstartFired);
+
+      let triggerLoadstart = function() {
+        // We did miss the original loadstart. Make sure the player
+        // sees loadstart before loadedmetadata
+        if (!loadstartFired) {
+          this.trigger('loadstart');
+        }
+      };
+      this.on('loadedmetadata', triggerLoadstart);
+
+      this.ready(function(){
+        this.off('loadstart', setLoadstartFired);
+        this.off('loadedmetadata', triggerLoadstart);
+
+        if (!loadstartFired) {
+          // We did miss the original native loadstart. Fire it now.
+          this.trigger('loadstart');
+        }
+      });
+
+      return;
+    }
+
+    // From here on we know that loadstart already fired and we missed it.
+    // The other readyState events aren't as much of a problem if we double
+    // them, so not going to go to as much trouble as loadstart to prevent
+    // that unless we find reason to.
+    let eventsToTrigger = ['loadstart'];
+
+    // loadedmetadata: newly equal to HAVE_METADATA (1) or greater
+    eventsToTrigger.push('loadedmetadata');
+
+    // loadeddata: newly increased to HAVE_CURRENT_DATA (2) or greater
+    if (el.readyState >= 2) {
+      eventsToTrigger.push('loadeddata');
+    }
+
+    // canplay: newly increased to HAVE_FUTURE_DATA (3) or greater
+    if (el.readyState >= 3) {
+      eventsToTrigger.push('canplay');
+    }
+
+    // canplaythrough: newly equal to HAVE_ENOUGH_DATA (4)
+    if (el.readyState >= 4) {
+      eventsToTrigger.push('canplaythrough');
+    }
+
+    // We still need to give the player time to add event listeners
+    this.ready(function(){
+      eventsToTrigger.forEach(function(type){
+        this.trigger(type);
+      }, this);
+    });
+  }
 
   proxyNativeTextTracks_() {
     let tt = this.el().textTracks;
@@ -390,14 +473,18 @@ class Html5 extends Tech {
    * @deprecated
    * @method setSrc
    */
-  setSrc(src) { this.el_.src = src; }
+  setSrc(src) {
+    this.el_.src = src;
+  }
 
   /**
    * Load media into player
    *
    * @method load
    */
-  load(){ this.el_.load(); }
+  load(){
+    this.el_.load();
+  }
 
   /**
    * Get current source

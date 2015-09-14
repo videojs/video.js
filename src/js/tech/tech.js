@@ -53,8 +53,6 @@ class Tech extends Component {
       this.manualTimeUpdatesOn();
     }
 
-    this.initControlsListeners();
-
     if (options.nativeCaptions === false || options.nativeTextTracks === false) {
       this.featuresNativeTextTracks = false;
     }
@@ -67,39 +65,6 @@ class Tech extends Component {
 
     // Turn on component tap events
     this.emitTapEvents();
-  }
-
-  /**
-   * Set up click and touch listeners for the playback element
-   * On desktops, a click on the video itself will toggle playback,
-   * on a mobile device a click on the video toggles controls.
-   * (toggling controls is done by toggling the user state between active and
-   * inactive)
-   * A tap can signal that a user has become active, or has become inactive
-   * e.g. a quick tap on an iPhone movie should reveal the controls. Another
-   * quick tap should hide them again (signaling the user is in an inactive
-   * viewing state)
-   * In addition to this, we still want the user to be considered inactive after
-   * a few seconds of inactivity.
-   * Note: the only part of iOS interaction we can't mimic with this setup
-   * is a touch and hold on the video element counting as activity in order to
-   * keep the controls showing, but that shouldn't be an issue. A touch and hold on
-   * any controls will still keep the user active
-   *
-   * @method initControlsListeners
-   */
-  initControlsListeners() {
-    // if we're loading the playback object after it has started loading or playing the
-    // video (often with autoplay on) then the loadstart event has already fired and we
-    // need to fire it manually because many things rely on it.
-    // Long term we might consider how we would do this for other events like 'canplay'
-    // that may also have fired.
-    this.ready(function(){
-      if (this.networkState && this.networkState() > 0) {
-        this.trigger('loadstart');
-      }
-    // Allow the tech ready event to handle synchronisity
-    }, true);
   }
 
   /* Fallbacks for unsupported event types

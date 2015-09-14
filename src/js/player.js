@@ -495,10 +495,6 @@ class Player extends Component {
     // Turn off API access because we're loading a new tech that might load asynchronously
     this.isReady_ = false;
 
-    var techReady = Fn.bind(this, function() {
-      this.triggerReady();
-    });
-
     // Grab tech-specific options from player options and add source and parent element to use.
     var techOptions = assign({
       'nativeControlsForTouch': this.options_.nativeControlsForTouch,
@@ -532,11 +528,12 @@ class Player extends Component {
     let techComponent = Component.getComponent(techName);
     this.tech_ = new techComponent(techOptions);
 
+    // player.triggerReady is always async, so don't need this to be async
+    this.tech_.ready(Fn.bind(this, this.handleTechReady_), true);
+
     textTrackConverter.jsonToTextTracks(this.textTracksJson_ || [], this.tech_);
 
-    this.on(this.tech_, 'ready', this.handleTechReady_);
-
-    // Listen to every HTML5 events and trigger them back on the player for the plugins
+    // Listen to all HTML5-defined events and trigger them on the player
     this.on(this.tech_, 'loadstart', this.handleTechLoadStart_);
     this.on(this.tech_, 'waiting', this.handleTechWaiting_);
     this.on(this.tech_, 'canplay', this.handleTechCanPlay_);
@@ -581,9 +578,6 @@ class Player extends Component {
       this.tag.player = null;
       this.tag = null;
     }
-
-    // player.triggerReady is always async, so don't need this to be async
-    this.tech_.ready(techReady, true);
   }
 
   /**
@@ -605,7 +599,22 @@ class Player extends Component {
   }
 
   /**
-   * Add playback technology listeners
+   * Set up click and touch listeners for the playback element
+   *
+   * On desktops, a click on the video itself will toggle playback,
+   * on a mobile device a click on the video toggles controls.
+   * (toggling controls is done by toggling the user state between active and
+   * inactive)
+   * A tap can signal that a user has become active, or has become inactive
+   * e.g. a quick tap on an iPhone movie should reveal the controls. Another
+   * quick tap should hide them again (signaling the user is in an inactive
+   * viewing state)
+   * In addition to this, we still want the user to be considered inactive after
+   * a few seconds of inactivity.
+   * Note: the only part of iOS interaction we can't mimic with this setup
+   * is a touch and hold on the video element counting as activity in order to
+   * keep the controls showing, but that shouldn't be an issue. A touch and hold
+   * on any controls will still keep the user active
    *
    * @private
    * @method addTechControlsListeners_
