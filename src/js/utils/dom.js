@@ -351,7 +351,7 @@ export function getPointerPosition(el, event) {
 
   let boxY = box.top;
   let boxX = box.left;
-  let pageY = event.pageY
+  let pageY = event.pageY;
   let pageX = event.pageX;
 
   if (event.changedTouches) {
