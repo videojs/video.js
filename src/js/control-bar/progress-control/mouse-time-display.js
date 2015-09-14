@@ -2,7 +2,7 @@
  * @file mouse-time-display.js
  */
 import Component from '../../component.js';
-import SeekBar from './seek-bar.js';
+import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
 import throttle from 'lodash-compat/function/throttle';
@@ -16,7 +16,7 @@ import throttle from 'lodash-compat/function/throttle';
  * @extends Component
  * @class MouseTimeDisplay
  */
-class MouseTimeDisplay extends SeekBar {
+class MouseTimeDisplay extends Component {
 
   constructor(player, options) {
     super(player, options);
@@ -24,11 +24,6 @@ class MouseTimeDisplay extends SeekBar {
     player.on('ready', () => {
       this.on(player.controlBar.progressControl.el(), 'mousemove', throttle(Fn.bind(this, this.handleMouseMove), 50));
     });
-
-    this.bar_ = this.el().querySelector('.vjs-mouse-display-bar');
-    this.bar = {
-      el: () => this.bar_
-    };
   }
 
   /**
@@ -39,8 +34,7 @@ class MouseTimeDisplay extends SeekBar {
    */
   createEl() {
     return super.createEl('div', {
-      className: 'vjs-mouse-display',
-      innerHTML: `<div class="vjs-mouse-display-bar vjs-play-progress"></div>`
+      className: 'vjs-mouse-display'
     });
   }
 
@@ -51,24 +45,26 @@ class MouseTimeDisplay extends SeekBar {
   handleMouseMove(event) {
     this.newTime = this.calculateDistance(event) * this.player_.duration();
 
+    this.position = event.pageX - Dom.findElPosition(this.el().parentNode).left;
+
     this.update();
+  }
+
+  calculateDistance(event) {
+    return Dom.getPointerPosition(this.el().parentNode, event).x;
   }
 
   update() {
     this.updateDataAttr();
-    super.update();
+
+    this.el().style.left = this.position + 'px';
   }
 
   updateDataAttr() {
     let time = formatTime(this.newTime, this.player_.duration());
-    this.bar && this.bar.el().setAttribute('data-current-time', time);
+    this.el().setAttribute('data-current-time', time);
   }
 }
-
-MouseTimeDisplay.prototype.options_ = {
-  'barName': 'mouseTimeDisplay'
-};
-MouseTimeDisplay.prototype.handleMouseDown = MouseTimeDisplay.prototype.handleMouseMove;
 
 Component.registerComponent('MouseTimeDisplay', MouseTimeDisplay);
 export default MouseTimeDisplay;

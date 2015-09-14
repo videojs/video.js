@@ -28,6 +28,7 @@
 .video-js .vjs-progress-control:hover .vjs-progress-holder { font-size: 1.666666666666666666em }
 
 /* Also show the current time tooltip */
+.video-js .vjs-progress-control:hover .vjs-mouse-display:after,
 .video-js .vjs-progress-control:hover .vjs-play-progress:after {
   display: block;
 
@@ -53,6 +54,13 @@
   top: 0;
 }
 
+.video-js .vjs-mouse-display {
+  @extend .vjs-icon-circle;
+
+  &:before {
+    display: none;
+  }
+}
 .video-js .vjs-play-progress {
   background-color: $primary-text;
   @extend .vjs-icon-circle;
@@ -65,10 +73,12 @@
     font-size: 0.9em;
     height: 1em;
     line-height: 1em;
+    z-index: 1;
   }
 }
 
 // Current Time "tooltip"
+.video-js .vjs-mouse-display:after,
 .video-js .vjs-play-progress:after {
   /* By default this is hidden and only shown when hovering over the progress control */
   display: none;
@@ -81,6 +91,7 @@
   padding: 0.2em 0.5em;
   @include background-color-with-alpha($primary-text, 0.8);
   @include border-radius(0.3em);
+  z-index: 1;
 }
 
 .video-js .vjs-load-progress {
@@ -99,17 +110,17 @@ specific time ranges that have been buffered */
 }
 
 .video-js .vjs-progress-control .vjs-mouse-display {
-  visibility: hidden;
+  display: none;
   position: absolute;
-  right: 0;
-  left: 0;
-  top: calc(50% - 0.15em);
+  width: 1px;
+  height: 100%;
+  background-color: $primary-bg;
+  opacity: 0.9;
 }
-.video-js .vjs-progress-control .vjs-mouse-display .vjs-mouse-display-bar {
-  visibility: hidden;
+.video-js .vjs-progress-control:hover .vjs-mouse-display {
+  display: block;
 }
-.video-js .vjs-progress-control .vjs-mouse-display .vjs-mouse-display-bar:after {
-  visibility: visible;
+.video-js .vjs-progress-control .vjs-mouse-display:after {
   color: $primary-text; 
   @include background-color-with-alpha($primary-bg, 0.8);
 }

@@ -31,7 +31,6 @@ class ProgressControl extends Component {
 
 ProgressControl.prototype.options_ = {
   children: {
-    'mouseTimeDisplay': {},
     'seekBar': {}
   }
 };

@@ -128,7 +128,8 @@ class SeekBar extends Slider {
 SeekBar.prototype.options_ = {
   children: {
     'loadProgressBar': {},
-    'playProgressBar': {}
+    'playProgressBar': {},
+    'mouseTimeDisplay': {}
   },
   'barName': 'playProgressBar'
 };
