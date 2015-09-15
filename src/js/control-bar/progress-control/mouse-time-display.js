@@ -21,9 +21,7 @@ class MouseTimeDisplay extends Component {
   constructor(player, options) {
     super(player, options);
 
-    this.position = 0;
-    this.newTime = 0;
-    this.update();
+    this.update(0, 0);
 
     player.on('ready', () => {
       this.on(player.controlBar.progressControl.el(), 'mousemove', throttle(Fn.bind(this, this.handleMouseMove), 50));
@@ -42,31 +40,23 @@ class MouseTimeDisplay extends Component {
     });
   }
 
-  getPercent() {
-    return this.newTime / this.player_.duration();
+  handleMouseMove(event) {
+    let duration = this.player_.duration();
+    let newTime = this.calculateDistance(event) * duration;
+    let position = event.pageX - Dom.findElPosition(this.el().parentNode).left;
+
+    this.update(newTime, position);
   }
 
-  handleMouseMove(event) {
-    this.newTime = this.calculateDistance(event) * this.player_.duration();
+  update(newTime, position) {
+    let time = formatTime(newTime, this.player_.duration());
 
-    this.position = (event.pageX - Dom.findElPosition(this.el().parentNode).left) || 0;
-
-    this.update();
+    this.el().style.left = position + 'px';
+    this.el().setAttribute('data-current-time', time);
   }
 
   calculateDistance(event) {
     return Dom.getPointerPosition(this.el().parentNode, event).x;
-  }
-
-  update() {
-    this.updateDataAttr();
-
-    this.el().style.left = this.position + 'px';
-  }
-
-  updateDataAttr() {
-    let time = formatTime(this.newTime, this.player_.duration());
-    this.el().setAttribute('data-current-time', time);
   }
 }
 
