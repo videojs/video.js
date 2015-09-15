@@ -30,7 +30,7 @@ class MediaLoader extends Component {
 
         // Check if the browser supports this technology
         if (tech && tech.isSupported()) {
-          player.loadTech(techName);
+          player.loadTech_(techName);
           break;
         }
       }

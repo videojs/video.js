@@ -48,7 +48,7 @@ class VolumeMenuButton extends MenuButton {
 
     // hide mute toggle if the current tech doesn't support volume control
     function updateVisibility() {
-      if (player.tech && player.tech['featuresVolumeControl'] === false) {
+      if (player.tech_ && player.tech_['featuresVolumeControl'] === false) {
         this.addClass('vjs-hidden');
       } else {
         this.removeClass('vjs-hidden');

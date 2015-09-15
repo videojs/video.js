@@ -44,10 +44,10 @@ test('Player track methods call the tech', function() {
 
   player = TestHelpers.makePlayer();
 
-  player.tech.textTracks = function() {
+  player.tech_.textTracks = function() {
     calls++;
   };
-  player.tech.addTextTrack = function() {
+  player.tech_.addTextTrack = function() {
     calls++;
   };
 
@@ -289,10 +289,10 @@ test('html5 tech supports native text tracks if the video supports it, unless it
 test('when switching techs, we should not get a new text track', function() {
   let player = TestHelpers.makePlayer();
 
-  player.loadTech('TechFaker');
+  player.loadTech_('TechFaker');
   let firstTracks = player.textTracks();
 
-  player.loadTech('TechFaker');
+  player.loadTech_('TechFaker');
   let secondTracks = player.textTracks();
 
   ok(firstTracks === secondTracks, 'the tracks are equal');
