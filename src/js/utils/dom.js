@@ -332,3 +332,35 @@ export function findElPosition(el) {
     top: Math.round(top)
   };
 }
+
+/**
+ * Get pointer position in element
+ * Returns an object with x and y coordinates.
+ * The base on the coordinates are the bottom left of the element.
+ *
+ * @param {Element} el Element on which to get the pointer position on
+ * @param {Event} event Event object
+ * @return {Object=} position This object will have x and y coordinates corresponding to the mouse position
+ * @metho getPointerPosition
+ */
+export function getPointerPosition(el, event) {
+  let position = {};
+  let box = findElPosition(el);
+  let boxW = el.offsetWidth;
+  let boxH = el.offsetHeight;
+
+  let boxY = box.top;
+  let boxX = box.left;
+  let pageY = event.pageY;
+  let pageX = event.pageX;
+
+  if (event.changedTouches) {
+    pageX = event.changedTouches[0].pageX;
+    pageY = event.changedTouches[0].pageY;
+  }
+
+  position.y = Math.max(0, Math.min(1, ((boxY - pageY) + boxH) / boxH));
+  position.x = Math.max(0, Math.min(1, (pageX - boxX) / boxW));
+
+  return position;
+}
