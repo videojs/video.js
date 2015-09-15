@@ -41,7 +41,7 @@ class CaptionsButton extends TextTrackButton {
     super.update();
 
     // if native, then threshold is 1 because no settings button
-    if (this.player().tech && this.player().tech['featuresNativeTextTracks']) {
+    if (this.player().tech_ && this.player().tech_['featuresNativeTextTracks']) {
       threshold = 1;
     }
 
@@ -61,7 +61,7 @@ class CaptionsButton extends TextTrackButton {
   createItems() {
     let items = [];
 
-    if (!(this.player().tech && this.player().tech['featuresNativeTextTracks'])) {
+    if (!(this.player().tech_ && this.player().tech_['featuresNativeTextTracks'])) {
       items.push(new CaptionSettingsMenuItem(this.player_, { 'kind': this.kind_ }));
     }
 

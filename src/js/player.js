@@ -231,7 +231,7 @@ class Player extends Component {
     if (this.tag && this.tag.player) { this.tag.player = null; }
     if (this.el_ && this.el_.player) { this.el_.player = null; }
 
-    if (this.tech) { this.tech.dispose(); }
+    if (this.tech_) { this.tech_.dispose(); }
 
     super.dispose();
   }
@@ -478,7 +478,7 @@ class Player extends Component {
   loadTech(techName, source) {
 
     // Pause and remove current playback technology
-    if (this.tech) {
+    if (this.tech_) {
       this.unloadTech();
     }
 
@@ -529,39 +529,39 @@ class Player extends Component {
 
     // Initialize tech instance
     let techComponent = Component.getComponent(techName);
-    this.tech = new techComponent(techOptions);
+    this.tech_ = new techComponent(techOptions);
 
-    textTrackConverter.jsonToTextTracks(this.textTracksJson_ || [], this.tech);
+    textTrackConverter.jsonToTextTracks(this.textTracksJson_ || [], this.tech_);
 
-    this.on(this.tech, 'ready', this.handleTechReady);
+    this.on(this.tech_, 'ready', this.handleTechReady);
 
     // Listen to every HTML5 events and trigger them back on the player for the plugins
-    this.on(this.tech, 'loadstart', this.handleTechLoadStart);
-    this.on(this.tech, 'waiting', this.handleTechWaiting);
-    this.on(this.tech, 'canplay', this.handleTechCanPlay);
-    this.on(this.tech, 'canplaythrough', this.handleTechCanPlayThrough);
-    this.on(this.tech, 'playing', this.handleTechPlaying);
-    this.on(this.tech, 'ended', this.handleTechEnded);
-    this.on(this.tech, 'seeking', this.handleTechSeeking);
-    this.on(this.tech, 'seeked', this.handleTechSeeked);
-    this.on(this.tech, 'play', this.handleTechPlay);
-    this.on(this.tech, 'firstplay', this.handleTechFirstPlay);
-    this.on(this.tech, 'pause', this.handleTechPause);
-    this.on(this.tech, 'progress', this.handleTechProgress);
-    this.on(this.tech, 'durationchange', this.handleTechDurationChange);
-    this.on(this.tech, 'fullscreenchange', this.handleTechFullscreenChange);
-    this.on(this.tech, 'error', this.handleTechError);
-    this.on(this.tech, 'suspend', this.handleTechSuspend);
-    this.on(this.tech, 'abort', this.handleTechAbort);
-    this.on(this.tech, 'emptied', this.handleTechEmptied);
-    this.on(this.tech, 'stalled', this.handleTechStalled);
-    this.on(this.tech, 'loadedmetadata', this.handleTechLoadedMetaData);
-    this.on(this.tech, 'loadeddata', this.handleTechLoadedData);
-    this.on(this.tech, 'timeupdate', this.handleTechTimeUpdate);
-    this.on(this.tech, 'ratechange', this.handleTechRateChange);
-    this.on(this.tech, 'volumechange', this.handleTechVolumeChange);
-    this.on(this.tech, 'texttrackchange', this.onTextTrackChange);
-    this.on(this.tech, 'loadedmetadata', this.updateStyleEl_);
+    this.on(this.tech_, 'loadstart', this.handleTechLoadStart);
+    this.on(this.tech_, 'waiting', this.handleTechWaiting);
+    this.on(this.tech_, 'canplay', this.handleTechCanPlay);
+    this.on(this.tech_, 'canplaythrough', this.handleTechCanPlayThrough);
+    this.on(this.tech_, 'playing', this.handleTechPlaying);
+    this.on(this.tech_, 'ended', this.handleTechEnded);
+    this.on(this.tech_, 'seeking', this.handleTechSeeking);
+    this.on(this.tech_, 'seeked', this.handleTechSeeked);
+    this.on(this.tech_, 'play', this.handleTechPlay);
+    this.on(this.tech_, 'firstplay', this.handleTechFirstPlay);
+    this.on(this.tech_, 'pause', this.handleTechPause);
+    this.on(this.tech_, 'progress', this.handleTechProgress);
+    this.on(this.tech_, 'durationchange', this.handleTechDurationChange);
+    this.on(this.tech_, 'fullscreenchange', this.handleTechFullscreenChange);
+    this.on(this.tech_, 'error', this.handleTechError);
+    this.on(this.tech_, 'suspend', this.handleTechSuspend);
+    this.on(this.tech_, 'abort', this.handleTechAbort);
+    this.on(this.tech_, 'emptied', this.handleTechEmptied);
+    this.on(this.tech_, 'stalled', this.handleTechStalled);
+    this.on(this.tech_, 'loadedmetadata', this.handleTechLoadedMetaData);
+    this.on(this.tech_, 'loadeddata', this.handleTechLoadedData);
+    this.on(this.tech_, 'timeupdate', this.handleTechTimeUpdate);
+    this.on(this.tech_, 'ratechange', this.handleTechRateChange);
+    this.on(this.tech_, 'volumechange', this.handleTechVolumeChange);
+    this.on(this.tech_, 'texttrackchange', this.onTextTrackChange);
+    this.on(this.tech_, 'loadedmetadata', this.updateStyleEl_);
 
     this.usingNativeControls(this.techGet('controls'));
 
@@ -571,8 +571,8 @@ class Player extends Component {
 
     // Add the tech element in the DOM if it was not already there
     // Make sure to not insert the original video element if using Html5
-    if (this.tech.el().parentNode !== this.el() && (techName !== 'Html5' || !this.tag)) {
-      Dom.insertElFirst(this.tech.el(), this.el());
+    if (this.tech_.el().parentNode !== this.el() && (techName !== 'Html5' || !this.tag)) {
+      Dom.insertElFirst(this.tech_.el(), this.el());
     }
 
     // Get rid of the original video tag reference after the first tech is loaded
@@ -582,7 +582,7 @@ class Player extends Component {
     }
 
     // player.triggerReady is always async, so don't need this to be async
-    this.tech.ready(techReady, true);
+    this.tech_.ready(techReady, true);
   }
 
   /**
@@ -597,9 +597,9 @@ class Player extends Component {
 
     this.isReady_ = false;
 
-    this.tech.dispose();
+    this.tech_.dispose();
 
-    this.tech = false;
+    this.tech_ = false;
   }
 
   /**
@@ -615,18 +615,18 @@ class Player extends Component {
     // trigger mousedown/up.
     // http://stackoverflow.com/questions/1444562/javascript-onclick-event-over-flash-object
     // Any touch events are set to block the mousedown event from happening
-    this.on(this.tech, 'mousedown', this.handleTechClick);
+    this.on(this.tech_, 'mousedown', this.handleTechClick);
 
     // If the controls were hidden we don't want that to change without a tap event
     // so we'll check if the controls were already showing before reporting user
     // activity
-    this.on(this.tech, 'touchstart', this.handleTechTouchStart);
-    this.on(this.tech, 'touchmove', this.handleTechTouchMove);
-    this.on(this.tech, 'touchend', this.handleTechTouchEnd);
+    this.on(this.tech_, 'touchstart', this.handleTechTouchStart);
+    this.on(this.tech_, 'touchmove', this.handleTechTouchMove);
+    this.on(this.tech_, 'touchend', this.handleTechTouchEnd);
 
     // The tap listener needs to come after the touchend listener because the tap
     // listener cancels out any reportedUserActivity when setting userActive(false)
-    this.on(this.tech, 'tap', this.handleTechTap);
+    this.on(this.tech_, 'tap', this.handleTechTap);
   }
 
   /**
@@ -638,11 +638,11 @@ class Player extends Component {
   removeTechControlsListeners() {
     // We don't want to just use `this.off()` because there might be other needed
     // listeners added by techs that extend this.
-    this.off(this.tech, 'tap', this.handleTechTap);
-    this.off(this.tech, 'touchstart', this.handleTechTouchStart);
-    this.off(this.tech, 'touchmove', this.handleTechTouchMove);
-    this.off(this.tech, 'touchend', this.handleTechTouchEnd);
-    this.off(this.tech, 'mousedown', this.handleTechClick);
+    this.off(this.tech_, 'tap', this.handleTechTap);
+    this.off(this.tech_, 'touchstart', this.handleTechTouchStart);
+    this.off(this.tech_, 'touchmove', this.handleTechTouchMove);
+    this.off(this.tech_, 'touchend', this.handleTechTouchEnd);
+    this.off(this.tech_, 'mousedown', this.handleTechClick);
   }
 
   /**
@@ -977,7 +977,7 @@ class Player extends Component {
    * @event error
    */
   handleTechError() {
-    let error = this.tech.error();
+    let error = this.tech_.error();
     this.error(error && error.code);
   }
 
@@ -1090,15 +1090,15 @@ class Player extends Component {
    */
   techCall(method, arg) {
     // If it's not ready yet, call method when it is
-    if (this.tech && !this.tech.isReady_) {
-      this.tech.ready(function(){
+    if (this.tech_ && !this.tech_.isReady_) {
+      this.tech_.ready(function(){
         this[method](arg);
       }, true);
 
     // Otherwise call method now
     } else {
       try {
-        this.tech[method](arg);
+        this.tech_[method](arg);
       } catch(e) {
         log(e);
         throw e;
@@ -1114,22 +1114,22 @@ class Player extends Component {
    * @method techGet
    */
   techGet(method) {
-    if (this.tech && this.tech.isReady_) {
+    if (this.tech_ && this.tech_.isReady_) {
 
       // Flash likes to die and reload when you hide or reposition it.
       // In these cases the object methods go away and we get errors.
       // When that happens we'll catch the errors and inform tech that it's not ready any more.
       try {
-        return this.tech[method]();
+        return this.tech_[method]();
       } catch(e) {
         // When building additional tech libs, an expected method may not be defined yet
-        if (this.tech[method] === undefined) {
+        if (this.tech_[method] === undefined) {
           log(`Video.js: ${method} method not defined for ${this.techName} playback technology.`, e);
         } else {
           // When a method isn't available on the object it throws a TypeError
           if (e.name === 'TypeError') {
             log(`Video.js: ${method} unavailable on ${this.techName} playback technology element.`, e);
-            this.tech.isReady_ = false;
+            this.tech_.isReady_ = false;
           } else {
             log(e);
           }
@@ -1494,7 +1494,7 @@ class Player extends Component {
 
       this.el_[fsApi.requestFullscreen]();
 
-    } else if (this.tech.supportsFullScreen()) {
+    } else if (this.tech_.supportsFullScreen()) {
       // we can't take the video.js controls fullscreen but we can go fullscreen
       // with native controls
       this.techCall('enterFullScreen');
@@ -1524,7 +1524,7 @@ class Player extends Component {
     // Check for browser element fullscreen support
     if (fsApi.requestFullscreen) {
       document[fsApi.exitFullscreen]();
-    } else if (this.tech.supportsFullScreen()) {
+    } else if (this.tech_.supportsFullScreen()) {
      this.techCall('exitFullScreen');
     } else {
      this.exitFullWindow();
@@ -2068,8 +2068,8 @@ class Player extends Component {
           //
           // When this gets resolved in ALL browsers it can be removed
           // https://code.google.com/p/chromium/issues/detail?id=103041
-          if(this.tech) {
-            this.tech.one('mousemove', function(e){
+          if(this.tech_) {
+            this.tech_.one('mousemove', function(e){
               e.stopPropagation();
               e.preventDefault();
             });
@@ -2185,7 +2185,7 @@ class Player extends Component {
       return this;
     }
 
-    if (this.tech && this.tech['featuresPlaybackRate']) {
+    if (this.tech_ && this.tech_['featuresPlaybackRate']) {
       return this.techGet('playbackRate');
     } else {
       return 1.0;
@@ -2279,7 +2279,7 @@ class Player extends Component {
   textTracks() {
     // cannot use techGet directly because it checks to see whether the tech is ready.
     // Flash is unlikely to be ready in time but textTracks should still work.
-    return this.tech && this.tech['textTracks']();
+    return this.tech_ && this.tech_['textTracks']();
   }
 
   /**
@@ -2289,7 +2289,7 @@ class Player extends Component {
    * @method remoteTextTracks
    */
   remoteTextTracks() {
-    return this.tech && this.tech['remoteTextTracks']();
+    return this.tech_ && this.tech_['remoteTextTracks']();
   }
 
   /**
@@ -2303,7 +2303,7 @@ class Player extends Component {
    * @method addTextTrack
    */
   addTextTrack(kind, label, language) {
-    return this.tech && this.tech['addTextTrack'](kind, label, language);
+    return this.tech_ && this.tech_['addTextTrack'](kind, label, language);
   }
 
   /**
@@ -2313,7 +2313,7 @@ class Player extends Component {
    * @method addRemoteTextTrack
    */
   addRemoteTextTrack(options) {
-    return this.tech && this.tech['addRemoteTextTrack'](options);
+    return this.tech_ && this.tech_['addRemoteTextTrack'](options);
   }
 
   /**
@@ -2323,7 +2323,7 @@ class Player extends Component {
    * @method removeRemoteTextTrack
    */
   removeRemoteTextTrack(track) {
-    this.tech && this.tech['removeRemoteTextTrack'](track);
+    this.tech_ && this.tech_['removeRemoteTextTrack'](track);
   }
 
   /**
@@ -2333,7 +2333,7 @@ class Player extends Component {
    * @method videoWidth
    */
   videoWidth() {
-    return this.tech && this.tech.videoWidth && this.tech.videoWidth() || 0;
+    return this.tech_ && this.tech_.videoWidth && this.tech_.videoWidth() || 0;
   }
 
   /**
@@ -2343,7 +2343,7 @@ class Player extends Component {
    * @method videoHeight
    */
   videoHeight() {
-    return this.tech && this.tech.videoHeight && this.tech.videoHeight() || 0;
+    return this.tech_ && this.tech_.videoHeight && this.tech_.videoHeight() || 0;
   }
 
   // Methods to add support for

@@ -44,10 +44,10 @@ test('Player track methods call the tech', function() {
 
   player = TestHelpers.makePlayer();
 
-  player.tech.textTracks = function() {
+  player.tech_.textTracks = function() {
     calls++;
   };
-  player.tech.addTextTrack = function() {
+  player.tech_.addTextTrack = function() {
     calls++;
   };
 

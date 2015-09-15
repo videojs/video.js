@@ -16,7 +16,7 @@ test('should hide volume control if it\'s not supported', function(){
     id: noop,
     on: noop,
     ready: noop,
-    tech: {
+    tech_: {
       'featuresVolumeControl': false
     },
     volume: function(){},
@@ -50,7 +50,7 @@ test('should test and toggle volume control on `loadstart`', function(){
     muted: function(){
       return false;
     },
-    tech: {
+    tech_: {
       'featuresVolumeControl': true
     },
     reportUserActivity: function(){}
@@ -62,7 +62,7 @@ test('should test and toggle volume control on `loadstart`', function(){
   equal(volumeControl.hasClass('vjs-hidden'), false, 'volumeControl is hidden initially');
   equal(muteToggle.hasClass('vjs-hidden'), false, 'muteToggle is hidden initially');
 
-  player.tech['featuresVolumeControl'] = false;
+  player.tech_['featuresVolumeControl'] = false;
   for (i = 0; i < listeners.length; i++) {
     listeners[i]();
   }
@@ -70,7 +70,7 @@ test('should test and toggle volume control on `loadstart`', function(){
   equal(volumeControl.hasClass('vjs-hidden'), true, 'volumeControl does not hide itself');
   equal(muteToggle.hasClass('vjs-hidden'), true, 'muteToggle does not hide itself');
 
-  player.tech['featuresVolumeControl'] = true;
+  player.tech_['featuresVolumeControl'] = true;
   for (i = 0; i < listeners.length; i++) {
     listeners[i]();
   }
