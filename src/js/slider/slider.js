@@ -43,18 +43,22 @@ class Slider extends Component {
    * @return {Element}
    * @method createEl
    */
-  createEl(type, props={}) {
+  createEl(type, props={}, attributes={}) {
     // Add the slider element class to all sub classes
     props.className = props.className + ' vjs-slider';
     props = assign({
+      tabIndex: 0
+    }, props);
+
+    attributes = assign({
       'role': 'slider',
       'aria-valuenow': 0,
       'aria-valuemin': 0,
       'aria-valuemax': 100,
       tabIndex: 0
-    }, props);
+    }, attributes);
 
-    return super.createEl(type, props);
+    return super.createEl(type, props, attributes);
   }
 
   /**

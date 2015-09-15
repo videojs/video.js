@@ -131,6 +131,7 @@ CHANGELOG
 * @heff moved scss vars to be private ([view](https://github.com/videojs/video.js/pull/2584))
 * @heff added a fancy loading spinner ([view](https://github.com/videojs/video.js/pull/2582))
 * @gkatsev added a mouse-hover time display to the progress bar ([view](https://github.com/videojs/video.js/pull/2569))
+* @heff added an attributes argument to createEl() ([view](https://github.com/videojs/video.js/pull/2589))
 
 --------------------
 

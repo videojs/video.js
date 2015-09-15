@@ -33,7 +33,8 @@ class SeekBar extends Slider {
    */
   createEl() {
     return super.createEl('div', {
-      className: 'vjs-progress-holder',
+      className: 'vjs-progress-holder'
+    }, {
       'aria-label': 'video progress bar'
     });
   }
