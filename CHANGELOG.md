@@ -128,6 +128,7 @@ CHANGELOG
 * @forbesjo fixed webkit deprecation warnings ([view](https://github.com/videojs/video.js/pull/2558))
 * @forbesjo added Android and iOS browser testing ([view](https://github.com/videojs/video.js/pull/2538))
 * @heff improved css selector strengths ([view](https://github.com/videojs/video.js/pull/2583))
+* @heff moved scss vars to be private ([view](https://github.com/videojs/video.js/pull/2584))
 
 --------------------
 
