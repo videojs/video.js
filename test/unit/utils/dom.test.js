@@ -20,11 +20,16 @@ test('should return the element with the ID', function(){
 });
 
 test('should create an element', function(){
-  var div = Dom.createEl();
-  var span = Dom.createEl('span', { 'data-test': 'asdf', innerHTML:'fdsa' });
+  let div = Dom.createEl();
+  let span = Dom.createEl('span', {
+    innerHTML: 'fdsa'
+  }, {
+    'data-test': 'asdf'
+  });
+
   ok(div.nodeName === 'DIV');
   ok(span.nodeName === 'SPAN');
-  ok(span['data-test'] === 'asdf');
+  ok(span.getAttribute('data-test') === 'asdf');
   ok(span.innerHTML === 'fdsa');
 });
 
