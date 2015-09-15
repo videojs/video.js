@@ -563,7 +563,7 @@ class Player extends Component {
     this.on(this.tech_, 'texttrackchange', this.onTextTrackChange);
     this.on(this.tech_, 'loadedmetadata', this.updateStyleEl_);
 
-    this.usingNativeControls(this.techGet('controls'));
+    this.usingNativeControls(this.techGet_('controls'));
 
     if (this.controls() && !this.usingNativeControls()) {
       this.addTechControlsListeners();
@@ -656,7 +656,7 @@ class Player extends Component {
 
     // Keep the same volume as before
     if (this.cache_.volume) {
-      this.techCall('setVolume', this.cache_.volume);
+      this.techCall_('setVolume', this.cache_.volume);
     }
 
     // Update the duration if available
@@ -870,7 +870,7 @@ class Player extends Component {
    * @event durationchange
    */
   handleTechDurationChange() {
-    this.duration(this.techGet('duration'));
+    this.duration(this.techGet_('duration'));
   }
 
   /**
@@ -1086,9 +1086,10 @@ class Player extends Component {
    *
    * @param {String=} method Method
    * @param {Object=} arg Argument
-   * @method techCall
+   * @method techCall_
+   * @private
    */
-  techCall(method, arg) {
+  techCall_(method, arg) {
     // If it's not ready yet, call method when it is
     if (this.tech_ && !this.tech_.isReady_) {
       this.tech_.ready(function(){
@@ -1111,9 +1112,10 @@ class Player extends Component {
    *
    * @param {String} method Tech method
    * @return {Method}
-   * @method techGet
+   * @method techGet_
+   * @private
    */
-  techGet(method) {
+  techGet_(method) {
     if (this.tech_ && this.tech_.isReady_) {
 
       // Flash likes to die and reload when you hide or reposition it.
@@ -1151,7 +1153,7 @@ class Player extends Component {
    * @method play
    */
   play() {
-    this.techCall('play');
+    this.techCall_('play');
     return this;
   }
 
@@ -1165,7 +1167,7 @@ class Player extends Component {
    * @method pause
    */
   pause() {
-    this.techCall('pause');
+    this.techCall_('pause');
     return this;
   }
 
@@ -1181,7 +1183,7 @@ class Player extends Component {
    */
   paused() {
     // The initial state of paused should be true (in Safari it's actually false)
-    return (this.techGet('paused') === false) ? false : true;
+    return (this.techGet_('paused') === false) ? false : true;
   }
 
   /**
@@ -1226,7 +1228,7 @@ class Player extends Component {
   currentTime(seconds) {
     if (seconds !== undefined) {
 
-      this.techCall('setCurrentTime', seconds);
+      this.techCall_('setCurrentTime', seconds);
 
       return this;
     }
@@ -1237,7 +1239,7 @@ class Player extends Component {
     // currentTime when scrubbing, but may not provide much performance benefit afterall.
     // Should be tested. Also something has to read the actual current time or the cache will
     // never get updated.
-    return this.cache_.currentTime = (this.techGet('currentTime') || 0);
+    return this.cache_.currentTime = (this.techGet_('currentTime') || 0);
   }
 
   /**
@@ -1318,7 +1320,7 @@ class Player extends Component {
    * @method buffered
    */
   buffered() {
-    var buffered = this.techGet('buffered');
+    var buffered = this.techGet_('buffered');
 
     if (!buffered || !buffered.length) {
       buffered = createTimeRange(0,0);
@@ -1382,13 +1384,13 @@ class Player extends Component {
     if (percentAsDecimal !== undefined) {
       vol = Math.max(0, Math.min(1, parseFloat(percentAsDecimal))); // Force value to between 0 and 1
       this.cache_.volume = vol;
-      this.techCall('setVolume', vol);
+      this.techCall_('setVolume', vol);
 
       return this;
     }
 
     // Default to 1 when returning current volume.
-    vol = parseFloat(this.techGet('volume'));
+    vol = parseFloat(this.techGet_('volume'));
     return (isNaN(vol)) ? 1 : vol;
   }
 
@@ -1409,10 +1411,10 @@ class Player extends Component {
    */
   muted(muted) {
     if (muted !== undefined) {
-      this.techCall('setMuted', muted);
+      this.techCall_('setMuted', muted);
       return this;
     }
-    return this.techGet('muted') || false; // Default to false
+    return this.techGet_('muted') || false; // Default to false
   }
 
   // Check if current tech can support native fullscreen
@@ -1424,7 +1426,7 @@ class Player extends Component {
    * @method supportsFullScreen
    */
   supportsFullScreen() {
-    return this.techGet('supportsFullScreen') || false;
+    return this.techGet_('supportsFullScreen') || false;
   }
 
   /**
@@ -1497,7 +1499,7 @@ class Player extends Component {
     } else if (this.tech_.supportsFullScreen()) {
       // we can't take the video.js controls fullscreen but we can go fullscreen
       // with native controls
-      this.techCall('enterFullScreen');
+      this.techCall_('enterFullScreen');
     } else {
       // fullscreen isn't supported so we'll just stretch the video element to
       // fill the viewport
@@ -1525,7 +1527,7 @@ class Player extends Component {
     if (fsApi.requestFullscreen) {
       document[fsApi.exitFullscreen]();
     } else if (this.tech_.supportsFullScreen()) {
-     this.techCall('exitFullScreen');
+     this.techCall_('exitFullScreen');
     } else {
      this.exitFullWindow();
      this.trigger('fullscreenchange');
@@ -1663,7 +1665,7 @@ class Player extends Component {
    */
   src(source) {
     if (source === undefined) {
-      return this.techGet('src');
+      return this.techGet_('src');
     }
 
     let currentTech = Component.getComponent(this.techName);
@@ -1697,9 +1699,9 @@ class Player extends Component {
           // We need to check the direct prototype for the case where subclasses
           // of the tech do not support source handlers
           if (currentTech.prototype.hasOwnProperty('setSource')) {
-            this.techCall('setSource', source);
+            this.techCall_('setSource', source);
           } else {
-            this.techCall('src', source.src);
+            this.techCall_('src', source.src);
           }
 
           if (this.options_.preload === 'auto') {
@@ -1755,7 +1757,7 @@ class Player extends Component {
    * @method load
    */
   load() {
-    this.techCall('load');
+    this.techCall_('load');
     return this;
   }
 
@@ -1767,7 +1769,7 @@ class Player extends Component {
    * @method currentSrc
    */
   currentSrc() {
-    return this.techGet('currentSrc') || this.cache_.src || '';
+    return this.techGet_('currentSrc') || this.cache_.src || '';
   }
 
   /**
@@ -1792,11 +1794,11 @@ class Player extends Component {
    */
   preload(value) {
     if (value !== undefined) {
-      this.techCall('setPreload', value);
+      this.techCall_('setPreload', value);
       this.options_.preload = value;
       return this;
     }
-    return this.techGet('preload');
+    return this.techGet_('preload');
   }
 
   /**
@@ -1809,11 +1811,11 @@ class Player extends Component {
    */
   autoplay(value) {
     if (value !== undefined) {
-      this.techCall('setAutoplay', value);
+      this.techCall_('setAutoplay', value);
       this.options_.autoplay = value;
       return this;
     }
-    return this.techGet('autoplay', value);
+    return this.techGet_('autoplay', value);
   }
 
   /**
@@ -1826,11 +1828,11 @@ class Player extends Component {
    */
   loop(value) {
     if (value !== undefined) {
-      this.techCall('setLoop', value);
+      this.techCall_('setLoop', value);
       this.options_['loop'] = value;
       return this;
     }
-    return this.techGet('loop');
+    return this.techGet_('loop');
   }
 
   /**
@@ -1863,7 +1865,7 @@ class Player extends Component {
     this.poster_ = src;
 
     // update the tech's poster
-    this.techCall('setPoster', src);
+    this.techCall_('setPoster', src);
 
     // alert components that the poster has been set
     this.trigger('posterchange');
@@ -1886,7 +1888,7 @@ class Player extends Component {
         this.controls_ = bool;
 
         if (this.usingNativeControls()) {
-          this.techCall('setControls', bool);
+          this.techCall_('setControls', bool);
         }
 
         if (bool) {
@@ -2007,7 +2009,7 @@ class Player extends Component {
    * @return {Boolean} True if the player is in the ended state, false if not.
    * @method ended
    */
-  ended() { return this.techGet('ended'); }
+  ended() { return this.techGet_('ended'); }
 
   /**
    * Returns whether or not the player is in the "seeking" state.
@@ -2015,7 +2017,7 @@ class Player extends Component {
    * @return {Boolean} True if the player is in the seeking state, false if not.
    * @method seeking
    */
-  seeking() { return this.techGet('seeking'); }
+  seeking() { return this.techGet_('seeking'); }
 
   /**
    * Returns the TimeRanges of the media that are currently available
@@ -2024,7 +2026,7 @@ class Player extends Component {
    * @return {TimeRanges} the seekable intervals of the media timeline
    * @method seekable
    */
-  seekable() { return this.techGet('seekable'); }
+  seekable() { return this.techGet_('seekable'); }
 
   /**
    * Report user activity
@@ -2181,12 +2183,12 @@ class Player extends Component {
    */
   playbackRate(rate) {
     if (rate !== undefined) {
-      this.techCall('setPlaybackRate', rate);
+      this.techCall_('setPlaybackRate', rate);
       return this;
     }
 
     if (this.tech_ && this.tech_['featuresPlaybackRate']) {
-      return this.techGet('playbackRate');
+      return this.techGet_('playbackRate');
     } else {
       return 1.0;
     }
@@ -2231,7 +2233,7 @@ class Player extends Component {
    * @method networkState
    */
   networkState() {
-    return this.techGet('networkState');
+    return this.techGet_('networkState');
   }
 
   /**
@@ -2258,7 +2260,7 @@ class Player extends Component {
    * @method readyState
    */
   readyState() {
-    return this.techGet('readyState');
+    return this.techGet_('readyState');
   }
 
   /*
@@ -2277,7 +2279,7 @@ class Player extends Component {
    * @method textTracks
    */
   textTracks() {
-    // cannot use techGet directly because it checks to see whether the tech is ready.
+    // cannot use techGet_ directly because it checks to see whether the tech is ready.
     // Flash is unlikely to be ready in time but textTracks should still work.
     return this.tech_ && this.tech_['textTracks']();
   }
@@ -2347,16 +2349,16 @@ class Player extends Component {
   }
 
   // Methods to add support for
-  // initialTime: function(){ return this.techCall('initialTime'); },
-  // startOffsetTime: function(){ return this.techCall('startOffsetTime'); },
-  // played: function(){ return this.techCall('played'); },
-  // seekable: function(){ return this.techCall('seekable'); },
-  // videoTracks: function(){ return this.techCall('videoTracks'); },
-  // audioTracks: function(){ return this.techCall('audioTracks'); },
-  // defaultPlaybackRate: function(){ return this.techCall('defaultPlaybackRate'); },
-  // mediaGroup: function(){ return this.techCall('mediaGroup'); },
-  // controller: function(){ return this.techCall('controller'); },
-  // defaultMuted: function(){ return this.techCall('defaultMuted'); }
+  // initialTime: function(){ return this.techCall_('initialTime'); },
+  // startOffsetTime: function(){ return this.techCall_('startOffsetTime'); },
+  // played: function(){ return this.techCall_('played'); },
+  // seekable: function(){ return this.techCall_('seekable'); },
+  // videoTracks: function(){ return this.techCall_('videoTracks'); },
+  // audioTracks: function(){ return this.techCall_('audioTracks'); },
+  // defaultPlaybackRate: function(){ return this.techCall_('defaultPlaybackRate'); },
+  // mediaGroup: function(){ return this.techCall_('mediaGroup'); },
+  // controller: function(){ return this.techCall_('controller'); },
+  // defaultMuted: function(){ return this.techCall_('defaultMuted'); }
 
   // TODO
   // currentSrcList: the array of sources including other formats and bitrates
