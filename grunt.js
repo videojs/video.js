@@ -74,13 +74,13 @@ module.exports = function(grunt) {
     },
     dist: {},
     watch: {
-      jshint: {
-        files: ['src/**/*', 'test/unit/**/*.js', 'Gruntfile.js'],
-        tasks: 'jshint'
-      },
       skin: {
         files: ['src/css/**/*'],
         tasks: 'sass'
+      },
+      jshint: {
+        files: ['src/**/*', 'test/unit/**/*.js', 'Gruntfile.js'],
+        tasks: 'jshint'
       }
     },
     connect: {
