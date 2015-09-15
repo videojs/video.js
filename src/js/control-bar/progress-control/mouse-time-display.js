@@ -24,7 +24,7 @@ class MouseTimeDisplay extends Component {
     this.update(0, 0);
 
     player.on('ready', () => {
-      this.on(player.controlBar.progressControl.el(), 'mousemove', throttle(Fn.bind(this, this.handleMouseMove), 50));
+      this.on(player.controlBar.progressControl.el(), 'mousemove', throttle(Fn.bind(this, this.handleMouseMove), 25));
     });
   }
 
