@@ -473,13 +473,14 @@ class Player extends Component {
    *
    * @param {String} techName Name of the playback technology
    * @param {String} source Video source
-   * @method loadTech
+   * @method loadTech_
+   * @private
    */
-  loadTech(techName, source) {
+  loadTech_(techName, source) {
 
     // Pause and remove current playback technology
     if (this.tech_) {
-      this.unloadTech();
+      this.unloadTech_();
     }
 
     // get rid of the HTML5 video tag as soon as we are using another tech
@@ -489,7 +490,7 @@ class Player extends Component {
       this.tag = null;
     }
 
-    this.techName = techName;
+    this.techName_ = techName;
 
     // Turn off API access because we're loading a new tech that might load asynchronously
     this.isReady_ = false;
@@ -588,9 +589,10 @@ class Player extends Component {
   /**
    * Unload playback technology
    *
-   * @method unloadTech
+   * @method unloadTech_
+   * @private
    */
-  unloadTech() {
+  unloadTech_() {
     // Save the current text tracks so that we can reuse the same text tracks with the next tech
     this.textTracks_ = this.textTracks();
     this.textTracksJson_ = textTrackConverter.textTracksToJson(this);
@@ -1126,11 +1128,11 @@ class Player extends Component {
       } catch(e) {
         // When building additional tech libs, an expected method may not be defined yet
         if (this.tech_[method] === undefined) {
-          log(`Video.js: ${method} method not defined for ${this.techName} playback technology.`, e);
+          log(`Video.js: ${method} method not defined for ${this.techName_} playback technology.`, e);
         } else {
           // When a method isn't available on the object it throws a TypeError
           if (e.name === 'TypeError') {
-            log(`Video.js: ${method} unavailable on ${this.techName} playback technology element.`, e);
+            log(`Video.js: ${method} unavailable on ${this.techName_} playback technology element.`, e);
             this.tech_.isReady_ = false;
           } else {
             log(e);
@@ -1668,7 +1670,7 @@ class Player extends Component {
       return this.techGet_('src');
     }
 
-    let currentTech = Component.getComponent(this.techName);
+    let currentTech = Component.getComponent(this.techName_);
 
     // case: Array of source objects to choose from and pick the best to play
     if (Array.isArray(source)) {
@@ -1731,12 +1733,12 @@ class Player extends Component {
     var sourceTech = this.selectSource(sources);
 
     if (sourceTech) {
-      if (sourceTech.tech === this.techName) {
+      if (sourceTech.tech === this.techName_) {
         // if this technology is already loaded, set the source
         this.src(sourceTech.source);
       } else {
         // load this technology with the chosen source
-        this.loadTech(sourceTech.tech, sourceTech.source);
+        this.loadTech_(sourceTech.tech, sourceTech.source);
       }
     } else {
       // We need to wrap this in a timeout to give folks a chance to add error event handlers
