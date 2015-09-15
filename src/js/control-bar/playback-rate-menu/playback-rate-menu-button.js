@@ -125,8 +125,8 @@ class PlaybackRateMenuButton extends MenuButton {
    * @method playbackRateSupported
    */
   playbackRateSupported() {
-    return this.player().tech
-      && this.player().tech['featuresPlaybackRate']
+    return this.player().tech_
+      && this.player().tech_['featuresPlaybackRate']
       && this.playbackRates()
       && this.playbackRates().length > 0
     ;

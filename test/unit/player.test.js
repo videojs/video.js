@@ -253,7 +253,7 @@ test('should hide the poster when play is called', function() {
   player.play();
   equal(player.hasStarted(), true, 'the show poster flag is false after play');
 
-  player.tech.trigger('loadstart');
+  player.tech_.trigger('loadstart');
   equal(player.hasStarted(),
         false,
         'the resource selection algorithm sets the show poster flag to true');
@@ -419,7 +419,7 @@ test('make sure that controls listeners do not get added too many times', functi
   var player = TestHelpers.makePlayer({});
   var listeners = 0;
 
-  player.addTechControlsListeners = function() {
+  player.addTechControlsListeners_ = function() {
     listeners++;
   };
 
@@ -430,13 +430,13 @@ test('make sure that controls listeners do not get added too many times', functi
 
   player.controls(true);
 
-  equal(listeners, 0, 'addTechControlsListeners should not have gotten called yet');
+  equal(listeners, 0, 'addTechControlsListeners_ should not have gotten called yet');
 
   player.usingNativeControls(false);
   player.controls(false);
 
   player.controls(true);
-  equal(listeners, 1, 'addTechControlsListeners should have gotten called once');
+  equal(listeners, 1, 'addTechControlsListeners_ should have gotten called once');
 
   player.dispose();
 });
@@ -488,9 +488,9 @@ test('should not add multiple first play events despite subsequent loads', funct
   });
 
   // Checking to make sure onLoadStart removes first play listener before adding a new one.
-  player.tech.trigger('loadstart');
-  player.tech.trigger('loadstart');
-  player.tech.trigger('play');
+  player.tech_.trigger('loadstart');
+  player.tech_.trigger('loadstart');
+  player.tech_.trigger('play');
 });
 
 test('should fire firstplay after resetting the player', function() {
@@ -502,23 +502,23 @@ test('should fire firstplay after resetting the player', function() {
   });
 
   // init firstplay listeners
-  player.tech.trigger('loadstart');
-  player.tech.trigger('play');
+  player.tech_.trigger('loadstart');
+  player.tech_.trigger('play');
   ok(fpFired, 'First firstplay fired');
 
   // reset the player
-  player.tech.trigger('loadstart');
+  player.tech_.trigger('loadstart');
   fpFired = false;
-  player.tech.trigger('play');
+  player.tech_.trigger('play');
   ok(fpFired, 'Second firstplay fired');
 
   // the play event can fire before the loadstart event.
   // in that case we still want the firstplay even to fire.
-  player.tech.paused = function(){ return false; };
+  player.tech_.paused = function(){ return false; };
   fpFired = false;
   // reset the player
-  player.tech.trigger('loadstart');
-  // player.tech.trigger('play');
+  player.tech_.trigger('loadstart');
+  // player.tech_.trigger('play');
   ok(fpFired, 'Third firstplay fired');
 });
 
@@ -527,14 +527,14 @@ test('should remove vjs-has-started class', function(){
 
   var player = TestHelpers.makePlayer({});
 
-  player.tech.trigger('loadstart');
-  player.tech.trigger('play');
+  player.tech_.trigger('loadstart');
+  player.tech_.trigger('play');
   ok(player.el().className.indexOf('vjs-has-started') !== -1, 'vjs-has-started class added');
 
-  player.tech.trigger('loadstart');
+  player.tech_.trigger('loadstart');
   ok(player.el().className.indexOf('vjs-has-started') === -1, 'vjs-has-started class removed');
 
-  player.tech.trigger('play');
+  player.tech_.trigger('play');
   ok(player.el().className.indexOf('vjs-has-started') !== -1, 'vjs-has-started class added again');
 });
 
@@ -543,18 +543,18 @@ test('should add and remove vjs-ended class', function() {
 
   var player = TestHelpers.makePlayer({});
 
-  player.tech.trigger('loadstart');
-  player.tech.trigger('play');
-  player.tech.trigger('ended');
+  player.tech_.trigger('loadstart');
+  player.tech_.trigger('play');
+  player.tech_.trigger('ended');
   ok(player.el().className.indexOf('vjs-ended') !== -1, 'vjs-ended class added');
 
-  player.tech.trigger('play');
+  player.tech_.trigger('play');
   ok(player.el().className.indexOf('vjs-ended') === -1, 'vjs-ended class removed');
 
-  player.tech.trigger('ended');
+  player.tech_.trigger('ended');
   ok(player.el().className.indexOf('vjs-ended') !== -1, 'vjs-ended class re-added');
 
-  player.tech.trigger('loadstart');
+  player.tech_.trigger('loadstart');
   ok(player.el().className.indexOf('vjs-ended') === -1, 'vjs-ended class removed');
 });
 
@@ -721,7 +721,7 @@ test('pause is called when player ended event is fired and player is not paused'
   player.pause = function() {
     pauses++;
   };
-  player.tech.trigger('ended');
+  player.tech_.trigger('ended');
   equal(pauses, 1, 'pause was called');
 });
 
@@ -735,7 +735,7 @@ test('pause is not called if the player is paused and ended is fired', function(
   player.pause = function() {
     pauses++;
   };
-  player.tech.trigger('ended');
+  player.tech_.trigger('ended');
   equal(pauses, 0, 'pause was not called when ended fired');
 });
 
