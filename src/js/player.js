@@ -856,11 +856,6 @@ class Player extends Component {
    */
   handleTechProgress_() {
     this.trigger('progress');
-
-    // Add custom event for when source is finished downloading.
-    if (this.bufferedPercent() === 1) {
-      this.trigger('loadedalldata');
-    }
   }
 
   /**
@@ -2570,13 +2565,6 @@ Player.prototype.handleLoadedMetaData_;
  * @event loadeddata
  */
 Player.prototype.handleLoadedData_;
-
-/**
- * Fired when the player has finished downloading the source data
- *
- * @event loadedalldata
- */
-Player.prototype.handleLoadedAllData;
 
 /**
  * Fired when the user is active, e.g. moves the mouse over the player
