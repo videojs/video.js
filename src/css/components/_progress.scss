@@ -125,6 +125,17 @@ specific time ranges that have been buffered */
 .video-js .vjs-progress-control:hover .vjs-mouse-display {
   display: block;
 }
+.video-js.vjs-user-inactive .vjs-progress-control .vjs-mouse-display,
+.video-js.vjs-user-inactive .vjs-progress-control .vjs-mouse-display:after {
+  visibility: hidden;
+  opacity: 0;
+  $trans: visibility 1.0s, opacity 1.0s;
+  @include transition($trans);
+}
+.video-js.vjs-user-inactive.vjs-no-flex .vjs-progress-control .vjs-mouse-display,
+.video-js.vjs-user-inactive.vjs-no-flex .vjs-progress-control .vjs-mouse-display:after {
+  display: none;
+}
 .video-js .vjs-progress-control .vjs-mouse-display:after {
   color: $primary-text; 
   @include background-color-with-alpha($primary-bg, 0.8);
