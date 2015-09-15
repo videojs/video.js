@@ -211,12 +211,13 @@ class Component {
    * Create the component's DOM element
    *
    * @param  {String=} tagName  Element's node type. e.g. 'div'
-   * @param  {Object=} attributes An object of element attributes that should be set on the element
+   * @param  {Object=} properties An object of properties that should be set
+   * @param  {Object=} attributes An object of attributes that should be set
    * @return {Element}
    * @method createEl
    */
-  createEl(tagName, attributes) {
-    return Dom.createEl(tagName, attributes);
+  createEl(tagName, properties, attributes) {
+    return Dom.createEl(tagName, properties, attributes);
   }
 
   localize(string) {
