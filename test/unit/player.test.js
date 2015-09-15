@@ -419,7 +419,7 @@ test('make sure that controls listeners do not get added too many times', functi
   var player = TestHelpers.makePlayer({});
   var listeners = 0;
 
-  player.addTechControlsListeners = function() {
+  player.addTechControlsListeners_ = function() {
     listeners++;
   };
 
@@ -430,13 +430,13 @@ test('make sure that controls listeners do not get added too many times', functi
 
   player.controls(true);
 
-  equal(listeners, 0, 'addTechControlsListeners should not have gotten called yet');
+  equal(listeners, 0, 'addTechControlsListeners_ should not have gotten called yet');
 
   player.usingNativeControls(false);
   player.controls(false);
 
   player.controls(true);
-  equal(listeners, 1, 'addTechControlsListeners should have gotten called once');
+  equal(listeners, 1, 'addTechControlsListeners_ should have gotten called once');
 
   player.dispose();
 });
