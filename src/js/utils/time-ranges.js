@@ -6,14 +6,24 @@
  * return the start and end times for a range
  * TimeRanges are returned by the buffered() method
  *
- * @param  {Number} start Start time in seconds
- * @param  {Number} end   End time in seconds
- * @return {Object}       Fake TimeRange object
+ * @param  {(Number|Array)} Start of a single range or an array of ranges
+ * @param  {Number} End of a single range
  * @private
- * @method createTimeRange
+ * @method createTimeRanges
  */
-export function createTimeRange(start, end){
-  if (start === undefined && end === undefined) {
+export function createTimeRanges(start, end){
+  if (Array.isArray(start)) {
+    return createTimeRangesObj(start);
+  } else if (start === undefined || end === undefined) {
+    return createTimeRangesObj();
+  }
+  return createTimeRangesObj([[start, end]]);
+}
+
+export { createTimeRanges as createTimeRange };
+
+function createTimeRangesObj(ranges){
+  if (ranges === undefined || ranges.length === 0) {
     return {
       length: 0,
       start: function() {
@@ -25,8 +35,22 @@ export function createTimeRange(start, end){
     };
   }
   return {
-    length: 1,
-    start: function() { return start; },
-    end: function() { return end; }
+    length: ranges.length,
+    start: getRange.bind(null, 'start', 0, ranges),
+    end: getRange.bind(null, 'end', 1, ranges)
   };
+}
+
+function getRange(fnName, valueIndex, ranges, rangeIndex){
+  if (rangeIndex === undefined) {
+    rangeIndex = 0;
+  }
+  rangeCheck(fnName, rangeIndex, ranges.length - 1);
+  return ranges[rangeIndex][valueIndex];
+}
+
+function rangeCheck(fnName, index, maxIndex){
+  if (index < 0 || index > maxIndex) {
+    throw new Error(`Failed to execute '${fnName}' on 'TimeRanges': The index provided (${index}) is greater than or equal to the maximum bound (${maxIndex}).`);
+  }
 }
