@@ -30,7 +30,7 @@ import mergeOptions from './utils/merge-options.js';
  *       <div class="vjs-button">Button</div>
  *     </div>
  * ```
- * Components are also event emitters.
+ * Components are also event targets.
  * ```js
  *     button.on('click', function(){
  *       console.log('Button Clicked!');
@@ -96,12 +96,6 @@ class Component {
     if (options.reportTouchActivity !== false) {
       this.enableTouchActivity();
     }
-  }
-
-  // Temp for ES6 class transition, remove before 5.0
-  init() {
-    // console.log('init called on Component');
-    Component.apply(this, arguments);
   }
 
   /**
@@ -217,12 +211,13 @@ class Component {
    * Create the component's DOM element
    *
    * @param  {String=} tagName  Element's node type. e.g. 'div'
-   * @param  {Object=} attributes An object of element attributes that should be set on the element
+   * @param  {Object=} properties An object of properties that should be set
+   * @param  {Object=} attributes An object of attributes that should be set
    * @return {Element}
    * @method createEl
    */
-  createEl(tagName, attributes) {
-    return Dom.createEl(tagName, attributes);
+  createEl(tagName, properties, attributes) {
+    return Dom.createEl(tagName, properties, attributes);
   }
 
   localize(string) {
@@ -507,6 +502,12 @@ class Component {
           return;
         }
 
+        // Allow options to be passed as a simple boolean if no configuration
+        // is necessary.
+        if (opts === true) {
+          opts = {};
+        }
+
         // We also want to pass the original player options to each component as well so they don't need to
         // reach back into the player for options later.
         opts.playerOptions = this.options_.playerOptions;
@@ -585,7 +586,7 @@ class Component {
    * @param  {String|Component} first   The event type or other component
    * @param  {Function|String}      second  The event handler or event type
    * @param  {Function}             third   The event handler
-   * @return {Component} 
+   * @return {Component}
    * @method on
    */
   on(first, second, third) {
@@ -745,14 +746,19 @@ class Component {
    * it will trigger the function immediately.
    *
    * @param  {Function} fn Ready listener
+   * @param  {Boolean} sync Exec the listener synchronously if component is ready
    * @return {Component}
    * @method ready
    */
-  ready(fn) {
+  ready(fn, sync=false) {
     if (fn) {
       if (this.isReady_) {
-        // Ensure function is always called asynchronously
-        this.setTimeout(fn, 1);
+        if (sync) {
+          fn.call(this);
+        } else {
+          // Call the function asynchronously by default for consistency
+          this.setTimeout(fn, 1);
+        }
       } else {
         this.readyQueue_ = this.readyQueue_ || [];
         this.readyQueue_.push(fn);
@@ -1208,7 +1214,7 @@ class Component {
    * Registers a component
    *
    * @param {String} name Name of the component to register
-   * @param {Object} comp The component to register  
+   * @param {Object} comp The component to register
    * @static
    * @method registerComponent
    */
@@ -1244,12 +1250,16 @@ class Component {
    * Sets up the constructor using the supplied init method
    * or uses the init of the parent object
    *
-   * @param {Object} props An object of properties  
+   * @param {Object} props An object of properties
    * @static
+   * @deprecated
    * @method extend
    */
   static extend(props) {
     props = props || {};
+
+    log.warn('Component.extend({}) has been deprecated, use videojs.extends(Component, {}) instead');
+
     // Set up the constructor using the supplied init method
     // or using the init of the parent object
     // Make sure to check the unobfuscated version for external libs
@@ -1275,8 +1285,6 @@ class Component {
 
     // Make the class extendable
     subObj.extend = Component.extend;
-    // Make a function for creating instances
-    // subObj.create = CoreObject.create;
 
     // Extend subObj's prototype with functions and other properties from props
     for (let name in props) {

@@ -1,14 +1,32 @@
 module.exports = function(grunt) {
   require('time-grunt')(grunt);
 
+  let _ = require('lodash-compat');
   let pkg = grunt.file.readJSON('package.json');
   let license = grunt.file.read('build/license-header.txt');
+  let bannerCommonData = _.pick(pkg, ['version', 'copyright']);
   let verParts = pkg.version.split('.');
   let version = {
     full: pkg.version,
     major: verParts[0],
     minor: verParts[1],
     patch: verParts[2]
+  };
+
+  /**
+   * Creates processor functions for license banners.
+   *
+   * @private
+   * @param  {Object} data Custom data overriding `bannerCommonData`. Will
+   *                       not be mutated.
+   * @return {Function}    A function which returns a processed grunt template
+   *                       using an object constructed from `bannerCommonData`
+   *                       and the `data` argument.
+   */
+  let createLicenseProcessor = (data) => function () {
+    return grunt.template.process(license, {
+      data: _.merge({}, bannerCommonData, data)
+    });
   };
 
   version.majorMinor = `${version.major}.${version.minor}`;
@@ -49,32 +67,28 @@ module.exports = function(grunt) {
       },
       build: {
         files: {
+          'build/temp/alt/video.novtt.min.js': 'build/temp/alt/video.novtt.js',
           'build/temp/video.min.js': 'build/temp/video.js'
         }
       }
     },
     dist: {},
     watch: {
-      default: {
-        files: [ 'src/**/*', 'test/unit/**/*.js', 'Gruntfile.js' ],
-        tasks: 'dev'
-      },
       skin: {
         files: ['src/css/**/*'],
         tasks: 'sass'
+      },
+      jshint: {
+        files: ['src/**/*', 'test/unit/**/*.js', 'Gruntfile.js'],
+        tasks: 'jshint'
       }
     },
     connect: {
-      preview: {
-        options: {
-          port: 9999,
-          keepalive: true
-        }
-      },
       dev: {
         options: {
-          port: 9999,
-          livereload: true
+          port: Number(process.env.VJS_CONNECT_PORT) || 9999,
+          livereload: true,
+          useAvailablePort: true
         }
       }
     },
@@ -106,7 +120,7 @@ module.exports = function(grunt) {
       }
     },
     sass: {
-      dist: {
+      build: {
         files: {
           'build/temp/video-js.css': 'src/css/video-js.scss'
         }
@@ -118,10 +132,15 @@ module.exports = function(grunt) {
         configFile: 'test/karma.conf.js'
       },
 
-      // these are run locally on local browsers
-      dev: {
-        browsers: ['Chrome', 'Firefox', 'Safari']
+      defaults: {},
+
+      watch: {
+        autoWatch: true,
+        singleRun: false
       },
+
+      // these are run locally on local browsers
+      dev: { browsers: ['Chrome', 'Firefox', 'Safari'] },
       chromecanary: { browsers: ['ChromeCanary'] },
       chrome:       { browsers: ['Chrome'] },
       firefox:      { browsers: ['Firefox'] },
@@ -129,14 +148,17 @@ module.exports = function(grunt) {
       ie:           { browsers: ['IE'] },
       phantomjs:    { browsers: ['PhantomJS'] },
 
-      // this only runs on PRs from the mainrepo on saucelabs
-      saucelabs:  { browsers: ['chrome_sl'] },
-      chrome_sl:  { browsers: ['chrome_sl'] },
-      firefox_sl: { browsers: ['firefox_sl'] },
-      safari_sl:  { browsers: ['safari_sl'] },
-      ipad_sl:    { browsers: ['ipad_sl'] },
-      android_sl: { browsers: ['android_sl'] },
-      ie_sl:      { browsers: ['ie_sl'] }
+      // this only runs on PRs from the mainrepo on BrowserStack
+      browserstack: { browsers: ['chrome_bs'] },
+      chrome_bs:    { browsers: ['chrome_bs'] },
+      firefox_bs:   { browsers: ['firefox_bs'] },
+      safari_bs:    { browsers: ['safari_bs'] },
+      ie11_bs:      { browsers: ['ie11_bs'] },
+      ie10_bs:      { browsers: ['ie10_bs'] },
+      ie9_bs:       { browsers: ['ie9_bs'] },
+      ie8_bs:       { browsers: ['ie8_bs'] },
+      android_bs:   { browsers: ['android_bs'] },
+      ios_bs:       { browsers: ['ios_bs'] }
     },
     vjsdocs: {
       all: {
@@ -219,71 +241,61 @@ module.exports = function(grunt) {
       }
     },
     browserify: {
+      options: {
+        browserifyOptions: {
+          debug: true,
+          standalone: 'videojs'
+        },
+        plugin: [
+          ['browserify-derequire']
+        ],
+        transform: [
+          require('babelify').configure({
+            sourceMapRelative: './',
+            loose: ['all']
+          }),
+          ['browserify-versionify', {
+            placeholder: '__VERSION__',
+            version: pkg.version
+          }],
+          ['browserify-versionify', {
+            placeholder: '__VERSION_NO_PATCH__',
+            version: version.majorMinor
+          }],
+          ['browserify-versionify', {
+            placeholder: '__SWF_VERSION__',
+            version: pkg.dependencies['videojs-swf']
+          }]
+        ]
+      },
       build: {
         files: {
           'build/temp/video.js': ['src/js/video.js']
-        },
-        options: {
-          browserifyOptions: {
-            debug: true,
-            standalone: 'videojs'
-          },
-          banner: license,
-          plugin: [
-            [ 'browserify-derequire' ]
-          ],
-          transform: [
-            require('babelify').configure({
-              sourceMapRelative: './src/js',
-              loose: 'all'
-            }),
-            ['browserify-versionify', {
-              placeholder: '__VERSION__',
-              version: pkg.version
-            }],
-            ['browserify-versionify', {
-              placeholder: '__VERSION_NO_PATCH__',
-              version: version.majorMinor
-            }]
-          ]
-        }
-      },
-      test: {
-        files: {
-          'build/temp/tests.js': [
-            'test/globals-shim.js',
-            'test/unit/**/*.js'
-          ]
-        },
-        options: {
-          browserifyOptions: {
-            debug: true,
-            standalone: 'videojs'
-          },
-          transform: [
-            require('babelify').configure(),
-            'browserify-istanbul'
-          ]
         }
       },
       watch: {
+        options: {
+          watch: true,
+          keepAlive: true
+        },
         files: {
-          'build/temp/video.js': ['src/js/video.js'],
+          'build/temp/video.js': ['src/js/video.js']
+        }
+      },
+      tests: {
+        options: {
+          browserifyOptions: {
+            debug: true,
+            standalone: false
+          },
+          banner: false,
+          watch: true,
+          keepAlive: true
+        },
+        files: {
           'build/temp/tests.js': [
             'test/globals-shim.js',
             'test/unit/**/*.js'
-          ]
-        },
-        options: {
-          watch: true,
-          keepAlive: true,
-          browserifyOptions: {
-            standalone: 'videojs'
-          },
-          banner: license,
-          transform: ['babelify'],
-          plugin: [
-            [ 'browserify-derequire' ]
           ]
         }
       }
@@ -307,6 +319,13 @@ module.exports = function(grunt) {
       }
     },
     concat: {
+      novtt: {
+        options: {
+          separator: '\n'
+        },
+        src: ['build/temp/video.js'],
+        dest: 'build/temp/video.novtt.js'
+      },
       vtt: {
         options: {
           separator: '\n',
@@ -314,6 +333,41 @@ module.exports = function(grunt) {
         src: ['build/temp/video.js', 'node_modules/vtt.js/dist/vtt.js'],
         dest: 'build/temp/video.js',
       },
+    },
+    concurrent: {
+      options: {
+        logConcurrentOutput: true
+      },
+      // Run multiple watch tasks in parallel
+      // Needed so watchify can cache intelligently
+      watchAll: [
+        'watch',
+        'browserify:watch',
+        'browserify:tests',
+        'karma:watch'
+      ],
+      watchSandbox: [
+        'watch',
+        'browserify:watch'
+      ]
+    },
+    usebanner: {
+      novtt: {
+        options: {
+          process: createLicenseProcessor({includesVtt: false})
+        },
+        files: {
+          src: ['build/temp/alt/video.novtt.js']
+        }
+      },
+      vtt: {
+        options: {
+          process: createLicenseProcessor({includesVtt: true})
+        },
+        files: {
+          src: ['build/temp/video.js']
+        }
+      }
     }
   });
 
@@ -324,16 +378,21 @@ module.exports = function(grunt) {
 
   grunt.registerTask('build', [
     'clean:build',
+
     'jshint',
     'browserify:build',
-    'browserify:test',
-    'copy:novtt',
+    'exorcise:build',
+    'concat:novtt',
     'concat:vtt',
-    'exorcise',
+    'copy:novtt',
+    'usebanner:novtt',
+    'usebanner:vtt',
     'uglify',
+
     'sass',
     'version:css',
     'cssmin',
+
     'copy:fonts',
     'copy:swf',
     'copy:ie8',
@@ -348,25 +407,19 @@ module.exports = function(grunt) {
     'zip:dist'
   ]);
 
-  // Remove this and add to the test task once mmcc's coverall changes are merged
-  grunt.registerTask('newtest', ['build', 'karma:chrome']);
+  // Default task - build and test
+  grunt.registerTask('default', ['test']);
 
-  // Default task.
-  grunt.registerTask('default', ['build', 'test-local']);
+  grunt.registerTask('test', ['build', 'karma:defaults']);
 
-  // Development watch task. Doing the minimum required.
-  grunt.registerTask('dev', ['jshint', 'sass', 'browserify:build', 'karma:chrome']);
+  // Run while developing
+  grunt.registerTask('dev', ['build', 'connect:dev', 'concurrent:watchSandbox']);
 
-  // Skin development watch task.
-  grunt.registerTask('skin-dev', ['connect:dev', 'watch:skin']);
+  grunt.registerTask('watchAll', ['build', 'connect:dev', 'concurrent:watchAll']);
 
-  // Tests.
-  // We want to run things a little differently if it's coming from Travis vs local
-  if (process.env.TRAVIS) {
-    grunt.registerTask('test', ['build', 'test-travis', 'coveralls']);
-  } else {
-    grunt.registerTask('test', ['build', 'test-local']);
-  }
+  // Pick your testing, or run both in different terminals
+  grunt.registerTask('test-ui', ['browserify:tests']);
+  grunt.registerTask('test-cli', ['karma:watch']);
 
   // Load all the tasks in the tasks directory
   grunt.loadTasks('build/tasks');

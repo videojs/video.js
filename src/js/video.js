@@ -3,19 +3,26 @@
  */
 import document from 'global/document';
 import * as setup from './setup';
+import * as stylesheet from './utils/stylesheet.js';
 import Component from './component';
-import globalOptions from './global-options.js';
+import EventTarget from './event-target';
+import * as Events from './utils/events.js';
 import Player from './player';
 import plugin from './plugins.js';
 import mergeOptions from '../../src/js/utils/merge-options.js';
 import * as Fn from './utils/fn.js';
 
 import assign from 'object.assign';
+import { createTimeRange } from './utils/time-ranges.js';
+import formatTime from './utils/format-time.js';
 import log from './utils/log.js';
 import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
+import * as Url from './utils/url.js';
 import extendsFn from './extends.js';
 import merge from 'lodash-compat/object/merge';
+import createDeprecationProxy from './utils/create-deprecation-proxy.js';
+import xhr from 'xhr';
 
 // Include the built-in techs
 import Html5 from './tech/html5.js';
@@ -56,7 +63,7 @@ var videojs = function(id, options, ready){
     }
 
     // If a player instance has already been created for this ID return it.
-    if (Player.players[id]) {
+    if (videojs.getPlayers()[id]) {
 
       // If options or ready funtion are passed, warn
       if (options) {
@@ -64,10 +71,10 @@ var videojs = function(id, options, ready){
       }
 
       if (ready) {
-        Player.players[id].ready(ready);
+        videojs.getPlayers()[id].ready(ready);
       }
 
-      return Player.players[id];
+      return videojs.getPlayers()[id];
 
     // Otherwise get element for ID
     } else {
@@ -89,6 +96,16 @@ var videojs = function(id, options, ready){
   return tag['player'] || new Player(tag, options, ready);
 };
 
+// Add default styles
+let style = stylesheet.createStyleElement('vjs-styles-defaults');
+let head = document.querySelector('head');
+head.insertBefore(style, head.firstChild);
+stylesheet.setTextContent(style, `
+  .video-js {
+    width: 300px;
+    height: 150px;
+`);
+
 // Run Auto-load players
 // You have to wait at least once in case this script is loaded after your video in the DOM (weird behavior only with minified version)
 setup.autoSetupTimeout(1, videojs);
@@ -101,32 +118,17 @@ setup.autoSetupTimeout(1, videojs);
 videojs.VERSION = '__VERSION__';
 
 /**
- * Get the global options object
+ * The global options object. These are the settings that take effect
+ * if no overrides are specified when the player is created.
  *
- * @return {Object} The global options object
- * @mixes videojs
- * @method getGlobalOptions
- */
-videojs.getGlobalOptions = () => globalOptions;
-
-/**
- * Set options that will apply to every player
  * ```js
- *     videojs.setGlobalOptions({
- *       autoplay: true
- *     });
+ *     videojs.options.autoplay = true
  *     // -> all players will autoplay by default
  * ```
- * NOTE: This will do a deep merge with the new options,
- * not overwrite the entire global options object.
  *
- * @return {Object} The updated global options object
- * @mixes videojs
- * @method setGlobalOptions
+ * @type {Object}
  */
-videojs.setGlobalOptions = function(newOptions) {
-  return mergeOptions(globalOptions, newOptions);
-};
+videojs.options = Player.prototype.options_;
 
 /**
  * Get an object with the currently created players, keyed by player ID
@@ -138,6 +140,18 @@ videojs.setGlobalOptions = function(newOptions) {
 videojs.getPlayers = function() {
   return Player.players;
 };
+
+/**
+ * For backward compatibility, expose players object.
+ *
+ * @deprecated
+ * @memberOf videojs
+ * @property {Object|Proxy} players
+ */
+videojs.players = createDeprecationProxy(Player.players, {
+  get: 'Access to videojs.players is deprecated; use videojs.getPlayers instead',
+  set: 'Modification of videojs.players is deprecated'
+});
 
 /**
  * Get a component class object by name
@@ -181,12 +195,23 @@ videojs.getComponent = Component.getComponent;
  */
 videojs.registerComponent = Component.registerComponent;
 
-/*
+/**
  * A suite of browser and device tests
  *
  * @type {Object}
+ * @private
  */
 videojs.browser = browser;
+
+/**
+ * Whether or not the browser supports touch events. Included for backward
+ * compatibility with 4.x, but deprecated. Use `videojs.browser.TOUCH_ENABLED`
+ * instead going forward.
+ *
+ * @deprecated
+ * @type {Boolean}
+ */
+videojs.TOUCH_ENABLED = browser.TOUCH_ENABLED;
 
 /**
  * Subclass an existing class
@@ -336,7 +361,7 @@ videojs.plugin = plugin;
  */
 videojs.addLanguage = function(code, data){
   code = ('' + code).toLowerCase();
-  return merge(globalOptions.languages, { [code]: data })[code];
+  return merge(videojs.options.languages, { [code]: data })[code];
 };
 
 /**
@@ -345,6 +370,111 @@ videojs.addLanguage = function(code, data){
  * @param {...Object} messages One or more messages to log
  */
 videojs.log = log;
+
+/**
+ * Creates an emulated TimeRange object.
+ *
+ * @param  {Number} start Start time in seconds
+ * @param  {Number} end   End time in seconds
+ * @return {Object}       Fake TimeRange object
+ * @method createTimeRange
+ */
+videojs.createTimeRange = createTimeRange;
+
+/**
+ * Format seconds as a time string, H:MM:SS or M:SS
+ * Supplying a guide (in seconds) will force a number of leading zeros
+ * to cover the length of the guide
+ *
+ * @param  {Number} seconds Number of seconds to be turned into a string
+ * @param  {Number} guide   Number (in seconds) to model the string after
+ * @return {String}         Time formatted as H:MM:SS or M:SS
+ * @method formatTime
+ */
+videojs.formatTime = formatTime;
+
+/**
+ * Resolve and parse the elements of a URL
+ *
+ * @param  {String} url The url to parse
+ * @return {Object}     An object of url details
+ * @method parseUrl
+ */
+videojs.parseUrl = Url.parseUrl;
+
+/**
+ * Event target class.
+ *
+ * @type {Function}
+ */
+videojs.EventTarget = EventTarget;
+
+/**
+ * Add an event listener to element
+ * It stores the handler function in a separate cache object
+ * and adds a generic handler to the element's event,
+ * along with a unique id (guid) to the element.
+ *
+ * @param  {Element|Object}   elem Element or object to bind listeners to
+ * @param  {String|Array}   type Type of event to bind to.
+ * @param  {Function} fn   Event listener.
+ * @method on
+ */
+videojs.on = Events.on;
+
+/**
+ * Trigger a listener only once for an event
+ *
+ * @param  {Element|Object}   elem Element or object to
+ * @param  {String|Array}   type Name/type of event
+ * @param  {Function} fn Event handler function
+ * @method one
+ */
+videojs.one = Events.one;
+
+/**
+ * Removes event listeners from an element
+ *
+ * @param  {Element|Object}   elem Object to remove listeners from
+ * @param  {String|Array=}   type Type of listener to remove. Don't include to remove all events from element.
+ * @param  {Function} fn   Specific listener to remove. Don't include to remove listeners for an event type.
+ * @method off
+ */
+videojs.off = Events.off;
+
+/**
+ * Trigger an event for an element
+ *
+ * @param  {Element|Object}      elem  Element to trigger an event on
+ * @param  {Event|Object|String} event A string (the type) or an event object with a type attribute
+ * @param  {Object} [hash] data hash to pass along with the event
+ * @return {Boolean=} Returned only if default was prevented
+ * @method trigger
+ */
+videojs.trigger = Events.trigger;
+
+/**
+ * A cross-browser XMLHttpRequest wrapper. Here's a simple example:
+ *
+ *     videojs.xhr({
+ *       body: someJSONString,
+ *       uri: "/foo",
+ *       headers: {
+ *         "Content-Type": "application/json"
+ *       }
+ *     }, function (err, resp, body) {
+ *       // check resp.statusCode
+ *     });
+ *
+ * Check out the [full
+ * documentation](https://github.com/Raynos/xhr/blob/v2.1.0/README.md)
+ * for more options.
+ *
+ * @param {Object} options settings for the request.
+ * @return {XMLHttpRequest|XDomainRequest} the request object.
+ * @see https://github.com/Raynos/xhr
+ */
+videojs.xhr = xhr;
 
 // REMOVING: We probably should add this to the migration plugin
 // // Expose but deprecate the window[componentName] method for accessing components

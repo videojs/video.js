@@ -1,0 +1,16 @@
+$primary-text: #fff !default;
+// currently just used for visited links in errors and such.
+$secondary-text: #F4A460 !default;
+
+$primary-bg: #000 !default;
+$secondary-bg: lighten($primary-bg, 35%) !default;
+
+$text-font-family: Arial, Helvetica, sans-serif !default;
+$base-font-size: 10px !default;
+
+$control-bar--bg: #2B333F !default;
+$control-bar--transparency: 0.5 !default;
+
+$big-play-button--width: 3em !default;
+$big-play-button--height: 1.5em !default;
+$big-play-button--transparency: 0.8 !default;

@@ -37,16 +37,20 @@ class Button extends Component {
    * @return {Element}
    * @method createEl
    */
-  createEl(type='button', props={}) {
-    // Add standard Aria and Tabindex info
+  createEl(tag='button', props={}, attributes={}) {
     props = assign({
       className: this.buildCSSClass(),
-      'role': 'button',
-      'aria-live': 'polite', // let the screen reader user know that the text of the button may change
       tabIndex: 0
     }, props);
 
-    let el = super.createEl(type, props);
+    // Add standard Aria info
+    attributes = assign({
+      role: 'button',
+      type: 'button', // Necessary since the default button type is "submit"
+      'aria-live': 'polite' // let the screen reader user know that the text of the button may change
+    }, attributes);
+
+    let el = super.createEl(tag, props, attributes);
 
     this.controlTextEl_ = Dom.createEl('span', {
       className: 'vjs-control-text'
@@ -110,7 +114,7 @@ class Button extends Component {
     // Check for space bar (32) or enter (13) keys
     if (event.which === 32 || event.which === 13) {
       event.preventDefault();
-      this.handleClick();
+      this.handleClick(event);
     }
   }
 

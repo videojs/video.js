@@ -365,26 +365,43 @@ test('should add listeners to other components that are fired once', function(){
 });
 
 test('should trigger a listener when ready', function(){
-  expect(2);
+  let initListenerFired;
+  let methodListenerFired;
+  let syncListenerFired;
 
-  var optionsReadyListener = function(){
-    ok(true, 'options listener fired');
-  };
-  var methodReadyListener = function(){
-    ok(true, 'ready method listener fired');
-  };
+  let comp = new Component(getFakePlayer(), {}, function(){
+    initListenerFired = true;
+  });
 
-  var comp = new Component(getFakePlayer(), {}, optionsReadyListener);
+  comp.ready(function(){
+    methodListenerFired = true;
+  });
+
+  comp.triggerReady();
+
+  comp.ready(function(){
+    syncListenerFired = true;
+  }, true);
+
+  ok(!initListenerFired, 'init listener should NOT fire synchronously');
+  ok(!methodListenerFired, 'method listener should NOT fire synchronously');
+  ok(syncListenerFired, 'sync listener SHOULD fire synchronously if after ready');
+
+  this.clock.tick(1);
+  ok(initListenerFired, 'init listener should fire asynchronously');
+  ok(methodListenerFired, 'method listener should fire asynchronously');
+
+  // Listeners should only be fired once and then removed
+  initListenerFired = false;
+  methodListenerFired = false;
+  syncListenerFired = false;
 
   comp.triggerReady();
   this.clock.tick(1);
 
-  comp.ready(methodReadyListener);
-  this.clock.tick(1);
-
-  // First two listeners should only be fired once and then removed
-  comp.triggerReady();
-  this.clock.tick(1);
+  ok(!initListenerFired, 'init listener should be removed');
+  ok(!methodListenerFired, 'method listener should be removed');
+  ok(!syncListenerFired, 'sync listener should be removed');
 });
 
 test('should add and remove a CSS class', function(){

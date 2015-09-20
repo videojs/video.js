@@ -1,4 +1,5 @@
 import Flash from '../../../src/js/tech/flash.js';
+import { createTimeRange } from '../../../src/js/utils/time-ranges.js';
 import document from 'global/document';
 
 q.module('Flash');
@@ -22,6 +23,7 @@ test('Flash.canPlaySource', function() {
 test('currentTime', function() {
   let getCurrentTime = Flash.prototype.currentTime;
   let setCurrentTime = Flash.prototype.setCurrentTime;
+  let seekingCount = 0;
   let seeking = false;
   let setPropVal;
   let getPropVal;
@@ -30,14 +32,22 @@ test('currentTime', function() {
   // Mock out a Flash instance to avoid creating the swf object
   let mockFlash = {
     el_: {
-      vjs_setProperty: function(prop, val){
+      vjs_setProperty(prop, val){
         setPropVal = val;
       },
-      vjs_getProperty: function(){
+      vjs_getProperty(){
         return getPropVal;
       }
     },
-    seeking: function(){
+    seekable(){
+      return createTimeRange(5, 1000);
+    },
+    trigger(event){
+      if (event === 'seeking') {
+        seekingCount++;
+      }
+    },
+    seeking(){
       return seeking;
     }
   };
@@ -50,6 +60,7 @@ test('currentTime', function() {
   // Test the currentTime setter
   setCurrentTime.call(mockFlash, 10);
   equal(setPropVal, 10, 'currentTime is set on the swf element');
+  equal(seekingCount, 1, 'triggered seeking');
 
   // Test current time while seeking
   setCurrentTime.call(mockFlash, 20);
@@ -57,6 +68,18 @@ test('currentTime', function() {
   result = getCurrentTime.call(mockFlash);
   equal(result, 20, 'currentTime is retrieved from the lastSeekTarget while seeking');
   notEqual(result, getPropVal, 'currentTime is not retrieved from the element while seeking');
+  equal(seekingCount, 2, 'triggered seeking');
+
+  // clamp seeks to seekable
+  setCurrentTime.call(mockFlash, 1001);
+  result = getCurrentTime.call(mockFlash);
+  equal(result, mockFlash.seekable().end(0), 'clamped to the seekable end');
+  equal(seekingCount, 3, 'triggered seeking');
+
+  setCurrentTime.call(mockFlash, 1);
+  result = getCurrentTime.call(mockFlash);
+  equal(result, mockFlash.seekable().start(0), 'clamped to the seekable start');
+  equal(seekingCount, 4, 'triggered seeking');
 });
 
 test('dispose removes the object element even before ready fires', function() {
@@ -70,6 +93,7 @@ test('dispose removes the object element even before ready fires', function() {
   mockFlash.off = noop;
   mockFlash.trigger = noop;
   mockFlash.el_ = {};
+  mockFlash.textTracks = () => ([]);
 
   dispose.call(mockFlash);
   strictEqual(mockFlash.el_, null, 'swf el is nulled');
@@ -141,3 +165,32 @@ test('seekable', function() {
   result = seekable.call(mockFlash);
   equal(result.length, mockFlash.duration_, 'seekable is empty with a zero duration');
 });
+
+test('play after ended seeks to the beginning', function() {
+  let plays = 0, seeks = [];
+
+  Flash.prototype.play.call({
+    el_: {
+      vjs_play() {
+        plays++;
+      }
+    },
+    ended() {
+      return true;
+    },
+    setCurrentTime(time) {
+      seeks.push(time);
+    }
+  });
+
+  equal(plays, 1, 'called play on the SWF');
+  equal(seeks.length, 1, 'seeked on play');
+  equal(seeks[0], 0, 'seeked to the beginning');
+});
+
+// fake out the <object> interaction but leave all the other logic intact
+class MockFlash extends Flash {
+  constructor() {
+    super({});
+  }
+}

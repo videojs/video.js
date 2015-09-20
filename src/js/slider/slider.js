@@ -3,7 +3,6 @@
  */
 import Component from '../component.js';
 import * as Dom from '../utils/dom.js';
-import roundFloat from '../utils/round-float.js';
 import document from 'global/document';
 import assign from 'object.assign';
 
@@ -20,12 +19,11 @@ class Slider extends Component {
   constructor(player, options) {
     super(player, options);
 
-    // Set property names to bar and handle to match with the child Slider class is looking for
-    this.bar = this.getChild(this.options_['barName']);
-    this.handle = this.getChild(this.options_['handleName']);
+    // Set property names to bar to match with the child Slider class is looking for
+    this.bar = this.getChild(this.options_.barName);
 
     // Set a horizontal or vertical class on the slider depending on the slider type
-    this.vertical(!!this.options_['vertical']);
+    this.vertical(!!this.options_.vertical);
 
     this.on('mousedown', this.handleMouseDown);
     this.on('touchstart', this.handleMouseDown);
@@ -41,22 +39,26 @@ class Slider extends Component {
    * Create the component's DOM element
    *
    * @param {String} type Type of element to create
-   * @param {Object=} props List of properties in Object form 
+   * @param {Object=} props List of properties in Object form
    * @return {Element}
    * @method createEl
    */
-  createEl(type, props={}) {
+  createEl(type, props={}, attributes={}) {
     // Add the slider element class to all sub classes
     props.className = props.className + ' vjs-slider';
     props = assign({
+      tabIndex: 0
+    }, props);
+
+    attributes = assign({
       'role': 'slider',
       'aria-valuenow': 0,
       'aria-valuemin': 0,
       'aria-valuemax': 100,
       tabIndex: 0
-    }, props);
+    }, attributes);
 
-    return super.createEl(type, props);
+    return super.createEl(type, props, attributes);
   }
 
   /**
@@ -68,7 +70,9 @@ class Slider extends Component {
   handleMouseDown(event) {
     event.preventDefault();
     Dom.blockTextSelection();
+
     this.addClass('vjs-sliding');
+    this.trigger('slideractive');
 
     this.on(document, 'mousemove', this.handleMouseMove);
     this.on(document, 'mouseup', this.handleMouseUp);
@@ -86,13 +90,15 @@ class Slider extends Component {
   handleMouseMove() {}
 
   /**
-   * Handle mouse up on Slider 
+   * Handle mouse up on Slider
    *
    * @method handleMouseUp
    */
   handleMouseUp() {
     Dom.unblockTextSelection();
+
     this.removeClass('vjs-sliding');
+    this.trigger('sliderinactive');
 
     this.off(document, 'mousemove', this.handleMouseMove);
     this.off(document, 'mouseup', this.handleMouseUp);
@@ -114,7 +120,7 @@ class Slider extends Component {
 
     // If scrubbing, we could use a cached value to make the handle keep up with the user's mouse.
     // On HTML5 browsers scrubbing is really smooth, but some flash players are slow, so we might want to utilize this later.
-    // var progress =  (this.player_.scrubbing) ? this.player_.getCache().currentTime / this.player_.duration() : this.player_.currentTime() / this.player_.duration();
+    // var progress =  (this.player_.scrubbing()) ? this.player_.getCache().currentTime / this.player_.duration() : this.player_.currentTime() / this.player_.duration();
     let progress = this.getPercent();
     let bar = this.bar;
 
@@ -130,7 +136,7 @@ class Slider extends Component {
     }
 
     // Convert to a percentage for setting
-    let percentage = roundFloat(progress * 100, 2) + '%';
+    let percentage = (progress * 100).toFixed(2) + '%';
 
     // Set the new bar width or height
     if (this.vertical()) {
@@ -147,53 +153,11 @@ class Slider extends Component {
    * @method calculateDistance
    */
   calculateDistance(event){
-    let el = this.el_;
-    let box = Dom.findElPosition(el);
-    let boxW = el.offsetWidth;
-    let boxH = el.offsetHeight;
-    let handle = this.handle;
-
-    if (this.options_['vertical']) {
-      let boxY = box.top;
-
-      let pageY;
-      if (event.changedTouches) {
-        pageY = event.changedTouches[0].pageY;
-      } else {
-        pageY = event.pageY;
-      }
-
-      if (handle) {
-        var handleH = handle.el().offsetHeight;
-        // Adjusted X and Width, so handle doesn't go outside the bar
-        boxY = boxY + (handleH / 2);
-        boxH = boxH - handleH;
-      }
-
-      // Percent that the click is through the adjusted area
-      return Math.max(0, Math.min(1, ((boxY - pageY) + boxH) / boxH));
-
-    } else {
-      let boxX = box.left;
-
-      let pageX;
-      if (event.changedTouches) {
-        pageX = event.changedTouches[0].pageX;
-      } else {
-        pageX = event.pageX;
-      }
-
-      if (handle) {
-        var handleW = handle.el().offsetWidth;
-
-        // Adjusted X and Width, so handle doesn't go outside the bar
-        boxX = boxX + (handleW / 2);
-        boxW = boxW - handleW;
-      }
-
-      // Percent that the click is through the adjusted area
-      return Math.max(0, Math.min(1, (pageX - boxX) / boxW));
+    let position = Dom.getPointerPosition(this.el_, event);
+    if (this.vertical()) {
+      return position.y;
     }
+    return position.x;
   }
 
   /**

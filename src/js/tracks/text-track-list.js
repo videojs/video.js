@@ -1,7 +1,7 @@
 /**
  * @file text-track-list.js
  */
-import EventEmitter from '../event-emitter';
+import EventTarget from '../event-target';
 import * as Fn from '../utils/fn.js';
 import * as browser from '../utils/browser.js';
 import document from 'global/document';
@@ -48,7 +48,7 @@ let TextTrackList = function(tracks) {
   }
 };
 
-TextTrackList.prototype = Object.create(EventEmitter.prototype);
+TextTrackList.prototype = Object.create(EventTarget.prototype);
 TextTrackList.prototype.constructor = TextTrackList;
 
 /*

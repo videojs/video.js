@@ -7,10 +7,10 @@ import * as Guid from '../utils/guid.js';
 import * as browser from '../utils/browser.js';
 import * as TextTrackEnum from './text-track-enums';
 import log from '../utils/log.js';
-import EventEmitter from '../event-emitter';
+import EventTarget from '../event-target';
 import document from 'global/document';
 import window from 'global/window';
-import XHR from '../xhr.js';
+import XHR from 'xhr';
 
 /*
  * https://html.spec.whatwg.org/multipage/embedded-content.html#texttrack
@@ -176,6 +176,7 @@ let TextTrack = function(options={}) {
   });
 
   if (options.src) {
+    tt.src = options.src;
     loadTrack(options.src, tt);
   } else {
     tt.loaded_ = true;
@@ -186,7 +187,7 @@ let TextTrack = function(options={}) {
   }
 };
 
-TextTrack.prototype = Object.create(EventEmitter.prototype);
+TextTrack.prototype = Object.create(EventTarget.prototype);
 TextTrack.prototype.constructor = TextTrack;
 
 /*
@@ -252,11 +253,10 @@ var parseCues = function(srcContent, track) {
 };
 
 var loadTrack = function(src, track) {
-  XHR(src, Fn.bind(this, function(err, response, responseBody){
+  XHR({ uri: src }, Fn.bind(this, function(err, response, responseBody){
     if (err) {
-      return log.error(err);
+      return log.error(err, response);
     }
-
 
     track.loaded_ = true;
     parseCues(responseBody, track);

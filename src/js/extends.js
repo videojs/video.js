@@ -1,3 +1,5 @@
+import log from './utils/log';
+
 /*
  * @file extends.js
  *
@@ -49,6 +51,10 @@ const extendsFn = function(superClass, subClassMethods={}) {
   let methods = {};
 
   if (typeof subClassMethods === 'object') {
+    if (typeof subClassMethods.init === 'function') {
+      log.warn('Constructor logic via init() is deprecated; please use constructor() instead.');
+      subClassMethods.constructor = subClassMethods.init;
+    }
     if (subClassMethods.constructor !== Object.prototype.constructor) {
       subClass = subClassMethods.constructor;
     }

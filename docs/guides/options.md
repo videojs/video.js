@@ -92,7 +92,7 @@ The loop attribute causes the video to start over as soon as it ends. This could
 ```html
 <video loop ...>
 or
-{ "loop": "true" }
+{ "loop": true }
 ```
 
 

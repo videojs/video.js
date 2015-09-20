@@ -1,6 +1,6 @@
 import TextTrackList from '../../../src/js/tracks/text-track-list.js';
 import TextTrack from '../../../src/js/tracks/text-track.js';
-import EventEmitter from '../../../src/js/event-emitter.js';
+import EventTarget from '../../../src/js/event-target.js';
 
 var noop = Function.prototype;
 var genericTracks = [
@@ -146,7 +146,7 @@ test('a "removetrack" event is triggered when tracks are removed', function() {
 });
 
 test('trigger "change" event when "modechange" is fired on a track', function() {
-  var tt = new EventEmitter(),
+  var tt = new EventTarget(),
       ttl = new TextTrackList([tt]),
       changes = 0,
       changeHandler = function() {

@@ -4,7 +4,8 @@
 import document from 'global/document';
 import window from 'global/window';
 import  * as Guid from './guid.js';
-import roundFloat from './round-float.js';
+import log from './log.js';
+import tsml from 'tsml';
 
 /**
  * Shorthand for document.getElementById()
@@ -30,25 +31,28 @@ export function getEl(id){
  * @return {Element}
  * @function createEl
  */
-export function createEl(tagName='div', properties={}){
+export function createEl(tagName='div', properties={}, attributes={}){
   let el = document.createElement(tagName);
 
   Object.getOwnPropertyNames(properties).forEach(function(propName){
-      let val = properties[propName];
+    let val = properties[propName];
 
-      // Not remembering why we were checking for dash
-      // but using setAttribute means you have to use getAttribute
+    // See #2176
+    // We originally were accepting both properties and attributes in the
+    // same object, but that doesn't work so well.
+    if (propName.indexOf('aria-') !== -1 || propName === 'role' || propName === 'type') {
+      log.warn(tsml(`Setting attributes in the second argument of createEl()
+                has been deprecated. Use the third argument instead.
+                createEl(type, properties, attributes). Attempting to set ${propName} to ${val}.`));
+      el.setAttribute(propName, val);
+    } else {
+      el[propName] = val;
+    }
+  });
 
-      // The check for dash checks for the aria- * attributes, like aria-label, aria-valuemin.
-      // The additional check for "role" is because the default method for adding attributes does not
-      // add the attribute "role". My guess is because it's not a valid attribute in some namespaces, although
-      // browsers handle the attribute just fine. The W3C allows for aria- * attributes to be used in pre-HTML5 docs.
-      // http://www.w3.org/TR/wai-aria-primer/#ariahtml. Using setAttribute gets around this problem.
-      if (propName.indexOf('aria-') !== -1 || propName === 'role') {
-       el.setAttribute(propName, val);
-      } else {
-       el[propName] = val;
-      }
+  Object.getOwnPropertyNames(attributes).forEach(function(attrName){
+    let val = attributes[attrName];
+    el.setAttribute(attrName, attributes[attrName]);
   });
 
   return el;
@@ -56,7 +60,7 @@ export function createEl(tagName='div', properties={}){
 
 /**
  * Insert an element as the first child node of another
- * 
+ *
  * @param  {Element} child   Element to insert
  * @param  {Element} parent Element to insert child into
  * @private
@@ -271,7 +275,7 @@ export function getElAttributes(tag) {
 /**
  * Attempt to block the ability to select text while dragging controls
  *
- * @return {Boolean} 
+ * @return {Boolean}
  * @method blockTextSelection
  */
 export function blockTextSelection() {
@@ -284,7 +288,7 @@ export function blockTextSelection() {
 /**
  * Turn off text selection blocking
  *
- * @return {Boolean} 
+ * @return {Boolean}
  * @method unblockTextSelection
  */
 export function unblockTextSelection() {
@@ -295,11 +299,11 @@ export function unblockTextSelection() {
 
 /**
  * Offset Left
- * getBoundingClientRect technique from 
+ * getBoundingClientRect technique from
  * John Resig http://ejohn.org/blog/getboundingclientrect-is-awesome/
  *
  * @param {Element} el Element from which to get offset
- * @return {Object=} 
+ * @return {Object=}
  * @method findElPosition
  */
 export function findElPosition(el) {
@@ -329,7 +333,39 @@ export function findElPosition(el) {
 
   // Android sometimes returns slightly off decimal values, so need to round
   return {
-    left: roundFloat(left),
-    top: roundFloat(top)
+    left: Math.round(left),
+    top: Math.round(top)
   };
+}
+
+/**
+ * Get pointer position in element
+ * Returns an object with x and y coordinates.
+ * The base on the coordinates are the bottom left of the element.
+ *
+ * @param {Element} el Element on which to get the pointer position on
+ * @param {Event} event Event object
+ * @return {Object=} position This object will have x and y coordinates corresponding to the mouse position
+ * @metho getPointerPosition
+ */
+export function getPointerPosition(el, event) {
+  let position = {};
+  let box = findElPosition(el);
+  let boxW = el.offsetWidth;
+  let boxH = el.offsetHeight;
+
+  let boxY = box.top;
+  let boxX = box.left;
+  let pageY = event.pageY;
+  let pageX = event.pageX;
+
+  if (event.changedTouches) {
+    pageX = event.changedTouches[0].pageX;
+    pageY = event.changedTouches[0].pageY;
+  }
+
+  position.y = Math.max(0, Math.min(1, ((boxY - pageY) + boxH) / boxH));
+  position.x = Math.max(0, Math.min(1, (pageX - boxX) / boxW));
+
+  return position;
 }

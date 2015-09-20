@@ -2,6 +2,8 @@ import document from 'global/document';
 import * as Dom from '../../../src/js/utils/dom.js';
 import TestHelpers from '../test-helpers.js';
 
+q.module('dom');
+
 test('should return the element with the ID', function(){
   var el1 = document.createElement('div');
   var el2 = document.createElement('div');
@@ -18,11 +20,16 @@ test('should return the element with the ID', function(){
 });
 
 test('should create an element', function(){
-  var div = Dom.createEl();
-  var span = Dom.createEl('span', { 'data-test': 'asdf', innerHTML:'fdsa' });
+  let div = Dom.createEl();
+  let span = Dom.createEl('span', {
+    innerHTML: 'fdsa'
+  }, {
+    'data-test': 'asdf'
+  });
+
   ok(div.nodeName === 'DIV');
   ok(span.nodeName === 'SPAN');
-  ok(span['data-test'] === 'asdf');
+  ok(span.getAttribute('data-test') === 'asdf');
   ok(span.innerHTML === 'fdsa');
 });
 
@@ -88,25 +95,26 @@ test('should set element attributes from object', function(){
 });
 
 test('should read tag attributes from elements, including HTML5 in all browsers', function(){
-  var tags = '<video id="vid1" controls autoplay loop muted preload="none" src="http://google.com" poster="http://www2.videojs.com/img/video-js-html5-video-player.png" data-test="asdf" data-empty-string=""></video>';
-  tags += '<video id="vid2">';
-  // Not putting source and track inside video element because
-  // oldIE needs the HTML5 shim to read tags inside HTML5 tags.
-  // Still may not work in oldIE.
-  tags += '<source id="source" src="http://google.com" type="video/mp4" media="fdsa" title="test" >';
-  tags += '<track id="track" default src="http://google.com" kind="captions" srclang="en" label="testlabel" title="test" >';
-  tags += '</video>';
+  // Creating the source/track tags outside of the video tag prevents log errors
+  let tags = `
+  <video id="vid1" controls autoplay loop muted preload="none" src="http://google.com" poster="http://www2.videojs.com/img/video-js-html5-video-player.png" data-test="asdf" data-empty-string="">
+    <source id="source" src="http://google.com" type="video/mp4" media="fdsa" title="test" >
+  </video>
+  <track id="track" default src="http://google.com" kind="captions" srclang="en" label="testlabel" title="test" >
+  `;
 
-  document.getElementById('qunit-fixture').innerHTML += tags;
+  let fixture = document.getElementById('qunit-fixture');
 
-  var vid1Vals = Dom.getElAttributes(document.getElementById('vid1'));
-  var vid2Vals = Dom.getElAttributes(document.getElementById('vid2'));
-  var sourceVals = Dom.getElAttributes(document.getElementById('source'));
-  var trackVals = Dom.getElAttributes(document.getElementById('track'));
+  // Have to use innerHTML to append for IE8. AppendChild doesn't work.
+  // Also it must be added to the page body, not just in memory.
+  fixture.innerHTML += tags;
 
-  // was using deepEqual, but ie8 would send all properties as attributes
+  let vid1Vals = Dom.getElAttributes(fixture.getElementsByTagName('video')[0]);
+  let sourceVals = Dom.getElAttributes(fixture.getElementsByTagName('source')[0]);
+  let trackVals = Dom.getElAttributes(fixture.getElementsByTagName('track')[0]);
 
   // vid1
+  // was using deepEqual, but ie8 would send all properties as attributes
   equal(vid1Vals['autoplay'], true);
   equal(vid1Vals['controls'], true);
   equal(vid1Vals['data-test'], 'asdf');
@@ -117,9 +125,6 @@ test('should read tag attributes from elements, including HTML5 in all browsers'
   equal(vid1Vals['poster'], 'http://www2.videojs.com/img/video-js-html5-video-player.png');
   equal(vid1Vals['preload'], 'none');
   equal(vid1Vals['src'], 'http://google.com');
-
-  // vid2
-  equal(vid2Vals['id'], 'vid2');
 
   // sourceVals
   equal(sourceVals['title'], 'test');

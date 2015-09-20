@@ -7,11 +7,6 @@
   vertical-align: top;
   box-sizing: border-box;
 
-  /* Default to the video element width/height. This will be overridden by
-   * the source width height unless changed elsewhere. */
-  width: 300px;
-  height: 150px;
-
   color: $primary-text;
   background-color: $primary-bg;
   position: relative;
@@ -19,6 +14,7 @@
   /* Start with 10px for base font size so other dimensions can be em based and
   easily calculable. */
   font-size: $base-font-size;
+  line-height: 1;
 
   /* Provide some basic defaults for fonts */
   font-weight: normal;
@@ -43,6 +39,20 @@
 .video-js *:before,
 .video-js *:after {
   box-sizing: inherit;
+}
+
+/* List style reset */
+.video-js ul {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  list-style-position: outside;
+
+  /* Important to specify each */
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 /* Fill the width of the containing element and use padding to create the
@@ -86,7 +96,7 @@ body.vjs-full-window {
   /* Fix for IE6 full-window. http://www.cssplay.co.uk/layouts/fixed.html */
   overflow-y: auto;
 }
-.video-js.vjs-fullscreen {
+.vjs-full-window .video-js.vjs-fullscreen {
   position: fixed;
   overflow: hidden;
   z-index: 1000;
@@ -94,6 +104,8 @@ body.vjs-full-window {
   top: 0;
   bottom: 0;
   right: 0;
+}
+.video-js.vjs-fullscreen {
   width: 100% !important;
   height: 100% !important;
   /* Undo any aspect ratio padding for fluid layouts */

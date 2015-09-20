@@ -4,7 +4,6 @@
 import Slider from '../../slider/slider.js';
 import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
-import roundFloat from '../../utils/round-float.js';
 
 // Required children
 import VolumeLevel from './volume-level.js';
@@ -33,7 +32,8 @@ class VolumeBar extends Slider {
    */
   createEl() {
     return super.createEl('div', {
-      className: 'vjs-volume-bar',
+      className: 'vjs-volume-bar'
+    }, {
       'aria-label': 'volume level'
     });
   }
@@ -90,8 +90,9 @@ class VolumeBar extends Slider {
    */
   updateARIAAttributes() {
     // Current value of volume bar as a percentage
-    this.el_.setAttribute('aria-valuenow', roundFloat(this.player_.volume()*100, 2));
-    this.el_.setAttribute('aria-valuetext', roundFloat(this.player_.volume()*100, 2)+'%');
+    let volume = (this.player_.volume() * 100).toFixed(2);
+    this.el_.setAttribute('aria-valuenow', volume);
+    this.el_.setAttribute('aria-valuetext', volume + '%');
   }
 
 }

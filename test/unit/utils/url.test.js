@@ -2,6 +2,8 @@ import document from 'global/document';
 import window from 'global/window';
 import * as Url from '../../../src/js/utils/url.js';
 
+q.module('url');
+
 test('should parse the details of a url correctly', function(){
   equal(Url.parseUrl('#').protocol, window.location.protocol, 'parsed relative url protocol');
   equal(Url.parseUrl('#').host, window.location.host, 'parsed relative url host');
@@ -30,9 +32,11 @@ test('should strip port from hosts using http or https', function() {
   };
 
   url = Url.parseUrl('/domain/relative/url');
-  ok(!(/.*:80$/).test(url.host), ':80 is not appended to the host');
 
   document.createElement = origDocCreate;
+
+  ok(!(/.*:80$/).test(url.host), ':80 is not appended to the host');
+
 });
 
 test('should get an absolute URL', function(){

@@ -228,7 +228,7 @@ test('component can be subclassed externally', function(){
   var Component = videojs.getComponent('Component');
   var ControlBar = videojs.getComponent('ControlBar');
 
-  var player = new (Component.extend({
+  var player = new (videojs.extends(Component, {
     reportUserActivity: function(){},
     textTracks: function(){ return {
         addEventListener: Function.prototype,

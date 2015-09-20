@@ -25,11 +25,10 @@ class Spacer extends Component {
   /**
    * Create the component's DOM element
    *
-   * @param {Object} props An object of properties  
    * @return {Element}
    * @method createEl
    */
-  createEl(props) {
+  createEl() {
     return super.createEl('div', {
       className: this.buildCSSClass()
     });

@@ -1,6 +1,9 @@
 var noop = function() {}, clock, oldTextTracks;
 
 import Tech from '../../../src/js/tech/tech.js';
+import { createTimeRange } from '../../../src/js/utils/time-ranges.js';
+import extendsFn from '../../../src/js/extends.js';
+import MediaError from '../../../src/js/media-error.js';
 
 q.module('Media Tech', {
   'setup': function() {
@@ -97,12 +100,12 @@ test('dispose() should stop time tracking', function() {
   ok(true, 'no exception was thrown');
 });
 
-test('should add the source hanlder interface to a tech', function(){
+test('should add the source handler interface to a tech', function(){
   var sourceA = { src: 'foo.mp4', type: 'video/mp4' };
   var sourceB = { src: 'no-support', type: 'no-support' };
 
   // Define a new tech class
-  var MyTech = Tech.extend();
+  var MyTech = extendsFn(Tech);
 
   // Extend Tech with source handlers
   Tech.withSourceHandlers(MyTech);
@@ -118,7 +121,7 @@ test('should add the source hanlder interface to a tech', function(){
   ok(tech.setSource, 'added a setSource function to the tech instance');
 
   // Create an internal state class for the source handler
-  // The internal class would be used by a source hanlder to maintain state
+  // The internal class would be used by a source handler to maintain state
   // and provde a dispose method for the handler.
   // This is optional for source handlers
   var disposeCalled = false;
@@ -176,9 +179,9 @@ test('should add the source hanlder interface to a tech', function(){
   ok(disposeCalled, 'the handler dispose method was called when the tech was disposed');
 });
 
-test('should handle unsupported sources with the source hanlder API', function(){
+test('should handle unsupported sources with the source handler API', function(){
   // Define a new tech class
-  var MyTech = Tech.extend();
+  var MyTech = extendsFn(Tech);
   // Extend Tech with source handlers
   Tech.withSourceHandlers(MyTech);
   // Create an instance of Tech
@@ -191,4 +194,64 @@ test('should handle unsupported sources with the source hanlder API', function()
 
   tech.setSource('');
   ok(usedNative, 'native source handler was used when an unsupported source was set');
+});
+
+test('should allow custom error events to be set', function() {
+  let tech = new Tech();
+  let errors = [];
+  tech.on('error', function() {
+    errors.push(tech.error());
+  });
+
+  equal(tech.error(), null, 'error is null by default');
+
+  tech.error(new MediaError(1));
+  equal(errors.length, 1, 'triggered an error event');
+  equal(errors[0].code, 1, 'set the proper code');
+
+  tech.error(2);
+  equal(errors.length, 2, 'triggered an error event');
+  equal(errors[1].code, 2, 'wrapped the error code');
+});
+
+test('should track whether a video has played', function() {
+  let tech = new Tech();
+
+  equal(tech.played().length, 0, 'starts with zero length');
+  tech.trigger('playing');
+  equal(tech.played().length, 1, 'has length after playing');
+});
+
+test('delegates seekable to the source handler', function(){
+  let MyTech = extendsFn(Tech, {
+    seekable: function() {
+      throw new Error('You should not be calling me!');
+    }
+  });
+  Tech.withSourceHandlers(MyTech);
+
+  let seekableCount = 0;
+  let handler = {
+    seekable: function() {
+      seekableCount++;
+      return createTimeRange(0, 0);
+    }
+  };
+
+  MyTech.registerSourceHandler({
+    canHandleSource: function() {
+      return true;
+    },
+    handleSource: function(source, tech) {
+      return handler;
+    }
+  });
+
+  let tech = new MyTech();
+  tech.setSource({
+    src: 'example.mp4',
+    type: 'video/mp4'
+  });
+  tech.seekable();
+  equal(seekableCount, 1, 'called the source handler');
 });
