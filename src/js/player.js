@@ -580,7 +580,7 @@ class Player extends Component {
     }
 
     // Look for the default poster of the tech if their is no poster specified
-    if (!this._poster) {
+    if (!this.poster_) {
       this.trigger('posterchange');
     }
   }
@@ -678,7 +678,7 @@ class Player extends Component {
     }
 
     // Look if the tech found a higher resolution poster while loading
-    if (!this._poster) {
+    if (!this.poster_) {
       this.trigger('posterchange');
     }
 
@@ -1760,6 +1760,11 @@ class Player extends Component {
 
           if (this.options_.autoplay) {
             this.play();
+          }
+
+          // Update the default poster if none is specified
+          if (!this.poster_) {
+            this.trigger('posterchange');
           }
 
         // Set the source synchronously if possible (#2326)
