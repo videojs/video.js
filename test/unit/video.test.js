@@ -26,7 +26,7 @@ test('should return a video player instance', function(){
   ok(player.id() === 'test_vid_id');
   ok(videojs.getPlayers()['test_vid_id'] === player, 'added player to global reference');
 
-  var playerAgain = videojs('test_vid_id', { techOrder: ['html5'] });
+  var playerAgain = videojs('test_vid_id');
   ok(player === playerAgain, 'did not create a second player from same tag');
 
   var tag2 = document.getElementById('test_vid_id2');
