@@ -578,6 +578,11 @@ class Player extends Component {
       this.tag.player = null;
       this.tag = null;
     }
+
+    // Look for the default poster of the tech if their is no poster specified
+    if (!this._poster) {
+      this.trigger('posterchange');
+    }
   }
 
   /**
@@ -670,6 +675,11 @@ class Player extends Component {
     // Keep the same volume as before
     if (this.cache_.volume) {
       this.techCall_('setVolume', this.cache_.volume);
+    }
+
+    // Look if the tech found a higher resolution poster while loading
+    if (!this._poster) {
+      this.trigger('posterchange');
     }
 
     // Update the duration if available
@@ -1892,7 +1902,14 @@ class Player extends Component {
    */
   poster(src) {
     if (src === undefined) {
-      return this.poster_;
+      let poster = this.poster_;
+
+      // Get the default poster from the tech if their is none
+      if (!poster && this.tech_ && typeof this.tech_.poster === 'function') {
+        poster = this.tech_.poster() || '';
+      }
+
+      return poster;
     }
 
     // The correct way to remove a poster is to set as an empty string
