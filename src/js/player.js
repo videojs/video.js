@@ -1910,7 +1910,7 @@ class Player extends Component {
       let poster = this.poster_;
 
       // Get the default poster from the tech if their is none
-      if (!poster && this.tech_ && typeof this.tech_.poster === 'function') {
+      if (!poster && this.tech_ && this.tech_.poster) {
         poster = this.tech_.poster() || '';
       }
 
