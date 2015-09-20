@@ -1001,15 +1001,6 @@ class Player extends Component {
   }
 
   /**
-   * Handle Tech Poster Change
-   *
-   * @method handleTechPosterChange
-   */
-  handleTechPosterChange() {
-    this.trigger('posterchange');
-  }
-
-  /**
    * Fires when an error occurred during the loading of an audio/video
    *
    * @private
