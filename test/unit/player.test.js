@@ -292,7 +292,7 @@ test('should be able to initialize player twice on the same tag using string ref
   fixture.appendChild(videoTag);
 
   //here we receive cached version instead of real
-  player = videojs(videoTag.id);
+  player = videojs(videoTag.id, { techOrder: ['html5'] });
   //here it triggers error, because player was destroyed already after first dispose
   player.dispose();
 });
