@@ -283,7 +283,7 @@ test('should be able to initialize player twice on the same tag using string ref
   var fixture = document.getElementById('qunit-fixture');
   fixture.appendChild(videoTag);
 
-  var player = videojs(videoTag.id);
+  var player = videojs(videoTag.id, { techOrder: ['html5'] });
   ok(player, 'player is created');
   player.dispose();
 
