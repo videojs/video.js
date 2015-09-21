@@ -4,10 +4,6 @@
  */
 
 (function(){
-window.q = QUnit;
-window.fixture = document.createElement('div');
-window.fixture.id = 'qunit-fixture';
-document.body.appendChild(window.fixture);
 
 q.module('Player API');
 
