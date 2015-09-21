@@ -134,6 +134,17 @@ module.exports = function(grunt) {
 
       defaults: {},
 
+      api: {
+        options:{
+          files: [
+            '../build/temp/ie8/videojs-ie8.min.js',
+            '../build/temp/video.min.js',
+            '../test/api/**/*.js'
+          ],
+          preprocessors: []
+        }
+      },
+
       watch: {
         autoWatch: true,
         singleRun: false
@@ -410,7 +421,7 @@ module.exports = function(grunt) {
   // Default task - build and test
   grunt.registerTask('default', ['test']);
 
-  grunt.registerTask('test', ['build', 'karma:defaults']);
+  grunt.registerTask('test', ['build', 'karma:defaults', 'karma:api']);
 
   // Run while developing
   grunt.registerTask('dev', ['build', 'connect:dev', 'concurrent:watchSandbox']);
