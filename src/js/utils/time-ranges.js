@@ -1,3 +1,5 @@
+import log from './log.js';
+
 /**
  * @file time-ranges.js
  *
@@ -43,6 +45,7 @@ function createTimeRangesObj(ranges){
 
 function getRange(fnName, valueIndex, ranges, rangeIndex){
   if (rangeIndex === undefined) {
+    log.warn(`DEPRECATED: Function '${fnName}' on 'TimeRanges' called without an index argument.`);
     rangeIndex = 0;
   }
   rangeCheck(fnName, rangeIndex, ranges.length - 1);
