@@ -13,7 +13,7 @@ import mergeOptions from '../../src/js/utils/merge-options.js';
 import * as Fn from './utils/fn.js';
 
 import assign from 'object.assign';
-import { createTimeRange } from './utils/time-ranges.js';
+import { createTimeRanges } from './utils/time-ranges.js';
 import formatTime from './utils/format-time.js';
 import log from './utils/log.js';
 import * as Dom from './utils/dom.js';
@@ -377,12 +377,12 @@ videojs.log = log;
 /**
  * Creates an emulated TimeRange object.
  *
- * @param  {Number} start Start time in seconds
+ * @param  {Number|Array} start Start time in seconds or an array of ranges
  * @param  {Number} end   End time in seconds
  * @return {Object}       Fake TimeRange object
  * @method createTimeRange
  */
-videojs.createTimeRange = createTimeRange;
+videojs.createTimeRange = videojs.createTimeRanges = createTimeRanges;
 
 /**
  * Format seconds as a time string, H:MM:SS or M:SS

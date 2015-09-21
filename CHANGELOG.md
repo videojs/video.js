@@ -137,6 +137,7 @@ CHANGELOG
 * @dmlap switched to using raynos/xhr for requests ([view](https://github.com/videojs/video.js/pull/2594))
 * @heff Fixed double loadstart and ready events ([view](https://github.com/videojs/video.js/pull/2605))
 * @gkatsev fixed potential double default style elements ([view](https://github.com/videojs/video.js/pull/2619))
+* @imbcmdth extended createTimeRange to support multiple timeranges ([view](https://github.com/videojs/video.js/pull/2604))
 
 --------------------
 
