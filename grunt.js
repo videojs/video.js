@@ -106,7 +106,6 @@ module.exports = function(grunt) {
       fonts: { cwd: 'node_modules/videojs-font/fonts/', src: ['*'], dest: 'build/temp/font/', expand: true, filter: 'isFile' },
       swf:   { cwd: 'node_modules/videojs-swf/dist/', src: 'video-js.swf', dest: 'build/temp/', expand: true, filter: 'isFile' },
       ie8:   { cwd: 'node_modules/videojs-ie8/dist/', src: ['**/**'], dest: 'build/temp/ie8/', expand: true, filter: 'isFile' },
-      novtt: { cwd: 'build/temp/', src: 'video.novtt.js', dest: 'build/temp/alt/', expand: true, filter: 'isFile' },
       dist:  { cwd: 'build/temp/', src: ['**/**', '!test*'], dest: 'dist/', expand: true, filter: 'isFile' },
       examples: { cwd: 'docs/examples/', src: ['**/**'], dest: 'dist/examples/', expand: true, filter: 'isFile' }
     },
@@ -323,7 +322,7 @@ module.exports = function(grunt) {
           separator: '\n'
         },
         src: ['build/temp/video.js'],
-        dest: 'build/temp/video.novtt.js'
+        dest: 'build/temp/alt/video.novtt.js'
       },
       vtt: {
         options: {
@@ -383,7 +382,6 @@ module.exports = function(grunt) {
     'exorcise:build',
     'concat:novtt',
     'concat:vtt',
-    'copy:novtt',
     'usebanner:novtt',
     'usebanner:vtt',
     'uglify',
