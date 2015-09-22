@@ -146,7 +146,6 @@ module.exports = function(grunt) {
       firefox:      { browsers: ['Firefox'] },
       safari:       { browsers: ['Safari'] },
       ie:           { browsers: ['IE'] },
-      phantomjs:    { browsers: ['PhantomJS'] },
 
       // this only runs on PRs from the mainrepo on BrowserStack
       browserstack: { browsers: ['chrome_bs'] },
