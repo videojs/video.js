@@ -140,6 +140,7 @@ CHANGELOG
 * @imbcmdth extended createTimeRange to support multiple timeranges ([view](https://github.com/videojs/video.js/pull/2604))
 * @misteroneill rename &quot;extends&quot; to &quot;extend&quot; for ie8 ([view](https://github.com/videojs/video.js/pull/2624))
 * @forbesjo removed the PhantomJS dependency ([view](https://github.com/videojs/video.js/pull/2622))
+* @misteroneill re-exposed videojs.TextTrack ([view](https://github.com/videojs/video.js/pull/2625))
 
 --------------------
 
