@@ -1258,7 +1258,7 @@ class Component {
   static extend(props) {
     props = props || {};
 
-    log.warn('Component.extend({}) has been deprecated, use videojs.extends(Component, {}) instead');
+    log.warn('Component.extend({}) has been deprecated, use videojs.extend(Component, {}) instead');
 
     // Set up the constructor using the supplied init method
     // or using the init of the parent object
