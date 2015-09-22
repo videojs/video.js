@@ -11,6 +11,7 @@ import Player from './player';
 import plugin from './plugins.js';
 import mergeOptions from '../../src/js/utils/merge-options.js';
 import * as Fn from './utils/fn.js';
+import TextTrack from './tracks/text-track.js';
 
 import assign from 'object.assign';
 import { createTimeRanges } from './utils/time-ranges.js';
@@ -478,6 +479,13 @@ videojs.trigger = Events.trigger;
  * @see https://github.com/Raynos/xhr
  */
 videojs.xhr = xhr;
+
+/**
+ * TextTrack class
+ *
+ * @type {Function}
+ */
+videojs.TextTrack = TextTrack;
 
 // REMOVING: We probably should add this to the migration plugin
 // // Expose but deprecate the window[componentName] method for accessing components

@@ -1,7 +1,6 @@
 /**
  * @file text-track.js
  */
-import Component from '../component.js';
 import TextTrackCueList from './text-track-cue-list';
 import * as Fn from '../utils/fn.js';
 import * as Guid from '../utils/guid.js';
@@ -298,5 +297,4 @@ var indexOf = function(searchElement, fromIndex) {
   return -1;
 };
 
-Component.registerComponent('TextTrack', TextTrack);
 export default TextTrack;
