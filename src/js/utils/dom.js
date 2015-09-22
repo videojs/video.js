@@ -41,9 +41,9 @@ export function createEl(tagName='div', properties={}, attributes={}){
     // We originally were accepting both properties and attributes in the
     // same object, but that doesn't work so well.
     if (propName.indexOf('aria-') !== -1 || propName === 'role' || propName === 'type') {
-      log.warn(tsml(`Setting attributes in the second argument of createEl()
+      log.warn(tsml`Setting attributes in the second argument of createEl()
                 has been deprecated. Use the third argument instead.
-                createEl(type, properties, attributes). Attempting to set ${propName} to ${val}.`));
+                createEl(type, properties, attributes). Attempting to set ${propName} to ${val}.`);
       el.setAttribute(propName, val);
     } else {
       el[propName] = val;
