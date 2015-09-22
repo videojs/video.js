@@ -19,7 +19,7 @@ import log from './utils/log.js';
 import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
 import * as Url from './utils/url.js';
-import extendsFn from './extends.js';
+import extendFn from './extend.js';
 import merge from 'lodash-compat/object/merge';
 import createDeprecationProxy from './utils/create-deprecation-proxy.js';
 import xhr from 'xhr';
@@ -180,8 +180,8 @@ videojs.getComponent = Component.getComponent;
  * ```js
  *     // Get a component to subclass
  *     var VjsButton = videojs.getComponent('Button');
- *     // Subclass the component (see 'extends' doc for more info)
- *     var MySpecialButton = videojs.extends(VjsButton, {});
+ *     // Subclass the component (see 'extend' doc for more info)
+ *     var MySpecialButton = videojs.extend(VjsButton, {});
  *     // Register the new component
  *     VjsButton.registerComponent('MySepcialButton', MySepcialButton);
  *     // (optionally) add the new component as a default player child
@@ -218,7 +218,7 @@ videojs.TOUCH_ENABLED = browser.TOUCH_ENABLED;
 
 /**
  * Subclass an existing class
- * Mimics ES6 subclassing with the `extends` keyword
+ * Mimics ES6 subclassing with the `extend` keyword
  * ```js
  *     // Create a basic javascript 'class'
  *     function MyClass(name){
@@ -231,7 +231,7 @@ videojs.TOUCH_ENABLED = browser.TOUCH_ENABLED;
  *     };
  *     // Subclass the exisitng class and change the name
  *     // when initializing
- *     var MySubClass = videojs.extends(MyClass, {
+ *     var MySubClass = videojs.extend(MyClass, {
  *       constructor: function(name) {
  *         // Call the super class constructor for the subclass
  *         MyClass.call(this, name)
@@ -247,9 +247,9 @@ videojs.TOUCH_ENABLED = browser.TOUCH_ENABLED;
  *                   Optionally including a `constructor` function
  * @return {Function} The newly created subclass
  * @mixes videojs
- * @method extends
+ * @method extend
  */
-videojs.extends = extendsFn;
+videojs.extend = extendFn;
 
 /**
  * Merge two options objects recursively
