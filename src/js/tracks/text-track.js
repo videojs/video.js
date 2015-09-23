@@ -253,7 +253,7 @@ var parseCues = function(srcContent, track) {
 };
 
 var loadTrack = function(src, track) {
-  XHR({ uri: src }, Fn.bind(this, function(err, response, responseBody){
+  XHR({ uri: src, cors: true }, Fn.bind(this, function(err, response, responseBody){
     if (err) {
       return log.error(err, response);
     }
