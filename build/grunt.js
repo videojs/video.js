@@ -286,6 +286,9 @@ module.exports = function(grunt) {
             debug: true,
             standalone: false
           },
+          plugin: [
+            ['proxyquireify/plugin']
+          ],
           banner: false,
           watch: true,
           keepAlive: true

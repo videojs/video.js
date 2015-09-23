@@ -1,6 +1,8 @@
 import document from 'global/document';
 import window from 'global/window';
 import * as Url from '../../../src/js/utils/url.js';
+import proxyquireify from 'proxyquireify';
+const proxyquire = proxyquireify(require);
 
 q.module('url');
 
@@ -66,4 +68,32 @@ test('should get the file extension of the passed path', function() {
   //with capital letters
   equal(Url.getFileExtension('test.video.MP4'), 'mp4');
   equal(Url.getFileExtension('test.video.FLV'), 'flv');
+});
+
+// isCrossOrigin tests
+test('isCrossOrigin can identify cross origin urls', function() {
+  let win = {
+    location: {}
+  };
+  let Url = proxyquire('../../../src/js/utils/url.js', {
+    'global/window': win
+  });
+
+  win.location.protocol = 'http:';
+  win.location.host = 'google.com'
+  ok(!Url.isCrossOrigin('http://google.com/example.vtt'), 'http://google.com from http://google.com is not cross origin');
+  ok(Url.isCrossOrigin('https://google.com/example.vtt'), 'https://google.com from http://google.com is cross origin');
+  ok(!Url.isCrossOrigin('//google.com/example.vtt'), '//google.com from http://google.com is not cross origin');
+  ok(Url.isCrossOrigin('http://example.com/example.vtt'), 'http://example.com from http://google.com is cross origin');
+  ok(Url.isCrossOrigin('https://example.com/example.vtt'), 'https://example.com from http://google.com is cross origin');
+  ok(Url.isCrossOrigin('//example.com/example.vtt'), '//example.com from http://google.com is cross origin');
+
+  win.location.protocol = 'https:';
+  win.location.host = 'google.com'
+  ok(Url.isCrossOrigin('http://google.com/example.vtt'), 'http://google.com from http://google.com is cross origin');
+  ok(!Url.isCrossOrigin('https://google.com/example.vtt'), 'https://google.com from http://google.com is not cross origin');
+  ok(Url.isCrossOrigin('//google.com/example.vtt'), '//google.com from http://google.com is cross origin');
+  ok(Url.isCrossOrigin('http://example.com/example.vtt'), 'http://example.com from https://google.com is cross origin');
+  ok(Url.isCrossOrigin('https://example.com/example.vtt'), 'https://example.com from https://google.com is cross origin');
+  ok(Url.isCrossOrigin('//example.com/example.vtt'), '//example.com from https://google.com is cross origin');
 });
