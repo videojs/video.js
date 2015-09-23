@@ -10,6 +10,7 @@ import log from '../utils/log.js';
 import EventTarget from '../event-target';
 import document from 'global/document';
 import window from 'global/window';
+import { parseUrl } from '../utils/url.js';
 import XHR from 'xhr';
 
 /*
@@ -253,7 +254,23 @@ var parseCues = function(srcContent, track) {
 };
 
 var loadTrack = function(src, track) {
-  XHR({ uri: src, cors: true }, Fn.bind(this, function(err, response, responseBody){
+  let urlInfo = parseUrl(src);
+  let winLoc = window.location;
+  // IE8 protocol relative urls will return ':' for protocol
+  let srcProtocol = urlInfo.protocol === ':' ? winLoc.protocol : urlInfo.protocol;
+  // Check if url is for another domain/origin
+  // IE8 doesn't know location.origin, so we won't rely on it here
+  let crossOrigin = (srcProtocol + urlInfo.host) !== (winLoc.protocol + winLoc.host);
+
+  let opts = {
+    uri: src;
+  };
+
+  if (crossOrigin) {
+    opts.cors = crossOrigin;
+  }
+
+  XHR(opts, Fn.bind(this, function(err, response, responseBody){
     if (err) {
       return log.error(err, response);
     }
