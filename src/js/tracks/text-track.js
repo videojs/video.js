@@ -263,7 +263,7 @@ var loadTrack = function(src, track) {
   let crossOrigin = (srcProtocol + urlInfo.host) !== (winLoc.protocol + winLoc.host);
 
   let opts = {
-    uri: src;
+    uri: src
   };
 
   if (crossOrigin) {
