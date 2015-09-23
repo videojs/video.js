@@ -141,6 +141,7 @@ CHANGELOG
 * @misteroneill rename &quot;extends&quot; to &quot;extend&quot; for ie8 ([view](https://github.com/videojs/video.js/pull/2624))
 * @forbesjo removed the PhantomJS dependency ([view](https://github.com/videojs/video.js/pull/2622))
 * @misteroneill re-exposed videojs.TextTrack ([view](https://github.com/videojs/video.js/pull/2625))
+* @heff removed a second copy of video.novtt.js from dist ([view](https://github.com/videojs/video.js/pull/2630))
 
 --------------------
 
