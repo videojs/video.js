@@ -142,6 +142,7 @@ CHANGELOG
 * @forbesjo removed the PhantomJS dependency ([view](https://github.com/videojs/video.js/pull/2622))
 * @misteroneill re-exposed videojs.TextTrack ([view](https://github.com/videojs/video.js/pull/2625))
 * @heff removed a second copy of video.novtt.js from dist ([view](https://github.com/videojs/video.js/pull/2630))
+* @heff fixed timeranges deprecation warnings in tests ([view](https://github.com/videojs/video.js/pull/2627))
 
 --------------------
 

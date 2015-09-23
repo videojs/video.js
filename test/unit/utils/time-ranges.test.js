@@ -10,8 +10,6 @@ test('should create a fake single timerange', function(assert){
   var tr = createTimeRanges(0, 10);
 
   equal(tr.length, 1, 'length should be 1');
-  equal(tr.start(), 0, 'works if start is called with no arguments');
-  equal(tr.end(), 10, 'works if end is called with no arguments');
   equal(tr.start(0), 0, 'works if start is called with valid index');
   equal(tr.end(0), 10, 'works if end is called with with valid index');
   assert.throws(()=>tr.start(1), /Failed to execute 'start'/, 'fails if start is called with an invalid index');
@@ -25,8 +23,6 @@ test('should create a fake multiple timerange', function(assert){
   ]);
 
   equal(tr.length, 2, 'length should equal 2');
-  equal(tr.start(), 0, 'works if start is called with no arguments');
-  equal(tr.end(), 10, 'works if end is called with no arguments');
   equal(tr.start(1), 11, 'works if start is called with valid index');
   equal(tr.end(1), 20, 'works if end is called with with valid index');
   assert.throws(()=>tr.start(-1), /Failed to execute 'start'/, 'fails if start is called with an invalid index');
