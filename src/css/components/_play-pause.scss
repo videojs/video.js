@@ -5,6 +5,6 @@
 .video-js .vjs-play-control {
   @extend .vjs-icon-play;
 }
-.video-js.vjs-playing .vjs-play-control {
+.video-js .vjs-play-control.vjs-playing {
   @extend .vjs-icon-pause;
 }
