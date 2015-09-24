@@ -407,6 +407,15 @@ videojs.formatTime = formatTime;
 videojs.parseUrl = Url.parseUrl;
 
 /**
+ * Returns whether the url passed is a cross domain request or not.
+ *
+ * @param {String} url The url to check
+ * @return {Boolean}   Whether it is a cross domain request or not
+ * @method isCrossOrigin
+ */
+videojs.isCrossOrigin = Url.isCrossOrigin;
+
+/**
  * Event target class.
  *
  * @type {Function}

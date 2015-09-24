@@ -144,6 +144,7 @@ CHANGELOG
 * @heff removed a second copy of video.novtt.js from dist ([view](https://github.com/videojs/video.js/pull/2630))
 * @heff fixed timeranges deprecation warnings in tests ([view](https://github.com/videojs/video.js/pull/2627))
 * @misteroneill updated play control to use its state for icon ([view](https://github.com/videojs/video.js/pull/2636))
+* @gkatsev exposed isCrossOrigin and used it to enable CORS for textTrack XHRs ([view](https://github.com/videojs/video.js/pull/2633))
 
 --------------------
 
