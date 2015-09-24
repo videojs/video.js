@@ -80,7 +80,7 @@ test('isCrossOrigin can identify cross origin urls', function() {
   });
 
   win.location.protocol = 'http:';
-  win.location.host = 'google.com'
+  win.location.host = 'google.com';
   ok(!Url.isCrossOrigin('http://google.com/example.vtt'), 'http://google.com from http://google.com is not cross origin');
   ok(Url.isCrossOrigin('https://google.com/example.vtt'), 'https://google.com from http://google.com is cross origin');
   ok(!Url.isCrossOrigin('//google.com/example.vtt'), '//google.com from http://google.com is not cross origin');
@@ -89,7 +89,7 @@ test('isCrossOrigin can identify cross origin urls', function() {
   ok(Url.isCrossOrigin('//example.com/example.vtt'), '//example.com from http://google.com is cross origin');
 
   win.location.protocol = 'https:';
-  win.location.host = 'google.com'
+  win.location.host = 'google.com';
   ok(Url.isCrossOrigin('http://google.com/example.vtt'), 'http://google.com from http://google.com is cross origin');
   ok(!Url.isCrossOrigin('https://google.com/example.vtt'), 'https://google.com from http://google.com is not cross origin');
   ok(Url.isCrossOrigin('//google.com/example.vtt'), '//google.com from http://google.com is cross origin');
