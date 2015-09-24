@@ -79,14 +79,16 @@ test('isCrossOrigin can identify cross origin urls', function() {
     'global/window': win
   });
 
-  win.location.protocol = 'http:';
-  win.location.host = 'google.com';
-  ok(!Url.isCrossOrigin('http://google.com/example.vtt'), 'http://google.com from http://google.com is not cross origin');
-  ok(Url.isCrossOrigin('https://google.com/example.vtt'), 'https://google.com from http://google.com is cross origin');
-  ok(!Url.isCrossOrigin('//google.com/example.vtt'), '//google.com from http://google.com is not cross origin');
+  win.location.protocol = window.location.protocol;
+  win.location.host = window.location.host;
+  ok(!Url.isCrossOrigin(`http://${win.location.host}/example.vtt`), 'http://google.com from http://google.com is not cross origin');
+  ok(Url.isCrossOrigin(`https://${win.location.host}/example.vtt`), 'https://google.com from http://google.com is cross origin');
+  ok(!Url.isCrossOrigin(`//${win.location.host}/example.vtt`), '//google.com from http://google.com is not cross origin');
   ok(Url.isCrossOrigin('http://example.com/example.vtt'), 'http://example.com from http://google.com is cross origin');
   ok(Url.isCrossOrigin('https://example.com/example.vtt'), 'https://example.com from http://google.com is cross origin');
   ok(Url.isCrossOrigin('//example.com/example.vtt'), '//example.com from http://google.com is cross origin');
+  // we cannot test that relative urls work on https, though
+  ok(!Url.isCrossOrigin('example.vtt'), 'relative url is not cross origin');
 
   win.location.protocol = 'https:';
   win.location.host = 'google.com';
