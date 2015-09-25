@@ -145,6 +145,7 @@ CHANGELOG
 * @heff fixed timeranges deprecation warnings in tests ([view](https://github.com/videojs/video.js/pull/2627))
 * @misteroneill updated play control to use its state for icon ([view](https://github.com/videojs/video.js/pull/2636))
 * @gkatsev exposed isCrossOrigin and used it to enable CORS for textTrack XHRs ([view](https://github.com/videojs/video.js/pull/2633))
+* @misteroneill fixed tsml to be used as a tag for template strings ([view](https://github.com/videojs/video.js/pull/2629))
 
 --------------------
 
