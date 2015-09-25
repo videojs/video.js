@@ -249,7 +249,7 @@
         [ "npm publish",                               "Publish to npm" ],
         [ "grunt github-release",                      "Create a new release on Github" ],
         [ "git checkout stable",                       "Checkout the developmet branch" ],
-        [ "git branch -D temp-release-branch",         "Delete the temp release branch" ],
+        [ "git branch -D temp-release-branch",         "Delete the temp release branch" ]
       ]
     }
   },
