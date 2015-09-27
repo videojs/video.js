@@ -11,7 +11,7 @@
   padding: 0;
   cursor: pointer;
   opacity: 1;
-  border: 2px solid $primary-text;
+  border: $big-play-button--border-width solid $primary-text;
 
   /* Need a slightly gray bg so it can be seen on black backgrounds */
   @include background-color-with-alpha($primary-bg, $big-play-button--transparency);
@@ -31,8 +31,8 @@
 .vjs-big-play-centered .vjs-big-play-button {
   top: 50%;
   left: 50%;
-  margin-top: -($big-play-button--height / 2);
-  margin-left: -($big-play-button--width / 2);
+  margin-top: -($big-play-button--height / 2 + $big-play-button--border-width);
+  margin-left: -($big-play-button--width / 2 + $big-play-button--border-width);
 }
 
 .video-js:hover .vjs-big-play-button,
