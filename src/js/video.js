@@ -107,6 +107,11 @@ if (!style) {
     .video-js {
       width: 300px;
       height: 150px;
+    }
+
+    .vjs-fluid {
+      padding-top: 56.25%
+    }
   `);
 }
 
