@@ -5,7 +5,7 @@
   padding: 0;
   margin: 0 0.45em 0 0.45em;
 
-  @include background-color-with-alpha($lighter-background-color, $lighter-background-transparency);
+  @include background-color-with-alpha($secondary-background-color, $secondary-background-transparency);
 }
 
 .video-js .vjs-slider:focus {

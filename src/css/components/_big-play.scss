@@ -40,7 +40,7 @@
   outline: 0;
   border-color: $primary-foreground-color;
 
-  @include background-color-with-alpha($lighter-background-color, $lighter-background-transparency);
+  @include background-color-with-alpha($secondary-background-color, $secondary-background-transparency);
   @include transition(all 0s);
 }
 

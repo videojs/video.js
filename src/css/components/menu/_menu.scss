@@ -26,7 +26,7 @@
 .vjs-menu li:focus,
 .vjs-menu li:hover {
   outline: 0;
-  @include background-color-with-alpha($lighter-background-color, $lighter-background-transparency);
+  @include background-color-with-alpha($secondary-background-color, $secondary-background-transparency);
 }
 
 .vjs-menu li.vjs-selected,

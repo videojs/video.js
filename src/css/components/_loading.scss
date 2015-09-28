@@ -75,36 +75,36 @@
 
 @keyframes vjs-spinner-fade {
   0% {
-    border-top-color: $lighter-background-color;
+    border-top-color: $secondary-background-color;
   }
   20% {
-    border-top-color: $lighter-background-color;
+    border-top-color: $secondary-background-color;
   }
   35% {
     border-top-color: white;
   }
   60% {
-    border-top-color: $lighter-background-color;
+    border-top-color: $secondary-background-color;
   }
   100% {
-    border-top-color: $lighter-background-color;
+    border-top-color: $secondary-background-color;
   }
 }
 
 @-webkit-keyframes vjs-spinner-fade {
   0% {
-    border-top-color: $lighter-background-color;
+    border-top-color: $secondary-background-color;
   }
   20% {
-    border-top-color: $lighter-background-color;
+    border-top-color: $secondary-background-color;
   }
   35% {
     border-top-color: white;
   }
   60% {
-    border-top-color: $lighter-background-color;
+    border-top-color: $secondary-background-color;
   }
   100% {
-    border-top-color: $lighter-background-color;
+    border-top-color: $secondary-background-color;
   }
 }
