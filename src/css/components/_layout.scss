@@ -7,13 +7,13 @@
   vertical-align: top;
   box-sizing: border-box;
 
-  color: $primary-text;
-  background-color: $primary-bg;
+  color: $primary-foreground-color;
+  background-color: #000;
   position: relative;
   padding: 0;
   /* Start with 10px for base font size so other dimensions can be em based and
   easily calculable. */
-  font-size: $base-font-size;
+  font-size: 10px;
   line-height: 1;
 
   /* Provide some basic defaults for fonts */
@@ -137,8 +137,8 @@ This optional paragraph inside the video tag can provide a message to users
 about what's required to play video. */
 .vjs-no-js {
   padding: 20px;
-  color: $primary-text;
-  background-color: $primary-bg;
+  color: #fff;
+  background-color: #000;
   font-size: 18px;
   font-family: $text-font-family;
   text-align: center;
@@ -147,6 +147,7 @@ about what's required to play video. */
   margin: 0px auto;
 }
 
-.vjs-no-js a, .vjs-no-js a:visited {
-  color: $secondary-text;
+.vjs-no-js a,
+.vjs-no-js a:visited {
+  color: #66A8CC;
 }

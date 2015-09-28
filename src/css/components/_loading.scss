@@ -9,7 +9,7 @@
   /* Need to fix centered page layouts */
   text-align: left;
 
-  border: 6px solid rgba(113, 119, 129, 0.75);
+  border: 6px solid rgba($primary-background-color, $primary-background-transparency);
   // border: 6px solid rgba(43, 51, 63, 0.5);
 
   box-sizing: border-box;
@@ -75,36 +75,36 @@
 
 @keyframes vjs-spinner-fade {
   0% {
-    border-top-color: #a6aab0;
+    border-top-color: $lighter-background-color;
   }
   20% {
-    border-top-color: #a6aab0;
+    border-top-color: $lighter-background-color;
   }
   35% {
     border-top-color: white;
   }
   60% {
-    border-top-color: #a6aab0;
+    border-top-color: $lighter-background-color;
   }
   100% {
-    border-top-color: #a6aab0;
+    border-top-color: $lighter-background-color;
   }
 }
 
 @-webkit-keyframes vjs-spinner-fade {
   0% {
-    border-top-color: #a6aab0;
+    border-top-color: $lighter-background-color;
   }
   20% {
-    border-top-color: #a6aab0;
+    border-top-color: $lighter-background-color;
   }
   35% {
     border-top-color: white;
   }
   60% {
-    border-top-color: #a6aab0;
+    border-top-color: $lighter-background-color;
   }
   100% {
-    border-top-color: #a6aab0;
+    border-top-color: $lighter-background-color;
   }
 }

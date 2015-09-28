@@ -23,18 +23,17 @@
   text-transform: lowercase;
 }
 
-.vjs-menu li.vjs-selected {
-  background-color: $primary-bg;
+.vjs-menu li:focus,
+.vjs-menu li:hover {
+  outline: 0;
+  @include background-color-with-alpha($lighter-background-color, $lighter-background-transparency);
 }
 
-.vjs-menu li:focus,
-.vjs-menu li:hover,
+.vjs-menu li.vjs-selected,
 .vjs-menu li.vjs-selected:focus,
 .vjs-menu li.vjs-selected:hover {
-  outline: 0;
-  color: $primary-bg;
-
-  @include background-color-with-alpha($primary-text, 0.75);
+  background-color: $primary-foreground-color;
+  color: $primary-background-color;
 }
 
 .vjs-menu li.vjs-menu-title {
