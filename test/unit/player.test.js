@@ -67,7 +67,7 @@ test('should accept options from multiple sources and override in correct order'
   videojs.options.attr = 1;
 
   let tag0 = TestHelpers.makeTag();
-  let player0 = new Player(tag0);
+  let player0 = new Player(tag0, { techOrder: ['techFaker'] });
 
   equal(player0.options_.attr, 1, 'global option was set');
   player0.dispose();
@@ -76,7 +76,7 @@ test('should accept options from multiple sources and override in correct order'
   let tag2 = TestHelpers.makeTag();
   tag2.setAttribute('attr', 'asdf'); // Attributes must be set as strings
 
-  let player2 = new Player(tag2);
+  let player2 = new Player(tag2, { techOrder: ['techFaker'] });
   equal(player2.options_.attr, 'asdf', 'Tag options overrode global options');
   player2.dispose();
 
@@ -84,7 +84,7 @@ test('should accept options from multiple sources and override in correct order'
   let tag3 = TestHelpers.makeTag();
   tag3.setAttribute('attr', 'asdf');
 
-  let player3 = new Player(tag3, { 'attr': 'fdsa' });
+  let player3 = new Player(tag3, { techOrder: ['techFaker'], 'attr': 'fdsa' });
   equal(player3.options_.attr, 'fdsa', 'Init options overrode tag and global options');
   player3.dispose();
 });
@@ -207,7 +207,7 @@ test('should wrap the original tag in the player div', function(){
   container.appendChild(tag);
   fixture.appendChild(container);
 
-  var player = new Player(tag);
+  var player = new Player(tag, { techOrder: ['techFaker'] });
   var el = player.el();
 
   ok(el.parentNode === container, 'player placed at same level as tag');
@@ -283,7 +283,7 @@ test('should be able to initialize player twice on the same tag using string ref
   var fixture = document.getElementById('qunit-fixture');
   fixture.appendChild(videoTag);
 
-  var player = videojs(videoTag.id);
+  var player = videojs(videoTag.id, { techOrder: ['techFaker'] });
   ok(player, 'player is created');
   player.dispose();
 
@@ -292,7 +292,7 @@ test('should be able to initialize player twice on the same tag using string ref
   fixture.appendChild(videoTag);
 
   //here we receive cached version instead of real
-  player = videojs(videoTag.id);
+  player = videojs(videoTag.id, { techOrder: ['techFaker'] });
   //here it triggers error, because player was destroyed already after first dispose
   player.dispose();
 });
@@ -454,7 +454,7 @@ test('make sure that controls listeners do not get added too many times', functi
 //   fixture.innerHTML += html;
 
 //   var tag = document.getElementById('example_1');
-//   var player = new Player(tag);
+//   var player = new Player(tag, { techOrder: ['techFaker'] });
 
 //   var incompatibilityMessage = player.el().getElementsByTagName('p')[0];
 //   // ie8 capitalizes tag names
@@ -471,7 +471,7 @@ test('should register players with generated ids', function(){
   video.className = 'vjs-default-skin video-js';
   fixture.appendChild(video);
 
-  player = new Player(video);
+  player = new Player(video, { techOrder: ['techFaker'] });
   id = player.el().id;
 
   equal(player.el().id, player.id(), 'the player and element ids are equal');
