@@ -21,7 +21,7 @@ test('should return a video player instance', function(){
   var fixture = document.getElementById('qunit-fixture');
   fixture.innerHTML += '<video id="test_vid_id"></video><video id="test_vid_id2"></video>';
 
-  var player = videojs('test_vid_id', { techOrder: ['html5'] });
+  var player = videojs('test_vid_id', { techOrder: ['techFaker'] });
   ok(player, 'created player from tag');
   ok(player.id() === 'test_vid_id');
   ok(videojs.getPlayers()['test_vid_id'] === player, 'added player to global reference');
@@ -30,7 +30,7 @@ test('should return a video player instance', function(){
   ok(player === playerAgain, 'did not create a second player from same tag');
 
   var tag2 = document.getElementById('test_vid_id2');
-  var player2 = videojs(tag2, { techOrder: ['html5'] });
+  var player2 = videojs(tag2, { techOrder: ['techFaker'] });
   ok(player2.id() === 'test_vid_id2', 'created player from element');
 });
 
