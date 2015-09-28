@@ -68,7 +68,7 @@
   }
 }
 .video-js .vjs-play-progress {
-  background-color: $primary-text;
+  background-color: $primary-foreground-color;
   @extend .vjs-icon-circle;
 
   // Progress handle
@@ -89,10 +89,10 @@
   top: -2.4em;
   right: -1.5em;
   font-size: 0.9em;
-  color: $primary-bg;
+  color: #000;
   content: attr(data-current-time);
   padding: 0.2em 0.5em;
-  @include background-color-with-alpha($primary-text, 0.8);
+  @include background-color-with-alpha(#fff, 0.8);
   @include border-radius(0.3em);
 }
 .video-js .vjs-play-progress:before,
@@ -101,14 +101,19 @@
 }
 
 .video-js .vjs-load-progress {
-  background: rgb(100, 100, 100) /* IE8- Fallback */;
-  background: rgba(255, 255, 255, 0.2);
+  /* For IE8 we'll lighten the color */
+  background: ligthen($secondary-background-color, 25%);
+  /* Otherwise we'll rely on stacked opacities */
+  background: rgba($secondary-background-color, $secondary-background-transparency);
 }
 
 /* there are child elements of the load progress bar that represent the
 specific time ranges that have been buffered */
 .video-js .vjs-load-progress div {
-  background: rgba($secondary-bg, 0.1);
+  /* For IE8 we'll lighten the color */
+  background: ligthen($secondary-background-color, 50%);
+  /* Otherwise we'll rely on stacked opacities */
+  background: rgba($secondary-background-color, 0.75);
 }
 
 .video-js.vjs-no-flex .vjs-progress-control {
@@ -120,7 +125,7 @@ specific time ranges that have been buffered */
   position: absolute;
   width: 1px;
   height: 100%;
-  background-color: $primary-bg;
+  background-color: #000;
   z-index: 1;
 }
 .vjs-no-flex .vjs-progress-control .vjs-mouse-display {
@@ -141,6 +146,6 @@ specific time ranges that have been buffered */
   display: none;
 }
 .video-js .vjs-progress-control .vjs-mouse-display:after {
-  color: $primary-text; 
-  @include background-color-with-alpha($primary-bg, 0.8);
+  color: #fff;
+  @include background-color-with-alpha(#000, 0.8);
 }

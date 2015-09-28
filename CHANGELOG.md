@@ -147,6 +147,7 @@ CHANGELOG
 * @gkatsev exposed isCrossOrigin and used it to enable CORS for textTrack XHRs ([view](https://github.com/videojs/video.js/pull/2633))
 * @misteroneill fixed tsml to be used as a tag for template strings ([view](https://github.com/videojs/video.js/pull/2629))
 * @eXon added support for a tech-supplied poster ([view](https://github.com/videojs/video.js/pull/2339))
+* @heff improved some skin defaults for external styling ([view](https://github.com/videojs/video.js/pull/2642))
 
 --------------------
 

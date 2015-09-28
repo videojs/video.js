@@ -1,16 +1,17 @@
-$primary-text: #fff !default;
-// currently just used for visited links in errors and such.
-$secondary-text: #F4A460 !default;
+// Text, icons, hover states
+$primary-foreground-color: #fff;
 
-$primary-bg: #000 !default;
-$secondary-bg: lighten($primary-bg, 35%) !default;
+// Control backgrounds (control bar, big play, menus)
+$primary-background-color: #2B333F !default;
+$primary-background-transparency: 0.7 !default;
+
+// Hover states, slider backgrounds
+$secondary-background-color: lighten($primary-background-color, 33%) !default;
+$secondary-background-transparency: 0.5 !default;
 
 $text-font-family: Arial, Helvetica, sans-serif !default;
-$base-font-size: 10px !default;
 
-$control-bar--bg: #2B333F !default;
-$control-bar--transparency: 0.5 !default;
-
+// Using the '--' naming for component-specific styles
 $big-play-button--width: 3em !default;
 $big-play-button--height: 1.5em !default;
 $big-play-button--transparency: 0.8 !default;

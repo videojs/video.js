@@ -43,7 +43,7 @@
   bottom: 0;
   left: 0;
 
-  background-color: $primary-text;
+  background-color: $primary-foreground-color;
 
   @extend .vjs-icon-circle;
 
@@ -120,4 +120,10 @@ width and height to zero. */
 .vjs-volume-menu-button-horizontal .vjs-lock-showing .vjs-menu-content {
   height: 2.9em;
   width: 8em;
+}
+
+.vjs-volume-menu-button.vjs-menu-button-inline .vjs-menu-content {
+  /* An inline volume should never have a menu background color.
+     This protects it from external changes to background colors. */
+  background-color: transparent !important;
 }
