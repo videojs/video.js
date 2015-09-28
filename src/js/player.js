@@ -560,6 +560,7 @@ class Player extends Component {
     this.on(this.tech_, 'volumechange', this.handleTechVolumeChange_);
     this.on(this.tech_, 'texttrackchange', this.handleTechTextTrackChange_);
     this.on(this.tech_, 'loadedmetadata', this.updateStyleEl_);
+    this.on(this.tech_, 'posterchange', this.handleTechPosterChange_);
 
     this.usingNativeControls(this.techGet_('controls'));
 
@@ -577,11 +578,6 @@ class Player extends Component {
     if (this.tag) {
       this.tag.player = null;
       this.tag = null;
-    }
-
-    // Look for the default poster of the tech if their is no poster specified
-    if (!this.poster_) {
-      this.trigger('posterchange');
     }
   }
 
@@ -678,9 +674,7 @@ class Player extends Component {
     }
 
     // Look if the tech found a higher resolution poster while loading
-    if (!this.poster_) {
-      this.trigger('posterchange');
-    }
+    this.handleTechPosterChange_();
 
     // Update the duration if available
     this.handleTechDurationChange_();
@@ -1762,11 +1756,6 @@ class Player extends Component {
             this.play();
           }
 
-          // Update the default poster if none is specified
-          if (!this.poster_) {
-            this.trigger('posterchange');
-          }
-
         // Set the source synchronously if possible (#2326)
         }, true);
       }
@@ -1891,7 +1880,8 @@ class Player extends Component {
   }
 
   /**
-   * get or set the poster image source url
+   * Get or set the poster image source url
+   *
    * ##### EXAMPLE:
    * ```js
    *     // get
@@ -1907,14 +1897,7 @@ class Player extends Component {
    */
   poster(src) {
     if (src === undefined) {
-      let poster = this.poster_;
-
-      // Get the default poster from the tech if their is none
-      if (!poster && this.tech_ && this.tech_.poster) {
-        poster = this.tech_.poster() || '';
-      }
-
-      return poster;
+      return this.poster_;
     }
 
     // The correct way to remove a poster is to set as an empty string
@@ -1933,6 +1916,26 @@ class Player extends Component {
     this.trigger('posterchange');
 
     return this;
+  }
+
+  /**
+   * Some techs (e.g. YouTube) can provide a poster source in an
+   * asynchronous way. We want the poster component to use this
+   * poster source so that it covers up the tech's controls.
+   * (YouTube's play button). However we only want to use this
+   * soruce if the player user hasn't set a poster through
+   * the normal APIs.
+   *
+   * @private
+   * @method handleTechPosterChange_
+   */
+  handleTechPosterChange_() {
+    if (!this.poster_ && this.tech_ && this.tech_.poster) {
+      this.poster_ = this.tech_.poster() || '';
+
+      // Let components know the poster has changed
+      this.trigger('posterchange');
+    }
   }
 
   /**
