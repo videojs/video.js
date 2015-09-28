@@ -47,9 +47,9 @@ class VolumeControl extends Component {
 }
 
 VolumeControl.prototype.options_ = {
-  children: {
-    'volumeBar': {}
-  }
+  children: [
+    'volumeBar'
+  ]
 };
 
 Component.registerComponent('VolumeControl', VolumeControl);

@@ -98,9 +98,9 @@ class VolumeBar extends Slider {
 }
 
 VolumeBar.prototype.options_ = {
-  children: {
-    'volumeLevel': {}
-  },
+  children: [
+    'volumeLevel'
+  ],
   'barName': 'volumeLevel'
 };
 

@@ -30,9 +30,9 @@ class ProgressControl extends Component {
 }
 
 ProgressControl.prototype.options_ = {
-  children: {
-    'seekBar': {}
-  }
+  children: [
+    'seekBar'
+  ]
 };
 
 Component.registerComponent('ProgressControl', ProgressControl);
