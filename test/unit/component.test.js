@@ -419,10 +419,12 @@ test('should not retrigger a listener when the listener calls triggerReady', fun
     }
   };
 
-  var comp = new vjs.Component(getFakePlayer(), {});
+  var comp = new Component(getFakePlayer(), {});
 
   comp.ready(readyListener);
   comp.triggerReady();
+
+  this.clock.tick(100);
 
   equal(timesCalled, 1, 'triggerReady from inside a ready handler does not result in an infinite loop');
 });

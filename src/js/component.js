@@ -785,13 +785,13 @@ class Component {
     this.setTimeout(function(){
       let readyQueue = this.readyQueue_;
 
+      // Reset Ready Queue
+      this.readyQueue_ = [];
+
       if (readyQueue && readyQueue.length > 0) {
         readyQueue.forEach(function(fn){
           fn.call(this);
         }, this);
-
-        // Reset Ready Queue
-        this.readyQueue_ = [];
       }
 
       // Allow for using event listeners also
