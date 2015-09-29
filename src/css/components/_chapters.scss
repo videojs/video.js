@@ -1,0 +1,12 @@
+.video-js .vjs-chapters-button {
+  @extend .vjs-icon-chapters;
+}
+
+.vjs-chapters-button .vjs-menu {
+  left: -10em; /* (Width of vjs-menu - width of vjs-control) / 2 */
+  width: 0;
+}
+
+.vjs-chapters-button .vjs-menu ul {
+  width: 24em;
+}

@@ -1,0 +1,37 @@
+@import "variables";
+@import "private-variables";
+@import "utilities";
+
+@import "../../node_modules/videojs-font/scss/icons";
+
+@import "components/layout";
+@import "components/big-play";
+@import "components/button";
+
+@import "components/menu/menu";
+@import "components/menu/menu-popup";
+@import "components/menu/menu-inline";
+
+@import "components/control-bar";
+@import "components/control";
+@import "components/control-spacer";
+
+@import "components/progress";
+@import "components/slider";
+
+@import "components/volume";
+
+@import "components/poster";
+@import "components/live";
+@import "components/time";
+@import "components/play-pause";
+@import "components/text-track";
+@import "components/fullscreen";
+@import "components/playback-rate";
+@import "components/error";
+@import "components/loading";
+@import "components/captions";
+@import "components/chapters";
+@import "components/subtitles";
+@import "components/adaptive";
+@import "components/captions-settings";

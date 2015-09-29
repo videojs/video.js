@@ -1,0 +1,15 @@
+.video-js .vjs-slider {
+  outline: 0;
+  position: relative;
+  cursor: pointer;
+  padding: 0;
+  margin: 0 0.45em 0 0.45em;
+
+  @include background-color-with-alpha($secondary-background-color, $secondary-background-transparency);
+}
+
+.video-js .vjs-slider:focus {
+  text-shadow: 0em 0em 1em rgba($primary-foreground-color, 1);
+
+  @include box-shadow(0 0 1em $primary-foreground-color);
+}

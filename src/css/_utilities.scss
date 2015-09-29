@@ -1,0 +1,104 @@
+@mixin background-color-with-alpha($color, $alpha) {
+  background-color: $color;
+  background-color: rgba($color, $alpha);
+}
+
+@mixin transition($string: $transition--default) {
+  -webkit-transition: $string;
+  -moz-transition: $string;
+  -o-transition: $string;
+  transition: $string;
+}
+
+@mixin hide-visually {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+@mixin border-radius($radius) {
+  -webkit-border-radius: $radius;
+  -moz-border-radius: $radius;
+  border-radius: $radius;
+}
+
+@mixin animation($string: spin 1s infinite linear) {
+  -webkit-animation: $string;
+  -moz-animation: $string;
+  -o-animation: $string;
+  animation: $string;
+}
+
+@mixin display-flex($alignment: '', $justification: '') {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+
+  @if $alignment != '' {
+    -webkit-box-align: $alignment;
+    -webkit-align-items: $alignment;
+    -ms-flex-align: $alignment;
+    align-items: $alignment;
+  }
+
+  @if $justification != '' {
+    -webkit-box-pack: $justification;
+    -webkit-justify-content: $justification;
+    -ms-flex-pack: $justification;
+    justify-content: $justification;
+  }
+}
+
+@mixin flex($value) {
+  // @include context('.video-js', '.video-js.vjs-no-flex') {
+  //   display: table-cell;
+  //   vertical-align: middle;
+  //   @if ($value == 'auto') {
+  //     width: auto;
+  //   }
+  // }
+
+  -webkit-box-flex: $value;
+  -moz-box-flex: $value;
+  -webkit-flex: $value;
+  -ms-flex: $value;
+  flex: $value;
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/user-select
+@mixin user-select($string: none) {
+  -webkit-user-select: $string;
+  -moz-user-select: $string;
+  -ms-user-select: $string;
+  user-select: $string
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow
+@mixin box-shadow ($string: 0 0 1em rgba(0, 0, 0, 0.25)) {
+  -webkit-box-shadow: $string;
+  -moz-box-shadow: $string;
+  box-shadow: $string;
+}
+
+@mixin order($value) {
+  -webkit-box-ordinal-group: $value;
+  -moz-box-ordinal-group: $value;
+  -ms-flex-order: $value;
+  -webkit-order: $value;
+  order: $value;
+}
+
+%icon-default {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}

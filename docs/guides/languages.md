@@ -37,7 +37,7 @@ Video.js uses key/value object dictionaries in JSON form. A sample dictionary fo
 ```
 
 Notes:
- 
+
 - The file name should always be in the format `XX.json`, where `XX` is the two letter value of the language reported to the browser (for options see the bottom of this document).
 - For automatic inclusion at build time, add your language file to the `/lang` directory (see 'Adding Languages to Video.js below').
 
@@ -45,7 +45,7 @@ Adding Languages to Video.js
 ----------------------------
 Additional language support can be added to Video.js in multiple ways.
 
-1. Create language scripts out of your JSON objects by using our custom grunt task `vjslanguages`. This task is automatically run as part of the default grunt task in Video.JS, but can be configured to match your `src`/`dist` directories if different. Once these scripts are created, just add them to your DOM like any other script. 
+1. Create language scripts out of your JSON objects by using our custom grunt task `vjslanguages`. This task is automatically run as part of the default grunt task in Video.JS, but can be configured to match your `src`/`dist` directories if different. Once these scripts are created, just add them to your DOM like any other script.
 
 NOTE: These need to be added after the core Video.js script.
 
@@ -122,6 +122,24 @@ During a Video.js player instantiation you can force it to localize to a specifi
 </video>
 ```
 
+Determining Player Language
+---------------------------
+
+The player language is set to one of the following in descending priority
+
+* The language set in setup options as above
+* The document language (`lang` attribute of the `html` element)
+* Browser language preference
+* 'en'
+
+That can be overridden after instantiation with `language('fr')`.
+
+Language selection
+------------------
+
+* Language codes are considered case-insensitively (`en-US` == `en-us`).
+* If there is no match for a language code with a subcode (`en-us`), a match for the primary code (`en`) is used if available.
+
 Localization in Plugins
 -----------------------
 
@@ -133,7 +151,7 @@ var details = '<div class="vjs-errors-details">' + player.localize('Technical de
 
 Language Codes
 --------------
-The following is a list of official language codes. 
+The following is a list of official language codes.
 
 **NOTE:** For supported language translations, please see the [Languages Folder (/lang)](../../lang) folder located in the project root.
 
@@ -180,10 +198,10 @@ The following is a list of official language codes.
         <tr><th>fj<th><td>Fiji</td></tr>
         <tr><th>fi<th><td>Finnish</td></tr>
       </table>
-      
+
     </td>
     <td>
-      
+
       <table>
         <tr><th>fr<th><td>French</td></tr>
         <tr><th>fy<th><td>Frisian</td></tr>
@@ -223,10 +241,10 @@ The following is a list of official language codes.
         <tr><th>lo<th><td>Laothian</td></tr>
         <tr><th>la<th><td>Latin</td></tr>
       </table>
-      
+
     </td>
     <td>
-      
+
       <table>
         <tr><th>lv<th><td>Latvian (Lettish)</td></tr>
         <tr><th>li<th><td>Limburgish ( Limburger)</td></tr>
@@ -266,10 +284,10 @@ The following is a list of official language codes.
         <tr><th>ii<th><td>Sichuan Yi</td></tr>
         <tr><th>sd<th><td>Sindhi</td></tr>
       </table>
-      
+
     </td>
     <td>
-      
+
       <table>
         <tr><th>si<th><td>Sinhalese</td></tr>
         <tr><th>ss<th><td>Siswati</td></tr>
@@ -307,7 +325,7 @@ The following is a list of official language codes.
         <tr><th>yo<th><td>Yoruba</td></tr>
         <tr><th>zu<th><td>Zulu</td></tr>
       </table>
-      
+
     </td>
   </tr>
 </table>

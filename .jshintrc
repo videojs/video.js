@@ -1,7 +1,7 @@
 {
     "evil" : true,
     "validthis": true,
-    "browser"  : true,
+    "node"     : true,
     "debug"    : true,
     "boss"     : true,
     "expr"     : true,
@@ -11,13 +11,10 @@
     "trailing" : true,
     "undef"    : true,
     "laxbreak" : true,
-    "globals"  : {
-        "vjs": true,
-        "videojs": true,
-        "PlayerTest": true,
-        "TestHelpers": true
-    },
+    "esnext"   : true,
+    "eqeqeq"   : true,
     "predef"   : [
+        "_V_",
         "goog",
         "console",
 
@@ -27,6 +24,7 @@
         "exports",
         "process",
 
+        "q",
         "asyncTest",
         "deepEqual",
         "equal",
