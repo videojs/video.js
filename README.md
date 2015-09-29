@@ -1,8 +1,4 @@
-## Please Note!
-The master branch is now the development branch for 5.0 and should be considered unstable until the first 5.0 release. If you're looking for the most recent stable release, please refer to the [stable branch](https://github.com/videojs/video.js/tree/stable).
-
-
-![Video.js logo](https://i.cloudup.com/C3nAUZ-l4c.png)
+![Video.js logo](http://videojs.com/img/logo.png)
 
 # [Video.js - HTML5 Video Player](http://videojs.com)  [![Build Status](https://travis-ci.org/videojs/video.js.svg?branch=master)](https://travis-ci.org/videojs/video.js)
 
@@ -48,8 +44,7 @@ var player = videojs('really-cool-video', { /* Options */ }, function() {
 });
 ```
 
-If you're ready to dive in, the [documentation](docs/index.md) is the first place to go for more information. Generally the
-[player API docs](docs/api/vjs.Player.md) are the most pertinent.
+If you're ready to dive in, the [documentation](http://docs.videojs.com) is the first place to go for more information.
 
 ## Contributing
 Video.js is a free and open source library, and we appreciate any help you're willing to give. Check out the [contributing guide](CONTRIBUTING.md).
