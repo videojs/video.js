@@ -2,6 +2,11 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 5.0.0 (2015-09-29)
 * @carpasse infer MIME types from file extensions in the HTML5 and Flash techs ([view](https://github.com/videojs/video.js/pull/1974))
 * @mmcc updated the slider to allow for vertical orientation ([view](https://github.com/videojs/video.js/pull/1816))
 * @dmlap removed an ie6 hack for flash object embedding ([view](https://github.com/videojs/video.js/pull/1946))
@@ -149,8 +154,6 @@ CHANGELOG
 * @eXon added support for a tech-supplied poster ([view](https://github.com/videojs/video.js/pull/2339))
 * @heff improved some skin defaults for external styling ([view](https://github.com/videojs/video.js/pull/2642))
 * @heff changed component child lists to arrays instead of objects ([view](https://github.com/videojs/video.js/pull/2477))
-
---------------------
 
 ## 4.12.15 (2015-08-31)
 * @dmlap update to videojs-swf 4.7.4 ([view](https://github.com/videojs/video.js/pull/2463))
