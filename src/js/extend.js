@@ -1,7 +1,7 @@
 import log from './utils/log';
 
 /*
- * @file extends.js
+ * @file extend.js
  *
  * A combination of node inherits and babel's inherits (after transpile).
  * Both work the same but node adds `super_` to the subClass
@@ -34,7 +34,7 @@ const _inherits = function (subClass, superClass) {
  * var Button = videojs.getComponent('Button');
  * ```
  * ```js
- * var MyButton = videojs.extends(Button, {
+ * var MyButton = videojs.extend(Button, {
  *   constructor: function(player, options) {
  *     Button.call(this, player, options);
  *   },
@@ -44,7 +44,7 @@ const _inherits = function (subClass, superClass) {
  * });
  * ```
  */
-const extendsFn = function(superClass, subClassMethods={}) {
+const extendFn = function(superClass, subClassMethods={}) {
   let subClass = function() {
     superClass.apply(this, arguments);
   };
@@ -75,4 +75,4 @@ const extendsFn = function(superClass, subClassMethods={}) {
   return subClass;
 };
 
-export default extendsFn;
+export default extendFn;

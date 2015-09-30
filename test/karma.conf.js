@@ -43,7 +43,6 @@ module.exports = function(config) {
       'karma-firefox-launcher',
       'karma-ie-launcher',
       'karma-opera-launcher',
-      'karma-phantomjs-launcher',
       'karma-safari-launcher',
       'karma-browserstack-launcher',
       'karma-browserify',
@@ -59,12 +58,12 @@ module.exports = function(config) {
     runnerPort: 9100,
     colors: true,
     logLevel: config.LOG_INFO,
-    captureTimeout: 60000,
-    browserNoActivityTimeout: 60000,
+    captureTimeout: 300000,
+    browserNoActivityTimeout: 300000,
 
     browserStack: {
       name: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH,
-      pollingTimeout: 10000
+      pollingTimeout: 30000
     },
     customLaunchers: getCustomLaunchers(),
 
@@ -99,7 +98,9 @@ module.exports = function(config) {
         'ie11_bs',
         'ie10_bs',
         'ie9_bs',
-        'ie8_bs'
+        'ie8_bs',
+        'android_bs',
+        'ios_bs'
       ];
     } else {
       settings.browsers = ['Firefox'];
@@ -162,6 +163,18 @@ function getCustomLaunchers(){
       browser_version: '8',
       os: 'Windows',
       os_version: '7'
+    },
+
+    android_bs: {
+      base: 'BrowserStack',
+      os: 'android',
+      os_version: '4.4'
+    },
+
+    ios_bs: {
+      base: 'BrowserStack',
+      os: 'ios',
+      os_version: '8.3'
     }
   };
 }

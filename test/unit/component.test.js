@@ -404,6 +404,31 @@ test('should trigger a listener when ready', function(){
   ok(!syncListenerFired, 'sync listener should be removed');
 });
 
+test('should not retrigger a listener when the listener calls triggerReady', function(){
+  var timesCalled = 0;
+  var selfTriggered = false;
+
+  var readyListener = function(){
+    timesCalled++;
+
+    // Don't bother calling again if we have
+    // already failed
+    if (!selfTriggered) {
+      selfTriggered = true;
+      comp.triggerReady();
+    }
+  };
+
+  var comp = new Component(getFakePlayer(), {});
+
+  comp.ready(readyListener);
+  comp.triggerReady();
+
+  this.clock.tick(100);
+
+  equal(timesCalled, 1, 'triggerReady from inside a ready handler does not result in an infinite loop');
+});
+
 test('should add and remove a CSS class', function(){
   var comp = new Component(getFakePlayer(), {});
 

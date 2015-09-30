@@ -2,6 +2,7 @@
  * @file url.js
  */
 import document from 'global/document';
+import window from 'global/window';
 
 /**
  * Resolve and parse the elements of a URL
@@ -94,4 +95,25 @@ export const getFileExtension = function(path) {
   }
 
   return '';
+};
+
+/**
+ * Returns whether the url passed is a cross domain request or not.
+ *
+ * @param {String} url The url to check
+ * @return {Boolean}   Whether it is a cross domain request or not
+ * @method isCrossOrigin
+ */
+export const isCrossOrigin = function(url) {
+  let urlInfo = parseUrl(url);
+  let winLoc = window.location;
+
+  // IE8 protocol relative urls will return ':' for protocol
+  let srcProtocol = urlInfo.protocol === ':' ? winLoc.protocol : urlInfo.protocol;
+
+  // Check if url is for another domain/origin
+  // IE8 doesn't know location.origin, so we won't rely on it here
+  let crossOrigin = (srcProtocol + urlInfo.host) !== (winLoc.protocol + winLoc.host);
+
+  return crossOrigin;
 };

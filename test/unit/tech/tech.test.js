@@ -2,7 +2,7 @@ var noop = function() {}, clock, oldTextTracks;
 
 import Tech from '../../../src/js/tech/tech.js';
 import { createTimeRange } from '../../../src/js/utils/time-ranges.js';
-import extendsFn from '../../../src/js/extends.js';
+import extendFn from '../../../src/js/extend.js';
 import MediaError from '../../../src/js/media-error.js';
 
 q.module('Media Tech', {
@@ -105,7 +105,7 @@ test('should add the source handler interface to a tech', function(){
   var sourceB = { src: 'no-support', type: 'no-support' };
 
   // Define a new tech class
-  var MyTech = extendsFn(Tech);
+  var MyTech = extendFn(Tech);
 
   // Extend Tech with source handlers
   Tech.withSourceHandlers(MyTech);
@@ -181,7 +181,7 @@ test('should add the source handler interface to a tech', function(){
 
 test('should handle unsupported sources with the source handler API', function(){
   // Define a new tech class
-  var MyTech = extendsFn(Tech);
+  var MyTech = extendFn(Tech);
   // Extend Tech with source handlers
   Tech.withSourceHandlers(MyTech);
   // Create an instance of Tech
@@ -223,7 +223,7 @@ test('should track whether a video has played', function() {
 });
 
 test('delegates seekable to the source handler', function(){
-  let MyTech = extendsFn(Tech, {
+  let MyTech = extendFn(Tech, {
     seekable: function() {
       throw new Error('You should not be calling me!');
     }

@@ -2,11 +2,11 @@
   @extend .vjs-icon-chapters;
 }
 
-.video-js .vjs-chapters-button.vjs-menu-button .vjs-menu {
-  left: 2em;
+.vjs-chapters-button .vjs-menu {
+  left: -10em; /* (Width of vjs-menu - width of vjs-control) / 2 */
+  width: 0;
 }
 
-.video-js .vjs-chapters-button.vjs-menu-button .vjs-menu .vjs-menu-content {
+.vjs-chapters-button .vjs-menu ul {
   width: 24em;
-  left: -12em;
 }

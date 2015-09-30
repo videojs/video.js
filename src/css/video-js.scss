@@ -1,12 +1,16 @@
 @import "variables";
+@import "private-variables";
 @import "utilities";
 
-$icon-font-path: 'font';
 @import "../../node_modules/videojs-font/scss/icons";
 
 @import "components/layout";
 @import "components/big-play";
 @import "components/button";
+
+@import "components/menu/menu";
+@import "components/menu/menu-popup";
+@import "components/menu/menu-inline";
 
 @import "components/control-bar";
 @import "components/control";
@@ -14,11 +18,8 @@ $icon-font-path: 'font';
 
 @import "components/progress";
 @import "components/slider";
-@import "components/volume";
 
-@import "components/menu/menu";
-@import "components/menu/menu-popup";
-@import "components/menu/menu-inline";
+@import "components/volume";
 
 @import "components/poster";
 @import "components/live";

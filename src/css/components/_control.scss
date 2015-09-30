@@ -1,3 +1,6 @@
+// vjs-control might be better named vjs-button now.
+// It's used on both real buttons (play button)
+// and div buttons (menu buttons)
 .video-js .vjs-control {
   outline: none;
   position: relative;
@@ -20,7 +23,7 @@
 .video-js .vjs-control:focus:before,
 .video-js .vjs-control:hover:before,
 .video-js .vjs-control:focus {
-  text-shadow: 0em 0em 1em rgba($primary-text, 1);
+  text-shadow: 0em 0em 1em rgba($primary-foreground-color, 1);
 }
 
 /* Hide control text visually, but have it available for screenreaders */

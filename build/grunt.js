@@ -74,13 +74,13 @@ module.exports = function(grunt) {
     },
     dist: {},
     watch: {
-      jshint: {
-        files: ['src/**/*', 'test/unit/**/*.js', 'Gruntfile.js'],
-        tasks: 'jshint'
-      },
       skin: {
         files: ['src/css/**/*'],
         tasks: 'sass'
+      },
+      jshint: {
+        files: ['src/**/*', 'test/unit/**/*.js', 'Gruntfile.js'],
+        tasks: 'jshint'
       }
     },
     connect: {
@@ -106,7 +106,6 @@ module.exports = function(grunt) {
       fonts: { cwd: 'node_modules/videojs-font/fonts/', src: ['*'], dest: 'build/temp/font/', expand: true, filter: 'isFile' },
       swf:   { cwd: 'node_modules/videojs-swf/dist/', src: 'video-js.swf', dest: 'build/temp/', expand: true, filter: 'isFile' },
       ie8:   { cwd: 'node_modules/videojs-ie8/dist/', src: ['**/**'], dest: 'build/temp/ie8/', expand: true, filter: 'isFile' },
-      novtt: { cwd: 'build/temp/', src: 'video.novtt.js', dest: 'build/temp/alt/', expand: true, filter: 'isFile' },
       dist:  { cwd: 'build/temp/', src: ['**/**', '!test*'], dest: 'dist/', expand: true, filter: 'isFile' },
       examples: { cwd: 'docs/examples/', src: ['**/**'], dest: 'dist/examples/', expand: true, filter: 'isFile' }
     },
@@ -146,7 +145,6 @@ module.exports = function(grunt) {
       firefox:      { browsers: ['Firefox'] },
       safari:       { browsers: ['Safari'] },
       ie:           { browsers: ['IE'] },
-      phantomjs:    { browsers: ['PhantomJS'] },
 
       // this only runs on PRs from the mainrepo on BrowserStack
       browserstack: { browsers: ['chrome_bs'] },
@@ -156,7 +154,9 @@ module.exports = function(grunt) {
       ie11_bs:      { browsers: ['ie11_bs'] },
       ie10_bs:      { browsers: ['ie10_bs'] },
       ie9_bs:       { browsers: ['ie9_bs'] },
-      ie8_bs:       { browsers: ['ie8_bs'] }
+      ie8_bs:       { browsers: ['ie8_bs'] },
+      android_bs:   { browsers: ['android_bs'] },
+      ios_bs:       { browsers: ['ios_bs'] }
     },
     vjsdocs: {
       all: {
@@ -286,6 +286,9 @@ module.exports = function(grunt) {
             debug: true,
             standalone: false
           },
+          plugin: [
+            ['proxyquireify/plugin']
+          ],
           banner: false,
           watch: true,
           keepAlive: true
@@ -322,7 +325,7 @@ module.exports = function(grunt) {
           separator: '\n'
         },
         src: ['build/temp/video.js'],
-        dest: 'build/temp/video.novtt.js'
+        dest: 'build/temp/alt/video.novtt.js'
       },
       vtt: {
         options: {
@@ -382,7 +385,6 @@ module.exports = function(grunt) {
     'exorcise:build',
     'concat:novtt',
     'concat:vtt',
-    'copy:novtt',
     'usebanner:novtt',
     'usebanner:vtt',
     'uglify',

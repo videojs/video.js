@@ -43,18 +43,22 @@ class Slider extends Component {
    * @return {Element}
    * @method createEl
    */
-  createEl(type, props={}) {
+  createEl(type, props={}, attributes={}) {
     // Add the slider element class to all sub classes
     props.className = props.className + ' vjs-slider';
     props = assign({
+      tabIndex: 0
+    }, props);
+
+    attributes = assign({
       'role': 'slider',
       'aria-valuenow': 0,
       'aria-valuemin': 0,
       'aria-valuemax': 100,
       tabIndex: 0
-    }, props);
+    }, attributes);
 
-    return super.createEl(type, props);
+    return super.createEl(type, props, attributes);
   }
 
   /**
@@ -66,7 +70,9 @@ class Slider extends Component {
   handleMouseDown(event) {
     event.preventDefault();
     Dom.blockTextSelection();
+
     this.addClass('vjs-sliding');
+    this.trigger('slideractive');
 
     this.on(document, 'mousemove', this.handleMouseMove);
     this.on(document, 'mouseup', this.handleMouseUp);
@@ -90,7 +96,9 @@ class Slider extends Component {
    */
   handleMouseUp() {
     Dom.unblockTextSelection();
+
     this.removeClass('vjs-sliding');
+    this.trigger('sliderinactive');
 
     this.off(document, 'mousemove', this.handleMouseMove);
     this.off(document, 'mouseup', this.handleMouseUp);
@@ -145,37 +153,11 @@ class Slider extends Component {
    * @method calculateDistance
    */
   calculateDistance(event){
-    let el = this.el_;
-    let box = Dom.findElPosition(el);
-    let boxW = el.offsetWidth;
-    let boxH = el.offsetHeight;
-
+    let position = Dom.getPointerPosition(this.el_, event);
     if (this.vertical()) {
-      let boxY = box.top;
-
-      let pageY;
-      if (event.changedTouches) {
-        pageY = event.changedTouches[0].pageY;
-      } else {
-        pageY = event.pageY;
-      }
-
-      // Percent that the click is through the adjusted area
-      return Math.max(0, Math.min(1, ((boxY - pageY) + boxH) / boxH));
-
-    } else {
-      let boxX = box.left;
-
-      let pageX;
-      if (event.changedTouches) {
-        pageX = event.changedTouches[0].pageX;
-      } else {
-        pageX = event.pageX;
-      }
-
-      // Percent that the click is through the adjusted area
-      return Math.max(0, Math.min(1, (pageX - boxX) / boxW));
+      return position.y;
     }
+    return position.x;
   }
 
   /**

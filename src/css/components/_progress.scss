@@ -17,6 +17,10 @@
   @include display-flex(center);
 }
 
+.vjs-live .vjs-progress-control {
+  display: none;
+}
+
 /* Box containing play and load progresses. Also acts as seek scrubber. */
 .video-js .vjs-progress-holder {
   @include flex(auto);
@@ -25,9 +29,12 @@
 }
 
 /* We need an increased hit area on hover */
-.video-js .vjs-progress-control:hover .vjs-progress-holder { font-size: 1.666666666666666666em }
+.video-js .vjs-progress-control:hover .vjs-progress-holder {
+  font-size: 1.666666666666666666em
+}
 
 /* Also show the current time tooltip */
+.video-js .vjs-progress-control:hover .vjs-mouse-display:after,
 .video-js .vjs-progress-control:hover .vjs-play-progress:after {
   display: block;
 
@@ -53,8 +60,15 @@
   top: 0;
 }
 
+.video-js .vjs-mouse-display {
+  @extend .vjs-icon-circle;
+
+  &:before {
+    display: none;
+  }
+}
 .video-js .vjs-play-progress {
-  background-color: $primary-text;
+  background-color: $primary-foreground-color;
   @extend .vjs-icon-circle;
 
   // Progress handle
@@ -63,12 +77,11 @@
     top: -0.333333333333333em;
     right: -0.5em;
     font-size: 0.9em;
-    height: 1em;
-    line-height: 1em;
   }
 }
 
 // Current Time "tooltip"
+.video-js .vjs-mouse-display:after,
 .video-js .vjs-play-progress:after {
   /* By default this is hidden and only shown when hovering over the progress control */
   display: none;
@@ -76,24 +89,63 @@
   top: -2.4em;
   right: -1.5em;
   font-size: 0.9em;
-  color: $primary-bg;
+  color: #000;
   content: attr(data-current-time);
   padding: 0.2em 0.5em;
-  @include background-color-with-alpha($primary-text, 0.8);
+  @include background-color-with-alpha(#fff, 0.8);
   @include border-radius(0.3em);
+}
+.video-js .vjs-play-progress:before,
+.video-js .vjs-play-progress:after {
+  z-index: 1;
 }
 
 .video-js .vjs-load-progress {
-  background: rgb(100, 100, 100) /* IE8- Fallback */;
-  background: rgba(255, 255, 255, 0.2);
+  /* For IE8 we'll lighten the color */
+  background: ligthen($secondary-background-color, 25%);
+  /* Otherwise we'll rely on stacked opacities */
+  background: rgba($secondary-background-color, $secondary-background-transparency);
 }
 
 /* there are child elements of the load progress bar that represent the
 specific time ranges that have been buffered */
 .video-js .vjs-load-progress div {
-  background: rgba($secondary-bg, 0.1);
+  /* For IE8 we'll lighten the color */
+  background: ligthen($secondary-background-color, 50%);
+  /* Otherwise we'll rely on stacked opacities */
+  background: rgba($secondary-background-color, 0.75);
 }
 
 .video-js.vjs-no-flex .vjs-progress-control {
   width: auto;
+}
+
+.video-js .vjs-progress-control .vjs-mouse-display {
+  display: none;
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  background-color: #000;
+  z-index: 1;
+}
+.vjs-no-flex .vjs-progress-control .vjs-mouse-display {
+  z-index: 0;
+}
+.video-js .vjs-progress-control:hover .vjs-mouse-display {
+  display: block;
+}
+.video-js.vjs-user-inactive .vjs-progress-control .vjs-mouse-display,
+.video-js.vjs-user-inactive .vjs-progress-control .vjs-mouse-display:after {
+  visibility: hidden;
+  opacity: 0;
+  $trans: visibility 1.0s, opacity 1.0s;
+  @include transition($trans);
+}
+.video-js.vjs-user-inactive.vjs-no-flex .vjs-progress-control .vjs-mouse-display,
+.video-js.vjs-user-inactive.vjs-no-flex .vjs-progress-control .vjs-mouse-display:after {
+  display: none;
+}
+.video-js .vjs-progress-control .vjs-mouse-display:after {
+  color: #fff;
+  @include background-color-with-alpha(#000, 0.8);
 }
