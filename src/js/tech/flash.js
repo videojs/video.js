@@ -447,7 +447,6 @@ Flash.checkReady = function(tech){
 Flash.onEvent = function(swfID, eventName){
   let tech = Dom.getEl(swfID).tech;
   tech.trigger(eventName);
-
 };
 
 // Log errors from the swf
