@@ -1197,8 +1197,28 @@ class Player extends Component {
    * @method play
    */
   play() {
-    this.techCall_('play');
-    return this;
+    var self = this;
+
+    if (!this.src() && !!this.options_.asyncSrc && typeof this.options_.asyncSrc === 'function'){
+
+        if (!!this.options_.asyncLock && this.options_.asyncLock === true) {
+            return false;
+        }
+
+        this.options_.asyncLock = true;
+
+        this.options_.asyncSrc.call(this, function(url){
+            self.src(url);
+            self.load();
+            self.techCall_('play');
+            self.options_.asyncLock = false;
+            return self;
+        });
+
+    } else {
+        this.techCall_('play');
+        return this;
+    }
   }
 
   /**
@@ -2553,6 +2573,7 @@ Player.prototype.options_ = {
 
   html5: {},
   flash: {},
+  asyncSrc: null,
 
   // defaultVolume: 0.85,
   defaultVolume: 0.00, // The freakin seaguls are driving me crazy!
