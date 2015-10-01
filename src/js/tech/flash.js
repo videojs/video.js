@@ -58,6 +58,25 @@ class Flash extends Tech {
     this.on('seeked', function() {
       this.lastSeekTarget_ = undefined;
     });
+
+    this.on('cuepoint', function(event, data){
+      let textTracks = this.textTracks(),
+        timedMetadataTT, i, track, cue;
+      for(i = 0; i < textTracks.length; i++){
+        track = textTracks[i];
+        if(track.label === 'Timed Metadata'){
+          timedMetadataTT = track;
+        }
+      }
+      if(!timedMetadataTT) {
+        timedMetadataTT = this.addTextTrack('metadata', 'Timed Metadata');
+        //@cgcladera TODO: I don't know how to construct the band metadata dispatch type for a RTMP live stream
+        //https://html.spec.whatwg.org/multipage/embedded-content.html#guidelines-for-exposing-cues-in-various-formats-as-text-track-cues
+        timedMetadataTT.inBandMetadataTrackDispatchType = '';
+      }
+      cue = new window.VTTCue(this.player().currentTime(), this.player().currentTime(), JSON.stringify(data));
+      timedMetadataTT.addCue(cue);
+    });
   }
 
   /**
@@ -444,9 +463,9 @@ Flash.checkReady = function(tech){
 };
 
 // Trigger events from the swf on the player
-Flash.onEvent = function(swfID, eventName){
+Flash.onEvent = function(swfID, eventName, data){
   let tech = Dom.getEl(swfID).tech;
-  tech.trigger(eventName);
+  tech.trigger(eventName, data);
 };
 
 // Log errors from the swf
