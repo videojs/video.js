@@ -92,7 +92,7 @@ The loop attribute causes the video to start over as soon as it ends. This could
 ```html
 <video loop ...>
 or
-{ "loop": "true" }
+{ "loop": true }
 ```
 
 
@@ -121,21 +121,6 @@ is a child of `controlBar`, you can just set that component to false:
 
 ```javascript
 var player = videojs('video-id', {
-  children: {
-    controlBar: {
-      children: {
-        muteToggle: false
-      }
-    }
-  }
-});
-```
-
-All the children can start getting a little verbose, so to simplify things, you can also set options for child components directly on the parent options.
-This is functionally the exact same as the above, for instance.
-
-```javascript
-var player = videojs('video-id', {
   controlBar: {
     muteToggle: false
   }
@@ -146,7 +131,7 @@ This also works using the `data-setup` attribute on the video element, just reme
 notation.
 
 ```html
-<video ... data-setup='{ "children": { "controlBar": { "children": { "muteToggle": false } } } }'></video>
+<video ... data-setup='{ "controlBar": { "muteToggle": false } }'></video>
 ```
 
 The [components guide](components.md) has an excellent breakdown of the structure of a player, you

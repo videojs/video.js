@@ -4,19 +4,27 @@
   <meta charset="utf-8" />
   <title>Video.js Sandbox</title>
 
-  <link href="../build/files/video-js.css" rel="stylesheet" type="text/css">
+  <!-- Add ES5 shim and sham for IE8 -->
+  <script src="../build/temp/ie8/videojs-ie8.js"></script>
 
-  <!-- LOAD VIDEO.JS SOURCE FILES IN ORDER -->
-  <script src="../build/source-loader.js"></script>
+  <!-- Load the source files -->
+  <link href="../build/temp/video-js.css" rel="stylesheet" type="text/css">
+  <script src="../build/temp/video.js"></script>
 
   <!-- Set the location of the flash SWF -->
   <script>
-    vjs.options.flash.swf = '../node_modules/videojs-swf/dist/video-js.swf'
+    videojs.options.flash.swf = '../build/temp/video-js.swf';
   </script>
 
 </head>
 <body>
-  <p style="background-color:#eee; border: 1px solid #777; padding: 10px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">You can use /sandbox/ for writing and testing your own code. Nothing in /sandbox/ will get checked into the repo, except files that end in .example, so please don't edit or add those files. To get started make a copy of index.html.example and rename it to index.html.</p>
+  <div style="background-color:#eee; border: 1px solid #777; padding: 10px; margin-bottom: 20px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">
+    <p>You can use /sandbox/ for writing and testing your own code. Nothing in /sandbox/ will get checked into the repo, except files that end in .example (so don't edit or add those files). To get started make a copy of index.html.example and rename it to index.html.</p>
+    <pre>cp sandbox/index.html.example sandbox/index.html</pre>
+    <pre>grunt watch</pre>
+    <pre>grunt connect</pre>
+    <pre>open http://localhost:9999/sandbox/index.html</pre>
+  </div>
 
   <video id="vid1" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264"
       poster="http://video-js.zencoder.com/oceans-clip.png"
@@ -24,7 +32,7 @@
     <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4'>
     <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm'>
     <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg'>
-    <track kind="captions" src="../build/demo-files/demo.captions.vtt" srclang="en" label="English"></track><!-- Tracks need an ending tag thanks to IE9 -->
+    <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English"></track><!-- Tracks need an ending tag thanks to IE9 -->
     <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
   </video>
 

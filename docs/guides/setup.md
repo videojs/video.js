@@ -6,24 +6,23 @@ Video.js is pretty easy to set up. It can take a matter of seconds to get the pl
 Step 1: Include the Video.js Javascript and CSS files in the head of your page.
 ------------------------------------------------------------------------------
 
-You can download the Video.js source and host it on your own servers, or use the free CDN hosted version. It's often recommended now to put JavaScript before the end body tag (&lt;/body>) instead of the head (&lt;head>), but Video.js includes an 'HTML5 Shiv', which needs to be in the head for older IE versions to respect the video tag as a valid element.
+You can download the Video.js source and host it on your own servers, or use the free CDN hosted version. As of Video.js 5.0, the source is [transpiled from ES2015](http://babeljs.io/) (formerly known as ES6) to [ES5](https://es5.github.io/), but IE8 only supports ES3. In order to continue to support IE8, we've bundled an [ES5 shim and sham](https://github.com/es-shims/es5-shim) together and hosted it on the CDN.
 
-> NOTE: If you're already using an HTML5 shiv like [Modernizr](http://modernizr.com/) you can include the Video.js JavaScript anywhere, however make sure your version of Modernizr includes the shiv for video.
-
-> If you're not using something like Modernizr but still want to include Video.JS before the closing body tag, you can add your own shiv. Include this in the head of your document:
-
-> ```html
-<script type="text/javascript">
-  document.createElement('video');document.createElement('audio');document.createElement('track');
-</script>
+```html
+<script src="//vjs.zencdn.net/ie8/1.1.0/videojs-ie8.min.js"></script>
 ```
 
 ### CDN Version ###
 ```html
-<link href="//vjs.zencdn.net/4.12/video-js.css" rel="stylesheet">
-<script src="//vjs.zencdn.net/4.12/video.js"></script>
+<link href="//vjs.zencdn.net/4.12/video-js.min.css" rel="stylesheet">
+<script src="//vjs.zencdn.net/4.12/video.min.js"></script>
 ```
 
+We include a stripped down Google Analytics pixel that tracks a random percentage (currently 1%) of players loaded from the CDN. This allows us to see (roughly) what browsers are in use in the wild, along with other useful metrics such as OS and device. If you'd like to disable analytics, you can simply include the following global **before** including Video.js:
+
+```js
+window.HELP_IMPROVE_VIDEOJS = false;
+```
 
 ## Install via package manager
 
@@ -43,8 +42,8 @@ To entirely self-host, you'll need to pull in the font files and let Video.js kn
 should Just Work™, but the paths can easily be changed by editing the LESS file and re-building, or by modifying the generated CSS file.
 
 ```html
-<link href="//example.com/path/to/video-js.css" rel="stylesheet">
-<script src="//example.com/path/to/video.js"></script>
+<link href="//example.com/path/to/video-js.min.css" rel="stylesheet">
+<script src="//example.com/path/to/video.min.js"></script>
 <script>
   videojs.options.flash.swf = "http://example.com/path/to/video-js.swf"
 </script>

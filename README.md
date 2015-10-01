@@ -1,3 +1,7 @@
+## Please Note!
+The master branch is now the development branch for 5.0 and should be considered unstable until the first 5.0 release. If you're looking for the most recent stable release, please refer to the [stable branch](https://github.com/videojs/video.js/tree/stable).
+
+
 ![Video.js logo](https://i.cloudup.com/C3nAUZ-l4c.png)
 
 # [Video.js - HTML5 Video Player](http://videojs.com)  [![Build Status](https://travis-ci.org/videojs/video.js.svg?branch=master)](https://travis-ci.org/videojs/video.js)
@@ -9,8 +13,8 @@ Thanks to the awesome folks over at [Fastly](http://www.fastly.com/), there's a 
 `<head>`:
 
 ```html
-<link href="http://vjs.zencdn.net/4.11/video-js.css" rel="stylesheet">
-<script src="http://vjs.zencdn.net/4.11/video.js"></script>
+<link href="http://vjs.zencdn.net/4.12/video-js.css" rel="stylesheet">
+<script src="http://vjs.zencdn.net/4.12/video.js"></script>
 ```
 
 Then, whenever you want to use Video.js you can simply use the `<video>` element as your normally would, but with an additional `data-setup` attribute containing any Video.js options. These options
@@ -50,11 +54,11 @@ If you're ready to dive in, the [documentation](docs/index.md) is the first plac
 ## Contributing
 Video.js is a free and open source library, and we appreciate any help you're willing to give. Check out the [contributing guide](CONTRIBUTING.md).
 
+_Video.js uses [BrowserStack](https://browserstack.com) for compatibility testing_
 ## Building your own Video.js from source
 To build your own custom version read the section on [contributing code](CONTRIBUTING.md#contributing-code) and ["Building your own copy"](CONTRIBUTING.md#building-your-own-copy-of-videojs) in the contributing guide.
-
 ## License
 
 Video.js is licensed under the Apache License, Version 2.0. [View the license file](LICENSE)
 
-Copyright 2014 Brightcove, Inc.
+Copyright 2014-2015 Brightcove, Inc.

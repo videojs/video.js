@@ -1,0 +1,47 @@
+.vjs-poster {
+  display: inline-block;
+  vertical-align: middle;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  background-size: contain;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 100%;
+}
+
+/* Used for IE8 fallback */
+.vjs-poster img {
+  display: block;
+  vertical-align: middle;
+  margin: 0 auto;
+  max-height: 100%;
+  padding: 0;
+  width: 100%;
+}
+
+/* Hide the poster after the video has started playing */
+.vjs-has-started .vjs-poster {
+  display: none;
+}
+
+/* Don't hide the poster if we're playing audio */
+.vjs-audio.vjs-has-started .vjs-poster {
+  display: block;
+}
+
+/* Hide the poster when controls are disabled because it's clickable
+and the native poster can take over */
+.vjs-controls-disabled .vjs-poster {
+  display: none;
+}
+
+/* Hide the poster when native controls are used otherwise it covers them */
+.vjs-using-native-controls .vjs-poster {
+  display: none;
+}

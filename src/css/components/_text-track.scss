@@ -1,0 +1,26 @@
+.vjs-text-track-display {
+  position: absolute;
+  bottom: 3em;
+  left: 0;
+  right: 0;
+  top: 0;
+  pointer-events: none;
+}
+
+/* Move captions down when controls aren't being shown */
+.video-js.vjs-user-inactive.vjs-playing .vjs-text-track-display {
+  bottom: 1em;
+}
+
+/* Individual tracks */
+.video-js .vjs-text-track {
+  font-size: 1.4em;
+  text-align: center;
+  margin-bottom: 0.1em;
+  /* Transparent black background, or fallback to all black (oldIE) */
+  @include background-color-with-alpha(#000, 0.5);
+}
+
+.vjs-subtitles { color: #fff /* Subtitles are white */; }
+.vjs-captions { color: #fc6 /* Captions are yellow */; }
+.vjs-tt-cue { display: block; }

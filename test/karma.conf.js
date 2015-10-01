@@ -1,85 +1,41 @@
-var fs = require('fs'),
-    vm = require('vm'),
-    sourceLoader = fs.readFileSync('./build/source-loader.js', 'utf8');
-    sandbox = {
-      blockSourceLoading: true,
-      document: {},
-      window: {}
-    };
-    sourceFiles = [];
-
-
-vm.runInNewContext(sourceLoader, sandbox, 'build/source-loader.js');
-sourceFiles = sandbox.sourceFiles.map(function(src) {
-  return '../' + src;
-});
-
 module.exports = function(config) {
-  var customLaunchers = {
-    chrome_sl: {
-      singleRun: true,
-      base: 'SauceLabs',
-      browserName: 'chrome',
-      platform: 'Windows 8.1',
-      version: '34'
-    },
-
-    firefox_sl: {
-      singleRun: true,
-      base: 'SauceLabs',
-      browserName: 'firefox',
-      platform: 'Linux',
-      version: '29'
-    },
-
-    safari_sl: {
-      singleRun: true,
-      base: 'SauceLabs',
-      browserName: 'safari',
-      platform: 'OS X 10.8'
-    },
-
-    ipad_sl: {
-      singleRun: true,
-      base: 'SauceLabs',
-      browserName: 'ipad',
-      platform:'OS X 10.9',
-      version: '7.1'
-    },
-
-    android_sl: {
-      singleRun: true,
-      base: 'SauceLabs',
-      browserName: 'android',
-      platform:'Linux'
-    },
-
-    ie_sl: {
-      singleRun: true,
-      base: 'SauceLabs',
-      browserName: 'internet explorer',
-      platform: 'Windows 8.1',
-      version: '11'
-    }
-  };
-
-  config.set({
+  // Creating settings object first so we can modify based on travis
+  var settings = {
     basePath: '',
 
-    frameworks: ['qunit', 'sinon'],
-
+    frameworks: ['browserify', 'qunit'],
     autoWatch: false,
-
     singleRun: true,
+    browsers: ['Chrome'],
 
-    customLaunchers: customLaunchers,
-
+    // Compling tests here
     files: [
-      '../build/files/video-js.css',
-      '../test/karma-qunit-shim.js'
-    ].concat(sourceFiles).concat([
-      '../test/unit/**/*.js'
-    ]),
+      '../build/temp/video-js.css',
+      '../build/temp/ie8/videojs-ie8.min.js',
+      '../test/globals-shim.js',
+      '../test/unit/**/*.js',
+      { pattern: '../src/**/*.js', watched: true, included: false, served: false }
+    ],
+
+    // Using precompiled tests
+    // files: [
+    //   '../build/temp/video-js.css',
+    //   '../build/temp/tests.js'
+    // ],
+
+    preprocessors: {
+      '../test/**/*.js': [ 'browserify' ]
+    },
+
+    browserify: {
+      debug: true,
+      transform: [
+        require('babelify').configure({
+          sourceMapRelative: './',
+          loose: ['all']
+        })
+      ]
+    },
 
     plugins: [
       'karma-qunit',
@@ -87,10 +43,10 @@ module.exports = function(config) {
       'karma-firefox-launcher',
       'karma-ie-launcher',
       'karma-opera-launcher',
-      'karma-phantomjs-launcher',
       'karma-safari-launcher',
-      'karma-sauce-launcher',
-      'karma-sinon'
+      'karma-browserstack-launcher',
+      'karma-browserify',
+      'karma-coverage'
     ],
 
     reporters: ['dots'],
@@ -100,19 +56,125 @@ module.exports = function(config) {
 
     // cli runner port
     runnerPort: 9100,
-
     colors: true,
-
     logLevel: config.LOG_INFO,
+    captureTimeout: 300000,
+    browserNoActivityTimeout: 300000,
 
-    captureTimeout: 60000,
+    browserStack: {
+      name: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH,
+      pollingTimeout: 30000
+    },
+    customLaunchers: getCustomLaunchers(),
 
-    sauceLabs: {
-      startConnect: true,
-      tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
-      build: process.env.TRAVIS_BUILD_NUMBER,
-      testName: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH,
-      recordScreenshots: false
+    // The HTML reporter seems to be busted right now, so we're just using text in the meantime
+    // along with the summary after the test run.
+    coverageReporter: {
+      reporters: [
+        {
+          type: 'text',
+          dir: 'coverage/',
+          file: 'coverage.txt'
+        },
+        {
+          type: 'lcovonly',
+          dir: 'coverage/',
+          subdir: '.'
+        },
+        { type: 'text-summary' }
+      ]
     }
-  });
+  };
+
+  if (process.env.TRAVIS) {
+    settings.browserify.transform.push('browserify-istanbul');
+    settings.reporters.push('coverage');
+
+    if (process.env.BROWSER_STACK_USERNAME) {
+      settings.browsers = [
+        'chrome_bs',
+        'firefox_bs',
+        'safari_bs',
+        'ie11_bs',
+        'ie10_bs',
+        'ie9_bs',
+        'ie8_bs',
+        'android_bs',
+        'ios_bs'
+      ];
+    } else {
+      settings.browsers = ['Firefox'];
+    }
+  }
+
+  config.set(settings);
 };
+
+function getCustomLaunchers(){
+  return {
+    chrome_bs: {
+      base: 'BrowserStack',
+      browser: 'chrome',
+      os: 'Windows',
+      os_version: '8.1'
+    },
+
+    firefox_bs: {
+      base: 'BrowserStack',
+      browser: 'firefox',
+      os: 'Windows',
+      os_version: '8.1'
+    },
+
+    safari_bs: {
+      base: 'BrowserStack',
+      browser: 'safari',
+      os: 'OS X',
+      os_version: 'Yosemite'
+    },
+
+    ie11_bs: {
+      base: 'BrowserStack',
+      browser: 'ie',
+      browser_version: '11',
+      os: 'Windows',
+      os_version: '8.1'
+    },
+
+    ie10_bs: {
+      base: 'BrowserStack',
+      browser: 'ie',
+      browser_version: '10',
+      os: 'Windows',
+      os_version: '7'
+    },
+
+    ie9_bs: {
+      base: 'BrowserStack',
+      browser: 'ie',
+      browser_version: '9',
+      os: 'Windows',
+      os_version: '7'
+    },
+
+    ie8_bs: {
+      base: 'BrowserStack',
+      browser: 'ie',
+      browser_version: '8',
+      os: 'Windows',
+      os_version: '7'
+    },
+
+    android_bs: {
+      base: 'BrowserStack',
+      os: 'android',
+      os_version: '4.4'
+    },
+
+    ios_bs: {
+      base: 'BrowserStack',
+      os: 'ios',
+      os_version: '8.3'
+    }
+  };
+}

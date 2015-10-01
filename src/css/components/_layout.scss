@@ -1,0 +1,153 @@
+.video-js {
+  /* display:inline-block would be closer to the video el's display:inline
+   * but it results in flash reloading when going into fullscreen [#2205]
+   */
+  display: block;
+  /* Make video.js videos align top when next to video elements */
+  vertical-align: top;
+  box-sizing: border-box;
+
+  color: $primary-foreground-color;
+  background-color: #000;
+  position: relative;
+  padding: 0;
+  /* Start with 10px for base font size so other dimensions can be em based and
+  easily calculable. */
+  font-size: 10px;
+  line-height: 1;
+
+  /* Provide some basic defaults for fonts */
+  font-weight: normal;
+  font-style: normal;
+  /* Avoiding helvetica: issue #376 */
+  font-family: $text-font-family;
+
+  @include user-select(none);
+
+  /* Fix for Firefox 9 fullscreen (only if it is enabled). Not needed when
+  checking fullScreenEnabled. */
+  &:-moz-full-screen { position: absolute; }
+
+  &:-webkit-full-screen {
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
+
+/* All elements inherit border-box sizing */
+.video-js *,
+.video-js *:before,
+.video-js *:after {
+  box-sizing: inherit;
+}
+
+/* List style reset */
+.video-js ul {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  list-style-position: outside;
+
+  /* Important to specify each */
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Fill the width of the containing element and use padding to create the
+   desired aspect ratio. Default to 16x9 unless another ratio is given. */
+@mixin apply-aspect-ratio($width, $height) {
+  padding-top: 100% * ($height/$width);
+}
+
+/* Not including a default AR in vjs-fluid because it would override
+   the user set AR injected into the header. */
+.video-js.vjs-fluid,
+.video-js.vjs-16-9,
+.video-js.vjs-4-3 {
+  width: 100%;
+  max-width: 100%;
+  height: 0;
+}
+
+.video-js.vjs-16-9 {
+  @include apply-aspect-ratio(16, 9);
+}
+
+.video-js.vjs-4-3 {
+  @include apply-aspect-ratio(4, 3);
+}
+
+.video-js.vjs-fill {
+  width: 100%;
+  height: 100%;
+}
+
+/* Playback technology elements expand to the width/height of the containing div
+<video> or <object> */
+.video-js .vjs-tech {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Fullscreen Styles */
+body.vjs-full-window {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  /* Fix for IE6 full-window. http://www.cssplay.co.uk/layouts/fixed.html */
+  overflow-y: auto;
+}
+.vjs-full-window .video-js.vjs-fullscreen {
+  position: fixed;
+  overflow: hidden;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+}
+.video-js.vjs-fullscreen {
+  width: 100% !important;
+  height: 100% !important;
+  /* Undo any aspect ratio padding for fluid layouts */
+  padding-top: 0 !important;
+}
+.video-js.vjs-fullscreen.vjs-user-inactive {
+  cursor: none;
+}
+
+
+/* Hide disabled or unsupported controls. */
+.vjs-hidden { display: none !important; }
+
+.vjs-lock-showing {
+  display: block !important;
+  opacity: 1;
+  visibility: visible;
+}
+
+/*  In IE8 w/ no JavaScript (no HTML5 shim), the video tag doesn't register.
+The .video-js classname on the video tag also isn't considered.
+This optional paragraph inside the video tag can provide a message to users
+about what's required to play video. */
+.vjs-no-js {
+  padding: 20px;
+  color: #fff;
+  background-color: #000;
+  font-size: 18px;
+  font-family: $text-font-family;
+  text-align: center;
+  width: 300px;
+  height: 150px;
+  margin: 0px auto;
+}
+
+.vjs-no-js a,
+.vjs-no-js a:visited {
+  color: #66A8CC;
+}
