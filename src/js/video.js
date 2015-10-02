@@ -29,6 +29,9 @@ import xhr from 'xhr';
 import Html5 from './tech/html5.js';
 import Flash from './tech/flash.js';
 
+import CloseButton from './close-button';
+import ModalDialog from './modal-dialog';
+
 // HTML5 Element Shim for IE8
 if (typeof HTMLVideoElement === 'undefined') {
   document.createElement('video');
