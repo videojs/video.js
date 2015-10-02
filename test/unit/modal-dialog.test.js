@@ -169,6 +169,16 @@ q.test('open() pauses playback, close() resumes', function(assert) {
   assert.strictEqual(this.player.play.callCount, 1, 'player is resumed when the modal closes');
 });
 
+q.test('open() hides controls, close() shows controls', function(assert) {
+  this.modal.open();
+
+  assert.expect(2);
+  assert.notOk(this.player.controls_, 'controls are hidden');
+
+  this.modal.close();
+  assert.ok(this.player.controls_, 'controls are no longer hidden');
+});
+
 q.test('"disposeOnClose" option', function(assert) {
   var modal = new ModalDialog(this.player, {disposeOnClose: true});
 

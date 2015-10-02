@@ -137,14 +137,16 @@ class ModalDialog extends Component {
 
     this.trigger('beforemodalopen');
     this.opened_ = true;
+    let player = this.player();
 
     // If the player was playing, pause it and take note of its previously
     // playing state.
-    this.wasPlaying_ = !this.player().paused();
+    this.wasPlaying_ = !player.paused();
     if (this.wasPlaying_) {
-      this.player().pause();
+      player.pause();
     }
 
+    player.controls(false);
     Events.on(document, 'keydown', this.handleKeyPress);
     this.show();
     this.trigger('modalopen');
@@ -173,11 +175,13 @@ class ModalDialog extends Component {
 
     this.trigger('beforemodalclose');
     this.opened_ = false;
+    let player = this.player();
 
     if (this.wasPlaying_) {
-      this.player().play();
+      player.play();
     }
 
+    player.controls(true);
     Events.off(document, 'keydown', this.handleKeyPress);
     this.hide();
     this.trigger('modalclose');
