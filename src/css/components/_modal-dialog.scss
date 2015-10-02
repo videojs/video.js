@@ -1,0 +1,51 @@
+%fill-player {
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+.video-js .vjs-modal-dialog {
+  @extend %fill-player;
+
+  $gradient-start: rgba(0, 0, 0, 0.8);
+  $gradient-stop: rgba(255, 255, 255, 0);
+  background: $gradient-start;
+  background: -moz-linear-gradient(top, $gradient-start 0%, $gradient-stop 100%);
+  background: -webkit-gradient(left top, left bottom, color-stop(0%, $gradient-start), color-stop(100%, $gradient-stop));
+  background: -webkit-linear-gradient(top, $gradient-start 0%, $gradient-stop 100%);
+  background: -o-linear-gradient(top, $gradient-start 0%, $gradient-stop 100%);
+  background: -ms-linear-gradient(top, $gradient-start 0%, $gradient-stop 100%);
+  background: linear-gradient(top bottom, $gradient-start 0%, $gradient-stop 100%);
+
+  .vjs-modal-dialog-content {
+    @extend %fill-player;
+    z-index: 1;
+  }
+
+  // Ultimately, this would be moved to its own component partial, but
+  // for now it's unclear what styles would be generic and which specific
+  // to this context!
+  .vjs-close {
+    cursor: pointer;
+    font-size: 1.2em; // 12px
+    height: auto;
+    padding: 0.75em 1em; // 9px 12px
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: auto;
+    z-index: 2;
+
+    .vjs-control-text {
+
+      // Reset inherited control-text styles.
+      clip: auto;
+      height: auto;
+      margin: 0;
+      position: static;
+      width: auto;
+    }
+  }
+}
