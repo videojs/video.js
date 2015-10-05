@@ -337,6 +337,16 @@ q.test('"disposeOnClose" option', function(assert) {
   assert.strictEqual(modal.dispose.callCount, 1, 'dispose was called');
 });
 
+q.test('"fillAlways" option', function(assert) {
+  var modal = new ModalDialog(this.player, {fillAlways: true});
+
+  sinon.spy(modal, 'fill');
+  modal.open().close().open();
+
+  assert.expect(1);
+  assert.strictEqual(modal.fill.callCount, 2, 'the modal was filled on each open call');
+});
+
 q.test('"label" option', function(assert) {
   var label = 'foo';
   var modal = new ModalDialog(this.player, {label: label});

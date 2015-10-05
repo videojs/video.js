@@ -47,6 +47,11 @@ class ModalDialog extends Component {
    *         disposed as soon as it's closed, which is useful for one-off
    *         modals.
    *
+   * @param  {Boolean} [options.fillAlways=false]
+   *         Normally, modals are automatically filled only the first time
+   *         they open. This tells the modal to refresh its content
+   *         every time it opens.
+   *
    * @param  {String} [options.label='']
    *         A text label for the modal, primarily for accessibility.
    *
@@ -153,7 +158,7 @@ class ModalDialog extends Component {
 
       // Fill content if the modal has never opened before and
       // never been filled.
-      if (this.content() && !this.hasBeenOpened_ && !this.hasBeenFilled_) {
+      if (this.options_.fillAlways || !this.hasBeenOpened_ && !this.hasBeenFilled_) {
         this.fill();
       }
 
@@ -321,7 +326,8 @@ class ModalDialog extends Component {
   }
 
   /**
-   * Retrieves or sets the modal content; the raw content that fills the modal.
+   * Gets or sets the raw modal content. This will be normalized prior to
+   * injection into the live DOM.
    *
    * This does not update the DOM or fill the modal, but it is called during
    * that process.
