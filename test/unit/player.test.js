@@ -143,7 +143,7 @@ test('should get current source from source tag', function(){
   fixture.innerHTML += html;
 
   var tag = document.getElementById('example_1');
-  var player = PlayerTest.makePlayer({}, tag);
+  var player = TestHelpers.makePlayer({}, tag);
 
   ok(player.currentSource().src === 'http://google.com');
   ok(player.currentSource().type === 'video/mp4');
@@ -162,7 +162,7 @@ test('should get current sources from source tag', function(){
   fixture.innerHTML += html;
 
   var tag = document.getElementById('example_1');
-  var player = PlayerTest.makePlayer({}, tag);
+  var player = TestHelpers.makePlayer({}, tag);
 
   ok(player.currentSources()[0].src === 'http://google.com');
   ok(player.currentSources()[0].type === 'video/mp4');
@@ -185,9 +185,9 @@ test('should get current source from src set', function(){
   fixture.innerHTML += html;
 
   var tag = document.getElementById('example_1');
-  var player = PlayerTest.makePlayer({}, tag);
+  var player = TestHelpers.makePlayer({}, tag);
 
-  player.loadTech('Html5');
+  player.loadTech_('Html5');
 
   // check for matching undefined src
   ok(player.currentSource().src === player.currentSrc());
@@ -221,9 +221,9 @@ test('should get current sources from src set', function(){
   fixture.innerHTML += html;
 
   var tag = document.getElementById('example_1');
-  var player = PlayerTest.makePlayer({}, tag);
+  var player = TestHelpers.makePlayer({}, tag);
 
-  player.loadTech('Html5');
+  player.loadTech_('Html5');
 
   // check for matching undefined src
   ok(player.currentSources()[0].src === player.currentSrc());
