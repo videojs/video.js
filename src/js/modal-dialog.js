@@ -251,12 +251,23 @@ class ModalDialog extends Component {
   }
 
   /**
-   * Fill the modal's content element with the given content or
-   * falling back on the modal's "content" option.
+   * Fill the modal's content element with the modal's "content" option.
    *
    * The content element will be emptied before this change takes place.
    *
    * @method fill
+   * @return {ModalDialog}
+   */
+  fill() {
+    return this.fillWith(this.options_.content);
+  }
+
+  /**
+   * Fill the modal's content element with the given content.
+   *
+   * The content element will be emptied before this change takes place.
+   *
+   * @method fillWith
    * @param  {Mixed} [content]
    *         Defines the contents of the modal. This must be either
    *         a DOM element, an array of DOM elements, or a function which
@@ -264,7 +275,7 @@ class ModalDialog extends Component {
    *
    * @return {ModalDialog}
    */
-  fill(content=this.options_.content) {
+  fillWith(content) {
     let contentEl = this.contentEl();
     let parentEl = contentEl.parentNode;
     let nextSiblingEl = contentEl.nextSibling;

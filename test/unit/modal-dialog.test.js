@@ -66,7 +66,7 @@ q.test('should create a close button by default', function(assert) {
 });
 
 q.test('returns `this` for expected methods', function(assert) {
-  var methods = ['open', 'close', 'fill', 'empty'];
+  var methods = ['close', 'empty', 'fill', 'fillWith', 'open'];
 
   assert.expect(methods.length);
   methods.forEach(function(method) {
@@ -254,13 +254,7 @@ q.test('normalizeContent_() callback invocations', function(assert) {
   assert.ok(spyCall.calledWithExactly(this.modal.contentEl()), 'the contentEl is passed to the callback');
 });
 
-q.test('empty()', function(assert) {
-  this.modal.fill([Dom.createEl(), Dom.createEl()]).empty();
-  assert.expect(1);
-  assert.strictEqual(this.modal.contentEl().children.length, 0, 'removed all `contentEl()` children');
-});
-
-q.test('fill()', function(assert) {
+q.test('fillWith()', function(assert) {
   var contentEl = this.modal.contentEl();
   var children = [Dom.createEl(), Dom.createEl(), Dom.createEl()];
 
@@ -268,13 +262,19 @@ q.test('fill()', function(assert) {
     contentEl.appendChild(el);
   });
 
-  this.modal.fill(children);
+  this.modal.fillWith(children);
 
   assert.expect(1 + children.length);
   assert.strictEqual(contentEl.children.length, children.length, 'has the right number of children');
   children.forEach(function(el) {
     assert.strictEqual(el.parentNode, contentEl, 'new child appended');
   });
+});
+
+q.test('empty()', function(assert) {
+  this.modal.fillWith([Dom.createEl(), Dom.createEl()]).empty();
+  assert.expect(1);
+  assert.strictEqual(this.modal.contentEl().children.length, 0, 'removed all `contentEl()` children');
 });
 
 q.test('closeable()', function(assert) {
