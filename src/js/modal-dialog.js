@@ -7,6 +7,7 @@ import tsml from 'tsml';
 import * as Dom from './utils/dom';
 import * as Events from './utils/events';
 import * as Fn from './utils/fn';
+import log from './utils/log';
 
 import Component from './component';
 import CloseButton from './close-button';
@@ -79,6 +80,7 @@ class ModalDialog extends Component {
     this.opened_ = this.hasBeenOpened_ = this.hasBeenFilled_ = false;
 
     this.closeable(!this.options_.uncloseable);
+    this.content(this.options_.content);
 
     // Make sure the contentEl is defined AFTER any children are initialized
     // because we only want the contents of the modal in the contentEl
@@ -151,7 +153,7 @@ class ModalDialog extends Component {
 
       // Fill content if the modal has never opened before and
       // never been filled.
-      if (this.options_.content && !this.hasBeenOpened_ && !this.hasBeenFilled_) {
+      if (this.content() && !this.hasBeenOpened_ && !this.hasBeenFilled_) {
         this.fill();
       }
 
@@ -259,7 +261,7 @@ class ModalDialog extends Component {
    * @return {ModalDialog}
    */
   fill() {
-    return this.fillWith(this.options_.content);
+    return this.fillWith(this.content());
   }
 
   /**
@@ -268,8 +270,8 @@ class ModalDialog extends Component {
    * The content element will be emptied before this change takes place.
    *
    * @method fillWith
-   * @param  {Mixed} [content]
-   *         Defines the contents of the modal. This must be either
+   * @param  {Element|Array|Function} [content]
+   *         The content with which to fill the modal. This must be either
    *         a DOM element, an array of DOM elements, or a function which
    *         returns one of these.
    *
@@ -280,20 +282,25 @@ class ModalDialog extends Component {
     let parentEl = contentEl.parentNode;
     let nextSiblingEl = contentEl.nextSibling;
 
-    this.hasBeenFilled_ = true;
+    content = this.normalizeContent_(content);
 
-    // Detach the content element from the DOM before performing
-    // manipulation to avoid modifying the live DOM multiple times.
-    parentEl.removeChild(contentEl);
-    this.empty();
+    if (content && content.length) {
+      this.hasBeenFilled_ = true;
 
-    this.normalizeContent_(content).forEach(el => contentEl.appendChild(el));
+      // Detach the content element from the DOM before performing
+      // manipulation to avoid modifying the live DOM multiple times.
+      parentEl.removeChild(contentEl);
+      this.empty();
+      content.forEach(el => contentEl.appendChild(el));
 
-    // Re-inject the re-filled content element.
-    if (nextSiblingEl) {
-      parentEl.insertBefore(contentEl, nextSiblingEl);
+      // Re-inject the re-filled content element.
+      if (nextSiblingEl) {
+        parentEl.insertBefore(contentEl, nextSiblingEl);
+      } else {
+        parentEl.appendChild(contentEl);
+      }
     } else {
-      parentEl.appendChild(contentEl);
+      log.warn('no content defined for modal');
     }
 
     return this;
@@ -311,6 +318,28 @@ class ModalDialog extends Component {
     let contentEl = this.contentEl();
     [].slice.call(contentEl.children).forEach(el => contentEl.removeChild(el));
     return this;
+  }
+
+  /**
+   * Retrieves or sets the modal content; the raw content that fills the modal.
+   *
+   * This does not update the DOM or fill the modal, but it is called during
+   * that process.
+   *
+   * @method content
+   * @param  {Element|Array|Function|Null} [value]
+   *         If given, sets the internal content value to be used on the next
+   *         call to `fill`.
+   *
+   * @return {Element|Array|Function}
+   */
+  content(value) {
+    if (value === null || Dom.isEl(value) || Array.isArray(value) || typeof value === 'function') {
+      this.content_ = value;
+    } else if (typeof content !== 'undefined') {
+      log.warn('invalid content value, expected element, array, function or null');
+    }
+    return this.content_;
   }
 
   /**

@@ -208,6 +208,17 @@ q.test('opened()', function(assert) {
   assert.strictEqual(closeSpy.callCount, 1, 'modal was closed only once');
 });
 
+q.test('content()', function(assert) {
+  assert.expect(4);
+  assert.strictEqual(this.modal.content(), undefined, 'no content by default');
+  this.modal.content(Dom.createEl());
+  assert.ok(Dom.isEl(this.modal.content()), 'content was set');
+  this.modal.content(null);
+  assert.ok(this.modal.content() === null, 'content was nullified');
+  this.modal.content(123);
+  assert.ok(this.modal.content() === null, 'content was NOT changed due to invalid input');
+});
+
 q.test('normalizeContent_() with arrays and elements', function(assert) {
   var asElement = this.modal.normalizeContent_(Dom.createEl());
   var asInvalid = this.modal.normalizeContent_(null);
@@ -310,9 +321,10 @@ q.test('"content" option (fills on first open() invocation)', function(assert) {
   sinon.spy(modal, 'fill');
   modal.open().close().open();
 
-  assert.expect(2);
+  assert.expect(3);
+  assert.strictEqual(modal.content(), modal.options_.content, 'has the expected content');
   assert.strictEqual(modal.fill.callCount, 1, 'auto-fills only once');
-  assert.strictEqual(modal.contentEl().firstChild, modal.options_.content, 'has the expected content');
+  assert.strictEqual(modal.contentEl().firstChild, modal.options_.content, 'has the expected content in the DOM');
 });
 
 q.test('"disposeOnClose" option', function(assert) {
