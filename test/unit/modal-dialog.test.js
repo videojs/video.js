@@ -4,6 +4,8 @@ import * as Dom from '../../src/js/utils/dom';
 import * as Fn from '../../src/js/utils/fn';
 import TestHelpers from './test-helpers';
 
+var ESC = 27;
+
 q.module('ModalDialog', {
 
   beforeEach: function() {
@@ -82,11 +84,13 @@ q.test('open() triggers events', function(assert) {
     assert.ok(modal.opened(), 'modal is opened on opening event');
   });
 
-  modal.on('beforemodalopen', beforeModalOpenSpy);
-  modal.on('modalopen', modalOpenSpy);
-
   assert.expect(4);
-  modal.open();
+
+  modal.
+    on('beforemodalopen', beforeModalOpenSpy).
+    on('modalopen', modalOpenSpy).
+    open();
+
   assert.strictEqual(beforeModalOpenSpy.callCount, 1, 'beforemodalopen spy was called');
   assert.strictEqual(modalOpenSpy.callCount, 1, 'modalopen spy was called');
 });
@@ -101,8 +105,7 @@ q.test('open() removes "vjs-hidden" class', function(assert) {
 q.test('open() cannot be called on an opened modal', function(assert) {
   var spy = sinon.spy();
 
-  this.modal.on('modalopen', spy);
-  this.modal.open().open();
+  this.modal.on('modalopen', spy).open().open();
 
   assert.expect(1);
   assert.strictEqual(spy.callCount, 1, 'modal was only opened once');
@@ -118,11 +121,14 @@ q.test('close() triggers events', function(assert) {
     assert.notOk(modal.opened(), 'modal is closed on closing event');
   });
 
-  modal.on('beforemodalclose', beforeModalCloseSpy);
-  modal.on('modalclose', modalCloseSpy);
-
   assert.expect(4);
-  modal.open().close();
+
+  modal.
+    on('beforemodalclose', beforeModalCloseSpy).
+    on('modalclose', modalCloseSpy).
+    open().
+    close();
+
   assert.strictEqual(beforeModalCloseSpy.callCount, 1, 'beforemodalclose spy was called');
   assert.strictEqual(modalCloseSpy.callCount, 1, 'modalclose spy was called');
 });
@@ -136,21 +142,18 @@ q.test('close() adds the "vjs-hidden" class', function(assert) {
 q.test('pressing ESC triggers close(), but only when the modal is opened', function(assert) {
   var spy = sinon.spy();
 
-  this.modal.on('modalclose', spy);
-  this.modal.handleKeyPress({which: 27});
+  this.modal.on('modalclose', spy).handleKeyPress({which: ESC});
   assert.expect(2);
   assert.strictEqual(spy.callCount, 0, 'ESC did not close the closed modal');
 
-  this.modal.open();
-  this.modal.handleKeyPress({which: 27});
+  this.modal.open().handleKeyPress({which: ESC});
   assert.strictEqual(spy.callCount, 1, 'ESC closed the now-opened modal');
 });
 
 q.test('close() cannot be called on an closed modal', function(assert) {
   var spy = sinon.spy();
 
-  this.modal.on('modalclose', spy);
-  this.modal.open().close().close();
+  this.modal.on('modalclose', spy).open().close().close();
 
   assert.expect(1);
   assert.strictEqual(spy.callCount, 1, 'modal was only closed once');
@@ -182,6 +185,27 @@ q.test('open() hides controls, close() shows controls', function(assert) {
 
   this.modal.close();
   assert.ok(this.player.controls_, 'controls are no longer hidden');
+});
+
+q.test('opened()', function(assert) {
+  var openSpy = sinon.spy();
+  var closeSpy = sinon.spy();
+
+  assert.expect(4);
+  assert.strictEqual(this.modal.opened(), false, 'the modal is closed');
+  this.modal.open();
+  assert.strictEqual(this.modal.opened(), true, 'the modal is open');
+
+  this.modal.
+    close().
+    on('modalopen', openSpy).
+    on('modalclose', closeSpy).
+    opened(true);
+
+  this.modal.opened(true);
+  this.modal.opened(false);
+  assert.strictEqual(openSpy.callCount, 1, 'modal was opened only once');
+  assert.strictEqual(closeSpy.callCount, 1, 'modal was closed only once');
 });
 
 q.test('normalizeContent_() with arrays and elements', function(assert) {
@@ -253,6 +277,33 @@ q.test('fill()', function(assert) {
   });
 });
 
+q.test('closeable()', function(assert) {
+  let initialCloseButton = this.modal.getChild('closeButton');
+
+  assert.expect(8);
+  assert.strictEqual(this.modal.closeable(), true, 'the modal is closed');
+
+  this.modal.open().closeable(false);
+  assert.notOk(this.modal.getChild('closeButton'), 'the close button is no longer a child of the modal');
+  assert.notOk(initialCloseButton.el(), 'the initial close button was disposed');
+
+  this.modal.handleKeyPress({which: ESC});
+  assert.ok(this.modal.opened(), 'the modal was not closed by the ESC key');
+
+  this.modal.close();
+  assert.notOk(this.modal.opened(), 'the modal was closed programmatically');
+
+  this.modal.open().closeable(true);
+  assert.ok(this.modal.getChild('closeButton'), 'a new close button was created');
+
+  this.modal.getChild('closeButton').trigger('click');
+  assert.notOk(this.modal.opened(), 'the modal was closed by the new close button');
+
+  this.modal.open().handleKeyPress({which: ESC});
+  assert.notOk(this.modal.opened(), 'the modal was closed by the ESC key');
+});
+
+
 q.test('"content" option (fills on first open() invocation)', function(assert) {
   var modal = new ModalDialog(this.player, {content: Dom.createEl()});
 
@@ -300,4 +351,18 @@ q.test('"slug" option', function(assert) {
   assert.throws(function() {
     new ModalDialog(player, {slug: 'content'});
   }, 'throws errors on disallowed slugs');
+});
+
+q.test('"uncloseable" option', function(assert) {
+  var modal = new ModalDialog(this.player, {uncloseable: true});
+  var spy = sinon.spy();
+
+  modal.on('modalclose', spy);
+
+  assert.expect(3);
+  assert.strictEqual(modal.closeable(), false, 'the modal is uncloseable');
+  assert.notOk(modal.getChild('closeButton'), 'the close button is not present');
+
+  modal.open().handleKeyPress({which: ESC});
+  assert.strictEqual(spy.callCount, 0, 'ESC did not close the modal');
 });
