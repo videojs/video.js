@@ -369,3 +369,14 @@ export function getPointerPosition(el, event) {
 
   return position;
 }
+
+
+/**
+ * Determines, via duck typing, whether or not a value is a DOM element.
+ *
+ * @param  {Mixed} value
+ * @return {Boolean}
+ */
+export function isEl(value) {
+  return !!value && typeof value === 'object' && value.nodeType === 1;
+}

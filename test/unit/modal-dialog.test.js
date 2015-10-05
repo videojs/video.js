@@ -1,5 +1,6 @@
 import CloseButton from '../../src/js/close-button';
 import ModalDialog from '../../src/js/modal-dialog';
+import * as Dom from '../../src/js/utils/dom';
 import * as Fn from '../../src/js/utils/fn';
 import TestHelpers from './test-helpers';
 
@@ -62,6 +63,15 @@ q.test('should create a close button by default', function(assert) {
   assert.strictEqual(btn.el().parentNode, this.el, 'close button is a child of el');
 });
 
+q.test('returns `this` for expected methods', function(assert) {
+  var methods = ['open', 'close', 'fill', 'empty'];
+
+  assert.expect(methods.length);
+  methods.forEach(function(method) {
+    assert.strictEqual(this[method](), this, '`' + method + '()` returns `this`');
+  }, this.modal);
+});
+
 q.test('open() triggers events', function(assert) {
   var modal = this.modal;
   var beforeModalOpenSpy = sinon.spy(function() {
@@ -92,8 +102,7 @@ q.test('open() cannot be called on an opened modal', function(assert) {
   var spy = sinon.spy();
 
   this.modal.on('modalopen', spy);
-  this.modal.open();
-  this.modal.open();
+  this.modal.open().open();
 
   assert.expect(1);
   assert.strictEqual(spy.callCount, 1, 'modal was only opened once');
@@ -113,16 +122,14 @@ q.test('close() triggers events', function(assert) {
   modal.on('modalclose', modalCloseSpy);
 
   assert.expect(4);
-  modal.open();
-  modal.close();
+  modal.open().close();
   assert.strictEqual(beforeModalCloseSpy.callCount, 1, 'beforemodalclose spy was called');
   assert.strictEqual(modalCloseSpy.callCount, 1, 'modalclose spy was called');
 });
 
 q.test('close() adds the "vjs-hidden" class', function(assert) {
   assert.expect(1);
-  this.modal.open();
-  this.modal.close();
+  this.modal.open().close();
   assert.ok(this.modal.hasClass('vjs-hidden'), 'modal is hidden upon close');
 });
 
@@ -143,9 +150,7 @@ q.test('close() cannot be called on an closed modal', function(assert) {
   var spy = sinon.spy();
 
   this.modal.on('modalclose', spy);
-  this.modal.open();
-  this.modal.close();
-  this.modal.close();
+  this.modal.open().close().close();
 
   assert.expect(1);
   assert.strictEqual(spy.callCount, 1, 'modal was only closed once');
@@ -179,12 +184,91 @@ q.test('open() hides controls, close() shows controls', function(assert) {
   assert.ok(this.player.controls_, 'controls are no longer hidden');
 });
 
+q.test('normalizeContent_() with arrays and elements', function(assert) {
+  var asElement = this.modal.normalizeContent_(Dom.createEl());
+  var asInvalid = this.modal.normalizeContent_(null);
+
+  var asArray = this.modal.normalizeContent_([
+    Dom.createEl(), {}, Dom.createEl('span'), []
+  ]);
+
+  assert.expect(3);
+  assert.strictEqual(asElement.length, 1, 'single elements are accepted');
+  assert.strictEqual(asInvalid.length, 0, 'single invalid values are rejected');
+  assert.strictEqual(asArray.length, 2, 'invalid values filtered out of array');
+});
+
+q.test('normalizeContent_() with callbacks', function(assert) {
+  var asElementFn = this.modal.normalizeContent_(function() {
+    return Dom.createEl();
+  });
+
+  var asInvalidFn = this.modal.normalizeContent_(function() {
+    return 'hello world';
+  });
+
+  var asArrayFn = this.modal.normalizeContent_(function() {
+    return [null, 123, Dom.createEl()];
+  });
+
+  assert.expect(3);
+  assert.strictEqual(asElementFn.length, 1, 'single elements are accepted when returned by a function');
+  assert.strictEqual(asInvalidFn.length, 0, 'single invalid values are rejected when returned by a function');
+  assert.strictEqual(asArrayFn.length, 1, 'invalid values filtered out of array when returned by a function');
+});
+
+q.test('normalizeContent_() callback invocations', function(assert) {
+  var callbackSpy = sinon.spy();
+  var spyCall;
+
+  this.modal.normalizeContent_(callbackSpy);
+  spyCall = callbackSpy.getCall(0);
+
+  assert.expect(3);
+  assert.strictEqual(callbackSpy.callCount, 1, 'the test callback was called');
+  assert.strictEqual(spyCall.thisValue, this.modal, 'the value of "this" in the callback is the modal');
+  assert.ok(spyCall.calledWithExactly(this.modal.contentEl()), 'the contentEl is passed to the callback');
+});
+
+q.test('empty()', function(assert) {
+  this.modal.fill([Dom.createEl(), Dom.createEl()]).empty();
+  assert.expect(1);
+  assert.strictEqual(this.modal.contentEl().children.length, 0, 'removed all `contentEl()` children');
+});
+
+q.test('fill()', function(assert) {
+  var contentEl = this.modal.contentEl();
+  var children = [Dom.createEl(), Dom.createEl(), Dom.createEl()];
+
+  [Dom.createEl(), Dom.createEl()].forEach(function(el) {
+    contentEl.appendChild(el);
+  });
+
+  this.modal.fill(children);
+
+  assert.expect(1 + children.length);
+  assert.strictEqual(contentEl.children.length, children.length, 'has the right number of children');
+  children.forEach(function(el) {
+    assert.strictEqual(el.parentNode, contentEl, 'new child appended');
+  });
+});
+
+q.test('"content" option (fills on first open() invocation)', function(assert) {
+  var modal = new ModalDialog(this.player, {content: Dom.createEl()});
+
+  sinon.spy(modal, 'fill');
+  modal.open().close().open();
+
+  assert.expect(2);
+  assert.strictEqual(modal.fill.callCount, 1, 'auto-fills only once');
+  assert.strictEqual(modal.contentEl().firstChild, modal.options_.content, 'has the expected content');
+});
+
 q.test('"disposeOnClose" option', function(assert) {
   var modal = new ModalDialog(this.player, {disposeOnClose: true});
 
-  modal.open();
   sinon.spy(modal, 'dispose');
-  modal.close();
+  modal.open().close();
 
   assert.expect(1);
   assert.strictEqual(modal.dispose.callCount, 1, 'dispose was called');
