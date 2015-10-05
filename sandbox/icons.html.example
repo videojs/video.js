@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Video.js Icons Sandbox</title>
+
+  <link href="../build/temp/video-js.css" rel="stylesheet" type="text/css">
+
+  <style>
+  .icon-list li span { font-size: 150% }
+  </style>
+</head>
+<body>
+  <h1>Video.js Icons</h1>
+  <p>This is a list of all of the icons available in the Video.js base stylesheet. The appropriate class is to the right of each icon.</p>
+
+  <ul class="icon-list">
+    <li><span class="vjs-icon-play"></span> <code>.vjs-icon-play</code></li>
+    <li><span class="vjs-icon-pause"></span> <code>.vjs-icon-pause</code></li>
+    <li><span class="vjs-icon-volume-mute"></span> <code>.vjs-icon-volume-mute</code></li>
+    <li><span class="vjs-icon-volume-low"></span> <code>.vjs-icon-volume-low</code></li>
+    <li><span class="vjs-icon-volume-mid"></span> <code>.vjs-icon-volume-mid</code></li>
+    <li><span class="vjs-icon-volume-high"></span> <code>.vjs-icon-volume-high</code></li>
+    <li><span class="vjs-icon-fullscreen-enter"></span> <code>.vjs-icon-fullscreen-enter</code></li>
+    <li><span class="vjs-icon-fullscreen-exit"></span> <code>.vjs-icon-fullscreen-exit</code></li>
+    <li><span class="vjs-icon-square"></span> <code>.vjs-icon-square</code></li>
+    <li><span class="vjs-icon-spinner"></span> <code>.vjs-icon-spinner</code></li>
+    <li><span class="vjs-icon-subtitles"></span> <code>.vjs-icon-subtitles</code></li>
+    <li><span class="vjs-icon-captions"></span> <code>.vjs-icon-captions</code></li>
+    <li><span class="vjs-icon-chapters"></span> <code>.vjs-icon-chapters</code></li>
+    <li><span class="vjs-icon-share"></span> <code>.vjs-icon-share</code></li>
+    <li><span class="vjs-icon-cog"></span> <code>.vjs-icon-cog</code></li>
+    <li><span class="vjs-icon-circle"></span> <code>.vjs-icon-circle</code></li>
+    <li><span class="vjs-icon-circle-outline"></span> <code>.vjs-icon-circle-outline</code></li>
+    <li><span class="vjs-icon-circle-inner-circle"></span> <code>.vjs-icon-circle-inner-circle</code></li>
+  </ul>
+</body>
+</html>

@@ -1,0 +1,38 @@
+// vjs-control might be better named vjs-button now.
+// It's used on both real buttons (play button)
+// and div buttons (menu buttons)
+.video-js .vjs-control {
+  outline: none;
+  position: relative;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 4em;
+  @include flex(none);
+
+  &:before {
+    font-size: 1.8em;
+    line-height: 1.67;
+
+    @extend %icon-default;
+  }
+}
+
+/* Replacement for focus outline */
+.video-js .vjs-control:focus:before,
+.video-js .vjs-control:hover:before,
+.video-js .vjs-control:focus {
+  text-shadow: 0em 0em 1em rgba($primary-foreground-color, 1);
+}
+
+/* Hide control text visually, but have it available for screenreaders */
+.video-js .vjs-control-text {
+  @include hide-visually;
+}
+
+/* IE 8 + 9 Support */
+.vjs-no-flex .vjs-control {
+  display: table-cell;
+  vertical-align: middle;
+}

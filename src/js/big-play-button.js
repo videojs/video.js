@@ -1,23 +1,46 @@
-/* Big Play Button
-================================================================================ */
+/**
+ * @file big-play-button.js
+ */
+import Button from './button.js';
+import Component from './component.js';
+
 /**
  * Initial play button. Shows before the video has played. The hiding of the
  * big play button is done via CSS and player states.
- * @param {vjs.Player|Object} player
- * @param {Object=} options
- * @class
- * @constructor
+ *
+ * @param {Object} player  Main Player
+ * @param {Object=} options Object of option names and values
+ * @extends Button
+ * @class BigPlayButton
  */
-vjs.BigPlayButton = vjs.Button.extend();
+class BigPlayButton extends Button {
 
-vjs.BigPlayButton.prototype.createEl = function(){
-  return vjs.Button.prototype.createEl.call(this, 'div', {
-    className: 'vjs-big-play-button',
-    innerHTML: '<span aria-hidden="true"></span>',
-    'aria-label': 'play video'
-  });
-};
+  constructor(player, options) {
+    super(player, options);
+  }
 
-vjs.BigPlayButton.prototype.onClick = function(){
-  this.player_.play();
-};
+  /**
+   * Allow sub components to stack CSS class names
+   *
+   * @return {String} The constructed class name
+   * @method buildCSSClass
+   */
+  buildCSSClass() {
+    return 'vjs-big-play-button';
+  }
+
+  /**
+   * Handles click for play
+   *
+   * @method handleClick
+   */
+  handleClick() {
+    this.player_.play();
+  }
+
+}
+
+BigPlayButton.prototype.controlText_ = 'Play Video';
+
+Component.registerComponent('BigPlayButton', BigPlayButton);
+export default BigPlayButton;
