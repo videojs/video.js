@@ -63,10 +63,6 @@ class ModalDialog extends Component {
     super(player, options);
     this.opened_ = false;
 
-    // Create an own property for each instance with a bound keypress
-    // handler so it can be properly added and removed as a listener.
-    this.handleKeyPress = Fn.bind(this, this.handleKeyPress);
-
     // If a close button was added (which is the default), set the modal to
     // close when the button is activated.
     let close = this.getChild('closeButton');
@@ -147,7 +143,7 @@ class ModalDialog extends Component {
     }
 
     player.controls(false);
-    Events.on(document, 'keydown', this.handleKeyPress);
+    Events.on(document, 'keydown', Fn.bind(this, this.handleKeyPress));
     this.show();
     this.trigger('modalopen');
   }
@@ -182,7 +178,7 @@ class ModalDialog extends Component {
     }
 
     player.controls(true);
-    Events.off(document, 'keydown', this.handleKeyPress);
+    Events.off(document, 'keydown', Fn.bind(this, this.handleKeyPress));
     this.hide();
     this.trigger('modalclose');
 
