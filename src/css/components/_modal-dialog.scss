@@ -1,26 +1,9 @@
-%fill-player {
-  height: 100%;
-  left: 0;
-  position: absolute;
-  top: 0;
-  width: 100%;
-}
-
 .video-js .vjs-modal-dialog {
-  @extend %fill-player;
-
-  $gradient-start: rgba(0, 0, 0, 0.8);
-  $gradient-stop: rgba(255, 255, 255, 0);
-  background: $gradient-start;
-  background: -moz-linear-gradient(top, $gradient-start 0%, $gradient-stop 100%);
-  background: -webkit-gradient(left top, left bottom, color-stop(0%, $gradient-start), color-stop(100%, $gradient-stop));
-  background: -webkit-linear-gradient(top, $gradient-start 0%, $gradient-stop 100%);
-  background: -o-linear-gradient(top, $gradient-start 0%, $gradient-stop 100%);
-  background: -ms-linear-gradient(top, $gradient-start 0%, $gradient-stop 100%);
-  background: linear-gradient(top bottom, $gradient-start 0%, $gradient-stop 100%);
+  @extend %overlay-space;
+  @include linear-gradient(180deg, rgba(0, 0, 0, 0.8), rgba(255, 255, 255, 0));
 
   .vjs-modal-dialog-content {
-    @extend %fill-player;
+    @extend %overlay-space;
     z-index: 1;
   }
 
