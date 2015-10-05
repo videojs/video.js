@@ -240,7 +240,7 @@
         [ "grunt chg-release:{{version}}",             "Update the changelog with the new release" ],
         [ "git commit -am 'v{{version}}'",             "Add and commit the package changes" ],
         [ "git push upstream stable",                  "Push the release branch changes to the repo" ],
-        [ "git checkout -b temp-release-branch master","Create a temporary branch for the dist" ],
+        [ "git checkout -b temp-release-branch stable","Create a temporary branch for the dist" ],
         [ "grunt dist",                                "Build the dist" ],
         [ "git add dist --force",                      "Add the (otherwise ignored) release files" ],
         [ "git commit -m 'v{{version}} dist'",         "Commit the dist changes" ],
