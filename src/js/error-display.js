@@ -2,53 +2,61 @@
  * @file error-display.js
  */
 import Component from './component';
-import  * as Dom from './utils/dom.js';
+import ModalDialog from './modal-dialog';
+
+import * as Dom from './utils/dom';
+import mergeOptions from './utils/merge-options';
 
 /**
- * Display that an error has occurred making the video unplayable
+ * Display that an error has occurred making the video unplayable.
  *
- * @param {Object} player  Main Player
- * @param {Object=} options Object of option names and values
- * @extends Component
+ * @extends ModalDialog
  * @class ErrorDisplay
  */
-class ErrorDisplay extends Component {
+class ErrorDisplay extends ModalDialog {
 
+  /**
+   * Constructor for error display modal.
+   *
+   * @param  {Player} player
+   * @param  {Object} [options]
+   */
   constructor(player, options) {
     super(player, options);
-
-    this.update();
-    this.on(player, 'error', this.update);
+    this.on(player, 'error', this.open);
   }
 
   /**
-   * Create the component's DOM element
+   * Build the modal's CSS class.
    *
-   * @return {Element}
-   * @method createEl
+   * @method buildCSSClass
+   * @return {String}
    */
-  createEl() {
-    var el = super.createEl('div', {
-      className: 'vjs-error-display'
-    });
-
-    this.contentEl_ = Dom.createEl('div');
-    el.appendChild(this.contentEl_);
-
-    return el;
+  buildCSSClass() {
+    return `vjs-error-display ${super.buildCSSClass()}`;
   }
 
   /**
-   * Update the error message in localized language
+   * Generates the modal content based on the player error.
    *
-   * @method update
+   * @return {Element|Null}
    */
-  update() {
-    if (this.player().error()) {
-      this.contentEl_.innerHTML = this.localize(this.player().error().message);
+  content() {
+    let error = this.player().error();
+    if (error) {
+      this.content_ = Dom.createEl('span');
+      this.content_.textContent = this.localize(error.message);
+    } else {
+      this.content_ = null;
     }
+    return this.content_;
   }
 }
+
+ErrorDisplay.prototype.options_ = mergeOptions(ModalDialog.prototype.options_, {
+  fillAlways: true,
+  uncloseable: true
+});
 
 Component.registerComponent('ErrorDisplay', ErrorDisplay);
 export default ErrorDisplay;
