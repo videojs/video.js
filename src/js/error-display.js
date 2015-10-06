@@ -27,9 +27,12 @@ class ErrorDisplay extends ModalDialog {
   }
 
   /**
-   * Build the modal's CSS class.
+   * Include the old class for backward-compatibility.
+   *
+   * This can be removed in 6.0.
    *
    * @method buildCSSClass
+   * @deprecated
    * @return {String}
    */
   buildCSSClass() {
@@ -39,22 +42,18 @@ class ErrorDisplay extends ModalDialog {
   /**
    * Generates the modal content based on the player error.
    *
-   * @return {Element|Null}
+   * @return {String|Null}
    */
   content() {
     let error = this.player().error();
-    if (error) {
-      this.content_ = Dom.createEl('span');
-      this.content_.textContent = this.localize(error.message);
-    } else {
-      this.content_ = null;
-    }
+    this.content_ = error ? this.localize(error.message) : null;
     return this.content_;
   }
 }
 
 ErrorDisplay.prototype.options_ = mergeOptions(ModalDialog.prototype.options_, {
   fillAlways: true,
+  slug: 'error-display',
   uncloseable: true
 });
 

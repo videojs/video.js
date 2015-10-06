@@ -270,15 +270,15 @@ class ModalDialog extends Component {
   }
 
   /**
-   * Fill the modal's content element with the given content.
+   * Fill the modal's content element with arbitrary content.
    *
    * The content element will be emptied before this change takes place.
    *
    * @method fillWith
-   * @param  {Element|Array|Function} [content]
+   * @param  {String|Function|Element|Array} [content]
    *         The content with which to fill the modal. This must be either
-   *         a DOM element, an array of DOM elements, or a function which
-   *         returns one of these.
+   *         a DOM element, an array of DOM elements, a string, or a
+   *         function which returns one of these.
    *
    * @return {ModalDialog}
    */
@@ -296,7 +296,14 @@ class ModalDialog extends Component {
       // manipulation to avoid modifying the live DOM multiple times.
       parentEl.removeChild(contentEl);
       this.empty();
-      content.forEach(el => contentEl.appendChild(el));
+
+      // Strings are written into the DOM directly, arrays should by filtered
+      // down to DOM elements only and appended in order.
+      if (typeof content === 'string') {
+        contentEl.innerHTML = content;
+      } else {
+        content.forEach(el => contentEl.appendChild(el));
+      }
 
       // Re-inject the re-filled content element.
       if (nextSiblingEl) {
@@ -326,24 +333,29 @@ class ModalDialog extends Component {
   }
 
   /**
-   * Gets or sets the raw modal content. This will be normalized prior to
-   * injection into the live DOM.
+   * Gets or sets the modal content, which gets normalized before being
+   * rendered into the DOM.
    *
    * This does not update the DOM or fill the modal, but it is called during
    * that process.
    *
    * @method content
-   * @param  {Element|Array|Function|Null} [value]
+   * @param  {String|Function|Element|Array|Null} [value]
    *         If given, sets the internal content value to be used on the next
-   *         call to `fill`.
+   *         call to `fill`. This value is passed through normalizeContent_
+   *         before being rendered into the DOM.
    *
-   * @return {Element|Array|Function}
+   * @return {String|Function|Element|Array|Null}
    */
   content(value) {
-    if (value === null || Dom.isEl(value) || Array.isArray(value) || typeof value === 'function') {
+    if (
+      value === null ||
+      typeof value === 'string' ||
+      typeof value === 'function' ||
+      Array.isArray(value) ||
+      Dom.isEl(value)
+    ) {
       this.content_ = value;
-    } else if (typeof content !== 'undefined') {
-      log.warn('invalid content value, expected element, array, function or null');
     }
     return this.content_;
   }
@@ -351,23 +363,29 @@ class ModalDialog extends Component {
   /**
    * Normalizes contents for insertion into a content element.
    *
-   * Always returns an array of DOM elements.
-   *
    * @method normalizeContent_
    * @private
-   * @param  {Array|Element|Function} content
-   * @return {Array}
+   * @param  {String|Function|Element|Array} content
+   * @return {Array|String|Null}
+   *         An array of one or more DOM element(s). A non-empty string. Null.
    */
   normalizeContent_(content) {
+
+    // Short-cut out if it's clearly invalid.
+    if (!content) {
+      return null;
+    }
+
     if (typeof content === 'function') {
       content = content.call(this, this.contentEl());
     }
 
-    if (!Array.isArray(content)) {
-      content = [content];
+    if (typeof content === 'string' && /\S/.test(content)) {
+      return content;
     }
 
-    return content.filter(Dom.isEl);
+    content = (Array.isArray(content) ? content : [content]).filter(Dom.isEl);
+    return content.length ? content : null;
   }
 }
 
