@@ -19,7 +19,7 @@ q.test('should create the expected element', function(assert) {
 
   assert.expect(2 + classes.length);
   assert.strictEqual(this.btn.el().tagName.toLowerCase(), 'button', 'is a <button>');
-  assert.strictEqual(this.btn.el().textContent, 'Close');
+  assert.strictEqual(this.btn.el().querySelector('.vjs-control-text').innerHTML, 'Close');
 
   classes.forEach(function(s) {
     var c = 'vjs-' + s;
