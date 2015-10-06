@@ -11,7 +11,10 @@ import Player from './player.js';
  * @method plugin
  */
 var plugin = function(name, init){
-  Player.prototype[name] = init;
+  Player.prototype[name] = function() {
+    this.plugins_[name] = true;
+    init.apply(this, arguments);
+  };
 };
 
 export default plugin;

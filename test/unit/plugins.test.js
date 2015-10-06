@@ -198,3 +198,19 @@ test('Plugin that does not exist logs an error', function() {
   error.restore();
   window['console'] = origConsole;
 });
+
+test('Plugin use can be detected on the player', function() {
+  expect(2);
+
+  registerPlugin('foo', function(){});
+
+  var player = TestHelpers.makePlayer({});
+
+  ok(!player.usingPlugin('foo'), 'plugin not in use yet');
+
+  player.foo();
+
+  ok(player.usingPlugin('foo'), 'plugin in use');
+
+  player.dispose();
+});

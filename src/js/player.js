@@ -152,6 +152,9 @@ class Player extends Component {
     // an infinite loop.
     let playerOptionsCopy = mergeOptions(this.options_);
 
+    // Create an object to track which plugins are active on a player
+    this.plugins_ = {};
+
     // Load plugins
     if (options.plugins) {
       let plugins = options.plugins;
@@ -2477,6 +2480,16 @@ class Player extends Component {
     }
 
     return options;
+  }
+
+  /**
+   * Whether or not this player is using a given plugin.
+   *
+   * @param  {String} name The name of a plugin
+   * @return {Boolean}
+   */
+  usingPlugin(name) {
+    return !!this.plugins_[name];
   }
 
   /**
