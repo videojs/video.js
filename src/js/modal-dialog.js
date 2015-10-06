@@ -2,7 +2,6 @@
  * @file modal-dialog.js
  */
 import document from 'global/document';
-import tsml from 'tsml';
 
 import * as Dom from './utils/dom';
 import * as Events from './utils/events';
