@@ -304,6 +304,8 @@ class ModalDialog extends Component {
         content.forEach(el => contentEl.appendChild(el));
       }
 
+      this.trigger('modalfill');
+
       // Re-inject the re-filled content element.
       if (nextSiblingEl) {
         parentEl.insertBefore(contentEl, nextSiblingEl);

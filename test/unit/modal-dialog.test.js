@@ -287,18 +287,24 @@ q.test('normalizeContent_() callback invocations', function(assert) {
 q.test('fillWith()', function(assert) {
   var contentEl = this.modal.contentEl();
   var children = [Dom.createEl(), Dom.createEl(), Dom.createEl()];
+  var spy = sinon.spy();
 
   [Dom.createEl(), Dom.createEl()].forEach(function(el) {
     contentEl.appendChild(el);
   });
 
+  this.modal.on('modalfill', spy);
   this.modal.fillWith(children);
 
-  assert.expect(1 + children.length);
+  assert.expect(3 + children.length);
   assert.strictEqual(contentEl.children.length, children.length, 'has the right number of children');
+
   children.forEach(function(el) {
     assert.strictEqual(el.parentNode, contentEl, 'new child appended');
   });
+
+  assert.strictEqual(spy.callCount, 1, 'the test callback was called');
+  assert.strictEqual(spy.getCall(0).thisValue, this.modal, 'the value of "this" in the callback is the modal');
 });
 
 q.test('empty()', function(assert) {
