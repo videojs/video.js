@@ -287,30 +287,47 @@ q.test('normalizeContent_() callback invocations', function(assert) {
 q.test('fillWith()', function(assert) {
   var contentEl = this.modal.contentEl();
   var children = [Dom.createEl(), Dom.createEl(), Dom.createEl()];
-  var spy = sinon.spy();
+  var beforeFillSpy = sinon.spy();
+  var fillSpy = sinon.spy();
 
   [Dom.createEl(), Dom.createEl()].forEach(function(el) {
     contentEl.appendChild(el);
   });
 
-  this.modal.on('modalfill', spy);
-  this.modal.fillWith(children);
+  this.modal.
+    on('beforemodalfill', beforeFillSpy).
+    on('modalfill', fillSpy).
+    fillWith(children);
 
-  assert.expect(3 + children.length);
+  assert.expect(5 + children.length);
   assert.strictEqual(contentEl.children.length, children.length, 'has the right number of children');
 
   children.forEach(function(el) {
     assert.strictEqual(el.parentNode, contentEl, 'new child appended');
   });
 
-  assert.strictEqual(spy.callCount, 1, 'the test callback was called');
-  assert.strictEqual(spy.getCall(0).thisValue, this.modal, 'the value of "this" in the callback is the modal');
+  assert.strictEqual(beforeFillSpy.callCount, 1, 'the "beforemodalfill" callback was called');
+  assert.strictEqual(beforeFillSpy.getCall(0).thisValue, this.modal, 'the value of "this" is the modal');
+  assert.strictEqual(fillSpy.callCount, 1, 'the "modalfill" callback was called');
+  assert.strictEqual(fillSpy.getCall(0).thisValue, this.modal, 'the value of "this" is the modal');
 });
 
 q.test('empty()', function(assert) {
-  this.modal.fillWith([Dom.createEl(), Dom.createEl()]).empty();
-  assert.expect(1);
+  var beforeEmptySpy = sinon.spy();
+  var emptySpy = sinon.spy();
+
+  this.modal.
+    fillWith([Dom.createEl(), Dom.createEl()]).
+    on('beforemodalempty', beforeEmptySpy).
+    on('modalempty', emptySpy).
+    empty();
+
+  assert.expect(5);
   assert.strictEqual(this.modal.contentEl().children.length, 0, 'removed all `contentEl()` children');
+  assert.strictEqual(beforeEmptySpy.callCount, 1, 'the "beforemodalempty" callback was called');
+  assert.strictEqual(beforeEmptySpy.getCall(0).thisValue, this.modal, 'the value of "this" is the modal');
+  assert.strictEqual(emptySpy.callCount, 1, 'the "modalempty" callback was called');
+  assert.strictEqual(emptySpy.getCall(0).thisValue, this.modal, 'the value of "this" is the modal');
 });
 
 q.test('closeable()', function(assert) {

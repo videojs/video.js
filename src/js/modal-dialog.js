@@ -289,6 +289,7 @@ class ModalDialog extends Component {
     content = this.normalizeContent_(content);
 
     if (content && content.length) {
+      this.trigger('beforemodalfill');
       this.hasBeenFilled_ = true;
 
       // Detach the content element from the DOM before performing
@@ -329,7 +330,9 @@ class ModalDialog extends Component {
    */
   empty() {
     let contentEl = this.contentEl();
+    this.trigger('beforemodalempty');
     [].slice.call(contentEl.children).forEach(el => contentEl.removeChild(el));
+    this.trigger('modalempty');
     return this;
   }
 
