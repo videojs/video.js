@@ -10,7 +10,7 @@ q.module('ModalDialog', {
 
   beforeEach: function() {
     this.player = TestHelpers.makePlayer();
-    this.modal = new ModalDialog(this.player);
+    this.modal = new ModalDialog(this.player, {temporary: false});
     this.el = this.modal.el();
   },
 
@@ -23,8 +23,7 @@ q.module('ModalDialog', {
 q.test('should create the expected element', function(assert) {
   var classes = [
     'modal-dialog',
-    'hidden',
-    'modal-dialog-none'
+    'hidden'
   ];
 
   assert.expect(4 + classes.length);
@@ -356,9 +355,11 @@ q.test('closeable()', function(assert) {
   assert.notOk(this.modal.opened(), 'the modal was closed by the ESC key');
 });
 
-
 q.test('"content" option (fills on first open() invocation)', function(assert) {
-  var modal = new ModalDialog(this.player, {content: Dom.createEl()});
+  var modal = new ModalDialog(this.player, {
+    content: Dom.createEl(),
+    temporary: false
+  });
 
   sinon.spy(modal, 'fill');
   modal.open().close().open();
@@ -369,18 +370,25 @@ q.test('"content" option (fills on first open() invocation)', function(assert) {
   assert.strictEqual(modal.contentEl().firstChild, modal.options_.content, 'has the expected content in the DOM');
 });
 
-q.test('"disposeOnClose" option', function(assert) {
-  var modal = new ModalDialog(this.player, {disposeOnClose: true});
+q.test('"temporary" option', function(assert) {
+  var temp = new ModalDialog(this.player, {temporary: true});
+  var perm = new ModalDialog(this.player, {temporary: false});
 
-  sinon.spy(modal, 'dispose');
-  modal.open().close();
+  sinon.spy(temp, 'dispose');
+  sinon.spy(perm, 'dispose');
+  temp.open().close();
+  perm.open().close();
 
-  assert.expect(1);
-  assert.strictEqual(modal.dispose.callCount, 1, 'dispose was called');
+  assert.expect(2);
+  assert.strictEqual(temp.dispose.callCount, 1, 'temporary modals are disposed');
+  assert.strictEqual(perm.dispose.callCount, 0, 'permanent modals are not disposed');
 });
 
 q.test('"fillAlways" option', function(assert) {
-  var modal = new ModalDialog(this.player, {fillAlways: true});
+  var modal = new ModalDialog(this.player, {
+    fillAlways: true,
+    temporary: false
+  });
 
   sinon.spy(modal, 'fill');
   modal.open().close().open();
@@ -397,28 +405,12 @@ q.test('"label" option', function(assert) {
   assert.strictEqual(modal.el().getAttribute('aria-label'), label, 'uses the label as the aria-label');
 });
 
-q.test('"openImmediately" option', function(assert) {
-  var modal = new ModalDialog(this.player, {openImmediately: true});
-
-  assert.expect(1);
-  assert.ok(modal.opened(), 'the modal is opened immediately');
-});
-
-q.test('"slug" option', function(assert) {
-  var player = this.player;
-  var slug = 'foo';
-  var modal = new ModalDialog(player, {slug: slug});
-
-  assert.expect(2);
-  assert.ok(modal.hasClass('vjs-modal-dialog-' + slug), 'adds the slug-based class');
-
-  assert.throws(function() {
-    new ModalDialog(player, {slug: 'content'});
-  }, 'throws errors on disallowed slugs');
-});
-
 q.test('"uncloseable" option', function(assert) {
-  var modal = new ModalDialog(this.player, {uncloseable: true});
+  var modal = new ModalDialog(this.player, {
+    temporary: false,
+    uncloseable: true
+  });
+
   var spy = sinon.spy();
 
   modal.on('modalclose', spy);

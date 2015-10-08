@@ -11,14 +11,7 @@ import log from './utils/log';
 import Component from './component';
 import CloseButton from './close-button';
 
-const CLASS_NAME_PREFIX = 'vjs-modal-dialog';
-
-// An array of strings which are used for modal sub-element classes,
-// so will cause CSS issues if used as a slug.
-const DISALLOWED_SLUGS = [
-  'content'
-];
-
+const MODAL_CLASS_NAME = 'vjs-modal-dialog';
 const ESC = 27;
 
 /**
@@ -41,10 +34,9 @@ class ModalDialog extends Component {
    * @param  {Mixed} [options.content=undefined]
    *         Provide customized content for this modal.
    *
-   * @param  {Boolean} [options.disposeOnClose=false]
-   *         If `true`, the modal can only be opened once. It will be
-   *         disposed as soon as it's closed, which is useful for one-off
-   *         modals.
+   * @param  {Boolean} [options.temporary=true]
+   *         If `true`, the modal can only be opened once; it will be
+   *         disposed as soon as it's closed.
    *
    * @param  {Boolean} [options.fillAlways=false]
    *         Normally, modals are automatically filled only the first time
@@ -54,21 +46,6 @@ class ModalDialog extends Component {
    * @param  {String} [options.label='']
    *         A text label for the modal, primarily for accessibility.
    *
-   * @param  {Boolean} [options.openImmediately=false]
-   *         If `true`, the modal will be displayed immediately upon
-   *         instantiation.
-   *
-   * @param  {Boolean} [options.fillImmediately=false]
-   *         If `true`, the modal will be filled immediately upon
-   *         instantiation - rather than manually or the first time it
-   *         opens.
-   *
-   * @param  {String} [options.slug='none']
-   *         This is a string that will be prefixed with "vjs-modal-dialog-"
-   *         to construct a CSS class specific to this modal. For
-   *         example, if this option were "foo," the modal could be
-   *         identified with the class "vjs-modal-dialog-foo".
-   *
    * @param  {Boolean} [options.uncloseable=false]
    *         If `true`, the user will not be able to close the modal
    *         through the UI in the normal ways. Programmatic closing is
@@ -76,10 +53,6 @@ class ModalDialog extends Component {
    *
    */
   constructor(player, options) {
-    if (options && DISALLOWED_SLUGS.indexOf(options.slug) > -1) {
-      throw new Error(`${options.slug} is not allowed as a slug`);
-    }
-
     super(player, options);
     this.opened_ = this.hasBeenOpened_ = this.hasBeenFilled_ = false;
 
@@ -90,17 +63,9 @@ class ModalDialog extends Component {
     // because we only want the contents of the modal in the contentEl
     // (not the UI elements like the close button).
     this.contentEl_ = Dom.createEl('div', {
-      className: `${CLASS_NAME_PREFIX}-content`
+      className: `${MODAL_CLASS_NAME}-content`
     });
     this.el_.appendChild(this.contentEl_);
-
-    if (this.options_.fillImmediately) {
-      this.fill();
-    }
-
-    if (this.options_.openImmediately) {
-      this.open();
-    }
   }
 
   /**
@@ -126,7 +91,7 @@ class ModalDialog extends Component {
    * @return {String}
    */
   buildCSSClass() {
-    return `${CLASS_NAME_PREFIX} vjs-hidden ${CLASS_NAME_PREFIX}-${this.options_.slug} ${super.buildCSSClass()}`;
+    return `${MODAL_CLASS_NAME} vjs-hidden ${super.buildCSSClass()}`;
   }
 
   /**
@@ -224,7 +189,7 @@ class ModalDialog extends Component {
       this.hide();
       this.trigger('modalclose');
 
-      if (this.options_.disposeOnClose) {
+      if (this.options_.temporary) {
         this.dispose();
       }
     }
@@ -245,9 +210,12 @@ class ModalDialog extends Component {
       let closeable = this.closeable_ = !!value;
       let close = this.getChild('closeButton');
 
-      if (closeable && !close) {
-        this.on(this.addChild('closeButton'), 'close', this.close);
-      } else if (!closeable && close) {
+      if (closeable) {
+        if (!close) {
+          close = this.addChild('closeButton');
+        }
+        this.on(close, 'close', this.close);
+      } else if (close) {
         this.off(close, 'close', this.close);
         this.removeChild(close);
         close.dispose();
@@ -401,7 +369,7 @@ class ModalDialog extends Component {
  */
 ModalDialog.prototype.options_ = {
   children: ['closeButton'],
-  slug: 'none'
+  temporary: true
 };
 
 Component.registerComponent('ModalDialog', ModalDialog);

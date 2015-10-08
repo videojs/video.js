@@ -46,14 +46,12 @@ class ErrorDisplay extends ModalDialog {
    */
   content() {
     let error = this.player().error();
-    this.content_ = error ? this.localize(error.message) : null;
-    return this.content_;
+    return error ? this.localize(error.message) : '';
   }
 }
 
 ErrorDisplay.prototype.options_ = mergeOptions(ModalDialog.prototype.options_, {
   fillAlways: true,
-  slug: 'error-display',
   uncloseable: true
 });
 
