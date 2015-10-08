@@ -58,7 +58,7 @@ class Tech extends Component {
     }
 
     if (!this.featuresNativeTextTracks) {
-      this.emulateTextTracks();
+      this.on('ready', this.emulateTextTracks);
     }
 
     this.initTextTrackListeners();
