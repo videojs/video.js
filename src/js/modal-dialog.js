@@ -34,10 +34,6 @@ class ModalDialog extends Component {
    * @param  {Mixed} [options.content=undefined]
    *         Provide customized content for this modal.
    *
-   * @param  {Boolean} [options.temporary=true]
-   *         If `true`, the modal can only be opened once; it will be
-   *         disposed as soon as it's closed.
-   *
    * @param  {Boolean} [options.fillAlways=false]
    *         Normally, modals are automatically filled only the first time
    *         they open. This tells the modal to refresh its content
@@ -45,6 +41,10 @@ class ModalDialog extends Component {
    *
    * @param  {String} [options.label='']
    *         A text label for the modal, primarily for accessibility.
+   *
+   * @param  {Boolean} [options.temporary=true]
+   *         If `true`, the modal can only be opened once; it will be
+   *         disposed as soon as it's closed.
    *
    * @param  {Boolean} [options.uncloseable=false]
    *         If `true`, the user will not be able to close the modal
