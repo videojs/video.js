@@ -44,6 +44,8 @@ let trackToJson_ = function(track) {
  * @function textTracksToJson
  */
 let textTracksToJson = function(tech) {
+
+  // Cannot use $$ here because it is not an instance of Tech
   let trackEls = tech.el().querySelectorAll('track');
 
   let trackObjs = Array.prototype.map.call(trackEls, (t) => t.track);

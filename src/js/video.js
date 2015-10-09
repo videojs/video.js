@@ -99,10 +99,10 @@ var videojs = function(id, options, ready){
 };
 
 // Add default styles
-let style = document.querySelector('.vjs-styles-defaults');
+let style = Dom.$('.vjs-styles-defaults');
 if (!style) {
   style = stylesheet.createStyleElement('vjs-styles-defaults');
-  let head = document.querySelector('head');
+  let head = Dom.$('head');
   head.insertBefore(style, head.firstChild);
   stylesheet.setTextContent(style, `
     .video-js {
