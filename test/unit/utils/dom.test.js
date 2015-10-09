@@ -62,23 +62,68 @@ test('should get and remove data from an element', function(){
   ok(!Dom.hasElData(el), 'cached item emptied');
 });
 
-test('should add and remove a class name on an element', function(){
+test('addElClass()', function(){
   var el = document.createElement('div');
+
+  expect(5);
+
   Dom.addElClass(el, 'test-class');
-  ok(el.className === 'test-class', 'class added');
+  strictEqual(el.className, 'test-class', 'adds a single class');
+
   Dom.addElClass(el, 'test-class');
-  ok(el.className === 'test-class', 'same class not duplicated');
-  Dom.addElClass(el, 'test-class2');
-  ok(el.className === 'test-class test-class2', 'added second class');
-  Dom.removeElClass(el, 'test-class');
-  ok(el.className === 'test-class2', 'removed first class');
+  strictEqual(el.className, 'test-class', 'does not duplicate classes');
+
+  throws(function(){
+    Dom.addElClass(el, 'foo foo-bar');
+  }, Error, 'throws when attempting to add a class with whitespace');
+
+  Dom.addElClass(el, 'test2_className');
+  strictEqual(el.className, 'test-class test2_className', 'adds second class');
+
+  Dom.addElClass(el, 'FOO');
+  strictEqual(el.className, 'test-class test2_className FOO', 'adds third class');
 });
 
-test('should read class names on an element', function(){
+test('removeElClass()', function() {
   var el = document.createElement('div');
-  Dom.addElClass(el, 'test-class1');
-  ok(Dom.hasElClass(el, 'test-class1') === true, 'class detected');
-  ok(Dom.hasElClass(el, 'test-class') === false, 'substring correctly not detected');
+
+  el.className = 'test-class foo foo test2_className FOO bar';
+
+  expect(5);
+
+  Dom.removeElClass(el, 'test-class');
+  strictEqual(el.className, 'foo foo test2_className FOO bar', 'removes one class');
+
+  Dom.removeElClass(el, 'foo');
+  strictEqual(el.className, 'test2_className FOO bar', 'removes all instances of a class');
+
+  throws(function(){
+    Dom.removeElClass(el, 'test2_className bar');
+  }, Error, 'throws when attempting to remove a class with whitespace');
+
+  Dom.removeElClass(el, 'test2_className');
+  strictEqual(el.className, 'FOO bar', 'removes another class');
+
+  Dom.removeElClass(el, 'FOO');
+  strictEqual(el.className, 'bar', 'removes another class');
+});
+
+test('hasElClass()', function(){
+  var el = document.createElement('div');
+
+  el.className = 'test-class foo foo test2_className FOO bar';
+
+  strictEqual(Dom.hasElClass(el, 'test-class'), true, 'class detected');
+  strictEqual(Dom.hasElClass(el, 'foo'), true, 'class detected');
+  strictEqual(Dom.hasElClass(el, 'test2_className'), true, 'class detected');
+  strictEqual(Dom.hasElClass(el, 'FOO'), true, 'class detected');
+  strictEqual(Dom.hasElClass(el, 'bar'), true, 'class detected');
+  strictEqual(Dom.hasElClass(el, 'test2'), false, 'valid substring - but not a class - correctly not detected');
+  strictEqual(Dom.hasElClass(el, 'className'), false, 'valid substring - but not a class - correctly not detected');
+
+  throws(function(){
+    Dom.hasElClass(el, 'FOO bar');
+  }, Error, 'throws when attempting to detect a class with whitespace');
 });
 
 test('should set element attributes from object', function(){
@@ -293,7 +338,7 @@ test('Dom.appendContent', function(assert) {
   assert.strictEqual(el.firstChild.nextSibling, p2, 'the second paragraph was appended');
 });
 
-test('Dom.$ and Dom.$$', function() {
+test('$() and $$()', function() {
   let fixture = document.getElementById('qunit-fixture');
   let container = document.createElement('div');
   let children = [

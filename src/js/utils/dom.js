@@ -7,8 +7,37 @@ import  * as Guid from './guid.js';
 import log from './log.js';
 import tsml from 'tsml';
 
+/**
+ * Detect if a value is a string with any non-whitespace characters.
+ *
+ * @param  {String} str
+ * @return {Boolean}
+ */
 function isNonBlankString(str) {
   return typeof str === 'string' && /\S/.test(str);
+}
+
+/**
+ * Throws an error if the passed string has whitespace. This is used by
+ * class methods to be relatively consistent with the classList API.
+ *
+ * @param  {String} str
+ * @return {Boolean}
+ */
+function throwIfWhitespace(str) {
+  if (/\s/.test(str)) {
+    throw new Error('class has illegal whitespace characters');
+  }
+}
+
+/**
+ * Produce a regular expression for matching a class name.
+ *
+ * @param  {String} className
+ * @return {RegExp}
+ */
+function classRegExp(className) {
+  return new RegExp('(^|\\s)' + className + '($|\\s)');
 }
 
 /**
@@ -205,47 +234,53 @@ export function removeElData(el) {
 /**
  * Check if an element has a CSS class
  *
+ * @function hasElClass
  * @param {Element} element Element to check
  * @param {String} classToCheck Classname to check
- * @function hasElClass
  */
 export function hasElClass(element, classToCheck) {
-  return ((' ' + element.className + ' ').indexOf(' ' + classToCheck + ' ') !== -1);
+  if (element.classList) {
+    return element.classList.contains(classToCheck);
+  } else {
+    throwIfWhitespace(classToCheck);
+    return classRegExp(classToCheck).test(element.className);
+  }
 }
 
 /**
  * Add a CSS class name to an element
  *
+ * @function addElClass
  * @param {Element} element    Element to add class name to
  * @param {String} classToAdd Classname to add
- * @function addElClass
  */
 export function addElClass(element, classToAdd) {
-  if (!hasElClass(element, classToAdd)) {
-    element.className = element.className === '' ? classToAdd : element.className + ' ' + classToAdd;
+  if (element.classList) {
+    element.classList.add(classToAdd);
+
+  // Don't need to `throwIfWhitespace` here because `hasElClass` will do it
+  // in the case of classList not being supported.
+  } else if (!hasElClass(element, classToAdd)) {
+    element.className = (element.className + ' ' + classToAdd).trim();
   }
 }
 
 /**
  * Remove a CSS class name from an element
  *
+ * @function removeElClass
  * @param {Element} element    Element to remove from class name
  * @param {String} classToRemove Classname to remove
- * @function removeElClass
  */
 export function removeElClass(element, classToRemove) {
-  if (!hasElClass(element, classToRemove)) {return;}
-
-  let classNames = element.className.split(' ');
-
-  // no arr.indexOf in ie8, and we don't want to add a big shim
-  for (let i = classNames.length - 1; i >= 0; i--) {
-    if (classNames[i] === classToRemove) {
-      classNames.splice(i,1);
-    }
+  if (element.classList) {
+    return element.classList.remove(classToRemove);
+  } else {
+    throwIfWhitespace(classToRemove);
+    element.className = element.className.split(/\s+/).filter(function(c) {
+      return c !== classToRemove;
+    }).join(' ');
   }
-
-  element.className = classNames.join(' ');
 }
 
 /**
