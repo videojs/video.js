@@ -494,3 +494,47 @@ export function appendContent(el, content) {
 export function insertContent(el, content) {
   return appendContent(emptyEl(el), content);
 }
+
+/**
+ * Finds a single DOM element matching `selector` within the `context` of
+ * another DOM element.
+ *
+ * @param  {String} selector
+ *         A valid CSS selector, which will be passed to `querySelector`.
+ *
+ * @param  {Element|String} [context]
+ *         A DOM element within which to query. Can also be a selector
+ *         string in which case the first matching element will be used
+ *         as context. If missing (or no element matches selector), falls
+ *         back to `document`.
+ *
+ * @return {Element|null}
+ */
+export function $(selector, context) {
+  if (typeof context === 'string') {
+    context = $(context);
+  }
+  return (isEl(context) ? context : document).querySelector(selector);
+}
+
+/**
+ * Finds a all DOM elements matching `selector` within the `context` of
+ * another DOM element.
+ *
+ * @param  {String} selector
+ *         A valid CSS selector, which will be passed to `querySelectorAll`.
+ *
+ * @param  {Element|String} [context]
+ *         A DOM element within which to query. Can also be a selector
+ *         string in which case the first matching element will be used
+ *         as context. If missing (or no element matches selector), falls
+ *         back to `document`.
+ *
+ * @return {NodeList}
+ */
+export function $$(selector, context) {
+  if (typeof context === 'string') {
+    context = $(context);
+  }
+  return (isEl(context) ? context : document).querySelectorAll(selector);
+}

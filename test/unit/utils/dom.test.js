@@ -293,4 +293,37 @@ test('Dom.appendContent', function(assert) {
   assert.strictEqual(el.firstChild.nextSibling, p2, 'the second paragraph was appended');
 });
 
+test('Dom.$ and Dom.$$', function() {
+  let fixture = document.getElementById('qunit-fixture');
+  let container = document.createElement('div');
+  let children = [
+    document.createElement('div'),
+    document.createElement('div'),
+    document.createElement('div'),
+  ];
 
+  children.forEach(child => container.appendChild(child));
+  fixture.appendChild(container);
+
+  let totalDivCount = document.getElementsByTagName('div').length;
+
+  expect(12);
+
+  strictEqual(Dom.$('#qunit-fixture'), fixture, 'can find an element in the document context');
+  strictEqual(Dom.$$('div').length, totalDivCount, 'finds elements in the document context');
+
+  strictEqual(Dom.$('div', container), children[0], 'can find an element in a DOM element context');
+  strictEqual(Dom.$$('div', container).length, children.length, 'finds elements in a DOM element context');
+
+  strictEqual(Dom.$('#qunit-fixture', document.querySelector('unknown')), fixture, 'falls back to document given a bad context element');
+  strictEqual(Dom.$$('div', document.querySelector('unknown')).length, totalDivCount, 'falls back to document given a bad context element');
+
+  strictEqual(Dom.$('#qunit-fixture', 'body'), fixture, 'can find an element in a selector context');
+  strictEqual(Dom.$$('div', '#qunit-fixture').length, 1 + children.length, 'finds elements in a selector context');
+
+  strictEqual(Dom.$('#qunit-fixture', 'unknown'), fixture, 'falls back to document given a bad context selector');
+  strictEqual(Dom.$$('div', 'unknown').length, totalDivCount, 'falls back to document given a bad context selector');
+
+  strictEqual(Dom.$('div', children[0]), null, 'returns null for missing elements');
+  strictEqual(Dom.$$('div', children[0]).length, 0, 'returns 0 for missing elements');
+});
