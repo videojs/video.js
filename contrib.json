@@ -148,7 +148,10 @@
       "desc": "Merge a submitted patch",
       "steps": [
         { "include": "update {{meta.branches.release}}" },
-        { "include": "pull_request accept" }
+        { "include": "pull_request accept" },
+        [ "git checkout master",                    "Checkout the developmet branch" ],
+        [ "git merge stable",                       "Merge the patch changes" ],
+        [ "git push upstream master",               "Push the development changes" ]
       ]
     }
   },
