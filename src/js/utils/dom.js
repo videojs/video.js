@@ -7,6 +7,30 @@ import  * as Guid from './guid.js';
 import log from './log.js';
 import tsml from 'tsml';
 
+function isNonBlankString(str) {
+  return typeof str === 'string' && /\S/.test(str);
+}
+
+/**
+ * Creates functions to query the DOM using a given method.
+ *
+ * @function createQuerier
+ * @private
+ * @param  {String} method
+ * @return {Function}
+ */
+function createQuerier(method) {
+  return function (selector, context) {
+    if (!isNonBlankString(selector)) {
+      return document[method](null);
+    }
+    if (isNonBlankString(context)) {
+      context = document.querySelector(context);
+    }
+    return (isEl(context) ? context : document)[method](selector);
+  };
+}
+
 /**
  * Shorthand for document.getElementById()
  * Also allows for CSS (jQuery) ID syntax. But nothing other than IDs.
@@ -292,7 +316,7 @@ export function getElAttributes(tag) {
  * Attempt to block the ability to select text while dragging controls
  *
  * @return {Boolean}
- * @method blockTextSelection
+ * @function blockTextSelection
  */
 export function blockTextSelection() {
   document.body.focus();
@@ -305,7 +329,7 @@ export function blockTextSelection() {
  * Turn off text selection blocking
  *
  * @return {Boolean}
- * @method unblockTextSelection
+ * @function unblockTextSelection
  */
 export function unblockTextSelection() {
   document.onselectstart = function() {
@@ -318,9 +342,9 @@ export function unblockTextSelection() {
  * getBoundingClientRect technique from
  * John Resig http://ejohn.org/blog/getboundingclientrect-is-awesome/
  *
+ * @function findElPosition
  * @param {Element} el Element from which to get offset
- * @return {Object=}
- * @method findElPosition
+ * @return {Object}
  */
 export function findElPosition(el) {
   let box;
@@ -359,10 +383,10 @@ export function findElPosition(el) {
  * Returns an object with x and y coordinates.
  * The base on the coordinates are the bottom left of the element.
  *
+ * @function getPointerPosition
  * @param {Element} el Element on which to get the pointer position on
  * @param {Event} event Event object
- * @return {Object=} position This object will have x and y coordinates corresponding to the mouse position
- * @metho getPointerPosition
+ * @return {Object} This object will have x and y coordinates corresponding to the mouse position
  */
 export function getPointerPosition(el, event) {
   let position = {};
@@ -389,8 +413,9 @@ export function getPointerPosition(el, event) {
 /**
  * Determines, via duck typing, whether or not a value is a DOM element.
  *
- * @param  {Mixed} value
- * @return {Boolean}
+ * @function isEl
+ * @param    {Mixed} value
+ * @return   {Boolean}
  */
 export function isEl(value) {
   return !!value && typeof value === 'object' && value.nodeType === 1;
@@ -499,42 +524,34 @@ export function insertContent(el, content) {
  * Finds a single DOM element matching `selector` within the `context` of
  * another DOM element.
  *
- * @param  {String} selector
- *         A valid CSS selector, which will be passed to `querySelector`.
+ * @function $
+ * @param    {String} selector
+ *           A valid CSS selector, which will be passed to `querySelector`.
  *
- * @param  {Element|String} [context]
- *         A DOM element within which to query. Can also be a selector
- *         string in which case the first matching element will be used
- *         as context. If missing (or no element matches selector), falls
- *         back to `document`.
+ * @param    {Element|String} [context=document]
+ *           A DOM element within which to query. Can also be a selector
+ *           string in which case the first matching element will be used
+ *           as context. If missing (or no element matches selector), falls
+ *           back to `document`.
  *
- * @return {Element|null}
+ * @return   {Element|null}
  */
-export function $(selector, context) {
-  if (typeof context === 'string') {
-    context = $(context);
-  }
-  return (isEl(context) ? context : document).querySelector(selector);
-}
+export const $ = createQuerier('querySelector');
 
 /**
  * Finds a all DOM elements matching `selector` within the `context` of
  * another DOM element.
  *
- * @param  {String} selector
- *         A valid CSS selector, which will be passed to `querySelectorAll`.
+ * @function $$
+ * @param    {String} selector
+ *           A valid CSS selector, which will be passed to `querySelectorAll`.
  *
- * @param  {Element|String} [context]
- *         A DOM element within which to query. Can also be a selector
- *         string in which case the first matching element will be used
- *         as context. If missing (or no element matches selector), falls
- *         back to `document`.
+ * @param    {Element|String} [context=document]
+ *           A DOM element within which to query. Can also be a selector
+ *           string in which case the first matching element will be used
+ *           as context. If missing (or no element matches selector), falls
+ *           back to `document`.
  *
- * @return {NodeList}
+ * @return   {NodeList|Array}
  */
-export function $$(selector, context) {
-  if (typeof context === 'string') {
-    context = $(context);
-  }
-  return (isEl(context) ? context : document).querySelectorAll(selector);
-}
+export const $$ = createQuerier('querySelectorAll');
