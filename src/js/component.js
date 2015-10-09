@@ -831,6 +831,46 @@ class Component {
   }
 
   /**
+   * Finds a single DOM element matching `selector` within the component's
+   * `contentEl` or another custom context.
+   *
+   * @method $
+   * @param  {String} selector
+   *         A valid CSS selector, which will be passed to `querySelector`.
+   *
+   * @param  {Element|String} [context=document]
+   *         A DOM element within which to query. Can also be a selector
+   *         string in which case the first matching element will be used
+   *         as context. If missing (or no element matches selector), falls
+   *         back to `document`.
+   *
+   * @return {Element|null}
+   */
+  $(selector, context) {
+    return Dom.$(selector, context || this.contentEl());
+  }
+
+  /**
+   * Finds a all DOM elements matching `selector` within the component's
+   * `contentEl` or another custom context.
+   *
+   * @method $$
+   * @param  {String} selector
+   *         A valid CSS selector, which will be passed to `querySelectorAll`.
+   *
+   * @param  {Element|String} [context=document]
+   *         A DOM element within which to query. Can also be a selector
+   *         string in which case the first matching element will be used
+   *         as context. If missing (or no element matches selector), falls
+   *         back to `document`.
+   *
+   * @return {NodeList}
+   */
+  $$(selector, context) {
+    return Dom.$$(selector, context || this.contentEl());
+  }
+
+  /**
    * Check if a component's element has a CSS class name
    *
    * @param {String} classToCheck Classname to check
