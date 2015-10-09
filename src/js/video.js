@@ -545,22 +545,98 @@ videojs.xhr = xhr;
  */
 videojs.TextTrack = TextTrack;
 
-// REMOVING: We probably should add this to the migration plugin
-// // Expose but deprecate the window[componentName] method for accessing components
-// Object.getOwnPropertyNames(Component.components).forEach(function(name){
-//   let component = Component.components[name];
-//
-//   // A deprecation warning as the constuctor
-//   module.exports[name] = function(player, options, ready){
-//     log.warn('Using videojs.'+name+' to access the '+name+' component has been deprecated. Please use videojs.getComponent("componentName")');
-//
-//     return new Component(player, options, ready);
-//   };
-//
-//   // Allow the prototype and class methods to be accessible still this way
-//   // Though anything that attempts to override class methods will no longer work
-//   assign(module.exports[name], component);
-// });
+/**
+ * Finds a single DOM element matching `selector` within the `context` of
+ * another DOM element.
+ *
+ * @method $
+ * @param  {String} selector
+ *         A valid CSS selector, which will be passed to `querySelector`.
+ *
+ * @param  {Element|String} [context=document]
+ *         A DOM element within which to query. Can also be a selector
+ *         string in which case the first matching element will be used
+ *         as context. If missing (or no element matches selector), falls
+ *         back to `document`.
+ *
+ * @return {Element|null}
+ */
+videojs.$ = Dom.$;
+
+/**
+ * Finds a all DOM elements matching `selector` within the `context` of
+ * another DOM element.
+ *
+ * @method $$
+ * @param  {String} selector
+ *         A valid CSS selector, which will be passed to `querySelectorAll`.
+ *
+ * @param  {Element|String} [context=document]
+ *         A DOM element within which to query. Can also be a selector
+ *         string in which case the first matching element will be used
+ *         as context. If missing (or no element matches selector), falls
+ *         back to `document`.
+ *
+ * @return {NodeList}
+ */
+videojs.$$ = Dom.$$;
+
+/**
+ * Determines, via duck typing, whether or not a value is a DOM element.
+ *
+ * @method isEl
+ * @param  {Mixed} value
+ * @return {Boolean}
+ */
+videojs.isEl = Dom.isEl;
+
+/**
+ * Check if an element has a CSS class
+ *
+ * @method hasElClass
+ * @param {Element} element Element to check
+ * @param {String} classToCheck Classname to check
+ */
+videojs.hasClass = Dom.hasElClass;
+
+/**
+ * Add a CSS class name to an element
+ *
+ * @method addElClass
+ * @param {Element} element    Element to add class name to
+ * @param {String} classToAdd Classname to add
+ */
+videojs.addClass = Dom.addElClass;
+
+/**
+ * Remove a CSS class name from an element
+ *
+ * @method removeElClass
+ * @param {Element} element    Element to remove from class name
+ * @param {String} classToRemove Classname to remove
+ */
+videojs.removeClass = Dom.removeElClass;
+
+/**
+ * Apply attributes to an HTML element.
+ *
+ * @method setElAttributes
+ * @param  {Element} el         Target element.
+ * @param  {Object=} attributes Element attributes to be applied.
+ */
+videojs.setAttributes = Dom.setElAttributes;
+
+/**
+ * Get an element's attribute values, as defined on the HTML tag
+ * Attributes are not the same as properties. They're defined on the tag
+ * or with setAttribute (which shouldn't be used with HTML)
+ * This will return true or false for boolean attributes.
+ *
+ * @method getElAttributes
+ * @param  {Element} tag Element from which to get tag attributes
+ * @return {Object}
+ */
+videojs.getAttributes = Dom.getElAttributes;
 
 /*
  * Custom Universal Module Definition (UMD)

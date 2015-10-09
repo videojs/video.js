@@ -552,6 +552,6 @@ export const $ = createQuerier('querySelector');
  *           as context. If missing (or no element matches selector), falls
  *           back to `document`.
  *
- * @return   {NodeList|Array}
+ * @return   {NodeList}
  */
 export const $$ = createQuerier('querySelectorAll');
