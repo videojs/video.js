@@ -17,6 +17,7 @@ q.module('ModalDialog', {
   afterEach: function() {
     this.player.dispose();
     this.modal.dispose();
+    this.el = null;
   }
 });
 
@@ -149,31 +150,40 @@ q.test('pressing ESC triggers close(), but only when the modal is opened', funct
   assert.strictEqual(spy.callCount, 1, 'ESC closed the now-opened modal');
 });
 
-q.test('close() cannot be called on an closed modal', function(assert) {
+q.test('close() cannot be called on a closed modal', function(assert) {
   var spy = sinon.spy();
 
-  this.modal.on('modalclose', spy).open().close().close();
+  this.modal.on('modalclose', spy);
+  this.modal.open().close().close();
 
   assert.expect(1);
   assert.strictEqual(spy.callCount, 1, 'modal was only closed once');
 });
 
 q.test('open() pauses playback, close() resumes', function(assert) {
+  var playSpy = sinon.spy();
+  var pauseSpy = sinon.spy();
 
   // Quick and dirty; make it looks like the player is playing.
   this.player.paused = function() {
     return false;
   };
 
-  sinon.spy(this.player, 'play');
-  sinon.spy(this.player, 'pause');
+  this.player.play = function() {
+    playSpy();
+  };
+
+  this.player.pause = function() {
+    pauseSpy();
+  };
+
   this.modal.open();
 
   assert.expect(2);
-  assert.strictEqual(this.player.pause.callCount, 1, 'player is paused when the modal opens');
+  assert.strictEqual(pauseSpy.callCount, 1, 'player is paused when the modal opens');
 
   this.modal.close();
-  assert.strictEqual(this.player.play.callCount, 1, 'player is resumed when the modal closes');
+  assert.strictEqual(playSpy.callCount, 1, 'player is resumed when the modal closes');
 });
 
 q.test('open() hides controls, close() shows controls', function(assert) {
@@ -289,7 +299,7 @@ q.test('fillWith()', function(assert) {
   var beforeFillSpy = sinon.spy();
   var fillSpy = sinon.spy();
 
-  [Dom.createEl(), Dom.createEl()].forEach(function(el) {
+  children.forEach(function(el) {
     contentEl.appendChild(el);
   });
 
@@ -361,40 +371,47 @@ q.test('"content" option (fills on first open() invocation)', function(assert) {
     temporary: false
   });
 
-  sinon.spy(modal, 'fill');
+  var spy = sinon.spy();
+
+  modal.on('modalfill', spy);
   modal.open().close().open();
 
   assert.expect(3);
   assert.strictEqual(modal.content(), modal.options_.content, 'has the expected content');
-  assert.strictEqual(modal.fill.callCount, 1, 'auto-fills only once');
+  assert.strictEqual(spy.callCount, 1, 'auto-fills only once');
   assert.strictEqual(modal.contentEl().firstChild, modal.options_.content, 'has the expected content in the DOM');
 });
 
 q.test('"temporary" option', function(assert) {
   var temp = new ModalDialog(this.player, {temporary: true});
+  var tempSpy = sinon.spy();
   var perm = new ModalDialog(this.player, {temporary: false});
+  var permSpy = sinon.spy();
 
-  sinon.spy(temp, 'dispose');
-  sinon.spy(perm, 'dispose');
+  temp.on('dispose', tempSpy);
+  perm.on('dispose', permSpy);
   temp.open().close();
   perm.open().close();
 
   assert.expect(2);
-  assert.strictEqual(temp.dispose.callCount, 1, 'temporary modals are disposed');
-  assert.strictEqual(perm.dispose.callCount, 0, 'permanent modals are not disposed');
+  assert.strictEqual(tempSpy.callCount, 1, 'temporary modals are disposed');
+  assert.strictEqual(permSpy.callCount, 0, 'permanent modals are not disposed');
 });
 
 q.test('"fillAlways" option', function(assert) {
   var modal = new ModalDialog(this.player, {
+    content: 'foo',
     fillAlways: true,
     temporary: false
   });
 
-  sinon.spy(modal, 'fill');
+  var spy = sinon.spy();
+
+  modal.on('modalfill', spy);
   modal.open().close().open();
 
   assert.expect(1);
-  assert.strictEqual(modal.fill.callCount, 2, 'the modal was filled on each open call');
+  assert.strictEqual(spy.callCount, 2, 'the modal was filled on each open call');
 });
 
 q.test('"label" option', function(assert) {

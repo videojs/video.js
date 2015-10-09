@@ -298,8 +298,11 @@ class ModalDialog extends Component {
    */
   empty() {
     let contentEl = this.contentEl();
+    let count = contentEl.children.length;
     this.trigger('beforemodalempty');
-    [].slice.call(contentEl.children).forEach(el => contentEl.removeChild(el));
+    while (count--) {
+      contentEl.removeChild(contentEl.children[0]);
+    }
     this.trigger('modalempty');
     return this;
   }
