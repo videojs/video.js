@@ -3,6 +3,14 @@
   background-color: rgba($color, $alpha);
 }
 
+@mixin transform($transform) {
+  -moz-transform: $transform;
+  -ms-transform: $transform;
+  -o-transform: $transform;
+  -webkit-transform: $transform;
+  transform: $transform;
+}
+
 @mixin transition($string: $transition--default) {
   -webkit-transition: $string;
   -moz-transition: $string;

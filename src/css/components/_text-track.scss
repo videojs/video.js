@@ -24,3 +24,7 @@
 .vjs-subtitles { color: #fff /* Subtitles are white */; }
 .vjs-captions { color: #fc6 /* Captions are yellow */; }
 .vjs-tt-cue { display: block; }
+
+video::-webkit-media-text-track-display {
+  @include transform(translateY(-45px));
+}
