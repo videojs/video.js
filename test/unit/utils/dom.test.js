@@ -75,7 +75,7 @@ test('addElClass()', function(){
 
   throws(function(){
     Dom.addElClass(el, 'foo foo-bar');
-  }, Error, 'throws when attempting to add a class with whitespace');
+  }, 'throws when attempting to add a class with whitespace');
 
   Dom.addElClass(el, 'test2_className');
   strictEqual(el.className, 'test-class test2_className', 'adds second class');
@@ -99,7 +99,7 @@ test('removeElClass()', function() {
 
   throws(function(){
     Dom.removeElClass(el, 'test2_className bar');
-  }, Error, 'throws when attempting to remove a class with whitespace');
+  }, 'throws when attempting to remove a class with whitespace');
 
   Dom.removeElClass(el, 'test2_className');
   strictEqual(el.className, 'FOO bar', 'removes another class');
@@ -123,7 +123,7 @@ test('hasElClass()', function(){
 
   throws(function(){
     Dom.hasElClass(el, 'FOO bar');
-  }, Error, 'throws when attempting to detect a class with whitespace');
+  }, 'throws when attempting to detect a class with whitespace');
 });
 
 test('should set element attributes from object', function(){
