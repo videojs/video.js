@@ -107,6 +107,8 @@ module.exports = function(config) {
         'android_bs',
         'ios_bs'
       ];
+    } else {
+      settings.browsers = ['Firefox'];
     }
   }
 

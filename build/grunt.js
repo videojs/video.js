@@ -133,7 +133,7 @@ module.exports = function(grunt) {
 
       defaults: {
         detectBrowsers: {
-          enabled: true,
+          enabled: !process.env.TRAVIS,
           usePhantomJS: false
         }
       },
