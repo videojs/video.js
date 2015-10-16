@@ -3,10 +3,9 @@ module.exports = function(config) {
   var settings = {
     basePath: '',
 
-    frameworks: ['browserify', 'qunit'],
+    frameworks: ['browserify', 'qunit', 'detectBrowsers'],
     autoWatch: false,
     singleRun: true,
-    browsers: ['Chrome'],
 
     // Compling tests here
     files: [
@@ -46,8 +45,14 @@ module.exports = function(config) {
       'karma-safari-launcher',
       'karma-browserstack-launcher',
       'karma-browserify',
-      'karma-coverage'
+      'karma-coverage',
+      'karma-detect-browsers',
     ],
+
+    detectBrowsers: {
+      enabled: false,
+      usePhantomJS: false
+    },
 
     reporters: ['dots'],
 
@@ -102,8 +107,6 @@ module.exports = function(config) {
         'android_bs',
         'ios_bs'
       ];
-    } else {
-      settings.browsers = ['Firefox'];
     }
   }
 
