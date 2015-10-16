@@ -132,6 +132,12 @@ test('should add the source handler interface to a tech', function(){
 
   // Create source handlers
   var handlerOne = {
+    canPlayType: function(type){
+      if (type !=='no-support') {
+	return 'probably';
+      }
+      return '';
+    },
     canHandleSource: function(source){
       if (source.type !=='no-support') {
         return 'probably';
@@ -146,6 +152,9 @@ test('should add the source handler interface to a tech', function(){
   };
 
   var handlerTwo = {
+    canPlayType: function(type){
+      return ''; // no support
+    },
     canHandleSource: function(source){
       return ''; // no support
     },
@@ -163,6 +172,10 @@ test('should add the source handler interface to a tech', function(){
   // Test handler selection
   strictEqual(MyTech.selectSourceHandler(sourceA), handlerOne, 'handlerOne was selected to handle the valid source');
   strictEqual(MyTech.selectSourceHandler(sourceB), null, 'no handler was selected to handle the invalid source');
+
+  // Test canPlayType return values
+  strictEqual(MyTech.canPlayType(sourceA.type), 'probably', 'the Tech returned probably for the valid source');
+  strictEqual(MyTech.canPlayType(sourceB.type), '', 'the Tech returned an empty string for the invalid source');
 
   // Test canPlaySource return values
   strictEqual(MyTech.canPlaySource(sourceA), 'probably', 'the Tech returned probably for the valid source');
@@ -239,6 +252,9 @@ test('delegates seekable to the source handler', function(){
   };
 
   MyTech.registerSourceHandler({
+    canPlayType: function() {
+      return true;
+    },
     canHandleSource: function() {
       return true;
     },

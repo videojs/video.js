@@ -498,6 +498,26 @@ Tech.withSourceHandlers = function(_Tech){
     handlers.splice(index, 0, handler);
   };
 
+  /*
+   * Check if the tech can support the given type
+   * @param  {String} type    The mimetype to check
+   * @return {String}         'probably', 'maybe', or '' (empty string)
+   */
+  _Tech.canPlayType = function(type){
+    let handlers = _Tech.sourceHandlers || [];
+    let can;
+
+    for (let i = 0; i < handlers.length; i++) {
+      can = handlers[i].canPlayType(type);
+
+      if (can) {
+	return can;
+      }
+    }
+
+    return '';
+  };
+
    /*
     * Return the first source handler that supports the source
     * TODO: Answer question: should 'probably' be prioritized over 'maybe'
