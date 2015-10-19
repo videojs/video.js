@@ -93,7 +93,6 @@ test('isCrossOrigin can identify cross origin urls', function() {
   win.location.protocol = 'https:';
   win.location.host = 'google.com';
   ok(Url.isCrossOrigin('http://google.com/example.vtt'), 'http://google.com from https://google.com is cross origin');
-  ok(Url.isCrossOrigin('//google.com/example.vtt'), '//google.com from https://google.com is cross origin');
   ok(Url.isCrossOrigin('http://example.com/example.vtt'), 'http://example.com from https://google.com is cross origin');
   ok(Url.isCrossOrigin('https://example.com/example.vtt'), 'https://example.com from https://google.com is cross origin');
   ok(Url.isCrossOrigin('//example.com/example.vtt'), '//example.com from https://google.com is cross origin');
