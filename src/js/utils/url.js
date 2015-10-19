@@ -105,8 +105,8 @@ export const getFileExtension = function(path) {
  * @method isCrossOrigin
  */
 export const isCrossOrigin = function(url) {
-  let urlInfo = parseUrl(url);
   let winLoc = window.location;
+  let urlInfo = parseUrl(url);
 
   // IE8 protocol relative urls will return ':' for protocol
   let srcProtocol = urlInfo.protocol === ':' ? winLoc.protocol : urlInfo.protocol;
