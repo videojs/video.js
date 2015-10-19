@@ -349,8 +349,8 @@ videojs.bind = Fn.bind;
  *     // --> Should alert 'Plugin added later!'
  * ```
  *
- * @param {String} The plugin name
- * @param {Function} The plugin function that will be called with options
+ * @param {String}   name The plugin name
+ * @param {Function} fn   The plugin function that will be called with options
  * @mixes videojs
  * @method plugin
  */
