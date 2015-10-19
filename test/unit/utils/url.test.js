@@ -79,6 +79,8 @@ test('isCrossOrigin can identify cross origin urls', function() {
     'global/window': win
   });
 
+  ok(Url.isCrossOrigin, 'we export a isCrossOrigin function');
+
   win.location.protocol = window.location.protocol;
   win.location.host = window.location.host;
   ok(!Url.isCrossOrigin(`http://${win.location.host}/example.vtt`), 'http://google.com from http://google.com is not cross origin');
