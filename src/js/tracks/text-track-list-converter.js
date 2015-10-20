@@ -13,7 +13,7 @@
  * @private
  */
 let trackToJson_ = function(track) {
-  return {
+  let ret {
     kind: track.kind,
     label: track.label,
     language: track.language,
@@ -28,8 +28,11 @@ let trackToJson_ = function(track) {
         id: cue.id
       };
     }),
-    src: track.src
   };
+  if (track.src) {
+    ret.src = track.src;
+  }
+  return ret;
 };
 
 /**
@@ -46,7 +49,9 @@ let textTracksToJson = function(tech) {
   let trackObjs = Array.prototype.map.call(trackEls, (t) => t.track);
   let tracks = Array.prototype.map.call(trackEls, function(trackEl) {
     let json = trackToJson_(trackEl.track);
-    json.src = trackEl.src;
+    if (trackEl.src) {
+      json.src = trackEl.src;
+    }
     return json;
   });
 
