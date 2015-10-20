@@ -501,6 +501,43 @@ videojs.xhr = xhr;
  */
 videojs.TextTrack = TextTrack;
 
+/**
+ * Creates an element and applies properties.
+ *
+ * @param  {String=} tagName    Name of tag to be created.
+ * @param  {Object=} properties Element properties to be applied.
+ * @return {Element}
+ * @function createEl
+ */
+videojs.createEl = Dom.createEl;
+
+/**
+ * Check if an element has a CSS class
+ *
+ * @param {Element} element Element to check
+ * @param {String} classToCheck Classname to check
+ * @function hasElClass
+ */
+videojs.hasElClass = Dom.hasElClass;
+
+/**
+ * Add a CSS class name to an element
+ *
+ * @param {Element} element    Element to add class name to
+ * @param {String} classToAdd Classname to add
+ * @function addElClass
+ */
+videojs.addElClass = Dom.addElClass;
+
+/**
+ * Remove a CSS class name from an element
+ *
+ * @param {Element} element    Element to remove from class name
+ * @param {String} classToRemove Classname to remove
+ * @function removeElClass
+ */
+videojs.removeElClass = Dom.removeElClass;
+
 // REMOVING: We probably should add this to the migration plugin
 // // Expose but deprecate the window[componentName] method for accessing components
 // Object.getOwnPropertyNames(Component.components).forEach(function(name){
