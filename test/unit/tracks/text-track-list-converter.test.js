@@ -32,7 +32,6 @@ if (Html5.supportsNativeTextTracks()) {
     track.label = 'English';
 
     a.deepEqual(cleanup(c.trackToJson_(track.track)), {
-      src: undefined,
       kind: 'captions',
       label: 'English',
       language: 'en',
@@ -71,13 +70,11 @@ if (Html5.supportsNativeTextTracks()) {
     };
 
     a.deepEqual(cleanup(c.textTracksToJson(tech)), [{
-      src: undefined,
       kind: 'captions',
       label: 'Spanish',
       language: 'es',
       mode: 'disabled'
     }, {
-      src: undefined,
       kind: 'captions',
       label: 'English',
       language: 'en',

@@ -13,7 +13,7 @@
  * @private
  */
 let trackToJson_ = function(track) {
-  let ret {
+  let ret = {
     kind: track.kind,
     label: track.label,
     language: track.language,
