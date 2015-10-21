@@ -93,7 +93,7 @@
           [ "git push origin patch",   "Push any changes to your copy of the main project" ]
         ]
       }
-    }
+    },
 
     "master": {
       "steps": [
