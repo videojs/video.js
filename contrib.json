@@ -54,18 +54,43 @@
         [ "npm install", "Download dependencies"]
       ]
     },
+    "upstream": {
+      "master": {
+        "steps": [
+          [ "git checkout master",      "Switch to the development branch" ],
+          [ "git pull upstream master", "Get any changes to master in the main project" ]
+        ]
+      },
+      "stable": {
+        "steps": [
+          [ "git checkout stable",      "Switch to the release branch" ],
+          [ "git pull upstream stable", "Get any changes to stable in the main project" ]
+        ]
+      },
+      "patch": {
+        "steps": [
+          [ "git checkout patch",      "Switch to the patch branch" ],
+          [ "git pull upstream patch", "Get any changes to patch in the main project" ]
+        ]
+      }
+    },
+
     "master": {
       "steps": [
-        [ "git checkout master",      "Switch to the development branch" ],
-        [ "git pull upstream master", "Get any changes to master in the main project" ],
+        { "include": "update upstream master" },
         [ "git push origin master",   "Push any changes to your copy of the main project" ]
       ]
     },
     "stable": {
       "steps": [
-        [ "git checkout stable",      "Switch to the release branch" ],
-        [ "git pull upstream stable", "Get any changes to stable in the main project" ],
+        { "include": "update upstream stable" },
         [ "git push origin stable",   "Push any changes to your copy of the main project" ]
+      ]
+    },
+    "patch": {
+      "steps": [
+        { "include": "update upstream patch" },
+        [ "git push origin patch",   "Push any changes to your copy of the main project" ]
       ]
     }
   },
