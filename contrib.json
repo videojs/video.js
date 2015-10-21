@@ -223,8 +223,8 @@
       "description": "Create a minor release from the development branch (master)",
       "release_type": "minor",
       "steps": [
-        { "include": "update master" },
-        { "include": "update stable" },
+        { "include": "update upstream master" },
+        { "include": "update upstream stable" },
         [ "git merge master",                          "Copy the latest development changes to the release branch" ],
         { "include": "release run" },
         [ "git checkout master",                       "Checkout the developmet branch" ],
@@ -260,7 +260,7 @@
     "run": {
       "steps": [
         { "include": "branch check" },
-        { "include": "update stable" },
+        { "include": "update upstream stable" },
         [ "npm install",                               "Ensure dependency updates have been installed" ],
         [ "grunt test",                                "Run tests" ],
         [ "grunt version:{{release_type}}",            "Bump package versions" ],
