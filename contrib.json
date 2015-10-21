@@ -54,7 +54,7 @@
         [ "npm install", "Download dependencies"]
       ]
     },
-    "upstream": {
+    "local": {
       "master": {
         "steps": [
           [ "git checkout master",      "Switch to the development branch" ],
@@ -74,23 +74,40 @@
         ]
       }
     },
+    "remote": {
+      "master": {
+        "steps": [
+          { "include": "update local master" },
+          [ "git push origin master",   "Push any changes to your copy of the main project" ]
+        ]
+      },
+      "stable": {
+        "steps": [
+          { "include": "update local stable" },
+          [ "git push origin stable",   "Push any changes to your copy of the main project" ]
+        ]
+      },
+      "patch": {
+        "steps": [
+          { "include": "update local patch" },
+          [ "git push origin patch",   "Push any changes to your copy of the main project" ]
+        ]
+      }
+    }
 
     "master": {
       "steps": [
-        { "include": "update upstream master" },
-        [ "git push origin master",   "Push any changes to your copy of the main project" ]
+        { "include": "update remote master" },
       ]
     },
     "stable": {
       "steps": [
-        { "include": "update upstream stable" },
-        [ "git push origin stable",   "Push any changes to your copy of the main project" ]
+        { "include": "update remote stable" },
       ]
     },
     "patch": {
       "steps": [
-        { "include": "update upstream patch" },
-        [ "git push origin patch",   "Push any changes to your copy of the main project" ]
+        { "include": "update remote patch" },
       ]
     }
   },
@@ -223,8 +240,8 @@
       "description": "Create a minor release from the development branch (master)",
       "release_type": "minor",
       "steps": [
-        { "include": "update upstream master" },
-        { "include": "update upstream stable" },
+        { "include": "update local master" },
+        { "include": "update local stable" },
         [ "git merge master",                          "Copy the latest development changes to the release branch" ],
         { "include": "release run" },
         [ "git checkout master",                       "Checkout the developmet branch" ],
@@ -260,7 +277,7 @@
     "run": {
       "steps": [
         { "include": "branch check" },
-        { "include": "update upstream stable" },
+        { "include": "update local stable" },
         [ "npm install",                               "Ensure dependency updates have been installed" ],
         [ "grunt test",                                "Run tests" ],
         [ "grunt version:{{release_type}}",            "Bump package versions" ],
