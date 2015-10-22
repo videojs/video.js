@@ -624,6 +624,7 @@ class Player extends Component {
     this.on(this.tech_, 'texttrackchange', this.handleTechTextTrackChange_);
     this.on(this.tech_, 'loadedmetadata', this.updateStyleEl_);
     this.on(this.tech_, 'posterchange', this.handleTechPosterChange_);
+    this.on(this.tech_, 'textdata', this.handleTechTextData_);
 
     this.usingNativeControls(this.techGet_('controls'));
 
@@ -1158,6 +1159,14 @@ class Player extends Component {
    */
   handleTechLoadedMetaData_() {
     this.trigger('loadedmetadata');
+  }
+
+  handleTechTextData_() {
+    var data = null;
+    if (arguments.length > 1) {
+      data = arguments[1];
+    }
+    this.trigger('textdata', data);
   }
 
   /**
@@ -2875,6 +2884,8 @@ Player.prototype.handleTechLoadStart_;
  * @event loadedmetadata
  */
 Player.prototype.handleLoadedMetaData_;
+
+Player.prototype.handleTextData_;
 
 /**
  * Fired when the player has downloaded data at the current playback position
