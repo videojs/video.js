@@ -5,6 +5,7 @@ CHANGELOG
 * @imbcmdth fixed an issue with emulateTextTracks being called before the tech dom was ready ([view](https://github.com/videojs/video.js/pull/2692))
 * @gkatsev bumped obj.assign to fix uncaught SecurityError in iframes. Fixes #2703 ([view](https://github.com/videojs/video.js/pull/2721))
 * @gkatsev updated contrib update and have contrib release only update local branches ([view](https://github.com/videojs/video.js/pull/2723))
+* @gkatsev bumped chg to fix stalling issues ([view](https://github.com/videojs/video.js/pull/2732))
 
 --------------------
 
