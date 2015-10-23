@@ -97,17 +97,17 @@
 
     "master": {
       "steps": [
-        { "include": "update remote master" },
+        { "include": "update remote master" }
       ]
     },
     "stable": {
       "steps": [
-        { "include": "update remote stable" },
+        { "include": "update remote stable" }
       ]
     },
     "patch": {
       "steps": [
-        { "include": "update remote patch" },
+        { "include": "update remote patch" }
       ]
     }
   },
