@@ -6,6 +6,7 @@ CHANGELOG
 * @typcn bumped grunt-sass to ^1.0.0 to support node 4.x ([view](https://github.com/videojs/video.js/pull/2645))
 * @gkatsev bumped obj.assign to fix uncaught SecurityError in iframes. Fixes #2703 ([view](https://github.com/videojs/video.js/pull/2721))
 * @gkatsev updated contrib update and have contrib release only update local branches ([view](https://github.com/videojs/video.js/pull/2723))
+* @gkatsev bumped chg to fix stalling issues ([view](https://github.com/videojs/video.js/pull/2732))
 
 --------------------
 
