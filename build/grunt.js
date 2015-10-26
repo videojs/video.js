@@ -317,7 +317,7 @@ module.exports = function(grunt) {
           transform: [
             ['browserify-versionify', {
               placeholder: '../node_modules/vtt.js/dist/vtt.js',
-              version: 'https://raw.githubusercontent.com/gkatsev/vtt.js/vjs-v0.12.1/dist/vtt.min.js'
+              version: 'https://cdn.rawgit.com/gkatsev/vtt.js/vjs-v0.12.1/dist/vtt.min.js'
             }],
           ]
         }),
