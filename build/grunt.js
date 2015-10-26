@@ -13,9 +13,71 @@ module.exports = function(grunt) {
     patch: verParts[2]
   };
 
+  const browserifyGruntDefaults = {
+    browserifyOptions: {
+      debug: true,
+      standalone: 'videojs'
+    },
+    plugin: [
+      ['browserify-derequire']
+    ],
+    transform: [
+      require('babelify').configure({
+        sourceMapRelative: './',
+        loose: ['all']
+      }),
+      ['browserify-versionify', {
+        placeholder: '__VERSION__',
+        version: pkg.version
+      }],
+      ['browserify-versionify', {
+        placeholder: '__VERSION_NO_PATCH__',
+        version: version.majorMinor
+      }],
+      ['browserify-versionify', {
+        placeholder: '__SWF_VERSION__',
+        version: pkg.dependencies['videojs-swf']
+      }]
+    ]
+  };
+
+  /**
+   * Customizes _.merge behavior in `browserifyGruntOptions` to concatenate
+   * arrays. This can be overridden on a per-call basis to
+   *
+   * @see https://lodash.com/docs#merge
+   * @function browserifyGruntCustomizer
+   * @private
+   * @param  {Mixed} objectValue
+   * @param  {Mixed} sourceValue
+   * @return {Object}
+   */
+  function browserifyGruntCustomizer(objectValue, sourceValue) {
+    if (Array.isArray(objectValue)) {
+      return objectValue.concat(sourceValue);
+    }
+  }
+
+  /**
+   * Creates a unique object of Browserify Grunt task options.
+   *
+   * @function browserifyGruntOptions
+   * @private
+   * @param  {Object} [options]
+   * @param  {Function} [customizer=browserifyGruntCustomizer]
+   *         If the default array-concatenation behavior is not desireable,
+   *         pass _.noop or a unique customizer (https://lodash.com/docs#merge).
+   *
+   * @return {Object}
+   */
+  function browserifyGruntOptions(options = null, customizer = browserifyGruntCustomizer) {
+    return _.merge({}, browserifyGruntDefaults, options, customizer);
+  }
+
   /**
    * Creates processor functions for license banners.
    *
+   * @function createLicenseProcessor
    * @private
    * @param  {Object} data Custom data overriding `bannerCommonData`. Will
    *                       not be mutated.
@@ -23,11 +85,13 @@ module.exports = function(grunt) {
    *                       using an object constructed from `bannerCommonData`
    *                       and the `data` argument.
    */
-  let createLicenseProcessor = (data) => function () {
-    return grunt.template.process(license, {
-      data: _.merge({}, bannerCommonData, data)
-    });
-  };
+  function createLicenseProcessor(data) {
+    return () => {
+      return grunt.template.process(license, {
+        data: _.merge({}, bannerCommonData, data)
+      });
+    };
+  }
 
   version.majorMinor = `${version.major}.${version.minor}`;
   grunt.vjsVersion = version;
@@ -242,34 +306,21 @@ module.exports = function(grunt) {
       }
     },
     browserify: {
-      options: {
-        browserifyOptions: {
-          debug: true,
-          standalone: 'videojs'
-        },
-        plugin: [
-          ['browserify-derequire']
-        ],
-        transform: [
-          require('babelify').configure({
-            sourceMapRelative: './',
-            loose: ['all']
-          }),
-          ['browserify-versionify', {
-            placeholder: '__VERSION__',
-            version: pkg.version
-          }],
-          ['browserify-versionify', {
-            placeholder: '__VERSION_NO_PATCH__',
-            version: version.majorMinor
-          }],
-          ['browserify-versionify', {
-            placeholder: '__SWF_VERSION__',
-            version: pkg.dependencies['videojs-swf']
-          }]
-        ]
-      },
+      options: browserifyGruntOptions(),
       build: {
+        files: {
+          'build/temp/video.js': ['src/js/video.js']
+        }
+      },
+      dist: {
+        options: browserifyGruntOptions({
+          transform: [
+            ['browserify-versionify', {
+              placeholder: '../node_modules/vtt.js/dist/vtt.js',
+              version: 'https://raw.githubusercontent.com/gkatsev/vtt.js/vjs-v0.12.1/dist/vtt.min.js'
+            }],
+          ]
+        }),
         files: {
           'build/temp/video.js': ['src/js/video.js']
         }
@@ -380,7 +431,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('videojs-doc-generator');
   grunt.loadNpmTasks('chg');
 
-  grunt.registerTask('build', [
+  const buildDependents = [
     'clean:build',
 
     'jshint',
@@ -400,11 +451,18 @@ module.exports = function(grunt) {
     'copy:swf',
     'copy:ie8',
     'vjslanguages'
-  ]);
+  ];
+
+  grunt.registerTask('build', buildDependents);
+
+  grunt.registerTask(
+    'build:dist',
+    buildDependents.map(task => task === 'browserify:build' ? 'browserify:dist' : task)
+  );
 
   grunt.registerTask('dist', [
     'clean:dist',
-    'build',
+    'build:dist',
     'copy:dist',
     'copy:examples',
     'zip:dist'
