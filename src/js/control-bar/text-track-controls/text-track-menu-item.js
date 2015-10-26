@@ -24,6 +24,7 @@ class TextTrackMenuItem extends MenuItem {
     // Modify options for parent MenuItem class's init.
     options['label'] = track['label'] || track['language'] || 'Unknown';
     options['selected'] = track['default'] || track['mode'] === 'showing';
+
     super(player, options);
 
     this.track = track;

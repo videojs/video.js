@@ -17,7 +17,18 @@ class MenuItem extends ClickableComponent {
 
   constructor(player, options) {
     super(player, options);
+
+    this.selectable = options['selectable'];
+
     this.selected(options['selected']);
+
+    if (this.selectable) {
+      // TODO: May need to be either menuitemcheckbox or menuitemradio,
+      //       and may need logical grouping of menu items.
+      this.el_.setAttribute('role', 'menuitemcheckbox');
+    } else {
+      this.el_.setAttribute('role', 'menuitem');
+    }
   }
 
   /**
@@ -51,12 +62,14 @@ class MenuItem extends ClickableComponent {
    * @method selected
    */
   selected(selected) {
-    if (selected) {
-      this.addClass('vjs-selected');
-      this.el_.setAttribute('aria-selected',true);
-    } else {
-      this.removeClass('vjs-selected');
-      this.el_.setAttribute('aria-selected',false);
+    if (this.selectable) {
+      if (selected) {
+        this.addClass('vjs-selected');
+        this.el_.setAttribute('aria-checked',true);
+      } else {
+        this.removeClass('vjs-selected');
+        this.el_.setAttribute('aria-checked',false);
+      }
     }
   }
 

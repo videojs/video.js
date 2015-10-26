@@ -25,6 +25,7 @@ class MenuButton extends ClickableComponent {
 
     this.on('keydown', this.handleKeyPress);
     this.el_.setAttribute('aria-haspopup', true);
+    this.el_.setAttribute('role', 'menu');
   }
 
   /**
@@ -200,7 +201,7 @@ class MenuButton extends ClickableComponent {
   pressButton() {
     this.buttonPressed_ = true;
     this.menu.lockShowing();
-    this.el_.setAttribute('aria-pressed', true);
+    this.el_.setAttribute('aria-expanded', true);
     if (this.items && this.items.length > 0) {
       this.items[0].el().focus(); // set the focus to the title of the submenu
     }
@@ -214,7 +215,7 @@ class MenuButton extends ClickableComponent {
   unpressButton() {
     this.buttonPressed_ = false;
     this.menu.unlockShowing();
-    this.el_.setAttribute('aria-pressed', false);
+    this.el_.setAttribute('aria-expanded', false);
   }
 }
 
