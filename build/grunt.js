@@ -131,7 +131,12 @@ module.exports = function(grunt) {
         configFile: 'test/karma.conf.js'
       },
 
-      defaults: {},
+      defaults: {
+        detectBrowsers: {
+          enabled: !process.env.TRAVIS,
+          usePhantomJS: false
+        }
+      },
 
       watch: {
         autoWatch: true,
