@@ -159,9 +159,7 @@ module.exports = function(grunt) {
       ie11_bs:      { browsers: ['ie11_bs'] },
       ie10_bs:      { browsers: ['ie10_bs'] },
       ie9_bs:       { browsers: ['ie9_bs'] },
-      ie8_bs:       { browsers: ['ie8_bs'] },
-      android_bs:   { browsers: ['android_bs'] },
-      ios_bs:       { browsers: ['ios_bs'] }
+      ie8_bs:       { browsers: ['ie8_bs'] }
     },
     vjsdocs: {
       all: {
