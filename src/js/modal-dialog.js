@@ -150,17 +150,15 @@ class ModalDialog extends Component {
    *
    * @method opened
    * @param  {Boolean} [value]
-   *         If given as a Boolean, it will open (`true`) or close (`false`)
-   *         the modal.
+   *         If given, it will open (`true`) or close (`false`) the modal.
    *
-   * @return {Boolean|ModalDialog}
-   *         Returns `this` only if `value` was passed.
+   * @return {Boolean}
    */
   opened(value) {
-    if (typeof value !== 'undefined') {
+    if (typeof value === 'boolean') {
       this[value ? 'open' : 'close']();
     }
-    return !!this.opened_;
+    return this.opened_;
   }
 
   /**
@@ -205,7 +203,7 @@ class ModalDialog extends Component {
    * @return {Boolean}
    */
   closeable(value) {
-    if (typeof value !== 'undefined') {
+    if (typeof value === 'boolean') {
       let closeable = this.closeable_ = !!value;
       let close = this.getChild('closeButton');
 
@@ -220,7 +218,7 @@ class ModalDialog extends Component {
         close.dispose();
       }
     }
-    return !!this.closeable_;
+    return this.closeable_;
   }
 
   /**
