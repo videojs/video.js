@@ -22,9 +22,9 @@ q.module('ModalDialog', {
 });
 
 q.test('should create the expected element', function(assert) {
-  var classes = [
-    'modal-dialog',
-    'hidden'
+  let classes = [
+    'vjs-modal-dialog',
+    'vjs-hidden'
   ];
 
   assert.expect(4 + classes.length);
@@ -32,17 +32,7 @@ q.test('should create the expected element', function(assert) {
   assert.strictEqual(this.el.tabIndex, -1, 'el has -1 tabindex');
   assert.strictEqual(this.el.getAttribute('aria-role'), 'dialog', 'el has aria-role="dialog"');
   assert.strictEqual(this.el.getAttribute('aria-label'), '', 'el has aria-role="" by default');
-
-  classes.forEach(function(s) {
-    var c = 'vjs-' + s;
-    assert.ok(this.modal.hasClass(c), [
-      'has the "',
-      c,
-      '" class in "',
-      this.el.className,
-      '"'
-    ].join(''));
-  }, this);
+  TestHelpers.assertElHasClasses(assert, this.modal, classes);
 });
 
 q.test('should create the expected contentEl', function(assert) {

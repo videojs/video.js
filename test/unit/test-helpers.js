@@ -40,6 +40,13 @@ var TestHelpers = {
         return el.currentStyle[rule];
       }
     }
+  },
+
+  assertElHasClasses: function(assert, component, classes) {
+    let el = component.el();
+    classes.forEach(c => {
+      assert.ok(component.hasClass(c), `has the "${c}" class in "${el.className}"`);
+    });
   }
 };
 
