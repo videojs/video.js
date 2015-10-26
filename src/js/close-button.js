@@ -16,7 +16,7 @@ class CloseButton extends Button {
   }
 
   buildCSSClass() {
-    return `vjs-close ${super.buildCSSClass()}`;
+    return `vjs-close-button ${super.buildCSSClass()}`;
   }
 
   handleClick() {

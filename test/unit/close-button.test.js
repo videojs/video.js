@@ -15,7 +15,7 @@ q.module('CloseButton', {
 });
 
 q.test('should create the expected element', function(assert) {
-  var classes = ['button', 'close', 'control'];
+  var classes = ['button', 'close-button', 'control'];
 
   assert.expect(2 + classes.length);
   assert.strictEqual(this.btn.el().tagName.toLowerCase(), 'button', 'is a <button>');

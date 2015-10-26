@@ -7,27 +7,3 @@
   @extend %fill-parent;
   z-index: 1;
 }
-
-// Ultimately, this would be moved to its own component partial, but
-// for now it's unclear what styles would be generic and which specific
-// to this context!
-.vjs-modal-dialog .vjs-close {
-  cursor: pointer;
-  font-size: 1.2em; // 12px
-  height: auto;
-  padding: 0.75em 1em; // 9px 12px
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: auto;
-  z-index: 2;
-}
-
-// Reset inherited control-text styles.
-.vjs-modal-dialog .vjs-close .vjs-control-text {
-  clip: auto;
-  height: auto;
-  margin: 0;
-  position: static;
-  width: auto;
-}
