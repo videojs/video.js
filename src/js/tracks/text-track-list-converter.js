@@ -13,13 +13,15 @@
  * @private
  */
 let trackToJson_ = function(track) {
-  let ret = {
-    kind: track.kind,
-    label: track.label,
-    language: track.language,
-    id: track.id,
-    inBandMetadataTrackDispatchType: track.inBandMetadataTrackDispatchType,
-    mode: track.mode,
+  let ret = ['kind', 'label', 'language', 'id',
+             'inBandMetadataTrackDispatchType',
+             'mode', 'src'].reduce((acc, prop, i) => {
+    if (track[prop]) {
+      acc[prop] = track[prop];
+    }
+    
+    return acc;
+  }, {
     cues: track.cues && Array.prototype.map.call(track.cues, function(cue) {
       return {
         startTime: cue.startTime,
@@ -27,11 +29,9 @@ let trackToJson_ = function(track) {
         text: cue.text,
         id: cue.id
       };
-    }),
-  };
-  if (track.src) {
-    ret.src = track.src;
-  }
+    })
+  });
+
   return ret;
 };
 
