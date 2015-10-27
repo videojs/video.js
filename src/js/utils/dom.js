@@ -386,7 +386,6 @@ export function getPointerPosition(el, event) {
   return position;
 }
 
-
 /**
  * Determines, via duck typing, whether or not a value is a DOM element.
  *
@@ -395,4 +394,106 @@ export function getPointerPosition(el, event) {
  */
 export function isEl(value) {
   return !!value && typeof value === 'object' && value.nodeType === 1;
+}
+
+/**
+ * Determines, via duck typing, whether or not a value is a text node.
+ *
+ * @param  {Mixed} value
+ * @return {Boolean}
+ */
+export function isTextNode(value) {
+  return !!value && typeof value === 'object' && value.nodeType === 3;
+}
+
+/**
+ * Empties the contents of an element.
+ *
+ * @function emptyEl
+ * @param    {Element} el
+ * @return   {Element}
+ */
+export function emptyEl(el) {
+  while (el.firstChild) {
+    el.removeChild(el.firstChild);
+  }
+  return el;
+}
+
+/**
+ * Normalizes content for eventual insertion into the DOM.
+ *
+ * This allows a wide range of content definition methods, but protects
+ * from falling into the trap of simply writing to `innerHTML`, which is
+ * an XSS concern.
+ *
+ * The content for an element can be passed in multiple types, whose
+ * behavior is as follows:
+ *
+ * - String: Normalized into a text node.
+ * - Node: An Element or TextNode is passed through.
+ * - Array: A one-dimensional array of strings, nodes, or functions (which
+ *   return single strings or nodes).
+ * - Function: If the sole argument, is expected to produce a string, node,
+ *   or array.
+ *
+ * @function normalizeContent
+ * @param    {String|Element|Array|Function} content
+ * @return   {Array}
+ */
+export function normalizeContent(content) {
+
+  // First, invoke content if it is a function. If it produces an array,
+  // that needs to happen before normalization.
+  if (typeof content === 'function') {
+    content = content();
+  }
+
+  // Next up, normalize to an array, so one or many items can be normalized,
+  // filtered, and returned.
+  return (Array.isArray(content) ? content : [content]).map(value => {
+
+    // First, invoke value if it is a function to produce a new value,
+    // which will be subsequently normalized to a Node of some kind.
+    if (typeof value === 'function') {
+      value = value();
+    }
+
+    if (isEl(value) || isTextNode(value)) {
+      return value;
+    }
+
+    if (typeof value === 'string' && /\S/.test(value)) {
+      return document.createTextNode(value);
+    }
+  }).filter(value => value);
+}
+
+/**
+ * Normalizes and inserts content into an element.
+ *
+ * @function insertContent
+ * @param    {Element} el
+ * @param    {String|Element|Array|Function} content
+ * @param    {Boolean} [append=false]
+ * @return   {Element}
+ */
+export function insertContent(el, content, append=false) {
+  if (!append) {
+    emptyEl(el);
+  }
+  normalizeContent(content).forEach(node => el.appendChild(node));
+  return el;
+}
+
+/**
+ * Normalizes and inserts content into an element.
+ *
+ * @function insertContent
+ * @param    {Element} el
+ * @param    {String|Element|Array|Function} content
+ * @return   {Element}
+ */
+export function appendContent(el, content) {
+  return insertContent(el, content, true);
 }

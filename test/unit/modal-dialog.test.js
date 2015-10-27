@@ -241,77 +241,13 @@ q.test('opened()', function(assert) {
 q.test('content()', function(assert) {
   var content;
 
-  assert.expect(4);
+  assert.expect(3);
   assert.strictEqual(typeof this.modal.content(), 'undefined', 'no content by default');
 
   content = this.modal.content(Dom.createEl());
   assert.ok(Dom.isEl(content), 'content was set from a single DOM element');
 
-  assert.strictEqual(this.modal.content(123), content, 'content was NOT changed by invalid input');
   assert.strictEqual(this.modal.content(null), null, 'content was nullified');
-});
-
-q.test('normalizeContent_() arrays, elements, and non-empty strings', function(assert) {
-  var asElement = this.modal.normalizeContent_(Dom.createEl());
-
-  var asString = this.modal.normalizeContent_('hello');
-
-  var asArray = this.modal.normalizeContent_([
-    Dom.createEl(), {}, Dom.createEl('span'), []
-  ]);
-
-  var asInvalid = this.modal.normalizeContent_(true);
-
-  var asEmptyString = this.modal.normalizeContent_('  ');
-
-  assert.expect(5);
-  assert.strictEqual(asElement.length, 1, 'single elements are accepted');
-  assert.strictEqual(asString.length, 5, 'non-empty strings are accepted');
-  assert.strictEqual(asArray.length, 2, 'invalid values filtered out of array');
-  assert.strictEqual(asInvalid, null, 'single invalid values are rejected');
-  assert.strictEqual(asEmptyString, null, 'empty strings are rejected');
-});
-
-q.test('normalizeContent_() callbacks', function(assert) {
-  var asElementFn = this.modal.normalizeContent_(function() {
-    return Dom.createEl();
-  });
-
-  var asStringFn = this.modal.normalizeContent_(function() {
-    return 'hello';
-  });
-
-  var asArrayFn = this.modal.normalizeContent_(function() {
-    return [null, '123', Dom.createEl()];
-  });
-
-  var asInvalidFn = this.modal.normalizeContent_(function() {
-    return 123;
-  });
-
-  var asEmptyStringFn = this.modal.normalizeContent_(function() {
-    return '\t\r\n';
-  });
-
-  assert.expect(5);
-  assert.strictEqual(asElementFn.length, 1, 'single elements are accepted when returned by a function');
-  assert.strictEqual(asStringFn.length, 5, 'non-empty strings are passed through directly');
-  assert.strictEqual(asArrayFn.length, 1, 'invalid values filtered out of array when returned by a function');
-  assert.strictEqual(asInvalidFn, null, 'single invalid values are rejected when returned by a function');
-  assert.strictEqual(asEmptyStringFn, null, 'empty strings are rejected when returned by a function');
-});
-
-q.test('normalizeContent_() callback invocations', function(assert) {
-  var callbackSpy = sinon.spy();
-  var spyCall;
-
-  this.modal.normalizeContent_(callbackSpy);
-  spyCall = callbackSpy.getCall(0);
-
-  assert.expect(3);
-  assert.strictEqual(callbackSpy.callCount, 1, 'the test callback was called');
-  assert.strictEqual(spyCall.thisValue, this.modal, 'the value of "this" in the callback is the modal');
-  assert.ok(spyCall.calledWithExactly(this.modal.contentEl()), 'the contentEl is passed to the callback');
 });
 
 q.test('fillWith()', function(assert) {

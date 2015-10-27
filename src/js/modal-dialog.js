@@ -14,17 +14,6 @@ const MODAL_CLASS_NAME = 'vjs-modal-dialog';
 const ESC = 27;
 
 /**
- * Whether or not a value is a non-empty string.
- *
- * @function nonEmptyString
- * @param    {Mixed} value
- * @return   {Boolean}
- */
-function nonEmptyString(value) {
-  return typeof value === 'string' && /\S/.test(value);
-}
-
-/**
  * The `ModalDialog` displays over the video and its controls, which blocks
  * interaction with the player until it is closed.
  *
@@ -293,10 +282,8 @@ class ModalDialog extends Component {
    * The content element will be emptied before this change takes place.
    *
    * @method fillWith
-   * @param  {String|Function|Element|Array} [content]
-   *         The content with which to fill the modal. This must be either
-   *         a DOM element, an array of DOM elements, a string, or a
-   *         function which returns one of these.
+   * @param  {Mixed} [content]
+   *         The same rules apply to this as apply to the `content` option.
    *
    * @return {ModalDialog}
    */
@@ -305,35 +292,21 @@ class ModalDialog extends Component {
     let parentEl = contentEl.parentNode;
     let nextSiblingEl = contentEl.nextSibling;
 
-    content = this.normalizeContent_(content);
+    this.trigger('beforemodalfill');
+    this.hasBeenFilled_ = true;
 
-    if (content && content.length) {
-      this.trigger('beforemodalfill');
-      this.hasBeenFilled_ = true;
+    // Detach the content element from the DOM before performing
+    // manipulation to avoid modifying the live DOM multiple times.
+    parentEl.removeChild(contentEl);
+    this.empty();
+    Dom.insertContent(contentEl, content);
+    this.trigger('modalfill');
 
-      // Detach the content element from the DOM before performing
-      // manipulation to avoid modifying the live DOM multiple times.
-      parentEl.removeChild(contentEl);
-      this.empty();
-
-      // Strings are written into the DOM directly, arrays should by filtered
-      // down to DOM elements only and appended in order.
-      if (typeof content === 'string') {
-        contentEl.innerHTML = content;
-      } else {
-        content.forEach(el => contentEl.appendChild(el));
-      }
-
-      this.trigger('modalfill');
-
-      // Re-inject the re-filled content element.
-      if (nextSiblingEl) {
-        parentEl.insertBefore(contentEl, nextSiblingEl);
-      } else {
-        parentEl.appendChild(contentEl);
-      }
+    // Re-inject the re-filled content element.
+    if (nextSiblingEl) {
+      parentEl.insertBefore(contentEl, nextSiblingEl);
     } else {
-      log.warn('no content defined for modal');
+      parentEl.appendChild(contentEl);
     }
 
     return this;
@@ -348,12 +321,8 @@ class ModalDialog extends Component {
    * @return {ModalDialog}
    */
   empty() {
-    let contentEl = this.contentEl();
-    let count = contentEl.children.length;
     this.trigger('beforemodalempty');
-    while (count--) {
-      contentEl.removeChild(contentEl.children[0]);
-    }
+    Dom.emptyEl(this.contentEl());
     this.trigger('modalempty');
     return this;
   }
@@ -366,53 +335,18 @@ class ModalDialog extends Component {
    * that process.
    *
    * @method content
-   * @param  {String|Function|Element|Array|Null} [value]
-   *         If given, sets the internal content value to be used on the next
-   *         call to `fill`. This value is passed through normalizeContent_
-   *         before being rendered into the DOM.
+   * @param  {Mixed} [value]
+   *         If defined, sets the internal content value to be used on the
+   *         next call(s) to `fill`. This value is normalized before being
+   *         inserted. To "clear" the internal content value, pass `null`.
    *
-   * @return {String|Function|Element|Array|Null}
+   * @return {Mixed}
    */
   content(value) {
-    if (
-      value === null ||
-      typeof value === 'string' ||
-      typeof value === 'function' ||
-      Array.isArray(value) ||
-      Dom.isEl(value)
-    ) {
+    if (typeof value !== 'undefined') {
       this.content_ = value;
     }
     return this.content_;
-  }
-
-  /**
-   * Normalizes contents for insertion into a content element.
-   *
-   * @method normalizeContent_
-   * @private
-   * @param  {String|Function|Element|Array} content
-   * @return {Array|String|Null}
-   *         An array of one or more DOM element(s). A non-empty string. Null.
-   */
-  normalizeContent_(content) {
-
-    // Short-cut out if it's clearly invalid.
-    if (!content) {
-      return null;
-    }
-
-    if (typeof content === 'function') {
-      content = content.call(this, this.contentEl());
-    }
-
-    if (nonEmptyString(content)) {
-      return content;
-    }
-
-    // DOM element and array handling.
-    content = (Array.isArray(content) ? content : [content]).filter(Dom.isEl);
-    return content.length ? content : null;
   }
 }
 
