@@ -25,6 +25,8 @@ test('should be displayed when text tracks list is not empty', function() {
 
   ok(!player.controlBar.captionsButton.hasClass('vjs-hidden'), 'control is displayed');
   equal(player.textTracks().length, 1, 'textTracks contains one item');
+
+  player.dispose();
 });
 
 test('should be displayed when a text track is added to an empty track list', function() {
@@ -34,6 +36,8 @@ test('should be displayed when a text track is added to an empty track list', fu
 
   ok(!player.controlBar.captionsButton.hasClass('vjs-hidden'), 'control is displayed');
   equal(player.textTracks().length, 1, 'textTracks contains one item');
+
+  player.dispose();
 });
 
 test('should not be displayed when text tracks list is empty', function() {
@@ -41,6 +45,8 @@ test('should not be displayed when text tracks list is empty', function() {
 
   ok(player.controlBar.captionsButton.hasClass('vjs-hidden'), 'control is not displayed');
   equal(player.textTracks().length, 0, 'textTracks is empty');
+
+  player.dispose();
 });
 
 test('should not be displayed when last text track is removed', function() {
@@ -52,6 +58,8 @@ test('should not be displayed when last text track is removed', function() {
 
   ok(player.controlBar.captionsButton.hasClass('vjs-hidden'), 'control is not displayed');
   equal(player.textTracks().length, 0, 'textTracks is empty');
+
+  player.dispose();
 });
 
 test('menu should contain "Settings", "Off" and one track', function() {
@@ -68,6 +76,8 @@ test('menu should contain "Settings", "Off" and one track', function() {
   equal(menuItems[0].track.label, 'captions settings', 'menu contains "captions settings"');
   equal(menuItems[1].track.label, 'captions off', 'menu contains "captions off"');
   equal(menuItems[2].track.label, 'test', 'menu contains "test" track');
+
+  player.dispose();
 });
 
 test('menu should update with addRemoteTextTrack', function() {
@@ -81,6 +91,8 @@ test('menu should update with addRemoteTextTrack', function() {
 
   equal(player.controlBar.captionsButton.items.length, 4, 'menu does contain added track');
   equal(player.textTracks().length, 2, 'textTracks contains two items');
+
+  player.dispose();
 });
 
 test('menu should update with removeRemoteTextTrack', function() {
@@ -94,6 +106,8 @@ test('menu should update with removeRemoteTextTrack', function() {
 
   equal(player.controlBar.captionsButton.items.length, 3, 'menu does not contain removed track');
   equal(player.textTracks().length, 1, 'textTracks contains one item');
+
+  player.dispose();
 });
 
 if (!browser.IS_IE8) {
@@ -121,5 +135,7 @@ if (!browser.IS_IE8) {
 
     trackMenuItem.trigger('click');
     equal(changes, 2, 'clicks trigger change events');
+
+    player.dispose();
   });
 }

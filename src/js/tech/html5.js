@@ -36,6 +36,8 @@ class Html5 extends Tech {
     // anyway so the error gets fired.
     if (source && (this.el_.currentSrc !== source.src || (options.tag && options.tag.initNetworkState_ === 3))) {
       this.setSource(source);
+    } else {
+      this.handleLateInit_(this.el_);
     }
 
     if (this.el_.hasChildNodes()) {
@@ -66,15 +68,20 @@ class Html5 extends Tech {
     }
 
     if (this.featuresNativeTextTracks) {
-      this.on('loadstart', Fn.bind(this, this.hideCaptions));
+      this.handleTextTrackChange_ = Fn.bind(this, this.handleTextTrackChange);
+      this.handleTextTrackAdd_ = Fn.bind(this, this.handleTextTrackAdd);
+      this.handleTextTrackRemove_ = Fn.bind(this, this.handleTextTrackRemove);
+      this.proxyNativeTextTracks_();
     }
 
     // Determine if native controls should be used
     // Our goal should be to get the custom controls on mobile solid everywhere
     // so we can remove this all together. Right now this will block custom
     // controls on touch enabled laptops like the Chrome Pixel
-    if (browser.TOUCH_ENABLED && options.nativeControlsForTouch === true) {
-      this.trigger('usenativecontrols');
+    if (browser.TOUCH_ENABLED && options.nativeControlsForTouch === true ||
+        browser.IS_IPHONE ||
+        browser.IS_NATIVE_ANDROID) {
+      this.setControls(true);
     }
 
     this.triggerReady();
@@ -86,6 +93,24 @@ class Html5 extends Tech {
    * @method dispose
    */
   dispose() {
+    let tt = this.el().textTracks;
+    let emulatedTt = this.textTracks();
+
+    // remove native event listeners
+    if (tt && tt.removeEventListener) {
+      tt.removeEventListener('change', this.handleTextTrackChange_);
+      tt.removeEventListener('addtrack', this.handleTextTrackAdd_);
+      tt.removeEventListener('removetrack', this.handleTextTrackRemove_);
+    }
+
+    // clearout the emulated text track list.
+    let i = emulatedTt.length;
+
+    while (i--) {
+      emulatedTt.removeTrack_(emulatedTt[i]);
+    }
+
+
     Html5.disposeMediaElement(this.el_);
     super.dispose();
   }
@@ -106,7 +131,7 @@ class Html5 extends Tech {
 
       // If the original tag is still there, clone and remove it.
       if (el) {
-        const clone = el.cloneNode(false);
+        const clone = el.cloneNode(true);
         el.parentNode.insertBefore(clone, el);
         Html5.disposeMediaElement(el);
         el = clone;
@@ -127,21 +152,6 @@ class Html5 extends Tech {
           })
         );
       }
-
-      if (this.options_.tracks) {
-        for (let i = 0; i < this.options_.tracks.length; i++) {
-          const track = this.options_.tracks[i];
-          let trackEl = document.createElement('track');
-          trackEl.kind = track.kind;
-          trackEl.label = track.label;
-          trackEl.srclang = track.srclang;
-          trackEl.src = track.src;
-          if ('default' in track) {
-            trackEl.setAttribute('default', 'default');
-          }
-          el.appendChild(trackEl);
-        }
-      }
     }
 
     // Update specific tag settings, in case they were overridden
@@ -159,27 +169,114 @@ class Html5 extends Tech {
     // jenniisawesome = true;
   }
 
-
-  /**
-   * Hide captions from text track
-   *
-   * @method hideCaptions
-   */
-  hideCaptions() {
-    let tracks = this.el_.querySelectorAll('track');
-    let i = tracks.length;
-    const kinds = {
-      'captions': 1,
-      'subtitles': 1
-    };
-
-    while (i--) {
-      let track = tracks[i].track;
-      if ((track && track['kind'] in kinds) &&
-          (!tracks[i]['default'])) {
-        track.mode = 'disabled';
-      }
+  // If we're loading the playback object after it has started loading
+  // or playing the video (often with autoplay on) then the loadstart event
+  // has already fired and we need to fire it manually because many things
+  // rely on it.
+  handleLateInit_(el) {
+    if (el.networkState === 0 || el.networkState === 3) {
+      // The video element hasn't started loading the source yet
+      // or didn't find a source
+      return;
     }
+
+    if (el.readyState === 0) {
+      // NetworkState is set synchronously BUT loadstart is fired at the
+      // end of the current stack, usually before setInterval(fn, 0).
+      // So at this point we know loadstart may have already fired or is
+      // about to fire, and either way the player hasn't seen it yet.
+      // We don't want to fire loadstart prematurely here and cause a
+      // double loadstart so we'll wait and see if it happens between now
+      // and the next loop, and fire it if not.
+      // HOWEVER, we also want to make sure it fires before loadedmetadata
+      // which could also happen between now and the next loop, so we'll
+      // watch for that also.
+      let loadstartFired = false;
+      let setLoadstartFired = function() {
+        loadstartFired = true;
+      };
+      this.on('loadstart', setLoadstartFired);
+
+      let triggerLoadstart = function() {
+        // We did miss the original loadstart. Make sure the player
+        // sees loadstart before loadedmetadata
+        if (!loadstartFired) {
+          this.trigger('loadstart');
+        }
+      };
+      this.on('loadedmetadata', triggerLoadstart);
+
+      this.ready(function(){
+        this.off('loadstart', setLoadstartFired);
+        this.off('loadedmetadata', triggerLoadstart);
+
+        if (!loadstartFired) {
+          // We did miss the original native loadstart. Fire it now.
+          this.trigger('loadstart');
+        }
+      });
+
+      return;
+    }
+
+    // From here on we know that loadstart already fired and we missed it.
+    // The other readyState events aren't as much of a problem if we double
+    // them, so not going to go to as much trouble as loadstart to prevent
+    // that unless we find reason to.
+    let eventsToTrigger = ['loadstart'];
+
+    // loadedmetadata: newly equal to HAVE_METADATA (1) or greater
+    eventsToTrigger.push('loadedmetadata');
+
+    // loadeddata: newly increased to HAVE_CURRENT_DATA (2) or greater
+    if (el.readyState >= 2) {
+      eventsToTrigger.push('loadeddata');
+    }
+
+    // canplay: newly increased to HAVE_FUTURE_DATA (3) or greater
+    if (el.readyState >= 3) {
+      eventsToTrigger.push('canplay');
+    }
+
+    // canplaythrough: newly equal to HAVE_ENOUGH_DATA (4)
+    if (el.readyState >= 4) {
+      eventsToTrigger.push('canplaythrough');
+    }
+
+    // We still need to give the player time to add event listeners
+    this.ready(function(){
+      eventsToTrigger.forEach(function(type){
+        this.trigger(type);
+      }, this);
+    });
+  }
+
+  proxyNativeTextTracks_() {
+    let tt = this.el().textTracks;
+
+    if (tt && tt.addEventListener) {
+      tt.addEventListener('change', this.handleTextTrackChange_);
+      tt.addEventListener('addtrack', this.handleTextTrackAdd_);
+      tt.addEventListener('removetrack', this.handleTextTrackRemove_);
+    }
+  }
+
+  handleTextTrackChange(e) {
+    let tt = this.textTracks();
+    this.textTracks().trigger({
+      type: 'change',
+      target: tt,
+      currentTarget: tt,
+      srcElement: tt
+    });
+  }
+
+  handleTextTrackAdd(e) {
+    this.textTracks().addTrack_(e.track);
+  }
+
+  handleTextTrackRemove(e) {
+    this.textTracks().removeTrack_(e.track);
   }
 
   /**
@@ -376,14 +473,18 @@ class Html5 extends Tech {
    * @deprecated
    * @method setSrc
    */
-  setSrc(src) { this.el_.src = src; }
+  setSrc(src) {
+    this.el_.src = src;
+  }
 
   /**
    * Load media into player
    *
    * @method load
    */
-  load(){ this.el_.load(); }
+  load(){
+    this.el_.load();
+  }
 
   /**
    * Get current source
@@ -593,11 +694,7 @@ class Html5 extends Tech {
    * @method textTracks
    */
   textTracks() {
-    if (!this['featuresNativeTextTracks']) {
-      return super.textTracks();
-    }
-
-    return this.el_.textTracks;
+    return super.textTracks();
   }
 
   /**
@@ -654,24 +751,6 @@ class Html5 extends Tech {
 
     this.el().appendChild(track);
 
-    if (track.track['kind'] === 'metadata') {
-      track['track']['mode'] = 'hidden';
-    } else {
-      track['track']['mode'] = 'disabled';
-    }
-
-    track['onload'] = function() {
-      var tt = track['track'];
-      if (track.readyState >= 2) {
-        if (tt['kind'] === 'metadata' && tt['mode'] !== 'hidden') {
-          tt['mode'] = 'hidden';
-        } else if (tt['kind'] !== 'metadata' && tt['mode'] !== 'disabled') {
-          tt['mode'] = 'disabled';
-        }
-        track['onload'] = null;
-      }
-    };
-
     this.remoteTextTracks().addTrack_(track.track);
 
     return track;
@@ -692,12 +771,12 @@ class Html5 extends Tech {
 
     this.remoteTextTracks().removeTrack_(track);
 
-    tracks = this.el()['querySelectorAll']('track');
+    tracks = this.el().querySelectorAll('track');
 
-    for (i = 0; i < tracks.length; i++) {
-      if (tracks[i] === track || tracks[i]['track'] === track) {
-        tracks[i]['parentNode']['removeChild'](tracks[i]);
-        break;
+    i = tracks.length;
+    while (i--) {
+      if (track === tracks[i] || track === tracks[i].track) {
+        this.el().removeChild(tracks[i]);
       }
     }
   }
@@ -750,6 +829,22 @@ Tech.withSourceHandlers(Html5);
 Html5.nativeSourceHandler = {};
 
 /*
+ * Check if the video element can play the given videotype
+ *
+ * @param  {String} type    The mimetype to check
+ * @return {String}         'probably', 'maybe', or '' (empty string)
+ */
+Html5.nativeSourceHandler.canPlayType = function(type){
+  // IE9 on Windows 7 without MediaPlayer throws an error here
+  // https://github.com/videojs/video.js/issues/519
+  try {
+    return Html5.TEST_VID.canPlayType(type);
+  } catch(e) {
+    return '';
+  }
+};
+
+/*
  * Check if the video element can handle the source natively
  *
  * @param  {Object} source  The source object
@@ -758,24 +853,14 @@ Html5.nativeSourceHandler = {};
 Html5.nativeSourceHandler.canHandleSource = function(source){
   var match, ext;
 
-  function canPlayType(type){
-    // IE9 on Windows 7 without MediaPlayer throws an error here
-    // https://github.com/videojs/video.js/issues/519
-    try {
-      return Html5.TEST_VID.canPlayType(type);
-    } catch(e) {
-      return '';
-    }
-  }
-
   // If a type was provided we should rely on that
   if (source.type) {
-    return canPlayType(source.type);
+    return Html5.nativeSourceHandler.canPlayType(source.type);
   } else if (source.src) {
     // If no type, fall back to checking 'video/[EXTENSION]'
     ext = Url.getFileExtension(source.src);
 
-    return canPlayType(`video/${ext}`);
+    return Html5.nativeSourceHandler.canPlayType(`video/${ext}`);
   }
 
   return '';
@@ -846,9 +931,43 @@ Html5.supportsNativeTextTracks = function() {
   if (supportsTextTracks && browser.IS_FIREFOX) {
     supportsTextTracks = false;
   }
+  if (supportsTextTracks && !('onremovetrack' in Html5.TEST_VID.textTracks)) {
+    supportsTextTracks = false;
+  }
 
   return supportsTextTracks;
 };
+
+/**
+ * An array of events available on the Html5 tech.
+ *
+ * @private
+ * @type {Array}
+ */
+Html5.Events = [
+  'loadstart',
+  'suspend',
+  'abort',
+  'error',
+  'emptied',
+  'stalled',
+  'loadedmetadata',
+  'loadeddata',
+  'canplay',
+  'canplaythrough',
+  'playing',
+  'waiting',
+  'seeking',
+  'seeked',
+  'ended',
+  'durationchange',
+  'timeupdate',
+  'progress',
+  'play',
+  'pause',
+  'ratechange',
+  'volumechange'
+];
 
 /*
  * Set the tech's volume control support status

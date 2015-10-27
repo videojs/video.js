@@ -1,8 +1,6 @@
 language: node_js
 node_js:
   - 0.12
-before_script:
-  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then curl https://gist.githubusercontent.com/santiycr/5139565/raw/sauce_connect_setup.sh | bash; fi
 before_install:
   - export CHROME_BIN=chromium-browser
   - export DISPLAY=:99.0

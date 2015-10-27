@@ -155,6 +155,27 @@ test('should have the source handler interface', function() {
   ok(Html5.registerSourceHandler, 'has the registerSourceHandler function');
 });
 
+test('native source handler canPlayType', function(){
+  var result;
+
+  // Stub the test video canPlayType (used in canPlayType) to control results
+  var origCPT = Html5.TEST_VID.canPlayType;
+  Html5.TEST_VID.canPlayType = function(type){
+    if (type === 'video/mp4') {
+      return 'maybe';
+    }
+    return '';
+  };
+
+  var canPlayType = Html5.nativeSourceHandler.canPlayType;
+
+  equal(canPlayType('video/mp4'), 'maybe', 'Native source handler reported type support');
+  equal(canPlayType('foo'), '', 'Native source handler handled bad type');
+
+  // Reset test video canPlayType
+  Html5.TEST_VID.canPlayType = origCPT;
+});
+
 test('native source handler canHandleSource', function(){
   var result;
 
@@ -182,4 +203,98 @@ test('native source handler canHandleSource', function(){
 
   // Reset test video canPlayType
   Html5.TEST_VID.canPlayType = origCPT;
+});
+
+if (Html5.supportsNativeTextTracks()) {
+  test('add native textTrack listeners on startup', function() {
+    let adds = [];
+    let rems = [];
+    let tt = {
+      length: 0,
+      addEventListener: (type, fn) => adds.push([type, fn]),
+      removeEventListener: (type, fn) => rems.push([type, fn]),
+    };
+    let el = document.createElement('div');
+    el.textTracks = tt;
+
+    let htmlTech = new Html5({el});
+
+    equal(adds[0][0], 'change', 'change event handler added');
+    equal(adds[1][0], 'addtrack', 'addtrack event handler added');
+    equal(adds[2][0], 'removetrack', 'removetrack event handler added');
+  });
+
+  test('remove all tracks from emulated list on dispose', function() {
+    let adds = [];
+    let rems = [];
+    let tt = {
+      length: 0,
+      addEventListener: (type, fn) => adds.push([type, fn]),
+      removeEventListener: (type, fn) => rems.push([type, fn]),
+    };
+    let el = document.createElement('div');
+    el.textTracks = tt;
+
+    let htmlTech = new Html5({el});
+    htmlTech.dispose();
+
+    equal(adds[0][0], 'change', 'change event handler added');
+    equal(adds[1][0], 'addtrack', 'addtrack event handler added');
+    equal(adds[2][0], 'removetrack', 'removetrack event handler added');
+    equal(rems[0][0], 'change', 'change event handler removed');
+    equal(rems[1][0], 'addtrack', 'addtrack event handler removed');
+    equal(rems[2][0], 'removetrack', 'removetrack event handler removed');
+    equal(adds[0][0], rems[0][0], 'change event handler removed');
+    equal(adds[1][0], rems[1][0], 'addtrack event handler removed');
+    equal(adds[2][0], rems[2][0], 'removetrack event handler removed');
+  });
+}
+
+test('should fire makeup events when a video tag is initialized late', function(){
+  let lateInit = Html5.prototype.handleLateInit_;
+  let triggeredEvents = [];
+  let mockHtml5 = {
+    readyListeners: [],
+    ready(listener){
+      this.readyListeners.push(listener);
+    },
+    triggerReady(){
+      this.readyListeners.forEach(function(listener){
+        listener.call(this);
+      }, this);
+    },
+    trigger(type){
+      triggeredEvents.push(type);
+    },
+    on: function(){},
+    off: function(){}
+  };
+
+  function resetMock() {
+    triggeredEvents = {};
+    mockHtml5.readyListeners = [];
+  }
+
+  function testStates(statesObject, expectedEvents) {
+    lateInit.call(mockHtml5, statesObject);
+    mockHtml5.triggerReady();
+    deepEqual(triggeredEvents, expectedEvents, `wrong events triggered for networkState:${statesObject.networkState} and readyState:${statesObject.readyState || 'no readyState'}`);
+
+    // reset mock
+    triggeredEvents = [];
+    mockHtml5.readyListeners = [];
+  }
+
+  // Network States
+  testStates({ networkState: 0, readyState: 0 }, []);
+  testStates({ networkState: 1, readyState: 0 }, ['loadstart']);
+  testStates({ networkState: 2, readyState: 0 }, ['loadstart']);
+  testStates({ networkState: 3, readyState: 0 }, []);
+
+  // Ready States
+  testStates({ networkState: 1, readyState: 0 }, ['loadstart']);
+  testStates({ networkState: 1, readyState: 1 }, ['loadstart', 'loadedmetadata']);
+  testStates({ networkState: 1, readyState: 2 }, ['loadstart', 'loadedmetadata', 'loadeddata']);
+  testStates({ networkState: 1, readyState: 3 }, ['loadstart', 'loadedmetadata', 'loadeddata', 'canplay']);
+  testStates({ networkState: 1, readyState: 4 }, ['loadstart', 'loadedmetadata', 'loadeddata', 'canplay', 'canplaythrough']);
 });

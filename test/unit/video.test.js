@@ -1,7 +1,6 @@
 import videojs from '../../src/js/video.js';
 import TestHelpers from './test-helpers.js';
 import Player from '../../src/js/player.js';
-import globalOptions from '../../src/js/global-options.js';
 import log from '../../src/js/utils/log.js';
 import document from 'global/document';
 
@@ -22,16 +21,16 @@ test('should return a video player instance', function(){
   var fixture = document.getElementById('qunit-fixture');
   fixture.innerHTML += '<video id="test_vid_id"></video><video id="test_vid_id2"></video>';
 
-  var player = videojs('test_vid_id');
+  var player = videojs('test_vid_id', { techOrder: ['techFaker'] });
   ok(player, 'created player from tag');
   ok(player.id() === 'test_vid_id');
-  ok(Player.players['test_vid_id'] === player, 'added player to global reference');
+  ok(videojs.getPlayers()['test_vid_id'] === player, 'added player to global reference');
 
   var playerAgain = videojs('test_vid_id');
   ok(player === playerAgain, 'did not create a second player from same tag');
 
   var tag2 = document.getElementById('test_vid_id2');
-  var player2 = videojs(tag2);
+  var player2 = videojs(tag2, { techOrder: ['techFaker'] });
   ok(player2.id() === 'test_vid_id2', 'created player from element');
 });
 
@@ -42,9 +41,9 @@ test('should add the value to the languages object', function() {
   data = {'Hello': 'Hola'};
   result = videojs.addLanguage(code, data);
 
-  ok(globalOptions.languages[code], 'should exist');
-  equal(globalOptions.languages['es']['Hello'], 'Hola', 'should match');
-  deepEqual(result['Hello'], globalOptions.languages['es']['Hello'], 'should also match');
+  ok(videojs.options.languages[code], 'should exist');
+  equal(videojs.options.languages['es']['Hello'], 'Hola', 'should match');
+  deepEqual(result['Hello'], videojs.options.languages['es']['Hello'], 'should also match');
 });
 
 test('should add the value to the languages object with lower case lang code', function() {
@@ -54,18 +53,16 @@ test('should add the value to the languages object with lower case lang code', f
   data = {'Hello': 'Guten Tag'};
   result = videojs.addLanguage(code, data);
 
-  ok(globalOptions['languages'][code.toLowerCase()], 'should exist');
-  equal(globalOptions['languages'][code.toLowerCase()]['Hello'], 'Guten Tag', 'should match');
-  deepEqual(result, globalOptions['languages'][code.toLowerCase()], 'should also match');
+  ok(videojs.options['languages'][code.toLowerCase()], 'should exist');
+  equal(videojs.options['languages'][code.toLowerCase()]['Hello'], 'Guten Tag', 'should match');
+  deepEqual(result, videojs.options['languages'][code.toLowerCase()], 'should also match');
 });
 
 test('should expose plugin registry function', function() {
   var pluginName, pluginFunction, player;
 
   pluginName = 'foo';
-  pluginFunction = function(options) {
-    console.log(this);
-  };
+  pluginFunction = function(options) {};
 
   ok(videojs.plugin, 'should exist');
 

@@ -11,10 +11,10 @@
   padding: 0;
   cursor: pointer;
   opacity: 1;
-  border: 2px solid $primary-text;
+  border: 0.06666em solid $primary-foreground-color;
 
   /* Need a slightly gray bg so it can be seen on black backgrounds */
-  @include background-color-with-alpha($primary-bg, $big-play-button--transparency);
+  @include background-color-with-alpha($primary-background-color, $primary-background-transparency);
   @include border-radius(0.3em);
   @include transition(all 0.4s);
 
@@ -28,29 +28,26 @@
 }
 
 // Allow people that hate their poster image to center the big play button.
-.video-js.vjs-big-play-centered .vjs-big-play-button {
+.vjs-big-play-centered .vjs-big-play-button {
   top: 50%;
   left: 50%;
   margin-top: -($big-play-button--height / 2);
   margin-left: -($big-play-button--width / 2);
 }
 
-// Hide if controls are disabled, the video is playing, or native controls are used.
-.video-js.vjs-controls-disabled .vjs-big-play-button,
-.video-js.vjs-has-started .vjs-big-play-button,
-.video-js.vjs-using-native-controls .vjs-big-play-button {
-  display: none;
-}
-
 .video-js:hover .vjs-big-play-button,
 .video-js .vjs-big-play-button:focus {
   outline: 0;
-  border-color: $primary-text;
+  border-color: $primary-foreground-color;
 
-  @include background-color-with-alpha($secondary-bg, 0.75);
+  @include background-color-with-alpha($secondary-background-color, $secondary-background-transparency);
   @include transition(all 0s);
 }
 
+// Hide if controls are disabled, the video is playing, or native controls are used.
+.vjs-controls-disabled .vjs-big-play-button,
+.vjs-has-started .vjs-big-play-button,
+.vjs-using-native-controls .vjs-big-play-button,
 .vjs-error .vjs-big-play-button {
   display: none;
 }

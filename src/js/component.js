@@ -98,12 +98,6 @@ class Component {
     }
   }
 
-  // Temp for ES6 class transition, remove before 5.0
-  init() {
-    // console.log('init called on Component');
-    Component.apply(this, arguments);
-  }
-
   /**
    * Dispose of the component and all child components
    *
@@ -152,19 +146,17 @@ class Component {
    * Deep merge of options objects
    * Whenever a property is an object on both options objects
    * the two properties will be merged using mergeOptions.
-   * This is used for merging options for child components. We
-   * want it to be easy to override individual options on a child
-   * component without having to rewrite all the other default options.
+   *
    * ```js
    *     Parent.prototype.options_ = {
-   *       children: {
+   *       optionSet: {
    *         'childOne': { 'foo': 'bar', 'asdf': 'fdsa' },
    *         'childTwo': {},
    *         'childThree': {}
    *       }
    *     }
    *     newOptions = {
-   *       children: {
+   *       optionSet: {
    *         'childOne': { 'foo': 'baz', 'abc': '123' }
    *         'childTwo': null,
    *         'childFour': {}
@@ -176,7 +168,7 @@ class Component {
    * RESULT
    * ```js
    *     {
-   *       children: {
+   *       optionSet: {
    *         'childOne': { 'foo': 'baz', 'asdf': 'fdsa', 'abc': '123' },
    *         'childTwo': null, // Disabled. Won't be initialized.
    *         'childThree': {},
@@ -217,12 +209,13 @@ class Component {
    * Create the component's DOM element
    *
    * @param  {String=} tagName  Element's node type. e.g. 'div'
-   * @param  {Object=} attributes An object of element attributes that should be set on the element
+   * @param  {Object=} properties An object of properties that should be set
+   * @param  {Object=} attributes An object of attributes that should be set
    * @return {Element}
    * @method createEl
    */
-  createEl(tagName, attributes) {
-    return Dom.createEl(tagName, attributes);
+  createEl(tagName, properties, attributes) {
+    return Dom.createEl(tagName, properties, attributes);
   }
 
   localize(string) {
@@ -329,16 +322,14 @@ class Component {
    *
    *     var myButton = myComponent.addChild('MyButton');
    *     // -> <div class='my-component'><div class="my-button">myButton<div></div>
-   *     // -> myButton === myComonent.children()[0];
+   *     // -> myButton === myComponent.children()[0];
    * ```
    * Pass in options for child constructors and options for children of the child
    * ```js
    *     var myButton = myComponent.addChild('MyButton', {
    *       text: 'Press Me',
-   *       children: {
-   *         buttonChildExample: {
-   *           buttonChildOption: true
-   *         }
+   *       buttonChildExample: {
+   *         buttonChildOption: true
    *       }
    *     });
    * ```
@@ -454,24 +445,29 @@ class Component {
    * ```js
    *     // when an instance of MyComponent is created, all children in options
    *     // will be added to the instance by their name strings and options
-   *     MyComponent.prototype.options_.children = {
+   *     MyComponent.prototype.options_ = {
+   *       children: [
+   *         'myChildComponent'
+   *       ],
    *       myChildComponent: {
    *         myChildOption: true
    *       }
-   *     }
-   * ```
+   *     };
+   *
    *     // Or when creating the component
-   * ```js
    *     var myComp = new MyComponent(player, {
-   *       children: {
-   *         myChildComponent: {
-   *           myChildOption: true
-   *         }
+   *       children: [
+   *         'myChildComponent'
+   *       ],
+   *       myChildComponent: {
+   *         myChildOption: true
    *       }
    *     });
    * ```
-   * The children option can also be an Array of child names or
+   * The children option can also be an array of
    * child options objects (that also include a 'name' key).
+   * This can be used if you have two child components of the
+   * same type that need different options.
    * ```js
    *     var myComp = new MyComponent(player, {
    *       children: [
@@ -479,6 +475,10 @@ class Component {
    *         {
    *           name: 'button',
    *           someOtherOption: true
+   *         },
+   *         {
+   *           name: 'button',
+   *           someOtherOption: false
    *         }
    *       ]
    *     });
@@ -505,6 +505,12 @@ class Component {
         // e.g. options['children']['posterImage'] = false
         if (opts === false) {
           return;
+        }
+
+        // Allow options to be passed as a simple boolean if no configuration
+        // is necessary.
+        if (opts === true) {
+          opts = {};
         }
 
         // We also want to pass the original player options to each component as well so they don't need to
@@ -779,13 +785,13 @@ class Component {
     this.setTimeout(function(){
       let readyQueue = this.readyQueue_;
 
+      // Reset Ready Queue
+      this.readyQueue_ = [];
+
       if (readyQueue && readyQueue.length > 0) {
         readyQueue.forEach(function(fn){
           fn.call(this);
         }, this);
-
-        // Reset Ready Queue
-        this.readyQueue_ = [];
       }
 
       // Allow for using event listeners also
@@ -1257,7 +1263,7 @@ class Component {
   static extend(props) {
     props = props || {};
 
-    log.warn('Component.extend({}) has been deprecated, use videojs.extends(Component, {}) instead');
+    log.warn('Component.extend({}) has been deprecated, use videojs.extend(Component, {}) instead');
 
     // Set up the constructor using the supplied init method
     // or using the init of the parent object

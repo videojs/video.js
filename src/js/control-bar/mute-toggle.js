@@ -6,7 +6,7 @@ import Component from '../component';
 import * as Dom from '../utils/dom.js';
 
 /**
- * A button component for muting the audio 
+ * A button component for muting the audio
  *
  * @param {Player|Object} player
  * @param {Object=} options
@@ -21,12 +21,14 @@ class MuteToggle extends Button {
     this.on(player, 'volumechange', this.update);
 
     // hide mute toggle if the current tech doesn't support volume control
-    if (player.tech && player.tech['featuresVolumeControl'] === false) {
+    if (player.tech_ && player.tech_['featuresVolumeControl'] === false) {
       this.addClass('vjs-hidden');
     }
 
-    this.on(player, 'loadstart', function(){
-      if (player.tech['featuresVolumeControl'] === false) {
+    this.on(player, 'loadstart', function() {
+      this.update(); // We need to update the button to account for a default muted state.
+
+      if (player.tech_['featuresVolumeControl'] === false) {
         this.addClass('vjs-hidden');
       } else {
         this.removeClass('vjs-hidden');

@@ -46,7 +46,7 @@ class TextTrackDisplay extends Component {
     // Should probably be moved to an external track loader when we support
     // tracks that don't need a display.
     player.ready(Fn.bind(this, function() {
-      if (player.tech && player.tech['featuresNativeTextTracks']) {
+      if (player.tech_ && player.tech_['featuresNativeTextTracks']) {
         this.hide();
         return;
       }
@@ -62,12 +62,12 @@ class TextTrackDisplay extends Component {
   }
 
   /**
-   * Toggle display texttracks 
+   * Toggle display texttracks
    *
    * @method toggleDisplay
    */
   toggleDisplay() {
-    if (this.player_.tech && this.player_.tech['featuresNativeTextTracks']) {
+    if (this.player_.tech_ && this.player_.tech_['featuresNativeTextTracks']) {
       this.hide();
     } else {
       this.show();
@@ -87,7 +87,7 @@ class TextTrackDisplay extends Component {
   }
 
   /**
-   * Clear display texttracks 
+   * Clear display texttracks
    *
    * @method clearDisplay
    */
@@ -98,7 +98,7 @@ class TextTrackDisplay extends Component {
   }
 
   /**
-   * Update display texttracks 
+   * Update display texttracks
    *
    * @method updateDisplay
    */
@@ -120,7 +120,7 @@ class TextTrackDisplay extends Component {
   }
 
   /**
-   * Add texttrack to texttrack list 
+   * Add texttrack to texttrack list
    *
    * @param {TextTrackObject} track Texttrack object to be added to list
    * @method updateForTrack
@@ -226,7 +226,7 @@ function constructColor(color, opacity) {
  * @method tryUpdateStyle
  */
 function tryUpdateStyle(el, style, rule) {
-  // 
+  //
   try {
     el.style[style] = rule;
   } catch (e) {}

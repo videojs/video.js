@@ -40,8 +40,11 @@ class DurationDisplay extends Component {
 
     this.contentEl_ = Dom.createEl('div', {
       className: 'vjs-duration-display',
-      innerHTML: `<span class="vjs-control-text">${this.localize('Duration Time')}</span> 0:00`, // label the duration time for screen reader users
-      'aria-live': 'off' // tell screen readers not to automatically read the time as it changes
+      // label the duration time for screen reader users
+      innerHTML: `<span class="vjs-control-text">${this.localize('Duration Time')}</span> 0:00`
+    }, {
+      // tell screen readers not to automatically read the time as it changes
+      'aria-live': 'off'
     });
 
     el.appendChild(this.contentEl_);
@@ -49,7 +52,7 @@ class DurationDisplay extends Component {
   }
 
   /**
-   * Update duration time display   
+   * Update duration time display
    *
    * @method updateContent
    */

@@ -1,6 +1,5 @@
 import Player from '../../src/js/player.js';
 import videojs from '../../src/js/video.js';
-import globalOptions from '../../src/js/global-options.js';
 import * as Dom from '../../src/js/utils/dom.js';
 import * as browser from '../../src/js/utils/browser.js';
 import log from '../../src/js/utils/log.js';
@@ -58,36 +57,36 @@ test('should create player instance that inherits from component and dispose it'
   ok(player.el() === null, 'element disposed');
 });
 
+// technically, all uses of videojs.options should be replaced with
+// Player.prototype.options_ in this file and a equivalent test using
+// videojs.options should be made in video.test.js. Keeping this here
+// until we make that move.
 test('should accept options from multiple sources and override in correct order', function(){
-  // For closure compiler to work, all reference to the prop have to be the same type
-  // As in options['attr'] or options.attr. Compiler will minimize each separately.
-  // Since we're using setAttribute which requires a string, we have to use the string
-  // version of the key for all version.
 
   // Set a global option
-  globalOptions['attr'] = 1;
+  videojs.options.attr = 1;
 
-  var tag0 = TestHelpers.makeTag();
-  var player0 = new Player(tag0);
+  let tag0 = TestHelpers.makeTag();
+  let player0 = new Player(tag0, { techOrder: ['techFaker'] });
 
-  ok(player0.options_['attr'] === 1, 'global option was set');
+  equal(player0.options_.attr, 1, 'global option was set');
   player0.dispose();
 
   // Set a tag level option
-  var tag1 = TestHelpers.makeTag();
-  tag1.setAttribute('attr', 'asdf'); // Attributes must be set as strings
+  let tag2 = TestHelpers.makeTag();
+  tag2.setAttribute('attr', 'asdf'); // Attributes must be set as strings
 
-  var player1 = new Player(tag1);
-  ok(player1.options_['attr'] === 'asdf', 'Tag options overrode global options');
-  player1.dispose();
+  let player2 = new Player(tag2, { techOrder: ['techFaker'] });
+  equal(player2.options_.attr, 'asdf', 'Tag options overrode global options');
+  player2.dispose();
 
   // Set a tag level option
-  var tag2 = TestHelpers.makeTag();
-  tag2.setAttribute('attr', 'asdf');
+  let tag3 = TestHelpers.makeTag();
+  tag3.setAttribute('attr', 'asdf');
 
-  var player2 = new Player(tag2, { 'attr': 'fdsa' });
-  ok(player2.options_['attr'] === 'fdsa', 'Init options overrode tag and global options');
-  player2.dispose();
+  let player3 = new Player(tag3, { techOrder: ['techFaker'], 'attr': 'fdsa' });
+  equal(player3.options_.attr, 'fdsa', 'Init options overrode tag and global options');
+  player3.dispose();
 });
 
 test('should get tag, source, and track settings', function(){
@@ -173,7 +172,6 @@ test('should set the width, height, and aspect ratio via a css class', function(
   };
 
   // Initial state
-  ok(player.styleEl_.parentNode === player.el(), 'player has a style element');
   ok(!getStyleText(player.styleEl_), 'style element should be empty when the player is given no dimensions');
 
   // Set only the width
@@ -209,7 +207,7 @@ test('should wrap the original tag in the player div', function(){
   container.appendChild(tag);
   fixture.appendChild(container);
 
-  var player = new Player(tag);
+  var player = new Player(tag, { techOrder: ['techFaker'] });
   var el = player.el();
 
   ok(el.parentNode === container, 'player placed at same level as tag');
@@ -222,7 +220,7 @@ test('should wrap the original tag in the player div', function(){
 test('should set and update the poster value', function(){
   var tag, poster, updatedPoster, player;
 
-  poster = 'http://example.com/poster.jpg';
+  poster = '#';
   updatedPoster = 'http://example.com/updated-poster.jpg';
 
   tag = TestHelpers.makeTag();
@@ -255,7 +253,7 @@ test('should hide the poster when play is called', function() {
   player.play();
   equal(player.hasStarted(), true, 'the show poster flag is false after play');
 
-  player.tech.trigger('loadstart');
+  player.tech_.trigger('loadstart');
   equal(player.hasStarted(),
         false,
         'the resource selection algorithm sets the show poster flag to true');
@@ -285,7 +283,7 @@ test('should be able to initialize player twice on the same tag using string ref
   var fixture = document.getElementById('qunit-fixture');
   fixture.appendChild(videoTag);
 
-  var player = videojs(videoTag.id);
+  var player = videojs(videoTag.id, { techOrder: ['techFaker'] });
   ok(player, 'player is created');
   player.dispose();
 
@@ -294,7 +292,7 @@ test('should be able to initialize player twice on the same tag using string ref
   fixture.appendChild(videoTag);
 
   //here we receive cached version instead of real
-  player = videojs(videoTag.id);
+  player = videojs(videoTag.id, { techOrder: ['techFaker'] });
   //here it triggers error, because player was destroyed already after first dispose
   player.dispose();
 });
@@ -417,6 +415,32 @@ test('should allow for tracking when native controls are used', function(){
   player.dispose();
 });
 
+test('make sure that controls listeners do not get added too many times', function(){
+  var player = TestHelpers.makePlayer({});
+  var listeners = 0;
+
+  player.addTechControlsListeners_ = function() {
+    listeners++;
+  };
+
+  // Make sure native controls is false before starting test
+  player.usingNativeControls(false);
+
+  player.usingNativeControls(true);
+
+  player.controls(true);
+
+  equal(listeners, 0, 'addTechControlsListeners_ should not have gotten called yet');
+
+  player.usingNativeControls(false);
+  player.controls(false);
+
+  player.controls(true);
+  equal(listeners, 1, 'addTechControlsListeners_ should have gotten called once');
+
+  player.dispose();
+});
+
 // test('should use custom message when encountering an unsupported video type',
 //     function() {
 //   videojs.options['notSupportedMessage'] = 'Video no go <a href="">link</a>';
@@ -430,7 +454,7 @@ test('should allow for tracking when native controls are used', function(){
 //   fixture.innerHTML += html;
 
 //   var tag = document.getElementById('example_1');
-//   var player = new Player(tag);
+//   var player = new Player(tag, { techOrder: ['techFaker'] });
 
 //   var incompatibilityMessage = player.el().getElementsByTagName('p')[0];
 //   // ie8 capitalizes tag names
@@ -447,7 +471,7 @@ test('should register players with generated ids', function(){
   video.className = 'vjs-default-skin video-js';
   fixture.appendChild(video);
 
-  player = new Player(video);
+  player = new Player(video, { techOrder: ['techFaker'] });
   id = player.el().id;
 
   equal(player.el().id, player.id(), 'the player and element ids are equal');
@@ -464,9 +488,9 @@ test('should not add multiple first play events despite subsequent loads', funct
   });
 
   // Checking to make sure onLoadStart removes first play listener before adding a new one.
-  player.tech.trigger('loadstart');
-  player.tech.trigger('loadstart');
-  player.tech.trigger('play');
+  player.tech_.trigger('loadstart');
+  player.tech_.trigger('loadstart');
+  player.tech_.trigger('play');
 });
 
 test('should fire firstplay after resetting the player', function() {
@@ -478,23 +502,23 @@ test('should fire firstplay after resetting the player', function() {
   });
 
   // init firstplay listeners
-  player.tech.trigger('loadstart');
-  player.tech.trigger('play');
+  player.tech_.trigger('loadstart');
+  player.tech_.trigger('play');
   ok(fpFired, 'First firstplay fired');
 
   // reset the player
-  player.tech.trigger('loadstart');
+  player.tech_.trigger('loadstart');
   fpFired = false;
-  player.tech.trigger('play');
+  player.tech_.trigger('play');
   ok(fpFired, 'Second firstplay fired');
 
   // the play event can fire before the loadstart event.
   // in that case we still want the firstplay even to fire.
-  player.tech.paused = function(){ return false; };
+  player.tech_.paused = function(){ return false; };
   fpFired = false;
   // reset the player
-  player.tech.trigger('loadstart');
-  // player.tech.trigger('play');
+  player.tech_.trigger('loadstart');
+  // player.tech_.trigger('play');
   ok(fpFired, 'Third firstplay fired');
 });
 
@@ -503,14 +527,14 @@ test('should remove vjs-has-started class', function(){
 
   var player = TestHelpers.makePlayer({});
 
-  player.tech.trigger('loadstart');
-  player.tech.trigger('play');
+  player.tech_.trigger('loadstart');
+  player.tech_.trigger('play');
   ok(player.el().className.indexOf('vjs-has-started') !== -1, 'vjs-has-started class added');
 
-  player.tech.trigger('loadstart');
+  player.tech_.trigger('loadstart');
   ok(player.el().className.indexOf('vjs-has-started') === -1, 'vjs-has-started class removed');
 
-  player.tech.trigger('play');
+  player.tech_.trigger('play');
   ok(player.el().className.indexOf('vjs-has-started') !== -1, 'vjs-has-started class added again');
 });
 
@@ -519,18 +543,18 @@ test('should add and remove vjs-ended class', function() {
 
   var player = TestHelpers.makePlayer({});
 
-  player.tech.trigger('loadstart');
-  player.tech.trigger('play');
-  player.tech.trigger('ended');
+  player.tech_.trigger('loadstart');
+  player.tech_.trigger('play');
+  player.tech_.trigger('ended');
   ok(player.el().className.indexOf('vjs-ended') !== -1, 'vjs-ended class added');
 
-  player.tech.trigger('play');
+  player.tech_.trigger('play');
   ok(player.el().className.indexOf('vjs-ended') === -1, 'vjs-ended class removed');
 
-  player.tech.trigger('ended');
+  player.tech_.trigger('ended');
   ok(player.el().className.indexOf('vjs-ended') !== -1, 'vjs-ended class re-added');
 
-  player.tech.trigger('loadstart');
+  player.tech_.trigger('loadstart');
   ok(player.el().className.indexOf('vjs-ended') === -1, 'vjs-ended class removed');
 });
 
@@ -697,7 +721,7 @@ test('pause is called when player ended event is fired and player is not paused'
   player.pause = function() {
     pauses++;
   };
-  player.tech.trigger('ended');
+  player.tech_.trigger('ended');
   equal(pauses, 1, 'pause was called');
 });
 
@@ -711,7 +735,7 @@ test('pause is not called if the player is paused and ended is fired', function(
   player.pause = function() {
     pauses++;
   };
-  player.tech.trigger('ended');
+  player.tech_.trigger('ended');
   equal(pauses, 0, 'pause was not called when ended fired');
 });
 
@@ -739,14 +763,14 @@ test('should be scrubbing while seeking', function(){
 });
 
 test('should throw on startup no techs are specified', function() {
-  const techOrder = globalOptions.techOrder;
+  const techOrder = videojs.options.techOrder;
 
-  globalOptions.techOrder = null;
+  videojs.options.techOrder = null;
   q.throws(function() {
     videojs(TestHelpers.makeTag());
   }, 'a falsey techOrder should throw');
 
-  globalOptions.techOrder = techOrder;
+  videojs.options.techOrder = techOrder;
 });
 
 test('should have a sensible toJSON that is equivalent to player.options', function() {
@@ -799,4 +823,13 @@ expect(3);
   strictEqual(player.localize('Error'), 'Problem', 'Used primary code localisation');
   player.language('en-GB');
   strictEqual(player.localize('Good'), 'Brilliant', 'Ignored case');
+});
+
+test('should return correct values for canPlayType', function(){
+  var player = TestHelpers.makePlayer();
+
+  equal(player.canPlayType('video/mp4'), 'maybe', 'player can play mp4 files');
+  equal(player.canPlayType('video/unsupported-format'), '', 'player can not play unsupported files');
+
+  player.dispose();
 });

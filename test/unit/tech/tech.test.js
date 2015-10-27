@@ -2,7 +2,8 @@ var noop = function() {}, clock, oldTextTracks;
 
 import Tech from '../../../src/js/tech/tech.js';
 import { createTimeRange } from '../../../src/js/utils/time-ranges.js';
-import extendsFn from '../../../src/js/extends.js';
+import extendFn from '../../../src/js/extend.js';
+import MediaError from '../../../src/js/media-error.js';
 
 q.module('Media Tech', {
   'setup': function() {
@@ -104,7 +105,7 @@ test('should add the source handler interface to a tech', function(){
   var sourceB = { src: 'no-support', type: 'no-support' };
 
   // Define a new tech class
-  var MyTech = extendsFn(Tech);
+  var MyTech = extendFn(Tech);
 
   // Extend Tech with source handlers
   Tech.withSourceHandlers(MyTech);
@@ -131,6 +132,12 @@ test('should add the source handler interface to a tech', function(){
 
   // Create source handlers
   var handlerOne = {
+    canPlayType: function(type){
+      if (type !=='no-support') {
+        return 'probably';
+      }
+      return '';
+    },
     canHandleSource: function(source){
       if (source.type !=='no-support') {
         return 'probably';
@@ -145,6 +152,9 @@ test('should add the source handler interface to a tech', function(){
   };
 
   var handlerTwo = {
+    canPlayType: function(type){
+      return ''; // no support
+    },
     canHandleSource: function(source){
       return ''; // no support
     },
@@ -163,6 +173,10 @@ test('should add the source handler interface to a tech', function(){
   strictEqual(MyTech.selectSourceHandler(sourceA), handlerOne, 'handlerOne was selected to handle the valid source');
   strictEqual(MyTech.selectSourceHandler(sourceB), null, 'no handler was selected to handle the invalid source');
 
+  // Test canPlayType return values
+  strictEqual(MyTech.canPlayType(sourceA.type), 'probably', 'the Tech returned probably for the valid source');
+  strictEqual(MyTech.canPlayType(sourceB.type), '', 'the Tech returned an empty string for the invalid source');
+
   // Test canPlaySource return values
   strictEqual(MyTech.canPlaySource(sourceA), 'probably', 'the Tech returned probably for the valid source');
   strictEqual(MyTech.canPlaySource(sourceB), '', 'the Tech returned an empty string for the invalid source');
@@ -180,7 +194,7 @@ test('should add the source handler interface to a tech', function(){
 
 test('should handle unsupported sources with the source handler API', function(){
   // Define a new tech class
-  var MyTech = extendsFn(Tech);
+  var MyTech = extendFn(Tech);
   // Extend Tech with source handlers
   Tech.withSourceHandlers(MyTech);
   // Create an instance of Tech
@@ -195,6 +209,24 @@ test('should handle unsupported sources with the source handler API', function()
   ok(usedNative, 'native source handler was used when an unsupported source was set');
 });
 
+test('should allow custom error events to be set', function() {
+  let tech = new Tech();
+  let errors = [];
+  tech.on('error', function() {
+    errors.push(tech.error());
+  });
+
+  equal(tech.error(), null, 'error is null by default');
+
+  tech.error(new MediaError(1));
+  equal(errors.length, 1, 'triggered an error event');
+  equal(errors[0].code, 1, 'set the proper code');
+
+  tech.error(2);
+  equal(errors.length, 2, 'triggered an error event');
+  equal(errors[1].code, 2, 'wrapped the error code');
+});
+
 test('should track whether a video has played', function() {
   let tech = new Tech();
 
@@ -204,7 +236,7 @@ test('should track whether a video has played', function() {
 });
 
 test('delegates seekable to the source handler', function(){
-  let MyTech = extendsFn(Tech, {
+  let MyTech = extendFn(Tech, {
     seekable: function() {
       throw new Error('You should not be calling me!');
     }
@@ -220,6 +252,9 @@ test('delegates seekable to the source handler', function(){
   };
 
   MyTech.registerSourceHandler({
+    canPlayType: function() {
+      return true;
+    },
     canHandleSource: function() {
       return true;
     },

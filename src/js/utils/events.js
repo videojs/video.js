@@ -236,7 +236,9 @@ export function fixEvent(event) {
     for (var key in old) {
       // Safari 6.0.3 warns you if you try to copy deprecated layerX/Y
       // Chrome warns you if you try to copy deprecated keyboardEvent.keyLocation
-      if (key !== 'layerX' && key !== 'layerY' && key !== 'keyLocation') {
+      // and webkitMovementX/Y
+      if (key !== 'layerX' && key !== 'layerY' && key !== 'keyLocation' &&
+          key !== 'webkitMovementX' && key !== 'webkitMovementY') {
         // Chrome 32+ warns if you try to copy deprecated returnValue, but
         // we still want to if preventDefault isn't supported (IE8).
         if (!(key === 'returnValue' && old.preventDefault)) {
@@ -263,6 +265,7 @@ export function fixEvent(event) {
         old.preventDefault();
       }
       event.returnValue = false;
+      old.returnValue = false;
       event.defaultPrevented = true;
     };
 
@@ -274,6 +277,7 @@ export function fixEvent(event) {
         old.stopPropagation();
       }
       event.cancelBubble = true;
+      old.cancelBubble = true;
       event.isPropagationStopped = returnTrue;
     };
 

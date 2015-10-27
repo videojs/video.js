@@ -34,8 +34,11 @@ class RemainingTimeDisplay extends Component {
 
     this.contentEl_ = Dom.createEl('div', {
       className: 'vjs-remaining-time-display',
-      innerHTML: `<span class="vjs-control-text">${this.localize('Remaining Time')}</span> -0:00`, // label the remaining time for screen reader users
-      'aria-live': 'off' // tell screen readers not to automatically read the time as it changes
+      // label the remaining time for screen reader users
+      innerHTML: `<span class="vjs-control-text">${this.localize('Remaining Time')}</span> -0:00`,
+    }, {
+      // tell screen readers not to automatically read the time as it changes
+      'aria-live': 'off'
     });
 
     el.appendChild(this.contentEl_);

@@ -11,6 +11,7 @@ import * as Fn from '../utils/fn.js';
 import log from '../utils/log.js';
 import { createTimeRange } from '../utils/time-ranges.js';
 import { bufferedPercent } from '../utils/buffer.js';
+import MediaError from '../media-error.js';
 import window from 'global/window';
 import document from 'global/document';
 
@@ -52,53 +53,18 @@ class Tech extends Component {
       this.manualTimeUpdatesOn();
     }
 
-    this.initControlsListeners();
-
     if (options.nativeCaptions === false || options.nativeTextTracks === false) {
       this.featuresNativeTextTracks = false;
     }
 
     if (!this.featuresNativeTextTracks) {
-      this.emulateTextTracks();
+      this.on('ready', this.emulateTextTracks);
     }
 
     this.initTextTrackListeners();
 
     // Turn on component tap events
     this.emitTapEvents();
-  }
-
-  /**
-   * Set up click and touch listeners for the playback element
-   * On desktops, a click on the video itself will toggle playback,
-   * on a mobile device a click on the video toggles controls.
-   * (toggling controls is done by toggling the user state between active and
-   * inactive)
-   * A tap can signal that a user has become active, or has become inactive
-   * e.g. a quick tap on an iPhone movie should reveal the controls. Another
-   * quick tap should hide them again (signaling the user is in an inactive
-   * viewing state)
-   * In addition to this, we still want the user to be considered inactive after
-   * a few seconds of inactivity.
-   * Note: the only part of iOS interaction we can't mimic with this setup
-   * is a touch and hold on the video element counting as activity in order to
-   * keep the controls showing, but that shouldn't be an issue. A touch and hold on
-   * any controls will still keep the user active
-   *
-   * @method initControlsListeners
-   */
-  initControlsListeners() {
-    // if we're loading the playback object after it has started loading or playing the
-    // video (often with autoplay on) then the loadstart event has already fired and we
-    // need to fire it manually because many things rely on it.
-    // Long term we might consider how we would do this for other events like 'canplay'
-    // that may also have fired.
-    this.ready(function(){
-      if (this.networkState && this.networkState() > 0) {
-        this.trigger('loadstart');
-      }
-    // Allow the tech ready event to handle synchronisity
-    }, true);
   }
 
   /* Fallbacks for unsupported event types
@@ -249,12 +215,43 @@ class Tech extends Component {
    * @method dispose
    */
   dispose() {
+    // clear out text tracks because we can't reuse them between techs
+    let textTracks = this.textTracks();
+
+    if (textTracks) {
+      let i = textTracks.length;
+      while(i--) {
+        this.removeRemoteTextTrack(textTracks[i]);
+      }
+    }
+
     // Turn off any manual progress or timeupdate tracking
     if (this.manualProgress) { this.manualProgressOff(); }
 
     if (this.manualTimeUpdates) { this.manualTimeUpdatesOff(); }
 
     super.dispose();
+  }
+
+  /**
+   * When invoked without an argument, returns a MediaError object
+   * representing the current error state of the player or null if
+   * there is no error. When invoked with an argument, set the current
+   * error state of the player.
+   * @param {MediaError=} err    Optional an error object
+   * @return {MediaError}        the current error object or null
+   * @method error
+   */
+  error(err) {
+    if (err !== undefined) {
+      if (err instanceof MediaError) {
+        this.error_ = err;
+      } else {
+        this.error_ = new MediaError(err);
+      }
+      this.trigger('error');
+    }
+    return this.error_;
   }
 
   /**
@@ -427,6 +424,19 @@ class Tech extends Component {
    */
   setPoster() {}
 
+  /*
+   * Check if the tech can support the given type
+   *
+   * The base tech does not support any type, but source handlers might
+   * overwrite this.
+   *
+   * @param  {String} type    The mimetype to check
+   * @return {String}         'probably', 'maybe', or '' (empty string)
+   */
+  canPlayType() {
+    return '';
+  }
+
 }
 
 /*
@@ -499,6 +509,26 @@ Tech.withSourceHandlers = function(_Tech){
     }
 
     handlers.splice(index, 0, handler);
+  };
+
+  /*
+   * Check if the tech can support the given type
+   * @param  {String} type    The mimetype to check
+   * @return {String}         'probably', 'maybe', or '' (empty string)
+   */
+  _Tech.canPlayType = function(type){
+    let handlers = _Tech.sourceHandlers || [];
+    let can;
+
+    for (let i = 0; i < handlers.length; i++) {
+      can = handlers[i].canPlayType(type);
+
+      if (can) {
+        return can;
+      }
+    }
+
+    return '';
   };
 
    /*
