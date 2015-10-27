@@ -24,7 +24,7 @@ q.test('should create the expected element', function(assert) {
   assert.expect(2 + classes.length);
   assert.strictEqual(this.btn.el().tagName.toLowerCase(), 'button', 'is a <button>');
   assert.strictEqual(this.btn.el().querySelector('.vjs-control-text').innerHTML, 'Close');
-  TestHelpers.assertElHasClasses(assert, this.modal, classes);
+  TestHelpers.assertElHasClasses(assert, this.btn, classes);
 });
 
 q.test('should allow setting the controlText_ property as an option', function(assert) {
