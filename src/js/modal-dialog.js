@@ -14,6 +14,17 @@ const MODAL_CLASS_NAME = 'vjs-modal-dialog';
 const ESC = 27;
 
 /**
+ * Whether or not a value is a non-empty string.
+ *
+ * @function nonEmptyString
+ * @param    {Mixed} value
+ * @return   {Boolean}
+ */
+function nonEmptyString(value) {
+  return typeof value === 'string' && /\S/.test(value);
+}
+
+/**
  * The `ModalDialog` displays over the video and its controls, which blocks
  * interaction with the player until it is closed.
  *
@@ -33,12 +44,15 @@ class ModalDialog extends Component {
    * @param  {Mixed} [options.content=undefined]
    *         Provide customized content for this modal.
    *
+   * @param  {String} [options.description]
+   *         A text description for the modal, primarily for accessibility.
+   *
    * @param  {Boolean} [options.fillAlways=false]
    *         Normally, modals are automatically filled only the first time
    *         they open. This tells the modal to refresh its content
    *         every time it opens.
    *
-   * @param  {String} [options.label='']
+   * @param  {String} [options.label]
    *         A text label for the modal, primarily for accessibility.
    *
    * @param  {Boolean} [options.temporary=true]
@@ -63,7 +77,17 @@ class ModalDialog extends Component {
     // (not the UI elements like the close button).
     this.contentEl_ = Dom.createEl('div', {
       className: `${MODAL_CLASS_NAME}-content`
+    }, {
+      role: 'document'
     });
+
+    this.descEl_ = Dom.createEl('p', {
+      className: `${MODAL_CLASS_NAME}-description vjs-offscreen`,
+      id: this.el().getAttribute('aria-describedby')
+    });
+
+    Dom.textContent(this.descEl_, this.description());
+    this.el_.appendChild(this.descEl_);
     this.el_.appendChild(this.contentEl_);
   }
 
@@ -78,8 +102,10 @@ class ModalDialog extends Component {
       className: this.buildCSSClass(),
       tabIndex: -1
     }, {
-      'aria-role': 'dialog',
-      'aria-label': this.options_.label || ''
+      'aria-describedby': `${this.id()}_description`,
+      'aria-hidden': 'true',
+      'aria-label': this.label(),
+      role: 'dialog'
     });
   }
 
@@ -104,6 +130,32 @@ class ModalDialog extends Component {
     if (e.which === ESC && this.closeable()) {
       this.close();
     }
+  }
+
+  /**
+   * Returns the label string for this modal. Primarily used for accessibility.
+   *
+   * @return {String}
+   */
+  label() {
+    return this.options_.label || this.localize('Modal Window');
+  }
+
+  /**
+   * Returns the description string for this modal. Primarily used for
+   * accessibility.
+   *
+   * @return {String}
+   */
+  description() {
+    let desc = this.options_.description || this.localize('This is a modal window.');
+
+    // Append a universal closeability message if the modal is closeable.
+    if (this.closeable()) {
+      desc += ' ' + this.localize('This modal can be closed by pressing the Escape key or activating the close button.');
+    }
+
+    return desc;
   }
 
   /**
@@ -139,6 +191,7 @@ class ModalDialog extends Component {
 
       player.controls(false);
       this.show();
+      this.el().setAttribute('aria-hidden', 'false');
       this.trigger('modalopen');
       this.hasBeenOpened_ = true;
     }
@@ -184,6 +237,7 @@ class ModalDialog extends Component {
 
       player.controls(true);
       this.hide();
+      this.el().setAttribute('aria-hidden', 'true');
       this.trigger('modalclose');
 
       if (this.options_.temporary) {
@@ -352,10 +406,11 @@ class ModalDialog extends Component {
       content = content.call(this, this.contentEl());
     }
 
-    if (typeof content === 'string' && /\S/.test(content)) {
+    if (nonEmptyString(content)) {
       return content;
     }
 
+    // DOM element and array handling.
     content = (Array.isArray(content) ? content : [content]).filter(Dom.isEl);
     return content.length ? content : null;
   }

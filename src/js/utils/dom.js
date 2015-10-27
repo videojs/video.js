@@ -59,6 +59,22 @@ export function createEl(tagName='div', properties={}, attributes={}){
 }
 
 /**
+ * Injects text into an element, replacing any existing contents entirely.
+ *
+ * @param  {Element} el
+ * @param  {String} text
+ * @return {Element}
+ * @function textContent
+ */
+export function textContent(el, text) {
+  if (typeof el.textContent === 'undefined') {
+    el.innerText = text;
+  } else {
+    el.textContent = text;
+  }
+}
+
+/**
  * Insert an element as the first child node of another
  *
  * @param  {Element} child   Element to insert

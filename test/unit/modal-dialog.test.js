@@ -22,26 +22,57 @@ q.module('ModalDialog', {
 });
 
 q.test('should create the expected element', function(assert) {
-  let classes = [
-    'vjs-modal-dialog',
-    'vjs-hidden'
-  ];
+  let elAssertions = TestHelpers.assertEl(assert, this.el, {
+    tagName: 'div',
+    classes: [
+      'vjs-modal-dialog',
+      'vjs-hidden'
+    ],
+    attrs: {
+      'aria-describedby': this.modal.descEl_.id,
+      'aria-hidden': 'true',
+      'aria-label': this.modal.label(),
+      'role': 'dialog'
+    },
+    props: {
+      tabIndex: -1
+    }
+  });
 
-  assert.expect(4 + classes.length);
-  assert.strictEqual(this.el.tagName.toLowerCase(), 'div', 'el is a <div>');
-  assert.strictEqual(this.el.tabIndex, -1, 'el has -1 tabindex');
-  assert.strictEqual(this.el.getAttribute('aria-role'), 'dialog', 'el has aria-role="dialog"');
-  assert.strictEqual(this.el.getAttribute('aria-label'), '', 'el has aria-role="" by default');
-  TestHelpers.assertElHasClasses(assert, this.modal, classes);
+  assert.expect(elAssertions.count);
+  elAssertions();
+});
+
+q.test('should create the expected description element', function(assert) {
+  let elAssertions = TestHelpers.assertEl(assert, this.modal.descEl_, {
+    tagName: 'p',
+    innerHTML: this.modal.description(),
+    classes: [
+      'vjs-modal-dialog-description',
+      'vjs-offscreen'
+    ],
+    attrs: {
+      id: this.el.getAttribute('aria-describedby')
+    }
+  });
+
+  assert.expect(elAssertions.count);
+  elAssertions();
 });
 
 q.test('should create the expected contentEl', function(assert) {
-  var contentEl = this.modal.contentEl();
+  let elAssertions = TestHelpers.assertEl(assert, this.modal.contentEl(), {
+    tagName: 'div',
+    classes: [
+      'vjs-modal-dialog-content'
+    ],
+    props: {
+      parentNode: this.el
+    }
+  });
 
-  assert.expect(3);
-  assert.strictEqual(contentEl.parentNode, this.el, 'contentEl is a child of el');
-  assert.strictEqual(contentEl.tagName.toLowerCase(), 'div', 'contentEl is a <div>');
-  assert.strictEqual(contentEl.className.trim(), 'vjs-modal-dialog-content', 'has "vjs-modal-dialog-content" class');
+  assert.expect(elAssertions.count);
+  elAssertions();
 });
 
 q.test('should create a close button by default', function(assert) {

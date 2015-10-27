@@ -15,16 +15,18 @@ q.module('CloseButton', {
 });
 
 q.test('should create the expected element', function(assert) {
-  let classes = [
-    'vjs-button',
-    'vjs-close-button',
-    'vjs-control'
-  ];
+  let elAssertions = TestHelpers.assertEl(assert, this.btn.el(), {
+    tagName: 'button',
+    classes: [
+      'vjs-button',
+      'vjs-close-button',
+      'vjs-control'
+    ]
+  });
 
-  assert.expect(2 + classes.length);
-  assert.strictEqual(this.btn.el().tagName.toLowerCase(), 'button', 'is a <button>');
+  assert.expect(elAssertions.count + 1);
+  elAssertions();
   assert.strictEqual(this.btn.el().querySelector('.vjs-control-text').innerHTML, 'Close');
-  TestHelpers.assertElHasClasses(assert, this.btn, classes);
 });
 
 q.test('should allow setting the controlText_ property as an option', function(assert) {
