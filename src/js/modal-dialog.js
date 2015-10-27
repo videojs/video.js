@@ -250,12 +250,20 @@ class ModalDialog extends Component {
       let closeable = this.closeable_ = !!value;
       let close = this.getChild('closeButton');
 
-      if (closeable) {
-        if (!close) {
-          close = this.addChild('closeButton');
-        }
+      // If this is being made closeable and has no close button, add one.
+      if (closeable && !close) {
+
+        // The close button should be a child of the modal - not its
+        // content element, so temporarily change the content element.
+        let temp = this.contentEl_;
+        this.contentEl_ = this.el_;
+        close = this.addChild('closeButton');
+        this.contentEl_ = temp;
         this.on(close, 'close', this.close);
-      } else if (close) {
+      }
+
+      // If this is being made uncloseable and has a close button, remove it.
+      if (!closeable && close) {
         this.off(close, 'close', this.close);
         this.removeChild(close);
         close.dispose();
@@ -357,7 +365,6 @@ class ModalDialog extends Component {
  * @private
  */
 ModalDialog.prototype.options_ = {
-  children: ['closeButton'],
   temporary: true
 };
 
