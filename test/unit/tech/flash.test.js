@@ -135,6 +135,16 @@ test('should have the source handler interface', function() {
   ok(Flash.registerSourceHandler, 'has the registerSourceHandler function');
 });
 
+test('canPlayType should select the correct types to play', function () {
+  let canPlayType = Flash.nativeSourceHandler.canPlayType;
+
+  equal(canPlayType('video/flv'), 'maybe', 'should be able to play FLV files');
+  equal(canPlayType('video/x-flv'), 'maybe', 'should be able to play x-FLV files');
+  equal(canPlayType('video/mp4'), 'maybe', 'should be able to play MP4 files');
+  equal(canPlayType('video/m4v'), 'maybe', 'should be able to play M4V files');
+  equal(canPlayType('video/ogg'), '', 'should return empty string if it can not play the video');
+});
+
 test('canHandleSource should be able to work with src objects without a type', function () {
   let canHandleSource = Flash.nativeSourceHandler.canHandleSource;
 

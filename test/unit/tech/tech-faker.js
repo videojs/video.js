@@ -50,6 +50,7 @@ class TechFaker extends Tech {
 
   // Support everything except for "video/unsupported-format"
   static isSupported() { return true; }
+  static canPlayType(type) { return (type !== 'video/unsupported-format' ? 'maybe' : ''); }
   static canPlaySource(srcObj) { return srcObj.type !== 'video/unsupported-format'; }
 }
 

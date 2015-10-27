@@ -424,6 +424,19 @@ class Tech extends Component {
    */
   setPoster() {}
 
+  /*
+   * Check if the tech can support the given type
+   *
+   * The base tech does not support any type, but source handlers might
+   * overwrite this.
+   *
+   * @param  {String} type    The mimetype to check
+   * @return {String}         'probably', 'maybe', or '' (empty string)
+   */
+  canPlayType() {
+    return '';
+  }
+
 }
 
 /*
@@ -496,6 +509,26 @@ Tech.withSourceHandlers = function(_Tech){
     }
 
     handlers.splice(index, 0, handler);
+  };
+
+  /*
+   * Check if the tech can support the given type
+   * @param  {String} type    The mimetype to check
+   * @return {String}         'probably', 'maybe', or '' (empty string)
+   */
+  _Tech.canPlayType = function(type){
+    let handlers = _Tech.sourceHandlers || [];
+    let can;
+
+    for (let i = 0; i < handlers.length; i++) {
+      can = handlers[i].canPlayType(type);
+
+      if (can) {
+        return can;
+      }
+    }
+
+    return '';
   };
 
    /*
