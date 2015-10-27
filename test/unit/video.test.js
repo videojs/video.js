@@ -70,8 +70,8 @@ test('should expose plugin registry function', function() {
 
   player = TestHelpers.makePlayer();
 
-  ok(player.foo, 'should exist');
-  equal(player.foo, pluginFunction, 'should be equal');
+  ok(player[pluginName], 'should exist');
+  equal(typeof player[pluginName], 'function', 'should be equal');
 });
 
 test('should expose options and players properties for backward-compatibility', function() {
