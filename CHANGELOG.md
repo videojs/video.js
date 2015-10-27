@@ -7,6 +7,7 @@ CHANGELOG
 * @forbesjo updated karma to use all installed browsers for unit tests ([view](https://github.com/videojs/video.js/pull/2708))
 * @forbesjo removed android/ios tests to increase build stability ([view](https://github.com/videojs/video.js/pull/2739))
 * @nickygerritsen added canPlayType method to player ([view](https://github.com/videojs/video.js/pull/2709))
+* @gkatsev fixes track tests and ignored empty properties in tracks converter ([view](https://github.com/videojs/video.js/pull/2744))
 
 --------------------
 
