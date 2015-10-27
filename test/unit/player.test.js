@@ -826,17 +826,10 @@ expect(3);
 });
 
 test('should return correct values for canPlayType', function(){
-  var tag = TestHelpers.makeTag();
-  var container = document.createElement('div');
-  var fixture = document.getElementById('qunit-fixture');
+  var player = TestHelpers.makePlayer();
 
-  container.appendChild(tag);
-  fixture.appendChild(container);
-
-  var player = new Player(tag, { techOrder: ['techFaker'] });
-
-  ok(player.canPlayType('video/mp4') === 'maybe', 'player can play mp4 files');
-  ok(player.canPlayType('video/unsupported-format') === '', 'player can not play unsupported files');
+  equal(player.canPlayType('video/mp4'), 'maybe', 'player can play mp4 files');
+  equal(player.canPlayType('video/unsupported-format'), '', 'player can not play unsupported files');
 
   player.dispose();
 });

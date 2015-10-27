@@ -1650,7 +1650,7 @@ class Player extends Component {
     let can;
 
     // Loop through each playback technology in the options order
-    for (var i=0,j=this.options_.techOrder;i<j.length;i++) {
+    for (let i = 0, j = this.options_.techOrder; i < j.length; i++) {
       let techName = toTitleCase(j[i]);
       let tech = Component.getComponent(techName);
 
