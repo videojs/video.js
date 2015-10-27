@@ -134,7 +134,7 @@ test('should add the source handler interface to a tech', function(){
   var handlerOne = {
     canPlayType: function(type){
       if (type !=='no-support') {
-	return 'probably';
+        return 'probably';
       }
       return '';
     },

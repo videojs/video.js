@@ -524,7 +524,7 @@ Tech.withSourceHandlers = function(_Tech){
       can = handlers[i].canPlayType(type);
 
       if (can) {
-	return can;
+        return can;
       }
     }
 

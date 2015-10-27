@@ -1656,17 +1656,17 @@ class Player extends Component {
 
       // Check if the current tech is defined before continuing
       if (!tech) {
-	log.error(`The "${techName}" tech is undefined. Skipped browser support check for that tech.`);
-	continue;
+        log.error(`The "${techName}" tech is undefined. Skipped browser support check for that tech.`);
+        continue;
       }
 
       // Check if the browser supports this technology
       if (tech.isSupported()) {
-	can = tech.canPlayType(type);
+        can = tech.canPlayType(type);
 
-	if (can) {
-	  return can;
-	}
+        if (can) {
+          return can;
+        }
       }
     }
 
