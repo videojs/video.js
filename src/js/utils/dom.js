@@ -470,30 +470,27 @@ export function normalizeContent(content) {
 }
 
 /**
- * Normalizes and inserts content into an element.
+ * Normalizes and appends content to an element.
  *
- * @function insertContent
- * @param    {Element} el
- * @param    {String|Element|Array|Function} content
- * @param    {Boolean} [append=false]
- * @return   {Element}
- */
-export function insertContent(el, content, append=false) {
-  if (!append) {
-    emptyEl(el);
-  }
-  normalizeContent(content).forEach(node => el.appendChild(node));
-  return el;
-}
-
-/**
- * Normalizes and inserts content into an element.
- *
- * @function insertContent
+ * @function appendContent
  * @param    {Element} el
  * @param    {String|Element|Array|Function} content
  * @return   {Element}
  */
 export function appendContent(el, content) {
-  return insertContent(el, content, true);
+  normalizeContent(content).forEach(node => el.appendChild(node));
+  return el;
+}
+
+/**
+ * Normalizes and inserts content into an element; this is identical to
+ * `appendContent()`, except it empties the element first.
+ *
+ * @function insertContent
+ * @param    {Element} el
+ * @param    {String|Element|Array|Function} content
+ * @return   {Element}
+ */
+export function insertContent(el, content) {
+  return appendContent(emptyEl(el), content);
 }
