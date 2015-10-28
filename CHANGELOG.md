@@ -17,6 +17,7 @@ CHANGELOG
 * @forbesjo Added Microsoft Caption Maker link ([view](https://github.com/videojs/video.js/pull/2618))
 * @misteroneill updated modal dialog CSS ([view](https://github.com/videojs/video.js/pull/2756))
 * @misteroneill Add browserify
+* @brkattk updated emulateTextTrack to exit early if no textTracks ([view](https://github.com/videojs/video.js/pull/2426))
 
 --------------------
 
