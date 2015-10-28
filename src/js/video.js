@@ -591,6 +591,15 @@ videojs.$$ = Dom.$$;
 videojs.isEl = Dom.isEl;
 
 /**
+ * Determines, via duck typing, whether or not a value is a text node.
+ *
+ * @method isTextNode
+ * @param  {Mixed} value
+ * @return {Boolean}
+ */
+videojs.isTextNode = Dom.isTextNode;
+
+/**
  * Check if an element has a CSS class
  *
  * @method hasElClass
@@ -637,6 +646,36 @@ videojs.setAttributes = Dom.setElAttributes;
  * @return {Object}
  */
 videojs.getAttributes = Dom.getElAttributes;
+
+/**
+ * Empties the contents of an element.
+ *
+ * @method emptyEl
+ * @param  {Element} el
+ * @return {Element}
+ */
+videojs.emptyEl = Dom.emptyEl;
+
+/**
+ * Normalizes and inserts content into an element.
+ *
+ * @method insertContent
+ * @param  {Element} el
+ * @param  {String|Element|Array|Function} content
+ * @param  {Boolean} [append=false]
+ * @return {Element}
+ */
+videojs.insertContent = Dom.insertContent;
+
+/**
+ * Normalizes and appends content to an element.
+ *
+ * @method appendContent
+ * @param  {Element} el
+ * @param  {String|Element|Array|Function} content
+ * @return {Element}
+ */
+videojs.appendContent = Dom.appendContent;
 
 /*
  * Custom Universal Module Definition (UMD)

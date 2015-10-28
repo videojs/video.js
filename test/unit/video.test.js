@@ -87,11 +87,15 @@ test('should expose DOM functions', function() {
     $: '$',
     $$: '$$',
     isEl: 'isEl',
+    isTextNode: 'isTextNode',
     hasClass: 'hasElClass',
     addClass: 'addElClass',
     removeClass: 'removeElClass',
     setAttributes: 'setElAttributes',
-    getAttributes: 'getElAttributes'
+    getAttributes: 'getElAttributes',
+    emptyEl: 'emptyEl',
+    insertContent: 'insertContent',
+    appendContent: 'appendContent'
   };
 
   let keys = Object.keys(methods);
