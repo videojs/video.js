@@ -16,6 +16,7 @@ CHANGELOG
 * @Soviut Fixed argument names in some API docs ([view](https://github.com/videojs/video.js/pull/2714))
 * @forbesjo Added Microsoft Caption Maker link ([view](https://github.com/videojs/video.js/pull/2618))
 * @misteroneill updated modal dialog CSS ([view](https://github.com/videojs/video.js/pull/2756))
+* @misteroneill Add browserify
 
 --------------------
 
