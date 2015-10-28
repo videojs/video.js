@@ -10,6 +10,7 @@ CHANGELOG
 * @gkatsev fixes track tests and ignored empty properties in tracks converter ([view](https://github.com/videojs/video.js/pull/2744))
 * @misteroneill added a modal dialog ([view](https://github.com/videojs/video.js/pull/2668))
 * @misteroneill removed z-index from big play button ([view](https://github.com/videojs/video.js/pull/2639))
+* @DaveVoyles updated URL to player API docs ([view](https://github.com/videojs/video.js/pull/2685))
 
 --------------------
 
