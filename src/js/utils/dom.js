@@ -487,18 +487,25 @@ export function emptyEl(el) {
  * from falling into the trap of simply writing to `innerHTML`, which is
  * an XSS concern.
  *
- * The content for an element can be passed in multiple types, whose
- * behavior is as follows:
+ * The content for an element can be passed in multiple types and
+ * combinations, whose behavior is as follows:
  *
- * - String: Normalized into a text node.
- * - Node: An Element or TextNode is passed through.
- * - Array: A one-dimensional array of strings, nodes, or functions (which
- *   return single strings or nodes).
- * - Function: If the sole argument, is expected to produce a string, node,
- *   or array.
+ * - String
+ *   Normalized into a text node.
+ *
+ * - Element, TextNode
+ *   Passed through.
+ *
+ * - Array
+ *   A one-dimensional array of strings, elements, nodes, or functions (which
+ *   return single strings, elements, or nodes).
+ *
+ * - Function
+ *   If the sole argument, is expected to produce a string, element,
+ *   node, or array.
  *
  * @function normalizeContent
- * @param    {String|Element|Array|Function} content
+ * @param    {String|Element|TextNode|Array|Function} content
  * @return   {Array}
  */
 export function normalizeContent(content) {
@@ -534,7 +541,8 @@ export function normalizeContent(content) {
  *
  * @function appendContent
  * @param    {Element} el
- * @param    {String|Element|Array|Function} content
+ * @param    {String|Element|TextNode|Array|Function} content
+ *           See: `normalizeContent`
  * @return   {Element}
  */
 export function appendContent(el, content) {
@@ -548,7 +556,8 @@ export function appendContent(el, content) {
  *
  * @function insertContent
  * @param    {Element} el
- * @param    {String|Element|Array|Function} content
+ * @param    {String|Element|TextNode|Array|Function} content
+ *           See: `normalizeContent`
  * @return   {Element}
  */
 export function insertContent(el, content) {
@@ -556,8 +565,8 @@ export function insertContent(el, content) {
 }
 
 /**
- * Finds a single DOM element matching `selector` within the `context` of
- * another DOM element.
+ * Finds a single DOM element matching `selector` within the optional
+ * `context` of another DOM element (defaulting to `document`).
  *
  * @function $
  * @param    {String} selector
@@ -574,8 +583,8 @@ export function insertContent(el, content) {
 export const $ = createQuerier('querySelector');
 
 /**
- * Finds a all DOM elements matching `selector` within the `context` of
- * another DOM element.
+ * Finds a all DOM elements matching `selector` within the optional
+ * `context` of another DOM element (defaulting to `document`).
  *
  * @function $$
  * @param    {String} selector

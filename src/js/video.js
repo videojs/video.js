@@ -546,8 +546,8 @@ videojs.xhr = xhr;
 videojs.TextTrack = TextTrack;
 
 /**
- * Finds a single DOM element matching `selector` within the `context` of
- * another DOM element.
+ * Finds a single DOM element matching `selector` within the optional
+ * `context` of another DOM element (defaulting to `document`).
  *
  * @method $
  * @param  {String} selector
@@ -564,8 +564,8 @@ videojs.TextTrack = TextTrack;
 videojs.$ = Dom.$;
 
 /**
- * Finds a all DOM elements matching `selector` within the `context` of
- * another DOM element.
+ * Finds a all DOM elements matching `selector` within the optional
+ * `context` of another DOM element (defaulting to `document`).
  *
  * @method $$
  * @param  {String} selector
@@ -602,7 +602,7 @@ videojs.isTextNode = Dom.isTextNode;
 /**
  * Check if an element has a CSS class
  *
- * @method hasElClass
+ * @method hasClass
  * @param {Element} element Element to check
  * @param {String} classToCheck Classname to check
  */
@@ -611,7 +611,7 @@ videojs.hasClass = Dom.hasElClass;
 /**
  * Add a CSS class name to an element
  *
- * @method addElClass
+ * @method addClass
  * @param {Element} element    Element to add class name to
  * @param {String} classToAdd Classname to add
  */
@@ -620,7 +620,7 @@ videojs.addClass = Dom.addElClass;
 /**
  * Remove a CSS class name from an element
  *
- * @method removeElClass
+ * @method removeClass
  * @param {Element} element    Element to remove from class name
  * @param {String} classToRemove Classname to remove
  */
@@ -629,7 +629,7 @@ videojs.removeClass = Dom.removeElClass;
 /**
  * Apply attributes to an HTML element.
  *
- * @method setElAttributes
+ * @method setAttributes
  * @param  {Element} el         Target element.
  * @param  {Object=} attributes Element attributes to be applied.
  */
@@ -641,7 +641,7 @@ videojs.setAttributes = Dom.setElAttributes;
  * or with setAttribute (which shouldn't be used with HTML)
  * This will return true or false for boolean attributes.
  *
- * @method getElAttributes
+ * @method getAttributes
  * @param  {Element} tag Element from which to get tag attributes
  * @return {Object}
  */
@@ -657,25 +657,59 @@ videojs.getAttributes = Dom.getElAttributes;
 videojs.emptyEl = Dom.emptyEl;
 
 /**
- * Normalizes and inserts content into an element.
- *
- * @method insertContent
- * @param  {Element} el
- * @param  {String|Element|Array|Function} content
- * @param  {Boolean} [append=false]
- * @return {Element}
- */
-videojs.insertContent = Dom.insertContent;
-
-/**
  * Normalizes and appends content to an element.
+ *
+ * The content for an element can be passed in multiple types and
+ * combinations, whose behavior is as follows:
+ *
+ * - String
+ *   Normalized into a text node.
+ *
+ * - Element, TextNode
+ *   Passed through.
+ *
+ * - Array
+ *   A one-dimensional array of strings, elements, nodes, or functions (which
+ *   return single strings, elements, or nodes).
+ *
+ * - Function
+ *   If the sole argument, is expected to produce a string, element,
+ *   node, or array.
  *
  * @method appendContent
  * @param  {Element} el
- * @param  {String|Element|Array|Function} content
+ * @param  {String|Element|TextNode|Array|Function} content
  * @return {Element}
  */
 videojs.appendContent = Dom.appendContent;
+
+/**
+ * Normalizes and inserts content into an element; this is identical to
+ * `appendContent()`, except it empties the element first.
+ *
+ * The content for an element can be passed in multiple types and
+ * combinations, whose behavior is as follows:
+ *
+ * - String
+ *   Normalized into a text node.
+ *
+ * - Element, TextNode
+ *   Passed through.
+ *
+ * - Array
+ *   A one-dimensional array of strings, elements, nodes, or functions (which
+ *   return single strings, elements, or nodes).
+ *
+ * - Function
+ *   If the sole argument, is expected to produce a string, element,
+ *   node, or array.
+ *
+ * @method insertContent
+ * @param  {Element} el
+ * @param  {String|Element|TextNode|Array|Function} content
+ * @return {Element}
+ */
+videojs.insertContent = Dom.insertContent;
 
 /*
  * Custom Universal Module Definition (UMD)
