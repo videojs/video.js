@@ -160,3 +160,137 @@ test('Dom.findElPosition should find top and left position', function() {
   position = Dom.findElPosition(d);
   deepEqual(position, {left: 0, top: 0}, 'If there is no gBCR, we should get zeros');
 });
+
+test('Dom.isEl', function(assert) {
+  assert.expect(7);
+  assert.notOk(Dom.isEl(), 'undefined is not an element');
+  assert.notOk(Dom.isEl(true), 'booleans are not elements');
+  assert.notOk(Dom.isEl({}), 'objects are not elements');
+  assert.notOk(Dom.isEl([]), 'arrays are not elements');
+  assert.notOk(Dom.isEl('<h1></h1>'), 'strings are not elements');
+  assert.ok(Dom.isEl(document.createElement('div')), 'elements are elements');
+  assert.ok(Dom.isEl({nodeType: 1}), 'duck typing is imperfect');
+});
+
+test('Dom.isTextNode', function(assert) {
+  assert.expect(7);
+  assert.notOk(Dom.isTextNode(), 'undefined is not a text node');
+  assert.notOk(Dom.isTextNode(true), 'booleans are not text nodes');
+  assert.notOk(Dom.isTextNode({}), 'objects are not text nodes');
+  assert.notOk(Dom.isTextNode([]), 'arrays are not text nodes');
+  assert.notOk(Dom.isTextNode('hola mundo'), 'strings are not text nodes');
+  assert.ok(Dom.isTextNode(document.createTextNode('hello, world!')), 'text nodes are text nodes');
+  assert.ok(Dom.isTextNode({nodeType: 3}), 'duck typing is imperfect');
+});
+
+test('Dom.emptyEl', function(assert) {
+  let el = Dom.createEl();
+
+  el.appendChild(Dom.createEl('span'));
+  el.appendChild(Dom.createEl('span'));
+  el.appendChild(document.createTextNode('hola mundo'));
+  el.appendChild(Dom.createEl('span'));
+
+  Dom.emptyEl(el);
+
+  assert.expect(1);
+  assert.notOk(el.firstChild, 'the element was emptied');
+});
+
+test('Dom.normalizeContent: strings and elements/nodes', function(assert) {
+  assert.expect(8);
+
+  let str = Dom.normalizeContent('hello');
+  assert.strictEqual(str[0].data, 'hello', 'single string becomes a text node');
+
+  let elem = Dom.normalizeContent(Dom.createEl());
+  assert.ok(Dom.isEl(elem[0]), 'an element is passed through');
+
+  let node = Dom.normalizeContent(document.createTextNode('goodbye'));
+  assert.strictEqual(node[0].data, 'goodbye', 'a text node is passed through');
+
+  assert.strictEqual(Dom.normalizeContent(null).length, 0, 'falsy values are ignored');
+  assert.strictEqual(Dom.normalizeContent(false).length, 0, 'falsy values are ignored');
+  assert.strictEqual(Dom.normalizeContent().length, 0, 'falsy values are ignored');
+  assert.strictEqual(Dom.normalizeContent(123).length, 0, 'numbers are ignored');
+  assert.strictEqual(Dom.normalizeContent({}).length, 0, 'objects are ignored');
+});
+
+test('Dom.normalizeContent: functions returning strings and elements/nodes', function(assert) {
+  assert.expect(9);
+
+  let str = Dom.normalizeContent(() => 'hello');
+  assert.strictEqual(str[0].data, 'hello', 'a function can return a string, which becomes a text node');
+
+  let elem = Dom.normalizeContent(() => Dom.createEl());
+  assert.ok(Dom.isEl(elem[0]), 'a function can return an element');
+
+  let node = Dom.normalizeContent(() => document.createTextNode('goodbye'));
+  assert.strictEqual(node[0].data, 'goodbye', 'a function can return a text node');
+
+  assert.strictEqual(Dom.normalizeContent(() => null).length, 0, 'a function CANNOT return falsy values');
+  assert.strictEqual(Dom.normalizeContent(() => false).length, 0, 'a function CANNOT return falsy values');
+  assert.strictEqual(Dom.normalizeContent(() => undefined).length, 0, 'a function CANNOT return falsy values');
+  assert.strictEqual(Dom.normalizeContent(() => 123).length, 0, 'a function CANNOT return numbers');
+  assert.strictEqual(Dom.normalizeContent(() => {}).length, 0, 'a function CANNOT return objects');
+  assert.strictEqual(Dom.normalizeContent(() => (() => null)).length, 0, 'a function CANNOT return a function');
+});
+
+test('Dom.normalizeContent: arrays of strings and objects', function(assert) {
+  assert.expect(7);
+
+  let source = [
+    'hello',
+    {},
+    Dom.createEl(),
+    ['oops'],
+    null,
+    document.createTextNode('goodbye'),
+    () => 'it works'
+  ];
+
+  let result = Dom.normalizeContent(source);
+
+  assert.strictEqual(result[0].data, 'hello', 'an array can include a string normalized to a text node');
+  assert.ok(Dom.isEl(result[1]), 'an array can include an element');
+  assert.strictEqual(result[2].data, 'goodbye', 'an array can include a text node');
+  assert.strictEqual(result[3].data, 'it works', 'an array can include a function, which is invoked');
+  assert.strictEqual(result.indexOf(source[1]), -1, 'an array CANNOT include an object');
+  assert.strictEqual(result.indexOf(source[3]), -1, 'an array CANNOT include an array');
+  assert.strictEqual(result.indexOf(source[4]), -1, 'an array CANNOT include falsy values');
+});
+
+test('Dom.normalizeContent: functions returning arrays', function(assert) {
+  assert.expect(3);
+
+  let arr = [];
+  let result = Dom.normalizeContent(() => ['hello', Function.prototype, arr]);
+
+  assert.strictEqual(result[0].data, 'hello', 'a function can return an array');
+  assert.strictEqual(result.indexOf(Function.prototype), -1, 'a function can return an array, but it CANNOT include a function');
+  assert.strictEqual(result.indexOf(arr), -1, 'a function can return an array, but it CANNOT include an array');
+});
+
+test('Dom.insertContent', function(assert) {
+  let p = Dom.createEl('p');
+  let text = document.createTextNode('hello');
+  let el = Dom.insertContent(Dom.createEl(), [p, text]);
+
+  assert.expect(2);
+  assert.strictEqual(el.firstChild, p, 'the paragraph was inserted first');
+  assert.strictEqual(el.firstChild.nextSibling, text, 'the text node was inserted last');
+});
+
+test('Dom.appendContent', function(assert) {
+  let p1 = Dom.createEl('p');
+  let p2 = Dom.createEl('p');
+  let el = Dom.insertContent(Dom.createEl(), [p1]);
+
+  Dom.appendContent(el, p2);
+
+  assert.expect(2);
+  assert.strictEqual(el.firstChild, p1, 'the first paragraph is the first child');
+  assert.strictEqual(el.firstChild.nextSibling, p2, 'the second paragraph was appended');
+});
+
+

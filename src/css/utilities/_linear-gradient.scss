@@ -1,0 +1,94 @@
+// These functions and mixins taken from:
+//
+// "Building a linear-gradient Mixin in Sass" by Hugo Giraudel
+//    http://www.sitepoint.com/building-linear-gradient-mixin-sass/
+//    http://sassmeister.com/gist/b58f6e2cc3160007c880
+//
+
+/// Convert angle
+/// @author Chris Eppstein
+/// @param {Number} $value - Value to convert
+/// @param {String} $unit - Unit to convert to
+/// @return {Number} Converted angle
+@function convert-angle($value, $unit) {
+  $convertable-units: deg grad turn rad;
+  $conversion-factors: 1 (10grad/9deg) (1turn/360deg) (3.1415926rad/180deg);
+  @if index($convertable-units, unit($value)) and index($convertable-units, $unit) {
+    @return $value
+             / nth($conversion-factors, index($convertable-units, unit($value)))
+             * nth($conversion-factors, index($convertable-units, $unit));
+  }
+
+  @warn "Cannot convert `#{unit($value)}` to `#{$unit}`.";
+}
+
+/// Test if `$value` is an angle
+/// @param {*} $value - Value to test
+/// @return {Bool}
+@function is-direction($value) {
+  $is-direction: index((
+    'to top',
+    'to top right',
+    'to right top',
+    'to right',
+    'to bottom right',
+    'to right bottom',
+    'to bottom',
+    'to bottom left',
+    'to left bottom',
+    'to left',
+    'to left top',
+    'to top left'
+  ), $value);
+  $is-angle: type-of($value) == 'number' and index('deg' 'grad' 'turn' 'rad', unit($value));
+
+  @return $is-direction or $is-angle;
+}
+
+/// Convert a direction to legacy syntax
+/// @param {Keyword | Angle} $value - Value to convert
+/// @require {function} is-direction
+/// @require {function} convert-angle
+@function legacy-direction($value) {
+  @if is-direction($value) == false {
+    @warn "Cannot convert `#{$value}` to legacy syntax because it doesn't seem to be an angle or a direction";
+  }
+
+  $conversion-map: (
+    'to top'          : 'bottom',
+    'to top right'    : 'bottom left',
+    'to right top'    : 'left bottom',
+    'to right'        : 'left',
+    'to bottom right' : 'top left',
+    'to right bottom' : 'left top',
+    'to bottom'       : 'top',
+    'to bottom left'  : 'top right',
+    'to left bottom'  : 'right top',
+    'to left'         : 'right',
+    'to left top'     : 'right bottom',
+    'to top left'     : 'bottom right'
+  );
+
+  @if map-has-key($conversion-map, $value) {
+    @return map-get($conversion-map, $value);
+  }
+
+  @return 90deg - convert-angle($value, 'deg');
+}
+
+/// Mixin printing a linear-gradient
+/// as well as a plain color fallback
+/// and the `-webkit-` prefixed declaration
+/// @access public
+/// @param {String | List | Angle} $direction - Linear gradient direction
+/// @param {Arglist} $color-stops - List of color-stops composing the gradient
+@mixin linear-gradient($direction, $color-stops...) {
+  @if is-direction($direction) == false {
+    $color-stops: ($direction, $color-stops);
+    $direction: 180deg;
+  }
+
+  background: nth(nth($color-stops, 1), 1);
+  background: -webkit-linear-gradient(legacy-direction($direction), $color-stops);
+  background: linear-gradient($direction, $color-stops);
+}

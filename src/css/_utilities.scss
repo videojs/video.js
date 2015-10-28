@@ -1,3 +1,5 @@
+@import "utilities/linear-gradient";
+
 @mixin background-color-with-alpha($color, $alpha) {
   background-color: $color;
   background-color: rgba($color, $alpha);
@@ -94,11 +96,15 @@
   order: $value;
 }
 
-%icon-default {
+%fill-parent {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+%icon-default {
+  @extend %fill-parent;
   text-align: center;
 }

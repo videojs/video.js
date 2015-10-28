@@ -125,6 +125,15 @@ body.vjs-full-window {
 /* Hide disabled or unsupported controls. */
 .vjs-hidden { display: none !important; }
 
+// Visually hidden offscreen, but accessible to screen readers.
+.video-js .vjs-offscreen {
+  height: 1px;
+  left: -9999px;
+  position: absolute;
+  top: 0;
+  width: 1px;
+}
+
 .vjs-lock-showing {
   display: block !important;
   opacity: 1;
