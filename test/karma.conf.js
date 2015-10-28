@@ -3,10 +3,9 @@ module.exports = function(config) {
   var settings = {
     basePath: '',
 
-    frameworks: ['browserify', 'qunit'],
+    frameworks: ['browserify', 'qunit', 'detectBrowsers'],
     autoWatch: false,
     singleRun: true,
-    browsers: ['Chrome'],
 
     // Compling tests here
     files: [
@@ -46,8 +45,14 @@ module.exports = function(config) {
       'karma-safari-launcher',
       'karma-browserstack-launcher',
       'karma-browserify',
-      'karma-coverage'
+      'karma-coverage',
+      'karma-detect-browsers',
     ],
+
+    detectBrowsers: {
+      enabled: false,
+      usePhantomJS: false
+    },
 
     reporters: ['dots'],
 
@@ -98,9 +103,7 @@ module.exports = function(config) {
         'ie11_bs',
         'ie10_bs',
         'ie9_bs',
-        'ie8_bs',
-        'android_bs',
-        'ios_bs'
+        'ie8_bs'
       ];
     } else {
       settings.browsers = ['Firefox'];
@@ -163,18 +166,6 @@ function getCustomLaunchers(){
       browser_version: '8',
       os: 'Windows',
       os_version: '7'
-    },
-
-    android_bs: {
-      base: 'BrowserStack',
-      os: 'android',
-      os_version: '4.4'
-    },
-
-    ios_bs: {
-      base: 'BrowserStack',
-      os: 'ios',
-      os_version: '8.3'
     }
   };
 }

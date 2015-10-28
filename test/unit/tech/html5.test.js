@@ -155,6 +155,27 @@ test('should have the source handler interface', function() {
   ok(Html5.registerSourceHandler, 'has the registerSourceHandler function');
 });
 
+test('native source handler canPlayType', function(){
+  var result;
+
+  // Stub the test video canPlayType (used in canPlayType) to control results
+  var origCPT = Html5.TEST_VID.canPlayType;
+  Html5.TEST_VID.canPlayType = function(type){
+    if (type === 'video/mp4') {
+      return 'maybe';
+    }
+    return '';
+  };
+
+  var canPlayType = Html5.nativeSourceHandler.canPlayType;
+
+  equal(canPlayType('video/mp4'), 'maybe', 'Native source handler reported type support');
+  equal(canPlayType('foo'), '', 'Native source handler handled bad type');
+
+  // Reset test video canPlayType
+  Html5.TEST_VID.canPlayType = origCPT;
+});
+
 test('native source handler canHandleSource', function(){
   var result;
 

@@ -824,3 +824,12 @@ expect(3);
   player.language('en-GB');
   strictEqual(player.localize('Good'), 'Brilliant', 'Ignored case');
 });
+
+test('should return correct values for canPlayType', function(){
+  var player = TestHelpers.makePlayer();
+
+  equal(player.canPlayType('video/mp4'), 'maybe', 'player can play mp4 files');
+  equal(player.canPlayType('video/unsupported-format'), '', 'player can not play unsupported files');
+
+  player.dispose();
+});
