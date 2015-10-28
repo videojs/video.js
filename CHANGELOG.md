@@ -13,6 +13,7 @@ CHANGELOG
 * @DaveVoyles updated URL to player API docs ([view](https://github.com/videojs/video.js/pull/2685))
 * @ ([view](https://github.com/videojs/video.js/pull/2691))
 * @kahwee Fixed sandbox plugin example to work in Video.js 5 ([view](https://github.com/videojs/video.js/pull/2691))
+* @Soviut Fixed argument names in some API docs ([view](https://github.com/videojs/video.js/pull/2714))
 
 --------------------
 
