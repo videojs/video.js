@@ -126,6 +126,102 @@ test('hasElClass()', function(){
   }, 'throws when attempting to detect a class with whitespace');
 });
 
+test('toggleElClass()', function() {
+  let el = Dom.createEl('div', {className: 'foo bar'});
+
+  let predicateToggles = [
+    {
+      toggle: 'foo',
+      predicate: true,
+      className: 'foo bar',
+      message: 'if predicate `true` matches state of the element, do nothing'
+    },
+    {
+      toggle: 'baz',
+      predicate: false,
+      className: 'foo bar',
+      message: 'if predicate `false` matches state of the element, do nothing'
+    },
+    {
+      toggle: 'baz',
+      predicate: true,
+      className: 'foo bar baz',
+      message: 'if predicate `true` differs from state of the element, add the class'
+    },
+    {
+      toggle: 'foo',
+      predicate: false,
+      className: 'bar baz',
+      message: 'if predicate `false` differs from state of the element, remove the class'
+    },
+    {
+      toggle: 'bar',
+      predicate: () => true,
+      className: 'bar baz',
+      message: 'if a predicate function returns `true`, matching the state of the element, do nothing'
+    },
+    {
+      toggle: 'foo',
+      predicate: () => false,
+      className: 'bar baz',
+      message: 'if a predicate function returns `false`, matching the state of the element, do nothing'
+    },
+    {
+      toggle: 'foo',
+      predicate: () => true,
+      className: 'bar baz foo',
+      message: 'if a predicate function returns `true`, differing from state of the element, add the class'
+    },
+    {
+      toggle: 'foo',
+      predicate: () => false,
+      className: 'bar baz',
+      message: 'if a predicate function returns `false`, differing from state of the element, remove the class'
+    },
+    {
+      toggle: 'foo',
+      predicate: Function.prototype,
+      className: 'bar baz foo',
+      message: 'if a predicate function returns `undefined` and the element does not have the class, add the class'
+    },
+    {
+      toggle: 'bar',
+      predicate: Function.prototype,
+      className: 'baz foo',
+      message: 'if a predicate function returns `undefined` and the element has the class, remove the class'
+    },
+    {
+      toggle: 'bar',
+      predicate: () => [],
+      className: 'baz foo bar',
+      message: 'if a predicate function returns a defined non-boolean value and the element does not have the class, add the class'
+    },
+    {
+      toggle: 'baz',
+      predicate: () => 'this is incorrect',
+      className: 'foo bar',
+      message: 'if a predicate function returns a defined non-boolean value and the element has the class, remove the class'
+    },
+  ];
+
+  expect(3 + predicateToggles.length);
+
+  Dom.toggleElClass(el, 'bar');
+  strictEqual(el.className, 'foo', 'toggles a class off, if present');
+
+  Dom.toggleElClass(el, 'bar');
+  strictEqual(el.className, 'foo bar', 'toggles a class on, if absent');
+
+  throws(function(){
+    Dom.toggleElClass(el, 'foo bar');
+  }, 'throws when attempting to toggle a class with whitespace');
+
+  predicateToggles.forEach(x => {
+    Dom.toggleElClass(el, x.toggle, x.predicate);
+    strictEqual(el.className, x.className, x.message);
+  });
+});
+
 test('should set element attributes from object', function(){
   var el, vid1Vals;
 

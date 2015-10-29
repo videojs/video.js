@@ -91,6 +91,7 @@ test('should expose DOM functions', function() {
     hasClass: 'hasElClass',
     addClass: 'addElClass',
     removeClass: 'removeElClass',
+    toggleClass: 'toggleElClass',
     setAttributes: 'setElAttributes',
     getAttributes: 'getElAttributes',
     emptyEl: 'emptyEl',

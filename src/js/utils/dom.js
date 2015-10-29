@@ -263,6 +263,8 @@ export function addElClass(element, classToAdd) {
   } else if (!hasElClass(element, classToAdd)) {
     element.className = (element.className + ' ' + classToAdd).trim();
   }
+
+  return element;
 }
 
 /**
@@ -274,13 +276,57 @@ export function addElClass(element, classToAdd) {
  */
 export function removeElClass(element, classToRemove) {
   if (element.classList) {
-    return element.classList.remove(classToRemove);
+    element.classList.remove(classToRemove);
   } else {
     throwIfWhitespace(classToRemove);
     element.className = element.className.split(/\s+/).filter(function(c) {
       return c !== classToRemove;
     }).join(' ');
   }
+
+  return element;
+}
+
+/**
+ * Adds or removes a CSS class name on an element depending on an optional
+ * condition or the presence/absence of the class name.
+ *
+ * @function toggleElClass
+ * @param    {Element} element
+ * @param    {String} classToToggle
+ * @param    {Boolean|Function} [predicate]
+ *           Can be a function that returns a Boolean. If `true`, the class
+ *           will be added; if `false`, the class will be removed. If not
+ *           given, the class will be added if not present and vice versa.
+ */
+export function toggleElClass(element, classToToggle, predicate) {
+
+  // This CANNOT use `classList` internally because IE does not support the
+  // second parameter to the `classList.toggle()` method! Which is fine because
+  // `classList` will be used by the add/remove functions.
+  let has = hasElClass(element, classToToggle);
+
+  if (typeof predicate === 'function') {
+    predicate = predicate(element, classToToggle);
+  }
+
+  if (typeof predicate !== 'boolean') {
+    predicate = !has;
+  }
+
+  // If the necessary class operation matches the current state of the
+  // element, no action is required.
+  if (predicate === has) {
+    return;
+  }
+
+  if (predicate) {
+    addElClass(element, classToToggle);
+  } else {
+    removeElClass(element, classToToggle);
+  }
+
+  return element;
 }
 
 /**

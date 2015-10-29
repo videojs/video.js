@@ -627,6 +627,20 @@ videojs.addClass = Dom.addElClass;
 videojs.removeClass = Dom.removeElClass;
 
 /**
+ * Adds or removes a CSS class name on an element depending on an optional
+ * condition or the presence/absence of the class name.
+ *
+ * @method toggleElClass
+ * @param  {Element} element
+ * @param  {String} classToToggle
+ * @param  {Boolean|Function} [predicate]
+ *         Can be a function that returns a Boolean. If `true`, the class
+ *         will be added; if `false`, the class will be removed. If not
+ *         given, the class will be added if not present and vice versa.
+ */
+videojs.toggleClass = Dom.toggleElClass;
+
+/**
  * Apply attributes to an HTML element.
  *
  * @method setAttributes

@@ -894,7 +894,7 @@ class Component {
   }
 
   /**
-   * Remove and return a CSS class name from the component's element
+   * Remove a CSS class name from the component's element
    *
    * @param {String} classToRemove Classname to remove
    * @return {Component}
@@ -902,6 +902,23 @@ class Component {
    */
   removeClass(classToRemove) {
     Dom.removeElClass(this.el_, classToRemove);
+    return this;
+  }
+
+  /**
+   * Add or remove a CSS class name from the component's element
+   *
+   * @param  {String} classToToggle
+   * @param  {Boolean|Function} [predicate]
+   *         Can be a function that returns a Boolean. If `true`, the class
+   *         will be added; if `false`, the class will be removed. If not
+   *         given, the class will be added if not present and vice versa.
+   *
+   * @return {Component}
+   * @method toggleClass
+   */
+  toggleClass(classToToggle, predicate) {
+    Dom.toggleElClass(this.el_, classToToggle, predicate);
     return this;
   }
 

@@ -471,6 +471,10 @@ test('should add and remove a CSS class', function(){
   ok(comp.el().className.indexOf('test-class') !== -1);
   comp.removeClass('test-class');
   ok(comp.el().className.indexOf('test-class') === -1);
+  comp.toggleClass('test-class');
+  ok(comp.el().className.indexOf('test-class') !== -1);
+  comp.toggleClass('test-class');
+  ok(comp.el().className.indexOf('test-class') === -1);
 });
 
 test('should show and hide an element', function(){
