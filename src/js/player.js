@@ -32,6 +32,7 @@ import BigPlayButton from './big-play-button.js';
 import ControlBar from './control-bar/control-bar.js';
 import ErrorDisplay from './error-display.js';
 import TextTrackSettings from './tracks/text-track-settings.js';
+import ModalDialog from './modal-dialog';
 
 // Require html5 tech, at least for disposing the original video tag
 import Html5 from './tech/html5.js';
@@ -2511,6 +2512,38 @@ class Player extends Component {
     }
 
     return options;
+  }
+
+  /**
+   * Creates a simple modal dialog (an instance of the `ModalDialog`
+   * component) that immediately overlays the player with arbitrary
+   * content and removes itself when closed.
+   *
+   * @param {String|Function|Element|Array|Null} content
+   *        Same as `ModalDialog#content`'s param of the same name.
+   *
+   *        The most straight-forward usage is to provide a string or DOM
+   *        element.
+   *
+   * @param {Object} [options]
+   *        Extra options which will be passed on to the `ModalDialog`.
+   *
+   * @return {ModalDialog}
+   */
+  createModal(content, options) {
+    let player = this;
+
+    options = options || {};
+    options.content = content || '';
+
+    let modal = new ModalDialog(player, options);
+
+    player.addChild(modal);
+    modal.on('dispose', function() {
+      player.removeChild(modal);
+    });
+
+    return modal.open();
   }
 
   /**

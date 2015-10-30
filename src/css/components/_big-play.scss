@@ -4,7 +4,6 @@
   height: $big-play-button--height;
   width: $big-play-button--width; // Firefox bug: For some reason without width the icon wouldn't show up. Switched to using width and removed padding.
   display: block;
-  z-index: 2;
   position: absolute;
   top: 10px;
   left: 10px;

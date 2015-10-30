@@ -8,6 +8,16 @@ CHANGELOG
 * @forbesjo removed android/ios tests to increase build stability ([view](https://github.com/videojs/video.js/pull/2739))
 * @nickygerritsen added canPlayType method to player ([view](https://github.com/videojs/video.js/pull/2709))
 * @gkatsev fixes track tests and ignored empty properties in tracks converter ([view](https://github.com/videojs/video.js/pull/2744))
+* @misteroneill added a modal dialog ([view](https://github.com/videojs/video.js/pull/2668))
+* @misteroneill removed z-index from big play button ([view](https://github.com/videojs/video.js/pull/2639))
+* @DaveVoyles updated URL to player API docs ([view](https://github.com/videojs/video.js/pull/2685))
+* @ ([view](https://github.com/videojs/video.js/pull/2691))
+* @kahwee Fixed sandbox plugin example to work in Video.js 5 ([view](https://github.com/videojs/video.js/pull/2691))
+* @Soviut Fixed argument names in some API docs ([view](https://github.com/videojs/video.js/pull/2714))
+* @forbesjo Added Microsoft Caption Maker link ([view](https://github.com/videojs/video.js/pull/2618))
+* @misteroneill updated modal dialog CSS ([view](https://github.com/videojs/video.js/pull/2756))
+* @misteroneill Add browserify
+* @brkattk updated emulateTextTrack to exit early if no textTracks ([view](https://github.com/videojs/video.js/pull/2426))
 
 --------------------
 

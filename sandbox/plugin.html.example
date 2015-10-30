@@ -41,10 +41,10 @@
       };
 
       // register the plugin
-      vjs.plugin('progressed', progressed);
+      videojs.plugin('progressed', progressed);
 
       // initialize it
-      vid1 = vjs('vid1');
+      vid1 = videojs('vid1');
       vid1.progressed();
     })();
   </script>

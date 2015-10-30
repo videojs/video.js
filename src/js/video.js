@@ -282,9 +282,9 @@ videojs.extend = extendFn;
  *     // result.bar.b = [4,5,6];
  * ```
  *
- * @param {Object} The options object whose values will be overriden
- * @param {Object} The options object with values to override the first
- * @param {Object} Any number of additional options objects
+ * @param {Object} defaults  The options object whose values will be overriden
+ * @param {Object} overrides The options object with values to override the first
+ * @param {Object} etc       Any number of additional options objects
  *
  * @return {Object} a new object with the merged values
  * @mixes videojs
@@ -349,8 +349,8 @@ videojs.bind = Fn.bind;
  *     // --> Should alert 'Plugin added later!'
  * ```
  *
- * @param {String} The plugin name
- * @param {Function} The plugin function that will be called with options
+ * @param {String} name The plugin name
+ * @param {Function} fn The plugin function that will be called with options
  * @mixes videojs
  * @method plugin
  */
