@@ -1,3 +1,4 @@
+/* Emulated tracks */
 .vjs-text-track-display {
   position: absolute;
   bottom: 3em;
@@ -24,3 +25,13 @@
 .vjs-subtitles { color: #fff /* Subtitles are white */; }
 .vjs-captions { color: #fc6 /* Captions are yellow */; }
 .vjs-tt-cue { display: block; }
+
+/* Native tracks */
+video::-webkit-media-text-track-display {
+  @include transform(translateY(-3em));
+}
+
+/* Move captions down when controls aren't being shown */
+.video-js.vjs-user-inactive.vjs-playing video::-webkit-media-text-track-display {
+  @include transform(translateY(-1.5em));
+}
