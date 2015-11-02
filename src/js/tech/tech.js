@@ -568,16 +568,29 @@ Tech.withSourceHandlers = function(_Tech){
     return '';
   };
 
-  let originalSeekable = _Tech.prototype.seekable;
+  /*
+   * When using a source handler, prefer its implementation of
+   * any function normally provided by the tech.
+   */
+  let deferrable = [
+      'seekable',
+      'duration'
+    ];
 
-  // when a source handler is registered, prefer its implementation of
-  // seekable when present.
-  _Tech.prototype.seekable = function() {
-    if (this.sourceHandler_ && this.sourceHandler_.seekable) {
-      return this.sourceHandler_.seekable();
+  deferrable.forEach(function (fnName) {
+    let originalFn = this[fnName];
+
+    if (typeof originalFn !== 'function') {
+      return;
     }
-    return originalSeekable.call(this);
-  };
+
+    this[fnName] = function() {
+      if (this.sourceHandler_ && this.sourceHandler_[fnName]) {
+        return this.sourceHandler_[fnName].apply(this.sourceHandler_, arguments);
+      }
+      return originalFn.apply(this, arguments);
+    };
+  }, _Tech.prototype);
 
    /*
     * Create a function for setting the source using a source object
