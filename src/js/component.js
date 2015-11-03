@@ -560,9 +560,9 @@ class Component {
         // we have to make sure that child.name isn't in the techOrder since
         // techs are registerd as Components but can't aren't compatible
         // See https://github.com/videojs/video.js/issues/2772
-        return this.player_.options_.techOrder.indexOf(child.name) == -1 &&
+        return this.player_.options_.techOrder.indexOf(child.name) === -1 &&
                Component.getComponent(child.opts.componentClass ||
-                                      toTitleCase(child.name))
+                                      toTitleCase(child.name));
       })
       .forEach(handleAdd);
     }
