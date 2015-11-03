@@ -528,7 +528,10 @@ class Component {
         // Add a direct reference to the child by name on the parent instance.
         // If two of the same component are used, different names should be supplied
         // for each
-        this[name] = this.addChild(name, opts);
+        let newChild = this.addChild(name, opts);
+        if (newChild) {
+          this[name] = newChild;
+        }
       };
 
       // Allow for an array of children details to passed in the options
