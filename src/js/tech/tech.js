@@ -438,7 +438,11 @@ class Tech extends Component {
   }
 
   static isTech(component) {
-    return Object.getPrototypeOf(component) === Tech;
+    let proto = component.__proto__;
+    if (Object.getPrototypeOf) {
+      proto = Object.getPrototypeOf(component);
+    }
+    return proto === Tech;
   }
 }
 
