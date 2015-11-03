@@ -438,7 +438,9 @@ class Tech extends Component {
   }
 
   static isTech(component) {
+    /* jshint proto:true */
     let proto = component.__proto__;
+    /* jshint proto:false */
     if (Object.getPrototypeOf) {
       proto = Object.getPrototypeOf(component);
     }
