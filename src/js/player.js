@@ -1648,7 +1648,7 @@ class Player extends Component {
    * @method canPlayType
    */
   canPlayType(type) {
-    let can;
+    let canPlay;
 
     // Loop through each playback technology in the options order
     for (let i = 0, j = this.options_.techOrder; i < j.length; i++) {
@@ -1663,10 +1663,10 @@ class Player extends Component {
 
       // Check if the browser supports this technology
       if (tech.isSupported()) {
-        can = tech.canPlayType(type);
+        canPlay = tech.canPlayType(type);
 
-        if (can) {
-          return can;
+        if (canPlay) {
+          return canPlay;
         }
       }
     }
