@@ -13,7 +13,6 @@ import log from './utils/log.js';
 import toTitleCase from './utils/to-title-case.js';
 import assign from 'object.assign';
 import mergeOptions from './utils/merge-options.js';
-import uniq from 'lodash-compat/array/uniq';
 
 
 /**
@@ -545,7 +544,27 @@ class Component {
         workingChildren = Object.getOwnPropertyNames(children);
       }
 
-      uniq(workingChildren.concat(Object.getOwnPropertyNames(this.options_))
+      workingChildren
+      // children that are in this.options_ but also in workingChildren  would
+      // give us extra children we do not want. So, we want to filter them out.
+      .concat(Object.getOwnPropertyNames(this.options_)
+              .filter(function(child) {
+                return !workingChildren.some(function(wchild) {
+                  if (typeof child === 'string') {
+                    if (typeof wchild === 'string') {
+                      return child === wchild;
+                    } else {
+                      return child === wchild.name;
+                    }
+                  } else {
+                    if (typeof wchild === 'string') {
+                      return child.name === wchild;
+                    } else {
+                      return child.name === wchild.name;
+                    }
+                  }
+                });
+              }))
       .map((child) => {
         let name, opts;
 
@@ -558,7 +577,7 @@ class Component {
         }
 
         return {name, opts};
-      }), 'name')
+      })
       .filter((child) => {
         // we have to make sure that child.name isn't in the techOrder since
         // techs are registerd as Components but can't aren't compatible
