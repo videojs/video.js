@@ -445,7 +445,9 @@ class Tech extends Component {
    * @return {Boolean}         Whether it is a tech or not
    */
   static isTech(component) {
-    return component.prototype instanceof Tech || component instanceof Tech;
+    return component.prototype instanceof Tech ||
+           component instanceof Tech ||
+           component === Tech;
   }
 }
 
