@@ -133,6 +133,7 @@ test('should allows setting child options at the parent options level', function
     ok(false, 'Child with `false` option was initialized');
   }
   equal(parent.children()[0].options_['foo'], true, 'child options set when children array is used');
+  equal(parent.children().length, 1, 'we should only have one child');
 
   // using children object
   options = {
@@ -155,6 +156,7 @@ test('should allows setting child options at the parent options level', function
     ok(false, 'Child with `false` option was initialized');
   }
   equal(parent.children()[0].options_['foo'], true, 'child options set when children object is used');
+  equal(parent.children().length, 1, 'we should only have one child');
 });
 
 test('should dispose of component and children', function(){

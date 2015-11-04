@@ -13,6 +13,7 @@ import log from './utils/log.js';
 import toTitleCase from './utils/to-title-case.js';
 import assign from 'object.assign';
 import mergeOptions from './utils/merge-options.js';
+import uniq from 'lodash-compat/array/uniq';
 
 
 /**
@@ -544,7 +545,7 @@ class Component {
         workingChildren = Object.getOwnPropertyNames(children);
       }
 
-      workingChildren.concat(Object.getOwnPropertyNames(this.options_))
+      uniq(workingChildren.concat(Object.getOwnPropertyNames(this.options_))
       .map((child) => {
         let name, opts;
 
@@ -557,7 +558,7 @@ class Component {
         }
 
         return {name, opts};
-      })
+      }), 'name')
       .filter((child) => {
         // we have to make sure that child.name isn't in the techOrder since
         // techs are registerd as Components but can't aren't compatible
