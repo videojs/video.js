@@ -1,6 +1,9 @@
 var noop = function() {}, clock, oldTextTracks;
 
 import Tech from '../../../src/js/tech/tech.js';
+import Html5 from '../../../src/js/tech/html5.js';
+import Flash from '../../../src/js/tech/flash.js';
+import Button from '../../../src/js/button.js';
 import { createTimeRange } from '../../../src/js/utils/time-ranges.js';
 import extendFn from '../../../src/js/extend.js';
 import MediaError from '../../../src/js/media-error.js';
@@ -270,4 +273,18 @@ test('delegates seekable to the source handler', function(){
   });
   tech.seekable();
   equal(seekableCount, 1, 'called the source handler');
+});
+
+test('Tech.isTech returns correct answers for techs and components', function() {
+  let isTech = Tech.isTech;
+
+  ok(isTech(Tech), 'Tech is a Tech');
+  ok(isTech(Html5), 'Html5 is a Tech');
+  ok(isTech(new Html5({}, {})), 'An html5 instance is a Tech');
+  ok(isTech(Flash), 'Flash is a Tech');
+  ok(!isTech(5), 'A number is not a Tech');
+  ok(!isTech('this is a tech'), 'A string is not a Tech');
+  ok(!isTech(Button), 'A Button is not a Tech');
+  ok(!isTech(new Button({}, {})), 'A Button instance is not a Tech');
+  ok(!isTech(isTech), 'A function is not a Tech');
 });
