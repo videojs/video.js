@@ -89,12 +89,12 @@ NOTE: These need to be added after the core Video.js script.
 3. During a Video.js player instantiation. Adding the languages to the configuration object provided in the `data-setup` attribute.
 
 ```html
-<video id="example_video_1" class="video-js vjs-default-skin"  
-  controls preload="auto" width="640" height="264"  
-  data-setup='{"languages":{"es":{"Play":"Juego"}}}'>  
- <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' />  
- <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />  
- <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />  
+<video id="example_video_1" class="video-js vjs-default-skin"
+  controls preload="auto" width="640" height="264"
+  data-setup='{"languages":{"es":{"Play":"Juego"}}}'>
+ <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' />
+ <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />
+ <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />
 
  <track kind="captions" src="http://example.com/path/to/captions.vtt" srclang="en" label="English" default>
 
@@ -110,12 +110,12 @@ Setting Default Language in a Video.js Player
 During a Video.js player instantiation you can force it to localize to a specific language by including the locale value into the configuration object via the `data-setup` attribute. Valid options listed at the bottom of the page for reference.
 
 ```html
-<video id="example_video_1" class="video-js vjs-default-skin"  
-  controls preload="auto" width="640" height="264"  
-  data-setup='{"language":"es"}'>  
- <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' />  
- <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />  
- <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />  
+<video id="example_video_1" class="video-js vjs-default-skin"
+  controls preload="auto" width="640" height="264"
+  data-setup='{"language":"es"}'>
+ <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' />
+ <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />
+ <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />
 
  <track kind="captions" src="http://example.com/path/to/captions.vtt" srclang="en" label="English" default>
 
@@ -145,7 +145,7 @@ Localization in Plugins
 
 When you're developing a plugin, you can also introduce new localized strings. Simply wrap the string with the player's `localize` function:
 
-```javascript
+```js
 var details = '<div class="vjs-errors-details">' + player.localize('Technical details') + '</div>';
 ```
 

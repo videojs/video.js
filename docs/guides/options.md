@@ -119,7 +119,7 @@ Component Options
 You can set the options for any single player component. For instance, if you wanted to remove the `muteToggle` button, which
 is a child of `controlBar`, you can just set that component to false:
 
-```javascript
+```js
 var player = videojs('video-id', {
   controlBar: {
     muteToggle: false
