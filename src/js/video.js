@@ -26,6 +26,7 @@ import createDeprecationProxy from './utils/create-deprecation-proxy.js';
 import xhr from 'xhr';
 
 // Include the built-in techs
+import Tech from './tech/tech.js';
 import Html5 from './tech/html5.js';
 import Flash from './tech/flash.js';
 
@@ -202,7 +203,50 @@ videojs.getComponent = Component.getComponent;
  * @mixes videojs
  * @method registerComponent
  */
-videojs.registerComponent = Component.registerComponent;
+videojs.registerComponent = (name, comp) => {
+  if (Tech.isTech(comp)) {
+    log.warn(`The ${name} tech was registered as a component. It should instead be registered using videojs.registerTech(name, tech)`);
+  }
+
+  Component.registerComponent.call(Component, name, comp);
+};
+
+/**
+ * Get a Tech class object by name
+ * ```js
+ *     var Html5 = videojs.getTech('Html5');
+ *     // Create a new instance of the component
+ *     var html5 = new Html5(options);
+ * ```
+ *
+ * @return {Tech} Tech identified by name
+ * @mixes videojs
+ * @method getComponent
+ */
+videojs.getTech = Tech.getTech;
+
+/**
+ * Register a Tech so it can referred to by name.
+ * This is used in the tech order for the player.
+ *
+ * ```js
+ *     // get the Html5 Tech
+ *     var Html5 = videojs.getTech('Html5');
+ *     var MyTech = videojs.extend(Html5, {});
+ *     // Register the new Tech
+ *     VjsButton.registerTech('Tech', MyTech);
+ *     var player = videojs('myplayer', {
+ *       techOrder: ['myTech', 'html5']
+ *     });
+ * ```
+ *
+ * @param {String} The class name of the tech
+ * @param {Tech} The tech class
+ * @return {Tech} The newly registered Tech
+ * @mixes videojs
+ * @method registerTech
+ */
+videojs.registerTech = Component.registerTech;
 
 /**
  * A suite of browser and device tests

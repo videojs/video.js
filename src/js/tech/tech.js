@@ -449,6 +449,42 @@ class Tech extends Component {
            component instanceof Tech ||
            component === Tech;
   }
+
+  /**
+   * Registers a Tech
+   *
+   * @param {String} name Name of the Tech to register
+   * @param {Object} tech The tecj to register
+   * @static
+   * @method registerComponent
+   */
+  static registerTech(name, tech) {
+    if (!Tech.techs_) {
+      Tech.techs_ = {};
+    }
+
+    Tech.techs_[name] = tech;
+    return tech;
+  }
+
+  /**
+   * Gets a component by name
+   *
+   * @param {String} name Name of the component to get
+   * @return {Component}
+   * @static
+   * @method getComponent
+   */
+  static getTech(name) {
+    if (Tech.techs_ && Tech.techs_[name]) {
+      return Tech.techs_[name];
+    }
+
+    if (window && window.videojs && window.videojs[name]) {
+      log.warn(`The ${name} tech was added to the videojs object when it should be registered using videojs.registerTech(name, tech)`);
+      return window.videojs[name];
+    }
+  }
 }
 
 /*
@@ -649,4 +685,5 @@ Tech.withSourceHandlers = function(_Tech){
 Component.registerComponent('Tech', Tech);
 // Old name for Tech
 Component.registerComponent('MediaTechController', Tech);
+Tech.registerTech('Tech', Tech);
 export default Tech;

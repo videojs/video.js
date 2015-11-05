@@ -548,4 +548,5 @@ Flash.getEmbedCode = function(swf, flashVars, params, attributes){
 FlashRtmpDecorator(Flash);
 
 Component.registerComponent('Flash', Flash);
+Tech.registerTech('Flash', Flash);
 export default Flash;

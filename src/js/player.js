@@ -35,6 +35,7 @@ import TextTrackSettings from './tracks/text-track-settings.js';
 import ModalDialog from './modal-dialog';
 
 // Require html5 tech, at least for disposing the original video tag
+import Tech from './tech/tech.js';
 import Html5 from './tech/html5.js';
 
 /**
@@ -1653,7 +1654,11 @@ class Player extends Component {
     // Loop through each playback technology in the options order
     for (let i = 0, j = this.options_.techOrder; i < j.length; i++) {
       let techName = toTitleCase(j[i]);
-      let tech = Component.getComponent(techName);
+      let tech = Tech.getTech(techName);
+
+      if (!tech) {
+        tech = Component.getComponent(techName);
+      }
 
       // Check if the current tech is defined before continuing
       if (!tech) {
