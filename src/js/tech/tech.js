@@ -454,7 +454,7 @@ class Tech extends Component {
    * Registers a Tech
    *
    * @param {String} name Name of the Tech to register
-   * @param {Object} tech The tecj to register
+   * @param {Object} tech The tech to register
    * @static
    * @method registerComponent
    */
