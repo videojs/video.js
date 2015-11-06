@@ -1,10 +1,24 @@
 import Component from '../../src/js/component.js';
-import ControlBar from  '../../src/js/control-bar/control-bar.js';
 import * as Dom from '../../src/js/utils/dom.js';
 import * as Events from '../../src/js/utils/events.js';
 import * as browser from '../../src/js/utils/browser.js';
 import document from 'global/document';
 import TestHelpers from './test-helpers.js';
+
+class TestComponent1 extends Component {}
+class TestComponent2 extends Component {}
+class TestComponent3 extends Component {}
+class TestComponent4 extends Component {}
+TestComponent1.prototype.options_ = {
+  children: [
+    'testComponent2',
+    'testComponent3'
+  ]
+};
+Component.registerComponent('TestComponent1', TestComponent1);
+Component.registerComponent('TestComponent2', TestComponent2);
+Component.registerComponent('TestComponent3', TestComponent3);
+Component.registerComponent('TestComponent4', TestComponent4);
 
 q.module('Component', {
   'setup': function() {
@@ -113,13 +127,13 @@ test('should do a deep merge of child options', function(){
 });
 
 test('should init child components from component options', function(){
-  var comp = new ControlBar(TestHelpers.makePlayer(), {
-    volumeControl: {},
-    volumeMenuButton: false
+  let testComp = new TestComponent1(TestHelpers.makePlayer(), {
+    testComponent2: false,
+    testComponent4: {}
   });
 
-  ok(!comp.childNameIndex_.volumeMenuButton, 'we do not have volumeMenuButton');
-  ok(comp.childNameIndex_.volumeControl, 'we have a volume control');
+  ok(!testComp.childNameIndex_.testComponent2, 'we do not have testComponent2');
+  ok(testComp.childNameIndex_.testComponent4, 'we have a testComponent4');
 });
 
 test('should allows setting child options at the parent options level', function(){
