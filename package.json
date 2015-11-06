@@ -30,7 +30,7 @@
     "tsml": "1.0.1",
     "videojs-font": "1.4.0",
     "videojs-ie8": "1.1.0",
-    "videojs-swf": "5.0.0-rc1",
+    "videojs-swf": "5.0.1",
     "vtt.js": "git+https://github.com/gkatsev/vtt.js.git#vjs-v0.12.1",
     "xhr": "2.1.0"
   },
