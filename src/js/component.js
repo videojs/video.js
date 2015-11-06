@@ -541,13 +541,13 @@ class Component {
       if (Array.isArray(children)) {
         workingChildren = children;
       } else {
-        workingChildren = Object.getOwnPropertyNames(children);
+        workingChildren = Object.keys(children);
       }
 
       workingChildren
       // children that are in this.options_ but also in workingChildren  would
       // give us extra children we do not want. So, we want to filter them out.
-      .concat(Object.getOwnPropertyNames(this.options_)
+      .concat(Object.keys(this.options_)
               .filter(function(child) {
                 return !workingChildren.some(function(wchild) {
                   if (typeof child === 'string') {
