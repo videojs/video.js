@@ -547,18 +547,10 @@ class Component {
       .concat(Object.keys(this.options_)
               .filter(function(child) {
                 return !workingChildren.some(function(wchild) {
-                  if (typeof child === 'string') {
-                    if (typeof wchild === 'string') {
-                      return child === wchild;
-                    } else {
-                      return child === wchild.name;
-                    }
+                  if (typeof wchild === 'string') {
+                    return child === wchild;
                   } else {
-                    if (typeof wchild === 'string') {
-                      return child.name === wchild;
-                    } else {
-                      return child.name === wchild.name;
-                    }
+                    return child === wchild.name;
                   }
                 });
               }))
