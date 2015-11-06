@@ -437,6 +437,18 @@ class Tech extends Component {
     return '';
   }
 
+  /*
+   * Return whether the argument is a Tech or not.
+   * Can be passed either a Class like `Html5` or a instance like `player.tech_`
+   * 
+   * @param {Object} component An item to check
+   * @return {Boolean}         Whether it is a tech or not
+   */
+  static isTech(component) {
+    return component.prototype instanceof Tech ||
+           component instanceof Tech ||
+           component === Tech;
+  }
 }
 
 /*

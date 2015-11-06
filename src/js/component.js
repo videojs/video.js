@@ -369,6 +369,10 @@ class Component {
       // If there's no .player_, this is a player
       let ComponentClass = Component.getComponent(componentClassName);
 
+      if (!ComponentClass) {
+        throw new Error(`Component ${componentClassName} does not exist`);
+      }
+
       component = new ComponentClass(this.player_ || this, options);
 
     // child is a component instance
@@ -493,7 +497,10 @@ class Component {
       // `this` is `parent`
       let parentOptions = this.options_;
 
-      let handleAdd = (name, opts) => {
+      let handleAdd = (child) => {
+        let name = child.name;
+        let opts = child.opts;
+
         // Allow options for children to be set at the parent options
         // e.g. videojs(id, { controlBar: false });
         // instead of videojs(id, { children: { controlBar: false });
@@ -525,29 +532,50 @@ class Component {
       };
 
       // Allow for an array of children details to passed in the options
+      let workingChildren;
+      let Tech = Component.getComponent('Tech');
+
       if (Array.isArray(children)) {
-        for (let i = 0; i < children.length; i++) {
-          let child = children[i];
-          let name;
-          let opts;
-
-          if (typeof child === 'string') {
-            // ['myComponent']
-            name = child;
-            opts = {};
-          } else {
-            // [{ name: 'myComponent', otherOption: true }]
-            name = child.name;
-            opts = child;
-          }
-
-          handleAdd(name, opts);
-        }
+        workingChildren = children;
       } else {
-        Object.getOwnPropertyNames(children).forEach(function(name){
-          handleAdd(name, children[name]);
-        });
+        workingChildren = Object.keys(children);
       }
+
+      workingChildren
+      // children that are in this.options_ but also in workingChildren  would
+      // give us extra children we do not want. So, we want to filter them out.
+      .concat(Object.keys(this.options_)
+              .filter(function(child) {
+                return !workingChildren.some(function(wchild) {
+                  if (typeof wchild === 'string') {
+                    return child === wchild;
+                  } else {
+                    return child === wchild.name;
+                  }
+                });
+              }))
+      .map((child) => {
+        let name, opts;
+
+        if (typeof child === 'string') {
+          name = child;
+          opts = children[name] || this.options_[name] || {};
+        } else {
+          name = child.name;
+          opts = child;
+        }
+
+        return {name, opts};
+      })
+      .filter((child) => {
+        // we have to make sure that child.name isn't in the techOrder since
+        // techs are registerd as Components but can't aren't compatible
+        // See https://github.com/videojs/video.js/issues/2772
+        let c = Component.getComponent(child.opts.componentClass ||
+                                       toTitleCase(child.name));
+        return c && !Tech.isTech(c);
+      })
+      .forEach(handleAdd);
     }
   }
 
