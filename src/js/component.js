@@ -370,7 +370,7 @@ class Component {
       let ComponentClass = Component.getComponent(componentClassName);
 
       if (!ComponentClass) {
-        return;
+        throw new Error(`Component ${componentClassName} does not exist`);
       }
 
       component = new ComponentClass(this.player_ || this, options);
@@ -528,10 +528,7 @@ class Component {
         // Add a direct reference to the child by name on the parent instance.
         // If two of the same component are used, different names should be supplied
         // for each
-        let newChild = this.addChild(name, opts);
-        if (newChild) {
-          this[name] = newChild;
-        }
+        this[name] = this.addChild(name, opts);
       };
 
       // Allow for an array of children details to passed in the options

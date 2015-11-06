@@ -55,6 +55,14 @@ test('should add a child component', function(){
   ok(comp.getChildById(child.id()) === child);
 });
 
+test('addChild should throw if the child does not exist', function() {
+  var comp = new Component(getFakePlayer());
+
+  throws(function() {
+    comp.addChild('non-existent-child');
+  }, new Error('Component Non-existent-child does not exist'), 'addChild threw');
+});
+
 test('should init child components from options', function(){
   var comp = new Component(getFakePlayer(), {
     children: {
