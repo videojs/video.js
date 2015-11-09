@@ -569,18 +569,7 @@ Tech.withSourceHandlers = function(_Tech){
    * @return {String}         'probably', 'maybe', or '' (empty string)
    */
   _Tech.canPlayType = function(type){
-    let handlers = _Tech.sourceHandlers || [];
-    let can;
-
-    for (let i = 0; i < handlers.length; i++) {
-      can = handlers[i].canPlayType(type);
-
-      if (can) {
-        return can;
-      }
-    }
-
-    return '';
+    return _Tech.canPlaySource({src: '', type: type});
   };
 
    /*
@@ -592,12 +581,12 @@ Tech.withSourceHandlers = function(_Tech){
     */
    _Tech.selectSourceHandler = function(source){
     let handlers = _Tech.sourceHandlers || [];
-    let can;
+    let canPlay;
 
     for (let i = 0; i < handlers.length; i++) {
-      can = handlers[i].canHandleSource(source);
+      canPlay = handlers[i].canHandleSource(source);
 
-      if (can) {
+      if (canPlay) {
         return handlers[i];
       }
     }

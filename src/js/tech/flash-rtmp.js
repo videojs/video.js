@@ -60,31 +60,12 @@ function FlashRtmpDecorator(Flash) {
   Flash.rtmpSourceHandler = {};
 
   /**
-   * Check if Flash can play the given videotype
-   * @param  {String} type    The mimetype to check
-   * @return {String}         'probably', 'maybe', or '' (empty string)
-   */
-  Flash.rtmpSourceHandler.canPlayType = function(type){
-    if (Flash.isStreamingType(type)) {
-      return 'maybe';
-    }
-
-    return '';
-  };
-
-  /**
    * Check if Flash can handle the source natively
    * @param  {Object} source  The source object
    * @return {String}         'probably', 'maybe', or '' (empty string)
    */
   Flash.rtmpSourceHandler.canHandleSource = function(source){
-    let can = Flash.rtmpSourceHandler.canPlayType(source.type);
-
-    if (can) {
-      return can;
-    }
-
-    if (Flash.isStreamingSrc(source.src)) {
+    if (Flash.isStreamingType(source.type) || Flash.isStreamingSrc(source.src)) {
       return 'maybe';
     }
 

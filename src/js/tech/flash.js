@@ -352,19 +352,6 @@ Tech.withSourceHandlers(Flash);
  */
 Flash.nativeSourceHandler = {};
 
-/**
- * Check if Flash can play the given videotype
- * @param  {String} type    The mimetype to check
- * @return {String}         'probably', 'maybe', or '' (empty string)
- */
-Flash.nativeSourceHandler.canPlayType = function(type){
-  if (type in Flash.formats) {
-    return 'maybe';
-  }
-
-  return '';
-};
-
 /*
  * Check Flash can handle the source natively
  *
@@ -389,7 +376,11 @@ Flash.nativeSourceHandler.canHandleSource = function(source){
     type = source.type.replace(/;.*/, '').toLowerCase();
   }
 
-  return Flash.nativeSourceHandler.canPlayType(type);
+  if (type in Flash.formats) {
+    return 'maybe';
+  }
+
+  return '';
 };
 
 /*
