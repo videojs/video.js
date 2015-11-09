@@ -84,8 +84,6 @@ test('should expose DOM functions', function() {
 
   // Keys are videojs methods, values are Dom methods.
   let methods = {
-    $: '$',
-    $$: '$$',
     isEl: 'isEl',
     isTextNode: 'isTextNode',
     hasClass: 'hasElClass',

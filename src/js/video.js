@@ -546,42 +546,6 @@ videojs.xhr = xhr;
 videojs.TextTrack = TextTrack;
 
 /**
- * Finds a single DOM element matching `selector` within the optional
- * `context` of another DOM element (defaulting to `document`).
- *
- * @method $
- * @param  {String} selector
- *         A valid CSS selector, which will be passed to `querySelector`.
- *
- * @param  {Element|String} [context=document]
- *         A DOM element within which to query. Can also be a selector
- *         string in which case the first matching element will be used
- *         as context. If missing (or no element matches selector), falls
- *         back to `document`.
- *
- * @return {Element|null}
- */
-videojs.$ = Dom.$;
-
-/**
- * Finds a all DOM elements matching `selector` within the optional
- * `context` of another DOM element (defaulting to `document`).
- *
- * @method $$
- * @param  {String} selector
- *         A valid CSS selector, which will be passed to `querySelectorAll`.
- *
- * @param  {Element|String} [context=document]
- *         A DOM element within which to query. Can also be a selector
- *         string in which case the first matching element will be used
- *         as context. If missing (or no element matches selector), falls
- *         back to `document`.
- *
- * @return {NodeList}
- */
-videojs.$$ = Dom.$$;
-
-/**
  * Determines, via duck typing, whether or not a value is a DOM element.
  *
  * @method isEl
