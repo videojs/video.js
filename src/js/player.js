@@ -1767,7 +1767,7 @@ class Player extends Component {
     // Support old behavior of techs being registered as components.
     // Remove once that deprecated behavior is removed.
     if (!currentTech) {
-      currentTech = Component.getComponent(techName);
+      currentTech = Component.getComponent(this.techName_);
     }
 
     // case: Array of source objects to choose from and pick the best to play
