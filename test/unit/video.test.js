@@ -1,6 +1,7 @@
 import videojs from '../../src/js/video.js';
 import TestHelpers from './test-helpers.js';
 import Player from '../../src/js/player.js';
+import * as Dom from '../../src/js/utils/dom.js';
 import log from '../../src/js/utils/log.js';
 import document from 'global/document';
 
@@ -77,4 +78,11 @@ test('should expose plugin registry function', function() {
 test('should expose options and players properties for backward-compatibility', function() {
   ok(typeof videojs.options, 'object', 'options should be an object');
   ok(typeof videojs.players, 'object', 'players should be an object');
+});
+
+test('should expose dom.js methods', function() {
+  ok(videojs.createEl, Dom.createEl, 'createEl should be an alias for Dom.createEl');
+  ok(videojs.hasElClass, Dom.hasElClass, 'hasElClass should be an alias for Dom.hasElClass');
+  ok(videojs.addElClass, Dom.addElClass, 'addElClass should be an alias for Dom.addElClass');
+  ok(videojs.removeElClass, Dom.removeElClass, 'removeElClass should be an alias for Dom.removeElClass');
 });
