@@ -8,6 +8,7 @@ CHANGELOG
 * @Lillemanden impoved logic for dividing RTMP paths ([view](https://github.com/videojs/video.js/pull/2787))
 * @bdeitte added a test for improved RTMP path dividing logic ([view](https://github.com/videojs/video.js/pull/2794))
 * @paladox updated grunt-cli dependency ([view](https://github.com/videojs/video.js/pull/2555))
+* @paladox updated grunt-contrib-jshint ([view](https://github.com/videojs/video.js/pull/2554))
 
 --------------------
 
