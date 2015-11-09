@@ -471,6 +471,10 @@ test('should add and remove a CSS class', function(){
   ok(comp.el().className.indexOf('test-class') !== -1);
   comp.removeClass('test-class');
   ok(comp.el().className.indexOf('test-class') === -1);
+  comp.toggleClass('test-class');
+  ok(comp.el().className.indexOf('test-class') !== -1);
+  comp.toggleClass('test-class');
+  ok(comp.el().className.indexOf('test-class') === -1);
 });
 
 test('should show and hide an element', function(){
@@ -694,4 +698,19 @@ test('should provide interval methods that automatically get cleared on componen
   this.clock.tick(1200);
 
   ok(intervalsFired === 5, 'Interval was cleared when component was disposed');
+});
+
+test('$ and $$ functions', function() {
+  var comp = new Component(getFakePlayer());
+  var contentEl = document.createElement('div');
+  var children = [
+    document.createElement('div'),
+    document.createElement('div')
+  ];
+
+  comp.contentEl_ = contentEl;
+  children.forEach(child => contentEl.appendChild(child));
+
+  strictEqual(comp.$('div'), children[0], '$ defaults to contentEl as scope');
+  strictEqual(comp.$$('div').length, children.length, '$$ defaults to contentEl as scope');
 });

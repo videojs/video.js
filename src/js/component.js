@@ -831,6 +831,46 @@ class Component {
   }
 
   /**
+   * Finds a single DOM element matching `selector` within the component's
+   * `contentEl` or another custom context.
+   *
+   * @method $
+   * @param  {String} selector
+   *         A valid CSS selector, which will be passed to `querySelector`.
+   *
+   * @param  {Element|String} [context=document]
+   *         A DOM element within which to query. Can also be a selector
+   *         string in which case the first matching element will be used
+   *         as context. If missing (or no element matches selector), falls
+   *         back to `document`.
+   *
+   * @return {Element|null}
+   */
+  $(selector, context) {
+    return Dom.$(selector, context || this.contentEl());
+  }
+
+  /**
+   * Finds a all DOM elements matching `selector` within the component's
+   * `contentEl` or another custom context.
+   *
+   * @method $$
+   * @param  {String} selector
+   *         A valid CSS selector, which will be passed to `querySelectorAll`.
+   *
+   * @param  {Element|String} [context=document]
+   *         A DOM element within which to query. Can also be a selector
+   *         string in which case the first matching element will be used
+   *         as context. If missing (or no element matches selector), falls
+   *         back to `document`.
+   *
+   * @return {NodeList}
+   */
+  $$(selector, context) {
+    return Dom.$$(selector, context || this.contentEl());
+  }
+
+  /**
    * Check if a component's element has a CSS class name
    *
    * @param {String} classToCheck Classname to check
@@ -854,7 +894,7 @@ class Component {
   }
 
   /**
-   * Remove and return a CSS class name from the component's element
+   * Remove a CSS class name from the component's element
    *
    * @param {String} classToRemove Classname to remove
    * @return {Component}
@@ -862,6 +902,23 @@ class Component {
    */
   removeClass(classToRemove) {
     Dom.removeElClass(this.el_, classToRemove);
+    return this;
+  }
+
+  /**
+   * Add or remove a CSS class name from the component's element
+   *
+   * @param  {String} classToToggle
+   * @param  {Boolean|Function} [predicate]
+   *         Can be a function that returns a Boolean. If `true`, the class
+   *         will be added; if `false`, the class will be removed. If not
+   *         given, the class will be added if not present and vice versa.
+   *
+   * @return {Component}
+   * @method toggleClass
+   */
+  toggleClass(classToToggle, predicate) {
+    Dom.toggleElClass(this.el_, classToToggle, predicate);
     return this;
   }
 

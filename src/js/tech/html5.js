@@ -771,7 +771,7 @@ class Html5 extends Tech {
 
     this.remoteTextTracks().removeTrack_(track);
 
-    tracks = this.el().querySelectorAll('track');
+    tracks = this.$$('track');
 
     i = tracks.length;
     while (i--) {

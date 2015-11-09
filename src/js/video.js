@@ -99,10 +99,10 @@ var videojs = function(id, options, ready){
 };
 
 // Add default styles
-let style = document.querySelector('.vjs-styles-defaults');
+let style = Dom.$('.vjs-styles-defaults');
 if (!style) {
   style = stylesheet.createStyleElement('vjs-styles-defaults');
-  let head = document.querySelector('head');
+  let head = Dom.$('head');
   head.insertBefore(style, head.firstChild);
   stylesheet.setTextContent(style, `
     .video-js {
@@ -545,22 +545,149 @@ videojs.xhr = xhr;
  */
 videojs.TextTrack = TextTrack;
 
-// REMOVING: We probably should add this to the migration plugin
-// // Expose but deprecate the window[componentName] method for accessing components
-// Object.getOwnPropertyNames(Component.components).forEach(function(name){
-//   let component = Component.components[name];
-//
-//   // A deprecation warning as the constuctor
-//   module.exports[name] = function(player, options, ready){
-//     log.warn('Using videojs.'+name+' to access the '+name+' component has been deprecated. Please use videojs.getComponent("componentName")');
-//
-//     return new Component(player, options, ready);
-//   };
-//
-//   // Allow the prototype and class methods to be accessible still this way
-//   // Though anything that attempts to override class methods will no longer work
-//   assign(module.exports[name], component);
-// });
+/**
+ * Determines, via duck typing, whether or not a value is a DOM element.
+ *
+ * @method isEl
+ * @param  {Mixed} value
+ * @return {Boolean}
+ */
+videojs.isEl = Dom.isEl;
+
+/**
+ * Determines, via duck typing, whether or not a value is a text node.
+ *
+ * @method isTextNode
+ * @param  {Mixed} value
+ * @return {Boolean}
+ */
+videojs.isTextNode = Dom.isTextNode;
+
+/**
+ * Check if an element has a CSS class
+ *
+ * @method hasClass
+ * @param {Element} element Element to check
+ * @param {String} classToCheck Classname to check
+ */
+videojs.hasClass = Dom.hasElClass;
+
+/**
+ * Add a CSS class name to an element
+ *
+ * @method addClass
+ * @param {Element} element    Element to add class name to
+ * @param {String} classToAdd Classname to add
+ */
+videojs.addClass = Dom.addElClass;
+
+/**
+ * Remove a CSS class name from an element
+ *
+ * @method removeClass
+ * @param {Element} element    Element to remove from class name
+ * @param {String} classToRemove Classname to remove
+ */
+videojs.removeClass = Dom.removeElClass;
+
+/**
+ * Adds or removes a CSS class name on an element depending on an optional
+ * condition or the presence/absence of the class name.
+ *
+ * @method toggleElClass
+ * @param  {Element} element
+ * @param  {String} classToToggle
+ * @param  {Boolean|Function} [predicate]
+ *         Can be a function that returns a Boolean. If `true`, the class
+ *         will be added; if `false`, the class will be removed. If not
+ *         given, the class will be added if not present and vice versa.
+ */
+videojs.toggleClass = Dom.toggleElClass;
+
+/**
+ * Apply attributes to an HTML element.
+ *
+ * @method setAttributes
+ * @param  {Element} el         Target element.
+ * @param  {Object=} attributes Element attributes to be applied.
+ */
+videojs.setAttributes = Dom.setElAttributes;
+
+/**
+ * Get an element's attribute values, as defined on the HTML tag
+ * Attributes are not the same as properties. They're defined on the tag
+ * or with setAttribute (which shouldn't be used with HTML)
+ * This will return true or false for boolean attributes.
+ *
+ * @method getAttributes
+ * @param  {Element} tag Element from which to get tag attributes
+ * @return {Object}
+ */
+videojs.getAttributes = Dom.getElAttributes;
+
+/**
+ * Empties the contents of an element.
+ *
+ * @method emptyEl
+ * @param  {Element} el
+ * @return {Element}
+ */
+videojs.emptyEl = Dom.emptyEl;
+
+/**
+ * Normalizes and appends content to an element.
+ *
+ * The content for an element can be passed in multiple types and
+ * combinations, whose behavior is as follows:
+ *
+ * - String
+ *   Normalized into a text node.
+ *
+ * - Element, TextNode
+ *   Passed through.
+ *
+ * - Array
+ *   A one-dimensional array of strings, elements, nodes, or functions (which
+ *   return single strings, elements, or nodes).
+ *
+ * - Function
+ *   If the sole argument, is expected to produce a string, element,
+ *   node, or array.
+ *
+ * @method appendContent
+ * @param  {Element} el
+ * @param  {String|Element|TextNode|Array|Function} content
+ * @return {Element}
+ */
+videojs.appendContent = Dom.appendContent;
+
+/**
+ * Normalizes and inserts content into an element; this is identical to
+ * `appendContent()`, except it empties the element first.
+ *
+ * The content for an element can be passed in multiple types and
+ * combinations, whose behavior is as follows:
+ *
+ * - String
+ *   Normalized into a text node.
+ *
+ * - Element, TextNode
+ *   Passed through.
+ *
+ * - Array
+ *   A one-dimensional array of strings, elements, nodes, or functions (which
+ *   return single strings, elements, or nodes).
+ *
+ * - Function
+ *   If the sole argument, is expected to produce a string, element,
+ *   node, or array.
+ *
+ * @method insertContent
+ * @param  {Element} el
+ * @param  {String|Element|TextNode|Array|Function} content
+ * @return {Element}
+ */
+videojs.insertContent = Dom.insertContent;
 
 /*
  * Custom Universal Module Definition (UMD)
