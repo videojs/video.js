@@ -531,7 +531,7 @@ class Player extends Component {
     // Support old behavior of techs being registered as components.
     // Remove once that deprecated behavior is removed.
     if (!techComponent) {
-      Component.getComponent(techName);
+      techComponent = Component.getComponent(techName);
     }
     this.tech_ = new techComponent(techOptions);
 
@@ -1767,7 +1767,7 @@ class Player extends Component {
     // Support old behavior of techs being registered as components.
     // Remove once that deprecated behavior is removed.
     if (!currentTech) {
-      tech = Component.getComponent(techName);
+      currentTech = Component.getComponent(techName);
     }
 
     // case: Array of source objects to choose from and pick the best to play
