@@ -22,6 +22,10 @@ test('test streamToParts', function() {
   ok(parts.connection === 'http://myurl.com/');
   ok(parts.stream === 'streaming&/is/fun');
 
+  parts = Flash.streamToParts('http://myurl.com/really?streaming=fun&really=fun');
+  ok(parts.connection === 'http://myurl.com/');
+  ok(parts.stream === 'really?streaming=fun&really=fun');
+
   parts = Flash.streamToParts('http://myurl.com/streaming/is/fun');
   ok(parts.connection === 'http://myurl.com/streaming/is/');
   ok(parts.stream === 'fun');
