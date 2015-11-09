@@ -58,7 +58,7 @@ if (Html5.supportsNativeTextTracks()) {
 
     let tech = {
       $$() {
-        return [nativeTrack]
+        return [nativeTrack];
       },
 
       el() {
@@ -108,7 +108,7 @@ if (Html5.supportsNativeTextTracks()) {
     let addRemotes = 0;
     let tech = {
       $$() {
-        return [nativeTrack]
+        return [nativeTrack];
       },
 
       el() {
@@ -176,7 +176,7 @@ q.test('textTracksToJson produces good json output for emulated only', function(
 
   let tech = {
     $$() {
-      return []
+      return [];
     },
 
     el() {
@@ -230,7 +230,7 @@ q.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated trac
   let addRemotes = 0;
   let tech = {
     $$() {
-      return []
+      return [];
     },
 
     el() {
