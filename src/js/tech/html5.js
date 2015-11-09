@@ -1087,4 +1087,5 @@ Html5.disposeMediaElement = function(el){
 };
 
 Component.registerComponent('Html5', Html5);
+Tech.registerTech('Html5', Html5);
 export default Html5;

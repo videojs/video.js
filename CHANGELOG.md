@@ -4,6 +4,7 @@ CHANGELOG
 ## HEAD (Unreleased)
 * @gkatsev made initListeners more general and added Tech.isTech. Fixes #2767 ([view](https://github.com/videojs/video.js/pull/2773))
 * @dmlap updated swf to 5.0.1 ([view](https://github.com/videojs/video.js/pull/2795))
+* @gkatsev added a tech registry. Fixes #2772 ([view](https://github.com/videojs/video.js/pull/2782))
 
 --------------------
 
