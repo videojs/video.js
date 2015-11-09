@@ -464,7 +464,7 @@ class Tech extends Component {
     }
 
     if (!Tech.isTech(tech)) {
-      throw new Error(`Tech ${name} must be a Tech`)
+      throw new Error(`Tech ${name} must be a Tech`);
     }
 
     Tech.techs_[name] = tech;
