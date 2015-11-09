@@ -1656,6 +1656,8 @@ class Player extends Component {
       let techName = toTitleCase(j[i]);
       let tech = Tech.getTech(techName);
 
+      // Support old behavior of techs being registered as components.
+      // Remove once that deprecated behavior is removed.
       if (!tech) {
         tech = Component.getComponent(techName);
       }
