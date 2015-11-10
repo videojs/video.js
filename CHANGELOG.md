@@ -11,6 +11,7 @@ CHANGELOG
 * @paladox updated grunt-contrib-jshint ([view](https://github.com/videojs/video.js/pull/2554))
 * @siebrand updated dutch translations ([view](https://github.com/videojs/video.js/pull/2556))
 * @misteroneill exposed DOM helpers ([view](https://github.com/videojs/video.js/pull/2754))
+* @incompl fixed broken link to reduced test cases article ([view](https://github.com/videojs/video.js/pull/2801))
 
 --------------------
 
