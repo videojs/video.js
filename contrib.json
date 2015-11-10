@@ -398,7 +398,7 @@
         { "prompt": "text", "id": "prNum",                             "desc": "What is the the pull request number?" },
         { "get": "{{meta.urls.repo_api}}/pulls/{{prNum}}",             "desc": "Get the PR information", "id": "pr" },
         { "get": "{{meta.urls.repo_api}}/pulls/{{prNum}}/commits",     "desc": "Get the PR commits to access author info", "id": "prCommits" },
-        [ "git checkout -b {{pr.user.login}}-{{pr.head.ref}} {{pr.base.ref}}", "Create a new branch for merging the changes" ],
+        [ "git checkout -b {{pr.user.login}}/{{pr.head.ref}} {{pr.base.ref}}", "Create a new branch for merging the changes" ],
         [ "git fetch {{pr.head.repo.ssh_url}} {{pr.head.ref}}",                "Fetch the changes" ],
         [ "git merge --no-commit --squash FETCH_HEAD",                         "Merge the changes in without committing so they can be squashed" ],
         [ "grunt test",                                                        "Run tests to make sure they still pass" ],

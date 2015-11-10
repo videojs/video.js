@@ -597,7 +597,7 @@ class Player extends Component {
   unloadTech_() {
     // Save the current text tracks so that we can reuse the same text tracks with the next tech
     this.textTracks_ = this.textTracks();
-    this.textTracksJson_ = textTrackConverter.textTracksToJson(this);
+    this.textTracksJson_ = textTrackConverter.textTracksToJson(this.tech_);
 
     this.isReady_ = false;
 
