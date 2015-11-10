@@ -2,7 +2,6 @@
 // can run without HTML5 or Flash, of which PhantomJS supports neither.
 
 import Tech from '../../../src/js/tech/tech.js';
-import Component from '../../../src/js/component.js';
 
 /**
  * @constructor
@@ -54,5 +53,5 @@ class TechFaker extends Tech {
   static canPlaySource(srcObj) { return srcObj.type !== 'video/unsupported-format'; }
 }
 
-Component.registerComponent('TechFaker', TechFaker);
+Tech.registerTech('TechFaker', TechFaker);
 export default TechFaker;
