@@ -2,6 +2,11 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 5.2.0 (2015-11-10)
 * @gkatsev made initListeners more general and added Tech.isTech. Fixes #2767 ([view](https://github.com/videojs/video.js/pull/2773))
 * @dmlap updated swf to 5.0.1 ([view](https://github.com/videojs/video.js/pull/2795))
 * @gkatsev added a tech registry. Fixes #2772 ([view](https://github.com/videojs/video.js/pull/2782))
@@ -16,8 +21,6 @@ CHANGELOG
 * @gkatsev fixed usage of textTracksToJson ([view](https://github.com/videojs/video.js/pull/2797))
 * @gkatsev updated contrib.json to use / as branch-name separator in feature-accept ([view](https://github.com/videojs/video.js/pull/2803))
 * @gkatsev updated MediaLoader to check for techs in their registry ([view](https://github.com/videojs/video.js/pull/2798))
-
---------------------
 
 ## 5.1.0 (2015-11-02)
 * @typcn bumped grunt-sass to ^1.0.0 to support node 4.x ([view](https://github.com/videojs/video.js/pull/2645))
