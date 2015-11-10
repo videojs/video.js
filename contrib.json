@@ -408,10 +408,10 @@
         [ "git commit -a --author='{{prCommits.[0].commit.author.name}} <{{prCommits.[0].commit.author.email}}>' -m '{{line}}. closes #{{prNum}}'", "Commit the changes" ],
         { "prompt": "confirm",                                         "desc": "Does everything look ok?" },
         [ "git checkout {{pr.base.ref}}",                                      "Check out the base branch" ],
-        [ "git merge {{pr.user.login}}-{{pr.head.ref}}",                       "Merge the changes" ],
+        [ "git merge {{pr.user.login}}/{{pr.head.ref}}",                       "Merge the changes" ],
         [ "git push origin {{pr.base.ref}}",                                   "Push the changes to your remote copy of the project" ],
         [ "git push upstream {{pr.base.ref}}",                                 "Push the changes to the main project" ],
-        [ "git branch -D {{pr.user.login}}-{{pr.head.ref}}",                   "Delete the local branch used for merging" ]
+        [ "git branch -D {{pr.user.login}}/{{pr.head.ref}}",                   "Delete the local branch used for merging" ]
       ]
     }
   }

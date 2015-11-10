@@ -14,6 +14,7 @@ CHANGELOG
 * @incompl fixed broken link to reduced test cases article ([view](https://github.com/videojs/video.js/pull/2801))
 * @zjruan updated text track prototype loops to blacklist constructor for IE8 ([view](https://github.com/videojs/video.js/pull/2565))
 * @gkatsev fixed usage of textTracksToJson ([view](https://github.com/videojs/video.js/pull/2797))
+* @gkatsev updated contrib.json to use / as branch-name separator in feature-accept ([view](https://github.com/videojs/video.js/pull/2803))
 
 --------------------
 
