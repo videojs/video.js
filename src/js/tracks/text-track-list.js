@@ -91,15 +91,22 @@ TextTrackList.prototype.addTrack_ = function(track) {
 };
 
 TextTrackList.prototype.removeTrack_ = function(rtrack) {
-  let result = null;
   let track;
 
   for (let i = 0, l = this.length; i < l; i++) {
-    track = this[i];
-    if (track === rtrack) {
-      this.tracks_.splice(i, 1);
-      break;
+    if (this[i] !== rtrack) {
+      continue;
     }
+
+    track = this[i];
+
+    this.tracks_.splice(i, 1);
+
+    break;
+  }
+
+  if (track) {
+    return;
   }
 
   this.trigger({
