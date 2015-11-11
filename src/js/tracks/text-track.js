@@ -195,7 +195,8 @@ TextTrack.prototype.constructor = TextTrack;
  * cuechange - One or more cues in the track have become active or stopped being active.
  */
 TextTrack.prototype.allowedEvents_ = {
-  'cuechange': 'cuechange'
+  'cuechange': 'cuechange',
+  'loadeddata': 'loadeddata'
 };
 
 TextTrack.prototype.addCue = function(cue) {
@@ -233,20 +234,21 @@ TextTrack.prototype.removeCue = function(removeCue) {
 * Downloading stuff happens below this point
 */
 var parseCues = function(srcContent, track) {
-  if (typeof window['WebVTT'] !== 'function') {
-    //try again a bit later
-    return window.setTimeout(function() {
-      parseCues(srcContent, track);
-    }, 25);
-  }
-
   let parser = new window['WebVTT']['Parser'](window, window['vttjs'], window['WebVTT']['StringDecoder']());
 
   parser['oncue'] = function(cue) {
     track.addCue(cue);
   };
+
   parser['onparsingerror'] = function(error) {
     log.error(error);
+  };
+
+  parser['onflush'] = () => {
+    track.trigger({
+      type: 'loadeddata',
+      target: track
+    });
   };
 
   parser['parse'](srcContent);
@@ -269,7 +271,15 @@ var loadTrack = function(src, track) {
     }
 
     track.loaded_ = true;
-    parseCues(responseBody, track);
+
+    if (typeof window['WebVTT'] !== 'function') {
+      //try again a bit later
+      return window.setTimeout(function() {
+        parseCues(responseBody, track);
+      }, 100);
+    } else {
+      parseCues(responseBody, track);
+    }
   }));
 };
 
