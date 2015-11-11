@@ -2493,6 +2493,16 @@ class Player extends Component {
   }
 
   /**
+   * Get an array of remote html track elements
+   *
+   * @return {HTMLTrackElement[]}
+   * @method remoteTextTrackEls
+   */
+  remoteTextTrackEls() {
+    return this.tech_ && this.tech_['remoteTextTrackEls']();
+  }
+
+  /**
    * Add a text track
    * In addition to the W3C settings we allow adding additional info through options.
    * http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-addtexttrack

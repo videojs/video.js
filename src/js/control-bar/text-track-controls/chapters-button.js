@@ -77,21 +77,13 @@ class ChaptersButton extends TextTrackButton {
     let chaptersTrack;
     let items = this.items = [];
 
-    for (let i = 0, l = tracks.length; i < l; i++) {
+    for (let i = 0, length = tracks.length; i < length; i++) {
       let track = tracks[i];
+
       if (track['kind'] === this.kind_) {
-        if (!track.cues) {
-          track['mode'] = 'hidden';
-          /* jshint loopfunc:true */
-          // TODO see if we can figure out a better way of doing this https://github.com/videojs/video.js/issues/1864
-          window.setTimeout(Fn.bind(this, function() {
-            this.createMenu();
-          }), 100);
-          /* jshint loopfunc:false */
-        } else {
-          chaptersTrack = track;
-          break;
-        }
+        chaptersTrack = track;
+
+        break;
       }
     }
 
@@ -105,7 +97,19 @@ class ChaptersButton extends TextTrackButton {
       }));
     }
 
-    if (chaptersTrack) {
+    if (chaptersTrack && !chaptersTrack.cues) {
+      chaptersTrack['mode'] = 'hidden';
+
+      let remoteTextTrackEl = this.player_.remoteTextTrackEls().getTrackElementByTrack_(chaptersTrack);
+
+      if (remoteTextTrackEl) {
+        remoteTextTrackEl.addEventListener('load', (event) => {
+          this.update();
+        });
+      }
+    }
+
+    if (chaptersTrack && chaptersTrack.cues && chaptersTrack.cues.length > 0) {
       let cues = chaptersTrack['cues'], cue;
 
       for (let i = 0, l = cues.length; i < l; i++) {
@@ -120,6 +124,7 @@ class ChaptersButton extends TextTrackButton {
 
         menu.addChild(mi);
       }
+
       this.addChild(menu);
     }
 
