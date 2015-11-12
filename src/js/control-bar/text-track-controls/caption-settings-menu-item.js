@@ -29,6 +29,7 @@ import Component from '../../component.js';
 
     super(player, options);
     this.addClass('vjs-texttrack-settings');
+    this.controlText(', opens ' + options['kind'] + ' settings dialog');
   }
 
   /**
