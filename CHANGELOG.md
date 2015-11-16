@@ -2,10 +2,13 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* @dmlap Check a component is a function before new-ing ([view](https://github.com/videojs/video.js/pull/2814))
-* @ksjun corrected the registerTech export ([view](https://github.com/videojs/video.js/pull/2816))
+_(none)_
 
 --------------------
+
+## 5.2.1 (2015-11-16)
+* @dmlap Check a component is a function before new-ing ([view](https://github.com/videojs/video.js/pull/2814))
+* @ksjun corrected the registerTech export ([view](https://github.com/videojs/video.js/pull/2816))
 
 ## 5.2.0 (2015-11-10)
 * @gkatsev made initListeners more general and added Tech.isTech. Fixes #2767 ([view](https://github.com/videojs/video.js/pull/2773))
