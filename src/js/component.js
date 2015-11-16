@@ -373,6 +373,14 @@ class Component {
         throw new Error(`Component ${componentClassName} does not exist`);
       }
 
+      // data stored directly on the videojs object may be
+      // misidentified as a component to retain
+      // backwards-compatibility with 4.x. check to make sure the
+      // component class can be instantiated.
+      if (typeof ComponentClass !== 'function') {
+        return null;
+      }
+
       component = new ComponentClass(this.player_ || this, options);
 
     // child is a component instance
