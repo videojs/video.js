@@ -3,6 +3,7 @@ CHANGELOG
 
 ## HEAD (Unreleased)
 * @dmlap Check a component is a function before new-ing ([view](https://github.com/videojs/video.js/pull/2814))
+* @ksjun corrected the registerTech export ([view](https://github.com/videojs/video.js/pull/2816))
 
 --------------------
 
