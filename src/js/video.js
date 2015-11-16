@@ -246,7 +246,7 @@ videojs.getTech = Tech.getTech;
  * @mixes videojs
  * @method registerTech
  */
-videojs.registerTech = Component.registerTech;
+videojs.registerTech = Tech.registerTech;
 
 /**
  * A suite of browser and device tests
