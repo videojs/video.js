@@ -2,10 +2,10 @@ import * as browser from '../utils/browser.js';
 import document from 'global/document';
 import EventTarget from '../event-target';
 
-export const NONE = 0;
-export const LOADING = 1;
-export const LOADED = 2;
-export const ERROR = 3;
+const NONE = 0;
+const LOADING = 1;
+const LOADED = 2;
+const ERROR = 3;
 
 /**
  * https://html.spec.whatwg.org/multipage/embedded-content.html#htmltrackelement
@@ -32,7 +32,6 @@ class HTMLTrackElement extends EventTarget {
     super();
 
     let readyState,
-        textTrack,
         trackElement = this;
 
     if (browser.IS_IE8) {
@@ -57,14 +56,13 @@ class HTMLTrackElement extends EventTarget {
 
     Object.defineProperty(trackElement, 'track', {
       get() {
-        return textTrack;
+        return track;
       }
     });
 
     readyState = NONE;
-    textTrack = track;
 
-    textTrack.addEventListener('loadeddata', function() {
+    track.addEventListener('loadeddata', function() {
       readyState = LOADED;
 
       trackElement.trigger({
@@ -82,5 +80,10 @@ class HTMLTrackElement extends EventTarget {
 HTMLTrackElement.prototype.allowedEvents_ = {
   load: 'load'
 };
+
+HTMLTrackElement.NONE = NONE;
+HTMLTrackElement.LOADING = LOADING;
+HTMLTrackElement.LOADED = LOADED;
+HTMLTrackElement.ERROR = ERROR;
 
 export default HTMLTrackElement;

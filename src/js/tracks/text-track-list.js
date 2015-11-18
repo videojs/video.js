@@ -69,6 +69,13 @@ for (let event in TextTrackList.prototype.allowedEvents_) {
   TextTrackList.prototype['on' + event] = null;
 }
 
+/**
+ * Add TextTrack from TextTrackList
+ *
+ * @param {TextTrack} track
+ * @method addTrack_
+ * @private
+ */
 TextTrackList.prototype.addTrack_ = function(track) {
   let index = this.tracks_.length;
   if (!(''+index in this)) {
@@ -90,19 +97,25 @@ TextTrackList.prototype.addTrack_ = function(track) {
   });
 };
 
+/**
+ * Remove TextTrack from TextTrackList
+ * NOTE: Be mindful of what is passed in as it may be a HTMLTrackElement
+ *
+ * @param {TextTrack} rtrack
+ * @method removeTrack_
+ * @private
+ */
 TextTrackList.prototype.removeTrack_ = function(rtrack) {
   let track;
 
   for (let i = 0, l = this.length; i < l; i++) {
-    if (this[i] !== rtrack) {
-      continue;
+    if (this[i] === rtrack) {
+      track = this[i];
+
+      this.tracks_.splice(i, 1);
+
+      break;
     }
-
-    track = this[i];
-
-    this.tracks_.splice(i, 1);
-
-    break;
   }
 
   if (track) {

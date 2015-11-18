@@ -42,13 +42,11 @@ class HtmlTrackElementList {
     let trackElement_;
 
     for (let i = 0, length = this.trackElements_.length; i < length; i++) {
-      if (track !== this.trackElements_[i].track) {
-        continue;
+      if (track === this.trackElements_[i].track) {
+        trackElement_ = this.trackElements_[i];
+
+        break;
       }
-
-      trackElement_ = this.trackElements_[i];
-
-      break;
     }
 
     return trackElement_;
@@ -56,13 +54,11 @@ class HtmlTrackElementList {
 
   removeTrackElement_(trackElement) {
     for (let i = 0, length = this.trackElements_.length; i < length; i++) {
-      if (trackElement !== this.trackElements_[i]) {
-        continue;
+      if (trackElement === this.trackElements_[i]) {
+        this.trackElements_.splice(i, 1);
+
+        break;
       }
-
-      this.trackElements_.splice(i, 1);
-
-      break;
     }
   }
 }

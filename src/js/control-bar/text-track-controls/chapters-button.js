@@ -97,7 +97,7 @@ class ChaptersButton extends TextTrackButton {
       }));
     }
 
-    if (chaptersTrack && !chaptersTrack.cues) {
+    if (chaptersTrack && chaptersTrack.cues == null) {
       chaptersTrack['mode'] = 'hidden';
 
       let remoteTextTrackEl = this.player_.remoteTextTrackEls().getTrackElementByTrack_(chaptersTrack);

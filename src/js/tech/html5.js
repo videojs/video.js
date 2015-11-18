@@ -769,8 +769,6 @@ class Html5 extends Tech {
     this.remoteTextTrackEls().addTrackElement_(htmlTrackElement);
     this.remoteTextTracks().addTrack_(htmlTrackElement.track);
 
-    // TODO: need to verify that we should be returning htmlTrackElement
-    // https://github.com/videojs/video.js/issues/2799
     return htmlTrackElement;
   }
 
