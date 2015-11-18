@@ -118,7 +118,7 @@ TextTrackList.prototype.removeTrack_ = function(rtrack) {
     }
   }
 
-  if (track) {
+  if (!track) {
     return;
   }
 
