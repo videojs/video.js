@@ -1,4 +1,5 @@
 import * as browser from '../utils/browser.js';
+import document from 'global/document';
 import EventTarget from '../event-target';
 
 export const NONE = 0;
@@ -35,27 +36,26 @@ class HTMLTrackElement extends EventTarget {
         trackElement = this;
 
     if (browser.IS_IE8) {
-      // TODO: do stuff
+      trackElement = document.createElement('custom');
+
+      for (let prop in HTMLTrackElement.prototype) {
+        trackElement[prop] = HTMLTrackElement.prototype[prop];
+      }
     }
 
-    this.kind = track.kind;
-    this.src = track.src;
-    this.srclang = track.srclang;
-    this.label = track.label;
-    this.default = track.default;
+    trackElement.kind = track.kind;
+    trackElement.src = track.src;
+    trackElement.srclang = track.srclang;
+    trackElement.label = track.label;
+    trackElement.default = track.default;
 
-    const NONE = 0;
-    const LOADING = 1;
-    const LOADED = 2;
-    const ERROR = 3;
-
-    Object.defineProperty(this, 'readyState', {
+    Object.defineProperty(trackElement, 'readyState', {
       get() {
         return readyState;
       }
     });
 
-    Object.defineProperty(this, 'track', {
+    Object.defineProperty(trackElement, 'track', {
       get() {
         return textTrack;
       }
@@ -74,7 +74,7 @@ class HTMLTrackElement extends EventTarget {
     });
 
     if (browser.IS_IE8) {
-      return this;
+      return trackElement;
     }
   }
 }

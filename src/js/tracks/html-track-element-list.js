@@ -3,23 +3,34 @@
  */
 
 import * as browser from '../utils/browser.js';
+import document from 'global/document';
 
 class HtmlTrackElementList {
   constructor(trackElements = []) {
-    this.trackElements_ = [];
+    let list = this;
 
-    Object.defineProperty(this, 'length', {
+    if (browser.IS_IE8) {
+      list = document.createElement('custom');
+
+      for (let prop in HtmlTrackElementList.prototype) {
+        list[prop] = HtmlTrackElementList.prototype[prop];
+      }
+    }
+
+    list.trackElements_ = [];
+
+    Object.defineProperty(list, 'length', {
       get() {
         return this.trackElements_.length;
       }
     });
 
     for (let i = 0, length = trackElements.length; i < length; i++) {
-      this.addTrackElement_(trackElements[i]);
+      list.addTrackElement_(trackElements[i]);
     }
 
     if (browser.IS_IE8) {
-      return this;
+      return list;
     }
   }
 
