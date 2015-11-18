@@ -234,25 +234,25 @@ TextTrack.prototype.removeCue = function(removeCue) {
 * Downloading stuff happens below this point
 */
 var parseCues = function(srcContent, track) {
-  let parser = new window['WebVTT']['Parser'](window, window['vttjs'], window['WebVTT']['StringDecoder']());
+  let parser = new window.WebVTT.Parser(window, window.vttjs, window.WebVTT.StringDecoder());
 
-  parser['oncue'] = function(cue) {
+  parser.oncue = function(cue) {
     track.addCue(cue);
   };
 
-  parser['onparsingerror'] = function(error) {
+  parser.onparsingerror = function(error) {
     log.error(error);
   };
 
-  parser['onflush'] = () => {
+  parser.onflush = function() {
     track.trigger({
       type: 'loadeddata',
       target: track
     });
   };
 
-  parser['parse'](srcContent);
-  parser['flush']();
+  parser.parse(srcContent);
+  parser.flush();
 };
 
 var loadTrack = function(src, track) {
@@ -272,9 +272,9 @@ var loadTrack = function(src, track) {
 
     track.loaded_ = true;
 
-    if (typeof window['WebVTT'] !== 'function') {
-      //try again a bit later
-      return window.setTimeout(function() {
+    // NOTE: this is only used for the alt/video.novtt.js build
+    if (typeof window.WebVTT !== 'function') {
+      window.setTimeout(function() {
         parseCues(responseBody, track);
       }, 100);
     } else {

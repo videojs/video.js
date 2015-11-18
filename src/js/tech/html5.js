@@ -743,25 +743,25 @@ class Html5 extends Tech {
       return super.addRemoteTextTrack(options);
     }
 
-    var htmlTrackElement = document.createElement('track');
+    let htmlTrackElement = document.createElement('track');
 
-    if (options['kind']) {
-      htmlTrackElement['kind'] = options['kind'];
+    if (options.kind) {
+      htmlTrackElement.kind = options.kind;
     }
-    if (options['label']) {
-      htmlTrackElement['label'] = options['label'];
+    if (options.label) {
+      htmlTrackElement.label = options.label;
     }
-    if (options['language'] || options['srclang']) {
-      htmlTrackElement['srclang'] = options['language'] || options['srclang'];
+    if (options.language || options.srclang) {
+      htmlTrackElement.srclang = options.language || options.srclang;
     }
-    if (options['default']) {
-      htmlTrackElement['default'] = options['default'];
+    if (options.default) {
+      htmlTrackElement.default = options.default;
     }
-    if (options['id']) {
-      htmlTrackElement['id'] = options['id'];
+    if (options.id) {
+      htmlTrackElement.id = options.id;
     }
-    if (options['src']) {
-      htmlTrackElement['src'] = options['src'];
+    if (options.src) {
+      htmlTrackElement.src = options.src;
     }
 
     this.el().appendChild(htmlTrackElement);

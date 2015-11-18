@@ -103,9 +103,7 @@ class ChaptersButton extends TextTrackButton {
       let remoteTextTrackEl = this.player_.remoteTextTrackEls().getTrackElementByTrack_(chaptersTrack);
 
       if (remoteTextTrackEl) {
-        remoteTextTrackEl.addEventListener('load', (event) => {
-          this.update();
-        });
+        remoteTextTrackEl.addEventListener('load', (event) => this.update());
       }
     }
 

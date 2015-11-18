@@ -1,6 +1,11 @@
 import * as browser from '../utils/browser.js';
 import EventTarget from '../event-target';
 
+export const NONE = 0;
+export const LOADING = 1;
+export const LOADED = 2;
+export const ERROR = 3;
+
 /**
  * https://html.spec.whatwg.org/multipage/embedded-content.html#htmltrackelement
  *
@@ -25,7 +30,7 @@ class HTMLTrackElement extends EventTarget {
   constructor(track) {
     super();
 
-    var readyState,
+    let readyState,
         textTrack,
         trackElement = this;
 
@@ -59,10 +64,6 @@ class HTMLTrackElement extends EventTarget {
     readyState = NONE;
     textTrack = track;
 
-    this.allowedEvents_ = {
-      load: 'load'
-    };
-
     textTrack.addEventListener('loadeddata', function() {
       readyState = LOADED;
 
@@ -77,5 +78,9 @@ class HTMLTrackElement extends EventTarget {
     }
   }
 }
+
+HTMLTrackElement.prototype.allowedEvents_ = {
+  load: 'load'
+};
 
 export default HTMLTrackElement;
