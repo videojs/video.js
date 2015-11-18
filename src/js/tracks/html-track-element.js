@@ -42,7 +42,9 @@ class HTMLTrackElement extends EventTarget {
       trackElement = document.createElement('custom');
 
       for (let prop in HTMLTrackElement.prototype) {
-        trackElement[prop] = HTMLTrackElement.prototype[prop];
+        if (prop !== 'constructor') {
+          trackElement[prop] = HTMLTrackElement.prototype[prop];
+        }
       }
     }
 

@@ -45,7 +45,9 @@ let TextTrack = function(options={}) {
     tt = document.createElement('custom');
 
     for (let prop in TextTrack.prototype) {
-      tt[prop] = TextTrack.prototype[prop];
+      if (prop !== 'constructor') {
+        tt[prop] = TextTrack.prototype[prop];
+      }
     }
   }
 

@@ -13,7 +13,9 @@ class HtmlTrackElementList {
       list = document.createElement('custom');
 
       for (let prop in HtmlTrackElementList.prototype) {
-        list[prop] = HtmlTrackElementList.prototype[prop];
+        if (prop !== 'constructor') {
+          list[prop] = HtmlTrackElementList.prototype[prop];
+        }
       }
     }
 
