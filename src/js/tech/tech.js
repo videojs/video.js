@@ -7,6 +7,7 @@
 import Component from '../component';
 import HTMLTrackElement from '../tracks/html-track-element';
 import HTMLTrackElementList from '../tracks/html-track-element-list';
+import mergeOptions from '../utils/merge-options.js';
 import TextTrack from '../tracks/text-track';
 import TextTrackList from '../tracks/text-track-list';
 import * as Fn from '../utils/fn.js';
@@ -417,12 +418,16 @@ class Tech extends Component {
    * @method addRemoteTextTrack
    */
   addRemoteTextTrack(options) {
-    let track = createTrackHelper(this, options.kind, options.label, options.language, options);
+    let track = mergeOptions(options, {
+      tech: this
+    });
 
     let htmlTrackElement = new HTMLTrackElement(track);
 
     this.remoteTextTrackEls().addTrackElement_(htmlTrackElement);
-    this.remoteTextTracks().addTrack_(track);
+
+    this.textTracks().addTrack_(htmlTrackElement.track);
+    this.remoteTextTracks().addTrack_(htmlTrackElement.track);
 
     return htmlTrackElement;
   }

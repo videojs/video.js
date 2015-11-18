@@ -1,6 +1,7 @@
 import * as browser from '../utils/browser.js';
 import document from 'global/document';
 import EventTarget from '../event-target';
+import TextTrack from '../tracks/text-track';
 
 const NONE = 0;
 const LOADING = 1;
@@ -25,10 +26,13 @@ const ERROR = 3;
  *
  *   readonly attribute TextTrack track;
  * };
+ *
+ * @param {Object} options TextTrack configuration
+ * @class HTMLTrackElement
  */
 
 class HTMLTrackElement extends EventTarget {
-  constructor(track) {
+  constructor(options = {}) {
     super();
 
     let readyState,
@@ -41,6 +45,8 @@ class HTMLTrackElement extends EventTarget {
         trackElement[prop] = HTMLTrackElement.prototype[prop];
       }
     }
+
+    let track = new TextTrack(options);
 
     trackElement.kind = track.kind;
     trackElement.src = track.src;
