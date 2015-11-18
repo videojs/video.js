@@ -195,8 +195,7 @@ TextTrack.prototype.constructor = TextTrack;
  * cuechange - One or more cues in the track have become active or stopped being active.
  */
 TextTrack.prototype.allowedEvents_ = {
-  'cuechange': 'cuechange',
-  'loadeddata': 'loadeddata'
+  'cuechange': 'cuechange'
 };
 
 TextTrack.prototype.addCue = function(cue) {
