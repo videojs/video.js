@@ -415,6 +415,7 @@ class Player extends Component {
     let width;
     let height;
     let aspectRatio;
+    let idClass;
 
     // The aspect ratio is either used directly or to calculate width and height.
     if (this.aspectRatio_ !== undefined && this.aspectRatio_ !== 'auto') {
@@ -451,7 +452,12 @@ class Player extends Component {
       height = width  * ratioMultiplier;
     }
 
-    let idClass = this.id()+'-dimensions';
+    // Ensure the CSS class is valid by starting with an alpha character
+    if (/^[^a-zA-Z]/.test(this.id())) {
+      idClass = 'dimensions-'+this.id();
+    } else {
+      idClass = this.id()+'-dimensions';
+    }
 
     // Ensure the right class is still on the player for the style element
     this.addClass(idClass);
