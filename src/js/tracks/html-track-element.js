@@ -52,7 +52,7 @@ class HTMLTrackElement extends EventTarget {
 
     trackElement.kind = track.kind;
     trackElement.src = track.src;
-    trackElement.srclang = track.srclang;
+    trackElement.srclang = track.language;
     trackElement.label = track.label;
     trackElement.default = track.default;
 
