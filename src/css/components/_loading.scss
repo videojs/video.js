@@ -6,7 +6,7 @@
   margin: -25px 0 0 -25px;
   opacity: 0.85;
 
-  /* Need to fix centered page layouts */
+  // Need to fix centered page layouts
   text-align: left;
 
   border: 6px solid rgba($primary-background-color, $primary-background-transparency);
@@ -33,14 +33,14 @@
   width: inherit;
   height: inherit;
   border-radius: inherit;
-  /* Keep 100% opacity so they don't show through each other */
+  // Keep 100% opacity so they don't show through each other
   opacity: 1;
   border: inherit;
   border-color: transparent;
   border-top-color: white;
 }
 
-/* only animate when showing because it can be processor heavy */
+// only animate when showing because it can be processor heavy
 .vjs-seeking .vjs-loading-spinner:before,
 .vjs-seeking .vjs-loading-spinner:after,
 .vjs-waiting .vjs-loading-spinner:before,
