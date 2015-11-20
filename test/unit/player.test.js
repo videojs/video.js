@@ -199,6 +199,21 @@ test('should set the width, height, and aspect ratio via a css class', function(
   ok(confirmSetting('padding-top', '25%'), 'aspect ratio percent should match the newly set aspect ratio');
 });
 
+test('should use an class name that begins with an alpha character', function(){
+  let alphaPlayer = TestHelpers.makePlayer({ id: 'alpha1' });
+  let numericPlayer = TestHelpers.makePlayer({ id: '1numeric' });
+
+  let getStyleText = function(styleEl){
+    return (styleEl.styleSheet && styleEl.styleSheet.cssText) || styleEl.innerHTML;
+  };
+
+  alphaPlayer.width(100);
+  numericPlayer.width(100);
+
+  ok(/\s*\.alpha1-dimensions\s*\{/.test(getStyleText(alphaPlayer.styleEl_)), 'appends -dimensions to an alpha player ID');
+  ok(/\s*\.dimensions-1numeric\s*\{/.test(getStyleText(numericPlayer.styleEl_)), 'prepends dimensions- to a numeric player ID');
+});
+
 test('should wrap the original tag in the player div', function(){
   var tag = TestHelpers.makeTag();
   var container = document.createElement('div');
