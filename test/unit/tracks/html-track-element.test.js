@@ -1,5 +1,4 @@
 import HTMLTrackElement from '../../../src/js/tracks/html-track-element.js';
-import TestHelpers from '../test-helpers.js';
 import TextTrack from '../../../src/js/tracks/text-track.js';
 import window from 'global/window';
 
@@ -43,7 +42,7 @@ test('can create a html track element with various properties', function() {
   equal(htmlTrackElement.readyState, 0, 'we have a readyState');
   equal(htmlTrackElement.src, src, 'we have a src');
   equal(htmlTrackElement.srclang, language, 'we have a srclang');
-  equal(htmlTrackElement.track instanceof TextTrack, true, 'we have a track');
+  equal(htmlTrackElement.track.cues, null, 'we have a track');
 });
 
 test('defaults when items not provided', function() {
@@ -57,12 +56,11 @@ test('defaults when items not provided', function() {
   equal(htmlTrackElement.readyState, 0, 'we have a readyState');
   equal(htmlTrackElement.src, undefined, 'we have a src');
   equal(htmlTrackElement.srclang, '', 'we have a srclang');
-  equal(htmlTrackElement.track instanceof TextTrack, true, 'we have a track');
+  equal(htmlTrackElement.track.cues.length, 0, 'we have a track');
 });
 
 test('fires loadeddata when track cues become populated', function() {
-  let player = TestHelpers.makePlayer(),
-      changes = 0,
+  let changes = 0,
       loadHandler;
 
   loadHandler = function() {
@@ -70,7 +68,7 @@ test('fires loadeddata when track cues become populated', function() {
   };
 
   let htmlTrackElement = new HTMLTrackElement({
-    tech: player.tech_
+    tech: noop
   });
 
   htmlTrackElement.addEventListener('load', loadHandler);
@@ -80,6 +78,4 @@ test('fires loadeddata when track cues become populated', function() {
 
   equal(changes, 1, 'a loadeddata event trigger addEventListener');
   equal(htmlTrackElement.readyState, 2, 'readyState is loaded');
-
-  player.dispose();
 });
