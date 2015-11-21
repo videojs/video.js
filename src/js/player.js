@@ -2718,6 +2718,13 @@ Player.prototype.handleUserInactive_;
 Player.prototype.handleTimeUpdate_;
 
 /**
+ * Fired when video playback ends
+ *
+ * @event ended
+ */
+Player.prototype.handleTechEnded_;
+
+/**
  * Fired when the volume changes
  *
  * @event volumechange
