@@ -335,6 +335,7 @@ class Tech extends Component {
       }
     });
 
+    textTracksChanges();
     tracks.addEventListener('change', textTracksChanges);
 
     this.on('dispose', function() {
