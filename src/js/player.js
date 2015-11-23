@@ -1713,10 +1713,7 @@ class Player extends Component {
           // Remove once that deprecated behavior is removed.
           return [techName, Tech.getTech(techName) || Component.getComponent(techName)];
         })
-        .filter((techArr) => {
-          let techName = techArr[0];
-          let tech = techArr[1];
-
+        .filter(([techName, tech]) => {
           // Check if the current tech is defined before continuing
           if (tech) {
             // Check if the browser supports this technology
@@ -1748,10 +1745,7 @@ class Player extends Component {
 
     let foundSourceAndTech;
     let flip = (fn) => (a, b) => fn(b, a);
-    let finder = (techArr, source) => {
-      let techName = techArr[0];
-      let tech = techArr[1];
-
+    let finder = ([techName, tech], source) => {
       if (tech.canPlaySource(source)) {
         return {source: source, tech: techName};
       }
