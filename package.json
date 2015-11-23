@@ -32,7 +32,7 @@
     "videojs-ie8": "1.1.0",
     "videojs-swf": "5.0.1",
     "vtt.js": "git+https://github.com/gkatsev/vtt.js.git#vjs-v0.12.1",
-    "xhr": "2.1.0"
+    "xhr": "~2.2.0"
   },
   "devDependencies": {
     "babel": "^5.2.2",
