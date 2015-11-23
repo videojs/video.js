@@ -1700,26 +1700,26 @@ class Player extends Component {
    * @method selectSource
    */
   selectSource(sources) {
-    // Loop through each playback technology in the options order
-    for (var i=0,j=this.options_.techOrder;i<j.length;i++) {
-      let techName = toTitleCase(j[i]);
-      let tech = Tech.getTech(techName);
-      // Support old behavior of techs being registered as components.
-      // Remove once that deprecated behavior is removed.
-      if (!tech) {
-        tech = Component.getComponent(techName);
-      }
-      // Check if the current tech is defined before continuing
-      if (!tech) {
-        log.error(`The "${techName}" tech is undefined. Skipped browser support check for that tech.`);
-        continue;
-      }
+    // Loop through each source object
+    for (let a=0,b=sources;a<b.length;a++) {
+      // Loop through each playback technology in the options order
+      for (let i=0,j=this.options_.techOrder;i<j.length;i++) {
+        let techName = toTitleCase(j[i]);
+        let tech = Tech.getTech(techName);
+        // Support old behavior of techs being registered as components.
+        // Remove once that deprecated behavior is removed.
+        if (!tech) {
+          tech = Component.getComponent(techName);
+        }
+        // Check if the current tech is defined before continuing
+        if (!tech) {
+          log.error(`The "${techName}" tech is undefined. Skipped browser support check for that tech.`);
+          continue;
+        }
 
-      // Check if the browser supports this technology
-      if (tech.isSupported()) {
-        // Loop through each source object
-        for (var a=0,b=sources;a<b.length;a++) {
-          var source = b[a];
+        // Check if the browser supports this technology
+        if (tech.isSupported()) {
+          let source = b[a];
 
           // Check if source can be played with this technology
           if (tech.canPlaySource(source)) {
