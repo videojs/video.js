@@ -251,9 +251,9 @@ if (Html5.supportsNativeTextTracks()) {
 }
 test('should always return currentSource_ if set', function(){
   let currentSrc = Html5.prototype.currentSrc;
-  equal(currentSrc.call({el_: {currentSrc:"test1"}}), "test1", "sould return source from element if nothing else set");
-  equal(currentSrc.call({currentSource_:{src: "test2"}}), "test2", "sould return source from currentSource_, if nothing else set");
-  equal(currentSrc.call({currentSource_:{src: "test2"}, el_:{currentSrc:"test1"}}), "test2", "sould return source from  source set, not from element");
+  equal(currentSrc.call({el_: {currentSrc:'test1'}}), 'test1', 'sould return source from element if nothing else set');
+  equal(currentSrc.call({currentSource_:{src: 'test2'}}), 'test2', 'sould return source from currentSource_, if nothing else set');
+  equal(currentSrc.call({currentSource_:{src: 'test2'}, el_:{currentSrc:'test1'}}), 'test2', 'sould return source from  source set, not from element');
 });
 
 test('should fire makeup events when a video tag is initialized late', function(){
