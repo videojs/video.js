@@ -412,8 +412,8 @@ test('make sure that controls listeners do not get added too many times', functi
 
 test('should select the proper tech based on the the sourceOrder option',
   function() {
-    var fixture = document.getElementById('qunit-fixture');
-    var html =
+    let fixture = document.getElementById('qunit-fixture');
+    let html =
         '<video id="example_1">' +
           '<source src="fake.foo1" type="video/unsupported-format">' +
           '<source src="fake.foo2" type="video/foo-format">' +
@@ -433,9 +433,9 @@ test('should select the proper tech based on the the sourceOrder option',
     Tech.registerTech('PlaysUnsupported', PlaysUnsupported);
 
     fixture.innerHTML += html;
-    var tag = document.getElementById('example_1');
+    let tag = document.getElementById('example_1');
 
-    var player = new Player(tag, { techOrder: ['techFaker', 'playsUnsupported'], sourceOrder: true });
+    let player = new Player(tag, { techOrder: ['techFaker', 'playsUnsupported'], sourceOrder: true });
     equal(player.techName_, 'PlaysUnsupported', 'selected the PlaysUnsupported tech when sourceOrder is truthy');
     player.dispose();
 
