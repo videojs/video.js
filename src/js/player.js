@@ -1705,12 +1705,19 @@ class Player extends Component {
     let techs =
       this.options_.techOrder
         .map(toTitleCase)
-        .map((techName) => [techName, Tech.getTech(techName) || Component.getComponent(techName)])
+        .map((techName) => {
+          // `Component.getComponent(...)` is for support of old behavior of techs
+          // being registered as components.
+          // Remove once that deprecated behavior is removed.
+          return [techName, Tech.getTech(techName) || Component.getComponent(techName)];
+        })
         .filter((techArr) => {
           let techName = techArr[0];
           let tech = techArr[1];
 
+          // Check if the current tech is defined before continuing
           if (tech) {
+            // Check if the browser supports this technology
             return tech.isSupported();
           }
 
@@ -1719,14 +1726,14 @@ class Player extends Component {
         });
 
     // Iterate over each `innerArray` element once per `outerArray` element and execute
-    // `techFn` with both. If `testFn` returns a non-falsy value, exit early and return
+    // `tester` with both. If `tester` returns a non-falsy value, exit early and return
     // that value.
-    let findFirstPassingTechSourcePair = function (outerArray, innerArray, testFn) {
+    let findFirstPassingTechSourcePair = function (outerArray, innerArray, tester) {
       let found;
 
       outerArray.some((outerChoice) => {
         return innerArray.some((innerChoice) => {
-          found = testFn(outerChoice, innerChoice);
+          found = tester(outerChoice, innerChoice);
 
           if (found) {
             return true;
@@ -1738,8 +1745,8 @@ class Player extends Component {
     };
 
     let foundSourceAndTech;
-    let flipFn = (fn) => (a, b) => fn(b, a);
-    let finderFn = (techArr, source) => {
+    let flip = (fn) => (a, b) => fn(b, a);
+    let finder = (techArr, source) => {
       let techName = techArr[0];
       let tech = techArr[1];
 
@@ -1751,9 +1758,11 @@ class Player extends Component {
     // Depending on the truthiness of `options.sourceOrder`, we swap the order of techs and sources
     // to select from them based on their priority.
     if (this.options_.sourceOrder) {
-      foundSourceAndTech = findFirstPassingTechSourcePair(sources, techs, flipFn(finderFn));
+      // Source-first ordering
+      foundSourceAndTech = findFirstPassingTechSourcePair(sources, techs, flip(finder));
     } else {
-      foundSourceAndTech = findFirstPassingTechSourcePair(techs, sources, finderFn);
+      // Tech-first ordering
+      foundSourceAndTech = findFirstPassingTechSourcePair(techs, sources, finder);
     }
 
     return foundSourceAndTech || false;
