@@ -2,13 +2,16 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 5.2.2 (2015-11-23)
 * @DatTran fixed bower paths. Fixes #2740 ([view](https://github.com/videojs/video.js/pull/2775))
 * @nbibler ensured classes begin with alpha characters. Fixes #2828 ([view](https://github.com/videojs/video.js/pull/2829))
 * @bcvio fixed returning current source rather than blob url ([view](https://github.com/videojs/video.js/pull/2833))
 * @tomaspinho added ended event to API docs ([view](https://github.com/videojs/video.js/pull/2836))
 * @paladox updated xhr from deprecated ver to v2.2 ([view](https://github.com/videojs/video.js/pull/2837))
-
---------------------
 
 ## 5.2.1 (2015-11-16)
 * @dmlap Check a component is a function before new-ing ([view](https://github.com/videojs/video.js/pull/2814))
