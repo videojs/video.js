@@ -478,6 +478,45 @@ test('make sure that controls listeners do not get added too many times', functi
 //   player.dispose();
 // });
 
+test('should select the proper tech based on the the sourceOrder option',
+  function() {
+    var fixture = document.getElementById('qunit-fixture');
+    var html =
+        '<video id="example_1">' +
+          '<source src="fake.foo1" type="video/unsupported-format">' +
+          '<source src="fake.foo2" type="video/foo-format">' +
+        '</video>';
+
+    // Extend TechFaker to create a tech that plays the only mime-type that TechFaker
+    // will not play
+    import Tech from '../../src/js/tech/tech.js';
+    import TechFaker from './tech/tech-faker.js';
+    class PlaysUnsupported extends TechFaker {
+      constructor(options, handleReady){
+        super(options, handleReady);
+      }
+      // Support ONLY "video/unsupported-format"
+      static isSupported() { return true; }
+      static canPlayType(type) { return (type === 'video/unsupported-format' ? 'maybe' : ''); }
+      static canPlaySource(srcObj) { return srcObj.type === 'video/unsupported-format'; }
+    }
+    Tech.registerTech('PlaysUnsupported', PlaysUnsupported);
+
+    fixture.innerHTML += html;
+    var tag = document.getElementById('example_1');
+
+    var player = new Player(tag, { techOrder: ['techFaker', 'playsUnsupported'], sourceOrder: true });
+    equal(player.techName_, 'PlaysUnsupported', 'selected the PlaysUnsupported tech when sourceOrder is truthy');
+    player.dispose();
+
+    fixture.innerHTML += html;
+    tag = document.getElementById('example_1');
+
+    player = new Player(tag, { techOrder: ['techFaker', 'playsUnsupported']});
+    equal(player.techName_, 'TechFaker', 'selected the TechFaker tech when sourceOrder is falsey');
+    player.dispose();
+});
+
 test('should register players with generated ids', function(){
   var fixture, video, player, id;
   fixture = document.getElementById('qunit-fixture');
