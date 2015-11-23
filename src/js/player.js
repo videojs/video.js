@@ -1693,7 +1693,9 @@ class Player extends Component {
   }
 
   /**
-   * Select source based on tech order
+   * Select source based on tech-order or source-order
+   * Uses source-order selection if `options.sourceOrder` is truthy. Otherwise,
+   * defaults to tech-order selection
    *
    * @param {Array} sources The sources for a media asset
    * @return {Object|Boolean} Object of source and tech order, otherwise false
