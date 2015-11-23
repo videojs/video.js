@@ -7,6 +7,8 @@ import MediaError from '../../src/js/media-error.js';
 import Html5 from '../../src/js/tech/html5.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
+import Tech from '../../src/js/tech/tech.js';
+import TechFaker from './tech/tech-faker.js';
 
 q.module('Player', {
   'setup': function() {
@@ -419,8 +421,6 @@ test('should select the proper tech based on the the sourceOrder option',
 
     // Extend TechFaker to create a tech that plays the only mime-type that TechFaker
     // will not play
-    import Tech from '../../src/js/tech/tech.js';
-    import TechFaker from './tech/tech-faker.js';
     class PlaysUnsupported extends TechFaker {
       constructor(options, handleReady){
         super(options, handleReady);
