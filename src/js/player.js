@@ -1700,36 +1700,26 @@ class Player extends Component {
    * @method selectSource
    */
   selectSource(sources) {
-    // Loop through each source object
-    for (let a=0,b=sources;a<b.length;a++) {
-      // Loop through each playback technology in the options order
-      for (let i=0,j=this.options_.techOrder;i<j.length;i++) {
-        let techName = toTitleCase(j[i]);
-        let tech = Tech.getTech(techName);
-        // Support old behavior of techs being registered as components.
-        // Remove once that deprecated behavior is removed.
-        if (!tech) {
-          tech = Component.getComponent(techName);
-        }
-        // Check if the current tech is defined before continuing
-        if (!tech) {
-          log.error(`The "${techName}" tech is undefined. Skipped browser support check for that tech.`);
-          continue;
-        }
+    // Get only the techs that exist and are supported by the current platform
+    let techs =
+      this.options_.techOrder
+        .map(toTitleCase)
+        .map(techName => Tech.getTech(techName) || Component.getComponent(techName) ||
+          log.error(`The "${techName}" tech is undefined. Skipped browser support check for that tech.`))
+        .filter(tech => tech && tech.isSupported());
 
-        // Check if the browser supports this technology
-        if (tech.isSupported()) {
-          let source = b[a];
+    // Depending on the truthiness of options.sourceOrder, we swap the order of techs and sources
+    // to select from them based on their priority.
+    let combinedSources = this.options_.sourceOrder ?
+      sources.reduce((acc, source) => acc.concat(techs.map(tech => ({source, tech}))), []) :
+      techs.reduce((acc, tech) => acc.concat(sources.map(source => ({source, tech}))), []);
 
-          // Check if source can be played with this technology
-          if (tech.canPlaySource(source)) {
-            return { source: source, tech: techName };
-          }
-        }
-      }
-    }
+    let matchedSource = combinedSources
+      .find(({source, tech}) => tech.canPlaySource(source));
 
-    return false;
+    return matchedSource ?
+      { source: matchedSource.source, tech: matchedSource.tech.name } :
+      false;
   }
 
   /**
