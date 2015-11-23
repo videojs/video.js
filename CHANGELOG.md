@@ -4,6 +4,7 @@ CHANGELOG
 ## HEAD (Unreleased)
 * @DatTran fixed bower paths. Fixes #2740 ([view](https://github.com/videojs/video.js/pull/2775))
 * @nbibler ensured classes begin with alpha characters. Fixes #2828 ([view](https://github.com/videojs/video.js/pull/2829))
+* @bcvio fixed returning current source rather than blob url ([view](https://github.com/videojs/video.js/pull/2833))
 
 --------------------
 
