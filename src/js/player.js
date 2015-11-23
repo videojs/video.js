@@ -1700,36 +1700,63 @@ class Player extends Component {
    * @method selectSource
    */
   selectSource(sources) {
-    // Loop through each playback technology in the options order
-    for (var i=0,j=this.options_.techOrder;i<j.length;i++) {
-      let techName = toTitleCase(j[i]);
-      let tech = Tech.getTech(techName);
-      // Support old behavior of techs being registered as components.
-      // Remove once that deprecated behavior is removed.
-      if (!tech) {
-        tech = Component.getComponent(techName);
-      }
-      // Check if the current tech is defined before continuing
-      if (!tech) {
-        log.error(`The "${techName}" tech is undefined. Skipped browser support check for that tech.`);
-        continue;
-      }
+    // Get only the techs specified in `techOrder` that exist and are supported by the
+    // current platform
+    let techs =
+      this.options_.techOrder
+        .map(toTitleCase)
+        .map((techName) => [techName, Tech.getTech(techName) || Component.getComponent(techName)])
+        .filter((techArr) => {
+          let techName = techArr[0];
+          let tech = techArr[1];
 
-      // Check if the browser supports this technology
-      if (tech.isSupported()) {
-        // Loop through each source object
-        for (var a=0,b=sources;a<b.length;a++) {
-          var source = b[a];
-
-          // Check if source can be played with this technology
-          if (tech.canPlaySource(source)) {
-            return { source: source, tech: techName };
+          if (tech) {
+            return tech.isSupported();
           }
-        }
+
+          log.error(`The "${techName}" tech is undefined. Skipped browser support check for that tech.`);
+          return false;
+        });
+
+    // Iterate over each `innerArray` element once per `outerArray` element and execute
+    // `techFn` with both. If `testFn` returns a non-falsy value, exit early and return
+    // that value.
+    let findFirstPassingTechSourcePair = function (outerArray, innerArray, testFn) {
+      let found;
+
+      outerArray.some((outerChoice) => {
+        return innerArray.some((innerChoice) => {
+          found = testFn(outerChoice, innerChoice);
+
+          if (found) {
+            return true;
+          }
+        });
+      });
+
+      return found;
+    };
+
+    let foundSourceAndTech;
+    let flipFn = (fn) => (a, b) => fn(b, a);
+    let finderFn = (techArr, source) => {
+      let techName = techArr[0];
+      let tech = techArr[1];
+
+      if (tech.canPlaySource(source)) {
+        return {source: source, tech: techName};
       }
+    };
+
+    // Depending on the truthiness of `options.sourceOrder`, we swap the order of techs and sources
+    // to select from them based on their priority.
+    if (this.options_.sourceOrder) {
+      foundSourceAndTech = findFirstPassingTechSourcePair(sources, techs, flipFn(finderFn));
+    } else {
+      foundSourceAndTech = findFirstPassingTechSourcePair(techs, sources, finderFn);
     }
 
-    return false;
+    return foundSourceAndTech || false;
   }
 
   /**
