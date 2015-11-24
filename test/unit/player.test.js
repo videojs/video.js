@@ -804,3 +804,21 @@ test('createModal() options object', function() {
   strictEqual(modal.options_.label, 'boo', 'modal options are set properly');
   modal.close();
 });
+
+test('you can clear error in the error event', function() {
+  let player = TestHelpers.makePlayer();
+
+  sinon.stub(log, 'error');
+
+  player.error({code: 4});
+  ok(player.error(), 'we have an error');
+  player.error(null);
+
+  player.one('error', function() {
+    player.error(null);
+  });
+  player.error({code: 4});
+  ok(!player.error(), 'we no longer have an error');
+
+  log.error.restore();
+});
