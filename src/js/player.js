@@ -2118,15 +2118,15 @@ class Player extends Component {
       this.error_ = new MediaError(err);
     }
 
-    // fire an error event on the player
-    this.trigger('error');
-
     // add the vjs-error classname to the player
     this.addClass('vjs-error');
 
     // log the name of the error type and any message
     // ie8 just logs "[object object]" if you just log the error object
     log.error(`(CODE:${this.error_.code} ${MediaError.errorTypes[this.error_.code]})`, this.error_.message, this.error_);
+
+    // fire an error event on the player
+    this.trigger('error');
 
     return this;
   }
