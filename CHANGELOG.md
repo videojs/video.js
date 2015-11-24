@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* @gkatsev fixed clearing out errors ([view](https://github.com/videojs/video.js/pull/2850))
+_(none)_
 
 --------------------
+
+## 5.2.3 (2015-11-24)
+* @gkatsev fixed clearing out errors ([view](https://github.com/videojs/video.js/pull/2850))
 
 ## 5.2.2 (2015-11-23)
 * @DatTran fixed bower paths. Fixes #2740 ([view](https://github.com/videojs/video.js/pull/2775))
