@@ -2107,6 +2107,7 @@ class Player extends Component {
     if (err === null) {
       this.error_ = err;
       this.removeClass('vjs-error');
+      this.errorDisplay.close();
       return this;
     }
 
