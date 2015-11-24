@@ -72,7 +72,7 @@ Video.js now provides another method of selecting the source - "Source-first" or
 
 With a player setup as follows:
 
-  <video data-setup='{"techOrder": ["html5", "flash"]}, "sourceOrder": true'>
+  <video data-setup='{"techOrder": ["html5", "flash"], "sourceOrder": true}'>
     <source src="http://your.static.provider.net/path/to/video.m3u8" type="application/x-mpegURL">
     <source src="http://your.static.provider.net/path/to/video.mp4" type="video/mp4">
   </video>
