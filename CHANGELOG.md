@@ -3,6 +3,7 @@ CHANGELOG
 
 ## HEAD (Unreleased)
 * @forbesjo updated formatTime to not go negative ([view](https://github.com/videojs/video.js/pull/2821))
+* @imbcmdth added sourceOrder option for source-first ordering in selectSource ([view](https://github.com/videojs/video.js/pull/2847))
 
 --------------------
 
