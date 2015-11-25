@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @forbesjo updated formatTime to not go negative ([view](https://github.com/videojs/video.js/pull/2821))
 
 --------------------
 
