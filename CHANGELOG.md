@@ -2,11 +2,14 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 5.2.4 (2015-11-25)
 * @gesinger checked for track changes before tech started listening ([view](https://github.com/videojs/video.js/pull/2835))
 * @gesinger fixed handler explosion for cuechange events ([view](https://github.com/videojs/video.js/pull/2849))
 * @mmcc fixed vertical volume ([view](https://github.com/videojs/video.js/pull/2859))
-
---------------------
 
 ## 5.2.3 (2015-11-24)
 * @gkatsev fixed clearing out errors ([view](https://github.com/videojs/video.js/pull/2850))
