@@ -2,10 +2,13 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* @forbesjo updated formatTime to not go negative ([view](https://github.com/videojs/video.js/pull/2821))
-* @imbcmdth added sourceOrder option for source-first ordering in selectSource ([view](https://github.com/videojs/video.js/pull/2847))
+_(none)_
 
 --------------------
+
+## 5.3.0 (2015-11-25)
+* @forbesjo updated formatTime to not go negative ([view](https://github.com/videojs/video.js/pull/2821))
+* @imbcmdth added sourceOrder option for source-first ordering in selectSource ([view](https://github.com/videojs/video.js/pull/2847))
 
 ## 5.2.4 (2015-11-25)
 * @gesinger checked for track changes before tech started listening ([view](https://github.com/videojs/video.js/pull/2835))
