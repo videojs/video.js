@@ -342,3 +342,13 @@ if (Html5.supportsNativeTextTracks()) {
     emulatedTt.on('addtrack', addtrack);
   });
 }
+
+test('should check for text track changes when emulating text tracks', function() {
+  let tech = new Tech();
+  let numTextTrackChanges = 0;
+  tech.on('texttrackchange', function() {
+    numTextTrackChanges++;
+  });
+  tech.emulateTextTracks();
+  equal(numTextTrackChanges, 1, 'we got a texttrackchange event');
+});

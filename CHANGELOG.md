@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @gesinger checked for track changes before tech started listening ([view](https://github.com/videojs/video.js/pull/2835))
 
 --------------------
 
