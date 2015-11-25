@@ -10,7 +10,7 @@
 }
 
 /* Button Pop-up Menu */
-.vjs-menu-button-popup .vjs-menu ul {
+.vjs-menu-button-popup .vjs-menu .vjs-menu-content {
   @include background-color-with-alpha($primary-background-color, $primary-background-transparency);
 
   position: absolute;

@@ -4,6 +4,7 @@ CHANGELOG
 ## HEAD (Unreleased)
 * @gesinger checked for track changes before tech started listening ([view](https://github.com/videojs/video.js/pull/2835))
 * @gesinger fixed handler explosion for cuechange events ([view](https://github.com/videojs/video.js/pull/2849))
+* @mmcc fixed vertical volume ([view](https://github.com/videojs/video.js/pull/2859))
 
 --------------------
 
