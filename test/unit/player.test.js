@@ -884,3 +884,25 @@ test('Player#tech alerts and throws without the appropriate input', function() {
   ok(alertCalled, 'we called an alert');
   window.alert = oldAlert;
 });
+
+test('player#reset loads the Html5 tech and then techCalls reset', function() {
+  let loadedTech;
+  let loadedSource;
+  let techCallMethod;
+
+  let testPlayer = {
+    loadTech_(tech, source) {
+      loadedTech = tech;
+      loadedSource = source;
+    },
+    techCall_(method) {
+      techCallMethod = method;
+    }
+  }
+
+  Player.prototype.reset.call(testPlayer);
+
+  equal(loadedTech, 'Html5', 'we loaded the html5 tech');
+  equal(loadedSource, null, 'with a null source');
+  equal(techCallMethod, 'reset', 'we then reset the tech');
+});

@@ -337,3 +337,17 @@ test('Html5.resetMediaElement should remove sources and call load', function() {
   equal(removedAttribute, 'src', 'we removed the src attribute');
   ok(loaded, 'we called load on the element');
 });
+
+test('Html5#reset calls Html5.resetMediaElement when called', function() {
+  let oldResetMedia = Html5.resetMediaElement;
+  let resetEl;
+
+  Html5.resetMediaElement = (el) => resetEl = el;
+
+  let el = {};
+  Html5.prototype.reset.call({el_: el});
+
+  equal(resetEl, el, 'we called resetMediaElement with the tech\'s el');
+
+  Html5.resetMediaElement = oldResetMedia;
+});
