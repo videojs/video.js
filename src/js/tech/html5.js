@@ -86,6 +86,9 @@ class Html5 extends Tech {
 
     this.triggerReady();
   }
+  clearMedia() {
+    Html5.clearMediaElement(this.el());
+  }
 
   /**
    * Dispose of html5 media element
@@ -484,6 +487,15 @@ class Html5 extends Tech {
    */
   load(){
     this.el_.load();
+  }
+
+  /**
+   * Reset the tech. Removes all sources and calls `load`.
+   *
+   * @method reset
+   */
+  reset() {
+    Html5.resetMediaElement(this.el_);
   }
 
   /**
@@ -1089,6 +1101,29 @@ Html5.disposeMediaElement = function(el){
         // not supported
       }
     })();
+  }
+};
+
+Html5.resetMediaElement = function(el){
+  if (!el) { return; }
+
+  let sources = el.querySelectorAll('source');
+  let i = sources.length;
+  while (i--) {
+    el.removeChild(sources[i]);
+  }
+
+  // remove any src reference.
+  // not setting `src=''` because that throws an error
+  el.removeAttribute('src');
+
+  if (typeof el.load === 'function') {
+    // wrapping in an iife so it's not deoptimized (#1060#discussion_r10324473)
+    (function() {
+      try {
+        el.load();
+      } catch (e) {}
+    })()
   }
 };
 

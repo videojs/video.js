@@ -1924,6 +1924,18 @@ class Player extends Component {
   }
 
   /**
+   * Reset the player. Removes all sources, loads the Html tech, and calls `load`.
+   *
+   * @return {Player} Returns the player
+   * @method reset
+   */
+  reset() {
+    this.loadTech_('Html5', null);
+    this.techCall_('reset');
+    return this;
+  }
+
+  /**
    * Returns the fully qualified URL of the current source value e.g. http://mysite.com/video.mp4
    * Can be used in conjuction with `currentType` to assist in rebuilding the current source object.
    *
