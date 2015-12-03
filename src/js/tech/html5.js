@@ -1123,7 +1123,7 @@ Html5.resetMediaElement = function(el){
       try {
         el.load();
       } catch (e) {}
-    })()
+    })();
   }
 };
 
