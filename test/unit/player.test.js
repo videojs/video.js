@@ -898,7 +898,7 @@ test('player#reset loads the Html5 tech and then techCalls reset', function() {
     techCall_(method) {
       techCallMethod = method;
     }
-  }
+  };
 
   Player.prototype.reset.call(testPlayer);
 
