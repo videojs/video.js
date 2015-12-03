@@ -10,6 +10,9 @@ import document from 'global/document';
 import Tech from '../../src/js/tech/tech.js';
 import TechFaker from './tech/tech-faker.js';
 
+import proxyquireify from 'proxyquireify';
+const proxyquire = proxyquireify(require);
+
 q.module('Player', {
   'setup': function() {
     this.clock = sinon.useFakeTimers();
@@ -860,4 +863,29 @@ test('you can clear error in the error event', function() {
   ok(!player.error(), 'we no longer have an error');
 
   log.error.restore();
+});
+
+test('Player#tech will return tech given the appropriate input', function() {
+  let tech_ = {};
+  let returnedTech = Player.prototype.tech.call({tech_}, {IWillNotUseThisInPlugins: true});
+
+  equal(returnedTech, tech_, 'We got back the tech we wanted');
+});
+
+test('Player#tech alerts and throws without the appropriate input', function() {
+  let alertCalled;
+  let win = {
+    alert: () => alertCalled = true
+  };
+  let Player = proxyquire('../../src/js/player.js', {
+    'global/window': win
+  });
+
+  let tech_ = {};
+  throws(function() {
+    Player.prototype.tech.call({tech_});
+  }, new RegExp('https://github.com/videojs/video.js/issues/2617'),
+  'we threw an error');
+
+  ok(alertCalled, 'we called an alert');
 });
