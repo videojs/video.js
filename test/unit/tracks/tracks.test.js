@@ -2,6 +2,7 @@ import ChaptersButton from '../../../src/js/control-bar/text-track-controls/chap
 import SubtitlesButton from '../../../src/js/control-bar/text-track-controls/subtitles-button.js';
 import CaptionsButton from '../../../src/js/control-bar/text-track-controls/captions-button.js';
 
+import TextTrack from '../../../src/js/tracks/text-track.js';
 import TextTrackDisplay from '../../../src/js/tracks/text-track-display.js';
 import Html5 from '../../../src/js/tech/html5.js';
 import Flash from '../../../src/js/tech/flash.js';
@@ -342,3 +343,58 @@ if (Html5.supportsNativeTextTracks()) {
     emulatedTt.on('addtrack', addtrack);
   });
 }
+
+test('should check for text track changes when emulating text tracks', function() {
+  let tech = new Tech();
+  let numTextTrackChanges = 0;
+  tech.on('texttrackchange', function() {
+    numTextTrackChanges++;
+  });
+  tech.emulateTextTracks();
+  equal(numTextTrackChanges, 1, 'we got a texttrackchange event');
+});
+
+test('removes cuechange event when text track is hidden for emulated tracks', function() {
+  let player = TestHelpers.makePlayer();
+  let tt = new TextTrack({
+    tech: player.tech_,
+    mode: 'showing'
+  });
+  tt.addCue({
+    id: '1',
+    startTime: 2,
+    endTime: 5
+  });
+  player.tech_.textTracks().addTrack_(tt);
+  player.tech_.emulateTextTracks();
+
+  let numTextTrackChanges = 0;
+  player.tech_.on('texttrackchange', function() {
+    numTextTrackChanges++;
+  });
+
+  tt.mode = 'showing';
+  equal(numTextTrackChanges, 1,
+    'texttrackchange should be called once for mode change');
+  tt.mode = 'showing';
+  equal(numTextTrackChanges, 2,
+    'texttrackchange should be called once for mode change');
+
+  player.tech_.currentTime = function() {
+    return 3;
+  };
+  player.tech_.trigger('timeupdate');
+  equal(numTextTrackChanges, 3,
+    'texttrackchange should be triggered once for the cuechange');
+
+  tt.mode = 'hidden';
+  equal(numTextTrackChanges, 4,
+    'texttrackchange should be called once for the mode change');
+
+  player.tech_.currentTime = function() {
+    return 7;
+  };
+  player.tech_.trigger('timeupdate');
+  equal(numTextTrackChanges, 4,
+    'texttrackchange should be not be called since mode is hidden');
+});

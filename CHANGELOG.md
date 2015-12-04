@@ -6,6 +6,25 @@ _(none)_
 
 --------------------
 
+## 5.3.0 (2015-11-25)
+* @forbesjo updated formatTime to not go negative ([view](https://github.com/videojs/video.js/pull/2821))
+* @imbcmdth added sourceOrder option for source-first ordering in selectSource ([view](https://github.com/videojs/video.js/pull/2847))
+
+## 5.2.4 (2015-11-25)
+* @gesinger checked for track changes before tech started listening ([view](https://github.com/videojs/video.js/pull/2835))
+* @gesinger fixed handler explosion for cuechange events ([view](https://github.com/videojs/video.js/pull/2849))
+* @mmcc fixed vertical volume ([view](https://github.com/videojs/video.js/pull/2859))
+
+## 5.2.3 (2015-11-24)
+* @gkatsev fixed clearing out errors ([view](https://github.com/videojs/video.js/pull/2850))
+
+## 5.2.2 (2015-11-23)
+* @DatTran fixed bower paths. Fixes #2740 ([view](https://github.com/videojs/video.js/pull/2775))
+* @nbibler ensured classes begin with alpha characters. Fixes #2828 ([view](https://github.com/videojs/video.js/pull/2829))
+* @bcvio fixed returning current source rather than blob url ([view](https://github.com/videojs/video.js/pull/2833))
+* @tomaspinho added ended event to API docs ([view](https://github.com/videojs/video.js/pull/2836))
+* @paladox updated xhr from deprecated ver to v2.2 ([view](https://github.com/videojs/video.js/pull/2837))
+
 ## 5.2.1 (2015-11-16)
 * @dmlap Check a component is a function before new-ing ([view](https://github.com/videojs/video.js/pull/2814))
 * @ksjun corrected the registerTech export ([view](https://github.com/videojs/video.js/pull/2816))

@@ -415,6 +415,7 @@ class Player extends Component {
     let width;
     let height;
     let aspectRatio;
+    let idClass;
 
     // The aspect ratio is either used directly or to calculate width and height.
     if (this.aspectRatio_ !== undefined && this.aspectRatio_ !== 'auto') {
@@ -451,7 +452,12 @@ class Player extends Component {
       height = width  * ratioMultiplier;
     }
 
-    let idClass = this.id()+'-dimensions';
+    // Ensure the CSS class is valid by starting with an alpha character
+    if (/^[^a-zA-Z]/.test(this.id())) {
+      idClass = 'dimensions-'+this.id();
+    } else {
+      idClass = this.id()+'-dimensions';
+    }
 
     // Ensure the right class is still on the player for the style element
     this.addClass(idClass);
@@ -1687,43 +1693,75 @@ class Player extends Component {
   }
 
   /**
-   * Select source based on tech order
+   * Select source based on tech-order or source-order
+   * Uses source-order selection if `options.sourceOrder` is truthy. Otherwise,
+   * defaults to tech-order selection
    *
    * @param {Array} sources The sources for a media asset
    * @return {Object|Boolean} Object of source and tech order, otherwise false
    * @method selectSource
    */
   selectSource(sources) {
-    // Loop through each playback technology in the options order
-    for (var i=0,j=this.options_.techOrder;i<j.length;i++) {
-      let techName = toTitleCase(j[i]);
-      let tech = Tech.getTech(techName);
-      // Support old behavior of techs being registered as components.
-      // Remove once that deprecated behavior is removed.
-      if (!tech) {
-        tech = Component.getComponent(techName);
-      }
-      // Check if the current tech is defined before continuing
-      if (!tech) {
-        log.error(`The "${techName}" tech is undefined. Skipped browser support check for that tech.`);
-        continue;
-      }
-
-      // Check if the browser supports this technology
-      if (tech.isSupported()) {
-        // Loop through each source object
-        for (var a=0,b=sources;a<b.length;a++) {
-          var source = b[a];
-
-          // Check if source can be played with this technology
-          if (tech.canPlaySource(source)) {
-            return { source: source, tech: techName };
+    // Get only the techs specified in `techOrder` that exist and are supported by the
+    // current platform
+    let techs =
+      this.options_.techOrder
+        .map(toTitleCase)
+        .map((techName) => {
+          // `Component.getComponent(...)` is for support of old behavior of techs
+          // being registered as components.
+          // Remove once that deprecated behavior is removed.
+          return [techName, Tech.getTech(techName) || Component.getComponent(techName)];
+        })
+        .filter(([techName, tech]) => {
+          // Check if the current tech is defined before continuing
+          if (tech) {
+            // Check if the browser supports this technology
+            return tech.isSupported();
           }
-        }
+
+          log.error(`The "${techName}" tech is undefined. Skipped browser support check for that tech.`);
+          return false;
+        });
+
+    // Iterate over each `innerArray` element once per `outerArray` element and execute
+    // `tester` with both. If `tester` returns a non-falsy value, exit early and return
+    // that value.
+    let findFirstPassingTechSourcePair = function (outerArray, innerArray, tester) {
+      let found;
+
+      outerArray.some((outerChoice) => {
+        return innerArray.some((innerChoice) => {
+          found = tester(outerChoice, innerChoice);
+
+          if (found) {
+            return true;
+          }
+        });
+      });
+
+      return found;
+    };
+
+    let foundSourceAndTech;
+    let flip = (fn) => (a, b) => fn(b, a);
+    let finder = ([techName, tech], source) => {
+      if (tech.canPlaySource(source)) {
+        return {source: source, tech: techName};
       }
+    };
+
+    // Depending on the truthiness of `options.sourceOrder`, we swap the order of techs and sources
+    // to select from them based on their priority.
+    if (this.options_.sourceOrder) {
+      // Source-first ordering
+      foundSourceAndTech = findFirstPassingTechSourcePair(sources, techs, flip(finder));
+    } else {
+      // Tech-first ordering
+      foundSourceAndTech = findFirstPassingTechSourcePair(techs, sources, finder);
     }
 
-    return false;
+    return foundSourceAndTech || false;
   }
 
   /**
@@ -2101,6 +2139,7 @@ class Player extends Component {
     if (err === null) {
       this.error_ = err;
       this.removeClass('vjs-error');
+      this.errorDisplay.close();
       return this;
     }
 
@@ -2111,15 +2150,15 @@ class Player extends Component {
       this.error_ = new MediaError(err);
     }
 
-    // fire an error event on the player
-    this.trigger('error');
-
     // add the vjs-error classname to the player
     this.addClass('vjs-error');
 
     // log the name of the error type and any message
     // ie8 just logs "[object object]" if you just log the error object
     log.error(`(CODE:${this.error_.code} ${MediaError.errorTypes[this.error_.code]})`, this.error_.message, this.error_);
+
+    // fire an error event on the player
+    this.trigger('error');
 
     return this;
   }
@@ -2710,6 +2749,13 @@ Player.prototype.handleUserInactive_;
  * @event timeupdate
  */
 Player.prototype.handleTimeUpdate_;
+
+/**
+ * Fired when video playback ends
+ *
+ * @event ended
+ */
+Player.prototype.handleTechEnded_;
 
 /**
  * Fired when the volume changes

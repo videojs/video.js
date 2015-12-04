@@ -492,7 +492,13 @@ class Html5 extends Tech {
    * @return {Object}
    * @method currentSrc
    */
-  currentSrc() { return this.el_.currentSrc; }
+  currentSrc() { 
+    if (this.currentSource_) {
+      return this.currentSource_.src;
+    } else {
+      return this.el_.currentSrc;
+    }
+  }
 
   /**
    * Get poster

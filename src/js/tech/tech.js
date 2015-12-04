@@ -321,9 +321,8 @@ class Tech extends Component {
       window['WebVTT'] = true;
     }
 
-    let textTracksChanges = Fn.bind(this, function() {
-      let updateDisplay = () => this.trigger('texttrackchange');
-
+    let updateDisplay = () => this.trigger('texttrackchange');
+    let textTracksChanges = () => {
       updateDisplay();
 
       for (let i = 0; i < tracks.length; i++) {
@@ -333,8 +332,9 @@ class Tech extends Component {
           track.addEventListener('cuechange', updateDisplay);
         }
       }
-    });
+    };
 
+    textTracksChanges();
     tracks.addEventListener('change', textTracksChanges);
 
     this.on('dispose', function() {
