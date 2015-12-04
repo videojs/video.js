@@ -7,11 +7,9 @@ import MediaError from '../../src/js/media-error.js';
 import Html5 from '../../src/js/tech/html5.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
+import window from 'global/window';
 import Tech from '../../src/js/tech/tech.js';
 import TechFaker from './tech/tech-faker.js';
-
-import proxyquireify from 'proxyquireify';
-const proxyquire = proxyquireify(require);
 
 q.module('Player', {
   'setup': function() {
@@ -874,12 +872,8 @@ test('Player#tech will return tech given the appropriate input', function() {
 
 test('Player#tech alerts and throws without the appropriate input', function() {
   let alertCalled;
-  let win = {
-    alert: () => alertCalled = true
-  };
-  let Player = proxyquire('../../src/js/player.js', {
-    'global/window': win
-  });
+  let oldAlert = window.alert;
+  window.alert = () => alertCalled = true;
 
   let tech_ = {};
   throws(function() {
@@ -888,4 +882,5 @@ test('Player#tech alerts and throws without the appropriate input', function() {
   'we threw an error');
 
   ok(alertCalled, 'we called an alert');
+  window.alert = oldAlert;
 });
