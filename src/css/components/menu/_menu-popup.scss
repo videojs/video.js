@@ -9,13 +9,8 @@
   border-top-color: rgba($primary-background-color, $primary-background-transparency); // Same as ul background
 }
 
-<<<<<<< HEAD
 // Button Pop-up Menu
-.vjs-menu-button-popup .vjs-menu ul {
-=======
-/* Button Pop-up Menu */
 .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
->>>>>>> videojs/master
   @include background-color-with-alpha($primary-background-color, $primary-background-transparency);
 
   position: absolute;
