@@ -33,14 +33,14 @@
   font-size: 1.666666666666666666em
 }
 
+/* If we let the font size grow as much as everything else, the current time tooltip ends up
+ ginormous. If you'd like to enable the current time tooltip all the time, this should be disabled
+ to avoid a weird hitch when you roll off the hover. */
+
 // Also show the current time tooltip
 .video-js .vjs-progress-control:hover .vjs-mouse-display:after,
 .video-js .vjs-progress-control:hover .vjs-play-progress:after {
   display: block;
-
-  // If we let the font size grow as much as everything else, the current time tooltip ends up
-  // ginormous. If you'd like to enable the current time tooltip all the time, this should be disabled
-  // to avoid a weird hitch when you roll off the hover.
   font-size: 0.6em;
 }
 
@@ -81,9 +81,9 @@
 }
 
 // Current Time "tooltip"
+// By default this is hidden and only shown when hovering over the progress control
 .video-js .vjs-mouse-display:after,
 .video-js .vjs-play-progress:after {
-  // By default this is hidden and only shown when hovering over the progress control
   display: none;
   position: absolute;
   top: -2.4em;
