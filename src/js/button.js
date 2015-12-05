@@ -43,10 +43,24 @@ class Button extends Component {
       tabIndex: 0
     }, props);
 
-    // Add standard Aria info
+    if (tag === 'button') {
+      this.isButtonElement_ = true;
+
+      // Add attributes for button element
+      attributes = assign({
+        type: 'button' // Necessary since the default button type is "submit"
+      }, attributes);
+    } else {
+      this.isButtonElement_ = false;
+
+      // Add ARIA attributes for clickable non-button element
+      attributes = assign({
+        role: 'button'
+      }, attributes);
+    }
+
+    // Add common ARIA attributes
     attributes = assign({
-      role: 'button',
-      type: 'button', // Necessary since the default button type is "submit"
       'aria-live': 'polite' // let the screen reader user know that the text of the button may change
     }, attributes);
 
@@ -111,10 +125,13 @@ class Button extends Component {
    * @method handleKeyPress
    */
   handleKeyPress(event) {
-    // Check for space bar (32) or enter (13) keys
-    if (event.which === 32 || event.which === 13) {
-      event.preventDefault();
-      this.handleClick(event);
+    // A button element already handles Space or Enter key to fire a click event
+    if (!this.isButtonElement_) {
+      // Check for space bar (32) or enter (13) keys
+      if (event.which === 32 || event.which === 13) {
+        event.preventDefault();
+        this.handleClick(event);
+      }
     }
   }
 
