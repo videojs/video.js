@@ -42,7 +42,8 @@ class MenuItem extends Button {
   createEl(type, props, attrs) {
     return super.createEl('li', assign({
       className: 'vjs-menu-item',
-      innerHTML: this.localize(this.options_['label'])
+      innerHTML: this.localize(this.options_['label']),
+      tabIndex: -1
     }, props), attrs);
   }
 

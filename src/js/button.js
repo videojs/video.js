@@ -39,8 +39,7 @@ class Button extends Component {
    */
   createEl(tag='button', props={}, attributes={}) {
     props = assign({
-      className: this.buildCSSClass(),
-      tabIndex: 0
+      className: this.buildCSSClass()
     }, props);
 
     if (tag === 'button') {
@@ -52,6 +51,11 @@ class Button extends Component {
       }, attributes);
     } else {
       this.isButtonElement_ = false;
+
+      // If the element isn't a button, it needs tabIndex=0 to allow keyboard focus
+      props = assign({
+        tabIndex: 0
+      }, props);
 
       // Add ARIA attributes for clickable non-button element
       attributes = assign({
