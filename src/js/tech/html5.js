@@ -86,9 +86,6 @@ class Html5 extends Tech {
 
     this.triggerReady();
   }
-  clearMedia() {
-    Html5.clearMediaElement(this.el());
-  }
 
   /**
    * Dispose of html5 media element
