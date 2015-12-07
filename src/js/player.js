@@ -613,6 +613,30 @@ class Player extends Component {
   }
 
   /**
+   * Return a reference to the current tech.
+   * It will only return a reference to the tech if given an object with the
+   * `IWillNotUseThisInPlugins` property on it. This is try and prevent misuse
+   * of techs by plugins.
+   *
+   * @param {Object}
+   * @return {Object} The Tech
+   * @method tech
+   */
+  tech(safety) {
+    if (safety && safety.IWillNotUseThisInPlugins) {
+      return this.tech_;
+    }
+    let errorText = `
+      Please make sure that you are not using this inside of a plugin.
+      To disable this alert and error, please pass in an object with
+      \`IWillNotUseThisInPlugins\` to the \`tech\` method. See
+      https://github.com/videojs/video.js/issues/2617 for more info.
+    `;
+    window.alert(errorText);
+    throw new Error(errorText);
+  }
+
+  /**
    * Set up click and touch listeners for the playback element
    *
    * On desktops, a click on the video itself will toggle playback,

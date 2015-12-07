@@ -3,6 +3,7 @@ CHANGELOG
 
 ## HEAD (Unreleased)
 * @misteroneill updated videojs-ie8 to 1.1.1 ([view](https://github.com/videojs/video.js/pull/2869))
+* @gkatsev added Player#tech. Fixes #2617 ([view](https://github.com/videojs/video.js/pull/2883))
 
 --------------------
 

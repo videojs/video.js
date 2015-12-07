@@ -7,6 +7,7 @@ import MediaError from '../../src/js/media-error.js';
 import Html5 from '../../src/js/tech/html5.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
+import window from 'global/window';
 import Tech from '../../src/js/tech/tech.js';
 import TechFaker from './tech/tech-faker.js';
 
@@ -860,4 +861,26 @@ test('you can clear error in the error event', function() {
   ok(!player.error(), 'we no longer have an error');
 
   log.error.restore();
+});
+
+test('Player#tech will return tech given the appropriate input', function() {
+  let tech_ = {};
+  let returnedTech = Player.prototype.tech.call({tech_}, {IWillNotUseThisInPlugins: true});
+
+  equal(returnedTech, tech_, 'We got back the tech we wanted');
+});
+
+test('Player#tech alerts and throws without the appropriate input', function() {
+  let alertCalled;
+  let oldAlert = window.alert;
+  window.alert = () => alertCalled = true;
+
+  let tech_ = {};
+  throws(function() {
+    Player.prototype.tech.call({tech_});
+  }, new RegExp('https://github.com/videojs/video.js/issues/2617'),
+  'we threw an error');
+
+  ok(alertCalled, 'we called an alert');
+  window.alert = oldAlert;
 });
