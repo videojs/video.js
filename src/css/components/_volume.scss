@@ -73,7 +73,7 @@
   }
 }
 
-/* Assumes volume starts at 1.0. */
+// Assumes volume starts at 1.0.
 .vjs-volume-bar.vjs-slider-vertical .vjs-volume-level {
   height: 100%;
 }
@@ -82,11 +82,11 @@
   width: 100%;
 }
 
-/* The volume menu button is like menu buttons (captions/subtitles) but works
-a little differently. It needs to be possible to tab to the volume slider
-without hitting space bar on the menu button. To do this we're not using
-display:none to hide the slider menu by default, and instead setting the
-width and height to zero. */
+// The volume menu button is like menu buttons (captions/subtitles) but works
+// a little differently. It needs to be possible to tab to the volume slider
+// without hitting space bar on the menu button. To do this we're not using
+// display:none to hide the slider menu by default, and instead setting the
+// width and height to zero.
 .vjs-menu-button-popup.vjs-volume-menu-button .vjs-menu {
   display: block;
   width: 0;
@@ -124,7 +124,7 @@ width and height to zero. */
 }
 
 .vjs-volume-menu-button.vjs-menu-button-inline .vjs-menu-content {
-  /* An inline volume should never have a menu background color.
-     This protects it from external changes to background colors. */
+  // An inline volume should never have a menu background color.
+  //  This protects it from external changes to background colors.
   background-color: transparent !important;
 }

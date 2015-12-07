@@ -15,7 +15,7 @@
   height: 100%;
 }
 
-/* Used for IE8 fallback */
+// Used for IE8 fallback
 .vjs-poster img {
   display: block;
   vertical-align: middle;
@@ -25,23 +25,23 @@
   width: 100%;
 }
 
-/* Hide the poster after the video has started playing */
+// Hide the poster after the video has started playing
 .vjs-has-started .vjs-poster {
   display: none;
 }
 
-/* Don't hide the poster if we're playing audio */
+// Don't hide the poster if we're playing audio
 .vjs-audio.vjs-has-started .vjs-poster {
   display: block;
 }
 
-/* Hide the poster when controls are disabled because it's clickable
-and the native poster can take over */
+// Hide the poster when controls are disabled because it's clickable
+// and the native poster can take over
 .vjs-controls-disabled .vjs-poster {
   display: none;
 }
 
-/* Hide the poster when native controls are used otherwise it covers them */
+// Hide the poster when native controls are used otherwise it covers them
 .vjs-using-native-controls .vjs-poster {
   display: none;
 }

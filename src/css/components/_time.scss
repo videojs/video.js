@@ -8,7 +8,7 @@
   display: none;
 }
 
-/* We need the extra specificity that referencing .vjs-no-flex provides. */
+// We need the extra specificity that referencing .vjs-no-flex provides.
 .video-js .vjs-current-time,
 .vjs-no-flex .vjs-current-time {
   display: none;
