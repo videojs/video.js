@@ -250,8 +250,30 @@
       ]
     },
 
+    "next": {
+      "patch": {
+        "description": "Create a patch release and tag it @next on npm",
+        "release_type": "patch",
+        "steps": [{ "include": "release run_next" }]
+      },
+      "minor": {
+        "description": "Create a minor release and tag it @next on npm",
+        "release_type": "minor",
+        "steps": [{ "include": "release run_next" }]
+      },
+      "major": {
+        "description": "Create a major release and tag it @next on npm",
+        "release_type": "major",
+        "steps": [{ "include": "release run_next" }]
+      }
+    },
+
     "prerelease": {
       "release_type": "prerelease",
+      "steps": [{ "include": "release run_next" }]
+    },
+
+    "run_next": {
       "steps": [
         { "include": "branch check" },
         { "include": "update local master" },
@@ -273,6 +295,7 @@
         [ "git branch -D temp-release-branch",         "Delete the temp release branch" ]
       ]
     },
+
     "run": {
       "steps": [
         { "include": "branch check" },
