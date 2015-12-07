@@ -851,6 +851,8 @@ test('should return correct remote text track values', function () {
     techOrder: ['html5']
   }, tag);
 
+  this.clock.tick(1);
+
   equal(player.remoteTextTracks().length, 1, 'add text track via html');
   equal(player.remoteTextTrackEls().length, 1, 'add html track element via html');
 
