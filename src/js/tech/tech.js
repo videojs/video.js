@@ -424,10 +424,12 @@ class Tech extends Component {
 
     let htmlTrackElement = new HTMLTrackElement(track);
 
+    // store HTMLTrackElement and TextTrack to remote list
     this.remoteTextTrackEls().addTrackElement_(htmlTrackElement);
-
-    this.textTracks().addTrack_(htmlTrackElement.track);
     this.remoteTextTracks().addTrack_(htmlTrackElement.track);
+
+    // must come after remoteTextTracks()
+    this.textTracks().addTrack_(htmlTrackElement.track);
 
     return htmlTrackElement;
   }
@@ -441,10 +443,10 @@ class Tech extends Component {
   removeRemoteTextTrack(track) {
     this.textTracks().removeTrack_(track);
 
-    // TODO: track can be html text element due to addRemoteTextTrack—consider refactoring
     let trackElement = this.remoteTextTrackEls().getTrackElementByTrack_(track);
-    this.remoteTextTrackEls().removeTrackElement_(trackElement);
 
+    // remove HTMLTrackElement and TextTrack from remote list
+    this.remoteTextTrackEls().removeTrackElement_(trackElement);
     this.remoteTextTracks().removeTrack_(track);
   }
 

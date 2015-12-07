@@ -49,6 +49,7 @@ class Html5 extends Tech {
       while (nodesLength--) {
         let node = nodes[nodesLength];
         let nodeName = node.nodeName.toLowerCase();
+
         if (nodeName === 'track') {
           if (!this.featuresNativeTextTracks) {
             // Empty video tag tracks so the built-in player doesn't use them also.
@@ -57,6 +58,8 @@ class Html5 extends Tech {
             // captions and subtitles. videoElement.textTracks
             removeNodes.push(node);
           } else {
+            // store HTMLTrackElement and TextTrack to remote list
+            this.remoteTextTrackEls().addTrackElement_(node);
             this.remoteTextTracks().addTrack_(node.track);
           }
         }
@@ -766,6 +769,7 @@ class Html5 extends Tech {
 
     this.el().appendChild(htmlTrackElement);
 
+    // store HTMLTrackElement and TextTrack to remote list
     this.remoteTextTrackEls().addTrackElement_(htmlTrackElement);
     this.remoteTextTracks().addTrack_(htmlTrackElement.track);
 
@@ -785,10 +789,10 @@ class Html5 extends Tech {
 
     let tracks, i;
 
-    // TODO: track can be html text element due to addRemoteTextTrack—consider refactoring
     let trackElement = this.remoteTextTrackEls().getTrackElementByTrack_(track);
-    this.remoteTextTrackEls().removeTrackElement_(trackElement);
 
+    // remove HTMLTrackElement and TextTrack from remote list
+    this.remoteTextTrackEls().removeTrackElement_(trackElement);
     this.remoteTextTracks().removeTrack_(track);
 
     tracks = this.$$('track');

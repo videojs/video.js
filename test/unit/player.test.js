@@ -835,6 +835,39 @@ test('createModal()', function() {
   strictEqual(player.children().indexOf(modal), -1, 'modal was removed from player\'s children');
 });
 
+test('should return correct remote text track values', function () {
+  var fixture = document.getElementById('qunit-fixture');
+
+  var html = '<video id="example_1" class="video-js" autoplay preload="none">';
+      html += '<source src="http://google.com" type="video/mp4">';
+      html += '<track kind="captions" label="label">';
+      html += '</video>';
+
+  fixture.innerHTML += html;
+
+  var tag = document.getElementById('example_1');
+
+  var player = TestHelpers.makePlayer({
+    techOrder: ['html5']
+  }, tag);
+
+  equal(player.remoteTextTracks().length, 1, 'add text track via html');
+  equal(player.remoteTextTrackEls().length, 1, 'add html track element via html');
+
+  let htmlTextTrack = player.addRemoteTextTrack({
+    kind: 'captions',
+    label: 'label'
+  });
+
+  equal(player.remoteTextTracks().length, 2, 'add text track via method');
+  equal(player.remoteTextTrackEls().length, 2, 'add html track element via method');
+
+  player.removeRemoteTextTrack(htmlTextTrack.track);
+
+  equal(player.remoteTextTracks().length, 1, 'remove text track via method');
+  equal(player.remoteTextTrackEls().length, 1, 'remove html track element via method');
+});
+
 test('createModal() options object', function() {
   var player = TestHelpers.makePlayer();
   var modal = player.createModal('foo', {content: 'bar', label: 'boo'});
