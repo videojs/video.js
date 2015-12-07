@@ -909,3 +909,28 @@ test('player#reset loads the Html5 tech and then techCalls reset', function() {
   equal(loadedSource, null, 'with a null source');
   equal(techCallMethod, 'reset', 'we then reset the tech');
 });
+
+test('player#reset loads the first item in the techOrder and then techCalls reset', function() {
+  let loadedTech;
+  let loadedSource;
+  let techCallMethod;
+
+  let testPlayer = {
+    options_: {
+      techOrder: ['flash', 'html5'],
+    },
+    loadTech_(tech, source) {
+      loadedTech = tech;
+      loadedSource = source;
+    },
+    techCall_(method) {
+      techCallMethod = method;
+    }
+  };
+
+  Player.prototype.reset.call(testPlayer);
+
+  equal(loadedTech, 'Flash', 'we loaded the Flash tech');
+  equal(loadedSource, null, 'with a null source');
+  equal(techCallMethod, 'reset', 'we then reset the tech');
+});
