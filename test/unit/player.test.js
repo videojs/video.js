@@ -891,6 +891,9 @@ test('player#reset loads the Html5 tech and then techCalls reset', function() {
   let techCallMethod;
 
   let testPlayer = {
+    options_: {
+      techOrder: ['html5', 'flash'],
+    },
     loadTech_(tech, source) {
       loadedTech = tech;
       loadedSource = source;

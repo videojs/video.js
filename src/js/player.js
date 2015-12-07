@@ -1924,13 +1924,14 @@ class Player extends Component {
   }
 
   /**
-   * Reset the player. Removes all sources, loads the Html tech, and calls `load`.
+   * Reset the player. Loads the first tech in the techOrder,
+   * and calls `reset` on the tech`.
    *
    * @return {Player} Returns the player
    * @method reset
    */
   reset() {
-    this.loadTech_('Html5', null);
+    this.loadTech_(toTitleCase(this.options_.techOrder[0]), null);
     this.techCall_('reset');
     return this;
   }
