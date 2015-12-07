@@ -253,9 +253,8 @@
     "prerelease": {
       "release_type": "prerelease",
       "steps": [
-        [ "git checkout master",                       "Checkout the developmet branch" ],
-        [ "git pull upstream master",                  "Update the developmet branch" ],
         { "include": "branch check" },
+        { "include": "update local master" },
         [ "git checkout -b temp-release-branch master","Create a temporary branch for the dist" ],
         [ "grunt version:{{release_type}}",            "Bump package versions" ],
         [ "./build/bin/version",                       "Return the current VJS Version from the package.json file", "version" ],
