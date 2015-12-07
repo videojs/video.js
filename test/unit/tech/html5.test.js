@@ -304,3 +304,50 @@ test('should fire makeup events when a video tag is initialized late', function(
   testStates({ networkState: 1, readyState: 3 }, ['loadstart', 'loadedmetadata', 'loadeddata', 'canplay']);
   testStates({ networkState: 1, readyState: 4 }, ['loadstart', 'loadedmetadata', 'loadeddata', 'canplay', 'canplaythrough']);
 });
+
+test('Html5.resetMediaElement should remove sources and call load', function() {
+  let selector;
+  let removedChildren = [];
+  let removedAttribute;
+  let loaded;
+
+  let children = ['source1', 'source2', 'source3'];
+  let testEl = {
+    querySelectorAll(input) {
+      selector = input;
+      return children;
+    },
+
+    removeChild(child) {
+      removedChildren.push(child);
+    },
+
+    removeAttribute(attr) {
+      removedAttribute = attr;
+    },
+
+    load() {
+      loaded = true;
+    }
+  };
+
+  Html5.resetMediaElement(testEl);
+  equal(selector, 'source', 'we got the source elements from the test el');
+  deepEqual(removedChildren, children.reverse(), 'we removed the children that were present');
+  equal(removedAttribute, 'src', 'we removed the src attribute');
+  ok(loaded, 'we called load on the element');
+});
+
+test('Html5#reset calls Html5.resetMediaElement when called', function() {
+  let oldResetMedia = Html5.resetMediaElement;
+  let resetEl;
+
+  Html5.resetMediaElement = (el) => resetEl = el;
+
+  let el = {};
+  Html5.prototype.reset.call({el_: el});
+
+  equal(resetEl, el, 'we called resetMediaElement with the tech\'s el');
+
+  Html5.resetMediaElement = oldResetMedia;
+});

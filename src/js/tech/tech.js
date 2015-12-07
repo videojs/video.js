@@ -234,6 +234,13 @@ class Tech extends Component {
   }
 
   /**
+   * Reset the tech. Removes all sources and resets readyState.
+   *
+   * @method reset
+   */
+  reset() {}
+
+  /**
    * When invoked without an argument, returns a MediaError object
    * representing the current error state of the player or null if
    * there is no error. When invoked with an argument, set the current

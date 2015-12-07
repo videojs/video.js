@@ -487,6 +487,15 @@ class Html5 extends Tech {
   }
 
   /**
+   * Reset the tech. Removes all sources and calls `load`.
+   *
+   * @method reset
+   */
+  reset() {
+    Html5.resetMediaElement(this.el_);
+  }
+
+  /**
    * Get current source
    *
    * @return {Object}
@@ -1088,6 +1097,29 @@ Html5.disposeMediaElement = function(el){
       } catch (e) {
         // not supported
       }
+    })();
+  }
+};
+
+Html5.resetMediaElement = function(el){
+  if (!el) { return; }
+
+  let sources = el.querySelectorAll('source');
+  let i = sources.length;
+  while (i--) {
+    el.removeChild(sources[i]);
+  }
+
+  // remove any src reference.
+  // not setting `src=''` because that throws an error
+  el.removeAttribute('src');
+
+  if (typeof el.load === 'function') {
+    // wrapping in an iife so it's not deoptimized (#1060#discussion_r10324473)
+    (function() {
+      try {
+        el.load();
+      } catch (e) {}
     })();
   }
 };
