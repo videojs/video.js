@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* @gkatsev updated grunt-release config ([view](https://github.com/videojs/video.js/pull/2900))
+_(none)_
 
 --------------------
+
+## 5.4.2 (2015-12-08)
+* @gkatsev updated grunt-release config ([view](https://github.com/videojs/video.js/pull/2900))
 
 ## 5.4.1 (2015-12-08)
 * @misteroneill updated videojs-ie8 to 1.1.1 ([view](https://github.com/videojs/video.js/pull/2869))
