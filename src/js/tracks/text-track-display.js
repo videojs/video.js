@@ -146,7 +146,7 @@ class TextTrackDisplay extends Component {
         continue;
       }
 
-      let cueDiv = cues[i].displayState;
+      let cueDiv = cue.displayState;
       if (overrides.color) {
         cueDiv.firstChild.style.color = overrides.color;
       }
