@@ -166,7 +166,7 @@ test('trigger "change" event when "modechange" is fired on a track', function() 
   equal(changes, 2, 'two change events should have fired');
 });
 
-test('trigger "change" event when mode changes on a TextTracl', function() {
+test('trigger "change" event when mode changes on a TextTrack', function() {
   var tt = new TextTrack({
         tech: {
           on: noop

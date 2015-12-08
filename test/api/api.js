@@ -61,6 +61,7 @@ test('should be able to access expected player API methods', function() {
 
   // TextTrack methods
   ok(player.textTracks, 'textTracks exists');
+  ok(player.remoteTextTrackEls, 'remoteTextTrackEls exists');
   ok(player.remoteTextTracks, 'remoteTextTracks exists');
   ok(player.addTextTrack, 'addTextTrack exists');
   ok(player.addRemoteTextTrack, 'addRemoteTextTrack exists');
