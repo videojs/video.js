@@ -15,7 +15,14 @@ import document from 'global/document';
 import window from 'global/window';
 import TechFaker from '../tech/tech-faker.js';
 
-q.module('Tracks');
+q.module('Tracks', {
+  'setup': function() {
+    this.clock = sinon.useFakeTimers();
+  },
+  'teardown': function() {
+    this.clock.restore();
+  }
+});
 
 test('should place title list item into ul', function() {
   var player, chaptersButton;
@@ -397,4 +404,67 @@ test('removes cuechange event when text track is hidden for emulated tracks', fu
   player.tech_.trigger('timeupdate');
   equal(numTextTrackChanges, 4,
     'texttrackchange should be not be called since mode is hidden');
+});
+
+test('should return correct remote text track values', function () {
+  let fixture = document.getElementById('qunit-fixture');
+
+  let html = '<video id="example_1" class="video-js" autoplay preload="none">';
+      html += '<source src="http://google.com" type="video/mp4">';
+      html += '<source src="http://google.com" type="video/webm">';
+      html += '<track kind="captions" label="label">';
+      html += '</video>';
+
+  fixture.innerHTML += html;
+
+  let tag = document.getElementById('example_1');
+
+  let player = TestHelpers.makePlayer({}, tag);
+
+  this.clock.tick(1);
+
+  equal(player.remoteTextTracks().length, 1, 'add text track via html');
+  equal(player.remoteTextTrackEls().length, 1, 'add html track element via html');
+
+  let htmlTrackElement = player.addRemoteTextTrack({
+    kind: 'captions',
+    label: 'label'
+  });
+
+  equal(player.remoteTextTracks().length, 2, 'add text track via method');
+  equal(player.remoteTextTrackEls().length, 2, 'add html track element via method');
+
+  player.removeRemoteTextTrack(htmlTrackElement.track);
+
+  equal(player.remoteTextTracks().length, 1, 'remove text track via method');
+  equal(player.remoteTextTrackEls().length, 1, 'remove html track element via method');
+
+  player.dispose();
+});
+
+test('should uniformly create html track element when adding text track', function () {
+  let player = TestHelpers.makePlayer();
+
+  let track = {
+    kind: 'kind',
+    src: 'src',
+    language: 'language',
+    label: 'label',
+    default: 'default'
+  };
+
+  equal(player.remoteTextTrackEls().length, 0, 'no html text tracks');
+
+  let htmlTrackElement = player.addRemoteTextTrack(track);
+
+  equal(htmlTrackElement.kind, htmlTrackElement.track.kind, 'verify html track element kind');
+  equal(htmlTrackElement.src, htmlTrackElement.track.src, 'verify html track element src');
+  equal(htmlTrackElement.srclang, htmlTrackElement.track.language, 'verify html track element language');
+  equal(htmlTrackElement.label, htmlTrackElement.track.label, 'verify html track element label');
+  equal(htmlTrackElement.default, htmlTrackElement.track.default, 'verify html track element default');
+
+  equal(player.remoteTextTrackEls().length, 1, 'html track element exist');
+  equal(player.remoteTextTrackEls().getTrackElementByTrack_(htmlTrackElement.track), htmlTrackElement, 'verify same html track element');
+
+  player.dispose();
 });
