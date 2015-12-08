@@ -299,6 +299,12 @@ module.exports = function(grunt) {
           tag_name: 'v'+ version.full,
           name: version.full,
           body: require('chg').find(version.full).changesRaw
+        },
+        prerelease: {
+          tag_name: 'v'+ version.full,
+          name: version.full,
+          body: require('chg').find(version.full).changesRaw,
+          prerelease: true
         }
       },
       files: {
