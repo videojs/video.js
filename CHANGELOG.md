@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @gkatsev updated grunt-release config ([view](https://github.com/videojs/video.js/pull/2900))
 
 --------------------
 

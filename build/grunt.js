@@ -294,17 +294,25 @@ module.exports = function(grunt) {
         auth: {
           user: process.env.VJS_GITHUB_USER,
           password: process.env.VJS_GITHUB_TOKEN
-        },
-        release: {
-          tag_name: 'v'+ version.full,
-          name: version.full,
-          body: require('chg').find(version.full).changesRaw
-        },
-        prerelease: {
-          tag_name: 'v'+ version.full,
-          name: version.full,
-          body: require('chg').find(version.full).changesRaw,
-          prerelease: true
+        }
+      },
+      release: {
+        options: {
+          release: {
+            tag_name: 'v'+ version.full,
+            name: version.full,
+            body: require('chg').find(version.full).changesRaw
+          }
+        }
+      },
+      prerelease: {
+        options: {
+          release: {
+            tag_name: 'v'+ version.full,
+            name: version.full,
+            body: require('chg').find(version.full).changesRaw,
+            prerelease: true
+          }
         }
       },
       files: {
