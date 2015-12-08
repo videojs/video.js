@@ -48,7 +48,7 @@ class Menu extends Component {
     this.contentEl_ = Dom.createEl(contentElType, {
       className: 'vjs-menu-content'
     });
-    this.contentEl_.setAttribute('role', 'presentation');
+    this.contentEl_.setAttribute('role', 'menu');
     var el = super.createEl('div', {
       append: this.contentEl_,
       className: 'vjs-menu'

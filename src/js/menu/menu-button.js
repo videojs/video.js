@@ -24,7 +24,7 @@ class MenuButton extends Button {
     this.update();
 
     this.el_.setAttribute('aria-haspopup', true);
-    this.el_.setAttribute('role', 'menu');
+    this.el_.setAttribute('role', 'menuitem');
     this.on('keydown', this.handleSubmenuKeyPress);
   }
 

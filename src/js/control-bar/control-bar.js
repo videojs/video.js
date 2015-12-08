@@ -38,6 +38,8 @@ class ControlBar extends Component {
   createEl() {
     return super.createEl('div', {
       className: 'vjs-control-bar'
+    }, {
+      'role': 'group' // The control bar is a group, so it can contain menuitems
     });
   }
 }
