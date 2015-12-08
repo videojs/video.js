@@ -2,6 +2,11 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 5.4.1 (2015-12-08)
 * @misteroneill updated videojs-ie8 to 1.1.1 ([view](https://github.com/videojs/video.js/pull/2869))
 * @gkatsev added Player#tech. Fixes #2617 ([view](https://github.com/videojs/video.js/pull/2883))
 * @nick11703 changed multiline comments in sass with single-line comments ([view](https://github.com/videojs/video.js/pull/2827))
@@ -10,8 +15,6 @@ CHANGELOG
 * @gkatsev added nullcheck for cues in updateForTrack. Fixes #2870 ([view](https://github.com/videojs/video.js/pull/2896))
 * @gkatsev added ability to release next tag from master ([view](https://github.com/videojs/video.js/pull/2894))
 * @gkatsev added chg- and github- release for next releases ([view](https://github.com/videojs/video.js/pull/2899))
-
---------------------
 
 ## 5.3.0 (2015-11-25)
 * @forbesjo updated formatTime to not go negative ([view](https://github.com/videojs/video.js/pull/2821))
