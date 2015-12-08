@@ -8,6 +8,7 @@ CHANGELOG
 * @gkatsev added a Player#reset method. Fixes #2852 ([view](https://github.com/videojs/video.js/pull/2880))
 * @chemoish emulated HTMLTrackElement to enable track load events ([view](https://github.com/videojs/video.js/pull/2804))
 * @gkatsev added nullcheck for cues in updateForTrack. Fixes #2870 ([view](https://github.com/videojs/video.js/pull/2896))
+* @gkatsev added ability to release next tag from master ([view](https://github.com/videojs/video.js/pull/2894))
 
 --------------------
 
