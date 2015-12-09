@@ -7,6 +7,9 @@ import MediaError from '../../src/js/media-error.js';
 import Html5 from '../../src/js/tech/html5.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
+import window from 'global/window';
+import Tech from '../../src/js/tech/tech.js';
+import TechFaker from './tech/tech-faker.js';
 
 q.module('Player', {
   'setup': function() {
@@ -16,36 +19,6 @@ q.module('Player', {
     this.clock.restore();
   }
 });
-
-// Compiler doesn't like using 'this' in setup/teardown.
-// module("Player", {
-//   /**
-//    * @this {*}
-//    */
-//   setup: function(){
-//     window.player1 = true; // using window works
-//   },
-
-//   /**
-//    * @this {*}
-//    */
-//   teardown: function(){
-//     // if (this.player && this.player.el() !== null) {
-//     //   this.player.dispose();
-//     //   this.player = null;
-//     // }
-//   }
-// });
-
-// Object.size = function(obj) {
-//     var size = 0, key;
-//     for (key in obj) {
-//         console.log('key', key)
-//         if (obj.hasOwnProperty(key)) size++;
-//     }
-//     return size;
-// };
-
 
 test('should create player instance that inherits from component and dispose it', function(){
   var player = TestHelpers.makePlayer();
@@ -199,6 +172,21 @@ test('should set the width, height, and aspect ratio via a css class', function(
   ok(confirmSetting('padding-top', '25%'), 'aspect ratio percent should match the newly set aspect ratio');
 });
 
+test('should use an class name that begins with an alpha character', function(){
+  let alphaPlayer = TestHelpers.makePlayer({ id: 'alpha1' });
+  let numericPlayer = TestHelpers.makePlayer({ id: '1numeric' });
+
+  let getStyleText = function(styleEl){
+    return (styleEl.styleSheet && styleEl.styleSheet.cssText) || styleEl.innerHTML;
+  };
+
+  alphaPlayer.width(100);
+  numericPlayer.width(100);
+
+  ok(/\s*\.alpha1-dimensions\s*\{/.test(getStyleText(alphaPlayer.styleEl_)), 'appends -dimensions to an alpha player ID');
+  ok(/\s*\.dimensions-1numeric\s*\{/.test(getStyleText(numericPlayer.styleEl_)), 'prepends dimensions- to a numeric player ID');
+});
+
 test('should wrap the original tag in the player div', function(){
   var tag = TestHelpers.makeTag();
   var container = document.createElement('div');
@@ -324,24 +312,6 @@ test('should set controls and trigger events', function() {
   player.dispose();
 });
 
-// Can't figure out how to test fullscreen events with tests
-// Browsers aren't triggering the events at least
-// asyncTest('should trigger the fullscreenchange event', function() {
-//   expect(3);
-
-//   var player = TestHelpers.makePlayer();
-//   player.on('fullscreenchange', function(){
-//     ok(true, 'fullscreenchange event fired');
-//     ok(this.isFullscreen() === true, 'isFullscreen is true');
-//     ok(this.el().className.indexOf('vjs-fullscreen') !== -1, 'vjs-fullscreen class added');
-
-//     player.dispose();
-//     start();
-//   });
-
-//   player.requestFullscreen();
-// });
-
 test('should toggle user the user state between active and inactive', function(){
   var player = TestHelpers.makePlayer({});
 
@@ -441,27 +411,42 @@ test('make sure that controls listeners do not get added too many times', functi
   player.dispose();
 });
 
-// test('should use custom message when encountering an unsupported video type',
-//     function() {
-//   videojs.options['notSupportedMessage'] = 'Video no go <a href="">link</a>';
-//   var fixture = document.getElementById('qunit-fixture');
+test('should select the proper tech based on the the sourceOrder option',
+  function() {
+    let fixture = document.getElementById('qunit-fixture');
+    let html =
+        '<video id="example_1">' +
+          '<source src="fake.foo1" type="video/unsupported-format">' +
+          '<source src="fake.foo2" type="video/foo-format">' +
+        '</video>';
 
-//   var html =
-//       '<video id="example_1">' +
-//           '<source src="fake.foo" type="video/foo">' +
-//           '</video>';
+    // Extend TechFaker to create a tech that plays the only mime-type that TechFaker
+    // will not play
+    class PlaysUnsupported extends TechFaker {
+      constructor(options, handleReady){
+        super(options, handleReady);
+      }
+      // Support ONLY "video/unsupported-format"
+      static isSupported() { return true; }
+      static canPlayType(type) { return (type === 'video/unsupported-format' ? 'maybe' : ''); }
+      static canPlaySource(srcObj) { return srcObj.type === 'video/unsupported-format'; }
+    }
+    Tech.registerTech('PlaysUnsupported', PlaysUnsupported);
 
-//   fixture.innerHTML += html;
+    fixture.innerHTML += html;
+    let tag = document.getElementById('example_1');
 
-//   var tag = document.getElementById('example_1');
-//   var player = new Player(tag, { techOrder: ['techFaker'] });
+    let player = new Player(tag, { techOrder: ['techFaker', 'playsUnsupported'], sourceOrder: true });
+    equal(player.techName_, 'PlaysUnsupported', 'selected the PlaysUnsupported tech when sourceOrder is truthy');
+    player.dispose();
 
-//   var incompatibilityMessage = player.el().getElementsByTagName('p')[0];
-//   // ie8 capitalizes tag names
-//   equal(incompatibilityMessage.innerHTML.toLowerCase(), 'video no go <a href="">link</a>');
+    fixture.innerHTML += html;
+    tag = document.getElementById('example_1');
 
-//   player.dispose();
-// });
+    player = new Player(tag, { techOrder: ['techFaker', 'playsUnsupported']});
+    equal(player.techName_, 'TechFaker', 'selected the TechFaker tech when sourceOrder is falsey');
+    player.dispose();
+});
 
 test('should register players with generated ids', function(){
   var fixture, video, player, id;
@@ -858,4 +843,94 @@ test('createModal() options object', function() {
   strictEqual(modal.content(), 'foo', 'content argument takes precedence');
   strictEqual(modal.options_.label, 'boo', 'modal options are set properly');
   modal.close();
+});
+
+test('you can clear error in the error event', function() {
+  let player = TestHelpers.makePlayer();
+
+  sinon.stub(log, 'error');
+
+  player.error({code: 4});
+  ok(player.error(), 'we have an error');
+  player.error(null);
+
+  player.one('error', function() {
+    player.error(null);
+  });
+  player.error({code: 4});
+  ok(!player.error(), 'we no longer have an error');
+
+  log.error.restore();
+});
+
+test('Player#tech will return tech given the appropriate input', function() {
+  let tech_ = {};
+  let returnedTech = Player.prototype.tech.call({tech_}, {IWillNotUseThisInPlugins: true});
+
+  equal(returnedTech, tech_, 'We got back the tech we wanted');
+});
+
+test('Player#tech alerts and throws without the appropriate input', function() {
+  let alertCalled;
+  let oldAlert = window.alert;
+  window.alert = () => alertCalled = true;
+
+  let tech_ = {};
+  throws(function() {
+    Player.prototype.tech.call({tech_});
+  }, new RegExp('https://github.com/videojs/video.js/issues/2617'),
+  'we threw an error');
+
+  ok(alertCalled, 'we called an alert');
+  window.alert = oldAlert;
+});
+
+test('player#reset loads the Html5 tech and then techCalls reset', function() {
+  let loadedTech;
+  let loadedSource;
+  let techCallMethod;
+
+  let testPlayer = {
+    options_: {
+      techOrder: ['html5', 'flash'],
+    },
+    loadTech_(tech, source) {
+      loadedTech = tech;
+      loadedSource = source;
+    },
+    techCall_(method) {
+      techCallMethod = method;
+    }
+  };
+
+  Player.prototype.reset.call(testPlayer);
+
+  equal(loadedTech, 'Html5', 'we loaded the html5 tech');
+  equal(loadedSource, null, 'with a null source');
+  equal(techCallMethod, 'reset', 'we then reset the tech');
+});
+
+test('player#reset loads the first item in the techOrder and then techCalls reset', function() {
+  let loadedTech;
+  let loadedSource;
+  let techCallMethod;
+
+  let testPlayer = {
+    options_: {
+      techOrder: ['flash', 'html5'],
+    },
+    loadTech_(tech, source) {
+      loadedTech = tech;
+      loadedSource = source;
+    },
+    techCall_(method) {
+      techCallMethod = method;
+    }
+  };
+
+  Player.prototype.reset.call(testPlayer);
+
+  equal(loadedTech, 'Flash', 'we loaded the Flash tech');
+  equal(loadedSource, null, 'with a null source');
+  equal(techCallMethod, 'reset', 'we then reset the tech');
 });

@@ -1,3 +1,4 @@
+import {gruntCustomizer, gruntOptionsMaker} from './options-customizer.js';
 module.exports = function(grunt) {
   require('time-grunt')(grunt);
 
@@ -41,6 +42,19 @@ module.exports = function(grunt) {
     ]
   };
 
+  const githubReleaseDefaults = {
+    options: {
+      release: {
+        tag_name: 'v'+ version.full,
+        name: version.full,
+        body: require('chg').find(version.full).changesRaw
+      },
+    },
+    files: {
+      src: [`dist/video-js-${version.full}.zip`] // Files that you want to attach to Release
+    }
+  };
+
   /**
    * Customizes _.merge behavior in `browserifyGruntOptions` to concatenate
    * arrays. This can be overridden on a per-call basis to
@@ -52,11 +66,7 @@ module.exports = function(grunt) {
    * @param  {Mixed} sourceValue
    * @return {Object}
    */
-  function browserifyGruntCustomizer(objectValue, sourceValue) {
-    if (Array.isArray(objectValue)) {
-      return objectValue.concat(sourceValue);
-    }
-  }
+  const browserifyGruntCustomizer = gruntCustomizer;
 
   /**
    * Creates a unique object of Browserify Grunt task options.
@@ -70,9 +80,10 @@ module.exports = function(grunt) {
    *
    * @return {Object}
    */
-  function browserifyGruntOptions(options = null, customizer = browserifyGruntCustomizer) {
-    return _.merge({}, browserifyGruntDefaults, options, customizer);
-  }
+  const browserifyGruntOptions = gruntOptionsMaker(browserifyGruntDefaults, browserifyGruntCustomizer);
+
+  const githubReleaseCustomizer = gruntCustomizer;
+  const githubReleaseOptions = gruntOptionsMaker(githubReleaseDefaults, githubReleaseCustomizer);
 
   /**
    * Creates processor functions for license banners.
@@ -294,16 +305,16 @@ module.exports = function(grunt) {
         auth: {
           user: process.env.VJS_GITHUB_USER,
           password: process.env.VJS_GITHUB_TOKEN
-        },
-        release: {
-          tag_name: 'v'+ version.full,
-          name: version.full,
-          body: require('chg').find(version.full).changesRaw
         }
       },
-      files: {
-        src: [`dist/video-js-${version.full}.zip`] // Files that you want to attach to Release
-      }
+      release: githubReleaseOptions(),
+      prerelease: githubReleaseOptions({
+        options: {
+          release: {
+            prerelease: true
+          }
+        }
+      })
     },
     browserify: {
       options: browserifyGruntOptions(),

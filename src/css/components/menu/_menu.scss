@@ -8,7 +8,7 @@
   overflow: auto;
 }
 
-/* prevent menus from opening while scrubbing (FF, IE) */
+// prevent menus from opening while scrubbing (FF, IE)
 .vjs-scrubbing .vjs-menu-button:hover .vjs-menu {
   display: none;
 }

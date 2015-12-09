@@ -9,7 +9,7 @@ Step 1: Include the Video.js Javascript and CSS files in the head of your page.
 You can download the Video.js source and host it on your own servers, or use the free CDN hosted version. As of Video.js 5.0, the source is [transpiled from ES2015](http://babeljs.io/) (formerly known as ES6) to [ES5](https://es5.github.io/), but IE8 only supports ES3. In order to continue to support IE8, we've bundled an [ES5 shim and sham](https://github.com/es-shims/es5-shim) together and hosted it on the CDN.
 
 ```html
-<script src="//vjs.zencdn.net/ie8/1.1.0/videojs-ie8.min.js"></script>
+<script src="//vjs.zencdn.net/ie8/1.1.1/videojs-ie8.min.js"></script>
 ```
 
 ### CDN Version ###

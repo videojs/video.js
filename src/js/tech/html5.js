@@ -49,6 +49,7 @@ class Html5 extends Tech {
       while (nodesLength--) {
         let node = nodes[nodesLength];
         let nodeName = node.nodeName.toLowerCase();
+
         if (nodeName === 'track') {
           if (!this.featuresNativeTextTracks) {
             // Empty video tag tracks so the built-in player doesn't use them also.
@@ -57,6 +58,8 @@ class Html5 extends Tech {
             // captions and subtitles. videoElement.textTracks
             removeNodes.push(node);
           } else {
+            // store HTMLTrackElement and TextTrack to remote list
+            this.remoteTextTrackEls().addTrackElement_(node);
             this.remoteTextTracks().addTrack_(node.track);
           }
         }
@@ -487,12 +490,27 @@ class Html5 extends Tech {
   }
 
   /**
+   * Reset the tech. Removes all sources and calls `load`.
+   *
+   * @method reset
+   */
+  reset() {
+    Html5.resetMediaElement(this.el_);
+  }
+
+  /**
    * Get current source
    *
    * @return {Object}
    * @method currentSrc
    */
-  currentSrc() { return this.el_.currentSrc; }
+  currentSrc() { 
+    if (this.currentSource_) {
+      return this.currentSource_.src;
+    } else {
+      return this.el_.currentSrc;
+    }
+  }
 
   /**
    * Get poster
@@ -716,11 +734,11 @@ class Html5 extends Tech {
   }
 
   /**
-   * Creates and returns a remote text track object
+   * Creates a remote text track object and returns a html track element
    *
    * @param {Object} options The object should contain values for
    * kind, language, label and src (location of the WebVTT file)
-   * @return {TextTrackObject}
+   * @return {HTMLTrackElement}
    * @method addRemoteTextTrack
    */
   addRemoteTextTrack(options={}) {
@@ -728,32 +746,34 @@ class Html5 extends Tech {
       return super.addRemoteTextTrack(options);
     }
 
-    var track = document.createElement('track');
+    let htmlTrackElement = document.createElement('track');
 
-    if (options['kind']) {
-      track['kind'] = options['kind'];
+    if (options.kind) {
+      htmlTrackElement.kind = options.kind;
     }
-    if (options['label']) {
-      track['label'] = options['label'];
+    if (options.label) {
+      htmlTrackElement.label = options.label;
     }
-    if (options['language'] || options['srclang']) {
-      track['srclang'] = options['language'] || options['srclang'];
+    if (options.language || options.srclang) {
+      htmlTrackElement.srclang = options.language || options.srclang;
     }
-    if (options['default']) {
-      track['default'] = options['default'];
+    if (options.default) {
+      htmlTrackElement.default = options.default;
     }
-    if (options['id']) {
-      track['id'] = options['id'];
+    if (options.id) {
+      htmlTrackElement.id = options.id;
     }
-    if (options['src']) {
-      track['src'] = options['src'];
+    if (options.src) {
+      htmlTrackElement.src = options.src;
     }
 
-    this.el().appendChild(track);
+    this.el().appendChild(htmlTrackElement);
 
-    this.remoteTextTracks().addTrack_(track.track);
+    // store HTMLTrackElement and TextTrack to remote list
+    this.remoteTextTrackEls().addTrackElement_(htmlTrackElement);
+    this.remoteTextTracks().addTrack_(htmlTrackElement.track);
 
-    return track;
+    return htmlTrackElement;
   }
 
   /**
@@ -767,11 +787,15 @@ class Html5 extends Tech {
       return super.removeRemoteTextTrack(track);
     }
 
-    var tracks, i;
+    let tracks, i;
 
+    let trackElement = this.remoteTextTrackEls().getTrackElementByTrack_(track);
+
+    // remove HTMLTrackElement and TextTrack from remote list
+    this.remoteTextTrackEls().removeTrackElement_(trackElement);
     this.remoteTextTracks().removeTrack_(track);
 
-    tracks = this.el().querySelectorAll('track');
+    tracks = this.$$('track');
 
     i = tracks.length;
     while (i--) {
@@ -1086,5 +1110,29 @@ Html5.disposeMediaElement = function(el){
   }
 };
 
+Html5.resetMediaElement = function(el){
+  if (!el) { return; }
+
+  let sources = el.querySelectorAll('source');
+  let i = sources.length;
+  while (i--) {
+    el.removeChild(sources[i]);
+  }
+
+  // remove any src reference.
+  // not setting `src=''` because that throws an error
+  el.removeAttribute('src');
+
+  if (typeof el.load === 'function') {
+    // wrapping in an iife so it's not deoptimized (#1060#discussion_r10324473)
+    (function() {
+      try {
+        el.load();
+      } catch (e) {}
+    })();
+  }
+};
+
 Component.registerComponent('Html5', Html5);
+Tech.registerTech('Html5', Html5);
 export default Html5;

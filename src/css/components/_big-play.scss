@@ -12,7 +12,7 @@
   opacity: 1;
   border: 0.06666em solid $primary-foreground-color;
 
-  /* Need a slightly gray bg so it can be seen on black backgrounds */
+  // Need a slightly gray bg so it can be seen on black backgrounds
   @include background-color-with-alpha($primary-background-color, $primary-background-transparency);
   @include border-radius(0.3em);
   @include transition(all 0.4s);

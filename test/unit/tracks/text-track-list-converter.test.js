@@ -57,6 +57,10 @@ if (Html5.supportsNativeTextTracks()) {
     tt.addTrack_(emulatedTrack);
 
     let tech = {
+      $$() {
+        return [nativeTrack];
+      },
+
       el() {
         return {
           querySelectorAll() {
@@ -103,6 +107,10 @@ if (Html5.supportsNativeTextTracks()) {
 
     let addRemotes = 0;
     let tech = {
+      $$() {
+        return [nativeTrack];
+      },
+
       el() {
         return {
           querySelectorAll() {
@@ -167,6 +175,10 @@ q.test('textTracksToJson produces good json output for emulated only', function(
   tt.addTrack_(emulatedTrack);
 
   let tech = {
+    $$() {
+      return [];
+    },
+
     el() {
       return {
         querySelectorAll() {
@@ -217,6 +229,10 @@ q.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated trac
 
   let addRemotes = 0;
   let tech = {
+    $$() {
+      return [];
+    },
+
     el() {
       return {
         querySelectorAll() {

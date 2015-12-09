@@ -62,23 +62,164 @@ test('should get and remove data from an element', function(){
   ok(!Dom.hasElData(el), 'cached item emptied');
 });
 
-test('should add and remove a class name on an element', function(){
+test('addElClass()', function(){
   var el = document.createElement('div');
+
+  expect(5);
+
   Dom.addElClass(el, 'test-class');
-  ok(el.className === 'test-class', 'class added');
+  strictEqual(el.className, 'test-class', 'adds a single class');
+
   Dom.addElClass(el, 'test-class');
-  ok(el.className === 'test-class', 'same class not duplicated');
-  Dom.addElClass(el, 'test-class2');
-  ok(el.className === 'test-class test-class2', 'added second class');
-  Dom.removeElClass(el, 'test-class');
-  ok(el.className === 'test-class2', 'removed first class');
+  strictEqual(el.className, 'test-class', 'does not duplicate classes');
+
+  throws(function(){
+    Dom.addElClass(el, 'foo foo-bar');
+  }, 'throws when attempting to add a class with whitespace');
+
+  Dom.addElClass(el, 'test2_className');
+  strictEqual(el.className, 'test-class test2_className', 'adds second class');
+
+  Dom.addElClass(el, 'FOO');
+  strictEqual(el.className, 'test-class test2_className FOO', 'adds third class');
 });
 
-test('should read class names on an element', function(){
+test('removeElClass()', function() {
   var el = document.createElement('div');
-  Dom.addElClass(el, 'test-class1');
-  ok(Dom.hasElClass(el, 'test-class1') === true, 'class detected');
-  ok(Dom.hasElClass(el, 'test-class') === false, 'substring correctly not detected');
+
+  el.className = 'test-class foo foo test2_className FOO bar';
+
+  expect(5);
+
+  Dom.removeElClass(el, 'test-class');
+  strictEqual(el.className, 'foo foo test2_className FOO bar', 'removes one class');
+
+  Dom.removeElClass(el, 'foo');
+  strictEqual(el.className, 'test2_className FOO bar', 'removes all instances of a class');
+
+  throws(function(){
+    Dom.removeElClass(el, 'test2_className bar');
+  }, 'throws when attempting to remove a class with whitespace');
+
+  Dom.removeElClass(el, 'test2_className');
+  strictEqual(el.className, 'FOO bar', 'removes another class');
+
+  Dom.removeElClass(el, 'FOO');
+  strictEqual(el.className, 'bar', 'removes another class');
+});
+
+test('hasElClass()', function(){
+  var el = document.createElement('div');
+
+  el.className = 'test-class foo foo test2_className FOO bar';
+
+  strictEqual(Dom.hasElClass(el, 'test-class'), true, 'class detected');
+  strictEqual(Dom.hasElClass(el, 'foo'), true, 'class detected');
+  strictEqual(Dom.hasElClass(el, 'test2_className'), true, 'class detected');
+  strictEqual(Dom.hasElClass(el, 'FOO'), true, 'class detected');
+  strictEqual(Dom.hasElClass(el, 'bar'), true, 'class detected');
+  strictEqual(Dom.hasElClass(el, 'test2'), false, 'valid substring - but not a class - correctly not detected');
+  strictEqual(Dom.hasElClass(el, 'className'), false, 'valid substring - but not a class - correctly not detected');
+
+  throws(function(){
+    Dom.hasElClass(el, 'FOO bar');
+  }, 'throws when attempting to detect a class with whitespace');
+});
+
+test('toggleElClass()', function() {
+  let el = Dom.createEl('div', {className: 'foo bar'});
+
+  let predicateToggles = [
+    {
+      toggle: 'foo',
+      predicate: true,
+      className: 'foo bar',
+      message: 'if predicate `true` matches state of the element, do nothing'
+    },
+    {
+      toggle: 'baz',
+      predicate: false,
+      className: 'foo bar',
+      message: 'if predicate `false` matches state of the element, do nothing'
+    },
+    {
+      toggle: 'baz',
+      predicate: true,
+      className: 'foo bar baz',
+      message: 'if predicate `true` differs from state of the element, add the class'
+    },
+    {
+      toggle: 'foo',
+      predicate: false,
+      className: 'bar baz',
+      message: 'if predicate `false` differs from state of the element, remove the class'
+    },
+    {
+      toggle: 'bar',
+      predicate: () => true,
+      className: 'bar baz',
+      message: 'if a predicate function returns `true`, matching the state of the element, do nothing'
+    },
+    {
+      toggle: 'foo',
+      predicate: () => false,
+      className: 'bar baz',
+      message: 'if a predicate function returns `false`, matching the state of the element, do nothing'
+    },
+    {
+      toggle: 'foo',
+      predicate: () => true,
+      className: 'bar baz foo',
+      message: 'if a predicate function returns `true`, differing from state of the element, add the class'
+    },
+    {
+      toggle: 'foo',
+      predicate: () => false,
+      className: 'bar baz',
+      message: 'if a predicate function returns `false`, differing from state of the element, remove the class'
+    },
+    {
+      toggle: 'foo',
+      predicate: Function.prototype,
+      className: 'bar baz foo',
+      message: 'if a predicate function returns `undefined` and the element does not have the class, add the class'
+    },
+    {
+      toggle: 'bar',
+      predicate: Function.prototype,
+      className: 'baz foo',
+      message: 'if a predicate function returns `undefined` and the element has the class, remove the class'
+    },
+    {
+      toggle: 'bar',
+      predicate: () => [],
+      className: 'baz foo bar',
+      message: 'if a predicate function returns a defined non-boolean value and the element does not have the class, add the class'
+    },
+    {
+      toggle: 'baz',
+      predicate: () => 'this is incorrect',
+      className: 'foo bar',
+      message: 'if a predicate function returns a defined non-boolean value and the element has the class, remove the class'
+    },
+  ];
+
+  expect(3 + predicateToggles.length);
+
+  Dom.toggleElClass(el, 'bar');
+  strictEqual(el.className, 'foo', 'toggles a class off, if present');
+
+  Dom.toggleElClass(el, 'bar');
+  strictEqual(el.className, 'foo bar', 'toggles a class on, if absent');
+
+  throws(function(){
+    Dom.toggleElClass(el, 'foo bar');
+  }, 'throws when attempting to toggle a class with whitespace');
+
+  predicateToggles.forEach(x => {
+    Dom.toggleElClass(el, x.toggle, x.predicate);
+    strictEqual(el.className, x.className, x.message);
+  });
 });
 
 test('should set element attributes from object', function(){
@@ -293,4 +434,37 @@ test('Dom.appendContent', function(assert) {
   assert.strictEqual(el.firstChild.nextSibling, p2, 'the second paragraph was appended');
 });
 
+test('$() and $$()', function() {
+  let fixture = document.getElementById('qunit-fixture');
+  let container = document.createElement('div');
+  let children = [
+    document.createElement('div'),
+    document.createElement('div'),
+    document.createElement('div'),
+  ];
 
+  children.forEach(child => container.appendChild(child));
+  fixture.appendChild(container);
+
+  let totalDivCount = document.getElementsByTagName('div').length;
+
+  expect(12);
+
+  strictEqual(Dom.$('#qunit-fixture'), fixture, 'can find an element in the document context');
+  strictEqual(Dom.$$('div').length, totalDivCount, 'finds elements in the document context');
+
+  strictEqual(Dom.$('div', container), children[0], 'can find an element in a DOM element context');
+  strictEqual(Dom.$$('div', container).length, children.length, 'finds elements in a DOM element context');
+
+  strictEqual(Dom.$('#qunit-fixture', document.querySelector('unknown')), fixture, 'falls back to document given a bad context element');
+  strictEqual(Dom.$$('div', document.querySelector('unknown')).length, totalDivCount, 'falls back to document given a bad context element');
+
+  strictEqual(Dom.$('#qunit-fixture', 'body'), fixture, 'can find an element in a selector context');
+  strictEqual(Dom.$$('div', '#qunit-fixture').length, 1 + children.length, 'finds elements in a selector context');
+
+  strictEqual(Dom.$('#qunit-fixture', 'unknown'), fixture, 'falls back to document given a bad context selector');
+  strictEqual(Dom.$$('div', 'unknown').length, totalDivCount, 'falls back to document given a bad context selector');
+
+  strictEqual(Dom.$('div', children[0]), null, 'returns null for missing elements');
+  strictEqual(Dom.$$('div', children[0]).length, 0, 'returns 0 for missing elements');
+});

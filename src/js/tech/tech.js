@@ -5,6 +5,9 @@
  */
 
 import Component from '../component';
+import HTMLTrackElement from '../tracks/html-track-element';
+import HTMLTrackElementList from '../tracks/html-track-element-list';
+import mergeOptions from '../utils/merge-options.js';
 import TextTrack from '../tracks/text-track';
 import TextTrackList from '../tracks/text-track-list';
 import * as Fn from '../utils/fn.js';
@@ -234,6 +237,13 @@ class Tech extends Component {
   }
 
   /**
+   * Reset the tech. Removes all sources and resets readyState.
+   *
+   * @method reset
+   */
+  reset() {}
+
+  /**
    * When invoked without an argument, returns a MediaError object
    * representing the current error state of the player or null if
    * there is no error. When invoked with an argument, set the current
@@ -321,9 +331,8 @@ class Tech extends Component {
       window['WebVTT'] = true;
     }
 
-    let textTracksChanges = Fn.bind(this, function() {
-      let updateDisplay = () => this.trigger('texttrackchange');
-
+    let updateDisplay = () => this.trigger('texttrackchange');
+    let textTracksChanges = () => {
       updateDisplay();
 
       for (let i = 0; i < tracks.length; i++) {
@@ -333,8 +342,9 @@ class Tech extends Component {
           track.addEventListener('cuechange', updateDisplay);
         }
       }
-    });
+    };
 
+    textTracksChanges();
     tracks.addEventListener('change', textTracksChanges);
 
     this.on('dispose', function() {
@@ -371,6 +381,17 @@ class Tech extends Component {
   }
 
   /**
+   * Get remote htmltrackelements
+   *
+   * @returns {HTMLTrackElementList}
+   * @method remoteTextTrackEls
+   */
+  remoteTextTrackEls() {
+    this.remoteTextTrackEls_ = this.remoteTextTrackEls_ || new HTMLTrackElementList();
+    return this.remoteTextTrackEls_;
+  }
+
+  /**
    * Creates and returns a remote text track object
    *
    * @param {String} kind Text track kind (subtitles, captions, descriptions
@@ -389,19 +410,28 @@ class Tech extends Component {
   }
 
   /**
-   * Creates and returns a remote text track object
+   * Creates a remote text track object and returns a emulated html track element
    *
    * @param {Object} options The object should contain values for
    * kind, language, label and src (location of the WebVTT file)
-   * @return {TextTrackObject}
+   * @return {HTMLTrackElement}
    * @method addRemoteTextTrack
    */
   addRemoteTextTrack(options) {
-    let track = createTrackHelper(this, options.kind, options.label, options.language, options);
-    this.remoteTextTracks().addTrack_(track);
-    return {
-      track: track
-    };
+    let track = mergeOptions(options, {
+      tech: this
+    });
+
+    let htmlTrackElement = new HTMLTrackElement(track);
+
+    // store HTMLTrackElement and TextTrack to remote list
+    this.remoteTextTrackEls().addTrackElement_(htmlTrackElement);
+    this.remoteTextTracks().addTrack_(htmlTrackElement.track);
+
+    // must come after remoteTextTracks()
+    this.textTracks().addTrack_(htmlTrackElement.track);
+
+    return htmlTrackElement;
   }
 
   /**
@@ -412,6 +442,11 @@ class Tech extends Component {
    */
   removeRemoteTextTrack(track) {
     this.textTracks().removeTrack_(track);
+
+    let trackElement = this.remoteTextTrackEls().getTrackElementByTrack_(track);
+
+    // remove HTMLTrackElement and TextTrack from remote list
+    this.remoteTextTrackEls().removeTrackElement_(trackElement);
     this.remoteTextTracks().removeTrack_(track);
   }
 
@@ -437,6 +472,58 @@ class Tech extends Component {
     return '';
   }
 
+  /*
+   * Return whether the argument is a Tech or not.
+   * Can be passed either a Class like `Html5` or a instance like `player.tech_`
+   *
+   * @param {Object} component An item to check
+   * @return {Boolean}         Whether it is a tech or not
+   */
+  static isTech(component) {
+    return component.prototype instanceof Tech ||
+           component instanceof Tech ||
+           component === Tech;
+  }
+
+  /**
+   * Registers a Tech
+   *
+   * @param {String} name Name of the Tech to register
+   * @param {Object} tech The tech to register
+   * @static
+   * @method registerComponent
+   */
+  static registerTech(name, tech) {
+    if (!Tech.techs_) {
+      Tech.techs_ = {};
+    }
+
+    if (!Tech.isTech(tech)) {
+      throw new Error(`Tech ${name} must be a Tech`);
+    }
+
+    Tech.techs_[name] = tech;
+    return tech;
+  }
+
+  /**
+   * Gets a component by name
+   *
+   * @param {String} name Name of the component to get
+   * @return {Component}
+   * @static
+   * @method getComponent
+   */
+  static getTech(name) {
+    if (Tech.techs_ && Tech.techs_[name]) {
+      return Tech.techs_[name];
+    }
+
+    if (window && window.videojs && window.videojs[name]) {
+      log.warn(`The ${name} tech was added to the videojs object when it should be registered using videojs.registerTech(name, tech)`);
+      return window.videojs[name];
+    }
+  }
 }
 
 /*
@@ -637,4 +724,5 @@ Tech.withSourceHandlers = function(_Tech){
 Component.registerComponent('Tech', Tech);
 // Old name for Tech
 Component.registerComponent('MediaTechController', Tech);
+Tech.registerTech('Tech', Tech);
 export default Tech;

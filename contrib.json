@@ -250,15 +250,37 @@
       ]
     },
 
+    "next": {
+      "patch": {
+        "description": "Create a patch release and tag it @next on npm",
+        "release_type": "patch",
+        "steps": [{ "include": "release run_next" }]
+      },
+      "minor": {
+        "description": "Create a minor release and tag it @next on npm",
+        "release_type": "minor",
+        "steps": [{ "include": "release run_next" }]
+      },
+      "major": {
+        "description": "Create a major release and tag it @next on npm",
+        "release_type": "major",
+        "steps": [{ "include": "release run_next" }]
+      }
+    },
+
     "prerelease": {
       "release_type": "prerelease",
+      "steps": [{ "include": "release run_next" }]
+    },
+
+    "run_next": {
       "steps": [
-        [ "git checkout master",                       "Checkout the developmet branch" ],
-        [ "git pull upstream master",                  "Update the developmet branch" ],
         { "include": "branch check" },
+        { "include": "update local master" },
         [ "git checkout -b temp-release-branch master","Create a temporary branch for the dist" ],
         [ "grunt version:{{release_type}}",            "Bump package versions" ],
         [ "./build/bin/version",                       "Return the current VJS Version from the package.json file", "version" ],
+        [ "grunt chg-release:{{version}}",             "Update the changelog with the new release" ],
         [ "git commit -am 'v{{version}}'",             "Add and commit the package changes" ],
         [ "git checkout master",                       "Checkout the developmet branch" ],
         [ "git merge temp-release-branch",             "Merge package changes into the dev brach" ],
@@ -269,11 +291,13 @@
         [ "git commit -m 'v{{version}} dist'",         "Commit the dist changes" ],
         [ "git tag -a v{{version}} -m 'v{{version}}'", "Tag the release" ],
         [ "git push upstream --tags",                  "Push the new tag to the repo" ],
+        [ "grunt github-release:prerelease",           "Create a new pre-release on Github" ],
         [ "npm publish --tag next",                    "Publish to npm as 'next'" ],
         [ "git checkout master",                       "Checkout the developmet branch" ],
         [ "git branch -D temp-release-branch",         "Delete the temp release branch" ]
       ]
     },
+
     "run": {
       "steps": [
         { "include": "branch check" },
@@ -292,7 +316,7 @@
         [ "git tag -a v{{version}} -m 'v{{version}}'", "Tag the release" ],
         [ "git push upstream --tags",                  "Push the new tag to the repo" ],
         [ "npm publish",                               "Publish to npm" ],
-        [ "grunt github-release",                      "Create a new release on Github" ],
+        [ "grunt github-release:release",              "Create a new release on Github" ],
         [ "git checkout stable",                       "Checkout the developmet branch" ],
         [ "git branch -D temp-release-branch",         "Delete the temp release branch" ]
       ]
@@ -398,7 +422,7 @@
         { "prompt": "text", "id": "prNum",                             "desc": "What is the the pull request number?" },
         { "get": "{{meta.urls.repo_api}}/pulls/{{prNum}}",             "desc": "Get the PR information", "id": "pr" },
         { "get": "{{meta.urls.repo_api}}/pulls/{{prNum}}/commits",     "desc": "Get the PR commits to access author info", "id": "prCommits" },
-        [ "git checkout -b {{pr.user.login}}-{{pr.head.ref}} {{pr.base.ref}}", "Create a new branch for merging the changes" ],
+        [ "git checkout -b {{pr.user.login}}/{{pr.head.ref}} {{pr.base.ref}}", "Create a new branch for merging the changes" ],
         [ "git fetch {{pr.head.repo.ssh_url}} {{pr.head.ref}}",                "Fetch the changes" ],
         [ "git merge --no-commit --squash FETCH_HEAD",                         "Merge the changes in without committing so they can be squashed" ],
         [ "grunt test",                                                        "Run tests to make sure they still pass" ],
@@ -408,10 +432,10 @@
         [ "git commit -a --author='{{prCommits.[0].commit.author.name}} <{{prCommits.[0].commit.author.email}}>' -m '{{line}}. closes #{{prNum}}'", "Commit the changes" ],
         { "prompt": "confirm",                                         "desc": "Does everything look ok?" },
         [ "git checkout {{pr.base.ref}}",                                      "Check out the base branch" ],
-        [ "git merge {{pr.user.login}}-{{pr.head.ref}}",                       "Merge the changes" ],
+        [ "git merge {{pr.user.login}}/{{pr.head.ref}}",                       "Merge the changes" ],
         [ "git push origin {{pr.base.ref}}",                                   "Push the changes to your remote copy of the project" ],
         [ "git push upstream {{pr.base.ref}}",                                 "Push the changes to the main project" ],
-        [ "git branch -D {{pr.user.login}}-{{pr.head.ref}}",                   "Delete the local branch used for merging" ]
+        [ "git branch -D {{pr.user.login}}/{{pr.head.ref}}",                   "Delete the local branch used for merging" ]
       ]
     }
   }

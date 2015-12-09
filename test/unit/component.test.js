@@ -5,6 +5,21 @@ import * as browser from '../../src/js/utils/browser.js';
 import document from 'global/document';
 import TestHelpers from './test-helpers.js';
 
+class TestComponent1 extends Component {}
+class TestComponent2 extends Component {}
+class TestComponent3 extends Component {}
+class TestComponent4 extends Component {}
+TestComponent1.prototype.options_ = {
+  children: [
+    'testComponent2',
+    'testComponent3'
+  ]
+};
+Component.registerComponent('TestComponent1', TestComponent1);
+Component.registerComponent('TestComponent2', TestComponent2);
+Component.registerComponent('TestComponent3', TestComponent3);
+Component.registerComponent('TestComponent4', TestComponent4);
+
 q.module('Component', {
   'setup': function() {
     this.clock = sinon.useFakeTimers();
@@ -38,6 +53,14 @@ test('should add a child component', function(){
   ok(comp.el().childNodes[0] === child.el());
   ok(comp.getChild('component') === child);
   ok(comp.getChildById(child.id()) === child);
+});
+
+test('addChild should throw if the child does not exist', function() {
+  var comp = new Component(getFakePlayer());
+
+  throws(function() {
+    comp.addChild('non-existent-child');
+  }, new Error('Component Non-existent-child does not exist'), 'addChild threw');
 });
 
 test('should init child components from options', function(){
@@ -111,6 +134,16 @@ test('should do a deep merge of child options', function(){
   Component.prototype.options_ = null;
 });
 
+test('should init child components from component options', function(){
+  let testComp = new TestComponent1(TestHelpers.makePlayer(), {
+    testComponent2: false,
+    testComponent4: {}
+  });
+
+  ok(!testComp.childNameIndex_.testComponent2, 'we do not have testComponent2');
+  ok(testComp.childNameIndex_.testComponent4, 'we have a testComponent4');
+});
+
 test('should allows setting child options at the parent options level', function(){
   var parent, options;
 
@@ -133,6 +166,7 @@ test('should allows setting child options at the parent options level', function
     ok(false, 'Child with `false` option was initialized');
   }
   equal(parent.children()[0].options_['foo'], true, 'child options set when children array is used');
+  equal(parent.children().length, 1, 'we should only have one child');
 
   // using children object
   options = {
@@ -155,6 +189,7 @@ test('should allows setting child options at the parent options level', function
     ok(false, 'Child with `false` option was initialized');
   }
   equal(parent.children()[0].options_['foo'], true, 'child options set when children object is used');
+  equal(parent.children().length, 1, 'we should only have one child');
 });
 
 test('should dispose of component and children', function(){
@@ -436,6 +471,10 @@ test('should add and remove a CSS class', function(){
   ok(comp.el().className.indexOf('test-class') !== -1);
   comp.removeClass('test-class');
   ok(comp.el().className.indexOf('test-class') === -1);
+  comp.toggleClass('test-class');
+  ok(comp.el().className.indexOf('test-class') !== -1);
+  comp.toggleClass('test-class');
+  ok(comp.el().className.indexOf('test-class') === -1);
 });
 
 test('should show and hide an element', function(){
@@ -659,4 +698,19 @@ test('should provide interval methods that automatically get cleared on componen
   this.clock.tick(1200);
 
   ok(intervalsFired === 5, 'Interval was cleared when component was disposed');
+});
+
+test('$ and $$ functions', function() {
+  var comp = new Component(getFakePlayer());
+  var contentEl = document.createElement('div');
+  var children = [
+    document.createElement('div'),
+    document.createElement('div')
+  ];
+
+  comp.contentEl_ = contentEl;
+  children.forEach(child => contentEl.appendChild(child));
+
+  strictEqual(comp.$('div'), children[0], '$ defaults to contentEl as scope');
+  strictEqual(comp.$$('div').length, children.length, '$$ defaults to contentEl as scope');
 });

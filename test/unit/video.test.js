@@ -1,6 +1,7 @@
 import videojs from '../../src/js/video.js';
 import TestHelpers from './test-helpers.js';
 import Player from '../../src/js/player.js';
+import * as Dom from '../../src/js/utils/dom.js';
 import log from '../../src/js/utils/log.js';
 import document from 'global/document';
 
@@ -77,4 +78,30 @@ test('should expose plugin registry function', function() {
 test('should expose options and players properties for backward-compatibility', function() {
   ok(typeof videojs.options, 'object', 'options should be an object');
   ok(typeof videojs.players, 'object', 'players should be an object');
+});
+
+test('should expose DOM functions', function() {
+
+  // Keys are videojs methods, values are Dom methods.
+  let methods = {
+    isEl: 'isEl',
+    isTextNode: 'isTextNode',
+    hasClass: 'hasElClass',
+    addClass: 'addElClass',
+    removeClass: 'removeElClass',
+    toggleClass: 'toggleElClass',
+    setAttributes: 'setElAttributes',
+    getAttributes: 'getElAttributes',
+    emptyEl: 'emptyEl',
+    insertContent: 'insertContent',
+    appendContent: 'appendContent'
+  };
+
+  let keys = Object.keys(methods);
+
+  expect(keys.length);
+  keys.forEach(function(vjsName) {
+    let domName = methods[vjsName];
+    strictEqual(videojs[vjsName], Dom[domName], `videojs.${vjsName} is a reference to Dom.${domName}`);
+  });
 });
