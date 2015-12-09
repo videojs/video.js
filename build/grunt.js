@@ -42,6 +42,19 @@ module.exports = function(grunt) {
     ]
   };
 
+  const githubReleaseDefaults = {
+    options: {
+      release: {
+        tag_name: 'v'+ version.full,
+        name: version.full,
+        body: require('chg').find(version.full).changesRaw
+      },
+    },
+    files: {
+      src: [`dist/video-js-${version.full}.zip`] // Files that you want to attach to Release
+    }
+  };
+
   /**
    * Customizes _.merge behavior in `browserifyGruntOptions` to concatenate
    * arrays. This can be overridden on a per-call basis to
@@ -68,6 +81,9 @@ module.exports = function(grunt) {
    * @return {Object}
    */
   const browserifyGruntOptions = gruntOptionsMaker(browserifyGruntDefaults, browserifyGruntCustomizer);
+
+  const githubReleaseCustomizer = gruntCustomizer;
+  const githubReleaseOptions = gruntOptionsMaker(githubReleaseDefaults, githubReleaseCustomizer);
 
   /**
    * Creates processor functions for license banners.
@@ -291,28 +307,14 @@ module.exports = function(grunt) {
           password: process.env.VJS_GITHUB_TOKEN
         }
       },
-      release: {
+      release: githubReleaseOptions(),
+      prerelease: githubReleaseOptions({
         options: {
           release: {
-            tag_name: 'v'+ version.full,
-            name: version.full,
-            body: require('chg').find(version.full).changesRaw
-          }
-        }
-      },
-      prerelease: {
-        options: {
-          release: {
-            tag_name: 'v'+ version.full,
-            name: version.full,
-            body: require('chg').find(version.full).changesRaw,
             prerelease: true
           }
         }
-      },
-      files: {
-        src: [`dist/video-js-${version.full}.zip`] // Files that you want to attach to Release
-      }
+      })
     },
     browserify: {
       options: browserifyGruntOptions(),
