@@ -326,7 +326,7 @@ class Tech extends Component {
 
     if (!window['WebVTT'] && this.el().parentNode != null) {
       let script = document.createElement('script');
-      script.src = this.options_['vtt.js'] || '../node_modules/vtt.js/dist/vtt.js';
+      script.src = this.options_['vtt.js'] || '../node_modules/videojs-vtt.js/dist/vtt.js';
       this.el().parentNode.appendChild(script);
       window['WebVTT'] = true;
     }
