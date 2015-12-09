@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* @gkatsev switched to use custom vtt.js from npm ([view](https://github.com/videojs/video.js/pull/2905))
+_(none)_
 
 --------------------
+
+## 5.4.4 (2015-12-09)
+* @gkatsev switched to use custom vtt.js from npm ([view](https://github.com/videojs/video.js/pull/2905))
 
 ## 5.4.3 (2015-12-08)
 * @gkatsev updated options customizer and github-release options ([view](https://github.com/videojs/video.js/pull/2903))
