@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @gkatsev updated options customizer and github-release options ([view](https://github.com/videojs/video.js/pull/2903))
 
 --------------------
 
