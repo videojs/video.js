@@ -31,7 +31,7 @@
     "videojs-font": "1.4.0",
     "videojs-ie8": "1.1.1",
     "videojs-swf": "5.0.1",
-    "vtt.js": "git+https://github.com/gkatsev/vtt.js.git#vjs-v0.12.1",
+    "videojs-vtt.js": "^0.12.1",
     "xhr": "~2.2.0"
   },
   "devDependencies": {
