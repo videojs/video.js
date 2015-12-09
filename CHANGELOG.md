@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* @gkatsev updated options customizer and github-release options ([view](https://github.com/videojs/video.js/pull/2903))
+_(none)_
 
 --------------------
+
+## 5.4.3 (2015-12-08)
+* @gkatsev updated options customizer and github-release options ([view](https://github.com/videojs/video.js/pull/2903))
 
 ## 5.4.2 (2015-12-08)
 * @gkatsev updated grunt-release config ([view](https://github.com/videojs/video.js/pull/2900))
