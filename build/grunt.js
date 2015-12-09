@@ -1,3 +1,4 @@
+import {gruntCustomizer, gruntOptionsMaker} from './options-customizer.js';
 module.exports = function(grunt) {
   require('time-grunt')(grunt);
 
@@ -52,11 +53,7 @@ module.exports = function(grunt) {
    * @param  {Mixed} sourceValue
    * @return {Object}
    */
-  function browserifyGruntCustomizer(objectValue, sourceValue) {
-    if (Array.isArray(objectValue)) {
-      return objectValue.concat(sourceValue);
-    }
-  }
+  const browserifyGruntCustomizer = gruntCustomizer;
 
   /**
    * Creates a unique object of Browserify Grunt task options.
@@ -70,9 +67,7 @@ module.exports = function(grunt) {
    *
    * @return {Object}
    */
-  function browserifyGruntOptions(options = null, customizer = browserifyGruntCustomizer) {
-    return _.merge({}, browserifyGruntDefaults, options, customizer);
-  }
+  const browserifyGruntOptions = gruntOptionsMaker(browserifyGruntDefaults, browserifyGruntCustomizer);
 
   /**
    * Creates processor functions for license banners.
