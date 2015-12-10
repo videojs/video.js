@@ -135,4 +135,4 @@ notation.
 ```
 
 The [components guide](components.md) has an excellent breakdown of the structure of a player, you
-just need to remember to nest child components in a `children` object for each level.
+just need to remember to nest child components in a `children` array for each level.
