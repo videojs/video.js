@@ -327,7 +327,7 @@ module.exports = function(grunt) {
         options: browserifyGruntOptions({
           transform: [
             ['browserify-versionify', {
-              placeholder: '../node_modules/vtt.js/dist/vtt.js',
+              placeholder: '../node_modules/videojs-vtt.js/dist/vtt.js',
               version: 'https://cdn.rawgit.com/gkatsev/vtt.js/vjs-v0.12.1/dist/vtt.min.js'
             }],
           ]
