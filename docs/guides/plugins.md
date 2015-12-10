@@ -45,3 +45,7 @@ If you've already initialized your video tag, you can activate a plugin at any t
     video.examplePlugin({ exampleOption: true });
 
 That's it. Head on over to the [Video.js wiki](https://github.com/videojs/video.js/wiki/Plugins) and add your plugin to the list so everyone else can check it out.
+
+## How should I use the Video.js icons in my plugin?
+
+If you'd like to use any of the icons available in the [Video.js icon set](http://videojs.github.io/font/), please target them via the CSS class names instead of codepoints. The codepoints *may* change between versions of the font, so using the class names ensures that your plugin will stay up to date with any font changes.
