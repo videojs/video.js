@@ -22,7 +22,6 @@ class VolumeBar extends Slider {
     super(player, options);
     this.on(player, 'volumechange', this.updateARIAAttributes);
     player.ready(Fn.bind(this, this.updateARIAAttributes));
-    player.ready(() => this.on(this.el().parentNode, ['mousedown', 'touchdown'], this.handleMouseDown));
   }
 
   /**
@@ -50,19 +49,6 @@ class VolumeBar extends Slider {
     }
 
     this.player_.volume(this.calculateDistance(event));
-  }
-
-  handleMouseDown(event) {
-    super.handleMouseDown(event);
-
-    this.on(this.el().parentNode, ['mousemove', 'touchmove'], this.handleMouseMove);
-    this.on(this.el().parentNode, ['mouseup', 'touchend'], this.handleMouseUp);
-  }
-
-  handleMouseUp(event) {
-    super.handleMouseUp(event);
-
-    this.off(this.el().parentNode, ['mousemove', 'touchmove'], this.handleMouseMove);
   }
 
   /**

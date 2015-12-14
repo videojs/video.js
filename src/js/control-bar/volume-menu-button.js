@@ -2,6 +2,7 @@
  * @file volume-menu-button.js
  */
 import Button from '../button.js';
+import * as Fn from '../utils/fn.js';
 import Component from '../component.js';
 import Menu from '../menu/menu.js';
 import MenuButton from '../menu/menu-button.js';
@@ -100,6 +101,9 @@ class VolumeMenuButton extends MenuButton {
     menu.addChild(vb);
 
     this.volumeBar = vb;
+
+    this.attachVolumeBarEvents();
+
     return menu;
   }
 
@@ -113,6 +117,18 @@ class VolumeMenuButton extends MenuButton {
     super.handleClick();
   }
 
+  attachVolumeBarEvents() {
+    this.on(['mousedown', 'touchdown'], this.handleMouseDown);
+  }
+
+  handleMouseDown(event) {
+    this.on(['mousemove', 'touchmove'], Fn.bind(this.volumeBar, this.volumeBar.handleMouseMove));
+    this.on(['mouseup', 'touchend'], this.handleMouseUp);
+  }
+
+  handleMouseUp(event) {
+    this.off(['mousemove', 'touchmove'], Fn.bind(this.volumeBar, this.volumeBar.handleMouseMove));
+  }
 }
 
 VolumeMenuButton.prototype.volumeUpdate = MuteToggle.prototype.update;
