@@ -8,6 +8,7 @@ import Menu from '../menu/menu.js';
 import MenuButton from '../menu/menu-button.js';
 import MuteToggle from './mute-toggle.js';
 import VolumeBar from './volume-control/volume-bar.js';
+import document from 'global/document';
 
 /**
  * Button for volume menu
@@ -123,7 +124,7 @@ class VolumeMenuButton extends MenuButton {
 
   handleMouseDown(event) {
     this.on(['mousemove', 'touchmove'], Fn.bind(this.volumeBar, this.volumeBar.handleMouseMove));
-    this.on(['mouseup', 'touchend'], this.handleMouseUp);
+    this.on(document, ['mouseup', 'touchend'], this.handleMouseUp);
   }
 
   handleMouseUp(event) {
