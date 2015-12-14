@@ -67,6 +67,12 @@ class VolumeMenuButton extends MenuButton {
     this.on(this.volumeBar, ['sliderinactive', 'blur'], function(){
       this.removeClass('vjs-slider-active');
     });
+
+    // we show the volumeBar on focus for keyboard accessibility
+    // when using the mouse, you don't want it to stay up, so, we blur it manually
+    this.on('mouseout', function() {
+      this.el().blur();
+    });
   }
 
   /**
