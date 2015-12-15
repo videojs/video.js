@@ -5,6 +5,7 @@ CHANGELOG
 * @gkatsev added mouse/touch listeners to volume menu button ([view](https://github.com/videojs/video.js/pull/2638))
 * @gkatsev updated styles for inline menu and volume bar ([view](https://github.com/videojs/video.js/pull/2913))
 * @BrandonOCasey updated sandbox to to use newer CDN urls ([view](https://github.com/videojs/video.js/pull/2917))
+* @hartman updated options guide doc ([view](https://github.com/videojs/video.js/pull/2908))
 
 --------------------
 
