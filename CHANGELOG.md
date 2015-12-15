@@ -2,13 +2,16 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 5.4.5 (2015-12-15)
 * @gkatsev added mouse/touch listeners to volume menu button ([view](https://github.com/videojs/video.js/pull/2638))
 * @gkatsev updated styles for inline menu and volume bar ([view](https://github.com/videojs/video.js/pull/2913))
 * @BrandonOCasey updated sandbox to to use newer CDN urls ([view](https://github.com/videojs/video.js/pull/2917))
 * @hartman updated options guide doc ([view](https://github.com/videojs/video.js/pull/2908))
 * @rcrooks fixed simple embed example ([view](https://github.com/videojs/video.js/pull/2915))
-
---------------------
 
 ## 5.4.4 (2015-12-09)
 * @gkatsev switched to use custom vtt.js from npm ([view](https://github.com/videojs/video.js/pull/2905))
