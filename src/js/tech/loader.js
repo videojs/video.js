@@ -1,4 +1,8 @@
-import Component from '../component';
+/**
+ * @file loader.js
+ */
+import Component from '../component.js';
+import Tech from './tech.js';
 import window from 'global/window';
 import toTitleCase from '../utils/to-title-case.js';
 
@@ -6,7 +10,11 @@ import toTitleCase from '../utils/to-title-case.js';
  * The Media Loader is the component that decides which playback technology to load
  * when the player is initialized.
  *
- * @constructor
+ * @param {Object} player  Main Player
+ * @param {Object=} options Object of option names and values
+ * @param {Function=} ready    Ready callback function
+ * @extends Component
+ * @class MediaLoader
  */
 class MediaLoader extends Component {
 
@@ -19,11 +27,16 @@ class MediaLoader extends Component {
     if (!options.playerOptions['sources'] || options.playerOptions['sources'].length === 0) {
       for (let i=0, j=options.playerOptions['techOrder']; i<j.length; i++) {
         let techName = toTitleCase(j[i]);
-        let tech = Component.getComponent(techName);
+        let tech = Tech.getTech(techName);
+        // Support old behavior of techs being registered as components.
+        // Remove once that deprecated behavior is removed.
+        if (!techName) {
+          tech = Component.getComponent(techName);
+        }
 
         // Check if the browser supports this technology
         if (tech && tech.isSupported()) {
-          player.loadTech(techName);
+          player.loadTech_(techName);
           break;
         }
       }

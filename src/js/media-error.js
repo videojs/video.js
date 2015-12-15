@@ -1,7 +1,11 @@
+/**
+ * @file media-error.js
+ */
 import assign from 'object.assign';
 
-/**
+/*
  * Custom MediaError to mimic the HTML5 MediaError
+ *
  * @param {Number} code The media error code
  */
 let MediaError = function(code){
@@ -19,29 +23,32 @@ let MediaError = function(code){
   }
 };
 
-/**
+/*
  * The error code that refers two one of the defined
  * MediaError types
+ *
  * @type {Number}
  */
 MediaError.prototype.code = 0;
 
-/**
+/*
  * An optional message to be shown with the error.
  * Message is not part of the HTML5 video spec
  * but allows for more informative custom errors.
+ *
  * @type {String}
  */
 MediaError.prototype.message = '';
 
-/**
+/*
  * An optional status code that can be set by plugins
  * to allow even more detail about the error.
  * For example the HLS plugin might provide the specific
  * HTTP status code that was returned when the error
  * occurred, then allowing a custom error overlay
  * to display more information.
- * @type {[type]}
+ *
+ * @type {Array}
  */
 MediaError.prototype.status = null;
 
@@ -55,11 +62,11 @@ MediaError.errorTypes = [
 ];
 
 MediaError.defaultMessages = {
-  1: 'You aborted the video playback',
-  2: 'A network error caused the video download to fail part-way.',
-  3: 'The video playback was aborted due to a corruption problem or because the video used features your browser did not support.',
-  4: 'The video could not be loaded, either because the server or network failed or because the format is not supported.',
-  5: 'The video is encrypted and we do not have the keys to decrypt it.'
+  1: 'You aborted the media playback',
+  2: 'A network error caused the media download to fail part-way.',
+  3: 'The media playback was aborted due to a corruption problem or because the media used features your browser did not support.',
+  4: 'The media could not be loaded, either because the server or network failed or because the format is not supported.',
+  5: 'The media is encrypted and we do not have the keys to decrypt it.'
 };
 
 // Add types as properties on MediaError

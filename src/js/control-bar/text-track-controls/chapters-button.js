@@ -1,3 +1,6 @@
+/**
+ * @file chapters-button.js
+ */
 import TextTrackButton from './text-track-button.js';
 import Component from '../../component.js';
 import TextTrackMenuItem from './text-track-menu-item.js';
@@ -8,12 +11,16 @@ import * as Fn from '../../utils/fn.js';
 import toTitleCase from '../../utils/to-title-case.js';
 import window from 'global/window';
 
-// Chapters act much differently than other text tracks
-// Cues are navigation vs. other tracks of alternative languages
 /**
  * The button component for toggling and selecting chapters
+ * Chapters act much differently than other text tracks
+ * Cues are navigation vs. other tracks of alternative languages
  *
- * @constructor
+ * @param {Object} player  Player object
+ * @param {Object=} options Object of option names and values
+ * @param {Function=} ready    Ready callback function
+ * @extends TextTrackButton
+ * @class ChaptersButton
  */
 class ChaptersButton extends TextTrackButton {
 
@@ -22,11 +29,22 @@ class ChaptersButton extends TextTrackButton {
     this.el_.setAttribute('aria-label','Chapters Menu');
   }
 
+  /**
+   * Allow sub components to stack CSS class names
+   *
+   * @return {String} The constructed class name
+   * @method buildCSSClass
+   */
   buildCSSClass() {
     return `vjs-chapters-button ${super.buildCSSClass()}`;
   }
 
-  // Create a menu item for each text track
+  /**
+   * Create a menu item for each text track
+   *
+   * @return {Array} Array of menu items
+   * @method createItems
+   */
   createItems() {
     let items = [];
 
@@ -48,26 +66,24 @@ class ChaptersButton extends TextTrackButton {
     return items;
   }
 
+  /**
+   * Create menu from chapter buttons
+   *
+   * @return {Menu} Menu of chapter buttons
+   * @method createMenu
+   */
   createMenu() {
     let tracks = this.player_.textTracks() || [];
     let chaptersTrack;
     let items = this.items = [];
 
-    for (let i = 0, l = tracks.length; i < l; i++) {
+    for (let i = 0, length = tracks.length; i < length; i++) {
       let track = tracks[i];
+
       if (track['kind'] === this.kind_) {
-        if (!track.cues) {
-          track['mode'] = 'hidden';
-          /* jshint loopfunc:true */
-          // TODO see if we can figure out a better way of doing this https://github.com/videojs/video.js/issues/1864
-          window.setTimeout(Fn.bind(this, function() {
-            this.createMenu();
-          }), 100);
-          /* jshint loopfunc:false */
-        } else {
-          chaptersTrack = track;
-          break;
-        }
+        chaptersTrack = track;
+
+        break;
       }
     }
 
@@ -81,7 +97,17 @@ class ChaptersButton extends TextTrackButton {
       }));
     }
 
-    if (chaptersTrack) {
+    if (chaptersTrack && chaptersTrack.cues == null) {
+      chaptersTrack['mode'] = 'hidden';
+
+      let remoteTextTrackEl = this.player_.remoteTextTrackEls().getTrackElementByTrack_(chaptersTrack);
+
+      if (remoteTextTrackEl) {
+        remoteTextTrackEl.addEventListener('load', (event) => this.update());
+      }
+    }
+
+    if (chaptersTrack && chaptersTrack.cues && chaptersTrack.cues.length > 0) {
       let cues = chaptersTrack['cues'], cue;
 
       for (let i = 0, l = cues.length; i < l; i++) {
@@ -96,6 +122,7 @@ class ChaptersButton extends TextTrackButton {
 
         menu.addChild(mi);
       }
+
       this.addChild(menu);
     }
 

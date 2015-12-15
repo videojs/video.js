@@ -1,4 +1,7 @@
-import EventEmitter from '../event-emitter';
+/**
+ * @file text-track-list.js
+ */
+import EventTarget from '../event-target';
 import * as Fn from '../utils/fn.js';
 import * as browser from '../utils/browser.js';
 import document from 'global/document';
@@ -23,7 +26,9 @@ let TextTrackList = function(tracks) {
     list = document.createElement('custom');
 
     for (let prop in TextTrackList.prototype) {
-      list[prop] = TextTrackList.prototype[prop];
+      if (prop !== 'constructor') {
+        list[prop] = TextTrackList.prototype[prop];
+      }
     }
   }
 
@@ -45,14 +50,14 @@ let TextTrackList = function(tracks) {
   }
 };
 
-TextTrackList.prototype = Object.create(EventEmitter.prototype);
+TextTrackList.prototype = Object.create(EventTarget.prototype);
 TextTrackList.prototype.constructor = TextTrackList;
 
 /*
  * change - One or more tracks in the track list have been enabled or disabled.
  * addtrack - A track has been added to the track list.
  * removetrack - A track has been removed from the track list.
-*/
+ */
 TextTrackList.prototype.allowedEvents_ = {
   'change': 'change',
   'addtrack': 'addtrack',
@@ -64,6 +69,13 @@ for (let event in TextTrackList.prototype.allowedEvents_) {
   TextTrackList.prototype['on' + event] = null;
 }
 
+/**
+ * Add TextTrack from TextTrackList
+ *
+ * @param {TextTrack} track
+ * @method addTrack_
+ * @private
+ */
 TextTrackList.prototype.addTrack_ = function(track) {
   let index = this.tracks_.length;
   if (!(''+index in this)) {
@@ -85,16 +97,29 @@ TextTrackList.prototype.addTrack_ = function(track) {
   });
 };
 
+/**
+ * Remove TextTrack from TextTrackList
+ * NOTE: Be mindful of what is passed in as it may be a HTMLTrackElement
+ *
+ * @param {TextTrack} rtrack
+ * @method removeTrack_
+ * @private
+ */
 TextTrackList.prototype.removeTrack_ = function(rtrack) {
-  let result = null;
   let track;
 
   for (let i = 0, l = this.length; i < l; i++) {
-    track = this[i];
-    if (track === rtrack) {
+    if (this[i] === rtrack) {
+      track = this[i];
+
       this.tracks_.splice(i, 1);
+
       break;
     }
+  }
+
+  if (!track) {
+    return;
   }
 
   this.trigger({

@@ -1,3 +1,6 @@
+/**
+ * @file control-bar.js
+ */
 import Component from '../component.js';
 
 // Required children
@@ -20,13 +23,18 @@ import CustomControlSpacer from './spacer-controls/custom-control-spacer.js';
 
 /**
  * Container of main controls
- * @param {Player|Object} player
- * @param {Object=} options
- * @class
- * @constructor
+ *
  * @extends Component
+ * @class ControlBar
  */
 class ControlBar extends Component {
+
+  /**
+   * Create the component's DOM element
+   *
+   * @return {Element}
+   * @method createEl
+   */
   createEl() {
     return super.createEl('div', {
       className: 'vjs-control-bar'
@@ -38,6 +46,7 @@ ControlBar.prototype.options_ = {
   loadEvent: 'play',
   children: [
     'playToggle',
+    'volumeMenuButton',
     'currentTimeDisplay',
     'timeDivider',
     'durationDisplay',
@@ -46,12 +55,9 @@ ControlBar.prototype.options_ = {
     'remainingTimeDisplay',
     'customControlSpacer',
     'playbackRateMenuButton',
-    'muteToggle',
-    'volumeControl',
     'chaptersButton',
     'subtitlesButton',
     'captionsButton',
-    'volumeMenuButton',
     'fullscreenToggle'
   ]
 };

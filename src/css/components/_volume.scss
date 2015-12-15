@@ -24,15 +24,18 @@
   @include display-flex(center);
 }
 
-.video-js .vjs-volume-bar.vjs-slider-horizontal {
+.video-js .vjs-volume-bar {
+  margin: 1.35em;
+}
+
+.vjs-volume-bar.vjs-slider-horizontal {
   width: 5em;
   height: 0.3em;
 }
 
-.video-js .vjs-volume-bar.vjs-slider-vertical {
+.vjs-volume-bar.vjs-slider-vertical {
   width: 0.3em;
   height: 5em;
-  margin: 1.3em;
 }
 
 .video-js .vjs-volume-level {
@@ -40,53 +43,66 @@
   bottom: 0;
   left: 0;
 
-  background-color: $primary-text;
+  background-color: $primary-foreground-color;
 
   @extend .vjs-icon-circle;
 
   // Volume handle
   &:before {
     position: absolute;
+    font-size: 0.9em; // Doing this to match the handle on play progress.
   }
 }
 
-.video-js .vjs-slider-vertical .vjs-volume-level {
+.vjs-slider-vertical .vjs-volume-level {
   width: 0.3em;
 
   // Volume handle
   &:before {
     top: -0.5em;
-    left: -0.35em;
+    left: -0.3em;
   }
 }
-.video-js .vjs-slider-horizontal .vjs-volume-level {
+.vjs-slider-horizontal .vjs-volume-level {
   height: 0.3em;
 
   // Volume handle
   &:before {
-    top: -0.35em;
+    top: -0.3em;
     right: -0.5em;
   }
 }
 
-/* Assumes volume starts at 1.0. */
-.video-js .vjs-volume-bar.vjs-slider-vertical .vjs-volume-level { height: 100%; }
-.video-js .vjs-volume-bar.vjs-slider-horizontal .vjs-volume-level { width: 100%; }
+// Assumes volume starts at 1.0.
+.vjs-volume-bar.vjs-slider-vertical .vjs-volume-level {
+  height: 100%;
+}
 
-/* The volume menu button is like menu buttons (captions/subtitles) but works
-a little differently. It needs to be possible to tab to the volume slider
-without hitting space bar on the menu button. To do this we're not using
-display:none to hide the slider menu by default, and instead setting the
-width and height to zero. */
-.video-js .vjs-volume-menu-button .vjs-menu {
+.vjs-volume-bar.vjs-slider-horizontal .vjs-volume-level {
+  width: 100%;
+}
+
+// The volume menu button is like menu buttons (captions/subtitles) but works
+// a little differently. It needs to be possible to tab to the volume slider
+// without hitting space bar on the menu button. To do this we're not using
+// display:none to hide the slider menu by default, and instead setting the
+// width and height to zero.
+.vjs-menu-button-popup.vjs-volume-menu-button .vjs-menu {
   display: block;
   width: 0;
   height: 0;
-  left: 0.5em;
   border-top-color: transparent;
 }
 
-.video-js .vjs-menu-button.vjs-volume-menu-button .vjs-menu .vjs-menu-content {
+.vjs-menu-button-popup.vjs-volume-menu-button-vertical .vjs-menu {
+  left: 0.5em;
+  height: 8em;
+}
+.vjs-menu-button-popup.vjs-volume-menu-button-horizontal .vjs-menu {
+  left: -2em;
+}
+
+.vjs-menu-button-popup.vjs-volume-menu-button .vjs-menu-content {
   height: 0;
   width: 0;
 
@@ -95,20 +111,20 @@ width and height to zero. */
   overflow-y: hidden;
 }
 
-.video-js .vjs-volume-menu-button:hover .vjs-menu,
-.video-js .vjs-volume-menu-button .vjs-menu.vjs-lock-showing {
-  // border-top-color: rgba(7, 40, 50, 0.5); /* Same as ul background */
-}
-
-.video-js .vjs-volume-menu-button:hover .vjs-menu .vjs-menu-content,
-.video-js .vjs-volume-menu-button .vjs-menu.vjs-lock-showing .vjs-menu-content {
+.vjs-volume-menu-button-vertical:hover .vjs-menu-content,
+.vjs-volume-menu-button-vertical .vjs-lock-showing .vjs-menu-content {
   height: 8em;
   width: 2.9em;
 }
 
-// By default, all menu items are shown, but we hide .vjs-mute-control and .vjs-volume-control
-// so that the volume menu button is the only visible volume control.
-.video-js .vjs-mute-control,
-.video-js .vjs-volume-control {
-  display: none;
+.vjs-volume-menu-button-horizontal:hover .vjs-menu-content,
+.vjs-volume-menu-button-horizontal .vjs-lock-showing .vjs-menu-content {
+  height: 2.9em;
+  width: 8em;
+}
+
+.vjs-volume-menu-button.vjs-menu-button-inline .vjs-menu-content {
+  // An inline volume should never have a menu background color.
+  //  This protects it from external changes to background colors.
+  background-color: transparent !important;
 }

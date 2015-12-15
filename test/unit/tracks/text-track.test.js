@@ -224,7 +224,7 @@ test('fires cuechange when cues become active and inactive', function() {
       changes = 0,
       cuechangeHandler,
       tt = new TextTrack({
-        tech: player.tech,
+        tech: player.tech_,
         mode: 'showing'
       });
 
@@ -241,19 +241,21 @@ test('fires cuechange when cues become active and inactive', function() {
   tt.oncuechange = cuechangeHandler;
   tt.addEventListener('cuechange', cuechangeHandler);
 
-  player.tech.currentTime = function() {
+  player.tech_.currentTime = function() {
     return 2;
   };
 
-  player.tech.trigger('timeupdate');
+  player.tech_.trigger('timeupdate');
 
   equal(changes, 2, 'a cuechange event trigger addEventListener and oncuechange');
 
-  player.tech.currentTime = function() {
+  player.tech_.currentTime = function() {
     return 7;
   };
 
-  player.tech.trigger('timeupdate');
+  player.tech_.trigger('timeupdate');
 
   equal(changes, 4, 'a cuechange event trigger addEventListener and oncuechange');
+
+  player.dispose();
 });

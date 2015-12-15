@@ -1,3 +1,6 @@
+/**
+ * @file text-track-cue-list.js
+ */
 import * as browser from '../utils/browser.js';
 import document from 'global/document';
 
@@ -18,7 +21,9 @@ let TextTrackCueList = function(cues) {
     list = document.createElement('custom');
 
     for (let prop in TextTrackCueList.prototype) {
-      list[prop] = TextTrackCueList.prototype[prop];
+      if (prop !== 'constructor') {
+        list[prop] = TextTrackCueList.prototype[prop];
+      }
     }
   }
 

@@ -1,4 +1,6 @@
-/*
+/**
+ * @file text-track-enums.js
+ *
  * https://html.spec.whatwg.org/multipage/embedded-content.html#texttrackmode
  *
  * enum TextTrackMode { "disabled",  "hidden",  "showing" };

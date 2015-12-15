@@ -1,3 +1,6 @@
+/**
+ * @file text-track-button.js
+ */
 import MenuButton from '../../menu/menu-button.js';
 import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
@@ -7,7 +10,10 @@ import OffTextTrackMenuItem from './off-text-track-menu-item.js';
 /**
  * The base class for buttons that toggle specific text track types (e.g. subtitles)
  *
- * @constructor
+ * @param {Player|Object} player
+ * @param {Object=} options
+ * @extends MenuButton
+ * @class TextTrackButton
  */
 class TextTrackButton extends MenuButton {
 

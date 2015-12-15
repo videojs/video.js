@@ -1,5 +1,5 @@
 // TODO: I feel like this should be a generic menu. Research later.
-.video-js .vjs-playback-rate .vjs-playback-rate-value {
+.vjs-playback-rate .vjs-playback-rate-value {
   font-size: 1.5em;
   line-height: 2;
   position: absolute;
@@ -10,11 +10,7 @@
   text-align: center;
 }
 
-.video-js .vjs-playback-rate .vjs-menu {
-  left: 0em;
-}
-.video-js .vjs-playback-rate.vjs-menu-button .vjs-menu .vjs-menu-content {
+.vjs-playback-rate .vjs-menu {
   width: 4em;
-  left: 0;
-  list-style: none;
+  left: 0em;
 }

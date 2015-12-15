@@ -34,12 +34,14 @@
         "notEqual",
         "notStrictEqual",
         "ok",
+        "throws",
         "QUnit",
         "raises",
         "start",
         "stop",
         "strictEqual",
         "test",
+        "throws",
         "sinon"
     ]
 }

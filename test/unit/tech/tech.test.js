@@ -1,6 +1,12 @@
 var noop = function() {}, clock, oldTextTracks;
 
 import Tech from '../../../src/js/tech/tech.js';
+import Html5 from '../../../src/js/tech/html5.js';
+import Flash from '../../../src/js/tech/flash.js';
+import Button from '../../../src/js/button.js';
+import { createTimeRange } from '../../../src/js/utils/time-ranges.js';
+import extendFn from '../../../src/js/extend.js';
+import MediaError from '../../../src/js/media-error.js';
 
 q.module('Media Tech', {
   'setup': function() {
@@ -61,14 +67,26 @@ test('stops manual timeupdates while paused', function() {
 });
 
 test('should synthesize progress events by default', function() {
-  var progresses = 0, tech;
+  var progresses = 0, bufferedPercent = 0.5, tech;
   tech = new Tech();
   tech.on('progress', function() {
     progresses++;
   });
+  tech.bufferedPercent = function() {
+    return bufferedPercent;
+  };
 
   this.clock.tick(500);
+  equal(progresses, 0, 'waits until ready');
+
+  tech.trigger('ready');
+  this.clock.tick(500);
   equal(progresses, 1, 'triggered one event');
+
+  tech.trigger('ready');
+  bufferedPercent = 0.75;
+  this.clock.tick(500);
+  equal(progresses, 2, 'repeated readies are ok');
 });
 
 test('dispose() should stop time tracking', function() {
@@ -85,12 +103,12 @@ test('dispose() should stop time tracking', function() {
   ok(true, 'no exception was thrown');
 });
 
-test('should add the source hanlder interface to a tech', function(){
+test('should add the source handler interface to a tech', function(){
   var sourceA = { src: 'foo.mp4', type: 'video/mp4' };
   var sourceB = { src: 'no-support', type: 'no-support' };
 
   // Define a new tech class
-  var MyTech = Tech.extend();
+  var MyTech = extendFn(Tech);
 
   // Extend Tech with source handlers
   Tech.withSourceHandlers(MyTech);
@@ -106,7 +124,7 @@ test('should add the source hanlder interface to a tech', function(){
   ok(tech.setSource, 'added a setSource function to the tech instance');
 
   // Create an internal state class for the source handler
-  // The internal class would be used by a source hanlder to maintain state
+  // The internal class would be used by a source handler to maintain state
   // and provde a dispose method for the handler.
   // This is optional for source handlers
   var disposeCalled = false;
@@ -117,6 +135,12 @@ test('should add the source hanlder interface to a tech', function(){
 
   // Create source handlers
   var handlerOne = {
+    canPlayType: function(type){
+      if (type !=='no-support') {
+        return 'probably';
+      }
+      return '';
+    },
     canHandleSource: function(source){
       if (source.type !=='no-support') {
         return 'probably';
@@ -131,6 +155,9 @@ test('should add the source hanlder interface to a tech', function(){
   };
 
   var handlerTwo = {
+    canPlayType: function(type){
+      return ''; // no support
+    },
     canHandleSource: function(source){
       return ''; // no support
     },
@@ -149,6 +176,10 @@ test('should add the source hanlder interface to a tech', function(){
   strictEqual(MyTech.selectSourceHandler(sourceA), handlerOne, 'handlerOne was selected to handle the valid source');
   strictEqual(MyTech.selectSourceHandler(sourceB), null, 'no handler was selected to handle the invalid source');
 
+  // Test canPlayType return values
+  strictEqual(MyTech.canPlayType(sourceA.type), 'probably', 'the Tech returned probably for the valid source');
+  strictEqual(MyTech.canPlayType(sourceB.type), '', 'the Tech returned an empty string for the invalid source');
+
   // Test canPlaySource return values
   strictEqual(MyTech.canPlaySource(sourceA), 'probably', 'the Tech returned probably for the valid source');
   strictEqual(MyTech.canPlaySource(sourceB), '', 'the Tech returned an empty string for the invalid source');
@@ -164,9 +195,9 @@ test('should add the source hanlder interface to a tech', function(){
   ok(disposeCalled, 'the handler dispose method was called when the tech was disposed');
 });
 
-test('should handle unsupported sources with the source hanlder API', function(){
+test('should handle unsupported sources with the source handler API', function(){
   // Define a new tech class
-  var MyTech = Tech.extend();
+  var MyTech = extendFn(Tech);
   // Extend Tech with source handlers
   Tech.withSourceHandlers(MyTech);
   // Create an instance of Tech
@@ -179,4 +210,81 @@ test('should handle unsupported sources with the source hanlder API', function()
 
   tech.setSource('');
   ok(usedNative, 'native source handler was used when an unsupported source was set');
+});
+
+test('should allow custom error events to be set', function() {
+  let tech = new Tech();
+  let errors = [];
+  tech.on('error', function() {
+    errors.push(tech.error());
+  });
+
+  equal(tech.error(), null, 'error is null by default');
+
+  tech.error(new MediaError(1));
+  equal(errors.length, 1, 'triggered an error event');
+  equal(errors[0].code, 1, 'set the proper code');
+
+  tech.error(2);
+  equal(errors.length, 2, 'triggered an error event');
+  equal(errors[1].code, 2, 'wrapped the error code');
+});
+
+test('should track whether a video has played', function() {
+  let tech = new Tech();
+
+  equal(tech.played().length, 0, 'starts with zero length');
+  tech.trigger('playing');
+  equal(tech.played().length, 1, 'has length after playing');
+});
+
+test('delegates seekable to the source handler', function(){
+  let MyTech = extendFn(Tech, {
+    seekable: function() {
+      throw new Error('You should not be calling me!');
+    }
+  });
+  Tech.withSourceHandlers(MyTech);
+
+  let seekableCount = 0;
+  let handler = {
+    seekable: function() {
+      seekableCount++;
+      return createTimeRange(0, 0);
+    }
+  };
+
+  MyTech.registerSourceHandler({
+    canPlayType: function() {
+      return true;
+    },
+    canHandleSource: function() {
+      return true;
+    },
+    handleSource: function(source, tech) {
+      return handler;
+    }
+  });
+
+  let tech = new MyTech();
+  tech.setSource({
+    src: 'example.mp4',
+    type: 'video/mp4'
+  });
+  tech.seekable();
+  equal(seekableCount, 1, 'called the source handler');
+});
+
+test('Tech.isTech returns correct answers for techs and components', function() {
+  let isTech = Tech.isTech;
+
+  ok(isTech(Tech), 'Tech is a Tech');
+  ok(isTech(Html5), 'Html5 is a Tech');
+  ok(isTech(new Html5({}, {})), 'An html5 instance is a Tech');
+  ok(isTech(Flash), 'Flash is a Tech');
+  ok(!isTech(5), 'A number is not a Tech');
+  ok(!isTech('this is a tech'), 'A string is not a Tech');
+  ok(!isTech(Button), 'A Button is not a Tech');
+  ok(!isTech(new Button({}, {})), 'A Button instance is not a Tech');
+  ok(!isTech(isTech), 'A function is not a Tech');
 });

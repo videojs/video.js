@@ -13,11 +13,7 @@
 
   <!-- Set the location of the flash SWF -->
   <script>
-    videojs.setGlobalOptions({
-      flash: {
-        swf: '../build/temp/video-js.swf'
-      }
-    });
+    videojs.options.flash.swf = '../build/temp/video-js.swf';
   </script>
 
 </head>
@@ -45,10 +41,10 @@
       };
 
       // register the plugin
-      vjs.plugin('progressed', progressed);
+      videojs.plugin('progressed', progressed);
 
       // initialize it
-      vid1 = vjs('vid1');
+      vid1 = videojs('vid1');
       vid1.progressed();
     })();
   </script>

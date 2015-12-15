@@ -1,3 +1,6 @@
+/**
+ * @file volume-control.js
+ */
 import Component from '../../component.js';
 
 // Required children
@@ -8,7 +11,8 @@ import VolumeBar from './volume-bar.js';
  *
  * @param {Player|Object} player
  * @param {Object=} options
- * @constructor
+ * @extends Component
+ * @class VolumeControl
  */
 class VolumeControl extends Component {
 
@@ -16,11 +20,11 @@ class VolumeControl extends Component {
     super(player, options);
 
     // hide volume controls when they're not supported by the current tech
-    if (player.tech && player.tech['featuresVolumeControl'] === false) {
+    if (player.tech_ && player.tech_['featuresVolumeControl'] === false) {
       this.addClass('vjs-hidden');
     }
     this.on(player, 'loadstart', function(){
-      if (player.tech['featuresVolumeControl'] === false) {
+      if (player.tech_['featuresVolumeControl'] === false) {
         this.addClass('vjs-hidden');
       } else {
         this.removeClass('vjs-hidden');
@@ -28,6 +32,12 @@ class VolumeControl extends Component {
     });
   }
 
+  /**
+   * Create the component's DOM element
+   *
+   * @return {Element}
+   * @method createEl
+   */
   createEl() {
     return super.createEl('div', {
       className: 'vjs-volume-control vjs-control'
@@ -37,9 +47,9 @@ class VolumeControl extends Component {
 }
 
 VolumeControl.prototype.options_ = {
-  children: {
-    'volumeBar': {}
-  }
+  children: [
+    'volumeBar'
+  ]
 };
 
 Component.registerComponent('VolumeControl', VolumeControl);
