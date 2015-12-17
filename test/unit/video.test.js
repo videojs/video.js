@@ -86,6 +86,7 @@ test('should expose DOM functions', function() {
   let methods = {
     isEl: 'isEl',
     isTextNode: 'isTextNode',
+    createEl: 'createEl',
     hasClass: 'hasElClass',
     addClass: 'addElClass',
     removeClass: 'removeElClass',
