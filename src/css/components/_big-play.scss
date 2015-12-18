@@ -4,7 +4,6 @@
   height: $big-play-button--height;
   width: $big-play-button--width; // Firefox bug: For some reason without width the icon wouldn't show up. Switched to using width and removed padding.
   display: block;
-  z-index: 2;
   position: absolute;
   top: 10px;
   left: 10px;
@@ -13,7 +12,7 @@
   opacity: 1;
   border: 0.06666em solid $primary-foreground-color;
 
-  /* Need a slightly gray bg so it can be seen on black backgrounds */
+  // Need a slightly gray bg so it can be seen on black backgrounds
   @include background-color-with-alpha($primary-background-color, $primary-background-transparency);
   @include border-radius(0.3em);
   @include transition(all 0.4s);

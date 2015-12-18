@@ -141,7 +141,12 @@ class TextTrackDisplay extends Component {
 
     let i = cues.length;
     while (i--) {
-      let cueDiv = cues[i].displayState;
+      let cue = cues[i];
+      if (!cue) {
+        continue;
+      }
+
+      let cueDiv = cue.displayState;
       if (overrides.color) {
         cueDiv.firstChild.style.color = overrides.color;
       }

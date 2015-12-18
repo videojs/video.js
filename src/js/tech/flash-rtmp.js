@@ -22,7 +22,7 @@ function FlashRtmpDecorator(Flash) {
     // Look for the normal URL separator we expect, '&'.
     // If found, we split the URL into two pieces around the
     // first '&'.
-    let connEnd = src.indexOf('&');
+    let connEnd = src.search(/&(?!\w+=)/);
     let streamBegin;
     if (connEnd !== -1) {
       streamBegin = connEnd + 1;
@@ -60,12 +60,31 @@ function FlashRtmpDecorator(Flash) {
   Flash.rtmpSourceHandler = {};
 
   /**
-   * Check Flash can handle the source natively
+   * Check if Flash can play the given videotype
+   * @param  {String} type    The mimetype to check
+   * @return {String}         'probably', 'maybe', or '' (empty string)
+   */
+  Flash.rtmpSourceHandler.canPlayType = function(type){
+    if (Flash.isStreamingType(type)) {
+      return 'maybe';
+    }
+
+    return '';
+  };
+
+  /**
+   * Check if Flash can handle the source natively
    * @param  {Object} source  The source object
    * @return {String}         'probably', 'maybe', or '' (empty string)
    */
   Flash.rtmpSourceHandler.canHandleSource = function(source){
-    if (Flash.isStreamingType(source.type) || Flash.isStreamingSrc(source.src)) {
+    let can = Flash.rtmpSourceHandler.canPlayType(source.type);
+
+    if (can) {
+      return can;
+    }
+
+    if (Flash.isStreamingSrc(source.src)) {
       return 'maybe';
     }
 

@@ -45,7 +45,9 @@ let TextTrack = function(options={}) {
     tt = document.createElement('custom');
 
     for (let prop in TextTrack.prototype) {
-      tt[prop] = TextTrack.prototype[prop];
+      if (prop !== 'constructor') {
+        tt[prop] = TextTrack.prototype[prop];
+      }
     }
   }
 
@@ -233,24 +235,25 @@ TextTrack.prototype.removeCue = function(removeCue) {
 * Downloading stuff happens below this point
 */
 var parseCues = function(srcContent, track) {
-  if (typeof window['WebVTT'] !== 'function') {
-    //try again a bit later
-    return window.setTimeout(function() {
-      parseCues(srcContent, track);
-    }, 25);
-  }
+  let parser = new window.WebVTT.Parser(window, window.vttjs, window.WebVTT.StringDecoder());
 
-  let parser = new window['WebVTT']['Parser'](window, window['vttjs'], window['WebVTT']['StringDecoder']());
-
-  parser['oncue'] = function(cue) {
+  parser.oncue = function(cue) {
     track.addCue(cue);
   };
-  parser['onparsingerror'] = function(error) {
+
+  parser.onparsingerror = function(error) {
     log.error(error);
   };
 
-  parser['parse'](srcContent);
-  parser['flush']();
+  parser.onflush = function() {
+    track.trigger({
+      type: 'loadeddata',
+      target: track
+    });
+  };
+
+  parser.parse(srcContent);
+  parser.flush();
 };
 
 var loadTrack = function(src, track) {
@@ -269,7 +272,15 @@ var loadTrack = function(src, track) {
     }
 
     track.loaded_ = true;
-    parseCues(responseBody, track);
+
+    // NOTE: this is only used for the alt/video.novtt.js build
+    if (typeof window.WebVTT !== 'function') {
+      window.setTimeout(function() {
+        parseCues(responseBody, track);
+      }, 100);
+    } else {
+      parseCues(responseBody, track);
+    }
   }));
 };
 

@@ -1,3 +1,4 @@
+// Emulated tracks
 .vjs-text-track-display {
   position: absolute;
   bottom: 3em;
@@ -7,20 +8,30 @@
   pointer-events: none;
 }
 
-/* Move captions down when controls aren't being shown */
+// Move captions down when controls aren't being shown
 .video-js.vjs-user-inactive.vjs-playing .vjs-text-track-display {
   bottom: 1em;
 }
 
-/* Individual tracks */
+// Individual tracks
 .video-js .vjs-text-track {
   font-size: 1.4em;
   text-align: center;
   margin-bottom: 0.1em;
-  /* Transparent black background, or fallback to all black (oldIE) */
+  // Transparent black background, or fallback to all black (oldIE)
   @include background-color-with-alpha(#000, 0.5);
 }
 
-.vjs-subtitles { color: #fff /* Subtitles are white */; }
-.vjs-captions { color: #fc6 /* Captions are yellow */; }
+.vjs-subtitles { color: #fff; } // Subtitles are white
+.vjs-captions { color: #fc6; } // Captions are yellow
 .vjs-tt-cue { display: block; }
+
+// Native tracks
+video::-webkit-media-text-track-display {
+  @include transform(translateY(-3em));
+}
+
+// Move captions down when controls aren't being shown
+.video-js.vjs-user-inactive.vjs-playing video::-webkit-media-text-track-display {
+  @include transform(translateY(-1.5em));
+}

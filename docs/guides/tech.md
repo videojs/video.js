@@ -49,6 +49,40 @@ When adding additional Tech to a video player, make sure to add the supported te
       techOrder: ["html5", "flash", "other supported tech"]
     });
 
+Technology Ordering
+==================
+By default Video.js performs "Tech-first" ordering when it searches for a source/tech combination to play videos. This means that if you have two sources and two techs, video.js will try to play each video with the first tech in the `techOrder` option property before moving on to try the next playback technology.
+
+Tech-first ordering can present a problem if you have a `sourceHandler` that supports both `Html5` and `Flash` techs such as videojs-contrib-hls.
+
+For example, given the following video element:
+
+  <video data-setup='{"techOrder": ["html5", "flash"]}'>
+    <source src="http://your.static.provider.net/path/to/video.m3u8" type="application/x-mpegURL">
+    <source src="http://your.static.provider.net/path/to/video.mp4" type="video/mp4">
+  </video>
+
+There is a good chance that the mp4 source will be selected on platforms that do not have media source extensions. Video.js will try all sources against the first playback technology, in this case `Html5`, and select the first source that can play - in this case MP4.
+
+In "Tech-first" mode, the tests run something like this:
+  Can video.m3u8 play with Html5? No...
+  Can video.mp4 play with Html5? Yes! Use the second source.
+
+Video.js now provides another method of selecting the source - "Source-first" ordering. In this mode, Video.js tries the first source against every tech in `techOrder` before moving onto the next source.
+
+With a player setup as follows:
+
+  <video data-setup='{"techOrder": ["html5", "flash"], "sourceOrder": true}'>
+    <source src="http://your.static.provider.net/path/to/video.m3u8" type="application/x-mpegURL">
+    <source src="http://your.static.provider.net/path/to/video.mp4" type="video/mp4">
+  </video>
+
+The Flash-based HLS support will be tried before falling back to the MP4 source.
+
+In "Source-first" mode, the tests run something like this:
+  Can video.m3u8 play with Html5? No...
+  Can video.m3u8 play with Flash? Yes! Use the first source.
+
 Flash Technology
 ==================
 The Flash playback tech is a part of the default `techOrder`. You may notice undesirable playback behavior in browsers that are subject to using this playback tech, in particular when scrubbing and seeking within a video. This behavior is a result of Flash's progressive video playback.
