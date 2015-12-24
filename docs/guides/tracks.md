@@ -57,7 +57,6 @@ The two-letter code (valid BCP 47 language tag) for the language of the text tra
 <table border="0" cellspacing="5" cellpadding="5">
   <tr>
     <td>
-
       <table>
         <tr><th>ab<th><td>Abkhazian</td></tr>
         <tr><th>aa<th><td>Afar</td></tr>
@@ -97,10 +96,8 @@ The two-letter code (valid BCP 47 language tag) for the language of the text tra
         <tr><th>fj<th><td>Fiji</td></tr>
         <tr><th>fi<th><td>Finnish</td></tr>
       </table>
-
     </td>
     <td>
-
       <table>
         <tr><th>fr<th><td>French</td></tr>
         <tr><th>fy<th><td>Frisian</td></tr>
@@ -140,10 +137,8 @@ The two-letter code (valid BCP 47 language tag) for the language of the text tra
         <tr><th>lo<th><td>Laothian</td></tr>
         <tr><th>la<th><td>Latin</td></tr>
       </table>
-
     </td>
     <td>
-
       <table>
         <tr><th>lv<th><td>Latvian (Lettish)</td></tr>
         <tr><th>li<th><td>Limburgish ( Limburger)</td></tr>
@@ -183,10 +178,8 @@ The two-letter code (valid BCP 47 language tag) for the language of the text tra
         <tr><th>ii<th><td>Sichuan Yi</td></tr>
         <tr><th>sd<th><td>Sindhi</td></tr>
       </table>
-
     </td>
     <td>
-
       <table>
         <tr><th>si<th><td>Sinhalese</td></tr>
         <tr><th>ss<th><td>Siswati</td></tr>
@@ -224,7 +217,6 @@ The two-letter code (valid BCP 47 language tag) for the language of the text tra
         <tr><th>yo<th><td>Yoruba</td></tr>
         <tr><th>zu<th><td>Zulu</td></tr>
       </table>
-
     </td>
   </tr>
 </table>
