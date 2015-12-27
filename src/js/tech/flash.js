@@ -91,6 +91,7 @@ class Flash extends Tech {
       // Player Settings
       'autoplay': options.autoplay,
       'preload': options.preload,
+      'startparam': options.startparam,
       'loop': options.loop,
       'muted': options.muted
 
@@ -311,7 +312,7 @@ class Flash extends Tech {
 
 // Create setters and getters for attributes
 const _api = Flash.prototype;
-const _readWrite = 'rtmpConnection,rtmpStream,preload,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted'.split(',');
+const _readWrite = 'rtmpConnection,rtmpStream,preload,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted,startparam'.split(',');
 const _readOnly = 'networkState,readyState,initialTime,duration,startOffsetTime,paused,ended,videoTracks,audioTracks,videoWidth,videoHeight'.split(',');
 
 function _createSetter(attr){
