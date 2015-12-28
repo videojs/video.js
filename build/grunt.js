@@ -14,6 +14,10 @@ module.exports = function(grunt) {
     patch: verParts[2]
   };
 
+  version.majorMinor = `${version.major}.${version.minor}`;
+  grunt.vjsVersion = version;
+
+
   const browserifyGruntDefaults = {
     browserifyOptions: {
       debug: true,
@@ -103,9 +107,6 @@ module.exports = function(grunt) {
       });
     };
   }
-
-  version.majorMinor = `${version.major}.${version.minor}`;
-  grunt.vjsVersion = version;
 
   // Project configuration.
   grunt.initConfig({
