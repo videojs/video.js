@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Video.js Sandbox</title>
+  <!--<script src='node_modules/es6-shim/es6-shim.js'></script>-->
+
+  <!-- Add in the videojs-ie8 shim automatically if we're in IE8 -->
+  <!--[if IE 8]>
+    <script src="node_modules/videojs-ie8/dist/videojs-ie8.js"></script>
+  <![endif]-->
+
+  <link href="build/temp/video-js.css" rel="stylesheet" type="text/css">
+
+  <script src="video.js"></script>
+
+  <!-- Set the location of the flash SWF -->
+  <script>
+    //videojs.options.flash.swf = 'build/temp/video-js.swf';
+  </script>
+
+</head>
+<body>
+  <div style="background-color:#eee; border: 1px solid #777; padding: 10px; margin-bottom: 20px; font-size: .8em; line-height: 1.5em; font-family: Verdana, sans-serif;">
+    <p>You can use /sandbox/ for writing and testing your own code. Nothing in /sandbox/ will get checked into the repo, except files that end in .example (so don't edit or add those files). To get started make a copy of index.html.example and rename it to index.html.</p>
+    <pre>cp sandbox/index.html.example index.html</pre>
+    <pre>grunt watch</pre>
+    <pre>grunt connect</pre>
+    <pre>open http://localhost:9999/sandbox/index.html</pre>
+  </div>
+
+  <video id="vid1" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264"
+      poster="http://vjs.zencdn.net/v/oceans.png"
+      >
+    <source src="http://vjs.zencdn.net/v/oceans.mp4" type='video/mp4'>
+    <source src="http://vjs.zencdn.net/v/oceans.webm" type='video/webm'>
+    <source src="http://vjs.zencdn.net/v/oceans.ogv" type='video/ogg'>
+    <track kind="captions" src="docs/examples/shared/example-captions.vtt" srclang="en" label="English"></track>
+    <track kind="captions" src="docs/examples/shared/example-captions.vtt" srclang="fr" label="Another"></track>
+    <track kind="chapters" src="docs/examples/shared/example-captions.vtt" srclang="en" label="Subs"></track>
+    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+  </video>
+
+  <script>
+    var vid = document.getElementById("vid1");
+    var player = videojs(vid, {
+      controlBar: {
+        volumeMenuButton: {
+          inline: false
+        }
+      }
+    });
+  </script>
+</body>
+</html>

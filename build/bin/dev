@@ -1,0 +1,69 @@
+#!/usr/bin/env node
+var path = require('path');
+var sh = require('shelljs');
+var nodeCli = require('shelljs-nodecli');
+var budo = require('budo');
+var minimist = require('minimist');
+var pkg = require('../../package.json');
+var version = pkg.version.split('.');
+var argv = minimist(process.argv, {
+  boolean: ['l', 'o'],
+  alias: {
+    l: 'live',
+    o: 'open'
+  },
+  default: {
+    o: false,
+    l: false
+  }
+});
+
+version = {
+  full: pkg.version,
+  major: version[0],
+  minor: version[1],
+  patch: version[2],
+  majorMinor: version[0] + version[1]
+};
+
+var b = budo(process.cwd() + '/src/js/video.js', {
+  // log to stdout
+  stream: process.stdout,
+  // open up the server the browser
+  open: argv.open,
+  port: 9999,
+  verbose: true,
+  live: argv.live,
+  dir: process.cwd(),
+  serve: 'video.js',
+  browserify: {
+    standalone: 'videojs',
+    transform: [
+      require('babelify').configure({
+        sourceMapRelative: process.cwd(),
+        loose: ['all']
+      }),
+      ['browserify-versionify', {
+        placeholder: '__VERSION__',
+        version: pkg.version
+      }],
+      ['browserify-versionify', {
+        placeholder: '__VERSION_NO_PATCH__',
+        version: version.majorMinor
+      }],
+      ['browserify-versionify', {
+        placeholder: '__SWF_VERSION__',
+        version: pkg.dependencies['videojs-swf']
+      }]
+    ]
+  }
+});
+
+b.watch('src/css/**/*.scss').on('watch', function(type, file) {
+  if (path.extname(file) === '.scss') {
+    nodeCli.exec('node-sass', 'src/css/video-js.scss', 'build/temp/video-js.css');
+    b.reload('build/temp/video-js.css');
+  } else {
+    b.reload(file);
+  }
+});
