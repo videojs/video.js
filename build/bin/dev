@@ -59,11 +59,13 @@ var b = budo(process.cwd() + '/src/js/video.js', {
   }
 });
 
-b.watch('src/css/**/*.scss').on('watch', function(type, file) {
-  if (path.extname(file) === '.scss') {
-    nodeCli.exec('node-sass', 'src/css/video-js.scss', 'build/temp/video-js.css');
-    b.reload('build/temp/video-js.css');
-  } else {
-    b.reload(file);
-  }
-});
+if (argv.live) {
+  b.watch('src/css/**/*.scss').on('watch', function(type, file) {
+    if (path.extname(file) === '.scss') {
+      nodeCli.exec('node-sass', 'src/css/video-js.scss', 'build/temp/video-js.css');
+      b.reload('build/temp/video-js.css');
+    } else {
+      b.reload(file);
+    }
+  });
+}
