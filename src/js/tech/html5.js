@@ -477,6 +477,11 @@ class Html5 extends Tech {
    * @method setSrc
    */
   setSrc(src) {
+    let loadstartlistener = () => this.currentSource_ = null;
+
+    this.off(this.el_, 'loadstart', loadstartlistener);
+    this.one(this.el_, 'loadstart', () => this.one(this.el_, 'loadstart', loadstartlistener));
+
     this.el_.src = src;
   }
 
