@@ -196,7 +196,7 @@ module.exports = function(grunt) {
     sass: {
       build: {
         files: {
-          'build/temp/video-js.css': 'src/css/video-js.scss'
+          'build/temp/video-js.css': 'src/css/vjs.scss'
         }
       }
     },
