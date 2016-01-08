@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* @gkatsev fixed sass if else for icons ([view](https://github.com/videojs/video.js/pull/2988))
+_(none)_
 
 --------------------
+
+## 5.5.1 (2016-01-08)
+* @gkatsev fixed sass if else for icons ([view](https://github.com/videojs/video.js/pull/2988))
 
 ## 5.5.0 (2016-01-07)
 * @hartman fixed usage of lighten in progress component. Fixes #2793 ([view](https://github.com/videojs/video.js/pull/2875))
