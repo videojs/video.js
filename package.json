@@ -28,7 +28,7 @@
     "object.assign": "^4.0.1",
     "safe-json-parse": "^4.0.0",
     "tsml": "1.0.1",
-    "videojs-font": "1.4.0",
+    "videojs-font": "1.5.1",
     "videojs-ie8": "1.1.1",
     "videojs-swf": "5.0.1",
     "videojs-vtt.js": "^0.12.1",
