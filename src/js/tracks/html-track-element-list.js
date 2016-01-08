@@ -1,5 +1,5 @@
 /**
- * @file html-track-element.js
+ * @file html-track-element-list.js
  */
 
 import * as browser from '../utils/browser.js';

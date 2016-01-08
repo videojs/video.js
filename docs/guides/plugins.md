@@ -17,7 +17,7 @@ You may have already done this step. Code up something interesting and then wrap
       });
     };
 
-When it's activated, `this` will be the Video.js player your plugin is attached to. You can use anything you'd like in the [Video.js API](api.md) when you're writing a plugin: change the `src`, mess up the DOM, or listen for and emit your own events.
+When it's activated, `this` will be the Video.js player your plugin is attached to. You can use anything you'd like in the [Video.js API](./api.md) when you're writing a plugin: change the `src`, mess up the DOM, or listen for and emit your own events.
 
 Step 2: Registering A Plugin
 -------------------------------
