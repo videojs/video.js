@@ -5,6 +5,7 @@ CHANGELOG
 * @hartman fixed usage of lighten in progress component. Fixes #2793 ([view](https://github.com/videojs/video.js/pull/2875))
 * @misteroneill exposed createEl on videojs ([view](https://github.com/videojs/video.js/pull/2926))
 * @huitsing updated docstrings for autoplay and loop methods ([view](https://github.com/videojs/video.js/pull/2960))
+* @rcrooks fixed some broken links in guides ([view](https://github.com/videojs/video.js/pull/2965))
 
 --------------------
 

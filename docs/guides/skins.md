@@ -9,7 +9,7 @@ enabled, you'll need to manually include them.
 
 ## Icons
 
-You can view all of the icons available in the base theme by renaming and viewing [`icons.html.example`](../../sandbox/icons.html.example) in the sandbox directory.
+You can view all of the icons available in the base theme by renaming and viewing [`icons.html.example`](https://github.com/videojs/video.js/blob/master/sandbox/icons.html.example) in the sandbox directory.
 
 ## Customization
 
