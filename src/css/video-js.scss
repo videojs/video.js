@@ -4,7 +4,7 @@
 
 @if $icon-codepoints {
   @import "../../node_modules/videojs-font/scss/icons-codepoints";
-} else {
+} @else {
   @import "../../node_modules/videojs-font/scss/icons";
 }
 
