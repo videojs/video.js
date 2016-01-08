@@ -102,7 +102,7 @@
 
 .video-js .vjs-load-progress {
   // For IE8 we'll lighten the color
-  background: ligthen($secondary-background-color, 25%);
+  background: lighten($secondary-background-color, 25%);
   // Otherwise we'll rely on stacked opacities
   background: rgba($secondary-background-color, $secondary-background-transparency);
 }
@@ -111,7 +111,7 @@
 // specific time ranges that have been buffered
 .video-js .vjs-load-progress div {
   // For IE8 we'll lighten the color
-  background: ligthen($secondary-background-color, 50%);
+  background: lighten($secondary-background-color, 50%);
   // Otherwise we'll rely on stacked opacities
   background: rgba($secondary-background-color, 0.75);
 }
