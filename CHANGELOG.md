@@ -8,6 +8,7 @@ CHANGELOG
 * @rcrooks fixed some broken links in guides ([view](https://github.com/videojs/video.js/pull/2965))
 * @forbesjo fixed errorDisplay erroring on subsequent openings ([view](https://github.com/videojs/video.js/pull/2966))
 * @incompl updated build command in CONTRIBUTING.md ([view](https://github.com/videojs/video.js/pull/2967))
+* @forbesjo updated player to not autoplay if there is no source ([view](https://github.com/videojs/video.js/pull/2971))
 
 --------------------
 
