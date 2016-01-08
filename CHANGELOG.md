@@ -6,6 +6,7 @@ CHANGELOG
 * @misteroneill exposed createEl on videojs ([view](https://github.com/videojs/video.js/pull/2926))
 * @huitsing updated docstrings for autoplay and loop methods ([view](https://github.com/videojs/video.js/pull/2960))
 * @rcrooks fixed some broken links in guides ([view](https://github.com/videojs/video.js/pull/2965))
+* @forbesjo fixed errorDisplay erroring on subsequent openings ([view](https://github.com/videojs/video.js/pull/2966))
 
 --------------------
 
