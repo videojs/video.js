@@ -564,6 +564,17 @@ videojs.isEl = Dom.isEl;
 videojs.isTextNode = Dom.isTextNode;
 
 /**
+ * Creates an element and applies properties.
+ *
+ * @method createEl
+ * @param  {String} [tagName='div'] Name of tag to be created.
+ * @param  {Object} [properties={}] Element properties to be applied.
+ * @param  {Object} [attributes={}] Element attributes to be applied.
+ * @return {Element}
+ */
+videojs.createEl = Dom.createEl;
+
+/**
  * Check if an element has a CSS class
  *
  * @method hasClass
