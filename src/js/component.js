@@ -517,8 +517,8 @@ class Component {
         }
 
         // Allow for disabling default components
-        // e.g. options['children']['posterImage'] = false
-        if (opts === false) {
+        // e.g. options['children']['posterImage'] = false or "false" (if set via HTML)
+        if ((opts === false) || (opts === "false")) {
           return;
         }
 
