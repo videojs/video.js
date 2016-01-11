@@ -66,7 +66,7 @@ let TextTrack = function(options={}) {
   tt.cues_ = [];
   tt.activeCues_ = [];
 
-  let cues = new TextTrackCueList(tt.cues_);
+  let cues = new TextTrackCueList(tt.cues_, true);
   let activeCues = new TextTrackCueList(tt.activeCues_);
 
   let changed = false;
@@ -147,16 +147,7 @@ let TextTrack = function(options={}) {
       }
 
       let ct = this.tech_.currentTime();
-      let active = [];
-
-      for (let i = 0, l = this['cues'].length; i < l; i++) {
-        let cue = this['cues'][i];
-        if (cue['startTime'] <= ct && cue['endTime'] >= ct) {
-          active.push(cue);
-        } else if (cue['startTime'] === cue['endTime'] && cue['startTime'] <= ct && cue['startTime'] + 0.5 >= ct) {
-          active.push(cue);
-        }
-      }
+      let active = this.cues.getActiveCuesByTime(ct);
 
       changed = false;
 
@@ -210,25 +201,11 @@ TextTrack.prototype.addCue = function(cue) {
       }
     }
   }
-
-  this.cues_.push(cue);
-  this['cues'].setCues_(this.cues_);
+  this['cues'].addCue_(cue);
 };
 
 TextTrack.prototype.removeCue = function(removeCue) {
-  let removed = false;
-
-  for (let i = 0, l = this.cues_.length; i < l; i++) {
-    let cue = this.cues_[i];
-    if (cue === removeCue) {
-      this.cues_.splice(i, 1);
-      removed = true;
-    }
-  }
-
-  if (removed) {
-    this.cues.setCues_(this.cues_);
-  }
+  this['cues'].removeCue_(removeCue);
 };
 
 /*
