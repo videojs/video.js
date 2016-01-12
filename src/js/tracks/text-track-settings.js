@@ -27,33 +27,33 @@ class TextTrackSettings extends Component {
       this.options_.persistTextTrackSettings = this.options_.playerOptions.persistTextTrackSettings;
     }
 
-    Events.on(this.el().querySelector('.vjs-done-button'), 'click', Fn.bind(this, function() {
+    Events.on(this.$('.vjs-done-button'), 'click', Fn.bind(this, function() {
       this.saveSettings();
       this.hide();
     }));
 
-    Events.on(this.el().querySelector('.vjs-default-button'), 'click', Fn.bind(this, function() {
-      this.el().querySelector('.vjs-fg-color > select').selectedIndex = 0;
-      this.el().querySelector('.vjs-bg-color > select').selectedIndex = 0;
-      this.el().querySelector('.window-color > select').selectedIndex = 0;
-      this.el().querySelector('.vjs-text-opacity > select').selectedIndex = 0;
-      this.el().querySelector('.vjs-bg-opacity > select').selectedIndex = 0;
-      this.el().querySelector('.vjs-window-opacity > select').selectedIndex = 0;
-      this.el().querySelector('.vjs-edge-style select').selectedIndex = 0;
-      this.el().querySelector('.vjs-font-family select').selectedIndex = 0;
-      this.el().querySelector('.vjs-font-percent select').selectedIndex = 2;
+    Events.on(this.$('.vjs-default-button'), 'click', Fn.bind(this, function() {
+      this.$('.vjs-fg-color > select').selectedIndex = 0;
+      this.$('.vjs-bg-color > select').selectedIndex = 0;
+      this.$('.window-color > select').selectedIndex = 0;
+      this.$('.vjs-text-opacity > select').selectedIndex = 0;
+      this.$('.vjs-bg-opacity > select').selectedIndex = 0;
+      this.$('.vjs-window-opacity > select').selectedIndex = 0;
+      this.$('.vjs-edge-style select').selectedIndex = 0;
+      this.$('.vjs-font-family select').selectedIndex = 0;
+      this.$('.vjs-font-percent select').selectedIndex = 2;
       this.updateDisplay();
     }));
 
-    Events.on(this.el().querySelector('.vjs-fg-color > select'), 'change', Fn.bind(this, this.updateDisplay));
-    Events.on(this.el().querySelector('.vjs-bg-color > select'), 'change', Fn.bind(this, this.updateDisplay));
-    Events.on(this.el().querySelector('.window-color > select'), 'change', Fn.bind(this, this.updateDisplay));
-    Events.on(this.el().querySelector('.vjs-text-opacity > select'), 'change', Fn.bind(this, this.updateDisplay));
-    Events.on(this.el().querySelector('.vjs-bg-opacity > select'), 'change', Fn.bind(this, this.updateDisplay));
-    Events.on(this.el().querySelector('.vjs-window-opacity > select'), 'change', Fn.bind(this, this.updateDisplay));
-    Events.on(this.el().querySelector('.vjs-font-percent select'), 'change', Fn.bind(this, this.updateDisplay));
-    Events.on(this.el().querySelector('.vjs-edge-style select'), 'change', Fn.bind(this, this.updateDisplay));
-    Events.on(this.el().querySelector('.vjs-font-family select'), 'change', Fn.bind(this, this.updateDisplay));
+    Events.on(this.$('.vjs-fg-color > select'), 'change', Fn.bind(this, this.updateDisplay));
+    Events.on(this.$('.vjs-bg-color > select'), 'change', Fn.bind(this, this.updateDisplay));
+    Events.on(this.$('.window-color > select'), 'change', Fn.bind(this, this.updateDisplay));
+    Events.on(this.$('.vjs-text-opacity > select'), 'change', Fn.bind(this, this.updateDisplay));
+    Events.on(this.$('.vjs-bg-opacity > select'), 'change', Fn.bind(this, this.updateDisplay));
+    Events.on(this.$('.vjs-window-opacity > select'), 'change', Fn.bind(this, this.updateDisplay));
+    Events.on(this.$('.vjs-font-percent select'), 'change', Fn.bind(this, this.updateDisplay));
+    Events.on(this.$('.vjs-edge-style select'), 'change', Fn.bind(this, this.updateDisplay));
+    Events.on(this.$('.vjs-font-family select'), 'change', Fn.bind(this, this.updateDisplay));
 
     if (this.options_.persistTextTrackSettings) {
       this.restoreSettings();
@@ -74,7 +74,7 @@ class TextTrackSettings extends Component {
   }
 
   /**
-   * Get texttrack settings 
+   * Get texttrack settings
    * Settings are
    * .vjs-edge-style
    * .vjs-font-family
@@ -83,23 +83,21 @@ class TextTrackSettings extends Component {
    * .vjs-bg-color
    * .vjs-bg-opacity
    * .window-color
-   * .vjs-window-opacity 
+   * .vjs-window-opacity
    *
-   * @return {Object} 
+   * @return {Object}
    * @method getValues
    */
   getValues() {
-    const el = this.el();
-
-    const textEdge = getSelectedOptionValue(el.querySelector('.vjs-edge-style select'));
-    const fontFamily = getSelectedOptionValue(el.querySelector('.vjs-font-family select'));
-    const fgColor = getSelectedOptionValue(el.querySelector('.vjs-fg-color > select'));
-    const textOpacity = getSelectedOptionValue(el.querySelector('.vjs-text-opacity > select'));
-    const bgColor = getSelectedOptionValue(el.querySelector('.vjs-bg-color > select'));
-    const bgOpacity = getSelectedOptionValue(el.querySelector('.vjs-bg-opacity > select'));
-    const windowColor = getSelectedOptionValue(el.querySelector('.window-color > select'));
-    const windowOpacity = getSelectedOptionValue(el.querySelector('.vjs-window-opacity > select'));
-    const fontPercent = window['parseFloat'](getSelectedOptionValue(el.querySelector('.vjs-font-percent > select')));
+    const textEdge = getSelectedOptionValue(this.$('.vjs-edge-style select'));
+    const fontFamily = getSelectedOptionValue(this.$('.vjs-font-family select'));
+    const fgColor = getSelectedOptionValue(this.$('.vjs-fg-color > select'));
+    const textOpacity = getSelectedOptionValue(this.$('.vjs-text-opacity > select'));
+    const bgColor = getSelectedOptionValue(this.$('.vjs-bg-color > select'));
+    const bgOpacity = getSelectedOptionValue(this.$('.vjs-bg-opacity > select'));
+    const windowColor = getSelectedOptionValue(this.$('.window-color > select'));
+    const windowOpacity = getSelectedOptionValue(this.$('.vjs-window-opacity > select'));
+    const fontPercent = window['parseFloat'](getSelectedOptionValue(this.$('.vjs-font-percent > select')));
 
     let result = {
       'backgroundOpacity': bgOpacity,
@@ -121,7 +119,7 @@ class TextTrackSettings extends Component {
   }
 
   /**
-   * Set texttrack settings 
+   * Set texttrack settings
    * Settings are
    * .vjs-edge-style
    * .vjs-font-family
@@ -130,22 +128,20 @@ class TextTrackSettings extends Component {
    * .vjs-bg-color
    * .vjs-bg-opacity
    * .window-color
-   * .vjs-window-opacity 
+   * .vjs-window-opacity
    *
    * @param {Object} values Object with texttrack setting values
    * @method setValues
    */
   setValues(values) {
-    const el = this.el();
-
-    setSelectedOption(el.querySelector('.vjs-edge-style select'), values.edgeStyle);
-    setSelectedOption(el.querySelector('.vjs-font-family select'), values.fontFamily);
-    setSelectedOption(el.querySelector('.vjs-fg-color > select'), values.color);
-    setSelectedOption(el.querySelector('.vjs-text-opacity > select'), values.textOpacity);
-    setSelectedOption(el.querySelector('.vjs-bg-color > select'), values.backgroundColor);
-    setSelectedOption(el.querySelector('.vjs-bg-opacity > select'), values.backgroundOpacity);
-    setSelectedOption(el.querySelector('.window-color > select'), values.windowColor);
-    setSelectedOption(el.querySelector('.vjs-window-opacity > select'), values.windowOpacity);
+    setSelectedOption(this.$('.vjs-edge-style select'), values.edgeStyle);
+    setSelectedOption(this.$('.vjs-font-family select'), values.fontFamily);
+    setSelectedOption(this.$('.vjs-fg-color > select'), values.color);
+    setSelectedOption(this.$('.vjs-text-opacity > select'), values.textOpacity);
+    setSelectedOption(this.$('.vjs-bg-color > select'), values.backgroundColor);
+    setSelectedOption(this.$('.vjs-bg-opacity > select'), values.backgroundOpacity);
+    setSelectedOption(this.$('.window-color > select'), values.windowColor);
+    setSelectedOption(this.$('.vjs-window-opacity > select'), values.windowOpacity);
 
     let fontPercent = values.fontPercent;
 
@@ -153,11 +149,11 @@ class TextTrackSettings extends Component {
       fontPercent = fontPercent.toFixed(2);
     }
 
-    setSelectedOption(el.querySelector('.vjs-font-percent > select'), fontPercent);
+    setSelectedOption(this.$('.vjs-font-percent > select'), fontPercent);
   }
 
   /**
-   * Restore texttrack settings 
+   * Restore texttrack settings
    *
    * @method restoreSettings
    */
@@ -174,7 +170,7 @@ class TextTrackSettings extends Component {
   }
 
   /**
-   * Save texttrack settings to local storage 
+   * Save texttrack settings to local storage
    *
    * @method saveSettings
    */
@@ -194,7 +190,7 @@ class TextTrackSettings extends Component {
   }
 
   /**
-   * Update display of texttrack settings  
+   * Update display of texttrack settings
    *
    * @method updateDisplay
    */

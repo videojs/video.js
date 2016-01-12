@@ -24,15 +24,15 @@ class MenuItem extends Button {
    * Create the component's DOM element
    *
    * @param {String=} type Desc
-   * @param {Object=} props Desc 
+   * @param {Object=} props Desc
    * @return {Element}
    * @method createEl
    */
-  createEl(type, props) {
+  createEl(type, props, attrs) {
     return super.createEl('li', assign({
       className: 'vjs-menu-item',
       innerHTML: this.localize(this.options_['label'])
-    }, props));
+    }, props), attrs);
   }
 
   /**

@@ -10,7 +10,8 @@ import log from '../utils/log.js';
 import EventTarget from '../event-target';
 import document from 'global/document';
 import window from 'global/window';
-import XHR from '../xhr.js';
+import { isCrossOrigin } from '../utils/url.js';
+import XHR from 'xhr';
 
 /*
  * https://html.spec.whatwg.org/multipage/embedded-content.html#texttrack
@@ -44,7 +45,9 @@ let TextTrack = function(options={}) {
     tt = document.createElement('custom');
 
     for (let prop in TextTrack.prototype) {
-      tt[prop] = TextTrack.prototype[prop];
+      if (prop !== 'constructor') {
+        tt[prop] = TextTrack.prototype[prop];
+      }
     }
   }
 
@@ -232,34 +235,52 @@ TextTrack.prototype.removeCue = function(removeCue) {
 * Downloading stuff happens below this point
 */
 var parseCues = function(srcContent, track) {
-  if (typeof window['WebVTT'] !== 'function') {
-    //try again a bit later
-    return window.setTimeout(function() {
-      parseCues(srcContent, track);
-    }, 25);
-  }
+  let parser = new window.WebVTT.Parser(window, window.vttjs, window.WebVTT.StringDecoder());
 
-  let parser = new window['WebVTT']['Parser'](window, window['vttjs'], window['WebVTT']['StringDecoder']());
-
-  parser['oncue'] = function(cue) {
+  parser.oncue = function(cue) {
     track.addCue(cue);
   };
-  parser['onparsingerror'] = function(error) {
+
+  parser.onparsingerror = function(error) {
     log.error(error);
   };
 
-  parser['parse'](srcContent);
-  parser['flush']();
+  parser.onflush = function() {
+    track.trigger({
+      type: 'loadeddata',
+      target: track
+    });
+  };
+
+  parser.parse(srcContent);
+  parser.flush();
 };
 
 var loadTrack = function(src, track) {
-  XHR(src, Fn.bind(this, function(err, response, responseBody){
+  let opts = {
+    uri: src
+  };
+
+  let crossOrigin = isCrossOrigin(src);
+  if (crossOrigin) {
+    opts.cors = crossOrigin;
+  }
+
+  XHR(opts, Fn.bind(this, function(err, response, responseBody){
     if (err) {
       return log.error(err, response);
     }
 
     track.loaded_ = true;
-    parseCues(responseBody, track);
+
+    // NOTE: this is only used for the alt/video.novtt.js build
+    if (typeof window.WebVTT !== 'function') {
+      window.setTimeout(function() {
+        parseCues(responseBody, track);
+      }, 100);
+    } else {
+      parseCues(responseBody, track);
+    }
   }));
 };
 

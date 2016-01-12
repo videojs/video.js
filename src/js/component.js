@@ -146,19 +146,17 @@ class Component {
    * Deep merge of options objects
    * Whenever a property is an object on both options objects
    * the two properties will be merged using mergeOptions.
-   * This is used for merging options for child components. We
-   * want it to be easy to override individual options on a child
-   * component without having to rewrite all the other default options.
+   *
    * ```js
    *     Parent.prototype.options_ = {
-   *       children: {
+   *       optionSet: {
    *         'childOne': { 'foo': 'bar', 'asdf': 'fdsa' },
    *         'childTwo': {},
    *         'childThree': {}
    *       }
    *     }
    *     newOptions = {
-   *       children: {
+   *       optionSet: {
    *         'childOne': { 'foo': 'baz', 'abc': '123' }
    *         'childTwo': null,
    *         'childFour': {}
@@ -170,7 +168,7 @@ class Component {
    * RESULT
    * ```js
    *     {
-   *       children: {
+   *       optionSet: {
    *         'childOne': { 'foo': 'baz', 'asdf': 'fdsa', 'abc': '123' },
    *         'childTwo': null, // Disabled. Won't be initialized.
    *         'childThree': {},
@@ -211,12 +209,13 @@ class Component {
    * Create the component's DOM element
    *
    * @param  {String=} tagName  Element's node type. e.g. 'div'
-   * @param  {Object=} attributes An object of element attributes that should be set on the element
+   * @param  {Object=} properties An object of properties that should be set
+   * @param  {Object=} attributes An object of attributes that should be set
    * @return {Element}
    * @method createEl
    */
-  createEl(tagName, attributes) {
-    return Dom.createEl(tagName, attributes);
+  createEl(tagName, properties, attributes) {
+    return Dom.createEl(tagName, properties, attributes);
   }
 
   localize(string) {
@@ -323,16 +322,14 @@ class Component {
    *
    *     var myButton = myComponent.addChild('MyButton');
    *     // -> <div class='my-component'><div class="my-button">myButton<div></div>
-   *     // -> myButton === myComonent.children()[0];
+   *     // -> myButton === myComponent.children()[0];
    * ```
    * Pass in options for child constructors and options for children of the child
    * ```js
    *     var myButton = myComponent.addChild('MyButton', {
    *       text: 'Press Me',
-   *       children: {
-   *         buttonChildExample: {
-   *           buttonChildOption: true
-   *         }
+   *       buttonChildExample: {
+   *         buttonChildOption: true
    *       }
    *     });
    * ```
@@ -372,6 +369,18 @@ class Component {
       // Create a new object & element for this controls set
       // If there's no .player_, this is a player
       let ComponentClass = Component.getComponent(componentClassName);
+
+      if (!ComponentClass) {
+        throw new Error(`Component ${componentClassName} does not exist`);
+      }
+
+      // data stored directly on the videojs object may be
+      // misidentified as a component to retain
+      // backwards-compatibility with 4.x. check to make sure the
+      // component class can be instantiated.
+      if (typeof ComponentClass !== 'function') {
+        return null;
+      }
 
       component = new ComponentClass(this.player_ || this, options);
 
@@ -451,24 +460,29 @@ class Component {
    * ```js
    *     // when an instance of MyComponent is created, all children in options
    *     // will be added to the instance by their name strings and options
-   *     MyComponent.prototype.options_.children = {
+   *     MyComponent.prototype.options_ = {
+   *       children: [
+   *         'myChildComponent'
+   *       ],
    *       myChildComponent: {
    *         myChildOption: true
    *       }
-   *     }
-   * ```
+   *     };
+   *
    *     // Or when creating the component
-   * ```js
    *     var myComp = new MyComponent(player, {
-   *       children: {
-   *         myChildComponent: {
-   *           myChildOption: true
-   *         }
+   *       children: [
+   *         'myChildComponent'
+   *       ],
+   *       myChildComponent: {
+   *         myChildOption: true
    *       }
    *     });
    * ```
-   * The children option can also be an Array of child names or
+   * The children option can also be an array of
    * child options objects (that also include a 'name' key).
+   * This can be used if you have two child components of the
+   * same type that need different options.
    * ```js
    *     var myComp = new MyComponent(player, {
    *       children: [
@@ -476,6 +490,10 @@ class Component {
    *         {
    *           name: 'button',
    *           someOtherOption: true
+   *         },
+   *         {
+   *           name: 'button',
+   *           someOtherOption: false
    *         }
    *       ]
    *     });
@@ -490,7 +508,10 @@ class Component {
       // `this` is `parent`
       let parentOptions = this.options_;
 
-      let handleAdd = (name, opts) => {
+      let handleAdd = (child) => {
+        let name = child.name;
+        let opts = child.opts;
+
         // Allow options for children to be set at the parent options
         // e.g. videojs(id, { controlBar: false });
         // instead of videojs(id, { children: { controlBar: false });
@@ -518,33 +539,57 @@ class Component {
         // Add a direct reference to the child by name on the parent instance.
         // If two of the same component are used, different names should be supplied
         // for each
-        this[name] = this.addChild(name, opts);
+        let newChild = this.addChild(name, opts);
+        if (newChild) {
+          this[name] = newChild;
+        }
       };
 
       // Allow for an array of children details to passed in the options
+      let workingChildren;
+      let Tech = Component.getComponent('Tech');
+
       if (Array.isArray(children)) {
-        for (let i = 0; i < children.length; i++) {
-          let child = children[i];
-          let name;
-          let opts;
-
-          if (typeof child === 'string') {
-            // ['myComponent']
-            name = child;
-            opts = {};
-          } else {
-            // [{ name: 'myComponent', otherOption: true }]
-            name = child.name;
-            opts = child;
-          }
-
-          handleAdd(name, opts);
-        }
+        workingChildren = children;
       } else {
-        Object.getOwnPropertyNames(children).forEach(function(name){
-          handleAdd(name, children[name]);
-        });
+        workingChildren = Object.keys(children);
       }
+
+      workingChildren
+      // children that are in this.options_ but also in workingChildren  would
+      // give us extra children we do not want. So, we want to filter them out.
+      .concat(Object.keys(this.options_)
+              .filter(function(child) {
+                return !workingChildren.some(function(wchild) {
+                  if (typeof wchild === 'string') {
+                    return child === wchild;
+                  } else {
+                    return child === wchild.name;
+                  }
+                });
+              }))
+      .map((child) => {
+        let name, opts;
+
+        if (typeof child === 'string') {
+          name = child;
+          opts = children[name] || this.options_[name] || {};
+        } else {
+          name = child.name;
+          opts = child;
+        }
+
+        return {name, opts};
+      })
+      .filter((child) => {
+        // we have to make sure that child.name isn't in the techOrder since
+        // techs are registerd as Components but can't aren't compatible
+        // See https://github.com/videojs/video.js/issues/2772
+        let c = Component.getComponent(child.opts.componentClass ||
+                                       toTitleCase(child.name));
+        return c && !Tech.isTech(c);
+      })
+      .forEach(handleAdd);
     }
   }
 
@@ -782,18 +827,58 @@ class Component {
     this.setTimeout(function(){
       let readyQueue = this.readyQueue_;
 
+      // Reset Ready Queue
+      this.readyQueue_ = [];
+
       if (readyQueue && readyQueue.length > 0) {
         readyQueue.forEach(function(fn){
           fn.call(this);
         }, this);
-
-        // Reset Ready Queue
-        this.readyQueue_ = [];
       }
 
       // Allow for using event listeners also
       this.trigger('ready');
     }, 1);
+  }
+
+  /**
+   * Finds a single DOM element matching `selector` within the component's
+   * `contentEl` or another custom context.
+   *
+   * @method $
+   * @param  {String} selector
+   *         A valid CSS selector, which will be passed to `querySelector`.
+   *
+   * @param  {Element|String} [context=document]
+   *         A DOM element within which to query. Can also be a selector
+   *         string in which case the first matching element will be used
+   *         as context. If missing (or no element matches selector), falls
+   *         back to `document`.
+   *
+   * @return {Element|null}
+   */
+  $(selector, context) {
+    return Dom.$(selector, context || this.contentEl());
+  }
+
+  /**
+   * Finds a all DOM elements matching `selector` within the component's
+   * `contentEl` or another custom context.
+   *
+   * @method $$
+   * @param  {String} selector
+   *         A valid CSS selector, which will be passed to `querySelectorAll`.
+   *
+   * @param  {Element|String} [context=document]
+   *         A DOM element within which to query. Can also be a selector
+   *         string in which case the first matching element will be used
+   *         as context. If missing (or no element matches selector), falls
+   *         back to `document`.
+   *
+   * @return {NodeList}
+   */
+  $$(selector, context) {
+    return Dom.$$(selector, context || this.contentEl());
   }
 
   /**
@@ -820,7 +905,7 @@ class Component {
   }
 
   /**
-   * Remove and return a CSS class name from the component's element
+   * Remove a CSS class name from the component's element
    *
    * @param {String} classToRemove Classname to remove
    * @return {Component}
@@ -828,6 +913,23 @@ class Component {
    */
   removeClass(classToRemove) {
     Dom.removeElClass(this.el_, classToRemove);
+    return this;
+  }
+
+  /**
+   * Add or remove a CSS class name from the component's element
+   *
+   * @param  {String} classToToggle
+   * @param  {Boolean|Function} [predicate]
+   *         Can be a function that returns a Boolean. If `true`, the class
+   *         will be added; if `false`, the class will be removed. If not
+   *         given, the class will be added if not present and vice versa.
+   *
+   * @return {Component}
+   * @method toggleClass
+   */
+  toggleClass(classToToggle, predicate) {
+    Dom.toggleElClass(this.el_, classToToggle, predicate);
     return this;
   }
 
@@ -1260,7 +1362,7 @@ class Component {
   static extend(props) {
     props = props || {};
 
-    log.warn('Component.extend({}) has been deprecated, use videojs.extends(Component, {}) instead');
+    log.warn('Component.extend({}) has been deprecated, use videojs.extend(Component, {}) instead');
 
     // Set up the constructor using the supplied init method
     // or using the init of the parent object

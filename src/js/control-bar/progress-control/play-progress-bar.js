@@ -17,6 +17,7 @@ class PlayProgressBar extends Component {
 
   constructor(player, options){
     super(player, options);
+    this.updateDataAttr();
     this.on(player, 'timeupdate', this.updateDataAttr);
     player.ready(Fn.bind(this, this.updateDataAttr));
   }
@@ -29,7 +30,7 @@ class PlayProgressBar extends Component {
    */
   createEl() {
     return super.createEl('div', {
-      className: 'vjs-play-progress',
+      className: 'vjs-play-progress vjs-slider-bar',
       innerHTML: `<span class="vjs-control-text"><span>${this.localize('Progress')}</span>: 0%</span>`
     });
   }

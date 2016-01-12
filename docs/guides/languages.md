@@ -153,7 +153,7 @@ Language Codes
 --------------
 The following is a list of official language codes.
 
-**NOTE:** For supported language translations, please see the [Languages Folder (/lang)](../../lang) folder located in the project root.
+**NOTE:** For supported language translations, please see the [Languages Folder (/lang)](https://github.com/videojs/video.js/tree/master/lang) folder located in the project root.
 
 <table border="0" cellspacing="5" cellpadding="5">
   <tr>

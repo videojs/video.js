@@ -36,6 +36,8 @@ class Html5 extends Tech {
     // anyway so the error gets fired.
     if (source && (this.el_.currentSrc !== source.src || (options.tag && options.tag.initNetworkState_ === 3))) {
       this.setSource(source);
+    } else {
+      this.handleLateInit_(this.el_);
     }
 
     if (this.el_.hasChildNodes()) {
@@ -47,6 +49,7 @@ class Html5 extends Tech {
       while (nodesLength--) {
         let node = nodes[nodesLength];
         let nodeName = node.nodeName.toLowerCase();
+
         if (nodeName === 'track') {
           if (!this.featuresNativeTextTracks) {
             // Empty video tag tracks so the built-in player doesn't use them also.
@@ -55,6 +58,8 @@ class Html5 extends Tech {
             // captions and subtitles. videoElement.textTracks
             removeNodes.push(node);
           } else {
+            // store HTMLTrackElement and TextTrack to remote list
+            this.remoteTextTrackEls().addTrackElement_(node);
             this.remoteTextTracks().addTrack_(node.track);
           }
         }
@@ -167,6 +172,87 @@ class Html5 extends Tech {
     // jenniisawesome = true;
   }
 
+  // If we're loading the playback object after it has started loading
+  // or playing the video (often with autoplay on) then the loadstart event
+  // has already fired and we need to fire it manually because many things
+  // rely on it.
+  handleLateInit_(el) {
+    if (el.networkState === 0 || el.networkState === 3) {
+      // The video element hasn't started loading the source yet
+      // or didn't find a source
+      return;
+    }
+
+    if (el.readyState === 0) {
+      // NetworkState is set synchronously BUT loadstart is fired at the
+      // end of the current stack, usually before setInterval(fn, 0).
+      // So at this point we know loadstart may have already fired or is
+      // about to fire, and either way the player hasn't seen it yet.
+      // We don't want to fire loadstart prematurely here and cause a
+      // double loadstart so we'll wait and see if it happens between now
+      // and the next loop, and fire it if not.
+      // HOWEVER, we also want to make sure it fires before loadedmetadata
+      // which could also happen between now and the next loop, so we'll
+      // watch for that also.
+      let loadstartFired = false;
+      let setLoadstartFired = function() {
+        loadstartFired = true;
+      };
+      this.on('loadstart', setLoadstartFired);
+
+      let triggerLoadstart = function() {
+        // We did miss the original loadstart. Make sure the player
+        // sees loadstart before loadedmetadata
+        if (!loadstartFired) {
+          this.trigger('loadstart');
+        }
+      };
+      this.on('loadedmetadata', triggerLoadstart);
+
+      this.ready(function(){
+        this.off('loadstart', setLoadstartFired);
+        this.off('loadedmetadata', triggerLoadstart);
+
+        if (!loadstartFired) {
+          // We did miss the original native loadstart. Fire it now.
+          this.trigger('loadstart');
+        }
+      });
+
+      return;
+    }
+
+    // From here on we know that loadstart already fired and we missed it.
+    // The other readyState events aren't as much of a problem if we double
+    // them, so not going to go to as much trouble as loadstart to prevent
+    // that unless we find reason to.
+    let eventsToTrigger = ['loadstart'];
+
+    // loadedmetadata: newly equal to HAVE_METADATA (1) or greater
+    eventsToTrigger.push('loadedmetadata');
+
+    // loadeddata: newly increased to HAVE_CURRENT_DATA (2) or greater
+    if (el.readyState >= 2) {
+      eventsToTrigger.push('loadeddata');
+    }
+
+    // canplay: newly increased to HAVE_FUTURE_DATA (3) or greater
+    if (el.readyState >= 3) {
+      eventsToTrigger.push('canplay');
+    }
+
+    // canplaythrough: newly equal to HAVE_ENOUGH_DATA (4)
+    if (el.readyState >= 4) {
+      eventsToTrigger.push('canplaythrough');
+    }
+
+    // We still need to give the player time to add event listeners
+    this.ready(function(){
+      eventsToTrigger.forEach(function(type){
+        this.trigger(type);
+      }, this);
+    });
+  }
 
   proxyNativeTextTracks_() {
     let tt = this.el().textTracks;
@@ -390,14 +476,27 @@ class Html5 extends Tech {
    * @deprecated
    * @method setSrc
    */
-  setSrc(src) { this.el_.src = src; }
+  setSrc(src) {
+    this.el_.src = src;
+  }
 
   /**
    * Load media into player
    *
    * @method load
    */
-  load(){ this.el_.load(); }
+  load(){
+    this.el_.load();
+  }
+
+  /**
+   * Reset the tech. Removes all sources and calls `load`.
+   *
+   * @method reset
+   */
+  reset() {
+    Html5.resetMediaElement(this.el_);
+  }
 
   /**
    * Get current source
@@ -405,7 +504,13 @@ class Html5 extends Tech {
    * @return {Object}
    * @method currentSrc
    */
-  currentSrc() { return this.el_.currentSrc; }
+  currentSrc() { 
+    if (this.currentSource_) {
+      return this.currentSource_.src;
+    } else {
+      return this.el_.currentSrc;
+    }
+  }
 
   /**
    * Get poster
@@ -629,11 +734,11 @@ class Html5 extends Tech {
   }
 
   /**
-   * Creates and returns a remote text track object
+   * Creates a remote text track object and returns a html track element
    *
    * @param {Object} options The object should contain values for
    * kind, language, label and src (location of the WebVTT file)
-   * @return {TextTrackObject}
+   * @return {HTMLTrackElement}
    * @method addRemoteTextTrack
    */
   addRemoteTextTrack(options={}) {
@@ -641,32 +746,34 @@ class Html5 extends Tech {
       return super.addRemoteTextTrack(options);
     }
 
-    var track = document.createElement('track');
+    let htmlTrackElement = document.createElement('track');
 
-    if (options['kind']) {
-      track['kind'] = options['kind'];
+    if (options.kind) {
+      htmlTrackElement.kind = options.kind;
     }
-    if (options['label']) {
-      track['label'] = options['label'];
+    if (options.label) {
+      htmlTrackElement.label = options.label;
     }
-    if (options['language'] || options['srclang']) {
-      track['srclang'] = options['language'] || options['srclang'];
+    if (options.language || options.srclang) {
+      htmlTrackElement.srclang = options.language || options.srclang;
     }
-    if (options['default']) {
-      track['default'] = options['default'];
+    if (options.default) {
+      htmlTrackElement.default = options.default;
     }
-    if (options['id']) {
-      track['id'] = options['id'];
+    if (options.id) {
+      htmlTrackElement.id = options.id;
     }
-    if (options['src']) {
-      track['src'] = options['src'];
+    if (options.src) {
+      htmlTrackElement.src = options.src;
     }
 
-    this.el().appendChild(track);
+    this.el().appendChild(htmlTrackElement);
 
-    this.remoteTextTracks().addTrack_(track.track);
+    // store HTMLTrackElement and TextTrack to remote list
+    this.remoteTextTrackEls().addTrackElement_(htmlTrackElement);
+    this.remoteTextTracks().addTrack_(htmlTrackElement.track);
 
-    return track;
+    return htmlTrackElement;
   }
 
   /**
@@ -680,11 +787,15 @@ class Html5 extends Tech {
       return super.removeRemoteTextTrack(track);
     }
 
-    var tracks, i;
+    let tracks, i;
 
+    let trackElement = this.remoteTextTrackEls().getTrackElementByTrack_(track);
+
+    // remove HTMLTrackElement and TextTrack from remote list
+    this.remoteTextTrackEls().removeTrackElement_(trackElement);
     this.remoteTextTracks().removeTrack_(track);
 
-    tracks = this.el().querySelectorAll('track');
+    tracks = this.$$('track');
 
     i = tracks.length;
     while (i--) {
@@ -742,6 +853,22 @@ Tech.withSourceHandlers(Html5);
 Html5.nativeSourceHandler = {};
 
 /*
+ * Check if the video element can play the given videotype
+ *
+ * @param  {String} type    The mimetype to check
+ * @return {String}         'probably', 'maybe', or '' (empty string)
+ */
+Html5.nativeSourceHandler.canPlayType = function(type){
+  // IE9 on Windows 7 without MediaPlayer throws an error here
+  // https://github.com/videojs/video.js/issues/519
+  try {
+    return Html5.TEST_VID.canPlayType(type);
+  } catch(e) {
+    return '';
+  }
+};
+
+/*
  * Check if the video element can handle the source natively
  *
  * @param  {Object} source  The source object
@@ -750,24 +877,14 @@ Html5.nativeSourceHandler = {};
 Html5.nativeSourceHandler.canHandleSource = function(source){
   var match, ext;
 
-  function canPlayType(type){
-    // IE9 on Windows 7 without MediaPlayer throws an error here
-    // https://github.com/videojs/video.js/issues/519
-    try {
-      return Html5.TEST_VID.canPlayType(type);
-    } catch(e) {
-      return '';
-    }
-  }
-
   // If a type was provided we should rely on that
   if (source.type) {
-    return canPlayType(source.type);
+    return Html5.nativeSourceHandler.canPlayType(source.type);
   } else if (source.src) {
     // If no type, fall back to checking 'video/[EXTENSION]'
     ext = Url.getFileExtension(source.src);
 
-    return canPlayType(`video/${ext}`);
+    return Html5.nativeSourceHandler.canPlayType(`video/${ext}`);
   }
 
   return '';
@@ -993,5 +1110,29 @@ Html5.disposeMediaElement = function(el){
   }
 };
 
+Html5.resetMediaElement = function(el){
+  if (!el) { return; }
+
+  let sources = el.querySelectorAll('source');
+  let i = sources.length;
+  while (i--) {
+    el.removeChild(sources[i]);
+  }
+
+  // remove any src reference.
+  // not setting `src=''` because that throws an error
+  el.removeAttribute('src');
+
+  if (typeof el.load === 'function') {
+    // wrapping in an iife so it's not deoptimized (#1060#discussion_r10324473)
+    (function() {
+      try {
+        el.load();
+      } catch (e) {}
+    })();
+  }
+};
+
 Component.registerComponent('Html5', Html5);
+Tech.registerTech('Html5', Html5);
 export default Html5;

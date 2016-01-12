@@ -20,11 +20,11 @@ class VolumeControl extends Component {
     super(player, options);
 
     // hide volume controls when they're not supported by the current tech
-    if (player.tech && player.tech['featuresVolumeControl'] === false) {
+    if (player.tech_ && player.tech_['featuresVolumeControl'] === false) {
       this.addClass('vjs-hidden');
     }
     this.on(player, 'loadstart', function(){
-      if (player.tech['featuresVolumeControl'] === false) {
+      if (player.tech_['featuresVolumeControl'] === false) {
         this.addClass('vjs-hidden');
       } else {
         this.removeClass('vjs-hidden');
@@ -47,9 +47,9 @@ class VolumeControl extends Component {
 }
 
 VolumeControl.prototype.options_ = {
-  children: {
-    'volumeBar': {}
-  }
+  children: [
+    'volumeBar'
+  ]
 };
 
 Component.registerComponent('VolumeControl', VolumeControl);

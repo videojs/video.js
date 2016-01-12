@@ -2,11 +2,13 @@
  * @file volume-menu-button.js
  */
 import Button from '../button.js';
+import * as Fn from '../utils/fn.js';
 import Component from '../component.js';
 import Menu from '../menu/menu.js';
 import MenuButton from '../menu/menu-button.js';
 import MuteToggle from './mute-toggle.js';
 import VolumeBar from './volume-control/volume-bar.js';
+import document from 'global/document';
 
 /**
  * Button for volume menu
@@ -19,10 +21,15 @@ import VolumeBar from './volume-control/volume-bar.js';
 class VolumeMenuButton extends MenuButton {
 
   constructor(player, options={}){
+    // Default to inline
+    if (options.inline === undefined) {
+      options.inline = true;
+    }
+
     // If the vertical option isn't passed at all, default to true.
     if (options.vertical === undefined) {
-      // If an inline volumeMenuButton is used, we should default to using a horizontal
-      // slider for obvious reasons.
+      // If an inline volumeMenuButton is used, we should default to using
+      // a horizontal slider for obvious reasons.
       if (options.inline) {
         options.vertical = false;
       } else {
@@ -30,8 +37,8 @@ class VolumeMenuButton extends MenuButton {
       }
     }
 
-    // The vertical option needs to be set on the volumeBar as well, since that will
-    // need to be passed along to the VolumeBar constructor
+    // The vertical option needs to be set on the volumeBar as well,
+    // since that will need to be passed along to the VolumeBar constructor
     options.volumeBar = options.volumeBar || {};
     options.volumeBar.vertical = !!options.vertical;
 
@@ -42,17 +49,24 @@ class VolumeMenuButton extends MenuButton {
     this.on(player, 'loadstart', this.volumeUpdate);
 
     // hide mute toggle if the current tech doesn't support volume control
-    if (player.tech && player.tech['featuresVolumeControl'] === false) {
-      this.addClass('vjs-hidden');
-    }
-    this.on(player, 'loadstart', function(){
-      if (player.tech['featuresVolumeControl'] === false) {
+    function updateVisibility() {
+      if (player.tech_ && player.tech_['featuresVolumeControl'] === false) {
         this.addClass('vjs-hidden');
       } else {
         this.removeClass('vjs-hidden');
       }
+    }
+
+    updateVisibility.call(this);
+    this.on(player, 'loadstart', updateVisibility);
+
+    this.on(this.volumeBar, ['slideractive', 'focus'], function(){
+      this.addClass('vjs-slider-active');
     });
-    this.addClass('vjs-menu-button');
+
+    this.on(this.volumeBar, ['sliderinactive', 'blur'], function(){
+      this.removeClass('vjs-slider-active');
+    });
   }
 
   /**
@@ -83,15 +97,14 @@ class VolumeMenuButton extends MenuButton {
       contentElType: 'div'
     });
 
-    let vc = new VolumeBar(this.player_, this.options_.volumeBar);
+    let vb = new VolumeBar(this.player_, this.options_.volumeBar);
 
-    vc.on('focus', function() {
-      menu.lockShowing();
-    });
-    vc.on('blur', function() {
-      menu.unlockShowing();
-    });
-    menu.addChild(vc);
+    menu.addChild(vb);
+
+    this.volumeBar = vb;
+
+    this.attachVolumeBarEvents();
+
     return menu;
   }
 
@@ -105,6 +118,18 @@ class VolumeMenuButton extends MenuButton {
     super.handleClick();
   }
 
+  attachVolumeBarEvents() {
+    this.on(['mousedown', 'touchdown'], this.handleMouseDown);
+  }
+
+  handleMouseDown(event) {
+    this.on(['mousemove', 'touchmove'], Fn.bind(this.volumeBar, this.volumeBar.handleMouseMove));
+    this.on(document, ['mouseup', 'touchend'], this.handleMouseUp);
+  }
+
+  handleMouseUp(event) {
+    this.off(['mousemove', 'touchmove'], Fn.bind(this.volumeBar, this.volumeBar.handleMouseMove));
+  }
 }
 
 VolumeMenuButton.prototype.volumeUpdate = MuteToggle.prototype.update;

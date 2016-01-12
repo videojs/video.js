@@ -2,53 +2,59 @@
  * @file error-display.js
  */
 import Component from './component';
-import  * as Dom from './utils/dom.js';
+import ModalDialog from './modal-dialog';
+
+import * as Dom from './utils/dom';
+import mergeOptions from './utils/merge-options';
 
 /**
- * Display that an error has occurred making the video unplayable
+ * Display that an error has occurred making the video unplayable.
  *
- * @param {Object} player  Main Player
- * @param {Object=} options Object of option names and values
- * @extends Component
+ * @extends ModalDialog
  * @class ErrorDisplay
  */
-class ErrorDisplay extends Component {
+class ErrorDisplay extends ModalDialog {
 
+  /**
+   * Constructor for error display modal.
+   *
+   * @param  {Player} player
+   * @param  {Object} [options]
+   */
   constructor(player, options) {
     super(player, options);
-
-    this.update();
-    this.on(player, 'error', this.update);
+    this.on(player, 'error', this.open);
   }
 
   /**
-   * Create the component's DOM element
+   * Include the old class for backward-compatibility.
    *
-   * @return {Element}
-   * @method createEl
+   * This can be removed in 6.0.
+   *
+   * @method buildCSSClass
+   * @deprecated
+   * @return {String}
    */
-  createEl() {
-    var el = super.createEl('div', {
-      className: 'vjs-error-display'
-    });
-
-    this.contentEl_ = Dom.createEl('div');
-    el.appendChild(this.contentEl_);
-
-    return el;
+  buildCSSClass() {
+    return `vjs-error-display ${super.buildCSSClass()}`;
   }
 
   /**
-   * Update the error message in localized language
+   * Generates the modal content based on the player error.
    *
-   * @method update
+   * @return {String|Null}
    */
-  update() {
-    if (this.player().error()) {
-      this.contentEl_.innerHTML = this.localize(this.player().error().message);
-    }
+  content() {
+    let error = this.player().error();
+    return error ? this.localize(error.message) : '';
   }
 }
+
+ErrorDisplay.prototype.options_ = mergeOptions(ModalDialog.prototype.options_, {
+  fillAlways: true,
+  temporary: false,
+  uncloseable: true
+});
 
 Component.registerComponent('ErrorDisplay', ErrorDisplay);
 export default ErrorDisplay;

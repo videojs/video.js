@@ -3,6 +3,7 @@
  */
 import Component from '../../component.js';
 import SeekBar from './seek-bar.js';
+import MouseTimeDisplay from './mouse-time-display.js';
 
 /**
  * The Progress Control component contains the seek bar, load progress,
@@ -29,9 +30,9 @@ class ProgressControl extends Component {
 }
 
 ProgressControl.prototype.options_ = {
-  children: {
-    'seekBar': {}
-  }
+  children: [
+    'seekBar'
+  ]
 };
 
 Component.registerComponent('ProgressControl', ProgressControl);

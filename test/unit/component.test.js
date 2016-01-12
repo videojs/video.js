@@ -5,6 +5,21 @@ import * as browser from '../../src/js/utils/browser.js';
 import document from 'global/document';
 import TestHelpers from './test-helpers.js';
 
+class TestComponent1 extends Component {}
+class TestComponent2 extends Component {}
+class TestComponent3 extends Component {}
+class TestComponent4 extends Component {}
+TestComponent1.prototype.options_ = {
+  children: [
+    'testComponent2',
+    'testComponent3'
+  ]
+};
+Component.registerComponent('TestComponent1', TestComponent1);
+Component.registerComponent('TestComponent2', TestComponent2);
+Component.registerComponent('TestComponent3', TestComponent3);
+Component.registerComponent('TestComponent4', TestComponent4);
+
 q.module('Component', {
   'setup': function() {
     this.clock = sinon.useFakeTimers();
@@ -65,6 +80,14 @@ test('should add a child component to an index', function(){
   ok(comp.children().length === 5);
   ok(comp.children()[3] === child3);
   ok(comp.children()[4] === child2);
+
+
+//test('addChild should throw if the child does not exist', function() {
+//  var comp = new Component(getFakePlayer());
+
+//  throws(function() {
+//    comp.addChild('non-existent-child');
+//  }, new Error('Component Non-existent-child does not exist'), 'addChild threw');
 
 });
 
@@ -139,6 +162,16 @@ test('should do a deep merge of child options', function(){
   Component.prototype.options_ = null;
 });
 
+test('should init child components from component options', function(){
+  let testComp = new TestComponent1(TestHelpers.makePlayer(), {
+    testComponent2: false,
+    testComponent4: {}
+  });
+
+  ok(!testComp.childNameIndex_.testComponent2, 'we do not have testComponent2');
+  ok(testComp.childNameIndex_.testComponent4, 'we have a testComponent4');
+});
+
 test('should allows setting child options at the parent options level', function(){
   var parent, options;
 
@@ -161,6 +194,7 @@ test('should allows setting child options at the parent options level', function
     ok(false, 'Child with `false` option was initialized');
   }
   equal(parent.children()[0].options_['foo'], true, 'child options set when children array is used');
+  equal(parent.children().length, 1, 'we should only have one child');
 
   // using children object
   options = {
@@ -183,6 +217,7 @@ test('should allows setting child options at the parent options level', function
     ok(false, 'Child with `false` option was initialized');
   }
   equal(parent.children()[0].options_['foo'], true, 'child options set when children object is used');
+  equal(parent.children().length, 1, 'we should only have one child');
 });
 
 test('should dispose of component and children', function(){
@@ -432,12 +467,41 @@ test('should trigger a listener when ready', function(){
   ok(!syncListenerFired, 'sync listener should be removed');
 });
 
+test('should not retrigger a listener when the listener calls triggerReady', function(){
+  var timesCalled = 0;
+  var selfTriggered = false;
+
+  var readyListener = function(){
+    timesCalled++;
+
+    // Don't bother calling again if we have
+    // already failed
+    if (!selfTriggered) {
+      selfTriggered = true;
+      comp.triggerReady();
+    }
+  };
+
+  var comp = new Component(getFakePlayer(), {});
+
+  comp.ready(readyListener);
+  comp.triggerReady();
+
+  this.clock.tick(100);
+
+  equal(timesCalled, 1, 'triggerReady from inside a ready handler does not result in an infinite loop');
+});
+
 test('should add and remove a CSS class', function(){
   var comp = new Component(getFakePlayer(), {});
 
   comp.addClass('test-class');
   ok(comp.el().className.indexOf('test-class') !== -1);
   comp.removeClass('test-class');
+  ok(comp.el().className.indexOf('test-class') === -1);
+  comp.toggleClass('test-class');
+  ok(comp.el().className.indexOf('test-class') !== -1);
+  comp.toggleClass('test-class');
   ok(comp.el().className.indexOf('test-class') === -1);
 });
 
@@ -662,4 +726,19 @@ test('should provide interval methods that automatically get cleared on componen
   this.clock.tick(1200);
 
   ok(intervalsFired === 5, 'Interval was cleared when component was disposed');
+});
+
+test('$ and $$ functions', function() {
+  var comp = new Component(getFakePlayer());
+  var contentEl = document.createElement('div');
+  var children = [
+    document.createElement('div'),
+    document.createElement('div')
+  ];
+
+  comp.contentEl_ = contentEl;
+  children.forEach(child => contentEl.appendChild(child));
+
+  strictEqual(comp.$('div'), children[0], '$ defaults to contentEl as scope');
+  strictEqual(comp.$$('div').length, children.length, '$$ defaults to contentEl as scope');
 });

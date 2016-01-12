@@ -20,6 +20,10 @@ test('should format time as a string', function(){
   // Don't do extra leading zeros for hours
   ok(formatTime(1,36000) === '0:00:01');
   ok(formatTime(1,360000) === '0:00:01');
+
+  // Do not display negative time
+  ok(formatTime(-1) === '0:00');
+  ok(formatTime(-1,3600) === '0:00:00');
 });
 
 test('should format invalid times as dashes', function(){
