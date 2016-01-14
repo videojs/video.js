@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* make sure that styleEl_ is in DOM before removing on dispose ([view](https://github.com/videojs/video.js/pull/3004))
+_(none)_
 
 --------------------
+
+## 5.5.2 (2016-01-14)
+* make sure that styleEl_ is in DOM before removing on dispose ([view](https://github.com/videojs/video.js/pull/3004))
 
 ## 5.5.1 (2016-01-08)
 * @gkatsev fixed sass if else for icons ([view](https://github.com/videojs/video.js/pull/2988))
