@@ -224,7 +224,7 @@ class Player extends Component {
     // prevent dispose from being called twice
     this.off('dispose');
 
-    if (this.styleEl_) {
+    if (this.styleEl_ && this.styleEl_.parentNode) {
       this.styleEl_.parentNode.removeChild(this.styleEl_);
     }
 
