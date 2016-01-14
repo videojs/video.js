@@ -106,6 +106,7 @@ class Html5 extends Tech {
       this.handleTextTrackChange_ = Fn.bind(this, this.handleTextTrackChange);
       this.handleTextTrackAdd_ = Fn.bind(this, this.handleTextTrackAdd);
       this.handleTextTrackRemove_ = Fn.bind(this, this.handleTextTrackRemove);
+      this.removeOldTextTracks_ = Fn.bind(this, this.removeOldTextTracks);
       this.proxyNativeTextTracks_();
     }
 
@@ -137,6 +138,11 @@ class Html5 extends Tech {
         tl.removeEventListener('change', this[`handle${capitalType}TrackChange_`]);
         tl.removeEventListener('addtrack', this[`handle${capitalType}TrackAdd_`]);
         tl.removeEventListener('removetrack', this[`handle${capitalType}TrackRemove_`]);
+      }
+      
+      // Stop removing old tracks
+      if (tl) {
+        this.off('loadstart', this[`removeOld${capitalType}Tracks_`]);
       }
     });
 
@@ -297,6 +303,11 @@ class Html5 extends Tech {
         tt.addEventListener('removetrack', this.handleTextTrackRemove_);
       }
     }
+
+    // Remove (native) texttracks that are not used anymore
+    if (tt) {
+      this.on('loadstart', this.removeOldTextTracks_);
+    }
   }
 
   handleTextTrackChange(e) {
@@ -353,6 +364,32 @@ class Html5 extends Tech {
     this.audioTracks().removeTrack_(e.track);
   }
 
+  removeOldTextTracks() {
+    // This will loop over the texttracks and check if they are still used
+    // If not, they will be removed from the emulated list
+    let removeTracks = [];
+
+    for (let i = 0; i < this.textTracks().length; i++) {
+      let techTrack = this.textTracks()[i];
+
+      let found = false;
+      for (let j = 0; j < this.el().textTracks.length; j++) {
+	if (this.el().textTracks[j] === techTrack) {
+	  found = true;
+	  break;
+	}
+      }
+
+      if (!found) {
+	removeTracks.push(techTrack);
+      }
+    }
+
+    for (let i = 0; i < removeTracks.length; i++) {
+      const track = removeTracks[i];
+      this.textTracks().removeTrack_(track);
+    }
+  }
 
   /**
    * Play for html5 tech
