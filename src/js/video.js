@@ -95,7 +95,7 @@ let videojs = function(id, options, ready){
 
   // Element may have a player attr referring to an already created player instance.
   // If not, set up a new player and return the instance.
-  return tag['player'] || new Player(tag, options, ready);
+  return tag['player'] || Player.players[tag.playerId] || new Player(tag, options, ready);
 };
 
 // Add default styles
