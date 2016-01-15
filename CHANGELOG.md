@@ -2,11 +2,14 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 5.5.3 (2016-01-15)
 * @gkasev updated vjs to correctly return already created player when given an element ([view](https://github.com/videojs/video.js/pull/3006))
 * @mister-ben updated CDN urls in setup guide ([view](https://github.com/videojs/video.js/pull/2984))
 * @rcrooks fixed a couple of docs link and a jsdoc comment ([view](https://github.com/videojs/video.js/pull/2987))
-
---------------------
 
 ## 5.5.2 (2016-01-14)
 * make sure that styleEl_ is in DOM before removing on dispose ([view](https://github.com/videojs/video.js/pull/3004))
