@@ -52,8 +52,8 @@ if (typeof HTMLVideoElement === 'undefined') {
  * @mixes videojs
  * @method videojs
  */
-var videojs = function(id, options, ready){
-  var tag; // Element of ID
+let videojs = function(id, options, ready){
+  let tag; // Element of ID
 
   // Allow for element or ID to be passed in
   // String ID
