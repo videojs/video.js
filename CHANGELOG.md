@@ -3,6 +3,7 @@ CHANGELOG
 
 ## HEAD (Unreleased)
 * @gkasev updated vjs to correctly return already created player when given an element ([view](https://github.com/videojs/video.js/pull/3006))
+* @mister-ben updated CDN urls in setup guide ([view](https://github.com/videojs/video.js/pull/2984))
 
 --------------------
 
