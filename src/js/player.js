@@ -224,7 +224,7 @@ class Player extends Component {
     // prevent dispose from being called twice
     this.off('dispose');
 
-    if (this.styleEl_) {
+    if (this.styleEl_ && this.styleEl_.parentNode) {
       this.styleEl_.parentNode.removeChild(this.styleEl_);
     }
 
@@ -269,6 +269,7 @@ class Player extends Component {
     // Update tag id/class for use as HTML5 playback tech
     // Might think we should do this after embedding in container so .vjs-tech class
     // doesn't flash 100% width/height, but class only applies with .video-js parent
+    tag.playerId = tag.id;
     tag.id += '_html5_api';
     tag.className = 'vjs-tech';
 
