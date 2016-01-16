@@ -80,16 +80,17 @@ test('should add a child component to an index', function(){
   ok(comp.children().length === 5);
   ok(comp.children()[3] === child3);
   ok(comp.children()[4] === child2);
+});
 
+test('addChild should throw if the child does not exist', function() {
+  var comp = new Component(getFakePlayer());
 
-//test('addChild should throw if the child does not exist', function() {
-//  var comp = new Component(getFakePlayer());
-
-//  throws(function() {
-//    comp.addChild('non-existent-child');
-//  }, new Error('Component Non-existent-child does not exist'), 'addChild threw');
+  throws(function() {
+   comp.addChild('non-existent-child');
+  }, new Error('Component Non-existent-child does not exist'), 'addChild threw');
 
 });
+
 
 test('should init child components from options', function(){
   var comp = new Component(getFakePlayer(), {
