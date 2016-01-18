@@ -14,9 +14,11 @@ You can download the Video.js source and host it on your own servers, or use the
 
 ### CDN Version ###
 ```html
-<link href="//vjs.zencdn.net/5.1.0/video-js.min.css" rel="stylesheet">
-<script src="//vjs.zencdn.net/5.1.0/video.min.js"></script>
+<link href="//vjs.zencdn.net/5.4.6/video-js.min.css" rel="stylesheet">
+<script src="//vjs.zencdn.net/5.4.6/video.min.js"></script>
 ```
+
+Alternatively you can always [go here](http://videojs.com/getting-started/) to get the latest URL for videojs CDN.
 
 We include a stripped down Google Analytics pixel that tracks a random percentage (currently 1%) of players loaded from the CDN. This allows us to see (roughly) what browsers are in use in the wild, along with other useful metrics such as OS and device. If you'd like to disable analytics, you can simply include the following global **before** including Video.js:
 
