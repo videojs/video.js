@@ -2256,6 +2256,11 @@ class Player extends Component {
           this.addClass('vjs-user-active');
           this.trigger('useractive');
         } else {
+          // if we are focused anywhere in the player, don't go inactive
+          if (this.el().contains(document.activeElement)) {
+            return;
+          }
+
           // We're switching the state to inactive manually, so erase any other
           // activity
           this.userActivity_ = false;

@@ -20,6 +20,7 @@ import SubtitlesButton from './text-track-controls/subtitles-button.js';
 import CaptionsButton from './text-track-controls/captions-button.js';
 import PlaybackRateMenuButton from './playback-rate-menu/playback-rate-menu-button.js';
 import CustomControlSpacer from './spacer-controls/custom-control-spacer.js';
+import * as Fn from '../utils/fn.js';
 
 /**
  * Container of main controls
@@ -28,6 +29,13 @@ import CustomControlSpacer from './spacer-controls/custom-control-spacer.js';
  * @class ControlBar
  */
 class ControlBar extends Component {
+  constructor(player, options) {
+    super(player, options); 
+
+    player.on('play', Fn.bind(this, this.handleUserActive));
+    player.on('useractive', Fn.bind(this, this.handleUserActive));
+    player.on('userinactive', Fn.bind(this, this.handleUserInactive));
+  }
 
   /**
    * Create the component's DOM element
@@ -38,7 +46,19 @@ class ControlBar extends Component {
   createEl() {
     return super.createEl('div', {
       className: 'vjs-control-bar'
+    }, {
+      'aria-hidden': 'true'
     });
+  }
+
+  handleUserActive(event) {
+    if (this.player().hasClass('vjs-has-started')) {
+      this.el().setAttribute('aria-hidden', 'false');
+    }
+  }
+
+  handleUserInactive(event) {
+    this.el().setAttribute('aria-hidden', 'true');
   }
 }
 
