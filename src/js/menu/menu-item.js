@@ -1,7 +1,7 @@
 /**
  * @file menu-item.js
  */
-import Button from '../button.js';
+import ClickableComponent from '../clickable-component.js';
 import Component from '../component.js';
 import assign from 'object.assign';
 
@@ -13,7 +13,7 @@ import assign from 'object.assign';
  * @extends Button
  * @class MenuItem
  */
-class MenuItem extends Button {
+class MenuItem extends ClickableComponent {
 
   constructor(player, options) {
     super(player, options);

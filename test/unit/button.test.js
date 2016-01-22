@@ -4,7 +4,7 @@ import TestHelpers from './test-helpers.js';
 q.module('Button');
 
 test('should localize its text', function(){
-  expect(1);
+  expect(2);
 
   var player, testButton, el;
 
@@ -21,5 +21,6 @@ test('should localize its text', function(){
   testButton.controlText_ = 'Play';
   el = testButton.createEl();
 
+  ok(el.nodeName.toLowerCase().match('button'));
   ok(el.innerHTML.match('Juego'));
 });
