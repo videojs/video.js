@@ -2257,7 +2257,7 @@ class Player extends Component {
           this.trigger('useractive');
         } else {
           // if we are focused anywhere in the player, don't go inactive
-          if (player.el().contains(document.activeElement)) {
+          if (this.el().contains(document.activeElement)) {
             return;
           }
 
