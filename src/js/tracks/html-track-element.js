@@ -1,3 +1,7 @@
+/**
+ * @file html-track-element.js
+ */
+
 import * as browser from '../utils/browser.js';
 import document from 'global/document';
 import EventTarget from '../event-target';
