@@ -14,6 +14,6 @@ test('should create a div with role="button"', function(){
   testClickableComponent = new ClickableComponent(player);
   el = testClickableComponent.createEl();
 
-  ok(el.nodeName.toLowerCase().match('div'));
-  ok(el.getAttribute('role').toLowerCase().match('button'));
+  equal(el.nodeName.toLowerCase(), 'div', 'the name of the element is "div"');
+  equal(el.getAttribute('role').toLowerCase(), 'button', 'the role of the element is "button"');
 });

@@ -155,7 +155,7 @@ class ClickableComponent extends Component {
     if (event.which === 32 || event.which === 13) {
       event.preventDefault();
       this.handleClick(event);
-    } else {
+    } else if (super.handleKeyPress) {
       super.handleKeyPress(event); // Pass keypress handling up for unsupported keys
     }
   }
