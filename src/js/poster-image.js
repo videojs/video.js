@@ -1,7 +1,7 @@
 /**
  * @file poster-image.js
  */
-import Button from './button.js';
+import ClickableComponent from './clickable-component.js';
 import Component from './component.js';
 import * as Fn from './utils/fn.js';
 import * as Dom from './utils/dom.js';
@@ -15,7 +15,7 @@ import * as browser from './utils/browser.js';
  * @extends Button
  * @class PosterImage
  */
-class PosterImage extends Button {
+class PosterImage extends ClickableComponent {
 
   constructor(player, options){
     super(player, options);

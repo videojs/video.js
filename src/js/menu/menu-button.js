@@ -1,7 +1,7 @@
 /**
  * @file menu-button.js
  */
-import Button from '../button.js';
+import ClickableComponent from '../clickable-component.js';
 import Component from '../component.js';
 import Menu from './menu.js';
 import * as Dom from '../utils/dom.js';
@@ -16,7 +16,7 @@ import toTitleCase from '../utils/to-title-case.js';
  * @extends Button
  * @class MenuButton
  */
-class MenuButton extends Button {
+class MenuButton extends ClickableComponent {
 
   constructor(player, options={}){
     super(player, options);
@@ -25,7 +25,6 @@ class MenuButton extends Button {
 
     this.on('keydown', this.handleKeyPress);
     this.el_.setAttribute('aria-haspopup', true);
-    this.el_.setAttribute('role', 'button');
   }
 
   /**

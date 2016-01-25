@@ -1,7 +1,6 @@
 /**
  * @file volume-menu-button.js
  */
-import Button from '../button.js';
 import * as Fn from '../utils/fn.js';
 import Component from '../component.js';
 import Menu from '../menu/menu.js';
