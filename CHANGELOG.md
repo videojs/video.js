@@ -11,6 +11,7 @@ CHANGELOG
 * @vitor-faiante updated the guides ([view](https://github.com/videojs/video.js/pull/2781))
 * @aril-spetalen added language support for Norwegian (nb and nn) ([view](https://github.com/videojs/video.js/pull/3021))
 * @CoWinkKeyDinkInc fixed table in Tracks guide. Replaced some single quotes with double quotes ([view](https://github.com/videojs/video.js/pull/2946))
+* @hubdotcom changed URLs in README to be protocol-relative ([view](https://github.com/videojs/video.js/pull/3040))
 
 --------------------
 
