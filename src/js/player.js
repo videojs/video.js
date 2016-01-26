@@ -513,6 +513,7 @@ class Player extends Component {
       'textTracks': this.textTracks_,
       'autoplay': this.options_.autoplay,
       'preload': this.options_.preload,
+      'startparam': this.options_.startparam,
       'loop': this.options_.loop,
       'muted': this.options_.muted,
       'poster': this.poster(),
