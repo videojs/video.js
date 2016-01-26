@@ -10,6 +10,7 @@ CHANGELOG
 * @gkatsev checked muted status when updating volume bar level ([view](https://github.com/videojs/video.js/pull/3037))
 * @vitor-faiante updated the guides ([view](https://github.com/videojs/video.js/pull/2781))
 * @aril-spetalen added language support for Norwegian (nb and nn) ([view](https://github.com/videojs/video.js/pull/3021))
+* @CoWinkKeyDinkInc fixed table in Tracks guide. Replaced some single quotes with double quotes ([view](https://github.com/videojs/video.js/pull/2946))
 
 --------------------
 
