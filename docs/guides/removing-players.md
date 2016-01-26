@@ -8,7 +8,7 @@ Call `.dispose()`
 
 To remove the html associated with your videojs player from the page always call the player's [`dispose()`](http://docs.videojs.com/docs/api/player.html#Methodsdispose) method:
 
-```javascript```
+```js
 var oldPlayer = document.getElementById('my-player');
 videojs(oldPlayer).dispose();
 ```

@@ -8,6 +8,7 @@ CHANGELOG
 * @mister-ben made $primary-foreground-color a !default sass var ([view](https://github.com/videojs/video.js/pull/3003))
 * @OwenEdwards fixed double-localization of mute toggle control text ([view](https://github.com/videojs/video.js/pull/3017))
 * @gkatsev checked muted status when updating volume bar level ([view](https://github.com/videojs/video.js/pull/3037))
+* @vitor-faiante updated the guides ([view](https://github.com/videojs/video.js/pull/2781))
 
 --------------------
 
