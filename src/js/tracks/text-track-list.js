@@ -111,6 +111,7 @@ TextTrackList.prototype.removeTrack_ = function(rtrack) {
   for (let i = 0, l = this.length; i < l; i++) {
     if (this[i] === rtrack) {
       track = this[i];
+      track.off();
 
       this.tracks_.splice(i, 1);
 
