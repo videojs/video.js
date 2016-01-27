@@ -341,10 +341,19 @@ class Player extends Component {
     let privDimension = dimension + '_';
 
     if (value === undefined) {
-      return this[privDimension] || 0;
+      // if attr of width or height is "auto",
+      // return computed width or height for responsiveness
+      let computedWidthOrHeight;
+      if (dimension === 'width') {
+        computedWidthOrHeight = this.el_.offsetWidth;
+      } else {
+        computedWidthOrHeight = this.el_.offsetHeight;
+      }
+
+      return this[privDimension] || computedWidthOrHeight || 0;
     }
 
-    if (value === '') {
+    if (value === '' || value === 'auto') {
       // If an empty string is given, reset the dimension to be automatic
       this[privDimension] = undefined;
     } else {

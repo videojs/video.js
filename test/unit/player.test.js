@@ -196,6 +196,26 @@ test('should use an class name that begins with an alpha character', function(){
   ok(/\s*\.dimensions-1numeric\s*\{/.test(getStyleText(numericPlayer.styleEl_)), 'prepends dimensions- to a numeric player ID');
 });
 
+test('should be able to set auto value to width or height for responsiveness', function(){
+  var tag = TestHelpers.makeTag();
+  var fixture = document.getElementById('qunit-fixture');
+  fixture.appendChild(tag);
+
+  tag.style.width = '100%';
+  tag.style.height = '100%';
+  tag.setAttribute('width', 'auto');
+  tag.setAttribute('height', 'auto');
+
+  var player = TestHelpers.makePlayer({}, tag);
+  var tagWidth = TestHelpers.getComputedStyle(fixture, 'width');
+  var tagHeight = TestHelpers.getComputedStyle(fixture, 'height');
+
+  equal(player.width() + 'px', tagWidth, 'the width property should equal the tag width');
+  equal(player.height() + 'px', tagHeight, 'the height property should equal the tag height');
+
+  player.dispose();
+});
+
 test('should wrap the original tag in the player div', function(){
   var tag = TestHelpers.makeTag();
   var container = document.createElement('div');
