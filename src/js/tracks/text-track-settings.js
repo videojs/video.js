@@ -37,7 +37,7 @@ class TextTrackSettings extends Component {
       this.$('.vjs-bg-color > select').selectedIndex = 0;
       this.$('.window-color > select').selectedIndex = 0;
       this.$('.vjs-text-opacity > select').selectedIndex = 0;
-      this.$('.vjs-bg-opacity > select').selectedIndex = 0;
+      this.$('.vjs-bg-opacity > select').selectedIndex = 1;
       this.$('.vjs-window-opacity > select').selectedIndex = 0;
       this.$('.vjs-edge-style select').selectedIndex = 0;
       this.$('.vjs-font-family select').selectedIndex = 0;
@@ -235,113 +235,112 @@ function setSelectedOption(target, value) {
 
 function captionOptionsMenuTemplate() {
   let template = `<div class="vjs-tracksettings">
-      <div class="vjs-tracksettings-colors">
-        <div class="vjs-fg-color vjs-tracksetting">
-            <label class="vjs-label">Foreground</label>
-            <select>
-              <option value="">---</option>
-              <option value="#FFF">White</option>
-              <option value="#000">Black</option>
-              <option value="#F00">Red</option>
-              <option value="#0F0">Green</option>
-              <option value="#00F">Blue</option>
-              <option value="#FF0">Yellow</option>
-              <option value="#F0F">Magenta</option>
-              <option value="#0FF">Cyan</option>
-            </select>
-            <span class="vjs-text-opacity vjs-opacity">
-              <select>
-                <option value="">---</option>
-                <option value="1">Opaque</option>
-                <option value="0.5">Semi-Opaque</option>
+         <div class="vjs-tracksettings-colors">
+          <fieldset>
+            <legend>Colors</legend>
+            <div class="vjs-fg-color vjs-tracksetting">
+              <label class="vjs-label" for="captions-foreground">Foreground</label>
+              <select id="captions-foreground">
+                <option value="#FFF" selected>White</option>
+                <option value="#000">Black</option>
+                <option value="#F00">Red</option>
+                <option value="#0F0">Green</option>
+                <option value="#00F">Blue</option>
+                <option value="#FF0">Yellow</option>
+                <option value="#F0F">Magenta</option>
+                <option value="#0FF">Cyan</option>
               </select>
-            </span>
-        </div> <!-- vjs-fg-color -->
-        <div class="vjs-bg-color vjs-tracksetting">
-            <label class="vjs-label">Background</label>
-            <select>
-              <option value="">---</option>
-              <option value="#FFF">White</option>
-              <option value="#000">Black</option>
-              <option value="#F00">Red</option>
-              <option value="#0F0">Green</option>
-              <option value="#00F">Blue</option>
-              <option value="#FF0">Yellow</option>
-              <option value="#F0F">Magenta</option>
-              <option value="#0FF">Cyan</option>
-            </select>
-            <span class="vjs-bg-opacity vjs-opacity">
+              <span class="vjs-text-opacity vjs-opacity">
                 <select>
-                  <option value="">---</option>
+                  <option value="1" selected>Opaque</option>
+                  <option value="0.5">Semi-Opaque</option>
+                </select>
+              </span>
+            </div>
+            <div class="vjs-bg-color vjs-tracksetting">
+              <label class="vjs-label" for="captions-background">Background</label>
+              <select id="captions-background">
+                <option value="#000" selected>Black</option>
+                <option value="#FFF">White</option>
+                <option value="#F00">Red</option>
+                <option value="#0F0">Green</option>
+                <option value="#00F">Blue</option>
+                <option value="#FF0">Yellow</option>
+                <option value="#F0F">Magenta</option>
+                <option value="#0FF">Cyan</option>
+              </select>
+              <span class="vjs-bg-opacity vjs-opacity">
+                <select>
                   <option value="1">Opaque</option>
+                  <option value="0.8" selected>80% Opaque</option>
                   <option value="0.5">Semi-Transparent</option>
                   <option value="0">Transparent</option>
                 </select>
-            </span>
-        </div> <!-- vjs-bg-color -->
-        <div class="window-color vjs-tracksetting">
-            <label class="vjs-label">Window</label>
-            <select>
-              <option value="">---</option>
-              <option value="#FFF">White</option>
-              <option value="#000">Black</option>
-              <option value="#F00">Red</option>
-              <option value="#0F0">Green</option>
-              <option value="#00F">Blue</option>
-              <option value="#FF0">Yellow</option>
-              <option value="#F0F">Magenta</option>
-              <option value="#0FF">Cyan</option>
-            </select>
-            <span class="vjs-window-opacity vjs-opacity">
+              </span>
+            </div>
+            <div class="window-color vjs-tracksetting">
+              <label class="vjs-label" for="captions-window">Window</label>
+              <select id="captions-window">
+                <option value="#000" selected>Black</option>
+                <option value="#FFF">White</option>
+                <option value="#F00">Red</option>
+                <option value="#0F0">Green</option>
+                <option value="#00F">Blue</option>
+                <option value="#FF0">Yellow</option>
+                <option value="#F0F">Magenta</option>
+                <option value="#0FF">Cyan</option>
+              </select>
+              <span class="vjs-window-opacity vjs-opacity">
                 <select>
-                  <option value="">---</option>
-                  <option value="1">Opaque</option>
+                  <option value="0" selected>Transparent</option>
                   <option value="0.5">Semi-Transparent</option>
-                  <option value="0">Transparent</option>
+                  <option value="1">Opaque</option>
                 </select>
-            </span>
-        </div> <!-- vjs-window-color -->
-      </div> <!-- vjs-tracksettings -->
-      <div class="vjs-tracksettings-font">
-        <div class="vjs-font-percent vjs-tracksetting">
-          <label class="vjs-label">Font Size</label>
-          <select>
-            <option value="0.50">50%</option>
-            <option value="0.75">75%</option>
-            <option value="1.00" selected>100%</option>
-            <option value="1.25">125%</option>
-            <option value="1.50">150%</option>
-            <option value="1.75">175%</option>
-            <option value="2.00">200%</option>
-            <option value="3.00">300%</option>
-            <option value="4.00">400%</option>
-          </select>
-        </div> <!-- vjs-font-percent -->
-        <div class="vjs-edge-style vjs-tracksetting">
-          <label class="vjs-label">Text Edge Style</label>
-          <select>
-            <option value="none">None</option>
-            <option value="raised">Raised</option>
-            <option value="depressed">Depressed</option>
-            <option value="uniform">Uniform</option>
-            <option value="dropshadow">Dropshadow</option>
-          </select>
-        </div> <!-- vjs-edge-style -->
-        <div class="vjs-font-family vjs-tracksetting">
-          <label class="vjs-label">Font Family</label>
-          <select>
-            <option value="">Default</option>
-            <option value="monospaceSerif">Monospace Serif</option>
-            <option value="proportionalSerif">Proportional Serif</option>
-            <option value="monospaceSansSerif">Monospace Sans-Serif</option>
-            <option value="proportionalSansSerif">Proportional Sans-Serif</option>
-            <option value="casual">Casual</option>
-            <option value="script">Script</option>
-            <option value="small-caps">Small Caps</option>
-          </select>
-        </div> <!-- vjs-font-family -->
-      </div>
-    </div>
+              </span>
+            </div>
+          </fieldset>
+        </div><!-- vjs-tracksettings -->
+        <div class="vjs-tracksettings-font">
+          <fieldset>
+            <legend>Fonts</legend>
+            <div class="vjs-font-percent vjs-tracksetting">
+              <label class="vjs-label" for="captions-font-size">Font Size</label>
+              <select id="captions-font-size">
+                <option value="0.50">50%</option>
+                <option value="0.75">75%</option>
+                <option value="1.00" selected>100%</option>
+                <option value="1.25">125%</option>
+                <option value="1.50">150%</option>
+                <option value="1.75">175%</option>
+                <option value="2.00">200%</option>
+                <option value="3.00">300%</option>
+                <option value="4.00">400%</option>
+              </select>
+            </div> 
+            <div class="vjs-edge-style vjs-tracksetting">
+              <label class="vjs-label" for="captions-edge-style">Text Edge Style</label>
+              <select id="captions-edge-style">
+                <option value="none" selected>None</option>
+                <option value="raised">Raised</option>
+                <option value="depressed">Depressed</option>
+                <option value="uniform">Uniform</option>
+                <option value="dropshadow">Dropshadow</option>
+              </select>        
+            </div>
+            <div class="vjs-font-family vjs-tracksetting">
+              <label class="vjs-label" for="captions-font-family">Font Family</label>
+              <select id="captions-font-family">
+                <option value="proportionalSansSerif" selected>Proportional Sans-Serif</option>
+                <option value="monospaceSansSerif">Monospace Sans-Serif</option>
+                <option value="proportionalSerif">Proportional Serif</option>
+                <option value="monospaceSerif">Monospace Serif</option>
+                <option value="casual">Casual</option>
+                <option value="script">Script</option>
+                <option value="small-caps">Small Caps</option>
+              </select>
+            </div> 
+          </fieldset>
+        </div>
     <div class="vjs-tracksettings-controls">
       <button class="vjs-default-button">Defaults</button>
       <button class="vjs-done-button">Done</button>
