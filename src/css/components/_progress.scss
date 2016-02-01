@@ -93,6 +93,7 @@
   content: attr(data-current-time);
   padding: 6px 8px 8px 8px;
   @include background-color-with-alpha(#fff, 0.8);
+  @include border-radius(0.3em);
 }
 .video-js .vjs-play-progress:before,
 .video-js .vjs-play-progress:after {
