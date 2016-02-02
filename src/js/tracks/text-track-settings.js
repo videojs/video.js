@@ -8,6 +8,21 @@ import log from '../utils/log.js';
 import safeParseTuple from 'safe-json-parse/tuple';
 import window from 'global/window';
 
+const darkGray = '#222';
+const lightGray = '#ccc';
+const fontMap = {
+  monospace:             'monospace',
+  sansSerif:             'sans-serif',
+  serif:                 'serif',
+  monospaceSansSerif:    '"Andale Mono", "Lucida Console", monospace',
+  monospaceSerif:        '"Courier New", monospace',
+  proportionalSansSerif: 'sans-serif',
+  proportionalSerif:     'serif',
+  casual:                '"Comic Sans MS", Impact, fantasy',
+  script:                '"Monotype Corsiva", cursive',
+  smallcaps:             '"Andale Mono", "Lucida Console", monospace, sans-serif'
+};
+
 /**
  * Manipulate settings of texttracks
  *
@@ -201,6 +216,78 @@ class TextTrackSettings extends Component {
     }
   }
 
+
+  /**
+   * Apply textTrackSettings to cues
+   *
+   * @method applyUserSettings
+   */
+  applyUserSettings(cues) {
+
+    let overrides = this.getValues();
+
+    let i = cues.length;
+    while (i--) {
+      let cue = cues[i];
+      if (!cue) {
+        continue;
+      }
+
+      let cueDiv = cue.displayState;
+      if (overrides.color) {
+        cueDiv.firstChild.style.color = overrides.color;
+      }
+      if (overrides.textOpacity) {
+        tryUpdateStyle(cueDiv.firstChild,
+                       'color',
+                       constructColor(overrides.color || '#fff',
+                                      overrides.textOpacity));
+      }
+      if (overrides.backgroundColor) {
+        cueDiv.firstChild.style.backgroundColor = overrides.backgroundColor;
+      }
+      if (overrides.backgroundOpacity) {
+        tryUpdateStyle(cueDiv.firstChild,
+                       'backgroundColor',
+                       constructColor(overrides.backgroundColor || '#000',
+                                      overrides.backgroundOpacity));
+      }
+      if (overrides.windowColor) {
+        if (overrides.windowOpacity) {
+          tryUpdateStyle(cueDiv,
+                         'backgroundColor',
+                         constructColor(overrides.windowColor, overrides.windowOpacity));
+        } else {
+          cueDiv.style.backgroundColor = overrides.windowColor;
+        }
+      }
+      if (overrides.edgeStyle) {
+        if (overrides.edgeStyle === 'dropshadow') {
+          cueDiv.firstChild.style.textShadow = `2px 2px 3px ${darkGray}, 2px 2px 4px ${darkGray}, 2px 2px 5px ${darkGray}`;
+        } else if (overrides.edgeStyle === 'raised') {
+          cueDiv.firstChild.style.textShadow = `1px 1px ${darkGray}, 2px 2px ${darkGray}, 3px 3px ${darkGray}`;
+        } else if (overrides.edgeStyle === 'depressed') {
+          cueDiv.firstChild.style.textShadow = `1px 1px ${lightGray}, 0 1px ${lightGray}, -1px -1px ${darkGray}, 0 -1px ${darkGray}`;
+        } else if (overrides.edgeStyle === 'uniform') {
+          cueDiv.firstChild.style.textShadow = `0 0 4px ${darkGray}, 0 0 4px ${darkGray}, 0 0 4px ${darkGray}, 0 0 4px ${darkGray}`;
+        }
+      }
+      if (overrides.fontPercent && overrides.fontPercent !== 1) {
+        const fontSize = window.parseFloat(cueDiv.style.fontSize);
+        cueDiv.style.fontSize = (fontSize * overrides.fontPercent) + 'px';
+        cueDiv.style.height = 'auto';
+        cueDiv.style.top = 'auto';
+        cueDiv.style.bottom = '2px';
+      }
+      if (overrides.fontFamily && overrides.fontFamily !== 'default') {
+        if (overrides.fontFamily === 'small-caps') {
+          cueDiv.firstChild.style.fontVariant = 'small-caps';
+        } else {
+          cueDiv.firstChild.style.fontFamily = fontMap[overrides.fontFamily];
+        }
+      }
+    }
+  }
 }
 
 Component.registerComponent('TextTrackSettings', TextTrackSettings);
@@ -231,6 +318,39 @@ function setSelectedOption(target, value) {
   }
 
   target.selectedIndex = i;
+}
+
+/**
+* Add cue HTML to display
+*
+* @param {Number} color Hex number for color, like #f0e
+* @param {Number} opacity Value for opacity,0.0 - 1.0
+* @return {RGBAColor} In the form 'rgba(255, 0, 0, 0.3)'
+* @method constructColor
+*/
+function constructColor(color, opacity) {
+  return 'rgba(' +
+    // color looks like "#f0e"
+    parseInt(color[1] + color[1], 16) + ',' +
+    parseInt(color[2] + color[2], 16) + ',' +
+    parseInt(color[3] + color[3], 16) + ',' +
+    opacity + ')';
+}
+
+/**
+ * Try to update style
+ * Some style changes will throw an error, particularly in IE8. Those should be noops.
+ *
+ * @param {Element} el The element to be styles
+ * @param {CSSProperty} style The CSS property to be styled
+ * @param {CSSStyle} rule The actual style to be applied to the property
+ * @method tryUpdateStyle
+ */
+function tryUpdateStyle(el, style, rule) {
+  //
+  try {
+    el.style[style] = rule;
+  } catch (e) {}
 }
 
 function captionOptionsMenuTemplate() {
