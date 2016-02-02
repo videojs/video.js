@@ -55,5 +55,3 @@ To build your own custom version read the section on [contributing code](CONTRIB
 ## License
 
 Video.js is licensed under the Apache License, Version 2.0. [View the license file](LICENSE)
-
-Copyright 2014-2015 Brightcove, Inc.
