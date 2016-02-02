@@ -2,11 +2,7 @@
  * @file text-track-display.js
  */
 import Component from '../component';
-import Menu from '../menu/menu.js';
-import MenuItem from '../menu/menu-item.js';
-import MenuButton from '../menu/menu-button.js';
 import * as Fn from '../utils/fn.js';
-import document from 'global/document';
 import window from 'global/window';
 
 /**
