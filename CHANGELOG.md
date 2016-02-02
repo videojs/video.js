@@ -4,6 +4,7 @@ CHANGELOG
 ## HEAD (Unreleased)
 * @forbesjo updated emulated tracks to have listeners removed when they are removed ([view](https://github.com/videojs/video.js/pull/3046))
 * @incompl improved the UX of time tooltips ([view](https://github.com/videojs/video.js/pull/3060))
+* @gkatsev updated README to include links to plugins page and getting started and cleaner link to LICENSE ([view](https://github.com/videojs/video.js/pull/3066))
 
 --------------------
 

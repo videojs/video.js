@@ -5,7 +5,9 @@
 > Video.js is a web video player built from the ground up for an HTML5 world. It supports HTML5 and Flash video, as well as YouTube and Vimeo (through [plugins](https://github.com/videojs/video.js/wiki/Plugins)). It supports video playback on desktops and mobile devices. This project was started mid 2010, and the player is now used on over ~~50,000~~ ~~100,000~~ 200,000 websites.
 
 ## Quick start
-Thanks to the awesome folks over at [Fastly](http://www.fastly.com/), there's a free, CDN hosted version of Video.js that anyone can use. Simply add these includes to your document's
+Thanks to the awesome folks over at [Fastly](http://www.fastly.com/), there's a free, CDN hosted version of Video.js that anyone can use.
+Also, check out the [Getting Started](http://videojs.com/getting-started/) page on our website which has the latest urls as well.
+Simply add these includes to your document's
 `<head>`:
 
 ```html
@@ -14,7 +16,7 @@ Thanks to the awesome folks over at [Fastly](http://www.fastly.com/), there's a 
 ```
 
 Then, whenever you want to use Video.js you can simply use the `<video>` element as your normally would, but with an additional `data-setup` attribute containing any Video.js options. These options
-can include any Video.js option plus potential [plugin](https://github.com/videojs/video.js/wiki/Plugins) options, just make sure they're valid JSON!
+can include any Video.js option plus potential [plugin](http://videojs.com/plugins/) options, just make sure they're valid JSON!
 
 ```html
 <video id="really-cool-video" class="video-js vjs-default-skin" controls
@@ -55,5 +57,3 @@ To build your own custom version read the section on [contributing code](CONTRIB
 ## License
 
 Video.js is licensed under the Apache License, Version 2.0. [View the license file](LICENSE)
-
-Copyright 2014-2015 Brightcove, Inc.
