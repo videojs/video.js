@@ -1,7 +1,7 @@
 /**
  * @file menu-button.js
  */
-import Button from '../button.js';
+import ClickableComponent from '../clickable-component.js';
 import Component from '../component.js';
 import Menu from './menu.js';
 import * as Dom from '../utils/dom.js';
@@ -16,16 +16,16 @@ import toTitleCase from '../utils/to-title-case.js';
  * @extends Button
  * @class MenuButton
  */
-class MenuButton extends Button {
+class MenuButton extends ClickableComponent {
 
   constructor(player, options={}){
     super(player, options);
 
     this.update();
 
-    this.on('keydown', this.handleKeyPress);
     this.el_.setAttribute('aria-haspopup', true);
-    this.el_.setAttribute('role', 'button');
+    this.el_.setAttribute('role', 'menuitem');
+    this.on('keydown', this.handleSubmenuKeyPress);
   }
 
   /**
@@ -50,6 +50,7 @@ class MenuButton extends Button {
      * @private
      */
     this.buttonPressed_ = false;
+    this.el_.setAttribute('aria-expanded', false);
 
     if (this.items && this.items.length === 0) {
       this.hide();
@@ -127,27 +128,6 @@ class MenuButton extends Button {
   }
 
   /**
-   * Focus - Add keyboard functionality to element
-   * This function is not needed anymore. Instead, the
-   * keyboard functionality is handled by
-   * treating the button as triggering a submenu.
-   * When the button is pressed, the submenu
-   * appears. Pressing the button again makes
-   * the submenu disappear.
-   *
-   * @method handleFocus
-   */
-  handleFocus() {}
-
-  /**
-   * Can't turn off list display that we turned
-   * on with focus, because list would go away.
-   *
-   * @method handleBlur
-   */
-  handleBlur() {}
-
-  /**
    * When you click the button it adds focus, which
    * will show the menu indefinitely.
    * So we'll remove focus when the mouse leaves the button.
@@ -171,25 +151,48 @@ class MenuButton extends Button {
   /**
    * Handle key press on menu
    *
-   * @param {Object} Key press event
+   * @param {Object} event Key press event
    * @method handleKeyPress
    */
   handleKeyPress(event) {
 
-    // Check for space bar (32) or enter (13) keys
-    if (event.which === 32 || event.which === 13) {
-      if (this.buttonPressed_){
+    // Escape (27) key or Tab (9) key unpress the 'button'
+    if (event.which === 27 || event.which === 9) {
+      if (this.buttonPressed_) {
         this.unpressButton();
-      } else {
+      }
+      // Don't preventDefault for Tab key - we still want to lose focus
+      if (event.which !== 9) {
+        event.preventDefault();
+      }
+    // Up (38) key or Down (40) key press the 'button'
+    } else if (event.which === 38 || event.which === 40) {
+      if (!this.buttonPressed_) {
         this.pressButton();
+        event.preventDefault();
       }
-      event.preventDefault();
-    // Check for escape (27) key
-    } else if (event.which === 27){
+    } else {
+      super.handleKeyPress(event);
+    }
+  }
+
+  /**
+   * Handle key press on submenu
+   *
+   * @param {Object} event Key press event
+   * @method handleSubmenuKeyPress
+   */
+  handleSubmenuKeyPress(event) {
+
+    // Escape (27) key or Tab (9) key unpress the 'button'
+    if (event.which === 27 || event.which === 9){
       if (this.buttonPressed_){
         this.unpressButton();
       }
-      event.preventDefault();
+      // Don't preventDefault for Tab key - we still want to lose focus
+      if (event.which !== 9) {
+        event.preventDefault();
+      }
     }
   }
 
@@ -201,10 +204,8 @@ class MenuButton extends Button {
   pressButton() {
     this.buttonPressed_ = true;
     this.menu.lockShowing();
-    this.el_.setAttribute('aria-pressed', true);
-    if (this.items && this.items.length > 0) {
-      this.items[0].el().focus(); // set the focus to the title of the submenu
-    }
+    this.el_.setAttribute('aria-expanded', true);
+    this.menu.focus(); // set the focus into the submenu
   }
 
   /**
@@ -215,7 +216,8 @@ class MenuButton extends Button {
   unpressButton() {
     this.buttonPressed_ = false;
     this.menu.unlockShowing();
-    this.el_.setAttribute('aria-pressed', false);
+    this.el_.setAttribute('aria-expanded', false);
+    this.el_.focus(); // Set focus back to this menu button
   }
 }
 

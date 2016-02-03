@@ -25,6 +25,9 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
       'mode': 'disabled'
     };
 
+    // MenuItem is selectable
+    options['selectable'] = true;
+
     super(player, options);
     this.selected(true);
   }

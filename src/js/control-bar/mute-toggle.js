@@ -76,9 +76,8 @@ class MuteToggle extends Button {
     // This causes unnecessary and confusing information for screen reader users.
     // This check is needed because this function gets called every time the volume level is changed.
     let toMute = this.player_.muted() ? 'Unmute' : 'Mute';
-    let localizedMute = this.localize(toMute);
-    if (this.controlText() !== localizedMute) {
-      this.controlText(localizedMute);
+    if (this.controlText() !== toMute) {
+      this.controlText(toMute);
     }
 
     /* TODO improve muted icon classes */

@@ -6,13 +6,16 @@ var noop = Function.prototype;
 var genericTracks = [
   {
     id: '1',
-    addEventListener: noop
+    addEventListener: noop,
+    off: noop
   }, {
     id: '2',
-    addEventListener: noop
+    addEventListener: noop,
+    off: noop
   }, {
     id: '3',
-    addEventListener: noop
+    addEventListener: noop,
+    off: noop
   }
 ];
 
@@ -36,9 +39,9 @@ test('can get text tracks by id', function() {
 test('length is updated when new tracks are added or removed', function() {
   var ttl = new TextTrackList(genericTracks);
 
-  ttl.addTrack_({id: '100', addEventListener: noop});
+  ttl.addTrack_({id: '100', addEventListener: noop, off: noop});
   equal(ttl.length, genericTracks.length + 1, 'the length is ' + (genericTracks.length + 1));
-  ttl.addTrack_({id: '101', addEventListener: noop});
+  ttl.addTrack_({id: '101', addEventListener: noop, off: noop});
   equal(ttl.length, genericTracks.length + 2, 'the length is ' + (genericTracks.length + 2));
 
   ttl.removeTrack_(ttl.getTrackById('101'));
@@ -71,8 +74,8 @@ test('can access new items by index', function() {
 test('cannot access removed items by index', function() {
   var ttl = new TextTrackList(genericTracks);
 
-  ttl.addTrack_({id: '100', addEventListener: noop});
-  ttl.addTrack_({id: '101', addEventListener: noop});
+  ttl.addTrack_({id: '100', addEventListener: noop, off: noop});
+  ttl.addTrack_({id: '101', addEventListener: noop, off: noop});
   equal(ttl[3].id, '100', 'id of item at index 3 is 100');
   equal(ttl[4].id, '101', 'id of item at index 4 is 101');
 
@@ -86,7 +89,7 @@ test('cannot access removed items by index', function() {
 test('new item available at old index', function() {
   var ttl = new TextTrackList(genericTracks);
 
-  ttl.addTrack_({id: '100', addEventListener: noop});
+  ttl.addTrack_({id: '100', addEventListener: noop, off: noop});
   equal(ttl[3].id, '100', 'id of item at index 3 is 100');
 
   ttl.removeTrack_(ttl.getTrackById('100'));

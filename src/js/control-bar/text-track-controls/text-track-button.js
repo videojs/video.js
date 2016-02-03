@@ -57,6 +57,8 @@ class TextTrackButton extends MenuButton {
       // only add tracks that are of the appropriate kind and have a label
       if (track['kind'] === this.kind_) {
         items.push(new TextTrackMenuItem(this.player_, {
+          // MenuItem is selectable
+          'selectable': true,
           'track': track
         }));
       }

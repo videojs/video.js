@@ -18,6 +18,8 @@ You can download the Video.js source and host it on your own servers, or use the
 <script src="//vjs.zencdn.net/5.4.6/video.min.js"></script>
 ```
 
+Alternatively you can always [go here](http://videojs.com/getting-started/) to get the latest URL for videojs CDN.
+
 We include a stripped down Google Analytics pixel that tracks a random percentage (currently 1%) of players loaded from the CDN. This allows us to see (roughly) what browsers are in use in the wild, along with other useful metrics such as OS and device. If you'd like to disable analytics, you can simply include the following global **before** including Video.js:
 
 ```js
@@ -70,9 +72,9 @@ Otherwise include/exclude attributes, settings, sources, and tracks exactly as y
   controls preload="auto" width="640" height="264"
   poster="http://video-js.zencoder.com/oceans-clip.png"
   data-setup='{"example_option":true}'>
- <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' />
- <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />
- <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />
+ <source src="http://video-js.zencoder.com/oceans-clip.mp4" type="video/mp4" />
+ <source src="http://video-js.zencoder.com/oceans-clip.webm" type="video/webm" />
+ <source src="http://video-js.zencoder.com/oceans-clip.ogv" type="video/ogg" />
  <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
 </video>
 ```

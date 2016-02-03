@@ -86,12 +86,12 @@
 .video-js .vjs-play-progress:after {
   display: none;
   position: absolute;
-  top: -2.4em;
+  top: -3.4em;
   right: -1.5em;
   font-size: 0.9em;
   color: #000;
   content: attr(data-current-time);
-  padding: 0.2em 0.5em;
+  padding: 6px 8px 8px 8px;
   @include background-color-with-alpha(#fff, 0.8);
   @include border-radius(0.3em);
 }
