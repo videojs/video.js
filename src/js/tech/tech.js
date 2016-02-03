@@ -193,16 +193,16 @@ class Tech extends Component {
    * @method trackCurrentTime
    */
   trackCurrentTime() {
-    this.manualTimeUpdatesActive = true;
-    this.manualTimeUpdateTicker();
+    this.manualTimeUpdatesActive_ = true;
+    this.manualTimeUpdateTicker_();
   }
 
   /**
    * Trigger timeupdate event if not supported by browser
    *
-   * @method manualTimeUpdateTicker
+   * @method manualTimeUpdateTicker_
    */
-  manualTimeUpdateTicker() {
+  manualTimeUpdateTicker_() {
     let requestAnimationFrame =
         window.requestAnimationFrame ||
         window.webkitRequestAnimationFrame ||
@@ -212,8 +212,8 @@ class Tech extends Component {
         };
 
     this.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true });
-    if(this.manualTimeUpdatesActive){
-      requestAnimationFrame(Fn.bind(this, this.manualTimeUpdateTicker));
+    if(this.manualTimeUpdatesActive_) {
+      requestAnimationFrame(Fn.bind(this, this.manualTimeUpdateTicker_));
     }
   }
 
@@ -223,7 +223,7 @@ class Tech extends Component {
    * @method stopTrackingCurrentTime
    */
   stopTrackingCurrentTime() {
-    this.manualTimeUpdatesActive = false;
+    this.manualTimeUpdatesActive_ = false;
   }
 
   /**
