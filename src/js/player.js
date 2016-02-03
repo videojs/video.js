@@ -301,17 +301,11 @@ class Player extends Component {
       tag.parentNode.insertBefore(el, tag);
     }
 
-    // using insertElFirst will cause the video element to move to the last child of the player div
-    //Dom.insertElFirst(tag, el); // Breaks iPhone, fixed in HTML5 setup.
-
-    // append the DOM el function to make use of our component.addChild method
-    // to properly be injected into the children Array
-    tag.el = function () {
-      return this;
-    };
-
-    // use our own method to ensure our tag is the first child
-    this.addChild(tag, {}, 0);
+    // insert the tag as the first child of the player element
+    // then manually add it to the children array so that this.addChild
+    // will work properly for other components
+    Dom.insertElFirst(tag, el); // Breaks iPhone, fixed in HTML5 setup.
+    this.children_.unshift(tag);
 
     this.el_ = el;
 
