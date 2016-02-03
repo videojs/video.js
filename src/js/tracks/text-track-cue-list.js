@@ -58,6 +58,10 @@ TextTrackCueList.prototype.setCues_ = function(cues) {
   this.length_ = this.cues_.length;
 };
 
+/**
+ * Reset all optimization and rebuild quickCues
+ * @private
+ */
 TextTrackCueList.prototype.optimizeAllCues_ = function() {
   let cues = this.cues_;
   this.quickCues_ = [];
@@ -67,11 +71,22 @@ TextTrackCueList.prototype.optimizeAllCues_ = function() {
   }
 };
 
-TextTrackCueList.prototype.optimizeCue_ = function(cue){
-  if(this.optimized_){
-    for (let j = cue['startTime']; j < cue['endTime'] + 100; j += 100) {
-      this.quickCues_[j / 100 | 0] = this.quickCues_[j / 100 | 0] || [];
-      this.quickCues_[j / 100 | 0].push(cue);
+/**
+ * Optimize lookup time of a cue by separating cues into groups of 100 seconds
+ * quickCues_[n] will contains every cues that should be visible
+ * between 100*n seconds and 100*(n+1) seconds
+ * @param cue to be optimized
+ * @private
+ */
+TextTrackCueList.prototype.optimizeCue_ = function(cue) {
+  if(this.optimized_) {
+    // Find every quickCue group the cue should be in.
+    // Start with appearance time and goes 100 by 100 until disappearance time + 100
+    for (let cueTime = cue['startTime']; cueTime < cue['endTime'] + 100; cueTime += 100) {
+      // Calculation of current group of time
+      let group = cueTime / 100 | 0;
+      this.quickCues_[group] = this.quickCues_[group] || [];
+      this.quickCues_[group].push(cue);
     }
   }
 };
@@ -126,7 +141,7 @@ TextTrackCueList.prototype.getActiveCuesByTime = function(time) {
       active.push(cue);
     }
 
-    if (cue['startTime'] > time){
+    if (cue['startTime'] > time) {
       break;
     }
   }
