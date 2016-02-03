@@ -6,6 +6,7 @@ CHANGELOG
 * @incompl improved the UX of time tooltips ([view](https://github.com/videojs/video.js/pull/3060))
 * @gkatsev updated README to include links to plugins page and getting started and cleaner link to LICENSE ([view](https://github.com/videojs/video.js/pull/3066))
 * @hartman Corrected adaptive layout selectors to match their intent ([view](https://github.com/videojs/video.js/pull/2923))
+* @mister-ben updated Umuted to Unmute in lang files ([view](https://github.com/videojs/video.js/pull/3053))
 
 --------------------
 
