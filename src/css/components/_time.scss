@@ -2,6 +2,10 @@
   @include flex(none);
   font-size: 1em;
   line-height: 3em;
+  min-width: 2em;
+  width: auto;
+  padding-left: 1em;
+  padding-right: 1em;
 }
 
 .vjs-live .vjs-time-control {
