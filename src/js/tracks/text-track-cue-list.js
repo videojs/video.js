@@ -118,6 +118,7 @@ TextTrackCueList.prototype.removeCue_ = function(removeCue) {
     if (cue === removeCue) {
       this.cues_.splice(i, 1);
       removed = true;
+      break;
     }
   }
 
@@ -129,20 +130,26 @@ TextTrackCueList.prototype.removeCue_ = function(removeCue) {
   }
 };
 
-TextTrackCueList.prototype.getActiveCuesByTime = function(time) {
-  let cues = this.quickCues_[time/100|0]||[];
+/**
+ * Return array of active cues at given time from optimized storage of cues.
+ * @param time
+ * @returns {Array}
+ * @private
+ */
+TextTrackCueList.prototype.getActiveCuesByTime_ = function(time) {
+  let group = time/100|0;
+  // Doesn't check for every cues but only the ones appearing around time
+  let cues = this.quickCues_[group]||[];
   let active = [];
 
   for (let i = 0, l = cues.length; i < l; i++) {
     let cue = cues[i];
+    // Accept standard cues that are visible at given time
+    // Also accept malformed cue with same startTime and endTime
     if (cue['startTime'] <= time && cue['endTime'] >= time) {
       active.push(cue);
     } else if (cue['startTime'] === cue['endTime'] && cue['startTime'] <= time && cue['startTime'] + 0.5 >= time) {
       active.push(cue);
-    }
-
-    if (cue['startTime'] > time) {
-      break;
     }
   }
 

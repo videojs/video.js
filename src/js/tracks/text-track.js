@@ -147,7 +147,7 @@ let TextTrack = function(options={}) {
       }
 
       let ct = this.tech_.currentTime();
-      let active = this.cues.getActiveCuesByTime(ct);
+      let active = this.cues.getActiveCuesByTime_(ct);
 
       changed = false;
 
