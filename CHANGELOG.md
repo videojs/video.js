@@ -10,6 +10,7 @@ CHANGELOG
 * @hartman updated fullscreen and time controls for more consistent widths ([view](https://github.com/videojs/video.js/pull/2893))
 * @hartman Set a min-width for the progress slider of 4em ([view](https://github.com/videojs/video.js/pull/2902))
 * @misteroneill fixed iphone useragent detection ([view](https://github.com/videojs/video.js/pull/3077))
+* @erikyuzwa added ability to add child component at specific index ([view](https://github.com/videojs/video.js/pull/2540))
 
 --------------------
 

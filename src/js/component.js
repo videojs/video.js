@@ -336,10 +336,11 @@ class Component {
    *
    * @param {String|Component} child The class name or instance of a child to add
    * @param {Object=} options Options, including options to be passed to children of the child.
+   * @param {Number} index into our children array to attempt to add the child
    * @return {Component} The child component (created by this process if a string was used)
    * @method addChild
    */
-  addChild(child, options={}) {
+  addChild(child, options={}, index=this.children_.length) {
     let component;
     let componentName;
 
@@ -388,7 +389,7 @@ class Component {
       component = child;
     }
 
-    this.children_.push(component);
+    this.children_.splice(index, 0, component);
 
     if (typeof component.id === 'function') {
       this.childIndex_[component.id()] = component;
@@ -405,7 +406,9 @@ class Component {
     // Add the UI object's element to the container div (box)
     // Having an element is not required
     if (typeof component.el === 'function' && component.el()) {
-      this.contentEl().appendChild(component.el());
+      let childNodes = this.contentEl().children;
+      let refNode = childNodes[index] || null;
+      this.contentEl().insertBefore(component.el(), refNode);
     }
 
     // Return so it can stored on parent object if desired.
