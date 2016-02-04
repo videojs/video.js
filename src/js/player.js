@@ -1400,7 +1400,24 @@ class Player extends Component {
       this.cache_.duration = seconds;
 
       if (seconds === Infinity) {
-        this.addClass('vjs-live');
+        // On Android Chrome, duration of VOD HLS remains Infinity until
+        // after playback has begun (and after hasStarted()).
+        if (browser.IS_ANDROID && browser.IS_CHROME) {
+          let checkDuration = function () {
+            if (this.currentTime() > 0) {
+              if (this.duration() === Infinity) {
+                this.addClass('vjs-live');
+              } else {
+                this.removeClass('vjs-live');
+              }
+              this.off('timeupdate', checkDuration);
+            }
+          };
+
+          this.on('timeupdate', checkDuration);
+        } else {
+          this.addClass('vjs-live');
+        }
       } else {
         this.removeClass('vjs-live');
       }
