@@ -2,6 +2,11 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 5.7.0 (2016-02-04)
 * @forbesjo updated emulated tracks to have listeners removed when they are removed ([view](https://github.com/videojs/video.js/pull/3046))
 * @incompl improved the UX of time tooltips ([view](https://github.com/videojs/video.js/pull/3060))
 * @gkatsev updated README to include links to plugins page and getting started and cleaner link to LICENSE ([view](https://github.com/videojs/video.js/pull/3066))
@@ -11,8 +16,6 @@ CHANGELOG
 * @hartman Set a min-width for the progress slider of 4em ([view](https://github.com/videojs/video.js/pull/2902))
 * @misteroneill fixed iphone useragent detection ([view](https://github.com/videojs/video.js/pull/3077))
 * @erikyuzwa added ability to add child component at specific index ([view](https://github.com/videojs/video.js/pull/2540))
-
---------------------
 
 ## 5.6.0 (2016-01-26)
 * @OwenEdwards added ClickableComponent. Fixed keyboard operation of buttons ([view](https://github.com/videojs/video.js/pull/3032))
