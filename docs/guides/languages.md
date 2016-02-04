@@ -28,6 +28,7 @@ Video.js uses key/value object dictionaries in JSON form. A sample dictionary fo
   "Captions": "Subtítulos especiales",
   "captions off": "Subtítulos especiales desactivados",
   "Chapters": "Capítulos",
+  "Close Dialog": "Cerca de diálogo",
   "You aborted the video playback": "Ha interrumpido la reproducción del vídeo.",
   "A network error caused the video download to fail part-way.": "Un error de red ha interrumpido la descarga del vídeo.",
   "The video could not be loaded, either because the server or network failed or because the format is not supported.": "No se ha podido cargar el vídeo debido a un fallo de red o del servidor o porque el formato es incompatible.",
