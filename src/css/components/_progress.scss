@@ -15,6 +15,7 @@
 .video-js .vjs-progress-control {
   @include flex(auto);
   @include display-flex(center);
+  min-width: 4em;
 }
 
 .vjs-live .vjs-progress-control {
