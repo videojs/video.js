@@ -5,7 +5,11 @@ Multiple language support allows for users of non-English locales to natively in
 
 Creating the Language File
 --------------------------
-Video.js uses key/value object dictionaries in JSON form. A sample dictionary for Spanish `['es']` would look as follows;
+Video.js uses key/value object dictionaries in JSON form.
+
+An English lang file is at [/lang/en.json](https://github.com/videojs/video.js/tree/master/lang/en.json) which should be used as a template for new files. This will be kept up to date with strings in the core player that need localizations.
+
+A sample dictionary for Spanish `['es']` would look as follows:
 
 ```JSON
 {
@@ -38,7 +42,7 @@ Video.js uses key/value object dictionaries in JSON form. A sample dictionary fo
 
 Notes:
 
-- The file name should always be in the format `XX.json`, where `XX` is the two letter value of the language reported to the browser (for options see the bottom of this document).
+- The file name should always be in the format `XX.json`, where `XX` is the language code. This should be a two letter code (for options see the bottom of this document) except for cases where a more specific code with sub-code is appropriate, e.g. `zh-CN.lang`.
 - For automatic inclusion at build time, add your language file to the `/lang` directory (see 'Adding Languages to Video.js below').
 
 Adding Languages to Video.js
