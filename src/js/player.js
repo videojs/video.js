@@ -286,10 +286,12 @@ class Player extends Component {
     // Add a style element in the player that we'll use to set the width/height
     // of the player in a way that's still overrideable by CSS, just like the
     // video element
-    this.styleEl_ = stylesheet.createStyleElement('vjs-styles-dimensions');
-    let defaultsStyleEl = Dom.$('.vjs-styles-defaults');
-    let head = Dom.$('head');
-    head.insertBefore(this.styleEl_, defaultsStyleEl ? defaultsStyleEl.nextSibling : head.firstChild);
+    if (window.VIDEOJS_NO_BASE_THEME !== true) {
+      this.styleEl_ = stylesheet.createStyleElement('vjs-styles-dimensions');
+      let defaultsStyleEl = Dom.$('.vjs-styles-defaults');
+      let head = Dom.$('head');
+      head.insertBefore(this.styleEl_, defaultsStyleEl ? defaultsStyleEl.nextSibling : head.firstChild);
+    }
 
     // Pass in the width/height/aspectRatio options which will update the style el
     this.width(this.options_.width);
@@ -423,6 +425,10 @@ class Player extends Component {
    * @method updateStyleEl_
    */
   updateStyleEl_() {
+    if (window.VIDEOJS_NO_BASE_THEME === true) {
+      return;
+    }
+
     let width;
     let height;
     let aspectRatio;

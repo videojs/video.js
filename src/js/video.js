@@ -1,6 +1,7 @@
 /**
  * @file video.js
  */
+import window from 'global/window';
 import document from 'global/document';
 import * as setup from './setup';
 import * as stylesheet from './utils/stylesheet.js';
@@ -99,21 +100,23 @@ let videojs = function(id, options, ready){
 };
 
 // Add default styles
-let style = Dom.$('.vjs-styles-defaults');
-if (!style) {
-  style = stylesheet.createStyleElement('vjs-styles-defaults');
-  let head = Dom.$('head');
-  head.insertBefore(style, head.firstChild);
-  stylesheet.setTextContent(style, `
-    .video-js {
-      width: 300px;
-      height: 150px;
-    }
+if (window.VIDEOJS_NO_BASE_THEME !== true) {
+  let style = Dom.$('.vjs-styles-defaults');
+  if (!style) {
+    style = stylesheet.createStyleElement('vjs-styles-defaults');
+    let head = Dom.$('head');
+    head.insertBefore(style, head.firstChild);
+    stylesheet.setTextContent(style, `
+      .video-js {
+        width: 300px;
+        height: 150px;
+      }
 
-    .vjs-fluid {
-      padding-top: 56.25%
-    }
-  `);
+      .vjs-fluid {
+        padding-top: 56.25%
+      }
+    `);
+  }
 }
 
 // Run Auto-load players
