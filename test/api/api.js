@@ -188,6 +188,7 @@ test('should export useful components to the public', function () {
   ok(videojs.getComponent('TextTrackButton'), 'TextTrackButton should be public');
   ok(videojs.getComponent('CaptionsButton'), 'CaptionsButton should be public');
   ok(videojs.getComponent('SubtitlesButton'), 'SubtitlesButton should be public');
+  ok(videojs.getComponent('DescriptionsButton'), 'DescriptionsButton should be public');
   ok(videojs.getComponent('ChaptersButton'), 'ChaptersButton should be public');
   ok(videojs.getComponent('ChaptersTrackMenuItem'), 'ChaptersTrackMenuItem should be public');
 

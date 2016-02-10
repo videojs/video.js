@@ -16,6 +16,7 @@ import VolumeControl from './volume-control/volume-control.js';
 import VolumeMenuButton from './volume-menu-button.js';
 import MuteToggle from './mute-toggle.js';
 import ChaptersButton from './text-track-controls/chapters-button.js';
+import DescriptionsButton from './text-track-controls/descriptions-button.js';
 import SubtitlesButton from './text-track-controls/subtitles-button.js';
 import CaptionsButton from './text-track-controls/captions-button.js';
 import PlaybackRateMenuButton from './playback-rate-menu/playback-rate-menu-button.js';
@@ -58,6 +59,7 @@ ControlBar.prototype.options_ = {
     'customControlSpacer',
     'playbackRateMenuButton',
     'chaptersButton',
+    'descriptionsButton',
     'subtitlesButton',
     'captionsButton',
     'fullscreenToggle'

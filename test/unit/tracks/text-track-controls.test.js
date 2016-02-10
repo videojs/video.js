@@ -110,6 +110,74 @@ test('menu should update with removeRemoteTextTrack', function() {
   player.dispose();
 });
 
+var descriptionstrack = {
+  kind: 'descriptions',
+  label: 'desc'
+};
+
+test('descriptions should be displayed when text tracks list is not empty', function() {
+  let player = TestHelpers.makePlayer({
+    tracks: [descriptionstrack]
+  });
+
+  this.clock.tick(1000);
+
+  ok(!player.controlBar.descriptionsButton.hasClass('vjs-hidden'), 'descriptions control is displayed');
+  equal(player.textTracks().length, 1, 'textTracks contains one item');
+
+  player.dispose();
+});
+
+test('descriptions should be displayed when a text track is added to an empty track list', function() {
+  var player = TestHelpers.makePlayer();
+
+  player.addRemoteTextTrack(descriptionstrack);
+
+  ok(!player.controlBar.descriptionsButton.hasClass('vjs-hidden'), 'control is displayed');
+  equal(player.textTracks().length, 1, 'textTracks contains one item');
+
+  player.dispose();
+});
+
+test('descriptions should not be displayed when text tracks list is empty', function() {
+  var player = TestHelpers.makePlayer();
+
+  ok(player.controlBar.descriptionsButton.hasClass('vjs-hidden'), 'control is not displayed');
+  equal(player.textTracks().length, 0, 'textTracks is empty');
+
+  player.dispose();
+});
+
+test('descriptions should not be displayed when last text track is removed', function() {
+  var player = TestHelpers.makePlayer({
+    tracks: [descriptionstrack]
+  });
+
+  player.removeRemoteTextTrack(player.textTracks()[0]);
+
+  ok(player.controlBar.descriptionsButton.hasClass('vjs-hidden'), 'control is not displayed');
+  equal(player.textTracks().length, 0, 'textTracks is empty');
+
+  player.dispose();
+});
+
+test('descriptions menu should contain "Off" and one track', function() {
+  var player = TestHelpers.makePlayer({
+      tracks: [descriptionstrack]
+    }),
+    menuItems;
+
+  this.clock.tick(1000);
+
+  menuItems = player.controlBar.descriptionsButton.items;
+
+  equal(menuItems.length, 2, 'descriptions menu contains two items');
+  equal(menuItems[0].track.label, 'descriptions off', 'menu contains "descriptions off"');
+  equal(menuItems[1].track.label, 'desc', 'menu contains "desc" track');
+
+  player.dispose();
+});
+
 if (!browser.IS_IE8) {
   // This test doesn't work on IE8.
   // However, this test tests a specific with iOS7 where the TextTrackList doesn't report track mode changes.
