@@ -951,3 +951,29 @@ test('Remove waiting class on timeupdate after tech waiting', function() {
   player.trigger('timeupdate');
   ok(!/vjs-waiting/.test(player.el().className), 'vjs-waiting is removed from the player el on timeupdate');
 });
+
+test('Make sure that player\'s style el respects VIDEOJS_NO_BASE_THEME option', function() {
+  // clear the HEAD before running this test
+  let styles = document.querySelectorAll('style');
+  let i = styles.length;
+  while (i--) {
+    let style = styles[i];
+    style.parentNode.removeChild(style);
+  }
+
+  let tag = TestHelpers.makeTag();
+  tag.id = 'vjs-no-base-theme-tag';
+  tag.width = 600;
+  tag.height = 300;
+
+  window.VIDEOJS_NO_BASE_THEME = true;
+  let player = TestHelpers.makePlayer({}, tag);
+  styles = document.querySelectorAll('style');
+  equal(styles.length, 0, 'we should not get any style elements included in the DOM');
+
+  window.VIDEOJS_NO_BASE_THEME = false;
+  player = TestHelpers.makePlayer({}, tag);
+  styles = document.querySelectorAll('style');
+  equal(styles.length, 1, 'we should have one style element in the DOM');
+  equal(styles[0].className, 'vjs-styles-dimensions', 'the class name is the one we expected');
+});
