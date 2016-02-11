@@ -149,6 +149,10 @@ module.exports = function(grunt) {
     },
     dist: {},
     watch: {
+      minify: {
+        files: ['build/temp/video.js'],
+        tasks: ['uglify']
+      },
       skin: {
         files: ['src/css/**/*'],
         tasks: ['sass', 'wrapcodepoints']
