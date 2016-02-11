@@ -38,7 +38,7 @@ function TextTrackCueList (cues) {
   if (browser.IS_IE8) {
     return list;
   }
-};
+}
 
 TextTrackCueList.prototype.setCues_ = function(cues) {
   let oldLength = this.length || 0;

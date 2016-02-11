@@ -188,7 +188,7 @@ function TextTrack (options={}) {
   if (browser.IS_IE8) {
     return tt;
   }
-};
+}
 
 TextTrack.prototype = Object.create(EventTarget.prototype);
 TextTrack.prototype.constructor = TextTrack;

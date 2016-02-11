@@ -48,7 +48,7 @@ function TextTrackList (tracks) {
   if (browser.IS_IE8) {
     return list;
   }
-};
+}
 
 TextTrackList.prototype = Object.create(EventTarget.prototype);
 TextTrackList.prototype.constructor = TextTrackList;
