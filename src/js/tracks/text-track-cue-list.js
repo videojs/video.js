@@ -14,7 +14,7 @@ import document from 'global/document';
  * };
  */
 
-let TextTrackCueList = function(cues) {
+function TextTrackCueList (cues) {
   let list = this;
 
   if (browser.IS_IE8) {

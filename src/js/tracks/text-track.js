@@ -35,7 +35,7 @@ import XHR from 'xhr';
  *   attribute EventHandler oncuechange;
  * };
  */
-let TextTrack = function(options={}) {
+function TextTrack (options={}) {
   if (!options.tech) {
     throw new Error('A tech was not provided.');
   }
