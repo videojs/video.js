@@ -396,7 +396,7 @@ module.exports = function(grunt) {
         options: {
           separator: '\n',
         },
-        src: ['build/temp/video.js', 'node_modules/vtt.js/dist/vtt.js'],
+        src: ['build/temp/video.js', 'node_modules/videojs-vtt.js/dist/vtt.js'],
         dest: 'build/temp/video.js',
       },
     },
