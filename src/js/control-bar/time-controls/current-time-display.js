@@ -55,7 +55,7 @@ class CurrentTimeDisplay extends Component {
     let time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
     let localizedText = this.localize('Current Time');
     let formattedTime = formatTime(time, this.player_.duration());
-    if(formattedTime !== this.formattedTime_){
+    if (formattedTime !== this.formattedTime_) {
       this.formattedTime_ = formattedTime;
       this.contentEl_.innerHTML = `<span class="vjs-control-text">${localizedText}</span> ${formattedTime}`;
     }
