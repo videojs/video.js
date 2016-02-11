@@ -14,7 +14,7 @@ import document from 'global/document';
  * };
  */
 
-let TextTrackCueList = function(cues) {
+function TextTrackCueList (cues) {
   let list = this;
 
   if (browser.IS_IE8) {
@@ -38,7 +38,7 @@ let TextTrackCueList = function(cues) {
   if (browser.IS_IE8) {
     return list;
   }
-};
+}
 
 TextTrackCueList.prototype.setCues_ = function(cues) {
   let oldLength = this.length || 0;

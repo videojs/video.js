@@ -19,7 +19,7 @@ import document from 'global/document';
  *   attribute EventHandler onremovetrack;
  * };
  */
-let TextTrackList = function(tracks) {
+function TextTrackList (tracks) {
   let list = this;
 
   if (browser.IS_IE8) {
@@ -48,7 +48,7 @@ let TextTrackList = function(tracks) {
   if (browser.IS_IE8) {
     return list;
   }
-};
+}
 
 TextTrackList.prototype = Object.create(EventTarget.prototype);
 TextTrackList.prototype.constructor = TextTrackList;

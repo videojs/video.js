@@ -35,7 +35,7 @@ import XHR from 'xhr';
  *   attribute EventHandler oncuechange;
  * };
  */
-let TextTrack = function(options={}) {
+function TextTrack (options={}) {
   if (!options.tech) {
     throw new Error('A tech was not provided.');
   }
@@ -188,7 +188,7 @@ let TextTrack = function(options={}) {
   if (browser.IS_IE8) {
     return tt;
   }
-};
+}
 
 TextTrack.prototype = Object.create(EventTarget.prototype);
 TextTrack.prototype.constructor = TextTrack;
