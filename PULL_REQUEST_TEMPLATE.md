@@ -12,5 +12,5 @@ Any existing examples?
 - [ ] Unit tests implemented
 - [ ] Feature implemented  
 - [ ] Docs/guides updated  
-- [ ] Example created
+- [ ] Example created ([starter template on JSBin](http://jsbin.com/axedog/edit?html,output))
 - [ ] Reviewed by Two Core Contributors
