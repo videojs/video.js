@@ -20,6 +20,7 @@ Please describe what actually happened.
 If there are any errors at all, please include them here.
 
 ## Additional Information
+Please include any additional information necessary here. Including the following:
 ### versions
 #### videojs
 what version of videojs does this occur with?
