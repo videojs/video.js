@@ -1,16 +1,16 @@
 ## Description
-Please describe the feature/enhancement (be as detailed as possible when describing the use cases behind it).
+Please describe the change as necessary.
+If it's a feature or enhancement please be as detailed as possible.
+If it's a bug fix, please link the issue that it fixes or describe the bug in as much detail.
 
 
 ## Specific Changes proposed
 Please list the specific changes involved in this pull request.
 
-Any existing documentation/specs?
-Any existing examples?
-
 ## Requirements Checklist
-- [ ] Unit tests implemented
-- [ ] Feature implemented  
-- [ ] Docs/guides updated  
-- [ ] Example created ([starter template on JSBin](http://jsbin.com/axedog/edit?html,output))
+- [ ] Feature implemented / Bug fixed
+- [ ] If necessary, more likely in a feature request than a bug fix
+  - [ ] Unit Tests updated or fixed
+  - [ ] Docs/guides updated
+  - [ ] Example created ([starter template on JSBin](http://jsbin.com/axedog/edit?html,output))
 - [ ] Reviewed by Two Core Contributors
