@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @gkatsev added issue and PR templates for github ([view](https://github.com/videojs/video.js/pull/3117))
 
 --------------------
 
