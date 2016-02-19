@@ -7,6 +7,7 @@ CHANGELOG
 * @forbesjo updated travis to use latest firefox ([view](https://github.com/videojs/video.js/pull/3112))
 * @Naouak updated time display to not change if values do not change ([view](https://github.com/videojs/video.js/pull/3101))
 * @forbesjo updated track settings to not fail restoring settings when localStorage is not available ([view](https://github.com/videojs/video.js/pull/3120))
+* @mister-ben Added en.json as localization template ([view](https://github.com/videojs/video.js/pull/3096))
 
 --------------------
 
