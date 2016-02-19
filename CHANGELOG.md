@@ -8,6 +8,7 @@ CHANGELOG
 * @Naouak updated time display to not change if values do not change ([view](https://github.com/videojs/video.js/pull/3101))
 * @forbesjo updated track settings to not fail restoring settings when localStorage is not available ([view](https://github.com/videojs/video.js/pull/3120))
 * @mister-ben Added en.json as localization template ([view](https://github.com/videojs/video.js/pull/3096))
+* @misteroneill added alt css as video-js-cdn.css ([view](https://github.com/videojs/video.js/pull/3118))
 
 --------------------
 
