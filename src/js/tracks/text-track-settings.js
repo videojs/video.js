@@ -166,7 +166,9 @@ class TextTrackSettings extends Component {
       if (err) {
         log.error(err);
       }
-    } catch (e) { }
+    } catch (e) {
+      log.warn(e);
+    }
 
     if (values) {
       this.setValues(values);
@@ -190,7 +192,9 @@ class TextTrackSettings extends Component {
       } else {
         window.localStorage.removeItem('vjs-text-track-settings');
       }
-    } catch (e) {}
+    } catch (e) {
+      log.warn(e);
+    }
   }
 
   /**
