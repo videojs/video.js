@@ -4,6 +4,7 @@ CHANGELOG
 ## HEAD (Unreleased)
 * @gkatsev added issue and PR templates for github ([view](https://github.com/videojs/video.js/pull/3117))
 * @Nipoto added fa.json (farsi/persian lang file) ([view](https://github.com/videojs/video.js/pull/3116))
+* @forbesjo updated travis to use latest firefox ([view](https://github.com/videojs/video.js/pull/3112))
 
 --------------------
 
