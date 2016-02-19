@@ -58,7 +58,8 @@ class DurationDisplay extends Component {
    */
   updateContent() {
     let duration = this.player_.duration();
-    if (duration) {
+    if (duration && this.duration_ !== duration) {
+      this.duration_ = duration;
       let localizedText = this.localize('Duration Time');
       let formattedTime = formatTime(duration);
       this.contentEl_.innerHTML = `<span class="vjs-control-text">${localizedText}</span> ${formattedTime}`; // label the duration time for screen reader users
