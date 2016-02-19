@@ -2,6 +2,11 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 5.8.0 (2016-02-19)
 * @gkatsev added issue and PR templates for github ([view](https://github.com/videojs/video.js/pull/3117))
 * @Nipoto added fa.json (farsi/persian lang file) ([view](https://github.com/videojs/video.js/pull/3116))
 * @forbesjo updated travis to use latest firefox ([view](https://github.com/videojs/video.js/pull/3112))
@@ -9,8 +14,6 @@ CHANGELOG
 * @forbesjo updated track settings to not fail restoring settings when localStorage is not available ([view](https://github.com/videojs/video.js/pull/3120))
 * @mister-ben Added en.json as localization template ([view](https://github.com/videojs/video.js/pull/3096))
 * @misteroneill added alt css as video-js-cdn.css ([view](https://github.com/videojs/video.js/pull/3118))
-
---------------------
 
 ## 5.7.1 (2016-02-11)
 * @alex-phillips fixed reference to videojs-vtt.js dependency ([view](https://github.com/videojs/video.js/pull/3080))
