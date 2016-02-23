@@ -20,7 +20,7 @@ import document from 'global/document';
  *   attribute EventHandler onremovetrack;
  * };
  *
- * @param {Track[]} tracks A list of tracks to add to the list
+ * @param {Track[]} tracks A list of tracks to initialize the list with
  * @extends EventTarget
  * @class TextTrackList
  */

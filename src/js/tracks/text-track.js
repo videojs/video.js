@@ -14,7 +14,10 @@ import { isCrossOrigin } from '../utils/url.js';
 import XHR from 'xhr';
 
 /**
- * Downloading stuff happens below this point
+ * takes a webvtt file contents and parses it into cues
+ *
+ * @param {String} srcContent webVTT file contents
+ * @param {Track} track track to addcues to
  */
 const parseCues = function(srcContent, track) {
   let parser = new window.WebVTT.Parser(window,
@@ -40,6 +43,13 @@ const parseCues = function(srcContent, track) {
   parser.flush();
 };
 
+
+/**
+ * load a track from a  specifed url
+ *
+ * @param {String} src url to load track from
+ * @param {Track} track track to addcues to
+ */
 const loadTrack = function(src, track) {
   let opts = {
     uri: src
@@ -66,40 +76,6 @@ const loadTrack = function(src, track) {
       parseCues(responseBody, track);
     }
   }));
-};
-
-const indexOf = function(searchElement, fromIndex) {
-  if (this == null) {
-    throw new TypeError('"this" is null or not defined');
-  }
-
-  let O = Object(this);
-
-  let len = O.length >>> 0;
-
-  if (len === 0) {
-    return -1;
-  }
-
-  let n = +fromIndex || 0;
-
-  if (Math.abs(n) === Infinity) {
-    n = 0;
-  }
-
-  if (n >= len) {
-    return -1;
-  }
-
-  let k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
-
-  while (k < len) {
-    if (k in O && O[k] === searchElement) {
-      return k;
-    }
-    k++;
-  }
-  return -1;
 };
 
 /**
@@ -182,28 +158,28 @@ class TextTrack extends EventTarget {
       get() {
         return kind;
       },
-      set: Function.prototype
+      set: () => {}
     });
 
     Object.defineProperty(tt, 'label', {
       get() {
         return label;
       },
-      set: Function.prototype
+      set: () => {}
     });
 
     Object.defineProperty(tt, 'language', {
       get() {
         return language;
       },
-      set: Function.prototype
+      set: () => {}
     });
 
     Object.defineProperty(tt, 'id', {
       get() {
         return id;
       },
-      set: Function.prototype
+      set: () => {}
     });
 
     Object.defineProperty(tt, 'mode', {
@@ -230,7 +206,7 @@ class TextTrack extends EventTarget {
 
         return cues;
       },
-      set: Function.prototype
+      set: () => {}
     });
 
     Object.defineProperty(tt, 'activeCues', {
@@ -265,7 +241,7 @@ class TextTrack extends EventTarget {
           changed = true;
         } else {
           for (let i = 0; i < active.length; i++) {
-            if (indexOf.call(this.activeCues_, active[i]) === -1) {
+            if (this.activeCues_.indexOf(active[i]) === -1) {
               changed = true;
             }
           }
@@ -276,7 +252,7 @@ class TextTrack extends EventTarget {
 
         return activeCues;
       },
-      set: Function.prototype
+      set: () => {}
     });
 
     if (options.src) {
