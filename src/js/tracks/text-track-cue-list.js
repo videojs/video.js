@@ -14,7 +14,7 @@ import document from 'global/document';
  *   TextTrackCue? getCueById(DOMString id);
  * };
  *
- * @param {Array} cues cues to add to the list
+ * @param {Array} cues A list of cues to be initialized with
  * @class TextTrackCueList
  */
 
