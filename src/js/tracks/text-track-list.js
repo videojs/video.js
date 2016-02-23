@@ -81,8 +81,8 @@ class TextTrackList extends EventTarget {
     this.tracks_.push(track);
 
     this.trigger({
-      type: 'addtrack',
-      track
+      track,
+      type: 'addtrack'
     });
   }
 
@@ -115,8 +115,8 @@ class TextTrackList extends EventTarget {
     }
 
     this.trigger({
-      type: 'removetrack',
-      track
+      track,
+      type: 'removetrack'
     });
   }
 
