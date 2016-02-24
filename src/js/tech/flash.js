@@ -235,8 +235,12 @@ class Flash extends Tech {
    * @returns {Number} Media duration
    */
   duration() {
-    var duration = this.el_.vjs_getProperty('duration');
-    return duration >= 0 ? duration : Infinity;
+    if (this.readyState() === 0) {
+      return NaN;
+    } else {
+      let duration = this.el_.vjs_getProperty('duration');
+      return duration >= 0 ? duration : Infinity;
+    }
   }
 
   /**
