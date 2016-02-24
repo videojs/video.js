@@ -812,6 +812,7 @@ class Player extends Component {
   handleTechWaiting_() {
     this.addClass('vjs-waiting');
     this.trigger('waiting');
+    this.one('timeupdate', () => this.removeClass('vjs-waiting'));
   }
 
   /**
