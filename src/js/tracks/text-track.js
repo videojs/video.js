@@ -3,13 +3,11 @@
  */
 import TextTrackCueList from './text-track-cue-list';
 import * as Fn from '../utils/fn.js';
-import * as Guid from '../utils/guid.js';
-import * as browser from '../utils/browser.js';
 import * as TextTrackEnum from './text-track-enums';
 import log from '../utils/log.js';
-import EventTarget from '../event-target';
 import document from 'global/document';
 import window from 'global/window';
+import Track from './track.js';
 import { isCrossOrigin } from '../utils/url.js';
 import XHR from 'xhr';
 
@@ -42,7 +40,6 @@ const parseCues = function(srcContent, track) {
   parser.parse(srcContent);
   parser.flush();
 };
-
 
 /**
  * load a track from a  specifed url
@@ -88,7 +85,7 @@ const loadTrack = function(src, track) {
 
 /**
  * A single text track as defined in:
- * https://html.spec.whatwg.org/multipage/embedded-content.html#texttrack
+ * @link https://html.spec.whatwg.org/multipage/embedded-content.html#texttrack
  *
  * interface TextTrack : EventTarget {
  *   readonly attribute TextTrackKind kind;
@@ -110,39 +107,22 @@ const loadTrack = function(src, track) {
  * };
  *
  * @param {Object=} options Object of option names and values
- * @extends EventTarget
+ * @extends Track
  * @class TextTrack
  */
-class TextTrack extends EventTarget {
+class TextTrack extends Track {
   constructor(options = {}) {
-    super();
-    if (!options.tech) {
-      throw new Error('A tech was not provided.');
-    }
-
-    let tt = this;
-
-    if (browser.IS_IE8) {
-      tt = document.createElement('custom');
-
-      for (let prop in TextTrack.prototype) {
-        if (prop !== 'constructor') {
-          tt[prop] = TextTrack.prototype[prop];
-        }
-      }
-    }
-
-    tt.tech_ = options.tech;
-
+    options.kind = TextTrackEnum.TextTrackKind[options.kind] || 'subtitles';
+    options.language = options.language || options.srclang || '';
+    options.trackType = 'text';
     let mode = TextTrackEnum.TextTrackMode[options.mode] || 'disabled';
-    let kind = TextTrackEnum.TextTrackKind[options.kind] || 'subtitles';
-    let label = options.label || '';
-    let language = options.language || options.srclang || '';
-    let id = options.id || 'vjs_text_track_' + Guid.newGUID();
 
-    if (kind === 'metadata' || kind === 'chapters') {
+    if (options.kind === 'metadata' || options.kind === 'chapters') {
       mode = 'hidden';
     }
+    // retval will only be defined on IE8, which is when we need it
+    let retval = super(options);
+    let tt = this;
 
     tt.cues_ = [];
     tt.activeCues_ = [];
@@ -161,34 +141,6 @@ class TextTrack extends EventTarget {
     if (mode !== 'disabled') {
       tt.tech_.on('timeupdate', timeupdateHandler);
     }
-
-    Object.defineProperty(tt, 'kind', {
-      get() {
-        return kind;
-      },
-      set() {}
-    });
-
-    Object.defineProperty(tt, 'label', {
-      get() {
-        return label;
-      },
-      set() {}
-    });
-
-    Object.defineProperty(tt, 'language', {
-      get() {
-        return language;
-      },
-      set() {}
-    });
-
-    Object.defineProperty(tt, 'id', {
-      get() {
-        return id;
-      },
-      set() {}
-    });
 
     Object.defineProperty(tt, 'mode', {
       get() {
@@ -270,9 +222,7 @@ class TextTrack extends EventTarget {
       tt.loaded_ = true;
     }
 
-    if (browser.IS_IE8) {
-      return tt;
-    }
+    return retval;
   }
 
   /**
