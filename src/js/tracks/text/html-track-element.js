@@ -2,10 +2,10 @@
  * @file html-track-element.js
  */
 
-import * as browser from '../utils/browser.js';
+import * as browser from '../../utils/browser.js';
 import document from 'global/document';
-import EventTarget from '../event-target';
-import TextTrack from '../tracks/text-track';
+import EventTarget from '../../event-target';
+import TextTrack from './text-track';
 
 const NONE = 0;
 const LOADING = 1;

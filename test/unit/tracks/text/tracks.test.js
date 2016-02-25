@@ -1,19 +1,19 @@
-import ChaptersButton from '../../../src/js/control-bar/text-track-controls/chapters-button.js';
-import SubtitlesButton from '../../../src/js/control-bar/text-track-controls/subtitles-button.js';
-import CaptionsButton from '../../../src/js/control-bar/text-track-controls/captions-button.js';
+import ChaptersButton from '../../../../src/js/control-bar/text-track-controls/chapters-button.js';
+import SubtitlesButton from '../../../../src/js/control-bar/text-track-controls/subtitles-button.js';
+import CaptionsButton from '../../../../src/js/control-bar/text-track-controls/captions-button.js';
 
-import TextTrack from '../../../src/js/tracks/text-track.js';
-import TextTrackDisplay from '../../../src/js/tracks/text-track-display.js';
-import Html5 from '../../../src/js/tech/html5.js';
-import Flash from '../../../src/js/tech/flash.js';
-import Tech from '../../../src/js/tech/tech.js';
-import Component from '../../../src/js/component.js';
+import TextTrack from '../../../../src/js/tracks/text/text-track.js';
+import TextTrackDisplay from '../../../../src/js/tracks/text/text-track-display.js';
+import Html5 from '../../../../src/js/tech/html5.js';
+import Flash from '../../../../src/js/tech/flash.js';
+import Tech from '../../../../src/js/tech/tech.js';
+import Component from '../../../../src/js/component.js';
 
-import * as browser from '../../../src/js/utils/browser.js';
-import TestHelpers from '../test-helpers.js';
+import * as browser from '../../../../src/js/utils/browser.js';
+import TestHelpers from '../../test-helpers.js';
 import document from 'global/document';
 import window from 'global/window';
-import TechFaker from '../tech/tech-faker.js';
+import TechFaker from '../../tech/tech-faker.js';
 
 q.module('Tracks', {
   'setup': function() {

@@ -1,10 +1,10 @@
 /**
  * @file text-track-settings.js
  */
-import Component from '../component';
-import * as Events from '../utils/events.js';
-import * as Fn from '../utils/fn.js';
-import log from '../utils/log.js';
+import Component from '../../component';
+import * as Events from '../../utils/events.js';
+import * as Fn from '../../utils/fn.js';
+import log from '../../utils/log.js';
 import safeParseTuple from 'safe-json-parse/tuple';
 import window from 'global/window';
 

@@ -1,6 +1,6 @@
-import TextTrackMenuItem from '../../../src/js/control-bar/text-track-controls/text-track-menu-item.js';
-import TestHelpers from '../test-helpers.js';
-import * as browser from '../../../src/js/utils/browser.js';
+import TextTrackMenuItem from '../../../../src/js/control-bar/text-track-controls/text-track-menu-item.js';
+import TestHelpers from '../../test-helpers.js';
+import * as browser from '../../../../src/js/utils/browser.js';
 
 q.module('Text Track Controls', {
   'setup': function() {

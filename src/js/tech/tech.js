@@ -5,11 +5,11 @@
  */
 
 import Component from '../component';
-import HTMLTrackElement from '../tracks/html-track-element';
-import HTMLTrackElementList from '../tracks/html-track-element-list';
+import HTMLTrackElement from '../tracks/text/html-track-element';
+import HTMLTrackElementList from '../tracks/text/html-track-element-list';
 import mergeOptions from '../utils/merge-options.js';
-import TextTrack from '../tracks/text-track';
-import TextTrackList from '../tracks/text-track-list';
+import TextTrack from '../tracks/text/text-track';
+import TextTrackList from '../tracks/text/text-track-list';
 import * as Fn from '../utils/fn.js';
 import log from '../utils/log.js';
 import { createTimeRange } from '../utils/time-ranges.js';

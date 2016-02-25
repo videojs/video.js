@@ -1,5 +1,5 @@
-import HTMLTrackElement from '../../../src/js/tracks/html-track-element.js';
-import TextTrack from '../../../src/js/tracks/text-track.js';
+import HTMLTrackElement from '../../../../src/js/tracks/text/html-track-element.js';
+import TextTrack from '../../../../src/js/tracks/text/text-track.js';
 import window from 'global/window';
 
 let noop = Function.prototype;

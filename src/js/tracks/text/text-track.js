@@ -2,15 +2,15 @@
  * @file text-track.js
  */
 import TextTrackCueList from './text-track-cue-list';
-import * as Fn from '../utils/fn.js';
-import * as Guid from '../utils/guid.js';
-import * as browser from '../utils/browser.js';
+import * as Fn from '../../utils/fn.js';
+import * as Guid from '../../utils/guid.js';
+import * as browser from '../../utils/browser.js';
 import * as TextTrackEnum from './text-track-enums';
-import log from '../utils/log.js';
-import EventTarget from '../event-target';
+import log from '../../utils/log.js';
+import EventTarget from '../../event-target';
 import document from 'global/document';
 import window from 'global/window';
-import { isCrossOrigin } from '../utils/url.js';
+import { isCrossOrigin } from '../../utils/url.js';
 import XHR from 'xhr';
 
 /**
