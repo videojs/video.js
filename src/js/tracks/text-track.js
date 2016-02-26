@@ -158,28 +158,28 @@ class TextTrack extends EventTarget {
       get() {
         return kind;
       },
-      set: () => {}
+      set() {}
     });
 
     Object.defineProperty(tt, 'label', {
       get() {
         return label;
       },
-      set: () => {}
+      set() {}
     });
 
     Object.defineProperty(tt, 'language', {
       get() {
         return language;
       },
-      set: () => {}
+      set() {}
     });
 
     Object.defineProperty(tt, 'id', {
       get() {
         return id;
       },
-      set: () => {}
+      set() {}
     });
 
     Object.defineProperty(tt, 'mode', {
@@ -206,7 +206,7 @@ class TextTrack extends EventTarget {
 
         return cues;
       },
-      set: () => {}
+      set() {}
     });
 
     Object.defineProperty(tt, 'activeCues', {
@@ -252,7 +252,7 @@ class TextTrack extends EventTarget {
 
         return activeCues;
       },
-      set: () => {}
+      set() {}
     });
 
     if (options.src) {
