@@ -4,33 +4,33 @@ import * as Events from '../../../src/js/utils/events.js';
 import safeParseTuple from 'safe-json-parse/tuple';
 import window from 'global/window';
 
-var tracks = [{
+const tracks = [{
   kind: 'captions',
   label: 'test'
 }];
 
 q.module('Text Track Settings', {
-  beforeEach: function() {
+  beforeEach() {
     window.localStorage.clear();
   }
 });
 
 test('should update settings', function() {
-  var player = TestHelpers.makePlayer({
-      tracks: tracks,
-      persistTextTrackSettings: true
-    }),
-    newSettings = {
-      'backgroundOpacity': '1',
-      'textOpacity': '1',
-      'windowOpacity': '1',
-      'edgeStyle': 'raised',
-      'fontFamily': 'monospaceSerif',
-      'color': '#FFF',
-      'backgroundColor': '#FFF',
-      'windowColor': '#FFF',
-      'fontPercent': 1.25
-    };
+  let player = TestHelpers.makePlayer({
+    tracks,
+    persistTextTrackSettings: true
+  });
+  let newSettings = {
+    backgroundOpacity: '1',
+    textOpacity: '1',
+    windowOpacity: '1',
+    edgeStyle: 'raised',
+    fontFamily: 'monospaceSerif',
+    color: '#FFF',
+    backgroundColor: '#FFF',
+    windowColor: '#FFF',
+    fontPercent: 1.25
+  };
 
   player.textTrackSettings.setValues(newSettings);
   deepEqual(player.textTrackSettings.getValues(), newSettings, 'values are updated');
@@ -52,8 +52,8 @@ test('should update settings', function() {
 });
 
 test('should restore default settings', function() {
-  var player = TestHelpers.makePlayer({
-    tracks: tracks,
+  let player = TestHelpers.makePlayer({
+    tracks,
     persistTextTrackSettings: true
   });
 
@@ -88,9 +88,10 @@ test('should restore default settings', function() {
 });
 
 test('should open on click', function() {
-  var player = TestHelpers.makePlayer({
-    tracks: tracks
+  let player = TestHelpers.makePlayer({
+    tracks
   });
+
   Events.trigger(player.$('.vjs-texttrack-settings'), 'click');
   ok(!player.textTrackSettings.hasClass('vjs-hidden'), 'settings open');
 
@@ -98,9 +99,10 @@ test('should open on click', function() {
 });
 
 test('should close on done click', function() {
-  var player = TestHelpers.makePlayer({
-    tracks: tracks
+  let player = TestHelpers.makePlayer({
+    tracks
   });
+
   Events.trigger(player.$('.vjs-texttrack-settings'), 'click');
   Events.trigger(player.$('.vjs-done-button'), 'click');
   ok(player.textTrackSettings.hasClass('vjs-hidden'), 'settings closed');
@@ -109,16 +111,16 @@ test('should close on done click', function() {
 });
 
 test('if persist option is set, restore settings on init', function() {
-  var player,
-      oldRestoreSettings = TextTrackSettings.prototype.restoreSettings,
-      restore = 0;
+  let player;
+  let oldRestoreSettings = TextTrackSettings.prototype.restoreSettings;
+  let restore = 0;
 
   TextTrackSettings.prototype.restoreSettings = function() {
     restore++;
   };
 
   player = TestHelpers.makePlayer({
-    tracks: tracks,
+    tracks,
     persistTextTrackSettings: true
   });
 
@@ -130,12 +132,12 @@ test('if persist option is set, restore settings on init', function() {
 });
 
 test('if persist option is set, save settings when "done"', function() {
-  var player = TestHelpers.makePlayer({
-        tracks: tracks,
-        persistTextTrackSettings: true
-      }),
-      oldSaveSettings = TextTrackSettings.prototype.saveSettings,
-      save = 0;
+  let player = TestHelpers.makePlayer({
+    tracks,
+    persistTextTrackSettings: true
+  });
+  let oldSaveSettings = TextTrackSettings.prototype.saveSettings;
+  let save = 0;
 
   TextTrackSettings.prototype.saveSettings = function() {
     save++;
@@ -151,11 +153,11 @@ test('if persist option is set, save settings when "done"', function() {
 });
 
 test('do not try to restore or save settings if persist option is not set', function() {
-  var player,
-      oldRestoreSettings = TextTrackSettings.prototype.restoreSettings,
-      oldSaveSettings = TextTrackSettings.prototype.saveSettings,
-      save = 0,
-      restore = 0;
+  let player;
+  let oldRestoreSettings = TextTrackSettings.prototype.restoreSettings;
+  let oldSaveSettings = TextTrackSettings.prototype.saveSettings;
+  let save = 0;
+  let restore = 0;
 
   TextTrackSettings.prototype.restoreSettings = function() {
     restore++;
@@ -165,7 +167,7 @@ test('do not try to restore or save settings if persist option is not set', func
   };
 
   player = TestHelpers.makePlayer({
-    tracks: tracks,
+    tracks,
     persistTextTrackSettings: false
   });
 
@@ -183,23 +185,23 @@ test('do not try to restore or save settings if persist option is not set', func
 });
 
 test('should restore saved settings', function() {
-  var player,
-    newSettings = {
-      'backgroundOpacity': '1',
-      'textOpacity': '1',
-      'windowOpacity': '1',
-      'edgeStyle': 'raised',
-      'fontFamily': 'monospaceSerif',
-      'color': '#FFF',
-      'backgroundColor': '#FFF',
-      'windowColor': '#FFF',
-      'fontPercent': 1.25
-    };
+  let player;
+  let newSettings = {
+    backgroundOpacity: '1',
+    textOpacity: '1',
+    windowOpacity: '1',
+    edgeStyle: 'raised',
+    fontFamily: 'monospaceSerif',
+    color: '#FFF',
+    backgroundColor: '#FFF',
+    windowColor: '#FFF',
+    fontPercent: 1.25
+  };
 
   window.localStorage.setItem('vjs-text-track-settings', JSON.stringify(newSettings));
 
   player = TestHelpers.makePlayer({
-    tracks: tracks,
+    tracks,
     persistTextTrackSettings: true
   });
 
@@ -209,23 +211,23 @@ test('should restore saved settings', function() {
 });
 
 test('should not restore saved settings', function() {
-  var player,
-    newSettings = {
-      'backgroundOpacity': '1',
-      'textOpacity': '1',
-      'windowOpacity': '1',
-      'edgeStyle': 'raised',
-      'fontFamily': 'monospaceSerif',
-      'color': '#FFF',
-      'backgroundColor': '#FFF',
-      'windowColor': '#FFF',
-      'fontPercent': 1.25
-    };
+  let player;
+  let newSettings = {
+    backgroundOpacity: '1',
+    textOpacity: '1',
+    windowOpacity: '1',
+    edgeStyle: 'raised',
+    fontFamily: 'monospaceSerif',
+    color: '#FFF',
+    backgroundColor: '#FFF',
+    windowColor: '#FFF',
+    fontPercent: 1.25
+  };
 
   window.localStorage.setItem('vjs-text-track-settings', JSON.stringify(newSettings));
 
   player = TestHelpers.makePlayer({
-    tracks: tracks,
+    tracks,
     persistTextTrackSettings: false
   });
 

@@ -2,33 +2,33 @@ import TextTrackList from '../../../src/js/tracks/text-track-list.js';
 import TextTrack from '../../../src/js/tracks/text-track.js';
 import EventTarget from '../../../src/js/event-target.js';
 
-var noop = Function.prototype;
-var genericTracks = [
+const noop = () => {};
+const genericTracks = [
   {
     id: '1',
-    addEventListener: noop,
-    off: noop
+    addEventListener() {},
+    off() {}
   }, {
     id: '2',
-    addEventListener: noop,
-    off: noop
+    addEventListener() {},
+    off() {}
   }, {
     id: '3',
-    addEventListener: noop,
-    off: noop
+    addEventListener() {},
+    off() {}
   }
 ];
 
 q.module('Text Track List');
 
 test('TextTrackList\'s length is set correctly', function() {
-  var ttl = new TextTrackList(genericTracks);
+  let ttl = new TextTrackList(genericTracks);
 
   equal(ttl.length, genericTracks.length, 'the length is ' + genericTracks.length);
 });
 
 test('can get text tracks by id', function() {
-  var ttl = new TextTrackList(genericTracks);
+  let ttl = new TextTrackList(genericTracks);
 
   equal(ttl.getTrackById('1').id, 1, 'id "1" has id of "1"');
   equal(ttl.getTrackById('2').id, 2, 'id "2" has id of "2"');
@@ -37,11 +37,11 @@ test('can get text tracks by id', function() {
 });
 
 test('length is updated when new tracks are added or removed', function() {
-  var ttl = new TextTrackList(genericTracks);
+  let ttl = new TextTrackList(genericTracks);
 
-  ttl.addTrack_({id: '100', addEventListener: noop, off: noop});
+  ttl.addTrack_({id: '100', addEventListener() {}, off() {}});
   equal(ttl.length, genericTracks.length + 1, 'the length is ' + (genericTracks.length + 1));
-  ttl.addTrack_({id: '101', addEventListener: noop, off: noop});
+  ttl.addTrack_({id: '101', addEventListener() {}, off() {}});
   equal(ttl.length, genericTracks.length + 2, 'the length is ' + (genericTracks.length + 2));
 
   ttl.removeTrack_(ttl.getTrackById('101'));
@@ -51,9 +51,9 @@ test('length is updated when new tracks are added or removed', function() {
 });
 
 test('can access items by index', function() {
-  var ttl = new TextTrackList(genericTracks),
-      i = 0,
-      length = ttl.length;
+  let ttl = new TextTrackList(genericTracks);
+  let i = 0;
+  let length = ttl.length;
 
   expect(length);
 
@@ -63,19 +63,19 @@ test('can access items by index', function() {
 });
 
 test('can access new items by index', function() {
-  var ttl = new TextTrackList(genericTracks);
+  let ttl = new TextTrackList(genericTracks);
 
-  ttl.addTrack_({id: '100', addEventListener: noop});
+  ttl.addTrack_({id: '100', addEventListener() {}});
   equal(ttl[3].id, '100', 'id of item at index 3 is 100');
-  ttl.addTrack_({id: '101', addEventListener: noop});
+  ttl.addTrack_({id: '101', addEventListener() {}});
   equal(ttl[4].id, '101', 'id of item at index 4 is 101');
 });
 
 test('cannot access removed items by index', function() {
-  var ttl = new TextTrackList(genericTracks);
+  let ttl = new TextTrackList(genericTracks);
 
-  ttl.addTrack_({id: '100', addEventListener: noop, off: noop});
-  ttl.addTrack_({id: '101', addEventListener: noop, off: noop});
+  ttl.addTrack_({id: '100', addEventListener() {}, off() {}});
+  ttl.addTrack_({id: '101', addEventListener() {}, off() {}});
   equal(ttl[3].id, '100', 'id of item at index 3 is 100');
   equal(ttl[4].id, '101', 'id of item at index 4 is 101');
 
@@ -87,51 +87,55 @@ test('cannot access removed items by index', function() {
 });
 
 test('new item available at old index', function() {
-  var ttl = new TextTrackList(genericTracks);
+  let ttl = new TextTrackList(genericTracks);
 
-  ttl.addTrack_({id: '100', addEventListener: noop, off: noop});
+  ttl.addTrack_({id: '100', addEventListener() {}, off() {}});
   equal(ttl[3].id, '100', 'id of item at index 3 is 100');
 
   ttl.removeTrack_(ttl.getTrackById('100'));
   ok(!ttl[3], 'nothing at index 3');
 
-  ttl.addTrack_({id: '101', addEventListener: noop});
+  ttl.addTrack_({id: '101', addEventListener() {}});
   equal(ttl[3].id, '101', 'id of new item at index 3 is now 101');
 });
 
 test('a "addtrack" event is triggered when new tracks are added', function() {
-  var ttl = new TextTrackList(genericTracks),
-      tracks = 0,
-      adds = 0,
-      addHandler = function(e) {
-        e.track && tracks++;
-        adds++;
-      };
+  let ttl = new TextTrackList(genericTracks);
+  let tracks = 0;
+  let adds = 0;
+  let addHandler = function(e) {
+    if (e.track) {
+      tracks++;
+    }
+    adds++;
+  };
 
   ttl.on('addtrack', addHandler);
 
-  ttl.addTrack_({id: '100', addEventListener: noop});
-  ttl.addTrack_({id: '101', addEventListener: noop});
+  ttl.addTrack_({id: '100', addEventListener() {}});
+  ttl.addTrack_({id: '101', addEventListener() {}});
 
   ttl.off('addtrack', addHandler);
 
   ttl.onaddtrack = addHandler;
 
-  ttl.addTrack_({id: '102', addEventListener: noop});
-  ttl.addTrack_({id: '103', addEventListener: noop});
+  ttl.addTrack_({id: '102', addEventListener() {}});
+  ttl.addTrack_({id: '103', addEventListener() {}});
 
   equal(adds, 4, 'we got ' + adds + ' "addtrack" events');
   equal(tracks, 4, 'we got a track with every event');
 });
 
 test('a "removetrack" event is triggered when tracks are removed', function() {
-  var ttl = new TextTrackList(genericTracks),
-      tracks = 0,
-      rms = 0,
-      rmHandler = function(e) {
-        e.track && tracks++;
-        rms++;
-      };
+  let ttl = new TextTrackList(genericTracks);
+  let tracks = 0;
+  let rms = 0;
+  let rmHandler = function(e) {
+    if (e.track) {
+      tracks++;
+    }
+    rms++;
+  };
 
   ttl.on('removetrack', rmHandler);
 
@@ -149,12 +153,12 @@ test('a "removetrack" event is triggered when tracks are removed', function() {
 });
 
 test('trigger "change" event when "modechange" is fired on a track', function() {
-  var tt = new EventTarget(),
-      ttl = new TextTrackList([tt]),
-      changes = 0,
-      changeHandler = function() {
-        changes++;
-      };
+  let tt = new EventTarget();
+  let ttl = new TextTrackList([tt]);
+  let changes = 0;
+  let changeHandler = function() {
+    changes++;
+  };
 
   ttl.on('change', changeHandler);
 
@@ -170,16 +174,16 @@ test('trigger "change" event when "modechange" is fired on a track', function() 
 });
 
 test('trigger "change" event when mode changes on a TextTrack', function() {
-  var tt = new TextTrack({
-        tech: {
-          on: noop
-        }
-      }),
-      ttl = new TextTrackList([tt]),
-      changes = 0,
-      changeHandler = function() {
-        changes++;
-      };
+  let tt = new TextTrack({
+    tech: {
+      on() {}
+    }
+  });
+  let ttl = new TextTrackList([tt]);
+  let changes = 0;
+  let changeHandler = function() {
+    changes++;
+  };
 
   ttl.on('change', changeHandler);
 

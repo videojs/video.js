@@ -2,12 +2,11 @@ import HTMLTrackElement from '../../../src/js/tracks/html-track-element.js';
 import TextTrack from '../../../src/js/tracks/text-track.js';
 import window from 'global/window';
 
-let noop = Function.prototype;
-let defaultTech = {
-  textTracks: noop,
-  on: noop,
-  off: noop,
-  currentTime: noop
+const defaultTech = {
+  textTracks() {},
+  on() {},
+  off() {},
+  currentTime() {}
 };
 
 q.module('HTML Track Element');
@@ -23,12 +22,12 @@ test('html track element requires a tech', function() {
 });
 
 test('can create a html track element with various properties', function() {
-  let kind = 'chapters',
-      label = 'English',
-      language = 'en',
-      src = 'http://www.example.com';
+  let kind = 'chapters';
+  let label = 'English';
+  let language = 'en';
+  let src = 'http://www.example.com';
 
-  let htmlTrackElement = new  HTMLTrackElement({
+  let htmlTrackElement = new HTMLTrackElement({
     kind,
     label,
     language,
@@ -36,7 +35,7 @@ test('can create a html track element with various properties', function() {
     tech: defaultTech
   });
 
-  equal(htmlTrackElement.default, undefined, 'we have a default');
+  equal(typeof htmlTrackElement.default, 'undefined', 'we have a default');
   equal(htmlTrackElement.kind, kind, 'we have a kind');
   equal(htmlTrackElement.label, label, 'we have a label');
   equal(htmlTrackElement.readyState, 0, 'we have a readyState');
@@ -46,29 +45,29 @@ test('can create a html track element with various properties', function() {
 });
 
 test('defaults when items not provided', function() {
-  let htmlTrackElement = new  HTMLTrackElement({
+  let htmlTrackElement = new HTMLTrackElement({
     tech: defaultTech
   });
 
-  equal(htmlTrackElement.default, undefined, 'we have a default');
+  equal(typeof htmlTrackElement.default, 'undefined', 'we have a default');
   equal(htmlTrackElement.kind, 'subtitles', 'we have a kind');
   equal(htmlTrackElement.label, '', 'we have a label');
   equal(htmlTrackElement.readyState, 0, 'we have a readyState');
-  equal(htmlTrackElement.src, undefined, 'we have a src');
+  equal(typeof htmlTrackElement.src, 'undefined', 'we have a src');
   equal(htmlTrackElement.srclang, '', 'we have a srclang');
   equal(htmlTrackElement.track.cues.length, 0, 'we have a track');
 });
 
 test('fires loadeddata when track cues become populated', function() {
-  let changes = 0,
-      loadHandler;
+  let changes = 0;
+  let loadHandler;
 
   loadHandler = function() {
     changes++;
   };
 
   let htmlTrackElement = new HTMLTrackElement({
-    tech: noop
+    tech() {}
   });
 
   htmlTrackElement.addEventListener('load', loadHandler);

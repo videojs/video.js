@@ -3,7 +3,6 @@ import TextTrack from '../../../src/js/tracks/text-track.js';
 import TextTrackList from '../../../src/js/tracks/text-track-list.js';
 import Html5 from '../../../src/js/tech/html5.js';
 import document from 'global/document';
-import window from 'global/window';
 
 q.module('Text Track List Converter', {});
 
@@ -26,6 +25,7 @@ let cleanup = (item) => {
 if (Html5.supportsNativeTextTracks()) {
   q.test('trackToJson_ produces correct representation for native track object', function(a) {
     let track = document.createElement('track');
+
     track.src = 'example.com/english.vtt';
     track.kind = 'captions';
     track.srclang = 'en';
@@ -48,11 +48,13 @@ if (Html5.supportsNativeTextTracks()) {
     });
 
     let nativeTrack = document.createElement('track');
+
     nativeTrack.kind = 'captions';
     nativeTrack.srclang = 'es';
     nativeTrack.label = 'Spanish';
 
     let tt = new TextTrackList();
+
     tt.addTrack_(nativeTrack.track);
     tt.addTrack_(emulatedTrack);
 
@@ -96,12 +98,14 @@ if (Html5.supportsNativeTextTracks()) {
     });
 
     let nativeTrack = document.createElement('track');
+
     nativeTrack.src = 'example.com/spanish.vtt';
     nativeTrack.kind = 'captions';
     nativeTrack.srclang = 'es';
     nativeTrack.label = 'Spanish';
 
     let tt = new TextTrackList();
+
     tt.addTrack_(nativeTrack.track);
     tt.addTrack_(emulatedTrack);
 
@@ -171,6 +175,7 @@ q.test('textTracksToJson produces good json output for emulated only', function(
   });
 
   let tt = new TextTrackList();
+
   tt.addTrack_(anotherTrack);
   tt.addTrack_(emulatedTrack);
 
@@ -224,6 +229,7 @@ q.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated trac
   });
 
   let tt = new TextTrackList();
+
   tt.addTrack_(anotherTrack);
   tt.addTrack_(emulatedTrack);
 

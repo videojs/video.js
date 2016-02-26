@@ -1,39 +1,35 @@
 import TextTrack from '../../../src/js/tracks/text-track.js';
-import window from 'global/window';
 import TestHelpers from '../test-helpers.js';
 
-var noop = Function.prototype;
-var defaultTech = {
-  textTracks: noop,
-  on: noop,
-  off: noop,
-  currentTime: noop
+const defaultTech = {
+  textTracks() {},
+  on() {},
+  off() {},
+  currentTime() {}
 };
 
 q.module('Text Track');
 
 test('text-track requires a tech', function() {
-  window.throws(function() {
-           new TextTrack();
-         },
-         new Error('A tech was not provided.'),
-         'a tech is required for text track');
+  let error = new Error('A tech was not provided.');
+
+  q.throws(() => new TextTrack(), error, 'a tech is required for text track');
 });
 
 test('can create a TextTrack with various properties', function() {
-  var kind = 'captions',
-      label = 'English',
-      language = 'en',
-      id = '1',
-      mode = 'disabled',
-      tt = new TextTrack({
-        tech: defaultTech,
-        kind: kind,
-        label: label,
-        language: language,
-        id: id,
-        mode: mode
-      });
+  let kind = 'captions';
+  let label = 'English';
+  let language = 'en';
+  let id = '1';
+  let mode = 'disabled';
+  let tt = new TextTrack({
+    kind,
+    label,
+    language,
+    id,
+    mode,
+    tech: defaultTech
+  });
 
   equal(tt.kind, kind, 'we have a kind');
   equal(tt.label, label, 'we have a label');
@@ -43,7 +39,7 @@ test('can create a TextTrack with various properties', function() {
 });
 
 test('defaults when items not provided', function() {
-  var tt = new TextTrack({
+  let tt = new TextTrack({
     tech: defaultTech
   });
 
@@ -54,7 +50,7 @@ test('defaults when items not provided', function() {
 });
 
 test('kind can only be one of several options, defaults to subtitles', function() {
-  var tt = new TextTrack({
+  let tt = new TextTrack({
     tech: defaultTech,
     kind: 'foo'
   });
@@ -99,7 +95,7 @@ test('kind can only be one of several options, defaults to subtitles', function(
 });
 
 test('mode can only be one of several options, defaults to disabled', function() {
-  var tt = new TextTrack({
+  let tt = new TextTrack({
     tech: defaultTech,
     mode: 'foo'
   });
@@ -130,19 +126,19 @@ test('mode can only be one of several options, defaults to disabled', function()
 });
 
 test('kind, label, language, id, cue, and activeCues are read only', function() {
-  var kind = 'captions',
-      label = 'English',
-      language = 'en',
-      id = '1',
-      mode = 'disabled',
-      tt = new TextTrack({
-        tech: defaultTech,
-        kind: kind,
-        label: label,
-        language: language,
-        id: id,
-        mode: mode
-      });
+  let kind = 'captions';
+  let label = 'English';
+  let language = 'en';
+  let id = '1';
+  let mode = 'disabled';
+  let tt = new TextTrack({
+    kind,
+    label,
+    language,
+    id,
+    mode,
+    tech: defaultTech
+  });
 
   tt.kind = 'subtitles';
   tt.label = 'Spanish';
@@ -160,8 +156,8 @@ test('kind, label, language, id, cue, and activeCues are read only', function() 
 });
 
 test('mode can only be set to a few options', function() {
-  var tt = new TextTrack({
-    tech: defaultTech,
+  let tt = new TextTrack({
+    tech: defaultTech
   });
 
   tt.mode = 'foo';
@@ -185,8 +181,8 @@ test('mode can only be set to a few options', function() {
 });
 
 test('cues and activeCues return a TextTrackCueList', function() {
-  var tt = new TextTrack({
-    tech: defaultTech,
+  let tt = new TextTrack({
+    tech: defaultTech
   });
 
   ok(tt.cues.getCueById, 'cues are a TextTrackCueList');
@@ -194,13 +190,12 @@ test('cues and activeCues return a TextTrackCueList', function() {
 });
 
 test('cues can be added and removed from a TextTrack', function() {
-  var tt = new TextTrack({
-        tech: defaultTech,
-      }),
-      cues;
+  let tt = new TextTrack({
+    tech: defaultTech
+  });
+  let cues;
 
   cues = tt.cues;
-
 
   equal(cues.length, 0, 'start with zero cues');
 
@@ -220,13 +215,13 @@ test('cues can be added and removed from a TextTrack', function() {
 });
 
 test('fires cuechange when cues become active and inactive', function() {
-  var player = TestHelpers.makePlayer(),
-      changes = 0,
-      cuechangeHandler,
-      tt = new TextTrack({
-        tech: player.tech_,
-        mode: 'showing'
-      });
+  let player = TestHelpers.makePlayer();
+  let changes = 0;
+  let cuechangeHandler;
+  let tt = new TextTrack({
+    tech: player.tech_,
+    mode: 'showing'
+  });
 
   cuechangeHandler = function() {
     changes++;
