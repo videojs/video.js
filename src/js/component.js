@@ -1092,6 +1092,67 @@ class Component {
   }
 
   /**
+   * Get width or height of computed style
+   * @param  {String} widthOrHeight  'width' or 'height'
+   * @return {Number|Boolean} The bolean false if nothing was set
+   * @method currentDimension
+   */
+  currentDimension(widthOrHeight) {
+    let computedWidthOrHeight;
+
+    if (widthOrHeight !== 'width' && widthOrHeight !== 'height') {
+      log.warn('currentDimension only accepts width or height value');
+      return false;
+    }
+
+    if (typeof window.getComputedStyle !== 'undefined') {
+      const computedStyle = window.getComputedStyle(this.el_, null);
+      computedWidthOrHeight = computedStyle.getPropertyValue(widthOrHeight) || computedStyle[ widthOrHeight ];
+    }
+
+    if (this.el_.currentStyle) {
+      // ie 8 doesn't support computed style, shim it
+      // return clientWidth or clientHeight instead for better accuracy
+      const rule = 'client' + widthOrHeight.substr(0, 1).toUpperCase() + widthOrHeight.substr(1);
+      computedWidthOrHeight = this.el_[rule];
+    }
+
+    // remove 'px' from variable and parse as integer
+    computedWidthOrHeight = parseInt(computedWidthOrHeight, 10);
+    return computedWidthOrHeight;
+  }
+
+  /**
+   * Get an object which contains width and height values of computed style
+   * @return {Object} The dimensions of element
+   * @method currentDimensions
+   */
+  currentDimensions() {
+    return {
+      width: this.currentDimension('width'),
+      height: this.currentDimension('height')
+    };
+  }
+
+  /**
+   * Get width of computed style
+   * @return {Integer}
+   * @method currentWidth
+   */
+  currentWidth() {
+    return this.currentDimension('width');
+  }
+
+  /**
+   * Get height of computed style
+   * @return {Integer}
+   * @method currentHeight
+   */
+  currentHeight() {
+    return this.currentDimension('height');
+  }
+
+  /**
    * Emit 'tap' events when touch events are supported
    * This is used to support toggling the controls through a tap on the video.
    * We're requiring them to be enabled because otherwise every component would
