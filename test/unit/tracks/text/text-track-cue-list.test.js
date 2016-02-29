@@ -1,4 +1,4 @@
-import TextTrackCueList from '../../../src/js/tracks/text-track-cue-list.js';
+import TextTrackCueList from '../../../../src/js/tracks/text/text-track-cue-list.js';
 
 let genericTracks = [
   {

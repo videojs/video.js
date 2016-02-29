@@ -2,7 +2,7 @@
  * @file html-track-element-list.js
  */
 
-import * as browser from '../utils/browser.js';
+import * as browser from '../../utils/browser.js';
 import document from 'global/document';
 
 class HtmlTrackElementList {

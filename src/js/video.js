@@ -11,7 +11,7 @@ import Player from './player';
 import plugin from './plugins.js';
 import mergeOptions from '../../src/js/utils/merge-options.js';
 import * as Fn from './utils/fn.js';
-import TextTrack from './tracks/text-track.js';
+import TextTrack from './tracks/text/text-track.js';
 
 import assign from 'object.assign';
 import { createTimeRanges } from './utils/time-ranges.js';

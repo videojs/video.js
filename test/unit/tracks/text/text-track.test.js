@@ -1,6 +1,6 @@
-import TextTrack from '../../../src/js/tracks/text-track.js';
+import TextTrack from '../../../../src/js/tracks/text/text-track.js';
 import window from 'global/window';
-import TestHelpers from '../test-helpers.js';
+import TestHelpers from '../../test-helpers.js';
 
 var noop = Function.prototype;
 var defaultTech = {

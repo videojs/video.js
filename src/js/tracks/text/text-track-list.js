@@ -1,9 +1,9 @@
 /**
  * @file text-track-list.js
  */
-import EventTarget from '../event-target';
-import * as Fn from '../utils/fn.js';
-import * as browser from '../utils/browser.js';
+import EventTarget from '../../event-target';
+import * as Fn from '../../utils/fn.js';
+import * as browser from '../../utils/browser.js';
 import document from 'global/document';
 
 /**

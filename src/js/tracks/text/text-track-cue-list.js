@@ -1,7 +1,7 @@
 /**
  * @file text-track-cue-list.js
  */
-import * as browser from '../utils/browser.js';
+import * as browser from '../../utils/browser.js';
 import document from 'global/document';
 
 /**

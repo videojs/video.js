@@ -21,17 +21,17 @@ import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
 import assign from 'object.assign';
 import mergeOptions from './utils/merge-options.js';
-import textTrackConverter from './tracks/text-track-list-converter.js';
+import textTrackConverter from './tracks/text/text-track-list-converter.js';
 
 // Include required child components (importing also registers them)
 import MediaLoader from './tech/loader.js';
 import PosterImage from './poster-image.js';
-import TextTrackDisplay from './tracks/text-track-display.js';
+import TextTrackDisplay from './tracks/text/text-track-display.js';
 import LoadingSpinner from './loading-spinner.js';
 import BigPlayButton from './big-play-button.js';
 import ControlBar from './control-bar/control-bar.js';
 import ErrorDisplay from './error-display.js';
-import TextTrackSettings from './tracks/text-track-settings.js';
+import TextTrackSettings from './tracks/text/text-track-settings.js';
 import ModalDialog from './modal-dialog';
 
 // Require html5 tech, at least for disposing the original video tag

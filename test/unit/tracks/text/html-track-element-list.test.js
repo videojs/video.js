@@ -1,6 +1,6 @@
-import HTMLTrackElement from '../../../src/js/tracks/html-track-element.js';
-import HTMLTrackElementList from '../../../src/js/tracks/html-track-element-list.js';
-import TextTrack from '../../../src/js/tracks/text-track.js';
+import HTMLTrackElement from '../../../../src/js/tracks/text/html-track-element.js';
+import HTMLTrackElementList from '../../../../src/js/tracks/text/html-track-element-list.js';
+import TextTrack from '../../../../src/js/tracks/text/text-track.js';
 
 let noop = Function.prototype;
 let defaultTech = {
