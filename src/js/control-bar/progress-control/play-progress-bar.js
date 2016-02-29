@@ -30,12 +30,6 @@ class PlayProgressBar extends Component {
     }
 
     if (this.keepWithin) {
-      this.timeTooltip = Dom.createEl('div', {
-        className: 'vjs-play-progress-time vjs-time-tooltip'
-      });
-      this.el().appendChild(this.timeTooltip);
-
-      this.on(player, ['seeked'], this.resetMargin);
       this.addClass('vjs-keep-within');
     }
   }
@@ -53,30 +47,9 @@ class PlayProgressBar extends Component {
     });
   }
 
-  resetMargin() {
-    this.timeTooltip.style.marginRight = '-1.5em';
-  }
-
   updateDataAttr() {
     let time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
     this.el_.setAttribute('data-current-time', formatTime(time, this.player_.duration()));
-
-    if (this.keepWithin) {
-      let progressControl = player.controlBar.progressControl;
-      let playerRect = progressControl.el().getBoundingClientRect();
-      let tooltipRect = this.timeTooltip.getBoundingClientRect();
-      let tooltipStyle = getComputedStyle(this.timeTooltip);
-
-      if (tooltipRect.right === 0 && tooltipRect.left === 0) {
-        return;
-      }
-
-      if (playerRect.right < tooltipRect.right) {
-        this.timeTooltip.style.marginRight = (parseInt(tooltipStyle.marginRight, 10) - (playerRect.right - tooltipRect.right)) + 'px';
-      }
-
-      this.timeTooltip.innerHTML = formatTime(time, this.player_.duration());
-    }
   }
 
 }
