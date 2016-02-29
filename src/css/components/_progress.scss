@@ -98,7 +98,6 @@
   visibility: visible;
 }
 
-.vjs-time-tooltip,
 .video-js .vjs-play-progress:before,
 .video-js .vjs-play-progress:after {
   z-index: 1;
@@ -126,24 +125,6 @@
 
 .video-js.vjs-no-flex .vjs-progress-control {
   width: auto;
-}
-
-.vjs-time-tooltip {
-  display: none;
-  height: 2.4em;
-  width: 3.8em;
-  font-size: 0.6em;
-  position: relative;
-  margin: -3.4em -1.5em auto auto;
-  color: #000;
-  content: attr(data-current-time);
-  padding: 6px 8px 8px 8px;
-  @include background-color-with-alpha(#fff, 0.8);
-  @include border-radius(0.3em);
-  background: red;
-}
-.vjs-progress-control:hover .vjs-time-tooltip {
-  display: block;
 }
 
 .vjs-tooltip-progress-bar {
