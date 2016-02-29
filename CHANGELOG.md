@@ -3,6 +3,7 @@ CHANGELOG
 
 ## HEAD (Unreleased)
 * @gkatsev updated videojs badges in the README ([view](https://github.com/videojs/video.js/pull/3134))
+* @BrandonOCasey converted remaining text-track modules to ES6 ([view](https://github.com/videojs/video.js/pull/3130))
 
 --------------------
 
