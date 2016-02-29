@@ -24,10 +24,19 @@ class SeekBar extends Slider {
     this.on(player, 'timeupdate', this.updateARIAAttributes);
     player.ready(Fn.bind(this, this.updateARIAAttributes));
 
-    this.tooltipProgressBar = this.addChild('PlayProgressBar', {
-      name: 'tooltipProgressBar'
-    });
-    this.tooltipProgressBar.addClass('vjs-tooltip-progress-bar');
+    if (options.playerOptions &&
+        options.playerOptions.controlBar &&
+        options.playerOptions.controlBar.progressControl &&
+        options.playerOptions.controlBar.progressControl.keepWithin) {
+      this.keepWithin = options.playerOptions.controlBar.progressControl.keepWithin;
+    }
+
+    if (this.keepWithin) {
+      this.tooltipProgressBar = this.addChild('PlayProgressBar', {
+        name: 'tooltipProgressBar'
+      });
+      this.tooltipProgressBar.addClass('vjs-tooltip-progress-bar');
+    }
   }
 
   /**
@@ -51,8 +60,11 @@ class SeekBar extends Slider {
    */
   updateARIAAttributes() {
     this.updateAttributes(this.el_);
-    this.updateAttributes(this.tooltipProgressBar.el_);
-    this.tooltipProgressBar.el_.style.width = this.bar.el_.style.width;
+
+    if (this.keepWithin) {
+      this.updateAttributes(this.tooltipProgressBar.el_);
+      this.tooltipProgressBar.el_.style.width = this.bar.el_.style.width;
+    }
   }
 
   updateAttributes(el) {
