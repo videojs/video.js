@@ -95,6 +95,7 @@
   padding: 6px 8px 8px 8px;
   @include background-color-with-alpha(#fff, 0.8);
   @include border-radius(0.3em);
+  visibility: visible;
 }
 
 .vjs-time-tooltip,
@@ -143,6 +144,12 @@
 }
 .vjs-progress-control:hover .vjs-time-tooltip {
   display: block;
+}
+
+.vjs-tooltip-progress-bar {
+  min-width: 1.5em;
+  max-width: calc(100% - 1.5em);
+  visibility: hidden;
 }
 
 .video-js .vjs-progress-control .vjs-mouse-display {
