@@ -23,6 +23,11 @@ class SeekBar extends Slider {
     super(player, options);
     this.on(player, 'timeupdate', this.updateARIAAttributes);
     player.ready(Fn.bind(this, this.updateARIAAttributes));
+
+    this.tooltipProgressBar = this.addChild('PlayProgressBar', {
+      name: 'tooltipProgressBar'
+    });
+    this.tooltipProgressBar.addClass('vjs-tooltip-progress-bar');
   }
 
   /**
@@ -45,10 +50,16 @@ class SeekBar extends Slider {
    * @method updateARIAAttributes
    */
   updateARIAAttributes() {
+    this.updateAttributes(this.el_);
+    this.updateAttributes(this.tooltipProgressBar.el_);
+    this.tooltipProgressBar.el_.style.width = this.bar.el_.style.width;
+  }
+
+  updateAttributes(el) {
     // Allows for smooth scrubbing, when player can't keep up.
     let time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
-    this.el_.setAttribute('aria-valuenow', (this.getPercent() * 100).toFixed(2)); // machine readable value of progress bar (percentage complete)
-    this.el_.setAttribute('aria-valuetext', formatTime(time, this.player_.duration())); // human readable value of progress bar (time complete)
+    el.setAttribute('aria-valuenow', (this.getPercent() * 100).toFixed(2)); // machine readable value of progress bar (percentage complete)
+    el.setAttribute('aria-valuetext', formatTime(time, this.player_.duration())); // human readable value of progress bar (time complete)
   }
 
   /**
