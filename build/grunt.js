@@ -496,6 +496,8 @@ module.exports = function(grunt) {
     grunt.file.write(cssPath, css.replace(/(\\f\w+);/g, "'$1';"));
   });
 
+  grunt.registerTask('skin', ['sass', 'wrapcodepoints']);
+
   // Default task - build and test
   grunt.registerTask('default', ['test']);
 
