@@ -51,12 +51,27 @@ class MouseTimeDisplay extends Component {
   update(newTime, position) {
     let time = formatTime(newTime, this.player_.duration());
 
-    this.el().style.left = position + 'px';
+    this.el().style.left = this.clampPosition(position) + 'px';
     this.el().setAttribute('data-current-time', time);
   }
 
   calculateDistance(event) {
     return Dom.getPointerPosition(this.el().parentNode, event).x;
+  }
+
+  clampPosition(position) {
+    let playerWidth = parseFloat(getComputedStyle(this.player().el()).width);
+    let tooltipWidth = parseFloat(getComputedStyle(this.el(), ':after').width);
+    let tooltipWidthHalf = tooltipWidth / 2;
+    let actualPosition = position;
+
+    if (position < tooltipWidthHalf) {
+      actualPosition = Math.ceil(tooltipWidthHalf);
+    } else if (position > (playerWidth - tooltipWidthHalf)) {
+      actualPosition = Math.floor(playerWidth - tooltipWidthHalf);
+    }
+
+    return actualPosition;
   }
 }
 
