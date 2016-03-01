@@ -22,6 +22,13 @@ class MouseTimeDisplay extends Component {
   constructor(player, options) {
     super(player, options);
 
+    if (options.playerOptions &&
+        options.playerOptions.controlBar &&
+        options.playerOptions.controlBar.progressControl &&
+        options.playerOptions.controlBar.progressControl.keepWithin) {
+      this.keepWithin = options.playerOptions.controlBar.progressControl.keepWithin;
+    }
+
     this.update(0, 0);
 
     player.on('ready', () => {
@@ -61,6 +68,10 @@ class MouseTimeDisplay extends Component {
   }
 
   clampPosition(position) {
+    if (!this.keepWithin) {
+      return position;
+    }
+
     let playerWidth = parseFloat(window.getComputedStyle(this.player().el()).width);
     let tooltipWidth = parseFloat(window.getComputedStyle(this.el(), ':after').width);
     let tooltipWidthHalf = tooltipWidth / 2;
