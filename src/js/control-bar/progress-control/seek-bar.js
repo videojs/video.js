@@ -21,8 +21,9 @@ class SeekBar extends Slider {
 
   constructor(player, options){
     super(player, options);
-    this.on(player, 'timeupdate', this.updateARIAAttributes);
-    player.ready(Fn.bind(this, this.updateARIAAttributes));
+    this.on(player, 'timeupdate', this.updateProgress);
+    this.on(player, 'ended', this.updateProgress);
+    player.ready(Fn.bind(this, this.updateProgress));
 
     if (options.playerOptions &&
         options.playerOptions.controlBar &&
@@ -58,16 +59,22 @@ class SeekBar extends Slider {
    *
    * @method updateARIAAttributes
    */
-  updateARIAAttributes() {
-    this.updateAttributes(this.el_);
+  updateProgress() {
+    this.updateAriaAttributes(this.el_);
 
     if (this.keepWithin) {
-      this.updateAttributes(this.tooltipProgressBar.el_);
+      this.updateAriaAttributes(this.tooltipProgressBar.el_);
       this.tooltipProgressBar.el_.style.width = this.bar.el_.style.width;
+
+      let playerWidth = parseFloat(getComputedStyle(player.el()).width);
+      let tooltipWidth = parseFloat(getComputedStyle(this.tooltipProgressBar.el(), ':after').width);
+      let tooltipStyle = this.tooltipProgressBar.el().style;
+      tooltipStyle.maxWidth = (playerWidth - (tooltipWidth / 2)) + 'px';
+      tooltipStyle.minWidth = (tooltipWidth / 2) + 'px';
     }
   }
 
-  updateAttributes(el) {
+  updateAriaAttributes(el) {
     // Allows for smooth scrubbing, when player can't keep up.
     let time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
     el.setAttribute('aria-valuenow', (this.getPercent() * 100).toFixed(2)); // machine readable value of progress bar (percentage complete)
