@@ -1,6 +1,7 @@
 /**
  * @file seek-bar.js
  */
+import window from 'global/window';
 import Slider from '../../slider/slider.js';
 import Component from '../../component.js';
 import LoadProgressBar from './load-progress-bar.js';
@@ -66,8 +67,8 @@ class SeekBar extends Slider {
       this.updateAriaAttributes(this.tooltipProgressBar.el_);
       this.tooltipProgressBar.el_.style.width = this.bar.el_.style.width;
 
-      let playerWidth = parseFloat(getComputedStyle(player.el()).width);
-      let tooltipWidth = parseFloat(getComputedStyle(this.tooltipProgressBar.el(), ':after').width);
+      let playerWidth = parseFloat(window.getComputedStyle(this.player().el()).width);
+      let tooltipWidth = parseFloat(window.getComputedStyle(this.tooltipProgressBar.el(), ':after').width);
       let tooltipStyle = this.tooltipProgressBar.el().style;
       tooltipStyle.maxWidth = Math.floor(playerWidth - (tooltipWidth / 2)) + 'px';
       tooltipStyle.minWidth = Math.ceil(tooltipWidth / 2) + 'px';

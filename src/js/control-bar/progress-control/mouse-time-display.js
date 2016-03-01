@@ -1,6 +1,7 @@
 /**
  * @file mouse-time-display.js
  */
+import window from 'global/window';
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
@@ -60,8 +61,8 @@ class MouseTimeDisplay extends Component {
   }
 
   clampPosition(position) {
-    let playerWidth = parseFloat(getComputedStyle(this.player().el()).width);
-    let tooltipWidth = parseFloat(getComputedStyle(this.el(), ':after').width);
+    let playerWidth = parseFloat(window.getComputedStyle(this.player().el()).width);
+    let tooltipWidth = parseFloat(window.getComputedStyle(this.el(), ':after').width);
     let tooltipWidthHalf = tooltipWidth / 2;
     let actualPosition = position;
 
