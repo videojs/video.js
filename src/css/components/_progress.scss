@@ -41,7 +41,7 @@
 // Also show the current time tooltip
 .video-js .vjs-progress-control:hover .vjs-mouse-display:after,
 .video-js .vjs-progress-control:hover .vjs-play-progress:after {
-  display: block;
+  visibility: visible;
   font-size: 0.6em;
 }
 
@@ -85,17 +85,17 @@
 // By default this is hidden and only shown when hovering over the progress control
 .video-js .vjs-mouse-display:after,
 .video-js .vjs-play-progress:after {
-  display: none;
+  visibility: hidden;
+  pointer-events: none;
   position: absolute;
   top: -3.4em;
-  right: -1.5em;
+  right: -1.9em;
   font-size: 0.9em;
   color: #000;
   content: attr(data-current-time);
   padding: 6px 8px 8px 8px;
   @include background-color-with-alpha(#fff, 0.8);
   @include border-radius(0.3em);
-  visibility: visible;
 }
 
 .video-js .vjs-play-progress:before,
@@ -128,8 +128,6 @@
 }
 
 .vjs-tooltip-progress-bar {
-  min-width: 1.5em;
-  max-width: calc(100% - 1.5em);
   visibility: hidden;
 }
 
