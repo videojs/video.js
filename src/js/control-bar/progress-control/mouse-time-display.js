@@ -25,8 +25,8 @@ class MouseTimeDisplay extends Component {
     if (options.playerOptions &&
         options.playerOptions.controlBar &&
         options.playerOptions.controlBar.progressControl &&
-        options.playerOptions.controlBar.progressControl.keepWithin) {
-      this.keepWithin = options.playerOptions.controlBar.progressControl.keepWithin;
+        options.playerOptions.controlBar.progressControl.keepTooltipsInside) {
+      this.keepTooltipsInside = options.playerOptions.controlBar.progressControl.keepTooltipsInside;
     }
 
     this.update(0, 0);
@@ -68,7 +68,7 @@ class MouseTimeDisplay extends Component {
   }
 
   clampPosition(position) {
-    if (!this.keepWithin) {
+    if (!this.keepTooltipsInside) {
       return position;
     }
 

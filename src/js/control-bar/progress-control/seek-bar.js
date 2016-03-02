@@ -29,11 +29,11 @@ class SeekBar extends Slider {
     if (options.playerOptions &&
         options.playerOptions.controlBar &&
         options.playerOptions.controlBar.progressControl &&
-        options.playerOptions.controlBar.progressControl.keepWithin) {
-      this.keepWithin = options.playerOptions.controlBar.progressControl.keepWithin;
+        options.playerOptions.controlBar.progressControl.keepTooltipsInside) {
+      this.keepTooltipsInside = options.playerOptions.controlBar.progressControl.keepTooltipsInside;
     }
 
-    if (this.keepWithin) {
+    if (this.keepTooltipsInside) {
       this.tooltipProgressBar = this.addChild('PlayProgressBar', {
         name: 'tooltipProgressBar'
       });
@@ -63,7 +63,7 @@ class SeekBar extends Slider {
   updateProgress() {
     this.updateAriaAttributes(this.el_);
 
-    if (this.keepWithin) {
+    if (this.keepTooltipsInside) {
       this.updateAriaAttributes(this.tooltipProgressBar.el_);
       this.tooltipProgressBar.el_.style.width = this.bar.el_.style.width;
 
