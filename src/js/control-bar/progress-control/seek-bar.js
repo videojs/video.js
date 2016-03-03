@@ -6,6 +6,7 @@ import Slider from '../../slider/slider.js';
 import Component from '../../component.js';
 import LoadProgressBar from './load-progress-bar.js';
 import PlayProgressBar from './play-progress-bar.js';
+import TooltipProgressBar from './tooltip-progress-bar.js';
 import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
 import assign from 'object.assign';
@@ -34,10 +35,7 @@ class SeekBar extends Slider {
     }
 
     if (this.keepTooltipsInside) {
-      this.tooltipProgressBar = this.addChild('PlayProgressBar', {
-        name: 'tooltipProgressBar'
-      });
-      this.tooltipProgressBar.addClass('vjs-tooltip-progress-bar');
+      this.tooltipProgressBar = this.addChild('TooltipProgressBar');
     }
   }
 
@@ -68,7 +66,7 @@ class SeekBar extends Slider {
       this.tooltipProgressBar.el_.style.width = this.bar.el_.style.width;
 
       let playerWidth = parseFloat(window.getComputedStyle(this.player().el()).width);
-      let tooltipWidth = parseFloat(window.getComputedStyle(this.tooltipProgressBar.el(), ':after').width);
+      let tooltipWidth = parseFloat(window.getComputedStyle(this.tooltipProgressBar.tooltip).width);
       let tooltipStyle = this.tooltipProgressBar.el().style;
       tooltipStyle.maxWidth = Math.floor(playerWidth - (tooltipWidth / 2)) + 'px';
       tooltipStyle.minWidth = Math.ceil(tooltipWidth / 2) + 'px';

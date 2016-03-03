@@ -29,6 +29,12 @@ class MouseTimeDisplay extends Component {
       this.keepTooltipsInside = options.playerOptions.controlBar.progressControl.keepTooltipsInside;
     }
 
+    if (this.keepTooltipsInside) {
+      this.el().innerHTML = `<div class='vjs-time-tooltip'>`;
+      this.tooltip = this.el().querySelector('.vjs-time-tooltip');
+      this.addClass('vjs-keep-tooltips-inside');
+    }
+
     this.update(0, 0);
 
     player.on('ready', () => {
@@ -61,6 +67,10 @@ class MouseTimeDisplay extends Component {
 
     this.el().style.left = this.clampPosition(position) + 'px';
     this.el().setAttribute('data-current-time', time);
+
+    if (this.keepTooltipsInside) {
+      this.tooltip.innerHTML = time;
+    }
   }
 
   calculateDistance(event) {
@@ -73,7 +83,7 @@ class MouseTimeDisplay extends Component {
     }
 
     let playerWidth = parseFloat(window.getComputedStyle(this.player().el()).width);
-    let tooltipWidth = parseFloat(window.getComputedStyle(this.el(), ':after').width);
+    let tooltipWidth = parseFloat(window.getComputedStyle(this.tooltip).width);
     let tooltipWidthHalf = tooltipWidth / 2;
     let actualPosition = position;
 
