@@ -2,7 +2,6 @@ import TextTrackList from '../../../src/js/tracks/text-track-list.js';
 import TextTrack from '../../../src/js/tracks/text-track.js';
 import EventTarget from '../../../src/js/event-target.js';
 
-const noop = () => {};
 const genericTracks = [
   {
     id: '1',
