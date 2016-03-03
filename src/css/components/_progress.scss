@@ -132,15 +132,11 @@
 }
 
 .vjs-time-tooltip {
+  display: inline-block;
   height: 2.4em;
-  width: 3.8em;
-  top: auto;
-  right: auto;
   position: relative;
-  margin: -3.4em -1.9em auto auto;
-}
-.vjs-mouse-display .vjs-time-tooltip {
-  margin-left: -1.9em;
+  float: right;
+  right: -1.9em;
 }
 
 .vjs-tooltip-progress-bar {
