@@ -69,7 +69,10 @@ class MouseTimeDisplay extends Component {
     this.el().setAttribute('data-current-time', time);
 
     if (this.keepTooltipsInside) {
+      let tooltipWidth = parseFloat(window.getComputedStyle(this.tooltip).width);
+      let tooltipWidthHalf = tooltipWidth / 2;
       this.tooltip.innerHTML = time;
+      this.tooltip.style.right = `-${tooltipWidthHalf}px`;
     }
   }
 

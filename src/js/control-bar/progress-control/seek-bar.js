@@ -70,6 +70,7 @@ class SeekBar extends Slider {
       let tooltipStyle = this.tooltipProgressBar.el().style;
       tooltipStyle.maxWidth = Math.floor(playerWidth - (tooltipWidth / 2)) + 'px';
       tooltipStyle.minWidth = Math.ceil(tooltipWidth / 2) + 'px';
+      tooltipStyle.right = `-${tooltipWidth / 2}px`;
     }
   }
 
