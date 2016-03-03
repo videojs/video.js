@@ -144,7 +144,7 @@ npm install
 Build a local copy of video.js and run tests
 
 ```bash
-grunt
+grunt dist
 grunt test
 ```
 

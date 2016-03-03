@@ -79,8 +79,9 @@ export function getEl(id){
 /**
  * Creates an element and applies properties.
  *
- * @param  {String=} tagName    Name of tag to be created.
- * @param  {Object=} properties Element properties to be applied.
+ * @param  {String} [tagName='div'] Name of tag to be created.
+ * @param  {Object} [properties={}] Element properties to be applied.
+ * @param  {Object} [attributes={}] Element attributes to be applied.
  * @return {Element}
  * @function createEl
  */

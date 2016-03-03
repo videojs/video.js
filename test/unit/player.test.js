@@ -30,6 +30,15 @@ test('should create player instance that inherits from component and dispose it'
   ok(player.el() === null, 'element disposed');
 });
 
+test('dispose should not throw if styleEl is missing', function(){
+  var player = TestHelpers.makePlayer();
+
+  player.styleEl_.parentNode.removeChild(player.styleEl_);
+
+  player.dispose();
+  ok(player.el() === null, 'element disposed');
+});
+
 // technically, all uses of videojs.options should be replaced with
 // Player.prototype.options_ in this file and a equivalent test using
 // videojs.options should be made in video.test.js. Keeping this here

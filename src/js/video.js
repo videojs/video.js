@@ -52,8 +52,8 @@ if (typeof HTMLVideoElement === 'undefined') {
  * @mixes videojs
  * @method videojs
  */
-var videojs = function(id, options, ready){
-  var tag; // Element of ID
+let videojs = function(id, options, ready){
+  let tag; // Element of ID
 
   // Allow for element or ID to be passed in
   // String ID
@@ -95,7 +95,7 @@ var videojs = function(id, options, ready){
 
   // Element may have a player attr referring to an already created player instance.
   // If not, set up a new player and return the instance.
-  return tag['player'] || new Player(tag, options, ready);
+  return tag['player'] || Player.players[tag.playerId] || new Player(tag, options, ready);
 };
 
 // Add default styles
@@ -562,6 +562,17 @@ videojs.isEl = Dom.isEl;
  * @return {Boolean}
  */
 videojs.isTextNode = Dom.isTextNode;
+
+/**
+ * Creates an element and applies properties.
+ *
+ * @method createEl
+ * @param  {String} [tagName='div'] Name of tag to be created.
+ * @param  {Object} [properties={}] Element properties to be applied.
+ * @param  {Object} [attributes={}] Element attributes to be applied.
+ * @return {Element}
+ */
+videojs.createEl = Dom.createEl;
 
 /**
  * Check if an element has a CSS class

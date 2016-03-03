@@ -158,10 +158,16 @@ class TextTrackSettings extends Component {
    * @method restoreSettings
    */
   restoreSettings() {
-    let [err, values] = safeParseTuple(window.localStorage.getItem('vjs-text-track-settings'));
+    let err, values;
 
-    if (err) {
-      log.error(err);
+    try {
+      [err, values] = safeParseTuple(window.localStorage.getItem('vjs-text-track-settings'));
+
+      if (err) {
+        log.error(err);
+      }
+    } catch (e) {
+      log.warn(e);
     }
 
     if (values) {
@@ -186,7 +192,9 @@ class TextTrackSettings extends Component {
       } else {
         window.localStorage.removeItem('vjs-text-track-settings');
       }
-    } catch (e) {}
+    } catch (e) {
+      log.warn(e);
+    }
   }
 
   /**

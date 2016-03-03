@@ -44,11 +44,14 @@ class VolumeBar extends Slider {
    * @method handleMouseMove
    */
   handleMouseMove(event) {
+    this.checkMuted();
+    this.player_.volume(this.calculateDistance(event));
+  }
+
+  checkMuted() {
     if (this.player_.muted()) {
       this.player_.muted(false);
     }
-
-    this.player_.volume(this.calculateDistance(event));
   }
 
   /**
@@ -71,6 +74,7 @@ class VolumeBar extends Slider {
    * @method stepForward
    */
   stepForward() {
+    this.checkMuted();
     this.player_.volume(this.player_.volume() + 0.1);
   }
 
@@ -80,6 +84,7 @@ class VolumeBar extends Slider {
    * @method stepBack
    */
   stepBack() {
+    this.checkMuted();
     this.player_.volume(this.player_.volume() - 0.1);
   }
 

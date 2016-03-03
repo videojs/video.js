@@ -5,7 +5,11 @@ Multiple language support allows for users of non-English locales to natively in
 
 Creating the Language File
 --------------------------
-Video.js uses key/value object dictionaries in JSON form. A sample dictionary for Spanish `['es']` would look as follows;
+Video.js uses key/value object dictionaries in JSON form.
+
+An English lang file is at [/lang/en.json](https://github.com/videojs/video.js/tree/master/lang/en.json) which should be used as a template for new files. This will be kept up to date with strings in the core player that need localizations.
+
+A sample dictionary for Spanish `['es']` would look as follows:
 
 ```JSON
 {
@@ -21,7 +25,7 @@ Video.js uses key/value object dictionaries in JSON form. A sample dictionary fo
   "Fullscreen": "Pantalla completa",
   "Non-Fullscreen": "Pantalla no completa",
   "Mute": "Silenciar",
-  "Unmuted": "No silenciado",
+  "Unmute": "No silenciado",
   "Playback Rate": "Velocidad de reproducción",
   "Subtitles": "Subtítulos",
   "subtitles off": "Subtítulos desactivados",
@@ -38,7 +42,7 @@ Video.js uses key/value object dictionaries in JSON form. A sample dictionary fo
 
 Notes:
 
-- The file name should always be in the format `XX.json`, where `XX` is the two letter value of the language reported to the browser (for options see the bottom of this document).
+- The file name should always be in the format `XX.json`, where `XX` is the language code. This should be a two letter code (for options see the bottom of this document) except for cases where a more specific code with sub-code is appropriate, e.g. `zh-CN.lang`.
 - For automatic inclusion at build time, add your language file to the `/lang` directory (see 'Adding Languages to Video.js below').
 
 Adding Languages to Video.js
@@ -69,7 +73,7 @@ NOTE: These need to be added after the core Video.js script.
     "Fullscreen": "Pantalla completa",
     "Non-Fullscreen": "Pantalla no completa",
     "Mute": "Silenciar",
-    "Unmuted": "No silenciado",
+    "Unmute": "No silenciado",
     "Playback Rate": "Velocidad de reproducción",
     "Subtitles": "Subtítulos",
     "subtitles off": "Subtítulos desactivados",
@@ -89,12 +93,12 @@ NOTE: These need to be added after the core Video.js script.
 3. During a Video.js player instantiation. Adding the languages to the configuration object provided in the `data-setup` attribute.
 
 ```html
-<video id="example_video_1" class="video-js vjs-default-skin"  
-  controls preload="auto" width="640" height="264"  
-  data-setup='{"languages":{"es":{"Play":"Juego"}}}'>  
- <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' />  
- <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />  
- <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />  
+<video id="example_video_1" class="video-js vjs-default-skin"
+  controls preload="auto" width="640" height="264"
+  data-setup='{"languages":{"es":{"Play":"Juego"}}}'>
+ <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' />
+ <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />
+ <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />
 
  <track kind="captions" src="http://example.com/path/to/captions.vtt" srclang="en" label="English" default>
 
@@ -110,12 +114,12 @@ Setting Default Language in a Video.js Player
 During a Video.js player instantiation you can force it to localize to a specific language by including the locale value into the configuration object via the `data-setup` attribute. Valid options listed at the bottom of the page for reference.
 
 ```html
-<video id="example_video_1" class="video-js vjs-default-skin"  
-  controls preload="auto" width="640" height="264"  
-  data-setup='{"language":"es"}'>  
- <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' />  
- <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />  
- <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />  
+<video id="example_video_1" class="video-js vjs-default-skin"
+  controls preload="auto" width="640" height="264"
+  data-setup='{"language":"es"}'>
+ <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' />
+ <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />
+ <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />
 
  <track kind="captions" src="http://example.com/path/to/captions.vtt" srclang="en" label="English" default>
 
@@ -145,7 +149,7 @@ Localization in Plugins
 
 When you're developing a plugin, you can also introduce new localized strings. Simply wrap the string with the player's `localize` function:
 
-```javascript
+```js
 var details = '<div class="vjs-errors-details">' + player.localize('Technical details') + '</div>';
 ```
 
@@ -153,7 +157,7 @@ Language Codes
 --------------
 The following is a list of official language codes.
 
-**NOTE:** For supported language translations, please see the [Languages Folder (/lang)](../../lang) folder located in the project root.
+**NOTE:** For supported language translations, please see the [Languages Folder (/lang)](https://github.com/videojs/video.js/tree/master/lang) folder located in the project root.
 
 <table border="0" cellspacing="5" cellpadding="5">
   <tr>

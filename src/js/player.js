@@ -224,7 +224,7 @@ class Player extends Component {
     // prevent dispose from being called twice
     this.off('dispose');
 
-    if (this.styleEl_) {
+    if (this.styleEl_ && this.styleEl_.parentNode) {
       this.styleEl_.parentNode.removeChild(this.styleEl_);
     }
 
@@ -269,6 +269,7 @@ class Player extends Component {
     // Update tag id/class for use as HTML5 playback tech
     // Might think we should do this after embedding in container so .vjs-tech class
     // doesn't flash 100% width/height, but class only applies with .video-js parent
+    tag.playerId = tag.id;
     tag.id += '_html5_api';
     tag.className = 'vjs-tech';
 
@@ -299,7 +300,12 @@ class Player extends Component {
     if (tag.parentNode) {
       tag.parentNode.insertBefore(el, tag);
     }
+
+    // insert the tag as the first child of the player element
+    // then manually add it to the children array so that this.addChild
+    // will work properly for other components
     Dom.insertElFirst(tag, el); // Breaks iPhone, fixed in HTML5 setup.
+    this.children_.unshift(tag);
 
     this.el_ = el;
 
@@ -720,7 +726,7 @@ class Player extends Component {
     // In Safari (5.1.1), when we move the video element into the container div, autoplay doesn't work.
     // In Chrome (15), if you have autoplay + a poster + no controls, the video gets hidden (but audio plays)
     // This fixes both issues. Need to wait for API, so it updates displays correctly
-    if (this.tag && this.options_.autoplay && this.paused()) {
+    if (this.src() && this.tag && this.options_.autoplay && this.paused()) {
       delete this.tag.poster; // Chrome Fix. Fixed in Chrome v16.
       this.play();
     }
@@ -1979,7 +1985,7 @@ class Player extends Component {
   /**
    * Get or set the autoplay attribute.
    *
-   * @param {Boolean} value Boolean to determine if preload should be used
+   * @param {Boolean} value Boolean to determine if video should autoplay
    * @return {String} The autoplay attribute value when getting
    * @return {Player} Returns the player when setting
    * @method autoplay
@@ -1996,7 +2002,7 @@ class Player extends Component {
   /**
    * Get or set the loop attribute on the video element.
    *
-   * @param {Boolean} value Boolean to determine if preload should be used
+   * @param {Boolean} value Boolean to determine if video should loop
    * @return {String} The loop attribute value when getting
    * @return {Player} Returns the player when setting
    * @method loop

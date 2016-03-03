@@ -15,6 +15,7 @@
 .video-js .vjs-progress-control {
   @include flex(auto);
   @include display-flex(center);
+  min-width: 4em;
 }
 
 .vjs-live .vjs-progress-control {
@@ -86,12 +87,12 @@
 .video-js .vjs-play-progress:after {
   display: none;
   position: absolute;
-  top: -2.4em;
+  top: -3.4em;
   right: -1.5em;
   font-size: 0.9em;
   color: #000;
   content: attr(data-current-time);
-  padding: 0.2em 0.5em;
+  padding: 6px 8px 8px 8px;
   @include background-color-with-alpha(#fff, 0.8);
   @include border-radius(0.3em);
 }
@@ -102,7 +103,7 @@
 
 .video-js .vjs-load-progress {
   // For IE8 we'll lighten the color
-  background: ligthen($secondary-background-color, 25%);
+  background: lighten($secondary-background-color, 25%);
   // Otherwise we'll rely on stacked opacities
   background: rgba($secondary-background-color, $secondary-background-transparency);
 }
@@ -111,7 +112,7 @@
 // specific time ranges that have been buffered
 .video-js .vjs-load-progress div {
   // For IE8 we'll lighten the color
-  background: ligthen($secondary-background-color, 50%);
+  background: lighten($secondary-background-color, 50%);
   // Otherwise we'll rely on stacked opacities
   background: rgba($secondary-background-color, 0.75);
 }

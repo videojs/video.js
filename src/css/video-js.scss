@@ -2,7 +2,11 @@
 @import "private-variables";
 @import "utilities";
 
-@import "../../node_modules/videojs-font/scss/icons";
+@if $icon-codepoints {
+  @import "../../node_modules/videojs-font/scss/icons-codepoints";
+} @else {
+  @import "../../node_modules/videojs-font/scss/icons";
+}
 
 @import "components/layout";
 @import "components/big-play";
