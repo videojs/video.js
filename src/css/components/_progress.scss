@@ -42,6 +42,7 @@
 .vjs-progress-control:hover .vjs-time-tooltip,
 .video-js .vjs-progress-control:hover .vjs-mouse-display:after,
 .video-js .vjs-progress-control:hover .vjs-play-progress:after {
+  font-family: VideoJS;
   visibility: visible;
   font-size: 0.6em;
 }
