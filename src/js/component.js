@@ -1098,27 +1098,24 @@ class Component {
    * @method currentDimension
    */
   currentDimension(widthOrHeight) {
-    let computedWidthOrHeight;
+    let computedWidthOrHeight = 0;
 
     if (widthOrHeight !== 'width' && widthOrHeight !== 'height') {
-      log.warn('currentDimension only accepts width or height value');
-      return false;
+      throw new Error('currentDimension only accepts width or height value');
     }
 
-    if (typeof window.getComputedStyle !== 'undefined') {
-      const computedStyle = window.getComputedStyle(this.el_, null);
+    if (typeof window.getComputedStyle === 'function') {
+      const computedStyle = window.getComputedStyle(this.el_);
       computedWidthOrHeight = computedStyle.getPropertyValue(widthOrHeight) || computedStyle[ widthOrHeight ];
-    }
-
-    if (this.el_.currentStyle) {
+    } else if (this.el_.currentStyle) {
       // ie 8 doesn't support computed style, shim it
       // return clientWidth or clientHeight instead for better accuracy
-      const rule = 'client' + widthOrHeight.substr(0, 1).toUpperCase() + widthOrHeight.substr(1);
+      const rule = `offset${toTitleCase(widthOrHeight)}`;
       computedWidthOrHeight = this.el_[rule];
     }
 
     // remove 'px' from variable and parse as integer
-    computedWidthOrHeight = parseInt(computedWidthOrHeight, 10);
+    computedWidthOrHeight = parseFloat(computedWidthOrHeight);
     return computedWidthOrHeight;
   }
 

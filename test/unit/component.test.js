@@ -573,10 +573,13 @@ test('should change the width and height of a component', function(){
 });
 
 test('should get the computed dimensions', function(){
-  var container = document.createElement('div');
-  var comp = new Component(getFakePlayer(), {});
-  var el = comp.el();
-  var fixture = document.getElementById('qunit-fixture');
+  const container = document.createElement('div');
+  const comp = new Component(getFakePlayer(), {});
+  const el = comp.el();
+  const fixture = document.getElementById('qunit-fixture');
+
+  const computedWidth = '500px';
+  const computedHeight = '500px';
 
   fixture.appendChild(container);
   container.appendChild(el);
@@ -587,17 +590,14 @@ test('should get the computed dimensions', function(){
   comp.width('50%');
   comp.height('50%');
 
-  var computedWidth = TestHelpers.getComputedStyle(el, 'width');
-  var computedHeight = TestHelpers.getComputedStyle(el, 'height');
+  equal(comp.currentWidth() + 'px', computedWidth, 'matches computed width');
+  equal(comp.currentHeight() + 'px', computedHeight, 'matches computed height');
 
-  ok(computedWidth === comp.currentWidth() + 'px', 'matches computed width');
-  ok(computedHeight === comp.currentHeight() + 'px', 'matches computed height');
+  equal(comp.currentDimension('width') + 'px', computedWidth, 'matches computed width');
+  equal(comp.currentDimension('height') + 'px', computedHeight, 'matches computed height');
 
-  ok(computedWidth === comp.currentDimension('width') + 'px', 'matches computed width');
-  ok(computedHeight === comp.currentDimension('height') + 'px', 'matches computed height');
-
-  ok(computedWidth === comp.currentDimensions()['width'] + 'px', 'matches computed width');
-  ok(computedHeight === comp.currentDimensions()['height'] + 'px', 'matches computed width');
+  equal(comp.currentDimensions()['width'] + 'px', computedWidth, 'matches computed width');
+  equal(comp.currentDimensions()['height'] + 'px', computedHeight, 'matches computed width');
 
 });
 
