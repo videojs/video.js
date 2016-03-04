@@ -410,16 +410,15 @@ test('removes cuechange event when text track is hidden for emulated tracks', fu
 
 test('should return correct remote text track values', function() {
   let fixture = document.getElementById('qunit-fixture');
-  let html = '';
-
-  html += '<video id="example_1" class="video-js" autoplay preload="none">';
-  html += '<source src="http://google.com" type="video/mp4">';
-  html += '<source src="http://google.com" type="video/webm">';
-  html += '<track kind="captions" label="label">';
-  html += '</video>';
+  let html = `
+    <video id="example_1" class="video-js" autoplay preload="none">
+      <source src="http://google.com" type="video/mp4">
+      <source src="http://google.com" type="video/webm">
+      <track kind="captions" label="label">
+    </video>
+  `;
 
   fixture.innerHTML += html;
-
   let tag = document.getElementById('example_1');
   let player = TestHelpers.makePlayer({}, tag);
 
