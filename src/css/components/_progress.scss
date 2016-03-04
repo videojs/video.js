@@ -39,7 +39,7 @@
  to avoid a weird hitch when you roll off the hover. */
 
 // Also show the current time tooltip
-.vjs-progress-control:hover .vjs-time-tooltip,
+.video-js .vjs-progress-control:hover .vjs-time-tooltip,
 .video-js .vjs-progress-control:hover .vjs-mouse-display:after,
 .video-js .vjs-progress-control:hover .vjs-play-progress:after {
   font-family: VideoJS;
@@ -86,7 +86,7 @@
 
 // Current Time "tooltip"
 // By default this is hidden and only shown when hovering over the progress control
-.vjs-time-tooltip,
+.video-js .vjs-time-tooltip,
 .video-js .vjs-mouse-display:after,
 .video-js .vjs-play-progress:after {
   visibility: hidden;
@@ -102,7 +102,7 @@
   @include border-radius(0.3em);
 }
 
-.vjs-time-tooltip,
+.video-js .vjs-time-tooltip,
 .video-js .vjs-play-progress:before,
 .video-js .vjs-play-progress:after {
   z-index: 1;
@@ -132,7 +132,7 @@
   width: auto;
 }
 
-.vjs-time-tooltip {
+.video-js .vjs-time-tooltip {
   display: inline-block;
   height: 2.4em;
   position: relative;
