@@ -2,6 +2,11 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 5.8.1 (2016-03-07)
 * @gkatsev updated videojs badges in the README ([view](https://github.com/videojs/video.js/pull/3134))
 * @BrandonOCasey converted remaining text-track modules to ES6 ([view](https://github.com/videojs/video.js/pull/3130))
 * @gkatsev cleared waiting/spinner on timeupdate. Fixes #3124 ([view](https://github.com/videojs/video.js/pull/3138))
@@ -9,8 +14,6 @@ CHANGELOG
 * @defli added missing var to sandbox index.html example ([view](https://github.com/videojs/video.js/pull/3155))
 * @defli fixed typo and updated Turkish translations ([view](https://github.com/videojs/video.js/pull/3156))
 * @OwenEdwards fixed menu closing on ios, specifically ipad ([view](https://github.com/videojs/video.js/pull/3158))
-
---------------------
 
 ## 5.8.0 (2016-02-19)
 * @gkatsev added issue and PR templates for github ([view](https://github.com/videojs/video.js/pull/3117))
