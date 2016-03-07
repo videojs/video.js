@@ -943,3 +943,11 @@ test('player#reset loads the first item in the techOrder and then techCalls rese
   equal(loadedSource, null, 'with a null source');
   equal(techCallMethod, 'reset', 'we then reset the tech');
 });
+
+test('Remove waiting class on timeupdate after tech waiting', function() {
+  let player = TestHelpers.makePlayer();
+  player.tech_.trigger('waiting');
+  ok(/vjs-waiting/.test(player.el().className), 'vjs-waiting is added to the player el on tech waiting');
+  player.trigger('timeupdate');
+  ok(!/vjs-waiting/.test(player.el().className), 'vjs-waiting is removed from the player el on timeupdate');
+});
