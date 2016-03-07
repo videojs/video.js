@@ -7,6 +7,7 @@ CHANGELOG
 * @gkatsev cleared waiting/spinner on timeupdate. Fixes #3124 ([view](https://github.com/videojs/video.js/pull/3138))
 * @BrandonOCasey updated text track unit tests to use full es6 syntax ([view](https://github.com/videojs/video.js/pull/3148))
 * @defli added missing var to sandbox index.html example ([view](https://github.com/videojs/video.js/pull/3155))
+* @defli fixed typo and updated Turkish translations ([view](https://github.com/videojs/video.js/pull/3156))
 
 --------------------
 
