@@ -69,7 +69,7 @@ class MouseTimeDisplay extends Component {
     this.el().setAttribute('data-current-time', time);
 
     if (this.keepTooltipsInside) {
-      let clampedPosition = this.clampPosition(position);
+      let clampedPosition = this.clampPosition_(position);
       let difference = position - clampedPosition + 1;
       let tooltipWidth = parseFloat(window.getComputedStyle(this.tooltip).width);
       let tooltipWidthHalf = tooltipWidth / 2;
@@ -83,7 +83,17 @@ class MouseTimeDisplay extends Component {
     return Dom.getPointerPosition(this.el().parentNode, event).x;
   }
 
-  clampPosition(position) {
+  /**
+   * This takes in a horizontal position for the bar and returns a clamped position.
+   * Clamped position means that it will keep the position greater than half the width
+   * of the tooltip and smaller than the player width minus half the width o the tooltip.
+   * It will only clamp the position if `keepTooltipsInside` option is set.
+   *
+   * @param {Number} position the position the bar wants to be
+   * @return {Number} newPosition the (potentially) clamped position
+   * @method clampPosition_
+   */
+  clampPosition_(position) {
     if (!this.keepTooltipsInside) {
       return position;
     }
