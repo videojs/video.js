@@ -41,19 +41,22 @@ Player
     BigPlayButton
     ControlBar
         PlayToggle
-        FullscreenToggle
-        CurrentTimeDisplay
-        TimeDivider
-        DurationDisplay
-        RemainingTimeDisplay
+        VolumeMenuButton
+        CurrentTimeDisplay (Hidden by default)
+        TimeDivider (Hidden by default)
+        DurationDisplay (Hidden by default)
         ProgressControl
             SeekBar
               LoadProgressBar
+              MouseTimeDisplay
               PlayProgressBar
-              SeekHandle
-        VolumeControl
-            VolumeBar
-                VolumeLevel
-                VolumeHandle
-        MuteToggle
+        LiveDisplay (Hidden by default)
+        RemainingTimeDisplay
+        CustomControlsSpacer (No UI)
+        ChaptersButton (Hidden by default)
+        SubtitlesButton (Hidden by default)
+        CaptionsButton (Hidden by default)
+        FullscreenToggle
+    ErrorDisplay
+    TextTrackSettings
 ```
