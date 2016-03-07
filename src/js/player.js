@@ -196,6 +196,11 @@ class Player extends Component {
     //   this.addClass('vjs-touch-enabled');
     // }
 
+    // iOS Safari has broken hover handling
+    if (!browser.IS_IOS) {
+      this.addClass('vjs-workinghover');
+    }
+
     // Make player easily findable by ID
     Player.players[this.id_] = this;
 
