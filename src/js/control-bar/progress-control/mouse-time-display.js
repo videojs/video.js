@@ -30,8 +30,8 @@ class MouseTimeDisplay extends Component {
     }
 
     if (this.keepTooltipsInside) {
-      this.el().innerHTML = `<div class='vjs-time-tooltip'>`;
-      this.tooltip = this.el().querySelector('.vjs-time-tooltip');
+      this.tooltip = Dom.createEl('div', {className: 'vjs-time-tooltip'});
+      this.el().appendChild(this.tooltip);
       this.addClass('vjs-keep-tooltips-inside');
     }
 
