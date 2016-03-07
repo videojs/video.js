@@ -5,6 +5,7 @@ CHANGELOG
 * @gkatsev updated videojs badges in the README ([view](https://github.com/videojs/video.js/pull/3134))
 * @BrandonOCasey converted remaining text-track modules to ES6 ([view](https://github.com/videojs/video.js/pull/3130))
 * @gkatsev cleared waiting/spinner on timeupdate. Fixes #3124 ([view](https://github.com/videojs/video.js/pull/3138))
+* @BrandonOCasey updated text track unit tests to use full es6 syntax ([view](https://github.com/videojs/video.js/pull/3148))
 
 --------------------
 

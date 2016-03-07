@@ -2,30 +2,29 @@ import HTMLTrackElement from '../../../src/js/tracks/html-track-element.js';
 import HTMLTrackElementList from '../../../src/js/tracks/html-track-element-list.js';
 import TextTrack from '../../../src/js/tracks/text-track.js';
 
-let noop = Function.prototype;
-let defaultTech = {
-  textTracks: noop,
-  on: noop,
-  off: noop,
-  currentTime: noop
+const defaultTech = {
+  textTracks() {},
+  on() {},
+  off() {},
+  currentTime() {}
 };
 
-let track1 = new TextTrack({
+const track1 = new TextTrack({
   id: 1,
   tech: defaultTech
 });
-let track2 = new TextTrack({
+const track2 = new TextTrack({
   id: 2,
   tech: defaultTech
 });
 
-var genericHtmlTrackElements = [{
+const genericHtmlTrackElements = [{
+  tech() {},
   kind: 'captions',
-  tech: noop,
   track: track1
 }, {
+  tech() {},
   kind: 'chapters',
-  tech: noop,
   track: track2
 }];
 
@@ -47,9 +46,9 @@ test('can get html track element by track', function() {
 test('length is updated when new tracks are added or removed', function() {
   let htmlTrackElementList = new HTMLTrackElementList(genericHtmlTrackElements);
 
-  htmlTrackElementList.addTrackElement_({tech: noop});
+  htmlTrackElementList.addTrackElement_({tech() {}});
   equal(htmlTrackElementList.length, genericHtmlTrackElements.length + 1, `the length is ${genericHtmlTrackElements.length + 1}`);
-  htmlTrackElementList.addTrackElement_({tech: noop});
+  htmlTrackElementList.addTrackElement_({tech() {}});
   equal(htmlTrackElementList.length, genericHtmlTrackElements.length + 2, `the length is ${genericHtmlTrackElements.length + 2}`);
 
   htmlTrackElementList.removeTrackElement_(htmlTrackElementList.getTrackElementByTrack_(track1));
