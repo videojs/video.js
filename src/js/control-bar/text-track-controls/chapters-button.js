@@ -90,11 +90,13 @@ class ChaptersButton extends TextTrackButton {
     let menu = this.menu;
     if (menu === undefined) {
       menu = new Menu(this.player_);
-      menu.contentEl().appendChild(Dom.createEl('li', {
+      let title = Dom.createEl('li', {
         className: 'vjs-menu-title',
         innerHTML: toTitleCase(this.kind_),
         tabIndex: -1
-      }));
+      });
+      menu.children_.unshift(title);
+      Dom.insertElFirst(title, menu.contentEl());
     }
 
     if (chaptersTrack && chaptersTrack.cues == null) {
