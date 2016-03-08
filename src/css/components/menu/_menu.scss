@@ -8,7 +8,7 @@
 }
 
 // prevent menus from opening while disabled
-.vjs-menu-button.vjs-disabled:hover .vjs-menu {
+.vjs-workinghover .vjs-menu-button.vjs-disabled:hover .vjs-menu {
   display: none;
 }
 
