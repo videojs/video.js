@@ -126,6 +126,13 @@ class Menu extends Component {
         item = children.length - 1;
       }
 
+      let haveTitle = children[0].className &&
+        /vjs-menu-title/.test(children[0].className);
+
+      if (item === 0 && haveTitle) {
+        item = 1;
+      }
+
       this.focusedChild_ = item;
 
       children[item].el_.focus();
