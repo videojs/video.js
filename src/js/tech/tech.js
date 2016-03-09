@@ -10,6 +10,10 @@ import HTMLTrackElementList from '../tracks/html-track-element-list';
 import mergeOptions from '../utils/merge-options.js';
 import TextTrack from '../tracks/text-track';
 import TextTrackList from '../tracks/text-track-list';
+import VideoTrack from '../tracks/video-track';
+import VideoTrackList from '../tracks/video-track-list';
+import AudioTrackList from '../tracks/audio-track-list';
+import AudioTrack from '../tracks/audio-track';
 import * as Fn from '../utils/fn.js';
 import log from '../utils/log.js';
 import { createTimeRange } from '../utils/time-ranges.js';
@@ -45,6 +49,8 @@ class Tech extends Component {
     });
 
     this.textTracks_ = options.textTracks;
+    this.videoTracks_ = options.videoTracks;
+    this.audioTracks_ = options.audioTracks;
 
     // Manually track progress in cases where the browser/flash player doesn't report it.
     if (!this.featuresProgressEvents) {
@@ -65,6 +71,8 @@ class Tech extends Component {
     }
 
     this.initTextTrackListeners();
+    this.initVideoTrackListeners();
+    this.initAudioTrackListeners();
 
     // Turn on component tap events
     this.emitTapEvents();
@@ -290,6 +298,30 @@ class Tech extends Component {
     if (this.manualTimeUpdates) { this.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true }); }
   }
 
+
+  /**
+   * Initialize videotrack listeners
+   *
+   * @method initVideoTrackListeners
+   */
+  initVideoTrackListeners() {
+    let videoTrackListChanges = () => {
+      this.trigger('videotrackchange');
+    };
+
+    let tracks = this.videoTracks();
+
+    if (!tracks) return;
+
+    tracks.addEventListener('removetrack', videoTrackListChanges);
+    tracks.addEventListener('addtrack', videoTrackListChanges);
+
+    this.on('dispose', () => {
+      tracks.removeEventListener('removetrack', videoTrackListChanges);
+      tracks.removeEventListener('addtrack', videoTrackListChanges);
+    });
+  }
+
   /**
    * Initialize texttrack listeners
    *
@@ -311,6 +343,30 @@ class Tech extends Component {
       tracks.removeEventListener('removetrack', textTrackListChanges);
       tracks.removeEventListener('addtrack', textTrackListChanges);
     }));
+  }
+
+
+  /**
+   * Initialize audiotrack listeners
+   *
+   * @method initAudioTrackListeners
+   */
+  initAudioTrackListeners() {
+    let audioTrackListChanges = () => {
+      this.trigger('audiotrackchange');
+    };
+
+    let tracks = this.audioTracks();
+
+    if (!tracks) return;
+
+    tracks.addEventListener('removetrack', audioTrackListChanges);
+    tracks.addEventListener('addtrack', audioTrackListChanges);
+
+    this.on('dispose', () => {
+      tracks.removeEventListener('removetrack', audioTrackListChanges);
+      tracks.removeEventListener('addtrack', audioTrackListChanges);
+    });
   }
 
   /**
@@ -360,6 +416,28 @@ class Tech extends Component {
     this.on('dispose', function() {
       tracks.removeEventListener('change', textTracksChanges);
     });
+  }
+
+  /**
+   * Get videotracks
+   *
+   * @returns {VideoTrackList}
+   * @method videoTracks
+   */
+  videoTracks() {
+    this.videoTracks_ = this.videoTracks_ || new VideoTrackList();
+    return this.videoTracks_;
+  }
+
+  /**
+   * Get audiotracklist
+   *
+   * @returns {AudioTrackList}
+   * @method audioTracks
+   */
+  audioTracks() {
+    this.audioTracks_ = this.audioTracks_ || new AudioTrackList();
+    return this.audioTracks_;
   }
 
   /*
