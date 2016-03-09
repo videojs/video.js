@@ -20,11 +20,11 @@ class AudioTrack extends Track {
   constructor(options = {}) {
     options.trackType = 'audio';
     options.kind = AudioTrackEnums.AudioTrackKind[options.kind] || '';
-    let enabled = false;
     // retval is only defined in ie8, the only time when we need it
     let retval = super(options);
     let audioTrack = this;
 
+    let enabled = false;
     Object.defineProperty(audioTrack, 'enabled', {
       get() { return enabled; },
       set(newEnabled) {
