@@ -70,11 +70,13 @@ class MenuButton extends ClickableComponent {
 
     // Add a title list item to the top
     if (this.options_.title) {
-      menu.contentEl().appendChild(Dom.createEl('li', {
+      let title = Dom.createEl('li', {
         className: 'vjs-menu-title',
         innerHTML: toTitleCase(this.options_.title),
         tabIndex: -1
-      }));
+      });
+      menu.children_.unshift(title);
+      Dom.insertElFirst(title, menu.contentEl());
     }
 
     this.items = this['createItems']();
