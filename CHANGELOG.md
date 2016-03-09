@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* @gkatsev fixed chapters menu. Fixes #3062 ([view](https://github.com/videojs/video.js/pull/3163))
+_(none)_
 
 --------------------
+
+## 5.8.2 (2016-03-09)
+* @gkatsev fixed chapters menu. Fixes #3062 ([view](https://github.com/videojs/video.js/pull/3163))
 
 ## 5.8.1 (2016-03-07)
 * @gkatsev updated videojs badges in the README ([view](https://github.com/videojs/video.js/pull/3134))
