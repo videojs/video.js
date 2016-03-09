@@ -8,8 +8,10 @@ import Component from '../component';
 import HTMLTrackElement from '../tracks/html-track-element';
 import HTMLTrackElementList from '../tracks/html-track-element-list';
 import mergeOptions from '../utils/merge-options.js';
-import TextTrack from '../tracks/text-track';
-import TextTrackList from '../tracks/text-track-list';
+import TextTrack from '../tracks/text/text-track';
+import TextTrackList from '../tracks/text/text-track-list';
+import AudioTrackList from '../tracks/audio/audio-track-list';
+import VideoTrackList from '../tracks/video/video-track-list';
 import * as Fn from '../utils/fn.js';
 import log from '../utils/log.js';
 import { createTimeRange } from '../utils/time-ranges.js';
@@ -45,6 +47,8 @@ class Tech extends Component {
     });
 
     this.textTracks_ = options.textTracks;
+    this.audioTracks_ = options.audioTracks;
+    this.videoTracks_ = options.videoTracks;
 
     // Manually track progress in cases where the browser/flash player doesn't report it.
     if (!this.featuresProgressEvents) {
@@ -64,7 +68,7 @@ class Tech extends Component {
       this.on('ready', this.emulateTextTracks);
     }
 
-    this.initTextTrackListeners();
+    this.initTrackListeners();
 
     // Turn on component tap events
     this.emitTapEvents();
@@ -295,22 +299,29 @@ class Tech extends Component {
    *
    * @method initTextTrackListeners
    */
-  initTextTrackListeners() {
-    let textTrackListChanges = Fn.bind(this, function() {
-      this.trigger('texttrackchange');
-    });
+  initTrackListeners() {
+    const typesTracks = ['text', 'video', 'audio'];
+    const typesLength = typesTracks.length;
+    let i = 0;
 
-    let tracks = this.textTracks();
+    for (i; i < typesLength; i++) {
+      let type = typesTracks[i];
+      let trackListChanges = Fn.bind(this, function () {
+        this.trigger(type + 'trackchange');
+      });
 
-    if (!tracks) return;
+      let tracks = this[`${type}Tracks`]();
 
-    tracks.addEventListener('removetrack', textTrackListChanges);
-    tracks.addEventListener('addtrack', textTrackListChanges);
+      if (!tracks) return;
 
-    this.on('dispose', Fn.bind(this, function() {
-      tracks.removeEventListener('removetrack', textTrackListChanges);
-      tracks.removeEventListener('addtrack', textTrackListChanges);
-    }));
+      tracks.addEventListener('removetrack', trackListChanges);
+      tracks.addEventListener('addtrack', trackListChanges);
+
+      this.on('dispose', Fn.bind(this, function () {
+        tracks.removeEventListener('removetrack', trackListChanges);
+        tracks.removeEventListener('addtrack', trackListChanges);
+      }));
+    }
   }
 
   /**
@@ -353,10 +364,32 @@ class Tech extends Component {
   }
 
   /*
-   * Provide default methods for text tracks.
+   * Provide default methods for (text/video/audio) tracks.
    *
    * Html5 tech overrides these.
    */
+
+  /**
+   * Get audiotracks
+   *
+   * @returns {TrackList}
+   * @method audioTracks
+   */
+  audioTracks() {
+    this.audioTracks_ = this.audioTracks_ || new AudioTrackList();
+    return this.audioTracks_;
+  }
+
+  /**
+   * Get videotracks
+   *
+   * @returns {TrackList}
+   * @method videoTracks
+   */
+  videoTracks() {
+    this.videoTracks_ = this.videoTracks_ || new VideoTrackList();
+    return this.videoTracks_;
+  }
 
   /**
    * Get texttracks

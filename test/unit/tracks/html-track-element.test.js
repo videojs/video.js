@@ -1,5 +1,5 @@
 import HTMLTrackElement from '../../../src/js/tracks/html-track-element.js';
-import TextTrack from '../../../src/js/tracks/text-track.js';
+import TextTrack from '../../../src/js/tracks/text/text-track.js';
 import window from 'global/window';
 
 const defaultTech = {

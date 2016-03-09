@@ -2,8 +2,8 @@ import ChaptersButton from '../../../src/js/control-bar/text-track-controls/chap
 import SubtitlesButton from '../../../src/js/control-bar/text-track-controls/subtitles-button.js';
 import CaptionsButton from '../../../src/js/control-bar/text-track-controls/captions-button.js';
 
-import TextTrack from '../../../src/js/tracks/text-track.js';
-import TextTrackDisplay from '../../../src/js/tracks/text-track-display.js';
+import TextTrack from '../../../src/js/tracks/text/text-track.js';
+import TextTrackDisplay from '../../../src/js/tracks/text/text-track-display.js';
 import Html5 from '../../../src/js/tech/html5.js';
 import Tech from '../../../src/js/tech/tech.js';
 import Component from '../../../src/js/component.js';

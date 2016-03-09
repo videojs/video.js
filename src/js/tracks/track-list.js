@@ -1,19 +1,19 @@
 /**
- * @file text-track-list.js
+ * @file track-list.js
  */
 import EventTarget from '../event-target';
 import * as Fn from '../utils/fn.js';
 import * as browser from '../utils/browser.js';
-import document from 'global/document';
+import document from '../../../node_modules/global/document';
 
 /**
  * A text track list as defined in:
  * https://html.spec.whatwg.org/multipage/embedded-content.html#texttracklist
  *
- * interface TextTrackList : EventTarget {
+ * interface TrackList : EventTarget {
  *   readonly attribute unsigned long length;
  *   getter TextTrack (unsigned long index);
- *   TextTrack? getTrackById(DOMString id);
+ *   Track? getTrackById(DOMString id);
  *
  *   attribute EventHandler onchange;
  *   attribute EventHandler onaddtrack;
@@ -22,10 +22,10 @@ import document from 'global/document';
  *
  * @param {Track[]} tracks A list of tracks to initialize the list with
  * @extends EventTarget
- * @class TextTrackList
+ * @class TrackList
  */
 
-class TextTrackList extends EventTarget {
+class TrackList extends EventTarget {
   constructor(tracks = []) {
     super();
     let list = this;
@@ -33,9 +33,9 @@ class TextTrackList extends EventTarget {
     if (browser.IS_IE8) {
       list = document.createElement('custom');
 
-      for (let prop in TextTrackList.prototype) {
+      for (let prop in TrackList.prototype) {
         if (prop !== 'constructor') {
-          list[prop] = TextTrackList.prototype[prop];
+          list[prop] = TrackList.prototype[prop];
         }
       }
     }
@@ -58,9 +58,9 @@ class TextTrackList extends EventTarget {
   }
 
   /**
-   * Add TextTrack from TextTrackList
+   * Add Track from TrackList
    *
-   * @param {TextTrack} track
+   * @param {Track} track
    * @method addTrack_
    * @private
    */
@@ -75,9 +75,6 @@ class TextTrackList extends EventTarget {
       });
     }
 
-    track.addEventListener('modechange', Fn.bind(this, function() {
-      this.trigger('change');
-    }));
     this.tracks_.push(track);
 
     this.trigger({
@@ -87,10 +84,10 @@ class TextTrackList extends EventTarget {
   }
 
   /**
-   * Remove TextTrack from TextTrackList
+   * Remove Track from TrackList
    * NOTE: Be mindful of what is passed in as it may be a HTMLTrackElement
    *
-   * @param {TextTrack} rtrack
+   * @param {Track} rtrack
    * @method removeTrack_
    * @private
    */
@@ -121,11 +118,11 @@ class TextTrackList extends EventTarget {
   }
 
   /**
-   * Get a TextTrack from TextTrackList by a tracks id
+   * Get a Track from TrackList by a tracks id
    *
    * @param {String} id - the id of the track to get
    * @method getTrackById
-   * @return {TextTrack}
+   * @return {Track}
    * @private
    */
   getTrackById(id) {
@@ -149,15 +146,15 @@ class TextTrackList extends EventTarget {
  * addtrack - A track has been added to the track list.
  * removetrack - A track has been removed from the track list.
  */
-TextTrackList.prototype.allowedEvents_ = {
+TrackList.prototype.allowedEvents_ = {
   change: 'change',
   addtrack: 'addtrack',
   removetrack: 'removetrack'
 };
 
 // emulate attribute EventHandler support to allow for feature detection
-for (let event in TextTrackList.prototype.allowedEvents_) {
-  TextTrackList.prototype['on' + event] = null;
+for (let event in TrackList.prototype.allowedEvents_) {
+  TrackList.prototype['on' + event] = null;
 }
 
-export default TextTrackList;
+export default TrackList;

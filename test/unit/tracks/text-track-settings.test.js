@@ -1,4 +1,4 @@
-import TextTrackSettings from '../../../src/js/tracks/text-track-settings.js';
+import TextTrackSettings from '../../../src/js/tracks/text/text-track-settings.js';
 import TestHelpers from '../test-helpers.js';
 import * as Events from '../../../src/js/utils/events.js';
 import safeParseTuple from 'safe-json-parse/tuple';
