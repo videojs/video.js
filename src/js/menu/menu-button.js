@@ -74,7 +74,7 @@ class MenuButton extends ClickableComponent {
         className: 'vjs-menu-title',
         innerHTML: toTitleCase(this.options_.title),
         tabIndex: -1
-      }));
+      });
       menu.children_.unshift(title);
       Dom.insertElFirst(title, menu.contentEl());
     }
