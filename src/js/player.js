@@ -520,7 +520,9 @@ class Player extends Component {
       'source': source,
       'playerId': this.id(),
       'techId': `${this.id()}_${techName}_api`,
+      'videoTracks': this.videoTracks_,
       'textTracks': this.textTracks_,
+      'audioTracks': this.audioTracks_,
       'autoplay': this.options_.autoplay,
       'preload': this.options_.preload,
       'loop': this.options_.loop,
@@ -613,7 +615,9 @@ class Player extends Component {
    */
   unloadTech_() {
     // Save the current text tracks so that we can reuse the same text tracks with the next tech
+    this.videoTracks_ = this.videoTracks();
     this.textTracks_ = this.textTracks();
+    this.audioTracks_ = this.audioTracks();
     this.textTracksJson_ = textTrackConverter.textTracksToJson(this.tech_);
 
     this.isReady_ = false;
@@ -2471,6 +2475,33 @@ class Player extends Component {
    */
   readyState() {
     return this.techGet_('readyState');
+  }
+
+  /**
+   * Get a video track list
+   * @link https://html.spec.whatwg.org/multipage/embedded-content.html#videotracklist
+   *
+   * @return {VideoTrackList} thes current video track list
+   * @method videoTracks
+   */
+  videoTracks() {
+    // cannot use techGet_ directly because it checks to see whether the tech is ready.
+    // Flash is unlikely to be ready in time but videoTracks should still work.
+    return this.tech_ && this.tech_['videoTracks']();
+  }
+
+
+  /**
+   * Get an audio track list
+   * @link https://html.spec.whatwg.org/multipage/embedded-content.html#audiotracklist
+   *
+   * @return {AudioTrackList} thes current audio track list
+   * @method audioTracks
+   */
+  audioTracks() {
+    // cannot use techGet_ directly because it checks to see whether the tech is ready.
+    // Flash is unlikely to be ready in time but audioTracks should still work.
+    return this.tech_ && this.tech_['audioTracks']();
   }
 
   /*

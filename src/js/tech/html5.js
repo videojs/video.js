@@ -14,6 +14,8 @@ import document from 'global/document';
 import window from 'global/window';
 import assign from 'object.assign';
 import mergeOptions from '../utils/merge-options.js';
+import VideoTrack from '../tracks/video-track';
+import AudioTrack from '../tracks/audio-track';
 
 /**
  * HTML5 Media Controller - Wrapper for HTML5 Media API
@@ -70,12 +72,27 @@ class Html5 extends Tech {
       }
     }
 
+    if (this.featuresNativeVideoTracks) {
+      this.handleVideoTrackChange_ = Fn.bind(this, this.handleVideoTrackChange);
+      this.handleVideoTrackAdd_ = Fn.bind(this, this.handleVideoTrackAdd);
+      this.handleVideoTrackRemove_ = Fn.bind(this, this.handleVideoTrackRemove);
+      this.proxyNativeVideoTracks_();
+    }
+
     if (this.featuresNativeTextTracks) {
       this.handleTextTrackChange_ = Fn.bind(this, this.handleTextTrackChange);
       this.handleTextTrackAdd_ = Fn.bind(this, this.handleTextTrackAdd);
       this.handleTextTrackRemove_ = Fn.bind(this, this.handleTextTrackRemove);
       this.proxyNativeTextTracks_();
     }
+
+    if (this.featuresNativeAudioTracks) {
+      this.handleAudioTrackChange_ = Fn.bind(this, this.handleAudioTrackChange);
+      this.handleAudioTrackAdd_ = Fn.bind(this, this.handleAudioTrackAdd);
+      this.handleAudioTrackRemove_ = Fn.bind(this, this.handleAudioTrackRemove);
+      this.proxyNativeAudioTracks_();
+    }
+
 
     // Determine if native controls should be used
     // Our goal should be to get the custom controls on mobile solid everywhere
@@ -96,8 +113,19 @@ class Html5 extends Tech {
    * @method dispose
    */
   dispose() {
+    let vt = this.el().videoTracks;
     let tt = this.el().textTracks;
+    let at = this.el().audioTracks;
+    let emulatedVt = this.videoTracks();
     let emulatedTt = this.textTracks();
+    let emulatedAt = this.audioTracks();
+
+    // remove native event listeners
+    if (vt && vt.removeEventListener) {
+      vt.removeEventListener('change', this.handleVideoTrackChange_);
+      vt.removeEventListener('addtrack', this.handleVideoTrackAdd_);
+      vt.removeEventListener('removetrack', this.handleVideoTrackRemove_);
+    }
 
     // remove native event listeners
     if (tt && tt.removeEventListener) {
@@ -106,6 +134,14 @@ class Html5 extends Tech {
       tt.removeEventListener('removetrack', this.handleTextTrackRemove_);
     }
 
+    // remove native event listeners
+    if (at && at.removeEventListener) {
+      at.removeEventListener('change', this.handleAudioTrackChange_);
+      at.removeEventListener('addtrack', this.handleAudioTrackAdd_);
+      at.removeEventListener('removetrack', this.handleAudioTrackRemove_);
+    }
+
+
     // clearout the emulated text track list.
     let i = emulatedTt.length;
 
@@ -113,6 +149,18 @@ class Html5 extends Tech {
       emulatedTt.removeTrack_(emulatedTt[i]);
     }
 
+    // clearout the emulated video track list.
+    i = emulatedVt.length;
+
+    while (i--) {
+      emulatedVt.removeTrack_(emulatedVt[i]);
+    }
+    // clearout the emulated audio track list.
+    i = emulatedAt.length;
+
+    while (i--) {
+      emulatedAt.removeTrack_(emulatedAt[i]);
+    }
 
     Html5.disposeMediaElement(this.el_);
     super.dispose();
@@ -264,6 +312,18 @@ class Html5 extends Tech {
     }
   }
 
+  proxyNativeAudioTracks_() {
+    let audioTrackList = this.el().audioTracks;
+
+    if (audioTrackList && audioTrackList.addEventListener) {
+      audioTrackList.addEventListener('change', this.handleAudioTrackChange_);
+      audioTrackList.addEventListener('addtrack', this.handleAudioTrackAdd_);
+      audioTrackList.addEventListener('removetrack', this.handleAudioTrackRemove_);
+    }
+  }
+
+
+
   handleTextTrackChange(e) {
     let tt = this.textTracks();
     this.textTracks().trigger({
@@ -281,6 +341,63 @@ class Html5 extends Tech {
   handleTextTrackRemove(e) {
     this.textTracks().removeTrack_(e.track);
   }
+
+  proxyNativeVideoTracks_() {
+    let vt = this.el().videoTracks;
+
+    if (vt && vt.addEventListener) {
+      vt.addEventListener('change', this.handleVideoTrackChange_);
+      vt.addEventListener('addtrack', this.handleVideoTrackAdd_);
+      vt.addEventListener('removetrack', this.handleVideoTrackRemove_);
+    }
+  }
+
+  handleVideoTrackChange(e) {
+    let vt = this.videoTracks();
+    this.videoTracks().trigger({
+      type: 'change',
+      target: vt,
+      currentTarget: vt,
+      srcElement: vt
+    });
+  }
+
+  handleVideoTrackAdd(e) {
+    let track = e.track;
+    if(!(e.track instanceof VideoTrack)) {
+      track.tech = this;
+      track = new VideoTrack(track);
+    }
+    this.videoTracks().addTrack_(track);
+  }
+
+  handleVideoTrackRemove(e) {
+    this.videoTracks().removeTrack_(e.track);
+  }
+
+  handleAudioTrackChange(e) {
+    let audioTrackList = this.audioTracks();
+    this.audioTracks().trigger({
+      type: 'change',
+      target: audioTrackList,
+      currentTarget: audioTrackList,
+      srcElement: audioTrackList
+    });
+  }
+
+  handleAudioTrackAdd(e) {
+    let track = e.track;
+    if(!(e.track instanceof AudioTrack)) {
+      track.tech = this;
+      track = new AudioTrack(track);
+    }
+    this.audioTracks().addTrack_(e.track);
+  }
+
+  handleAudioTrackRemove(e) {
+    this.audioTracks().removeTrack_(e.track);
+  }
+
 
   /**
    * Play for html5 tech
@@ -504,7 +621,7 @@ class Html5 extends Tech {
    * @return {Object}
    * @method currentSrc
    */
-  currentSrc() { 
+  currentSrc() {
     if (this.currentSource_) {
       return this.currentSource_.src;
     } else {
@@ -962,6 +1079,27 @@ Html5.supportsNativeTextTracks = function() {
   return supportsTextTracks;
 };
 
+/*
+ * Check to see if native video tracks are supported by this browser/device
+ *
+ * @return {Boolean}
+ */
+Html5.supportsNativeVideoTracks = function() {
+  let supportsVideoTracks = !!Html5.TEST_VID.videoTracks;
+  return supportsVideoTracks;
+};
+
+/*
+ * Check to see if native audio tracks are supported by this browser/device
+ *
+ * @return {Boolean}
+ */
+Html5.supportsNativeAudioTracks = function() {
+  let supportsAudioTracks = !!Html5.TEST_VID.audioTracks;
+  return supportsAudioTracks;
+};
+
+
 /**
  * An array of events available on the Html5 tech.
  *
@@ -1034,6 +1172,21 @@ Html5.prototype['featuresProgressEvents'] = true;
  * @type {Boolean}
  */
 Html5.prototype['featuresNativeTextTracks'] = Html5.supportsNativeTextTracks();
+
+/**
+ * Sets the tech's status on native text track support
+ *
+ * @type {Boolean}
+ */
+Html5.prototype['featuresNativeVideoTracks'] = Html5.supportsNativeVideoTracks();
+
+/**
+ * Sets the tech's status on native audio track support
+ *
+ * @type {Boolean}
+ */
+Html5.prototype['featuresNativeAudioTracks'] = Html5.supportsNativeAudioTracks();
+
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //
 let canPlayType;
