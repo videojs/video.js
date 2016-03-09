@@ -135,7 +135,10 @@ class Menu extends Component {
 
       this.focusedChild_ = item;
 
-      children[item].el_.focus();
+      let child = children[item];
+      if (child && child.el_) {
+        child.el_.focus();
+      }
     }
   }
 }
