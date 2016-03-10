@@ -1,7 +1,7 @@
 /**
  * @file player.js
  */
-// Subclasses Component
+ // Subclasses Component
 import Component from './component.js';
 
 import document from 'global/document';
@@ -68,7 +68,7 @@ class Player extends Component {
    * @param {Object=} options    Player options
    * @param {Function=} ready    Ready callback function
    */
-  constructor(tag, options, ready) {
+  constructor(tag, options, ready){
     // Make sure tag ID exists
     tag.id = tag.id || `vjs_video_${Guid.newGUID()}`;
 
@@ -95,10 +95,12 @@ class Player extends Component {
 
     // if the global option object was accidentally blown away by
     // someone, bail early with an informative error
-    if (!this.options_ || !this.options_.techOrder || !this.options_.techOrder.length) {
+    if (!this.options_ ||
+        !this.options_.techOrder ||
+        !this.options_.techOrder.length) {
       throw new Error('No techOrder specified. Did you overwrite ' +
-        'videojs.options instead of just changing the ' +
-        'properties you want to override?');
+                      'videojs.options instead of just changing the ' +
+                      'properties you want to override?');
     }
 
     this.tag = tag; // Store the original tag used to set options
@@ -114,7 +116,7 @@ class Player extends Component {
       // Normalise player option languages to lowercase
       let languagesToLower = {};
 
-      Object.getOwnPropertyNames(options.languages).forEach(function (name) {
+      Object.getOwnPropertyNames(options.languages).forEach(function(name) {
         languagesToLower[name.toLowerCase()] = options.languages[name];
       });
       this.languages_ = languagesToLower;
@@ -156,7 +158,7 @@ class Player extends Component {
     if (options.plugins) {
       let plugins = options.plugins;
 
-      Object.getOwnPropertyNames(plugins).forEach(function (name) {
+      Object.getOwnPropertyNames(plugins).forEach(function(name){
         if (typeof this[name] === 'function') {
           this[name](plugins[name]);
         } else {
@@ -233,16 +235,10 @@ class Player extends Component {
 
     // Kill reference to this player
     Player.players[this.id_] = null;
-    if (this.tag && this.tag.player) {
-      this.tag.player = null;
-    }
-    if (this.el_ && this.el_.player) {
-      this.el_.player = null;
-    }
+    if (this.tag && this.tag.player) { this.tag.player = null; }
+    if (this.el_ && this.el_.player) { this.el_.player = null; }
 
-    if (this.tech_) {
-      this.tech_.dispose();
-    }
+    if (this.tech_) { this.tech_.dispose(); }
 
     super.dispose();
   }
@@ -265,7 +261,7 @@ class Player extends Component {
     // ID will now reference player box, not the video tag
     const attrs = Dom.getElAttributes(tag);
 
-    Object.getOwnPropertyNames(attrs).forEach(function (attr) {
+    Object.getOwnPropertyNames(attrs).forEach(function(attr){
       // workaround so we don't totally break IE7
       // http://stackoverflow.com/questions/3653444/css-styles-not-applied-on-dynamic-elements-in-internet-explorer-7
       if (attr === 'class') {
@@ -464,14 +460,14 @@ class Player extends Component {
       height = this.height_;
     } else {
       // Otherwise calculate the height from the ratio and the width
-      height = width * ratioMultiplier;
+      height = width  * ratioMultiplier;
     }
 
     // Ensure the CSS class is valid by starting with an alpha character
     if (/^[^a-zA-Z]/.test(this.id())) {
-      idClass = 'dimensions-' + this.id();
+      idClass = 'dimensions-'+this.id();
     } else {
-      idClass = this.id() + '-dimensions';
+      idClass = this.id()+'-dimensions';
     }
 
     // Ensure the right class is still on the player for the style element
@@ -896,7 +892,7 @@ class Player extends Component {
   handleTechFirstPlay_() {
     //If the first starttime attribute is specified
     //then we will start at the given offset in seconds
-    if (this.options_.starttime) {
+    if(this.options_.starttime){
       this.currentTime(this.options_.starttime);
     }
 
@@ -1005,7 +1001,7 @@ class Player extends Component {
    * @method handleTechTouchMove_
    */
   handleTechTouchMove_() {
-    if (this.userWasActive) {
+    if (this.userWasActive){
       this.reportUserActivity();
     }
   }
@@ -1191,15 +1187,15 @@ class Player extends Component {
   techCall_(method, arg) {
     // If it's not ready yet, call method when it is
     if (this.tech_ && !this.tech_.isReady_) {
-      this.tech_.ready(function () {
+      this.tech_.ready(function(){
         this[method](arg);
       }, true);
 
-      // Otherwise call method now
+    // Otherwise call method now
     } else {
       try {
         this.tech_[method](arg);
-      } catch (e) {
+      } catch(e) {
         log(e);
         throw e;
       }
@@ -1222,7 +1218,7 @@ class Player extends Component {
       // When that happens we'll catch the errors and inform tech that it's not ready any more.
       try {
         return this.tech_[method]();
-      } catch (e) {
+      } catch(e) {
         // When building additional tech libs, an expected method may not be defined yet
         if (this.tech_[method] === undefined) {
           log(`Video.js: ${method} method not defined for ${this.techName_} playback technology.`, e);
@@ -1422,7 +1418,7 @@ class Player extends Component {
     var buffered = this.techGet_('buffered');
 
     if (!buffered || !buffered.length) {
-      buffered = createTimeRange(0, 0);
+      buffered = createTimeRange(0,0);
     }
 
     return buffered;
@@ -1452,8 +1448,8 @@ class Player extends Component {
    */
   bufferedEnd() {
     var buffered = this.buffered(),
-      duration = this.duration(),
-      end = buffered.end(buffered.length - 1);
+        duration = this.duration(),
+        end = buffered.end(buffered.length-1);
 
     if (end > duration) {
       end = duration;
@@ -1582,7 +1578,7 @@ class Player extends Component {
       // when canceling fullscreen. Otherwise if there's multiple
       // players on a page, they would all be reacting to the same fullscreen
       // events
-      Events.on(document, fsApi.fullscreenchange, Fn.bind(this, function documentFullscreenChange(e) {
+      Events.on(document, fsApi.fullscreenchange, Fn.bind(this, function documentFullscreenChange(e){
         this.isFullscreen(document[fsApi.fullscreenElement]);
 
         // If cancelling fullscreen, remove event listener.
@@ -1626,10 +1622,10 @@ class Player extends Component {
     if (fsApi.requestFullscreen) {
       document[fsApi.exitFullscreen]();
     } else if (this.tech_.supportsFullScreen()) {
-      this.techCall_('exitFullScreen');
+     this.techCall_('exitFullScreen');
     } else {
-      this.exitFullWindow();
-      this.trigger('fullscreenchange');
+     this.exitFullWindow();
+     this.trigger('fullscreenchange');
     }
 
     return this;
@@ -1854,12 +1850,12 @@ class Player extends Component {
     if (Array.isArray(source)) {
       this.sourceList_(source);
 
-      // case: URL String (http://myvideo...)
+    // case: URL String (http://myvideo...)
     } else if (typeof source === 'string') {
       // create a source object from the string
-      this.src({src: source});
+      this.src({ src: source });
 
-      // case: Source object { src: '', type: '' ... }
+    // case: Source object { src: '', type: '' ... }
     } else if (source instanceof Object) {
       // check if the source has a type and the loaded tech cannot play the source
       // if there's no type we'll just try the current tech
@@ -1872,7 +1868,7 @@ class Player extends Component {
         this.currentType_ = source.type || '';
 
         // wait until the tech is ready to set the source
-        this.ready(function () {
+        this.ready(function(){
 
           // The setSource tech method was added with source handlers
           // so older techs won't support it
@@ -1892,7 +1888,7 @@ class Player extends Component {
             this.play();
           }
 
-          // Set the source synchronously if possible (#2326)
+        // Set the source synchronously if possible (#2326)
         }, true);
       }
     }
@@ -1920,8 +1916,8 @@ class Player extends Component {
       }
     } else {
       // We need to wrap this in a timeout to give folks a chance to add error event handlers
-      this.setTimeout(function () {
-        this.error({code: 4, message: this.localize(this.options_.notSupportedMessage)});
+      this.setTimeout( function() {
+        this.error({ code: 4, message: this.localize(this.options_.notSupportedMessage) });
       }, 0);
 
       // we could not find an appropriate tech, but let's still notify the delegate that this is it
@@ -2150,25 +2146,25 @@ class Player extends Component {
           this.addClass('vjs-using-native-controls');
 
           /**
-           * player is using the native device controls
+            * player is using the native device controls
            *
-           * @event usingnativecontrols
-           * @memberof Player
-           * @instance
-           * @private
-           */
+            * @event usingnativecontrols
+            * @memberof Player
+            * @instance
+            * @private
+            */
           this.trigger('usingnativecontrols');
         } else {
           this.removeClass('vjs-using-native-controls');
 
           /**
-           * player is using the custom HTML controls
+            * player is using the custom HTML controls
            *
-           * @event usingcustomcontrols
-           * @memberof Player
-           * @instance
-           * @private
-           */
+            * @event usingcustomcontrols
+            * @memberof Player
+            * @instance
+            * @private
+            */
           this.trigger('usingcustomcontrols');
         }
       }
@@ -2224,9 +2220,7 @@ class Player extends Component {
    * @return {Boolean} True if the player is in the ended state, false if not.
    * @method ended
    */
-  ended() {
-    return this.techGet_('ended');
-  }
+  ended() { return this.techGet_('ended'); }
 
   /**
    * Returns whether or not the player is in the "seeking" state.
@@ -2234,9 +2228,7 @@ class Player extends Component {
    * @return {Boolean} True if the player is in the seeking state, false if not.
    * @method seeking
    */
-  seeking() {
-    return this.techGet_('seeking');
-  }
+  seeking() { return this.techGet_('seeking'); }
 
   /**
    * Returns the TimeRanges of the media that are currently available
@@ -2245,9 +2237,7 @@ class Player extends Component {
    * @return {TimeRanges} the seekable intervals of the media timeline
    * @method seekable
    */
-  seekable() {
-    return this.techGet_('seekable');
-  }
+  seekable() { return this.techGet_('seekable'); }
 
   /**
    * Report user activity
@@ -2291,8 +2281,8 @@ class Player extends Component {
           //
           // When this gets resolved in ALL browsers it can be removed
           // https://code.google.com/p/chromium/issues/detail?id=103041
-          if (this.tech_) {
-            this.tech_.one('mousemove', function (e) {
+          if(this.tech_) {
+            this.tech_.one('mousemove', function(e){
               e.stopPropagation();
               e.preventDefault();
             });
@@ -2319,17 +2309,17 @@ class Player extends Component {
 
     let handleActivity = Fn.bind(this, this.reportUserActivity);
 
-    let handleMouseMove = function (e) {
+    let handleMouseMove = function(e) {
       // #1068 - Prevent mousemove spamming
       // Chrome Bug: https://code.google.com/p/chromium/issues/detail?id=366970
-      if (e.screenX !== lastMoveX || e.screenY !== lastMoveY) {
+      if(e.screenX !== lastMoveX || e.screenY !== lastMoveY) {
         lastMoveX = e.screenX;
         lastMoveY = e.screenY;
         handleActivity();
       }
     };
 
-    let handleMouseDown = function () {
+    let handleMouseDown = function() {
       handleActivity();
       // For as long as the they are touching the device or have their mouse down,
       // we consider them active even if they're not moving their finger or mouse.
@@ -2341,7 +2331,7 @@ class Player extends Component {
       mouseInProgress = this.setInterval(handleActivity, 250);
     };
 
-    let handleMouseUp = function (event) {
+    let handleMouseUp = function(event) {
       handleActivity();
       // Stop the interval that maintains activity if the mouse/touch is down
       this.clearInterval(mouseInProgress);
@@ -2363,7 +2353,7 @@ class Player extends Component {
     // then gets picked up by this loop
     // http://ejohn.org/blog/learning-from-twitter/
     let inactivityTimeout;
-    let activityCheck = this.setInterval(function () {
+    let activityCheck = this.setInterval(function() {
       // Check to see if mouse/touch activity has happened
       if (this.userActivity_) {
         // Reset the activity tracker
@@ -2384,7 +2374,7 @@ class Player extends Component {
             // before the next user activity is picked up by the activityCheck loop
             // causing a flicker
             if (!this.userActivity_) {
-              this.userActive(false);
+                this.userActive(false);
             }
           }, timeout);
         }
@@ -2486,12 +2476,12 @@ class Player extends Component {
   }
 
   /*
-   * Text tracks are tracks of timed text events.
-   * Captions - text displayed over the video for the hearing impaired
-   * Subtitles - text displayed over the video for those who don't understand language in the video
-   * Chapters - text displayed in a menu allowing the user to jump to particular points (chapters) in the video
-   * Descriptions (not supported yet) - audio descriptions that are read back to the user by a screen reading device
-   */
+    * Text tracks are tracks of timed text events.
+    * Captions - text displayed over the video for the hearing impaired
+    * Subtitles - text displayed over the video for those who don't understand language in the video
+    * Chapters - text displayed in a menu allowing the user to jump to particular points (chapters) in the video
+    * Descriptions (not supported yet) - audio descriptions that are read back to the user by a screen reading device
+    */
 
   /**
    * Get an array of associated text tracks. captions, subtitles, chapters, descriptions
@@ -2615,7 +2605,7 @@ class Player extends Component {
       return this.language_;
     }
 
-    this.language_ = ('' + code).toLowerCase();
+    this.language_ = (''+code).toLowerCase();
     return this;
   }
 
@@ -2628,7 +2618,7 @@ class Player extends Component {
    * @method languages
    */
   languages() {
-    return mergeOptions(Player.prototype.options_.languages, this.languages_);
+    return  mergeOptions(Player.prototype.options_.languages, this.languages_);
   }
 
   /**
@@ -2680,7 +2670,7 @@ class Player extends Component {
     let modal = new ModalDialog(player, options);
 
     player.addChild(modal);
-    modal.on('dispose', function () {
+    modal.on('dispose', function() {
       player.removeChild(modal);
     });
 
@@ -2705,7 +2695,7 @@ class Player extends Component {
     const dataSetup = tagOptions['data-setup'];
 
     // Check if data-setup attr exists.
-    if (dataSetup !== null) {
+    if (dataSetup !== null){
       // Parse options JSON
       // If empty string, make it a parsable json object.
       const [err, data] = safeParseTuple(dataSetup || '{}');
@@ -2721,7 +2711,7 @@ class Player extends Component {
     if (tag.hasChildNodes()) {
       const children = tag.childNodes;
 
-      for (let i = 0, j = children.length; i < j; i++) {
+      for (let i=0, j=children.length; i<j; i++) {
         const child = children[i];
         // Change case needed: http://ejohn.org/blog/nodename-case-sensitivity/
         const childName = child.nodeName.toLowerCase();
@@ -2756,7 +2746,7 @@ let navigator = window.navigator;
  */
 Player.prototype.options_ = {
   // Default order of fallback technology
-  techOrder: ['html5', 'flash'],
+  techOrder: ['html5','flash'],
   // techOrder: ['flash','html5'],
 
   html5: {},
@@ -2852,16 +2842,16 @@ Player.prototype.handleVolumeChange_;
  */
 Player.prototype.handleError_;
 
-Player.prototype.flexNotSupported_ = function () {
+Player.prototype.flexNotSupported_ = function() {
   var elem = document.createElement('i');
 
   // Note: We don't actually use flexBasis (or flexOrder), but it's one of the more
   // common flex features that we can rely on when checking for flex support.
   return !('flexBasis' in elem.style ||
-  'webkitFlexBasis' in elem.style ||
-  'mozFlexBasis' in elem.style ||
-  'msFlexBasis' in elem.style ||
-  'msFlexOrder' in elem.style /* IE10-specific (2012 flex spec)  */);
+          'webkitFlexBasis' in elem.style ||
+          'mozFlexBasis' in elem.style ||
+          'msFlexBasis' in elem.style ||
+          'msFlexOrder' in elem.style /* IE10-specific (2012 flex spec)  */);
 };
 
 Component.registerComponent('Player', Player);

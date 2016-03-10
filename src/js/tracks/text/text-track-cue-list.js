@@ -2,7 +2,7 @@
  * @file text-track-cue-list.js
  */
 import * as browser from '../../utils/browser.js';
-import document from '../../../../node_modules/global/document';
+import document from 'global/document';
 
 /**
  * A List of text track cues as defined in:

@@ -23,16 +23,26 @@ import * as Fn from '../../utils/fn.js';
  */
 
 class TextTrackList extends TrackList {
-  constructor() {
-    super();
+  constructor(tracks = []) {
+    super(tracks);
   }
 
+  /**
+   * Add Track from TextTrackList
+   *
+   * @param {TextTrack} track
+   * @method addTrack_
+   * @private
+   */
   addTrack_(track) {
+
     track.addEventListener('modechange', Fn.bind(this, function () {
       this.trigger('change');
     }));
+
     super.addTrack_(track);
   }
+
 }
 
 

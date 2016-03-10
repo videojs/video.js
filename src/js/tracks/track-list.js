@@ -4,7 +4,7 @@
 import EventTarget from '../event-target';
 import * as Fn from '../utils/fn.js';
 import * as browser from '../utils/browser.js';
-import document from '../../../node_modules/global/document';
+import document from 'global/document';
 
 /**
  * A text track list as defined in:

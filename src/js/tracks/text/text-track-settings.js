@@ -5,8 +5,8 @@ import Component from '../../component';
 import * as Events from '../../utils/events.js';
 import * as Fn from '../../utils/fn.js';
 import log from '../../utils/log.js';
-import safeParseTuple from '../../../../node_modules/safe-json-parse/tuple';
-import window from '../../../../node_modules/global/window';
+import safeParseTuple from 'safe-json-parse/tuple';
+import window from 'global/window';
 
 /**
  * Manipulate settings of texttracks

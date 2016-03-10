@@ -8,8 +8,8 @@ import * as browser from '../../utils/browser.js';
 import * as TextTrackEnum from './text-track-enums';
 import log from '../../utils/log.js';
 import EventTarget from '../../event-target';
-import document from '../../../../node_modules/global/document';
-import window from '../../../../node_modules/global/window';
+import document from 'global/document';
+import window from 'global/window';
 import { isCrossOrigin } from '../../utils/url.js';
 import XHR from 'xhr';
 

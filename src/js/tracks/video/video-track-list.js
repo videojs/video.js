@@ -23,8 +23,22 @@ import * as Fn from '../../utils/fn.js';
  */
 
 class VideoTrackList extends TrackList {
-  constructor() {
-    super();
+  constructor(tracks = []) {
+    super(tracks);
+  }
+
+  /**
+   * Add Track from VideoTrackList
+   *
+   * @param {VideoTrack} track
+   * @method addTrack_
+   * @private
+   */
+  addTrack_(track) {
+
+    this.trigger('change');
+
+    super.addTrack_(track);
   }
 }
 

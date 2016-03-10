@@ -36,6 +36,8 @@ test('should be able to access expected player API methods', function() {
   ok(player.height, 'height exists');
   ok(player.poster, 'poster exists');
   ok(player.textTracks, 'textTracks exists');
+  ok(player.audioTracks, 'audioTracks exists');
+  ok(player.videoTracks, 'videoTracks exists');
   ok(player.requestFullscreen, 'requestFullscreen exists');
   ok(player.exitFullscreen, 'exitFullscreen exists');
   ok(player.playbackRate, 'playbackRate exists');
@@ -66,6 +68,12 @@ test('should be able to access expected player API methods', function() {
   ok(player.addTextTrack, 'addTextTrack exists');
   ok(player.addRemoteTextTrack, 'addRemoteTextTrack exists');
   ok(player.removeRemoteTextTrack, 'removeRemoteTextTrack exists');
+
+  // VideoTrack methods
+  ok(player.videoTracks, 'videoTracks exists');
+
+  // AudioTrack methods
+  ok(player.audioTracks, 'audioTracks exists');
 
   // Deprecated methods that should still exist
   ok(player.requestFullScreen, 'requestFullScreen exists');

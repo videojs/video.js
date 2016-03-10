@@ -22,7 +22,7 @@ let cleanup = (item) => {
   return item;
 };
 
-if (Html5.supportsNativeTextTracks()) {
+if (Html5.supportsNativeTracks('text')) {
   q.test('trackToJson_ produces correct representation for native track object', function(a) {
     let track = document.createElement('track');
 

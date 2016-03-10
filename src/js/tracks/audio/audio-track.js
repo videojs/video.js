@@ -6,7 +6,7 @@ import * as Guid from '../../utils/guid.js';
 import * as browser from '../../utils/browser.js';
 import * as AudioTrackEnum from './audio-track-enums';
 import EventTarget from '../../event-target';
-import document from '../../../../node_modules/global/document';
+import document from 'global/document';
 
 /**
  * A single text track as defined in:
