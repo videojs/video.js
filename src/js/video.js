@@ -12,6 +12,8 @@ import plugin from './plugins.js';
 import mergeOptions from '../../src/js/utils/merge-options.js';
 import * as Fn from './utils/fn.js';
 import TextTrack from './tracks/text-track.js';
+import AudioTrack from './tracks/audio-track.js';
+import VideoTrack from './tracks/video-track.js';
 
 import assign from 'object.assign';
 import { createTimeRanges } from './utils/time-ranges.js';
@@ -544,6 +546,20 @@ videojs.xhr = xhr;
  * @type {Function}
  */
 videojs.TextTrack = TextTrack;
+
+/**
+ * AudioTrack class
+ *
+ * @type {Function}
+ */
+videojs.AudioTrack = AudioTrack;
+
+/**
+ * VideoTrack class
+ *
+ * @type {Function}
+ */
+videojs.VideoTrack = VideoTrack;
 
 /**
  * Determines, via duck typing, whether or not a value is a DOM element.
