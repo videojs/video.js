@@ -90,7 +90,7 @@ class AudioTrack extends EventTarget {
       },
       set(value) {
         enabled = value;
-        this.trigger('change');
+        this.trigger('enabledchange');
       }
     });
 
@@ -105,7 +105,7 @@ class AudioTrack extends EventTarget {
  * cuechange - One or more cues in the track have become active or stopped being active.
  */
 AudioTrack.prototype.allowedEvents_ = {
-  change: 'change'
+  enabledchange: 'enabledchange'
 };
 
 export default AudioTrack;

@@ -90,7 +90,7 @@ class VideoTrack extends EventTarget {
       },
       set(value) {
         selected = value;
-        this.trigger('change');
+        this.trigger('selectedchange');
       }
     });
 
@@ -105,7 +105,7 @@ class VideoTrack extends EventTarget {
  * cuechange - One or more cues in the track have become active or stopped being active.
  */
 VideoTrack.prototype.allowedEvents_ = {
-  change: 'change'
+  selectedchange: 'selectedchange'
 };
 
 export default VideoTrack;

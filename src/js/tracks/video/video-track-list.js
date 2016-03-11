@@ -25,6 +25,24 @@ import * as Fn from '../../utils/fn.js';
 class VideoTrackList extends TrackList {
   constructor(tracks = []) {
     super(tracks);
+    let list = this;
+
+    Object.defineProperty(list, 'selectedIndex', {
+      get() {
+        let result = null;
+
+        for (let i = 0, l = this.tracks_.length; i < l; i++) {
+          let track = this.tracks_[i];
+
+          if (track.selected) {
+            result = i;
+            break;
+          }
+        }
+
+        return result;
+      }
+    });
   }
 
   /**
@@ -36,31 +54,13 @@ class VideoTrackList extends TrackList {
    */
   addTrack_(track) {
 
-    this.trigger('change');
-
-    super.addTrack_(track);
-  }
-
-  /**
-   * Get the index of the current VideoTrack object
-   *
-   * @method selectedIndex
-   * @return {id}
-   * @private
-   */
-  selectedIndex() {
-    let result = null;
-
-    for (let i = 0, l = this.length; i < l; i++) {
-      let track = this[i];
-
-      if (track.selected) {
-        result = track;
-        break;
-      }
+    if (track.addEventListener) {
+      track.addEventListener('selectedchange', Fn.bind(this, function () {
+        this.trigger('change');
+      }));
     }
 
-    return result;
+    super.addTrack_(track);
   }
 }
 
