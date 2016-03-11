@@ -2525,7 +2525,6 @@ class Player extends Component {
     return this.tech_ && this.tech_['videoTracks']();
   }
 
-
   /**
    * Get an audio track list
    * @link https://html.spec.whatwg.org/multipage/embedded-content.html#audiotracklist
@@ -2640,8 +2639,6 @@ class Player extends Component {
   // initialTime: function(){ return this.techCall_('initialTime'); },
   // startOffsetTime: function(){ return this.techCall_('startOffsetTime'); },
   // played: function(){ return this.techCall_('played'); },
-  // videoTracks: function(){ return this.techCall_('videoTracks'); },
-  // audioTracks: function(){ return this.techCall_('audioTracks'); },
   // defaultPlaybackRate: function(){ return this.techCall_('defaultPlaybackRate'); },
   // defaultMuted: function(){ return this.techCall_('defaultMuted'); }
 

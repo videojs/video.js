@@ -59,7 +59,9 @@ test('should be able to access expected player API methods', function() {
   ok(player.usingNativeControls, 'usingNativeControls exists');
   ok(player.isFullscreen, 'isFullscreen exists');
 
-  // TextTrack methods
+  // Track methods
+  ok(player.audioTracks, 'audioTracks exists');
+  ok(player.videoTracks, 'videoTracks exists');
   ok(player.textTracks, 'textTracks exists');
   ok(player.remoteTextTrackEls, 'remoteTextTrackEls exists');
   ok(player.remoteTextTracks, 'remoteTextTracks exists');

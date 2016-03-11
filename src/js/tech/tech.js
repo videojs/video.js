@@ -614,13 +614,30 @@ class Tech extends Component {
   }
 }
 
-/*
+/**
  * List of associated text tracks
  *
- * @type {Array}
+ * @type {TextTrackList}
  * @private
  */
 Tech.prototype.textTracks_;
+
+/**
+ * List of associated audio tracks
+ *
+ * @type {AudioTrackList}
+ * @private
+ */
+Tech.prototype.audioTracks_;
+
+/**
+ * List of associated video tracks
+ *
+ * @type {VideoTrackList}
+ * @private
+ */
+Tech.prototype.videoTracks_;
+
 
 var createTrackHelper = function(self, kind, label, language, options={}) {
   let tracks = self.textTracks();
