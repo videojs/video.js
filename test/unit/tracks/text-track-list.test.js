@@ -1,5 +1,5 @@
-import TextTrackList from '../../../src/js/tracks/text-track-list.js';
-import TextTrack from '../../../src/js/tracks/text-track.js';
+import TextTrackList from '../../../src/js/tracks/text/text-track-list.js';
+import TextTrack from '../../../src/js/tracks/text/text-track.js';
 import EventTarget from '../../../src/js/event-target.js';
 
 const genericTracks = [

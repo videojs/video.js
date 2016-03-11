@@ -8,8 +8,12 @@ import Component from '../component';
 import HTMLTrackElement from '../tracks/html-track-element';
 import HTMLTrackElementList from '../tracks/html-track-element-list';
 import mergeOptions from '../utils/merge-options.js';
-import TextTrack from '../tracks/text-track';
-import TextTrackList from '../tracks/text-track-list';
+import TextTrack from '../tracks/text/text-track';
+import TextTrackList from '../tracks/text/text-track-list';
+import AudioTrack from '../tracks/audio/audio-track';
+import AudioTrackList from '../tracks/audio/audio-track-list';
+import VideoTrack from '../tracks/video/video-track';
+import VideoTrackList from '../tracks/video/video-track-list';
 import * as Fn from '../utils/fn.js';
 import log from '../utils/log.js';
 import { createTimeRange } from '../utils/time-ranges.js';
@@ -45,6 +49,8 @@ class Tech extends Component {
     });
 
     this.textTracks_ = options.textTracks;
+    this.audioTracks_ = options.audioTracks;
+    this.videoTracks_ = options.videoTracks;
 
     // Manually track progress in cases where the browser/flash player doesn't report it.
     if (!this.featuresProgressEvents) {
@@ -64,7 +70,7 @@ class Tech extends Component {
       this.on('ready', this.emulateTextTracks);
     }
 
-    this.initTextTrackListeners();
+    this.initTrackListeners();
 
     // Turn on component tap events
     this.emitTapEvents();
@@ -295,22 +301,29 @@ class Tech extends Component {
    *
    * @method initTextTrackListeners
    */
-  initTextTrackListeners() {
-    let textTrackListChanges = Fn.bind(this, function() {
-      this.trigger('texttrackchange');
-    });
+  initTrackListeners() {
+    const typesTracks = ['text', 'video', 'audio'];
+    const typesLength = typesTracks.length;
+    let i = 0;
 
-    let tracks = this.textTracks();
+    for (i; i < typesLength; i++) {
+      let type = typesTracks[i];
+      let trackListChanges = Fn.bind(this, function () {
+        this.trigger(type + 'trackchange');
+      });
 
-    if (!tracks) return;
+      let tracks = this[`${type}Tracks`]();
 
-    tracks.addEventListener('removetrack', textTrackListChanges);
-    tracks.addEventListener('addtrack', textTrackListChanges);
+      if (!tracks) return;
 
-    this.on('dispose', Fn.bind(this, function() {
-      tracks.removeEventListener('removetrack', textTrackListChanges);
-      tracks.removeEventListener('addtrack', textTrackListChanges);
-    }));
+      tracks.addEventListener('removetrack', trackListChanges);
+      tracks.addEventListener('addtrack', trackListChanges);
+
+      this.on('dispose', Fn.bind(this, function () {
+        tracks.removeEventListener('removetrack', trackListChanges);
+        tracks.removeEventListener('addtrack', trackListChanges);
+      }));
+    }
   }
 
   /**
@@ -353,10 +366,68 @@ class Tech extends Component {
   }
 
   /*
-   * Provide default methods for text tracks.
+   * Provide default methods for (text/video/audio) tracks.
    *
    * Html5 tech overrides these.
    */
+
+  /**
+   * Get audiotracks
+   *
+   * @returns {TrackList}
+   * @method audioTracks
+   */
+  audioTracks() {
+    this.audioTracks_ = this.audioTracks_ || new AudioTrackList();
+    return this.audioTracks_;
+  }
+
+  /**
+   * Creates and returns a audio track object
+   *
+   * @param {String} kind Audio track kind (alternative, descriptions, main
+   *                                       translation and commentary)
+   * @param {String=} label Label to identify the audio track
+   * @param {String=} language Two letter language abbreviation
+   * @return {AudioTrackObject}
+   * @method addAudioTrack
+   */
+  addAudioTrack(kind, label, language) {
+    if (!kind) {
+      throw new Error('AudioTrack kind is required but was not provided');
+    }
+
+    return createTrackHelper(this, 'audio', kind, label, language);
+  }
+
+  /**
+   * Get videotracks
+   *
+   * @returns {TrackList}
+   * @method videoTracks
+   */
+  videoTracks() {
+    this.videoTracks_ = this.videoTracks_ || new VideoTrackList();
+    return this.videoTracks_;
+  }
+
+  /**
+   * Creates and returns a video track object
+   *
+   * @param {String} kind Video track kind (alternative, main
+   *                                       sign and commentary)
+   * @param {String=} label Label to identify the video track
+   * @param {String=} language Two letter language abbreviation
+   * @return {VideoTrackObject}
+   * @method addVideoTrack
+   */
+  addVideoTrack(kind, label, language) {
+    if (!kind) {
+      throw new Error('VideoTrack kind is required but was not provided');
+    }
+
+    return createTrackHelper(this, 'video', kind, label, language);
+  }
 
   /**
    * Get texttracks
@@ -406,7 +477,7 @@ class Tech extends Component {
       throw new Error('TextTrack kind is required but was not provided');
     }
 
-    return createTrackHelper(this, kind, label, language);
+    return createTrackHelper(this, 'text', kind, label, language);
   }
 
   /**
@@ -533,9 +604,25 @@ class Tech extends Component {
  * @private
  */
 Tech.prototype.textTracks_;
+/*
+ * List of associated audio tracks
+ *
+ * @type {Array}
+ * @private
+ */
+Tech.prototype.audioTracks_;
+/*
+ * List of associated video tracks
+ *
+ * @type {Array}
+ * @private
+ */
+Tech.prototype.videoTracks_;
 
-var createTrackHelper = function(self, kind, label, language, options={}) {
-  let tracks = self.textTracks();
+var createTrackHelper = function(self, type, kind, label, language, options={}) {
+  let tracks;
+
+  let track;
 
   options.kind = kind;
 
@@ -547,7 +634,21 @@ var createTrackHelper = function(self, kind, label, language, options={}) {
   }
   options.tech = self;
 
-  let track = new TextTrack(options);
+  switch(type){
+    case 'audio':
+      tracks = self.audioTracks();
+      track = new AudioTrack(options);
+      break;
+    case 'video':
+      tracks = self.videoTracks();
+      track = new VideoTrack(options);
+      break;
+    default:
+      tracks = self.textTracks();
+      track = new TextTrack(options);
+      break;
+  }
+
   tracks.addTrack_(track);
 
   return track;
@@ -565,6 +666,8 @@ Tech.prototype.featuresProgressEvents = false;
 Tech.prototype.featuresTimeupdateEvents = false;
 
 Tech.prototype.featuresNativeTextTracks = false;
+Tech.prototype.featuresNativeAudioTracks = false;
+Tech.prototype.featuresNativeVideoTracks = false;
 
 /*
  * A functional mixin for techs that want to use the Source Handler pattern.

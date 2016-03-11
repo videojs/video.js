@@ -2,8 +2,8 @@ import ChaptersButton from '../../../src/js/control-bar/text-track-controls/chap
 import SubtitlesButton from '../../../src/js/control-bar/text-track-controls/subtitles-button.js';
 import CaptionsButton from '../../../src/js/control-bar/text-track-controls/captions-button.js';
 
-import TextTrack from '../../../src/js/tracks/text-track.js';
-import TextTrackDisplay from '../../../src/js/tracks/text-track-display.js';
+import TextTrack from '../../../src/js/tracks/text/text-track.js';
+import TextTrackDisplay from '../../../src/js/tracks/text/text-track-display.js';
 import Html5 from '../../../src/js/tech/html5.js';
 import Tech from '../../../src/js/tech/tech.js';
 import Component from '../../../src/js/component.js';
@@ -261,7 +261,7 @@ test('html5 tech supports native text tracks if the video supports it, unless mo
     }]
   };
 
-  ok(!Html5.supportsNativeTextTracks(), 'native text tracks are not supported if mode is a number');
+  ok(!Html5.supportsNativeTracks('text'), 'native text tracks are not supported if mode is a number');
 
   Html5.TEST_VID = oldTestVid;
 });
@@ -276,7 +276,7 @@ test('html5 tech supports native text tracks if the video supports it, unless it
 
   browser.IS_FIREFOX = true;
 
-  ok(!Html5.supportsNativeTextTracks(), 'if textTracks are available on video element, native text tracks are supported');
+  ok(!Html5.supportsNativeTracks('text'), 'if textTracks are available on video element, native text tracks are supported');
 
   Html5.TEST_VID = oldTestVid;
   browser.IS_FIREFOX = oldIsFirefox;
@@ -294,7 +294,7 @@ test('when switching techs, we should not get a new text track', function() {
   ok(firstTracks === secondTracks, 'the tracks are equal');
 });
 
-if (Html5.supportsNativeTextTracks()) {
+if (Html5.supportsNativeTracks('text')) {
   test('listen to native remove and add track events in native text tracks', function(assert) {
     let done = assert.async();
 

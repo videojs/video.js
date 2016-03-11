@@ -21,17 +21,17 @@ import MediaError from './media-error.js';
 import safeParseTuple from 'safe-json-parse/tuple';
 import assign from 'object.assign';
 import mergeOptions from './utils/merge-options.js';
-import textTrackConverter from './tracks/text-track-list-converter.js';
+import textTrackConverter from './tracks/text/text-track-list-converter.js';
 
 // Include required child components (importing also registers them)
 import MediaLoader from './tech/loader.js';
 import PosterImage from './poster-image.js';
-import TextTrackDisplay from './tracks/text-track-display.js';
+import TextTrackDisplay from './tracks/text/text-track-display.js';
 import LoadingSpinner from './loading-spinner.js';
 import BigPlayButton from './big-play-button.js';
 import ControlBar from './control-bar/control-bar.js';
 import ErrorDisplay from './error-display.js';
-import TextTrackSettings from './tracks/text-track-settings.js';
+import TextTrackSettings from './tracks/text/text-track-settings.js';
 import ModalDialog from './modal-dialog';
 
 // Require html5 tech, at least for disposing the original video tag
@@ -521,6 +521,8 @@ class Player extends Component {
       'playerId': this.id(),
       'techId': `${this.id()}_${techName}_api`,
       'textTracks': this.textTracks_,
+      'audioTracks': this.audioTracks_,
+      'videoTracks': this.videoTracks_,
       'autoplay': this.options_.autoplay,
       'preload': this.options_.preload,
       'loop': this.options_.loop,
@@ -2548,6 +2550,18 @@ class Player extends Component {
     this.tech_ && this.tech_['removeRemoteTextTrack'](track);
   }
 
+  videoTracks() {
+    // cannot use techGet_ directly because it checks to see whether the tech is ready.
+    // Flash is unlikely to be ready in time but videoTracks should still work.
+    return this.tech_ && this.tech_['videoTracks']();
+  }
+
+  audioTracks() {
+    // cannot use techGet_ directly because it checks to see whether the tech is ready.
+    // Flash is unlikely to be ready in time but audioTracks should still work.
+    return this.tech_ && this.tech_['audioTracks']();
+  }
+
   /**
    * Get video width
    *
@@ -2572,8 +2586,6 @@ class Player extends Component {
   // initialTime: function(){ return this.techCall_('initialTime'); },
   // startOffsetTime: function(){ return this.techCall_('startOffsetTime'); },
   // played: function(){ return this.techCall_('played'); },
-  // videoTracks: function(){ return this.techCall_('videoTracks'); },
-  // audioTracks: function(){ return this.techCall_('audioTracks'); },
   // defaultPlaybackRate: function(){ return this.techCall_('defaultPlaybackRate'); },
   // defaultMuted: function(){ return this.techCall_('defaultMuted'); }
 

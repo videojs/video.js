@@ -1,6 +1,6 @@
-import c from '../../../src/js/tracks/text-track-list-converter.js';
-import TextTrack from '../../../src/js/tracks/text-track.js';
-import TextTrackList from '../../../src/js/tracks/text-track-list.js';
+import c from '../../../src/js/tracks/text/text-track-list-converter.js';
+import TextTrack from '../../../src/js/tracks/text/text-track.js';
+import TextTrackList from '../../../src/js/tracks/text/text-track-list.js';
 import Html5 from '../../../src/js/tech/html5.js';
 import document from 'global/document';
 
@@ -22,7 +22,7 @@ let cleanup = (item) => {
   return item;
 };
 
-if (Html5.supportsNativeTextTracks()) {
+if (Html5.supportsNativeTracks('text')) {
   q.test('trackToJson_ produces correct representation for native track object', function(a) {
     let track = document.createElement('track');
 

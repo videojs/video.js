@@ -205,7 +205,7 @@ test('native source handler canHandleSource', function(){
   Html5.TEST_VID.canPlayType = origCPT;
 });
 
-if (Html5.supportsNativeTextTracks()) {
+if (Html5.supportsNativeTracks('text')) {
   test('add native textTrack listeners on startup', function() {
     let adds = [];
     let rems = [];

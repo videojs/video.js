@@ -77,6 +77,20 @@ class Html5 extends Tech {
       this.proxyNativeTextTracks_();
     }
 
+    if (this.featuresNativeAudioTracks) {
+      this.handleAudioTrackChange_ = Fn.bind(this, this.handleAudioTrackChange);
+      this.handleAudioTrackAdd_ = Fn.bind(this, this.handleAudioTrackAdd);
+      this.handleAudioTrackRemove_ = Fn.bind(this, this.handleAudioTrackRemove);
+      this.proxyNativeAudioTracks_();
+    }
+
+    if (this.featuresNativeVideoTracks) {
+      this.handleVideoTrackChange_ = Fn.bind(this, this.handleVideoTrackChange);
+      this.handleVideoTrackAdd_ = Fn.bind(this, this.handleVideoTrackAdd);
+      this.handleVideoTrackRemove_ = Fn.bind(this, this.handleVideoTrackRemove);
+      this.proxyNativeVideoTracks_();
+    }
+
     // Determine if native controls should be used
     // Our goal should be to get the custom controls on mobile solid everywhere
     // so we can remove this all together. Right now this will block custom
@@ -106,6 +120,21 @@ class Html5 extends Tech {
       tt.removeEventListener('removetrack', this.handleTextTrackRemove_);
     }
 
+    tt = this.el().audioTracks;
+
+    if (tt && tt.removeEventListener) {
+      tt.removeEventListener('change', this.handleAudioTrackChange_);
+      tt.removeEventListener('addtrack', this.handleAudioTrackAdd_);
+      tt.removeEventListener('removetrack', this.handleAudioTrackRemove_);
+    }
+
+    tt = this.el().videoTracks;
+
+    if (tt && tt.removeEventListener) {
+      tt.removeEventListener('change', this.handleVideoTrackChange_);
+      tt.removeEventListener('addtrack', this.handleVideoTrackAdd_);
+      tt.removeEventListener('removetrack', this.handleVideoTrackRemove_);
+    }
     // clearout the emulated text track list.
     let i = emulatedTt.length;
 
@@ -280,6 +309,62 @@ class Html5 extends Tech {
 
   handleTextTrackRemove(e) {
     this.textTracks().removeTrack_(e.track);
+  }
+
+  proxyNativeVideoTracks_() {
+    let tt = this.el().videoTracks;
+
+    if (tt && tt.addEventListener) {
+      tt.addEventListener('change', this.handleVideoTrackChange_);
+      tt.addEventListener('addtrack', this.handleVideoTrackAdd_);
+      tt.addEventListener('removetrack', this.handleVideoTrackRemove_);
+    }
+  }
+
+  handleVideoTrackChange(e) {
+    let tt = this.videoTracks();
+    this.videoTracks().trigger({
+      type: 'change',
+      target: tt,
+      currentTarget: tt,
+      srcElement: tt
+    });
+  }
+
+  handleVideoTrackAdd(e) {
+    this.videoTracks().addTrack_(e.track);
+  }
+
+  handleVideoTrackRemove(e) {
+    this.videoTracks().removeTrack_(e.track);
+  }
+
+  proxyNativeAudioTracks_() {
+    let tt = this.el().audioTracks;
+
+    if (tt && tt.addEventListener) {
+      tt.addEventListener('change', this.handleAudioTrackChange_);
+      tt.addEventListener('addtrack', this.handleAudioTrackAdd_);
+      tt.addEventListener('removetrack', this.handleAudioTrackRemove_);
+    }
+  }
+
+  handleAudioTrackChange(e) {
+    let tt = this.audioTracks();
+    this.audioTracks().trigger({
+      type: 'change',
+      target: tt,
+      currentTarget: tt,
+      srcElement: tt
+    });
+  }
+
+  handleAudioTrackAdd(e) {
+    this.audioTracks().addTrack_(e.track);
+  }
+
+  handleAudioTrackRemove(e) {
+    this.audioTracks().removeTrack_(e.track);
   }
 
   /**
@@ -504,7 +589,7 @@ class Html5 extends Tech {
    * @return {Object}
    * @method currentSrc
    */
-  currentSrc() { 
+  currentSrc() {
     if (this.currentSource_) {
       return this.currentSource_.src;
     } else {
@@ -805,6 +890,54 @@ class Html5 extends Tech {
     }
   }
 
+  /**
+   * Get audio tracks
+   *
+   * @return {AudioTrackList}
+   * @method audioTracks
+   */
+  audioTracks() {
+    return super.audioTracks();
+  }
+
+  /**
+   * Creates and returns a audio track object
+   *
+   * @param {String} kind Audio track kind (alternative, descriptions, main
+   *                                       translation and commentary)
+   * @param {String=} label Label to identify the audio track
+   * @param {String=} language Two letter language abbreviation
+   * @return {AudioTrackObject}
+   * @method addAudioTrack
+   */
+  addAudioTrack(kind, label, language) {
+    return super.addAudioTrack(kind, label, language);
+  }
+
+  /**
+   * Get video tracks
+   *
+   * @return {VideoTrackList}
+   * @method videoTracks
+   */
+  videoTracks() {
+    return super.videoTracks();
+  }
+
+  /**
+   * Creates and returns a video track object
+   *
+   * @param {String} kind Video track kind (alternative, main
+   *                                       sign and commentary)
+   * @param {String=} label Label to identify the video track
+   * @param {String=} language Two letter language abbreviation
+   * @return {VideoTrackObject}
+   * @method addVideoTrack
+   */
+  addVideoTrack(kind, label, language) {
+    return super.addVideoTrack(kind, label, language);
+  }
+
 }
 
 
@@ -936,30 +1069,30 @@ Html5.canControlPlaybackRate = function(){
 };
 
 /*
- * Check to see if native text tracks are supported by this browser/device
+ * Check to see if native tracks are supported by this browser/device
  *
  * @return {Boolean}
  */
-Html5.supportsNativeTextTracks = function() {
-  var supportsTextTracks;
-
+Html5.supportsNativeTracks = function (type = 'text') {
+  var supportsTracks;
+  const typeTrack = `${type}Tracks`;
   // Figure out native text track support
   // If mode is a number, we cannot change it because it'll disappear from view.
   // Browsers with numeric modes include IE10 and older (<=2013) samsung android models.
   // Firefox isn't playing nice either with modifying the mode
   // TODO: Investigate firefox: https://github.com/videojs/video.js/issues/1862
-  supportsTextTracks = !!Html5.TEST_VID.textTracks;
-  if (supportsTextTracks && Html5.TEST_VID.textTracks.length > 0) {
-    supportsTextTracks = typeof Html5.TEST_VID.textTracks[0]['mode'] !== 'number';
+  supportsTracks = !!Html5.TEST_VID[typeTrack];
+  if (supportsTracks && Html5.TEST_VID[typeTrack].length > 0) {
+    supportsTracks = typeof Html5.TEST_VID[typeTrack][0]['mode'] !== 'number';
   }
-  if (supportsTextTracks && browser.IS_FIREFOX) {
-    supportsTextTracks = false;
+  if (supportsTracks && browser.IS_FIREFOX) {
+    supportsTracks = false;
   }
-  if (supportsTextTracks && !('onremovetrack' in Html5.TEST_VID.textTracks)) {
-    supportsTextTracks = false;
+  if (supportsTracks && !('onremovetrack' in Html5.TEST_VID[typeTrack])) {
+    supportsTracks = false;
   }
 
-  return supportsTextTracks;
+  return supportsTracks;
 };
 
 /**
@@ -1033,7 +1166,21 @@ Html5.prototype['featuresProgressEvents'] = true;
  *
  * @type {Boolean}
  */
-Html5.prototype['featuresNativeTextTracks'] = Html5.supportsNativeTextTracks();
+Html5.prototype['featuresNativeTextTracks'] = Html5.supportsNativeTracks('text');
+
+/*
+ * Sets the tech's status on native audio track support
+ *
+ * @type {Boolean}
+ */
+Html5.prototype['featuresNativeAudioTracks'] = Html5.supportsNativeTracks('audio');
+
+/*
+ * Sets the tech's status on native video track support
+ *
+ * @type {Boolean}
+ */
+Html5.prototype['featuresNativeVideoTracks'] = Html5.supportsNativeTracks('video');
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //
 let canPlayType;
