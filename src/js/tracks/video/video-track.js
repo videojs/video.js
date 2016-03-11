@@ -46,7 +46,7 @@ class VideoTrack extends EventTarget {
     }
 
     tt.tech_ = options.tech;
-    let enabled = false;
+    let selected = false;
     let kind = VideoTrackEnum.VideoTrackKind[options.kind] || 'translation';
     let label = options.label || '';
     let language = options.language || options.srclang || '';
@@ -84,12 +84,12 @@ class VideoTrack extends EventTarget {
       }
     });
 
-    Object.defineProperty(tt, 'enabled', {
+    Object.defineProperty(tt, 'selected', {
       get() {
-        return enabled;
+        return selected;
       },
       set(value) {
-        enabled = value;
+        selected = value;
         this.trigger('change');
       }
     });

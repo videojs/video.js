@@ -911,11 +911,7 @@ class Html5 extends Tech {
    * @method addAudioTrack
    */
   addAudioTrack(kind, label, language) {
-    if (!this['featuresNativeAudioTracks']) {
-      return super.addAudioTrack(kind, label, language);
-    }
-
-    return this.el_.addAudioTrack(kind, label, language);
+    return super.addAudioTrack(kind, label, language);
   }
 
   /**
@@ -939,11 +935,7 @@ class Html5 extends Tech {
    * @method addVideoTrack
    */
   addVideoTrack(kind, label, language) {
-    if (!this['featuresNativeVideoTracks']) {
-      return super.addVideoTrack(kind, label, language);
-    }
-
-    return this.el_.addVideoTrack(kind, label, language);
+    return super.addVideoTrack(kind, label, language);
   }
 
 }

@@ -15,8 +15,10 @@
  */
 const VideoTrackKind = {
   alternative: 'alternative',
+  captions: 'captions',
   main: 'main',
   sign: 'sign',
+  subtitles: 'subtitles',
   commentary: 'commentary'
 };
 

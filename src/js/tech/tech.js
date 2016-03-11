@@ -666,6 +666,8 @@ Tech.prototype.featuresProgressEvents = false;
 Tech.prototype.featuresTimeupdateEvents = false;
 
 Tech.prototype.featuresNativeTextTracks = false;
+Tech.prototype.featuresNativeAudioTracks = false;
+Tech.prototype.featuresNativeVideoTracks = false;
 
 /*
  * A functional mixin for techs that want to use the Source Handler pattern.

@@ -40,6 +40,28 @@ class VideoTrackList extends TrackList {
 
     super.addTrack_(track);
   }
+
+  /**
+   * Get the index of the current VideoTrack object
+   *
+   * @method selectedIndex
+   * @return {id}
+   * @private
+   */
+  selectedIndex() {
+    let result = null;
+
+    for (let i = 0, l = this.length; i < l; i++) {
+      let track = this[i];
+
+      if (track.selected) {
+        result = track;
+        break;
+      }
+    }
+
+    return result;
+  }
 }
 
 export default VideoTrackList;

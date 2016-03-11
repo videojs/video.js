@@ -15,7 +15,7 @@
  */
 const AudioTrackKind = {
   alternative: 'alternative',
-  descriptions: 'descriptions',
+  description: 'description',
   main: 'main',
   translation: 'translation',
   commentary: 'commentary'

@@ -71,10 +71,10 @@ test('kind can only be one of several options, defaults to translation', functio
 
   tt = new AudioTrack({
     tech: defaultTech,
-    kind: 'descriptions'
+    kind: 'description'
   });
 
-  equal(tt.kind, 'descriptions', 'the kind is set to descriptions');
+  equal(tt.kind, 'description', 'the kind is set to description');
 
   tt = new AudioTrack({
     tech: defaultTech,
