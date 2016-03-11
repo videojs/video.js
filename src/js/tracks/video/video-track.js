@@ -88,12 +88,9 @@ class VideoTrack extends EventTarget {
       get() {
         return enabled;
       },
-      set(newMode) {
-        if (!VideoTrackEnum.VideoTrackKind[newMode]) {
-          return;
-        }
-        enabled = newMode;
-        this.trigger('modechange');
+      set(value) {
+        enabled = value;
+        this.trigger('change');
       }
     });
 

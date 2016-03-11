@@ -88,12 +88,9 @@ class AudioTrack extends EventTarget {
       get() {
         return enabled;
       },
-      set(newMode) {
-        if (!AudioTrackEnum.AudioTrackKind[newMode]) {
-          return;
-        }
-        enabled = newMode;
-        this.trigger('modechange');
+      set(value) {
+        enabled = value;
+        this.trigger('change');
       }
     });
 
