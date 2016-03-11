@@ -10,7 +10,9 @@ import HTMLTrackElementList from '../tracks/html-track-element-list';
 import mergeOptions from '../utils/merge-options.js';
 import TextTrack from '../tracks/text/text-track';
 import TextTrackList from '../tracks/text/text-track-list';
+import AudioTrack from '../tracks/audio/audio-track';
 import AudioTrackList from '../tracks/audio/audio-track-list';
+import VideoTrack from '../tracks/video/video-track';
 import VideoTrackList from '../tracks/video/video-track-list';
 import * as Fn from '../utils/fn.js';
 import log from '../utils/log.js';
@@ -381,6 +383,24 @@ class Tech extends Component {
   }
 
   /**
+   * Creates and returns a audio track object
+   *
+   * @param {String} kind Audio track kind (alternative, descriptions, main
+   *                                       translation and commentary)
+   * @param {String=} label Label to identify the audio track
+   * @param {String=} language Two letter language abbreviation
+   * @return {AudioTrackObject}
+   * @method addAudioTrack
+   */
+  addAudioTrack(kind, label, language) {
+    if (!kind) {
+      throw new Error('AudioTrack kind is required but was not provided');
+    }
+
+    return createTrackHelper(this, 'audio', kind, label, language);
+  }
+
+  /**
    * Get videotracks
    *
    * @returns {TrackList}
@@ -389,6 +409,24 @@ class Tech extends Component {
   videoTracks() {
     this.videoTracks_ = this.videoTracks_ || new VideoTrackList();
     return this.videoTracks_;
+  }
+
+  /**
+   * Creates and returns a video track object
+   *
+   * @param {String} kind Video track kind (alternative, main
+   *                                       sign and commentary)
+   * @param {String=} label Label to identify the video track
+   * @param {String=} language Two letter language abbreviation
+   * @return {VideoTrackObject}
+   * @method addVideoTrack
+   */
+  addVideoTrack(kind, label, language) {
+    if (!kind) {
+      throw new Error('VideoTrack kind is required but was not provided');
+    }
+
+    return createTrackHelper(this, 'video', kind, label, language);
   }
 
   /**
@@ -439,7 +477,7 @@ class Tech extends Component {
       throw new Error('TextTrack kind is required but was not provided');
     }
 
-    return createTrackHelper(this, kind, label, language);
+    return createTrackHelper(this, 'text', kind, label, language);
   }
 
   /**
@@ -566,9 +604,25 @@ class Tech extends Component {
  * @private
  */
 Tech.prototype.textTracks_;
+/*
+ * List of associated audio tracks
+ *
+ * @type {Array}
+ * @private
+ */
+Tech.prototype.audioTracks_;
+/*
+ * List of associated video tracks
+ *
+ * @type {Array}
+ * @private
+ */
+Tech.prototype.videoTracks_;
 
-var createTrackHelper = function(self, kind, label, language, options={}) {
-  let tracks = self.textTracks();
+var createTrackHelper = function(self, type, kind, label, language, options={}) {
+  let tracks;
+
+  let track;
 
   options.kind = kind;
 
@@ -580,7 +634,21 @@ var createTrackHelper = function(self, kind, label, language, options={}) {
   }
   options.tech = self;
 
-  let track = new TextTrack(options);
+  switch(type){
+    case 'audio':
+      tracks = self.audioTracks();
+      track = new AudioTrack(options);
+      break;
+    case 'video':
+      tracks = self.videoTracks();
+      track = new VideoTrack(options);
+      break;
+    default:
+      tracks = self.textTracks();
+      track = new TextTrack(options);
+      break;
+  }
+
   tracks.addTrack_(track);
 
   return track;

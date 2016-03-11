@@ -890,6 +890,62 @@ class Html5 extends Tech {
     }
   }
 
+  /**
+   * Get audio tracks
+   *
+   * @return {AudioTrackList}
+   * @method audioTracks
+   */
+  audioTracks() {
+    return super.audioTracks();
+  }
+
+  /**
+   * Creates and returns a audio track object
+   *
+   * @param {String} kind Audio track kind (alternative, descriptions, main
+   *                                       translation and commentary)
+   * @param {String=} label Label to identify the audio track
+   * @param {String=} language Two letter language abbreviation
+   * @return {AudioTrackObject}
+   * @method addAudioTrack
+   */
+  addAudioTrack(kind, label, language) {
+    if (!this['featuresNativeAudioTracks']) {
+      return super.addAudioTrack(kind, label, language);
+    }
+
+    return this.el_.addAudioTrack(kind, label, language);
+  }
+
+  /**
+   * Get video tracks
+   *
+   * @return {VideoTrackList}
+   * @method videoTracks
+   */
+  videoTracks() {
+    return super.videoTracks();
+  }
+
+  /**
+   * Creates and returns a video track object
+   *
+   * @param {String} kind Video track kind (alternative, main
+   *                                       sign and commentary)
+   * @param {String=} label Label to identify the video track
+   * @param {String=} language Two letter language abbreviation
+   * @return {VideoTrackObject}
+   * @method addVideoTrack
+   */
+  addVideoTrack(kind, label, language) {
+    if (!this['featuresNativeVideoTracks']) {
+      return super.addVideoTrack(kind, label, language);
+    }
+
+    return this.el_.addVideoTrack(kind, label, language);
+  }
+
 }
 
 
