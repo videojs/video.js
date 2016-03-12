@@ -178,6 +178,62 @@ test('descriptions menu should contain "Off" and one track', function() {
   player.dispose();
 });
 
+test('enabling a captions track should disable the descriptions menu button', function() {
+  expect(14);
+
+  var player = TestHelpers.makePlayer({
+    tracks: [track, descriptionstrack]
+  });
+  var i;
+
+  this.clock.tick(1000);
+
+  ok(!player.controlBar.captionsButton.hasClass('vjs-hidden'), 'captions control is displayed');
+  ok(!player.controlBar.descriptionsButton.hasClass('vjs-hidden'), 'descriptions control is displayed');
+  equal(player.textTracks().length, 2, 'textTracks contains two items');
+
+  ok(!player.controlBar.captionsButton.hasClass('vjs-disabled'), 'captions control is NOT disabled');
+  ok(!player.controlBar.descriptionsButton.hasClass('vjs-disabled'), 'descriptions control is NOT disabled');
+
+  for (i = 0; i < player.textTracks().length; i++) {
+    if (player.textTracks()[i].kind === 'descriptions') {
+      player.textTracks()[i].mode = 'showing';
+      ok(player.textTracks()[i].kind === 'descriptions' && player.textTracks()[i].mode === 'showing', 'descriptions mode set to showing');
+    }
+  }
+
+  this.clock.tick(1000);
+
+  ok(!player.controlBar.captionsButton.hasClass('vjs-disabled'), 'captions control is NOT disabled');
+  ok(!player.controlBar.descriptionsButton.hasClass('vjs-disabled'), 'descriptions control is NOT disabled');
+
+  for (i = 0; i < player.textTracks().length; i++) {
+    if (player.textTracks()[i].kind === 'captions') {
+      player.textTracks()[i].mode = 'showing';
+      ok(player.textTracks()[i].kind === 'captions' && player.textTracks()[i].mode === 'showing', 'captions mode set to showing');
+    }
+  }
+
+  this.clock.tick(1000);
+
+  ok(!player.controlBar.captionsButton.hasClass('vjs-disabled'), 'captions control is NOT disabled');
+  ok(player.controlBar.descriptionsButton.hasClass('vjs-disabled'), 'descriptions control IS disabled');
+
+  for (i = 0; i < player.textTracks().length; i++) {
+    if (player.textTracks()[i].kind === 'captions') {
+      player.textTracks()[i].mode = 'disabled';
+      ok(player.textTracks()[i].kind === 'captions' && player.textTracks()[i].mode === 'disabled', 'captions mode set to disabled');
+    }
+  }
+
+  this.clock.tick(1000);
+
+  ok(!player.controlBar.captionsButton.hasClass('vjs-disabled'), 'captions control is NOT disabled');
+  ok(!player.controlBar.descriptionsButton.hasClass('vjs-disabled'), 'descriptions control is NOT disabled');
+
+  player.dispose();
+});
+
 if (!browser.IS_IE8) {
   // This test doesn't work on IE8.
   // However, this test tests a specific with iOS7 where the TextTrackList doesn't report track mode changes.
