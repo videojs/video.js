@@ -3,7 +3,7 @@ import TestHelpers from './test-helpers.js';
 
 q.module('ClickableComponent');
 
-test('should create a div with role="button"', function(){
+q.test('should create a div with role="button"', function(){
   expect(2);
 
   var player, testClickableComponent, el;
@@ -16,4 +16,31 @@ test('should create a div with role="button"', function(){
 
   equal(el.nodeName.toLowerCase(), 'div', 'the name of the element is "div"');
   equal(el.getAttribute('role').toLowerCase(), 'button', 'the role of the element is "button"');
+
+  testClickableComponent.dispose();
+  player.dispose();
+});
+
+q.test('should be enabled/disabled', function(){
+  expect(3);
+
+  var player, testClickableComponent;
+
+  player = TestHelpers.makePlayer({
+  });
+
+  testClickableComponent = new ClickableComponent(player);
+
+  equal(testClickableComponent.hasClass('vjs-disabled'), false, 'ClickableComponent defaults to enabled');
+
+  testClickableComponent.disable();
+
+  equal(testClickableComponent.hasClass('vjs-disabled'), true, 'ClickableComponent is disabled');
+
+  testClickableComponent.enable();
+
+  equal(testClickableComponent.hasClass('vjs-disabled'), false, 'ClickableComponent is enabled');
+
+  testClickableComponent.dispose();
+  player.dispose();
 });
