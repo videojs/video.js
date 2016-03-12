@@ -5,16 +5,14 @@ import * as Events from '../../src/js/utils/events.js';
 q.module('MenuButton');
 
 q.test('should place title list item into ul', function() {
-  var player, menuButton;
+  let player = TestHelpers.makePlayer();
 
-  player = TestHelpers.makePlayer();
-
-  menuButton = new MenuButton(player, {
+  let menuButton = new MenuButton(player, {
     'title': 'testTitle'
   });
 
-  var menuContentElement = menuButton.el().getElementsByTagName('UL')[0];
-  var titleElement = menuContentElement.children[0];
+  let menuContentElement = menuButton.el().getElementsByTagName('UL')[0];
+  let titleElement = menuContentElement.children[0];
 
   ok(titleElement.innerHTML === 'TestTitle', 'title element placed in ul');
 
@@ -24,15 +22,13 @@ q.test('should place title list item into ul', function() {
 q.test('clicking should display the menu', function() {
   expect(6);
 
-  var player, menuButton, el;
-
-  player = TestHelpers.makePlayer();
+  let player = TestHelpers.makePlayer();
 
   // Make sure there's some content in the menu, even if it's just a title!
-  menuButton = new MenuButton(player, {
+  let menuButton = new MenuButton(player, {
     'title': 'testTitle'
   });
-  el = menuButton.el();
+  let el = menuButton.el();
 
   ok(menuButton.menu !== undefined, 'menu is created');
 

@@ -6,13 +6,10 @@ q.module('ClickableComponent');
 q.test('should create a div with role="button"', function(){
   expect(2);
 
-  var player, testClickableComponent, el;
+  let player = TestHelpers.makePlayer({});
 
-  player = TestHelpers.makePlayer({
-  });
-
-  testClickableComponent = new ClickableComponent(player);
-  el = testClickableComponent.createEl();
+  let testClickableComponent = new ClickableComponent(player);
+  let el = testClickableComponent.createEl();
 
   equal(el.nodeName.toLowerCase(), 'div', 'the name of the element is "div"');
   equal(el.getAttribute('role').toLowerCase(), 'button', 'the role of the element is "button"');
@@ -24,12 +21,9 @@ q.test('should create a div with role="button"', function(){
 q.test('should be enabled/disabled', function(){
   expect(3);
 
-  var player, testClickableComponent;
+  let player = TestHelpers.makePlayer({});
 
-  player = TestHelpers.makePlayer({
-  });
-
-  testClickableComponent = new ClickableComponent(player);
+  let testClickableComponent = new ClickableComponent(player);
 
   equal(testClickableComponent.hasClass('vjs-disabled'), false, 'ClickableComponent defaults to enabled');
 

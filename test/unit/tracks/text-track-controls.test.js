@@ -110,7 +110,7 @@ test('menu should update with removeRemoteTextTrack', function() {
   player.dispose();
 });
 
-var descriptionstrack = {
+let descriptionstrack = {
   kind: 'descriptions',
   label: 'desc'
 };
@@ -129,7 +129,7 @@ test('descriptions should be displayed when text tracks list is not empty', func
 });
 
 test('descriptions should be displayed when a text track is added to an empty track list', function() {
-  var player = TestHelpers.makePlayer();
+  let player = TestHelpers.makePlayer();
 
   player.addRemoteTextTrack(descriptionstrack);
 
@@ -140,7 +140,7 @@ test('descriptions should be displayed when a text track is added to an empty tr
 });
 
 test('descriptions should not be displayed when text tracks list is empty', function() {
-  var player = TestHelpers.makePlayer();
+  let player = TestHelpers.makePlayer();
 
   ok(player.controlBar.descriptionsButton.hasClass('vjs-hidden'), 'control is not displayed');
   equal(player.textTracks().length, 0, 'textTracks is empty');
@@ -149,7 +149,7 @@ test('descriptions should not be displayed when text tracks list is empty', func
 });
 
 test('descriptions should not be displayed when last text track is removed', function() {
-  var player = TestHelpers.makePlayer({
+  let player = TestHelpers.makePlayer({
     tracks: [descriptionstrack]
   });
 
@@ -162,7 +162,7 @@ test('descriptions should not be displayed when last text track is removed', fun
 });
 
 test('descriptions menu should contain "Off" and one track', function() {
-  var player = TestHelpers.makePlayer({
+  let player = TestHelpers.makePlayer({
       tracks: [descriptionstrack]
     }),
     menuItems;
@@ -181,10 +181,9 @@ test('descriptions menu should contain "Off" and one track', function() {
 test('enabling a captions track should disable the descriptions menu button', function() {
   expect(14);
 
-  var player = TestHelpers.makePlayer({
+  let player = TestHelpers.makePlayer({
     tracks: [track, descriptionstrack]
   });
-  var i;
 
   this.clock.tick(1000);
 
@@ -195,7 +194,7 @@ test('enabling a captions track should disable the descriptions menu button', fu
   ok(!player.controlBar.captionsButton.hasClass('vjs-disabled'), 'captions control is NOT disabled');
   ok(!player.controlBar.descriptionsButton.hasClass('vjs-disabled'), 'descriptions control is NOT disabled');
 
-  for (i = 0; i < player.textTracks().length; i++) {
+  for (let i = 0; i < player.textTracks().length; i++) {
     if (player.textTracks()[i].kind === 'descriptions') {
       player.textTracks()[i].mode = 'showing';
       ok(player.textTracks()[i].kind === 'descriptions' && player.textTracks()[i].mode === 'showing', 'descriptions mode set to showing');
@@ -207,7 +206,7 @@ test('enabling a captions track should disable the descriptions menu button', fu
   ok(!player.controlBar.captionsButton.hasClass('vjs-disabled'), 'captions control is NOT disabled');
   ok(!player.controlBar.descriptionsButton.hasClass('vjs-disabled'), 'descriptions control is NOT disabled');
 
-  for (i = 0; i < player.textTracks().length; i++) {
+  for (let i = 0; i < player.textTracks().length; i++) {
     if (player.textTracks()[i].kind === 'captions') {
       player.textTracks()[i].mode = 'showing';
       ok(player.textTracks()[i].kind === 'captions' && player.textTracks()[i].mode === 'showing', 'captions mode set to showing');
@@ -219,7 +218,7 @@ test('enabling a captions track should disable the descriptions menu button', fu
   ok(!player.controlBar.captionsButton.hasClass('vjs-disabled'), 'captions control is NOT disabled');
   ok(player.controlBar.descriptionsButton.hasClass('vjs-disabled'), 'descriptions control IS disabled');
 
-  for (i = 0; i < player.textTracks().length; i++) {
+  for (let i = 0; i < player.textTracks().length; i++) {
     if (player.textTracks()[i].kind === 'captions') {
       player.textTracks()[i].mode = 'disabled';
       ok(player.textTracks()[i].kind === 'captions' && player.textTracks()[i].mode === 'disabled', 'captions mode set to disabled');
