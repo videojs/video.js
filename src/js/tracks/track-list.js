@@ -41,9 +41,7 @@ class TrackList extends EventTarget {
       list.addTrack_(tracks[i]);
     }
 
-    if (browser.IS_IE8) {
-      return list;
-    }
+    return list;
   }
 
   /**

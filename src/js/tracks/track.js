@@ -35,33 +35,20 @@ class Track extends EventTarget {
     }
     track.tech_ = options.tech;
 
-    let id = options.id || 'vjs_' + type + '_track_' + Guid.newGUID();
-    let kind = options.kind || '';
-    let label = options.label || '';
-    let language = options.language || '';
+    let trackProps = {
+      id: options.id || 'vjs_' + type + '_track_' + Guid.newGUID(),
+      kind: options.kind || '',
+      label: options.label || '',
+      language: options.language || ''
+    };
 
-    Object.defineProperties(track, {
-      kind: {
-        get() { return kind; },
+    for(let key in trackProps) {
+      Object.defineProperty(track, key, {
+        get() { return trackProps[key]; },
         set() {}
-      },
-      label: {
-        get() { return label; },
-        set() {}
-      },
-      language: {
-        get() { return language; },
-        set() {}
-      },
-      id: {
-        get() { return id; },
-        set() {}
-      }
-    });
-
-    if (browser.IS_IE8) {
-      return track;
+      });
     }
+    return track;
   }
 }
 

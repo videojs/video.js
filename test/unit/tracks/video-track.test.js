@@ -1,4 +1,5 @@
 import VideoTrack from '../../../src/js/tracks/video-track';
+import VideoTrackList from '../../../src/js/tracks/video-track-list';
 import * as VideoTrackEnums from '../../../src/js/tracks/video-track-enums';
 import TrackBaseline from './track-baseline';
 
@@ -11,18 +12,7 @@ const defaultTech = {
 
 q.module('Video Track', {
   beforeEach() {
-    this.videoTrackList = [];
-    Object.defineProperty(this.videoTrackList, 'selectedIndex', {
-      get: () => {
-        for (let i = 0; i < this.length; i++) {
-          if (this[i].selected()) {
-            return i;
-          }
-        }
-        return -1;
-      },
-      set() {},
-    });
+    this.videoTrackList = new VideoTrackList();
     this.tech = defaultTech;
     this.tech.videoTracks = () => {
       return this.videoTrackList;
@@ -129,12 +119,12 @@ test('selected can only be set on one track at a time', function() {
     tech: this.tech,
     selected: true
   });
-  this.videoTrackList.push(track1);
+  this.videoTrackList.addTrack_(track1);
   let track2 = new VideoTrack({
     tech: this.tech,
     selected: true
   });
-  this.videoTrackList.push(track2);
+  this.videoTrackList.addTrack_(track2);
 
   equal(track1.selected, false, 'track 1 is not selected');
   equal(track2.selected, true, 'track 2 is selected');
@@ -154,12 +144,12 @@ test('all selected can be false', function() {
     tech: this.tech,
     selected: false
   });
-  this.videoTrackList.push(track1);
+  this.videoTrackList.addTrack_(track1);
   let track2 = new VideoTrack({
     tech: this.tech,
     selected: false
   });
-  this.videoTrackList.push(track2);
+  this.videoTrackList.addTrack_(track2);
 
   equal(track1.selected, false, 'track 1 is not selected');
   equal(track2.selected, false, 'track 2 is not selected');

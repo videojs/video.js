@@ -3,6 +3,7 @@ import VideoTrack from '../../../src/js/tracks/video-track.js';
 import EventTarget from '../../../src/js/event-target.js';
 
 q.module('Video Track List');
+
 test('trigger "change" event when "selectedchange" is fired on a track', function() {
   let track = new EventTarget();
   let videoTrackList = new VideoTrackList([track]);

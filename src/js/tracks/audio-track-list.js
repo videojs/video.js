@@ -4,7 +4,7 @@
 import TrackList from './track-list';
 
 /**
- * A list of possiblee audio tracks. All functionality is in the
+ * A list of possible audio tracks. All functionality is in the
  * base class Tracklist and the spec for AudioTrackList is located at:
  * @link https://html.spec.whatwg.org/multipage/embedded-content.html#audiotracklist
  *
@@ -24,7 +24,7 @@ import TrackList from './track-list';
  */
 class AudioTrackList extends TrackList {
   addTrack_(track) {
-    super(track);
+    super.addTrack_(track);
     track.addEventListener('enabledchange', () => {
       this.trigger('change');
     });
