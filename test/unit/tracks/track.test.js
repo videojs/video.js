@@ -12,6 +12,7 @@ const defaultTech = {
 
 // do baseline track testing
 q.module('Track');
+
 TrackBaseline(Track, {
   id: '1',
   kind: 'subtitles',
@@ -20,6 +21,7 @@ TrackBaseline(Track, {
   language: 'en',
   tech: new TechFaker()
 });
+
 test('defaults when items not provided', function() {
   let track = new Track({
     tech: defaultTech

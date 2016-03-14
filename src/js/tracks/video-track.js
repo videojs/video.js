@@ -20,22 +20,23 @@ class VideoTrack extends Track {
   constructor(options = {}) {
     options.kind = VideoTrackEnums.VideoTrackKind[options.kind] || '';
     options.trackType = 'video';
-    // retval will only be defined on IE8, which is when we need it
-    let retval = super(options);
-    let videoTrack = this;
-
+    // on IE8 this will be a document element
+    // for every other browser this will be a normal object
+    let videoTrack = super(options);
     let selected = false;
+
     Object.defineProperty(videoTrack, 'selected', {
       get() { return selected; },
       set(newSelected) {
+        // an invalid value
         if(typeof newSelected !== 'boolean' || newSelected === selected) {
           return;
         }
-        if(newSelected === true) {
+        if(newSelected) {
           let videoTrackList = videoTrack.tech_.videoTracks();
           for(let i = 0; i < videoTrackList.length; i++) {
             let vt = videoTrackList[i];
-            // another vido track is enabled, disable it
+            // another video track is enabled, disable it
             vt.selected = false;
           }
         }
@@ -46,7 +47,7 @@ class VideoTrack extends Track {
 
     videoTrack.selected = options.selected;
 
-    return retval;
+    return videoTrack;
   }
 }
 

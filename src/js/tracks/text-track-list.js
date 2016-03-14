@@ -25,7 +25,7 @@ import * as Fn from '../utils/fn.js';
  */
 class TextTrackList extends TrackList {
   addTrack_(track) {
-    super(track);
+    super.addTrack_(track);
     track.addEventListener('modechange', Fn.bind(this, function() {
       this.trigger('change');
     }));

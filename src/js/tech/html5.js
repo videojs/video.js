@@ -364,6 +364,8 @@ class Html5 extends Tech {
 
   handleVideoTrackAdd(e) {
     let track = e.track;
+    // native video tracks will not inherit from EventTarget
+    // so we have to turn them into our own VideoTrack class
     if(!(e.track instanceof VideoTrack)) {
       track.tech = this;
       track = new VideoTrack(track);
@@ -387,6 +389,8 @@ class Html5 extends Tech {
 
   handleAudioTrackAdd(e) {
     let track = e.track;
+    // native audio tracks will not inherit from EventTarget
+    // so we have to turn them into our own AudioTrack class
     if(!(e.track instanceof AudioTrack)) {
       track.tech = this;
       track = new AudioTrack(track);
