@@ -25,8 +25,8 @@ import TrackList from './track-list';
  */
 class VideoTrackList extends TrackList {
   constructor(tracks) {
-    super(tracks);
-    Object.defineProperty(this, 'selectedIndex', {
+    let videoTrackList = super(tracks);
+    Object.defineProperty(videoTrackList, 'selectedIndex', {
       get() {
         for (let i = 0; i < this.length; i++) {
           if (this[i].selected()) {
@@ -37,9 +37,10 @@ class VideoTrackList extends TrackList {
       },
       set() {},
     });
+    return videoTrackList;
   }
   addTrack_(track) {
-    super(track);
+    super.addTrack_(track);
     track.addEventListener('selectedchange', () => {
       this.trigger('change');
     });

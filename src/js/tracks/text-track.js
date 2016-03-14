@@ -120,9 +120,9 @@ class TextTrack extends Track {
     if (options.kind === 'metadata' || options.kind === 'chapters') {
       mode = 'hidden';
     }
-    // retval will only be defined on IE8, which is when we need it
-    let retval = super(options);
-    let tt = this;
+    // on IE8 this will be a document element
+    // for every other browser this will be a normal object
+    let tt = super(options);
 
     tt.cues_ = [];
     tt.activeCues_ = [];
@@ -222,7 +222,7 @@ class TextTrack extends Track {
       tt.loaded_ = true;
     }
 
-    return retval;
+    return tt;
   }
 
   /**
