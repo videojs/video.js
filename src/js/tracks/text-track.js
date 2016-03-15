@@ -23,7 +23,7 @@ const parseCues = function(srcContent, track) {
   // Make sure that vttjs has loaded, otherwise, wait till it finished loading
   // NOTE: this is only used for the alt/video.novtt.js build
   if (typeof window.WebVTT !== 'function') {
-    window.setTimeout(function() {
+    return window.setTimeout(function() {
       parseCues(srcContent, track);
     }, 100);
   }
