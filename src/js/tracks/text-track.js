@@ -20,6 +20,14 @@ import XHR from 'xhr';
  * @param {Track} track track to addcues to
  */
 const parseCues = function(srcContent, track) {
+  // Make sure that vttjs has loaded, otherwise, wait till it finished loading
+  // NOTE: this is only used for the alt/video.novtt.js build
+  if (typeof window.WebVTT !== 'function') {
+    window.setTimeout(function() {
+      parseCues(responseBody, track);
+    }, 100);
+  }
+
   let parser = new window.WebVTT.Parser(window,
                                         window.vttjs,
                                         window.WebVTT.StringDecoder());
@@ -67,14 +75,7 @@ const loadTrack = function(src, track) {
 
     track.loaded_ = true;
 
-    // NOTE: this is only used for the alt/video.novtt.js build
-    if (typeof window.WebVTT !== 'function') {
-      window.setTimeout(function() {
-        parseCues(responseBody, track);
-      }, 100);
-    } else {
-      parseCues(responseBody, track);
-    }
+    parseCues(responseBody, track);
   }));
 };
 
