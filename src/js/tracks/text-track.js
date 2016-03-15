@@ -24,7 +24,7 @@ const parseCues = function(srcContent, track) {
   // NOTE: this is only used for the alt/video.novtt.js build
   if (typeof window.WebVTT !== 'function') {
     window.setTimeout(function() {
-      parseCues(responseBody, track);
+      parseCues(srcContent, track);
     }, 100);
   }
 
