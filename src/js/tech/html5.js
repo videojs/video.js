@@ -72,11 +72,23 @@ class Html5 extends Tech {
       }
     }
 
-    if (this.featuresNativeVideoTracks) {
-      this.handleVideoTrackChange_ = Fn.bind(this, this.handleVideoTrackChange);
-      this.handleVideoTrackAdd_ = Fn.bind(this, this.handleVideoTrackAdd);
-      this.handleVideoTrackRemove_ = Fn.bind(this, this.handleVideoTrackRemove);
-      this.proxyNativeVideoTracks_();
+    let trackTypes = ['audio', 'video'];
+
+    // ProxyNativeTextTracks
+    for (let i = 0; i < trackTypes.length; i++) {
+      let type = trackTypes[i];
+      let capitalType = type.charAt(0).toUpperCase() + type.slice(1);
+
+      if (!this[`featuresNative${capitalType}Tracks`]) {
+        continue;
+      }
+      let tl = this.el()[`${type}Tracks`];
+
+      if (tl && tl.addEventListener) {
+        tl.addEventListener('change', this[`handle${capitalType}TrackChange_`]);
+        tl.addEventListener('addtrack', this[`handle${capitalType}TrackAdd_`]);
+        tl.addEventListener('removetrack', this[`handle${capitalType}TrackRemove_`]);
+      }
     }
 
     if (this.featuresNativeTextTracks) {
@@ -85,14 +97,6 @@ class Html5 extends Tech {
       this.handleTextTrackRemove_ = Fn.bind(this, this.handleTextTrackRemove);
       this.proxyNativeTextTracks_();
     }
-
-    if (this.featuresNativeAudioTracks) {
-      this.handleAudioTrackChange_ = Fn.bind(this, this.handleAudioTrackChange);
-      this.handleAudioTrackAdd_ = Fn.bind(this, this.handleAudioTrackAdd);
-      this.handleAudioTrackRemove_ = Fn.bind(this, this.handleAudioTrackRemove);
-      this.proxyNativeAudioTracks_();
-    }
-
 
     // Determine if native controls should be used
     // Our goal should be to get the custom controls on mobile solid everywhere
@@ -113,53 +117,26 @@ class Html5 extends Tech {
    * @method dispose
    */
   dispose() {
-    let vt = this.el().videoTracks;
-    let tt = this.el().textTracks;
-    let at = this.el().audioTracks;
-    let emulatedVt = this.videoTracks();
-    let emulatedTt = this.textTracks();
-    let emulatedAt = this.audioTracks();
+    let trackTypes = ['audio', 'video', 'text'];
 
-    // remove native event listeners
-    if (vt && vt.removeEventListener) {
-      vt.removeEventListener('change', this.handleVideoTrackChange_);
-      vt.removeEventListener('addtrack', this.handleVideoTrackAdd_);
-      vt.removeEventListener('removetrack', this.handleVideoTrackRemove_);
-    }
+    // ProxyNativeTextTracks
+    for (let i = 0; i < trackTypes.length; i++) {
+      let type = trackTypes[i];
+      let capitalType = type.charAt(0).toUpperCase() + type.slice(1);
+      let tl = this.el_[`${type}Tracks`];
+      let etl = this[`${type}Tracks`]();
 
-    // remove native event listeners
-    if (tt && tt.removeEventListener) {
-      tt.removeEventListener('change', this.handleTextTrackChange_);
-      tt.removeEventListener('addtrack', this.handleTextTrackAdd_);
-      tt.removeEventListener('removetrack', this.handleTextTrackRemove_);
-    }
+      if (tl && tl.removeEventListener) {
+        tl.removeEventListener('change', this[`handle${capitalType}TrackChange_`]);
+        tl.removeEventListener('addtrack', this[`handle${capitalType}TrackAdd_`]);
+        tl.removeEventListener('removetrack', this[`handle${capitalType}TrackRemove_`]);
+      }
+      // clearout the emulated audio track list.
+      let z = etl.length;
 
-    // remove native event listeners
-    if (at && at.removeEventListener) {
-      at.removeEventListener('change', this.handleAudioTrackChange_);
-      at.removeEventListener('addtrack', this.handleAudioTrackAdd_);
-      at.removeEventListener('removetrack', this.handleAudioTrackRemove_);
-    }
-
-
-    // clearout the emulated text track list.
-    let i = emulatedTt.length;
-
-    while (i--) {
-      emulatedTt.removeTrack_(emulatedTt[i]);
-    }
-
-    // clearout the emulated video track list.
-    i = emulatedVt.length;
-
-    while (i--) {
-      emulatedVt.removeTrack_(emulatedVt[i]);
-    }
-    // clearout the emulated audio track list.
-    i = emulatedAt.length;
-
-    while (i--) {
-      emulatedAt.removeTrack_(emulatedAt[i]);
+      while (z--) {
+        etl.removeTrack_(etl[z]);
+      }
     }
 
     Html5.disposeMediaElement(this.el_);
@@ -312,18 +289,6 @@ class Html5 extends Tech {
     }
   }
 
-  proxyNativeAudioTracks_() {
-    let audioTrackList = this.el().audioTracks;
-
-    if (audioTrackList && audioTrackList.addEventListener) {
-      audioTrackList.addEventListener('change', this.handleAudioTrackChange_);
-      audioTrackList.addEventListener('addtrack', this.handleAudioTrackAdd_);
-      audioTrackList.addEventListener('removetrack', this.handleAudioTrackRemove_);
-    }
-  }
-
-
-
   handleTextTrackChange(e) {
     let tt = this.textTracks();
     this.textTracks().trigger({
@@ -342,17 +307,7 @@ class Html5 extends Tech {
     this.textTracks().removeTrack_(e.track);
   }
 
-  proxyNativeVideoTracks_() {
-    let vt = this.el().videoTracks;
-
-    if (vt && vt.addEventListener) {
-      vt.addEventListener('change', this.handleVideoTrackChange_);
-      vt.addEventListener('addtrack', this.handleVideoTrackAdd_);
-      vt.addEventListener('removetrack', this.handleVideoTrackRemove_);
-    }
-  }
-
-  handleVideoTrackChange(e) {
+  handleVideoTrackChange_(e) {
     let vt = this.videoTracks();
     this.videoTracks().trigger({
       type: 'change',
@@ -362,7 +317,7 @@ class Html5 extends Tech {
     });
   }
 
-  handleVideoTrackAdd(e) {
+  handleVideoTrackAdd_(e) {
     let track = e.track;
     // native video tracks will not inherit from EventTarget
     // so we have to turn them into our own VideoTrack class
@@ -373,11 +328,11 @@ class Html5 extends Tech {
     this.videoTracks().addTrack_(track);
   }
 
-  handleVideoTrackRemove(e) {
+  handleVideoTrackRemove_(e) {
     this.videoTracks().removeTrack_(e.track);
   }
 
-  handleAudioTrackChange(e) {
+  handleAudioTrackChange_(e) {
     let audioTrackList = this.audioTracks();
     this.audioTracks().trigger({
       type: 'change',
@@ -387,7 +342,7 @@ class Html5 extends Tech {
     });
   }
 
-  handleAudioTrackAdd(e) {
+  handleAudioTrackAdd_(e) {
     let track = e.track;
     // native audio tracks will not inherit from EventTarget
     // so we have to turn them into our own AudioTrack class
@@ -398,7 +353,7 @@ class Html5 extends Tech {
     this.audioTracks().addTrack_(e.track);
   }
 
-  handleAudioTrackRemove(e) {
+  handleAudioTrackRemove_(e) {
     this.audioTracks().removeTrack_(e.track);
   }
 
