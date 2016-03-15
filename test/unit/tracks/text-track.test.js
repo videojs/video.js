@@ -289,3 +289,45 @@ test('tracks are parsed if vttjs is loaded', function() {
   clock.restore();
   window.WebVTT = oldVTT;
 });
+
+test('tracks are parsed once vttjs is loaded', function() {
+  const clock = sinon.useFakeTimers();
+  const oldVTT = window.WebVTT;
+  let parserCreated = false;
+
+  window.WebVTT = true;
+
+  let xhr;
+  window.xhr.onCreate = (newXhr) => xhr = newXhr;
+
+  let tt = new TextTrack({
+    tech: defaultTech,
+    src: 'http://example.com'
+  });
+
+  xhr.respond(200, {}, 'WebVTT\n');
+
+  ok(!parserCreated, 'WebVTT is not loaded, do not try to parse yet');
+
+  clock.tick(100);
+  ok(!parserCreated, 'WebVTT still not loaded, do not try to parse yet');
+
+  window.WebVTT = () => {};
+  window.WebVTT.StringDecoder = () => {}
+  window.WebVTT.Parser = () => {
+    parserCreated = true;
+    return {
+      oncue() {},
+      onparsingerror() {},
+      onflush() {},
+      parse() {},
+      flush() {}
+    };
+  };
+
+  clock.tick(100);
+  ok(parserCreated, 'WebVTT is loaded, so we can parse now');
+
+  clock.restore();
+  window.WebVTT = oldVTT;
+});
