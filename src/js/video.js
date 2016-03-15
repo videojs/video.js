@@ -102,6 +102,7 @@ let videojs = function(id, options, ready){
 // Add default styles
 if (window.VIDEOJS_NO_DYNAMIC_STYLE !== true) {
   let style = Dom.$('.vjs-styles-defaults');
+
   if (!style) {
     style = stylesheet.createStyleElement('vjs-styles-defaults');
     let head = Dom.$('head');
