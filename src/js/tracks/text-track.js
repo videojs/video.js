@@ -10,6 +10,7 @@ import window from 'global/window';
 import Track from './track.js';
 import { isCrossOrigin } from '../utils/url.js';
 import XHR from 'xhr';
+import merge from '../utils/merge-options';
 
 /**
  * takes a webvtt file contents and parses it into cues
@@ -112,17 +113,19 @@ const loadTrack = function(src, track) {
  */
 class TextTrack extends Track {
   constructor(options = {}) {
-    options.kind = TextTrackEnum.TextTrackKind[options.kind] || 'subtitles';
-    options.language = options.language || options.srclang || '';
-    options.trackType = 'text';
-    let mode = TextTrackEnum.TextTrackMode[options.mode] || 'disabled';
+    let settings = merge(options, {
+      trackType: 'text',
+      kind: TextTrackEnum.TextTrackKind[options.kind] || 'subtitles',
+      language: options.language || options.srclang || ''
+    });
+    let mode = TextTrackEnum.TextTrackMode[settings.mode] || 'disabled';
 
-    if (options.kind === 'metadata' || options.kind === 'chapters') {
+    if (settings.kind === 'metadata' || settings.kind === 'chapters') {
       mode = 'hidden';
     }
     // on IE8 this will be a document element
     // for every other browser this will be a normal object
-    let tt = super(options);
+    let tt = super(settings);
 
     tt.cues_ = [];
     tt.activeCues_ = [];
@@ -215,9 +218,9 @@ class TextTrack extends Track {
       set() {}
     });
 
-    if (options.src) {
-      tt.src = options.src;
-      loadTrack(options.src, tt);
+    if (settings.src) {
+      tt.src = settings.src;
+      loadTrack(settings.src, tt);
     } else {
       tt.loaded_ = true;
     }

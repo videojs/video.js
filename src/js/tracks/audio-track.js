@@ -42,7 +42,7 @@ class AudioTrack extends Track {
         // before we enable this one
         if (newEnabled) {
           let audioTrackList = audioTrack.tech_.audioTracks();
-          for(let i = 0; i < audioTrackList.length; i++) {
+          for (let i = 0; i < audioTrackList.length; i++) {
             let at = audioTrackList[i];
             // another audio track is enabled, disable it
             at.enabled = false;
@@ -56,7 +56,7 @@ class AudioTrack extends Track {
     // if the user sets this track to selected then
     // set selected to that true value otherwise
     // we keep it false
-    if(settings.enabled) {
+    if (settings.enabled) {
       audioTrack.enabled = settings.enabled;
     }
     audioTrack.loaded_ = true;

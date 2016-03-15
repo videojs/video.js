@@ -33,12 +33,12 @@ class VideoTrack extends Track {
       get() { return selected; },
       set(newSelected) {
         // an invalid value
-        if(typeof newSelected !== 'boolean' || newSelected === selected) {
+        if (typeof newSelected !== 'boolean' || newSelected === selected) {
           return;
         }
-        if(newSelected) {
+        if (newSelected) {
           let videoTrackList = videoTrack.tech_.videoTracks();
-          for(let i = 0; i < videoTrackList.length; i++) {
+          for (let i = 0; i < videoTrackList.length; i++) {
             let vt = videoTrackList[i];
             // another video track is enabled, disable it
             vt.selected = false;
@@ -52,7 +52,7 @@ class VideoTrack extends Track {
     // if the user sets this track to selected then
     // set selected to that true value otherwise
     // we keep it false
-    if(settings.selected) {
+    if (settings.selected) {
       videoTrack.selected = settings.selected;
     }
 
