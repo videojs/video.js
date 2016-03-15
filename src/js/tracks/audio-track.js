@@ -1,4 +1,4 @@
-import * as AudioTrackEnums from './audio-track-enums';
+import {AudioTrackKind} from './track-enums';
 import Track from './track';
 import merge from '../utils/merge-options';
 
@@ -21,7 +21,7 @@ class AudioTrack extends Track {
   constructor(options = {}) {
       let settings = merge(options, {
       trackType: 'audio',
-      kind: AudioTrackEnums.AudioTrackKind[options.kind] || ''
+      kind: AudioTrackKind[options.kind] || ''
     });
     // on IE8 this will be a document element
     // for every other browser this will be a normal object

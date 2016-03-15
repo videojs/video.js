@@ -35,7 +35,7 @@ class VideoTrackList extends TrackList {
         }
         return -1;
       },
-      set() {},
+      set() {}
     });
     return videoTrackList;
   }
