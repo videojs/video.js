@@ -426,19 +426,18 @@ class Player extends Component {
    */
   updateStyleEl_() {
     if (window.VIDEOJS_NO_DYNAMIC_STYLE === true) {
-      /* jshint ignore:start */
-      let {width_: width = this.options_.width, height_: height = this.options_.width} = this;
+      const width = typeof this.width_ === 'number' ? this.width_ : this.options_.width;
+      const height = typeof this.height_ === 'number' ? this.height_ : this.options_.height;
       let techEl = this.tech_ && this.tech_.el();
 
       if (techEl) {
-        if (width) {
+        if (width >= 0) {
           techEl.width = width;
         }
-        if (height) {
+        if (height >= 0) {
           techEl.height = height;
         }
       }
-      /* jshint ignore:end */
 
       return;
     }
