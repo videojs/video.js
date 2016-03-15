@@ -1,3 +1,4 @@
+import window from 'global/window';
 import TextTrack from '../../../src/js/tracks/text-track.js';
 import TestHelpers from '../test-helpers.js';
 
@@ -253,4 +254,38 @@ test('fires cuechange when cues become active and inactive', function() {
   equal(changes, 4, 'a cuechange event trigger addEventListener and oncuechange');
 
   player.dispose();
+});
+
+test('tracks are parsed if vttjs is loaded', function() {
+  const clock = sinon.useFakeTimers();
+  const oldVTT = window.WebVTT;
+  let parserCreated = false;
+
+  window.WebVTT = () => {};
+  window.WebVTT.StringDecoder = () => {}
+  window.WebVTT.Parser = () => {
+    parserCreated = true;
+    return {
+      oncue() {},
+      onparsingerror() {},
+      onflush() {},
+      parse() {},
+      flush() {}
+    };
+  };
+
+  let xhr;
+  window.xhr.onCreate = (newXhr) => xhr = newXhr;
+
+  let tt = new TextTrack({
+    tech: defaultTech,
+    src: 'http://example.com'
+  });
+
+  xhr.respond(200, {}, 'WebVTT\n');
+
+  ok(parserCreated, 'WebVTT is loaded, so we can just parse');
+
+  clock.restore();
+  window.WebVTT = oldVTT;
 });
