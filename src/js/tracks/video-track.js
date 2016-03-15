@@ -1,5 +1,6 @@
 import * as VideoTrackEnums from './video-track-enums';
 import Track from './track';
+import merge from '../utils/merge-options';
 
 /**
  * A single video text track as defined in:
@@ -18,11 +19,14 @@ import Track from './track';
  */
 class VideoTrack extends Track {
   constructor(options = {}) {
-    options.kind = VideoTrackEnums.VideoTrackKind[options.kind] || '';
-    options.trackType = 'video';
+    let settings = merge(options, {
+      trackType: 'video',
+      kind: VideoTrackEnums.VideoTrackKind[options.kind] || ''
+    });
+
     // on IE8 this will be a document element
     // for every other browser this will be a normal object
-    let videoTrack = super(options);
+    let videoTrack = super(settings);
     let selected = false;
 
     Object.defineProperty(videoTrack, 'selected', {
@@ -45,7 +49,12 @@ class VideoTrack extends Track {
       }
     });
 
-    videoTrack.selected = options.selected;
+    // if the user sets this track to selected then
+    // set selected to that true value otherwise
+    // we keep it false
+    if(settings.selected) {
+      videoTrack.selected = settings.selected;
+    }
 
     return videoTrack;
   }
