@@ -1,6 +1,6 @@
 import VideoTrack from '../../../src/js/tracks/video-track';
 import VideoTrackList from '../../../src/js/tracks/video-track-list';
-import * as VideoTrackEnums from '../../../src/js/tracks/video-track-enums';
+import {VideoTrackKind} from '../../../src/js/tracks/track-enums';
 import TrackBaseline from './track-baseline';
 
 const defaultTech = {
@@ -60,8 +60,8 @@ test('kind can only be one of several options, defaults to empty string', functi
   notEqual(track.kind, 'foo', 'the kind is set to empty string, not foo');
 
   // loop through all possible kinds to verify
-  for (let key in VideoTrackEnums.VideoTrackKind) {
-    let currentKind = VideoTrackEnums.VideoTrackKind[key];
+  for (let key in VideoTrackKind) {
+    let currentKind = VideoTrackKind[key];
     let track = new VideoTrack({
       tech: this.tech,
       kind: currentKind,

@@ -1,4 +1,4 @@
-import * as VideoTrackEnums from './video-track-enums';
+import {VideoTrackKind} from './track-enums';
 import Track from './track';
 import merge from '../utils/merge-options';
 
@@ -21,7 +21,7 @@ class VideoTrack extends Track {
   constructor(options = {}) {
     let settings = merge(options, {
       trackType: 'video',
-      kind: VideoTrackEnums.VideoTrackKind[options.kind] || ''
+      kind: VideoTrackKind[options.kind] || ''
     });
 
     // on IE8 this will be a document element
