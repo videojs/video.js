@@ -3,7 +3,7 @@
  */
 import TextTrackCueList from './text-track-cue-list';
 import * as Fn from '../utils/fn.js';
-import * as TextTrackEnum from './text-track-enums';
+import {TextTrackKind, TextTrackMode} from './track-enums';
 import log from '../utils/log.js';
 import document from 'global/document';
 import window from 'global/window';
@@ -115,10 +115,10 @@ class TextTrack extends Track {
   constructor(options = {}) {
     let settings = merge(options, {
       trackType: 'text',
-      kind: TextTrackEnum.TextTrackKind[options.kind] || 'subtitles',
+      kind: TextTrackKind[options.kind] || 'subtitles',
       language: options.language || options.srclang || ''
     });
-    let mode = TextTrackEnum.TextTrackMode[settings.mode] || 'disabled';
+    let mode = TextTrackMode[settings.mode] || 'disabled';
 
     if (settings.kind === 'metadata' || settings.kind === 'chapters') {
       mode = 'hidden';
@@ -150,7 +150,7 @@ class TextTrack extends Track {
         return mode;
       },
       set(newMode) {
-        if (!TextTrackEnum.TextTrackMode[newMode]) {
+        if (!TextTrackMode[newMode]) {
           return;
         }
         mode = newMode;

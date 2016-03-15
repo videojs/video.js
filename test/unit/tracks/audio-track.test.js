@@ -1,5 +1,5 @@
 import AudioTrack from '../../../src/js/tracks/audio-track.js';
-import * as AudioTrackEnums from '../../../src/js/tracks/audio-track-enums.js';
+import {AudioTrackKind} from '../../../src/js/tracks/track-enums.js';
 import TrackBaseline from './track-baseline';
 
 const defaultTech = {
@@ -59,8 +59,8 @@ test('kind can only be one of several options, defaults to empty string', functi
   notEqual(track.kind, 'foo', 'the kind is set to empty string, not foo');
 
   // loop through all possible kinds to verify
-  for (let key in AudioTrackEnums.AudioTrackKind) {
-    let currentKind = AudioTrackEnums.AudioTrackKind[key];
+  for (let key in AudioTrackKind) {
+    let currentKind = AudioTrackKind[key];
     let track = new AudioTrack({
       tech: this.tech,
       kind: currentKind,
