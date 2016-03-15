@@ -14,7 +14,7 @@ Video.js does not currently include the base skin automatically yet, so, this op
 
 ## Default style elements
 Video.js uses a couple of style elements dynamically, specifically, there's a default styles element as well as a player dimensions style element.
-They are used to provide extra default flexiblity with styling the player. However, in a lot of cases, users do not want this.
+They are used to provide extra default flexiblity with styling the player. However, in some cases, like if a user has the HEAD tag managed by React, users do not want this.
 When `window.VIDEOJS_NO_DYNAMIC_STYLE` is set to `true`, video.js will *not* include these element in the page.
 This means that default dimensions and configured player dimensions will *not* be applied.
 For example, the following player will end up having a width and height of 0 when initialized if `window.VIDEOJS_NO_DYNAMIC_STYLE === true`:
