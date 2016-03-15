@@ -39,12 +39,14 @@ class VideoTrackList extends TrackList {
     });
     return videoTrackList;
   }
+
   addTrack_(track) {
     super.addTrack_(track);
     track.addEventListener('selectedchange', () => {
       this.trigger('change');
     });
   }
+
   addTrack(track) {
     this.addTrack_(track);
   }

@@ -1,5 +1,6 @@
 import * as AudioTrackEnums from './audio-track-enums';
 import Track from './track';
+import merge from '../utils/merge-options';
 
 /**
  * A single audio text track as defined in:
@@ -18,11 +19,13 @@ import Track from './track';
  */
 class AudioTrack extends Track {
   constructor(options = {}) {
-    options.trackType = 'audio';
-    options.kind = AudioTrackEnums.AudioTrackKind[options.kind] || '';
+      let settings = merge(options, {
+      trackType: 'audio',
+      kind: AudioTrackEnums.AudioTrackKind[options.kind] || ''
+    });
     // on IE8 this will be a document element
     // for every other browser this will be a normal object
-    let audioTrack = super(options);
+    let audioTrack = super(settings);
     let enabled = false;
 
     Object.defineProperty(audioTrack, 'enabled', {
@@ -50,9 +53,12 @@ class AudioTrack extends Track {
       }
     });
 
-    options.enabled = options.enabled || false;
-    // we call this after defining the setter so we can use the setter
-    audioTrack.enabled = options.enabled;
+    // if the user sets this track to selected then
+    // set selected to that true value otherwise
+    // we keep it false
+    if(settings.enabled) {
+      audioTrack.enabled = settings.enabled;
+    }
     audioTrack.loaded_ = true;
 
     return audioTrack;
