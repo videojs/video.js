@@ -28,7 +28,7 @@ TrackBaseline(AudioTrack, {
   tech: defaultTech
 });
 
-test('Can create an AudioTrack an enabled property', function() {
+test('can create an enabled propert on an AudioTrack', function() {
   let enabled = true;
   let track = new AudioTrack({
     enabled,
@@ -59,7 +59,7 @@ test('kind can only be one of several options, defaults to empty string', functi
   notEqual(track.kind, 'foo', 'the kind is set to empty string, not foo');
 
   // loop through all possible kinds to verify
-  for(let key in AudioTrackEnums.AudioTrackKind) {
+  for (let key in AudioTrackEnums.AudioTrackKind) {
     let currentKind = AudioTrackEnums.AudioTrackKind[key];
     let track = new AudioTrack({
       tech: this.tech,
@@ -146,17 +146,19 @@ test('when enabled is changed enabledchange event is fired', function() {
   // two events
   track.enabled = true;
   track.enabled = false;
+  equal(eventsTriggered, 2, 'two enabled changes');
 
   // no event here
   track.enabled = false;
   track.enabled = false;
+  equal(eventsTriggered, 2, 'still two enabled changes');
 
   // one event
   track.enabled = true;
+  equal(eventsTriggered, 3, 'three enabled changes');
 
   // no events
   track.enabled = true;
   track.enabled = true;
-
-  equal(eventsTriggered, 3, 'three enabled changes');
+  equal(eventsTriggered, 3, 'still three enabled changes');
 });

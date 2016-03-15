@@ -92,7 +92,7 @@ test('html5 tech supports native video tracks if the video supports it', functio
   Html5.TEST_VID = oldTestVid;
 });
 
-test('html5 tech does nt support native video tracks if the video does not supports it', function() {
+test('html5 tech does not support native video tracks if the video does not supports it', function() {
   let oldTestVid = Html5.TEST_VID;
   Html5.TEST_VID = {};
 

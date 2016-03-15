@@ -552,14 +552,16 @@ videojs.xhr = xhr;
 videojs.TextTrack = TextTrack;
 
 /**
- * AudioTrack class
+ * export the AudioTrack class so that source handlers can create
+ * AudioTracks and then add them to the players AudioTrackList
  *
  * @type {Function}
  */
 videojs.AudioTrack = AudioTrack;
 
 /**
- * VideoTrack class
+ * export the VideoTrack class so that source handlers can create
+ * VideoTracks and then add them to the players VideoTrackList
  *
  * @type {Function}
  */
