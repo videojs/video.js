@@ -29,7 +29,7 @@ TrackBaseline(VideoTrack, {
   tech: defaultTech
 });
 
-test('Can create an VideoTrack a selected property', function() {
+test('can create an VideoTrack a selected property', function() {
   let selected = true;
   let track = new VideoTrack({
     selected,
@@ -60,7 +60,7 @@ test('kind can only be one of several options, defaults to empty string', functi
   notEqual(track.kind, 'foo', 'the kind is set to empty string, not foo');
 
   // loop through all possible kinds to verify
-  for(let key in VideoTrackEnums.VideoTrackKind) {
+  for (let key in VideoTrackEnums.VideoTrackKind) {
     let currentKind = VideoTrackEnums.VideoTrackKind[key];
     let track = new VideoTrack({
       tech: this.tech,
@@ -173,17 +173,14 @@ test('when selected is changed selectedchange event is fired', function() {
   // two events
   track.selected = true;
   track.selected = false;
+  equal(eventsTriggered, 2, 'two selected changes');
 
   // no event here
   track.selected = false;
   track.selected = false;
+  equal(eventsTriggered, 2, 'still two selected changes');
 
   // one event
   track.selected = true;
-
-  // no events
-  track.selected = true;
-  track.selected = true;
-
   equal(eventsTriggered, 3, 'three selected changes');
 });

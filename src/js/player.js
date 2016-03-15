@@ -22,6 +22,8 @@ import safeParseTuple from 'safe-json-parse/tuple';
 import assign from 'object.assign';
 import mergeOptions from './utils/merge-options.js';
 import textTrackConverter from './tracks/text-track-list-converter.js';
+import AudioTrackList from './tracks/audio-track-list.js';
+import VideoTrackList from './tracks/video-track-list.js';
 
 // Include required child components (importing also registers them)
 import MediaLoader from './tech/loader.js';
@@ -2485,9 +2487,14 @@ class Player extends Component {
    * @method videoTracks
    */
   videoTracks() {
-    // cannot use techGet_ directly because it checks to see whether the tech is ready.
-    // Flash is unlikely to be ready in time but videoTracks should still work.
-    return this.tech_ && this.tech_['videoTracks']();
+    // if we have not yet loadTech_, we create videoTracks_
+    // these will be passed to the tech during loading
+    if(!this.tech_) {
+      this.videoTracks_ = this.videoTracks_ || new VideoTrackList();
+      return this.videoTracks_;
+    }
+
+    return this.tech_['videoTracks']();
   }
 
   /**
@@ -2498,8 +2505,13 @@ class Player extends Component {
    * @method audioTracks
    */
   audioTracks() {
-    // cannot use techGet_ directly because it checks to see whether the tech is ready.
-    // Flash is unlikely to be ready in time but audioTracks should still work.
+    // if we have not yet loadTech_, we create videoTracks_
+    // these will be passed to the tech during loading
+    if(!this.tech_) {
+      this.videoTracks_ = this.videoTracks_ || new AudioTrackList();
+      return this.videoTracks_;
+    }
+
     return this.tech_ && this.tech_['audioTracks']();
   }
 
