@@ -29,6 +29,7 @@ class AudioTrackList extends TrackList {
       this.trigger('change');
     });
   }
+
   addTrack(track) {
     this.addTrack_(track);
   }
