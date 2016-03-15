@@ -262,7 +262,7 @@ test('tracks are parsed if vttjs is loaded', function() {
   let parserCreated = false;
 
   window.WebVTT = () => {};
-  window.WebVTT.StringDecoder = () => {}
+  window.WebVTT.StringDecoder = () => {};
   window.WebVTT.Parser = () => {
     parserCreated = true;
     return {
@@ -313,7 +313,7 @@ test('tracks are parsed once vttjs is loaded', function() {
   ok(!parserCreated, 'WebVTT still not loaded, do not try to parse yet');
 
   window.WebVTT = () => {};
-  window.WebVTT.StringDecoder = () => {}
+  window.WebVTT.StringDecoder = () => {};
   window.WebVTT.Parser = () => {
     parserCreated = true;
     return {
