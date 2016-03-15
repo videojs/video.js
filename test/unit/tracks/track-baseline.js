@@ -33,7 +33,7 @@ const TrackBaseline = function(TrackClass, options) {
     equal(track.id, options.id, 'we have an id');
   });
 
-  test('returns an instance of of itself on all browsers', function() {
+  test('returns an instance of itself on all browsers', function() {
     let track = new TrackClass(options);
     ok(track instanceof TrackClass, 'object is returned');
   });

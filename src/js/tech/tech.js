@@ -71,8 +71,7 @@ class Tech extends Component {
     }
 
     this.initTextTrackListeners();
-    this.initVideoTrackListeners();
-    this.initAudioTrackListeners();
+    this.initTrackListeners();
 
     // Turn on component tap events
     this.emitTapEvents();
@@ -298,30 +297,6 @@ class Tech extends Component {
     if (this.manualTimeUpdates) { this.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true }); }
   }
 
-
-  /**
-   * Initialize videotrack listeners
-   *
-   * @method initVideoTrackListeners
-   */
-  initVideoTrackListeners() {
-    let videoTrackListChanges = () => {
-      this.trigger('videotrackchange');
-    };
-
-    let tracks = this.videoTracks();
-
-    if (!tracks) return;
-
-    tracks.addEventListener('removetrack', videoTrackListChanges);
-    tracks.addEventListener('addtrack', videoTrackListChanges);
-
-    this.on('dispose', () => {
-      tracks.removeEventListener('removetrack', videoTrackListChanges);
-      tracks.removeEventListener('addtrack', videoTrackListChanges);
-    });
-  }
-
   /**
    * Initialize texttrack listeners
    *
@@ -347,26 +322,29 @@ class Tech extends Component {
 
 
   /**
-   * Initialize audiotrack listeners
+   * Initialize audio and video track listeners
    *
-   * @method initAudioTrackListeners
+   * @method initTrackListeners
    */
-  initAudioTrackListeners() {
-    let audioTrackListChanges = () => {
-      this.trigger('audiotrackchange');
-    };
+  initTrackListeners() {
+    const typesTracks = ['video', 'audio'];
 
-    let tracks = this.audioTracks();
+    for (let i = 0; i < typesTracks.length; i++) {
+      let type = typesTracks[i];
+      let trackListChanges = () => {
+        this.trigger(`${type}trackchange`);
+      };
 
-    if (!tracks) return;
+      let tracks = this[`${type}Tracks`]();
 
-    tracks.addEventListener('removetrack', audioTrackListChanges);
-    tracks.addEventListener('addtrack', audioTrackListChanges);
+      tracks.addEventListener('removetrack', trackListChanges);
+      tracks.addEventListener('addtrack', trackListChanges);
 
-    this.on('dispose', () => {
-      tracks.removeEventListener('removetrack', audioTrackListChanges);
-      tracks.removeEventListener('addtrack', audioTrackListChanges);
-    });
+      this.on('dispose', () => {
+        tracks.removeEventListener('removetrack', trackListChanges);
+        tracks.removeEventListener('addtrack', trackListChanges);
+      });
+    }
   }
 
   /**

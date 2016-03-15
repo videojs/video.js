@@ -3,6 +3,7 @@ import AudioTrack from '../../../src/js/tracks/audio-track.js';
 import EventTarget from '../../../src/js/event-target.js';
 
 q.module('Audio Track List');
+
 test('trigger "change" event when "enabledchange" is fired on a track', function() {
   let track = new EventTarget();
   let audioTrackList = new AudioTrackList([track]);
