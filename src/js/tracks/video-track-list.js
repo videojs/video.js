@@ -61,6 +61,11 @@ class VideoTrackList extends TrackList {
   addTrack(track) {
     this.addTrack_(track);
   }
+
+  removeTrack(track) {
+    super.removeTrack_(track);
+  }
+
 }
 
 export default VideoTrackList;
