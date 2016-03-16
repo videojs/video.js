@@ -371,8 +371,10 @@ class Tech extends Component {
         script.onload = null;
         script.onerror = null;
       });
-      this.el().parentNode.appendChild(script);
+      // but have not loaded yet and we set it to true before the inject so that
+      // we don't overwrite the injected window.WebVTT if it loads right away
       window['WebVTT'] = true;
+      this.el().parentNode.appendChild(script);
     }
 
     let updateDisplay = () => this.trigger('texttrackchange');
