@@ -11,6 +11,7 @@ import Track from './track.js';
 import { isCrossOrigin } from '../utils/url.js';
 import XHR from 'xhr';
 import merge from '../utils/merge-options';
+import * as browser from '../utils/browser.js';
 
 /**
  * takes a webvtt file contents and parses it into cues
@@ -138,6 +139,13 @@ class TextTrack extends Track {
     // on IE8 this will be a document element
     // for every other browser this will be a normal object
     let tt = super(settings);
+    if (browser.IS_IE8) {
+      for (let prop in TextTrack.prototype) {
+        if (prop !== 'constructor') {
+          tt[prop] = TextTrack.prototype[prop];
+        }
+      }
+    }
 
     tt.cues_ = [];
     tt.activeCues_ = [];

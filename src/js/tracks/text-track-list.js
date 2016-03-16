@@ -3,6 +3,8 @@
  */
 import TrackList from './track-list';
 import * as Fn from '../utils/fn.js';
+import * as browser from '../utils/browser.js';
+import document from 'global/document';
 
 /**
  * A list of possible text tracks. All functionality is in the
@@ -24,6 +26,20 @@ import * as Fn from '../utils/fn.js';
  * @class TextTrackList
  */
 class TextTrackList extends TrackList {
+  constructor(tracks = []) {
+    let list = super(tracks);
+
+    if (browser.IS_IE8) {
+      for (let prop in TextTrackList.prototype) {
+        if (prop !== 'constructor') {
+          list[prop] = TextTrackList.prototype[prop];
+        }
+      }
+    }
+
+    return list;
+  }
+
   addTrack_(track) {
     super.addTrack_(track);
     track.addEventListener('modechange', Fn.bind(this, function() {
