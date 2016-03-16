@@ -41,9 +41,12 @@ class AudioTrackList extends TrackList {
 
   addTrack_(track) {
     super.addTrack_(track);
-    track.addEventListener('enabledchange', () => {
-      this.trigger('change');
-    });
+    // native tracks don't have this
+    if(track.addEventListener) {
+      track.addEventListener('enabledchange', () => {
+        this.trigger('change');
+      });
+    }
   }
 
   addTrack(track) {

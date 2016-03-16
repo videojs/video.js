@@ -53,9 +53,12 @@ class VideoTrackList extends TrackList {
 
   addTrack_(track) {
     super.addTrack_(track);
-    track.addEventListener('selectedchange', () => {
-      this.trigger('change');
-    });
+    // native tracks don't have this
+    if(track.addEventListener) {
+      track.addEventListener('selectedchange', () => {
+        this.trigger('change');
+      });
+    }
   }
 
   addTrack(track) {
