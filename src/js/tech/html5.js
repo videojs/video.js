@@ -14,8 +14,6 @@ import document from 'global/document';
 import window from 'global/window';
 import assign from 'object.assign';
 import mergeOptions from '../utils/merge-options.js';
-import VideoTrack from '../tracks/video-track';
-import AudioTrack from '../tracks/audio-track';
 
 /**
  * HTML5 Media Controller - Wrapper for HTML5 Media API
@@ -85,9 +83,9 @@ class Html5 extends Tech {
       let tl = this.el()[`${type}Tracks`];
 
       if (tl && tl.addEventListener) {
-        tl.addEventListener('change', this[`handle${capitalType}TrackChange_`]);
-        tl.addEventListener('addtrack', this[`handle${capitalType}TrackAdd_`]);
-        tl.addEventListener('removetrack', this[`handle${capitalType}TrackRemove_`]);
+        tl.addEventListener('change', Fn.bind(this, this[`handle${capitalType}TrackChange_`]));
+        tl.addEventListener('addtrack', Fn.bind(this, this[`handle${capitalType}TrackAdd_`]));
+        tl.addEventListener('removetrack', Fn.bind(this, this[`handle${capitalType}TrackRemove_`]));
       }
     }
 
@@ -326,14 +324,7 @@ class Html5 extends Tech {
   }
 
   handleVideoTrackAdd_(e) {
-    let track = e.track;
-    // native video tracks will not inherit from EventTarget
-    // so we have to turn them into our own VideoTrack class
-    if (!(e.track instanceof VideoTrack)) {
-      track.tech = this;
-      track = new VideoTrack(track);
-    }
-    this.videoTracks().addTrack_(track);
+    this.videoTracks().addTrack_(e.track);
   }
 
   handleVideoTrackRemove_(e) {
@@ -351,13 +342,6 @@ class Html5 extends Tech {
   }
 
   handleAudioTrackAdd_(e) {
-    let track = e.track;
-    // native audio tracks will not inherit from EventTarget
-    // so we have to turn them into our own AudioTrack class
-    if (!(e.track instanceof AudioTrack)) {
-      track.tech = this;
-      track = new AudioTrack(track);
-    }
     this.audioTracks().addTrack_(e.track);
   }
 
