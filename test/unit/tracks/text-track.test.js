@@ -1,6 +1,7 @@
 import window from 'global/window';
 import TextTrack from '../../../src/js/tracks/text-track.js';
 import TestHelpers from '../test-helpers.js';
+import log from '../../../src/js/utils/log.js';
 
 const defaultTech = {
   textTracks() {},
@@ -329,5 +330,41 @@ test('tracks are parsed once vttjs is loaded', function() {
   ok(parserCreated, 'WebVTT is loaded, so we can parse now');
 
   clock.restore();
+  window.WebVTT = oldVTT;
+});
+
+test('retries processing a track 3 times if vttjs has not loaded', function() {
+  const clock = sinon.useFakeTimers();
+  sinon.stub(log, 'error');
+  const oldVTT = window.WebVTT;
+  let parserCreated = false;
+
+  window.WebVTT = true;
+
+  let xhr;
+  window.xhr.onCreate = (newXhr) => xhr = newXhr;
+
+  let tt = new TextTrack({
+    tech: defaultTech,
+    src: 'http://example.com'
+  });
+
+  xhr.respond(200, {}, 'WebVTT\n');
+
+  ok(!parserCreated, 'WebVTT is not loaded, do not try to parse yet');
+
+  clock.tick(100);
+  clock.tick(100);
+  clock.tick(100);
+  clock.tick(100);
+
+  let spyCall = log.error.getCall(0);
+
+  ok(spyCall.calledWithMatch('vttjs did not load, stopping trying to process'),
+     'we logged the correct error after 3 timeouts');
+  ok(!parserCreated, 'WebVTT is not loaded, do not try to parse yet');
+
+  clock.restore();
+  log.error.restore();
   window.WebVTT = oldVTT;
 });
