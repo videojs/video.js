@@ -30,7 +30,6 @@ class TrackList extends EventTarget {
     }
 
     list.tracks_ = [];
-
     Object.defineProperty(list, 'length', {
       get() {
         return this.tracks_.length;

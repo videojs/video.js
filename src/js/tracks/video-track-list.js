@@ -2,6 +2,7 @@
  * @file video-track-list.js
  */
 import TrackList from './track-list';
+import * as browser from '../utils/browser.js';
 
 /**
 * A list of possiblee video tracks. Most functionality is in the
@@ -24,12 +25,13 @@ import TrackList from './track-list';
  * @class VideoTrackList
  */
 class VideoTrackList extends TrackList {
+
   constructor(tracks) {
-    let videoTrackList = super(tracks);
-    Object.defineProperty(videoTrackList, 'selectedIndex', {
+    let list = super(tracks);
+    Object.defineProperty(list, 'selectedIndex', {
       get() {
         for (let i = 0; i < this.length; i++) {
-          if (this[i].selected()) {
+          if (this[i].selected) {
             return i;
           }
         }
@@ -37,7 +39,16 @@ class VideoTrackList extends TrackList {
       },
       set() {}
     });
-    return videoTrackList;
+
+    if (browser.IS_IE8) {
+      for (let prop in VideoTrackList.prototype) {
+        if (prop !== 'constructor') {
+          list[prop] = VideoTrackList.prototype[prop];
+        }
+      }
+    }
+
+    return list;
   }
 
   addTrack_(track) {

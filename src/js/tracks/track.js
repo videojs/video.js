@@ -27,9 +27,9 @@ class Track extends EventTarget {
     if (browser.IS_IE8) {
       track = document.createElement('custom_' + type);
 
-      for (let prop in track.prototype) {
+      for (let prop in Track.prototype) {
         if (prop !== 'constructor') {
-          track[prop] = track.prototype[prop];
+          track[prop] = Track.prototype[prop];
         }
       }
     }

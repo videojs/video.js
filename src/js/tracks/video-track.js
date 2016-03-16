@@ -1,6 +1,7 @@
 import {VideoTrackKind} from './track-enums';
 import Track from './track';
 import merge from '../utils/merge-options';
+import * as browser from '../utils/browser.js';
 
 /**
  * A single video text track as defined in:
@@ -28,6 +29,14 @@ class VideoTrack extends Track {
     // for every other browser this will be a normal object
     let videoTrack = super(settings);
     let selected = false;
+
+    if (browser.IS_IE8) {
+      for (let prop in VideoTrack.prototype) {
+        if (prop !== 'constructor') {
+          videoTrack[prop] = VideoTrack.prototype[prop];
+        }
+      }
+    }
 
     Object.defineProperty(videoTrack, 'selected', {
       get() { return selected; },

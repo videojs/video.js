@@ -1,6 +1,7 @@
 import {AudioTrackKind} from './track-enums';
 import Track from './track';
 import merge from '../utils/merge-options';
+import * as browser from '../utils/browser.js';
 
 /**
  * A single audio text track as defined in:
@@ -27,6 +28,14 @@ class AudioTrack extends Track {
     // for every other browser this will be a normal object
     let audioTrack = super(settings);
     let enabled = false;
+
+    if (browser.IS_IE8) {
+      for (let prop in AudioTrack.prototype) {
+        if (prop !== 'constructor') {
+          audioTrack[prop] = AudioTrack.prototype[prop];
+        }
+      }
+    }
 
     Object.defineProperty(audioTrack, 'enabled', {
       get() { return enabled; },

@@ -2,6 +2,7 @@
  * @file audio-track-list.js
  */
 import TrackList from './track-list';
+import * as browser from '../utils/browser.js';
 
 /**
  * A list of possible audio tracks. All functionality is in the
@@ -23,6 +24,21 @@ import TrackList from './track-list';
  * @class AudioTrackList
  */
 class AudioTrackList extends TrackList {
+  constructor(tracks = []) {
+    let list = super(tracks);
+
+    if (browser.IS_IE8) {
+      for (let prop in AudioTrackList.prototype) {
+        if (prop !== 'constructor') {
+          list[prop] = AudioTrackList.prototype[prop];
+        }
+      }
+    }
+
+    return list;
+  }
+
+
   addTrack_(track) {
     super.addTrack_(track);
     track.addEventListener('enabledchange', () => {
