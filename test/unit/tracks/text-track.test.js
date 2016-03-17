@@ -1,4 +1,5 @@
 import window from 'global/window';
+import EventTarget from '../../../src/js/event-target.js';
 import TextTrack from '../../../src/js/tracks/text-track.js';
 import TestHelpers from '../test-helpers.js';
 import log from '../../../src/js/utils/log.js';
@@ -301,8 +302,13 @@ test('tracks are parsed once vttjs is loaded', function() {
   let xhr;
   window.xhr.onCreate = (newXhr) => xhr = newXhr;
 
+  let testTech = new EventTarget();
+  testTech.textTracks = () => {};
+  testTech.currentTime = () => {};
+
+
   let tt = new TextTrack({
-    tech: defaultTech,
+    tech: testTech,
     src: 'http://example.com'
   });
 
@@ -326,7 +332,7 @@ test('tracks are parsed once vttjs is loaded', function() {
     };
   };
 
-  clock.tick(100);
+  testTech.trigger('vttjsloaded');
   ok(parserCreated, 'WebVTT is loaded, so we can parse now');
 
   clock.restore();
