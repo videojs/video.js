@@ -306,7 +306,6 @@ test('tracks are parsed once vttjs is loaded', function() {
   testTech.textTracks = () => {};
   testTech.currentTime = () => {};
 
-
   let tt = new TextTrack({
     tech: testTech,
     src: 'http://example.com'
@@ -339,7 +338,7 @@ test('tracks are parsed once vttjs is loaded', function() {
   window.WebVTT = oldVTT;
 });
 
-test('retries processing a track 3 times if vttjs has not loaded', function() {
+test('stops processing if vttjs loading errored out', function() {
   const clock = sinon.useFakeTimers();
   sinon.stub(log, 'error');
   const oldVTT = window.WebVTT;
@@ -350,8 +349,15 @@ test('retries processing a track 3 times if vttjs has not loaded', function() {
   let xhr;
   window.xhr.onCreate = (newXhr) => xhr = newXhr;
 
+  let testTech = new EventTarget();
+  testTech.textTracks = () => {};
+  testTech.currentTime = () => {};
+
+  sinon.stub(testTech, 'off');
+  testTech.off.withArgs('vttjsloaded');
+
   let tt = new TextTrack({
-    tech: defaultTech,
+    tech: testTech,
     src: 'http://example.com'
   });
 
@@ -359,16 +365,14 @@ test('retries processing a track 3 times if vttjs has not loaded', function() {
 
   ok(!parserCreated, 'WebVTT is not loaded, do not try to parse yet');
 
-  clock.tick(100);
-  clock.tick(100);
-  clock.tick(100);
-  clock.tick(100);
+  testTech.trigger('vttjserror');
+  let errorSpyCall = log.error.getCall(0);
+  let offSpyCall = testTech.off.getCall(0);
 
-  let spyCall = log.error.getCall(0);
-
-  ok(spyCall.calledWithMatch('vttjs did not load, stopping trying to process'),
+  ok(errorSpyCall.calledWithMatch('vttjs failed to load, stopping trying to process'),
      'we logged the correct error after 3 timeouts');
   ok(!parserCreated, 'WebVTT is not loaded, do not try to parse yet');
+  ok(offSpyCall, 'tech.off was called');
 
   clock.restore();
   log.error.restore();
