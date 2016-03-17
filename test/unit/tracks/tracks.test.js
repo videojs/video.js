@@ -363,7 +363,6 @@ test('should check for text track changes when emulating text tracks', function(
 
 test('removes cuechange event when text track is hidden for emulated tracks', function() {
   let player = TestHelpers.makePlayer();
-  player.textTrackDisplay.updateDisplay = () => {};
   let tt = new TextTrack({
     tech: player.tech_,
     mode: 'showing'
