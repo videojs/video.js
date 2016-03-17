@@ -1,5 +1,8 @@
+import window from 'global/window';
+import EventTarget from '../../../src/js/event-target.js';
 import TextTrack from '../../../src/js/tracks/text-track.js';
 import TestHelpers from '../test-helpers.js';
+import log from '../../../src/js/utils/log.js';
 
 const defaultTech = {
   textTracks() {},
@@ -253,4 +256,125 @@ test('fires cuechange when cues become active and inactive', function() {
   equal(changes, 4, 'a cuechange event trigger addEventListener and oncuechange');
 
   player.dispose();
+});
+
+test('tracks are parsed if vttjs is loaded', function() {
+  const clock = sinon.useFakeTimers();
+  const oldVTT = window.WebVTT;
+  let parserCreated = false;
+
+  window.WebVTT = () => {};
+  window.WebVTT.StringDecoder = () => {};
+  window.WebVTT.Parser = () => {
+    parserCreated = true;
+    return {
+      oncue() {},
+      onparsingerror() {},
+      onflush() {},
+      parse() {},
+      flush() {}
+    };
+  };
+
+  let xhr;
+  window.xhr.onCreate = (newXhr) => xhr = newXhr;
+
+  let tt = new TextTrack({
+    tech: defaultTech,
+    src: 'http://example.com'
+  });
+
+  xhr.respond(200, {}, 'WebVTT\n');
+
+  ok(parserCreated, 'WebVTT is loaded, so we can just parse');
+
+  clock.restore();
+  window.WebVTT = oldVTT;
+});
+
+test('tracks are parsed once vttjs is loaded', function() {
+  const clock = sinon.useFakeTimers();
+  const oldVTT = window.WebVTT;
+  let parserCreated = false;
+
+  window.WebVTT = true;
+
+  let xhr;
+  window.xhr.onCreate = (newXhr) => xhr = newXhr;
+
+  let testTech = new EventTarget();
+  testTech.textTracks = () => {};
+  testTech.currentTime = () => {};
+
+  let tt = new TextTrack({
+    tech: testTech,
+    src: 'http://example.com'
+  });
+
+  xhr.respond(200, {}, 'WebVTT\n');
+
+  ok(!parserCreated, 'WebVTT is not loaded, do not try to parse yet');
+
+  clock.tick(100);
+  ok(!parserCreated, 'WebVTT still not loaded, do not try to parse yet');
+
+  window.WebVTT = () => {};
+  window.WebVTT.StringDecoder = () => {};
+  window.WebVTT.Parser = () => {
+    parserCreated = true;
+    return {
+      oncue() {},
+      onparsingerror() {},
+      onflush() {},
+      parse() {},
+      flush() {}
+    };
+  };
+
+  testTech.trigger('vttjsloaded');
+  ok(parserCreated, 'WebVTT is loaded, so we can parse now');
+
+  clock.restore();
+  window.WebVTT = oldVTT;
+});
+
+test('stops processing if vttjs loading errored out', function() {
+  const clock = sinon.useFakeTimers();
+  sinon.stub(log, 'error');
+  const oldVTT = window.WebVTT;
+  let parserCreated = false;
+
+  window.WebVTT = true;
+
+  let xhr;
+  window.xhr.onCreate = (newXhr) => xhr = newXhr;
+
+  let testTech = new EventTarget();
+  testTech.textTracks = () => {};
+  testTech.currentTime = () => {};
+
+  sinon.stub(testTech, 'off');
+  testTech.off.withArgs('vttjsloaded');
+
+  let tt = new TextTrack({
+    tech: testTech,
+    src: 'http://example.com'
+  });
+
+  xhr.respond(200, {}, 'WebVTT\n');
+
+  ok(!parserCreated, 'WebVTT is not loaded, do not try to parse yet');
+
+  testTech.trigger('vttjserror');
+  let errorSpyCall = log.error.getCall(0);
+  let offSpyCall = testTech.off.getCall(0);
+
+  ok(errorSpyCall.calledWithMatch('vttjs failed to load, stopping trying to process'),
+     'vttjs failed to load, so, we logged an error');
+  ok(!parserCreated, 'WebVTT is not loaded, do not try to parse yet');
+  ok(offSpyCall, 'tech.off was called');
+
+  clock.restore();
+  log.error.restore();
+  window.WebVTT = oldVTT;
 });

@@ -67,14 +67,22 @@ const loadTrack = function(src, track) {
 
     track.loaded_ = true;
 
+    // Make sure that vttjs has loaded, otherwise, wait till it finished loading
     // NOTE: this is only used for the alt/video.novtt.js build
     if (typeof window.WebVTT !== 'function') {
-      window.setTimeout(function() {
-        parseCues(responseBody, track);
-      }, 100);
+      if (track.tech_) {
+        let loadHandler = () => parseCues(responseBody, track);
+        track.tech_.on('vttjsloaded', loadHandler);
+        track.tech_.on('vttjserror', () => {
+          log.error(`vttjs failed to load, stopping trying to process ${track.src}`);
+          track.tech_.off('vttjsloaded', loadHandler);
+        });
+
+      }
     } else {
       parseCues(responseBody, track);
     }
+
   }));
 };
 
