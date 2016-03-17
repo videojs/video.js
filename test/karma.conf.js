@@ -28,6 +28,7 @@ module.exports = function(config) {
 
     browserify: {
       debug: true,
+      plugin: ['proxyquireify/plugins'],
       transform: [
         require('babelify').configure({
           sourceMapRelative: './',
