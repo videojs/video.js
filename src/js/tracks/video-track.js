@@ -21,24 +21,23 @@ import * as browser from '../utils/browser.js';
 class VideoTrack extends Track {
   constructor(options = {}) {
     let settings = merge(options, {
-      trackType: 'video',
       kind: VideoTrackKind[options.kind] || ''
     });
 
     // on IE8 this will be a document element
     // for every other browser this will be a normal object
-    let videoTrack = super(settings);
+    let track = super(settings);
     let selected = false;
 
     if (browser.IS_IE8) {
       for (let prop in VideoTrack.prototype) {
         if (prop !== 'constructor') {
-          videoTrack[prop] = VideoTrack.prototype[prop];
+          track[prop] = VideoTrack.prototype[prop];
         }
       }
     }
 
-    Object.defineProperty(videoTrack, 'selected', {
+    Object.defineProperty(track, 'selected', {
       get() { return selected; },
       set(newSelected) {
         // an invalid value
@@ -46,7 +45,7 @@ class VideoTrack extends Track {
           return;
         }
         if (newSelected) {
-          let videoTrackList = videoTrack.tech_.videoTracks();
+          let videoTrackList = this.tech_.videoTracks();
           for (let i = 0; i < videoTrackList.length; i++) {
             let vt = videoTrackList[i];
             // another video track is enabled, disable it
@@ -62,10 +61,10 @@ class VideoTrack extends Track {
     // set selected to that true value otherwise
     // we keep it false
     if (settings.selected) {
-      videoTrack.selected = settings.selected;
+      track.selected = settings.selected;
     }
 
-    return videoTrack;
+    return track;
   }
 }
 

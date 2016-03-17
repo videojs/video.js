@@ -73,12 +73,11 @@ class Html5 extends Tech {
     let trackTypes = ['audio', 'video'];
 
     // ProxyNativeTextTracks
-    for (let i = 0; i < trackTypes.length; i++) {
-      let type = trackTypes[i];
+    trackTypes.forEach((type) => {
       let capitalType = type.charAt(0).toUpperCase() + type.slice(1);
 
       if (!this[`featuresNative${capitalType}Tracks`]) {
-        continue;
+        return;
       }
       let tl = this.el()[`${type}Tracks`];
 
@@ -87,7 +86,7 @@ class Html5 extends Tech {
         tl.addEventListener('addtrack', Fn.bind(this, this[`handle${capitalType}TrackAdd_`]));
         tl.addEventListener('removetrack', Fn.bind(this, this[`handle${capitalType}TrackRemove_`]));
       }
-    }
+    });
 
     if (this.featuresNativeTextTracks) {
       this.handleTextTrackChange_ = Fn.bind(this, this.handleTextTrackChange);
@@ -118,8 +117,7 @@ class Html5 extends Tech {
     let trackTypes = ['audio', 'video', 'text'];
 
     // ProxyNativeTextTracks
-    for (let i = 0; i < trackTypes.length; i++) {
-      let type = trackTypes[i];
+    trackTypes.forEach((type) => {
       let capitalType = type.charAt(0).toUpperCase() + type.slice(1);
       let tl = this.el_[`${type}Tracks`];
       let etl = this[`${type}Tracks`]();
@@ -130,12 +128,12 @@ class Html5 extends Tech {
         tl.removeEventListener('removetrack', this[`handle${capitalType}TrackRemove_`]);
       }
       // clearout the emulated audio track list.
-      let z = etl.length;
+      let i = etl.length;
 
-      while (z--) {
-        etl.removeTrack_(etl[z]);
+      while (i--) {
+        etl.removeTrack_(etl[i]);
       }
-    }
+    });
 
     Html5.disposeMediaElement(this.el_);
     super.dispose();

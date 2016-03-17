@@ -115,7 +115,6 @@ const loadTrack = function(src, track) {
 class TextTrack extends Track {
   constructor(options = {}) {
     let settings = merge(options, {
-      trackType: 'text',
       kind: TextTrackKind[options.kind] || 'subtitles',
       language: options.language || options.srclang || ''
     });
@@ -127,6 +126,7 @@ class TextTrack extends Track {
     // on IE8 this will be a document element
     // for every other browser this will be a normal object
     let tt = super(settings);
+
     if (browser.IS_IE8) {
       for (let prop in TextTrack.prototype) {
         if (prop !== 'constructor') {

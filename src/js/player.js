@@ -2489,12 +2489,12 @@ class Player extends Component {
   videoTracks() {
     // if we have not yet loadTech_, we create videoTracks_
     // these will be passed to the tech during loading
-    if(!this.tech_) {
+    if (!this.tech_) {
       this.videoTracks_ = this.videoTracks_ || new VideoTrackList();
       return this.videoTracks_;
     }
 
-    return this.tech_['videoTracks']();
+    return this.tech_.videoTracks();
   }
 
   /**
@@ -2507,12 +2507,12 @@ class Player extends Component {
   audioTracks() {
     // if we have not yet loadTech_, we create videoTracks_
     // these will be passed to the tech during loading
-    if(!this.tech_) {
-      this.videoTracks_ = this.videoTracks_ || new AudioTrackList();
-      return this.videoTracks_;
+    if (!this.tech_) {
+      this.audioTracks_ = this.audioTracks_ || new AudioTrackList();
+      return this.audioTracks_;
     }
 
-    return this.tech_ && this.tech_['audioTracks']();
+    return this.tech_.audioTracks();
   }
 
   /*
