@@ -297,6 +297,7 @@ test('tracks are parsed if vttjs is loaded', function() {
 
   clock.restore();
   window.WebVTT = oldVTT;
+  TextTrack = proxyquire('../../../src/js/tracks/text-track.js', {});
 });
 
 test('tracks are parsed once vttjs is loaded', function() {
@@ -347,6 +348,7 @@ test('tracks are parsed once vttjs is loaded', function() {
 
   clock.restore();
   window.WebVTT = oldVTT;
+  TextTrack = proxyquire('../../../src/js/tracks/text-track.js', {});
 });
 
 test('stops processing if vttjs loading errored out', function() {
@@ -394,4 +396,5 @@ test('stops processing if vttjs loading errored out', function() {
 
   clock.restore();
   window.WebVTT = oldVTT;
+  TextTrack = proxyquire('../../../src/js/tracks/text-track.js', {});
 });
