@@ -370,7 +370,7 @@ test('stops processing if vttjs loading errored out', function() {
   let offSpyCall = testTech.off.getCall(0);
 
   ok(errorSpyCall.calledWithMatch('vttjs failed to load, stopping trying to process'),
-     'we logged the correct error after 3 timeouts');
+     'vttjs failed to load, so, we logged an error');
   ok(!parserCreated, 'WebVTT is not loaded, do not try to parse yet');
   ok(offSpyCall, 'tech.off was called');
 
