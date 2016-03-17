@@ -279,10 +279,11 @@ test('tracks are parsed if vttjs is loaded', function() {
     };
   };
 
-  let xhr;
+  // use proxyquire to stub xhr module because IE8s XDomainRequest usage
+  let xhrHandler;
   let TextTrack = proxyquire('../../../src/js/tracks/text-track.js', {
     xhr(options, fn) {
-      xhr  = fn;
+      xhrHandler  = fn;
     }
   });
 
@@ -291,7 +292,7 @@ test('tracks are parsed if vttjs is loaded', function() {
     src: 'http://example.com'
   });
 
-  xhr(null, {}, 'WEBVTT\n');
+  xhrHandler(null, {}, 'WEBVTT\n');
 
   ok(parserCreated, 'WebVTT is loaded, so we can just parse');
 
@@ -305,10 +306,11 @@ test('tracks are parsed once vttjs is loaded', function() {
   const oldVTT = window.WebVTT;
   let parserCreated = false;
 
-  let xhr;
+  // use proxyquire to stub xhr module because IE8s XDomainRequest usage
+  let xhrHandler;
   let TextTrack = proxyquire('../../../src/js/tracks/text-track.js', {
     xhr(options, fn) {
-      xhr  = fn;
+      xhrHandler  = fn;
     }
   });
 
@@ -323,7 +325,7 @@ test('tracks are parsed once vttjs is loaded', function() {
     src: 'http://example.com'
   });
 
-  xhr(null, {}, 'WEBVTT\n');
+  xhrHandler(null, {}, 'WEBVTT\n');
 
   ok(!parserCreated, 'WebVTT is not loaded, do not try to parse yet');
 
@@ -357,11 +359,12 @@ test('stops processing if vttjs loading errored out', function() {
   let parserCreated = false;
   window.WebVTT = true;
 
-  let xhr;
+  // use proxyquire to stub xhr module because IE8s XDomainRequest usage
+  let xhrHandler;
   let errorMsg;
   let TextTrack = proxyquire('../../../src/js/tracks/text-track.js', {
     xhr(options, fn) {
-      xhr  = fn;
+      xhrHandler  = fn;
     },
     '../utils/log.js': {
       error(msg) {
@@ -382,7 +385,7 @@ test('stops processing if vttjs loading errored out', function() {
     src: 'http://example.com'
   });
 
-  xhr(null, {}, 'WEBVTT\n');
+  xhrHandler(null, {}, 'WEBVTT\n');
 
   ok(!parserCreated, 'WebVTT is not loaded, do not try to parse yet');
 
