@@ -149,6 +149,10 @@ module.exports = function(grunt) {
     },
     dist: {},
     watch: {
+      novtt: {
+        files: ['build/temp/video.js'],
+        tasks: ['concat:novtt']
+      },
       minify: {
         files: ['build/temp/video.js'],
         tasks: ['uglify']
