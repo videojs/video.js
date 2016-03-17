@@ -327,10 +327,9 @@ class Tech extends Component {
    * @method initTrackListeners
    */
   initTrackListeners() {
-    const typesTracks = ['video', 'audio'];
+    const trackTypes = ['video', 'audio'];
 
-    for (let i = 0; i < typesTracks.length; i++) {
-      let type = typesTracks[i];
+    trackTypes.forEach((type) => {
       let trackListChanges = () => {
         this.trigger(`${type}trackchange`);
       };
@@ -344,7 +343,7 @@ class Tech extends Component {
         tracks.removeEventListener('removetrack', trackListChanges);
         tracks.removeEventListener('addtrack', trackListChanges);
       });
-    }
+    });
   }
 
   /**
