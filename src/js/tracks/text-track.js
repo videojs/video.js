@@ -19,25 +19,7 @@ import XHR from 'xhr';
  * @param {String} srcContent webVTT file contents
  * @param {Track} track track to addcues to
  */
-const parseCues = function(srcContent, track, retryNum) {
-  // Make sure that vttjs has loaded, otherwise, wait till it finished loading
-  // NOTE: this is only used for the alt/video.novtt.js build
-  if (typeof window.WebVTT !== 'function') {
-    let retry;
-
-    if (retryNum === 0) {
-      return log.error(`vttjs did not load, stopping trying to process ${track.src}`);
-    } else if (typeof retryNum !== 'number') {
-      retry = 3;
-    } else {
-      retry = retryNum - 1;
-    }
-
-    return window.setTimeout(function() {
-      parseCues(srcContent, track, retry);
-    }, 100);
-  }
-
+const parseCues = function(srcContent, track) {
   let parser = new window.WebVTT.Parser(window,
                                         window.vttjs,
                                         window.WebVTT.StringDecoder());
@@ -85,7 +67,16 @@ const loadTrack = function(src, track) {
 
     track.loaded_ = true;
 
-    parseCues(responseBody, track);
+    // Make sure that vttjs has loaded, otherwise, wait till it finished loading
+    // NOTE: this is only used for the alt/video.novtt.js build
+    if (typeof window.WebVTT !== 'function') {
+      if (track.tech_) {
+        track.tech_.on('vttjsloaded', () => parseCues(responseBody, track));
+      }
+    } else {
+      parseCues(responseBody, track);
+    }
+
   }));
 };
 
