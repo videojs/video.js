@@ -333,6 +333,10 @@ class Tech extends Component {
       script.onerror = () => {
         this.trigger('vttjserror');
       };
+      this.on('dispose', () => {
+        script.onload = null;
+        script.onerror = null;
+      });
       this.el().parentNode.appendChild(script);
       window['WebVTT'] = true;
     }
