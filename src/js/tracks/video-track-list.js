@@ -27,7 +27,18 @@ import * as browser from '../utils/browser.js';
 class VideoTrackList extends TrackList {
 
   constructor(tracks) {
+    // on IE8 this will be a document element
+    // for every other browser this will be a normal object
     let list = super(tracks);
+
+    if (browser.IS_IE8) {
+      for (let prop in VideoTrackList.prototype) {
+        if (prop !== 'constructor') {
+          list[prop] = VideoTrackList.prototype[prop];
+        }
+      }
+    }
+
     Object.defineProperty(list, 'selectedIndex', {
       get() {
         for (let i = 0; i < this.length; i++) {
@@ -40,21 +51,13 @@ class VideoTrackList extends TrackList {
       set() {}
     });
 
-    if (browser.IS_IE8) {
-      for (let prop in VideoTrackList.prototype) {
-        if (prop !== 'constructor') {
-          list[prop] = VideoTrackList.prototype[prop];
-        }
-      }
-    }
-
     return list;
   }
 
   addTrack_(track) {
     super.addTrack_(track);
     // native tracks don't have this
-    if(track.addEventListener) {
+    if (track.addEventListener) {
       track.addEventListener('selectedchange', () => {
         this.trigger('change');
       });

@@ -23,10 +23,8 @@ class Track extends EventTarget {
     }
 
     let track = this;
-    let type = options.trackType || 'generic';
     if (browser.IS_IE8) {
-      track = document.createElement('custom_' + type);
-
+      track = document.createElement('custom');
       for (let prop in Track.prototype) {
         if (prop !== 'constructor') {
           track[prop] = Track.prototype[prop];
@@ -36,18 +34,19 @@ class Track extends EventTarget {
     track.tech_ = options.tech;
 
     let trackProps = {
-      id: options.id || 'vjs_' + type + '_track_' + Guid.newGUID(),
+      id: options.id || 'vjs_track_' + Guid.newGUID(),
       kind: options.kind || '',
       label: options.label || '',
       language: options.language || ''
     };
 
-    for(let key in trackProps) {
+    for (let key in trackProps) {
       Object.defineProperty(track, key, {
         get() { return trackProps[key]; },
         set() {}
       });
     }
+
     return track;
   }
 }

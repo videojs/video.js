@@ -25,6 +25,8 @@ import * as browser from '../utils/browser.js';
  */
 class AudioTrackList extends TrackList {
   constructor(tracks = []) {
+    // on IE8 this will be a document element
+    // for every other browser this will be a normal object
     let list = super(tracks);
 
     if (browser.IS_IE8) {
@@ -34,15 +36,13 @@ class AudioTrackList extends TrackList {
         }
       }
     }
-
     return list;
   }
-
 
   addTrack_(track) {
     super.addTrack_(track);
     // native tracks don't have this
-    if(track.addEventListener) {
+    if (track.addEventListener) {
       track.addEventListener('enabledchange', () => {
         this.trigger('change');
       });

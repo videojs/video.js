@@ -46,7 +46,7 @@ test('defaults when items not provided', function() {
   equal(track.enabled, false, 'enabled defaulted to true since there is one track');
   equal(track.label, '', 'label defaults to empty string');
   equal(track.language, '', 'language defaults to empty string');
-  ok(track.id.match(/vjs_audio_track_\d{5}/), 'id defaults to vjs_audio_track_GUID');
+  ok(track.id.match(/vjs_track_\d{5}/), 'id defaults to vjs_track_GUID');
 });
 
 test('kind can only be one of several options, defaults to empty string', function() {

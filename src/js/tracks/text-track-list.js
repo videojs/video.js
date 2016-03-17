@@ -27,6 +27,8 @@ import document from 'global/document';
  */
 class TextTrackList extends TrackList {
   constructor(tracks = []) {
+    // on IE8 this will be a document element
+    // for every other browser this will be a normal object
     let list = super(tracks);
 
     if (browser.IS_IE8) {
@@ -36,7 +38,6 @@ class TextTrackList extends TrackList {
         }
       }
     }
-
     return list;
   }
 

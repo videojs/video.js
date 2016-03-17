@@ -1,3 +1,6 @@
+import * as browser from '../../../src/js/utils/browser.js';
+import document from 'global/document';
+
 /**
  * Tests baseline functionality for all tracks
  *
@@ -33,9 +36,13 @@ const TrackBaseline = function(TrackClass, options) {
     equal(track.id, options.id, 'we have an id');
   });
 
-  test('returns an instance of itself on all browsers', function() {
+  test('returns an instance of itself on non ie8 browsers', function() {
     let track = new TrackClass(options);
-    ok(track instanceof TrackClass, 'object is returned');
+    if(browser.IS_IE8) {
+      ok(track, 'returns an object on ie8');
+      return;
+    }
+    ok(track instanceof TrackClass, 'returns an instance');
   });
 };
 

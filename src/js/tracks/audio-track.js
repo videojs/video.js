@@ -20,24 +20,23 @@ import * as browser from '../utils/browser.js';
  */
 class AudioTrack extends Track {
   constructor(options = {}) {
-      let settings = merge(options, {
-      trackType: 'audio',
+    let settings = merge(options, {
       kind: AudioTrackKind[options.kind] || ''
     });
     // on IE8 this will be a document element
     // for every other browser this will be a normal object
-    let audioTrack = super(settings);
+    let track = super(settings);
     let enabled = false;
 
     if (browser.IS_IE8) {
       for (let prop in AudioTrack.prototype) {
         if (prop !== 'constructor') {
-          audioTrack[prop] = AudioTrack.prototype[prop];
+          track[prop] = AudioTrack.prototype[prop];
         }
       }
     }
 
-    Object.defineProperty(audioTrack, 'enabled', {
+    Object.defineProperty(track, 'enabled', {
       get() { return enabled; },
       set(newEnabled) {
         // an invalid value
@@ -50,7 +49,7 @@ class AudioTrack extends Track {
         // make sure to disable any other audio track
         // before we enable this one
         if (newEnabled) {
-          let audioTrackList = audioTrack.tech_.audioTracks();
+          let audioTrackList = this.tech_.audioTracks();
           for (let i = 0; i < audioTrackList.length; i++) {
             let at = audioTrackList[i];
             // another audio track is enabled, disable it
@@ -66,11 +65,11 @@ class AudioTrack extends Track {
     // set selected to that true value otherwise
     // we keep it false
     if (settings.enabled) {
-      audioTrack.enabled = settings.enabled;
+      track.enabled = settings.enabled;
     }
-    audioTrack.loaded_ = true;
+    track.loaded_ = true;
 
-    return audioTrack;
+    return track;
   }
 }
 
