@@ -71,7 +71,13 @@ const loadTrack = function(src, track) {
     // NOTE: this is only used for the alt/video.novtt.js build
     if (typeof window.WebVTT !== 'function') {
       if (track.tech_) {
-        track.tech_.on('vttjsloaded', () => parseCues(responseBody, track));
+        let loadHandler = () => parseCues(responseBody, track);
+        track.tech_.on('vttjsloaded', loadHandler);
+        track.tech_.on('vttjserror', () => {
+          log.error(`vttjs failed to load, stopping processing ${track.src}`);
+          track.tech_.off('vttjsloaded', loadHandler);
+        });
+
       }
     } else {
       parseCues(responseBody, track);
