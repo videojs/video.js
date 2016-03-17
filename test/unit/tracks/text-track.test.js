@@ -3,6 +3,7 @@ import EventTarget from '../../../src/js/event-target.js';
 import TextTrack from '../../../src/js/tracks/text-track.js';
 import TestHelpers from '../test-helpers.js';
 import log from '../../../src/js/utils/log.js';
+import XHR from 'xhr';
 
 const defaultTech = {
   textTracks() {},
@@ -262,6 +263,8 @@ test('tracks are parsed if vttjs is loaded', function() {
   const clock = sinon.useFakeTimers();
   const oldVTT = window.WebVTT;
   let parserCreated = false;
+  XHR.OldXDomainRequest = XHR.XDomainRequest;
+  XHR.XDomainRequest = window.xhr;
 
   window.WebVTT = () => {};
   window.WebVTT.StringDecoder = () => {};
@@ -289,6 +292,7 @@ test('tracks are parsed if vttjs is loaded', function() {
   ok(parserCreated, 'WebVTT is loaded, so we can just parse');
 
   clock.restore();
+  XHR.XDomainRequest = XHR.OldXDomainRequest;
   window.WebVTT = oldVTT;
 });
 
@@ -296,6 +300,9 @@ test('tracks are parsed once vttjs is loaded', function() {
   const clock = sinon.useFakeTimers();
   const oldVTT = window.WebVTT;
   let parserCreated = false;
+
+  XHR.OldXDomainRequest = XHR.XDomainRequest;
+  XHR.XDomainRequest = window.xhr;
 
   window.WebVTT = true;
 
@@ -335,6 +342,7 @@ test('tracks are parsed once vttjs is loaded', function() {
   ok(parserCreated, 'WebVTT is loaded, so we can parse now');
 
   clock.restore();
+  XHR.XDomainRequest = XHR.OldXDomainRequest;
   window.WebVTT = oldVTT;
 });
 
@@ -343,7 +351,8 @@ test('stops processing if vttjs loading errored out', function() {
   sinon.stub(log, 'error');
   const oldVTT = window.WebVTT;
   let parserCreated = false;
-
+  XHR.OldXDomainRequest = XHR.XDomainRequest;
+  XHR.XDomainRequest = window.xhr;
   window.WebVTT = true;
 
   let xhr;
@@ -375,6 +384,7 @@ test('stops processing if vttjs loading errored out', function() {
   ok(offSpyCall, 'tech.off was called');
 
   clock.restore();
+  XHR.XDomainRequest = XHR.OldXDomainRequest;
   log.error.restore();
   window.WebVTT = oldVTT;
 });
