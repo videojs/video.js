@@ -12,19 +12,21 @@ import document from 'global/document';
  * @link https://html.spec.whatwg.org/multipage/embedded-content.html
  *
  * @param {Track[]} tracks A list of tracks to initialize the list with
+ * @param {Object} list the child object with inheritance done manually for ie8
  * @extends EventTarget
  * @class TrackList
  */
 class TrackList extends EventTarget {
-  constructor(tracks = []) {
+  constructor(tracks = [], list = null) {
     super();
-    let list = this;
-
-    if (browser.IS_IE8) {
-      list = document.createElement('custom');
-      for (let prop in TrackList.prototype) {
-        if (prop !== 'constructor') {
-          list[prop] = TrackList.prototype[prop];
+    if(!list) {
+      list = this;
+      if (browser.IS_IE8) {
+        list = document.createElement('custom');
+        for (let prop in TrackList.prototype) {
+          if (prop !== 'constructor') {
+            list[prop] = TrackList.prototype[prop];
+          }
         }
       }
     }
