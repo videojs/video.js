@@ -42,11 +42,24 @@ class AudioTrackList extends TrackList {
   addTrack_(track) {
     super.addTrack_(track);
     // native tracks don't have this
-    if (track.addEventListener) {
-      track.addEventListener('enabledchange', () => {
-        this.trigger('change');
-      });
+    if (!track.addEventListener) {
+      return;
     }
+
+    track.addEventListener('enabledchange', () => {
+      // We diverge from the spec here because we can only
+      // support one audio track at a time. So we
+      // make sure to disable any other audio tracks
+      for (let i = 0; i < this.length; i++) {
+        let t = this[i];
+        if(t.id === track.id) {
+          continue;
+        }
+        // another audio track is enabled, disable it
+        t.selected = false;
+      }
+      this.trigger('change');
+    });
   }
 
   addTrack(track) {

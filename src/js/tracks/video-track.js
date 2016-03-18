@@ -40,17 +40,9 @@ class VideoTrack extends Track {
     Object.defineProperty(track, 'selected', {
       get() { return selected; },
       set(newSelected) {
-        // an invalid value
+        // an invalid or unchanged value
         if (typeof newSelected !== 'boolean' || newSelected === selected) {
           return;
-        }
-        if (newSelected) {
-          let videoTrackList = this.tech_.videoTracks();
-          for (let i = 0; i < videoTrackList.length; i++) {
-            let vt = videoTrackList[i];
-            // another video track is enabled, disable it
-            vt.selected = false;
-          }
         }
         selected = newSelected;
         this.trigger('selectedchange');
