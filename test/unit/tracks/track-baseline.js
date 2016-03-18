@@ -8,12 +8,6 @@ import document from 'global/document';
  # @param {Object} options the options to setup a track with
  */
 const TrackBaseline = function(TrackClass, options) {
-  test('requires a tech', function() {
-    let error = new Error('A tech was not provided.');
-
-    q.throws(() => new TrackClass({}), error, 'a tech is required');
-    q.throws(() => new TrackClass({tech: null}), error, 'a tech is required');
-  });
 
   test('is setup with id, kind, label, and language', function() {
     let track = new TrackClass(options);

@@ -39,25 +39,12 @@ class AudioTrack extends Track {
     Object.defineProperty(track, 'enabled', {
       get() { return enabled; },
       set(newEnabled) {
-        // an invalid value
+        // an invalid or unchanged value
         if (typeof newEnabled !== 'boolean' || newEnabled === enabled) {
           return;
         }
-
-        // We diverge from the spec here because we can only
-        // support one audio track at a time. So we
-        // make sure to disable any other audio track
-        // before we enable this one
-        if (newEnabled) {
-          let audioTrackList = this.tech_.audioTracks();
-          for (let i = 0; i < audioTrackList.length; i++) {
-            let at = audioTrackList[i];
-            // another audio track is enabled, disable it
-            at.enabled = false;
-          }
-        }
-        enabled = newEnabled;
         this.trigger('enabledchange');
+        enabled = newEnabled;
       }
     });
 

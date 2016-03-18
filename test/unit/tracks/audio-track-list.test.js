@@ -4,8 +4,9 @@ import EventTarget from '../../../src/js/event-target.js';
 
 q.module('Audio Track List');
 
-test('trigger "change" event when "enabledchange" is fired on a track', function() {
+test('trigger "change" event when "enabledchange" is fired on loaded a track', function() {
   let track = new EventTarget();
+  track.loaded_ = true;
   let audioTrackList = new AudioTrackList([track]);
   let changes = 0;
   let changeHandler = function() {
@@ -21,7 +22,7 @@ test('trigger "change" event when "enabledchange" is fired on a track', function
   equal(changes, 2, 'two change events should have fired');
 });
 
-test('trigger "change" event when a new AudioTrack is enabled', function() {
+test('trigger "change" event when a new AudioTrack is after load enabled', function() {
   let track = new AudioTrack({
     tech: {
       on() {},
