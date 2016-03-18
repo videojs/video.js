@@ -3,6 +3,7 @@
  */
 import TrackList from './track-list';
 import * as browser from '../utils/browser.js';
+import document from 'global/document';
 
 /**
  * A list of possible audio tracks. All functionality is in the
@@ -25,17 +26,25 @@ import * as browser from '../utils/browser.js';
  */
 class AudioTrackList extends TrackList {
   constructor(tracks = []) {
-    // on IE8 this will be a document element
-    // for every other browser this will be a normal object
-    let list = super(tracks);
+    let list;
 
+    // IE8 forces us to implement inheritance ourselves
+    // as it does not support Object.defineProperty properly
     if (browser.IS_IE8) {
+      list = document.createElement('custom');
+      for (let prop in TrackList.prototype) {
+        if (prop !== 'constructor') {
+          list[prop] = TrackList.prototype[prop];
+        }
+      }
       for (let prop in AudioTrackList.prototype) {
         if (prop !== 'constructor') {
           list[prop] = AudioTrackList.prototype[prop];
         }
       }
     }
+
+    list = super(tracks, list);
     return list;
   }
 
