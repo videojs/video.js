@@ -18,9 +18,6 @@ import EventTarget from '../event-target';
 class Track extends EventTarget {
   constructor(options = {}) {
     super();
-    if (!options.tech) {
-      throw new Error('A tech was not provided.');
-    }
 
     let track = this;
     if (browser.IS_IE8) {
@@ -31,7 +28,6 @@ class Track extends EventTarget {
         }
       }
     }
-    track.tech_ = options.tech;
 
     let trackProps = {
       id: options.id || 'vjs_track_' + Guid.newGUID(),

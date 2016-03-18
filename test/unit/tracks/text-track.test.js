@@ -27,6 +27,13 @@ TrackBaseline(TextTrack, {
   tech: defaultTech
 });
 
+test('requires a tech', function() {
+  let error = new Error('A tech was not provided.');
+
+  q.throws(() => new TextTrack({}), error, 'a tech is required');
+  q.throws(() => new TextTrack({tech: null}), error, 'a tech is required');
+});
+
 test('can create a TextTrack with a mode property', function() {
   let mode = 'disabled';
   let tt = new TextTrack({
