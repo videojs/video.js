@@ -6,6 +6,23 @@ import * as browser from '../utils/browser.js';
 import document from 'global/document';
 
 /**
+ * anywhere we call this function we diverge from the spec
+ * as we only support one enabled audiotrack at a time
+ *
+ * @param {Array|VideoTrackList} list list to work on
+ * @param {VideoTrack} enabledTrack the track to skip
+ */
+const disableOthers = function(list, track) {
+  for (let i = 0; i < list.length; i++) {
+    if (track.id === list[i].id) {
+      continue;
+    }
+    // another audio track is enabled, disable it
+    list[i].selected = false;
+  }
+};
+
+/**
 * A list of possiblee video tracks. Most functionality is in the
  * base class Tracklist and the spec for VideoTrackList is located at:
  * @link https://html.spec.whatwg.org/multipage/embedded-content.html#videotracklist
@@ -27,8 +44,17 @@ import document from 'global/document';
  */
 class VideoTrackList extends TrackList {
 
-  constructor(tracks) {
+  constructor(tracks = []) {
     let list;
+
+    // make sure only 1 track is enabled
+    // sorted from last index to first index
+    for (let i = tracks.length - 1; i >= 0; i--) {
+      if (tracks[i].selected) {
+        disableOthers(tracks, tracks[i]);
+        break;
+      }
+    }
 
     // IE8 forces us to implement inheritance ourselves
     // as it does not support Object.defineProperty properly
@@ -47,6 +73,7 @@ class VideoTrackList extends TrackList {
     }
 
     list = super(tracks, list);
+    list.changing_ = false;
 
     Object.defineProperty(list, 'selectedIndex', {
       get() {
@@ -64,20 +91,23 @@ class VideoTrackList extends TrackList {
   }
 
   addTrack_(track) {
+    if (track.selected) {
+      disableOthers(this, track);
+    }
+
     super.addTrack_(track);
     // native tracks don't have this
     if (!track.addEventListener) {
       return;
     }
     track.addEventListener('selectedchange', () => {
-      for (let i = 0; i < this.length; i++) {
-        let t = this[i];
-        if(t.id === track.id) {
-          continue;
-        }
-        t.selected = false;
+      if (this.changing_) {
+        return;
       }
+      this.changing_ = true;
+      disableOthers(this, track);
       this.trigger('change');
+      this.changing_ = false;
     });
   }
 

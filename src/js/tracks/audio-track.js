@@ -43,8 +43,8 @@ class AudioTrack extends Track {
         if (typeof newEnabled !== 'boolean' || newEnabled === enabled) {
           return;
         }
-        this.trigger('enabledchange');
         enabled = newEnabled;
+        this.trigger('enabledchange');
       }
     });
 
