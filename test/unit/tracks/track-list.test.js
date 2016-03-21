@@ -98,7 +98,7 @@ test('a "addtrack" event is triggered when new tracks are added', function() {
   let tracks = 0;
   let adds = 0;
   let addHandler = (e) => {
-    if(e.track) {
+    if (e.track) {
       tracks++;
     }
     adds++;
@@ -124,7 +124,7 @@ test('a "removetrack" event is triggered when tracks are removed', function() {
   let tracks = 0;
   let rms = 0;
   let rmHandler = (e) => {
-    if(e.track) {
+    if (e.track) {
       tracks++;
     }
     rms++;
