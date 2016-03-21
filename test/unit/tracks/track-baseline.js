@@ -32,7 +32,7 @@ const TrackBaseline = function(TrackClass, options) {
 
   test('returns an instance of itself on non ie8 browsers', function() {
     let track = new TrackClass(options);
-    if(browser.IS_IE8) {
+    if (browser.IS_IE8) {
       ok(track, 'returns an object on ie8');
       return;
     }

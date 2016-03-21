@@ -19,7 +19,7 @@ import document from 'global/document';
 class TrackList extends EventTarget {
   constructor(tracks = [], list = null) {
     super();
-    if(!list) {
+    if (!list) {
       list = this;
       if (browser.IS_IE8) {
         list = document.createElement('custom');
