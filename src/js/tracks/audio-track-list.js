@@ -95,8 +95,8 @@ class AudioTrackList extends TrackList {
       }
       this.changing_ = true;
       disableOthers(this, track);
-      this.trigger('change');
       this.changing_ = false;
+      this.trigger('change');
     });
   }
 
