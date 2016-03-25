@@ -11,6 +11,9 @@ CHANGELOG
 
 --------------------
 
+## 5.8.6 (2016-03-25)
+* @misteroneill fixed typo and indenting in language files ([view](https://github.com/videojs/video.js/pull/3207))
+
 ## 5.8.5 (2016-03-17)
 * @gkatsev cleared vttjs script handlers on dispose. Fixed tests ([view](https://github.com/videojs/video.js/pull/3189))
 
