@@ -572,6 +572,34 @@ test('should change the width and height of a component', function(){
   ok(comp.height() === 0, 'forced height was removed');
 });
 
+test('should get the computed dimensions', function(){
+  const container = document.createElement('div');
+  const comp = new Component(getFakePlayer(), {});
+  const el = comp.el();
+  const fixture = document.getElementById('qunit-fixture');
+
+  const computedWidth = '500px';
+  const computedHeight = '500px';
+
+  fixture.appendChild(container);
+  container.appendChild(el);
+  // Container of el needs dimensions or the component won't have dimensions
+  container.style.width = '1000px';
+  container.style.height = '1000px';
+
+  comp.width('50%');
+  comp.height('50%');
+
+  equal(comp.currentWidth() + 'px', computedWidth, 'matches computed width');
+  equal(comp.currentHeight() + 'px', computedHeight, 'matches computed height');
+
+  equal(comp.currentDimension('width') + 'px', computedWidth, 'matches computed width');
+  equal(comp.currentDimension('height') + 'px', computedHeight, 'matches computed height');
+
+  equal(comp.currentDimensions()['width'] + 'px', computedWidth, 'matches computed width');
+  equal(comp.currentDimensions()['height'] + 'px', computedHeight, 'matches computed width');
+
+});
 
 test('should use a defined content el for appending children', function(){
   class CompWithContent extends Component {}

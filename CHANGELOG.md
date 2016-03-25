@@ -8,6 +8,7 @@ CHANGELOG
 * @arius28 added greek translation file (el.json) ([view](https://github.com/videojs/video.js/pull/3185))
 * @ricardosiri68 changed the relative sass paths ([view](https://github.com/videojs/video.js/pull/3147))
 * @gkatsev added an option to keep the tooltips inside the player bounds ([view](https://github.com/videojs/video.js/pull/3149))
+* @defli added currentWidth and currentHeight methods to the player ([view](https://github.com/videojs/video.js/pull/3144))
 
 --------------------
 
