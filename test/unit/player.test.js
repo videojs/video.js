@@ -951,3 +951,57 @@ test('Remove waiting class on timeupdate after tech waiting', function() {
   player.trigger('timeupdate');
   ok(!/vjs-waiting/.test(player.el().className), 'vjs-waiting is removed from the player el on timeupdate');
 });
+
+test('Make sure that player\'s style el respects VIDEOJS_NO_DYNAMIC_STYLE option', function() {
+  // clear the HEAD before running this test
+  let styles = document.querySelectorAll('style');
+  let i = styles.length;
+  while (i--) {
+    let style = styles[i];
+    style.parentNode.removeChild(style);
+  }
+
+  let tag = TestHelpers.makeTag();
+  tag.id = 'vjs-no-base-theme-tag';
+  tag.width = 600;
+  tag.height = 300;
+
+  window.VIDEOJS_NO_DYNAMIC_STYLE = true;
+  let player = TestHelpers.makePlayer({}, tag);
+  styles = document.querySelectorAll('style');
+  equal(styles.length, 0, 'we should not get any style elements included in the DOM');
+
+  window.VIDEOJS_NO_DYNAMIC_STYLE = false;
+  player = TestHelpers.makePlayer({}, tag);
+  styles = document.querySelectorAll('style');
+  equal(styles.length, 1, 'we should have one style element in the DOM');
+  equal(styles[0].className, 'vjs-styles-dimensions', 'the class name is the one we expected');
+});
+
+test('When VIDEOJS_NO_DYNAMIC_STYLE is set, apply sizing directly to the tech el', function() {
+  // clear the HEAD before running this test
+  let styles = document.querySelectorAll('style');
+  let i = styles.length;
+  while (i--) {
+    let style = styles[i];
+    style.parentNode.removeChild(style);
+  }
+
+  let tag = TestHelpers.makeTag();
+  tag.id = 'vjs-no-base-theme-tag';
+  tag.width = 600;
+  tag.height = 300;
+
+  window.VIDEOJS_NO_DYNAMIC_STYLE = true;
+  let player = TestHelpers.makePlayer({}, tag);
+
+  player.width(300);
+  player.height(600);
+  equal(player.tech_.el().width, 300, 'the width is equal to 300');
+  equal(player.tech_.el().height, 600, 'the height is equal 600');
+
+  player.width(600);
+  player.height(300);
+  equal(player.tech_.el().width, 600, 'the width is equal to 600');
+  equal(player.tech_.el().height, 300, 'the height is equal 300');
+});
