@@ -6,6 +6,7 @@ CHANGELOG
 * @OwenEdwards added basic descriptions track support ([view](https://github.com/videojs/video.js/pull/3098))
 * @kamilbrenk Added lang
 * @arius28 added greek translation file (el.json) ([view](https://github.com/videojs/video.js/pull/3185))
+* @ricardosiri68 changed the relative sass paths ([view](https://github.com/videojs/video.js/pull/3147))
 
 --------------------
 
