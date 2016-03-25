@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @misteroneill fixed type and indenting in language files ([view](https://github.com/videojs/video.js/pull/3207))
 
 --------------------
 
