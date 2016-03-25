@@ -3,6 +3,7 @@ CHANGELOG
 
 ## HEAD (Unreleased)
 * @gkatsev updated vjs to not add dynamic styles when VIDEOJS_NO_DYNAMIC_STYLE is set ([view](https://github.com/videojs/video.js/pull/3093))
+* @OwenEdwards added basic descriptions track support ([view](https://github.com/videojs/video.js/pull/3098))
 
 --------------------
 

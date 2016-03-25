@@ -130,6 +130,30 @@ class ClickableComponent extends Component {
   }
 
   /**
+   * Enable the component element
+   *
+   * @return {Component}
+   * @method enable
+   */
+  enable() {
+    this.removeClass('vjs-disabled');
+    this.el_.setAttribute('aria-disabled', 'false');
+    return this;
+  }
+
+  /**
+   * Disable the component element
+   *
+   * @return {Component}
+   * @method disable
+   */
+  disable() {
+    this.addClass('vjs-disabled');
+    this.el_.setAttribute('aria-disabled', 'true');
+    return this;
+  }
+
+  /**
    * Handle Click - Override with specific functionality for component
    *
    * @method handleClick

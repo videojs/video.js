@@ -2,6 +2,16 @@
   cursor: pointer;
 }
 
+// Change cursor back to default if the menu button is disabled
+.vjs-menu-button.vjs-disabled {
+  cursor: default;
+}
+
+// prevent menus from opening while disabled
+.vjs-workinghover .vjs-menu-button.vjs-disabled:hover .vjs-menu {
+  display: none;
+}
+
 .vjs-menu .vjs-menu-content {
   display: block;
   padding: 0; margin: 0;

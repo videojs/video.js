@@ -110,6 +110,129 @@ test('menu should update with removeRemoteTextTrack', function() {
   player.dispose();
 });
 
+let descriptionstrack = {
+  kind: 'descriptions',
+  label: 'desc'
+};
+
+test('descriptions should be displayed when text tracks list is not empty', function() {
+  let player = TestHelpers.makePlayer({
+    tracks: [descriptionstrack]
+  });
+
+  this.clock.tick(1000);
+
+  ok(!player.controlBar.descriptionsButton.hasClass('vjs-hidden'), 'descriptions control is displayed');
+  equal(player.textTracks().length, 1, 'textTracks contains one item');
+
+  player.dispose();
+});
+
+test('descriptions should be displayed when a text track is added to an empty track list', function() {
+  let player = TestHelpers.makePlayer();
+
+  player.addRemoteTextTrack(descriptionstrack);
+
+  ok(!player.controlBar.descriptionsButton.hasClass('vjs-hidden'), 'control is displayed');
+  equal(player.textTracks().length, 1, 'textTracks contains one item');
+
+  player.dispose();
+});
+
+test('descriptions should not be displayed when text tracks list is empty', function() {
+  let player = TestHelpers.makePlayer();
+
+  ok(player.controlBar.descriptionsButton.hasClass('vjs-hidden'), 'control is not displayed');
+  equal(player.textTracks().length, 0, 'textTracks is empty');
+
+  player.dispose();
+});
+
+test('descriptions should not be displayed when last text track is removed', function() {
+  let player = TestHelpers.makePlayer({
+    tracks: [descriptionstrack]
+  });
+
+  player.removeRemoteTextTrack(player.textTracks()[0]);
+
+  ok(player.controlBar.descriptionsButton.hasClass('vjs-hidden'), 'control is not displayed');
+  equal(player.textTracks().length, 0, 'textTracks is empty');
+
+  player.dispose();
+});
+
+test('descriptions menu should contain "Off" and one track', function() {
+  let player = TestHelpers.makePlayer({
+      tracks: [descriptionstrack]
+    }),
+    menuItems;
+
+  this.clock.tick(1000);
+
+  menuItems = player.controlBar.descriptionsButton.items;
+
+  equal(menuItems.length, 2, 'descriptions menu contains two items');
+  equal(menuItems[0].track.label, 'descriptions off', 'menu contains "descriptions off"');
+  equal(menuItems[1].track.label, 'desc', 'menu contains "desc" track');
+
+  player.dispose();
+});
+
+test('enabling a captions track should disable the descriptions menu button', function() {
+  expect(14);
+
+  let player = TestHelpers.makePlayer({
+    tracks: [track, descriptionstrack]
+  });
+
+  this.clock.tick(1000);
+
+  ok(!player.controlBar.captionsButton.hasClass('vjs-hidden'), 'captions control is displayed');
+  ok(!player.controlBar.descriptionsButton.hasClass('vjs-hidden'), 'descriptions control is displayed');
+  equal(player.textTracks().length, 2, 'textTracks contains two items');
+
+  ok(!player.controlBar.captionsButton.hasClass('vjs-disabled'), 'captions control is NOT disabled');
+  ok(!player.controlBar.descriptionsButton.hasClass('vjs-disabled'), 'descriptions control is NOT disabled');
+
+  for (let i = 0; i < player.textTracks().length; i++) {
+    if (player.textTracks()[i].kind === 'descriptions') {
+      player.textTracks()[i].mode = 'showing';
+      ok(player.textTracks()[i].kind === 'descriptions' && player.textTracks()[i].mode === 'showing', 'descriptions mode set to showing');
+    }
+  }
+
+  this.clock.tick(1000);
+
+  ok(!player.controlBar.captionsButton.hasClass('vjs-disabled'), 'captions control is NOT disabled');
+  ok(!player.controlBar.descriptionsButton.hasClass('vjs-disabled'), 'descriptions control is NOT disabled');
+
+  for (let i = 0; i < player.textTracks().length; i++) {
+    if (player.textTracks()[i].kind === 'captions') {
+      player.textTracks()[i].mode = 'showing';
+      ok(player.textTracks()[i].kind === 'captions' && player.textTracks()[i].mode === 'showing', 'captions mode set to showing');
+    }
+  }
+
+  this.clock.tick(1000);
+
+  ok(!player.controlBar.captionsButton.hasClass('vjs-disabled'), 'captions control is NOT disabled');
+  ok(player.controlBar.descriptionsButton.hasClass('vjs-disabled'), 'descriptions control IS disabled');
+
+  for (let i = 0; i < player.textTracks().length; i++) {
+    if (player.textTracks()[i].kind === 'captions') {
+      player.textTracks()[i].mode = 'disabled';
+      ok(player.textTracks()[i].kind === 'captions' && player.textTracks()[i].mode === 'disabled', 'captions mode set to disabled');
+    }
+  }
+
+  this.clock.tick(1000);
+
+  ok(!player.controlBar.captionsButton.hasClass('vjs-disabled'), 'captions control is NOT disabled');
+  ok(!player.controlBar.descriptionsButton.hasClass('vjs-disabled'), 'descriptions control is NOT disabled');
+
+  player.dispose();
+});
+
 if (!browser.IS_IE8) {
   // This test doesn't work on IE8.
   // However, this test tests a specific with iOS7 where the TextTrackList doesn't report track mode changes.

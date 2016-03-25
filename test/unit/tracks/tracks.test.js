@@ -1,4 +1,5 @@
 import ChaptersButton from '../../../src/js/control-bar/text-track-controls/chapters-button.js';
+import DescriptionsButton from '../../../src/js/control-bar/text-track-controls/descriptions-button.js';
 import SubtitlesButton from '../../../src/js/control-bar/text-track-controls/subtitles-button.js';
 import CaptionsButton from '../../../src/js/control-bar/text-track-controls/captions-button.js';
 
@@ -135,9 +136,11 @@ test('update texttrack buttons on removetrack or addtrack', function() {
   let oldCaptionsUpdate;
   let oldSubsUpdate;
   let oldChaptersUpdate;
+  let oldDescriptionsUpdate;
 
   oldCaptionsUpdate = CaptionsButton.prototype.update;
   oldSubsUpdate = SubtitlesButton.prototype.update;
+  oldDescriptionsUpdate = DescriptionsButton.prototype.update;
   oldChaptersUpdate = ChaptersButton.prototype.update;
   CaptionsButton.prototype.update = function() {
     update++;
@@ -146,6 +149,10 @@ test('update texttrack buttons on removetrack or addtrack', function() {
   SubtitlesButton.prototype.update = function() {
     update++;
     oldSubsUpdate.call(this);
+  };
+  DescriptionsButton.prototype.update = function() {
+    update++;
+    oldDescriptionsUpdate.call(this);
   };
   ChaptersButton.prototype.update = function() {
     update++;
@@ -186,19 +193,19 @@ test('update texttrack buttons on removetrack or addtrack', function() {
 
   player.player_ = player;
 
-  equal(update, 3, 'update was called on the three buttons during init');
+  equal(update, 4, 'update was called on the four buttons during init');
 
   for (i = 0; i < events.removetrack.length; i++) {
     events.removetrack[i]();
   }
 
-  equal(update, 6, 'update was called on the three buttons for remove track');
+  equal(update, 8, 'update was called on the four buttons for remove track');
 
   for (i = 0; i < events.addtrack.length; i++) {
     events.addtrack[i]();
   }
 
-  equal(update, 9, 'update was called on the three buttons for remove track');
+  equal(update, 12, 'update was called on the four buttons for remove track');
 
   Tech.prototype.textTracks = oldTextTracks;
   Tech.prototype.featuresNativeTextTracks = false;

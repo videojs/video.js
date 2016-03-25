@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Video.js Text Descriptions, Chapters &amp; Captions Example</title>
+
+  <!-- Add ES5 shim and sham for IE8 -->
+  <script src="../build/temp/ie8/videojs-ie8.js"></script>
+
+  <!-- Load the source files -->
+  <link href="../build/temp/video-js.css" rel="stylesheet" type="text/css">
+  <script src="../build/temp/video.js"></script>
+
+  <!-- Set the location of the flash SWF -->
+  <script>
+    videojs.options.flash.swf = '../build/temp/video-js.swf';
+  </script>
+
+</head>
+<body>
+  <!-- NOTE: we have to disable native Text Track support for the HTML5 tech,
+             since even HTML5 video players with native Text Track support
+             don't currently support 'description' text tracks in any
+             useful way! -->
+  <video id="example_video_1" class="video-js vjs-default-skin" controls preload="none" width="640" height="360"
+      data-setup='{ "html5" : { "nativeTextTracks" : false } }'>
+    <source src="https://archive.org/download/ElephantsDream/ed_hd.mp4" type="video/mp4">
+    <source src="https://archive.org/download/ElephantsDream/ed_hd.ogv" type="video/ogv">
+
+    <track kind="captions" src="../docs/examples/elephantsdream/captions.en.vtt" srclang="en" label="English" default></track><!-- Tracks need an ending tag thanks to IE9 -->
+    <track kind="captions" src="../docs/examples/elephantsdream/captions.sv.vtt" srclang="sv" label="Swedish"></track>
+    <track kind="captions" src="../docs/examples/elephantsdream/captions.ru.vtt" srclang="ru" label="Russian"></track>
+    <track kind="captions" src="../docs/examples/elephantsdream/captions.ja.vtt" srclang="ja" label="Japanese"></track>
+    <track kind="captions" src="../docs/examples/elephantsdream/captions.ar.vtt" srclang="ar" label="Arabic"></track>
+
+    <track kind="descriptions" src="../docs/examples/elephantsdream/descriptions.en.vtt" srclang="en" label="English"></track>
+
+    <track kind="chapters" src="../docs/examples/elephantsdream/chapters.en.vtt" srclang="en" label="English"></track>
+
+    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+  </video>
+</body>
+</html>
