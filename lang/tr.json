@@ -23,7 +23,7 @@
  "The media could not be loaded, either because the server or network failed or because the format is not supported.": "Video oynatılamadı, ağ ya da sunucu hatası veya belirtilen format desteklenmiyor.",
  "The media playback was aborted due to a corruption problem or because the media used features your browser did not support.": "Tarayıcınız desteklemediği için videoda hata oluştu.",
  "No compatible source was found for this media.": "Video için kaynak bulunamadı.",
- "Play video": "Videoyu Oynat",
+ "Play Video": "Videoyu Oynat",
  "Close": "Kapat",
  "Modal Window": "Modal Penceresi",
  "This is a modal window": "Bu bir modal penceresidir",
