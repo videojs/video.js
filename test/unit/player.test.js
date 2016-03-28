@@ -972,6 +972,7 @@ test('Make sure that player\'s style el respects VIDEOJS_NO_DYNAMIC_STYLE option
   equal(styles.length, 0, 'we should not get any style elements included in the DOM');
 
   window.VIDEOJS_NO_DYNAMIC_STYLE = false;
+  tag = TestHelpers.makeTag();
   player = TestHelpers.makePlayer({}, tag);
   styles = document.querySelectorAll('style');
   equal(styles.length, 1, 'we should have one style element in the DOM');
