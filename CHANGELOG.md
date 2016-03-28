@@ -9,6 +9,7 @@ CHANGELOG
 * @ricardosiri68 changed the relative sass paths ([view](https://github.com/videojs/video.js/pull/3147))
 * @gkatsev added an option to keep the tooltips inside the player bounds ([view](https://github.com/videojs/video.js/pull/3149))
 * @defli added currentWidth and currentHeight methods to the player ([view](https://github.com/videojs/video.js/pull/3144))
+* fix IE8 tests for VIDEOJS_NO_DYNAMIC_STYLE ([view](https://github.com/videojs/video.js/pull/3215))
 
 --------------------
 
