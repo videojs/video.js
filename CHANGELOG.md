@@ -6,6 +6,7 @@ CHANGELOG
 * @mister-ben added dir=ltr to control bar and loading spinner ([view](https://github.com/videojs/video.js/pull/3221))
 * @avreg fixed notSupportedMessage saying video when meaning media ([view](https://github.com/videojs/video.js/pull/3222))
 * @mister-ben fixed missing native HTML5 tracks ([view](https://github.com/videojs/video.js/pull/3212))
+* @mister-ben updated Arabic language files ([view](https://github.com/videojs/video.js/pull/3225))
 
 --------------------
 
