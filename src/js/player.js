@@ -299,6 +299,14 @@ class Player extends Component {
     this.fluid(this.options_.fluid);
     this.aspectRatio(this.options_.aspectRatio);
 
+    // Hide any links within the video/audio tag, because IE doesn't hide them completely.
+    let links = tag.getElementsByTagName('a');
+    for (let i = 0; i < links.length; i++) {
+      let linkEl = links.item(i);
+      Dom.addElClass(linkEl, 'vjs-hidden');
+      linkEl.setAttribute('hidden', 'hidden');
+    }
+
     // insertElFirst seems to cause the networkState to flicker from 3 to 2, so
     // keep track of the original for later so we can know if the source originally failed
     tag.initNetworkState_ = tag.networkState;
