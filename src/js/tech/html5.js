@@ -257,6 +257,12 @@ class Html5 extends Tech {
   proxyNativeTextTracks_() {
     let tt = this.el().textTracks;
 
+    // Add tracks - if player is initialised after DOM loaded, textTracks
+    // will not trigger addtrack
+    for (let i = 0; i < tt.length; i++) {
+      this.textTracks().addTrack_(tt[i]);
+    }
+
     if (tt && tt.addEventListener) {
       tt.addEventListener('change', this.handleTextTrackChange_);
       tt.addEventListener('addtrack', this.handleTextTrackAdd_);
@@ -504,7 +510,7 @@ class Html5 extends Tech {
    * @return {Object}
    * @method currentSrc
    */
-  currentSrc() { 
+  currentSrc() {
     if (this.currentSource_) {
       return this.currentSource_.src;
     } else {

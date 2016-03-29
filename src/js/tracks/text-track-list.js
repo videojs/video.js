@@ -78,12 +78,16 @@ class TextTrackList extends EventTarget {
     track.addEventListener('modechange', Fn.bind(this, function() {
       this.trigger('change');
     }));
-    this.tracks_.push(track);
 
-    this.trigger({
-      track,
-      type: 'addtrack'
-    });
+    // Do not add duplicate tracks
+    if (this.tracks_.indexOf(track) === -1) {
+      this.tracks_.push(track);
+      this.trigger({
+        track,
+        type: 'addtrack'
+      });
+    }
+
   }
 
   /**
