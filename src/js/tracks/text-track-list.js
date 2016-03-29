@@ -80,7 +80,7 @@ class TextTrackList extends EventTarget {
     }));
 
     // Do not add duplicate tracks
-    if (!this.tracks_.includes(track)) {
+    if (this.tracks_.indexOf(track) === -1) {
       this.tracks_.push(track);
       this.trigger({
         track,
