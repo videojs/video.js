@@ -2788,7 +2788,7 @@ Player.prototype.options_ = {
   languages: {},
 
   // Default message to show when a video cannot be played.
-  notSupportedMessage: 'No compatible source was found for this video.'
+  notSupportedMessage: 'No compatible source was found for this media.'
 };
 
 /**
