@@ -12,6 +12,7 @@ CHANGELOG
 * fix IE8 tests for VIDEOJS_NO_DYNAMIC_STYLE ([view](https://github.com/videojs/video.js/pull/3215))
 * @OwenEdwards fixed links adding extra tab stop with IE by removing anchor tags on videojs init ([view](https://github.com/videojs/video.js/pull/3194))
 * @scaryguy updated videojs cdn urls in the README ([view](https://github.com/videojs/video.js/pull/3195))
+* @mister-ben updated the time tooltips to use the chosen font family ([view](https://github.com/videojs/video.js/pull/3213))
 
 --------------------
 
