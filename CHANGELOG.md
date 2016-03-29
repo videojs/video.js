@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @llun fixed menus from throwing when focused when empty ([view](https://github.com/videojs/video.js/pull/3218))
 
 --------------------
 
