@@ -11,6 +11,7 @@ CHANGELOG
 * @defli added currentWidth and currentHeight methods to the player ([view](https://github.com/videojs/video.js/pull/3144))
 * fix IE8 tests for VIDEOJS_NO_DYNAMIC_STYLE ([view](https://github.com/videojs/video.js/pull/3215))
 * @llun fixed menus from throwing when focused when empty ([view](https://github.com/videojs/video.js/pull/3218))
+* @mister-ben added dir=ltr to control bar and loading spinner ([view](https://github.com/videojs/video.js/pull/3221))
 
 --------------------
 
