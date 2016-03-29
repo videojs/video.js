@@ -118,13 +118,12 @@ class Menu extends Component {
    */
   focus (item = 0) {
     let children = this.children().slice();
-    let haveTitle = children[0].className &&
+    let haveTitle = children.length && children[0].className &&
       /vjs-menu-title/.test(children[0].className);
 
     if (haveTitle) {
       children.shift();
     }
-
 
     if (children.length > 0) {
       if (item < 0) {
