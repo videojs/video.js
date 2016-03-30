@@ -741,6 +741,26 @@ test('should add an audio class if an audio el is used', function() {
   ok(player.el().className.indexOf(audioClass) !== -1, 'added '+ audioClass +' css class');
 });
 
+test('should add a video player region if a video el is used', function() {
+  var video = document.createElement('video'),
+      player = TestHelpers.makePlayer({}, video),
+      role = 'region',
+      label = 'video player';
+
+  ok(player.el().getAttribute('role') === 'region', 'region role is present');
+  ok(player.el().getAttribute('aria-label') === 'video player', 'video player label present');
+});
+
+test('should add an audio player region if an audio el is used', function() {
+  var audio = document.createElement('audio'),
+      player = TestHelpers.makePlayer({}, audio),
+      role = 'region',
+      label = 'audio player';
+
+  ok(player.el().getAttribute('role') === 'region', 'region role is present');
+  ok(player.el().getAttribute('aria-label') === 'audio player', 'audio player label present');
+});
+
 test('should not be scrubbing while not seeking', function(){
   var player = TestHelpers.makePlayer();
   equal(player.scrubbing(), false, 'player is not scrubbing');
