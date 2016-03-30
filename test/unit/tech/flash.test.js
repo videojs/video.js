@@ -96,6 +96,7 @@ test('dispose removes the object element even before ready fires', function() {
   mockFlash.textTracks = () => ([]);
   mockFlash.videoTracks = () => ([]);
   mockFlash.audioTracks = () => ([]);
+  mockFlash.emptyTrackLists_ = () => ([]);
 
   dispose.call(mockFlash);
   strictEqual(mockFlash.el_, null, 'swf el is nulled');

@@ -114,10 +114,8 @@ class Html5 extends Tech {
    * @method dispose
    */
   dispose() {
-    let trackTypes = ['audio', 'video', 'text'];
-
-    // ProxyNativeTextTracks
-    trackTypes.forEach((type) => {
+    // Un-ProxyNativeTracks
+    ['audio', 'video', 'text'].forEach((type) => {
       let capitalType = type.charAt(0).toUpperCase() + type.slice(1);
       let tl = this.el_[`${type}Tracks`];
 
@@ -126,7 +124,6 @@ class Html5 extends Tech {
         tl.removeEventListener('addtrack', this[`handle${capitalType}TrackAdd_`]);
         tl.removeEventListener('removetrack', this[`handle${capitalType}TrackRemove_`]);
       }
-      // clearout the emulated audio track list.
     });
 
     Html5.disposeMediaElement(this.el_);
