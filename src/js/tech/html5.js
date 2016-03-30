@@ -120,7 +120,6 @@ class Html5 extends Tech {
     trackTypes.forEach((type) => {
       let capitalType = type.charAt(0).toUpperCase() + type.slice(1);
       let tl = this.el_[`${type}Tracks`];
-      let etl = this[`${type}Tracks`]();
 
       if (tl && tl.removeEventListener) {
         tl.removeEventListener('change', this[`handle${capitalType}TrackChange_`]);
@@ -128,14 +127,10 @@ class Html5 extends Tech {
         tl.removeEventListener('removetrack', this[`handle${capitalType}TrackRemove_`]);
       }
       // clearout the emulated audio track list.
-      let i = etl.length;
-
-      while (i--) {
-        etl.removeTrack_(etl[i]);
-      }
     });
 
     Html5.disposeMediaElement(this.el_);
+    // tech will handle clearing of the emulated track list
     super.dispose();
   }
 
