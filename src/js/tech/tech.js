@@ -45,6 +45,7 @@ class Tech extends Component {
       this.hasStarted_ = true;
     });
     this.on('loadstart', function() {
+      this.emptyTrackLists_();
       this.hasStarted_ = false;
     });
 
@@ -225,6 +226,23 @@ class Tech extends Component {
    * @method dispose
    */
   dispose() {
+
+    this.emptyTrackLists_();
+    // Turn off any manual progress or timeupdate tracking
+    if (this.manualProgress) { this.manualProgressOff(); }
+
+    if (this.manualTimeUpdates) { this.manualTimeUpdatesOff(); }
+
+    super.dispose();
+  }
+
+  /**
+   * empty all of our track lists
+   *
+   * @private
+   * @method emptyTrackLists_
+   */
+  emptyTrackLists_() {
     // clear out all tracks because we can't reuse them between techs
     ['text', 'video', 'audio'].forEach((type) => {
       let list = this[`${type}Tracks`]();
@@ -241,13 +259,6 @@ class Tech extends Component {
         }
       }
     });
-
-    // Turn off any manual progress or timeupdate tracking
-    if (this.manualProgress) { this.manualProgressOff(); }
-
-    if (this.manualTimeUpdates) { this.manualTimeUpdatesOff(); }
-
-    super.dispose();
   }
 
   /**
