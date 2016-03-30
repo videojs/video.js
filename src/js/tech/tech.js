@@ -225,15 +225,22 @@ class Tech extends Component {
    * @method dispose
    */
   dispose() {
-    // clear out text tracks because we can't reuse them between techs
-    let textTracks = this.textTracks();
-
-    if (textTracks) {
-      let i = textTracks.length;
-      while(i--) {
-        this.removeRemoteTextTrack(textTracks[i]);
+    // clear out all tracks because we can't reuse them between techs
+    ['text', 'video', 'audio'].forEach((type) => {
+      let list = this[`${type}Tracks`]();
+      if (!list) {
+        return;
       }
-    }
+      let i = list.length;
+      while (i--) {
+        let track = list[i];
+        list.removeTrack_(track);
+        // text track has its own remove function on tech
+        if (type === 'text') {
+          this.removeRemoteTextTrack(track);
+        }
+      }
+    });
 
     // Turn off any manual progress or timeupdate tracking
     if (this.manualProgress) { this.manualProgressOff(); }

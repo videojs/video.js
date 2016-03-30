@@ -7,6 +7,13 @@ import Button from '../../../src/js/button.js';
 import { createTimeRange } from '../../../src/js/utils/time-ranges.js';
 import extendFn from '../../../src/js/extend.js';
 import MediaError from '../../../src/js/media-error.js';
+import AudioTrack from '../../../src/js/tracks/audio-track';
+import VideoTrack from '../../../src/js/tracks/video-track';
+import TextTrack from '../../../src/js/tracks/text-track';
+import AudioTrackList from '../../../src/js/tracks/audio-track-list';
+import VideoTrackList from '../../../src/js/tracks/video-track-list';
+import TextTrackList from '../../../src/js/tracks/text-track-list';
+
 
 q.module('Media Tech', {
   'setup': function() {
@@ -14,20 +21,10 @@ q.module('Media Tech', {
     this.clock = sinon.useFakeTimers();
     this.featuresProgessEvents = Tech.prototype['featuresProgessEvents'];
     Tech.prototype['featuresProgressEvents'] = false;
-    Tech.prototype['featuresNativeTextTracks'] = true;
-    oldTextTracks = Tech.prototype.textTracks;
-    Tech.prototype.textTracks = function() {
-      return {
-        addEventListener: Function.prototype,
-        removeEventListener: Function.prototype
-      };
-    };
   },
   'teardown': function() {
     this.clock.restore();
     Tech.prototype['featuresProgessEvents'] = this.featuresProgessEvents;
-    Tech.prototype['featuresNativeTextTracks'] = false;
-    Tech.prototype.textTracks = oldTextTracks;
   }
 });
 
@@ -101,6 +98,66 @@ test('dispose() should stop time tracking', function() {
     return equal(e, undefined, 'threw an exception');
   }
   ok(true, 'no exception was thrown');
+});
+
+test('dispose() should clear all tracks that are passed when its created', function() {
+  var audioTracks = new AudioTrackList([new AudioTrack(), new AudioTrack()]);
+  var videoTracks = new VideoTrackList([new VideoTrack(), new VideoTrack()]);
+  var textTracks = new TextTrackList([new TextTrack({tech: {}}), new TextTrack({tech: {}})]);
+  equal(audioTracks.length, 2, 'should have two audio tracks at the start');
+  equal(videoTracks.length, 2, 'should have two video tracks at the start');
+  equal(textTracks.length, 2, 'should have two text tracks at the start');
+
+  var tech = new Tech({audioTracks, videoTracks, textTracks});
+  equal(tech.videoTracks().length, videoTracks.length, 'should hold video tracks that we passed');
+  equal(tech.audioTracks().length, audioTracks.length, 'should hold audio tracks that we passed');
+  equal(tech.textTracks().length, textTracks.length, 'should hold text tracks that we passed');
+
+  tech.dispose();
+
+  equal(audioTracks.length, 0, 'should have zero audio tracks after dispose');
+  equal(videoTracks.length, 0, 'should have zero video tracks after dispose');
+  equal(textTracks.length, 0, 'should have zero text tracks after dispose');
+
+});
+
+test('dispose() should clear all tracks that are added after creation', function() {
+  var tech = new Tech();
+
+  tech.audioTracks().addTrack_(new AudioTrack());
+  tech.audioTracks().addTrack_(new AudioTrack());
+
+  tech.videoTracks().addTrack_(new VideoTrack());
+  tech.videoTracks().addTrack_(new VideoTrack());
+
+  tech.textTracks().addTrack_(new TextTrack({tech}));
+  tech.textTracks().addTrack_(new TextTrack({tech}));
+
+  equal(tech.audioTracks().length, 2, 'should have two audio tracks at the start');
+  equal(tech.videoTracks().length, 2, 'should have two video tracks at the start');
+  equal(tech.textTracks().length, 2, 'should have two video tracks at the start');
+
+  tech.dispose();
+
+  equal(tech.audioTracks().length, 0, 'should have zero audio tracks after dispose');
+  equal(tech.videoTracks().length, 0, 'should have zero video tracks after dispose');
+  equal(tech.textTracks().length, 0, 'should have zero video tracks after dispose');
+});
+
+test('dispose() should remote text tracks', function() {
+  var tech = new Tech();
+  tech.addRemoteTextTrack({});
+  tech.addRemoteTextTrack({});
+  equal(tech.remoteTextTrackEls().length, 2, 'should have two remote text tracks els');
+  equal(tech.remoteTextTracks().length, 2, 'should have two remote text tracks');
+  equal(tech.textTracks().length, 2, 'should have two text tracks');
+
+  tech.dispose();
+
+  equal(tech.remoteTextTrackEls().length, 0, 'should have zero remote text tracks els');
+  equal(tech.remoteTextTracks().length, 0, 'should have zero remote text tracks');
+  equal(tech.textTracks().length, 0, 'should have zero text tracks');
+
 });
 
 test('should add the source handler interface to a tech', function(){
