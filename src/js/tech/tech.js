@@ -45,7 +45,6 @@ class Tech extends Component {
       this.hasStarted_ = true;
     });
     this.on('loadstart', function() {
-      this.emptyTrackLists_();
       this.hasStarted_ = false;
     });
 
@@ -227,7 +226,9 @@ class Tech extends Component {
    */
   dispose() {
 
-    this.emptyTrackLists_();
+    // clear out all tracks because we can't reuse them between techs
+    this.emptyTrackLists_(['audio', 'video', 'text']);
+
     // Turn off any manual progress or timeupdate tracking
     if (this.manualProgress) { this.manualProgressOff(); }
 
@@ -237,26 +238,26 @@ class Tech extends Component {
   }
 
   /**
-   * empty all of our track lists
+   * empty all of our video/audio track lists
    *
    * @private
    * @method emptyTrackLists_
+   * @param {Array|String} types type of tracks list to empty
    */
-  emptyTrackLists_() {
+  emptyTrackLists_(types) {
+    if (typeof types === 'string') {
+      types = [types];
+    }
     // clear out all tracks because we can't reuse them between techs
-    ['text', 'video', 'audio'].forEach((type) => {
-      let list = this[`${type}Tracks`]();
-      if (!list) {
-        return;
-      }
+    types.forEach((type) => {
+      let list = this[`${type}Tracks`]() || [];
       let i = list.length;
       while (i--) {
         let track = list[i];
-        list.removeTrack_(track);
-        // text track has its own remove function on tech
         if (type === 'text') {
           this.removeRemoteTextTrack(track);
         }
+        list.removeTrack_(track);
       }
     });
   }
@@ -805,6 +806,12 @@ Tech.withSourceHandlers = function(_Tech){
     this.disposeSourceHandler();
     this.off('dispose', this.disposeSourceHandler);
 
+    // if we have a source and get another one
+    // then we are loading something new
+    // than clear all of our current tracks
+    if (this.currentSource_) {
+      this.emptyTrackLists_(['audio', 'video']);
+    }
     this.currentSource_ = source;
     this.sourceHandler_ = sh.handleSource(source, this);
     this.on('dispose', this.disposeSourceHandler);
