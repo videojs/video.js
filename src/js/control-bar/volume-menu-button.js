@@ -108,6 +108,7 @@ class VolumeMenuButton extends PopupButton {
 
     popup.addChild(vb);
 
+    this.menuContent = popup;
     this.volumeBar = vb;
 
     this.attachVolumeBarEvents();
@@ -125,8 +126,8 @@ class VolumeMenuButton extends PopupButton {
     super.handleClick();
   }
 
-  attachVolumeBarEvents() {
-    this.on(['mousedown', 'touchdown'], this.handleMouseDown);
+  attachVolumeBarEvents() {    
+    this.menuContent.on(['mousedown', 'touchdown'], Fn.bind(this, this.handleMouseDown));
   }
 
   handleMouseDown(event) {
