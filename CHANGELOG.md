@@ -2,11 +2,14 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 5.8.8 (2016-04-04)
 * @vtytar fixed auto-setup failing if taking too long to load ([view](http://github.com/videojs/video.js/pull/3233))
 * @seescode fixed css failing on IE8 due to incorrect ie8 hack ([view](http://github.com/videojs/video.js/pull/3226))
 * @seescode fixed dragging on mute toggle changing the volume ([view](http://github.com/videojs/video.js/pull/3228))
-
---------------------
 
 ## 5.8.7 (2016-03-29)
 * @llun fixed menus from throwing when focused when empty ([view](https://github.com/videojs/video.js/pull/3218))
