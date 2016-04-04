@@ -10,15 +10,6 @@
   @include background-color-with-alpha($primary-background-color, $primary-background-transparency);
 }
 
-// IE8 is flakey with fonts, and you have to change the actual content to force
-// fonts to show/hide properly.
-// - "\9" IE8 hack didn't work for this
-// Found in XP IE8 from http://modern.ie. Does not show up in "IE8 mode" in IE9
-$ie8screen: "\\0screen";
-.vjs-user-inactive.vjs-playing .vjs-control-bar :before {
-  @media #{$ie8screen} { content: ""; }
-}
-
 // Video has started playing
 .vjs-has-started .vjs-control-bar {
   @include display-flex;
@@ -28,6 +19,9 @@ $ie8screen: "\\0screen";
   $trans: visibility 0.1s, opacity 0.1s; // Var needed because of comma
   @include transition($trans);
 }
+
+// IE 8 hack for media queries
+$ie8screen: "\\0screen";
 
 // Video has started playing AND user is inactive
 .vjs-has-started.vjs-user-inactive.vjs-playing .vjs-control-bar {
@@ -55,6 +49,15 @@ $ie8screen: "\\0screen";
 .vjs-audio.vjs-has-started.vjs-user-inactive.vjs-playing .vjs-control-bar {
   opacity: 1;
   visibility: visible;
+}
+
+
+// IE8 is flakey with fonts, and you have to change the actual content to force
+// fonts to show/hide properly.
+// - "\9" IE8 hack didn't work for this
+// Found in XP IE8 from http://modern.ie. Does not show up in "IE8 mode" in IE9
+.vjs-user-inactive.vjs-playing .vjs-control-bar :before {
+  @media #{$ie8screen} { content: ""; }
 }
 
 // IE 8 + 9 Support
