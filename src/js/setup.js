@@ -72,7 +72,10 @@ var autoSetup = function(){
 
 // Pause to let the DOM keep processing
 var autoSetupTimeout = function(wait, vjs){
-  videojs = vjs;
+  if (vjs) {
+    videojs = vjs;
+  }
+
   setTimeout(autoSetup, wait);
 };
 
