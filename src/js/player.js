@@ -182,6 +182,14 @@ class Player extends Component {
       this.addClass('vjs-controls-disabled');
     }
 
+    // Set ARIA label and region role depending on player type
+    this.el_.setAttribute('role', 'region');
+    if (this.isAudio()) {
+      this.el_.setAttribute('aria-label', 'audio player');
+    } else {
+      this.el_.setAttribute('aria-label', 'video player');
+    }
+
     if (this.isAudio()) {
       this.addClass('vjs-audio');
     }
