@@ -39,6 +39,16 @@ class Button extends ClickableComponent {
 
     if (tag !== 'button') {
       log.warn(`Creating a Button with an HTML element of ${tag} is deprecated; use ClickableComponent instead.`);
+
+      // Add properties for clickable element which is not a native HTML button
+      props = assign({
+        tabIndex: 0
+      }, props);
+
+      // Add ARIA attributes for clickable element which is not a native HTML button
+      attributes = assign({
+        role: 'button'
+      }, attributes);
     }
 
     // Add attributes for button element
