@@ -2,6 +2,11 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 5.9.0 (2016-04-05)
 * @gkatsev updated vjs to not add dynamic styles when VIDEOJS_NO_DYNAMIC_STYLE is set ([view](https://github.com/videojs/video.js/pull/3093))
 * @OwenEdwards added basic descriptions track support ([view](https://github.com/videojs/video.js/pull/3098))
 * @kamilbrenk Added lang
@@ -18,8 +23,6 @@ CHANGELOG
 * @MCGallaspy added vttjs to the self-hosting guide ([view](https://github.com/videojs/video.js/pull/3229))
 * @chrisauclair added ARIA region and label to player element ([view](https://github.com/videojs/video.js/pull/3227))
 * @andyearnshaw updated document event handlers to use el.ownerDocument ([view](https://github.com/videojs/video.js/pull/3230))
-
---------------------
 
 ## 5.8.8 (2016-04-04)
 * @vtytar fixed auto-setup failing if taking too long to load ([view](http://github.com/videojs/video.js/pull/3233))
