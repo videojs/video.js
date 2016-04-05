@@ -245,9 +245,7 @@ class Tech extends Component {
    * @param {Array|String} types type of tracks list to empty
    */
   emptyTrackLists_(types) {
-    if (typeof types === 'string') {
-      types = [types];
-    }
+    types = [].concat(types);
     // clear out all tracks because we can't reuse them between techs
     types.forEach((type) => {
       let list = this[`${type}Tracks`]() || [];
