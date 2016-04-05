@@ -3,7 +3,6 @@
  */
 import Component from '../component.js';
 import * as Dom from '../utils/dom.js';
-import document from 'global/document';
 import assign from 'object.assign';
 
 /**
@@ -68,16 +67,18 @@ class Slider extends Component {
    * @method handleMouseDown
    */
   handleMouseDown(event) {
+    let doc = this.bar.el_.ownerDocument;
+
     event.preventDefault();
     Dom.blockTextSelection();
 
     this.addClass('vjs-sliding');
     this.trigger('slideractive');
 
-    this.on(document, 'mousemove', this.handleMouseMove);
-    this.on(document, 'mouseup', this.handleMouseUp);
-    this.on(document, 'touchmove', this.handleMouseMove);
-    this.on(document, 'touchend', this.handleMouseUp);
+    this.on(doc, 'mousemove', this.handleMouseMove);
+    this.on(doc, 'mouseup', this.handleMouseUp);
+    this.on(doc, 'touchmove', this.handleMouseMove);
+    this.on(doc, 'touchend', this.handleMouseUp);
 
     this.handleMouseMove(event);
   }
@@ -95,15 +96,17 @@ class Slider extends Component {
    * @method handleMouseUp
    */
   handleMouseUp() {
+    let doc = this.bar.el_.ownerDocument;
+
     Dom.unblockTextSelection();
 
     this.removeClass('vjs-sliding');
     this.trigger('sliderinactive');
 
-    this.off(document, 'mousemove', this.handleMouseMove);
-    this.off(document, 'mouseup', this.handleMouseUp);
-    this.off(document, 'touchmove', this.handleMouseMove);
-    this.off(document, 'touchend', this.handleMouseUp);
+    this.off(doc, 'mousemove', this.handleMouseMove);
+    this.off(doc, 'mouseup', this.handleMouseUp);
+    this.off(doc, 'touchmove', this.handleMouseMove);
+    this.off(doc, 'touchend', this.handleMouseUp);
 
     this.update();
   }
@@ -166,7 +169,7 @@ class Slider extends Component {
    * @method handleFocus
    */
   handleFocus() {
-    this.on(document, 'keydown', this.handleKeyPress);
+    this.on(this.bar.el_.ownerDocument, 'keydown', this.handleKeyPress);
   }
 
   /**
@@ -191,7 +194,7 @@ class Slider extends Component {
    * @method handleBlur
    */
   handleBlur() {
-    this.off(document, 'keydown', this.handleKeyPress);
+    this.off(this.bar.el_.ownerDocument, 'keydown', this.handleKeyPress);
   }
 
   /**

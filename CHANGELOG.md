@@ -17,6 +17,7 @@ CHANGELOG
 * @forbesjo added chrome for PR tests ([view](https://github.com/videojs/video.js/pull/3235))
 * @MCGallaspy added vttjs to the self-hosting guide ([view](https://github.com/videojs/video.js/pull/3229))
 * @chrisauclair added ARIA region and label to player element ([view](https://github.com/videojs/video.js/pull/3227))
+* @andyearnshaw updated document event handlers to use el.ownerDocument ([view](https://github.com/videojs/video.js/pull/3230))
 
 --------------------
 
