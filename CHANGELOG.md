@@ -14,6 +14,7 @@ CHANGELOG
 * @scaryguy updated videojs cdn urls in the README ([view](https://github.com/videojs/video.js/pull/3195))
 * @mister-ben updated the time tooltips to use the chosen font family ([view](https://github.com/videojs/video.js/pull/3213))
 * @OwenEdwards improved handling of deprecated use of Button component ([view](https://github.com/videojs/video.js/pull/3236))
+* @forbesjo added chrome for PR tests ([view](https://github.com/videojs/video.js/pull/3235))
 
 --------------------
 
