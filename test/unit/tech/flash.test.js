@@ -86,17 +86,13 @@ test('dispose removes the object element even before ready fires', function() {
   // This test appears to test bad functionaly that was fixed
   // so it's debateable whether or not it's useful
   let dispose = Flash.prototype.dispose;
-  let mockFlash = {};
+  let mockFlash = new MockFlash();
   let noop = function(){};
 
   // Mock required functions for dispose
   mockFlash.off = noop;
   mockFlash.trigger = noop;
   mockFlash.el_ = {};
-  mockFlash.textTracks = () => ([]);
-  mockFlash.videoTracks = () => ([]);
-  mockFlash.audioTracks = () => ([]);
-  mockFlash.emptyTrackLists_ = () => ([]);
 
   dispose.call(mockFlash);
   strictEqual(mockFlash.el_, null, 'swf el is nulled');
