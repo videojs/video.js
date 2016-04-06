@@ -227,7 +227,7 @@ class Tech extends Component {
   dispose() {
 
     // clear out all tracks because we can't reuse them between techs
-    this.emptyTrackLists_(['audio', 'video', 'text']);
+    this.clearTracks(['audio', 'video', 'text']);
 
     // Turn off any manual progress or timeupdate tracking
     if (this.manualProgress) { this.manualProgressOff(); }
@@ -238,13 +238,17 @@ class Tech extends Component {
   }
 
   /**
-   * empty all of our video/audio track lists
+   * clear out a track list, or multiple track lists
    *
-   * @private
-   * @method emptyTrackLists_
-   * @param {Array|String} types type of tracks list to empty
+   * Note: Techs without source handlers should call this between
+   * sources for video & audio tracks, as usually you don't want
+   * to use them between tracks and we have no automatic way to do
+   * it for you
+   *
+   * @method clearTracks
+   * @param {Array|String} types type(s) of track lists to empty
    */
-  emptyTrackLists_(types) {
+  clearTracks(types) {
     types = [].concat(types);
     // clear out all tracks because we can't reuse them between techs
     types.forEach((type) => {
@@ -808,7 +812,7 @@ Tech.withSourceHandlers = function(_Tech){
     // then we are loading something new
     // than clear all of our current tracks
     if (this.currentSource_) {
-      this.emptyTrackLists_(['audio', 'video']);
+      this.clearTracks(['audio', 'video']);
     }
     this.currentSource_ = source;
     this.sourceHandler_ = sh.handleSource(source, this, this.options_);
