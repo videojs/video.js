@@ -397,10 +397,11 @@ Flash.nativeSourceHandler.canHandleSource = function(source){
  * Adaptive source handlers will have more complicated workflows before passing
  * video data to the video element
  *
- * @param  {Object} source    The source object
- * @param  {Flash} tech   The instance of the Flash tech
+ * @param  {Object} source   The source object
+ * @param  {Flash}  tech     The instance of the Flash tech
+ * @param  {Object} options  The options to pass to the source
  */
-Flash.nativeSourceHandler.handleSource = function(source, tech){
+Flash.nativeSourceHandler.handleSource = function(source, tech, options){
   tech.setSrc(source.src);
 };
 
