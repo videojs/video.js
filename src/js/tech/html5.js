@@ -14,6 +14,7 @@ import document from 'global/document';
 import window from 'global/window';
 import assign from 'object.assign';
 import mergeOptions from '../utils/merge-options.js';
+import TitleCase from '../utils/to-title-case.js';
 
 /**
  * HTML5 Media Controller - Wrapper for HTML5 Media API
@@ -116,7 +117,7 @@ class Html5 extends Tech {
   dispose() {
     // Un-ProxyNativeTracks
     ['audio', 'video', 'text'].forEach((type) => {
-      let capitalType = type.charAt(0).toUpperCase() + type.slice(1);
+      let capitalType = TitleCase(type);
       let tl = this.el_[`${type}Tracks`];
 
       if (tl && tl.removeEventListener) {
