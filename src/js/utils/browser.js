@@ -58,7 +58,13 @@ export const IS_NATIVE_ANDROID = IS_ANDROID && ANDROID_VERSION < 5 && appleWebki
 
 export const IS_FIREFOX = (/Firefox/i).test(USER_AGENT);
 export const IS_CHROME = (/Chrome/i).test(USER_AGENT);
-export const IS_IE8 = (/MSIE\s8\.0/).test(USER_AGENT);
+export const IS_EDGE = (/Edge\/\d/i).test(USER_AGENT);
+
+export const IS_IE8 = (/MSIE\s8\.0/i).test(USER_AGENT);
+export const IS_IE9 = (/MSIE\s9\.0/i).test(USER_AGENT);
+export const IS_IE10 = (/MSIE\s10\.0/i).test(USER_AGENT);
+export const IS_IE11 = (/Trident\/7.0/i).test(USER_AGENT) && (/rv:11.0/).test(USER_AGENT);
+
 
 export const TOUCH_ENABLED = !!(('ontouchstart' in window) || window.DocumentTouch && document instanceof window.DocumentTouch);
 export const BACKGROUND_SIZE_SUPPORTED = 'backgroundSize' in document.createElement('video').style;
