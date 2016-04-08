@@ -119,9 +119,10 @@ class PlaybackRateMenuButton extends MenuButton {
   }
 
   /**
-   * Get supported playback rates
+   * Get whether playback rates is supported by the tech
+   * and an array of playback rates exists
    *
-   * @return {Array} Supported playback rates
+   * @return {Boolean} Whether changing playback rate is supported
    * @method playbackRateSupported
    */
   playbackRateSupported() {

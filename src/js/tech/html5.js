@@ -935,9 +935,14 @@ Html5.canControlVolume = function(){
 /*
  * Check if playbackRate is supported in this browser/device.
  *
- * @return {Number} [description]
+ * @return {Boolean}
  */
 Html5.canControlPlaybackRate = function(){
+  // Playback rate API is implemented in Android Chrome, but doesn't do anything
+  // https://github.com/videojs/video.js/issues/3180
+  if (browser.IS_ANDROID && browser.IS_CHROME) {
+    return false;
+  }
   var playbackRate = Html5.TEST_VID.playbackRate;
   Html5.TEST_VID.playbackRate = (playbackRate / 2) + 0.1;
   return playbackRate !== Html5.TEST_VID.playbackRate;
