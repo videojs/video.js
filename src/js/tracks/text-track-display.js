@@ -58,6 +58,17 @@ class TextTrackDisplay extends Component {
         let track = tracks[i];
         this.player_.addRemoteTextTrack(track);
       }
+
+      let modesToShow = {'captions': 1, 'subtitles': 1, 'descriptions': 1};
+      let trackList = this.player_.textTracks();
+
+      for (let i = 0; i < trackList.length; i++) {
+        let track = trackList[i];
+        if (track.default && track.kind in modesToShow) {
+          track.mode = 'showing';
+          break;
+        }
+      }
     }));
   }
 
