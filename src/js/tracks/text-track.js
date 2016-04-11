@@ -136,6 +136,7 @@ class TextTrack extends EventTarget {
 
     let mode = TextTrackEnum.TextTrackMode[options.mode] || 'disabled';
     let kind = TextTrackEnum.TextTrackKind[options.kind] || 'subtitles';
+    let default_ = options.default;
     let label = options.label || '';
     let language = options.language || options.srclang || '';
     let id = options.id || 'vjs_text_track_' + Guid.newGUID();
@@ -186,6 +187,13 @@ class TextTrack extends EventTarget {
     Object.defineProperty(tt, 'id', {
       get() {
         return id;
+      },
+      set() {}
+    });
+
+    Object.defineProperty(tt, 'default', {
+      get() {
+        return default_;
       },
       set() {}
     });
