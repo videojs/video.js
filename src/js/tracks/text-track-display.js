@@ -62,11 +62,13 @@ class TextTrackDisplay extends Component {
       let modesToShow = {'captions': 1, 'subtitles': 1, 'descriptions': 1};
       let trackList = this.player_.textTracks();
 
-      for (let i = 0; i < trackList.length; i++) {
-        let track = trackList[i];
-        if (track.default && track.kind in modesToShow) {
-          track.mode = 'showing';
-          break;
+      if (trackList) {
+        for (let i = 0; i < trackList.length; i++) {
+          let track = trackList[i];
+          if (track.default && track.kind in modesToShow) {
+            track.mode = 'showing';
+            break;
+          }
         }
       }
     }));
