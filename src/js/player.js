@@ -2581,7 +2581,7 @@ class Player extends Component {
    */
   // destructure the input into an object with a track argument, defaulting to arguments[0]
   // default the whole argument to an empty object if nothing was passed in
-  removeRemoteTextTrack({track = arguments[0]} = {}) {
+  removeRemoteTextTrack({track = arguments[0]} = {}) { // jshint ignore:line
     this.tech_ && this.tech_['removeRemoteTextTrack'](track);
   }
 
