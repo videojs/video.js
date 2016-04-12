@@ -2579,7 +2579,9 @@ class Player extends Component {
    * @param {Object} track    Remote text track to remove
    * @method removeRemoteTextTrack
    */
-  removeRemoteTextTrack(track) {
+  // destructure the input into an object with a track argument, defaulting to arguments[0]
+  // default the whole argument to an empty object if nothing was passed in
+  removeRemoteTextTrack({track = arguments[0]} = {}) {
     this.tech_ && this.tech_['removeRemoteTextTrack'](track);
   }
 
