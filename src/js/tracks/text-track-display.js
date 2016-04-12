@@ -76,6 +76,10 @@ class TextTrackDisplay extends Component {
           }
         }
 
+        // We want to show the first default track but captions and subtitles
+        // take precedence over descriptions.
+        // So, display the first default captions or subtitles track
+        // and otherwise the first default descriptions track.
         if (firstCaptions) {
           firstCaptions.mode = 'showing';
         } else if (firstDesc) {
