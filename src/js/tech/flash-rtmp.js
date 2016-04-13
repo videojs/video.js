@@ -95,10 +95,11 @@ function FlashRtmpDecorator(Flash) {
    * Pass the source to the flash object
    * Adaptive source handlers will have more complicated workflows before passing
    * video data to the video element
-   * @param  {Object} source    The source object
-   * @param  {Flash} tech   The instance of the Flash tech
+   * @param  {Object} source   The source object
+   * @param  {Flash}  tech     The instance of the Flash tech
+   * @param  {Object} options  The options to pass to the source
    */
-  Flash.rtmpSourceHandler.handleSource = function(source, tech){
+  Flash.rtmpSourceHandler.handleSource = function(source, tech, options){
     let srcParts = Flash.streamToParts(source.src);
 
     tech['setRtmpConnection'](srcParts.connection);

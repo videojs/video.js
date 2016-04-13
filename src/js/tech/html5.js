@@ -903,10 +903,11 @@ Html5.nativeSourceHandler.canHandleSource = function(source){
  * Adaptive source handlers will have more complicated workflows before passing
  * video data to the video element
  *
- * @param  {Object} source    The source object
- * @param  {Html5} tech   The instance of the Html5 tech
+ * @param  {Object} source   The source object
+ * @param  {Html5}  tech     The instance of the Html5 tech
+ * @param  {Object} options  The options to pass to the source
  */
-Html5.nativeSourceHandler.handleSource = function(source, tech){
+Html5.nativeSourceHandler.handleSource = function(source, tech, options){
   tech.setSrc(source.src);
 };
 

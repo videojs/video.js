@@ -147,9 +147,10 @@ test('should add the source handler interface to a tech', function(){
       }
       return '';
     },
-    handleSource: function(s, t){
+    handleSource: function(s, t, o){
       strictEqual(tech, t, 'the tech instance was passed to the source handler');
       strictEqual(sourceA, s, 'the tech instance was passed to the source handler');
+      strictEqual(tech.options_, o, 'the tech options were passed to the source handler');
       return new handlerInternalState();
     }
   };
@@ -161,7 +162,7 @@ test('should add the source handler interface to a tech', function(){
     canHandleSource: function(source){
       return ''; // no support
     },
-    handleSource: function(source, tech){
+    handleSource: function(source, tech, options){
       ok(false, 'handlerTwo supports nothing and should never be called');
     }
   };
@@ -261,7 +262,7 @@ test('delegates seekable to the source handler', function(){
     canHandleSource: function() {
       return true;
     },
-    handleSource: function(source, tech) {
+    handleSource: function(source, tech, options) {
       return handler;
     }
   });

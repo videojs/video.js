@@ -714,7 +714,7 @@ Tech.withSourceHandlers = function(_Tech){
     this.off('dispose', this.disposeSourceHandler);
 
     this.currentSource_ = source;
-    this.sourceHandler_ = sh.handleSource(source, this);
+    this.sourceHandler_ = sh.handleSource(source, this, this.options_);
     this.on('dispose', this.disposeSourceHandler);
 
     return this;
