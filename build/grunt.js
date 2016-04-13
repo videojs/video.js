@@ -454,6 +454,19 @@ module.exports = function(grunt) {
           preferLocal: true
         }
       }
+    },
+    accessibility: {
+      options: {
+        accessibilityLevel: 'WCAG2AA',
+        reportLevels: {
+          notice: false,
+          warning: true,
+          error: true
+        }
+      },
+      test: {
+        src: ['sandbox/index.html']
+      }
     }
   });
 
@@ -462,6 +475,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('videojs-doc-generator');
   grunt.loadNpmTasks('chg');
   grunt.loadNpmTasks('gkatsev-grunt-sass');
+  grunt.loadNpmTasks('grunt-accessibility');
 
   const buildDependents = [
     'shell:lint',
@@ -517,6 +531,8 @@ module.exports = function(grunt) {
   grunt.registerTask('dev', ['build', 'connect:dev', 'concurrent:watchSandbox']);
 
   grunt.registerTask('watchAll', ['build', 'connect:dev', 'concurrent:watchAll']);
+
+  grunt.registerTask('test-a11y', ['build', 'accessibility']);
 
   // Pick your testing, or run both in different terminals
   grunt.registerTask('test-ui', ['browserify:tests']);
