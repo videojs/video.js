@@ -3,6 +3,7 @@ CHANGELOG
 
 ## HEAD (Unreleased)
 * @nickygerritsen Pass tech options to source handlers ([view](https://github.com/videojs/video.js/pull/3245))
+* @nickygerritsen Pass tech options to source handlers ([view](https://github.com/videojs/video.js/pull/3245))
 
 --------------------
 
