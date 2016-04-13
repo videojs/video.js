@@ -9,6 +9,8 @@ import * as Dom from '../utils/dom.js';
 import * as Url from '../utils/url.js';
 import * as Fn from '../utils/fn.js';
 import log from '../utils/log.js';
+import tsml from 'tsml';
+import TextTrack from '../../../src/js/tracks/text-track.js';
 import * as browser from '../utils/browser.js';
 import document from 'global/document';
 import window from 'global/window';
@@ -29,6 +31,7 @@ class Html5 extends Tech {
     super(options, ready);
 
     const source = options.source;
+    let crossoriginTracks = false;
 
     // Set the source if one is provided
     // 1) Check if the source is new (if not, we want to keep the original so playback isn't interrupted)
@@ -61,6 +64,11 @@ class Html5 extends Tech {
             // store HTMLTrackElement and TextTrack to remote list
             this.remoteTextTrackEls().addTrackElement_(node);
             this.remoteTextTracks().addTrack_(node.track);
+            if (!crossoriginTracks &&
+                !this.el_.hasAttribute('crossorigin') &&
+                Url.isCrossOrigin(node.src)) {
+              crossoriginTracks = true;
+            }
           }
         }
       }
@@ -71,6 +79,11 @@ class Html5 extends Tech {
     }
 
     if (this.featuresNativeTextTracks) {
+      if (crossoriginTracks) {
+        log.warn(tsml`Text Tracks are being loaded from another origin but the crossorigin attribute isn't used. 
+            This may prevent text tracks from loading.`);
+      }
+
       this.handleTextTrackChange_ = Fn.bind(this, this.handleTextTrackChange);
       this.handleTextTrackAdd_ = Fn.bind(this, this.handleTextTrackAdd);
       this.handleTextTrackRemove_ = Fn.bind(this, this.handleTextTrackRemove);
