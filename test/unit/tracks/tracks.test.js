@@ -475,3 +475,27 @@ test('should uniformly create html track element when adding text track', functi
 
   player.dispose();
 });
+
+test('removeRemoteTextTrack should be able to take both a track and the response from addRemoteTextTrack', function() {
+  let player = TestHelpers.makePlayer();
+  let track = {
+    kind: 'kind',
+    src: 'src',
+    language: 'language',
+    label: 'label',
+    default: 'default'
+  };
+  let htmlTrackElement = player.addRemoteTextTrack(track);
+
+  equal(player.remoteTextTrackEls().length, 1, 'html track element exist');
+
+  player.removeRemoteTextTrack(htmlTrackElement);
+
+  equal(player.remoteTextTrackEls().length, 0, 'the track element was removed correctly');
+
+  htmlTrackElement = player.addRemoteTextTrack(track);
+  equal(player.remoteTextTrackEls().length, 1, 'html track element exist');
+
+  player.removeRemoteTextTrack(htmlTrackElement.track);
+  equal(player.remoteTextTrackEls().length, 0, 'the track element was removed correctly');
+});
