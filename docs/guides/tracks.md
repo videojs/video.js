@@ -36,6 +36,15 @@ Subtitles from Another Domain
 -----------------------------
 Because we're pulling in the text track file via Javascript, the [same-origin policy](http://en.wikipedia.org/wiki/Same_origin_policy) applies. If you'd like to have a player served from one domain,
 but the text track served from another, you'll need to [enable CORS](http://enable-cors.org/) in order to do so.
+In addition to enabling CORS on the server serving the text tracks, you will need to add the [`crossorigin` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_settings_attributes) to the video element itself. This attribute has two values `anonymous` and `use-credentials`. Most users will want to use `anonymous` with cross-origin tracks.
+It can be added to the video element like so:
+```html
+<video class="video-js" crossorigin="anonymous">
+  <source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+  <track src="http://example.com/oceans.vtt" kind="captions" srclang="en" label="English">
+</video>
+```
+One thing to be aware of is that in this case the video files themselves will *also* needs CORS headers applied to it. Since is because some browsers apply the crossorigin attribute to the video source itself and not just the tracks and is considered a [security concern by the spec](https://html.spec.whatwg.org/multipage/embedded-content.html#security-and-privacy-considerations).
 
 Track Attributes
 ----------------
