@@ -124,3 +124,48 @@ let player = videojs('myvideo', {
   display: none;
 }
 ```
+
+## Interacting with Text Tracks
+### Showing tracks programmatically
+Some of you would want to turn captions on and off programmatically rather than just forcing the user to do so themselves. This can be easily achieved by modifying the `mode` of the text tracks.
+The `mode` can be one of three values `disabled`, `hidden`, and `showing`.
+When a text track's `mode` is `disabled`, the track does not show on screen as the video is playing.
+When the `mode` is set to `showing`, the track is visible to the viewer and updates while the video is playing.
+You can change of a particular track like so:
+```js
+let tracks = player.textTracks();
+
+for (let i = 0; i < tracks.length; i++) {
+  let track = tracks[i];
+
+  // find the captions track that's in english
+  if (track.kind === 'captions' && track.language === 'en') {
+    track.mode = 'showing';
+  }
+}
+```
+
+### Doing something when a cue becomes active
+Above, we mentioned that `mode` can also be `hidden`, what this means is that the track will update
+as the video is playing but it won't be visible to the viewer. This is most useful for `metadata` text tracks.
+One usecase for metadata text tracks is to have something happen when their cues become active, to do so, you listen to the `cuechange` event on the track. These events fire when the mode is `showing` as well.
+Here's an example:
+```js
+let tracks = player.textTracks();
+let metadataTrack;
+
+for (let i = 0; i < tracks.length; i++) {
+  let track = tracks[i];
+
+  // find the metadata track that's labeled ads
+  if (track.kind === 'captions' && track.label === 'ads') {
+    track.mode = 'hidden';
+    // store it for usage outside of the loop
+    metadataTrack = track;
+  }
+}
+
+metadataTrack.addEventListener('cuechange', function() {
+  player.ads.startLinearAdMode();
+});
+```
