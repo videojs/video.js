@@ -47,6 +47,7 @@
     "es6-shim": "^0.35.1",
     "gkatsev-grunt-sass": "^1.1.1",
     "grunt": "^0.4.4",
+    "grunt-accessibility": "^4.1.0",
     "grunt-aws-s3": "^0.12.1",
     "grunt-banner": "^0.4.0",
     "grunt-browserify": "3.5.1",
