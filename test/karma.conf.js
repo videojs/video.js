@@ -107,7 +107,7 @@ module.exports = function(config) {
         'ie8_bs'
       ];
     } else {
-      settings.browsers = ['chrome_travis', 'Firefox'];
+      settings.browsers = ['Firefox'];
     }
   }
 
@@ -116,11 +116,6 @@ module.exports = function(config) {
 
 function getCustomLaunchers(){
   return {
-    chrome_travis: {
-      base: 'Chrome',
-      flags: ['--no-sandbox']
-    },
-
     chrome_bs: {
       base: 'BrowserStack',
       browser: 'chrome',
