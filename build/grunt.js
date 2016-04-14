@@ -451,7 +451,12 @@ module.exports = function(grunt) {
           notice: false,
           warning: true,
           error: true
-        }
+        },
+        ignore: [
+          // Ignore the warning about needing <optgroup> elements
+          'WCAG2AA.Principle1.Guideline1_3.1_3_1.H85.2'
+        ]
+
       },
       test: {
         src: ['sandbox/index.html']
