@@ -23,13 +23,14 @@ const parseCues = function(srcContent, track) {
   let parser = new window.WebVTT.Parser(window,
                                         window.vttjs,
                                         window.WebVTT.StringDecoder());
+  let errors = [];
 
   parser.oncue = function(cue) {
     track.addCue(cue);
   };
 
   parser.onparsingerror = function(error) {
-    log.error(error);
+    errors.push(error);
   };
 
   parser.onflush = function() {
@@ -40,6 +41,16 @@ const parseCues = function(srcContent, track) {
   };
 
   parser.parse(srcContent);
+  if (errors.length > 0) {
+    if (console.groupCollapsed) {
+      console.groupCollapsed(`Text Track parsing errors for ${track.src}`);
+    }
+    errors.forEach((error) => log.error(error));
+    if (console.groupEnd) {
+      console.groupEnd();
+    }
+  }
+
   parser.flush();
 };
 
