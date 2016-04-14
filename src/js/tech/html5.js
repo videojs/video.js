@@ -75,7 +75,7 @@ class Html5 extends Tech {
 
     // ProxyNativeTextTracks
     trackTypes.forEach((type) => {
-      let capitalType = type.charAt(0).toUpperCase() + type.slice(1);
+      let capitalType = toTitleCase(type);
 
       if (!this[`featuresNative${capitalType}Tracks`]) {
         return;
