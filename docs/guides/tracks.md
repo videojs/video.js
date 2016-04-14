@@ -5,7 +5,7 @@ Text Tracks are a function of HTML5 video for providing time triggered text to t
 - **Subtitles**: Translations of the dialogue in the video for when audio is available but not understood. Subtitles are shown over the video.
 - **Captions**: Transcription of the dialogue, sound effects, musical cues, and other audio information for when the viewer is deaf/hard of hearing, or the video is muted. Captions are also shown over the video.
 - **Chapters**: Chapter titles that are used to create navigation within the video. Typically they're in the form of a list of chapters that the viewer can click on to go to a specific chapter.
-- **Descriptions**: Text descriptions of what's happening in the video for when the video portion isn't available, because the viewer is blind, not using a screen, or driving and about to crash because they're trying to enjoy a video while driving. Descriptions are read by a screen reader or turned into a separate audio track. Captions and Subtitles take precedence of Descriptions when they are selected.
+- **Descriptions**: Text descriptions of what's happening in the video for when the video portion isn't available, because the viewer is blind, not using a screen, or driving and about to crash because they're trying to enjoy a video while driving. Descriptions are read by a screen reader or turned into a separate audio track. Captions or Subtitles take precedence over Descriptions when they are selected.
 - **Metadata**: Tracks that have data meant for javascript to parse and do something with. These aren't shown to the user.
 
 ## Creating the Text File
@@ -42,7 +42,7 @@ It can be added to the video element like so:
   <track src="http://example.com/oceans.vtt" kind="captions" srclang="en" label="English">
 </video>
 ```
-One thing to be aware of is that in this case the video files themselves will *also* needs CORS headers applied to it. Since is because some browsers apply the crossorigin attribute to the video source itself and not just the tracks and is considered a [security concern by the spec](https://html.spec.whatwg.org/multipage/embedded-content.html#security-and-privacy-considerations).
+One thing to be aware of is that in this case the video files themselves will *also* needs CORS headers applied to it. This is because some browsers apply the crossorigin attribute to the video source itself and not just the tracks and is considered a [security concern by the spec](https://html.spec.whatwg.org/multipage/embedded-content.html#security-and-privacy-considerations).
 
 ## Track Attributes
 Additional settings for track tags.
@@ -70,7 +70,7 @@ It return a TextTrackList which lists all the tracks on the player.
 This is a helper method to get a list of all the tracks that were created from `track` elements or that were added to the player by the `addRemoteTextTrack` method. All these tracks are removeable from the player, where-as not all tracks from `player.textTracks()` are necessarily removeable.
 
 ### `player.remoteTextTrackEls() -> HTMLTrackElementList`
-Another helper method, this is a list of all the `track` elements associates with the player. Both emulated or otherwise.
+Another helper method, this is a list of all the `track` elements associated with the player. Both emulated or otherwise.
 
 ### `player.addTextTrack(String kind, [String label [, String language]]) -> TextTrack`
 This is based on the [w3c spec API](http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-addtexttrack) and when given a kind and an optional label and language, will create a new text track for you to use.
