@@ -231,7 +231,6 @@ class TextTrack extends EventTarget {
         let ct = this.tech_.currentTime();
         let active = [];
         let activeCue = false;
-        let Cue = window.WebKitDataCue || window.VTTCue;
 
         for (let i = 0, l = this.cues.length; i < l; i++) {
           let cue = this.cues[i];
@@ -250,15 +249,15 @@ class TextTrack extends EventTarget {
           if (activeCue) {
             if (cueIndex === -1) {
               changed = true;
-              if(cue instanceof EventTarget) { // jshint ignore: line
-                cue.dispatchEvent(new Event('enter')); // jshint ignore: line
+              if(cue instanceof EventTarget) {
+                cue.dispatchEvent(new window.Event('enter'));
               }
             }
           }else{
             if (cueIndex !== -1) {
               changed = true;
-              if(cue instanceof Cue) {
-                cue.dispatchEvent(new Event('exit')); // jshint ignore: line
+              if(cue instanceof EventTarget) {
+                cue.dispatchEvent(new window.Event('exit'));
               }
             }
           }

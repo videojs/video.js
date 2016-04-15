@@ -8,6 +8,7 @@ import TextTrackDisplay from '../../../src/js/tracks/text-track-display.js';
 import Html5 from '../../../src/js/tech/html5.js';
 import Tech from '../../../src/js/tech/tech.js';
 import Component from '../../../src/js/component.js';
+import EventTarget from '../../../src/js/event-target.js';
 
 import * as browser from '../../../src/js/utils/browser.js';
 import TestHelpers from '../test-helpers.js';
@@ -415,7 +416,29 @@ test('removes cuechange event when text track is hidden for emulated tracks', fu
     'texttrackchange should be not be called since mode is hidden');
 });
 
-/*test('should trigger enter event when a cue becomes active', function() {
+test('should trigger enter & exit events when a cue becomes active or inactive', function() {
+  class CueMock extends EventTarget {
+    constructor(start, end, text) {
+      super();
+      let cue = this;
+
+      this.startTime = start;
+      this.endTime = end;
+      this.text = text;
+
+      this.addEventListener('enter', function(event){
+        if(cue.onenter){
+          cue.onenter.call(cue);
+        }
+      });
+
+      this.addEventListener('exit', function(event){
+        if(cue.onexit) {
+          cue.onexit.call(cue);
+        }
+      });
+    }
+  }
   let player = TestHelpers.makePlayer();
   let tt = new TextTrack({
     tech: player.tech_,
@@ -423,30 +446,46 @@ test('removes cuechange event when text track is hidden for emulated tracks', fu
     kind: 'metadata'
   });
   let numEnterEvents = 0;
+  let numExitEvents = 0;
   let enterHandler;
-
+  let exitHandler;
+  let currentTime = 0;
+  player.tech_.currentTime = function() {
+    return currentTime;
+  };
   enterHandler = function() {
     numEnterEvents++;
   };
+  exitHandler = function() {
+    numExitEvents++;
+  };
 
-  let cue = new VTTCue(2, 5, 'metadata cue'); // jshint ignore: line
+  let cue = new CueMock(2, 5, 'metadata cue');
   tt.addCue(cue);
 
   cue.onenter = enterHandler;
+  cue.onexit = exitHandler;
   cue.addEventListener('enter', enterHandler);
+  cue.addEventListener('exit', exitHandler);
 
-  player.tech_.currentTime = function() {
-    return 2;
-  };
+  // player.tech_.currentTime = function() {
+  //   return 2;
+  // };
+  currentTime = 2;
   player.tech_.trigger('timeupdate');
   equal(numEnterEvents, 2, 'enter event should be called once');
 
-  player.tech_.currentTime = function() {
-    return 3;
-  };
+  // player.tech_.currentTime = function() {
+  //   return 3;
+  // };
+  currentTime = 3;
   player.tech_.trigger('timeupdate');
   equal(numEnterEvents, 2, 'enter event should not be called twice for the same cue');
-});*/
+
+  currentTime = 6;
+  player.tech_.trigger('timeupdate');
+  equal(numExitEvents, 2, 'enter event should not be called twice for the same cue');
+});
 
 test('should return correct remote text track values', function() {
   let fixture = document.getElementById('qunit-fixture');
