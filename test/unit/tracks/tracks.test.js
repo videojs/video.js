@@ -273,20 +273,15 @@ test('html5 tech supports native text tracks if the video supports it, unless mo
   Html5.TEST_VID = oldTestVid;
 });
 
-test('html5 tech supports native text tracks if the video supports it, unless it is firefox', function() {
+test('html5 tech supports native text tracks if the video supports it', function() {
   let oldTestVid = Html5.TEST_VID;
-  let oldIsFirefox = browser.IS_FIREFOX;
-
   Html5.TEST_VID = {
     textTracks: []
   };
 
-  browser.IS_FIREFOX = true;
-
   ok(!Html5.supportsNativeTextTracks(), 'if textTracks are available on video element, native text tracks are supported');
 
   Html5.TEST_VID = oldTestVid;
-  browser.IS_FIREFOX = oldIsFirefox;
 });
 
 test('when switching techs, we should not get a new text track', function() {
