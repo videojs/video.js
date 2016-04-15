@@ -415,6 +415,39 @@ test('removes cuechange event when text track is hidden for emulated tracks', fu
     'texttrackchange should be not be called since mode is hidden');
 });
 
+/*test('should trigger enter event when a cue becomes active', function() {
+  let player = TestHelpers.makePlayer();
+  let tt = new TextTrack({
+    tech: player.tech_,
+    mode: 'hidden',
+    kind: 'metadata'
+  });
+  let numEnterEvents = 0;
+  let enterHandler;
+
+  enterHandler = function() {
+    numEnterEvents++;
+  };
+
+  let cue = new VTTCue(2, 5, 'metadata cue'); // jshint ignore: line
+  tt.addCue(cue);
+
+  cue.onenter = enterHandler;
+  cue.addEventListener('enter', enterHandler);
+
+  player.tech_.currentTime = function() {
+    return 2;
+  };
+  player.tech_.trigger('timeupdate');
+  equal(numEnterEvents, 2, 'enter event should be called once');
+
+  player.tech_.currentTime = function() {
+    return 3;
+  };
+  player.tech_.trigger('timeupdate');
+  equal(numEnterEvents, 2, 'enter event should not be called twice for the same cue');
+});*/
+
 test('should return correct remote text track values', function() {
   let fixture = document.getElementById('qunit-fixture');
   let html = `

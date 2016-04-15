@@ -230,29 +230,39 @@ class TextTrack extends EventTarget {
 
         let ct = this.tech_.currentTime();
         let active = [];
+        let activeCue = false;
+        let Cue = window.WebKitDataCue || window.VTTCue;
 
         for (let i = 0, l = this.cues.length; i < l; i++) {
           let cue = this.cues[i];
-
           if (cue.startTime <= ct && cue.endTime >= ct) {
             active.push(cue);
+            activeCue = true;
           } else if (cue.startTime === cue.endTime &&
                      cue.startTime <= ct &&
                      cue.startTime + 0.5 >= ct) {
             active.push(cue);
+            activeCue = true;
           }
-        }
 
-        changed = false;
-
-        if (active.length !== this.activeCues_.length) {
-          changed = true;
-        } else {
-          for (let i = 0; i < active.length; i++) {
-            if (this.activeCues_.indexOf(active[i]) === -1) {
+          changed = false;
+          let cueIndex = this.activeCues_.indexOf(cue);
+          if (activeCue) {
+            if (cueIndex === -1) {
               changed = true;
+              if(cue instanceof EventTarget) { // jshint ignore: line
+                cue.dispatchEvent(new Event('enter')); // jshint ignore: line
+              }
+            }
+          }else{
+            if (cueIndex !== -1) {
+              changed = true;
+              if(cue instanceof Cue) {
+                cue.dispatchEvent(new Event('exit')); // jshint ignore: line
+              }
             }
           }
+          activeCue = false;
         }
 
         this.activeCues_ = active;
