@@ -306,12 +306,13 @@ if (Html5.supportsNativeTextTracks()) {
     let done = assert.async();
 
     let el = document.createElement('video');
+    fixture.appendChild(el);
     let html = new Html5({el});
     let tt = el.textTracks;
     let emulatedTt = html.textTracks();
     let track = document.createElement('track');
-
-    el.appendChild(track);
+    track.src = '../docs/examples/elephantsdream/captions.en.vtt';
+    track.kind = 'captions';
 
     let addtrack = function() {
       equal(emulatedTt.length, tt.length, 'we have matching tracks length');
@@ -319,6 +320,7 @@ if (Html5.supportsNativeTextTracks()) {
 
       emulatedTt.off('addtrack', addtrack);
       el.removeChild(track);
+
     };
 
     emulatedTt.on('addtrack', addtrack);
@@ -327,18 +329,21 @@ if (Html5.supportsNativeTextTracks()) {
       equal(emulatedTt.length, 0, 'we have no more text tracks');
       done();
     });
+
+    el.appendChild(track);
   });
 
   test('should have removed tracks on dispose', function(assert) {
     let done = assert.async();
 
     let el = document.createElement('video');
+    fixture.appendChild(el);
     let html = new Html5({el});
     let tt = el.textTracks;
     let emulatedTt = html.textTracks();
     let track = document.createElement('track');
-
-    el.appendChild(track);
+    track.src = '../docs/examples/elephantsdream/captions.en.vtt';
+    track.kind = 'captions';
 
     let addtrack = function() {
       equal(emulatedTt.length, tt.length, 'we have matching tracks length');
@@ -354,6 +359,8 @@ if (Html5.supportsNativeTextTracks()) {
     };
 
     emulatedTt.on('addtrack', addtrack);
+
+    el.appendChild(track);
   });
 }
 
