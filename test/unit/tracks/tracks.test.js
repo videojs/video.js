@@ -12,6 +12,7 @@ import Component from '../../../src/js/component.js';
 import * as browser from '../../../src/js/utils/browser.js';
 import TestHelpers from '../test-helpers.js';
 import document from 'global/document';
+import window from 'global/window';
 
 q.module('Tracks', {
   setup() {
