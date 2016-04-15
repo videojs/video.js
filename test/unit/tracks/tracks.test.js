@@ -301,7 +301,7 @@ if (Html5.supportsNativeTextTracks()) {
     let done = assert.async();
 
     let el = document.createElement('video');
-    fixture.appendChild(el);
+    window.fixture.appendChild(el);
     let html = new Html5({el});
     let tt = el.textTracks;
     let emulatedTt = html.textTracks();
@@ -332,7 +332,7 @@ if (Html5.supportsNativeTextTracks()) {
     let done = assert.async();
 
     let el = document.createElement('video');
-    fixture.appendChild(el);
+    window.fixture.appendChild(el);
     let html = new Html5({el});
     let tt = el.textTracks;
     let emulatedTt = html.textTracks();
