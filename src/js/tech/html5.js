@@ -77,7 +77,7 @@ class Html5 extends Tech {
       this.proxyNativeTextTracks_();
 
       if (browser.IS_FIREFOX) {
-        let tracks = options.playerOptions['tracks'] || [];
+        let tracks = (options.playerOptions || {})['tracks'] || [];
         for (let i = 0; i < tracks.length; i++) {
           let track = tracks[i];
           this.addRemoteTextTrack(track);
