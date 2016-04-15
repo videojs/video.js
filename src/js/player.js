@@ -551,6 +551,7 @@ class Player extends Component {
 
     // Grab tech-specific options from player options and add source and parent element to use.
     var techOptions = assign({
+      'playerOptions': this.options_,
       'nativeControlsForTouch': this.options_.nativeControlsForTouch,
       'source': source,
       'playerId': this.id(),
