@@ -529,3 +529,27 @@ test('default captions take precedence over default descriptions', function() {
   equal(tracks[1].kind, 'captions', 'the captions track is second');
   equal(tracks[1].mode, 'showing', 'the captions track is showing');
 });
+
+test('removeRemoteTextTrack should be able to take both a track and the response from addRemoteTextTrack', function() {
+  let player = TestHelpers.makePlayer();
+  let track = {
+    kind: 'kind',
+    src: 'src',
+    language: 'language',
+    label: 'label',
+    default: 'default'
+  };
+  let htmlTrackElement = player.addRemoteTextTrack(track);
+
+  equal(player.remoteTextTrackEls().length, 1, 'html track element exist');
+
+  player.removeRemoteTextTrack(htmlTrackElement);
+
+  equal(player.remoteTextTrackEls().length, 0, 'the track element was removed correctly');
+
+  htmlTrackElement = player.addRemoteTextTrack(track);
+  equal(player.remoteTextTrackEls().length, 1, 'html track element exist');
+
+  player.removeRemoteTextTrack(htmlTrackElement.track);
+  equal(player.remoteTextTrackEls().length, 0, 'the track element was removed correctly');
+});

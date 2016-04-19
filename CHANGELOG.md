@@ -5,6 +5,7 @@ CHANGELOG
 * @benjipott updated IS_CHROME to not be true on MS Edge ([view](https://github.com/videojs/video.js/pull/3232))
 * @mister-ben blacklisted Chrome for Android for playback rate support ([view](https://github.com/videojs/video.js/pull/3246))
 * @gkatsev made the first emulated text track enabled by default ([view](https://github.com/videojs/video.js/pull/3248))
+* @gkatsev fixed removeRemoteTextTracks not working with return value from addRemoteTextTracks ([view](https://github.com/videojs/video.js/pull/3253))
 
 --------------------
 
