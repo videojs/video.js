@@ -8,6 +8,14 @@ CHANGELOG
 
 --------------------
 
+## 5.9.1 (2016-04-19)
+* @benjipott updated IS_CHROME to not be true on MS Edge ([view](https://github.com/videojs/video.js/pull/3232))
+* @mister-ben blacklisted Chrome for Android for playback rate support ([view](https://github.com/videojs/video.js/pull/3246))
+* @gkatsev made the first emulated text track enabled by default ([view](https://github.com/videojs/video.js/pull/3248))
+* @gkatsev fixed removeRemoteTextTracks not working with return value from addRemoteTextTracks ([view](https://github.com/videojs/video.js/pull/3253))
+* @forbesjo added back the background color to the poster ([view](https://github.com/videojs/video.js/pull/3267))
+* @gkatsev fixed text track tests for older IEs ([view](https://github.com/videojs/video.js/pull/3269))
+
 ## 5.9.0 (2016-04-05)
 * @gkatsev updated vjs to not add dynamic styles when VIDEOJS_NO_DYNAMIC_STYLE is set ([view](https://github.com/videojs/video.js/pull/3093))
 * @OwenEdwards added basic descriptions track support ([view](https://github.com/videojs/video.js/pull/3098))
