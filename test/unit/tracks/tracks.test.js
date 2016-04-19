@@ -480,7 +480,7 @@ test('default text tracks should show by default', function() {
   let tag = TestHelpers.makeTag();
   let capt = document.createElement('track');
 
-  capt.kind = 'captions';
+  capt.setAttribute('kind', 'captions');
   capt.setAttribute('default', 'default');
 
   tag.appendChild(capt);
@@ -505,9 +505,9 @@ test('default captions take precedence over default descriptions', function() {
   let desc = document.createElement('track');
   let capt = document.createElement('track');
 
-  desc.kind = 'descriptions';
+  desc.setAttribute('kind', 'descriptions');
   desc.setAttribute('default', 'default');
-  capt.kind = 'captions';
+  capt.setAttribute('kind', 'captions');
   capt.setAttribute('default', 'default');
 
   tag.appendChild(desc);

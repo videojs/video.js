@@ -87,29 +87,29 @@ test('should get tag, source, and track settings', function(){
   var tag = document.getElementById('example_1');
   var player = TestHelpers.makePlayer({}, tag);
 
-  ok(player.options_['autoplay'] === true);
-  ok(player.options_['preload'] === 'none'); // No extern. Use string.
-  ok(player.options_['id'] === 'example_1');
-  ok(player.options_['sources'].length === 2);
-  ok(player.options_['sources'][0].src === 'http://google.com');
-  ok(player.options_['sources'][0].type === 'video/mp4');
-  ok(player.options_['sources'][1].type === 'video/webm');
-  ok(player.options_['tracks'].length === 1);
-  ok(player.options_['tracks'][0]['kind'] === 'captions'); // No extern
-  ok(player.options_['tracks'][0]['attrtest'] === '');
+  equal(player.options_.autoplay, true, 'autoplay is set to true');
+  equal(player.options_.preload, 'none', 'preload is set to none');
+  equal(player.options_.id, 'example_1', 'id is set to example_1');
+  equal(player.options_.sources.length, 2, 'we have two sources');
+  equal(player.options_.sources[0].src, 'http://google.com', 'first source is google.com');
+  equal(player.options_.sources[0].type, 'video/mp4', 'first time is video/mp4');
+  equal(player.options_.sources[1].type, 'video/webm', 'second type is video/webm');
+  equal(player.options_.tracks.length, 1, 'we have one text track');
+  equal(player.options_.tracks[0].kind, 'captions', 'the text track is a captions file');
+  equal(player.options_.tracks[0].attrtest, '', 'we have an empty attribute called attrtest');
 
-  ok(player.el().className.indexOf('video-js') !== -1, 'transferred class from tag to player div');
-  ok(player.el().id === 'example_1', 'transferred id from tag to player div');
+  notEqual(player.el().className.indexOf('video-js'), -1, 'transferred class from tag to player div');
+  equal(player.el().id,'example_1', 'transferred id from tag to player div');
 
-  ok(Player.players[player.id()] === player, 'player referenceable from global list');
-  ok(tag.id !== player.id, 'tag ID no longer is the same as player ID');
-  ok(tag.className !== player.el().className, 'tag classname updated');
+  equal(Player.players[player.id()], player, 'player referenceable from global list');
+  notEqual(tag.id, player.id, 'tag ID no longer is the same as player ID');
+  notEqual(tag.className, player.el().className, 'tag classname updated');
 
   player.dispose();
 
-  ok(tag['player'] !== player, 'tag player ref killed');
+  notEqual(tag['player'], player, 'tag player ref killed');
   ok(!Player.players['example_1'], 'global player ref killed');
-  ok(player.el() === null, 'player el killed');
+  equal(player.el(), null, 'player el killed');
 });
 
 test('should asynchronously fire error events during source selection', function() {

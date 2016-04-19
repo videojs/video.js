@@ -7,6 +7,7 @@ CHANGELOG
 * @gkatsev made the first emulated text track enabled by default ([view](https://github.com/videojs/video.js/pull/3248))
 * @gkatsev fixed removeRemoteTextTracks not working with return value from addRemoteTextTracks ([view](https://github.com/videojs/video.js/pull/3253))
 * @forbesjo added back the background color to the poster ([view](https://github.com/videojs/video.js/pull/3267))
+* @gkatsev fixed text track tests for older IEs ([view](https://github.com/videojs/video.js/pull/3269))
 
 --------------------
 
