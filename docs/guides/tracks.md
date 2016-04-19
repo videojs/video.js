@@ -5,7 +5,7 @@ Text Tracks are a function of HTML5 video for providing time triggered text to t
 - **Subtitles**: Translations of the dialogue in the video for when audio is available but not understood. Subtitles are shown over the video.
 - **Captions**: Transcription of the dialogue, sound effects, musical cues, and other audio information for when the viewer is deaf/hard of hearing, or the video is muted. Captions are also shown over the video.
 - **Chapters**: Chapter titles that are used to create navigation within the video. Typically they're in the form of a list of chapters that the viewer can click on to go to a specific chapter.
-- **Descriptions**: Text descriptions of what's happening in the video for when the video portion isn't available, because the viewer is blind, not using a screen, or driving and about to crash because they're trying to enjoy a video while driving. Descriptions are read by a screen reader or turned into a separate audio track. Captions or Subtitles take precedence over Descriptions when they are selected.
+- **Descriptions**: Text descriptions of what's happening in the video for when the video portion isn't available, because the viewer is blind, not using a screen, or driving and about to crash because they're trying to enjoy a video while driving. Descriptions are read by a screen reader or turned into a separate audio track.
 - **Metadata**: Tracks that have data meant for javascript to parse and do something with. These aren't shown to the user.
 
 ## Creating the Text File
@@ -138,7 +138,18 @@ let player = videojs('myvideo', {
 }
 ```
 
-
+## Text Track Precedence
+In general, the Descriptions tracks is of lower precedence than captions and subtitles.
+What this means for you?
+* If you are using the `default` attribute, videojs will choose the first track that is marked as `default` and turn it on. If There are multiple tracks marked `default`, it will try and turn on the first `captions` or `subtitles` track *before* any `descriptions` tracks.
+  * This only applied to the emulated captions support, native text tracks behavior will change depending on the browser
+* If you select a given track from the menu, videojs will turn off all the other tracks of the same kind. This may seem like you can have both subtitles and captions turned on at the same time but unfortuantely, at this time we only support one track being displayed at a time.
+  * This means that for emulated text tracks, we'll choose the first captions or subtitles track that is enabled to display.
+  * When native text tracks are supported, we will still disable the other tracks of the same kind but it is possible that multiple text tracks are shown.
+  * If a `descriptions` track is selected and subsequently a `subtitles` or `captions` track is selected, the `descriptions` track is disabled and its menu button is also disabled.
+* When enabling a track programmatically, there's not much checking that videojs does.
+  * For emulated text tracks, when it's time to display the captions, video.js would choose the first track that's showing, again choosing `subtitles` or `captions` over `descriptions`, if necessary.
+  * For native text tracks, this behavior depends on the browser. Some browsers will let you have multiple text tracks but others will disable all other tracks when a new one is selected.
 
 ## API
 
