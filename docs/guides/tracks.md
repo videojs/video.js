@@ -60,71 +60,6 @@ NOTE: For chapters, default is required if you want the chapters menu to show.
 ### srclang
 The two-letter code (valid BCP 47 language tag) for the language of the text track, for example "en" for English. A list of language codes is [available here](languages.md#language-codes).
 
-## API
-
-### `player.textTracks() -> TextTrackList`
-This is the main interface into the text tracks of the player.
-It return a TextTrackList which lists all the tracks on the player.
-
-### `player.remoteTextTracks() -> TextTrackList`
-This is a helper method to get a list of all the tracks that were created from `track` elements or that were added to the player by the `addRemoteTextTrack` method. All these tracks are removeable from the player, where-as not all tracks from `player.textTracks()` are necessarily removeable.
-
-### `player.remoteTextTrackEls() -> HTMLTrackElementList`
-Another helper method, this is a list of all the `track` elements associated with the player. Both emulated or otherwise.
-
-### `player.addTextTrack(String kind, [String label [, String language]]) -> TextTrack`
-This is based on the [w3c spec API](http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-addtexttrack) and when given a kind and an optional label and language, will create a new text track for you to use.
-This method is intended for purely programmatic usage of tracks and has one important limitation:
-tracks created using this method *cannot* be removed. The native `addTextTrack` does not have a corresponding `removeTextTrack`, so, we actually discourage the usage of this method.
-
-### `player.addRemoteTextTrack(Object options) -> HTMLTrackElement`
-This function takes an options object that looks pretty similar to the track element and returns a HTMLTrackElement.
-This object has a `track` property on it which is the actual TextTrack object.
-This `TextTrack` object is equivalent to the one that can be returned from `player.addTextTrack` with the added bonus that it can be removed from the player.
-Internally, video.js will either add a `<track>` element for you, or emulate that depending on whether native text tracks are supported or not.
-The options available are:
-* `kind`
-* `label`
-* `language` (also `srclang`)
-* `id`
-* `src`
-
-### `player.removeRemoteTextTrack(HTMLTrackElement|TextTrack)`
-This function takes either an HTMLTrackElement or a TextTrack object and removes it from the player.
-
-## Emulated Text Tracks
-By default, video.js will try and use native text tracks if possible and fall back to emulated text tracks if the native functionality is broken or incomplete or non-existent.
-The Flash tech will always use the emulated text track functionality.
-The video.js API and TextTrack objects were modeled after the w3c's specification.
-video.js uses [Mozilla's vtt.js](https://github.com/mozilla/vtt.js) library to parse and display its emulated text tracks.
-
-If you wanted to disable native text track functionality and force video.js to use emulated text tracks always, you can supply the `nativeTextTrack` option to the tech like so:
-```js
-let player = videojs('myvideo', {
-  html5: {
-    nativeTextTrack: false
-  }
-});
-```
-
-### Text Track Settings
-When using emulated Text Tracks, captions will have an additional item in the menu called "caption settings".
-This allows the viewer of the player to change some styles of how the captions are displayed on screen.
-
-If you don't want that, you can disable it by turning off the text track settings component and hiding the menu item like so:
-```js
-let player = videojs('myvideo', {
-  // make the text track settings dialog not initialize
-  textTrackSettings: false
-});
-```
-```css
-/* hide the captions settings item from the captions menu */
-.vjs-texttrack-settings {
-  display: none;
-}
-```
-
 ## Interacting with Text Tracks
 ### Showing tracks programmatically
 Some of you would want to turn captions on and off programmatically rather than just forcing the user to do so themselves. This can be easily achieved by modifying the `mode` of the text tracks.
@@ -169,3 +104,70 @@ metadataTrack.addEventListener('cuechange', function() {
   player.ads.startLinearAdMode();
 });
 ```
+
+## Emulated Text Tracks
+By default, video.js will try and use native text tracks if possible and fall back to emulated text tracks if the native functionality is broken or incomplete or non-existent.
+The Flash tech will always use the emulated text track functionality.
+The video.js API and TextTrack objects were modeled after the w3c's specification.
+video.js uses [Mozilla's vtt.js](https://github.com/mozilla/vtt.js) library to parse and display its emulated text tracks.
+
+If you wanted to disable native text track functionality and force video.js to use emulated text tracks always, you can supply the `nativeTextTrack` option to the tech like so:
+```js
+let player = videojs('myvideo', {
+  html5: {
+    nativeTextTrack: false
+  }
+});
+```
+
+### Text Track Settings
+When using emulated Text Tracks, captions will have an additional item in the menu called "caption settings".
+This allows the viewer of the player to change some styles of how the captions are displayed on screen.
+
+If you don't want that, you can disable it by turning off the text track settings component and hiding the menu item like so:
+```js
+let player = videojs('myvideo', {
+  // make the text track settings dialog not initialize
+  textTrackSettings: false
+});
+```
+```css
+/* hide the captions settings item from the captions menu */
+.vjs-texttrack-settings {
+  display: none;
+}
+```
+
+
+
+## API
+
+### `player.textTracks() -> TextTrackList`
+This is the main interface into the text tracks of the player.
+It return a TextTrackList which lists all the tracks on the player.
+
+### `player.remoteTextTracks() -> TextTrackList`
+This is a helper method to get a list of all the tracks that were created from `track` elements or that were added to the player by the `addRemoteTextTrack` method. All these tracks are removeable from the player, where-as not all tracks from `player.textTracks()` are necessarily removeable.
+
+### `player.remoteTextTrackEls() -> HTMLTrackElementList`
+Another helper method, this is a list of all the `track` elements associated with the player. Both emulated or otherwise.
+
+### `player.addTextTrack(String kind, [String label [, String language]]) -> TextTrack`
+This is based on the [w3c spec API](http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-addtexttrack) and when given a kind and an optional label and language, will create a new text track for you to use.
+This method is intended for purely programmatic usage of tracks and has one important limitation:
+tracks created using this method *cannot* be removed. The native `addTextTrack` does not have a corresponding `removeTextTrack`, so, we actually discourage the usage of this method.
+
+### `player.addRemoteTextTrack(Object options) -> HTMLTrackElement`
+This function takes an options object that looks pretty similar to the track element and returns a HTMLTrackElement.
+This object has a `track` property on it which is the actual TextTrack object.
+This `TextTrack` object is equivalent to the one that can be returned from `player.addTextTrack` with the added bonus that it can be removed from the player.
+Internally, video.js will either add a `<track>` element for you, or emulate that depending on whether native text tracks are supported or not.
+The options available are:
+* `kind`
+* `label`
+* `language` (also `srclang`)
+* `id`
+* `src`
+
+### `player.removeRemoteTextTrack(HTMLTrackElement|TextTrack)`
+This function takes either an HTMLTrackElement or a TextTrack object and removes it from the player.
