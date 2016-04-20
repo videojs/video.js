@@ -5,7 +5,6 @@ import Component from '../component';
 import * as Events from '../utils/events.js';
 import * as Fn from '../utils/fn.js';
 import log from '../utils/log.js';
-import * as Guid from '../utils/guid.js';
 import safeParseTuple from 'safe-json-parse/tuple';
 import window from 'global/window';
 
@@ -68,9 +67,18 @@ class TextTrackSettings extends Component {
    * @method createEl
    */
   createEl() {
+    let uniqueId = this.id_;
+    let dialogLabelId = 'TTsettingsDialogLabel-' + uniqueId;
+    let dialogDescriptionId = 'TTsettingsDialogDescription-' + uniqueId;
+
     return super.createEl('div', {
       className: 'vjs-caption-settings vjs-modal-overlay',
-      innerHTML: captionOptionsMenuTemplate()
+      innerHTML: captionOptionsMenuTemplate(uniqueId, dialogLabelId, dialogDescriptionId),
+      tabIndex: -1
+    }, {
+      role: 'dialog',
+      'aria-labelledby': dialogLabelId,
+      'aria-describedby': dialogDescriptionId
     });
   }
 
@@ -242,10 +250,13 @@ function setSelectedOption(target, value) {
   target.selectedIndex = i;
 }
 
-function captionOptionsMenuTemplate() {
-  let uniqueId = Guid.newGUID();
+function captionOptionsMenuTemplate(uniqueId, dialogLabelId, dialogDescriptionId) {
 
   let template = `
+    <div role="document">
+      <h1 id="${dialogLabelId}" class="vjs-control-text">Captions Settings Dialog</h1>
+      <div id="${dialogDescriptionId}" class="vjs-control-text">Beginning of dialog window. Escape will cancel and close the window.</div>
+      <div class=""></div>
       <div class="vjs-tracksettings">
         <div class="vjs-tracksettings-colors">
           <fieldset class="vjs-fg-color vjs-tracksetting">
@@ -313,7 +324,7 @@ function captionOptionsMenuTemplate() {
               </select>
             </span>
           </fieldset>
-        </div><!-- vjs-tracksettings -->
+        </div> <!-- vjs-tracksettings-colors -->
         <div class="vjs-tracksettings-font">
           <div class="vjs-font-percent vjs-tracksetting">
             <label class="vjs-label" for="captions-font-size-${uniqueId}">Font Size</label>
@@ -351,12 +362,13 @@ function captionOptionsMenuTemplate() {
               <option value="small-caps">Small Caps</option>
             </select>
           </div>
-        </div>
+        </div> <!-- vjs-tracksettings-font -->
         <div class="vjs-tracksettings-controls">
           <button class="vjs-default-button">Defaults</button>
           <button class="vjs-done-button">Done</button>
         </div>
-      </div>`;
+      </div> <!-- vjs-tracksettings -->
+    </div> <!--  role="document" -->`;
 
     return template;
 }
