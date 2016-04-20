@@ -88,6 +88,14 @@ class Html5 extends Tech {
       this.handleTextTrackAdd_ = Fn.bind(this, this.handleTextTrackAdd);
       this.handleTextTrackRemove_ = Fn.bind(this, this.handleTextTrackRemove);
       this.proxyNativeTextTracks_();
+
+      if (browser.IS_FIREFOX) {
+        let tracks = (options.playerOptions || {})['tracks'] || [];
+        for (let i = 0; i < tracks.length; i++) {
+          let track = tracks[i];
+          this.addRemoteTextTrack(track);
+        }
+      }
     }
 
     // Determine if native controls should be used
@@ -148,6 +156,13 @@ class Html5 extends Tech {
       // If the original tag is still there, clone and remove it.
       if (el) {
         const clone = el.cloneNode(true);
+        if (browser.IS_FIREFOX) {
+          const trackEls = clone.querySelectorAll('track');
+          let i = trackEls.length;
+          while (i--) {
+            clone.removeChild(trackEls[i]);
+          }
+        }
         el.parentNode.insertBefore(clone, el);
         Html5.disposeMediaElement(el);
         el = clone;
@@ -979,9 +994,6 @@ Html5.supportsNativeTextTracks = function() {
   if (supportsTextTracks && Html5.TEST_VID.textTracks.length > 0) {
     supportsTextTracks = typeof Html5.TEST_VID.textTracks[0]['mode'] !== 'number';
   }
-  if (supportsTextTracks && browser.IS_FIREFOX) {
-    supportsTextTracks = false;
-  }
   if (supportsTextTracks && !('onremovetrack' in Html5.TEST_VID.textTracks)) {
     supportsTextTracks = false;
   }
@@ -1040,7 +1052,7 @@ Html5.prototype['featuresPlaybackRate'] = Html5.canControlPlaybackRate();
  *
  * @type {Boolean}
  */
-Html5.prototype['movingMediaElementInDOM'] = !browser.IS_IOS;
+Html5.prototype['movingMediaElementInDOM'] = !browser.IS_IOS && !browser.IS_FIREFOX;
 
 /*
  * Set the the tech's fullscreen resize support status.

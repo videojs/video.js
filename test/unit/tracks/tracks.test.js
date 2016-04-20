@@ -12,6 +12,7 @@ import Component from '../../../src/js/component.js';
 import * as browser from '../../../src/js/utils/browser.js';
 import TestHelpers from '../test-helpers.js';
 import document from 'global/document';
+import window from 'global/window';
 
 q.module('Tracks', {
   setup() {
@@ -273,20 +274,15 @@ test('html5 tech supports native text tracks if the video supports it, unless mo
   Html5.TEST_VID = oldTestVid;
 });
 
-test('html5 tech supports native text tracks if the video supports it, unless it is firefox', function() {
+test('html5 tech supports native text tracks if the video supports it', function() {
   let oldTestVid = Html5.TEST_VID;
-  let oldIsFirefox = browser.IS_FIREFOX;
-
   Html5.TEST_VID = {
     textTracks: []
   };
 
-  browser.IS_FIREFOX = true;
-
   ok(!Html5.supportsNativeTextTracks(), 'if textTracks are available on video element, native text tracks are supported');
 
   Html5.TEST_VID = oldTestVid;
-  browser.IS_FIREFOX = oldIsFirefox;
 });
 
 test('when switching techs, we should not get a new text track', function() {
@@ -306,12 +302,13 @@ if (Html5.supportsNativeTextTracks()) {
     let done = assert.async();
 
     let el = document.createElement('video');
+    window.fixture.appendChild(el);
     let html = new Html5({el});
     let tt = el.textTracks;
     let emulatedTt = html.textTracks();
     let track = document.createElement('track');
-
-    el.appendChild(track);
+    track.src = '../docs/examples/elephantsdream/captions.en.vtt';
+    track.kind = 'captions';
 
     let addtrack = function() {
       equal(emulatedTt.length, tt.length, 'we have matching tracks length');
@@ -319,6 +316,7 @@ if (Html5.supportsNativeTextTracks()) {
 
       emulatedTt.off('addtrack', addtrack);
       el.removeChild(track);
+
     };
 
     emulatedTt.on('addtrack', addtrack);
@@ -327,18 +325,21 @@ if (Html5.supportsNativeTextTracks()) {
       equal(emulatedTt.length, 0, 'we have no more text tracks');
       done();
     });
+
+    el.appendChild(track);
   });
 
   test('should have removed tracks on dispose', function(assert) {
     let done = assert.async();
 
     let el = document.createElement('video');
+    window.fixture.appendChild(el);
     let html = new Html5({el});
     let tt = el.textTracks;
     let emulatedTt = html.textTracks();
     let track = document.createElement('track');
-
-    el.appendChild(track);
+    track.src = '../docs/examples/elephantsdream/captions.en.vtt';
+    track.kind = 'captions';
 
     let addtrack = function() {
       equal(emulatedTt.length, tt.length, 'we have matching tracks length');
@@ -354,6 +355,8 @@ if (Html5.supportsNativeTextTracks()) {
     };
 
     emulatedTt.on('addtrack', addtrack);
+
+    el.appendChild(track);
   });
 }
 
