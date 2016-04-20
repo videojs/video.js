@@ -1,44 +1,50 @@
-Tracks
-======
+# Tracks
 
 Text Tracks are a function of HTML5 video for providing time triggered text to the viewer. Video.js makes tracks work across all browsers. There are currently five types of tracks:
 
 - **Subtitles**: Translations of the dialogue in the video for when audio is available but not understood. Subtitles are shown over the video.
 - **Captions**: Transcription of the dialogue, sound effects, musical cues, and other audio information for when the viewer is deaf/hard of hearing, or the video is muted. Captions are also shown over the video.
 - **Chapters**: Chapter titles that are used to create navigation within the video. Typically they're in the form of a list of chapters that the viewer can click on to go to a specific chapter.
-- **Descriptions** (not supported yet): Text descriptions of what's happening in the video for when the video portion isn't available, because the viewer is blind, not using a screen, or driving and about to crash because they're trying to enjoy a video while driving. Descriptions are read by a screen reader or turned into a separate audio track.
-- **Metadata** (not supported yet): Tracks that have data meant for javascript to parse and do something with. These aren't shown to the user.
+- **Descriptions**: Text descriptions of what's happening in the video for when the video portion isn't available, because the viewer is blind, not using a screen, or driving and about to crash because they're trying to enjoy a video while driving. Descriptions are read by a screen reader or turned into a separate audio track.
+- **Metadata**: Tracks that have data meant for javascript to parse and do something with. These aren't shown to the user.
 
-Creating the Text File
-----------------------
+## Creating the Text File
 Timed text requires a text file in [WebVTT](http://dev.w3.org/html5/webvtt/) format. This format defines a list of "cues" that have a start time, and end time, and text to display. [Microsoft has a builder](https://dev.modern.ie/testdrive/demos/captionmaker/) that can help you get started on the file.
 
 When creating captions, there's also additional [caption formatting techniques] (http://www.theneitherworld.com/mcpoodle/SCC_TOOLS/DOCS/SCC_FORMAT.HTML#style) that would be good to use, like brackets around sound effects: [ sound effect ]. If you'd like a more in depth style guide for captioning, you can reference the [Captioning Key](http://www.dcmp.org/captioningkey/), but keep in mind not all features are supported by WebVTT or (more likely) the Video.js WebVTT implementation.
 
-Adding to Video.js
-------------------
+## Adding to Video.js
 Once you have your WebVTT file created, you can add it to Video.js using the track tag. Put your track tag after all the source elements, and before any fallback content.
 
 ```html
-<video id="example_video_1" class="video-js vjs-default-skin"
+<video id="example_video_1" class="video-js"
   controls preload="auto" width="640" height="264"
   data-setup='{"example_option":true}'>
- <source src="http://video-js.zencoder.com/oceans-clip.mp4" type="video/mp4" />
- <source src="http://video-js.zencoder.com/oceans-clip.webm" type="video/webm" />
- <source src="http://video-js.zencoder.com/oceans-clip.ogv" type="video/ogg" />
+ <source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4" />
+ <source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm" />
+ <source src="http://vjs.zencdn.net/v/oceans.ogv" type="video/ogg" />
 
  <track kind="captions" src="http://example.com/path/to/captions.vtt" srclang="en" label="English" default>
 
 </video>
 ```
 
-Subtitles from Another Domain
------------------------------
+You can also add tracks [programatically](#api).
+
+## Subtitles from Another Domain
 Because we're pulling in the text track file via Javascript, the [same-origin policy](http://en.wikipedia.org/wiki/Same_origin_policy) applies. If you'd like to have a player served from one domain,
 but the text track served from another, you'll need to [enable CORS](http://enable-cors.org/) in order to do so.
+In addition to enabling CORS on the server serving the text tracks, you will need to add the [`crossorigin` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_settings_attributes) to the video element itself. This attribute has two values `anonymous` and `use-credentials`. Most users will want to use `anonymous` with cross-origin tracks.
+It can be added to the video element like so:
+```html
+<video class="video-js" crossorigin="anonymous">
+  <source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+  <track src="http://example.com/oceans.vtt" kind="captions" srclang="en" label="English">
+</video>
+```
+One thing to be aware of is that in this case the video files themselves will *also* needs CORS headers applied to it. This is because some browsers apply the crossorigin attribute to the video source itself and not just the tracks and is considered a [security concern by the spec](https://html.spec.whatwg.org/multipage/embedded-content.html#security-and-privacy-considerations).
 
-Track Attributes
-----------------
+## Track Attributes
 Additional settings for track tags.
 
 ### kind
@@ -52,157 +58,127 @@ The default attribute can be used to have a track default to showing. Otherwise 
 NOTE: For chapters, default is required if you want the chapters menu to show.
 
 ### srclang
-The two-letter code (valid BCP 47 language tag) for the language of the text track, for example "en" for English. Here's a list of available language codes.
+The two-letter code (valid BCP 47 language tag) for the language of the text track, for example "en" for English. A list of language codes is [available here](languages.md#language-codes).
 
-<table border="0" cellspacing="5" cellpadding="5">
-  <tr>
-      <table>
-        <tr><th>ab<th><td>Abkhazian</td></tr>
-        <tr><th>aa<th><td>Afar</td></tr>
-        <tr><th>af<th><td>Afrikaans</td></tr>
-        <tr><th>sq<th><td>Albanian</td></tr>
-        <tr><th>am<th><td>Amharic</td></tr>
-        <tr><th>ar<th><td>Arabic</td></tr>
-        <tr><th>an<th><td>Aragonese</td></tr>
-        <tr><th>hy<th><td>Armenian</td></tr>
-        <tr><th>as<th><td>Assamese</td></tr>
-        <tr><th>ay<th><td>Aymara</td></tr>
-        <tr><th>az<th><td>Azerbaijani</td></tr>
-        <tr><th>ba<th><td>Bashkir</td></tr>
-        <tr><th>eu<th><td>Basque</td></tr>
-        <tr><th>bn<th><td>Bengali (Bangla)</td></tr>
-        <tr><th>dz<th><td>Bhutani</td></tr>
-        <tr><th>bh<th><td>Bihari</td></tr>
-        <tr><th>bi<th><td>Bislama</td></tr>
-        <tr><th>br<th><td>Breton</td></tr>
-        <tr><th>bg<th><td>Bulgarian</td></tr>
-        <tr><th>my<th><td>Burmese</td></tr>
-        <tr><th>be<th><td>Byelorussian (Belarusian)</td></tr>
-        <tr><th>km<th><td>Cambodian</td></tr>
-        <tr><th>ca<th><td>Catalan</td></tr>
-        <tr><th>zh<th><td>Chinese (Simplified)</td></tr>
-        <tr><th>zh<th><td>Chinese (Traditional)</td></tr>
-        <tr><th>co<th><td>Corsican</td></tr>
-        <tr><th>hr<th><td>Croatian</td></tr>
-        <tr><th>cs<th><td>Czech</td></tr>
-        <tr><th>da<th><td>Danish</td></tr>
-        <tr><th>nl<th><td>Dutch</td></tr>
-        <tr><th>en<th><td>English</td></tr>
-        <tr><th>eo<th><td>Esperanto</td></tr>
-        <tr><th>et<th><td>Estonian</td></tr>
-        <tr><th>fo<th><td>Faeroese</td></tr>
-        <tr><th>fa<th><td>Farsi</td></tr>
-        <tr><th>fj<th><td>Fiji</td></tr>
-        <tr><th>fi<th><td>Finnish</td></tr>
-        <tr><th>fr<th><td>French</td></tr>
-        <tr><th>fy<th><td>Frisian</td></tr>
-        <tr><th>gl<th><td>Galician</td></tr>
-        <tr><th>gd<th><td>Gaelic (Scottish)</td></tr>
-        <tr><th>gv<th><td>Gaelic (Manx)</td></tr>
-        <tr><th>ka<th><td>Georgian</td></tr>
-        <tr><th>de<th><td>German</td></tr>
-        <tr><th>el<th><td>Greek</td></tr>
-        <tr><th>kl<th><td>Greenlandic</td></tr>
-        <tr><th>gn<th><td>Guarani</td></tr>
-        <tr><th>gu<th><td>Gujarati</td></tr>
-        <tr><th>ht<th><td>Haitian Creole</td></tr>
-        <tr><th>ha<th><td>Hausa</td></tr>
-        <tr><th>he<th><td>Hebrew</td></tr>
-        <tr><th>hi<th><td>Hindi</td></tr>
-        <tr><th>hu<th><td>Hungarian</td></tr>
-        <tr><th>is<th><td>Icelandic</td></tr>
-        <tr><th>io<th><td>Ido</td></tr>
-        <tr><th>id<th><td>Indonesian</td></tr>
-        <tr><th>ia<th><td>Interlingua</td></tr>
-        <tr><th>ie<th><td>Interlingue</td></tr>
-        <tr><th>iu<th><td>Inuktitut</td></tr>
-        <tr><th>ik<th><td>Inupiak</td></tr>
-        <tr><th>ga<th><td>Irish</td></tr>
-        <tr><th>it<th><td>Italian</td></tr>
-        <tr><th>ja<th><td>Japanese</td></tr>
-        <tr><th>jv<th><td>Javanese</td></tr>
-        <tr><th>kn<th><td>Kannada</td></tr>
-        <tr><th>ks<th><td>Kashmiri</td></tr>
-        <tr><th>kk<th><td>Kazakh</td></tr>
-        <tr><th>rw<th><td>Kinyarwanda (Ruanda)</td></tr>
-        <tr><th>ky<th><td>Kirghiz</td></tr>
-        <tr><th>rn<th><td>Kirundi (Rundi)</td></tr>
-        <tr><th>ko<th><td>Korean</td></tr>
-        <tr><th>ku<th><td>Kurdish</td></tr>
-        <tr><th>lo<th><td>Laothian</td></tr>
-        <tr><th>la<th><td>Latin</td></tr>
-        <tr><th>lv<th><td>Latvian (Lettish)</td></tr>
-        <tr><th>li<th><td>Limburgish ( Limburger)</td></tr>
-        <tr><th>ln<th><td>Lingala</td></tr>
-        <tr><th>lt<th><td>Lithuanian</td></tr>
-        <tr><th>mk<th><td>Macedonian</td></tr>
-        <tr><th>mg<th><td>Malagasy</td></tr>
-        <tr><th>ms<th><td>Malay</td></tr>
-        <tr><th>ml<th><td>Malayalam</td></tr>
-        <tr><th>mt<th><td>Maltese</td></tr>
-        <tr><th>mi<th><td>Maori</td></tr>
-        <tr><th>mr<th><td>Marathi</td></tr>
-        <tr><th>mo<th><td>Moldavian</td></tr>
-        <tr><th>mn<th><td>Mongolian</td></tr>
-        <tr><th>na<th><td>Nauru</td></tr>
-        <tr><th>ne<th><td>Nepali</td></tr>
-        <tr><th>no<th><td>Norwegian</td></tr>
-        <tr><th>oc<th><td>Occitan</td></tr>
-        <tr><th>or<th><td>Oriya</td></tr>
-        <tr><th>om<th><td>Oromo (Afan, Galla)</td></tr>
-        <tr><th>ps<th><td>Pashto (Pushto)</td></tr>
-        <tr><th>pl<th><td>Polish</td></tr>
-        <tr><th>pt<th><td>Portuguese</td></tr>
-        <tr><th>pa<th><td>Punjabi</td></tr>
-        <tr><th>qu<th><td>Quechua</td></tr>
-        <tr><th>rm<th><td>Rhaeto-Romance</td></tr>
-        <tr><th>ro<th><td>Romanian</td></tr>
-        <tr><th>ru<th><td>Russian</td></tr>
-        <tr><th>sm<th><td>Samoan</td></tr>
-        <tr><th>sg<th><td>Sangro</td></tr>
-        <tr><th>sa<th><td>Sanskrit</td></tr>
-        <tr><th>sr<th><td>Serbian</td></tr>
-        <tr><th>sh<th><td>Serbo-Croatian</td></tr>
-        <tr><th>st<th><td>Sesotho</td></tr>
-        <tr><th>tn<th><td>Setswana</td></tr>
-        <tr><th>sn<th><td>Shona</td></tr>
-        <tr><th>ii<th><td>Sichuan Yi</td></tr>
-        <tr><th>sd<th><td>Sindhi</td></tr>
-        <tr><th>si<th><td>Sinhalese</td></tr>
-        <tr><th>ss<th><td>Siswati</td></tr>
-        <tr><th>sk<th><td>Slovak</td></tr>
-        <tr><th>sl<th><td>Slovenian</td></tr>
-        <tr><th>so<th><td>Somali</td></tr>
-        <tr><th>es<th><td>Spanish</td></tr>
-        <tr><th>su<th><td>Sundanese</td></tr>
-        <tr><th>sw<th><td>Swahili (Kiswahili)</td></tr>
-        <tr><th>sv<th><td>Swedish</td></tr>
-        <tr><th>tl<th><td>Tagalog</td></tr>
-        <tr><th>tg<th><td>Tajik</td></tr>
-        <tr><th>ta<th><td>Tamil</td></tr>
-        <tr><th>tt<th><td>Tatar</td></tr>
-        <tr><th>te<th><td>Telugu</td></tr>
-        <tr><th>th<th><td>Thai</td></tr>
-        <tr><th>bo<th><td>Tibetan</td></tr>
-        <tr><th>ti<th><td>Tigrinya</td></tr>
-        <tr><th>to<th><td>Tonga</td></tr>
-        <tr><th>ts<th><td>Tsonga</td></tr>
-        <tr><th>tr<th><td>Turkish</td></tr>
-        <tr><th>tk<th><td>Turkmen</td></tr>
-        <tr><th>tw<th><td>Twi</td></tr>
-        <tr><th>ug<th><td>Uighur</td></tr>
-        <tr><th>uk<th><td>Ukrainian</td></tr>
-        <tr><th>ur<th><td>Urdu</td></tr>
-        <tr><th>uz<th><td>Uzbek</td></tr>
-        <tr><th>vi<th><td>Vietnamese</td></tr>
-        <tr><th>vo<th><td>Volapük</td></tr>
-        <tr><th>wa<th><td>Wallon</td></tr>
-        <tr><th>cy<th><td>Welsh</td></tr>
-        <tr><th>wo<th><td>Wolof</td></tr>
-        <tr><th>xh<th><td>Xhosa</td></tr>
-        <tr><th>yi<th><td>Yiddish</td></tr>
-        <tr><th>yo<th><td>Yoruba</td></tr>
-        <tr><th>zu<th><td>Zulu</td></tr>
-      </table>
-  </tr>
-</table>
+## Interacting with Text Tracks
+### Showing tracks programmatically
+Some of you would want to turn captions on and off programmatically rather than just forcing the user to do so themselves. This can be easily achieved by modifying the `mode` of the text tracks.
+The `mode` can be one of three values `disabled`, `hidden`, and `showing`.
+When a text track's `mode` is `disabled`, the track does not show on screen as the video is playing.
+When the `mode` is set to `showing`, the track is visible to the viewer and updates while the video is playing.
+You can change of a particular track like so:
+```js
+let tracks = player.textTracks();
+
+for (let i = 0; i < tracks.length; i++) {
+  let track = tracks[i];
+
+  // find the captions track that's in english
+  if (track.kind === 'captions' && track.language === 'en') {
+    track.mode = 'showing';
+  }
+}
+```
+
+### Doing something when a cue becomes active
+Above, we mentioned that `mode` can also be `hidden`, what this means is that the track will update
+as the video is playing but it won't be visible to the viewer. This is most useful for `metadata` text tracks.
+One usecase for metadata text tracks is to have something happen when their cues become active, to do so, you listen to the `cuechange` event on the track. These events fire when the mode is `showing` as well.
+Here's an example:
+```js
+let tracks = player.textTracks();
+let metadataTrack;
+
+for (let i = 0; i < tracks.length; i++) {
+  let track = tracks[i];
+
+  // find the metadata track that's labeled ads
+  if (track.kind === 'captions' && track.label === 'ads') {
+    track.mode = 'hidden';
+    // store it for usage outside of the loop
+    metadataTrack = track;
+  }
+}
+
+metadataTrack.addEventListener('cuechange', function() {
+  player.ads.startLinearAdMode();
+});
+```
+
+## Emulated Text Tracks
+By default, video.js will try and use native text tracks if possible and fall back to emulated text tracks if the native functionality is broken or incomplete or non-existent.
+The Flash tech will always use the emulated text track functionality.
+The video.js API and TextTrack objects were modeled after the w3c's specification.
+video.js uses [Mozilla's vtt.js](https://github.com/mozilla/vtt.js) library to parse and display its emulated text tracks.
+
+If you wanted to disable native text track functionality and force video.js to use emulated text tracks always, you can supply the `nativeTextTrack` option to the tech like so:
+```js
+let player = videojs('myvideo', {
+  html5: {
+    nativeTextTrack: false
+  }
+});
+```
+
+### Text Track Settings
+When using emulated Text Tracks, captions will have an additional item in the menu called "caption settings".
+This allows the viewer of the player to change some styles of how the captions are displayed on screen.
+
+If you don't want that, you can disable it by turning off the text track settings component and hiding the menu item like so:
+```js
+let player = videojs('myvideo', {
+  // make the text track settings dialog not initialize
+  textTrackSettings: false
+});
+```
+```css
+/* hide the captions settings item from the captions menu */
+.vjs-texttrack-settings {
+  display: none;
+}
+```
+
+## Text Track Precedence
+In general, the Descriptions tracks is of lower precedence than captions and subtitles.
+What this means for you?
+* If you are using the `default` attribute, videojs will choose the first track that is marked as `default` and turn it on. If There are multiple tracks marked `default`, it will try and turn on the first `captions` or `subtitles` track *before* any `descriptions` tracks.
+  * This only applied to the emulated captions support, native text tracks behavior will change depending on the browser
+* If you select a given track from the menu, videojs will turn off all the other tracks of the same kind. This may seem like you can have both subtitles and captions turned on at the same time but unfortuantely, at this time we only support one track being displayed at a time.
+  * This means that for emulated text tracks, we'll choose the first captions or subtitles track that is enabled to display.
+  * When native text tracks are supported, we will still disable the other tracks of the same kind but it is possible that multiple text tracks are shown.
+  * If a `descriptions` track is selected and subsequently a `subtitles` or `captions` track is selected, the `descriptions` track is disabled and its menu button is also disabled.
+* When enabling a track programmatically, there's not much checking that videojs does.
+  * For emulated text tracks, when it's time to display the captions, video.js would choose the first track that's showing, again choosing `subtitles` or `captions` over `descriptions`, if necessary.
+  * For native text tracks, this behavior depends on the browser. Some browsers will let you have multiple text tracks but others will disable all other tracks when a new one is selected.
+
+## API
+
+### `player.textTracks() -> TextTrackList`
+This is the main interface into the text tracks of the player.
+It return a TextTrackList which lists all the tracks on the player.
+
+### `player.remoteTextTracks() -> TextTrackList`
+This is a helper method to get a list of all the tracks that were created from `track` elements or that were added to the player by the `addRemoteTextTrack` method. All these tracks are removeable from the player, where-as not all tracks from `player.textTracks()` are necessarily removeable.
+
+### `player.remoteTextTrackEls() -> HTMLTrackElementList`
+Another helper method, this is a list of all the `track` elements associated with the player. Both emulated or otherwise.
+
+### `player.addTextTrack(String kind, [String label [, String language]]) -> TextTrack`
+This is based on the [w3c spec API](http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-addtexttrack) and when given a kind and an optional label and language, will create a new text track for you to use.
+This method is intended for purely programmatic usage of tracks and has one important limitation:
+tracks created using this method *cannot* be removed. The native `addTextTrack` does not have a corresponding `removeTextTrack`, so, we actually discourage the usage of this method.
+
+### `player.addRemoteTextTrack(Object options) -> HTMLTrackElement`
+This function takes an options object that looks pretty similar to the track element and returns a HTMLTrackElement.
+This object has a `track` property on it which is the actual TextTrack object.
+This `TextTrack` object is equivalent to the one that can be returned from `player.addTextTrack` with the added bonus that it can be removed from the player.
+Internally, video.js will either add a `<track>` element for you, or emulate that depending on whether native text tracks are supported or not.
+The options available are:
+* `kind`
+* `label`
+* `language` (also `srclang`)
+* `id`
+* `src`
+
+### `player.removeRemoteTextTrack(HTMLTrackElement|TextTrack)`
+This function takes either an HTMLTrackElement or a TextTrack object and removes it from the player.
