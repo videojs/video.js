@@ -6,11 +6,10 @@ import * as browser from '../utils/browser.js';
 import document from 'global/document';
 
 /**
- * anywhere we call this function we diverge from the spec
- * as we only support one enabled audiotrack at a time
+ * disable other video tracks before selecting the new one
  *
  * @param {Array|VideoTrackList} list list to work on
- * @param {VideoTrack} enabledTrack the track to skip
+ * @param {VideoTrack} track the track to skip
  */
 const disableOthers = function(list, track) {
   for (let i = 0; i < list.length; i++) {

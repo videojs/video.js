@@ -10,7 +10,7 @@ import document from 'global/document';
  * as we only support one enabled audiotrack at a time
  *
  * @param {Array|AudioTrackList} list list to work on
- * @param {AudioTrack} enabledTrack the track to skip
+ * @param {AudioTrack} track the track to skip
  */
 const disableOthers = function(list, track) {
   for (let i = 0; i < list.length; i++) {
