@@ -1,14 +1,15 @@
 /**
  * @file text-track-list.js
  */
-import EventTarget from '../event-target';
+import TrackList from './track-list';
 import * as Fn from '../utils/fn.js';
 import * as browser from '../utils/browser.js';
 import document from 'global/document';
 
 /**
- * A text track list as defined in:
- * https://html.spec.whatwg.org/multipage/embedded-content.html#texttracklist
+ * A list of possible text tracks. All functionality is in the
+ * base class TrackList. The spec for TextTrackList is located at:
+ * @link https://html.spec.whatwg.org/multipage/embedded-content.html#texttracklist
  *
  * interface TextTrackList : EventTarget {
  *   readonly attribute unsigned long length;
@@ -20,19 +21,23 @@ import document from 'global/document';
  *   attribute EventHandler onremovetrack;
  * };
  *
- * @param {Track[]} tracks A list of tracks to initialize the list with
- * @extends EventTarget
+ * @param {TextTrack[]} tracks A list of tracks to initialize the list with
+ * @extends TrackList
  * @class TextTrackList
  */
-
-class TextTrackList extends EventTarget {
+class TextTrackList extends TrackList {
   constructor(tracks = []) {
-    super();
-    let list = this;
+    let list;
 
+    // IE8 forces us to implement inheritance ourselves
+    // as it does not support Object.defineProperty properly
     if (browser.IS_IE8) {
       list = document.createElement('custom');
-
+      for (let prop in TrackList.prototype) {
+        if (prop !== 'constructor') {
+          list[prop] = TrackList.prototype[prop];
+        }
+      }
       for (let prop in TextTrackList.prototype) {
         if (prop !== 'constructor') {
           list[prop] = TextTrackList.prototype[prop];
@@ -40,54 +45,15 @@ class TextTrackList extends EventTarget {
       }
     }
 
-    list.tracks_ = [];
-
-    Object.defineProperty(list, 'length', {
-      get() {
-        return this.tracks_.length;
-      }
-    });
-
-    for (let i = 0; i < tracks.length; i++) {
-      list.addTrack_(tracks[i]);
-    }
-
-    if (browser.IS_IE8) {
-      return list;
-    }
+    list = super(tracks, list);
+    return list;
   }
 
-  /**
-   * Add TextTrack from TextTrackList
-   *
-   * @param {TextTrack} track
-   * @method addTrack_
-   * @private
-   */
   addTrack_(track) {
-    let index = this.tracks_.length;
-
-    if (!('' + index in this)) {
-      Object.defineProperty(this, index, {
-        get() {
-          return this.tracks_[index];
-        }
-      });
-    }
-
+    super.addTrack_(track);
     track.addEventListener('modechange', Fn.bind(this, function() {
       this.trigger('change');
     }));
-
-    // Do not add duplicate tracks
-    if (this.tracks_.indexOf(track) === -1) {
-      this.tracks_.push(track);
-      this.trigger({
-        track,
-        type: 'addtrack'
-      });
-    }
-
   }
 
   /**
@@ -147,21 +113,4 @@ class TextTrackList extends EventTarget {
     return result;
   }
 }
-
-/**
- * change - One or more tracks in the track list have been enabled or disabled.
- * addtrack - A track has been added to the track list.
- * removetrack - A track has been removed from the track list.
- */
-TextTrackList.prototype.allowedEvents_ = {
-  change: 'change',
-  addtrack: 'addtrack',
-  removetrack: 'removetrack'
-};
-
-// emulate attribute EventHandler support to allow for feature detection
-for (let event in TextTrackList.prototype.allowedEvents_) {
-  TextTrackList.prototype['on' + event] = null;
-}
-
 export default TextTrackList;

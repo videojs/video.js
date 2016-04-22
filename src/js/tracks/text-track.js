@@ -3,15 +3,15 @@
  */
 import TextTrackCueList from './text-track-cue-list';
 import * as Fn from '../utils/fn.js';
-import * as Guid from '../utils/guid.js';
-import * as browser from '../utils/browser.js';
-import * as TextTrackEnum from './text-track-enums';
+import {TextTrackKind, TextTrackMode} from './track-enums';
 import log from '../utils/log.js';
-import EventTarget from '../event-target';
 import document from 'global/document';
 import window from 'global/window';
+import Track from './track.js';
 import { isCrossOrigin } from '../utils/url.js';
 import XHR from 'xhr';
+import merge from '../utils/merge-options';
+import * as browser from '../utils/browser.js';
 
 /**
  * takes a webvtt file contents and parses it into cues
@@ -53,7 +53,6 @@ const parseCues = function(srcContent, track) {
 
   parser.flush();
 };
-
 
 /**
  * load a track from a  specifed url
@@ -99,7 +98,7 @@ const loadTrack = function(src, track) {
 
 /**
  * A single text track as defined in:
- * https://html.spec.whatwg.org/multipage/embedded-content.html#texttrack
+ * @link https://html.spec.whatwg.org/multipage/embedded-content.html#texttrack
  *
  * interface TextTrack : EventTarget {
  *   readonly attribute TextTrackKind kind;
@@ -121,39 +120,36 @@ const loadTrack = function(src, track) {
  * };
  *
  * @param {Object=} options Object of option names and values
- * @extends EventTarget
+ * @extends Track
  * @class TextTrack
  */
-class TextTrack extends EventTarget {
+class TextTrack extends Track {
   constructor(options = {}) {
-    super();
     if (!options.tech) {
       throw new Error('A tech was not provided.');
     }
 
-    let tt = this;
+    let settings = merge(options, {
+      kind: TextTrackKind[options.kind] || 'subtitles',
+      language: options.language || options.srclang || ''
+    });
+    let mode = TextTrackMode[settings.mode] || 'disabled';
+    let default_ = settings.default;
+
+    if (settings.kind === 'metadata' || settings.kind === 'chapters') {
+      mode = 'hidden';
+    }
+    // on IE8 this will be a document element
+    // for every other browser this will be a normal object
+    let tt = super(settings);
+    tt.tech_ = settings.tech;
 
     if (browser.IS_IE8) {
-      tt = document.createElement('custom');
-
       for (let prop in TextTrack.prototype) {
         if (prop !== 'constructor') {
           tt[prop] = TextTrack.prototype[prop];
         }
       }
-    }
-
-    tt.tech_ = options.tech;
-
-    let mode = TextTrackEnum.TextTrackMode[options.mode] || 'disabled';
-    let kind = TextTrackEnum.TextTrackKind[options.kind] || 'subtitles';
-    let default_ = options.default;
-    let label = options.label || '';
-    let language = options.language || options.srclang || '';
-    let id = options.id || 'vjs_text_track_' + Guid.newGUID();
-
-    if (kind === 'metadata' || kind === 'chapters') {
-      mode = 'hidden';
     }
 
     tt.cues_ = [];
@@ -174,34 +170,6 @@ class TextTrack extends EventTarget {
       tt.tech_.on('timeupdate', timeupdateHandler);
     }
 
-    Object.defineProperty(tt, 'kind', {
-      get() {
-        return kind;
-      },
-      set() {}
-    });
-
-    Object.defineProperty(tt, 'label', {
-      get() {
-        return label;
-      },
-      set() {}
-    });
-
-    Object.defineProperty(tt, 'language', {
-      get() {
-        return language;
-      },
-      set() {}
-    });
-
-    Object.defineProperty(tt, 'id', {
-      get() {
-        return id;
-      },
-      set() {}
-    });
-
     Object.defineProperty(tt, 'default', {
       get() {
         return default_;
@@ -214,7 +182,7 @@ class TextTrack extends EventTarget {
         return mode;
       },
       set(newMode) {
-        if (!TextTrackEnum.TextTrackMode[newMode]) {
+        if (!TextTrackMode[newMode]) {
           return;
         }
         mode = newMode;
@@ -282,16 +250,14 @@ class TextTrack extends EventTarget {
       set() {}
     });
 
-    if (options.src) {
-      tt.src = options.src;
-      loadTrack(options.src, tt);
+    if (settings.src) {
+      tt.src = settings.src;
+      loadTrack(settings.src, tt);
     } else {
       tt.loaded_ = true;
     }
 
-    if (browser.IS_IE8) {
-      return tt;
-    }
+    return tt;
   }
 
   /**
