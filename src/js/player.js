@@ -22,6 +22,8 @@ import safeParseTuple from 'safe-json-parse/tuple';
 import assign from 'object.assign';
 import mergeOptions from './utils/merge-options.js';
 import textTrackConverter from './tracks/text-track-list-converter.js';
+import AudioTrackList from './tracks/audio-track-list.js';
+import VideoTrackList from './tracks/video-track-list.js';
 
 // Include required child components (importing also registers them)
 import MediaLoader from './tech/loader.js';
@@ -555,7 +557,9 @@ class Player extends Component {
       'source': source,
       'playerId': this.id(),
       'techId': `${this.id()}_${techName}_api`,
+      'videoTracks': this.videoTracks_,
       'textTracks': this.textTracks_,
+      'audioTracks': this.audioTracks_,
       'autoplay': this.options_.autoplay,
       'preload': this.options_.preload,
       'loop': this.options_.loop,
@@ -648,7 +652,9 @@ class Player extends Component {
    */
   unloadTech_() {
     // Save the current text tracks so that we can reuse the same text tracks with the next tech
+    this.videoTracks_ = this.videoTracks();
     this.textTracks_ = this.textTracks();
+    this.audioTracks_ = this.audioTracks();
     this.textTracksJson_ = textTrackConverter.textTracksToJson(this.tech_);
 
     this.isReady_ = false;
@@ -2509,12 +2515,48 @@ class Player extends Component {
   }
 
   /**
-   * Text tracks are tracks of timed text events.
-   * Captions - text displayed over the video for the hearing impaired
-   * Subtitles - text displayed over the video for those who don't understand language in the video
-   * Chapters - text displayed in a menu allowing the user to jump to particular points (chapters) in the video
-   * Descriptions - audio descriptions that are read back to the user by a screen reading device
+   * Get a video track list
+   * @link https://html.spec.whatwg.org/multipage/embedded-content.html#videotracklist
+   *
+   * @return {VideoTrackList} thes current video track list
+   * @method videoTracks
    */
+  videoTracks() {
+    // if we have not yet loadTech_, we create videoTracks_
+    // these will be passed to the tech during loading
+    if (!this.tech_) {
+      this.videoTracks_ = this.videoTracks_ || new VideoTrackList();
+      return this.videoTracks_;
+    }
+
+    return this.tech_.videoTracks();
+  }
+
+  /**
+   * Get an audio track list
+   * @link https://html.spec.whatwg.org/multipage/embedded-content.html#audiotracklist
+   *
+   * @return {AudioTrackList} thes current audio track list
+   * @method audioTracks
+   */
+  audioTracks() {
+    // if we have not yet loadTech_, we create videoTracks_
+    // these will be passed to the tech during loading
+    if (!this.tech_) {
+      this.audioTracks_ = this.audioTracks_ || new AudioTrackList();
+      return this.audioTracks_;
+    }
+
+    return this.tech_.audioTracks();
+  }
+
+  /*
+    * Text tracks are tracks of timed text events.
+    * Captions - text displayed over the video for the hearing impaired
+    * Subtitles - text displayed over the video for those who don't understand language in the video
+    * Chapters - text displayed in a menu allowing the user to jump to particular points (chapters) in the video
+    * Descriptions (not supported yet) - audio descriptions that are read back to the user by a screen reading device
+    */
 
   /**
    * Get an array of associated text tracks. captions, subtitles, chapters, descriptions
@@ -2579,7 +2621,9 @@ class Player extends Component {
    * @param {Object} track    Remote text track to remove
    * @method removeRemoteTextTrack
    */
-  removeRemoteTextTrack(track) {
+  // destructure the input into an object with a track argument, defaulting to arguments[0]
+  // default the whole argument to an empty object if nothing was passed in
+  removeRemoteTextTrack({track = arguments[0]} = {}) { // jshint ignore:line
     this.tech_ && this.tech_['removeRemoteTextTrack'](track);
   }
 
@@ -2607,8 +2651,6 @@ class Player extends Component {
   // initialTime: function(){ return this.techCall_('initialTime'); },
   // startOffsetTime: function(){ return this.techCall_('startOffsetTime'); },
   // played: function(){ return this.techCall_('played'); },
-  // videoTracks: function(){ return this.techCall_('videoTracks'); },
-  // audioTracks: function(){ return this.techCall_('audioTracks'); },
   // defaultPlaybackRate: function(){ return this.techCall_('defaultPlaybackRate'); },
   // defaultMuted: function(){ return this.techCall_('defaultMuted'); }
 

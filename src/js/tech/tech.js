@@ -10,6 +10,10 @@ import HTMLTrackElementList from '../tracks/html-track-element-list';
 import mergeOptions from '../utils/merge-options.js';
 import TextTrack from '../tracks/text-track';
 import TextTrackList from '../tracks/text-track-list';
+import VideoTrack from '../tracks/video-track';
+import VideoTrackList from '../tracks/video-track-list';
+import AudioTrackList from '../tracks/audio-track-list';
+import AudioTrack from '../tracks/audio-track';
 import * as Fn from '../utils/fn.js';
 import log from '../utils/log.js';
 import { createTimeRange } from '../utils/time-ranges.js';
@@ -45,6 +49,8 @@ class Tech extends Component {
     });
 
     this.textTracks_ = options.textTracks;
+    this.videoTracks_ = options.videoTracks;
+    this.audioTracks_ = options.audioTracks;
 
     // Manually track progress in cases where the browser/flash player doesn't report it.
     if (!this.featuresProgressEvents) {
@@ -65,6 +71,7 @@ class Tech extends Component {
     }
 
     this.initTextTrackListeners();
+    this.initTrackListeners();
 
     // Turn on component tap events
     this.emitTapEvents();
@@ -218,15 +225,9 @@ class Tech extends Component {
    * @method dispose
    */
   dispose() {
-    // clear out text tracks because we can't reuse them between techs
-    let textTracks = this.textTracks();
 
-    if (textTracks) {
-      let i = textTracks.length;
-      while(i--) {
-        this.removeRemoteTextTrack(textTracks[i]);
-      }
-    }
+    // clear out all tracks because we can't reuse them between techs
+    this.clearTracks(['audio', 'video', 'text']);
 
     // Turn off any manual progress or timeupdate tracking
     if (this.manualProgress) { this.manualProgressOff(); }
@@ -234,6 +235,33 @@ class Tech extends Component {
     if (this.manualTimeUpdates) { this.manualTimeUpdatesOff(); }
 
     super.dispose();
+  }
+
+  /**
+   * clear out a track list, or multiple track lists
+   *
+   * Note: Techs without source handlers should call this between
+   * sources for video & audio tracks, as usually you don't want
+   * to use them between tracks and we have no automatic way to do
+   * it for you
+   *
+   * @method clearTracks
+   * @param {Array|String} types type(s) of track lists to empty
+   */
+  clearTracks(types) {
+    types = [].concat(types);
+    // clear out all tracks because we can't reuse them between techs
+    types.forEach((type) => {
+      let list = this[`${type}Tracks`]() || [];
+      let i = list.length;
+      while (i--) {
+        let track = list[i];
+        if (type === 'text') {
+          this.removeRemoteTextTrack(track);
+        }
+        list.removeTrack_(track);
+      }
+    });
   }
 
   /**
@@ -313,6 +341,32 @@ class Tech extends Component {
     }));
   }
 
+
+  /**
+   * Initialize audio and video track listeners
+   *
+   * @method initTrackListeners
+   */
+  initTrackListeners() {
+    const trackTypes = ['video', 'audio'];
+
+    trackTypes.forEach((type) => {
+      let trackListChanges = () => {
+        this.trigger(`${type}trackchange`);
+      };
+
+      let tracks = this[`${type}Tracks`]();
+
+      tracks.addEventListener('removetrack', trackListChanges);
+      tracks.addEventListener('addtrack', trackListChanges);
+
+      this.on('dispose', () => {
+        tracks.removeEventListener('removetrack', trackListChanges);
+        tracks.removeEventListener('addtrack', trackListChanges);
+      });
+    });
+  }
+
   /**
    * Emulate texttracks
    *
@@ -337,8 +391,10 @@ class Tech extends Component {
         script.onload = null;
         script.onerror = null;
       });
-      this.el().parentNode.appendChild(script);
+      // but have not loaded yet and we set it to true before the inject so that
+      // we don't overwrite the injected window.WebVTT if it loads right away
       window['WebVTT'] = true;
+      this.el().parentNode.appendChild(script);
     }
 
     let updateDisplay = () => this.trigger('texttrackchange');
@@ -360,6 +416,28 @@ class Tech extends Component {
     this.on('dispose', function() {
       tracks.removeEventListener('change', textTracksChanges);
     });
+  }
+
+  /**
+   * Get videotracks
+   *
+   * @returns {VideoTrackList}
+   * @method videoTracks
+   */
+  videoTracks() {
+    this.videoTracks_ = this.videoTracks_ || new VideoTrackList();
+    return this.videoTracks_;
+  }
+
+  /**
+   * Get audiotracklist
+   *
+   * @returns {AudioTrackList}
+   * @method audioTracks
+   */
+  audioTracks() {
+    this.audioTracks_ = this.audioTracks_ || new AudioTrackList();
+    return this.audioTracks_;
   }
 
   /*
@@ -536,13 +614,30 @@ class Tech extends Component {
   }
 }
 
-/*
+/**
  * List of associated text tracks
  *
- * @type {Array}
+ * @type {TextTrackList}
  * @private
  */
 Tech.prototype.textTracks_;
+
+/**
+ * List of associated audio tracks
+ *
+ * @type {AudioTrackList}
+ * @private
+ */
+Tech.prototype.audioTracks_;
+
+/**
+ * List of associated video tracks
+ *
+ * @type {VideoTrackList}
+ * @private
+ */
+Tech.prototype.videoTracks_;
+
 
 var createTrackHelper = function(self, kind, label, language, options={}) {
   let tracks = self.textTracks();
@@ -713,6 +808,12 @@ Tech.withSourceHandlers = function(_Tech){
     this.disposeSourceHandler();
     this.off('dispose', this.disposeSourceHandler);
 
+    // if we have a source and get another one
+    // then we are loading something new
+    // than clear all of our current tracks
+    if (this.currentSource_) {
+      this.clearTracks(['audio', 'video']);
+    }
     this.currentSource_ = source;
     this.sourceHandler_ = sh.handleSource(source, this, this.options_);
     this.on('dispose', this.disposeSourceHandler);
