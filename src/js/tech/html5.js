@@ -99,7 +99,7 @@ class Html5 extends Tech {
 
     if (this.featuresNativeTextTracks) {
       if (crossoriginTracks) {
-        log.warn(tsml`Text Tracks are being loaded from another origin but the crossorigin attribute isn't used. 
+        log.warn(tsml`Text Tracks are being loaded from another origin but the crossorigin attribute isn't used.
             This may prevent text tracks from loading.`);
       }
 
@@ -549,7 +549,17 @@ class Html5 extends Tech {
    * @method setSrc
    */
   setSrc(src) {
+    let loadstartlistener = Html5.prototype.loadStartListener_;
+
+    this.off(this.el_, 'loadstart', loadstartlistener);
+    this.one(this.el_, 'loadstart', () => this.one(this.el_, 'loadstart', loadstartlistener));
+    this.disposeSourceHandler();
+
     this.el_.src = src;
+  }
+
+  loadStartListener_() {
+    this.currentSource_ = null;
   }
 
   /**
@@ -1147,7 +1157,6 @@ Html5.prototype['featuresNativeVideoTracks'] = Html5.supportsNativeVideoTracks()
  * @type {Boolean}
  */
 Html5.prototype['featuresNativeAudioTracks'] = Html5.supportsNativeAudioTracks();
-
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //
 let canPlayType;

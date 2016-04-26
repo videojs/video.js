@@ -23,7 +23,12 @@ EventTarget.prototype.off = function(type, fn) {
 EventTarget.prototype.removeEventListener = EventTarget.prototype.off;
 
 EventTarget.prototype.one = function(type, fn) {
+  // Remove the addEventListener alias before calling Events.on
+  // so we don't get into an infinite type loop
+  let ael = this.addEventListener;
+  this.addEventListener = Function.prototype;
   Events.one(this, type, fn);
+  this.addEventListener = ael;
 };
 
 EventTarget.prototype.trigger = function(event) {
