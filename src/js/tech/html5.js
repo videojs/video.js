@@ -553,13 +553,13 @@ class Html5 extends Tech {
 
     this.off(this.el_, 'loadstart', loadstartlistener);
     this.one(this.el_, 'loadstart', () => this.one(this.el_, 'loadstart', loadstartlistener));
-    this.disposeSourceHandler();
 
     this.el_.src = src;
   }
 
   loadStartListener_() {
     this.currentSource_ = null;
+    this.disposeSourceHandler();
   }
 
   /**
