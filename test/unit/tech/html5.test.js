@@ -3,7 +3,6 @@ var player, tech, el;
 import Html5 from '../../../src/js/tech/html5.js';
 import * as browser from '../../../src/js/utils/browser.js';
 import document from 'global/document';
-import TestHelpers from '../test-helpers.js';
 import EventTarget from '../../../src/js/event-target.js';
 import * as Fn from '../../../src/js/utils/fn.js';
 
