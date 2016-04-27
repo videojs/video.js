@@ -448,12 +448,13 @@ test('Html5#reset calls Html5.resetMediaElement when called', function() {
 
 test('Html5#setSrc clears currentSource_ after loadstart', function() {
 
+  let disposed = false;
   let thing = {
     off: () => {},
     one: (el, type, fun) => {
       el.one(type, Fn.bind(thing, fun));
     },
-    disposeSourceHandler: () => {},
+    disposeSourceHandler: () => disposed = true,
     el_: new EventTarget()
   };
 
@@ -468,5 +469,6 @@ test('Html5#setSrc clears currentSource_ after loadstart', function() {
   thing.el_.trigger('loadstart');
 
   equal(thing.currentSource_, null);
+  equal(disposed, true);
 
 });

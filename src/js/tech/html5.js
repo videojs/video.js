@@ -99,7 +99,7 @@ class Html5 extends Tech {
 
     if (this.featuresNativeTextTracks) {
       if (crossoriginTracks) {
-        log.warn(tsml`Text Tracks are being loaded from another origin but the crossorigin attribute isn't used.
+        log.warn(tsml`Text Tracks are being loaded from another origin but the crossorigin attribute isn't used. 
             This may prevent text tracks from loading.`);
       }
 
