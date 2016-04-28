@@ -3,8 +3,6 @@ var player, tech, el;
 import Html5 from '../../../src/js/tech/html5.js';
 import * as browser from '../../../src/js/utils/browser.js';
 import document from 'global/document';
-import EventTarget from '../../../src/js/event-target.js';
-import * as Fn from '../../../src/js/utils/fn.js';
 
 q.module('HTML5', {
   'setup': function() {
@@ -443,31 +441,4 @@ test('Html5#reset calls Html5.resetMediaElement when called', function() {
   equal(resetEl, el, 'we called resetMediaElement with the tech\'s el');
 
   Html5.resetMediaElement = oldResetMedia;
-});
-
-test('Html5#setSrc clears currentSource_ after loadstart', function() {
-
-  let disposed = false;
-  let thing = {
-    off: () => {},
-    one: (el, type, fun) => {
-      el.one(type, Fn.bind(thing, fun));
-    },
-    disposeSourceHandler: () => disposed = true,
-    el_: new EventTarget()
-  };
-
-  Html5.prototype.setSrc.call(thing, 'test');
-
-  thing.currentSource_ = 'test';
-
-  thing.el_.trigger('loadstart');
-
-  equal(thing.currentSource_, 'test');
-
-  thing.el_.trigger('loadstart');
-
-  equal(thing.currentSource_, null);
-  equal(disposed, true);
-
 });

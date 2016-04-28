@@ -814,18 +814,41 @@ Tech.withSourceHandlers = function(_Tech){
     if (this.currentSource_) {
       this.clearTracks(['audio', 'video']);
     }
-    this.currentSource_ = source;
+
+    if (sh !== _Tech.nativeSourceHandler) {
+
+      this.currentSource_ = source;
+
+      // Try to catch if someone replaced the src some other way.
+      // If they do, set currentSource_ to null and dispose our source handler.
+      this.off(this.el_, 'loadstart', _Tech.prototype.loadStartListener_);
+      this.off(this.el_, 'loadstart', _Tech.prototype.secondLoadStartListener_);
+      this.one(this.el_, 'loadstart', _Tech.prototype.secondLoadStartListener_);
+
+    }
+
     this.sourceHandler_ = sh.handleSource(source, this, this.options_);
     this.on('dispose', this.disposeSourceHandler);
 
     return this;
   };
 
-   /*
-    * Clean up any existing source handler
-    */
-   _Tech.prototype.disposeSourceHandler = function(){
+  _Tech.prototype.loadStartListener_ = function() {
+    this.currentSource_ = null;
+    this.disposeSourceHandler();
+  };
+
+  _Tech.prototype.secondLoadStartListener_ = function() {
+    this.one(this.el_, 'loadstart', _Tech.prototype.loadStartListener_);
+  };
+
+  /*
+   * Clean up any existing source handler
+   */
+  _Tech.prototype.disposeSourceHandler = function() {
     if (this.sourceHandler_ && this.sourceHandler_.dispose) {
+      this.off(this.el_, 'loadstart', _Tech.prototype.loadStartListener_);
+      this.off(this.el_, 'loadstart', _Tech.prototype.secondLoadStartListener_);
       this.sourceHandler_.dispose();
     }
   };

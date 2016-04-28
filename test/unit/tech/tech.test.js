@@ -13,7 +13,7 @@ import TextTrack from '../../../src/js/tracks/text-track';
 import AudioTrackList from '../../../src/js/tracks/audio-track-list';
 import VideoTrackList from '../../../src/js/tracks/video-track-list';
 import TextTrackList from '../../../src/js/tracks/text-track-list';
-
+import * as Fn from '../../../src/js/utils/fn.js';
 
 q.module('Media Tech', {
   'setup': function() {
@@ -369,4 +369,44 @@ test('Tech.isTech returns correct answers for techs and components', function() 
   ok(!isTech(Button), 'A Button is not a Tech');
   ok(!isTech(new Button({}, {})), 'A Button instance is not a Tech');
   ok(!isTech(isTech), 'A function is not a Tech');
+});
+
+test('Tech#setSource clears currentSource_ after repeated loadstart', function() {
+  let disposed = false;
+  let MyTech = extendFn(Tech);
+
+  Tech.withSourceHandlers(MyTech);
+  let tech = new MyTech();
+
+  var sourceHandler = {
+    canPlayType: function(type) {
+      return true;
+    },
+    canHandleSource: function(source) {
+      return true;
+    },
+    handleSource: function(source, tech, options) {
+      return {
+        dispose: function() {
+          disposed = true;
+        }
+      };
+    }
+  };
+
+  // Test registering source handlers
+  MyTech.registerSourceHandler(sourceHandler);
+
+  tech.setSource('test');
+
+  tech.currentSource_ = 'test';
+
+  tech.trigger('loadstart');
+
+  equal(tech.currentSource_, 'test', 'Current source is test');
+
+  tech.trigger('loadstart');
+
+  equal(tech.currentSource_, null, 'Current source is null');
+  equal(disposed, true, 'disposed is true');
 });
