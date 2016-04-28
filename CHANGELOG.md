@@ -7,6 +7,7 @@ CHANGELOG
 * @chrisauclair Make controls visible for accessibility reasons ([view](https://github.com/videojs/video.js/pull/3237))
 * @gkatsev updated text track documentation and crossorigin warning. Fixes #1888, #1958, #2628, #3202 ([view](https://github.com/videojs/video.js/pull/3256))
 * @BrandonOCasey added audio and video track support ([view](https://github.com/videojs/video.js/pull/3173))
+* @OwenEdwards added language attribute in HTML files for accessibility ([view](https://github.com/videojs/video.js/pull/3257))
 
 --------------------
 
