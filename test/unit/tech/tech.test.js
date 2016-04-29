@@ -396,16 +396,20 @@ test('Tech#setSource clears currentSource_ after repeated loadstart', function()
   // Test registering source handlers
   MyTech.registerSourceHandler(sourceHandler);
 
+  // First loadstart
   tech.setSource('test');
-
   tech.currentSource_ = 'test';
-
   tech.trigger('loadstart');
-
   equal(tech.currentSource_, 'test', 'Current source is test');
 
+  // Second loadstart
   tech.trigger('loadstart');
-
   equal(tech.currentSource_, null, 'Current source is null');
   equal(disposed, true, 'disposed is true');
+
+  // Third loadstart
+  tech.currentSource_ = 'test';
+  tech.trigger('loadstart');
+  equal(tech.currentSource_, null, 'Current source is still null');
+
 });
