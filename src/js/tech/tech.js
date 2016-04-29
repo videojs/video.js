@@ -819,11 +819,11 @@ Tech.withSourceHandlers = function(_Tech){
 
       this.currentSource_ = source;
 
-      // Try to catch if someone replaced the src some other way.
+      // Catch if someone replaced the src without calling setSource.
       // If they do, set currentSource_ to null and dispose our source handler.
-      this.off(this.el_, 'loadstart', _Tech.prototype.loadStartListener_);
-      this.off(this.el_, 'loadstart', _Tech.prototype.secondLoadStartListener_);
-      this.one(this.el_, 'loadstart', _Tech.prototype.secondLoadStartListener_);
+      this.off(this.el_, 'loadstart', _Tech.prototype.firstLoadStartListener_);
+      this.off(this.el_, 'loadstart', _Tech.prototype.successiveLoadStartListener_);
+      this.one(this.el_, 'loadstart', _Tech.prototype.firstLoadStartListener_);
 
     }
 
@@ -833,13 +833,15 @@ Tech.withSourceHandlers = function(_Tech){
     return this;
   };
 
-  _Tech.prototype.loadStartListener_ = function() {
-    this.currentSource_ = null;
-    this.disposeSourceHandler();
+  // On the first loadstart after setSource
+  _Tech.prototype.firstLoadStartListener_ = function() {
+    this.one(this.el_, 'loadstart', _Tech.prototype.successiveLoadStartListener_);
   };
 
-  _Tech.prototype.secondLoadStartListener_ = function() {
-    this.one(this.el_, 'loadstart', _Tech.prototype.loadStartListener_);
+  // On successive loadstarts when setSource has not been called again
+  _Tech.prototype.successiveLoadStartListener_ = function() {
+    this.currentSource_ = null;
+    this.disposeSourceHandler();
   };
 
   /*
@@ -847,8 +849,8 @@ Tech.withSourceHandlers = function(_Tech){
    */
   _Tech.prototype.disposeSourceHandler = function() {
     if (this.sourceHandler_ && this.sourceHandler_.dispose) {
-      this.off(this.el_, 'loadstart', _Tech.prototype.loadStartListener_);
-      this.off(this.el_, 'loadstart', _Tech.prototype.secondLoadStartListener_);
+      this.off(this.el_, 'loadstart', _Tech.prototype.firstLoadStartListener_);
+      this.off(this.el_, 'loadstart', _Tech.prototype.successiveLoadStartListener_);
       this.sourceHandler_.dispose();
     }
   };

@@ -13,7 +13,6 @@ import TextTrack from '../../../src/js/tracks/text-track';
 import AudioTrackList from '../../../src/js/tracks/audio-track-list';
 import VideoTrackList from '../../../src/js/tracks/video-track-list';
 import TextTrackList from '../../../src/js/tracks/text-track-list';
-import * as Fn from '../../../src/js/utils/fn.js';
 
 q.module('Media Tech', {
   'setup': function() {
