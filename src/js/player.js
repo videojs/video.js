@@ -772,7 +772,7 @@ class Player extends Component {
     // In Safari (5.1.1), when we move the video element into the container div, autoplay doesn't work.
     // In Chrome (15), if you have autoplay + a poster + no controls, the video gets hidden (but audio plays)
     // This fixes both issues. Need to wait for API, so it updates displays correctly
-    if (this.src() && this.tag && this.options_.autoplay && this.paused()) {
+    if ((this.src() || this.currentSrc()) && this.tag && this.options_.autoplay && this.paused()) {
       delete this.tag.poster; // Chrome Fix. Fixed in Chrome v16.
       this.play();
     }
