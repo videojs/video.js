@@ -9,6 +9,7 @@ CHANGELOG
 * @BrandonOCasey added audio and video track support ([view](https://github.com/videojs/video.js/pull/3173))
 * @OwenEdwards added language attribute in HTML files for accessibility ([view](https://github.com/videojs/video.js/pull/3257))
 * @incompl clear currentSource_ after subsequent loadstarts ([view](https://github.com/videojs/video.js/pull/3285))
+* @forbesjo add an audio track selector menu button ([view](https://github.com/videojs/video.js/pull/3223))
 
 --------------------
 
