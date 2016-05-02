@@ -1148,7 +1148,6 @@ Html5.prototype['featuresNativeVideoTracks'] = Html5.supportsNativeVideoTracks()
  */
 Html5.prototype['featuresNativeAudioTracks'] = Html5.supportsNativeAudioTracks();
 
-
 // HTML5 Feature detection and Device Fixes --------------------------------- //
 let canPlayType;
 const mpegurlRE = /^application\/(?:x-|vnd\.apple\.)mpegurl/i;
