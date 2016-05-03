@@ -2,11 +2,6 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
-
---------------------
-
-## 5.10.0 (2016-05-03)
 * @nickygerritsen Pass tech options to source handlers ([view](https://github.com/videojs/video.js/pull/3245))
 * @gkatsev Use fonts 2.0 that do not require wrapping codepoints ([view](https://github.com/videojs/video.js/pull/3252))
 * @chrisauclair Make controls visible for accessibility reasons ([view](https://github.com/videojs/video.js/pull/3237))
@@ -15,6 +10,8 @@ _(none)_
 * @OwenEdwards added language attribute in HTML files for accessibility ([view](https://github.com/videojs/video.js/pull/3257))
 * @incompl clear currentSource_ after subsequent loadstarts ([view](https://github.com/videojs/video.js/pull/3285))
 * @forbesjo add an audio track selector menu button ([view](https://github.com/videojs/video.js/pull/3223))
+
+--------------------
 
 ## 5.9.2 (2016-04-19)
 * @gkatsev grouped text track errors in the console, if we can ([view](https://github.com/videojs/video.js/pull/3259))
