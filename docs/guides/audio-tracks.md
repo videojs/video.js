@@ -1,6 +1,6 @@
 # Audio Tracks
 
-Audio Tracks are a function of HTML5 video for providing time triggered text to the viewer. Video.js makes audio tracks work across all browsers. There are currently five types of tracks:
+Audio Tracks are a function of HTML5 video for providing alternative audio track selections to the user, so that a track other than the main track can be played. Video.js makes audio tracks work across all browsers. There are currently five types of tracks:
 
 - **Alternative**: alternative audio for the main video track
 - **Descriptions**: descriptions of what is happening in the video track

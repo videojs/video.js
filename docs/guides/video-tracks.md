@@ -1,6 +1,6 @@
 # Video Tracks
 
-Video Tracks are a function of HTML5 video for providing time triggered text to the viewer. Video.js makes video tracks work across all browsers. There are currently six types of tracks:
+Video Tracks are a function of HTML5 video for providing a selection of alternative video tracks to the user, so that they can change type of video they want to watch. Video.js makes video tracks work across all browsers. There are currently six types of tracks:
 
 - **Alternative**: an alternative video representation of the main video track
 - **Captions**: The main video track with burned in captions

@@ -1,4 +1,4 @@
-# Tracks
+# Text Tracks
 
 Text Tracks are a function of HTML5 video for providing time triggered text to the viewer. Video.js makes tracks work across all browsers. There are currently five types of tracks:
 
