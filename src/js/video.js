@@ -16,7 +16,6 @@ import TextTrack from './tracks/text-track.js';
 import AudioTrack from './tracks/audio-track.js';
 import VideoTrack from './tracks/video-track.js';
 
-import assign from 'object.assign';
 import { createTimeRanges } from './utils/time-ranges.js';
 import formatTime from './utils/format-time.js';
 import log from './utils/log.js';
@@ -25,7 +24,6 @@ import * as browser from './utils/browser.js';
 import * as Url from './utils/url.js';
 import extendFn from './extend.js';
 import merge from 'lodash-compat/object/merge';
-import createDeprecationProxy from './utils/create-deprecation-proxy.js';
 import xhr from 'xhr';
 
 // Include the built-in techs
@@ -153,21 +151,15 @@ videojs.options = Player.prototype.options_;
  * @mixes videojs
  * @method getPlayers
  */
-videojs.getPlayers = function() {
-  return Player.players;
-};
+videojs.getPlayers = () => Player.players;
 
 /**
- * For backward compatibility, expose players object.
+ * Expose players object.
  *
- * @deprecated
  * @memberOf videojs
- * @property {Object|Proxy} players
+ * @property {Object} players
  */
-videojs.players = createDeprecationProxy(Player.players, {
-  get: 'Access to videojs.players is deprecated; use videojs.getPlayers instead',
-  set: 'Modification of videojs.players is deprecated'
-});
+videojs.players = Player.players;
 
 /**
  * Get a component class object by name
