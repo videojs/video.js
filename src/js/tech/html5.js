@@ -140,9 +140,9 @@ class Html5 extends Tech {
         tl.removeEventListener('removetrack', this[`handle${capitalType}TrackRemove_`]);
       }
       
-      // Stop removing old tracks
-      if (tl) {
-        this.off('loadstart', this[`removeOld${capitalType}Tracks_`]);
+      // Stop removing old text tracks
+      if (type === 'text' && tl) {
+        this.off('loadstart', this.removeOldTextTracks_);
       }
     });
 
@@ -368,20 +368,25 @@ class Html5 extends Tech {
     // This will loop over the texttracks and check if they are still used
     // If not, they will be removed from the emulated list
     let removeTracks = [];
+    const techTracks = this.textTracks();
+    const elTracks = this.el().textTracks;
+    if (!elTracks) {
+      return;
+    }
 
-    for (let i = 0; i < this.textTracks().length; i++) {
-      let techTrack = this.textTracks()[i];
+    for (let i = 0; i < techTracks.length; i++) {
+      let techTrack = techTracks[i];
 
       let found = false;
-      for (let j = 0; j < this.el().textTracks.length; j++) {
-	if (this.el().textTracks[j] === techTrack) {
-	  found = true;
-	  break;
-	}
+      for (let j = 0; j < elTracks.length; j++) {
+        if (elTracks[j] === techTrack) {
+          found = true;
+          break;
+        }
       }
 
       if (!found) {
-	removeTracks.push(techTrack);
+        removeTracks.push(techTrack);
       }
     }
 
