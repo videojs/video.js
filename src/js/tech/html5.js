@@ -302,10 +302,8 @@ class Html5 extends Tech {
         tt.addEventListener('addtrack', this.handleTextTrackAdd_);
         tt.addEventListener('removetrack', this.handleTextTrackRemove_);
       }
-    }
-
-    // Remove (native) texttracks that are not used anymore
-    if (tt) {
+    
+      // Remove (native) texttracks that are not used anymore
       this.on('loadstart', this.removeOldTextTracks_);
     }
   }
