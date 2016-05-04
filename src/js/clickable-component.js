@@ -78,7 +78,7 @@ class ClickableComponent extends Component {
       el.appendChild(this.controlTextEl_);
     }
 
-    this.controlText(this.controlText_);
+    this.controlText(this.controlText_, el);
 
     return this.controlTextEl_;
   }
@@ -86,15 +86,19 @@ class ClickableComponent extends Component {
   /**
    * Controls text - both request and localize
    *
-   * @param {String} text Text for element
+   * @param {String}  text Text for element
+   * @param {Element=} el Element to set the title on
    * @return {String}
    * @method controlText
    */
-  controlText(text) {
+  controlText(text, el=this.el()) {
     if (!text) return this.controlText_ || 'Need Text';
+    
+    const localizedText = this.localize(text);
 
     this.controlText_ = text;
-    this.controlTextEl_.innerHTML = this.localize(this.controlText_);
+    this.controlTextEl_.innerHTML = localizedText;
+    el.setAttribute('title', localizedText);
 
     return this;
   }
