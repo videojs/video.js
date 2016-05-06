@@ -369,9 +369,10 @@ Flash.nativeSourceHandler.canPlayType = function(type){
  * Check Flash can handle the source natively
  *
  * @param  {Object} source  The source object
+ * @param  {Object} options The options passed to the tech
  * @return {String}         'probably', 'maybe', or '' (empty string)
  */
-Flash.nativeSourceHandler.canHandleSource = function(source){
+Flash.nativeSourceHandler.canHandleSource = function(source, options){
   var type;
 
   function guessMimeType(src) {

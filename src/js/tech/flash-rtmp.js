@@ -75,9 +75,10 @@ function FlashRtmpDecorator(Flash) {
   /**
    * Check if Flash can handle the source natively
    * @param  {Object} source  The source object
+   * @param  {Object} options The options passed to the tech
    * @return {String}         'probably', 'maybe', or '' (empty string)
    */
-  Flash.rtmpSourceHandler.canHandleSource = function(source){
+  Flash.rtmpSourceHandler.canHandleSource = function(source, options){
     let can = Flash.rtmpSourceHandler.canPlayType(source.type);
 
     if (can) {
