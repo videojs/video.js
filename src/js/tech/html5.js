@@ -94,6 +94,9 @@ class Html5 extends Tech {
         tl.addEventListener('change', Fn.bind(this, this[`handle${capitalType}TrackChange_`]));
         tl.addEventListener('addtrack', Fn.bind(this, this[`handle${capitalType}TrackAdd_`]));
         tl.addEventListener('removetrack', Fn.bind(this, this[`handle${capitalType}TrackRemove_`]));
+
+        // Remove (native) trackts that are not used anymore
+        this.on('loadstart', this[`removeOld${capitalType}Tracks_`]);
       }
     });
 
@@ -106,7 +109,6 @@ class Html5 extends Tech {
       this.handleTextTrackChange_ = Fn.bind(this, this.handleTextTrackChange);
       this.handleTextTrackAdd_ = Fn.bind(this, this.handleTextTrackAdd);
       this.handleTextTrackRemove_ = Fn.bind(this, this.handleTextTrackRemove);
-      this.removeOldTextTracks_ = Fn.bind(this, this.removeOldTextTracks);
       this.proxyNativeTextTracks_();
     }
 
@@ -141,8 +143,8 @@ class Html5 extends Tech {
       }
       
       // Stop removing old text tracks
-      if (type === 'text' && tl) {
-        this.off('loadstart', this.removeOldTextTracks_);
+      if (tl) {
+        this.off('loadstart', this[`removeOld${capitalType}Tracks_`]);
       }
     });
 
@@ -362,12 +364,17 @@ class Html5 extends Tech {
     this.audioTracks().removeTrack_(e.track);
   }
 
-  removeOldTextTracks() {
-    // This will loop over the texttracks and check if they are still used
+  /**
+   * This is a helper function that is used in removeOldTextTracks_, removeOldAudioTracks_ and
+   * removeOldVideoTracks_
+   * @param {Track[]} techTracks Tracks for this tech
+   * @param {Track[]} elTracks Tracks for the HTML5 video element
+   * @private
+   */
+  removeOldTracks_(techTracks, elTracks) {
+    // This will loop over the techTracks and check if they are still used by the HTML5 video element
     // If not, they will be removed from the emulated list
     let removeTracks = [];
-    const techTracks = this.textTracks();
-    const elTracks = this.el().textTracks;
     if (!elTracks) {
       return;
     }
@@ -390,8 +397,26 @@ class Html5 extends Tech {
 
     for (let i = 0; i < removeTracks.length; i++) {
       const track = removeTracks[i];
-      this.textTracks().removeTrack_(track);
+      techTracks.removeTrack_(track);
     }
+  }
+
+  removeOldTextTracks_() {
+    const techTracks = this.textTracks();
+    const elTracks = this.el().textTracks;
+    this.removeOldTracks_(techTracks, elTracks);
+  }
+
+  removeOldAudioTracks_() {
+    const techTracks = this.audioTracks();
+    const elTracks = this.el().audioTracks;
+    this.removeOldTracks_(techTracks, elTracks);
+  }
+
+  removeOldVideoTracks_() {
+    const techTracks = this.videoTracks();
+    const elTracks = this.el().videoTracks;
+    this.removeOldTracks_(techTracks, elTracks);
   }
 
   /**
