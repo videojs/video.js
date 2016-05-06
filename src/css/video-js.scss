@@ -1,7 +1,6 @@
 @import "variables";
 @import "private-variables";
 @import "utilities";
-@import "print";
 
 @import "node_modules/videojs-font/scss/icons";
 
@@ -40,3 +39,5 @@
 @import "components/adaptive";
 @import "components/captions-settings";
 @import "components/modal-dialog";
+
+@import "print";
