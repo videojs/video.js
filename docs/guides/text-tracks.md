@@ -111,11 +111,11 @@ The Flash tech will always use the emulated text track functionality.
 The video.js API and TextTrack objects were modeled after the w3c's specification.
 video.js uses [Mozilla's vtt.js](https://github.com/mozilla/vtt.js) library to parse and display its emulated text tracks.
 
-If you wanted to disable native text track functionality and force video.js to use emulated text tracks always, you can supply the `nativeTextTrack` option to the tech like so:
+If you wanted to disable native text track functionality and force video.js to use emulated text tracks always, you can supply the `nativeTextTracks` option to the tech like so:
 ```js
 let player = videojs('myvideo', {
   html5: {
-    nativeTextTrack: false
+    nativeTextTracks: false
   }
 });
 ```
