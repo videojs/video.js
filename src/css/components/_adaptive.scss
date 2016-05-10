@@ -8,7 +8,8 @@
   .vjs-current-time, .vjs-time-divider, .vjs-duration, .vjs-remaining-time,
   .vjs-playback-rate, .vjs-progress-control,
   .vjs-mute-control, .vjs-volume-control, .vjs-volume-menu-button,
-  .vjs-chapters-button, .vjs-captions-button, .vjs-subtitles-button { display: none; }
+  .vjs-chapters-button, .vjs-descriptions-button, .vjs-captions-button,
+  .vjs-subtitles-button, .vjs-audio-button { display: none; }
 }
 
 // When the player is x-small, display nothing but:
@@ -19,7 +20,8 @@
   .vjs-current-time, .vjs-time-divider, .vjs-duration, .vjs-remaining-time,
   .vjs-playback-rate,
   .vjs-mute-control, .vjs-volume-control, .vjs-volume-menu-button,
-  .vjs-chapters-button, .vjs-captions-button, .vjs-subtitles-button { display: none; }
+  .vjs-chapters-button, .vjs-descriptions-button, .vjs-captions-button,
+  .vjs-subtitles-button, .vjs-audio-button { display: none; }
 }
 
 
@@ -33,5 +35,6 @@
   .vjs-current-time, .vjs-time-divider, .vjs-duration, .vjs-remaining-time,
   .vjs-playback-rate,
   .vjs-mute-control, .vjs-volume-control,
-  .vjs-chapters-button, .vjs-captions-button, .vjs-subtitles-button { display: none; }
+  .vjs-chapters-button, .vjs-descriptions-button, .vjs-captions-button,
+  .vjs-subtitles-button .vjs-audio-button { display: none; }
 }
