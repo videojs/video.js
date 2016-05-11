@@ -3,6 +3,7 @@ CHANGELOG
 
 ## HEAD (Unreleased)
 * @BrandonOCasey Document audio/video track usage ([view](https://github.com/videojs/video.js/pull/3295))
+* @hartman Correct documentation to refer to nativeTextTracks option ([view](https://github.com/videojs/video.js/pull/3309))
 
 --------------------
 
