@@ -813,6 +813,8 @@ Tech.withSourceHandlers = function(_Tech){
     // than clear all of our current tracks
     if (this.currentSource_) {
       this.clearTracks(['audio', 'video']);
+
+      this.currentSource_ = null;
     }
 
     if (sh !== _Tech.nativeSourceHandler) {
@@ -852,6 +854,7 @@ Tech.withSourceHandlers = function(_Tech){
     if (this.sourceHandler_ && this.sourceHandler_.dispose) {
       this.off(this.el_, 'loadstart', _Tech.prototype.firstLoadStartListener_);
       this.off(this.el_, 'loadstart', _Tech.prototype.successiveLoadStartListener_);
+      this.currentSource_ = null;
       this.sourceHandler_.dispose();
     }
   };
