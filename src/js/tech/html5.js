@@ -944,9 +944,10 @@ Html5.nativeSourceHandler.canPlayType = function(type){
  * Check if the video element can handle the source natively
  *
  * @param  {Object} source  The source object
+ * @param  {Object} options The options passed to the tech
  * @return {String}         'probably', 'maybe', or '' (empty string)
  */
-Html5.nativeSourceHandler.canHandleSource = function(source){
+Html5.nativeSourceHandler.canHandleSource = function(source, options){
   var match, ext;
 
   // If a type was provided we should rely on that

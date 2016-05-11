@@ -8,16 +8,16 @@ test('Flash.canPlaySource', function() {
   var canPlaySource = Flash.canPlaySource;
 
   // Supported
-  ok(canPlaySource({ type: 'video/mp4; codecs=avc1.42E01E,mp4a.40.2' }), 'codecs supported');
-  ok(canPlaySource({ type: 'video/mp4' }), 'video/mp4 supported');
-  ok(canPlaySource({ type: 'video/x-flv' }), 'video/x-flv supported');
-  ok(canPlaySource({ type: 'video/flv' }), 'video/flv supported');
-  ok(canPlaySource({ type: 'video/m4v' }), 'video/m4v supported');
-  ok(canPlaySource({ type: 'VIDEO/FLV' }), 'capitalized mime type');
+  ok(canPlaySource({ type: 'video/mp4; codecs=avc1.42E01E,mp4a.40.2' }, {}), 'codecs supported');
+  ok(canPlaySource({ type: 'video/mp4' }, {}), 'video/mp4 supported');
+  ok(canPlaySource({ type: 'video/x-flv' }, {}), 'video/x-flv supported');
+  ok(canPlaySource({ type: 'video/flv' }, {}), 'video/flv supported');
+  ok(canPlaySource({ type: 'video/m4v' }, {}), 'video/m4v supported');
+  ok(canPlaySource({ type: 'VIDEO/FLV' }, {}), 'capitalized mime type');
 
   // Not supported
-  ok(!canPlaySource({ type: 'video/webm; codecs="vp8, vorbis"' }));
-  ok(!canPlaySource({ type: 'video/webm' }));
+  ok(!canPlaySource({ type: 'video/webm; codecs="vp8, vorbis"' }, {}));
+  ok(!canPlaySource({ type: 'video/webm' }, {}));
 });
 
 test('currentTime', function() {
@@ -147,10 +147,10 @@ test('canPlayType should select the correct types to play', function () {
 test('canHandleSource should be able to work with src objects without a type', function () {
   let canHandleSource = Flash.nativeSourceHandler.canHandleSource;
 
-  equal('maybe', canHandleSource({ src: 'test.video.mp4' }), 'should guess that it is a mp4 video');
-  equal('maybe', canHandleSource({ src: 'test.video.m4v' }), 'should guess that it is a m4v video');
-  equal('maybe', canHandleSource({ src: 'test.video.flv' }), 'should guess that it is a flash video');
-  equal('', canHandleSource({ src: 'test.video.wgg' }), 'should return empty string if it can not play the video');
+  equal('maybe', canHandleSource({ src: 'test.video.mp4' }, {}), 'should guess that it is a mp4 video');
+  equal('maybe', canHandleSource({ src: 'test.video.m4v' }, {}), 'should guess that it is a m4v video');
+  equal('maybe', canHandleSource({ src: 'test.video.flv' }, {}), 'should guess that it is a flash video');
+  equal('', canHandleSource({ src: 'test.video.wgg' }, {}), 'should return empty string if it can not play the video');
 });
 
 test('seekable', function() {

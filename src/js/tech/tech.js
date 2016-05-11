@@ -726,16 +726,17 @@ Tech.withSourceHandlers = function(_Tech){
    /*
     * Return the first source handler that supports the source
     * TODO: Answer question: should 'probably' be prioritized over 'maybe'
-    * @param  {Object} source The source object
+    * @param  {Object} source  The source object
+    * @param  {Object} options The options passed to the tech
     * @returns {Object}       The first source handler that supports the source
     * @returns {null}         Null if no source handler is found
     */
-   _Tech.selectSourceHandler = function(source){
+   _Tech.selectSourceHandler = function(source, options){
     let handlers = _Tech.sourceHandlers || [];
     let can;
 
     for (let i = 0; i < handlers.length; i++) {
-      can = handlers[i].canHandleSource(source);
+      can = handlers[i].canHandleSource(source, options);
 
       if (can) {
         return handlers[i];
@@ -748,13 +749,14 @@ Tech.withSourceHandlers = function(_Tech){
   /*
    * Check if the tech can support the given source
    * @param  {Object} srcObj  The source object
+   * @param  {Object} options The options passed to the tech
    * @return {String}         'probably', 'maybe', or '' (empty string)
    */
-  _Tech.canPlaySource = function(srcObj){
-    let sh = _Tech.selectSourceHandler(srcObj);
+  _Tech.canPlaySource = function(srcObj, options){
+    let sh = _Tech.selectSourceHandler(srcObj, options);
 
     if (sh) {
-      return sh.canHandleSource(srcObj);
+      return sh.canHandleSource(srcObj, options);
     }
 
     return '';
@@ -792,7 +794,7 @@ Tech.withSourceHandlers = function(_Tech){
     * @return {Tech} self
     */
    _Tech.prototype.setSource = function(source){
-    let sh = _Tech.selectSourceHandler(source);
+    let sh = _Tech.selectSourceHandler(source, this.options_);
 
     if (!sh) {
       // Fall back to a native source hander when unsupported sources are

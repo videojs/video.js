@@ -1823,7 +1823,7 @@ class Player extends Component {
     let foundSourceAndTech;
     let flip = (fn) => (a, b) => fn(b, a);
     let finder = ([techName, tech], source) => {
-      if (tech.canPlaySource(source)) {
+      if (tech.canPlaySource(source, this.options_[techName.toLowerCase()])) {
         return {source: source, tech: techName};
       }
     };
@@ -1898,7 +1898,7 @@ class Player extends Component {
     } else if (source instanceof Object) {
       // check if the source has a type and the loaded tech cannot play the source
       // if there's no type we'll just try the current tech
-      if (source.type && !currentTech.canPlaySource(source)) {
+      if (source.type && !currentTech.canPlaySource(source, this.options_[this.techName_.toLowerCase()])) {
         // create a source list with the current source and send through
         // the tech loop to check for a compatible technology
         this.sourceList_([source]);

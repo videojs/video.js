@@ -185,7 +185,8 @@ test('should add the source handler interface to a tech', function(){
       }
       return '';
     },
-    canHandleSource: function(source){
+    canHandleSource: function(source, options){
+      strictEqual(tech.options_, options, 'the tech options were passed to the source handler canHandleSource');
       if (source.type !=='no-support') {
         return 'probably';
       }
@@ -194,7 +195,7 @@ test('should add the source handler interface to a tech', function(){
     handleSource: function(s, t, o){
       strictEqual(tech, t, 'the tech instance was passed to the source handler');
       strictEqual(sourceA, s, 'the tech instance was passed to the source handler');
-      strictEqual(tech.options_, o, 'the tech options were passed to the source handler');
+      strictEqual(tech.options_, o, 'the tech options were passed to the source handler handleSource');
       return new handlerInternalState();
     }
   };
@@ -203,7 +204,7 @@ test('should add the source handler interface to a tech', function(){
     canPlayType: function(type){
       return ''; // no support
     },
-    canHandleSource: function(source){
+    canHandleSource: function(source, options){
       return ''; // no support
     },
     handleSource: function(source, tech, options){
@@ -218,16 +219,16 @@ test('should add the source handler interface to a tech', function(){
   strictEqual(MyTech.sourceHandlers[0], handlerTwo, 'handlerTwo was registered at the correct index (0)');
 
   // Test handler selection
-  strictEqual(MyTech.selectSourceHandler(sourceA), handlerOne, 'handlerOne was selected to handle the valid source');
-  strictEqual(MyTech.selectSourceHandler(sourceB), null, 'no handler was selected to handle the invalid source');
+  strictEqual(MyTech.selectSourceHandler(sourceA, tech.options_), handlerOne, 'handlerOne was selected to handle the valid source');
+  strictEqual(MyTech.selectSourceHandler(sourceB, tech.options_), null, 'no handler was selected to handle the invalid source');
 
   // Test canPlayType return values
   strictEqual(MyTech.canPlayType(sourceA.type), 'probably', 'the Tech returned probably for the valid source');
   strictEqual(MyTech.canPlayType(sourceB.type), '', 'the Tech returned an empty string for the invalid source');
 
   // Test canPlaySource return values
-  strictEqual(MyTech.canPlaySource(sourceA), 'probably', 'the Tech returned probably for the valid source');
-  strictEqual(MyTech.canPlaySource(sourceB), '', 'the Tech returned an empty string for the invalid source');
+  strictEqual(MyTech.canPlaySource(sourceA, tech.options_), 'probably', 'the Tech returned probably for the valid source');
+  strictEqual(MyTech.canPlaySource(sourceB, tech.options_), '', 'the Tech returned an empty string for the invalid source');
 
   tech.addRemoteTextTrack({});
   tech.addRemoteTextTrack({});
@@ -381,7 +382,7 @@ test('Tech#setSource clears currentSource_ after repeated loadstart', function()
     canPlayType: function(type) {
       return true;
     },
-    canHandleSource: function(source) {
+    canHandleSource: function(source, options) {
       return true;
     },
     handleSource: function(source, tech, options) {
