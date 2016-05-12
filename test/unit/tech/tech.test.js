@@ -265,7 +265,7 @@ test('should add the source handler interface to a tech', function(){
   // verify that all the tracks were removed as we got a new source
   equal(tech.audioTracks().length, 0, 'should have zero audio tracks');
   equal(tech.videoTracks().length, 0, 'should have zero video tracks');
-  equal(tech.textTracks().length, 2, 'should have two video tracks');
+  equal(tech.textTracks().length, 2, 'should have two text tracks');
   equal(tech.remoteTextTrackEls().length, 2, 'should have two remote text tracks els');
   equal(tech.remoteTextTracks().length, 2, 'should have two remote text tracks');
 
