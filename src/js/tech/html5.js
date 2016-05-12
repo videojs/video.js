@@ -993,9 +993,13 @@ Html5.registerSourceHandler(Html5.nativeSourceHandler);
  * @return {Boolean}
  */
 Html5.canControlVolume = function(){
-  var volume =  Html5.TEST_VID.volume;
-  Html5.TEST_VID.volume = (volume / 2) + 0.1;
-  return volume !== Html5.TEST_VID.volume;
+  try {
+    var volume =  Html5.TEST_VID.volume;
+    Html5.TEST_VID.volume = (volume / 2) + 0.1;
+    return volume !== Html5.TEST_VID.volume;
+  } catch(e) {
+    return false;
+  }
 };
 
 /*
@@ -1009,9 +1013,13 @@ Html5.canControlPlaybackRate = function(){
   if (browser.IS_ANDROID && browser.IS_CHROME) {
     return false;
   }
-  var playbackRate = Html5.TEST_VID.playbackRate;
-  Html5.TEST_VID.playbackRate = (playbackRate / 2) + 0.1;
-  return playbackRate !== Html5.TEST_VID.playbackRate;
+  try {
+    var playbackRate = Html5.TEST_VID.playbackRate;
+    Html5.TEST_VID.playbackRate = (playbackRate / 2) + 0.1;
+    return playbackRate !== Html5.TEST_VID.playbackRate;
+  } catch(e) {
+    return false;
+  }
 };
 
 /*
