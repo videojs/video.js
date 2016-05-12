@@ -815,6 +815,8 @@ Tech.withSourceHandlers = function(_Tech){
     // than clear all of our current tracks
     if (this.currentSource_) {
       this.clearTracks(['audio', 'video']);
+
+      this.currentSource_ = null;
     }
 
     if (sh !== _Tech.nativeSourceHandler) {

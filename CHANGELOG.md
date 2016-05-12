@@ -9,6 +9,9 @@ CHANGELOG
 
 --------------------
 
+## 5.10.2 (2016-05-12)
+* @gkatsev nulled out currentSource_ in setSource ([view](https://github.com/videojs/video.js/pull/3314))
+
 ## 5.10.1 (2016-05-03)
 * @nickygerritsen Pass tech options to source handlers ([view](https://github.com/videojs/video.js/pull/3245))
 * @gkatsev Use fonts 2.0 that do not require wrapping codepoints ([view](https://github.com/videojs/video.js/pull/3252))
