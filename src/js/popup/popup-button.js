@@ -85,6 +85,16 @@ class PopupButton extends ClickableComponent {
     return `vjs-menu-button ${menuButtonClass} ${super.buildCSSClass()}`;
   }
 
+  /**
+   * Return handler for the tooltip
+   *
+   * @return {Object} Dom element to serve as a handler for the tooltip
+   * @method tooltipHandler
+   */
+  tooltipHandler() {
+    // TODO: Fix popup button to have a real icon element to make it as tooltip handler
+    return;
+  }
 }
 
 Component.registerComponent('PopupButton', PopupButton);

@@ -256,6 +256,17 @@ class MenuButton extends ClickableComponent {
 
     return super.enable();
   }
+
+  /**
+   * Return handler for the tooltip
+   *
+   * @return {Object} Dom element to serve as a handler for the tooltip
+   * @method tooltipHandler
+   */
+  tooltipHandler() {
+    // TODO: Fix menu button to have a real icon element to make it as tooltip handler
+    return;
+  }
 }
 
 Component.registerComponent('MenuButton', MenuButton);

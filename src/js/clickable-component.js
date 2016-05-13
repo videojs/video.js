@@ -8,6 +8,7 @@ import * as Fn from './utils/fn.js';
 import log from './utils/log.js';
 import document from 'global/document';
 import assign from 'object.assign';
+import Tooltip from './tooltip';
 
 /**
  * Clickable Component which is clickable or keyboard actionable, but is not a native HTML button
@@ -21,6 +22,8 @@ class ClickableComponent extends Component {
 
   constructor(player, options) {
     super(player, options);
+
+    this.appendTooltip();
 
     this.emitTapEvents();
 
@@ -95,6 +98,12 @@ class ClickableComponent extends Component {
 
     this.controlText_ = text;
     this.controlTextEl_.innerHTML = this.localize(this.controlText_);
+
+    if (this.tooltip) {
+      this.tooltip.text(this.controlText_);
+    } else {
+      this.appendTooltip();
+    }
 
     return this;
   }
@@ -191,6 +200,55 @@ class ClickableComponent extends Component {
    */
   handleBlur() {
     Events.off(document, 'keydown', Fn.bind(this, this.handleKeyPress));
+  }
+
+  /**
+   * Append a tooltip to the component
+   *
+   * @method appendTooltip
+   */
+  appendTooltip() {
+    if (this.tooltip || !this.controlText_ || !this.el()) {
+      return;
+    }
+
+    let tooltipHandler = this.tooltipHandler();
+
+    if (tooltipHandler) {
+      console.log(this);
+      this.tooltip = new Tooltip(this.player_);
+      this.el().appendChild(this.tooltip.el());
+      this.tooltip.text(this.controlText_);
+      this.tooltip.handler(tooltipHandler);
+    }
+  }
+
+  /**
+   * Return handler for the tooltip
+   *
+   * @return {Object} Dom element to serve as a handler for the tooltip
+   * @method tooltipHandler
+   */
+  tooltipHandler() {
+    let handler = this.options_.tooltip;
+
+    if (handler === false) {
+      return;
+    }
+
+    if (handler === true || this.player_.options_.tooltips) {
+      return this.el();
+    }
+
+    if (typeof handler === 'string') {
+      return Dom.getEl(handler);
+    }
+
+    if (handler && typeof handler.el === 'function') {
+      return handler.el();
+    }
+
+    return handler;
   }
 }
 

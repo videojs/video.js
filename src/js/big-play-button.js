@@ -38,6 +38,18 @@ class BigPlayButton extends Button {
     this.player_.play();
   }
 
+  /**
+   * Return handler for the tooltip
+   *
+   * @return {Object} Dom element to serve as a handler for the tooltip
+   * @method tooltipHandler
+   */
+  tooltipHandler() {
+    if (this.options_.tooltip !== undefined) {
+      return super.tooltipHandler();
+    }
+  }
+
 }
 
 BigPlayButton.prototype.controlText_ = 'Play Video';

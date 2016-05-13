@@ -65,7 +65,6 @@ class PlayToggle extends Button {
     this.addClass('vjs-paused');
     this.controlText('Play'); // change the button text to "Play"
   }
-
 }
 
 PlayToggle.prototype.controlText_ = 'Play';
