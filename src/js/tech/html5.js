@@ -993,6 +993,7 @@ Html5.registerSourceHandler(Html5.nativeSourceHandler);
  * @return {Boolean}
  */
 Html5.canControlVolume = function(){
+  // IE will error if Windows Media Player not installed #3315
   try {
     var volume =  Html5.TEST_VID.volume;
     Html5.TEST_VID.volume = (volume / 2) + 0.1;
@@ -1013,6 +1014,7 @@ Html5.canControlPlaybackRate = function(){
   if (browser.IS_ANDROID && browser.IS_CHROME) {
     return false;
   }
+  // IE will error if Windows Media Player not installed #3315
   try {
     var playbackRate = Html5.TEST_VID.playbackRate;
     Html5.TEST_VID.playbackRate = (playbackRate / 2) + 0.1;
