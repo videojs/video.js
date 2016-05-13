@@ -236,7 +236,7 @@ class ClickableComponent extends Component {
       return;
     }
 
-    if (handler === true || this.player_.options_.tooltips) {
+    if (handler === true || (this.player_.options_ && this.player_.options_.tooltips)) {
       return this.el();
     }
 
