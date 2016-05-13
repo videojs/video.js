@@ -215,7 +215,6 @@ class ClickableComponent extends Component {
     let tooltipHandler = this.tooltipHandler();
 
     if (tooltipHandler) {
-      console.log(this);
       this.tooltip = new Tooltip(this.player_);
       this.el().appendChild(this.tooltip.el());
       this.tooltip.text(this.controlText_);
