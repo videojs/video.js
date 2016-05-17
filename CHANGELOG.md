@@ -6,6 +6,7 @@ CHANGELOG
 * @hartman Correct documentation to refer to nativeTextTracks option ([view](https://github.com/videojs/video.js/pull/3309))
 * @nickygerritsen Also pass tech options to canHandleSource ([view](https://github.com/videojs/video.js/pull/3303))
 * @misteroneill Un-deprecate the videojs.players property ([view](https://github.com/videojs/video.js/pull/3299))
+* @nickygerritsen Add title to all clickable components ([view](https://github.com/videojs/video.js/pull/3296))
 
 --------------------
 
