@@ -9,6 +9,7 @@ CHANGELOG
 * @nickygerritsen Add title to all clickable components ([view](https://github.com/videojs/video.js/pull/3296))
 * @nickygerritsen Update Dutch language file ([view](https://github.com/videojs/video.js/pull/3297))
 * @hartman Add descriptions and audio button to adaptive classes ([view](https://github.com/videojs/video.js/pull/3312))
+* @MattiasBuelens Retain details from tech error ([view](https://github.com/videojs/video.js/pull/3313))
 
 --------------------
 
