@@ -22,6 +22,6 @@ test('should localize its text', function(){
   el = testButton.createEl();
 
   ok(el.nodeName.toLowerCase().match('button'));
-  ok(el.innerHTML.match('vjs-control-text">Juego'));
+  ok(el.innerHTML.match(/vjs-control-text"?>Juego/));
   equal(el.getAttribute('title'), 'Juego');
 });
