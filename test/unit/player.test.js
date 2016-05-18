@@ -1026,3 +1026,58 @@ test('When VIDEOJS_NO_DYNAMIC_STYLE is set, apply sizing directly to the tech el
   equal(player.tech_.el().width, 600, 'the width is equal to 600');
   equal(player.tech_.el().height, 300, 'the height is equal 300');
 });
+
+test('Changing the source via the src() method triggers beforesourcechange and sourcechange events', function() {
+  var player = TestHelpers.makePlayer({
+    sources: [
+      {src: 'oceans.mp4', type: 'video/mp4'}
+    ]
+  });
+
+  var beforeSpy = sinon.spy();
+  var spy = sinon.spy();
+
+  player.on('beforesourcechange', beforeSpy);
+  player.on('sourcechange', spy);
+
+  this.clock.tick(1);
+
+  player.src([
+    {src: 'oceans-1.mp4', type: 'video/mp4'},
+    {src: 'oceans-1.webm', type: 'video/webm'}
+  ]);
+
+  let beforeSpyData = beforeSpy.lastCall.args[1];
+  let spyData = spy.lastCall.args[1];
+
+  strictEqual(beforeSpy.callCount, 1);
+  strictEqual(beforeSpyData.current, 'oceans.mp4');
+  strictEqual(beforeSpyData.upcoming, 'oceans-1.mp4');
+  strictEqual(spy.callCount, 1);
+  strictEqual(spyData.previous, 'oceans.mp4');
+  strictEqual(spyData.current, 'oceans-1.mp4');
+
+  player.src({src: 'oceans-2.mp4', type: 'video/mp4'});
+
+  beforeSpyData = beforeSpy.lastCall.args[1];
+  spyData = spy.lastCall.args[1];
+
+  strictEqual(beforeSpy.callCount, 2);
+  strictEqual(beforeSpyData.current, 'oceans-1.mp4');
+  strictEqual(beforeSpyData.upcoming, 'oceans-2.mp4');
+  strictEqual(spy.callCount, 2);
+  strictEqual(spyData.previous, 'oceans-1.mp4');
+  strictEqual(spyData.current, 'oceans-2.mp4');
+
+  player.src({src: 'oceans-3.mp4', type: 'video/mp4'});
+
+  beforeSpyData = beforeSpy.lastCall.args[1];
+  spyData = spy.lastCall.args[1];
+
+  strictEqual(beforeSpy.callCount, 3);
+  strictEqual(beforeSpyData.current, 'oceans-2.mp4');
+  strictEqual(beforeSpyData.upcoming, 'oceans-3.mp4');
+  strictEqual(spy.callCount, 3);
+  strictEqual(spyData.previous, 'oceans-2.mp4');
+  strictEqual(spyData.current, 'oceans-3.mp4');
+});

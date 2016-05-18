@@ -1903,6 +1903,13 @@ class Player extends Component {
         // the tech loop to check for a compatible technology
         this.sourceList_([source]);
       } else {
+        let previous = this.currentSrc();
+
+        this.trigger('beforesourcechange', {
+          current: previous,
+          upcoming: source.src
+        });
+
         this.cache_.src = source.src;
         this.currentType_ = source.type || '';
 
@@ -1926,6 +1933,11 @@ class Player extends Component {
           if (this.options_.autoplay) {
             this.play();
           }
+
+          this.trigger('sourcechange', {
+            previous,
+            current: source.src
+          });
 
         // Set the source synchronously if possible (#2326)
         }, true);
