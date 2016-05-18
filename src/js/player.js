@@ -1907,7 +1907,7 @@ class Player extends Component {
 
         this.trigger('beforesourcechange', {
           current: previous,
-          upcoming: source.src
+          next: source.src
         });
 
         this.cache_.src = source.src;

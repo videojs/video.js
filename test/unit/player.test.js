@@ -1052,7 +1052,7 @@ test('Changing the source via the src() method triggers beforesourcechange and s
 
   strictEqual(beforeSpy.callCount, 1);
   strictEqual(beforeSpyData.current, 'oceans.mp4');
-  strictEqual(beforeSpyData.upcoming, 'oceans-1.mp4');
+  strictEqual(beforeSpyData.next, 'oceans-1.mp4');
   strictEqual(spy.callCount, 1);
   strictEqual(spyData.previous, 'oceans.mp4');
   strictEqual(spyData.current, 'oceans-1.mp4');
@@ -1064,7 +1064,7 @@ test('Changing the source via the src() method triggers beforesourcechange and s
 
   strictEqual(beforeSpy.callCount, 2);
   strictEqual(beforeSpyData.current, 'oceans-1.mp4');
-  strictEqual(beforeSpyData.upcoming, 'oceans-2.mp4');
+  strictEqual(beforeSpyData.next, 'oceans-2.mp4');
   strictEqual(spy.callCount, 2);
   strictEqual(spyData.previous, 'oceans-1.mp4');
   strictEqual(spyData.current, 'oceans-2.mp4');
@@ -1076,7 +1076,7 @@ test('Changing the source via the src() method triggers beforesourcechange and s
 
   strictEqual(beforeSpy.callCount, 3);
   strictEqual(beforeSpyData.current, 'oceans-2.mp4');
-  strictEqual(beforeSpyData.upcoming, 'oceans-3.mp4');
+  strictEqual(beforeSpyData.next, 'oceans-3.mp4');
   strictEqual(spy.callCount, 3);
   strictEqual(spyData.previous, 'oceans-2.mp4');
   strictEqual(spyData.current, 'oceans-3.mp4');
