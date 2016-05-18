@@ -1903,10 +1903,14 @@ class Player extends Component {
         // the tech loop to check for a compatible technology
         this.sourceList_([source]);
       } else {
-        const previous = {
-          src: this.currentSrc(),
-          type: this.currentType()
-        };
+        const previous = {src: this.currentSrc()};
+
+        // We only want to include the type if it exists. This keeps the
+        // objects sent from the sourcechange events similar: `type` will
+        // not be present if it's not known.
+        if (this.currentType_) {
+          previous.type = this.currentType_;
+        }
 
         this.trigger('beforesourcechange', {
           current: previous,
@@ -1937,10 +1941,12 @@ class Player extends Component {
             this.play();
           }
 
-          this.trigger('sourcechange', {
-            previous,
-            current: source
-          });
+          window.setTimeout(() => {
+            this.trigger('sourcechange', {
+              previous,
+              current: source
+            });
+          }, 0);
 
         // Set the source synchronously if possible (#2326)
         }, true);
