@@ -1051,11 +1051,11 @@ test('Changing the source via the src() method triggers beforesourcechange and s
   let spyData = spy.lastCall.args[1];
 
   strictEqual(beforeSpy.callCount, 1);
-  strictEqual(beforeSpyData.current, 'oceans.mp4');
-  strictEqual(beforeSpyData.next, 'oceans-1.mp4');
+  deepEqual(beforeSpyData.current, {src: 'oceans.mp4', type: 'video/mp4'});
+  deepEqual(beforeSpyData.next, {src: 'oceans-1.mp4', type: 'video/mp4'});
   strictEqual(spy.callCount, 1);
-  strictEqual(spyData.previous, 'oceans.mp4');
-  strictEqual(spyData.current, 'oceans-1.mp4');
+  deepEqual(spyData.previous, {src: 'oceans.mp4', type: 'video/mp4'});
+  deepEqual(spyData.current, {src: 'oceans-1.mp4', type: 'video/mp4'});
 
   player.src({src: 'oceans-2.mp4', type: 'video/mp4'});
 
@@ -1063,11 +1063,11 @@ test('Changing the source via the src() method triggers beforesourcechange and s
   spyData = spy.lastCall.args[1];
 
   strictEqual(beforeSpy.callCount, 2);
-  strictEqual(beforeSpyData.current, 'oceans-1.mp4');
-  strictEqual(beforeSpyData.next, 'oceans-2.mp4');
+  deepEqual(beforeSpyData.current, {src: 'oceans-1.mp4', type: 'video/mp4'});
+  deepEqual(beforeSpyData.next, {src: 'oceans-2.mp4', type: 'video/mp4'});
   strictEqual(spy.callCount, 2);
-  strictEqual(spyData.previous, 'oceans-1.mp4');
-  strictEqual(spyData.current, 'oceans-2.mp4');
+  deepEqual(spyData.previous, {src: 'oceans-1.mp4', type: 'video/mp4'});
+  deepEqual(spyData.current, {src: 'oceans-2.mp4', type: 'video/mp4'});
 
   player.src({src: 'oceans-3.mp4', type: 'video/mp4'});
 
@@ -1075,9 +1075,9 @@ test('Changing the source via the src() method triggers beforesourcechange and s
   spyData = spy.lastCall.args[1];
 
   strictEqual(beforeSpy.callCount, 3);
-  strictEqual(beforeSpyData.current, 'oceans-2.mp4');
-  strictEqual(beforeSpyData.next, 'oceans-3.mp4');
+  deepEqual(beforeSpyData.current, {src: 'oceans-2.mp4', type: 'video/mp4'});
+  deepEqual(beforeSpyData.next, {src: 'oceans-3.mp4', type: 'video/mp4'});
   strictEqual(spy.callCount, 3);
-  strictEqual(spyData.previous, 'oceans-2.mp4');
-  strictEqual(spyData.current, 'oceans-3.mp4');
+  deepEqual(spyData.previous, {src: 'oceans-2.mp4', type: 'video/mp4'});
+  deepEqual(spyData.current, {src: 'oceans-3.mp4', type: 'video/mp4'});
 });
