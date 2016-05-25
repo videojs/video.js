@@ -777,7 +777,7 @@ class Player extends Component {
         delete this.tag.poster; // Chrome Fix. Fixed in Chrome v16.
       }
       catch (e) {
-        console.log('error on ios7, breaks player', e);
+        log('deleting tag.poster throws in some browsers', e);
       }
       this.play();
     }
