@@ -857,6 +857,7 @@ Tech.withSourceHandlers = function(_Tech){
       this.off(this.el_, 'loadstart', _Tech.prototype.firstLoadStartListener_);
       this.off(this.el_, 'loadstart', _Tech.prototype.successiveLoadStartListener_);
       this.sourceHandler_.dispose();
+      this.sourceHandler_ = null;
     }
   };
 

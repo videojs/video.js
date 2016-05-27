@@ -414,3 +414,82 @@ test('Tech#setSource clears currentSource_ after repeated loadstart', function()
   equal(tech.currentSource_, null, 'Current source is still null');
 
 });
+
+test('setSource after tech dispose should dispose source handler once', function(){
+  let MyTech = extendFn(Tech);
+  Tech.withSourceHandlers(MyTech);
+
+  let disposeCount = 0;
+  let handler = {
+    dispose() {
+      disposeCount++;
+    }
+  };
+
+  MyTech.registerSourceHandler({
+    canPlayType: function() {
+      return true;
+    },
+    canHandleSource: function() {
+      return true;
+    },
+    handleSource: function(source, tech, options) {
+      return handler;
+    }
+  });
+
+  let tech = new MyTech();
+  tech.setSource('test');
+
+  equal(disposeCount, 0, 'did not call sourceHandler_ dispose for initial dispose');
+  tech.dispose();
+  ok(!tech.sourceHandler_, 'sourceHandler should be unset');
+  equal(disposeCount, 1, 'called the source handler dispose');
+
+  // this would normally be done above tech on src after dispose
+  tech.el_ = tech.createEl();
+
+  tech.setSource('test');
+  equal(disposeCount, 1, 'did not dispose after initial setSource');
+
+  tech.setSource('test');
+  equal(disposeCount, 2, 'did dispose on second setSource');
+
+});
+
+test('setSource after previous setSource should dispose source handler once', function(){
+  let MyTech = extendFn(Tech);
+  Tech.withSourceHandlers(MyTech);
+
+  let disposeCount = 0;
+  let handler = {
+    dispose() {
+      disposeCount++;
+    }
+  };
+
+  MyTech.registerSourceHandler({
+    canPlayType: function() {
+      return true;
+    },
+    canHandleSource: function() {
+      return true;
+    },
+    handleSource: function(source, tech, options) {
+      return handler;
+    }
+  });
+
+  let tech = new MyTech();
+
+  tech.setSource('test');
+  equal(disposeCount, 0, 'did not call dispose for initial setSource');
+
+  tech.setSource('test');
+  equal(disposeCount, 1, 'did dispose for second setSource');
+
+  tech.setSource('test');
+  equal(disposeCount, 2, 'did dispose for third setSource');
+
+});
+

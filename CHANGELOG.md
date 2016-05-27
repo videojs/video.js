@@ -14,6 +14,9 @@ CHANGELOG
 
 --------------------
 
+## 5.10.3 (2016-05-27)
+* @BrandonOCasey fixed source handlers being disposed multiple times when a video is put into the video element directly ([view](https://github.com/videojs/video.js/pull/3343))
+
 ## 5.10.2 (2016-05-12)
 * @gkatsev nulled out currentSource_ in setSource ([view](https://github.com/videojs/video.js/pull/3314))
 
