@@ -6,6 +6,9 @@ _(none)_
 
 --------------------
 
+## 5.10.4 (2016-05-31)
+* Patch release to fix dist on npm
+
 ## 5.10.3 (2016-05-27)
 * @BrandonOCasey fixed source handlers being disposed multiple times when a video is put into the video element directly ([view](https://github.com/videojs/video.js/pull/3343))
 
