@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @gkatsev pinned dependencies to direct versions ([view](https://github.com/videojs/video.js/pull/3338))
 
 --------------------
 
