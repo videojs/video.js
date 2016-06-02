@@ -4,12 +4,13 @@ import window from 'global/window';
 q.module('log');
 
 test('should confirm logging functions work', function() {
-  let origConsole = window['console'];
+  let origConsole = window.console;
+
   // replace the native console for testing
   // in ie8 console.log is apparently not a 'function' so sinon chokes on it
   // https://github.com/cjohansen/Sinon.JS/issues/386
   // instead we'll temporarily replace them with no-op functions
-  let console = window['console'] = {
+  let console = window.console = {
     log: function(){},
     warn: function(){},
     error: function(){}
@@ -52,5 +53,5 @@ test('should confirm logging functions work', function() {
   warnStub.restore();
 
   // restore the native console
-  window['console'] = origConsole;
+  window.console = origConsole;
 });
