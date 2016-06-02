@@ -75,12 +75,12 @@ class ChaptersButton extends TextTrackButton {
   createMenu() {
     let tracks = this.player_.textTracks() || [];
     let chaptersTrack;
-    let items = this.items = [];
+    let items = this.items || [];
 
-    for (let i = 0, length = tracks.length; i < length; i++) {
+    for (let i = tracks.length - 1; i >= 0; i--) {
 
       // We will always choose the last track as our chaptersTrack
-      let track = tracks[length - 1];
+      let track = tracks[i];
 
       if (track['kind'] === this.kind_) {
         chaptersTrack = track;
@@ -99,17 +99,18 @@ class ChaptersButton extends TextTrackButton {
       });
       menu.children_.unshift(title);
       Dom.insertElFirst(title, menu.contentEl());
+      this.addChild(menu);
     }
-    // We will empty out the children each time because we want a 
-    // fresh new list each time
-    
-    if (menu.contentEl_.childElementCount > 1) {
-      while (menu.contentEl_.childElementCount > 1) {
+    else {
+      // We will empty out the menu children each time because we want a 
+     // fresh new menu child list each time
+     items.forEach(function(item) {
+       menu.removeChild(item);
+     });
+     // Empty out the ChaptersButton menu items because we no longer need them
+     items = [];
+    }
 
-        // Remove any child HTMLCollection as we are building a fresh new item list
-        menu.contentEl.children.item(menu.contentEl_.children.length - 1).remove();
-      }
-    }
     if (chaptersTrack && chaptersTrack.cues == null) {
       chaptersTrack['mode'] = 'hidden';
 
@@ -123,14 +124,6 @@ class ChaptersButton extends TextTrackButton {
     if (chaptersTrack && chaptersTrack.cues && chaptersTrack.cues.length > 0) {
       let cues = chaptersTrack['cues'], cue;
 
-      // We want to empty out the item children but just keep the chapter title item
-      if (menu.children_.length > 2) {
-
-        // Pop out all the children except chapter title item
-        while (menu.children_.length > 1) {
-          menu.children_.pop();
-        }
-      }
       for (let i = 0, l = cues.length; i < l; i++) {
         cue = cues[i];
 
@@ -143,14 +136,13 @@ class ChaptersButton extends TextTrackButton {
 
         menu.addChild(mi);
       }
-
-      this.addChild(menu);
     }
 
-    if (this.items.length > 0) {
+    if (items.length > 0) {
       this.show();
     }
-
+    // Assigning the value of items back to this.items for next iteration
+    this.items = items;
     return menu;
   }
 
