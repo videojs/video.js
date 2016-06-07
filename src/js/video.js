@@ -53,7 +53,7 @@ if (typeof HTMLVideoElement === 'undefined') {
  * @mixes videojs
  * @method videojs
  */
-let videojs = function(id, options, ready){
+function videojs(id, options, ready){
   let tag; // Element of ID
 
   // Allow for element or ID to be passed in
@@ -97,7 +97,7 @@ let videojs = function(id, options, ready){
   // Element may have a player attr referring to an already created player instance.
   // If not, set up a new player and return the instance.
   return tag['player'] || Player.players[tag.playerId] || new Player(tag, options, ready);
-};
+}
 
 // Add default styles
 if (window.VIDEOJS_NO_DYNAMIC_STYLE !== true) {
