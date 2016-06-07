@@ -4,6 +4,7 @@ CHANGELOG
 ## HEAD (Unreleased)
 * @gkatsev pinned dependencies to direct versions ([view](https://github.com/videojs/video.js/pull/3338))
 * @gkatsev fixed minified vjs in ie8 when initialized with id string ([view](https://github.com/videojs/video.js/pull/3357))
+* @IJsLauw fixed unhandled exception in deleting poster on ios7 ([view](https://github.com/videojs/video.js/pull/3337))
 
 --------------------
 
