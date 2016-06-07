@@ -2,11 +2,14 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 5.10.5 (2016-06-07)
 * @gkatsev pinned dependencies to direct versions ([view](https://github.com/videojs/video.js/pull/3338))
 * @gkatsev fixed minified vjs in ie8 when initialized with id string ([view](https://github.com/videojs/video.js/pull/3357))
 * @IJsLauw fixed unhandled exception in deleting poster on ios7 ([view](https://github.com/videojs/video.js/pull/3337))
-
---------------------
 
 ## 5.10.4 (2016-05-31)
 * Patch release to fix dist on npm
