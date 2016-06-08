@@ -148,7 +148,7 @@ class ChaptersButton extends TextTrackButton {
     
     // We want to make sure that we are always using the code below only when
     // we have update called on chapters and not anything else
-    if (this.kind_ === "chapters") {
+    if (this.kind_ === 'chapters') {
 
       //Call the parent update handler to add in the chapters menu for update
       super.update();
