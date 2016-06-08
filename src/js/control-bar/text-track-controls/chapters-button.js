@@ -99,7 +99,6 @@ class ChaptersButton extends TextTrackButton {
       });
       menu.children_.unshift(title);
       Dom.insertElFirst(title, menu.contentEl());
-      this.addChild(menu);
     } else {
         // We will empty out the menu children each time because we want a 
         // fresh new menu child list each time
@@ -146,13 +145,15 @@ class ChaptersButton extends TextTrackButton {
   // we try to put the chapter title into the DOM
 
   update() {
-      if(this.children_.length <= 1) {
-        this.firstCall = true;
-        super.update();
-      } else if(this.children_.length > 1) {
-          this.children_.pop();
-      }
+    
+    // We want to make sure that we are always using the code below only when
+    // we have update called on chapters and not anything else
+    if (this.kind_ === "chapters") {
+
+      //Call the parent update handler to add in the chapters menu for update
+      super.update();
     }
+  }
 }
 
 ChaptersButton.prototype.kind_ = 'chapters';
