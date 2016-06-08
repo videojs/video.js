@@ -41,6 +41,11 @@ class MenuButton extends ClickableComponent {
     if (this.menu) {
       this.removeChild(this.menu);
     }
+    // We need to remove the menu because we are already adding one before. 
+    // This can create duplicate menu items causing tests to fail
+    if(this.menu === undefined && this.firstCall) {
+      this.removeChild(menu);
+    }
 
     this.menu = menu;
     this.addChild(menu);

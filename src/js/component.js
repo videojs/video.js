@@ -105,8 +105,6 @@ class Component {
    */
   dispose() {
     this.trigger({ type: 'dispose', bubbles: false });
-
-    // Dispose all children.
     if (this.children_) {
       for (let i = this.children_.length - 1; i >= 0; i--) {
         if (this.children_[i].dispose) {

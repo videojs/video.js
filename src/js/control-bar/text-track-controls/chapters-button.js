@@ -100,15 +100,12 @@ class ChaptersButton extends TextTrackButton {
       menu.children_.unshift(title);
       Dom.insertElFirst(title, menu.contentEl());
       this.addChild(menu);
-    }
-    else {
-      // We will empty out the menu children each time because we want a 
-     // fresh new menu child list each time
-     items.forEach(function(item) {
-       menu.removeChild(item);
-     });
-     // Empty out the ChaptersButton menu items because we no longer need them
-     items = [];
+    } else {
+        // We will empty out the menu children each time because we want a 
+        // fresh new menu child list each time
+        items.forEach(item => menu.removeChild(item));
+        // Empty out the ChaptersButton menu items because we no longer need them
+        items = [];
     }
 
     if (chaptersTrack && chaptersTrack.cues == null) {
@@ -145,7 +142,17 @@ class ChaptersButton extends TextTrackButton {
     this.items = items;
     return menu;
   }
+  // Overriding the update button because duplicate chapters get created each time when
+  // we try to put the chapter title into the DOM
 
+  update() {
+      if(this.children_.length <= 1) {
+        this.firstCall = true;
+        super.update();
+      } else if(this.children_.length > 1) {
+          this.children_.pop();
+      }
+    }
 }
 
 ChaptersButton.prototype.kind_ = 'chapters';
