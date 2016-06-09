@@ -141,19 +141,6 @@ class ChaptersButton extends TextTrackButton {
     this.items = items;
     return menu;
   }
-  // Overriding the update button because duplicate chapters get created each time when
-  // we try to put the chapter title into the DOM
-
-  update() {
-    
-    // We want to make sure that we are always using the code below only when
-    // we have update called on chapters and not anything else
-    if (this.kind_ === 'chapters') {
-
-      //Call the parent update handler to add in the chapters menu for update
-      super.update();
-    }
-  }
 }
 
 ChaptersButton.prototype.kind_ = 'chapters';
