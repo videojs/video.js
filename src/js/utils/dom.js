@@ -181,7 +181,7 @@ export function getElData(el) {
   if (!elData[id]) {
     elData[id] = {};
   }
-  
+
   return elData[id];
 
 }
