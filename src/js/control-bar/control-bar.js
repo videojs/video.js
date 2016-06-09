@@ -48,7 +48,6 @@ class ControlBar extends Component {
 }
 
 ControlBar.prototype.options_ = {
-  loadEvent: 'play',
   children: [
     'playToggle',
     'volumeMenuButton',
