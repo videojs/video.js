@@ -171,7 +171,7 @@ const elIdAttr = 'vdata' + (new Date()).getTime();
  * @function getElData
  */
 export function getElData(el) {
-      
+
   let id = el[elIdAttr];
 
   if (!id) {

@@ -36,13 +36,12 @@ class MenuButton extends ClickableComponent {
    * @method update
    */
   update() {
-    
     let menu = this.createMenu();
 
     if (this.menu) {
       this.removeChild(this.menu);
     }
-    
+
     this.menu = menu;
     this.addChild(menu);
 
