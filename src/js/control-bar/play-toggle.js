@@ -51,6 +51,7 @@ class PlayToggle extends Button {
    */
   handlePlay() {
     this.removeClass('vjs-paused');
+    // this.removeClass('vjs-big-play-button');
     this.addClass('vjs-playing');
     this.controlText('Pause'); // change the button text to "Pause"
   }
@@ -62,6 +63,7 @@ class PlayToggle extends Button {
    */
   handlePause() {
     this.removeClass('vjs-playing');
+    // this.removeClass('vjs-big-play-button');
     this.addClass('vjs-paused');
     this.controlText('Play'); // change the button text to "Play"
   }

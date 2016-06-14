@@ -1292,7 +1292,13 @@ class Player extends Component {
    * @method play
    */
   play() {
-    this.techCall_('play');
+    /* Autoplay solution */
+    if (this.player_.currentSrc()) {
+      this.techCall_('play');
+    } else {
+      this.options_.autoplay = true;
+    }
+
     return this;
   }
 
