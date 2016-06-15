@@ -1,50 +1,52 @@
-import TextTrack from '../../../src/js/tracks/text-track.js';
 import window from 'global/window';
+import EventTarget from '../../../src/js/event-target.js';
+import TrackBaseline from './track-baseline';
+import TechFaker from '../tech/tech-faker';
+import TextTrack from '../../../src/js/tracks/text-track.js';
 import TestHelpers from '../test-helpers.js';
+import log from '../../../src/js/utils/log.js';
+import proxyquireify from 'proxyquireify';
 
-var noop = Function.prototype;
-var defaultTech = {
-  textTracks: noop,
-  on: noop,
-  off: noop,
-  currentTime: noop
+const proxyquire = proxyquireify(require);
+
+const defaultTech = {
+  textTracks() {},
+  on() {},
+  off() {},
+  currentTime() {}
 };
-
 q.module('Text Track');
 
-test('text-track requires a tech', function() {
-  window.throws(function() {
-           new TextTrack();
-         },
-         new Error('A tech was not provided.'),
-         'a tech is required for text track');
+// do baseline track testing
+TrackBaseline(TextTrack, {
+  id: '1',
+  kind: 'subtitles',
+  mode: 'disabled',
+  label: 'English',
+  language: 'en',
+  tech: defaultTech
 });
 
-test('can create a TextTrack with various properties', function() {
-  var kind = 'captions',
-      label = 'English',
-      language = 'en',
-      id = '1',
-      mode = 'disabled',
-      tt = new TextTrack({
-        tech: defaultTech,
-        kind: kind,
-        label: label,
-        language: language,
-        id: id,
-        mode: mode
-      });
+test('requires a tech', function() {
+  let error = new Error('A tech was not provided.');
 
-  equal(tt.kind, kind, 'we have a kind');
-  equal(tt.label, label, 'we have a label');
-  equal(tt.language, language, 'we have a language');
-  equal(tt.id, id, 'we have a id');
+  q.throws(() => new TextTrack({}), error, 'a tech is required');
+  q.throws(() => new TextTrack({tech: null}), error, 'a tech is required');
+});
+
+test('can create a TextTrack with a mode property', function() {
+  let mode = 'disabled';
+  let tt = new TextTrack({
+    mode,
+    tech: defaultTech
+  });
+
   equal(tt.mode, mode, 'we have a mode');
 });
 
 test('defaults when items not provided', function() {
-  var tt = new TextTrack({
-    tech: defaultTech
+  let tt = new TextTrack({
+    tech: TechFaker
   });
 
   equal(tt.kind, 'subtitles', 'kind defaulted to subtitles');
@@ -54,7 +56,7 @@ test('defaults when items not provided', function() {
 });
 
 test('kind can only be one of several options, defaults to subtitles', function() {
-  var tt = new TextTrack({
+  let tt = new TextTrack({
     tech: defaultTech,
     kind: 'foo'
   });
@@ -99,7 +101,7 @@ test('kind can only be one of several options, defaults to subtitles', function(
 });
 
 test('mode can only be one of several options, defaults to disabled', function() {
-  var tt = new TextTrack({
+  let tt = new TextTrack({
     tech: defaultTech,
     mode: 'foo'
   });
@@ -129,39 +131,23 @@ test('mode can only be one of several options, defaults to disabled', function()
   equal(tt.mode, 'showing', 'the mode is set to showing');
 });
 
-test('kind, label, language, id, cue, and activeCues are read only', function() {
-  var kind = 'captions',
-      label = 'English',
-      language = 'en',
-      id = '1',
-      mode = 'disabled',
-      tt = new TextTrack({
-        tech: defaultTech,
-        kind: kind,
-        label: label,
-        language: language,
-        id: id,
-        mode: mode
-      });
+test('cue and activeCues are read only', function() {
+  let mode = 'disabled';
+  let tt = new TextTrack({
+    mode,
+    tech: defaultTech,
+  });
 
-  tt.kind = 'subtitles';
-  tt.label = 'Spanish';
-  tt.language = 'es';
-  tt.id = '2';
   tt.cues = 'foo';
   tt.activeCues = 'bar';
 
-  equal(tt.kind, kind, 'kind is still set to captions');
-  equal(tt.label, label, 'label is still set to English');
-  equal(tt.language, language, 'language is still set to en');
-  equal(tt.id, id, 'id is still set to \'1\'');
   notEqual(tt.cues, 'foo', 'cues is still original value');
   notEqual(tt.activeCues, 'bar', 'activeCues is still original value');
 });
 
 test('mode can only be set to a few options', function() {
-  var tt = new TextTrack({
-    tech: defaultTech,
+  let tt = new TextTrack({
+    tech: defaultTech
   });
 
   tt.mode = 'foo';
@@ -185,8 +171,8 @@ test('mode can only be set to a few options', function() {
 });
 
 test('cues and activeCues return a TextTrackCueList', function() {
-  var tt = new TextTrack({
-    tech: defaultTech,
+  let tt = new TextTrack({
+    tech: defaultTech
   });
 
   ok(tt.cues.getCueById, 'cues are a TextTrackCueList');
@@ -194,13 +180,12 @@ test('cues and activeCues return a TextTrackCueList', function() {
 });
 
 test('cues can be added and removed from a TextTrack', function() {
-  var tt = new TextTrack({
-        tech: defaultTech,
-      }),
-      cues;
+  let tt = new TextTrack({
+    tech: defaultTech
+  });
+  let cues;
 
   cues = tt.cues;
-
 
   equal(cues.length, 0, 'start with zero cues');
 
@@ -220,13 +205,13 @@ test('cues can be added and removed from a TextTrack', function() {
 });
 
 test('fires cuechange when cues become active and inactive', function() {
-  var player = TestHelpers.makePlayer(),
-      changes = 0,
-      cuechangeHandler,
-      tt = new TextTrack({
-        tech: player.tech,
-        mode: 'showing'
-      });
+  let player = TestHelpers.makePlayer();
+  let changes = 0;
+  let cuechangeHandler;
+  let tt = new TextTrack({
+    tech: player.tech_,
+    mode: 'showing'
+  });
 
   cuechangeHandler = function() {
     changes++;
@@ -241,19 +226,162 @@ test('fires cuechange when cues become active and inactive', function() {
   tt.oncuechange = cuechangeHandler;
   tt.addEventListener('cuechange', cuechangeHandler);
 
-  player.tech.currentTime = function() {
+  player.tech_.currentTime = function() {
     return 2;
   };
 
-  player.tech.trigger('timeupdate');
+  player.tech_.trigger('timeupdate');
 
   equal(changes, 2, 'a cuechange event trigger addEventListener and oncuechange');
 
-  player.tech.currentTime = function() {
+  player.tech_.currentTime = function() {
     return 7;
   };
 
-  player.tech.trigger('timeupdate');
+  player.tech_.trigger('timeupdate');
 
   equal(changes, 4, 'a cuechange event trigger addEventListener and oncuechange');
+
+  player.dispose();
+});
+
+test('tracks are parsed if vttjs is loaded', function() {
+  const clock = sinon.useFakeTimers();
+  const oldVTT = window.WebVTT;
+  let parserCreated = false;
+
+  window.WebVTT = () => {};
+  window.WebVTT.StringDecoder = () => {};
+  window.WebVTT.Parser = () => {
+    parserCreated = true;
+    return {
+      oncue() {},
+      onparsingerror() {},
+      onflush() {},
+      parse() {},
+      flush() {}
+    };
+  };
+
+  // use proxyquire to stub xhr module because IE8s XDomainRequest usage
+  let xhrHandler;
+  let TextTrack = proxyquire('../../../src/js/tracks/text-track.js', {
+    xhr(options, fn) {
+      xhrHandler  = fn;
+    }
+  });
+
+  let tt = new TextTrack({
+    tech: defaultTech,
+    src: 'http://example.com'
+  });
+
+  xhrHandler(null, {}, 'WEBVTT\n');
+
+  ok(parserCreated, 'WebVTT is loaded, so we can just parse');
+
+  clock.restore();
+  window.WebVTT = oldVTT;
+  TextTrack = proxyquire('../../../src/js/tracks/text-track.js', {});
+});
+
+test('tracks are parsed once vttjs is loaded', function() {
+  const clock = sinon.useFakeTimers();
+  const oldVTT = window.WebVTT;
+  let parserCreated = false;
+
+  // use proxyquire to stub xhr module because IE8s XDomainRequest usage
+  let xhrHandler;
+  let TextTrack = proxyquire('../../../src/js/tracks/text-track.js', {
+    xhr(options, fn) {
+      xhrHandler  = fn;
+    }
+  });
+
+  window.WebVTT = true;
+
+  let testTech = new EventTarget();
+  testTech.textTracks = () => {};
+  testTech.currentTime = () => {};
+
+  let tt = new TextTrack({
+    tech: testTech,
+    src: 'http://example.com'
+  });
+
+  xhrHandler(null, {}, 'WEBVTT\n');
+
+  ok(!parserCreated, 'WebVTT is not loaded, do not try to parse yet');
+
+  clock.tick(100);
+  ok(!parserCreated, 'WebVTT still not loaded, do not try to parse yet');
+
+  window.WebVTT = () => {};
+  window.WebVTT.StringDecoder = () => {};
+  window.WebVTT.Parser = () => {
+    parserCreated = true;
+    return {
+      oncue() {},
+      onparsingerror() {},
+      onflush() {},
+      parse() {},
+      flush() {}
+    };
+  };
+
+  testTech.trigger('vttjsloaded');
+  ok(parserCreated, 'WebVTT is loaded, so we can parse now');
+
+  clock.restore();
+  window.WebVTT = oldVTT;
+  TextTrack = proxyquire('../../../src/js/tracks/text-track.js', {});
+});
+
+test('stops processing if vttjs loading errored out', function() {
+  const clock = sinon.useFakeTimers();
+  const oldVTT = window.WebVTT;
+  let parserCreated = false;
+  window.WebVTT = true;
+
+  // use proxyquire to stub xhr module because IE8s XDomainRequest usage
+  let xhrHandler;
+  let errorMsg;
+  let TextTrack = proxyquire('../../../src/js/tracks/text-track.js', {
+    xhr(options, fn) {
+      xhrHandler  = fn;
+    },
+    '../utils/log.js': {
+      error(msg) {
+        errorMsg = msg;
+      }
+    }
+  });
+
+  let testTech = new EventTarget();
+  testTech.textTracks = () => {};
+  testTech.currentTime = () => {};
+
+  sinon.stub(testTech, 'off');
+  testTech.off.withArgs('vttjsloaded');
+
+  let tt = new TextTrack({
+    tech: testTech,
+    src: 'http://example.com'
+  });
+
+  xhrHandler(null, {}, 'WEBVTT\n');
+
+  ok(!parserCreated, 'WebVTT is not loaded, do not try to parse yet');
+
+  testTech.trigger('vttjserror');
+  let offSpyCall = testTech.off.getCall(0);
+
+  ok(/^vttjs failed to load, stopping trying to process/.test(errorMsg),
+     'vttjs failed to load, so, we logged an error');
+  ok(!parserCreated, 'WebVTT is not loaded, do not try to parse yet');
+  ok(offSpyCall, 'tech.off was called');
+
+  clock.restore();
+  window.WebVTT = oldVTT;
+  TextTrack = proxyquire('../../../src/js/tracks/text-track.js', {});
 });

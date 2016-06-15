@@ -92,7 +92,7 @@ The loop attribute causes the video to start over as soon as it ends. This could
 ```html
 <video loop ...>
 or
-{ "loop": "true" }
+{ "loop": true }
 ```
 
 
@@ -119,22 +119,7 @@ Component Options
 You can set the options for any single player component. For instance, if you wanted to remove the `muteToggle` button, which
 is a child of `controlBar`, you can just set that component to false:
 
-```javascript
-var player = videojs('video-id', {
-  children: {
-    controlBar: {
-      children: {
-        muteToggle: false
-      }
-    }
-  }
-});
-```
-
-All the children can start getting a little verbose, so to simplify things, you can also set options for child components directly on the parent options.
-This is functionally the exact same as the above, for instance.
-
-```javascript
+```js
 var player = videojs('video-id', {
   controlBar: {
     muteToggle: false
@@ -146,8 +131,8 @@ This also works using the `data-setup` attribute on the video element, just reme
 notation.
 
 ```html
-<video ... data-setup='{ "children": { "controlBar": { "children": { "muteToggle": false } } } }'></video>
+<video ... data-setup='{ "controlBar": { "muteToggle": false } }'></video>
 ```
 
-The [components guide](components.md) has an excellent breakdown of the structure of a player, you
-just need to remember to nest child components in a `children` object for each level.
+The [components guide](./components.md) has an excellent breakdown of the structure of a player, you
+just need to remember to nest child components in a `children` array for each level.

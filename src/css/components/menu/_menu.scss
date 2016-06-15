@@ -1,0 +1,58 @@
+.vjs-menu-button {
+  cursor: pointer;
+}
+
+// Change cursor back to default if the menu button is disabled
+.vjs-menu-button.vjs-disabled {
+  cursor: default;
+}
+
+// prevent menus from opening while disabled
+.vjs-workinghover .vjs-menu-button.vjs-disabled:hover .vjs-menu {
+  display: none;
+}
+
+.vjs-menu .vjs-menu-content {
+  display: block;
+  padding: 0; margin: 0;
+  overflow: auto;
+}
+
+// prevent menus from opening while scrubbing (FF, IE)
+.vjs-scrubbing .vjs-menu-button:hover .vjs-menu {
+  display: none;
+}
+
+.vjs-menu li {
+  list-style: none;
+  margin: 0;
+  padding: 0.2em 0;
+  line-height: 1.4em;
+  font-size: 1.2em;
+  text-align: center;
+  text-transform: lowercase;
+}
+
+.vjs-menu li:focus,
+.vjs-menu li:hover {
+  outline: 0;
+  @include background-color-with-alpha($secondary-background-color, $secondary-background-transparency);
+}
+
+.vjs-menu li.vjs-selected,
+.vjs-menu li.vjs-selected:focus,
+.vjs-menu li.vjs-selected:hover {
+  background-color: $primary-foreground-color;
+  color: $primary-background-color;
+}
+
+.vjs-menu li.vjs-menu-title {
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 1em;
+  line-height: 2em;
+  padding: 0;
+  margin: 0 0 0.3em 0;
+  font-weight: bold;
+  cursor: default;
+}

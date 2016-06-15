@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <title>Video.js Sandbox</title>
@@ -13,11 +13,7 @@
 
   <!-- Set the location of the flash SWF -->
   <script>
-    videojs.setGlobalOptions({
-      flash: {
-        swf: '../build/temp/video-js.swf'
-      }
-    });
+    videojs.options.flash.swf = '../build/temp/video-js.swf';
   </script>
 
 </head>
@@ -31,17 +27,17 @@
   </div>
 
   <video id="vid1" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264"
-      poster="http://video-js.zencoder.com/oceans-clip.png"
+      poster="http://vjs.zencdn.net/v/oceans.png"
       data-setup='{}'>
-    <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4'>
-    <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm'>
-    <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg'>
+    <source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+    <source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm">
+    <source src="http://vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
     <track kind="captions" src="../docs/examples/shared/example-captions.vtt" srclang="en" label="English"></track><!-- Tracks need an ending tag thanks to IE9 -->
     <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
   </video>
 
   <script>
-    vid = document.getElementById("vid1");
+    var vid = document.getElementById("vid1");
   </script>
 
 </body>

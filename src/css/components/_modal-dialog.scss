@@ -1,0 +1,13 @@
+.video-js .vjs-modal-dialog {
+  @extend %fill-parent;
+  @include linear-gradient(180deg, rgba(0, 0, 0, 0.8), rgba(255, 255, 255, 0));
+}
+
+.vjs-modal-dialog .vjs-modal-dialog-content {
+  @extend %fill-parent;
+
+  font-size: 1.2em; // 12px
+  line-height: 1.5; // 18px
+  padding: 20px 24px;
+  z-index: 1;
+}

@@ -1,0 +1,25 @@
+.vjs-menu-button-popup .vjs-menu {
+  display: none;
+  position: absolute;
+  bottom: 0;
+  width: 10em;
+  left: -3em; // (Width of vjs-menu - width of button) / 2
+  height: 0em;
+  margin-bottom: 1.5em;
+  border-top-color: rgba($primary-background-color, $primary-background-transparency); // Same as ul background
+}
+
+// Button Pop-up Menu
+.vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+  @include background-color-with-alpha($primary-background-color, $primary-background-transparency);
+
+  position: absolute;
+  width: 100%;
+  bottom: 1.5em; // Same bottom as vjs-menu border-top
+  max-height: 15em;
+}
+
+.vjs-workinghover .vjs-menu-button-popup:hover .vjs-menu,
+.vjs-menu-button-popup .vjs-menu.vjs-lock-showing {
+  display: block;
+}

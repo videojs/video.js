@@ -1,3 +1,6 @@
+/**
+ * @file text-track-display.js
+ */
 import Component from '../component';
 import Menu from '../menu/menu.js';
 import MenuItem from '../menu/menu-item.js';
@@ -24,7 +27,11 @@ const fontMap = {
 /**
  * The component for displaying text track cues
  *
- * @constructor
+ * @param {Object} player  Main Player
+ * @param {Object=} options Object of option names and values
+ * @param {Function=} ready    Ready callback function
+ * @extends Component
+ * @class TextTrackDisplay
  */
 class TextTrackDisplay extends Component {
 
@@ -39,7 +46,7 @@ class TextTrackDisplay extends Component {
     // Should probably be moved to an external track loader when we support
     // tracks that don't need a display.
     player.ready(Fn.bind(this, function() {
-      if (player.tech && player.tech['featuresNativeTextTracks']) {
+      if (player.tech_ && player.tech_['featuresNativeTextTracks']) {
         this.hide();
         return;
       }
@@ -51,29 +58,81 @@ class TextTrackDisplay extends Component {
         let track = tracks[i];
         this.player_.addRemoteTextTrack(track);
       }
+
+      let modes = {'captions': 1, 'subtitles': 1};
+      let trackList = this.player_.textTracks();
+      let firstDesc;
+      let firstCaptions;
+
+      if (trackList) {
+        for (let i = 0; i < trackList.length; i++) {
+          let track = trackList[i];
+          if (track.default) {
+            if (track.kind === 'descriptions' && !firstDesc) {
+              firstDesc = track;
+            } else if (track.kind in modes && !firstCaptions) {
+              firstCaptions = track;
+            }
+          }
+        }
+
+        // We want to show the first default track but captions and subtitles
+        // take precedence over descriptions.
+        // So, display the first default captions or subtitles track
+        // and otherwise the first default descriptions track.
+        if (firstCaptions) {
+          firstCaptions.mode = 'showing';
+        } else if (firstDesc) {
+          firstDesc.mode = 'showing';
+        }
+      }
     }));
   }
 
+  /**
+   * Toggle display texttracks
+   *
+   * @method toggleDisplay
+   */
   toggleDisplay() {
-    if (this.player_.tech && this.player_.tech['featuresNativeTextTracks']) {
+    if (this.player_.tech_ && this.player_.tech_['featuresNativeTextTracks']) {
       this.hide();
     } else {
       this.show();
     }
   }
 
+  /**
+   * Create the component's DOM element
+   *
+   * @return {Element}
+   * @method createEl
+   */
   createEl() {
     return super.createEl('div', {
       className: 'vjs-text-track-display'
+    }, {
+      'aria-live': 'assertive',
+      'aria-atomic': 'true'
     });
   }
 
+  /**
+   * Clear display texttracks
+   *
+   * @method clearDisplay
+   */
   clearDisplay() {
     if (typeof window['WebVTT'] === 'function') {
       window['WebVTT']['processCues'](window, [], this.el_);
     }
   }
 
+  /**
+   * Update display texttracks
+   *
+   * @method updateDisplay
+   */
   updateDisplay() {
     var tracks = this.player_.textTracks();
 
@@ -83,14 +142,38 @@ class TextTrackDisplay extends Component {
       return;
     }
 
-    for (let i=0; i < tracks.length; i++) {
+    // Track display prioritization model: if multiple tracks are 'showing',
+    //  display the first 'subtitles' or 'captions' track which is 'showing',
+    //  otherwise display the first 'descriptions' track which is 'showing'
+
+    let descriptionsTrack = null;
+    let captionsSubtitlesTrack = null;
+
+    let i = tracks.length;
+    while (i--) {
       let track = tracks[i];
       if (track['mode'] === 'showing') {
-        this.updateForTrack(track);
+        if (track['kind'] === 'descriptions') {
+          descriptionsTrack = track;
+        } else {
+          captionsSubtitlesTrack = track;
+        }
       }
+    }
+
+    if (captionsSubtitlesTrack) {
+      this.updateForTrack(captionsSubtitlesTrack);
+    } else if (descriptionsTrack) {
+      this.updateForTrack(descriptionsTrack);
     }
   }
 
+  /**
+   * Add texttrack to texttrack list
+   *
+   * @param {TextTrackObject} track Texttrack object to be added to list
+   * @method updateForTrack
+   */
   updateForTrack(track) {
     if (typeof window['WebVTT'] !== 'function' || !track['activeCues']) {
       return;
@@ -103,11 +186,16 @@ class TextTrackDisplay extends Component {
       cues.push(track['activeCues'][i]);
     }
 
-    window['WebVTT']['processCues'](window, track['activeCues'], this.el_);
+    window['WebVTT']['processCues'](window, cues, this.el_);
 
     let i = cues.length;
     while (i--) {
-      let cueDiv = cues[i].displayState;
+      let cue = cues[i];
+      if (!cue) {
+        continue;
+      }
+
+      let cueDiv = cue.displayState;
       if (overrides.color) {
         cueDiv.firstChild.style.color = overrides.color;
       }
@@ -165,7 +253,14 @@ class TextTrackDisplay extends Component {
 
 }
 
-// Add cue HTML to display
+/**
+* Add cue HTML to display
+*
+* @param {Number} color Hex number for color, like #f0e
+* @param {Number} opacity Value for opacity,0.0 - 1.0
+* @return {RGBAColor} In the form 'rgba(255, 0, 0, 0.3)'
+* @method constructColor
+*/
 function constructColor(color, opacity) {
   return 'rgba(' +
     // color looks like "#f0e"
@@ -175,8 +270,17 @@ function constructColor(color, opacity) {
     opacity + ')';
 }
 
+/**
+ * Try to update style
+ * Some style changes will throw an error, particularly in IE8. Those should be noops.
+ *
+ * @param {Element} el The element to be styles
+ * @param {CSSProperty} style The CSS property to be styled
+ * @param {CSSStyle} rule The actual style to be applied to the property
+ * @method tryUpdateStyle
+ */
 function tryUpdateStyle(el, style, rule) {
-  // some style changes will throw an error, particularly in IE8. Those should be noops.
+  //
   try {
     el.style[style] = rule;
   } catch (e) {}

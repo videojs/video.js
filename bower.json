@@ -2,8 +2,8 @@
   "name": "video.js",
   "description": "An HTML5 and Flash video player with a common API and skin for both.",
   "main": [
-    "src/js/video.js",
-    "src/css/video-js.scss"
+    "dist/video.js",
+    "dist/video-js.css"
   ],
   "moduleType": "es6",
   "keywords": [

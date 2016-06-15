@@ -1,15 +1,1 @@
-$primary-text: #fff;
-$secondary-text: #F4A460; // currently just used for visited links in errors and such.
-
-$primary-bg: #000;
-$secondary-bg: lighten($primary-bg, 35%);
-
-$text-font-family: Arial, Helvetica, sans-serif;
-$base-font-size: 10px;
-
-$control-bar--bg: #2B333F;
-$control-bar--transparency: 0.5;
-
-$big-play-button--width: 3em;
-$big-play-button--height: 1.5em;
-$big-play-button--transparency: 0.8;
+$icon-font-path: 'font' !default;

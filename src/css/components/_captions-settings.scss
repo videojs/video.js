@@ -1,13 +1,12 @@
 .vjs-caption-settings {
   position: relative;
   top: 1em;
-  background-color: $primary-bg;
-  opacity: 0.75;
-  color: $primary-text;
+  background-color: $primary-background-color;
+  background-color: rgba($primary-background-color, 0.75);
+  color: $primary-foreground-color;
   margin: 0 auto;
   padding: 0.5em;
   height: 15em;
-  font-family: $text-font-family;
   font-size: 12px;
   width: 40em;
 }

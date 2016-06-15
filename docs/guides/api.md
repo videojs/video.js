@@ -17,7 +17,7 @@ Wait Until the Player is Ready
 ------------------------------
 The time it takes Video.js to set up the video and API will vary depending on the playback technology being used (HTML5 will often be much faster to load than Flash). For that reason we want to use the player's 'ready' function to trigger any code that requires the player's API.
 
-```javascript
+```js
 videojs("example_video_1").ready(function(){
   var myPlayer = this;
 
@@ -41,4 +41,4 @@ myPlayer.currentTime(120);
 
 ```
 
-The full list of player API methods and events can be found in the [player API docs](../api/vjs.Player.md).
+The full list of player API methods and events can be found in the [player API docs](http://docs.videojs.com/docs/api/index.html).

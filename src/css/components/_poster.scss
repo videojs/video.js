@@ -4,6 +4,7 @@
   background-repeat: no-repeat;
   background-position: 50% 50%;
   background-size: contain;
+  background-color: #000000;
   cursor: pointer;
   margin: 0;
   padding: 0;
@@ -14,6 +15,8 @@
   left: 0;
   height: 100%;
 }
+
+// Used for IE8 fallback
 .vjs-poster img {
   display: block;
   vertical-align: middle;
@@ -23,23 +26,23 @@
   width: 100%;
 }
 
-/* Hide the poster after the video has started playing */
-.video-js.vjs-has-started .vjs-poster {
+// Hide the poster after the video has started playing
+.vjs-has-started .vjs-poster {
   display: none;
 }
 
-/* Don't hide the poster if we're playing audio */
-.video-js.vjs-audio.vjs-has-started .vjs-poster {
+// Don't hide the poster if we're playing audio
+.vjs-audio.vjs-has-started .vjs-poster {
   display: block;
 }
 
-/* Hide the poster when controls are disabled because it's clickable
-and the native poster can take over */
-.video-js.vjs-controls-disabled .vjs-poster {
+// Hide the poster when controls are disabled because it's clickable
+// and the native poster can take over
+.vjs-controls-disabled .vjs-poster {
   display: none;
 }
 
-/* Hide the poster when native controls are used otherwise it covers them */
-.video-js.vjs-using-native-controls .vjs-poster {
+// Hide the poster when native controls are used otherwise it covers them
+.vjs-using-native-controls .vjs-poster {
   display: none;
 }

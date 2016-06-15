@@ -2,7 +2,6 @@
 // can run without HTML5 or Flash, of which PhantomJS supports neither.
 
 import Tech from '../../../src/js/tech/tech.js';
-import Component from '../../../src/js/component.js';
 
 /**
  * @constructor
@@ -46,11 +45,13 @@ class TechFaker extends Tech {
   duration() { return {}; }
   networkState() { return 0; }
   readyState() { return 0; }
+  controls() { return false; }
 
   // Support everything except for "video/unsupported-format"
   static isSupported() { return true; }
+  static canPlayType(type) { return (type !== 'video/unsupported-format' ? 'maybe' : ''); }
   static canPlaySource(srcObj) { return srcObj.type !== 'video/unsupported-format'; }
 }
 
-Component.registerComponent('TechFaker', TechFaker);
+Tech.registerTech('TechFaker', TechFaker);
 export default TechFaker;

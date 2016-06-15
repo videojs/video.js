@@ -1,4 +1,7 @@
-import MenuButton from '../../menu/menu-button.js';
+/**
+ * @file text-track-button.js
+ */
+import TrackButton from '../track-button.js';
 import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
 import TextTrackMenuItem from './text-track-menu-item.js';
@@ -7,34 +10,25 @@ import OffTextTrackMenuItem from './off-text-track-menu-item.js';
 /**
  * The base class for buttons that toggle specific text track types (e.g. subtitles)
  *
- * @constructor
+ * @param {Player|Object} player
+ * @param {Object=} options
+ * @extends MenuButton
+ * @class TextTrackButton
  */
-class TextTrackButton extends MenuButton {
+class TextTrackButton extends TrackButton {
 
-  constructor(player, options){
+  constructor(player, options = {}){
+    options.tracks = player.textTracks();
+
     super(player, options);
-
-    let tracks = this.player_.textTracks();
-
-    if (this.items.length <= 1) {
-      this.hide();
-    }
-
-    if (!tracks) {
-      return;
-    }
-
-    let updateHandler = Fn.bind(this, this.update);
-    tracks.addEventListener('removetrack', updateHandler);
-    tracks.addEventListener('addtrack', updateHandler);
-
-    this.player_.on('dispose', function() {
-      tracks.removeEventListener('removetrack', updateHandler);
-      tracks.removeEventListener('addtrack', updateHandler);
-    });
   }
 
-  // Create a menu item for each text track
+  /**
+   * Create a menu item for each text track
+   *
+   * @return {Array} Array of menu items
+   * @method createItems
+   */
   createItems(items=[]) {
     // Add an OFF menu item to turn all tracks off
     items.push(new OffTextTrackMenuItem(this.player_, { 'kind': this.kind_ }));
@@ -51,6 +45,8 @@ class TextTrackButton extends MenuButton {
       // only add tracks that are of the appropriate kind and have a label
       if (track['kind'] === this.kind_) {
         items.push(new TextTrackMenuItem(this.player_, {
+          // MenuItem is selectable
+          'selectable': true,
           'track': track
         }));
       }

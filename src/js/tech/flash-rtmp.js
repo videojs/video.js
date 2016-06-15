@@ -1,3 +1,6 @@
+/**
+ * @file flash-rtmp.js
+ */
 function FlashRtmpDecorator(Flash) {
   Flash.streamingFormats = {
     'rtmp/mp4': 'MP4',
@@ -19,7 +22,7 @@ function FlashRtmpDecorator(Flash) {
     // Look for the normal URL separator we expect, '&'.
     // If found, we split the URL into two pieces around the
     // first '&'.
-    let connEnd = src.indexOf('&');
+    let connEnd = src.search(/&(?!\w+=)/);
     let streamBegin;
     if (connEnd !== -1) {
       streamBegin = connEnd + 1;
@@ -57,12 +60,32 @@ function FlashRtmpDecorator(Flash) {
   Flash.rtmpSourceHandler = {};
 
   /**
-   * Check Flash can handle the source natively
-   * @param  {Object} source  The source object
+   * Check if Flash can play the given videotype
+   * @param  {String} type    The mimetype to check
    * @return {String}         'probably', 'maybe', or '' (empty string)
    */
-  Flash.rtmpSourceHandler.canHandleSource = function(source){
-    if (Flash.isStreamingType(source.type) || Flash.isStreamingSrc(source.src)) {
+  Flash.rtmpSourceHandler.canPlayType = function(type){
+    if (Flash.isStreamingType(type)) {
+      return 'maybe';
+    }
+
+    return '';
+  };
+
+  /**
+   * Check if Flash can handle the source natively
+   * @param  {Object} source  The source object
+   * @param  {Object} options The options passed to the tech
+   * @return {String}         'probably', 'maybe', or '' (empty string)
+   */
+  Flash.rtmpSourceHandler.canHandleSource = function(source, options){
+    let can = Flash.rtmpSourceHandler.canPlayType(source.type);
+
+    if (can) {
+      return can;
+    }
+
+    if (Flash.isStreamingSrc(source.src)) {
       return 'maybe';
     }
 
@@ -73,10 +96,11 @@ function FlashRtmpDecorator(Flash) {
    * Pass the source to the flash object
    * Adaptive source handlers will have more complicated workflows before passing
    * video data to the video element
-   * @param  {Object} source    The source object
-   * @param  {Flash} tech   The instance of the Flash tech
+   * @param  {Object} source   The source object
+   * @param  {Flash}  tech     The instance of the Flash tech
+   * @param  {Object} options  The options to pass to the source
    */
-  Flash.rtmpSourceHandler.handleSource = function(source, tech){
+  Flash.rtmpSourceHandler.handleSource = function(source, tech, options){
     let srcParts = Flash.streamToParts(source.src);
 
     tech['setRtmpConnection'](srcParts.connection);

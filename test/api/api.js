@@ -59,8 +59,11 @@ test('should be able to access expected player API methods', function() {
   ok(player.usingNativeControls, 'usingNativeControls exists');
   ok(player.isFullscreen, 'isFullscreen exists');
 
-  // TextTrack methods
+  // Track methods
+  ok(player.audioTracks, 'audioTracks exists');
+  ok(player.videoTracks, 'videoTracks exists');
   ok(player.textTracks, 'textTracks exists');
+  ok(player.remoteTextTrackEls, 'remoteTextTrackEls exists');
   ok(player.remoteTextTracks, 'remoteTextTracks exists');
   ok(player.addTextTrack, 'addTextTrack exists');
   ok(player.addRemoteTextTrack, 'addRemoteTextTrack exists');
@@ -187,6 +190,7 @@ test('should export useful components to the public', function () {
   ok(videojs.getComponent('TextTrackButton'), 'TextTrackButton should be public');
   ok(videojs.getComponent('CaptionsButton'), 'CaptionsButton should be public');
   ok(videojs.getComponent('SubtitlesButton'), 'SubtitlesButton should be public');
+  ok(videojs.getComponent('DescriptionsButton'), 'DescriptionsButton should be public');
   ok(videojs.getComponent('ChaptersButton'), 'ChaptersButton should be public');
   ok(videojs.getComponent('ChaptersTrackMenuItem'), 'ChaptersTrackMenuItem should be public');
 
@@ -228,7 +232,7 @@ test('component can be subclassed externally', function(){
   var Component = videojs.getComponent('Component');
   var ControlBar = videojs.getComponent('ControlBar');
 
-  var player = new (Component.extend({
+  var player = new (videojs.extend(Component, {
     reportUserActivity: function(){},
     textTracks: function(){ return {
         addEventListener: Function.prototype,
@@ -252,7 +256,7 @@ function testHelperMakeTag(){
 
 test('should extend Component', function(){
   var Component = videojs.getComponent('Component');
-  var MyComponent = videojs.extends(Component, {
+  var MyComponent = videojs.extend(Component, {
     constructor: function() {
       this.bar = true;
     },
@@ -267,7 +271,7 @@ test('should extend Component', function(){
   ok(myComponent.bar, 'the constructor function is used');
   ok(myComponent.foo(), 'instance methods are applied');
 
-  var NoMethods = videojs.extends(Component);
+  var NoMethods = videojs.extend(Component);
   var noMethods = new NoMethods({});
   ok(noMethods.on, 'should extend component with no methods or constructor');
 });

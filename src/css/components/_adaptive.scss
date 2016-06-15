@@ -5,10 +5,11 @@
   .vjs-custom-control-spacer { @include flex(auto); }
   &.vjs-no-flex .vjs-custom-control-spacer { width: auto; }
 
-  .vjs-current-time, .vjs-captions-button, .vjs-time-divider,
-  .vjs-progress-control, .vjs-duration, .vjs-remaining-time, .vjs-playback-rate,
-  .vjs-mute-control, .vjs-volume-control, .vjs-chapters-button, .vjs-captions-button,
-  .vjs-subtitles-button, .vjs-volume-menu-button { display: none; }
+  .vjs-current-time, .vjs-time-divider, .vjs-duration, .vjs-remaining-time,
+  .vjs-playback-rate, .vjs-progress-control,
+  .vjs-mute-control, .vjs-volume-control, .vjs-volume-menu-button,
+  .vjs-chapters-button, .vjs-descriptions-button, .vjs-captions-button,
+  .vjs-subtitles-button, .vjs-audio-button { display: none; }
 }
 
 // When the player is x-small, display nothing but:
@@ -16,10 +17,11 @@
 // - Progress bar
 // - Fullscreen Button
 .video-js.vjs-layout-x-small:not(.vjs-fullscreen) {
-  .vjs-current-time, .vjs-captions-button, .vjs-time-divider,
-  .vjs-duration, .vjs-remaining-time, .vjs-playback-rate, .vjs-captions-button,
-  .vjs-mute-control, .vjs-volume-control, .vjs-chapters-button,
-  .vjs-subtitles-button, .vjs-volume-button, .vjs-fullscreen-control { display: none; }
+  .vjs-current-time, .vjs-time-divider, .vjs-duration, .vjs-remaining-time,
+  .vjs-playback-rate,
+  .vjs-mute-control, .vjs-volume-control, .vjs-volume-menu-button,
+  .vjs-chapters-button, .vjs-descriptions-button, .vjs-captions-button,
+  .vjs-subtitles-button, .vjs-audio-button { display: none; }
 }
 
 
@@ -30,8 +32,9 @@
 // - Captions Button
 // - Fullscreen button
 .video-js.vjs-layout-small:not(.vjs-fullscreen) {
-  .vjs-current-time, .vjs-captions-button, .vjs-time-divider,
-  .vjs-duration, .vjs-remaining-time, .vjs-playback-rate,
-  .vjs-mute-control, .vjs-volume-control, .vjs-chapters-button,
-  .vjs-subtitles-button { display: none; }
+  .vjs-current-time, .vjs-time-divider, .vjs-duration, .vjs-remaining-time,
+  .vjs-playback-rate,
+  .vjs-mute-control, .vjs-volume-control,
+  .vjs-chapters-button, .vjs-descriptions-button, .vjs-captions-button,
+  .vjs-subtitles-button .vjs-audio-button { display: none; }
 }

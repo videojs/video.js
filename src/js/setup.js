@@ -1,3 +1,9 @@
+/**
+ * @file setup.js
+ *
+ * Functions for automatically setting up a player
+ * based on the data-setup attribute of the video tag
+ */
 import * as Events from './utils/events.js';
 import document from 'global/document';
 import window from 'global/window';
@@ -5,10 +11,6 @@ import window from 'global/window';
 let _windowLoaded = false;
 let videojs;
 
-/**
- * @fileoverview Functions for automatically setting up a player
- * based on the data-setup attribute of the video tag
- */
 
 // Automatically set up any tags that have a data-setup attribute
 var autoSetup = function(){
@@ -70,7 +72,10 @@ var autoSetup = function(){
 
 // Pause to let the DOM keep processing
 var autoSetupTimeout = function(wait, vjs){
-  videojs = vjs;
+  if (vjs) {
+    videojs = vjs;
+  }
+
   setTimeout(autoSetup, wait);
 };
 

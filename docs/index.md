@@ -14,7 +14,7 @@ There are two categories of docs: [Guides](./guides/) and [API docs](./api/). Gu
 
 * [Options](./guides/options.md) - There are a number of options that can be used to change how the player behaves, starting with the HTML5 media options like autoplay and preload, and expanding to Video.js specific options.
 
-* [Tracks](./guides/tracks.md) - Text Tracks are used to display subtitles and captions, and add a menu for navigating between chapters in a video.
+* [Tracks](./guides/tracks.md) - Tracks are used for displaying text information over a video, selecting different audio tracks for a video, or selected different video tracks for a video.
 
 ### Customizing
 

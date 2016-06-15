@@ -1,5 +1,9 @@
+/**
+ * @file progress-control.js
+ */
 import Component from '../../component.js';
 import SeekBar from './seek-bar.js';
+import MouseTimeDisplay from './mouse-time-display.js';
 
 /**
  * The Progress Control component contains the seek bar, load progress,
@@ -7,9 +11,17 @@ import SeekBar from './seek-bar.js';
  *
  * @param {Player|Object} player
  * @param {Object=} options
- * @constructor
+ * @extends Component
+ * @class ProgressControl
  */
 class ProgressControl extends Component {
+
+  /**
+   * Create the component's DOM element
+   *
+   * @return {Element}
+   * @method createEl
+   */
   createEl() {
     return super.createEl('div', {
       className: 'vjs-progress-control vjs-control'
@@ -18,9 +30,9 @@ class ProgressControl extends Component {
 }
 
 ProgressControl.prototype.options_ = {
-  children: {
-    'seekBar': {}
-  }
+  children: [
+    'seekBar'
+  ]
 };
 
 Component.registerComponent('ProgressControl', ProgressControl);

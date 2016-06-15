@@ -1,3 +1,6 @@
+/**
+ * @file control-bar.js
+ */
 import Component from '../component.js';
 
 // Required children
@@ -13,23 +16,33 @@ import VolumeControl from './volume-control/volume-control.js';
 import VolumeMenuButton from './volume-menu-button.js';
 import MuteToggle from './mute-toggle.js';
 import ChaptersButton from './text-track-controls/chapters-button.js';
+import DescriptionsButton from './text-track-controls/descriptions-button.js';
 import SubtitlesButton from './text-track-controls/subtitles-button.js';
 import CaptionsButton from './text-track-controls/captions-button.js';
+import AudioTrackButton from './audio-track-controls/audio-track-button.js';
 import PlaybackRateMenuButton from './playback-rate-menu/playback-rate-menu-button.js';
 import CustomControlSpacer from './spacer-controls/custom-control-spacer.js';
 
 /**
  * Container of main controls
- * @param {Player|Object} player
- * @param {Object=} options
- * @class
- * @constructor
+ *
  * @extends Component
+ * @class ControlBar
  */
 class ControlBar extends Component {
+
+  /**
+   * Create the component's DOM element
+   *
+   * @return {Element}
+   * @method createEl
+   */
   createEl() {
     return super.createEl('div', {
-      className: 'vjs-control-bar'
+      className: 'vjs-control-bar',
+      dir: 'ltr'
+    }, {
+      'role': 'group' // The control bar is a group, so it can contain menuitems
     });
   }
 }
@@ -38,6 +51,7 @@ ControlBar.prototype.options_ = {
   loadEvent: 'play',
   children: [
     'playToggle',
+    'volumeMenuButton',
     'currentTimeDisplay',
     'timeDivider',
     'durationDisplay',
@@ -46,12 +60,11 @@ ControlBar.prototype.options_ = {
     'remainingTimeDisplay',
     'customControlSpacer',
     'playbackRateMenuButton',
-    'muteToggle',
-    'volumeControl',
     'chaptersButton',
+    'descriptionsButton',
     'subtitlesButton',
     'captionsButton',
-    'volumeMenuButton',
+    'audioTrackButton',
     'fullscreenToggle'
   ]
 };

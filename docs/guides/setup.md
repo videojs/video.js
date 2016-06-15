@@ -9,14 +9,16 @@ Step 1: Include the Video.js Javascript and CSS files in the head of your page.
 You can download the Video.js source and host it on your own servers, or use the free CDN hosted version. As of Video.js 5.0, the source is [transpiled from ES2015](http://babeljs.io/) (formerly known as ES6) to [ES5](https://es5.github.io/), but IE8 only supports ES3. In order to continue to support IE8, we've bundled an [ES5 shim and sham](https://github.com/es-shims/es5-shim) together and hosted it on the CDN.
 
 ```html
-<script src="//vjs.zencdn.net/ie8/1.1.0/videojs-ie8.min.js"></script>
+<script src="//vjs.zencdn.net/ie8/1.1.1/videojs-ie8.min.js"></script>
 ```
 
 ### CDN Version ###
 ```html
-<link href="//vjs.zencdn.net/4.12/video-js.min.css" rel="stylesheet">
-<script src="//vjs.zencdn.net/4.12/video.min.js"></script>
+<link href="//vjs.zencdn.net/5.4.6/video-js.min.css" rel="stylesheet">
+<script src="//vjs.zencdn.net/5.4.6/video.min.js"></script>
 ```
+
+Alternatively you can always [go here](http://videojs.com/getting-started/) to get the latest URL for videojs CDN.
 
 We include a stripped down Google Analytics pixel that tracks a random percentage (currently 1%) of players loaded from the CDN. This allows us to see (roughly) what browsers are in use in the wild, along with other useful metrics such as OS and device. If you'd like to disable analytics, you can simply include the following global **before** including Video.js:
 
@@ -39,10 +41,11 @@ $ bower install --save video.js
 
 ### Self Hosted. ###
 To entirely self-host, you'll need to pull in the font files and let Video.js know where the swf is located. If you simply copy the dist folder or zip file contents into your project everything
-should Just Work™, but the paths can easily be changed by editing the LESS file and re-building, or by modifying the generated CSS file.
+should Just Work™, but the paths can easily be changed by editing the LESS file and re-building, or by modifying the generated CSS file. Additionally include the [videojs-vtt.js](https://www.npmjs.com/package/videojs-vtt.js) source, which adds the `WebVTT` object to the global scope.
 
 ```html
 <link href="//example.com/path/to/video-js.min.css" rel="stylesheet">
+<script src="//example.com/path/to/videojs-vtt.js"></script>
 <script src="//example.com/path/to/video.min.js"></script>
 <script>
   videojs.options.flash.swf = "http://example.com/path/to/video-js.swf"
@@ -56,7 +59,7 @@ With Video.js you just use an HTML5 video tag to embed a video. Video.js will th
 
 > Note: The `data-setup` attribute described here should not be used if you use the alternative setup described in the next section.
 
-  1. The 'data-setup' Attribute tells Video.js to automatically set up the video when the page is ready, and read any options (in JSON format) from the attribute (see [options](options.md)). There are other methods for initializing the player, but this is the easiest.
+  1. The 'data-setup' Attribute tells Video.js to automatically set up the video when the page is ready, and read any options (in JSON format) from the attribute (see [options](./options.md)). There are other methods for initializing the player, but this is the easiest.
 
   2. The 'id' Attribute: Should be used and unique for every video on the same page.
 
@@ -70,9 +73,9 @@ Otherwise include/exclude attributes, settings, sources, and tracks exactly as y
   controls preload="auto" width="640" height="264"
   poster="http://video-js.zencoder.com/oceans-clip.png"
   data-setup='{"example_option":true}'>
- <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' />
- <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />
- <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />
+ <source src="http://video-js.zencoder.com/oceans-clip.mp4" type="video/mp4" />
+ <source src="http://video-js.zencoder.com/oceans-clip.webm" type="video/webm" />
+ <source src="http://video-js.zencoder.com/oceans-clip.ogv" type="video/ogg" />
  <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
 </video>
 ```

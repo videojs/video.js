@@ -1,5 +1,6 @@
 /**
- * @fileoverview VideoJS-SWF - Custom Flash Player with HTML5-ish API
+ * @file flash.js
+ * VideoJS-SWF - Custom Flash Player with HTML5-ish API
  * https://github.com/zencoder/video-js-swf
  * Not using setupTriggers. Using global onEvent func to distribute events
  */
@@ -17,21 +18,21 @@ let navigator = window.navigator;
 /**
  * Flash Media Controller - Wrapper for fallback SWF API
  *
- * @param {Player} player
- * @param {Object=} options
- * @param {Function=} ready
- * @constructor
+ * @param {Object=} options Object of option names and values
+ * @param {Function=} ready Ready callback function
+ * @extends Tech
+ * @class Flash
  */
 class Flash extends Tech {
 
   constructor(options, ready){
     super(options, ready);
 
-    // If source was supplied pass as a flash var.
+    // Set the source when ready
     if (options.source) {
       this.ready(function(){
         this.setSource(options.source);
-      });
+      }, true);
     }
 
     // Having issues with Flash reloading on certain page actions (hide/resize/fullscreen) in certain browsers
@@ -41,7 +42,7 @@ class Flash extends Tech {
         this.load();
         this.play();
         this.currentTime(options.startTime);
-      });
+      }, true);
     }
 
     // Add global window functions that the swf expects
@@ -53,10 +54,28 @@ class Flash extends Tech {
     window.videojs.Flash.onReady = Flash.onReady;
     window.videojs.Flash.onEvent = Flash.onEvent;
     window.videojs.Flash.onError = Flash.onError;
+
+    this.on('seeked', function() {
+      this.lastSeekTarget_ = undefined;
+    });
   }
 
+  /**
+   * Create the component's DOM element
+   *
+   * @return {Element}
+   * @method createEl
+   */
   createEl() {
     let options = this.options_;
+
+    // If video.js is hosted locally you should also set the location
+    // for the hosted swf, which should be relative to the page (not video.js)
+    // Otherwise this adds a CDN url.
+    // The CDN also auto-adds a swf URL for that specific version.
+    if (!options.swf) {
+      options.swf = '//vjs.zencdn.net/swf/__SWF_VERSION__/video-js.swf';
+    }
 
     // Generate ID for swf object
     let objId = options.techId;
@@ -96,14 +115,34 @@ class Flash extends Tech {
     return this.el_;
   }
 
+  /**
+   * Play for flash tech
+   *
+   * @method play
+   */
   play() {
+    if (this.ended()) {
+      this.setCurrentTime(0);
+    }
     this.el_.vjs_play();
   }
 
+  /**
+   * Pause for flash tech
+   *
+   * @method pause
+   */
   pause() {
     this.el_.vjs_pause();
   }
 
+  /**
+   * Get/set video
+   *
+   * @param {Object=} src Source object
+   * @return {Object}
+   * @method src
+   */
   src(src) {
     if (src === undefined) {
       return this.currentSrc();
@@ -113,6 +152,13 @@ class Flash extends Tech {
     return this.setSrc(src);
   }
 
+  /**
+   * Set video
+   *
+   * @param {Object=} src Source object
+   * @deprecated
+   * @method setSrc
+   */
   setSrc(src) {
     // Make sure source URL is absolute.
     src = Url.getAbsoluteURL(src);
@@ -126,12 +172,41 @@ class Flash extends Tech {
     }
   }
 
-  setCurrentTime(time) {
-    this.lastSeekTarget_ = time;
-    this.el_.vjs_setProperty('currentTime', time);
-    super.setCurrentTime();
+  /**
+   * Returns true if the tech is currently seeking.
+   * @return {boolean} true if seeking
+   */
+  seeking() {
+    return this.lastSeekTarget_ !== undefined;
   }
 
+  /**
+   * Set current time
+   *
+   * @param {Number} time Current time of video
+   * @method setCurrentTime
+   */
+  setCurrentTime(time) {
+    let seekable = this.seekable();
+    if (seekable.length) {
+      // clamp to the current seekable range
+      time = time > seekable.start(0) ? time : seekable.start(0);
+      time = time < seekable.end(seekable.length - 1) ? time : seekable.end(seekable.length - 1);
+
+      this.lastSeekTarget_ = time;
+      this.trigger('seeking');
+      this.el_.vjs_setProperty('currentTime', time);
+      super.setCurrentTime();
+    }
+  }
+
+  /**
+   * Get current time
+   *
+   * @param {Number=} time Current time of video
+   * @return {Number} Current time
+   * @method currentTime
+   */
   currentTime(time) {
     // when seeking make the reported time keep up with the requested time
     // by reading the time we're seeking to
@@ -141,6 +216,11 @@ class Flash extends Tech {
     return this.el_.vjs_getProperty('currentTime');
   }
 
+  /**
+   * Get current source
+   *
+   * @method currentSrc
+   */
   currentSrc() {
     if (this.currentSource_) {
       return this.currentSource_.src;
@@ -149,17 +229,37 @@ class Flash extends Tech {
     }
   }
 
+  /**
+   * Load media into player
+   *
+   * @method load
+   */
   load() {
     this.el_.vjs_load();
   }
 
+  /**
+   * Get poster
+   *
+   * @method poster
+   */
   poster() {
     this.el_.vjs_getProperty('poster');
   }
 
-  // poster images are not handled by the Flash tech so make this a no-op
+  /**
+   * Poster images are not handled by the Flash tech so make this a no-op
+   *
+   * @method setPoster
+   */
   setPoster() {}
 
+  /**
+   * Determine if can seek in media
+   *
+   * @return {TimeRangeObject}
+   * @method seekable
+   */
   seekable() {
     const duration = this.duration();
     if (duration === 0) {
@@ -168,14 +268,40 @@ class Flash extends Tech {
     return createTimeRange(0, duration);
   }
 
+  /**
+   * Get buffered time range
+   *
+   * @return {TimeRangeObject}
+   * @method buffered
+   */
   buffered() {
-    return createTimeRange(0, this.el_.vjs_getProperty('buffered'));
+    let ranges = this.el_.vjs_getProperty('buffered');
+    if (ranges.length === 0) {
+      return createTimeRange();
+    }
+    return createTimeRange(ranges[0][0], ranges[0][1]);
   }
 
+  /**
+   * Get fullscreen support -
+   * Flash does not allow fullscreen through javascript
+   * so always returns false
+   *
+   * @return {Boolean} false
+   * @method supportsFullScreen
+   */
   supportsFullScreen() {
     return false; // Flash does not allow fullscreen through javascript
   }
 
+  /**
+   * Request to enter fullscreen
+   * Flash does not allow fullscreen through javascript
+   * so always returns false
+   *
+   * @return {Boolean} false
+   * @method enterFullScreen
+   */
   enterFullScreen() {
     return false;
   }
@@ -186,7 +312,7 @@ class Flash extends Tech {
 // Create setters and getters for attributes
 const _api = Flash.prototype;
 const _readWrite = 'rtmpConnection,rtmpStream,preload,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted'.split(',');
-const _readOnly = 'error,networkState,readyState,seeking,initialTime,duration,startOffsetTime,paused,played,ended,videoTracks,audioTracks,videoWidth,videoHeight'.split(',');
+const _readOnly = 'networkState,readyState,initialTime,duration,startOffsetTime,paused,ended,videoWidth,videoHeight'.split(',');
 
 function _createSetter(attr){
   var attrUpper = attr.charAt(0).toUpperCase() + attr.slice(1);
@@ -217,20 +343,36 @@ Flash.isSupported = function(){
 // Add Source Handler pattern functions to this tech
 Tech.withSourceHandlers(Flash);
 
-/**
+/*
  * The default native source handler.
  * This simply passes the source to the video element. Nothing fancy.
+ *
  * @param  {Object} source   The source object
  * @param  {Flash} tech  The instance of the Flash tech
  */
 Flash.nativeSourceHandler = {};
 
 /**
- * Check Flash can handle the source natively
- * @param  {Object} source  The source object
+ * Check if Flash can play the given videotype
+ * @param  {String} type    The mimetype to check
  * @return {String}         'probably', 'maybe', or '' (empty string)
  */
-Flash.nativeSourceHandler.canHandleSource = function(source){
+Flash.nativeSourceHandler.canPlayType = function(type){
+  if (type in Flash.formats) {
+    return 'maybe';
+  }
+
+  return '';
+};
+
+/*
+ * Check Flash can handle the source natively
+ *
+ * @param  {Object} source  The source object
+ * @param  {Object} options The options passed to the tech
+ * @return {String}         'probably', 'maybe', or '' (empty string)
+ */
+Flash.nativeSourceHandler.canHandleSource = function(source, options){
   var type;
 
   function guessMimeType(src) {
@@ -248,25 +390,23 @@ Flash.nativeSourceHandler.canHandleSource = function(source){
     type = source.type.replace(/;.*/, '').toLowerCase();
   }
 
-  if (type in Flash.formats) {
-    return 'maybe';
-  }
-
-  return '';
+  return Flash.nativeSourceHandler.canPlayType(type);
 };
 
-/**
+/*
  * Pass the source to the flash object
  * Adaptive source handlers will have more complicated workflows before passing
  * video data to the video element
- * @param  {Object} source    The source object
- * @param  {Flash} tech   The instance of the Flash tech
+ *
+ * @param  {Object} source   The source object
+ * @param  {Flash}  tech     The instance of the Flash tech
+ * @param  {Object} options  The options to pass to the source
  */
-Flash.nativeSourceHandler.handleSource = function(source, tech){
+Flash.nativeSourceHandler.handleSource = function(source, tech, options){
   tech.setSrc(source.src);
 };
 
-/**
+/*
  * Clean up the source handler when disposing the player or switching sources..
  * (no cleanup is needed when supporting the format natively)
  */
@@ -323,15 +463,14 @@ Flash.onEvent = function(swfID, eventName){
 // Log errors from the swf
 Flash.onError = function(swfID, err){
   const tech = Dom.getEl(swfID).tech;
-  const msg = 'FLASH: '+err;
 
+  // trigger MEDIA_ERR_SRC_NOT_SUPPORTED
   if (err === 'srcnotfound') {
-    tech.trigger('error', { code: 4, message: msg });
-
-  // errors we haven't categorized into the media errors
-  } else {
-    tech.trigger('error', msg);
+    return tech.error(4);
   }
+
+  // trigger a custom error
+  tech.error('FLASH: ' + err);
 };
 
 // Flash Version Check
@@ -411,4 +550,5 @@ Flash.getEmbedCode = function(swf, flashVars, params, attributes){
 FlashRtmpDecorator(Flash);
 
 Component.registerComponent('Flash', Flash);
+Tech.registerTech('Flash', Flash);
 export default Flash;

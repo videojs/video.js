@@ -1,9 +1,15 @@
+/**
+ * @file url.js
+ */
 import document from 'global/document';
+import window from 'global/window';
 
 /**
  * Resolve and parse the elements of a URL
+ *
  * @param  {String} url The url to parse
  * @return {Object}     An object of url details
+ * @method parseUrl
  */
 export const parseUrl = function(url) {
   const props = ['protocol', 'hostname', 'port', 'pathname', 'search', 'hash', 'host'];
@@ -53,9 +59,11 @@ export const parseUrl = function(url) {
 /**
  * Get absolute version of relative URL. Used to tell flash correct URL.
  * http://stackoverflow.com/questions/470832/getting-an-absolute-url-from-a-relative-one-ie6-issue
+ *
  * @param  {String} url URL to make absolute
  * @return {String}     Absolute URL
  * @private
+ * @method getAbsoluteURL
  */
 export const getAbsoluteURL = function(url){
   // Check if absolute URL
@@ -74,6 +82,7 @@ export const getAbsoluteURL = function(url){
  *
  * @param {String}    path    The fileName path like '/path/to/file.mp4'
  * @returns {String}          The extension in lower case or an empty string if no extension could be found.
+ * @method getFileExtension
  */
 export const getFileExtension = function(path) {
   if(typeof path === 'string'){
@@ -86,4 +95,25 @@ export const getFileExtension = function(path) {
   }
 
   return '';
+};
+
+/**
+ * Returns whether the url passed is a cross domain request or not.
+ *
+ * @param {String} url The url to check
+ * @return {Boolean}   Whether it is a cross domain request or not
+ * @method isCrossOrigin
+ */
+export const isCrossOrigin = function(url) {
+  let winLoc = window.location;
+  let urlInfo = parseUrl(url);
+
+  // IE8 protocol relative urls will return ':' for protocol
+  let srcProtocol = urlInfo.protocol === ':' ? winLoc.protocol : urlInfo.protocol;
+
+  // Check if url is for another domain/origin
+  // IE8 doesn't know location.origin, so we won't rely on it here
+  let crossOrigin = (srcProtocol + urlInfo.host) !== (winLoc.protocol + winLoc.host);
+
+  return crossOrigin;
 };
