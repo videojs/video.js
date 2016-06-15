@@ -1292,11 +1292,11 @@ class Player extends Component {
    * @method play
    */
   play() {
-    /* Autoplay solution */
+    // Only calls the tech's play if we already have a src loaded
     if (this.player_.currentSrc()) {
       this.techCall_('play');
     } else {
-      this.options_.autoplay = true;
+      this.autoplay(true);
     }
 
     return this;
