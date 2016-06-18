@@ -199,13 +199,21 @@ module.exports = function(grunt) {
         src: ['video-js.css', 'alt/video-js-cdn.css'],
         dest: 'build/temp/',
         ext: '.min.css'
+      },
+      ie8: {
+        expand: true,
+        cwd: 'build/temp/ie8/',
+        src: ['videojs-ie8.css'],
+        dest: 'build/temp/ie8/',
+        ext: '.min.css'
       }
     },
     sass: {
       build: {
         files: {
           'build/temp/video-js.css': 'src/css/vjs.scss',
-          'build/temp/alt/video-js-cdn.css': 'src/css/vjs-cdn.scss'
+          'build/temp/alt/video-js-cdn.css': 'src/css/vjs-cdn.scss',
+          'build/temp/ie8/videojs-ie8.css': 'src/css/ie8.scss'
         }
       }
     },
@@ -466,6 +474,7 @@ module.exports = function(grunt) {
     'sass',
     'version:css',
     'cssmin',
+    'cssmin:ie8',
 
     'copy:fonts',
     'copy:swf',
