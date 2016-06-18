@@ -182,11 +182,9 @@ module.exports = function(grunt) {
     },
     cssmin: {
       minify: {
-        expand: true,
-        cwd: 'build/temp/',
-        src: ['video-js.css', 'alt/video-js-cdn.css'],
-        dest: 'build/temp/',
-        ext: '.min.css'
+        files: {
+          'build/temp/video-js.min.css': ['build/temp/video-js.css', 'build/temp/alt/video-js-cdn.css', 'src/css/ie8.css']
+        }
       }
     },
     sass: {
@@ -382,20 +380,17 @@ module.exports = function(grunt) {
       }
     },
     concat: {
+      options: {
+        separator: '\n'
+      },
       novtt: {
-        options: {
-          separator: '\n'
-        },
         src: ['build/temp/video.js'],
         dest: 'build/temp/alt/video.novtt.js'
       },
       vtt: {
-        options: {
-          separator: '\n',
-        },
         src: ['build/temp/video.js', 'node_modules/videojs-vtt.js/dist/vtt.js'],
-        dest: 'build/temp/video.js',
-      },
+        dest: 'build/temp/video.js'
+      }
     },
     concurrent: {
       options: {
