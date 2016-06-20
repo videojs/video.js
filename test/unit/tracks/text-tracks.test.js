@@ -475,3 +475,81 @@ test('should uniformly create html track element when adding text track', functi
 
   player.dispose();
 });
+
+test('default text tracks should show by default', function() {
+  let tag = TestHelpers.makeTag();
+  let capt = document.createElement('track');
+
+  capt.setAttribute('kind', 'captions');
+  capt.setAttribute('default', 'default');
+
+  tag.appendChild(capt);
+
+  let player = TestHelpers.makePlayer({
+    html5: {
+      nativeTextTracks: false
+    }
+  }, tag);
+
+  // native tracks are initialized after the player is ready
+  this.clock.tick(1);
+
+  let tracks = player.textTracks();
+
+  equal(tracks[0].kind, 'captions', 'the captions track is present');
+  equal(tracks[0].mode, 'showing', 'the captions track is showing');
+});
+
+test('default captions take precedence over default descriptions', function() {
+  let tag = TestHelpers.makeTag();
+  let desc = document.createElement('track');
+  let capt = document.createElement('track');
+
+  desc.setAttribute('kind', 'descriptions');
+  desc.setAttribute('default', 'default');
+  capt.setAttribute('kind', 'captions');
+  capt.setAttribute('default', 'default');
+
+  tag.appendChild(desc);
+  tag.appendChild(capt);
+
+  let player = TestHelpers.makePlayer({
+    html5: {
+      nativeTextTracks: false
+    }
+  }, tag);
+
+  // native tracks are initialized after the player is ready
+  this.clock.tick(1);
+
+  let tracks = player.textTracks();
+
+  equal(tracks[0].kind, 'descriptions', 'the descriptions track is first');
+  equal(tracks[0].mode, 'disabled', 'the descriptions track is disabled');
+  equal(tracks[1].kind, 'captions', 'the captions track is second');
+  equal(tracks[1].mode, 'showing', 'the captions track is showing');
+});
+
+test('removeRemoteTextTrack should be able to take both a track and the response from addRemoteTextTrack', function() {
+  let player = TestHelpers.makePlayer();
+  let track = {
+    kind: 'kind',
+    src: 'src',
+    language: 'language',
+    label: 'label',
+    default: 'default'
+  };
+  let htmlTrackElement = player.addRemoteTextTrack(track);
+
+  equal(player.remoteTextTrackEls().length, 1, 'html track element exist');
+
+  player.removeRemoteTextTrack(htmlTrackElement);
+
+  equal(player.remoteTextTrackEls().length, 0, 'the track element was removed correctly');
+
+  htmlTrackElement = player.addRemoteTextTrack(track);
+  equal(player.remoteTextTrackEls().length, 1, 'html track element exist');
+
+  player.removeRemoteTextTrack(htmlTrackElement.track);
+  equal(player.remoteTextTrackEls().length, 0, 'the track element was removed correctly');
+});

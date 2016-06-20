@@ -1,5 +1,7 @@
 import window from 'global/window';
 import EventTarget from '../../../src/js/event-target.js';
+import TrackBaseline from './track-baseline';
+import TechFaker from '../tech/tech-faker';
 import TextTrack from '../../../src/js/tracks/text-track.js';
 import TestHelpers from '../test-helpers.js';
 import log from '../../../src/js/utils/log.js';
@@ -13,40 +15,38 @@ const defaultTech = {
   off() {},
   currentTime() {}
 };
-
 q.module('Text Track');
 
-test('text-track requires a tech', function() {
-  let error = new Error('A tech was not provided.');
-
-  q.throws(() => new TextTrack(), error, 'a tech is required for text track');
+// do baseline track testing
+TrackBaseline(TextTrack, {
+  id: '1',
+  kind: 'subtitles',
+  mode: 'disabled',
+  label: 'English',
+  language: 'en',
+  tech: defaultTech
 });
 
-test('can create a TextTrack with various properties', function() {
-  let kind = 'captions';
-  let label = 'English';
-  let language = 'en';
-  let id = '1';
+test('requires a tech', function() {
+  let error = new Error('A tech was not provided.');
+
+  q.throws(() => new TextTrack({}), error, 'a tech is required');
+  q.throws(() => new TextTrack({tech: null}), error, 'a tech is required');
+});
+
+test('can create a TextTrack with a mode property', function() {
   let mode = 'disabled';
   let tt = new TextTrack({
-    kind,
-    label,
-    language,
-    id,
     mode,
     tech: defaultTech
   });
 
-  equal(tt.kind, kind, 'we have a kind');
-  equal(tt.label, label, 'we have a label');
-  equal(tt.language, language, 'we have a language');
-  equal(tt.id, id, 'we have a id');
   equal(tt.mode, mode, 'we have a mode');
 });
 
 test('defaults when items not provided', function() {
   let tt = new TextTrack({
-    tech: defaultTech
+    tech: TechFaker
   });
 
   equal(tt.kind, 'subtitles', 'kind defaulted to subtitles');
@@ -131,32 +131,16 @@ test('mode can only be one of several options, defaults to disabled', function()
   equal(tt.mode, 'showing', 'the mode is set to showing');
 });
 
-test('kind, label, language, id, cue, and activeCues are read only', function() {
-  let kind = 'captions';
-  let label = 'English';
-  let language = 'en';
-  let id = '1';
+test('cue and activeCues are read only', function() {
   let mode = 'disabled';
   let tt = new TextTrack({
-    kind,
-    label,
-    language,
-    id,
     mode,
-    tech: defaultTech
+    tech: defaultTech,
   });
 
-  tt.kind = 'subtitles';
-  tt.label = 'Spanish';
-  tt.language = 'es';
-  tt.id = '2';
   tt.cues = 'foo';
   tt.activeCues = 'bar';
 
-  equal(tt.kind, kind, 'kind is still set to captions');
-  equal(tt.label, label, 'label is still set to English');
-  equal(tt.language, language, 'language is still set to en');
-  equal(tt.id, id, 'id is still set to \'1\'');
   notEqual(tt.cues, 'foo', 'cues is still original value');
   notEqual(tt.activeCues, 'bar', 'activeCues is still original value');
 });

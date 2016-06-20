@@ -57,7 +57,8 @@ export const IS_OLD_ANDROID = IS_ANDROID && (/webkit/i).test(USER_AGENT) && ANDR
 export const IS_NATIVE_ANDROID = IS_ANDROID && ANDROID_VERSION < 5 && appleWebkitVersion < 537;
 
 export const IS_FIREFOX = (/Firefox/i).test(USER_AGENT);
-export const IS_CHROME = (/Chrome/i).test(USER_AGENT);
+export const IS_EDGE = (/Edge/i).test(USER_AGENT);
+export const IS_CHROME = !IS_EDGE && (/Chrome/i).test(USER_AGENT);
 export const IS_IE8 = (/MSIE\s8\.0/).test(USER_AGENT);
 
 export const TOUCH_ENABLED = !!(('ontouchstart' in window) || window.DocumentTouch && document instanceof window.DocumentTouch);

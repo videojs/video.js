@@ -58,6 +58,34 @@ class TextTrackDisplay extends Component {
         let track = tracks[i];
         this.player_.addRemoteTextTrack(track);
       }
+
+      let modes = {'captions': 1, 'subtitles': 1};
+      let trackList = this.player_.textTracks();
+      let firstDesc;
+      let firstCaptions;
+
+      if (trackList) {
+        for (let i = 0; i < trackList.length; i++) {
+          let track = trackList[i];
+          if (track.default) {
+            if (track.kind === 'descriptions' && !firstDesc) {
+              firstDesc = track;
+            } else if (track.kind in modes && !firstCaptions) {
+              firstCaptions = track;
+            }
+          }
+        }
+
+        // We want to show the first default track but captions and subtitles
+        // take precedence over descriptions.
+        // So, display the first default captions or subtitles track
+        // and otherwise the first default descriptions track.
+        if (firstCaptions) {
+          firstCaptions.mode = 'showing';
+        } else if (firstDesc) {
+          firstDesc.mode = 'showing';
+        }
+      }
     }));
   }
 

@@ -190,16 +190,16 @@ test('native source handler canHandleSource', function(){
 
   var canHandleSource = Html5.nativeSourceHandler.canHandleSource;
 
-  equal(canHandleSource({ type: 'video/mp4', src: 'video.flv' }), 'maybe', 'Native source handler reported type support');
-  equal(canHandleSource({ src: 'http://www.example.com/video.mp4' }), 'maybe', 'Native source handler reported extension support');
-  equal(canHandleSource({ src: 'https://example.com/video.sd.mp4?s=foo&token=bar' }), 'maybe', 'Native source handler reported extension support');
-  equal(canHandleSource({ src: 'https://example.com/video.sd.mp4?s=foo' }), 'maybe', 'Native source handler reported extension support');
+  equal(canHandleSource({ type: 'video/mp4', src: 'video.flv' }, {}), 'maybe', 'Native source handler reported type support');
+  equal(canHandleSource({ src: 'http://www.example.com/video.mp4' }, {}), 'maybe', 'Native source handler reported extension support');
+  equal(canHandleSource({ src: 'https://example.com/video.sd.mp4?s=foo&token=bar' }, {}), 'maybe', 'Native source handler reported extension support');
+  equal(canHandleSource({ src: 'https://example.com/video.sd.mp4?s=foo' }, {}), 'maybe', 'Native source handler reported extension support');
 
   // Test for issue videojs/video.js#1785 and other potential failures
-  equal(canHandleSource({ src: '' }), '', 'Native source handler handled empty src');
-  equal(canHandleSource({}), '', 'Native source handler handled empty object');
-  equal(canHandleSource({ src: 'foo' }), '', 'Native source handler handled bad src');
-  equal(canHandleSource({ type: 'foo' }), '', 'Native source handler handled bad type');
+  equal(canHandleSource({ src: '' }, {}), '', 'Native source handler handled empty src');
+  equal(canHandleSource({}, {}), '', 'Native source handler handled empty object');
+  equal(canHandleSource({ src: 'foo' }, {}), '', 'Native source handler handled bad src');
+  equal(canHandleSource({ type: 'foo' }, {}), '', 'Native source handler handled bad type');
 
   // Reset test video canPlayType
   Html5.TEST_VID.canPlayType = origCPT;
@@ -249,6 +249,97 @@ if (Html5.supportsNativeTextTracks()) {
     equal(adds[2][0], rems[2][0], 'removetrack event handler removed');
   });
 }
+
+if (Html5.supportsNativeAudioTracks()) {
+  test('add native audioTrack listeners on startup', function() {
+    let adds = [];
+    let rems = [];
+    let at = {
+      length: 0,
+      addEventListener: (type, fn) => adds.push([type, fn]),
+      removeEventListener: (type, fn) => rems.push([type, fn]),
+    };
+    let el = document.createElement('div');
+    el.audioTracks = at;
+
+    let htmlTech = new Html5({el});
+
+    equal(adds[0][0], 'change', 'change event handler added');
+    equal(adds[1][0], 'addtrack', 'addtrack event handler added');
+    equal(adds[2][0], 'removetrack', 'removetrack event handler added');
+  });
+
+  test('remove all tracks from emulated list on dispose', function() {
+    let adds = [];
+    let rems = [];
+    let at = {
+      length: 0,
+      addEventListener: (type, fn) => adds.push([type, fn]),
+      removeEventListener: (type, fn) => rems.push([type, fn]),
+    };
+    let el = document.createElement('div');
+    el.audioTracks = at;
+
+    let htmlTech = new Html5({el});
+    htmlTech.dispose();
+
+    equal(adds[0][0], 'change', 'change event handler added');
+    equal(adds[1][0], 'addtrack', 'addtrack event handler added');
+    equal(adds[2][0], 'removetrack', 'removetrack event handler added');
+    equal(rems[0][0], 'change', 'change event handler removed');
+    equal(rems[1][0], 'addtrack', 'addtrack event handler removed');
+    equal(rems[2][0], 'removetrack', 'removetrack event handler removed');
+    equal(adds[0][0], rems[0][0], 'change event handler removed');
+    equal(adds[1][0], rems[1][0], 'addtrack event handler removed');
+    equal(adds[2][0], rems[2][0], 'removetrack event handler removed');
+  });
+}
+
+if (Html5.supportsNativeVideoTracks()) {
+  test('add native videoTrack listeners on startup', function() {
+    let adds = [];
+    let rems = [];
+    let vt = {
+      length: 0,
+      addEventListener: (type, fn) => adds.push([type, fn]),
+      removeEventListener: (type, fn) => rems.push([type, fn]),
+    };
+    let el = document.createElement('div');
+    el.videoTracks = vt;
+
+    let htmlTech = new Html5({el});
+
+    equal(adds[0][0], 'change', 'change event handler added');
+    equal(adds[1][0], 'addtrack', 'addtrack event handler added');
+    equal(adds[2][0], 'removetrack', 'removetrack event handler added');
+  });
+
+  test('remove all tracks from emulated list on dispose', function() {
+    let adds = [];
+    let rems = [];
+    let vt = {
+      length: 0,
+      addEventListener: (type, fn) => adds.push([type, fn]),
+      removeEventListener: (type, fn) => rems.push([type, fn]),
+    };
+    let el = document.createElement('div');
+    el.videoTracks = vt;
+
+    let htmlTech = new Html5({el});
+    htmlTech.dispose();
+
+    equal(adds[0][0], 'change', 'change event handler added');
+    equal(adds[1][0], 'addtrack', 'addtrack event handler added');
+    equal(adds[2][0], 'removetrack', 'removetrack event handler added');
+    equal(rems[0][0], 'change', 'change event handler removed');
+    equal(rems[1][0], 'addtrack', 'addtrack event handler removed');
+    equal(rems[2][0], 'removetrack', 'removetrack event handler removed');
+    equal(adds[0][0], rems[0][0], 'change event handler removed');
+    equal(adds[1][0], rems[1][0], 'addtrack event handler removed');
+    equal(adds[2][0], rems[2][0], 'removetrack event handler removed');
+  });
+}
+
 test('should always return currentSource_ if set', function(){
   let currentSrc = Html5.prototype.currentSrc;
   equal(currentSrc.call({el_: {currentSrc:'test1'}}), 'test1', 'sould return source from element if nothing else set');

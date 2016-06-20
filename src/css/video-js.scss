@@ -2,11 +2,7 @@
 @import "private-variables";
 @import "utilities";
 
-@if $icon-codepoints {
-  @import "node_modules/videojs-font/scss/icons-codepoints";
-} @else {
-  @import "node_modules/videojs-font/scss/icons";
-}
+@import "node_modules/videojs-font/scss/icons";
 
 @import "components/layout";
 @import "components/big-play";
@@ -39,6 +35,7 @@
 @import "components/chapters";
 @import "components/descriptions";
 @import "components/subtitles";
+@import "components/audio";
 @import "components/adaptive";
 @import "components/captions-settings";
 @import "components/modal-dialog";

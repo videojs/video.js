@@ -19,6 +19,7 @@ import ChaptersButton from './text-track-controls/chapters-button.js';
 import DescriptionsButton from './text-track-controls/descriptions-button.js';
 import SubtitlesButton from './text-track-controls/subtitles-button.js';
 import CaptionsButton from './text-track-controls/captions-button.js';
+import AudioTrackButton from './audio-track-controls/audio-track-button.js';
 import PlaybackRateMenuButton from './playback-rate-menu/playback-rate-menu-button.js';
 import CustomControlSpacer from './spacer-controls/custom-control-spacer.js';
 
@@ -63,6 +64,7 @@ ControlBar.prototype.options_ = {
     'descriptionsButton',
     'subtitlesButton',
     'captionsButton',
+    'audioTrackButton',
     'fullscreenToggle'
   ]
 };
