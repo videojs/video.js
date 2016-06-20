@@ -1293,7 +1293,7 @@ class Player extends Component {
    */
   play() {
     // Only calls the tech's play if we already have a src loaded
-    if (this.player_.currentSrc()) {
+    if (this.src() || this.currentSrc()) {
       this.techCall_('play');
     } else {
       this.tech_.one('loadstart', function() {
