@@ -6,6 +6,9 @@ _(none)_
 
 --------------------
 
+## 5.10.6 (2016-06-20)
+* @gkatsev fix not fully minified video.min.js file.
+
 ## 5.10.5 (2016-06-07)
 * @gkatsev pinned dependencies to direct versions ([view](https://github.com/videojs/video.js/pull/3338))
 * @gkatsev fixed minified vjs in ie8 when initialized with id string ([view](https://github.com/videojs/video.js/pull/3357))
