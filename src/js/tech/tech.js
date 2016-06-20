@@ -309,9 +309,9 @@ class Tech extends Component {
   }
 
   delayedPlay() {
-    this.el_.onloadstart = function() {
+    this.one('loadstart', function() {
       this.play();
-    };
+    });
   }
 
   /**
