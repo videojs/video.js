@@ -1296,10 +1296,14 @@ class Player extends Component {
     if (this.player_.currentSrc()) {
       this.techCall_('play');
     } else {
-      this.autoplay(true);
+      this.delayedPlay();
     }
 
     return this;
+  }
+
+  delayedPlay() {
+    this.techCall_('delayedPlay');
   }
 
   /**
