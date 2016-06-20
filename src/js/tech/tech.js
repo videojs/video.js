@@ -308,12 +308,6 @@ class Tech extends Component {
     return createTimeRange();
   }
 
-  delayedPlay() {
-    this.one('loadstart', function() {
-      this.play();
-    });
-  }
-
   /**
    * Set current time
    *
