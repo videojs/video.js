@@ -254,9 +254,8 @@ function captionOptionsMenuTemplate(uniqueId, dialogLabelId, dialogDescriptionId
 
   let template = `
     <div role="document">
-      <h1 id="${dialogLabelId}" class="vjs-control-text">Captions Settings Dialog</h1>
+      <div role="heading" aria-level="1" id="${dialogLabelId}" class="vjs-control-text">Captions Settings Dialog</div>
       <div id="${dialogDescriptionId}" class="vjs-control-text">Beginning of dialog window. Escape will cancel and close the window.</div>
-      <div class=""></div>
       <div class="vjs-tracksettings">
         <div class="vjs-tracksettings-colors">
           <fieldset class="vjs-fg-color vjs-tracksetting">
