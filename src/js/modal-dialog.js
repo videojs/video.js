@@ -256,6 +256,7 @@ class ModalDialog extends Component {
         let temp = this.contentEl_;
         this.contentEl_ = this.el_;
         close = this.addChild('closeButton');
+        close.controlText('Close Modal Dialog');
         this.contentEl_ = temp;
         this.on(close, 'close', this.close);
       }
