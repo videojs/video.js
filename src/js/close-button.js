@@ -12,7 +12,7 @@ class CloseButton extends Button {
 
   constructor(player, options) {
     super(player, options);
-    this.controlText(options && options.controlText || this.localize('Close Dialog'));
+    this.controlText(options && options.controlText || this.localize('Close Modal Dialog'));
   }
 
   buildCSSClass() {

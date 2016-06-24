@@ -26,7 +26,7 @@ q.test('should create the expected element', function(assert) {
 
   assert.expect(elAssertions.count + 1);
   elAssertions();
-  assert.strictEqual(this.btn.el().querySelector('.vjs-control-text').innerHTML, 'Close Dialog');
+  assert.strictEqual(this.btn.el().querySelector('.vjs-control-text').innerHTML, 'Close Modal Dialog');
 });
 
 q.test('should allow setting the controlText_ property as an option', function(assert) {
