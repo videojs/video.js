@@ -26,7 +26,7 @@ if (typeof window.HTMLVideoElement === 'undefined') {
 ;
 
 // UMD (Universal Module Definition)
-// see https://github.com/umdjs/umd/blob/master/templates/returnExports.js
+// see https://github.com/umdjs/umd/blob/master/returnExports.js
 (function (root, factory) {
     'use strict';
 
@@ -72,7 +72,6 @@ var array_push = ArrayPrototype.push;
 var array_unshift = ArrayPrototype.unshift;
 var array_concat = ArrayPrototype.concat;
 var call = FunctionPrototype.call;
-var apply = FunctionPrototype.apply;
 var max = Math.max;
 var min = Math.min;
 
@@ -85,18 +84,19 @@ var isRegex; /* inlined from https://npmjs.com/is-regex */ var regexExec = RegEx
 var isString; /* inlined from https://npmjs.com/is-string */ var strValue = String.prototype.valueOf, tryStringObject = function tryStringObject(value) { try { strValue.call(value); return true; } catch (e) { return false; } }, stringClass = '[object String]'; isString = function isString(value) { if (typeof value === 'string') { return true; } if (typeof value !== 'object') { return false; } return hasToStringTag ? tryStringObject(value) : to_string.call(value) === stringClass; };
 
 /* inlined from http://npmjs.com/define-properties */
-var supportsDescriptors = $Object.defineProperty && (function () {
-    try {
-        var obj = {};
-        $Object.defineProperty(obj, 'x', { enumerable: false, value: obj });
-        for (var _ in obj) { return false; }
-        return obj.x === obj;
-    } catch (e) { /* this is ES3 */
-        return false;
-    }
-}());
 var defineProperties = (function (has) {
-  // Define configurable, writable, and non-enumerable props
+  var supportsDescriptors = $Object.defineProperty && (function () {
+      try {
+          var obj = {};
+          $Object.defineProperty(obj, 'x', { enumerable: false, value: obj });
+          for (var _ in obj) { return false; }
+          return obj.x === obj;
+      } catch (e) { /* this is ES3 */
+          return false;
+      }
+  }());
+
+  // Define configurable, writable and non-enumerable props
   // if they don't exist.
   var defineProperty;
   if (supportsDescriptors) {
@@ -179,6 +179,7 @@ var ES = {
     // http://es5.github.com/#x9.9
     /* replaceable with https://npmjs.com/package/es-abstract ES5.ToObject */
     ToObject: function (o) {
+        /* jshint eqnull: true */
         if (o == null) { // this matches both null and undefined
             throw new TypeError("can't convert " + o + ' to object');
         }
@@ -336,17 +337,13 @@ defineProperties(FunctionPrototype, {
 });
 
 // _Please note: Shortcuts are defined after `Function.prototype.bind` as we
-// use it in defining shortcuts.
+// us it in defining shortcuts.
 var owns = call.bind(ObjectPrototype.hasOwnProperty);
 var toStr = call.bind(ObjectPrototype.toString);
-var arraySlice = call.bind(array_slice);
-var arraySliceApply = apply.bind(array_slice);
 var strSlice = call.bind(StringPrototype.slice);
 var strSplit = call.bind(StringPrototype.split);
 var strIndexOf = call.bind(StringPrototype.indexOf);
-var pushCall = call.bind(array_push);
-var isEnum = call.bind(ObjectPrototype.propertyIsEnumerable);
-var arraySort = call.bind(ArrayPrototype.sort);
+var push = call.bind(array_push);
 
 //
 // Array
@@ -400,23 +397,18 @@ var properlyBoxesContext = function properlyBoxed(method) {
     // Check node 0.6.21 bug where third parameter is not boxed
     var properlyBoxesNonStrict = true;
     var properlyBoxesStrict = true;
-    var threwException = false;
     if (method) {
-        try {
-            method.call('foo', function (_, __, context) {
-                if (typeof context !== 'object') { properlyBoxesNonStrict = false; }
-            });
+        method.call('foo', function (_, __, context) {
+            if (typeof context !== 'object') { properlyBoxesNonStrict = false; }
+        });
 
-            method.call([1], function () {
-                'use strict';
+        method.call([1], function () {
+            'use strict';
 
-                properlyBoxesStrict = typeof this === 'string';
-            }, 'x');
-        } catch (e) {
-            threwException = true;
-        }
+            properlyBoxesStrict = typeof this === 'string';
+        }, 'x');
     }
-    return !!method && !threwException && properlyBoxesNonStrict && properlyBoxesStrict;
+    return !!method && properlyBoxesNonStrict && properlyBoxesStrict;
 };
 
 defineProperties(ArrayPrototype, {
@@ -505,7 +497,7 @@ defineProperties(ArrayPrototype, {
             if (i in self) {
                 value = self[i];
                 if (typeof T === 'undefined' ? callbackfn(value, i, object) : callbackfn.call(T, value, i, object)) {
-                    pushCall(result, value);
+                    push(result, value);
                 }
             }
         }
@@ -758,9 +750,9 @@ defineProperties(ArrayPrototype, {
         var args = arguments;
         this.length = max(ES.ToInteger(this.length), 0);
         if (arguments.length > 0 && typeof deleteCount !== 'number') {
-            args = arraySlice(arguments);
+            args = array_slice.call(arguments);
             if (args.length < 2) {
-                pushCall(args, this.length - start);
+                push(args, this.length - start);
             } else {
                 args[1] = ES.ToInteger(deleteCount);
             }
@@ -807,7 +799,7 @@ defineProperties(ArrayPrototype, {
             k += 1;
         }
 
-        var items = arraySlice(arguments, 2);
+        var items = array_slice.call(arguments, 2);
         var itemCount = items.length;
         var to;
         if (itemCount < actualDeleteCount) {
@@ -851,31 +843,13 @@ defineProperties(ArrayPrototype, {
     }
 }, !spliceWorksWithLargeSparseArrays || !spliceWorksWithSmallSparseArrays);
 
-var originalJoin = ArrayPrototype.join;
-var hasStringJoinBug;
-try {
-    hasStringJoinBug = Array.prototype.join.call('123', ',') !== '1,2,3';
-} catch (e) {
-    hasStringJoinBug = true;
-}
-if (hasStringJoinBug) {
-    defineProperties(ArrayPrototype, {
-        join: function join(separator) {
-            var sep = typeof separator === 'undefined' ? ',' : separator;
-            return originalJoin.call(isString(this) ? strSplit(this, '') : this, sep);
-        }
-    }, hasStringJoinBug);
-}
-
 var hasJoinUndefinedBug = [1, 2].join(undefined) !== '1,2';
-if (hasJoinUndefinedBug) {
-    defineProperties(ArrayPrototype, {
-        join: function join(separator) {
-            var sep = typeof separator === 'undefined' ? ',' : separator;
-            return originalJoin.call(this, sep);
-        }
-    }, hasJoinUndefinedBug);
-}
+var originalJoin = ArrayPrototype.join;
+defineProperties(ArrayPrototype, {
+    join: function join(separator) {
+        return originalJoin.call(this, typeof separator === 'undefined' ? ',' : separator);
+    }
+}, hasJoinUndefinedBug);
 
 var pushShim = function push(item) {
     var O = ES.ToObject(this);
@@ -911,52 +885,6 @@ var pushUndefinedIsWeird = (function () {
 }());
 defineProperties(ArrayPrototype, { push: pushShim }, pushUndefinedIsWeird);
 
-// ES5 15.2.3.14
-// http://es5.github.io/#x15.4.4.10
-// Fix boxed string bug
-defineProperties(ArrayPrototype, {
-    slice: function (start, end) {
-        var arr = isString(this) ? strSplit(this, '') : this;
-        return arraySliceApply(arr, arguments);
-    }
-}, splitString);
-
-var sortIgnoresNonFunctions = (function () {
-    try {
-        [1, 2].sort(null);
-        [1, 2].sort({});
-        return true;
-    } catch (e) { /**/ }
-    return false;
-}());
-var sortThrowsOnRegex = (function () {
-    // this is a problem in Firefox 4, in which `typeof /a/ === 'function'`
-    try {
-        [1, 2].sort(/a/);
-        return false;
-    } catch (e) { /**/ }
-    return true;
-}());
-var sortIgnoresUndefined = (function () {
-    // applies in IE 8, for one.
-    try {
-        [1, 2].sort(undefined);
-        return true;
-    } catch (e) { /**/ }
-    return false;
-}());
-defineProperties(ArrayPrototype, {
-    sort: function sort(compareFn) {
-        if (typeof compareFn === 'undefined') {
-            return arraySort(this);
-        }
-        if (!isCallable(compareFn)) {
-            throw new TypeError('Array.prototype.sort callback must be a function');
-        }
-        return arraySort(this, compareFn);
-    }
-}, sortIgnoresNonFunctions || !sortIgnoresUndefined || !sortThrowsOnRegex);
-
 //
 // Object
 // ======
@@ -982,8 +910,7 @@ var blacklistedKeys = {
     $frames: true,
     $frameElement: true,
     $webkitIndexedDB: true,
-    $webkitStorageInfo: true,
-    $external: true
+    $webkitStorageInfo: true
 };
 var hasAutomationEqualityBug = (function () {
     /* globals window */
@@ -1048,14 +975,14 @@ defineProperties($Object, {
         var skipProto = hasProtoEnumBug && isFn;
         if ((isStr && hasStringEnumBug) || isArgs) {
             for (var i = 0; i < object.length; ++i) {
-                pushCall(theKeys, $String(i));
+                push(theKeys, $String(i));
             }
         }
 
         if (!isArgs) {
             for (var name in object) {
                 if (!(skipProto && name === 'prototype') && owns(object, name)) {
-                    pushCall(theKeys, $String(name));
+                    push(theKeys, $String(name));
                 }
             }
         }
@@ -1065,7 +992,7 @@ defineProperties($Object, {
             for (var j = 0; j < dontEnumsLength; j++) {
                 var dontEnum = dontEnums[j];
                 if (!(skipConstructor && dontEnum === 'constructor') && owns(object, dontEnum)) {
-                    pushCall(theKeys, dontEnum);
+                    push(theKeys, dontEnum);
                 }
             }
         }
@@ -1085,7 +1012,7 @@ var originalKeys = $Object.keys;
 defineProperties($Object, {
     keys: function keys(object) {
         if (isArguments(object)) {
-            return originalKeys(arraySlice(object));
+            return originalKeys(array_slice.call(object));
         } else {
             return originalKeys(object);
         }
@@ -1096,190 +1023,6 @@ defineProperties($Object, {
 // Date
 // ====
 //
-
-var hasNegativeMonthYearBug = new Date(-3509827329600292).getUTCMonth() !== 0;
-var aNegativeTestDate = new Date(-1509842289600292);
-var aPositiveTestDate = new Date(1449662400000);
-var hasToUTCStringFormatBug = aNegativeTestDate.toUTCString() !== 'Mon, 01 Jan -45875 11:59:59 GMT';
-var hasToDateStringFormatBug;
-var hasToStringFormatBug;
-var timeZoneOffset = aNegativeTestDate.getTimezoneOffset();
-if (timeZoneOffset < -720) {
-    hasToDateStringFormatBug = aNegativeTestDate.toDateString() !== 'Tue Jan 02 -45875';
-    hasToStringFormatBug = !(/^Thu Dec 10 2015 \d\d:\d\d:\d\d GMT[-\+]\d\d\d\d(?: |$)/).test(aPositiveTestDate.toString());
-} else {
-    hasToDateStringFormatBug = aNegativeTestDate.toDateString() !== 'Mon Jan 01 -45875';
-    hasToStringFormatBug = !(/^Wed Dec 09 2015 \d\d:\d\d:\d\d GMT[-\+]\d\d\d\d(?: |$)/).test(aPositiveTestDate.toString());
-}
-
-var originalGetFullYear = call.bind(Date.prototype.getFullYear);
-var originalGetMonth = call.bind(Date.prototype.getMonth);
-var originalGetDate = call.bind(Date.prototype.getDate);
-var originalGetUTCFullYear = call.bind(Date.prototype.getUTCFullYear);
-var originalGetUTCMonth = call.bind(Date.prototype.getUTCMonth);
-var originalGetUTCDate = call.bind(Date.prototype.getUTCDate);
-var originalGetUTCDay = call.bind(Date.prototype.getUTCDay);
-var originalGetUTCHours = call.bind(Date.prototype.getUTCHours);
-var originalGetUTCMinutes = call.bind(Date.prototype.getUTCMinutes);
-var originalGetUTCSeconds = call.bind(Date.prototype.getUTCSeconds);
-var originalGetUTCMilliseconds = call.bind(Date.prototype.getUTCMilliseconds);
-var dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
-var monthName = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-var daysInMonth = function daysInMonth(month, year) {
-    return originalGetDate(new Date(year, month, 0));
-};
-
-defineProperties(Date.prototype, {
-    getFullYear: function getFullYear() {
-        if (!this || !(this instanceof Date)) {
-            throw new TypeError('this is not a Date object.');
-        }
-        var year = originalGetFullYear(this);
-        if (year < 0 && originalGetMonth(this) > 11) {
-            return year + 1;
-        }
-        return year;
-    },
-    getMonth: function getMonth() {
-        if (!this || !(this instanceof Date)) {
-            throw new TypeError('this is not a Date object.');
-        }
-        var year = originalGetFullYear(this);
-        var month = originalGetMonth(this);
-        if (year < 0 && month > 11) {
-            return 0;
-        }
-        return month;
-    },
-    getDate: function getDate() {
-        if (!this || !(this instanceof Date)) {
-            throw new TypeError('this is not a Date object.');
-        }
-        var year = originalGetFullYear(this);
-        var month = originalGetMonth(this);
-        var date = originalGetDate(this);
-        if (year < 0 && month > 11) {
-            if (month === 12) {
-                return date;
-            }
-            var days = daysInMonth(0, year + 1);
-            return (days - date) + 1;
-        }
-        return date;
-    },
-    getUTCFullYear: function getUTCFullYear() {
-        if (!this || !(this instanceof Date)) {
-            throw new TypeError('this is not a Date object.');
-        }
-        var year = originalGetUTCFullYear(this);
-        if (year < 0 && originalGetUTCMonth(this) > 11) {
-            return year + 1;
-        }
-        return year;
-    },
-    getUTCMonth: function getUTCMonth() {
-        if (!this || !(this instanceof Date)) {
-            throw new TypeError('this is not a Date object.');
-        }
-        var year = originalGetUTCFullYear(this);
-        var month = originalGetUTCMonth(this);
-        if (year < 0 && month > 11) {
-            return 0;
-        }
-        return month;
-    },
-    getUTCDate: function getUTCDate() {
-        if (!this || !(this instanceof Date)) {
-            throw new TypeError('this is not a Date object.');
-        }
-        var year = originalGetUTCFullYear(this);
-        var month = originalGetUTCMonth(this);
-        var date = originalGetUTCDate(this);
-        if (year < 0 && month > 11) {
-            if (month === 12) {
-                return date;
-            }
-            var days = daysInMonth(0, year + 1);
-            return (days - date) + 1;
-        }
-        return date;
-    }
-}, hasNegativeMonthYearBug);
-
-defineProperties(Date.prototype, {
-    toUTCString: function toUTCString() {
-        if (!this || !(this instanceof Date)) {
-            throw new TypeError('this is not a Date object.');
-        }
-        var day = originalGetUTCDay(this);
-        var date = originalGetUTCDate(this);
-        var month = originalGetUTCMonth(this);
-        var year = originalGetUTCFullYear(this);
-        var hour = originalGetUTCHours(this);
-        var minute = originalGetUTCMinutes(this);
-        var second = originalGetUTCSeconds(this);
-        return dayName[day] + ', ' +
-            (date < 10 ? '0' + date : date) + ' ' +
-            monthName[month] + ' ' +
-            year + ' ' +
-            (hour < 10 ? '0' + hour : hour) + ':' +
-            (minute < 10 ? '0' + minute : minute) + ':' +
-            (second < 10 ? '0' + second : second) + ' GMT';
-    }
-}, hasNegativeMonthYearBug || hasToUTCStringFormatBug);
-
-// Opera 12 has `,`
-defineProperties(Date.prototype, {
-    toDateString: function toDateString() {
-        if (!this || !(this instanceof Date)) {
-            throw new TypeError('this is not a Date object.');
-        }
-        var day = this.getDay();
-        var date = this.getDate();
-        var month = this.getMonth();
-        var year = this.getFullYear();
-        return dayName[day] + ' ' +
-            monthName[month] + ' ' +
-            (date < 10 ? '0' + date : date) + ' ' +
-            year;
-    }
-}, hasNegativeMonthYearBug || hasToDateStringFormatBug);
-
-// can't use defineProperties here because of toString enumeration issue in IE <= 8
-if (hasNegativeMonthYearBug || hasToStringFormatBug) {
-    Date.prototype.toString = function toString() {
-        if (!this || !(this instanceof Date)) {
-            throw new TypeError('this is not a Date object.');
-        }
-        var day = this.getDay();
-        var date = this.getDate();
-        var month = this.getMonth();
-        var year = this.getFullYear();
-        var hour = this.getHours();
-        var minute = this.getMinutes();
-        var second = this.getSeconds();
-        var timezoneOffset = this.getTimezoneOffset();
-        var hoursOffset = Math.floor(Math.abs(timezoneOffset) / 60);
-        var minutesOffset = Math.floor(Math.abs(timezoneOffset) % 60);
-        return dayName[day] + ' ' +
-            monthName[month] + ' ' +
-            (date < 10 ? '0' + date : date) + ' ' +
-            year + ' ' +
-            (hour < 10 ? '0' + hour : hour) + ':' +
-            (minute < 10 ? '0' + minute : minute) + ':' +
-            (second < 10 ? '0' + second : second) + ' GMT' +
-            (timezoneOffset > 0 ? '-' : '+') +
-            (hoursOffset < 10 ? '0' + hoursOffset : hoursOffset) +
-            (minutesOffset < 10 ? '0' + minutesOffset : minutesOffset);
-    };
-    if (supportsDescriptors) {
-        $Object.defineProperty(Date.prototype, 'toString', {
-            configurable: true,
-            enumerable: false,
-            writable: true
-        });
-    }
-}
 
 // ES5 15.9.5.43
 // http://es5.github.com/#x15.9.5.43
@@ -1295,33 +1038,39 @@ var hasSafari51DateBug = Date.prototype.toISOString && new Date(-1).toISOString(
 
 defineProperties(Date.prototype, {
     toISOString: function toISOString() {
+        var result, length, value, year, month;
         if (!isFinite(this)) {
             throw new RangeError('Date.prototype.toISOString called on non-finite value.');
         }
 
-        var year = originalGetUTCFullYear(this);
+        year = this.getUTCFullYear();
 
-        var month = originalGetUTCMonth(this);
+        month = this.getUTCMonth();
         // see https://github.com/es-shims/es5-shim/issues/111
         year += Math.floor(month / 12);
         month = (month % 12 + 12) % 12;
 
         // the date time string format is specified in 15.9.1.15.
-        var result = [month + 1, originalGetUTCDate(this), originalGetUTCHours(this), originalGetUTCMinutes(this), originalGetUTCSeconds(this)];
+        result = [month + 1, this.getUTCDate(), this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds()];
         year = (
             (year < 0 ? '-' : (year > 9999 ? '+' : '')) +
             strSlice('00000' + Math.abs(year), (0 <= year && year <= 9999) ? -4 : -6)
         );
 
-        for (var i = 0; i < result.length; ++i) {
-          // pad months, days, hours, minutes, and seconds to have two digits.
-          result[i] = strSlice('00' + result[i], -2);
+        length = result.length;
+        while (length--) {
+            value = result[length];
+            // pad months, days, hours, minutes, and seconds to have two
+            // digits.
+            if (value < 10) {
+                result[length] = '0' + value;
+            }
         }
         // pad milliseconds to have three digits.
         return (
-            year + '-' + arraySlice(result, 0, 2).join('-') +
-            'T' + arraySlice(result, 2).join(':') + '.' +
-            strSlice('000' + originalGetUTCMilliseconds(this), -3) + 'Z'
+            year + '-' + array_slice.call(result, 0, 2).join('-') +
+            'T' + array_slice.call(result, 2).join(':') + '.' +
+            strSlice('000' + this.getUTCMilliseconds(), -3) + 'Z'
         );
     }
 }, hasNegativeDateBug || hasSafari51DateBug);
@@ -1391,6 +1140,7 @@ if (doesNotParseY2KNewYear || acceptsInvalidDates || !supportsExtendedYears) {
     /* global Date: true */
     /* eslint-disable no-undef */
     var maxSafeUnsigned32Bit = Math.pow(2, 31) - 1;
+    var secondsWithinMaxSafeUnsigned32Bit = Math.floor(maxSafeUnsigned32Bit / 1e3);
     var hasSafariSignedIntBug = isActualNaN(new Date(1970, 0, 1, 0, 0, 0, maxSafeUnsigned32Bit + 1).getTime());
     Date = (function (NativeDate) {
     /* eslint-enable no-undef */
@@ -1763,7 +1513,7 @@ if (
         var maxSafe32BitInt = Math.pow(2, 32) - 1;
 
         StringPrototype.split = function (separator, limit) {
-            var string = String(this);
+            var string = this;
             if (typeof separator === 'undefined' && limit === 0) {
                 return [];
             }
@@ -1782,6 +1532,7 @@ if (
                 // Make `global` and avoid `lastIndex` issues by working with a copy
                 separator2, match, lastIndex, lastLength;
             var separatorCopy = new RegExp(separator.source, flags + 'g');
+            string += ''; // Type-convert
             if (!compliantExecNpcg) {
                 // Doesn't need flags gy, but they don't hurt
                 separator2 = new RegExp('^' + separatorCopy.source + '$(?!\\s)', flags);
@@ -1799,7 +1550,7 @@ if (
                 // `separatorCopy.lastIndex` is not reliable cross-browser
                 lastIndex = match.index + match[0].length;
                 if (lastIndex > lastLastIndex) {
-                    pushCall(output, strSlice(string, lastLastIndex, match.index));
+                    push(output, strSlice(string, lastLastIndex, match.index));
                     // Fix browsers whose `exec` methods don't consistently return `undefined` for
                     // nonparticipating capturing groups
                     if (!compliantExecNpcg && match.length > 1) {
@@ -1814,7 +1565,7 @@ if (
                         /* eslint-enable no-loop-func */
                     }
                     if (match.length > 1 && match.index < string.length) {
-                        array_push.apply(output, arraySlice(match, 1));
+                        array_push.apply(output, array_slice.call(match, 1));
                     }
                     lastLength = match[0].length;
                     lastLastIndex = lastIndex;
@@ -1829,10 +1580,10 @@ if (
             }
             if (lastLastIndex === string.length) {
                 if (lastLength || !separatorCopy.test('')) {
-                    pushCall(output, '');
+                    push(output, '');
                 }
             } else {
-                pushCall(output, strSlice(string, lastLastIndex));
+                push(output, strSlice(string, lastLastIndex));
             }
             return output.length > splitLimit ? strSlice(output, 0, splitLimit) : output;
         };
@@ -1855,7 +1606,7 @@ var str_replace = StringPrototype.replace;
 var replaceReportsGroupsCorrectly = (function () {
     var groups = [];
     'x'.replace(/x(.)?/g, function (match, group) {
-        pushCall(groups, group);
+        push(groups, group);
     });
     return groups.length === 1 && typeof groups[0] === 'undefined';
 }());
@@ -1873,7 +1624,7 @@ if (!replaceReportsGroupsCorrectly) {
                 searchValue.lastIndex = 0;
                 var args = searchValue.exec(match) || [];
                 searchValue.lastIndex = originalLastIndex;
-                pushCall(args, arguments[length - 2], arguments[length - 1]);
+                push(args, arguments[length - 2], arguments[length - 1]);
                 return replaceValue.apply(this, args);
             };
             return str_replace.call(this, searchValue, wrappedReplaceValue);
@@ -1918,7 +1669,6 @@ defineProperties(StringPrototype, {
         return $String(this).replace(trimBeginRegexp, '').replace(trimEndRegexp, '');
     }
 }, hasTrimWhitespaceBug);
-var trim = call.bind(String.prototype.trim);
 
 var hasLastIndexBug = StringPrototype.lastIndexOf && 'abcあい'.lastIndexOf('あい', 2) !== -1;
 defineProperties(StringPrototype, {
@@ -1959,26 +1709,15 @@ if (parseInt(ws + '08') !== 8 || parseInt(ws + '0x16') !== 22) {
     parseInt = (function (origParseInt) {
         var hexRegex = /^[\-+]?0[xX]/;
         return function parseInt(str, radix) {
-            var string = trim(str);
+            var string = $String(str).trim();
             var defaultedRadix = $Number(radix) || (hexRegex.test(string) ? 16 : 10);
             return origParseInt(string, defaultedRadix);
         };
     }(parseInt));
 }
 
-// https://es5.github.io/#x15.1.2.3
-if (1 / parseFloat('-0') !== -Infinity) {
-    /* global parseFloat: true */
-    parseFloat = (function (origParseFloat) {
-        return function parseFloat(string) {
-            var inputString = trim(string);
-            var result = origParseFloat(inputString);
-            return result === 0 && strSlice(inputString, 0, 1) === '-' ? -0 : result;
-        };
-    }(parseFloat));
-}
-
 if (String(new RangeError('test')) !== 'RangeError: test') {
+    var originalErrorToString = Error.prototype.toString;
     var errorToStringShim = function toString() {
         if (typeof this === 'undefined' || this === null) {
             throw new TypeError("can't convert " + this + ' to object');
@@ -2007,39 +1746,6 @@ if (String(new RangeError('test')) !== 'RangeError: test') {
     Error.prototype.toString = errorToStringShim;
 }
 
-if (supportsDescriptors) {
-    var ensureNonEnumerable = function (obj, prop) {
-        if (isEnum(obj, prop)) {
-            var desc = Object.getOwnPropertyDescriptor(obj, prop);
-            desc.enumerable = false;
-            Object.defineProperty(obj, prop, desc);
-        }
-    };
-    ensureNonEnumerable(Error.prototype, 'message');
-    if (Error.prototype.message !== '') {
-      Error.prototype.message = '';
-    }
-    ensureNonEnumerable(Error.prototype, 'name');
-}
-
-if (String(/a/mig) !== '/a/gim') {
-    var regexToString = function toString() {
-        var str = '/' + this.source + '/';
-        if (this.global) {
-            str += 'g';
-        }
-        if (this.ignoreCase) {
-            str += 'i';
-        }
-        if (this.multiline) {
-            str += 'm';
-        }
-        return str;
-    };
-    // can't use defineProperties here because of toString enumeration issue in IE <= 8
-    RegExp.prototype.toString = regexToString;
-}
-
 }));
 
 /*!
@@ -2054,7 +1760,7 @@ if (String(/a/mig) !== '/a/gim') {
 ;
 
 // UMD (Universal Module Definition)
-// see https://github.com/umdjs/umd/blob/master/templates/returnExports.js
+// see https://github.com/umdjs/umd/blob/master/returnExports.js
 (function (root, factory) {
     'use strict';
 
@@ -2073,10 +1779,10 @@ if (String(/a/mig) !== '/a/gim') {
   }
 }(this, function () {
 
-var call = Function.call;
+var call = Function.prototype.call;
 var prototypeOfObject = Object.prototype;
 var owns = call.bind(prototypeOfObject.hasOwnProperty);
-var isEnumerable = call.bind(prototypeOfObject.propertyIsEnumerable);
+var propertyIsEnumerable = call.bind(prototypeOfObject.propertyIsEnumerable);
 var toStr = call.bind(prototypeOfObject.toString);
 
 // If JS engine supports accessors creating shortcuts.
@@ -2175,7 +1881,7 @@ if (!Object.getOwnPropertyDescriptor || getOwnPropertyDescriptorFallback) {
         // If object has a property then it's for sure `configurable`, and
         // probably `enumerable`. Detect enumerability though.
         descriptor = {
-            enumerable: isEnumerable(object, property),
+            enumerable: propertyIsEnumerable(object, property),
             configurable: true
         };
 
