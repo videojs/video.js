@@ -431,7 +431,8 @@ body.vjs-full-window {
   display: block;
   padding: 0;
   margin: 0;
-  overflow: auto; }
+  overflow: auto;
+  font-family: Arial, Helvetica, sans-serif; }
 
 .vjs-scrubbing .vjs-menu-button:hover .vjs-menu {
   display: none; }
