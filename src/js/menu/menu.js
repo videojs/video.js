@@ -63,6 +63,17 @@ class Menu extends Component {
       event.stopImmediatePropagation();
     });
 
+    // Events.on(this.contentEl_, 'mouseout', function(e, elem) {
+    //   console.log('mousing out of actual menu', e, e.relatedTarget, 'elem', elem);
+    //   var listItemName = 'vjs-menu-item';
+    //   console.log(listItemName, e.relatedTarget.className);
+    //   if (e.relatedTarget && !(e.relatedTarget.className.includes(listItemName))) {
+    //     console.log('trying to hide menu because we got the right thing');
+    //     // this.menuButton.unpressButton();
+    //     // this.menuButton.el().blur();
+    //   }
+    // });
+
     return el;
   }
 

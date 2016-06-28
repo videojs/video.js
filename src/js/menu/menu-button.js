@@ -7,6 +7,8 @@ import Menu from './menu.js';
 import * as Dom from '../utils/dom.js';
 import * as Fn from '../utils/fn.js';
 import toTitleCase from '../utils/to-title-case.js';
+// import * as Browser from '../utils/browser.js';
+import * as Events from '../utils/events.js';
 
 /**
  * A button class with a popup menu
@@ -28,6 +30,7 @@ class MenuButton extends ClickableComponent {
     this.el_.setAttribute('aria-haspopup', 'true');
     this.el_.setAttribute('role', 'menuitem');
     this.on('keydown', this.handleSubmenuKeyPress);
+    this.on('hideMenuButton', this.hideMenuButton);
   }
 
   /**
@@ -141,15 +144,45 @@ class MenuButton extends ClickableComponent {
    * @method handleClick
    */
   handleClick() {
-    this.one('mouseout', Fn.bind(this, function(){
-      this.menu.unlockShowing();
-      this.el_.blur();
-    }));
+    this.handleMouseOut();
+
     if (this.buttonPressed_){
       this.unpressButton();
     } else {
       this.pressButton();
     }
+  }
+
+  handleMouseOut() {
+    // var menuContent = this.menu.el().querySelector('.vjs-menu-content');
+    var menuContent = this.menu.contentEl();
+
+    // this.one(menuContent, 'mouseout', Fn.bind(this, function(elem, event) {
+    //   console.log('somehow got what i wanted', elem, event);
+    //   this.unpressButton();
+    //   this.el_.blur();
+    // }));
+
+    Events.on(menuContent, 'mouseout', function(e) {
+      // console.log('mousing out of actual menu', e, e.relatedTarget);
+
+      var listItemName = 'vjs-menu-item';
+      // console.log(listItemName, '|', e.relatedTarget.className);
+
+      if (e.relatedTarget && !(e.relatedTarget.className.includes(listItemName))) {
+
+        // Dom.removeElClass(this.parentNode, 'vjs-lock-showing');
+        this.parentNode.parentNode.blur();
+
+        Events.trigger(this.parentNode.parentNode, 'hideMenuButton');
+      }
+    });
+  }
+
+  hideMenuButton() {
+    console.log('the menu button knows to hide');
+    this.unpressButton();
+    this.el_.blur();
   }
 
   /**
