@@ -75,9 +75,11 @@ class ChaptersButton extends TextTrackButton {
   createMenu() {
     let tracks = this.player_.textTracks() || [];
     let chaptersTrack;
-    let items = this.items = [];
+    let items = this.items || [];
 
-    for (let i = 0, length = tracks.length; i < length; i++) {
+    for (let i = tracks.length - 1; i >= 0; i--) {
+
+      // We will always choose the last track as our chaptersTrack
       let track = tracks[i];
 
       if (track['kind'] === this.kind_) {
@@ -97,6 +99,12 @@ class ChaptersButton extends TextTrackButton {
       });
       menu.children_.unshift(title);
       Dom.insertElFirst(title, menu.contentEl());
+    } else {
+        // We will empty out the menu children each time because we want a 
+        // fresh new menu child list each time
+        items.forEach(item => menu.removeChild(item));
+        // Empty out the ChaptersButton menu items because we no longer need them
+        items = [];
     }
 
     if (chaptersTrack && chaptersTrack.cues == null) {
@@ -124,17 +132,15 @@ class ChaptersButton extends TextTrackButton {
 
         menu.addChild(mi);
       }
-
-      this.addChild(menu);
     }
 
-    if (this.items.length > 0) {
+    if (items.length > 0) {
       this.show();
     }
-
+    // Assigning the value of items back to this.items for next iteration
+    this.items = items;
     return menu;
   }
-
 }
 
 ChaptersButton.prototype.kind_ = 'chapters';
