@@ -13,6 +13,7 @@ CHANGELOG
 * @nickygerritsen Fix test for tooltips in IE8 ([view](https://github.com/videojs/video.js/pull/3327))
 * @mboles added loadstart event to jsdoc ([view](https://github.com/videojs/video.js/pull/3370))
 * @hartman added default print styling ([view](https://github.com/videojs/video.js/pull/3304))
+* @ldayananda updated videojs to not do anything if no src is set ([view](https://github.com/videojs/video.js/pull/3378))
 
 --------------------
 
