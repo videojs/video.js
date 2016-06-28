@@ -7,6 +7,7 @@ import Menu from './menu.js';
 import * as Dom from '../utils/dom.js';
 import * as Fn from '../utils/fn.js';
 import toTitleCase from '../utils/to-title-case.js';
+import * as Events from '../utils/events.js';
 
 /**
  * A button class with a popup menu
@@ -28,6 +29,7 @@ class MenuButton extends ClickableComponent {
     this.el_.setAttribute('aria-haspopup', 'true');
     this.el_.setAttribute('role', 'menuitem');
     this.on('keydown', this.handleSubmenuKeyPress);
+    this.on('hideMenuButton', this.hideMenuButton);
   }
 
   /**
