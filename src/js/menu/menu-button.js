@@ -7,7 +7,6 @@ import Menu from './menu.js';
 import * as Dom from '../utils/dom.js';
 import * as Fn from '../utils/fn.js';
 import toTitleCase from '../utils/to-title-case.js';
-import * as Events from '../utils/events.js';
 
 /**
  * A button class with a popup menu
