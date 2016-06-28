@@ -29,7 +29,6 @@ class MenuButton extends ClickableComponent {
     this.el_.setAttribute('aria-haspopup', 'true');
     this.el_.setAttribute('role', 'menuitem');
     this.on('keydown', this.handleSubmenuKeyPress);
-    this.on('hideMenuButton', this.hideMenuButton);
   }
 
   /**
