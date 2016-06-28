@@ -2855,6 +2855,13 @@ Player.prototype.options_ = {
 };
 
 /**
+ * Fired when the user agent begins looking for media data
+ *
+ * @event loadstart
+ */
+Player.prototype.handleTechLoadStart_;
+
+/**
  * Fired when the player has initial duration and dimension information
  *
  * @event loadedmetadata
