@@ -12,6 +12,7 @@ CHANGELOG
 * @MattiasBuelens Retain details from tech error ([view](https://github.com/videojs/video.js/pull/3313))
 * @nickygerritsen Fix test for tooltips in IE8 ([view](https://github.com/videojs/video.js/pull/3327))
 * @mboles added loadstart event to jsdoc ([view](https://github.com/videojs/video.js/pull/3370))
+* @hartman added default print styling ([view](https://github.com/videojs/video.js/pull/3304))
 
 --------------------
 
