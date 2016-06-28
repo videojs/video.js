@@ -14,6 +14,14 @@ CHANGELOG
 
 --------------------
 
+## 5.10.7 (2016-06-27)
+* @gkatsev pinned node-sass to 3.4 ([view](https://github.com/videojs/video.js/pull/3401))
+* @mister-ben added try catch to volume and playbackrate checks. Fixes #3315 ([view](https://github.com/videojs/video.js/pull/3320))
+* @m14t removed unused loadEvent property in ControlBar options ([view](https://github.com/videojs/video.js/pull/3363))
+* @bklava updated pt-BR language file ([view](https://github.com/videojs/video.js/pull/3373))
+* @mister-ben updated menus to use default videojs font-family ([view](https://github.com/videojs/video.js/pull/3384))
+* @vdeshpande fixed chapters getting duplicated each time a track is loaded ([view](https://github.com/videojs/video.js/pull/3354))
+
 ## 5.10.6 (2016-06-20)
 * @gkatsev fix not fully minified video.min.js file.
 
