@@ -14,6 +14,7 @@ CHANGELOG
 * @mboles added loadstart event to jsdoc ([view](https://github.com/videojs/video.js/pull/3370))
 * @hartman added default print styling ([view](https://github.com/videojs/video.js/pull/3304))
 * @ldayananda updated videojs to not do anything if no src is set ([view](https://github.com/videojs/video.js/pull/3378))
+* @nickygerritsen removed unused tracks when changing sources. Fixes #3000 ([view](https://github.com/videojs/video.js/pull/3002))
 
 --------------------
 
