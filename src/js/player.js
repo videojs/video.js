@@ -1292,7 +1292,15 @@ class Player extends Component {
    * @method play
    */
   play() {
-    this.techCall_('play');
+    // Only calls the tech's play if we already have a src loaded
+    if (this.src() || this.currentSrc()) {
+      this.techCall_('play');
+    } else {
+      this.tech_.one('loadstart', function() {
+        this.play();
+      });
+    }
+
     return this;
   }
 
@@ -2853,6 +2861,13 @@ Player.prototype.options_ = {
   // Default message to show when a video cannot be played.
   notSupportedMessage: 'No compatible source was found for this media.'
 };
+
+/**
+ * Fired when the user agent begins looking for media data
+ *
+ * @event loadstart
+ */
+Player.prototype.handleTechLoadStart_;
 
 /**
  * Fired when the player has initial duration and dimension information

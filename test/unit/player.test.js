@@ -247,7 +247,7 @@ test('should hide the poster when play is called', function() {
   });
 
   equal(player.hasStarted(), false, 'the show poster flag is true before play');
-  player.play();
+  player.tech_.trigger('play');
   equal(player.hasStarted(), true, 'the show poster flag is false after play');
 
   player.tech_.trigger('loadstart');
@@ -255,7 +255,7 @@ test('should hide the poster when play is called', function() {
         false,
         'the resource selection algorithm sets the show poster flag to true');
 
-  player.play();
+  player.tech_.trigger('play');
   equal(player.hasStarted(), true, 'the show poster flag is false after play');
 });
 
