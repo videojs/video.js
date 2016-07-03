@@ -41,8 +41,9 @@ $ie8screen: "\\0screen";
 .vjs-controls-disabled .vjs-control-bar,
 .vjs-using-native-controls .vjs-control-bar,
 .vjs-error .vjs-control-bar {
-  // !important is ok in this context.
-  display: none !important;
+  // Allow you to change src even if
+  // your on the error screen.
+  z-index: 100;
 }
 
 // Don't hide the control bar if it's audio
