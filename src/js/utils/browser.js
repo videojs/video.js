@@ -63,6 +63,7 @@ export const IS_IE8 = (/MSIE\s8\.0/).test(USER_AGENT);
 export const IE_VERSION = (function(result){
   return result && parseFloat(result[1]);
 })((/MSIE\s(\d+)\.\d/).exec(USER_AGENT));
+export const IS_IE_LT_11 = !!IE_VERSION && IE_VERSION < 11;
 
 export const TOUCH_ENABLED = !!(('ontouchstart' in window) || window.DocumentTouch && document instanceof window.DocumentTouch);
 export const BACKGROUND_SIZE_SUPPORTED = 'backgroundSize' in document.createElement('video').style;

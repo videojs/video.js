@@ -2,35 +2,33 @@
  * @file log.js
  */
 import window from 'global/window';
-import {IE_VERSION} from './browser';
-
-const IS_IE_LT_11 = !!IE_VERSION && IE_VERSION < 11;
+import {IS_IE_LT_11} from './browser';
 
 /**
  * Log messages to the console and history based on the type of message
  *
- * @param  {Object} args The args to be passed to the log
- * @param  {String} [type='log']
- * @private
+ * @param  {String} type
+ *         The name of the console method to use.
+ * @param  {Array} args
+ *         The arguments to be passed to the matching console method.
+ * @param  {Boolean} [stringify=IS_IE_LT_11]
+ *         By default, only old IEs should get console argument stringification,
+ *         but this is exposed as a parameter to facilitate testing.
  */
-const _logByType = (args, type = 'log') => {
+export const logByType = (type, args, stringify = IS_IE_LT_11) => {
+  const console = window.console;
 
-  // if there's no console then don't try to output messages
-  // they will still be stored in log.history
+  // If there's no console then don't try to output messages, but they will
+  // still be stored in `log.history`.
+  //
   // Was setting these once outside of this function, but containing them
   // in the function makes it easier to test cases where console doesn't exist
-  const noop = function(){};
-
-  const console = window.console || {
-    log: noop,
-    warn: noop,
-    error: noop
-  };
-
-  const fn = console[type];
+  // when the module is executed.
+  const fn = console && console[type] || function(){};
 
   if (type !== 'log') {
-    // add the type to the front of the message
+
+    // add the type to the front of the message when it's not "log"
     args.unshift(type.toUpperCase() + ':');
   }
 
@@ -43,17 +41,20 @@ const _logByType = (args, type = 'log') => {
   // Old IE versions do not allow .apply() for some/all console method(s). And
   // IEs previous to 11 log objects uselessly as "[object Object]"; so, JSONify
   // objects and arrays for those less-capable browsers.
-  if (!fn.apply || IS_IE_LT_11) {
+  if (!fn.apply || stringify) {
     fn(args.map(a => {
       if (a && typeof a === 'object' || Array.isArray(a)) {
         return JSON.stringify(a);
       }
-      return a;
+
+      // Cast to string before joining, so we get null and undefined explicitly
+      // included in output (as we would in a modern console).
+      return String(a);
     }).join(' '));
 
   // Default hanlding for modern consoles.
   } else {
-    fn(...args);
+    fn.apply(console, args);
   }
 };
 
@@ -63,7 +64,7 @@ const _logByType = (args, type = 'log') => {
  * @function log
  */
 function log(...args) {
-  _logByType(args);
+  logByType('log', args);
 }
 
 /**
@@ -78,14 +79,14 @@ log.history = [];
  *
  * @method error
  */
-log.error = (...args) => _logByType(args, 'error');
+log.error = (...args) => logByType('error', args);
 
 /**
  * Log warning messages
  *
  * @method warn
  */
-log.warn = (...args) => _logByType(args, 'warn');
+log.warn = (...args) => logByType('warn', args);
 
 
 export default log;
