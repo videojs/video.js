@@ -44,7 +44,9 @@ export const logByType = (type, args, stringify = IS_IE_LT_11) => {
   if (!fn.apply || stringify) {
     fn(args.map(a => {
       if (a && typeof a === 'object' || Array.isArray(a)) {
-        return JSON.stringify(a);
+        try {
+          return JSON.stringify(a);
+        } catch (x) {}
       }
 
       // Cast to string before joining, so we get null and undefined explicitly
