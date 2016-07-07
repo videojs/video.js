@@ -32,6 +32,11 @@ q.module('log', {
 });
 
 test('logging functions should work', function() {
+
+  // Need to reset history here because there are extra messages logged
+  // when running via Karma.
+  log.history.length = 0;
+
   log('log1', 'log2');
   log.warn('warn1', 'warn2');
   log.error('error1', 'error2');
