@@ -839,6 +839,24 @@ expect(3);
   strictEqual(player.localize('Good'), 'Brilliant', 'Ignored case');
 });
 
+test('inherits language from parent element', function() {
+  var fixture = document.getElementById('qunit-fixture');
+  var oldLang = fixture.getAttribute('lang');
+  var player;
+
+  fixture.setAttribute('lang', 'x-test');
+  player = TestHelpers.makePlayer();
+
+  equal(player.language(), 'x-test', 'player inherits parent element language');
+
+  player.dispose();
+  if (oldLang) {
+    fixture.setAttribute('lang', oldLang);
+  } else {
+    fixture.removeAttribute('lang');
+  }
+});
+
 test('should return correct values for canPlayType', function(){
   var player = TestHelpers.makePlayer();
 

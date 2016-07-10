@@ -92,6 +92,25 @@ class Player extends Component {
     // see enableTouchActivity in Component
     options.reportTouchActivity = false;
 
+    // If language is not set, get the closest lang attribute
+    if (!options.language) {
+      if (typeof tag.closest === 'function') {
+        let closest = tag.closest('[lang]');
+        if (closest) {
+          options.language = closest.getAttribute('lang');
+        }
+      } else {
+        let element = tag;
+        while (element && element.nodeType === 1) {
+          if (Dom.getElAttributes(tag).hasOwnProperty('lang')) {
+            options.language = element.getAttribute('lang');
+            break;
+          }
+          element = element.parentNode;
+        }
+      }
+    }
+
     // Run base component initializing with new options
     super(null, options, ready);
 
@@ -2853,7 +2872,7 @@ Player.prototype.options_ = {
     'textTrackSettings'
   ],
 
-  language: document.getElementsByTagName('html')[0].getAttribute('lang') || navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language || 'en',
+  language: navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language || 'en',
 
   // locales and their language translations
   languages: {},
