@@ -2,7 +2,7 @@
  * @file log.js
  */
 import window from 'global/window';
-import {IS_IE_LT_11} from './browser';
+import {IE_VERSION} from './browser';
 
 /**
  * Log messages to the console and history based on the type of message
@@ -11,11 +11,11 @@ import {IS_IE_LT_11} from './browser';
  *         The name of the console method to use.
  * @param  {Array} args
  *         The arguments to be passed to the matching console method.
- * @param  {Boolean} [stringify=IS_IE_LT_11]
+ * @param  {Boolean} [stringify]
  *         By default, only old IEs should get console argument stringification,
  *         but this is exposed as a parameter to facilitate testing.
  */
-export const logByType = (type, args, stringify = IS_IE_LT_11) => {
+export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 11) => {
   const console = window.console;
 
   // If there's no console then don't try to output messages, but they will
