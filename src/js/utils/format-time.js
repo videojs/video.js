@@ -12,6 +12,11 @@
  * @function formatTime
  */
 function formatTime(seconds, guide=seconds) {
+  // Allow the user to manually override time formatting using a custom function
+  if (typeof videojs.formatTime === 'function') {
+    return videojs.formatTime.apply(this, arguments);
+  }
+
   seconds = seconds < 0 ? 0 : seconds;
   let s = Math.floor(seconds % 60);
   let m = Math.floor(seconds / 60 % 60);
