@@ -17,7 +17,7 @@ import window from 'global/window';
  */
 function formatTime(seconds, guide=seconds) {
   // Allow the user to manually override time formatting using a custom function
-  if (window.videojs && typeof window.videojs.formatTime === 'function') {
+  if (window.videojs && typeof window.videojs.formatTime === 'function' && window.videojs.formatTime !== formatTime) {
     return window.videojs.formatTime.apply(this, arguments);
   }
 
