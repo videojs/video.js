@@ -230,6 +230,20 @@ class Flash extends Tech {
   }
 
   /**
+   * Get media duration
+   *
+   * @returns {Number} Media duration
+   */
+  duration() {
+    if (this.readyState() === 0) {
+      return NaN;
+    } else {
+      let duration = this.el_.vjs_getProperty('duration');
+      return duration >= 0 ? duration : Infinity;
+    }
+  }
+
+  /**
    * Load media into player
    *
    * @method load
@@ -312,7 +326,7 @@ class Flash extends Tech {
 // Create setters and getters for attributes
 const _api = Flash.prototype;
 const _readWrite = 'rtmpConnection,rtmpStream,preload,defaultPlaybackRate,playbackRate,autoplay,loop,mediaGroup,controller,controls,volume,muted,defaultMuted'.split(',');
-const _readOnly = 'networkState,readyState,initialTime,duration,startOffsetTime,paused,ended,videoWidth,videoHeight'.split(',');
+const _readOnly = 'networkState,readyState,initialTime,startOffsetTime,paused,ended,videoWidth,videoHeight'.split(',');
 
 function _createSetter(attr){
   var attrUpper = attr.charAt(0).toUpperCase() + attr.slice(1);
