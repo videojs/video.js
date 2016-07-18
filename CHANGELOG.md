@@ -19,6 +19,7 @@ CHANGELOG
 * @alex-phillips added ontextdata to Flash tech ([view](https://github.com/videojs/video.js/pull/2748))
 * @MattiasBuelens updated components to use durationchange only ([view](https://github.com/videojs/video.js/pull/3349))
 * @misteroneill improved Logging for IE < 11 ([view](https://github.com/videojs/video.js/pull/3356))
+* @vdeshpande updated control text of modal dialog ([view](https://github.com/videojs/video.js/pull/3400))
 
 --------------------
 
