@@ -2885,6 +2885,11 @@ Player.prototype.handleTechLoadStart_;
  */
 Player.prototype.handleLoadedMetaData_;
 
+/**
+ * Fired when the player receives text data
+ *
+ * @event textdata
+ */
 Player.prototype.handleTextData_;
 
 /**
