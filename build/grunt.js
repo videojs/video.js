@@ -151,7 +151,11 @@ module.exports = function(grunt) {
       },
       skin: {
         files: ['src/css/**/*'],
-        tasks: ['sass']
+        tasks: ['skin']
+      },
+      jshint: {
+        files: ['src/**/*', 'test/unit/**/*.js', 'Gruntfile.js'],
+        tasks: 'jshint'
       }
     },
     connect: {
@@ -182,9 +186,11 @@ module.exports = function(grunt) {
     },
     cssmin: {
       minify: {
-        files: {
-          'build/temp/video-js.min.css': ['build/temp/video-js.css', 'build/temp/alt/video-js-cdn.css', 'src/css/ie8.css']
-        }
+        expand: true,
+        cwd: 'build/temp/',
+        src: ['video-js.css', 'alt/video-js-cdn.css'],
+        dest: 'build/temp/',
+        ext: '.min.css'
       }
     },
     sass: {
@@ -390,6 +396,10 @@ module.exports = function(grunt) {
       vtt: {
         src: ['build/temp/video.js', 'node_modules/videojs-vtt.js/dist/vtt.js'],
         dest: 'build/temp/video.js'
+      },
+      ie8_addition: {
+        src: ['build/temp/video-js.css', 'src/css/ie8.css'],
+        dest: 'build/temp/video-js.css'
       }
     },
     concurrent: {
@@ -454,7 +464,7 @@ module.exports = function(grunt) {
     'usebanner:vtt',
     'uglify',
 
-    'sass',
+    'skin',
     'version:css',
     'cssmin',
 
@@ -479,7 +489,7 @@ module.exports = function(grunt) {
     'zip:dist'
   ]);
 
-  grunt.registerTask('skin', ['sass']);
+  grunt.registerTask('skin', ['sass', 'concat:ie8_addition']);
 
   // Default task - build and test
   grunt.registerTask('default', ['test']);
