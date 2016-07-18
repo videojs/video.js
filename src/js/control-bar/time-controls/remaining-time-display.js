@@ -19,6 +19,7 @@ class RemainingTimeDisplay extends Component {
     super(player, options);
 
     this.on(player, 'timeupdate', this.updateContent);
+    this.on(player, 'durationchange', this.updateContent);
   }
 
   /**

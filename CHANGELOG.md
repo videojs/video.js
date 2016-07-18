@@ -17,6 +17,7 @@ CHANGELOG
 * @nickygerritsen removed unused tracks when changing sources. Fixes #3000 ([view](https://github.com/videojs/video.js/pull/3002))
 * @vit-koumar updated Flash tech to return Infinity from duration instead of -1 ([view](https://github.com/videojs/video.js/pull/3128))
 * @alex-phillips added ontextdata to Flash tech ([view](https://github.com/videojs/video.js/pull/2748))
+* @MattiasBuelens updated components to use durationchange only ([view](https://github.com/videojs/video.js/pull/3349))
 
 --------------------
 

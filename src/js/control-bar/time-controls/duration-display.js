@@ -18,13 +18,7 @@ class DurationDisplay extends Component {
   constructor(player, options){
     super(player, options);
 
-    // this might need to be changed to 'durationchange' instead of 'timeupdate' eventually,
-    // however the durationchange event fires before this.player_.duration() is set,
-    // so the value cannot be written out using this method.
-    // Once the order of durationchange and this.player_.duration() being set is figured out,
-    // this can be updated.
-    this.on(player, 'timeupdate', this.updateContent);
-    this.on(player, 'loadedmetadata', this.updateContent);
+    this.on(player, 'durationchange', this.updateContent);
   }
 
   /**
