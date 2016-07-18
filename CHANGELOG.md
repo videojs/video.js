@@ -23,6 +23,7 @@ CHANGELOG
 * @ldayananda fixed mouse handling on menus by using mouseleave over mouseout ([view](https://github.com/videojs/video.js/pull/3404))
 * @mister-ben updated language to inherit correctly and respect the attribute on the player ([view](https://github.com/videojs/video.js/pull/3426))
 * @sashyro fixed nativeControlsForTouch option ([view](https://github.com/videojs/video.js/pull/3410))
+* @tbasse fixed techCall null check against tech ([view](https://github.com/videojs/video.js/pull/2676))
 
 --------------------
 
