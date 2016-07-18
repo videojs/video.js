@@ -1,8 +1,6 @@
 /**
  * @file modal-dialog.js
  */
-import document from 'global/document';
-
 import * as Dom from './utils/dom';
 import * as Fn from './utils/fn';
 import log from './utils/log';
@@ -175,7 +173,7 @@ class ModalDialog extends Component {
       }
 
       if (this.closeable()) {
-        this.on(document, 'keydown', Fn.bind(this, this.handleKeyPress));
+        this.on(this.el_.ownerDocument, 'keydown', Fn.bind(this, this.handleKeyPress));
       }
 
       player.controls(false);
@@ -221,7 +219,7 @@ class ModalDialog extends Component {
       }
 
       if (this.closeable()) {
-        this.off(document, 'keydown', Fn.bind(this, this.handleKeyPress));
+        this.off(this.el_.ownerDocument, 'keydown', Fn.bind(this, this.handleKeyPress));
       }
 
       player.controls(true);

@@ -1,4 +1,5 @@
 import ChaptersButton from '../../../src/js/control-bar/text-track-controls/chapters-button.js';
+import DescriptionsButton from '../../../src/js/control-bar/text-track-controls/descriptions-button.js';
 import SubtitlesButton from '../../../src/js/control-bar/text-track-controls/subtitles-button.js';
 import CaptionsButton from '../../../src/js/control-bar/text-track-controls/captions-button.js';
 
@@ -135,9 +136,11 @@ test('update texttrack buttons on removetrack or addtrack', function() {
   let oldCaptionsUpdate;
   let oldSubsUpdate;
   let oldChaptersUpdate;
+  let oldDescriptionsUpdate;
 
   oldCaptionsUpdate = CaptionsButton.prototype.update;
   oldSubsUpdate = SubtitlesButton.prototype.update;
+  oldDescriptionsUpdate = DescriptionsButton.prototype.update;
   oldChaptersUpdate = ChaptersButton.prototype.update;
   CaptionsButton.prototype.update = function() {
     update++;
@@ -146,6 +149,10 @@ test('update texttrack buttons on removetrack or addtrack', function() {
   SubtitlesButton.prototype.update = function() {
     update++;
     oldSubsUpdate.call(this);
+  };
+  DescriptionsButton.prototype.update = function() {
+    update++;
+    oldDescriptionsUpdate.call(this);
   };
   ChaptersButton.prototype.update = function() {
     update++;
@@ -186,19 +193,19 @@ test('update texttrack buttons on removetrack or addtrack', function() {
 
   player.player_ = player;
 
-  equal(update, 3, 'update was called on the three buttons during init');
+  equal(update, 4, 'update was called on the four buttons during init');
 
   for (i = 0; i < events.removetrack.length; i++) {
     events.removetrack[i]();
   }
 
-  equal(update, 6, 'update was called on the three buttons for remove track');
+  equal(update, 8, 'update was called on the four buttons for remove track');
 
   for (i = 0; i < events.addtrack.length; i++) {
     events.addtrack[i]();
   }
 
-  equal(update, 9, 'update was called on the three buttons for remove track');
+  equal(update, 12, 'update was called on the four buttons for remove track');
 
   Tech.prototype.textTracks = oldTextTracks;
   Tech.prototype.featuresNativeTextTracks = false;
@@ -467,4 +474,82 @@ test('should uniformly create html track element when adding text track', functi
   equal(player.remoteTextTrackEls().getTrackElementByTrack_(htmlTrackElement.track), htmlTrackElement, 'verify same html track element');
 
   player.dispose();
+});
+
+test('default text tracks should show by default', function() {
+  let tag = TestHelpers.makeTag();
+  let capt = document.createElement('track');
+
+  capt.setAttribute('kind', 'captions');
+  capt.setAttribute('default', 'default');
+
+  tag.appendChild(capt);
+
+  let player = TestHelpers.makePlayer({
+    html5: {
+      nativeTextTracks: false
+    }
+  }, tag);
+
+  // native tracks are initialized after the player is ready
+  this.clock.tick(1);
+
+  let tracks = player.textTracks();
+
+  equal(tracks[0].kind, 'captions', 'the captions track is present');
+  equal(tracks[0].mode, 'showing', 'the captions track is showing');
+});
+
+test('default captions take precedence over default descriptions', function() {
+  let tag = TestHelpers.makeTag();
+  let desc = document.createElement('track');
+  let capt = document.createElement('track');
+
+  desc.setAttribute('kind', 'descriptions');
+  desc.setAttribute('default', 'default');
+  capt.setAttribute('kind', 'captions');
+  capt.setAttribute('default', 'default');
+
+  tag.appendChild(desc);
+  tag.appendChild(capt);
+
+  let player = TestHelpers.makePlayer({
+    html5: {
+      nativeTextTracks: false
+    }
+  }, tag);
+
+  // native tracks are initialized after the player is ready
+  this.clock.tick(1);
+
+  let tracks = player.textTracks();
+
+  equal(tracks[0].kind, 'descriptions', 'the descriptions track is first');
+  equal(tracks[0].mode, 'disabled', 'the descriptions track is disabled');
+  equal(tracks[1].kind, 'captions', 'the captions track is second');
+  equal(tracks[1].mode, 'showing', 'the captions track is showing');
+});
+
+test('removeRemoteTextTrack should be able to take both a track and the response from addRemoteTextTrack', function() {
+  let player = TestHelpers.makePlayer();
+  let track = {
+    kind: 'kind',
+    src: 'src',
+    language: 'language',
+    label: 'label',
+    default: 'default'
+  };
+  let htmlTrackElement = player.addRemoteTextTrack(track);
+
+  equal(player.remoteTextTrackEls().length, 1, 'html track element exist');
+
+  player.removeRemoteTextTrack(htmlTrackElement);
+
+  equal(player.remoteTextTrackEls().length, 0, 'the track element was removed correctly');
+
+  htmlTrackElement = player.addRemoteTextTrack(track);
+  equal(player.remoteTextTrackEls().length, 1, 'html track element exist');
+
+  player.removeRemoteTextTrack(htmlTrackElement.track);
+  equal(player.remoteTextTrackEls().length, 0, 'the track element was removed correctly');
 });

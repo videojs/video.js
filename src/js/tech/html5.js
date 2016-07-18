@@ -9,11 +9,14 @@ import * as Dom from '../utils/dom.js';
 import * as Url from '../utils/url.js';
 import * as Fn from '../utils/fn.js';
 import log from '../utils/log.js';
+import tsml from 'tsml';
+import TextTrack from '../../../src/js/tracks/text-track.js';
 import * as browser from '../utils/browser.js';
 import document from 'global/document';
 import window from 'global/window';
 import assign from 'object.assign';
 import mergeOptions from '../utils/merge-options.js';
+import toTitleCase from '../utils/to-title-case.js';
 
 /**
  * HTML5 Media Controller - Wrapper for HTML5 Media API
@@ -29,6 +32,7 @@ class Html5 extends Tech {
     super(options, ready);
 
     const source = options.source;
+    let crossoriginTracks = false;
 
     // Set the source if one is provided
     // 1) Check if the source is new (if not, we want to keep the original so playback isn't interrupted)
@@ -61,6 +65,11 @@ class Html5 extends Tech {
             // store HTMLTrackElement and TextTrack to remote list
             this.remoteTextTrackEls().addTrackElement_(node);
             this.remoteTextTracks().addTrack_(node.track);
+            if (!crossoriginTracks &&
+                !this.el_.hasAttribute('crossorigin') &&
+                Url.isCrossOrigin(node.src)) {
+              crossoriginTracks = true;
+            }
           }
         }
       }
@@ -70,7 +79,33 @@ class Html5 extends Tech {
       }
     }
 
+    let trackTypes = ['audio', 'video'];
+
+    // ProxyNativeTextTracks
+    trackTypes.forEach((type) => {
+      let capitalType = toTitleCase(type);
+
+      if (!this[`featuresNative${capitalType}Tracks`]) {
+        return;
+      }
+      let tl = this.el()[`${type}Tracks`];
+
+      if (tl && tl.addEventListener) {
+        tl.addEventListener('change', Fn.bind(this, this[`handle${capitalType}TrackChange_`]));
+        tl.addEventListener('addtrack', Fn.bind(this, this[`handle${capitalType}TrackAdd_`]));
+        tl.addEventListener('removetrack', Fn.bind(this, this[`handle${capitalType}TrackRemove_`]));
+
+        // Remove (native) trackts that are not used anymore
+        this.on('loadstart', this[`removeOld${capitalType}Tracks_`]);
+      }
+    });
+
     if (this.featuresNativeTextTracks) {
+      if (crossoriginTracks) {
+        log.warn(tsml`Text Tracks are being loaded from another origin but the crossorigin attribute isn't used. 
+            This may prevent text tracks from loading.`);
+      }
+
       this.handleTextTrackChange_ = Fn.bind(this, this.handleTextTrackChange);
       this.handleTextTrackAdd_ = Fn.bind(this, this.handleTextTrackAdd);
       this.handleTextTrackRemove_ = Fn.bind(this, this.handleTextTrackRemove);
@@ -96,25 +131,25 @@ class Html5 extends Tech {
    * @method dispose
    */
   dispose() {
-    let tt = this.el().textTracks;
-    let emulatedTt = this.textTracks();
+    // Un-ProxyNativeTracks
+    ['audio', 'video', 'text'].forEach((type) => {
+      let capitalType = toTitleCase(type);
+      let tl = this.el_[`${type}Tracks`];
 
-    // remove native event listeners
-    if (tt && tt.removeEventListener) {
-      tt.removeEventListener('change', this.handleTextTrackChange_);
-      tt.removeEventListener('addtrack', this.handleTextTrackAdd_);
-      tt.removeEventListener('removetrack', this.handleTextTrackRemove_);
-    }
-
-    // clearout the emulated text track list.
-    let i = emulatedTt.length;
-
-    while (i--) {
-      emulatedTt.removeTrack_(emulatedTt[i]);
-    }
-
+      if (tl && tl.removeEventListener) {
+        tl.removeEventListener('change', this[`handle${capitalType}TrackChange_`]);
+        tl.removeEventListener('addtrack', this[`handle${capitalType}TrackAdd_`]);
+        tl.removeEventListener('removetrack', this[`handle${capitalType}TrackRemove_`]);
+      }
+      
+      // Stop removing old text tracks
+      if (tl) {
+        this.off('loadstart', this[`removeOld${capitalType}Tracks_`]);
+      }
+    });
 
     Html5.disposeMediaElement(this.el_);
+    // tech will handle clearing of the emulated track list
     super.dispose();
   }
 
@@ -269,6 +304,9 @@ class Html5 extends Tech {
         tt.addEventListener('addtrack', this.handleTextTrackAdd_);
         tt.addEventListener('removetrack', this.handleTextTrackRemove_);
       }
+    
+      // Remove (native) texttracks that are not used anymore
+      this.on('loadstart', this.removeOldTextTracks_);
     }
   }
 
@@ -288,6 +326,97 @@ class Html5 extends Tech {
 
   handleTextTrackRemove(e) {
     this.textTracks().removeTrack_(e.track);
+  }
+
+  handleVideoTrackChange_(e) {
+    let vt = this.videoTracks();
+    this.videoTracks().trigger({
+      type: 'change',
+      target: vt,
+      currentTarget: vt,
+      srcElement: vt
+    });
+  }
+
+  handleVideoTrackAdd_(e) {
+    this.videoTracks().addTrack_(e.track);
+  }
+
+  handleVideoTrackRemove_(e) {
+    this.videoTracks().removeTrack_(e.track);
+  }
+
+  handleAudioTrackChange_(e) {
+    let audioTrackList = this.audioTracks();
+    this.audioTracks().trigger({
+      type: 'change',
+      target: audioTrackList,
+      currentTarget: audioTrackList,
+      srcElement: audioTrackList
+    });
+  }
+
+  handleAudioTrackAdd_(e) {
+    this.audioTracks().addTrack_(e.track);
+  }
+
+  handleAudioTrackRemove_(e) {
+    this.audioTracks().removeTrack_(e.track);
+  }
+
+  /**
+   * This is a helper function that is used in removeOldTextTracks_, removeOldAudioTracks_ and
+   * removeOldVideoTracks_
+   * @param {Track[]} techTracks Tracks for this tech
+   * @param {Track[]} elTracks Tracks for the HTML5 video element
+   * @private
+   */
+  removeOldTracks_(techTracks, elTracks) {
+    // This will loop over the techTracks and check if they are still used by the HTML5 video element
+    // If not, they will be removed from the emulated list
+    let removeTracks = [];
+    if (!elTracks) {
+      return;
+    }
+
+    for (let i = 0; i < techTracks.length; i++) {
+      let techTrack = techTracks[i];
+
+      let found = false;
+      for (let j = 0; j < elTracks.length; j++) {
+        if (elTracks[j] === techTrack) {
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        removeTracks.push(techTrack);
+      }
+    }
+
+    for (let i = 0; i < removeTracks.length; i++) {
+      const track = removeTracks[i];
+      techTracks.removeTrack_(track);
+    }
+  }
+
+  removeOldTextTracks_() {
+    const techTracks = this.textTracks();
+    const elTracks = this.el().textTracks;
+    this.removeOldTracks_(techTracks, elTracks);
+  }
+
+  removeOldAudioTracks_() {
+    const techTracks = this.audioTracks();
+    const elTracks = this.el().audioTracks;
+    this.removeOldTracks_(techTracks, elTracks);
+  }
+
+  removeOldVideoTracks_() {
+    const techTracks = this.videoTracks();
+    const elTracks = this.el().videoTracks;
+    this.removeOldTracks_(techTracks, elTracks);
   }
 
   /**
@@ -880,9 +1009,10 @@ Html5.nativeSourceHandler.canPlayType = function(type){
  * Check if the video element can handle the source natively
  *
  * @param  {Object} source  The source object
+ * @param  {Object} options The options passed to the tech
  * @return {String}         'probably', 'maybe', or '' (empty string)
  */
-Html5.nativeSourceHandler.canHandleSource = function(source){
+Html5.nativeSourceHandler.canHandleSource = function(source, options){
   var match, ext;
 
   // If a type was provided we should rely on that
@@ -903,10 +1033,11 @@ Html5.nativeSourceHandler.canHandleSource = function(source){
  * Adaptive source handlers will have more complicated workflows before passing
  * video data to the video element
  *
- * @param  {Object} source    The source object
- * @param  {Html5} tech   The instance of the Html5 tech
+ * @param  {Object} source   The source object
+ * @param  {Html5}  tech     The instance of the Html5 tech
+ * @param  {Object} options  The options to pass to the source
  */
-Html5.nativeSourceHandler.handleSource = function(source, tech){
+Html5.nativeSourceHandler.handleSource = function(source, tech, options){
   tech.setSrc(source.src);
 };
 
@@ -927,20 +1058,35 @@ Html5.registerSourceHandler(Html5.nativeSourceHandler);
  * @return {Boolean}
  */
 Html5.canControlVolume = function(){
-  var volume =  Html5.TEST_VID.volume;
-  Html5.TEST_VID.volume = (volume / 2) + 0.1;
-  return volume !== Html5.TEST_VID.volume;
+  // IE will error if Windows Media Player not installed #3315
+  try {
+    var volume =  Html5.TEST_VID.volume;
+    Html5.TEST_VID.volume = (volume / 2) + 0.1;
+    return volume !== Html5.TEST_VID.volume;
+  } catch(e) {
+    return false;
+  }
 };
 
 /*
  * Check if playbackRate is supported in this browser/device.
  *
- * @return {Number} [description]
+ * @return {Boolean}
  */
 Html5.canControlPlaybackRate = function(){
-  var playbackRate = Html5.TEST_VID.playbackRate;
-  Html5.TEST_VID.playbackRate = (playbackRate / 2) + 0.1;
-  return playbackRate !== Html5.TEST_VID.playbackRate;
+  // Playback rate API is implemented in Android Chrome, but doesn't do anything
+  // https://github.com/videojs/video.js/issues/3180
+  if (browser.IS_ANDROID && browser.IS_CHROME) {
+    return false;
+  }
+  // IE will error if Windows Media Player not installed #3315
+  try {
+    var playbackRate = Html5.TEST_VID.playbackRate;
+    Html5.TEST_VID.playbackRate = (playbackRate / 2) + 0.1;
+    return playbackRate !== Html5.TEST_VID.playbackRate;
+  } catch(e) {
+    return false;
+  }
 };
 
 /*
@@ -969,6 +1115,27 @@ Html5.supportsNativeTextTracks = function() {
 
   return supportsTextTracks;
 };
+
+/*
+ * Check to see if native video tracks are supported by this browser/device
+ *
+ * @return {Boolean}
+ */
+Html5.supportsNativeVideoTracks = function() {
+  let supportsVideoTracks = !!Html5.TEST_VID.videoTracks;
+  return supportsVideoTracks;
+};
+
+/*
+ * Check to see if native audio tracks are supported by this browser/device
+ *
+ * @return {Boolean}
+ */
+Html5.supportsNativeAudioTracks = function() {
+  let supportsAudioTracks = !!Html5.TEST_VID.audioTracks;
+  return supportsAudioTracks;
+};
+
 
 /**
  * An array of events available on the Html5 tech.
@@ -1042,6 +1209,20 @@ Html5.prototype['featuresProgressEvents'] = true;
  * @type {Boolean}
  */
 Html5.prototype['featuresNativeTextTracks'] = Html5.supportsNativeTextTracks();
+
+/**
+ * Sets the tech's status on native text track support
+ *
+ * @type {Boolean}
+ */
+Html5.prototype['featuresNativeVideoTracks'] = Html5.supportsNativeVideoTracks();
+
+/**
+ * Sets the tech's status on native audio track support
+ *
+ * @type {Boolean}
+ */
+Html5.prototype['featuresNativeAudioTracks'] = Html5.supportsNativeAudioTracks();
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //
 let canPlayType;

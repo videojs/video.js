@@ -3,6 +3,7 @@
  */
 import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
+import * as Dom from '../../utils/dom.js';
 import formatTime from '../../utils/format-time.js';
 
 /**
@@ -20,6 +21,17 @@ class PlayProgressBar extends Component {
     this.updateDataAttr();
     this.on(player, 'timeupdate', this.updateDataAttr);
     player.ready(Fn.bind(this, this.updateDataAttr));
+
+    if (options.playerOptions &&
+        options.playerOptions.controlBar &&
+        options.playerOptions.controlBar.progressControl &&
+        options.playerOptions.controlBar.progressControl.keepTooltipsInside) {
+      this.keepTooltipsInside = options.playerOptions.controlBar.progressControl.keepTooltipsInside;
+    }
+
+    if (this.keepTooltipsInside) {
+      this.addClass('vjs-keep-tooltips-inside');
+    }
   }
 
   /**

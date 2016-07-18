@@ -1092,6 +1092,64 @@ class Component {
   }
 
   /**
+   * Get width or height of computed style
+   * @param  {String} widthOrHeight  'width' or 'height'
+   * @return {Number|Boolean} The bolean false if nothing was set
+   * @method currentDimension
+   */
+  currentDimension(widthOrHeight) {
+    let computedWidthOrHeight = 0;
+
+    if (widthOrHeight !== 'width' && widthOrHeight !== 'height') {
+      throw new Error('currentDimension only accepts width or height value');
+    }
+
+    if (typeof window.getComputedStyle === 'function') {
+      const computedStyle = window.getComputedStyle(this.el_);
+      computedWidthOrHeight = computedStyle.getPropertyValue(widthOrHeight) || computedStyle[widthOrHeight];
+    } else if (this.el_.currentStyle) {
+      // ie 8 doesn't support computed style, shim it
+      // return clientWidth or clientHeight instead for better accuracy
+      const rule = `offset${toTitleCase(widthOrHeight)}`;
+      computedWidthOrHeight = this.el_[rule];
+    }
+
+    // remove 'px' from variable and parse as integer
+    computedWidthOrHeight = parseFloat(computedWidthOrHeight);
+    return computedWidthOrHeight;
+  }
+
+  /**
+   * Get an object which contains width and height values of computed style
+   * @return {Object} The dimensions of element
+   * @method currentDimensions
+   */
+  currentDimensions() {
+    return {
+      width: this.currentDimension('width'),
+      height: this.currentDimension('height')
+    };
+  }
+
+  /**
+   * Get width of computed style
+   * @return {Integer}
+   * @method currentWidth
+   */
+  currentWidth() {
+    return this.currentDimension('width');
+  }
+
+  /**
+   * Get height of computed style
+   * @return {Integer}
+   * @method currentHeight
+   */
+  currentHeight() {
+    return this.currentDimension('height');
+  }
+
+  /**
    * Emit 'tap' events when touch events are supported
    * This is used to support toggling the controls through a tap on the video.
    * We're requiring them to be enabled because otherwise every component would

@@ -124,6 +124,11 @@ body.vjs-full-window {
 // Hide disabled or unsupported controls.
 .vjs-hidden { display: none !important; }
 
+.vjs-disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 // Visually hidden offscreen, but accessible to screen readers.
 .video-js .vjs-offscreen {
   height: 1px;

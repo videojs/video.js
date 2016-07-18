@@ -75,9 +75,10 @@ function FlashRtmpDecorator(Flash) {
   /**
    * Check if Flash can handle the source natively
    * @param  {Object} source  The source object
+   * @param  {Object} options The options passed to the tech
    * @return {String}         'probably', 'maybe', or '' (empty string)
    */
-  Flash.rtmpSourceHandler.canHandleSource = function(source){
+  Flash.rtmpSourceHandler.canHandleSource = function(source, options){
     let can = Flash.rtmpSourceHandler.canPlayType(source.type);
 
     if (can) {
@@ -95,10 +96,11 @@ function FlashRtmpDecorator(Flash) {
    * Pass the source to the flash object
    * Adaptive source handlers will have more complicated workflows before passing
    * video data to the video element
-   * @param  {Object} source    The source object
-   * @param  {Flash} tech   The instance of the Flash tech
+   * @param  {Object} source   The source object
+   * @param  {Flash}  tech     The instance of the Flash tech
+   * @param  {Object} options  The options to pass to the source
    */
-  Flash.rtmpSourceHandler.handleSource = function(source, tech){
+  Flash.rtmpSourceHandler.handleSource = function(source, tech, options){
     let srcParts = Flash.streamToParts(source.src);
 
     tech['setRtmpConnection'](srcParts.connection);

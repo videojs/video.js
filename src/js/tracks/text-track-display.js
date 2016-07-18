@@ -58,6 +58,34 @@ class TextTrackDisplay extends Component {
         let track = tracks[i];
         this.player_.addRemoteTextTrack(track);
       }
+
+      let modes = {'captions': 1, 'subtitles': 1};
+      let trackList = this.player_.textTracks();
+      let firstDesc;
+      let firstCaptions;
+
+      if (trackList) {
+        for (let i = 0; i < trackList.length; i++) {
+          let track = trackList[i];
+          if (track.default) {
+            if (track.kind === 'descriptions' && !firstDesc) {
+              firstDesc = track;
+            } else if (track.kind in modes && !firstCaptions) {
+              firstCaptions = track;
+            }
+          }
+        }
+
+        // We want to show the first default track but captions and subtitles
+        // take precedence over descriptions.
+        // So, display the first default captions or subtitles track
+        // and otherwise the first default descriptions track.
+        if (firstCaptions) {
+          firstCaptions.mode = 'showing';
+        } else if (firstDesc) {
+          firstDesc.mode = 'showing';
+        }
+      }
     }));
   }
 
@@ -83,6 +111,9 @@ class TextTrackDisplay extends Component {
   createEl() {
     return super.createEl('div', {
       className: 'vjs-text-track-display'
+    }, {
+      'aria-live': 'assertive',
+      'aria-atomic': 'true'
     });
   }
 
@@ -111,11 +142,29 @@ class TextTrackDisplay extends Component {
       return;
     }
 
-    for (let i=0; i < tracks.length; i++) {
+    // Track display prioritization model: if multiple tracks are 'showing',
+    //  display the first 'subtitles' or 'captions' track which is 'showing',
+    //  otherwise display the first 'descriptions' track which is 'showing'
+
+    let descriptionsTrack = null;
+    let captionsSubtitlesTrack = null;
+
+    let i = tracks.length;
+    while (i--) {
       let track = tracks[i];
       if (track['mode'] === 'showing') {
-        this.updateForTrack(track);
+        if (track['kind'] === 'descriptions') {
+          descriptionsTrack = track;
+        } else {
+          captionsSubtitlesTrack = track;
+        }
       }
+    }
+
+    if (captionsSubtitlesTrack) {
+      this.updateForTrack(captionsSubtitlesTrack);
+    } else if (descriptionsTrack) {
+      this.updateForTrack(descriptionsTrack);
     }
   }
 
@@ -137,7 +186,7 @@ class TextTrackDisplay extends Component {
       cues.push(track['activeCues'][i]);
     }
 
-    window['WebVTT']['processCues'](window, track['activeCues'], this.el_);
+    window['WebVTT']['processCues'](window, cues, this.el_);
 
     let i = cues.length;
     while (i--) {

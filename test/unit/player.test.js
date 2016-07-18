@@ -87,29 +87,29 @@ test('should get tag, source, and track settings', function(){
   var tag = document.getElementById('example_1');
   var player = TestHelpers.makePlayer({}, tag);
 
-  ok(player.options_['autoplay'] === true);
-  ok(player.options_['preload'] === 'none'); // No extern. Use string.
-  ok(player.options_['id'] === 'example_1');
-  ok(player.options_['sources'].length === 2);
-  ok(player.options_['sources'][0].src === 'http://google.com');
-  ok(player.options_['sources'][0].type === 'video/mp4');
-  ok(player.options_['sources'][1].type === 'video/webm');
-  ok(player.options_['tracks'].length === 1);
-  ok(player.options_['tracks'][0]['kind'] === 'captions'); // No extern
-  ok(player.options_['tracks'][0]['attrtest'] === '');
+  equal(player.options_.autoplay, true, 'autoplay is set to true');
+  equal(player.options_.preload, 'none', 'preload is set to none');
+  equal(player.options_.id, 'example_1', 'id is set to example_1');
+  equal(player.options_.sources.length, 2, 'we have two sources');
+  equal(player.options_.sources[0].src, 'http://google.com', 'first source is google.com');
+  equal(player.options_.sources[0].type, 'video/mp4', 'first time is video/mp4');
+  equal(player.options_.sources[1].type, 'video/webm', 'second type is video/webm');
+  equal(player.options_.tracks.length, 1, 'we have one text track');
+  equal(player.options_.tracks[0].kind, 'captions', 'the text track is a captions file');
+  equal(player.options_.tracks[0].attrtest, '', 'we have an empty attribute called attrtest');
 
-  ok(player.el().className.indexOf('video-js') !== -1, 'transferred class from tag to player div');
-  ok(player.el().id === 'example_1', 'transferred id from tag to player div');
+  notEqual(player.el().className.indexOf('video-js'), -1, 'transferred class from tag to player div');
+  equal(player.el().id,'example_1', 'transferred id from tag to player div');
 
-  ok(Player.players[player.id()] === player, 'player referenceable from global list');
-  ok(tag.id !== player.id, 'tag ID no longer is the same as player ID');
-  ok(tag.className !== player.el().className, 'tag classname updated');
+  equal(Player.players[player.id()], player, 'player referenceable from global list');
+  notEqual(tag.id, player.id, 'tag ID no longer is the same as player ID');
+  notEqual(tag.className, player.el().className, 'tag classname updated');
 
   player.dispose();
 
-  ok(tag['player'] !== player, 'tag player ref killed');
+  notEqual(tag['player'], player, 'tag player ref killed');
   ok(!Player.players['example_1'], 'global player ref killed');
-  ok(player.el() === null, 'player el killed');
+  equal(player.el(), null, 'player el killed');
 });
 
 test('should asynchronously fire error events during source selection', function() {
@@ -247,7 +247,7 @@ test('should hide the poster when play is called', function() {
   });
 
   equal(player.hasStarted(), false, 'the show poster flag is true before play');
-  player.play();
+  player.tech_.trigger('play');
   equal(player.hasStarted(), true, 'the show poster flag is false after play');
 
   player.tech_.trigger('loadstart');
@@ -255,7 +255,7 @@ test('should hide the poster when play is called', function() {
         false,
         'the resource selection algorithm sets the show poster flag to true');
 
-  player.play();
+  player.tech_.trigger('play');
   equal(player.hasStarted(), true, 'the show poster flag is false after play');
 });
 
@@ -741,6 +741,26 @@ test('should add an audio class if an audio el is used', function() {
   ok(player.el().className.indexOf(audioClass) !== -1, 'added '+ audioClass +' css class');
 });
 
+test('should add a video player region if a video el is used', function() {
+  var video = document.createElement('video'),
+      player = TestHelpers.makePlayer({}, video),
+      role = 'region',
+      label = 'video player';
+
+  ok(player.el().getAttribute('role') === 'region', 'region role is present');
+  ok(player.el().getAttribute('aria-label') === 'video player', 'video player label present');
+});
+
+test('should add an audio player region if an audio el is used', function() {
+  var audio = document.createElement('audio'),
+      player = TestHelpers.makePlayer({}, audio),
+      role = 'region',
+      label = 'audio player';
+
+  ok(player.el().getAttribute('role') === 'region', 'region role is present');
+  ok(player.el().getAttribute('aria-label') === 'audio player', 'audio player label present');
+});
+
 test('should not be scrubbing while not seeking', function(){
   var player = TestHelpers.makePlayer();
   equal(player.scrubbing(), false, 'player is not scrubbing');
@@ -950,4 +970,59 @@ test('Remove waiting class on timeupdate after tech waiting', function() {
   ok(/vjs-waiting/.test(player.el().className), 'vjs-waiting is added to the player el on tech waiting');
   player.trigger('timeupdate');
   ok(!/vjs-waiting/.test(player.el().className), 'vjs-waiting is removed from the player el on timeupdate');
+});
+
+test('Make sure that player\'s style el respects VIDEOJS_NO_DYNAMIC_STYLE option', function() {
+  // clear the HEAD before running this test
+  let styles = document.querySelectorAll('style');
+  let i = styles.length;
+  while (i--) {
+    let style = styles[i];
+    style.parentNode.removeChild(style);
+  }
+
+  let tag = TestHelpers.makeTag();
+  tag.id = 'vjs-no-base-theme-tag';
+  tag.width = 600;
+  tag.height = 300;
+
+  window.VIDEOJS_NO_DYNAMIC_STYLE = true;
+  let player = TestHelpers.makePlayer({}, tag);
+  styles = document.querySelectorAll('style');
+  equal(styles.length, 0, 'we should not get any style elements included in the DOM');
+
+  window.VIDEOJS_NO_DYNAMIC_STYLE = false;
+  tag = TestHelpers.makeTag();
+  player = TestHelpers.makePlayer({}, tag);
+  styles = document.querySelectorAll('style');
+  equal(styles.length, 1, 'we should have one style element in the DOM');
+  equal(styles[0].className, 'vjs-styles-dimensions', 'the class name is the one we expected');
+});
+
+test('When VIDEOJS_NO_DYNAMIC_STYLE is set, apply sizing directly to the tech el', function() {
+  // clear the HEAD before running this test
+  let styles = document.querySelectorAll('style');
+  let i = styles.length;
+  while (i--) {
+    let style = styles[i];
+    style.parentNode.removeChild(style);
+  }
+
+  let tag = TestHelpers.makeTag();
+  tag.id = 'vjs-no-base-theme-tag';
+  tag.width = 600;
+  tag.height = 300;
+
+  window.VIDEOJS_NO_DYNAMIC_STYLE = true;
+  let player = TestHelpers.makePlayer({}, tag);
+
+  player.width(300);
+  player.height(600);
+  equal(player.tech_.el().width, 300, 'the width is equal to 300');
+  equal(player.tech_.el().height, 600, 'the height is equal 600');
+
+  player.width(600);
+  player.height(300);
+  equal(player.tech_.el().width, 600, 'the width is equal to 600');
+  equal(player.tech_.el().height, 300, 'the height is equal 300');
 });

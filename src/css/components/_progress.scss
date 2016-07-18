@@ -39,15 +39,18 @@
  to avoid a weird hitch when you roll off the hover. */
 
 // Also show the current time tooltip
+.video-js .vjs-progress-control:hover .vjs-time-tooltip,
 .video-js .vjs-progress-control:hover .vjs-mouse-display:after,
 .video-js .vjs-progress-control:hover .vjs-play-progress:after {
-  display: block;
+  font-family: $text-font-family;
+  visibility: visible;
   font-size: 0.6em;
 }
 
 // Progress Bars
 .video-js .vjs-progress-holder .vjs-play-progress,
 .video-js .vjs-progress-holder .vjs-load-progress,
+.video-js .vjs-progress-holder .vjs-tooltip-progress-bar,
 .video-js .vjs-progress-holder .vjs-load-progress div {
   position: absolute;
   display: block;
@@ -83,12 +86,14 @@
 
 // Current Time "tooltip"
 // By default this is hidden and only shown when hovering over the progress control
+.video-js .vjs-time-tooltip,
 .video-js .vjs-mouse-display:after,
 .video-js .vjs-play-progress:after {
-  display: none;
+  visibility: hidden;
+  pointer-events: none;
   position: absolute;
   top: -3.4em;
-  right: -1.5em;
+  right: -1.9em;
   font-size: 0.9em;
   color: #000;
   content: attr(data-current-time);
@@ -96,9 +101,15 @@
   @include background-color-with-alpha(#fff, 0.8);
   @include border-radius(0.3em);
 }
+
+.video-js .vjs-time-tooltip,
 .video-js .vjs-play-progress:before,
 .video-js .vjs-play-progress:after {
   z-index: 1;
+}
+
+.video-js .vjs-progress-control .vjs-keep-tooltips-inside:after {
+  display: none;
 }
 
 .video-js .vjs-load-progress {
@@ -119,6 +130,18 @@
 
 .video-js.vjs-no-flex .vjs-progress-control {
   width: auto;
+}
+
+.video-js .vjs-time-tooltip {
+  display: inline-block;
+  height: 2.4em;
+  position: relative;
+  float: right;
+  right: -1.9em;
+}
+
+.vjs-tooltip-progress-bar {
+  visibility: hidden;
 }
 
 .video-js .vjs-progress-control .vjs-mouse-display {
@@ -146,6 +169,7 @@
 .video-js.vjs-user-inactive.vjs-no-flex .vjs-progress-control .vjs-mouse-display:after {
   display: none;
 }
+.vjs-mouse-display .vjs-time-tooltip,
 .video-js .vjs-progress-control .vjs-mouse-display:after {
   color: #fff;
   @include background-color-with-alpha(#000, 0.8);
