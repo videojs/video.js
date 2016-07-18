@@ -24,6 +24,7 @@ CHANGELOG
 * @mister-ben updated language to inherit correctly and respect the attribute on the player ([view](https://github.com/videojs/video.js/pull/3426))
 * @sashyro fixed nativeControlsForTouch option ([view](https://github.com/videojs/video.js/pull/3410))
 * @tbasse fixed techCall null check against tech ([view](https://github.com/videojs/video.js/pull/2676))
+* @rbran100 checked src and currentSrc in handleTechReady to work around mixed content issues in chrome ([view](https://github.com/videojs/video.js/pull/3287))
 
 --------------------
 
