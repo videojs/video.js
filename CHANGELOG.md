@@ -20,6 +20,7 @@ CHANGELOG
 * @MattiasBuelens updated components to use durationchange only ([view](https://github.com/videojs/video.js/pull/3349))
 * @misteroneill improved Logging for IE < 11 ([view](https://github.com/videojs/video.js/pull/3356))
 * @vdeshpande updated control text of modal dialog ([view](https://github.com/videojs/video.js/pull/3400))
+* @ldayananda fixed mouse handling on menus by using mouseleave over mouseout ([view](https://github.com/videojs/video.js/pull/3404))
 
 --------------------
 
