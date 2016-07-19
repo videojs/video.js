@@ -25,6 +25,7 @@ CHANGELOG
 * @sashyro fixed nativeControlsForTouch option ([view](https://github.com/videojs/video.js/pull/3410))
 * @tbasse fixed techCall null check against tech ([view](https://github.com/videojs/video.js/pull/2676))
 * @rbran100 checked src and currentSrc in handleTechReady to work around mixed content issues in chrome ([view](https://github.com/videojs/video.js/pull/3287))
+* @OwenEdwards fixed caption settings dialog labels for accessibility ([view](https://github.com/videojs/video.js/pull/3281))
 
 --------------------
 
