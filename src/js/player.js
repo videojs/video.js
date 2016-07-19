@@ -2270,7 +2270,9 @@ class Player extends Component {
     if (err === null) {
       this.error_ = err;
       this.removeClass('vjs-error');
-      this.errorDisplay.close();
+      if (this.errorDisplay) {
+        this.errorDisplay.close();
+      }
       return this;
     }
 
