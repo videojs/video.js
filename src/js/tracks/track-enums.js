@@ -15,7 +15,7 @@
  *   "",
  * };
  */
-const VideoTrackKind = {
+export const VideoTrackKind = {
   alternative: 'alternative',
   captions: 'captions',
   main: 'main',
@@ -37,7 +37,7 @@ const VideoTrackKind = {
  *   "",
  * };
  */
-const AudioTrackKind = {
+export const AudioTrackKind = {
   'alternative': 'alternative',
   'descriptions': 'descriptions',
   'main': 'main',
@@ -57,7 +57,7 @@ const AudioTrackKind = {
  *   "metadata"
  * };
  */
-const TextTrackKind = {
+export const TextTrackKind = {
   subtitles: 'subtitles',
   captions: 'captions',
   descriptions: 'descriptions',
@@ -70,10 +70,8 @@ const TextTrackKind = {
  *
  * enum TextTrackMode { "disabled",  "hidden",  "showing" };
  */
-const TextTrackMode = {
+export const TextTrackMode = {
   disabled: 'disabled',
   hidden: 'hidden',
   showing: 'showing'
 };
-
-export default { VideoTrackKind, AudioTrackKind, TextTrackKind, TextTrackMode };
