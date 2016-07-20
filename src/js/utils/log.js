@@ -38,11 +38,10 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
   // add console prefix after adding to history
   args.unshift('VIDEOJS:');
 
-  // Old IE versions do not allow .apply() for some/all console method(s). And
   // IEs previous to 11 log objects uselessly as "[object Object]"; so, JSONify
   // objects and arrays for those less-capable browsers.
-  if (!fn.apply || stringify) {
-    fn(args.map(a => {
+  if (stringify) {
+    args = args.map(a => {
       if (a && typeof a === 'object' || Array.isArray(a)) {
         try {
           return JSON.stringify(a);
@@ -52,11 +51,15 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
       // Cast to string before joining, so we get null and undefined explicitly
       // included in output (as we would in a modern console).
       return String(a);
-    }).join(' '));
+    }).join(' ');
+  }
 
-  // Default hanlding for modern consoles.
+  // Old IE versions do not allow .apply() for console methods (they are
+  // reported as objects rather than functions).
+  if (!fn.apply) {
+    fn(args);
   } else {
-    fn.apply(console, args);
+    fn[Array.isArray(args) ? 'apply' : 'call'](console, args);
   }
 };
 
