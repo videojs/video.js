@@ -23,10 +23,6 @@ module.exports = function(grunt) {
       ['browserify-derequire']
     ],
     transform: [
-      require('babelify').configure({
-        sourceMapRelative: './',
-        loose: ['all']
-      }),
       ['browserify-versionify', {
         placeholder: '__VERSION__',
         version: pkg.version
@@ -152,6 +148,10 @@ module.exports = function(grunt) {
       skin: {
         files: ['src/css/**/*'],
         tasks: ['skin']
+      },
+      babel: {
+        files: ['src/js/**/*.js'],
+        tasks: ['babel:es5']
       },
       jshint: {
         files: ['src/**/*', 'test/unit/**/*.js', 'Gruntfile.js'],
@@ -317,11 +317,24 @@ module.exports = function(grunt) {
         }
       })
     },
+    babel: {
+      options: {
+        sourceMap: true
+      },
+      es5: {
+        files: [{
+          expand: true,
+          cwd: 'src/js/',
+          src: ['**/*.js', '!base-styles.js'],
+          dest: 'es5/'
+        }]
+      }
+    },
     browserify: {
       options: browserifyGruntOptions(),
       build: {
         files: {
-          'build/temp/video.js': ['src/js/video.js']
+          'build/temp/video.js': ['es5/video.js']
         }
       },
       dist: {
@@ -334,7 +347,7 @@ module.exports = function(grunt) {
           ]
         }),
         files: {
-          'build/temp/video.js': ['src/js/video.js']
+          'build/temp/video.js': ['es5/video.js']
         }
       },
       watch: {
@@ -343,14 +356,16 @@ module.exports = function(grunt) {
           keepAlive: true
         },
         files: {
-          'build/temp/video.js': ['src/js/video.js']
+          'build/temp/video.js': ['es5/video.js']
         }
       },
       tests: {
         options: {
           browserifyOptions: {
+            verbose: true,
             debug: true,
-            standalone: false
+            standalone: false,
+            transform: ['babelify']
           },
           plugin: [
             ['proxyquireify/plugin']
@@ -406,6 +421,10 @@ module.exports = function(grunt) {
       options: {
         logConcurrentOutput: true
       },
+      tests: [
+        'watch:babel',
+        'browserify:tests'
+      ],
       // Run multiple watch tasks in parallel
       // Needed so watchify can cache intelligently
       watchAll: [
@@ -457,6 +476,7 @@ module.exports = function(grunt) {
     'shell:lint',
     'clean:build',
 
+    'babel:es5',
     'browserify:build',
     'exorcise:build',
     'concat:novtt',

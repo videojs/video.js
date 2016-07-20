@@ -36,8 +36,10 @@
     "xhr": "2.2.0"
   },
   "devDependencies": {
+    "babel-cli": "^6.11.4",
+    "babel-preset-es2015-loose": "^7.0.0",
     "babel-register": "^6.9.0",
-    "babelify": "^6.0.1",
+    "babelify": "^7.3.0",
     "blanket": "^1.1.6",
     "browserify-derequire": "^0.9.4",
     "browserify-istanbul": "^0.2.1",
@@ -48,6 +50,7 @@
     "ghooks": "^1.3.2",
     "gkatsev-grunt-sass": "^1.1.1",
     "grunt": "^0.4.4",
+    "grunt-babel": "^6.0.0",
     "grunt-banner": "^0.4.0",
     "grunt-browserify": "3.5.1",
     "grunt-cli": "~0.1.13",
