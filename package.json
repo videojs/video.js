@@ -36,7 +36,7 @@
     "xhr": "2.2.0"
   },
   "devDependencies": {
-    "babel": "^5.2.2",
+    "babel-register": "^6.9.0",
     "babelify": "^6.0.1",
     "blanket": "^1.1.6",
     "browserify-derequire": "^0.9.4",
