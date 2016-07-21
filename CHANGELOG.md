@@ -29,6 +29,7 @@ CHANGELOG
 * @OwenEdwards removed spurious head tags in the simple-embed example ([view](https://github.com/videojs/video.js/pull/3438))
 * @ntadej added a null check to errorDisplay usage ([view](https://github.com/videojs/video.js/pull/3440))
 * @misteroneill fixed logging issues on IE by separating fn.apply and stringify checks ([view](https://github.com/videojs/video.js/pull/3444))
+* @misteroneill fixed npm test from running coveralls locally ([view](https://github.com/videojs/video.js/pull/3449))
 
 --------------------
 

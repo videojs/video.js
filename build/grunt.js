@@ -494,7 +494,8 @@ module.exports = function(grunt) {
   // Default task - build and test
   grunt.registerTask('default', ['test']);
 
-  grunt.registerTask('test', ['build', 'karma:defaults']);
+  // The test script includes coveralls only when the TRAVIS env var is set.
+  grunt.registerTask('test', ['build', 'karma:defaults'].concat(process.env.TRAVIS && 'coveralls').filter(Boolean));
 
   // Run while developing
   grunt.registerTask('dev', ['build', 'connect:dev', 'concurrent:watchSandbox']);
