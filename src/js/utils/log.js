@@ -27,7 +27,6 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
   const fn = console && console[type] || function(){};
 
   if (type !== 'log') {
-
     // add the type to the front of the message when it's not "log"
     args.unshift(type.toUpperCase() + ':');
   }
@@ -48,9 +47,10 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
         } catch (x) {}
       }
 
-      // Cast to string before joining, so we get null and undefined explicitly
-      // included in output (as we would in a modern console).
-      return String(a);
+      // Cast to string before joining in order to get consistent results. And
+      // explicitly include a check for undefined because IE8 casts undefined
+      // to an empty string.
+      return a === undefined ? 'undefined' : String(a);
     }).join(' ');
   }
 
