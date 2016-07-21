@@ -75,11 +75,10 @@ test('in IE pre-11 (or when requested) objects and arrays are stringified', func
     [1, 2, 3],
     0,
     false,
-    null,
-    undefined
+    null
   ], true);
 
   ok(window.console.log.called, 'log was called');
   deepEqual(window.console.log.firstCall.args,
-            ['VIDEOJS: test {"foo":"bar"} [1,2,3] 0 false null undefined']);
+            ['VIDEOJS: test {"foo":"bar"} [1,2,3] 0 false null']);
 });
