@@ -46,16 +46,22 @@ test('logging functions should work', function() {
   log.error('error1', 'error2');
 
   ok(window.console.log.called, 'log was called');
-  deepEqual(window.console.log.firstCall.args,
-            getConsoleArgs('VIDEOJS:', 'log1', 'log2'));
+  deepEqual(
+    window.console.log.firstCall.args,
+    getConsoleArgs('VIDEOJS:', 'log1', 'log2')
+  );
 
   ok(window.console.warn.called, 'warn was called');
-  deepEqual(window.console.warn.firstCall.args,
-            getConsoleArgs('VIDEOJS:', 'WARN:', 'warn1', 'warn2'));
+  deepEqual(
+    window.console.warn.firstCall.args,
+    getConsoleArgs('VIDEOJS:', 'WARN:', 'warn1', 'warn2')
+  );
 
   ok(window.console.error.called, 'error was called');
-  deepEqual(window.console.error.firstCall.args,
-            getConsoleArgs('VIDEOJS:', 'ERROR:', 'error1', 'error2'));
+  deepEqual(
+    window.console.error.firstCall.args,
+    getConsoleArgs('VIDEOJS:', 'ERROR:', 'error1', 'error2')
+  );
 
   equal(log.history.length, 3, 'there should be three messages in the log history');
 });
