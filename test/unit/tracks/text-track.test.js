@@ -266,7 +266,7 @@ QUnit.test('tracks are parsed if vttjs is loaded', function(assert) {
     xhr(options, fn) {
       xhrHandler = fn;
     }
-  });
+  }).default;
 
   /* eslint-disable no-unused-vars */
   const tt = new TextTrack_({
@@ -294,7 +294,7 @@ QUnit.test('tracks are parsed once vttjs is loaded', function(assert) {
     xhr(options, fn) {
       xhrHandler = fn;
     }
-  });
+  }).default;
 
   window.WebVTT = true;
 
@@ -356,7 +356,7 @@ QUnit.test('stops processing if vttjs loading errored out', function(assert) {
         error: errorSpy
       }
     }
-  });
+  }).default;
 
   const testTech = new EventTarget();
 
