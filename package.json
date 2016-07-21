@@ -14,7 +14,7 @@
   "homepage": "http://videojs.com",
   "author": "Steve Heffernan",
   "scripts": {
-    "test": "grunt test && if [ '$TRAVIS' ]; then grunt coveralls; fi;"
+    "test": "grunt test"
   },
   "repository": {
     "type": "git",
