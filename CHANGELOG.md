@@ -30,6 +30,7 @@ CHANGELOG
 * @ntadej added a null check to errorDisplay usage ([view](https://github.com/videojs/video.js/pull/3440))
 * @misteroneill fixed logging issues on IE by separating fn.apply and stringify checks ([view](https://github.com/videojs/video.js/pull/3444))
 * @misteroneill fixed npm test from running coveralls locally ([view](https://github.com/videojs/video.js/pull/3449))
+* @gkatsev added es6-shim to tests. Fixes Flash duration test ([view](https://github.com/videojs/video.js/pull/3453))
 
 --------------------
 
