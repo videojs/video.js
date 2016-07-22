@@ -197,7 +197,7 @@ test('Plugin that does not exist logs an error', function() {
   ok(error.called, 'error was called');
 
   if (IE_VERSION && IE_VERSION < 11) {
-    equal(error.firstCall.args[1], 'VIDEOJS: Unable to find plugin: nonExistingPlugin');
+    equal(error.firstCall.args[0], 'VIDEOJS: Unable to find plugin: nonExistingPlugin');
   } else {
     equal(error.firstCall.args[2], 'Unable to find plugin:');
     equal(error.firstCall.args[3], 'nonExistingPlugin');
