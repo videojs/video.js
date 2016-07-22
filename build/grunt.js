@@ -319,7 +319,9 @@ module.exports = function(grunt) {
     },
     babel: {
       options: {
-        sourceMap: true
+        sourceMap: true,
+        presets: ['es2015'],
+        plugins: [['transform-runtime', {polyfill: false, regenerator: false}]]
       },
       es5: {
         files: [{
