@@ -2,6 +2,11 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 5.11.0 (2016-07-22)
 * @BrandonOCasey Document audio/video track usage ([view](https://github.com/videojs/video.js/pull/3295))
 * @hartman Correct documentation to refer to nativeTextTracks option ([view](https://github.com/videojs/video.js/pull/3309))
 * @nickygerritsen Also pass tech options to canHandleSource ([view](https://github.com/videojs/video.js/pull/3303))
@@ -33,8 +38,6 @@ CHANGELOG
 * @gkatsev added es6-shim to tests. Fixes Flash duration test ([view](https://github.com/videojs/video.js/pull/3453))
 * @misteroneill corrects test assertions for older IEs in the log module ([view](https://github.com/videojs/video.js/pull/3454))
 * @gkatsev fixed setting lang by looping through loop element variable and not constant tag ([view](https://github.com/videojs/video.js/pull/3455))
-
---------------------
 
 ## 5.10.7 (2016-06-27)
 * @gkatsev pinned node-sass to 3.4 ([view](https://github.com/videojs/video.js/pull/3401))
