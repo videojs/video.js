@@ -4,11 +4,13 @@
 import merge from 'lodash-compat/object/merge';
 
 function isPlain(obj) {
-  return !!obj
-    && typeof obj === 'object'
-    && obj.toString() === '[object Object]'
-    && obj.constructor === Object;
+  return !!obj &&
+    typeof obj === 'object' &&
+    obj.toString() === '[object Object]' &&
+    obj.constructor === Object;
 }
+
+let mergeOptions;
 
 /**
  * Merge customizer. video.js simply overwrites non-simple objects
@@ -41,7 +43,7 @@ const customizer = function(destination, source) {
  * provided objects
  * @function mergeOptions
  */
-export default function mergeOptions() {
+mergeOptions = function() {
   // contruct the call dynamically to handle the variable number of
   // objects to merge
   let args = Array.prototype.slice.call(arguments);
@@ -57,4 +59,6 @@ export default function mergeOptions() {
 
   // return the mutated result object
   return args[0];
-}
+};
+
+export default mergeOptions;

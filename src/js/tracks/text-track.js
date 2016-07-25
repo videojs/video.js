@@ -5,7 +5,6 @@ import TextTrackCueList from './text-track-cue-list';
 import * as Fn from '../utils/fn.js';
 import {TextTrackKind, TextTrackMode} from './track-enums';
 import log from '../utils/log.js';
-import document from 'global/document';
 import window from 'global/window';
 import Track from './track.js';
 import { isCrossOrigin } from '../utils/url.js';
@@ -42,12 +41,12 @@ const parseCues = function(srcContent, track) {
 
   parser.parse(srcContent);
   if (errors.length > 0) {
-    if (console.groupCollapsed) {
-      console.groupCollapsed(`Text Track parsing errors for ${track.src}`);
+    if (window.console && window.console.groupCollapsed) {
+      window.console.groupCollapsed(`Text Track parsing errors for ${track.src}`);
     }
     errors.forEach((error) => log.error(error));
-    if (console.groupEnd) {
-      console.groupEnd();
+    if (window.console && window.console.groupEnd) {
+      window.console.groupEnd();
     }
   }
 
@@ -82,6 +81,7 @@ const loadTrack = function(src, track) {
     if (typeof window.WebVTT !== 'function') {
       if (track.tech_) {
         let loadHandler = () => parseCues(responseBody, track);
+
         track.tech_.on('vttjsloaded', loadHandler);
         track.tech_.on('vttjserror', () => {
           log.error(`vttjs failed to load, stopping trying to process ${track.src}`);
@@ -142,6 +142,7 @@ class TextTrack extends Track {
     // on IE8 this will be a document element
     // for every other browser this will be a normal object
     let tt = super(settings);
+
     tt.tech_ = settings.tech;
 
     if (browser.IS_IE8) {
@@ -159,6 +160,10 @@ class TextTrack extends Track {
     let activeCues = new TextTrackCueList(tt.activeCues_);
     let changed = false;
     let timeupdateHandler = Fn.bind(tt, function() {
+
+      // Accessing this.activeCues for the side-effects of updating itself
+      // due to it's nature as a getter function. Do not remove or cues will
+      // stop updating!
       this.activeCues;
       if (changed) {
         this.trigger('cuechange');

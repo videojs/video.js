@@ -21,6 +21,7 @@ const disableOthers = function(list, track) {
     list[i].enabled = false;
   }
 };
+
 /**
  * A list of possible audio tracks. All functionality is in the
  * base class Tracklist and the spec for AudioTrackList is located at:

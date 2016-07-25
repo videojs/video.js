@@ -39,8 +39,8 @@ class HTMLTrackElement extends EventTarget {
   constructor(options = {}) {
     super();
 
-    let readyState,
-        trackElement = this;
+    let readyState;
+    let trackElement = this; // eslint-disable-line
 
     if (browser.IS_IE8) {
       trackElement = document.createElement('custom');

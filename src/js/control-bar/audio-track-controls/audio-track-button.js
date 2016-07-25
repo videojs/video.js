@@ -3,7 +3,6 @@
  */
 import TrackButton from '../track-button.js';
 import Component from '../../component.js';
-import * as Fn from '../../utils/fn.js';
 import AudioTrackMenuItem from './audio-track-menu-item.js';
 
 /**
@@ -40,19 +39,19 @@ class AudioTrackButton extends TrackButton {
    * @method createItems
    */
   createItems(items = []) {
-    let tracks = this.player_.audioTracks && this.player_.audioTracks();
+    const tracks = this.player_.audioTracks && this.player_.audioTracks();
 
     if (!tracks) {
       return items;
     }
 
     for (let i = 0; i < tracks.length; i++) {
-      let track = tracks[i];
+      const track = tracks[i];
 
       items.push(new AudioTrackMenuItem(this.player_, {
+        track,
         // MenuItem is selectable
-        'selectable': true,
-        'track': track
+        selectable: true
       }));
     }
 

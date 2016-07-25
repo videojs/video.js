@@ -10,7 +10,6 @@ import * as Url from '../utils/url.js';
 import * as Fn from '../utils/fn.js';
 import log from '../utils/log.js';
 import tsml from 'tsml';
-import TextTrack from '../../../src/js/tracks/text-track.js';
 import * as browser from '../utils/browser.js';
 import document from 'global/document';
 import window from 'global/window';
@@ -28,7 +27,7 @@ import toTitleCase from '../utils/to-title-case.js';
  */
 class Html5 extends Tech {
 
-  constructor(options, ready){
+  constructor(options, ready) {
     super(options, ready);
 
     const source = options.source;
@@ -74,7 +73,7 @@ class Html5 extends Tech {
         }
       }
 
-      for (let i=0; i<removeNodes.length; i++) {
+      for (let i = 0; i < removeNodes.length; i++) {
         this.el_.removeChild(removeNodes[i]);
       }
     }
@@ -102,7 +101,7 @@ class Html5 extends Tech {
 
     if (this.featuresNativeTextTracks) {
       if (crossoriginTracks) {
-        log.warn(tsml`Text Tracks are being loaded from another origin but the crossorigin attribute isn't used. 
+        log.warn(tsml`Text Tracks are being loaded from another origin but the crossorigin attribute isn't used.
             This may prevent text tracks from loading.`);
       }
 
@@ -140,7 +139,7 @@ class Html5 extends Tech {
         tl.removeEventListener('addtrack', this[`handle${capitalType}TrackAdd_`]);
         tl.removeEventListener('removetrack', this[`handle${capitalType}TrackRemove_`]);
       }
-      
+
       // Stop removing old text tracks
       if (tl) {
         this.off('loadstart', this[`removeOld${capitalType}Tracks_`]);
@@ -164,11 +163,12 @@ class Html5 extends Tech {
     // Check if this browser supports moving the element into the box.
     // On the iPhone video will break if you move the element,
     // So we have to create a brand new element.
-    if (!el || this['movingMediaElementInDOM'] === false) {
+    if (!el || this.movingMediaElementInDOM === false) {
 
       // If the original tag is still there, clone and remove it.
       if (el) {
         const clone = el.cloneNode(true);
+
         el.parentNode.insertBefore(clone, el);
         Html5.disposeMediaElement(el);
         el = clone;
@@ -178,6 +178,7 @@ class Html5 extends Tech {
         // determine if native controls should be used
         let tagAttributes = this.options_.tag && Dom.getElAttributes(this.options_.tag);
         let attributes = mergeOptions({}, tagAttributes);
+
         if (!browser.TOUCH_ENABLED || this.options_.nativeControlsForTouch !== true) {
           delete attributes.controls;
         }
@@ -192,10 +193,12 @@ class Html5 extends Tech {
     }
 
     // Update specific tag settings, in case they were overridden
-    let settingsAttrs = ['autoplay','preload','loop','muted'];
+    let settingsAttrs = ['autoplay', 'preload', 'loop', 'muted'];
+
     for (let i = settingsAttrs.length - 1; i >= 0; i--) {
       const attr = settingsAttrs[i];
       let overwriteAttrs = {};
+
       if (typeof this.options_[attr] !== 'undefined') {
         overwriteAttrs[attr] = this.options_[attr];
       }
@@ -232,6 +235,7 @@ class Html5 extends Tech {
       let setLoadstartFired = function() {
         loadstartFired = true;
       };
+
       this.on('loadstart', setLoadstartFired);
 
       let triggerLoadstart = function() {
@@ -241,9 +245,10 @@ class Html5 extends Tech {
           this.trigger('loadstart');
         }
       };
+
       this.on('loadedmetadata', triggerLoadstart);
 
-      this.ready(function(){
+      this.ready(function() {
         this.off('loadstart', setLoadstartFired);
         this.off('loadedmetadata', triggerLoadstart);
 
@@ -281,8 +286,8 @@ class Html5 extends Tech {
     }
 
     // We still need to give the player time to add event listeners
-    this.ready(function(){
-      eventsToTrigger.forEach(function(type){
+    this.ready(function() {
+      eventsToTrigger.forEach(function(type) {
         this.trigger(type);
       }, this);
     });
@@ -303,7 +308,7 @@ class Html5 extends Tech {
         tt.addEventListener('addtrack', this.handleTextTrackAdd_);
         tt.addEventListener('removetrack', this.handleTextTrackRemove_);
       }
-    
+
       // Remove (native) texttracks that are not used anymore
       this.on('loadstart', this.removeOldTextTracks_);
     }
@@ -311,6 +316,7 @@ class Html5 extends Tech {
 
   handleTextTrackChange(e) {
     let tt = this.textTracks();
+
     this.textTracks().trigger({
       type: 'change',
       target: tt,
@@ -329,6 +335,7 @@ class Html5 extends Tech {
 
   handleVideoTrackChange_(e) {
     let vt = this.videoTracks();
+
     this.videoTracks().trigger({
       type: 'change',
       target: vt,
@@ -347,6 +354,7 @@ class Html5 extends Tech {
 
   handleAudioTrackChange_(e) {
     let audioTrackList = this.audioTracks();
+
     this.audioTracks().trigger({
       type: 'change',
       target: audioTrackList,
@@ -374,14 +382,15 @@ class Html5 extends Tech {
     // This will loop over the techTracks and check if they are still used by the HTML5 video element
     // If not, they will be removed from the emulated list
     let removeTracks = [];
+
     if (!elTracks) {
       return;
     }
 
     for (let i = 0; i < techTracks.length; i++) {
       let techTrack = techTracks[i];
-
       let found = false;
+
       for (let j = 0; j < elTracks.length; j++) {
         if (elTracks[j] === techTrack) {
           found = true;
@@ -396,6 +405,7 @@ class Html5 extends Tech {
 
     for (let i = 0; i < removeTracks.length; i++) {
       const track = removeTracks[i];
+
       techTracks.removeTrack_(track);
     }
   }
@@ -403,18 +413,21 @@ class Html5 extends Tech {
   removeOldTextTracks_() {
     const techTracks = this.textTracks();
     const elTracks = this.el().textTracks;
+
     this.removeOldTracks_(techTracks, elTracks);
   }
 
   removeOldAudioTracks_() {
     const techTracks = this.audioTracks();
     const elTracks = this.el().audioTracks;
+
     this.removeOldTracks_(techTracks, elTracks);
   }
 
   removeOldVideoTracks_() {
     const techTracks = this.videoTracks();
     const elTracks = this.el().videoTracks;
+
     this.removeOldTracks_(techTracks, elTracks);
   }
 
@@ -423,14 +436,18 @@ class Html5 extends Tech {
    *
    * @method play
    */
-  play() { this.el_.play(); }
+  play() {
+    this.el_.play();
+  }
 
   /**
    * Pause for html5 tech
    *
    * @method pause
    */
-  pause() { this.el_.pause(); }
+  pause() {
+    this.el_.pause();
+  }
 
   /**
    * Paused for html5 tech
@@ -438,7 +455,9 @@ class Html5 extends Tech {
    * @return {Boolean}
    * @method paused
    */
-  paused() { return this.el_.paused; }
+  paused() {
+    return this.el_.paused;
+  }
 
   /**
    * Get current time
@@ -446,7 +465,9 @@ class Html5 extends Tech {
    * @return {Number}
    * @method currentTime
    */
-  currentTime() { return this.el_.currentTime; }
+  currentTime() {
+    return this.el_.currentTime;
+  }
 
   /**
    * Set current time
@@ -457,7 +478,7 @@ class Html5 extends Tech {
   setCurrentTime(seconds) {
     try {
       this.el_.currentTime = seconds;
-    } catch(e) {
+    } catch (e) {
       log(e, 'Video is not ready. (Video.js)');
       // this.warning(VideoJS.warnings.videoNotReady);
     }
@@ -469,7 +490,9 @@ class Html5 extends Tech {
    * @return {Number}
    * @method duration
    */
-  duration() { return this.el_.duration || 0; }
+  duration() {
+    return this.el_.duration || 0;
+  }
 
   /**
    * Get a TimeRange object that represents the intersection
@@ -479,7 +502,9 @@ class Html5 extends Tech {
    * @return {TimeRangeObject}
    * @method buffered
    */
-  buffered() { return this.el_.buffered; }
+  buffered() {
+    return this.el_.buffered;
+  }
 
   /**
    * Get volume level
@@ -487,7 +512,9 @@ class Html5 extends Tech {
    * @return {Number}
    * @method volume
    */
-  volume() { return this.el_.volume; }
+  volume() {
+    return this.el_.volume;
+  }
 
   /**
    * Set volume level
@@ -495,7 +522,9 @@ class Html5 extends Tech {
    * @param {Number} percentAsDecimal Volume percent as a decimal
    * @method setVolume
    */
-  setVolume(percentAsDecimal) { this.el_.volume = percentAsDecimal; }
+  setVolume(percentAsDecimal) {
+    this.el_.volume = percentAsDecimal;
+  }
 
   /**
    * Get if muted
@@ -503,7 +532,9 @@ class Html5 extends Tech {
    * @return {Boolean}
    * @method muted
    */
-  muted() { return this.el_.muted; }
+  muted() {
+    return this.el_.muted;
+  }
 
   /**
    * Set muted
@@ -511,7 +542,9 @@ class Html5 extends Tech {
    * @param {Boolean} If player is to be muted or note
    * @method setMuted
    */
-  setMuted(muted) { this.el_.muted = muted; }
+  setMuted(muted) {
+    this.el_.muted = muted;
+  }
 
   /**
    * Get player width
@@ -519,7 +552,9 @@ class Html5 extends Tech {
    * @return {Number}
    * @method width
    */
-  width() { return this.el_.offsetWidth; }
+  width() {
+    return this.el_.offsetWidth;
+  }
 
   /**
    * Get player height
@@ -527,7 +562,9 @@ class Html5 extends Tech {
    * @return {Number}
    * @method height
    */
-  height() {  return this.el_.offsetHeight; }
+  height() {
+    return this.el_.offsetHeight;
+  }
 
   /**
    * Get if there is fullscreen support
@@ -538,8 +575,9 @@ class Html5 extends Tech {
   supportsFullScreen() {
     if (typeof this.el_.webkitEnterFullScreen === 'function') {
       let userAgent = window.navigator.userAgent;
+
       // Seems to be broken in Chromium/Chrome && Safari in Leopard
-      if (/Android/.test(userAgent) || !/Chrome|Mac OS X 10.5/.test(userAgent)) {
+      if ((/Android/).test(userAgent) || !(/Chrome|Mac OS X 10.5/).test(userAgent)) {
         return true;
       }
     }
@@ -552,7 +590,7 @@ class Html5 extends Tech {
    * @method enterFullScreen
    */
   enterFullScreen() {
-    var video = this.el_;
+    let video = this.el_;
 
     if ('webkitDisplayingFullscreen' in video) {
       this.one('webkitbeginfullscreen', function() {
@@ -571,7 +609,7 @@ class Html5 extends Tech {
 
       // playing and pausing synchronously during the transition to fullscreen
       // can get iOS ~6.1 devices into a play/pause loop
-      this.setTimeout(function(){
+      this.setTimeout(function() {
         video.pause();
         video.webkitEnterFullScreen();
       }, 0);
@@ -599,10 +637,10 @@ class Html5 extends Tech {
   src(src) {
     if (src === undefined) {
       return this.el_.src;
-    } else {
-      // Setting src through `src` instead of `setSrc` will be deprecated
-      this.setSrc(src);
     }
+
+    // Setting src through `src` instead of `setSrc` will be deprecated
+    this.setSrc(src);
   }
 
   /**
@@ -621,7 +659,7 @@ class Html5 extends Tech {
    *
    * @method load
    */
-  load(){
+  load() {
     this.el_.load();
   }
 
@@ -643,9 +681,8 @@ class Html5 extends Tech {
   currentSrc() {
     if (this.currentSource_) {
       return this.currentSource_.src;
-    } else {
-      return this.el_.currentSrc;
     }
+    return this.el_.currentSrc;
   }
 
   /**
@@ -654,7 +691,9 @@ class Html5 extends Tech {
    * @return {String}
    * @method poster
    */
-  poster() { return this.el_.poster; }
+  poster() {
+    return this.el_.poster;
+  }
 
   /**
    * Set poster
@@ -662,7 +701,9 @@ class Html5 extends Tech {
    * @param {String} val URL to poster image
    * @method
    */
-  setPoster(val) { this.el_.poster = val; }
+  setPoster(val) {
+    this.el_.poster = val;
+  }
 
   /**
    * Get preload attribute
@@ -670,7 +711,9 @@ class Html5 extends Tech {
    * @return {String}
    * @method preload
    */
-  preload() { return this.el_.preload; }
+  preload() {
+    return this.el_.preload;
+  }
 
   /**
    * Set preload attribute
@@ -678,7 +721,9 @@ class Html5 extends Tech {
    * @param {String} val Value for preload attribute
    * @method setPreload
    */
-  setPreload(val) { this.el_.preload = val; }
+  setPreload(val) {
+    this.el_.preload = val;
+  }
 
   /**
    * Get autoplay attribute
@@ -686,7 +731,9 @@ class Html5 extends Tech {
    * @return {String}
    * @method autoplay
    */
-  autoplay() { return this.el_.autoplay; }
+  autoplay() {
+    return this.el_.autoplay;
+  }
 
   /**
    * Set autoplay attribute
@@ -694,7 +741,9 @@ class Html5 extends Tech {
    * @param {String} val Value for preload attribute
    * @method setAutoplay
    */
-  setAutoplay(val) { this.el_.autoplay = val; }
+  setAutoplay(val) {
+    this.el_.autoplay = val;
+  }
 
   /**
    * Get controls attribute
@@ -702,7 +751,9 @@ class Html5 extends Tech {
    * @return {String}
    * @method controls
    */
-  controls() { return this.el_.controls; }
+  controls() {
+    return this.el_.controls;
+  }
 
   /**
    * Set controls attribute
@@ -710,7 +761,9 @@ class Html5 extends Tech {
    * @param {String} val Value for controls attribute
    * @method setControls
    */
-  setControls(val) { this.el_.controls = !!val; }
+  setControls(val) {
+    this.el_.controls = !!val;
+  }
 
   /**
    * Get loop attribute
@@ -718,7 +771,9 @@ class Html5 extends Tech {
    * @return {String}
    * @method loop
    */
-  loop() { return this.el_.loop; }
+  loop() {
+    return this.el_.loop;
+  }
 
   /**
    * Set loop attribute
@@ -726,7 +781,9 @@ class Html5 extends Tech {
    * @param {String} val Value for loop attribute
    * @method setLoop
    */
-  setLoop(val) { this.el_.loop = val; }
+  setLoop(val) {
+    this.el_.loop = val;
+  }
 
   /**
    * Get error value
@@ -734,7 +791,9 @@ class Html5 extends Tech {
    * @return {String}
    * @method error
    */
-  error() { return this.el_.error; }
+  error() {
+    return this.el_.error;
+  }
 
   /**
    * Get whether or not the player is in the "seeking" state
@@ -742,7 +801,9 @@ class Html5 extends Tech {
    * @return {Boolean}
    * @method seeking
    */
-  seeking() { return this.el_.seeking; }
+  seeking() {
+    return this.el_.seeking;
+  }
 
   /**
    * Get a TimeRanges object that represents the
@@ -752,7 +813,9 @@ class Html5 extends Tech {
    * @return {TimeRangeObject}
    * @method seekable
    */
-  seekable() { return this.el_.seekable; }
+  seekable() {
+    return this.el_.seekable;
+  }
 
   /**
    * Get if video ended
@@ -760,7 +823,9 @@ class Html5 extends Tech {
    * @return {Boolean}
    * @method ended
    */
-  ended() { return this.el_.ended; }
+  ended() {
+    return this.el_.ended;
+  }
 
   /**
    * Get the value of the muted content attribute
@@ -770,7 +835,9 @@ class Html5 extends Tech {
    * @return {Boolean}
    * @method defaultMuted
    */
-  defaultMuted() { return this.el_.defaultMuted; }
+  defaultMuted() {
+    return this.el_.defaultMuted;
+  }
 
   /**
    * Get desired speed at which the media resource is to play
@@ -778,7 +845,9 @@ class Html5 extends Tech {
    * @return {Number}
    * @method playbackRate
    */
-  playbackRate() { return this.el_.playbackRate; }
+  playbackRate() {
+    return this.el_.playbackRate;
+  }
 
   /**
    * Returns a TimeRanges object that represents the ranges of the
@@ -787,7 +856,9 @@ class Html5 extends Tech {
    * timeline that has been reached through normal playback
    * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-played
    */
-  played() { return this.el_.played; }
+  played() {
+    return this.el_.played;
+  }
 
   /**
    * Set desired speed at which the media resource is to play
@@ -795,7 +866,9 @@ class Html5 extends Tech {
    * @param {Number} val Speed at which the media resource is to play
    * @method setPlaybackRate
    */
-  setPlaybackRate(val) { this.el_.playbackRate = val; }
+  setPlaybackRate(val) {
+    this.el_.playbackRate = val;
+  }
 
   /**
    * Get the current state of network activity for the element, from
@@ -808,7 +881,9 @@ class Html5 extends Tech {
    * @return {Number}
    * @method networkState
    */
-  networkState() { return this.el_.networkState; }
+  networkState() {
+    return this.el_.networkState;
+  }
 
   /**
    * Get a value that expresses the current state of the element
@@ -823,7 +898,9 @@ class Html5 extends Tech {
    * @return {Number}
    * @method readyState
    */
-  readyState() { return this.el_.readyState; }
+  readyState() {
+    return this.el_.readyState;
+  }
 
   /**
    * Get width of video
@@ -831,7 +908,9 @@ class Html5 extends Tech {
    * @return {Number}
    * @method videoWidth
    */
-  videoWidth() { return this.el_.videoWidth; }
+  videoWidth() {
+    return this.el_.videoWidth;
+  }
 
   /**
    * Get height of video
@@ -839,7 +918,9 @@ class Html5 extends Tech {
    * @return {Number}
    * @method videoHeight
    */
-  videoHeight() { return this.el_.videoHeight; }
+  videoHeight() {
+    return this.el_.videoHeight;
+  }
 
   /**
    * Get text tracks
@@ -862,7 +943,7 @@ class Html5 extends Tech {
    * @method addTextTrack
    */
   addTextTrack(kind, label, language) {
-    if (!this['featuresNativeTextTracks']) {
+    if (!this.featuresNativeTextTracks) {
       return super.addTextTrack(kind, label, language);
     }
 
@@ -877,8 +958,8 @@ class Html5 extends Tech {
    * @return {HTMLTrackElement}
    * @method addRemoteTextTrack
    */
-  addRemoteTextTrack(options={}) {
-    if (!this['featuresNativeTextTracks']) {
+  addRemoteTextTrack(options = {}) {
+    if (!this.featuresNativeTextTracks) {
       return super.addRemoteTextTrack(options);
     }
 
@@ -919,12 +1000,11 @@ class Html5 extends Tech {
    * @method removeRemoteTextTrack
    */
   removeRemoteTextTrack(track) {
-    if (!this['featuresNativeTextTracks']) {
+    if (!this.featuresNativeTextTracks) {
       return super.removeRemoteTextTrack(track);
     }
 
-    let tracks, i;
-
+    let tracks;
     let trackElement = this.remoteTextTrackEls().getTrackElementByTrack_(track);
 
     // remove HTMLTrackElement and TextTrack from remote list
@@ -933,7 +1013,8 @@ class Html5 extends Tech {
 
     tracks = this.$$('track');
 
-    i = tracks.length;
+    let i = tracks.length;
+
     while (i--) {
       if (track === tracks[i] || track === tracks[i].track) {
         this.el().removeChild(tracks[i]);
@@ -942,7 +1023,6 @@ class Html5 extends Tech {
   }
 
 }
-
 
 /* HTML5 Support Testing ---------------------------------------------------- */
 
@@ -955,6 +1035,7 @@ class Html5 extends Tech {
 */
 Html5.TEST_VID = document.createElement('video');
 let track = document.createElement('track');
+
 track.kind = 'captions';
 track.srclang = 'en';
 track.label = 'English';
@@ -965,10 +1046,10 @@ Html5.TEST_VID.appendChild(track);
  *
  * @return {Boolean}
  */
-Html5.isSupported = function(){
+Html5.isSupported = function() {
   // IE9 with no Media Player is a LIAR! (#984)
   try {
-    Html5.TEST_VID['volume'] = 0.5;
+    Html5.TEST_VID.volume = 0.5;
   } catch (e) {
     return false;
   }
@@ -994,12 +1075,12 @@ Html5.nativeSourceHandler = {};
  * @param  {String} type    The mimetype to check
  * @return {String}         'probably', 'maybe', or '' (empty string)
  */
-Html5.nativeSourceHandler.canPlayType = function(type){
+Html5.nativeSourceHandler.canPlayType = function(type) {
   // IE9 on Windows 7 without MediaPlayer throws an error here
   // https://github.com/videojs/video.js/issues/519
   try {
     return Html5.TEST_VID.canPlayType(type);
-  } catch(e) {
+  } catch (e) {
     return '';
   }
 };
@@ -1011,15 +1092,15 @@ Html5.nativeSourceHandler.canPlayType = function(type){
  * @param  {Object} options The options passed to the tech
  * @return {String}         'probably', 'maybe', or '' (empty string)
  */
-Html5.nativeSourceHandler.canHandleSource = function(source, options){
-  var match, ext;
+Html5.nativeSourceHandler.canHandleSource = function(source, options) {
 
   // If a type was provided we should rely on that
   if (source.type) {
     return Html5.nativeSourceHandler.canPlayType(source.type);
+
+  // If no type, fall back to checking 'video/[EXTENSION]'
   } else if (source.src) {
-    // If no type, fall back to checking 'video/[EXTENSION]'
-    ext = Url.getFileExtension(source.src);
+    let ext = Url.getFileExtension(source.src);
 
     return Html5.nativeSourceHandler.canPlayType(`video/${ext}`);
   }
@@ -1036,7 +1117,7 @@ Html5.nativeSourceHandler.canHandleSource = function(source, options){
  * @param  {Html5}  tech     The instance of the Html5 tech
  * @param  {Object} options  The options to pass to the source
  */
-Html5.nativeSourceHandler.handleSource = function(source, tech, options){
+Html5.nativeSourceHandler.handleSource = function(source, tech, options) {
   tech.setSrc(source.src);
 };
 
@@ -1044,7 +1125,7 @@ Html5.nativeSourceHandler.handleSource = function(source, tech, options){
 * Clean up the source handler when disposing the player or switching sources..
 * (no cleanup is needed when supporting the format natively)
 */
-Html5.nativeSourceHandler.dispose = function(){};
+Html5.nativeSourceHandler.dispose = function() {};
 
 // Register the native source handler
 Html5.registerSourceHandler(Html5.nativeSourceHandler);
@@ -1056,13 +1137,14 @@ Html5.registerSourceHandler(Html5.nativeSourceHandler);
  *
  * @return {Boolean}
  */
-Html5.canControlVolume = function(){
+Html5.canControlVolume = function() {
   // IE will error if Windows Media Player not installed #3315
   try {
-    var volume =  Html5.TEST_VID.volume;
+    let volume = Html5.TEST_VID.volume;
+
     Html5.TEST_VID.volume = (volume / 2) + 0.1;
     return volume !== Html5.TEST_VID.volume;
-  } catch(e) {
+  } catch (e) {
     return false;
   }
 };
@@ -1072,7 +1154,7 @@ Html5.canControlVolume = function(){
  *
  * @return {Boolean}
  */
-Html5.canControlPlaybackRate = function(){
+Html5.canControlPlaybackRate = function() {
   // Playback rate API is implemented in Android Chrome, but doesn't do anything
   // https://github.com/videojs/video.js/issues/3180
   if (browser.IS_ANDROID && browser.IS_CHROME) {
@@ -1080,10 +1162,11 @@ Html5.canControlPlaybackRate = function(){
   }
   // IE will error if Windows Media Player not installed #3315
   try {
-    var playbackRate = Html5.TEST_VID.playbackRate;
+    let playbackRate = Html5.TEST_VID.playbackRate;
+
     Html5.TEST_VID.playbackRate = (playbackRate / 2) + 0.1;
     return playbackRate !== Html5.TEST_VID.playbackRate;
-  } catch(e) {
+  } catch (e) {
     return false;
   }
 };
@@ -1094,7 +1177,7 @@ Html5.canControlPlaybackRate = function(){
  * @return {Boolean}
  */
 Html5.supportsNativeTextTracks = function() {
-  var supportsTextTracks;
+  let supportsTextTracks;
 
   // Figure out native text track support
   // If mode is a number, we cannot change it because it'll disappear from view.
@@ -1103,7 +1186,7 @@ Html5.supportsNativeTextTracks = function() {
   // TODO: Investigate firefox: https://github.com/videojs/video.js/issues/1862
   supportsTextTracks = !!Html5.TEST_VID.textTracks;
   if (supportsTextTracks && Html5.TEST_VID.textTracks.length > 0) {
-    supportsTextTracks = typeof Html5.TEST_VID.textTracks[0]['mode'] !== 'number';
+    supportsTextTracks = typeof Html5.TEST_VID.textTracks[0].mode !== 'number';
   }
   if (supportsTextTracks && browser.IS_FIREFOX) {
     supportsTextTracks = false;
@@ -1122,6 +1205,7 @@ Html5.supportsNativeTextTracks = function() {
  */
 Html5.supportsNativeVideoTracks = function() {
   let supportsVideoTracks = !!Html5.TEST_VID.videoTracks;
+
   return supportsVideoTracks;
 };
 
@@ -1132,9 +1216,9 @@ Html5.supportsNativeVideoTracks = function() {
  */
 Html5.supportsNativeAudioTracks = function() {
   let supportsAudioTracks = !!Html5.TEST_VID.audioTracks;
+
   return supportsAudioTracks;
 };
-
 
 /**
  * An array of events available on the Html5 tech.
@@ -1172,14 +1256,14 @@ Html5.Events = [
  *
  * @type {Boolean}
  */
-Html5.prototype['featuresVolumeControl'] = Html5.canControlVolume();
+Html5.prototype.featuresVolumeControl = Html5.canControlVolume();
 
 /*
  * Set the tech's playbackRate support status
  *
  * @type {Boolean}
  */
-Html5.prototype['featuresPlaybackRate'] = Html5.canControlPlaybackRate();
+Html5.prototype.featuresPlaybackRate = Html5.canControlPlaybackRate();
 
 /*
  * Set the tech's status on moving the video element.
@@ -1187,41 +1271,41 @@ Html5.prototype['featuresPlaybackRate'] = Html5.canControlPlaybackRate();
  *
  * @type {Boolean}
  */
-Html5.prototype['movingMediaElementInDOM'] = !browser.IS_IOS;
+Html5.prototype.movingMediaElementInDOM = !browser.IS_IOS;
 
 /*
  * Set the the tech's fullscreen resize support status.
  * HTML video is able to automatically resize when going to fullscreen.
  * (No longer appears to be used. Can probably be removed.)
  */
-Html5.prototype['featuresFullscreenResize'] = true;
+Html5.prototype.featuresFullscreenResize = true;
 
 /*
  * Set the tech's progress event support status
  * (this disables the manual progress events of the Tech)
  */
-Html5.prototype['featuresProgressEvents'] = true;
+Html5.prototype.featuresProgressEvents = true;
 
 /*
  * Sets the tech's status on native text track support
  *
  * @type {Boolean}
  */
-Html5.prototype['featuresNativeTextTracks'] = Html5.supportsNativeTextTracks();
+Html5.prototype.featuresNativeTextTracks = Html5.supportsNativeTextTracks();
 
 /**
  * Sets the tech's status on native text track support
  *
  * @type {Boolean}
  */
-Html5.prototype['featuresNativeVideoTracks'] = Html5.supportsNativeVideoTracks();
+Html5.prototype.featuresNativeVideoTracks = Html5.supportsNativeVideoTracks();
 
 /**
  * Sets the tech's status on native audio track support
  *
  * @type {Boolean}
  */
-Html5.prototype['featuresNativeAudioTracks'] = Html5.supportsNativeAudioTracks();
+Html5.prototype.featuresNativeAudioTracks = Html5.supportsNativeAudioTracks();
 
 // HTML5 Feature detection and Device Fixes --------------------------------- //
 let canPlayType;
@@ -1249,7 +1333,7 @@ Html5.patchCanPlayType = function() {
       canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
     }
 
-    Html5.TEST_VID.constructor.prototype.canPlayType = function(type){
+    Html5.TEST_VID.constructor.prototype.canPlayType = function(type) {
       if (type && mp4RE.test(type)) {
         return 'maybe';
       }
@@ -1259,7 +1343,8 @@ Html5.patchCanPlayType = function() {
 };
 
 Html5.unpatchCanPlayType = function() {
-  var r = Html5.TEST_VID.constructor.prototype.canPlayType;
+  let r = Html5.TEST_VID.constructor.prototype.canPlayType;
+
   Html5.TEST_VID.constructor.prototype.canPlayType = canPlayType;
   canPlayType = null;
   return r;
@@ -1268,15 +1353,17 @@ Html5.unpatchCanPlayType = function() {
 // by default, patch the video element
 Html5.patchCanPlayType();
 
-Html5.disposeMediaElement = function(el){
-  if (!el) { return; }
+Html5.disposeMediaElement = function(el) {
+  if (!el) {
+    return;
+  }
 
   if (el.parentNode) {
     el.parentNode.removeChild(el);
   }
 
   // remove any child track or source nodes to prevent their loading
-  while(el.hasChildNodes()) {
+  while (el.hasChildNodes()) {
     el.removeChild(el.firstChild);
   }
 
@@ -1294,15 +1381,18 @@ Html5.disposeMediaElement = function(el){
       } catch (e) {
         // not supported
       }
-    })();
+    }());
   }
 };
 
-Html5.resetMediaElement = function(el){
-  if (!el) { return; }
+Html5.resetMediaElement = function(el) {
+  if (!el) {
+    return;
+  }
 
   let sources = el.querySelectorAll('source');
   let i = sources.length;
+
   while (i--) {
     el.removeChild(sources[i]);
   }
@@ -1316,8 +1406,10 @@ Html5.resetMediaElement = function(el){
     (function() {
       try {
         el.load();
-      } catch (e) {}
-    })();
+      } catch (e) {
+        // satisfy linter
+      }
+    }());
   }
 };
 

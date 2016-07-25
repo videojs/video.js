@@ -3,7 +3,6 @@
  *
  * Player Component - Base class for all UI objects
  */
-
 import window from 'global/window';
 import * as Dom from './utils/dom.js';
 import * as Fn from './utils/fn.js';
@@ -13,7 +12,6 @@ import log from './utils/log.js';
 import toTitleCase from './utils/to-title-case.js';
 import assign from 'object.assign';
 import mergeOptions from './utils/merge-options.js';
-
 
 /**
  * Base UI Component class
@@ -32,7 +30,7 @@ import mergeOptions from './utils/merge-options.js';
  * ```
  * Components are also event targets.
  * ```js
- *     button.on('click', function(){
+ *     button.on('click', function() {
  *       console.log('Button Clicked!');
  *     });
  *     button.trigger('customevent');
@@ -340,7 +338,7 @@ class Component {
    * @return {Component} The child component (created by this process if a string was used)
    * @method addChild
    */
-  addChild(child, options={}, index=this.children_.length) {
+  addChild(child, options = {}, index = this.children_.length) {
     let component;
     let componentName;
 
@@ -408,6 +406,7 @@ class Component {
     if (typeof component.el === 'function' && component.el()) {
       let childNodes = this.contentEl().children;
       let refNode = childNodes[index] || null;
+
       this.contentEl().insertBefore(component.el(), refNode);
     }
 
@@ -540,6 +539,7 @@ class Component {
         // If two of the same component are used, different names should be supplied
         // for each
         let newChild = this.addChild(name, opts);
+
         if (newChild) {
           this[name] = newChild;
         }
@@ -563,13 +563,13 @@ class Component {
                 return !workingChildren.some(function(wchild) {
                   if (typeof wchild === 'string') {
                     return child === wchild;
-                  } else {
-                    return child === wchild.name;
                   }
+                  return child === wchild.name;
                 });
               }))
       .map((child) => {
-        let name, opts;
+        let name;
+        let opts;
 
         if (typeof child === 'string') {
           name = child;
@@ -587,6 +587,7 @@ class Component {
         // See https://github.com/videojs/video.js/issues/2772
         let c = Component.getComponent(child.opts.componentClass ||
                                        toTitleCase(child.name));
+
         return c && !Tech.isTech(c);
       })
       .forEach(handleAdd);
@@ -608,7 +609,7 @@ class Component {
   /**
    * Add an event listener to this component's element
    * ```js
-   *     var myFunc = function(){
+   *     var myFunc = function() {
    *       var myComponent = this;
    *       // Do something when the event is fired
    *     };
@@ -797,7 +798,7 @@ class Component {
    * @return {Component}
    * @method ready
    */
-  ready(fn, sync=false) {
+  ready(fn, sync = false) {
     if (fn) {
       if (this.isReady_) {
         if (sync) {
@@ -824,14 +825,14 @@ class Component {
     this.isReady_ = true;
 
     // Ensure ready is triggerd asynchronously
-    this.setTimeout(function(){
+    this.setTimeout(function() {
       let readyQueue = this.readyQueue_;
 
       // Reset Ready Queue
       this.readyQueue_ = [];
 
       if (readyQueue && readyQueue.length > 0) {
-        readyQueue.forEach(function(fn){
+        readyQueue.forEach(function(fn) {
           fn.call(this);
         }, this);
       }
@@ -1106,11 +1107,13 @@ class Component {
 
     if (typeof window.getComputedStyle === 'function') {
       const computedStyle = window.getComputedStyle(this.el_);
+
       computedWidthOrHeight = computedStyle.getPropertyValue(widthOrHeight) || computedStyle[widthOrHeight];
     } else if (this.el_.currentStyle) {
       // ie 8 doesn't support computed style, shim it
       // return clientWidth or clientHeight instead for better accuracy
       const rule = `offset${toTitleCase(widthOrHeight)}`;
+
       computedWidthOrHeight = this.el_[rule];
     }
 
@@ -1194,7 +1197,7 @@ class Component {
         // So, if we moved only a small distance, this could still be a tap
         const xdiff = event.touches[0].pageX - firstTouch.pageX;
         const ydiff = event.touches[0].pageY - firstTouch.pageY;
-        const touchDistance = Math.sqrt(xdiff  * xdiff + ydiff  * ydiff);
+        const touchDistance = Math.sqrt(xdiff * xdiff + ydiff * ydiff);
 
         if (touchDistance > tapMovementThreshold) {
           couldBeTap = false;
