@@ -3,10 +3,7 @@
  */
 import * as Dom from './utils/dom';
 import * as Fn from './utils/fn';
-import log from './utils/log';
-
 import Component from './component';
-import CloseButton from './close-button';
 
 const MODAL_CLASS_NAME = 'vjs-modal-dialog';
 const ESC = 27;
@@ -92,7 +89,7 @@ class ModalDialog extends Component {
       'aria-describedby': `${this.id()}_description`,
       'aria-hidden': 'true',
       'aria-label': this.label(),
-      role: 'dialog'
+      'role': 'dialog'
     });
   }
 
@@ -254,6 +251,7 @@ class ModalDialog extends Component {
         // The close button should be a child of the modal - not its
         // content element, so temporarily change the content element.
         let temp = this.contentEl_;
+
         this.contentEl_ = this.el_;
         close = this.addChild('closeButton', {controlText: 'Close Modal Dialog'});
         this.contentEl_ = temp;

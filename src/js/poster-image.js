@@ -17,7 +17,7 @@ import * as browser from './utils/browser.js';
  */
 class PosterImage extends ClickableComponent {
 
-  constructor(player, options){
+  constructor(player, options) {
     super(player, options);
 
     this.update();
@@ -90,6 +90,7 @@ class PosterImage extends ClickableComponent {
       this.fallbackImg_.src = url;
     } else {
       let backgroundImage = '';
+
       // Any falsey values should stay as an empty string, otherwise
       // this will throw an extra error
       if (url) {
