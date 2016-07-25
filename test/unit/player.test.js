@@ -1252,3 +1252,15 @@ QUnit.test('When VIDEOJS_NO_DYNAMIC_STYLE is set, apply sizing directly to the t
   assert.equal(player.tech_.el().height, 300, 'the height is equal 300');
   player.dispose();
 });
+
+test('should allow to use custom player class', function(){
+  class CustomPlayer extends Player {}
+  videojs.registerComponent('Player', CustomPlayer);
+
+  let tag = TestHelpers.makeTag();
+  let player = videojs(tag);
+
+  equal(player instanceof CustomPlayer, true, 'player is custom');
+
+  player.dispose();
+});
