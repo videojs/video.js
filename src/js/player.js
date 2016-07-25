@@ -22,10 +22,14 @@ import safeParseTuple from 'safe-json-parse/tuple';
 import assign from 'object.assign';
 import mergeOptions from './utils/merge-options.js';
 import textTrackConverter from './tracks/text-track-list-converter.js';
+import ModalDialog from './modal-dialog';
+import Tech from './tech/tech.js';
 import AudioTrackList from './tracks/audio-track-list.js';
 import VideoTrackList from './tracks/video-track-list.js';
 
-// Include required child components (importing also registers them)
+// The following imports are used only to ensure that the corresponding modules
+// are always included in the video.js package. Importing the modules will
+// execute them and they will register themselves with video.js.
 import './tech/loader.js';
 import './poster-image.js';
 import './tracks/text-track-display.js';
@@ -34,10 +38,8 @@ import './big-play-button.js';
 import './control-bar/control-bar.js';
 import './error-display.js';
 import './tracks/text-track-settings.js';
-import ModalDialog from './modal-dialog';
 
-// Require html5 tech, at least for disposing the original video tag
-import Tech from './tech/tech.js';
+// Import Html5 tech, at least for disposing the original video tag.
 import './tech/html5.js';
 
 /**
