@@ -537,9 +537,9 @@ class Player extends Component {
 
     // Ensure the CSS class is valid by starting with an alpha character
     if ((/^[^a-zA-Z]/).test(this.id())) {
-      idClass = `dimensions-${this.id()}`;
+      idClass = 'dimensions-' + this.id();
     } else {
-      idClass = `${this.id()}-dimensions`;
+      idClass = this.id() + '-dimensions';
     }
 
     // Ensure the right class is still on the player for the style element
@@ -2941,50 +2941,49 @@ Player.prototype.options_ = {
   notSupportedMessage: 'No compatible source was found for this media.'
 };
 
-// The following pointless assignment expressions are here only for
-// purposes of documentation tooling compatibility.
+// The following no-op expressions are here only for purposes of documentation.
 
 /**
  * Fired when the user agent begins looking for media data
  *
  * @event loadstart
  */
-Player.prototype.handleTechLoadStart_ = Player.prototype.handleTechLoadStart_;
+Player.prototype.handleTechLoadStart_; // eslint-disable-line
 
 /**
  * Fired when the player has initial duration and dimension information
  *
  * @event loadedmetadata
  */
-Player.prototype.handleLoadedMetaData_ = Player.prototype.handleLoadedMetaData_;
+Player.prototype.handleLoadedMetaData_; // eslint-disable-line
 
 /**
  * Fired when the player receives text data
  *
  * @event textdata
  */
-Player.prototype.handleTextData_ = Player.prototype.handleTextData_;
+Player.prototype.handleTextData_; // eslint-disable-line
 
 /**
  * Fired when the player has downloaded data at the current playback position
  *
  * @event loadeddata
  */
-Player.prototype.handleLoadedData_ = Player.prototype.handleLoadedData_;
+Player.prototype.handleLoadedData_; // eslint-disable-line
 
 /**
  * Fired when the user is active, e.g. moves the mouse over the player
  *
  * @event useractive
  */
-Player.prototype.handleUserActive_ = Player.prototype.handleUserActive_;
+Player.prototype.handleUserActive_; // eslint-disable-line
 
 /**
  * Fired when the user is inactive, e.g. a short delay after the last mouse move or control interaction
  *
  * @event userinactive
  */
-Player.prototype.handleUserInactive_ = Player.prototype.handleUserInactive_;
+Player.prototype.handleUserInactive_; // eslint-disable-line
 
 /**
  * Fired when the current playback position has changed *
@@ -2993,21 +2992,21 @@ Player.prototype.handleUserInactive_ = Player.prototype.handleUserInactive_;
  *
  * @event timeupdate
  */
-Player.prototype.handleTimeUpdate_ = Player.prototype.handleTimeUpdate_;
+Player.prototype.handleTimeUpdate_; // eslint-disable-line
 
 /**
  * Fired when video playback ends
  *
  * @event ended
  */
-Player.prototype.handleTechEnded_ = Player.prototype.handleTechEnded_;
+Player.prototype.handleTechEnded_; // eslint-disable-line
 
 /**
  * Fired when the volume changes
  *
  * @event volumechange
  */
-Player.prototype.handleVolumeChange_ = Player.prototype.handleVolumeChange_;
+Player.prototype.handleVolumeChange_; // eslint-disable-line
 
 /**
  * Fired when an error occurs
