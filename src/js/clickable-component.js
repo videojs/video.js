@@ -126,7 +126,7 @@ class ClickableComponent extends Component {
    * @method addChild
    */
   addChild(child, options = {}) {
-    // TO_DO: Fix adding an actionable child to a ClickableComponent; currently
+    // TODO: Fix adding an actionable child to a ClickableComponent; currently
     // it will cause issues with assistive technology (e.g. screen readers)
     // which support ARIA, since an element with role="button" cannot have
     // actionable child elements.

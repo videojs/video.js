@@ -222,7 +222,7 @@ class Player extends Component {
       this.addClass('vjs-no-flex');
     }
 
-    // TO_DO: Make this smarter. Toggle user state between touching/mousing
+    // TODO: Make this smarter. Toggle user state between touching/mousing
     // using events, since devices can have both touch and mouse events.
     // if (browser.TOUCH_ENABLED) {
     //   this.addClass('vjs-touch-enabled');
@@ -828,7 +828,7 @@ class Player extends Component {
    * @method handleTechLoadStart_
    */
   handleTechLoadStart_() {
-    // TO_DO: Update to use `emptied` event instead. See #1277.
+    // TODO: Update to use `emptied` event instead. See #1277.
 
     this.removeClass('vjs-ended');
 

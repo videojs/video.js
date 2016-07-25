@@ -1088,7 +1088,7 @@ class Component {
 
     // No px so using % or no style was set, so falling back to offsetWidth/height
     // If component has display:none, offset will return 0
-    // TO_DO: handle display:none and no dimension style using px
+    // TODO: handle display:none and no dimension style using px
     return parseInt(this.el_['offset' + toTitleCase(widthOrHeight)], 10);
   }
 
@@ -1209,7 +1209,7 @@ class Component {
       couldBeTap = false;
     };
 
-    // TO_DO: Listen to the original target. http://youtu.be/DujfpXOKUp8?t=13m8s
+    // TODO: Listen to the original target. http://youtu.be/DujfpXOKUp8?t=13m8s
     this.on('touchleave', noTap);
     this.on('touchcancel', noTap);
 
