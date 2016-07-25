@@ -18,7 +18,6 @@ let log;
  *         but this is exposed as a parameter to facilitate testing.
  */
 export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 11) => {
-  const console = window.console;
 
   // If there's no console then don't try to output messages, but they will
   // still be stored in `log.history`.
@@ -26,7 +25,7 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
   // Was setting these once outside of this function, but containing them
   // in the function makes it easier to test cases where console doesn't exist
   // when the module is executed.
-  const fn = console && console[type] || function() {}; // eslint-disable-line
+  const fn = window.console && window.console[type] || function() {};
 
   if (type !== 'log') {
 
