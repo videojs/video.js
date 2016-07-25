@@ -8,7 +8,7 @@
  * @private
  * @method toTitleCase
  */
-function toTitleCase(string){
+function toTitleCase(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 

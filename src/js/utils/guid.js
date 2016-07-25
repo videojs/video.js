@@ -10,7 +10,7 @@ let _guid = 1;
 /**
  * Get the next unique ID
  *
- * @return {String} 
+ * @return {String}
  * @function newGUID
  */
 export function newGUID() {
