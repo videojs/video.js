@@ -15,7 +15,7 @@ import formatTime from '../../utils/format-time.js';
  */
 class DurationDisplay extends Component {
 
-  constructor(player, options){
+  constructor(player, options) {
     super(player, options);
 
     this.on(player, 'durationchange', this.updateContent);
@@ -28,7 +28,7 @@ class DurationDisplay extends Component {
    * @method createEl
    */
   createEl() {
-    let el = super.createEl('div', {
+    const el = super.createEl('div', {
       className: 'vjs-duration vjs-time-control vjs-control'
     });
 
@@ -51,12 +51,15 @@ class DurationDisplay extends Component {
    * @method updateContent
    */
   updateContent() {
-    let duration = this.player_.duration();
+    const duration = this.player_.duration();
+
     if (duration && this.duration_ !== duration) {
       this.duration_ = duration;
-      let localizedText = this.localize('Duration Time');
-      let formattedTime = formatTime(duration);
-      this.contentEl_.innerHTML = `<span class="vjs-control-text">${localizedText}</span> ${formattedTime}`; // label the duration time for screen reader users
+      const localizedText = this.localize('Duration Time');
+      const formattedTime = formatTime(duration);
+
+      // label the duration time for screen reader users
+      this.contentEl_.innerHTML = `<span class="vjs-control-text">${localizedText}</span> ${formattedTime}`;
     }
   }
 

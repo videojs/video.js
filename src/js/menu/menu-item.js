@@ -18,9 +18,9 @@ class MenuItem extends ClickableComponent {
   constructor(player, options) {
     super(player, options);
 
-    this.selectable = options['selectable'];
+    this.selectable = options.selectable;
 
-    this.selected(options['selected']);
+    this.selected(options.selected);
 
     if (this.selectable) {
       // TODO: May need to be either menuitemcheckbox or menuitemradio,
@@ -42,7 +42,7 @@ class MenuItem extends ClickableComponent {
   createEl(type, props, attrs) {
     return super.createEl('li', assign({
       className: 'vjs-menu-item',
-      innerHTML: this.localize(this.options_['label']),
+      innerHTML: this.localize(this.options_.label),
       tabIndex: -1
     }, props), attrs);
   }
@@ -66,13 +66,13 @@ class MenuItem extends ClickableComponent {
     if (this.selectable) {
       if (selected) {
         this.addClass('vjs-selected');
-        this.el_.setAttribute('aria-checked','true');
+        this.el_.setAttribute('aria-checked', 'true');
         // aria-checked isn't fully supported by browsers/screen readers,
         // so indicate selected state to screen reader in the control text.
         this.controlText(', selected');
       } else {
         this.removeClass('vjs-selected');
-        this.el_.setAttribute('aria-checked','false');
+        this.el_.setAttribute('aria-checked', 'false');
         // Indicate un-selected state to screen reader
         // Note that a space clears out the selected state text
         this.controlText(' ');

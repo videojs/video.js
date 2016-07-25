@@ -22,7 +22,7 @@ class Popup extends Component {
    */
   addItem(component) {
     this.addChild(component);
-    component.on('click', Fn.bind(this, function(){
+    component.on('click', Fn.bind(this, function() {
       this.unlockShowing();
     }));
   }
@@ -34,19 +34,22 @@ class Popup extends Component {
    * @method createEl
    */
   createEl() {
-    let contentElType = this.options_.contentElType || 'ul';
+    const contentElType = this.options_.contentElType || 'ul';
+
     this.contentEl_ = Dom.createEl(contentElType, {
       className: 'vjs-menu-content'
     });
-    var el = super.createEl('div', {
+
+    const el = super.createEl('div', {
       append: this.contentEl_,
       className: 'vjs-menu'
     });
+
     el.appendChild(this.contentEl_);
 
     // Prevent clicks from bubbling up. Needed for Popup Buttons,
     // where a click on the parent is significant
-    Events.on(el, 'click', function(event){
+    Events.on(el, 'click', function(event) {
       event.preventDefault();
       event.stopImmediatePropagation();
     });
