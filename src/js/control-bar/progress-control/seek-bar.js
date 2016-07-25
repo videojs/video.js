@@ -4,12 +4,12 @@
 import window from 'global/window';
 import Slider from '../../slider/slider.js';
 import Component from '../../component.js';
-import LoadProgressBar from './load-progress-bar.js';
-import PlayProgressBar from './play-progress-bar.js';
-import TooltipProgressBar from './tooltip-progress-bar.js';
 import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
-import assign from 'object.assign';
+
+import './load-progress-bar.js';
+import './play-progress-bar.js';
+import './tooltip-progress-bar.js';
 
 /**
  * Seek Bar and holder for the progress bars
@@ -21,7 +21,7 @@ import assign from 'object.assign';
  */
 class SeekBar extends Slider {
 
-  constructor(player, options){
+  constructor(player, options) {
     super(player, options);
     this.on(player, 'timeupdate', this.updateProgress);
     this.on(player, 'ended', this.updateProgress);
@@ -65,9 +65,10 @@ class SeekBar extends Slider {
       this.updateAriaAttributes(this.tooltipProgressBar.el_);
       this.tooltipProgressBar.el_.style.width = this.bar.el_.style.width;
 
-      let playerWidth = parseFloat(window.getComputedStyle(this.player().el()).width);
-      let tooltipWidth = parseFloat(window.getComputedStyle(this.tooltipProgressBar.tooltip).width);
-      let tooltipStyle = this.tooltipProgressBar.el().style;
+      const playerWidth = parseFloat(window.getComputedStyle(this.player().el()).width);
+      const tooltipWidth = parseFloat(window.getComputedStyle(this.tooltipProgressBar.tooltip).width);
+      const tooltipStyle = this.tooltipProgressBar.el().style;
+
       tooltipStyle.maxWidth = Math.floor(playerWidth - (tooltipWidth / 2)) + 'px';
       tooltipStyle.minWidth = Math.ceil(tooltipWidth / 2) + 'px';
       tooltipStyle.right = `-${tooltipWidth / 2}px`;
@@ -76,9 +77,12 @@ class SeekBar extends Slider {
 
   updateAriaAttributes(el) {
     // Allows for smooth scrubbing, when player can't keep up.
-    let time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
-    el.setAttribute('aria-valuenow', (this.getPercent() * 100).toFixed(2)); // machine readable value of progress bar (percentage complete)
-    el.setAttribute('aria-valuetext', formatTime(time, this.player_.duration())); // human readable value of progress bar (time complete)
+    const time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
+
+    // machine readable value of progress bar (percentage complete)
+    el.setAttribute('aria-valuenow', (this.getPercent() * 100).toFixed(2));
+    // human readable value of progress bar (time complete)
+    el.setAttribute('aria-valuetext', formatTime(time, this.player_.duration()));
   }
 
   /**
@@ -88,7 +92,8 @@ class SeekBar extends Slider {
    * @method getPercent
    */
   getPercent() {
-    let percent = this.player_.currentTime() / this.player_.duration();
+    const percent = this.player_.currentTime() / this.player_.duration();
+
     return percent >= 1 ? 1 : percent;
   }
 
@@ -115,7 +120,9 @@ class SeekBar extends Slider {
     let newTime = this.calculateDistance(event) * this.player_.duration();
 
     // Don't let video end while scrubbing.
-    if (newTime === this.player_.duration()) { newTime = newTime - 0.1; }
+    if (newTime === this.player_.duration()) {
+      newTime = newTime - 0.1;
+    }
 
     // Set new time (tell player to seek to new time)
     this.player_.currentTime(newTime);
@@ -141,7 +148,8 @@ class SeekBar extends Slider {
    * @method stepForward
    */
   stepForward() {
-    this.player_.currentTime(this.player_.currentTime() + 5); // more quickly fast forward for keyboard-only users
+    // more quickly fast forward for keyboard-only users
+    this.player_.currentTime(this.player_.currentTime() + 5);
   }
 
   /**
@@ -150,7 +158,8 @@ class SeekBar extends Slider {
    * @method stepBack
    */
   stepBack() {
-    this.player_.currentTime(this.player_.currentTime() - 5); // more quickly rewind for keyboard-only users
+    // more quickly rewind for keyboard-only users
+    this.player_.currentTime(this.player_.currentTime() - 5);
   }
 
 }
@@ -161,7 +170,7 @@ SeekBar.prototype.options_ = {
     'mouseTimeDisplay',
     'playProgressBar'
   ],
-  'barName': 'playProgressBar'
+  barName: 'playProgressBar'
 };
 
 SeekBar.prototype.playerEvent = 'timeupdate';

@@ -16,14 +16,14 @@ import * as Fn from '../../utils/fn.js';
  */
 class DescriptionsButton extends TextTrackButton {
 
-  constructor(player, options, ready){
+  constructor(player, options, ready) {
     super(player, options, ready);
     this.el_.setAttribute('aria-label', 'Descriptions Menu');
 
-    let tracks = player.textTracks();
+    const tracks = player.textTracks();
 
     if (tracks) {
-      let changeHandler = Fn.bind(this, this.handleTracksChange);
+      const changeHandler = Fn.bind(this, this.handleTracksChange);
 
       tracks.addEventListener('change', changeHandler);
       this.on('dispose', function() {
@@ -37,14 +37,15 @@ class DescriptionsButton extends TextTrackButton {
    *
    * @method handleTracksChange
    */
-  handleTracksChange(event){
-    let tracks = this.player().textTracks();
+  handleTracksChange(event) {
+    const tracks = this.player().textTracks();
     let disabled = false;
 
     // Check whether a track of a different kind is showing
     for (let i = 0, l = tracks.length; i < l; i++) {
-      let track = tracks[i];
-      if (track['kind'] !== this.kind_ && track['mode'] === 'showing') {
+      const track = tracks[i];
+
+      if (track.kind !== this.kind_ && track.mode === 'showing') {
         disabled = true;
         break;
       }

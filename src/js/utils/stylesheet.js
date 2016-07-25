@@ -2,6 +2,7 @@ import document from 'global/document';
 
 export let createStyleElement = function(className) {
   let style = document.createElement('style');
+
   style.className = className;
 
   return style;

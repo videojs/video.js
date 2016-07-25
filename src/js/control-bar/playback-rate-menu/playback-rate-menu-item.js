@@ -14,13 +14,13 @@ import Component from '../../component.js';
  */
 class PlaybackRateMenuItem extends MenuItem {
 
-  constructor(player, options){
-    let label = options['rate'];
-    let rate = parseFloat(label, 10);
+  constructor(player, options) {
+    const label = options.rate;
+    const rate = parseFloat(label, 10);
 
     // Modify options for parent MenuItem class's init.
-    options['label'] = label;
-    options['selected'] = rate === 1;
+    options.label = label;
+    options.selected = rate === 1;
     super(player, options);
 
     this.label = label;

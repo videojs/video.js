@@ -4,6 +4,8 @@
 import window from 'global/window';
 import {IE_VERSION} from './browser';
 
+let log;
+
 /**
  * Log messages to the console and history based on the type of message
  *
@@ -16,7 +18,6 @@ import {IE_VERSION} from './browser';
  *         but this is exposed as a parameter to facilitate testing.
  */
 export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 11) => {
-  const console = window.console;
 
   // If there's no console then don't try to output messages, but they will
   // still be stored in `log.history`.
@@ -24,7 +25,7 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
   // Was setting these once outside of this function, but containing them
   // in the function makes it easier to test cases where console doesn't exist
   // when the module is executed.
-  const fn = console && console[type] || function(){};
+  const fn = window.console && window.console[type] || function() {};
 
   if (type !== 'log') {
 
@@ -45,7 +46,9 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
       if (a && typeof a === 'object' || Array.isArray(a)) {
         try {
           return JSON.stringify(a);
-        } catch (x) {}
+        } catch (x) {
+          return String(a);
+        }
       }
 
       // Cast to string before joining, so we get null and undefined explicitly
@@ -68,9 +71,9 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
  *
  * @function log
  */
-function log(...args) {
+log = function(...args) {
   logByType('log', args);
-}
+};
 
 /**
  * Keep a history of log messages
@@ -92,6 +95,5 @@ log.error = (...args) => logByType('error', args);
  * @method warn
  */
 log.warn = (...args) => logByType('warn', args);
-
 
 export default log;
