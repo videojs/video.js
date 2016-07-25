@@ -78,9 +78,4 @@ const TextTrackMode = {
   showing: 'showing'
 };
 
-/* jshint ignore:start */
-// we ignore jshint here because it does not see
-// AudioTrackKind as defined here
 export default { VideoTrackKind, AudioTrackKind, TextTrackKind, TextTrackMode };
-/* jshint ignore:end */
-
