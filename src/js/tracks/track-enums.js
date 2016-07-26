@@ -21,7 +21,7 @@ const VideoTrackKind = {
   main: 'main',
   sign: 'sign',
   subtitles: 'subtitles',
-  commentary: 'commentary',
+  commentary: 'commentary'
 };
 
 /**
@@ -38,12 +38,12 @@ const VideoTrackKind = {
  * };
  */
 const AudioTrackKind = {
-  alternative: 'alternative',
-  descriptions: 'descriptions',
-  main: 'main',
+  'alternative': 'alternative',
+  'descriptions': 'descriptions',
+  'main': 'main',
   'main-desc': 'main-desc',
-  translation: 'translation',
-  commentary: 'commentary',
+  'translation': 'translation',
+  'commentary': 'commentary'
 };
 
 /**
@@ -64,8 +64,6 @@ const TextTrackKind = {
   chapters: 'chapters',
   metadata: 'metadata'
 };
-
-
 
 /**
  * https://html.spec.whatwg.org/multipage/embedded-content.html#texttrackmode

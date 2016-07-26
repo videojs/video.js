@@ -19,7 +19,8 @@ class Track extends EventTarget {
   constructor(options = {}) {
     super();
 
-    let track = this;
+    let track = this; // eslint-disable-line
+
     if (browser.IS_IE8) {
       track = document.createElement('custom');
       for (let prop in Track.prototype) {
@@ -38,7 +39,9 @@ class Track extends EventTarget {
 
     for (let key in trackProps) {
       Object.defineProperty(track, key, {
-        get() { return trackProps[key]; },
+        get() {
+          return trackProps[key];
+        },
         set() {}
       });
     }
