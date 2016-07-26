@@ -71,7 +71,7 @@ class ChaptersButton extends TextTrackButton {
   createMenu() {
     const tracks = this.player_.textTracks() || [];
     let chaptersTrack;
-    const items = this.items || [];
+    let items = this.items || [];
 
     for (let i = tracks.length - 1; i >= 0; i--) {
 
