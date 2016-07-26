@@ -1005,7 +1005,6 @@ class Html5 extends Tech {
     }
 
     let tracks;
-    let i;
     let trackElement = this.remoteTextTrackEls().getTrackElementByTrack_(track);
 
     // remove HTMLTrackElement and TextTrack from remote list
@@ -1014,7 +1013,8 @@ class Html5 extends Tech {
 
     tracks = this.$$('track');
 
-    i = tracks.length;
+    let i = tracks.length;
+
     while (i--) {
       if (track === tracks[i] || track === tracks[i].track) {
         this.el().removeChild(tracks[i]);
@@ -1093,14 +1093,14 @@ Html5.nativeSourceHandler.canPlayType = function(type) {
  * @return {String}         'probably', 'maybe', or '' (empty string)
  */
 Html5.nativeSourceHandler.canHandleSource = function(source, options) {
-  let ext;
 
   // If a type was provided we should rely on that
   if (source.type) {
     return Html5.nativeSourceHandler.canPlayType(source.type);
+
+  // If no type, fall back to checking 'video/[EXTENSION]'
   } else if (source.src) {
-    // If no type, fall back to checking 'video/[EXTENSION]'
-    ext = Url.getFileExtension(source.src);
+    let ext = Url.getFileExtension(source.src);
 
     return Html5.nativeSourceHandler.canPlayType(`video/${ext}`);
   }
