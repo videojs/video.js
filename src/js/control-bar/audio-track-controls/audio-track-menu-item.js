@@ -15,8 +15,8 @@ import * as Fn from '../../utils/fn.js';
  */
 class AudioTrackMenuItem extends MenuItem {
   constructor(player, options) {
-    let track = options.track;
-    let tracks = player.audioTracks();
+    const track = options.track;
+    const tracks = player.audioTracks();
 
     // Modify options for parent MenuItem class's init.
     options.label = track.label || track.language || 'Unknown';
@@ -27,7 +27,7 @@ class AudioTrackMenuItem extends MenuItem {
     this.track = track;
 
     if (tracks) {
-      let changeHandler = Fn.bind(this, this.handleTracksChange);
+      const changeHandler = Fn.bind(this, this.handleTracksChange);
 
       tracks.addEventListener('change', changeHandler);
       this.on('dispose', () => {
@@ -42,14 +42,16 @@ class AudioTrackMenuItem extends MenuItem {
    * @method handleClick
    */
   handleClick(event) {
-    let tracks = this.player_.audioTracks();
+    const tracks = this.player_.audioTracks();
 
     super.handleClick(event);
 
-    if (!tracks) return;
+    if (!tracks) {
+      return;
+    }
 
     for (let i = 0; i < tracks.length; i++) {
-      let track = tracks[i];
+      const track = tracks[i];
 
       if (track === this.track) {
         track.enabled = true;
