@@ -21,7 +21,7 @@ const VideoTrackKind = {
   main: 'main',
   sign: 'sign',
   subtitles: 'subtitles',
-  commentary: 'commentary',
+  commentary: 'commentary'
 };
 
 /**
@@ -38,12 +38,12 @@ const VideoTrackKind = {
  * };
  */
 const AudioTrackKind = {
-  alternative: 'alternative',
-  descriptions: 'descriptions',
-  main: 'main',
+  'alternative': 'alternative',
+  'descriptions': 'descriptions',
+  'main': 'main',
   'main-desc': 'main-desc',
-  translation: 'translation',
-  commentary: 'commentary',
+  'translation': 'translation',
+  'commentary': 'commentary'
 };
 
 /**
@@ -65,8 +65,6 @@ const TextTrackKind = {
   metadata: 'metadata'
 };
 
-
-
 /**
  * https://html.spec.whatwg.org/multipage/embedded-content.html#texttrackmode
  *
@@ -78,9 +76,4 @@ const TextTrackMode = {
   showing: 'showing'
 };
 
-/* jshint ignore:start */
-// we ignore jshint here because it does not see
-// AudioTrackKind as defined here
 export default { VideoTrackKind, AudioTrackKind, TextTrackKind, TextTrackMode };
-/* jshint ignore:end */
-

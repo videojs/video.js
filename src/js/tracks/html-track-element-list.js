@@ -7,7 +7,7 @@ import document from 'global/document';
 
 class HtmlTrackElementList {
   constructor(trackElements = []) {
-    let list = this;
+    let list = this; // eslint-disable-line
 
     if (browser.IS_IE8) {
       list = document.createElement('custom');

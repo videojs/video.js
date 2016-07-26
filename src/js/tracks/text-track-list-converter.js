@@ -13,13 +13,15 @@
  * @private
  */
 let trackToJson_ = function(track) {
-  let ret = ['kind', 'label', 'language', 'id',
-             'inBandMetadataTrackDispatchType',
-             'mode', 'src'].reduce((acc, prop, i) => {
+  let ret = [
+    'kind', 'label', 'language', 'id',
+    'inBandMetadataTrackDispatchType', 'mode', 'src'
+  ].reduce((acc, prop, i) => {
+
     if (track[prop]) {
       acc[prop] = track[prop];
     }
-    
+
     return acc;
   }, {
     cues: track.cues && Array.prototype.map.call(track.cues, function(cue) {
@@ -50,6 +52,7 @@ let textTracksToJson = function(tech) {
   let trackObjs = Array.prototype.map.call(trackEls, (t) => t.track);
   let tracks = Array.prototype.map.call(trackEls, function(trackEl) {
     let json = trackToJson_(trackEl.track);
+
     if (trackEl.src) {
       json.src = trackEl.src;
     }
@@ -72,6 +75,7 @@ let textTracksToJson = function(tech) {
 let jsonToTextTracks = function(json, tech) {
   json.forEach(function(track) {
     let addedTrack = tech.addRemoteTextTrack(track).track;
+
     if (!track.src && track.cues) {
       track.cues.forEach((cue) => addedTrack.addCue(cue));
     }
