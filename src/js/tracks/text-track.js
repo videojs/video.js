@@ -160,6 +160,9 @@ class TextTrack extends Track {
     let activeCues = new TextTrackCueList(tt.activeCues_);
     let changed = false;
     let timeupdateHandler = Fn.bind(tt, function() {
+      // This could be misleading. There is a getter on this property and if
+      // this line is removed things will break!
+      this.activeCues;
       if (changed) {
         this.trigger('cuechange');
         changed = false;
