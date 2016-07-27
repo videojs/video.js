@@ -24,8 +24,9 @@ import window from 'global/window';
  */
 class ChaptersButton extends TextTrackButton {
 
-  constructor(player, options, ready){
+  constructor(player, options, ready) {
     super(player, options, ready);
+    this.updateHandler_ = Fn.bind(this, this.update);
     this.el_.setAttribute('aria-label','Chapters Menu');
   }
 
@@ -39,107 +40,90 @@ class ChaptersButton extends TextTrackButton {
     return `vjs-chapters-button ${super.buildCSSClass()}`;
   }
 
+  update(event) {
+    if (this.track_ === undefined || (event && (event.type === 'addtrack' || event.type === 'removetrack'))) {
+      this.setTrack(this.findChaptersTrack());
+    }
+    super.update();
+  }
+  
+  setTrack(track) {
+    if (this.track_ === track) return;
+
+    if (this.track_) {
+      let remoteTextTrackEl = this.player_.remoteTextTrackEls().getTrackElementByTrack_(this.track_);
+      if (remoteTextTrackEl) {
+        remoteTextTrackEl.removeEventListener('load', this.updateHandler_);
+      }
+      this.track_ = null;
+    }
+
+    this.track_ = track;
+
+    if (this.track_) {
+      this.track_['mode'] = 'hidden';
+
+      let remoteTextTrackEl = this.player_.remoteTextTrackEls().getTrackElementByTrack_(this.track_);
+      if (remoteTextTrackEl) {
+        remoteTextTrackEl.addEventListener('load', this.updateHandler_);
+      }
+    }
+  }
+
+  findChaptersTrack() {
+    let tracks = this.player_.textTracks() || [];
+    
+    for (let i = tracks.length - 1; i >= 0; i--) {
+      // We will always choose the last track as our chaptersTrack
+      let track = tracks[i];
+
+      if (track['kind'] === this.kind_) {
+        return track;
+      }
+    }
+  }
+
+  getMenuCaption() {
+    if (this.track_ && this.track_.label)
+      return this.track_.label;
+    return this.localize(toTitleCase(this.kind_));
+  }
+
   /**
-   * Create a menu item for each text track
+   * Create menu from chapter track
+   *
+   * @return {Menu} Menu of chapter buttons
+   * @method createMenu
+   */
+  createMenu() {
+    this.options_.title = this.getMenuCaption();
+    return super.createMenu();
+  }
+
+  /**
+   * Create a menu item for each chapter cue
    *
    * @return {Array} Array of menu items
    * @method createItems
    */
   createItems() {
     let items = [];
+    if (!this.track_) return items;
 
-    let tracks = this.player_.textTracks();
+    let cues = this.track_['cues'], cue;
 
-    if (!tracks) {
-      return items;
-    }
+    for (let i = 0, l = cues.length; i < l; i++) {
+      cue = cues[i];
 
-    for (let i = 0; i < tracks.length; i++) {
-      let track = tracks[i];
-      if (track['kind'] === this.kind_) {
-        items.push(new TextTrackMenuItem(this.player_, {
-          'track': track
-        }));
-      }
+      let mi = new ChaptersTrackMenuItem(this.player_, {
+        'track': this.track_,
+        'cue': cue
+      });
+
+      items.push(mi);
     }
 
     return items;
-  }
-
-  /**
-   * Create menu from chapter buttons
-   *
-   * @return {Menu} Menu of chapter buttons
-   * @method createMenu
-   */
-  createMenu() {
-    let tracks = this.player_.textTracks() || [];
-    let chaptersTrack;
-    let items = this.items || [];
-
-    for (let i = tracks.length - 1; i >= 0; i--) {
-
-      // We will always choose the last track as our chaptersTrack
-      let track = tracks[i];
-
-      if (track['kind'] === this.kind_) {
-        chaptersTrack = track;
-
-        break;
-      }
-    }
-
-    let menu = this.menu;
-    if (menu === undefined) {
-      menu = new Menu(this.player_);
-      let title = Dom.createEl('li', {
-        className: 'vjs-menu-title',
-        innerHTML: toTitleCase(this.kind_),
-        tabIndex: -1
-      });
-      menu.children_.unshift(title);
-      Dom.insertElFirst(title, menu.contentEl());
-    } else {
-        // We will empty out the menu children each time because we want a 
-        // fresh new menu child list each time
-        items.forEach(item => menu.removeChild(item));
-        // Empty out the ChaptersButton menu items because we no longer need them
-        items = [];
-    }
-
-    if (chaptersTrack && chaptersTrack.cues == null) {
-      chaptersTrack['mode'] = 'hidden';
-
-      let remoteTextTrackEl = this.player_.remoteTextTrackEls().getTrackElementByTrack_(chaptersTrack);
-
-      if (remoteTextTrackEl) {
-        remoteTextTrackEl.addEventListener('load', (event) => this.update());
-      }
-    }
-
-    if (chaptersTrack && chaptersTrack.cues && chaptersTrack.cues.length > 0) {
-      let cues = chaptersTrack['cues'], cue;
-
-      for (let i = 0, l = cues.length; i < l; i++) {
-        cue = cues[i];
-
-        let mi = new ChaptersTrackMenuItem(this.player_, {
-          'track': chaptersTrack,
-          'cue': cue
-        });
-
-        items.push(mi);
-
-        menu.addChild(mi);
-      }
-    }
-
-    if (items.length > 0) {
-      this.show();
-    }
-    // Assigning the value of items back to this.items for next iteration
-    this.items = items;
-    return menu;
   }
 }
 
