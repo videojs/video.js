@@ -14,19 +14,19 @@ import Component from '../../component.js';
  */
 class OffTextTrackMenuItem extends TextTrackMenuItem {
 
-  constructor(player, options){
+  constructor(player, options) {
     // Create pseudo track info
     // Requires options['kind']
-    options['track'] = {
-      'kind': options['kind'],
-      'player': player,
-      'label': options['kind'] + ' off',
-      'default': false,
-      'mode': 'disabled'
+    options.track = {
+      player,
+      kind: options.kind,
+      label: options.kind + ' off',
+      default: false,
+      mode: 'disabled'
     };
 
     // MenuItem is selectable
-    options['selectable'] = true;
+    options.selectable = true;
 
     super(player, options);
     this.selected(true);
@@ -38,13 +38,14 @@ class OffTextTrackMenuItem extends TextTrackMenuItem {
    * @param {Object} event Event object
    * @method handleTracksChange
    */
-  handleTracksChange(event){
-    let tracks = this.player().textTracks();
+  handleTracksChange(event) {
+    const tracks = this.player().textTracks();
     let selected = true;
 
     for (let i = 0, l = tracks.length; i < l; i++) {
-      let track = tracks[i];
-      if (track['kind'] === this.track['kind'] && track['mode'] === 'showing') {
+      const track = tracks[i];
+
+      if (track.kind === this.track.kind && track.mode === 'showing') {
         selected = false;
         break;
       }

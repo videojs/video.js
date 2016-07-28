@@ -15,8 +15,8 @@ import * as Fn from '../utils/fn.js';
  */
 class TrackButton extends MenuButton {
 
-  constructor(player, options){
-    let tracks = options.tracks;
+  constructor(player, options) {
+    const tracks = options.tracks;
 
     super(player, options);
 
@@ -28,7 +28,8 @@ class TrackButton extends MenuButton {
       return;
     }
 
-    let updateHandler = Fn.bind(this, this.update);
+    const updateHandler = Fn.bind(this, this.update);
+
     tracks.addEventListener('removetrack', updateHandler);
     tracks.addEventListener('addtrack', updateHandler);
 

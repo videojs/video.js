@@ -14,7 +14,7 @@ import * as Dom from '../../utils/dom.js';
  */
 class LoadProgressBar extends Component {
 
-  constructor(player, options){
+  constructor(player, options) {
     super(player, options);
     this.on(player, 'progress', this.update);
   }
@@ -38,14 +38,16 @@ class LoadProgressBar extends Component {
    * @method update
    */
   update() {
-    let buffered = this.player_.buffered();
-    let duration = this.player_.duration();
-    let bufferedEnd = this.player_.bufferedEnd();
-    let children = this.el_.children;
+    const buffered = this.player_.buffered();
+    const duration = this.player_.duration();
+    const bufferedEnd = this.player_.bufferedEnd();
+    const children = this.el_.children;
 
     // get the percent width of a time compared to the total end
-    let percentify = function (time, end){
-      let percent = (time / end) || 0; // no NaN
+    const percentify = function(time, end) {
+      // no NaN
+      const percent = (time / end) || 0;
+
       return ((percent >= 1 ? 1 : percent) * 100) + '%';
     };
 
@@ -54,8 +56,8 @@ class LoadProgressBar extends Component {
 
     // add child elements to represent the individual buffered time ranges
     for (let i = 0; i < buffered.length; i++) {
-      let start = buffered.start(i);
-      let end = buffered.end(i);
+      const start = buffered.start(i);
+      const end = buffered.end(i);
       let part = children[i];
 
       if (!part) {
@@ -69,7 +71,7 @@ class LoadProgressBar extends Component {
 
     // remove unused buffered range elements
     for (let i = children.length; i > buffered.length; i--) {
-      this.el_.removeChild(children[i-1]);
+      this.el_.removeChild(children[i - 1]);
     }
   }
 
