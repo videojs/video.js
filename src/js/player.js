@@ -3015,7 +3015,7 @@ Player.prototype.handleVolumeChange_; // eslint-disable-line
  *
  * @event error
  */
-Player.prototype.handleError_ = Player.prototype.handleError_;
+Player.prototype.handleError_; // eslint-disable-line
 
 Player.prototype.flexNotSupported_ = function() {
   const elem = document.createElement('i');

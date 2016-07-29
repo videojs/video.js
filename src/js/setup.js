@@ -10,7 +10,6 @@ import window from 'global/window';
 
 let _windowLoaded = false;
 let videojs;
-let autoSetupTimeout;
 
 // Automatically set up any tags that have a data-setup attribute
 const autoSetup = function() {
@@ -74,13 +73,13 @@ const autoSetup = function() {
 };
 
 // Pause to let the DOM keep processing
-autoSetupTimeout = function(wait, vjs) {
+function autoSetupTimeout(wait, vjs) {
   if (vjs) {
     videojs = vjs;
   }
 
   setTimeout(autoSetup, wait);
-};
+}
 
 if (document.readyState === 'complete') {
   _windowLoaded = true;
