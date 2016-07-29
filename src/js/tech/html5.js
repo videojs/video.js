@@ -435,7 +435,7 @@ class Html5 extends Tech {
     if (this.el_.duration === Infinity &&
       browser.IS_ANDROID && browser.IS_CHROME) {
       if (this.el_.currentTime === 0) {
-        let checkProgress = () => {
+        const checkProgress = () => {
           if (this.el_.currentTime > 0) {
             this.trigger('durationchange');
             this.off(this.player_, 'timeupdate', checkProgress);
