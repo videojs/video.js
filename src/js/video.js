@@ -106,7 +106,7 @@ if (window.VIDEOJS_NO_DYNAMIC_STYLE !== true) {
 
   if (!style) {
     style = stylesheet.createStyleElement('vjs-styles-defaults');
-    let head = Dom.$('head');
+    const head = Dom.$('head');
 
     head.insertBefore(style, head.firstChild);
     stylesheet.setTextContent(style, `

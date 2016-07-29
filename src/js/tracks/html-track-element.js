@@ -45,14 +45,14 @@ class HTMLTrackElement extends EventTarget {
     if (browser.IS_IE8) {
       trackElement = document.createElement('custom');
 
-      for (let prop in HTMLTrackElement.prototype) {
+      for (const prop in HTMLTrackElement.prototype) {
         if (prop !== 'constructor') {
           trackElement[prop] = HTMLTrackElement.prototype[prop];
         }
       }
     }
 
-    let track = new TextTrack(options);
+    const track = new TextTrack(options);
 
     trackElement.kind = track.kind;
     trackElement.src = track.src;

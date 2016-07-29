@@ -8,7 +8,7 @@ import assign from 'object.assign';
  *
  * @param {Number} code The media error code
  */
-let MediaError = function(code) {
+const MediaError = function(code) {
   if (typeof code === 'number') {
     this.code = code;
   } else if (typeof code === 'string') {

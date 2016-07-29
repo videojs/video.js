@@ -9,7 +9,7 @@ import safeParseTuple from 'safe-json-parse/tuple';
 import window from 'global/window';
 
 function captionOptionsMenuTemplate(uniqueId, dialogLabelId, dialogDescriptionId) {
-  let template = `
+  const template = `
     <div role="document">
       <div role="heading" aria-level="1" id="${dialogLabelId}" class="vjs-control-text">Captions Settings Dialog</div>
       <div id="${dialogDescriptionId}" class="vjs-control-text">Beginning of dialog window. Escape will cancel and close the window.</div>
@@ -220,9 +220,9 @@ class TextTrackSettings extends Component {
    * @method createEl
    */
   createEl() {
-    let uniqueId = this.id_;
-    let dialogLabelId = 'TTsettingsDialogLabel-' + uniqueId;
-    let dialogDescriptionId = 'TTsettingsDialogDescription-' + uniqueId;
+    const uniqueId = this.id_;
+    const dialogLabelId = 'TTsettingsDialogLabel-' + uniqueId;
+    const dialogDescriptionId = 'TTsettingsDialogDescription-' + uniqueId;
 
     return super.createEl('div', {
       className: 'vjs-caption-settings vjs-modal-overlay',
@@ -261,7 +261,7 @@ class TextTrackSettings extends Component {
     const windowOpacity = getSelectedOptionValue(this.$('.vjs-window-opacity > select'));
     const fontPercent = window.parseFloat(getSelectedOptionValue(this.$('.vjs-font-percent > select')));
 
-    let result = {
+    const result = {
       fontPercent,
       fontFamily,
       textOpacity,
@@ -273,7 +273,7 @@ class TextTrackSettings extends Component {
       backgroundColor: bgColor
     };
 
-    for (let name in result) {
+    for (const name in result) {
       if (result[name] === '' || result[name] === 'none' || (name === 'fontPercent' && result[name] === 1.00)) {
         delete result[name];
       }
@@ -349,7 +349,7 @@ class TextTrackSettings extends Component {
       return;
     }
 
-    let values = this.getValues();
+    const values = this.getValues();
 
     try {
       if (Object.getOwnPropertyNames(values).length > 0) {
@@ -368,7 +368,7 @@ class TextTrackSettings extends Component {
    * @method updateDisplay
    */
   updateDisplay() {
-    let ttDisplay = this.player_.getChild('textTrackDisplay');
+    const ttDisplay = this.player_.getChild('textTrackDisplay');
 
     if (ttDisplay) {
       ttDisplay.updateDisplay();

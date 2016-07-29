@@ -19,10 +19,10 @@ import * as browser from '../utils/browser.js';
  * @param {Track} track track to addcues to
  */
 const parseCues = function(srcContent, track) {
-  let parser = new window.WebVTT.Parser(window,
+  const parser = new window.WebVTT.Parser(window,
                                         window.vttjs,
                                         window.WebVTT.StringDecoder());
-  let errors = [];
+  const errors = [];
 
   parser.oncue = function(cue) {
     track.addCue(cue);
@@ -60,10 +60,10 @@ const parseCues = function(srcContent, track) {
  * @param {Track} track track to addcues to
  */
 const loadTrack = function(src, track) {
-  let opts = {
+  const opts = {
     uri: src
   };
-  let crossOrigin = isCrossOrigin(src);
+  const crossOrigin = isCrossOrigin(src);
 
   if (crossOrigin) {
     opts.cors = crossOrigin;
@@ -80,7 +80,7 @@ const loadTrack = function(src, track) {
     // NOTE: this is only used for the alt/video.novtt.js build
     if (typeof window.WebVTT !== 'function') {
       if (track.tech_) {
-        let loadHandler = () => parseCues(responseBody, track);
+        const loadHandler = () => parseCues(responseBody, track);
 
         track.tech_.on('vttjsloaded', loadHandler);
         track.tech_.on('vttjserror', () => {
@@ -129,24 +129,24 @@ class TextTrack extends Track {
       throw new Error('A tech was not provided.');
     }
 
-    let settings = merge(options, {
+    const settings = merge(options, {
       kind: TextTrackKind[options.kind] || 'subtitles',
       language: options.language || options.srclang || ''
     });
     let mode = TextTrackMode[settings.mode] || 'disabled';
-    let default_ = settings.default;
+    const default_ = settings.default;
 
     if (settings.kind === 'metadata' || settings.kind === 'chapters') {
       mode = 'hidden';
     }
     // on IE8 this will be a document element
     // for every other browser this will be a normal object
-    let tt = super(settings);
+    const tt = super(settings);
 
     tt.tech_ = settings.tech;
 
     if (browser.IS_IE8) {
-      for (let prop in TextTrack.prototype) {
+      for (const prop in TextTrack.prototype) {
         if (prop !== 'constructor') {
           tt[prop] = TextTrack.prototype[prop];
         }
@@ -156,15 +156,15 @@ class TextTrack extends Track {
     tt.cues_ = [];
     tt.activeCues_ = [];
 
-    let cues = new TextTrackCueList(tt.cues_);
-    let activeCues = new TextTrackCueList(tt.activeCues_);
+    const cues = new TextTrackCueList(tt.cues_);
+    const activeCues = new TextTrackCueList(tt.activeCues_);
     let changed = false;
-    let timeupdateHandler = Fn.bind(tt, function() {
+    const timeupdateHandler = Fn.bind(tt, function() {
 
       // Accessing this.activeCues for the side-effects of updating itself
       // due to it's nature as a getter function. Do not remove or cues will
       // stop updating!
-      this.activeCues;
+      this.activeCues; // eslint-disable-line
       if (changed) {
         this.trigger('cuechange');
         changed = false;
@@ -220,11 +220,11 @@ class TextTrack extends Track {
           return activeCues;
         }
 
-        let ct = this.tech_.currentTime();
-        let active = [];
+        const ct = this.tech_.currentTime();
+        const active = [];
 
         for (let i = 0, l = this.cues.length; i < l; i++) {
-          let cue = this.cues[i];
+          const cue = this.cues[i];
 
           if (cue.startTime <= ct && cue.endTime >= ct) {
             active.push(cue);
@@ -272,7 +272,7 @@ class TextTrack extends Track {
    * @method addCue
    */
   addCue(cue) {
-    let tracks = this.tech_.textTracks();
+    const tracks = this.tech_.textTracks();
 
     if (tracks) {
       for (let i = 0; i < tracks.length; i++) {
@@ -296,7 +296,7 @@ class TextTrack extends Track {
     let removed = false;
 
     for (let i = 0, l = this.cues_.length; i < l; i++) {
-      let cue = this.cues_[i];
+      const cue = this.cues_[i];
 
       if (cue === removeCue) {
         this.cues_.splice(i, 1);

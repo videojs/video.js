@@ -45,13 +45,13 @@ class Html5 extends Tech {
 
     if (this.el_.hasChildNodes()) {
 
-      let nodes = this.el_.childNodes;
+      const nodes = this.el_.childNodes;
       let nodesLength = nodes.length;
-      let removeNodes = [];
+      const removeNodes = [];
 
       while (nodesLength--) {
-        let node = nodes[nodesLength];
-        let nodeName = node.nodeName.toLowerCase();
+        const node = nodes[nodesLength];
+        const nodeName = node.nodeName.toLowerCase();
 
         if (nodeName === 'track') {
           if (!this.featuresNativeTextTracks) {
@@ -78,16 +78,16 @@ class Html5 extends Tech {
       }
     }
 
-    let trackTypes = ['audio', 'video'];
+    const trackTypes = ['audio', 'video'];
 
     // ProxyNativeTextTracks
     trackTypes.forEach((type) => {
-      let capitalType = toTitleCase(type);
+      const capitalType = toTitleCase(type);
 
       if (!this[`featuresNative${capitalType}Tracks`]) {
         return;
       }
-      let tl = this.el()[`${type}Tracks`];
+      const tl = this.el()[`${type}Tracks`];
 
       if (tl && tl.addEventListener) {
         tl.addEventListener('change', Fn.bind(this, this[`handle${capitalType}TrackChange_`]));
@@ -131,8 +131,8 @@ class Html5 extends Tech {
   dispose() {
     // Un-ProxyNativeTracks
     ['audio', 'video', 'text'].forEach((type) => {
-      let capitalType = toTitleCase(type);
-      let tl = this.el_[`${type}Tracks`];
+      const capitalType = toTitleCase(type);
+      const tl = this.el_[`${type}Tracks`];
 
       if (tl && tl.removeEventListener) {
         tl.removeEventListener('change', this[`handle${capitalType}TrackChange_`]);
@@ -176,8 +176,8 @@ class Html5 extends Tech {
         el = document.createElement('video');
 
         // determine if native controls should be used
-        let tagAttributes = this.options_.tag && Dom.getElAttributes(this.options_.tag);
-        let attributes = mergeOptions({}, tagAttributes);
+        const tagAttributes = this.options_.tag && Dom.getElAttributes(this.options_.tag);
+        const attributes = mergeOptions({}, tagAttributes);
 
         if (!browser.TOUCH_ENABLED || this.options_.nativeControlsForTouch !== true) {
           delete attributes.controls;
@@ -193,11 +193,11 @@ class Html5 extends Tech {
     }
 
     // Update specific tag settings, in case they were overridden
-    let settingsAttrs = ['autoplay', 'preload', 'loop', 'muted'];
+    const settingsAttrs = ['autoplay', 'preload', 'loop', 'muted'];
 
     for (let i = settingsAttrs.length - 1; i >= 0; i--) {
       const attr = settingsAttrs[i];
-      let overwriteAttrs = {};
+      const overwriteAttrs = {};
 
       if (typeof this.options_[attr] !== 'undefined') {
         overwriteAttrs[attr] = this.options_[attr];
@@ -232,13 +232,13 @@ class Html5 extends Tech {
       // which could also happen between now and the next loop, so we'll
       // watch for that also.
       let loadstartFired = false;
-      let setLoadstartFired = function() {
+      const setLoadstartFired = function() {
         loadstartFired = true;
       };
 
       this.on('loadstart', setLoadstartFired);
 
-      let triggerLoadstart = function() {
+      const triggerLoadstart = function() {
         // We did miss the original loadstart. Make sure the player
         // sees loadstart before loadedmetadata
         if (!loadstartFired) {
@@ -265,7 +265,7 @@ class Html5 extends Tech {
     // The other readyState events aren't as much of a problem if we double
     // them, so not going to go to as much trouble as loadstart to prevent
     // that unless we find reason to.
-    let eventsToTrigger = ['loadstart'];
+    const eventsToTrigger = ['loadstart'];
 
     // loadedmetadata: newly equal to HAVE_METADATA (1) or greater
     eventsToTrigger.push('loadedmetadata');
@@ -294,7 +294,7 @@ class Html5 extends Tech {
   }
 
   proxyNativeTextTracks_() {
-    let tt = this.el().textTracks;
+    const tt = this.el().textTracks;
 
     if (tt) {
       // Add tracks - if player is initialised after DOM loaded, textTracks
@@ -315,7 +315,7 @@ class Html5 extends Tech {
   }
 
   handleTextTrackChange(e) {
-    let tt = this.textTracks();
+    const tt = this.textTracks();
 
     this.textTracks().trigger({
       type: 'change',
@@ -334,7 +334,7 @@ class Html5 extends Tech {
   }
 
   handleVideoTrackChange_(e) {
-    let vt = this.videoTracks();
+    const vt = this.videoTracks();
 
     this.videoTracks().trigger({
       type: 'change',
@@ -353,7 +353,7 @@ class Html5 extends Tech {
   }
 
   handleAudioTrackChange_(e) {
-    let audioTrackList = this.audioTracks();
+    const audioTrackList = this.audioTracks();
 
     this.audioTracks().trigger({
       type: 'change',
@@ -381,14 +381,14 @@ class Html5 extends Tech {
   removeOldTracks_(techTracks, elTracks) {
     // This will loop over the techTracks and check if they are still used by the HTML5 video element
     // If not, they will be removed from the emulated list
-    let removeTracks = [];
+    const removeTracks = [];
 
     if (!elTracks) {
       return;
     }
 
     for (let i = 0; i < techTracks.length; i++) {
-      let techTrack = techTracks[i];
+      const techTrack = techTracks[i];
       let found = false;
 
       for (let j = 0; j < elTracks.length; j++) {
@@ -574,7 +574,7 @@ class Html5 extends Tech {
    */
   supportsFullScreen() {
     if (typeof this.el_.webkitEnterFullScreen === 'function') {
-      let userAgent = window.navigator.userAgent;
+      const userAgent = window.navigator.userAgent;
 
       // Seems to be broken in Chromium/Chrome && Safari in Leopard
       if ((/Android/).test(userAgent) || !(/Chrome|Mac OS X 10.5/).test(userAgent)) {
@@ -590,7 +590,7 @@ class Html5 extends Tech {
    * @method enterFullScreen
    */
   enterFullScreen() {
-    let video = this.el_;
+    const video = this.el_;
 
     if ('webkitDisplayingFullscreen' in video) {
       this.one('webkitbeginfullscreen', function() {
@@ -963,7 +963,7 @@ class Html5 extends Tech {
       return super.addRemoteTextTrack(options);
     }
 
-    let htmlTrackElement = document.createElement('track');
+    const htmlTrackElement = document.createElement('track');
 
     if (options.kind) {
       htmlTrackElement.kind = options.kind;
@@ -1004,14 +1004,13 @@ class Html5 extends Tech {
       return super.removeRemoteTextTrack(track);
     }
 
-    let tracks;
-    let trackElement = this.remoteTextTrackEls().getTrackElementByTrack_(track);
+    const trackElement = this.remoteTextTrackEls().getTrackElementByTrack_(track);
 
     // remove HTMLTrackElement and TextTrack from remote list
     this.remoteTextTrackEls().removeTrackElement_(trackElement);
     this.remoteTextTracks().removeTrack_(track);
 
-    tracks = this.$$('track');
+    const tracks = this.$$('track');
 
     let i = tracks.length;
 
@@ -1034,7 +1033,7 @@ class Html5 extends Tech {
 * @private
 */
 Html5.TEST_VID = document.createElement('video');
-let track = document.createElement('track');
+const track = document.createElement('track');
 
 track.kind = 'captions';
 track.srclang = 'en';
@@ -1100,7 +1099,7 @@ Html5.nativeSourceHandler.canHandleSource = function(source, options) {
 
   // If no type, fall back to checking 'video/[EXTENSION]'
   } else if (source.src) {
-    let ext = Url.getFileExtension(source.src);
+    const ext = Url.getFileExtension(source.src);
 
     return Html5.nativeSourceHandler.canPlayType(`video/${ext}`);
   }
@@ -1140,7 +1139,7 @@ Html5.registerSourceHandler(Html5.nativeSourceHandler);
 Html5.canControlVolume = function() {
   // IE will error if Windows Media Player not installed #3315
   try {
-    let volume = Html5.TEST_VID.volume;
+    const volume = Html5.TEST_VID.volume;
 
     Html5.TEST_VID.volume = (volume / 2) + 0.1;
     return volume !== Html5.TEST_VID.volume;
@@ -1162,7 +1161,7 @@ Html5.canControlPlaybackRate = function() {
   }
   // IE will error if Windows Media Player not installed #3315
   try {
-    let playbackRate = Html5.TEST_VID.playbackRate;
+    const playbackRate = Html5.TEST_VID.playbackRate;
 
     Html5.TEST_VID.playbackRate = (playbackRate / 2) + 0.1;
     return playbackRate !== Html5.TEST_VID.playbackRate;
@@ -1204,7 +1203,7 @@ Html5.supportsNativeTextTracks = function() {
  * @return {Boolean}
  */
 Html5.supportsNativeVideoTracks = function() {
-  let supportsVideoTracks = !!Html5.TEST_VID.videoTracks;
+  const supportsVideoTracks = !!Html5.TEST_VID.videoTracks;
 
   return supportsVideoTracks;
 };
@@ -1215,7 +1214,7 @@ Html5.supportsNativeVideoTracks = function() {
  * @return {Boolean}
  */
 Html5.supportsNativeAudioTracks = function() {
-  let supportsAudioTracks = !!Html5.TEST_VID.audioTracks;
+  const supportsAudioTracks = !!Html5.TEST_VID.audioTracks;
 
   return supportsAudioTracks;
 };
@@ -1343,7 +1342,7 @@ Html5.patchCanPlayType = function() {
 };
 
 Html5.unpatchCanPlayType = function() {
-  let r = Html5.TEST_VID.constructor.prototype.canPlayType;
+  const r = Html5.TEST_VID.constructor.prototype.canPlayType;
 
   Html5.TEST_VID.constructor.prototype.canPlayType = canPlayType;
   canPlayType = null;
@@ -1390,7 +1389,7 @@ Html5.resetMediaElement = function(el) {
     return;
   }
 
-  let sources = el.querySelectorAll('source');
+  const sources = el.querySelectorAll('source');
   let i = sources.length;
 
   while (i--) {

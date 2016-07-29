@@ -25,7 +25,7 @@ class MediaLoader extends Component {
 
     if (!options.playerOptions.sources || options.playerOptions.sources.length === 0) {
       for (let i = 0, j = options.playerOptions.techOrder; i < j.length; i++) {
-        let techName = toTitleCase(j[i]);
+        const techName = toTitleCase(j[i]);
         let tech = Tech.getTech(techName);
 
         // Support old behavior of techs being registered as components.

@@ -10,7 +10,7 @@ EventTarget.prototype.allowedEvents_ = {};
 EventTarget.prototype.on = function(type, fn) {
   // Remove the addEventListener alias before calling Events.on
   // so we don't get into an infinite type loop
-  let ael = this.addEventListener;
+  const ael = this.addEventListener;
 
   this.addEventListener = () => {};
   Events.on(this, type, fn);
@@ -28,7 +28,7 @@ EventTarget.prototype.removeEventListener = EventTarget.prototype.off;
 EventTarget.prototype.one = function(type, fn) {
   // Remove the addEventListener alias before calling Events.on
   // so we don't get into an infinite type loop
-  let ael = this.addEventListener;
+  const ael = this.addEventListener;
 
   this.addEventListener = () => {};
   Events.one(this, type, fn);
@@ -36,7 +36,7 @@ EventTarget.prototype.one = function(type, fn) {
 };
 
 EventTarget.prototype.trigger = function(event) {
-  let type = event.type || event;
+  const type = event.type || event;
 
   if (typeof event === 'string') {
     event = {type};

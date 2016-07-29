@@ -97,7 +97,7 @@ class Player extends Component {
     // If language is not set, get the closest lang attribute
     if (!options.language) {
       if (typeof tag.closest === 'function') {
-        let closest = tag.closest('[lang]');
+        const closest = tag.closest('[lang]');
 
         if (closest) {
           options.language = closest.getAttribute('lang');
@@ -140,7 +140,7 @@ class Player extends Component {
     // Update Supported Languages
     if (options.languages) {
       // Normalise player option languages to lowercase
-      let languagesToLower = {};
+      const languagesToLower = {};
 
       Object.getOwnPropertyNames(options.languages).forEach(function(name) {
         languagesToLower[name.toLowerCase()] = options.languages[name];
@@ -178,11 +178,11 @@ class Player extends Component {
     // as well so they don't need to reach back into the player for options later.
     // We also need to do another copy of this.options_ so we don't end up with
     // an infinite loop.
-    let playerOptionsCopy = mergeOptions(this.options_);
+    const playerOptionsCopy = mergeOptions(this.options_);
 
     // Load plugins
     if (options.plugins) {
-      let plugins = options.plugins;
+      const plugins = options.plugins;
 
       Object.getOwnPropertyNames(plugins).forEach(function(name) {
         if (typeof this[name] === 'function') {
@@ -292,8 +292,8 @@ class Player extends Component {
    * @method createEl
    */
   createEl() {
-    let el = this.el_ = super.createEl('div');
-    let tag = this.tag;
+    const el = this.el_ = super.createEl('div');
+    const tag = this.tag;
 
     // Remove width/height attrs from tag so CSS can make it 100% width/height
     tag.removeAttribute('width');
@@ -330,8 +330,8 @@ class Player extends Component {
     // video element
     if (window.VIDEOJS_NO_DYNAMIC_STYLE !== true) {
       this.styleEl_ = stylesheet.createStyleElement('vjs-styles-dimensions');
-      let defaultsStyleEl = Dom.$('.vjs-styles-defaults');
-      let head = Dom.$('head');
+      const defaultsStyleEl = Dom.$('.vjs-styles-defaults');
+      const head = Dom.$('head');
 
       head.insertBefore(this.styleEl_, defaultsStyleEl ? defaultsStyleEl.nextSibling : head.firstChild);
     }
@@ -343,10 +343,10 @@ class Player extends Component {
     this.aspectRatio(this.options_.aspectRatio);
 
     // Hide any links within the video/audio tag, because IE doesn't hide them completely.
-    let links = tag.getElementsByTagName('a');
+    const links = tag.getElementsByTagName('a');
 
     for (let i = 0; i < links.length; i++) {
-      let linkEl = links.item(i);
+      const linkEl = links.item(i);
 
       Dom.addElClass(linkEl, 'vjs-hidden');
       linkEl.setAttribute('hidden', 'hidden');
@@ -405,7 +405,7 @@ class Player extends Component {
    * @method dimension
    */
   dimension(dimension, value) {
-    let privDimension = dimension + '_';
+    const privDimension = dimension + '_';
 
     if (value === undefined) {
       return this[privDimension] || 0;
@@ -415,7 +415,7 @@ class Player extends Component {
       // If an empty string is given, reset the dimension to be automatic
       this[privDimension] = undefined;
     } else {
-      let parsedVal = parseFloat(value);
+      const parsedVal = parseFloat(value);
 
       if (isNaN(parsedVal)) {
         log.error(`Improper value "${value}" supplied for for ${dimension}`);
@@ -483,7 +483,7 @@ class Player extends Component {
     if (window.VIDEOJS_NO_DYNAMIC_STYLE === true) {
       const width = typeof this.width_ === 'number' ? this.width_ : this.options_.width;
       const height = typeof this.height_ === 'number' ? this.height_ : this.options_.height;
-      let techEl = this.tech_ && this.tech_.el();
+      const techEl = this.tech_ && this.tech_.el();
 
       if (techEl) {
         if (width >= 0) {
@@ -515,8 +515,8 @@ class Player extends Component {
     }
 
     // Get the ratio as a decimal we can use to calculate dimensions
-    let ratioParts = aspectRatio.split(':');
-    let ratioMultiplier = ratioParts[1] / ratioParts[0];
+    const ratioParts = aspectRatio.split(':');
+    const ratioMultiplier = ratioParts[1] / ratioParts[0];
 
     if (this.width_ !== undefined) {
       // Use any width that's been specifically set
@@ -589,7 +589,7 @@ class Player extends Component {
     this.isReady_ = false;
 
     // Grab tech-specific options from player options and add source and parent element to use.
-    let techOptions = assign({
+    const techOptions = assign({
       source,
       'nativeControlsForTouch': this.options_.nativeControlsForTouch,
       'playerId': this.id(),
@@ -717,7 +717,7 @@ class Player extends Component {
     if (safety && safety.IWillNotUseThisInPlugins) {
       return this.tech_;
     }
-    let errorText = `
+    const errorText = `
       Please make sure that you are not using this inside of a plugin.
       To disable this alert and error, please pass in an object with
       \`IWillNotUseThisInPlugins\` to the \`tech\` method. See
@@ -1148,7 +1148,7 @@ class Player extends Component {
    * @method handleTechError_
    */
   handleTechError_() {
-    let error = this.tech_.error();
+    const error = this.tech_.error();
 
     this.error(error);
   }
@@ -1553,8 +1553,8 @@ class Player extends Component {
    * @method bufferedEnd
    */
   bufferedEnd() {
-    let buffered = this.buffered();
-    let duration = this.duration();
+    const buffered = this.buffered();
+    const duration = this.duration();
     let end = buffered.end(buffered.length - 1);
 
     if (end > duration) {
@@ -1671,7 +1671,7 @@ class Player extends Component {
    * @method requestFullscreen
    */
   requestFullscreen() {
-    let fsApi = FullscreenApi;
+    const fsApi = FullscreenApi;
 
     this.isFullscreen(true);
 
@@ -1721,7 +1721,7 @@ class Player extends Component {
    * @method exitFullscreen
    */
   exitFullscreen() {
-    let fsApi = FullscreenApi;
+    const fsApi = FullscreenApi;
 
     this.isFullscreen(false);
 
@@ -1809,7 +1809,7 @@ class Player extends Component {
 
     // Loop through each playback technology in the options order
     for (let i = 0, j = this.options_.techOrder; i < j.length; i++) {
-      let techName = toTitleCase(j[i]);
+      const techName = toTitleCase(j[i]);
       let tech = Tech.getTech(techName);
 
       // Support old behavior of techs being registered as components.
@@ -1849,7 +1849,7 @@ class Player extends Component {
   selectSource(sources) {
     // Get only the techs specified in `techOrder` that exist and are supported by the
     // current platform
-    let techs =
+    const techs =
       this.options_.techOrder
         .map(toTitleCase)
         .map((techName) => {
@@ -1872,7 +1872,7 @@ class Player extends Component {
     // Iterate over each `innerArray` element once per `outerArray` element and execute
     // `tester` with both. If `tester` returns a non-falsy value, exit early and return
     // that value.
-    let findFirstPassingTechSourcePair = function(outerArray, innerArray, tester) {
+    const findFirstPassingTechSourcePair = function(outerArray, innerArray, tester) {
       let found;
 
       outerArray.some((outerChoice) => {
@@ -1889,8 +1889,8 @@ class Player extends Component {
     };
 
     let foundSourceAndTech;
-    let flip = (fn) => (a, b) => fn(b, a);
-    let finder = ([techName, tech], source) => {
+    const flip = (fn) => (a, b) => fn(b, a);
+    const finder = ([techName, tech], source) => {
       if (tech.canPlaySource(source, this.options_[techName.toLowerCase()])) {
         return {source, tech: techName};
       }
@@ -2012,7 +2012,7 @@ class Player extends Component {
    * @method sourceList_
    */
   sourceList_(sources) {
-    let sourceTech = this.selectSource(sources);
+    const sourceTech = this.selectSource(sources);
 
     if (sourceTech) {
       if (sourceTech.tech === this.techName_) {
@@ -2426,9 +2426,9 @@ class Player extends Component {
     let mouseInProgress;
     let lastMoveX;
     let lastMoveY;
-    let handleActivity = Fn.bind(this, this.reportUserActivity);
+    const handleActivity = Fn.bind(this, this.reportUserActivity);
 
-    let handleMouseMove = function(e) {
+    const handleMouseMove = function(e) {
       // #1068 - Prevent mousemove spamming
       // Chrome Bug: https://code.google.com/p/chromium/issues/detail?id=366970
       if (e.screenX !== lastMoveX || e.screenY !== lastMoveY) {
@@ -2438,7 +2438,7 @@ class Player extends Component {
       }
     };
 
-    let handleMouseDown = function() {
+    const handleMouseDown = function() {
       handleActivity();
       // For as long as the they are touching the device or have their mouse down,
       // we consider them active even if they're not moving their finger or mouse.
@@ -2450,7 +2450,7 @@ class Player extends Component {
       mouseInProgress = this.setInterval(handleActivity, 250);
     };
 
-    let handleMouseUp = function(event) {
+    const handleMouseUp = function(event) {
       handleActivity();
       // Stop the interval that maintains activity if the mouse/touch is down
       this.clearInterval(mouseInProgress);
@@ -2485,7 +2485,7 @@ class Player extends Component {
         // Clear any existing inactivity timeout to start the timer over
         this.clearTimeout(inactivityTimeout);
 
-        let timeout = this.options_.inactivityTimeout;
+        const timeout = this.options_.inactivityTimeout;
 
         if (timeout > 0) {
           // In <timeout> milliseconds, if no more activity has occurred the
@@ -2786,8 +2786,8 @@ class Player extends Component {
    * @method toJSON
    */
   toJSON() {
-    let options = mergeOptions(this.options_);
-    let tracks = options.tracks;
+    const options = mergeOptions(this.options_);
+    const tracks = options.tracks;
 
     options.tracks = [];
 
@@ -2823,7 +2823,7 @@ class Player extends Component {
     options = options || {};
     options.content = content || '';
 
-    let modal = new ModalDialog(this, options);
+    const modal = new ModalDialog(this, options);
 
     this.addChild(modal);
     modal.on('dispose', () => {
@@ -2842,7 +2842,7 @@ class Player extends Component {
    * @method getTagSettings
    */
   static getTagSettings(tag) {
-    let baseOptions = {
+    const baseOptions = {
       sources: [],
       tracks: []
     };
@@ -2893,7 +2893,7 @@ class Player extends Component {
  */
 Player.players = {};
 
-let navigator = window.navigator;
+const navigator = window.navigator;
 
 /*
  * Player instance options, surfaced using options
@@ -3018,7 +3018,7 @@ Player.prototype.handleVolumeChange_; // eslint-disable-line
 Player.prototype.handleError_ = Player.prototype.handleError_;
 
 Player.prototype.flexNotSupported_ = function() {
-  let elem = document.createElement('i');
+  const elem = document.createElement('i');
 
   // Note: We don't actually use flexBasis (or flexOrder), but it's one of the more
   // common flex features that we can rely on when checking for flex support.

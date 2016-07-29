@@ -41,7 +41,7 @@ const autoSetup = function() {
   if (mediaEls && mediaEls.length > 0) {
 
     for (let i = 0, e = mediaEls.length; i < e; i++) {
-      let mediaEl = mediaEls[i];
+      const mediaEl = mediaEls[i];
 
       // Check if element exists, has getAttribute func.
       // IE seems to consider typeof el.getAttribute == 'object' instead of
@@ -50,7 +50,7 @@ const autoSetup = function() {
 
         // Make sure this player hasn't already been set up.
         if (mediaEl.player === undefined) {
-          let options = mediaEl.getAttribute('data-setup');
+          const options = mediaEl.getAttribute('data-setup');
 
           // Check if data-setup attr exists.
           // We only auto-setup if they've added the data-setup attr.

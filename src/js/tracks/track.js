@@ -23,21 +23,21 @@ class Track extends EventTarget {
 
     if (browser.IS_IE8) {
       track = document.createElement('custom');
-      for (let prop in Track.prototype) {
+      for (const prop in Track.prototype) {
         if (prop !== 'constructor') {
           track[prop] = Track.prototype[prop];
         }
       }
     }
 
-    let trackProps = {
+    const trackProps = {
       id: options.id || 'vjs_track_' + Guid.newGUID(),
       kind: options.kind || '',
       label: options.label || '',
       language: options.language || ''
     };
 
-    for (let key in trackProps) {
+    for (const key in trackProps) {
       Object.defineProperty(track, key, {
         get() {
           return trackProps[key];

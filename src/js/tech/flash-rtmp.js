@@ -12,7 +12,7 @@ function FlashRtmpDecorator(Flash) {
   };
 
   Flash.streamToParts = function(src) {
-    let parts = {
+    const parts = {
       connection: '',
       stream: ''
     };
@@ -82,7 +82,7 @@ function FlashRtmpDecorator(Flash) {
    * @return {String}         'probably', 'maybe', or '' (empty string)
    */
   Flash.rtmpSourceHandler.canHandleSource = function(source, options) {
-    let can = Flash.rtmpSourceHandler.canPlayType(source.type);
+    const can = Flash.rtmpSourceHandler.canPlayType(source.type);
 
     if (can) {
       return can;
@@ -104,7 +104,7 @@ function FlashRtmpDecorator(Flash) {
    * @param  {Object} options  The options to pass to the source
    */
   Flash.rtmpSourceHandler.handleSource = function(source, tech, options) {
-    let srcParts = Flash.streamToParts(source.src);
+    const srcParts = Flash.streamToParts(source.src);
 
     tech.setRtmpConnection(srcParts.connection);
     tech.setRtmpStream(srcParts.stream);
