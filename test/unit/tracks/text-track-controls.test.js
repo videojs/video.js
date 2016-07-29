@@ -322,7 +322,7 @@ test('chapters should be displayed when cues added to initial track and button u
   player.dispose();
 });
 
-test('chapters should be displayed when a track with added and button updated', function() {
+test('chapters should be displayed when a track and its cures added and button updated', function() {
   let player = TestHelpers.makePlayer();
 
   this.clock.tick(1000);
