@@ -31,8 +31,7 @@ QUnit.test('Plugin should get initialized and receive options', function() {
   player.dispose();
 });
 
-QUnit.test('Plugin should have the option of being initilized ' +
-           'outside of player init', function() {
+QUnit.test('Plugin should have the option of being initilized outside of player init', function() {
   QUnit.expect(3);
 
   registerPlugin('myPlugin3', function(options) {
@@ -112,7 +111,6 @@ QUnit.test('Plugins should get events in registration order', function() {
   const expectedOrder = [];
   const pluginName = 'orderPlugin';
   const player = TestHelpers.makePlayer({});
-  let i = 0;
   const plugin = function(name) {
     registerPlugin(name, function(opts) {
       this.on('test', function(event) {
@@ -122,7 +120,7 @@ QUnit.test('Plugins should get events in registration order', function() {
     player[name]({});
   };
 
-  for (; i < 3; i++) {
+  for (let i = 0; i < 3; i++) {
     const name = pluginName + i;
 
     expectedOrder.push(name);
@@ -141,12 +139,10 @@ QUnit.test('Plugins should get events in registration order', function() {
   player.dispose();
 });
 
-QUnit.test('Plugins should not get events after ' +
-           'stopImmediatePropagation is called', function() {
+QUnit.test('Plugins should not get events after stopImmediatePropagation is called', function() {
   const order = [];
   const expectedOrder = [];
   const pluginName = 'orderPlugin';
-  let i = 0;
   const player = TestHelpers.makePlayer({});
   const plugin = function(name) {
     registerPlugin(name, function(opts) {
@@ -158,7 +154,7 @@ QUnit.test('Plugins should not get events after ' +
     player[name]({});
   };
 
-  for (; i < 3; i++) {
+  for (let i = 0; i < 3; i++) {
     const name = pluginName + i;
 
     expectedOrder.push(name);

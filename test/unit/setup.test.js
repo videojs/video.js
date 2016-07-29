@@ -3,8 +3,7 @@ import TestHelpers from './test-helpers.js';
 
 QUnit.module('Setup');
 
-QUnit.test('should set options from data-setup even if ' +
-           'autoSetup is not called before initialisation', function() {
+QUnit.test('should set options from data-setup even if autoSetup is not called before initialisation', function() {
   const el = TestHelpers.makeTag();
 
   el.setAttribute('data-setup',

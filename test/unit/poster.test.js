@@ -63,8 +63,7 @@ QUnit.test('should create and update a fallback image in older browsers', functi
                  'Fallback image updated');
 });
 
-QUnit.test('should remove itself from the document ' +
-           'flow when there is no poster', function() {
+QUnit.test('should remove itself from the document flow when there is no poster', function() {
   const posterImage = new PosterImage(this.mockPlayer);
 
   QUnit.equal(posterImage.el().style.display, '', 'Poster image shows by default');

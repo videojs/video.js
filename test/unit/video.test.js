@@ -103,8 +103,7 @@ QUnit.test('should add the value to the languages object', function() {
   QUnit.deepEqual(result.Hello, videojs.options.languages.es.Hello, 'should also match');
 });
 
-QUnit.test('should add the value to the languages ' +
-           'object with lower case lang code', function() {
+QUnit.test('should add the value to the languages object with lower case lang code', function() {
   const code = 'DE';
   const data = {Hello: 'Guten Tag'};
   const result = videojs.addLanguage(code, data);
@@ -132,8 +131,7 @@ QUnit.test('should expose plugin registry function', function() {
   QUnit.equal(player.foo, pluginFunction, 'should be equal');
 });
 
-QUnit.test('should expose options and players properties ' +
-           'for backward-compatibility', function() {
+QUnit.test('should expose options and players properties for backward-compatibility', function() {
   QUnit.ok(typeof videojs.options, 'object', 'options should be an object');
   QUnit.ok(typeof videojs.players, 'object', 'players should be an object');
 });
