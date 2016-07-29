@@ -125,6 +125,32 @@ var TestHelpers = {
       props.length;
 
     return run;
+  },
+
+  /**
+   * Triggers an event on a DOM node natively.
+   *
+   * @param  {Element} element
+   * @param  {string} eventType
+   */
+  triggerDomEvent: function (element, eventType) {
+    var event;
+
+    if (document.createEvent) {
+      event = document.createEvent('HTMLEvents');
+      event.initEvent(eventType, true, true);
+    } else {
+      event = document.createEventObject();
+      event.eventType = eventType;
+    }
+
+    event.eventName = eventType;
+
+    if (document.createEvent) {
+      element.dispatchEvent(event);
+    } else {
+      element.fireEvent('on' + event.eventType, event);
+    }
   }
 };
 
