@@ -435,9 +435,14 @@ class Html5 extends Tech {
     if (this.el_.duration === Infinity &&
       browser.IS_ANDROID && browser.IS_CHROME) {
       if (this.el_.currentTime === 0) {
+        // Wait for the first `timeupdate` with currentTime > 0 - there may be
+        // several with 0
         const checkProgress = () => {
           if (this.el_.currentTime > 0) {
-            this.trigger('durationchange');
+            // Trigger durationchange for genuinely live video
+            if (this.el_.duration === Infinity) {
+              this.trigger('durationchange');
+            }
             this.off(this.player_, 'timeupdate', checkProgress);
           }
         };
