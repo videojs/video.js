@@ -35,6 +35,7 @@
     "xhr": "2.2.0"
   },
   "devDependencies": {
+    "axe-core": "^2.0.5",
     "babel": "^5.2.2",
     "babelify": "^6.0.1",
     "blanket": "^1.1.6",
