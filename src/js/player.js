@@ -1114,6 +1114,8 @@ class Player extends Component {
       this.addClass('vjs-fullscreen');
     } else {
       this.removeClass('vjs-fullscreen');
+      // Making sure the Control text reverts back after pressing ESC
+      this.controlBar.fullscreenToggle.controlText('Fullscreen');
     }
   }
 
