@@ -38,6 +38,8 @@
   },
   "devDependencies": {
     "babel-cli": "^6.11.4",
+    "babel-plugin-transform-es3-member-expression-literals": "^6.8.0",
+    "babel-plugin-transform-es3-property-literals": "^6.8.0",
     "babel-plugin-transform-runtime": "^6.9.0",
     "babel-preset-es2015-loose": "^7.0.0",
     "babel-register": "^6.9.0",

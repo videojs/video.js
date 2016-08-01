@@ -321,7 +321,10 @@ module.exports = function(grunt) {
       options: {
         sourceMap: true,
         presets: ['es2015'],
-        plugins: [['transform-runtime', {polyfill: false, regenerator: false}]]
+        plugins: [
+          'transform-es3-property-literals',
+          'transform-es3-member-expression-literals'
+        ]
       },
       es5: {
         files: [{
