@@ -4,6 +4,7 @@ CHANGELOG
 ## HEAD (Unreleased)
 * @misteroneill, @BrandonOCasey, and @pagarwal123 updates all the code to pass the linter ([view](https://github.com/videojs/video.js/pull/3459))
 * @misteroneill added ghooks to run linter on git push ([view](https://github.com/videojs/video.js/pull/3459))
+* @BrandonOCasey removed unused base-styles.js file ([view](https://github.com/videojs/video.js/pull/3486))
 
 --------------------
 
