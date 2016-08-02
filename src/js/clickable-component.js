@@ -28,7 +28,7 @@ class ClickableComponent extends Component {
     this.on('click', this.handleClick);
     this.on('focus', this.handleFocus);
     this.on('blur', this.handleBlur);
-    player.on('fullscreenchange', this.handleFullscreenChange);
+    //player.on('fullscreenchange', this.handleFullscreenChange);
   }
 
   /**
@@ -168,11 +168,6 @@ class ClickableComponent extends Component {
    * @method handleClick
    */
   handleClick() {}
-  
-  /**
-    
-  */
-  handleFullscreenChange() {}
 
   /**
    * Handle Focus - Add keyboard functionality to element
