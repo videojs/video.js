@@ -28,7 +28,6 @@ class ClickableComponent extends Component {
     this.on('click', this.handleClick);
     this.on('focus', this.handleFocus);
     this.on('blur', this.handleBlur);
-    //player.on('fullscreenchange', this.handleFullscreenChange);
   }
 
   /**
