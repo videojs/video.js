@@ -1105,20 +1105,3 @@ QUnit.test('When VIDEOJS_NO_DYNAMIC_STYLE is set, apply sizing directly to the t
   player.dispose();
 });
 
-test('When Android Chrome reports Infinity duration with currentTime 0, return NaN', function() {
-  const oldIsAndroid = browser.IS_ANDROID;
-  const oldIsChrome = browser.IS_CHROME;
-  const player = TestHelpers.makePlayer();
-
-  browser.IS_ANDROID = true;
-  browser.IS_CHROME = true;
-
-  player.tech_.el_ = {
-    duration: Infinity,
-    currentTime: 0
-  };
-  ok(isNaN(player.tech_.duration()), 'returned NaN with currentTime 0');
-
-  browser.IS_ANDROID = oldIsAndroid;
-  browser.IS_CHROME = oldIsChrome;
-});
