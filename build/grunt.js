@@ -1,4 +1,6 @@
 import {gruntCustomizer, gruntOptionsMaker} from './options-customizer.js';
+import chg from 'chg';
+
 module.exports = function(grunt) {
   require('time-grunt')(grunt);
 
@@ -43,7 +45,7 @@ module.exports = function(grunt) {
       release: {
         tag_name: 'v'+ version.full,
         name: version.full,
-        body: require('chg').find(version.full).changesRaw
+        body: chg.find(version.full).changesRaw
       },
     },
     files: {
@@ -323,7 +325,8 @@ module.exports = function(grunt) {
         presets: ['es2015'],
         plugins: [
           'transform-es3-property-literals',
-          'transform-es3-member-expression-literals'
+          'transform-es3-member-expression-literals',
+          'inline-json-config-values'
         ]
       },
       es5: {

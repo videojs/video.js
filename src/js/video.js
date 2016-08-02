@@ -132,7 +132,7 @@ setup.autoSetupTimeout(1, videojs);
  *
  * @type {String}
  */
-videojs.VERSION = '__VERSION__';
+videojs.VERSION = require('../../package.json').version;
 
 /**
  * The global options object. These are the settings that take effect
