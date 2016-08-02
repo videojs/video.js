@@ -1104,4 +1104,3 @@ QUnit.test('When VIDEOJS_NO_DYNAMIC_STYLE is set, apply sizing directly to the t
   assert.equal(player.tech_.el().height, 300, 'the height is equal 300');
   player.dispose();
 });
-
