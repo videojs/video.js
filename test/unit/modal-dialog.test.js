@@ -375,7 +375,7 @@ QUnit.test('"fillAlways" option', function(assert) {
 
 QUnit.test('"label" option', function(assert) {
   const label = 'foo';
-  const modal = new ModalDialog(this.player, {label: label});
+  const modal = new ModalDialog(this.player, {label});
 
   assert.expect(1);
   assert.strictEqual(modal.el().getAttribute('aria-label'),

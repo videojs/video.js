@@ -645,7 +645,7 @@ test('should restore attributes from the original video tag when creating a new 
   tag.setAttribute('autoplay', '');
   tag.setAttribute('webkit-playsinline', '');
 
-  const html5Mock = { options_: { tag: tag } };
+  const html5Mock = { options_: {tag} };
 
   // set options that should override tag attributes
   html5Mock.options_.preload = 'none';
@@ -940,7 +940,9 @@ test('Player#tech alerts and throws without the appropriate input', function() {
   let alertCalled;
   const oldAlert = window.alert;
 
-  window.alert = () => alertCalled = true;
+  window.alert = () => {
+    alertCalled = true;
+  };
 
   const tech_ = {};
 
@@ -1030,14 +1032,14 @@ test('Make sure that player\'s style el respects VIDEOJS_NO_DYNAMIC_STYLE option
   tag.height = 300;
 
   window.VIDEOJS_NO_DYNAMIC_STYLE = true;
-  let player = TestHelpers.makePlayer({}, tag);
+  TestHelpers.makePlayer({}, tag);
 
   styles = document.querySelectorAll('style');
   equal(styles.length, 0, 'we should not get any style elements included in the DOM');
 
   window.VIDEOJS_NO_DYNAMIC_STYLE = false;
   tag = TestHelpers.makeTag();
-  player = TestHelpers.makePlayer({}, tag);
+  TestHelpers.makePlayer({}, tag);
   styles = document.querySelectorAll('style');
   equal(styles.length, 1, 'we should have one style element in the DOM');
   equal(styles[0].className, 'vjs-styles-dimensions', 'the class name is the one we expected');
