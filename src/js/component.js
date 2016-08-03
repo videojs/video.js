@@ -64,7 +64,7 @@ class Component {
     // If there was no ID from the options, generate one
     if (!this.id_) {
       // Don't require the player ID function in the case of mock players
-      let id = player && player.id && player.id() || 'no_player';
+      const id = player && player.id && player.id() || 'no_player';
 
       this.id_ = `${id}_component_${Guid.newGUID()}`;
     }
@@ -217,21 +217,21 @@ class Component {
   }
 
   localize(string) {
-    let code = this.player_.language && this.player_.language();
-    let languages = this.player_.languages && this.player_.languages();
+    const code = this.player_.language && this.player_.language();
+    const languages = this.player_.languages && this.player_.languages();
 
     if (!code || !languages) {
       return string;
     }
 
-    let language = languages[code];
+    const language = languages[code];
 
     if (language && language[string]) {
       return language[string];
     }
 
-    let primaryCode = code.split('-')[0];
-    let primaryLang = languages[primaryCode];
+    const primaryCode = code.split('-')[0];
+    const primaryLang = languages[primaryCode];
 
     if (primaryLang && primaryLang[string]) {
       return primaryLang[string];
@@ -359,14 +359,14 @@ class Component {
 
       // If no componentClass in options, assume componentClass is the name lowercased
       // (e.g. playButton)
-      let componentClassName = options.componentClass || toTitleCase(componentName);
+      const componentClassName = options.componentClass || toTitleCase(componentName);
 
       // Set name through options
       options.name = componentName;
 
       // Create a new object & element for this controls set
       // If there's no .player_, this is a player
-      let ComponentClass = Component.getComponent(componentClassName);
+      const ComponentClass = Component.getComponent(componentClassName);
 
       if (!ComponentClass) {
         throw new Error(`Component ${componentClassName} does not exist`);
@@ -404,8 +404,8 @@ class Component {
     // Add the UI object's element to the container div (box)
     // Having an element is not required
     if (typeof component.el === 'function' && component.el()) {
-      let childNodes = this.contentEl().children;
-      let refNode = childNodes[index] || null;
+      const childNodes = this.contentEl().children;
+      const refNode = childNodes[index] || null;
 
       this.contentEl().insertBefore(component.el(), refNode);
     }
@@ -447,7 +447,7 @@ class Component {
     this.childIndex_[component.id()] = null;
     this.childNameIndex_[component.name()] = null;
 
-    let compEl = component.el();
+    const compEl = component.el();
 
     if (compEl && compEl.parentNode === this.contentEl()) {
       this.contentEl().removeChild(component.el());
@@ -501,14 +501,14 @@ class Component {
    * @method initChildren
    */
   initChildren() {
-    let children = this.options_.children;
+    const children = this.options_.children;
 
     if (children) {
       // `this` is `parent`
-      let parentOptions = this.options_;
+      const parentOptions = this.options_;
 
-      let handleAdd = (child) => {
-        let name = child.name;
+      const handleAdd = (child) => {
+        const name = child.name;
         let opts = child.opts;
 
         // Allow options for children to be set at the parent options
@@ -538,7 +538,7 @@ class Component {
         // Add a direct reference to the child by name on the parent instance.
         // If two of the same component are used, different names should be supplied
         // for each
-        let newChild = this.addChild(name, opts);
+        const newChild = this.addChild(name, opts);
 
         if (newChild) {
           this[name] = newChild;
@@ -547,7 +547,7 @@ class Component {
 
       // Allow for an array of children details to passed in the options
       let workingChildren;
-      let Tech = Component.getComponent('Tech');
+      const Tech = Component.getComponent('Tech');
 
       if (Array.isArray(children)) {
         workingChildren = children;
@@ -585,7 +585,7 @@ class Component {
         // we have to make sure that child.name isn't in the techOrder since
         // techs are registerd as Components but can't aren't compatible
         // See https://github.com/videojs/video.js/issues/2772
-        let c = Component.getComponent(child.opts.componentClass ||
+        const c = Component.getComponent(child.opts.componentClass ||
                                        toTitleCase(child.name));
 
         return c && !Tech.isTech(c);
@@ -826,7 +826,7 @@ class Component {
 
     // Ensure ready is triggerd asynchronously
     this.setTimeout(function() {
-      let readyQueue = this.readyQueue_;
+      const readyQueue = this.readyQueue_;
 
       // Reset Ready Queue
       this.readyQueue_ = [];
@@ -1078,8 +1078,8 @@ class Component {
     }
 
     // Get dimension value from style
-    let val = this.el_.style[widthOrHeight];
-    let pxIndex = val.indexOf('px');
+    const val = this.el_.style[widthOrHeight];
+    const pxIndex = val.indexOf('px');
 
     if (pxIndex !== -1) {
       // Return the pixel value with no 'px'
@@ -1300,7 +1300,7 @@ class Component {
     fn = Fn.bind(this, fn);
 
     // window.setTimeout would be preferable here, but due to some bizarre issue with Sinon and/or Phantomjs, we can't.
-    let timeoutId = window.setTimeout(fn, timeout);
+    const timeoutId = window.setTimeout(fn, timeout);
 
     const disposeFn = function() {
       this.clearTimeout(timeoutId);
@@ -1343,7 +1343,7 @@ class Component {
   setInterval(fn, interval) {
     fn = Fn.bind(this, fn);
 
-    let intervalId = window.setInterval(fn, interval);
+    const intervalId = window.setInterval(fn, interval);
 
     const disposeFn = function() {
       this.clearInterval(intervalId);
@@ -1428,7 +1428,7 @@ class Component {
     // Set up the constructor using the supplied init method
     // or using the init of the parent object
     // Make sure to check the unobfuscated version for external libs
-    let init = props.init || props.init || this.prototype.init || this.prototype.init || function() {};
+    const init = props.init || props.init || this.prototype.init || this.prototype.init || function() {};
     // In Resig's simple class inheritance (previously used) the constructor
     //  is a function that calls `this.init.apply(arguments)`
     // However that would prevent us from using `ParentObject.call(this);`
@@ -1438,7 +1438,7 @@ class Component {
     //    `ParentObject.prototype.init.apply(this, arguments);`
     //  Bleh. We're not creating a _super() function, so it's good to keep
     //  the parent constructor reference simple.
-    let subObj = function() {
+    const subObj = function() {
       init.apply(this, arguments);
     };
 
@@ -1452,7 +1452,7 @@ class Component {
     subObj.extend = Component.extend;
 
     // Extend subObj's prototype with functions and other properties from props
-    for (let name in props) {
+    for (const name in props) {
       if (props.hasOwnProperty(name)) {
         subObj.prototype[name] = props[name];
       }

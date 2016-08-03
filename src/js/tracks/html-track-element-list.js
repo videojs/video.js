@@ -12,7 +12,7 @@ class HtmlTrackElementList {
     if (browser.IS_IE8) {
       list = document.createElement('custom');
 
-      for (let prop in HtmlTrackElementList.prototype) {
+      for (const prop in HtmlTrackElementList.prototype) {
         if (prop !== 'constructor') {
           list[prop] = HtmlTrackElementList.prototype[prop];
         }

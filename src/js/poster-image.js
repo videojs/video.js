@@ -41,7 +41,7 @@ class PosterImage extends ClickableComponent {
    * @method createEl
    */
   createEl() {
-    let el = Dom.createEl('div', {
+    const el = Dom.createEl('div', {
       className: 'vjs-poster',
 
       // Don't want poster to be tabbable.
@@ -66,7 +66,7 @@ class PosterImage extends ClickableComponent {
    * @method update
    */
   update() {
-    let url = this.player().poster();
+    const url = this.player().poster();
 
     this.setSrc(url);
 

@@ -58,7 +58,7 @@ class Button extends ClickableComponent {
       'aria-live': 'polite'
     }, attributes);
 
-    let el = Component.prototype.createEl.call(this, tag, props, attributes);
+    const el = Component.prototype.createEl.call(this, tag, props, attributes);
 
     this.createControlTextEl(el);
 
@@ -75,7 +75,7 @@ class Button extends ClickableComponent {
    * @method addChild
    */
   addChild(child, options = {}) {
-    let className = this.constructor.name;
+    const className = this.constructor.name;
 
     log.warn(`Adding an actionable (user controllable) child to a Button (${className}) is not supported; use a ClickableComponent instead.`);
 

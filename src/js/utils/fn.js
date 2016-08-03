@@ -21,7 +21,7 @@ export const bind = function(context, fn, uid) {
   }
 
   // Create the new function that changes the context
-  let ret = function() {
+  const ret = function() {
     return fn.apply(context, arguments);
   };
 
