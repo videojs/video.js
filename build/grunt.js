@@ -23,20 +23,6 @@ module.exports = function(grunt) {
     },
     plugin: [
       ['browserify-derequire']
-    ],
-    transform: [
-      ['browserify-versionify', {
-        placeholder: '__VERSION__',
-        version: pkg.version
-      }],
-      ['browserify-versionify', {
-        placeholder: '__VERSION_NO_PATCH__',
-        version: version.majorMinor
-      }],
-      ['browserify-versionify', {
-        placeholder: '__SWF_VERSION__',
-        version: pkg.dependencies['videojs-swf']
-      }]
     ]
   };
 
