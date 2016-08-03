@@ -20,8 +20,8 @@ QUnit.test('should create a video tag and have access children in old IE', funct
 QUnit.test('should return a video player instance', function() {
   const fixture = document.getElementById('qunit-fixture');
 
-  fixture.innerHTML += '<video id="test_vid_id">' +
-                       '</video><video id="test_vid_id2"></video>';
+  fixture.innerHTML += '<video id="test_vid_id"></video>' +
+                       '<video id="test_vid_id2"></video>';
 
   const player = videojs('test_vid_id', { techOrder: ['techFaker'] });
 
@@ -45,8 +45,8 @@ QUnit.test('should return a video player instance', function() {
 QUnit.test('should return a video player instance from el html5 tech', function() {
   const fixture = document.getElementById('qunit-fixture');
 
-  fixture.innerHTML += '<video id="test_vid_id">' +
-                       '</video><video id="test_vid_id2"></video>';
+  fixture.innerHTML += '<video id="test_vid_id"></video>' +
+                       '<video id="test_vid_id2"></video>';
 
   const vid = document.querySelector('#test_vid_id');
 
@@ -71,8 +71,8 @@ QUnit.test('should return a video player instance from el html5 tech', function(
 QUnit.test('should return a video player instance from el techfaker', function() {
   const fixture = document.getElementById('qunit-fixture');
 
-  fixture.innerHTML += '<video id="test_vid_id">' +
-                       '</video><video id="test_vid_id2"></video>';
+  fixture.innerHTML += '<video id="test_vid_id"></video>' +
+                       '<video id="test_vid_id2"></video>';
 
   const vid = document.querySelector('#test_vid_id');
   const player = videojs(vid, {techOrder: ['techFaker']});
@@ -161,7 +161,7 @@ QUnit.test('should expose DOM functions', function() {
     const domName = methods[vjsName];
 
     QUnit.strictEqual(videojs[vjsName],
-                Dom[domName],
-                `videojs.${vjsName} is a reference to Dom.${domName}`);
+                      Dom[domName],
+                      `videojs.${vjsName} is a reference to Dom.${domName}`);
   });
 });
