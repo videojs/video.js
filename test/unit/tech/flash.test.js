@@ -12,6 +12,7 @@ class MockFlash extends Flash {
 }
 
 QUnit.module('Flash');
+
 QUnit.test('Flash.canPlaySource', function() {
   const canPlaySource = Flash.canPlaySource;
 

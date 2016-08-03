@@ -17,11 +17,6 @@ class TechFaker extends Tech {
       className: 'vjs-tech'
     });
 
-    /* if (this.player().poster()) {
-      // transfer the poster image to mimic HTML
-      el.poster = this.player().poster();
-    }*/
-
     return el;
   }
 
