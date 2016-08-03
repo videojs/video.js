@@ -8,16 +8,15 @@ import document from 'global/document';
 
 QUnit.module('HTML5', {
   setup() {
+    const el = document.createElement('div');
 
-    this.el = document.createElement('div');
-    this.el.innerHTML = '<div />';
-
+    el.innerHTML = '<div />';
     player = {
       id() {
         return 'id';
       },
-      el: () => {
-        return this.el;
+      el() {
+        return el;
       },
       options_: {},
       options() {
@@ -46,7 +45,6 @@ QUnit.module('HTML5', {
   },
   teardown() {
     tech.dispose();
-    this.el = null;
     player = null;
     tech = null;
   }
