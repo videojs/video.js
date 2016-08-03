@@ -7,10 +7,10 @@ QUnit.module('MenuButton');
 
 QUnit.test('should not throw an error when there is no children', function() {
   QUnit.expect(0);
-  let player = TestHelpers.makePlayer();
+  const player = TestHelpers.makePlayer();
 
-  let menuButton = new MenuButton(player);
-  let el = menuButton.el();
+  const menuButton = new MenuButton(player);
+  const el = menuButton.el();
 
   try {
     Events.trigger(el, 'click');
@@ -22,17 +22,14 @@ QUnit.test('should not throw an error when there is no children', function() {
 });
 
 QUnit.test('should place title list item into ul', function() {
-  var player;
-  var menuButton;
+  const player = TestHelpers.makePlayer();
 
-  player = TestHelpers.makePlayer();
-
-  menuButton = new MenuButton(player, {
+  const menuButton = new MenuButton(player, {
     title: 'testTitle'
   });
 
-  let menuContentElement = menuButton.el().getElementsByTagName('UL')[0];
-  let titleElement = menuContentElement.children[0];
+  const menuContentElement = menuButton.el().getElementsByTagName('UL')[0];
+  const titleElement = menuContentElement.children[0];
 
   QUnit.ok(titleElement.innerHTML === 'TestTitle', 'title element placed in ul');
 
@@ -42,13 +39,13 @@ QUnit.test('should place title list item into ul', function() {
 QUnit.test('clicking should display the menu', function() {
   QUnit.expect(6);
 
-  let player = TestHelpers.makePlayer();
+  const player = TestHelpers.makePlayer();
 
   // Make sure there's some content in the menu, even if it's just a title!
-  let menuButton = new MenuButton(player, {
+  const menuButton = new MenuButton(player, {
     title: 'testTitle'
   });
-  let el = menuButton.el();
+  const el = menuButton.el();
 
   QUnit.ok(menuButton.menu !== undefined, 'menu is created');
 
