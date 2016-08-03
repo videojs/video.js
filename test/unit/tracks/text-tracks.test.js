@@ -167,19 +167,20 @@ QUnit.test('update texttrack buttons on removetrack or addtrack', function() {
   };
 
   const tag = document.createElement('video');
-  const track = document.createElement('track');
+  const track1 = document.createElement('track');
+  const track2 = document.createElement('track');
 
-  track.kind = 'captions';
-  track.label = 'en';
-  track.language = 'English';
-  track.src = '#en.vtt';
-  tag.appendChild(track);
+  track1.kind = 'captions';
+  track1.label = 'en';
+  track1.language = 'English';
+  track1.src = '#en.vtt';
+  tag.appendChild(track1);
 
-  track.kind = 'captions';
-  track.label = 'es';
-  track.language = 'Spanish';
-  track.src = '#es.vtt';
-  tag.appendChild(track);
+  track2.kind = 'captions';
+  track2.label = 'es';
+  track2.language = 'Spanish';
+  track2.src = '#es.vtt';
+  tag.appendChild(track2);
 
   const player = TestHelpers.makePlayer({}, tag);
 
@@ -214,19 +215,20 @@ QUnit.test('if native text tracks are not supported, create a texttrackdisplay',
   const oldTextTrackDisplay = Component.getComponent('TextTrackDisplay');
   let called = false;
   const tag = document.createElement('video');
-  const track = document.createElement('track');
+  const track1 = document.createElement('track');
+  const track2 = document.createElement('track');
 
-  track.kind = 'captions';
-  track.label = 'en';
-  track.language = 'English';
-  track.src = 'en.vtt';
-  tag.appendChild(track);
+  track1.kind = 'captions';
+  track1.label = 'en';
+  track1.language = 'English';
+  track1.src = 'en.vtt';
+  tag.appendChild(track1);
 
-  track.kind = 'captions';
-  track.label = 'es';
-  track.language = 'Spanish';
-  track.src = 'es.vtt';
-  tag.appendChild(track);
+  track2.kind = 'captions';
+  track2.label = 'es';
+  track2.language = 'Spanish';
+  track2.src = 'es.vtt';
+  tag.appendChild(track2);
 
   Html5.TEST_VID = {
     textTracks: []
