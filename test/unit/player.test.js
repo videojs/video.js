@@ -307,8 +307,6 @@ test('should be able to initialize player twice on the same tag using string ref
 });
 
 test('should set controls and trigger events', function() {
-  // expect(6);
-
   const player = TestHelpers.makePlayer({ controls: false });
 
   ok(player.controls() === false, 'controls set through options');
@@ -329,9 +327,6 @@ test('should set controls and trigger events', function() {
     ok(true, 'disabled fired once');
   });
   player.controls(false);
-  // player.controls(true);
-  // Check for unnecessary events
-  // player.controls(true);
 
   player.dispose();
 });
