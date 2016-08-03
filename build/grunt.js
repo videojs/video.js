@@ -167,6 +167,7 @@ module.exports = function(grunt) {
       swf:   { cwd: 'node_modules/videojs-swf/dist/', src: 'video-js.swf', dest: 'build/temp/', expand: true, filter: 'isFile' },
       ie8:   { cwd: 'node_modules/videojs-ie8/dist/', src: ['**/**'], dest: 'build/temp/ie8/', expand: true, filter: 'isFile' },
       dist:  { cwd: 'build/temp/', src: ['**/**', '!test*'], dest: 'dist/', expand: true, filter: 'isFile' },
+      a11y:  { src: 'sandbox/descriptions.html.example', dest: 'sandbox/descriptions.test-a11y.html' }, // Can only test a file with a .html or .htm extension
       examples: { cwd: 'docs/examples/', src: ['**/**'], dest: 'dist/examples/', expand: true, filter: 'isFile' }
     },
     cssmin: {
@@ -470,7 +471,7 @@ module.exports = function(grunt) {
 
       },
       test: {
-        src: ['sandbox/index.html']
+        src: ['sandbox/descriptions.test-a11y.html']
       }
     }
   });
@@ -537,7 +538,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('watchAll', ['build', 'connect:dev', 'concurrent:watchAll']);
 
-  grunt.registerTask('test-a11y', ['build', 'accessibility']);
+  grunt.registerTask('test-a11y', ['build', 'copy:a11y', 'accessibility']);
 
   // Pick your testing, or run both in different terminals
   grunt.registerTask('test-ui', ['browserify:tests']);
