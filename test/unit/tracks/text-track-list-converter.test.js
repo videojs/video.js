@@ -1,10 +1,11 @@
+/* eslint-env qunit */
 import c from '../../../src/js/tracks/text-track-list-converter.js';
 import TextTrack from '../../../src/js/tracks/text-track.js';
 import TextTrackList from '../../../src/js/tracks/text-track-list.js';
 import Html5 from '../../../src/js/tech/html5.js';
 import document from 'global/document';
 
-q.module('Text Track List Converter', {});
+QUnit.module('Text Track List Converter', {});
 
 let clean = (item) => {
   delete item.id;
@@ -23,7 +24,7 @@ let cleanup = (item) => {
 };
 
 if (Html5.supportsNativeTextTracks()) {
-  q.test('trackToJson_ produces correct representation for native track object', function(a) {
+  QUnit.test('trackToJson_ produces correct representation for native track object', function(a) {
     let track = document.createElement('track');
 
     track.src = 'example.com/english.vtt';
@@ -39,7 +40,7 @@ if (Html5.supportsNativeTextTracks()) {
     }, 'the json output is same');
   });
 
-  q.test('textTracksToJson produces good json output', function(a) {
+  QUnit.test('textTracksToJson produces good json output', function(a) {
     let emulatedTrack = new TextTrack({
       kind: 'captions',
       label: 'English',
@@ -88,7 +89,7 @@ if (Html5.supportsNativeTextTracks()) {
     }], 'the output is correct');
   });
 
-  q.test('jsonToTextTracks calls addRemoteTextTrack on the tech with mixed tracks', function(a) {
+  QUnit.test('jsonToTextTracks calls addRemoteTextTrack on the tech with mixed tracks', function(a) {
     let emulatedTrack = new TextTrack({
       kind: 'captions',
       label: 'English',
@@ -139,7 +140,7 @@ if (Html5.supportsNativeTextTracks()) {
   });
 }
 
-q.test('trackToJson_ produces correct representation for emulated track object', function(a) {
+QUnit.test('trackToJson_ produces correct representation for emulated track object', function(a) {
   let track = new TextTrack({
     kind: 'captions',
     label: 'English',
@@ -157,7 +158,7 @@ q.test('trackToJson_ produces correct representation for emulated track object',
   }, 'the json output is same');
 });
 
-q.test('textTracksToJson produces good json output for emulated only', function(a) {
+QUnit.test('textTracksToJson produces good json output for emulated only', function(a) {
   let emulatedTrack = new TextTrack({
     kind: 'captions',
     label: 'English',
@@ -211,7 +212,7 @@ q.test('textTracksToJson produces good json output for emulated only', function(
   }], 'the output is correct');
 });
 
-q.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated tracks only', function(a) {
+QUnit.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated tracks only', function(a) {
   let emulatedTrack = new TextTrack({
     kind: 'captions',
     label: 'English',
