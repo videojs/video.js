@@ -303,8 +303,7 @@ QUnit.test('closeable()', function(assert) {
   assert.strictEqual(this.modal.closeable(), true, 'the modal is closed');
 
   this.modal.open().closeable(false);
-  assert.notOk(this.modal.getChild('closeButton'),
-  'the close button is no longer a child of the modal');
+  assert.notOk(this.modal.getChild('closeButton'), 'the close button is no longer a child of the modal');
   assert.notOk(initialCloseButton.el(), 'the initial close button was disposed');
 
   this.modal.handleKeyPress({which: ESC});
@@ -337,8 +336,7 @@ QUnit.test('"content" option (fills on first open() invocation)', function(asser
   assert.expect(3);
   assert.strictEqual(modal.content(), modal.options_.content, 'has the expected content');
   assert.strictEqual(spy.callCount, 1, 'auto-fills only once');
-  assert.strictEqual(modal.contentEl().firstChild, modal.options_.content,
-  'has the expected content in the DOM');
+  assert.strictEqual(modal.contentEl().firstChild, modal.options_.content, 'has the expected content in the DOM');
 });
 
 QUnit.test('"temporary" option', function(assert) {
@@ -378,8 +376,7 @@ QUnit.test('"label" option', function(assert) {
   const modal = new ModalDialog(this.player, {label});
 
   assert.expect(1);
-  assert.strictEqual(modal.el().getAttribute('aria-label'),
-  label, 'uses the label as the aria-label');
+  assert.strictEqual(modal.el().getAttribute('aria-label'), label, 'uses the label as the aria-label');
 });
 
 QUnit.test('"uncloseable" option', function(assert) {

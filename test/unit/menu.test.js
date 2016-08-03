@@ -49,32 +49,27 @@ QUnit.test('clicking should display the menu', function() {
 
   QUnit.ok(menuButton.menu !== undefined, 'menu is created');
 
-  QUnit.equal(menuButton.menu.hasClass('vjs-lock-showing'), false,
-  'menu defaults to hidden');
+  QUnit.equal(menuButton.menu.hasClass('vjs-lock-showing'), false, 'menu defaults to hidden');
 
   Events.trigger(el, 'click');
 
-  QUnit.equal(menuButton.menu.hasClass('vjs-lock-showing'), true,
-  'clicking on the menu button shows the menu');
+  QUnit.equal(menuButton.menu.hasClass('vjs-lock-showing'), true, 'clicking on the menu button shows the menu');
 
   Events.trigger(el, 'click');
 
-  QUnit.equal(menuButton.menu.hasClass('vjs-lock-showing'), false,
-  'clicking again on the menu button hides the menu');
+  QUnit.equal(menuButton.menu.hasClass('vjs-lock-showing'), false, 'clicking again on the menu button hides the menu');
 
   menuButton.disable();
 
   Events.trigger(el, 'click');
 
-  QUnit.equal(menuButton.menu.hasClass('vjs-lock-showing'), false,
-  'disable() prevents clicking from showing the menu');
+  QUnit.equal(menuButton.menu.hasClass('vjs-lock-showing'), false, 'disable() prevents clicking from showing the menu');
 
   menuButton.enable();
 
   Events.trigger(el, 'click');
 
-  QUnit.equal(menuButton.menu.hasClass('vjs-lock-showing'), true,
-  'enable() allows clicking to show the menu');
+  QUnit.equal(menuButton.menu.hasClass('vjs-lock-showing'), true, 'enable() allows clicking to show the menu');
 
   player.dispose();
 });

@@ -13,11 +13,11 @@ QUnit.test('should add and remove an event listener to an element', function() {
   };
 
   Events.on(el, 'click', listener);
-  Events.trigger(el, 'click');
   // 1 click
-  Events.off(el, 'click', listener);
   Events.trigger(el, 'click');
+  Events.off(el, 'click', listener);
   // No click should happen.
+  Events.trigger(el, 'click');
 });
 
 QUnit.test('should add and remove multiple event listeners to an element with a single call', function() {
@@ -33,20 +33,20 @@ QUnit.test('should add and remove multiple event listeners to an element with a 
   Events.trigger(el, 'click');
   Events.trigger(el, 'click');
   Events.off(el, 'click', listener);
-  Events.trigger(el, 'click');
   // No click should happen.
+  Events.trigger(el, 'click');
 
   Events.trigger(el, 'event1');
   Events.trigger(el, 'event1');
   Events.off(el, 'event1', listener);
-  Events.trigger(el, 'event1');
   // No event1 should happen.
+  Events.trigger(el, 'event1');
 
   Events.trigger(el, 'event2');
   Events.trigger(el, 'event2');
   Events.off(el, 'event2', listener);
-  Events.trigger(el, 'event2');
   // No event2 should happen.
+  Events.trigger(el, 'event2');
 });
 
 QUnit.test('should be possible to pass data when you trigger an event', function() {
@@ -79,14 +79,14 @@ QUnit.test('should remove all listeners of a type', function() {
 
   Events.on(el, 'click', listener);
   Events.on(el, 'click', listener2);
+    // 2 clicks
   Events.trigger(el, 'click');
-  // 2 clicks
 
   QUnit.ok(clicks === 2, 'both click listeners fired');
 
   Events.off(el, 'click');
-  Events.trigger(el, 'click');
   // No click should happen.
+  Events.trigger(el, 'click');
 
   QUnit.ok(clicks === 2, 'no click listeners fired');
 });
@@ -103,18 +103,18 @@ QUnit.test('should remove all listeners of an array of types', function() {
 
   Events.on(el, ['click', 'event1'], listener);
   Events.on(el, ['click', 'event1'], listener2);
+  // 2 calls
   Events.trigger(el, 'click');
   // 2 calls
   Events.trigger(el, 'event1');
-  // 2 calls
 
   QUnit.ok(calls === 4, 'both click listeners fired');
 
   Events.off(el, ['click', 'event1']);
-  Events.trigger(el, 'click');
   // No click should happen.
-  Events.trigger(el, 'event1');
+  Events.trigger(el, 'click');
   // No event1 should happen.
+  Events.trigger(el, 'event1');
 
   QUnit.ok(calls === 4, 'no event listeners fired');
 });
@@ -152,10 +152,10 @@ QUnit.test('should listen only once', function() {
   };
 
   Events.one(el, 'click', listener);
-  Events.trigger(el, 'click');
   // 1 click
   Events.trigger(el, 'click');
   // No click should happen.
+  Events.trigger(el, 'click');
 });
 
 QUnit.test('should listen only once in multiple events from a single call', function() {
@@ -167,18 +167,18 @@ QUnit.test('should listen only once in multiple events from a single call', func
   };
 
   Events.one(el, ['click', 'event1', 'event2'], listener);
-  Events.trigger(el, 'click');
   // 1 click
   Events.trigger(el, 'click');
   // No click should happen.
-  Events.trigger(el, 'event1');
+  Events.trigger(el, 'click');
   // event1 must be handled.
   Events.trigger(el, 'event1');
   // No event1 should be handled.
-  Events.trigger(el, 'event2');
+  Events.trigger(el, 'event1');
   // event2 must be handled.
   Events.trigger(el, 'event2');
   // No event2 should be handled.
+  Events.trigger(el, 'event2');
 });
 
 QUnit.test('should stop immediate propagtion', function() {
@@ -234,8 +234,7 @@ QUnit.test('should have a defaultPrevented property on an event that was prevent
   });
 
   Events.on(el, 'test', function(e) {
-    QUnit.ok(e.defaultPrevented,
-      'Should have `defaultPrevented` to signify preventDefault being called');
+    QUnit.ok(e.defaultPrevented, 'Should have `defaultPrevented` to signify preventDefault being called');
   });
 
   Events.trigger(el, 'test');
@@ -249,8 +248,7 @@ QUnit.test('should have relatedTarget correctly set on the event', function() {
   const relatedEl = document.createElement('div');
 
   Events.on(el1, 'click', function(e) {
-    QUnit.equal(e.relatedTarget, relatedEl,
-      'relatedTarget is set for all browsers when related element is set on the event');
+    QUnit.equal(e.relatedTarget, relatedEl, 'relatedTarget is set for all browsers when related element is set on the event');
   });
 
   Events.trigger(el1, { type: 'click', relatedTarget: relatedEl });

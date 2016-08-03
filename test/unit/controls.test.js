@@ -26,15 +26,11 @@ QUnit.test('should hide volume control if it\'s not supported', function() {
   const volumeControl = new VolumeControl(player);
   const muteToggle = new MuteToggle(player);
 
-  QUnit.ok(volumeControl.el().className.indexOf('vjs-hidden') >= 0,
-  'volumeControl is not hidden');
-  QUnit.ok(muteToggle.el().className.indexOf('vjs-hidden') >= 0,
-  'muteToggle is not hidden');
+  QUnit.ok(volumeControl.el().className.indexOf('vjs-hidden') >= 0, 'volumeControl is not hidden');
+  QUnit.ok(muteToggle.el().className.indexOf('vjs-hidden') >= 0, 'muteToggle is not hidden');
 });
 
 QUnit.test('should test and toggle volume control on `loadstart`', function() {
-  let i;
-
   const noop = function() {};
   const listeners = [];
   const player = {
@@ -61,28 +57,24 @@ QUnit.test('should test and toggle volume control on `loadstart`', function() {
   const volumeControl = new VolumeControl(player);
   const muteToggle = new MuteToggle(player);
 
-  QUnit.equal(volumeControl.hasClass('vjs-hidden'), false,
-  'volumeControl is hidden initially');
+  QUnit.equal(volumeControl.hasClass('vjs-hidden'), false, 'volumeControl is hidden initially');
   QUnit.equal(muteToggle.hasClass('vjs-hidden'), false, 'muteToggle is hidden initially');
 
   player.tech_.featuresVolumeControl = false;
-  for (i = 0; i < listeners.length; i++) {
+  for (let i = 0; i < listeners.length; i++) {
     listeners[i]();
   }
 
-  QUnit.equal(volumeControl.hasClass('vjs-hidden'), true,
-  'volumeControl does not hide itself');
+  QUnit.equal(volumeControl.hasClass('vjs-hidden'), true, 'volumeControl does not hide itself');
   QUnit.equal(muteToggle.hasClass('vjs-hidden'), true, 'muteToggle does not hide itself');
 
   player.tech_.featuresVolumeControl = true;
-  for (i = 0; i < listeners.length; i++) {
+  for (let i = 0; i < listeners.length; i++) {
     listeners[i]();
   }
 
-  QUnit.equal(volumeControl.hasClass('vjs-hidden'), false,
-  'volumeControl does not show itself');
-  QUnit.equal(muteToggle.hasClass('vjs-hidden'), false,
-  'muteToggle does not show itself');
+  QUnit.equal(volumeControl.hasClass('vjs-hidden'), false, 'volumeControl does not show itself');
+  QUnit.equal(muteToggle.hasClass('vjs-hidden'), false, 'muteToggle does not show itself');
 });
 
 QUnit.test('calculateDistance should use changedTouches, if available', function() {
@@ -107,8 +99,7 @@ QUnit.test('calculateDistance should use changedTouches, if available', function
     }]
   };
 
-  QUnit.equal(slider.calculateDistance(event), 0.5,
-  'we should have touched exactly in the center, so, the ratio should be half');
+  QUnit.equal(slider.calculateDistance(event), 0.5, 'we should have touched exactly in the center, so, the ratio should be half');
 });
 
 QUnit.test('should hide playback rate control if it\'s not supported', function() {
@@ -117,6 +108,5 @@ QUnit.test('should hide playback rate control if it\'s not supported', function(
   const player = TestHelpers.makePlayer();
   const playbackRate = new PlaybackRateMenuButton(player);
 
-  QUnit.ok(playbackRate.el().className.indexOf('vjs-hidden') >= 0,
-  'playbackRate is not hidden');
+  QUnit.ok(playbackRate.el().className.indexOf('vjs-hidden') >= 0, 'playbackRate is not hidden');
 });

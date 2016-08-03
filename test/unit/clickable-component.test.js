@@ -13,8 +13,7 @@ QUnit.test('should create a div with role="button"', function() {
   const el = testClickableComponent.createEl();
 
   QUnit.equal(el.nodeName.toLowerCase(), 'div', 'the name of the element is "div"');
-  QUnit.equal(el.getAttribute('role').toLowerCase(), 'button',
-    'the role of the element is "button"');
+  QUnit.equal(el.getAttribute('role').toLowerCase(), 'button', 'the role of the element is "button"');
 
   testClickableComponent.dispose();
   player.dispose();
@@ -27,18 +26,15 @@ QUnit.test('should be enabled/disabled', function() {
 
   const testClickableComponent = new ClickableComponent(player);
 
-  QUnit.equal(testClickableComponent.hasClass('vjs-disabled'), false,
-    'ClickableComponent defaults to enabled');
+  QUnit.equal(testClickableComponent.hasClass('vjs-disabled'), false, 'ClickableComponent defaults to enabled');
 
   testClickableComponent.disable();
 
-  QUnit.equal(testClickableComponent.hasClass('vjs-disabled'), true,
-    'ClickableComponent is disabled');
+  QUnit.equal(testClickableComponent.hasClass('vjs-disabled'), true, 'ClickableComponent is disabled');
 
   testClickableComponent.enable();
 
-  QUnit.equal(testClickableComponent.hasClass('vjs-disabled'), false,
-    'ClickableComponent is enabled');
+  QUnit.equal(testClickableComponent.hasClass('vjs-disabled'), false, 'ClickableComponent is enabled');
 
   testClickableComponent.dispose();
   player.dispose();

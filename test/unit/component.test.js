@@ -183,10 +183,9 @@ QUnit.test('should init child components from component options', function() {
 
 QUnit.test('should allows setting child options at the parent options level', function() {
   let parent;
-  let options;
 
   // using children array
-  options = {
+  let options = {
     children: [
       'component',
       'nullComponent'
@@ -226,8 +225,7 @@ QUnit.test('should allows setting child options at the parent options level', fu
   } catch (err) {
     QUnit.ok(false, 'Child with `false` option was initialized');
   }
-  QUnit.equal(parent.children()[0].options_.foo, true,
-  'child options set when children object is used');
+  QUnit.equal(parent.children()[0].options_.foo, true, 'child options set when children object is used');
   QUnit.equal(parent.children().length, 1, 'we should only have one child');
 });
 
@@ -507,8 +505,7 @@ QUnit.test('should not retrigger a listener when the listener calls triggerReady
 
   this.clock.tick(100);
 
-  QUnit.equal(timesCalled, 1,
-    'triggerReady from inside a ready handler does not result in an infinite loop');
+  QUnit.equal(timesCalled, 1, 'triggerReady from inside a ready handler does not result in an infinite loop');
 });
 
 QUnit.test('should add and remove a CSS class', function() {
@@ -546,13 +543,13 @@ QUnit.test('dimension() should treat NaN and null as zero', function() {
 
   newWidth = comp.dimension('width', null);
 
-  notEqual(newWidth, width, 'new width and old width are not the same');
+  QUnit.notEqual(newWidth, width, 'new width and old width are not the same');
   QUnit.equal(newWidth, comp, 'we set a value, so, return value is component');
   QUnit.equal(comp.width(), 0, 'the new width is zero');
 
   const newHeight = comp.dimension('height', NaN);
 
-  notEqual(newHeight, height, 'new height and old height are not the same');
+  QUnit.notEqual(newHeight, height, 'new height and old height are not the same');
   QUnit.equal(newHeight, comp, 'we set a value, so, return value is component');
   QUnit.equal(comp.height(), 0, 'the new height is zero');
 
@@ -613,15 +610,11 @@ QUnit.test('should get the computed dimensions', function() {
   QUnit.equal(comp.currentWidth() + 'px', computedWidth, 'matches computed width');
   QUnit.equal(comp.currentHeight() + 'px', computedHeight, 'matches computed height');
 
-  QUnit.equal(comp.currentDimension('width') + 'px', computedWidth,
-  'matches computed width');
-  QUnit.equal(comp.currentDimension('height') + 'px', computedHeight,
-  'matches computed height');
+  QUnit.equal(comp.currentDimension('width') + 'px', computedWidth, 'matches computed width');
+  QUnit.equal(comp.currentDimension('height') + 'px', computedHeight, 'matches computed height');
 
-  QUnit.equal(comp.currentDimensions().width + 'px', computedWidth,
-  'matches computed width');
-  QUnit.equal(comp.currentDimensions().height + 'px', computedHeight,
-  'matches computed width');
+  QUnit.equal(comp.currentDimensions().width + 'px', computedWidth, 'matches computed width');
+  QUnit.equal(comp.currentDimensions().height + 'px', computedHeight, 'matches computed width');
 
 });
 
@@ -711,8 +704,7 @@ QUnit.test('should emit a tap event', function() {
   browser.TOUCH_ENABLED = origTouch;
 });
 
-QUnit.test('should provide timeout methods that automatically get cleared on component disposal',
-function() {
+QUnit.test('should provide timeout methods that automatically get cleared on component disposal', function() {
   const comp = new Component(getFakePlayer());
   let timeoutsFired = 0;
   const timeoutToClear = comp.setTimeout(function() {
@@ -748,8 +740,7 @@ function() {
   QUnit.ok(timeoutsFired === 1, 'One timeout should have fired overall');
 });
 
-QUnit.test('should provide interval methods that automatically get cleared on component disposal',
-function() {
+QUnit.test('should provide interval methods that automatically get cleared on component disposal', function() {
   const comp = new Component(getFakePlayer());
 
   let intervalsFired = 0;
@@ -796,6 +787,5 @@ QUnit.test('$ and $$ functions', function() {
   children.forEach(child => contentEl.appendChild(child));
 
   QUnit.strictEqual(comp.$('div'), children[0], '$ defaults to contentEl as scope');
-  QUnit.strictEqual(comp.$$('div').length, children.length,
-  '$$ defaults to contentEl as scope');
+  QUnit.strictEqual(comp.$$('div').length, children.length, '$$ defaults to contentEl as scope');
 });

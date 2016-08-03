@@ -31,8 +31,7 @@ QUnit.test('should create the expected element', function(assert) {
   assert.strictEqual(this.btn.el().querySelector('.vjs-control-text').innerHTML, 'Close');
 });
 
-QUnit.test('should allow setting the controlText_ property as an option',
-function(assert) {
+QUnit.test('should allow setting the controlText_ property as an option', function(assert) {
   const text = 'OK!';
   const btn = new CloseButton(this.player, {controlText: text});
 
