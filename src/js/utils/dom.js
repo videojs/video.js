@@ -97,10 +97,10 @@ export function getEl(id) {
  * @function createEl
  */
 export function createEl(tagName = 'div', properties = {}, attributes = {}) {
-  let el = document.createElement(tagName);
+  const el = document.createElement(tagName);
 
   Object.getOwnPropertyNames(properties).forEach(function(propName) {
-    let val = properties[propName];
+    const val = properties[propName];
 
     // See #2176
     // We originally were accepting both properties and attributes in the
@@ -220,7 +220,7 @@ export function hasElData(el) {
  * @function removeElData
  */
 export function removeElData(el) {
-  let id = el[elIdAttr];
+  const id = el[elIdAttr];
 
   if (!id) {
     return;
@@ -314,7 +314,7 @@ export function toggleElClass(element, classToToggle, predicate) {
   // This CANNOT use `classList` internally because IE does not support the
   // second parameter to the `classList.toggle()` method! Which is fine because
   // `classList` will be used by the add/remove functions.
-  let has = hasElClass(element, classToToggle);
+  const has = hasElClass(element, classToToggle);
 
   if (typeof predicate === 'function') {
     predicate = predicate(element, classToToggle);
@@ -349,7 +349,7 @@ export function toggleElClass(element, classToToggle, predicate) {
  */
 export function setElAttributes(el, attributes) {
   Object.getOwnPropertyNames(attributes).forEach(function(attrName) {
-    let attrValue = attributes[attrName];
+    const attrValue = attributes[attrName];
 
     if (attrValue === null || typeof attrValue === 'undefined' || attrValue === false) {
       el.removeAttribute(attrName);
@@ -371,25 +371,19 @@ export function setElAttributes(el, attributes) {
  * @function getElAttributes
  */
 export function getElAttributes(tag) {
-  let obj;
-  let knownBooleans;
-  let attrs;
-  let attrName;
-  let attrVal;
-
-  obj = {};
+  const obj = {};
 
   // known boolean attributes
   // we can check for matching boolean properties, but older browsers
   // won't know about HTML5 boolean attributes that we still read from
-  knownBooleans = ',' + 'autoplay,controls,loop,muted,default' + ',';
+  const knownBooleans = ',' + 'autoplay,controls,loop,muted,default' + ',';
 
   if (tag && tag.attributes && tag.attributes.length > 0) {
-    attrs = tag.attributes;
+    const attrs = tag.attributes;
 
     for (let i = attrs.length - 1; i >= 0; i--) {
-      attrName = attrs[i].name;
-      attrVal = attrs[i].value;
+      const attrName = attrs[i].name;
+      let attrVal = attrs[i].value;
 
       // check for known booleans
       // the matching element property will return a value for typeof
@@ -484,13 +478,13 @@ export function findElPosition(el) {
  * @return {Object} This object will have x and y coordinates corresponding to the mouse position
  */
 export function getPointerPosition(el, event) {
-  let position = {};
-  let box = findElPosition(el);
-  let boxW = el.offsetWidth;
-  let boxH = el.offsetHeight;
+  const position = {};
+  const box = findElPosition(el);
+  const boxW = el.offsetWidth;
+  const boxH = el.offsetHeight;
 
-  let boxY = box.top;
-  let boxX = box.left;
+  const boxY = box.top;
+  const boxX = box.left;
   let pageY = event.pageY;
   let pageX = event.pageX;
 

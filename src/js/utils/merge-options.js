@@ -10,14 +10,12 @@ function isPlain(obj) {
     obj.constructor === Object;
 }
 
-let mergeOptions;
-
 /**
  * Merge customizer. video.js simply overwrites non-simple objects
  * (like arrays) instead of attempting to overlay them.
  * @see https://lodash.com/docs#merge
  */
-const customizer = function(destination, source) {
+function customizer(destination, source) {
   // If we're not working with a plain object, copy the value as is
   // If source is an array, for instance, it will replace destination
   if (!isPlain(source)) {
@@ -32,7 +30,7 @@ const customizer = function(destination, source) {
   if (!isPlain(destination)) {
     return mergeOptions(source);
   }
-};
+}
 
 /**
  * Merge one or more options objects, recursively merging **only**
@@ -43,10 +41,10 @@ const customizer = function(destination, source) {
  * provided objects
  * @function mergeOptions
  */
-mergeOptions = function() {
+export default function mergeOptions() {
   // contruct the call dynamically to handle the variable number of
   // objects to merge
-  let args = Array.prototype.slice.call(arguments);
+  const args = Array.prototype.slice.call(arguments);
 
   // unshift an empty object into the front of the call as the target
   // of the merge
@@ -59,6 +57,4 @@ mergeOptions = function() {
 
   // return the mutated result object
   return args[0];
-};
-
-export default mergeOptions;
+}

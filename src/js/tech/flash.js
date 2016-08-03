@@ -14,7 +14,7 @@ import Component from '../component';
 import window from 'global/window';
 import assign from 'object.assign';
 
-let navigator = window.navigator;
+const navigator = window.navigator;
 
 /**
  * Flash Media Controller - Wrapper for fallback SWF API
@@ -68,7 +68,7 @@ class Flash extends Tech {
    * @method createEl
    */
   createEl() {
-    let options = this.options_;
+    const options = this.options_;
 
     // If video.js is hosted locally you should also set the location
     // for the hosted swf, which should be relative to the page (not video.js)
@@ -79,10 +79,10 @@ class Flash extends Tech {
     }
 
     // Generate ID for swf object
-    let objId = options.techId;
+    const objId = options.techId;
 
     // Merge default flashvars with ones passed in to init
-    let flashVars = assign({
+    const flashVars = assign({
 
       // SWF Callback Functions
       readyFunction: 'videojs.Flash.onReady',
@@ -98,7 +98,7 @@ class Flash extends Tech {
     }, options.flashVars);
 
     // Merge default parames with ones passed in
-    let params = assign({
+    const params = assign({
       // Opaque is needed to overlay controls, but can affect playback performance
       wmode: 'opaque',
       // Using bgcolor prevents a white flash when the object is loading
@@ -106,7 +106,7 @@ class Flash extends Tech {
     }, options.params);
 
     // Merge default attributes with ones passed in
-    let attributes = assign({
+    const attributes = assign({
       // Both ID and Name needed or swf to identify itself
       id: objId,
       name: objId,
@@ -190,7 +190,7 @@ class Flash extends Tech {
    * @method setCurrentTime
    */
   setCurrentTime(time) {
-    let seekable = this.seekable();
+    const seekable = this.seekable();
 
     if (seekable.length) {
       // clamp to the current seekable range
@@ -241,7 +241,7 @@ class Flash extends Tech {
     if (this.readyState() === 0) {
       return NaN;
     }
-    let duration = this.el_.vjs_getProperty('duration');
+    const duration = this.el_.vjs_getProperty('duration');
 
     return duration >= 0 ? duration : Infinity;
   }
@@ -293,7 +293,7 @@ class Flash extends Tech {
    * @method buffered
    */
   buffered() {
-    let ranges = this.el_.vjs_getProperty('buffered');
+    const ranges = this.el_.vjs_getProperty('buffered');
 
     if (ranges.length === 0) {
       return createTimeRange();
@@ -334,7 +334,7 @@ const _readWrite = 'rtmpConnection,rtmpStream,preload,defaultPlaybackRate,playba
 const _readOnly = 'networkState,readyState,initialTime,startOffsetTime,paused,ended,videoWidth,videoHeight'.split(',');
 
 function _createSetter(attr) {
-  let attrUpper = attr.charAt(0).toUpperCase() + attr.slice(1);
+  const attrUpper = attr.charAt(0).toUpperCase() + attr.slice(1);
 
   _api['set' + attrUpper] = function(val) {
     return this.el_.vjs_setProperty(attr, val);
@@ -401,7 +401,7 @@ Flash.nativeSourceHandler.canHandleSource = function(source, options) {
   let type;
 
   function guessMimeType(src) {
-    let ext = Url.getFileExtension(src);
+    const ext = Url.getFileExtension(src);
 
     if (ext) {
       return `video/${ext}`;
@@ -449,8 +449,8 @@ Flash.formats = {
 };
 
 Flash.onReady = function(currSwf) {
-  let el = Dom.getEl(currSwf);
-  let tech = el && el.tech;
+  const el = Dom.getEl(currSwf);
+  const tech = el && el.tech;
 
   // if there is no el then the tech has been disposed
   // and the tech element was removed from the player div
@@ -482,7 +482,7 @@ Flash.checkReady = function(tech) {
 
 // Trigger events from the swf on the player
 Flash.onEvent = function(swfID, eventName) {
-  let tech = Dom.getEl(swfID).tech;
+  const tech = Dom.getEl(swfID).tech;
 
   tech.trigger(eventName, Array.prototype.slice.call(arguments, 2));
 };

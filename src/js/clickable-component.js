@@ -57,7 +57,7 @@ class ClickableComponent extends Component {
       'aria-live': 'polite'
     }, attributes);
 
-    let el = super.createEl(tag, props, attributes);
+    const el = super.createEl(tag, props, attributes);
 
     this.createControlTextEl(el);
 

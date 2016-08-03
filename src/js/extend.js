@@ -67,7 +67,7 @@ const extendFn = function(superClass, subClassMethods = {}) {
   _inherits(subClass, superClass);
 
   // Extend subObj's prototype with functions and other properties from props
-  for (let name in methods) {
+  for (const name in methods) {
     if (methods.hasOwnProperty(name)) {
       subClass.prototype[name] = methods[name];
     }

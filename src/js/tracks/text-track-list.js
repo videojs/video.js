@@ -33,12 +33,12 @@ class TextTrackList extends TrackList {
     // as it does not support Object.defineProperty properly
     if (browser.IS_IE8) {
       list = document.createElement('custom');
-      for (let prop in TrackList.prototype) {
+      for (const prop in TrackList.prototype) {
         if (prop !== 'constructor') {
           list[prop] = TrackList.prototype[prop];
         }
       }
-      for (let prop in TextTrackList.prototype) {
+      for (const prop in TextTrackList.prototype) {
         if (prop !== 'constructor') {
           list[prop] = TextTrackList.prototype[prop];
         }
@@ -102,7 +102,7 @@ class TextTrackList extends TrackList {
     let result = null;
 
     for (let i = 0, l = this.length; i < l; i++) {
-      let track = this[i];
+      const track = this[i];
 
       if (track.id === id) {
         result = track;

@@ -150,7 +150,7 @@ class ModalDialog extends Component {
    */
   open() {
     if (!this.opened_) {
-      let player = this.player();
+      const player = this.player();
 
       this.trigger('beforemodalopen');
       this.opened_ = true;
@@ -206,7 +206,7 @@ class ModalDialog extends Component {
    */
   close() {
     if (this.opened_) {
-      let player = this.player();
+      const player = this.player();
 
       this.trigger('beforemodalclose');
       this.opened_ = false;
@@ -242,7 +242,7 @@ class ModalDialog extends Component {
    */
   closeable(value) {
     if (typeof value === 'boolean') {
-      let closeable = this.closeable_ = !!value;
+      const closeable = this.closeable_ = !!value;
       let close = this.getChild('closeButton');
 
       // If this is being made closeable and has no close button, add one.
@@ -250,7 +250,7 @@ class ModalDialog extends Component {
 
         // The close button should be a child of the modal - not its
         // content element, so temporarily change the content element.
-        let temp = this.contentEl_;
+        const temp = this.contentEl_;
 
         this.contentEl_ = this.el_;
         close = this.addChild('closeButton', {controlText: 'Close Modal Dialog'});
@@ -292,9 +292,9 @@ class ModalDialog extends Component {
    * @return {ModalDialog}
    */
   fillWith(content) {
-    let contentEl = this.contentEl();
-    let parentEl = contentEl.parentNode;
-    let nextSiblingEl = contentEl.nextSibling;
+    const contentEl = this.contentEl();
+    const parentEl = contentEl.parentNode;
+    const nextSiblingEl = contentEl.nextSibling;
 
     this.trigger('beforemodalfill');
     this.hasBeenFilled_ = true;

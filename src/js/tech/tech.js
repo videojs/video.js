@@ -21,7 +21,7 @@ import window from 'global/window';
 import document from 'global/document';
 
 function createTrackHelper(self, kind, label, language, options = {}) {
-  let tracks = self.textTracks();
+  const tracks = self.textTracks();
 
   options.kind = kind;
 
@@ -33,7 +33,7 @@ function createTrackHelper(self, kind, label, language, options = {}) {
   }
   options.tech = self;
 
-  let track = new TextTrack(options);
+  const track = new TextTrack(options);
 
   tracks.addTrack_(track);
 
@@ -135,7 +135,7 @@ class Tech extends Component {
     this.progressInterval = this.setInterval(Fn.bind(this, function() {
       // Don't trigger unless buffered amount is greater than last time
 
-      let numBufferedPercent = this.bufferedPercent();
+      const numBufferedPercent = this.bufferedPercent();
 
       if (this.bufferedPercent_ !== numBufferedPercent) {
         this.trigger('progress');
@@ -277,11 +277,11 @@ class Tech extends Component {
     types = [].concat(types);
     // clear out all tracks because we can't reuse them between techs
     types.forEach((type) => {
-      let list = this[`${type}Tracks`]() || [];
+      const list = this[`${type}Tracks`]() || [];
       let i = list.length;
 
       while (i--) {
-        let track = list[i];
+        const track = list[i];
 
         if (type === 'text') {
           this.removeRemoteTextTrack(track);
@@ -353,11 +353,11 @@ class Tech extends Component {
    * @method initTextTrackListeners
    */
   initTextTrackListeners() {
-    let textTrackListChanges = Fn.bind(this, function() {
+    const textTrackListChanges = Fn.bind(this, function() {
       this.trigger('texttrackchange');
     });
 
-    let tracks = this.textTracks();
+    const tracks = this.textTracks();
 
     if (!tracks) {
       return;
@@ -381,11 +381,11 @@ class Tech extends Component {
     const trackTypes = ['video', 'audio'];
 
     trackTypes.forEach((type) => {
-      let trackListChanges = () => {
+      const trackListChanges = () => {
         this.trigger(`${type}trackchange`);
       };
 
-      let tracks = this[`${type}Tracks`]();
+      const tracks = this[`${type}Tracks`]();
 
       tracks.addEventListener('removetrack', trackListChanges);
       tracks.addEventListener('addtrack', trackListChanges);
@@ -403,14 +403,14 @@ class Tech extends Component {
    * @method emulateTextTracks
    */
   emulateTextTracks() {
-    let tracks = this.textTracks();
+    const tracks = this.textTracks();
 
     if (!tracks) {
       return;
     }
 
-    if (!window.WebVTT && this.el().parentNode != null) {
-      let script = document.createElement('script');
+    if (!window.WebVTT && this.el().parentNode !== null && this.el().parentNode !== undefined) {
+      const script = document.createElement('script');
 
       script.src = this.options_['vtt.js'] || '../node_modules/videojs-vtt.js/dist/vtt.js';
       script.onload = () => {
@@ -429,12 +429,12 @@ class Tech extends Component {
       this.el().parentNode.appendChild(script);
     }
 
-    let updateDisplay = () => this.trigger('texttrackchange');
-    let textTracksChanges = () => {
+    const updateDisplay = () => this.trigger('texttrackchange');
+    const textTracksChanges = () => {
       updateDisplay();
 
       for (let i = 0; i < tracks.length; i++) {
-        let track = tracks[i];
+        const track = tracks[i];
 
         track.removeEventListener('cuechange', updateDisplay);
         if (track.mode === 'showing') {
@@ -539,11 +539,11 @@ class Tech extends Component {
    * @method addRemoteTextTrack
    */
   addRemoteTextTrack(options) {
-    let track = mergeOptions(options, {
+    const track = mergeOptions(options, {
       tech: this
     });
 
-    let htmlTrackElement = new HTMLTrackElement(track);
+    const htmlTrackElement = new HTMLTrackElement(track);
 
     // store HTMLTrackElement and TextTrack to remote list
     this.remoteTextTrackEls().addTrackElement_(htmlTrackElement);
@@ -564,7 +564,7 @@ class Tech extends Component {
   removeRemoteTextTrack(track) {
     this.textTracks().removeTrack_(track);
 
-    let trackElement = this.remoteTextTrackEls().getTrackElementByTrack_(track);
+    const trackElement = this.remoteTextTrackEls().getTrackElementByTrack_(track);
 
     // remove HTMLTrackElement and TextTrack from remote list
     this.remoteTextTrackEls().removeTrackElement_(trackElement);
@@ -723,7 +723,7 @@ Tech.withSourceHandlers = function(_Tech) {
    * @return {String}         'probably', 'maybe', or '' (empty string)
    */
   _Tech.canPlayType = function(type) {
-    let handlers = _Tech.sourceHandlers || [];
+    const handlers = _Tech.sourceHandlers || [];
     let can;
 
     for (let i = 0; i < handlers.length; i++) {
@@ -746,7 +746,7 @@ Tech.withSourceHandlers = function(_Tech) {
    * @returns {null}         Null if no source handler is found
    */
   _Tech.selectSourceHandler = function(source, options) {
-    let handlers = _Tech.sourceHandlers || [];
+    const handlers = _Tech.sourceHandlers || [];
     let can;
 
     for (let i = 0; i < handlers.length; i++) {
@@ -767,7 +767,7 @@ Tech.withSourceHandlers = function(_Tech) {
    * @return {String}         'probably', 'maybe', or '' (empty string)
    */
   _Tech.canPlaySource = function(srcObj, options) {
-    let sh = _Tech.selectSourceHandler(srcObj, options);
+    const sh = _Tech.selectSourceHandler(srcObj, options);
 
     if (sh) {
       return sh.canHandleSource(srcObj, options);
@@ -780,13 +780,13 @@ Tech.withSourceHandlers = function(_Tech) {
    * When using a source handler, prefer its implementation of
    * any function normally provided by the tech.
    */
-  let deferrable = [
+  const deferrable = [
     'seekable',
     'duration'
   ];
 
   deferrable.forEach(function(fnName) {
-    let originalFn = this[fnName];
+    const originalFn = this[fnName];
 
     if (typeof originalFn !== 'function') {
       return;

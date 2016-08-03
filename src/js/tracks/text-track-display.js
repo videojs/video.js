@@ -85,20 +85,20 @@ class TextTrackDisplay extends Component {
 
       player.on('fullscreenchange', Fn.bind(this, this.updateDisplay));
 
-      let tracks = this.options_.playerOptions.tracks || [];
+      const tracks = this.options_.playerOptions.tracks || [];
 
       for (let i = 0; i < tracks.length; i++) {
         this.player_.addRemoteTextTrack(tracks[i]);
       }
 
-      let modes = {captions: 1, subtitles: 1};
-      let trackList = this.player_.textTracks();
+      const modes = {captions: 1, subtitles: 1};
+      const trackList = this.player_.textTracks();
       let firstDesc;
       let firstCaptions;
 
       if (trackList) {
         for (let i = 0; i < trackList.length; i++) {
-          let track = trackList[i];
+          const track = trackList[i];
 
           if (track.default) {
             if (track.kind === 'descriptions' && !firstDesc) {
@@ -167,7 +167,7 @@ class TextTrackDisplay extends Component {
    * @method updateDisplay
    */
   updateDisplay() {
-    let tracks = this.player_.textTracks();
+    const tracks = this.player_.textTracks();
 
     this.clearDisplay();
 
@@ -185,7 +185,7 @@ class TextTrackDisplay extends Component {
     let i = tracks.length;
 
     while (i--) {
-      let track = tracks[i];
+      const track = tracks[i];
 
       if (track.mode === 'showing') {
         if (track.kind === 'descriptions') {
@@ -214,8 +214,8 @@ class TextTrackDisplay extends Component {
       return;
     }
 
-    let overrides = this.player_.textTrackSettings.getValues();
-    let cues = [];
+    const overrides = this.player_.textTrackSettings.getValues();
+    const cues = [];
 
     for (let i = 0; i < track.activeCues.length; i++) {
       cues.push(track.activeCues[i]);
@@ -226,13 +226,13 @@ class TextTrackDisplay extends Component {
     let i = cues.length;
 
     while (i--) {
-      let cue = cues[i];
+      const cue = cues[i];
 
       if (!cue) {
         continue;
       }
 
-      let cueDiv = cue.displayState;
+      const cueDiv = cue.displayState;
 
       if (overrides.color) {
         cueDiv.firstChild.style.color = overrides.color;

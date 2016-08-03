@@ -10,7 +10,6 @@ import window from 'global/window';
 
 let _windowLoaded = false;
 let videojs;
-let autoSetupTimeout;
 
 // Automatically set up any tags that have a data-setup attribute
 const autoSetup = function() {
@@ -41,7 +40,7 @@ const autoSetup = function() {
   if (mediaEls && mediaEls.length > 0) {
 
     for (let i = 0, e = mediaEls.length; i < e; i++) {
-      let mediaEl = mediaEls[i];
+      const mediaEl = mediaEls[i];
 
       // Check if element exists, has getAttribute func.
       // IE seems to consider typeof el.getAttribute == 'object' instead of
@@ -50,7 +49,7 @@ const autoSetup = function() {
 
         // Make sure this player hasn't already been set up.
         if (mediaEl.player === undefined) {
-          let options = mediaEl.getAttribute('data-setup');
+          const options = mediaEl.getAttribute('data-setup');
 
           // Check if data-setup attr exists.
           // We only auto-setup if they've added the data-setup attr.
@@ -74,13 +73,13 @@ const autoSetup = function() {
 };
 
 // Pause to let the DOM keep processing
-autoSetupTimeout = function(wait, vjs) {
+function autoSetupTimeout(wait, vjs) {
   if (vjs) {
     videojs = vjs;
   }
 
   setTimeout(autoSetup, wait);
-};
+}
 
 if (document.readyState === 'complete') {
   _windowLoaded = true;

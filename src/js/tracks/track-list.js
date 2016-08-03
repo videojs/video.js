@@ -22,7 +22,7 @@ class TrackList extends EventTarget {
       list = this; // eslint-disable-line
       if (browser.IS_IE8) {
         list = document.createElement('custom');
-        for (let prop in TrackList.prototype) {
+        for (const prop in TrackList.prototype) {
           if (prop !== 'constructor') {
             list[prop] = TrackList.prototype[prop];
           }
@@ -52,7 +52,7 @@ class TrackList extends EventTarget {
    * @private
    */
   addTrack_(track) {
-    let index = this.tracks_.length;
+    const index = this.tracks_.length;
 
     if (!('' + index in this)) {
       Object.defineProperty(this, index, {
@@ -117,7 +117,7 @@ class TrackList extends EventTarget {
     let result = null;
 
     for (let i = 0, l = this.length; i < l; i++) {
-      let track = this[i];
+      const track = this[i];
 
       if (track.id === id) {
         result = track;
@@ -141,7 +141,7 @@ TrackList.prototype.allowedEvents_ = {
 };
 
 // emulate attribute EventHandler support to allow for feature detection
-for (let event in TrackList.prototype.allowedEvents_) {
+for (const event in TrackList.prototype.allowedEvents_) {
   TrackList.prototype['on' + event] = null;
 }
 

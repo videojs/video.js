@@ -59,12 +59,12 @@ class VideoTrackList extends TrackList {
     // as it does not support Object.defineProperty properly
     if (browser.IS_IE8) {
       list = document.createElement('custom');
-      for (let prop in TrackList.prototype) {
+      for (const prop in TrackList.prototype) {
         if (prop !== 'constructor') {
           list[prop] = TrackList.prototype[prop];
         }
       }
-      for (let prop in VideoTrackList.prototype) {
+      for (const prop in VideoTrackList.prototype) {
         if (prop !== 'constructor') {
           list[prop] = VideoTrackList.prototype[prop];
         }

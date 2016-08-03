@@ -21,7 +21,7 @@ import document from 'global/document';
  * @method _cleanUpEvents
  */
 function _cleanUpEvents(elem, type) {
-  let data = Dom.getElData(elem);
+  const data = Dom.getElData(elem);
 
   // Remove the events of a particular type if there are none left
   if (data.handlers[type].length === 0) {
@@ -91,7 +91,7 @@ export function fixEvent(event) {
   // other expected methods like isPropagationStopped. Seems to be a problem
   // with the Javascript Ninja code. So we're just overriding all events now.
   if (!event || !event.isPropagationStopped) {
-    let old = event || window.event;
+    const old = event || window.event;
 
     event = {};
     // Clone the old object so that we can modify the values event = {};
@@ -99,7 +99,7 @@ export function fixEvent(event) {
     // Firefox returns false for event.hasOwnProperty('type') and other props
     //  which makes copying more difficult.
     // TODO: Probably best to create a whitelist of event props
-    for (let key in old) {
+    for (const key in old) {
       // Safari 6.0.3 warns you if you try to copy deprecated layerX/Y
       // Chrome warns you if you try to copy deprecated keyboardEvent.keyLocation
       // and webkitMovementX/Y
@@ -161,9 +161,9 @@ export function fixEvent(event) {
     event.isImmediatePropagationStopped = returnFalse;
 
     // Handle mouse position
-    if (event.clientX != null) {
-      let doc = document.documentElement;
-      let body = document.body;
+    if (event.clientX !== null && event.clientX !== undefined) {
+      const doc = document.documentElement;
+      const body = document.body;
 
       event.pageX = event.clientX +
         (doc && doc.scrollLeft || body && body.scrollLeft || 0) -
@@ -178,7 +178,7 @@ export function fixEvent(event) {
 
     // Fix button for mouse clicks:
     // 0 == left; 1 == middle; 2 == right
-    if (event.button != null) {
+    if (event.button !== null && event.button !== undefined) {
 
       // The following is disabled because it does not pass videojs-standard
       // and... yikes.
@@ -210,7 +210,7 @@ export function on(elem, type, fn) {
     return _handleMultipleEvents(on, elem, type, fn);
   }
 
-  let data = Dom.getElData(elem);
+  const data = Dom.getElData(elem);
 
   // We need a place to store all our handler data
   if (!data.handlers) {
@@ -238,11 +238,11 @@ export function on(elem, type, fn) {
 
       event = fixEvent(event);
 
-      let handlers = data.handlers[event.type];
+      const handlers = data.handlers[event.type];
 
       if (handlers) {
         // Copy handlers so if handlers are added/removed during the process it doesn't throw everything off.
-        let handlersCopy = handlers.slice(0);
+        const handlersCopy = handlers.slice(0);
 
         for (let m = 0, n = handlersCopy.length; m < n; m++) {
           if (event.isImmediatePropagationStopped()) {
@@ -278,7 +278,7 @@ export function off(elem, type, fn) {
     return;
   }
 
-  let data = Dom.getElData(elem);
+  const data = Dom.getElData(elem);
 
   // If no events exist, nothing to unbind
   if (!data.handlers) {
@@ -290,20 +290,20 @@ export function off(elem, type, fn) {
   }
 
   // Utility function
-  let removeType = function(t) {
+  const removeType = function(t) {
     data.handlers[t] = [];
     _cleanUpEvents(elem, t);
   };
 
   // Are we removing all bound events?
   if (!type) {
-    for (let t in data.handlers) {
+    for (const t in data.handlers) {
       removeType(t);
     }
     return;
   }
 
-  let handlers = data.handlers[type];
+  const handlers = data.handlers[type];
 
   // If no handlers exist, nothing to unbind
   if (!handlers) {
@@ -341,8 +341,8 @@ export function trigger(elem, event, hash) {
   // Fetches element data and a reference to the parent (for bubbling).
   // Don't want to add a data object to cache for every parent,
   // so checking hasElData first.
-  let elemData = (Dom.hasElData(elem)) ? Dom.getElData(elem) : {};
-  let parent = elem.parentNode || elem.ownerDocument;
+  const elemData = (Dom.hasElData(elem)) ? Dom.getElData(elem) : {};
+  const parent = elem.parentNode || elem.ownerDocument;
       // type = event.type || event,
       // handler;
 
@@ -365,7 +365,7 @@ export function trigger(elem, event, hash) {
 
   // If at the top of the DOM, triggers the default action unless disabled.
   } else if (!parent && !event.defaultPrevented) {
-    let targetData = Dom.getElData(event.target);
+    const targetData = Dom.getElData(event.target);
 
     // Checks if the target has a default action for this event.
     if (event.target[event.type]) {
@@ -396,7 +396,7 @@ export function one(elem, type, fn) {
   if (Array.isArray(type)) {
     return _handleMultipleEvents(one, elem, type, fn);
   }
-  let func = function() {
+  const func = function() {
     off(elem, type, func);
     fn.apply(this, arguments);
   };
