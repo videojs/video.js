@@ -9,7 +9,24 @@ import TestHelpers from './test-helpers.js';
 
 class TestComponent1 extends Component {}
 class TestComponent2 extends Component {}
-c
+class TestComponent3 extends Component {}
+class TestComponent4 extends Component {}
+TestComponent1.prototype.options_ = {
+  children: [
+    'testComponent2',
+    'testComponent3'
+  ]
+};
+Component.registerComponent('TestComponent1', TestComponent1);
+Component.registerComponent('TestComponent2', TestComponent2);
+Component.registerComponent('TestComponent3', TestComponent3);
+Component.registerComponent('TestComponent4', TestComponent4);
+
+QUnit.module('Component', {
+  setup() {
+    this.clock = sinon.useFakeTimers();
+  },
+  teardown() {
     this.clock.restore();
   }
 });
@@ -25,15 +42,15 @@ const getFakePlayer = function() {
 };
 
 QUnit.test('should create an element', function() {
-  let comp = new Component(getFakePlayer(), {});
+  const comp = new Component(getFakePlayer(), {});
 
   QUnit.ok(comp.el().nodeName);
 });
 
 QUnit.test('should add a child component', function() {
-  let comp = new Component(getFakePlayer());
+  const comp = new Component(getFakePlayer());
 
-  let child = comp.addChild('component');
+  const child = comp.addChild('component');
 
   QUnit.ok(comp.children().length === 1);
   QUnit.ok(comp.children()[0] === child);
@@ -43,30 +60,30 @@ QUnit.test('should add a child component', function() {
 });
 
 QUnit.test('should add a child component to an index', function() {
-  let comp = new Component(getFakePlayer());
+  const comp = new Component(getFakePlayer());
 
-  let child = comp.addChild('component');
+  const child = comp.addChild('component');
 
   QUnit.ok(comp.children().length === 1);
   QUnit.ok(comp.children()[0] === child);
 
-  let child0 = comp.addChild('component', {}, 0);
+  const child0 = comp.addChild('component', {}, 0);
 
   QUnit.ok(comp.children().length === 2);
   QUnit.ok(comp.children()[0] === child0);
   QUnit.ok(comp.children()[1] === child);
 
-  let child1 = comp.addChild('component', {}, '2');
+  const child1 = comp.addChild('component', {}, '2');
 
   QUnit.ok(comp.children().length === 3);
   QUnit.ok(comp.children()[2] === child1);
 
-  let child2 = comp.addChild('component', {}, undefined);
+  const child2 = comp.addChild('component', {}, undefined);
 
   QUnit.ok(comp.children().length === 4);
   QUnit.ok(comp.children()[3] === child2);
 
-  let child3 = comp.addChild('component', {}, -1);
+  const child3 = comp.addChild('component', {}, -1);
 
   QUnit.ok(comp.children().length === 5);
   QUnit.ok(comp.children()[3] === child3);
@@ -74,7 +91,7 @@ QUnit.test('should add a child component to an index', function() {
 });
 
 QUnit.test('addChild should throw if the child does not exist', function() {
-  let comp = new Component(getFakePlayer());
+  const comp = new Component(getFakePlayer());
 
   throws(function() {
     comp.addChild('non-existent-child');
@@ -83,7 +100,7 @@ QUnit.test('addChild should throw if the child does not exist', function() {
 });
 
 QUnit.test('should init child components from options', function() {
-  let comp = new Component(getFakePlayer(), {
+  const comp = new Component(getFakePlayer(), {
     children: {
       component: {}
     }
@@ -93,8 +110,8 @@ QUnit.test('should init child components from options', function() {
   QUnit.ok(comp.el().childNodes.length === 1);
 });
 
-QUnit.test('should init child components from simple children array', function()  {
-  let comp = new Component(getFakePlayer(), {
+QUnit.test('should init child components from simple children array', function() {
+  const comp = new Component(getFakePlayer(), {
     children: [
       'component',
       'component',
@@ -107,7 +124,7 @@ QUnit.test('should init child components from simple children array', function()
 });
 
 QUnit.test('should init child components from children array of objects', function() {
-  let comp = new Component(getFakePlayer(), {
+  const comp = new Component(getFakePlayer(), {
     children: [
       { name: 'component' },
       { name: 'component' },
@@ -122,39 +139,40 @@ QUnit.test('should init child components from children array of objects', functi
 QUnit.test('should do a deep merge of child options', function() {
   // Create a default option for component
   Component.prototype.options_ = {
-    'example': {
-      'childOne': { 'foo': 'bar', 'asdf': 'fdsa' },
-      'childTwo': {},
-      'childThree': {}
+    example: {
+      childOne: { foo: 'bar', asdf: 'fdsa' },
+      childTwo: {},
+      childThree: {}
     }
   };
 
-  let comp = new Component(getFakePlayer(), {
-    'example': {
-      'childOne': { 'foo': 'baz', 'abc': '123' },
-      'childThree': false,
-      'childFour': {}
+  const comp = new Component(getFakePlayer(), {
+    example: {
+      childOne: { foo: 'baz', abc: '123' },
+      childThree: false,
+      childFour: {}
     }
   });
 
-  let mergedOptions = comp.options_;
-  let children = mergedOptions['example'];
+  const mergedOptions = comp.options_;
+  const children = mergedOptions.example;
 
-  QUnit.strictEqual(children['childOne']['foo'], 'baz', 'value three levels deep overridden');
-  QUnit.strictEqual(children['childOne']['asdf'], 'fdsa', 'value three levels deep maintained');
-  QUnit.strictEqual(children['childOne']['abc'], '123', 'value three levels deep added');
-  QUnit.ok(children['childTwo'], 'object two levels deep maintained');
-  QUnit.strictEqual(children['childThree'], false, 'object two levels deep removed');
-  QUnit.ok(children['childFour'], 'object two levels deep added');
+  QUnit.strictEqual(children.childOne.foo, 'baz', 'value three levels deep overridden');
+  QUnit.strictEqual(children.childOne.asdf, 'fdsa', 'value three levels deep maintained');
+  QUnit.strictEqual(children.childOne.abc, '123', 'value three levels deep added');
+  QUnit.ok(children.childTwo, 'object two levels deep maintained');
+  QUnit.strictEqual(children.childThree, false, 'object two levels deep removed');
+  QUnit.ok(children.childFour, 'object two levels deep added');
 
-  QUnit.strictEqual(Component.prototype.options_['example']['childOne']['foo'], 'bar', 'prototype options were not overridden');
+  QUnit.strictEqual(Component.prototype.options_.example.childOne.foo, 'bar',
+  'prototype options were not overridden');
 
   // Reset default component options to none
   Component.prototype.options_ = null;
 });
 
-QUnit.test('should init child components from component options', function(){
-  let testComp = new TestComponent1(TestHelpers.makePlayer(), {
+QUnit.test('should init child components from component options', function() {
+  const testComp = new TestComponent1(TestHelpers.makePlayer(), {
     testComponent2: false,
     testComponent4: {}
   });
@@ -163,69 +181,75 @@ QUnit.test('should init child components from component options', function(){
   QUnit.ok(testComp.childNameIndex_.testComponent4, 'we have a testComponent4');
 });
 
-QUnit.test('should allows setting child options at the parent options level', function(){
-  let parent, options;
+QUnit.test('should allows setting child options at the parent options level', function() {
+  let parent;
+  let options;
 
   // using children array
   options = {
-    'children': [
+    children: [
       'component',
       'nullComponent'
     ],
     // parent-level option for child
-    'component': {
-      'foo': true
+    component: {
+      foo: true
     },
-    'nullComponent': false
+    nullComponent: false
   };
 
   try {
     parent = new Component(getFakePlayer(), options);
-  } catch(err) {
+  } catch (err) {
     QUnit.ok(false, 'Child with `false` option was initialized');
   }
-  QUnit.equal(parent.children()[0].options_['foo'], true, 'child options set when children array is used');
+  QUnit.equal(parent.children()[0].options_.foo, true, 'child options set when children array is used');
   QUnit.equal(parent.children().length, 1, 'we should only have one child');
 
   // using children object
   options = {
-    'children': {
-      'component': {
-        'foo': false
+    children: {
+      component: {
+        foo: false
       },
-      'nullComponent': {}
+      nullComponent: {}
     },
     // parent-level option for child
-    'component': {
-      'foo': true
+    component: {
+      foo: true
     },
-    'nullComponent': false
+    nullComponent: false
   };
 
   try {
     parent = new Component(getFakePlayer(), options);
-  } catch(err) {
+  } catch (err) {
     QUnit.ok(false, 'Child with `false` option was initialized');
   }
-  QUnit.equal(parent.children()[0].options_['foo'], true, 'child options set when children object is used');
+  QUnit.equal(parent.children()[0].options_.foo, true,
+  'child options set when children object is used');
   QUnit.equal(parent.children().length, 1, 'we should only have one child');
 });
 
-QUnit.test('should dispose of component and children', function(){
-  let comp = new Component(getFakePlayer());
+QUnit.test('should dispose of component and children', function() {
+  const comp = new Component(getFakePlayer());
 
   // Add a child
-  let child = comp.addChild('Component');
+  const child = comp.addChild('Component');
+
   QUnit.ok(comp.children().length === 1);
 
   // Add a listener
-  comp.on('click', function(){ return true; });
-  let el = comp.el();
-  let data = Dom.getElData(el);
+  comp.on('click', function() {
+    return true;
+  });
+  const el = comp.el();
+  const data = Dom.getElData(el);
 
   let hasDisposed = false;
   let bubbles = null;
-  comp.on('dispose', function(event){
+
+  comp.on('dispose', function(event) {
     hasDisposed = true;
     bubbles = event.bubbles;
   });
@@ -239,18 +263,19 @@ QUnit.test('should dispose of component and children', function(){
   QUnit.ok(!child.children(), 'child children were deleted');
   QUnit.ok(!child.el(), 'child element was deleted');
   QUnit.ok(!Dom.hasElData(el), 'listener data nulled');
-  QUnit.ok(!Object.getOwnPropertyNames(data).length, 'original listener data object was emptied');
+  QUnit.ok(!Object.getOwnPropertyNames(data).length,
+  'original listener data object was emptied');
 });
 
-QUnit.test('should add and remove event listeners to element', function(){
-  let comp = new Component(getFakePlayer(), {});
+QUnit.test('should add and remove event listeners to element', function() {
+  const comp = new Component(getFakePlayer(), {});
 
   // No need to make this async because we're triggering events inline.
   // We're going to trigger the event after removing the listener,
   // So if we get extra asserts that's a problem.
   QUnit.expect(2);
 
-  let testListener = function(){
+  const testListener = function() {
     QUnit.ok(true, 'fired event once');
     QUnit.ok(this === comp, 'listener has the component as context');
   };
@@ -261,12 +286,12 @@ QUnit.test('should add and remove event listeners to element', function(){
   comp.trigger('test-event');
 });
 
-QUnit.test('should trigger a listener once using one()', function(){
-  let comp = new Component(getFakePlayer(), {});
+QUnit.test('should trigger a listener once using one()', function() {
+  const comp = new Component(getFakePlayer(), {});
 
   QUnit.expect(1);
 
-  let testListener = function(){
+  const testListener = function() {
     QUnit.ok(true, 'fired event once');
   };
 
@@ -275,13 +300,14 @@ QUnit.test('should trigger a listener once using one()', function(){
   comp.trigger('test-event');
 });
 
-QUnit.test('should be possible to pass data when you trigger an event', function () {
-  let comp = new Component(getFakePlayer(), {});
-  let data1 = 'Data1';
-  let data2 = {txt: 'Data2'};
+QUnit.test('should be possible to pass data when you trigger an event', function() {
+  const comp = new Component(getFakePlayer(), {});
+  const data1 = 'Data1';
+  const data2 = {txt: 'Data2'};
+
   QUnit.expect(3);
 
-  let testListener = function(evt, hash){
+  const testListener = function(evt, hash) {
     QUnit.ok(true, 'fired event once');
     deepEqual(hash.d1, data1);
     deepEqual(hash.d2, data2);
@@ -292,14 +318,13 @@ QUnit.test('should be possible to pass data when you trigger an event', function
   comp.trigger('test-event');
 });
 
-QUnit.test('should add listeners to other components and remove them', function(){
-  let player = getFakePlayer(),
-      comp1 = new Component(player),
-      comp2 = new Component(player),
-      listenerFired = 0,
-      testListener;
+QUnit.test('should add listeners to other components and remove them', function() {
+  const player = getFakePlayer();
+  const comp1 = new Component(player);
+  const comp2 = new Component(player);
+  let listenerFired = 0;
 
-  testListener = function(){
+  const testListener = function() {
     QUnit.equal(this, comp1, 'listener has the first component as context');
     listenerFired++;
   };
@@ -319,19 +344,20 @@ QUnit.test('should add listeners to other components and remove them', function(
   comp1.dispose();
   comp2.trigger('test-event');
   QUnit.equal(listenerFired, 0, 'listener was removed when this component was disposed first');
-  comp1.off = function(){ throw 'Comp1 off called'; };
+  comp1.off = function() {
+    throw new Error('Comp1 off called');
+  };
   comp2.dispose();
   QUnit.ok(true, 'this component removed dispose listeners from other component');
 });
 
 QUnit.test('should add listeners to other components and remove when them other component is disposed', function() {
-  let player = getFakePlayer();
-  let comp1 = new Component(player);
-  let comp2 = new Component(player);
+  const player = getFakePlayer();
+  const comp1 = new Component(player);
+  const comp2 = new Component(player);
   let listenerFired = 0;
-  let testListener;
 
-  testListener = function(){
+  const testListener = function() {
     QUnit.equal(this, comp1, 'listener has the first component as context');
     listenerFired++;
   };
@@ -339,20 +365,19 @@ QUnit.test('should add listeners to other components and remove when them other 
   comp1.on(comp2, 'test-event', testListener);
   comp2.dispose();
   comp2.off = function() {
-    throw 'Comp2 off called';
+    throw new Error('Comp2 off called');
   };
   comp1.dispose();
   QUnit.ok(true, 'this component removed dispose listener from this component that referenced other component');
 });
 
 QUnit.test('should add listeners to other components that are fired once', function() {
-  let player = getFakePlayer();
-  let comp1 = new Component(player);
-  let comp2 = new Component(player);
+  const player = getFakePlayer();
+  const comp1 = new Component(player);
+  const comp2 = new Component(player);
   let listenerFired = 0;
-  let testListener;
 
-  testListener = function(){
+  const testListener = function() {
     QUnit.equal(this, comp1, 'listener has the first component as context');
     listenerFired++;
   };
@@ -364,14 +389,13 @@ QUnit.test('should add listeners to other components that are fired once', funct
   QUnit.equal(listenerFired, 1, 'listener was executed only once');
 });
 
-QUnit.test('should add listeners to other element and remove them', function(){
-  let player = getFakePlayer();
-  let comp1 = new Component(player);
-  let el = document.createElement('div');
+QUnit.test('should add listeners to other element and remove them', function() {
+  const player = getFakePlayer();
+  const comp1 = new Component(player);
+  const el = document.createElement('div');
   let listenerFired = 0;
-  let testListener;
 
-  testListener = function(){
+  const testListener = function() {
     QUnit.equal(this, comp1, 'listener has the first component as context');
     listenerFired++;
   };
@@ -392,7 +416,7 @@ QUnit.test('should add listeners to other element and remove them', function(){
   Events.trigger(el, 'test-event');
   QUnit.equal(listenerFired, 0, 'listener was removed when this component was disposed first');
   comp1.off = function() {
-    throw 'Comp1 off called';
+    throw new Error('Comp1 off called');
   };
 
   try {
@@ -405,13 +429,12 @@ QUnit.test('should add listeners to other element and remove them', function(){
 });
 
 QUnit.test('should add listeners to other components that are fired once', function() {
-  let player = getFakePlayer();
-  let comp1 = new Component(player);
-  let el = document.createElement('div');
+  const player = getFakePlayer();
+  const comp1 = new Component(player);
+  const el = document.createElement('div');
   let listenerFired = 0;
-  let testListener;
 
-  testListener = function() {
+  const testListener = function() {
     QUnit.equal(this, comp1, 'listener has the first component as context');
     listenerFired++;
   };
@@ -428,7 +451,7 @@ QUnit.test('should trigger a listener when ready', function() {
   let methodListenerFired;
   let syncListenerFired;
 
-  let comp = new Component(getFakePlayer(), {}, function() {
+  const comp = new Component(getFakePlayer(), {}, function() {
     initListenerFired = true;
   });
 
@@ -466,9 +489,9 @@ QUnit.test('should trigger a listener when ready', function() {
 QUnit.test('should not retrigger a listener when the listener calls triggerReady', function() {
   let timesCalled = 0;
   let selfTriggered = false;
-  let comp = new Component(getFakePlayer(), {});
+  const comp = new Component(getFakePlayer(), {});
 
-  let readyListener = function() {
+  const readyListener = function() {
     timesCalled++;
 
     // Don't bother calling again if we have
@@ -489,7 +512,7 @@ QUnit.test('should not retrigger a listener when the listener calls triggerReady
 });
 
 QUnit.test('should add and remove a CSS class', function() {
-  let comp = new Component(getFakePlayer(), {});
+  const comp = new Component(getFakePlayer(), {});
 
   comp.addClass('test-class');
   QUnit.ok(comp.el().className.indexOf('test-class') !== -1);
@@ -502,7 +525,7 @@ QUnit.test('should add and remove a CSS class', function() {
 });
 
 QUnit.test('should show and hide an element', function() {
-  let comp = new Component(getFakePlayer(), {});
+  const comp = new Component(getFakePlayer(), {});
 
   comp.hide();
   QUnit.ok(comp.hasClass('vjs-hidden') === true);
@@ -511,16 +534,12 @@ QUnit.test('should show and hide an element', function() {
 });
 
 QUnit.test('dimension() should treat NaN and null as zero', function() {
-  let comp;
-  let width;
-  let height;
   let newWidth;
-  let newHeight;
 
-  width = 300;
-  height = 150;
+  const width = 300;
+  const height = 150;
 
-  comp = new Component(getFakePlayer(), {});
+  const comp = new Component(getFakePlayer(), {});
   // set component dimension
 
   comp.dimensions(width, height);
@@ -531,7 +550,7 @@ QUnit.test('dimension() should treat NaN and null as zero', function() {
   QUnit.equal(newWidth, comp, 'we set a value, so, return value is component');
   QUnit.equal(comp.width(), 0, 'the new width is zero');
 
-  newHeight = comp.dimension('height', NaN);
+  const newHeight = comp.dimension('height', NaN);
 
   notEqual(newHeight, height, 'new height and old height are not the same');
   QUnit.equal(newHeight, comp, 'we set a value, so, return value is component');
@@ -544,10 +563,10 @@ QUnit.test('dimension() should treat NaN and null as zero', function() {
 });
 
 QUnit.test('should change the width and height of a component', function() {
-  let container = document.createElement('div');
-  let comp = new Component(getFakePlayer(), {});
-  let el = comp.el();
-  let fixture = document.getElementById('qunit-fixture');
+  const container = document.createElement('div');
+  const comp = new Component(getFakePlayer(), {});
+  const el = comp.el();
+  const fixture = document.getElementById('qunit-fixture');
 
   fixture.appendChild(container);
   container.appendChild(el);
@@ -559,7 +578,7 @@ QUnit.test('should change the width and height of a component', function() {
   comp.height('123px');
 
   QUnit.ok(comp.width() === 500, 'percent values working');
-  let compStyle = TestHelpers.getComputedStyle(el, 'width');
+  const compStyle = TestHelpers.getComputedStyle(el, 'width');
 
   QUnit.ok(compStyle === comp.width() + 'px', 'matches computed style');
   QUnit.ok(comp.height() === 123, 'px values working');
@@ -611,7 +630,7 @@ QUnit.test('should use a defined content el for appending children', function() 
 
   CompWithContent.prototype.createEl = function() {
     // Create the main componenent element
-    let el = Dom.createEl('div');
+    const el = Dom.createEl('div');
 
     // Create the element where children will be appended
     this.contentEl_ = Dom.createEl('div', { id: 'contentEl' });
@@ -619,8 +638,8 @@ QUnit.test('should use a defined content el for appending children', function() 
     return el;
   };
 
-  let comp = new CompWithContent(getFakePlayer());
-  let child = comp.addChild('component');
+  const comp = new CompWithContent(getFakePlayer());
+  const child = comp.addChild('component');
 
   QUnit.ok(comp.children().length === 1);
   QUnit.ok(comp.el().childNodes[0].id === 'contentEl');
@@ -635,9 +654,9 @@ QUnit.test('should use a defined content el for appending children', function() 
 });
 
 QUnit.test('should emit a tap event', function() {
-  let comp = new Component(getFakePlayer());
+  const comp = new Component(getFakePlayer());
   let singleTouch = {};
-  let origTouch = browser.TOUCH_ENABLED;
+  const origTouch = browser.TOUCH_ENABLED;
 
   QUnit.expect(3);
   // Fake touch support. Real touch support isn't needed for this test.
@@ -694,9 +713,9 @@ QUnit.test('should emit a tap event', function() {
 
 QUnit.test('should provide timeout methods that automatically get cleared on component disposal',
 function() {
-  let comp = new Component(getFakePlayer());
+  const comp = new Component(getFakePlayer());
   let timeoutsFired = 0;
-  let timeoutToClear = comp.setTimeout(function() {
+  const timeoutToClear = comp.setTimeout(function() {
     timeoutsFired++;
     QUnit.ok(false, 'Timeout should have been manually cleared');
   }, 500);
@@ -731,11 +750,11 @@ function() {
 
 QUnit.test('should provide interval methods that automatically get cleared on component disposal',
 function() {
-  let comp = new Component(getFakePlayer());
+  const comp = new Component(getFakePlayer());
 
   let intervalsFired = 0;
 
-  let interval = comp.setInterval(function() {
+  const interval = comp.setInterval(function() {
     intervalsFired++;
     QUnit.equal(this, comp, 'Interval fn has the component as its context');
     QUnit.ok(true, 'Interval created and fired.');
@@ -766,9 +785,9 @@ function() {
 });
 
 QUnit.test('$ and $$ functions', function() {
-  let comp = new Component(getFakePlayer());
-  let contentEl = document.createElement('div');
-  let children = [
+  const comp = new Component(getFakePlayer());
+  const contentEl = document.createElement('div');
+  const children = [
     document.createElement('div'),
     document.createElement('div')
   ];
