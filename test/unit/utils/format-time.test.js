@@ -30,7 +30,6 @@ QUnit.test('should format time as a string', function() {
 QUnit.test('should format invalid times as dashes', function() {
   QUnit.equal(formatTime(Infinity, 90), '-:-');
   QUnit.equal(formatTime(NaN), '-:-');
-  // QUnit.equal(formatTime(NaN, 216000), '-:--:--');
   QUnit.equal(formatTime(10, Infinity), '0:00:10');
   QUnit.equal(formatTime(90, NaN), '1:30');
 });
