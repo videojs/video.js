@@ -4,7 +4,11 @@
  * Format seconds as a time string, H:MM:SS or M:SS
  * Supplying a guide (in seconds) will force a number of leading zeros
  * to cover the length of the guide
- *
+ */
+
+import window from 'global/window';
+
+/**
  * @param  {Number} seconds Number of seconds to be turned into a string
  * @param  {Number} guide   Number (in seconds) to model the string after
  * @return {String}         Time formatted as H:MM:SS or M:SS
@@ -12,6 +16,11 @@
  * @function formatTime
  */
 function formatTime(seconds, guide=seconds) {
+  // Allow the user to manually override time formatting using a custom function
+  if (window.videojs && typeof window.videojs.formatTime === 'function' && window.videojs.formatTime !== formatTime) {
+    return window.videojs.formatTime.apply(this, arguments);
+  }
+
   seconds = seconds < 0 ? 0 : seconds;
   let s = Math.floor(seconds % 60);
   let m = Math.floor(seconds / 60 % 60);
