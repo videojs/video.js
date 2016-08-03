@@ -531,14 +531,15 @@ module.exports = function(grunt) {
     'shell:noderequire',
     'shell:browserify',
     'shell:webpack',
-    'karma:defaults'].concat(process.env.TRAVIS && 'coveralls').filter(Boolean));
+    'karma:defaults'
+    'test-a11y'].concat(process.env.TRAVIS && 'coveralls').filter(Boolean));
 
   // Run while developing
   grunt.registerTask('dev', ['build', 'connect:dev', 'concurrent:watchSandbox']);
 
   grunt.registerTask('watchAll', ['build', 'connect:dev', 'concurrent:watchAll']);
 
-  grunt.registerTask('test-a11y', ['build', 'copy:a11y', 'accessibility']);
+  grunt.registerTask('test-a11y', ['copy:a11y', 'accessibility']);
 
   // Pick your testing, or run both in different terminals
   grunt.registerTask('test-ui', ['browserify:tests']);
