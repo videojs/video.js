@@ -234,7 +234,7 @@ QUnit.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated 
   tt.addTrack_(anotherTrack);
   tt.addTrack_(emulatedTrack);
 
-  const addRemotes = 0;
+  let addRemotes = 0;
   const tech = {
     $$() {
       return [];
