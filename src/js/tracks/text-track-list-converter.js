@@ -12,14 +12,16 @@
  * @return {Object} a serializable javascript representation of the
  * @private
  */
-let trackToJson_ = function(track) {
-  let ret = ['kind', 'label', 'language', 'id',
-             'inBandMetadataTrackDispatchType',
-             'mode', 'src'].reduce((acc, prop, i) => {
+const trackToJson_ = function(track) {
+  const ret = [
+    'kind', 'label', 'language', 'id',
+    'inBandMetadataTrackDispatchType', 'mode', 'src'
+  ].reduce((acc, prop, i) => {
+
     if (track[prop]) {
       acc[prop] = track[prop];
     }
-    
+
     return acc;
   }, {
     cues: track.cues && Array.prototype.map.call(track.cues, function(cue) {
@@ -43,13 +45,14 @@ let trackToJson_ = function(track) {
  * @return {Array} a serializable javascript representation of the
  * @function textTracksToJson
  */
-let textTracksToJson = function(tech) {
+const textTracksToJson = function(tech) {
 
-  let trackEls = tech.$$('track');
+  const trackEls = tech.$$('track');
 
-  let trackObjs = Array.prototype.map.call(trackEls, (t) => t.track);
-  let tracks = Array.prototype.map.call(trackEls, function(trackEl) {
-    let json = trackToJson_(trackEl.track);
+  const trackObjs = Array.prototype.map.call(trackEls, (t) => t.track);
+  const tracks = Array.prototype.map.call(trackEls, function(trackEl) {
+    const json = trackToJson_(trackEl.track);
+
     if (trackEl.src) {
       json.src = trackEl.src;
     }
@@ -69,9 +72,10 @@ let textTracksToJson = function(tech) {
  * @param tech {tech} the tech to create text tracks on
  * @function jsonToTextTracks
  */
-let jsonToTextTracks = function(json, tech) {
+const jsonToTextTracks = function(json, tech) {
   json.forEach(function(track) {
-    let addedTrack = tech.addRemoteTextTrack(track).track;
+    const addedTrack = tech.addRemoteTextTrack(track).track;
+
     if (!track.src && track.cues) {
       track.cues.forEach((cue) => addedTrack.addCue(cue));
     }

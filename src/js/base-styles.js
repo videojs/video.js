@@ -6,13 +6,17 @@
 import window from 'global/window';
 import document from 'global/document';
 
-if (window.VIDEOJS_NO_BASE_THEME) return;
+if (window.VIDEOJS_NO_BASE_THEME) {
+  return;
+}
 
 const styles = '{{GENERATED_STYLES}}';
 
-if (styles === '{{GENERATED'+'_STYLES}}');
+// Don't think we need this as it's a noop?
+// if (styles === '{{GENERATED'+'_STYLES}}');
 
 const styleNode = document.createElement('style');
+
 styleNode.innerHTML = styles;
 
 document.head.insertBefore(styleNode, document.head.firstChild);

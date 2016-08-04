@@ -3,7 +3,6 @@
  */
 import TrackButton from '../track-button.js';
 import Component from '../../component.js';
-import * as Fn from '../../utils/fn.js';
 import TextTrackMenuItem from './text-track-menu-item.js';
 import OffTextTrackMenuItem from './off-text-track-menu-item.js';
 
@@ -17,7 +16,7 @@ import OffTextTrackMenuItem from './off-text-track-menu-item.js';
  */
 class TextTrackButton extends TrackButton {
 
-  constructor(player, options = {}){
+  constructor(player, options = {}) {
     options.tracks = player.textTracks();
 
     super(player, options);
@@ -29,25 +28,25 @@ class TextTrackButton extends TrackButton {
    * @return {Array} Array of menu items
    * @method createItems
    */
-  createItems(items=[]) {
+  createItems(items = []) {
     // Add an OFF menu item to turn all tracks off
-    items.push(new OffTextTrackMenuItem(this.player_, { 'kind': this.kind_ }));
+    items.push(new OffTextTrackMenuItem(this.player_, {kind: this.kind_}));
 
-    let tracks = this.player_.textTracks();
+    const tracks = this.player_.textTracks();
 
     if (!tracks) {
       return items;
     }
 
     for (let i = 0; i < tracks.length; i++) {
-      let track = tracks[i];
+      const track = tracks[i];
 
       // only add tracks that are of the appropriate kind and have a label
-      if (track['kind'] === this.kind_) {
+      if (track.kind === this.kind_) {
         items.push(new TextTrackMenuItem(this.player_, {
+          track,
           // MenuItem is selectable
-          'selectable': true,
-          'track': track
+          selectable: true
         }));
       }
     }

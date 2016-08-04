@@ -21,6 +21,7 @@ const disableOthers = function(list, track) {
     list[i].enabled = false;
   }
 };
+
 /**
  * A list of possible audio tracks. All functionality is in the
  * base class Tracklist and the spec for AudioTrackList is located at:
@@ -57,12 +58,12 @@ class AudioTrackList extends TrackList {
     // as it does not support Object.defineProperty properly
     if (browser.IS_IE8) {
       list = document.createElement('custom');
-      for (let prop in TrackList.prototype) {
+      for (const prop in TrackList.prototype) {
         if (prop !== 'constructor') {
           list[prop] = TrackList.prototype[prop];
         }
       }
-      for (let prop in AudioTrackList.prototype) {
+      for (const prop in AudioTrackList.prototype) {
         if (prop !== 'constructor') {
           list[prop] = AudioTrackList.prototype[prop];
         }

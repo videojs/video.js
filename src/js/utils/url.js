@@ -16,13 +16,15 @@ export const parseUrl = function(url) {
 
   // add the url to an anchor and let the browser parse the URL
   let a = document.createElement('a');
+
   a.href = url;
 
   // IE8 (and 9?) Fix
   // ie8 doesn't parse the URL correctly until the anchor is actually
   // added to the body, and an innerHTML is needed to trigger the parsing
-  let addToBody = (a.host === '' && a.protocol !== 'file:');
+  const addToBody = (a.host === '' && a.protocol !== 'file:');
   let div;
+
   if (addToBody) {
     div = document.createElement('div');
     div.innerHTML = `<a href="${url}"></a>`;
@@ -35,8 +37,9 @@ export const parseUrl = function(url) {
   // Copy the specific URL properties to a new object
   // This is also needed for IE8 because the anchor loses its
   // properties when it's removed from the dom
-  let details = {};
-  for (var i = 0; i < props.length; i++) {
+  const details = {};
+
+  for (let i = 0; i < props.length; i++) {
     details[props[i]] = a[props[i]];
   }
 
@@ -45,6 +48,7 @@ export const parseUrl = function(url) {
   if (details.protocol === 'http:') {
     details.host = details.host.replace(/:80$/, '');
   }
+
   if (details.protocol === 'https:') {
     details.host = details.host.replace(/:443$/, '');
   }
@@ -65,11 +69,12 @@ export const parseUrl = function(url) {
  * @private
  * @method getAbsoluteURL
  */
-export const getAbsoluteURL = function(url){
+export const getAbsoluteURL = function(url) {
   // Check if absolute URL
   if (!url.match(/^https?:\/\//)) {
     // Convert to absolute URL. Flash hosted off-site needs an absolute URL.
-    let div = document.createElement('div');
+    const div = document.createElement('div');
+
     div.innerHTML = `<a href="${url}">x</a>`;
     url = div.firstChild.href;
   }
@@ -85,9 +90,9 @@ export const getAbsoluteURL = function(url){
  * @method getFileExtension
  */
 export const getFileExtension = function(path) {
-  if(typeof path === 'string'){
-    let splitPathRe = /^(\/?)([\s\S]*?)((?:\.{1,2}|[^\/]+?)(\.([^\.\/\?]+)))(?:[\/]*|[\?].*)$/i;
-    let pathParts = splitPathRe.exec(path);
+  if (typeof path === 'string') {
+    const splitPathRe = /^(\/?)([\s\S]*?)((?:\.{1,2}|[^\/]+?)(\.([^\.\/\?]+)))(?:[\/]*|[\?].*)$/i;
+    const pathParts = splitPathRe.exec(path);
 
     if (pathParts) {
       return pathParts.pop().toLowerCase();
@@ -105,15 +110,15 @@ export const getFileExtension = function(path) {
  * @method isCrossOrigin
  */
 export const isCrossOrigin = function(url) {
-  let winLoc = window.location;
-  let urlInfo = parseUrl(url);
+  const winLoc = window.location;
+  const urlInfo = parseUrl(url);
 
   // IE8 protocol relative urls will return ':' for protocol
-  let srcProtocol = urlInfo.protocol === ':' ? winLoc.protocol : urlInfo.protocol;
+  const srcProtocol = urlInfo.protocol === ':' ? winLoc.protocol : urlInfo.protocol;
 
   // Check if url is for another domain/origin
   // IE8 doesn't know location.origin, so we won't rely on it here
-  let crossOrigin = (srcProtocol + urlInfo.host) !== (winLoc.protocol + winLoc.host);
+  const crossOrigin = (srcProtocol + urlInfo.host) !== (winLoc.protocol + winLoc.host);
 
   return crossOrigin;
 };

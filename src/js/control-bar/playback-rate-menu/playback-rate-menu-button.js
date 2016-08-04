@@ -17,7 +17,7 @@ import * as Dom from '../../utils/dom.js';
  */
 class PlaybackRateMenuButton extends MenuButton {
 
-  constructor(player, options){
+  constructor(player, options) {
     super(player, options);
 
     this.updateVisibility();
@@ -34,7 +34,7 @@ class PlaybackRateMenuButton extends MenuButton {
    * @method createEl
    */
   createEl() {
-    let el = super.createEl();
+    const el = super.createEl();
 
     this.labelEl_ = Dom.createEl('div', {
       className: 'vjs-playback-rate-value',
@@ -63,13 +63,13 @@ class PlaybackRateMenuButton extends MenuButton {
    * @method createMenu
    */
   createMenu() {
-    let menu = new Menu(this.player());
-    let rates = this.playbackRates();
+    const menu = new Menu(this.player());
+    const rates = this.playbackRates();
 
     if (rates) {
       for (let i = rates.length - 1; i >= 0; i--) {
         menu.addChild(
-          new PlaybackRateMenuItem(this.player(), { 'rate': rates[i] + 'x'})
+          new PlaybackRateMenuItem(this.player(), {rate: rates[i] + 'x'})
         );
       }
     }
@@ -94,12 +94,13 @@ class PlaybackRateMenuButton extends MenuButton {
    */
   handleClick() {
     // select next rate option
-    let currentRate = this.player().playbackRate();
-    let rates = this.playbackRates();
+    const currentRate = this.player().playbackRate();
+    const rates = this.playbackRates();
 
     // this will select first one if the last one currently selected
     let newRate = rates[0];
-    for (let i = 0; i < rates.length ; i++) {
+
+    for (let i = 0; i < rates.length; i++) {
       if (rates[i] > currentRate) {
         newRate = rates[i];
         break;
@@ -115,7 +116,7 @@ class PlaybackRateMenuButton extends MenuButton {
    * @method playbackRates
    */
   playbackRates() {
-    return this.options_['playbackRates'] || (this.options_.playerOptions && this.options_.playerOptions['playbackRates']);
+    return this.options_.playbackRates || (this.options_.playerOptions && this.options_.playerOptions.playbackRates);
   }
 
   /**
@@ -126,10 +127,10 @@ class PlaybackRateMenuButton extends MenuButton {
    * @method playbackRateSupported
    */
   playbackRateSupported() {
-    return this.player().tech_
-      && this.player().tech_['featuresPlaybackRate']
-      && this.playbackRates()
-      && this.playbackRates().length > 0
+    return this.player().tech_ &&
+      this.player().tech_.featuresPlaybackRate &&
+      this.playbackRates() &&
+      this.playbackRates().length > 0
     ;
   }
 

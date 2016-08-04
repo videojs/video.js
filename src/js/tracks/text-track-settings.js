@@ -8,251 +8,8 @@ import log from '../utils/log.js';
 import safeParseTuple from 'safe-json-parse/tuple';
 import window from 'global/window';
 
-/**
- * Manipulate settings of texttracks
- *
- * @param {Object} player  Main Player
- * @param {Object=} options Object of option names and values
- * @extends Component
- * @class TextTrackSettings
- */
-class TextTrackSettings extends Component {
-
-  constructor(player, options) {
-    super(player, options);
-    this.hide();
-
-    // Grab `persistTextTrackSettings` from the player options if not passed in child options
-    if (options.persistTextTrackSettings === undefined) {
-      this.options_.persistTextTrackSettings = this.options_.playerOptions.persistTextTrackSettings;
-    }
-
-    Events.on(this.$('.vjs-done-button'), 'click', Fn.bind(this, function() {
-      this.saveSettings();
-      this.hide();
-    }));
-
-    Events.on(this.$('.vjs-default-button'), 'click', Fn.bind(this, function() {
-      this.$('.vjs-fg-color > select').selectedIndex = 0;
-      this.$('.vjs-bg-color > select').selectedIndex = 0;
-      this.$('.window-color > select').selectedIndex = 0;
-      this.$('.vjs-text-opacity > select').selectedIndex = 0;
-      this.$('.vjs-bg-opacity > select').selectedIndex = 0;
-      this.$('.vjs-window-opacity > select').selectedIndex = 0;
-      this.$('.vjs-edge-style select').selectedIndex = 0;
-      this.$('.vjs-font-family select').selectedIndex = 0;
-      this.$('.vjs-font-percent select').selectedIndex = 2;
-      this.updateDisplay();
-    }));
-
-    Events.on(this.$('.vjs-fg-color > select'), 'change', Fn.bind(this, this.updateDisplay));
-    Events.on(this.$('.vjs-bg-color > select'), 'change', Fn.bind(this, this.updateDisplay));
-    Events.on(this.$('.window-color > select'), 'change', Fn.bind(this, this.updateDisplay));
-    Events.on(this.$('.vjs-text-opacity > select'), 'change', Fn.bind(this, this.updateDisplay));
-    Events.on(this.$('.vjs-bg-opacity > select'), 'change', Fn.bind(this, this.updateDisplay));
-    Events.on(this.$('.vjs-window-opacity > select'), 'change', Fn.bind(this, this.updateDisplay));
-    Events.on(this.$('.vjs-font-percent select'), 'change', Fn.bind(this, this.updateDisplay));
-    Events.on(this.$('.vjs-edge-style select'), 'change', Fn.bind(this, this.updateDisplay));
-    Events.on(this.$('.vjs-font-family select'), 'change', Fn.bind(this, this.updateDisplay));
-
-    if (this.options_.persistTextTrackSettings) {
-      this.restoreSettings();
-    }
-  }
-
-  /**
-   * Create the component's DOM element
-   *
-   * @return {Element}
-   * @method createEl
-   */
-  createEl() {
-    let uniqueId = this.id_;
-    let dialogLabelId = 'TTsettingsDialogLabel-' + uniqueId;
-    let dialogDescriptionId = 'TTsettingsDialogDescription-' + uniqueId;
-
-    return super.createEl('div', {
-      className: 'vjs-caption-settings vjs-modal-overlay',
-      innerHTML: captionOptionsMenuTemplate(uniqueId, dialogLabelId, dialogDescriptionId),
-      tabIndex: -1
-    }, {
-      role: 'dialog',
-      'aria-labelledby': dialogLabelId,
-      'aria-describedby': dialogDescriptionId
-    });
-  }
-
-  /**
-   * Get texttrack settings
-   * Settings are
-   * .vjs-edge-style
-   * .vjs-font-family
-   * .vjs-fg-color
-   * .vjs-text-opacity
-   * .vjs-bg-color
-   * .vjs-bg-opacity
-   * .window-color
-   * .vjs-window-opacity
-   *
-   * @return {Object}
-   * @method getValues
-   */
-  getValues() {
-    const textEdge = getSelectedOptionValue(this.$('.vjs-edge-style select'));
-    const fontFamily = getSelectedOptionValue(this.$('.vjs-font-family select'));
-    const fgColor = getSelectedOptionValue(this.$('.vjs-fg-color > select'));
-    const textOpacity = getSelectedOptionValue(this.$('.vjs-text-opacity > select'));
-    const bgColor = getSelectedOptionValue(this.$('.vjs-bg-color > select'));
-    const bgOpacity = getSelectedOptionValue(this.$('.vjs-bg-opacity > select'));
-    const windowColor = getSelectedOptionValue(this.$('.window-color > select'));
-    const windowOpacity = getSelectedOptionValue(this.$('.vjs-window-opacity > select'));
-    const fontPercent = window['parseFloat'](getSelectedOptionValue(this.$('.vjs-font-percent > select')));
-
-    let result = {
-      'backgroundOpacity': bgOpacity,
-      'textOpacity': textOpacity,
-      'windowOpacity': windowOpacity,
-      'edgeStyle': textEdge,
-      'fontFamily': fontFamily,
-      'color': fgColor,
-      'backgroundColor': bgColor,
-      'windowColor': windowColor,
-      'fontPercent': fontPercent
-    };
-    for (let name in result) {
-      if (result[name] === '' || result[name] === 'none' || (name === 'fontPercent' && result[name] === 1.00)) {
-        delete result[name];
-      }
-    }
-    return result;
-  }
-
-  /**
-   * Set texttrack settings
-   * Settings are
-   * .vjs-edge-style
-   * .vjs-font-family
-   * .vjs-fg-color
-   * .vjs-text-opacity
-   * .vjs-bg-color
-   * .vjs-bg-opacity
-   * .window-color
-   * .vjs-window-opacity
-   *
-   * @param {Object} values Object with texttrack setting values
-   * @method setValues
-   */
-  setValues(values) {
-    setSelectedOption(this.$('.vjs-edge-style select'), values.edgeStyle);
-    setSelectedOption(this.$('.vjs-font-family select'), values.fontFamily);
-    setSelectedOption(this.$('.vjs-fg-color > select'), values.color);
-    setSelectedOption(this.$('.vjs-text-opacity > select'), values.textOpacity);
-    setSelectedOption(this.$('.vjs-bg-color > select'), values.backgroundColor);
-    setSelectedOption(this.$('.vjs-bg-opacity > select'), values.backgroundOpacity);
-    setSelectedOption(this.$('.window-color > select'), values.windowColor);
-    setSelectedOption(this.$('.vjs-window-opacity > select'), values.windowOpacity);
-
-    let fontPercent = values.fontPercent;
-
-    if (fontPercent) {
-      fontPercent = fontPercent.toFixed(2);
-    }
-
-    setSelectedOption(this.$('.vjs-font-percent > select'), fontPercent);
-  }
-
-  /**
-   * Restore texttrack settings
-   *
-   * @method restoreSettings
-   */
-  restoreSettings() {
-    let err, values;
-
-    try {
-      [err, values] = safeParseTuple(window.localStorage.getItem('vjs-text-track-settings'));
-
-      if (err) {
-        log.error(err);
-      }
-    } catch (e) {
-      log.warn(e);
-    }
-
-    if (values) {
-      this.setValues(values);
-    }
-  }
-
-  /**
-   * Save texttrack settings to local storage
-   *
-   * @method saveSettings
-   */
-  saveSettings() {
-    if (!this.options_.persistTextTrackSettings) {
-      return;
-    }
-
-    let values = this.getValues();
-    try {
-      if (Object.getOwnPropertyNames(values).length > 0) {
-        window.localStorage.setItem('vjs-text-track-settings', JSON.stringify(values));
-      } else {
-        window.localStorage.removeItem('vjs-text-track-settings');
-      }
-    } catch (e) {
-      log.warn(e);
-    }
-  }
-
-  /**
-   * Update display of texttrack settings
-   *
-   * @method updateDisplay
-   */
-  updateDisplay() {
-    let ttDisplay = this.player_.getChild('textTrackDisplay');
-    if (ttDisplay) {
-      ttDisplay.updateDisplay();
-    }
-  }
-
-}
-
-Component.registerComponent('TextTrackSettings', TextTrackSettings);
-
-function getSelectedOptionValue(target) {
-  let selectedOption;
-  // not all browsers support selectedOptions, so, fallback to options
-  if (target.selectedOptions) {
-    selectedOption = target.selectedOptions[0];
-  } else if (target.options) {
-    selectedOption = target.options[target.options.selectedIndex];
-  }
-
-  return selectedOption.value;
-}
-
-function setSelectedOption(target, value) {
-  if (!value) {
-    return;
-  }
-
-  let i;
-  for (i = 0; i < target.options.length; i++) {
-    const option = target.options[i];
-    if (option.value === value) {
-      break;
-    }
-  }
-
-  target.selectedIndex = i;
-}
-
 function captionOptionsMenuTemplate(uniqueId, dialogLabelId, dialogDescriptionId) {
-
-  let template = `
+  const template = `
     <div role="document">
       <div role="heading" aria-level="1" id="${dialogLabelId}" class="vjs-control-text">Captions Settings Dialog</div>
       <div id="${dialogDescriptionId}" class="vjs-control-text">Beginning of dialog window. Escape will cancel and close the window.</div>
@@ -367,9 +124,259 @@ function captionOptionsMenuTemplate(uniqueId, dialogLabelId, dialogDescriptionId
           <button class="vjs-done-button">Done</button>
         </div>
       </div> <!-- vjs-tracksettings -->
-    </div> <!--  role="document" -->`;
+    </div> <!--  role="document" -->
+  `;
 
-    return template;
+  return template;
 }
+
+function getSelectedOptionValue(target) {
+  let selectedOption;
+
+  // not all browsers support selectedOptions, so, fallback to options
+  if (target.selectedOptions) {
+    selectedOption = target.selectedOptions[0];
+  } else if (target.options) {
+    selectedOption = target.options[target.options.selectedIndex];
+  }
+
+  return selectedOption.value;
+}
+
+function setSelectedOption(target, value) {
+  if (!value) {
+    return;
+  }
+
+  let i;
+
+  for (i = 0; i < target.options.length; i++) {
+    const option = target.options[i];
+
+    if (option.value === value) {
+      break;
+    }
+  }
+
+  target.selectedIndex = i;
+}
+
+/**
+ * Manipulate settings of texttracks
+ *
+ * @param {Object} player  Main Player
+ * @param {Object=} options Object of option names and values
+ * @extends Component
+ * @class TextTrackSettings
+ */
+class TextTrackSettings extends Component {
+
+  constructor(player, options) {
+    super(player, options);
+    this.hide();
+
+    // Grab `persistTextTrackSettings` from the player options if not passed in child options
+    if (options.persistTextTrackSettings === undefined) {
+      this.options_.persistTextTrackSettings = this.options_.playerOptions.persistTextTrackSettings;
+    }
+
+    Events.on(this.$('.vjs-done-button'), 'click', Fn.bind(this, function() {
+      this.saveSettings();
+      this.hide();
+    }));
+
+    Events.on(this.$('.vjs-default-button'), 'click', Fn.bind(this, function() {
+      this.$('.vjs-fg-color > select').selectedIndex = 0;
+      this.$('.vjs-bg-color > select').selectedIndex = 0;
+      this.$('.window-color > select').selectedIndex = 0;
+      this.$('.vjs-text-opacity > select').selectedIndex = 0;
+      this.$('.vjs-bg-opacity > select').selectedIndex = 0;
+      this.$('.vjs-window-opacity > select').selectedIndex = 0;
+      this.$('.vjs-edge-style select').selectedIndex = 0;
+      this.$('.vjs-font-family select').selectedIndex = 0;
+      this.$('.vjs-font-percent select').selectedIndex = 2;
+      this.updateDisplay();
+    }));
+
+    Events.on(this.$('.vjs-fg-color > select'), 'change', Fn.bind(this, this.updateDisplay));
+    Events.on(this.$('.vjs-bg-color > select'), 'change', Fn.bind(this, this.updateDisplay));
+    Events.on(this.$('.window-color > select'), 'change', Fn.bind(this, this.updateDisplay));
+    Events.on(this.$('.vjs-text-opacity > select'), 'change', Fn.bind(this, this.updateDisplay));
+    Events.on(this.$('.vjs-bg-opacity > select'), 'change', Fn.bind(this, this.updateDisplay));
+    Events.on(this.$('.vjs-window-opacity > select'), 'change', Fn.bind(this, this.updateDisplay));
+    Events.on(this.$('.vjs-font-percent select'), 'change', Fn.bind(this, this.updateDisplay));
+    Events.on(this.$('.vjs-edge-style select'), 'change', Fn.bind(this, this.updateDisplay));
+    Events.on(this.$('.vjs-font-family select'), 'change', Fn.bind(this, this.updateDisplay));
+
+    if (this.options_.persistTextTrackSettings) {
+      this.restoreSettings();
+    }
+  }
+
+  /**
+   * Create the component's DOM element
+   *
+   * @return {Element}
+   * @method createEl
+   */
+  createEl() {
+    const uniqueId = this.id_;
+    const dialogLabelId = 'TTsettingsDialogLabel-' + uniqueId;
+    const dialogDescriptionId = 'TTsettingsDialogDescription-' + uniqueId;
+
+    return super.createEl('div', {
+      className: 'vjs-caption-settings vjs-modal-overlay',
+      innerHTML: captionOptionsMenuTemplate(uniqueId, dialogLabelId, dialogDescriptionId),
+      tabIndex: -1
+    }, {
+      'role': 'dialog',
+      'aria-labelledby': dialogLabelId,
+      'aria-describedby': dialogDescriptionId
+    });
+  }
+
+  /**
+   * Get texttrack settings
+   * Settings are
+   * .vjs-edge-style
+   * .vjs-font-family
+   * .vjs-fg-color
+   * .vjs-text-opacity
+   * .vjs-bg-color
+   * .vjs-bg-opacity
+   * .window-color
+   * .vjs-window-opacity
+   *
+   * @return {Object}
+   * @method getValues
+   */
+  getValues() {
+    const textEdge = getSelectedOptionValue(this.$('.vjs-edge-style select'));
+    const fontFamily = getSelectedOptionValue(this.$('.vjs-font-family select'));
+    const fgColor = getSelectedOptionValue(this.$('.vjs-fg-color > select'));
+    const textOpacity = getSelectedOptionValue(this.$('.vjs-text-opacity > select'));
+    const bgColor = getSelectedOptionValue(this.$('.vjs-bg-color > select'));
+    const bgOpacity = getSelectedOptionValue(this.$('.vjs-bg-opacity > select'));
+    const windowColor = getSelectedOptionValue(this.$('.window-color > select'));
+    const windowOpacity = getSelectedOptionValue(this.$('.vjs-window-opacity > select'));
+    const fontPercent = window.parseFloat(getSelectedOptionValue(this.$('.vjs-font-percent > select')));
+
+    const result = {
+      fontPercent,
+      fontFamily,
+      textOpacity,
+      windowColor,
+      windowOpacity,
+      backgroundOpacity: bgOpacity,
+      edgeStyle: textEdge,
+      color: fgColor,
+      backgroundColor: bgColor
+    };
+
+    for (const name in result) {
+      if (result[name] === '' || result[name] === 'none' || (name === 'fontPercent' && result[name] === 1.00)) {
+        delete result[name];
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Set texttrack settings
+   * Settings are
+   * .vjs-edge-style
+   * .vjs-font-family
+   * .vjs-fg-color
+   * .vjs-text-opacity
+   * .vjs-bg-color
+   * .vjs-bg-opacity
+   * .window-color
+   * .vjs-window-opacity
+   *
+   * @param {Object} values Object with texttrack setting values
+   * @method setValues
+   */
+  setValues(values) {
+    setSelectedOption(this.$('.vjs-edge-style select'), values.edgeStyle);
+    setSelectedOption(this.$('.vjs-font-family select'), values.fontFamily);
+    setSelectedOption(this.$('.vjs-fg-color > select'), values.color);
+    setSelectedOption(this.$('.vjs-text-opacity > select'), values.textOpacity);
+    setSelectedOption(this.$('.vjs-bg-color > select'), values.backgroundColor);
+    setSelectedOption(this.$('.vjs-bg-opacity > select'), values.backgroundOpacity);
+    setSelectedOption(this.$('.window-color > select'), values.windowColor);
+    setSelectedOption(this.$('.vjs-window-opacity > select'), values.windowOpacity);
+
+    let fontPercent = values.fontPercent;
+
+    if (fontPercent) {
+      fontPercent = fontPercent.toFixed(2);
+    }
+
+    setSelectedOption(this.$('.vjs-font-percent > select'), fontPercent);
+  }
+
+  /**
+   * Restore texttrack settings
+   *
+   * @method restoreSettings
+   */
+  restoreSettings() {
+    let err;
+    let values;
+
+    try {
+      [err, values] = safeParseTuple(window.localStorage.getItem('vjs-text-track-settings'));
+
+      if (err) {
+        log.error(err);
+      }
+    } catch (e) {
+      log.warn(e);
+    }
+
+    if (values) {
+      this.setValues(values);
+    }
+  }
+
+  /**
+   * Save texttrack settings to local storage
+   *
+   * @method saveSettings
+   */
+  saveSettings() {
+    if (!this.options_.persistTextTrackSettings) {
+      return;
+    }
+
+    const values = this.getValues();
+
+    try {
+      if (Object.getOwnPropertyNames(values).length > 0) {
+        window.localStorage.setItem('vjs-text-track-settings', JSON.stringify(values));
+      } else {
+        window.localStorage.removeItem('vjs-text-track-settings');
+      }
+    } catch (e) {
+      log.warn(e);
+    }
+  }
+
+  /**
+   * Update display of texttrack settings
+   *
+   * @method updateDisplay
+   */
+  updateDisplay() {
+    const ttDisplay = this.player_.getChild('textTrackDisplay');
+
+    if (ttDisplay) {
+      ttDisplay.updateDisplay();
+    }
+  }
+
+}
+
+Component.registerComponent('TextTrackSettings', TextTrackSettings);
 
 export default TextTrackSettings;
