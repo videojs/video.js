@@ -2,7 +2,8 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @misteroneill, @BrandonOCasey, and @pagarwal123 updates all the code to pass the linter ([view](https://github.com/videojs/video.js/pull/3459))
+* @misteroneill added ghooks to run linter on git push ([view](https://github.com/videojs/video.js/pull/3459))
 
 --------------------
 
