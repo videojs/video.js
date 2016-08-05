@@ -200,10 +200,28 @@ class Tech extends Component {
    * @method trackCurrentTime
    */
   trackCurrentTime() {
-    if (this.currentTimeInterval) { this.stopTrackingCurrentTime(); }
-    this.currentTimeInterval = this.setInterval(function(){
-      this.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true });
-    }, 250); // 42 = 24 fps // 250 is what Webkit uses // FF uses 15
+    this.manualTimeUpdatesActive_ = true;
+    this.manualTimeUpdateTicker_();
+  }
+
+  /**
+   * Trigger timeupdate event if not supported by browser
+   *
+   * @method manualTimeUpdateTicker_
+   */
+  manualTimeUpdateTicker_() {
+    let requestAnimationFrame =
+        window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        function(timingFn) {
+          setTimeout(timingFn, 16);
+        };
+
+    this.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true });
+    if(this.manualTimeUpdatesActive_) {
+      requestAnimationFrame(Fn.bind(this, this.manualTimeUpdateTicker_));
+    }
   }
 
   /**
@@ -212,11 +230,7 @@ class Tech extends Component {
    * @method stopTrackingCurrentTime
    */
   stopTrackingCurrentTime() {
-    this.clearInterval(this.currentTimeInterval);
-
-    // #1002 - if the video ends right before the next timeupdate would happen,
-    // the progress bar won't make it all the way to the end
-    this.trigger({ type: 'timeupdate', target: this, manuallyTriggered: true });
+    this.manualTimeUpdatesActive_ = false;
   }
 
   /**
