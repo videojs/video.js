@@ -317,9 +317,8 @@ class Player extends Component {
     // video element
     if (window.VIDEOJS_NO_DYNAMIC_STYLE !== true) {
       this.styleEl_ = stylesheet.createStyleElement('vjs-styles-dimensions');
-      let defaultsStyleEl = Dom.$('.vjs-styles-defaults');
-      let head = Dom.$('head');
-      head.insertBefore(this.styleEl_, defaultsStyleEl ? defaultsStyleEl.nextSibling : head.firstChild);
+      this.styleEl_.setAttribute('scoped', '');
+      this.el_.insertBefore(this.styleEl_, this.el_.firstChild);
     }
 
     // Pass in the width/height/aspectRatio options which will update the style el
