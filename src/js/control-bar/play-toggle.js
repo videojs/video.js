@@ -14,7 +14,7 @@ import Component from '../component.js';
  */
 class PlayToggle extends Button {
 
-  constructor(player, options){
+  constructor(player, options) {
     super(player, options);
 
     this.on(player, 'play', this.handlePlay);
@@ -52,7 +52,8 @@ class PlayToggle extends Button {
   handlePlay() {
     this.removeClass('vjs-paused');
     this.addClass('vjs-playing');
-    this.controlText('Pause'); // change the button text to "Pause"
+    // change the button text to "Pause"
+    this.controlText('Pause');
   }
 
   /**
@@ -63,7 +64,8 @@ class PlayToggle extends Button {
   handlePause() {
     this.removeClass('vjs-playing');
     this.addClass('vjs-paused');
-    this.controlText('Play'); // change the button text to "Play"
+    // change the button text to "Play"
+    this.controlText('Play');
   }
 
 }

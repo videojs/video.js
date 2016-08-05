@@ -15,14 +15,14 @@ import * as Fn from '../../utils/fn.js';
  */
 class ChaptersTrackMenuItem extends MenuItem {
 
-  constructor(player, options){
-    let track = options['track'];
-    let cue = options['cue'];
-    let currentTime = player.currentTime();
+  constructor(player, options) {
+    const track = options.track;
+    const cue = options.cue;
+    const currentTime = player.currentTime();
 
     // Modify options for parent MenuItem class's init.
-    options['label'] = cue.text;
-    options['selected'] = (cue['startTime'] <= currentTime && currentTime < cue['endTime']);
+    options.label = cue.text;
+    options.selected = (cue.startTime <= currentTime && currentTime < cue.endTime);
     super(player, options);
 
     this.track = track;
@@ -47,11 +47,11 @@ class ChaptersTrackMenuItem extends MenuItem {
    * @method update
    */
   update() {
-    let cue = this.cue;
-    let currentTime = this.player_.currentTime();
+    const cue = this.cue;
+    const currentTime = this.player_.currentTime();
 
     // vjs.log(currentTime, cue.startTime);
-    this.selected(cue['startTime'] <= currentTime && currentTime < cue['endTime']);
+    this.selected(cue.startTime <= currentTime && currentTime < cue.endTime);
   }
 
 }

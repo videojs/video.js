@@ -3,8 +3,6 @@
  */
 import Component from './component';
 import ModalDialog from './modal-dialog';
-
-import * as Dom from './utils/dom';
 import mergeOptions from './utils/merge-options';
 
 /**
@@ -46,6 +44,7 @@ class ErrorDisplay extends ModalDialog {
    */
   content() {
     let error = this.player().error();
+
     return error ? this.localize(error.message) : '';
   }
 }

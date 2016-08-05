@@ -55,24 +55,24 @@ class MouseTimeDisplay extends Component {
   }
 
   handleMouseMove(event) {
-    let duration = this.player_.duration();
-    let newTime = this.calculateDistance(event) * duration;
-    let position = event.pageX - Dom.findElPosition(this.el().parentNode).left;
+    const duration = this.player_.duration();
+    const newTime = this.calculateDistance(event) * duration;
+    const position = event.pageX - Dom.findElPosition(this.el().parentNode).left;
 
     this.update(newTime, position);
   }
 
   update(newTime, position) {
-    let time = formatTime(newTime, this.player_.duration());
+    const time = formatTime(newTime, this.player_.duration());
 
     this.el().style.left = position + 'px';
     this.el().setAttribute('data-current-time', time);
 
     if (this.keepTooltipsInside) {
-      let clampedPosition = this.clampPosition_(position);
-      let difference = position - clampedPosition + 1;
-      let tooltipWidth = parseFloat(window.getComputedStyle(this.tooltip).width);
-      let tooltipWidthHalf = tooltipWidth / 2;
+      const clampedPosition = this.clampPosition_(position);
+      const difference = position - clampedPosition + 1;
+      const tooltipWidth = parseFloat(window.getComputedStyle(this.tooltip).width);
+      const tooltipWidthHalf = tooltipWidth / 2;
 
       this.tooltip.innerHTML = time;
       this.tooltip.style.right = `-${tooltipWidthHalf - difference}px`;
@@ -98,9 +98,9 @@ class MouseTimeDisplay extends Component {
       return position;
     }
 
-    let playerWidth = parseFloat(window.getComputedStyle(this.player().el()).width);
-    let tooltipWidth = parseFloat(window.getComputedStyle(this.tooltip).width);
-    let tooltipWidthHalf = tooltipWidth / 2;
+    const playerWidth = parseFloat(window.getComputedStyle(this.player().el()).width);
+    const tooltipWidth = parseFloat(window.getComputedStyle(this.tooltip).width);
+    const tooltipWidthHalf = tooltipWidth / 2;
     let actualPosition = position;
 
     if (position < tooltipWidthHalf) {
