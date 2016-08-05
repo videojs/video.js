@@ -574,7 +574,7 @@ class Html5 extends Tech {
    */
   supportsFullScreen() {
     if (typeof this.el_.webkitEnterFullScreen === 'function') {
-      const userAgent = window.navigator && window.navigator.userAgent || "";
+      const userAgent = window.navigator && window.navigator.userAgent || '';
 
       // Seems to be broken in Chromium/Chrome && Safari in Leopard
       if ((/Android/).test(userAgent) || !(/Chrome|Mac OS X 10.5/).test(userAgent)) {

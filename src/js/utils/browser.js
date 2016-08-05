@@ -4,7 +4,7 @@
 import document from 'global/document';
 import window from 'global/window';
 
-const USER_AGENT = window.navigator && window.navigator.userAgent || "";
+const USER_AGENT = window.navigator && window.navigator.userAgent || '';
 const webkitVersionMap = (/AppleWebKit\/([\d.]+)/i).exec(USER_AGENT);
 const appleWebkitVersion = webkitVersionMap ? parseFloat(webkitVersionMap.pop()) : null;
 
