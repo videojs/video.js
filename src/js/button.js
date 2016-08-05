@@ -55,6 +55,7 @@ class Button extends ClickableComponent {
     attributes = assign({
       type: 'button', // Necessary since the default button type is "submit"
       'aria-live': 'polite' // let the screen reader user know that the text of the button may change
+      'tabindex' : 0 // add tabindex for keyboard accessibility to buttons
     }, attributes);
 
     let el = Component.prototype.createEl.call(this, tag, props, attributes);
