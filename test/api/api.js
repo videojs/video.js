@@ -68,11 +68,6 @@ test('should be able to access expected player API methods', function() {
   ok(player.addTextTrack, 'addTextTrack exists');
   ok(player.addRemoteTextTrack, 'addRemoteTextTrack exists');
   ok(player.removeRemoteTextTrack, 'removeRemoteTextTrack exists');
-
-  // Deprecated methods that should still exist
-  ok(player.requestFullScreen, 'requestFullScreen exists');
-  ok(player.isFullScreen, 'isFullScreen exists');
-  ok(player.cancelFullScreen, 'cancelFullScreen exists');
 });
 
 test('should be able to access expected component API methods', function() {
@@ -82,7 +77,6 @@ test('should be able to access expected component API methods', function() {
   // Component methods
   ok(comp.player, 'player exists');
   ok(comp.options, 'options exists');
-  ok(comp.init, 'init exists');
   ok(comp.dispose, 'dispose exists');
   ok(comp.createEl, 'createEl exists');
   ok(comp.contentEl, 'contentEl exists');
@@ -234,6 +228,9 @@ test('component can be subclassed externally', function(){
 
   var player = new (videojs.extend(Component, {
     reportUserActivity: function(){},
+    duration: function(){},
+    scrubbing: function(){},
+    currentTime: function(){},
     textTracks: function(){ return {
         addEventListener: Function.prototype,
         removeEventListener: Function.prototype
