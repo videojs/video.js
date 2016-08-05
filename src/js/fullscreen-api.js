@@ -74,7 +74,7 @@ for (let i = 0; i < apiMap.length; i++) {
 
 // map the browser API names to the spec API names
 if (browserApi) {
-  for (let i=0; i<browserApi.length; i++) {
+  for (let i = 0; i < browserApi.length; i++) {
     FullscreenApi[specApi[i]] = browserApi[i];
   }
 }

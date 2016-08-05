@@ -114,14 +114,6 @@ module.exports = function(grunt) {
       build: ['build/temp/*'],
       dist: ['dist/*']
     },
-    jshint: {
-      src: {
-        src: ['src/js/**/*.js', 'Gruntfile.js', 'test/unit/**/*.js'],
-        options: {
-          jshintrc: '.jshintrc'
-        }
-      }
-    },
     uglify: {
       options: {
         sourceMap: true,
@@ -160,10 +152,6 @@ module.exports = function(grunt) {
       skin: {
         files: ['src/css/**/*'],
         tasks: ['sass']
-      },
-      jshint: {
-        files: ['src/**/*', 'test/unit/**/*.js', 'Gruntfile.js'],
-        tasks: 'jshint'
       }
     },
     connect: {
@@ -455,7 +443,6 @@ module.exports = function(grunt) {
   const buildDependents = [
     'clean:build',
 
-    'jshint',
     'browserify:build',
     'exorcise:build',
     'concat:novtt',
