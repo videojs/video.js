@@ -87,9 +87,9 @@ class Button extends ClickableComponent {
    * @method handleKeyPress
    */
   handleKeyPress(event) {
+    // If the element is a div acting like a button, use super's handleKeyPress but 
     // Ignore Space (32) or Enter (13) key operation, which is handled by the browser for a button.
-    if (event.which === 32 || event.which === 13) {
-    } else {
+    if ((this.el_.tagName.toUpperCase() === 'DIV') && ((event.which !== 32) || (event.which !== 13))) {
       super.handleKeyPress(event); // Pass keypress handling up for unsupported keys
     }
   }
