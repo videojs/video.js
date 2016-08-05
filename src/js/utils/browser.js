@@ -4,7 +4,7 @@
 import document from 'global/document';
 import window from 'global/window';
 
-const USER_AGENT = window.navigator.userAgent;
+const USER_AGENT = window.navigator && window.navigator.userAgent || "";
 const webkitVersionMap = (/AppleWebKit\/([\d.]+)/i).exec(USER_AGENT);
 const appleWebkitVersion = webkitVersionMap ? parseFloat(webkitVersionMap.pop()) : null;
 
@@ -30,6 +30,7 @@ export const IOS_VERSION = (function() {
   if (match && match[1]) {
     return match[1];
   }
+  return null;
 }());
 
 export const IS_ANDROID = (/Android/i).test(USER_AGENT);

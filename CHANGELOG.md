@@ -6,6 +6,7 @@ CHANGELOG
 * @misteroneill added ghooks to run linter on git push ([view](https://github.com/videojs/video.js/pull/3459))
 * @BrandonOCasey removed unused base-styles.js file ([view](https://github.com/videojs/video.js/pull/3486))
 * @erikyuzwa, @gkatsev updated CSS build to inlcude the IE8-specific CSS from a separate file instead of it being inside of sass ([view](https://github.com/videojs/video.js/pull/3380)) ([view2](https://github.com/erikyuzwa/video.js/pull/1))
+* @gkatsev added null checks around navigator.userAgent ([view](https://github.com/videojs/video.js/pull/3502))
 
 --------------------
 
