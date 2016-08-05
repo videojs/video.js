@@ -8,3 +8,6 @@
 .video-js .vjs-play-control.vjs-playing {
   @extend .vjs-icon-pause;
 }
+.video-js .vjs-play-control.vjs-ended {
+  @extend .vjs-icon-replay;
+}
