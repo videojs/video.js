@@ -37,7 +37,9 @@ class AudioTrack extends Track {
     }
 
     Object.defineProperty(track, 'enabled', {
-      get() { return enabled; },
+      get() {
+        return enabled;
+      },
       set(newEnabled) {
         // an invalid or unchanged value
         if (typeof newEnabled !== 'boolean' || newEnabled === enabled) {

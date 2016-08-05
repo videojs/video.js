@@ -38,7 +38,9 @@ class VideoTrack extends Track {
     }
 
     Object.defineProperty(track, 'selected', {
-      get() { return selected; },
+      get() {
+        return selected;
+      },
       set(newSelected) {
         // an invalid or unchanged value
         if (typeof newSelected !== 'boolean' || newSelected === selected) {
