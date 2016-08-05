@@ -122,3 +122,14 @@ QUnit.test('Fullscreen control text should be correct when fullscreenchange is t
   player.trigger('fullscreenchange');
   QUnit.equal(fullscreentoggle.controlText(), 'Fullscreen', 'Control Text is correct while switching back to normal mode');
 });
+
+test('Fullscreen control text should be correct when fullscreenchange is triggered', function() {
+  var player = TestHelpers.makePlayer();
+  var fullscreentoggle = new FullscreenToggle(player);
+  player.isFullscreen(true);
+  player.trigger('fullscreenchange');
+  equal(fullscreentoggle.controlText(), 'Non-Fullscreen', 'Control Text is correct while switching to fullscreen mode');
+  player.isFullscreen(false);
+  player.trigger('fullscreenchange');
+  equal(fullscreentoggle.controlText(), 'Fullscreen', 'Control Text is correct while switching back to normal mode');
+});
