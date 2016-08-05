@@ -32,6 +32,7 @@ class TechFaker extends Tech {
 
   setControls(val) {}
 
+  currentSrc() { return ''; }
   currentTime() { return 0; }
   seeking() { return false; }
   src() { return 'movie.mp4'; }

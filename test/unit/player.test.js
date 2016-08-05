@@ -1044,3 +1044,78 @@ test('When VIDEOJS_NO_DYNAMIC_STYLE is set, apply sizing directly to the tech el
   equal(player.tech_.el().width, 600, 'the width is equal to 600');
   equal(player.tech_.el().height, 300, 'the height is equal 300');
 });
+
+test('Changing the source via the src() method triggers beforesourcechange and sourcechange events', function() {
+  var player = TestHelpers.makePlayer({
+    sources: [
+      {src: 'oceans.mp4', type: 'video/mp4'}
+    ]
+  });
+
+  // Tick forward to ready the player.
+  this.clock.tick(1);
+
+  var beforeSpy = sinon.spy();
+  var spy = sinon.spy();
+
+  player.on('beforesourcechange', beforeSpy);
+  player.on('sourcechange', spy);
+
+  player.src([
+    {src: 'oceans-1.mp4', type: 'video/mp4'},
+    {src: 'oceans-1.webm', type: 'video/webm'}
+  ]);
+
+  // We need to tick forward each time we call `src()` because the
+  // `sourcechange` event is asynchronous.
+  this.clock.tick(1);
+
+  let beforeSpyData = beforeSpy.lastCall.args[1];
+  let spyData = spy.lastCall.args[1];
+
+  strictEqual(beforeSpy.callCount, 1, 'beforesourechange was triggered once');
+  deepEqual(beforeSpyData.current, {src: 'oceans.mp4', type: 'video/mp4'}, 'the current source has both src and type');
+  deepEqual(beforeSpyData.next, {src: 'oceans-1.mp4', type: 'video/mp4'}, 'the next source has both src and type');
+  strictEqual(spy.callCount, 1, 'sourechange was triggered once');
+  deepEqual(spyData.previous, {src: 'oceans.mp4', type: 'video/mp4'}, 'the previous source has both src and type');
+  deepEqual(spyData.current, {src: 'oceans-1.mp4', type: 'video/mp4'}, 'the (new) current source has both src and type');
+
+  player.src({src: 'oceans-2.mp4', type: 'video/mp4'});
+  this.clock.tick(1);
+
+  beforeSpyData = beforeSpy.lastCall.args[1];
+  spyData = spy.lastCall.args[1];
+
+  strictEqual(beforeSpy.callCount, 2, 'beforesourechange was triggered twice');
+  deepEqual(beforeSpyData.current, {src: 'oceans-1.mp4', type: 'video/mp4'}, 'the current source has both src and type');
+  deepEqual(beforeSpyData.next, {src: 'oceans-2.mp4', type: 'video/mp4'}, 'the next source has both src and type');
+  strictEqual(spy.callCount, 2, 'sourechange was triggered twice');
+  deepEqual(spyData.previous, {src: 'oceans-1.mp4', type: 'video/mp4'}, 'the previous source has both src and type');
+  deepEqual(spyData.current, {src: 'oceans-2.mp4', type: 'video/mp4'}, 'the (new) current source has both src and type');
+
+  player.src('oceans-3.mp4');
+  this.clock.tick(1);
+
+  beforeSpyData = beforeSpy.lastCall.args[1];
+  spyData = spy.lastCall.args[1];
+
+  strictEqual(beforeSpy.callCount, 3, 'beforesourechange was triggered three times');
+  deepEqual(beforeSpyData.current, {src: 'oceans-2.mp4', type: 'video/mp4'}, 'the current source has both src and type');
+  deepEqual(beforeSpyData.next, {src: 'oceans-3.mp4'}, 'the next source has only src');
+  strictEqual(spy.callCount, 3, 'sourechange was triggered three times');
+  deepEqual(spyData.previous, {src: 'oceans-2.mp4', type: 'video/mp4'}, 'the previous source has both src and type');
+  deepEqual(spyData.current, {src: 'oceans-3.mp4'}, 'the (new) current source has only src');
+
+  player.src({src: 'oceans-4.mp4', type: 'video/mp4'});
+  this.clock.tick(1);
+
+  beforeSpyData = beforeSpy.lastCall.args[1];
+  spyData = spy.lastCall.args[1];
+
+  strictEqual(beforeSpy.callCount, 4, 'beforesourechange was triggered four times');
+  deepEqual(beforeSpyData.current, {src: 'oceans-3.mp4'}, 'the current source has only src');
+  deepEqual(beforeSpyData.next, {src: 'oceans-4.mp4', type: 'video/mp4'}, 'the next source has both src and type');
+  strictEqual(spy.callCount, 4, 'sourechange was triggered four times');
+  deepEqual(spyData.previous, {src: 'oceans-3.mp4'}, 'the previous source has only src');
+  deepEqual(spyData.current, {src: 'oceans-4.mp4', type: 'video/mp4'}, 'the (new) current source has both src and type');
+});

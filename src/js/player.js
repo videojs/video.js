@@ -1944,6 +1944,20 @@ class Player extends Component {
         // the tech loop to check for a compatible technology
         this.sourceList_([source]);
       } else {
+        const previous = {src: this.currentSrc()};
+
+        // We only want to include the type if it exists. This keeps the
+        // objects sent from the sourcechange events similar: `type` will
+        // not be present if it's not known.
+        if (this.currentType_) {
+          previous.type = this.currentType_;
+        }
+
+        this.trigger('beforesourcechange', {
+          current: previous,
+          next: source
+        });
+
         this.cache_.src = source.src;
         this.currentType_ = source.type || '';
 
@@ -1967,6 +1981,13 @@ class Player extends Component {
           if (this.options_.autoplay) {
             this.play();
           }
+
+          window.setTimeout(() => {
+            this.trigger('sourcechange', {
+              previous,
+              current: source
+            });
+          }, 0);
 
         // Set the source synchronously if possible (#2326)
         }, true);
