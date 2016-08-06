@@ -39,7 +39,7 @@ class ClickableComponent extends Component {
    * @return {Element}
    * @method createEl
    */
-  createEl(tag='div', props={}, attributes={}) {
+  createEl(tag = 'div', props = {}, attributes = {}) {
     props = assign({
       className: this.buildCSSClass(),
       tabIndex: 0
@@ -51,11 +51,13 @@ class ClickableComponent extends Component {
 
     // Add ARIA attributes for clickable element which is not a native HTML button
     attributes = assign({
-      role: 'button',
-      'aria-live': 'polite' // let the screen reader user know that the text of the element may change
+      'role': 'button',
+
+      // let the screen reader user know that the text of the element may change
+      'aria-live': 'polite'
     }, attributes);
 
-    let el = super.createEl(tag, props, attributes);
+    const el = super.createEl(tag, props, attributes);
 
     this.createControlTextEl(el);
 
@@ -91,9 +93,11 @@ class ClickableComponent extends Component {
    * @return {String}
    * @method controlText
    */
-  controlText(text, el=this.el()) {
-    if (!text) return this.controlText_ || 'Need Text';
-    
+  controlText(text, el = this.el()) {
+    if (!text) {
+      return this.controlText_ || 'Need Text';
+    }
+
     const localizedText = this.localize(text);
 
     this.controlText_ = text;
@@ -121,14 +125,14 @@ class ClickableComponent extends Component {
    * @return {Component} The child component (created by this process if a string was used)
    * @method addChild
    */
-  addChild(child, options={}) {
+  addChild(child, options = {}) {
     // TODO: Fix adding an actionable child to a ClickableComponent; currently
     // it will cause issues with assistive technology (e.g. screen readers)
     // which support ARIA, since an element with role="button" cannot have
     // actionable child elements.
 
-    //let className = this.constructor.name;
-    //log.warn(`Adding a child to a ClickableComponent (${className}) can cause issues with assistive technology which supports ARIA, since an element with role="button" cannot have actionable child elements.`);
+    // let className = this.constructor.name;
+    // log.warn(`Adding a child to a ClickableComponent (${className}) can cause issues with assistive technology which supports ARIA, since an element with role="button" cannot have actionable child elements.`);
 
     return super.addChild(child, options);
   }
@@ -179,12 +183,15 @@ class ClickableComponent extends Component {
    * @method handleKeyPress
    */
   handleKeyPress(event) {
+
     // Support Space (32) or Enter (13) key operation to fire a click event
     if (event.which === 32 || event.which === 13) {
       event.preventDefault();
       this.handleClick(event);
     } else if (super.handleKeyPress) {
-      super.handleKeyPress(event); // Pass keypress handling up for unsupported keys
+
+      // Pass keypress handling up for unsupported keys
+      super.handleKeyPress(event);
     }
   }
 

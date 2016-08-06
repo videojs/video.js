@@ -1,13 +1,9 @@
-import AudioTrack from '../../../src/js/tracks/text-track.js';
+/* eslint-env qunit */
 import Html5 from '../../../src/js/tech/html5.js';
-import Tech from '../../../src/js/tech/tech.js';
-import Component from '../../../src/js/component.js';
-
-import * as browser from '../../../src/js/utils/browser.js';
 import TestHelpers from '../test-helpers.js';
-import document from 'global/document';
+import sinon from 'sinon';
 
-q.module('Tracks', {
+QUnit.module('Tracks', {
   setup() {
     this.clock = sinon.useFakeTimers();
   },
@@ -16,11 +12,9 @@ q.module('Tracks', {
   }
 });
 
-test('Player track methods call the tech', function() {
-  let player;
+QUnit.test('Player track methods call the tech', function() {
+  const player = TestHelpers.makePlayer();
   let calls = 0;
-
-  player = TestHelpers.makePlayer();
 
   player.tech_.audioTracks = function() {
     calls++;
@@ -28,17 +22,14 @@ test('Player track methods call the tech', function() {
 
   player.audioTracks();
 
-  equal(calls, 1, 'audioTrack defers to the tech');
+  QUnit.equal(calls, 1, 'audioTrack defers to the tech');
   player.dispose();
 });
 
-test('listen to remove and add track events in native audio tracks', function() {
-  let oldTestVid = Html5.TEST_VID;
-  let player;
-  let options;
-  let oldAudioTracks = Html5.prototype.audioTracks;
-  let events = {};
-  let html;
+QUnit.test('listen to remove and add track events in native audio tracks', function() {
+  const oldTestVid = Html5.TEST_VID;
+  const oldAudioTracks = Html5.prototype.audioTracks;
+  const events = {};
 
   Html5.prototype.audioTracks = function() {
     return {
@@ -52,7 +43,7 @@ test('listen to remove and add track events in native audio tracks', function() 
     audioTracks: []
   };
 
-  player = {
+  const player = {
     // Function.prototype is a built-in no-op function.
     controls() {},
     ready() {},
@@ -68,47 +59,51 @@ test('listen to remove and add track events in native audio tracks', function() 
       };
     }
   };
+
   player.player_ = player;
-  player.options_ = options = {};
+  player.options_ = {};
 
-  html = new Html5(options);
+  /* eslint-disable no-unused-vars */
+  const html = new Html5({});
+  /* eslint-enable no-unused-vars */
 
-  ok(events.removetrack, 'removetrack listener was added');
-  ok(events.addtrack, 'addtrack listener was added');
+  QUnit.ok(events.removetrack, 'removetrack listener was added');
+  QUnit.ok(events.addtrack, 'addtrack listener was added');
 
   Html5.TEST_VID = oldTestVid;
   Html5.prototype.audioTracks = oldAudioTracks;
 });
 
-test('html5 tech supports native audio tracks if the video supports it', function() {
-  let oldTestVid = Html5.TEST_VID;
+QUnit.test('html5 tech supports native audio tracks if the video supports it', function() {
+  const oldTestVid = Html5.TEST_VID;
 
   Html5.TEST_VID = {
     audioTracks: []
   };
 
-  ok(Html5.supportsNativeAudioTracks(), 'native audio tracks are supported');
+  QUnit.ok(Html5.supportsNativeAudioTracks(), 'native audio tracks are supported');
 
   Html5.TEST_VID = oldTestVid;
 });
 
-test('html5 tech does not support native audio tracks if the video does not supports it', function() {
-  let oldTestVid = Html5.TEST_VID;
+QUnit.test('html5 tech does not support native audio tracks if the video does not supports it', function() {
+  const oldTestVid = Html5.TEST_VID;
+
   Html5.TEST_VID = {};
 
-  ok(!Html5.supportsNativeAudioTracks(), 'native audio tracks are not supported');
+  QUnit.ok(!Html5.supportsNativeAudioTracks(), 'native audio tracks are not supported');
 
   Html5.TEST_VID = oldTestVid;
 });
 
-test('when switching techs, we should not get a new audio track', function() {
-  let player = TestHelpers.makePlayer();
+QUnit.test('when switching techs, we should not get a new audio track', function() {
+  const player = TestHelpers.makePlayer();
 
   player.loadTech_('TechFaker');
-  let firstTracks = player.audioTracks();
+  const firstTracks = player.audioTracks();
 
   player.loadTech_('TechFaker');
-  let secondTracks = player.audioTracks();
+  const secondTracks = player.audioTracks();
 
-  ok(firstTracks === secondTracks, 'the tracks are equal');
+  QUnit.ok(firstTracks === secondTracks, 'the tracks are equal');
 });

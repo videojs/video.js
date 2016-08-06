@@ -3,10 +3,6 @@
  */
 import ClickableComponent from '../clickable-component.js';
 import Component from '../component.js';
-import Popup from './popup.js';
-import * as Dom from '../utils/dom.js';
-import * as Fn from '../utils/fn.js';
-import toTitleCase from '../utils/to-title-case.js';
 
 /**
  * A button class with a popup control
@@ -18,7 +14,7 @@ import toTitleCase from '../utils/to-title-case.js';
  */
 class PopupButton extends ClickableComponent {
 
-  constructor(player, options={}){
+  constructor(player, options = {}) {
     super(player, options);
 
     this.update();
@@ -30,7 +26,7 @@ class PopupButton extends ClickableComponent {
    * @method update
    */
   update() {
-    let popup = this.createPopup();
+    const popup = this.createPopup();
 
     if (this.popup) {
       this.removeChild(this.popup);
@@ -73,7 +69,7 @@ class PopupButton extends ClickableComponent {
    * @method buildCSSClass
    */
   buildCSSClass() {
-    var menuButtonClass = 'vjs-menu-button';
+    let menuButtonClass = 'vjs-menu-button';
 
     // If the inline option is passed, we want to use different styles altogether.
     if (this.options_.inline === true) {

@@ -16,10 +16,12 @@ import { newGUID } from './guid.js';
  */
 export const bind = function(context, fn, uid) {
   // Make sure the function has a unique ID
-  if (!fn.guid) { fn.guid = newGUID(); }
+  if (!fn.guid) {
+    fn.guid = newGUID();
+  }
 
   // Create the new function that changes the context
-  let ret = function() {
+  const ret = function() {
     return fn.apply(context, arguments);
   };
 

@@ -32,6 +32,7 @@ A sample dictionary for Spanish `['es']` would look as follows:
   "Captions": "Subtítulos especiales",
   "captions off": "Subtítulos especiales desactivados",
   "Chapters": "Capítulos",
+  "Close Modal Dialog": "Cerca de diálogo modal",
   "You aborted the video playback": "Ha interrumpido la reproducción del vídeo.",
   "A network error caused the video download to fail part-way.": "Un error de red ha interrumpido la descarga del vídeo.",
   "The video could not be loaded, either because the server or network failed or because the format is not supported.": "No se ha podido cargar el vídeo debido a un fallo de red o del servidor o porque el formato es incompatible.",
@@ -80,6 +81,7 @@ NOTE: These need to be added after the core Video.js script.
     "Captions": "Subtítulos especiales",
     "captions off": "Subtítulos especiales desactivados",
     "Chapters": "Capítulos",
+    "Close Modal Dialog": "Cerca de diálogo modal",
     "You aborted the video playback": "Ha interrumpido la reproducción del vídeo.",
     "A network error caused the video download to fail part-way.": "Un error de red ha interrumpido la descarga del vídeo.",
     "The video could not be loaded, either because the server or network failed or because the format is not supported.": "No se ha podido cargar el vídeo debido a un fallo de red o del servidor o porque el formato es incompatible.",
@@ -129,14 +131,14 @@ During a Video.js player instantiation you can force it to localize to a specifi
 Determining Player Language
 ---------------------------
 
-The player language is set to one of the following in descending priority
+The player language is set to one of the following in descending priority:
 
-* The language set in setup options as above
-* The document language (`lang` attribute of the `html` element)
-* Browser language preference
+* The language specified in setup options as above
+* The language specified by the closet element with a `lang` attribute. This could be the player itself or a parent element. Usually the document language is specified on the `html` tag.
+* Browser language preference (the first language if more than one is configured)
 * 'en'
 
-That can be overridden after instantiation with `language('fr')`.
+The player language can be change after instantiation with `language('fr')`. However localizable text will not be modified by doing this, for best results set the language beforehand.
 
 Language selection
 ------------------

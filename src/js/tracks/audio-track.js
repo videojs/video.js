@@ -20,16 +20,16 @@ import * as browser from '../utils/browser.js';
  */
 class AudioTrack extends Track {
   constructor(options = {}) {
-    let settings = merge(options, {
+    const settings = merge(options, {
       kind: AudioTrackKind[options.kind] || ''
     });
     // on IE8 this will be a document element
     // for every other browser this will be a normal object
-    let track = super(settings);
+    const track = super(settings);
     let enabled = false;
 
     if (browser.IS_IE8) {
-      for (let prop in AudioTrack.prototype) {
+      for (const prop in AudioTrack.prototype) {
         if (prop !== 'constructor') {
           track[prop] = AudioTrack.prototype[prop];
         }
@@ -37,7 +37,9 @@ class AudioTrack extends Track {
     }
 
     Object.defineProperty(track, 'enabled', {
-      get() { return enabled; },
+      get() {
+        return enabled;
+      },
       set(newEnabled) {
         // an invalid or unchanged value
         if (typeof newEnabled !== 'boolean' || newEnabled === enabled) {

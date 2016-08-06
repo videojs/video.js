@@ -3,7 +3,6 @@
  */
 import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
-import * as Dom from '../../utils/dom.js';
 import formatTime from '../../utils/format-time.js';
 
 /**
@@ -16,7 +15,7 @@ import formatTime from '../../utils/format-time.js';
  */
 class PlayProgressBar extends Component {
 
-  constructor(player, options){
+  constructor(player, options) {
     super(player, options);
     this.updateDataAttr();
     this.on(player, 'timeupdate', this.updateDataAttr);
@@ -48,7 +47,8 @@ class PlayProgressBar extends Component {
   }
 
   updateDataAttr() {
-    let time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
+    const time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
+
     this.el_.setAttribute('data-current-time', formatTime(time, this.player_.duration()));
   }
 

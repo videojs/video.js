@@ -114,14 +114,6 @@ module.exports = function(grunt) {
       build: ['build/temp/*'],
       dist: ['dist/*']
     },
-    jshint: {
-      src: {
-        src: ['src/js/**/*.js', 'Gruntfile.js', 'test/unit/**/*.js'],
-        options: {
-          jshintrc: '.jshintrc'
-        }
-      }
-    },
     uglify: {
       options: {
         sourceMap: true,
@@ -159,7 +151,7 @@ module.exports = function(grunt) {
       },
       skin: {
         files: ['src/css/**/*'],
-        tasks: ['sass']
+        tasks: ['skin']
       },
       jshint: {
         files: ['src/**/*', 'test/unit/**/*.js', 'Gruntfile.js'],
@@ -394,20 +386,21 @@ module.exports = function(grunt) {
       }
     },
     concat: {
+      options: {
+        separator: '\n'
+      },
       novtt: {
-        options: {
-          separator: '\n'
-        },
         src: ['build/temp/video.js'],
         dest: 'build/temp/alt/video.novtt.js'
       },
       vtt: {
-        options: {
-          separator: '\n',
-        },
         src: ['build/temp/video.js', 'node_modules/videojs-vtt.js/dist/vtt.js'],
-        dest: 'build/temp/video.js',
+        dest: 'build/temp/video.js'
       },
+      ie8_addition: {
+        src: ['build/temp/video-js.css', 'src/css/ie8.css'],
+        dest: 'build/temp/video-js.css'
+      }
     },
     concurrent: {
       options: {
@@ -443,6 +436,14 @@ module.exports = function(grunt) {
           src: ['build/temp/video.js']
         }
       }
+    },
+    shell: {
+      lint: {
+        command: 'vjsstandard',
+        options: {
+          preferLocal: true
+        }
+      }
     }
   });
 
@@ -455,7 +456,6 @@ module.exports = function(grunt) {
   const buildDependents = [
     'clean:build',
 
-    'jshint',
     'browserify:build',
     'exorcise:build',
     'concat:novtt',
@@ -464,7 +464,7 @@ module.exports = function(grunt) {
     'usebanner:vtt',
     'uglify',
 
-    'sass',
+    'skin',
     'version:css',
     'cssmin',
 
@@ -489,12 +489,13 @@ module.exports = function(grunt) {
     'zip:dist'
   ]);
 
-  grunt.registerTask('skin', ['sass']);
+  grunt.registerTask('skin', ['sass', 'concat:ie8_addition']);
 
   // Default task - build and test
   grunt.registerTask('default', ['test']);
 
-  grunt.registerTask('test', ['build', 'karma:defaults']);
+  // The test script includes coveralls only when the TRAVIS env var is set.
+  grunt.registerTask('test', ['build', 'karma:defaults'].concat(process.env.TRAVIS && 'coveralls').filter(Boolean));
 
   // Run while developing
   grunt.registerTask('dev', ['build', 'connect:dev', 'concurrent:watchSandbox']);
