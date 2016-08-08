@@ -454,6 +454,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('gkatsev-grunt-sass');
 
   const buildDependents = [
+    'shell:lint',
     'clean:build',
 
     'browserify:build',
@@ -482,6 +483,7 @@ module.exports = function(grunt) {
   );
 
   grunt.registerTask('dist', [
+    'shell:lint',
     'clean:dist',
     'build:dist',
     'copy:dist',
