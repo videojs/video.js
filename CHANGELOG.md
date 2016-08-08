@@ -10,6 +10,9 @@ CHANGELOG
 
 --------------------
 
+## 5.11.1 (2016-08-08)
+* @vxsx fixed legend selector to be more specific. Fixes #3492 ([view](https://github.com/videojs/video.js/pull/3494))
+
 ## 5.11.0 (2016-07-22)
 * @BrandonOCasey Document audio/video track usage ([view](https://github.com/videojs/video.js/pull/3295))
 * @hartman Correct documentation to refer to nativeTextTracks option ([view](https://github.com/videojs/video.js/pull/3309))
