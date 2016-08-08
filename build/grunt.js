@@ -483,7 +483,6 @@ module.exports = function(grunt) {
   );
 
   grunt.registerTask('dist', [
-    'shell:lint',
     'clean:dist',
     'build:dist',
     'copy:dist',
