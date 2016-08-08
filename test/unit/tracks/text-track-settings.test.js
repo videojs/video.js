@@ -26,7 +26,7 @@ QUnit.module('Text Track Settings', {
   }
 });
 
-QUnit.test('should update settings', function() {
+QUnit.test('should update settings', function(assert) {
   const player = TestHelpers.makePlayer({
     tracks,
     persistTextTrackSettings: true
@@ -44,40 +44,40 @@ QUnit.test('should update settings', function() {
   };
 
   player.textTrackSettings.setValues(newSettings);
-  QUnit.deepEqual(player.textTrackSettings.getValues(),
+  assert.deepEqual(player.textTrackSettings.getValues(),
                   newSettings,
                   'values are updated');
 
-  QUnit.equal(player.$('.vjs-fg-color > select').selectedIndex,
+  assert.equal(player.$('.vjs-fg-color > select').selectedIndex,
               2,
               'fg-color is set to new value');
-  QUnit.equal(player.$('.vjs-bg-color > select').selectedIndex,
+  assert.equal(player.$('.vjs-bg-color > select').selectedIndex,
               1,
               'bg-color is set to new value');
-  QUnit.equal(player.$('.window-color > select').selectedIndex,
+  assert.equal(player.$('.window-color > select').selectedIndex,
               1,
               'window-color is set to new value');
-  QUnit.equal(player.$('.vjs-text-opacity > select').selectedIndex,
+  assert.equal(player.$('.vjs-text-opacity > select').selectedIndex,
               1,
               'text-opacity is set to new value');
-  QUnit.equal(player.$('.vjs-bg-opacity > select').selectedIndex,
+  assert.equal(player.$('.vjs-bg-opacity > select').selectedIndex,
               1,
               'bg-opacity is set to new value');
-  QUnit.equal(player.$('.vjs-window-opacity > select').selectedIndex,
+  assert.equal(player.$('.vjs-window-opacity > select').selectedIndex,
               1,
               'window-opacity is set to new value');
-  QUnit.equal(player.$('.vjs-edge-style select').selectedIndex,
+  assert.equal(player.$('.vjs-edge-style select').selectedIndex,
               1,
               'edge-style is set to new value');
-  QUnit.equal(player.$('.vjs-font-family select').selectedIndex,
+  assert.equal(player.$('.vjs-font-family select').selectedIndex,
               3,
               'font-family is set to new value');
-  QUnit.equal(player.$('.vjs-font-percent select').selectedIndex,
+  assert.equal(player.$('.vjs-font-percent select').selectedIndex,
               3,
               'font-percent is set to new value');
 
   Events.trigger(player.$('.vjs-done-button'), 'click');
-  QUnit.deepEqual(safeParseTuple(
+  assert.deepEqual(safeParseTuple(
                     window.localStorage.getItem('vjs-text-track-settings'))[1],
                   newSettings,
                   'values are saved');
@@ -85,7 +85,7 @@ QUnit.test('should update settings', function() {
   player.dispose();
 });
 
-QUnit.test('should restore default settings', function() {
+QUnit.test('should restore default settings', function(assert) {
   const player = TestHelpers.makePlayer({
     tracks,
     persistTextTrackSettings: true
@@ -105,71 +105,71 @@ QUnit.test('should restore default settings', function() {
   Events.trigger(player.$('.vjs-default-button'), 'click');
   Events.trigger(player.$('.vjs-done-button'), 'click');
 
-  QUnit.deepEqual(player.textTrackSettings.getValues(),
+  assert.deepEqual(player.textTrackSettings.getValues(),
                   defaultSettings,
                   'values are defaulted');
   // TODO:
   // MikeA: need to figure out how to modify saveSettings
   // to factor in defaults are no longer null
-  // QUnit.deepEqual(window.localStorage.getItem('vjs-text-track-settings'),
+  // assert.deepEqual(window.localStorage.getItem('vjs-text-track-settings'),
   //                 defaultSettings,
   //                 'values are saved');
 
-  QUnit.equal(player.$('.vjs-fg-color > select').selectedIndex,
+  assert.equal(player.$('.vjs-fg-color > select').selectedIndex,
               0,
               'fg-color is set to default value');
-  QUnit.equal(player.$('.vjs-bg-color > select').selectedIndex,
+  assert.equal(player.$('.vjs-bg-color > select').selectedIndex,
               0,
               'bg-color is set to default value');
-  QUnit.equal(player.$('.window-color > select').selectedIndex,
+  assert.equal(player.$('.window-color > select').selectedIndex,
               0,
               'window-color is set to default value');
-  QUnit.equal(player.$('.vjs-text-opacity > select').selectedIndex,
+  assert.equal(player.$('.vjs-text-opacity > select').selectedIndex,
               0,
               'text-opacity is set to default value');
-  QUnit.equal(player.$('.vjs-bg-opacity > select').selectedIndex,
+  assert.equal(player.$('.vjs-bg-opacity > select').selectedIndex,
               0,
               'bg-opacity is set to default value');
-  QUnit.equal(player.$('.vjs-window-opacity > select').selectedIndex,
+  assert.equal(player.$('.vjs-window-opacity > select').selectedIndex,
               0,
               'window-opacity is set to default value');
-  QUnit.equal(player.$('.vjs-edge-style select').selectedIndex,
+  assert.equal(player.$('.vjs-edge-style select').selectedIndex,
               0,
               'edge-style is set to default value');
-  QUnit.equal(player.$('.vjs-font-family select').selectedIndex,
+  assert.equal(player.$('.vjs-font-family select').selectedIndex,
               0,
               'font-family is set to default value');
-  QUnit.equal(player.$('.vjs-font-percent select').selectedIndex,
+  assert.equal(player.$('.vjs-font-percent select').selectedIndex,
               2,
               'font-percent is set to default value');
 
   player.dispose();
 });
 
-QUnit.test('should open on click', function() {
+QUnit.test('should open on click', function(assert) {
   const player = TestHelpers.makePlayer({
     tracks
   });
 
   Events.trigger(player.$('.vjs-texttrack-settings'), 'click');
-  QUnit.ok(!player.textTrackSettings.hasClass('vjs-hidden'), 'settings open');
+  assert.ok(!player.textTrackSettings.hasClass('vjs-hidden'), 'settings open');
 
   player.dispose();
 });
 
-QUnit.test('should close on done click', function() {
+QUnit.test('should close on done click', function(assert) {
   const player = TestHelpers.makePlayer({
     tracks
   });
 
   Events.trigger(player.$('.vjs-texttrack-settings'), 'click');
   Events.trigger(player.$('.vjs-done-button'), 'click');
-  QUnit.ok(player.textTrackSettings.hasClass('vjs-hidden'), 'settings closed');
+  assert.ok(player.textTrackSettings.hasClass('vjs-hidden'), 'settings closed');
 
   player.dispose();
 });
 
-QUnit.test('if persist option is set, restore settings on init', function() {
+QUnit.test('if persist option is set, restore settings on init', function(assert) {
   const oldRestoreSettings = TextTrackSettings.prototype.restoreSettings;
   let restore = 0;
 
@@ -182,14 +182,14 @@ QUnit.test('if persist option is set, restore settings on init', function() {
     persistTextTrackSettings: true
   });
 
-  QUnit.equal(restore, 1, 'restore was called');
+  assert.equal(restore, 1, 'restore was called');
 
   TextTrackSettings.prototype.restoreSettings = oldRestoreSettings;
 
   player.dispose();
 });
 
-QUnit.test('if persist option is set, save settings when "done"', function() {
+QUnit.test('if persist option is set, save settings when "done"', function(assert) {
   const player = TestHelpers.makePlayer({
     tracks,
     persistTextTrackSettings: true
@@ -203,14 +203,14 @@ QUnit.test('if persist option is set, save settings when "done"', function() {
 
   Events.trigger(player.$('.vjs-done-button'), 'click');
 
-  QUnit.equal(save, 1, 'save was called');
+  assert.equal(save, 1, 'save was called');
 
   TextTrackSettings.prototype.saveSettings = oldSaveSettings;
 
   player.dispose();
 });
 
-QUnit.test('do not try to restore or save settings if persist option is not set', function() {
+QUnit.test('do not try to restore or save settings if persist option is not set', function(assert) {
   const oldRestoreSettings = TextTrackSettings.prototype.restoreSettings;
   const oldSaveSettings = TextTrackSettings.prototype.saveSettings;
   let save = 0;
@@ -228,12 +228,12 @@ QUnit.test('do not try to restore or save settings if persist option is not set'
     persistTextTrackSettings: false
   });
 
-  QUnit.equal(restore, 0, 'restore was not called');
+  assert.equal(restore, 0, 'restore was not called');
 
   Events.trigger(player.$('.vjs-done-button'), 'click');
 
   // saveSettings is called but does nothing
-  QUnit.equal(save, 1, 'save was not called');
+  assert.equal(save, 1, 'save was not called');
 
   TextTrackSettings.prototype.saveSettings = oldSaveSettings;
   TextTrackSettings.prototype.restoreSettings = oldRestoreSettings;
@@ -241,7 +241,7 @@ QUnit.test('do not try to restore or save settings if persist option is not set'
   player.dispose();
 });
 
-QUnit.test('should restore saved settings', function() {
+QUnit.test('should restore saved settings', function(assert) {
   const newSettings = {
     backgroundOpacity: '0.5',
     textOpacity: '0.5',
@@ -261,12 +261,12 @@ QUnit.test('should restore saved settings', function() {
     persistTextTrackSettings: true
   });
 
-  QUnit.deepEqual(player.textTrackSettings.getValues(), newSettings);
+  assert.deepEqual(player.textTrackSettings.getValues(), newSettings);
 
   player.dispose();
 });
 
-QUnit.test('should not restore saved settings', function() {
+QUnit.test('should not restore saved settings', function(assert) {
   const newSettings = {
     backgroundOpacity: '0.5',
     textOpacity: '0.5',
@@ -286,7 +286,7 @@ QUnit.test('should not restore saved settings', function() {
     persistTextTrackSettings: false
   });
 
-  QUnit.deepEqual(player.textTrackSettings.getValues(), defaultSettings);
+  assert.deepEqual(player.textTrackSettings.getValues(), defaultSettings);
 
   player.dispose();
 });

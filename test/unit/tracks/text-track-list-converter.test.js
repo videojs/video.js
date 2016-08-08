@@ -24,7 +24,7 @@ const cleanup = (item) => {
 };
 
 if (Html5.supportsNativeTextTracks()) {
-  QUnit.test('trackToJson_ produces correct representation for native track object', function(a) {
+  QUnit.test('trackToJson_ produces correct representation for native track object', function(assert) {
     const track = document.createElement('track');
 
     track.src = 'example.com/english.vtt';
@@ -32,7 +32,7 @@ if (Html5.supportsNativeTextTracks()) {
     track.srclang = 'en';
     track.label = 'English';
 
-    a.deepEqual(cleanup(c.trackToJson_(track.track)), {
+    assert.deepEqual(cleanup(c.trackToJson_(track.track)), {
       kind: 'captions',
       label: 'English',
       language: 'en',
@@ -40,7 +40,7 @@ if (Html5.supportsNativeTextTracks()) {
     }, 'the json output is same');
   });
 
-  QUnit.test('textTracksToJson produces good json output', function(a) {
+  QUnit.test('textTracksToJson produces good json output', function(assert) {
     const emulatedTrack = new TextTrack({
       kind: 'captions',
       label: 'English',
@@ -76,7 +76,7 @@ if (Html5.supportsNativeTextTracks()) {
       }
     };
 
-    a.deepEqual(cleanup(c.textTracksToJson(tech)), [{
+    assert.deepEqual(cleanup(c.textTracksToJson(tech)), [{
       kind: 'captions',
       label: 'Spanish',
       language: 'es',
@@ -89,7 +89,7 @@ if (Html5.supportsNativeTextTracks()) {
     }], 'the output is correct');
   });
 
-  QUnit.test('jsonToTextTracks calls addRemoteTextTrack on the tech with mixed tracks', function(a) {
+  QUnit.test('jsonToTextTracks calls addRemoteTextTrack on the tech with mixed tracks', function(assert) {
     const emulatedTrack = new TextTrack({
       kind: 'captions',
       label: 'English',
@@ -136,11 +136,11 @@ if (Html5.supportsNativeTextTracks()) {
 
     c.jsonToTextTracks(cleanup(c.textTracksToJson(tech)), tech);
 
-    a.equal(addRemotes, 2, 'we added two text tracks');
+    assert.equal(addRemotes, 2, 'we added two text tracks');
   });
 }
 
-QUnit.test('trackToJson_ produces correct representation for emulated track object', function(a) {
+QUnit.test('trackToJson_ produces correct representation for emulated track object', function(assert) {
   const track = new TextTrack({
     kind: 'captions',
     label: 'English',
@@ -149,7 +149,7 @@ QUnit.test('trackToJson_ produces correct representation for emulated track obje
     tech: {}
   });
 
-  a.deepEqual(cleanup(c.trackToJson_(track)), {
+  assert.deepEqual(cleanup(c.trackToJson_(track)), {
     src: 'example.com/english.vtt',
     kind: 'captions',
     label: 'English',
@@ -158,7 +158,7 @@ QUnit.test('trackToJson_ produces correct representation for emulated track obje
   }, 'the json output is same');
 });
 
-QUnit.test('textTracksToJson produces good json output for emulated only', function(a) {
+QUnit.test('textTracksToJson produces good json output for emulated only', function(assert) {
   const emulatedTrack = new TextTrack({
     kind: 'captions',
     label: 'English',
@@ -197,7 +197,7 @@ QUnit.test('textTracksToJson produces good json output for emulated only', funct
     }
   };
 
-  a.deepEqual(cleanup(c.textTracksToJson(tech)), [{
+  assert.deepEqual(cleanup(c.textTracksToJson(tech)), [{
     src: 'example.com/spanish.vtt',
     kind: 'captions',
     label: 'Spanish',
@@ -212,7 +212,7 @@ QUnit.test('textTracksToJson produces good json output for emulated only', funct
   }], 'the output is correct');
 });
 
-QUnit.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated tracks only', function(a) {
+QUnit.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated tracks only', function(assert) {
   const emulatedTrack = new TextTrack({
     kind: 'captions',
     label: 'English',
@@ -260,5 +260,5 @@ QUnit.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated 
 
   c.jsonToTextTracks(cleanup(c.textTracksToJson(tech)), tech);
 
-  a.equal(addRemotes, 2, 'we added two text tracks');
+  assert.equal(addRemotes, 2, 'we added two text tracks');
 });

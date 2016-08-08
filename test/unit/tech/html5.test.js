@@ -7,7 +7,7 @@ import * as browser from '../../../src/js/utils/browser.js';
 import document from 'global/document';
 
 QUnit.module('HTML5', {
-  setup() {
+  beforeEach(assert) {
     const el = document.createElement('div');
 
     el.innerHTML = '<div />';
@@ -43,17 +43,17 @@ QUnit.module('HTML5', {
     };
     tech = new Html5({});
   },
-  teardown() {
+  afterEach(assert) {
     tech.dispose();
     player = null;
     tech = null;
   }
 });
 
-QUnit.test('should detect whether the volume can be changed', function() {
+QUnit.test('should detect whether the volume can be changed', function(assert) {
 
   if (!{}.__defineSetter__) {
-    QUnit.ok(true, 'your browser does not support this test, skipping it');
+    assert.ok(true, 'your browser does not support this test, skipping it');
     return;
   }
   const testVid = Html5.TEST_VID;
@@ -64,32 +64,32 @@ QUnit.test('should detect whether the volume can be changed', function() {
 
   Html5.TEST_VID = new ConstVolumeVideo();
 
-  QUnit.ok(!Html5.canControlVolume());
+  assert.ok(!Html5.canControlVolume());
   Html5.TEST_VID = testVid;
 });
 
-QUnit.test('test playbackRate', function() {
+QUnit.test('test playbackRate', function(assert) {
   // Android 2.3 always returns 0 for playback rate
   if (!Html5.canControlPlaybackRate()) {
-    QUnit.ok('Playback rate is not supported');
+    assert.ok('Playback rate is not supported');
     return;
   }
 
   tech.createEl();
 
   tech.el().playbackRate = 1.25;
-  QUnit.strictEqual(tech.playbackRate(), 1.25);
+  assert.strictEqual(tech.playbackRate(), 1.25);
 
   tech.setPlaybackRate(0.75);
-  QUnit.strictEqual(tech.playbackRate(), 0.75);
+  assert.strictEqual(tech.playbackRate(), 0.75);
 });
 
-QUnit.test('should export played', function() {
+QUnit.test('should export played', function(assert) {
   tech.createEl();
-  QUnit.deepEqual(tech.played(), tech.el().played, 'returns the played attribute');
+  assert.deepEqual(tech.played(), tech.el().played, 'returns the played attribute');
 });
 
-QUnit.test('should remove the controls attribute when recreating the element', function() {
+QUnit.test('should remove the controls attribute when recreating the element', function(assert) {
   player.tagAttributes = {
     controls: true
   };
@@ -99,13 +99,13 @@ QUnit.test('should remove the controls attribute when recreating the element', f
 
   // On the iPhone controls are always true
   if (!browser.IS_IPHONE) {
-    QUnit.ok(!el.controls, 'controls attribute is absent');
+    assert.ok(!el.controls, 'controls attribute is absent');
   }
 
-  QUnit.ok(player.tagAttributes.controls, 'tag attribute is still present');
+  assert.ok(player.tagAttributes.controls, 'tag attribute is still present');
 });
 
-QUnit.test('patchCanPlayType patches canplaytype with our function, conditionally', function() {
+QUnit.test('patchCanPlayType patches canplaytype with our function, conditionally', function(assert) {
   // the patch runs automatically so we need to first unpatch
   Html5.unpatchCanPlayType();
 
@@ -116,17 +116,17 @@ QUnit.test('patchCanPlayType patches canplaytype with our function, conditionall
   browser.ANDROID_VERSION = 4.0;
   Html5.patchCanPlayType();
 
-  QUnit.notStrictEqual(video.canPlayType,
+  assert.notStrictEqual(video.canPlayType,
                  canPlayType,
                  'original canPlayType and patched canPlayType should not be equal');
 
   const patchedCanPlayType = video.canPlayType;
   const unpatchedCanPlayType = Html5.unpatchCanPlayType();
 
-  QUnit.strictEqual(canPlayType,
+  assert.strictEqual(canPlayType,
                     Html5.TEST_VID.constructor.prototype.canPlayType,
                     'original canPlayType and unpatched canPlayType should be equal');
-  QUnit.strictEqual(patchedCanPlayType,
+  assert.strictEqual(patchedCanPlayType,
                     unpatchedCanPlayType,
                     'patched canPlayType and function returned from unpatch are equal');
 
@@ -134,24 +134,24 @@ QUnit.test('patchCanPlayType patches canplaytype with our function, conditionall
   Html5.unpatchCanPlayType();
 });
 
-QUnit.test('should return maybe for HLS urls on Android 4.0 or above', function() {
+QUnit.test('should return maybe for HLS urls on Android 4.0 or above', function(assert) {
   const oldAV = browser.ANDROID_VERSION;
   const video = document.createElement('video');
 
   browser.ANDROID_VERSION = 4.0;
   Html5.patchCanPlayType();
 
-  QUnit.strictEqual(video.canPlayType('application/x-mpegurl'),
+  assert.strictEqual(video.canPlayType('application/x-mpegurl'),
                     'maybe',
                     'android version 4.0 or above should be a maybe for x-mpegurl');
-  QUnit.strictEqual(video.canPlayType('application/x-mpegURL'),
+  assert.strictEqual(video.canPlayType('application/x-mpegURL'),
                     'maybe',
                     'android version 4.0 or above should be a maybe for x-mpegURL');
-  QUnit.strictEqual(video.canPlayType('application/vnd.apple.mpegurl'),
+  assert.strictEqual(video.canPlayType('application/vnd.apple.mpegurl'),
                     'maybe',
                     'android version 4.0 or above should be a ' +
                     'maybe for vnd.apple.mpegurl');
-  QUnit.strictEqual(video.canPlayType('application/vnd.apple.mpegURL'),
+  assert.strictEqual(video.canPlayType('application/vnd.apple.mpegURL'),
                     'maybe',
                     'android version 4.0 or above should be a ' +
                     'maybe for vnd.apple.mpegurl');
@@ -160,14 +160,14 @@ QUnit.test('should return maybe for HLS urls on Android 4.0 or above', function(
   Html5.unpatchCanPlayType();
 });
 
-QUnit.test('should return a maybe for mp4 on OLD ANDROID', function() {
+QUnit.test('should return a maybe for mp4 on OLD ANDROID', function(assert) {
   const isOldAndroid = browser.IS_OLD_ANDROID;
   const video = document.createElement('video');
 
   browser.IS_OLD_ANDROID = true;
   Html5.patchCanPlayType();
 
-  QUnit.strictEqual(video.canPlayType('video/mp4'),
+  assert.strictEqual(video.canPlayType('video/mp4'),
                     'maybe',
                     'old android should return a maybe for video/mp4');
 
@@ -175,17 +175,17 @@ QUnit.test('should return a maybe for mp4 on OLD ANDROID', function() {
   Html5.unpatchCanPlayType();
 });
 
-QUnit.test('error events may not set the errors property', function() {
-  QUnit.equal(tech.error(), undefined, 'no tech-level error');
+QUnit.test('error events may not set the errors property', function(assert) {
+  assert.equal(tech.error(), undefined, 'no tech-level error');
   tech.trigger('error');
-  QUnit.ok(true, 'no error was thrown');
+  assert.ok(true, 'no error was thrown');
 });
 
-QUnit.test('should have the source handler interface', function() {
-  QUnit.ok(Html5.registerSourceHandler, 'has the registerSourceHandler function');
+QUnit.test('should have the source handler interface', function(assert) {
+  assert.ok(Html5.registerSourceHandler, 'has the registerSourceHandler function');
 });
 
-QUnit.test('native source handler canPlayType', function() {
+QUnit.test('native source handler canPlayType', function(assert) {
   // Stub the test video canPlayType (used in canPlayType) to control results
   const origCPT = Html5.TEST_VID.canPlayType;
 
@@ -198,16 +198,16 @@ QUnit.test('native source handler canPlayType', function() {
 
   const canPlayType = Html5.nativeSourceHandler.canPlayType;
 
-  QUnit.equal(canPlayType('video/mp4'),
+  assert.equal(canPlayType('video/mp4'),
               'maybe',
               'Native source handler reported type support');
-  QUnit.equal(canPlayType('foo'), '', 'Native source handler handled bad type');
+  assert.equal(canPlayType('foo'), '', 'Native source handler handled bad type');
 
   // Reset test video canPlayType
   Html5.TEST_VID.canPlayType = origCPT;
 });
 
-QUnit.test('native source handler canHandleSource', function() {
+QUnit.test('native source handler canHandleSource', function(assert) {
   // Stub the test video canPlayType (used in canHandleSource) to control results
   const origCPT = Html5.TEST_VID.canPlayType;
 
@@ -220,30 +220,30 @@ QUnit.test('native source handler canHandleSource', function() {
 
   const canHandleSource = Html5.nativeSourceHandler.canHandleSource;
 
-  QUnit.equal(canHandleSource({ type: 'video/mp4', src: 'video.flv' }, {}),
+  assert.equal(canHandleSource({ type: 'video/mp4', src: 'video.flv' }, {}),
               'maybe',
               'Native source handler reported type support');
-  QUnit.equal(canHandleSource({ src: 'http://www.example.com/video.mp4' }, {}),
+  assert.equal(canHandleSource({ src: 'http://www.example.com/video.mp4' }, {}),
               'maybe',
               'Native source handler reported extension support');
-  QUnit.equal(canHandleSource({ src: 'https://example.com/video.sd.mp4?s=foo&token=bar' }, {}),
+  assert.equal(canHandleSource({ src: 'https://example.com/video.sd.mp4?s=foo&token=bar' }, {}),
               'maybe',
               'Native source handler reported extension support');
-  QUnit.equal(canHandleSource({ src: 'https://example.com/video.sd.mp4?s=foo' }, {}),
+  assert.equal(canHandleSource({ src: 'https://example.com/video.sd.mp4?s=foo' }, {}),
               'maybe',
               'Native source handler reported extension support');
 
   // Test for issue videojs/video.js#1785 and other potential failures
-  QUnit.equal(canHandleSource({ src: '' }, {}),
+  assert.equal(canHandleSource({ src: '' }, {}),
               '',
               'Native source handler handled empty src');
-  QUnit.equal(canHandleSource({}, {}),
+  assert.equal(canHandleSource({}, {}),
               '',
               'Native source handler handled empty object');
-  QUnit.equal(canHandleSource({ src: 'foo' }, {}),
+  assert.equal(canHandleSource({ src: 'foo' }, {}),
               '',
               'Native source handler handled bad src');
-  QUnit.equal(canHandleSource({ type: 'foo' }, {}),
+  assert.equal(canHandleSource({ type: 'foo' }, {}),
               '',
               'Native source handler handled bad type');
 
@@ -252,7 +252,7 @@ QUnit.test('native source handler canHandleSource', function() {
 });
 
 if (Html5.supportsNativeTextTracks()) {
-  QUnit.test('add native textTrack listeners on startup', function() {
+  QUnit.test('add native textTrack listeners on startup', function(assert) {
     const adds = [];
     const rems = [];
     const tt = {
@@ -268,12 +268,12 @@ if (Html5.supportsNativeTextTracks()) {
     const htmlTech = new Html5({el});
     /* eslint-enable no-unused-vars */
 
-    QUnit.equal(adds[0][0], 'change', 'change event handler added');
-    QUnit.equal(adds[1][0], 'addtrack', 'addtrack event handler added');
-    QUnit.equal(adds[2][0], 'removetrack', 'removetrack event handler added');
+    assert.equal(adds[0][0], 'change', 'change event handler added');
+    assert.equal(adds[1][0], 'addtrack', 'addtrack event handler added');
+    assert.equal(adds[2][0], 'removetrack', 'removetrack event handler added');
   });
 
-  QUnit.test('remove all tracks from emulated list on dispose', function() {
+  QUnit.test('remove all tracks from emulated list on dispose', function(assert) {
     const adds = [];
     const rems = [];
     const tt = {
@@ -289,20 +289,20 @@ if (Html5.supportsNativeTextTracks()) {
 
     htmlTech.dispose();
 
-    QUnit.equal(adds[0][0], 'change', 'change event handler added');
-    QUnit.equal(adds[1][0], 'addtrack', 'addtrack event handler added');
-    QUnit.equal(adds[2][0], 'removetrack', 'removetrack event handler added');
-    QUnit.equal(rems[0][0], 'change', 'change event handler removed');
-    QUnit.equal(rems[1][0], 'addtrack', 'addtrack event handler removed');
-    QUnit.equal(rems[2][0], 'removetrack', 'removetrack event handler removed');
-    QUnit.equal(adds[0][0], rems[0][0], 'change event handler removed');
-    QUnit.equal(adds[1][0], rems[1][0], 'addtrack event handler removed');
-    QUnit.equal(adds[2][0], rems[2][0], 'removetrack event handler removed');
+    assert.equal(adds[0][0], 'change', 'change event handler added');
+    assert.equal(adds[1][0], 'addtrack', 'addtrack event handler added');
+    assert.equal(adds[2][0], 'removetrack', 'removetrack event handler added');
+    assert.equal(rems[0][0], 'change', 'change event handler removed');
+    assert.equal(rems[1][0], 'addtrack', 'addtrack event handler removed');
+    assert.equal(rems[2][0], 'removetrack', 'removetrack event handler removed');
+    assert.equal(adds[0][0], rems[0][0], 'change event handler removed');
+    assert.equal(adds[1][0], rems[1][0], 'addtrack event handler removed');
+    assert.equal(adds[2][0], rems[2][0], 'removetrack event handler removed');
   });
 }
 
 if (Html5.supportsNativeAudioTracks()) {
-  QUnit.test('add native audioTrack listeners on startup', function() {
+  QUnit.test('add native audioTrack listeners on startup', function(assert) {
     const adds = [];
     const rems = [];
     const at = {
@@ -318,12 +318,12 @@ if (Html5.supportsNativeAudioTracks()) {
     const htmlTech = new Html5({el});
     /* eslint-enable no-unused-vars */
 
-    QUnit.equal(adds[0][0], 'change', 'change event handler added');
-    QUnit.equal(adds[1][0], 'addtrack', 'addtrack event handler added');
-    QUnit.equal(adds[2][0], 'removetrack', 'removetrack event handler added');
+    assert.equal(adds[0][0], 'change', 'change event handler added');
+    assert.equal(adds[1][0], 'addtrack', 'addtrack event handler added');
+    assert.equal(adds[2][0], 'removetrack', 'removetrack event handler added');
   });
 
-  QUnit.test('remove all tracks from emulated list on dispose', function() {
+  QUnit.test('remove all tracks from emulated list on dispose', function(assert) {
     const adds = [];
     const rems = [];
     const at = {
@@ -339,20 +339,20 @@ if (Html5.supportsNativeAudioTracks()) {
 
     htmlTech.dispose();
 
-    QUnit.equal(adds[0][0], 'change', 'change event handler added');
-    QUnit.equal(adds[1][0], 'addtrack', 'addtrack event handler added');
-    QUnit.equal(adds[2][0], 'removetrack', 'removetrack event handler added');
-    QUnit.equal(rems[0][0], 'change', 'change event handler removed');
-    QUnit.equal(rems[1][0], 'addtrack', 'addtrack event handler removed');
-    QUnit.equal(rems[2][0], 'removetrack', 'removetrack event handler removed');
-    QUnit.equal(adds[0][0], rems[0][0], 'change event handler removed');
-    QUnit.equal(adds[1][0], rems[1][0], 'addtrack event handler removed');
-    QUnit.equal(adds[2][0], rems[2][0], 'removetrack event handler removed');
+    assert.equal(adds[0][0], 'change', 'change event handler added');
+    assert.equal(adds[1][0], 'addtrack', 'addtrack event handler added');
+    assert.equal(adds[2][0], 'removetrack', 'removetrack event handler added');
+    assert.equal(rems[0][0], 'change', 'change event handler removed');
+    assert.equal(rems[1][0], 'addtrack', 'addtrack event handler removed');
+    assert.equal(rems[2][0], 'removetrack', 'removetrack event handler removed');
+    assert.equal(adds[0][0], rems[0][0], 'change event handler removed');
+    assert.equal(adds[1][0], rems[1][0], 'addtrack event handler removed');
+    assert.equal(adds[2][0], rems[2][0], 'removetrack event handler removed');
   });
 }
 
 if (Html5.supportsNativeVideoTracks()) {
-  QUnit.test('add native videoTrack listeners on startup', function() {
+  QUnit.test('add native videoTrack listeners on startup', function(assert) {
     const adds = [];
     const rems = [];
     const vt = {
@@ -368,12 +368,12 @@ if (Html5.supportsNativeVideoTracks()) {
     const htmlTech = new Html5({el});
     /* eslint-enable no-unused-vars */
 
-    QUnit.equal(adds[0][0], 'change', 'change event handler added');
-    QUnit.equal(adds[1][0], 'addtrack', 'addtrack event handler added');
-    QUnit.equal(adds[2][0], 'removetrack', 'removetrack event handler added');
+    assert.equal(adds[0][0], 'change', 'change event handler added');
+    assert.equal(adds[1][0], 'addtrack', 'addtrack event handler added');
+    assert.equal(adds[2][0], 'removetrack', 'removetrack event handler added');
   });
 
-  QUnit.test('remove all tracks from emulated list on dispose', function() {
+  QUnit.test('remove all tracks from emulated list on dispose', function(assert) {
     const adds = [];
     const rems = [];
     const vt = {
@@ -389,34 +389,34 @@ if (Html5.supportsNativeVideoTracks()) {
 
     htmlTech.dispose();
 
-    QUnit.equal(adds[0][0], 'change', 'change event handler added');
-    QUnit.equal(adds[1][0], 'addtrack', 'addtrack event handler added');
-    QUnit.equal(adds[2][0], 'removetrack', 'removetrack event handler added');
-    QUnit.equal(rems[0][0], 'change', 'change event handler removed');
-    QUnit.equal(rems[1][0], 'addtrack', 'addtrack event handler removed');
-    QUnit.equal(rems[2][0], 'removetrack', 'removetrack event handler removed');
-    QUnit.equal(adds[0][0], rems[0][0], 'change event handler removed');
-    QUnit.equal(adds[1][0], rems[1][0], 'addtrack event handler removed');
-    QUnit.equal(adds[2][0], rems[2][0], 'removetrack event handler removed');
+    assert.equal(adds[0][0], 'change', 'change event handler added');
+    assert.equal(adds[1][0], 'addtrack', 'addtrack event handler added');
+    assert.equal(adds[2][0], 'removetrack', 'removetrack event handler added');
+    assert.equal(rems[0][0], 'change', 'change event handler removed');
+    assert.equal(rems[1][0], 'addtrack', 'addtrack event handler removed');
+    assert.equal(rems[2][0], 'removetrack', 'removetrack event handler removed');
+    assert.equal(adds[0][0], rems[0][0], 'change event handler removed');
+    assert.equal(adds[1][0], rems[1][0], 'addtrack event handler removed');
+    assert.equal(adds[2][0], rems[2][0], 'removetrack event handler removed');
   });
 }
 
-QUnit.test('should always return currentSource_ if set', function() {
+QUnit.test('should always return currentSource_ if set', function(assert) {
   const currentSrc = Html5.prototype.currentSrc;
 
-  QUnit.equal(currentSrc.call({el_: {currentSrc: 'test1'}}),
+  assert.equal(currentSrc.call({el_: {currentSrc: 'test1'}}),
               'test1',
               'sould return source from element if nothing else set');
-  QUnit.equal(currentSrc.call({currentSource_: {src: 'test2'}}),
+  assert.equal(currentSrc.call({currentSource_: {src: 'test2'}}),
               'test2',
               'sould return source from currentSource_, if nothing else set');
-  QUnit.equal(currentSrc.call({currentSource_: {src: 'test2'},
+  assert.equal(currentSrc.call({currentSource_: {src: 'test2'},
                                el_: {currentSrc: 'test1'}}),
               'test2',
               'sould return source from  source set, not from element');
 });
 
-QUnit.test('should fire makeup events when a video tag is initialized late', function() {
+QUnit.test('should fire makeup events when a video tag is initialized late', function(assert) {
   const lateInit = Html5.prototype.handleLateInit_;
   let triggeredEvents = [];
   const mockHtml5 = {
@@ -439,7 +439,7 @@ QUnit.test('should fire makeup events when a video tag is initialized late', fun
   function testStates(statesObject, expectedEvents) {
     lateInit.call(mockHtml5, statesObject);
     mockHtml5.triggerReady();
-    QUnit.deepEqual(triggeredEvents,
+    assert.deepEqual(triggeredEvents,
                     expectedEvents,
                     'wrong events triggered for ' +
                     `networkState:${statesObject.networkState} ` +
@@ -467,7 +467,7 @@ QUnit.test('should fire makeup events when a video tag is initialized late', fun
              ['loadstart', 'loadedmetadata', 'loadeddata', 'canplay', 'canplaythrough']);
 });
 
-QUnit.test('Html5.resetMediaElement should remove sources and call load', function() {
+QUnit.test('Html5.resetMediaElement should remove sources and call load', function(assert) {
   let selector;
   const removedChildren = [];
   let removedAttribute;
@@ -493,15 +493,15 @@ QUnit.test('Html5.resetMediaElement should remove sources and call load', functi
   };
 
   Html5.resetMediaElement(testEl);
-  QUnit.equal(selector, 'source', 'we got the source elements from the test el');
-  QUnit.deepEqual(removedChildren,
+  assert.equal(selector, 'source', 'we got the source elements from the test el');
+  assert.deepEqual(removedChildren,
                   children.reverse(),
                   'we removed the children that were present');
-  QUnit.equal(removedAttribute, 'src', 'we removed the src attribute');
-  QUnit.ok(loaded, 'we called load on the element');
+  assert.equal(removedAttribute, 'src', 'we removed the src attribute');
+  assert.ok(loaded, 'we called load on the element');
 });
 
-QUnit.test('Html5#reset calls Html5.resetMediaElement when called', function() {
+QUnit.test('Html5#reset calls Html5.resetMediaElement when called', function(assert) {
   const oldResetMedia = Html5.resetMediaElement;
   let resetEl;
 
@@ -513,7 +513,7 @@ QUnit.test('Html5#reset calls Html5.resetMediaElement when called', function() {
 
   Html5.prototype.reset.call({el_: el});
 
-  QUnit.equal(resetEl, el, 'we called resetMediaElement with the tech\'s el');
+  assert.equal(resetEl, el, 'we called resetMediaElement with the tech\'s el');
 
   Html5.resetMediaElement = oldResetMedia;
 });

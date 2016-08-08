@@ -4,15 +4,15 @@ import TestHelpers from '../test-helpers.js';
 import sinon from 'sinon';
 
 QUnit.module('Tracks', {
-  setup() {
+  beforeEach(assert) {
     this.clock = sinon.useFakeTimers();
   },
-  teardown() {
+  afterEach(assert) {
     this.clock.restore();
   }
 });
 
-QUnit.test('Player track methods call the tech', function() {
+QUnit.test('Player track methods call the tech', function(assert) {
   const player = TestHelpers.makePlayer();
   let calls = 0;
 
@@ -22,11 +22,11 @@ QUnit.test('Player track methods call the tech', function() {
 
   player.audioTracks();
 
-  QUnit.equal(calls, 1, 'audioTrack defers to the tech');
+  assert.equal(calls, 1, 'audioTrack defers to the tech');
   player.dispose();
 });
 
-QUnit.test('listen to remove and add track events in native audio tracks', function() {
+QUnit.test('listen to remove and add track events in native audio tracks', function(assert) {
   const oldTestVid = Html5.TEST_VID;
   const oldAudioTracks = Html5.prototype.audioTracks;
   const events = {};
@@ -67,36 +67,36 @@ QUnit.test('listen to remove and add track events in native audio tracks', funct
   const html = new Html5({});
   /* eslint-enable no-unused-vars */
 
-  QUnit.ok(events.removetrack, 'removetrack listener was added');
-  QUnit.ok(events.addtrack, 'addtrack listener was added');
+  assert.ok(events.removetrack, 'removetrack listener was added');
+  assert.ok(events.addtrack, 'addtrack listener was added');
 
   Html5.TEST_VID = oldTestVid;
   Html5.prototype.audioTracks = oldAudioTracks;
 });
 
-QUnit.test('html5 tech supports native audio tracks if the video supports it', function() {
+QUnit.test('html5 tech supports native audio tracks if the video supports it', function(assert) {
   const oldTestVid = Html5.TEST_VID;
 
   Html5.TEST_VID = {
     audioTracks: []
   };
 
-  QUnit.ok(Html5.supportsNativeAudioTracks(), 'native audio tracks are supported');
+  assert.ok(Html5.supportsNativeAudioTracks(), 'native audio tracks are supported');
 
   Html5.TEST_VID = oldTestVid;
 });
 
-QUnit.test('html5 tech does not support native audio tracks if the video does not supports it', function() {
+QUnit.test('html5 tech does not support native audio tracks if the video does not supports it', function(assert) {
   const oldTestVid = Html5.TEST_VID;
 
   Html5.TEST_VID = {};
 
-  QUnit.ok(!Html5.supportsNativeAudioTracks(), 'native audio tracks are not supported');
+  assert.ok(!Html5.supportsNativeAudioTracks(), 'native audio tracks are not supported');
 
   Html5.TEST_VID = oldTestVid;
 });
 
-QUnit.test('when switching techs, we should not get a new audio track', function() {
+QUnit.test('when switching techs, we should not get a new audio track', function(assert) {
   const player = TestHelpers.makePlayer();
 
   player.loadTech_('TechFaker');
@@ -105,5 +105,5 @@ QUnit.test('when switching techs, we should not get a new audio track', function
   player.loadTech_('TechFaker');
   const secondTracks = player.audioTracks();
 
-  QUnit.ok(firstTracks === secondTracks, 'the tracks are equal');
+  assert.ok(firstTracks === secondTracks, 'the tracks are equal');
 });

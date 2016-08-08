@@ -4,15 +4,15 @@ import TestHelpers from '../test-helpers.js';
 import sinon from 'sinon';
 
 QUnit.module('Video Tracks', {
-  setup() {
+  beforeEach(assert) {
     this.clock = sinon.useFakeTimers();
   },
-  teardown() {
+  afterEach(assert) {
     this.clock.restore();
   }
 });
 
-QUnit.test('Player track methods call the tech', function() {
+QUnit.test('Player track methods call the tech', function(assert) {
   let calls = 0;
   const player = TestHelpers.makePlayer();
 
@@ -22,11 +22,11 @@ QUnit.test('Player track methods call the tech', function() {
 
   player.videoTracks();
 
-  QUnit.equal(calls, 1, 'videoTrack defers to the tech');
+  assert.equal(calls, 1, 'videoTrack defers to the tech');
   player.dispose();
 });
 
-QUnit.test('listen to remove and add track events in native video tracks', function() {
+QUnit.test('listen to remove and add track events in native video tracks', function(assert) {
   const oldTestVid = Html5.TEST_VID;
   const oldVideoTracks = Html5.prototype.videoTracks;
   const events = {};
@@ -67,36 +67,36 @@ QUnit.test('listen to remove and add track events in native video tracks', funct
   const html = new Html5({});
   /* eslint-enable no-unused-vars */
 
-  QUnit.ok(events.removetrack, 'removetrack listener was added');
-  QUnit.ok(events.addtrack, 'addtrack listener was added');
+  assert.ok(events.removetrack, 'removetrack listener was added');
+  assert.ok(events.addtrack, 'addtrack listener was added');
 
   Html5.TEST_VID = oldTestVid;
   Html5.prototype.videoTracks = oldVideoTracks;
 });
 
-QUnit.test('html5 tech supports native video tracks if the video supports it', function() {
+QUnit.test('html5 tech supports native video tracks if the video supports it', function(assert) {
   const oldTestVid = Html5.TEST_VID;
 
   Html5.TEST_VID = {
     videoTracks: []
   };
 
-  QUnit.ok(Html5.supportsNativeVideoTracks(), 'native video tracks are supported');
+  assert.ok(Html5.supportsNativeVideoTracks(), 'native video tracks are supported');
 
   Html5.TEST_VID = oldTestVid;
 });
 
-QUnit.test('html5 tech does not support native video tracks if the video does not supports it', function() {
+QUnit.test('html5 tech does not support native video tracks if the video does not supports it', function(assert) {
   const oldTestVid = Html5.TEST_VID;
 
   Html5.TEST_VID = {};
 
-  QUnit.ok(!Html5.supportsNativeVideoTracks(), 'native video tracks are not supported');
+  assert.ok(!Html5.supportsNativeVideoTracks(), 'native video tracks are not supported');
 
   Html5.TEST_VID = oldTestVid;
 });
 
-QUnit.test('when switching techs, we should not get a new video track', function() {
+QUnit.test('when switching techs, we should not get a new video track', function(assert) {
   const player = TestHelpers.makePlayer();
 
   player.loadTech_('TechFaker');
@@ -105,5 +105,5 @@ QUnit.test('when switching techs, we should not get a new video track', function
   player.loadTech_('TechFaker');
   const secondTracks = player.videoTracks();
 
-  QUnit.ok(firstTracks === secondTracks, 'the tracks are equal');
+  assert.ok(firstTracks === secondTracks, 'the tracks are equal');
 });

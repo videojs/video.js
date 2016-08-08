@@ -9,16 +9,16 @@ import * as browser from '../../../src/js/utils/browser.js';
  */
 const TrackBaseline = function(TrackClass, options) {
 
-  QUnit.test('is setup with id, kind, label, and language', function() {
+  QUnit.test('is setup with id, kind, label, and language', function(assert) {
     const track = new TrackClass(options);
 
-    QUnit.equal(track.kind, options.kind, 'we have a kind');
-    QUnit.equal(track.label, options.label, 'we have a label');
-    QUnit.equal(track.language, options.language, 'we have a language');
-    QUnit.equal(track.id, options.id, 'we have a id');
+    assert.equal(track.kind, options.kind, 'we have a kind');
+    assert.equal(track.label, options.label, 'we have a label');
+    assert.equal(track.language, options.language, 'we have a language');
+    assert.equal(track.id, options.id, 'we have a id');
   });
 
-  QUnit.test('kind, label, language, id, are read only', function() {
+  QUnit.test('kind, label, language, id, are read only', function(assert) {
     const track = new TrackClass(options);
 
     track.kind = 'subtitles';
@@ -26,20 +26,20 @@ const TrackBaseline = function(TrackClass, options) {
     track.language = 'es';
     track.id = '2';
 
-    QUnit.equal(track.kind, options.kind, 'we have a kind');
-    QUnit.equal(track.label, options.label, 'we have a label');
-    QUnit.equal(track.language, options.language, 'we have a language');
-    QUnit.equal(track.id, options.id, 'we have an id');
+    assert.equal(track.kind, options.kind, 'we have a kind');
+    assert.equal(track.label, options.label, 'we have a label');
+    assert.equal(track.language, options.language, 'we have a language');
+    assert.equal(track.id, options.id, 'we have an id');
   });
 
-  QUnit.test('returns an instance of itself on non ie8 browsers', function() {
+  QUnit.test('returns an instance of itself on non ie8 browsers', function(assert) {
     const track = new TrackClass(options);
 
     if (browser.IS_IE8) {
-      QUnit.ok(track, 'returns an object on ie8');
+      assert.ok(track, 'returns an object on ie8');
       return;
     }
-    QUnit.ok(track instanceof TrackClass, 'returns an instance');
+    assert.ok(track instanceof TrackClass, 'returns an instance');
   });
 };
 

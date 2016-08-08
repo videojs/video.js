@@ -4,8 +4,8 @@ import TestHelpers from './test-helpers.js';
 
 QUnit.module('Button');
 
-QUnit.test('should localize its text', function() {
-  QUnit.expect(3);
+QUnit.test('should localize its text', function(assert) {
+  assert.expect(3);
 
   const player = TestHelpers.makePlayer({
     language: 'es',
@@ -21,7 +21,7 @@ QUnit.test('should localize its text', function() {
   testButton.controlText_ = 'Play';
   const el = testButton.createEl();
 
-  QUnit.ok(el.nodeName.toLowerCase().match('button'));
-  QUnit.ok(el.innerHTML.match(/vjs-control-text"?>Juego/));
-  QUnit.equal(el.getAttribute('title'), 'Juego');
+  assert.ok(el.nodeName.toLowerCase().match('button'));
+  assert.ok(el.innerHTML.match(/vjs-control-text"?>Juego/));
+  assert.equal(el.getAttribute('title'), 'Juego');
 });

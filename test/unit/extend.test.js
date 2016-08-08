@@ -3,7 +3,7 @@ import extendFn from '../../src/js/extend.js';
 
 QUnit.module('extend.js');
 
-QUnit.test('should add implicit parent constructor call', function() {
+QUnit.test('should add implicit parent constructor call', function(assert) {
   let superCalled = false;
   const Parent = function() {
     superCalled = true;
@@ -13,6 +13,6 @@ QUnit.test('should add implicit parent constructor call', function() {
   });
   const child = new Child();
 
-  QUnit.ok(superCalled, 'super constructor called');
-  QUnit.ok(child.foo, 'child properties set');
+  assert.ok(superCalled, 'super constructor called');
+  assert.ok(child.foo, 'child properties set');
 });

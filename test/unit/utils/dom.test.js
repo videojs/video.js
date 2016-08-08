@@ -4,7 +4,7 @@ import * as Dom from '../../../src/js/utils/dom.js';
 
 QUnit.module('dom');
 
-QUnit.test('should return the element with the ID', function() {
+QUnit.test('should return the element with the ID', function(assert) {
   const el1 = document.createElement('div');
   const el2 = document.createElement('div');
   const fixture = document.getElementById('qunit-fixture');
@@ -15,11 +15,11 @@ QUnit.test('should return the element with the ID', function() {
   el1.id = 'test_id1';
   el2.id = 'test_id2';
 
-  QUnit.ok(Dom.getEl('test_id1') === el1, 'found element for ID');
-  QUnit.ok(Dom.getEl('#test_id2') === el2, 'found element for CSS ID');
+  assert.ok(Dom.getEl('test_id1') === el1, 'found element for ID');
+  assert.ok(Dom.getEl('#test_id2') === el2, 'found element for CSS ID');
 });
 
-QUnit.test('should create an element', function() {
+QUnit.test('should create an element', function(assert) {
   const div = Dom.createEl();
   const span = Dom.createEl('span', {
     innerHTML: 'fdsa'
@@ -27,113 +27,113 @@ QUnit.test('should create an element', function() {
     'data-test': 'asdf'
   });
 
-  QUnit.ok(div.nodeName === 'DIV');
-  QUnit.ok(span.nodeName === 'SPAN');
-  QUnit.ok(span.getAttribute('data-test') === 'asdf');
-  QUnit.ok(span.innerHTML === 'fdsa');
+  assert.ok(div.nodeName === 'DIV');
+  assert.ok(span.nodeName === 'SPAN');
+  assert.ok(span.getAttribute('data-test') === 'asdf');
+  assert.ok(span.innerHTML === 'fdsa');
 });
 
-QUnit.test('should insert an element first in another', function() {
+QUnit.test('should insert an element first in another', function(assert) {
   const el1 = document.createElement('div');
   const el2 = document.createElement('div');
   const parent = document.createElement('div');
 
   Dom.insertElFirst(el1, parent);
-  QUnit.ok(parent.firstChild === el1, 'inserts first into empty parent');
+  assert.ok(parent.firstChild === el1, 'inserts first into empty parent');
 
   Dom.insertElFirst(el2, parent);
-  QUnit.ok(parent.firstChild === el2, 'inserts first into parent with child');
+  assert.ok(parent.firstChild === el2, 'inserts first into parent with child');
 });
 
-QUnit.test('should get and remove data from an element', function() {
+QUnit.test('should get and remove data from an element', function(assert) {
   const el = document.createElement('div');
   const data = Dom.getElData(el);
 
-  QUnit.ok(typeof data === 'object', 'data object created');
+  assert.ok(typeof data === 'object', 'data object created');
 
   // Add data
   const testData = { asdf: 'fdsa' };
 
   data.test = testData;
-  QUnit.ok(Dom.getElData(el).test === testData, 'data added');
+  assert.ok(Dom.getElData(el).test === testData, 'data added');
 
   // Remove all data
   Dom.removeElData(el);
 
-  QUnit.ok(!Dom.hasElData(el), 'cached item emptied');
+  assert.ok(!Dom.hasElData(el), 'cached item emptied');
 });
 
-QUnit.test('addElClass()', function() {
+QUnit.test('addElClass()', function(assert) {
   const el = document.createElement('div');
 
-  QUnit.expect(5);
+  assert.expect(5);
 
   Dom.addElClass(el, 'test-class');
-  QUnit.strictEqual(el.className, 'test-class', 'adds a single class');
+  assert.strictEqual(el.className, 'test-class', 'adds a single class');
 
   Dom.addElClass(el, 'test-class');
-  QUnit.strictEqual(el.className, 'test-class', 'does not duplicate classes');
+  assert.strictEqual(el.className, 'test-class', 'does not duplicate classes');
 
-  QUnit.throws(function() {
+  assert.throws(function() {
     Dom.addElClass(el, 'foo foo-bar');
   }, 'throws when attempting to add a class with whitespace');
 
   Dom.addElClass(el, 'test2_className');
-  QUnit.strictEqual(el.className, 'test-class test2_className', 'adds second class');
+  assert.strictEqual(el.className, 'test-class test2_className', 'adds second class');
 
   Dom.addElClass(el, 'FOO');
-  QUnit.strictEqual(el.className, 'test-class test2_className FOO', 'adds third class');
+  assert.strictEqual(el.className, 'test-class test2_className FOO', 'adds third class');
 });
 
-QUnit.test('removeElClass()', function() {
+QUnit.test('removeElClass()', function(assert) {
   const el = document.createElement('div');
 
   el.className = 'test-class foo foo test2_className FOO bar';
 
-  QUnit.expect(5);
+  assert.expect(5);
 
   Dom.removeElClass(el, 'test-class');
-  QUnit.strictEqual(el.className, 'foo foo test2_className FOO bar', 'removes one class');
+  assert.strictEqual(el.className, 'foo foo test2_className FOO bar', 'removes one class');
 
   Dom.removeElClass(el, 'foo');
-  QUnit.strictEqual(el.className,
+  assert.strictEqual(el.className,
                     'test2_className FOO bar',
                     'removes all instances of a class');
 
-  QUnit.throws(function() {
+  assert.throws(function() {
     Dom.removeElClass(el, 'test2_className bar');
   }, 'throws when attempting to remove a class with whitespace');
 
   Dom.removeElClass(el, 'test2_className');
-  QUnit.strictEqual(el.className, 'FOO bar', 'removes another class');
+  assert.strictEqual(el.className, 'FOO bar', 'removes another class');
 
   Dom.removeElClass(el, 'FOO');
-  QUnit.strictEqual(el.className, 'bar', 'removes another class');
+  assert.strictEqual(el.className, 'bar', 'removes another class');
 });
 
-QUnit.test('hasElClass()', function() {
+QUnit.test('hasElClass()', function(assert) {
   const el = document.createElement('div');
 
   el.className = 'test-class foo foo test2_className FOO bar';
 
-  QUnit.strictEqual(Dom.hasElClass(el, 'test-class'), true, 'class detected');
-  QUnit.strictEqual(Dom.hasElClass(el, 'foo'), true, 'class detected');
-  QUnit.strictEqual(Dom.hasElClass(el, 'test2_className'), true, 'class detected');
-  QUnit.strictEqual(Dom.hasElClass(el, 'FOO'), true, 'class detected');
-  QUnit.strictEqual(Dom.hasElClass(el, 'bar'), true, 'class detected');
-  QUnit.strictEqual(Dom.hasElClass(el, 'test2'),
+  assert.strictEqual(Dom.hasElClass(el, 'test-class'), true, 'class detected');
+  assert.strictEqual(Dom.hasElClass(el, 'foo'), true, 'class detected');
+  assert.strictEqual(Dom.hasElClass(el, 'test2_className'), true, 'class detected');
+  assert.strictEqual(Dom.hasElClass(el, 'FOO'), true, 'class detected');
+  assert.strictEqual(Dom.hasElClass(el, 'bar'), true, 'class detected');
+  assert.strictEqual(Dom.hasElClass(el, 'test2'),
                     false,
                     'valid substring - but not a class - correctly not detected');
-  QUnit.strictEqual(Dom.hasElClass(el, 'className'),
+  assert.strictEqual(Dom.hasElClass(el, 'className'),
                     false,
                     'valid substring - but not a class - correctly not detected');
 
-  QUnit.throws(function() {
+  assert.throws(function() {
     Dom.hasElClass(el, 'FOO bar');
   }, 'throws when attempting to detect a class with whitespace');
 });
 
-QUnit.test('toggleElClass()', function() {
+QUnit.test('toggleElClass()', function(assert) {
   const el = Dom.createEl('div', {className: 'foo bar'});
 
   const predicateToggles = [
@@ -219,36 +219,36 @@ QUnit.test('toggleElClass()', function() {
     }
   ];
 
-  QUnit.expect(3 + predicateToggles.length);
+  assert.expect(3 + predicateToggles.length);
 
   Dom.toggleElClass(el, 'bar');
-  QUnit.strictEqual(el.className, 'foo', 'toggles a class off, if present');
+  assert.strictEqual(el.className, 'foo', 'toggles a class off, if present');
 
   Dom.toggleElClass(el, 'bar');
-  QUnit.strictEqual(el.className, 'foo bar', 'toggles a class on, if absent');
+  assert.strictEqual(el.className, 'foo bar', 'toggles a class on, if absent');
 
-  QUnit.throws(function() {
+  assert.throws(function() {
     Dom.toggleElClass(el, 'foo bar');
   }, 'throws when attempting to toggle a class with whitespace');
 
   predicateToggles.forEach(x => {
     Dom.toggleElClass(el, x.toggle, x.predicate);
-    QUnit.strictEqual(el.className, x.className, x.message);
+    assert.strictEqual(el.className, x.className, x.message);
   });
 });
 
-QUnit.test('should set element attributes from object', function() {
+QUnit.test('should set element attributes from object', function(assert) {
   const el = document.createElement('div');
 
   el.id = 'el1';
   Dom.setElAttributes(el, {'controls': true, 'data-test': 'asdf'});
 
-  QUnit.equal(el.getAttribute('id'), 'el1');
-  QUnit.equal(el.getAttribute('controls'), '');
-  QUnit.equal(el.getAttribute('data-test'), 'asdf');
+  assert.equal(el.getAttribute('id'), 'el1');
+  assert.equal(el.getAttribute('controls'), '');
+  assert.equal(el.getAttribute('data-test'), 'asdf');
 });
 
-QUnit.test('should read tag attributes from elements, including HTML5 in all browsers', function() {
+QUnit.test('should read tag attributes from elements, including HTML5 in all browsers', function(assert) {
   // Creating the source/track tags outside of the video tag prevents log errors
   const tags = `
   <video id="vid1" controls autoplay loop muted preload="none" src="http://google.com" poster="http://www2.videojs.com/img/video-js-html5-video-player.png" data-test="asdf" data-empty-string="">
@@ -269,35 +269,35 @@ QUnit.test('should read tag attributes from elements, including HTML5 in all bro
 
   // vid1
   // was using deepEqual, but ie8 would send all properties as attributes
-  QUnit.equal(vid1Vals.autoplay, true);
-  QUnit.equal(vid1Vals.controls, true);
-  QUnit.equal(vid1Vals['data-test'], 'asdf');
-  QUnit.equal(vid1Vals['data-empty-string'], '');
-  QUnit.equal(vid1Vals.id, 'vid1');
-  QUnit.equal(vid1Vals.loop, true);
-  QUnit.equal(vid1Vals.muted, true);
-  QUnit.equal(vid1Vals.poster, 'http://www2.videojs.com/img/video-js-html5-video-player.png');
-  QUnit.equal(vid1Vals.preload, 'none');
-  QUnit.equal(vid1Vals.src, 'http://google.com');
+  assert.equal(vid1Vals.autoplay, true);
+  assert.equal(vid1Vals.controls, true);
+  assert.equal(vid1Vals['data-test'], 'asdf');
+  assert.equal(vid1Vals['data-empty-string'], '');
+  assert.equal(vid1Vals.id, 'vid1');
+  assert.equal(vid1Vals.loop, true);
+  assert.equal(vid1Vals.muted, true);
+  assert.equal(vid1Vals.poster, 'http://www2.videojs.com/img/video-js-html5-video-player.png');
+  assert.equal(vid1Vals.preload, 'none');
+  assert.equal(vid1Vals.src, 'http://google.com');
 
   // sourceVals
-  QUnit.equal(sourceVals.title, 'test');
-  QUnit.equal(sourceVals.media, 'fdsa');
-  QUnit.equal(sourceVals.type, 'video/mp4');
-  QUnit.equal(sourceVals.src, 'http://google.com');
-  QUnit.equal(sourceVals.id, 'source');
+  assert.equal(sourceVals.title, 'test');
+  assert.equal(sourceVals.media, 'fdsa');
+  assert.equal(sourceVals.type, 'video/mp4');
+  assert.equal(sourceVals.src, 'http://google.com');
+  assert.equal(sourceVals.id, 'source');
 
   // trackVals
-  QUnit.equal(trackVals.default, true);
-  QUnit.equal(trackVals.id, 'track');
-  QUnit.equal(trackVals.kind, 'captions');
-  QUnit.equal(trackVals.label, 'testlabel');
-  QUnit.equal(trackVals.src, 'http://google.com');
-  QUnit.equal(trackVals.srclang, 'en');
-  QUnit.equal(trackVals.title, 'test');
+  assert.equal(trackVals.default, true);
+  assert.equal(trackVals.id, 'track');
+  assert.equal(trackVals.kind, 'captions');
+  assert.equal(trackVals.label, 'testlabel');
+  assert.equal(trackVals.src, 'http://google.com');
+  assert.equal(trackVals.srclang, 'en');
+  assert.equal(trackVals.title, 'test');
 });
 
-QUnit.test('Dom.findElPosition should find top and left position', function() {
+QUnit.test('Dom.findElPosition should find top and left position', function(assert) {
   const d = document.createElement('div');
   let position = Dom.findElPosition(d);
 
@@ -305,17 +305,17 @@ QUnit.test('Dom.findElPosition should find top and left position', function() {
   d.style.left = '20px';
   d.style.position = 'absolute';
 
-  QUnit.deepEqual(position,
+  assert.deepEqual(position,
                   {left: 0, top: 0},
                   'If element isn\'t in the DOM, we should get zeros');
 
   document.body.appendChild(d);
   position = Dom.findElPosition(d);
-  QUnit.deepEqual(position, {left: 20, top: 10}, 'The position was not correct');
+  assert.deepEqual(position, {left: 20, top: 10}, 'The position was not correct');
 
   d.getBoundingClientRect = null;
   position = Dom.findElPosition(d);
-  QUnit.deepEqual(position,
+  assert.deepEqual(position,
                   {left: 0, top: 0},
                   'If there is no gBCR, we should get zeros');
 });
@@ -482,7 +482,7 @@ QUnit.test('Dom.appendContent', function(assert) {
   assert.strictEqual(el.firstChild.nextSibling, p2, 'the second paragraph was appended');
 });
 
-QUnit.test('$() and $$()', function() {
+QUnit.test('$() and $$()', function(assert) {
   const fixture = document.getElementById('qunit-fixture');
   const container = document.createElement('div');
   const children = [
@@ -496,45 +496,45 @@ QUnit.test('$() and $$()', function() {
 
   const totalDivCount = document.getElementsByTagName('div').length;
 
-  QUnit.expect(12);
+  assert.expect(12);
 
-  QUnit.strictEqual(Dom.$('#qunit-fixture'),
+  assert.strictEqual(Dom.$('#qunit-fixture'),
                     fixture,
                     'can find an element in the document context');
-  QUnit.strictEqual(Dom.$$('div').length,
+  assert.strictEqual(Dom.$$('div').length,
                     totalDivCount,
                     'finds elements in the document context');
 
-  QUnit.strictEqual(Dom.$('div', container),
+  assert.strictEqual(Dom.$('div', container),
                     children[0],
                     'can find an element in a DOM element context');
-  QUnit.strictEqual(Dom.$$('div', container).length,
+  assert.strictEqual(Dom.$$('div', container).length,
                     children.length,
                     'finds elements in a DOM element context');
 
-  QUnit.strictEqual(Dom.$('#qunit-fixture', document.querySelector('unknown')),
+  assert.strictEqual(Dom.$('#qunit-fixture', document.querySelector('unknown')),
               fixture,
               'falls back to document given a bad context element');
-  QUnit.strictEqual(Dom.$$('div', document.querySelector('unknown')).length,
+  assert.strictEqual(Dom.$$('div', document.querySelector('unknown')).length,
               totalDivCount,
               'falls back to document given a bad context element');
 
-  QUnit.strictEqual(Dom.$('#qunit-fixture', 'body'),
+  assert.strictEqual(Dom.$('#qunit-fixture', 'body'),
               fixture,
               'can find an element in a selector context');
-  QUnit.strictEqual(Dom.$$('div', '#qunit-fixture').length,
+  assert.strictEqual(Dom.$$('div', '#qunit-fixture').length,
               1 + children.length,
               'finds elements in a selector context');
 
-  QUnit.strictEqual(Dom.$('#qunit-fixture', 'unknown'),
+  assert.strictEqual(Dom.$('#qunit-fixture', 'unknown'),
               fixture,
               'falls back to document given a bad context selector');
-  QUnit.strictEqual(Dom.$$('div', 'unknown').length,
+  assert.strictEqual(Dom.$$('div', 'unknown').length,
               totalDivCount,
               'falls back to document given a bad context selector');
 
-  QUnit.strictEqual(Dom.$('div', children[0]), null, 'returns null for missing elements');
-  QUnit.strictEqual(Dom.$$('div', children[0]).length,
+  assert.strictEqual(Dom.$('div', children[0]), null, 'returns null for missing elements');
+  assert.strictEqual(Dom.$$('div', children[0]).length,
                     0,
                     'returns 0 for missing elements');
 });
