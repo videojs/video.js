@@ -255,7 +255,7 @@ class ModalDialog extends Component {
         // content element, so temporarily change the content element.
         let temp = this.contentEl_;
         this.contentEl_ = this.el_;
-        close = this.addChild('closeButton');
+        close = this.addChild('closeButton', {controlText: 'Close Modal Dialog'});
         this.contentEl_ = temp;
         this.on(close, 'close', this.close);
       }

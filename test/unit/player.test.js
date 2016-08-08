@@ -247,7 +247,7 @@ test('should hide the poster when play is called', function() {
   });
 
   equal(player.hasStarted(), false, 'the show poster flag is true before play');
-  player.play();
+  player.tech_.trigger('play');
   equal(player.hasStarted(), true, 'the show poster flag is false after play');
 
   player.tech_.trigger('loadstart');
@@ -255,7 +255,7 @@ test('should hide the poster when play is called', function() {
         false,
         'the resource selection algorithm sets the show poster flag to true');
 
-  player.play();
+  player.tech_.trigger('play');
   equal(player.hasStarted(), true, 'the show poster flag is false after play');
 });
 
@@ -837,6 +837,24 @@ expect(3);
   strictEqual(player.localize('Error'), 'Problem', 'Used primary code localisation');
   player.language('en-GB');
   strictEqual(player.localize('Good'), 'Brilliant', 'Ignored case');
+});
+
+test('inherits language from parent element', function() {
+  var fixture = document.getElementById('qunit-fixture');
+  var oldLang = fixture.getAttribute('lang');
+  var player;
+
+  fixture.setAttribute('lang', 'x-test');
+  player = TestHelpers.makePlayer();
+
+  equal(player.language(), 'x-test', 'player inherits parent element language');
+
+  player.dispose();
+  if (oldLang) {
+    fixture.setAttribute('lang', oldLang);
+  } else {
+    fixture.removeAttribute('lang');
+  }
 });
 
 test('should return correct values for canPlayType', function(){

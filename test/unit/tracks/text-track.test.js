@@ -339,20 +339,20 @@ test('tracks are parsed once vttjs is loaded', function() {
 
 test('stops processing if vttjs loading errored out', function() {
   const clock = sinon.useFakeTimers();
+  const errorSpy = sinon.spy();
   const oldVTT = window.WebVTT;
   let parserCreated = false;
   window.WebVTT = true;
 
   // use proxyquire to stub xhr module because IE8s XDomainRequest usage
   let xhrHandler;
-  let errorMsg;
   let TextTrack = proxyquire('../../../src/js/tracks/text-track.js', {
     xhr(options, fn) {
       xhrHandler  = fn;
     },
     '../utils/log.js': {
-      error(msg) {
-        errorMsg = msg;
+      'default': {
+        error: errorSpy
       }
     }
   });
@@ -376,8 +376,11 @@ test('stops processing if vttjs loading errored out', function() {
   testTech.trigger('vttjserror');
   let offSpyCall = testTech.off.getCall(0);
 
-  ok(/^vttjs failed to load, stopping trying to process/.test(errorMsg),
-     'vttjs failed to load, so, we logged an error');
+  ok(errorSpy.called, 'vttjs failed to load, so log.error was called');
+  if (errorSpy.called) {
+    ok(/^vttjs failed to load, stopping trying to process/.test(errorSpy.getCall(0).args[0]),
+       'log.error was called with the expected message');
+  }
   ok(!parserCreated, 'WebVTT is not loaded, do not try to parse yet');
   ok(offSpyCall, 'tech.off was called');
 

@@ -141,8 +141,8 @@ class MenuButton extends ClickableComponent {
    * @method handleClick
    */
   handleClick() {
-    this.one('mouseout', Fn.bind(this, function(){
-      this.menu.unlockShowing();
+    this.one(this.menu.contentEl(), 'mouseleave', Fn.bind(this, function(e){
+      this.unpressButton();
       this.el_.blur();
     }));
     if (this.buttonPressed_){

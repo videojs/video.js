@@ -197,6 +197,33 @@ test('play after ended seeks to the beginning', function() {
   equal(seeks[0], 0, 'seeked to the beginning');
 });
 
+test('duration returns NaN, Infinity or duration according to the HTML standard', function() {
+  let duration = Flash.prototype.duration;
+  let mockedDuration = -1;
+  let mockedReadyState = 0;
+  let result;
+  let mockFlash = {
+    el_: {
+      vjs_getProperty() {
+        return mockedDuration;
+      }
+    },
+    readyState: function() {
+      return mockedReadyState;
+    }
+  };
+  result = duration.call(mockFlash);
+  ok(Number.isNaN(result), 'duration returns NaN when readyState equals 0');
+
+  mockedReadyState = 1;
+  result = duration.call(mockFlash);
+  ok(!Number.isFinite(result), 'duration returns Infinity when duration property is less then 0');
+
+  mockedDuration = 1;
+  result = duration.call(mockFlash);
+  equal(result, 1, 'duration returns duration property when readeyState and duration property are both higher than 0');
+});
+
 // fake out the <object> interaction but leave all the other logic intact
 class MockFlash extends Flash {
   constructor() {
