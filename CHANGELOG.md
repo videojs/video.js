@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* @gkatsev re-published to make sure that the audio button has css
+_(none)_
 
 --------------------
+
+## 5.10.8 (2016-08-08)
+* @gkatsev re-published to make sure that the audio button has css
 
 ## 5.10.7 (2016-06-27)
 * @gkatsev pinned node-sass to 3.4 ([view](https://github.com/videojs/video.js/pull/3401))
