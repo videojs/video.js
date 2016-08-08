@@ -43,6 +43,9 @@ CHANGELOG
 * @misteroneill corrects test assertions for older IEs in the log module ([view](https://github.com/videojs/video.js/pull/3454))
 * @gkatsev fixed setting lang by looping through loop element variable and not constant tag ([view](https://github.com/videojs/video.js/pull/3455))
 
+## 5.10.8 (2016-08-08)
+* @gkatsev re-published to make sure that the audio button has css
+
 ## 5.10.7 (2016-06-27)
 * @gkatsev pinned node-sass to 3.4 ([view](https://github.com/videojs/video.js/pull/3401))
 * @mister-ben added try catch to volume and playbackrate checks. Fixes #3315 ([view](https://github.com/videojs/video.js/pull/3320))
