@@ -3,10 +3,7 @@
  */
 import * as Dom from './utils/dom';
 import * as Fn from './utils/fn';
-import log from './utils/log';
-
 import Component from './component';
-import CloseButton from './close-button';
 
 const MODAL_CLASS_NAME = 'vjs-modal-dialog';
 const ESC = 27;
@@ -92,7 +89,7 @@ class ModalDialog extends Component {
       'aria-describedby': `${this.id()}_description`,
       'aria-hidden': 'true',
       'aria-label': this.label(),
-      role: 'dialog'
+      'role': 'dialog'
     });
   }
 
@@ -153,7 +150,7 @@ class ModalDialog extends Component {
    */
   open() {
     if (!this.opened_) {
-      let player = this.player();
+      const player = this.player();
 
       this.trigger('beforemodalopen');
       this.opened_ = true;
@@ -209,7 +206,7 @@ class ModalDialog extends Component {
    */
   close() {
     if (this.opened_) {
-      let player = this.player();
+      const player = this.player();
 
       this.trigger('beforemodalclose');
       this.opened_ = false;
@@ -245,7 +242,7 @@ class ModalDialog extends Component {
    */
   closeable(value) {
     if (typeof value === 'boolean') {
-      let closeable = this.closeable_ = !!value;
+      const closeable = this.closeable_ = !!value;
       let close = this.getChild('closeButton');
 
       // If this is being made closeable and has no close button, add one.
@@ -253,9 +250,10 @@ class ModalDialog extends Component {
 
         // The close button should be a child of the modal - not its
         // content element, so temporarily change the content element.
-        let temp = this.contentEl_;
+        const temp = this.contentEl_;
+
         this.contentEl_ = this.el_;
-        close = this.addChild('closeButton');
+        close = this.addChild('closeButton', {controlText: 'Close Modal Dialog'});
         this.contentEl_ = temp;
         this.on(close, 'close', this.close);
       }
@@ -294,9 +292,9 @@ class ModalDialog extends Component {
    * @return {ModalDialog}
    */
   fillWith(content) {
-    let contentEl = this.contentEl();
-    let parentEl = contentEl.parentNode;
-    let nextSiblingEl = contentEl.nextSibling;
+    const contentEl = this.contentEl();
+    const parentEl = contentEl.parentNode;
+    const nextSiblingEl = contentEl.nextSibling;
 
     this.trigger('beforemodalfill');
     this.hasBeenFilled_ = true;

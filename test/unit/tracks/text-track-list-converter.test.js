@@ -1,18 +1,19 @@
+/* eslint-env qunit */
 import c from '../../../src/js/tracks/text-track-list-converter.js';
 import TextTrack from '../../../src/js/tracks/text-track.js';
 import TextTrackList from '../../../src/js/tracks/text-track-list.js';
 import Html5 from '../../../src/js/tech/html5.js';
 import document from 'global/document';
 
-q.module('Text Track List Converter', {});
+QUnit.module('Text Track List Converter', {});
 
-let clean = (item) => {
+const clean = (item) => {
   delete item.id;
   delete item.inBandMetadataTrackDispatchType;
   delete item.cues;
 };
 
-let cleanup = (item) => {
+const cleanup = (item) => {
   if (Array.isArray(item)) {
     item.forEach(clean);
   } else {
@@ -23,8 +24,8 @@ let cleanup = (item) => {
 };
 
 if (Html5.supportsNativeTextTracks()) {
-  q.test('trackToJson_ produces correct representation for native track object', function(a) {
-    let track = document.createElement('track');
+  QUnit.test('trackToJson_ produces correct representation for native track object', function(a) {
+    const track = document.createElement('track');
 
     track.src = 'example.com/english.vtt';
     track.kind = 'captions';
@@ -39,26 +40,26 @@ if (Html5.supportsNativeTextTracks()) {
     }, 'the json output is same');
   });
 
-  q.test('textTracksToJson produces good json output', function(a) {
-    let emulatedTrack = new TextTrack({
+  QUnit.test('textTracksToJson produces good json output', function(a) {
+    const emulatedTrack = new TextTrack({
       kind: 'captions',
       label: 'English',
       language: 'en',
       tech: {}
     });
 
-    let nativeTrack = document.createElement('track');
+    const nativeTrack = document.createElement('track');
 
     nativeTrack.kind = 'captions';
     nativeTrack.srclang = 'es';
     nativeTrack.label = 'Spanish';
 
-    let tt = new TextTrackList();
+    const tt = new TextTrackList();
 
     tt.addTrack_(nativeTrack.track);
     tt.addTrack_(emulatedTrack);
 
-    let tech = {
+    const tech = {
       $$() {
         return [nativeTrack];
       },
@@ -88,8 +89,8 @@ if (Html5.supportsNativeTextTracks()) {
     }], 'the output is correct');
   });
 
-  q.test('jsonToTextTracks calls addRemoteTextTrack on the tech with mixed tracks', function(a) {
-    let emulatedTrack = new TextTrack({
+  QUnit.test('jsonToTextTracks calls addRemoteTextTrack on the tech with mixed tracks', function(a) {
+    const emulatedTrack = new TextTrack({
       kind: 'captions',
       label: 'English',
       language: 'en',
@@ -97,20 +98,20 @@ if (Html5.supportsNativeTextTracks()) {
       tech: {}
     });
 
-    let nativeTrack = document.createElement('track');
+    const nativeTrack = document.createElement('track');
 
     nativeTrack.src = 'example.com/spanish.vtt';
     nativeTrack.kind = 'captions';
     nativeTrack.srclang = 'es';
     nativeTrack.label = 'Spanish';
 
-    let tt = new TextTrackList();
+    const tt = new TextTrackList();
 
     tt.addTrack_(nativeTrack.track);
     tt.addTrack_(emulatedTrack);
 
     let addRemotes = 0;
-    let tech = {
+    const tech = {
       $$() {
         return [nativeTrack];
       },
@@ -139,8 +140,8 @@ if (Html5.supportsNativeTextTracks()) {
   });
 }
 
-q.test('trackToJson_ produces correct representation for emulated track object', function(a) {
-  let track = new TextTrack({
+QUnit.test('trackToJson_ produces correct representation for emulated track object', function(a) {
+  const track = new TextTrack({
     kind: 'captions',
     label: 'English',
     language: 'en',
@@ -157,8 +158,8 @@ q.test('trackToJson_ produces correct representation for emulated track object',
   }, 'the json output is same');
 });
 
-q.test('textTracksToJson produces good json output for emulated only', function(a) {
-  let emulatedTrack = new TextTrack({
+QUnit.test('textTracksToJson produces good json output for emulated only', function(a) {
+  const emulatedTrack = new TextTrack({
     kind: 'captions',
     label: 'English',
     language: 'en',
@@ -166,7 +167,7 @@ q.test('textTracksToJson produces good json output for emulated only', function(
     tech: {}
   });
 
-  let anotherTrack = new TextTrack({
+  const anotherTrack = new TextTrack({
     src: 'example.com/spanish.vtt',
     kind: 'captions',
     srclang: 'es',
@@ -174,12 +175,12 @@ q.test('textTracksToJson produces good json output for emulated only', function(
     tech: {}
   });
 
-  let tt = new TextTrackList();
+  const tt = new TextTrackList();
 
   tt.addTrack_(anotherTrack);
   tt.addTrack_(emulatedTrack);
 
-  let tech = {
+  const tech = {
     $$() {
       return [];
     },
@@ -211,8 +212,8 @@ q.test('textTracksToJson produces good json output for emulated only', function(
   }], 'the output is correct');
 });
 
-q.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated tracks only', function(a) {
-  let emulatedTrack = new TextTrack({
+QUnit.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated tracks only', function(a) {
+  const emulatedTrack = new TextTrack({
     kind: 'captions',
     label: 'English',
     language: 'en',
@@ -220,7 +221,7 @@ q.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated trac
     tech: {}
   });
 
-  let anotherTrack = new TextTrack({
+  const anotherTrack = new TextTrack({
     src: 'example.com/spanish.vtt',
     kind: 'captions',
     srclang: 'es',
@@ -228,13 +229,13 @@ q.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated trac
     tech: {}
   });
 
-  let tt = new TextTrackList();
+  const tt = new TextTrackList();
 
   tt.addTrack_(anotherTrack);
   tt.addTrack_(emulatedTrack);
 
   let addRemotes = 0;
-  let tech = {
+  const tech = {
     $$() {
       return [];
     },

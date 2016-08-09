@@ -4,10 +4,10 @@
 import merge from 'lodash-compat/object/merge';
 
 function isPlain(obj) {
-  return !!obj
-    && typeof obj === 'object'
-    && obj.toString() === '[object Object]'
-    && obj.constructor === Object;
+  return !!obj &&
+    typeof obj === 'object' &&
+    obj.toString() === '[object Object]' &&
+    obj.constructor === Object;
 }
 
 /**
@@ -15,7 +15,7 @@ function isPlain(obj) {
  * (like arrays) instead of attempting to overlay them.
  * @see https://lodash.com/docs#merge
  */
-const customizer = function(destination, source) {
+function customizer(destination, source) {
   // If we're not working with a plain object, copy the value as is
   // If source is an array, for instance, it will replace destination
   if (!isPlain(source)) {
@@ -30,7 +30,7 @@ const customizer = function(destination, source) {
   if (!isPlain(destination)) {
     return mergeOptions(source);
   }
-};
+}
 
 /**
  * Merge one or more options objects, recursively merging **only**
@@ -44,7 +44,7 @@ const customizer = function(destination, source) {
 export default function mergeOptions() {
   // contruct the call dynamically to handle the variable number of
   // objects to merge
-  let args = Array.prototype.slice.call(arguments);
+  const args = Array.prototype.slice.call(arguments);
 
   // unshift an empty object into the front of the call as the target
   // of the merge

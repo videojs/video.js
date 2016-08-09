@@ -17,7 +17,7 @@ import * as browser from './utils/browser.js';
  */
 class PosterImage extends ClickableComponent {
 
-  constructor(player, options){
+  constructor(player, options) {
     super(player, options);
 
     this.update();
@@ -41,7 +41,7 @@ class PosterImage extends ClickableComponent {
    * @method createEl
    */
   createEl() {
-    let el = Dom.createEl('div', {
+    const el = Dom.createEl('div', {
       className: 'vjs-poster',
 
       // Don't want poster to be tabbable.
@@ -66,7 +66,7 @@ class PosterImage extends ClickableComponent {
    * @method update
    */
   update() {
-    let url = this.player().poster();
+    const url = this.player().poster();
 
     this.setSrc(url);
 
@@ -90,6 +90,7 @@ class PosterImage extends ClickableComponent {
       this.fallbackImg_.src = url;
     } else {
       let backgroundImage = '';
+
       // Any falsey values should stay as an empty string, otherwise
       // this will throw an extra error
       if (url) {

@@ -16,9 +16,9 @@ import CaptionSettingsMenuItem from './caption-settings-menu-item.js';
  */
 class CaptionsButton extends TextTrackButton {
 
-  constructor(player, options, ready){
+  constructor(player, options, ready) {
     super(player, options, ready);
-    this.el_.setAttribute('aria-label','Captions Menu');
+    this.el_.setAttribute('aria-label', 'Captions Menu');
   }
 
   /**
@@ -38,10 +38,11 @@ class CaptionsButton extends TextTrackButton {
    */
   update() {
     let threshold = 2;
+
     super.update();
 
     // if native, then threshold is 1 because no settings button
-    if (this.player().tech_ && this.player().tech_['featuresNativeTextTracks']) {
+    if (this.player().tech_ && this.player().tech_.featuresNativeTextTracks) {
       threshold = 1;
     }
 
@@ -59,10 +60,10 @@ class CaptionsButton extends TextTrackButton {
    * @method createItems
    */
   createItems() {
-    let items = [];
+    const items = [];
 
-    if (!(this.player().tech_ && this.player().tech_['featuresNativeTextTracks'])) {
-      items.push(new CaptionSettingsMenuItem(this.player_, { 'kind': this.kind_ }));
+    if (!(this.player().tech_ && this.player().tech_.featuresNativeTextTracks)) {
+      items.push(new CaptionSettingsMenuItem(this.player_, {kind: this.kind_}));
     }
 
     return super.createItems(items);

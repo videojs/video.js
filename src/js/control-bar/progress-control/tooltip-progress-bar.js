@@ -3,7 +3,6 @@
  */
 import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
-import * as Dom from '../../utils/dom.js';
 import formatTime from '../../utils/format-time.js';
 
 /**
@@ -16,7 +15,7 @@ import formatTime from '../../utils/format-time.js';
  */
 class TooltipProgressBar extends Component {
 
-  constructor(player, options){
+  constructor(player, options) {
     super(player, options);
     this.updateDataAttr();
     this.on(player, 'timeupdate', this.updateDataAttr);
@@ -30,7 +29,7 @@ class TooltipProgressBar extends Component {
    * @method createEl
    */
   createEl() {
-    let el = super.createEl('div', {
+    const el = super.createEl('div', {
       className: 'vjs-tooltip-progress-bar vjs-slider-bar',
       innerHTML: `<div class="vjs-time-tooltip"></div>
         <span class="vjs-control-text"><span>${this.localize('Progress')}</span>: 0%</span>`
@@ -42,8 +41,9 @@ class TooltipProgressBar extends Component {
   }
 
   updateDataAttr() {
-    let time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
-    let formattedTime = formatTime(time, this.player_.duration());
+    const time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
+    const formattedTime = formatTime(time, this.player_.duration());
+
     this.el_.setAttribute('data-current-time', formattedTime);
     this.tooltip.innerHTML = formattedTime;
   }

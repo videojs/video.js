@@ -8,7 +8,7 @@ import document from 'global/document';
  * @type {Object|undefined}
  * @private
  */
-let FullscreenApi = {};
+const FullscreenApi = {};
 
 // browser API methods
 // map approach from Screenful.js - https://github.com/sindresorhus/screenfull.js
@@ -60,7 +60,7 @@ const apiMap = [
   ]
 ];
 
-let specApi = apiMap[0];
+const specApi = apiMap[0];
 let browserApi;
 
 // determine the supported set of functions
@@ -74,7 +74,7 @@ for (let i = 0; i < apiMap.length; i++) {
 
 // map the browser API names to the spec API names
 if (browserApi) {
-  for (let i=0; i<browserApi.length; i++) {
+  for (let i = 0; i < browserApi.length; i++) {
     FullscreenApi[specApi[i]] = browserApi[i];
   }
 }

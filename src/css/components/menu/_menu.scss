@@ -16,6 +16,7 @@
   display: block;
   padding: 0; margin: 0;
   overflow: auto;
+  font-family: $text-font-family;
 }
 
 // prevent menus from opening while scrubbing (FF, IE)

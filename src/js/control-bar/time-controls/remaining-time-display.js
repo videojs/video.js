@@ -15,10 +15,11 @@ import formatTime from '../../utils/format-time.js';
  */
 class RemainingTimeDisplay extends Component {
 
-  constructor(player, options){
+  constructor(player, options) {
     super(player, options);
 
     this.on(player, 'timeupdate', this.updateContent);
+    this.on(player, 'durationchange', this.updateContent);
   }
 
   /**
@@ -28,14 +29,14 @@ class RemainingTimeDisplay extends Component {
    * @method createEl
    */
   createEl() {
-    let el = super.createEl('div', {
+    const el = super.createEl('div', {
       className: 'vjs-remaining-time vjs-time-control vjs-control'
     });
 
     this.contentEl_ = Dom.createEl('div', {
       className: 'vjs-remaining-time-display',
       // label the remaining time for screen reader users
-      innerHTML: `<span class="vjs-control-text">${this.localize('Remaining Time')}</span> -0:00`,
+      innerHTML: `<span class="vjs-control-text">${this.localize('Remaining Time')}</span> -0:00`
     }, {
       // tell screen readers not to automatically read the time as it changes
       'aria-live': 'off'
@@ -54,6 +55,7 @@ class RemainingTimeDisplay extends Component {
     if (this.player_.duration()) {
       const localizedText = this.localize('Remaining Time');
       const formattedTime = formatTime(this.player_.remainingTime());
+
       if (formattedTime !== this.formattedTime_) {
         this.formattedTime_ = formattedTime;
         this.contentEl_.innerHTML = `<span class="vjs-control-text">${localizedText}</span> -${formattedTime}`;

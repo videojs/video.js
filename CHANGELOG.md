@@ -2,6 +2,21 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+* @misteroneill, @BrandonOCasey, and @pagarwal123 updates all the code to pass the linter ([view](https://github.com/videojs/video.js/pull/3459))
+* @misteroneill added ghooks to run linter on git push ([view](https://github.com/videojs/video.js/pull/3459))
+* @BrandonOCasey removed unused base-styles.js file ([view](https://github.com/videojs/video.js/pull/3486))
+* @erikyuzwa, @gkatsev updated CSS build to inlcude the IE8-specific CSS from a separate file instead of it being inside of sass ([view](https://github.com/videojs/video.js/pull/3380)) ([view2](https://github.com/erikyuzwa/video.js/pull/1))
+* @gkatsev added null checks around navigator.userAgent ([view](https://github.com/videojs/video.js/pull/3502))
+
+--------------------
+
+## 5.11.2 (2016-08-09)
+_(none)_
+
+## 5.11.1 (2016-08-08)
+* @vxsx fixed legend selector to be more specific. Fixes #3492 ([view](https://github.com/videojs/video.js/pull/3494))
+
+## 5.11.0 (2016-07-22)
 * @BrandonOCasey Document audio/video track usage ([view](https://github.com/videojs/video.js/pull/3295))
 * @hartman Correct documentation to refer to nativeTextTracks option ([view](https://github.com/videojs/video.js/pull/3309))
 * @nickygerritsen Also pass tech options to canHandleSource ([view](https://github.com/videojs/video.js/pull/3303))
@@ -11,8 +26,42 @@ CHANGELOG
 * @hartman Add descriptions and audio button to adaptive classes ([view](https://github.com/videojs/video.js/pull/3312))
 * @MattiasBuelens Retain details from tech error ([view](https://github.com/videojs/video.js/pull/3313))
 * @nickygerritsen Fix test for tooltips in IE8 ([view](https://github.com/videojs/video.js/pull/3327))
+* @mboles added loadstart event to jsdoc ([view](https://github.com/videojs/video.js/pull/3370))
+* @hartman added default print styling ([view](https://github.com/videojs/video.js/pull/3304))
+* @ldayananda updated videojs to not do anything if no src is set ([view](https://github.com/videojs/video.js/pull/3378))
+* @nickygerritsen removed unused tracks when changing sources. Fixes #3000 ([view](https://github.com/videojs/video.js/pull/3002))
+* @vit-koumar updated Flash tech to return Infinity from duration instead of -1 ([view](https://github.com/videojs/video.js/pull/3128))
+* @alex-phillips added ontextdata to Flash tech ([view](https://github.com/videojs/video.js/pull/2748))
+* @MattiasBuelens updated components to use durationchange only ([view](https://github.com/videojs/video.js/pull/3349))
+* @misteroneill improved Logging for IE < 11 ([view](https://github.com/videojs/video.js/pull/3356))
+* @vdeshpande updated control text of modal dialog ([view](https://github.com/videojs/video.js/pull/3400))
+* @ldayananda fixed mouse handling on menus by using mouseleave over mouseout ([view](https://github.com/videojs/video.js/pull/3404))
+* @mister-ben updated language to inherit correctly and respect the attribute on the player ([view](https://github.com/videojs/video.js/pull/3426))
+* @sashyro fixed nativeControlsForTouch option ([view](https://github.com/videojs/video.js/pull/3410))
+* @tbasse fixed techCall null check against tech ([view](https://github.com/videojs/video.js/pull/2676))
+* @rbran100 checked src and currentSrc in handleTechReady to work around mixed content issues in chrome ([view](https://github.com/videojs/video.js/pull/3287))
+* @OwenEdwards fixed caption settings dialog labels for accessibility ([view](https://github.com/videojs/video.js/pull/3281))
+* @OwenEdwards removed spurious head tags in the simple-embed example ([view](https://github.com/videojs/video.js/pull/3438))
+* @ntadej added a null check to errorDisplay usage ([view](https://github.com/videojs/video.js/pull/3440))
+* @misteroneill fixed logging issues on IE by separating fn.apply and stringify checks ([view](https://github.com/videojs/video.js/pull/3444))
+* @misteroneill fixed npm test from running coveralls locally ([view](https://github.com/videojs/video.js/pull/3449))
+* @gkatsev added es6-shim to tests. Fixes Flash duration test ([view](https://github.com/videojs/video.js/pull/3453))
+* @misteroneill corrects test assertions for older IEs in the log module ([view](https://github.com/videojs/video.js/pull/3454))
+* @gkatsev fixed setting lang by looping through loop element variable and not constant tag ([view](https://github.com/videojs/video.js/pull/3455))
 
---------------------
+## 5.10.8 (2016-08-08)
+* @gkatsev re-published to make sure that the audio button has css
+
+## 5.10.7 (2016-06-27)
+* @gkatsev pinned node-sass to 3.4 ([view](https://github.com/videojs/video.js/pull/3401))
+* @mister-ben added try catch to volume and playbackrate checks. Fixes #3315 ([view](https://github.com/videojs/video.js/pull/3320))
+* @m14t removed unused loadEvent property in ControlBar options ([view](https://github.com/videojs/video.js/pull/3363))
+* @bklava updated pt-BR language file ([view](https://github.com/videojs/video.js/pull/3373))
+* @mister-ben updated menus to use default videojs font-family ([view](https://github.com/videojs/video.js/pull/3384))
+* @vdeshpande fixed chapters getting duplicated each time a track is loaded ([view](https://github.com/videojs/video.js/pull/3354))
+
+## 5.10.6 (2016-06-20)
+* @gkatsev fix not fully minified video.min.js file.
 
 ## 5.10.5 (2016-06-07)
 * @gkatsev pinned dependencies to direct versions ([view](https://github.com/videojs/video.js/pull/3338))

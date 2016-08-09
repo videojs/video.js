@@ -10,7 +10,7 @@ import Player from './player.js';
  * @param  {Function} init The function that is run when the player inits
  * @method plugin
  */
-var plugin = function(name, init){
+const plugin = function(name, init) {
   Player.prototype[name] = init;
 };
 

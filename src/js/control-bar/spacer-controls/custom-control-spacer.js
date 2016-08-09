@@ -29,8 +29,8 @@ class CustomControlSpacer extends Spacer {
    * @method createEl
    */
   createEl() {
-    let el = super.createEl({
-      className: this.buildCSSClass(),
+    const el = super.createEl({
+      className: this.buildCSSClass()
     });
 
     // No-flex/table-cell mode requires there be some content

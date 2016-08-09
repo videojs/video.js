@@ -15,16 +15,10 @@ import formatTime from '../../utils/format-time.js';
  */
 class DurationDisplay extends Component {
 
-  constructor(player, options){
+  constructor(player, options) {
     super(player, options);
 
-    // this might need to be changed to 'durationchange' instead of 'timeupdate' eventually,
-    // however the durationchange event fires before this.player_.duration() is set,
-    // so the value cannot be written out using this method.
-    // Once the order of durationchange and this.player_.duration() being set is figured out,
-    // this can be updated.
-    this.on(player, 'timeupdate', this.updateContent);
-    this.on(player, 'loadedmetadata', this.updateContent);
+    this.on(player, 'durationchange', this.updateContent);
   }
 
   /**
@@ -34,7 +28,7 @@ class DurationDisplay extends Component {
    * @method createEl
    */
   createEl() {
-    let el = super.createEl('div', {
+    const el = super.createEl('div', {
       className: 'vjs-duration vjs-time-control vjs-control'
     });
 
@@ -57,12 +51,15 @@ class DurationDisplay extends Component {
    * @method updateContent
    */
   updateContent() {
-    let duration = this.player_.duration();
+    const duration = this.player_.duration();
+
     if (duration && this.duration_ !== duration) {
       this.duration_ = duration;
-      let localizedText = this.localize('Duration Time');
-      let formattedTime = formatTime(duration);
-      this.contentEl_.innerHTML = `<span class="vjs-control-text">${localizedText}</span> ${formattedTime}`; // label the duration time for screen reader users
+      const localizedText = this.localize('Duration Time');
+      const formattedTime = formatTime(duration);
+
+      // label the duration time for screen reader users
+      this.contentEl_.innerHTML = `<span class="vjs-control-text">${localizedText}</span> ${formattedTime}`;
     }
   }
 

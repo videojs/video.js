@@ -2,27 +2,59 @@
  * @file text-track-display.js
  */
 import Component from '../component';
-import Menu from '../menu/menu.js';
-import MenuItem from '../menu/menu-item.js';
-import MenuButton from '../menu/menu-button.js';
 import * as Fn from '../utils/fn.js';
-import document from 'global/document';
 import window from 'global/window';
 
 const darkGray = '#222';
 const lightGray = '#ccc';
 const fontMap = {
-  monospace:             'monospace',
-  sansSerif:             'sans-serif',
-  serif:                 'serif',
-  monospaceSansSerif:    '"Andale Mono", "Lucida Console", monospace',
-  monospaceSerif:        '"Courier New", monospace',
+  monospace: 'monospace',
+  sansSerif: 'sans-serif',
+  serif: 'serif',
+  monospaceSansSerif: '"Andale Mono", "Lucida Console", monospace',
+  monospaceSerif: '"Courier New", monospace',
   proportionalSansSerif: 'sans-serif',
-  proportionalSerif:     'serif',
-  casual:                '"Comic Sans MS", Impact, fantasy',
-  script:                '"Monotype Corsiva", cursive',
-  smallcaps:             '"Andale Mono", "Lucida Console", monospace, sans-serif'
+  proportionalSerif: 'serif',
+  casual: '"Comic Sans MS", Impact, fantasy',
+  script: '"Monotype Corsiva", cursive',
+  smallcaps: '"Andale Mono", "Lucida Console", monospace, sans-serif'
 };
+
+/**
+ * Add cue HTML to display
+ *
+ * @param {Number} color Hex number for color, like #f0e
+ * @param {Number} opacity Value for opacity,0.0 - 1.0
+ * @return {RGBAColor} In the form 'rgba(255, 0, 0, 0.3)'
+ * @method constructColor
+ */
+function constructColor(color, opacity) {
+  return 'rgba(' +
+    // color looks like "#f0e"
+    parseInt(color[1] + color[1], 16) + ',' +
+    parseInt(color[2] + color[2], 16) + ',' +
+    parseInt(color[3] + color[3], 16) + ',' +
+    opacity + ')';
+}
+
+/**
+ * Try to update style
+ * Some style changes will throw an error, particularly in IE8. Those should be noops.
+ *
+ * @param {Element} el The element to be styles
+ * @param {CSSProperty} style The CSS property to be styled
+ * @param {CSSStyle} rule The actual style to be applied to the property
+ * @method tryUpdateStyle
+ */
+function tryUpdateStyle(el, style, rule) {
+  try {
+    el.style[style] = rule;
+  } catch (e) {
+
+    // Satisfies linter.
+    return;
+  }
+}
 
 /**
  * The component for displaying text track cues
@@ -35,7 +67,7 @@ const fontMap = {
  */
 class TextTrackDisplay extends Component {
 
-  constructor(player, options, ready){
+  constructor(player, options, ready) {
     super(player, options, ready);
 
     player.on('loadstart', Fn.bind(this, this.toggleDisplay));
@@ -46,27 +78,28 @@ class TextTrackDisplay extends Component {
     // Should probably be moved to an external track loader when we support
     // tracks that don't need a display.
     player.ready(Fn.bind(this, function() {
-      if (player.tech_ && player.tech_['featuresNativeTextTracks']) {
+      if (player.tech_ && player.tech_.featuresNativeTextTracks) {
         this.hide();
         return;
       }
 
       player.on('fullscreenchange', Fn.bind(this, this.updateDisplay));
 
-      let tracks = this.options_.playerOptions['tracks'] || [];
+      const tracks = this.options_.playerOptions.tracks || [];
+
       for (let i = 0; i < tracks.length; i++) {
-        let track = tracks[i];
-        this.player_.addRemoteTextTrack(track);
+        this.player_.addRemoteTextTrack(tracks[i]);
       }
 
-      let modes = {'captions': 1, 'subtitles': 1};
-      let trackList = this.player_.textTracks();
+      const modes = {captions: 1, subtitles: 1};
+      const trackList = this.player_.textTracks();
       let firstDesc;
       let firstCaptions;
 
       if (trackList) {
         for (let i = 0; i < trackList.length; i++) {
-          let track = trackList[i];
+          const track = trackList[i];
+
           if (track.default) {
             if (track.kind === 'descriptions' && !firstDesc) {
               firstDesc = track;
@@ -95,7 +128,7 @@ class TextTrackDisplay extends Component {
    * @method toggleDisplay
    */
   toggleDisplay() {
-    if (this.player_.tech_ && this.player_.tech_['featuresNativeTextTracks']) {
+    if (this.player_.tech_ && this.player_.tech_.featuresNativeTextTracks) {
       this.hide();
     } else {
       this.show();
@@ -123,8 +156,8 @@ class TextTrackDisplay extends Component {
    * @method clearDisplay
    */
   clearDisplay() {
-    if (typeof window['WebVTT'] === 'function') {
-      window['WebVTT']['processCues'](window, [], this.el_);
+    if (typeof window.WebVTT === 'function') {
+      window.WebVTT.processCues(window, [], this.el_);
     }
   }
 
@@ -134,7 +167,7 @@ class TextTrackDisplay extends Component {
    * @method updateDisplay
    */
   updateDisplay() {
-    var tracks = this.player_.textTracks();
+    const tracks = this.player_.textTracks();
 
     this.clearDisplay();
 
@@ -150,10 +183,12 @@ class TextTrackDisplay extends Component {
     let captionsSubtitlesTrack = null;
 
     let i = tracks.length;
+
     while (i--) {
-      let track = tracks[i];
-      if (track['mode'] === 'showing') {
-        if (track['kind'] === 'descriptions') {
+      const track = tracks[i];
+
+      if (track.mode === 'showing') {
+        if (track.kind === 'descriptions') {
           descriptionsTrack = track;
         } else {
           captionsSubtitlesTrack = track;
@@ -175,27 +210,30 @@ class TextTrackDisplay extends Component {
    * @method updateForTrack
    */
   updateForTrack(track) {
-    if (typeof window['WebVTT'] !== 'function' || !track['activeCues']) {
+    if (typeof window.WebVTT !== 'function' || !track.activeCues) {
       return;
     }
 
-    let overrides = this.player_['textTrackSettings'].getValues();
+    const overrides = this.player_.textTrackSettings.getValues();
+    const cues = [];
 
-    let cues = [];
-    for (let i = 0; i < track['activeCues'].length; i++) {
-      cues.push(track['activeCues'][i]);
+    for (let i = 0; i < track.activeCues.length; i++) {
+      cues.push(track.activeCues[i]);
     }
 
-    window['WebVTT']['processCues'](window, cues, this.el_);
+    window.WebVTT.processCues(window, cues, this.el_);
 
     let i = cues.length;
+
     while (i--) {
-      let cue = cues[i];
+      const cue = cues[i];
+
       if (!cue) {
         continue;
       }
 
-      let cueDiv = cue.displayState;
+      const cueDiv = cue.displayState;
+
       if (overrides.color) {
         cueDiv.firstChild.style.color = overrides.color;
       }
@@ -236,6 +274,7 @@ class TextTrackDisplay extends Component {
       }
       if (overrides.fontPercent && overrides.fontPercent !== 1) {
         const fontSize = window.parseFloat(cueDiv.style.fontSize);
+
         cueDiv.style.fontSize = (fontSize * overrides.fontPercent) + 'px';
         cueDiv.style.height = 'auto';
         cueDiv.style.top = 'auto';
@@ -251,39 +290,6 @@ class TextTrackDisplay extends Component {
     }
   }
 
-}
-
-/**
-* Add cue HTML to display
-*
-* @param {Number} color Hex number for color, like #f0e
-* @param {Number} opacity Value for opacity,0.0 - 1.0
-* @return {RGBAColor} In the form 'rgba(255, 0, 0, 0.3)'
-* @method constructColor
-*/
-function constructColor(color, opacity) {
-  return 'rgba(' +
-    // color looks like "#f0e"
-    parseInt(color[1] + color[1], 16) + ',' +
-    parseInt(color[2] + color[2], 16) + ',' +
-    parseInt(color[3] + color[3], 16) + ',' +
-    opacity + ')';
-}
-
-/**
- * Try to update style
- * Some style changes will throw an error, particularly in IE8. Those should be noops.
- *
- * @param {Element} el The element to be styles
- * @param {CSSProperty} style The CSS property to be styled
- * @param {CSSStyle} rule The actual style to be applied to the property
- * @method tryUpdateStyle
- */
-function tryUpdateStyle(el, style, rule) {
-  //
-  try {
-    el.style[style] = rule;
-  } catch (e) {}
 }
 
 Component.registerComponent('TextTrackDisplay', TextTrackDisplay);
