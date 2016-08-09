@@ -164,8 +164,9 @@ QUnit.test('should do a deep merge of child options', function(assert) {
   assert.strictEqual(children.childThree, false, 'object two levels deep removed');
   assert.ok(children.childFour, 'object two levels deep added');
 
-  assert.strictEqual(Component.prototype.options_.example.childOne.foo, 'bar',
-  'prototype options were not overridden');
+  assert.strictEqual(Component.prototype.options_.example.childOne.foo,
+                     'bar',
+                     'prototype options were not overridden');
 
   // Reset default component options to none
   Component.prototype.options_ = null;
