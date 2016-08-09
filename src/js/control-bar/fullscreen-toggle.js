@@ -16,6 +16,7 @@ class FullscreenToggle extends Button {
     super(player, options);
     this.on(player, 'fullscreenchange', this.handleFullscreenChange);
   }
+
   /**
    * Allow sub components to stack CSS class names
    *
