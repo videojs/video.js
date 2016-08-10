@@ -441,8 +441,8 @@ class Html5 extends Tech {
 
     // Catch/silence error when a pause interrupts a play request
     // on browsers which return a promise
-    if (playPromise !== undefined) {
-      playPromise.catch((e) => {});
+    if (playPromise !== undefined && typeof playPromise.then === 'function') {
+      playPromise.then(null, (e) => {});
     }
   }
 
