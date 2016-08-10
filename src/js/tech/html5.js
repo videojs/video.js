@@ -437,7 +437,13 @@ class Html5 extends Tech {
    * @method play
    */
   play() {
-    this.el_.play();
+    const playPromise = this.el_.play();
+
+    // Catch/silence error when a pause interrupts a play request
+    // on browsers which return a promise
+    if (playPromise !== undefined) {
+      playPromise.catch((e) => {});
+    }
   }
 
   /**
