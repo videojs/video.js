@@ -1,6 +1,5 @@
 /* eslint-env qunit */
 import HTMLTrackElement from '../../../src/js/tracks/html-track-element.js';
-import window from 'global/window';
 
 const defaultTech = {
   textTracks() {},
@@ -12,7 +11,7 @@ const defaultTech = {
 QUnit.module('HTML Track Element');
 
 QUnit.test('html track element requires a tech', function(assert) {
-  window.throws(
+  assert.throws(
     function() {
       return new HTMLTrackElement();
     },
