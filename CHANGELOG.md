@@ -9,6 +9,7 @@ CHANGELOG
 * @gkatsev added null checks around navigator.userAgent ([view](https://github.com/videojs/video.js/pull/3502))
 * greenkeeper updated karma dependencies ([view](https://github.com/videojs/video.js/pull/3523))
 * @BrandonOCasey updated language docs to link to IANA language registry ([view](https://github.com/videojs/video.js/pull/3493))
+* @gkatsev removed unused dependencies ([view](https://github.com/videojs/video.js/pull/3516))
 
 --------------------
 
