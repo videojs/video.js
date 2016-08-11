@@ -8,6 +8,7 @@ CHANGELOG
 * @erikyuzwa, @gkatsev updated CSS build to inlcude the IE8-specific CSS from a separate file instead of it being inside of sass ([view](https://github.com/videojs/video.js/pull/3380)) ([view2](https://github.com/erikyuzwa/video.js/pull/1))
 * @gkatsev added null checks around navigator.userAgent ([view](https://github.com/videojs/video.js/pull/3502))
 * greenkeeper updated karma dependencies ([view](https://github.com/videojs/video.js/pull/3523))
+* @BrandonOCasey updated language docs to link to IANA language registry ([view](https://github.com/videojs/video.js/pull/3493))
 
 --------------------
 
