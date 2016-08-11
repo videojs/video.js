@@ -312,7 +312,7 @@ module.exports = function(grunt) {
         plugins: [
           'transform-es3-property-literals',
           'transform-es3-member-expression-literals',
-          'inline-json-config-values'
+          'inline-json'
         ]
       },
       es5: {
