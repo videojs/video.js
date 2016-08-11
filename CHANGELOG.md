@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* greenkeeper updated karma dependencies ([view](https://github.com/videojs/video.js/pull/3523))
 
 --------------------
 
