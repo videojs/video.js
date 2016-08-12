@@ -146,6 +146,8 @@ class ClickableComponent extends Component {
   enable() {
     this.removeClass('vjs-disabled');
     this.el_.setAttribute('aria-disabled', 'false');
+    this.on('tap', this.handleClick);
+    this.on('click', this.handleClick);
     return this;
   }
 
@@ -158,6 +160,8 @@ class ClickableComponent extends Component {
   disable() {
     this.addClass('vjs-disabled');
     this.el_.setAttribute('aria-disabled', 'true');
+    this.off('tap', this.handleClick);
+    this.off('click', this.handleClick);
     return this;
   }
 
