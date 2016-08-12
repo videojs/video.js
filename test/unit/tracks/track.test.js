@@ -22,13 +22,13 @@ TrackBaseline(Track, {
   tech: new TechFaker()
 });
 
-QUnit.test('defaults when items not provided', function() {
+QUnit.test('defaults when items not provided', function(assert) {
   const track = new Track({
     tech: defaultTech
   });
 
-  QUnit.equal(track.kind, '', 'kind defaulted to empty string');
-  QUnit.equal(track.label, '', 'label defaults to empty string');
-  QUnit.equal(track.language, '', 'language defaults to empty string');
-  QUnit.ok(track.id.match(/vjs_track_\d{5}/), 'id defaults to vjs_track_GUID');
+  assert.equal(track.kind, '', 'kind defaulted to empty string');
+  assert.equal(track.label, '', 'label defaults to empty string');
+  assert.equal(track.language, '', 'language defaults to empty string');
+  assert.ok(track.id.match(/vjs_track_\d{5}/), 'id defaults to vjs_track_GUID');
 });

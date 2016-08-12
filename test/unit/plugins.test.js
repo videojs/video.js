@@ -8,16 +8,16 @@ import sinon from 'sinon';
 
 QUnit.module('Plugins');
 
-QUnit.test('Plugin should get initialized and receive options', function() {
-  QUnit.expect(2);
+QUnit.test('Plugin should get initialized and receive options', function(assert) {
+  assert.expect(2);
 
   registerPlugin('myPlugin1', function(options) {
-    QUnit.ok(true, 'Plugin initialized');
-    QUnit.ok(options.test, 'Option passed through');
+    assert.ok(true, 'Plugin initialized');
+    assert.ok(options.test, 'Option passed through');
   });
 
   registerPlugin('myPlugin2', function(options) {
-    QUnit.ok(false, 'Plugin initialized and should not have been');
+    assert.ok(false, 'Plugin initialized and should not have been');
   });
 
   const player = TestHelpers.makePlayer({
@@ -31,17 +31,17 @@ QUnit.test('Plugin should get initialized and receive options', function() {
   player.dispose();
 });
 
-QUnit.test('Plugin should have the option of being initilized outside of player init', function() {
-  QUnit.expect(3);
+QUnit.test('Plugin should have the option of being initilized outside of player init', function(assert) {
+  assert.expect(3);
 
   registerPlugin('myPlugin3', function(options) {
-    QUnit.ok(true, 'Plugin initialized after player init');
-    QUnit.ok(options.test, 'Option passed through');
+    assert.ok(true, 'Plugin initialized after player init');
+    assert.ok(options.test, 'Option passed through');
   });
 
   const player = TestHelpers.makePlayer({});
 
-  QUnit.ok(player.myPlugin3, 'Plugin has direct access on player instance');
+  assert.ok(player.myPlugin3, 'Plugin has direct access on player instance');
 
   player.myPlugin3({
     test: true
@@ -50,11 +50,11 @@ QUnit.test('Plugin should have the option of being initilized outside of player 
   player.dispose();
 });
 
-QUnit.test('Plugin should be able to add a UI component', function() {
-  QUnit.expect(2);
+QUnit.test('Plugin should be able to add a UI component', function(assert) {
+  assert.expect(2);
 
   registerPlugin('myPlugin4', function(options) {
-    QUnit.ok((this instanceof Player), 'Plugin executed in player scope by default');
+    assert.ok((this instanceof Player), 'Plugin executed in player scope by default');
     this.addChild('component');
   });
 
@@ -66,12 +66,12 @@ QUnit.test('Plugin should be able to add a UI component', function() {
 
   const comp = player.getChild('component');
 
-  QUnit.ok(comp, 'Plugin added a component to the player');
+  assert.ok(comp, 'Plugin added a component to the player');
 
   player.dispose();
 });
 
-QUnit.test('Plugin should overwrite plugin of same name', function() {
+QUnit.test('Plugin should overwrite plugin of same name', function(assert) {
   let v1Called = 0;
   let v2Called = 0;
   let v3Called = 0;
@@ -98,15 +98,15 @@ QUnit.test('Plugin should overwrite plugin of same name', function() {
   });
   player2.myPlugin5({});
 
-  QUnit.ok(v1Called === 1, 'First version of plugin called once');
-  QUnit.ok(v2Called === 1, 'Plugin overwritten for new player');
-  QUnit.ok(v3Called === 1, 'Plugin overwritten for existing player');
+  assert.ok(v1Called === 1, 'First version of plugin called once');
+  assert.ok(v2Called === 1, 'Plugin overwritten for new player');
+  assert.ok(v3Called === 1, 'Plugin overwritten for existing player');
 
   player.dispose();
   player2.dispose();
 });
 
-QUnit.test('Plugins should get events in registration order', function() {
+QUnit.test('Plugins should get events in registration order', function(assert) {
   const order = [];
   const expectedOrder = [];
   const pluginName = 'orderPlugin';
@@ -133,13 +133,13 @@ QUnit.test('Plugins should get events in registration order', function() {
 
   player.testerPlugin({});
 
-  QUnit.deepEqual(order,
+  assert.deepEqual(order,
             expectedOrder,
             'plugins should receive events in order of initialization');
   player.dispose();
 });
 
-QUnit.test('Plugins should not get events after stopImmediatePropagation is called', function() {
+QUnit.test('Plugins should not get events after stopImmediatePropagation is called', function(assert) {
   const order = [];
   const expectedOrder = [];
   const pluginName = 'orderPlugin';
@@ -167,16 +167,16 @@ QUnit.test('Plugins should not get events after stopImmediatePropagation is call
 
   player.testerPlugin({});
 
-  QUnit.deepEqual(order,
+  assert.deepEqual(order,
             expectedOrder.slice(0, order.length),
             'plugins should receive events in order of ' +
             'initialization, until stopImmediatePropagation');
 
-  QUnit.equal(order.length, 1, 'only one event listener should have triggered');
+  assert.equal(order.length, 1, 'only one event listener should have triggered');
   player.dispose();
 });
 
-QUnit.test('Plugin that does not exist logs an error', function() {
+QUnit.test('Plugin that does not exist logs an error', function(assert) {
 
   // stub the global log functions
   const console = window.console = {
@@ -197,14 +197,14 @@ QUnit.test('Plugin that does not exist logs an error', function() {
     }
   });
 
-  QUnit.ok(error.called, 'error was called');
+  assert.ok(error.called, 'error was called');
 
   if (IE_VERSION && IE_VERSION < 11) {
-    QUnit.equal(error.firstCall.args[0],
+    assert.equal(error.firstCall.args[0],
                 'VIDEOJS: ERROR: Unable to find plugin: nonExistingPlugin');
   } else {
-    QUnit.equal(error.firstCall.args[2], 'Unable to find plugin:');
-    QUnit.equal(error.firstCall.args[3], 'nonExistingPlugin');
+    assert.equal(error.firstCall.args[2], 'Unable to find plugin:');
+    assert.equal(error.firstCall.args[3], 'nonExistingPlugin');
   }
 
   // tear down logging stubs

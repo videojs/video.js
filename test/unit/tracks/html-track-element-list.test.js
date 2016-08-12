@@ -30,45 +30,45 @@ const genericHtmlTrackElements = [{
 
 QUnit.module('HTML Track Element List');
 
-QUnit.test('HTMLTrackElementList\'s length is set correctly', function() {
+QUnit.test('HTMLTrackElementList\'s length is set correctly', function(assert) {
   const htmlTrackElementList = new HTMLTrackElementList(genericHtmlTrackElements);
 
-  QUnit.equal(htmlTrackElementList.length,
-              genericHtmlTrackElements.length,
-              `the length is ${genericHtmlTrackElements.length}`);
+  assert.equal(htmlTrackElementList.length,
+               genericHtmlTrackElements.length,
+               `the length is ${genericHtmlTrackElements.length}`);
 });
 
-QUnit.test('can get html track element by track', function() {
+QUnit.test('can get html track element by track', function(assert) {
   const htmlTrackElementList = new HTMLTrackElementList(genericHtmlTrackElements);
 
-  QUnit.equal(htmlTrackElementList.getTrackElementByTrack_(track1).kind,
-              'captions',
-              'track1 has kind of captions');
-  QUnit.equal(htmlTrackElementList.getTrackElementByTrack_(track2).kind,
-              'chapters',
-              'track2 has kind of captions');
+  assert.equal(htmlTrackElementList.getTrackElementByTrack_(track1).kind,
+               'captions',
+               'track1 has kind of captions');
+  assert.equal(htmlTrackElementList.getTrackElementByTrack_(track2).kind,
+               'chapters',
+               'track2 has kind of captions');
 });
 
-QUnit.test('length is updated when new tracks are added or removed', function() {
+QUnit.test('length is updated when new tracks are added or removed', function(assert) {
   const htmlTrackElementList = new HTMLTrackElementList(genericHtmlTrackElements);
 
   htmlTrackElementList.addTrackElement_({tech() {}});
-  QUnit.equal(htmlTrackElementList.length,
-              genericHtmlTrackElements.length + 1,
-              `the length is ${genericHtmlTrackElements.length + 1}`);
+  assert.equal(htmlTrackElementList.length,
+               genericHtmlTrackElements.length + 1,
+               `the length is ${genericHtmlTrackElements.length + 1}`);
   htmlTrackElementList.addTrackElement_({tech() {}});
-  QUnit.equal(htmlTrackElementList.length,
-              genericHtmlTrackElements.length + 2,
-              `the length is ${genericHtmlTrackElements.length + 2}`);
+  assert.equal(htmlTrackElementList.length,
+               genericHtmlTrackElements.length + 2,
+               `the length is ${genericHtmlTrackElements.length + 2}`);
 
   htmlTrackElementList.removeTrackElement_(
     htmlTrackElementList.getTrackElementByTrack_(track1));
-  QUnit.equal(htmlTrackElementList.length,
-              genericHtmlTrackElements.length + 1,
-              `the length is ${genericHtmlTrackElements.length + 1}`);
+  assert.equal(htmlTrackElementList.length,
+               genericHtmlTrackElements.length + 1,
+               `the length is ${genericHtmlTrackElements.length + 1}`);
   htmlTrackElementList.removeTrackElement_(
     htmlTrackElementList.getTrackElementByTrack_(track2));
-  QUnit.equal(htmlTrackElementList.length,
-              genericHtmlTrackElements.length,
-              `the length is ${genericHtmlTrackElements.length}`);
+  assert.equal(htmlTrackElementList.length,
+               genericHtmlTrackElements.length,
+               `the length is ${genericHtmlTrackElements.length}`);
 });

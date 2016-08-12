@@ -4,7 +4,7 @@ import TextTrack from '../../../src/js/tracks/text-track.js';
 import EventTarget from '../../../src/js/event-target.js';
 
 QUnit.module('Text Track List');
-QUnit.test('trigger "change" event when "modechange" is fired on a track', function() {
+QUnit.test('trigger "change" event when "modechange" is fired on a track', function(assert) {
   const tt = new EventTarget();
   const ttl = new TextTrackList([tt]);
   let changes = 0;
@@ -19,10 +19,10 @@ QUnit.test('trigger "change" event when "modechange" is fired on a track', funct
   ttl.onchange = changeHandler;
 
   tt.trigger('modechange');
-  QUnit.equal(changes, 2, 'two change events should have fired');
+  assert.equal(changes, 2, 'two change events should have fired');
 });
 
-QUnit.test('trigger "change" event when mode changes on a TextTrack', function() {
+QUnit.test('trigger "change" event when mode changes on a TextTrack', function(assert) {
   const tt = new TextTrack({
     tech: {
       on() {}
@@ -43,5 +43,5 @@ QUnit.test('trigger "change" event when mode changes on a TextTrack', function()
   tt.mode = 'hidden';
   tt.mode = 'disabled';
 
-  QUnit.equal(changes, 3, 'three change events should have fired');
+  assert.equal(changes, 3, 'three change events should have fired');
 });

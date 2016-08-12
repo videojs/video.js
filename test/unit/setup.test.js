@@ -3,7 +3,7 @@ import TestHelpers from './test-helpers.js';
 
 QUnit.module('Setup');
 
-QUnit.test('should set options from data-setup even if autoSetup is not called before initialisation', function() {
+QUnit.test('should set options from data-setup even if autoSetup is not called before initialisation', function(assert) {
   const el = TestHelpers.makeTag();
 
   el.setAttribute('data-setup',
@@ -11,7 +11,7 @@ QUnit.test('should set options from data-setup even if autoSetup is not called b
 
   const player = TestHelpers.makePlayer({}, el);
 
-  QUnit.ok(player.options_.controls === true);
-  QUnit.ok(player.options_.autoplay === false);
-  QUnit.ok(player.options_.preload === 'auto');
+  assert.ok(player.options_.controls === true);
+  assert.ok(player.options_.autoplay === false);
+  assert.ok(player.options_.preload === 'auto');
 });

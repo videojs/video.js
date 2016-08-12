@@ -2,7 +2,7 @@
 import mergeOptions from '../../../src/js/utils/merge-options.js';
 
 QUnit.module('merge-options');
-QUnit.test('should merge options objects', function() {
+QUnit.test('should merge options objects', function(assert) {
   const ob1 = {
     a: true,
     b: { b1: true, b2: true, b3: true },
@@ -20,7 +20,7 @@ QUnit.test('should merge options objects', function() {
 
   const ob3 = mergeOptions(ob1, ob2);
 
-  QUnit.deepEqual(ob3, {
+  assert.deepEqual(ob3, {
     a: false,
     b: { b1: true, b2: false, b3: true, b4: true },
     c: true,

@@ -11,6 +11,7 @@ CHANGELOG
 * @BrandonOCasey updated language docs to link to IANA language registry ([view](https://github.com/videojs/video.js/pull/3493))
 * @gkatsev removed unused dependencies ([view](https://github.com/videojs/video.js/pull/3516))
 * @misteroneill enabled and updated videojs-standard and fixed an issue with linting ([view](https://github.com/videojs/video.js/pull/3508))
+* @misteroneill updated tests to qunit 2.0 ([view](https://github.com/videojs/video.js/pull/3509))
 
 --------------------
 

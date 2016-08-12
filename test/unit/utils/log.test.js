@@ -37,7 +37,7 @@ QUnit.module('log', {
 const getConsoleArgs = (...arr) =>
   IE_VERSION && IE_VERSION < 11 ? [arr.join(' ')] : arr;
 
-QUnit.test('logging functions should work', function() {
+QUnit.test('logging functions should work', function(assert) {
 
   // Need to reset history here because there are extra messages logged
   // when running via Karma.
@@ -47,28 +47,28 @@ QUnit.test('logging functions should work', function() {
   log.warn('warn1', 'warn2');
   log.error('error1', 'error2');
 
-  QUnit.ok(window.console.log.called, 'log was called');
-  QUnit.deepEqual(
+  assert.ok(window.console.log.called, 'log was called');
+  assert.deepEqual(
     window.console.log.firstCall.args,
     getConsoleArgs('VIDEOJS:', 'log1', 'log2')
   );
 
-  QUnit.ok(window.console.warn.called, 'warn was called');
-  QUnit.deepEqual(
+  assert.ok(window.console.warn.called, 'warn was called');
+  assert.deepEqual(
     window.console.warn.firstCall.args,
     getConsoleArgs('VIDEOJS:', 'WARN:', 'warn1', 'warn2')
   );
 
-  QUnit.ok(window.console.error.called, 'error was called');
-  QUnit.deepEqual(
+  assert.ok(window.console.error.called, 'error was called');
+  assert.deepEqual(
     window.console.error.firstCall.args,
     getConsoleArgs('VIDEOJS:', 'ERROR:', 'error1', 'error2')
   );
 
-  QUnit.equal(log.history.length, 3, 'there should be three messages in the log history');
+  assert.equal(log.history.length, 3, 'there should be three messages in the log history');
 });
 
-QUnit.test('in IE pre-11 (or when requested) objects and arrays are stringified', function() {
+QUnit.test('in IE pre-11 (or when requested) objects and arrays are stringified', function(assert) {
 
   // Run a custom log call, explicitly requesting object/array stringification.
   logByType('log', [
@@ -80,7 +80,7 @@ QUnit.test('in IE pre-11 (or when requested) objects and arrays are stringified'
     null
   ], true);
 
-  QUnit.ok(window.console.log.called, 'log was called');
-  QUnit.deepEqual(window.console.log.firstCall.args,
+  assert.ok(window.console.log.called, 'log was called');
+  assert.deepEqual(window.console.log.firstCall.args,
             ['VIDEOJS: test {"foo":"bar"} [1,2,3] 0 false null']);
 });

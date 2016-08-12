@@ -5,7 +5,7 @@ import TestHelpers from './test-helpers.js';
 import document from 'global/document';
 
 QUnit.module('PosterImage', {
-  setup() {
+  beforeEach() {
     // Store the original background support so we can test different vals
     this.origVal = browser.BACKGROUND_SIZE_SUPPORTED;
     this.poster1 = '#poster1';
@@ -26,64 +26,64 @@ QUnit.module('PosterImage', {
       }
     };
   },
-  teardown() {
+  afterEach() {
     browser.BACKGROUND_SIZE_SUPPORTED = this.origVal;
   }
 });
 
-QUnit.test('should create and update a poster image', function() {
+QUnit.test('should create and update a poster image', function(assert) {
   browser.BACKGROUND_SIZE_SUPPORTED = true;
 
   const posterImage = new PosterImage(this.mockPlayer);
   let backgroundImage = posterImage.el().style.backgroundImage;
 
-  QUnit.notEqual(backgroundImage.indexOf(this.poster1), -1, 'Background image used');
+  assert.notEqual(backgroundImage.indexOf(this.poster1), -1, 'Background image used');
 
   // Update with a new poster source and check the new value
   this.mockPlayer.poster_ = this.poster2;
   this.mockPlayer.trigger('posterchange');
   backgroundImage = posterImage.el().style.backgroundImage;
-  QUnit.notEqual(backgroundImage.indexOf(this.poster2), -1, 'Background image updated');
+  assert.notEqual(backgroundImage.indexOf(this.poster2), -1, 'Background image updated');
 });
 
-QUnit.test('should create and update a fallback image in older browsers', function() {
+QUnit.test('should create and update a fallback image in older browsers', function(assert) {
   browser.BACKGROUND_SIZE_SUPPORTED = false;
 
   const posterImage = new PosterImage(this.mockPlayer);
 
-  QUnit.notEqual(posterImage.fallbackImg_.src.indexOf(this.poster1),
+  assert.notEqual(posterImage.fallbackImg_.src.indexOf(this.poster1),
                  -1,
                  'Fallback image created');
 
   // Update with a new poster source and check the new value
   this.mockPlayer.poster_ = this.poster2;
   this.mockPlayer.trigger('posterchange');
-  QUnit.notEqual(posterImage.fallbackImg_.src.indexOf(this.poster2),
+  assert.notEqual(posterImage.fallbackImg_.src.indexOf(this.poster2),
                  -1,
                  'Fallback image updated');
 });
 
-QUnit.test('should remove itself from the document flow when there is no poster', function() {
+QUnit.test('should remove itself from the document flow when there is no poster', function(assert) {
   const posterImage = new PosterImage(this.mockPlayer);
 
-  QUnit.equal(posterImage.el().style.display, '', 'Poster image shows by default');
+  assert.equal(posterImage.el().style.display, '', 'Poster image shows by default');
 
   // Update with an empty string
   this.mockPlayer.poster_ = '';
   this.mockPlayer.trigger('posterchange');
-  QUnit.equal(posterImage.hasClass('vjs-hidden'),
+  assert.equal(posterImage.hasClass('vjs-hidden'),
               true,
               'Poster image hides with an empty source');
 
   // Updated with a valid source
   this.mockPlayer.poster_ = this.poster2;
   this.mockPlayer.trigger('posterchange');
-  QUnit.equal(posterImage.hasClass('vjs-hidden'),
+  assert.equal(posterImage.hasClass('vjs-hidden'),
               false,
               'Poster image shows again when there is a source');
 });
 
-QUnit.test('should hide the poster in the appropriate player states', function() {
+QUnit.test('should hide the poster in the appropriate player states', function(assert) {
   const posterImage = new PosterImage(this.mockPlayer);
   const playerDiv = document.createElement('div');
   const fixture = document.getElementById('qunit-fixture');
@@ -98,12 +98,12 @@ QUnit.test('should hide the poster in the appropriate player states', function()
   fixture.appendChild(playerDiv);
 
   playerDiv.className = 'video-js vjs-has-started';
-  QUnit.equal(TestHelpers.getComputedStyle(el, 'display'),
+  assert.equal(TestHelpers.getComputedStyle(el, 'display'),
               'none',
               'The poster hides when the video has started (CSS may not be loaded)');
 
   playerDiv.className = 'video-js vjs-has-started vjs-audio';
-  QUnit.equal(TestHelpers.getComputedStyle(el, 'display'),
+  assert.equal(TestHelpers.getComputedStyle(el, 'display'),
               'block',
               'The poster continues to show when playing audio');
 });
