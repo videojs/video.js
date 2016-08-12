@@ -293,6 +293,8 @@ QUnit.test('when switching techs, we should not get a new text track', function(
   const secondTracks = player.textTracks();
 
   assert.ok(firstTracks === secondTracks, 'the tracks are equal');
+
+  player.dispose();
 });
 
 if (Html5.supportsNativeTextTracks()) {
@@ -407,6 +409,7 @@ QUnit.test('removes cuechange event when text track is hidden for emulated track
   player.tech_.trigger('timeupdate');
   assert.equal(numTextTrackChanges, 4,
     'texttrackchange should be not be called since mode is hidden');
+  player.dispose();
 });
 
 QUnit.test('should return correct remote text track values', function(assert) {
@@ -506,6 +509,8 @@ QUnit.test('default text tracks should show by default', function(assert) {
 
   assert.equal(tracks[0].kind, 'captions', 'the captions track is present');
   assert.equal(tracks[0].mode, 'showing', 'the captions track is showing');
+
+  player.dispose();
 });
 
 QUnit.test('default captions take precedence over default descriptions', function(assert) {
@@ -536,6 +541,7 @@ QUnit.test('default captions take precedence over default descriptions', functio
   assert.equal(tracks[0].mode, 'disabled', 'the descriptions track is disabled');
   assert.equal(tracks[1].kind, 'captions', 'the captions track is second');
   assert.equal(tracks[1].mode, 'showing', 'the captions track is showing');
+  player.dispose();
 });
 
 QUnit.test('removeRemoteTextTrack should be able to take both a track and the response from addRemoteTextTrack', function(assert) {
@@ -564,4 +570,5 @@ QUnit.test('removeRemoteTextTrack should be able to take both a track and the re
   assert.equal(player.remoteTextTrackEls().length,
               0,
               'the track element was removed correctly');
+  player.dispose();
 });
