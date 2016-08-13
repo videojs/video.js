@@ -12,6 +12,7 @@ CHANGELOG
 * @gkatsev removed unused dependencies ([view](https://github.com/videojs/video.js/pull/3516))
 * @misteroneill enabled and updated videojs-standard and fixed an issue with linting ([view](https://github.com/videojs/video.js/pull/3508))
 * @misteroneill updated tests to qunit 2.0 ([view](https://github.com/videojs/video.js/pull/3509))
+* @gkatsev added slack badge to README ([view](https://github.com/videojs/video.js/pull/3527))
 
 --------------------
 

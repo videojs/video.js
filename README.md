@@ -3,6 +3,8 @@
 # [Video.js - HTML5 Video Player](http://videojs.com)
 [![Build Status](https://travis-ci.org/videojs/video.js.svg?branch=master)](https://travis-ci.org/videojs/video.js)
 [![Coverage Status](https://coveralls.io/repos/github/videojs/video.js/badge.svg?branch=master)](https://coveralls.io/github/videojs/video.js?branch=master)
+[![Slack Status](http://slack.videojs.com/badge.svg)](http://slack.videojs.com)
+
 
 [![NPM](https://nodei.co/npm/video.js.png?downloads=true&downloadRank=true)](https://nodei.co/npm/video.js/)
 
