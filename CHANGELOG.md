@@ -13,6 +13,7 @@ CHANGELOG
 * @misteroneill enabled and updated videojs-standard and fixed an issue with linting ([view](https://github.com/videojs/video.js/pull/3508))
 * @misteroneill updated tests to qunit 2.0 ([view](https://github.com/videojs/video.js/pull/3509))
 * @gkatsev added slack badge to README ([view](https://github.com/videojs/video.js/pull/3527))
+* @gkatsev reverted back to qunitjs 1.x to unbreak IE8. Added es5-shim to tests ([view](https://github.com/videojs/video.js/pull/3533))
 
 --------------------
 

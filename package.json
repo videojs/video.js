@@ -82,7 +82,7 @@
     "karma-sinon": "^1.0.5",
     "load-grunt-tasks": "^3.1.0",
     "proxyquireify": "^3.0.0",
-    "qunitjs": "^2.0.1",
+    "qunitjs": "^1.23.1",
     "sinon": "^1.16.1",
     "time-grunt": "^1.1.1",
     "uglify-js": "~2.3.6",
