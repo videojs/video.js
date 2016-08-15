@@ -24,6 +24,8 @@
         "exports",
         "process",
 
+        "DOMException",
+
         "q",
         "asyncTest",
         "deepEqual",
