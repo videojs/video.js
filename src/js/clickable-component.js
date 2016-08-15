@@ -24,10 +24,7 @@ class ClickableComponent extends Component {
 
     this.emitTapEvents();
 
-    this.on('tap', this.handleClick);
-    this.on('click', this.handleClick);
-    this.on('focus', this.handleFocus);
-    this.on('blur', this.handleBlur);
+    this.enable();
   }
 
   /**
@@ -56,6 +53,8 @@ class ClickableComponent extends Component {
       // let the screen reader user know that the text of the element may change
       'aria-live': 'polite'
     }, attributes);
+
+    this.tabIndex_ = props.tabIndex;
 
     const el = super.createEl(tag, props, attributes);
 
@@ -146,8 +145,13 @@ class ClickableComponent extends Component {
   enable() {
     this.removeClass('vjs-disabled');
     this.el_.setAttribute('aria-disabled', 'false');
+    if (typeof this.tabIndex_ !== 'undefined') {
+      this.el_.setAttribute('tabindex', this.tabIndex_);
+    }
     this.on('tap', this.handleClick);
     this.on('click', this.handleClick);
+    this.on('focus', this.handleFocus);
+    this.on('blur', this.handleBlur);
     return this;
   }
 
@@ -160,8 +164,13 @@ class ClickableComponent extends Component {
   disable() {
     this.addClass('vjs-disabled');
     this.el_.setAttribute('aria-disabled', 'true');
+    if (typeof this.tabIndex_ !== 'undefined') {
+      this.el_.removeAttribute('tabindex');
+    }
     this.off('tap', this.handleClick);
     this.off('click', this.handleClick);
+    this.off('focus', this.handleFocus);
+    this.off('blur', this.handleBlur);
     return this;
   }
 
