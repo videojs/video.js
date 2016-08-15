@@ -17,6 +17,12 @@ CHANGELOG
 
 --------------------
 
+## 5.11.3 (2016-08-15)
+* @vdeshpande fixed control text for fullscreen button ([view](https://github.com/videojs/video.js/pull/3485))
+* @mister-ben fixed android treating swipe as a tap ([view](https://github.com/videojs/video.js/pull/3514))
+* @mboles updated duration() method documentation ([view](https://github.com/videojs/video.js/pull/3515))
+* @mister-ben silenced chrome's play() request was interrupted by pause() error ([view](https://github.com/videojs/video.js/pull/3518))
+
 ## 5.11.2 (2016-08-09)
 _(none)_
 
