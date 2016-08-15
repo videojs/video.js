@@ -84,7 +84,7 @@ class Button extends ClickableComponent {
   }
 
   /**
-   * Enable the component element
+   * Enable the button element
    *
    * @return {Component}
    * @method enable
@@ -95,10 +95,10 @@ class Button extends ClickableComponent {
   }
 
   /**
-   * Enable the component element
+   * Disable the button element
    *
    * @return {Component}
-   * @method enable
+   * @method disable
    */
   disable() {
     super.disable();
