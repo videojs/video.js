@@ -11,7 +11,6 @@ import * as Guid from './utils/guid.js';
 import * as Events from './utils/events.js';
 import log from './utils/log.js';
 import toTitleCase from './utils/to-title-case.js';
-import assign from 'object.assign';
 import mergeOptions from './utils/merge-options.js';
 
 
@@ -1176,8 +1175,11 @@ class Component {
     this.on('touchstart', function(event) {
       // If more than one finger, don't consider treating this as a click
       if (event.touches.length === 1) {
-        // Copy the touches object to prevent modifying the original
-        firstTouch = assign({}, event.touches[0]);
+        // Copy pageX/pageY from the object
+        firstTouch = {
+          pageX: event.touches[0].pageX,
+          pageY: event.touches[0].pageY
+        };
         // Record start time so we can detect a tap vs. "touch and hold"
         touchStart = new Date().getTime();
         // Reset couldBeTap tracking

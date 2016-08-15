@@ -3,6 +3,7 @@ CHANGELOG
 
 ## HEAD (Unreleased)
 * @vdeshpande fixed control text for fullscreen button ([view](https://github.com/videojs/video.js/pull/3485))
+* @mister-ben fixed android treating swipe as a tap ([view](https://github.com/videojs/video.js/pull/3514))
 
 --------------------
 
