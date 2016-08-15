@@ -1418,7 +1418,8 @@ class Player extends Component {
   }
 
   /**
-   * Get the length in time of the video in seconds
+   * Normally gets the length in time of the video in seconds;
+   * in all but the rarest use cases an argument will NOT be passed to the method
    * ```js
    *     var lengthOfVideo = myPlayer.duration();
    * ```
