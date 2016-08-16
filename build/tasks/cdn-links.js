@@ -1,7 +1,7 @@
 module.exports = function(grunt) {
   grunt.registerTask('cdn-links', 'Update the version of CDN links in docs', function(){
     let doc = grunt.file.read('docs/guides/setup.md');
-    let version = require('../package.json').version;
+    let version = require('../../package.json').version;
 
     // remove the patch version to point to the latest patch
     version = version.replace(/(\d+\.\d+)\.\d+/, '$1');
