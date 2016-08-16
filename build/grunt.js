@@ -306,15 +306,6 @@ module.exports = function(grunt) {
       })
     },
     babel: {
-      options: {
-        sourceMap: true,
-        presets: ['es2015'],
-        plugins: [
-          'transform-es3-property-literals',
-          'transform-es3-member-expression-literals',
-          'inline-json'
-        ]
-      },
       es5: {
         files: [{
           expand: true,
