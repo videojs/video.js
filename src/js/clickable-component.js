@@ -146,7 +146,7 @@ class ClickableComponent extends Component {
     this.removeClass('vjs-disabled');
     this.el_.setAttribute('aria-disabled', 'false');
     if (typeof this.tabIndex_ !== 'undefined') {
-      this.el_.setAttribute('tabindex', this.tabIndex_);
+      this.el_.setAttribute('tabIndex', this.tabIndex_);
     }
     this.on('tap', this.handleClick);
     this.on('click', this.handleClick);
@@ -165,7 +165,7 @@ class ClickableComponent extends Component {
     this.addClass('vjs-disabled');
     this.el_.setAttribute('aria-disabled', 'true');
     if (typeof this.tabIndex_ !== 'undefined') {
-      this.el_.removeAttribute('tabindex');
+      this.el_.removeAttribute('tabIndex');
     }
     this.off('tap', this.handleClick);
     this.off('click', this.handleClick);
