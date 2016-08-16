@@ -76,6 +76,7 @@ class Flash extends Tech {
     // The CDN also auto-adds a swf URL for that specific version.
     if (!options.swf) {
       const ver = require('videojs-swf/package.json').version;
+
       options.swf = `//vjs.zencdn.net/swf/${ver}/video-js.swf`;
     }
 
