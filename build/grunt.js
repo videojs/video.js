@@ -18,7 +18,6 @@ module.exports = function(grunt) {
 
   const browserifyGruntDefaults = {
     browserifyOptions: {
-      debug: true,
       standalone: 'videojs'
     },
     plugin: [
@@ -100,9 +99,6 @@ module.exports = function(grunt) {
     },
     uglify: {
       options: {
-        sourceMap: true,
-        sourceMapIn: 'build/temp/video.js.map',
-        sourceMapRoot: '../../src/js',
         preserveComments: 'some',
         mangle: true,
         compress: {
@@ -348,7 +344,6 @@ module.exports = function(grunt) {
         options: {
           browserifyOptions: {
             verbose: true,
-            debug: true,
             standalone: false,
             transform: ['babelify']
           },
