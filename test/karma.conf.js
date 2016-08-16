@@ -92,10 +92,11 @@ module.exports = function(config) {
     }
   };
 
-  if (process.env.TRAVIS) {
-    settings.browserify.transform.push('browserify-istanbul');
-    settings.reporters.push('coverage');
+  // coverage reporting
+  settings.browserify.transform.push('browserify-istanbul');
+  settings.reporters.push('coverage');
 
+  if (process.env.TRAVIS) {
     if (process.env.BROWSER_STACK_USERNAME) {
       settings.browsers = [
         'chrome_bs',
