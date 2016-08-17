@@ -67,7 +67,10 @@ function createQuerier(method) {
     if (isNonBlankString(context)) {
       context = document.querySelector(context);
     }
-    return (isEl(context) ? context : document)[method](selector);
+
+    const fn = (isEl(context) ? context : document)[method];
+
+    return fn && fn(selector);
   };
 }
 

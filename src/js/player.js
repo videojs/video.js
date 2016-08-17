@@ -2937,7 +2937,7 @@ Player.prototype.options_ = {
     'textTrackSettings'
   ],
 
-  language: navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language || 'en',
+  language: navigator && (navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language) || 'en',
 
   // locales and their language translations
   languages: {},
