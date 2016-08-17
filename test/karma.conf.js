@@ -93,8 +93,12 @@ module.exports = function(config) {
   };
 
   // coverage reporting
-  settings.browserify.transform.push('browserify-istanbul');
-  settings.reporters.push('coverage');
+  var coverageFlag = process.env.npm_config_coverage;  // set through npm test --coverage
+  var reportCoverage = process.env.TRAVIS || coverageFlag;
+  if (reportCoverage) {
+    settings.browserify.transform.push('browserify-istanbul');
+    settings.reporters.push('coverage');
+  }
 
   if (process.env.TRAVIS) {
     if (process.env.BROWSER_STACK_USERNAME) {
