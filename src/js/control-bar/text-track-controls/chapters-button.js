@@ -26,7 +26,6 @@ class ChaptersButton extends TextTrackButton {
 
   constructor(player, options, ready) {
     super(player, options, ready);
-    this.updateHandler_ = Fn.bind(this, this.update);
     this.el_.setAttribute('aria-label','Chapters Menu');
   }
 
@@ -50,6 +49,9 @@ class ChaptersButton extends TextTrackButton {
   setTrack(track) {
     if (this.track_ === track) return;
 
+    if (!this.updateHandler_)
+      this.updateHandler_ = Fn.bind(this, this.update);
+    
     if (this.track_) {
       let remoteTextTrackEl = this.player_.remoteTextTrackEls().getTrackElementByTrack_(this.track_);
       if (remoteTextTrackEl) {
