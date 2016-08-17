@@ -438,7 +438,7 @@ module.exports = function(grunt) {
     },
     shell: {
       lint: {
-        command: 'vjsstandard',
+        command: 'npm run lint',
         options: {
           preferLocal: true
         }
