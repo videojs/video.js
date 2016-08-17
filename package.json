@@ -2,6 +2,8 @@
   "name": "video.js",
   "description": "An HTML5 and Flash video player with a common API and skin for both.",
   "version": "5.11.4",
+  "main": "./es5/video.js",
+  "style": "./dist/video-js.css",
   "copyright": "Copyright Brightcove, Inc. <https://www.brightcove.com/>",
   "license": "Apache-2.0",
   "keywords": [
@@ -21,9 +23,8 @@
     "type": "git",
     "url": "https://github.com/videojs/video.js.git"
   },
-  "main": "./dist/video.js",
-  "style": "./dist/video-js.css",
   "dependencies": {
+    "babel-runtime": "^6.9.2",
     "global": "4.3.0",
     "lodash-compat": "3.10.2",
     "object.assign": "4.0.3",
@@ -36,8 +37,14 @@
     "xhr": "2.2.0"
   },
   "devDependencies": {
-    "babel": "^5.2.2",
-    "babelify": "^6.0.1",
+    "babel-cli": "^6.11.4",
+    "babel-plugin-inline-json": "^1.1.1",
+    "babel-plugin-transform-es3-member-expression-literals": "^6.8.0",
+    "babel-plugin-transform-es3-property-literals": "^6.8.0",
+    "babel-plugin-transform-runtime": "^6.9.0",
+    "babel-preset-es2015-loose": "^7.0.0",
+    "babel-register": "^6.9.0",
+    "babelify": "^7.3.0",
     "blanket": "^1.1.6",
     "browserify-derequire": "^0.9.4",
     "browserify-istanbul": "^0.2.1",
@@ -48,6 +55,7 @@
     "ghooks": "^1.3.2",
     "gkatsev-grunt-sass": "^1.1.1",
     "grunt": "^0.4.4",
+    "grunt-babel": "^6.0.0",
     "grunt-banner": "^0.4.0",
     "grunt-browserify": "3.5.1",
     "grunt-cli": "~0.1.13",
@@ -60,7 +68,6 @@
     "grunt-contrib-uglify": "^0.8.0",
     "grunt-contrib-watch": "~0.1.4",
     "grunt-coveralls": "^1.0.0",
-    "grunt-exorcise": "^1.0.1",
     "grunt-fastly": "^0.1.3",
     "grunt-github-releaser": "^0.1.17",
     "grunt-karma": "^2.0.0",
@@ -92,6 +99,7 @@
   "vjsstandard": {
     "ignore": [
       "**/Gruntfile.js",
+      "**/es5/**",
       "**/build/**",
       "**/dist/**",
       "**/docs/**",
@@ -104,7 +112,7 @@
   },
   "config": {
     "ghooks": {
-      "pre-push": "npm run lint"
+      "pre-push": "npm run lint -- --errors"
     }
   }
 }

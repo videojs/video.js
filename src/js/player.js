@@ -31,10 +31,12 @@ import VideoTrackList from './tracks/video-track-list.js';
 // are always included in the video.js package. Importing the modules will
 // execute them and they will register themselves with video.js.
 import './tech/loader.js';
+import './tech/flash.js';
 import './poster-image.js';
 import './tracks/text-track-display.js';
 import './loading-spinner.js';
 import './big-play-button.js';
+import './close-button.js';
 import './control-bar/control-bar.js';
 import './error-display.js';
 import './tracks/text-track-settings.js';

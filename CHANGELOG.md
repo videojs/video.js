@@ -14,6 +14,7 @@ CHANGELOG
 * @misteroneill updated tests to qunit 2.0 ([view](https://github.com/videojs/video.js/pull/3509))
 * @gkatsev added slack badge to README ([view](https://github.com/videojs/video.js/pull/3527))
 * @gkatsev reverted back to qunitjs 1.x to unbreak IE8. Added es5-shim to tests ([view](https://github.com/videojs/video.js/pull/3533))
+* @gkatsev updated build system to open es5 folder for bundles and dist folder other users ([view](https://github.com/videojs/video.js/pull/3445))
 
 --------------------
 

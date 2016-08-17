@@ -13,7 +13,7 @@ import EventTarget from './event-target';
 import * as Events from './utils/events.js';
 import Player from './player';
 import plugin from './plugins.js';
-import mergeOptions from '../../src/js/utils/merge-options.js';
+import mergeOptions from './utils/merge-options.js';
 import * as Fn from './utils/fn.js';
 import TextTrack from './tracks/text-track.js';
 import AudioTrack from './tracks/audio-track.js';
@@ -132,7 +132,7 @@ setup.autoSetupTimeout(1, videojs);
  *
  * @type {String}
  */
-videojs.VERSION = '__VERSION__';
+videojs.VERSION = require('../../package.json').version;
 
 /**
  * The global options object. These are the settings that take effect

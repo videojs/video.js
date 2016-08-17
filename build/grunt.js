@@ -1,4 +1,6 @@
 import {gruntCustomizer, gruntOptionsMaker} from './options-customizer.js';
+import chg from 'chg';
+
 module.exports = function(grunt) {
   require('time-grunt')(grunt);
 
@@ -16,29 +18,10 @@ module.exports = function(grunt) {
 
   const browserifyGruntDefaults = {
     browserifyOptions: {
-      debug: true,
       standalone: 'videojs'
     },
     plugin: [
       ['browserify-derequire']
-    ],
-    transform: [
-      require('babelify').configure({
-        sourceMapRelative: './',
-        loose: ['all']
-      }),
-      ['browserify-versionify', {
-        placeholder: '__VERSION__',
-        version: pkg.version
-      }],
-      ['browserify-versionify', {
-        placeholder: '__VERSION_NO_PATCH__',
-        version: version.majorMinor
-      }],
-      ['browserify-versionify', {
-        placeholder: '__SWF_VERSION__',
-        version: pkg.dependencies['videojs-swf']
-      }]
     ]
   };
 
@@ -47,7 +30,7 @@ module.exports = function(grunt) {
       release: {
         tag_name: 'v'+ version.full,
         name: version.full,
-        body: require('chg').find(version.full).changesRaw
+        body: chg.find(version.full).changesRaw
       },
     },
     files: {
@@ -111,14 +94,11 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg,
     clean: {
-      build: ['build/temp/*'],
+      build: ['build/temp/*', 'es5'],
       dist: ['dist/*']
     },
     uglify: {
       options: {
-        sourceMap: true,
-        sourceMapIn: 'build/temp/video.js.map',
-        sourceMapRoot: '../../src/js',
         preserveComments: 'some',
         mangle: true,
         compress: {
@@ -152,6 +132,10 @@ module.exports = function(grunt) {
       skin: {
         files: ['src/css/**/*'],
         tasks: ['skin']
+      },
+      babel: {
+        files: ['src/js/**/*.js'],
+        tasks: ['babel:es5']
       },
       jshint: {
         files: ['src/**/*', 'test/unit/**/*.js', 'Gruntfile.js'],
@@ -317,11 +301,21 @@ module.exports = function(grunt) {
         }
       })
     },
+    babel: {
+      es5: {
+        files: [{
+          expand: true,
+          cwd: 'src/js/',
+          src: ['**/*.js', '!base-styles.js'],
+          dest: 'es5/'
+        }]
+      }
+    },
     browserify: {
       options: browserifyGruntOptions(),
       build: {
         files: {
-          'build/temp/video.js': ['src/js/video.js']
+          'build/temp/video.js': ['es5/video.js']
         }
       },
       dist: {
@@ -334,7 +328,7 @@ module.exports = function(grunt) {
           ]
         }),
         files: {
-          'build/temp/video.js': ['src/js/video.js']
+          'build/temp/video.js': ['es5/video.js']
         }
       },
       watch: {
@@ -343,14 +337,15 @@ module.exports = function(grunt) {
           keepAlive: true
         },
         files: {
-          'build/temp/video.js': ['src/js/video.js']
+          'build/temp/video.js': ['es5/video.js']
         }
       },
       tests: {
         options: {
           browserifyOptions: {
-            debug: true,
-            standalone: false
+            verbose: true,
+            standalone: false,
+            transform: ['babelify']
           },
           plugin: [
             ['proxyquireify/plugin']
@@ -364,14 +359,6 @@ module.exports = function(grunt) {
             'test/globals-shim.js',
             'test/unit/**/*.js'
           ]
-        }
-      }
-    },
-    exorcise: {
-      build: {
-        options: {},
-        files: {
-          'build/temp/video.js.map': ['build/temp/video.js'],
         }
       }
     },
@@ -406,6 +393,10 @@ module.exports = function(grunt) {
       options: {
         logConcurrentOutput: true
       },
+      tests: [
+        'watch:babel',
+        'browserify:tests'
+      ],
       // Run multiple watch tasks in parallel
       // Needed so watchify can cache intelligently
       watchAll: [
@@ -439,7 +430,7 @@ module.exports = function(grunt) {
     },
     shell: {
       lint: {
-        command: 'vjsstandard',
+        command: 'npm run lint',
         options: {
           preferLocal: true
         }
@@ -457,8 +448,8 @@ module.exports = function(grunt) {
     'shell:lint',
     'clean:build',
 
+    'babel:es5',
     'browserify:build',
-    'exorcise:build',
     'concat:novtt',
     'concat:vtt',
     'usebanner:novtt',
