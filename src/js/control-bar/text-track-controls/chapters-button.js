@@ -7,9 +7,7 @@ import TextTrackMenuItem from './text-track-menu-item.js';
 import ChaptersTrackMenuItem from './chapters-track-menu-item.js';
 import Menu from '../../menu/menu.js';
 import * as Dom from '../../utils/dom.js';
-import * as Fn from '../../utils/fn.js';
 import toTitleCase from '../../utils/to-title-case.js';
-import window from 'global/window';
 
 /**
  * The button component for toggling and selecting chapters
@@ -26,7 +24,7 @@ class ChaptersButton extends TextTrackButton {
 
   constructor(player, options, ready) {
     super(player, options, ready);
-    this.el_.setAttribute('aria-label','Chapters Menu');
+    this.el_.setAttribute('aria-label', 'Chapters Menu');
   }
 
   /**

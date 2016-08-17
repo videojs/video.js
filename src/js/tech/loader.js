@@ -3,7 +3,6 @@
  */
 import Component from '../component.js';
 import Tech from './tech.js';
-import window from 'global/window';
 import toTitleCase from '../utils/to-title-case.js';
 
 /**
@@ -18,16 +17,17 @@ import toTitleCase from '../utils/to-title-case.js';
  */
 class MediaLoader extends Component {
 
-  constructor(player, options, ready){
+  constructor(player, options, ready) {
     super(player, options, ready);
 
     // If there are no sources when the player is initialized,
     // load the first supported playback technology.
 
-    if (!options.playerOptions['sources'] || options.playerOptions['sources'].length === 0) {
-      for (let i=0, j=options.playerOptions['techOrder']; i<j.length; i++) {
-        let techName = toTitleCase(j[i]);
+    if (!options.playerOptions.sources || options.playerOptions.sources.length === 0) {
+      for (let i = 0, j = options.playerOptions.techOrder; i < j.length; i++) {
+        const techName = toTitleCase(j[i]);
         let tech = Tech.getTech(techName);
+
         // Support old behavior of techs being registered as components.
         // Remove once that deprecated behavior is removed.
         if (!techName) {
@@ -41,11 +41,11 @@ class MediaLoader extends Component {
         }
       }
     } else {
-      // // Loop through playback technologies (HTML5, Flash) and check for support.
-      // // Then load the best source.
-      // // A few assumptions here:
-      // //   All playback technologies respect preload false.
-      player.src(options.playerOptions['sources']);
+      // Loop through playback technologies (HTML5, Flash) and check for support.
+      // Then load the best source.
+      // A few assumptions here:
+      //   All playback technologies respect preload false.
+      player.src(options.playerOptions.sources);
     }
   }
 }

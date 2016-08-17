@@ -1,10 +1,11 @@
+/* eslint-env qunit */
 import PosterImage from '../../src/js/poster-image.js';
 import * as browser from '../../src/js/utils/browser.js';
 import TestHelpers from './test-helpers.js';
 import document from 'global/document';
 
-q.module('PosterImage', {
-  'setup': function(){
+QUnit.module('PosterImage', {
+  beforeEach() {
     // Store the original background support so we can test different vals
     this.origVal = browser.BACKGROUND_SIZE_SUPPORTED;
     this.poster1 = '#poster1';
@@ -13,69 +14,80 @@ q.module('PosterImage', {
     // Create a mock player object that responds as a player would
     this.mockPlayer = {
       poster_: this.poster1,
-      poster: function(){
+      poster() {
         return this.poster_;
       },
       handler_: null,
-      on: function(type, handler){
+      on(type, handler) {
         this.handler_ = handler;
       },
-      trigger: function(type){
+      trigger(type) {
         this.handler_.call();
       }
     };
   },
-  'teardown': function(){
+  afterEach() {
     browser.BACKGROUND_SIZE_SUPPORTED = this.origVal;
   }
 });
 
-test('should create and update a poster image', function(){
+QUnit.test('should create and update a poster image', function(assert) {
   browser.BACKGROUND_SIZE_SUPPORTED = true;
 
-  let posterImage = new PosterImage(this.mockPlayer);
+  const posterImage = new PosterImage(this.mockPlayer);
   let backgroundImage = posterImage.el().style.backgroundImage;
-  notEqual(backgroundImage.indexOf(this.poster1), -1, 'Background image used');
+
+  assert.notEqual(backgroundImage.indexOf(this.poster1), -1, 'Background image used');
 
   // Update with a new poster source and check the new value
   this.mockPlayer.poster_ = this.poster2;
   this.mockPlayer.trigger('posterchange');
   backgroundImage = posterImage.el().style.backgroundImage;
-  notEqual(backgroundImage.indexOf(this.poster2), -1, 'Background image updated');
+  assert.notEqual(backgroundImage.indexOf(this.poster2), -1, 'Background image updated');
 });
 
-test('should create and update a fallback image in older browsers', function(){
+QUnit.test('should create and update a fallback image in older browsers', function(assert) {
   browser.BACKGROUND_SIZE_SUPPORTED = false;
 
-  let posterImage = new PosterImage(this.mockPlayer);
-  notEqual(posterImage.fallbackImg_.src.indexOf(this.poster1), -1, 'Fallback image created');
+  const posterImage = new PosterImage(this.mockPlayer);
+
+  assert.notEqual(posterImage.fallbackImg_.src.indexOf(this.poster1),
+                 -1,
+                 'Fallback image created');
 
   // Update with a new poster source and check the new value
   this.mockPlayer.poster_ = this.poster2;
   this.mockPlayer.trigger('posterchange');
-  notEqual(posterImage.fallbackImg_.src.indexOf(this.poster2), -1, 'Fallback image updated');
+  assert.notEqual(posterImage.fallbackImg_.src.indexOf(this.poster2),
+                 -1,
+                 'Fallback image updated');
 });
 
-test('should remove itself from the document flow when there is no poster', function(){
-  let posterImage = new PosterImage(this.mockPlayer);
-  equal(posterImage.el().style.display, '', 'Poster image shows by default');
+QUnit.test('should remove itself from the document flow when there is no poster', function(assert) {
+  const posterImage = new PosterImage(this.mockPlayer);
+
+  assert.equal(posterImage.el().style.display, '', 'Poster image shows by default');
 
   // Update with an empty string
   this.mockPlayer.poster_ = '';
   this.mockPlayer.trigger('posterchange');
-  equal(posterImage.hasClass('vjs-hidden'), true, 'Poster image hides with an empty source');
+  assert.equal(posterImage.hasClass('vjs-hidden'),
+              true,
+              'Poster image hides with an empty source');
 
   // Updated with a valid source
   this.mockPlayer.poster_ = this.poster2;
   this.mockPlayer.trigger('posterchange');
-  equal(posterImage.hasClass('vjs-hidden'), false, 'Poster image shows again when there is a source');
+  assert.equal(posterImage.hasClass('vjs-hidden'),
+              false,
+              'Poster image shows again when there is a source');
 });
 
-test('should hide the poster in the appropriate player states', function(){
-  var posterImage = new PosterImage(this.mockPlayer);
-  var playerDiv = document.createElement('div');
-  var fixture = document.getElementById('qunit-fixture');
-  var el = posterImage.el();
+QUnit.test('should hide the poster in the appropriate player states', function(assert) {
+  const posterImage = new PosterImage(this.mockPlayer);
+  const playerDiv = document.createElement('div');
+  const fixture = document.getElementById('qunit-fixture');
+  const el = posterImage.el();
 
   // Remove the source so when we add to the DOM it doesn't throw an error
   // We want to poster to still think it has a real source so it doesn't hide itself
@@ -86,8 +98,12 @@ test('should hide the poster in the appropriate player states', function(){
   fixture.appendChild(playerDiv);
 
   playerDiv.className = 'video-js vjs-has-started';
-  equal(TestHelpers.getComputedStyle(el, 'display'), 'none', 'The poster hides when the video has started (CSS may not be loaded)');
+  assert.equal(TestHelpers.getComputedStyle(el, 'display'),
+              'none',
+              'The poster hides when the video has started (CSS may not be loaded)');
 
   playerDiv.className = 'video-js vjs-has-started vjs-audio';
-  equal(TestHelpers.getComputedStyle(el, 'display'), 'block', 'The poster continues to show when playing audio');
+  assert.equal(TestHelpers.getComputedStyle(el, 'display'),
+              'block',
+              'The poster continues to show when playing audio');
 });

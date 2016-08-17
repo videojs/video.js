@@ -2,9 +2,36 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @misteroneill, @BrandonOCasey, and @pagarwal123 updates all the code to pass the linter ([view](https://github.com/videojs/video.js/pull/3459))
+* @misteroneill added ghooks to run linter on git push ([view](https://github.com/videojs/video.js/pull/3459))
+* @BrandonOCasey removed unused base-styles.js file ([view](https://github.com/videojs/video.js/pull/3486))
+* @erikyuzwa, @gkatsev updated CSS build to inlcude the IE8-specific CSS from a separate file instead of it being inside of sass ([view](https://github.com/videojs/video.js/pull/3380)) ([view2](https://github.com/erikyuzwa/video.js/pull/1))
+* @gkatsev added null checks around navigator.userAgent ([view](https://github.com/videojs/video.js/pull/3502))
+* greenkeeper updated karma dependencies ([view](https://github.com/videojs/video.js/pull/3523))
+* @BrandonOCasey updated language docs to link to IANA language registry ([view](https://github.com/videojs/video.js/pull/3493))
+* @gkatsev removed unused dependencies ([view](https://github.com/videojs/video.js/pull/3516))
+* @misteroneill enabled and updated videojs-standard and fixed an issue with linting ([view](https://github.com/videojs/video.js/pull/3508))
+* @misteroneill updated tests to qunit 2.0 ([view](https://github.com/videojs/video.js/pull/3509))
+* @gkatsev added slack badge to README ([view](https://github.com/videojs/video.js/pull/3527))
+* @gkatsev reverted back to qunitjs 1.x to unbreak IE8. Added es5-shim to tests ([view](https://github.com/videojs/video.js/pull/3533))
+* @gkatsev updated build system to open es5 folder for bundles and dist folder other users ([view](https://github.com/videojs/video.js/pull/3445))
 
 --------------------
+
+## 5.11.4 (2016-08-16)
+_(none)_
+
+## 5.11.3 (2016-08-15)
+* @vdeshpande fixed control text for fullscreen button ([view](https://github.com/videojs/video.js/pull/3485))
+* @mister-ben fixed android treating swipe as a tap ([view](https://github.com/videojs/video.js/pull/3514))
+* @mboles updated duration() method documentation ([view](https://github.com/videojs/video.js/pull/3515))
+* @mister-ben silenced chrome's play() request was interrupted by pause() error ([view](https://github.com/videojs/video.js/pull/3518))
+
+## 5.11.2 (2016-08-09)
+_(none)_
+
+## 5.11.1 (2016-08-08)
+* @vxsx fixed legend selector to be more specific. Fixes #3492 ([view](https://github.com/videojs/video.js/pull/3494))
 
 ## 5.11.0 (2016-07-22)
 * @BrandonOCasey Document audio/video track usage ([view](https://github.com/videojs/video.js/pull/3295))
@@ -38,6 +65,9 @@ _(none)_
 * @gkatsev added es6-shim to tests. Fixes Flash duration test ([view](https://github.com/videojs/video.js/pull/3453))
 * @misteroneill corrects test assertions for older IEs in the log module ([view](https://github.com/videojs/video.js/pull/3454))
 * @gkatsev fixed setting lang by looping through loop element variable and not constant tag ([view](https://github.com/videojs/video.js/pull/3455))
+
+## 5.10.8 (2016-08-08)
+* @gkatsev re-published to make sure that the audio button has css
 
 ## 5.10.7 (2016-06-27)
 * @gkatsev pinned node-sass to 3.4 ([view](https://github.com/videojs/video.js/pull/3401))

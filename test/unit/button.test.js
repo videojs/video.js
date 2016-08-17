@@ -1,27 +1,27 @@
+/* eslint-env qunit */
 import Button from '../../src/js/button.js';
 import TestHelpers from './test-helpers.js';
 
-q.module('Button');
+QUnit.module('Button');
 
-test('should localize its text', function(){
-  expect(3);
+QUnit.test('should localize its text', function(assert) {
+  assert.expect(3);
 
-  var player, testButton, el;
-
-  player = TestHelpers.makePlayer({
-    'language': 'es',
-    'languages': {
-      'es': {
-        'Play': 'Juego'
+  const player = TestHelpers.makePlayer({
+    language: 'es',
+    languages: {
+      es: {
+        Play: 'Juego'
       }
     }
   });
 
-  testButton = new Button(player);
-  testButton.controlText_ = 'Play';
-  el = testButton.createEl();
+  const testButton = new Button(player);
 
-  ok(el.nodeName.toLowerCase().match('button'));
-  ok(el.innerHTML.match(/vjs-control-text"?>Juego/));
-  equal(el.getAttribute('title'), 'Juego');
+  testButton.controlText_ = 'Play';
+  const el = testButton.createEl();
+
+  assert.ok(el.nodeName.toLowerCase().match('button'));
+  assert.ok(el.innerHTML.match(/vjs-control-text"?>Juego/));
+  assert.equal(el.getAttribute('title'), 'Juego');
 });

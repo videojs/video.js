@@ -1,28 +1,31 @@
+/* eslint-env qunit */
 import * as Events from '../../src/js/utils/events.js';
 import document from 'global/document';
 
-q.module('Events');
+QUnit.module('Events');
 
-test('should add and remove an event listener to an element', function(){
-  expect(1);
+QUnit.test('should add and remove an event listener to an element', function(assert) {
+  assert.expect(1);
 
-  var el = document.createElement('div');
-  var listener = function(){
-    ok(true, 'Click Triggered');
+  const el = document.createElement('div');
+  const listener = function() {
+    assert.ok(true, 'Click Triggered');
   };
 
   Events.on(el, 'click', listener);
-  Events.trigger(el, 'click'); // 1 click
+  // 1 click
+  Events.trigger(el, 'click');
   Events.off(el, 'click', listener);
-  Events.trigger(el, 'click'); // No click should happen.
+  // No click should happen.
+  Events.trigger(el, 'click');
 });
 
-test('should add and remove multiple event listeners to an element with a single call', function(){
-  expect(6);
+QUnit.test('should add and remove multiple event listeners to an element with a single call', function(assert) {
+  assert.expect(6);
 
-  var el = document.createElement('div');
-  var listener = function(){
-    ok(true, 'Callback triggered');
+  const el = document.createElement('div');
+  const listener = function() {
+    assert.ok(true, 'Callback triggered');
   };
 
   Events.on(el, ['click', 'event1', 'event2'], listener);
@@ -30,92 +33,101 @@ test('should add and remove multiple event listeners to an element with a single
   Events.trigger(el, 'click');
   Events.trigger(el, 'click');
   Events.off(el, 'click', listener);
-  Events.trigger(el, 'click'); // No click should happen.
+  // No click should happen.
+  Events.trigger(el, 'click');
 
   Events.trigger(el, 'event1');
   Events.trigger(el, 'event1');
   Events.off(el, 'event1', listener);
-  Events.trigger(el, 'event1'); // No event1 should happen.
+  // No event1 should happen.
+  Events.trigger(el, 'event1');
 
   Events.trigger(el, 'event2');
   Events.trigger(el, 'event2');
   Events.off(el, 'event2', listener);
-  Events.trigger(el, 'event2'); // No event2 should happen.
+  // No event2 should happen.
+  Events.trigger(el, 'event2');
 });
 
-test('should be possible to pass data when you trigger an event', function () {
-  expect(6);
-  var el = document.createElement('div');
-  var fakeData1 = 'Fake Data 1';
-  var fakeData2 = {txt: 'Fake Data 2'};
+QUnit.test('should be possible to pass data when you trigger an event', function(assert) {
+  assert.expect(6);
+  const el = document.createElement('div');
+  const fakeData1 = 'Fake Data 1';
+  const fakeData2 = {txt: 'Fake Data 2'};
 
-  var listener = function(evt, hash){
-    ok(true, 'Callback triggered');
-    deepEqual(fakeData1, hash.d1, 'Shoulbe be passed to the handler');
-    deepEqual(fakeData2, hash.d2, 'Shoulbe be passed to the handler');
+  const listener = function(evt, hash) {
+    assert.ok(true, 'Callback triggered');
+    assert.deepEqual(fakeData1, hash.d1, 'Shoulbe be passed to the handler');
+    assert.deepEqual(fakeData2, hash.d2, 'Shoulbe be passed to the handler');
   };
 
   Events.on(el, ['event1', 'event2'], listener);
-  Events.trigger(el, 'event1', { d1: fakeData1, d2:fakeData2});
-  Events.trigger(el, 'event2', { d1: fakeData1, d2:fakeData2});
+  Events.trigger(el, 'event1', { d1: fakeData1, d2: fakeData2});
+  Events.trigger(el, 'event2', { d1: fakeData1, d2: fakeData2});
 
 });
 
-test('should remove all listeners of a type', function(){
-  var el = document.createElement('div');
-  var clicks = 0;
-  var listener = function(){
+QUnit.test('should remove all listeners of a type', function(assert) {
+  const el = document.createElement('div');
+  let clicks = 0;
+  const listener = function() {
     clicks++;
   };
-  var listener2 = function(){
+  const listener2 = function() {
     clicks++;
   };
 
   Events.on(el, 'click', listener);
   Events.on(el, 'click', listener2);
-  Events.trigger(el, 'click'); // 2 clicks
+    // 2 clicks
+  Events.trigger(el, 'click');
 
-  ok(clicks === 2, 'both click listeners fired');
+  assert.ok(clicks === 2, 'both click listeners fired');
 
   Events.off(el, 'click');
-  Events.trigger(el, 'click'); // No click should happen.
+  // No click should happen.
+  Events.trigger(el, 'click');
 
-  ok(clicks === 2, 'no click listeners fired');
+  assert.ok(clicks === 2, 'no click listeners fired');
 });
 
-test('should remove all listeners of an array of types', function(){
-  var el = document.createElement('div');
-  var calls = 0;
-  var listener = function(){
+QUnit.test('should remove all listeners of an array of types', function(assert) {
+  const el = document.createElement('div');
+  let calls = 0;
+  const listener = function() {
     calls++;
   };
-  var listener2 = function(){
+  const listener2 = function() {
     calls++;
   };
 
   Events.on(el, ['click', 'event1'], listener);
   Events.on(el, ['click', 'event1'], listener2);
-  Events.trigger(el, 'click'); // 2 calls
-  Events.trigger(el, 'event1'); // 2 calls
+  // 2 calls
+  Events.trigger(el, 'click');
+  // 2 calls
+  Events.trigger(el, 'event1');
 
-  ok(calls === 4, 'both click listeners fired');
+  assert.ok(calls === 4, 'both click listeners fired');
 
   Events.off(el, ['click', 'event1']);
-  Events.trigger(el, 'click'); // No click should happen.
-  Events.trigger(el, 'event1'); // No event1 should happen.
+  // No click should happen.
+  Events.trigger(el, 'click');
+  // No event1 should happen.
+  Events.trigger(el, 'event1');
 
-  ok(calls === 4, 'no event listeners fired');
+  assert.ok(calls === 4, 'no event listeners fired');
 });
 
-test('should remove all listeners from an element', function(){
-  expect(2);
+QUnit.test('should remove all listeners from an element', function(assert) {
+  assert.expect(2);
 
-  var el = document.createElement('div');
-  var listener = function(){
-    ok(true, 'Fake1 Triggered');
+  const el = document.createElement('div');
+  const listener = function() {
+    assert.ok(true, 'Fake1 Triggered');
   };
-  var listener2 = function(){
-    ok(true, 'Fake2 Triggered');
+  const listener2 = function() {
+    assert.ok(true, 'Fake2 Triggered');
   };
 
   Events.on(el, 'fake1', listener);
@@ -131,111 +143,119 @@ test('should remove all listeners from an element', function(){
   Events.trigger(el, 'fake2');
 });
 
-test('should listen only once', function(){
-  expect(1);
+QUnit.test('should listen only once', function(assert) {
+  assert.expect(1);
 
-  var el = document.createElement('div');
-  var listener = function(){
-    ok(true, 'Click Triggered');
+  const el = document.createElement('div');
+  const listener = function() {
+    assert.ok(true, 'Click Triggered');
   };
 
   Events.one(el, 'click', listener);
-  Events.trigger(el, 'click'); // 1 click
-  Events.trigger(el, 'click'); // No click should happen.
+  // 1 click
+  Events.trigger(el, 'click');
+  // No click should happen.
+  Events.trigger(el, 'click');
 });
 
-test( 'should listen only once in multiple events from a single call', function(){
-  expect(3);
+QUnit.test('should listen only once in multiple events from a single call', function(assert) {
+  assert.expect(3);
 
-  var el = document.createElement('div');
-  var listener = function(){
-    ok(true, 'Callback Triggered');
+  const el = document.createElement('div');
+  const listener = function() {
+    assert.ok(true, 'Callback Triggered');
   };
 
   Events.one(el, ['click', 'event1', 'event2'], listener);
-  Events.trigger(el, 'click'); // 1 click
-  Events.trigger(el, 'click'); // No click should happen.
-  Events.trigger(el, 'event1'); // event1 must be handled.
-  Events.trigger(el, 'event1'); // No event1 should be handled.
-  Events.trigger(el, 'event2'); // event2 must be handled.
-  Events.trigger(el, 'event2'); // No event2 should be handled.
+  // 1 click
+  Events.trigger(el, 'click');
+  // No click should happen.
+  Events.trigger(el, 'click');
+  // event1 must be handled.
+  Events.trigger(el, 'event1');
+  // No event1 should be handled.
+  Events.trigger(el, 'event1');
+  // event2 must be handled.
+  Events.trigger(el, 'event2');
+  // No event2 should be handled.
+  Events.trigger(el, 'event2');
 });
 
-test('should stop immediate propagtion', function(){
-  expect(1);
+QUnit.test('should stop immediate propagtion', function(assert) {
+  assert.expect(1);
 
-  var el = document.createElement('div');
+  const el = document.createElement('div');
 
-  Events.on(el, 'test', function(e){
-    ok(true, 'First listener fired');
+  Events.on(el, 'test', function(e) {
+    assert.ok(true, 'First listener fired');
     e.stopImmediatePropagation();
   });
 
-  Events.on(el, 'test', function(e){
-    ok(false, 'Second listener fired');
+  Events.on(el, 'test', function(e) {
+    assert.ok(false, 'Second listener fired');
   });
 
   Events.trigger(el, 'test');
 });
 
-test('should bubble up DOM unless bubbles == false', function(){
-  expect(3);
+QUnit.test('should bubble up DOM unless bubbles == false', function(assert) {
+  assert.expect(3);
 
-  var outer = document.createElement('div');
-  var inner = outer.appendChild(document.createElement('div'));
+  const outer = document.createElement('div');
+  const inner = outer.appendChild(document.createElement('div'));
 
   // Verify that if bubbles === true, event bubbles up dom.
-  Events.on(inner, 'bubbles', function(e){
-    ok(true, 'Inner listener fired');
+  Events.on(inner, 'bubbles', function(e) {
+    assert.ok(true, 'Inner listener fired');
   });
-  Events.on(outer, 'bubbles', function(e){
-    ok(true, 'Outer listener fired');
+  Events.on(outer, 'bubbles', function(e) {
+    assert.ok(true, 'Outer listener fired');
   });
-  Events.trigger(inner, { type:'bubbles', target:inner, bubbles:true });
+  Events.trigger(inner, { type: 'bubbles', target: inner, bubbles: true });
 
   // Only change 'bubbles' to false, and verify only inner handler is called.
-  Events.on(inner, 'nobub', function(e){
-    ok(true, 'Inner listener fired');
+  Events.on(inner, 'nobub', function(e) {
+    assert.ok(true, 'Inner listener fired');
   });
-  Events.on(outer, 'nobub', function(e){
-    ok(false, 'Outer listener fired');
+  Events.on(outer, 'nobub', function(e) {
+    assert.ok(false, 'Outer listener fired');
   });
-  Events.trigger(inner, { type:'nobub', target:inner, bubbles:false });
+  Events.trigger(inner, { type: 'nobub', target: inner, bubbles: false });
 });
 
-test('should have a defaultPrevented property on an event that was prevent from doing default action', function() {
-  expect(2);
+QUnit.test('should have a defaultPrevented property on an event that was prevent from doing default action', function(assert) {
+  assert.expect(2);
 
-  var el = document.createElement('div');
+  const el = document.createElement('div');
 
-  Events.on(el, 'test', function(e){
-    ok(true, 'First listener fired');
+  Events.on(el, 'test', function(e) {
+    assert.ok(true, 'First listener fired');
     e.preventDefault();
   });
 
-  Events.on(el, 'test', function(e){
-    ok(e.defaultPrevented, 'Should have `defaultPrevented` to signify preventDefault being called');
+  Events.on(el, 'test', function(e) {
+    assert.ok(e.defaultPrevented, 'Should have `defaultPrevented` to signify preventDefault being called');
   });
 
   Events.trigger(el, 'test');
 });
 
-test('should have relatedTarget correctly set on the event', function() {
-  expect(2);
+QUnit.test('should have relatedTarget correctly set on the event', function(assert) {
+  assert.expect(2);
 
-  var el1 = document.createElement('div'),
-      el2 = document.createElement('div'),
-      relatedEl = document.createElement('div');
+  const el1 = document.createElement('div');
+  const el2 = document.createElement('div');
+  const relatedEl = document.createElement('div');
 
-  Events.on(el1, 'click', function(e){
-    equal(e.relatedTarget, relatedEl, 'relatedTarget is set for all browsers when related element is set on the event');
+  Events.on(el1, 'click', function(e) {
+    assert.equal(e.relatedTarget, relatedEl, 'relatedTarget is set for all browsers when related element is set on the event');
   });
 
-  Events.trigger(el1, { type:'click', relatedTarget:relatedEl });
+  Events.trigger(el1, { type: 'click', relatedTarget: relatedEl });
 
   Events.on(el2, 'click', function(e) {
-    equal(e.relatedTarget, null, 'relatedTarget is null when none is provided');
+    assert.equal(e.relatedTarget, null, 'relatedTarget is null when none is provided');
   });
 
-  Events.trigger(el2, { type:'click', relatedTarget:undefined });
+  Events.trigger(el2, { type: 'click', relatedTarget: undefined });
 });

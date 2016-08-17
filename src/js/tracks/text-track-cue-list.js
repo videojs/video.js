@@ -20,12 +20,12 @@ import document from 'global/document';
 
 class TextTrackCueList {
   constructor(cues) {
-    let list = this;
+    let list = this; // eslint-disable-line
 
     if (browser.IS_IE8) {
       list = document.createElement('custom');
 
-      for (let prop in TextTrackCueList.prototype) {
+      for (const prop in TextTrackCueList.prototype) {
         if (prop !== 'constructor') {
           list[prop] = TextTrackCueList.prototype[prop];
         }
@@ -53,14 +53,14 @@ class TextTrackCueList {
    * @private
    */
   setCues_(cues) {
-    let oldLength = this.length || 0;
+    const oldLength = this.length || 0;
     let i = 0;
-    let l = cues.length;
+    const l = cues.length;
 
     this.cues_ = cues;
     this.length_ = cues.length;
 
-    let defineProp = function(index) {
+    const defineProp = function(index) {
       if (!('' + index in this)) {
         Object.defineProperty(this, '' + index, {
           get() {
@@ -90,7 +90,7 @@ class TextTrackCueList {
     let result = null;
 
     for (let i = 0, l = this.length; i < l; i++) {
-      let cue = this[i];
+      const cue = this[i];
 
       if (cue.id === id) {
         result = cue;

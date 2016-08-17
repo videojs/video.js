@@ -15,7 +15,7 @@ import formatTime from '../../utils/format-time.js';
  */
 class CurrentTimeDisplay extends Component {
 
-  constructor(player, options){
+  constructor(player, options) {
     super(player, options);
 
     this.on(player, 'timeupdate', this.updateContent);
@@ -28,14 +28,14 @@ class CurrentTimeDisplay extends Component {
    * @method createEl
    */
   createEl() {
-    let el = super.createEl('div', {
+    const el = super.createEl('div', {
       className: 'vjs-current-time vjs-time-control vjs-control'
     });
 
     this.contentEl_ = Dom.createEl('div', {
       className: 'vjs-current-time-display',
       // label the current time for screen reader users
-      innerHTML: '<span class="vjs-control-text">Current Time </span>' + '0:00',
+      innerHTML: '<span class="vjs-control-text">Current Time </span>' + '0:00'
     }, {
       // tell screen readers not to automatically read the time as it changes
       'aria-live': 'off'
@@ -52,9 +52,10 @@ class CurrentTimeDisplay extends Component {
    */
   updateContent() {
     // Allows for smooth scrubbing, when player can't keep up.
-    let time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
-    let localizedText = this.localize('Current Time');
-    let formattedTime = formatTime(time, this.player_.duration());
+    const time = (this.player_.scrubbing()) ? this.player_.getCache().currentTime : this.player_.currentTime();
+    const localizedText = this.localize('Current Time');
+    const formattedTime = formatTime(time, this.player_.duration());
+
     if (formattedTime !== this.formattedTime_) {
       this.formattedTime_ = formattedTime;
       this.contentEl_.innerHTML = `<span class="vjs-control-text">${localizedText}</span> ${formattedTime}`;

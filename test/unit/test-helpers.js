@@ -1,32 +1,30 @@
 import * as Dom from '../../src/js/utils/dom';
 import Player from '../../src/js/player.js';
-import TechFaker from './tech/tech-faker.js';
-import window from 'global/window';
 import document from 'global/document';
 
-var TestHelpers = {
-  makeTag: function(){
-    var videoTag = document.createElement('video');
+const TestHelpers = {
+  makeTag() {
+    const videoTag = document.createElement('video');
+
     videoTag.id = 'example_1';
     videoTag.className = 'video-js vjs-default-skin';
     return videoTag;
   },
 
-  makePlayer: function(playerOptions, videoTag){
-    var player;
-
+  makePlayer(playerOptions, videoTag) {
     videoTag = videoTag || TestHelpers.makeTag();
 
-    var fixture = document.getElementById('qunit-fixture');
+    const fixture = document.getElementById('qunit-fixture');
+
     fixture.appendChild(videoTag);
 
     playerOptions = playerOptions || {};
-    playerOptions['techOrder'] = playerOptions['techOrder'] || ['techFaker'];
+    playerOptions.techOrder = playerOptions.techOrder || ['techFaker'];
 
-    return player = new Player(videoTag, playerOptions);
+    return new Player(videoTag, playerOptions);
   },
 
-  getComputedStyle: function(el, rule){
+  getComputedStyle(el, rule) {
     if (document.defaultView && document.defaultView.getComputedStyle) {
       return document.defaultView.getComputedStyle(el, null).getPropertyValue(rule);
     }
@@ -37,9 +35,8 @@ var TestHelpers = {
         // return clientWidth or clientHeight instead for better accuracy
         rule = 'client' + rule.substr(0, 1).toUpperCase() + rule.substr(1);
         return el[rule] + 'px';
-      } else {
-        return el.currentStyle[rule];
       }
+      return el.currentStyle[rule];
     }
   },
 
@@ -73,52 +70,60 @@ var TestHelpers = {
    *         reference how many assertions will be run (e.g. for use
    *         with `assert.expect()`).
    */
-  assertEl: function(assert, el, spec) {
-    let attrs = spec.attrs ? Object.keys(spec.attrs) : [];
-    let classes = spec.classes || [];
-    let innerHTML = spec.innerHTML ? spec.innerHTML.trim() : '';
-    let props = spec.props ? Object.keys(spec.props) : [];
-    let tagName = spec.tagName ? spec.tagName.toLowerCase() : '';
+  assertEl(assert, el, spec) {
+    const attrs = spec.attrs ? Object.keys(spec.attrs) : [];
+    const classes = spec.classes || [];
+    const innerHTML = spec.innerHTML ? spec.innerHTML.trim() : '';
+    const props = spec.props ? Object.keys(spec.props) : [];
+    const tagName = spec.tagName ? spec.tagName.toLowerCase() : '';
 
     // Return value is a function, which runs through all the combined
     // assertions. This is done so that the count can be attached dynamically
     // and run whenever desired.
-    let run = () => {
+    const run = () => {
       if (tagName) {
-        let elTagName = el.tagName.toLowerCase();
-        let msg = `el should have been a <${tagName}> and was a <${elTagName}>`;
+        const elTagName = el.tagName.toLowerCase();
+        const msg = `el should have been a <${tagName}> and was a <${elTagName}>`;
+
         assert.strictEqual(elTagName, tagName, msg);
       }
 
       if (innerHTML) {
-        let elInnerHTML = el.innerHTML.trim();
-        let msg = `el should have expected HTML content`;
+        const elInnerHTML = el.innerHTML.trim();
+        const msg = 'el should have expected HTML content';
+
         assert.strictEqual(elInnerHTML, innerHTML, msg);
       }
 
       attrs.forEach(a => {
-        let actual = el.getAttribute(a);
-        let expected = spec.attrs[a];
-        let msg = `el should have the "${a}" attribute with the value "${expected}" and it was "${actual}"`;
+        const actual = el.getAttribute(a);
+        const expected = spec.attrs[a];
+        const msg = `el should have the "${a}" attribute with ` +
+                    `the value "${expected}" and it was "${actual}"`;
+
         assert.strictEqual(actual, expected, msg);
       });
 
       classes.forEach(c => {
-        let msg = `el should have the "${c}" class in its className, which is "${el.className}"`;
+        const msg = `el should have the "${c}" class in its ` +
+                    `className, which is "${el.className}"`;
+
         assert.ok(Dom.hasElClass(el, c), msg);
       });
 
       props.forEach(p => {
-        let actual = el[p];
-        let expected = spec.props[p];
-        let msg = `el should have the "${p}" property with the value "${expected}" and it was "${actual}"`;
+        const actual = el[p];
+        const expected = spec.props[p];
+        const msg = `el should have the "${p}" property with the ` +
+                    `value "${expected}" and it was "${actual}"`;
+
         assert.strictEqual(actual, expected, msg);
       });
     };
 
     // Include the number of assertions to run, so it can be used to set
     // expectations (via `assert.expect()`).
-    run.count =  Number(!!tagName) +
+    run.count = Number(!!tagName) +
       Number(!!innerHTML) +
       classes.length +
       attrs.length +

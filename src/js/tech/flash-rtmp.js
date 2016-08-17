@@ -12,22 +12,24 @@ function FlashRtmpDecorator(Flash) {
   };
 
   Flash.streamToParts = function(src) {
-    let parts = {
+    const parts = {
       connection: '',
       stream: ''
     };
 
-    if (!src) return parts;
+    if (!src) {
+      return parts;
+    }
 
     // Look for the normal URL separator we expect, '&'.
     // If found, we split the URL into two pieces around the
     // first '&'.
     let connEnd = src.search(/&(?!\w+=)/);
     let streamBegin;
+
     if (connEnd !== -1) {
       streamBegin = connEnd + 1;
-    }
-    else {
+    } else {
       // If there's not a '&', we use the last '/' as the delimiter.
       connEnd = streamBegin = src.lastIndexOf('/') + 1;
       if (connEnd === 0) {
@@ -35,6 +37,7 @@ function FlashRtmpDecorator(Flash) {
         connEnd = streamBegin = src.length;
       }
     }
+
     parts.connection = src.substring(0, connEnd);
     parts.stream = src.substring(streamBegin, src.length);
 
@@ -64,7 +67,7 @@ function FlashRtmpDecorator(Flash) {
    * @param  {String} type    The mimetype to check
    * @return {String}         'probably', 'maybe', or '' (empty string)
    */
-  Flash.rtmpSourceHandler.canPlayType = function(type){
+  Flash.rtmpSourceHandler.canPlayType = function(type) {
     if (Flash.isStreamingType(type)) {
       return 'maybe';
     }
@@ -78,8 +81,8 @@ function FlashRtmpDecorator(Flash) {
    * @param  {Object} options The options passed to the tech
    * @return {String}         'probably', 'maybe', or '' (empty string)
    */
-  Flash.rtmpSourceHandler.canHandleSource = function(source, options){
-    let can = Flash.rtmpSourceHandler.canPlayType(source.type);
+  Flash.rtmpSourceHandler.canHandleSource = function(source, options) {
+    const can = Flash.rtmpSourceHandler.canPlayType(source.type);
 
     if (can) {
       return can;
@@ -100,11 +103,11 @@ function FlashRtmpDecorator(Flash) {
    * @param  {Flash}  tech     The instance of the Flash tech
    * @param  {Object} options  The options to pass to the source
    */
-  Flash.rtmpSourceHandler.handleSource = function(source, tech, options){
-    let srcParts = Flash.streamToParts(source.src);
+  Flash.rtmpSourceHandler.handleSource = function(source, tech, options) {
+    const srcParts = Flash.streamToParts(source.src);
 
-    tech['setRtmpConnection'](srcParts.connection);
-    tech['setRtmpStream'](srcParts.stream);
+    tech.setRtmpConnection(srcParts.connection);
+    tech.setRtmpStream(srcParts.stream);
   };
 
   // Register the native source handler

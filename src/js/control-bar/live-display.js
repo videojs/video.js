@@ -27,7 +27,7 @@ class LiveDisplay extends Component {
    * @method createEl
    */
   createEl() {
-    var el = super.createEl('div', {
+    const el = super.createEl('div', {
       className: 'vjs-live-control vjs-control'
     });
 

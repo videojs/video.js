@@ -1,212 +1,231 @@
+/* eslint-env qunit */
 /**
  * These tests run on the minified, window.videojs and ensure the needed
  * APIs still exist
  */
+import document from 'global/document';
+import window from 'global/window';
+const videojs = window.videojs;
 
-(function(){
-
-q.module('Player API');
-
-test('videojs should exist on the window', function() {
-  ok(window.videojs, 'videojs exists on the window');
+QUnit.module('Player API');
+QUnit.test('videojs should exist on the window', function(assert) {
+  assert.ok(window.videojs, 'videojs exists on the window');
 });
 
-test('should be able to access expected player API methods', function() {
-  var player = videojs.getComponent('Player').prototype;
+QUnit.test('should be able to access expected player API methods', function(assert) {
+  const player = videojs.getComponent('Player').prototype;
 
   // Native HTML5 Methods
-  ok(player.error, 'error exists');
-  ok(player.src, 'src exists');
-  ok(player.currentSrc, 'currentSrc exists');
-  ok(player.buffered, 'buffered exists');
-  ok(player.load, 'load exists');
-  ok(player.seeking, 'seeking exists');
-  ok(player.currentTime, 'currentTime exists');
-  ok(player.duration, 'duration exists');
-  ok(player.paused, 'paused exists');
-  ok(player.ended, 'ended exists');
-  ok(player.autoplay, 'autoplay exists');
-  ok(player.loop, 'loop exists');
-  ok(player.play , 'play exists');
-  ok(player.pause , 'pause exists');
-  ok(player.controls, 'controls exists');
-  ok(player.volume, 'volume exists');
-  ok(player.muted, 'muted exists');
-  ok(player.width, 'width exists');
-  ok(player.height, 'height exists');
-  ok(player.poster, 'poster exists');
-  ok(player.textTracks, 'textTracks exists');
-  ok(player.requestFullscreen, 'requestFullscreen exists');
-  ok(player.exitFullscreen, 'exitFullscreen exists');
-  ok(player.playbackRate, 'playbackRate exists');
-  ok(player.networkState, 'networkState exists');
-  ok(player.readyState, 'readyState exists');
+  assert.ok(player.error, 'error exists');
+  assert.ok(player.src, 'src exists');
+  assert.ok(player.currentSrc, 'currentSrc exists');
+  assert.ok(player.buffered, 'buffered exists');
+  assert.ok(player.load, 'load exists');
+  assert.ok(player.seeking, 'seeking exists');
+  assert.ok(player.currentTime, 'currentTime exists');
+  assert.ok(player.duration, 'duration exists');
+  assert.ok(player.paused, 'paused exists');
+  assert.ok(player.ended, 'ended exists');
+  assert.ok(player.autoplay, 'autoplay exists');
+  assert.ok(player.loop, 'loop exists');
+  assert.ok(player.play, 'play exists');
+  assert.ok(player.pause, 'pause exists');
+  assert.ok(player.controls, 'controls exists');
+  assert.ok(player.volume, 'volume exists');
+  assert.ok(player.muted, 'muted exists');
+  assert.ok(player.width, 'width exists');
+  assert.ok(player.height, 'height exists');
+  assert.ok(player.poster, 'poster exists');
+  assert.ok(player.textTracks, 'textTracks exists');
+  assert.ok(player.requestFullscreen, 'requestFullscreen exists');
+  assert.ok(player.exitFullscreen, 'exitFullscreen exists');
+  assert.ok(player.playbackRate, 'playbackRate exists');
+  assert.ok(player.networkState, 'networkState exists');
+  assert.ok(player.readyState, 'readyState exists');
 
   // Unsupported Native HTML5 Methods
-  // ok(player.canPlayType, 'canPlayType exists');
-  // ok(player.startTime, 'startTime exists');
-  // ok(player.defaultPlaybackRate, 'defaultPlaybackRate exists');
-  // ok(player.playbackRate, 'playbackRate exists');
-  // ok(player.played, 'played exists');
-  // ok(player.seekable, 'seekable exists');
-  // ok(player.videoWidth, 'videoWidth exists');
-  // ok(player.videoHeight, 'videoHeight exists');
+  // assert.ok(player.canPlayType, 'canPlayType exists');
+  // assert.ok(player.startTime, 'startTime exists');
+  // assert.ok(player.defaultPlaybackRate, 'defaultPlaybackRate exists');
+  // assert.ok(player.playbackRate, 'playbackRate exists');
+  // assert.ok(player.played, 'played exists');
+  // assert.ok(player.seekable, 'seekable exists');
+  // assert.ok(player.videoWidth, 'videoWidth exists');
+  // assert.ok(player.videoHeight, 'videoHeight exists');
 
   // Additional player methods
-  ok(player.bufferedPercent, 'bufferedPercent exists');
-  ok(player.reportUserActivity, 'reportUserActivity exists');
-  ok(player.userActive, 'userActive exists');
-  ok(player.usingNativeControls, 'usingNativeControls exists');
-  ok(player.isFullscreen, 'isFullscreen exists');
+  assert.ok(player.bufferedPercent, 'bufferedPercent exists');
+  assert.ok(player.reportUserActivity, 'reportUserActivity exists');
+  assert.ok(player.userActive, 'userActive exists');
+  assert.ok(player.usingNativeControls, 'usingNativeControls exists');
+  assert.ok(player.isFullscreen, 'isFullscreen exists');
 
   // Track methods
-  ok(player.audioTracks, 'audioTracks exists');
-  ok(player.videoTracks, 'videoTracks exists');
-  ok(player.textTracks, 'textTracks exists');
-  ok(player.remoteTextTrackEls, 'remoteTextTrackEls exists');
-  ok(player.remoteTextTracks, 'remoteTextTracks exists');
-  ok(player.addTextTrack, 'addTextTrack exists');
-  ok(player.addRemoteTextTrack, 'addRemoteTextTrack exists');
-  ok(player.removeRemoteTextTrack, 'removeRemoteTextTrack exists');
+  assert.ok(player.audioTracks, 'audioTracks exists');
+  assert.ok(player.videoTracks, 'videoTracks exists');
+  assert.ok(player.textTracks, 'textTracks exists');
+  assert.ok(player.remoteTextTrackEls, 'remoteTextTrackEls exists');
+  assert.ok(player.remoteTextTracks, 'remoteTextTracks exists');
+  assert.ok(player.addTextTrack, 'addTextTrack exists');
+  assert.ok(player.addRemoteTextTrack, 'addRemoteTextTrack exists');
+  assert.ok(player.removeRemoteTextTrack, 'removeRemoteTextTrack exists');
 
   // Deprecated methods that should still exist
-  ok(player.requestFullScreen, 'requestFullScreen exists');
-  ok(player.isFullScreen, 'isFullScreen exists');
-  ok(player.cancelFullScreen, 'cancelFullScreen exists');
+  assert.ok(player.requestFullScreen, 'requestFullScreen exists');
+  assert.ok(player.isFullScreen, 'isFullScreen exists');
+  assert.ok(player.cancelFullScreen, 'cancelFullScreen exists');
 });
 
-test('should be able to access expected component API methods', function() {
-  var Component = videojs.getComponent('Component');
-  var comp = new Component({ id: function(){ return 1; }, reportUserActivity: function(){} });
+QUnit.test('should be able to access expected component API methods', function(assert) {
+  const Component = videojs.getComponent('Component');
+  const comp = new Component({
+    id() {
+      return 1;
+    },
+    reportUserActivity() {}
+  });
 
   // Component methods
-  ok(comp.player, 'player exists');
-  ok(comp.options, 'options exists');
-  ok(comp.init, 'init exists');
-  ok(comp.dispose, 'dispose exists');
-  ok(comp.createEl, 'createEl exists');
-  ok(comp.contentEl, 'contentEl exists');
-  ok(comp.el, 'el exists');
-  ok(comp.addChild, 'addChild exists');
-  ok(comp.getChild, 'getChild exists');
-  ok(comp.getChildById, 'getChildById exists');
-  ok(comp.children, 'children exists');
-  ok(comp.initChildren, 'initChildren exists');
-  ok(comp.removeChild, 'removeChild exists');
-  ok(comp.on, 'on exists');
-  ok(comp.off, 'off exists');
-  ok(comp.one, 'one exists');
-  ok(comp.trigger, 'trigger exists');
-  ok(comp.triggerReady, 'triggerReady exists');
-  ok(comp.show, 'show exists');
-  ok(comp.hide, 'hide exists');
-  ok(comp.width, 'width exists');
-  ok(comp.height, 'height exists');
-  ok(comp.dimensions, 'dimensions exists');
-  ok(comp.ready, 'ready exists');
-  ok(comp.addClass, 'addClass exists');
-  ok(comp.removeClass, 'removeClass exists');
-  ok(comp.buildCSSClass, 'buildCSSClass exists');
-  ok(comp.setInterval, 'setInterval exists');
-  ok(comp.clearInterval, 'clearInterval exists');
-  ok(comp.setTimeout, 'setTimeout exists');
-  ok(comp.clearTimeout, 'clearTimeout exists');
+  assert.ok(comp.player, 'player exists');
+  assert.ok(comp.options, 'options exists');
+  assert.ok(comp.init, 'init exists');
+  assert.ok(comp.dispose, 'dispose exists');
+  assert.ok(comp.createEl, 'createEl exists');
+  assert.ok(comp.contentEl, 'contentEl exists');
+  assert.ok(comp.el, 'el exists');
+  assert.ok(comp.addChild, 'addChild exists');
+  assert.ok(comp.getChild, 'getChild exists');
+  assert.ok(comp.getChildById, 'getChildById exists');
+  assert.ok(comp.children, 'children exists');
+  assert.ok(comp.initChildren, 'initChildren exists');
+  assert.ok(comp.removeChild, 'removeChild exists');
+  assert.ok(comp.on, 'on exists');
+  assert.ok(comp.off, 'off exists');
+  assert.ok(comp.one, 'one exists');
+  assert.ok(comp.trigger, 'trigger exists');
+  assert.ok(comp.triggerReady, 'triggerReady exists');
+  assert.ok(comp.show, 'show exists');
+  assert.ok(comp.hide, 'hide exists');
+  assert.ok(comp.width, 'width exists');
+  assert.ok(comp.height, 'height exists');
+  assert.ok(comp.dimensions, 'dimensions exists');
+  assert.ok(comp.ready, 'ready exists');
+  assert.ok(comp.addClass, 'addClass exists');
+  assert.ok(comp.removeClass, 'removeClass exists');
+  assert.ok(comp.buildCSSClass, 'buildCSSClass exists');
+  assert.ok(comp.setInterval, 'setInterval exists');
+  assert.ok(comp.clearInterval, 'clearInterval exists');
+  assert.ok(comp.setTimeout, 'setTimeout exists');
+  assert.ok(comp.clearTimeout, 'clearTimeout exists');
 });
 
-test('should be able to access expected MediaTech API methods', function() {
-  var media = videojs.getComponent('Tech');
-  var mediaProto = media.prototype;
-  var html5 = videojs.getComponent('Html5');
-  var html5Proto = html5.prototype;
-  var flash = videojs.getComponent('Flash');
-  var flashProto = flash.prototype;
+QUnit.test('should be able to access expected MediaTech API methods', function(assert) {
+  const media = videojs.getComponent('Tech');
+  const mediaProto = media.prototype;
+  const html5 = videojs.getComponent('Html5');
+  const html5Proto = html5.prototype;
+  const flash = videojs.getComponent('Flash');
+  const flashProto = flash.prototype;
 
-  ok(mediaProto.setPoster, 'setPoster should exist on the Media tech');
-  ok(html5Proto.setPoster, 'setPoster should exist on the HTML5 tech');
-  ok(flashProto.setPoster, 'setPoster should exist on the Flash tech');
+  assert.ok(mediaProto.setPoster, 'setPoster should exist on the Media tech');
+  assert.ok(html5Proto.setPoster, 'setPoster should exist on the HTML5 tech');
+  assert.ok(flashProto.setPoster, 'setPoster should exist on the Flash tech');
 
-  ok(html5.patchCanPlayType, 'patchCanPlayType should exist for HTML5');
-  ok(html5.unpatchCanPlayType, 'unpatchCanPlayType should exist for HTML5');
+  assert.ok(html5.patchCanPlayType, 'patchCanPlayType should exist for HTML5');
+  assert.ok(html5.unpatchCanPlayType, 'unpatchCanPlayType should exist for HTML5');
 
   // Source Handler Functions
-  ok(media.withSourceHandlers, 'withSourceHandlers should exist for Media Tech');
+  assert.ok(media.withSourceHandlers, 'withSourceHandlers should exist for Media Tech');
 
-  ok(html5.canPlaySource, 'canPlaySource should exist for HTML5');
-  ok(html5.registerSourceHandler, 'registerSourceHandler should exist for Html5');
-  ok(html5.selectSourceHandler, 'selectSourceHandler should exist for Html5');
-  ok(html5.prototype.setSource, 'setSource should exist for Html5');
-  ok(html5.prototype.disposeSourceHandler, 'disposeSourceHandler should exist for Html5');
+  assert.ok(html5.canPlaySource, 'canPlaySource should exist for HTML5');
+  assert.ok(html5.registerSourceHandler, 'registerSourceHandler should exist for Html5');
+  assert.ok(html5.selectSourceHandler, 'selectSourceHandler should exist for Html5');
+  assert.ok(html5.prototype.setSource, 'setSource should exist for Html5');
+  assert.ok(html5.prototype.disposeSourceHandler,
+           'disposeSourceHandler should exist for Html5');
 
-  ok(flash.canPlaySource, 'canPlaySource should exist for Flash');
-  ok(flash.registerSourceHandler, 'registerSourceHandler should exist for Flash');
-  ok(flash.selectSourceHandler, 'selectSourceHandler should exist for Flash');
-  ok(flash.prototype.setSource, 'setSource should exist for Flash');
-  ok(flash.prototype.disposeSourceHandler, 'disposeSourceHandler should exist for Flash');
+  assert.ok(flash.canPlaySource, 'canPlaySource should exist for Flash');
+  assert.ok(flash.registerSourceHandler, 'registerSourceHandler should exist for Flash');
+  assert.ok(flash.selectSourceHandler, 'selectSourceHandler should exist for Flash');
+  assert.ok(flash.prototype.setSource, 'setSource should exist for Flash');
+  assert.ok(flash.prototype.disposeSourceHandler,
+           'disposeSourceHandler should exist for Flash');
 });
 
-test('should export ready api call to public', function() {
-  var videoTag = testHelperMakeTag();
+QUnit.test('should export ready api call to public', function(assert) {
+  const videoTag = testHelperMakeTag();
+  const fixture = document.getElementById('qunit-fixture');
 
-  var fixture = document.getElementById('qunit-fixture');
   fixture.appendChild(videoTag);
 
-  var player = videojs('example_1');
-  ok(player.ready !== undefined, 'ready callback is defined');
+  const player = videojs('example_1');
+
+  assert.ok(player.ready !== undefined, 'ready callback is defined');
   player.dispose();
 });
 
-test('should export useful components to the public', function () {
-  ok(videojs.browser.TOUCH_ENABLED !== undefined, 'Touch detection should be public');
-  ok(videojs.getComponent('ControlBar'), 'ControlBar should be public');
-  ok(videojs.getComponent('Button'), 'Button should be public');
-  ok(videojs.getComponent('PlayToggle'), 'PlayToggle should be public');
-  ok(videojs.getComponent('FullscreenToggle'), 'FullscreenToggle should be public');
-  ok(videojs.getComponent('BigPlayButton'), 'BigPlayButton should be public');
-  ok(videojs.getComponent('LoadingSpinner'), 'LoadingSpinner should be public');
-  ok(videojs.getComponent('CurrentTimeDisplay'), 'CurrentTimeDisplay should be public');
-  ok(videojs.getComponent('DurationDisplay'), 'DurationDisplay should be public');
-  ok(videojs.getComponent('TimeDivider'), 'TimeDivider should be public');
-  ok(videojs.getComponent('RemainingTimeDisplay'), 'RemainingTimeDisplay should be public');
-  ok(videojs.getComponent('Slider'), 'Slider should be public');
-  ok(videojs.getComponent('ProgressControl'), 'ProgressControl should be public');
-  ok(videojs.getComponent('SeekBar'), 'SeekBar should be public');
-  ok(videojs.getComponent('LoadProgressBar'), 'LoadProgressBar should be public');
-  ok(videojs.getComponent('PlayProgressBar'), 'PlayProgressBar should be public');
-  ok(videojs.getComponent('VolumeControl'), 'VolumeControl should be public');
-  ok(videojs.getComponent('VolumeBar'), 'VolumeBar should be public');
-  ok(videojs.getComponent('VolumeLevel'), 'VolumeLevel should be public');
-  ok(videojs.getComponent('VolumeMenuButton'), 'VolumeMenuButton should be public');
-  ok(videojs.getComponent('MuteToggle'), 'MuteToggle should be public');
-  ok(videojs.getComponent('PosterImage'), 'PosterImage should be public');
-  ok(videojs.getComponent('Menu'), 'Menu should be public');
-  ok(videojs.getComponent('MenuItem'), 'MenuItem should be public');
-  ok(videojs.getComponent('MenuButton'), 'MenuButton should be public');
-  ok(videojs.getComponent('PlaybackRateMenuButton'), 'PlaybackRateMenuButton should be public');
+QUnit.test('should export useful components to the public', function(assert) {
+  assert.ok(videojs.browser.TOUCH_ENABLED !== undefined,
+           'Touch detection should be public');
+  assert.ok(videojs.getComponent('ControlBar'), 'ControlBar should be public');
+  assert.ok(videojs.getComponent('Button'), 'Button should be public');
+  assert.ok(videojs.getComponent('PlayToggle'), 'PlayToggle should be public');
+  assert.ok(videojs.getComponent('FullscreenToggle'), 'FullscreenToggle should be public');
+  assert.ok(videojs.getComponent('BigPlayButton'), 'BigPlayButton should be public');
+  assert.ok(videojs.getComponent('LoadingSpinner'), 'LoadingSpinner should be public');
+  assert.ok(videojs.getComponent('CurrentTimeDisplay'),
+           'CurrentTimeDisplay should be public');
+  assert.ok(videojs.getComponent('DurationDisplay'), 'DurationDisplay should be public');
+  assert.ok(videojs.getComponent('TimeDivider'), 'TimeDivider should be public');
+  assert.ok(videojs.getComponent('RemainingTimeDisplay'),
+           'RemainingTimeDisplay should be public');
+  assert.ok(videojs.getComponent('Slider'), 'Slider should be public');
+  assert.ok(videojs.getComponent('ProgressControl'), 'ProgressControl should be public');
+  assert.ok(videojs.getComponent('SeekBar'), 'SeekBar should be public');
+  assert.ok(videojs.getComponent('LoadProgressBar'), 'LoadProgressBar should be public');
+  assert.ok(videojs.getComponent('PlayProgressBar'), 'PlayProgressBar should be public');
+  assert.ok(videojs.getComponent('VolumeControl'), 'VolumeControl should be public');
+  assert.ok(videojs.getComponent('VolumeBar'), 'VolumeBar should be public');
+  assert.ok(videojs.getComponent('VolumeLevel'), 'VolumeLevel should be public');
+  assert.ok(videojs.getComponent('VolumeMenuButton'), 'VolumeMenuButton should be public');
+  assert.ok(videojs.getComponent('MuteToggle'), 'MuteToggle should be public');
+  assert.ok(videojs.getComponent('PosterImage'), 'PosterImage should be public');
+  assert.ok(videojs.getComponent('Menu'), 'Menu should be public');
+  assert.ok(videojs.getComponent('MenuItem'), 'MenuItem should be public');
+  assert.ok(videojs.getComponent('MenuButton'), 'MenuButton should be public');
+  assert.ok(videojs.getComponent('PlaybackRateMenuButton'),
+           'PlaybackRateMenuButton should be public');
 
-  ok(videojs.getComponent('CaptionSettingsMenuItem'), 'CaptionSettingsMenuItem should be public');
-  ok(videojs.getComponent('OffTextTrackMenuItem'), 'OffTextTrackMenuItem should be public');
-  ok(videojs.getComponent('TextTrackMenuItem'), 'TextTrackMenuItem should be public');
-  ok(videojs.getComponent('TextTrackDisplay'), 'TextTrackDisplay should be public');
-  ok(videojs.getComponent('TextTrackButton'), 'TextTrackButton should be public');
-  ok(videojs.getComponent('CaptionsButton'), 'CaptionsButton should be public');
-  ok(videojs.getComponent('SubtitlesButton'), 'SubtitlesButton should be public');
-  ok(videojs.getComponent('DescriptionsButton'), 'DescriptionsButton should be public');
-  ok(videojs.getComponent('ChaptersButton'), 'ChaptersButton should be public');
-  ok(videojs.getComponent('ChaptersTrackMenuItem'), 'ChaptersTrackMenuItem should be public');
+  assert.ok(videojs.getComponent('CaptionSettingsMenuItem'),
+           'CaptionSettingsMenuItem should be public');
+  assert.ok(videojs.getComponent('OffTextTrackMenuItem'),
+           'OffTextTrackMenuItem should be public');
+  assert.ok(videojs.getComponent('TextTrackMenuItem'),
+           'TextTrackMenuItem should be public');
+  assert.ok(videojs.getComponent('TextTrackDisplay'), 'TextTrackDisplay should be public');
+  assert.ok(videojs.getComponent('TextTrackButton'), 'TextTrackButton should be public');
+  assert.ok(videojs.getComponent('CaptionsButton'), 'CaptionsButton should be public');
+  assert.ok(videojs.getComponent('SubtitlesButton'), 'SubtitlesButton should be public');
+  assert.ok(videojs.getComponent('DescriptionsButton'),
+           'DescriptionsButton should be public');
+  assert.ok(videojs.getComponent('ChaptersButton'), 'ChaptersButton should be public');
+  assert.ok(videojs.getComponent('ChaptersTrackMenuItem'),
+           'ChaptersTrackMenuItem should be public');
 
-  ok(videojs.mergeOptions, 'mergeOptions should be public');
+  assert.ok(videojs.mergeOptions, 'mergeOptions should be public');
 });
 
-test('should be able to initialize player twice on the same tag using string reference', function() {
-  var videoTag = testHelperMakeTag();
-  var id = videoTag.id;
+QUnit.test('should be able to initialize player twice on the same tag using string reference', function(assert) {
+  const videoTag = testHelperMakeTag();
+  const id = videoTag.id;
+  const fixture = document.getElementById('qunit-fixture');
 
-  var fixture = document.getElementById('qunit-fixture');
   fixture.appendChild(videoTag);
 
-  var player = videojs('example_1');
+  const player = videojs('example_1');
+
   player.dispose();
-  ok(!document.getElementById(id), 'element is removed');
+  assert.ok(!document.getElementById(id), 'element is removed');
 
   videoTag = testHelperMakeTag();
   fixture.appendChild(videoTag);
@@ -215,66 +234,68 @@ test('should be able to initialize player twice on the same tag using string ref
   player.dispose();
 });
 
-test('videojs.getPlayers() should be available after minification', function() {
-  var videoTag = testHelperMakeTag();
-  var id = videoTag.id;
+QUnit.test('videojs.getPlayers() should be available after minification', function(assert) {
+  const videoTag = testHelperMakeTag();
+  const id = videoTag.id;
+  const fixture = document.getElementById('qunit-fixture');
 
-  var fixture = document.getElementById('qunit-fixture');
   fixture.appendChild(videoTag);
 
-  var player = videojs(id);
-  ok(videojs.getPlayers()[id] === player, 'videojs.getPlayers() is available');
+  const player = videojs(id);
+
+  assert.ok(videojs.getPlayers()[id] === player, 'videojs.getPlayers() is available');
 
   player.dispose();
 });
 
-test('component can be subclassed externally', function(){
-  var Component = videojs.getComponent('Component');
-  var ControlBar = videojs.getComponent('ControlBar');
+QUnit.test('component can be subclassed externally', function(assert) {
+  const Component = videojs.getComponent('Component');
+  const ControlBar = videojs.getComponent('ControlBar');
 
-  var player = new (videojs.extend(Component, {
-    reportUserActivity: function(){},
-    textTracks: function(){ return {
+  const player = new (videojs.extend(Component, {
+    reportUserActivity() {},
+    textTracks() {
+      return {
         addEventListener: Function.prototype,
         removeEventListener: Function.prototype
       };
     }
   }))({
-    id: function(){},
-    reportUserActivity: function(){}
+    id() {},
+    reportUserActivity() {}
   });
 
-  ok(new ControlBar(player), 'created a control bar without throwing');
+  assert.ok(new ControlBar(player), 'created a control bar without throwing');
 });
 
-function testHelperMakeTag(){
-  var videoTag = document.createElement('video');
+function testHelperMakeTag() {
+  const videoTag = document.createElement('video');
+
   videoTag.id = 'example_1';
   videoTag.className = 'video-js vjs-default-skin';
   return videoTag;
 }
 
-test('should extend Component', function(){
-  var Component = videojs.getComponent('Component');
-  var MyComponent = videojs.extend(Component, {
-    constructor: function() {
+QUnit.test('should extend Component', function(assert) {
+  const Component = videojs.getComponent('Component');
+  const MyComponent = videojs.extend(Component, {
+    constructor() {
       this.bar = true;
     },
-    foo: function() {
+    foo() {
       return true;
     }
   });
 
-  var myComponent = new MyComponent();
-  ok(myComponent instanceof Component, 'creates an instance of Component');
-  ok(myComponent instanceof MyComponent, 'creates an instance of MyComponent');
-  ok(myComponent.bar, 'the constructor function is used');
-  ok(myComponent.foo(), 'instance methods are applied');
+  const myComponent = new MyComponent();
 
-  var NoMethods = videojs.extend(Component);
-  var noMethods = new NoMethods({});
-  ok(noMethods.on, 'should extend component with no methods or constructor');
+  assert.ok(myComponent instanceof Component, 'creates an instance of Component');
+  assert.ok(myComponent instanceof MyComponent, 'creates an instance of MyComponent');
+  assert.ok(myComponent.bar, 'the constructor function is used');
+  assert.ok(myComponent.foo(), 'instance methods are applied');
+
+  const NoMethods = videojs.extend(Component);
+  const noMethods = new NoMethods({});
+
+  assert.ok(noMethods.on, 'should extend component with no methods or constructor');
 });
-
-
-})();

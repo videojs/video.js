@@ -12,6 +12,11 @@ import Component from '../component.js';
  */
 class FullscreenToggle extends Button {
 
+  constructor(player, options) {
+    super(player, options);
+    this.on(player, 'fullscreenchange', this.handleFullscreenChange);
+  }
+
   /**
    * Allow sub components to stack CSS class names
    *
@@ -21,7 +26,18 @@ class FullscreenToggle extends Button {
   buildCSSClass() {
     return `vjs-fullscreen-control ${super.buildCSSClass()}`;
   }
-
+  /**
+   * Handles Fullscreenchange on the component and change control text accordingly
+   *
+   * @method handleFullscreenChange
+   */
+  handleFullscreenChange() {
+    if (this.player_.isFullscreen()) {
+      this.controlText('Non-Fullscreen');
+    } else {
+      this.controlText('Fullscreen');
+    }
+  }
   /**
    * Handles click for full screen
    *
@@ -30,10 +46,8 @@ class FullscreenToggle extends Button {
   handleClick() {
     if (!this.player_.isFullscreen()) {
       this.player_.requestFullscreen();
-      this.controlText('Non-Fullscreen');
     } else {
       this.player_.exitFullscreen();
-      this.controlText('Fullscreen');
     }
   }
 

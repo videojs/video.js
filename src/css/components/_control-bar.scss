@@ -20,9 +20,6 @@
   @include transition($trans);
 }
 
-// IE 8 hack for media queries
-$ie8screen: "\\0screen";
-
 // Video has started playing AND user is inactive
 .vjs-has-started.vjs-user-inactive.vjs-playing .vjs-control-bar {
   // Remain visible for screen reader and keyboard users
@@ -32,10 +29,6 @@ $ie8screen: "\\0screen";
   $trans: visibility 1.0s, opacity 1.0s;
   @include transition($trans);
 
-  // Make controls hidden in IE8 for now
-  @media #{$ie8screen} {
-    visibility: hidden;
-  }
 }
 
 .vjs-controls-disabled .vjs-control-bar,
@@ -49,15 +42,6 @@ $ie8screen: "\\0screen";
 .vjs-audio.vjs-has-started.vjs-user-inactive.vjs-playing .vjs-control-bar {
   opacity: 1;
   visibility: visible;
-}
-
-
-// IE8 is flakey with fonts, and you have to change the actual content to force
-// fonts to show/hide properly.
-// - "\9" IE8 hack didn't work for this
-// Found in XP IE8 from http://modern.ie. Does not show up in "IE8 mode" in IE9
-.vjs-user-inactive.vjs-playing .vjs-control-bar :before {
-  @media #{$ie8screen} { content: ""; }
 }
 
 // IE 8 + 9 Support

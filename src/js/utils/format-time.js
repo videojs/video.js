@@ -11,7 +11,7 @@
  * @private
  * @function formatTime
  */
-function formatTime(seconds, guide=seconds) {
+function formatTime(seconds, guide = seconds) {
   seconds = seconds < 0 ? 0 : seconds;
   let s = Math.floor(seconds % 60);
   let m = Math.floor(seconds / 60 % 60);

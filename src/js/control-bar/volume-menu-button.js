@@ -18,7 +18,7 @@ import VolumeBar from './volume-control/volume-bar.js';
  */
 class VolumeMenuButton extends PopupButton {
 
-  constructor(player, options={}){
+  constructor(player, options = {}) {
     // Default to inline
     if (options.inline === undefined) {
       options.inline = true;
@@ -48,7 +48,7 @@ class VolumeMenuButton extends PopupButton {
 
     // hide mute toggle if the current tech doesn't support volume control
     function updateVisibility() {
-      if (player.tech_ && player.tech_['featuresVolumeControl'] === false) {
+      if (player.tech_ && player.tech_.featuresVolumeControl === false) {
         this.addClass('vjs-hidden');
       } else {
         this.removeClass('vjs-hidden');
@@ -58,19 +58,19 @@ class VolumeMenuButton extends PopupButton {
     updateVisibility.call(this);
     this.on(player, 'loadstart', updateVisibility);
 
-    this.on(this.volumeBar, ['slideractive', 'focus'], function(){
+    this.on(this.volumeBar, ['slideractive', 'focus'], function() {
       this.addClass('vjs-slider-active');
     });
 
-    this.on(this.volumeBar, ['sliderinactive', 'blur'], function(){
+    this.on(this.volumeBar, ['sliderinactive', 'blur'], function() {
       this.removeClass('vjs-slider-active');
     });
 
-    this.on(this.volumeBar, ['focus'], function(){
+    this.on(this.volumeBar, ['focus'], function() {
       this.addClass('vjs-lock-showing');
     });
 
-    this.on(this.volumeBar, ['blur'], function(){
+    this.on(this.volumeBar, ['blur'], function() {
       this.removeClass('vjs-lock-showing');
     });
   }
@@ -83,7 +83,8 @@ class VolumeMenuButton extends PopupButton {
    */
   buildCSSClass() {
     let orientationClass = '';
-    if (!!this.options_.vertical) {
+
+    if (this.options_.vertical) {
       orientationClass = 'vjs-volume-menu-button-vertical';
     } else {
       orientationClass = 'vjs-volume-menu-button-horizontal';
@@ -99,11 +100,11 @@ class VolumeMenuButton extends PopupButton {
    * @method createPopup
    */
   createPopup() {
-    let popup = new Popup(this.player_, {
+    const popup = new Popup(this.player_, {
       contentElType: 'div'
     });
 
-    let vb = new VolumeBar(this.player_, this.options_.volumeBar);
+    const vb = new VolumeBar(this.player_, this.options_.volumeBar);
 
     popup.addChild(vb);
 

@@ -15,13 +15,13 @@
  *   "",
  * };
  */
-const VideoTrackKind = {
+export const VideoTrackKind = {
   alternative: 'alternative',
   captions: 'captions',
   main: 'main',
   sign: 'sign',
   subtitles: 'subtitles',
-  commentary: 'commentary',
+  commentary: 'commentary'
 };
 
 /**
@@ -37,13 +37,13 @@ const VideoTrackKind = {
  *   "",
  * };
  */
-const AudioTrackKind = {
-  alternative: 'alternative',
-  descriptions: 'descriptions',
-  main: 'main',
+export const AudioTrackKind = {
+  'alternative': 'alternative',
+  'descriptions': 'descriptions',
+  'main': 'main',
   'main-desc': 'main-desc',
-  translation: 'translation',
-  commentary: 'commentary',
+  'translation': 'translation',
+  'commentary': 'commentary'
 };
 
 /**
@@ -57,7 +57,7 @@ const AudioTrackKind = {
  *   "metadata"
  * };
  */
-const TextTrackKind = {
+export const TextTrackKind = {
   subtitles: 'subtitles',
   captions: 'captions',
   descriptions: 'descriptions',
@@ -65,22 +65,13 @@ const TextTrackKind = {
   metadata: 'metadata'
 };
 
-
-
 /**
  * https://html.spec.whatwg.org/multipage/embedded-content.html#texttrackmode
  *
  * enum TextTrackMode { "disabled",  "hidden",  "showing" };
  */
-const TextTrackMode = {
+export const TextTrackMode = {
   disabled: 'disabled',
   hidden: 'hidden',
   showing: 'showing'
 };
-
-/* jshint ignore:start */
-// we ignore jshint here because it does not see
-// AudioTrackKind as defined here
-export default { VideoTrackKind, AudioTrackKind, TextTrackKind, TextTrackMode };
-/* jshint ignore:end */
-
