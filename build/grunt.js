@@ -94,7 +94,7 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg,
     clean: {
-      build: ['build/temp/*'],
+      build: ['build/temp/*', 'es5'],
       dist: ['dist/*']
     },
     uglify: {
