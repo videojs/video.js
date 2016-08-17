@@ -295,13 +295,13 @@ if (!browser.IS_IE8) {
   });
 }
 
-let chaptersTrack = {
+const chaptersTrack = {
   kind: 'chapters',
   label: 'Test Chapters'
 };
 
 test('chapters should not be displayed when text tracks list is empty', function() {
-  let player = TestHelpers.makePlayer();
+  const player = TestHelpers.makePlayer();
 
   ok(player.controlBar.chaptersButton.hasClass('vjs-hidden'), 'control is not displayed');
   equal(player.textTracks().length, 0, 'textTracks is empty');
@@ -310,7 +310,7 @@ test('chapters should not be displayed when text tracks list is empty', function
 });
 
 test('chapters should not be displayed when there is chapters track but no cues', function() {
-  let player = TestHelpers.makePlayer({
+  const player = TestHelpers.makePlayer({
     tracks: [chaptersTrack]
   });
 
@@ -323,7 +323,7 @@ test('chapters should not be displayed when there is chapters track but no cues'
 });
 
 test('chapters should be displayed when cues added to initial track and button updated', function() {
-  let player = TestHelpers.makePlayer({
+  const player = TestHelpers.makePlayer({
     tracks: [chaptersTrack]
   });
 
@@ -355,7 +355,7 @@ test('chapters should be displayed when cues added to initial track and button u
 });
 
 test('chapters should be displayed when a track and its cures added and button updated', function() {
-  let player = TestHelpers.makePlayer();
+  const player = TestHelpers.makePlayer();
 
   this.clock.tick(1000);
 
@@ -385,7 +385,7 @@ test('chapters should be displayed when a track and its cures added and button u
 });
 
 test('chapters menu should use track label as menu title', function() {
-  let player = TestHelpers.makePlayer({
+  const player = TestHelpers.makePlayer({
     tracks: [chaptersTrack]
   });
 
@@ -416,7 +416,7 @@ test('chapters menu should use track label as menu title', function() {
 });
 
 test('chapters should be displayed when remote track added and load event fired', function() {
-  let player = TestHelpers.makePlayer();
+  const player = TestHelpers.makePlayer();
 
   this.clock.tick(1000);
 

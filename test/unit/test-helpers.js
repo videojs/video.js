@@ -138,8 +138,8 @@ const TestHelpers = {
    * @param  {Element} element
    * @param  {string} eventType
    */
-  triggerDomEvent: function (element, eventType) {
-    var event;
+  triggerDomEvent(element, eventType) {
+    let event;
 
     if (document.createEvent) {
       event = document.createEvent('HTMLEvents');
