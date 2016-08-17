@@ -92,8 +92,9 @@ module.exports = function(config) {
     }
   };
 
-  // coverage reporting
-  var coverageFlag = process.env.npm_config_coverage;  // set through npm test --coverage
+  // Coverage reporting
+  // Coverage is enabled by passing the flag --coverage to npm test
+  var coverageFlag = process.env.npm_config_coverage;
   var reportCoverage = process.env.TRAVIS || coverageFlag;
   if (reportCoverage) {
     settings.browserify.transform.push('browserify-istanbul');
