@@ -362,14 +362,6 @@ module.exports = function(grunt) {
         }
       }
     },
-    exorcise: {
-      build: {
-        options: {},
-        files: {
-          'build/temp/video.js.map': ['build/temp/video.js'],
-        }
-      }
-    },
     coveralls: {
       options: {
         // warn instead of failing when coveralls errors
