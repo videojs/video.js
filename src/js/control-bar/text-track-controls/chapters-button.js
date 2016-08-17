@@ -3,10 +3,7 @@
  */
 import TextTrackButton from './text-track-button.js';
 import Component from '../../component.js';
-import TextTrackMenuItem from './text-track-menu-item.js';
 import ChaptersTrackMenuItem from './chapters-track-menu-item.js';
-import Menu from '../../menu/menu.js';
-import * as Dom from '../../utils/dom.js';
 import toTitleCase from '../../utils/to-title-case.js';
 
 /**
@@ -47,23 +44,27 @@ class ChaptersButton extends TextTrackButton {
   setTrack(track) {
     if (this.track_ === track) return;
 
-    if (!this.updateHandler_)
+    if (!this.updateHandler_) {
       this.updateHandler_ = Fn.bind(this, this.update);
-    
+    }
+
     if (this.track_) {
-      let remoteTextTrackEl = this.player_.remoteTextTrackEls().getTrackElementByTrack_(this.track_);
+      const remoteTextTrackEl = this.player_.remoteTextTrackEls().getTrackElementByTrack_(this.track_);
+
       if (remoteTextTrackEl) {
         remoteTextTrackEl.removeEventListener('load', this.updateHandler_);
       }
+
       this.track_ = null;
     }
 
     this.track_ = track;
 
     if (this.track_) {
-      this.track_['mode'] = 'hidden';
+      this.track_.mode = 'hidden';
 
-      let remoteTextTrackEl = this.player_.remoteTextTrackEls().getTrackElementByTrack_(this.track_);
+      const remoteTextTrackEl = this.player_.remoteTextTrackEls().getTrackElementByTrack_(this.track_);
+
       if (remoteTextTrackEl) {
         remoteTextTrackEl.addEventListener('load', this.updateHandler_);
       }
@@ -71,21 +72,22 @@ class ChaptersButton extends TextTrackButton {
   }
 
   findChaptersTrack() {
-    let tracks = this.player_.textTracks() || [];
-    
+    const tracks = this.player_.textTracks() || [];
+
     for (let i = tracks.length - 1; i >= 0; i--) {
       // We will always choose the last track as our chaptersTrack
-      let track = tracks[i];
+      const track = tracks[i];
 
-      if (track['kind'] === this.kind_) {
+      if (track.kind === this.kind_) {
         return track;
       }
     }
   }
 
   getMenuCaption() {
-    if (this.track_ && this.track_.label)
+    if (this.track_ && this.track_.label) {
       return this.track_.label;
+    }
     return this.localize(toTitleCase(this.kind_));
   }
 
@@ -107,18 +109,18 @@ class ChaptersButton extends TextTrackButton {
    * @method createItems
    */
   createItems() {
-    let items = [];
+    const items = [];
     if (!this.track_) return items;
 
-    let cues = this.track_['cues'];
+    const cues = this.track_.cues;
     if (!cues) return items;
 
     for (let i = 0, l = cues.length; i < l; i++) {
-      let cue = cues[i];
+      const cue = cues[i];
 
-      let mi = new ChaptersTrackMenuItem(this.player_, {
-        'track': this.track_,
-        'cue': cue
+      const mi = new ChaptersTrackMenuItem(this.player_, {
+        track: this.track_,
+        cue: cue
       });
 
       items.push(mi);
