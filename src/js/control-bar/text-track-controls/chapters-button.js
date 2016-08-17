@@ -110,10 +110,11 @@ class ChaptersButton extends TextTrackButton {
     let items = [];
     if (!this.track_) return items;
 
-    let cues = this.track_['cues'], cue;
+    let cues = this.track_['cues'];
+    if (!cues) return items;
 
     for (let i = 0, l = cues.length; i < l; i++) {
-      cue = cues[i];
+      let cue = cues[i];
 
       let mi = new ChaptersTrackMenuItem(this.player_, {
         'track': this.track_,
