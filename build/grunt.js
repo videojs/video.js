@@ -458,7 +458,6 @@ module.exports = function(grunt) {
 
     'babel:es5',
     'browserify:build',
-    'exorcise:build',
     'concat:novtt',
     'concat:vtt',
     'usebanner:novtt',
