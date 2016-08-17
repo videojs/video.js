@@ -40,12 +40,14 @@ class ChaptersButton extends TextTrackButton {
     }
     super.update();
   }
-  
+
   setTrack(track) {
-    if (this.track_ === track) return;
+    if (this.track_ === track) {
+      return;
+    }
 
     if (!this.updateHandler_) {
-      this.updateHandler_ = Fn.bind(this, this.update);
+      this.updateHandler_ = this.update.bind(this);
     }
 
     if (this.track_) {
@@ -110,18 +112,20 @@ class ChaptersButton extends TextTrackButton {
    */
   createItems() {
     const items = [];
-    if (!this.track_) return items;
+
+    if (!this.track_) {
+      return items;
+    }
 
     const cues = this.track_.cues;
-    if (!cues) return items;
+
+    if (!cues) {
+      return items;
+    }
 
     for (let i = 0, l = cues.length; i < l; i++) {
       const cue = cues[i];
-
-      const mi = new ChaptersTrackMenuItem(this.player_, {
-        track: this.track_,
-        cue: cue
-      });
+      const mi = new ChaptersTrackMenuItem(this.player_, { track: this.track_, cue });
 
       items.push(mi);
     }
