@@ -68,9 +68,9 @@ function createQuerier(method) {
       context = document.querySelector(context);
     }
 
-    const fn = (isEl(context) ? context : document)[method];
+    const ctx = isEl(context) ? context : document;
 
-    return fn && fn(selector);
+    return ctx[method] && ctx[method](selector);
   };
 }
 
