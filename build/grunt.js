@@ -440,6 +440,12 @@ module.exports = function(grunt) {
         options: {
           failOnError: true
         }
+      },
+      browserify: {
+        command: 'browserify test/require/browserify.js -o build/temp/browserify.js',
+        options: {
+          preferLocal: true
+        }
       }
     }
   });
@@ -493,7 +499,11 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['test']);
 
   // The test script includes coveralls only when the TRAVIS env var is set.
-  grunt.registerTask('test', ['build', 'shell:noderequire', 'karma:defaults'].concat(process.env.TRAVIS && 'coveralls').filter(Boolean));
+  grunt.registerTask('test', [
+    'build',
+    'shell:noderequire',
+    'shell:browserify',
+    'karma:defaults'].concat(process.env.TRAVIS && 'coveralls').filter(Boolean));
 
   // Run while developing
   grunt.registerTask('dev', ['build', 'connect:dev', 'concurrent:watchSandbox']);
