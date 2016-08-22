@@ -17,6 +17,7 @@ CHANGELOG
 * @gkatsev updated build system to open es5 folder for bundles and dist folder other users ([view](https://github.com/videojs/video.js/pull/3445))
 * greenkeeper updated uglify ([view](https://github.com/videojs/video.js/pull/3547))
 * greenkeeper updated grunt-concurrent ([view](https://github.com/videojs/video.js/pull/3532))
+* greenkeeper updated karma-chrome-launcher ([view](https://github.com/videojs/video.js/pull/3553))
 
 --------------------
 
