@@ -6,16 +6,23 @@ import assign from 'object.assign';
 /*
  * Custom MediaError to mimic the HTML5 MediaError
  *
- * @param {Number} code The media error code
+ * @param {Number|String|Object|MediaError} value The media error code
  */
-const MediaError = function(code) {
-  if (typeof code === 'number') {
-    this.code = code;
-  } else if (typeof code === 'string') {
+const MediaError = function(value) {
+  if (typeof value === 'number') {
+    this.code = value;
+  } else if (typeof value === 'string') {
     // default code is zero, so this is a custom error
-    this.message = code;
-  } else if (typeof code === 'object') {
-    assign(this, code);
+    this.message = value;
+  } else if (typeof value === 'object') {
+
+    // We assign the `code` property manually because native MediaError objects
+    // do not expose it as an own/enumerable property of the object.
+    if (typeof value.code === 'number') {
+      this.code = value.code;
+    }
+
+    assign(this, value);
   }
 
   if (!this.message) {
