@@ -446,6 +446,12 @@ module.exports = function(grunt) {
         options: {
           preferLocal: true
         }
+      },
+      webpack: {
+        command: 'webpack test/require/webpack.js build/temp/webpack.js',
+        options: {
+          preferLocal: true
+        }
       }
     }
   });

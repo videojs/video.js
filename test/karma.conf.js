@@ -14,6 +14,7 @@ module.exports = function(config) {
       '../test/globals-shim.js',
       '../test/unit/**/*.js',
       '../build/temp/browserify.js',
+      '../build/temp/webpack.js',
       { pattern: '../src/**/*.js', watched: true, included: false, served: false }
     ],
 
