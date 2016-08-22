@@ -2309,12 +2309,7 @@ class Player extends Component {
       return this;
     }
 
-    // error instance
-    if (err instanceof MediaError) {
-      this.error_ = err;
-    } else {
-      this.error_ = new MediaError(err);
-    }
+    this.error_ = new MediaError(err);
 
     // add the vjs-error classname to the player
     this.addClass('vjs-error');
