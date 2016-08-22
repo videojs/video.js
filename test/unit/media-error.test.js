@@ -56,3 +56,10 @@ QUnit.test('can be constructed from a native MediaError object', function(assert
   assert.strictEqual(mediaErrorMsg.code, 4);
   assert.strictEqual(mediaErrorMsg.message, 'hello, world');
 });
+
+QUnit.test('can be constructed redundantly', function(assert) {
+  const mediaError = new MediaError(2);
+  const redundantMediaError = new MediaError(mediaError);
+
+  assert.strictEqual(redundantMediaError, mediaError);
+});

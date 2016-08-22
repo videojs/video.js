@@ -8,7 +8,14 @@ import assign from 'object.assign';
  *
  * @param {Number|String|Object|MediaError} value The media error code
  */
-const MediaError = function(value) {
+function MediaError(value) {
+
+  // Allow redundant calls to this constructor to avoid having `instanceof`
+  // checks peppered around the code.
+  if (value instanceof MediaError) {
+    return value;
+  }
+
   if (typeof value === 'number') {
     this.code = value;
   } else if (typeof value === 'string') {
@@ -28,7 +35,7 @@ const MediaError = function(value) {
   if (!this.message) {
     this.message = MediaError.defaultMessages[this.code] || '';
   }
-};
+}
 
 /*
  * The error code that refers two one of the defined
