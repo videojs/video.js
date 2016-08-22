@@ -309,11 +309,7 @@ class Tech extends Component {
    */
   error(err) {
     if (err !== undefined) {
-      if (err instanceof MediaError) {
-        this.error_ = err;
-      } else {
-        this.error_ = new MediaError(err);
-      }
+      this.error_ = new MediaError(err);
       this.trigger('error');
     }
     return this.error_;
