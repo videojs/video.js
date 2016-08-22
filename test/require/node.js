@@ -1,6 +1,7 @@
+/* eslint-disable no-console */
 try {
   require('../../');
-} catch(e) {
+} catch (e) {
   console.error(e);
   process.exit(1);
 }
