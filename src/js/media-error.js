@@ -4,9 +4,16 @@
 import assign from 'object.assign';
 
 /*
- * Custom MediaError to mimic the HTML5 MediaError
+ * Custom MediaError class which mimics the standard HTML5 MediaError class.
  *
- * @param {Number|String|Object|MediaError} value The media error code
+ * @param {Number|String|Object|MediaError} value
+ *        This can be of multiple types:
+ *        - Number: should be a standard error code
+ *        - String: an error message (the code will be 0)
+ *        - Object: arbitrary properties
+ *        - MediaError (native): used to populate a video.js MediaError object
+ *        - MediaError (video.js): will return itself if it's already a
+ *          video.js MediaError object.
  */
 function MediaError(value) {
 
