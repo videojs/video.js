@@ -16,7 +16,11 @@
   "homepage": "http://videojs.com",
   "author": "Steve Heffernan",
   "scripts": {
+    "build": "grunt dist",
+    "change": "grunt chg-add",
+    "clean": "grunt clean",
     "lint": "vjsstandard",
+    "start": "grunt watchAll",
     "test": "grunt test"
   },
   "repository": {
