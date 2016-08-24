@@ -58,6 +58,6 @@ class AudioTrackButton extends TrackButton {
     return items;
   }
 }
-
+AudioTrackButton.prototype.controlText_ = 'Audio';
 Component.registerComponent('AudioTrackButton', AudioTrackButton);
 export default AudioTrackButton;
