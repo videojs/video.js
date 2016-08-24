@@ -5,6 +5,7 @@ CHANGELOG
 * @misteroneill fixed wrapping native and emulated MediaErrors ([view](https://github.com/videojs/video.js/pull/3562))
 * @snyderizer fixed switching between audio tracks. Fixes #3510 ([view](https://github.com/videojs/video.js/pull/3538))
 * @jbarabander added title attribute to audio button. Fixes #3528 ([view](https://github.com/videojs/video.js/pull/3565))
+* @misteroneill fixed IE8 media error test failure ([view](https://github.com/videojs/video.js/pull/3568))
 
 --------------------
 
