@@ -2,6 +2,8 @@
 import window from 'global/window';
 import MediaError from '../../src/js/media-error';
 
+const isModernBrowser = window.MediaError && Object.create && Object.defineProperty;
+
 /**
  * Creates a real native MediaError object.
  *
@@ -47,15 +49,17 @@ QUnit.test('can be constructed from an object', function(assert) {
   assert.strictEqual(mediaErrorMsg.message, 'hello, world');
 });
 
-QUnit.test('can be constructed from a native MediaError object', function(assert) {
-  const mediaError = new MediaError(createNativeMediaError(3));
-  const mediaErrorMsg = new MediaError(createNativeMediaError(4, 'hello, world'));
+if (isModernBrowser) {
+  QUnit.test('can be constructed from a native MediaError object', function(assert) {
+    const mediaError = new MediaError(createNativeMediaError(3));
+    const mediaErrorMsg = new MediaError(createNativeMediaError(4, 'hello, world'));
 
-  assert.strictEqual(mediaError.code, 3);
-  assert.strictEqual(mediaError.message, MediaError.defaultMessages['3']);
-  assert.strictEqual(mediaErrorMsg.code, 4);
-  assert.strictEqual(mediaErrorMsg.message, 'hello, world');
-});
+    assert.strictEqual(mediaError.code, 3);
+    assert.strictEqual(mediaError.message, MediaError.defaultMessages['3']);
+    assert.strictEqual(mediaErrorMsg.code, 4);
+    assert.strictEqual(mediaErrorMsg.message, 'hello, world');
+  });
+}
 
 QUnit.test('can be constructed redundantly', function(assert) {
   const mediaError = new MediaError(2);
