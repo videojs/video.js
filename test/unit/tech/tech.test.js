@@ -434,7 +434,7 @@ QUnit.test('Tech.isTech returns correct answers for techs and components', funct
   assert.ok(!isTech(isTech), 'A function is not a Tech');
 });
 
-QUnit.test('Tech#setSource clears currentSource_ after repeated loadstart', function(assert) {
+QUnit.test('Tech#setSource clear currentSource_ after repeated loadstart with new source', function(assert) {
   let disposed = false;
   const MyTech = extendFn(Tech);
 
@@ -461,20 +461,71 @@ QUnit.test('Tech#setSource clears currentSource_ after repeated loadstart', func
   MyTech.registerSourceHandler(sourceHandler);
 
   // First loadstart
-  tech.setSource('test');
-  tech.currentSource_ = 'test';
+  tech.setSource({src: 'test', type: 'test'});
+  tech.currentSource_ = {src: 'test', type: 'test'};
   tech.trigger('loadstart');
-  assert.equal(tech.currentSource_, 'test', 'Current source is test');
+  assert.deepEqual(tech.currentSource_, {src: 'test', type: 'test'}, 'Current source is test');
 
   // Second loadstart
+  tech.currentSource_ = {src: 'test2', type: 'test2'};
   tech.trigger('loadstart');
   assert.equal(tech.currentSource_, null, 'Current source is null');
   assert.equal(disposed, true, 'disposed is true');
 
   // Third loadstart
-  tech.currentSource_ = 'test';
+  tech.currentSource_ = {src: 'test3', type: 'test3'};
   tech.trigger('loadstart');
   assert.equal(tech.currentSource_, null, 'Current source is still null');
+
+});
+
+QUnit.test('Tech#setSource currentSource_ stays after repeated loadstart with same source', function(assert) {
+  let disposed = false;
+  const MyTech = extendFn(Tech);
+
+  Tech.withSourceHandlers(MyTech);
+  const tech = new MyTech();
+
+  const sourceHandler = {
+    canPlayType(type) {
+      return true;
+    },
+    canHandleSource(source, options) {
+      return true;
+    },
+    handleSource(source, tech_, options) {
+      return {
+        dispose() {
+          disposed = true;
+        }
+      };
+    }
+  };
+
+  // Test registering source handlers
+  MyTech.registerSourceHandler(sourceHandler);
+
+  // First loadstart
+  tech.setSource({src: 'test', type: 'test'});
+  tech.currentSource_ = {src: 'test', type: 'test'};
+  tech.trigger('loadstart');
+  assert.deepEqual(tech.currentSource_, {src: 'test', type: 'test'}, 'Current source is test');
+
+  // Second loadstart
+  tech.currentSource_ = {src: 'test', type: 'test'};
+  tech.trigger('loadstart');
+  assert.deepEqual(tech.currentSource_, {src: 'test', type: 'test'}, 'Current source is test');
+
+  // Third loadstart
+  tech.currentSource_ = {src: 'test', type: 'test'};
+  tech.trigger('loadstart');
+  assert.deepEqual(tech.currentSource_, {src: 'test', type: 'test'}, 'Current source is test');
+
+  // fourth loadstart, and src change
+  tech.currentSource_ = {src: 'test2', type: 'test'};
+  tech.trigger('loadstart');
+  assert.deepEqual(tech.currentSource_, null, 'Current source is null');
+  assert.equal(disposed, true, 'disposed is true');
 
 });
 
