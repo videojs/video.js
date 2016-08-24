@@ -13,6 +13,8 @@ module.exports = function(config) {
       '../build/temp/ie8/videojs-ie8.min.js',
       '../test/globals-shim.js',
       '../test/unit/**/*.js',
+      '../build/temp/browserify.js',
+      '../build/temp/webpack.js',
       { pattern: '../src/**/*.js', watched: true, included: false, served: false }
     ],
 

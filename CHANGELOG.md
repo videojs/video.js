@@ -18,6 +18,7 @@ CHANGELOG
 * greenkeeper updated uglify ([view](https://github.com/videojs/video.js/pull/3547))
 * greenkeeper updated grunt-concurrent ([view](https://github.com/videojs/video.js/pull/3532))
 * greenkeeper updated karma-chrome-launcher ([view](https://github.com/videojs/video.js/pull/3553))
+* @gkatsev added tests for webpack and browserify bundling and node.js requiring ([view](https://github.com/videojs/video.js/pull/3558))
 
 --------------------
 

@@ -94,7 +94,8 @@
     "time-grunt": "^1.1.1",
     "uglify-js": "~2.7.3",
     "videojs-doc-generator": "0.0.1",
-    "videojs-standard": "^5.2.0"
+    "videojs-standard": "^5.2.0",
+    "webpack": "^1.13.2"
   },
   "vjsstandard": {
     "ignore": [
