@@ -96,10 +96,11 @@ export function getEl(id) {
  * @param  {String} [tagName='div'] Name of tag to be created.
  * @param  {Object} [properties={}] Element properties to be applied.
  * @param  {Object} [attributes={}] Element attributes to be applied.
+ * @param  {String|Element|TextNode|Array|Function} [content] Contents for the element (see: `normalizeContent`)
  * @return {Element}
  * @function createEl
  */
-export function createEl(tagName = 'div', properties = {}, attributes = {}) {
+export function createEl(tagName = 'div', properties = {}, attributes = {}, content) {
   const el = document.createElement(tagName);
 
   Object.getOwnPropertyNames(properties).forEach(function(propName) {
@@ -113,6 +114,11 @@ export function createEl(tagName = 'div', properties = {}, attributes = {}) {
                 has been deprecated. Use the third argument instead.
                 createEl(type, properties, attributes). Attempting to set ${propName} to ${val}.`);
       el.setAttribute(propName, val);
+
+    // Handle textContent since it's not supported everywhere and we have a
+    // method for it.
+    } else if (propName === 'textContent') {
+      textContent(el, val);
     } else {
       el[propName] = val;
     }
@@ -121,6 +127,10 @@ export function createEl(tagName = 'div', properties = {}, attributes = {}) {
   Object.getOwnPropertyNames(attributes).forEach(function(attrName) {
     el.setAttribute(attrName, attributes[attrName]);
   });
+
+  if (content) {
+    appendContent(el, content);
+  }
 
   return el;
 }
@@ -139,6 +149,7 @@ export function textContent(el, text) {
   } else {
     el.textContent = text;
   }
+  return el;
 }
 
 /**

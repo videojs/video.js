@@ -3,6 +3,7 @@
  */
 import window from 'global/window';
 import Component from '../component';
+import {createEl} from '../utils/dom';
 import * as Fn from '../utils/fn';
 import * as Obj from '../utils/obj';
 import log from '../utils/log';
@@ -22,35 +23,126 @@ const LOCAL_STORAGE_KEY = 'vjs-text-track-settings';
 //   The selector used to find the associated <select> element.
 const selectConfigs = {
   backgroundColor: {
-    selector: '.vjs-bg-color > select'
+    selector: '.vjs-bg-color > select',
+    id: 'captions-background-color-%s',
+    label: 'Color',
+    options: [
+      ['#000', 'Black'],
+      ['#FFF', 'White'],
+      ['#F00', 'Red'],
+      ['#0F0', 'Green'],
+      ['#00F', 'Blue'],
+      ['#FF0', 'Yellow'],
+      ['#F0F', 'Magenta'],
+      ['#0FF', 'Cyan']
+    ]
   },
+
   backgroundOpacity: {
-    selector: '.vjs-bg-opacity > select'
+    selector: '.vjs-bg-opacity > select',
+    id: 'captions-background-opacity-%s',
+    label: 'Transparency',
+    options: [
+      ['1', 'Opaque'],
+      ['0.5', 'Semi-Transparent'],
+      ['0', 'Transparent']
+    ]
   },
+
   color: {
-    selector: '.vjs-fg-color > select'
+    selector: '.vjs-fg-color > select',
+    id: 'captions-foreground-color-%s',
+    label: 'Color',
+    options: [
+      ['#FFF', 'White'],
+      ['#000', 'Black'],
+      ['#F00', 'Red'],
+      ['#0F0', 'Green'],
+      ['#00F', 'Blue'],
+      ['#FF0', 'Yellow'],
+      ['#F0F', 'Magenta'],
+      ['#0FF', 'Cyan']
+    ]
   },
+
   edgeStyle: {
-    selector: '.vjs-edge-style > select'
+    selector: '.vjs-edge-style > select',
+    id: '%s',
+    label: 'Text Edge Style',
+    options: [
+      ['none', 'None'],
+      ['raised', 'Raised'],
+      ['depressed', 'Depressed'],
+      ['uniform', 'Uniform'],
+      ['dropshadow', 'Dropshadow']
+    ]
   },
+
   fontFamily: {
-    selector: '.vjs-font-family > select'
+    selector: '.vjs-font-family > select',
+    id: 'captions-font-family-%s',
+    label: 'Font Family',
+    options: [
+      ['proportionalSansSerif', 'Proportional Sans-Serif'],
+      ['monospaceSansSerif', 'Monospace Sans-Serif'],
+      ['proportionalSerif', 'Proportional Serif'],
+      ['monospaceSerif', 'Monospace Serif'],
+      ['casual', 'Casual'],
+      ['script', 'Script'],
+      ['small-caps', 'Small Caps']
+    ]
   },
+
   fontPercent: {
     selector: '.vjs-font-percent > select',
+    id: 'captions-font-size-%s',
+    label: 'Font Size',
+    options: [
+      ['0.50', '50%'],
+      ['0.75', '75%'],
+      ['1.00', '100%'],
+      ['1.25', '125%'],
+      ['1.50', '150%'],
+      ['1.75', '175%'],
+      ['2.00', '200%'],
+      ['3.00', '300%'],
+      ['4.00', '400%']
+    ],
     default: 2,
     parser: (v) => v === '1.00' ? null : Number(v)
   },
+
   textOpacity: {
-    selector: '.vjs-text-opacity > select'
+    selector: '.vjs-text-opacity > select',
+    id: 'captions-foreground-opacity-%s',
+    label: 'Transparency',
+    options: [
+      ['1', 'Opaque'],
+      ['0.5', 'Semi-Opaque']
+    ]
   },
+
+  // Options for this object are defined below.
   windowColor: {
-    selector: '.vjs-window-color > select'
+    selector: '.vjs-window-color > select',
+    id: 'captions-window-color-%s',
+    label: 'Color'
   },
+
+  // Options for this object are defined below.
   windowOpacity: {
-    selector: '.vjs-window-opacity > select'
+    selector: '.vjs-window-opacity > select',
+    id: 'captions-window-opacity-%s',
+    label: 'Transparency',
+    options: [
+      ['0', 'Transparent'],
+      ['0.5', 'Semi-Transparent'],
+      ['1', 'Opaque']
+    ]
   }
 };
+
+selectConfigs.windowColor.options = selectConfigs.backgroundColor.options;
 
 /**
  * Parses out option values.
@@ -108,128 +200,6 @@ function setSelectedOption(el, value, parser) {
   }
 }
 
-function captionOptionsMenuTemplate(uniqueId, dialogLabelId, dialogDescriptionId) {
-  const template = `
-    <div role="document">
-      <div role="heading" aria-level="1" id="${dialogLabelId}" class="vjs-control-text">Captions Settings Dialog</div>
-      <div id="${dialogDescriptionId}" class="vjs-control-text">Beginning of dialog window. Escape will cancel and close the window.</div>
-      <div class="vjs-tracksettings">
-        <div class="vjs-tracksettings-colors">
-          <fieldset class="vjs-fg-color vjs-tracksetting">
-            <legend>Text</legend>
-            <label class="vjs-label" for="captions-foreground-color-${uniqueId}">Color</label>
-            <select id="captions-foreground-color-${uniqueId}">
-              <option value="#FFF" selected>White</option>
-              <option value="#000">Black</option>
-              <option value="#F00">Red</option>
-              <option value="#0F0">Green</option>
-              <option value="#00F">Blue</option>
-              <option value="#FF0">Yellow</option>
-              <option value="#F0F">Magenta</option>
-              <option value="#0FF">Cyan</option>
-            </select>
-            <span class="vjs-text-opacity vjs-opacity">
-              <label class="vjs-label" for="captions-foreground-opacity-${uniqueId}">Transparency</label>
-              <select id="captions-foreground-opacity-${uniqueId}">
-                <option value="1" selected>Opaque</option>
-                <option value="0.5">Semi-Opaque</option>
-              </select>
-            </span>
-          </fieldset>
-          <fieldset class="vjs-bg-color vjs-tracksetting">
-            <legend>Background</legend>
-            <label class="vjs-label" for="captions-background-color-${uniqueId}">Color</label>
-            <select id="captions-background-color-${uniqueId}">
-              <option value="#000" selected>Black</option>
-              <option value="#FFF">White</option>
-              <option value="#F00">Red</option>
-              <option value="#0F0">Green</option>
-              <option value="#00F">Blue</option>
-              <option value="#FF0">Yellow</option>
-              <option value="#F0F">Magenta</option>
-              <option value="#0FF">Cyan</option>
-            </select>
-            <span class="vjs-bg-opacity vjs-opacity">
-              <label class="vjs-label" for="captions-background-opacity-${uniqueId}">Transparency</label>
-              <select id="captions-background-opacity-${uniqueId}">
-                <option value="1" selected>Opaque</option>
-                <option value="0.5">Semi-Transparent</option>
-                <option value="0">Transparent</option>
-              </select>
-            </span>
-          </fieldset>
-          <fieldset class="vjs-window-color vjs-tracksetting">
-            <legend>Window</legend>
-            <label class="vjs-label" for="captions-window-color-${uniqueId}">Color</label>
-            <select id="captions-window-color-${uniqueId}">
-              <option value="#000" selected>Black</option>
-              <option value="#FFF">White</option>
-              <option value="#F00">Red</option>
-              <option value="#0F0">Green</option>
-              <option value="#00F">Blue</option>
-              <option value="#FF0">Yellow</option>
-              <option value="#F0F">Magenta</option>
-              <option value="#0FF">Cyan</option>
-            </select>
-            <span class="vjs-window-opacity vjs-opacity">
-              <label class="vjs-label" for="captions-window-opacity-${uniqueId}">Transparency</label>
-              <select id="captions-window-opacity-${uniqueId}">
-                <option value="0" selected>Transparent</option>
-                <option value="0.5">Semi-Transparent</option>
-                <option value="1">Opaque</option>
-              </select>
-            </span>
-          </fieldset>
-        </div> <!-- vjs-tracksettings-colors -->
-        <div class="vjs-tracksettings-font">
-          <div class="vjs-font-percent vjs-tracksetting">
-            <label class="vjs-label" for="captions-font-size-${uniqueId}">Font Size</label>
-            <select id="captions-font-size-${uniqueId}">
-              <option value="0.50">50%</option>
-              <option value="0.75">75%</option>
-              <option value="1.00" selected>100%</option>
-              <option value="1.25">125%</option>
-              <option value="1.50">150%</option>
-              <option value="1.75">175%</option>
-              <option value="2.00">200%</option>
-              <option value="3.00">300%</option>
-              <option value="4.00">400%</option>
-            </select>
-          </div>
-          <div class="vjs-edge-style vjs-tracksetting">
-            <label class="vjs-label" for="captions-edge-style-${uniqueId}">Text Edge Style</label>
-            <select id="captions-edge-style-${uniqueId}">
-              <option value="none" selected>None</option>
-              <option value="raised">Raised</option>
-              <option value="depressed">Depressed</option>
-              <option value="uniform">Uniform</option>
-              <option value="dropshadow">Dropshadow</option>
-            </select>
-          </div>
-          <div class="vjs-font-family vjs-tracksetting">
-            <label class="vjs-label" for="captions-font-family-${uniqueId}">Font Family</label>
-            <select id="captions-font-family-${uniqueId}">
-              <option value="proportionalSansSerif" selected>Proportional Sans-Serif</option>
-              <option value="monospaceSansSerif">Monospace Sans-Serif</option>
-              <option value="proportionalSerif">Proportional Serif</option>
-              <option value="monospaceSerif">Monospace Serif</option>
-              <option value="casual">Casual</option>
-              <option value="script">Script</option>
-              <option value="small-caps">Small Caps</option>
-            </select>
-          </div>
-        </div> <!-- vjs-tracksettings-font -->
-        <div class="vjs-tracksettings-controls">
-          <button class="vjs-default-button">Defaults</button>
-          <button class="vjs-done-button">Done</button>
-        </div>
-      </div> <!-- vjs-tracksettings -->
-    </div> <!--  role="document" -->
-  `;
-
-  return template;
-}
-
 /**
  * Manipulate settings of text tracks
  *
@@ -242,6 +212,7 @@ class TextTrackSettings extends Component {
 
   constructor(player, options) {
     super(player, options);
+    this.setDefaults();
     this.hide();
 
     this.updateDisplay = Fn.bind(this, this.updateDisplay);
@@ -257,9 +228,7 @@ class TextTrackSettings extends Component {
     });
 
     this.on(this.$('.vjs-default-button'), 'click', () => {
-      Obj.each(selectConfigs, config => {
-        this.$(config.selector).selectedIndex = config.default || 0;
-      });
+      this.setDefaults();
       this.updateDisplay();
     });
 
@@ -273,25 +242,184 @@ class TextTrackSettings extends Component {
   }
 
   /**
+   * Create a <select> element with configured options.
+   *
+   * @private
+   * @return {Element}
+   * @method createElSelect_
+   */
+  createElSelect_(key) {
+    const config = selectConfigs[key];
+    const id = config.id.replace('%s', this.id_);
+
+    return [
+      createEl(
+        'label',
+        {className: 'vjs-label', textContent: config.label},
+        {for: id}),
+      createEl(
+        'select',
+        {id},
+        undefined,
+        config.options.map(o => {
+          return createEl('option', {textContent: o[1], value: o[0]});
+        }))
+    ];
+  }
+
+  /**
+   * Create color elements for the component
+   *
+   * @private
+   * @return {Element}
+   * @method createElColors_
+   */
+  createElColors_() {
+    return createEl(
+      'div',
+      {className: 'vjs-tracksettings-colors'},
+      undefined,
+      [
+        createEl(
+          'fieldset',
+          {className: 'vjs-fg-color vjs-tracksetting'},
+          undefined,
+          [createEl('legend', {textContent: 'Text'})].concat(
+            this.createElSelect_('color'),
+            createEl(
+              'span',
+              {className: 'vjs-text-opacity vjs-opacity'},
+              undefined,
+              this.createElSelect_('textOpacity')))),
+        createEl(
+          'fieldset',
+          {className: 'vjs-bg-color vjs-tracksetting'},
+          undefined,
+          [createEl('legend', {textContent: 'Background'})].concat(
+            this.createElSelect_('backgroundColor'),
+            createEl(
+              'span',
+              {className: 'vjs-bg-opacity vjs-opacity'},
+              undefined,
+              this.createElSelect_('backgroundOpacity')))),
+        createEl(
+          'fieldset',
+          {className: 'vjs-window-color vjs-tracksetting'},
+          undefined,
+          [createEl('legend', {textContent: 'Window'})].concat(
+            this.createElSelect_('windowColor'),
+            createEl(
+              'span',
+              {className: 'vjs-window-opacity vjs-opacity'},
+              undefined,
+              this.createElSelect_('windowOpacity'))))
+      ]);
+  }
+
+  /**
+   * Create font elements for the component
+   *
+   * @private
+   * @return {Element}
+   * @method createElFont_
+   */
+  createElFont_() {
+    return createEl(
+      'div',
+      {className: 'vjs-tracksettings-font'},
+      undefined,
+      [
+        createEl(
+          'div',
+          {className: 'vjs-font-percent vjs-tracksetting'},
+          undefined,
+          this.createElSelect_('fontPercent')),
+        createEl(
+          'div',
+          {className: 'vjs-edge-style vjs-tracksetting'},
+          undefined,
+          this.createElSelect_('edgeStyle')),
+        createEl(
+          'div',
+          {className: 'vjs-font-family vjs-tracksetting'},
+          undefined,
+          this.createElSelect_('fontFamily'))
+      ]);
+  }
+
+  /**
+   * Create controls for the component
+   *
+   * @private
+   * @return {Element}
+   * @method createElControls_
+   */
+  createElControls_() {
+    return createEl(
+      'div',
+      {className: 'vjs-tracksettings-controls'},
+      undefined,
+      [
+        createEl(
+          'button',
+          {className: 'vjs-default-button', textContent: 'Defaults'}),
+        createEl(
+          'button',
+          {className: 'vjs-done-button', textContent: 'Done'})
+      ]);
+  }
+
+  /**
    * Create the component's DOM element
    *
    * @return {Element}
    * @method createEl
    */
   createEl() {
-    const uniqueId = this.id_;
-    const dialogLabelId = 'TTsettingsDialogLabel-' + uniqueId;
-    const dialogDescriptionId = 'TTsettingsDialogDescription-' + uniqueId;
+    const settings = createEl(
+      'div',
+      {className: 'vjs-tracksettings'},
+      undefined,
+      [this.createElColors_(), this.createElFont_(), this.createElControls_()]);
 
-    return super.createEl('div', {
-      className: 'vjs-caption-settings vjs-modal-overlay',
-      innerHTML: captionOptionsMenuTemplate(uniqueId, dialogLabelId, dialogDescriptionId),
-      tabIndex: -1
-    }, {
-      'role': 'dialog',
-      'aria-labelledby': dialogLabelId,
-      'aria-describedby': dialogDescriptionId
-    });
+    const heading = createEl(
+      'div',
+      {
+        className: 'vjs-control-text',
+        id: `TTsettingsDialogLabel-${this.id_}`,
+        textContent: 'Caption Settings Dialog'
+      },
+      {
+        'aria-level': '1',
+        'role': 'heading'
+      });
+
+    const description = createEl(
+      'div',
+      {
+        className: 'vjs-control-text',
+        id: `TTsettingsDialogDescription-${this.id_}`,
+        textContent: 'Beginning of dialog window. Escape will cancel and close the window.'
+      });
+
+    const doc = createEl(
+      'div',
+      undefined,
+      {role: 'document'},
+      [heading, description, settings]);
+
+    return createEl(
+      'div',
+      {
+        className: 'vjs-caption-settings vjs-modal-overlay',
+        tabIndex: -1
+      },
+      {
+        'role': 'dialog',
+        'aria-labelledby': heading.id,
+        'aria-describedby': description.id
+      },
+      doc);
   }
 
   /**
@@ -327,7 +455,20 @@ class TextTrackSettings extends Component {
   }
 
   /**
-   * Restore text track settings
+   * Sets all <select> elements to their default values.
+   *
+   * @method setDefaults
+   */
+  setDefaults() {
+    Obj.each(selectConfigs, config => {
+      const index = config.hasOwnProperty('default') ? config.default : 0;
+
+      this.$(config.selector).selectedIndex = index;
+    });
+  }
+
+  /**
+   * Restore texttrack settings
    *
    * @method restoreSettings
    */
