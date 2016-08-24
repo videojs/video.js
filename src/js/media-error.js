@@ -4,24 +4,45 @@
 import assign from 'object.assign';
 
 /*
- * Custom MediaError to mimic the HTML5 MediaError
+ * Custom MediaError class which mimics the standard HTML5 MediaError class.
  *
- * @param {Number} code The media error code
+ * @param {Number|String|Object|MediaError} value
+ *        This can be of multiple types:
+ *        - Number: should be a standard error code
+ *        - String: an error message (the code will be 0)
+ *        - Object: arbitrary properties
+ *        - MediaError (native): used to populate a video.js MediaError object
+ *        - MediaError (video.js): will return itself if it's already a
+ *          video.js MediaError object.
  */
-let MediaError = function(code){
-  if (typeof code === 'number') {
-    this.code = code;
-  } else if (typeof code === 'string') {
+function MediaError(value) {
+
+  // Allow redundant calls to this constructor to avoid having `instanceof`
+  // checks peppered around the code.
+  if (value instanceof MediaError) {
+    return value;
+  }
+
+  if (typeof value === 'number') {
+    this.code = value;
+  } else if (typeof value === 'string') {
     // default code is zero, so this is a custom error
-    this.message = code;
-  } else if (typeof code === 'object') { // object
-    assign(this, code);
+    this.message = value;
+  } else if (typeof value === 'object') {
+
+    // We assign the `code` property manually because native MediaError objects
+    // do not expose it as an own/enumerable property of the object.
+    if (typeof value.code === 'number') {
+      this.code = value.code;
+    }
+
+    assign(this, value);
   }
 
   if (!this.message) {
     this.message = MediaError.defaultMessages[this.code] || '';
   }
-};
+}
 
 /*
  * The error code that refers two one of the defined
