@@ -45,7 +45,7 @@ const selectConfigs = {
     selector: '.vjs-text-opacity > select'
   },
   windowColor: {
-    selector: '.window-color > select'
+    selector: '.vjs-window-color > select'
   },
   windowOpacity: {
     selector: '.vjs-window-opacity > select'
@@ -102,7 +102,7 @@ function captionOptionsMenuTemplate(uniqueId, dialogLabelId, dialogDescriptionId
               </select>
             </span>
           </fieldset>
-          <fieldset class="window-color vjs-tracksetting">
+          <fieldset class="vjs-window-color vjs-tracksetting">
             <legend>Window</legend>
             <label class="vjs-label" for="captions-window-color-${uniqueId}">Color</label>
             <select id="captions-window-color-${uniqueId}">
