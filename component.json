@@ -1,7 +1,7 @@
 {
   "name": "video.js",
   "description": "An HTML5 and Flash video player with a common API and skin for both.",
-  "version": "5.11.4",
+  "version": "5.11.5",
   "keywords": [
     "videojs",
     "html5",
