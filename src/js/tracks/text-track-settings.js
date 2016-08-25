@@ -231,7 +231,7 @@ function captionOptionsMenuTemplate(uniqueId, dialogLabelId, dialogDescriptionId
 }
 
 /**
- * Manipulate settings of texttracks
+ * Manipulate settings of text tracks
  *
  * @param {Object} player  Main Player
  * @param {Object=} options Object of option names and values
@@ -298,6 +298,7 @@ class TextTrackSettings extends Component {
    * Gets an object of text track settings (or null).
    *
    * @return {Object}
+   *         An object with config values parsed from the DOM or localStorage.
    * @method getValues
    */
   getValues() {
@@ -316,6 +317,7 @@ class TextTrackSettings extends Component {
    * Sets text track settings from an object of values.
    *
    * @param {Object} values
+   *        An object with config values parsed from the DOM or localStorage.
    * @method setValues
    */
   setValues(values) {
@@ -325,7 +327,7 @@ class TextTrackSettings extends Component {
   }
 
   /**
-   * Restore texttrack settings
+   * Restore text track settings
    *
    * @method restoreSettings
    */
@@ -344,7 +346,7 @@ class TextTrackSettings extends Component {
   }
 
   /**
-   * Save texttrack settings to local storage
+   * Save text track settings to local storage
    *
    * @method saveSettings
    */
@@ -367,7 +369,7 @@ class TextTrackSettings extends Component {
   }
 
   /**
-   * Update display of texttrack settings
+   * Update display of text track settings
    *
    * @method updateDisplay
    */
