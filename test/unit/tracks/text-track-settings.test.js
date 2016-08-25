@@ -58,7 +58,7 @@ QUnit.test('should update settings', function(assert) {
                1,
                'bg-color is set to new value');
 
-  assert.equal(player.$('.window-color > select').selectedIndex,
+  assert.equal(player.$('.vjs-window-color > select').selectedIndex,
                1,
                'window-color is set to new value');
 
@@ -103,7 +103,7 @@ QUnit.test('should restore default settings', function(assert) {
 
   player.$('.vjs-fg-color > select').selectedIndex = 1;
   player.$('.vjs-bg-color > select').selectedIndex = 1;
-  player.$('.window-color > select').selectedIndex = 1;
+  player.$('.vjs-window-color > select').selectedIndex = 1;
   player.$('.vjs-text-opacity > select').selectedIndex = 1;
   player.$('.vjs-bg-opacity > select').selectedIndex = 1;
   player.$('.vjs-window-opacity > select').selectedIndex = 1;
@@ -133,7 +133,7 @@ QUnit.test('should restore default settings', function(assert) {
                0,
                'bg-color is set to default value');
 
-  assert.equal(player.$('.window-color > select').selectedIndex,
+  assert.equal(player.$('.vjs-window-color > select').selectedIndex,
                0,
                'window-color is set to default value');
 
