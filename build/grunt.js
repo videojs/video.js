@@ -509,6 +509,7 @@ module.exports = function(grunt) {
     'build',
     'shell:noderequire',
     'shell:browserify',
+    'shell:webpack',
     'karma:defaults'].concat(process.env.TRAVIS && 'coveralls').filter(Boolean));
 
   // Run while developing
