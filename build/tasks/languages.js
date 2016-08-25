@@ -1,8 +1,10 @@
 module.exports = function(grunt) {
   grunt.registerTask('check-translations', 'Check that translations are up to date', function(){
     const source = require('../../lang/en.json');
+    const table = require('markdown-table');
     let doc = grunt.file.read('docs/translations-needed.md');
-    let table = '|---|---|\n';
+    const tableRegex = /(<!-- START langtable -->)(.|\n)*(<!-- END langtable -->)/;
+    let tableData = [['Language file', 'Missing translations']];
 
     grunt.file.recurse('lang', (abspath, rootdir, subdir, filename) => {
       if (filename === 'en.json') {
@@ -18,14 +20,16 @@ module.exports = function(grunt) {
       }
       if (missing.length > 0) {
         grunt.log.error(`${filename} is missing ${missing.length} translations.`);
-        table += `|${filename}|${missing.join('|\n| |')}|\n`;
-        table += `| | (${missing.length}) |\n`;
+        tableData.push([`${filename} (missing ${missing.length})`, missing[0]]);
+        for (var i = 1; i < missing.length; i++) {
+          tableData.push(['', missing[i]]);
+        }
       } else {
         grunt.log.ok(`${filename} is up to date.`);
-        table += `|${filename}|(Complete)|\n`;
+        tableData.push([`${filename} (Complete)`, '']);
       }
     });
-    doc = doc.replace(/\|---\|---\|\n(.*\n)+/, table);
+    doc = doc.replace(tableRegex, `$1\n` + table(tableData) + `\n$3`);
     grunt.file.write('docs/translations-needed.md', doc);
   });
 };

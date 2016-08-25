@@ -33,7 +33,7 @@
   ", selected": ", ausgewählt",
   "Close Modal Dialog": "Modales Fenster schließen",
   "Descriptions": "Beschreibungen",
-  "descriptions off": "Bescreibungen aus",
-  "The media is encrypted and we do not have the keys to decrypt it.": "Die Entschlüsselungsschülssel für den verschlüsselten Medieninhalt sind nicht verfügbar.",
+  "descriptions off": "Beschreibungen aus",
+  "The media is encrypted and we do not have the keys to decrypt it.": "Die Entschlüsselungsschlüssel für den verschlüsselten Medieninhalt sind nicht verfügbar.",
   ", opens descriptions settings dialog": ", öffnet Einstellungen für Beschreibungen"
 }
