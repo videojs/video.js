@@ -35,5 +35,6 @@
   "Descriptions": "Beschreibungen",
   "descriptions off": "Beschreibungen aus",
   "The media is encrypted and we do not have the keys to decrypt it.": "Die Entschlüsselungsschlüssel für den verschlüsselten Medieninhalt sind nicht verfügbar.",
-  ", opens descriptions settings dialog": ", öffnet Einstellungen für Beschreibungen"
+  ", opens descriptions settings dialog": ", öffnet Einstellungen für Beschreibungen",
+  "Audio Track": "Tonspur"
 }
