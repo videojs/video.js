@@ -358,7 +358,7 @@ class TextTrackSettings extends Component {
     const values = this.getValues();
 
     try {
-      if (values) {
+      if (Object.keys(values).length) {
         window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(values));
       } else {
         window.localStorage.removeItem(LOCAL_STORAGE_KEY);
