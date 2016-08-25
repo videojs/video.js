@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @imbcmdth Added exception handling to event dispatcher ([view](https://github.com/videojs/video.js/pull/3580))
 
 --------------------
 
