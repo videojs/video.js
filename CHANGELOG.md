@@ -6,6 +6,9 @@ _(none)_
 
 --------------------
 
+## 5.13.0 (2016-08-25)
+_(none)_
+
 ## 5.12.0 (2016-08-25)
 * @misteroneill, @BrandonOCasey, and @pagarwal123 updates all the code to pass the linter ([view](https://github.com/videojs/video.js/pull/3459))
 * @misteroneill added ghooks to run linter on git push ([view](https://github.com/videojs/video.js/pull/3459))
