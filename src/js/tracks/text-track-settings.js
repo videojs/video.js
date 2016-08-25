@@ -3,8 +3,9 @@
  */
 import window from 'global/window';
 import Component from '../component';
-import * as Fn from '../utils/fn.js';
-import log from '../utils/log.js';
+import * as Fn from '../utils/fn';
+import * as Obj from '../utils/obj';
+import log from '../utils/log';
 
 const LOCAL_STORAGE_KEY = 'vjs-text-track-settings';
 
@@ -49,12 +50,6 @@ const selectConfigs = {
   windowOpacity: {
     selector: '.vjs-window-opacity > select'
   }
-};
-
-const iterateSelectConfigs = (fn) => {
-  Object.keys(selectConfigs).forEach(key => {
-    fn(selectConfigs[key], key);
-  });
 };
 
 function captionOptionsMenuTemplate(uniqueId, dialogLabelId, dialogDescriptionId) {
@@ -206,13 +201,13 @@ class TextTrackSettings extends Component {
     });
 
     this.on(this.$('.vjs-default-button'), 'click', () => {
-      iterateSelectConfigs(config => {
+      Obj.each(selectConfigs, config => {
         this.$(config.selector).selectedIndex = config.default || 0;
       });
       this.updateDisplay();
     });
 
-    iterateSelectConfigs(config => {
+    Obj.each(selectConfigs, config => {
       this.on(this.$(config.selector), 'change', this.updateDisplay);
     });
 
@@ -271,21 +266,18 @@ class TextTrackSettings extends Component {
    * @method getValues
    */
   getValues() {
-    let result = null;
-
-    iterateSelectConfigs((config, key) => {
+    return Obj.reduce(selectConfigs, (accum, config, key) => {
       const el = this.$(config.selector);
       let value = el.options[el.options.selectedIndex].value;
 
       value = this.parseOptionValue_(value, config.parser);
 
       if (value !== undefined) {
-        result = result || {};
-        result[key] = value;
+        accum[key] = value;
       }
-    });
 
-    return result;
+      return accum;
+    }, {});
   }
 
   /**
@@ -295,7 +287,7 @@ class TextTrackSettings extends Component {
    * @method setValues
    */
   setValues(values) {
-    iterateSelectConfigs((config, key) => {
+    Obj.each(selectConfigs, (config, key) => {
       const value = values[key];
 
       if (!value) {
