@@ -30,5 +30,11 @@
   "This modal can be closed by pressing the Escape key or activating the close button.": "Durch Drücken der Esc-Taste bzw. Betätigung der Schaltfläche \"Schließen\" wird dieses modale Fenster geschlossen.",
   ", opens captions settings dialog": ", öffnet Einstellungen für Untertitel",
   ", opens subtitles settings dialog": ", öffnet Einstellungen für Untertitel",
-  ", selected": " (ausgewählt)"
+  ", selected": ", ausgewählt",
+  "Close Modal Dialog": "Modales Fenster schließen",
+  "Descriptions": "Beschreibungen",
+  "descriptions off": "Beschreibungen aus",
+  "The media is encrypted and we do not have the keys to decrypt it.": "Die Entschlüsselungsschlüssel für den verschlüsselten Medieninhalt sind nicht verfügbar.",
+  ", opens descriptions settings dialog": ", öffnet Einstellungen für Beschreibungen",
+  "Audio Track": "Tonspur"
 }

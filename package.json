@@ -93,6 +93,7 @@
     "karma-safari-launcher": "^1.0.0",
     "karma-sinon": "^1.0.5",
     "load-grunt-tasks": "^3.1.0",
+    "markdown-table": "^1.0.0",
     "proxyquireify": "^3.0.0",
     "qunitjs": "^1.23.1",
     "sinon": "^1.16.1",
