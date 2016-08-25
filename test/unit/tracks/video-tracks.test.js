@@ -106,4 +106,6 @@ QUnit.test('when switching techs, we should not get a new video track', function
   const secondTracks = player.videoTracks();
 
   assert.ok(firstTracks === secondTracks, 'the tracks are equal');
+
+  player.dispose();
 });

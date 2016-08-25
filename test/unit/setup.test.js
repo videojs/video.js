@@ -14,4 +14,5 @@ QUnit.test('should set options from data-setup even if autoSetup is not called b
   assert.ok(player.options_.controls === true);
   assert.ok(player.options_.autoplay === false);
   assert.ok(player.options_.preload === 'auto');
+  player.dispose();
 });

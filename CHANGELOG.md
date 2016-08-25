@@ -19,6 +19,7 @@ CHANGELOG
 * greenkeeper updated grunt-concurrent ([view](https://github.com/videojs/video.js/pull/3532))
 * greenkeeper updated karma-chrome-launcher ([view](https://github.com/videojs/video.js/pull/3553))
 * @gkatsev added tests for webpack and browserify bundling and node.js requiring ([view](https://github.com/videojs/video.js/pull/3558))
+* @rlchung fixed tests that weren't disposing players when they finished ([view](https://github.com/videojs/video.js/pull/3524))
 
 --------------------
 

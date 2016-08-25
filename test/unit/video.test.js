@@ -129,6 +129,7 @@ QUnit.test('should expose plugin registry function', function(assert) {
 
   assert.ok(player.foo, 'should exist');
   assert.equal(player.foo, pluginFunction, 'should be equal');
+  player.dispose();
 });
 
 QUnit.test('should expose options and players properties for backward-compatibility', function(assert) {

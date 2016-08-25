@@ -24,4 +24,6 @@ QUnit.test('should localize its text', function(assert) {
   assert.ok(el.nodeName.toLowerCase().match('button'));
   assert.ok(el.innerHTML.match(/vjs-control-text"?>Juego/));
   assert.equal(el.getAttribute('title'), 'Juego');
+  player.dispose();
+
 });
