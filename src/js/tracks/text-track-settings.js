@@ -52,6 +52,62 @@ const selectConfigs = {
   }
 };
 
+/**
+ * Parses out option values.
+ *
+ * @private
+ * @param  {String} value
+ * @param  {Function} [parser]
+ *         Optional function to adjust the value.
+ * @return {Mixed}
+ *         Will be `undefined` if no value exists (or if given value is "none").
+ */
+function parseOptionValue(value, parser) {
+  if (parser) {
+    value = parser(value);
+  }
+
+  if (value && value !== 'none') {
+    return value;
+  }
+}
+
+/**
+ * Gets the value of the selected <option> element within a <select> element.
+ *
+ * @param  {Object} config
+ * @param  {Function} [parser]
+ *         Optional function to adjust the value.
+ * @return {Mixed}
+ */
+function getSelectedOptionValue(el, parser) {
+  const value = el.options[el.options.selectedIndex].value;
+
+  return parseOptionValue(value, parser);
+}
+
+/**
+ * Sets the selected <option> element within a <select> element based on a
+ * given value.
+ *
+ * @param {Object} el
+ * @param {String} value
+ * @param {Function} [parser]
+ *        Optional function to adjust the value before comparing.
+ */
+function setSelectedOption(el, value, parser) {
+  if (!value) {
+    return;
+  }
+
+  for (let i = 0; i < el.options.length; i++) {
+    if (parseOptionValue(el.options[i].value, parser) === value) {
+      el.selectedIndex = i;
+      break;
+    }
+  }
+}
+
 function captionOptionsMenuTemplate(uniqueId, dialogLabelId, dialogDescriptionId) {
   const template = `
     <div role="document">
@@ -239,38 +295,14 @@ class TextTrackSettings extends Component {
   }
 
   /**
-   * Parses out option values.
-   *
-   * @private
-   * @param  {String} value
-   * @param  {Function} [parser]
-   *         Optional function to adjust the value.
-   * @return {Mixed}
-   *         Will be `undefined` if no value exists (or if given value is "none").
-   * @method parseOptionValue_
-   */
-  parseOptionValue_(value, parser) {
-    if (parser) {
-      value = parser(value);
-    }
-
-    if (value && value !== 'none') {
-      return value;
-    }
-  }
-
-  /**
    * Gets an object of text track settings (or null).
    *
-   * @return {Object|null}
+   * @return {Object}
    * @method getValues
    */
   getValues() {
     return Obj.reduce(selectConfigs, (accum, config, key) => {
-      const el = this.$(config.selector);
-      let value = el.options[el.options.selectedIndex].value;
-
-      value = this.parseOptionValue_(value, config.parser);
+      const value = getSelectedOptionValue(this.$(config.selector), config.parser);
 
       if (value !== undefined) {
         accum[key] = value;
@@ -288,24 +320,7 @@ class TextTrackSettings extends Component {
    */
   setValues(values) {
     Obj.each(selectConfigs, (config, key) => {
-      const value = values[key];
-
-      if (!value) {
-        return;
-      }
-
-      const el = this.$(config.selector);
-
-      // Find the option that should be selected by comparing value(s) and
-      // setting the `selectedIndex` of the <select> element if we find it.
-      for (let i = 0; i < el.options.length; i++) {
-        const opt = this.parseOptionValue_(el.options[i].value, config.parser);
-
-        if (opt === value) {
-          el.selectedIndex = i;
-          break;
-        }
-      }
+      setSelectedOption(this.$(config.selector), values[key], config.parser);
     });
   }
 
