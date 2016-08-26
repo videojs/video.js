@@ -982,6 +982,42 @@ class Component {
   }
 
   /**
+   * Get the value of an attribute on the component's element
+   *
+   * @param {String} attribute Attribute to get
+   * @return {String}
+   * @method getAttribute
+   */
+  getAttribute(attribute) {
+    return Dom.getAttribute(this.el_, attribute);
+  }
+
+  /**
+   * Set the value of an attribute on the component's element
+   *
+   * @param {String} attribute Attribute to set
+   * @param {String} value Value to set the attribute to
+   * @return {Component}
+   * @method setAttribute
+   */
+  setAttribute(attribute, value) {
+    Dom.setAttribute(this.el_, attribute, value);
+    return this;
+  }
+
+  /**
+   * Remove an attribute from the component's element
+   *
+   * @param {String} attribute Attribute to remove
+   * @return {Component}
+   * @method removeAttribute
+   */
+  removeAttribute(attribute) {
+    Dom.removeAttribute(this.el_, attribute);
+    return this;
+  }
+
+  /**
    * Set or get the width of the component (CSS values)
    * Setting the video tag dimension values only works with values in pixels.
    * Percent values will not work.
