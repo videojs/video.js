@@ -124,7 +124,7 @@ QUnit.test('should get current source from source tag', function(assert) {
   const fixture = document.getElementById('qunit-fixture');
 
   const html = [
-    '<video id="example_1" class="video-js" autoplay preload="none">',
+    '<video id="example_1" class="video-js" preload="none">',
     '<source src="http://google.com" type="video/mp4">',
     '<source src="http://hugo.com" type="video/webm">',
     '</video>'
@@ -143,7 +143,7 @@ QUnit.test('should get current sources from source tag', function(assert) {
   const fixture = document.getElementById('qunit-fixture');
 
   const html = [
-    '<video id="example_1" class="video-js" autoplay preload="none">',
+    '<video id="example_1" class="video-js" preload="none">',
     '<source src="http://google.com" type="video/mp4">',
     '<source src="http://hugo.com" type="video/webm">',
     '</video>'
@@ -158,20 +158,29 @@ QUnit.test('should get current sources from source tag', function(assert) {
   assert.ok(player.currentSources()[0].type === 'video/mp4');
   assert.ok(player.currentSources()[1].src === 'http://hugo.com');
   assert.ok(player.currentSources()[1].type === 'video/webm');
+
+  // when redefining src expect sources to update accordingly
+  player.src('http://google.com');
+
+  assert.ok(player.currentSources()[0].src === 'http://google.com');
+  assert.ok(player.currentSources()[0].type === undefined);
+  assert.ok(player.currentSources()[1] === undefined);
 });
 
 QUnit.test('should get current source from src set', function(assert) {
   const fixture = document.getElementById('qunit-fixture');
 
-  const html = '<video id="example_1" class="video-js" autoplay preload="none"></video>';
+  const html = '<video id="example_1" class="video-js" preload="none"></video>';
 
   fixture.innerHTML += html;
 
   const tag = document.getElementById('example_1');
   const player = TestHelpers.makePlayer({}, tag);
 
-  // check for empty object
-  assert.ok(Object.keys(player.currentSource()).length === 0);
+  player.loadTech_('Html5');
+
+  // check for matching undefined src
+  assert.ok(player.currentSource().src === player.currentSrc());
 
   player.src('http://google.com');
 
@@ -197,15 +206,17 @@ QUnit.test('should get current source from src set', function(assert) {
 QUnit.test('should get current sources from src set', function(assert) {
   const fixture = document.getElementById('qunit-fixture');
 
-  const html = '<video id="example_1" class="video-js" autoplay preload="none"></video>';
+  const html = '<video id="example_1" class="video-js" preload="none"></video>';
 
   fixture.innerHTML += html;
 
   const tag = document.getElementById('example_1');
   const player = TestHelpers.makePlayer({}, tag);
 
-  // check for empty object
-  assert.ok(Object.keys(player.currentSources()[0]).length === 0);
+  player.loadTech_('Html5');
+
+  // check for matching undefined src
+  assert.ok(player.currentSource().src === player.currentSrc());
 
   player.src([{
     src: 'http://google.com'
@@ -230,6 +241,13 @@ QUnit.test('should get current sources from src set', function(assert) {
   assert.ok(player.currentSources()[0].type === 'video/mp4');
   assert.ok(player.currentSources()[1].src === 'http://hugo.com');
   assert.ok(player.currentSources()[1].type === 'video/webm');
+
+  // when redefining src expect sources to update accordingly
+  player.src('http://hugo.com');
+
+  assert.ok(player.currentSources()[0].src === 'http://hugo.com');
+  assert.ok(player.currentSources()[0].type === undefined);
+  assert.ok(player.currentSources()[1] === undefined);
 });
 
 QUnit.test('should asynchronously fire error events during source selection', function(assert) {

@@ -619,6 +619,7 @@ class Player extends Component {
         techOptions.startTime = this.cache_.currentTime;
       }
 
+      this.cache_.sources = null;
       this.cache_.source = source;
       this.cache_.src = source.src;
     }
@@ -1977,8 +1978,10 @@ class Player extends Component {
         // the tech loop to check for a compatible technology
         this.sourceList_([source]);
       } else {
+        this.cache_.sources = null;
         this.cache_.source = source;
         this.cache_.src = source.src;
+
         this.currentType_ = source.type || '';
 
         // wait until the tech is ready to set the source
@@ -2083,7 +2086,7 @@ class Player extends Component {
    * @method currentSource
    */
   currentSource() {
-    return this.cache_.source || {};
+    return this.cache_.source || { src: this.currentSrc() };
   }
 
   /**
