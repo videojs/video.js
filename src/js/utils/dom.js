@@ -405,6 +405,41 @@ export function getElAttributes(tag) {
 }
 
 /**
+ * Get the value of an element's attribute
+ *
+ * @param {Element} el
+ * @param {String} attribute Attribute to get
+ * @return {String} value of the attribute
+ * @method getAttribute
+ */
+export function getAttribute(el, attribute) {
+  return el.getAttribute(attribute);
+}
+
+/**
+ * Set the value of an element's attribute
+ *
+ * @param {Element} el
+ * @param {String} attribute Attribute to set
+ * @param {String} value Value to set the attribute to
+ * @method setAttribute
+ */
+export function setAttribute(el, attribute, value) {
+  el.setAttribute(attribute, value);
+}
+
+/**
+ * Remove an element's attribute
+ *
+ * @param {Element} el
+ * @param {String} attribute Attribute to remove
+ * @method removeAttribute
+ */
+export function removeAttribute(el, attribute) {
+  el.removeAttribute(attribute);
+}
+
+/**
  * Attempt to block the ability to select text while dragging controls
  *
  * @return {Boolean}
