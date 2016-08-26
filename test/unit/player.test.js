@@ -120,6 +120,118 @@ QUnit.test('should get tag, source, and track settings', function(assert) {
   assert.equal(player.el(), null, 'player el killed');
 });
 
+QUnit.test('should get current source from source tag', function(assert) {
+  const fixture = document.getElementById('qunit-fixture');
+
+  const html = [
+    '<video id="example_1" class="video-js" autoplay preload="none">',
+    '<source src="http://google.com" type="video/mp4">',
+    '<source src="http://hugo.com" type="video/webm">',
+    '</video>'
+  ].join('');
+
+  fixture.innerHTML += html;
+
+  const tag = document.getElementById('example_1');
+  const player = TestHelpers.makePlayer({}, tag);
+
+  assert.ok(player.currentSource().src === 'http://google.com');
+  assert.ok(player.currentSource().type === 'video/mp4');
+});
+
+QUnit.test('should get current sources from source tag', function(assert) {
+  const fixture = document.getElementById('qunit-fixture');
+
+  const html = [
+    '<video id="example_1" class="video-js" autoplay preload="none">',
+    '<source src="http://google.com" type="video/mp4">',
+    '<source src="http://hugo.com" type="video/webm">',
+    '</video>'
+  ].join('');
+
+  fixture.innerHTML += html;
+
+  const tag = document.getElementById('example_1');
+  const player = TestHelpers.makePlayer({}, tag);
+
+  assert.ok(player.currentSources()[0].src === 'http://google.com');
+  assert.ok(player.currentSources()[0].type === 'video/mp4');
+  assert.ok(player.currentSources()[1].src === 'http://hugo.com');
+  assert.ok(player.currentSources()[1].type === 'video/webm');
+});
+
+QUnit.test('should get current source from src set', function(assert) {
+  const fixture = document.getElementById('qunit-fixture');
+
+  const html = '<video id="example_1" class="video-js" autoplay preload="none"></video>';
+
+  fixture.innerHTML += html;
+
+  const tag = document.getElementById('example_1');
+  const player = TestHelpers.makePlayer({}, tag);
+
+  // check for empty object
+  assert.ok(Object.keys(player.currentSource()).length === 0);
+
+  player.src('http://google.com');
+
+  assert.ok(player.currentSource().src === 'http://google.com');
+  assert.ok(player.currentSource().type === undefined);
+
+  player.src({
+    src: 'http://google.com'
+  });
+
+  assert.ok(player.currentSource().src === 'http://google.com');
+  assert.ok(player.currentSource().type === undefined);
+
+  player.src({
+    src: 'http://google.com',
+    type: 'video/mp4'
+  });
+
+  assert.ok(player.currentSource().src === 'http://google.com');
+  assert.ok(player.currentSource().type === 'video/mp4');
+});
+
+QUnit.test('should get current sources from src set', function(assert) {
+  const fixture = document.getElementById('qunit-fixture');
+
+  const html = '<video id="example_1" class="video-js" autoplay preload="none"></video>';
+
+  fixture.innerHTML += html;
+
+  const tag = document.getElementById('example_1');
+  const player = TestHelpers.makePlayer({}, tag);
+
+  // check for empty object
+  assert.ok(Object.keys(player.currentSources()[0]).length === 0);
+
+  player.src([{
+    src: 'http://google.com'
+  }, {
+    src: 'http://hugo.com'
+  }]);
+
+  assert.ok(player.currentSources()[0].src === 'http://google.com');
+  assert.ok(player.currentSources()[0].type === undefined);
+  assert.ok(player.currentSources()[1].src === 'http://hugo.com');
+  assert.ok(player.currentSources()[1].type === undefined);
+
+  player.src([{
+    src: 'http://google.com',
+    type: 'video/mp4'
+  }, {
+    src: 'http://hugo.com',
+    type: 'video/webm'
+  }]);
+
+  assert.ok(player.currentSources()[0].src === 'http://google.com');
+  assert.ok(player.currentSources()[0].type === 'video/mp4');
+  assert.ok(player.currentSources()[1].src === 'http://hugo.com');
+  assert.ok(player.currentSources()[1].type === 'video/webm');
+});
+
 QUnit.test('should asynchronously fire error events during source selection', function(assert) {
   assert.expect(2);
 

@@ -614,10 +614,12 @@ class Player extends Component {
 
     if (source) {
       this.currentType_ = source.type;
+
       if (source.src === this.cache_.src && this.cache_.currentTime > 0) {
         techOptions.startTime = this.cache_.currentTime;
       }
 
+      this.cache_.source = source;
       this.cache_.src = source.src;
     }
 
@@ -1975,6 +1977,7 @@ class Player extends Component {
         // the tech loop to check for a compatible technology
         this.sourceList_([source]);
       } else {
+        this.cache_.source = source;
         this.cache_.src = source.src;
         this.currentType_ = source.type || '';
 
@@ -2025,6 +2028,8 @@ class Player extends Component {
         // load this technology with the chosen source
         this.loadTech_(sourceTech.tech, sourceTech.source);
       }
+
+      this.cache_.sources = sources;
     } else {
       // We need to wrap this in a timeout to give folks a chance to add error event handlers
       this.setTimeout(function() {
@@ -2059,6 +2064,26 @@ class Player extends Component {
     this.loadTech_(toTitleCase(this.options_.techOrder[0]), null);
     this.techCall_('reset');
     return this;
+  }
+
+  /**
+   * Returns the current source objects.
+   *
+   * @return {Object[]} The current source objects
+   * @method currentSources
+   */
+  currentSources() {
+    return this.cache_.sources || [this.currentSource()];
+  }
+
+  /**
+   * Returns the current source object.
+   *
+   * @return {Object} The current source object
+   * @method currentSource
+   */
+  currentSource() {
+    return this.cache_.source || {};
   }
 
   /**
