@@ -135,7 +135,7 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| fr.json (missing 1)     | The media is encrypted and we do not have the keys to decrypt it.                   |
+| fr.json (Complete)      |                                                                                     |
 | hr.json (missing 14)    | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
