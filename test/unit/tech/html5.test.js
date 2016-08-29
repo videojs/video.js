@@ -110,10 +110,12 @@ QUnit.test('patchCanPlayType patches canplaytype with our function, conditionall
   Html5.unpatchCanPlayType();
 
   const oldAV = browser.ANDROID_VERSION;
+  const oldIsFirefox = browser.IS_FIREFOX;
   const video = document.createElement('video');
   const canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
 
   browser.ANDROID_VERSION = 4.0;
+  browser.IS_FIREFOX = false;
   Html5.patchCanPlayType();
 
   assert.notStrictEqual(video.canPlayType,
@@ -131,14 +133,17 @@ QUnit.test('patchCanPlayType patches canplaytype with our function, conditionall
                     'patched canPlayType and function returned from unpatch are equal');
 
   browser.ANDROID_VERSION = oldAV;
+  browser.IS_FIREFOX = oldIsFirefox;
   Html5.unpatchCanPlayType();
 });
 
 QUnit.test('should return maybe for HLS urls on Android 4.0 or above', function(assert) {
   const oldAV = browser.ANDROID_VERSION;
+  const oldIsFirefox = browser.IS_FIREFOX;
   const video = document.createElement('video');
 
   browser.ANDROID_VERSION = 4.0;
+  browser.IS_FIREFOX = false;
   Html5.patchCanPlayType();
 
   assert.strictEqual(video.canPlayType('application/x-mpegurl'),
@@ -157,6 +162,7 @@ QUnit.test('should return maybe for HLS urls on Android 4.0 or above', function(
                     'maybe for vnd.apple.mpegurl');
 
   browser.ANDROID_VERSION = oldAV;
+  browser.IS_FIREFOX = oldIsFirefox;
   Html5.unpatchCanPlayType();
 });
 
