@@ -137,6 +137,28 @@ QUnit.test('patchCanPlayType patches canplaytype with our function, conditionall
   Html5.unpatchCanPlayType();
 });
 
+QUnit.test('patchCanPlayType doesn\'t patch canplaytype with our function in Firefox for Android', function(assert) {
+  // the patch runs automatically so we need to first unpatch
+  Html5.unpatchCanPlayType();
+
+  const oldAV = browser.ANDROID_VERSION;
+  const oldIsFirefox = browser.IS_FIREFOX;
+  const video = document.createElement('video');
+  const canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
+
+  browser.ANDROID_VERSION = 4.0;
+  browser.IS_FIREFOX = true;
+  Html5.patchCanPlayType();
+
+  assert.strictEqual(video.canPlayType,
+                 canPlayType,
+                 'original canPlayType and patched canPlayType should not be equal');
+
+  browser.ANDROID_VERSION = oldAV;
+  browser.IS_FIREFOX = oldIsFirefox;
+  Html5.unpatchCanPlayType();
+});
+
 QUnit.test('should return maybe for HLS urls on Android 4.0 or above', function(assert) {
   const oldAV = browser.ANDROID_VERSION;
   const oldIsFirefox = browser.IS_FIREFOX;
