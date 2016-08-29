@@ -152,7 +152,7 @@ QUnit.test('patchCanPlayType doesn\'t patch canplaytype with our function in Fir
 
   assert.strictEqual(video.canPlayType,
                  canPlayType,
-                 'original canPlayType and patched canPlayType should not be equal');
+                 'original canPlayType and patched canPlayType should be equal');
 
   browser.ANDROID_VERSION = oldAV;
   browser.IS_FIREFOX = oldIsFirefox;
