@@ -17,6 +17,44 @@ import assign from 'object.assign';
 import mergeOptions from '../utils/merge-options.js';
 import toTitleCase from '../utils/to-title-case.js';
 
+const NATIVE_GET = [
+  'paused',
+  'currentTime',
+  'buffered',
+  'volume',
+  'muted',
+  'poster',
+  'preload',
+  'autoplay',
+  'loop',
+  'error',
+  'seeking',
+  'seekable',
+  'ended',
+  'defaultMuted',
+  'playbackRate',
+  'played',
+  'networkState',
+  'readyState',
+  'videoWidth',
+  'videoHeight'
+];
+const NATIVE_SET = [
+  'volume',
+  'muted',
+  'src',
+  'poster',
+  'preload',
+  'autoplay',
+  'loop',
+  'playbackRate'
+];
+
+const NATIVE_FN = [
+  'pause',
+  'load'
+];
+
 /**
  * HTML5 Media Controller - Wrapper for HTML5 Media API
  *
@@ -29,6 +67,22 @@ class Html5 extends Tech {
 
   constructor(options, ready) {
     super(options, ready);
+
+    NATIVE_GET.forEach((prop) => {
+      this[prop] = () => this.el_[prop];
+    });
+
+    NATIVE_SET.forEach((prop) => {
+      const setterName = `set${toTitleCase(prop)}`;
+
+      this[setterName] = (v) => {
+        this.el_[prop] = v;
+      };
+    });
+
+    NATIVE_FN.forEach((prop) => {
+      this[prop] = () => this.el_[prop]();
+    });
 
     const source = options.source;
     let crossoriginTracks = false;
@@ -78,25 +132,39 @@ class Html5 extends Tech {
       }
     }
 
+    // TODO: add text tracks into this list
     const trackTypes = ['audio', 'video'];
 
-    // ProxyNativeTextTracks
+    // ProxyNative Video/Audio Track
     trackTypes.forEach((type) => {
+      const elTracks = this.el()[`${type}Tracks`];
+      const techTracks = this[`${type}Tracks`]();
       const capitalType = toTitleCase(type);
 
-      if (!this[`featuresNative${capitalType}Tracks`]) {
+      if (!this[`featuresNative${capitalType}Tracks`] ||
+          !elTracks ||
+          !elTracks.addEventListener) {
         return;
       }
-      const tl = this.el()[`${type}Tracks`];
 
-      if (tl && tl.addEventListener) {
-        tl.addEventListener('change', Fn.bind(this, this[`handle${capitalType}TrackChange_`]));
-        tl.addEventListener('addtrack', Fn.bind(this, this[`handle${capitalType}TrackAdd_`]));
-        tl.addEventListener('removetrack', Fn.bind(this, this[`handle${capitalType}TrackRemove_`]));
+      this[`handle${capitalType}TrackChange_`] = (e) => {
+        techTracks.trigger({
+          type: 'change',
+          target: techTracks,
+          currentTarget: techTracks,
+          srcElement: techTracks
+        });
+      };
+      this[`handle${capitalType}TrackAdd_`] = (e) => techTracks.addTrack(e.track);
+      this[`handle${capitalType}TrackRemove_`] = (e) => techTracks.removetrack(e.track);
 
-        // Remove (native) trackts that are not used anymore
-        this.on('loadstart', this[`removeOld${capitalType}Tracks_`]);
-      }
+      elTracks.addEventListener('change', this[`handle${capitalType}TrackChange_`]);
+      elTracks.addEventListener('addtrack', this[`handle${capitalType}TrackAdd_`]);
+      elTracks.addEventListener('removetrack', this[`handle${capitalType}TrackRemove_`]);
+      this[`removeOld${capitalType}Tracks_`] = (e) => this.removeOldTracks_(techTracks, elTracks);
+
+      // Remove (native) trackts that are not used anymore
+      this.on('loadstart', this[`removeOld${capitalType}Tracks_`]);
     });
 
     if (this.featuresNativeTextTracks) {
@@ -333,44 +401,6 @@ class Html5 extends Tech {
     this.textTracks().removeTrack_(e.track);
   }
 
-  handleVideoTrackChange_(e) {
-    const vt = this.videoTracks();
-
-    this.videoTracks().trigger({
-      type: 'change',
-      target: vt,
-      currentTarget: vt,
-      srcElement: vt
-    });
-  }
-
-  handleVideoTrackAdd_(e) {
-    this.videoTracks().addTrack_(e.track);
-  }
-
-  handleVideoTrackRemove_(e) {
-    this.videoTracks().removeTrack_(e.track);
-  }
-
-  handleAudioTrackChange_(e) {
-    const audioTrackList = this.audioTracks();
-
-    this.audioTracks().trigger({
-      type: 'change',
-      target: audioTrackList,
-      currentTarget: audioTrackList,
-      srcElement: audioTrackList
-    });
-  }
-
-  handleAudioTrackAdd_(e) {
-    this.audioTracks().addTrack_(e.track);
-  }
-
-  handleAudioTrackRemove_(e) {
-    this.audioTracks().removeTrack_(e.track);
-  }
-
   /**
    * This is a helper function that is used in removeOldTextTracks_, removeOldAudioTracks_ and
    * removeOldVideoTracks_
@@ -417,20 +447,6 @@ class Html5 extends Tech {
     this.removeOldTracks_(techTracks, elTracks);
   }
 
-  removeOldAudioTracks_() {
-    const techTracks = this.audioTracks();
-    const elTracks = this.el().audioTracks;
-
-    this.removeOldTracks_(techTracks, elTracks);
-  }
-
-  removeOldVideoTracks_() {
-    const techTracks = this.videoTracks();
-    const elTracks = this.el().videoTracks;
-
-    this.removeOldTracks_(techTracks, elTracks);
-  }
-
   /**
    * Play for html5 tech
    *
@@ -444,35 +460,6 @@ class Html5 extends Tech {
     if (playPromise !== undefined && typeof playPromise.then === 'function') {
       playPromise.then(null, (e) => {});
     }
-  }
-
-  /**
-   * Pause for html5 tech
-   *
-   * @method pause
-   */
-  pause() {
-    this.el_.pause();
-  }
-
-  /**
-   * Paused for html5 tech
-   *
-   * @return {Boolean}
-   * @method paused
-   */
-  paused() {
-    return this.el_.paused;
-  }
-
-  /**
-   * Get current time
-   *
-   * @return {Number}
-   * @method currentTime
-   */
-  currentTime() {
-    return this.el_.currentTime;
   }
 
   /**
@@ -498,58 +485,6 @@ class Html5 extends Tech {
    */
   duration() {
     return this.el_.duration || 0;
-  }
-
-  /**
-   * Get a TimeRange object that represents the intersection
-   * of the time ranges for which the user agent has all
-   * relevant media
-   *
-   * @return {TimeRangeObject}
-   * @method buffered
-   */
-  buffered() {
-    return this.el_.buffered;
-  }
-
-  /**
-   * Get volume level
-   *
-   * @return {Number}
-   * @method volume
-   */
-  volume() {
-    return this.el_.volume;
-  }
-
-  /**
-   * Set volume level
-   *
-   * @param {Number} percentAsDecimal Volume percent as a decimal
-   * @method setVolume
-   */
-  setVolume(percentAsDecimal) {
-    this.el_.volume = percentAsDecimal;
-  }
-
-  /**
-   * Get if muted
-   *
-   * @return {Boolean}
-   * @method muted
-   */
-  muted() {
-    return this.el_.muted;
-  }
-
-  /**
-   * Set muted
-   *
-   * @param {Boolean} If player is to be muted or note
-   * @method setMuted
-   */
-  setMuted(muted) {
-    this.el_.muted = muted;
   }
 
   /**
@@ -650,26 +585,6 @@ class Html5 extends Tech {
   }
 
   /**
-   * Set video
-   *
-   * @param {Object} src Source object
-   * @deprecated
-   * @method setSrc
-   */
-  setSrc(src) {
-    this.el_.src = src;
-  }
-
-  /**
-   * Load media into player
-   *
-   * @method load
-   */
-  load() {
-    this.el_.load();
-  }
-
-  /**
    * Reset the tech. Removes all sources and calls `load`.
    *
    * @method reset
@@ -692,76 +607,6 @@ class Html5 extends Tech {
   }
 
   /**
-   * Get poster
-   *
-   * @return {String}
-   * @method poster
-   */
-  poster() {
-    return this.el_.poster;
-  }
-
-  /**
-   * Set poster
-   *
-   * @param {String} val URL to poster image
-   * @method
-   */
-  setPoster(val) {
-    this.el_.poster = val;
-  }
-
-  /**
-   * Get preload attribute
-   *
-   * @return {String}
-   * @method preload
-   */
-  preload() {
-    return this.el_.preload;
-  }
-
-  /**
-   * Set preload attribute
-   *
-   * @param {String} val Value for preload attribute
-   * @method setPreload
-   */
-  setPreload(val) {
-    this.el_.preload = val;
-  }
-
-  /**
-   * Get autoplay attribute
-   *
-   * @return {String}
-   * @method autoplay
-   */
-  autoplay() {
-    return this.el_.autoplay;
-  }
-
-  /**
-   * Set autoplay attribute
-   *
-   * @param {String} val Value for preload attribute
-   * @method setAutoplay
-   */
-  setAutoplay(val) {
-    this.el_.autoplay = val;
-  }
-
-  /**
-   * Get controls attribute
-   *
-   * @return {String}
-   * @method controls
-   */
-  controls() {
-    return this.el_.controls;
-  }
-
-  /**
    * Set controls attribute
    *
    * @param {String} val Value for controls attribute
@@ -769,173 +614,6 @@ class Html5 extends Tech {
    */
   setControls(val) {
     this.el_.controls = !!val;
-  }
-
-  /**
-   * Get loop attribute
-   *
-   * @return {String}
-   * @method loop
-   */
-  loop() {
-    return this.el_.loop;
-  }
-
-  /**
-   * Set loop attribute
-   *
-   * @param {String} val Value for loop attribute
-   * @method setLoop
-   */
-  setLoop(val) {
-    this.el_.loop = val;
-  }
-
-  /**
-   * Get error value
-   *
-   * @return {String}
-   * @method error
-   */
-  error() {
-    return this.el_.error;
-  }
-
-  /**
-   * Get whether or not the player is in the "seeking" state
-   *
-   * @return {Boolean}
-   * @method seeking
-   */
-  seeking() {
-    return this.el_.seeking;
-  }
-
-  /**
-   * Get a TimeRanges object that represents the
-   * ranges of the media resource to which it is possible
-   * for the user agent to seek.
-   *
-   * @return {TimeRangeObject}
-   * @method seekable
-   */
-  seekable() {
-    return this.el_.seekable;
-  }
-
-  /**
-   * Get if video ended
-   *
-   * @return {Boolean}
-   * @method ended
-   */
-  ended() {
-    return this.el_.ended;
-  }
-
-  /**
-   * Get the value of the muted content attribute
-   * This attribute has no dynamic effect, it only
-   * controls the default state of the element
-   *
-   * @return {Boolean}
-   * @method defaultMuted
-   */
-  defaultMuted() {
-    return this.el_.defaultMuted;
-  }
-
-  /**
-   * Get desired speed at which the media resource is to play
-   *
-   * @return {Number}
-   * @method playbackRate
-   */
-  playbackRate() {
-    return this.el_.playbackRate;
-  }
-
-  /**
-   * Returns a TimeRanges object that represents the ranges of the
-   * media resource that the user agent has played.
-   * @return {TimeRangeObject} the range of points on the media
-   * timeline that has been reached through normal playback
-   * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-played
-   */
-  played() {
-    return this.el_.played;
-  }
-
-  /**
-   * Set desired speed at which the media resource is to play
-   *
-   * @param {Number} val Speed at which the media resource is to play
-   * @method setPlaybackRate
-   */
-  setPlaybackRate(val) {
-    this.el_.playbackRate = val;
-  }
-
-  /**
-   * Get the current state of network activity for the element, from
-   * the list below
-   * NETWORK_EMPTY (numeric value 0)
-   * NETWORK_IDLE (numeric value 1)
-   * NETWORK_LOADING (numeric value 2)
-   * NETWORK_NO_SOURCE (numeric value 3)
-   *
-   * @return {Number}
-   * @method networkState
-   */
-  networkState() {
-    return this.el_.networkState;
-  }
-
-  /**
-   * Get a value that expresses the current state of the element
-   * with respect to rendering the current playback position, from
-   * the codes in the list below
-   * HAVE_NOTHING (numeric value 0)
-   * HAVE_METADATA (numeric value 1)
-   * HAVE_CURRENT_DATA (numeric value 2)
-   * HAVE_FUTURE_DATA (numeric value 3)
-   * HAVE_ENOUGH_DATA (numeric value 4)
-   *
-   * @return {Number}
-   * @method readyState
-   */
-  readyState() {
-    return this.el_.readyState;
-  }
-
-  /**
-   * Get width of video
-   *
-   * @return {Number}
-   * @method videoWidth
-   */
-  videoWidth() {
-    return this.el_.videoWidth;
-  }
-
-  /**
-   * Get height of video
-   *
-   * @return {Number}
-   * @method videoHeight
-   */
-  videoHeight() {
-    return this.el_.videoHeight;
-  }
-
-  /**
-   * Get text tracks
-   *
-   * @return {TextTrackList}
-   * @method textTracks
-   */
-  textTracks() {
-    return super.textTracks();
   }
 
   /**
