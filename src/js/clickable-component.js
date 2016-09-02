@@ -10,15 +10,22 @@ import document from 'global/document';
 import assign from 'object.assign';
 
 /**
- * Clickable Component which is clickable or keyboard actionable, but is not a native HTML button
+ * Clickable Component which is clickable or keyboard actionable,
+ * but is not a native HTML button.
  *
- * @param {Object} player  Main Player
- * @param {Object=} options Object of option names and values
  * @extends Component
- * @class ClickableComponent
  */
 class ClickableComponent extends Component {
 
+  /**
+   * Creates an instance of this class.
+   *
+   * @param  {Player} player
+   *         The `Player` that this class should be attached to.
+   *
+   * @param  {Object} [options]
+   *         The key/value store of player options.
+   */
   constructor(player, options) {
     super(player, options);
 
@@ -28,13 +35,19 @@ class ClickableComponent extends Component {
   }
 
   /**
-   * Create the component's DOM element
+   * Create the `Component`s DOM element.
    *
-   * @param {String=} type Element's node type. e.g. 'div'
-   * @param {Object=} props An object of properties that should be set on the element
-   * @param {Object=} attributes An object of attributes that should be set on the element
+   * @param {string} [tag=div]
+   *        The element's node type.
+   *
+   * @param {Object} [props={}]
+   *        An object of properties that should be set on the element.
+   *
+   * @param {Object} [attributes={}]
+   *        An object of attributes that should be set on the element.
+   *
    * @return {Element}
-   * @method createEl
+   *         The element that gets created.
    */
   createEl(tag = 'div', props = {}, attributes = {}) {
     props = assign({
@@ -64,11 +77,13 @@ class ClickableComponent extends Component {
   }
 
   /**
-   * create control text
+   * Create a control text element on this `Component`
    *
-   * @param {Element} el Parent element for the control text
+   * @param {Element} [el]
+   *        Parent element for the control text.
+   *
    * @return {Element}
-   * @method controlText
+   *         The control text element that gets created.
    */
   createControlTextEl(el) {
     this.controlTextEl_ = Dom.createEl('span', {
@@ -85,12 +100,17 @@ class ClickableComponent extends Component {
   }
 
   /**
-   * Controls text - both request and localize
+   * Get or set the localize text to use for the controls on the `Component`.
    *
-   * @param {String}  text Text for element
-   * @param {Element=} el Element to set the title on
-   * @return {String}
-   * @method controlText
+   * @param {string} [text]
+   *        Control text for element.
+   *
+   * @param {Element} [el=this.el()]
+   *        Element to set the title on.
+   *
+   * @return {string|ClickableComponent}
+   *         - The control text when getting
+   *         - Returns itself when setting; method can be chained.
    */
   controlText(text, el = this.el()) {
     if (!text) {
@@ -107,20 +127,20 @@ class ClickableComponent extends Component {
   }
 
   /**
-   * Allows sub components to stack CSS class names
+   * Builds the default DOM `className`.
    *
-   * @return {String}
-   * @method buildCSSClass
+   * @return {string}
+   *         The DOM `className` for this object.
    */
   buildCSSClass() {
     return `vjs-control vjs-button ${super.buildCSSClass()}`;
   }
 
   /**
-   * Enable the component element
+   * Enable this `Component`s element.
    *
-   * @return {Component}
-   * @method enable
+   * @return {ClickableComponent}
+   *         Returns itself; method can be chained.
    */
   enable() {
     this.removeClass('vjs-disabled');
@@ -136,10 +156,10 @@ class ClickableComponent extends Component {
   }
 
   /**
-   * Disable the component element
+   * Disable this `Component`s element.
    *
-   * @return {Component}
-   * @method disable
+   * @return {ClickableComponent}
+   *         Returns itself; method can be chained.
    */
   disable() {
     this.addClass('vjs-disabled');
@@ -155,25 +175,44 @@ class ClickableComponent extends Component {
   }
 
   /**
-   * Handle Click - Override with specific functionality for component
+   * This gets called when a `ClickableComponent` gets:
+   * - Clicked (via the `click` event, listening starts in the constructor)
+   * - Tapped (via the `tap` event, listening starts in the constructor)
+   * - Gains focus (via the `focus` event). Causes `ClickableComponent`
+   *   to listen for the `keydown` event. If the enter/space key gets
+   *   pressed before focus gets lost (via the `blur` event) this function gets called.
    *
-   * @method handleClick
+   * @param {EventTarget~Event} event
+   *        The `keydown`, `tap`, or `click` event that caused this function to be
+   *        called.
+   *
+   * @listens {tap}
+   * @listens {click}
    */
-  handleClick() {}
+  handleClick(event) {}
 
   /**
-   * Handle Focus - Add keyboard functionality to element
+   * This gets called when a `ClickableComponent` gains focus via a `focus` event.
+   * Turns on listening for `keydown` events. When they happen it
+   * calls `this.handleKeyPress`.
    *
-   * @method handleFocus
+   * @param {EventTarget~Event} event
+   *        The `focus` event that caused this function to be called.
+   *
+   * @listens {focus}
    */
-  handleFocus() {
+  handleFocus(event) {
     Events.on(document, 'keydown', Fn.bind(this, this.handleKeyPress));
   }
 
   /**
-   * Handle KeyPress (document level) - Trigger click when Space or Enter key is pressed
+   * Called when this ClickableComponent has focus and a key gets pressed down. By
+   * default it will call `this.handleClick` when the key is space or enter.
    *
-   * @method handleKeyPress
+   * @param {EventTarget~Event} event
+   *        The `keydown` event that caused this function to be called.
+   *
+   * @listens {keydown}
    */
   handleKeyPress(event) {
 
@@ -189,11 +228,15 @@ class ClickableComponent extends Component {
   }
 
   /**
-   * Handle Blur - Remove keyboard triggers
+   * Called when a `ClickableComponent` loses focus. Turns off the listener for
+   * `keydown` events. Which Stops `this.handleKeyPress` from getting called.
    *
-   * @method handleBlur
+   * @param {EventTarget~Event} event
+   *        The `blur` event that caused this function to be called.
+   *
+   * @listens {blur}
    */
-  handleBlur() {
+  handleBlur(event) {
     Events.off(document, 'keydown', Fn.bind(this, this.handleKeyPress));
   }
 }

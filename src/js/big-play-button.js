@@ -5,37 +5,49 @@ import Button from './button.js';
 import Component from './component.js';
 
 /**
- * Initial play button. Shows before the video has played. The hiding of the
- * big play button is done via CSS and player states.
+ * The initial play button that shows before the video has played. The hiding of the
+ * `BigPlayButton` get done via CSS and `Player` states.
  *
- * @param {Object} player  Main Player
- * @param {Object=} options Object of option names and values
  * @extends Button
- * @class BigPlayButton
  */
 class BigPlayButton extends Button {
 
   /**
-   * Allow sub components to stack CSS class names
+   * Builds the default DOM `className`.
    *
-   * @return {String} The constructed class name
-   * @method buildCSSClass
+   * @return {string}
+   *         The DOM `className` for this object. Always returns 'vjs-big-play-button'.
    */
   buildCSSClass() {
     return 'vjs-big-play-button';
   }
 
   /**
-   * Handles click for play
+   * This gets called when a `BigPlayButton` gets:
+   * - Clicked (via the `click` event, listening starts in the constructor)
+   * - Tapped (via the `tap` event, listening starts in the constructor)
+   * - Gains focus (via the `focus` event). Causes `ClickableComponent`
+   *   to listen for the `keydown` event. If the enter/space key gets
+   *   pressed before focus gets lost (via the `blur` event) this function gets called.
    *
-   * @method handleClick
+   * @param {EventTarget~Event} event
+   *        The `keydown`, `tap`, or `click` event that caused this function to be
+   *        called.
+   *
+   * @listens {tap}
+   * @listens {click}
    */
-  handleClick() {
+  handleClick(event) {
     this.player_.play();
   }
-
 }
 
+/**
+ * The text that should display over the `BigPlayButton`s controls. Added to for localization.
+ *
+ * @type {string}
+ * @private
+ */
 BigPlayButton.prototype.controlText_ = 'Play Video';
 
 Component.registerComponent('BigPlayButton', BigPlayButton);
