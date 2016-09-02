@@ -22,7 +22,6 @@ import toTitleCase from '../utils/to-title-case.js';
  *
  * @param {Object=} options Object of option names and values
  * @param {Function=} ready Ready callback function
- * @extends Tech
  * @class Html5
  */
 class Html5 extends Tech {
@@ -139,8 +138,6 @@ class Html5 extends Tech {
 
   /**
    * Dispose of html5 media element
-   *
-   * @method dispose
    */
   dispose() {
     // Un-ProxyNativeTracks
@@ -169,7 +166,6 @@ class Html5 extends Tech {
    * Create the component's DOM element
    *
    * @return {Element}
-   * @method createEl
    */
   createEl() {
     let el = this.options_.tag;
@@ -395,8 +391,6 @@ class Html5 extends Tech {
 
   /**
    * Play for html5 tech
-   *
-   * @method play
    */
   play() {
     const playPromise = this.el_.play();
@@ -412,7 +406,6 @@ class Html5 extends Tech {
    * Set current time
    *
    * @param {Number} seconds Current time of video
-   * @method setCurrentTime
    */
   setCurrentTime(seconds) {
     try {
@@ -427,7 +420,6 @@ class Html5 extends Tech {
    * Get duration
    *
    * @return {Number}
-   * @method duration
    */
   duration() {
     return this.el_.duration || 0;
@@ -437,7 +429,6 @@ class Html5 extends Tech {
    * Get player width
    *
    * @return {Number}
-   * @method width
    */
   width() {
     return this.el_.offsetWidth;
@@ -447,7 +438,6 @@ class Html5 extends Tech {
    * Get player height
    *
    * @return {Number}
-   * @method height
    */
   height() {
     return this.el_.offsetHeight;
@@ -457,7 +447,6 @@ class Html5 extends Tech {
    * Get if there is fullscreen support
    *
    * @return {Boolean}
-   * @method supportsFullScreen
    */
   supportsFullScreen() {
     if (typeof this.el_.webkitEnterFullScreen === 'function') {
@@ -473,8 +462,6 @@ class Html5 extends Tech {
 
   /**
    * Request to enter fullscreen
-   *
-   * @method enterFullScreen
    */
   enterFullScreen() {
     const video = this.el_;
@@ -507,8 +494,6 @@ class Html5 extends Tech {
 
   /**
    * Request to exit fullscreen
-   *
-   * @method exitFullScreen
    */
   exitFullScreen() {
     this.el_.webkitExitFullScreen();
@@ -519,7 +504,6 @@ class Html5 extends Tech {
    *
    * @param {Object=} src Source object
    * @return {Object}
-   * @method src
    */
   src(src) {
     if (src === undefined) {
@@ -532,8 +516,6 @@ class Html5 extends Tech {
 
   /**
    * Reset the tech. Removes all sources and calls `load`.
-   *
-   * @method reset
    */
   reset() {
     Html5.resetMediaElement(this.el_);
@@ -543,7 +525,6 @@ class Html5 extends Tech {
    * Get current source
    *
    * @return {Object}
-   * @method currentSrc
    */
   currentSrc() {
     if (this.currentSource_) {
@@ -556,7 +537,6 @@ class Html5 extends Tech {
    * Set controls attribute
    *
    * @param {String} val Value for controls attribute
-   * @method setControls
    */
   setControls(val) {
     this.el_.controls = !!val;
@@ -570,7 +550,6 @@ class Html5 extends Tech {
    * @param {String=} label Label to identify the text track
    * @param {String=} language Two letter language abbreviation
    * @return {TextTrackObject}
-   * @method addTextTrack
    */
   addTextTrack(kind, label, language) {
     if (!this.featuresNativeTextTracks) {
@@ -586,7 +565,6 @@ class Html5 extends Tech {
    * @param {Object} options The object should contain values for
    * kind, language, label and src (location of the WebVTT file)
    * @return {HTMLTrackElement}
-   * @method addRemoteTextTrack
    */
   addRemoteTextTrack(options = {}) {
     if (!this.featuresNativeTextTracks) {
@@ -627,7 +605,6 @@ class Html5 extends Tech {
    * Remove remote text track from TextTrackList object
    *
    * @param {TextTrackObject} track Texttrack object to remove
-   * @method removeRemoteTextTrack
    */
   removeRemoteTextTrack(track) {
     if (!this.featuresNativeTextTracks) {
@@ -1042,27 +1019,177 @@ Html5.resetMediaElement = function(el) {
   }
 };
 
+/* Native HTML5 element property wrapping ----------------------------------- */
 // Wrap native properties with a getter
 [
+  /**
+   * Paused for html5 tech
+   *
+   * @method Html5.prototype.paused
+   * @return {Boolean}
+   */
   'paused',
+  /**
+   * Get current time
+   *
+   * @method Html5.prototype.currentTime
+   * @return {Number}
+   */
   'currentTime',
+  /**
+   * Get a TimeRange object that represents the intersection
+   * of the time ranges for which the user agent has all
+   * relevant media
+   *
+   * @return {TimeRangeObject}
+   * @method Html5.prototype.buffered
+   */
   'buffered',
+  /**
+   * Get volume level
+   *
+   * @return {Number}
+   * @method Html5.prototype.volume
+   */
   'volume',
+  /**
+   * Get if muted
+   *
+   * @return {Boolean}
+   * @method Html5.prototype.muted
+   */
   'muted',
+  /**
+   * Get poster
+   *
+   * @return {String}
+   * @method Html5.prototype.poster
+   */
   'poster',
+  /**
+   * Get preload attribute
+   *
+   * @return {String}
+   * @method Html5.prototype.preload
+   */
   'preload',
+  /**
+   * Get autoplay attribute
+   *
+   * @return {String}
+   * @method Html5.prototype.autoplay
+   */
   'autoplay',
+  /**
+   * Get controls attribute
+   *
+   * @return {String}
+   * @method Html5.prototype.controls
+   */
+  'controls',
+  /**
+   * Get loop attribute
+   *
+   * @return {String}
+   * @method Html5.prototype.loop
+   */
   'loop',
+  /**
+   * Get error value
+   *
+   * @return {String}
+   * @method Html5.prototype.error
+   */
   'error',
+  /**
+   * Get whether or not the player is in the "seeking" state
+   *
+   * @return {Boolean}
+   * @method Html5.prototype.seeking
+   */
   'seeking',
+  /**
+   * Get a TimeRanges object that represents the
+   * ranges of the media resource to which it is possible
+   * for the user agent to seek.
+   *
+   * @return {TimeRangeObject}
+   * @method Html5.prototype.seekable
+   */
   'seekable',
+  /**
+   * Get if video ended
+   *
+   * @return {Boolean}
+   * @method Html5.prototype.ended
+   */
   'ended',
+  /**
+   * Get the value of the muted content attribute
+   * This attribute has no dynamic effect, it only
+   * controls the default state of the element
+   *
+   * @return {Boolean}
+   * @method Html5.prototype.defaultMuted
+   */
   'defaultMuted',
+  /**
+   * Get desired speed at which the media resource is to play
+   *
+   * @return {Number}
+   * @method Html5.prototype.playbackRate
+   */
   'playbackRate',
+  /**
+   * Returns a TimeRanges object that represents the ranges of the
+   * media resource that the user agent has played.
+   * @see https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-played
+   *
+   * @return {TimeRangeObject} the range of points on the media
+   *                           timeline that has been reached through
+   *                           normal playback
+   * @method Html5.prototype.played
+   */
   'played',
+  /**
+   * Get the current state of network activity for the element, from
+   * the list below
+   * - NETWORK_EMPTY (numeric value 0)
+   * - NETWORK_IDLE (numeric value 1)
+   * - NETWORK_LOADING (numeric value 2)
+   * - NETWORK_NO_SOURCE (numeric value 3)
+   *
+   * @return {Number}
+   * @method Html5.prototype.networkState
+   */
   'networkState',
+  /**
+   * Get a value that expresses the current state of the element
+   * with respect to rendering the current playback position, from
+   * the codes in the list below
+   * - HAVE_NOTHING (numeric value 0)
+   * - HAVE_METADATA (numeric value 1)
+   * - HAVE_CURRENT_DATA (numeric value 2)
+   * - HAVE_FUTURE_DATA (numeric value 3)
+   * - HAVE_ENOUGH_DATA (numeric value 4)
+   *
+   * @return {Number}
+   * @method Html5.prototype.readyState
+   */
   'readyState',
+  /**
+   * Get width of video
+   *
+   * @return {Number}
+   * @method Html5.prototype.videoWidth
+   */
   'videoWidth',
+  /**
+   * Get height of video
+   *
+   * @return {Number}
+   * @method Html5.prototype.videoHeight
+   */
   'videoHeight'
 ].forEach(function(prop) {
   Html5.prototype[prop] = function() {
@@ -1070,15 +1197,65 @@ Html5.resetMediaElement = function(el) {
   };
 });
 
-// Wrap native properties with a setter
+// Wrap native properties with a setter in this format:
+// set + toTitleCase(name)
 [
+  /**
+   * Set volume level
+   *
+   * @param {Number} percentAsDecimal Volume percent as a decimal
+   * @method Html5.prototype.setVolume
+   */
   'volume',
+  /**
+   * Set muted
+   *
+   * @param {Boolean} muted If player is to be muted or note
+   * @method Html5.prototype.setMuted
+   */
   'muted',
+  /**
+   * Set video source
+   *
+   * @param {Object} src Source object
+   * @deprecated since version 5
+   * @method Html5.prototype.setSrc
+   */
   'src',
+  /**
+   * Set poster
+   *
+   * @param {String} val URL to poster image
+   * @method Html5.prototype.setPoster
+   */
   'poster',
+  /**
+   * Set preload attribute
+   *
+   * @param {String} val Value for the preload attribute
+   * @method Htm5.prototype.setPreload
+   */
   'preload',
+  /**
+   * Set autoplay attribute
+   *
+   * @param {Boolean} autoplay Value for the autoplay attribute
+   * @method setAutoplay
+   */
   'autoplay',
+  /**
+   * Set loop attribute
+   *
+   * @param {Boolean} loop Value for the loop attribute
+   * @method Html5.prototype.setLoop
+   */
   'loop',
+  /**
+   * Set desired speed at which the media resource is to play
+   *
+   * @param {Number} val Speed at which the media resource is to play
+   * @method Html5.prototype.setPlaybackRate
+   */
   'playbackRate'
 ].forEach(function(prop) {
   Html5.prototype[`set${toTitleCase(prop)}`] = function(v) {
@@ -1088,7 +1265,17 @@ Html5.resetMediaElement = function(el) {
 
 // wrap native functions with a function
 [
+  /**
+   * Pause for html5 tech
+   *
+   * @method Html5.prototype.pause
+   */
   'pause',
+  /**
+   * Load media into player
+   *
+   * @method Html5.prototype.load
+   */
   'load'
 ].forEach(function(prop) {
   Html5.prototype[prop] = function() {
