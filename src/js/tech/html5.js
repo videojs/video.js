@@ -17,44 +17,6 @@ import assign from 'object.assign';
 import mergeOptions from '../utils/merge-options.js';
 import toTitleCase from '../utils/to-title-case.js';
 
-const NATIVE_GET = [
-  'paused',
-  'currentTime',
-  'buffered',
-  'volume',
-  'muted',
-  'poster',
-  'preload',
-  'autoplay',
-  'loop',
-  'error',
-  'seeking',
-  'seekable',
-  'ended',
-  'defaultMuted',
-  'playbackRate',
-  'played',
-  'networkState',
-  'readyState',
-  'videoWidth',
-  'videoHeight'
-];
-const NATIVE_SET = [
-  'volume',
-  'muted',
-  'src',
-  'poster',
-  'preload',
-  'autoplay',
-  'loop',
-  'playbackRate'
-];
-
-const NATIVE_FN = [
-  'pause',
-  'load'
-];
-
 /**
  * HTML5 Media Controller - Wrapper for HTML5 Media API
  *
@@ -67,22 +29,6 @@ class Html5 extends Tech {
 
   constructor(options, ready) {
     super(options, ready);
-
-    NATIVE_GET.forEach((prop) => {
-      this[prop] = () => this.el_[prop];
-    });
-
-    NATIVE_SET.forEach((prop) => {
-      const setterName = `set${toTitleCase(prop)}`;
-
-      this[setterName] = (v) => {
-        this.el_[prop] = v;
-      };
-    });
-
-    NATIVE_FN.forEach((prop) => {
-      this[prop] = () => this.el_[prop]();
-    });
 
     const source = options.source;
     let crossoriginTracks = false;
@@ -1095,6 +1041,60 @@ Html5.resetMediaElement = function(el) {
     }());
   }
 };
+
+// Wrap native properties with a getter
+[
+  'paused',
+  'currentTime',
+  'buffered',
+  'volume',
+  'muted',
+  'poster',
+  'preload',
+  'autoplay',
+  'loop',
+  'error',
+  'seeking',
+  'seekable',
+  'ended',
+  'defaultMuted',
+  'playbackRate',
+  'played',
+  'networkState',
+  'readyState',
+  'videoWidth',
+  'videoHeight'
+].forEach(function(prop) {
+  Html5.prototype[prop] = function() {
+    return this.el_[prop];
+  };
+});
+
+// Wrap native properties with a setter
+[
+  'volume',
+  'muted',
+  'src',
+  'poster',
+  'preload',
+  'autoplay',
+  'loop',
+  'playbackRate'
+].forEach(function(prop) {
+  Html5.prototype[`set${toTitleCase(prop)}`] = function(v) {
+    this.el_[prop] = v;
+  };
+});
+
+// wrap native functions with a function
+[
+  'pause',
+  'load'
+].forEach(function(prop) {
+  Html5.prototype[prop] = function() {
+    return this.el_[prop]();
+  };
+});
 
 Component.registerComponent('Html5', Html5);
 Tech.registerTech('Html5', Html5);
