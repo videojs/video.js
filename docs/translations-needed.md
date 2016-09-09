@@ -86,13 +86,7 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
 | de.json (Complete)      |                                                                                     |
-| el.json (missing 7)     | Close Modal Dialog                                                                  |
-|                         | Descriptions                                                                        |
-|                         | descriptions off                                                                    |
-|                         | Audio Track                                                                         |
-|                         | The media is encrypted and we do not have the keys to decrypt it.                   |
-|                         | Play Video                                                                          |
-|                         | , opens descriptions settings dialog                                                |
+| el.json (Complete)      |                                                                                     |
 | es.json (missing 14)    | Close Modal Dialog                                                                  |
 |                         | Descriptions                                                                        |
 |                         | descriptions off                                                                    |
