@@ -101,14 +101,14 @@ class Html5 extends Tech {
         });
       };
       this[`handle${capitalType}TrackAdd_`] = (e) => techTracks.addTrack(e.track);
-      this[`handle${capitalType}TrackRemove_`] = (e) => techTracks.removetrack(e.track);
+      this[`handle${capitalType}TrackRemove_`] = (e) => techTracks.removeTrack(e.track);
 
       elTracks.addEventListener('change', this[`handle${capitalType}TrackChange_`]);
       elTracks.addEventListener('addtrack', this[`handle${capitalType}TrackAdd_`]);
       elTracks.addEventListener('removetrack', this[`handle${capitalType}TrackRemove_`]);
       this[`removeOld${capitalType}Tracks_`] = (e) => this.removeOldTracks_(techTracks, elTracks);
 
-      // Remove (native) trackts that are not used anymore
+      // Remove (native) tracks that are not used anymore
       this.on('loadstart', this[`removeOld${capitalType}Tracks_`]);
     });
 
@@ -632,13 +632,13 @@ class Html5 extends Tech {
 
 /* HTML5 Support Testing ---------------------------------------------------- */
 
-/*
-* Element for testing browser HTML5 video capabilities
-*
-* @type {Element}
-* @constant
-* @private
-*/
+/**
+ * Element for testing browser HTML5 video capabilities
+ *
+ * @type {Element}
+ * @constant
+ * @private
+ */
 Html5.TEST_VID = document.createElement('video');
 const track = document.createElement('track');
 
@@ -647,7 +647,7 @@ track.srclang = 'en';
 track.label = 'English';
 Html5.TEST_VID.appendChild(track);
 
-/*
+/**
  * Check if HTML5 video is supported by this browser/device
  *
  * @return {Boolean}
@@ -666,7 +666,7 @@ Html5.isSupported = function() {
 // Add Source Handler pattern functions to this tech
 Tech.withSourceHandlers(Html5);
 
-/*
+/**
  * The default native source handler.
  * This simply passes the source to the video element. Nothing fancy.
  *
@@ -675,7 +675,7 @@ Tech.withSourceHandlers(Html5);
  */
 Html5.nativeSourceHandler = {};
 
-/*
+/**
  * Check if the video element can play the given videotype
  *
  * @param  {String} type    The mimetype to check
@@ -691,7 +691,7 @@ Html5.nativeSourceHandler.canPlayType = function(type) {
   }
 };
 
-/*
+/**
  * Check if the video element can handle the source natively
  *
  * @param  {Object} source  The source object
@@ -714,7 +714,7 @@ Html5.nativeSourceHandler.canHandleSource = function(source, options) {
   return '';
 };
 
-/*
+/**
  * Pass the source to the video element
  * Adaptive source handlers will have more complicated workflows before passing
  * video data to the video element
@@ -728,15 +728,15 @@ Html5.nativeSourceHandler.handleSource = function(source, tech, options) {
 };
 
 /*
-* Clean up the source handler when disposing the player or switching sources..
-* (no cleanup is needed when supporting the format natively)
-*/
+ * Clean up the source handler when disposing the player or switching sources..
+ * (no cleanup is needed when supporting the format natively)
+ */
 Html5.nativeSourceHandler.dispose = function() {};
 
 // Register the native source handler
 Html5.registerSourceHandler(Html5.nativeSourceHandler);
 
-/*
+/**
  * Check if the volume can be changed in this browser/device.
  * Volume cannot be changed in a lot of mobile devices.
  * Specifically, it can't be changed from 1 on iOS.
@@ -755,7 +755,7 @@ Html5.canControlVolume = function() {
   }
 };
 
-/*
+/**
  * Check if playbackRate is supported in this browser/device.
  *
  * @return {Boolean}
@@ -777,7 +777,7 @@ Html5.canControlPlaybackRate = function() {
   }
 };
 
-/*
+/**
  * Check to see if native text tracks are supported by this browser/device
  *
  * @return {Boolean}
@@ -804,7 +804,7 @@ Html5.supportsNativeTextTracks = function() {
   return supportsTextTracks;
 };
 
-/*
+/**
  * Check to see if native video tracks are supported by this browser/device
  *
  * @return {Boolean}
@@ -815,7 +815,7 @@ Html5.supportsNativeVideoTracks = function() {
   return supportsVideoTracks;
 };
 
-/*
+/**
  * Check to see if native audio tracks are supported by this browser/device
  *
  * @return {Boolean}
@@ -857,21 +857,21 @@ Html5.Events = [
   'volumechange'
 ];
 
-/*
+/**
  * Set the tech's volume control support status
  *
  * @type {Boolean}
  */
 Html5.prototype.featuresVolumeControl = Html5.canControlVolume();
 
-/*
+/**
  * Set the tech's playbackRate support status
  *
  * @type {Boolean}
  */
 Html5.prototype.featuresPlaybackRate = Html5.canControlPlaybackRate();
 
-/*
+/**
  * Set the tech's status on moving the video element.
  * In iOS, if you move a video element in the DOM, it breaks video playback.
  *
@@ -879,20 +879,20 @@ Html5.prototype.featuresPlaybackRate = Html5.canControlPlaybackRate();
  */
 Html5.prototype.movingMediaElementInDOM = !browser.IS_IOS;
 
-/*
+/**
  * Set the the tech's fullscreen resize support status.
  * HTML video is able to automatically resize when going to fullscreen.
  * (No longer appears to be used. Can probably be removed.)
  */
 Html5.prototype.featuresFullscreenResize = true;
 
-/*
+/**
  * Set the tech's progress event support status
  * (this disables the manual progress events of the Tech)
  */
 Html5.prototype.featuresProgressEvents = true;
 
-/*
+/**
  * Sets the tech's status on native text track support
  *
  * @type {Boolean}
