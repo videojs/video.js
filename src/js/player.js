@@ -411,7 +411,7 @@ class Player extends Component {
     this.fluid(this.options_.fluid);
     this.aspectRatio(this.options_.aspectRatio);
     // Style el has not updated yet if width, heigth and aspect ratio are undefined
-    this.updateStyleEl_();
+    // this.updateStyleEl_();
 
     // Hide any links within the video/audio tag, because IE doesn't hide them completely.
     const links = tag.getElementsByTagName('a');
@@ -514,6 +514,8 @@ class Player extends Component {
     } else {
       this.removeClass('vjs-fluid');
     }
+
+    this.updateStyleEl_();
   }
 
   /**
