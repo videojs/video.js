@@ -3,7 +3,6 @@
  */
 import TextTrackButton from './text-track-button.js';
 import Component from '../../component.js';
-import TextTrackMenuItem from './text-track-menu-item.js';
 import ChaptersTrackMenuItem from './chapters-track-menu-item.js';
 import Menu from '../../menu/menu.js';
 import * as Dom from '../../utils/dom.js';
@@ -35,31 +34,6 @@ class ChaptersButton extends TextTrackButton {
    */
   buildCSSClass() {
     return `vjs-chapters-button ${super.buildCSSClass()}`;
-  }
-
-  /**
-   * Create a menu item for each text track
-   *
-   * @return {Array} Array of menu items
-   * @method createItems
-   */
-  createItems() {
-    const items = [];
-    const tracks = this.player_.textTracks();
-
-    if (!tracks) {
-      return items;
-    }
-
-    for (let i = 0; i < tracks.length; i++) {
-      const track = tracks[i];
-
-      if (track.kind === this.kind_) {
-        items.push(new TextTrackMenuItem(this.player_, {track}));
-      }
-    }
-
-    return items;
   }
 
   /**
@@ -124,7 +98,8 @@ class ChaptersButton extends TextTrackButton {
 
         const mi = new ChaptersTrackMenuItem(this.player_, {
           cue,
-          track: chaptersTrack
+          track: chaptersTrack,
+          selectable: true
         });
 
         items.push(mi);
