@@ -189,6 +189,8 @@ class Html5 extends Tech {
           })
         );
       }
+
+      el.playerId = this.options_.playerId;
     }
 
     // Update specific tag settings, in case they were overridden
