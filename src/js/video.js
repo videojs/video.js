@@ -96,9 +96,69 @@ function videojs(id, options, ready) {
   }
 
   // Element may have a player attr referring to an already created player instance.
-  // If not, set up a new player and return the instance.
-  return tag.player || Player.players[tag.playerId] || new Player(tag, options, ready);
+  // If so return that otherwise set up a new player below
+  if (tag.player || Player.players[tag.playerId]) {
+    return tag.player || Player.players[tag.playerId];
+  }
+
+  videojs.hooks('presetup').forEach(function(hookFunction) {
+    options = videojs.mergeOptions(options, hookFunction(tag, options, ready));
+  });
+
+  // If not, set up a new player
+  const player = new Player(tag, options, ready);
+
+  videojs.hooks('postsetup').forEach((hookFunction) => hookFunction(player));
+
+  return player;
 }
+
+/**
+ * An Object that contains lifecycle hooks as keys which point to an array
+ * of functions that are run when a lifecycle event is triggered
+ */
+videojs.hooks_ = {};
+
+/**
+ * Get a list of hooks for a specific lifecycle event
+ *
+ * @param {String} type the lifecyle event to get hooks from
+ * @return {Array} an array of hooks, or an empty array if there are none
+ */
+videojs.hooks = function(type) {
+  return videojs.hooks_[type] || [];
+};
+
+/**
+ * Add a function hook to a specific videojs lifecycle event
+ *
+ * @param {String} type the lifecycle event to hook the function to
+ * @param {Function} fn the function to attach
+ */
+videojs.hook = function(type, fn) {
+  videojs.hooks_[type] = videojs.hooks_[type] || [];
+  videojs.hooks_[type].push(fn);
+};
+
+/**
+ * Remove a hook from a specific videojs lifecycle event
+ *
+ * @param {String} type the lifecycle event that the function hooked to
+ * @param {Function} fn the hooked function to remove
+ * @return {Function|undefined} the function that was removed or undef
+ */
+videojs.removeHook = function(type, fn) {
+  const hooks = videojs.hooks_[type] || [];
+  let i = hooks.length;
+
+  while (i--) {
+    const hook = hooks[i];
+
+    if (hook === fn) {
+      return hooks.splice(i, 1);
+    }
+  }
+};
 
 // Add default styles
 if (window.VIDEOJS_NO_DYNAMIC_STYLE !== true) {
