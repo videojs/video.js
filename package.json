@@ -69,7 +69,7 @@
     "grunt-contrib-connect": "~0.7.1",
     "grunt-contrib-copy": "^0.8.0",
     "grunt-contrib-cssmin": "~0.6.0",
-    "grunt-contrib-uglify": "^0.8.0",
+    "grunt-contrib-uglify": "~0.11.0",
     "grunt-contrib-watch": "~0.1.4",
     "grunt-coveralls": "^1.0.0",
     "grunt-fastly": "^0.1.3",
