@@ -180,7 +180,7 @@ QUnit.test('should get current source from src set', function(assert) {
   player.loadTech_('Html5');
 
   // check for matching undefined src
-  assert.ok(player.currentSource().src === player.currentSrc());
+  assert.deepEqual(player.currentSource(), {});
 
   player.src('http://google.com');
 
@@ -216,7 +216,7 @@ QUnit.test('should get current sources from src set', function(assert) {
   player.loadTech_('Html5');
 
   // check for matching undefined src
-  assert.ok(player.currentSource().src === player.currentSrc());
+  assert.ok(player.currentSources(), []);
 
   player.src([{
     src: 'http://google.com'

@@ -2076,7 +2076,15 @@ class Player extends Component {
    * @method currentSources
    */
   currentSources() {
-    return this.cache_.sources || [this.currentSource()];
+    const source = this.currentSource();
+    const sources = [];
+
+    // assume `{}` or `{ src }`
+    if (Object.keys(source).length !== 0) {
+      sources.push(source);
+    }
+
+    return this.cache_.sources || sources;
   }
 
   /**
@@ -2086,7 +2094,14 @@ class Player extends Component {
    * @method currentSource
    */
   currentSource() {
-    return this.cache_.source || { src: this.currentSrc() };
+    const source = {};
+    const src = this.currentSrc();
+
+    if (src) {
+      source.src = src;
+    }
+
+    return this.cache_.source || source;
   }
 
   /**
