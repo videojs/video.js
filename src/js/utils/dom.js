@@ -240,10 +240,10 @@ export function removeElData(el) {
  * @param {String} classToCheck Classname to check
  */
 export function hasElClass(element, classToCheck) {
+  throwIfWhitespace(classToCheck);
   if (element.classList) {
     return element.classList.contains(classToCheck);
   } else {
-    throwIfWhitespace(classToCheck);
     return classRegExp(classToCheck).test(element.className);
   }
 }
