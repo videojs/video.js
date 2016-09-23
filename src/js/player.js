@@ -2432,12 +2432,12 @@ class Player extends Component {
       if (e.screenX !== lastMoveX || e.screenY !== lastMoveY) {
         lastMoveX = e.screenX;
         lastMoveY = e.screenY;
-        handleActivity();
+        handleActivity(e);
       }
     };
 
-    const handleMouseDown = function() {
-      handleActivity();
+    const handleMouseDown = function(e) {
+      handleActivity(e);
       // For as long as the they are touching the device or have their mouse down,
       // we consider them active even if they're not moving their finger or mouse.
       // So we want to continue to update that they are active
@@ -2448,8 +2448,8 @@ class Player extends Component {
       mouseInProgress = this.setInterval(handleActivity, 250);
     };
 
-    const handleMouseUp = function(event) {
-      handleActivity();
+    const handleMouseUp = function(e) {
+      handleActivity(e);
       // Stop the interval that maintains activity if the mouse/touch is down
       this.clearInterval(mouseInProgress);
     };
