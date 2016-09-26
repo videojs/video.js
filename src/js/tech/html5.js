@@ -587,7 +587,7 @@ class Html5 extends Tech {
    */
   proxyWebkitFullscreen_() {
     if ('webkitDisplayingFullscreen' in this.el_) {
-      const webkitbeginFn =  function() {
+      const webkitbeginFn = function() {
         this.one('webkitendfullscreen', function() {
           this.trigger('fullscreenchange', { isFullscreen: false });
         });
