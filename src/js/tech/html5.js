@@ -1258,7 +1258,7 @@ Html5.resetMediaElement = function(el) {
    */
   'playbackRate'
 ].forEach(function(prop) {
-  Html5.prototype[`set${toTitleCase(prop)}`] = function(v) {
+  Html5.prototype['set' + toTitleCase(prop)] = function(v) {
     this.el_[prop] = v;
   };
 });
