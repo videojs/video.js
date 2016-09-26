@@ -99,6 +99,18 @@ QUnit.test('addChild should throw if the child does not exist', function(assert)
 
 });
 
+QUnit.test('should add a child component with title case name', function(assert) {
+  const comp = new Component(getFakePlayer());
+
+  const child = comp.addChild('Component');
+
+  assert.ok(comp.children().length === 1);
+  assert.ok(comp.children()[0] === child);
+  assert.ok(comp.el().childNodes[0] === child.el());
+  assert.ok(comp.getChild('Component') === child);
+  assert.ok(comp.getChildById(child.id()) === child);
+});
+
 QUnit.test('should init child components from options', function(assert) {
   const comp = new Component(getFakePlayer(), {
     children: {
