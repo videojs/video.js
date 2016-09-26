@@ -120,6 +120,10 @@ class Html5 extends Tech {
       this.setControls(true);
     }
 
+    // on iOS, we want to proxy `webkitbeginfullscreen` and `webkitendfullscreen`
+    // into a `fullscreenchange` event
+    this.proxyWebkitFullscreen_();
+
     this.triggerReady();
   }
 
@@ -575,6 +579,25 @@ class Html5 extends Tech {
   }
 
   /**
+   * Proxy iOS `webkitbeginfullscreen` and `webkitendfullscreen` into
+   * `fullscreenchange` event
+   *
+   * @private
+   * @method proxyWebkitFullscreen_
+   */
+  proxyWebkitFullscreen_() {
+    if ('webkitDisplayingFullscreen' in this.el_) {
+      this.one('webkitbeginfullscreen', function() {
+        this.one('webkitendfullscreen', function() {
+          this.trigger('fullscreenchange', { isFullscreen: false });
+        });
+
+        this.trigger('fullscreenchange', { isFullscreen: true });
+      });
+    }
+  }
+
+  /**
    * Get if there is fullscreen support
    *
    * @return {Boolean}
@@ -599,16 +622,6 @@ class Html5 extends Tech {
    */
   enterFullScreen() {
     const video = this.el_;
-
-    if ('webkitDisplayingFullscreen' in video) {
-      this.one('webkitbeginfullscreen', function() {
-        this.one('webkitendfullscreen', function() {
-          this.trigger('fullscreenchange', { isFullscreen: false });
-        });
-
-        this.trigger('fullscreenchange', { isFullscreen: true });
-      });
-    }
 
     if (video.paused && video.networkState <= video.HAVE_METADATA) {
       // attempt to prime the video element for programmatic access
