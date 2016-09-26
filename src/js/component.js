@@ -347,7 +347,7 @@ class Component {
     let component;
     let componentName;
 
-    // If child is a string, create nt with options
+    // If child is a string, create component with options
     if (typeof child === 'string') {
       componentName = toTitleCase(child);
 
@@ -364,7 +364,7 @@ class Component {
 
       // If no componentClass in options, assume componentClass is the name lowercased
       // (e.g. playButton)
-      const componentClassName = options.componentClass || toTitleCase(componentName);
+      const componentClassName = options.componentClass || componentName;
 
       // Set name through options
       options.name = componentName;

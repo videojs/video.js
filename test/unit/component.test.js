@@ -190,8 +190,8 @@ QUnit.test('should init child components from component options', function(asser
     testComponent4: {}
   });
 
-  assert.ok(!testComp.childNameIndex_.testComponent2, 'we do not have testComponent2');
-  assert.ok(testComp.childNameIndex_.testComponent4, 'we have a testComponent4');
+  assert.ok(!testComp.childNameIndex_.TestComponent2, 'we do not have testComponent2');
+  assert.ok(testComp.childNameIndex_.TestComponent4, 'we have a testComponent4');
 });
 
 QUnit.test('should allows setting child options at the parent options level', function(assert) {
