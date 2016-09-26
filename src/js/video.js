@@ -102,7 +102,7 @@ function videojs(id, options, ready) {
   }
 
   videojs.hooks('presetup').forEach(function(hookFunction) {
-    options = videojs.mergeOptions(options, hookFunction(tag, options, ready));
+    options = videojs.mergeOptions(options, hookFunction(tag, options));
   });
 
   // If not, set up a new player
