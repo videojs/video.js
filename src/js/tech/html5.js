@@ -587,16 +587,21 @@ class Html5 extends Tech {
    */
   proxyWebkitFullscreen_() {
     if ('webkitDisplayingFullscreen' in this.el_) {
-      const webkitbeginFn = function() {
-        this.one('webkitendfullscreen', function() {
-          this.trigger('fullscreenchange', { isFullscreen: false });
-        });
+      const endFn = function() {
+        this.trigger('fullscreenchange', { isFullscreen: false });
+      };
+
+      const beginFn = function() {
+        this.one('webkitendfullscreen', endFn);
 
         this.trigger('fullscreenchange', { isFullscreen: true });
       };
 
-      this.on('webkitbeginfullscreen', webkitbeginFn);
-      this.on('dispose', () => this.off('webkitbeginfullscreen', webkitbeginFn));
+      this.on('webkitbeginfullscreen', beginFn);
+      this.on('dispose', () => {
+        this.off('webkitbeginfullscreen', beginFn);
+        this.off('webkitendfullscreen', endFn);
+      });
     }
   }
 
