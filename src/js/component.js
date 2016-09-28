@@ -362,8 +362,6 @@ class Component {
         options = {};
       }
 
-      // If no componentClass in options, assume componentClass is the name lowercased
-      // (e.g. playButton)
       const componentClassName = options.componentClass || componentName;
 
       // Set name through options
