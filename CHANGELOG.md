@@ -2,15 +2,15 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Changes from 5.11.7 on the 5.12 branch
 
 --------------------
 
 ## 5.12.1 (2016-08-25)
-_(none)_
+* Changes from 5.11.6 on the 5.12 branch
 
 ## 5.13.0 (2016-08-25)
-_(none)_
+* Ignored release
 
 ## 5.12.0 (2016-08-25)
 * @misteroneill, @BrandonOCasey, and @pagarwal123 updates all the code to pass the linter ([view](https://github.com/videojs/video.js/pull/3459))
