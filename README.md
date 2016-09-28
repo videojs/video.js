@@ -55,11 +55,11 @@ var player = videojs('really-cool-video', { /* Options */ }, function() {
 If you're ready to dive in, the [documentation](http://docs.videojs.com) is the first place to go for more information.
 
 ## Contributing
-Video.js is a free and open source library, and we appreciate any help you're willing to give. Check out the [contributing guide](CONTRIBUTING.md).
+Video.js is a free and open source library, and we appreciate any help you're willing to give. Check out the [contributing guide](/CONTRIBUTING.md).
 
 _Video.js uses [BrowserStack](https://browserstack.com) for compatibility testing_
 ## Building your own Video.js from source
-To build your own custom version read the section on [contributing code](CONTRIBUTING.md#contributing-code) and ["Building your own copy"](CONTRIBUTING.md#building-your-own-copy-of-videojs) in the contributing guide.
+To build your own custom version read the section on [contributing code](/CONTRIBUTING.md#contributing-code) and ["Building your own copy"](/CONTRIBUTING.md#building-your-own-copy-of-videojs) in the contributing guide.
 ## License
 
 Video.js is licensed under the Apache License, Version 2.0. [View the license file](LICENSE)
