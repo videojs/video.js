@@ -874,6 +874,7 @@ class Player extends Component {
   /**
    * Fired when the user agent begins looking for media data
    *
+   * @event loadstart
    * @private
    */
   handleTechLoadStart_() {
@@ -1036,6 +1037,7 @@ class Player extends Component {
   /**
    * Fired when the end of the media resource is reached (currentTime == duration)
    *
+   * @event ended
    * @private
    */
   handleTechEnded_() {
