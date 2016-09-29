@@ -1321,7 +1321,7 @@ const mp4RE = /^video\/mp4/i;
 
 Html5.patchCanPlayType = function() {
   // Android 4.0 and above can play HLS to some extent but it reports being unable to do so
-  if (browser.ANDROID_VERSION >= 4.0) {
+  if (browser.ANDROID_VERSION >= 4.0 && !browser.IS_FIREFOX) {
     if (!canPlayType) {
       canPlayType = Html5.TEST_VID.constructor.prototype.canPlayType;
     }
