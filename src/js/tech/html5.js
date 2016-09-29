@@ -918,6 +918,12 @@ Html5.prototype.featuresFullscreenResize = true;
 Html5.prototype.featuresProgressEvents = true;
 
 /**
+ * Set the tech's timeupdate event support status
+ * (this disables the manual timeupdate events of the Tech)
+ */
+Html5.prototype.featuresTimeupdateEvents = true;
+
+/**
  * Sets the tech's status on native text track support
  *
  * @type {Boolean}
