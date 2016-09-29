@@ -56,6 +56,7 @@ if (typeof HTMLVideoElement === 'undefined') {
  */
 function videojs(id, options, ready) {
   let tag;
+
   options = options || {};
 
   // Allow for element or ID to be passed in
@@ -102,14 +103,14 @@ function videojs(id, options, ready) {
     return tag.player || Player.players[tag.playerId];
   }
 
-  videojs.hooks('presetup').forEach(function(hookFunction) {
+  videojs.hooks('beforesetup').forEach(function(hookFunction) {
     options = videojs.mergeOptions(options, hookFunction(tag, videojs.mergeOptions({}, options)));
   });
 
   // If not, set up a new player
   const player = new Player(tag, options, ready);
 
-  videojs.hooks('postsetup').forEach((hookFunction) => hookFunction(player));
+  videojs.hooks('setup').forEach((hookFunction) => hookFunction(player));
 
   return player;
 }
