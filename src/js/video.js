@@ -128,18 +128,20 @@ videojs.hooks_ = {};
  * @return {Array} an array of hooks, or an empty array if there are none
  */
 videojs.hooks = function(type) {
-  return videojs.hooks_[type] || [];
+  videojs.hooks_[type] = videojs.hooks_[type] || [];
+  return videojs.hooks_[type];
 };
 
 /**
  * Add a function hook to a specific videojs lifecycle event
  *
  * @param {String} type the lifecycle event to hook the function to
- * @param {Function} fn the function to attach
+ * @param {Function|Array} fn the function to attach
  */
 videojs.hook = function(type, fn) {
-  videojs.hooks_[type] = videojs.hooks_[type] || [];
-  videojs.hooks_[type].push(fn);
+  const hooks = videojs.hooks[type];
+
+  hooks[type].concat(fn);
 };
 
 /**
@@ -147,19 +149,16 @@ videojs.hook = function(type, fn) {
  *
  * @param {String} type the lifecycle event that the function hooked to
  * @param {Function} fn the hooked function to remove
- * @return {Function|undefined} the function that was removed or undef
+ * @return {Boolean} the function that was removed or undef
  */
 videojs.removeHook = function(type, fn) {
-  const hooks = videojs.hooks_[type] || [];
-  let i = hooks.length;
+  const hooks = videojs.hooks(type);
+  const index = hooks[type].indexOf(fn);
 
-  while (i--) {
-    const hook = hooks[i];
+  hooks[type] = hooks[type].slice();
+  hooks[type].splice(index, 1);
 
-    if (hook === fn) {
-      return hooks.splice(i, 1);
-    }
-  }
+  return index > -1;
 };
 
 // Add default styles
