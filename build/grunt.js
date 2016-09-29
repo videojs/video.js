@@ -21,6 +21,7 @@ module.exports = function(grunt) {
       standalone: 'videojs'
     },
     plugin: [
+      ['bundle-collapser/plugin'],
       ['browserify-derequire']
     ]
   };
@@ -348,7 +349,7 @@ module.exports = function(grunt) {
             transform: ['babelify']
           },
           plugin: [
-            ['proxyquireify/plugin']
+            ['proxyquireify/plugin', 'bundle-collapser/plugin']
           ],
           banner: false,
           watch: true,
