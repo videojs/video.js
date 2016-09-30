@@ -167,6 +167,7 @@ module.exports = function(grunt) {
       swf:   { cwd: 'node_modules/videojs-swf/dist/', src: 'video-js.swf', dest: 'build/temp/', expand: true, filter: 'isFile' },
       ie8:   { cwd: 'node_modules/videojs-ie8/dist/', src: ['**/**'], dest: 'build/temp/ie8/', expand: true, filter: 'isFile' },
       dist:  { cwd: 'build/temp/', src: ['**/**', '!test*'], dest: 'dist/', expand: true, filter: 'isFile' },
+      a11y:  { src: 'sandbox/descriptions.html.example', dest: 'sandbox/descriptions.test-a11y.html' }, // Can only test a file with a .html or .htm extension
       examples: { cwd: 'docs/examples/', src: ['**/**'], dest: 'dist/examples/', expand: true, filter: 'isFile' }
     },
     cssmin: {
@@ -454,6 +455,24 @@ module.exports = function(grunt) {
           preferLocal: true
         }
       }
+    },
+    accessibility: {
+      options: {
+        accessibilityLevel: 'WCAG2AA',
+        reportLevels: {
+          notice: false,
+          warning: true,
+          error: true
+        },
+        ignore: [
+          // Ignore the warning about needing <optgroup> elements
+          'WCAG2AA.Principle1.Guideline1_3.1_3_1.H85.2'
+        ]
+
+      },
+      test: {
+        src: ['sandbox/descriptions.test-a11y.html']
+      }
     }
   });
 
@@ -462,6 +481,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('videojs-doc-generator');
   grunt.loadNpmTasks('chg');
   grunt.loadNpmTasks('gkatsev-grunt-sass');
+  grunt.loadNpmTasks('grunt-accessibility');
 
   const buildDependents = [
     'shell:lint',
@@ -511,12 +531,15 @@ module.exports = function(grunt) {
     'shell:noderequire',
     'shell:browserify',
     'shell:webpack',
-    'karma:defaults'].concat(process.env.TRAVIS && 'coveralls').filter(Boolean));
+    'karma:defaults',
+    'test-a11y'].concat(process.env.TRAVIS && 'coveralls').filter(Boolean));
 
   // Run while developing
   grunt.registerTask('dev', ['build', 'connect:dev', 'concurrent:watchSandbox']);
 
   grunt.registerTask('watchAll', ['build', 'connect:dev', 'concurrent:watchAll']);
+
+  grunt.registerTask('test-a11y', ['copy:a11y', 'accessibility']);
 
   // Pick your testing, or run both in different terminals
   grunt.registerTask('test-ui', ['browserify:tests']);

@@ -61,6 +61,7 @@
     "gkatsev-grunt-sass": "^1.1.1",
     "grunt": "^0.4.4",
     "grunt-babel": "^6.0.0",
+    "grunt-accessibility": "^4.1.0",
     "grunt-banner": "^0.4.0",
     "grunt-browserify": "3.5.1",
     "grunt-cli": "~0.1.13",
