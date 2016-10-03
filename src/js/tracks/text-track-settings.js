@@ -266,21 +266,88 @@ class TextTrackSettings extends Component {
     const id = config.id.replace('%s', this.id_);
 
     return [
-      createEl(
-        'label',
-        {className: 'vjs-label', textContent: config.label},
-        {for: id}),
-      createEl(
-        'select',
-        {id},
-        undefined,
-        config.options.map(o => {
-          return createEl('option', {
-            textContent: this.localize(o[1]),
-            value: o[0]
-          });
-        }))
+      createEl('label', {
+        className: 'vjs-label',
+        textContent: config.label
+      }, {
+        for: id
+      }),
+      createEl('select', {id}, undefined, config.options.map(o => {
+        return createEl('option', {
+          textContent: this.localize(o[1]),
+          value: o[0]
+        });
+      }))
     ];
+  }
+
+  /**
+   * Create foreground color element for the component
+   *
+   * @private
+   * @return {Element}
+   * @method createElFgColor_
+   */
+  createElFgColor_() {
+    const legend = createEl('legend', {
+      textContent: this.localize('Text')
+    });
+
+    const select = this.createElSelect_('color');
+
+    const opacity = createEl('span', {
+      className: 'vjs-text-opacity vjs-opacity'
+    }, undefined, this.createElSelect_('textOpacity'));
+
+    return createEl('fieldset', {
+      className: 'vjs-fg-color vjs-tracksetting'
+    }, undefined, [legend, select, opacity]);
+  }
+
+  /**
+   * Create background color element for the component
+   *
+   * @private
+   * @return {Element}
+   * @method createElBgColor_
+   */
+  createElBgColor_() {
+    const legend = createEl('legend', {
+      textContent: this.localize('Background')
+    });
+
+    const select = this.createElSelect_('backgroundColor');
+
+    const opacity = createEl('span', {
+      className: 'vjs-bg-opacity vjs-opacity'
+    }, undefined, this.createElSelect_('backgroundOpacity'));
+
+    return createEl('fieldset', {
+      className: 'vjs-bg-color vjs-tracksetting'
+    }, undefined, [legend, select, opacity]);
+  }
+
+  /**
+   * Create window color element for the component
+   *
+   * @private
+   * @return {Element}
+   * @method createElWinColor_
+   */
+  createElWinColor_() {
+    const legend = createEl('legend', {
+      textContent: this.localize('Window')
+    });
+
+    const select = this.createElSelect_('windowColor');
+
+    const opacity = createEl('span', {
+      className: 'vjs-window-opacity vjs-opacity'
+    }, undefined, this.createElSelect_('windowOpacity'));
+
+    return createEl('fieldset', {
+      className: 'vjs-window-color vjs-tracksetting'
+    }, undefined, [legend, select, opacity]);
   }
 
   /**
@@ -291,45 +358,13 @@ class TextTrackSettings extends Component {
    * @method createElColors_
    */
   createElColors_() {
-    return createEl(
-      'div',
-      {className: 'vjs-tracksettings-colors'},
-      undefined,
-      [
-        createEl(
-          'fieldset',
-          {className: 'vjs-fg-color vjs-tracksetting'},
-          undefined,
-          [createEl('legend', {textContent: 'Text'})].concat(
-            this.createElSelect_('color'),
-            createEl(
-              'span',
-              {className: 'vjs-text-opacity vjs-opacity'},
-              undefined,
-              this.createElSelect_('textOpacity')))),
-        createEl(
-          'fieldset',
-          {className: 'vjs-bg-color vjs-tracksetting'},
-          undefined,
-          [createEl('legend', {textContent: 'Background'})].concat(
-            this.createElSelect_('backgroundColor'),
-            createEl(
-              'span',
-              {className: 'vjs-bg-opacity vjs-opacity'},
-              undefined,
-              this.createElSelect_('backgroundOpacity')))),
-        createEl(
-          'fieldset',
-          {className: 'vjs-window-color vjs-tracksetting'},
-          undefined,
-          [createEl('legend', {textContent: 'Window'})].concat(
-            this.createElSelect_('windowColor'),
-            createEl(
-              'span',
-              {className: 'vjs-window-opacity vjs-opacity'},
-              undefined,
-              this.createElSelect_('windowOpacity'))))
-      ]);
+    return createEl('div', {
+      className: 'vjs-tracksettings-colors'
+    }, undefined, [
+      this.createElFgColor_(),
+      this.createElBgColor_(),
+      this.createElWinColor_()
+    ]);
   }
 
   /**
@@ -340,27 +375,21 @@ class TextTrackSettings extends Component {
    * @method createElFont_
    */
   createElFont_() {
-    return createEl(
-      'div',
-      {className: 'vjs-tracksettings-font'},
-      undefined,
-      [
-        createEl(
-          'div',
-          {className: 'vjs-font-percent vjs-tracksetting'},
-          undefined,
-          this.createElSelect_('fontPercent')),
-        createEl(
-          'div',
-          {className: 'vjs-edge-style vjs-tracksetting'},
-          undefined,
-          this.createElSelect_('edgeStyle')),
-        createEl(
-          'div',
-          {className: 'vjs-font-family vjs-tracksetting'},
-          undefined,
-          this.createElSelect_('fontFamily'))
-      ]);
+    const fontPercent = createEl('div', {
+      className: 'vjs-font-percent vjs-tracksetting'
+    }, undefined, this.createElSelect_('fontPercent'));
+
+    const edgeStyle = createEl('div', {
+      className: 'vjs-edge-style vjs-tracksetting'
+    }, undefined, this.createElSelect_('edgeStyle'));
+
+    const fontFamily = createEl('div', {
+      className: 'vjs-font-family vjs-tracksetting'
+    }, undefined, this.createElSelect_('fontFamily'));
+
+    return createEl('div', {
+      className: 'vjs-tracksettings-font'
+    }, undefined, [fontPercent, edgeStyle, fontFamily]);
   }
 
   /**
@@ -371,18 +400,19 @@ class TextTrackSettings extends Component {
    * @method createElControls_
    */
   createElControls_() {
-    return createEl(
-      'div',
-      {className: 'vjs-tracksettings-controls'},
-      undefined,
-      [
-        createEl(
-          'button',
-          {className: 'vjs-default-button', textContent: 'Defaults'}),
-        createEl(
-          'button',
-          {className: 'vjs-done-button', textContent: 'Done'})
-      ]);
+    const defaultsButton = createEl('button', {
+      className: 'vjs-default-button',
+      textContent: this.localize('Defaults')
+    });
+
+    const doneButton = createEl('button', {
+      className: 'vjs-done-button',
+      textContent: 'Done'
+    });
+
+    return createEl('div', {
+      className: 'vjs-tracksettings-controls'
+    }, undefined, [defaultsButton, doneButton]);
   }
 
   /**
@@ -392,50 +422,41 @@ class TextTrackSettings extends Component {
    * @method createEl
    */
   createEl() {
-    const settings = createEl(
-      'div',
-      {className: 'vjs-tracksettings'},
-      undefined,
-      [this.createElColors_(), this.createElFont_(), this.createElControls_()]);
+    const settings = createEl('div', {
+      className: 'vjs-tracksettings'
+    }, undefined, [
+      this.createElColors_(),
+      this.createElFont_(),
+      this.createElControls_()
+    ]);
 
-    const heading = createEl(
-      'div',
-      {
-        className: 'vjs-control-text',
-        id: `TTsettingsDialogLabel-${this.id_}`,
-        textContent: 'Caption Settings Dialog'
-      },
-      {
-        'aria-level': '1',
-        'role': 'heading'
-      });
+    const heading = createEl('div', {
+      className: 'vjs-control-text',
+      id: `TTsettingsDialogLabel-${this.id_}`,
+      textContent: 'Caption Settings Dialog'
+    }, {
+      'aria-level': '1',
+      'role': 'heading'
+    });
 
-    const description = createEl(
-      'div',
-      {
-        className: 'vjs-control-text',
-        id: `TTsettingsDialogDescription-${this.id_}`,
-        textContent: 'Beginning of dialog window. Escape will cancel and close the window.'
-      });
+    const description = createEl('div', {
+      className: 'vjs-control-text',
+      id: `TTsettingsDialogDescription-${this.id_}`,
+      textContent: 'Beginning of dialog window. Escape will cancel and close the window.'
+    });
 
-    const doc = createEl(
-      'div',
-      undefined,
-      {role: 'document'},
-      [heading, description, settings]);
+    const doc = createEl('div', undefined, {
+      role: 'document'
+    }, [heading, description, settings]);
 
-    return createEl(
-      'div',
-      {
-        className: 'vjs-caption-settings vjs-modal-overlay',
-        tabIndex: -1
-      },
-      {
-        'role': 'dialog',
-        'aria-labelledby': heading.id,
-        'aria-describedby': description.id
-      },
-      doc);
+    return createEl('div', {
+      className: 'vjs-caption-settings vjs-modal-overlay',
+      tabIndex: -1
+    }, {
+      'role': 'dialog',
+      'aria-labelledby': heading.id,
+      'aria-describedby': description.id
+    }, doc);
   }
 
   /**
