@@ -10,6 +10,19 @@ import log from '../utils/log';
 
 const LOCAL_STORAGE_KEY = 'vjs-text-track-settings';
 
+const COLOR_BLACK = ['#000', 'Black'];
+const COLOR_BLUE = ['#00F', 'Blue'];
+const COLOR_CYAN = ['#0FF', 'Cyan'];
+const COLOR_GREEN = ['#0F0', 'Green'];
+const COLOR_MAGENTA = ['#F0F', 'Magenta'];
+const COLOR_RED = ['#F00', 'Red'];
+const COLOR_WHITE = ['#FFF', 'White'];
+const COLOR_YELLOW = ['#FF0', 'Yellow'];
+
+const OPACITY_OPAQUE = ['1', 'Opaque'];
+const OPACITY_SEMI = ['0.5', 'Semi-Transparent'];
+const OPACITY_TRANS = ['0', 'Transparent'];
+
 // Configuration for the various <select> elements in the DOM of this component.
 //
 // Possible keys include:
@@ -27,14 +40,14 @@ const selectConfigs = {
     id: 'captions-background-color-%s',
     label: 'Color',
     options: [
-      ['#000', 'Black'],
-      ['#FFF', 'White'],
-      ['#F00', 'Red'],
-      ['#0F0', 'Green'],
-      ['#00F', 'Blue'],
-      ['#FF0', 'Yellow'],
-      ['#F0F', 'Magenta'],
-      ['#0FF', 'Cyan']
+      COLOR_BLACK,
+      COLOR_WHITE,
+      COLOR_RED,
+      COLOR_GREEN,
+      COLOR_BLUE,
+      COLOR_YELLOW,
+      COLOR_MAGENTA,
+      COLOR_CYAN
     ]
   },
 
@@ -43,9 +56,9 @@ const selectConfigs = {
     id: 'captions-background-opacity-%s',
     label: 'Transparency',
     options: [
-      ['1', 'Opaque'],
-      ['0.5', 'Semi-Transparent'],
-      ['0', 'Transparent']
+      OPACITY_OPAQUE,
+      OPACITY_SEMI,
+      OPACITY_TRANS
     ]
   },
 
@@ -54,14 +67,14 @@ const selectConfigs = {
     id: 'captions-foreground-color-%s',
     label: 'Color',
     options: [
-      ['#FFF', 'White'],
-      ['#000', 'Black'],
-      ['#F00', 'Red'],
-      ['#0F0', 'Green'],
-      ['#00F', 'Blue'],
-      ['#FF0', 'Yellow'],
-      ['#F0F', 'Magenta'],
-      ['#0FF', 'Cyan']
+      COLOR_WHITE,
+      COLOR_BLACK,
+      COLOR_RED,
+      COLOR_GREEN,
+      COLOR_BLUE,
+      COLOR_YELLOW,
+      COLOR_MAGENTA,
+      COLOR_CYAN
     ]
   },
 
@@ -117,8 +130,8 @@ const selectConfigs = {
     id: 'captions-foreground-opacity-%s',
     label: 'Transparency',
     options: [
-      ['1', 'Opaque'],
-      ['0.5', 'Semi-Opaque']
+      OPACITY_OPAQUE,
+      OPACITY_SEMI
     ]
   },
 
@@ -135,9 +148,9 @@ const selectConfigs = {
     id: 'captions-window-opacity-%s',
     label: 'Transparency',
     options: [
-      ['0', 'Transparent'],
-      ['0.5', 'Semi-Transparent'],
-      ['1', 'Opaque']
+      OPACITY_TRANS,
+      OPACITY_SEMI,
+      OPACITY_OPAQUE
     ]
   }
 };
@@ -262,7 +275,10 @@ class TextTrackSettings extends Component {
         {id},
         undefined,
         config.options.map(o => {
-          return createEl('option', {textContent: o[1], value: o[0]});
+          return createEl('option', {
+            textContent: this.localize(o[1]),
+            value: o[0]
+          });
         }))
     ];
   }
