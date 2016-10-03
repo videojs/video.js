@@ -117,37 +117,41 @@ function videojs(id, options, ready) {
 
 /**
  * An Object that contains lifecycle hooks as keys which point to an array
- * of functions that are run when a lifecycle event is triggered
+ * of functions that are run when a lifecycle is triggered
  */
 videojs.hooks_ = {};
 
 /**
- * Get a list of hooks for a specific lifecycle event
+ * Get a list of hooks for a specific lifecycle
  *
- * @param {String} type the lifecyle event to get hooks from
+ * @param {String} type the lifecyle to get hooks from
+ * @param {Function=} optionally add a hook to the lifecycle that your are getting
  * @return {Array} an array of hooks, or an empty array if there are none
  */
-videojs.hooks = function(type) {
+videojs.hooks = function(type, fn) {
   videojs.hooks_[type] = videojs.hooks_[type] || [];
+  if (fn) {
+    videojs.hook(type, fn);
+  }
   return videojs.hooks_[type];
 };
 
 /**
- * Add a function hook to a specific videojs lifecycle event
+ * Add a function hook to a specific videojs lifecycle
  *
- * @param {String} type the lifecycle event to hook the function to
+ * @param {String} type the lifecycle to hook the function to
  * @param {Function|Array} fn the function to attach
  */
 videojs.hook = function(type, fn) {
-  const hooks = videojs.hooks[type];
+  const hooks = videojs.hooks(type);
 
-  hooks[type].concat(fn);
+  videojs.hooks_[type] = hooks[type].concat(fn);
 };
 
 /**
- * Remove a hook from a specific videojs lifecycle event
+ * Remove a hook from a specific videojs lifecycle
  *
- * @param {String} type the lifecycle event that the function hooked to
+ * @param {String} type the lifecycle that the function hooked to
  * @param {Function} fn the hooked function to remove
  * @return {Boolean} the function that was removed or undef
  */
