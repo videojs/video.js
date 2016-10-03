@@ -497,7 +497,7 @@ class TextTrackSettings extends Component {
    * @method setDefaults
    */
   setDefaults() {
-    Obj.each(selectConfigs, config => {
+    Obj.each(selectConfigs, (config) => {
       const index = config.hasOwnProperty('default') ? config.default : 0;
 
       this.$(config.selector).selectedIndex = index;
