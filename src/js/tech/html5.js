@@ -446,6 +446,7 @@ class Html5 extends Tech {
             this.off(this.player_, 'timeupdate', checkProgress);
           }
         };
+
         this.on(this.player_, 'timeupdate', checkProgress);
         return NaN;
       }
