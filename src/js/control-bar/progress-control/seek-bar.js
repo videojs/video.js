@@ -5,7 +5,7 @@ import Slider from '../../slider/slider.js';
 import Component from '../../component.js';
 import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
-import computedStyle from '../../utils/get-computed-style.js';
+import computedStyle from '../../utils/computed-style.js';
 
 import './load-progress-bar.js';
 import './play-progress-bar.js';

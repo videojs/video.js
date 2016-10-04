@@ -25,7 +25,7 @@ import log from './utils/log.js';
 import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
 import * as Url from './utils/url.js';
-import computedStyle from './utils/get-computed-style.js';
+import computedStyle from './utils/computed-style.js';
 import extendFn from './extend.js';
 import merge from 'lodash-compat/object/merge';
 import xhr from 'xhr';
@@ -728,11 +728,11 @@ videojs.insertContent = Dom.insertContent;
  * that the player doesn't break in these cases.
  * See https://bugzilla.mozilla.org/show_bug.cgi?id=548397 for more details.
  *
- * @function getComputedStyle
+ * @function computedStyle
  * @param el the element you want the computed style of
  * @param prop the property name you want
  */
-videojs.getComputedStyle = computedStyle;
+videojs.computedStyle = computedStyle;
 
 /*
  * Custom Universal Module Definition (UMD)

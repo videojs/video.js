@@ -6,7 +6,7 @@ import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
 import throttle from 'lodash-compat/function/throttle';
-import computedStyle from '../../utils/get-computed-style.js';
+import computedStyle from '../../utils/computed-style.js';
 
 /**
  * The Mouse Time Display component shows the time you will seek to
