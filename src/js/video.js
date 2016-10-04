@@ -131,7 +131,7 @@ videojs.hooks_ = {};
 videojs.hooks = function(type, fn) {
   videojs.hooks_[type] = videojs.hooks_[type] || [];
   if (fn) {
-    videojs.hook(type, fn);
+    videojs.hooks_[type] = videojs.hooks_[type].concat(fn);
   }
   return videojs.hooks_[type];
 };
@@ -143,9 +143,7 @@ videojs.hooks = function(type, fn) {
  * @param {Function|Array} fn the function to attach
  */
 videojs.hook = function(type, fn) {
-  const hooks = videojs.hooks(type);
-
-  videojs.hooks_[type] = hooks[type].concat(fn);
+  videojs.hooks(type, fn);
 };
 
 /**
@@ -156,11 +154,10 @@ videojs.hook = function(type, fn) {
  * @return {Boolean} the function that was removed or undef
  */
 videojs.removeHook = function(type, fn) {
-  const hooks = videojs.hooks(type);
-  const index = hooks[type].indexOf(fn);
+  const index = videojs.hooks(type).indexOf(fn);
 
-  hooks[type] = hooks[type].slice();
-  hooks[type].splice(index, 1);
+  videojs.hooks_[type] = videojs.hooks_[type].slice();
+  videojs.hooks_[type].splice(index, 1);
 
   return index > -1;
 };
