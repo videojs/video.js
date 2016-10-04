@@ -301,7 +301,7 @@ class TextTrackSettings extends Component {
 
     return createEl('fieldset', {
       className: 'vjs-fg-color vjs-tracksetting'
-    }, undefined, [legend, select, opacity]);
+    }, undefined, [legend].concat(select, opacity));
   }
 
   /**
@@ -324,7 +324,7 @@ class TextTrackSettings extends Component {
 
     return createEl('fieldset', {
       className: 'vjs-bg-color vjs-tracksetting'
-    }, undefined, [legend, select, opacity]);
+    }, undefined, [legend].concat(select, opacity));
   }
 
   /**
@@ -347,7 +347,7 @@ class TextTrackSettings extends Component {
 
     return createEl('fieldset', {
       className: 'vjs-window-color vjs-tracksetting'
-    }, undefined, [legend, select, opacity]);
+    }, undefined, [legend].concat(select, opacity));
   }
 
   /**
