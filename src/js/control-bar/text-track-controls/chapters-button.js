@@ -35,7 +35,7 @@ class ChaptersButton extends TextTrackButton {
   }
 
   update(event) {
-    if (this.track_ === undefined || (event && (event.type === 'addtrack' || event.type === 'removetrack'))) {
+    if (!this.track_ || (event && (event.type === 'addtrack' || event.type === 'removetrack'))) {
       this.setTrack(this.findChaptersTrack());
     }
     super.update();
@@ -50,6 +50,7 @@ class ChaptersButton extends TextTrackButton {
       this.updateHandler_ = this.update.bind(this);
     }
 
+    // here this.track_ refers to the old track instance
     if (this.track_) {
       const remoteTextTrackEl = this.player_.remoteTextTrackEls().getTrackElementByTrack_(this.track_);
 
@@ -62,6 +63,7 @@ class ChaptersButton extends TextTrackButton {
 
     this.track_ = track;
 
+    // here this.track_ refers to the new track instance
     if (this.track_) {
       this.track_.mode = 'hidden';
 
