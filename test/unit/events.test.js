@@ -259,3 +259,21 @@ QUnit.test('should have relatedTarget correctly set on the event', function(asse
 
   Events.trigger(el2, { type: 'click', relatedTarget: undefined });
 });
+
+QUnit.test('should execute remaining handlers after an exception in an event handler', function(assert) {
+  assert.expect(1);
+
+  const el = document.createElement('div');
+  const listener1 = function() {
+    throw new Error('GURU MEDITATION ERROR');
+  };
+  const listener2 = function() {
+    assert.ok(true, 'Click Triggered');
+  };
+
+  Events.on(el, 'click', listener1);
+  Events.on(el, 'click', listener2);
+
+  // 1 click
+  Events.trigger(el, 'click');
+});

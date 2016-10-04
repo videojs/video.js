@@ -188,6 +188,7 @@ QUnit.test('should set the width, height, and aspect ratio via a css class', fun
   // Change the aspect ratio
   player.aspectRatio('4:1');
   assert.ok(confirmSetting('padding-top', '25%'), 'aspect ratio percent should match the newly set aspect ratio');
+  player.dispose();
 });
 
 QUnit.test('should use an class name that begins with an alpha character', function(assert) {
@@ -203,6 +204,8 @@ QUnit.test('should use an class name that begins with an alpha character', funct
 
   assert.ok(/\s*\.alpha1-dimensions\s*\{/.test(getStyleText(alphaPlayer.styleEl_)), 'appends -dimensions to an alpha player ID');
   assert.ok(/\s*\.dimensions-1numeric\s*\{/.test(getStyleText(numericPlayer.styleEl_)), 'prepends dimensions- to a numeric player ID');
+  alphaPlayer.dispose();
+  numericPlayer.dispose();
 });
 
 QUnit.test('should wrap the original tag in the player div', function(assert) {
@@ -265,6 +268,7 @@ QUnit.test('should hide the poster when play is called', function(assert) {
 
   player.tech_.trigger('play');
   assert.equal(player.hasStarted(), true, 'the show poster flag is false after play');
+  player.dispose();
 });
 
 QUnit.test('should load a media controller', function(assert) {
@@ -482,6 +486,7 @@ QUnit.test('should register players with generated ids', function(assert) {
 
   assert.equal(player.el().id, player.id(), 'the player and element ids are equal');
   assert.ok(Player.players[id], 'the generated id is registered');
+  player.dispose();
 });
 
 QUnit.test('should not add multiple first play events despite subsequent loads', function(assert) {
@@ -497,6 +502,7 @@ QUnit.test('should not add multiple first play events despite subsequent loads',
   player.tech_.trigger('loadstart');
   player.tech_.trigger('loadstart');
   player.tech_.trigger('play');
+  player.dispose();
 });
 
 QUnit.test('should fire firstplay after resetting the player', function(assert) {
@@ -529,6 +535,7 @@ QUnit.test('should fire firstplay after resetting the player', function(assert) 
   player.tech_.trigger('loadstart');
   // player.tech_.trigger('play');
   assert.ok(fpFired, 'Third firstplay fired');
+  player.dispose();
 });
 
 QUnit.test('should remove vjs-has-started class', function(assert) {
@@ -544,7 +551,9 @@ QUnit.test('should remove vjs-has-started class', function(assert) {
   assert.ok(player.el().className.indexOf('vjs-has-started') === -1, 'vjs-has-started class removed');
 
   player.tech_.trigger('play');
+
   assert.ok(player.el().className.indexOf('vjs-has-started') !== -1, 'vjs-has-started class added again');
+  player.dispose();
 });
 
 QUnit.test('should add and remove vjs-ended class', function(assert) {
@@ -565,6 +574,7 @@ QUnit.test('should add and remove vjs-ended class', function(assert) {
 
   player.tech_.trigger('loadstart');
   assert.ok(player.el().className.indexOf('vjs-ended') === -1, 'vjs-ended class removed');
+  player.dispose();
 });
 
 QUnit.test('player should handle different error types', function(assert) {
@@ -615,6 +625,8 @@ QUnit.test('player should handle different error types', function(assert) {
 
   // restore error logging
   log.error.restore();
+
+  player.dispose();
 });
 
 QUnit.test('Data attributes on the video element should persist in the new wrapper element', function(assert) {
@@ -627,6 +639,8 @@ QUnit.test('Data attributes on the video element should persist in the new wrapp
   const player = TestHelpers.makePlayer({}, tag);
 
   assert.equal(player.el().getAttribute('data-id'), dataId, 'data-id should be available on the new player element after creation');
+
+  player.dispose();
 });
 
 QUnit.test('should restore attributes from the original video tag when creating a new element', function(assert) {
@@ -663,6 +677,7 @@ QUnit.test('should honor default inactivity timeout', function(assert) {
   assert.equal(player.userActive(), false, 'User is inactive after timeout expired');
 
   clock.restore();
+  player.dispose();
 });
 
 QUnit.test('should honor configured inactivity timeout', function(assert) {
@@ -681,6 +696,7 @@ QUnit.test('should honor configured inactivity timeout', function(assert) {
   assert.equal(player.userActive(), false, 'User is inactive after timeout expired');
 
   clock.restore();
+  player.dispose();
 });
 
 QUnit.test('should honor disabled inactivity timeout', function(assert) {
@@ -696,6 +712,7 @@ QUnit.test('should honor disabled inactivity timeout', function(assert) {
   assert.equal(player.userActive(), true, 'User is still active');
 
   clock.restore();
+  player.dispose();
 });
 
 QUnit.test('should clear pending errors on disposal', function(assert) {
@@ -729,6 +746,7 @@ QUnit.test('pause is called when player ended event is fired and player is not p
   };
   player.tech_.trigger('ended');
   assert.equal(pauses, 1, 'pause was called');
+  player.dispose();
 });
 
 QUnit.test('pause is not called if the player is paused and ended is fired', function(assert) {
@@ -743,7 +761,9 @@ QUnit.test('pause is not called if the player is paused and ended is fired', fun
     pauses++;
   };
   player.tech_.trigger('ended');
+
   assert.equal(pauses, 0, 'pause was not called when ended fired');
+  player.dispose();
 });
 
 QUnit.test('should add an audio class if an audio el is used', function(assert) {
@@ -752,6 +772,7 @@ QUnit.test('should add an audio class if an audio el is used', function(assert) 
   const audioClass = 'vjs-audio';
 
   assert.ok(player.el().className.indexOf(audioClass) !== -1, 'added ' + audioClass + ' css class');
+  player.dispose();
 });
 
 QUnit.test('should add a video player region if a video el is used', function(assert) {
@@ -760,6 +781,7 @@ QUnit.test('should add a video player region if a video el is used', function(as
 
   assert.ok(player.el().getAttribute('role') === 'region', 'region role is present');
   assert.ok(player.el().getAttribute('aria-label') === 'video player', 'video player label present');
+  player.dispose();
 });
 
 QUnit.test('should add an audio player region if an audio el is used', function(assert) {
@@ -768,6 +790,7 @@ QUnit.test('should add an audio player region if an audio el is used', function(
 
   assert.ok(player.el().getAttribute('role') === 'region', 'region role is present');
   assert.ok(player.el().getAttribute('aria-label') === 'audio player', 'audio player label present');
+  player.dispose();
 });
 
 QUnit.test('should not be scrubbing while not seeking', function(assert) {
@@ -776,7 +799,9 @@ QUnit.test('should not be scrubbing while not seeking', function(assert) {
   assert.equal(player.scrubbing(), false, 'player is not scrubbing');
   assert.ok(player.el().className.indexOf('scrubbing') === -1, 'scrubbing class is not present');
   player.scrubbing(false);
+
   assert.equal(player.scrubbing(), false, 'player is not scrubbing');
+  player.dispose();
 });
 
 QUnit.test('should be scrubbing while seeking', function(assert) {
@@ -785,6 +810,7 @@ QUnit.test('should be scrubbing while seeking', function(assert) {
   player.scrubbing(true);
   assert.equal(player.scrubbing(), true, 'player is scrubbing');
   assert.ok(player.el().className.indexOf('scrubbing') !== -1, 'scrubbing class is present');
+  player.dispose();
 });
 
 QUnit.test('should throw on startup no techs are specified', function(assert) {
@@ -827,6 +853,9 @@ QUnit.test('should have a sensible toJSON that is equivalent to player.options',
   popts.tracks[0].player = undefined;
 
   assert.deepEqual(player2.toJSON(), popts, 'no circular references');
+
+  player.dispose();
+  player2.dispose();
 });
 
 QUnit.test('should ignore case in language codes and try primary code', function(assert) {
@@ -849,6 +878,7 @@ QUnit.test('should ignore case in language codes and try primary code', function
   assert.strictEqual(player.localize('Error'), 'Problem', 'Used primary code localisation');
   player.language('en-GB');
   assert.strictEqual(player.localize('Good'), 'Brilliant', 'Ignored case');
+  player.dispose();
 });
 
 QUnit.test('inherits language from parent element', function(assert) {
@@ -889,8 +919,10 @@ QUnit.test('createModal()', function(assert) {
   assert.strictEqual(modal.content(), 'foo', 'content is set properly');
   assert.ok(modal.opened(), 'modal is opened by default');
   modal.close();
+
   assert.ok(spy.called, 'modal was disposed when closed');
   assert.strictEqual(player.children().indexOf(modal), -1, 'modal was removed from player\'s children');
+  player.dispose();
 });
 
 QUnit.test('createModal() options object', function(assert) {
@@ -901,6 +933,7 @@ QUnit.test('createModal() options object', function(assert) {
   assert.strictEqual(modal.content(), 'foo', 'content argument takes precedence');
   assert.strictEqual(modal.options_.label, 'boo', 'modal options are set properly');
   modal.close();
+  player.dispose();
 });
 
 QUnit.test('you can clear error in the error event', function(assert) {
@@ -919,6 +952,7 @@ QUnit.test('you can clear error in the error event', function(assert) {
   assert.ok(!player.error(), 'we no longer have an error');
 
   log.error.restore();
+  player.dispose();
 });
 
 QUnit.test('Player#tech will return tech given the appropriate input', function(assert) {
@@ -1004,6 +1038,7 @@ QUnit.test('Remove waiting class on timeupdate after tech waiting', function(ass
   assert.ok(/vjs-waiting/.test(player.el().className), 'vjs-waiting is added to the player el on tech waiting');
   player.trigger('timeupdate');
   assert.ok(!(/vjs-waiting/).test(player.el().className), 'vjs-waiting is removed from the player el on timeupdate');
+  player.dispose();
 });
 
 QUnit.test('Make sure that player\'s style el respects VIDEOJS_NO_DYNAMIC_STYLE option', function(assert) {
@@ -1064,6 +1099,8 @@ QUnit.test('When VIDEOJS_NO_DYNAMIC_STYLE is set, apply sizing directly to the t
 
   player.width(600);
   player.height(300);
+
   assert.equal(player.tech_.el().width, 600, 'the width is equal to 600');
   assert.equal(player.tech_.el().height, 300, 'the height is equal 300');
+  player.dispose();
 });

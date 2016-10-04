@@ -108,7 +108,9 @@ if (window.VIDEOJS_NO_DYNAMIC_STYLE !== true) {
     style = stylesheet.createStyleElement('vjs-styles-defaults');
     const head = Dom.$('head');
 
-    head.insertBefore(style, head.firstChild);
+    if (head) {
+      head.insertBefore(style, head.firstChild);
+    }
     stylesheet.setTextContent(style, `
       .video-js {
         width: 300px;

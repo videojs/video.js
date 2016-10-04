@@ -121,4 +121,4 @@ videojs(document.getElementsByClassName('awesome_video_class')[0], {}, function(
 });
 ```
 
-\* If you have trouble playing back content you know is in the [correct format](http://blog.zencoder.com/2013/09/13/what-formats-do-i-need-for-html5-video/), your HTTP server might not be delivering the content with the correct [MIME type](http://en.wikipedia.org/wiki/Internet_media_type#Type_video). Please double check your content's headers before opening an [issue](https://github.com/videojs/video.js/blob/master/CONTRIBUTING.md).
+\* If you have trouble playing back content you know is in the [correct format](http://blog.zencoder.com/2013/09/13/what-formats-do-i-need-for-html5-video/), your HTTP server might not be delivering the content with the correct [MIME type](http://en.wikipedia.org/wiki/Internet_media_type#Type_video). Please double check your content's headers before opening an [issue](/CONTRIBUTING.md).

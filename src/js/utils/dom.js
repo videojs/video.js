@@ -67,7 +67,10 @@ function createQuerier(method) {
     if (isNonBlankString(context)) {
       context = document.querySelector(context);
     }
-    return (isEl(context) ? context : document)[method](selector);
+
+    const ctx = isEl(context) ? context : document;
+
+    return ctx[method] && ctx[method](selector);
   };
 }
 
@@ -250,10 +253,10 @@ export function removeElData(el) {
  * @param {String} classToCheck Classname to check
  */
 export function hasElClass(element, classToCheck) {
+  throwIfWhitespace(classToCheck);
   if (element.classList) {
     return element.classList.contains(classToCheck);
   }
-  throwIfWhitespace(classToCheck);
   return classRegExp(classToCheck).test(element.className);
 }
 

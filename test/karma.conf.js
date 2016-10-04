@@ -13,6 +13,8 @@ module.exports = function(config) {
       '../build/temp/ie8/videojs-ie8.min.js',
       '../test/globals-shim.js',
       '../test/unit/**/*.js',
+      '../build/temp/browserify.js',
+      '../build/temp/webpack.js',
       { pattern: '../src/**/*.js', watched: true, included: false, served: false }
     ],
 
@@ -87,10 +89,16 @@ module.exports = function(config) {
     }
   };
 
-  if (process.env.TRAVIS) {
+  // Coverage reporting
+  // Coverage is enabled by passing the flag --coverage to npm test
+  var coverageFlag = process.env.npm_config_coverage;
+  var reportCoverage = process.env.TRAVIS || coverageFlag;
+  if (reportCoverage) {
     settings.browserify.transform.push('browserify-istanbul');
     settings.reporters.push('coverage');
+  }
 
+  if (process.env.TRAVIS) {
     if (process.env.BROWSER_STACK_USERNAME) {
       settings.browsers = [
         'chrome_bs',

@@ -110,6 +110,7 @@ QUnit.test('should hide playback rate control if it\'s not supported', function(
   const playbackRate = new PlaybackRateMenuButton(player);
 
   assert.ok(playbackRate.el().className.indexOf('vjs-hidden') >= 0, 'playbackRate is not hidden');
+  player.dispose();
 });
 
 QUnit.test('Fullscreen control text should be correct when fullscreenchange is triggered', function() {
@@ -122,4 +123,5 @@ QUnit.test('Fullscreen control text should be correct when fullscreenchange is t
   player.isFullscreen(false);
   player.trigger('fullscreenchange');
   QUnit.equal(fullscreentoggle.controlText(), 'Fullscreen', 'Control Text is correct while switching back to normal mode');
+  player.dispose();
 });

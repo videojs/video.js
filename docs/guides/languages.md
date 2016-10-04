@@ -110,6 +110,10 @@ NOTE: These need to be added after the core Video.js script.
 Notes:
 - This will add your language key/values to the Video.js player instances individually. If these values already exist in the global dictionary via the process above, those will be overridden for the player instance in question.
 
+Updating default translations
+-----------------------------
+
+A list of the current translations and any strings that need translation are at [docs/translations-needed.md](../translations-needed.md). After updating the language files in /lang/ running `grunt check-languages` will update that list.
 
 Setting Default Language in a Video.js Player
 ---------------------------------------------

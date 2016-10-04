@@ -9,6 +9,7 @@
 
 import * as Dom from './dom.js';
 import * as Guid from './guid.js';
+import log from './log.js';
 import window from 'global/window';
 import document from 'global/document';
 
@@ -248,7 +249,11 @@ export function on(elem, type, fn) {
           if (event.isImmediatePropagationStopped()) {
             break;
           } else {
-            handlersCopy[m].call(elem, event, hash);
+            try {
+              handlersCopy[m].call(elem, event, hash);
+            } catch (e) {
+              log.error(e);
+            }
           }
         }
       }
