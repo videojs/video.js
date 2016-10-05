@@ -100,6 +100,7 @@
     "markdown-table": "^1.0.0",
     "proxyquireify": "^3.0.0",
     "qunitjs": "^1.23.1",
+    "shelljs-nodecli": "^0.1.1",
     "sinon": "^1.16.1",
     "time-grunt": "^1.1.1",
     "uglify-js": "~2.7.3",
