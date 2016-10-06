@@ -1,3 +1,39 @@
+<a name="5.12.3"></a>
+## [5.12.3](https://github.com/videojs/video.js/compare/v5.10.7...v5.12.3) (2016-10-06)
+
+### Features
+
+* **lang:** add missing translations in fr.json ([280ecd4](https://github.com/videojs/video.js/commit/280ecd4))
+* **lang:** add missing translations to el.json ([eb0efd4](https://github.com/videojs/video.js/commit/eb0efd4))
+
+### Bug Fixes
+
+* **controls:** fix load progress bar never highlighting first buffered time range ([ca02298](https://github.com/videojs/video.js/commit/ca02298))
+* **css:** remove commented out css ([5fdcd46](https://github.com/videojs/video.js/commit/5fdcd46)), closes [#3587](https://github.com/videojs/video.js/issues/3587)
+* disable HLS hack on Firefox for Android ([#3586](https://github.com/videojs/video.js/issues/3586)) ([dd2aff0](https://github.com/videojs/video.js/commit/dd2aff0))
+* proxy ios webkit events into fullscreenchange ([#3644](https://github.com/videojs/video.js/issues/3644)) ([e479f8c](https://github.com/videojs/video.js/commit/e479f8c))
+* **html5:** disable manual timeupdate events on html5 tech ([#3656](https://github.com/videojs/video.js/issues/3656)) ([920c54a](https://github.com/videojs/video.js/commit/920c54a))
+
+### Chores
+
+* move metadata to hidden folder and update references ([86f0830](https://github.com/videojs/video.js/commit/86f0830))
+* **deps:** add the bundle-collapser browserify plugin ([816291e](https://github.com/videojs/video.js/commit/816291e))
+* **package:** remove es2015-loose since it's an option for es2015 ([#3629](https://github.com/videojs/video.js/issues/3629)) ([c545acd](https://github.com/videojs/video.js/commit/c545acd))
+* **package:** update grunt-contrib-cssmin to version 1.0.2 ([#3595](https://github.com/videojs/video.js/issues/3595)) ([54e3db5](https://github.com/videojs/video.js/commit/54e3db5))
+* **package:** update grunt-shell to version 2.0.0 ([#3642](https://github.com/videojs/video.js/issues/3642)) ([2032b17](https://github.com/videojs/video.js/commit/2032b17))
+* refactor redundant code in html5 tech ([#3593](https://github.com/videojs/video.js/issues/3593)) ([6878c21](https://github.com/videojs/video.js/commit/6878c21))
+* refactor redundant or verbose code in player.js ([#3597](https://github.com/videojs/video.js/issues/3597)) ([ae3e277](https://github.com/videojs/video.js/commit/ae3e277))
+* update CHANGELOG automation to use conventional-changelog ([#3669](https://github.com/videojs/video.js/issues/3669)) ([d4e89d2](https://github.com/videojs/video.js/commit/d4e89d2))
+* update object.assign to ^4.0.4 ([08c7f4e](https://github.com/videojs/video.js/commit/08c7f4e))
+
+### Documentation
+
+* fix broken links in docs index.md ([4063f96](https://github.com/videojs/video.js/commit/4063f96))
+
+### Tests
+
+* **a11y:** add basic accessibility testing using grunt-accessibility ([7d85f27](https://github.com/videojs/video.js/commit/7d85f27))
+
 ## 5.12.2 (2016-09-28)
 * Changes from 5.11.7 on the 5.12 branch
 
