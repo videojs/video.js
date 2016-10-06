@@ -4,7 +4,6 @@
  */
 import document from 'global/document';
 import window from 'global/window';
-import * as Guid from './guid.js';
 import log from './log.js';
 import tsml from 'tsml';
 import {isObject} from './obj';
@@ -110,24 +109,6 @@ function createQuerier(method) {
 }
 
 /**
- * Shorthand for document.getElementById()
- * Also allows for CSS (jQuery) ID syntax. But nothing other than IDs.
- *
- * @param {string} id
- *         The id of the element to get
- *
- * @return {Element|null}
- *         Element with supplied ID or null if there wasn't one.
- */
-export function getEl(id) {
-  if (id.indexOf('#') === 0) {
-    id = id.slice(1);
-  }
-
-  return document.getElementById(id);
-}
-
-/**
  * Creates an element and applies properties.
  *
  * @param {string} [tagName='div']
@@ -209,104 +190,12 @@ export function textContent(el, text) {
  *
  * @param {Element} parent
  *        Element to insert child into
- *
  */
-export function insertElFirst(child, parent) {
+export function prependTo(child, parent) {
   if (parent.firstChild) {
     parent.insertBefore(child, parent.firstChild);
   } else {
     parent.appendChild(child);
-  }
-}
-
-/**
- * Element Data Store. Allows for binding data to an element without putting it directly on the element.
- * Ex. Event listeners are stored here.
- * (also from jsninja.com, slightly modified and updated for closure compiler)
- *
- * @type {Object}
- * @private
- */
-const elData = {};
-
-/*
- * Unique attribute name to store an element's guid in
- *
- * @type {string}
- * @constant
- * @private
- */
-const elIdAttr = 'vdata' + (new Date()).getTime();
-
-/**
- * Returns the cache object where data for an element is stored
- *
- * @param {Element} el
- *        Element to store data for.
- *
- * @return {Object}
- *         The cache object for that el that was passed in.
- */
-export function getElData(el) {
-  let id = el[elIdAttr];
-
-  if (!id) {
-    id = el[elIdAttr] = Guid.newGUID();
-  }
-
-  if (!elData[id]) {
-    elData[id] = {};
-  }
-
-  return elData[id];
-}
-
-/**
- * Returns whether or not an element has cached data
- *
- * @param {Element} el
- *        Check if this element has cached data.
- *
- * @return {boolean}
- *         - True if the DOM element has cached data.
- *         - False otherwise.
- */
-export function hasElData(el) {
-  const id = el[elIdAttr];
-
-  if (!id) {
-    return false;
-  }
-
-  return !!Object.getOwnPropertyNames(elData[id]).length;
-}
-
-/**
- * Delete data for the element from the cache and the guid attr from getElementById
- *
- * @param {Element} el
- *        Remove cached data for this element.
- */
-export function removeElData(el) {
-  const id = el[elIdAttr];
-
-  if (!id) {
-    return;
-  }
-
-  // Remove all stored data
-  delete elData[id];
-
-  // Remove the elIdAttr property from the DOM node
-  try {
-    delete el[elIdAttr];
-  } catch (e) {
-    if (el.removeAttribute) {
-      el.removeAttribute(elIdAttr);
-    } else {
-      // IE doesn't appear to support removeAttribute on the document element
-      el[elIdAttr] = null;
-    }
   }
 }
 
@@ -326,7 +215,7 @@ export function removeElData(el) {
  * @throws {Error}
  *         Throws an error if `classToCheck` has white space.
  */
-export function hasElClass(element, classToCheck) {
+export function hasClass(element, classToCheck) {
   throwIfWhitespace(classToCheck);
   if (element.classList) {
     return element.classList.contains(classToCheck);
@@ -346,13 +235,13 @@ export function hasElClass(element, classToCheck) {
  * @return {Element}
  *         The dom element with the added class name.
  */
-export function addElClass(element, classToAdd) {
+export function addClass(element, classToAdd) {
   if (element.classList) {
     element.classList.add(classToAdd);
 
   // Don't need to `throwIfWhitespace` here because `hasElClass` will do it
   // in the case of classList not being supported.
-  } else if (!hasElClass(element, classToAdd)) {
+  } else if (!hasClass(element, classToAdd)) {
     element.className = (element.className + ' ' + classToAdd).trim();
   }
 
@@ -371,7 +260,7 @@ export function addElClass(element, classToAdd) {
  * @return {Element}
  *         The dom element with class name removed.
  */
-export function removeElClass(element, classToRemove) {
+export function removeClass(element, classToRemove) {
   if (element.classList) {
     element.classList.remove(classToRemove);
   } else {
@@ -416,12 +305,12 @@ export function removeElClass(element, classToRemove) {
  * @return {Element}
  *         The element with a class that has been toggled.
  */
-export function toggleElClass(element, classToToggle, predicate) {
+export function toggleClass(element, classToToggle, predicate) {
 
   // This CANNOT use `classList` internally because IE does not support the
   // second parameter to the `classList.toggle()` method! Which is fine because
   // `classList` will be used by the add/remove functions.
-  const has = hasElClass(element, classToToggle);
+  const has = hasClass(element, classToToggle);
 
   if (typeof predicate === 'function') {
     predicate = predicate(element, classToToggle);
@@ -438,9 +327,9 @@ export function toggleElClass(element, classToToggle, predicate) {
   }
 
   if (predicate) {
-    addElClass(element, classToToggle);
+    addClass(element, classToToggle);
   } else {
-    removeElClass(element, classToToggle);
+    removeClass(element, classToToggle);
   }
 
   return element;
@@ -455,7 +344,7 @@ export function toggleElClass(element, classToToggle, predicate) {
  * @param {Object} [attributes]
  *        Attributes to be applied.
  */
-export function setElAttributes(el, attributes) {
+export function setAttributes(el, attributes) {
   Object.getOwnPropertyNames(attributes).forEach(function(attrName) {
     const attrValue = attributes[attrName];
 
@@ -479,7 +368,7 @@ export function setElAttributes(el, attributes) {
  * @return {Object}
  *         All attributes of the element.
  */
-export function getElAttributes(tag) {
+export function getAttributes(tag) {
   const obj = {};
 
   // known boolean attributes
@@ -599,7 +488,7 @@ export function unblockTextSelection() {
  * @return {Dom~Position}
  *         The position of the element that was passed in.
  */
-export function findElPosition(el) {
+export function findPosition(el) {
   let box;
 
   if (el.getBoundingClientRect && el.parentNode) {
@@ -660,7 +549,7 @@ export function findElPosition(el) {
  */
 export function getPointerPosition(el, event) {
   const position = {};
-  const box = findElPosition(el);
+  const box = findPosition(el);
   const boxW = el.offsetWidth;
   const boxH = el.offsetHeight;
 

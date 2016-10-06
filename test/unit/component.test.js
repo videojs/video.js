@@ -1,6 +1,7 @@
 /* eslint-env qunit */
 import Component from '../../src/js/component.js';
 import * as Dom from '../../src/js/utils/dom.js';
+import * as DomData from '../../src/js/utils/dom-data';
 import * as Events from '../../src/js/utils/events.js';
 import * as browser from '../../src/js/utils/browser.js';
 import document from 'global/document';
@@ -293,7 +294,7 @@ QUnit.test('should dispose of component and children', function(assert) {
     return true;
   });
   const el = comp.el();
-  const data = Dom.getElData(el);
+  const data = DomData.getData(el);
 
   let hasDisposed = false;
   let bubbles = null;
@@ -311,7 +312,7 @@ QUnit.test('should dispose of component and children', function(assert) {
   assert.ok(!comp.el(), 'component element was deleted');
   assert.ok(!child.children(), 'child children were deleted');
   assert.ok(!child.el(), 'child element was deleted');
-  assert.ok(!Dom.hasElData(el), 'listener data nulled');
+  assert.ok(!DomData.hasData(el), 'listener data nulled');
   assert.ok(!Object.getOwnPropertyNames(data).length,
   'original listener data object was emptied');
 });

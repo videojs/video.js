@@ -203,14 +203,14 @@ class Html5 extends Tech {
         el = document.createElement('video');
 
         // determine if native controls should be used
-        const tagAttributes = this.options_.tag && Dom.getElAttributes(this.options_.tag);
+        const tagAttributes = this.options_.tag && Dom.getAttributes(this.options_.tag);
         const attributes = mergeOptions({}, tagAttributes);
 
         if (!browser.TOUCH_ENABLED || this.options_.nativeControlsForTouch !== true) {
           delete attributes.controls;
         }
 
-        Dom.setElAttributes(el,
+        Dom.setAttributes(el,
           assign(attributes, {
             id: this.options_.techId,
             class: 'vjs-tech'
@@ -231,7 +231,7 @@ class Html5 extends Tech {
       if (typeof this.options_[attr] !== 'undefined') {
         overwriteAttrs[attr] = this.options_[attr];
       }
-      Dom.setElAttributes(el, overwriteAttrs);
+      Dom.setAttributes(el, overwriteAttrs);
     }
 
     return el;

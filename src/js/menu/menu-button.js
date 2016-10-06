@@ -83,7 +83,7 @@ class MenuButton extends ClickableComponent {
       });
 
       menu.children_.unshift(title);
-      Dom.insertElFirst(title, menu.contentEl());
+      Dom.prependTo(title, menu.contentEl());
     }
 
     this.items = this.createItems();

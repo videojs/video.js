@@ -1,6 +1,7 @@
 /* eslint-env qunit */
 import videojs from '../../src/js/video.js';
 import * as Dom from '../../src/js/utils/dom.js';
+import TestHelpers from './test-helpers.js';
 import log from '../../src/js/utils/log.js';
 import document from 'global/document';
 
@@ -182,32 +183,23 @@ QUnit.test('should expose options and players properties for backward-compatibil
 });
 
 QUnit.test('should expose DOM functions', function(assert) {
+  const methods = [
+    'isEl',
+    'isTextNode',
+    'createEl',
+    'hasClass',
+    'addClass',
+    'removeClass',
+    'toggleClass',
+    'setAttributes',
+    'getAttributes',
+    'emptyEl',
+    'insertContent',
+    'appendContent'
+  ];
 
-  // Keys are videojs methods, values are Dom methods.
-  const methods = {
-    isEl: 'isEl',
-    isTextNode: 'isTextNode',
-    createEl: 'createEl',
-    hasClass: 'hasElClass',
-    addClass: 'addElClass',
-    removeClass: 'removeElClass',
-    toggleClass: 'toggleElClass',
-    setAttributes: 'setElAttributes',
-    getAttributes: 'getElAttributes',
-    emptyEl: 'emptyEl',
-    insertContent: 'insertContent',
-    appendContent: 'appendContent'
-  };
-
-  const keys = Object.keys(methods);
-
-  assert.expect(keys.length);
-  keys.forEach(function(vjsName) {
-    const domName = methods[vjsName];
-
-    assert.strictEqual(videojs[vjsName],
-                      Dom[domName],
-                      `videojs.${vjsName} is a reference to Dom.${domName}`);
+  methods.forEach(name => {
+    assert.strictEqual(typeof videojs[name], 'function');
   });
 });
 

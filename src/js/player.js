@@ -32,7 +32,6 @@ import VideoTrackList from './tracks/video-track-list.js';
 // are always included in the video.js package. Importing the modules will
 // execute them and they will register themselves with video.js.
 import './tech/loader.js';
-import './tech/flash.js';
 import './poster-image.js';
 import './tracks/text-track-display.js';
 import './loading-spinner.js';
@@ -282,7 +281,7 @@ class Player extends Component {
         let element = tag;
 
         while (element && element.nodeType === 1) {
-          if (Dom.getElAttributes(element).hasOwnProperty('lang')) {
+          if (Dom.getAttributes(element).hasOwnProperty('lang')) {
             options.language = element.getAttribute('lang');
             break;
           }
@@ -308,7 +307,7 @@ class Player extends Component {
     this.tag = tag;
 
     // Store the tag attributes used to restore html5 element
-    this.tagAttributes = tag && Dom.getElAttributes(tag);
+    this.tagAttributes = tag && Dom.getAttributes(tag);
 
     // Update current language
     this.language(this.options_.language);
@@ -488,7 +487,7 @@ class Player extends Component {
 
     // Copy over all the attributes from the tag, including ID and class
     // ID will now reference player box, not the video tag
-    const attrs = Dom.getElAttributes(tag);
+    const attrs = Dom.getAttributes(tag);
 
     Object.getOwnPropertyNames(attrs).forEach(function(attr) {
       // workaround so we don't totally break IE7
@@ -535,7 +534,7 @@ class Player extends Component {
     for (let i = 0; i < links.length; i++) {
       const linkEl = links.item(i);
 
-      Dom.addElClass(linkEl, 'vjs-hidden');
+      Dom.addClass(linkEl, 'vjs-hidden');
       linkEl.setAttribute('hidden', 'hidden');
     }
 
@@ -553,7 +552,7 @@ class Player extends Component {
     // will work properly for other components
     //
     // Breaks iPhone, fixed in HTML5 setup.
-    Dom.insertElFirst(tag, el);
+    Dom.prependTo(tag, el);
     this.children_.unshift(tag);
 
     this.el_ = el;
@@ -889,7 +888,7 @@ class Player extends Component {
     // Add the tech element in the DOM if it was not already there
     // Make sure to not insert the original video element if using Html5
     if (this.tech_.el().parentNode !== this.el() && (techName !== 'Html5' || !this.tag)) {
-      Dom.insertElFirst(this.tech_.el(), this.el());
+      Dom.prependTo(this.tech_.el(), this.el());
     }
 
     // Get rid of the original video tag reference after the first tech is loaded
@@ -1993,7 +1992,7 @@ class Player extends Component {
     document.documentElement.style.overflow = 'hidden';
 
     // Apply fullscreen styles
-    Dom.addElClass(document.body, 'vjs-full-window');
+    Dom.addClass(document.body, 'vjs-full-window');
 
     /**
      * @event Player#enterFullWindow
@@ -2032,7 +2031,7 @@ class Player extends Component {
     document.documentElement.style.overflow = this.docOrigOverflow;
 
     // Remove fullscreen styles
-    Dom.removeElClass(document.body, 'vjs-full-window');
+    Dom.removeClass(document.body, 'vjs-full-window');
 
     // Resize the box, controller, and poster to original sizes
     // this.positionAll();
@@ -3132,10 +3131,10 @@ class Player extends Component {
       tracks: []
     };
 
-    const tagOptions = Dom.getElAttributes(tag);
+    const tagOptions = Dom.getAttributes(tag);
     const dataSetup = tagOptions['data-setup'];
 
-    if (Dom.hasElClass(tag, 'vjs-fluid')) {
+    if (Dom.hasClass(tag, 'vjs-fluid')) {
       tagOptions.fluid = true;
     }
 
@@ -3163,9 +3162,9 @@ class Player extends Component {
         const childName = child.nodeName.toLowerCase();
 
         if (childName === 'source') {
-          baseOptions.sources.push(Dom.getElAttributes(child));
+          baseOptions.sources.push(Dom.getAttributes(child));
         } else if (childName === 'track') {
-          baseOptions.tracks.push(Dom.getElAttributes(child));
+          baseOptions.tracks.push(Dom.getAttributes(child));
         }
       }
     }
@@ -3213,8 +3212,7 @@ const navigator = window.navigator;
  */
 Player.prototype.options_ = {
   // Default order of fallback technology
-  techOrder: ['html5', 'flash'],
-  // techOrder: ['flash','html5'],
+  techOrder: ['html5'],
 
   html5: {},
   flash: {},

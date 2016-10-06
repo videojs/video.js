@@ -5,6 +5,7 @@
  */
 import window from 'global/window';
 import * as Dom from './utils/dom.js';
+import * as DomData from './utils/dom-data';
 import * as Fn from './utils/fn.js';
 import * as Guid from './utils/guid.js';
 import * as Events from './utils/events.js';
@@ -141,7 +142,7 @@ class Component {
       this.el_.parentNode.removeChild(this.el_);
     }
 
-    Dom.removeElData(this.el_);
+    DomData.removeData(this.el_);
     this.el_ = null;
   }
 
@@ -816,7 +817,7 @@ class Component {
    *         - False if the `Component` does not have the class`
    */
   hasClass(classToCheck) {
-    return Dom.hasElClass(this.el_, classToCheck);
+    return Dom.hasClass(this.el_, classToCheck);
   }
 
   /**
@@ -826,7 +827,8 @@ class Component {
    *        CSS class name to add
    */
   addClass(classToAdd) {
-    Dom.addElClass(this.el_, classToAdd);
+    Dom.addClass(this.el_, classToAdd);
+    return this;
   }
 
   /**
@@ -836,7 +838,8 @@ class Component {
    *        CSS class name to remove
    */
   removeClass(classToRemove) {
-    Dom.removeElClass(this.el_, classToRemove);
+    Dom.removeClass(this.el_, classToRemove);
+    return this;
   }
 
   /**
@@ -851,7 +854,8 @@ class Component {
    *         An {@link Dom~predicate} function or a boolean
    */
   toggleClass(classToToggle, predicate) {
-    Dom.toggleElClass(this.el_, classToToggle, predicate);
+    Dom.toggleClass(this.el_, classToToggle, predicate);
+    return this;
   }
 
   /**
