@@ -327,3 +327,23 @@ QUnit.test('beforesetup returns dont break videojs options', function(assert) {
   assert.ok(player.options_, 'beforesetup should not destory options');
   assert.equal(player.options_.techOrder, vjsOptions.techOrder, 'options set by user should exist');
 });
+
+QUnit.test('beforesetup options override videojs options', function(assert) {
+  const vjsOptions = {techOrder: ['techFaker'], autoplay: false};
+  const fixture = document.getElementById('qunit-fixture');
+
+  fixture.innerHTML += '<video id="test_vid_id"><source type="video/mp4"></video>';
+
+  const vid = document.getElementById('test_vid_id');
+
+  videojs.hook('beforesetup', function(options) {
+    assert.equal(options.autoplay, false, 'false was passed to us');
+    return {autoplay: true};
+  });
+
+  const player = videojs(vid, vjsOptions);
+
+  assert.ok(player.options_, 'beforesetup should not destory options');
+  assert.equal(player.options_.techOrder, vjsOptions.techOrder, 'options set by user should exist');
+  assert.equal(player.options_.autoplay, true, 'autoplay should be set to true now');
+});
