@@ -1,11 +1,3 @@
-CHANGELOG
-=========
-
-## HEAD (Unreleased)
-_(none)_
-
---------------------
-
 ## 5.12.2 (2016-09-28)
 * Changes from 5.11.7 on the 5.12 branch
 
