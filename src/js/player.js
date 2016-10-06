@@ -32,7 +32,6 @@ import VideoTrackList from './tracks/video-track-list.js';
 // are always included in the video.js package. Importing the modules will
 // execute them and they will register themselves with video.js.
 import './tech/loader.js';
-import './tech/flash.js';
 import './poster-image.js';
 import './tracks/text-track-display.js';
 import './loading-spinner.js';
@@ -3149,8 +3148,7 @@ const navigator = window.navigator;
  */
 Player.prototype.options_ = {
   // Default order of fallback technology
-  techOrder: ['html5', 'flash'],
-  // techOrder: ['flash','html5'],
+  techOrder: ['html5'],
 
   html5: {},
   flash: {},

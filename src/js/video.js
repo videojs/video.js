@@ -554,6 +554,8 @@ videojs.AudioTrack = AudioTrack;
  */
 videojs.VideoTrack = VideoTrack;
 
+videojs.Dom = Dom;
+
 /**
  * Determines, via duck typing, whether or not a value is a DOM element.
  *
@@ -692,3 +694,16 @@ videojs.computedStyle = computedStyle;
 // We use Node-style module.exports here instead of ES6 because it is more
 // compatible with different module systems.
 module.exports = videojs;
+
+/**
+ * Export the Dom utilities for use in external plugins
+ * and Tech's
+ */
+videojs.Dom = Dom;
+
+/**
+ * Export the Url utilities for use in external plugins
+ * and Tech's
+ */
+videojs.Url = Url;
+
