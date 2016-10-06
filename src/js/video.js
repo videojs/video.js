@@ -163,10 +163,14 @@ videojs.hook = function(type, fn) {
 videojs.removeHook = function(type, fn) {
   const index = videojs.hooks(type).indexOf(fn);
 
+  if (index <= -1) {
+    return false;
+  }
+
   videojs.hooks_[type] = videojs.hooks_[type].slice();
   videojs.hooks_[type].splice(index, 1);
 
-  return index > -1;
+  return true;
 };
 
 // Add default styles

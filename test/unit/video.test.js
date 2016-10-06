@@ -228,7 +228,7 @@ QUnit.test('should be able to remove a hook', function(assert) {
   assert.equal(videojs.hooks_.bar.length, 0, 'should have 0 bar hook');
 });
 
-QUnit.test('should be get all hooks for a type', function(assert) {
+QUnit.test('should be able get all hooks for a type', function(assert) {
   const noop = function() {};
 
   videojs.hook('foo', noop);
@@ -274,11 +274,14 @@ QUnit.test('should trigger beforesetup and setup during videojs setup', function
   let beforeSetupCalled = false;
   const beforeSetup = function(video, options) {
     beforeSetupCalled = true;
+    assert.equal(setupCalled, false, 'setup should be called after beforesetup');
     assert.deepEqual(options, vjsOptions, 'options should be the same');
     assert.equal(video.id, 'test_vid_id', 'video id should be correct');
   };
   const setup = function(player) {
     setupCalled = true;
+
+    assert.equal(beforeSetupCalled, true, 'beforesetup should have been called already');
     assert.ok(player, 'created player from tag');
     assert.ok(player.id() === 'test_vid_id');
     assert.ok(videojs.getPlayers().test_vid_id === player,
