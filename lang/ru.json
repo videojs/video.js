@@ -27,6 +27,7 @@
   "The media could not be loaded, either because the server or network failed or because the format is not supported.": "Невозможно загрузить видео из-за сетевого или серверного сбоя либо формат не поддерживается.",
   "The media playback was aborted due to a corruption problem or because the media used features your browser did not support.": "Воспроизведение видео было приостановлено из-за повреждения либо в связи с тем, что видео использует функции, неподдерживаемые вашим браузером.",
   "No compatible source was found for this media.": "Совместимые источники для этого видео отсутствуют.",
+  "The media is encrypted and we do not have the keys to decrypt it.": "Видео в зашифрованном виде, и у нас нет нет ключей для расшифровки.",
   "Play Video": "Воспроизвести видео",
   "Close": "Закрыть",
   "Modal Window": "Модальное окно",
