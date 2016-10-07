@@ -18,6 +18,7 @@
   "Captions": "Подписи",
   "captions off": "Подписи выкл.",
   "Chapters": "Главы",
+  "Close Modal Dialog": "Закрыть модальное окно",
   "Descriptions": "Описания",
   "descriptions off": "описания выкл.",
   "Audio Track": "Звуковая дорожка",
@@ -29,6 +30,10 @@
   "Play Video": "Воспроизвести видео",
   "Close": "Закрыть",
   "Modal Window": "Модальное окно",
-  "This is a modal window": "Это модальное окно",
-  "This modal can be closed by pressing the Escape key or activating the close button.": "Это модальное окно можно закрыть нажав Esc или кнопку закрытия окна."
+  "This is a modal window.": "Это модальное окно.",
+  "This modal can be closed by pressing the Escape key or activating the close button.": "Модальное окно можно закрыть нажав Esc или кнопку закрытия окна.",
+  ", opens captions settings dialog": ", откроется диалог настройки подписей",
+  ", opens subtitles settings dialog": ", откроется диалог настройки субтитров",
+  ", opens descriptions settings dialog": ", откроется диалог настройки описаний",
+  ", selected": ", выбрано"
 }
