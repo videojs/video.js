@@ -29,7 +29,7 @@ videojs("example_video_1").ready(function(){
 
 API Methods
 -----------
-Now that you have access to a ready player, you can control the video, get values, or respond to video events. The Video.js API function names follow the [HTML5 media API](http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html). The main difference is that getter/setter functions are used for video properties.
+Now that you have access to a ready player, you can control the video, get values, or respond to video events. The Video.js API function names follow the [HTML5 media API](https://html.spec.whatwg.org/multipage/embedded-content.html#the-video-element). The main difference is that getter/setter functions are used for video properties.
 
 ```js
 

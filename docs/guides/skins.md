@@ -50,5 +50,5 @@ and use the developer tools to inspect the different elements and see what you'd
 to target when you do so.
 
 More custom skins will be available for download soon.
-If you have one you like you can share it by forking [this example on CodePen.io](http://codepen.io/heff/pen/EarCt),
+If you have one you like you can share it by forking [this example on CodePen.io](https://codepen.io/heff/pen/EarCt),
 and adding a link on the [Skins wiki page](https://github.com/videojs/video.js/wiki/Skins).

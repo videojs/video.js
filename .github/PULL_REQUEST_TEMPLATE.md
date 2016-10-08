@@ -12,5 +12,5 @@ Please list the specific changes involved in this pull request.
 - [ ] If necessary, more likely in a feature request than a bug fix
   - [ ] Unit Tests updated or fixed
   - [ ] Docs/guides updated
-  - [ ] Example created ([starter template on JSBin](http://jsbin.com/axedog/edit?html,output))
+  - [ ] Example created ([starter template on JSBin](https://jsbin.com/axedog/edit?html,output))
 - [ ] Reviewed by Two Core Contributors

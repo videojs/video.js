@@ -271,7 +271,7 @@ QUnit.test('tracks are parsed if vttjs is loaded', function(assert) {
   /* eslint-disable no-unused-vars */
   const tt = new TextTrack_({
     tech: defaultTech,
-    src: 'http://example.com'
+    src: 'https://example.com'
   });
   /* eslint-enable no-unused-vars */
 
@@ -306,7 +306,7 @@ QUnit.test('tracks are parsed once vttjs is loaded', function(assert) {
   /* eslint-disable no-unused-vars */
   const tt = new TextTrack_({
     tech: testTech,
-    src: 'http://example.com'
+    src: 'https://example.com'
   });
   /* eslint-enable no-unused-vars */
 
@@ -369,7 +369,7 @@ QUnit.test('stops processing if vttjs loading errored out', function(assert) {
   /* eslint-disable no-unused-vars */
   const tt = new TextTrack_({
     tech: testTech,
-    src: 'http://example.com'
+    src: 'https://example.com'
   });
   /* eslint-enable no-unused-vars */
 

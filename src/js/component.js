@@ -1035,7 +1035,7 @@ class Component {
    * Known issue: Hidden elements officially have a width of 0. We're defaulting
    * to the style.width value and falling back to computedStyle which has the
    * hidden element issue. Info, but probably not an efficient fix:
-   * http://www.foliotek.com/devblog/getting-the-width-of-a-hidden-element-with-jquery-using-width/
+   * https://www.foliotek.com/devblog/getting-the-width-of-a-hidden-element-with-jquery-using-width/
    *
    * @param  {String} widthOrHeight  'width' or 'height'
    * @param  {Number|String=} num     New dimension
@@ -1211,7 +1211,7 @@ class Component {
       couldBeTap = false;
     };
 
-    // TODO: Listen to the original target. http://youtu.be/DujfpXOKUp8?t=13m8s
+    // TODO: Listen to the original target. https://youtu.be/DujfpXOKUp8?t=13m8s
     this.on('touchleave', noTap);
     this.on('touchcancel', noTap);
 
