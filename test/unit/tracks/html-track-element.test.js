@@ -24,7 +24,7 @@ QUnit.test('can create a html track element with various properties', function(a
   const kind = 'chapters';
   const label = 'English';
   const language = 'en';
-  const src = 'https://www.example.com';
+  const src = 'http://www.example.com';
 
   const htmlTrackElement = new HTMLTrackElement({
     kind,

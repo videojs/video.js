@@ -85,8 +85,8 @@ QUnit.test('should get tag, source, and track settings', function(assert) {
 
   let html = '<video id="example_1" class="video-js" autoplay preload="none">';
 
-  html += '<source src="https://google.com" type="video/mp4">';
-  html += '<source src="https://google.com" type="video/webm">';
+  html += '<source src="http://google.com" type="video/mp4">';
+  html += '<source src="http://google.com" type="video/webm">';
   html += '<track kind="captions" attrtest>';
   html += '</video>';
 
@@ -99,7 +99,7 @@ QUnit.test('should get tag, source, and track settings', function(assert) {
   assert.equal(player.options_.preload, 'none', 'preload is set to none');
   assert.equal(player.options_.id, 'example_1', 'id is set to example_1');
   assert.equal(player.options_.sources.length, 2, 'we have two sources');
-  assert.equal(player.options_.sources[0].src, 'https://google.com', 'first source is google.com');
+  assert.equal(player.options_.sources[0].src, 'http://google.com', 'first source is google.com');
   assert.equal(player.options_.sources[0].type, 'video/mp4', 'first time is video/mp4');
   assert.equal(player.options_.sources[1].type, 'video/webm', 'second type is video/webm');
   assert.equal(player.options_.tracks.length, 1, 'we have one text track');
@@ -128,7 +128,7 @@ QUnit.test('should asynchronously fire error events during source selection', fu
   const player = TestHelpers.makePlayer({
     techOrder: ['foo'],
     sources: [
-      { src: 'https://vjs.zencdn.net/v/oceans.mp4', type: 'video/mp4' }
+      { src: 'http://vjs.zencdn.net/v/oceans.mp4', type: 'video/mp4' }
     ]
   });
 
@@ -228,7 +228,7 @@ QUnit.test('should wrap the original tag in the player div', function(assert) {
 
 QUnit.test('should set and update the poster value', function(assert) {
   const poster = '#';
-  const updatedPoster = 'https://example.com/updated-poster.jpg';
+  const updatedPoster = 'http://example.com/updated-poster.jpg';
 
   const tag = TestHelpers.makeTag();
 
@@ -256,7 +256,7 @@ QUnit.test('should set and update the poster value', function(assert) {
 // https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-play
 QUnit.test('should hide the poster when play is called', function(assert) {
   const player = TestHelpers.makePlayer({
-    poster: 'https://example.com/poster.jpg'
+    poster: 'http://example.com/poster.jpg'
   });
 
   assert.equal(player.hasStarted(), false, 'the show poster flag is true before play');
@@ -275,8 +275,8 @@ QUnit.test('should load a media controller', function(assert) {
   const player = TestHelpers.makePlayer({
     preload: 'none',
     sources: [
-      { src: 'https://google.com', type: 'video/mp4' },
-      { src: 'https://google.com', type: 'video/webm' }
+      { src: 'http://google.com', type: 'video/mp4' },
+      { src: 'http://google.com', type: 'video/webm' }
     ]
   });
 
@@ -721,7 +721,7 @@ QUnit.test('should clear pending errors on disposal', function(assert) {
   const player = TestHelpers.makePlayer();
 
   player.src({
-    src: 'https://example.com/movie.unsupported-format',
+    src: 'http://example.com/movie.unsupported-format',
     type: 'video/unsupported-format'
   });
   player.dispose();
@@ -974,7 +974,7 @@ QUnit.test('Player#tech alerts and throws without the appropriate input', functi
 
   assert.throws(function() {
     Player.prototype.tech.call({tech_});
-  }, new RegExp('https://github.com/videojs/video.js/issues/2617'),
+  }, new RegExp('http://github.com/videojs/video.js/issues/2617'),
   'we threw an error');
 
   assert.ok(alertCalled, 'we called an alert');

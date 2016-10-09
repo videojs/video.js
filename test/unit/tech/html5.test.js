@@ -251,13 +251,13 @@ QUnit.test('native source handler canHandleSource', function(assert) {
   assert.equal(canHandleSource({ type: 'video/mp4', src: 'video.flv' }, {}),
               'maybe',
               'Native source handler reported type support');
-  assert.equal(canHandleSource({ src: 'https://www.example.com/video.mp4' }, {}),
+  assert.equal(canHandleSource({ src: 'http://www.example.com/video.mp4' }, {}),
               'maybe',
               'Native source handler reported extension support');
-  assert.equal(canHandleSource({ src: 'https://example.com/video.sd.mp4?s=foo&token=bar' }, {}),
+  assert.equal(canHandleSource({ src: 'http://example.com/video.sd.mp4?s=foo&token=bar' }, {}),
               'maybe',
               'Native source handler reported extension support');
-  assert.equal(canHandleSource({ src: 'https://example.com/video.sd.mp4?s=foo' }, {}),
+  assert.equal(canHandleSource({ src: 'http://example.com/video.sd.mp4?s=foo' }, {}),
               'maybe',
               'Native source handler reported extension support');
 

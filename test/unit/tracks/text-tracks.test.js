@@ -416,8 +416,8 @@ QUnit.test('should return correct remote text track values', function(assert) {
   const fixture = document.getElementById('qunit-fixture');
   const html = `
     <video id="example_1" class="video-js" autoplay preload="none">
-      <source src="https://google.com" type="video/mp4">
-      <source src="https://google.com" type="video/webm">
+      <source src="http://google.com" type="video/mp4">
+      <source src="http://google.com" type="video/webm">
       <track kind="captions" label="label">
     </video>
   `;
