@@ -121,9 +121,16 @@ class VolumeMenuButton extends PopupButton {
    *
    * @method handleClick
    */
-  handleClick() {
+  handleClick(event) {
     MuteToggle.prototype.handleClick.call(this);
     super.handleClick();
+  }
+
+  handleKeyPress(event) {
+    if ((event.which === 32 || event.which === 13) &&
+        (event.target !== this.volumeBar.el())) {
+      this.handleClick(event);
+    }
   }
 
   attachVolumeBarEvents() {
