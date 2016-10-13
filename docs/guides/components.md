@@ -12,13 +12,13 @@ The UI component architecture makes it easier to add child components to a paren
 
 ```js
 // Adding a new control to the player
-myPlayer.addChild('BigPlayButton');
+myPlayer.addChild('bigPlayButton');
 ```
 
 Every component has an associated DOM element, and when you add a child component, it inserts the element of that child into the element of the parent.
 
 ```js
-myPlayer.addChild('BigPlayButton');
+myPlayer.addChild('bigPlayButton');
 ```
 
 Results in:
@@ -35,30 +35,30 @@ The actual default component structure of the Video.js player looks something li
 
 ```
 Player
-    PosterImage
-    TextTrackDisplay
-    LoadingSpinner
-    BigPlayButton
-    ControlBar
-        PlayToggle
-        VolumeMenuButton
-        CurrentTimeDisplay (Hidden by default)
-        TimeDivider (Hidden by default)
-        DurationDisplay (Hidden by default)
-        ProgressControl
-            SeekBar
-              LoadProgressBar
-              MouseTimeDisplay
-              PlayProgressBar
-        LiveDisplay (Hidden by default)
-        RemainingTimeDisplay
-        CustomControlsSpacer (No UI)
-        ChaptersButton (Hidden by default)
-        SubtitlesButton (Hidden by default)
-        CaptionsButton (Hidden by default)
-        FullscreenToggle
-    ErrorDisplay
-    TextTrackSettings
+    posterImage
+    textTrackDisplay
+    loadingSpinner
+    bigPlayButton
+    controlBar
+        playToggle
+        volumeMenuButton
+        currentTimeDisplay (Hidden by default)
+        timeDivider (Hidden by default)
+        durationDisplay (Hidden by default)
+        progressControl
+            seekBar
+              loadProgressBar
+              mouseTimeDisplay
+              playProgressBar
+        liveDisplay (Hidden by default)
+        remainingTimeDisplay
+        customControlsSpacer (No UI)
+        chaptersButton (Hidden by default)
+        subtitlesButton (Hidden by default)
+        captionsButton (Hidden by default)
+        fullscreenToggle
+    errorDisplay
+    textTrackSettings
 ```
 
 ## Progress Control
