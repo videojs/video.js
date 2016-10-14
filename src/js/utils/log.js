@@ -16,27 +16,30 @@ import {IE_VERSION} from './browser';
  *         but this is exposed as a parameter to facilitate testing.
  */
 export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 11) => {
-  const console = window.console;
+
+  // Make sure this is a plain old array.
+  args = Array.prototype.slice.call(args);
+
+  // Add the type to the front of the message when it's not "log"
+  if (type !== 'log') {
+    args.unshift(type.toUpperCase() + ':');
+  }
+
+  args.unshift('VIDEOJS:');
+
+  // Add arguments to history
+  log.history.push(args);
 
   // If there's no console then don't try to output messages, but they will
   // still be stored in `log.history`.
   //
-  // Was setting these once outside of this function, but containing them
-  // in the function makes it easier to test cases where console doesn't exist
-  // when the module is executed.
-  const fn = console && console[type] || function(){};
+  // This mainly prevents cases where old IE versions don't expose a `console`
+  // object unless the console is actually open.
+  const fn = window.console && window.console[type];
 
-  if (type !== 'log') {
-
-    // add the type to the front of the message when it's not "log"
-    args.unshift(type.toUpperCase() + ':');
+  if (!fn) {
+    return;
   }
-
-  // add to history
-  log.history.push(args);
-
-  // add console prefix after adding to history
-  args.unshift('VIDEOJS:');
 
   // IEs previous to 11 log objects uselessly as "[object Object]"; so, JSONify
   // objects and arrays for those less-capable browsers.
@@ -59,7 +62,7 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
   if (!fn.apply) {
     fn(args);
   } else {
-    fn[Array.isArray(args) ? 'apply' : 'call'](console, args);
+    fn[Array.isArray(args) ? 'apply' : 'call'](null, args);
   }
 };
 
