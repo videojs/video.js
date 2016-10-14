@@ -100,3 +100,6 @@ You may optionally use the last `/` as the separator between connection and stre
     <source src="rtmp://your.streaming.provider.net/cfx/st/mp4:video.mp4" type="rtmp/mp4">
 
 All four RTMP protocols are valid in the `src` (RTMP, RTMPT, RTMPE, and RTMPS).
+
+### A note on sandboxing and security
+In some environments, such as an Electron or node-webkit app, stricter policies are applied and you won’t be able to stream media out of the box – instead, you have to add the `.swf` files to a special manifest of trusted files. [nw-flash-trust](https://github.com/szwacz/nw-flash-trust) makes this job easy.
