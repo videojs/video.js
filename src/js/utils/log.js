@@ -1,7 +1,7 @@
 /**
  * @file log.js
  */
-import window from 'global/window';
+import console from 'global/console';
 import {IE_VERSION} from './browser';
 
 /**
@@ -35,7 +35,7 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
   //
   // This mainly prevents cases where old IE versions don't expose a `console`
   // object unless the console is actually open.
-  const fn = window.console && window.console[type];
+  const fn = console && console[type];
 
   if (!fn) {
     return;
@@ -62,7 +62,13 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
   if (!fn.apply) {
     fn(args);
   } else {
-    fn[Array.isArray(args) ? 'apply' : 'call'](null, args);
+
+    // Make sure args is an array.
+    if (!Array.isArray(args)) {
+      args = [args];
+    }
+
+    fn.apply(null, args);
   }
 };
 
