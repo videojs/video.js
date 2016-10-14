@@ -62,7 +62,7 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
   if (!fn.apply) {
     fn(args);
   } else {
-    fn[Array.isArray(args) ? 'apply' : 'call'](console, args);
+    fn[Array.isArray(args) ? 'apply' : 'call'](null, args);
   }
 };
 
