@@ -166,17 +166,14 @@ QUnit.test('should add the value to the languages object with lower case lang co
 });
 
 QUnit.test('should expose plugin registry function', function(assert) {
-  const pluginName = 'foo';
-  const pluginFunction = function(options) {};
+  assert.ok(videojs.registerPlugin, 'should exist');
 
-  assert.ok(videojs.plugin, 'should exist');
-
-  videojs.plugin(pluginName, pluginFunction);
+  videojs.registerPlugin('foo', function() {});
 
   const player = TestHelpers.makePlayer();
 
   assert.ok(player.foo, 'should exist');
-  assert.equal(player.foo, pluginFunction, 'should be equal');
+  assert.ok(player.plugin('foo'), 'should return a Plugin object');
   player.dispose();
 });
 

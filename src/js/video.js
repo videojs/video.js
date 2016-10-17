@@ -13,7 +13,7 @@ import Component from './component';
 import EventTarget from './event-target';
 import * as Events from './utils/events.js';
 import Player from './player';
-import plugin from './plugins.js';
+import registerPlugin from './plugins.js';
 import mergeOptions from './utils/merge-options.js';
 import * as Fn from './utils/fn.js';
 import TextTrack from './tracks/text-track.js';
@@ -354,7 +354,7 @@ videojs.bind = Fn.bind;
  *
  * @borrows plugin:plugin as videojs.plugin
  */
-videojs.plugin = plugin;
+videojs.registerPlugin = registerPlugin;
 
 /**
  * Adding languages so that they're available to all players.
