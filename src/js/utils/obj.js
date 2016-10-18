@@ -2,6 +2,7 @@
  * @file obj.js
  * @module obj
  */
+import objectAssign from 'object.assign';
 
 /**
  * @callback obj:EachCallback
@@ -115,4 +116,18 @@ export function isPlain(value) {
   return isObject(value) &&
     toString.call(value) === '[object Object]' &&
     value.constructor === Object;
+}
+
+/**
+ * Object.assign polyfill
+ *
+ * @param  {Object} target
+ * @param  {Object} ...sources
+ * @return {Object}
+ */
+export function assign(...args) {
+
+  // This exists primarily to isolate our dependence on this third-party
+  // polyfill. If we decide to move away from it, we can do so in one place.
+  return objectAssign(...args);
 }

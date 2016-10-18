@@ -2,31 +2,170 @@
  * @file plugins.js
  * @module plugins
  */
-import log from './utils/log';
+import * as Fn from './utils/fn';
+import * as Obj from './utils/obj';
+import EventTarget from './event-target';
 import Player from './player';
-import Plugin from './plugin';
 
 /**
- * Store all available plugins.
+ * Cache of plugins that have been registered.
  *
  * @type {Object}
  */
 const plugins = {};
 
 /**
- * Normalize the second argument to `registerPlugin` into an object.
+ * Plugin wrapper methods.
  *
- * @param  {Function|Object} plugin
+ * @private
+ * @type {Object}
+ */
+const wrapperMethods = Obj.assign({
+
+  /**
+   * Provides boilerplate for a plugin teardown process.
+   *
+   * @param  {...Mixed} args
+   */
+  teardown(...args) {
+    if (!this.active_) {
+      return;
+    }
+
+    this.trigger('beforeteardown');
+
+    // Plugins can be initialized more than once; so, this allows us to track
+    // the number of times this has happened - potentially for debug purposes.
+    this.active_ = false;
+    this.teardown(...args);
+    this.trigger('teardown');
+  },
+
+  /**
+   * Provides boilerplate for a plugin disposal process.
+   *
+   * @param  {...Mixed} args
+   */
+  dispose(...args) {
+    if (this.active_) {
+      this.teardown();
+    }
+
+    this.trigger('beforedispose');
+    this.dispose(...args);
+    this.off();
+    this.trigger('dispose');
+
+    // Eliminate possible sources of leaking memory after disposal.
+    delete this.player_[this.name_];
+    this.player_ = this.state_ = null;
+  },
+
+  /**
+   * Getter/setter for a state management on a per-player/per-plugin basis.
+   *
+   * @param  {Object} [props]
+   *         If provided, acts as a setter.
+   * @return {Object}
+   */
+  state(props) {
+    if (props && typeof props === 'object') {
+      this.trigger('beforestatechange', props);
+      Obj.assign(this.state_, props);
+      this.trigger('statechange');
+    }
+
+    return this.state_;
+  },
+
+  /**
+   * Whether or not this plugin is active on this player.
+   *
+   * @return {Boolean}
+   */
+  active() {
+    return this.active_;
+  },
+
+  /**
+   * The version number of this plugin, if available.
+   *
+   * @return {String}
+   */
+  version() {
+    return this.VERSION || '';
+  }
+}, EventTarget.prototype);
+
+/**
+ * Normalize an object or function into an object proper for validating and
+ * creating a plugin.
+ *
+ * @param  {Object|Function} obj
  * @return {Object}
  */
-const normalizePlugin = (plugin) => {
-  if (plugin !== null && typeof plugin === 'object') {
-    return plugin;
+const normalize = (obj) => {
+  if (typeof obj === 'function') {
+    return Obj.assign({setup: obj}, obj);
   }
-  return {
-    deinit() {},
-    dispose() {},
-    init: plugin
+  return obj;
+};
+
+/**
+ * Takes an object with at least a setup method on it and returns a wrapped
+ * function that will initialize the plugin and handle per-player state setup.
+ *
+ * @private
+ * @param  {String} name
+ * @param  {Object} plugin
+ * @return {Function}
+ */
+const implement = (name, plugin) => {
+
+  // Create a Player.prototype-level plugin wrapper that only gets called
+  // once per player.
+  plugins[name] = Player.prototype[name] = function(...firstArgs) {
+
+    // Replace this function with a new player-specific plugin wrapper.
+    const wrapper = function(...args) {
+      if (this.active_) {
+        this.teardown();
+      }
+
+      this.trigger('beforesetup');
+      plugin.setup(...args);
+      this.trigger('setup');
+    };
+
+    // Wrapper is bound to itself to preserve expectations.
+    this[name] = Fn.bind(wrapper, wrapper);
+
+    // Add EventTarget methods and custom, per-player properties to the wrapper object.
+    Obj.assign(wrapper, wrapperMethods, {
+      active_: false,
+      name_: name,
+      player_: this,
+      state_: {}
+    });
+
+    // Wrap/mirror all own properties of the source `plugin` object that are
+    // NOT present on the wrapper object onto the wrapper object.
+    Obj.each(plugin, (value, key) => {
+      if (wrapper.hasOwnProperty(key)) {
+        return;
+      }
+      wrapper[key] = plugin[key];
+    });
+
+    // Bind all methods of the wrapper to itself.
+    Obj.each(wrapper, (value, key) => {
+      if (typeof value === 'function') {
+        wrapper[key] = Fn.bind(this, value);
+      }
+    });
+
+    // Finally, call the player-specific plugin wrapper.
+    wrapper(...firstArgs);
   };
 };
 
@@ -38,66 +177,30 @@ const normalizePlugin = (plugin) => {
  *        The name of the plugin that is being registered
  *
  * @param {plugins:PluginFn} init
- *         A plugin object with an `init` method and optional `dispose`
- *         method. As a short-cut, a function can be provided, which will
- *         be used as the init for your plugin.
  */
-const registerPlugin = function(name, plugin) {
-  const normalized = normalizePlugin(plugin);
-
+const registerPlugin = function(name, obj) {
   if (typeof name !== 'string' || !name.trim()) {
     throw new Error('illegal plugin name; must be non-empty string');
   }
 
-  if (plugins[name]) {
-    throw new Error('illegal plugin name; already exists');
+  if (Player.prototype[name]) {
+    throw new Error(`illegal plugin name; "${name}" already exists`);
   }
 
-  if (typeof normalized.init !== 'function') {
-    throw new Error('illegal plugin init method; must be a function');
+  const plugin = normalize(obj);
+
+  if (typeof plugin.setup !== 'function') {
+    throw new Error('illegal setup() method; should be a function');
   }
 
-  if (normalized.dispose && typeof normalized.dispose !== 'function') {
-    throw new Error('illegal plugin dipose method; must be a function');
-  }
+  // If optional methods exist, they should be functions.
+  ['dispose', 'teardown'].forEach(method => {
+    if (plugin[method] && typeof plugin[method] !== 'function') {
+      throw new Error(`illegal ${method}() method; should be a function`);
+    }
+  });
 
-  // Create a private plugin object, which is used to create Plugin objects
-  // when a plugin is accessed on a player.
-  plugins[name] = normalized;
-
-  // Support old-style plugin initialization.
-  Player.prototype[name] = function(...args) {
-    log.warn(`initializing plugins via custom player method names is deprecated as of video.js 6.0. instead of calling this.${name}(), use this.plugin('${name}').init()`);
-    this.plugin(name).init(...args);
-  };
-
-  // If using the old style of passing just an init function, copy own
-  // properties from the init (such as `VERSION`) onto the plugin object,
-  // excluding "reserved" keys that are already found on the created plugin
-  // object. This prevents weird scenarios like overriding `plugin.init`.
-  if (typeof plugin === 'function') {
-    const reserved = Object.keys(plugins[name]);
-
-    Object.keys(plugin)
-      .filter(k => reserved.indexOf(k) === -1)
-      .forEach(k => {
-        plugins[name][k] = plugin[k];
-      });
-  }
-};
-
-/**
- * This is documented in the Player component, but defined here because it
- * needs to be to avoid circular dependencies.
- *
- * @ignore
- */
-Player.prototype.plugin = function(name) {
-  if (!this.plugins_[name]) {
-    this.plugins_[name] = new Plugin(this, name, plugins[name]);
-  }
-
-  return this.plugins_[name];
+  implement(plugin);
 };
 
 export default registerPlugin;
