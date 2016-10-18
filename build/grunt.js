@@ -1,6 +1,6 @@
 import {gruntCustomizer, gruntOptionsMaker} from './options-customizer.js';
 import chg from 'chg';
-import nodeCli from 'shelljs-nodecli';
+import npmRun from 'npm-run';
 
 module.exports = function(grunt) {
   require('time-grunt')(grunt);
@@ -32,7 +32,10 @@ module.exports = function(grunt) {
       release: {
         tag_name: 'v'+ version.full,
         name: version.full,
-        body: nodeCli.exec('conventional-changelog', '-p videojs', {silent: true}).output
+        body: npmRun.execSync('conventional-changelog -p videojs', {
+          silent: true,
+          encoding: 'utf8'
+        })
       },
     },
     files: {
