@@ -19,14 +19,6 @@ let log;
  */
 export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 11) => {
 
-  // If there's no console then don't try to output messages, but they will
-  // still be stored in `log.history`.
-  //
-  // Was setting these once outside of this function, but containing them
-  // in the function makes it easier to test cases where console doesn't exist
-  // when the module is executed.
-  const fn = window.console && window.console[type] || function() {};
-
   if (type !== 'log') {
 
     // add the type to the front of the message when it's not "log"
@@ -38,6 +30,19 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
 
   // add console prefix after adding to history
   args.unshift('VIDEOJS:');
+
+  // If there's no console then don't try to output messages, but they will
+  // still be stored in `log.history`.
+  //
+  // Was setting these once outside of this function, but containing them
+  // in the function makes it easier to test cases where console doesn't exist
+  // when the module is executed.
+  const fn = window.console && window.console[type];
+
+  // Bail out if there's no console.
+  if (!fn) {
+    return;
+  }
 
   // IEs previous to 11 log objects uselessly as "[object Object]"; so, JSONify
   // objects and arrays for those less-capable browsers.
@@ -62,7 +67,7 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
   if (!fn.apply) {
     fn(args);
   } else {
-    fn[Array.isArray(args) ? 'apply' : 'call'](console, args);
+    fn[Array.isArray(args) ? 'apply' : 'call'](window.console, args);
   }
 };
 
