@@ -19,6 +19,12 @@ class DurationDisplay extends Component {
     super(player, options);
 
     this.on(player, 'durationchange', this.updateContent);
+
+    // Also listen for timeupdate and loadedmetadata because removing those
+    // listeners could have broken dependent applications/libraries. These
+    // can likely be removed for 6.0.
+    this.on(player, 'timeupdate', this.updateContent);
+    this.on(player, 'loadedmetadata', this.updateContent);
   }
 
   /**
