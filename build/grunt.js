@@ -32,7 +32,10 @@ module.exports = function(grunt) {
       release: {
         tag_name: 'v'+ version.full,
         name: version.full,
-        body: npmRun.execSync('conventional-changelog -p videojs', {silent: true})
+        body: npmRun.execSync('conventional-changelog -p videojs', {
+          silent: true,
+          encoding: 'utf8'
+        })
       },
     },
     files: {
