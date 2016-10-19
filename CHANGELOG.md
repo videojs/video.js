@@ -1,3 +1,10 @@
+<a name="5.12.5"></a>
+## [5.12.5](https://github.com/videojs/video.js/compare/v5.12.4...v5.12.5) (2016-10-19)
+
+### Bug Fixes
+
+* move html5 source handler incantation to bottom ([#3695](https://github.com/videojs/video.js/issues/3695)) ([7b9574b](https://github.com/videojs/video.js/commit/7b9574b))
+
 <a name="5.12.4"></a>
 ## [5.12.4](https://github.com/videojs/video.js/compare/v5.12.3...v5.12.4) (2016-10-18)
 
