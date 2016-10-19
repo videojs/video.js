@@ -688,79 +688,6 @@ Html5.isSupported = function() {
   return !!Html5.TEST_VID.canPlayType;
 };
 
-// Add Source Handler pattern functions to this tech
-Tech.withSourceHandlers(Html5);
-
-/**
- * The default native source handler.
- * This simply passes the source to the video element. Nothing fancy.
- *
- * @param  {Object} source   The source object
- * @param  {Html5} tech  The instance of the HTML5 tech
- */
-Html5.nativeSourceHandler = {};
-
-/**
- * Check if the video element can play the given videotype
- *
- * @param  {String} type    The mimetype to check
- * @return {String}         'probably', 'maybe', or '' (empty string)
- */
-Html5.nativeSourceHandler.canPlayType = function(type) {
-  // IE9 on Windows 7 without MediaPlayer throws an error here
-  // https://github.com/videojs/video.js/issues/519
-  try {
-    return Html5.TEST_VID.canPlayType(type);
-  } catch (e) {
-    return '';
-  }
-};
-
-/**
- * Check if the video element can handle the source natively
- *
- * @param  {Object} source  The source object
- * @param  {Object} options The options passed to the tech
- * @return {String}         'probably', 'maybe', or '' (empty string)
- */
-Html5.nativeSourceHandler.canHandleSource = function(source, options) {
-
-  // If a type was provided we should rely on that
-  if (source.type) {
-    return Html5.nativeSourceHandler.canPlayType(source.type);
-
-  // If no type, fall back to checking 'video/[EXTENSION]'
-  } else if (source.src) {
-    const ext = Url.getFileExtension(source.src);
-
-    return Html5.nativeSourceHandler.canPlayType(`video/${ext}`);
-  }
-
-  return '';
-};
-
-/**
- * Pass the source to the video element
- * Adaptive source handlers will have more complicated workflows before passing
- * video data to the video element
- *
- * @param  {Object} source   The source object
- * @param  {Html5}  tech     The instance of the Html5 tech
- * @param  {Object} options  The options to pass to the source
- */
-Html5.nativeSourceHandler.handleSource = function(source, tech, options) {
-  tech.setSrc(source.src);
-};
-
-/*
- * Clean up the source handler when disposing the player or switching sources..
- * (no cleanup is needed when supporting the format natively)
- */
-Html5.nativeSourceHandler.dispose = function() {};
-
-// Register the native source handler
-Html5.registerSourceHandler(Html5.nativeSourceHandler);
-
 /**
  * Check if the volume can be changed in this browser/device.
  * Volume cannot be changed in a lot of mobile devices.
@@ -1313,6 +1240,79 @@ Html5.resetMediaElement = function(el) {
     return this.el_[prop]();
   };
 });
+
+// Add Source Handler pattern functions to this tech
+Tech.withSourceHandlers(Html5);
+
+/**
+ * The default native source handler.
+ * This simply passes the source to the video element. Nothing fancy.
+ *
+ * @param  {Object} source   The source object
+ * @param  {Html5} tech  The instance of the HTML5 tech
+ */
+Html5.nativeSourceHandler = {};
+
+/**
+ * Check if the video element can play the given videotype
+ *
+ * @param  {String} type    The mimetype to check
+ * @return {String}         'probably', 'maybe', or '' (empty string)
+ */
+Html5.nativeSourceHandler.canPlayType = function(type) {
+  // IE9 on Windows 7 without MediaPlayer throws an error here
+  // https://github.com/videojs/video.js/issues/519
+  try {
+    return Html5.TEST_VID.canPlayType(type);
+  } catch (e) {
+    return '';
+  }
+};
+
+/**
+ * Check if the video element can handle the source natively
+ *
+ * @param  {Object} source  The source object
+ * @param  {Object} options The options passed to the tech
+ * @return {String}         'probably', 'maybe', or '' (empty string)
+ */
+Html5.nativeSourceHandler.canHandleSource = function(source, options) {
+
+  // If a type was provided we should rely on that
+  if (source.type) {
+    return Html5.nativeSourceHandler.canPlayType(source.type);
+
+  // If no type, fall back to checking 'video/[EXTENSION]'
+  } else if (source.src) {
+    const ext = Url.getFileExtension(source.src);
+
+    return Html5.nativeSourceHandler.canPlayType(`video/${ext}`);
+  }
+
+  return '';
+};
+
+/**
+ * Pass the source to the video element
+ * Adaptive source handlers will have more complicated workflows before passing
+ * video data to the video element
+ *
+ * @param  {Object} source   The source object
+ * @param  {Html5}  tech     The instance of the Html5 tech
+ * @param  {Object} options  The options to pass to the source
+ */
+Html5.nativeSourceHandler.handleSource = function(source, tech, options) {
+  tech.setSrc(source.src);
+};
+
+/*
+ * Clean up the source handler when disposing the player or switching sources..
+ * (no cleanup is needed when supporting the format natively)
+ */
+Html5.nativeSourceHandler.dispose = function() {};
+
+// Register the native source handler
+Html5.registerSourceHandler(Html5.nativeSourceHandler);
 
 Component.registerComponent('Html5', Html5);
 Tech.registerTech('Html5', Html5);
