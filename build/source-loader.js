@@ -48,12 +48,6 @@ var sourceFiles = [
   "src/js/media/flash.js",
   "src/js/media/flash.rtmp.js",
   "src/js/media/loader.js",
-  "src/js/tracks/text-track-enums.js",
-  "src/js/tracks/text-track.js",
-  "src/js/tracks/text-track-list.js",
-  "src/js/tracks/text-track-cue-list.js",
-  "src/js/tracks/text-track-controls.js",
-  "src/js/tracks/text-track-settings.js",
   "src/js/json.js",
   "src/js/setup.js",
   "src/js/plugins.js"

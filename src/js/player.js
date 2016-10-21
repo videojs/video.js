@@ -181,8 +181,7 @@ vjs.Player.prototype.getTagSettings = function(tag){
   var tagOptions,
       dataSetup,
       options = {
-        'sources': [],
-        'tracks': []
+        'sources': []
       };
 
   tagOptions = vjs.getElementAttributes(tag);
@@ -209,8 +208,6 @@ vjs.Player.prototype.getTagSettings = function(tag){
       childName = child.nodeName.toLowerCase();
       if (childName === 'source') {
         options['sources'].push(vjs.getElementAttributes(child));
-      } else if (childName === 'track') {
-        options['tracks'].push(vjs.getElementAttributes(child));
       }
     }
   }
@@ -1694,64 +1691,3 @@ vjs.Player.prototype.networkState = function(){
 vjs.Player.prototype.readyState = function(){
   return this.techGet('readyState');
 };
-
-/**
- * Text tracks are tracks of timed text events.
- * Captions - text displayed over the video for the hearing impaired
- * Subtitles - text displayed over the video for those who don't understand language in the video
- * Chapters - text displayed in a menu allowing the user to jump to particular points (chapters) in the video
- * Descriptions (not supported yet) - audio descriptions that are read back to the user by a screen reading device
- */
-
-/**
- * Get an array of associated text tracks. captions, subtitles, chapters, descriptions
- * http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-texttracks
- * @return {Array}           Array of track objects
- */
-vjs.Player.prototype.textTracks = function(){
-  // cannot use techGet directly because it checks to see whether the tech is ready.
-  // Flash is unlikely to be ready in time but textTracks should still work.
-  return this.tech && this.tech['textTracks']();
-};
-
-vjs.Player.prototype.remoteTextTracks = function() {
-  return this.tech && this.tech['remoteTextTracks']();
-};
-
-/**
- * Add a text track
- * In addition to the W3C settings we allow adding additional info through options.
- * http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-addtexttrack
- * @param {String}  kind        Captions, subtitles, chapters, descriptions, or metadata
- * @param {String=} label       Optional label
- * @param {String=} language    Optional language
- */
-vjs.Player.prototype.addTextTrack = function(kind, label, language) {
-  return this.tech && this.tech['addTextTrack'](kind, label, language);
-};
-
-vjs.Player.prototype.addRemoteTextTrack = function(options) {
-  return this.tech && this.tech['addRemoteTextTrack'](options);
-};
-
-vjs.Player.prototype.removeRemoteTextTrack = function(track) {
-  this.tech && this.tech['removeRemoteTextTrack'](track);
-};
-
-// Methods to add support for
-// initialTime: function(){ return this.techCall('initialTime'); },
-// startOffsetTime: function(){ return this.techCall('startOffsetTime'); },
-// played: function(){ return this.techCall('played'); },
-// seekable: function(){ return this.techCall('seekable'); },
-// videoTracks: function(){ return this.techCall('videoTracks'); },
-// audioTracks: function(){ return this.techCall('audioTracks'); },
-// videoWidth: function(){ return this.techCall('videoWidth'); },
-// videoHeight: function(){ return this.techCall('videoHeight'); },
-// defaultPlaybackRate: function(){ return this.techCall('defaultPlaybackRate'); },
-// mediaGroup: function(){ return this.techCall('mediaGroup'); },
-// controller: function(){ return this.techCall('controller'); },
-// defaultMuted: function(){ return this.techCall('defaultMuted'); }
-
-// TODO
-// currentSrcList: the array of sources including other formats and bitrates
-// playList: array of source lists in order of playback
