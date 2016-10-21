@@ -7,13 +7,10 @@ module.exports = function(grunt) {
     // Manually copy each source file
     grunt.file.copy('build/files/minified.video.js', 'dist/video-js/video.js');
     grunt.file.copy('build/files/combined.video.js', 'dist/video-js/video.dev.js');
-    grunt.file.copy('build/files/minified.video.novtt.js', 'dist/video-js/video.novtt.js');
-    grunt.file.copy('build/files/combined.video.novtt.js', 'dist/video-js/video.novtt.dev.js');
     grunt.file.copy('build/files/video-js.css', 'dist/video-js/video-js.css');
     grunt.file.copy('build/files/video-js.min.css', 'dist/video-js/video-js.min.css');
     grunt.file.copy('node_modules/videojs-swf/dist/video-js.swf', 'dist/video-js/video-js.swf');
     grunt.file.copy('build/demo-files/demo.html', 'dist/video-js/demo.html');
-    grunt.file.copy('build/demo-files/demo.captions.vtt', 'dist/video-js/demo.captions.vtt');
     grunt.file.copy('src/css/video-js.less', 'dist/video-js/video-js.less');
 
 
@@ -44,7 +41,6 @@ module.exports = function(grunt) {
     grunt.file.copy('build/files/minified.video.js', 'dist/cdn/video.js');
     grunt.file.copy('build/files/video-js.min.css', 'dist/cdn/video-js.css');
     grunt.file.copy('node_modules/videojs-swf/dist/video-js.swf', 'dist/cdn/video-js.swf');
-    grunt.file.copy('build/demo-files/demo.captions.vtt', 'dist/cdn/demo.captions.vtt');
     grunt.file.copy('build/demo-files/demo.html', 'dist/cdn/demo.html');
 
     // Replace font urls with CDN versions

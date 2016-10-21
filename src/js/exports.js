@@ -96,15 +96,9 @@ goog.exportProperty(vjs.Player.prototype, 'cancelFullScreen', vjs.Player.prototy
 goog.exportProperty(vjs.Player.prototype, 'exitFullscreen', vjs.Player.prototype.exitFullscreen);
 goog.exportProperty(vjs.Player.prototype, 'isFullScreen', vjs.Player.prototype.isFullScreen);
 goog.exportProperty(vjs.Player.prototype, 'isFullscreen', vjs.Player.prototype.isFullscreen);
-goog.exportProperty(vjs.Player.prototype, 'textTracks', vjs.Player.prototype.textTracks);
-goog.exportProperty(vjs.Player.prototype, 'remoteTextTracks', vjs.Player.prototype.remoteTextTracks);
-goog.exportProperty(vjs.Player.prototype, 'addTextTrack', vjs.Player.prototype.addTextTrack);
-goog.exportProperty(vjs.Player.prototype, 'addRemoteTextTrack', vjs.Player.prototype.addRemoteTextTrack);
-goog.exportProperty(vjs.Player.prototype, 'removeRemoteTextTrack', vjs.Player.prototype.removeRemoteTextTrack);
 goog.exportProperty(vjs.Player.prototype, 'seekable', vjs.Player.prototype.seekable);
 
 goog.exportSymbol('videojs.MediaLoader', vjs.MediaLoader);
-goog.exportSymbol('videojs.TextTrackDisplay', vjs.TextTrackDisplay);
 
 goog.exportSymbol('videojs.ControlBar', vjs.ControlBar);
 goog.exportSymbol('videojs.Button', vjs.Button);
@@ -135,19 +129,8 @@ goog.exportSymbol('videojs.Menu', vjs.Menu);
 goog.exportSymbol('videojs.MenuItem', vjs.MenuItem);
 goog.exportSymbol('videojs.MenuButton', vjs.MenuButton);
 goog.exportSymbol('videojs.PlaybackRateMenuButton', vjs.PlaybackRateMenuButton);
-goog.exportSymbol('videojs.ChaptersTrackMenuItem', vjs.ChaptersTrackMenuItem);
-goog.exportSymbol('videojs.TextTrackButton', vjs.TextTrackButton);
-goog.exportSymbol('videojs.TextTrackMenuItem', vjs.TextTrackMenuItem);
-goog.exportSymbol('videojs.OffTextTrackMenuItem', vjs.OffTextTrackMenuItem);
-goog.exportSymbol('videojs.CaptionSettingsMenuItem', vjs.CaptionSettingsMenuItem);
 
 goog.exportProperty(vjs.MenuButton.prototype, 'createItems', vjs.MenuButton.prototype.createItems);
-goog.exportProperty(vjs.TextTrackButton.prototype, 'createItems', vjs.TextTrackButton.prototype.createItems);
-goog.exportProperty(vjs.ChaptersButton.prototype, 'createItems', vjs.ChaptersButton.prototype.createItems);
-
-goog.exportSymbol('videojs.SubtitlesButton', vjs.SubtitlesButton);
-goog.exportSymbol('videojs.CaptionsButton', vjs.CaptionsButton);
-goog.exportSymbol('videojs.ChaptersButton', vjs.ChaptersButton);
 
 goog.exportSymbol('videojs.MediaTechController', vjs.MediaTechController);
 goog.exportProperty(vjs.MediaTechController, 'withSourceHandlers', vjs.MediaTechController.withSourceHandlers);
@@ -157,11 +140,6 @@ goog.exportProperty(vjs.MediaTechController.prototype, 'featuresPlaybackRate', v
 goog.exportProperty(vjs.MediaTechController.prototype, 'featuresProgressEvents', vjs.MediaTechController.prototype.featuresProgressEvents);
 goog.exportProperty(vjs.MediaTechController.prototype, 'featuresTimeupdateEvents', vjs.MediaTechController.prototype.featuresTimeupdateEvents);
 goog.exportProperty(vjs.MediaTechController.prototype, 'setPoster', vjs.MediaTechController.prototype.setPoster);
-goog.exportProperty(vjs.MediaTechController.prototype, 'textTracks', vjs.MediaTechController.prototype.textTracks);
-goog.exportProperty(vjs.MediaTechController.prototype, 'remoteTextTracks', vjs.MediaTechController.prototype.remoteTextTracks);
-goog.exportProperty(vjs.MediaTechController.prototype, 'addTextTrack', vjs.MediaTechController.prototype.addTextTrack);
-goog.exportProperty(vjs.MediaTechController.prototype, 'addRemoteTextTrack', vjs.MediaTechController.prototype.addRemoteTextTrack);
-goog.exportProperty(vjs.MediaTechController.prototype, 'removeRemoteTextTrack', vjs.MediaTechController.prototype.removeRemoteTextTrack);
 
 goog.exportSymbol('videojs.Html5', vjs.Html5);
 goog.exportProperty(vjs.Html5, 'Events', vjs.Html5.Events);
@@ -187,11 +165,6 @@ goog.exportProperty(vjs.Html5, 'registerSourceHandler', vjs.Html5.registerSource
 goog.exportProperty(vjs.Html5, 'selectSourceHandler', vjs.Html5.selectSourceHandler);
 goog.exportProperty(vjs.Html5.prototype, 'setSource', vjs.Html5.prototype.setSource);
 goog.exportProperty(vjs.Html5.prototype, 'disposeSourceHandler', vjs.Html5.prototype.disposeSourceHandler);
-goog.exportProperty(vjs.Html5.prototype, 'textTracks', vjs.Html5.prototype.textTracks);
-goog.exportProperty(vjs.Html5.prototype, 'remoteTextTracks', vjs.Html5.prototype.remoteTextTracks);
-goog.exportProperty(vjs.Html5.prototype, 'addTextTrack', vjs.Html5.prototype.addTextTrack);
-goog.exportProperty(vjs.Html5.prototype, 'addRemoteTextTrack', vjs.Html5.prototype.addRemoteTextTrack);
-goog.exportProperty(vjs.Html5.prototype, 'removeRemoteTextTrack', vjs.Html5.prototype.removeRemoteTextTrack);
 
 goog.exportSymbol('videojs.Flash', vjs.Flash);
 goog.exportProperty(vjs.Flash, 'isSupported', vjs.Flash.isSupported);
@@ -205,25 +178,6 @@ goog.exportProperty(vjs.Flash, 'registerSourceHandler', vjs.Flash.registerSource
 goog.exportProperty(vjs.Flash, 'selectSourceHandler', vjs.Flash.selectSourceHandler);
 goog.exportProperty(vjs.Flash.prototype, 'setSource', vjs.Flash.prototype.setSource);
 goog.exportProperty(vjs.Flash.prototype, 'disposeSourceHandler', vjs.Flash.prototype.disposeSourceHandler);
-
-goog.exportSymbol('videojs.TextTrack', vjs.TextTrack);
-goog.exportSymbol('videojs.TextTrackList', vjs.TextTrackList);
-goog.exportSymbol('videojs.TextTrackCueList', vjs.TextTrackCueList);
-goog.exportSymbol('videojs.TextTrackSettings', vjs.TextTrackSettings);
-goog.exportProperty(vjs.TextTrack.prototype, 'id', vjs.TextTrack.prototype.id);
-goog.exportProperty(vjs.TextTrack.prototype, 'label', vjs.TextTrack.prototype.label);
-goog.exportProperty(vjs.TextTrack.prototype, 'kind', vjs.TextTrack.prototype.kind);
-goog.exportProperty(vjs.TextTrack.prototype, 'mode', vjs.TextTrack.prototype.mode);
-goog.exportProperty(vjs.TextTrack.prototype, 'cues', vjs.TextTrack.prototype.cues);
-goog.exportProperty(vjs.TextTrack.prototype, 'activeCues', vjs.TextTrack.prototype.activeCues);
-goog.exportProperty(vjs.TextTrack.prototype, 'addCue', vjs.TextTrack.prototype.addCue);
-goog.exportProperty(vjs.TextTrack.prototype, 'removeCue', vjs.TextTrack.prototype.removeCue);
-goog.exportProperty(vjs.TextTrackList.prototype, 'getTrackById', vjs.TextTrackList.prototype.getTrackById);
-goog.exportProperty(vjs.TextTrackCueList.prototype, 'getCueById', vjs.TextTrackList.prototype.getCueById);
-
-goog.exportSymbol('videojs.CaptionsTrack', vjs.CaptionsTrack);
-goog.exportSymbol('videojs.SubtitlesTrack', vjs.SubtitlesTrack);
-goog.exportSymbol('videojs.ChaptersTrack', vjs.ChaptersTrack);
 
 goog.exportSymbol('videojs.autoSetup', vjs.autoSetup);
 

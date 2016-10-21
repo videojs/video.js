@@ -5,7 +5,6 @@
 // HTML5 Shiv. Must be in <head> to support older browsers.
 document.createElement('video');
 document.createElement('audio');
-document.createElement('track');
 
 /**
  * Doubles as the main function for users to create a player instance and also
@@ -116,11 +115,9 @@ vjs.options = {
     'mediaLoader': {},
     'posterImage': {},
     'loadingSpinner': {},
-    'textTrackDisplay': {},
     'bigPlayButton': {},
     'controlBar': {},
-    'errorDisplay': {},
-    'textTrackSettings': {}
+    'errorDisplay': {}
   },
 
   'language': document.getElementsByTagName('html')[0].getAttribute('lang') || navigator.languages && navigator.languages[0] || navigator.userLanguage || navigator.language || 'en',

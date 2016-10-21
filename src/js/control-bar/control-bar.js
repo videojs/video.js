@@ -22,10 +22,7 @@ vjs.ControlBar.prototype.options_ = {
     'volumeControl': {},
     'muteToggle': {},
     // 'volumeMenuButton': {},
-    'playbackRateMenuButton': {},
-    'subtitlesButton': {},
-    'captionsButton': {},
-    'chaptersButton': {}
+    'playbackRateMenuButton': {}
   }
 };
 

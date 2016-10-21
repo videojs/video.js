@@ -5,6 +5,8 @@ CHANGELOG
 _(none)_
 
 --------------------
+## 4.12.10-notrack (2016-10-21)
+* @Mulder90 Remove track supports
 
 ## 4.12.10 (2015-06-23)
 * @dmlap update to video-js-swf 4.7.1 ([view](https://github.com/videojs/video.js/pull/2280))

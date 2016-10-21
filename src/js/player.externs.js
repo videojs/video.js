@@ -58,12 +58,6 @@ videojs.Player.prototype.exitFullscreen = function(){};
 videojs.Player.prototype.cancelFullScreen = function(){}; /* deprecated */
 
 /**
- * Text tracks
- */
-videojs.Player.prototype.textTracks = function(){};
-videojs.Player.prototype.addTextTrack = function(){};
-
-/**
  * Language support
  */
 videojs.Player.prototype.language = function(){};
