@@ -34,7 +34,7 @@ By default, when your web page finishes loading, Video.js will scan for media el
 </video>
 ```
 
-> Note: You **must** use single-quotes with `data-setup` as it is expected to contain JSON and it **must** contain `'{}'` at a minimum!
+> Note: You **must** use single-quotes with `data-setup` as it is expected to contain JSON.
 
 ### Manual Setup
 
@@ -66,7 +66,7 @@ Using an `id` attribute isn't always practical when your DOM is generated progra
 videojs(document.querySelector('.video-js'));
 ```
 
-Regardless, in either case, the `data-setup` attribute is still supported for providing [options][options] to Video.js. Additionally, the `videojs` function can take options as its second argument.
+Regardless, in either case, the `data-setup` attribute is still supported for providing [options][options] to Video.js. Additionally, the `videojs` function can take options as its second argument. [Learn more about Video.js options][options].
 
 
 [getting-started]: http://videojs.com/getting-started/
