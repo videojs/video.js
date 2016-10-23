@@ -1,7 +1,43 @@
 # Options
 
-<!-- START doctoc -->
-<!-- END doctoc -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Setting Options](#setting-options)
+  - [Setting Global Defaults](#setting-global-defaults)
+  - [A Note on `<video>` Tag Attributes](#a-note-on-video-tag-attributes)
+  - [Precedence](#precedence)
+- [Options Reference](#options-reference)
+  - [Standard `<video>` Element Options](#standard-video-element-options)
+    - [`autoplay`](#autoplay)
+    - [`controls`](#controls)
+    - [`height`](#height)
+    - [`loop`](#loop)
+    - [`muted`](#muted)
+    - [`poster`](#poster)
+    - [`preload`](#preload)
+    - [`src`](#src)
+    - [`width`](#width)
+  - [Video.js-specific Options](#videojs-specific-options)
+    - [`aspectRatio`](#aspectratio)
+    - [`children`](#children)
+    - [`fluid`](#fluid)
+    - [`inactivityTimeout`](#inactivitytimeout)
+    - [`language`](#language)
+    - [`languages`](#languages)
+    - [`notSupportedMessage`](#notsupportedmessage)
+    - [`plugins`](#plugins)
+    - [`sourceOrder`](#sourceorder)
+    - [`sources`](#sources)
+    - [`techOrder`](#techorder)
+  - [Component Options](#component-options)
+    - [`children`](#children-1)
+    - [`${componentName}`](#componentname)
+  - [Tech Options](#tech-options)
+    - [`${techName}`](#techname)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Setting Options
 

@@ -1,5 +1,16 @@
 # Video.js Setup
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Installing Video.js](#installing-videojs)
+- [Decorating a `<video>` Element](#decorating-a-video-element)
+  - [Automatic Setup](#automatic-setup)
+  - [Manual Setup](#manual-setup)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Installing Video.js
 
 Video.js is officially available via CDN, npm, and Bower.
