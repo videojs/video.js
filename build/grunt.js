@@ -16,7 +16,6 @@ module.exports = function(grunt) {
 
   const browserifyGruntDefaults = {
     browserifyOptions: {
-      debug: true,
       standalone: 'videojs'
     },
     plugin: [
@@ -124,9 +123,6 @@ module.exports = function(grunt) {
     },
     uglify: {
       options: {
-        sourceMap: true,
-        sourceMapIn: 'build/temp/video.js.map',
-        sourceMapRoot: '../../src/js',
         preserveComments: 'some',
         screwIE8: false,
         mangle: true,
@@ -376,14 +372,6 @@ module.exports = function(grunt) {
         }
       }
     },
-    exorcise: {
-      build: {
-        options: {},
-        files: {
-          'build/temp/video.js.map': ['build/temp/video.js'],
-        }
-      }
-    },
     coveralls: {
       options: {
         // warn instead of failing when coveralls errors
@@ -458,7 +446,6 @@ module.exports = function(grunt) {
 
     'jshint',
     'browserify:build',
-    'exorcise:build',
     'concat:novtt',
     'concat:vtt',
     'usebanner:novtt',
