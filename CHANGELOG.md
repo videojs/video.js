@@ -87,6 +87,11 @@
 * @gkatsev added tests for webpack and browserify bundling and node.js requiring ([view](https://github.com/videojs/video.js/pull/3558))
 * @rlchung fixed tests that weren't disposing players when they finished ([view](https://github.com/videojs/video.js/pull/3524))
 
+## 5.11.9 (2016-10-25)
+* greenkeeper updated karma dependencies ([view](https://github.com/videojs/video.js/pull/3523))
+* update to latest uglify to fix preserve comments issue. Disable screw ie8 option. ([view](https://github.com/videojs/video.js/pull/3709))
+* remove sourcemap generation ([view](https://github.com/videojs/video.js/pull/3710))
+
 ## 5.11.8 (2016-10-17)
 * @misteroneill restore timeupdate/loadedmetadata listeners for duration display ([view](https://github.com/videojs/video.js/pull/3682))
 

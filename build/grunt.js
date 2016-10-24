@@ -105,6 +105,7 @@ module.exports = function(grunt) {
     uglify: {
       options: {
         preserveComments: 'some',
+        screwIE8: false,
         mangle: true,
         compress: {
           sequences: true,
