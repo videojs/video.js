@@ -2,7 +2,8 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* greenkeeper updated karma dependencies ([view](https://github.com/videojs/video.js/pull/3523))
+* update to latest uglify to fix preserve comments issue. Disable screw ie8 option. ([view](https://github.com/videojs/video.js/pull/3709))
 
 --------------------
 

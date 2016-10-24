@@ -128,6 +128,7 @@ module.exports = function(grunt) {
         sourceMapIn: 'build/temp/video.js.map',
         sourceMapRoot: '../../src/js',
         preserveComments: 'some',
+        screwIE8: false,
         mangle: true,
         compress: {
           sequences: true,
