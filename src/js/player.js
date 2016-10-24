@@ -347,8 +347,7 @@ class Player extends Component {
      */
     this.scrubbing_ = false;
 
-    this.plugins_ = {};
-
+    this.activePlugins_ = {};
     this.el_ = this.createEl();
 
     // We also want to pass the original player options to each component and plugin
@@ -3102,6 +3101,19 @@ class Player extends Component {
     });
 
     return modal.open();
+  }
+
+  /**
+   * Reports whether or not a player is using a plugin by name.
+   *
+   * For basic plugins, this only reports whether the plugin has _ever_ been
+   * initialized on this player.
+   *
+   * @param  {String} name
+   * @return {Boolean}
+   */
+  usingPlugin(name) {
+    return !!(this.activePlugins_ && this.activePlugins_[name]);
   }
 
   /**

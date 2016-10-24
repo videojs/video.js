@@ -13,7 +13,7 @@ import Component from './component';
 import EventTarget from './event-target';
 import * as Events from './utils/events.js';
 import Player from './player';
-import registerPlugin from './plugins.js';
+import Plugin from './plugin';
 import mergeOptions from './utils/merge-options.js';
 import * as Fn from './utils/fn.js';
 import TextTrack from './tracks/text-track.js';
@@ -352,14 +352,29 @@ videojs.bind = Fn.bind;
  * in the player options, or the plugin function on the player instance is
  * called.
  *
- * @borrows plugin:plugin as videojs.plugin
+ * @borrows plugin:registerPlugin as videojs.registerPlugin
+ * @param {String} name The plugin name
+ * @param {Function} fn The plugin function that will be called with options
+ * @mixes videojs
+ * @method registerPlugin
  */
-videojs.registerPlugin = registerPlugin;
+videojs.registerPlugin = Fn.bind(Plugin, Plugin.registerPlugin);
 
+/**
+ * @deprecated videojs.plugin() is deprecated; use videojs.registerPlugin() instead
+ * @param {String} name The plugin name
+ * @param {Function} fn The plugin function that will be called with options
+ * @mixes videojs
+ * @method plugin
+ */
 videojs.plugin = (...args) => {
   log.warn('videojs.plugin() is deprecated; use videojs.registerPlugin() instead');
   return videojs.registerPlugin(...args);
 };
+
+videojs.getPlugins = Fn.bind(Plugin, Plugin.getPlugins);
+videojs.getPlugin = Fn.bind(Plugin, Plugin.getPlugin);
+videojs.getPluginVersion = Fn.bind(Plugin, Plugin.getPluginVersion);
 
 /**
  * Adding languages so that they're available to all players.

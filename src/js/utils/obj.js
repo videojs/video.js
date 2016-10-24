@@ -131,3 +131,15 @@ export function assign(...args) {
   // polyfill. If we decide to move away from it, we can do so in one place.
   return objectAssign(...args);
 }
+
+/**
+ * Returns whether an object appears to be a non-function/non-array object.
+ *
+ * This avoids gotchas like `typeof null === 'object'`.
+ *
+ * @param  {Object} object
+ * @return {Boolean}
+ */
+export function isObject(object) {
+  return Object.prototype.toString.call(object) === '[object Object]';
+}
