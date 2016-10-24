@@ -66,6 +66,7 @@ module.exports = function(config) {
     logLevel: config.LOG_INFO,
     captureTimeout: 300000,
     browserNoActivityTimeout: 300000,
+    concurrency: 2,
 
     browserStack: {
       name: process.env.TRAVIS_BUILD_NUMBER + process.env.TRAVIS_BRANCH,
