@@ -143,3 +143,14 @@ export function assign(...args) {
 export function isObject(object) {
   return Object.prototype.toString.call(object) === '[object Object]';
 }
+
+/**
+ * Returns whether an object appears to be a "plain" object - that is, a
+ * direct instance of `Object`.
+ *
+ * @param  {Object} object
+ * @return {Boolean}
+ */
+export function isPlain(object) {
+  return isObject(object) && object.constructor === Object;
+}

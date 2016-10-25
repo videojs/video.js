@@ -1,6 +1,7 @@
 /**
  * @file plugin.js
  */
+import stateful from './mixins/stateful';
 import * as Fn from './utils/fn';
 import * as Obj from './utils/obj';
 import EventTarget from './event-target';
@@ -56,14 +57,15 @@ class Plugin extends EventTarget {
   /**
    * Plugin constructor.
    *
-   * Subclasses should make sure they call `super()` in order to make sure their
+   * Subclasses should make sure they call `super` in order to make sure their
    * plugins are properly initialized.
    *
    * @param {Player} player
    */
   constructor(player) {
+    super();
     this.player = player;
-    this.state = Obj.assign({}, this.constructor.defaultState);
+    stateful(this, this.constructor.defaultState);
     player.on('dispose', Fn.bind(this, this.dispose));
     player.activePlugins_[this.name] = true;
     player.trigger('pluginsetup', this.name, this);
@@ -86,43 +88,6 @@ class Plugin extends EventTarget {
     this.player[name] = createPluginFactory(name, pluginCache[name]);
     this.player = this.state = null;
     this.trigger('dispose', this, props);
-  }
-
-  /**
-   * Set the state of a plugin by mutating the plugin instance's `state`
-   * object in place.
-   *
-   * @param {Object|Function} next
-   *        A new set of properties to shallow-merge into the plugin state. Can
-   *        be a plain object or a function returning a plain object.
-   */
-  setState(next) {
-    if (typeof next === 'function') {
-      next = next();
-    }
-
-    if (!Obj.isObject(next)) {
-      return;
-    }
-
-    const {state} = this;
-    const changes = {};
-
-    Obj.each(next, (value, key) => {
-
-      // Record the change if the value is different from what's in the
-      // current state.
-      if (state[key] !== value) {
-        changes[key] = {
-          from: state[key],
-          to: value
-        };
-      }
-
-      state[key] = value;
-    });
-
-    this.trigger('statechange', next, changes);
   }
 
   /**
