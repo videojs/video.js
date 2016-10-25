@@ -91,17 +91,6 @@ class Plugin extends EventTarget {
   }
 
   /**
-   * Gets the version of the plugin, if known.
-   *
-   * This will look for a `VERSION` property on the plugin subclass.
-   *
-   * @return {String} [description]
-   */
-  static version() {
-    return this.VERSION || '';
-  }
-
-  /**
    * Determines if a plugin is a "basic" plugin (i.e. not a sub-class of `Plugin`).
    *
    * @param  {String|Function} plugin
@@ -117,15 +106,15 @@ class Plugin extends EventTarget {
   }
 
   /**
-   * Register a video.js plugin
+   * Register a Video.js plugin
    *
    * @param  {String} name
    * @param  {Function} plugin
-   *         A sub-class of `Plugin` or an anonymous function for simple plugins.
+   *         A sub-class of `Plugin` or an anonymous function for basic plugins.
    * @return {Function}
    */
   static registerPlugin(name, plugin) {
-    if (pluginCache[name] || Player.prototype[name]) {
+    if (typeof name !== 'string' || pluginCache[name] || Player.prototype[name]) {
       throw new Error(`illegal plugin name, "${name}"`);
     }
 
@@ -145,12 +134,66 @@ class Plugin extends EventTarget {
   }
 
   /**
-   * Gets an object containing all plugins.
+   * Register multiple plugins via an object where the keys are plugin names
+   * and the values are sub-classes of `Plugin` or anonymous functions for
+   * basic plugins.
    *
+   * @param  {Object} plugins
+   * @return {Object}
+   *         An object containing plugins that were added.
+   */
+  static registerPlugins(plugins) {
+    Obj.each(plugins, (value, key) => this.registerPlugin(key, value));
+    return plugins;
+  }
+
+  /**
+   * De-register a Video.js plugin.
+   *
+   * This is mostly used for testing, but may potentially be useful in advanced
+   * player workflows.
+   *
+   * @param  {String} name
+   */
+  static deregisterPlugin(name) {
+    if (pluginCache.hasOwnProperty(name)) {
+      delete pluginCache[name];
+      delete Player.prototype[name];
+    }
+  }
+
+  /**
+   * De-register multiple Video.js plugins.
+   *
+   * @param  {Array} [names]
+   *         If provided, should be an array of plugin names. Defaults to _all_
+   *         plugin names.
+   */
+  static deregisterPlugins(names = Object.keys(pluginCache)) {
+    names.forEach(name => this.deregisterPlugin(name));
+  }
+
+  /**
+   * Gets an object containing multiple Video.js plugins.
+   *
+   * @param  {Array} [names]
+   *         If provided, should be an array of plugin names. Defaults to _all_
+   *         plugin names.
    * @return {Object}
    */
-  static getPlugins() {
-    return Obj.assign({}, pluginCache);
+  static getPlugins(names = Object.keys(pluginCache)) {
+    let result;
+
+    names.forEach(name => {
+      const plugin = this.getPlugin(name);
+
+      if (plugin) {
+        result = result || {};
+        result[name] = plugin;
+      }
+    });
+
+    return result;
   }
 
   /**
@@ -172,7 +215,7 @@ class Plugin extends EventTarget {
   static getPluginVersion(name) {
     const plugin = Plugin.getPlugin(name);
 
-    return plugin && plugin.version() || '';
+    return plugin && plugin.VERSION || '';
   }
 }
 

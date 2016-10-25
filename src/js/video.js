@@ -347,34 +347,67 @@ videojs.mergeOptions = mergeOptions;
 videojs.bind = Fn.bind;
 
 /**
- * Create a Video.js player plugin.
- * Plugins are only initialized when options for the plugin are included
- * in the player options, or the plugin function on the player instance is
- * called.
+ * Register a Video.js plugin
  *
  * @borrows plugin:registerPlugin as videojs.registerPlugin
  * @param {String} name The plugin name
- * @param {Function} fn The plugin function that will be called with options
+ * @param {Function} plugin A sub-class of `Plugin` or an anonymous function for basic plugins.
  * @mixes videojs
  * @method registerPlugin
  */
-videojs.registerPlugin = Fn.bind(Plugin, Plugin.registerPlugin);
+videojs.registerPlugin = (name, plugin) => Plugin.registerPlugin(name, plugin);
 
 /**
- * @deprecated videojs.plugin() is deprecated; use videojs.registerPlugin() instead
- * @param {String} name The plugin name
- * @param {Function} fn The plugin function that will be called with options
- * @mixes videojs
- * @method plugin
+ * Register multiple Video.js plugins via an object where the keys are
+ * plugin names and the values are sub-classes of `Plugin` or anonymous
+ * functions for basic plugins.
+ *
+ * @param  {Object} plugins
+ * @return {Object}
+ *         An object containing plugins that were added.
  */
-videojs.plugin = (...args) => {
+videojs.registerPlugins = (plugins) => Plugin.registerPlugins(plugins);
+
+/**
+ * Deprecated method to register a plugin with Video.js
+ *
+ * @deprecated
+ *        videojs.plugin() is deprecated; use videojs.registerPlugin() instead
+ *
+ * @param {String} name
+ *        The plugin name
+ *
+ * @param {Plugin|Function} plugin
+ *         The plugin sub-class or function
+ */
+videojs.plugin = (name, plugin) => {
   log.warn('videojs.plugin() is deprecated; use videojs.registerPlugin() instead');
-  return videojs.registerPlugin(...args);
+  return Plugin.registerPlugin(name, plugin);
 };
 
-videojs.getPlugins = Fn.bind(Plugin, Plugin.getPlugins);
-videojs.getPlugin = Fn.bind(Plugin, Plugin.getPlugin);
-videojs.getPluginVersion = Fn.bind(Plugin, Plugin.getPluginVersion);
+/**
+ * Get an object containing all available plugins.
+ *
+ * @return {Object}
+ */
+videojs.getPlugins = () => Plugin.getPlugins();
+
+/**
+ * Get a single plugin by name.
+ *
+ * @param  {String} name
+ * @return {Plugin|Function}
+ */
+videojs.getPlugin = (name) => Plugin.getPlugin(name);
+
+/**
+ * Get the version - if known - of a plugin by name.
+ *
+ * @param  {String} name
+ * @return {String}
+ *         If the version is not known, returns an empty string.
+ */
+videojs.getPluginVersion = (name) => Plugin.getPluginVersion(name);
 
 /**
  * Adding languages so that they're available to all players.
