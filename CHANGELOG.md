@@ -2,11 +2,14 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 5.11.9 (2016-10-25)
 * greenkeeper updated karma dependencies ([view](https://github.com/videojs/video.js/pull/3523))
 * update to latest uglify to fix preserve comments issue. Disable screw ie8 option. ([view](https://github.com/videojs/video.js/pull/3709))
 * remove sourcemap generation ([view](https://github.com/videojs/video.js/pull/3710))
-
---------------------
 
 ## 5.11.8 (2016-10-17)
 * @misteroneill restore timeupdate/loadedmetadata listeners for duration display ([view](https://github.com/videojs/video.js/pull/3682))
