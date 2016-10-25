@@ -23,11 +23,16 @@ const pluginCache = {};
  * @return {Function}
  */
 const createBasicPlugin = (name, plugin) => function() {
-  const result = plugin.apply(this, arguments);
+  const instance = plugin.apply(this, arguments);
 
   this.activePlugins_[name] = true;
-  this.trigger('pluginsetup', name, result);
-  return result;
+
+  this.trigger({
+    type: 'pluginsetup',
+    pluginSetupMeta: {name, plugin, instance}
+  });
+
+  return instance;
 };
 
 /**
@@ -68,7 +73,14 @@ class Plugin extends EventTarget {
     stateful(this, this.constructor.defaultState);
     player.on('dispose', Fn.bind(this, this.dispose));
     player.activePlugins_[this.name] = true;
-    player.trigger('pluginsetup', this.name, this);
+    player.trigger({
+      type: 'pluginsetup',
+      pluginSetupMeta: {
+        name: this.name,
+        plugin: this.constructor,
+        instance: this
+      }
+    });
   }
 
   /**
