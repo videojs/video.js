@@ -33,7 +33,9 @@ import xhr from 'xhr';
 import Tech from './tech/tech.js';
 
 // HTML5 Element Shim for IE8
-if (typeof HTMLVideoElement === 'undefined') {
+if (typeof HTMLVideoElement === 'undefined' &&
+    window.document &&
+    window.document.createElement) {
   document.createElement('video');
   document.createElement('audio');
   document.createElement('track');
