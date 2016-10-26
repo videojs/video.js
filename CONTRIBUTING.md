@@ -4,7 +4,7 @@ So you want to help out? Great! There's a number of ways you can get involved.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+**Table of Contents**
 
 - [Other repositories where issues could be filed](#other-repositories-where-issues-could-be-filed)
 - [Filing issues](#filing-issues)
@@ -28,6 +28,7 @@ So you want to help out? Great! There's a number of ways you can get involved.
     - [Step 5: Test](#step-5-test)
     - [Step 6: Push](#step-6-push)
   - [Code Style Guide](#code-style-guide)
+- [Developer's Certificate of Origin 1.1](#developers-certificate-of-origin-11)
 - [Doc Credit](#doc-credit)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
