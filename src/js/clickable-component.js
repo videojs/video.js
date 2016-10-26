@@ -118,26 +118,6 @@ class ClickableComponent extends Component {
   }
 
   /**
-   * Adds a child component inside this clickable-component
-   *
-   * @param {String|Component} child The class name or instance of a child to add
-   * @param {Object=} options Options, including options to be passed to children of the child.
-   * @return {Component} The child component (created by this process if a string was used)
-   * @method addChild
-   */
-  addChild(child, options = {}) {
-    // TODO: Fix adding an actionable child to a ClickableComponent; currently
-    // it will cause issues with assistive technology (e.g. screen readers)
-    // which support ARIA, since an element with role="button" cannot have
-    // actionable child elements.
-
-    // let className = this.constructor.name;
-    // log.warn(`Adding a child to a ClickableComponent (${className}) can cause issues with assistive technology which supports ARIA, since an element with role="button" cannot have actionable child elements.`);
-
-    return super.addChild(child, options);
-  }
-
-  /**
    * Enable the component element
    *
    * @return {Component}

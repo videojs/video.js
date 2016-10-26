@@ -15,10 +15,6 @@ import Component from './component.js';
  */
 class BigPlayButton extends Button {
 
-  constructor(player, options) {
-    super(player, options);
-  }
-
   /**
    * Allow sub components to stack CSS class names
    *
