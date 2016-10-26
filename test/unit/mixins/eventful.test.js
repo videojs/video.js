@@ -1,9 +1,10 @@
 /* eslint-env qunit */
 import sinon from 'sinon';
 import eventful from '../../../src/js/mixins/eventful';
+import * as Dom from '../../../src/js/utils/dom';
 import * as Obj from '../../../src/js/utils/obj';
 
-QUnit.module('mixins: Eventful');
+QUnit.module('mixins: eventful');
 
 QUnit.test('eventful() mutations', function(assert) {
   const target = {};
@@ -12,6 +13,7 @@ QUnit.test('eventful() mutations', function(assert) {
   assert.strictEqual(eventful(target), target, 'returns the target object');
 
   assert.ok(Obj.isObject(target), 'the target is still an object');
+  assert.ok(Dom.isEl(target.eventBusEl_), 'the target has an event bus element');
   assert.strictEqual(typeof target.off, 'function', 'the target has an off method');
   assert.strictEqual(typeof target.on, 'function', 'the target has an on method');
   assert.strictEqual(typeof target.one, 'function', 'the target has a one method');

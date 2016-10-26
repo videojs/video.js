@@ -4,7 +4,7 @@ import EventTarget from '../../../src/js/event-target';
 import stateful from '../../../src/js/mixins/stateful';
 import * as Obj from '../../../src/js/utils/obj';
 
-QUnit.module('mixins: Stateful');
+QUnit.module('mixins: stateful');
 
 QUnit.test('stateful() mutations', function(assert) {
   const target = {};

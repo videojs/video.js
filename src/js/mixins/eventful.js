@@ -1,6 +1,7 @@
 /**
  * @file mixins/eventful.js
  */
+import * as Dom from '../utils/dom';
 import * as Events from '../utils/events';
 
 /**
@@ -22,7 +23,8 @@ function eventful(target, exclusions = []) {
   ['off', 'on', 'one', 'trigger']
     .filter(name => exclusions.indexOf(name) === -1)
     .forEach(name => {
-      target[name] = Events[name].bind(target, target);
+      target.eventBusEl_ = target.el_ || Dom.createEl('span', {className: 'vjs-event-bus'});
+      target[name] = (...args) => Events[name](...[target.eventBusEl_, ...args]);
     });
 
   return target;

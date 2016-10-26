@@ -6,7 +6,6 @@ import stateful from './mixins/stateful';
 import * as Events from './utils/events';
 import * as Fn from './utils/fn';
 import * as Obj from './utils/obj';
-import EventTarget from './event-target';
 import Player from './player';
 
 /**
@@ -15,7 +14,7 @@ import Player from './player';
  * @private
  * @type {Object}
  */
-const pluginCache = {};
+const pluginStorage = {};
 
 /**
  * Takes a basic plugin function and returns a wrapper function which marks
@@ -27,12 +26,12 @@ const pluginCache = {};
 const createBasicPlugin = (name, plugin) => function() {
   const instance = plugin.apply(this, arguments);
 
-  this.activePlugins_[name] = true;
+  this.plugins_[name] = true;
 
-  // We trigger the "pluginsetup" event regardless, but we want the hash to
-  // be consistent. The only odd thing here is the `instance` is the value
-  // returned by the `plugin` function (instead of, necessarily, an instance
-  // of it).
+  // We trigger the "pluginsetup" event on the player regardless, but we want
+  // the hash to be consistent with the hash provided for class-based plugins.
+  // The only potentially counter-intuitive thing here is the `instance` is the
+  // value returned by the `plugin` function.
   this.trigger('pluginsetup', {name, plugin, instance});
   return instance;
 };
@@ -50,7 +49,7 @@ const createBasicPlugin = (name, plugin) => function() {
 const createPluginFactory = (name, PluginSubClass) => {
 
   // Add a `name` property to the plugin prototype so that each plugin can
-  // refer to itself.
+  // refer to itself by name.
   PluginSubClass.prototype.name = name;
 
   return function(...args) {
@@ -59,7 +58,7 @@ const createPluginFactory = (name, PluginSubClass) => {
   };
 };
 
-class Plugin extends EventTarget {
+class Plugin {
 
   /**
    * Plugin constructor.
@@ -70,14 +69,11 @@ class Plugin extends EventTarget {
    * @param {Player} player
    */
   constructor(player) {
-    super();
     this.player = player;
-
     eventful(this, ['trigger']);
     stateful(this, this.constructor.defaultState);
-
-    player.on('dispose', Fn.bind(this, this.dispose));
-    player.activePlugins_[this.name] = true;
+    player.plugins_[this.name] = true;
+    player.one('dispose', Fn.bind(this, this.dispose));
     player.trigger('pluginsetup', this.getEventHash_());
   }
 
@@ -87,6 +83,7 @@ class Plugin extends EventTarget {
    *
    * This returns that object or mutates an existing hash.
    *
+   * @private
    * @param  {Object} [hash={}]
    * @return {Object}
    *         - `instance`: The plugin instance on which the event is fired.
@@ -107,13 +104,18 @@ class Plugin extends EventTarget {
    *         A string (the type) or an event object with a type attribute.
    *
    * @param  {Object} [hash={}]
-   *         Additional data hash to pass along with the event.
+   *         Additional data hash to pass along with the event. In this case,
+   *         several properties are added to the hash:
+   *
+   *         - `instance`: The plugin instance on which the event is fired.
+   *         - `name`: The name of the plugin.
+   *         - `plugin`: The plugin class/constructor.
    *
    * @return {Boolean}
    *         Whether or not default was prevented.
    */
   trigger(event, hash = {}) {
-    return Events.trigger(this, event, this.getEventHash_(hash));
+    return Events.trigger(this.eventBusEl_, event, this.getEventHash_(hash));
   }
 
   /**
@@ -123,13 +125,26 @@ class Plugin extends EventTarget {
    * it's probably best to subscribe to one of the disposal events.
    */
   dispose() {
-    this.off();
-    this.player.activePlugins_[this.name] = false;
-    this.trigger('dispose');
+    const {name, player} = this;
 
-    // Eliminate possible sources of leaking memory.
-    this.player[this.name] = createPluginFactory(this.name, pluginCache[this.name]);
+    this.trigger('dispose');
+    this.off();
+
+    // Eliminate any possible sources of leaking memory by clearing up references
+    // between the player and the plugin instance and nulling out the plugin's
+    // state and replacing methods with a function that throws.
+    player.plugins_[name] = false;
     this.player = this.state = null;
+
+    this.dispose = () => {
+      throw new Error('cannot call methods on a disposed object');
+    };
+
+    this.setState = this.off = this.on = this.one = this.trigger = this.dispose;
+
+    // Finally, replace the plugin name on the player with a new factory
+    // function, so that the plugin is ready to be set up again.
+    player[name] = createPluginFactory(name, pluginStorage[name]);
   }
 
   /**
@@ -156,7 +171,7 @@ class Plugin extends EventTarget {
    * @return {Function}
    */
   static registerPlugin(name, plugin) {
-    if (typeof name !== 'string' || pluginCache[name] || Player.prototype[name]) {
+    if (typeof name !== 'string' || pluginStorage[name] || Player.prototype[name]) {
       throw new Error(`illegal plugin name, "${name}"`);
     }
 
@@ -164,7 +179,7 @@ class Plugin extends EventTarget {
       throw new Error(`illegal plugin for "${name}", must be a function, was ${typeof plugin}`);
     }
 
-    pluginCache[name] = plugin;
+    pluginStorage[name] = plugin;
 
     if (Plugin.isBasic(plugin)) {
       Player.prototype[name] = createBasicPlugin(name, plugin);
@@ -198,8 +213,8 @@ class Plugin extends EventTarget {
    * @param  {String} name
    */
   static deregisterPlugin(name) {
-    if (pluginCache.hasOwnProperty(name)) {
-      delete pluginCache[name];
+    if (pluginStorage.hasOwnProperty(name)) {
+      delete pluginStorage[name];
       delete Player.prototype[name];
     }
   }
@@ -211,7 +226,7 @@ class Plugin extends EventTarget {
    *         If provided, should be an array of plugin names. Defaults to _all_
    *         plugin names.
    */
-  static deregisterPlugins(names = Object.keys(pluginCache)) {
+  static deregisterPlugins(names = Object.keys(pluginStorage)) {
     names.forEach(name => this.deregisterPlugin(name));
   }
 
@@ -223,7 +238,7 @@ class Plugin extends EventTarget {
    *         plugin names.
    * @return {Object}
    */
-  static getPlugins(names = Object.keys(pluginCache)) {
+  static getPlugins(names = Object.keys(pluginStorage)) {
     let result;
 
     names.forEach(name => {
@@ -245,7 +260,7 @@ class Plugin extends EventTarget {
    * @return {[type]}      [description]
    */
   static getPlugin(name) {
-    return pluginCache[name] || Player.prototype[name];
+    return pluginStorage[name] || Player.prototype[name];
   }
 
   /**
