@@ -1,5 +1,5 @@
 /**
- * @file mixins/stateful.js
+ * @file decorators/stateful.js
  */
 import * as Fn from '../utils/fn';
 import log from '../utils/log';
@@ -62,7 +62,7 @@ const setState = function(next) {
  * arbitrary keys/values and a `setState` method which will trigger state
  * changes if the object has a `trigger` method.
  *
- * @param  {Object} object
+ * @param  {Object} target
  * @return {Object}
  *         Returns the `object`.
  */

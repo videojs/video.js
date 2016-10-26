@@ -1,15 +1,15 @@
 /* eslint-env qunit */
 import sinon from 'sinon';
 import EventTarget from '../../../src/js/event-target';
-import stateful from '../../../src/js/mixins/stateful';
+import stateful from '../../../src/js/decorators/stateful';
 import * as Obj from '../../../src/js/utils/obj';
 
-QUnit.module('Mixins: Stateful');
+QUnit.module('Decorators: Stateful');
 
 QUnit.test('stateful() mutations', function(assert) {
   const target = {};
 
-  assert.strictEqual(typeof stateful, 'function', 'the mixin is a function');
+  assert.strictEqual(typeof stateful, 'function', 'the decorator is a function');
   assert.strictEqual(stateful(target), target, 'returns the target object');
 
   assert.ok(Obj.isObject(target), 'the target is still an object');

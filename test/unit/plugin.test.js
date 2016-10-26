@@ -161,13 +161,14 @@ QUnit.test('"pluginsetup" event', function(assert) {
   assert.strictEqual(setupSpy.callCount, 1, 'the "pluginsetup" event was triggered');
 
   const event = setupSpy.firstCall.args[0];
+  const hash = setupSpy.firstCall.args[1];
 
   assert.strictEqual(event.type, 'pluginsetup', 'the event has the correct type');
-  assert.deepEqual(event.pluginSetupMeta, {
+  assert.deepEqual(hash, {
     name: 'basic',
     instance,
     plugin: this.basic
-  }, 'the event `pluginSetupMeta` object is correct');
+  }, 'the event hash object is correct');
 });
 
 QUnit.module('Plugin: class-based', {

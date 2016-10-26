@@ -1,7 +1,9 @@
 /**
  * @file plugin.js
  */
-import stateful from './mixins/stateful';
+import eventful from './decorators/eventful';
+import stateful from './decorators/stateful';
+import * as Events from './utils/events';
 import * as Fn from './utils/fn';
 import * as Obj from './utils/obj';
 import EventTarget from './event-target';
@@ -27,11 +29,11 @@ const createBasicPlugin = (name, plugin) => function() {
 
   this.activePlugins_[name] = true;
 
-  this.trigger({
-    type: 'pluginsetup',
-    pluginSetupMeta: {name, plugin, instance}
-  });
-
+  // We trigger the "pluginsetup" event regardless, but we want the hash to
+  // be consistent. The only odd thing here is the `instance` is the value
+  // returned by the `plugin` function (instead of, necessarily, an instance
+  // of it).
+  this.trigger('pluginsetup', {name, plugin, instance});
   return instance;
 };
 
@@ -70,17 +72,48 @@ class Plugin extends EventTarget {
   constructor(player) {
     super();
     this.player = player;
+
+    eventful(this, ['trigger']);
     stateful(this, this.constructor.defaultState);
+
     player.on('dispose', Fn.bind(this, this.dispose));
     player.activePlugins_[this.name] = true;
-    player.trigger({
-      type: 'pluginsetup',
-      pluginSetupMeta: {
-        name: this.name,
-        plugin: this.constructor,
-        instance: this
-      }
-    });
+    player.trigger('pluginsetup', this.getEventHash_());
+  }
+
+  /**
+   * Each event triggered by plugins includes a hash of additional data with
+   * conventional properties.
+   *
+   * This returns that object or mutates an existing hash.
+   *
+   * @param  {Object} [hash={}]
+   * @return {Object}
+   *         - `instance`: The plugin instance on which the event is fired.
+   *         - `name`: The name of the plugin.
+   *         - `plugin`: The plugin class/constructor.
+   */
+  getEventHash_(hash = {}) {
+    hash.name = this.name;
+    hash.plugin = this.constructor;
+    hash.instance = this;
+    return hash;
+  }
+
+  /**
+   * Triggers an event on the plugin object.
+   *
+   * @param  {Event|Object|String} event
+   *         A string (the type) or an event object with a type attribute.
+   *
+   * @param  {Object} [hash={}]
+   *         Additional data hash to pass along with the event.
+   *
+   * @return {Boolean}
+   *         Whether or not default was prevented.
+   */
+  trigger(event, hash = {}) {
+    return Events.trigger(this, event, this.getEventHash_(hash));
   }
 
   /**
@@ -90,16 +123,13 @@ class Plugin extends EventTarget {
    * it's probably best to subscribe to one of the disposal events.
    */
   dispose() {
-    const {name, player, state} = this;
-    const props = {name, player, state};
-
     this.off();
-    player.activePlugins_[name] = false;
+    this.player.activePlugins_[this.name] = false;
+    this.trigger('dispose');
 
     // Eliminate possible sources of leaking memory.
-    this.player[name] = createPluginFactory(name, pluginCache[name]);
+    this.player[this.name] = createPluginFactory(this.name, pluginCache[this.name]);
     this.player = this.state = null;
-    this.trigger('dispose', this, props);
   }
 
   /**
