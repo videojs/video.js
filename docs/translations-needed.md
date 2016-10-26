@@ -341,6 +341,5 @@ If you add or update a translation run `grunt check-translations` to update the 
 |                         | , opens subtitles settings dialog                                                   |
 |                         | , opens descriptions settings dialog                                                |
 |                         | , selected                                                                          |
-| de.json (Complete)      |                                                                                     |
 | zh-TW.json (Complete)   |                                                                                     |
 <!-- END langtable -->
