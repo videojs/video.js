@@ -1,8 +1,8 @@
 /**
  * @file plugin.js
  */
-import eventful from './decorators/eventful';
-import stateful from './decorators/stateful';
+import eventful from './mixins/eventful';
+import stateful from './mixins/stateful';
 import * as Events from './utils/events';
 import * as Fn from './utils/fn';
 import * as Obj from './utils/obj';

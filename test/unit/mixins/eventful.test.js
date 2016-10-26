@@ -1,14 +1,14 @@
 /* eslint-env qunit */
 import sinon from 'sinon';
-import eventful from '../../../src/js/decorators/eventful';
+import eventful from '../../../src/js/mixins/eventful';
 import * as Obj from '../../../src/js/utils/obj';
 
-QUnit.module('Decorators: Eventful');
+QUnit.module('mixins: Eventful');
 
 QUnit.test('eventful() mutations', function(assert) {
   const target = {};
 
-  assert.strictEqual(typeof eventful, 'function', 'the decorator is a function');
+  assert.strictEqual(typeof eventful, 'function', 'the mixin is a function');
   assert.strictEqual(eventful(target), target, 'returns the target object');
 
   assert.ok(Obj.isObject(target), 'the target is still an object');

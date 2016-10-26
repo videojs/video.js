@@ -1,5 +1,5 @@
 /**
- * @file decorators/stateful.js
+ * @file mixins/stateful.js
  */
 import * as Fn from '../utils/fn';
 import log from '../utils/log';

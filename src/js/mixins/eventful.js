@@ -1,5 +1,5 @@
 /**
- * @file decorators/eventful.js
+ * @file mixins/eventful.js
  */
 import * as Events from '../utils/events';
 
