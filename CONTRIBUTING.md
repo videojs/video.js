@@ -317,7 +317,7 @@ This doc was inspired by some great contribution guide examples including [contr
 [grunt](https://github.com/gruntjs/grunt/wiki/Contributing),
 [html5 boilerplate](https://github.com/h5bp/html5-boilerplate/blob/master/CONTRIBUTING.md),
 [jquery](https://github.com/jquery/jquery/blob/master/CONTRIBUTING.md),
-and [node.js](https://github.com/joyent/node/wiki/Contributing).
+and [node.js](https://github.com/nodejs/node/blob/master/CONTRIBUTING.md).
 
 [issue template]: /.github/ISSUE_TEMPLATE.md
 [linter]: https://github.com/videojs/standard
