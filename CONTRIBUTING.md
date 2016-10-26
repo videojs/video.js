@@ -233,6 +233,7 @@ $ git checkout -b my-branch
 
 #### Step 4: Commit
 Commit changes as you go. Write thorough descriptions of your changes in your commit messages.
+For more information see our [conventional changelog guidelines for video.js](https://github.com/videojs/conventional-changelog-videojs/blob/master/convention.md)
 Follow these guidelines:
 
 1. The first line should be less than 50 characters and contain a short description of the commit.
