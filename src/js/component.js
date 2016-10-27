@@ -4,13 +4,13 @@
  * @file component.js
  */
 import window from 'global/window';
-import * as Dom from './utils/dom.js';
-import * as Fn from './utils/fn.js';
-import * as Guid from './utils/guid.js';
-import * as Events from './utils/events.js';
-import log from './utils/log.js';
-import toTitleCase from './utils/to-title-case.js';
-import mergeOptions from './utils/merge-options.js';
+import evented from './mixins/evented';
+import * as Dom from './utils/dom';
+import * as Fn from './utils/fn';
+import * as Guid from './utils/guid';
+import log from './utils/log';
+import toTitleCase from './utils/to-title-case';
+import mergeOptions from './utils/merge-options';
 
 /**
  * Base class for all UI Components.
@@ -81,6 +81,9 @@ class Component {
     } else if (options.createEl !== false) {
       this.el_ = this.createEl();
     }
+
+    // Make this an evented object and use `el_` as its event bus.
+    evented(this, {eventBusKey: 'el_'});
 
     this.children_ = [];
     this.childIndex_ = {};
@@ -564,188 +567,9 @@ class Component {
   }
 
   /**
-   * Add an `event listener` to this `Component`s element.
-   *
-   * The benefit of using this over the following:
-   * - `VjsEvents.on(otherElement, 'eventName', myFunc)`
-   * - `otherComponent.on('eventName', myFunc)`
-   *
-   * 1. Is that the listeners will get cleaned up when either component gets disposed.
-   * 1. It will also bind `myComponent` as the context of `myFunc`.
-   * > NOTE: If you remove the element from the DOM that has used `on` you need to
-   *         clean up references using: `myComponent.trigger(el, 'dispose')`
-   *         This will also allow the browser to garbage collect it. In special
-   *         cases such as with `window` and `document`, which are both permanent,
-   *         this is not necessary.
-   *
-   * @param {string|Component|string[]} [first]
-   *        The event name, and array of event names, or another `Component`.
-   *
-   * @param {EventTarget~EventListener|string|string[]} [second]
-   *        The listener function, an event name, or an Array of events names.
-   *
-   * @param {EventTarget~EventListener} [third]
-   *        The event handler if `first` is a `Component` and `second` is an event name
-   *        or an Array of event names.
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
-   *
-   * @listens Component#dispose
-   */
-  on(first, second, third) {
-    if (typeof first === 'string' || Array.isArray(first)) {
-      Events.on(this.el_, first, Fn.bind(this, second));
-
-    // Targeting another component or element
-    } else {
-      const target = first;
-      const type = second;
-      const fn = Fn.bind(this, third);
-
-      // When this component is disposed, remove the listener from the other component
-      const removeOnDispose = () => this.off(target, type, fn);
-
-      // Use the same function ID so we can remove it later it using the ID
-      // of the original listener
-      removeOnDispose.guid = fn.guid;
-      this.on('dispose', removeOnDispose);
-
-      // If the other component is disposed first we need to clean the reference
-      // to the other component in this component's removeOnDispose listener
-      // Otherwise we create a memory leak.
-      const cleanRemover = () => this.off('dispose', removeOnDispose);
-
-      // Add the same function ID so we can easily remove it later
-      cleanRemover.guid = fn.guid;
-
-      // Check if this is a DOM node
-      if (first.nodeName) {
-        // Add the listener to the other element
-        Events.on(target, type, fn);
-        Events.on(target, 'dispose', cleanRemover);
-
-      // Should be a component
-      // Not using `instanceof Component` because it makes mock players difficult
-      } else if (typeof first.on === 'function') {
-        // Add the listener to the other component
-        target.on(type, fn);
-        target.on('dispose', cleanRemover);
-      }
-    }
-
-    return this;
-  }
-
-  /**
-   * Remove an event listener from this `Component`s element. If the second argument is
-   * exluded all listeners for the type passed in as the first argument will be removed.
-   *
-   * @param {string|Component|string[]} [first]
-   *        The event name, and array of event names, or another `Component`.
-   *
-   * @param {EventTarget~EventListener|string|string[]} [second]
-   *        The listener function, an event name, or an Array of events names.
-   *
-   * @param {EventTarget~EventListener} [third]
-   *        The event handler if `first` is a `Component` and `second` is an event name
-   *        or an Array of event names.
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
-   */
-  off(first, second, third) {
-    if (!first || typeof first === 'string' || Array.isArray(first)) {
-      Events.off(this.el_, first, second);
-    } else {
-      const target = first;
-      const type = second;
-      // Ensure there's at least a guid, even if the function hasn't been used
-      const fn = Fn.bind(this, third);
-
-      // Remove the dispose listener on this component,
-      // which was given the same guid as the event listener
-      this.off('dispose', fn);
-
-      if (first.nodeName) {
-        // Remove the listener
-        Events.off(target, type, fn);
-        // Remove the listener for cleaning the dispose listener
-        Events.off(target, 'dispose', fn);
-      } else {
-        target.off(type, fn);
-        target.off('dispose', fn);
-      }
-    }
-
-    return this;
-  }
-
-  /**
-   * Add an event listener that gets triggered only once and then gets removed.
-   *
-   * @param {string|Component|string[]} [first]
-   *        The event name, and array of event names, or another `Component`.
-   *
-   * @param {EventTarget~EventListener|string|string[]} [second]
-   *        The listener function, an event name, or an Array of events names.
-   *
-   * @param {EventTarget~EventListener} [third]
-   *        The event handler if `first` is a `Component` and `second` is an event name
-   *        or an Array of event names.
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
-   */
-  one(first, second, third) {
-    if (typeof first === 'string' || Array.isArray(first)) {
-      Events.one(this.el_, first, Fn.bind(this, second));
-    } else {
-      const target = first;
-      const type = second;
-      const fn = Fn.bind(this, third);
-
-      const newFunc = () => {
-        this.off(target, type, newFunc);
-        fn.apply(null, arguments);
-      };
-
-      // Keep the same function ID so we can remove it later
-      newFunc.guid = fn.guid;
-
-      this.on(target, type, newFunc);
-    }
-
-    return this;
-  }
-
-  /**
-   * Trigger an event on an element.
-   *
-   * @param {EventTarget~Event|Object|string} event
-   *        The event name, and Event, or an event-like object with a type attribute
-   *        set to the event name.
-   *
-   * @param {Object} [hash]
-   *        Data hash to pass along with the event
-   *
-   * @return {Component}
-   *         Returns itself; method can be chained.
-   */
-  trigger(event, hash) {
-    Events.trigger(this.el_, event, hash);
-    return this;
-  }
-
-  /**
-   * Bind a listener to the component's ready state. If the ready event has already
-   * happened it will trigger the function immediately.
-   *
-   * @param  {Component~ReadyCallback} fn
-   *         A function to call when ready is triggered.
-   *
-   * @param  {boolean} [sync=false]
-   *         Execute the listener synchronously if `Component` is ready.
+   * Bind a listener to the component's ready state.
+   * Different from event listeners in that if the ready event has already happened
+   * it will trigger the function immediately.
    *
    * @return {Component}
    *         Returns itself; method can be chained.

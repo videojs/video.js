@@ -59,3 +59,28 @@ QUnit.test('supports basic event handling (not complete functionality tests)', f
   assert.strictEqual(event.type, 'foo', 'the spy saw a "foo" event');
   assert.strictEqual(hash.x, 1, 'the "foo" event included an extra hash');
 });
+
+QUnit.test('target objects add listeners for events on themselves', function(assert) {
+
+});
+
+QUnit.test('target objects add listeners that only fire once for events on themselves', function(assert) {
+
+});
+
+QUnit.test('target objects add listeners for events on themselves - and remove them when disposed', function(assert) {
+
+});
+
+QUnit.test('target objects add listeners for events on other evented objects', function(assert) {
+
+});
+
+QUnit.test('target objects add listeners that only fire once for events on other evented objects', function(assert) {
+
+});
+
+QUnit.test('target objects add listeners for events on other evented objects - and remove them when disposed', function(assert) {
+
+});
+
