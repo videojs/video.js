@@ -250,7 +250,59 @@ To do so, just reset the branch against master.
 $ git reset --hard upstream/master
 ```
 
--------------------
+## video.js releases
+
+Releasing video.js is partially automated through [`conrib.json`](/contrib.json) scripts. To do a release, you need a couple of things: npm access, github personal access token.
+
+Releases in video.js are done on npm and bower and github and eventually posted on the CDN. This is the instruction for the npm/bower/github releases.
+
+When we do a release, we release it as a `next` tag on npm first and then at least a week later, we promote this release to `latest` on npm.
+
+### Getting dependencies
+
+#### Install contrib
+
+You can install it globally
+
+```sh
+npm i -g contrib/contrib
+```
+
+#### npm access
+
+To see who currently has access run this:
+
+```sh
+npm owner ls video.js
+```
+
+If you are a core committer, you can request access to npm from one of the current owners.
+
+#### Github personal access token
+
+This is used to make a github release on videojs. You can get a token from the [personal access tokens](https://github.com/settings/tokens) page.
+
+After generating one, make sure to keep it safe because github will not show the token for you again. A good place to save it is Lastpass Secure Notes.
+
+### Doing a release
+
+To do a release, check out the master branch
+
+```sh
+$ git checkout master
+```
+
+Then run the contrib command to do the next release. Don't forget to provide your github token so the github release goes through.
+
+```sh
+VJS_GITHUB_USER=gkatsev VJS_GITHUB_TOKEN=my-personal-access-token contrib release next patch
+```
+
+This makes a patch release, you can also do a `minor` and a `major` release.
+
+After it's done, verify that the github release has the correct changelog output.
+
+## Doc credit
 
 This collaborator guide was heavily inspired by [node.js's guide](https://github.com/nodejs/node/blob/master/COLLABORATOR_GUIDE.md)
 
