@@ -70,7 +70,7 @@ class Plugin {
    */
   constructor(player) {
     this.player = player;
-    evented(this, ['trigger']);
+    evented(this, {exclude: ['trigger']});
     stateful(this, this.constructor.defaultState);
     player.plugins_[this.name] = true;
     player.one('dispose', Fn.bind(this, this.dispose));

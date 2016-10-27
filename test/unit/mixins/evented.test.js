@@ -21,12 +21,25 @@ QUnit.test('evented() mutations', function(assert) {
 });
 
 QUnit.test('evented() with exclusions', function(assert) {
-  const target = evented({}, ['one']);
+  const target = evented({}, {exclude: ['one']});
 
   assert.strictEqual(typeof target.off, 'function', 'the target has an off method');
   assert.strictEqual(typeof target.on, 'function', 'the target has an on method');
   assert.notStrictEqual(typeof target.one, 'function', 'the target DOES NOT have a one method');
   assert.strictEqual(typeof target.trigger, 'function', 'the target has a trigger method');
+});
+
+QUnit.test('evented() with custom element', function(assert) {
+  const target = evented({foo: Dom.createEl('span')}, {eventBusKey: 'foo'});
+
+  assert.strictEqual(target.eventBusEl_, target.foo, 'the custom DOM element is re-used');
+
+  assert.throws(
+    function() {
+      evented({foo: {}}, {eventBusKey: 'foo'});
+    },
+    new Error('eventBusKey "foo" does not refer to an element'),
+    'throws if the target does not have an element at the supplied key');
 });
 
 QUnit.test('supports basic event handling (not complete functionality tests)', function(assert) {
