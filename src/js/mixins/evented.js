@@ -1,11 +1,11 @@
 /**
- * @file mixins/eventful.js
+ * @file mixins/evented.js
  */
 import * as Dom from '../utils/dom';
 import * as Events from '../utils/events';
 
 /**
- * Makes an object "eventful" - granting it methods from the `Events` utility.
+ * Makes an object "evented" - granting it methods from the `Events` utility.
  *
  * By default, this adds the `off`, `on`, `one`, and `trigger` methods, but
  * exclusions can optionally be made.
@@ -19,7 +19,7 @@ import * as Events from '../utils/events';
  * @return {Object}
  *         The target object.
  */
-function eventful(target, exclusions = []) {
+function evented(target, exclusions = []) {
   ['off', 'on', 'one', 'trigger']
     .filter(name => exclusions.indexOf(name) === -1)
     .forEach(name => {
@@ -30,4 +30,4 @@ function eventful(target, exclusions = []) {
   return target;
 }
 
-export default eventful;
+export default evented;

@@ -81,10 +81,10 @@ QUnit.test('setup', function(assert) {
   assert.strictEqual(instance.name, 'mock', 'instance knows its name');
   assert.strictEqual(typeof instance.state, 'object', 'instance is stateful');
   assert.strictEqual(typeof instance.setState, 'function', 'instance is stateful');
-  assert.strictEqual(typeof instance.off, 'function', 'instance is eventful');
-  assert.strictEqual(typeof instance.on, 'function', 'instance is eventful');
-  assert.strictEqual(typeof instance.one, 'function', 'instance is eventful');
-  assert.strictEqual(typeof instance.trigger, 'function', 'instance is eventful');
+  assert.strictEqual(typeof instance.off, 'function', 'instance is evented');
+  assert.strictEqual(typeof instance.on, 'function', 'instance is evented');
+  assert.strictEqual(typeof instance.one, 'function', 'instance is evented');
+  assert.strictEqual(typeof instance.trigger, 'function', 'instance is evented');
   assert.strictEqual(typeof instance.dispose, 'function', 'instance has dispose method');
 });
 

@@ -1,7 +1,7 @@
 /**
  * @file plugin.js
  */
-import eventful from './mixins/eventful';
+import evented from './mixins/evented';
 import stateful from './mixins/stateful';
 import * as Events from './utils/events';
 import * as Fn from './utils/fn';
@@ -70,7 +70,7 @@ class Plugin {
    */
   constructor(player) {
     this.player = player;
-    eventful(this, ['trigger']);
+    evented(this, ['trigger']);
     stateful(this, this.constructor.defaultState);
     player.plugins_[this.name] = true;
     player.one('dispose', Fn.bind(this, this.dispose));
