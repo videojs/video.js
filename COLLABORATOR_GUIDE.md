@@ -14,7 +14,13 @@
       - [I accidentally pushed a broken commit or incorrect commit to master](#i-accidentally-pushed-a-broken-commit-or-incorrect-commit-to-master)
       - [I lost changes](#i-lost-changes)
       - [I accidentally committed a broken change to master](#i-accidentally-committed-a-broken-change-to-master)
-- [](#)
+- [video.js releases](#videojs-releases)
+  - [Getting dependencies](#getting-dependencies)
+    - [Install contrib](#install-contrib)
+    - [npm access](#npm-access)
+    - [Github personal access token](#github-personal-access-token)
+  - [Doing a release](#doing-a-release)
+- [Doc credit](#doc-credit)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
