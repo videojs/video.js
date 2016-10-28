@@ -30,7 +30,7 @@ Full courtesey should always be shown in video.js projects.
 
 Collaborators may manage issues they feel qualified to handle, being mindful of our guidelines.
 
-Any issue and PR can be closed if they are not relevant, when in doubt leave it open for more discussion. Issues and always be re-opened if new information is made available.
+Any issue and PR can be closed if they are not relevant, when in doubt leave it open for more discussion. Issues can always be re-opened if new information is made available.
 
 If issues or PRs are very short and don't contain much information, ask for more by linking to the [issue][issue template] or [PR][pr template] template. There is also a [response guide](https://github.com/videojs/video.js/wiki/New-Issue-Response-Guide) if you're unsure.
 
@@ -64,7 +64,7 @@ The TSC will be the final arbiter when required.
 
 Landing a PR is fairly easy given that we can use the GitHub UI for it.
 
-When using the big green button on GitHub, make sure the "squash and merge" is selected -- it should be the only allowed option. If a PR has two features in it and should be merged as two separate commits, either ask the contributor to break it up into two, or follow the [manual steps](#langing-a-pr-manually).
+When using the big green button on GitHub, make sure the "squash and merge" is selected -- it should be the only allowed option. If a PR has two features in it and should be merged as two separate commits, either ask the contributor to break it up into two, or follow the [manual steps](#landing-a-pr-manually).
 
 The commit message should follow our [conventional changelog conventions][conventions]. They are based on the angularjs changelog conventions. The changelog is then generated from these commit messages on release.
 
