@@ -83,7 +83,9 @@ class Component {
     }
 
     // Make this an evented object and use `el_` as its event bus.
-    evented(this, {eventBusKey: 'el_'});
+    if (this.el_) {
+      evented(this, {eventBusKey: 'el_'});
+    }
 
     this.children_ = [];
     this.childIndex_ = {};

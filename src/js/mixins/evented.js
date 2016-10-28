@@ -213,7 +213,7 @@ const mixin = {
    *         Returns the object itself.
    */
   trigger(event, hash) {
-    Events.trigger(this.el_, event, hash);
+    Events.trigger(this.eventBusEl_, event, hash);
     return this;
   }
 };
@@ -246,7 +246,7 @@ function evented(target, options = {}) {
 
   // Set or create the eventBusEl_.
   if (eventBusKey) {
-    if (!Dom.isEl(target[eventBusKey])) {
+    if (!target[eventBusKey].nodeName) {
       throw new Error(`eventBusKey "${eventBusKey}" does not refer to an element`);
     }
     target.eventBusEl_ = target[eventBusKey];

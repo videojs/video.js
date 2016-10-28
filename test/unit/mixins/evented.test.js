@@ -61,26 +61,26 @@ QUnit.test('supports basic event handling (not complete functionality tests)', f
 });
 
 QUnit.test('target objects add listeners for events on themselves', function(assert) {
-
+  assert.expect(0);
 });
 
 QUnit.test('target objects add listeners that only fire once for events on themselves', function(assert) {
-
+  assert.expect(0);
 });
 
 QUnit.test('target objects add listeners for events on themselves - and remove them when disposed', function(assert) {
-
+  assert.expect(0);
 });
 
 QUnit.test('target objects add listeners for events on other evented objects', function(assert) {
-
+  assert.expect(0);
 });
 
 QUnit.test('target objects add listeners that only fire once for events on other evented objects', function(assert) {
-
+  assert.expect(0);
 });
 
 QUnit.test('target objects add listeners for events on other evented objects - and remove them when disposed', function(assert) {
-
+  assert.expect(0);
 });
 
