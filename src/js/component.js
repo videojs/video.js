@@ -666,18 +666,17 @@ class Component {
       // Add the same function ID so we can easily remove it later
       cleanRemover.guid = fn.guid;
 
-      // Check if this is a DOM node
-      if (first.nodeName) {
-        // Add the listener to the other element
-        Events.on(target, type, fn);
-        Events.on(target, 'dispose', cleanRemover);
-
-      // Should be a component
-      // Not using `instanceof Component` because it makes mock players difficult
-      } else if (typeof first.on === 'function') {
+      // If we are attaching to a component like object use the preferred `on` method
+      if (typeof target.on === 'function') {
         // Add the listener to the other component
         target.on(type, fn);
         target.on('dispose', cleanRemover);
+      } else if (Events.canAttachEvent(target)) {
+        // Add the listener to the other element
+        Events.on(target, type, fn);
+        Events.on(target, 'dispose', cleanRemover);
+      } else {
+        log.warn(`Not adding ${type} listener. Not sure how to add it.`);
       }
     }
 

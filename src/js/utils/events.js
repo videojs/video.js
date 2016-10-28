@@ -196,6 +196,20 @@ export function fixEvent(event) {
 }
 
 /**
+ * Determine if the events utility will be able to attach events to this object.
+ *
+ * @param {Object} obj Object to check
+ * @method canAttachEvent
+ * @return {Boolean} True if events can be attached to this object
+ */
+export function canAttachEvent(obj) {
+  const hasAddListener = typeof obj.addEventListener === 'function';
+  const hasAttachEvent = typeof obj.attachEvent === 'function';
+
+  return hasAddListener || hasAttachEvent;
+}
+
+/**
  * Add an event listener to element
  * It stores the handler function in a separate cache object
  * and adds a generic handler to the element's event,
