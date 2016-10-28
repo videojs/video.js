@@ -18,7 +18,7 @@
   - [Getting dependencies](#getting-dependencies)
     - [Install contrib](#install-contrib)
     - [npm access](#npm-access)
-    - [Github personal access token](#github-personal-access-token)
+    - [GitHub personal access token](#github-personal-access-token)
   - [Doing a release](#doing-a-release)
 - [Doc credit](#doc-credit)
 
@@ -36,7 +36,7 @@ If issues or PRs are very short and don't contain much information, ask for more
 
 ## Accepting changes
 
-Any code change in video.js should be happening through Pull Requests on Github. This includes core committers.
+Any code change in video.js should be happening through Pull Requests on GitHub. This includes core committers.
 
 Before a PR is merged, it must be reviewed by at least two core committers, at least one if it comes from a core committer.
 
@@ -62,13 +62,13 @@ The TSC will be the final arbiter when required.
 
 ## Landing a PR
 
-Landing a PR is fairly easy given that we can use the Github UI for it.
+Landing a PR is fairly easy given that we can use the GitHub UI for it.
 
-When using the big green button on github, make sure the "squash and merge" is selected -- it should be the only allowed option. If a PR has two features in it and should be merged as two separate commits, either ask the contributor to break it up into two, or follow the [manual steps](#langing-a-pr-manually).
+When using the big green button on GitHub, make sure the "squash and merge" is selected -- it should be the only allowed option. If a PR has two features in it and should be merged as two separate commits, either ask the contributor to break it up into two, or follow the [manual steps](#langing-a-pr-manually).
 
 The commit message should follow our [conventional changelog conventions][conventions]. They are based on the angularjs changelog conventions. The changelog is then generated from these commit messages on release.
 
-The first line of the commit message -- the header and first text box on github -- should be prefixed with a type and optional scope followed by a short description of the commit.
+The first line of the commit message -- the header and first text box on GitHub -- should be prefixed with a type and optional scope followed by a short description of the commit.
 The type is required. Two common ones are `fix` and `feat` for bug fixes and new features. Scope is optional and can be anything.
 
 The body should contain extra information, potentially copied from the original comment of the PR.
@@ -248,7 +248,7 @@ Assuming that the changes were committed, even if you lost the commit in your cu
 
 ##### I accidentally committed a broken change to master
 
-This is a great time to discover that something is broken. Because it hasn't been pushed to github yet, it's very easy to reset the change as if nothing has happened and try again.
+This is a great time to discover that something is broken. Because it hasn't been pushed to GitHub yet, it's very easy to reset the change as if nothing has happened and try again.
 
 To do so, just reset the branch against master.
 
@@ -258,9 +258,9 @@ $ git reset --hard upstream/master
 
 ## video.js releases
 
-Releasing video.js is partially automated through [`conrib.json`](/contrib.json) scripts. To do a release, you need a couple of things: npm access, github personal access token.
+Releasing video.js is partially automated through [`conrib.json`](/contrib.json) scripts. To do a release, you need a couple of things: npm access, GitHub personal access token.
 
-Releases in video.js are done on npm and bower and github and eventually posted on the CDN. This is the instruction for the npm/bower/github releases.
+Releases in video.js are done on npm and bower and GitHub and eventually posted on the CDN. This is the instruction for the npm/bower/GitHub releases.
 
 When we do a release, we release it as a `next` tag on npm first and then at least a week later, we promote this release to `latest` on npm.
 
@@ -284,11 +284,11 @@ npm owner ls video.js
 
 If you are a core committer, you can request access to npm from one of the current owners.
 
-#### Github personal access token
+#### GitHub personal access token
 
-This is used to make a github release on videojs. You can get a token from the [personal access tokens](https://github.com/settings/tokens) page.
+This is used to make a GitHub release on videojs. You can get a token from the [personal access tokens](https://github.com/settings/tokens) page.
 
-After generating one, make sure to keep it safe because github will not show the token for you again. A good place to save it is Lastpass Secure Notes.
+After generating one, make sure to keep it safe because GitHub will not show the token for you again. A good place to save it is Lastpass Secure Notes.
 
 ### Doing a release
 
@@ -298,7 +298,7 @@ To do a release, check out the master branch
 $ git checkout master
 ```
 
-Then run the contrib command to do the next release. Don't forget to provide your github token so the github release goes through.
+Then run the contrib command to do the next release. Don't forget to provide your GitHub token so the GitHub release goes through.
 
 ```sh
 VJS_GITHUB_USER=gkatsev VJS_GITHUB_TOKEN=my-personal-access-token contrib release next patch
@@ -306,7 +306,7 @@ VJS_GITHUB_USER=gkatsev VJS_GITHUB_TOKEN=my-personal-access-token contrib releas
 
 This makes a patch release, you can also do a `minor` and a `major` release.
 
-After it's done, verify that the github release has the correct changelog output.
+After it's done, verify that the GitHub release has the correct changelog output.
 
 ## Doc credit
 
