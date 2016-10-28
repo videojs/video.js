@@ -58,13 +58,15 @@ When filling out an issue, make sure to fill out the questions in the
 
 Guidelines for bug reports:
 
+1. If your issue is with a particular video.js plugin or subproject, please open an issue against that project. See [list of some potential other projects above](#other-repositories-where-issues-could-be-filed)
+
 1. Use the [GitHub issue search](https://github.com/videojs/video.js/issues) &mdash; check if the issue has already been reported.
 
-2. Check if the issue has already been fixed &mdash; try to reproduce it using the latest `master` branch in the repository.
+1. Check if the issue has already been fixed &mdash; try to reproduce it using the latest `master` branch in the repository.
 
-3. Isolate the problem &mdash; **create a [reduced test case](https://css-tricks.com/reduced-test-cases/)** with a live example. You can possibly use [this JSBin example](http://jsbin.com/axedog/7/edit) as a starting point.
+1. Isolate the problem &mdash; **create a [reduced test case](https://css-tricks.com/reduced-test-cases/)** with a live example. You can possibly use [this JSBin example](http://jsbin.com/axedog/edit) as a starting point -- don't forget to update it to the videojs version you use.
 
-4. Answer all questions in the [issue template][]. The questions in the issue template are designed to try and provide the maintainers with as much information possible to minimize back-and-forth to get the issue resolved.
+1. Answer all questions in the [issue template][]. The questions in the issue template are designed to try and provide the maintainers with as much information possible to minimize back-and-forth to get the issue resolved.
 
 
 A good bug report should be as detailed as possible, so that others won't have to follow up for the essential details.
@@ -106,7 +108,7 @@ Depending on how you have node and npm set up, you may need to run the global in
 
 #### Forking and cloning the repository
 
-First, [fork](http://help.github.com/fork-a-repo/) the video.js git repository. At the top of every github page, there is a Fork button. Click it, and the forking process will copy Video.js into your own GitHub account.
+First, [fork](http://help.github.com/fork-a-repo/) the video.js git repository. At the top of every GitHub page, there is a Fork button. Click it, and the forking process will copy Video.js into your own GitHub account.
 
 Clone your fork of the repo into your code directory
 
@@ -173,12 +175,13 @@ Besides running automated tests, you often want to run video.js manually and pla
 
 #### Sandbox test directory
 
-There's a sandbox directory where you can add any file and it won't get tracked in git. To start you can copy the example index file and see a working version of a player (using the local source code) by loading it in a browser.
+There's a sandbox directory where you can add any file and it won't get tracked in git. To start you can copy the example index file.
 
 ```sh
 $ cp sandbox/index.html.example sandbox/index.html
-$ open sandbox/index.html
 ```
+
+See [the following section](#running-a-local-web-server) for how to open the page in a browser.
 
 #### Running a local web server
 
@@ -239,7 +242,7 @@ Follow these guidelines:
 
 1. The first line should be less than 50 characters and contain a short description of the commit.
 1. The body should contain a more detailed description. It can contain things like reasoning for the change and specifics of what changed.
-1. A footer can be added if this fixes a particular issue on github.
+1. A footer can be added if this fixes a particular issue on GitHub.
 
 ```sh
 $ git add src/js/player.js
