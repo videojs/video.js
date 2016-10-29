@@ -1,5 +1,4 @@
 /* eslint-env qunit */
-import sinon from 'sinon';
 import evented from '../../../src/js/mixins/evented';
 import * as Dom from '../../../src/js/utils/dom';
 import * as Obj from '../../../src/js/utils/obj';
@@ -42,45 +41,62 @@ QUnit.test('evented() with custom element', function(assert) {
     'throws if the target does not have an element at the supplied key');
 });
 
-QUnit.test('supports basic event handling (not complete functionality tests)', function(assert) {
-  const spy = sinon.spy();
-  const target = evented({});
-
-  target.on('foo', spy);
-  target.trigger('foo', {x: 1});
-  target.off('foo');
-  target.trigger('foo');
-
-  assert.strictEqual(spy.callCount, 1, 'the spy was called once');
-
-  const event = spy.firstCall.args[0];
-  const hash = spy.firstCall.args[1];
-
-  assert.strictEqual(event.type, 'foo', 'the spy saw a "foo" event');
-  assert.strictEqual(hash.x, 1, 'the "foo" event included an extra hash');
-});
-
-QUnit.test('target objects add listeners for events on themselves', function(assert) {
+QUnit.test('on() errors', function(assert) {
   assert.expect(0);
 });
 
-QUnit.test('target objects add listeners that only fire once for events on themselves', function(assert) {
+QUnit.test('one() errors', function(assert) {
   assert.expect(0);
 });
 
-QUnit.test('target objects add listeners for events on themselves - and remove them when disposed', function(assert) {
+QUnit.test('off() errors', function(assert) {
   assert.expect(0);
 });
 
-QUnit.test('target objects add listeners for events on other evented objects', function(assert) {
+QUnit.test('a.on("x", fn)', function(assert) {
   assert.expect(0);
 });
 
-QUnit.test('target objects add listeners that only fire once for events on other evented objects', function(assert) {
+QUnit.test('a.on(["x", "y"], fn)', function(assert) {
   assert.expect(0);
 });
 
-QUnit.test('target objects add listeners for events on other evented objects - and remove them when disposed', function(assert) {
+QUnit.test('a.one("x", fn)', function(assert) {
   assert.expect(0);
 });
 
+QUnit.test('a.one(["x", "y"], fn)', function(assert) {
+  assert.expect(0);
+});
+
+QUnit.test('a.on(b, "x", fn)', function(assert) {
+  assert.expect(0);
+});
+
+QUnit.test('a.on(b, ["x", "y"], fn)', function(assert) {
+  assert.expect(0);
+});
+
+QUnit.test('a.one(b, "x", fn)', function(assert) {
+  assert.expect(0);
+});
+
+QUnit.test('a.one(b, ["x", "y"], fn)', function(assert) {
+  assert.expect(0);
+});
+
+QUnit.test('a.off()', function(assert) {
+  assert.expect(0);
+});
+
+QUnit.test('a.off("x")', function(assert) {
+  assert.expect(0);
+});
+
+QUnit.test('a.off("x", fn)', function(assert) {
+  assert.expect(0);
+});
+
+QUnit.test('a.off(b, "x", fn)', function(assert) {
+  assert.expect(0);
+});

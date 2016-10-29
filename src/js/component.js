@@ -138,9 +138,6 @@ class Component {
     this.childIndex_ = null;
     this.childNameIndex_ = null;
 
-    // Remove all event listeners.
-    this.off();
-
     // Remove element from DOM
     if (this.el_.parentNode) {
       this.el_.parentNode.removeChild(this.el_);

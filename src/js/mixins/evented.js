@@ -6,6 +6,134 @@ import * as Fn from '../utils/fn';
 import * as Events from '../utils/events';
 
 /**
+ * Returns whether or not an object has had the evented mixin applied.
+ *
+ * @private
+ * @param  {Object} object
+ * @return {Boolean}
+ */
+const isEvented = (object) =>
+  !!object.eventBusEl_ &&
+  ['on', 'one', 'off', 'trigger'].every(k => typeof object[k] === 'function');
+
+/**
+ * Whether a value is a valid event type - string or array.
+ *
+ * @param  {String|Array} type
+ * @return {Boolean}
+ */
+const isValidEventType = (type) => typeof type === 'string' || Array.isArray(type);
+
+/**
+ * Validates a value to determine if it is a valid event target. Throws if not.
+ *
+ * @throws {Error}
+ * @param  {Object} target
+ */
+const validateTarget = (target) => {
+  if (!target.nodeName && !isEvented(target)) {
+    throw new Error('invalid target; must be a DOM node or evented object');
+  }
+};
+
+/**
+ * Validates a value to determine if it is a valid event target. Throws if not.
+ *
+ * @throws {Error}
+ * @param  {String|Array} type
+ */
+const validateEventType = (type) => {
+  if (!isValidEventType(type)) {
+    throw new Error('invalid event type; must be a string or array');
+  }
+};
+
+/**
+ * Validates a value to determine if it is a valid listener. Throws if not.
+ *
+ * @throws Error
+ * @param  {Function} listener
+ */
+const validateListener = (listener) => {
+  if (typeof listener !== 'function') {
+    throw new Error('invalid listener; must be a function');
+  }
+};
+
+/**
+ * Takes an array of arguments given to on() or one(), validates them, and
+ * normalizes them into an object.
+ *
+ * @throws Error
+ * @param  {Object} self
+ *         The evented object on which on() or one() was called.
+ *
+ * @param  {Array} args
+ *         An array of arguments passed to on() or one().
+ *
+ * @return {Object}
+ */
+const normalizeListenArgs = (self, args) => {
+
+  // If the number of arguments is less than 3, the target is always the
+  // evented object itself.
+  const isTargetingSelf = args.length < 3 || args[0] === self || args[0] === self.eventBusEl_;
+  let target;
+  let type;
+  let listener;
+
+  if (isTargetingSelf) {
+    target = self.eventBusEl_;
+
+    // Deal with cases where we got 3 arguments, but we are still listening to
+    // the evented object itself.
+    if (args.length >= 3) {
+      args.shift();
+    }
+
+    [type, listener] = args;
+  } else {
+    [target, type, listener] = args;
+  }
+
+  validateTarget(target);
+  validateEventType(type);
+  validateListener(listener);
+
+  listener = Fn.bind(self, listener);
+
+  return {isTargetingSelf, target, type, listener};
+};
+
+/**
+ * Adds the listener to the event type(s) on the target, normalizing for
+ * the type of target.
+ *
+ * @private
+ * @throws {Error} If unable to add the listener
+ * @param  {Element|Object} target
+ *         A DOM node or evented object.
+ *
+ * @param  {String|Array} type
+ *         One or more event type(s).
+ *
+ * @param  {Function} listener
+ *         A listener function.
+ *
+ * @param  {String} [method="on"]
+ *         The event binding method to use.
+ */
+const listen = (target, type, listener, method = 'on') => {
+  validateTarget(target);
+
+  if (target.nodeName) {
+    Events[method](target, type, listener);
+  } else {
+    target[method](type, listener);
+  }
+};
+
+/**
  * Methods that can be mixed-in with any object to provide event capabilities.
  *
  * @name mixins/evented
@@ -17,7 +145,7 @@ const mixin = {
    * Add a listener to an event (or events) on this object or another evented
    * object.
    *
-   * @param  {String|Array|Element|Object} first
+   * @param  {String|Array|Element|Object} targetOrType
    *         If this is a string or array, it represents an event type(s) and
    *         the listener will be bound to this object.
    *
@@ -28,59 +156,44 @@ const mixin = {
    *         In either case, the listener's `this` value will be bound to
    *         this object.
    *
-   * @param  {String|Array|Function} second
+   * @param  {String|Array|Function} typeOrListener
    *         If the first argument was a string or array, this should be the
    *         listener function. Otherwise, this is a string or array of event
    *         type(s).
    *
-   * @param  {Function} [third]
+   * @param  {Function} [listener]
    *         If the first argument was another evented object, this will be
    *         the listener function.
    *
    * @return {Object}
    *         Returns the object itself.
    */
-  on(first, second, third) {
-    // Targeting this evented object.
-    if (typeof first === 'string' || Array.isArray(first)) {
-      Events.on(this.eventBusEl_, first, Fn.bind(this, second));
+  on(...args) {
+    const {isTargetingSelf, target, type, listener} = normalizeListenArgs(this, args);
 
-    // Targeting another evented object.
-    } else {
-      const target = first;
-      const type = second;
-      const listener = Fn.bind(this, third);
+    listen(target, type, listener);
 
-      // When this object is disposed, remove the listener from the target.
-      const removeOnDispose = () => this.off(target, type, listener);
+    // If this object is listening to another evented object.
+    if (!isTargetingSelf) {
+
+      // If this object is disposed, remove the listener.
+      const removeListenerOnDispose = () => this.off(target, type, listener);
 
       // Use the same function ID as the listener so we can remove it later it
       // using the ID of the original listener.
-      removeOnDispose.guid = listener.guid;
-      this.on('dispose', removeOnDispose);
+      removeListenerOnDispose.guid = listener.guid;
 
-      // If the target is disposed first, we need to remove the reference to
-      // the target in this evented object's `removeOnDispose` listener.
-      // Otherwise, we create a memory leak.
-      const cleanRemover = () => this.off('dispose', removeOnDispose);
+      // Add a listener to the target's dispose event as well. This ensures
+      // that if the target is disposed BEFORE this object, we remove the
+      // removal listener that was just added. Otherwise, we create a memory leak.
+      const removeRemoverOnTargetDispose = () => this.off('dispose', removeListenerOnDispose);
 
-      // Add the same function ID so we can easily remove it later
-      cleanRemover.guid = listener.guid;
+      // Use the same function ID as the listener so we can remove it later
+      // it using the ID of the original listener.
+      removeRemoverOnTargetDispose.guid = listener.guid;
 
-      // Handle cases where the target is a DOM node.
-      if (target.nodeName) {
-        Events.on(target, type, listener);
-        Events.on(target, 'dispose', cleanRemover);
-
-      // Should be another evented object, which we detect via duck typing.
-      } else if (typeof target.on === 'function') {
-        target.on(type, listener);
-        target.on('dispose', cleanRemover);
-
-      // If the target is not a valid object, throw.
-      } else {
-        throw new Error('target was not a DOM node or an evented object');
-      }
+      listen(this, 'dispose', removeListenerOnDispose);
+      listen(target, 'dispose', removeRemoverOnTargetDispose);
     }
 
     return this;
@@ -88,9 +201,9 @@ const mixin = {
 
   /**
    * Add a listener to an event (or events) on this object or another evented
-   * object. The listener will be removed after the first time it is called.
+   * object. The listener will only be called once and then removed.
    *
-   * @param  {String|Array|Element|Object} first
+   * @param  {String|Array|Element|Object} targetOrType
    *         If this is a string or array, it represents an event type(s) and
    *         the listener will be bound to this object.
    *
@@ -101,38 +214,36 @@ const mixin = {
    *         In either case, the listener's `this` value will be bound to
    *         this object.
    *
-   * @param  {String|Array|Function} second
+   * @param  {String|Array|Function} typeOrListener
    *         If the first argument was a string or array, this should be the
    *         listener function. Otherwise, this is a string or array of event
    *         type(s).
    *
-   * @param  {Function} [third]
+   * @param  {Function} [listener]
    *         If the first argument was another evented object, this will be
    *         the listener function.
    *
    * @return {Object}
    *         Returns the object itself.
    */
-  one(first, second, third) {
+  one(...args) {
+    const {isTargetingSelf, target, type, listener} = normalizeListenArgs(this, args);
 
     // Targeting this evented object.
-    if (typeof first === 'string' || Array.isArray(first)) {
-      Events.one(this.eventBusEl_, first, Fn.bind(this, second));
+    if (isTargetingSelf) {
+      listen(target, type, listener, 'one');
 
     // Targeting another evented object.
     } else {
-      const target = first;
-      const type = second;
-      const listener = Fn.bind(this, third);
-
-      const wrapper = (...args) => {
+      const wrapper = (...largs) => {
         this.off(target, type, wrapper);
-        listener.apply(null, args);
+        listener.apply(null, largs);
       };
 
-      // Keep the same function ID so we can remove it later
+      // Use the same function ID as the listener so we can remove it later
+      // it using the ID of the original listener.
       wrapper.guid = listener.guid;
-      this.on(target, type, wrapper);
+      listen(target, type, wrapper, 'one');
     }
 
     return this;
@@ -141,59 +252,58 @@ const mixin = {
   /**
    * Removes listeners from events on an evented object.
    *
-   * @param  {String|Array|Element|Object} [first]
-   *         If this is a string or array, it represents an event type(s)
-   *         from which to remove the listener.
+   * @param  {String|Array|Element|Object} [targetOrType]
+   *         If this is a string or array, it represents an event type(s) and
+   *         the listener will be bound to this object.
    *
    *         Another evented object can be passed here instead, which will
-   *         remove the listener from THAT object.
+   *         bind a listener to the given event(s) being triggered on THAT
+   *         object.
    *
-   *         If no arguments are passed at all, ALL listeners will be removed
-   *         from this evented object.
+   *         In either case, the listener's `this` value will be bound to
+   *         this object.
    *
-   * @param  {String|Array|Function} [second]
+   * @param  {String|Array|Function} [typeOrListener]
    *         If the first argument was a string or array, this should be the
    *         listener function. Otherwise, this is a string or array of event
    *         type(s).
    *
-   * @param  {Function} [third]
+   * @param  {Function} [listener]
    *         If the first argument was another evented object, this will be
    *         the listener function.
    *
    * @return {Object}
    *         Returns the object itself.
    */
-  off(first, second, third) {
+  off(targetOrType, typeOrListener, listener) {
 
     // Targeting this evented object.
-    if (!first || typeof first === 'string' || Array.isArray(first)) {
-      Events.off(this.eventBusEl_, first, second);
+    if (!targetOrType || isValidEventType(targetOrType)) {
+      Events.off(this.eventBusEl_, targetOrType, typeOrListener);
 
     // Targeting another evented object.
     } else {
-      const target = first;
-      const type = second;
+      const target = targetOrType;
+      const type = typeOrListener;
+
+      // Fail fast and in a meaningful way!
+      validateTarget(target);
+      validateEventType(type);
+      validateListener(listener);
 
       // Ensure there's at least a guid, even if the function hasn't been used
-      const listener = Fn.bind(this, third);
+      listener = Fn.bind(this, listener);
 
       // Remove the dispose listener on this evented object, which was given
       // the same guid as the event listener in on().
       this.off('dispose', listener);
 
-      // Handle cases where the target is a DOM node.
-      if (first.nodeName) {
+      if (target.nodeName) {
         Events.off(target, type, listener);
         Events.off(target, 'dispose', listener);
-
-      // Should be another evented object, which we detect via duck typing.
-      } else if (typeof target.off === 'function') {
+      } else if (isEvented(target)) {
         target.off(type, listener);
         target.off('dispose', listener);
-
-      // If the target is not a valid object, throw.
-      } else {
-        throw new Error('target was not a DOM node or an evented object');
       }
     }
 
@@ -260,6 +370,9 @@ function evented(target, options = {}) {
     .forEach(name => {
       target[name] = Fn.bind(target, mixin[name]);
     });
+
+  // When any evented object is disposed, it removes all its listeners.
+  target.on('dispose', () => target.off());
 
   return target;
 }
