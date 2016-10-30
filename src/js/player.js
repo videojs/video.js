@@ -6,7 +6,6 @@ import Component from './component.js';
 
 import document from 'global/document';
 import window from 'global/window';
-import evented from './mixins/evented';
 import * as Events from './utils/events.js';
 import * as Dom from './utils/dom.js';
 import * as Fn from './utils/fn.js';
@@ -350,9 +349,6 @@ class Player extends Component {
 
     this.plugins_ = {};
     this.el_ = this.createEl();
-
-    // Make this an evented object and use `el_` as its event bus.
-    evented(this, {eventBusKey: 'el_'});
 
     // We also want to pass the original player options to each component and plugin
     // as well so they don't need to reach back into the player for options later.

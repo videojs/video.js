@@ -4,13 +4,13 @@
  * @file component.js
  */
 import window from 'global/window';
-import evented from './mixins/evented';
-import * as Dom from './utils/dom';
-import * as Fn from './utils/fn';
-import * as Guid from './utils/guid';
-import log from './utils/log';
-import toTitleCase from './utils/to-title-case';
-import mergeOptions from './utils/merge-options';
+import * as Dom from './utils/dom.js';
+import * as Fn from './utils/fn.js';
+import * as Guid from './utils/guid.js';
+import * as Events from './utils/events.js';
+import log from './utils/log.js';
+import toTitleCase from './utils/to-title-case.js';
+import mergeOptions from './utils/merge-options.js';
 
 /**
  * Base class for all UI Components.
@@ -82,11 +82,6 @@ class Component {
       this.el_ = this.createEl();
     }
 
-    // Make this an evented object and use `el_` as its event bus.
-    if (this.el_) {
-      evented(this, {eventBusKey: 'el_'});
-    }
-
     this.children_ = [];
     this.childIndex_ = {};
     this.childNameIndex_ = {};
@@ -137,6 +132,9 @@ class Component {
     this.children_ = null;
     this.childIndex_ = null;
     this.childNameIndex_ = null;
+
+    // Remove all event listeners.
+    this.off();
 
     // Remove element from DOM
     if (this.el_.parentNode) {
@@ -563,6 +561,188 @@ class Component {
     // Child classes can include a function that does:
     // return 'CLASS NAME' + this._super();
     return '';
+  }
+
+  /**
+   * Add an event listener to this component's element
+   * ```js
+   *     var myFunc = function() {
+   *       var myComponent = this;
+   *       // Do something when the event is fired
+   *     };
+   *
+   *     myComponent.on('eventType', myFunc);
+   * ```
+   * The context of myFunc will be myComponent unless previously bound.
+   * Alternatively, you can add a listener to another element or component.
+   * ```js
+   *     myComponent.on(otherElement, 'eventName', myFunc);
+   *     myComponent.on(otherComponent, 'eventName', myFunc);
+   * ```
+   * The benefit of using this over `VjsEvents.on(otherElement, 'eventName', myFunc)`
+   * and `otherComponent.on('eventName', myFunc)` is that this way the listeners
+   * will be automatically cleaned up when either component is disposed.
+   * It will also bind myComponent as the context of myFunc.
+   * **NOTE**: When using this on elements in the page other than window
+   * and document (both permanent), if you remove the element from the DOM
+   * you need to call `myComponent.trigger(el, 'dispose')` on it to clean up
+   * references to it and allow the browser to garbage collect it.
+   *
+   * @param  {String|Component} first   The event type or other component
+   * @param  {Function|String}      second  The event handler or event type
+   * @param  {Function}             third   The event handler
+   * @return {Component}
+   * @method on
+   */
+  on(first, second, third) {
+    if (typeof first === 'string' || Array.isArray(first)) {
+      Events.on(this.el_, first, Fn.bind(this, second));
+
+    // Targeting another component or element
+    } else {
+      const target = first;
+      const type = second;
+      const fn = Fn.bind(this, third);
+
+      // When this component is disposed, remove the listener from the other component
+      const removeOnDispose = () => this.off(target, type, fn);
+
+      // Use the same function ID so we can remove it later it using the ID
+      // of the original listener
+      removeOnDispose.guid = fn.guid;
+      this.on('dispose', removeOnDispose);
+
+      // If the other component is disposed first we need to clean the reference
+      // to the other component in this component's removeOnDispose listener
+      // Otherwise we create a memory leak.
+      const cleanRemover = () => this.off('dispose', removeOnDispose);
+
+      // Add the same function ID so we can easily remove it later
+      cleanRemover.guid = fn.guid;
+
+      // Check if this is a DOM node
+      if (first.nodeName) {
+        // Add the listener to the other element
+        Events.on(target, type, fn);
+        Events.on(target, 'dispose', cleanRemover);
+
+      // Should be a component
+      // Not using `instanceof Component` because it makes mock players difficult
+      } else if (typeof first.on === 'function') {
+        // Add the listener to the other component
+        target.on(type, fn);
+        target.on('dispose', cleanRemover);
+      }
+    }
+
+    return this;
+  }
+
+  /**
+   * Remove an event listener from this component's element
+   * ```js
+   *     myComponent.off('eventType', myFunc);
+   * ```
+   * If myFunc is excluded, ALL listeners for the event type will be removed.
+   * If eventType is excluded, ALL listeners will be removed from the component.
+   * Alternatively you can use `off` to remove listeners that were added to other
+   * elements or components using `myComponent.on(otherComponent...`.
+   * In this case both the event type and listener function are REQUIRED.
+   * ```js
+   *     myComponent.off(otherElement, 'eventType', myFunc);
+   *     myComponent.off(otherComponent, 'eventType', myFunc);
+   * ```
+   *
+   * @param  {String=|Component}  first  The event type or other component
+   * @param  {Function=|String}       second The listener function or event type
+   * @param  {Function=}              third  The listener for other component
+   * @return {Component}
+   * @method off
+   */
+  off(first, second, third) {
+    if (!first || typeof first === 'string' || Array.isArray(first)) {
+      Events.off(this.el_, first, second);
+    } else {
+      const target = first;
+      const type = second;
+      // Ensure there's at least a guid, even if the function hasn't been used
+      const fn = Fn.bind(this, third);
+
+      // Remove the dispose listener on this component,
+      // which was given the same guid as the event listener
+      this.off('dispose', fn);
+
+      if (first.nodeName) {
+        // Remove the listener
+        Events.off(target, type, fn);
+        // Remove the listener for cleaning the dispose listener
+        Events.off(target, 'dispose', fn);
+      } else {
+        target.off(type, fn);
+        target.off('dispose', fn);
+      }
+    }
+
+    return this;
+  }
+
+  /**
+   * Add an event listener to be triggered only once and then removed
+   * ```js
+   *     myComponent.one('eventName', myFunc);
+   * ```
+   * Alternatively you can add a listener to another element or component
+   * that will be triggered only once.
+   * ```js
+   *     myComponent.one(otherElement, 'eventName', myFunc);
+   *     myComponent.one(otherComponent, 'eventName', myFunc);
+   * ```
+   *
+   * @param  {String|Component}  first   The event type or other component
+   * @param  {Function|String}       second  The listener function or event type
+   * @param  {Function=}             third   The listener function for other component
+   * @return {Component}
+   * @method one
+   */
+  one(first, second, third) {
+    if (typeof first === 'string' || Array.isArray(first)) {
+      Events.one(this.el_, first, Fn.bind(this, second));
+    } else {
+      const target = first;
+      const type = second;
+      const fn = Fn.bind(this, third);
+
+      const newFunc = () => {
+        this.off(target, type, newFunc);
+        fn.apply(null, arguments);
+      };
+
+      // Keep the same function ID so we can remove it later
+      newFunc.guid = fn.guid;
+
+      this.on(target, type, newFunc);
+    }
+
+    return this;
+  }
+
+  /**
+   * Trigger an event on an element
+   * ```js
+   *     myComponent.trigger('eventName');
+   *     myComponent.trigger({'type':'eventName'});
+   *     myComponent.trigger('eventName', {data: 'some data'});
+   *     myComponent.trigger({'type':'eventName'}, {data: 'some data'});
+   * ```
+   *
+   * @param  {Event|Object|String} event  A string (the type) or an event object with a type attribute
+   * @param  {Object} [hash] data hash to pass along with the event
+   * @return {Component}       self
+   * @method trigger
+   */
+  trigger(event, hash) {
+    Events.trigger(this.el_, event, hash);
+    return this;
   }
 
   /**

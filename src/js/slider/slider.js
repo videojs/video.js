@@ -38,10 +38,7 @@ class Slider extends Component {
     this.on('click', this.handleClick);
 
     this.on(player, 'controlsvisible', this.update);
-
-    if (this.playerEvent) {
-      this.on(player, this.playerEvent, this.update);
-    }
+    this.on(player, this.playerEvent, this.update);
   }
 
   /**
