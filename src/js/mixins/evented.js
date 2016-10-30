@@ -17,12 +17,14 @@ const isEvented = (object) =>
   ['on', 'one', 'off', 'trigger'].every(k => typeof object[k] === 'function');
 
 /**
- * Whether a value is a valid event type - string or array.
+ * Whether a value is a valid event type - non-empty string or array.
  *
  * @param  {String|Array} type
  * @return {Boolean}
  */
-const isValidEventType = (type) => typeof type === 'string' || Array.isArray(type);
+const isValidEventType = (type) =>
+  (typeof type === 'string' && (/\S/).test(type)) ||
+  (Array.isArray(type) && !!type.length);
 
 /**
  * Validates a value to determine if it is a valid event target. Throws if not.
@@ -44,7 +46,7 @@ const validateTarget = (target) => {
  */
 const validateEventType = (type) => {
   if (!isValidEventType(type)) {
-    throw new Error('invalid event type; must be a string or array');
+    throw new Error('invalid event type; must be a non-empty string or array');
   }
 };
 
@@ -253,15 +255,10 @@ const mixin = {
    * Removes listeners from events on an evented object.
    *
    * @param  {String|Array|Element|Object} [targetOrType]
-   *         If this is a string or array, it represents an event type(s) and
-   *         the listener will be bound to this object.
+   *         If this is a string or array, it represents an event type(s).
    *
-   *         Another evented object can be passed here instead, which will
-   *         bind a listener to the given event(s) being triggered on THAT
-   *         object.
-   *
-   *         In either case, the listener's `this` value will be bound to
-   *         this object.
+   *         Another evented object can be passed here instead, in which case
+   *         ALL 3 arguments are REQUIRED.
    *
    * @param  {String|Array|Function} [typeOrListener]
    *         If the first argument was a string or array, this should be the
