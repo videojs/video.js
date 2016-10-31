@@ -186,8 +186,8 @@ class ClickableComponent extends Component {
    *        The `keydown`, `tap`, or `click` event that caused this function to be
    *        called.
    *
-   * @listens {tap}
-   * @listens {click}
+   * @listens tap
+   * @listens click
    */
   handleClick(event) {}
 
@@ -199,7 +199,7 @@ class ClickableComponent extends Component {
    * @param {EventTarget~Event} event
    *        The `focus` event that caused this function to be called.
    *
-   * @listens {focus}
+   * @listens focus
    */
   handleFocus(event) {
     Events.on(document, 'keydown', Fn.bind(this, this.handleKeyPress));
@@ -212,7 +212,7 @@ class ClickableComponent extends Component {
    * @param {EventTarget~Event} event
    *        The `keydown` event that caused this function to be called.
    *
-   * @listens {keydown}
+   * @listens keydown
    */
   handleKeyPress(event) {
 
@@ -234,7 +234,7 @@ class ClickableComponent extends Component {
    * @param {EventTarget~Event} event
    *        The `blur` event that caused this function to be called.
    *
-   * @listens {blur}
+   * @listens blur
    */
   handleBlur(event) {
     Events.off(document, 'keydown', Fn.bind(this, this.handleKeyPress));

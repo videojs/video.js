@@ -129,6 +129,8 @@ class Component {
   dispose() {
 
     /**
+     * Triggered when a `Component` is disposed.
+     *
      * @event Component#dispose
      * @type {EventTarget~Event}
      *
@@ -745,7 +747,7 @@ class Component {
    * @return {Component}
    *         Returns itself; method can be chained.
    *
-   * @listens {Component#dispose}
+   * @listens Component#dispose
    */
   on(first, second, third) {
     if (typeof first === 'string' || Array.isArray(first)) {
@@ -1038,6 +1040,8 @@ class Component {
 
       // Allow for using event listeners also
       /**
+       * Triggered when a `Component` is ready.
+       *
        * @event Component#ready
        * @type {EventTarget~Event}
        */
@@ -1361,6 +1365,8 @@ class Component {
       // skipListeners allows us to avoid triggering the resize event when setting both width and height
       if (!skipListeners) {
         /**
+         * Triggered when a component is resized.
+         *
          * @event Component#resize
          * @type {EventTarget~Event}
          */
@@ -1484,11 +1490,11 @@ class Component {
    *
    * @private
    * @fires Component#tap
-   * @listens {Component#touchstart}
-   * @listens {Component#touchmove}
-   * @listens {Component#touchleave}
-   * @listens {Component#touchcancel}
-   * @listens {Component#touchend}
+   * @listens Component#touchstart
+   * @listens Component#touchmove
+   * @listens Component#touchleave
+   * @listens Component#touchcancel
+   * @listens Component#touchend
 
    */
   emitTapEvents() {
@@ -1560,6 +1566,8 @@ class Component {
           // Don't let browser turn this into a click
           event.preventDefault();
           /**
+           * Triggered when a `Component` is tapped.
+           *
            * @event Component#tap
            * @type {EventTarget~Event}
            */
@@ -1590,10 +1598,10 @@ class Component {
    * Furthermore a `touchmove` event and anything other than a tap, should not turn
    * controls back on.
    *
-   * @listens {Component#touchstart}
-   * @listens {Component#touchmove}
-   * @listens {Component#touchend}
-   * @listens {Component#touchcancel}
+   * @listens Component#touchstart
+   * @listens Component#touchmove
+   * @listens Component#touchend
+   * @listens Component#touchcancel
    */
   enableTouchActivity() {
     // Don't continue if the root player doesn't support reporting user activity
@@ -1656,7 +1664,7 @@ class Component {
    *         get used in {@link Component#clearTimeout} to clear the timeout that
    *         was set.
    *
-   * @listens {Component#dispose}
+   * @listens Component#dispose
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers/setTimeout}
    */
   setTimeout(fn, timeout) {
@@ -1718,7 +1726,7 @@ class Component {
    *         Returns an id that can be used to identify the interval. It can also be be used in
    *         {@link Component#clearInterval} to clear the interval.
    *
-   * @listens {Component#dispose}
+   * @listens Component#dispose
    * @see [Similar to]{@link https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers/setInterval}
    */
   setInterval(fn, interval) {

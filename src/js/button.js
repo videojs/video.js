@@ -120,7 +120,7 @@ class Button extends ClickableComponent {
    * @param {EventTarget~Event} event
    *        The event that caused this function to get called.
    *
-   * @listens {keydown}
+   * @listens keydown
    */
   handleKeyPress(event) {
 

@@ -48,15 +48,17 @@ class CloseButton extends Button {
    *        The `keydown`, `tap`, or `click` event that caused this function to be
    *        called.
    *
-   * @listens {tap}
-   * @listens {click}
-   * @fires {CloseButton#close}
+   * @listens tap
+   * @listens click
+   * @fires CloseButton#close
    */
   handleClick(event) {
 
     /**
+     * Triggered when the a `CloseButton` is clicked.
+     *
      * @event CloseButton#close
-     * @type {EvenTarget~Event}
+     * @type {EventTarget~Event}
      *
      * @property {boolean} [bubbles=false]
      *           set to false so that the close event does not
