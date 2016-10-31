@@ -1,8 +1,9 @@
 /**
- * @file setup.js
+ * Functions for setting up a player without user insteraction based on the data-setup
+ * `attribute` of the video tag.
  *
- * Functions for automatically setting up a player
- * based on the data-setup attribute of the video tag
+ * @file setup.js
+ * @module setup
  */
 import * as Events from './utils/events.js';
 import document from 'global/document';
@@ -11,7 +12,9 @@ import window from 'global/window';
 let _windowLoaded = false;
 let videojs;
 
-// Automatically set up any tags that have a data-setup attribute
+/**
+ * Set up any tags that have a data-setup `attribute` when the player is started.
+ */
 const autoSetup = function() {
   // One day, when we stop supporting IE8, go back to this, but in the meantime...*hack hack hack*
   // var vids = Array.prototype.slice.call(document.getElementsByTagName('video'));
@@ -72,7 +75,10 @@ const autoSetup = function() {
   }
 };
 
-// Pause to let the DOM keep processing
+/**
+ * Wait until the page is loaded before running autoSetup. This will be called in
+ * autoSetup if `hasLoaded` returns false.
+ */
 function autoSetupTimeout(wait, vjs) {
   if (vjs) {
     videojs = vjs;
@@ -84,13 +90,21 @@ function autoSetupTimeout(wait, vjs) {
 if (document.readyState === 'complete') {
   _windowLoaded = true;
 } else {
+  /**
+   * Listen for the load event on window, and set _windowLoaded to true.
+   *
+   * @listens load
+   */
   Events.one(window, 'load', function() {
     _windowLoaded = true;
   });
 }
 
+/**
+ * check if the document has been loaded
+ */
 const hasLoaded = function() {
   return _windowLoaded;
 };
 
-export { autoSetup, autoSetupTimeout, hasLoaded };
+export {autoSetup, autoSetupTimeout, hasLoaded};
