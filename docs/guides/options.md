@@ -1,124 +1,46 @@
-# Options
+# Video.js Options Reference
+
+> **Note:** This document is only a reference for available options. To learn about passing options to Video.js, see [the setup guide](setup.md#options).
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
-- [Setting Options](#setting-options)
-  - [Setting Global Defaults](#setting-global-defaults)
-  - [A Note on `<video>` Tag Attributes](#a-note-on-video-tag-attributes)
-  - [Precedence](#precedence)
-- [Options Reference](#options-reference)
-  - [Standard `<video>` Element Options](#standard-video-element-options)
-    - [`autoplay`](#autoplay)
-    - [`controls`](#controls)
-    - [`height`](#height)
-    - [`loop`](#loop)
-    - [`muted`](#muted)
-    - [`poster`](#poster)
-    - [`preload`](#preload)
-    - [`src`](#src)
-    - [`width`](#width)
-  - [Video.js-specific Options](#videojs-specific-options)
-    - [`aspectRatio`](#aspectratio)
-    - [`children`](#children)
-    - [`fluid`](#fluid)
-    - [`inactivityTimeout`](#inactivitytimeout)
-    - [`language`](#language)
-    - [`languages`](#languages)
-    - [`notSupportedMessage`](#notsupportedmessage)
-    - [`plugins`](#plugins)
-    - [`sourceOrder`](#sourceorder)
-    - [`sources`](#sources)
-    - [`techOrder`](#techorder)
-  - [Component Options](#component-options)
-    - [`children`](#children-1)
-    - [`${componentName}`](#componentname)
-  - [Tech Options](#tech-options)
-    - [`${techName}`](#techname)
+- [Standard `<video>` Element Options](#standard-video-element-options)
+  - [`autoplay`](#autoplay)
+  - [`controls`](#controls)
+  - [`height`](#height)
+  - [`loop`](#loop)
+  - [`muted`](#muted)
+  - [`poster`](#poster)
+  - [`preload`](#preload)
+  - [`src`](#src)
+  - [`width`](#width)
+- [Video.js-specific Options](#videojs-specific-options)
+  - [`aspectRatio`](#aspectratio)
+  - [`children`](#children)
+  - [`fluid`](#fluid)
+  - [`inactivityTimeout`](#inactivitytimeout)
+  - [`language`](#language)
+  - [`languages`](#languages)
+  - [`notSupportedMessage`](#notsupportedmessage)
+  - [`plugins`](#plugins)
+  - [`sourceOrder`](#sourceorder)
+  - [`sources`](#sources)
+  - [`techOrder`](#techorder)
+- [Component Options](#component-options)
+  - [`children`](#children-1)
+  - [`${componentName}`](#componentname)
+- [Tech Options](#tech-options)
+  - [`${techName}`](#techname)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## Setting Options
-
-Because Video.js decorates an HTML5 `<video>` element, many of the options available to you are also available as [standard `<video>` tag attributes][video-attrs]:
-
-```html
-<video controls autoplay preload="auto" ...>
-```
-
-Alternatively, you can use the `data-setup` attribute to provide options as [JSON][json]. This is also how you would set options that aren't standard to the `<video>` element:
-
-```html
-<video data-setup='{"controls": true, "autoplay": false, "preload": "auto"}'...>
-```
-
-Finally, if you're not using the `data-setup` attribute to trigger the player setup, you can pass in an object of player options as the second argument to the `videojs` function:
-
-```js
-videojs('my-player', {
-  controls: true,
-  autoplay: false,
-  preload: 'auto'
-});
-```
-
-### Setting Global Defaults
-
-Default options for all players can be found at `videojs.options`. In order to override them, mutate this object as needed. For example, to set `{autoplay: true}` for all players:
-
-```js
-videojs.options.autoplay = true;
-```
-
-### A Note on `<video>` Tag Attributes
-
-Many attributes are so-called [boolean attributes][boolean-attrs]. This means they are either on or off. In these cases, the attribute _should have no value_ - its presence implies a true value and its absence implies a false value.
-
-_These are incorrect:_
-
-```html
-<video controls="true" ...>
-<video loop="true" ...>
-<video controls="false" ...>
-```
-
-> **Note:** The example with `controls="false"` can be a point of confusion for new developers - it will actually turn controls _on_!
-
-These are correct:
-
-```html
-<video controls ...>
-<video loop="loop" ...>
-<video ...>
-```
-
-### Precedence
-
-There are multiple ways to provide options for Video.js, so we should be clear about which methods take precedence. From highest to lowest, the precedence rules are:
-
-1. Options as the second argument to the `videojs` function
-1. Options parsed from the `data-setup` attribute
-1. `<video>` element attributes and children
-
-For example, given:
-
-```html
-<video id="foo" src="foo-1.mp4" data-setup='{"src":"foo-2.mp4"}'></video>
-<script>
-  videojs('foo', {src: 'foo-3.mp4'});
-</script>
-```
-
-The `src` option would have the value `'foo-3.mp4'`.
-
-## Options Reference
-
-### Standard `<video>` Element Options
+## Standard `<video>` Element Options
 
 Each of these options is also available as a [standard `<video>` element attribute][video-attrs]; so, they can be defined in all three manners [outlined above](#setting-options). Typically, defaults are not listed as this is left to browser vendors.
 
-#### `autoplay`
+### `autoplay`
 
 > Type: `Boolean`
 
@@ -126,37 +48,37 @@ If `true`/present as an attribute, begins playback automatically.
 
 > **Note:** As of iOS 10, Apple offers `autoplay` support in Safari. For details, refer to ["New <video> Policies for iOS"][ios-10-updates].
 
-#### `controls`
+### `controls`
 
 > Type: `Boolean`
 
 Determines whether or not the player has controls that the user can interact with. Without controls the only way to start the video playing is with the `autoplay` attribute or through the Player API.
 
-#### `height`
+### `height`
 
 > Type: `String|Number`
 
 Sets the display height of the video player in pixels.
 
-#### `loop`
+### `loop`
 
 > Type: `Boolean`
 
 Causes the video to start over as soon as it ends.
 
-#### `muted`
+### `muted`
 
 > Type: `Boolean`
 
 Will silence any audio by default.
 
-#### `poster`
+### `poster`
 
 > Type: `String`
 
 A URL to an image that displays before the video begins playing. This is often a frame of the video or a custom title screen. As soon as the user hits "play" the image will go away.
 
-#### `preload`
+### `preload`
 
 > Type: `String`
 
@@ -176,33 +98,33 @@ Suggests to the browser whether or not the video data should begin downloading a
 
   Don't preload any data. The browser will wait until the user hits "play" to begin downloading.
 
-#### `src`
+### `src`
 
 > Type: `String`
 
 The source URL to a video source to embed.
 
-#### `width`
+### `width`
 
 > Type: `String|Number`
 
 Sets the display height of the video player in pixels.
 
-### Video.js-specific Options
+## Video.js-specific Options
 
 Each option is `undefined` by default unless otherwise specified.
 
-#### `aspectRatio`
+### `aspectRatio`
 
 > Type: `String`
 
 Puts the player in [fluid](#fluid) mode and the value is used when calculating the dynamic size of the player. The value should represent a ratio - two numbers separated by a colon (e.g. `"16:9"` or `"4:3"`).
 
-#### `children`
+### `children`
 
 > Type: `Array`
 
-#### `fluid`
+### `fluid`
 
 > Type: `Boolean`
 
@@ -210,7 +132,7 @@ When `true`, the Video.js player will have a fluid size. In other words, it will
 
 Also, if the `<video>` element has the `"vjs-fluid"`, this option is automatically set to `true`.
 
-#### `inactivityTimeout`
+### `inactivityTimeout`
 
 > Type: `Number`
 
@@ -218,7 +140,7 @@ Video.js indicates that the user is interacting with the player by way of the `"
 
 The `inactivityTimeout` determines how many milliseconds of inactivity is required before declaring the user inactive. A value of `0` indicates that there is no `inactivityTimeout` and the user will never be considered inactive.
 
-#### `language`
+### `language`
 
 > Type: `String`
 
@@ -226,7 +148,7 @@ A [language code][lang-codes] matching one of the available languages in the pla
 
 Learn more about [languages in Video.js](languages.md).
 
-#### `languages`
+### `languages`
 
 > Type: `Object`
 
@@ -236,13 +158,13 @@ Learn more about [languages in Video.js](languages.md).
 
 > **Note**: Generally, this option is not needed and it would be better to pass your custom languages to `videojs.addLanguage()`, so they are available in all players!
 
-#### `notSupportedMessage`
+### `notSupportedMessage`
 
 > Type: `String`
 
 Allows overriding the default message that is displayed when Video.js cannot play back a media source.
 
-#### `plugins`
+### `plugins`
 
 > Type: `Object`
 
@@ -268,7 +190,7 @@ player.boo({baz: false});
 
 Although, since the `plugins` option is an object, the order of initialization is not guaranteed!
 
-#### `sourceOrder`
+### `sourceOrder`
 
 > Type: `Boolean`
 
@@ -309,7 +231,7 @@ With `sourceOrder: true`, the algorithm becomes:
   - for each tech:
     - if tech can play source, use this tech/source combo
 
-#### `sources`
+### `sources`
 
 > Type: `Array`
 
@@ -327,19 +249,19 @@ videojs('my-player', {
 });
 ```
 
-#### `techOrder`
+### `techOrder`
 
 > Type: `Array`, Default: `['html5', 'flash']`
 
 Defines the order in which Video.js techs are preferred. By default, this means that the `Html5` tech is preferred, but Video.js will fall back to `Flash` if no `Html5`-compatible source can be found.
 
-### Component Options
+## Component Options
 
 The Video.js player is a component. Like all components, you can define what children it includes, what order they appear in, and what options are passed to them.
 
 This is meant to be a quick reference; so, for more detailed information on components in Video.js, check out the [components guide](components.md).
 
-#### `children`
+### `children`
 
 > Type: `Array|Object`
 
@@ -347,7 +269,7 @@ If an `Array` - which is the default - this is used to determine the order in wh
 
 This can also be passed as an `Object`. In this case, it is used to provide `options` for any/all children.
 
-#### `${componentName}`
+### `${componentName}`
 
 > Type: `Object`
 
@@ -361,9 +283,9 @@ videojs('my-player', {
 });
 ```
 
-### Tech Options
+## Tech Options
 
-#### `${techName}`
+### `${techName}`
 
 > Type: `Object`
 
@@ -385,8 +307,6 @@ However, this is a case where changing the global defaults is more useful:
 videojs.options.flash.swf = '//path/to/videojs.swf'
 ```
 
-[boolean-attrs]: https://www.w3.org/TR/2011/WD-html5-20110525/common-microsyntaxes.html#boolean-attributes
 [ios-10-updates]: https://webkit.org/blog/6784/new-video-policies-for-ios/
-[json]: http://json.org/example.html
 [lang-codes]: http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
 [video-attrs]: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video#Attributes

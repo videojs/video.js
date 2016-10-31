@@ -1,6 +1,6 @@
 # [Video.js][vjs] Documentation
 
-There are two categories of docs: [Guides][guides] and [API docs][guides-api].
+There are two categories of docs: [Guides][guides] and [API docs][api].
 
 Guides explain general topics and use cases (e.g. setup). API docs are automatically generated from the codebase and give specific details about functions, properties, and events.
 
@@ -10,7 +10,7 @@ Guides explain general topics and use cases (e.g. setup). API docs are automatic
 
 #### [Setup][guides-setup]
 
-The setup documentation gives a deeper view of the additional methods you can use to trigger the player setup.
+The setup guide covers all methods of setting up Video.js players.
 
 #### [Options][guides-options]
 
@@ -22,27 +22,17 @@ Tracks are used for displaying text information over a video, selecting differen
 
 ### Customizing
 
-#### [API][guides-api]
-
-The Video.js API allows you to control the video through javascript or trigger event listeners, whether the video is playing through HTML5, flash, or another playback technology.
-
 #### [Skins][guides-skins]
 
 You can change the look of the player across playback technologies just by editing a CSS file. The skins documentation gives you a intro to how the HTML and CSS of the default skin is put together.
-
-#### [Tech][guides-tech]
-
-A "tech" is the shorthand we're using to describe any video playback technology - be it HTML5 video, Flash, . Basically anything that has a unique API to audio or video. Additional playback technologies can be added relatively easily.
 
 #### [Plugins][guides-plugins]
 
 You can package up interesting Video.js customizations and reuse them elsewhere. Find out how to build your own plugin or use one created by someone else.
 
-### Resources
+#### [Tech][guides-tech]
 
-#### [Glossary][guides-glossary]
-
-Some helpful definitions for those unfamiliar with web video-related terms - with links to more technical details.
+A "tech" is the shorthand we're using to describe any video playback technology - be it HTML5 video, Flash, . Basically anything that has a unique API to audio or video. Additional playback technologies can be added relatively easily.
 
 ## API Docs
 

@@ -4,14 +4,18 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
-- [Installing Video.js](#installing-videojs)
-- [Decorating a `<video>` Element](#decorating-a-video-element)
+- [Getting Video.js](#getting-videojs)
+- [Creating a Player](#creating-a-player)
   - [Automatic Setup](#automatic-setup)
   - [Manual Setup](#manual-setup)
+- [Options](#options)
+  - [Global Defaults](#global-defaults)
+  - [A Note on `<video>` Tag Attributes](#a-note-on-video-tag-attributes)
+- [Player Readiness](#player-readiness)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## Installing Video.js
+## Getting Video.js
 
 Video.js is officially available via CDN, npm, and Bower.
 
@@ -19,15 +23,15 @@ Video.js works out of the box with not only HTML `<script>` and `<link>` tags, b
 
 Please refer to the [Getting Started][getting-started] document for details.
 
-## Decorating a `<video>` Element
+## Creating a Player
+
+> **Note:** Video.js works with `<video>` _and_ `<audio>` elements, but for simplicity we'll refer only to `<video>` elements going forward.
 
 Once you have Video.js [loaded on your page][getting-started], you're ready to create a player!
 
-> Note: Video.js works with `<video>` _and_ `<audio>` elements, but for simplicity we'll refer only to `<video>` elements going forward!
-
 The core strength of Video.js is that it decorates a [standard `<video>` element][w3c-video] and emulates its associated [events and APIs][w3c-media-events], while providing a customizable DOM-based UI.
 
-Video.js supports all attributes of the `<video>` element (such as `controls`, `preload`, etc), but it also supports [its own options][options]. There are two ways to create a Video.js player and pass it options, but they both start with a standard `<video>` element with the attribute `class="video-js"`:
+Video.js supports all attributes of the `<video>` element (such as `controls`, `preload`, etc), but it also supports [its own options](#options). There are two ways to create a Video.js player and pass it options, but they both start with a standard `<video>` element with the attribute `class="video-js"`:
 
 ```html
 <video class="video-js">
@@ -38,7 +42,7 @@ Video.js supports all attributes of the `<video>` element (such as `controls`, `
 
 ### Automatic Setup
 
-By default, when your web page finishes loading, Video.js will scan for media elements that have the `data-setup` attribute. The `data-setup` attribute is used to provide [options][options] to Video.js. The minimum example looks like this:
+By default, when your web page finishes loading, Video.js will scan for media elements that have the `data-setup` attribute. The `data-setup` attribute is used to pass options to Video.js. A minimal example looks like this:
 
 ```html
 <video class="video-js" data-setup='{}'>
@@ -47,11 +51,11 @@ By default, when your web page finishes loading, Video.js will scan for media el
 </video>
 ```
 
-> Note: You **must** use single-quotes with `data-setup` as it is expected to contain JSON.
+> **Note:** You _must_ use single-quotes with `data-setup` as it is expected to contain JSON.
 
 ### Manual Setup
 
-From updating the DOM via standard APIs to full-fledged frameworks like React and Ember, a `<video>` element often does not exist when the page finishes loading. In these cases, automatic setup is not possible, but manual setup is available via [the `videojs` function][videojs].
+On the modern web, a `<video>` element often does not exist when the page finishes loading. In these cases, automatic setup is not possible, but manual setup is available via [the `videojs` function][videojs].
 
 One way to call this function is by providing it a string matching a `<video>` element's `id` attribute:
 
@@ -66,7 +70,7 @@ One way to call this function is by providing it a string matching a `<video>` e
 videojs('my-player');
 ```
 
-Using an `id` attribute isn't always practical when your DOM is generated programmatically. In that case, Video.js accepts a DOM element instead:
+However, using an `id` attribute isn't always practical; so, the `videojs` function accepts a DOM element instead:
 
 ```html
 <video class="video-js">
@@ -79,11 +83,104 @@ Using an `id` attribute isn't always practical when your DOM is generated progra
 videojs(document.querySelector('.video-js'));
 ```
 
-Regardless, in either case, the `data-setup` attribute is still supported for providing [options][options] to Video.js. Additionally, the `videojs` function can take options as its second argument. [Learn more about Video.js options][options].
+## Options
+
+> **Note:** This guide only covers how to pass options during player setup. For a complete reference on _all_ available options, see the [options guide](options.md).
+
+There are three ways to pass options to Video.js. Because Video.js decorates an HTML5 `<video>` element, many of the options available are also available as [standard `<video>` tag attributes][video-attrs]:
+
+```html
+<video controls autoplay preload="auto" ...>
+```
+
+Alternatively, you can use the `data-setup` attribute to pass options as [JSON][json]. This is also how you would set options that aren't standard to the `<video>` element:
+
+```html
+<video data-setup='{"controls": true, "autoplay": false, "preload": "auto"}'...>
+```
+
+Finally, if you're not using the `data-setup` attribute to trigger the player setup, you can pass in an object of player options as the second argument to the `videojs` function:
+
+```js
+videojs('my-player', {
+  controls: true,
+  autoplay: false,
+  preload: 'auto'
+});
+```
+
+### Global Defaults
+
+Default options for all players can be found at `videojs.options` and can be changed directly. For example, to set `{autoplay: true}` for all future players:
+
+```js
+videojs.options.autoplay = true;
+```
+
+### A Note on `<video>` Tag Attributes
+
+Many attributes are so-called [boolean attributes][boolean-attrs]. This means they are either on or off. In these cases, the attribute _should have no value_ - its presence implies a true value and its absence implies a false value.
+
+_These are incorrect:_
+
+```html
+<video controls="true" ...>
+<video loop="true" ...>
+<video controls="false" ...>
+```
+
+> **Note:** The example with `controls="false"` can be a point of confusion for new developers - it will actually turn controls _on_!
+
+These are correct:
+
+```html
+<video controls ...>
+<video loop="loop" ...>
+<video ...>
+```
+
+## Player Readiness
+
+Because Video.js techs have the potential to be loaded asynchronously, it isn't always safe to interact with a player immediately upon setup. For this reason, Video.js players have a concept of "readiness" which will be familiar to anyone who has used jQuery before.
+
+Essentially, any number of ready callbacks can be defined for a Video.js player. There are three ways to pass these callbacks. In each example, we'll add an identical class to the player:
+
+Pass a callback to the `videojs()` function as a third argument:
+
+```js
+// Passing `null` for the options argument.
+videojs('my-player', null, function() {
+  this.addClass('my-example');
+});
+```
+
+Pass a callback to a player's `ready()` method:
+
+```js
+var player = videojs('my-player');
+
+player.ready(function() {
+  this.addClass('my-example');
+});
+```
+
+Listen for the player's `"ready"` event:
+
+```js
+var player = videojs('my-player');
+
+player.on('ready', function() {
+  this.addClass('my-example');
+});
+```
+
+In each case, the callback is called asynchronously - _even if the player is already ready!_
 
 
+[boolean-attrs]: https://www.w3.org/TR/2011/WD-html5-20110525/common-microsyntaxes.html#boolean-attributes
 [getting-started]: http://videojs.com/getting-started/
-[options]: options.md
+[json]: http://json.org/example.html
+[video-attrs]: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video#Attributes
 [videojs]: http://docs.videojs.com/docs/api/video.html
 [w3c-media-events]: https://www.w3.org/2010/05/video/mediaevents.html
 [w3c-video]: http://www.w3.org/TR/html5/embedded-content-0.html#the-video-element
