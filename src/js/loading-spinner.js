@@ -3,20 +3,18 @@
  */
 import Component from './component';
 
-/* Loading Spinner
-================================================================================ */
 /**
- * Loading spinner for waiting events
+ * A loading spinner for use during waiting/loading events.
  *
  * @extends Component
- * @class LoadingSpinner
  */
 class LoadingSpinner extends Component {
 
   /**
-   * Create the component's DOM element
+   * Create the `LoadingSpinner`s DOM element.
    *
-   * @method createEl
+   * @return {Element}
+   *         The dom element that gets created.
    */
   createEl() {
     return super.createEl('div', {

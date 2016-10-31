@@ -10,15 +10,15 @@ import * as Events from '../utils/events.js';
  * The Popup component is used to build pop up controls.
  *
  * @extends Component
- * @class Popup
  */
 class Popup extends Component {
 
   /**
    * Add a popup item to the popup
    *
-   * @param {Object|String} component Component or component type to add
-   * @method addItem
+   * @param {Object|string} component
+   *        Component or component type to add
+   *
    */
   addItem(component) {
     this.addChild(component);
@@ -28,10 +28,10 @@ class Popup extends Component {
   }
 
   /**
-   * Create the component's DOM element
+   * Create the `PopupButton`s DOM element.
    *
    * @return {Element}
-   * @method createEl
+   *         The element that gets created.
    */
   createEl() {
     const contentElType = this.options_.contentElType || 'ul';

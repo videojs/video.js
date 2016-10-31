@@ -1,19 +1,21 @@
 /**
  * @file fullscreen-api.js
+ * @module fullscreen-api
+ * @private
  */
 import document from 'global/document';
 
-/*
- * Store the browser-specific methods for the fullscreen API
- * @type {Object|undefined}
- * @private
+/**
+ * Store the browser-specific methods for the fullscreen API.
+ *
+ * @type {Object}
+ * @see [Specification]{@link https://fullscreen.spec.whatwg.org}
+ * @see [Map Approach From Screenfull.js]{@link https://github.com/sindresorhus/screenfull.js}
  */
 const FullscreenApi = {};
 
 // browser API methods
-// map approach from Screenful.js - https://github.com/sindresorhus/screenfull.js
 const apiMap = [
-  // Spec: https://dvcs.w3.org/hg/fullscreen/raw-file/tip/Overview.html
   [
     'requestFullscreen',
     'exitFullscreen',
