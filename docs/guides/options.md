@@ -79,6 +79,7 @@ _These are incorrect:_
 
 ```html
 <video controls="true" ...>
+<video loop="true" ...>
 <video controls="false" ...>
 ```
 
@@ -88,6 +89,7 @@ These are correct:
 
 ```html
 <video controls ...>
+<video loop="loop" ...>
 <video ...>
 ```
 
@@ -114,7 +116,7 @@ The `src` option would have the value `'foo-3.mp4'`.
 
 ### Standard `<video>` Element Options
 
-Each of these options is also available as a standard `<video>` element attribute; so, they can be defined in all three manners [outlined above](#setting-options). Typically, defaults are not listed as this is left to browser vendors.
+Each of these options is also available as a [standard `<video>` element attribute][video-attrs]; so, they can be defined in all three manners [outlined above](#setting-options). Typically, defaults are not listed as this is left to browser vendors.
 
 #### `autoplay`
 
@@ -122,7 +124,7 @@ Each of these options is also available as a standard `<video>` element attribut
 
 If `true`/present as an attribute, begins playback automatically.
 
-> **Note:** As of iOS 10, Apple offers `autoplay` support in Safari. However, in order for it to work, the `<video>` element must have `muted` and `playsinline` attributes!
+> **Note:** As of iOS 10, Apple offers `autoplay` support in Safari. For details, refer to ["New <video> Policies for iOS"][ios-10-updates].
 
 #### `controls`
 
@@ -206,19 +208,21 @@ Puts the player in [fluid](#fluid) mode and the value is used when calculating t
 
 When `true`, the Video.js player will have a fluid size. In other words, it will scale to fit its container.
 
+Also, if the `<video>` element has the `"vjs-fluid"`, this option is automatically set to `true`.
+
 #### `inactivityTimeout`
 
 > Type: `Number`
 
 Video.js indicates that the user is interacting with the player by way of the `"vjs-user-active"` and `"vjs-user-inactive"` classes and the `"useractive"` event.
 
-The `inactivityTimeout` determines how many milliseconds of inactivity is required before declaring the user inactive.
+The `inactivityTimeout` determines how many milliseconds of inactivity is required before declaring the user inactive. A value of `0` indicates that there is no `inactivityTimeout` and the user will never be considered inactive.
 
 #### `language`
 
 > Type: `String`
 
-A [two-letter code][lang-codes] matching one of the available languages in the player. This sets the initial language for a player, but it can always be changed.
+A [language code][lang-codes] matching one of the available languages in the player. This sets the initial language for a player, but it can always be changed.
 
 Learn more about [languages in Video.js](languages.md).
 
@@ -226,7 +230,7 @@ Learn more about [languages in Video.js](languages.md).
 
 > Type: `Object`
 
-Customize which languages are available in a player. The keys of this object will be [two-letter language codes][lang-codes] and the values will be objects with English keys and translated values.
+Customize which languages are available in a player. The keys of this object will be [language codes][lang-codes] and the values will be objects with English keys and translated values.
 
 Learn more about [languages in Video.js](languages.md).
 
@@ -269,6 +273,41 @@ Although, since the `plugins` option is an object, the order of initialization i
 > Type: `Boolean`
 
 Tells Video.js to prefer the order of [`sources`](#sources) over [`techOrder`](#techOrder) in selecting a source and playback tech.
+
+Given the following example:
+
+```js
+videojs('my-player', {
+  sourceOrder: true,
+  sources: [{
+    src: '//path/to/video.flv',
+    type: 'video/x-flv'
+  }, {
+    src: '//path/to/video.mp4',
+    type: 'video/mp4'
+  }, {
+    src: '//path/to/video.webm',
+    type: 'video/webm'
+  }],
+  techOrder: ['html5', 'flash']
+});
+```
+
+Normally, the fact that HTML5 comes before Flash in the `techOrder` would mean Video.js would look for a compatible _source_ for HTML5 and would pick either the MP4 or WebM video (depending on browser support) only falling back to Flash if no compatible source for HTML5 was found.
+
+However, because the `sourceOrder` is `true`, Video.js flips that process around. It will look for a compatible _tech_ for each source in order. Presumably, it would first find a match between the FLV (since it's first in the source order) and the Flash tech.
+
+In summary, the default algorithm is:
+
+- for each tech:
+  - for each source:
+    - if tech can play source, use this tech/source combo
+
+With `sourceOrder: true`, the algorithm becomes:
+
+- for each source:
+  - for each tech:
+    - if tech can play source, use this tech/source combo
 
 #### `sources`
 
@@ -347,6 +386,7 @@ videojs.options.flash.swf = '//path/to/videojs.swf'
 ```
 
 [boolean-attrs]: https://www.w3.org/TR/2011/WD-html5-20110525/common-microsyntaxes.html#boolean-attributes
+[ios-10-updates]: https://webkit.org/blog/6784/new-video-policies-for-ios/
 [json]: http://json.org/example.html
 [lang-codes]: http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
 [video-attrs]: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video#Attributes

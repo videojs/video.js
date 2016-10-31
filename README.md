@@ -70,7 +70,7 @@ Video.js is a free and open source library, and we appreciate any help you're wi
 
 _Video.js uses [BrowserStack][browserstack] for compatibility testing._
 
-## License
+## [License][license]
 
 Video.js is [licensed][license] under the Apache License, Version 2.0.
 

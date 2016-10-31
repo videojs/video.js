@@ -1,6 +1,6 @@
 # [Video.js][vjs] Documentation
 
-There are two categories of docs: [Guides][guides] and [API docs][api].
+There are two categories of docs: [Guides][guides] and [API docs][guides-api].
 
 Guides explain general topics and use cases (e.g. setup). API docs are automatically generated from the codebase and give specific details about functions, properties, and events.
 

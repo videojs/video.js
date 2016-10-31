@@ -15,6 +15,8 @@
 
 Video.js is officially available via CDN, npm, and Bower.
 
+Video.js works out of the box with not only HTML `<script>` and `<link>` tags, but also all major bundlers/packagers/builders, such as Browserify, Node, WebPack, etc.
+
 Please refer to the [Getting Started][getting-started] document for details.
 
 ## Decorating a `<video>` Element
