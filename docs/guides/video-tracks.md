@@ -1,70 +1,83 @@
 # Video Tracks
+Video tracks are a feature of HTML5 video for providing alternate video tracks to the user, so they can change type of video they want to watch. Video.js offers a cross-browser implementation of video tracks.
 
-Video Tracks are a function of HTML5 video for providing a selection of alternative video tracks to the user, so that they can change type of video they want to watch. Video.js makes video tracks work across all browsers. There are currently six types of tracks:
+## Caveats
+- It is not possible to add video tracks through HTML. They must be added [programmatically](#api).
+- Literal switching of video tracks for playback is not handled by Video.js and must be handled by something else. Video.js only stores the track representation.
 
-- **Alternative**: an alternative video representation of the main video track
-- **Captions**: The main video track with burned in captions
-- **Main**: the main video track
-- **Sign**: the main video track with added sign language overlay
-- **Subtitles**: the main video track with burned in subtitles
-- **Commentary**: the main video track with burned in commentary
-
-## Missing Funtionality
-- It is currently impossible to add VideoTracks in a non-programtic way
-- Literal switching of VideoTracks for playback is not handled by video.js and must be handled by something else. video.js only stores the track representation
-- There is currently no UI implementation of VideoTracks
-
-## Adding to Video.js
-
-> Right now adding video tracks in the HTML is unsupported. Video Tracks must be added programatically.
-
-You must add video tracks [programatically](#api) for the time being.
-
-## Attributes
-Video Track propertites and settings
-
-### kind
-One of the five track types listed above. Kind defaults to empty string if no kind is included, or an invalid kind is used.
-
-### label
-The label for the track that will be show to the user, for example in a menu that list the different languages available for video tracks.
-
-### language
-The two-letter code (valid BCP 47 language tag) for the language of the video track, for example "en" for English. A list of language codes is [available here](languages.md#language-codes).
-
-### selected
-If this track should be playing or not. Trying to select more than one track will cause other tracks to be deselected.
-
-## Interacting with Video Tracks
-### Doing something when a track becomes enabled
-When a new track is enabled (other than the main track) an event is fired on the `VideoTrackList` called `change` you can listen to that event and do something with it.
-Here's an example:
+## Working with Video Tracks
+### Add a Video Track to the Player
 ```js
-// get the current players VideoTrackList object
-let tracks = player.videoTracks();
+// Create a player.
+var player = videojs('my-player');
 
-// listen to the change event
+// Create a track object.
+var track = new videojs.VideoTrack({
+  kind: 'commentary',
+  label: 'Director\'s Commentary',
+  language: 'en'
+});
+
+// Add the track to the player's video track list.
+player.videoTracks().addTrack(track);
+```
+
+### Listen for a Track Becoming Enabled
+When a new track is enabled (other than the main track) an event is fired on the `VideoTrackList` called `"change"`. You can listen for that event and do something with it.
+
+```js
+// Get the current player's VideoTrackList object.
+var tracks = player.videoTracks();
+
+// Listen to the "change" event.
 tracks.addEventListener('change', function() {
-  // get the currently selected track
-  let index = tracks.selectedIndex;
-  let track = tracks[index];
 
-  // print the currently selected track
-  console.log(track.label);
+  // Log the currently enabled VideoTrack label.
+  for (var i = 0; i < tracks.length; i++) {
+    var track = tracks[i];
+
+    if (track.enabled) {
+      videojs.log(track.label);
+      return;
+    }
+  }
 });
 ```
 
 ## API
+### `videojs.VideoTrack`
+This class can be used to create new video track objects. Each property below is available as an option to the `VideoTrack` constructor.
 
-### `player.videoTracks() -> VideoTrackList`
-This is the main interface into the video tracks of the player.
-It returns an VideoTrackList which is an array like object that contains all the `VideoTrack` on the player.
+## Attributes
+Video Track propertites and settings
 
-### `player.videoTracks().addTrack(VideoTrack)`
-Add an existing VideoTrack to the players internal list of VideoTracks.
+### `kind`
+One of the track types supported by Video.js:
 
-### `player.videoTracks().removeTrack(VideoTrack)`
-Remove a track from the VideoTrackList currently on the player. if no track exists this will do nothing.
+- `"alternative"`: A possible alternative to the main track.
+- `"captions"`: The main video track with burned in captions
+- `"main"`: The main video track.
+- `"sign"`: The main video track with added sign language overlay.
+- `"subtitles"`: The main video track with burned in subtitles.
+- `"commentary"`: The main video track with burned in commentary.
 
-### `player.videoTracks().selectedIndex`
-The current index for the selected track
+Defaults to empty string if `kind` is missing or an invalid `kind` is used.
+
+### `label`
+The label for the track that will be shown to the user. For example, in a menu that lists the different captions available as alternate video tracks.
+
+### `language`
+The valid BCP 47 code for the language of the video track, e.g. `"en"` for English or `"es"` for Spanish. For supported language translations, please see the [Languages Folder (/lang)](https://github.com/videojs/video.js/tree/master/lang) folder located in the Video.js root.
+
+### `selected`
+Whether or not this track should be playing. Only one video track may be selected at a time.
+
+### Player Methods
+#### `player.videoTracks()`
+This is the main interface into the video tracks of the player. It returns a `VideoTrackList`, which is an array-like object that contains all the `VideoTrack`s associated with the player.
+
+#### `player.videoTracks().addTrack(VideoTrack)`
+Add an `VideoTrack` object to the player's `VideoTrackList`.
+
+#### `player.videoTracks().removeTrack(VideoTrack)`
+Remove an `VideoTrack` from the player's `VideoTrackList`. If the track is not in the `VideoTrackList`, it is simply ignored.
