@@ -176,6 +176,10 @@ player.on('ready', function() {
 
 In each case, the callback is called asynchronously - _even if the player is already ready!_
 
+## Advanced Player Workflows
+
+For a discussion of more advanced player workflows, see the [player workflows guide](player-workflows.md).
+
 
 [boolean-attrs]: https://www.w3.org/TR/2011/WD-html5-20110525/common-microsyntaxes.html#boolean-attributes
 [getting-started]: http://videojs.com/getting-started/

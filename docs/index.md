@@ -10,7 +10,7 @@ Guides explain general topics and use cases (e.g. setup). API docs are automatic
 
 #### [Setup][guides-setup]
 
-The setup guide covers all methods of setting up Video.js players.
+The setup guide covers all methods of setting up Video.js players. After mastering the basics, see the [player workflows guide][guides-workflow].
 
 #### [Options][guides-options]
 
@@ -60,4 +60,5 @@ You can refer to the [full list of API docs][api], but the most relevant API doc
 [guides-text-tracks]: ./guides/text-tracks.md
 [guides-tracks]: ./guides/tracks.md
 [guides-video-tracks]: ./guides/video-tracks.md
+[guides-workflow]: ./guides/player-workflows.md
 [vjs]: http://videojs.com
