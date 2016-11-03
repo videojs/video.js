@@ -675,10 +675,13 @@ class Player extends Component {
 
     if (source) {
       this.currentType_ = source.type;
+
       if (source.src === this.cache_.src && this.cache_.currentTime > 0) {
         techOptions.startTime = this.cache_.currentTime;
       }
 
+      this.cache_.sources = null;
+      this.cache_.source = source;
       this.cache_.src = source.src;
     }
 
@@ -1866,7 +1869,10 @@ class Player extends Component {
         // the tech loop to check for a compatible technology
         this.sourceList_([source]);
       } else {
+        this.cache_.sources = null;
+        this.cache_.source = source;
         this.cache_.src = source.src;
+
         this.currentType_ = source.type || '';
 
         // wait until the tech is ready to set the source
@@ -1915,6 +1921,8 @@ class Player extends Component {
         // load this technology with the chosen source
         this.loadTech_(sourceTech.tech, sourceTech.source);
       }
+
+      this.cache_.sources = sources;
     } else {
       // We need to wrap this in a timeout to give folks a chance to add error event handlers
       this.setTimeout(function() {
@@ -1947,6 +1955,41 @@ class Player extends Component {
     this.loadTech_(toTitleCase(this.options_.techOrder[0]), null);
     this.techCall_('reset');
     return this;
+  }
+
+  /**
+   * Returns the current source objects.
+   *
+   * @return {Object[]} The current source objects
+   * @method currentSources
+   */
+  currentSources() {
+    const source = this.currentSource();
+    const sources = [];
+
+    // assume `{}` or `{ src }`
+    if (Object.keys(source).length !== 0) {
+      sources.push(source);
+    }
+
+    return this.cache_.sources || sources;
+  }
+
+  /**
+   * Returns the current source object.
+   *
+   * @return {Object} The current source object
+   * @method currentSource
+   */
+  currentSource() {
+    const source = {};
+    const src = this.currentSrc();
+
+    if (src) {
+      source.src = src;
+    }
+
+    return this.cache_.source || source;
   }
 
   /**
