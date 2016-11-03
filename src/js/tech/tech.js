@@ -696,7 +696,7 @@ Tech.withSourceHandlers = function(_Tech) {
    * The source handler pattern is used for adaptive formats (HLS, DASH) that
    * manually load video data and feed it into a Source Buffer (Media Source Extensions)
    * @param  {Function} handler  The source handler
-   * @param  {Boolean}  first    Register it before any existing handlers
+   * @param  {Number}   index    The index to register the handler among existing handlers
    */
   _Tech.registerSourceHandler = function(handler, index) {
     let handlers = _Tech.sourceHandlers;
