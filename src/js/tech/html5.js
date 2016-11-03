@@ -428,7 +428,30 @@ class Html5 extends Tech {
    * @return {Number}
    */
   duration() {
-    return this.el_.duration || 0;
+    // Android Chrome will report duration as Infinity for VOD HLS until after
+    // playback has started, which triggers the live display erroneously.
+    // Return NaN if playback has not started and trigger a durationupdate once
+    // the duration can be reliably known.
+    if (this.el_.duration === Infinity &&
+      browser.IS_ANDROID && browser.IS_CHROME) {
+      if (this.el_.currentTime === 0) {
+        // Wait for the first `timeupdate` with currentTime > 0 - there may be
+        // several with 0
+        const checkProgress = () => {
+          if (this.el_.currentTime > 0) {
+            // Trigger durationchange for genuinely live video
+            if (this.el_.duration === Infinity) {
+              this.trigger('durationchange');
+            }
+            this.off(this.player_, 'timeupdate', checkProgress);
+          }
+        };
+
+        this.on(this.player_, 'timeupdate', checkProgress);
+        return NaN;
+      }
+    }
+    return this.el_.duration || NaN;
   }
 
   /**

@@ -562,3 +562,22 @@ QUnit.test('Exception in play promise should be caught', function() {
 
   tech.el_ = oldEl;
 });
+
+test('When Android Chrome reports Infinity duration with currentTime 0, return NaN', function() {
+  const oldIsAndroid = browser.IS_ANDROID;
+  const oldIsChrome = browser.IS_CHROME;
+  const oldEl = tech.el_;
+
+  browser.IS_ANDROID = true;
+  browser.IS_CHROME = true;
+
+  tech.el_ = {
+    duration: Infinity,
+    currentTime: 0
+  };
+  ok(Number.isNaN(tech.duration()), 'returned NaN with currentTime 0');
+
+  browser.IS_ANDROID = oldIsAndroid;
+  browser.IS_CHROME = oldIsChrome;
+  tech.el_ = oldEl;
+});
