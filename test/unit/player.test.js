@@ -323,8 +323,10 @@ QUnit.test('should set the width, height, and aspect ratio via a css class', fun
 
 QUnit.test('should default to 16:9 when fluid', function(assert) {
   const player = TestHelpers.makePlayer({fluid: true});
+  const ratio = player.currentHeight() / player.currentWidth();
 
-  assert.equal(player.currentHeight() / player.currentWidth(), 0.5625, 'fluid player without dimensions defaults to 16:9');
+  // IE8 rounds 0.5625 up to 0.563
+  assert.ok(((ratio >= 0.562) && (ratio <= 0.563)), 'fluid player without dimensions defaults to 16:9');
 });
 
 QUnit.test('should set fluid to true if element has vjs-fluid class', function(assert) {
