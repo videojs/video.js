@@ -191,6 +191,22 @@ QUnit.test('should set the width, height, and aspect ratio via a css class', fun
   player.dispose();
 });
 
+QUnit.test('should default to 16:9 when fluid', function(assert) {
+  const player = TestHelpers.makePlayer({fluid: true});
+
+  assert.equal(player.currentHeight() / player.currentWidth(), 0.5625, 'fluid player without dimensions defaults to 16:9');
+});
+
+QUnit.test('should set fluid to true if element has vjs-fluid class', function(assert) {
+  const tag = TestHelpers.makeTag();
+
+  tag.className += ' vjs-fluid';
+
+  const player = TestHelpers.makePlayer({}, tag);
+
+  assert.ok(player.fluid(), 'fluid is true with vjs-fluid class');
+});
+
 QUnit.test('should use an class name that begins with an alpha character', function(assert) {
   const alphaPlayer = TestHelpers.makePlayer({ id: 'alpha1' });
   const numericPlayer = TestHelpers.makePlayer({ id: '1numeric' });

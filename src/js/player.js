@@ -496,7 +496,7 @@ class Player extends Component {
   }
 
   /**
-   * Add/remove the vjs-fluid class
+   * Get/set fluid mode
    *
    * @param {Boolean} bool Value of true adds the class, value of false removes the class
    */
@@ -512,6 +512,8 @@ class Player extends Component {
     } else {
       this.removeClass('vjs-fluid');
     }
+
+    this.updateStyleEl_();
   }
 
   /**
@@ -568,7 +570,7 @@ class Player extends Component {
     if (this.aspectRatio_ !== undefined && this.aspectRatio_ !== 'auto') {
       // Use any aspectRatio that's been specifically set
       aspectRatio = this.aspectRatio_;
-    } else if (this.videoWidth()) {
+    } else if (this.videoWidth() > 0) {
       // Otherwise try to get the aspect ratio from the video metadata
       aspectRatio = this.videoWidth() + ':' + this.videoHeight();
     } else {
@@ -2622,6 +2624,10 @@ class Player extends Component {
 
     const tagOptions = Dom.getElAttributes(tag);
     const dataSetup = tagOptions['data-setup'];
+
+    if (Dom.hasElClass(tag, 'vjs-fluid')) {
+      tagOptions.fluid = true;
+    }
 
     // Check if data-setup attr exists.
     if (dataSetup !== null) {
