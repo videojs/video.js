@@ -84,6 +84,28 @@ class Button extends ClickableComponent {
   }
 
   /**
+   * Enable the button element
+   *
+   * @return {Component}
+   * @method enable
+   */
+  enable() {
+    super.enable();
+    this.el_.removeAttribute('disabled');
+  }
+
+  /**
+   * Disable the button element
+   *
+   * @return {Component}
+   * @method disable
+   */
+  disable() {
+    super.disable();
+    this.el_.setAttribute('disabled', 'disabled');
+  }
+
+  /**
    * Handle KeyPress (document level) - Extend with specific functionality for button
    *
    * @method handleKeyPress
