@@ -1148,15 +1148,14 @@ class Component {
       const computedStyle = window.getComputedStyle(this.el_);
 
       computedWidthOrHeight = computedStyle.getPropertyValue(widthOrHeight) || computedStyle[widthOrHeight];
-    } else if (this.el_.currentStyle) {
-      computedWidthOrHeight = this.el_.currentStyle[widthOrHeight];
     }
 
     // remove 'px' from variable and parse as integer
     computedWidthOrHeight = parseFloat(computedWidthOrHeight);
 
     // if the computed value is still 0, it's possible that the browser is lying
-    // and we want to check the offset values
+    // and we want to check the offset values.
+    // This code also runs on IE8 and whereever getComputedStyle doesn't exist.
     if (computedWidthOrHeight === 0) {
       const rule = `offset${toTitleCase(widthOrHeight)}`;
 
