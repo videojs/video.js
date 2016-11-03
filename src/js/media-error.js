@@ -120,6 +120,7 @@ for (let errNum = 0; errNum < MediaError.errorTypes.length; errNum++) {
 }
 
 // jsdocs for instance/static members added above
+// instance methods use `#` and static methods use `.`
 /**
  * W3C error code for any custom error.
  *
