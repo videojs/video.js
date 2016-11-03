@@ -306,6 +306,12 @@ class Component {
    * @method getChild
    */
   getChild(name) {
+    if (!name) {
+      return;
+    }
+
+    name = toTitleCase(name);
+
     return this.childNameIndex_[name];
   }
 
@@ -341,9 +347,9 @@ class Component {
     let component;
     let componentName;
 
-    // If child is a string, create nt with options
+    // If child is a string, create component with options
     if (typeof child === 'string') {
-      componentName = child;
+      componentName = toTitleCase(child);
 
       // Options can also be specified as a boolean, so convert to an empty object if false.
       if (!options) {
@@ -356,9 +362,7 @@ class Component {
         options = {};
       }
 
-      // If no componentClass in options, assume componentClass is the name lowercased
-      // (e.g. playButton)
-      const componentClassName = options.componentClass || toTitleCase(componentName);
+      const componentClassName = options.componentClass || componentName;
 
       // Set name through options
       options.name = componentName;
@@ -1386,11 +1390,18 @@ class Component {
    * @method registerComponent
    */
   static registerComponent(name, comp) {
+    if (!name) {
+      return;
+    }
+
+    name = toTitleCase(name);
+
     if (!Component.components_) {
       Component.components_ = {};
     }
 
     Component.components_[name] = comp;
+
     return comp;
   }
 
@@ -1403,12 +1414,19 @@ class Component {
    * @method getComponent
    */
   static getComponent(name) {
+    if (!name) {
+      return;
+    }
+
+    name = toTitleCase(name);
+
     if (Component.components_ && Component.components_[name]) {
       return Component.components_[name];
     }
 
     if (window && window.videojs && window.videojs[name]) {
       log.warn(`The ${name} component was added to the videojs object when it should be registered using videojs.registerComponent(name, component)`);
+
       return window.videojs[name];
     }
   }
