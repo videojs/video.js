@@ -60,6 +60,8 @@ if (typeof HTMLVideoElement === 'undefined' &&
 function videojs(id, options, ready) {
   let tag;
 
+  options = options || {};
+
   // Allow for element or ID to be passed in
   // String ID
   if (typeof id === 'string') {
@@ -99,9 +101,80 @@ function videojs(id, options, ready) {
   }
 
   // Element may have a player attr referring to an already created player instance.
-  // If not, set up a new player and return the instance.
-  return tag.player || Player.players[tag.playerId] || new Player(tag, options, ready);
+  // If so return that otherwise set up a new player below
+  if (tag.player || Player.players[tag.playerId]) {
+    return tag.player || Player.players[tag.playerId];
+  }
+
+  videojs.hooks('beforesetup').forEach(function(hookFunction) {
+    const opts = hookFunction(tag, videojs.mergeOptions({}, options));
+
+    if (!opts || typeof opts !== 'object' || Array.isArray(opts)) {
+      videojs.log.error('please return an object in beforesetup hooks');
+      return;
+    }
+
+    options = videojs.mergeOptions(options, opts);
+  });
+
+  // If not, set up a new player
+  const player = new Player(tag, options, ready);
+
+  videojs.hooks('setup').forEach((hookFunction) => hookFunction(player));
+
+  return player;
 }
+
+/**
+ * An Object that contains lifecycle hooks as keys which point to an array
+ * of functions that are run when a lifecycle is triggered
+ */
+videojs.hooks_ = {};
+
+/**
+ * Get a list of hooks for a specific lifecycle
+ *
+ * @param {String} type the lifecyle to get hooks from
+ * @param {Function=} optionally add a hook to the lifecycle that your are getting
+ * @return {Array} an array of hooks, or an empty array if there are none
+ */
+videojs.hooks = function(type, fn) {
+  videojs.hooks_[type] = videojs.hooks_[type] || [];
+  if (fn) {
+    videojs.hooks_[type] = videojs.hooks_[type].concat(fn);
+  }
+  return videojs.hooks_[type];
+};
+
+/**
+ * Add a function hook to a specific videojs lifecycle
+ *
+ * @param {String} type the lifecycle to hook the function to
+ * @param {Function|Array} fn the function to attach
+ */
+videojs.hook = function(type, fn) {
+  videojs.hooks(type, fn);
+};
+
+/**
+ * Remove a hook from a specific videojs lifecycle
+ *
+ * @param {String} type the lifecycle that the function hooked to
+ * @param {Function} fn the hooked function to remove
+ * @return {Boolean} the function that was removed or undef
+ */
+videojs.removeHook = function(type, fn) {
+  const index = videojs.hooks(type).indexOf(fn);
+
+  if (index <= -1) {
+    return false;
+  }
+
+  videojs.hooks_[type] = videojs.hooks_[type].slice();
+  videojs.hooks_[type].splice(index, 1);
+
+  return true;
+};
 
 // Add default styles
 if (window.VIDEOJS_NO_DYNAMIC_STYLE !== true) {
