@@ -1,121 +1,125 @@
-CONTRIBUTING
-============
+# CONTRIBUTING
+
 So you want to help out? Great! There's a number of ways you can get involved.
 
-  * [File and discuss issues](#filing-issues)
-  * [Contribute code](#contributing-code)
-  * [Build and share plugins](docs/guides/plugins.md)
-  * [Answer questions on Stack Overflow](http://stackoverflow.com/questions/tagged/video.js)
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Other repositories where issues could be filed](#other-repositories-where-issues-could-be-filed)
+- [Filing issues](#filing-issues)
+  - [Reporting a Bug](#reporting-a-bug)
+  - [Requesting a Feature](#requesting-a-feature)
+- [Contributing code](#contributing-code)
+  - [Building video.js locally](#building-videojs-locally)
+    - [Forking and cloning the repository](#forking-and-cloning-the-repository)
+    - [Installing local dependencies](#installing-local-dependencies)
+    - [Running tests](#running-tests)
+    - [Building videojs](#building-videojs)
+    - [Testing Locally](#testing-locally)
+    - [Sandbox test directory](#sandbox-test-directory)
+    - [Running a local web server](#running-a-local-web-server)
+    - [Watching source and test changes](#watching-source-and-test-changes)
+  - [Making Changes](#making-changes)
+    - [Step 1: Verify](#step-1-verify)
+    - [Step 2: Update remote](#step-2-update-remote)
+    - [Step 3: Branch](#step-3-branch)
+    - [Step 4: Commit](#step-4-commit)
+    - [Step 5: Test](#step-5-test)
+    - [Step 6: Push](#step-6-push)
+  - [Code Style Guide](#code-style-guide)
+- [Developer's Certificate of Origin 1.1](#developers-certificate-of-origin-11)
+- [Doc Credit](#doc-credit)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## Other repositories where issues could be filed
 
 There's also other Video.js projects where you can help. (check the [video.js org](https://github.com/videojs) for an up-to-date list of projects)
 
   * [Videojs.com](https://github.com/videojs/videojs.com)
-  * [Video.js flash player](https://github.com/videojs/video-js-swf)
-  * [Player skin designer](https://github.com/videojs/designer)
-  * [Contribflow](https://github.com/zencoder/contribflow)
+  * [Video.js flash player](https://github.com/videojs/videojs-flash)
+  * [HLS](https://github.com/videojs/videojs-contrib-hls)
+  * [DASH](https://github.com/videojs/videojs-contrib-dash)
+  * [Youtube Tech](https://github.com/videojs/videojs-youtube)
+  * [Vimeo Tech](https://github.com/videojs/videojs-vimeo)
+  * [Ads](https://github.com/videojs/videojs-contrib-ads)
+  * [Plugin generator](https://github.com/videojs/generator-videojs-plugin)
+  * [Linter][linter]
 
-Filing issues
--------------
+## Filing issues
+
 [GitHub Issues](https://github.com/videojs/video.js/issues) are used for all discussions around the codebase, including **bugs**, **features**, and other **enhancements**.
 
+When filling out an issue, make sure to fill out the questions in the 
 ### Reporting a Bug
 
 **A bug is a demonstrable problem** that is caused by the code in the repository. Good bug reports are extremely helpful. Thank You!
 
 Guidelines for bug reports:
 
+1. If your issue is with a particular video.js plugin or subproject, please open an issue against that project. See [list of some potential other projects above](#other-repositories-where-issues-could-be-filed)
+
 1. Use the [GitHub issue search](https://github.com/videojs/video.js/issues) &mdash; check if the issue has already been reported.
 
-2. Check if the issue has already been fixed &mdash; try to reproduce it using the latest `master` branch in the repository.
+1. Check if the issue has already been fixed &mdash; try to reproduce it using the latest `master` branch in the repository.
 
-3. Isolate the problem &mdash; **create a [reduced test case](https://css-tricks.com/reduced-test-cases/)** with a live example. You can possibly use [this JSBin example](http://jsbin.com/axedog/7/edit) as a starting point.
+1. Isolate the problem &mdash; **create a [reduced test case](https://css-tricks.com/reduced-test-cases/)** with a live example. You can possibly use [this JSBin example](http://jsbin.com/axedog/edit) as a starting point -- don't forget to update it to the videojs version you use.
+
+1. Answer all questions in the [issue template][]. The questions in the issue template are designed to try and provide the maintainers with as much information possible to minimize back-and-forth to get the issue resolved.
+
 
 A good bug report should be as detailed as possible, so that others won't have to follow up for the essential details.
-
-Here's an example:
-
-> Short yet concise Bug Summary
->
-> Description:
-> Happens on Windows 7 and OSX. Seen with IE9, Firefox 19 OSX, Chrome 21, Flash 11.6 and 11.2
->
-> 1. This is the first step
-> 2. This is the second step
-> 3. Further steps, etc.
->
-> Expected:
-> (describe the expected outcome of the steps above)
->
-> Actual:
-> (describe what actually happens)
->
-> `<url>` (a link to the reduced test case, if it exists)
->
-> Any other information you want to share that is relevant to the issue being
-> reported. This might include the lines of code that you have identified as
-> causing the bug, and potential solutions (and your opinions on their
-> merits).
 
 **[File a bug report](https://github.com/videojs/video.js/issues/new)**
 
 ### Requesting a Feature
 
-1. [Check the plugin list](https://github.com/videojs/video.js/wiki/Plugins) for any plugins that may already support the feature.
+1. [Check the plugin list](http://videojs.com/plugins/) for any plugins that may already support the feature.
 
 2. [Search the issues](https://github.com/videojs/video.js/issues) for any previous requests for the same feature, and give a thumbs up or +1 on existing requests.
 
 2. If no previous requests exist, create a new issue. Please be as clear as possible about why the feautre is needed and the intended use case.
 
+3. Once again, be as details as possible and follow the [issue template][]
+
 **[Request a feature](https://github.com/videojs/video.js/issues/new)**
 
-Contributing code
------------------
+## Contributing code
 
 To contibute code you'll need to be able to build a copy of Video.js and run tests locally. There are a few requirements before getting started.
 
-- Node.js -- Video.js uses Node for build and test automation. Node is available for Windows, Mac OS X, Linux, and SunOS, as well as source code if that doesn't scare you. [Download and install Node.js](http://nodejs.org/download/)
+- Node.js
+Video.js uses Node for build and test automation. Node is available for Windows, Mac OS X, Linux, and SunOS, as well as source code if that doesn't scare you. [Download and install Node.js](http://nodejs.org/download/)
 
-- grunt-cli -- Install grunt-cli globally so that you will have the correct version of grunt available for any project that needs it.
-
-  On Unix-based systems, you'll have to do this as a superuser:
-
-```bash
-sudo npm install -g grunt-cli
-```
-  On Windows, you can just run:
-
-```bash
-npm install -g grunt-cli
+- `grunt-cli`
+Optionally, install `grunt-cli` globally to use grunt directly. It can always be run via an npm script:
+```sh
+$ npm run grunt
 ```
 
-- Contribflow -- A homegrown git workflow tool for managing feature/hotfix branches and submitting pull requests. If you have your own preferred git workflow, contribflow isn't required, but the following instructions will assume you're using it.
-
-  On Unix-based systems, you'll have to do this as a superuser:
-
-```bash
-sudo npm install -g contribflow
+```sh
+$ npm install -g grunt-cli
 ```
 
-  On Windows, you can just run:
+Depending on how you have node and npm set up, you may need to run the global install (`-g`) as a superuser by prepending `sudo`.
 
-```bash
-npm install -g contribflow
-```
+### Building video.js locally
 
-### Building your own copy of Video.js
+#### Forking and cloning the repository
 
-First, [fork](http://help.github.com/fork-a-repo/) the video.js git repository. At the top of every github page, there is a Fork button. Click it, and the forking process will copy Video.js into your own GitHub account.
+First, [fork](http://help.github.com/fork-a-repo/) the video.js git repository. At the top of every GitHub page, there is a Fork button. Click it, and the forking process will copy Video.js into your own GitHub account.
 
 Clone your fork of the repo into your code directory
 
-```bash
-git clone https://github.com/<your-username>/video.js.git
+```sh
+$ git clone https://github.com/<your-username>/video.js.git
 ```
 
 Navigate to the newly cloned directory
 
-```bash
-cd video.js
+```sh
+$ cd video.js
 ```
 
 Assign the original repo to a remote called "upstream"
@@ -124,152 +128,200 @@ Assign the original repo to a remote called "upstream"
 git remote add upstream https://github.com/videojs/video.js.git
 ```
 
->In the future, if you want to pull in updates to video.js that happened after you cloned the main repo, you can run:
+> In the future, if you want to pull in updates to video.js that happened after you cloned the main repo, you can run:
 >
-> ```bash
-> git checkout master
-> git pull upstream master
+> ```sh
+> $ git remote update
+> $ git checkout master
+> $ git pull upstream master
 > ```
+
+#### Installing local dependencies
 
 Install the required node.js modules using node package manager
 
-```bash
-npm install
+```sh
+$ npm install
 ```
 
 > A note to Windows developers: If you run npm commands, and you find that your command prompt colors have suddenly reversed, you can configure npm to set color to false to prevent this from happening.
 > `npm config set color false`
 > Note that this change takes effect when a new command prompt window is opened; the current window will not be affected.
 
-Build a local copy of video.js and run tests
+#### Running tests
 
-```bash
-grunt dist
-grunt test
+To run the tests all you need to do is run
+
+```sh
+$ npm test
 ```
 
-Video.js is also configured to run tests with Karma. Karma is installed as a grunt plugin to run QUnit tests in real browsers, as opposed to simply running the tests in phantomjs, a headless browser. To run the tests with Karma:
+This will build video.js locally and run the tests using [Karma](https://karma-runner.github.io/1.0/index.html) which runs our tests in actual browsers.
 
-```bash
-grunt karma:dev
+#### Building videojs
+
+To build video.js, simply run
+
+```sh
+$ npm run build
 ```
 
-At this point you should have a built copy of video.js in a directory named `dist`, and all tests should be passing.
+This outputs an `es5/` and `dist/` folder. The `es5/` folder is used by bundling tools like browserify and webpack to package video.js into projects. The `dist/` folder has pre-compiled versions of video.js, including a minified version and the CSS file. This file can be included in page via a `<script></script>` tag.
+
+
+#### Testing Locally
+
+Besides running automated tests, you often want to run video.js manually and play around with things as you're developing. A few things are provided to make it easier.
+
+#### Sandbox test directory
+
+There's a sandbox directory where you can add any file and it won't get tracked in git. To start you can copy the example index file.
+
+```sh
+$ cp sandbox/index.html.example sandbox/index.html
+```
+
+See [the following section](#running-a-local-web-server) for how to open the page in a browser.
+
+#### Running a local web server
+
+This ties in nicely with the sandbox directory. You can always open the `sandbox/index.html` file directly but in some cases it may not work properly.
+
+> Flash files (`.swf`) that are local and loaded into a locally accessed page (file:///) will NOT run.
+> To get around this you must use a local web server.
+
+To run the local webserver, you can run it in a couple of ways.
+
+```sh
+$ grunt connect
+$ open http://localhost:9999/sandbox/index.html
+```
+or
+```sh
+$ npm start
+```
+The latter does some extra work which will be described in the [next section]
+
+#### Watching source and test changes
+
+As you're developing, you want the build to re-run and update itself, and potentially re-run the tests. In addition, you want to launch a local web-server that you can open the `sandbox` directory in.
+To do so, you just need to run
+```sh
+$ npm start
+```
+This sets up the local webserver using connect and then watches source files, test files, and CSS files for you and rebuilds things as they happen.
 
 ### Making Changes
 
+#### Step 1: Verify
+
 Whether you're adding something new, making something better, or fixing a bug, you'll first want to search the [GitHub issues](https://github.com/videojs/video.js/issues) and [plugins list](https://github.com/videojs/video.js/wiki/Plugins) to make sure you're aware of any previous discussion or work. If an unclaimed issue exists, claim it via a comment. If no issue exists for your change, submit one, follwing the [issue filing guidelines](#filing-issues).
 
-There are two categories of changes in video.js land, features and hotfixes (Video.js follows a branching model similar to [gitflow](http://nvie.com/posts/a-successful-git-branching-model/)). Hotfixes are for urgent fixes that need to be released immediately as a patch. Features are for everything else (including non-urgent fixes). If you think you have a hotfix scenario, verify that (via comment) before starting the work. We'll focus on features here, but you can swap `hotfix` for `feature` in any command.
+#### Step 2: Update remote
 
-Start a new development branch
+Before starting work, you want to update your local repository to have all the latest changes.
 
-```bash
-contrib feature start
+```sh
+$ git remote update
+$ git checkout master
+$ git rebase upstream/master
 ```
 
-You'll be prompted to name the branch.  After that, contrib will create the branch locally, and use git to push it up to your origin, and track it.  You're now ready to start building your feature or fixing that bug! Be sure to read the [Code Style Guide](#code-style-guide).
+#### Step 3: Branch
 
-While you're developing, you can ensure your changes are working by writing tests (in the `test` directory) and running `grunt test`.
+You want to do your work in a separate branch.
 
-There's also a sandbox directory where you can add any file and it won't get tracked as a change. To start you can copy the example index file and see a working version of a player (using the local source code) by loading it in a browser.
-
-```bash
-cp sandbox/index.html.example sandbox/index.html
-open sandbox/index.html
+```sh
+$ git checkout -b my-branch
 ```
 
+#### Step 4: Commit
+Commit changes as you go. Write thorough descriptions of your changes in your commit messages.
+For more information see our [conventional changelog guidelines for video.js](https://github.com/videojs/conventional-changelog-videojs/blob/master/convention.md)
+Follow these guidelines:
 
-### Testing Locally
-A simple Connect server is available via the Grunt plugin. The commands below will allow you to setup a test sandbox and begin development.
+1. The first line should be less than 50 characters and contain a short description of the commit.
+1. The body should contain a more detailed description. It can contain things like reasoning for the change and specifics of what changed.
+1. A footer can be added if this fixes a particular issue on GitHub.
 
-```bash
-cp sandbox/index.html.example sandbox/index.html
-grunt connect
-open http://localhost:9999/sandbox/index.html
+```sh
+$ git add src/js/player.js
+$ git commit
 ```
 
-> NOTES regarding local testing in Chrome 21+ (as of 2013/01/01)
-> Flash files that are local and loaded into a locally accessed page (file:///) will NOT run.
-> To get around this you can do either of the following:
+An example commit message:
+
+```
+fix: one line commit explanation
+
+In the body of the commit message, we can talk about why we made the change. What the change entails.
+
+Any testing considerations or things to think about when looking at the commit.
+
+Fixes #123. The footer can contain Fixes messages.
+```
+
+> Make sure that git knows your name and email:
 >
-> 1. Do your development and testing using a local HTTP server. See Grunt commands above.
->
-> 2. [Disable the version of Flash included with Chrome](http://helpx.adobe.com/flash-player/kb/flash-player-google-chrome.html#How_can_I_run_debugger_or_alternate_versions_of_Flash_Player_in_Google_Chrome) and enable a system-wide version of Flash instead.
-
-Commit and push changes as you go (using git directly). Write thorough descriptions of your changes in your commit messages.
-
-```bash
-git add .
-git commit -av
-git push
-```
-
-> GitHub allows you to close an issue through your commit message using the [fixes](https://github.com/blog/831-issues-2-0-the-next-generation) keyword.
->
-> ```bash
-> My commit message. fixes #123
-> Testing: (briefly describe any testing here, for example, 'unit tests and cross-browser manual tests around playback and network interruption')
+> ```sh
+> $ git config --global user.name "Random User"
+> $ git config --global user.email "random.user@example.com"
 > ```
 
-### Submitting your changes
+#### Step 5: Test
 
-First, thoroughly test your feature or fix, including writing tests to make sure your change doesn't get regressed in a future update. If you're fixing a bug, we recommend in addition to testing the fix itself, to do some testing around the areas that your fix has touched. For example, a brief smoketest of the player never hurts.
+Any code change should come with corresponding test changes. Especially bug fixes.
+Tests attached to bug fixes should fail before the change and succeed with it.
 
-Make sure your changes are pushed to origin
-
-```bash
-git push
+```sh
+$ npm test
 ```
 
-Use contrib to submit a pull request (make sure you're in your feature branch)
+#### Step 6: Push
 
-```bash
-contrib feature submit
+```sh
+$ git push origin my-branch
 ```
 
-You'll be prompted for title and description for the Pull Request.  After that, contrib will use Git to submit your pull request to video.js.
+Then go to the [repo page](http://github.com/videojs/video.js) and click the "Pull Request" button and fill out the [pull request template](/.github/PULL_REQUEST_TEMPLATE.md)
 
-You're Done! (except for cleanup.) To clean up your feature or hotfix branch:
+### Code Style Guide
 
-First, checkout your feature or issue branch:
+Our javascript is linted using [videojs-standard][linter].
 
-```bash
-git checkout (branchname)
-```
+## [Developer's Certificate of Origin 1.1](https://github.com/nodejs/node/blob/master/CONTRIBUTING.md#developers-certificate-of-origin-11)
 
-Run this command to clean up your feature:
+By making a contribution to this project, I certify that:
 
-```bash
-contrib feature delete
-```
+* (a) The contribution was created in whole or in part by me and I
+  have the right to submit it under the open source license
+  indicated in the file; or
 
-Run this command to clean up your bug fix:
+* (b) The contribution is based upon previous work that, to the best
+  of my knowledge, is covered under an appropriate open source
+  license and I have the right under that license to submit that
+  work with modifications, whether created in whole or in part
+  by me, under the same open source license (unless I am
+  permitted to submit under a different license), as indicated
+  in the file; or
 
-```bash
-contrib hotfix delete
-```
-> PLEASE NOTE: THIS WILL DELETE YOUR LOCAL AND REMOTE COPIES OF THE FEATURE.
-> This is meant to clean up your local and remote branches, so make sure any changes you don't want to lose have been pulled into the parent project or another branch first.
+* (c) The contribution was provided directly to me by some other
+  person who certified (a), (b) or (c) and I have not modified
+  it.
 
-Code Style Guide
-----------------
-Please follow [Google's JavaScript Style Guide](http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml) to the letter. If your editor supports [.editorconfig](http://editorconfig.org/#download) it will make it easier to manage differences from your own coding style.
+* (d) I understand and agree that this project and the contribution
+  are public and that a record of the contribution (including all
+  personal information I submit with it, including my sign-off) is
+  maintained indefinitely and may be redistributed consistent with
+  this project or the open source license(s) involved.
 
-### Style examples include:
-* Two space indents.
-* Delimit strings with single-quotes `'`, not double-quotes `"`.
-* No trailing whitespace, except in markdown files where a linebreak must be forced.
-* No more than [one assignment](http://benalman.com/news/2012/05/multiple-var-statements-javascript/) per `var` statement.
-* Prefer `if` and `else` to ["clever"](http://programmers.stackexchange.com/a/25281) uses of `? :` conditional or `||`, `&&` logical operators.
-* **When in doubt, follow the conventions you see used in the source already.**
 
-If you happen to find something in the codebase that does not follow the style guide, that's a good opportunity to make your first contribution!
-
----
-### Doc Credit
+## Doc Credit
 This doc was inspired by some great contribution guide examples including [contribute.md template](https://github.com/contribute-md/contribute-md-template),
 [grunt](https://github.com/gruntjs/grunt/wiki/Contributing),
 [html5 boilerplate](https://github.com/h5bp/html5-boilerplate/blob/master/CONTRIBUTING.md),
 [jquery](https://github.com/jquery/jquery/blob/master/CONTRIBUTING.md),
-and [node.js](https://github.com/joyent/node/wiki/Contributing).
+and [node.js](https://github.com/nodejs/node/blob/master/CONTRIBUTING.md).
+
+[issue template]: /.github/ISSUE_TEMPLATE.md
+[linter]: https://github.com/videojs/standard
