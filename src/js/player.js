@@ -2329,8 +2329,8 @@ class Player extends Component {
    *   ]);
    * ```
    *
-   * @param {string|Object|Array} [source]
-   *        The source URL, object, or array of sources
+   * @param {Tech~SourceObject|Tech~SourceObject[]} [source]
+   *        One SourceObject or an array of SourceObjects
    *
    * @return {string|Player}
    *         - The current video source when getting
@@ -2405,7 +2405,7 @@ class Player extends Component {
   /**
    * Handle an array of source objects
    *
-   * @param  {Array} sources
+   * @param  {Tech~SourceObject[]} sources
    *         Array of source objects
    *
    * @private
