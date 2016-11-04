@@ -10,6 +10,7 @@ import * as Dom from '../utils/dom.js';
 import * as Url from '../utils/url.js';
 import { createTimeRange } from '../utils/time-ranges.js';
 import FlashRtmpDecorator from './flash-rtmp';
+import timeExpiringCache from './flash-cache.js';
 import Component from '../component';
 import window from 'global/window';
 import assign from 'object.assign';
@@ -59,6 +60,34 @@ class Flash extends Tech {
     this.on('seeked', function() {
       this.lastSeekTarget_ = undefined;
     });
+
+    // calling into the SWF can be expensive, especially if Flash is
+    // busy rendering video frames
+    // automatically cache commonly used properties for a short period
+    // of time so that multiple calls within a short time period don't
+    // all pay a big performance penalty for properties that change
+    // relatively slowly over time
+    const getCurrentTimeCached = timeExpiringCache(() => {
+      return this.el_.vjs_getProperty('currentTime');
+    }, 100);
+
+    this.currentTime = (time) => {
+      // when seeking make the reported time keep up with the requested time
+      // by reading the time we're seeking to
+      if (this.seeking()) {
+        return this.lastSeekTarget_ || 0;
+      }
+
+      return getCurrentTimeCached();
+    };
+    this.buffered = timeExpiringCache(() => {
+      const ranges = this.el_.vjs_getProperty('buffered');
+
+      if (ranges.length === 0) {
+        return createTimeRange();
+      }
+      return createTimeRange(ranges[0][0], ranges[0][1]);
+    }, 100);
   }
 
   /**
@@ -213,14 +242,6 @@ class Flash extends Tech {
    * @return {Number} Current time
    * @method currentTime
    */
-  currentTime(time) {
-    // when seeking make the reported time keep up with the requested time
-    // by reading the time we're seeking to
-    if (this.seeking()) {
-      return this.lastSeekTarget_ || 0;
-    }
-    return this.el_.vjs_getProperty('currentTime');
-  }
 
   /**
    * Get current source
@@ -294,14 +315,6 @@ class Flash extends Tech {
    * @return {TimeRangeObject}
    * @method buffered
    */
-  buffered() {
-    const ranges = this.el_.vjs_getProperty('buffered');
-
-    if (ranges.length === 0) {
-      return createTimeRange();
-    }
-    return createTimeRange(ranges[0][0], ranges[0][1]);
-  }
 
   /**
    * Get fullscreen support -
