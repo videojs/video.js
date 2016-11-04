@@ -107,14 +107,14 @@ function videojs(id, options, ready) {
   }
 
   videojs.hooks('beforesetup').forEach(function(hookFunction) {
-    const opts = hookFunction(tag, videojs.mergeOptions({}, options));
+    const opts = hookFunction(tag, mergeOptions(options));
 
     if (!opts || typeof opts !== 'object' || Array.isArray(opts)) {
       videojs.log.error('please return an object in beforesetup hooks');
       return;
     }
 
-    options = videojs.mergeOptions(options, opts);
+    options = mergeOptions(options, opts);
   });
 
   // If not, set up a new player
