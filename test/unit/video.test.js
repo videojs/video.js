@@ -336,7 +336,7 @@ QUnit.test('beforesetup options override videojs options', function(assert) {
 
   const vid = document.getElementById('test_vid_id');
 
-  videojs.hook('beforesetup', function(options) {
+  videojs.hook('beforesetup', function(tag, options) {
     assert.equal(options.autoplay, false, 'false was passed to us');
     return {autoplay: true};
   });
