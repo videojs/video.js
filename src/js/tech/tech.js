@@ -548,9 +548,11 @@ class Tech extends Component {
    *
    * @param {Object} options The object should contain values for
    * kind, language, label and src (location of the WebVTT file)
-   * @param {Boolean} manualCleanup if set to false, the TextTrack will be
+   * @param {Boolean} [manualCleanup=true] if set to false, the TextTrack will be
    * automatically removed from the video element whenever the source changes
    * @return {HTMLTrackElement}
+   * @deprecated The default value of the "manualCleanup" parameter will default
+   * to "false" in upcoming versions of Video.js
    * @method addRemoteTextTrack
    */
   addRemoteTextTrack(options, manualCleanup) {
@@ -718,7 +720,7 @@ Tech.prototype.featuresNativeTextTracks = false;
  *
  * ##### EXAMPLE:
  *
- *   Tech.withSourceHandlers.call(MyTech);
+ *   Tech.withSourceHandlers(MyTech);
  *
  */
 Tech.withSourceHandlers = function(_Tech) {
