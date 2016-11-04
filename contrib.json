@@ -5,11 +5,11 @@
     "requirements": [
       {
         "name": "git",
-        "info": "http://git-scm.com"
+        "info": "https://git-scm.com"
       },
       {
         "name": "node.js",
-        "info": "http://nodejs.org"
+        "info": "https://nodejs.org"
       }
     ],
     "urls": {
@@ -208,7 +208,7 @@
       { "prompt": "text", "desc": "What version of video.js are you using?",           "id": "version" },
       { "prompt": "text", "desc": "Are you using any video.js plugins?",               "id": "plugins" },
       { "prompt": "text", "desc": "What browsers/platforms did you experience this in (e.g. Win 7, IE10; Android 4, Chrome;)?", "id": "browsers" },
-      { "prompt": "text", "desc": "Is there a URL to a live example, or a jsbin (e.g. http://jsbin.com/axedog/9999/edit)?",     "id": "example" },
+      { "prompt": "text", "desc": "Is there a URL to a live example, or a jsbin (e.g. https://jsbin.com/axedog/9999/edit)?",     "id": "example" },
       { "prompt": "text", "desc": "Are there any other details you'd like to provide?",                                         "id": "details" },
       { "open": "{{meta.urls.repo_ui}}/issues/new?title={{title}}&body=**Steps to reproduce:**\n> {{reproduce}}\n\n**What was expected:**\n> {{expected}}\n\n**What Happened:**\n> {{actual}}\n\n**Video.js Version:**\n> {{version}}\n\n**Plugins:**\n> {{plugins}}\n\n**Browsers experienced on:**\n> {{browsers}}\n\n**Example:**\n> {{example}}\n\n**Other details:**\n> {{details}}" }
     ],

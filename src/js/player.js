@@ -374,7 +374,7 @@ class Player extends Component {
 
     Object.getOwnPropertyNames(attrs).forEach(function(attr) {
       // workaround so we don't totally break IE7
-      // http://stackoverflow.com/questions/3653444/css-styles-not-applied-on-dynamic-elements-in-internet-explorer-7
+      // https://stackoverflow.com/questions/3653444/css-styles-not-applied-on-dynamic-elements-in-internet-explorer-7
       if (attr === 'class') {
         el.className = attrs[attr];
       } else {
@@ -810,7 +810,7 @@ class Player extends Component {
 
     // Some browsers (Chrome & IE) don't trigger a click on a flash swf, but do
     // trigger mousedown/up.
-    // http://stackoverflow.com/questions/1444562/javascript-onclick-event-over-flash-object
+    // https://stackoverflow.com/questions/1444562/javascript-onclick-event-over-flash-object
     // Any touch events are set to block the mousedown event from happening
     this.on(this.tech_, 'mousedown', this.handleTechClick_);
 
@@ -1814,13 +1814,13 @@ class Player extends Component {
    * the current playback technology (HTML5/Flash) can support the source you
    * provide. Currently only MP4 files can be used in both HTML5 and Flash.
    * ```js
-   *     myPlayer.src("http://www.example.com/path/to/video.mp4");
+   *     myPlayer.src("https://www.example.com/path/to/video.mp4");
    * ```
    * **Source Object (or element):* * A javascript object containing information
    * about the source file. Use this method if you want the player to determine if
    * it can support the file using the type information.
    * ```js
-   *     myPlayer.src({ type: "video/mp4", src: "http://www.example.com/path/to/video.mp4" });
+   *     myPlayer.src({ type: "video/mp4", src: "https://www.example.com/path/to/video.mp4" });
    * ```
    * **Array of Source Objects:* * To provide multiple versions of the source so
    * that it can be played using HTML5 across browsers you can use an array of
@@ -1828,8 +1828,8 @@ class Player extends Component {
    * file.
    * ```js
    *     myPlayer.src([
-   *       { type: "video/mp4", src: "http://www.example.com/path/to/video.mp4" },
-   *       { type: "video/webm", src: "http://www.example.com/path/to/video.webm" },
+   *       { type: "video/mp4", src: "https://www.example.com/path/to/video.mp4" },
+   *       { type: "video/webm", src: "https://www.example.com/path/to/video.webm" },
    *       { type: "video/ogg", src: "http://www.example.com/path/to/video.ogv" }
    *     ]);
    * ```

@@ -9,9 +9,9 @@ Text Tracks are a function of HTML5 video for providing time triggered text to t
 - **Metadata**: Tracks that have data meant for javascript to parse and do something with. These aren't shown to the user.
 
 ## Creating the Text File
-Timed text requires a text file in [WebVTT](http://dev.w3.org/html5/webvtt/) format. This format defines a list of "cues" that have a start time, and end time, and text to display. [Microsoft has a builder](https://dev.modern.ie/testdrive/demos/captionmaker/) that can help you get started on the file.
+Timed text requires a text file in [WebVTT](https://dev.w3.org/html5/webvtt/) format. This format defines a list of "cues" that have a start time, and end time, and text to display. [Microsoft has a builder](https://dev.modern.ie/testdrive/demos/captionmaker/) that can help you get started on the file.
 
-When creating captions, there's also additional [caption formatting techniques] (http://www.theneitherworld.com/mcpoodle/SCC_TOOLS/DOCS/SCC_FORMAT.HTML#style) that would be good to use, like brackets around sound effects: [ sound effect ]. If you'd like a more in depth style guide for captioning, you can reference the [Captioning Key](http://www.dcmp.org/captioningkey/), but keep in mind not all features are supported by WebVTT or (more likely) the Video.js WebVTT implementation.
+When creating captions, there's also additional [caption formatting techniques] (http://www.theneitherworld.com/mcpoodle/SCC_TOOLS/DOCS/SCC_FORMAT.HTML#style) that would be good to use, like brackets around sound effects: [ sound effect ]. If you'd like a more in depth style guide for captioning, you can reference the [Captioning Key](https://www.dcmp.org/captioningkey/), but keep in mind not all features are supported by WebVTT or (more likely) the Video.js WebVTT implementation.
 
 ## Adding to Video.js
 Once you have your WebVTT file created, you can add it to Video.js using the track tag. Put your track tag after all the source elements, and before any fallback content.
@@ -20,11 +20,11 @@ Once you have your WebVTT file created, you can add it to Video.js using the tra
 <video id="example_video_1" class="video-js"
   controls preload="auto" width="640" height="264"
   data-setup='{"example_option":true}'>
- <source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4" />
- <source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm" />
- <source src="http://vjs.zencdn.net/v/oceans.ogv" type="video/ogg" />
+ <source src="https://vjs.zencdn.net/v/oceans.mp4" type="video/mp4" />
+ <source src="https://vjs.zencdn.net/v/oceans.webm" type="video/webm" />
+ <source src="https://vjs.zencdn.net/v/oceans.ogv" type="video/ogg" />
 
- <track kind="captions" src="http://example.com/path/to/captions.vtt" srclang="en" label="English" default>
+ <track kind="captions" src="https://example.com/path/to/captions.vtt" srclang="en" label="English" default>
 
 </video>
 ```
@@ -32,7 +32,7 @@ Once you have your WebVTT file created, you can add it to Video.js using the tra
 You can also add tracks [programatically](#api).
 
 ## Subtitles from Another Domain
-Because we're pulling in the text track file via Javascript, the [same-origin policy](http://en.wikipedia.org/wiki/Same_origin_policy) applies. If you'd like to have a player served from one domain,
+Because we're pulling in the text track file via Javascript, the [same-origin policy](https://en.wikipedia.org/wiki/Same_origin_policy) applies. If you'd like to have a player served from one domain,
 but the text track served from another, you'll need to [enable CORS](http://enable-cors.org/) in order to do so.
 In addition to enabling CORS on the server serving the text tracks, you will need to add the [`crossorigin` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_settings_attributes) to the video element itself. This attribute has two values `anonymous` and `use-credentials`. Most users will want to use `anonymous` with cross-origin tracks.
 It can be added to the video element like so:
@@ -164,7 +164,7 @@ This is a helper method to get a list of all the tracks that were created from `
 Another helper method, this is a list of all the `track` elements associated with the player. Both emulated or otherwise.
 
 ### `player.addTextTrack(String kind, [String label [, String language]]) -> TextTrack`
-This is based on the [w3c spec API](http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-addtexttrack) and when given a kind and an optional label and language, will create a new text track for you to use.
+This is based on the [w3c spec API](https://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-addtexttrack) and when given a kind and an optional label and language, will create a new text track for you to use.
 This method is intended for purely programmatic usage of tracks and has one important limitation:
 tracks created using this method *cannot* be removed. The native `addTextTrack` does not have a corresponding `removeTextTrack`, so, we actually discourage the usage of this method.
 

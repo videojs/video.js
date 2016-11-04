@@ -98,11 +98,11 @@ NOTE: These need to be added after the core Video.js script.
 <video id="example_video_1" class="video-js vjs-default-skin"
   controls preload="auto" width="640" height="264"
   data-setup='{"languages":{"es":{"Play":"Juego"}}}'>
- <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' />
- <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />
- <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />
+ <source src="https://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' />
+ <source src="https://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />
+ <source src="https://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />
 
- <track kind="captions" src="http://example.com/path/to/captions.vtt" srclang="en" label="English" default>
+ <track kind="captions" src="https://example.com/path/to/captions.vtt" srclang="en" label="English" default>
 
 </video>
 ```
@@ -123,11 +123,11 @@ During a Video.js player instantiation you can force it to localize to a specifi
 <video id="example_video_1" class="video-js vjs-default-skin"
   controls preload="auto" width="640" height="264"
   data-setup='{"language":"es"}'>
- <source src="http://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' />
- <source src="http://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />
- <source src="http://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />
+ <source src="https://video-js.zencoder.com/oceans-clip.mp4" type='video/mp4' />
+ <source src="https://video-js.zencoder.com/oceans-clip.webm" type='video/webm' />
+ <source src="https://video-js.zencoder.com/oceans-clip.ogv" type='video/ogg' />
 
- <track kind="captions" src="http://example.com/path/to/captions.vtt" srclang="en" label="English" default>
+ <track kind="captions" src="https://example.com/path/to/captions.vtt" srclang="en" label="English" default>
 
 </video>
 ```
@@ -161,7 +161,6 @@ var details = '<div class="vjs-errors-details">' + player.localize('Technical de
 
 Language Codes
 --------------
-A list of languages codes can be found [here](http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry)
+A list of languages codes can be found [here](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry)
 
 For supported language translations, please see the [Languages Folder (/lang)](https://github.com/videojs/video.js/tree/master/lang) folder located in the project root.
-

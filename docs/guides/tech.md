@@ -58,8 +58,8 @@ Tech-first ordering can present a problem if you have a `sourceHandler` that sup
 For example, given the following video element:
 
   <video data-setup='{"techOrder": ["html5", "flash"]}'>
-    <source src="http://your.static.provider.net/path/to/video.m3u8" type="application/x-mpegURL">
-    <source src="http://your.static.provider.net/path/to/video.mp4" type="video/mp4">
+    <source src="https://your.static.provider.net/path/to/video.m3u8" type="application/x-mpegURL">
+    <source src="https://your.static.provider.net/path/to/video.mp4" type="video/mp4">
   </video>
 
 There is a good chance that the mp4 source will be selected on platforms that do not have media source extensions. Video.js will try all sources against the first playback technology, in this case `Html5`, and select the first source that can play - in this case MP4.
@@ -73,8 +73,8 @@ Video.js now provides another method of selecting the source - "Source-first" or
 With a player setup as follows:
 
   <video data-setup='{"techOrder": ["html5", "flash"], "sourceOrder": true}'>
-    <source src="http://your.static.provider.net/path/to/video.m3u8" type="application/x-mpegURL">
-    <source src="http://your.static.provider.net/path/to/video.mp4" type="video/mp4">
+    <source src="https://your.static.provider.net/path/to/video.m3u8" type="application/x-mpegURL">
+    <source src="https://your.static.provider.net/path/to/video.mp4" type="video/mp4">
   </video>
 
 The Flash-based HLS support will be tried before falling back to the MP4 source.
@@ -92,8 +92,8 @@ Enabling Streaming Playback
 In order to force the Flash tech to choose streaming playback, you need to provide a valid streaming source **before other valid Flash video sources**. This is necessary because of the source selection algorithm, where playback tech chooses the first possible source object with a valid type. Valid streaming `type` values include `rtmp/mp4` and `rtmp/flv`. The streaming `src` value requires valid connection and stream strings, separated by an `&`. An example of supplying a streaming source through your HTML markup might look like:
 
     <source src="rtmp://your.streaming.provider.net/cfx/st/&mp4:path/to/video.mp4" type="rtmp/mp4">
-    <source src="http://your.static.provider.net/path/to/video.mp4" type="video/mp4">
-    <source src="http://your.static.provider.net/path/to/video.webm" type="video/webm">
+    <source src="https://your.static.provider.net/path/to/video.mp4" type="video/mp4">
+    <source src="https://your.static.provider.net/path/to/video.webm" type="video/webm">
 
 You may optionally use the last `/` as the separator between connection and stream strings, for example:
 

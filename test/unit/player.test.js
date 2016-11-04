@@ -404,7 +404,7 @@ QUnit.test('should set and update the poster value', function(assert) {
 // https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-play
 QUnit.test('should hide the poster when play is called', function(assert) {
   const player = TestHelpers.makePlayer({
-    poster: 'https://example.com/poster.jpg'
+    poster: 'http://example.com/poster.jpg'
   });
 
   assert.equal(player.hasStarted(), false, 'the show poster flag is true before play');
@@ -1122,7 +1122,7 @@ QUnit.test('Player#tech alerts and throws without the appropriate input', functi
 
   assert.throws(function() {
     Player.prototype.tech.call({tech_});
-  }, new RegExp('https://github.com/videojs/video.js/issues/2617'),
+  }, new RegExp('http://github.com/videojs/video.js/issues/2617'),
   'we threw an error');
 
   assert.ok(alertCalled, 'we called an alert');

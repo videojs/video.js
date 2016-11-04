@@ -21,7 +21,7 @@ Video Tracks are a function of HTML5 video for providing a selection of alternat
 You must add video tracks [programatically](#api) for the time being.
 
 ## Attributes
-Video Track propertites and settings
+Video Track properties and settings
 
 ### kind
 One of the five track types listed above. Kind defaults to empty string if no kind is included, or an invalid kind is used.
