@@ -56,6 +56,7 @@ class Component {
    * @callback Component~ReadyCallback
    * @this Component
    */
+
   /**
    * Creates an instance of this class.
    *
@@ -178,7 +179,7 @@ class Component {
 
   /**
    * Deep merge of options objects with new options.
-   * > Note: When a property of is an object on both `obj` and `options`.
+   * > Note: When both `obj` and `options` contain properties whose values are objects.
    *         The two properties get merged using {@link module:mergeOptions}
    *
    * Example
@@ -679,10 +680,12 @@ class Component {
   }
 
   /**
-   * Builds the default DOM `className`. Should be overriden by sub-components.
+   * Builds the default DOM class name. Should be overriden by sub-components.
    *
    * @return {string}
-   *         The DOM `className` for this object.
+   *         The DOM class name for this object.
+   *
+   * @abstract
    */
   buildCSSClass() {
     // Child classes can include a function that does:
@@ -725,7 +728,7 @@ class Component {
    * - `otherComponent.on('eventName', myFunc)`
    * Is that the listeners will get cleaned up when either component gets disposed.
    * It will also bind `myComponent` as the context of `myFunc`.
-   * > **NOTE**: If you remove the element from the DOM that has used `on` you need to
+   * > NOTE: If you remove the element from the DOM that has used `on` you need to
    *             clean up references using:
    *
    *             `myComponent.trigger(el, 'dispose')`
@@ -1094,10 +1097,10 @@ class Component {
   }
 
   /**
-   * Check if a component's element has a CSS `className`.
+   * Check if a component's element has a CSS class name.
    *
    * @param {string} classToCheck
-   *        CSS `className` to check.
+   *        CSS class name to check.
    *
    * @return {boolean}
    *         - True if the `Component` has the class.
@@ -1108,10 +1111,10 @@ class Component {
   }
 
   /**
-   * Add a CSS `className` to the `Component`s element.
+   * Add a CSS class name to the `Component`s element.
    *
    * @param {string} classToAdd
-   *        CSS `className` to add
+   *        CSS class name to add
    *
    * @return {Component}
    *         Returns itself; method can be chained.
@@ -1122,10 +1125,10 @@ class Component {
   }
 
   /**
-   * Remove a CSS `className` from the `Component`s element.
+   * Remove a CSS class name from the `Component`s element.
    *
    * @param {string} classToRemove
-   *        CSS `className` to remove
+   *        CSS class name to remove
    *
    * @return {Component}
    *         Returns itself; method can be chained.
@@ -1136,7 +1139,7 @@ class Component {
   }
 
   /**
-   * Add or remove a CSS `className` from the component's element.
+   * Add or remove a CSS class name from the component's element.
    * - `classToToggle` gets added when {@link Component#hasClass} would return false.
    * - `classToToggle` gets removed when {@link Component#hasClass} would return true.
    *
@@ -1156,7 +1159,7 @@ class Component {
 
   /**
    * Show the `Component`s element if it is hidden by removing the
-   * 'vjs-hidden' `className` from it.
+   * 'vjs-hidden' class name from it.
    *
    * @return {Component}
    *         Returns itself; method can be chained.
@@ -1168,7 +1171,7 @@ class Component {
 
   /**
    * Hide the `Component`s element if it is currently showing by adding the
-   * 'vjs-hidden` `className` to it.
+   * 'vjs-hidden` class name to it.
    *
    * @return {Component}
    *         Returns itself; method can be chained.
@@ -1180,7 +1183,7 @@ class Component {
 
   /**
    * Lock a `Component`s element in its visible state by adding the 'vjs-lock-showing'
-   * `className` to it. Used during fadeIn/fadeOut.
+   * class name to it. Used during fadeIn/fadeOut.
    *
    * @return {Component}
    *         Returns itself; method can be chained.
@@ -1194,7 +1197,7 @@ class Component {
 
   /**
    * Unlock a `Component`s element from its visible state by removing the 'vjs-lock-showing'
-   * `className` from it. Used during fadeIn/fadeOut.
+   * class name from it. Used during fadeIn/fadeOut.
    *
    * @return {Component}
    *         Returns itself; method can be chained.
@@ -1320,15 +1323,13 @@ class Component {
    * for the {@link Component#width} and {@link Component#height}.
    *
    * Things to know:
-   * - If the width or height in an number this will return the number
-   *   postfixed with 'px'.
-   * - If the width/height is a percent this will return the percent postfixed with
-   *   '%'
+   * - If the width or height in an number this will return the number postfixed with 'px'.
+   * - If the width/height is a percent this will return the percent postfixed with '%'
    * - Hidden elements have a width of 0 with `window.getComputedStyle`. This function
-   *   defaults to the `Component`s `style.width` and falls back to
-   *   `window.getComputedStyle`. See [this]{@link http://www.foliotek.com/devblog/getting-the-width-of-a-hidden-element-with-jquery-using-width/}
+   *   defaults to the `Component`s `style.width` and falls back to `window.getComputedStyle`.
+   *   See [this]{@link http://www.foliotek.com/devblog/getting-the-width-of-a-hidden-element-with-jquery-using-width/}
    *   for more information
-   * - If you want the `window.getComputedStyle` use {@link Component#currentWidth}
+   * - If you want the computed style of the component, use {@link Component#currentWidth}
    *   and {@link {Component#currentHeight}
    *
    * @fires Component#resize
@@ -1449,6 +1450,7 @@ class Component {
    * @property {number} height
    *           The height of the `Component`s computed style.
    */
+
   /**
    * Get an object that contains width and height values of the `Component`s
    * computed style.
@@ -1641,6 +1643,7 @@ class Component {
    * @callback Component~GenericCallback
    * @this Component
    */
+
   /**
    * Creates a function that runs after an `x` millisecond timeout. This function is a
    * wrapper around `window.setTimeout`. There are a few reasons to use this one
@@ -1650,7 +1653,7 @@ class Component {
    * 2. The function callback will gets turned into a {@link Component~GenericCallback}
    *
    * > Note: You can use `window.clearTimeout` on the id returned by this function. This
-   *         will cause its dispose listener will not get cleaned up! Please use
+   *         will cause its dispose listener not to get cleaned up! Please use
    *         {@link Component#clearTimeout} or {@link Component#dispose}.
    *
    * @param {Component~GenericCallback} fn
@@ -1774,6 +1777,13 @@ class Component {
 
   /**
    * Register a `Component` with `videojs` given the name and the component.
+   *
+   * > NOTE: {@link Tech}s should not be registered as a `Component`. {@link Tech}s
+   *         should be registered using {@link Tech.registerTech} or
+   *         {@link videojs:videojs.registerTech}.
+   *
+   * > NOTE: This function can also be seen on videojs as
+   *         {@link videojs:videojs.registerComponent}.
    *
    * @param {string} name
    *        The name of the `Component` to register.

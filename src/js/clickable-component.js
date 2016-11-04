@@ -178,9 +178,15 @@ class ClickableComponent extends Component {
    * This gets called when a `ClickableComponent` gets:
    * - Clicked (via the `click` event, listening starts in the constructor)
    * - Tapped (via the `tap` event, listening starts in the constructor)
-   * - Gains focus (via the `focus` event). Causes `ClickableComponent`
-   *   to listen for the `keydown` event. If the enter/space key gets
-   *   pressed before focus gets lost (via the `blur` event) this function gets called.
+   * - The following things happen in order:
+   *   1. {@link ClickableComponent#handleFocus} is called via a `focus` event on the
+   *      `ClickableComponent`.
+   *   2. {@link ClickableComponent#handleFocus} adds a listener for `keydown` on using
+   *      {@link ClickableComponent#handleKeyPress}.
+   *   3. `ClickableComponent` has not had a `blur` event (`blur` means that focus was lost). The user presses
+   *      the space or enter key.
+   *   4. {@link ClickableComponent#handleKeyPress} calls this function with the `keydown`
+   *      event as a parameter.
    *
    * @param {EventTarget~Event} event
    *        The `keydown`, `tap`, or `click` event that caused this function to be
@@ -188,6 +194,7 @@ class ClickableComponent extends Component {
    *
    * @listens tap
    * @listens click
+   * @abstract
    */
   handleClick(event) {}
 

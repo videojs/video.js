@@ -37,12 +37,9 @@ class CloseButton extends Button {
   }
 
   /**
-   * This gets called when a `CloseButton` gets:
-   * - Clicked (via the `click` event, listening starts in the constructor)
-   * - Tapped (via the `tap` event, listening starts in the constructor)
-   * - Gains focus (via the `focus` event). Causes `ClickableComponent`
-   *   to listen for the `keydown` event. If the enter/space key gets
-   *   pressed before focus gets lost (via the `blur` event) this function gets called.
+   * This gets called when a `CloseButton` gets clicked. See
+   * {@link ClickableComponent#handleClick} for more information on when this will be
+   * triggered
    *
    * @param {EventTarget~Event} event
    *        The `keydown`, `tap`, or `click` event that caused this function to be

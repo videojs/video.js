@@ -19,6 +19,7 @@ const EventTarget = function() {};
  * @typedef {Object} EventTarget~Event
  * @see [Properties]{@link https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent}
  */
+
 /**
  * All event listeners should follow the following format.
  *
@@ -31,9 +32,12 @@ const EventTarget = function() {};
  * @param {Object} [hash]
  *        hash of data sent during the event
  */
+
 /**
- * An object containing event names as keys and true/false values as values. If an
- * event name is set to a true value here {@link EventTarget#trigger} will have extra.
+ * An object containing event names as keys and booleans as values.
+ *
+ * > NOTE: If an event name is set to a true value here {@link EventTarget#trigger}
+ *         will have extra functionality. See that function for more information.
  *
  * @property EventTarget.prototype.allowedEvents_
  * @private
@@ -186,9 +190,11 @@ EventTarget.prototype.one = function(type, fn) {
  * that are waiting for that event, to get called. If there are no `event listeners`
  * for an event then nothing will happen.
  *
- * If the name of the Event that is being triggered is in `EventTarget.allowedEvents_`
- * then trigger will also call the `on` + `uppercaseEventName` function. Example:
- * the 'click' is in in `EventTarget.allowedEvents_` trigger will attempt to call
+ * If the name of the `Event` that is being triggered is in `EventTarget.allowedEvents_`.
+ * Trigger will also call the `on` + `uppercaseEventName` function.
+ *
+ * Example:
+ * 'click' is in `EventTarget.allowedEvents_`, so, trigger will attempt to call
  * `onClick` if it exists.
  *
  * ```js
