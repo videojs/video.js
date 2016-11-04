@@ -16,10 +16,6 @@ import assign from 'object.assign';
  */
 class Button extends ClickableComponent {
 
-  constructor(player, options) {
-    super(player, options);
-  }
-
   /**
    * Create the component's DOM element
    *
