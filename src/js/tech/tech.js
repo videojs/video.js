@@ -560,6 +560,16 @@ class Tech extends Component {
     return createTrackHelper(this, kind, label, language);
   }
 
+  /**
+   * Create an emulated TextTrack for use by addRemoteTextTrack
+   *
+   * This is intended to be overridden by classes that inherit from
+   * Tech in order to create native or custom TextTracks.
+   *
+   * @param {Object} options The object should contain values for
+   * kind, language, label and src (location of the WebVTT file)
+   * @method createRemoteTextTrack
+   */
   createRemoteTextTrack(options) {
     const track = mergeOptions(options, {
       tech: this

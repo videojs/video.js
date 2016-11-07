@@ -607,6 +607,14 @@ class Html5 extends Tech {
     return this.el_.addTextTrack(kind, label, language);
   }
 
+  /**
+   * Creates either native TextTrack or an emulated TextTrack depending
+   * on the value of `featuresNativeTextTracks`
+   *
+   * @param {Object} options The object should contain values for
+   * kind, language, label and src (location of the WebVTT file)
+   * @method createRemoteTextTrack
+   */
   createRemoteTextTrack(options) {
     if (!this.featuresNativeTextTracks) {
       return super.createRemoteTextTrack(options);
