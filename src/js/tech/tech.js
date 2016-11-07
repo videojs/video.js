@@ -85,8 +85,10 @@ class Tech extends Component {
     }
 
     if (!this.featuresNativeTextTracks) {
-      this.on('ready', this.emulateTextTracks);
+      this.emulateTextTracks();
     }
+
+    this.autoRemoteTextTracks_ = new TextTrackList();
 
     this.initTextTrackListeners();
     this.initTrackListeners();
@@ -410,18 +412,7 @@ class Tech extends Component {
     });
   }
 
-  /**
-   * Emulate texttracks
-   *
-   * @method emulateTextTracks
-   */
-  emulateTextTracks() {
-    const tracks = this.textTracks();
-
-    if (!tracks) {
-      return;
-    }
-
+  addWebVttScript() {
     if (!window.WebVTT && this.el().parentNode !== null && this.el().parentNode !== undefined) {
       const script = document.createElement('script');
 
@@ -441,6 +432,32 @@ class Tech extends Component {
       window.WebVTT = true;
       this.el().parentNode.appendChild(script);
     }
+  }
+
+  /**
+   * Emulate texttracks
+   *
+   * @method emulateTextTracks
+   */
+  emulateTextTracks() {
+    const tracks = this.textTracks();
+
+    if (!tracks) {
+      return;
+    }
+
+    this.remoteTextTracks().on('addtrack', (e) => {
+      this.textTracks().addTrack_(e.track);
+    });
+
+    this.remoteTextTracks().on('removetrack', (e) => {
+      this.textTracks().removeTrack_(e.track);
+    });
+
+    // Initially, Tech.el_ is a child of a dummy-div wait until the Component system
+    // signals that the Tech is ready at which point Tech.el_ is part of the DOM
+    // before inserting the WebVTT script
+    this.on('ready', this.addWebVttScript);
 
     const updateDisplay = () => this.trigger('texttrackchange');
     const textTracksChanges = () => {
@@ -543,6 +560,14 @@ class Tech extends Component {
     return createTrackHelper(this, kind, label, language);
   }
 
+  createRemoteTextTrack(options) {
+    const track = mergeOptions(options, {
+      tech: this
+    });
+
+    return new HTMLTrackElement(track);
+  }
+
   /**
    * Creates a remote text track object and returns a emulated html track element
    *
@@ -556,10 +581,7 @@ class Tech extends Component {
    * @method addRemoteTextTrack
    */
   addRemoteTextTrack(options, manualCleanup) {
-    const track = mergeOptions(options, {
-      tech: this
-    });
-    const htmlTrackElement = new HTMLTrackElement(track);
+    const htmlTrackElement = this.createRemoteTextTrack(options);
 
     if (manualCleanup !== true && manualCleanup !== false) {
       // deprecation warning
@@ -573,12 +595,8 @@ class Tech extends Component {
 
     if (manualCleanup !== true) {
       // create the TextTrackList if it doesn't exist
-      this.autoRemoteTextTracks_ = this.autoRemoteTextTracks_ || new TextTrackList();
       this.autoRemoteTextTracks_.addTrack_(htmlTrackElement.track);
     }
-
-    // must come after remoteTextTracks()
-    this.textTracks().addTrack_(htmlTrackElement.track);
 
     return htmlTrackElement;
   }
@@ -590,16 +608,12 @@ class Tech extends Component {
    * @method removeRemoteTextTrack
    */
   removeRemoteTextTrack(track) {
-    this.textTracks().removeTrack_(track);
-
     const trackElement = this.remoteTextTrackEls().getTrackElementByTrack_(track);
 
     // remove HTMLTrackElement and TextTrack from remote list
     this.remoteTextTrackEls().removeTrackElement_(trackElement);
     this.remoteTextTracks().removeTrack_(track);
-    if (this.autoRemoteTextTracks_) {
-      this.autoRemoteTextTracks_.removeTrack_(track);
-    }
+    this.autoRemoteTextTracks_.removeTrack_(track);
   }
 
   /**

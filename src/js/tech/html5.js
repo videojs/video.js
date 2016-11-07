@@ -607,18 +607,10 @@ class Html5 extends Tech {
     return this.el_.addTextTrack(kind, label, language);
   }
 
-  /**
-   * Creates a remote text track object and returns a html track element
-   *
-   * @param {Object} options The object should contain values for
-   * kind, language, label and src (location of the WebVTT file)
-   * @return {HTMLTrackElement}
-   */
-  addRemoteTextTrack(options = {}) {
+  createRemoteTextTrack(options) {
     if (!this.featuresNativeTextTracks) {
-      return super.addRemoteTextTrack(options);
+      return super.createRemoteTextTrack(options);
     }
-
     const htmlTrackElement = document.createElement('track');
 
     if (options.kind) {
@@ -640,11 +632,20 @@ class Html5 extends Tech {
       htmlTrackElement.src = options.src;
     }
 
-    this.el().appendChild(htmlTrackElement);
+    return htmlTrackElement;
+  }
 
-    // store HTMLTrackElement and TextTrack to remote list
-    this.remoteTextTrackEls().addTrackElement_(htmlTrackElement);
-    this.remoteTextTracks().addTrack_(htmlTrackElement.track);
+  /**
+   * Creates a remote text track object and returns a html track element
+   *
+   * @param {Object} options The object should contain values for
+   * kind, language, label and src (location of the WebVTT file)
+   * @return {HTMLTrackElement}
+   */
+  addRemoteTextTrack(options = {}, ...theRest) {
+    const htmlTrackElement = super.addRemoteTextTrack(options, ...theRest);
+
+    this.el().appendChild(htmlTrackElement);
 
     return htmlTrackElement;
   }
@@ -655,15 +656,7 @@ class Html5 extends Tech {
    * @param {TextTrackObject} track Texttrack object to remove
    */
   removeRemoteTextTrack(track) {
-    if (!this.featuresNativeTextTracks) {
-      return super.removeRemoteTextTrack(track);
-    }
-
-    const trackElement = this.remoteTextTrackEls().getTrackElementByTrack_(track);
-
-    // remove HTMLTrackElement and TextTrack from remote list
-    this.remoteTextTrackEls().removeTrackElement_(trackElement);
-    this.remoteTextTracks().removeTrack_(track);
+    super.removeRemoteTextTrack(track);
 
     const tracks = this.$$('track');
 

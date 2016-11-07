@@ -2525,9 +2525,9 @@ class Player extends Component {
    *
    * @param {Object} options    Options for remote text track
    */
-  addRemoteTextTrack(options) {
+  addRemoteTextTrack(...theArgs) {
     if (this.tech_) {
-      return this.tech_.addRemoteTextTrack(options);
+      return this.tech_.addRemoteTextTrack(...theArgs);
     }
   }
 
