@@ -78,3 +78,27 @@ export function assign(...args) {
   // polyfill. If we decide to move away from it, we can do so in one place.
   return objectAssign(...args);
 }
+
+/**
+ * Returns whether a value is an object of any kind - including DOM nodes,
+ * arrays, regular expressions, etc. Not functions, though.
+ *
+ * This avoids gotchas like `typeof null === 'object'`.
+ *
+ * @param  {Object} value
+ * @return {Boolean}
+ */
+export function isObject(value) {
+  return !!value && typeof value === 'object';
+}
+
+/**
+ * Returns whether an object appears to be a "plain" object - that is, a
+ * direct instance of `Object`.
+ *
+ * @param  {Object} value
+ * @return {Boolean}
+ */
+export function isPlain(value) {
+  return isObject(value) && value.constructor === Object;
+}

@@ -4,6 +4,7 @@
  */
 import window from 'global/window';
 import {IE_VERSION} from './browser';
+import {isObject} from './obj';
 
 let log;
 
@@ -51,7 +52,7 @@ export const logByType = (type, args, stringify = !!IE_VERSION && IE_VERSION < 1
   // objects and arrays for those less-capable browsers.
   if (stringify) {
     args = args.map(a => {
-      if (a && typeof a === 'object' || Array.isArray(a)) {
+      if (isObject(a) || Array.isArray(a)) {
         try {
           return JSON.stringify(a);
         } catch (x) {

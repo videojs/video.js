@@ -7,6 +7,7 @@ import window from 'global/window';
 import * as Guid from './guid.js';
 import log from './log.js';
 import tsml from 'tsml';
+import {isObject} from './obj';
 
 /**
  * Detect if a value is a string with any non-whitespace characters.
@@ -65,7 +66,7 @@ function classRegExp(className) {
  *         - False otherwise
  */
 export function isEl(value) {
-  return !!value && typeof value === 'object' && value.nodeType === 1;
+  return isObject(value) && value.nodeType === 1;
 }
 
 /**
@@ -674,7 +675,7 @@ export function getPointerPosition(el, event) {
  *         - False otherwise
  */
 export function isTextNode(value) {
-  return !!value && typeof value === 'object' && value.nodeType === 3;
+  return isObject(value) && value.nodeType === 3;
 }
 
 /**
