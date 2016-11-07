@@ -12,7 +12,7 @@ import { createTimeRange } from '../utils/time-ranges.js';
 import FlashRtmpDecorator from './flash-rtmp';
 import Component from '../component';
 import window from 'global/window';
-import assign from 'object.assign';
+import {assign} from '../utils/obj';
 
 const navigator = window.navigator;
 

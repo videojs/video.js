@@ -11,7 +11,7 @@ import tsml from 'tsml';
 import * as browser from '../utils/browser.js';
 import document from 'global/document';
 import window from 'global/window';
-import assign from 'object.assign';
+import {assign} from '../utils/obj';
 import mergeOptions from '../utils/merge-options.js';
 import toTitleCase from '../utils/to-title-case.js';
 

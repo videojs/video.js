@@ -1,7 +1,7 @@
 /**
  * @file media-error.js
  */
-import assign from 'object.assign';
+import {assign} from './utils/obj';
 
 /**
  * A Custom `MediaError` class which mimics the standard HTML5 `MediaError` class.

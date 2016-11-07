@@ -28,6 +28,7 @@
  * @return {Mixed}
  *         The new accumulated value.
  */
+import objectAssign from 'object.assign';
 
 /**
  * Array-like iteration for objects.
@@ -62,4 +63,18 @@ export function each(object, fn) {
 export function reduce(object, fn, initial = 0) {
   return Object.keys(object).reduce(
     (accum, key) => fn(accum, object[key], key), initial);
+}
+
+/**
+ * Object.assign-style object merge/extend.
+ *
+ * @param  {Object} target
+ * @param  {Object} ...sources
+ * @return {Object}
+ */
+export function assign(...args) {
+
+  // This exists primarily to isolate our dependence on this third-party
+  // polyfill. If we decide to move away from it, we can do so in one place.
+  return objectAssign(...args);
 }
