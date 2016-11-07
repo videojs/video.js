@@ -28,7 +28,6 @@
  * @return {Mixed}
  *         The new accumulated value.
  */
-import objectAssign from 'object.assign';
 
 /**
  * Array-like iteration for objects.
@@ -66,17 +65,28 @@ export function reduce(object, fn, initial = 0) {
 }
 
 /**
- * Object.assign-style object merge/extend.
+ * Object.assign-style object shallow merge/extend.
  *
  * @param  {Object} target
  * @param  {Object} ...sources
  * @return {Object}
  */
-export function assign(...args) {
+export function assign(target, ...sources) {
+  if (Object.assign) {
+    return Object.assign(target, ...sources);
+  }
 
-  // This exists primarily to isolate our dependence on this third-party
-  // polyfill. If we decide to move away from it, we can do so in one place.
-  return objectAssign(...args);
+  sources.forEach(source => {
+    if (!source) {
+      return;
+    }
+
+    each(source, (value, key) => {
+      target[key] = value;
+    });
+  });
+
+  return target;
 }
 
 /**

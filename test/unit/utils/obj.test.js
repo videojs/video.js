@@ -82,12 +82,11 @@ QUnit.test('isObject', function(assert) {
     'regex': new RegExp('.'),
     'date': new Date()
   }, {
-    'null': null,
-    'function': () => {},
-    'boolean': true,
-    'number': 1,
-    'string': 'xyz',
-    'undefined': undefined
+    null: null,
+    function() {},
+    boolean: true,
+    number: 1,
+    string: 'xyz'
   });
 });
 
@@ -98,12 +97,11 @@ QUnit.test('isPlain', function(assert) {
     'constructed object': new Foo(),
     'null': null,
     'array': [],
-    'function': () => {},
+    'function'() {},
     'regex': new RegExp('.'),
     'date': new Date(),
     'boolean': true,
     'number': 1,
-    'string': 'xyz',
-    'undefined': undefined
+    'string': 'xyz'
   });
 });
