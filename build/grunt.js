@@ -5,7 +5,7 @@ import npmRun from 'npm-run';
 module.exports = function(grunt) {
   require('time-grunt')(grunt);
 
-  let _ = require('lodash-compat');
+  let _ = require('lodash');
   let pkg = grunt.file.readJSON('package.json');
   let license = grunt.file.read('build/license-header.txt');
   let bannerCommonData = _.pick(pkg, ['version', 'copyright']);

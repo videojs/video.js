@@ -34,7 +34,6 @@
   "dependencies": {
     "babel-runtime": "^6.9.2",
     "global": "4.3.0",
-    "lodash-compat": "3.10.2",
     "safe-json-parse": "4.0.0",
     "tsml": "1.0.1",
     "videojs-font": "2.0.0",
@@ -101,6 +100,7 @@
     "karma-safari-launcher": "^1.0.0",
     "karma-sinon": "^1.0.5",
     "load-grunt-tasks": "^3.1.0",
+    "lodash": "^4.16.6",
     "markdown-table": "^1.0.0",
     "npm-run": "^4.1.0",
     "proxyquireify": "^3.0.0",
