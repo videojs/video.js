@@ -484,7 +484,7 @@ class Player extends Component {
   }
 
   /**
-   * Create the `Player`s DOM element.
+   * Create the `Player`'s DOM element.
    *
    * @return {Element}
    *         The DOM element that gets created.
@@ -573,7 +573,7 @@ class Player extends Component {
   }
 
   /**
-   * A getter/setter for the `Player`s width.
+   * A getter/setter for the `Player`'s width.
    *
    * @param {number} [value]
    *        The value to set the `Player's width to.
@@ -586,7 +586,7 @@ class Player extends Component {
   }
 
   /**
-   * A getter/setter for the `Player`s height.
+   * A getter/setter for the `Player`'s height.
    *
    * @param {number} [value]
    *        The value to set the `Player's heigth to.
@@ -599,7 +599,7 @@ class Player extends Component {
   }
 
   /**
-   * A getter/setter for the `Player`s width & height.
+   * A getter/setter for the `Player`'s width & height.
    *
    * @param {string} dimension
    *        This string can be:
@@ -677,7 +677,7 @@ class Player extends Component {
    */
 
   /**
-   * A getter/setter for the `Player`s aspect ratio.
+   * A getter/setter for the `Player`'s aspect ratio.
    *
    * @param {string} [ratio]
    *        The value to set the `Player's aspect ratio to.
@@ -708,6 +708,7 @@ class Player extends Component {
    * Update styles of the `Player` element (height, width and aspect ratio).
    *
    * @private
+   * @listens Tech#loadedmetadata
    */
   updateStyleEl_() {
     if (window.VIDEOJS_NO_DYNAMIC_STYLE === true) {
@@ -1063,10 +1064,13 @@ class Player extends Component {
   }
 
   /**
-   * Fired when the user agent begins looking for media data
+   * Retrigger the `loadstart` event that was triggered by the {@link Tech}. This
+   * function will also trigger {@link Player#firstplay} if it is the first loadstart
+   * for a video.
    *
    * @fires Player#loadstart
    * @fires Player#firstplay
+   * @listens Tech#loadstart
    * @private
    */
   handleTechLoadStart_() {
@@ -1082,22 +1086,16 @@ class Player extends Component {
     // which can happen in any order for a new source
     if (!this.paused()) {
       /**
+       * Fired when the user agent begins looking for media data
+       *
        * @event Player#loadstart
        * @type {EventTarget~Event}
        */
       this.trigger('loadstart');
-      /**
-       * @event Player#firstplay
-       * @type {EventTarget~Event}
-       */
       this.trigger('firstplay');
     } else {
       // reset the hasStarted state
       this.hasStarted(false);
-      /**
-       * @event Player#loadstart
-       * @type {EventTarget~Event}
-       */
       this.trigger('loadstart');
     }
   }
@@ -1121,10 +1119,6 @@ class Player extends Component {
         this.hasStarted_ = hasStarted;
         if (hasStarted) {
           this.addClass('vjs-has-started');
-          /**
-           * @event Player#firstplay
-           * @type {EventTarget~Event}
-           */
           // trigger the firstplay event if this newly has played
           this.trigger('firstplay');
         } else {
@@ -1141,6 +1135,7 @@ class Player extends Component {
    *
    * @see [Spec]{@link https://html.spec.whatwg.org/multipage/embedded-content.html#dom-media-play}
    * @fires Player#play
+   * @listens Tech#play
    * @private
    */
   handleTechPlay_() {
@@ -1151,21 +1146,27 @@ class Player extends Component {
     // hide the poster when the user hits play
     this.hasStarted(true);
     /**
-     * @event Player#firstplay
+     * Triggered whenever an {@link Tech#play} event happens. Indicates that
+     * playback has started or resumed.
+     *
+     * @event Player#play
      * @type {EventTarget~Event}
      */
     this.trigger('play');
   }
 
   /**
-   * Fired whenever the media begins waiting
+   * Retrigger the `waiting` event that was triggered by the {@link Tech}.
    *
    * @fires Player#waiting
+   * @listens Tech#waiting
    * @private
    */
   handleTechWaiting_() {
     this.addClass('vjs-waiting');
     /**
+     * A readyState change on the DOM element has caused playback to stop.
+     *
      * @event Player#waiting
      * @type {EventTarget~Event}
      */
@@ -1174,15 +1175,18 @@ class Player extends Component {
   }
 
   /**
-   * A handler for events that signal that waiting has ended
-   * which is not consistent between browsers. See #1351
+   * Retrigger the `canplay` event that was triggered by the {@link Tech}.
+   * > Note: This is not consistent between browsers. See #1351
    *
    * @fires Player#canplay
+   * @listens Tech#canplay
    * @private
    */
   handleTechCanPlay_() {
     this.removeClass('vjs-waiting');
     /**
+     * The media has a readyState of HAVE_FUTURE_DATA or greater.
+     *
      * @event Player#canplay
      * @type {EventTarget~Event}
      */
@@ -1190,15 +1194,18 @@ class Player extends Component {
   }
 
   /**
-   * A handler for events that signal that waiting has ended
-   * which is not consistent between browsers. See #1351
+   * Retrigger the `canplaythrough` event that was triggered by the {@link Tech}.
    *
    * @fires Player#canplaythrough
+   * @listens Tech#canplaythrough
    * @private
    */
   handleTechCanPlayThrough_() {
     this.removeClass('vjs-waiting');
     /**
+     * The media has a readyState of HAVE_ENOUGH_DATA or greater. This means that the
+     * entire media file can be played without buffering.
+     *
      * @event Player#canplaythrough
      * @type {EventTarget~Event}
      */
@@ -1206,15 +1213,17 @@ class Player extends Component {
   }
 
   /**
-   * A handler for events that signal that waiting has ended
-   * which is not consistent between browsers. See #1351
+   * Retrigger the `playing` event that was triggered by the {@link Tech}.
    *
    * @fires Player#playing
+   * @listens Tech#playing
    * @private
    */
   handleTechPlaying_() {
     this.removeClass('vjs-waiting');
     /**
+     * The media is no longer blocked from playback, and has started playing.
+     *
      * @event Player#playing
      * @type {EventTarget~Event}
      */
@@ -1222,14 +1231,17 @@ class Player extends Component {
   }
 
   /**
-   * Fired whenever the player is jumping to a new time
+   * Retrigger the `seeking` event that was triggered by the {@link Tech}.
    *
    * @fires Player#seeking
+   * @listens Tech#seeking
    * @private
    */
   handleTechSeeking_() {
     this.addClass('vjs-seeking');
     /**
+     * Fired whenever the player is jumping to a new time
+     *
      * @event Player#seeking
      * @type {EventTarget~Event}
      */
@@ -1237,14 +1249,17 @@ class Player extends Component {
   }
 
   /**
-   * Fired when the player has finished jumping to a new time
+   * Retrigger the `seeked` event that was triggered by the {@link Tech}.
    *
    * @fires Player#seeked
+   * @listens Tech#seeked
    * @private
    */
   handleTechSeeked_() {
     this.removeClass('vjs-seeking');
     /**
+     * Fired when the player has finished jumping to a new time
+     *
      * @event Player#seeked
      * @type {EventTarget~Event}
      */
@@ -1252,12 +1267,10 @@ class Player extends Component {
   }
 
   /**
-   * Fired the first time a video is played
-   * Not part of the HLS spec, and we're not sure if this is the best
-   * implementation yet, so use sparingly. If you don't have a reason to
-   * prevent playback, use `myPlayer.one('play');` instead.
+   * Retrigger the `firstplay` event that was triggered by the {@link Tech}.
    *
    * @fires Player#firstplay
+   * @listens Tech#firstplay
    * @private
    */
   handleTechFirstPlay_() {
@@ -1269,6 +1282,10 @@ class Player extends Component {
 
     this.addClass('vjs-has-started');
     /**
+     * Fired the first time a video is played. Not part of the HLS spec, and this is
+     * probably not the best implementation yet, so use sparingly. If you don't have a
+     * reason to prevent playback, use `myPlayer.one('play');` instead.
+     *
      * @event Player#firstplay
      * @type {EventTarget~Event}
      */
@@ -1276,15 +1293,18 @@ class Player extends Component {
   }
 
   /**
-   * Fired whenever the media has been paused
+   * Retrigger the `pause` event that was triggered by the {@link Tech}.
    *
    * @fires Player#pause
+   * @listens Tech#pause
    * @private
    */
   handleTechPause_() {
     this.removeClass('vjs-playing');
     this.addClass('vjs-paused');
     /**
+     * Fired whenever the media has been paused
+     *
      * @event Player#pause
      * @type {EventTarget~Event}
      */
@@ -1292,9 +1312,10 @@ class Player extends Component {
   }
 
   /**
-   * Fired when the end of the media resource is reached (currentTime == duration)
+   * Retrigger the `ended` event that was triggered by the {@link Tech}.
    *
    * @fires Player#ended
+   * @listens Tech#ended
    * @private
    */
   handleTechEnded_() {
@@ -1307,6 +1328,8 @@ class Player extends Component {
     }
 
     /**
+     * Fired when the end of the media resource is reached (currentTime == duration)
+     *
      * @event Player#ended
      * @type {EventTarget~Event}
      */
@@ -1316,6 +1339,7 @@ class Player extends Component {
   /**
    * Fired when the duration of the media resource is first known or changed
    *
+   * @listens Tech#durationchange
    * @private
    */
   handleTechDurationChange_() {
@@ -1328,6 +1352,7 @@ class Player extends Component {
    * @param {EventTarget~Event} event
    *        the event that caused this function to trigger
    *
+   * @listens Tech#mousedown
    * @private
    */
   handleTechClick_(event) {
@@ -1352,6 +1377,7 @@ class Player extends Component {
    * Handle a tap on the media element. It will toggle the user
    * activity state, which hides and shows the controls.
    *
+   * @listens Tech#tap
    * @private
    */
   handleTechTap_() {
@@ -1361,6 +1387,7 @@ class Player extends Component {
   /**
    * Handle touch to start
    *
+   * @listens Tech#touchstart
    * @private
    */
   handleTechTouchStart_() {
@@ -1370,6 +1397,7 @@ class Player extends Component {
   /**
    * Handle touch to move
    *
+   * @listens Tech#touchmove
    * @private
    */
   handleTechTouchMove_() {
@@ -1385,6 +1413,7 @@ class Player extends Component {
    *        the touchend event that triggered
    *        this function
    *
+   * @listens Tech#touchend
    * @private
    */
   handleTechTouchEnd_(event) {
@@ -1396,6 +1425,7 @@ class Player extends Component {
    * Fired when the player switches in or out of fullscreen mode
    *
    * @private
+   * @listens Player#fullscreenchange
    */
   handleFullscreenChange_() {
     if (this.isFullscreen()) {
@@ -1410,6 +1440,7 @@ class Player extends Component {
    * use stageclick events triggered from inside the SWF instead
    *
    * @private
+   * @listens stageclick
    */
   handleStageClick_() {
     this.reportUserActivity();
@@ -1418,8 +1449,6 @@ class Player extends Component {
   /**
    * Handle Tech Fullscreen Change
    *
-   * @fires Player#fullscreenchange
-   *
    * @param {EventTarget~Event} event
    *        the fullscreenchange event that triggered this function
    *
@@ -1427,12 +1456,16 @@ class Player extends Component {
    *        the data that was sent with the event
    *
    * @private
+   * @listens Tech#fullscreenchange
+   * @fires Player#fullscreenchange
    */
   handleTechFullscreenChange_(event, data) {
     if (data) {
       this.isFullscreen(data.isFullscreen);
     }
     /**
+     * Fired when going in and out of fullscreen.
+     *
      * @event Player#fullscreenchange
      * @type {EventTarget~Event}
      */
@@ -1440,9 +1473,10 @@ class Player extends Component {
   }
 
   /**
-   * Fires when an error occurred during the loading of an audio/video
+   * Fires when an error occurred during the loading of an audio/video.
    *
    * @private
+   * @listens Tech#error
    */
   handleTechError_() {
     const error = this.tech_.error();
@@ -1451,9 +1485,10 @@ class Player extends Component {
   }
 
   /**
-   * Fires when we get a textdata event from tech
+   * Retrigger the `textdata` event that was triggered by the {@link Tech}.
    *
    * @fires Player#textdata
+   * @listens Tech#textdata
    * @private
    */
   handleTechTextData_() {
@@ -1464,6 +1499,8 @@ class Player extends Component {
     }
 
     /**
+     * Fires when we get a textdata event from tech
+     *
      * @event Player#textdata
      * @type {EventTarget~Event}
      */
@@ -2621,6 +2658,8 @@ class Player extends Component {
 
     // alert components that the poster has been set
     /**
+     * This event fires when the poster image is changed on the player.
+     *
      * @event Player#posterchange
      * @type {EventTarget~Event}
      */
@@ -2638,6 +2677,7 @@ class Player extends Component {
    * the normal APIs.
    *
    * @fires Player#posterchange
+   * @listens Tech#posterchange
    * @private
    */
   handleTechPosterChange_() {
@@ -2645,10 +2685,6 @@ class Player extends Component {
       this.poster_ = this.tech_.poster() || '';
 
       // Let components know the poster has changed
-      /**
-       * @event Player#posterchange
-       * @type {EventTarget~Event}
-       */
       this.trigger('posterchange');
     }
   }
