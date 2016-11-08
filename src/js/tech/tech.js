@@ -412,7 +412,12 @@ class Tech extends Component {
     });
   }
 
-  addWebVttScript() {
+  /**
+   * Add vtt.js if necessary
+   *
+   * @private
+   */
+  addWebVttScript_() {
     if (!window.WebVTT && this.el().parentNode !== null && this.el().parentNode !== undefined) {
       const script = document.createElement('script');
 
@@ -457,7 +462,7 @@ class Tech extends Component {
     // Initially, Tech.el_ is a child of a dummy-div wait until the Component system
     // signals that the Tech is ready at which point Tech.el_ is part of the DOM
     // before inserting the WebVTT script
-    this.on('ready', this.addWebVttScript);
+    this.on('ready', this.addWebVttScript_);
 
     const updateDisplay = () => this.trigger('texttrackchange');
     const textTracksChanges = () => {
@@ -568,7 +573,6 @@ class Tech extends Component {
    *
    * @param {Object} options The object should contain values for
    * kind, language, label and src (location of the WebVTT file)
-   * @method createRemoteTextTrack
    */
   createRemoteTextTrack(options) {
     const track = mergeOptions(options, {

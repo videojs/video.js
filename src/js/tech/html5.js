@@ -613,7 +613,6 @@ class Html5 extends Tech {
    *
    * @param {Object} options The object should contain values for
    * kind, language, label and src (location of the WebVTT file)
-   * @method createRemoteTextTrack
    */
   createRemoteTextTrack(options) {
     if (!this.featuresNativeTextTracks) {
