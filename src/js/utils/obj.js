@@ -28,6 +28,7 @@
  * @return {Mixed}
  *         The new accumulated value.
  */
+const toString = Object.prototype.toString;
 
 /**
  * Array-like iteration for objects.
@@ -93,7 +94,8 @@ export function assign(target, ...sources) {
  * Returns whether a value is an object of any kind - including DOM nodes,
  * arrays, regular expressions, etc. Not functions, though.
  *
- * This avoids gotchas like `typeof null === 'object'`.
+ * This avoids the gotcha where using `typeof` on a `null` value
+ * results in `'object'`.
  *
  * @param  {Object} value
  * @return {Boolean}
@@ -110,5 +112,7 @@ export function isObject(value) {
  * @return {Boolean}
  */
 export function isPlain(value) {
-  return isObject(value) && value.constructor === Object;
+  return isObject(value) &&
+    toString.call(value) === '[object Object]' &&
+    value.constructor === Object;
 }
