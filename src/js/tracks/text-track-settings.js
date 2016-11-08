@@ -158,14 +158,20 @@ const selectConfigs = {
 selectConfigs.windowColor.options = selectConfigs.backgroundColor.options;
 
 /**
- * Parses out option values.
+ * Get the actual value of an option.
  *
- * @private
- * @param  {String} value
+ * @param  {string} value
+ *         The value to get
+ *
  * @param  {Function} [parser]
  *         Optional function to adjust the value.
+ *
  * @return {Mixed}
- *         Will be `undefined` if no value exists (or if given value is "none").
+ *         - Will be `undefined` if no value exists
+ *         - Will be `undefined` if the given value is "none".
+ *         - Will be the actual value otherwise.
+ *
+ * @private
  */
 function parseOptionValue(value, parser) {
   if (parser) {
@@ -180,10 +186,18 @@ function parseOptionValue(value, parser) {
 /**
  * Gets the value of the selected <option> element within a <select> element.
  *
- * @param  {Object} config
+ * @param  {Element} el
+ *         the element to look in
+ *
  * @param  {Function} [parser]
  *         Optional function to adjust the value.
+ *
  * @return {Mixed}
+ *         - Will be `undefined` if no value exists
+ *         - Will be `undefined` if the given value is "none".
+ *         - Will be the actual value otherwise.
+ *
+ * @private
  */
 function getSelectedOptionValue(el, parser) {
   const value = el.options[el.options.selectedIndex].value;
@@ -195,10 +209,16 @@ function getSelectedOptionValue(el, parser) {
  * Sets the selected <option> element within a <select> element based on a
  * given value.
  *
- * @param {Object} el
- * @param {String} value
+ * @param {Element} el
+ *        The element to look in.
+ *
+ * @param {string} value
+ *        the property to look on.
+ *
  * @param {Function} [parser]
  *        Optional function to adjust the value before comparing.
+ *
+ * @private
  */
 function setSelectedOption(el, value, parser) {
   if (!value) {
@@ -214,15 +234,21 @@ function setSelectedOption(el, value, parser) {
 }
 
 /**
- * Manipulate settings of text tracks
+ * Manipulate Text Tracks settings.
  *
- * @param {Object} player  Main Player
- * @param {Object=} options Object of option names and values
  * @extends Component
- * @class TextTrackSettings
  */
 class TextTrackSettings extends Component {
 
+  /**
+   * Creates an instance of this class.
+   *
+   * @param {Player} player
+   *         The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *         The key/value store of player options.
+   */
   constructor(player, options) {
     super(player, options);
     this.setDefaults();
@@ -257,9 +283,12 @@ class TextTrackSettings extends Component {
   /**
    * Create a <select> element with configured options.
    *
-   * @private
+   * @param {string} key
+   *        Configuration key to use during creation.
+   *
    * @return {Element}
-   * @method createElSelect_
+   *         The DOM element that gets created.
+   * @private
    */
   createElSelect_(key) {
     const config = selectConfigs[key];
@@ -284,9 +313,10 @@ class TextTrackSettings extends Component {
   /**
    * Create foreground color element for the component
    *
-   * @private
    * @return {Element}
-   * @method createElFgColor_
+   *         The element that was created.
+   *
+   * @private
    */
   createElFgColor_() {
     const legend = createEl('legend', {
@@ -307,9 +337,10 @@ class TextTrackSettings extends Component {
   /**
    * Create background color element for the component
    *
-   * @private
    * @return {Element}
-   * @method createElBgColor_
+   *         The element that was created
+   *
+   * @private
    */
   createElBgColor_() {
     const legend = createEl('legend', {
@@ -330,9 +361,10 @@ class TextTrackSettings extends Component {
   /**
    * Create window color element for the component
    *
-   * @private
    * @return {Element}
-   * @method createElWinColor_
+   *         The element that was created
+   *
+   * @private
    */
   createElWinColor_() {
     const legend = createEl('legend', {
@@ -353,9 +385,10 @@ class TextTrackSettings extends Component {
   /**
    * Create color elements for the component
    *
-   * @private
    * @return {Element}
-   * @method createElColors_
+   *         The element that was created
+   *
+   * @private
    */
   createElColors_() {
     return createEl('div', {
@@ -370,9 +403,10 @@ class TextTrackSettings extends Component {
   /**
    * Create font elements for the component
    *
-   * @private
    * @return {Element}
-   * @method createElFont_
+   *         The element that was created.
+   *
+   * @private
    */
   createElFont_() {
     const fontPercent = createEl('div', {
@@ -395,9 +429,10 @@ class TextTrackSettings extends Component {
   /**
    * Create controls for the component
    *
-   * @private
    * @return {Element}
-   * @method createElControls_
+   *         The element that was created.
+   *
+   * @private
    */
   createElControls_() {
     const defaultsButton = createEl('button', {
@@ -419,7 +454,7 @@ class TextTrackSettings extends Component {
    * Create the component's DOM element
    *
    * @return {Element}
-   * @method createEl
+   *         The element that was created.
    */
   createEl() {
     const settings = createEl('div', {
@@ -464,7 +499,6 @@ class TextTrackSettings extends Component {
    *
    * @return {Object}
    *         An object with config values parsed from the DOM or localStorage.
-   * @method getValues
    */
   getValues() {
     return Obj.reduce(selectConfigs, (accum, config, key) => {
@@ -483,7 +517,6 @@ class TextTrackSettings extends Component {
    *
    * @param {Object} values
    *        An object with config values parsed from the DOM or localStorage.
-   * @method setValues
    */
   setValues(values) {
     Obj.each(selectConfigs, (config, key) => {
@@ -493,8 +526,6 @@ class TextTrackSettings extends Component {
 
   /**
    * Sets all <select> elements to their default values.
-   *
-   * @method setDefaults
    */
   setDefaults() {
     Obj.each(selectConfigs, (config) => {
@@ -505,9 +536,7 @@ class TextTrackSettings extends Component {
   }
 
   /**
-   * Restore texttrack settings
-   *
-   * @method restoreSettings
+   * Restore texttrack settings from localStorage
    */
   restoreSettings() {
     let values;
@@ -524,9 +553,7 @@ class TextTrackSettings extends Component {
   }
 
   /**
-   * Save text track settings to local storage
-   *
-   * @method saveSettings
+   * Save text track settings to localStorage
    */
   saveSettings() {
     if (!this.options_.persistTextTrackSettings) {
@@ -548,8 +575,6 @@ class TextTrackSettings extends Component {
 
   /**
    * Update display of text track settings
-   *
-   * @method updateDisplay
    */
   updateDisplay() {
     const ttDisplay = this.player_.getChild('textTrackDisplay');

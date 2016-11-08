@@ -5,20 +5,36 @@ import * as browser from '../utils/browser.js';
 import document from 'global/document';
 
 /**
- * A List of text track cues as defined in:
- * https://html.spec.whatwg.org/multipage/embedded-content.html#texttrackcuelist
+ * @typedef {Object} TextTrackCue
  *
- * interface TextTrackCueList {
- *   readonly attribute unsigned long length;
- *   getter TextTrackCue (unsigned long index);
- *   TextTrackCue? getCueById(DOMString id);
- * };
+ * @property {string} id
+ *           The unique id for this text track cue
  *
- * @param {Array} cues A list of cues to be initialized with
- * @class TextTrackCueList
+ * @property {number} startTime
+ *           The start time for this text track cue
+ *
+ * @property {number} endTime
+ *           The end time for this text track cue
+ *
+ * @property {boolean} pauseOnExit
+ *           Pause when the end time is reached if true.
+ *
+ * @see [Spec]{@link https://html.spec.whatwg.org/multipage/embedded-content.html#texttrackcue}
  */
 
+/**
+ * A List of TextTrackCues.
+ *
+ * @see [Spec]{@link https://html.spec.whatwg.org/multipage/embedded-content.html#texttrackcuelist}
+ */
 class TextTrackCueList {
+
+  /**
+   * Create an instance of this class..
+   *
+   * @param {Array} cues
+   *        A list of cues to be initialized with
+   */
   constructor(cues) {
     let list = this; // eslint-disable-line
 
@@ -34,6 +50,10 @@ class TextTrackCueList {
 
     TextTrackCueList.prototype.setCues_.call(list, cues);
 
+    /**
+     * @member {number} length
+     *         The current number of `TextTrackCue`s in the TextTrackCueList.
+     */
     Object.defineProperty(list, 'length', {
       get() {
         return this.length_;
@@ -46,10 +66,12 @@ class TextTrackCueList {
   }
 
   /**
-   * A setter for cues in this list
+   * A setter for cues in this list. Creates getters
+   * an an index for the cues.
    *
-   * @param {Array} cues an array of cues
-   * @method setCues_
+   * @param {Array} cues
+   *        An array of cues to set
+   *
    * @private
    */
   setCues_(cues) {
@@ -80,11 +102,13 @@ class TextTrackCueList {
   }
 
   /**
-   * Get a cue that is currently in the Cue list by id
+   * Get a `TextTrackCue` that is currently in the `TextTrackCueList` by id.
    *
-   * @param {String} id
-   * @method getCueById
-   * @return {Object} a single cue
+   * @param {string} id
+   *        The id of the cue that should be searched for.
+   *
+   * @return {TextTrackCue|null}
+   *         A single cue or null if none was found.
    */
   getCueById(id) {
     let result = null;

@@ -3,13 +3,18 @@
  * based on a capture.
  *
  * @file text-track-list-converter.js
+ * @module text-track-list-converter
  */
 
 /**
- * Examine a single text track and return a JSON-compatible javascript
- * object that represents the text track's state.
- * @param track {TextTrackObject} the text track to query
- * @return {Object} a serializable javascript representation of the
+ * Examine a single {@link TextTrack} and return a JSON-compatible javascript object that
+ * represents the {@link TextTrack}'s state.
+ *
+ * @param {TextTrack} track
+ *        The text track to query.
+ *
+ * @return {Object}
+ *         A serializable javascript representation of the TextTrack.
  * @private
  */
 const trackToJson_ = function(track) {
@@ -38,12 +43,16 @@ const trackToJson_ = function(track) {
 };
 
 /**
- * Examine a tech and return a JSON-compatible javascript array that
- * represents the state of all text tracks currently configured. The
- * return array is compatible with `jsonToTextTracks`.
- * @param tech {tech} the tech object to query
- * @return {Array} a serializable javascript representation of the
- * @function textTracksToJson
+ * Examine a {@link Tech} and return a JSON-compatible javascript array that represents the
+ * state of all {@link TextTrack}s currently configured. The return array is compatible with
+ * {@link text-track-list-converter:jsonToTextTracks}.
+ *
+ * @param {Tech} tech
+ *        The tech object to query
+ *
+ * @return {Array}
+ *         A serializable javascript representation of the {@link Tech}s
+ *         {@link TextTrackList}.
  */
 const textTracksToJson = function(tech) {
 
@@ -65,12 +74,15 @@ const textTracksToJson = function(tech) {
 };
 
 /**
- * Creates a set of remote text tracks on a tech based on an array of
- * javascript text track representations.
- * @param json {Array} an array of text track representation objects,
- * like those that would be produced by `textTracksToJson`
- * @param tech {tech} the tech to create text tracks on
- * @function jsonToTextTracks
+ * Create a set of remote {@link TextTrack}s on a {@link Tech} based on an array of javascript
+ * object {@link TextTrack} representations.
+ *
+ * @param {Array} json
+ *        An array of `TextTrack` representation objects, like those that would be
+ *        produced by `textTracksToJson`.
+ *
+ * @param {Tech} tech
+ *        The `Tech` to create the `TextTrack`s on.
  */
 const jsonToTextTracks = function(json, tech) {
   json.forEach(function(track) {

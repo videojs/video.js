@@ -7,35 +7,57 @@ import document from 'global/document';
 import EventTarget from '../event-target';
 import TextTrack from '../tracks/text-track';
 
+/**
+ * @typedef {HTMLTrackElement~ReadyState}
+ * @enum {number}
+ */
 const NONE = 0;
 const LOADING = 1;
 const LOADED = 2;
 const ERROR = 3;
 
 /**
- * https://html.spec.whatwg.org/multipage/embedded-content.html#htmltrackelement
+ * A single track represented in the DOM.
  *
- * interface HTMLTrackElement : HTMLElement {
- *   attribute DOMString kind;
- *   attribute DOMString src;
- *   attribute DOMString srclang;
- *   attribute DOMString label;
- *   attribute boolean default;
- *
- *   const unsigned short NONE = 0;
- *   const unsigned short LOADING = 1;
- *   const unsigned short LOADED = 2;
- *   const unsigned short ERROR = 3;
- *   readonly attribute unsigned short readyState;
- *
- *   readonly attribute TextTrack track;
- * };
- *
- * @param {Object} options TextTrack configuration
- * @class HTMLTrackElement
+ * @see [Spec]{@link https://html.spec.whatwg.org/multipage/embedded-content.html#htmltrackelement}
+ * @extends EventTarget
  */
-
 class HTMLTrackElement extends EventTarget {
+
+  /**
+   * Create an instance of this class.
+   *
+   * @param {Object} options={}
+   *        Object of option names and values
+   *
+   * @param {Tech} options.tech
+   *        A reference to the tech that owns this HTMLTrackElement.
+   *
+   * @param {TextTrack~Kind} [options.kind='subtitles']
+   *        A valid text track kind.
+   *
+   * @param {TextTrack~Mode} [options.mode='disabled']
+   *        A valid text track mode.
+   *
+   * @param {string} [options.id='vjs_track_' + Guid.newGUID()]
+   *        A unique id for this TextTrack.
+   *
+   * @param {string} [options.label='']
+   *        The menu label for this track.
+   *
+   * @param {string} [options.language='']
+   *        A valid two character language code.
+   *
+   * @param {string} [options.srclang='']
+   *        A valid two character language code. An alternative, but deprioritized
+   *        vesion of `options.language`
+   *
+   * @param {string} [options.src]
+   *        A url to TextTrack cues.
+   *
+   * @param {boolean} [options.default]
+   *        If this track should default to on or off.
+   */
   constructor(options = {}) {
     super();
 
@@ -60,12 +82,20 @@ class HTMLTrackElement extends EventTarget {
     trackElement.label = track.label;
     trackElement.default = track.default;
 
+    /**
+     * @member {HTMLTrackElement~ReadyState} readyState
+     *         The current ready state of the track element.
+     */
     Object.defineProperty(trackElement, 'readyState', {
       get() {
         return readyState;
       }
     });
 
+    /**
+     * @member {TextTrack} track
+     *         The underlying TextTrack object.
+     */
     Object.defineProperty(trackElement, 'track', {
       get() {
         return track;
@@ -74,6 +104,10 @@ class HTMLTrackElement extends EventTarget {
 
     readyState = NONE;
 
+    /**
+     * @listens TextTrack#loadeddata
+     * @fires HTMLTrackElement#load
+     */
     track.addEventListener('loadeddata', function() {
       readyState = LOADED;
 
