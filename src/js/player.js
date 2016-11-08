@@ -238,8 +238,9 @@ const TECH_EVENTS_RETRIGGER = [
  *   </video>
  * ```
  *
- * After an instance has been created it can be accessed globally again
- * by calling `videojs('example_video_1');`
+ * After an instance has been created it can be accessed globally in two ways:
+ * 1. By calling `videojs('example_video_1');`
+ * 2. By using it directly via  `videojs.players.example_video_1;`
  *
  * @extends Component
  */
