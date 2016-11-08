@@ -100,6 +100,8 @@ class MenuButton extends ClickableComponent {
 
   /**
    * Create the list of menu items. Specific to each subclass.
+   *
+   * @abstract
    */
   createItems() {}
 

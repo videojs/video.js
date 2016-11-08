@@ -48,6 +48,8 @@ class PopupButton extends ClickableComponent {
 
   /**
    * Create a `Popup`. - Override with specific functionality for component
+   *
+   * @abstract
    */
   createPopup() {}
 
