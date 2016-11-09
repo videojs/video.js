@@ -105,17 +105,12 @@ QUnit.test('addElClass()', function(assert) {
 QUnit.test('removeElClass()', function(assert) {
   const el = document.createElement('div');
 
-  el.className = 'test-class foo foo test2_className FOO bar';
+  el.className = 'test-class test2_className FOO bar';
 
-  assert.expect(5);
+  assert.expect(4);
 
   Dom.removeElClass(el, 'test-class');
-  assert.strictEqual(el.className, 'foo foo test2_className FOO bar', 'removes one class');
-
-  Dom.removeElClass(el, 'foo');
-  assert.strictEqual(el.className,
-                    'test2_className FOO bar',
-                    'removes all instances of a class');
+  assert.strictEqual(el.className, 'test2_className FOO bar', 'removes one class');
 
   assert.throws(function() {
     Dom.removeElClass(el, 'test2_className bar');
