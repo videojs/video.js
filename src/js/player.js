@@ -2532,9 +2532,9 @@ class Player extends Component {
    * @deprecated The default value of the "manualCleanup" parameter will default
    * to "false" in upcoming versions of Video.js
    */
-  addRemoteTextTrack(...theArgs) {
+  addRemoteTextTrack(options, manualCleanup) {
     if (this.tech_) {
-      return this.tech_.addRemoteTextTrack(...theArgs);
+      return this.tech_.addRemoteTextTrack(options, manualCleanup);
     }
   }
 
