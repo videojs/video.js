@@ -21,7 +21,7 @@ class PosterImage extends ClickableComponent {
    *        The `Player` that this class should attach to.
    *
    * @param {Object} [options]
-   *        The key/value stroe of player options.
+   *        The key/value store of player options.
    */
   constructor(player, options) {
     super(player, options);

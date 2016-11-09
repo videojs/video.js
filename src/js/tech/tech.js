@@ -19,8 +19,8 @@ import window from 'global/window';
 import document from 'global/document';
 
 /**
- * An Object containing a structure like: `{src: 'url', type: 'mimetype'}` or  string
- * that just contains a only the src url.
+ * An Object containing a structure like: `{src: 'url', type: 'mimetype'}` or string
+ * that just contains the src url alone.
  *
  * ``` js
  *   var SourceObject = {
@@ -180,8 +180,8 @@ class Tech extends Component {
 
   /**
    * This is used to trigger a `progress` event when the buffered percent changes. It
-   * sets an interval function that will be called every 500miliseconds to check if the
-   * bufferend percent has changed.
+   * sets an interval function that will be called every 500 milliseconds to check if the
+   * buffer end percent has changed.
    *
    * > This function is called by {@link Tech#manualProgressOn}
    *
@@ -346,7 +346,7 @@ class Tech extends Component {
   }
 
   /**
-   * Clear out a single `TrackList`, or an array of  `TrackLists`.
+   * Clear out a single `TrackList` or an array of `TrackLists` given their names.
    *
    * > Note: Techs without source handlers should call this between sources for `video`
    *         & `audio` tracks. You don't want to use them between tracks!
@@ -402,7 +402,7 @@ class Tech extends Component {
    *        Error to set on the Tech
    *
    * @return {MediaError|null}
-   *         The curren error object on the tech, or null if there isn't one.
+   *         The current error object on the tech, or null if there isn't one.
    */
   error(err) {
     if (err !== undefined) {
@@ -430,7 +430,7 @@ class Tech extends Component {
   }
 
   /**
-   * Causes a manual time update to occure if {@link Tech#manualTimeUpdatesOn} was
+   * Causes a manual time update to occur if {@link Tech#manualTimeUpdatesOn} was
    * previously called.
    *
    * @fires Tech#timeupdate
@@ -696,7 +696,7 @@ class Tech extends Component {
    * Tech in order to create native or custom TextTracks.
    *
    * @param {Object} options
-   *        The object should contain the options to intialize the TextTrack with.
+   *        The object should contain the options to initialize the TextTrack with.
    *
    * @param {string} [options.kind]
    *        `TextTrack` kind (subtitles, captions, descriptions, chapters, or metadata).

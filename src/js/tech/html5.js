@@ -957,7 +957,7 @@ Html5.Events = [
 ];
 
 /**
- * Boolean indicating wether the `Tech` supports volume control.
+ * Boolean indicating whether the `Tech` supports volume control.
  *
  * @type {boolean}
  * @default {@link Html5.canControlVolume}
@@ -965,7 +965,7 @@ Html5.Events = [
 Html5.prototype.featuresVolumeControl = Html5.canControlVolume();
 
 /**
- * Boolean indicating wether the `Tech` supports changing the speed at which the media
+ * Boolean indicating whether the `Tech` supports changing the speed at which the media
  * plays. Examples:
  *   - Set player to play 2x (twice) as fast
  *   - Set player to play 0.5x (half) as fast
@@ -976,7 +976,7 @@ Html5.prototype.featuresVolumeControl = Html5.canControlVolume();
 Html5.prototype.featuresPlaybackRate = Html5.canControlPlaybackRate();
 
 /**
- * Boolean indicating wether the `HTML5` tech currently supports the media element
+ * Boolean indicating whether the `HTML5` tech currently supports the media element
  * moving in the DOM. iOS breaks if you move the media element, so this is set this to
  * false there. Everywhere else this should be true.
  *
@@ -988,7 +988,7 @@ Html5.prototype.movingMediaElementInDOM = !browser.IS_IOS;
 // TODO: Previous comment: No longer appears to be used. Can probably be removed.
 //       Is this true?
 /**
- * Boolean indicating wether the `HTML5` tech currently supports automatic media resize
+ * Boolean indicating whether the `HTML5` tech currently supports automatic media resize
  * when going into fullscreen.
  *
  * @type {boolean}
@@ -997,7 +997,7 @@ Html5.prototype.movingMediaElementInDOM = !browser.IS_IOS;
 Html5.prototype.featuresFullscreenResize = true;
 
 /**
- * Boolean indicating wether the `HTML5` tech currently supports the progress event.
+ * Boolean indicating whether the `HTML5` tech currently supports the progress event.
  * If this is false, manual `progress` events will be triggred instead.
  *
  * @type {boolean}
@@ -1006,7 +1006,7 @@ Html5.prototype.featuresFullscreenResize = true;
 Html5.prototype.featuresProgressEvents = true;
 
 /**
- * Boolean indicating wether the `HTML5` tech currently supports the timeupdate event.
+ * Boolean indicating whether the `HTML5` tech currently supports the timeupdate event.
  * If this is false, manual `timeupdate` events will be triggred instead.
  *
  * @default
@@ -1014,7 +1014,7 @@ Html5.prototype.featuresProgressEvents = true;
 Html5.prototype.featuresTimeupdateEvents = true;
 
 /**
- * Boolean indicating wether the `HTML5` tech currently supports native `TextTrack`s.
+ * Boolean indicating whether the `HTML5` tech currently supports native `TextTrack`s.
  *
  * @type {boolean}
  * @default {@link Html5.supportsNativeTextTracks}
@@ -1022,7 +1022,7 @@ Html5.prototype.featuresTimeupdateEvents = true;
 Html5.prototype.featuresNativeTextTracks = Html5.supportsNativeTextTracks();
 
 /**
- * Boolean indicating wether the `HTML5` tech currently supports native `VideoTrack`s.
+ * Boolean indicating whether the `HTML5` tech currently supports native `VideoTrack`s.
  *
  * @type {boolean}
  * @default {@link Html5.supportsNativeVideoTracks}
@@ -1030,7 +1030,7 @@ Html5.prototype.featuresNativeTextTracks = Html5.supportsNativeTextTracks();
 Html5.prototype.featuresNativeVideoTracks = Html5.supportsNativeVideoTracks();
 
 /**
- * Boolean indicating wether the `HTML5` tech currently supports native `AudioTrack`s.
+ * Boolean indicating whether the `HTML5` tech currently supports native `AudioTrack`s.
  *
  * @type {boolean}
  * @default {@link Html5.supportsNativeAudioTracks}
@@ -1147,8 +1147,8 @@ Html5.resetMediaElement = function(el) {
 // Wrap native properties with a getter
 [
   /**
-   * Get the value of `paused` from the media element. `paused` indicates wether the media element
-   * is current paused or not.
+   * Get the value of `paused` from the media element. `paused` indicates whether the media element
+   * is currently paused or not.
    *
    * @method Html5.prototype.paused
    * @return {boolean}
@@ -1173,7 +1173,7 @@ Html5.resetMediaElement = function(el) {
   /**
    * Get the value of `buffered` from the media element. `buffered` is a `TimeRange`
    * object that represents the parts of the media that are already downloaded and
-   * avialable for playback.
+   * available for playback.
    *
    * @method Html5.prototype.buffered
    * @return {TimeRange}
@@ -1186,7 +1186,7 @@ Html5.resetMediaElement = function(el) {
   /**
    * Get the value of `volume` from the media element. `volume` indicates
    * the current playback volume of audio for a media. `volume` will be a value from 0
-   * (silent) to 1 (loudest, and default).
+   * (silent) to 1 (loudest and default).
    *
    * @method Html5.prototype.volume
    * @return {number}
@@ -1212,7 +1212,7 @@ Html5.resetMediaElement = function(el) {
 
   /**
    * Get the value of `poster` from the media element. `poster` indicates
-   * that the url of an image file that can/will be shown when no media data is avialable.
+   * that the url of an image file that can/will be shown when no media data is available.
    *
    * @method Html5.prototype.poster
    * @return {string}
@@ -1258,7 +1258,7 @@ Html5.resetMediaElement = function(el) {
 
   /**
    * Get the value of `controls` from the media element. `controls` indicates
-   * wether the native media controls should be shown or hidden.
+   * whether the native media controls should be shown or hidden.
    *
    * @method Html5.prototype.controls
    * @return {boolean}
@@ -1302,7 +1302,7 @@ Html5.resetMediaElement = function(el) {
   'error',
 
   /**
-   * Get the value of `seeking` from the media element. `seeking` indicates wether the
+   * Get the value of `seeking` from the media element. `seeking` indicates whether the
    * media is currently seeking to a new position or not.
    *
    * @method Html5.prototype.seeking
@@ -1329,7 +1329,7 @@ Html5.resetMediaElement = function(el) {
   'seekable',
 
   /**
-   * Get the value of `ended` from the media element. `ended` indicates wether
+   * Get the value of `ended` from the media element. `ended` indicates whether
    * the media has reached the end or not.
    *
    * @method Html5.prototype.ended
@@ -1344,7 +1344,7 @@ Html5.resetMediaElement = function(el) {
 
   /**
    * Get the value of `defaultMuted` from the media element. `defaultMuted` indicates
-   * wether the media should start muted or not. Only changes the default state of the
+   * whether the media should start muted or not. Only changes the default state of the
    * media. `muted` and `defaultMuted` can have different values. `muted` indicates the
    * current state.
    *
@@ -1496,7 +1496,7 @@ Html5.resetMediaElement = function(el) {
 
   /**
    * Set the value of `poster` on the media element. `poster` is the url to
-   * an image file that can/will be shown when no media data is avialable.
+   * an image file that can/will be shown when no media data is available.
    *
    * @method Html5.prototype.setPoster
    * @param {string} poster

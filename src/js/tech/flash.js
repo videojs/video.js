@@ -192,7 +192,7 @@ class Flash extends Tech {
   }
 
   /**
-   * Indicates wether the media is currently seeking to a new position or not.
+   * Indicates whether the media is currently seeking to a new position or not.
    *
    * @return {boolean}
    *         - True if seeking to a new position
@@ -469,7 +469,7 @@ for (let i = 0; i < _readOnly.length; i++) {
 
 /**
  * Get the value of `controls` from the swf. `controls` indicates
- * wether the native flash controls should be shown or hidden.
+ * whether the native flash controls should be shown or hidden.
  *
  * @method Html5.prototype.controls
  * @return {boolean}
@@ -500,7 +500,7 @@ for (let i = 0; i < _readOnly.length; i++) {
 
 /**
  * Get the value of `defaultMuted` from the swf. `defaultMuted` indicates
- * wether the media should start muted or not. Only changes the default state of the
+ * whether the media should start muted or not. Only changes the default state of the
  * media. `muted` and `defaultMuted` can have different values. `muted` indicates the
  * current state.
  *
@@ -574,7 +574,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  */
 
 /**
- * Get the value of `paused` from the swf. `paused` indicates wether the swf
+ * Get the value of `paused` from the swf. `paused` indicates whether the swf
  * is current paused or not.
  *
  * @method Flash.prototype.paused
@@ -583,7 +583,7 @@ for (let i = 0; i < _readOnly.length; i++) {
  */
 
 /**
- * Get the value of `ended` from the swf. `ended` indicates wether
+ * Get the value of `ended` from the swf. `ended` indicates whether
  * the media has reached the end or not.
  *
  * @method Flash.prototype.ended
@@ -709,7 +709,7 @@ for (let i = 0; i < _readOnly.length; i++) {
 
 /**
  * Get the value of `controls` from the swf. `controls` indicates
- * wether the native flash controls should be shown or hidden.
+ * whether the native flash controls should be shown or hidden.
  *
  * @method Flash.prototype.controls
  * @return {boolean}
@@ -740,7 +740,7 @@ for (let i = 0; i < _readOnly.length; i++) {
 
 /**
  * Set the value of `defaultMuted` on the swf. `defaultMuted` indicates
- * wether the media should start muted or not. Only changes the default state of the
+ * whether the media should start muted or not. Only changes the default state of the
  * media. `muted` and `defaultMuted` can have different values. `muted` indicates the
  * current state.
  *

@@ -18,7 +18,7 @@ function FlashRtmpDecorator(Flash) {
   };
 
   /**
-   * Join connection an stream with an amperand.
+   * Join connection and stream with an ampersand.
    *
    * @param {string} connection
    *        The connection string.
@@ -102,7 +102,7 @@ function FlashRtmpDecorator(Flash) {
   // with one of these protocols should be valid
 
   /**
-   * Regular exprection used to check if the source is an rtmp source.
+   * Regular expression used to check if the source is an rtmp source.
    *
    * @property
    * @type {RegExp}
