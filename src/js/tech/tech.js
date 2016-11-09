@@ -849,11 +849,20 @@ Tech.withSourceHandlers = function(_Tech) {
 
   // On the first loadstart after setSource
   _Tech.prototype.firstLoadStartListener_ = function() {
+    this.previousSource_ = this.currentSource_;
     this.one(this.el_, 'loadstart', _Tech.prototype.successiveLoadStartListener_);
   };
 
   // On successive loadstarts when setSource has not been called again
   _Tech.prototype.successiveLoadStartListener_ = function() {
+
+    // if the second loadstart is for the same source
+    // it is an invalid loadstart, set this event to trigger again
+    if (this.currentSource_ && this.previousSource_ &&
+        this.previousSource_.src === this.currentSource_.src) {
+      return this.one(this.el_, 'loadstart', _Tech.prototype.successiveLoadStartListener_);
+    }
+    this.previousSource_ = this.currentSource_;
     this.currentSource_ = null;
     this.disposeSourceHandler();
     this.one(this.el_, 'loadstart', _Tech.prototype.successiveLoadStartListener_);
