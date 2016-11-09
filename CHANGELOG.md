@@ -1,5 +1,5 @@
-<a name="5.13.0"></a>
-# [5.13.0](https://github.com/videojs/video.js/compare/v5.12.6...v5.13.0) (2016-11-09)
+<a name="5.13.1"></a>
+# [5.13.1](https://github.com/videojs/video.js/compare/v5.12.6...v5.13.1) (2016-11-09)
 
 ### Features
 
