@@ -608,17 +608,16 @@ class Html5 extends Tech {
   }
 
   /**
-   * Creates a remote text track object and returns a html track element
+   * Creates either native TextTrack or an emulated TextTrack depending
+   * on the value of `featuresNativeTextTracks`
    *
    * @param {Object} options The object should contain values for
    * kind, language, label and src (location of the WebVTT file)
-   * @return {HTMLTrackElement}
    */
-  addRemoteTextTrack(options = {}) {
+  createRemoteTextTrack(options) {
     if (!this.featuresNativeTextTracks) {
-      return super.addRemoteTextTrack(options);
+      return super.createRemoteTextTrack(options);
     }
-
     const htmlTrackElement = document.createElement('track');
 
     if (options.kind) {
@@ -640,11 +639,25 @@ class Html5 extends Tech {
       htmlTrackElement.src = options.src;
     }
 
-    this.el().appendChild(htmlTrackElement);
+    return htmlTrackElement;
+  }
 
-    // store HTMLTrackElement and TextTrack to remote list
-    this.remoteTextTrackEls().addTrackElement_(htmlTrackElement);
-    this.remoteTextTracks().addTrack_(htmlTrackElement.track);
+  /**
+   * Creates a remote text track object and returns an html track element.
+   *
+   * @param {Object} options The object should contain values for
+   * kind, language, label, and src (location of the WebVTT file)
+   * @param {Boolean} [manualCleanup=true] if set to false, the TextTrack will be
+   * automatically removed from the video element whenever the source changes
+   * @return {HTMLTrackElement} An Html Track Element.
+   * This can be an emulated {@link HTMLTrackElement} or a native one.
+   * @deprecated The default value of the "manualCleanup" parameter will default
+   * to "false" in upcoming versions of Video.js
+   */
+  addRemoteTextTrack(options, manualCleanup) {
+    const htmlTrackElement = super.addRemoteTextTrack(options, manualCleanup);
+
+    this.el().appendChild(htmlTrackElement);
 
     return htmlTrackElement;
   }
@@ -655,15 +668,7 @@ class Html5 extends Tech {
    * @param {TextTrackObject} track Texttrack object to remove
    */
   removeRemoteTextTrack(track) {
-    if (!this.featuresNativeTextTracks) {
-      return super.removeRemoteTextTrack(track);
-    }
-
-    const trackElement = this.remoteTextTrackEls().getTrackElementByTrack_(track);
-
-    // remove HTMLTrackElement and TextTrack from remote list
-    this.remoteTextTrackEls().removeTrackElement_(trackElement);
-    this.remoteTextTracks().removeTrack_(track);
+    super.removeRemoteTextTrack(track);
 
     const tracks = this.$$('track');
 

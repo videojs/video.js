@@ -146,7 +146,7 @@ QUnit.test('dispose() should clear all tracks that are added after creation', fu
 
   assert.equal(tech.audioTracks().length, 2, 'should have two audio tracks at the start');
   assert.equal(tech.videoTracks().length, 2, 'should have two video tracks at the start');
-  assert.equal(tech.textTracks().length, 2, 'should have two video tracks at the start');
+  assert.equal(tech.textTracks().length, 2, 'should have two text tracks at the start');
   assert.equal(tech.remoteTextTrackEls().length,
               2,
               'should have two remote text tracks els');
@@ -165,6 +165,62 @@ QUnit.test('dispose() should clear all tracks that are added after creation', fu
               'should have zero remote text tracks els');
   assert.equal(tech.remoteTextTracks().length, 0, 'should have zero remote text tracks');
   assert.equal(tech.textTracks().length, 0, 'should have zero video tracks after dispose');
+});
+
+QUnit.test('switching sources should clear all remote tracks that are added with manualCleanup = false', function(assert) {
+  // Define a new tech class
+  const MyTech = extendFn(Tech);
+
+  // Create source handler
+  const handler = {
+    canPlayType: () => 'probably',
+    canHandleSource: () => 'probably',
+    handleSource: () => {
+      return {
+        dispose: () => {}
+      };
+    }
+  };
+
+  // Extend Tech with source handlers
+  Tech.withSourceHandlers(MyTech);
+
+  MyTech.registerSourceHandler(handler);
+
+  const tech = new MyTech();
+
+  // set the initial source
+  tech.setSource({src: 'foo.mp4', type: 'mp4'});
+
+  // default value for manualCleanup is true
+  tech.addRemoteTextTrack({});
+  // should be automatically cleaned up when source changes
+  tech.addRemoteTextTrack({}, false);
+
+  assert.equal(tech.textTracks().length, 2, 'should have two text tracks at the start');
+  assert.equal(tech.remoteTextTrackEls().length,
+              2,
+              'should have two remote text tracks els');
+  assert.equal(tech.remoteTextTracks().length, 2, 'should have two remote text tracks');
+  assert.equal(tech.autoRemoteTextTracks_.length,
+               1,
+               'should have one auto-cleanup remote text track');
+
+  // change source to force cleanup of auto remote text tracks
+  tech.setSource({src: 'bar.mp4', type: 'mp4'});
+
+  assert.equal(tech.textTracks().length,
+               1,
+               'should have one text track after source change');
+  assert.equal(tech.remoteTextTrackEls().length,
+              1,
+              'should have one remote remote text track els after source change');
+  assert.equal(tech.remoteTextTracks().length,
+               1,
+               'should have one remote text track after source change');
+  assert.equal(tech.autoRemoteTextTracks_.length,
+               0,
+               'should have zero auto-cleanup remote text tracks');
 });
 
 QUnit.test('should add the source handler interface to a tech', function(assert) {
