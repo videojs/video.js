@@ -643,14 +643,19 @@ class Html5 extends Tech {
   }
 
   /**
-   * Creates a remote text track object and returns a html track element
+   * Creates a remote text track object and returns an html track element.
    *
    * @param {Object} options The object should contain values for
-   * kind, language, label and src (location of the WebVTT file)
-   * @return {HTMLTrackElement}
+   * kind, language, label, and src (location of the WebVTT file)
+   * @param {Boolean} [manualCleanup=true] if set to false, the TextTrack will be
+   * automatically removed from the video element whenever the source changes
+   * @return {HTMLTrackElement} An Html Track Element.
+   * This can be an emulated {@link HTMLTrackElement} or a native one.
+   * @deprecated The default value of the "manualCleanup" parameter will default
+   * to "false" in upcoming versions of Video.js
    */
-  addRemoteTextTrack(options = {}, ...theRest) {
-    const htmlTrackElement = super.addRemoteTextTrack(options, ...theRest);
+  addRemoteTextTrack(options, manualCleanup) {
+    const htmlTrackElement = super.addRemoteTextTrack(options, manualCleanup);
 
     this.el().appendChild(htmlTrackElement);
 
