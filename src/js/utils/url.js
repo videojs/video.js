@@ -1,15 +1,43 @@
 /**
  * @file url.js
+ * @module url
  */
 import document from 'global/document';
 import window from 'global/window';
 
 /**
- * Resolve and parse the elements of a URL
+ * @typedef {Object} url:URLObject
  *
- * @param  {String} url The url to parse
- * @return {Object}     An object of url details
- * @method parseUrl
+ * @property {string} protocol
+ *           The protocol of the url that was parsed.
+ *
+ * @property {string} hostname
+ *           The hostname of the url that was parsed.
+ *
+ * @property {string} port
+ *           The port of the url that was parsed.
+ *
+ * @property {string} pathname
+ *           The pathname of the url that was parsed.
+ *
+ * @property {string} search
+ *           The search query of the url that was parsed.
+ *
+ * @property {string} hash
+ *           The hash of the url that was parsed.
+ *
+ * @property {string} host
+ *           The host of the url that was parsed.
+ */
+
+/**
+ * Resolve and parse the elements of a URL.
+ *
+ * @param  {String} url
+ *         The url to parse
+ *
+ * @return {url:URLObject}
+ *         An object of url details
  */
 export const parseUrl = function(url) {
   const props = ['protocol', 'hostname', 'port', 'pathname', 'search', 'hash', 'host'];
@@ -62,12 +90,15 @@ export const parseUrl = function(url) {
 
 /**
  * Get absolute version of relative URL. Used to tell flash correct URL.
- * http://stackoverflow.com/questions/470832/getting-an-absolute-url-from-a-relative-one-ie6-issue
  *
- * @param  {String} url URL to make absolute
- * @return {String}     Absolute URL
- * @private
- * @method getAbsoluteURL
+ *
+ * @param  {string} url
+ *         URL to make absolute
+ *
+ * @return {string}
+ *         Absolute URL
+ *
+ * @see http://stackoverflow.com/questions/470832/getting-an-absolute-url-from-a-relative-one-ie6-issue
  */
 export const getAbsoluteURL = function(url) {
   // Check if absolute URL
@@ -83,11 +114,15 @@ export const getAbsoluteURL = function(url) {
 };
 
 /**
- * Returns the extension of the passed file name. It will return an empty string if you pass an invalid path
+ * Returns the extension of the passed file name. It will return an empty string
+ * if passed an invalid path.
  *
- * @param {String}    path    The fileName path like '/path/to/file.mp4'
- * @returns {String}          The extension in lower case or an empty string if no extension could be found.
- * @method getFileExtension
+ * @param {string} path
+ *        The fileName path like '/path/to/file.mp4'
+ *
+ * @returns {string}
+ *          The extension in lower case or an empty string if no
+ *          extension could be found.
  */
 export const getFileExtension = function(path) {
   if (typeof path === 'string') {
@@ -105,9 +140,11 @@ export const getFileExtension = function(path) {
 /**
  * Returns whether the url passed is a cross domain request or not.
  *
- * @param {String} url The url to check
- * @return {Boolean}   Whether it is a cross domain request or not
- * @method isCrossOrigin
+ * @param {string} url
+ *        The url to check.
+ *
+ * @return {boolean}
+ *         Whether it is a cross domain request or not.
  */
 export const isCrossOrigin = function(url) {
   const winLoc = window.location;

@@ -11,29 +11,47 @@ import toTitleCase from '../../utils/to-title-case.js';
  * Chapters act much differently than other text tracks
  * Cues are navigation vs. other tracks of alternative languages
  *
- * @param {Object} player  Player object
- * @param {Object=} options Object of option names and values
- * @param {Function=} ready    Ready callback function
  * @extends TextTrackButton
- * @class ChaptersButton
  */
 class ChaptersButton extends TextTrackButton {
 
+  /**
+   * Creates an instance of this class.
+   *
+   * @param {Player} player
+   *        The `Player` that this class should be attached to.
+   *
+   * @param {Object} [options]
+   *        The key/value store of player options.
+   *
+   * @param {Component~ReadyCallback} [ready]
+   *        The function to call when this function is ready.
+   */
   constructor(player, options, ready) {
     super(player, options, ready);
     this.el_.setAttribute('aria-label', 'Chapters Menu');
   }
 
   /**
-   * Allow sub components to stack CSS class names
+   * Builds the default DOM `className`.
    *
-   * @return {String} The constructed class name
-   * @method buildCSSClass
+   * @return {string}
+   *         The DOM `className` for this object.
    */
   buildCSSClass() {
     return `vjs-chapters-button ${super.buildCSSClass()}`;
   }
 
+  /**
+   * Update the menu based on the current state of its items.
+   *
+   * @param {EventTarget~Event} [event]
+   *        An event that triggered this function to run.
+   *
+   * @listens TextTrackList#addtrack
+   * @listens TextTrackList#removetrack
+   * @listens TextTrackList#change
+   */
   update(event) {
     if (!this.track_ || (event && (event.type === 'addtrack' || event.type === 'removetrack'))) {
       this.setTrack(this.findChaptersTrack());
@@ -41,6 +59,13 @@ class ChaptersButton extends TextTrackButton {
     super.update();
   }
 
+  /**
+   * Set the currently selected track for the chapters button.
+   *
+   * @param {TextTrack} track
+   *        The new track to select. Nothing will change if this is the currently selected
+   *        track.
+   */
   setTrack(track) {
     if (this.track_ === track) {
       return;
@@ -75,6 +100,12 @@ class ChaptersButton extends TextTrackButton {
     }
   }
 
+  /**
+   * Find the track object that is currently in use by this ChaptersButton
+   *
+   * @return {TextTrack|undefined}
+   *         The current track or undefined if none was found.
+   */
   findChaptersTrack() {
     const tracks = this.player_.textTracks() || [];
 
@@ -88,6 +119,13 @@ class ChaptersButton extends TextTrackButton {
     }
   }
 
+  /**
+   * Get the caption for the ChaptersButton based on the track label. This will also
+   * use the current tracks localized kind as a fallback if a label does not exist.
+   *
+   * @return {string}
+   *         The tracks current label or the localized track kind.
+   */
   getMenuCaption() {
     if (this.track_ && this.track_.label) {
       return this.track_.label;
@@ -98,8 +136,8 @@ class ChaptersButton extends TextTrackButton {
   /**
    * Create menu from chapter track
    *
-   * @return {Menu} Menu of chapter buttons
-   * @method createMenu
+   * @return {Menu}
+   *         New menu for the chapter buttons
    */
   createMenu() {
     this.options_.title = this.getMenuCaption();
@@ -107,10 +145,10 @@ class ChaptersButton extends TextTrackButton {
   }
 
   /**
-   * Create a menu item for each chapter cue
+   * Create a menu item for each text track
    *
-   * @return {Array} Array of menu items
-   * @method createItems
+   * @return {TextTrackMenuItem[]}
+   *         Array of menu items
    */
   createItems() {
     const items = [];
@@ -136,7 +174,20 @@ class ChaptersButton extends TextTrackButton {
   }
 }
 
+/**
+ * `kind` of TextTrack to look for to associate it with this menu.
+ *
+ * @type {string}
+ * @private
+ */
 ChaptersButton.prototype.kind_ = 'chapters';
+
+/**
+ * The text that should display over the `ChaptersButton`s controls. Added for localization.
+ *
+ * @type {string}
+ * @private
+ */
 ChaptersButton.prototype.controlText_ = 'Chapters';
 
 Component.registerComponent('ChaptersButton', ChaptersButton);

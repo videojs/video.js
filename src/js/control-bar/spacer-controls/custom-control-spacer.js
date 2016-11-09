@@ -8,25 +8,24 @@ import Component from '../../component.js';
  * Spacer specifically meant to be used as an insertion point for new plugins, etc.
  *
  * @extends Spacer
- * @class CustomControlSpacer
  */
 class CustomControlSpacer extends Spacer {
 
   /**
-   * Allow sub components to stack CSS class names
+   * Builds the default DOM `className`.
    *
-   * @return {String} The constructed class name
-   * @method buildCSSClass
+   * @return {string}
+   *         The DOM `className` for this object.
    */
   buildCSSClass() {
     return `vjs-custom-control-spacer ${super.buildCSSClass()}`;
   }
 
   /**
-   * Create the component's DOM element
+   * Create the `Component`'s DOM element
    *
    * @return {Element}
-   * @method createEl
+   *         The element that was created.
    */
   createEl() {
     const el = super.createEl({
