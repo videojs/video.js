@@ -631,19 +631,54 @@ videojs.insertContent = Dom.insertContent;
  */
 videojs.computedStyle = computedStyle;
 
-/*
- * Custom Universal Module Definition (UMD)
- *
- * Video.js will never be a non-browser lib so we can simplify UMD a bunch and
- * still support requirejs and browserify. This also needs to be closure
- * compiler compatible, so string keys are used.
- */
-if (typeof define === 'function' && define.amd) {
-  define('videojs', [], () => videojs);
+module.exports = videojs;
 
-// checking that module is an object too because of umdjs/umd#35
-} else if (typeof exports === 'object' && typeof module === 'object') {
-  module.exports = videojs;
+
+
+
+
+
+
+
+
+window.vjsmiddleware = {};
+
+window.middlewareSetter = function(type, method, arg, tech) {
+  var value = arg;
+
+  (vjsmiddleware[type] || [])
+  .forEach((mw) => {
+    if (typeof mw === 'string') {
+      var ov = value;
+      value = middlewareSetter(mw, method, value, tech);
+      console.log(value, ov) 
+    } else {
+      value = mw[method](value)
+    }
+  });
+
+  return tech[method](value);
 }
 
-export default videojs;
+window.middlewareGetter = function(type, method, tech) {
+  var value = tech[method]();
+
+  (vjsmiddleware[type] || [])
+  .reverse()
+  .forEach((mw) => {
+    if (typeof mw === 'string') {
+      var ov = value;
+      value = middlewareGetter(mw, method, tech);
+      console.log(value, ov) 
+    } else {
+      value = mw[method](value)
+    }
+  });
+
+  return value;
+}
+
+videojs.use = function(type, middleware) {
+  const tm = vjsmiddleware[type] = vjsmiddleware[type] || [];
+  tm.unshift(middleware);
+}

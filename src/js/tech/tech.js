@@ -854,6 +854,12 @@ class Tech extends Component {
       return window.videojs[name];
     }
   }
+
+  static registerMiddleware(middleware, index) {
+    const middleware = Tech.prototype.middleware_ = Tech.prototype.middleware_ || [];
+
+    middleware.splice(index, 0, middleware);
+  }
 }
 
 /**
