@@ -7,11 +7,9 @@
 - [Writing a Basic Plugin](#writing-a-basic-plugin)
   - [Write a JavaScript Function](#write-a-javascript-function)
   - [Register a Basic Plugin](#register-a-basic-plugin)
-  - [Setting up a Basic Plugin](#setting-up-a-basic-plugin)
 - [Writing a Class-Based Plugin](#writing-a-class-based-plugin)
   - [Write a JavaScript Class/Constructor](#write-a-javascript-classconstructor)
   - [Register a Class-Based Plugin](#register-a-class-based-plugin)
-  - [Setting up a Class-Based Plugin](#setting-up-a-class-based-plugin)
   - [Key Differences from Basic Plugins](#key-differences-from-basic-plugins)
     - [The Value of `this`](#the-value-of-this)
     - [The Player Plugin Name Property](#the-player-plugin-name-property)
@@ -20,6 +18,7 @@
     - [Statefulness](#statefulness)
     - [Lifecycle](#lifecycle)
   - [Advanced Example Class-based Plugin](#advanced-example-class-based-plugin)
+- [Setting up a Plugin](#setting-up-a-plugin)
 - [References](#references)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -72,29 +71,6 @@ videojs.registerPlugin('examplePlugin', examplePlugin);
 ```
 
 The only stipulation with the name of the plugin is that it cannot conflict with any existing player method. After that, any player will automatically have an `examplePlugin` method on its prototype!
-
-### Setting up a Basic Plugin
-
-Finally, we can use our plugin on a player. There are two ways to do this. The first way is during creation of a Video.js player. Using the `plugins` option, a plugin can be automatically set up on a player:
-
-```js
-videojs('example-player', {
-  plugins: {
-    examplePlugin: {
-      customClass: 'example-class'
-    }
-  }
-});
-```
-
-Otherwise, a plugin can be manually set up:
-
-```js
-var player = videojs('example-player');
-player.examplePlugin({customClass: 'example-class'});
-```
-
-These two methods are functionally identical - use whichever you prefer! That's all there is to it for basic plugins.
 
 ## Writing a Class-Based Plugin
 
@@ -150,27 +126,6 @@ The registration process for class-based plugins is identical to [the process fo
 
 ```js
 videojs.registerPlugin('examplePlugin', ExamplePlugin);
-```
-
-### Setting up a Class-Based Plugin
-
-Again, just like registration, the setup process for class-based plugins is identical to [the process for basic plugins](#setting-up-a-basic-plugin).
-
-```js
-videojs('example-player', {
-  plugins: {
-    examplePlugin: {
-      customClass: 'example-class'
-    }
-  }
-});
-```
-
-Otherwise, a plugin can be manually set up:
-
-```js
-var player = videojs('example-player');
-player.examplePlugin({customClass: 'example-class'});
 ```
 
 ### Key Differences from Basic Plugins
@@ -328,6 +283,31 @@ player.play();
 ```
 
 This example may be a bit pointless in reality, but it demonstrates the sort of flexibility offered by class-based plugins over basic plugins.
+
+## Setting up a Plugin
+
+There are two ways to set up (or initialize) a plugin on a player. Both ways work identically for both basic and class-based plugins.
+
+The first way is during creation of the player. Using the `plugins` option, a plugin can be automatically set up on a player:
+
+```js
+videojs('example-player', {
+  plugins: {
+    examplePlugin: {
+      customClass: 'example-class'
+    }
+  }
+});
+```
+
+Otherwise, a plugin can be manually set up:
+
+```js
+var player = videojs('example-player');
+player.examplePlugin({customClass: 'example-class'});
+```
+
+These two methods are functionally identical - use whichever you prefer!
 
 ## References
 
