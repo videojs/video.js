@@ -11,14 +11,13 @@ QUnit.module('Plugin: static methods', {
   beforeEach() {
     this.basic = () => {};
 
-    Plugin.registerPlugins({
-      basic: this.basic,
-      mock: MockPlugin
-    });
+    Plugin.registerPlugin('basic', this.basic);
+    Plugin.registerPlugin('mock', MockPlugin);
   },
 
   afterEach() {
-    Plugin.deregisterPlugins();
+    Plugin.deregisterPlugin('basic');
+    Plugin.deregisterPlugin('mock');
   }
 });
 
@@ -34,18 +33,20 @@ QUnit.test('registerPlugin()', function(assert) {
     foo,
     'the function on the player prototype is a wrapper'
   );
+
+  Plugin.deregisterPlugin('foo');
 });
 
 QUnit.test('registerPlugin() illegal arguments', function(assert) {
   assert.throws(
     () => Plugin.registerPlugin(),
-    new Error('illegal plugin name, "undefined"'),
+    new Error('illegal plugin name, "undefined", must be a string, was undefined'),
     'plugins must have a name'
   );
 
   assert.throws(
     () => Plugin.registerPlugin('play'),
-    new Error('illegal plugin name, "play"'),
+    new Error('illegal plugin name, "play", already exists'),
     'plugins cannot share a name with an existing player method'
   );
 
@@ -60,16 +61,6 @@ QUnit.test('registerPlugin() illegal arguments', function(assert) {
     new Error('illegal plugin for "foo", must be a function, was object'),
     'plugins must be functions'
   );
-});
-
-QUnit.test('registerPlugins()', function(assert) {
-  const foo = () => {};
-  const bar = () => {};
-
-  Plugin.registerPlugins({bar, foo});
-
-  assert.strictEqual(Plugin.getPlugin('foo'), foo);
-  assert.strictEqual(Plugin.getPlugin('bar'), bar);
 });
 
 QUnit.test('getPlugin()', function(assert) {
@@ -91,9 +82,10 @@ QUnit.test('getPluginVersion()', function(assert) {
 });
 
 QUnit.test('getPlugins()', function(assert) {
-  assert.strictEqual(Object.keys(Plugin.getPlugins()).length, 2);
+  assert.strictEqual(Object.keys(Plugin.getPlugins()).length, 3);
   assert.strictEqual(Plugin.getPlugins().basic, this.basic);
   assert.strictEqual(Plugin.getPlugins().mock, MockPlugin);
+  assert.strictEqual(Plugin.getPlugins().plugin, Plugin);
   assert.strictEqual(Object.keys(Plugin.getPlugins(['basic'])).length, 1);
   assert.strictEqual(Plugin.getPlugins(['basic']).basic, this.basic);
 });
@@ -106,20 +98,11 @@ QUnit.test('deregisterPlugin()', function(assert) {
 
   assert.strictEqual(Player.prototype.foo, undefined);
   assert.strictEqual(Plugin.getPlugin('foo'), undefined);
-});
 
-QUnit.test('deregisterPlugins()', function(assert) {
-  const foo = () => {};
-  const bar = () => {};
-
-  Plugin.registerPlugins({bar, foo});
-  Plugin.deregisterPlugins(['bar']);
-
-  assert.strictEqual(Plugin.getPlugin('foo'), foo);
-  assert.strictEqual(Plugin.getPlugin('bar'), undefined);
-
-  Plugin.deregisterPlugins();
-  assert.strictEqual(Plugin.getPlugin('foo'), undefined);
+  assert.throws(
+    () => Plugin.deregisterPlugin('plugin'),
+    new Error('cannot de-register base plugin'),
+  );
 });
 
 QUnit.test('isBasic()', function(assert) {

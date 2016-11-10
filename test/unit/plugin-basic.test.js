@@ -14,7 +14,7 @@ QUnit.module('Plugin: basic', {
 
   afterEach() {
     this.player.dispose();
-    Plugin.deregisterPlugins();
+    Plugin.deregisterPlugin('basic');
   }
 });
 

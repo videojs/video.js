@@ -109,7 +109,7 @@ If you're familiar with creating [components](components.md), this process is si
 This can be achieved with ES6 classes:
 
 ```js
-const Plugin = videojs.getPlugin('Plugin');
+const Plugin = videojs.getPlugin('plugin');
 
 class ExamplePlugin extends Plugin {
 
@@ -127,7 +127,7 @@ class ExamplePlugin extends Plugin {
 Or with ES5:
 
 ```js
-var Plugin = videojs.getPlugin('Plugin');
+var Plugin = videojs.getPlugin('plugin');
 
 var ExamplePlugin = videojs.extend(Plugin, {
 
@@ -279,7 +279,7 @@ What follows is a complete ES6 class-based plugin that logs a custom message whe
 ```js
 import videojs from 'video.js';
 
-const Plugin = videojs.getPlugin('Plugin');
+const Plugin = videojs.getPlugin('plugin');
 
 class Advanced extends Plugin {
 

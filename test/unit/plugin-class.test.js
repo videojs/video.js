@@ -23,7 +23,7 @@ QUnit.module('Plugin: class-based', {
 
   afterEach() {
     this.player.dispose();
-    Plugin.deregisterPlugins();
+    Plugin.deregisterPlugin('mock');
   }
 });
 
@@ -122,6 +122,7 @@ QUnit.test('defaultState static property is used to populate state', function(as
   const instance = this.player.dsm();
 
   assert.deepEqual(instance.state, {foo: 1, bar: 2});
+  Plugin.deregisterPlugin('dsm');
 });
 
 QUnit.test('dispose', function(assert) {

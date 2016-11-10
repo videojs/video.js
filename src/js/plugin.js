@@ -5,8 +5,15 @@ import evented from './mixins/evented';
 import stateful from './mixins/stateful';
 import * as Events from './utils/events';
 import * as Fn from './utils/fn';
-import * as Obj from './utils/obj';
 import Player from './player';
+
+/**
+ * The base plugin name.
+ *
+ * @private
+ * @type {String}
+ */
+const BASE_PLUGIN_NAME = 'plugin';
 
 /**
  * Stores registered plugins in a private space.
@@ -171,8 +178,12 @@ class Plugin {
    * @return {Function}
    */
   static registerPlugin(name, plugin) {
-    if (typeof name !== 'string' || pluginStorage[name] || Player.prototype[name]) {
-      throw new Error(`illegal plugin name, "${name}"`);
+    if (typeof name !== 'string') {
+      throw new Error(`illegal plugin name, "${name}", must be a string, was ${typeof name}`);
+    }
+
+    if (pluginStorage[name] || Player.prototype[name]) {
+      throw new Error(`illegal plugin name, "${name}", already exists`);
     }
 
     if (typeof plugin !== 'function') {
@@ -191,20 +202,6 @@ class Plugin {
   }
 
   /**
-   * Register multiple plugins via an object where the keys are plugin names
-   * and the values are sub-classes of `Plugin` or anonymous functions for
-   * basic plugins.
-   *
-   * @param  {Object} plugins
-   * @return {Object}
-   *         An object containing plugins that were added.
-   */
-  static registerPlugins(plugins) {
-    Obj.each(plugins, (value, key) => this.registerPlugin(key, value));
-    return plugins;
-  }
-
-  /**
    * De-register a Video.js plugin.
    *
    * This is mostly used for testing, but may potentially be useful in advanced
@@ -213,21 +210,13 @@ class Plugin {
    * @param  {String} name
    */
   static deregisterPlugin(name) {
+    if (name === BASE_PLUGIN_NAME) {
+      throw new Error('cannot de-register base plugin');
+    }
     if (pluginStorage.hasOwnProperty(name)) {
       delete pluginStorage[name];
       delete Player.prototype[name];
     }
-  }
-
-  /**
-   * De-register multiple Video.js plugins.
-   *
-   * @param  {Array} [names]
-   *         If provided, should be an array of plugin names. Defaults to _all_
-   *         plugin names.
-   */
-  static deregisterPlugins(names = Object.keys(pluginStorage)) {
-    names.forEach(name => this.deregisterPlugin(name));
   }
 
   /**
@@ -276,6 +265,6 @@ class Plugin {
   }
 }
 
-Plugin.registerPlugin('plugin', Plugin);
+Plugin.registerPlugin(BASE_PLUGIN_NAME, Plugin);
 
 export default Plugin;
