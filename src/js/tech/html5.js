@@ -657,6 +657,10 @@ class Html5 extends Tech {
   addRemoteTextTrack(options, manualCleanup) {
     const htmlTrackElement = super.addRemoteTextTrack(options, manualCleanup);
 
+    if (!this.featuresNativeTextTracks) {
+      return htmlTrackElement;
+    }
+
     this.el().appendChild(htmlTrackElement);
 
     return htmlTrackElement;
@@ -669,6 +673,10 @@ class Html5 extends Tech {
    */
   removeRemoteTextTrack(track) {
     super.removeRemoteTextTrack(track);
+
+    if (!this.featuresNativeTextTracks) {
+      return;
+    }
 
     const tracks = this.$$('track');
 
