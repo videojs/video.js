@@ -34,13 +34,15 @@ QUnit.test('pre-setup interface', function(assert) {
     'plugins are a factory function on a player'
   );
 
+  assert.ok(this.player.hasPlugin('mock'), 'player has the plugin available');
+
   assert.strictEqual(
     this.player.mock.dispose,
     undefined,
     'class-based plugins are not populated on a player until the factory method creates them'
   );
 
-  assert.ok(!this.player.usingPlugin('mock'));
+  assert.notOk(this.player.usingPlugin('mock'));
 });
 
 QUnit.test('setup', function(assert) {
@@ -64,6 +66,8 @@ QUnit.test('setup', function(assert) {
     this.player.usingPlugin('mock'),
     'player now recognizes that the plugin was set up'
   );
+
+  assert.ok(this.player.hasPlugin('mock'), 'player has the plugin available');
 
   assert.ok(
     instance instanceof this.MockPlugin,
@@ -130,10 +134,12 @@ QUnit.test('dispose', function(assert) {
 
   instance.dispose();
 
-  assert.ok(
-    !this.player.usingPlugin('mock'),
+  assert.notOk(
+    this.player.usingPlugin('mock'),
     'player recognizes that the plugin is NOT set up'
   );
+
+  assert.ok(this.player.hasPlugin('mock'), 'player still has the plugin available');
 
   assert.strictEqual(
     typeof this.player.mock,

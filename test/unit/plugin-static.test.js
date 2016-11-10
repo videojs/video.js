@@ -108,6 +108,6 @@ QUnit.test('deregisterPlugin()', function(assert) {
 QUnit.test('isBasic()', function(assert) {
   assert.ok(Plugin.isBasic(this.basic));
   assert.ok(Plugin.isBasic('basic'));
-  assert.ok(!Plugin.isBasic(MockPlugin));
-  assert.ok(!Plugin.isBasic('mock'));
+  assert.notOk(Plugin.isBasic(MockPlugin));
+  assert.notOk(Plugin.isBasic('mock'));
 });

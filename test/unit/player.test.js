@@ -1,4 +1,5 @@
 /* eslint-env qunit */
+import Plugin from '../../src/js/plugin';
 import Player from '../../src/js/player.js';
 import videojs from '../../src/js/video.js';
 import * as Dom from '../../src/js/utils/dom.js';
@@ -1386,4 +1387,38 @@ QUnit.test('should not allow to register custom player when any player has been 
 
   // reset the Player to the original value;
   videojs.registerComponent('Player', Player);
+});
+
+QUnit.test('options: plugins', function(assert) {
+  const optionsSpy = sinon.spy();
+
+  Plugin.registerPlugin('foo', (options) => {
+    optionsSpy(options);
+  });
+
+  const player = TestHelpers.makePlayer({
+    plugins: {
+      foo: {
+        bar: 1
+      }
+    }
+  });
+
+  assert.strictEqual(optionsSpy.callCount, 1, 'the plugin was set up');
+  assert.deepEqual(optionsSpy.getCall(0).args[0], {bar: 1}, 'the plugin got the expected options');
+
+  assert.throws(
+    () => {
+      TestHelpers.makePlayer({
+        plugins: {
+          nope: {}
+        }
+      });
+    },
+    new Error('plugin "nope" does not exist'),
+    'plugins that do not exist cause the player to throw'
+  );
+
+  player.dispose();
+  Plugin.deregisterPlugin('foo');
 });

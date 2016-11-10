@@ -347,7 +347,6 @@ class Player extends Component {
      */
     this.scrubbing_ = false;
 
-    this.plugins_ = {};
     this.el_ = this.createEl();
 
     // We also want to pass the original player options to each component and plugin
@@ -360,11 +359,11 @@ class Player extends Component {
     if (options.plugins) {
       const plugins = options.plugins;
 
-      Object.getOwnPropertyNames(plugins).forEach(function(name) {
+      Object.keys(plugins).forEach(function(name) {
         if (typeof this[name] === 'function') {
           this[name](plugins[name]);
         } else {
-          log.error('Unable to find plugin:', name);
+          throw new Error(`plugin "${name}" does not exist`);
         }
       }, this);
     }
@@ -3104,16 +3103,35 @@ class Player extends Component {
   }
 
   /**
+   * Reports whether or not a player has a plugin available.
+   *
+   * This does not report whether or not the plugin has ever been initialized
+   * on this player. For that, [usingPlugin]{@link Player#usingPlugin}.
+   *
+   * @param  {string}  name
+   *         The name of a plugin.
+   *
+   * @return {boolean}
+   */
+  hasPlugin(name) {
+    // While a no-op by default, this method is created in plugin.js to avoid
+    // circular dependencies.
+  }
+
+  /**
    * Reports whether or not a player is using a plugin by name.
    *
    * For basic plugins, this only reports whether the plugin has _ever_ been
    * initialized on this player.
    *
-   * @param  {String} name
-   * @return {Boolean}
+   * @param  {string} name
+   *         The name of a plugin.
+   *
+   * @return {boolean}
    */
   usingPlugin(name) {
-    return !!(this.plugins_ && this.plugins_[name]);
+    // While a no-op by default, this method is created in plugin.js to avoid
+    // circular dependencies.
   }
 
   /**

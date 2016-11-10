@@ -11,9 +11,17 @@ import Player from './player';
  * The base plugin name.
  *
  * @private
- * @type {String}
+ * @type {string}
  */
 const BASE_PLUGIN_NAME = 'plugin';
+
+/**
+ * The key on which a player's active plugins cache is stored.
+ *
+ * @private
+ * @type {string}
+ */
+const PLUGIN_CACHE_KEY = 'activePlugins_';
 
 /**
  * Stores registered plugins in a private space.
@@ -22,6 +30,46 @@ const BASE_PLUGIN_NAME = 'plugin';
  * @type {Object}
  */
 const pluginStorage = {};
+
+/**
+ * Reports whether or not a plugin exists in storage.
+ *
+ * @private
+ * @param  {string} name
+ *         The name of a plugin.
+ *
+ * @return {boolean}
+ */
+const pluginExists = (name) => pluginStorage.hasOwnProperty(name);
+
+/**
+ * Get a plugin from storage.
+ *
+ * @private
+ * @param  {string} name
+ *         The name of a plugin.
+ *
+ * @return {Function|undefined}
+ *         The plugin (or undefined).
+ */
+const getPlugin = (name) => pluginExists(name) ? pluginStorage[name] : undefined;
+
+/**
+ * Marks a plugin as "active" on a player.
+ *
+ * Also ensures that the player has an object for tracking active plugins.
+ *
+ * @private
+ * @param  {Player} player
+ *         A Video.js player.
+ *
+ * @param  {string} name
+ *         The name of a plugin.
+ */
+const markPluginAsActive = (player, name) => {
+  player[PLUGIN_CACHE_KEY] = player[PLUGIN_CACHE_KEY] || {};
+  player[PLUGIN_CACHE_KEY][name] = true;
+};
 
 /**
  * Takes a basic plugin function and returns a wrapper function which marks
@@ -33,7 +81,7 @@ const pluginStorage = {};
 const createBasicPlugin = (name, plugin) => function() {
   const instance = plugin.apply(this, arguments);
 
-  this.plugins_[name] = true;
+  markPluginAsActive(this, name);
 
   // We trigger the "pluginsetup" event on the player regardless, but we want
   // the hash to be consistent with the hash provided for class-based plugins.
@@ -79,7 +127,7 @@ class Plugin {
     this.player = player;
     evented(this, {exclude: ['trigger']});
     stateful(this, this.constructor.defaultState);
-    player.plugins_[this.name] = true;
+    markPluginAsActive(player, this.name);
     player.one('dispose', Fn.bind(this, this.dispose));
     player.trigger('pluginsetup', this.getEventHash_());
   }
@@ -107,7 +155,7 @@ class Plugin {
   /**
    * Triggers an event on the plugin object.
    *
-   * @param  {Event|Object|String} event
+   * @param  {Event|Object|string} event
    *         A string (the type) or an event object with a type attribute.
    *
    * @param  {Object} [hash={}]
@@ -118,7 +166,7 @@ class Plugin {
    *         - `name`: The name of the plugin.
    *         - `plugin`: The plugin class/constructor.
    *
-   * @return {Boolean}
+   * @return {boolean}
    *         Whether or not default was prevented.
    */
   trigger(event, hash = {}) {
@@ -140,7 +188,7 @@ class Plugin {
     // Eliminate any possible sources of leaking memory by clearing up references
     // between the player and the plugin instance and nulling out the plugin's
     // state and replacing methods with a function that throws.
-    player.plugins_[name] = false;
+    player[PLUGIN_CACHE_KEY][name] = false;
     this.player = this.state = null;
 
     this.dispose = () => {
@@ -157,22 +205,22 @@ class Plugin {
   /**
    * Determines if a plugin is a "basic" plugin (i.e. not a sub-class of `Plugin`).
    *
-   * @param  {String|Function} plugin
+   * @param  {string|Function} plugin
    *         If a string, matches the name of a plugin. If a function, will be
    *         tested directly.
-   * @return {Boolean}
+   *
+   * @return {boolean}
    */
   static isBasic(plugin) {
-    plugin = (typeof plugin === 'string') ? Plugin.getPlugin(plugin) : plugin;
+    const p = (typeof plugin === 'string') ? getPlugin(plugin) : plugin;
 
-    return typeof plugin === 'function' &&
-      !Plugin.prototype.isPrototypeOf(plugin.prototype);
+    return typeof p === 'function' && !Plugin.prototype.isPrototypeOf(p.prototype);
   }
 
   /**
    * Register a Video.js plugin
    *
-   * @param  {String} name
+   * @param  {string} name
    * @param  {Function} plugin
    *         A sub-class of `Plugin` or an anonymous function for basic plugins.
    * @return {Function}
@@ -182,7 +230,7 @@ class Plugin {
       throw new Error(`illegal plugin name, "${name}", must be a string, was ${typeof name}`);
     }
 
-    if (pluginStorage[name] || Player.prototype[name]) {
+    if (pluginExists(name) || Player.prototype.hasOwnProperty(name)) {
       throw new Error(`illegal plugin name, "${name}", already exists`);
     }
 
@@ -207,13 +255,13 @@ class Plugin {
    * This is mostly used for testing, but may potentially be useful in advanced
    * player workflows.
    *
-   * @param  {String} name
+   * @param  {string} name
    */
   static deregisterPlugin(name) {
     if (name === BASE_PLUGIN_NAME) {
       throw new Error('cannot de-register base plugin');
     }
-    if (pluginStorage.hasOwnProperty(name)) {
+    if (pluginExists(name)) {
       delete pluginStorage[name];
       delete Player.prototype[name];
     }
@@ -231,7 +279,7 @@ class Plugin {
     let result;
 
     names.forEach(name => {
-      const plugin = this.getPlugin(name);
+      const plugin = getPlugin(name);
 
       if (plugin) {
         result = result || {};
@@ -243,28 +291,52 @@ class Plugin {
   }
 
   /**
-   * Gets a plugin by name
+   * Gets a plugin by name if it exists.
    *
-   * @param  {[type]} name [description]
-   * @return {[type]}      [description]
+   * @param  {string} name
+   *         The name of a plugin.
+   *
+   * @return {Function|undefined}
+   *         The plugin (or undefined).
    */
   static getPlugin(name) {
-    return pluginStorage[name] || Player.prototype[name];
+    return getPlugin(name);
   }
 
   /**
    * Gets a plugin's version, if available
    *
-   * @param  {String} name
-   * @return {String}
+   * @param  {string} name
+   *         The name of a plugin.
+   *
+   * @return {string}
+   *         The plugin's version or an empty string.
    */
   static getPluginVersion(name) {
-    const plugin = Plugin.getPlugin(name);
+    const plugin = getPlugin(name);
 
     return plugin && plugin.VERSION || '';
   }
 }
 
 Plugin.registerPlugin(BASE_PLUGIN_NAME, Plugin);
+
+/**
+ * Documented in player.js
+ *
+ * @ignore
+ */
+Player.prototype.usingPlugin = function(name) {
+  return !!this[PLUGIN_CACHE_KEY] && this[PLUGIN_CACHE_KEY][name] === true;
+};
+
+/**
+ * Documented in player.js
+ *
+ * @ignore
+ */
+Player.prototype.hasPlugin = function(name) {
+  return !!pluginExists(name);
+};
 
 export default Plugin;

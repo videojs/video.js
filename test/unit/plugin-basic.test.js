@@ -25,6 +25,8 @@ QUnit.test('pre-setup interface', function(assert) {
     'basic plugins are a function on a player'
   );
 
+  assert.ok(this.player.hasPlugin('basic'), 'player has the plugin available');
+
   assert.notStrictEqual(
     this.player.basic,
     this.basic,
@@ -37,7 +39,7 @@ QUnit.test('pre-setup interface', function(assert) {
     'unlike class-based plugins, basic plugins do not have a dispose method'
   );
 
-  assert.ok(!this.player.usingPlugin('basic'));
+  assert.notOk(this.player.usingPlugin('basic'));
 });
 
 QUnit.test('setup', function(assert) {
@@ -62,6 +64,7 @@ QUnit.test('setup', function(assert) {
     'the player now recognizes that the plugin was set up'
   );
 
+  assert.ok(this.player.hasPlugin('basic'), 'player has the plugin available');
 });
 
 QUnit.test('"pluginsetup" event', function(assert) {
