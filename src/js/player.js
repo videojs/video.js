@@ -2171,6 +2171,13 @@ class Player extends Component {
       return this.techGet_('src');
     }
 
+    middlewareSetSource(source[0], (tech, src) => {
+      console.log(tech.name, src);
+      this.loadTech_(tech.name, src)
+    });
+
+    return this;
+
     let currentTech = Tech.getTech(this.techName_);
 
     // Support old behavior of techs being registered as components.

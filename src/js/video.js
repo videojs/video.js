@@ -30,9 +30,11 @@ import {isObject} from './utils/obj';
 import computedStyle from './utils/computed-style.js';
 import extendFn from './extend.js';
 import xhr from 'xhr';
+import toTitleCase from './utils/to-title-case.js';
 
 // Include the built-in techs
 import Tech from './tech/tech.js';
+import Flash from './tech/flash.js';
 
 // HTML5 Element Shim for IE8
 if (typeof HTMLVideoElement === 'undefined' &&
@@ -678,7 +680,33 @@ window.middlewareGetter = function(type, method, tech) {
   return value;
 }
 
+function ssh(src, middleware, next) {
+  const mw = middleware[0];
+  if (typeof mw === 'string') {
+    const split = mw.split('/');
+    let tech;
+    if (split[0] === 'videojs') {
+      tech = videojs.getTech(toTitleCase(split[1]));
+      next(tech, src);
+    } else {
+      ssh(src, vjsmiddleware[mw] || [], next);
+    }
+  } else if (mw) {
+    mw.setSource(src, function(src) {
+      ssh(src, vjsmiddleware[src.type] || [], next)
+    })
+  }
+}
+
+window.middlewareSetSource = function(src, next) {
+  ssh(src, vjsmiddleware[src.type] || [], next);
+}
+
 videojs.use = function(type, middleware) {
   const tm = vjsmiddleware[type] = vjsmiddleware[type] || [];
-  tm.unshift(middleware);
+  tm.push(middleware);
 }
+
+videojs.use('video/mp4', 'videojs/html5');
+Object.keys(Flash.formats).forEach((format) => videojs.use(format, 'videojs/flash'));
+
