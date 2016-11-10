@@ -721,14 +721,22 @@ class Tech extends Component {
   /**
    * Creates a remote text track object and returns an html track element.
    *
-   * @param {Object} options The object should contain values for
-   * kind, language, label, and src (location of the WebVTT file)
-   * @param {Boolean} [manualCleanup=true] if set to false, the TextTrack will be
-   * automatically removed from the video element whenever the source changes
-   * @return {HTMLTrackElement} An Html Track Element.
-   * This can be an emulated {@link HTMLTrackElement} or a native one.
-   * @deprecated The default value of the "manualCleanup" parameter will default
-   * to "false" in upcoming versions of Video.js
+   * > Note: This can be an emulated {@link HTMLTrackElement} or a native one.
+   *
+   * @param {Object} options
+   *        See {@link Tech#createRemoteTextTrack} for more detailed properties.
+   *
+   * @param {boolean} [manualCleanup=true]
+   *        - When false: the TextTrack will be automatically removed from the video
+   *          element whenever the source changes
+   *        - When True: The TextTrack will have to be cleaned up manually
+   *
+   * @return {HTMLTrackElement}
+   *         An Html Track Element.
+   *
+   * @deprecated The default functionality for this function will be equivalent
+   *             to "manualCleanup=false" in the future. The manualCleanup parameter will
+   *             also be removed.
    */
   addRemoteTextTrack(options = {}, manualCleanup) {
     const htmlTrackElement = this.createRemoteTextTrack(options);
