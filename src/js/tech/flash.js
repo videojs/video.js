@@ -69,7 +69,7 @@ class Flash extends Tech {
     // relatively slowly over time
     const getCurrentTimeCached = timeExpiringCache(() => {
       return this.el_.vjs_getProperty('currentTime');
-    }, 100);
+    }, 25);
 
     this.currentTime = (time) => {
       // when seeking make the reported time keep up with the requested time
