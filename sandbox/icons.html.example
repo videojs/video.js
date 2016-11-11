@@ -33,6 +33,38 @@
     <li><span class="vjs-icon-circle"></span> <code>.vjs-icon-circle</code></li>
     <li><span class="vjs-icon-circle-outline"></span> <code>.vjs-icon-circle-outline</code></li>
     <li><span class="vjs-icon-circle-inner-circle"></span> <code>.vjs-icon-circle-inner-circle</code></li>
+
+          <li><span class="play"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="play-circle"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="pause"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="volume-mute"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="volume-low"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="volume-mid"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="volume-high"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="fullscreen-enter"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="fullscreen-exit"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="square"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="spinner"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="subtitles"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="captions"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="chapters"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="share"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="cog"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="circle"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="circle-outline"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="circle-inner-circle"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="hd"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="cancel"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="replay"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="facebook"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="gplus"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="linkedin"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="twitter"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="tumblr"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="pinterest"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="audio-description"></span> <code>.vjs-icon-play</code></li>
+          <li><span class="audio"></span> <code>.vjs-icon-play</code></li>
+
   </ul>
 </body>
 </html>
