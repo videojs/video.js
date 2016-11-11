@@ -33,20 +33,20 @@ QUnit.test('can get tracks by int and string id', function(assert) {
 QUnit.test('length is updated when new tracks are added or removed', function(assert) {
   const trackList = new TrackList(this.tracks);
 
-  trackList.addTrack_(newTrack('100'));
+  trackList.addTrack(newTrack('100'));
   assert.equal(trackList.length,
               this.tracks.length + 1,
               'the length is ' + (this.tracks.length + 1));
-  trackList.addTrack_(newTrack('101'));
+  trackList.addTrack(newTrack('101'));
   assert.equal(trackList.length,
               this.tracks.length + 2,
               'the length is ' + (this.tracks.length + 2));
 
-  trackList.removeTrack_(trackList.getTrackById('101'));
+  trackList.removeTrack(trackList.getTrackById('101'));
   assert.equal(trackList.length,
               this.tracks.length + 1,
               'the length is ' + (this.tracks.length + 1));
-  trackList.removeTrack_(trackList.getTrackById('100'));
+  trackList.removeTrack(trackList.getTrackById('100'));
   assert.equal(trackList.length,
               this.tracks.length,
               'the length is ' + this.tracks.length);
@@ -68,23 +68,23 @@ QUnit.test('can access items by index', function(assert) {
 QUnit.test('can access new items by index', function(assert) {
   const trackList = new TrackList(this.tracks);
 
-  trackList.addTrack_(newTrack('100'));
+  trackList.addTrack(newTrack('100'));
   assert.equal(trackList[3].id, '100', 'id of item at index 3 is 100');
 
-  trackList.addTrack_(newTrack('101'));
+  trackList.addTrack(newTrack('101'));
   assert.equal(trackList[4].id, '101', 'id of item at index 4 is 101');
 });
 
 QUnit.test('cannot access removed items by index', function(assert) {
   const trackList = new TrackList(this.tracks);
 
-  trackList.addTrack_(newTrack('100'));
-  trackList.addTrack_(newTrack('101'));
+  trackList.addTrack(newTrack('100'));
+  trackList.addTrack(newTrack('101'));
   assert.equal(trackList[3].id, '100', 'id of item at index 3 is 100');
   assert.equal(trackList[4].id, '101', 'id of item at index 4 is 101');
 
-  trackList.removeTrack_(trackList.getTrackById('101'));
-  trackList.removeTrack_(trackList.getTrackById('100'));
+  trackList.removeTrack(trackList.getTrackById('101'));
+  trackList.removeTrack(trackList.getTrackById('100'));
 
   assert.ok(!trackList[3], 'nothing at index 3');
   assert.ok(!trackList[4], 'nothing at index 4');
@@ -93,13 +93,13 @@ QUnit.test('cannot access removed items by index', function(assert) {
 QUnit.test('new item available at old index', function(assert) {
   const trackList = new TrackList(this.tracks);
 
-  trackList.addTrack_(newTrack('100'));
+  trackList.addTrack(newTrack('100'));
   assert.equal(trackList[3].id, '100', 'id of item at index 3 is 100');
 
-  trackList.removeTrack_(trackList.getTrackById('100'));
+  trackList.removeTrack(trackList.getTrackById('100'));
   assert.ok(!trackList[3], 'nothing at index 3');
 
-  trackList.addTrack_(newTrack('101'));
+  trackList.addTrack(newTrack('101'));
   assert.equal(trackList[3].id, '101', 'id of new item at index 3 is now 101');
 });
 
@@ -116,14 +116,14 @@ QUnit.test('a "addtrack" event is triggered when new tracks are added', function
 
   trackList.on('addtrack', addHandler);
 
-  trackList.addTrack_(newTrack('100'));
-  trackList.addTrack_(newTrack('101'));
+  trackList.addTrack(newTrack('100'));
+  trackList.addTrack(newTrack('101'));
 
   trackList.off('addtrack', addHandler);
   trackList.onaddtrack = addHandler;
 
-  trackList.addTrack_(newTrack('102'));
-  trackList.addTrack_(newTrack('103'));
+  trackList.addTrack(newTrack('102'));
+  trackList.addTrack(newTrack('103'));
 
   assert.equal(adds, 4, 'we got ' + adds + ' "addtrack" events');
   assert.equal(tracks, 4, 'we got a track with every event');
@@ -141,12 +141,12 @@ QUnit.test('a "removetrack" event is triggered when tracks are removed', functio
   };
 
   trackList.on('removetrack', rmHandler);
-  trackList.removeTrack_(trackList.getTrackById('1'));
-  trackList.removeTrack_(trackList.getTrackById('2'));
+  trackList.removeTrack(trackList.getTrackById('1'));
+  trackList.removeTrack(trackList.getTrackById('2'));
 
   trackList.off('removetrack', rmHandler);
   trackList.onremovetrack = rmHandler;
-  trackList.removeTrack_(trackList.getTrackById('3'));
+  trackList.removeTrack(trackList.getTrackById('3'));
 
   assert.equal(rms, 3, 'we got ' + rms + ' "removetrack" events');
   assert.equal(tracks, 3, 'we got a track with every event');

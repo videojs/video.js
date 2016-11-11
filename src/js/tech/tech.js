@@ -70,7 +70,7 @@ function createTrackHelper(self, kind, label, language, options = {}) {
 
   const track = new TextTrack(options);
 
-  tracks.addTrack_(track);
+  tracks.addTrack(track);
 
   return track;
 }
@@ -369,7 +369,7 @@ class Tech extends Component {
         if (type === 'text') {
           this.removeRemoteTextTrack(track);
         }
-        list.removeTrack_(track);
+        list.removeTrack(track);
       }
     });
   }
@@ -590,11 +590,11 @@ class Tech extends Component {
     }
 
     this.remoteTextTracks().on('addtrack', (e) => {
-      this.textTracks().addTrack_(e.track);
+      this.textTracks().addTrack(e.track);
     });
 
     this.remoteTextTracks().on('removetrack', (e) => {
-      this.textTracks().removeTrack_(e.track);
+      this.textTracks().removeTrack(e.track);
     });
 
     // Initially, Tech.el_ is a child of a dummy-div wait until the Component system
@@ -764,11 +764,11 @@ class Tech extends Component {
 
     // store HTMLTrackElement and TextTrack to remote list
     this.remoteTextTrackEls().addTrackElement_(htmlTrackElement);
-    this.remoteTextTracks().addTrack_(htmlTrackElement.track);
+    this.remoteTextTracks().addTrack(htmlTrackElement.track);
 
     if (manualCleanup !== true) {
       // create the TextTrackList if it doesn't exist
-      this.autoRemoteTextTracks_.addTrack_(htmlTrackElement.track);
+      this.autoRemoteTextTracks_.addTrack(htmlTrackElement.track);
     }
 
     return htmlTrackElement;
@@ -785,8 +785,8 @@ class Tech extends Component {
 
     // remove HTMLTrackElement and TextTrack from remote list
     this.remoteTextTrackEls().removeTrackElement_(trackElement);
-    this.remoteTextTracks().removeTrack_(track);
-    this.autoRemoteTextTracks_.removeTrack_(track);
+    this.remoteTextTracks().removeTrack(track);
+    this.autoRemoteTextTracks_.removeTrack(track);
   }
 
   /**

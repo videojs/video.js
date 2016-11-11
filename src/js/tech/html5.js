@@ -67,7 +67,7 @@ class Html5 extends Tech {
           } else {
             // store HTMLTrackElement and TextTrack to remote list
             this.remoteTextTrackEls().addTrackElement_(node);
-            this.remoteTextTracks().addTrack_(node.track);
+            this.remoteTextTracks().addTrack(node.track);
             if (!crossoriginTracks &&
                 !this.el_.hasAttribute('crossorigin') &&
                 Url.isCrossOrigin(node.src)) {
@@ -341,7 +341,7 @@ class Html5 extends Tech {
       // Add tracks - if player is initialised after DOM loaded, textTracks
       // will not trigger addtrack
       for (let i = 0; i < tt.length; i++) {
-        this.textTracks().addTrack_(tt[i]);
+        this.textTracks().addTrack(tt[i]);
       }
 
       if (tt.addEventListener) {
@@ -383,7 +383,7 @@ class Html5 extends Tech {
    * @listens TextTrackList#addtrack
    */
   handleTextTrackAdd(e) {
-    this.textTracks().addTrack_(e.track);
+    this.textTracks().addTrack(e.track);
   }
 
   /**
@@ -395,7 +395,7 @@ class Html5 extends Tech {
    * @listens TextTrackList#removetrack
    */
   handleTextTrackRemove(e) {
-    this.textTracks().removeTrack_(e.track);
+    this.textTracks().removeTrack(e.track);
   }
 
   /**
@@ -438,7 +438,7 @@ class Html5 extends Tech {
     for (let i = 0; i < removeTracks.length; i++) {
       const track = removeTracks[i];
 
-      techTracks.removeTrack_(track);
+      techTracks.removeTrack(track);
     }
   }
 

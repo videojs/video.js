@@ -90,6 +90,7 @@ class VideoTrackList extends TrackList {
     return list;
   }
 
+<<<<<<< HEAD
   /**
    * Add a {@link VideoTrack} to the `VideoTrackList`.
    *
@@ -97,14 +98,13 @@ class VideoTrackList extends TrackList {
    *        The VideoTrack to add to the list
    *
    * @fires TrackList#addtrack
-   * @private
    */
-  addTrack_(track) {
+  addTrack(track) {
     if (track.selected) {
       disableOthers(this, track);
     }
 
-    super.addTrack_(track);
+    super.addTrack(track);
     // native tracks don't have this
     if (!track.addEventListener) {
       return;
@@ -124,31 +124,6 @@ class VideoTrackList extends TrackList {
       this.trigger('change');
     });
   }
-
-  /**
-   * Add a {@link VideoTrack} to the `VideoTrackList`.
-   *
-   * @param {VideoTrack} track
-   *        The VideoTrack to add to the list
-   *
-   * @fires TrackList#addtrack
-   */
-  addTrack(track) {
-    this.addTrack_(track);
-  }
-
-  /**
-   * Remove a {@link VideoTrack} to the `VideoTrackList`.
-   *
-   * @param {VideoTrack} track
-   *        The VideoTrack to remove from the list.
-   *
-   * @fires TrackList#removetrack
-   */
-  removeTrack(track) {
-    super.removeTrack_(track);
-  }
-
 }
 
 export default VideoTrackList;

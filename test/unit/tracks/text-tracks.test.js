@@ -370,7 +370,7 @@ QUnit.test('removes cuechange event when text track is hidden for emulated track
     startTime: 2,
     endTime: 5
   });
-  player.tech_.textTracks().addTrack_(tt);
+  player.tech_.textTracks().addTrack(tt);
 
   let numTextTrackChanges = 0;
 
