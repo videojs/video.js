@@ -56,8 +56,8 @@ if (Html5.supportsNativeTextTracks()) {
 
     const tt = new TextTrackList();
 
-    tt.addTrack_(nativeTrack.track);
-    tt.addTrack_(emulatedTrack);
+    tt.addTrack(nativeTrack.track);
+    tt.addTrack(emulatedTrack);
 
     const tech = {
       $$() {
@@ -107,8 +107,8 @@ if (Html5.supportsNativeTextTracks()) {
 
     const tt = new TextTrackList();
 
-    tt.addTrack_(nativeTrack.track);
-    tt.addTrack_(emulatedTrack);
+    tt.addTrack(nativeTrack.track);
+    tt.addTrack(emulatedTrack);
 
     let addRemotes = 0;
     const tech = {
@@ -177,8 +177,8 @@ QUnit.test('textTracksToJson produces good json output for emulated only', funct
 
   const tt = new TextTrackList();
 
-  tt.addTrack_(anotherTrack);
-  tt.addTrack_(emulatedTrack);
+  tt.addTrack(anotherTrack);
+  tt.addTrack(emulatedTrack);
 
   const tech = {
     $$() {
@@ -231,8 +231,8 @@ QUnit.test('jsonToTextTracks calls addRemoteTextTrack on the tech with emulated 
 
   const tt = new TextTrackList();
 
-  tt.addTrack_(anotherTrack);
-  tt.addTrack_(emulatedTrack);
+  tt.addTrack(anotherTrack);
+  tt.addTrack(emulatedTrack);
 
   let addRemotes = 0;
   const tech = {

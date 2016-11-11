@@ -38,7 +38,7 @@ class TrackList extends EventTarget {
     });
 
     for (let i = 0; i < tracks.length; i++) {
-      list.addTrack_(tracks[i]);
+      list.addTrack(tracks[i]);
     }
 
     return list;
@@ -48,10 +48,10 @@ class TrackList extends EventTarget {
    * Add a Track from TrackList
    *
    * @param {Mixed} track
-   * @method addTrack_
+   * @method addTrack
    * @private
    */
-  addTrack_(track) {
+  addTrack(track) {
     const index = this.tracks_.length;
 
     if (!('' + index in this)) {
@@ -76,10 +76,10 @@ class TrackList extends EventTarget {
    * Remove a Track from TrackList
    *
    * @param {Track} rtrack track to be removed
-   * @method removeTrack_
+   * @method removeTrack
    * @private
    */
-  removeTrack_(rtrack) {
+  removeTrack(rtrack) {
     let track;
 
     for (let i = 0, l = this.length; i < l; i++) {

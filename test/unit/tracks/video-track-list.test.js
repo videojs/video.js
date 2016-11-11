@@ -40,7 +40,7 @@ QUnit.test('only one track is ever selected', function(assert) {
   assert.equal(track.selected, true, 'track is selected');
   assert.equal(track2.selected, false, 'track2 is unselected');
 
-  list.addTrack_(track3);
+  list.addTrack(track3);
   assert.equal(track.selected, false, 'track is unselected');
   assert.equal(track2.selected, false, 'track2 is unselected');
   assert.equal(track3.selected, true, 'track3 is selected');
@@ -50,7 +50,7 @@ QUnit.test('only one track is ever selected', function(assert) {
   assert.equal(track2.selected, false, 'track2 is unselected');
   assert.equal(track3.selected, false, 'track3 is unselected');
 
-  list.addTrack_(track4);
+  list.addTrack(track4);
   assert.equal(track.selected, true, 'track is selected');
   assert.equal(track2.selected, false, 'track2 is unselected');
   assert.equal(track3.selected, false, 'track3 is unselected');
@@ -89,7 +89,7 @@ QUnit.test('trigger a change event per selected change', function(assert) {
   track.selected = true;
   assert.equal(change, 1, 'one change triggered');
 
-  list.addTrack_(track3);
+  list.addTrack(track3);
   assert.equal(change, 2, 'another change triggered by adding an selected track');
 
   track.selected = true;
@@ -98,6 +98,6 @@ QUnit.test('trigger a change event per selected change', function(assert) {
   track.selected = false;
   assert.equal(change, 4, 'another change trigger by changing selected');
 
-  list.addTrack_(track4);
+  list.addTrack(track4);
   assert.equal(change, 4, 'no change triggered by adding a unselected track');
 });
