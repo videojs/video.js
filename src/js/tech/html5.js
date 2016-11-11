@@ -4,7 +4,6 @@
 import Tech from './tech.js';
 import * as Dom from '../utils/dom.js';
 import * as Url from '../utils/url.js';
-import * as Fn from '../utils/fn.js';
 import log from '../utils/log.js';
 import tsml from 'tsml';
 import * as browser from '../utils/browser.js';
@@ -13,6 +12,7 @@ import window from 'global/window';
 import {assign} from '../utils/obj';
 import mergeOptions from '../utils/merge-options.js';
 import toTitleCase from '../utils/to-title-case.js';
+import {NORMAL as TRACK_TYPES} from '../tracks/track-types';
 
 /**
  * HTML5 Media Controller - Wrapper for HTML5 Media API
@@ -82,52 +82,10 @@ class Html5 extends Tech {
       }
     }
 
-    // TODO: add text tracks into this list
-    const trackTypes = ['audio', 'video'];
-
-    // ProxyNative Video/Audio Track
-    trackTypes.forEach((type) => {
-      const elTracks = this.el()[`${type}Tracks`];
-      const techTracks = this[`${type}Tracks`]();
-      const capitalType = toTitleCase(type);
-
-      if (!this[`featuresNative${capitalType}Tracks`] ||
-          !elTracks ||
-          !elTracks.addEventListener) {
-        return;
-      }
-
-      this[`handle${capitalType}TrackChange_`] = (e) => {
-        techTracks.trigger({
-          type: 'change',
-          target: techTracks,
-          currentTarget: techTracks,
-          srcElement: techTracks
-        });
-      };
-
-      this[`handle${capitalType}TrackAdd_`] = (e) => techTracks.addTrack(e.track);
-      this[`handle${capitalType}TrackRemove_`] = (e) => techTracks.removeTrack(e.track);
-
-      elTracks.addEventListener('change', this[`handle${capitalType}TrackChange_`]);
-      elTracks.addEventListener('addtrack', this[`handle${capitalType}TrackAdd_`]);
-      elTracks.addEventListener('removetrack', this[`handle${capitalType}TrackRemove_`]);
-      this[`removeOld${capitalType}Tracks_`] = (e) => this.removeOldTracks_(techTracks, elTracks);
-
-      // Remove (native) tracks that are not used anymore
-      this.on('loadstart', this[`removeOld${capitalType}Tracks_`]);
-    });
-
-    if (this.featuresNativeTextTracks) {
-      if (crossoriginTracks) {
-        log.warn(tsml`Text Tracks are being loaded from another origin but the crossorigin attribute isn't used.
+    this.proxyNativeTracks_();
+    if (this.featuresNativeTextTracks && crossoriginTracks) {
+      log.warn(tsml`Text Tracks are being loaded from another origin but the crossorigin attribute isn't used.
             This may prevent text tracks from loading.`);
-      }
-
-      this.handleTextTrackChange_ = Fn.bind(this, this.handleTextTrackChange);
-      this.handleTextTrackAdd_ = Fn.bind(this, this.handleTextTrackAdd);
-      this.handleTextTrackRemove_ = Fn.bind(this, this.handleTextTrackRemove);
-      this.proxyNativeTextTracks_();
     }
 
     // Determine if native controls should be used
@@ -150,26 +108,79 @@ class Html5 extends Tech {
    * Dispose of `HTML5` media element and remove all tracks.
    */
   dispose() {
-    // Un-ProxyNativeTracks
-    ['audio', 'video', 'text'].forEach((type) => {
-      const capitalType = toTitleCase(type);
-      const tl = this.el_[`${type}Tracks`];
-
-      if (tl && tl.removeEventListener) {
-        tl.removeEventListener('change', this[`handle${capitalType}TrackChange_`]);
-        tl.removeEventListener('addtrack', this[`handle${capitalType}TrackAdd_`]);
-        tl.removeEventListener('removetrack', this[`handle${capitalType}TrackRemove_`]);
-      }
-
-      // Stop removing old text tracks
-      if (tl) {
-        this.off('loadstart', this[`removeOld${capitalType}Tracks_`]);
-      }
-    });
-
     Html5.disposeMediaElement(this.el_);
     // tech will handle clearing of the emulated track list
     super.dispose();
+  }
+
+  /**
+   * Proxy all native track list events to our track lists if the browser we are playing
+   * in supports that type of track list.
+   *
+   * @private
+   */
+  proxyNativeTracks_() {
+    TRACK_TYPES.names.forEach((name) => {
+      const props = TRACK_TYPES[name];
+      const elTracks = this.el()[props.getterName];
+      const techTracks = this[props.getterName]();
+
+      if (!this[`featuresNative${props.capitalName}Tracks`] ||
+          !elTracks ||
+          !elTracks.addEventListener) {
+        return;
+      }
+      const listeners = {
+        change(e) {
+          techTracks.trigger({
+            type: 'change',
+            target: techTracks,
+            currentTarget: techTracks,
+            srcElement: techTracks
+          });
+        },
+        addtrack(e) {
+          techTracks.addTrack(e.track);
+        },
+        removetrack(e) {
+          techTracks.removeTrack(e.track);
+        }
+      };
+      const removeOldTracks = function() {
+        const removeTracks = [];
+
+        for (let i = 0; i < techTracks.length; i++) {
+          let found = false;
+
+          for (let j = 0; j < elTracks.length; j++) {
+            if (elTracks[j] === techTracks[i]) {
+              found = true;
+              break;
+            }
+          }
+
+          if (!found) {
+            removeTracks.push(techTracks[i]);
+          }
+        }
+
+        while (removeTracks.length) {
+          techTracks.removeTrack(removeTracks.shift());
+        }
+      };
+
+      Object.keys(listeners).forEach((eventName) => {
+        const listener = listeners[eventName];
+
+        elTracks.addEventListener(eventName, listener);
+        this.on('dispose', (e) => elTracks.removeEventListener(eventName, listener));
+      });
+
+      // Remove (native) tracks that are not used anymore
+      this.on('loadstart', removeOldTracks);
+      this.on('dispose', (e) => this.off('loadstart', removeOldTracks));
+    });
+
   }
 
   /**
@@ -331,128 +342,16 @@ class Html5 extends Tech {
   }
 
   /**
-   * Add event listeners to native text track events. This adds the native text tracks
-   * to our emulated {@link TextTrackList}.
+   * Called by {@link Player#play} to play using the `Html5` `Tech`.
    */
-  proxyNativeTextTracks_() {
-    const tt = this.el().textTracks;
+  play() {
+    const playPromise = this.el_.play();
 
-    if (tt) {
-      // Add tracks - if player is initialised after DOM loaded, textTracks
-      // will not trigger addtrack
-      for (let i = 0; i < tt.length; i++) {
-        this.textTracks().addTrack(tt[i]);
-      }
-
-      if (tt.addEventListener) {
-        tt.addEventListener('change', this.handleTextTrackChange_);
-        tt.addEventListener('addtrack', this.handleTextTrackAdd_);
-        tt.addEventListener('removetrack', this.handleTextTrackRemove_);
-      }
-
-      // Remove (native) texttracks that are not used anymore
-      this.on('loadstart', this.removeOldTextTracks_);
+    // Catch/silence error when a pause interrupts a play request
+    // on browsers which return a promise
+    if (playPromise !== undefined && typeof playPromise.then === 'function') {
+      playPromise.then(null, (e) => {});
     }
-  }
-
-  /**
-   * Handle any {@link TextTrackList} `change` event.
-   *
-   * @param {EventTarget~Event} e
-   *        The `change` event that caused this to run.
-   *
-   * @listens TextTrackList#change
-   */
-  handleTextTrackChange(e) {
-    const tt = this.textTracks();
-
-    this.textTracks().trigger({
-      type: 'change',
-      target: tt,
-      currentTarget: tt,
-      srcElement: tt
-    });
-  }
-
-  /**
-   * Handle any {@link TextTrackList} `addtrack` event.
-   *
-   * @param {EventTarget~Event} e
-   *        The `addtrack` event that caused this to run.
-   *
-   * @listens TextTrackList#addtrack
-   */
-  handleTextTrackAdd(e) {
-    this.textTracks().addTrack(e.track);
-  }
-
-  /**
-   * Handle any {@link TextTrackList} `removetrack` event.
-   *
-   * @param {EventTarget~Event} e
-   *        The `removetrack` event that caused this to run.
-   *
-   * @listens TextTrackList#removetrack
-   */
-  handleTextTrackRemove(e) {
-    this.textTracks().removeTrack(e.track);
-  }
-
-  /**
-   * This function removes any {@link AudioTrack}s, {@link VideoTrack}s, or
-   * {@link TextTrack}s that are not in the media elements TrackList.
-   *
-   * @param {TrackList} techTracks
-   *        HTML5 Tech's TrackList to search through
-   *
-   * @param {TrackList} elTracks
-   *        HTML5 media elements TrackList to search trough.
-   *
-   * @private
-   */
-  removeOldTracks_(techTracks, elTracks) {
-    // This will loop over the techTracks and check if they are still used by the HTML5 media element
-    // If not, they will be removed from the emulated list
-    const removeTracks = [];
-
-    if (!elTracks) {
-      return;
-    }
-
-    for (let i = 0; i < techTracks.length; i++) {
-      const techTrack = techTracks[i];
-      let found = false;
-
-      for (let j = 0; j < elTracks.length; j++) {
-        if (elTracks[j] === techTrack) {
-          found = true;
-          break;
-        }
-      }
-
-      if (!found) {
-        removeTracks.push(techTrack);
-      }
-    }
-
-    for (let i = 0; i < removeTracks.length; i++) {
-      const track = removeTracks[i];
-
-      techTracks.removeTrack(track);
-    }
-  }
-
-  /**
-   * Remove {@link TextTrack}s that dont exist in the native track list from our
-   * emulated {@link TextTrackList}.
-   *
-   * @listens Tech#loadstart
-   */
-  removeOldTextTracks_(e) {
-    const techTracks = this.textTracks();
-    const elTracks = this.el().textTracks;
-
-    this.removeOldTracks_(techTracks, elTracks);
   }
 
   /**

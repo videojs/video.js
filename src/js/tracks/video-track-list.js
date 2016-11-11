@@ -90,7 +90,6 @@ class VideoTrackList extends TrackList {
     return list;
   }
 
-<<<<<<< HEAD
   /**
    * Add a {@link VideoTrack} to the `VideoTrackList`.
    *

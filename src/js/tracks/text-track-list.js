@@ -52,7 +52,7 @@ class TextTrackList extends TrackList {
    * @fires TrackList#addtrack
    */
   addTrack(track) {
-    super.addTrack_(track);
+    super.addTrack(track);
 
     /**
      * @listens TextTrack#modechange

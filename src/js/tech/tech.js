@@ -3,13 +3,7 @@
  */
 
 import Component from '../component';
-import HTMLTrackElement from '../tracks/html-track-element';
-import HTMLTrackElementList from '../tracks/html-track-element-list';
 import mergeOptions from '../utils/merge-options.js';
-import TextTrack from '../tracks/text-track';
-import TextTrackList from '../tracks/text-track-list';
-import VideoTrackList from '../tracks/video-track-list';
-import AudioTrackList from '../tracks/audio-track-list';
 import * as Fn from '../utils/fn.js';
 import log from '../utils/log.js';
 import { createTimeRange } from '../utils/time-ranges.js';
@@ -18,6 +12,7 @@ import MediaError from '../media-error.js';
 import window from 'global/window';
 import document from 'global/document';
 import {isPlain} from '../utils/obj';
+import * as TRACK_TYPES from '../tracks/track-types';
 
 /**
  * An Object containing a structure like: `{src: 'url', type: 'mimetype'}` or string
@@ -68,7 +63,7 @@ function createTrackHelper(self, kind, label, language, options = {}) {
   }
   options.tech = self;
 
-  const track = new TextTrack(options);
+  const track = new TRACK_TYPES.ALL.text.TrackClass(options);
 
   tracks.addTrack(track);
 
@@ -108,9 +103,13 @@ class Tech extends Component {
       this.hasStarted_ = false;
     });
 
-    this.textTracks_ = options.textTracks;
-    this.videoTracks_ = options.videoTracks;
-    this.audioTracks_ = options.audioTracks;
+    TRACK_TYPES.ALL.names.forEach((name) => {
+      const props = TRACK_TYPES.ALL[name];
+
+      if (options && options[props.getterName]) {
+        this[props.privateName] = options[props.getterName];
+      }
+    });
 
     // Manually track progress in cases where the browser/flash player doesn't report it.
     if (!this.featuresProgressEvents) {
@@ -136,9 +135,8 @@ class Tech extends Component {
       this.emulateTextTracks();
     }
 
-    this.autoRemoteTextTracks_ = new TextTrackList();
+    this.autoRemoteTextTracks_ = new TRACK_TYPES.ALL.text.ListClass();
 
-    this.initTextTrackListeners();
     this.initTrackListeners();
 
     // Turn on component tap events only if not using native controls
@@ -332,7 +330,7 @@ class Tech extends Component {
   dispose() {
 
     // clear out all tracks because we can't reuse them between techs
-    this.clearTracks(['audio', 'video', 'text']);
+    this.clearTracks(TRACK_TYPES.NORMAL.names);
 
     // Turn off any manual progress or timeupdate tracking
     if (this.manualProgress) {
@@ -450,49 +448,16 @@ class Tech extends Component {
   }
 
   /**
-   * Turn on listeners for {@link TextTrackList} events. This adds
-   * {@link EventTarget~EventListeners} for `texttrackchange`, `addtrack` and
-   * `removetrack`.
+   * Turn on listeners for {@link VideoTrackList}, {@link {AudioTrackList}, and
+   * {@link TextTrackList} events.
    *
-   * @fires Tech#texttrackchange
-   */
-  initTextTrackListeners() {
-    const textTrackListChanges = Fn.bind(this, function() {
-      /**
-       * Triggered when tracks are added or removed on the Tech {@link TextTrackList}
-       *
-       * @event Tech#texttrackchange
-       * @type {EventTarget~Event}
-       */
-      this.trigger('texttrackchange');
-    });
-
-    const tracks = this.textTracks();
-
-    if (!tracks) {
-      return;
-    }
-
-    tracks.addEventListener('removetrack', textTrackListChanges);
-    tracks.addEventListener('addtrack', textTrackListChanges);
-
-    this.on('dispose', Fn.bind(this, function() {
-      tracks.removeEventListener('removetrack', textTrackListChanges);
-      tracks.removeEventListener('addtrack', textTrackListChanges);
-    }));
-  }
-
-  /**
-   * Turn on listeners for {@link VideoTrackList} and {@link {AudioTrackList} events.
    * This adds {@link EventTarget~EventListeners} for `addtrack`, and  `removetrack`.
    *
    * @fires Tech#audiotrackchange
    * @fires Tech#videotrackchange
+   * @fires Tech#texttrackchange
    */
   initTrackListeners() {
-    const trackTypes = ['video', 'audio'];
-
-    trackTypes.forEach((type) => {
      /**
       * Triggered when tracks are added or removed on the Tech {@link AudioTrackList}
       *
@@ -506,11 +471,20 @@ class Tech extends Component {
       * @event Tech#videotrackchange
       * @type {EventTarget~Event}
       */
+
+     /**
+      * Triggered when tracks are added or removed on the Tech {@link TextTrackList}
+      *
+      * @event Tech#texttrackchange
+      * @type {EventTarget~Event}
+      */
+    TRACK_TYPES.NORMAL.names.forEach((name) => {
+      const props = TRACK_TYPES.NORMAL[name];
       const trackListChanges = () => {
-        this.trigger(`${type}trackchange`);
+        this.trigger(`${name}trackchange`);
       };
 
-      const tracks = this[`${type}Tracks`]();
+      const tracks = this[props.getterName]();
 
       tracks.addEventListener('removetrack', trackListChanges);
       tracks.addEventListener('addtrack', trackListChanges);
@@ -625,63 +599,6 @@ class Tech extends Component {
   }
 
   /**
-   * Get the `Tech`s {@link VideoTrackList}.
-   *
-   * @return {VideoTrackList}
-   *          The video track list that the Tech is currently using.
-   */
-  videoTracks() {
-    this.videoTracks_ = this.videoTracks_ || new VideoTrackList();
-    return this.videoTracks_;
-  }
-
-  /**
-   * Get the `Tech`s {@link AudioTrackList}.
-   *
-   * @return {AudioTrackList}
-   *          The audio track list that the Tech is currently using.
-   */
-  audioTracks() {
-    this.audioTracks_ = this.audioTracks_ || new AudioTrackList();
-    return this.audioTracks_;
-  }
-
-  /**
-   * Get the `Tech`s {@link TextTrackList}.
-   *
-   * @return {TextTrackList}
-   *          The text track list that the Tech is currently using.
-   */
-  textTracks() {
-    this.textTracks_ = this.textTracks_ || new TextTrackList();
-    return this.textTracks_;
-  }
-
-  /**
-   * Get the `Tech`s remote {@link TextTrackList}, which is created from elements
-   * that were added to the DOM.
-   *
-   * @return {TextTrackList}
-   *          The remote text track list that the Tech is currently using.
-   */
-  remoteTextTracks() {
-    this.remoteTextTracks_ = this.remoteTextTracks_ || new TextTrackList();
-    return this.remoteTextTracks_;
-  }
-
-  /**
-   * Get The `Tech`s  {HTMLTrackElementList}, which are the elements in the DOM that are
-   * being used as TextTracks.
-   *
-   * @return {HTMLTrackElementList}
-   *          The current HTML track elements that exist for the tech.
-   */
-  remoteTextTrackEls() {
-    this.remoteTextTrackEls_ = this.remoteTextTrackEls_ || new HTMLTrackElementList();
-    return this.remoteTextTrackEls_;
-  }
-
-  /**
    * Create and returns a remote {@link TextTrack} object.
    *
    * @param {string} kind
@@ -730,7 +647,7 @@ class Tech extends Component {
       tech: this
     });
 
-    return new HTMLTrackElement(track);
+    return new TRACK_TYPES.REMOTE.remoteTextEl.TrackClass(track);
   }
 
   /**
@@ -878,28 +795,72 @@ class Tech extends Component {
 }
 
 /**
- * List of associated text tracks.
+ * Get the {@link VideoTrackList}
+ *
+ * @returns {VideoTrackList}
+ * @method Tech.prototype.videoTracks
+ */
+
+/**
+ * Get the {@link AudioTrackList}
+ *
+ * @returns {AudioTrackList}
+ * @method Tech.prototype.audioTracks
+ */
+
+/**
+ * Get the {@link TextTrackList}
+ *
+ * @returns {TextTrackList}
+ * @method Tech.prototype.textTracks
+ */
+
+/**
+ * Get the remote element {@link TextTrackList}
+ *
+ * @returns {TextTrackList}
+ * @method Tech.prototype.remoteTextTracks
+ */
+
+/**
+ * Get the remote element {@link HTMLTrackElementList}
+ *
+ * @returns {HTMLTrackElementList}
+ * @method Tech.prototype.remoteTextTrackEls
+ */
+
+TRACK_TYPES.ALL.names.forEach(function(name) {
+  const props = TRACK_TYPES.ALL[name];
+
+  Tech.prototype[props.getterName] = function() {
+    this[props.privateName] = this[props.privateName] || new props.ListClass();
+    return this[props.privateName];
+  };
+});
+
+/**
+ * List of associated text tracks
  *
  * @type {TextTrackList}
  * @private
+ * @property Tech#textTracks_
  */
-Tech.prototype.textTracks_; // eslint-disable-line
 
 /**
  * List of associated audio tracks.
  *
  * @type {AudioTrackList}
  * @private
+ * @property Tech#audioTracks_
  */
-Tech.prototype.audioTracks_; // eslint-disable-line
 
 /**
  * List of associated video tracks.
  *
  * @type {VideoTrackList}
  * @private
+ * @property Tech#videotracks_
  */
-Tech.prototype.videoTracks_; // eslint-disable-line
 
 /**
  * Boolean indicating wether the `Tech` supports volume control.

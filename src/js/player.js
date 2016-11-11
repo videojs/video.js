@@ -25,8 +25,7 @@ import mergeOptions from './utils/merge-options.js';
 import textTrackConverter from './tracks/text-track-list-converter.js';
 import ModalDialog from './modal-dialog';
 import Tech from './tech/tech.js';
-import AudioTrackList from './tracks/audio-track-list.js';
-import VideoTrackList from './tracks/video-track-list.js';
+import {ALL as TRACK_TYPES} from './tracks/track-types';
 
 // The following imports are used only to ensure that the corresponding modules
 // are always included in the video.js package. Importing the modules will
@@ -809,14 +808,11 @@ class Player extends Component {
     this.isReady_ = false;
 
     // Grab tech-specific options from player options and add source and parent element to use.
-    const techOptions = assign({
+    let techOptions = {
       source,
       'nativeControlsForTouch': this.options_.nativeControlsForTouch,
       'playerId': this.id(),
       'techId': `${this.id()}_${techName}_api`,
-      'videoTracks': this.videoTracks_,
-      'textTracks': this.textTracks_,
-      'audioTracks': this.audioTracks_,
       'autoplay': this.options_.autoplay,
       'preload': this.options_.preload,
       'loop': this.options_.loop,
@@ -825,7 +821,15 @@ class Player extends Component {
       'language': this.language(),
       'playerElIngest': this.playerElIngest_ || false,
       'vtt.js': this.options_['vtt.js']
-    }, this.options_[techName.toLowerCase()]);
+    };
+
+    TRACK_TYPES.names.forEach((name) => {
+      const props = TRACK_TYPES[name];
+
+      techOptions[props.getterName] = this[props.privateName];
+    });
+
+    techOptions = assign(techOptions, this.options_[techName.toLowerCase()]);
 
     if (this.tag) {
       techOptions.tag = this.tag;
@@ -906,9 +910,11 @@ class Player extends Component {
    */
   unloadTech_() {
     // Save the current text tracks so that we can reuse the same text tracks with the next tech
-    this.videoTracks_ = this.videoTracks();
-    this.textTracks_ = this.textTracks();
-    this.audioTracks_ = this.audioTracks();
+    TRACK_TYPES.names.forEach((name) => {
+      const props = TRACK_TYPES[name];
+
+      this[props.privateName] = this[props.getterName]();
+    });
     this.textTracksJson_ = textTrackConverter.textTracksToJson(this.tech_);
 
     this.isReady_ = false;
@@ -2842,102 +2848,6 @@ class Player extends Component {
   }
 
   /**
-   * Get the {@link VideoTrackList}
-   *
-   * @see https://html.spec.whatwg.org/multipage/embedded-content.html#videotracklist
-   *
-   * @return {VideoTrackList}
-   *         the current video track list
-   */
-  videoTracks() {
-    // if we have not yet loadTech_, we create videoTracks_
-    // these will be passed to the tech during loading
-    if (!this.tech_) {
-      this.videoTracks_ = this.videoTracks_ || new VideoTrackList();
-      return this.videoTracks_;
-    }
-
-    return this.tech_.videoTracks();
-  }
-
-  /**
-   * Get the {@link AudioTrackList}
-   *
-   * @see https://html.spec.whatwg.org/multipage/embedded-content.html#audiotracklist
-   *
-   * @return {AudioTrackList}
-   *         the current audio track list
-   */
-  audioTracks() {
-    // if we have not yet loadTech_, we create videoTracks_
-    // these will be passed to the tech during loading
-    if (!this.tech_) {
-      this.audioTracks_ = this.audioTracks_ || new AudioTrackList();
-      return this.audioTracks_;
-    }
-
-    return this.tech_.audioTracks();
-  }
-
-  /**
-   * Get the {@link TextTrackList}
-   *
-   * Text tracks are tracks of timed text events.
-   * - Captions: text displayed over the video
-   *             for the hearing impaired
-   * - Subtitles: text displayed over the video for
-   *              those who don't understand language in the video
-   * - Chapters: text displayed in a menu allowing the user to jump
-   *             to particular points (chapters) in the video
-   * - Descriptions: (not yet implemented) audio descriptions that are read back to
-   *                 the user by a screen reading device
-   *
-   * @see http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-texttracks
-   *
-   * @return {TextTrackList|undefined}
-   *         The current TextTrackList or undefined if
-   *         or undefined if we don't have a tech
-   */
-  textTracks() {
-    // cannot use techGet_ directly because it checks to see whether the tech is ready.
-    // Flash is unlikely to be ready in time but textTracks should still work.
-    if (this.tech_) {
-      return this.tech_.textTracks();
-    }
-  }
-
-  /**
-   * Get the "remote" {@link TextTrackList}. Remote Text Tracks
-   * are tracks that were added to the HTML video element and can
-   * be removed, whereas normal texttracks cannot be removed.
-   *
-   *
-   * @return {TextTrackList|undefined}
-   *         The current remote text track list or undefined
-   *         if we don't have a tech
-   */
-  remoteTextTracks() {
-    if (this.tech_) {
-      return this.tech_.remoteTextTracks();
-    }
-  }
-
-  /**
-   * Get the "remote" {@link HTMLTrackElementList}.
-   * This gives the user all of the DOM elements that match up
-   * with the remote {@link TextTrackList}.
-   *
-   * @return {HTMLTrackElementList}
-   *         The current remote text track list elements
-   *         or undefined if we don't have a tech
-   */
-  remoteTextTrackEls() {
-    if (this.tech_) {
-      return this.tech_.remoteTextTrackEls();
-    }
-  }
-
-  /**
    * A helper method for adding a {@link TextTrack} to our
    * {@link TextTrackList}.
    *
@@ -3193,6 +3103,70 @@ class Player extends Component {
             'msFlexOrder' in elem.style);
   }
 }
+
+/**
+ * Get the {@link VideoTrackList}
+ * @link https://html.spec.whatwg.org/multipage/embedded-content.html#videotracklist
+ *
+ * @return {VideoTrackList}
+ *         the current video track list
+ *
+ * @method Player.prototype.videoTracks
+ */
+
+/**
+ * Get the {@link AudioTrackList}
+ * @link https://html.spec.whatwg.org/multipage/embedded-content.html#audiotracklist
+ *
+ * @return {AudioTrackList}
+ *         the current audio track list
+ *
+ * @method Player.prototype.audioTracks
+ */
+
+/**
+ * Get the {@link TextTrackList}
+ *
+ * @link http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-texttracks
+ *
+ * @return {TextTrackList}
+ *         the current text track list
+ *
+ * @method Player.prototype.textTracks
+ */
+
+/**
+ * Get the remote {@link TextTrackList}
+ *
+ * @return {TextTrackList}
+ *         The current remote text track list
+ *
+ * @method Player.prototype.textTracks
+ */
+
+/**
+ * Get the remote {@link HTMLTrackElementList} tracks.
+ *
+ * @return {HTMLTrackElementList}
+ *         The current remote text track element list
+ *
+ * @method Player.prototype.remoteTextTrackEls
+ */
+
+TRACK_TYPES.names.forEach(function(name) {
+  const props = TRACK_TYPES[name];
+
+  Player.prototype[props.getterName] = function() {
+    if (this.tech_) {
+      return this.tech_[props.getterName]();
+    }
+
+    // if we have not yet loadTech_, we create videoTracks_
+    // these will be passed to the tech during loading
+    this[props.privateName] = this[props.privateName] || new props.ListClass();
+    return this[props.privateName];
+  };
+});
 
 /**
  * Global player list
