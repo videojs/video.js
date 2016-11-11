@@ -108,7 +108,7 @@ var Plugin = videojs.getPlugin('plugin');
 var ExamplePlugin = videojs.extend(Plugin, {
 
   constructor: function(player, options) {
-    Plugin.prototype.call(this, player, options);
+    Plugin.call(this, player, options);
 
     player.addClass(options.customClass);
     player.on('playing', function() {
