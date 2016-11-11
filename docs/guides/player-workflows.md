@@ -1,13 +1,10 @@
 # Player Workflows
-
 This document outlines many considerations for using Video.js for advanced player workflows. Be sure to read [the setup guide](setup.md) first!
 
 ## Removing Players
-
 No matter the term used for it, web applications are becoming common. Not everything is a static, load-once-and-done web page anymore! This means that developers need to be able to manage the full lifecycle of a video player - from creation to destruction. Video.js supports player removal through the `dispose()` method.
 
 ### [`dispose()`](http://docs.videojs.com/docs/api/player.html#Methodsdispose)
-
 This method is available on all Video.js players and [components](http://docs.videojs.com/docs/api/component.html#Methodsdispose). It is _the only_ supported method of removing a Video.js player from both the DOM and memory. For example, the following code sets up a player and then disposes it when media playback is complete:
 
 ```js
