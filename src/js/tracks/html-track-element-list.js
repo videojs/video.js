@@ -37,7 +37,20 @@ class HtmlTrackElementList {
   }
 
   addTrackElement_(trackElement) {
-    this.trackElements_.push(trackElement);
+    const index = this.trackElements_.length;
+
+    if (!('' + index in this)) {
+      Object.defineProperty(this, index, {
+        get() {
+          return this.trackElements_[index];
+        }
+      });
+    }
+
+    // Do not add duplicate elements
+    if (this.trackElements_.indexOf(trackElement) === -1) {
+      this.trackElements_.push(trackElement);
+    }
   }
 
   getTrackElementByTrack_(track) {
