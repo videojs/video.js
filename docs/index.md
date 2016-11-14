@@ -28,7 +28,11 @@ You can change the look of the player across playback technologies just by editi
 
 #### [Plugins][guides-plugins]
 
-You can package up interesting Video.js customizations and reuse them elsewhere. Find out how to build your own plugin or use one created by someone else.
+You can package up interesting Video.js customizations and reuse them elsewhere. Find out how to build your own plugin or [use one created by someone else](https://github.com/videojs/video.js/wiki/Plugins).
+
+#### [Components][guides-components]
+
+Video.js is built around a collection of components. These are the building blocks of the player UI.
 
 #### [Tech][guides-tech]
 

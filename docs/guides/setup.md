@@ -119,7 +119,7 @@ videojs.options.autoplay = true;
 
 ### A Note on `<video>` Tag Attributes
 
-Many attributes are so-called [boolean attributes][boolean-attrs]. This means they are either on or off. In these cases, the attribute _should have no value_ - its presence implies a true value and its absence implies a false value.
+Many attributes are so-called [boolean attributes][boolean-attrs]. This means they are either on or off. In these cases, the attribute _should have no value_ (or should have its name as its value) - its presence implies a true value and its absence implies a false value.
 
 _These are incorrect:_
 

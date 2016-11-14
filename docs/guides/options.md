@@ -37,119 +37,101 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Standard `<video>` Element Options
-
 Each of these options is also available as a [standard `<video>` element attribute][video-attrs]; so, they can be defined in all three manners [outlined above](#setting-options). Typically, defaults are not listed as this is left to browser vendors.
 
 ### `autoplay`
+> Type: `boolean`
 
-> Type: `Boolean`
-
-If `true`/present as an attribute, begins playback automatically.
+If `true`/present as an attribute, begins playback when the player is ready.
 
 > **Note:** As of iOS 10, Apple offers `autoplay` support in Safari. For details, refer to ["New <video> Policies for iOS"][ios-10-updates].
 
 ### `controls`
-
-> Type: `Boolean`
+> Type: `boolean`
 
 Determines whether or not the player has controls that the user can interact with. Without controls the only way to start the video playing is with the `autoplay` attribute or through the Player API.
 
 ### `height`
-
-> Type: `String|Number`
+> Type: `string|number`
 
 Sets the display height of the video player in pixels.
 
 ### `loop`
-
-> Type: `Boolean`
+> Type: `boolean`
 
 Causes the video to start over as soon as it ends.
 
 ### `muted`
-
-> Type: `Boolean`
+> Type: `boolean`
 
 Will silence any audio by default.
 
 ### `poster`
-
-> Type: `String`
+> Type: `string`
 
 A URL to an image that displays before the video begins playing. This is often a frame of the video or a custom title screen. As soon as the user hits "play" the image will go away.
 
 ### `preload`
-
-> Type: `String`
+> Type: `string`
 
 Suggests to the browser whether or not the video data should begin downloading as soon as the `<video>` element is loaded. Supported values are:
 
-- `'auto'`
+#### `'auto'`
+Start loading the video immediately (if the browser supports it). Some mobile devices will not preload the video in order to protect their users' bandwidth/data usage. This is why the value is called 'auto' and not something more conclusive like `'true'`.
 
-  Start loading the video immediately (if the browser supports it). Some mobile devices will not preload the video in order to protect their users' bandwidth/data usage. This is why the value is called 'auto' and not something more conclusive like `'true'`.
+_This tends to be the most common and recommended value as it allows the browser to choose the best behavior._
 
-  _This tends to be the most common and recommended value as it allows the browser to choose the best behavior._
+#### `'metadata'`
+Load only the meta data of the video, which includes information like the duration and dimensions of the video. Sometimes, the meta data will be loaded by downloading a few frames of video.
 
-- `'metadata'`
-
-  Load only the meta data of the video, which includes information like the duration and dimensions of the video.
-
-- `'none'`
-
-  Don't preload any data. The browser will wait until the user hits "play" to begin downloading.
+#### `'none'`
+Don't preload any data. The browser will wait until the user hits "play" to begin downloading.
 
 ### `src`
-
-> Type: `String`
+> Type: `string`
 
 The source URL to a video source to embed.
 
 ### `width`
-
-> Type: `String|Number`
+> Type: `string|number`
 
 Sets the display height of the video player in pixels.
 
 ## Video.js-specific Options
-
 Each option is `undefined` by default unless otherwise specified.
 
 ### `aspectRatio`
-
-> Type: `String`
+> Type: `string`
 
 Puts the player in [fluid](#fluid) mode and the value is used when calculating the dynamic size of the player. The value should represent a ratio - two numbers separated by a colon (e.g. `"16:9"` or `"4:3"`).
 
 ### `children`
+> Type: `Array|Object`
 
-> Type: `Array`
+This option is inherited from the [`Component` base class](#component-options).
 
 ### `fluid`
-
-> Type: `Boolean`
+> Type: `boolean`
 
 When `true`, the Video.js player will have a fluid size. In other words, it will scale to fit its container.
 
 Also, if the `<video>` element has the `"vjs-fluid"`, this option is automatically set to `true`.
 
 ### `inactivityTimeout`
-
-> Type: `Number`
+> Type: `number`
 
 Video.js indicates that the user is interacting with the player by way of the `"vjs-user-active"` and `"vjs-user-inactive"` classes and the `"useractive"` event.
 
 The `inactivityTimeout` determines how many milliseconds of inactivity is required before declaring the user inactive. A value of `0` indicates that there is no `inactivityTimeout` and the user will never be considered inactive.
 
 ### `language`
-
-> Type: `String`
+> Type: `string`, Default: browser default or `'en'`
 
 A [language code][lang-codes] matching one of the available languages in the player. This sets the initial language for a player, but it can always be changed.
 
 Learn more about [languages in Video.js](languages.md).
 
 ### `languages`
-
 > Type: `Object`
 
 Customize which languages are available in a player. The keys of this object will be [language codes][lang-codes] and the values will be objects with English keys and translated values.
@@ -158,14 +140,17 @@ Learn more about [languages in Video.js](languages.md).
 
 > **Note**: Generally, this option is not needed and it would be better to pass your custom languages to `videojs.addLanguage()`, so they are available in all players!
 
-### `notSupportedMessage`
+### `nativeControlsForTouch`
+> Type: `boolean`
 
-> Type: `String`
+Explicitly set a default value for [the associated tech option](#nativecontrolsfortouch).
+
+### `notSupportedMessage`
+> Type: `string`
 
 Allows overriding the default message that is displayed when Video.js cannot play back a media source.
 
 ### `plugins`
-
 > Type: `Object`
 
 This supports having plugins be initialized automatically with custom options when the player is initialized - rather than requiring you to initialize them manually.
@@ -190,9 +175,10 @@ player.boo({baz: false});
 
 Although, since the `plugins` option is an object, the order of initialization is not guaranteed!
 
-### `sourceOrder`
+See [the plugins guide](plugins.md) for more information on Video.js plugins.
 
-> Type: `Boolean`
+### `sourceOrder`
+> Type: `Array`
 
 Tells Video.js to prefer the order of [`sources`](#sources) over [`techOrder`](#techOrder) in selecting a source and playback tech.
 
@@ -232,7 +218,6 @@ With `sourceOrder: true`, the algorithm becomes:
     - if tech can play source, use this tech/source combo
 
 ### `sources`
-
 > Type: `Array`
 
 An array of objects that mirror the native `<video>` element's capability to have a series of child `<source>` elements. This should be an array of objects with the `src` and `type` properties. For example:
@@ -249,11 +234,24 @@ videojs('my-player', {
 });
 ```
 
-### `techOrder`
+Using `<source>` elements will have the same effect:
 
+```html
+<video ...>
+  <source src="//path/to/video.mp4" type="video/mp4">
+  <source src="//path/to/video.webm" type="video/webm">
+</video>
+```
+
+### `techOrder`
 > Type: `Array`, Default: `['html5', 'flash']`
 
 Defines the order in which Video.js techs are preferred. By default, this means that the `Html5` tech is preferred, but Video.js will fall back to `Flash` if no `Html5`-compatible source can be found.
+
+### `vtt.js`
+> Type: `string`
+
+Allows overriding the default URL to vtt.js, which may be loaded asynchronously to polyfill support for `WebVTT`.
 
 ## Component Options
 
@@ -262,12 +260,34 @@ The Video.js player is a component. Like all components, you can define what chi
 This is meant to be a quick reference; so, for more detailed information on components in Video.js, check out the [components guide](components.md).
 
 ### `children`
-
 > Type: `Array|Object`
 
-If an `Array` - which is the default - this is used to determine the order in which children are created on a player.
+If an `Array` - which is the default - this is used to determine which children (by component name) and in which order they are created on a player (or other component):
 
-This can also be passed as an `Object`. In this case, it is used to provide `options` for any/all children.
+```js
+// The following code creates a player with ONLY bigPlayButton and
+// controlBar child components.
+videojs('my-player', {
+  children: [
+    'bigPlayButton',
+    'controlBar'
+  ]
+});
+```
+
+The `children` options can also be passed as an `Object`. In this case, it is used to provide `options` for any/all children, including disabling them with `false`:
+
+```js
+// This player's ONLY child will be the controlBar. Clearly, this is not the
+// ideal method for disabling a grandchild!
+videojs('my-player', {
+  children: {
+    controlBar: {
+      fullscreenControl: false
+    }
+  }
+});
+```
 
 ### `${componentName}`
 
@@ -306,6 +326,25 @@ However, this is a case where changing the global defaults is more useful:
 ```js
 videojs.options.flash.swf = '//path/to/videojs.swf'
 ```
+
+#### `nativeCaptions`
+
+> Type: `boolean`
+
+Can be set to `false` to force emulation of text tracks instead of native support.
+
+#### `nativeControlsForTouch`
+
+> Type: `boolean`
+
+Only supported by the `Html5` tech, this option can be set to `true` to force native controls for touch devices.
+
+#### `nativeTextTracks`
+
+> Type: `boolean`
+
+Can be set to `false` to force emulation of text tracks instead of native support.
+
 
 [ios-10-updates]: https://webkit.org/blog/6784/new-video-policies-for-ios/
 [lang-codes]: http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry

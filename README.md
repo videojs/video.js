@@ -8,7 +8,7 @@
 
 [![NPM][npm-icon]][npm-link]
 
-> Video.js is a web video player built from the ground up for an HTML5 world. It supports HTML5 and Flash video, as well as YouTube and Vimeo (through [plugins][plugins]). It supports video playback on desktops and mobile devices. This project was started mid 2010, and the player is now used on over ~~50,000~~ ~~100,000~~ 200,000 websites.
+> Video.js is a web video player built from the ground up for an HTML5 world. It supports HTML5 and Flash video, as well as YouTube and Vimeo (through [plugins][plugins]). It supports video playback on desktops and mobile devices. This project was started mid 2010, and the player is now used on over ~~50,000~~ ~~100,000~~ ~~200,000~~ 400,000 websites.
 
 ## Quick Start
 
@@ -46,13 +46,22 @@ Next, using Video.js is as simple as creating a `<video>` element, but with an a
 
 When the page loads, Video.js will find this element and automatically setup a player in its place.
 
-If you don't want to use automatic setup, you can leave off the `data-setup` attribute and initialize a `<video>` element manually:
+If you don't want to use automatic setup, you can leave off the `data-setup` attribute and initialize a `<video>` element manually using the `videojs` function:
 
 ```js
-var player = videojs('my-player', { /* options */ }, function() {
+var player = videojs('my-player');
+```
+
+The `videojs` function also accepts an `options` object and a callback to be invoked
+ when the player is ready:
+
+```js
+var options = {};
+
+var player = videojs('my-player', options, function onPlayerReady() {
   videojs.log('Your player is ready!');
 
-  // If you don't trust autoplay for some reason...
+  // In this context, `this` is the player that was created by Video.js.
   this.play();
 
   // How about an event listener?
