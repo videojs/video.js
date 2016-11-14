@@ -31,7 +31,8 @@ QUnit.test('Flash.canPlaySource', function(assert) {
 });
 
 QUnit.test('currentTime', function(assert) {
-  const mockFlash = new MockFlash();
+  const getCurrentTime = Flash.prototype.currentTime;
+  const setCurrentTime = Flash.prototype.setCurrentTime;
   let seekingCount = 0;
   let seeking = false;
   let setPropVal;
@@ -39,42 +40,44 @@ QUnit.test('currentTime', function(assert) {
   let result;
 
   // Mock out a Flash instance to avoid creating the swf object
-  mockFlash.el_ = {
-    /* eslint-disable camelcase */
-    vjs_setProperty(prop, val) {
-      setPropVal = val;
+  const mockFlash = {
+    el_: {
+      /* eslint-disable camelcase */
+      vjs_setProperty(prop, val) {
+        setPropVal = val;
+      },
+      vjs_getProperty() {
+        return getPropVal;
+      }
+      /* eslint-enable camelcase */
     },
-    vjs_getProperty() {
-      return getPropVal;
+    seekable() {
+      return createTimeRange(5, 1000);
+    },
+    trigger(event) {
+      if (event === 'seeking') {
+        seekingCount++;
+      }
+    },
+    seeking() {
+      return seeking;
     }
-    /* eslint-enable camelcase */
-  };
-  mockFlash.seekable = function() {
-    return createTimeRange(5, 1000);
-  };
-  mockFlash.trigger = function(event) {
-    if (event === 'seeking') {
-      seekingCount++;
-    }
-  };
-  mockFlash.seeking = function() {
-    return seeking;
   };
 
   // Test the currentTime getter
   getPropVal = 3;
-  result = mockFlash.currentTime();
+  result = getCurrentTime.call(mockFlash);
   assert.equal(result, 3, 'currentTime is retreived from the swf element');
 
   // Test the currentTime setter
-  mockFlash.setCurrentTime(10);
+  setCurrentTime.call(mockFlash, 10);
   assert.equal(setPropVal, 10, 'currentTime is set on the swf element');
   assert.equal(seekingCount, 1, 'triggered seeking');
 
   // Test current time while seeking
-  mockFlash.setCurrentTime(20);
+  setCurrentTime.call(mockFlash, 20);
   seeking = true;
-  result = mockFlash.currentTime();
+  result = getCurrentTime.call(mockFlash);
   assert.equal(result,
               20,
               'currentTime is retrieved from the lastSeekTarget while seeking');
@@ -84,13 +87,13 @@ QUnit.test('currentTime', function(assert) {
   assert.equal(seekingCount, 2, 'triggered seeking');
 
   // clamp seeks to seekable
-  mockFlash.setCurrentTime(1001);
-  result = mockFlash.currentTime();
+  setCurrentTime.call(mockFlash, 1001);
+  result = getCurrentTime.call(mockFlash);
   assert.equal(result, mockFlash.seekable().end(0), 'clamped to the seekable end');
   assert.equal(seekingCount, 3, 'triggered seeking');
 
-  mockFlash.setCurrentTime(1);
-  result = mockFlash.currentTime();
+  setCurrentTime.call(mockFlash, 1);
+  result = getCurrentTime.call(mockFlash);
   assert.equal(result, mockFlash.seekable().start(0), 'clamped to the seekable start');
   assert.equal(seekingCount, 4, 'triggered seeking');
 });
