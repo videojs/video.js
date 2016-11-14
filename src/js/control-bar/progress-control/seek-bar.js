@@ -65,7 +65,7 @@ class SeekBar extends Slider {
    * @param {EventTarget~Event} [event]
    *        The `timeupdate` or `ended` event that caused this to run.
    *
-   * @listens Player#timupdate
+   * @listens Player#timeupdate
    * @listens Player#ended
    */
   updateProgress(event) {

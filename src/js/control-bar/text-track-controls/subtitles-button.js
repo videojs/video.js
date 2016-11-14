@@ -21,7 +21,7 @@ class SubtitlesButton extends TextTrackButton {
    *        The key/value store of player options.
    *
    * @param {Component~ReadyCallback} [ready]
-   *        The functino to call when this component is ready.
+   *        The function to call when this component is ready.
    */
   constructor(player, options, ready) {
     super(player, options, ready);

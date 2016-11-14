@@ -359,8 +359,8 @@ export function off(elem, type, fn) {
  * @param {EventTarget~Event|string} event
  *        A string (the type) or an event object with a type attribute
  *
- * @param {Object} [hash] data
- *        hash to pass along with the event
+ * @param {Object} [hash]
+ *        data hash to pass along with the event
  *
  * @return {boolean|undefined}
  *         - Returns the opposite of `defaultPrevented` if default was prevented

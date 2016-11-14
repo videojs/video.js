@@ -61,7 +61,7 @@ class MouseTimeDisplay extends Component {
   }
 
   /**
-   * handle the mouse move event on the `MouseTimeDisplay`.
+   * Handle the mouse move event on the `MouseTimeDisplay`.
    *
    * @param {EventTarget~Event} event
    *        The `mousemove` event that caused this to event to run.

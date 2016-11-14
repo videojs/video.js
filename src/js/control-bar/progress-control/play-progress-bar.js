@@ -53,7 +53,7 @@ class PlayProgressBar extends Component {
   }
 
   /**
-   * Updatet the data-current-time attribute on the `PlayProgressBar`.
+   * Update the data-current-time attribute on the `PlayProgressBar`.
    *
    * @param {EventTarget~Event} [event]
    *        The `timeupdate` event that caused this to run.

@@ -56,7 +56,7 @@ class RemainingTimeDisplay extends Component {
    * Update remaining time display.
    *
    * @param {EventTarget~Event} [event]
-   *        The `timeupdate` or `durationchange` event taht caused this to run.
+   *        The `timeupdate` or `durationchange` event that caused this to run.
    *
    * @listens Player#timeupdate
    * @listens Player#durationchange
