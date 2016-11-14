@@ -1,12 +1,12 @@
 /**
  * @file mouse-time-display.js
  */
-import window from 'global/window';
 import Component from '../../component.js';
 import * as Dom from '../../utils/dom.js';
 import * as Fn from '../../utils/fn.js';
 import formatTime from '../../utils/format-time.js';
 import throttle from 'lodash-compat/function/throttle';
+import computedStyle from '../../utils/computed-style.js';
 
 /**
  * The Mouse Time Display component shows the time you will seek to
@@ -71,7 +71,7 @@ class MouseTimeDisplay extends Component {
     if (this.keepTooltipsInside) {
       const clampedPosition = this.clampPosition_(position);
       const difference = position - clampedPosition + 1;
-      const tooltipWidth = parseFloat(window.getComputedStyle(this.tooltip).width);
+      const tooltipWidth = parseFloat(computedStyle(this.tooltip, 'width'));
       const tooltipWidthHalf = tooltipWidth / 2;
 
       this.tooltip.innerHTML = time;
@@ -98,8 +98,8 @@ class MouseTimeDisplay extends Component {
       return position;
     }
 
-    const playerWidth = parseFloat(window.getComputedStyle(this.player().el()).width);
-    const tooltipWidth = parseFloat(window.getComputedStyle(this.tooltip).width);
+    const playerWidth = parseFloat(computedStyle(this.player().el(), 'width'));
+    const tooltipWidth = parseFloat(computedStyle(this.tooltip, 'width'));
     const tooltipWidthHalf = tooltipWidth / 2;
     let actualPosition = position;
 

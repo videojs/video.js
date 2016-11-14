@@ -1,6 +1,7 @@
 /* eslint-env qunit */
 import ClickableComponent from '../../src/js/clickable-component.js';
 import TestHelpers from './test-helpers.js';
+import * as Events from '../../src/js/utils/events.js';
 
 QUnit.module('ClickableComponent');
 
@@ -35,6 +36,37 @@ QUnit.test('should be enabled/disabled', function(assert) {
   testClickableComponent.enable();
 
   assert.equal(testClickableComponent.hasClass('vjs-disabled'), false, 'ClickableComponent is enabled');
+
+  testClickableComponent.dispose();
+  player.dispose();
+});
+
+QUnit.test('handleClick should not be triggered when disabled', function() {
+  let clicks = 0;
+
+  class TestClickableComponent extends ClickableComponent {
+    handleClick() {
+      clicks++;
+    }
+  }
+
+  const player = TestHelpers.makePlayer({});
+  const testClickableComponent = new TestClickableComponent(player);
+  const el = testClickableComponent.el();
+
+  // 1st click
+  Events.trigger(el, 'click');
+  QUnit.equal(clicks, 1, 'click on enabled ClickableComponent is handled');
+
+  testClickableComponent.disable();
+  // No click should happen.
+  Events.trigger(el, 'click');
+  QUnit.equal(clicks, 1, 'click on disabled ClickableComponent is not handled');
+
+  testClickableComponent.enable();
+  // 2nd Click
+  Events.trigger(el, 'click');
+  QUnit.equal(clicks, 2, 'click on re-enabled ClickableComponent is handled');
 
   testClickableComponent.dispose();
   player.dispose();

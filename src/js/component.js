@@ -306,6 +306,12 @@ class Component {
    * @method getChild
    */
   getChild(name) {
+    if (!name) {
+      return;
+    }
+
+    name = toTitleCase(name);
+
     return this.childNameIndex_[name];
   }
 
@@ -341,9 +347,9 @@ class Component {
     let component;
     let componentName;
 
-    // If child is a string, create nt with options
+    // If child is a string, create component with options
     if (typeof child === 'string') {
-      componentName = child;
+      componentName = toTitleCase(child);
 
       // Options can also be specified as a boolean, so convert to an empty object if false.
       if (!options) {
@@ -356,9 +362,7 @@ class Component {
         options = {};
       }
 
-      // If no componentClass in options, assume componentClass is the name lowercased
-      // (e.g. playButton)
-      const componentClassName = options.componentClass || toTitleCase(componentName);
+      const componentClassName = options.componentClass || componentName;
 
       // Set name through options
       options.name = componentName;
@@ -982,6 +986,42 @@ class Component {
   }
 
   /**
+   * Get the value of an attribute on the component's element
+   *
+   * @param {String} attribute Attribute to get
+   * @return {String}
+   * @method getAttribute
+   */
+  getAttribute(attribute) {
+    return Dom.getAttribute(this.el_, attribute);
+  }
+
+  /**
+   * Set the value of an attribute on the component's element
+   *
+   * @param {String} attribute Attribute to set
+   * @param {String} value Value to set the attribute to
+   * @return {Component}
+   * @method setAttribute
+   */
+  setAttribute(attribute, value) {
+    Dom.setAttribute(this.el_, attribute, value);
+    return this;
+  }
+
+  /**
+   * Remove an attribute from the component's element
+   *
+   * @param {String} attribute Attribute to remove
+   * @return {Component}
+   * @method removeAttribute
+   */
+  removeAttribute(attribute) {
+    Dom.removeAttribute(this.el_, attribute);
+    return this;
+  }
+
+  /**
    * Set or get the width of the component (CSS values)
    * Setting the video tag dimension values only works with values in pixels.
    * Percent values will not work.
@@ -1108,16 +1148,20 @@ class Component {
       const computedStyle = window.getComputedStyle(this.el_);
 
       computedWidthOrHeight = computedStyle.getPropertyValue(widthOrHeight) || computedStyle[widthOrHeight];
-    } else if (this.el_.currentStyle) {
-      // ie 8 doesn't support computed style, shim it
-      // return clientWidth or clientHeight instead for better accuracy
+    }
+
+    // remove 'px' from variable and parse as integer
+    computedWidthOrHeight = parseFloat(computedWidthOrHeight);
+
+    // if the computed value is still 0, it's possible that the browser is lying
+    // and we want to check the offset values.
+    // This code also runs on IE8 and wherever getComputedStyle doesn't exist.
+    if (computedWidthOrHeight === 0) {
       const rule = `offset${toTitleCase(widthOrHeight)}`;
 
       computedWidthOrHeight = this.el_[rule];
     }
 
-    // remove 'px' from variable and parse as integer
-    computedWidthOrHeight = parseFloat(computedWidthOrHeight);
     return computedWidthOrHeight;
   }
 
@@ -1386,11 +1430,18 @@ class Component {
    * @method registerComponent
    */
   static registerComponent(name, comp) {
+    if (!name) {
+      return;
+    }
+
+    name = toTitleCase(name);
+
     if (!Component.components_) {
       Component.components_ = {};
     }
 
     Component.components_[name] = comp;
+
     return comp;
   }
 
@@ -1403,12 +1454,19 @@ class Component {
    * @method getComponent
    */
   static getComponent(name) {
+    if (!name) {
+      return;
+    }
+
+    name = toTitleCase(name);
+
     if (Component.components_ && Component.components_[name]) {
       return Component.components_[name];
     }
 
     if (window && window.videojs && window.videojs[name]) {
       log.warn(`The ${name} component was added to the videojs object when it should be registered using videojs.registerComponent(name, component)`);
+
       return window.videojs[name];
     }
   }

@@ -39,6 +39,9 @@ class TechFaker extends Tech {
   src() {
     return 'movie.mp4';
   }
+  currentSrc() {
+    return 'movie.mp4';
+  }
   volume() {
     return 0;
   }

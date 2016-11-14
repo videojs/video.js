@@ -41,20 +41,17 @@ function customizer(destination, source) {
  * provided objects
  * @function mergeOptions
  */
-export default function mergeOptions() {
-  // contruct the call dynamically to handle the variable number of
-  // objects to merge
-  const args = Array.prototype.slice.call(arguments);
+export default function mergeOptions(...objects) {
 
   // unshift an empty object into the front of the call as the target
   // of the merge
-  args.unshift({});
+  objects.unshift({});
 
   // customize conflict resolution to match our historical merge behavior
-  args.push(customizer);
+  objects.push(customizer);
 
-  merge.apply(null, args);
+  merge.apply(null, objects);
 
   // return the mutated result object
-  return args[0];
+  return objects[0];
 }

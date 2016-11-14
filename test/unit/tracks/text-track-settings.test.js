@@ -31,6 +31,7 @@ QUnit.test('should update settings', function(assert) {
     tracks,
     persistTextTrackSettings: true
   });
+
   const newSettings = {
     backgroundOpacity: '0.5',
     textOpacity: '0.5',
@@ -44,43 +45,52 @@ QUnit.test('should update settings', function(assert) {
   };
 
   player.textTrackSettings.setValues(newSettings);
+
   assert.deepEqual(player.textTrackSettings.getValues(),
-                  newSettings,
-                  'values are updated');
+                   newSettings,
+                   'values are updated');
 
   assert.equal(player.$('.vjs-fg-color > select').selectedIndex,
-              2,
-              'fg-color is set to new value');
+               2,
+               'fg-color is set to new value');
+
   assert.equal(player.$('.vjs-bg-color > select').selectedIndex,
-              1,
-              'bg-color is set to new value');
-  assert.equal(player.$('.window-color > select').selectedIndex,
-              1,
-              'window-color is set to new value');
+               1,
+               'bg-color is set to new value');
+
+  assert.equal(player.$('.vjs-window-color > select').selectedIndex,
+               1,
+               'window-color is set to new value');
+
   assert.equal(player.$('.vjs-text-opacity > select').selectedIndex,
-              1,
-              'text-opacity is set to new value');
+               1,
+               'text-opacity is set to new value');
+
   assert.equal(player.$('.vjs-bg-opacity > select').selectedIndex,
-              1,
-              'bg-opacity is set to new value');
+               1,
+               'bg-opacity is set to new value');
+
   assert.equal(player.$('.vjs-window-opacity > select').selectedIndex,
-              1,
-              'window-opacity is set to new value');
+               1,
+               'window-opacity is set to new value');
+
   assert.equal(player.$('.vjs-edge-style select').selectedIndex,
-              1,
-              'edge-style is set to new value');
+               1,
+               'edge-style is set to new value');
+
   assert.equal(player.$('.vjs-font-family select').selectedIndex,
-              3,
-              'font-family is set to new value');
+               3,
+               'font-family is set to new value');
+
   assert.equal(player.$('.vjs-font-percent select').selectedIndex,
-              3,
-              'font-percent is set to new value');
+               3,
+               'font-percent is set to new value');
 
   Events.trigger(player.$('.vjs-done-button'), 'click');
-  assert.deepEqual(safeParseTuple(
-                    window.localStorage.getItem('vjs-text-track-settings'))[1],
-                  newSettings,
-                  'values are saved');
+
+  assert.deepEqual(safeParseTuple(window.localStorage.getItem('vjs-text-track-settings'))[1],
+                   newSettings,
+                   'values are saved');
 
   player.dispose();
 });
@@ -93,7 +103,7 @@ QUnit.test('should restore default settings', function(assert) {
 
   player.$('.vjs-fg-color > select').selectedIndex = 1;
   player.$('.vjs-bg-color > select').selectedIndex = 1;
-  player.$('.window-color > select').selectedIndex = 1;
+  player.$('.vjs-window-color > select').selectedIndex = 1;
   player.$('.vjs-text-opacity > select').selectedIndex = 1;
   player.$('.vjs-bg-opacity > select').selectedIndex = 1;
   player.$('.vjs-window-opacity > select').selectedIndex = 1;
@@ -106,8 +116,8 @@ QUnit.test('should restore default settings', function(assert) {
   Events.trigger(player.$('.vjs-done-button'), 'click');
 
   assert.deepEqual(player.textTrackSettings.getValues(),
-                  defaultSettings,
-                  'values are defaulted');
+                   defaultSettings,
+                   'values are defaulted');
   // TODO:
   // MikeA: need to figure out how to modify saveSettings
   // to factor in defaults are no longer null
@@ -116,32 +126,40 @@ QUnit.test('should restore default settings', function(assert) {
   //                 'values are saved');
 
   assert.equal(player.$('.vjs-fg-color > select').selectedIndex,
-              0,
-              'fg-color is set to default value');
+               0,
+               'fg-color is set to default value');
+
   assert.equal(player.$('.vjs-bg-color > select').selectedIndex,
-              0,
-              'bg-color is set to default value');
-  assert.equal(player.$('.window-color > select').selectedIndex,
-              0,
-              'window-color is set to default value');
+               0,
+               'bg-color is set to default value');
+
+  assert.equal(player.$('.vjs-window-color > select').selectedIndex,
+               0,
+               'window-color is set to default value');
+
   assert.equal(player.$('.vjs-text-opacity > select').selectedIndex,
-              0,
-              'text-opacity is set to default value');
+               0,
+               'text-opacity is set to default value');
+
   assert.equal(player.$('.vjs-bg-opacity > select').selectedIndex,
-              0,
-              'bg-opacity is set to default value');
+               0,
+               'bg-opacity is set to default value');
+
   assert.equal(player.$('.vjs-window-opacity > select').selectedIndex,
-              0,
-              'window-opacity is set to default value');
+               0,
+               'window-opacity is set to default value');
+
   assert.equal(player.$('.vjs-edge-style select').selectedIndex,
-              0,
-              'edge-style is set to default value');
+               0,
+               'edge-style is set to default value');
+
   assert.equal(player.$('.vjs-font-family select').selectedIndex,
-              0,
-              'font-family is set to default value');
+               0,
+               'font-family is set to default value');
+
   assert.equal(player.$('.vjs-font-percent select').selectedIndex,
-              2,
-              'font-percent is set to default value');
+               2,
+               'font-percent is set to default value');
 
   player.dispose();
 });

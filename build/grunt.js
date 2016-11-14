@@ -1,5 +1,6 @@
 import {gruntCustomizer, gruntOptionsMaker} from './options-customizer.js';
 import chg from 'chg';
+import npmRun from 'npm-run';
 
 module.exports = function(grunt) {
   require('time-grunt')(grunt);
@@ -31,7 +32,10 @@ module.exports = function(grunt) {
       release: {
         tag_name: 'v'+ version.full,
         name: version.full,
-        body: chg.find(version.full).changesRaw
+        body: npmRun.execSync('conventional-changelog -p videojs', {
+          silent: true,
+          encoding: 'utf8'
+        })
       },
     },
     files: {
@@ -101,6 +105,7 @@ module.exports = function(grunt) {
     uglify: {
       options: {
         preserveComments: 'some',
+        screwIE8: false,
         mangle: true,
         compress: {
           sequences: true,

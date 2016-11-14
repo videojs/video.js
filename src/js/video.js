@@ -25,6 +25,7 @@ import log from './utils/log.js';
 import * as Dom from './utils/dom.js';
 import * as browser from './utils/browser.js';
 import * as Url from './utils/url.js';
+import computedStyle from './utils/computed-style.js';
 import extendFn from './extend.js';
 import merge from 'lodash-compat/object/merge';
 import xhr from 'xhr';
@@ -33,7 +34,9 @@ import xhr from 'xhr';
 import Tech from './tech/tech.js';
 
 // HTML5 Element Shim for IE8
-if (typeof HTMLVideoElement === 'undefined') {
+if (typeof HTMLVideoElement === 'undefined' &&
+    window.document &&
+    window.document.createElement) {
   document.createElement('video');
   document.createElement('audio');
   document.createElement('track');
@@ -56,6 +59,8 @@ if (typeof HTMLVideoElement === 'undefined') {
  */
 function videojs(id, options, ready) {
   let tag;
+
+  options = options || {};
 
   // Allow for element or ID to be passed in
   // String ID
@@ -96,9 +101,80 @@ function videojs(id, options, ready) {
   }
 
   // Element may have a player attr referring to an already created player instance.
-  // If not, set up a new player and return the instance.
-  return tag.player || Player.players[tag.playerId] || new Player(tag, options, ready);
+  // If so return that otherwise set up a new player below
+  if (tag.player || Player.players[tag.playerId]) {
+    return tag.player || Player.players[tag.playerId];
+  }
+
+  videojs.hooks('beforesetup').forEach(function(hookFunction) {
+    const opts = hookFunction(tag, mergeOptions(options));
+
+    if (!opts || typeof opts !== 'object' || Array.isArray(opts)) {
+      videojs.log.error('please return an object in beforesetup hooks');
+      return;
+    }
+
+    options = mergeOptions(options, opts);
+  });
+
+  // If not, set up a new player
+  const player = new Player(tag, options, ready);
+
+  videojs.hooks('setup').forEach((hookFunction) => hookFunction(player));
+
+  return player;
 }
+
+/**
+ * An Object that contains lifecycle hooks as keys which point to an array
+ * of functions that are run when a lifecycle is triggered
+ */
+videojs.hooks_ = {};
+
+/**
+ * Get a list of hooks for a specific lifecycle
+ *
+ * @param {String} type the lifecyle to get hooks from
+ * @param {Function=} optionally add a hook to the lifecycle that your are getting
+ * @return {Array} an array of hooks, or an empty array if there are none
+ */
+videojs.hooks = function(type, fn) {
+  videojs.hooks_[type] = videojs.hooks_[type] || [];
+  if (fn) {
+    videojs.hooks_[type] = videojs.hooks_[type].concat(fn);
+  }
+  return videojs.hooks_[type];
+};
+
+/**
+ * Add a function hook to a specific videojs lifecycle
+ *
+ * @param {String} type the lifecycle to hook the function to
+ * @param {Function|Array} fn the function to attach
+ */
+videojs.hook = function(type, fn) {
+  videojs.hooks(type, fn);
+};
+
+/**
+ * Remove a hook from a specific videojs lifecycle
+ *
+ * @param {String} type the lifecycle that the function hooked to
+ * @param {Function} fn the hooked function to remove
+ * @return {Boolean} the function that was removed or undef
+ */
+videojs.removeHook = function(type, fn) {
+  const index = videojs.hooks(type).indexOf(fn);
+
+  if (index <= -1) {
+    return false;
+  }
+
+  videojs.hooks_[type] = videojs.hooks_[type].slice();
+  videojs.hooks_[type].splice(index, 1);
+
+  return true;
+};
 
 // Add default styles
 if (window.VIDEOJS_NO_DYNAMIC_STYLE !== true) {
@@ -718,6 +794,20 @@ videojs.appendContent = Dom.appendContent;
  * @return {Element}
  */
 videojs.insertContent = Dom.insertContent;
+
+/**
+ * A safe getComputedStyle with an IE8 fallback.
+ *
+ * This is because in Firefox, if the player is loaded in an iframe with `display:none`,
+ * then `getComputedStyle` returns `null`, so, we do a null-check to make sure
+ * that the player doesn't break in these cases.
+ * See https://bugzilla.mozilla.org/show_bug.cgi?id=548397 for more details.
+ *
+ * @function computedStyle
+ * @param el the element you want the computed style of
+ * @param prop the property name you want
+ */
+videojs.computedStyle = computedStyle;
 
 /*
  * Custom Universal Module Definition (UMD)

@@ -15,8 +15,8 @@ QUnit.test('should return the element with the ID', function(assert) {
   el1.id = 'test_id1';
   el2.id = 'test_id2';
 
-  assert.ok(Dom.getEl('test_id1') === el1, 'found element for ID');
-  assert.ok(Dom.getEl('#test_id2') === el2, 'found element for CSS ID');
+  assert.strictEqual(Dom.getEl('test_id1'), el1, 'found element for ID');
+  assert.strictEqual(Dom.getEl('#test_id2'), el2, 'found element for CSS ID');
 });
 
 QUnit.test('should create an element', function(assert) {
@@ -27,10 +27,27 @@ QUnit.test('should create an element', function(assert) {
     'data-test': 'asdf'
   });
 
-  assert.ok(div.nodeName === 'DIV');
-  assert.ok(span.nodeName === 'SPAN');
-  assert.ok(span.getAttribute('data-test') === 'asdf');
-  assert.ok(span.innerHTML === 'fdsa');
+  assert.strictEqual(div.nodeName, 'DIV');
+  assert.strictEqual(span.nodeName, 'SPAN');
+  assert.strictEqual(span.getAttribute('data-test'), 'asdf');
+  assert.strictEqual(span.innerHTML, 'fdsa');
+});
+
+QUnit.test('should create an element, supporting textContent', function(assert) {
+  const span = Dom.createEl('span', {textContent: 'howdy'});
+
+  if (span.textContent) {
+    assert.strictEqual(span.textContent, 'howdy', 'works in browsers that support textContent');
+  } else {
+    assert.strictEqual(span.innerText, 'howdy', 'works in browsers that DO NOT support textContent');
+  }
+});
+
+QUnit.test('should create an element with content', function(assert) {
+  const span = Dom.createEl('span');
+  const div = Dom.createEl('div', undefined, undefined, span);
+
+  assert.strictEqual(div.firstChild, span);
 });
 
 QUnit.test('should insert an element first in another', function(assert) {
@@ -39,28 +56,28 @@ QUnit.test('should insert an element first in another', function(assert) {
   const parent = document.createElement('div');
 
   Dom.insertElFirst(el1, parent);
-  assert.ok(parent.firstChild === el1, 'inserts first into empty parent');
+  assert.strictEqual(parent.firstChild, el1, 'inserts first into empty parent');
 
   Dom.insertElFirst(el2, parent);
-  assert.ok(parent.firstChild === el2, 'inserts first into parent with child');
+  assert.strictEqual(parent.firstChild, el2, 'inserts first into parent with child');
 });
 
 QUnit.test('should get and remove data from an element', function(assert) {
   const el = document.createElement('div');
   const data = Dom.getElData(el);
 
-  assert.ok(typeof data === 'object', 'data object created');
+  assert.strictEqual(typeof data, 'object', 'data object created');
 
   // Add data
-  const testData = { asdf: 'fdsa' };
+  const testData = {asdf: 'fdsa'};
 
   data.test = testData;
-  assert.ok(Dom.getElData(el).test === testData, 'data added');
+  assert.strictEqual(Dom.getElData(el).test, testData, 'data added');
 
   // Remove all data
   Dom.removeElData(el);
 
-  assert.ok(!Dom.hasElData(el), 'cached item emptied');
+  assert.notOk(Dom.hasElData(el), 'cached item emptied');
 });
 
 QUnit.test('addElClass()', function(assert) {
@@ -88,17 +105,12 @@ QUnit.test('addElClass()', function(assert) {
 QUnit.test('removeElClass()', function(assert) {
   const el = document.createElement('div');
 
-  el.className = 'test-class foo foo test2_className FOO bar';
+  el.className = 'test-class test2_className FOO bar';
 
-  assert.expect(5);
+  assert.expect(4);
 
   Dom.removeElClass(el, 'test-class');
-  assert.strictEqual(el.className, 'foo foo test2_className FOO bar', 'removes one class');
-
-  Dom.removeElClass(el, 'foo');
-  assert.strictEqual(el.className,
-                    'test2_className FOO bar',
-                    'removes all instances of a class');
+  assert.strictEqual(el.className, 'test2_className FOO bar', 'removes one class');
 
   assert.throws(function() {
     Dom.removeElClass(el, 'test2_className bar');

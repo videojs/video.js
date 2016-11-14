@@ -99,6 +99,18 @@ QUnit.test('addChild should throw if the child does not exist', function(assert)
 
 });
 
+QUnit.test('should add a child component with title case name', function(assert) {
+  const comp = new Component(getFakePlayer());
+
+  const child = comp.addChild('Component');
+
+  assert.ok(comp.children().length === 1);
+  assert.ok(comp.children()[0] === child);
+  assert.ok(comp.el().childNodes[0] === child.el());
+  assert.ok(comp.getChild('Component') === child);
+  assert.ok(comp.getChildById(child.id()) === child);
+});
+
 QUnit.test('should init child components from options', function(assert) {
   const comp = new Component(getFakePlayer(), {
     children: {
@@ -178,8 +190,8 @@ QUnit.test('should init child components from component options', function(asser
     testComponent4: {}
   });
 
-  assert.ok(!testComp.childNameIndex_.testComponent2, 'we do not have testComponent2');
-  assert.ok(testComp.childNameIndex_.testComponent4, 'we have a testComponent4');
+  assert.ok(!testComp.childNameIndex_.TestComponent2, 'we do not have testComponent2');
+  assert.ok(testComp.childNameIndex_.TestComponent4, 'we have a testComponent4');
 });
 
 QUnit.test('should allows setting child options at the parent options level', function(assert) {

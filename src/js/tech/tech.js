@@ -85,8 +85,10 @@ class Tech extends Component {
     }
 
     if (!this.featuresNativeTextTracks) {
-      this.on('ready', this.emulateTextTracks);
+      this.emulateTextTracks();
     }
+
+    this.autoRemoteTextTracks_ = new TextTrackList();
 
     this.initTextTrackListeners();
     this.initTrackListeners();
@@ -292,6 +294,23 @@ class Tech extends Component {
   }
 
   /**
+   * Remove any TextTracks added via addRemoteTextTrack that are
+   * flagged for automatic garbage collection
+   *
+   * @method cleanupAutoTextTracks
+   */
+  cleanupAutoTextTracks() {
+    const list = this.autoRemoteTextTracks_ || [];
+    let i = list.length;
+
+    while (i--) {
+      const track = list[i];
+
+      this.removeRemoteTextTrack(track);
+    }
+  }
+
+  /**
    * Reset the tech. Removes all sources and resets readyState.
    *
    * @method reset
@@ -394,17 +413,11 @@ class Tech extends Component {
   }
 
   /**
-   * Emulate texttracks
+   * Add vtt.js if necessary
    *
-   * @method emulateTextTracks
+   * @private
    */
-  emulateTextTracks() {
-    const tracks = this.textTracks();
-
-    if (!tracks) {
-      return;
-    }
-
+  addWebVttScript_() {
     if (!window.WebVTT && this.el().parentNode !== null && this.el().parentNode !== undefined) {
       const script = document.createElement('script');
 
@@ -424,6 +437,32 @@ class Tech extends Component {
       window.WebVTT = true;
       this.el().parentNode.appendChild(script);
     }
+  }
+
+  /**
+   * Emulate texttracks
+   *
+   * @method emulateTextTracks
+   */
+  emulateTextTracks() {
+    const tracks = this.textTracks();
+
+    if (!tracks) {
+      return;
+    }
+
+    this.remoteTextTracks().on('addtrack', (e) => {
+      this.textTracks().addTrack_(e.track);
+    });
+
+    this.remoteTextTracks().on('removetrack', (e) => {
+      this.textTracks().removeTrack_(e.track);
+    });
+
+    // Initially, Tech.el_ is a child of a dummy-div wait until the Component system
+    // signals that the Tech is ready at which point Tech.el_ is part of the DOM
+    // before inserting the WebVTT script
+    this.on('ready', this.addWebVttScript_);
 
     const updateDisplay = () => this.trigger('texttrackchange');
     const textTracksChanges = () => {
@@ -527,26 +566,51 @@ class Tech extends Component {
   }
 
   /**
-   * Creates a remote text track object and returns a emulated html track element
+   * Create an emulated TextTrack for use by addRemoteTextTrack
+   *
+   * This is intended to be overridden by classes that inherit from
+   * Tech in order to create native or custom TextTracks.
    *
    * @param {Object} options The object should contain values for
    * kind, language, label and src (location of the WebVTT file)
-   * @return {HTMLTrackElement}
-   * @method addRemoteTextTrack
    */
-  addRemoteTextTrack(options) {
+  createRemoteTextTrack(options) {
     const track = mergeOptions(options, {
       tech: this
     });
 
-    const htmlTrackElement = new HTMLTrackElement(track);
+    return new HTMLTrackElement(track);
+  }
+
+  /**
+   * Creates a remote text track object and returns an html track element.
+   *
+   * @param {Object} options The object should contain values for
+   * kind, language, label, and src (location of the WebVTT file)
+   * @param {Boolean} [manualCleanup=true] if set to false, the TextTrack will be
+   * automatically removed from the video element whenever the source changes
+   * @return {HTMLTrackElement} An Html Track Element.
+   * This can be an emulated {@link HTMLTrackElement} or a native one.
+   * @deprecated The default value of the "manualCleanup" parameter will default
+   * to "false" in upcoming versions of Video.js
+   */
+  addRemoteTextTrack(options = {}, manualCleanup) {
+    const htmlTrackElement = this.createRemoteTextTrack(options);
+
+    if (manualCleanup !== true && manualCleanup !== false) {
+      // deprecation warning
+      log.warn('Calling addRemoteTextTrack without explicitly setting the "manualCleanup" parameter to `true` is deprecated and default to `false` in future version of video.js');
+      manualCleanup = true;
+    }
 
     // store HTMLTrackElement and TextTrack to remote list
     this.remoteTextTrackEls().addTrackElement_(htmlTrackElement);
     this.remoteTextTracks().addTrack_(htmlTrackElement.track);
 
-    // must come after remoteTextTracks()
-    this.textTracks().addTrack_(htmlTrackElement.track);
+    if (manualCleanup !== true) {
+      // create the TextTrackList if it doesn't exist
+      this.autoRemoteTextTracks_.addTrack_(htmlTrackElement.track);
+    }
 
     return htmlTrackElement;
   }
@@ -558,13 +622,12 @@ class Tech extends Component {
    * @method removeRemoteTextTrack
    */
   removeRemoteTextTrack(track) {
-    this.textTracks().removeTrack_(track);
-
     const trackElement = this.remoteTextTrackEls().getTrackElementByTrack_(track);
 
     // remove HTMLTrackElement and TextTrack from remote list
     this.remoteTextTrackEls().removeTrackElement_(trackElement);
     this.remoteTextTracks().removeTrack_(track);
+    this.autoRemoteTextTracks_.removeTrack_(track);
   }
 
   /**
@@ -685,7 +748,7 @@ Tech.prototype.featuresNativeTextTracks = false;
  *
  * ##### EXAMPLE:
  *
- *   Tech.withSourceHandlers.call(MyTech);
+ *   Tech.withSourceHandlers(MyTech);
  *
  */
 Tech.withSourceHandlers = function(_Tech) {
@@ -696,7 +759,7 @@ Tech.withSourceHandlers = function(_Tech) {
    * The source handler pattern is used for adaptive formats (HLS, DASH) that
    * manually load video data and feed it into a Source Buffer (Media Source Extensions)
    * @param  {Function} handler  The source handler
-   * @param  {Boolean}  first    Register it before any existing handlers
+   * @param  {Number}   index    The index to register the handler among existing handlers
    */
   _Tech.registerSourceHandler = function(handler, index) {
     let handlers = _Tech.sourceHandlers;
@@ -820,17 +883,7 @@ Tech.withSourceHandlers = function(_Tech) {
     this.disposeSourceHandler();
     this.off('dispose', this.disposeSourceHandler);
 
-    // if we have a source and get another one
-    // then we are loading something new
-    // than clear all of our current tracks
-    if (this.currentSource_) {
-      this.clearTracks(['audio', 'video']);
-
-      this.currentSource_ = null;
-    }
-
     if (sh !== _Tech.nativeSourceHandler) {
-
       this.currentSource_ = source;
 
       // Catch if someone replaced the src without calling setSource.
@@ -838,7 +891,6 @@ Tech.withSourceHandlers = function(_Tech) {
       this.off(this.el_, 'loadstart', _Tech.prototype.firstLoadStartListener_);
       this.off(this.el_, 'loadstart', _Tech.prototype.successiveLoadStartListener_);
       this.one(this.el_, 'loadstart', _Tech.prototype.firstLoadStartListener_);
-
     }
 
     this.sourceHandler_ = sh.handleSource(source, this, this.options_);
@@ -854,7 +906,6 @@ Tech.withSourceHandlers = function(_Tech) {
 
   // On successive loadstarts when setSource has not been called again
   _Tech.prototype.successiveLoadStartListener_ = function() {
-    this.currentSource_ = null;
     this.disposeSourceHandler();
     this.one(this.el_, 'loadstart', _Tech.prototype.successiveLoadStartListener_);
   };
@@ -863,10 +914,25 @@ Tech.withSourceHandlers = function(_Tech) {
    * Clean up any existing source handler
    */
   _Tech.prototype.disposeSourceHandler = function() {
-    if (this.sourceHandler_ && this.sourceHandler_.dispose) {
+    // if we have a source and get another one
+    // then we are loading something new
+    // than clear all of our current tracks
+    if (this.currentSource_) {
+      this.clearTracks(['audio', 'video']);
+      this.currentSource_ = null;
+    }
+
+    // always clean up auto-text tracks
+    this.cleanupAutoTextTracks();
+
+    if (this.sourceHandler_) {
       this.off(this.el_, 'loadstart', _Tech.prototype.firstLoadStartListener_);
       this.off(this.el_, 'loadstart', _Tech.prototype.successiveLoadStartListener_);
-      this.sourceHandler_.dispose();
+
+      if (this.sourceHandler_.dispose) {
+        this.sourceHandler_.dispose();
+      }
+
       this.sourceHandler_ = null;
     }
   };

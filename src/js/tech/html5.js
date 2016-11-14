@@ -428,7 +428,30 @@ class Html5 extends Tech {
    * @return {Number}
    */
   duration() {
-    return this.el_.duration || 0;
+    // Android Chrome will report duration as Infinity for VOD HLS until after
+    // playback has started, which triggers the live display erroneously.
+    // Return NaN if playback has not started and trigger a durationupdate once
+    // the duration can be reliably known.
+    if (this.el_.duration === Infinity &&
+      browser.IS_ANDROID && browser.IS_CHROME) {
+      if (this.el_.currentTime === 0) {
+        // Wait for the first `timeupdate` with currentTime > 0 - there may be
+        // several with 0
+        const checkProgress = () => {
+          if (this.el_.currentTime > 0) {
+            // Trigger durationchange for genuinely live video
+            if (this.el_.duration === Infinity) {
+              this.trigger('durationchange');
+            }
+            this.off(this.player_, 'timeupdate', checkProgress);
+          }
+        };
+
+        this.on(this.player_, 'timeupdate', checkProgress);
+        return NaN;
+      }
+    }
+    return this.el_.duration || NaN;
   }
 
   /**
@@ -585,17 +608,16 @@ class Html5 extends Tech {
   }
 
   /**
-   * Creates a remote text track object and returns a html track element
+   * Creates either native TextTrack or an emulated TextTrack depending
+   * on the value of `featuresNativeTextTracks`
    *
    * @param {Object} options The object should contain values for
    * kind, language, label and src (location of the WebVTT file)
-   * @return {HTMLTrackElement}
    */
-  addRemoteTextTrack(options = {}) {
+  createRemoteTextTrack(options) {
     if (!this.featuresNativeTextTracks) {
-      return super.addRemoteTextTrack(options);
+      return super.createRemoteTextTrack(options);
     }
-
     const htmlTrackElement = document.createElement('track');
 
     if (options.kind) {
@@ -617,11 +639,27 @@ class Html5 extends Tech {
       htmlTrackElement.src = options.src;
     }
 
-    this.el().appendChild(htmlTrackElement);
+    return htmlTrackElement;
+  }
 
-    // store HTMLTrackElement and TextTrack to remote list
-    this.remoteTextTrackEls().addTrackElement_(htmlTrackElement);
-    this.remoteTextTracks().addTrack_(htmlTrackElement.track);
+  /**
+   * Creates a remote text track object and returns an html track element.
+   *
+   * @param {Object} options The object should contain values for
+   * kind, language, label, and src (location of the WebVTT file)
+   * @param {Boolean} [manualCleanup=true] if set to false, the TextTrack will be
+   * automatically removed from the video element whenever the source changes
+   * @return {HTMLTrackElement} An Html Track Element.
+   * This can be an emulated {@link HTMLTrackElement} or a native one.
+   * @deprecated The default value of the "manualCleanup" parameter will default
+   * to "false" in upcoming versions of Video.js
+   */
+  addRemoteTextTrack(options, manualCleanup) {
+    const htmlTrackElement = super.addRemoteTextTrack(options, manualCleanup);
+
+    if (this.featuresNativeTextTracks) {
+      this.el().appendChild(htmlTrackElement);
+    }
 
     return htmlTrackElement;
   }
@@ -632,23 +670,17 @@ class Html5 extends Tech {
    * @param {TextTrackObject} track Texttrack object to remove
    */
   removeRemoteTextTrack(track) {
-    if (!this.featuresNativeTextTracks) {
-      return super.removeRemoteTextTrack(track);
-    }
+    super.removeRemoteTextTrack(track);
 
-    const trackElement = this.remoteTextTrackEls().getTrackElementByTrack_(track);
+    if (this.featuresNativeTextTracks) {
+      const tracks = this.$$('track');
 
-    // remove HTMLTrackElement and TextTrack from remote list
-    this.remoteTextTrackEls().removeTrackElement_(trackElement);
-    this.remoteTextTracks().removeTrack_(track);
+      let i = tracks.length;
 
-    const tracks = this.$$('track');
-
-    let i = tracks.length;
-
-    while (i--) {
-      if (track === tracks[i] || track === tracks[i].track) {
-        this.el().removeChild(tracks[i]);
+      while (i--) {
+        if (track === tracks[i] || track === tracks[i].track) {
+          this.el().removeChild(tracks[i]);
+        }
       }
     }
   }
@@ -687,79 +719,6 @@ Html5.isSupported = function() {
 
   return !!Html5.TEST_VID.canPlayType;
 };
-
-// Add Source Handler pattern functions to this tech
-Tech.withSourceHandlers(Html5);
-
-/**
- * The default native source handler.
- * This simply passes the source to the video element. Nothing fancy.
- *
- * @param  {Object} source   The source object
- * @param  {Html5} tech  The instance of the HTML5 tech
- */
-Html5.nativeSourceHandler = {};
-
-/**
- * Check if the video element can play the given videotype
- *
- * @param  {String} type    The mimetype to check
- * @return {String}         'probably', 'maybe', or '' (empty string)
- */
-Html5.nativeSourceHandler.canPlayType = function(type) {
-  // IE9 on Windows 7 without MediaPlayer throws an error here
-  // https://github.com/videojs/video.js/issues/519
-  try {
-    return Html5.TEST_VID.canPlayType(type);
-  } catch (e) {
-    return '';
-  }
-};
-
-/**
- * Check if the video element can handle the source natively
- *
- * @param  {Object} source  The source object
- * @param  {Object} options The options passed to the tech
- * @return {String}         'probably', 'maybe', or '' (empty string)
- */
-Html5.nativeSourceHandler.canHandleSource = function(source, options) {
-
-  // If a type was provided we should rely on that
-  if (source.type) {
-    return Html5.nativeSourceHandler.canPlayType(source.type);
-
-  // If no type, fall back to checking 'video/[EXTENSION]'
-  } else if (source.src) {
-    const ext = Url.getFileExtension(source.src);
-
-    return Html5.nativeSourceHandler.canPlayType(`video/${ext}`);
-  }
-
-  return '';
-};
-
-/**
- * Pass the source to the video element
- * Adaptive source handlers will have more complicated workflows before passing
- * video data to the video element
- *
- * @param  {Object} source   The source object
- * @param  {Html5}  tech     The instance of the Html5 tech
- * @param  {Object} options  The options to pass to the source
- */
-Html5.nativeSourceHandler.handleSource = function(source, tech, options) {
-  tech.setSrc(source.src);
-};
-
-/*
- * Clean up the source handler when disposing the player or switching sources..
- * (no cleanup is needed when supporting the format natively)
- */
-Html5.nativeSourceHandler.dispose = function() {};
-
-// Register the native source handler
-Html5.registerSourceHandler(Html5.nativeSourceHandler);
 
 /**
  * Check if the volume can be changed in this browser/device.
@@ -1313,6 +1272,79 @@ Html5.resetMediaElement = function(el) {
     return this.el_[prop]();
   };
 });
+
+// Add Source Handler pattern functions to this tech
+Tech.withSourceHandlers(Html5);
+
+/**
+ * The default native source handler.
+ * This simply passes the source to the video element. Nothing fancy.
+ *
+ * @param  {Object} source   The source object
+ * @param  {Html5} tech  The instance of the HTML5 tech
+ */
+Html5.nativeSourceHandler = {};
+
+/**
+ * Check if the video element can play the given videotype
+ *
+ * @param  {String} type    The mimetype to check
+ * @return {String}         'probably', 'maybe', or '' (empty string)
+ */
+Html5.nativeSourceHandler.canPlayType = function(type) {
+  // IE9 on Windows 7 without MediaPlayer throws an error here
+  // https://github.com/videojs/video.js/issues/519
+  try {
+    return Html5.TEST_VID.canPlayType(type);
+  } catch (e) {
+    return '';
+  }
+};
+
+/**
+ * Check if the video element can handle the source natively
+ *
+ * @param  {Object} source  The source object
+ * @param  {Object} options The options passed to the tech
+ * @return {String}         'probably', 'maybe', or '' (empty string)
+ */
+Html5.nativeSourceHandler.canHandleSource = function(source, options) {
+
+  // If a type was provided we should rely on that
+  if (source.type) {
+    return Html5.nativeSourceHandler.canPlayType(source.type);
+
+  // If no type, fall back to checking 'video/[EXTENSION]'
+  } else if (source.src) {
+    const ext = Url.getFileExtension(source.src);
+
+    return Html5.nativeSourceHandler.canPlayType(`video/${ext}`);
+  }
+
+  return '';
+};
+
+/**
+ * Pass the source to the video element
+ * Adaptive source handlers will have more complicated workflows before passing
+ * video data to the video element
+ *
+ * @param  {Object} source   The source object
+ * @param  {Html5}  tech     The instance of the Html5 tech
+ * @param  {Object} options  The options to pass to the source
+ */
+Html5.nativeSourceHandler.handleSource = function(source, tech, options) {
+  tech.setSrc(source.src);
+};
+
+/*
+ * Clean up the source handler when disposing the player or switching sources..
+ * (no cleanup is needed when supporting the format natively)
+ */
+Html5.nativeSourceHandler.dispose = function() {};
+
+// Register the native source handler
+Html5.registerSourceHandler(Html5.nativeSourceHandler);
 
 Component.registerComponent('Html5', Html5);
 Tech.registerTech('Html5', Html5);

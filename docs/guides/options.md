@@ -54,7 +54,7 @@ or
 
 ### autoplay ###
 If autoplay is true, the video will start playing as soon as page is loaded (without any interaction from the user).
-NOT SUPPORTED BY APPLE iOS DEVICES. Apple blocks the autoplay functionality in an effort to protect it's customers from unwillingly using a lot of their (often expensive) monthly data plans. A user touch/click is required to start the video in this case.
+NOT SUPPORTED BY APPLE iOS DEVICES. Apple blocks the autoplay functionality in an effort to protect its customers from unwillingly using a lot of their (often expensive) monthly data plans. A user touch/click is required to start the video in this case.
 ```html
 <video autoplay ...>
 or

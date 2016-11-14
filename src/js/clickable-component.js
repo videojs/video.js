@@ -24,10 +24,7 @@ class ClickableComponent extends Component {
 
     this.emitTapEvents();
 
-    this.on('tap', this.handleClick);
-    this.on('click', this.handleClick);
-    this.on('focus', this.handleFocus);
-    this.on('blur', this.handleBlur);
+    this.enable();
   }
 
   /**
@@ -56,6 +53,8 @@ class ClickableComponent extends Component {
       // let the screen reader user know that the text of the element may change
       'aria-live': 'polite'
     }, attributes);
+
+    this.tabIndex_ = props.tabIndex;
 
     const el = super.createEl(tag, props, attributes);
 
@@ -118,26 +117,6 @@ class ClickableComponent extends Component {
   }
 
   /**
-   * Adds a child component inside this clickable-component
-   *
-   * @param {String|Component} child The class name or instance of a child to add
-   * @param {Object=} options Options, including options to be passed to children of the child.
-   * @return {Component} The child component (created by this process if a string was used)
-   * @method addChild
-   */
-  addChild(child, options = {}) {
-    // TODO: Fix adding an actionable child to a ClickableComponent; currently
-    // it will cause issues with assistive technology (e.g. screen readers)
-    // which support ARIA, since an element with role="button" cannot have
-    // actionable child elements.
-
-    // let className = this.constructor.name;
-    // log.warn(`Adding a child to a ClickableComponent (${className}) can cause issues with assistive technology which supports ARIA, since an element with role="button" cannot have actionable child elements.`);
-
-    return super.addChild(child, options);
-  }
-
-  /**
    * Enable the component element
    *
    * @return {Component}
@@ -146,6 +125,13 @@ class ClickableComponent extends Component {
   enable() {
     this.removeClass('vjs-disabled');
     this.el_.setAttribute('aria-disabled', 'false');
+    if (typeof this.tabIndex_ !== 'undefined') {
+      this.el_.setAttribute('tabIndex', this.tabIndex_);
+    }
+    this.on('tap', this.handleClick);
+    this.on('click', this.handleClick);
+    this.on('focus', this.handleFocus);
+    this.on('blur', this.handleBlur);
     return this;
   }
 
@@ -158,6 +144,13 @@ class ClickableComponent extends Component {
   disable() {
     this.addClass('vjs-disabled');
     this.el_.setAttribute('aria-disabled', 'true');
+    if (typeof this.tabIndex_ !== 'undefined') {
+      this.el_.removeAttribute('tabIndex');
+    }
+    this.off('tap', this.handleClick);
+    this.off('click', this.handleClick);
+    this.off('focus', this.handleFocus);
+    this.off('blur', this.handleBlur);
     return this;
   }
 

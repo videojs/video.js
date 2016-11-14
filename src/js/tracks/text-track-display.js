@@ -145,7 +145,7 @@ class TextTrackDisplay extends Component {
     return super.createEl('div', {
       className: 'vjs-text-track-display'
     }, {
-      'aria-live': 'assertive',
+      'aria-live': 'off',
       'aria-atomic': 'true'
     });
   }
@@ -197,8 +197,14 @@ class TextTrackDisplay extends Component {
     }
 
     if (captionsSubtitlesTrack) {
+      if (this.getAttribute('aria-live') !== 'off') {
+        this.setAttribute('aria-live', 'off');
+      }
       this.updateForTrack(captionsSubtitlesTrack);
     } else if (descriptionsTrack) {
+      if (this.getAttribute('aria-live') !== 'assertive') {
+        this.setAttribute('aria-live', 'assertive');
+      }
       this.updateForTrack(descriptionsTrack);
     }
   }

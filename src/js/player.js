@@ -496,7 +496,7 @@ class Player extends Component {
   }
 
   /**
-   * Add/remove the vjs-fluid class
+   * Get/set fluid mode
    *
    * @param {Boolean} bool Value of true adds the class, value of false removes the class
    */
@@ -512,6 +512,8 @@ class Player extends Component {
     } else {
       this.removeClass('vjs-fluid');
     }
+
+    this.updateStyleEl_();
   }
 
   /**
@@ -568,7 +570,7 @@ class Player extends Component {
     if (this.aspectRatio_ !== undefined && this.aspectRatio_ !== 'auto') {
       // Use any aspectRatio that's been specifically set
       aspectRatio = this.aspectRatio_;
-    } else if (this.videoWidth()) {
+    } else if (this.videoWidth() > 0) {
       // Otherwise try to get the aspect ratio from the video metadata
       aspectRatio = this.videoWidth() + ':' + this.videoHeight();
     } else {
@@ -673,10 +675,13 @@ class Player extends Component {
 
     if (source) {
       this.currentType_ = source.type;
+
       if (source.src === this.cache_.src && this.cache_.currentTime > 0) {
         techOptions.startTime = this.cache_.currentTime;
       }
 
+      this.cache_.sources = null;
+      this.cache_.source = source;
       this.cache_.src = source.src;
     }
 
@@ -1864,7 +1869,10 @@ class Player extends Component {
         // the tech loop to check for a compatible technology
         this.sourceList_([source]);
       } else {
+        this.cache_.sources = null;
+        this.cache_.source = source;
         this.cache_.src = source.src;
+
         this.currentType_ = source.type || '';
 
         // wait until the tech is ready to set the source
@@ -1913,6 +1921,8 @@ class Player extends Component {
         // load this technology with the chosen source
         this.loadTech_(sourceTech.tech, sourceTech.source);
       }
+
+      this.cache_.sources = sources;
     } else {
       // We need to wrap this in a timeout to give folks a chance to add error event handlers
       this.setTimeout(function() {
@@ -1945,6 +1955,41 @@ class Player extends Component {
     this.loadTech_(toTitleCase(this.options_.techOrder[0]), null);
     this.techCall_('reset');
     return this;
+  }
+
+  /**
+   * Returns the current source objects.
+   *
+   * @return {Object[]} The current source objects
+   * @method currentSources
+   */
+  currentSources() {
+    const source = this.currentSource();
+    const sources = [];
+
+    // assume `{}` or `{ src }`
+    if (Object.keys(source).length !== 0) {
+      sources.push(source);
+    }
+
+    return this.cache_.sources || sources;
+  }
+
+  /**
+   * Returns the current source object.
+   *
+   * @return {Object} The current source object
+   * @method currentSource
+   */
+  currentSource() {
+    const source = {};
+    const src = this.currentSrc();
+
+    if (src) {
+      source.src = src;
+    }
+
+    return this.cache_.source || source;
   }
 
   /**
@@ -2476,13 +2521,20 @@ class Player extends Component {
   }
 
   /**
-   * Add a remote text track
+   * Creates a remote text track object and returns an html track element.
    *
-   * @param {Object} options    Options for remote text track
+   * @param {Object} options The object should contain values for
+   * kind, language, label, and src (location of the WebVTT file)
+   * @param {Boolean} [manualCleanup=true] if set to false, the TextTrack will be
+   * automatically removed from the video element whenever the source changes
+   * @return {HTMLTrackElement} An Html Track Element.
+   * This can be an emulated {@link HTMLTrackElement} or a native one.
+   * @deprecated The default value of the "manualCleanup" parameter will default
+   * to "false" in upcoming versions of Video.js
    */
-  addRemoteTextTrack(options) {
+  addRemoteTextTrack(options, manualCleanup) {
     if (this.tech_) {
-      return this.tech_.addRemoteTextTrack(options);
+      return this.tech_.addRemoteTextTrack(options, manualCleanup);
     }
   }
 
@@ -2622,6 +2674,10 @@ class Player extends Component {
 
     const tagOptions = Dom.getElAttributes(tag);
     const dataSetup = tagOptions['data-setup'];
+
+    if (Dom.hasElClass(tag, 'vjs-fluid')) {
+      tagOptions.fluid = true;
+    }
 
     // Check if data-setup attr exists.
     if (dataSetup !== null) {
