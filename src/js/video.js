@@ -653,7 +653,7 @@ window.middlewareSetter = function(type, method, arg, tech) {
     if (typeof mw === 'string') {
       var ov = value;
       value = middlewareSetter(mw, method, value, tech);
-      console.log(value, ov) 
+      //console.log(value, ov) 
     } else {
       value = mw[method](value)
     }
@@ -671,7 +671,7 @@ window.middlewareGetter = function(type, method, tech) {
     if (typeof mw === 'string') {
       var ov = value;
       value = middlewareGetter(mw, method, tech);
-      console.log(value, ov) 
+      //console.log(value, ov) 
     } else {
       value = mw[method](value)
     }
@@ -692,14 +692,19 @@ function ssh(src, middleware, next) {
       ssh(src, vjsmiddleware[mw] || [], next);
     }
   } else if (mw) {
-    mw.setSource(src, function(src) {
-      ssh(src, vjsmiddleware[src.type] || [], next)
+    mw.setSource(src, function(err, _src) {
+      if (err) {
+        return ssh(src, middleware.slice(1), next);
+      }
+      ssh(_src, vjsmiddleware[_src.type] || [], next);
     })
+  } else if (middleware.length > 1) {
+    ssh(src, middleware.slice(1), next);
   }
 }
 
 window.middlewareSetSource = function(src, next) {
-  ssh(src, vjsmiddleware[src.type] || [], next);
+  setTimeout(()=>ssh(src, vjsmiddleware[src.type] || [], next), 1);
 }
 
 videojs.use = function(type, middleware) {
