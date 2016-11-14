@@ -7,7 +7,7 @@ import * as Guid from '../utils/guid.js';
 import EventTarget from '../event-target';
 
 /**
- * A Track class taht contains all of the common functionality for {@link AudioTrack},
+ * A Track class that contains all of the common functionality for {@link AudioTrack},
  * {@link VideoTrack}, and {@link TextTrack}.
  *
  * > Note: This class should not be used directly

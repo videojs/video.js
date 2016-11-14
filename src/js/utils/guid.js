@@ -10,7 +10,7 @@
 let _guid = 1;
 
 /**
- * Get the next unique ID by incrementing the global _guid singleton.
+ * Get a unique auto-incrementing ID by number that has not been returned before.
  *
  * @return {number}
  *         A new unique ID.

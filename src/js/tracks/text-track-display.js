@@ -21,7 +21,7 @@ const fontMap = {
 };
 
 /**
- * Contruct an rgba color form a given hex color code.
+ * Construct an rgba color from a given hex color code.
  *
  * @param {number} color
  *        Hex number for color, like #f0e.
@@ -172,7 +172,7 @@ class TextTrackDisplay extends Component {
   }
 
   /**
-   * Clear all displyed {@link TextTrack}s.
+   * Clear all displayed {@link TextTrack}s.
    */
   clearDisplay() {
     if (typeof window.WebVTT === 'function') {
