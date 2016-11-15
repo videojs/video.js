@@ -11,6 +11,15 @@ export function setSource (src, next) {
   setTimeout(()=>ssh(src, middlewares[src.type] || [], next, []), 1);
 }
 
+export const allowedGetters = {
+  currentTime: 1,
+  duration: 1
+};
+
+export const allowedSetters = {
+  setCurrentTime: 1,
+};
+
 function ssh(src, middleware, next, acc) {
   const mw = middleware[0];
 
