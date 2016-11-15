@@ -35,6 +35,7 @@ import toTitleCase from './utils/to-title-case.js';
 // Include the built-in techs
 import Tech from './tech/tech.js';
 import Flash from './tech/flash.js';
+import { use as middlewareUse } from './tech/middleware.js';
 
 // HTML5 Element Shim for IE8
 if (typeof HTMLVideoElement === 'undefined' &&
@@ -635,83 +636,7 @@ videojs.computedStyle = computedStyle;
 
 module.exports = videojs;
 
-
-
-
-
-
-
-
-
-window.vjsmiddleware = {};
-
-window.middlewareSetter = function(type, method, arg, tech) {
-  var value = arg;
-
-  (vjsmiddleware[type] || [])
-  .forEach((mw) => {
-    if (typeof mw === 'string') {
-      var ov = value;
-      value = middlewareSetter(mw, method, value, tech);
-      //console.log(value, ov) 
-    } else {
-      value = mw[method](value)
-    }
-  });
-
-  return tech[method](value);
-}
-
-window.middlewareGetter = function(type, method, tech) {
-  var value = tech[method]();
-
-  (vjsmiddleware[type] || [])
-  .reverse()
-  .forEach((mw) => {
-    if (typeof mw === 'string') {
-      var ov = value;
-      value = middlewareGetter(mw, method, tech);
-      //console.log(value, ov) 
-    } else {
-      value = mw[method](value)
-    }
-  });
-
-  return value;
-}
-
-function ssh(src, middleware, next) {
-  const mw = middleware[0];
-  if (typeof mw === 'string') {
-    const split = mw.split('/');
-    let tech;
-    if (split[0] === 'videojs') {
-      tech = videojs.getTech(toTitleCase(split[1]));
-      next(tech, src);
-    } else {
-      ssh(src, vjsmiddleware[mw] || [], next);
-    }
-  } else if (mw) {
-    mw.setSource(src, function(err, _src) {
-      if (err) {
-        return ssh(src, middleware.slice(1), next);
-      }
-      ssh(_src, vjsmiddleware[_src.type] || [], next);
-    })
-  } else if (middleware.length > 1) {
-    ssh(src, middleware.slice(1), next);
-  }
-}
-
-window.middlewareSetSource = function(src, next) {
-  setTimeout(()=>ssh(src, vjsmiddleware[src.type] || [], next), 1);
-}
-
-videojs.use = function(type, middleware) {
-  const tm = vjsmiddleware[type] = vjsmiddleware[type] || [];
-  tm.push(middleware);
-}
-
+videojs.use = middlewareUse;
 videojs.use('video/mp4', 'videojs/html5');
 Object.keys(Flash.formats).forEach((format) => videojs.use(format, 'videojs/flash'));
 

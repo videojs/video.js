@@ -24,6 +24,7 @@ import mergeOptions from './utils/merge-options.js';
 import textTrackConverter from './tracks/text-track-list-converter.js';
 import ModalDialog from './modal-dialog';
 import Tech from './tech/tech.js';
+import * as middleware from './tech/middleware.js';
 import AudioTrackList from './tracks/audio-track-list.js';
 import VideoTrackList from './tracks/video-track-list.js';
 
@@ -1512,7 +1513,7 @@ class Player extends Component {
   techCall_(method, arg) {
     // If it's not ready yet, call method when it is
     if (method === 'setCurrentTime') {
-      return middlewareSetter(this.currentType(), method, arg, this.tech_)
+      return middleware.set(this.currentType(), method, arg, this.tech_)
     }
 
     if (this.tech_ && !this.tech_.isReady_) {
@@ -1549,7 +1550,7 @@ class Player extends Component {
     if (this.tech_ && this.tech_.isReady_) {
 
       if (method in {currentTime:1, duration:1}) {
-        return middlewareGetter(this.currentType(), method, this.tech_);
+        return middleware.get(this.currentType(), method, this.tech_);
       }
 
       // Flash likes to die and reload when you hide or reposition it.
@@ -2171,7 +2172,7 @@ class Player extends Component {
       return this.techGet_('src');
     }
 
-    middlewareSetSource(source[0], (tech, src) => {
+    middleware.setSource(source[0], (tech, src) => {
       console.log(tech.name, src);
       this.loadTech_(tech.name, src)
     });
