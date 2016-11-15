@@ -8,40 +8,7 @@ export function use (type, middleware) {
 }
 
 export function setSource (src, next) {
-  setTimeout(()=>ssh(src, middlewares[src.type] || [], next), 1);
-}
-
-export function set (type, method, arg) {
-  var value = arg;
-
-  (middlewares[type] || [])
-  .forEach((mw) => {
-    if (typeof mw === 'string') {
-      var ov = value;
-      value = set(mw, method, value, tech);
-    } else {
-      value = mw[method](value)
-    }
-  });
-
-  return tech[method](value);
-}
-
-export function get (type, method, tech) {
-  var value = tech[method]();
-
-  (middlewares[type] || [])
-  .reverse()
-  .forEach((mw) => {
-    if (typeof mw === 'string') {
-      var ov = value;
-      value = get(mw, method, tech);
-    } else {
-      value = mw[method](value)
-    }
-  });
-
-  return value;
+  setTimeout(()=>ssh(src, middlewares[src.type] || [], next, []), 1);
 }
 
 function ssh(src, middleware, next, acc) {
@@ -54,11 +21,11 @@ function ssh(src, middleware, next, acc) {
     // we've reached the end, so, we need to get a tech and return.
     if (split[0] === 'videojs') {
       const tech = Tech.getTech(toTitleCase(split[1]));
-      next(tech, src);
+      next(tech, src, acc);
 
     // we've reached a fork, so, we need go deeper
     } else {
-      ssh(src, middlewares[mw] || [], next);
+      ssh(src, middlewares[mw] || [], next, acc);
     }
 
   // try the current middleware
@@ -67,15 +34,16 @@ function ssh(src, middleware, next, acc) {
 
       // something happened, try the next middleware on the current level
       if (err) {
-        return ssh(src, middleware.slice(1), next);
+        return ssh(src, middleware.slice(1), next, acc);
       }
 
       // we've succeeded, now we need to go deeper
-      ssh(_src, middlewares[_src.type] || [], next);
+      acc.push(mw);
+      ssh(_src, middlewares[_src.type] || [], next, acc);
     })
 
   // something weird happened, try the next middleware on the current level
   } else if (middleware.length > 1) {
-    ssh(src, middleware.slice(1), next);
+    ssh(src, middleware.slice(1), next, acc);
   }
 }
