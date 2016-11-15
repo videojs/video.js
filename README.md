@@ -8,7 +8,7 @@
 
 [![NPM][npm-icon]][npm-link]
 
-> Video.js is a web video player built from the ground up for an HTML5 world. It supports HTML5 and Flash video, as well as YouTube and Vimeo (through [plugins][plugins]). It supports video playback on desktops and mobile devices. This project was started mid 2010, and the player is now used on over ~~50,000~~ ~~100,000~~ ~~200,000~~ 400,000 websites.
+> Video.js is a web video player built from the ground up for an HTML5 world. It supports HTML5 and Flash video, as well as YouTube and Vimeo (through [plugins][plugins]). It supports video playback on desktops and mobile devices. This project was started mid 2010, and the player is now used on over ~~50,000~~ ~~100,000~~ ~~200,000~~ [400,000 websites][builtwith].
 
 ## Quick Start
 
@@ -83,7 +83,9 @@ _Video.js uses [BrowserStack][browserstack] for compatibility testing._
 
 Video.js is [licensed][license] under the Apache License, Version 2.0.
 
+
 [browserstack]: https://browserstack.com
+[buildwith]: https://trends.builtwith.com/media/VideoJS
 [contributing]: CONTRIBUTING.md
 [contributing-building]: CONTRIBUTING.md#building-your-own-copy-of-videojs
 [contributing-code]: CONTRIBUTING.md#contributing-code
