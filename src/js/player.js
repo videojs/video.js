@@ -2191,7 +2191,22 @@ class Player extends Component {
       return this.techGet_('src');
     }
 
-    middleware.setSource(source[0], (tech, src, mws) => {
+    this.cache_.sources = null;
+    this.cache_.source = source;
+    this.cache_.src = source.src;
+
+    let src = source;
+    if (Array.isArray(source)) {
+      src = source[0];
+    } else if (typeof source === 'string') {
+      const ext = source.split('.')[1]
+      src = {
+        src: source,
+        type: ext === 'm3u8' ? 'application/x-mpegurl' : 'video/' + ext
+      }
+    }
+
+    middleware.setSource(src, (tech, src, mws) => {
       console.log(tech.name, src, mws);
       this.middleware_ = mws;
       this.loadTech_(tech.name, src)
