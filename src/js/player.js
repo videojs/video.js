@@ -1578,31 +1578,20 @@ class Player extends Component {
     return;
   }
 
-  middlewareSet(method, arg) {
-    var value = arg;
-
-    this.middleware_
-    .forEach((mw) => {
-      if (mw[method]) {
-        value = mw[method](value)
-      }
-    });
+  middlewareIterator(value, mw) {
+    if (mw[method]) {
+      return mw[method](value);
+    }
 
     return value;
   }
 
+  middlewareSet(method, arg) {
+    return this.middleware_.reduce(this.middlewareIterator, arg);
+  }
+
   middlewareGet(method) {
-  var value;
-
-  this.middleware_
-  .reverse()
-  .forEach((mw) => {
-    if (mw[method]) {
-      value = mw[method](value)
-    }
-  });
-
-  return value;
+    return this.middleware_.reduceRight(this.middlewareIterator, undefined);
   }
 
   /**
