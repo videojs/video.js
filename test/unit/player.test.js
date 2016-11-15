@@ -1253,14 +1253,13 @@ QUnit.test('When VIDEOJS_NO_DYNAMIC_STYLE is set, apply sizing directly to the t
   player.dispose();
 });
 
-test('should allow to use custom player class', function(){
+QUnit.test('should allow to use custom player class', function(assert) {
   class CustomPlayer extends Player {}
   videojs.registerComponent('Player', CustomPlayer);
 
-  let tag = TestHelpers.makeTag();
-  let player = videojs(tag);
+  const tag = TestHelpers.makeTag();
+  const player = videojs(tag);
 
-  equal(player instanceof CustomPlayer, true, 'player is custom');
-
+  assert.equal(player instanceof CustomPlayer, true, 'player is custom');
   player.dispose();
 });
