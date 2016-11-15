@@ -11,6 +11,10 @@ export function setSource (src, next) {
   setTimeout(()=>ssh(src, middlewares[src.type] || [], next, []), 1);
 }
 
+export function setTech(middleware, tech) {
+  middleware.forEach((mw) => mw.setTech && mw.setTech(tech));
+}
+
 export const allowedGetters = {
   currentTime: 1,
   duration: 1
