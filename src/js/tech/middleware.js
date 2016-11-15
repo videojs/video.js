@@ -11,30 +11,6 @@ export function setSource (src, next) {
   setTimeout(()=>ssh(src, middlewares[src.type] || [], next), 1);
 }
 
-
-function ssh(src, middleware, next) {
-  const mw = middleware[0];
-  if (typeof mw === 'string') {
-    const split = mw.split('/');
-    let tech;
-    if (split[0] === 'videojs') {
-      tech = Tech.getTech(toTitleCase(split[1]));
-      next(tech, src);
-    } else {
-      ssh(src, middlewares[mw] || [], next);
-    }
-  } else if (mw) {
-    mw.setSource(src, function(err, _src) {
-      if (err) {
-        return ssh(src, middleware.slice(1), next);
-      }
-      ssh(_src, middlewares[_src.type] || [], next);
-    })
-  } else if (middleware.length > 1) {
-    ssh(src, middleware.slice(1), next);
-  }
-}
-
 export function set (type, method, arg) {
   var value = arg;
 
@@ -66,4 +42,40 @@ export function get (type, method, tech) {
   });
 
   return value;
+}
+
+function ssh(src, middleware, next, acc) {
+  const mw = middleware[0];
+
+  // Either we've reached a leaf or we've reached a fork
+  if (typeof mw === 'string') {
+    const split = mw.split('/');
+
+    // we've reached the end, so, we need to get a tech and return.
+    if (split[0] === 'videojs') {
+      const tech = Tech.getTech(toTitleCase(split[1]));
+      next(tech, src);
+
+    // we've reached a fork, so, we need go deeper
+    } else {
+      ssh(src, middlewares[mw] || [], next);
+    }
+
+  // try the current middleware
+  } else if (mw) {
+    mw.setSource(src, function(err, _src) {
+
+      // something happened, try the next middleware on the current level
+      if (err) {
+        return ssh(src, middleware.slice(1), next);
+      }
+
+      // we've succeeded, now we need to go deeper
+      ssh(_src, middlewares[_src.type] || [], next);
+    })
+
+  // something weird happened, try the next middleware on the current level
+  } else if (middleware.length > 1) {
+    ssh(src, middleware.slice(1), next);
+  }
 }
