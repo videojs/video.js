@@ -1578,20 +1578,22 @@ class Player extends Component {
     return;
   }
 
-  middlewareIterator(value, mw) {
-    if (mw[method]) {
-      return mw[method](value);
-    }
+  middlewareIterator(method) {
+  return (value, mw) => {
+      if (mw[method]) {
+        return mw[method](value);
+      }
 
-    return value;
+      return value;
+    }
   }
 
   middlewareSet(method, arg) {
-    return this.middleware_.reduce(this.middlewareIterator, arg);
+    return this.middleware_.reduce(this.middlewareIterator(method), arg);
   }
 
   middlewareGet(method) {
-    return this.middleware_.reduceRight(this.middlewareIterator, undefined);
+    return this.middleware_.reduceRight(this.middlewareIterator(method), undefined);
   }
 
   /**
