@@ -1440,6 +1440,14 @@ class Component {
       Component.components_ = {};
     }
 
+    if (name === 'Player' && Component.components_[name]) {
+      const Player = Component.components_[name];
+
+      if (Player.players && Object.keys(Player.players).length > 0) {
+        throw new Error(`Can't register ${name} component after Player has been created`);
+      }
+    }
+
     Component.components_[name] = comp;
 
     return comp;
