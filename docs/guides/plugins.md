@@ -51,7 +51,11 @@ A basic plugin is a plain JavaScript function:
 
 ```js
 function examplePlugin(options) {
-  this.addClass(options.customClass);
+
+  if (options.customClass) {
+    this.addClass(options.customClass);
+  }
+
   this.on('playing', function() {
     videojs.log('playback began!');
   });
@@ -92,7 +96,10 @@ class ExamplePlugin extends Plugin {
   constructor(player, options) {
     super(player);
 
-    player.addClass(options.customClass);
+    if (options.customClass) {
+      player.addClass(options.customClass);
+    }
+
     player.on('playing', function() {
       videojs.log('playback began!');
     });
@@ -110,7 +117,10 @@ var ExamplePlugin = videojs.extend(Plugin, {
   constructor: function(player, options) {
     Plugin.call(this, player, options);
 
-    player.addClass(options.customClass);
+    if (options.customClass) {
+      player.addClass(options.customClass);
+    }
+
     player.on('playing', function() {
       videojs.log('playback began!');
     });
@@ -192,14 +202,14 @@ ExamplePlugin.defaultState = {
 };
 ```
 
-When the `state` is updated via the `setState` method, the plugin instance fires a `"statechanged"` event, but _only if something changed!_ This event can be used as a signal to update the DOM or perform some other action. Listeners to this event will receive, as a second argument, a hash of changes which occurred on the `state` property:
+When the `state` is updated via the `setState` method, the plugin instance fires a `"statechanged"` event, but _only if something changed!_ This event can be used as a signal to update the DOM or perform some other action. The event object passed to listeners for this event includes, an object describing the changes that occurred on the `state` property:
 
 ```js
-player.examplePlugin.on('statechanged', function(changes) {
-  if (changes.customClass) {
-    this
-      .removeClass(changes.customClass.from)
-      .addClass(changes.customClass.to);
+player.examplePlugin.on('statechanged', function(e) {
+  if (e.changes && e.changes.customClass) {
+    this.player
+      .removeClass(e.changes.customClass.from)
+      .addClass(e.changes.customClass.to);
   }
 });
 
