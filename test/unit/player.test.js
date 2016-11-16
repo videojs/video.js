@@ -16,6 +16,13 @@ import TechFaker from './tech/tech-faker.js';
 QUnit.module('Player', {
   beforeEach() {
     this.clock = sinon.useFakeTimers();
+    // reset players storage
+    for (let playerId in Player.players) {
+      if (Player.players[playerId] !== null) {
+        Player.players[playerId].dispose();
+      }
+      delete Player.players[playerId];
+    }
   },
   afterEach() {
     this.clock.restore();
