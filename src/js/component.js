@@ -1444,7 +1444,7 @@ class Component {
       const Player = Component.components_[name];
 
       if (Player.players && Object.keys(Player.players).length > 0) {
-        throw new Error(`Can't register ${name} component after Player has been created`);
+        throw new Error('Can not register Player component after player has been created');
       }
     }
 
