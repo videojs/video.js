@@ -854,7 +854,7 @@ class Player extends Component {
       TechComponent = Component.getComponent(techName);
     }
     this.tech_ = new TechComponent(techOptions);
-    this.middleware_.push(this.tech_);
+    (this.middleware_ = this.middleware_ || []).push(this.tech_);
 
     // player.triggerReady is always async, so don't need this to be async
     this.tech_.ready(Fn.bind(this, this.handleTechReady_), true);
@@ -2191,22 +2191,23 @@ class Player extends Component {
       return this.techGet_('src');
     }
 
-    this.cache_.sources = null;
-    this.cache_.source = source;
-    this.cache_.src = source.src;
-
     let src = source;
 
     if (Array.isArray(source)) {
+      this.cache_.sources = source;
       src = source[0];
     } else if (typeof source === 'string') {
       const ext = source.split('.')[1];
 
       src = {
-        src: source,
-        type: ext === 'm3u8' ? 'application/x-mpegurl' : 'video/' + ext
+        src: source
       };
+
+      this.cache_.sources = [src];
     }
+
+    this.cache_.source = src;
+    this.cache_.src = src.src;
 
     middleware.setSource(src, (tech, src_, mws) => {
       this.middleware_ = mws;
