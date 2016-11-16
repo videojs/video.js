@@ -17,7 +17,7 @@ QUnit.module('Player', {
   beforeEach() {
     this.clock = sinon.useFakeTimers();
     // reset players storage
-    for (let playerId in Player.players) {
+    for (const playerId in Player.players) {
       if (Player.players[playerId] !== null) {
         Player.players[playerId].dispose();
       }
