@@ -3,8 +3,6 @@
  * @module videojs
  */
 
-/* global define */
-
 import window from 'global/window';
 import document from 'global/document';
 import * as setup from './setup';
@@ -30,7 +28,6 @@ import {isObject} from './utils/obj';
 import computedStyle from './utils/computed-style.js';
 import extendFn from './extend.js';
 import xhr from 'xhr';
-import toTitleCase from './utils/to-title-case.js';
 
 // Include the built-in techs
 import Tech from './tech/tech.js';
