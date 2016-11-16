@@ -1260,7 +1260,7 @@ QUnit.test('When VIDEOJS_NO_DYNAMIC_STYLE is set, apply sizing directly to the t
   player.dispose();
 });
 
-QUnit.test('should allow to use custom player class', function(assert) {
+QUnit.test('should allow to register custom player when any player has not been created', function(assert) {
   class CustomPlayer extends Player {}
   videojs.registerComponent('Player', CustomPlayer);
 
