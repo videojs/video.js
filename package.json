@@ -30,6 +30,9 @@
     "type": "git",
     "url": "https://github.com/videojs/video.js.git"
   },
+  "browserify-shim": {
+    "videojs-vtt.js": "node_modules/videojs-vtt.js/dist/vtt.js"
+  },
   "dependencies": {
     "babel-runtime": "^6.9.2",
     "global": "4.3.0",
@@ -55,12 +58,14 @@
     "blanket": "^1.1.6",
     "browserify-derequire": "^0.9.4",
     "browserify-istanbul": "^0.2.1",
+    "browserify-shim": "^3.8.12",
     "browserify-versionify": "^1.0.4",
     "bundle-collapser": "^1.2.1",
     "chg": "^0.3.2",
     "conventional-changelog-cli": "^1.2.0",
     "conventional-changelog-videojs": "^3.0.0",
     "doctoc": "^1.2.0",
+    "envify": "^3.4.1",
     "es5-shim": "^4.1.3",
     "es6-shim": "^0.35.1",
     "ghooks": "^1.3.2",
@@ -107,6 +112,7 @@
     "sinon": "^1.16.1",
     "time-grunt": "^1.1.1",
     "uglify-js": "~2.7.3",
+    "unreachable-branch-transform": "^0.5.1",
     "videojs-doc-generator": "0.0.1",
     "videojs-standard": "^5.2.0",
     "webpack": "^1.13.2"
