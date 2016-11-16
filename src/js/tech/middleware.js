@@ -1,5 +1,6 @@
 import Tech from './tech.js';
 import toTitleCase from '../utils/to-title-case.js';
+import assign from 'object.assign';
 
 const middlewares = {};
 
@@ -44,7 +45,7 @@ function ssh(src, middleware, next, acc) {
 
   // try the current middleware
   } else if (mw) {
-    mw.setSource(src, function(err, _src) {
+    mw.setSource(assign({}, src), function(err, _src) {
 
       // something happened, try the next middleware on the current level
       if (err) {
@@ -53,7 +54,13 @@ function ssh(src, middleware, next, acc) {
 
       // we've succeeded, now we need to go deeper
       acc.push(mw);
-      ssh(_src, middlewares[_src.type] || [], next, acc);
+
+      ssh(_src,
+          src.type === _src.type ?
+            middleware.slice(1) :
+            (middlewares[_src.type] || []),
+          next,
+          acc);
     });
 
   // something weird happened, try the next middleware on the current level
