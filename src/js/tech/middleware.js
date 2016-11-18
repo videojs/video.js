@@ -16,6 +16,14 @@ export function setTech(middleware, tech) {
   middleware.forEach((mw) => mw.setTech && mw.setTech(tech));
 }
 
+export function get(middleware, method) {
+  return middleware.reduceRight(middlewareIterator(method), undefined);
+}
+
+export function set(middleware, method, arg) {
+  return middleware.reduce(middlewareIterator(method), arg);
+}
+
 export const allowedGetters = {
   currentTime: 1,
   duration: 1
@@ -24,6 +32,16 @@ export const allowedGetters = {
 export const allowedSetters = {
   setCurrentTime: 1
 };
+
+function middlewareIterator(method) {
+  return (value, mw) => {
+    if (mw[method]) {
+      return mw[method](value);
+    }
+
+    return value;
+  };
+}
 
 function ssh(src, middleware, next, acc) {
   const mw = middleware[0];
