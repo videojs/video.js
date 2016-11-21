@@ -126,6 +126,10 @@ class Plugin {
   constructor(player) {
     this.player = player;
 
+    if (this.constructor === Plugin) {
+      throw new Error('Plugin must be sub-classed; not directly instantiated');
+    }
+
     evented(this, {exclude: ['trigger']});
     stateful(this, this.constructor.defaultState);
     markPluginAsActive(player, this.name);
@@ -184,7 +188,8 @@ class Plugin {
   }
 
   /**
-   * Handles "statechange" events on the plugin. Override by subclassing.
+   * Handles "statechange" events on the plugin. No-op by default, override by
+   * subclassing.
    *
    * @param {Event} e
    * @param {Object} e.changes
@@ -258,10 +263,14 @@ class Plugin {
 
     pluginStorage[name] = plugin;
 
-    if (Plugin.isBasic(plugin)) {
-      Player.prototype[name] = createBasicPlugin(name, plugin);
-    } else {
-      Player.prototype[name] = createPluginFactory(name, plugin);
+    // Add a player prototype method for all sub-classed plugins (but not for
+    // the base Plugin class).
+    if (name !== 'plugin') {
+      if (Plugin.isBasic(plugin)) {
+        Player.prototype[name] = createBasicPlugin(name, plugin);
+      } else {
+        Player.prototype[name] = createPluginFactory(name, plugin);
+      }
     }
 
     return plugin;

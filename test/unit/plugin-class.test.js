@@ -29,6 +29,12 @@ QUnit.module('Plugin: class-based', {
 
 QUnit.test('pre-setup interface', function(assert) {
   assert.strictEqual(
+    typeof this.player.plugin,
+    'undefined',
+    'the base Plugin does not add a method to the player'
+  );
+
+  assert.strictEqual(
     typeof this.player.mock,
     'function',
     'plugins are a factory function on a player'
@@ -90,6 +96,16 @@ QUnit.test('setup', function(assert) {
   assert.strictEqual(typeof instance.one, 'function', 'instance is evented');
   assert.strictEqual(typeof instance.trigger, 'function', 'instance is evented');
   assert.strictEqual(typeof instance.dispose, 'function', 'instance has dispose method');
+
+  assert.throws(
+    function() {
+
+      // This needs to return so that the linter doesn't complain.
+      return new Plugin(this.player);
+    },
+    new Error('Plugin must be sub-classed; not directly instantiated'),
+    'the Plugin class cannot be directly instantiated'
+  );
 });
 
 QUnit.test('"pluginsetup" event', function(assert) {
