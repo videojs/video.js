@@ -28,6 +28,7 @@
     "docs:api": "jsdoc -r src/js -d docs/api -c .jsdoc.json",
     "docs:lint": "remark -- './**/*.md'",
     "docs:fix": "remark --output -- './**/*.md'",
+    "predev": "babel src/js -d es5",
     "dev": "run-p babel browserify",
     "dev-test": "run-p dev test-watch",
     "babel": "babel -w src/js -d es5",
