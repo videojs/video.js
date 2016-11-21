@@ -2189,9 +2189,9 @@ class Player extends Component {
     this.cache_.source = src;
     this.cache_.src = src.src;
 
-    middleware.setSource(src, (tech, src_, mws) => {
+    middleware.setSource(src, (techName, src_, mws) => {
       this.middleware_ = mws;
-      this.loadTech_(tech.name, src_);
+      this.loadTech_(techName, src_);
       middleware.setTech(mws, this.tech_);
     });
 

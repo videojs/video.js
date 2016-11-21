@@ -300,7 +300,15 @@ videojs.getTech = Tech.getTech;
  *
  * @borrows Tech.registerTech as videojs.registerTech
  */
-videojs.registerTech = Tech.registerTech;
+videojs.registerTech = function(name, tech) {
+  middlewareUse('*', {
+    name,
+    canPlayType: tech.canPlayType
+  });
+
+  Tech.registerTech(name, tech);
+}
+
 
 /**
  * A suite of browser and device tests from {@link browser}.
@@ -634,6 +642,16 @@ videojs.computedStyle = computedStyle;
 module.exports = videojs;
 
 videojs.use = middlewareUse;
-videojs.use('video/mp4', 'videojs/html5');
-Object.keys(Flash.formats).forEach((format) => videojs.use(format, 'videojs/flash'));
 
+videojs.use('*', {
+  name: 'Html5',
+  canPlayType(type) {
+    return document.createElement('video').canPlayType(type);
+  }
+});
+videojs.use('*', {
+  name: 'Flash',
+  canPlayType(type) {
+    return Flash.nativeSourceHandler.canPlayType(type);
+  }
+});

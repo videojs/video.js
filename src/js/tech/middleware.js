@@ -1,4 +1,3 @@
-import Tech from './tech.js';
 import toTitleCase from '../utils/to-title-case.js';
 import assign from 'object.assign';
 
@@ -9,7 +8,7 @@ export function use(type, middleware) {
 }
 
 export function setSource(src, next) {
-  setTimeout(()=>ssh(src, middlewares[src.type] || [], next, []), 1);
+  setTimeout(() => ssh(src, middlewares[src.type], next), 1);
 }
 
 export function setTech(middleware, tech) {
@@ -43,46 +42,39 @@ function middlewareIterator(method) {
   };
 }
 
-function ssh(src, middleware, next, acc) {
-  const mw = middleware[0];
+function ssh(src = {}, middleware = [], next, acc = []) {
+  const [mw, ...mwrest] = middleware;
 
-  // Either we've reached a leaf or we've reached a fork
+  // if mw is a string, then we're at a fork in the road
   if (typeof mw === 'string') {
-    const split = mw.split('/');
+    ssh(src, middlewares[mw], next, acc);
 
-    // we've reached the end, so, we need to get a tech and return.
-    if (split[0] === 'videojs') {
-      const tech = Tech.getTech(toTitleCase(split[1]));
-
-      next(tech, src, acc);
-
-    // we've reached a fork, so, we need go deeper
-    } else {
-      ssh(src, middlewares[mw] || [], next, acc);
-    }
-
-  // try the current middleware
+  // if we have an mw, call its setSource method
   } else if (mw) {
     mw.setSource(assign({}, src), function(err, _src) {
 
       // something happened, try the next middleware on the current level
+      // make sure to use the old src
       if (err) {
-        return ssh(src, middleware.slice(1), next, acc);
+        return ssh(src, mwrest, next, acc);
       }
 
       // we've succeeded, now we need to go deeper
       acc.push(mw);
 
+      // if it's the same time, continue does the current chain
+      // otherwise, we want to go down the new chain
       ssh(_src,
-          src.type === _src.type ?
-            middleware.slice(1) :
-            (middlewares[_src.type] || []),
+          src.type === _src.type ?  mwrest : middlewares[_src.type],
           next,
           acc);
     });
+  } else if (mwrest.length) {
+    ssh(src, mwrest, next, acc);
+  } else {
+    const techs = middlewares['*'];
+    const tech = techs.filter((tech) => !!tech.canPlayType(src.type))[0].name;
 
-  // something weird happened, try the next middleware on the current level
-  } else if (middleware.length > 1) {
-    ssh(src, middleware.slice(1), next, acc);
+    next(tech, src, acc);
   }
 }
