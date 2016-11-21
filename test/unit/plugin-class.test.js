@@ -221,3 +221,21 @@ QUnit.test('arbitrary events', function(assert) {
     plugin: this.MockPlugin
   }, 'the event hash object is correct');
 });
+
+QUnit.test('handleStateChanged() method is automatically bound to the "statechanged" event', function(assert) {
+  const spy = sinon.spy();
+
+  class TestHandler extends Plugin {}
+  TestHandler.prototype.handleStateChanged = spy;
+
+  Plugin.registerPlugin('testHandler', TestHandler);
+
+  const instance = this.player.testHandler();
+
+  instance.setState({foo: 1});
+  assert.strictEqual(spy.callCount, 1, 'the handleStateChanged listener was called');
+  assert.strictEqual(spy.firstCall.args[0].type, 'statechanged', 'the event was "statechanged"');
+  assert.strictEqual(typeof spy.firstCall.args[0].changes, 'object', 'the event included a changes object');
+
+  Plugin.deregisterPlugin('testHandler');
+});

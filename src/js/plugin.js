@@ -125,10 +125,20 @@ class Plugin {
    */
   constructor(player) {
     this.player = player;
+
     evented(this, {exclude: ['trigger']});
     stateful(this, this.constructor.defaultState);
     markPluginAsActive(player, this.name);
-    player.one('dispose', Fn.bind(this, this.dispose));
+
+    // Bind all plugin prototype methods to this object.
+    Object.keys(Plugin.prototype).forEach(k => {
+      if (typeof this[k] === 'function') {
+        this[k] = Fn.bind(this, this[k]);
+      }
+    });
+
+    this.on('statechanged', this.handleStateChanged);
+    player.one('dispose', this.dispose);
     player.trigger('pluginsetup', this.getEventHash_());
   }
 
@@ -174,6 +184,14 @@ class Plugin {
   }
 
   /**
+   * Handles "statechange" events on the plugin. Override by subclassing.
+   *
+   * @param {Event} e
+   * @param {Object} e.changes
+   */
+  handleStateChanged(e) {}
+
+  /**
    * Disposes a plugin.
    *
    * Subclasses can override this if they want, but for the sake of safety,
@@ -185,9 +203,9 @@ class Plugin {
     this.trigger('dispose');
     this.off();
 
-    // Eliminate any possible sources of leaking memory by clearing up references
-    // between the player and the plugin instance and nulling out the plugin's
-    // state and replacing methods with a function that throws.
+    // Eliminate any possible sources of leaking memory by clearing up
+    // references between the player and the plugin instance and nulling out
+    // the plugin's state and replacing methods with a function that throws.
     player[PLUGIN_CACHE_KEY][name] = false;
     this.player = this.state = null;
 
