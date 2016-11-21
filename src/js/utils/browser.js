@@ -66,5 +66,8 @@ export const IE_VERSION = (function(result) {
   return result && parseFloat(result[1]);
 }((/MSIE\s(\d+)\.\d/).exec(USER_AGENT)));
 
+export const IS_SAFARI = (/Safari/i).test(USER_AGENT) && !IS_CHROME && !IS_ANDROID && !IS_EDGE;
+export const IS_ANY_SAFARI = IS_SAFARI || IS_IOS;
+
 export const TOUCH_ENABLED = !!(('ontouchstart' in window) || window.DocumentTouch && document instanceof window.DocumentTouch);
 export const BACKGROUND_SIZE_SUPPORTED = 'backgroundSize' in document.createElement('video').style;
