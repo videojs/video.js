@@ -264,7 +264,7 @@ QUnit.test('emulated tracks are always used, except in safari', function(assert)
 
   browser.IS_ANY_SAFARI = true;
 
-  assert.ok(!Html5.supportsNativeTextTracks(), 'Html5 does support native text tracks in safari');
+  assert.ok(Html5.supportsNativeTextTracks(), 'Html5 does support native text tracks in safari');
 
   Html5.TEST_VID = oldTestVid;
   browser.IS_ANY_SAFARI = oldIsAnySafari;
