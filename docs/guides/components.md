@@ -3,9 +3,9 @@ Components
 The Video.js player is built on top of a simple, custom UI components architecture. The player class and all control classes inherit from the `Component` class, or a subclass of `Component`.
 
 ```js
-videojs.registerComponent('Control', videojs.extends(Component));
-videojs.registerComponent('Button', videojs.extends(videojs.getComponent('Control')));
-videojs.registerComponent('PlayToggle', videojs.extends(videojs.getComponent('Button')));
+videojs.registerComponent('Control', videojs.extend(Component));
+videojs.registerComponent('Button', videojs.extend(videojs.getComponent('Control')));
+videojs.registerComponent('PlayToggle', videojs.extend(videojs.getComponent('Button')));
 ```
 
 The UI component architecture makes it easier to add child components to a parent component and build up an entire user interface, like the controls for the Video.js player.
