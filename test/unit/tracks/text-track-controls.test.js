@@ -294,3 +294,154 @@ if (!browser.IS_IE8) {
     player.dispose();
   });
 }
+
+const chaptersTrack = {
+  kind: 'chapters',
+  label: 'Test Chapters'
+};
+
+test('chapters should not be displayed when text tracks list is empty', function() {
+  const player = TestHelpers.makePlayer();
+
+  ok(player.controlBar.chaptersButton.hasClass('vjs-hidden'), 'control is not displayed');
+  equal(player.textTracks().length, 0, 'textTracks is empty');
+
+  player.dispose();
+});
+
+test('chapters should not be displayed when there is chapters track but no cues', function() {
+  const player = TestHelpers.makePlayer({
+    tracks: [chaptersTrack]
+  });
+
+  this.clock.tick(1000);
+
+  ok(player.controlBar.chaptersButton.hasClass('vjs-hidden'), 'chapters menu is not displayed');
+  equal(player.textTracks().length, 1, 'textTracks contains one item');
+
+  player.dispose();
+});
+
+test('chapters should be displayed when cues added to initial track and button updated', function() {
+  const player = TestHelpers.makePlayer({
+    tracks: [chaptersTrack]
+  });
+
+  this.clock.tick(1000);
+
+  const chapters = player.textTracks()[0];
+
+  chapters.addCue({
+    startTime: 0,
+    endTime: 2,
+    text: 'Chapter 1'
+  });
+  chapters.addCue({
+    startTime: 2,
+    endTime: 4,
+    text: 'Chapter 2'
+  });
+  equal(chapters.cues.length, 2);
+
+  player.controlBar.chaptersButton.update();
+
+  ok(!player.controlBar.chaptersButton.hasClass('vjs-hidden'), 'chapters menu is displayed');
+
+  const menuItems = player.controlBar.chaptersButton.items;
+
+  equal(menuItems.length, 2, 'menu contains two item');
+
+  player.dispose();
+});
+
+test('chapters should be displayed when a track and its cures added and button updated', function() {
+  const player = TestHelpers.makePlayer();
+
+  this.clock.tick(1000);
+
+  const chapters = player.addTextTrack('chapters', 'Test Chapters', 'en');
+
+  chapters.addCue({
+    startTime: 0,
+    endTime: 2,
+    text: 'Chapter 1'
+  });
+  chapters.addCue({
+    startTime: 2,
+    endTime: 4,
+    text: 'Chapter 2'
+  });
+  equal(chapters.cues.length, 2);
+
+  player.controlBar.chaptersButton.update();
+
+  ok(!player.controlBar.chaptersButton.hasClass('vjs-hidden'), 'chapters menu is displayed');
+
+  const menuItems = player.controlBar.chaptersButton.items;
+
+  equal(menuItems.length, 2, 'menu contains two item');
+
+  player.dispose();
+});
+
+test('chapters menu should use track label as menu title', function() {
+  const player = TestHelpers.makePlayer({
+    tracks: [chaptersTrack]
+  });
+
+  this.clock.tick(1000);
+
+  const chapters = player.textTracks()[0];
+
+  chapters.addCue({
+    startTime: 0,
+    endTime: 2,
+    text: 'Chapter 1'
+  });
+  chapters.addCue({
+    startTime: 2,
+    endTime: 4,
+    text: 'Chapter 2'
+  });
+  equal(chapters.cues.length, 2);
+
+  player.controlBar.chaptersButton.update();
+
+  const menu = player.controlBar.chaptersButton.menu;
+  const menuTitle = menu.contentEl().firstChild.textContent;
+
+  equal(menuTitle, 'Test Chapters', 'menu gets track label as title');
+
+  player.dispose();
+});
+
+test('chapters should be displayed when remote track added and load event fired', function() {
+  const player = TestHelpers.makePlayer();
+
+  this.clock.tick(1000);
+
+  const chaptersEl = player.addRemoteTextTrack(chaptersTrack);
+
+  chaptersEl.track.addCue({
+    startTime: 0,
+    endTime: 2,
+    text: 'Chapter 1'
+  });
+  chaptersEl.track.addCue({
+    startTime: 2,
+    endTime: 4,
+    text: 'Chapter 2'
+  });
+
+  equal(chaptersEl.track.cues.length, 2);
+
+  TestHelpers.triggerDomEvent(chaptersEl, 'load');
+
+  ok(!player.controlBar.chaptersButton.hasClass('vjs-hidden'), 'chapters menu is displayed');
+
+  const menuItems = player.controlBar.chaptersButton.items;
+
+  equal(menuItems.length, 2, 'menu contains two item');
+
+  player.dispose();
+});

@@ -21,6 +21,7 @@ class ChaptersTrackMenuItem extends MenuItem {
     const currentTime = player.currentTime();
 
     // Modify options for parent MenuItem class's init.
+    options.selectable = true;
     options.label = cue.text;
     options.selected = (cue.startTime <= currentTime && currentTime < cue.endTime);
     super(player, options);
