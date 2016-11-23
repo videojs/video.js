@@ -80,7 +80,13 @@ class Tech extends Component {
       this.manualTimeUpdatesOn();
     }
 
-    if (options.nativeCaptions === false || options.nativeTextTracks === false) {
+    ['Text', 'Audio', 'Video'].forEach((track) => {
+      if (options[`native${track}Tracks`] === false) {
+        this[`featuresNative${track}Tracks`] = false;
+      }
+    });
+
+    if (options.nativeCaptions === false) {
       this.featuresNativeTextTracks = false;
     }
 
