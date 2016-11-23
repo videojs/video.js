@@ -1276,12 +1276,9 @@ QUnit.test('should not allow to register custom player when any player has been 
   const player = videojs(tag);
 
   class CustomPlayer extends Player {}
-  try {
+  assert.throws(function() {
     videojs.registerComponent('Player', CustomPlayer);
-  } catch (e) {
-    player.dispose();
-    return assert.equal(e.message, 'Can not register Player component after player has been created');
-  }
+  }, 'Can not register Player component after player has been created');
 
-  assert.ok(false, 'It should throw Error when any player has been created');
+  player.dispose();
 });
