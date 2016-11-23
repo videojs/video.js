@@ -16,6 +16,13 @@ import TechFaker from './tech/tech-faker.js';
 QUnit.module('Player', {
   beforeEach() {
     this.clock = sinon.useFakeTimers();
+    // reset players storage
+    for (const playerId in Player.players) {
+      if (Player.players[playerId] !== null) {
+        Player.players[playerId].dispose();
+      }
+      delete Player.players[playerId];
+    }
   },
   afterEach() {
     this.clock.restore();
@@ -1251,4 +1258,30 @@ QUnit.test('When VIDEOJS_NO_DYNAMIC_STYLE is set, apply sizing directly to the t
   assert.equal(player.tech_.el().width, 600, 'the width is equal to 600');
   assert.equal(player.tech_.el().height, 300, 'the height is equal 300');
   player.dispose();
+});
+
+QUnit.test('should allow to register custom player when any player has not been created', function(assert) {
+  class CustomPlayer extends Player {}
+  videojs.registerComponent('Player', CustomPlayer);
+
+  const tag = TestHelpers.makeTag();
+  const player = videojs(tag);
+
+  assert.equal(player instanceof CustomPlayer, true, 'player is custom');
+  player.dispose();
+});
+
+QUnit.test('should not allow to register custom player when any player has been created', function(assert) {
+  const tag = TestHelpers.makeTag();
+  const player = videojs(tag);
+
+  class CustomPlayer extends Player {}
+  try {
+    videojs.registerComponent('Player', CustomPlayer);
+  } catch (e) {
+    player.dispose();
+    return assert.equal(e.message, 'Can not register Player component after player has been created');
+  }
+
+  assert.ok(false, 'It should throw Error when any player has been created');
 });

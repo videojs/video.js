@@ -117,8 +117,9 @@ function videojs(id, options, ready) {
     options = mergeOptions(options, opts);
   });
 
+  const PlayerComponent = Component.getComponent('Player');
   // If not, set up a new player
-  const player = new Player(tag, options, ready);
+  const player = new PlayerComponent(tag, options, ready);
 
   videojs.hooks('setup').forEach((hookFunction) => hookFunction(player));
 
