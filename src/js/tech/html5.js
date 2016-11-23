@@ -443,11 +443,11 @@ class Html5 extends Tech {
             if (this.el_.duration === Infinity) {
               this.trigger('durationchange');
             }
-            this.off(this.player_, 'timeupdate', checkProgress);
+            this.off('timeupdate', checkProgress);
           }
         };
 
-        this.on(this.player_, 'timeupdate', checkProgress);
+        this.on('timeupdate', checkProgress);
         return NaN;
       }
     }
