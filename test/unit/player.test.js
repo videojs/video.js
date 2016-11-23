@@ -1272,6 +1272,7 @@ QUnit.test('should allow to register custom player when any player has not been 
 });
 
 QUnit.test('should not allow to register custom player when any player has been created', function(assert) {
+  window.foo = true;
   const tag = TestHelpers.makeTag();
   const player = videojs(tag);
 
@@ -1281,4 +1282,5 @@ QUnit.test('should not allow to register custom player when any player has been 
   }, 'Can not register Player component after player has been created');
 
   player.dispose();
+  delete window.foo;
 });

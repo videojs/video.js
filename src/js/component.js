@@ -1440,9 +1440,15 @@ class Component {
       Component.components_ = {};
     }
 
+    if (window.foo) {
+      console.log(name, Component.components_[name]);
+    }
     if (name === 'Player' && Component.components_[name]) {
       const Player = Component.components_[name];
 
+      if (window.foo) {
+        console.log(Object.keys(Player.players));
+      }
       if (Player.players && Object.keys(Player.players).length > 0) {
         throw new Error('Can not register Player component after player has been created');
       }
