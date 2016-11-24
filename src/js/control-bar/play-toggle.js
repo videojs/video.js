@@ -67,7 +67,6 @@ class PlayToggle extends Button {
     // change the button text to "Play"
     this.controlText('Play');
   }
-
 }
 
 PlayToggle.prototype.controlText_ = 'Play';

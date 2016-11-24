@@ -1,0 +1,23 @@
+.video-js .vjs-tooltip {
+  position: absolute;
+  top: -3em;
+  left: 0;
+  z-index: 10;
+
+  display: none;
+  padding: 6px 8px 8px 8px;
+
+  @include border-radius(0.3em);
+  @include background-color-with-alpha($primary-background-color, $primary-background-transparency);
+
+  color: $primary-foreground-color;
+  font-size: 0.9em;
+  font-family: $text-font-family;
+  white-space: nowrap;
+
+  pointer-events: none;
+}
+
+.video-js .vjs-tooltip-active {
+  display: block;
+}
