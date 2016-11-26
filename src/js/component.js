@@ -1541,12 +1541,16 @@ class Component {
    * @return {Component}
    *         The `Component` that was registered.
    */
-  static registerComponent(name, comp) {
-    if (!name) {
-      return;
+  static registerComponent(name, Comp) {
+    if (typeof name !== 'string' || !(/\S/).test(name)) {
+      throw new Error('illegal "name"; must be non-empty string');
     }
 
-    name = toTitleCase(name);
+    if (!Component.prototype.isPrototypeOf(Comp.prototype) && Component !== Comp) {
+      throw new Error('illegal "Comp"; must be a subclass of Component');
+    }
+
+    name = toTitleCase(name.trim());
 
     if (!Component.components_) {
       Component.components_ = {};
@@ -1566,9 +1570,9 @@ class Component {
       }
     }
 
-    Component.components_[name] = comp;
+    Component.components_[name] = Comp;
 
-    return comp;
+    return Comp;
   }
 
   /**
@@ -1661,4 +1665,5 @@ class Component {
 }
 
 Component.registerComponent('Component', Component);
+
 export default Component;

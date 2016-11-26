@@ -213,7 +213,6 @@ QUnit.test('if native text tracks are not supported, create a texttrackdisplay',
   const oldTestVid = Html5.TEST_VID;
   const oldIsFirefox = browser.IS_FIREFOX;
   const oldTextTrackDisplay = Component.getComponent('TextTrackDisplay');
-  let called = false;
   const tag = document.createElement('video');
   const track1 = document.createElement('track');
   const track2 = document.createElement('track');
@@ -235,13 +234,21 @@ QUnit.test('if native text tracks are not supported, create a texttrackdisplay',
   };
 
   browser.IS_FIREFOX = true;
-  Component.registerComponent('TextTrackDisplay', function() {
-    called = true;
-  });
+
+  const fakeTTDSpy = sinon.spy();
+
+  class FakeTTD extends Component {
+    constructor() {
+      super();
+      fakeTTDSpy();
+    }
+  }
+
+  Component.registerComponent('TextTrackDisplay', FakeTTD);
 
   const player = TestHelpers.makePlayer({}, tag);
 
-  assert.ok(called, 'text track display was created');
+  assert.strictEqual(fakeTTDSpy.callCount, 1, 'text track display was created');
 
   Html5.TEST_VID = oldTestVid;
   browser.IS_FIREFOX = oldIsFirefox;
