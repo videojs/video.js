@@ -1269,6 +1269,9 @@ QUnit.test('should allow to register custom player when any player has not been 
 
   assert.equal(player instanceof CustomPlayer, true, 'player is custom');
   player.dispose();
+
+  // reset the Player to the original value;
+  videojs.registerComponent('Player', Player);
 });
 
 QUnit.test('should not allow to register custom player when any player has been created', function(assert) {
@@ -1282,4 +1285,7 @@ QUnit.test('should not allow to register custom player when any player has been 
   }, 'Can not register Player component after player has been created');
 
   player.dispose();
+
+  // reset the Player to the original value;
+  videojs.registerComponent('Player', Player);
 });
