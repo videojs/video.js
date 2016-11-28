@@ -10,7 +10,10 @@ import * as Events from '../utils/events';
  *
  * @private
  * @param  {Object} object
- * @return {Boolean}
+ *         An object to test.
+ *
+ * @return {boolean}
+ *         Whether or not the object appears to be evented.
  */
 const isEvented = (object) =>
   !!object.eventBusEl_ &&
@@ -19,8 +22,12 @@ const isEvented = (object) =>
 /**
  * Whether a value is a valid event type - non-empty string or array.
  *
- * @param  {String|Array} type
- * @return {Boolean}
+ * @private
+ * @param  {string|Array} type
+ *         The type value to test.
+ *
+ * @return {boolean}
+ *         Whether or not the type is a valid event type.
  */
 const isValidEventType = (type) =>
   (typeof type === 'string' && (/\S/).test(type)) ||
@@ -30,7 +37,10 @@ const isValidEventType = (type) =>
  * Validates a value to determine if it is a valid event target. Throws if not.
  *
  * @throws {Error}
+ *         If the target does not appear to be a valid event target.
+ *
  * @param  {Object} target
+ *         The object to test.
  */
 const validateTarget = (target) => {
   if (!target.nodeName && !isEvented(target)) {
@@ -42,7 +52,10 @@ const validateTarget = (target) => {
  * Validates a value to determine if it is a valid event target. Throws if not.
  *
  * @throws {Error}
- * @param  {String|Array} type
+ *         If the type does not appear to be a valid event type.
+ *
+ * @param  {string|Array} type
+ *         The type to test.
  */
 const validateEventType = (type) => {
   if (!isValidEventType(type)) {
@@ -53,8 +66,11 @@ const validateEventType = (type) => {
 /**
  * Validates a value to determine if it is a valid listener. Throws if not.
  *
- * @throws Error
+ * @throws {Error}
+ *         If the listener is not a function.
+ *
  * @param  {Function} listener
+ *         The listener to test.
  */
 const validateListener = (listener) => {
   if (typeof listener !== 'function') {
@@ -63,17 +79,18 @@ const validateListener = (listener) => {
 };
 
 /**
- * Takes an array of arguments given to on() or one(), validates them, and
+ * Takes an array of arguments given to `on()` or `one()`, validates them, and
  * normalizes them into an object.
  *
- * @throws Error
+ * @private
  * @param  {Object} self
- *         The evented object on which on() or one() was called.
+ *         The evented object on which `on()` or `one()` was called.
  *
  * @param  {Array} args
- *         An array of arguments passed to on() or one().
+ *         An array of arguments passed to `on()` or `one()`.
  *
  * @return {Object}
+ *         An object containing useful values for `on()` or `one()` calls.
  */
 const normalizeListenArgs = (self, args) => {
 
@@ -112,17 +129,16 @@ const normalizeListenArgs = (self, args) => {
  * the type of target.
  *
  * @private
- * @throws {Error} If unable to add the listener
  * @param  {Element|Object} target
  *         A DOM node or evented object.
  *
- * @param  {String|Array} type
+ * @param  {string|Array} type
  *         One or more event type(s).
  *
  * @param  {Function} listener
  *         A listener function.
  *
- * @param  {String} [method="on"]
+ * @param  {string} [method="on"]
  *         The event binding method to use.
  */
 const listen = (target, type, listener, method = 'on') => {
@@ -147,18 +163,17 @@ const mixin = {
    * Add a listener to an event (or events) on this object or another evented
    * object.
    *
-   * @param  {String|Array|Element|Object} targetOrType
+   * @param  {string|Array|Element|Object} targetOrType
    *         If this is a string or array, it represents an event type(s) and
-   *         the listener will be bound to this object.
+   *         the listener will listen for events on this object.
    *
    *         Another evented object can be passed here instead, which will
-   *         bind a listener to the given event(s) being triggered on THAT
-   *         object.
+   *         cause the listener to listen for events on THAT object.
    *
    *         In either case, the listener's `this` value will be bound to
    *         this object.
    *
-   * @param  {String|Array|Function} typeOrListener
+   * @param  {string|Array|Function} typeOrListener
    *         If the first argument was a string or array, this should be the
    *         listener function. Otherwise, this is a string or array of event
    *         type(s).
@@ -168,7 +183,7 @@ const mixin = {
    *         the listener function.
    *
    * @return {Object}
-   *         Returns the object itself.
+   *         Returns this object.
    */
   on(...args) {
     const {isTargetingSelf, target, type, listener} = normalizeListenArgs(this, args);
@@ -205,18 +220,17 @@ const mixin = {
    * Add a listener to an event (or events) on this object or another evented
    * object. The listener will only be called once and then removed.
    *
-   * @param  {String|Array|Element|Object} targetOrType
+   * @param  {string|Array|Element|Object} targetOrType
    *         If this is a string or array, it represents an event type(s) and
-   *         the listener will be bound to this object.
+   *         the listener will listen for events on this object.
    *
    *         Another evented object can be passed here instead, which will
-   *         bind a listener to the given event(s) being triggered on THAT
-   *         object.
+   *         cause the listener to listen for events on THAT object.
    *
    *         In either case, the listener's `this` value will be bound to
    *         this object.
    *
-   * @param  {String|Array|Function} typeOrListener
+   * @param  {string|Array|Function} typeOrListener
    *         If the first argument was a string or array, this should be the
    *         listener function. Otherwise, this is a string or array of event
    *         type(s).
@@ -226,7 +240,7 @@ const mixin = {
    *         the listener function.
    *
    * @return {Object}
-   *         Returns the object itself.
+   *         Returns this object.
    */
   one(...args) {
     const {isTargetingSelf, target, type, listener} = normalizeListenArgs(this, args);
@@ -252,16 +266,16 @@ const mixin = {
   },
 
   /**
-   * Removes listeners from events on an evented object.
+   * Removes listener(s) from event(s) on an evented object.
    *
-   * @param  {String|Array|Element|Object} [targetOrType]
+   * @param  {string|Array|Element|Object} [targetOrType]
    *         If this is a string or array, it represents an event type(s).
    *
    *         Another evented object can be passed here instead, in which case
    *         ALL 3 arguments are REQUIRED.
    *
-   * @param  {String|Array|Function} [typeOrListener]
-   *         If the first argument was a string or array, this should be the
+   * @param  {string|Array|Function} [typeOrListener]
+   *         If the first argument was a string or array, this may be the
    *         listener function. Otherwise, this is a string or array of event
    *         type(s).
    *
@@ -308,16 +322,16 @@ const mixin = {
   },
 
   /**
-   * Fire an event on this evented object.
+   * Fire an event on this evented object, causing its listeners to be called.
    *
-   * @param  {String|Object} event
+   * @param  {string|Object} event
    *         An event type or an object with a type property.
    *
    * @param  {Object} [hash]
    *         An additional object to pass along to listeners.
    *
    * @return {Object}
-   *         Returns the object itself.
+   *         Returns this object.
    */
   trigger(event, hash) {
     Events.trigger(this.eventBusEl_, event, hash);

@@ -32,13 +32,14 @@ const PLUGIN_CACHE_KEY = 'activePlugins_';
 const pluginStorage = {};
 
 /**
- * Reports whether or not a plugin exists in storage.
+ * Reports whether or not a plugin has been registered.
  *
  * @private
  * @param  {string} name
  *         The name of a plugin.
  *
  * @return {boolean}
+ *         Whether or not the plugin has been registered.
  */
 const pluginExists = (name) => pluginStorage.hasOwnProperty(name);
 
@@ -57,11 +58,11 @@ const getPlugin = (name) => pluginExists(name) ? pluginStorage[name] : undefined
 /**
  * Marks a plugin as "active" on a player.
  *
- * Also ensures that the player has an object for tracking active plugins.
+ * Also, ensures that the player has an object for tracking active plugins.
  *
  * @private
  * @param  {Player} player
- *         A Video.js player.
+ *         A Video.js player instance.
  *
  * @param  {string} name
  *         The name of a plugin.
@@ -76,7 +77,14 @@ const markPluginAsActive = (player, name) => {
  * on the player that the plugin has been activated.
  *
  * @private
+ * @param  {string} name
+ *         The name of the plugin.
+ *
+ * @param  {Function} plugin
+ *         The basic plugin.
+ *
  * @return {Function}
+ *         A wrapper function for the given plugin.
  */
 const createBasicPlugin = (name, plugin) => function() {
   const instance = plugin.apply(this, arguments);
@@ -99,7 +107,14 @@ const createBasicPlugin = (name, plugin) => function() {
  * sub-class of Plugin.
  *
  * @private
+ * @param  {string} name
+ *         The name of the plugin.
+ *
+ * @param  {Plugin} PluginSubClass
+ *         The class-based plugin.
+ *
  * @return {Function}
+ *         A factory function for the plugin sub-class.
  */
 const createPluginFactory = (name, PluginSubClass) => {
 
@@ -118,10 +133,10 @@ class Plugin {
   /**
    * Plugin constructor.
    *
-   * Subclasses should make sure they call `super` in order to make sure their
-   * plugins are properly initialized.
+   * Subclasses should call `super` to ensure plugins are properly initialized.
    *
    * @param {Player} player
+   *        A Video.js player instance.
    */
   constructor(player) {
     this.player = player;
@@ -143,6 +158,23 @@ class Plugin {
 
     this.on('statechanged', this.handleStateChanged);
     player.one('dispose', this.dispose);
+
+    /**
+     * Signals that a plugin (both basic and class-based) has just been set up
+     * on a player.
+     *
+     * In all cases, an object containing the following properties is passed as a
+     * second argument to event listeners:
+     *
+     * - `name`: The name of the plugin that was set up.
+     * - `plugin`: The raw plugin function.
+     * - `instance`: For class-based plugins, the instance of the plugin sub-class,
+     *   but, for basic plugins, the return value of the plugin invocation.
+     *
+     * @event pluginsetup
+     * @memberof Player
+     * @instance
+     */
     player.trigger('pluginsetup', this.getEventHash_());
   }
 
@@ -154,7 +186,11 @@ class Plugin {
    *
    * @private
    * @param  {Object} [hash={}]
+   *         An object to be used as event an event hash.
+   *
    * @return {Object}
+   *         The event hash object with, at least, the following properties:
+   *
    *         - `instance`: The plugin instance on which the event is fired.
    *         - `name`: The name of the plugin.
    *         - `plugin`: The plugin class/constructor.
@@ -173,7 +209,7 @@ class Plugin {
    *         A string (the type) or an event object with a type attribute.
    *
    * @param  {Object} [hash={}]
-   *         Additional data hash to pass along with the event. In this case,
+   *         Additional data hash to pass along with the event. For plugins,
    *         several properties are added to the hash:
    *
    *         - `instance`: The plugin instance on which the event is fired.
@@ -188,11 +224,15 @@ class Plugin {
   }
 
   /**
-   * Handles "statechange" events on the plugin. No-op by default, override by
+   * Handles "statechanged" events on the plugin. No-op by default, override by
    * subclassing.
    *
    * @param {Event} e
+   *        An event object provided by a "statechanged" event.
+   *
    * @param {Object} e.changes
+   *        An object describing changes that occurred with the "statechanged"
+   *        event.
    */
   handleStateChanged(e) {}
 
@@ -200,11 +240,18 @@ class Plugin {
    * Disposes a plugin.
    *
    * Subclasses can override this if they want, but for the sake of safety,
-   * it's probably best to subscribe to one of the disposal events.
+   * it's probably best to subscribe the "dispose" event.
    */
   dispose() {
     const {name, player} = this;
 
+    /**
+     * Signals that a class-based plugin is about to be disposed.
+     *
+     * @event dispose
+     * @memberof Plugin
+     * @instance
+     */
     this.trigger('dispose');
     this.off();
 
@@ -226,13 +273,14 @@ class Plugin {
   }
 
   /**
-   * Determines if a plugin is a "basic" plugin (i.e. not a sub-class of `Plugin`).
+   * Determines if a plugin is a basic plugin (i.e. not a sub-class of `Plugin`).
    *
    * @param  {string|Function} plugin
    *         If a string, matches the name of a plugin. If a function, will be
    *         tested directly.
    *
    * @return {boolean}
+   *         Whether or not a plugin is a basic plugin.
    */
   static isBasic(plugin) {
     const p = (typeof plugin === 'string') ? getPlugin(plugin) : plugin;
@@ -241,12 +289,19 @@ class Plugin {
   }
 
   /**
-   * Register a Video.js plugin
+   * Register a Video.js plugin.
    *
    * @param  {string} name
+   *         The name of the plugin to be registered. Must be a string and
+   *         must not match an existing plugin or a method on the `Player`
+   *         prototype.
+   *
    * @param  {Function} plugin
-   *         A sub-class of `Plugin` or an anonymous function for basic plugins.
+   *         A sub-class of `Plugin` or a function for basic plugins.
+   *
    * @return {Function}
+   *         For class-based plugins, a factory function for that plugin. For
+   *         basic plugins, a wrapper function that initializes the plugin.
    */
   static registerPlugin(name, plugin) {
     if (typeof name !== 'string') {
@@ -265,7 +320,7 @@ class Plugin {
 
     // Add a player prototype method for all sub-classed plugins (but not for
     // the base Plugin class).
-    if (name !== 'plugin') {
+    if (name !== BASE_PLUGIN_NAME) {
       if (Plugin.isBasic(plugin)) {
         Player.prototype[name] = createBasicPlugin(name, plugin);
       } else {
@@ -279,10 +334,8 @@ class Plugin {
   /**
    * De-register a Video.js plugin.
    *
-   * This is mostly used for testing, but may potentially be useful in advanced
-   * player workflows.
-   *
    * @param  {string} name
+   *         The name of the plugin to be deregistered.
    */
   static deregisterPlugin(name) {
     if (name === BASE_PLUGIN_NAME) {
@@ -300,7 +353,10 @@ class Plugin {
    * @param  {Array} [names]
    *         If provided, should be an array of plugin names. Defaults to _all_
    *         plugin names.
-   * @return {Object}
+   *
+   * @return {Object|undefined}
+   *         An object containing plugin(s) associated with their name(s) or
+   *         `undefined` if no matching plugins exist).
    */
   static getPlugins(names = Object.keys(pluginStorage)) {
     let result;
@@ -324,7 +380,7 @@ class Plugin {
    *         The name of a plugin.
    *
    * @return {Function|undefined}
-   *         The plugin (or undefined).
+   *         The plugin (or `undefined`).
    */
   static getPlugin(name) {
     return getPlugin(name);

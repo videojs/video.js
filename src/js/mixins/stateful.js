@@ -13,11 +13,12 @@ import * as Obj from '../utils/obj';
  *         be a plain object or a function returning a plain object.
  *
  * @return {Object}
- *         An object containing changes that occured. If no changes occurred,
+ *         An object containing changes that occurred. If no changes occurred,
  *         returns `undefined`.
- *
  */
 const setState = function(next) {
+
+  // Support providing the `next` state as a function.
   if (typeof next === 'function') {
     next = next();
   }
@@ -63,8 +64,14 @@ const setState = function(next) {
  * changes if the object has a `trigger` method.
  *
  * @param  {Object} target
+ *         The object to be made stateful.
+ *
+ * @param  {Object} [defaultState]
+ *         A default set of properties to populate the newly-stateful object's
+ *         `state` property.
+ *
  * @return {Object}
- *         Returns the `object`.
+ *         Returns the `target`.
  */
 function stateful(target, defaultState) {
   target.state = Obj.assign({}, defaultState);
