@@ -1445,7 +1445,7 @@ class Component {
 
       if (Player.players &&
           Object.keys(Player.players).length > 0 &&
-          Object.keys(Player.players).map((name) => Player.players[name]).every(Boolean)) {
+          Object.keys(Player.players).map((playerName) => Player.players[playerName]).every(Boolean)) {
         throw new Error('Can not register Player component after player has been created');
       }
     }
