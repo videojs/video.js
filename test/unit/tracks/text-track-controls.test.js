@@ -408,7 +408,8 @@ test('chapters menu should use track label as menu title', function() {
   player.controlBar.chaptersButton.update();
 
   const menu = player.controlBar.chaptersButton.menu;
-  const menuTitle = menu.contentEl().firstChild.textContent;
+  const titleEl = menu.contentEl().firstChild;
+  const menuTitle = titleEl.textContent || titleEl.innerText;
 
   equal(menuTitle, 'Test Chapters', 'menu gets track label as title');
 
