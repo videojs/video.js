@@ -144,6 +144,8 @@ QUnit.test('should get current source from source tag', function(assert) {
 
   assert.ok(player.currentSource().src === 'http://google.com');
   assert.ok(player.currentSource().type === 'video/mp4');
+
+  player.dispose();
 });
 
 QUnit.test('should get current sources from source tag', function(assert) {
@@ -172,6 +174,8 @@ QUnit.test('should get current sources from source tag', function(assert) {
   assert.ok(player.currentSources()[0].src === 'http://google.com');
   assert.ok(player.currentSources()[0].type === undefined);
   assert.ok(player.currentSources()[1] === undefined);
+
+  player.dispose();
 });
 
 QUnit.test('should get current source from src set', function(assert) {
@@ -208,6 +212,7 @@ QUnit.test('should get current source from src set', function(assert) {
 
   assert.ok(player.currentSource().src === 'http://google.com');
   assert.ok(player.currentSource().type === 'video/mp4');
+  player.dispose();
 });
 
 QUnit.test('should get current sources from src set', function(assert) {
@@ -255,6 +260,8 @@ QUnit.test('should get current sources from src set', function(assert) {
   assert.ok(player.currentSources()[0].src === 'http://hugo.com');
   assert.ok(player.currentSources()[0].type === undefined);
   assert.ok(player.currentSources()[1] === undefined);
+
+  player.dispose();
 });
 
 QUnit.test('should asynchronously fire error events during source selection', function(assert) {
@@ -334,6 +341,8 @@ QUnit.test('should default to 16:9 when fluid', function(assert) {
 
   // IE8 rounds 0.5625 up to 0.563
   assert.ok(((ratio >= 0.562) && (ratio <= 0.563)), 'fluid player without dimensions defaults to 16:9');
+
+  player.dispose();
 });
 
 QUnit.test('should set fluid to true if element has vjs-fluid class', function(assert) {
@@ -344,6 +353,8 @@ QUnit.test('should set fluid to true if element has vjs-fluid class', function(a
   const player = TestHelpers.makePlayer({}, tag);
 
   assert.ok(player.fluid(), 'fluid is true with vjs-fluid class');
+
+  player.dispose();
 });
 
 QUnit.test('should use an class name that begins with an alpha character', function(assert) {
