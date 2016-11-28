@@ -73,7 +73,7 @@ QUnit.test('off() errors', function(assert) {
   assert.throws(() => target.off(evented({}), 'x', null), errors.listener);
 });
 
-QUnit.test('a.on("x", fn)', function(assert) {
+QUnit.test('on() can add a listener to one event type on this object', function(assert) {
   const a = this.targets.a = evented({});
   const spy = sinon.spy();
 
@@ -86,7 +86,7 @@ QUnit.test('a.on("x", fn)', function(assert) {
   assert.strictEqual(spy.getCall(0).args[0].target, a.eventBusEl_);
 });
 
-QUnit.test('a.on(["x", "y"], fn)', function(assert) {
+QUnit.test('on() can add a listener to an array of event types on this object', function(assert) {
   const a = this.targets.a = evented({});
   const spy = sinon.spy();
 
@@ -103,7 +103,7 @@ QUnit.test('a.on(["x", "y"], fn)', function(assert) {
   assert.strictEqual(spy.getCall(1).args[0].target, a.eventBusEl_);
 });
 
-QUnit.test('a.one("x", fn)', function(assert) {
+QUnit.test('one() can add a listener to one event type on this object', function(assert) {
   const a = this.targets.a = evented({});
   const spy = sinon.spy();
 
@@ -117,7 +117,7 @@ QUnit.test('a.one("x", fn)', function(assert) {
   assert.strictEqual(spy.getCall(0).args[0].target, a.eventBusEl_);
 });
 
-QUnit.test('a.one(["x", "y"], fn)', function(assert) {
+QUnit.test('one() can add a listener to an array of event types on this object', function(assert) {
   const a = this.targets.a = evented({});
   const spy = sinon.spy();
 
@@ -136,7 +136,7 @@ QUnit.test('a.one(["x", "y"], fn)', function(assert) {
   assert.strictEqual(spy.getCall(1).args[0].target, a.eventBusEl_);
 });
 
-QUnit.test('a.on(b, "x", fn)', function(assert) {
+QUnit.test('on() can add a listener to one event type on a different target object', function(assert) {
   const a = this.targets.a = evented({});
   const b = this.targets.b = evented({});
   const spy = sinon.spy();
@@ -153,7 +153,7 @@ QUnit.test('a.on(b, "x", fn)', function(assert) {
   assert.strictEqual(spy.getCall(0).args[0].target, b.eventBusEl_);
 });
 
-QUnit.test('a.on(b, ["x", "y"], fn)', function(assert) {
+QUnit.test('on() can add a listener to an array of event types on a different target object', function(assert) {
   const a = this.targets.a = evented({});
   const b = this.targets.b = evented({});
   const spy = sinon.spy();
@@ -175,7 +175,7 @@ QUnit.test('a.on(b, ["x", "y"], fn)', function(assert) {
   assert.strictEqual(spy.getCall(1).args[0].target, b.eventBusEl_);
 });
 
-QUnit.test('a.one(b, "x", fn)', function(assert) {
+QUnit.test('one() can add a listener to one event type on a different target object', function(assert) {
   const a = this.targets.a = evented({});
   const b = this.targets.b = evented({});
   const spy = sinon.spy();
@@ -194,7 +194,7 @@ QUnit.test('a.one(b, "x", fn)', function(assert) {
 
 // The behavior here unfortunately differs from the identical case where "a"
 // listens to itself. This is something that should be resolved...
-QUnit.test('a.one(b, ["x", "y"], fn)', function(assert) {
+QUnit.test('one() can add a listener to an array of event types on a different target object', function(assert) {
   const a = this.targets.a = evented({});
   const b = this.targets.b = evented({});
   const spy = sinon.spy();
@@ -215,7 +215,7 @@ QUnit.test('a.one(b, ["x", "y"], fn)', function(assert) {
   assert.strictEqual(spy.getCall(0).args[0].target, b.eventBusEl_);
 });
 
-QUnit.test('a.off()', function(assert) {
+QUnit.test('off() with no arguments will remove all listeners from all events on this object', function(assert) {
   const a = this.targets.a = evented({});
   const spyX = sinon.spy();
   const spyY = sinon.spy();
@@ -239,7 +239,7 @@ QUnit.test('a.off()', function(assert) {
   assert.strictEqual(spyY.getCall(0).args[0].target, a.eventBusEl_);
 });
 
-QUnit.test('a.off("x")', function(assert) {
+QUnit.test('off() can remove all listeners from a single event on this object', function(assert) {
   const a = this.targets.a = evented({});
   const spyX = sinon.spy();
   const spyY = sinon.spy();
@@ -266,7 +266,7 @@ QUnit.test('a.off("x")', function(assert) {
   assert.strictEqual(spyY.getCall(1).args[0].target, a.eventBusEl_);
 });
 
-QUnit.test('a.off("x", fn)', function(assert) {
+QUnit.test('off() can remove a listener from a single event on this object', function(assert) {
   const a = this.targets.a = evented({});
   const spyX1 = sinon.spy();
   const spyX2 = sinon.spy();
@@ -303,7 +303,7 @@ QUnit.test('a.off("x", fn)', function(assert) {
   assert.strictEqual(spyY.getCall(1).args[0].target, a.eventBusEl_);
 });
 
-QUnit.test('a.off(b, "x", fn)', function(assert) {
+QUnit.test('off() can remove a listener from a single event on a different target object', function(assert) {
   const a = this.targets.a = evented({});
   const b = this.targets.b = evented({});
   const spy = sinon.spy();
@@ -319,7 +319,7 @@ QUnit.test('a.off(b, "x", fn)', function(assert) {
   assert.strictEqual(spy.getCall(0).args[0].target, b.eventBusEl_);
 });
 
-QUnit.test('a.off(b, ["x", "y"], fn)', function(assert) {
+QUnit.test('off() can remove a listener from an array of events on a different target object', function(assert) {
   const a = this.targets.a = evented({});
   const b = this.targets.b = evented({});
   const spy = sinon.spy();
