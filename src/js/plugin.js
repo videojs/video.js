@@ -145,7 +145,11 @@ class Plugin {
       throw new Error('Plugin must be sub-classed; not directly instantiated');
     }
 
-    evented(this, {exclude: ['trigger']});
+    // Make this object evented, but remove the added `trigger` method so we
+    // use the prototype version instead.
+    evented(this);
+    delete this.trigger;
+
     stateful(this, this.constructor.defaultState);
     markPluginAsActive(player, this.name);
 

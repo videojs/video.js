@@ -351,9 +351,6 @@ const mixin = {
  * @param  {Object} [options]
  *         Options for customizing the mixin behavior.
  *
- * @param  {Array} [options.exclude=[]]
- *         An array of methods to exclude from addition to the object.
- *
  * @param  {String} [options.eventBusKey]
  *         By default, adds a `eventBusEl_` DOM element to the target object,
  *         which is used as an event bus. If the target object already has a
@@ -363,7 +360,7 @@ const mixin = {
  *         The target object.
  */
 function evented(target, options = {}) {
-  const {exclude, eventBusKey} = options;
+  const {eventBusKey} = options;
 
   // Set or create the eventBusEl_.
   if (eventBusKey) {
@@ -375,12 +372,9 @@ function evented(target, options = {}) {
     target.eventBusEl_ = Dom.createEl('span', {className: 'vjs-event-bus'});
   }
 
-  // Add the mixin methods with whichever exclusions were requested.
-  ['off', 'on', 'one', 'trigger']
-    .filter(name => !exclude || exclude.indexOf(name) === -1)
-    .forEach(name => {
-      target[name] = Fn.bind(target, mixin[name]);
-    });
+  ['off', 'on', 'one', 'trigger'].forEach(name => {
+    target[name] = Fn.bind(target, mixin[name]);
+  });
 
   // When any evented object is disposed, it removes all its listeners.
   target.on('dispose', () => target.off());

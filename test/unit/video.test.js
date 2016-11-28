@@ -166,7 +166,6 @@ QUnit.test('should add the value to the languages object with lower case lang co
 
 QUnit.test('should expose plugin functions', function(assert) {
   assert.strictEqual(typeof videojs.registerPlugin, 'function');
-  assert.strictEqual(typeof videojs.registerPlugins, 'function');
   assert.strictEqual(typeof videojs.plugin, 'function');
   assert.strictEqual(typeof videojs.getPlugins, 'function');
   assert.strictEqual(typeof videojs.getPlugin, 'function');

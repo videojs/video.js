@@ -15,7 +15,7 @@ QUnit.module('mixins: evented', {
   }
 });
 
-QUnit.test('evented() mutations', function(assert) {
+QUnit.test('evented() mutates an object as expected', function(assert) {
   const target = this.targets.a = {};
 
   assert.strictEqual(typeof evented, 'function', 'the mixin is a function');
@@ -26,15 +26,6 @@ QUnit.test('evented() mutations', function(assert) {
   assert.strictEqual(typeof target.off, 'function', 'the target has an off method');
   assert.strictEqual(typeof target.on, 'function', 'the target has an on method');
   assert.strictEqual(typeof target.one, 'function', 'the target has a one method');
-  assert.strictEqual(typeof target.trigger, 'function', 'the target has a trigger method');
-});
-
-QUnit.test('evented() with exclusions', function(assert) {
-  const target = evented({}, {exclude: ['one']});
-
-  assert.strictEqual(typeof target.off, 'function', 'the target has an off method');
-  assert.strictEqual(typeof target.on, 'function', 'the target has an on method');
-  assert.notStrictEqual(typeof target.one, 'function', 'the target DOES NOT have a one method');
   assert.strictEqual(typeof target.trigger, 'function', 'the target has a trigger method');
 });
 
