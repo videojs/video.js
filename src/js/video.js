@@ -347,26 +347,25 @@ videojs.mergeOptions = mergeOptions;
 videojs.bind = Fn.bind;
 
 /**
- * Register a Video.js plugin
+ * Register a Video.js plugin.
  *
  * @borrows plugin:registerPlugin as videojs.registerPlugin
- * @param {String} name The plugin name
- * @param {Function} plugin A sub-class of `Plugin` or an anonymous function for basic plugins.
  * @mixes videojs
  * @method registerPlugin
- */
-videojs.registerPlugin = (name, plugin) => Plugin.registerPlugin(name, plugin);
-
-/**
- * Register multiple Video.js plugins via an object where the keys are
- * plugin names and the values are sub-classes of `Plugin` or anonymous
- * functions for basic plugins.
  *
- * @param  {Object} plugins
- * @return {Object}
- *         An object containing plugins that were added.
+ * @param  {string} name
+ *         The name of the plugin to be registered. Must be a string and
+ *         must not match an existing plugin or a method on the `Player`
+ *         prototype.
+ *
+ * @param  {Function} plugin
+ *         A sub-class of `Plugin` or a function for basic plugins.
+ *
+ * @return {Function}
+ *         For class-based plugins, a factory function for that plugin. For
+ *         basic plugins, a wrapper function that initializes the plugin.
  */
-videojs.registerPlugins = (plugins) => Plugin.registerPlugins(plugins);
+videojs.registerPlugin = Plugin.registerPlugin;
 
 /**
  * Deprecated method to register a plugin with Video.js
@@ -374,7 +373,7 @@ videojs.registerPlugins = (plugins) => Plugin.registerPlugins(plugins);
  * @deprecated
  *        videojs.plugin() is deprecated; use videojs.registerPlugin() instead
  *
- * @param {String} name
+ * @param {string} name
  *        The plugin name
  *
  * @param {Plugin|Function} plugin
@@ -386,28 +385,39 @@ videojs.plugin = (name, plugin) => {
 };
 
 /**
- * Get an object containing all available plugins.
+ * Gets an object containing multiple Video.js plugins.
  *
- * @return {Object}
+ * @param  {Array} [names]
+ *         If provided, should be an array of plugin names. Defaults to _all_
+ *         plugin names.
+ *
+ * @return {Object|undefined}
+ *         An object containing plugin(s) associated with their name(s) or
+ *         `undefined` if no matching plugins exist).
  */
-videojs.getPlugins = () => Plugin.getPlugins();
+videojs.getPlugins = Plugin.getPlugins;
 
 /**
- * Get a single plugin by name.
+ * Gets a plugin by name if it exists.
  *
- * @param  {String} name
- * @return {Plugin|Function}
+ * @param  {string} name
+ *         The name of a plugin.
+ *
+ * @return {Function|undefined}
+ *         The plugin (or `undefined`).
  */
-videojs.getPlugin = (name) => Plugin.getPlugin(name);
+videojs.getPlugin = Plugin.getPlugin;
 
 /**
- * Get the version - if known - of a plugin by name.
+ * Gets a plugin's version, if available
  *
- * @param  {String} name
- * @return {String}
- *         If the version is not known, returns an empty string.
+ * @param  {string} name
+ *         The name of a plugin.
+ *
+ * @return {string}
+ *         The plugin's version or an empty string.
  */
-videojs.getPluginVersion = (name) => Plugin.getPluginVersion(name);
+videojs.getPluginVersion = Plugin.getPluginVersion;
 
 /**
  * Adding languages so that they're available to all players.

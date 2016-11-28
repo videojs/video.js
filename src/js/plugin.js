@@ -44,7 +44,7 @@ const pluginStorage = {};
 const pluginExists = (name) => pluginStorage.hasOwnProperty(name);
 
 /**
- * Get a plugin from storage.
+ * Get a single registered plugin by name.
  *
  * @private
  * @param  {string} name
