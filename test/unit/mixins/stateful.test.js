@@ -6,7 +6,7 @@ import * as Obj from '../../../src/js/utils/obj';
 
 QUnit.module('mixins: stateful');
 
-QUnit.test('stateful() mutations', function(assert) {
+QUnit.test('stateful() mutates an object as expected', function(assert) {
   const target = {};
 
   assert.strictEqual(typeof stateful, 'function', 'the mixin is a function');
@@ -18,13 +18,19 @@ QUnit.test('stateful() mutations', function(assert) {
   assert.strictEqual(typeof target.setState, 'function', 'the target has a setState method');
 });
 
-QUnit.test('stateful() with defaults', function(assert) {
+QUnit.test('stateful() with default state passed in', function(assert) {
   const target = stateful({}, {foo: 'bar'});
 
   assert.strictEqual(target.state.foo, 'bar', 'the default properties are added to the state');
 });
 
-QUnit.test('setState()', function(assert) {
+QUnit.test('stateful() without default state passed in', function(assert) {
+  const target = stateful({});
+
+  assert.strictEqual(Object.keys(target.state).length, 0, 'no default properties are added to the state');
+});
+
+QUnit.test('setState() works as expected', function(assert) {
   const target = stateful(new EventTarget(), {foo: 'bar', abc: 'xyz'});
   const spy = sinon.spy();
 
@@ -52,7 +58,7 @@ QUnit.test('setState()', function(assert) {
   assert.strictEqual(event.changes, changes, 'the changes object is sent along with the event');
 });
 
-QUnit.test('setState() without changes', function(assert) {
+QUnit.test('setState() without changes does not trigger the "statechanged" event', function(assert) {
   const target = stateful(new EventTarget(), {foo: 'bar'});
   const spy = sinon.spy();
 
