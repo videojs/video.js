@@ -1443,7 +1443,9 @@ class Component {
     if (name === 'Player' && Component.components_[name]) {
       const Player = Component.components_[name];
 
-      if (Player.players && Object.keys(Player.players).length > 0) {
+      if (Player.players &&
+          Object.keys(Player.players).length > 0 &&
+          Object.keys(Player.players).map((name) => Player.players[name]).every(Boolean)) {
         throw new Error('Can not register Player component after player has been created');
       }
     }
