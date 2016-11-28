@@ -436,7 +436,11 @@ test('chapters should be displayed when remote track added and load event fired'
 
   equal(chaptersEl.track.cues.length, 2);
 
-  TestHelpers.triggerDomEvent(chaptersEl, 'load');
+  if (player.tech_.featuresNativeTextTracks) {
+    TestHelpers.triggerDomEvent(chaptersEl, 'load');
+  } else {
+    chaptersEl.trigger('load');
+  }
 
   ok(!player.controlBar.chaptersButton.hasClass('vjs-hidden'), 'chapters menu is displayed');
 
