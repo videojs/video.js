@@ -4,6 +4,13 @@ import evented from '../../../src/js/mixins/evented';
 import * as Dom from '../../../src/js/utils/dom';
 import * as Obj from '../../../src/js/utils/obj';
 
+// Common errors thrown by evented objects.
+const errors = {
+  type: new Error('invalid event type; must be a non-empty string or array'),
+  listener: new Error('invalid listener; must be a function'),
+  target: new Error('invalid target; must be a DOM node or evented object')
+};
+
 QUnit.module('mixins: evented', {
 
   beforeEach() {
@@ -35,106 +42,23 @@ QUnit.test('evented() with custom element', function(assert) {
   assert.strictEqual(target.eventBusEl_, target.foo, 'the custom DOM element is re-used');
 
   assert.throws(
-    function() {
-      evented({foo: {}}, {eventBusKey: 'foo'});
-    },
+    () => evented({foo: {}}, {eventBusKey: 'foo'}),
     new Error('eventBusKey "foo" does not refer to an element'),
     'throws if the target does not have an element at the supplied key'
   );
 });
 
-QUnit.test('on() errors', function(assert) {
+QUnit.test('on() and one() errors', function(assert) {
   const target = this.targets.a = evented({});
 
-  assert.throws(
-    function() {
-      target.on();
-    },
-    new Error('invalid event type; must be a non-empty string or array')
-  );
-
-  assert.throws(
-    function() {
-      target.on('   ');
-    },
-    new Error('invalid event type; must be a non-empty string or array')
-  );
-
-  assert.throws(
-    function() {
-      target.on([]);
-    },
-    new Error('invalid event type; must be a non-empty string or array'),
-    ''
-  );
-
-  assert.throws(
-    function() {
-      target.on('x');
-    },
-    new Error('invalid listener; must be a function')
-  );
-
-  assert.throws(
-    function() {
-      target.on({}, 'x', () => {});
-    },
-    new Error('invalid target; must be a DOM node or evented object')
-  );
-
-  assert.throws(
-    function() {
-      target.on(evented({}), 'x', null);
-    },
-    new Error('invalid listener; must be a function')
-  );
-});
-
-QUnit.test('one() errors', function(assert) {
-  const target = this.targets.a = evented({});
-
-  assert.throws(
-    function() {
-      target.one();
-    },
-    new Error('invalid event type; must be a non-empty string or array')
-  );
-
-  assert.throws(
-    function() {
-      target.one('   ');
-    },
-    new Error('invalid event type; must be a non-empty string or array')
-  );
-
-  assert.throws(
-    function() {
-      target.one([]);
-    },
-    new Error('invalid event type; must be a non-empty string or array'),
-    ''
-  );
-
-  assert.throws(
-    function() {
-      target.one('x');
-    },
-    new Error('invalid listener; must be a function')
-  );
-
-  assert.throws(
-    function() {
-      target.one({}, 'x', () => {});
-    },
-    new Error('invalid target; must be a DOM node or evented object')
-  );
-
-  assert.throws(
-    function() {
-      target.one(evented({}), 'x', null);
-    },
-    new Error('invalid listener; must be a function')
-  );
+  ['on', 'one'].forEach(method => {
+    assert.throws(() => target[method](), errors.type);
+    assert.throws(() => target[method]('   '), errors.type);
+    assert.throws(() => target[method]([]), errors.type);
+    assert.throws(() => target[method]('x'), errors.listener);
+    assert.throws(() => target[method]({}, 'x', () => {}), errors.target);
+    assert.throws(() => target[method](evented({}), 'x', null), errors.listener);
+  });
 });
 
 QUnit.test('off() errors', function(assert) {
@@ -142,40 +66,11 @@ QUnit.test('off() errors', function(assert) {
 
   // An invalid event actually causes an invalid target error because it
   // gets passed into code that assumes the first argument is the target.
-  assert.throws(
-    function() {
-      target.off([]);
-    },
-    new Error('invalid target; must be a DOM node or evented object')
-  );
-
-  assert.throws(
-    function() {
-      target.off({}, 'x', () => {});
-    },
-    new Error('invalid target; must be a DOM node or evented object')
-  );
-
-  assert.throws(
-    function() {
-      target.off(evented({}), '', () => {});
-    },
-    new Error('invalid event type; must be a non-empty string or array')
-  );
-
-  assert.throws(
-    function() {
-      target.off(evented({}), [], () => {});
-    },
-    new Error('invalid event type; must be a non-empty string or array')
-  );
-
-  assert.throws(
-    function() {
-      target.off(evented({}), 'x', null);
-    },
-    new Error('invalid listener; must be a function')
-  );
+  assert.throws(() => target.off([]), errors.target);
+  assert.throws(() => target.off({}, 'x', () => {}), errors.target);
+  assert.throws(() => target.off(evented({}), '', () => {}), errors.type);
+  assert.throws(() => target.off(evented({}), [], () => {}), errors.type);
+  assert.throws(() => target.off(evented({}), 'x', null), errors.listener);
 });
 
 QUnit.test('a.on("x", fn)', function(assert) {
