@@ -1278,7 +1278,7 @@ QUnit.test('should not allow to register custom player when any player has been 
   const tag = TestHelpers.makeTag();
   const player = videojs(tag);
 
-  const CustomPlayer = function() {};
+  class CustomPlayer extends Player {}
 
   assert.throws(function() {
     videojs.registerComponent('Player', CustomPlayer);
