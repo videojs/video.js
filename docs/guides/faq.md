@@ -20,6 +20,23 @@ out from under a userunless there is a major version increase.
 ## Q: How can I troubleshoot playback issues?
 See the [troubleshooting guide](/docs/guides/troubleshooting.md) for information on troubleshooting playback issues
 
+## Q: A video does not play in a specific browser. Why?
+Chrome and Safari both rely on byte-range requests for playing back video. So It is important to
+Make sure that the location which is serving your video files supports byte-range requests.
+Often PHP serving video is an issue as it does not support byte-range requests by default.
+
+## Q: Why does the entire video download before playback? Why does the video load for a long time?
+This could mean that your video is not encoded with the metadata -- things like duration,
+video dimensions, etc -- at the beginning of the video. This means that the browser will
+need to load the entire video before it know how long the video is and what to do with
+the video.
+
+## Q: I see an error thrown that mentions `vdata12345`. What is that?
+This error is thrown when an element that is associated with a component is removed
+from the DOM but the event handlers associated with the element are not removed. This
+is almost always due to event listeners not being disposed when dispose is called on
+a component.
+
 ## Q: What media formats does video.js support?
 This depends on the browsers support, video.js will work off of that. If Flash is
 avialable Flash videos can also be played but only if the Flash tech is included with
