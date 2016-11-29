@@ -109,6 +109,13 @@
       "steps": [
         { "include": "update remote patch" }
       ]
+    },
+    "patch": {
+      "steps": [
+        [ "git checkout patch",      "Switch to the patch branch" ],
+        [ "git pull upstream patch", "Get any changes to stable in the main project" ],
+        [ "git push origin patch",   "Push any changes to your copy of the main project" ]
+      ]
     }
   },
 
@@ -437,6 +444,54 @@
         [ "git push upstream {{pr.base.ref}}",                                 "Push the changes to the main project" ],
         [ "git branch -D {{pr.user.login}}/{{pr.head.ref}}",                   "Delete the local branch used for merging" ]
       ]
+    }
+  },
+
+  "stage": {
+    "patch": {
+      "release_type": "patch",
+      "description": "Get the repo ready for releasing a patch",
+      "steps": [
+        { "include": "update stable" },
+        { "include": "update patch" },
+        [ "git merge stable", "Merge stable into patch to stage patch release" ],
+        [ "git push upstream path", "Push upstream to trigger patch release" ],
+        [ "git push origin path", "Update origin" ]
+      ]
+    }
+  },
+  "codeship": {
+    "run": {
+      "steps": [
+        { "include": "branch check" },
+
+        [ "git checkout stable", "Switch to the release branch" ],
+        [ "git pull origin stable", "Get any changes on the release branch" ],
+
+        [ "npm install",                               "Ensure dependency updates have been installed" ],
+        [ "grunt test",                                "Run tests" ],
+        [ "grunt version:{{release_type}}",            "Bump package versions" ],
+        [ "./build/bin/version",                       "Return the current VJS Version from the package.json file", "version" ],
+        [ "grunt chg-release:{{version}}",             "Update the changelog with the new release" ],
+        [ "git commit -am 'v{{version}}'",             "Add and commit the package changes" ],
+        [ "git push origin stable",                  "Push the release branch changes to the repo" ],
+        [ "git checkout -b temp-release-branch master","Create a temporary branch for the dist" ],
+        [ "grunt dist",                                "Build the dist" ],
+        [ "git add dist --force",                      "Add the (otherwise ignored) release files" ],
+        [ "git commit -m 'v{{version}} dist'",         "Commit the dist changes" ],
+        [ "git tag -a v{{version}} -m 'v{{version}}'", "Tag the release" ],
+        [ "git push origin --tags",                  "Push the new tag to the repo" ],
+        [ "npm publish",                               "Publish to npm" ],
+        [ "grunt github-release",                      "Create a new release on Github" ],
+        [ "git checkout stable",                       "Checkout the developmet branch" ],
+        [ "git branch -D temp-release-branch",         "Delete the temp release branch" ]
+      ]
+    },
+
+    "patch": {
+      "release_type": "patch",
+      "description": "Create a patch release from the release branch (stable) on codeship",
+      "steps": [{ "include": "codeship run" }]
     }
   }
 }
