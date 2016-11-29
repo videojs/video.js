@@ -409,6 +409,13 @@ class Plugin {
 Plugin.registerPlugin(BASE_PLUGIN_NAME, Plugin);
 
 /**
+ * The name of the base plugin class as it is registered.
+ *
+ * @type {string}
+ */
+Plugin.BASE_PLUGIN_NAME = BASE_PLUGIN_NAME;
+
+/**
  * Documented in player.js
  *
  * @ignore

@@ -11,6 +11,19 @@ const errors = {
   target: new Error('invalid target; must be a DOM node or evented object')
 };
 
+const validateListenerCall = (call, thisValue, eventExpectation) => {
+  const eventActual = call.args[0];
+
+  QUnit.assert.strictEqual(call.thisValue, thisValue, 'the listener had the expected "this" value');
+  QUnit.assert.strictEqual(typeof eventActual, 'object', 'the listener was passed an event object');
+
+  // We don't use `deepEqual` here because we only want to test a subset of
+  // properties (designated by the `eventExpectation`).
+  Object.keys(eventExpectation).forEach(key => {
+    QUnit.assert.strictEqual(eventActual[key], eventExpectation[key], `the event had the expected "${key}"`);
+  });
+};
+
 QUnit.module('mixins: evented', {
 
   beforeEach() {
@@ -52,12 +65,12 @@ QUnit.test('on() and one() errors', function(assert) {
   const target = this.targets.a = evented({});
 
   ['on', 'one'].forEach(method => {
-    assert.throws(() => target[method](), errors.type);
-    assert.throws(() => target[method]('   '), errors.type);
-    assert.throws(() => target[method]([]), errors.type);
-    assert.throws(() => target[method]('x'), errors.listener);
-    assert.throws(() => target[method]({}, 'x', () => {}), errors.target);
-    assert.throws(() => target[method](evented({}), 'x', null), errors.listener);
+    assert.throws(() => target[method](), errors.type, 'the expected error is thrown');
+    assert.throws(() => target[method]('   '), errors.type, 'the expected error is thrown');
+    assert.throws(() => target[method]([]), errors.type, 'the expected error is thrown');
+    assert.throws(() => target[method]('x'), errors.listener, 'the expected error is thrown');
+    assert.throws(() => target[method]({}, 'x', () => {}), errors.target, 'the expected error is thrown');
+    assert.throws(() => target[method](evented({}), 'x', null), errors.listener, 'the expected error is thrown');
   });
 });
 
@@ -66,11 +79,11 @@ QUnit.test('off() errors', function(assert) {
 
   // An invalid event actually causes an invalid target error because it
   // gets passed into code that assumes the first argument is the target.
-  assert.throws(() => target.off([]), errors.target);
-  assert.throws(() => target.off({}, 'x', () => {}), errors.target);
-  assert.throws(() => target.off(evented({}), '', () => {}), errors.type);
-  assert.throws(() => target.off(evented({}), [], () => {}), errors.type);
-  assert.throws(() => target.off(evented({}), 'x', null), errors.listener);
+  assert.throws(() => target.off([]), errors.target, 'the expected error is thrown');
+  assert.throws(() => target.off({}, 'x', () => {}), errors.target, 'the expected error is thrown');
+  assert.throws(() => target.off(evented({}), '', () => {}), errors.type, 'the expected error is thrown');
+  assert.throws(() => target.off(evented({}), [], () => {}), errors.type, 'the expected error is thrown');
+  assert.throws(() => target.off(evented({}), 'x', null), errors.listener, 'the expected error is thrown');
 });
 
 QUnit.test('on() can add a listener to one event type on this object', function(assert) {
@@ -80,10 +93,12 @@ QUnit.test('on() can add a listener to one event type on this object', function(
   a.on('x', spy);
   a.trigger('x');
 
-  assert.strictEqual(spy.callCount, 1);
-  assert.strictEqual(spy.getCall(0).thisValue, a);
-  assert.strictEqual(spy.getCall(0).args[0].type, 'x');
-  assert.strictEqual(spy.getCall(0).args[0].target, a.eventBusEl_);
+  assert.strictEqual(spy.callCount, 1, 'the listener was called the expected number of times');
+
+  validateListenerCall(spy.getCall(0), a, {
+    type: 'x',
+    target: a.eventBusEl_
+  });
 });
 
 QUnit.test('on() can add a listener to an array of event types on this object', function(assert) {
@@ -94,13 +109,17 @@ QUnit.test('on() can add a listener to an array of event types on this object', 
   a.trigger('x');
   a.trigger('y');
 
-  assert.strictEqual(spy.callCount, 2);
-  assert.strictEqual(spy.getCall(0).thisValue, a);
-  assert.strictEqual(spy.getCall(0).args[0].type, 'x');
-  assert.strictEqual(spy.getCall(0).args[0].target, a.eventBusEl_);
-  assert.strictEqual(spy.getCall(1).thisValue, a);
-  assert.strictEqual(spy.getCall(1).args[0].type, 'y');
-  assert.strictEqual(spy.getCall(1).args[0].target, a.eventBusEl_);
+  assert.strictEqual(spy.callCount, 2, 'the listener was called the expected number of times');
+
+  validateListenerCall(spy.getCall(0), a, {
+    type: 'x',
+    target: a.eventBusEl_
+  });
+
+  validateListenerCall(spy.getCall(1), a, {
+    type: 'y',
+    target: a.eventBusEl_
+  });
 });
 
 QUnit.test('one() can add a listener to one event type on this object', function(assert) {
@@ -111,10 +130,12 @@ QUnit.test('one() can add a listener to one event type on this object', function
   a.trigger('x');
   a.trigger('x');
 
-  assert.strictEqual(spy.callCount, 1);
-  assert.strictEqual(spy.getCall(0).thisValue, a);
-  assert.strictEqual(spy.getCall(0).args[0].type, 'x');
-  assert.strictEqual(spy.getCall(0).args[0].target, a.eventBusEl_);
+  assert.strictEqual(spy.callCount, 1, 'the listener was called the expected number of times');
+
+  validateListenerCall(spy.getCall(0), a, {
+    type: 'x',
+    target: a.eventBusEl_
+  });
 });
 
 QUnit.test('one() can add a listener to an array of event types on this object', function(assert) {
@@ -127,13 +148,17 @@ QUnit.test('one() can add a listener to an array of event types on this object',
   a.trigger('x');
   a.trigger('y');
 
-  assert.strictEqual(spy.callCount, 2);
-  assert.strictEqual(spy.getCall(0).thisValue, a);
-  assert.strictEqual(spy.getCall(0).args[0].type, 'x');
-  assert.strictEqual(spy.getCall(0).args[0].target, a.eventBusEl_);
-  assert.strictEqual(spy.getCall(1).thisValue, a);
-  assert.strictEqual(spy.getCall(1).args[0].type, 'y');
-  assert.strictEqual(spy.getCall(1).args[0].target, a.eventBusEl_);
+  assert.strictEqual(spy.callCount, 2, 'the listener was called the expected number of times');
+
+  validateListenerCall(spy.getCall(0), a, {
+    type: 'x',
+    target: a.eventBusEl_
+  });
+
+  validateListenerCall(spy.getCall(1), a, {
+    type: 'y',
+    target: a.eventBusEl_
+  });
 });
 
 QUnit.test('on() can add a listener to one event type on a different target object', function(assert) {
@@ -147,10 +172,12 @@ QUnit.test('on() can add a listener to one event type on a different target obje
   // Make sure we aren't magically binding a listener to "a".
   a.trigger('x');
 
-  assert.strictEqual(spy.callCount, 1);
-  assert.strictEqual(spy.getCall(0).thisValue, a);
-  assert.strictEqual(spy.getCall(0).args[0].type, 'x');
-  assert.strictEqual(spy.getCall(0).args[0].target, b.eventBusEl_);
+  assert.strictEqual(spy.callCount, 1, 'the listener was called the expected number of times');
+
+  validateListenerCall(spy.getCall(0), a, {
+    type: 'x',
+    target: b.eventBusEl_
+  });
 });
 
 QUnit.test('on() can add a listener to an array of event types on a different target object', function(assert) {
@@ -166,13 +193,17 @@ QUnit.test('on() can add a listener to an array of event types on a different ta
   a.trigger('x');
   a.trigger('y');
 
-  assert.strictEqual(spy.callCount, 2);
-  assert.strictEqual(spy.getCall(0).thisValue, a);
-  assert.strictEqual(spy.getCall(0).args[0].type, 'x');
-  assert.strictEqual(spy.getCall(0).args[0].target, b.eventBusEl_);
-  assert.strictEqual(spy.getCall(1).thisValue, a);
-  assert.strictEqual(spy.getCall(1).args[0].type, 'y');
-  assert.strictEqual(spy.getCall(1).args[0].target, b.eventBusEl_);
+  assert.strictEqual(spy.callCount, 2, 'the listener was called the expected number of times');
+
+  validateListenerCall(spy.getCall(0), a, {
+    type: 'x',
+    target: b.eventBusEl_
+  });
+
+  validateListenerCall(spy.getCall(1), a, {
+    type: 'y',
+    target: b.eventBusEl_
+  });
 });
 
 QUnit.test('one() can add a listener to one event type on a different target object', function(assert) {
@@ -186,10 +217,12 @@ QUnit.test('one() can add a listener to one event type on a different target obj
   // Make sure we aren't magically binding a listener to "a".
   a.trigger('x');
 
-  assert.strictEqual(spy.callCount, 1);
-  assert.strictEqual(spy.getCall(0).thisValue, a);
-  assert.strictEqual(spy.getCall(0).args[0].type, 'x');
-  assert.strictEqual(spy.getCall(0).args[0].target, b.eventBusEl_);
+  assert.strictEqual(spy.callCount, 1, 'the listener was called the expected number of times');
+
+  validateListenerCall(spy.getCall(0), a, {
+    type: 'x',
+    target: b.eventBusEl_
+  });
 });
 
 // The behavior here unfortunately differs from the identical case where "a"
@@ -209,10 +242,12 @@ QUnit.test('one() can add a listener to an array of event types on a different t
   a.trigger('x');
   a.trigger('y');
 
-  assert.strictEqual(spy.callCount, 1);
-  assert.strictEqual(spy.getCall(0).thisValue, a);
-  assert.strictEqual(spy.getCall(0).args[0].type, 'x');
-  assert.strictEqual(spy.getCall(0).args[0].target, b.eventBusEl_);
+  assert.strictEqual(spy.callCount, 1, 'the listener was called the expected number of times');
+
+  validateListenerCall(spy.getCall(0), a, {
+    type: 'x',
+    target: b.eventBusEl_
+  });
 });
 
 QUnit.test('off() with no arguments will remove all listeners from all events on this object', function(assert) {
@@ -228,15 +263,19 @@ QUnit.test('off() with no arguments will remove all listeners from all events on
   a.trigger('x');
   a.trigger('y');
 
-  assert.strictEqual(spyX.callCount, 1);
-  assert.strictEqual(spyX.getCall(0).thisValue, a);
-  assert.strictEqual(spyX.getCall(0).args[0].type, 'x');
-  assert.strictEqual(spyX.getCall(0).args[0].target, a.eventBusEl_);
+  assert.strictEqual(spyX.callCount, 1, 'the listener was called the expected number of times');
 
-  assert.strictEqual(spyY.callCount, 1);
-  assert.strictEqual(spyY.getCall(0).thisValue, a);
-  assert.strictEqual(spyY.getCall(0).args[0].type, 'y');
-  assert.strictEqual(spyY.getCall(0).args[0].target, a.eventBusEl_);
+  validateListenerCall(spyX.getCall(0), a, {
+    type: 'x',
+    target: a.eventBusEl_
+  });
+
+  assert.strictEqual(spyY.callCount, 1, 'the listener was called the expected number of times');
+
+  validateListenerCall(spyY.getCall(0), a, {
+    type: 'y',
+    target: a.eventBusEl_
+  });
 });
 
 QUnit.test('off() can remove all listeners from a single event on this object', function(assert) {
@@ -252,18 +291,24 @@ QUnit.test('off() can remove all listeners from a single event on this object', 
   a.trigger('x');
   a.trigger('y');
 
-  assert.strictEqual(spyX.callCount, 1);
-  assert.strictEqual(spyX.getCall(0).thisValue, a);
-  assert.strictEqual(spyX.getCall(0).args[0].type, 'x');
-  assert.strictEqual(spyX.getCall(0).args[0].target, a.eventBusEl_);
+  assert.strictEqual(spyX.callCount, 1, 'the listener was called the expected number of times');
 
-  assert.strictEqual(spyY.callCount, 2);
-  assert.strictEqual(spyY.getCall(0).thisValue, a);
-  assert.strictEqual(spyY.getCall(0).args[0].type, 'y');
-  assert.strictEqual(spyY.getCall(0).args[0].target, a.eventBusEl_);
-  assert.strictEqual(spyY.getCall(1).thisValue, a);
-  assert.strictEqual(spyY.getCall(1).args[0].type, 'y');
-  assert.strictEqual(spyY.getCall(1).args[0].target, a.eventBusEl_);
+  validateListenerCall(spyX.getCall(0), a, {
+    type: 'x',
+    target: a.eventBusEl_
+  });
+
+  assert.strictEqual(spyY.callCount, 2, 'the listener was called the expected number of times');
+
+  validateListenerCall(spyY.getCall(0), a, {
+    type: 'y',
+    target: a.eventBusEl_
+  });
+
+  validateListenerCall(spyY.getCall(1), a, {
+    type: 'y',
+    target: a.eventBusEl_
+  });
 });
 
 QUnit.test('off() can remove a listener from a single event on this object', function(assert) {
@@ -281,26 +326,36 @@ QUnit.test('off() can remove a listener from a single event on this object', fun
   a.trigger('x');
   a.trigger('y');
 
-  assert.strictEqual(spyX1.callCount, 1);
-  assert.strictEqual(spyX1.getCall(0).thisValue, a);
-  assert.strictEqual(spyX1.getCall(0).args[0].type, 'x');
-  assert.strictEqual(spyX1.getCall(0).args[0].target, a.eventBusEl_);
+  assert.strictEqual(spyX1.callCount, 1, 'the listener was called the expected number of times');
 
-  assert.strictEqual(spyX2.callCount, 2);
-  assert.strictEqual(spyX2.getCall(0).thisValue, a);
-  assert.strictEqual(spyX2.getCall(0).args[0].type, 'x');
-  assert.strictEqual(spyX2.getCall(0).args[0].target, a.eventBusEl_);
-  assert.strictEqual(spyX2.getCall(1).thisValue, a);
-  assert.strictEqual(spyX2.getCall(1).args[0].type, 'x');
-  assert.strictEqual(spyX2.getCall(1).args[0].target, a.eventBusEl_);
+  validateListenerCall(spyX1.getCall(0), a, {
+    type: 'x',
+    target: a.eventBusEl_
+  });
 
-  assert.strictEqual(spyY.callCount, 2);
-  assert.strictEqual(spyY.getCall(0).thisValue, a);
-  assert.strictEqual(spyY.getCall(0).args[0].type, 'y');
-  assert.strictEqual(spyY.getCall(0).args[0].target, a.eventBusEl_);
-  assert.strictEqual(spyY.getCall(1).thisValue, a);
-  assert.strictEqual(spyY.getCall(1).args[0].type, 'y');
-  assert.strictEqual(spyY.getCall(1).args[0].target, a.eventBusEl_);
+  assert.strictEqual(spyX2.callCount, 2, 'the listener was called the expected number of times');
+
+  validateListenerCall(spyX2.getCall(0), a, {
+    type: 'x',
+    target: a.eventBusEl_
+  });
+
+  validateListenerCall(spyX2.getCall(1), a, {
+    type: 'x',
+    target: a.eventBusEl_
+  });
+
+  assert.strictEqual(spyY.callCount, 2, 'the listener was called the expected number of times');
+
+  validateListenerCall(spyY.getCall(0), a, {
+    type: 'y',
+    target: a.eventBusEl_
+  });
+
+  validateListenerCall(spyY.getCall(1), a, {
+    type: 'y',
+    target: a.eventBusEl_
+  });
 });
 
 QUnit.test('off() can remove a listener from a single event on a different target object', function(assert) {
@@ -313,10 +368,12 @@ QUnit.test('off() can remove a listener from a single event on a different targe
   a.off(b, 'x', spy);
   b.trigger('x');
 
-  assert.strictEqual(spy.callCount, 1);
-  assert.strictEqual(spy.getCall(0).thisValue, a);
-  assert.strictEqual(spy.getCall(0).args[0].type, 'x');
-  assert.strictEqual(spy.getCall(0).args[0].target, b.eventBusEl_);
+  assert.strictEqual(spy.callCount, 1, 'the listener was called the expected number of times');
+
+  validateListenerCall(spy.getCall(0), a, {
+    type: 'x',
+    target: b.eventBusEl_
+  });
 });
 
 QUnit.test('off() can remove a listener from an array of events on a different target object', function(assert) {
@@ -331,11 +388,15 @@ QUnit.test('off() can remove a listener from an array of events on a different t
   b.trigger('x');
   b.trigger('y');
 
-  assert.strictEqual(spy.callCount, 2);
-  assert.strictEqual(spy.getCall(0).thisValue, a);
-  assert.strictEqual(spy.getCall(0).args[0].type, 'x');
-  assert.strictEqual(spy.getCall(0).args[0].target, b.eventBusEl_);
-  assert.strictEqual(spy.getCall(1).thisValue, a);
-  assert.strictEqual(spy.getCall(1).args[0].type, 'y');
-  assert.strictEqual(spy.getCall(1).args[0].target, b.eventBusEl_);
+  assert.strictEqual(spy.callCount, 2, 'the listener was called the expected number of times');
+
+  validateListenerCall(spy.getCall(0), a, {
+    type: 'x',
+    target: b.eventBusEl_
+  });
+
+  validateListenerCall(spy.getCall(1), a, {
+    type: 'y',
+    target: b.eventBusEl_
+  });
 });

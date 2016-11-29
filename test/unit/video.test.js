@@ -165,11 +165,15 @@ QUnit.test('should add the value to the languages object with lower case lang co
 });
 
 QUnit.test('should expose plugin functions', function(assert) {
-  assert.strictEqual(typeof videojs.registerPlugin, 'function');
-  assert.strictEqual(typeof videojs.plugin, 'function');
-  assert.strictEqual(typeof videojs.getPlugins, 'function');
-  assert.strictEqual(typeof videojs.getPlugin, 'function');
-  assert.strictEqual(typeof videojs.getPluginVersion, 'function');
+  [
+    'registerPlugin',
+    'plugin',
+    'getPlugins',
+    'getPlugin',
+    'getPluginVersion'
+  ].forEach(name => {
+    assert.strictEqual(typeof videojs[name], 'function', `videojs.${name} is a function`);
+  });
 });
 
 QUnit.test('should expose options and players properties for backward-compatibility', function(assert) {

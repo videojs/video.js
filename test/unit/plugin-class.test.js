@@ -23,71 +23,34 @@ QUnit.module('Plugin: class-based', {
 
   afterEach() {
     this.player.dispose();
-    Plugin.deregisterPlugin('mock');
+
+    Object.keys(Plugin.getPlugins()).forEach(key => {
+      if (key !== Plugin.BASE_PLUGIN_NAME) {
+        Plugin.deregisterPlugin(key);
+      }
+    });
   }
 });
 
 QUnit.test('pre-setup interface', function(assert) {
-  assert.strictEqual(
-    typeof this.player.plugin,
-    'undefined',
-    'the base Plugin does not add a method to the player'
-  );
-
-  assert.strictEqual(
-    typeof this.player.mock,
-    'function',
-    'plugins are a factory function on a player'
-  );
-
+  assert.strictEqual(typeof this.player.plugin, 'undefined', 'the base Plugin does not add a method to the player');
+  assert.strictEqual(typeof this.player.mock, 'function', 'plugins are a factory function on a player');
   assert.ok(this.player.hasPlugin('mock'), 'player has the plugin available');
-
-  assert.strictEqual(
-    this.player.mock.dispose,
-    undefined,
-    'class-based plugins are not populated on a player until the factory method creates them'
-  );
-
-  assert.notOk(this.player.usingPlugin('mock'));
+  assert.strictEqual(this.player.mock.dispose, undefined, 'class-based plugins are not populated on a player until the factory method creates them');
+  assert.notOk(this.player.usingPlugin('mock'), 'the player is not using the plugin');
 });
 
 QUnit.test('setup', function(assert) {
   const instance = this.player.mock({foo: 'bar'}, 123);
 
   assert.strictEqual(this.spy.callCount, 1, 'plugin was set up once');
-
-  assert.strictEqual(
-    this.spy.firstCall.thisValue,
-    instance,
-    'plugin constructor `this` value was the instance'
-  );
-
-  assert.deepEqual(
-    this.spy.firstCall.args,
-    [this.player, {foo: 'bar'}, 123],
-    'plugin had the correct arguments'
-  );
-
-  assert.ok(
-    this.player.usingPlugin('mock'),
-    'player now recognizes that the plugin was set up'
-  );
-
+  assert.strictEqual(this.spy.firstCall.thisValue, instance, 'plugin constructor `this` value was the instance');
+  assert.deepEqual(this.spy.firstCall.args, [this.player, {foo: 'bar'}, 123], 'plugin had the correct arguments');
+  assert.ok(this.player.usingPlugin('mock'), 'player now recognizes that the plugin was set up');
   assert.ok(this.player.hasPlugin('mock'), 'player has the plugin available');
-
-  assert.ok(
-    instance instanceof this.MockPlugin,
-    'plugin instance has the correct constructor'
-  );
-
+  assert.ok(instance instanceof this.MockPlugin, 'plugin instance has the correct constructor');
   assert.strictEqual(instance, this.player.mock, 'instance replaces the factory');
-
-  assert.strictEqual(
-    instance.player,
-    this.player,
-    'instance has a reference to the player'
-  );
-
+  assert.strictEqual(instance.player, this.player, 'instance has a reference to the player');
   assert.strictEqual(instance.name, 'mock', 'instance knows its name');
   assert.strictEqual(typeof instance.state, 'object', 'instance is stateful');
   assert.strictEqual(typeof instance.setState, 'function', 'instance is stateful');
@@ -98,11 +61,7 @@ QUnit.test('setup', function(assert) {
   assert.strictEqual(typeof instance.dispose, 'function', 'instance has dispose method');
 
   assert.throws(
-    function() {
-
-      // This needs to return so that the linter doesn't complain.
-      return new Plugin(this.player);
-    },
+    () => new Plugin(this.player),
     new Error('Plugin must be sub-classed; not directly instantiated'),
     'the Plugin class cannot be directly instantiated'
   );
@@ -112,20 +71,14 @@ QUnit.test('"pluginsetup" event', function(assert) {
   const setupSpy = sinon.spy();
 
   this.player.on('pluginsetup', setupSpy);
+
   const instance = this.player.mock();
-
-  assert.strictEqual(setupSpy.callCount, 1, 'the "pluginsetup" event was triggered');
-
   const event = setupSpy.firstCall.args[0];
   const hash = setupSpy.firstCall.args[1];
 
+  assert.strictEqual(setupSpy.callCount, 1, 'the "pluginsetup" event was triggered');
   assert.strictEqual(event.type, 'pluginsetup', 'the event has the correct type');
-
-  assert.strictEqual(
-    event.target,
-    this.player.el_,
-    'the event has the correct target'
-  );
+  assert.strictEqual(event.target, this.player.el_, 'the event has the correct target');
 
   assert.deepEqual(hash, {
     name: 'mock',
@@ -141,8 +94,7 @@ QUnit.test('defaultState static property is used to populate state', function(as
 
   const instance = this.player.dsm();
 
-  assert.deepEqual(instance.state, {foo: 1, bar: 2});
-  Plugin.deregisterPlugin('dsm');
+  assert.deepEqual(instance.state, {foo: 1, bar: 2}, 'the plugin state has default properties');
 });
 
 QUnit.test('dispose', function(assert) {
@@ -150,34 +102,16 @@ QUnit.test('dispose', function(assert) {
 
   instance.dispose();
 
-  assert.notOk(
-    this.player.usingPlugin('mock'),
-    'player recognizes that the plugin is NOT set up'
-  );
-
+  assert.notOk(this.player.usingPlugin('mock'), 'player recognizes that the plugin is NOT set up');
   assert.ok(this.player.hasPlugin('mock'), 'player still has the plugin available');
-
-  assert.strictEqual(
-    typeof this.player.mock,
-    'function',
-    'instance is replaced by factory'
-  );
-
+  assert.strictEqual(typeof this.player.mock, 'function', 'instance is replaced by factory');
   assert.notStrictEqual(instance, this.player.mock, 'instance is replaced by factory');
-
-  assert.strictEqual(
-    instance.player,
-    null,
-    'instance no longer has a reference to the player'
-  );
-
+  assert.strictEqual(instance.player, null, 'instance no longer has a reference to the player');
   assert.strictEqual(instance.state, null, 'state is now null');
 
   ['dispose', 'setState', 'off', 'on', 'one', 'trigger'].forEach(n => {
     assert.throws(
-      function() {
-        instance[n]();
-      },
+      () => instance[n](),
       new Error('cannot call methods on a disposed object'),
       `the "${n}" method now throws`
     );
@@ -197,12 +131,7 @@ QUnit.test('"dispose" event', function(assert) {
   const hash = disposeSpy.firstCall.args[1];
 
   assert.strictEqual(event.type, 'dispose', 'the event has the correct type');
-
-  assert.strictEqual(
-    event.target,
-    instance.eventBusEl_,
-    'the event has the correct target'
-  );
+  assert.strictEqual(event.target, instance.eventBusEl_, 'the event has the correct target');
 
   assert.deepEqual(hash, {
     name: 'mock',
@@ -218,18 +147,12 @@ QUnit.test('arbitrary events', function(assert) {
   instance.on('foo', fooSpy);
   instance.trigger('foo');
 
-  assert.strictEqual(fooSpy.callCount, 1, 'the "foo" event was triggered');
-
   const event = fooSpy.firstCall.args[0];
   const hash = fooSpy.firstCall.args[1];
 
+  assert.strictEqual(fooSpy.callCount, 1, 'the "foo" event was triggered');
   assert.strictEqual(event.type, 'foo', 'the event has the correct type');
-
-  assert.strictEqual(
-    event.target,
-    instance.eventBusEl_,
-    'the event has the correct target'
-  );
+  assert.strictEqual(event.target, instance.eventBusEl_, 'the event has the correct target');
 
   assert.deepEqual(hash, {
     name: 'mock',
@@ -243,7 +166,6 @@ QUnit.test('handleStateChanged() method is automatically bound to the "statechan
 
   class TestHandler extends Plugin {}
   TestHandler.prototype.handleStateChanged = spy;
-
   Plugin.registerPlugin('testHandler', TestHandler);
 
   const instance = this.player.testHandler();
@@ -252,6 +174,4 @@ QUnit.test('handleStateChanged() method is automatically bound to the "statechan
   assert.strictEqual(spy.callCount, 1, 'the handleStateChanged listener was called');
   assert.strictEqual(spy.firstCall.args[0].type, 'statechanged', 'the event was "statechanged"');
   assert.strictEqual(typeof spy.firstCall.args[0].changes, 'object', 'the event included a changes object');
-
-  Plugin.deregisterPlugin('testHandler');
 });

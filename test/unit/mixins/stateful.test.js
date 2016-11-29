@@ -54,7 +54,7 @@ QUnit.test('setState() works as expected', function(assert) {
 
   const event = spy.firstCall.args[0];
 
-  assert.strictEqual(event.type, 'statechanged');
+  assert.strictEqual(event.type, 'statechanged', 'the event had the expected type');
   assert.strictEqual(event.changes, changes, 'the changes object is sent along with the event');
 });
 
