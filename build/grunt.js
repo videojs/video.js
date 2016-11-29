@@ -264,25 +264,25 @@ module.exports = function(grunt) {
         options: {
           release: 'major'
         },
-        src: ['package.json', 'component.json']
+        src: ['package.json']
       },
       minor: {
         options: {
           release: 'minor'
         },
-        src: ['package.json', 'component.json']
+        src: ['package.json']
       },
       patch: {
         options: {
           release: 'patch'
         },
-        src: ['package.json', 'component.json']
+        src: ['package.json']
       },
       prerelease: {
         options: {
           release: 'prerelease'
         },
-        src: ['package.json', 'component.json']
+        src: ['package.json']
       },
       css: {
         options: {
