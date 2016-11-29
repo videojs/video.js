@@ -436,6 +436,10 @@ test('chapters should be displayed when remote track added and load event fired'
 
   equal(chaptersEl.track.cues.length, 2);
 
+  // Anywhere where we support using native text tracks, we can trigger a custom DOM event.
+  // On IE8 and other places where we have emulated tracks, either we cannot trigger custom
+  // DOM events (like IE8 with the custom DOM element) or we aren't using a DOM element at all.
+  // In those cases just trigger `load` directly on the chaptersEl object.
   if (player.tech_.featuresNativeTextTracks) {
     TestHelpers.triggerDomEvent(chaptersEl, 'load');
   } else {
