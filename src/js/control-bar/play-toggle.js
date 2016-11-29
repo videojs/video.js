@@ -19,6 +19,7 @@ class PlayToggle extends Button {
 
     this.on(player, 'play', this.handlePlay);
     this.on(player, 'pause', this.handlePause);
+    this.on(player, 'ended', this.handleEnded);
   }
 
   /**
