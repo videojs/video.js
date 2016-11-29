@@ -161,7 +161,7 @@ class Plugin {
     });
 
     this.on('statechanged', this.handleStateChanged);
-    player.one('dispose', this.dispose);
+    player.on('dispose', this.dispose);
 
     /**
      * Signals that a plugin (both basic and class-based) has just been set up
