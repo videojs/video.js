@@ -138,6 +138,8 @@ The registration process for class-based plugins is identical to [the process fo
 videojs.registerPlugin('examplePlugin', ExamplePlugin);
 ```
 
+> **Note:** Because ES6 classes are syntactic sugar on top of existing constructor function and prototype architecture in JavaScript, in all cases `registerPlugin`'s second argument is a function.
+
 ### Key Differences from Basic Plugins
 
 Class-based plugins have two key differences from basic plugins that are important to understand before describing their advanced features.
@@ -258,7 +260,7 @@ class Advanced extends Plugin {
   }
 
   dispose() {
-    super();
+    super.dispose();
     videojs.log('the advanced plugin is being disposed');
   }
 
