@@ -558,58 +558,58 @@ videojs.VideoTrack = VideoTrack;
  * Determines, via duck typing, whether or not a value is a DOM element.
  *
  * @borrows dom:isEl as videojs.isEl
+ * @deprecated Use videojs.dom.isEl() instead
  */
-videojs.isEl = Dom.isEl;
 
 /**
  * Determines, via duck typing, whether or not a value is a text node.
  *
  * @borrows dom:isTextNode as videojs.isTextNode
+ * @deprecated Use videojs.dom.isTextNode() instead
  */
-videojs.isTextNode = Dom.isTextNode;
 
 /**
  * Creates an element and applies properties.
  *
  * @borrows dom:createEl as videojs.createEl
+ * @deprecated Use videojs.dom.createEl() instead
  */
-videojs.createEl = Dom.createEl;
 
 /**
  * Check if an element has a CSS class
  *
  * @borrows dom:hasElClass as videojs.hasClass
+ * @deprecated Use videojs.dom.hasClass() instead
  */
-videojs.hasClass = Dom.hasElClass;
 
 /**
  * Add a CSS class name to an element
  *
  * @borrows dom:addElClass as videojs.addClass
+ * @deprecated Use videojs.dom.addClass() instead
  */
-videojs.addClass = Dom.addElClass;
 
 /**
  * Remove a CSS class name from an element
  *
  * @borrows dom:removeElClass as videojs.removeClass
+ * @deprecated Use videojs.dom.removeClass() instead
  */
-videojs.removeClass = Dom.removeElClass;
 
 /**
  * Adds or removes a CSS class name on an element depending on an optional
  * condition or the presence/absence of the class name.
  *
  * @borrows dom:toggleElClass as videojs.toggleClass
+ * @deprecated Use videojs.dom.toggleElClass() instead
  */
-videojs.toggleClass = Dom.toggleElClass;
 
 /**
  * Apply attributes to an HTML element.
  *
  * @borrows dom:setElAttributes as videojs.setAttribute
+ * @deprecated Use videojs.dom.setAttributes() instead
  */
-videojs.setAttributes = Dom.setElAttributes;
 
 /**
  * Get an element's attribute values, as defined on the HTML tag
@@ -618,15 +618,15 @@ videojs.setAttributes = Dom.setElAttributes;
  * This will return true or false for boolean attributes.
  *
  * @borrows dom:getElAttributes as videojs.getAttributes
+ * @deprecated Use videojs.dom.getAttributes() instead
  */
-videojs.getAttributes = Dom.getElAttributes;
 
 /**
  * Empties the contents of an element.
  *
  * @borrows dom:emptyEl as videojs.emptyEl
+ * @deprecated Use videojs.dom.emptyEl() instead
  */
-videojs.emptyEl = Dom.emptyEl;
 
 /**
  * Normalizes and appends content to an element.
@@ -649,8 +649,8 @@ videojs.emptyEl = Dom.emptyEl;
  *   node, or array.
  *
  * @borrows dom:appendContents as videojs.appendContet
+ * @deprecated Use videojs.dom.appendContent() instead
  */
-videojs.appendContent = Dom.appendContent;
 
 /**
  * Normalizes and inserts content into an element; this is identical to
@@ -674,8 +674,28 @@ videojs.appendContent = Dom.appendContent;
  *   node, or array.
  *
  * @borrows dom:insertContent as videojs.insertContent
+ * @deprecated Use videojs.dom.insertContent() instead
  */
-videojs.insertContent = Dom.insertContent;
+
+[
+  'isEl',
+  'isTextNode',
+  'createEl',
+  'hasClass',
+  'addClass',
+  'removeClass',
+  'toggleClass',
+  'setAttributes',
+  'getAttributes',
+  'emptyEl',
+  'appendContent',
+  'insertContent'
+].forEach(k => {
+  videojs[k] = function() {
+    log.warn(`videojs.${k}() is deprecated; use videojs.dom.${k}() instead`);
+    return Dom[k].apply(null, arguments);
+  };
+});
 
 /**
  * A safe getComputedStyle with an IE8 fallback.
